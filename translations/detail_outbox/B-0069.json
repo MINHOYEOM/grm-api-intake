@@ -1,0 +1,352 @@
+[
+  {
+    "finding_id": "finding-15cc6ddc19016cf9566b434e",
+    "finding_text_md5": "20a99c48166725efc95416a8d7e92aa5",
+    "published_date": "2017-01-27",
+    "detail_text": "Specifically, your firm does not perform an annual visual assessment of retain samples in order to detect deterioration. SOP #QAP-124-S-1012, ver 8, states that an asscssment will only be completed if described in a technical agreement with the aplicationholder. -a",
+    "detail_text_ko": "구체적으로, 귀사는 열화를 감지하기 위한 보관 시료의 연 1회 육안 평가를 수행하지 않는다. SOP #QAP-124-S-1012, ver 8 은 허가권자와의 기술 계약서에 기술된 경우에만 평가(asscssment)를 완료한다고 규정한다. -a"
+  },
+  {
+    "finding_id": "finding-15622eb85b10b9a989d012bd",
+    "finding_text_md5": "44e60aed0a0f5bd996eae5632c682632",
+    "published_date": "2017-01-27",
+    "detail_text": "Specifically, A) Your firm has not implemented a system to evaluate data from relevant process trends and quality of incoming",
+    "detail_text_ko": "구체적으로, A) 귀사는 관련 공정 추이와 입고되는 물질의 품질에 대한 데이터를 평가하는 시스템을 구축하지 않았다"
+  },
+  {
+    "finding_id": "finding-f3a8a46bfafdb114410f0f0e",
+    "finding_text_md5": "84e53091285b94ccabf06c842d810a97",
+    "published_date": "2017-01-26",
+    "detail_text": "Corrections to entries shall be dated and signed and leave the original entry still legible and preserved. Specifically, A) | did not observe Quality Unit oversight/approvals required for the destruction and incineration of documents. For example on December 7, 2015, the following records were discovered torn/shredded in the scrap yard area awaiting incineration: 5 8 e (b) (4) (b) (4) i. Raw Material label for batch dated October 30, 2015 4 ii. Maintenance Work Order Permit for repairing leakage from®)@ gasket of() 4) ocated in®) area dated November 2, 2015 iii. Engineering Contractor Hot Work Permit for dismantling and cutting unwanted line for reactors removed from production building®)@ area dated October 7, 2015 B) On December 7, 2015 during a walk-through ofthe Process Development Laboratory, an uncontrolled private/ personal diary was discovered containing experimental protocol laboratory data. The Process Development Laboratory is used to conduct experimental quality failure investigation sample preparations, route of synthesis, and scale-up process related laboratory testing. Entries in the uncontrolled private/personal diary included calculations, molecular weights and exp",
+    "detail_text_ko": "기재 내용의 정정은 날짜를 기입하고 서명해야 하며 원래 기재 내용이 계속 읽을 수 있고 보존되도록 해야 한다. 구체적으로, A) | 문서의 폐기 및 소각에 필요한 품질 부서의 감독/승인이 이루어진 것을 관찰하지 못했다. 예를 들어 2015년 12월 7일 소각 대기 중인 폐기물 야적장 구역에서 다음 기록들이 찢어지거나 파쇄된 상태로 발견되었다: 5 8 e (b) (4) (b) (4) i. 2015년 10월 30일자 원료 라벨(배치) 4 ii. 2015년 11월 2일자, ��)@ 구역에 있는 () 4) 의 ��)@ 개스킷 누출 수리를 위한 정비 작업 지시 허가서 iii. 2015년 10월 7일자, 생산동에서 철거된 반응기용 불필요한 라인의 해체 및 절단을 위한 ��)@ 구역 엔지니어링 도급업체 화기 작업 허가서 B) 2015년 12월 7일 공정개발 실험실을 둘러보던 중 실험 프로토콜 실험실 데이터가 담긴 비관리 사적/개인 일기장이 발견되었다. 공정개발 실험실은 실험적 품질 실패 조사용 시료 조제, 합성 경로, 스케일업 공정 관련 실험실 시험을 수행하는 데 사용된다. 비관리 사적/개인 일기장의 기재 내용에는 계산, 분자량 및 exp"
+  },
+  {
+    "finding_id": "finding-dfd45c6b1da320b5da2f7b7a",
+    "finding_text_md5": "f04d90aeac6b7c3280884f3f61968d40",
+    "published_date": "2017-01-26",
+    "detail_text": "The degree of analytical validation performed shall also reflect the purpose of the analysis and the stage of the API production process. Specifically, On December 8, 2015 ME ) USP Finished Active Pharmaceutical Ingredient in-house developed test method Polymorphism by X-Ray Diffraction (XRD) (MOA-300937-02-2) that is used for the identification of the finished API had not been validated. FACILITIES AND EQUIPMENT",
+    "detail_text_ko": "분석 밸리데이션의 수행 정도는 분석의 목적과 원료의약품 생산 공정의 단계도 반영해야 한다. 구체적으로, 2015년 12월 8일 ME ) USP 완제 원료의약품(API)의 확인에 사용되는 자체 개발 시험법인 X선 회절(XRD)에 의한 다형(Polymorphism) 시험법(MOA-300937-02-2)은 밸리데이션되지 않았다. FACILITIES AND EQUIPMENT"
+  },
+  {
+    "finding_id": "finding-beb55f3357cb12fd04d2bc24",
+    "finding_text_md5": "698ffcb02a0bf0fa4ac7de72b62ad430",
+    "published_date": "2017-01-26",
+    "detail_text": "Specifically, A) Prior to July 25, 2014, Quality Control Analysts had the ability to delete raw data files from Gas Chromatograph instrument ID QA/G07 used in the anufacturing facility for testing residual solvents for finished APIs and Raw Materials. B) The following Gas Chromatograph injections were performed but the firm did not maintain any supporting documentation why these injections occurred. i. On January 26, 2013, three (3) injections ofRaw Material©) canker truck Batc d solvent tank FNRI ples were performed corresponding to injection file E\\JAN13G07\\DATA 2601 4) 01.D; 02.D and 03.D. Gas C hy Injection file E:VANI3GO7\\DATAY. 2601 01D was performed on January 26, 2013 at d corresponds to Raw Material er truck Batch with a passing result purity o (Specification NLTO) 4) Gas Chromatography Injection file E: JAN|3G07\\DATA 2601) 03.p was performed on January 26, 2013 a nd corresponds to Raw Material olvent tank Batch) 1) with a failing result purity o © (SpecificationNLT) Gas Chromatography Injection file E:\\JAN13G0 2601 02.D was performed on January 26, 2013 a nd corresponds to Raw Materia olvent tank Batch) with a passing result purity o 6 (Specification NLTO%) However, only",
+    "detail_text_ko": "구체적으로, A) 2014년 7월 25일 이전에는 품질관리 분석자가 완제 원료의약품과 원료의 잔류 용매 시험을 위해 anufacturing facility 에서 사용하는 가스 크로마토그래프 장비 ID QA/G07 의 원시 데이터 파일을 삭제할 수 있었다. B) 다음 가스 크로마토그래프 주입이 수행되었으나 귀사는 이러한 주입이 이루어진 이유를 뒷받침하는 어떠한 문서도 유지하지 않았다. i. 2013년 1월 26일 원료©) canker truck Batc d solvent tank FNRI ples 의 주입 3회(three (3) injections)가 주입 파일 E\\JAN13G07\\DATA 2601 4) 01.D; 02.D 및 03.D 에 해당하여 수행되었다. Gas C hy Injection file E:VANI3GO7\\DATAY. 2601 01D 는 2013년 1월 26일 d 에 수행되었으며 Raw Material er truck Batch 에 해당하고 순도 합격 결과 o (Specification NLTO) 4) Gas Chromatography Injection file E: JAN|3G07\\DATA 2601) 03.p 는 2013년 1월 26일 a nd 에 수행되었으며 Raw Material olvent tank Batch) 1) 에 해당하고 순도 부적합 결과 o © (SpecificationNLT) Gas Chromatography Injection file E:\\JAN13G0 2601 02.D 는 2013년 1월 26일 a nd 에 수행되었으며 Raw Materia olvent tank Batch) 에 해당하고 순도 합격 결과 o 6 (Specification NLTO%) 그러나 only"
+  },
+  {
+    "finding_id": "finding-a8625ef5ca36fea7207d460c",
+    "finding_text_md5": "7c02939c0eccc57db28d3f2f996c82bf",
+    "published_date": "2017-01-26",
+    "detail_text": "Specifically, A) On October 14, 2015, a change in quality testing laboratories occurred and a change control was not initiated and reviewed by the quality unit. On thisdace Finished API batches and@o © were sent to a different contract testing laboratory to conduct routine quality release testing of Polymorphism by X-Ray Diffraction (XRD) (MOA-300937-02-2). B) On July 28, 2015, Total Organic Carbon (TOC) instrument ID QAI/T02 computer system hard drive and instrument software was removed from the laboratory and a new hard drive and instrument software version was installed. On December 7, 2015, there was no entry in the TOC instrument ID QAI/T02 equipment logbook discussing this change in computer system hard drive and instrument software. Furthermore, change control (CC/ AN-QC/15-092) associated with changing non-chromatographic laboratory computer system hard drives and instrument software versions does not discuss the quality testing laboratory instruments that are affected by this change.",
+    "detail_text_ko": "구체적으로, A) 2015년 10월 14일 품질 시험 실험실이 변경되었으나 변경 관리가 시작되지 않았고 품질 부서가 검토하지도 않았다. 이 날짜에 완제 API 배치 @o © 가 X선 회절(XRD)에 의한 다형(Polymorphism) 시험(MOA-300937-02-2)의 정기 품질 출하 시험을 수행하도록 다른 위탁 시험 실험실로 보내졌다. B) 2015년 7월 28일 총유기탄소(TOC) 장비 ID QAI/T02 의 컴퓨터 시스템 하드 드라이브와 장비 소프트웨어가 실험실에서 제거되었고 새 하드 드라이브와 새 버전의 장비 소프트웨어가 설치되었다. 2015년 12월 7일 TOC 장비 ID QAI/T02 설비 로그북에는 컴퓨터 시스템 하드 드라이브와 장비 소프트웨어의 이 변경을 다룬 기재가 없었다. 더욱이 비크로마토그래피 실험실 컴퓨터 시스템 하드 드라이브와 장비 소프트웨어 버전의 변경과 관련된 변경 관리(CC/ AN-QC/15-092)는 이 변경으로 영향을 받는 품질 시험 실험실 장비를 다루지 않는다."
+  },
+  {
+    "finding_id": "finding-932fc74764b85c5dcd43479d",
+    "finding_text_md5": "da8fdea48dae9f322fbab1808c4bf6c5",
+    "published_date": "2017-01-26",
+    "detail_text": "Specifically, F P (4 OnJanuary 10, 2015, the Total Organic Carbon Analyzer instrument QAI/T03 that was used to test Mt ) b) (4) and)@ Water samples failed Calibration acceptance criteria for Standard Deviation value of)@ (Specification ‘te and Coefficient Variation value of )@ 4 (Specification Oy). However, an assessment was not performed to evaluate if the calibration failure had any impact on the samples tested on the instrument since the previous passing calibration.",
+    "detail_text_ko": "구체적으로, F P (4 2015년 1월 10일 Mt ) b) (4) 및 )@ 수 시료를 시험하는 데 사용된 총유기탄소 분석기 장비 QAI/T03 이 표준편차 값 )@ (Specification ‘te) 및 변동계수 값 )@ 4 (Specification Oy)에 대한 교정 허용 기준에 부적합했다. 그러나 직전의 교정 합격 이후 이 장비로 시험한 시료에 교정 실패가 영향을 미쳤는지 평가하는 평가는 수행되지 않았다."
+  },
+  {
+    "finding_id": "finding-4db2d837794d0b20503a759c",
+    "finding_text_md5": "27112427db1c0f4aeb22cc539ae40591",
+    "published_date": "2017-01-26",
+    "detail_text": "In addition, appropriate installation and operational qualifications shall also demonstrate the suitability ofcomputer hardware and software to perform assigned tasks. Specifically, The following twelve (12) computerized system and instrument software used in the quality testing laboratory that ; are currently in use for routine testing have not been validated: Instrument Name Software Date of Installation in Laboratory FTNIR Omnic 9.2.86 June 18, 2015 Stability Chambers Newtronic IC DAS 1.2 May 29, 2015 TOC-L TOC Control L 1.02 July 25, 2015",
+    "detail_text_ko": "또한 적절한 설치 적격성평가와 운전 적격성평가는 컴퓨터 하드웨어와 소프트웨어가 지정된 작업을 수행하기에 적합함도 입증해야 한다. 구체적으로, 현재 정기 시험에 사용 중인 품질 시험 실험실의 다음 컴퓨터화 시스템 및 장비 소프트웨어 열두(12) 개는 밸리데이션되지 않았다: 장비명 소프트웨어 실험실 설치일 FTNIR Omnic 9.2.86 2015년 6월 18일 Stability Chambers Newtronic IC DAS 1.2 2015년 5월 29일 TOC-L TOC Control L 1.02 2015년 7월 25일"
+  },
+  {
+    "finding_id": "finding-ff68ad3151d89f690ea8777c",
+    "finding_text_md5": "9ebf8eeaa2e61e8676e040164ad864ce",
+    "published_date": "2017-01-13",
+    "detail_text": "On December 9, 2016, all recently cleaned ® (® ) were in a condition unsuitable for the manufacture ofdrug products: All®® ss referenced below are not dedicated to a specific drug product. (a)°® PDE-369: This ”® equipment was in the “CLEANED” state. We observed white residue on the drug product contact surface ofthe” lining. Furthermore, white reside was ob- served on the surface above the” Additionally, the interior of the transfer line used to move drug product from the” to was soiled with? residue and a mold like ap- pearance. The” used for control of to the™® displayed®® residue / accumulation (the side of the facing the interior ofthe\" ). Moreover, the line between the) and®® that provides an“ displayed a reddish-brown discoloration consistent with rust.",
+    "detail_text_ko": "2016년 12월 9일 최근 세척된 모든 ® (® )가 의약품 제조에 적합하지 않은 상태였다: 아래에 언급된 모든 ®® ss 는 특정 의약품 전용이 아니다. (a)°® PDE-369: 이 ”® 설비는 “CLEANED” 상태였다. ” 라이닝의 의약품 접촉 표면에서 흰색 잔류물을 관찰했다. 또한 ” 위쪽 표면에서도 흰색 잔류물이 관찰되었다. 추가로 ”에서 로 의약품을 이송하는 데 사용되는 이송 라인의 내부는 ? 잔류물로 오염되어 있었고 곰팡이 같은 외관을 보였다. ”의 를 관리하는 데 사용되는 ” 은 ®® 잔류물 / 축적물을 보였다(\" 내부를 향한 면). 게다가 ) 와 ®® 사이의 라인은 “ 를 제공하는데, 녹과 일치하는 붉은 갈색 변색을 보였다."
+  },
+  {
+    "finding_id": "finding-d79c82279a30efd4a9ca0b9b",
+    "finding_text_md5": "5114bf86dcb1693a5ad99b80de2c6342",
+    "published_date": "2017-01-13",
+    "detail_text": "(a) Your firm received a complaint (MCU16-010 product tablets mg lot °® ) for “One tablet in bottle was twice the thickness of all others and it has same markings and color as the oth- er tablets.” Your firm then conducted an investigation identifying “the possibility to generate the higher thickness and higher weight tablets is” at the” stage.” The sample subject to the com- plaint was received form the consumer and your confirmed this weight disparity by measuring a",
+    "detail_text_ko": "(a) 귀사는 불만(MCU16-010 제품 정제 mg 로트 °® )을 접수했다. 내용은 “병 안의 정제 하나가 다른 모든 정제보다 두께가 두 배였고 다른 정제와 각인과 색상이 같았다”이다. 이후 귀사는 조사를 수행하여 “더 두껍고 더 무거운 정제가 생성될 가능성이 ” 단계 ”에 있다”고 확인했다. 불만 대상 시료는 소비자로부터 받았으며 귀사는 측정으로 이 중량 차이를 확인했다 a"
+  },
+  {
+    "finding_id": "finding-be9e5bc6520bafa6a3a96543",
+    "finding_text_md5": "fa942940f9e0bec448784ac03a023672",
+    "published_date": "2017-01-13",
+    "detail_text": "I. Data derived from your firm’s programmable logic controller (PLC) for compression machines is in- consistent with batch records and validation reports in support of applications to the Agency",
+    "detail_text_ko": "I. 압축기용 귀사의 프로그래머블 로직 컨트롤러(PLC)에서 나온 데이터는 당국에 제출한 신청서를 뒷받침하는 배치 기록서 및 밸리데이션 보고서와 일치하지 않는다"
+  },
+  {
+    "finding_id": "finding-b3475ff87ba9a6a40099c264",
+    "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+    "published_date": "2017-01-13",
+    "detail_text": "(1) Specifically, your QA technicians and other individuals were recorded destroying and altering rec- ords pertaining to commercial batch manufacturing immediately prior to this regulatory inspection. The loss ofdata and documents are evidenced by the following: Through a review of your firms Closed Circuit TV we identified the following: (a) A document shredder was introduced into your firm’s “DOCUMENTS STORAGE AREA” on December 03, 2016 at 15:44, approximately 4 days prior to the current US FDA inspection. (b) After introduction of the document shredder we observed extensive shredding of what ap- pears to be controlled documents and extensive signing of documents by QA. These documents were of a color consistent with batch packaging records and batch manufacturing records, among other documents. Your firm failed to maintain documentation ofwhat had been shredded. (c) On December 06, 2016, at™@ we observed that a contract employee with QA removed documents from the shredder and placed them in his pocket. (d) On December 07, 2016, at approximately 1:13 (in the middle of the night) individuals were shredding documents. Your firm stated this event represented cleaning staff shreddin",
+    "detail_text_ko": "(1) 구체적으로, 귀사의 QA 기술자와 다른 개인들이 이번 규제 실사 직전에 상업 배치 제조와 관련된 기록을 파기하고 변조하는 모습이 녹화되었다. 데이터와 문서의 손실은 다음으로 입증된다: 귀사의 폐쇄회로 TV 를 검토하여 다음을 확인했다: (a) 현재 US FDA 실사 약 4일 전인 2016년 12월 03일 15:44 에 문서 파쇄기가 귀사의 “DOCUMENTS STORAGE AREA” 에 반입되었다. (b) 문서 파쇄기가 반입된 뒤 관리 문서로 보이는 문서들의 대량 파쇄와 QA 의 문서 대량 서명을 관찰했다. 이 문서들은 다른 문서들과 함께 배치 포장 기록서 및 배치 제조 기록서와 일치하는 색상이었다. 귀사는 무엇이 파쇄되었는지에 대한 문서를 유지하지 못했다. (c) 2016년 12월 06일 ™@ 에 QA 소속 계약직 직원이 파쇄기에서 문서를 꺼내 자신의 주머니에 넣는 것을 관찰했다. (d) 2016년 12월 07일 약 1:13(한밤중)에 개인들이 문서를 파쇄하고 있었다. 귀사는 이 일이 청소 직원이 파쇄하는 것을 나타낸다고 진술했다"
+  },
+  {
+    "finding_id": "finding-7dd0bf9d30958aea39a6e73c",
+    "finding_text_md5": "250c4e2ccdde14d4a754389c3373a3da",
+    "published_date": "2017-01-13",
+    "detail_text": "Excursions in hold time are not investigated, trended or otherwise evaluated for product impact. The fol- lowing table contains examples of drug products and number of hold time excursions: Drug Product Number ofHold Time Excursions (b) (4) ns A Your firm’s Annual Product Quality Review was silent in regards to manufacturing hold time excur- sions. Your firm’s Quality Manager qualified this practice by referencing SOP QA058-07, which states “In case during commercial manufacturing if the product-exceeds the established hold time period at any IA",
+    "detail_text_ko": "보관 시간 일탈은 조사, 경향 분석 또는 제품에 미치는 영향 평가가 이루어지지 않는다. 다음 표에는 의약품 사례와 보관 시간 일탈 횟수가 있다: 의약품 보관 시간 일탈 횟수 (b) (4) ns A 귀사의 연간 제품 품질 검토(Annual Product Quality Review)는 제조 보관 시간 일탈에 대해 언급하지 않았다. 귀사의 품질 관리자는 SOP QA058-07 을 인용하여 이 관행을 정당화했는데, 이 SOP 는 “상업 제조 중 제품이 설정된 보관 시간을 초과하는 경우 IA"
+  },
+  {
+    "finding_id": "finding-17186b5f59895e94a79fde80",
+    "finding_text_md5": "8d21d71d15ba4aa84ead721140f66db5",
+    "published_date": "2017-01-13",
+    "detail_text": "Your firm’s Empower 3 based high-performance liquid chromatography (HPLC) system had approxi- mately 421 occurrences of a user abort since roughly September 23, 2016. The majority of these aborts are during data acquisition. However, a sub-set of these user abort events demonstrated a time gap be- tween the last injection (analytical testing) and the user abort event, such that the last injection occurred a significant amount of time prior to the user abort event. Your Deputy Manager ofQC stated that they have no documentation pertaining to events not captured between the last injection and the Empower system registering the user abort. There is no record of activity in the Empower system after the last in- jection recorded and prior to the registry of the user abort. Some examples of the time disparities with- out investigations are presented in the table below: Time of Last Run petectevent| yperabort | “Time | tanger | Timesee| 2409-2016 | 40min | Simm | PS",
+    "detail_text_ko": "귀사의 Empower 3 기반 고성능 액체 크로마토그래피(HPLC) 시스템에서 2016년 9월 23일경 이후 사용자 중단(user abort)이 대략 421회 발생했다. 이러한 중단의 대부분은 데이터 획득 중에 발생한다. 그러나 일부 사용자 중단 사례는 마지막 주입(분석 시험)과 사용자 중단 사건 사이에 시간 간격이 있어, 마지막 주입이 사용자 중단 사건보다 상당한 시간 전에 이루어졌음을 보여주었다. 귀사의 품질관리 부책임자(Deputy Manager of QC)는 마지막 주입과 Empower 시스템이 사용자 중단을 등록한 시점 사이에 포착되지 않은 사건에 관한 문서가 없다고 진술했다. 기록된 마지막 주입 이후부터 사용자 중단이 등록되기 전까지 Empower 시스템에는 활동 기록이 없다. 조사 없이 방치된 시간 차이의 몇 가지 사례는 아래 표에 제시되어 있다: Time of Last Run petectevent| yperabort | “Time | tanger | Timesee| 2409-2016 | 40min | Simm | PS"
+  },
+  {
+    "finding_id": "finding-f45997ceedf8f2dfae4f380e",
+    "finding_text_md5": "c81d3f5684a9c096f31e7ea2440b6077",
+    "published_date": "2017-01-10",
+    "detail_text": "Specifically, On 12/06/2016, 1 observed, the cleaning logbook for the Microbiology Laboratory ISO Class 8 room was cleaned three times by’ who was not trained on the SOPs titled “Cleaning Procedure for Microbiology” and “Enty and Exit Procedure for Microbiology” until 5 days after first cleaning.",
+    "detail_text_ko": "구체적으로, 12/06/2016 에 1 observed, 미생물 실험실 ISO Class 8 실의 세척 로그북에 따르면 이 실은 ’ 에 의해 세 번 세척되었는데, 이 사람은 “Cleaning Procedure for Microbiology” 와 “Enty and Exit Procedure for Microbiology” 라는 제목의 SOP 에 대한 교육을 첫 세척 후 5일이 지날 때까지 받지 않았다."
+  },
+  {
+    "finding_id": "finding-a23ac87d20ec327d0b4cfb27",
+    "finding_text_md5": "c8f54875ebc1d909ebe35da8b6fe9c08",
+    "published_date": "2017-01-10",
+    "detail_text": "Specilically, Raw material 2 approved by QA on 8/10/2016 was observed being stored in the raw material ware- house which is maintained at ambient storage conditions. The labeled storage requirement for the material states “keep con- tainer cool and dry”. There is no assurance the ambient condition do not adversely affect the quality of the product. For ex- ample, during the storage period, temperatures in the log book were recorded as the following: Month] Mas Temperature °C CF [Max %RH Sd August 2016 34.7 (94.46) 89.9 September 2016 | 33.2 (91.8) 90.9 October2016 32.2 (90.1) .)ee November 2016 30.3(86.54 Bi4 Ew LOVERS)5 10 DATS ISSUED HL Samillah Selby, investigator GiAschSe/,(b4~— , OF THIS PAGE =| Doan T. Nguyen, Investigator bn. 12/9/2016",
+    "detail_text_ko": "구체적으로, 8/10/2016 에 QA 가 승인한 원료 2 가 주변 온도 보관 조건으로 유지되는 원료 창고에 보관되어 있는 것을 관찰했다. 해당 물질의 표시된 보관 요건은 “용기를 서늘하고 건조하게 유지할 것”이다. 주변 온도 조건이 제품 품질에 악영향을 주지 않는다는 보증이 없다. 예를 들어 보관 기간 중 로그북에 기록된 온도는 다음과 같았다: Month] Mas Temperature °C CF [Max %RH Sd August 2016 34.7 (94.46) 89.9 September 2016 | 33.2 (91.8) 90.9 October2016 32.2 (90.1) .)ee November 2016 30.3(86.54 Bi4 Ew LOVERS)5 10 DATS ISSUED HL Samillah Selby, investigator GiAschSe/,(b4~— , OF THIS PAGE =| Doan T. Nguyen, Investigator bn. 12/9/2016"
+  },
+  {
+    "finding_id": "finding-1c6fcd9add60c4bfcdb8f9e7",
+    "finding_text_md5": "f2ba7d2e441f497bc641d1bcc2716bb7",
+    "published_date": "2017-01-10",
+    "detail_text": "On, 12/5/2016, during the walk though ofthe production area we observed the following: e The room used to store clean equipment contains a gap in the celling which spans across the length ofthe room that is approximately©) nches wide exposing the4) naterial ofthe adjacent room and extents up to the roof. e Cracks in the walls and peehng and chipping paint along the wall and light Gxtures. « The appearance ofwater damage to the drywall in various locations. MATERIAL SYSTEM",
+    "detail_text_ko": "12/5/2016 에 생산 구역을 둘러보던 중 다음을 관찰했다: e 청결한 설비를 보관하는 데 사용되는 실의 천장에는 실의 길이 전체에 걸쳐 폭 약 ©) 인치의 틈이 있어 인접한 실의 4) 물질이 노출되고 지붕까지 이어져 있다. e 벽의 균열, 벽과 조명 기구를 따라 벗겨지고 떨어져 나간 페인트. « 여러 곳에서 석고보드에 수해 흔적이 있는 것으로 보인다. MATERIAL SYSTEM"
+  },
+  {
+    "finding_id": "finding-183fb192f415b1e9ee025e19",
+    "finding_text_md5": "e7c4703c944de580c47e4e91e9b56483",
+    "published_date": "2017-01-10",
+    "detail_text": "Specifically, 1, Process Change Control PCR-MF1 P4996 for© parch™ sid not include sustificati ; i (0) (4) There is no technical a An adequate justification and evaluation of the addition ofa ; justification for the addition of the(©)(4) process, evaluation ofthe impact to the product, or specifica- tions for the equipment to be used. (b) (4) (b) (4) and (©) (4) 491.04 were not completely . Changes observed between. batch record B01-V03 an n ® documented and evaluated for the following: identification of Critical Parameters, the additional, removal or change ofmanufacturing instructions, (0)(4) speed, andrecording ©)(4) ntervals. |",
+    "detail_text_ko": "구체적으로, 1, ©  배치의 공정 변경 관리 PCR-MF1 P4996 에는 정당화 근거가 포함되지 않았다 (0) (4) 기술적 근거가 없다. 공정 추가에 대한 적절한 정당화와 평가가 없다 (b) (4) (b) (4) 및 (©) (4) 491.04 는 완전하게 문서화되고 평가되지 않았다. 배치 기록서 B01-V03 와 n ® 사이에서 관찰된 변경은 다음에 대해 문서화되고 평가되지 않았다: 핵심 파라미터의 식별, 제조 지시의 추가, 제거 또는 변경, (0)(4) 속도, 그리고 ©)(4) 간격 기록. |"
+  },
+  {
+    "finding_id": "finding-13f7058f6924c6cb4cabfd66",
+    "finding_text_md5": "2a29bc540b0d7d99c0817fc592ec5a08",
+    "published_date": "2017-01-10",
+    "detail_text": "| Specifically, | (b) (4) (b) (4) . «. of PD(4) (b) (4) lated Substances by HPLC for Basches and i 1 records for the analysisof Re’ u . a d (ye ewe observed yourrecordsdonotinclude documentation of the preparationperp agersPisce» depare am and reagents. In addition the quantity of the solution prepared, the d te of preparation and the expua are also not documented. | ! FACILITIES AND EQUIPMENT os BAPLO VEE) SKNATURE ‘yy : i y 2016 HL. Jamill h Selby",
+    "detail_text_ko": "| 구체적으로, | (b) (4) (b) (4) . «. of PD(4) (b) (4) 배치 Basches and i 에 대한 HPLC 에 의한 유연물질(Lated Substances) 시험 기록 1 records for the analysisof Re’ u . a d (ye ewe observed yourrecordsdonotinclude documentation of the preparationperp agersPisce» depare am and reagents. 또한 조제한 용액의 양, 조제일 및 사용기한(expua)도 문서화되지 않았다. | ! FACILITIES AND EQUIPMENT os BAPLO VEE) SKNATURE ‘yy : i y 2016 HL. Jamill h Selby"
+  },
+  {
+    "finding_id": "finding-0b6caabbd7d07981ef347a69",
+    "finding_text_md5": "1acc38e1829ad0f14c57db7b30f950ee",
+    "published_date": "2017-01-10",
+    "detail_text": "Specifically, o~ Your Remarks Forms # GP-0004-D07 and #GP-0004.Do7s, ver 2, effective 12-15-2014 used to report production deviations | are provided on an as needed basis by the Production Department directly to the production operators. | Traceability of these forms relies on the production operator to write in the form number and ensure all pages are include in the batch record. There are 21 cases where the production operator omitted or repeated numbering the forms. There is no as- surance all Remarks Forms are included inthebatch record andare reviewed by theQuality Unit prior tobatch release. | In addition, the Production department determines the need for further investigation based on the deviation reported in the Remarks Form. Therefore the Quality Unit cannot ensure appropriate actionsare of taken for each deviation reported in the Remark Form. n",
+    "detail_text_ko": "구체적으로, o~ 귀사의 생산 일탈 보고에 사용되는 Remarks Forms # GP-0004-D07 및 #GP-0004.Do7s, ver 2, 시행일 12-15-2014 는 생산 부서가 필요에 따라 생산 작업자에게 직접 제공한다. | 이 양식의 추적성은 생산 작업자가 양식 번호를 기입하고 모든 페이지가 배치 기록서에 포함되도록 하는 것에 의존한다. 생산 작업자가 양식 번호 부여를 누락하거나 반복한 사례가 21건 있다. 모든 Remarks Form 이 배치 기록서에 포함되고 배치 출하 전에 품질 부서가 검토한다는 보증이 없다. | 또한 생산 부서가 Remarks Form 에 보고된 일탈을 근거로 추가 조사의 필요성을 판단한다. 따라서 품질 부서는 Remark Form 에 보고된 각 일탈에 대해 적절한 조치가 취해지는지 보증할 수 없다. n"
+  },
+  {
+    "finding_id": "finding-980b4eb08eac717ece4b3599",
+    "finding_text_md5": "a97463504f8a3ef2cc195c84074da322",
+    "published_date": "2017-01-06",
+    "detail_text": "Specifically, a) Equipment cleaning validation studies do not support a validated time period for holding dirty equipment before initiating the cleaning process. The equipment cleaning procedure~pOP AQA-020, effective date January 20, 2016, specifies the establishment of a holding period of before cleaning dirty equipment through the completion ofthree acceptable cleaning runs; this activity has not been performed for ali product-specific equipmenttrains. Current cleaning procedures rely on an unvalidated holding period of b) Equipment cleaning validation procedures do not include testing for the efficacy ofbioburden or endotoxin removal from those equipment trains where product with a bioburden or endotoxin specification is manufactured.",
+    "detail_text_ko": "구체적으로, a) 설비 세척 밸리데이션 연구는 세척 공정을 시작하기 전에 오염된 설비를 보관하는 밸리데이션된 기간을 뒷받침하지 않는다. 2016년 1월 20일 시행된 설비 세척 절차~pOP AQA-020 은 오염된 설비를 세척하기 전의 보관 기간을 설정하고 세 번의 허용 가능한 세척 실행을 완료할 때까지 이어지도록 규정하는데, 이 활동은 제품별 설비 트레인 모두에 대해 수행되지 않았다. 현행 세척 절차는 밸리데이션되지 않은 보관 기간에 의존한다 b) 설비 세척 밸리데이션 절차에는 바이오버든 또는 엔도톡신 규격이 있는 제품을 제조하는 설비 트레인에서 바이오버든 또는 엔도톡신 제거의 효능에 대한 시험이 포함되지 않는다."
+  },
+  {
+    "finding_id": "finding-f4e3b363219f5239725d47ab",
+    "finding_text_md5": "a3dfa0e4d28b23fe744f3931541b52dd",
+    "published_date": "2016-12-28",
+    "detail_text": "Information pertaining to the IOM between QCD and \"R&D dated 13/04/14 were falsified. The document provided for photocopy was not consistent with the copy received. 2. The file provided for the inspection titled “Customer complaint log” is not accurate. During the inspection, we identified an interoffice memo dated 11-04-15 which describes “comments re- ceived from customer | ®® about three unknown solvents” which was not included in this list titled “Customer complaint log.” 3. On 12/1/16, we observed the incinerator contained several intact documents intermingled with ash which included documents signed from April 2016 as well as portions of interoffice memo- randums. A trash bin was observed directly outside the incinerator. 4. Equipment status tag for oO ‘Al-01 states last cleaned on 29/11/16, however, the equipment us- age log fails to capture the indicated cleaning.",
+    "detail_text_ko": "13/04/14 자 QCD 와 \"R&D 사이의 IOM 에 관한 정보가 위조되었다. 복사하도록 제공된 문서는 접수한 사본과 일치하지 않았다. 2. 실사에 제공된 “Customer complaint log” 라는 제목의 파일은 정확하지 않다. 실사 중 “고객 | ®® 으로부터 세 가지 알 수 없는 용매에 대해 접수한 의견”을 기술한 11-04-15 자 사내 메모(interoffice memo)를 확인했는데, 이는 “Customer complaint log” 라는 제목의 이 목록에 포함되지 않았다. 3. 12/1/16 에 소각로에 재와 뒤섞인 온전한 문서 여러 건이 있는 것을 관찰했으며, 여기에는 2016년 4월에 서명된 문서와 사내 메모의 일부가 포함되어 있었다. 소각로 바로 바깥에는 쓰레기통이 있는 것이 관찰되었다. 4. oO ‘Al-01 의 설비 상태 태그에는 마지막 세척이 29/11/16 라고 되어 있으나 설비 사용 로그에는 표시된 세척이 기록되어 있지 않다."
+  },
+  {
+    "finding_id": "finding-49db9c3fdb0860490103e47c",
+    "finding_text_md5": "578d93e51b3e156659e4b0a7d3b3d95c",
+    "published_date": "2016-12-28",
+    "detail_text": "1. Your firm engages in extensive use of “Inhibit Integration” and other anomalous integration tech- niques for assessing US APIs such that unknown impurities are disregarded without scientific justi- fication. Furthermore, unknown impurities are not accurately assessed or reported. a. For example, below lists some APIs for the US market with corresponding use of inhibit in- tegration: Inhibit Integration mer, mS C a",
+    "detail_text_ko": "1. 귀사는 알 수 없는 불순물이 과학적 정당화 없이 무시되도록 US API 를 평가하는 데 “Inhibit Integration” 및 기타 비정상적 적분 기법을 광범위하게 사용한다. 또한 알 수 없는 불순물이 정확하게 평가되거나 보고되지 않는다. a. 예를 들어 아래에는 inhibit integration 을 사용한 US 시장용 API 중 일부가 나열되어 있다: Inhibit Integration mer, mS C a"
+  },
+  {
+    "finding_id": "finding-38a1f1a7fb11c40e7b569093",
+    "finding_text_md5": "b474e5d82a9eeef65d9b4adf880cffca",
+    "published_date": "2016-12-28",
+    "detail_text": "1. We observed examples of product failing to meet specification for various stages of production in which R&D instructed onward processing of the product or alternative analysis. We discussed the contents of these memorandums with your firm and they confirmed the incorporation of fail- ing material or alternative analysis for the product. For example, a. ””.OOS investigation reference 2-PLVOOS/FE.U/002 dated 08.10.15 states “From the above investigation no laboratory error is evident. Therefore, it is proposed to reject the sample B.No: ” Subsequently, QA with a consult from R&D determined to re-sample and re-test, then instructed QC to re-sample the product which led to passing results being obtained and reported. avy’",
+    "detail_text_ko": "1. 여러 생산 단계에서 규격에 부적합한 제품에 대해 R&D 가 후속 공정 진행이나 대체 분석을 지시한 사례를 관찰했다. 이 메모의 내용을 귀사와 논의했으며 귀사는 해당 제품에 부적합 물질 또는 대체 분석이 반영되었음을 확인했다. 예를 들어 a. ””.OOS 조사 참조번호 2-PLVOOS/FE.U/002, 08.10.15 자는 “위 조사에서 시험실 오류는 명백하지 않다. 따라서 시료 B.No: ”를 불합격 처리할 것을 제안한다”고 기술한다. 이후 R&D 의 자문을 받은 QA 는 재샘플링과 재시험을 결정하고 QC 에 제품 재샘플링을 지시했으며, 그 결과 적합 결과가 얻어져 보고되었다. avy’"
+  },
+  {
+    "finding_id": "finding-27448169f5d628186d05d01f",
+    "finding_text_md5": "b295e00aa57953492d39ca6c8211e5f4",
+    "published_date": "2016-12-28",
+    "detail_text": "Your firm received complaints on 6-28-16 and 6-30-16 purporting the presence of »ma in © ‘4 These complaints affected products | | oe | © As part ofthe investigation, your conclusion and root cause states “***the definite root cause for presence of such amount of in batches could not be identified from the investigation as the data related to ®batches are in line with requirement and no abnormali- )",
+    "detail_text_ko": "귀사는 6-28-16 과 6-30-16 에 »ma 이 © ‘4 에 존재한다고 주장하는 불만을 접수했다. 이 불만은 제품 | | oe | © 에 영향을 미쳤다. 조사의 일환으로 귀사의 결론과 근본 원인은 “***배치에서 이 정도 양의 가 존재하는 확정적 근본 원인은 ®배치와 관련된 데이터가 요건에 부합하고 이상이 없으므로 조사에서 확인할 수 없었다 )”라고 기술한다"
+  },
+  {
+    "finding_id": "finding-20a4ff341010a2164cc43106",
+    "finding_text_md5": "0bdc42b269c7e34224dbc399a213a87f",
+    "published_date": "2016-12-28",
+    "detail_text": "(b) (4) (b) (4) (b) (4) 1. Unexplained®® colored product was observed on and . * ‘4 in© stages of API manufacturing (i.e. © Block): (b) (4) (b) . (b) (4) a. On 11/29/16, we observed your oe 1-01 contained a ° b) (4 . . e . ee » colored residue inside the comingled with product. This coloration is incon- sistent with the \"”“Loloration of , a US API manufactured in Block (b) - 4) 4), batch (\\ ) OATE ISSUED",
+    "detail_text_ko": "(b) (4) (b) (4) (b) (4) 1. 원료의약품 제조 ( © Block)의 및 에서 ‘4 in© 단계에서 설명되지 않는 ®® 색 제품이 관찰되었다: (b) (4) (b) . (b) (4) a. 11/29/16 에 귀사의 oe 1-01 안에 제품과 뒤섞인 ° b) (4 . . e . ee » 색 잔류물이 들어 있는 것을 관찰했다. 이 착색은 Block (b) - 4) 4), 배치 (\\ ) 에서 제조된 US API 인 의 ”“Loloration 과 일치하지 않는다. OATE ISSUED"
+  },
+  {
+    "finding_id": "finding-f445429764899434ccdfaffd",
+    "finding_text_md5": "43a7c8e75848fc3297861d63e99d1ff2",
+    "published_date": "2016-12-15",
+    "detail_text": "Specifically, the \"Indu Softweb Studio\" SCADA electronic recording system for temperatures found in the micro lab rooms for incubating Environmental Monitoring, Reference Cultures, and other media incubation shows multiple out-of-specification temperatures and loss of communication errors through June, July, and August 2016. As evidenced by repeated communication failures and out-of-specification data within a three month period, this equipment is not functioning adequately and has not been maintained to the criteria set in the qualification protocol #10443-01. *DATESOFINSPECTION = 8= =——“—————CO———— 9/06/2016(Tue),9/07/2016(Wed),9/08/201 6(Thu),9/09/201 6(Fri),9/12/201 6(Mon),9/13/20 16(Tue),9/14/ 2016(Wed),9/15/2016(Thu),9/16/20 16(Fri)",
+    "detail_text_ko": "구체적으로, 환경 모니터링, 표준 균주, 기타 배지 배양을 위한 배양 온도를 기록하는 미생물 실험실 실의 SCADA 전자 기록 시스템 \"Indu Softweb Studio\" 는 2016년 6월, 7월, 8월에 걸쳐 여러 건의 기준 일탈 온도와 통신 두절 오류를 보여준다. 3개월 동안 반복된 통신 실패와 기준 일탈 데이터가 입증하듯이 이 설비는 적절하게 기능하지 않으며 적격성평가 프로토콜 #10443-01 에 설정된 기준대로 유지되지 않았다. *DATESOFINSPECTION = 8= =——“—————CO———— 9/06/2016(Tue),9/07/2016(Wed),9/08/201 6(Thu),9/09/201 6(Fri),9/12/201 6(Mon),9/13/20 16(Tue),9/14/ 2016(Wed),9/15/2016(Thu),9/16/20 16(Fri)"
+  },
+  {
+    "finding_id": "finding-8e07028bdbda27f1c7ebee5f",
+    "finding_text_md5": "2c20fd50262fbd417da6f051310617cb",
+    "published_date": "2016-12-15",
+    "detail_text": "Specifically, from 01/2013 to 08/2013, your firm initiated a totalof7 deviation investigations regarding | ®©excursions during OO of API. This OMimit is considereda critical control point. Our review ofthe 7th deviation found that your firm had concluded no further",
+    "detail_text_ko": "구체적으로, 01/2013 부터 08/2013 까지 귀사는 API 의 OO 동안 | ©©일탈에 관한 일탈 조사를 총 7건 시작했다. 이 O 한계는 핵심 관리 지점으로 간주된다. 7번째 일탈에 대한 당사의 검토 결과 귀사는 더 이상의 조치가 필요 없다고 결론지었다"
+  },
+  {
+    "finding_id": "finding-6e258c5293f4911ff7e7e2be",
+    "finding_text_md5": "9237fe54e24ba14b9dbcea1107e2122e",
+    "published_date": "2016-12-15",
+    "detail_text": ". . . . (b) (4) ; Specifically, during our review of the electronic potency raw data for collected using the ZY-300IV Multifunction Microbiology Analyzer, we noted the following deficiencies regarding data security: A) There is no provision in place to create raw data records for each analysis performed. Test results are required to be saved manually. B) There are no individual user names/passwords configured. All analysts use a common login ID/password. : . b) (4 C) There are no controls in place to prevent data from being deleted between the © server back-ups.",
+    "detail_text_ko": ". . . . (b) (4) ; 구체적으로, ZY-300IV Multifunction Microbiology Analyzer 를 사용해 수집한 역가 전자 원시 데이터를 검토하는 동안 데이터 보안과 관련하여 다음 결함을 확인했다: A) 수행된 각 분석에 대한 원시 데이터 기록을 생성하는 장치가 마련되어 있지 않다. 시험 결과는 수동으로 저장해야 한다. B) 개별 사용자 이름/비밀번호가 설정되어 있지 않다. 모든 분석자가 공용 로그인 ID/비밀번호를 사용한다. : . b) (4 C) © 서버 백업 사이에 데이터가 삭제되는 것을 막는 관리 수단이 마련되어 있지 않다."
+  },
+  {
+    "finding_id": "finding-5cbc29af17bc169dd4af2598",
+    "finding_text_md5": "4c0d5edeae923e3ceb55861c5c719d64",
+    "published_date": "2016-12-15",
+    "detail_text": "Specifically, the qualification ofequipment is not adequate for its intended purpose including vial stoppering machine, and 2quipment. . 0) . . ae A. The Line #@stoppering equipment qualification document # SH10260Q Rev 1.0 and FU4-PN- ®@001-EQP-PQ-002 does not include a quantitative evaluation ofthe OCA for products intended for ®® During the inspection on September 7, 1 observed a large number. ofproduct vials with dislodged and variable© during production of Injection (batch . (b) (4) (b) (4) . . (b) (4) B. The 002 re-qualification document FU4-PN 002-EQP-RQ-001 and product validation reports such as FU4-SIPO-PVR-004) do not speak to the pressure needed to (0)4) cy (4). . . 4) « — up to vials in asingle load occupying This operation iscurrently controlled by visual indication of © through: © approximate as instructed by SOP #FU4-PR-MF-OPI-090.",
+    "detail_text_ko": "구체적으로, 바이알 스토퍼링 기계와 2quipment 를 포함하여 설비의 적격성평가가 의도한 목적에 적절하지 않다. . 0) . . ae A. Line #@ 스토퍼링 설비 적격성평가 문서 # SH10260Q Rev 1.0 및 FU4-PN- ®@001-EQP-PQ-002 에는 ®® 용으로 의도된 제품의 OCA 에 대한 정량적 평가가 포함되어 있지 않다. 9월 7일 실사 중 Injection(배치 . (b) (4) (b) (4) . . (b) (4)) 생산 중에 밀려난 상태이고 © 가 일정하지 않은 다수의 제품 바이알을 관찰했다. B. 002 재적격성평가 문서 FU4-PN 002-EQP-RQ-001 과 FU4-SIPO-PVR-004) 같은 제품 밸리데이션 보고서는 (0)4) cy (4)에 필요한 압력을 다루지 않는다. . 4) « — 한 번의 적재에서 최대 바이알까지 차지하는 이 작업은 현재 SOP #FU4-PR-MF-OPI-090 의 지시에 따라 © 의 약 © 를 통한 육안 확인으로 관리된다."
+  },
+  {
+    "finding_id": "finding-3f2f5c072cc6b931fb1fb26c",
+    "finding_text_md5": "b0f2982e1c80a96357854069d270c42d",
+    "published_date": "2016-12-15",
+    "detail_text": "Specifically, your written test procedures for assay and related substances for all sterile injectable drug ° oge (b) (4) ) : ° ° products intended for the US market utilize of unit containers in sample preparation HPLC analysis with thejustification that ©)4)educes the variability of results.",
+    "detail_text_ko": "구체적으로, 미국(US) 시장용으로 의도된 모든 무균 주사용 의약품 ° oge (b) (4) ) : ° ° 에 대한 귀사의 함량 및 유연물질 시험 절차서는 시료 조제 HPLC 분석에서 단위 용기 를 사용하며, 그 정당화 근거는 ©)4)가 결과의 변동성을 줄인다는 것이다."
+  },
+  {
+    "finding_id": "finding-1a1b786a6a364b8ba253375f",
+    "finding_text_md5": "6021f788c1f863f8cb939805041d881d",
+    "published_date": "2016-12-15",
+    "detail_text": ". . . . (b) (4) ees Specifically, during our inspection of the area within unit # ° we found there was no soap available at the entrance hand-washing station. Soap is required to be used per your posted entrance instructions. EMPLOVEESS)",
+    "detail_text_ko": ". . . . (b) (4) ees 구체적으로, 유닛 # ° 내 구역을 실사하는 동안 출입구 손 씻는 장소에 비누가 없는 것을 발견했다. 게시된 출입 지침에 따라 비누를 사용해야 한다. EMPLOVEESS)"
+  },
+  {
+    "finding_id": "finding-fa7299c0c887f95541d46e51",
+    "finding_text_md5": "5f58c5bfa3bde52d2e1eca880e953079",
+    "published_date": "2016-12-13",
+    "detail_text": "Specifically, OS-JK-2016-0078 was initiated 02FEB2016 for dissolution failure of finished product samples of oe OM tablets, | M@ng Batch © No root cause was identified during the laboratory investigation and the failure was referred to Production for investigation under IN- JK-2016-0151; IN-JK-2016-0151 identified no root cause of failure in production activities. A 2IMAY2016 i igati : () (4) (b) (4) (©)(4) (0), (©) (4) () (4) ; addendum to the OOS investigations for Batch #’s , and of 4) ng tablets references dissolution studies conducted by the OMin © @under Protocol MV1T/244/2015 which identified the de-acration of dissolution medium as the root cause ofthe failure of each batch. Data generated by O@ inder Protocol MV'1/244/2015 indicated an ~10% increased value ofmean drug releasewhen dissolution medium was not degassed. Analytical Test Procedures for @y ng, 4Myo and (ay ne for tablets were updated per Change Control CC-JK-2016-1335 on LOMAY2016 to preclude the de-aeration ofdissolution medium . Re-analysis of each failing batch wasperformed according toa revised test method without de-aeration of dissolution medium with results for active ingredients passing@ +@2 criterion, an",
+    "detail_text_ko": "구체적으로, OS-JK-2016-0078 은 2016년 2월 02일(02FEB2016) 완제품 oe OM 정제, | M@ng 배치 © 시료의 용출 부적합으로 시작되었다. 시험실 조사에서 근본 원인이 확인되지 않았고 이 부적합은 IN- JK-2016-0151 에 따른 조사를 위해 생산으로 이관되었으며, IN-JK-2016-0151 은 생산 활동에서 부적합의 근본 원인을 확인하지 못했다. 2016년 5월 21일(2IMAY2016) i igati : () (4) (b) (4) (©)(4) (0), (©) (4) () (4) ; 배치 #’s , 및 4) ng 정제의 OOS 조사에 대한 추가 문서는 Protocol MV1T/244/2015 에 따라 O@ 에서 수행한 용출 연구를 인용하며, 이 연구는 각 배치 부적합의 근본 원인을 용출 매질의 탈기 부족(de-aration)으로 확인했다. Protocol MV'1/244/2015 에 따라 O@ 에서 생성한 데이터는 용출 매질을 탈기하지 않았을 때 평균 약물 방출 값이 약 10% 증가했음을 나타냈다. 정제용 @y ng, 4Myo 및 (ay ne 의 분석 시험 절차서는 2016년 5월 10일(LOMAY2016) 변경 관리 CC-JK-2016-1335 에 따라 용출 매질의 탈기를 배제하도록 개정되었다. 부적합 각 배치의 재분석은 용출 매질을 탈기하지 않는 개정된 시험법에 따라 수행되었으며 주성분 결과는 @ +@2 기준에 적합했고, an"
+  },
+  {
+    "finding_id": "finding-f27874be1749f230ce32ac4b",
+    "finding_text_md5": "96c2879bf5f3a1672ce968f3fadd6880",
+    "published_date": "2016-12-13",
+    "detail_text": "mechanisms are not established to assure that components, drug product containers, closures, in-process materials, or drug products conform to appropriate standards of identity, strength, quality and purity. Specifically, (b) (4) ()(4) —(@) 4QB) (b) (4) 1}, Upon visual inspection following incubation of Media Fill Batch a (4) it ang Line and simulated O@>f fn vials using the we the entirety of Population-1 and -2 were suspected for turbidity and Incident IN-JK-2015-0137 was initiated A 4 unit from! Run of Population-1 (vials total) anda unit,from Population-2 were sent to the Microbiology Laboratory for evaluation. The notebook ofAnalyst ‘ ’, 568/2014, documents loading ofthe (b) an ‘ge . . (b) (4) samples at (@ 44 °C into Incubator QCC1090 from on intil visual inspection at Po a repeat visual inspection ofthe samples was performed following additional incubation at@ -@ °C at =~ onpe and. third re-inspection of the samples was performed following additional incubation at) jy °C at on? each of which identified no turbidity. The vials were then < : wiv) (0) (4) : + returned back to QA for reunion with Batch on The remainder of Population-1 and -2 of Batch ®@ vere immediately incubate",
+    "detail_text_ko": "구성 성분, 의약품 용기, 마개, 공정 중 물질 또는 의약품이 확인, 함량, 품질 및 순도의 적절한 기준에 부합함을 보증하는 체계가 확립되어 있지 않다. 구체적으로, (b) (4) ()(4) —(@) 4QB) (b) (4) 1}, Media Fill Batch a (4) it ang Line 의 배양 후 육안 검사에서 와 모사된 O@>f fn 바이알을 사용했을 때 we Population-1 과 -2 전체에서 혼탁이 의심되었고 Incident IN-JK-2015-0137 이 시작되었다. A 4 Population-1 의 ! Run 유닛(바이알 총수)과 Population-2 의 유닛 하나가 평가를 위해 미생물 실험실로 보내졌다. 분석자 ’ 의 노트북 568/2014 에는 (b) an ‘ge . . (b) (4) 시료를 (@ 44 °C 에서 Incubator QCC1090 에 on 부터 Po 에서 육안 검사할 때까지 넣은 것이 기록되어 있다. 시료의 반복 육안 검사는 @ -@ °C 에서 at =~ onpe 그리고 에 추가 배양한 후 수행되었고, 세 번째 재검사는 on? 에 시료를 추가 배양한 후 수행되었으며 그 각각에서 혼탁은 확인되지 않았다. 이후 바이알은 < : wiv) (0) (4) : + 에 Batch 와 합치기 위해 QA 로 돌려보내졌다. Batch ®@ 의 Population-1 과 -2 나머지는 즉시 incubate"
+  },
+  {
+    "finding_id": "finding-efb18116f1fd2d67edc4f009",
+    "finding_text_md5": "e67fd882a58fe81ae04f89278465cbcc",
+    "published_date": "2016-12-13",
+    "detail_text": "Specifically, test schedules established by stability protocols are not adhered to so as to characterize the degradation of products over their actual shelf-lives. For example: ae , ‘ (b) (4) : oa! stability samples ofBuproprion HCI 150mg Batch JKL4403A (expiry , were not analyzed until ” WAIN ¢ shelf-life) at which time dissolution failure was documented by OOS L2/314/2014. No FAR was submitted for the 24M failure of Batch JKL4403A as it was expired at the time of analysis. + 22M stability samples of Buproprion HCI 150mg Batch JKN0236A (expiry OM, ere not analyzed until r@ (@M@NSof shelf-life) at which time dissolution failure was documented by OS-JK-2016-0275. No FAR was submitted for the 22M failure of Batch JKN0236A as it was expired at the time of analysis. + 18M stability samples ofBuproprion HCI 200mg Batch JKM4152A (expiry ©@) were not analyzed until EMPLOVEE(S)",
+    "detail_text_ko": "구체적으로, 안정성 프로토콜에 규정된 시험 일정은 제품이 실제 유통기한 동안 분해되는 양상을 파악하도록 준수되지 않는다. 예를 들어: ae , ‘ (b) (4) : oa! Buproprion HCI 150mg Batch JKL4403A(유효기간 , 의 안정성 시료는 ” WAIN ¢ shelf-life)까지 분석되지 않았으며 그 시점에 OOS L2/314/2014 로 용출 부적합이 문서화되었다. Batch JKL4403A 는 분석 시점에 이미 유효기간이 지났기 때문에 24M 부적합에 대해 FAR 가 제출되지 않았다. + Buproprion HCI 150mg Batch JKN0236A(유효기간 OM, 의 22M 안정성 시료는 r@ (@M@NSof shelf-life)까지 분석되지 않았으며 그 시점에 OS-JK-2016-0275 로 용출 부적합이 문서화되었다. Batch JKN0236A 는 분석 시점에 이미 유효기간이 지났기 때문에 22M 부적합에 대해 FAR 가 제출되지 않았다. + Buproprion HCI 200mg Batch JKM4152A(유효기간 ©@)의 18M 안정성 시료는 EMPLOVEE(S) 까지 분석되지 않았다"
+  },
+  {
+    "finding_id": "finding-a50e5d2e7ff6d799197c6ad1",
+    "finding_text_md5": "f67206edec12fb04afac57507e263f3d",
+    "published_date": "2016-12-13",
+    "detail_text": "Specifically, — - (0) (4) ‘ , . : — 1} In response to Investigation WM 4/055, the frequency ofHEPA filter integrity testing for LAF/FFM modules of was reduced to —-”\". The change was not implemented according to a formal change control or pursuant to a Corrective Action Request. While implemented, the change was not formally reflected in the 20MAR2015 Revision 08 of SOP ENG-025. , . (b) (4) . . : 2) In response to Investigation IN-JK-2015-0331, the frequency ofHEPA filter integrity testing for LAF/ (4 f . FFM modules of “was reduced to 4 The change was not implemented according to a formal change control or pursuant to a Corrective Action Request. While implemented, the change had not been formalized as Section 7.3 of the current revision of SOP ENG-025/11 (eff. LYMAY2016) requires filter integrity and velocity tests to be completed sha ) vith no exception noted for the current M-equency applied to LAF/ OOiGMPLOYEE(S)",
+    "detail_text_ko": "구체적으로, — - (0) (4) ‘ , . : — 1} Investigation WM 4/055 에 대응하여 의 LAF/FFM 모듈에 대한 HEPA 필터 완전성 시험 주기가 —-”\"로 줄어들었다. 이 변경은 공식 변경 관리 또는 Corrective Action Request 에 따라 실시되지 않았다. 시행되는 동안 이 변경은 SOP ENG-025 의 2015년 3월 20일(20MAR2015) Revision 08 에 공식적으로 반영되지 않았다. , . (b) (4) . . : 2) Investigation IN-JK-2015-0331 에 대응하여 LAF/ (4 f . FFM 모듈의 HEPA 필터 완전성 시험 주기가 4 로 줄어들었다. 이 변경은 공식 변경 관리 또는 Corrective Action Request 에 따라 실시되지 않았다. 시행되는 동안 이 변경은 공식화되지 않았는데, 현행 SOP ENG-025/11(시행 LYMAY2016) 개정본 7.3 항은 필터 완전성 및 풍속 시험을 sha ) 완료하도록 요구하며 LAF/ OOiGMPLOYEE(S) 에 적용된 현재의 M 주기에 대한 예외가 명시되어 있지 않기 때문이다"
+  },
+  {
+    "finding_id": "finding-9a82c62abeff9dca289fcd5f",
+    "finding_text_md5": "db31633c364b0a0e81d148a6a3226cb6",
+    "published_date": "2016-12-13",
+    "detail_text": "Specifically, 1) Investigation IN-JK-2015-0271 was initiated OSMAY2015 for dissolution failure of I8M long-term stability samples of Buproprion HCI extended release tablets, 200mg, Batch JKM4152A. An initial Field Alert Report (FAR) for batch JKM4152A was submitted to the agency 07MAY2015. Product impact assessment of the investigation included dissolution testing of reserve samples of Batch #’s JKM4737A and JKM5270A of Buproprion HCI extended release tablets, 200mg, completed 30-31MAY2015 with out-of-specification and borderline L3 results, respectively, recorded on O1JUN2015. However, no separate Field Alerts were submitted for the dissolution failure/borderline results of Batch #’s JKM4737A and JKM5270A, and no notice of their failing/borderline results were submitted to the agency until notification of their recall on 08JUL2015. No follow-up Field Alert was submitted for failing/borderline dissolution results of Batch #’s JKM4737A and JKM5270A, until final FAR submission for Batch JEM4152A on a1 JULZ0TS; 2) OS-JK-2016-0749 was initiated 090CT2016 for L3 dissolution failures of23M control samples of Buproprion HCI extended release tablets, 150mg Batch #’s JKN5125A and JKN5232A,",
+    "detail_text_ko": "구체적으로, 1) Investigation IN-JK-2015-0271 은 Buproprion HCI 서방정, 200mg, Batch JKM4152A 의 I8M 장기 안정성 시료의 용출 부적합으로 2015년 5월 05일(OSMAY2015) 시작되었다. Batch JKM4152A 에 대한 최초 Field Alert Report(FAR)는 2015년 5월 07일(07MAY2015) 당국에 제출되었다. 조사의 제품 영향 평가에는 Buproprion HCI 서방정, 200mg, Batch #’s JKM4737A 및 JKM5270A 의 보관 시료에 대한 용출 시험이 포함되었으며, 이는 2015년 5월 30-31일(30-31MAY2015)에 완료되었고 각각 기준 일탈 결과와 경계 L3 결과가 2015년 6월 01일(O1JUN2015)에 기록되었다. 그러나 Batch #’s JKM4737A 및 JKM5270A 의 용출 부적합/경계 결과에 대해서는 별도의 Field Alert 가 제출되지 않았고, 이들의 부적합/경계 결과에 대한 통지는 2015년 7월 08일(08JUL2015) 회수를 통보할 때까지 당국에 제출되지 않았다. Batch #’s JKM4737A 및 JKM5270A 의 부적합/경계 용출 결과에 대한 후속 Field Alert 는 Batch JEM4152A 에 대한 최종 FAR 가 a1 JULZ0TS 에 제출될 때까지 제출되지 않았다; 2) OS-JK-2016-0749 는 Buproprion HCI 서방정, 150mg Batch #’s JKN5125A 및 JKN5232A 의 23M 관리 시료의 L3 용출 부적합으로 2016년 10월 09일(090CT2016) 시작되었으며,"
+  },
+  {
+    "finding_id": "finding-786b5eaf433413e38908e88f",
+    "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+    "published_date": "2016-12-13",
+    "detail_text": "Specifically, aces faci : — 2 , : (0)(4) (by (4) 1) LV/076/20 18 was initiated 04SEP20 14 foray} dissolution failure of 3M long-term samples of tabs ng Batch . No assignable root cause was identified during the laboratory investigation, an initial Field Alert Keport for Batch was submitted on LOSEP2014, the investigation was extended as ER-QCC-14/189. and no assignable root cause was identified in production. Upon release testing, Batch was passing at3 only. Review ofdissolution result trend data for batches of similar age or older than the subject batch identified one additional batch released after meeting@3 a@ ae ae,a",
+    "detail_text_ko": "구체적으로, aces faci : — 2 , : (0)(4) (by (4) 1) LV/076/20 18 은 정제 ng Batch 의 3M 장기 시료의 )} 용출 부적합으로 2014년 9월 04일(04SEP20 14) 시작되었다. 시험실 조사에서 지정 가능한 근본 원인이 확인되지 않았고, Batch 에 대한 최초 Field Alert Keport 는 2014년 9월 10일(LOSEP2014)에 제출되었으며, 조사는 ER-QCC-14/189 로 확대되었고 생산에서도 지정 가능한 근본 원인이 확인되지 않았다. 출하 시험에서 Batch 는 3 에서만 적합했다. 조사 대상 배치와 연령이 비슷하거나 더 오래된 배치의 용출 결과 추이 데이터를 검토한 결과 @3 a@ ae,a 를 충족한 뒤 출하된 배치가 하나 더 확인되었다"
+  },
+  {
+    "finding_id": "finding-593d233cb9984cccf4c1120b",
+    "finding_text_md5": "d7b95d390f7e40b6f69e222ed4300ea1",
+    "published_date": "2016-12-13",
+    "detail_text": "Specifically, media fill BMRs include attachments of incubation room temperature graphs to verify the storage conditions of filled units. Raw data is transmitted to the M-947 Building Management System (BMS) unit in and compiled into” data reports and graphs by G-Tek software. The data reports and graphs generated are retained in .pdfform by the ” department, but source electronic data for media fill incubation rooms acquired prior to July 2015 has not been retained. For example, data for the following specific events/time periods were not retained: , . . : Sopa om OVO, .. + Source data for temperature recording during 0-7D incubation ofMedia Fill Batch we) at@) -@ °C in ENG-002, identifying “communication errors” in which no data from sensor Channels appears in the firm’s BMS system (approximately 1/2hr., around 15:00hrs. on 23MAR2015, 3hrs., 10:00-13:00hrs. on 24MAR2015, and 6hrs., 13:00-17:00hrs. on 24MAR2015). Additionally, source data for high temperature excursion s ofENG-002 totaling 04:1 5hrs. are identified from 13:58-21:13hrs. on 20MAR2015. . . = ; — (b) (4) ¢ Source data and .pdf reports for temperature recording during the 0-7D incubation of Media Fill Batch at eLENEC i",
+    "detail_text_ko": "구체적으로, 배지충전 BMR 에는 충전된 유닛의 보관 조건을 확인하기 위한 배양실 온도 그래프 첨부물이 포함되어 있다. 원시 데이터는 에 있는 M-947 Building Management System(BMS) 유닛으로 전송되고 G-Tek 소프트웨어에 의해 ” 데이터 보고서와 그래프로 취합된다. 생성된 데이터 보고서와 그래프는 ” 부서에서 .pdf 형식으로 보관하지만 2015년 7월 이전에 취득한 배지충전 배양실의 원본 전자 데이터는 보관되지 않았다. 예를 들어 다음의 특정 사건/기간의 데이터는 보관되지 않았다: , . . : Sopa om OVO, .. + ENG-002 에서 @) -@ °C 로 Media Fill Batch we) 를 0-7D 배양하는 동안의 온도 기록 원본 데이터로서, 센서 Channels 의 데이터가 귀사의 BMS 시스템에 나타나지 않는 “통신 오류”가 확인된다(2015년 3월 23일(23MAR2015) 15:00시경 약 1/2시간, 2015년 3월 24일(24MAR2015) 10:00-13:00시 3시간, 2015년 3월 24일(24MAR2015) 13:00-17:00시 6시간). 또한 ENG-002 의 고온 일탈 s 합계 04:1 5시간에 대한 원본 데이터는 2015년 3월 20일(20MAR2015) 13:58-21:13시로 확인된다. . . = ; — (b) (4) ¢ Media Fill Batch 를 at eLENEC i 에서 0-7D 배양하는 동안의 온도 기록 원본 데이터와 .pdf 보고서"
+  },
+  {
+    "finding_id": "finding-49ddfb9f1ad8a5ed59025ca8",
+    "finding_text_md5": "d62e877af6e62302518cb7680d4a5feb",
+    "published_date": "2016-12-13",
+    "detail_text": "(b) (4) Specifically, the proposed expiries of Buproprion HCI extended release tablets af 1 50mg and 200mg strengths were based on 3M accelerated data for exhibit batches at the time of - filing. 24M of long- term data to support the proposed expiries were generated for exhibit batches as of O8AUG2008 and confirmed dissolution failures of samples at time points of 1 8.24M have been identified by (but not limited to) the following: 150mg + 1.2/314/2014, initiated 23SEP2014 for 24M long-term stability samples of Batch JKL4403A oO |",
+    "detail_text_ko": "(b) (4) 구체적으로, Buproprion HCI 서방정 af 1 50mg 및 200mg 함량의 제안 유효기간은 신청 시점에 exhibit 배치의 3M 가속 시험 데이터를 근거로 했다. 제안 유효기간을 뒷받침하는 장기 시험 데이터 24M 가 2008년 8월 08일(O8AUG2008) 현재 exhibit 배치에 대해 생성되었고, 1 8.24M 시점의 시료 용출 부적합이 다음(이에 한정되지 않음)에 의해 확인되었다: 150mg + 1.2/314/2014, Batch JKL4403A 의 24M 장기 안정성 시료에 대해 2014년 9월 23일(23SEP2014) 시작됨 oO |"
+  },
+  {
+    "finding_id": "finding-fbf445a3079d4aaa8592dfef",
+    "finding_text_md5": "6079f8b182625bbcd93776be5f7044f4",
+    "published_date": "2016-11-29",
+    "detail_text": ". . 4) 1. (b) 4) Specifically, the container closure system used to package exhibit batch does not prevent product leakage. Both control samples © bottles) and stability study samples ( bottles) of oe Solution”mg/mL batch © stored in the ®®\\osition appear to leak drug : (4 product. The ®©® of all bottles also appear discolored from the drug product. Four of “a cartons ofcontrol samples showed signs of leakage on the secondary carton and four of hi cartons of stability study samples stored in the position showed signs of apparent leakage on the secondary carton.",
+    "detail_text_ko": "구체적으로, exhibit 배치 에 포장하는 데 사용된 용기 마개 시스템은 제품 누출을 막지 못한다. ®®\\osition 으로 보관된 Solution”mg/mL 배치 © 의 관리 시료( © 병)와 안정성 시험 시료( 병) 모두 의약품이 새는 것으로 보인다. 모든 병의 ®® 도 의약품으로 인해 변색된 것으로 보인다. 관리 시료 “a 카톤 중 4개는 외부 카톤(secondary carton)에 누출 흔적을 보였고, 위치로 보관된 안정성 시험 시료 hi 카톤 중 4개는 외부 카톤에 누출로 보이는 흔적을 보였다. . . 4) 1. (b) 4)"
+  },
+  {
+    "finding_id": "finding-fbac18f38817899a04a3cbfe",
+    "finding_text_md5": "e8fb98a6402109bd89034fb8b1e253de",
+    "published_date": "2016-11-29",
+    "detail_text": "Specifically, a. Regarding ao OO solution, approximately 7 complaints have been received for lot o | exp. ®)@). between April 2015 and June 2016, describing empty containers or similar issues. Approximately 9 complaints have been received for this issue across other lots. Investigation has found that the container-closure system was being damaged during the assembly of the ©)@) and sterile integrity of the containers was compromised, allowing product to evaporate or leak out of the container. Although line™ is believed to be an appropriate corrective action to eliminate the defect, prevalence and severity of the defect has not been thoroughly investigated, and inspection for the container-closure defect has not yet been assessed throughout an entire filling run. The product has not beenfilled since January, 2016, but there are approximately 11 lots on the market within expiry, in addition to lot for which the integrity of the sterile barrier may be questionable. (b) (4) (4) ee ge 4 b. oe Solution, lot , is failing to meet the specification limit for content of mo the 25° 4y RH stability condition at 18 months. Values were reported at & %, OY, and (4, and the limit is % to ',. The r",
+    "detail_text_ko": "구체적으로, a. ao OO 용액과 관련하여, 2015년 4월부터 2016년 6월 사이에 로트 | (exp. ®)@))에 대해 빈 용기 또는 유사한 문제를 설명하는 불만이 약 7건 접수되었다. 다른 로트 전체에서 이 문제에 대해 약 9건의 불만이 접수되었다. 조사 결과 ©)@) 조립 중 용기 마개 시스템이 손상되어 용기의 무균 완전성이 훼손되었고, 그 결과 제품이 증발하거나 용기 밖으로 새어 나온 것으로 확인되었다. 라인 ™ 이 결함을 제거하는 적절한 시정 조치로 여겨지지만, 결함의 발생 빈도와 심각도는 철저히 조사되지 않았고 용기 마개 결함에 대한 검사는 충전 실행 전체에 걸쳐 아직 평가되지 않았다. 이 제품은 2016년 1월 이후 충전되지 않았으나 무균 장벽의 완전성이 의심될 수 있는 로트 외에 유효기간 내에 시장에 있는 약 11개 로트가 있다. (b) (4) (4) ee ge 4 b. oe Solution, 로트 는 25° 4y RH 안정성 조건의 18개월 시점에 mo 함량의 규격 한계를 충족하지 못하고 있다. 값은 & %, OY, 및 (4 로 보고되었고 한계는 % 에서 ',. 이다. The r"
+  },
+  {
+    "finding_id": "finding-fa7e91da7fd665bbf8e57772",
+    "finding_text_md5": "47da17fde3b9c4de6c83b9e5fe083c69",
+    "published_date": "2016-11-29",
+    "detail_text": "Specifically, at thea ofeach of “mr machines, the process includesa system, but it is only validated to holes that may occur at the7 of each vial_and not throughout the container itself This is nerformed following ® by whicha D) (4) There is no routine vial integrity testing performed after this. There is no assurance that if a leak were _ in any other part of the™® container that it would be™ —__ Products filled on these lines include is ® Suspension and OMond 4) solution. Postmarket Reporting",
+    "detail_text_ko": "구체적으로, 각 “mr 기계의 a 에서 공정은 시스템을 포함하지만 각 바이알의 7 에서 발생할 수 있는 구멍에 대해서만 밸리데이션되었고 용기 자체 전체에 대해서는 밸리데이션되지 않았다. 이는 에 의해 ® 이후 수행되며 whicha D) (4) 이 이후 정기적인 바이알 완전성 시험은 수행되지 않는다. ™® 용기의 다른 부분에서 누출이 _ 발생했다면 이것이 ™ —__ 되었을 것이라는 보증이 없다. 이 라인에서 충전되는 제품에는 is ® Suspension 및 OMond 4) 용액이 포함된다. Postmarket Reporting"
+  },
+  {
+    "finding_id": "finding-f87c4624b2cd69f51488fb04",
+    "finding_text_md5": "f2afb0462050139493a0abd8d478bfbd",
+    "published_date": "2016-11-29",
+    "detail_text": "Specifically, a) your QC laboratory does not report all test results from OOS investigations. CQA/057 Handling OOS Results states to report the average of six results. 1/00S/003/16 initiated for API raw Material,w USP on January 12, 2016 stated to reported the average of repeat _analvsis. USP : (b) (4) (b) (4) (b) (4) (b) (4) was used in the manufacture of Capsules mg batch numbers and shipped to the US. b) your QC laboratory does not always report all in-specification test results. . (b) (4) (b) (4) () (4) (by (4) (b) (4) (b) op: i) You retested and mg/ mg/ml exhibit batch (b) (4) . . number for assay after OM of storage of solution and issued a second CoA reporting only the value of the second test even though the results of the first test were also in specification. .. {b) (4) (b) (4) (by (4) () (4) (b) (4) (b) a ii) You retested le and mg/ mg ml exhibit batch oe (4 ‘4 “4: numbers ©” ” and o ‘stability study 25°/60% RH 3 month for assay after of storage of solution as partof = 2/OOT/001/14. The incidence summary and final",
+    "detail_text_ko": "구체적으로, a) 귀사의 QC 실험실은 OOS 조사의 모든 시험 결과를 보고하지 않는다. CQA/057 Handling OOS Results 는 6개 결과의 평균을 보고하도록 규정한다. 2016년 1월 12일 API 원료, w USP 에 대해 시작된 1/00S/003/16 은 반복 _분석(analvsis)의 평균을 보고하도록 기술했다. USP : (b) (4) (b) (4) (b) (4) (b) (4) 는 Capsules mg 배치 번호 및 의 제조에 사용되었고 미국으로 출하되었다. b) 귀사의 QC 실험실은 기준에 적합한 모든 시험 결과를 항상 보고하지는 않는다. . (b) (4) (b) (4) () (4) (by (4) (b) (4) (b) op: i) 귀사는 mg/ mg/ml exhibit 배치 (b) (4) . . 번호의 역가를 용액을 OM 보관한 후 재시험했고, 첫 번째 시험 결과도 기준에 적합했음에도 두 번째 시험 값만 보고하는 두 번째 CoA 를 발행했다. .. {b) (4) (b) (4) (by (4) () (4) (b) (4) (b) a ii) 귀사는 2/OOT/001/14 의 일부로 용액을 보관한 후 le 및 mg/ mg ml exhibit 배치 oe (4 ‘4 “4: 번호 ©” ” 및 o ‘ 안정성 시험 25°/60% RH 3개월의 역가를 재시험했다. 사건 요약과 최종"
+  },
+  {
+    "finding_id": "finding-f40b03fba644e0f80e92281f",
+    "finding_text_md5": "96433afc09b85fadeda33bcabe1df469",
+    "published_date": "2016-11-29",
+    "detail_text": "; ; (b) ; _. Specifically, samples collected for BET testing, per SOP # @/QAD/0372, titled, \"Finished Product Sampling\", are not collected in sufficient quantity to be representative of the final batch.",
+    "detail_text_ko": "; ; (b) ; _. 구체적으로, SOP # @/QAD/0372, \"Finished Product Sampling\" 에 따라 BET 시험을 위해 채취하는 시료는 최종 배치를 대표하기에 충분한 양으로 채취되지 않는다."
+  },
+  {
+    "finding_id": "finding-f2ef806f682fd8316700674c",
+    "finding_text_md5": "6c9ba08f5d7886bae57c3d906dc3afda",
+    "published_date": "2016-11-29",
+    "detail_text": "Specifically, between January and August 2016, approximately 459 complaints describing leaking or empty bottles for sterile ®@ »roducts have been received. Although a failure-mode-evaluation-analysis has resulted in procedural revisions and other corrections, complaints continue for batches made subsequent to those corrections, with trends as high as 24 : (b) (4), . (b) (4) : . (b) (4) complaints for one batch or Solution, lot ; along with 13 complaints for lot and 9 complaints for lot . The investigation has failed to expand to consider all batches of this product, as well as others, which may be impacted. Although equipment to perform 100% ©@ leak testing on all units produced is planned for qualification, production . . oy (b) (4) . ; : continues, and there are approximately 4% _ lots of Solution on the market potentially impacted by this defect. Complaints of this nature have been seen at lower rates for the following products as well: b) (4 . ° OM, olution ° OMnd 45 olution ° OMsolution ° ©) solution",
+    "detail_text_ko": "구체적으로, 2016년 1월부터 8월 사이에 무균 ®@ » 제품의 병이 새거나 비어 있다는 불만이 약 459건 접수되었다. 고장 모드 영향 분석(failure-mode-evaluation-analysis)을 통해 절차서 개정과 기타 시정이 이루어졌으나, 그 시정 이후 제조된 배치에 대해서도 불만이 계속되고 있으며 추세는 한 배치 또는 Solution, 로트 에 대해 최대 24 : (b) (4), . (b) (4) : . (b) (4) 건의 불만, 로트 에 대해 13건의 불만, 로트 에 대해 9건의 불만에 이른다. 조사는 이 제품은 물론 영향을 받을 수 있는 다른 제품의 모든 배치까지 확대하여 고려하지 못했다. 생산된 모든 유닛에 대해 100% ©@ 누출 시험을 수행하는 설비의 적격성평가가 계획되어 있으나 생산은 계속되고 있으며 oy (b) (4) . ; : 이 결함의 영향을 받았을 가능성이 있는 Solution 약 4% _ 로트가 시장에 있다. 이러한 성격의 불만은 다음 제품에서도 더 낮은 비율로 확인되었다: b) (4 ° OM, olution ° OMnd 45 olution ° OMsolution ° ©) solution"
+  },
+  {
+    "finding_id": "finding-ee284751e6925f3579ce80d7",
+    "finding_text_md5": "2f106bd5e5bf6b12388c2e2e6a957e71",
+    "published_date": "2016-11-29",
+    "detail_text": "For example ths non-viable pactsErte peut line is located nore than ww the height ofthe sterile at the o in the side ofthe © away from eoThe hen-viable particle probe in fill line @and_ pis located more than’ @ away from the oper in the",
+    "detail_text_ko": "예를 들어 ths 비생균(non-viable) 입자 pactsErte peut 라인은 무균 의 높이보다 ww 이상 떨어진 곳에 위치하며 o 의 측면에서 © 만큼 eoThe 떨어져 있다. 충전 라인 @and_ pis 의 비생균 입자 프로브는 oper 에서 ’ @ 이상 떨어진 곳에 위치한다"
+  },
+  {
+    "finding_id": "finding-edefb7ba92602a08172ff100",
+    "finding_text_md5": "d21d98a1123f1b6c191987ec82a050dd",
+    "published_date": "2016-11-29",
+    "detail_text": "Since March 2014, the firm has submitted 58 Field Alerts. The majority of these Field Alerts originate as single consumer product complaints and many ofthe complaints have not been confirmed by the company. For example, . : (0) (4) o@. A. The firm received a complaint on August 10, 2015 fora ee lot , in which the 24 OA riled to The returned complaint sample included a) in which the aad not been )(4) The QC department was able to) © the) Mand successfully” the , the complaint was not confirmed, The initial Field Alert was submitted on December 15, 2015 and the final Field Alert was submitted on December 24, 2015. . . : (b) (4) (4) B. The firm received a complaint on October 16, 2015 for an oe tot © for the prey me of the , The returned complaint sample included a filled) \"in which thes © had not been®™ and the complaint was not confirmed. The unsigned draft of the initial Field Alert was dated October 2 L 2015. The firm’s version 2 ofthe Final Report included a second complaint for the same | defect, for lot ©) in which the sample was returned and the defect was confirmed. The documents for the final Field Alert were not provided. , , (oa) (4) ow... sah C. The firm received a compla",
+    "detail_text_ko": "2014년 3월 이후 귀사는 Field Alert 를 58건 제출했다. 이 Field Alert 의 대부분은 단일 소비자 제품 불만에서 시작되며 불만의 상당수는 회사에서 확인되지 않았다. 예를 들어, . : (0) (4) o@. A. 귀사는 2015년 8월 10일 로트 , 에 대한 불만을 접수했는데, 24 OA riled to 였다. 반송된 불만 시료에는 a) 가 포함되어 있었고 그 안의 aad 는 )(4) 되지 않았다. QC 부서는 ) © Mand 를 successfully” 할 수 있었고 불만은 확인되지 않았다. 최초 Field Alert 는 2015년 12월 15일에, 최종 Field Alert 는 2015년 12월 24일에 제출되었다. . . : (b) (4) (4) B. 귀사는 2015년 10월 16일 oe tot © 의 prey me of the 에 대한 불만을 접수했다. 반송된 불만 시료에는 충전된 ) \"가 포함되어 있었고 그 안의 thes © 는 ™ 되지 않았으며 불만은 확인되지 않았다. 서명되지 않은 최초 Field Alert 초안은 2015년 10월 2 L 일자였다. 귀사의 최종 보고서 버전 2 에는 로트 ©) 에 대해 같은 | 결함을 다룬 두 번째 불만이 포함되어 있었는데, 이 시료는 반송되어 결함이 확인되었다. 최종 Field Alert 에 대한 문서는 제공되지 않았다. , , (oa) (4) ow... sah C. 귀사는 불만을 접수했다"
+  },
+  {
+    "finding_id": "finding-e6b87d9c5f8e938b375166d2",
+    "finding_text_md5": "bd77f6a20af095414579a4247195151e",
+    "published_date": "2016-11-29",
+    "detail_text": "Specifically, September 24, 2016 your SAP inventory system still showed an inventory of ©“bottles of Solution ‘mg/mL. The Batch Packaging Record for oe Solution mg/mL indicated “bottles were transferred to the warehouse after packaging on March 01, 2014. Your SAP inventory records show bottles of oo Solution” ‘mg/mL were received in the warehouse March 06, 2014. On September 21, 2016 I observed the actual count of bottles of ©) Solution ‘mg/mL in your warehouses is bottles. The SAP inventory system had of «bottles moving out of the warehouse either September 21, 2016 or September 24, 2016.",
+    "detail_text_ko": "구체적으로, 2016년 9월 24일 귀사의 SAP 재고 시스템에는 여전히 ©“병의 Solution ‘mg/mL 재고가 표시되어 있었다. oe Solution mg/mL 의 배치 포장 기록서에는 2014년 3월 01일 포장 후 “병이 창고로 이송되었다고 기재되어 있다. 귀사의 SAP 재고 기록에는 oo Solution” ‘mg/mL 병이 2014년 3월 06일 창고에 입고된 것으로 나타난다. 2016년 9월 21일 귀사 창고에 있는 ©) Solution ‘mg/mL 의 실제 병 수를 확인했는데 병이다. SAP 재고 시스템에는 2016년 9월 21일 또는 2016년 9월 24일에 창고에서 출고된 «병 중 가 표시되어 있었다."
+  },
+  {
+    "finding_id": "finding-e138793efd1282db842e81e3",
+    "finding_text_md5": "a84c27371a7c049b6fea8cdcc95dd022",
+    "published_date": "2016-11-29",
+    "detail_text": "Specifically, : 5 : (>) (4) . (b) (4) A. While your cleaning procedure requires a@ contact time between | and (a OF ), your Disinfectant Efficacy Study does not contain data surrounding the required contact time between and in order to ensure aq) logig kill of non spore- forming bacteria and fungi and a logio kill ofspore-forming bacteria. | P , a j oO |, B. Your cleaning proceduregequires that your sanitization solution. w maintain a contact time of @ on glass and other surfaces to ensure a@) logio kill of fungi and non spore-forming bacteria. You apply the to the surface of your equipment using a non-sterile wipe; we observed that the solution does not make contact with . (4 . your equipment surfaces for a full @ m@ due to evaporation. , : Te ‘ om ... C. Your cleaning procedure requires that, vour sanitization solution, maintain a gcontact time of @ to ensure a@ logio kill ofnon spore-forming bacteria and fungi and a @) logio kill ofspore-forming bacteria for various surfaces, including ww . You apply the to the surface of your equipment using a non-sterile Wipe; we . . : (b) observed that the solution does not make contact with your equipment surfaces for a full @ due to evapora",
+    "detail_text_ko": "구체적으로, : 5 : (>) (4) . (b) (4) A. 귀사의 세척 절차서는 | 과 (a OF ) 사이에 @ 접촉 시간을 요구하지만, 귀사의 소독제 효능 연구에는 비포자 형성 세균과 진균의 @) logio 사멸 및 포자 형성 세균의 logio 사멸을 보증하기 위해 필요한 와 사이의 접촉 시간에 관한 데이터가 포함되어 있지 않다. | P , a j oO |, B. 귀사의 세척 절차서는 귀사의 소독 용액 w 이 유리 및 기타 표면에서 @ 의 접촉 시간을 유지하여 진균과 비포자 형성 세균의 @) logio 사멸을 보증할 것을 요구한다. 귀사는 비멸균 와이프를 사용해 를 설비 표면에 도포하는데, 증발로 인해 용액이 설비 표면에 @ m@ 전체 동안 접촉하지 않는 것을 관찰했다. , : Te ‘ om ... C. 귀사의 세척 절차서는 vour 소독 용액이 ww 를 포함한 다양한 표면에서 비포자 형성 세균과 진균의 @ logio 사멸 및 포자 형성 세균의 @) logio 사멸을 보증하기 위해 gcontact time of @ 를 유지할 것을 요구한다. 귀사는 비멸균 Wipe 를 사용해 를 설비 표면에 도포하는데, 증발로 인해 용액이 설비 표면에 @ 전체 동안 접촉하지 않는 것을 관찰했다. . . : (b) evapora"
+  }
+]

@@ -1,0 +1,352 @@
+[
+ {
+  "finding_id": "finding-d3e6f8f1633ef660445405e6",
+  "finding_text_md5": "9ad88eb8a7bf4c344d28d516f75156da",
+  "published_date": "2021-04-21",
+  "detail_text": "A. You currently have no in-process defect alert (and/or action) limits for either your semi ­automated vial inspection process or your fully-automated vial inspection process despite the approximately 175 particulate complaints you have received since your visual inspection remediation process began in response to the January 2012 FDA inspection. The following applies to the approximately Redacted (b) (4) products which you visually inspect, such as Precedex, Marcaine HCl, Hydromorphone, Diltiazem, and Redacted (b) (4): Whenever any change is made to your manufacturing process (including a change to your visual inspection program) you completely remove the in-process defect limits for approximately Redacted (b) (4) of that product. During this time, your SOP QC 1310.10 directs you not to investigate any batches despite any number of defects found during inspection. You have reset (i.e. eliminated) your defect limit multiple times since 3/25/15 and plan to continue this practice in the future: - On 3/25/15, you began using fully-automated visual inspection and have moved approximately Redacted (b) (4) different products to this process (and inspected approximately Redacted (b) (4)",
+  "detail_text_ko": "A. 귀사는 2012년 1월 FDA 실사에 대응해 육안검사 개선 절차를 시작한 이후 약 175건의 이물 불만을 접수했음에도, 반자동 바이알 검사 공정과 완전자동 바이알 검사 공정 모두에 공정 중 결함 경고(및/또는 조치) 한도가 없다. 다음은 귀사가 육안검사하는 약 Redacted (b) (4)개 제품, 예를 들어 Precedex, Marcaine HCl, Hydromorphone, Diltiazem, Redacted (b) (4)에 적용된다: 제조 공정에 변경이 있을 때마다(육안검사 프로그램 변경 포함) 귀사는 해당 제품의 약 Redacted (b) (4)에 대해 공정 중 결함 한도를 완전히 제거한다. 이 기간 동안 SOP QC 1310.10 은 검사 중 결함이 몇 건 발견되더라도 어떤 배치도 조사하지 말라고 지시한다. 귀사는 3/25/15 이후 결함 한도를 여러 차례 재설정(즉, 폐지)했으며 앞으로도 이 관행을 계속할 계획이다: - 3/25/15 에 귀사는 완전자동 육안검사를 사용하기 시작해 약 Redacted (b) (4)개의 서로 다른 제품을 이 공정으로 옮겼다(그리고 약 Redacted (b) (4)를 검사했다)"
+ },
+ {
+  "finding_id": "finding-cf6b432be6bcf46a34299eb3",
+  "finding_text_md5": "0200bfcec352ce86574daa761852eac8",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically> Your SOP does not appropriately classify deterioration to your critical text, namely lot number and expiry. You classify faded print to the critical text fields of lot number and expiry as minor with AQLs for this defect type of <Redacted B4> A randomly selected retain review of Vancomycin HCI Injectable Lot 67230DD identified approximately units with faded lot numbers. REPEAT OBSERVATION from 6/8/2016",
+  "detail_text_ko": "구체적으로> 귀사의 SOP는 핵심 문구, 즉 로트 번호와 유효기간의 열화를 적절히 분류하지 않는다. 귀사는 로트 번호와 유효기간이라는 핵심 문구 영역의 인쇄 번짐을 경미한 결함으로 분류하고, 이 결함 유형의 AQL은 <Redacted B4> 이다. 무작위로 선정한 Vancomycin HCI Injectable Lot 67230DD 보관 검체 검토에서 로트 번호가 흐려진 단위가 약 몇 개 확인되었다. REPEAT OBSERVATION 6/8/2016"
+ },
+ {
+  "finding_id": "finding-be08f15995551840f90cf841",
+  "finding_text_md5": "8460be89ed67660284eb3d92ea2a9ee5",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, A non-sterile surface was introduced for use in the Redacted (b) (4), which is prohibited by your SOPs: On 5/21/16, while Hydromorphone lot 651903A was being manufactured in the Redacted (b) (4), a bottle of Redacted (b) (4) tamper resistant seal was observed in the Redacted (b) (4) . Inserting bottles with tamper seals is specifically prohibited by your procedure MF0732.00. According to your records, a Redacted (b) (4) was originally loaded into the Redacted (b) (4) on 5/19/16 by a Redacted (b) (4) . A surface sterilization cycle was run, but due to a separate manufacturing issue, the (b) (4)) were unloaded into the grade D area. Later on 5/19/16, a Redacted (b) (4) from the grade D area into the Redacted (b) (4) The Redacted (b) (4) on 5/20/16, and then the Redacted (b) (4) was opened and operators began using the items inside. On 5/21/16, our inspection discovered the Redacted (b) (4). You do not know whether the Redacted (b) (4)) was improperly loaded and placed/verified by Redacted (b) (4) or ifthe error only encompasses the Redacted (b) (4) operators. Repeat Observation from 10/24/2012",
+  "detail_text_ko": "구체적으로, 귀사의 SOP에서 금지하고 있는 비무균 표면이 Redacted (b) (4)에 반입되었다: 2016/5/21 에 Hydromorphone lot 651903A 가 Redacted (b) (4)에서 제조되던 중, Redacted (b) (4) 변조방지 씰 한 병이 Redacted (b) (4) 안에서 관찰되었다. 변조방지 씰이 있는 병을 투입하는 것은 귀사의 절차 MF0732.00 에서 명시적으로 금지되어 있다. 귀사의 기록에 따르면 Redacted (b) (4)는 원래 2016/5/19 에 Redacted (b) (4)가 Redacted (b) (4)에 적재한 것이다. 표면 멸균 사이클이 실행되었으나 별개의 제조 문제로 인해 (b) (4))이 D등급 구역으로 꺼내졌다. 같은 5/19/16 늦게 D등급 구역에서 Redacted (b) (4)가 Redacted (b) (4)로 옮겨졌다. Redacted (b) (4)가 5/20/16 에 진행되었고, 이후 Redacted (b) (4)가 열려 작업자들이 안의 물품을 사용하기 시작했다. 5/21/16 에 당사 실사에서 Redacted (b) (4)가 발견되었다. 귀사는 Redacted (b) (4))가 Redacted (b) (4)에 의해 부적절하게 적재되고 배치/확인되었는지, 아니면 오류가 Redacted (b) (4) 작업자에게만 해당하는지 알지 못한다. REPEAT OBSERVATION 10/24/2012"
+ },
+ {
+  "finding_id": "finding-bd36f95a990ce8833021b7d9",
+  "finding_text_md5": "9879095d6dc22d5a03385ae9f021982b",
+  "published_date": "2021-04-21",
+  "detail_text": "On 12/2/201 I observed an intervention on the REDACTION (b)(4) line at the needle assembly hopper during the filling of Labetalol HCI Inj. USP 5 mg/mL lot REDACTION (b)(4) The hopper was vibrating to move the assemblies into position. The operator opened the door and removed multiple assemblies using forceps. The intervention lasted for more than 20 seconds. The smoke study for this type of intervention did not have the hopper vibrating and the operator opened the door removed one assembly and closed the door in approximately 10 seconds. During the smoke study, I observed smoke beginning to enter into the hopper area before the operator closed the door. The firm did not have data to support longer interventions similar those observed and there were no interventions demonstrating the vibrating hopper . The smoke studies do not include the effect upon room pressure and laminar air flow when doors are opened to the sterile corridor simulating personnel and materials movement into and out of the aseptic filling room. Additionally, environmental monitoring activities are not routinely included in the smoke studies .",
+  "detail_text_ko": "실사관은 12/2/201 에 Labetalol HCI Inj. USP 5 mg/mL lot REDACTION (b)(4) 충전 중 REDACTION (b)(4) 라인의 니들 어셈블리 호퍼에서 개입을 관찰했다. 호퍼는 어셈블리를 위치로 이동시키기 위해 진동하고 있었다. 작업자는 문을 열고 핀셋으로 어셈블리 여러 개를 꺼냈다. 이 개입은 20초 넘게 지속되었다. 이 유형의 개입에 대한 스모크 스터디에서는 호퍼가 진동하지 않았고, 작업자가 문을 열어 어셈블리 하나를 꺼내고 문을 닫는 데 약 10초가 걸렸다. 스모크 스터디 중 작업자가 문을 닫기 전에 연기가 호퍼 구역으로 들어가기 시작하는 것을 실사관은 관찰했다. 귀사는 관찰된 것과 유사한 더 긴 개입을 뒷받침하는 데이터가 없었고, 진동하는 호퍼를 보여주는 개입도 없었다. 스모크 스터디에는 무균 충전실 안팎으로의 인원 및 자재 이동을 모사하여 무균 복도 쪽 문을 열 때 실내 압력과 층류 기류에 미치는 영향이 포함되어 있지 않다. 또한 환경 모니터링 활동이 스모크 스터디에 통상적으로 포함되지 않는다."
+ },
+ {
+  "finding_id": "finding-b8f620b4bc34b2fa604786c8",
+  "finding_text_md5": "068262848a702a8d2454325ebde70dce",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, A. ' The mop used to clean the walls ofthe filling room with <Redacted B4> was stored upright on a cart that also contained a box of sterile <Redacted B4> wipes used for cleaning. The mop was observed to be dripping onto the floor, and had the potential to drip into the container of sterile <Redacted B4> wipes when the lid was removed to obtain a clean wipe. This storage configuration has the potential to spread contamination cleaned from a wall to areas that are cleaned with the sterile <Redacted B4> wipes, such as windows and plexiglass in the filling room. B. <Redacted B4> cleaning of windows and plexiglass with <Redacted B4> in the <Redacted B4> filling room is not documented in the Sanitation Log Book, only the walls and ceilings being cleaned with <Redacted B4> is documented. While two different sporicidal agents are used in this room, they are not rotated so that each surface type is cleaned with two different sporicidal agents.",
+  "detail_text_ko": "구체적으로, A. ' <Redacted B4> 로 충전실 벽을 닦는 데 사용한 걸레(mop)가, 세척에 쓰는 멸균 <Redacted B4> 와이프 상자도 함께 놓인 카트 위에 세워져 보관되어 있었다. 걸레에서 바닥으로 물이 떨어지는 것이 관찰되었고, 깨끗한 와이프를 꺼내려고 뚜껑을 열 때 멸균 <Redacted B4> 와이프 용기 안으로 떨어질 가능성이 있었다. 이러한 보관 방식은 벽에서 닦아낸 오염이 충전실의 창문과 플렉시글라스처럼 멸균 <Redacted B4> 와이프로 닦는 곳으로 퍼질 가능성이 있다. B. <Redacted B4> 충전실의 창문과 플렉시글라스를 <Redacted B4> 로 <Redacted B4> 세척한 것은 위생 일지(Sanitation Log Book)에 기록되어 있지 않으며, 벽과 천장을 <Redacted B4> 로 세척한 것만 기록되어 있다. 이 방에서는 두 가지 포자 사멸제를 사용하지만, 각 표면 유형을 두 가지 서로 다른 포자 사멸제로 닦도록 교대 사용하지 않는다."
+ },
+ {
+  "finding_id": "finding-93f9a1d40dfa7d961fe38e94",
+  "finding_text_md5": "3087d3bf053987ce63f7b3fd3dbde0d5",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, A. B. During retain examination of Hydromorphone HCl lot 510053 (ANDA 078591), 15 of <Redacted B4> vials exhibited particulate matter, which was identified on 07/15/2016 as silicone based. This investigation began on 07/12/2016 and was not completed until 07/27/2017, with a recall initiated on 07/31/2017. C. The complaint investigation for a vial of Vanocmycin HCI for Injection lot 632153A (ANDA 062912), is inadequate in that it did not address potential inadequacies of the visual inspection process. A complaint vial was returned vvith a hair partially embedded in the stopper section that is inside of the vial. During the complaint investigation, the visual inspection process was not identified as a contributing factor for the distribution of the returned product.",
+  "detail_text_ko": "구체적으로, A. B. Hydromorphone HCl lot 510053 (ANDA 078591) 보관 검체 검사 중 <Redacted B4> 바이알 중 15개에서 이물이 나타났으며, 이는 07/15/2016 에 실리콘 기반으로 확인되었다. 이 조사는 07/12/2016 에 시작되어 07/27/2017 에야 완료되었고, 회수는 07/31/2017 에 개시되었다. C. Vanocmycin HCI for Injection lot 632153A (ANDA 062912) 바이알 한 개에 대한 불만 조사는 육안검사 공정의 잠재적 미흡을 다루지 않았다는 점에서 부적절하다. 불만 바이알이 바이알 안쪽 스토퍼 부분에 머리카락이 일부 박힌 채 반송되었다. 불만 조사 중 반송된 제품이 출하된 데 대해 육안검사 공정이 기여 요인으로 확인되지 않았다."
+ },
+ {
+  "finding_id": "finding-817684d9d2cf2fe8dfef0dfb",
+  "finding_text_md5": "60b530eb888a8144d1a849a3ff94d15d",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, On 5/18/16 we observed Redacted (b) (4) employees use Redacted (b) (4), write on some paperwork, and then perform personnel touch plates on line Redacted (b) (4), when Nimbex NX20, lot 65105DD, was being aseptically filled. On 5/19/16 we observed an employee use Redacted (b) (4) immediately before performing personnel touch plates on line Redacted (b) (4) when Vancomycin M-6535, lot 65090DD, was being aseptically filled.",
+  "detail_text_ko": "구체적으로, 5/18/16 에 Nimbex NX20, lot 65105DD 가 무균 충전되던 중 Redacted (b) (4) 직원들이 Redacted (b) (4)를 사용하고 서류에 기록한 다음 라인 Redacted (b) (4)에서 인원 터치 플레이트를 수행하는 것을 당사는 관찰했다. 5/19/16 에 Vancomycin M-6535, lot 65090DD 가 무균 충전되던 중 한 직원이 라인 Redacted (b) (4)에서 인원 터치 플레이트를 수행하기 직전에 Redacted (b) (4)를 사용하는 것을 당사는 관찰했다."
+ },
+ {
+  "finding_id": "finding-743e3b01c017fdfdd4168e46",
+  "finding_text_md5": "964e281cd5dac25cb0859fd643b047e9",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, you did not establish and maintain a design history file for each type of device. You did not document design changes in DHF (Design History File) for a major design change in a class II device. iSecure, a class II devices was approved in 2006 for use in the withdrawal and administration of sterile materials under aseptic conditions. In 08/01/2008 , your firm initiated a design change for iSecure that included new delivery sizes (1.5mL, 2.5mL and 5.0mL), materials, packaging and instruction for use. No design changes were documented in DHF prior to initiation ofthe new product design. As of 05/27/2016, the redesigned device, \" iSecure 2\" is used for withdrawal and administration of sterile materials under aseptic conditions for the following drug products",
+  "detail_text_ko": "구체적으로, 귀사는 각 의료기기 유형별 설계 이력 파일을 수립하고 유지하지 않았다. 귀사는 class II 기기의 주요 설계 변경을 DHF(Design History File)에 문서화하지 않았다. class II 기기인 iSecure 는 2006년에 무균 조건에서 무균 물질의 추출 및 투여용으로 승인되었다. 08/01/2008 에 귀사는 새로운 용량 크기(1.5mL, 2.5mL, 5.0mL), 재질, 포장 및 사용 설명서를 포함하는 iSecure 설계 변경을 시작했다. 새 제품 설계를 시작하기 전에 DHF에 어떤 설계 변경도 문서화되지 않았다. 05/27/2016 현재 재설계된 기기 \"iSecure 2\"는 다음 의약품의 무균 조건 하 물질 추출 및 투여에 사용된다"
+ },
+ {
+  "finding_id": "finding-629ac84fc7270e13f95d7245",
+  "finding_text_md5": "a41cd87bd6bfad9327ac572bbb73d14f",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, Employees performing your incoming quality visual inspection process associated with your glass components are not adequately trained. Your employees do not utilize physical glass components nor do you objectively measure this training process. Thls incoming quality inspection is critical to the prevention of container/closure integrity defects which affect critical attributes such as sterility and potency. The glass components are used as the primary container in all your sterile products including but not Limited to Vancomycin HCI Injectable (numerous ANDAINDAs), Marcaine HCI/Bupivicaine HCI Injectable (numerous ANDA/NDAs), Levophed/Norepinepbrine Bitartrate Injectable (ANDA/NDA 007513), Diltiazem HCI Injection (ANDA 074941, 075853), etc.",
+  "detail_text_ko": "구체적으로, 유리 부품과 관련된 입고 품질 육안검사 공정을 수행하는 직원들이 적절하게 교육받지 않았다. 귀사의 직원들은 실제 유리 부품을 사용하지 않으며 이 교육 과정을 객관적으로 측정하지도 않는다. 이 입고 품질 검사는 무균성 및 역가 같은 핵심 특성에 영향을 주는 용기/마개 완전성 결함을 예방하는 데 중요하다. 유리 부품은 Vancomycin HCI Injectable (다수의 ANDAINDAs), Marcaine HCI/Bupivicaine HCI Injectable (다수의 ANDA/NDAs), Levophed/Norepinepbrine Bitartrate Injectable (ANDA/NDA 007513), Diltiazem HCI Injection (ANDA 074941, 075853) 등을 포함하되 이에 국한되지 않는 귀사의 모든 무균 제품에서 1차 용기로 사용된다."
+ },
+ {
+  "finding_id": "finding-5cc1684136262e3928f88789",
+  "finding_text_md5": "fde411c6d069b4ab3cf575fb9be74737",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically,­ The alarms for the REDACTION (b)(4) humidity probes in the walk in REDACTION (b)(4) C REDACTION (b)(4) % RH stability room, containing all uncontrolled drug products held fo r stability testing, were turned off after 10/22/200 8. The humidity was out of specification on 6 different occasions after 10/22/2008 through 7/8/2011. There were 4 above hu midity events and 2 below humidity events. The. longest events lasted from 5/19/2011 to 7/8/2011. This recorder is checked daily by ManufactUring Quality personnel but they only looked for an alarm tbey did not look at the actual readings. Date/Date Range Length of Excursion Reason for Excursion 18-20 JUL 2009 37.5 hours 25-26 SEPT 2010 31 hours 28 SEPT 2010 11.5 hours 29-30 SEPT 2010 37 hours 30 DEC 2010 8 hours 19 MAY - 8 JUL 2011 400 hours (50 days) Further, humidity is only checked in the middle of the room during requalifications of the REDACTION (b)(4) C REDAC TION ( b)(4)% RH stability room M732. You have not verified the humidity is uniform throughout the entire room by mappin g humidity in the corners of the room during requalification.",
+  "detail_text_ko": "구체적으로,­ 안정성 시험을 위해 보관 중인 모든 비관리 의약품이 들어 있는 walk in REDACTION (b)(4) C REDACTION (b)(4) % RH 안정성 시험실의 REDACTION (b)(4) 습도 프로브 경보가 10/22/200 8 이후 꺼져 있었다. 습도는 10/22/2008 부터 7/8/2011 까지 6차례 기준을 벗어났다. 습도 상한 초과가 4회, 하한 미달이 2회 있었다. 가장 긴 이탈은 5/19/2011 부터 7/8/2011 까지였다. 이 기록계는 Manufactur ing Quality 직원이 매일 확인하지만 경보만 확인했을 뿐 실제 측정값은 확인하지 않았다. 날짜/기간 이탈 길이 이탈 사유 18-20 JUL 2009 37.5 hours 25-26 SEPT 2010 31 hours 28 SEPT 2010 11.5 hours 29-30 SEPT 2010 37 hours 30 DEC 2010 8 hours 19 MAY - 8 JUL 2011 400 hours (50 days) 또한 습도는 REDACTION (b)(4) C REDAC TION ( b)(4)% RH 안정성 시험실 M732 의 재적격성평가 때 방 중앙에서만 확인한다. 귀사는 재적격성평가 시 방 모서리의 습도를 맵핑하여 방 전체의 습도가 균일한지 확인하지 않았다."
+ },
+ {
+  "finding_id": "finding-52d691774261bd43eeedeeb9",
+  "finding_text_md5": "83c2e55db7bd89dd6278eb004a6018b8",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, Your firm has not qualified the process of tailgating (pre-delivered/pre-pulled samples by the glass vendor) glass container samples. Verification of accuracy from the vendor against glass container samples collected in house has not been performed. This applies to (and includes but is not limited to) glass components used in the manufacture of Fabrazyme (agalsidase beta), Epinephrine, Hydromorphone HCl, Heparin, Vancomycin HCl, Marcaine HCl (Bupivicaine), and Morphine Sulfate. These vendor pulled samples are used for qualifying a lot of glass for use in lieu of internally pulled samples. These samples are used to assure an accurate, representative, statistically valid lot of glass, to be released and used in production, meets specifications . •.",
+  "detail_text_ko": "구체적으로, 귀사는 유리 용기 샘플의 tailgating(유리 공급업체가 사전에 인도하거나 사전에 채취한 샘플) 공정을 적격성평가하지 않았다. 공급업체의 샘플 정확성을 자체 채취한 유리 용기 샘플과 대조하는 확인이 수행되지 않았다. 이는 Fabrazyme (agalsidase beta), Epinephrine, Hydromorphone HCl, Heparin, Vancomycin HCl, Marcaine HCl (Bupivicaine), Morphine Sulfate 제조에 사용되는 유리 부품에 적용되며(이에 국한되지 않음), 이를 포함한다. 이러한 공급업체 채취 샘플은 내부 채취 샘플 대신 유리 로트를 적격 판정하는 데 사용된다. 이 샘플은 출고되어 생산에 사용될 유리 로트가 정확하고 대표성 있으며 통계적으로 유효하여 규격을 충족함을 보증하는 데 사용된다. •."
+ },
+ {
+  "finding_id": "finding-48cb5447466dd44c91e15258",
+  "finding_text_md5": "81c420aeacdbf24acb879d4c178e09bd",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, All Redacte d (b) (4) batches of incoming ADD-Vantage labeling from 7/3/2013 until 4/9/2015 were accepted for use despite not meeting internal specifications outlined in Monograph Y-011, even though the Certificate of Conformance for each of these batches specifically listed the wrong adhesive. x ~ · X ~_Sl _, ,_--.. X~ Carl A. Huffman, Investigator Shafiq A. Ahadi, Investigator Brett R. Ha vranek",
+  "detail_text_ko": "구체적으로, 7/3/2013 부터 4/9/2015 까지 입고된 ADD-Vantage 라벨링의 모든 Redacte d (b) (4) 배치는, 각 배치의 적합성 증명서(Certificate of Conformance)에 잘못된 접착제가 명시되어 있었음에도 Monograph Y-011 에 명시된 내부 규격을 충족하지 못한 채 사용이 승인되었다. x ~ · X ~_Sl _, ,_--.. X~ Carl A. Huffman, Investigator Shafiq A. Ahadi, Investigator Brett R. Ha vranek"
+ },
+ {
+  "finding_id": "finding-45713fc05f557b8dd879a81d",
+  "finding_text_md5": "22eb6657fb39959bd03b2bf5adc24ea3",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, Your complaint handling procedure does not require you to procure the lot number from your customer in the event it is not provided at initial intake. You have received approximately 285 complaints without a lot number of approximately 1510 total complaints received. This represents approximately 20% of all complaints. Products which represent this process include but are not limited to Glatopa/Glatiramer Acetate Injection, <Redacted B4> Injection, Makena/HydroxyProgesterone Injection, Epinephrine Injection, etc.",
+  "detail_text_ko": "구체적으로, 귀사의 불만 처리 절차는 최초 접수 시 로트 번호가 제공되지 않은 경우 고객에게서 로트 번호를 확보하도록 요구하지 않는다. 귀사는 접수한 전체 약 1510건의 불만 중 약 285건을 로트 번호 없이 접수했다. 이는 전체 불만의 약 20%에 해당한다. 이 공정에 해당하는 제품에는 Glatopa/Glatiramer Acetate Injection, <Redacted B4> Injection, Makena/HydroxyProgesterone Injection, Epinephrine Injection 등이 있으며 이에 국한되지 않는다."
+ },
+ {
+  "finding_id": "finding-3c8d756476e547e12445334c",
+  "finding_text_md5": "d66bf57a1dd10479a0b0462dc3f0cad9",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, In your Annual Product Reviews for the following products you identify trends but fail to initiate appropriate corrective and preventive actions to address and correct these failures. A. Marcaine HCI 0.75% w/Dextrose 8.25% Injection, for the review period of4/2/2016 to 4/1/2017 you identified a trend with 367 complaints classified as Lack of Effect, which caused this complaint type to exceed your trend limit. B. Hydromorphone HCI Injection USP, 10mg/mL/Vial, for the review period 6/11/2016 to 6/10/2017 you identified your visual inspection process a<> a root cause and you failed to incorporate corrective and preventive action. REPEAT OBSERVATION from 4/23/2014 and 6/8/2016",
+  "detail_text_ko": "구체적으로, 다음 제품의 연간 제품 품질 평가에서 귀사는 경향을 확인했으나 이러한 실패를 해결하고 시정하기 위한 적절한 시정 및 예방 조치를 개시하지 않았다. A. Marcaine HCI 0.75% w/Dextrose 8.25% Injection 은 평가 기간 4/2/2016 부터 4/1/2017 동안 효과 없음(Lack of Effect)으로 분류된 불만 367건에서 경향을 확인했고, 이로 인해 이 불만 유형이 경향 한도를 초과했다. B. Hydromorphone HCI Injection USP, 10mg/mL/Vial 은 평가 기간 6/11/2016 부터 6/10/2017 동안 육안검사 공정을 근본 원인으로 a<> 확인했으나 시정 및 예방 조치를 반영하지 않았다. 4/23/2014 및 6/8/2016 REPEAT OBSERVATION"
+ },
+ {
+  "finding_id": "finding-2f539fabcc1a92499a45b85e",
+  "finding_text_md5": "47da17fde3b9c4de6c83b9e5fe083c69",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, You have not appropriately qualified your automated visual inspection labeling process used as your in-process control for lot and expiry label defects. A. Your qualification required the successful rejection of approximately defective units and it did not provide any detail surrounding the magnitude of the lot or expiry defects presented to your visual inspection equipment. Additionally, your equipment is designed to reject defective units when <Redacted B4> of the surface area of the lot or expiry is missing. B. You manually inspect approximately <Red acted B4> finished units for defects including but not l imited to lot and expiry criti cal text. Batch sizes for these products and packaging configurations routinely approach <Redacte d B4> units. Therefore, your sampling size is inadequate to provide statistical assurance for lot and expiry defects. Additionally, these types of defects are classified as general appearance and assigned an AQL of <Redacted B4> . This process affects products to include but not limited to your ADD-Vantage configurations such as Diltiazem 500mg, Vancomycin 500mg/750mg/lg, Erythromycin 100mg, and Azithromycin 500mg.",
+  "detail_text_ko": "구체적으로, 귀사는 로트 및 유효기간 라벨 결함에 대한 공정 중 관리로 사용하는 자동 육안검사 라벨링 공정을 적절히 적격성평가하지 않았다. A. 귀사의 적격성평가는 약 개의 결함 단위를 성공적으로 불합격 처리할 것을 요구했으며, 육안검사 장비에 제시된 로트 또는 유효기간 결함의 크기에 관한 어떠한 세부 사항도 제공하지 않았다. 또한 귀사의 장비는 로트 또는 유효기간 표면적의 <Redacted B4> 가 없을 때 결함 단위를 불합격 처리하도록 설계되어 있다. B. 귀사는 로트 및 유효기간 핵심 문구를 포함하되 이에 국한되지 않는 결함에 대해 완제품 약 <Red acted B4> 단위를 수동으로 검사한다. 이들 제품의 배치 크기와 포장 구성은 통상 <Redacte d B4> 단위에 이른다. 따라서 귀사의 샘플링 크기는 로트 및 유효기간 결함에 대한 통계적 보증을 제공하기에 부적절하다. 또한 이러한 유형의 결함은 일반 외관으로 분류되어 AQL <Redacted B4> 이 부여된다. 이 공정은 Diltiazem 500mg, Vancomycin 500mg/750mg/lg, Erythromycin 100mg, Azithromycin 500mg 같은 귀사의 ADD-Vantage 구성 제품을 포함하되 이에 국한되지 않는 제품에 영향을 준다."
+ },
+ {
+  "finding_id": "finding-2cd467f86478a28892aed4e7",
+  "finding_text_md5": "72f6aa3082f97d711c712126ef9ba3b1",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, A) Despite performing an investigation with a root cause implicating an entire product line and finding widespread impact across the line during numerous retention sample reviews, you did not expand your investigation beyond individual lots to the whole line: On 2/12/15, you received a complaint ofmultiple label defects (missing label, double labels, and pealing label) for Diltiazem ADD-Vantage Vial lot 39105DD, and you determined the primary root cause of the defects was the use of label adhesive that was optimal for glass vial adhesion but not for plastic vials. This label adhesive was used for your six ADD-Vantage products, all of which use plastic vials: - Diltiazem HC1100mg/vial; - Erythrocin Lactobionate-I.V. 500 mg/vial;",
+  "detail_text_ko": "구체적으로, A) 전체 제품 라인에 영향을 미치는 근본 원인을 지목한 조사를 수행했고 다수의 보관 검체 검토에서 라인 전반에 걸친 광범위한 영향을 확인했음에도, 귀사는 조사를 개별 로트를 넘어 라인 전체로 확대하지 않았다: 2/12/15 에 귀사는 Diltiazem ADD-Vantage Vial lot 39105DD 의 다수 라벨 결함(라벨 누락, 이중 라벨, 라벨 벗겨짐)에 대한 불만을 접수했고, 결함의 주된 근본 원인이 유리 바이알 부착에는 최적이지만 플라스틱 바이알에는 그렇지 않은 라벨 접착제의 사용이라고 판단했다. 이 라벨 접착제는 귀사의 ADD-Vantage 제품 여섯 가지에 사용되었으며, 모두 플라스틱 바이알을 사용한다: - Diltiazem HC1100mg/vial; - Erythrocin Lactobionate-I.V. 500 mg/vial;"
+ },
+ {
+  "finding_id": "finding-2c95692773a16f353d89a552",
+  "finding_text_md5": "cf119382b1d64bfd42ed549a4fd22e7a",
+  "published_date": "2021-04-21",
+  "detail_text": "You did not perform final acceptance activities for iSecure 2, a class II device to assure the device is functioning as intended. iSecure 2 is used in the withdrawal and administration of sterile drug materials under aseptic conditions. During the walk-through of manufacturing Redacted (b) (4) filing line) and packaging Redacted (b) (4) on May 17th 2016, an FDA investigator observed manufacturing and packaging of Hydromorphone HCl Inj. USP lmg/mL, lot no. 64560LL. The FDA investigator observed Hydromorphone HCl Inj . USP lmg/mL, lot no. 64560LL were being placed in iSecure 2 and prepared for shipment. Device functionally test was not conducted to ensure the device is functioning as intended.",
+  "detail_text_ko": "귀사는 class II 기기인 iSecure 2 가 의도한 대로 작동하는지 보증하기 위한 최종 인수 활동을 수행하지 않았다. iSecure 2 는 무균 조건에서 무균 의약품 물질의 추출 및 투여에 사용된다. 2016년 5월 17일 제조 Redacted (b) (4) filing line) 및 포장 Redacted (b) (4) 현장 점검 중 FDA 실사관은 Hydromorphone HCl Inj. USP lmg/mL, lot no. 64560LL 의 제조와 포장을 관찰했다. FDA 실사관은 Hydromorphone HCl Inj . USP lmg/mL, lot no. 64560LL 이 iSecure 2 에 담겨 출하 준비되는 것을 관찰했다. 기기가 의도한 대로 작동하는지 보증하기 위한 기기 기능 시험은 수행되지 않았다."
+ },
+ {
+  "finding_id": "finding-0baab4c58539c635c79b0f7e",
+  "finding_text_md5": "4448acacb54402750cf51542a5950f6a",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, during sterility testing on 10/19/2017, dynamic monitoring of the isolator conditions during testing was not observed. SOP QC0695.40, Environmental Monitoring Inside the <Redacted B4> Isolator, requires that contact plates are taken <Redacted B4> and a viable air sample is taken <Redacted B4>",
+  "detail_text_ko": "구체적으로, 10/19/2017 의 무균시험 중 시험 동안의 격리기 조건에 대한 동적 모니터링이 관찰되지 않았다. SOP QC0695.40 <Redacted B4> 격리기 내부 환경 모니터링(Environmental Monitoring Inside the <Redacted B4> Isolator)은 접촉 평판을 <Redacted B4> 채취하고 부유균 공기 시료를 <Redacted B4> 채취하도록 요구한다"
+ },
+ {
+  "finding_id": "finding-01327a3d6261a134a0fc5d36",
+  "finding_text_md5": "2f4811ce59d3e5691c3e98787b2da1a7",
+  "published_date": "2021-04-21",
+  "detail_text": "Specifically, The design of the personnel entryway, personnel and material traffiG. flow, and gowning practices promotes the propagation o f microbial contamination. The following was observed during the entirety of the inspection 11/28/11-1/4/12. This is applicable to all drug products, REDACTION (b)(4) different pharmaceutical configurations . Procedure MF0l0l.0l General Rules and Regulations: Aseptic Areas (effective Dec 16 2011) states\"*** The McPherson Aseptic Manufacturing areas are the most critical manufacturing locations in our site operations.***\" Training Course Plan PRT0106 attachment 2 under Importance of Correct Gowning (bullet 2) states \"***Protecting the product .from particulate and microbial contamination. ŁŁŁ\" Dedicated plant clothing is intended to mitigate the ingress of dirt, debris and microorganisms into the cleaner areas of the plant. However, it was observed aseptic filling room personnel are allowed to frequent common public area's such as administrative offices, restrooms, and the cafeteria without being required to change out of dedicated plant scrubs and shoes which are then worn back into aseptic fill rooms under aseptic gowning. There is common inter",
+  "detail_text_ko": "구체적으로, 인원 출입구의 설계, 인원 및 자재 동선, 무균복 착의 관행이 미생물 오염의 확산을 조장한다. 다음은 실사 전 기간인 11/28/11-1/4/12 동안 관찰되었다. 이는 REDACTION (b)(4) 가지 서로 다른 제형 구성의 모든 의약품에 해당한다. 절차 MF0l0l.0l General Rules and Regulations: Aseptic Areas (2011년 12월 16일 시행)는 \"*** McPherson 무균 제조 구역은 당사 사업장 운영에서 가장 중요한 제조 장소이다.***\" 라고 명시한다. 교육 과정 계획 PRT0106 별첨 2 의 올바른 무균복 착의의 중요성(두 번째 항목)은 \"***제품을 입자 및 미생물 오염으로부터 보호하는 것. ŁŁŁ\" 라고 명시한다. 전용 작업복은 먼지, 이물, 미생물이 공장의 더 청정한 구역으로 유입되는 것을 완화하기 위한 것이다. 그러나 무균 충전실 인원이 전용 작업복(scrubs)과 신발을 갈아입도록 요구받지 않은 채 행정 사무실, 화장실, 구내식당 같은 공용 구역을 자주 드나들고, 그 복장 그대로 무균 착의 상태로 무균 충전실에 다시 들어가는 것이 관찰되었다. 공통 inter"
+ },
+ {
+  "finding_id": "finding-ea3cb02761a50391ecd0088d",
+  "finding_text_md5": "3084307ac5363dca417813be702b01cc",
+  "published_date": "2021-03-31",
+  "detail_text": "Specifically, on 12/01/2020, we observed obvious surface abrasions located on the faceplate of your firm's pellet press, EQ00l , that come in direct contact with drug components during processing for implantable hormonal pellets intended to be sterile. Your firm's Vice President of Quality Assurance explained production operators would note equipment damages on your firm's batch record. However, your firm's written procedures for batch records do not address the documentation of equipment concerns. In addition, your firm's batch records do not have an allocated space for equipment concerns. Furthermore, your firm's written procedures for the preventative maintenance of the pellet press do not address the visual inspection of the pellet press for damages prior to production. Your firm produced ancl released at least <Redacted B4> lots ( approximately <Redacted B4> implantable sterile hormonal pellets) on EQ00l that are within expiry. Please refer to",
+  "detail_text_ko": "구체적으로, 12/01/2020 에 멸균이어야 하는 이식형 호르몬 펠릿의 공정 중 의약품 구성 성분과 직접 접촉하는 귀사의 펠릿 프레스 EQ00l 의 페이스플레이트에서 뚜렷한 표면 마모가 관찰되었다. 귀사의 품질보증 부사장은 생산 작업자가 장비 손상을 귀사의 배치 기록서에 기록한다고 설명했다. 그러나 귀사의 배치 기록서 관련 절차서는 장비 문제의 문서화를 다루지 않는다. 또한 귀사의 배치 기록서에는 장비 문제를 위한 별도 기재란이 없다. 더 나아가 귀사의 펠릿 프레스 예방 정비 절차서는 생산 전 펠릿 프레스의 손상 여부에 대한 육안 점검을 다루지 않는다. 귀사는 EQ00l 에서 유효기간 내인 최소 <Redacted B4> 로트(약 <Redacted B4> 개의 이식형 멸균 호르몬 펠릿)를 생산하고 출하했다. 다음을 참조하라"
+ },
+ {
+  "finding_id": "finding-e47b9890dfe5bdf67bb936df",
+  "finding_text_md5": "13b5fc04c602d75b24db1875a2e36506",
+  "published_date": "2021-03-31",
+  "detail_text": "Specifically, your firm compound drug products that: (a) are identical or nearly identical to an approved drug that is not on the drug shortage list in effect under section 506E at the time of compounding, distribution, and dispensing; or (b) are not identical or nearly identical to an approved drug but contain a bulk drug substance that is also a component of an approved drug, and for which there is no change that produces for an individual patient a clinical difference, as determined by the prescribing practitioner, between the compounded drug and the comparable approved drug. Examples of compounded drug products that are essentially a copy of one or more approved drugs include: • Testosterone 12.5 mg Pellets • Testosterone 37.5 mg Pellets • Testosterone 50 mg Pellets • Testosterone 62.5 mg Pellets • Testosterone 87.5 mg Pellets • Testosterone 100 mg Pellets • Progesterone 50 mg Pellets • Progesterone 100 mg Pellets",
+  "detail_text_ko": "구체적으로, 귀사는 다음과 같은 의약품을 조제한다. (a) 조제, 유통, 불출 시점에 section 506E 에 따라 유효한 의약품 부족 목록에 없는 승인 의약품과 동일하거나 거의 동일한 경우, 또는 (b) 승인 의약품과 동일하거나 거의 동일하지는 않지만 승인 의약품의 구성 성분이기도 한 벌크 의약품 원료를 포함하고, 처방자가 판단하기에 환자 개인에게 조제 의약품과 비교 가능한 승인 의약품 사이에 임상적 차이를 만드는 변경이 없는 경우. 하나 이상의 승인 의약품을 사실상 복제한 조제 의약품의 예는 다음과 같다: • Testosterone 12.5 mg Pellets • Testosterone 37.5 mg Pellets • Testosterone 50 mg Pellets • Testosterone 62.5 mg Pellets • Testosterone 87.5 mg Pellets • Testosterone 100 mg Pellets • Progesterone 50 mg Pellets • Progesterone 100 mg Pellets"
+ },
+ {
+  "finding_id": "finding-d1c8364b03455cfb780e37d9",
+  "finding_text_md5": "8d2c6aa7b2ce9482fa172884353a06ac",
+  "published_date": "2021-03-31",
+  "detail_text": "***THIS IS A REPEAT OBSERVATION FROM FDA 483 issued in 2018 (",
+  "detail_text_ko": "***THIS IS A REPEAT OBSERVATION FROM FDA 483 2018년 발부 ("
+ },
+ {
+  "finding_id": "finding-90016c6be562d5e721f2233c",
+  "finding_text_md5": "21a302f65863ab7d59bc552d1577cf98",
+  "published_date": "2021-03-31",
+  "detail_text": "***THIS IS A REPEAT OBSERVATION FROM FDA 483 issued in 2018 (",
+  "detail_text_ko": "***THIS IS A REPEAT OBSERVATION FROM FDA 483 2018년 발부 ("
+ },
+ {
+  "finding_id": "finding-39a351add65674229bf451dc",
+  "finding_text_md5": "e92a63cf23735fa206c46281d0643e4f",
+  "published_date": "2021-03-31",
+  "detail_text": "Specifically, A. Testosterone 100mg (Lot# 03182020TN) <Redacted B4> Implantable hormonal pellets intended to be sterile, failed sterility testing for Chaetomium globosum (fungus) after <Redacted B4> sterilization from your third-party contract testing laboratory. Your quality unit noted an 81 % recovery of Chaetomium globosum over the last 30 months, with an increasing frequency over the last 12 months . In addition, a third-party janitorial company concluded, \"the HVAC system inclucling the <Redacted B4> the air returns, walls, ceilings, and floors of the suite were all contaminated with mold.\" Your firm's quality unit failed to conduct a thorough investigation to address the source of this contamination. For example, but not limited to, your firm's Vice President of Quality Assurance stated on 09/02'2020, a third-party contractor performed cleanings to eradicate your firm's fungus/mold concerns. However, Chaetomium globosum was recovered at your facility on 10/07/2020. According to your firm's investigation report, provided by your firm's Vice President of Quality Assurance, various fungus species have been recovered on several occasions between 2018-2020. For example, but not li",
+  "detail_text_ko": "구체적으로, A. 멸균이어야 하는 Testosterone 100mg (Lot# 03182020TN) <Redacted B4> 이식형 호르몬 펠릿이 <Redacted B4> 멸균 후 귀사의 외부 위탁 시험기관에서 Chaetomium globosum(곰팡이)에 대한 무균시험에 불합격했다. 귀사의 품질 부서는 지난 30개월 동안 Chaetomium globosum 회수율이 81 %이며 지난 12개월 동안 빈도가 증가했다고 기록했다. 또한 외부 청소 업체는 \"HVAC 시스템, <Redacted B4> 공기 환기구, 벽, 천장, 바닥을 포함한 이 구역 전체가 곰팡이에 오염되었다\"고 결론지었다. 귀사의 품질 부서는 이 오염의 원인을 규명하기 위한 철저한 조사를 수행하지 않았다. 예를 들어, 귀사의 품질보증 부사장은 09/02'2020 에 외부 계약업체가 귀사의 곰팡이 문제를 제거하기 위해 청소를 수행했다고 진술했다. 그러나 Chaetomium globosum 은 10/07/2020 에 귀사 시설에서 회수되었다. 귀사의 품질보증 부사장이 제공한 귀사의 조사 보고서에 따르면 2018-2020년 사이에 여러 차례 다양한 곰팡이 종이 회수되었다. 예를 들어, 이에 국한되지 않는 li"
+ },
+ {
+  "finding_id": "finding-3600bf09c5f1914f7057caf4",
+  "finding_text_md5": "41d9dcb260382905dacd4bd016eed1af",
+  "published_date": "2021-03-31",
+  "detail_text": "Specifically, A. Your firm received a complaint involving hospitalization and sepsis after a patient received Estradiol 6mg (Lot #05282019TN <Redacted B4> Testosterone 37.5mg (Lot #04012019TN <Redacted B4> and Testosterone 100mg (Lot #04222019TN <Redacted B4> our quality unit failed to conduct an investigation for this complaint. In addition, your 2019 Micro ID log report, provided by your firm's Vice President of Quality Assurance, documents your pellet production employees recovered Staphylococcus epidermis and Paenibacillus provencensis during fingertip samplings on 04/22/2019 and 05/28/2019, respectively. In addition, samples for personnel monitoring and environmental monitodng were taken at your facility on 04/22/2019 and 05/28/2019. The following microbiological organisms were identified: Sample Date ID CFU 4/22/2019 Staphylococcus epidermidis 1 5/28/2019 Micrococcus luteus 27",
+  "detail_text_ko": "구체적으로, A. 귀사는 Estradiol 6mg (Lot #05282019TN <Redacted B4> Testosterone 37.5mg (Lot #04012019TN <Redacted B4> 및 Testosterone 100mg (Lot #04222019TN <Redacted B4> 을 투여받은 환자의 입원 및 패혈증과 관련된 불만을 접수했으나, 귀사의 품질 부서는 이 불만에 대한 조사를 수행하지 않았다. 또한 귀사의 품질보증 부사장이 제공한 귀사의 2019년 Micro ID 로그 보고서에는, 펠릿 생산 직원들이 04/22/2019 과 05/28/2019 의 손가락 끝 시료 채취에서 각각 Staphylococcus epidermis 와 Paenibacillus provencensis 를 회수한 것으로 기록되어 있다. 또한 인원 모니터링 및 환경 모니터링 시료가 귀사 시설에서 04/22/2019 과 05/28/2019 에 채취되었다. 다음 미생물이 확인되었다: 시료 날짜 ID CFU 4/22/2019 Staphylococcus epidermidis 1 5/28/2019 Micrococcus luteus 27"
+ },
+ {
+  "finding_id": "finding-02d10888a93350e914cc5adc",
+  "finding_text_md5": "bedaef7c372889d83edbc9b5bfd90e3c",
+  "published_date": "2021-03-31",
+  "detail_text": "Specifically, on 07/15/2019, your firm received an Adverse Event, ADR-TN 2019-001, for Estradiol 6 mg, Testosterone 37.5 mg, and Testosterone 100 mg pellets, for a patient that was hospitalized and tested positive for sepsis. However, this was not reported to FDA until 02/21/2020. The Adverse Event Report was not reported to FDA within 15 calendar days after first receiving information about the adverse event. Please refer to",
+  "detail_text_ko": "구체적으로, 07/15/2019 에 귀사는 Estradiol 6 mg, Testosterone 37.5 mg, Testosterone 100 mg 펠릿에 대해 입원하고 패혈증 양성 판정을 받은 환자의 이상반응 ADR-TN 2019-001 을 접수했다. 그러나 이는 02/21/2020 에야 FDA에 보고되었다. 이상반응 보고서는 이상반응에 대한 정보를 처음 접수한 후 15일(역일) 이내에 FDA에 보고되지 않았다. 다음을 참조하라"
+ },
+ {
+  "finding_id": "finding-0228cce94be15b4cd412f9aa",
+  "finding_text_md5": "b6d4016a4d663c371f5c3b172c5a2621",
+  "published_date": "2021-03-31",
+  "detail_text": "Specifically, your SOP 9.300: Training Program, states GMP training shall be conducted for each employee <Redacted B4> based on date of previous GMP training. However, there are no assurances the following employees have completed your firm's <Redacted B4> and refresher CGMP training requirements. Title Date of Hire Daily Duties and Responsibilities include but not. limited to: Vice President of Quality Assurance 04/2016 Ensures compliance with US FDCA, Section(s) 503A & 503B and all its related elements such as facilities, documentation, training, reports, and records (e.g. final review of all procedures, oversees all quality assurance, quality control, and regulatory duties). Please refer to OBSERVATIONS 1, 2, 3, 4, 5, 8 for quality concerns Vice President of Operations 07/2012 Oversees daily operations of Ocala, FL and Dyersburg, TN facilities (e.g. lab production~ facility management~ vendor management; evaluation, documentation, and investigation of complaints). Please refer to OBSERVATIONS 2, 5 & 8 for quality concerns.",
+  "detail_text_ko": "구체적으로, 귀사의 SOP 9.300: 교육 프로그램(Training Program)은 이전 GMP 교육 날짜를 기준으로 <Redacted B4> 각 직원에게 GMP 교육을 실시해야 한다고 명시한다. 그러나 다음 직원들이 귀사의 <Redacted B4> 및 보수 CGMP 교육 요건을 이수했다는 보증이 없다. 직책 입사일 일상 업무 및 책임(이에 국한되지 않음): 품질보증 부사장 04/2016 시설, 문서화, 교육, 보고서, 기록(예: 모든 절차서의 최종 검토, 모든 품질보증·품질관리·규제 업무 감독) 등 관련된 모든 요소를 포함하여 US FDCA section 503A 및 503B 준수를 보장한다. 품질 관련 우려 사항은 OBSERVATIONS 1, 2, 3, 4, 5, 8 을 참조하라. 운영 부사장 07/2012 Ocala, FL 및 Dyersburg, TN 시설의 일상 운영(예: 실험실 생산~ 시설 관리~ 공급업체 관리; 불만의 평가, 문서화 및 조사)을 감독한다. 품질 관련 우려 사항은 OBSERVATIONS 2, 5 & 8 을 참조하라."
+ },
+ {
+  "finding_id": "finding-f6fca005e729d0924af7d0fb",
+  "finding_text_md5": "a6d0ed5c25ef7c1fc541045fac0710ad",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, Thick white powder residues were observed on the ceiling intake vent over the <Redacted B4> hood (Asset# <Redacted B4> and on top of the <Redacted B4> hood within the firm's hazardous drug room <Redacted B4> The <Redacted B4> hood and room are utilized in the production of the following hazardous drug products. Cliolestyramine Pure Powder, Estrogen, Testosterone, Progesterone, Methylene Blue, and Disulfiram. • • • Large amounts of blue colored staining were observed on the inside of the door to the <Redacted B4> glasswasher within the firm's hazardous drug room. The glasswasher is utilized in the cleaning of glassware and equipment for the production of hazardous drug products. Flaking pain rust spots and yellow colored staining were observed on the interior of the firm's <Redacted B4> (Asset <Redacted B4> balance which was located within the <Redacted B4> Asset# <Redacted B4> hood. The balance/hood are utilized in the weighing/production ielo' lowing non-hazardous drug products: creams/ointments and nasal sprays (Vasoactive intestinal peptide). ~j) AMENDMENT 1",
+  "detail_text_ko": "구체적으로, <Redacted B4> 후드(Asset# <Redacted B4> 위 천장 흡기구와 귀사의 유해 의약품실 <Redacted B4> 안 <Redacted B4> 후드 상단에서 두꺼운 흰색 분말 잔류물이 관찰되었다. 이 <Redacted B4> 후드와 방은 Cliolestyramine Pure Powder, Estrogen, Testosterone, Progesterone, Methylene Blue, Disulfiram 의 유해 의약품 생산에 사용된다. • • • 귀사의 유해 의약품실 안 <Redacted B4> 글라스워셔 문 안쪽에서 다량의 푸른색 얼룩이 관찰되었다. 이 글라스워셔는 유해 의약품 생산을 위한 유리기구와 장비의 세척에 사용된다. <Redacted B4> Asset# <Redacted B4> 후드 안에 위치한 귀사의 <Redacted B4> (Asset <Redacted B4> 저울 내부에서 벗겨지는 페인트, 녹 반점, 노란색 얼룩이 관찰되었다. 이 저울/후드는 크림/연고 및 비강 스프레이(Vasoactive intestinal peptide)인 다음 비유해 의약품의 칭량/생산에 사용된다. ~j) AMENDMENT 1"
+ },
+ {
+  "finding_id": "finding-ec5f35390f0630231c2a414f",
+  "finding_text_md5": "d47bd56426b335537b2f7d38562853ce",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, On 4/21/2020 the fnm updated their Master Batch Record (MBR) to change the <Redacted B4> tubing used during the manufacture of Ketorolac Tromethamine Injection, USP to <Redacted B4> tubing formulation <Redacted B4> (<Redacted B4> part #<Redacted B4> under change notice CN-20-02348 as a result of Investigation 685634 for particulate matter observed in several lots of Ketorolac Tromethamine Injection, USP. According to the investigation report 685634,' <Redacted B4> tubing is being replaced <Redacted B4> tubing <Redacted B4>\". Investigation 685634 also indicates that these particulates were also forming <Redacted B4> Product Code 160101 was approved per CN-20-02348 on 04/21/2020 and the change will be verified per Protocol PR-20-00697 (approved 04/22/2020)\". However, it should be noted that the firm's investigation showed that these particulates were still forming and the firm continues to use <Redacted B4> tubing in their filling process <Redacted B4> the Ketorolac continues to make contact with the <Redacted B4> tubing. The Quality Unit reviewed and approved change control CN-20-02348 and Protocol PR-20-00697 which did not include the replacement of the <Redacted B4>",
+  "detail_text_ko": "구체적으로, 2020/4/21 에 귀사는 Ketorolac Tromethamine Injection, USP 여러 로트에서 관찰된 이물에 대한 조사 685634 의 결과로, 변경 통지 CN-20-02348 에 따라 Ketorolac Tromethamine Injection, USP 제조에 사용되는 <Redacted B4> 튜빙을 <Redacted B4> 튜빙 배합 <Redacted B4> (<Redacted B4> part #<Redacted B4> 으로 변경하도록 마스터 배치 기록서(MBR)를 갱신했다. 조사 보고서 685634 에 따르면 ' <Redacted B4> 튜빙을 <Redacted B4> 튜빙 <Redacted B4> 으로 교체하고 있다\". 조사 685634 는 이 이물이 <Redacted B4> 에서도 생성되고 있음을 또한 나타낸다. 제품 코드 160101 은 04/21/2020 에 CN-20-02348 에 따라 승인되었으며 변경은 프로토콜 PR-20-00697 (04/22/2020 승인)에 따라 확인될 것이다\". 그러나 귀사의 조사에서 이 이물이 여전히 생성되고 있음이 나타났음에도 귀사는 충전 공정에서 <Redacted B4> 튜빙을 계속 사용하고 있으며 <Redacted B4> Ketorolac 이 <Redacted B4> 튜빙과 계속 접촉한다는 점에 유의해야 한다. 품질 부서는 <Redacted B4> 의 교체를 포함하지 않은 변경 관리 CN-20-02348 과 프로토콜 PR-20-00697 을 검토하고 승인했다"
+ },
+ {
+  "finding_id": "finding-e8ff1334c54495caf37baf44",
+  "finding_text_md5": "b05637515c97a506b083d6b9e710c9b9",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, on 09/30/19, your film's Environmental Monito1ing (EM) testing vendor returned 1 cfu/m3 of the actionable microorganism, Aspergillus versicolor, from active air sampling in the LAB <Redacted B4> Compounding Room. On 11/11/19, your firm returned cfu of the actionable microorganism, Aspergillus versicolor, on settle plate sampling in the LAB <Redacted B4> AnteRoom. Your firm failed to retest the LAB <Redacted B4> AnteRoom after cleaning was performed on 11/19/19 and to assess the impact on drug products produced between 09/30/19 to 11/18/19 in the LAB <Redacted B$> Compounding Room.",
+  "detail_text_ko": "구체적으로, 09/30/19 에 귀사의 환경 모니터링(EM) 시험 위탁업체는 LAB <Redacted B4> 조제실의 능동 공기 샘플링에서 조치 수준 미생물인 Aspergillus versicolor 1 cfu/m3 를 보고했다. 11/11/19 에 귀사는 LAB <Redacted B4> 전실의 침강 평판 샘플링에서 조치 수준 미생물인 Aspergillus versicolor cfu 를 보고했다. 귀사는 11/19/19 에 청소를 수행한 후 LAB <Redacted B4> 전실을 재시험하지 않았으며, 09/30/19 부터 11/18/19 사이에 LAB <Redacted B$> 조제실에서 생산된 의약품에 대한 영향을 평가하지 않았다."
+ },
+ {
+  "finding_id": "finding-d9886f91d075f80fb71dd15f",
+  "finding_text_md5": "2500885ce342e4d0c06637e47374449d",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, the technician was observed to disinfect her gloves infrequently during sterile production of TPN products on 11/18/2019. For example, she was observed to move her hands outside of the ISO 5 hood and then back into the hood without sanitization. On 11/19/2019, the technician was observed tying out the trash bag in the large trash bin located in the ISO 7 production room, rolling the bin into the ISO 8 anteroom, and resuming aseptic production activities in the ISO 5 hood after spraying her hands with <Redacted B4>. She did not change her sterile gloves or sleeves although they had been in contact with the trash bin. On 11/19/2019, she was also observed to spray and wipe down the foldable step-stool, which she uses to reach within the hood during cleaning and production, without changing her sterile gloves before resuming aseptic production activities.",
+  "detail_text_ko": "구체적으로, 11/18/2019 의 TPN 제품 무균 생산 중 작업 기사가 장갑을 드물게 소독하는 것이 관찰되었다. 예를 들어 소독하지 않은 채 손을 ISO 5 후드 밖으로 뺐다가 다시 후드 안으로 넣는 것이 관찰되었다. 11/19/2019 에 작업 기사가 ISO 7 생산실에 있는 대형 쓰레기통의 쓰레기 봉투를 묶고, 통을 ISO 8 전실로 굴려 옮긴 뒤, <Redacted B4> 로 손에 분무한 다음 ISO 5 후드에서 무균 생산 활동을 재개하는 것이 관찰되었다. 멸균 장갑과 소매가 쓰레기통과 접촉했음에도 이를 교체하지 않았다. 11/19/2019 에 그는 또한 세척 및 생산 중 후드 안으로 손을 뻗기 위해 사용하는 접이식 발판에 분무하고 닦아낸 뒤, 멸균 장갑을 교체하지 않고 무균 생산 활동을 재개하는 것이 관찰되었다."
+ },
+ {
+  "finding_id": "finding-c8212d964a85cd681d000af2",
+  "finding_text_md5": "cea113130b7b84f9d0d41f4f8f7c4154",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, • • • You did not use a cleaner suitable for removing pharmaceutical residues and there is no evidence that the household cleaners used <Redacted B4> are capable of removing hazardous materials such as hormones, antibiotics and controlled substances. A <Redacted B4> beaker within the fnm's clean glassware storage area was observed with an unknown opaque residue on the interior of the beaker. Several containers of the following finished non-hazardous drug product were observed being stored within the firm's hazardous drug production room: Naltrexone 1.5mg lot# 07312020:97@1. In addition, review of the firm's <Redacted B4> for the following non­-hazardous drug products revealed that they had been processed within the firm's hazardous drug room: Naltrexone 3mg capsule lot# 07082020:33@7 and Naltrexone 3mg capsule lot# 08012020:33@1. AMENDMENT 1",
+  "detail_text_ko": "구체적으로, • • • 귀사는 의약품 잔류물 제거에 적합한 세척제를 사용하지 않았으며, <Redacted B4> 에 사용된 가정용 세척제가 호르몬, 항생제, 관리 약물 같은 유해 물질을 제거할 수 있다는 증거가 없다. 귀사의 청결한 유리기구 보관 구역 안 <Redacted B4> 비커 내부에서 정체불명의 불투명한 잔류물이 관찰되었다. 귀사의 유해 의약품 생산실 안에 다음 비유해 완제의약품 여러 용기가 보관되고 있는 것이 관찰되었다: Naltrexone 1.5mg lot# 07312020:97@1. 또한 다음 비유해 의약품에 대한 귀사의 <Redacted B4> 를 검토한 결과 이들이 귀사의 유해 의약품실에서 처리되었음이 드러났다: Naltrexone 3mg capsule lot# 07082020:33@7 및 Naltrexone 3mg capsule lot# 08012020:33@1. AMENDMENT 1"
+ },
+ {
+  "finding_id": "finding-c2d591fab9d1058406ee1332",
+  "finding_text_md5": "8ec84c69cc766b6c17a531944106d538",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, On 09/09/20, I observed an employee put on disposable sterile gloves just prior to performing sterile prod uction of Epinephrine/Ketorolac/Ropivicaine 0.0006%/0.03%/0.2% by using the outer surface of one gl ove to hold onto the inner surface of the opposite glove. This practice was observed prior to the product ion of lots 6373, 6368, and 6366 of Epinephrine/Ketorolac/Ropivicaine 0.0006%/0.03%/0.2 %",
+  "detail_text_ko": "구체적으로, 09/09/20 에 실사관은 한 직원이 Epinephrine/Ketorolac/Ropivicaine 0.0006%/0.03%/0.2% 의 무균 생산을 수행하기 직전에 한쪽 장갑의 바깥 표면으로 반대쪽 장갑의 안쪽 표면을 잡아 일회용 멸균 장갑을 착용하는 것을 관찰했다. 이 행위는 Epinephrine/Ketorolac/Ropivicaine 0.0006%/0.03%/0.2 % 의 로트 6373, 6368, 6366 생산 전에 관찰되었다"
+ },
+ {
+  "finding_id": "finding-bad01fd715fb5b0ccc683f1c",
+  "finding_text_md5": "36b6ba27edb7dbe06553d9ef7fdb4e06",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, a) The most recent smoke study conducted by your firm to demonstrate the flow of air between the ISO 7 Gowning Room into the ISO 7 Hazard Room, conducted on 07 /10/19, showed a stagnant congregation of smoke against the ceiling of the Hazard Room in the area in front of the Biosafety Cabinet (ISO 5 classified Laminar Hood), which is used to perform production of sterile drug products. OATE ISS\\AcO EMPlOVEf(S) SIGNAT\\JRE",
+  "detail_text_ko": "구체적으로, a) 귀사가 ISO 7 무균복 착의실에서 ISO 7 유해물질실로의 기류를 입증하기 위해 07 /10/19 에 수행한 가장 최근의 스모크 스터디에서, 무균 의약품 생산에 사용되는 생물안전 캐비닛(ISO 5 등급 층류 후드) 앞쪽 구역의 유해물질실 천장에 연기가 정체되어 모여 있는 것이 나타났다. OATE ISS\\AcO EMPlOVEf(S) SIGNAT\\JRE"
+ },
+ {
+  "finding_id": "finding-b98d793d940ffea9da046a35",
+  "finding_text_md5": "a8563f83e04494e8ce0ce1ea3535a4d0",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, on 5/27/2019, the response to Bacillus microbial contamination within ISO 5 Hood <Redacted B4> did not include testing to determine the extent of impact nor identification and notification of all potentially impacted patients.",
+  "detail_text_ko": "구체적으로, 5/27/2019 에 ISO 5 후드 <Redacted B4> 내 Bacillus 미생물 오염에 대한 대응에는 영향 범위를 판단하기 위한 시험도, 영향을 받았을 가능성이 있는 모든 환자의 확인 및 통지도 포함되지 않았다."
+ },
+ {
+  "finding_id": "finding-b0ddbcf34f89be797307c7c2",
+  "finding_text_md5": "c0dcd3c9d3b4298268a7f457b7566a46",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, The Biosafety Cabinet (ISO 5 classified Laminar Hood) used to perform production of sterile drug products is located inside the ISO 7 Hazard Room, which is adjacent to the ISO 7 Gowning Room. On 09/11/20, I observed difficult to clean and visibly dirty surfaces in the following areas: a) A white residue on the Hazard Room side of the <Redacted B4> separating the Hazard Room from the Gowning Room, located along the bottom edge of the <Redacted B4> containing <Redacted B4> between the rooms. b) A white residue on the Hazard Room side of the <Redacted B4> separating the Hazard Room from the Gowning Room, located along the bottom edge of the <Redacted B4> next to the left side of the Biosafety Cabinet. c) A white residue on the Hazard Room side of the <Redacted B4> separating the Hazard Room from the Gowning Room, located along the bottom edge of the <Redacted B4> in the corner of the room opposite the Biosafety Cabinet. d) A white residue on the Hazard Room side of the door between the Hazard Room and the Gowning Room, located just above the door handle. e) A buildup of dust on the <Redacted B4> installed in the wall between the Hazard Room and the Gowning Room that allo",
+  "detail_text_ko": "구체적으로, 무균 의약품 생산에 사용되는 생물안전 캐비닛(ISO 5 등급 층류 후드)은 ISO 7 무균복 착의실에 인접한 ISO 7 유해물질실 안에 위치한다. 09/11/20 에 실사관은 다음 구역에서 청소하기 어렵고 눈에 띄게 더러운 표면을 관찰했다: a) 유해물질실과 무균복 착의실을 분리하는 <Redacted B4> 의 유해물질실 쪽에서, 두 방 사이의 <Redacted B4> 를 포함한 <Redacted B4> 하단 가장자리를 따라 흰색 잔류물. b) 유해물질실과 무균복 착의실을 분리하는 <Redacted B4> 의 유해물질실 쪽에서, 생물안전 캐비닛 왼쪽 옆 <Redacted B4> 하단 가장자리를 따라 흰색 잔류물. c) 유해물질실과 무균복 착의실을 분리하는 <Redacted B4> 의 유해물질실 쪽에서, 생물안전 캐비닛 반대편 방 모서리의 <Redacted B4> 하단 가장자리를 따라 흰색 잔류물. d) 유해물질실과 무균복 착의실 사이 문의 유해물질실 쪽에서, 문손잡이 바로 위의 흰색 잔류물. e) 유해물질실과 무균복 착의실 사이 벽에 설치된 <Redacted B4> 에 쌓인 먼지가 allo"
+ },
+ {
+  "finding_id": "finding-ae8efe39dcab17dd3e08d83a",
+  "finding_text_md5": "fbb7bd1798cef30a605c5faaeb909543",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, the media fills consist of preparing and <Redacted B4> media into <Redacted B4> control vials and <Redacted B4> vials intended to represent finished product, though this is not representative of the worst-case activities such as the manual production and <Redacted B4> of product in up to <Redacted B4> syringes intended for intracameral injections.",
+  "detail_text_ko": "구체적으로, 배지충전은 <Redacted B4> 배지를 준비하여 <Redacted B4> 대조 바이알 및 완제품을 나타내도록 의도된 <Redacted B4> 바이알에 <Redacted B4> 하는 것으로 구성되나, 이는 안구 내 주사용으로 의도된 최대 <Redacted B4> 개의 주사기에 제품을 수작업으로 생산하고 <Redacted B4> 하는 것 같은 최악 조건의 활동을 대표하지 않는다."
+ },
+ {
+  "finding_id": "finding-a29450cc82dabd3e62c3c51a",
+  "finding_text_md5": "f6357770d2814d6586be095fafafc0b1",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, Your firm does not routinely validate the <Redacted B4> hold time for <Redacted B4> drug products prior to <Redacted B4> into the drug product. The firm manufactures numerous <Redacted B4> drug products such as Methylprednisone Sodium Succinate for Injection, USP, 40mg/vial #mL Lot# 70722196124199. *DATES OF INSPECTION 4/30/2020 (Thu), 5/0l/2020 (Fri), 5/12/2020 (Tue), 5/13/2020 (Wed), 5/18/2020 (Mon)",
+  "detail_text_ko": "구체적으로, 귀사는 <Redacted B4> 의약품을 의약품에 <Redacted B4> 하기 전 <Redacted B4> 보관 시간을 통상적으로 밸리데이션하지 않는다. 귀사는 Methylprednisone Sodium Succinate for Injection, USP, 40mg/vial #mL Lot# 70722196124199 같은 수많은 <Redacted B4> 의약품을 제조한다. *DATES OF INSPECTION 4/30/2020 (Thu), 5/0l/2020 (Fri), 5/12/2020 (Tue), 5/13/2020 (Wed), 5/18/2020 (Mon)"
+ },
+ {
+  "finding_id": "finding-9f4b74603c18e63cebf58245",
+  "finding_text_md5": "2987e8f9d00e1d3f42ed209573f65e0d",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, unidirectional airflow is not verified under operational conditions representative of the most challenging load and activities. The smoke studies performed only include evaluation of manual manipulations within the hood and do not include evaluation of a fully-loaded hood, such as with the <Redacted B4> equipment, which takes up a significant amount of space and potentially interrupts the first-pass air due to the <Redacted B4> airflow hood design. *DATES OF INSPECTION 11/18/2019 (Mon), 11/19/2019 (Tue), 11/20/2019 (Wed), 11/21/2019 (Thu), 11/22/2019 (Fri), 12/3/2019 (Tue), 12/4/2019 (Wed), 12/6/2019 (Fri)",
+  "detail_text_ko": "구체적으로, 일방향 기류는 가장 까다로운 적재 및 활동을 대표하는 운영 조건에서 확인되지 않는다. 수행된 스모크 스터디는 후드 내부의 수작업 조작에 대한 평가만 포함하고, <Redacted B4> 기류 후드 설계로 인해 상당한 공간을 차지하고 first-pass air 를 방해할 가능성이 있는 <Redacted B4> 장비를 갖춘 것 같은 완전 적재된 후드에 대한 평가는 포함하지 않는다. *DATES OF INSPECTION 11/18/2019 (Mon), 11/19/2019 (Tue), 11/20/2019 (Wed), 11/21/2019 (Thu), 11/22/2019 (Fri), 12/3/2019 (Tue), 12/4/2019 (Wed), 12/6/2019 (Fri)"
+ },
+ {
+  "finding_id": "finding-90e067c4fc7956c4248968eb",
+  "finding_text_md5": "96d62969203d5c85ef01d717b8e5a656",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, On 09/09/20, I observed the sterile production of three lots of Epinephrine/Ketorolac/Ropivicaine 0.0006%/0.03%/0.2%, during which the rubber stoppers on single use vials of Epinephrine, Ketorolac, Ropivicaine, and Sodium Chloride were swabbed with non-sterile <Redacted B4> prior to <Redacted B4> in the Biosafety Cabinet ( ISO 5 classified Laminar Hood). The material inside each syringe was then <Redacted B4> with no further sterilization step prior to delivery to patients. These non-sterile <Redacted B4> wipes were observed in use during the production of lots 6373, 6368, and 6366 of Epinephrine/Ketorolac/Ropivicaine 0.0006%/0.03%/0.2%.",
+  "detail_text_ko": "구체적으로, 09/09/20 에 실사관은 Epinephrine/Ketorolac/Ropivicaine 0.0006%/0.03%/0.2% 3개 로트의 무균 생산을 관찰했으며, 이 과정에서 생물안전 캐비닛(ISO 5 등급 층류 후드) 안에서 <Redacted B4> 전에 Epinephrine, Ketorolac, Ropivicaine, Sodium Chloride 단회용 바이알의 고무 마개를 비멸균 <Redacted B4> 로 닦았다. 이후 각 주사기 안의 물질은 <Redacted B4> 되었고 환자에게 전달되기 전에 추가적인 멸균 단계는 없었다. 이 비멸균 <Redacted B4> 와이프는 Epinephrine/Ketorolac/Ropivicaine 0.0006%/0.03%/0.2% 의 로트 6373, 6368, 6366 생산 중 사용되는 것이 관찰되었다."
+ },
+ {
+  "finding_id": "finding-8be678c16925da9f3354ddfd",
+  "finding_text_md5": "c1e9f704e81735a34f4e67f561731193",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, <Redacted B4> is non-sterile and is routinely used for disinfection of the ISO 5 hoods and supporting aseptic processing areas.",
+  "detail_text_ko": "구체적으로, <Redacted B4> 는 비멸균이며 ISO 5 후드와 이를 지원하는 무균 공정 구역의 소독에 통상적으로 사용된다."
+ },
+ {
+  "finding_id": "finding-869714a375a974a0870c507d",
+  "finding_text_md5": "83b2c6e0d1601493b8733510b32ca56b",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, materials are not adequately disinfected prior to moving them from areas of lower to stricter classifications. Large drug components, such as , <Redacted B4> are \"washed\" in baskets in a <Redacted B4> loaded with <Redacted B4> and then partially dried using a <Redacted B4> located in the general pharmacy area prior to being placed in the <Redacted B4> to the ISO 7 production room. Materials are moved into temporary storage baskets within the ISO 7 room without disinfection. When they are used for production, materials are placed on ISO 5 worksurfaces prior to their disinfection within the hoods.",
+  "detail_text_ko": "구체적으로, 낮은 등급 구역에서 더 엄격한 등급 구역으로 옮기기 전에 자재가 적절히 소독되지 않는다. , <Redacted B4> 같은 대형 의약품 구성 요소는 <Redacted B4> 가 담긴 <Redacted B4> 안의 바구니에서 \"세척\"된 뒤, 일반 약국 구역에 위치한 <Redacted B4> 로 부분 건조한 다음 ISO 7 생산실로 통하는 <Redacted B4> 에 넣어진다. 자재는 소독 없이 ISO 7 실 내부의 임시 보관 바구니로 옮겨진다. 생산에 사용될 때 자재는 후드 안에서 소독되기 전에 ISO 5 작업대 표면에 놓인다."
+ },
+ {
+  "finding_id": "finding-582d65ca7ff482aacd31c065",
+  "finding_text_md5": "1c47330ada29174cb22325694d7ca211",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, on 12/10/19, dming the production of Papaverine/ Alprostadil/Phentolamine 30MG/2MG/20MCG/mL solution (T1imix), Lot 12-09-2019@36, BUD 01/24/20, we observed the operator using her gloved fingers to <Redacted B4> the ISO 5 laminar airflow workbench (LAFW). This was also observed during review of your firm's dynamic smoke studies performed 09/30/19 for the (LAFW) and BSC hoods.",
+  "detail_text_ko": "구체적으로, 12/10/19 에 Papaverine/ Alprostadil/Phentolamine 30MG/2MG/20MCG/mL 용액 (T1imix), Lot 12-09-2019@36, BUD 01/24/20 의 생산 중, 작업자가 장갑 낀 손가락으로 ISO 5 층류 작업대(LAFW)를 <Redacted B4> 하는 것을 당사는 관찰했다. 이는 (LAFW) 및 BSC 후드에 대해 09/30/19 에 수행된 귀사의 동적 스모크 스터디를 검토하는 중에도 관찰되었다."
+ },
+ {
+  "finding_id": "finding-529ed0c6b3f1287255e5eb9a",
+  "finding_text_md5": "da8fd0e99fdeb98a0458b1d8375a4eb6",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, A. As of 5/13/2020 the firm has not initiated a retrospective review on the impact to additional product lines as pait of the Ketorolac investigation 685634 which investigated the precipitate found in multiple lots of Ketorolac Tromethainine Injection USP. B. While reviewing FAR 20-1497 regarding an OOS for an impurity later identified as Lidocaine contamination in Dexmedetomidine HCL, the firm failed to extend review to other products potentially impacted by Lidocaine contamination in compounding tanks <Redacted and <Redacted B4>. When asked if the firm extended their review to other batches manufactured after Lidocaine the firm only provided a Carry Over Calculations Spreadsheet, which included all products manufactured in the tanks to say that their cleaning verifications were effective enough to limit the amount of cross-over in the finished products manufactured in those tanks.",
+  "detail_text_ko": "구체적으로, A. 5/13/2020 현재 귀사는 Ketorolac Tromethainine Injection USP 여러 로트에서 발견된 침전물을 조사한 Ketorolac 조사 685634 의 일부로서 다른 제품 라인에 미치는 영향에 대한 소급 검토를 개시하지 않았다. B. 이후 Dexmedetomidine HCL 에서 Lidocaine 오염으로 확인된 불순물의 OOS 에 관한 FAR 20-1497 을 검토하는 동안, 귀사는 조제 탱크 <Redacted 및 <Redacted B4> 의 Lidocaine 오염으로 영향을 받았을 가능성이 있는 다른 제품으로 검토를 확대하지 않았다. 귀사가 Lidocaine 이후 제조된 다른 배치로 검토를 확대했는지 묻자, 귀사는 해당 탱크에서 제조된 모든 제품을 포함하는 이월(Carry Over) 계산 스프레드시트만 제공했으며, 이는 세척 확인이 해당 탱크에서 제조된 완제품의 교차 오염량을 제한하기에 충분히 효과적이었다고 주장하기 위한 것이었다."
+ },
+ {
+  "finding_id": "finding-4a61a4ba4ccba250267ad377",
+  "finding_text_md5": "8d44effaa5f3138455579e2731f48a14",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, Your firm performs non-sterile production of the following cytotoxic drugs using non-product dedicated <Redacted B4> without ensuring that the method used to clean <Redacted B4> between production operations effectively removes all cytotoxic material: a) Anastrazole/Clomiphene/DHEA 2mg/25mg/50mg capsules b) Chlorambucil (vet) Fixed Oil l .9mg/ml suspension c) Fluorouracil (5-Fu)/Salicylic Acid 5%/20%/DMSO topical suspension DI\\TE ISSUED EMPLOYEE($ ) SIG,...TURE",
+  "detail_text_ko": "구체적으로, 귀사는 제품 전용이 아닌 <Redacted B4> 를 사용하여 다음 세포독성 의약품의 비무균 생산을 수행하면서, 생산 작업 사이에 <Redacted B4> 를 세척하는 데 사용한 방법이 모든 세포독성 물질을 효과적으로 제거하는지 확인하지 않는다: a) Anastrazole/Clomiphene/DHEA 2mg/25mg/50mg capsules b) Chlorambucil (vet) Fixed Oil l .9mg/ml suspension c) Fluorouracil (5-Fu)/Salicylic Acid 5%/20%/DMSO topical suspension DI\\TE ISSUED EMPLOYEE($ ) SIG,...TURE"
+ },
+ {
+  "finding_id": "finding-3702b8b1b75a9b59c321fb27",
+  "finding_text_md5": "66b62b177b6da07edb48e4869684c9f8",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, A. Personnel Monitoring was not conducted after the aseptic connection for the <Redacted B4> was made. On 5/1/2020 while observing set-up operations for Methylprednisolone Sodium Succmate for Injection, USP, 40mg/vial, 3mL Lot# 7072219/6124199, I observed that a technician had performed the aseptic connection for the <Redacted B4> for the assembly. Upon completing this connection, the employee sanitized their gloves and continue with additional operations. This individual did not receive personnel monitoring for glove contact plates in filling room <Redacted B4> nor did they leave the room to perform glove print personnel monitoring. B. On 5/1/2020 while observing set-up operations for Methylprednisolone Sodium Succinate for Injection, USP, 40mg/vial, 3mL Lot# 7072219/6124199, I observed that a technician was wiping down a <Redacted B4> hose using inappropriate aseptic technique. Firm management identified this hose as a <Redacted B4> hose to supply <Redacted B4> for <Redacted B4> testing. The technician attached the hose to the <Redacted B4> in the ISO 5 area.",
+  "detail_text_ko": "구체적으로, A. <Redacted B4> 의 무균 연결이 이루어진 후 인원 모니터링이 수행되지 않았다. 5/1/2020 에 Methylprednisolone Sodium Succmate for Injection, USP, 40mg/vial, 3mL Lot# 7072219/6124199 의 준비 작업을 관찰하던 중, 실사관은 한 기사가 조립을 위한 <Redacted B4> 의 무균 연결을 수행한 것을 관찰했다. 이 연결을 마친 뒤 해당 직원은 장갑을 소독하고 추가 작업을 계속했다. 이 사람은 충전실 <Redacted B4> 에서 장갑 접촉 평판 인원 모니터링을 받지 않았고, 장갑 지문(glove print) 인원 모니터링을 하기 위해 방을 나가지도 않았다. B. 5/1/2020 에 Methylprednisolone Sodium Succinate for Injection, USP, 40mg/vial, 3mL Lot# 7072219/6124199 의 준비 작업을 관찰하던 중, 실사관은 한 기사가 부적절한 무균 기술로 <Redacted B4> 호스를 닦아내는 것을 관찰했다. 귀사 경영진은 이 호스를 <Redacted B4> 시험을 위해 <Redacted B4> 를 공급하는 <Redacted B4> 호스로 확인했다. 기사는 이 호스를 ISO 5 구역의 <Redacted B4> 에 연결했다."
+ },
+ {
+  "finding_id": "finding-36b2bf68f9ec7f3733c35ed7",
+  "finding_text_md5": "636680a9b1039e3e65e531bef2a7ec5a",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, ISO 5 Hood <Redacted B4> has a worksurface composed of laminate which is worn and stained on the left side and has been chipped on both front corner edges. This hood is used for sterile drug production and was the only hood in use while Hood <Redacted B4> was down from about 10/31/2019 through 12/2/2019.",
+  "detail_text_ko": "구체적으로, ISO 5 후드 <Redacted B4> 의 작업대 표면은 라미네이트 재질로, 왼쪽이 마모되고 얼룩져 있으며 앞쪽 양 모서리 가장자리가 깨져 있다. 이 후드는 무균 의약품 생산에 사용되며, 후드 <Redacted B4> 가 약 10/31/2019 부터 12/2/2019 까지 가동 중단된 동안 사용된 유일한 후드였다."
+ },
+ {
+  "finding_id": "finding-1d41a7573f95643844d300f6",
+  "finding_text_md5": "2be063080b18af9cc4296ead1d62e946",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, on 11/18/2019 and 11/19/2019, the technician was observed with her forehead exposed while leaning significantly into the ISO 5 certified Hood <Redacted B4> during aseptic production activities. d~J'B4",
+  "detail_text_ko": "구체적으로, 11/18/2019 과 11/19/2019 에 기사가 무균 생산 활동 중 ISO 5 인증 후드 <Redacted B4> 안으로 상당히 몸을 기울이면서 이마가 노출된 것이 관찰되었다. d~J'B4"
+ },
+ {
+  "finding_id": "finding-075810a1f546c2c95ae044ff",
+  "finding_text_md5": "cb1e9550e37e064971ffaa3973b278fd",
+  "published_date": "2021-01-29",
+  "detail_text": "Specifically, there is no verification of the pressure differentials before or during sterile drug production. Pressure differentials are measured with <Redacted B4> manometers which are not visible from within the cleanroom. The values are documented <Redacted B4> no time is recorded.",
+  "detail_text_ko": "구체적으로, 무균 의약품 생산 전 또는 생산 중 차압에 대한 확인이 없다. 차압은 클린룸 내부에서 보이지 않는 <Redacted B4> 마노미터로 측정한다. 값은 <Redacted B4> 기록되며 시간은 기록되지 않는다."
+ },
+ {
+  "finding_id": "finding-ef4d7b15503be7fc4280114b",
+  "finding_text_md5": "e32678650b0d238cfbeb629eb4ba6c5c",
+  "published_date": "2021-01-14",
+  "detail_text": "Specifically: a) There is no separate storage areal for different <Redacted B4>, products to prevent mix-ups. Bottles of <Redacted B4> intended for the U.S. market, EU market, and material derived from engineering <Redacted B4> are stored together in the same bin within freezer <Redacted B4>. This bin is also used to store <Redacted B4> material that has been rejected by the Quality Unit but is being released to the client for non-clinical use. Of note, there are differences between the U.S. and EU <Redacted B4> manufacturing processes. b) Bottles of different status materials are stored immediately adjacent to one another and primary bottle labels for the <Redacted B4> tru·e not adequately designed to prevent mix-ups. Master U.S. label (#02-00263 vl , Master EU Iabe l1/02-003 l 8 vl ), and Master Engineering label (#02-00316 vl) are the same dimensions (~2inch x 3inch), font, and colors (black text on white background). There is no bru·code present for direct electronic control. Bottles of both accepted and rejected material are designated by a \"RELEASED\" label that has green background and black text with identical font. c) Freezer unit <Redacted B4> in room <Redacted B4> which i",
+  "detail_text_ko": "구체적으로: a) 혼입을 방지하기 위한 서로 다른 <Redacted B4>, 제품의 별도 보관 구역이 없다. 미국 시장용, EU 시장용 <Redacted B4> 병과 엔지니어링 <Redacted B4> 에서 유래한 물질이 냉동고 <Redacted B4> 안의 같은 통에 함께 보관된다. 이 통은 품질 부서가 부적합 처리했으나 비임상 용도로 고객에게 출하되는 <Redacted B4> 물질을 보관하는 데도 사용된다. 참고로 미국과 EU <Redacted B4> 제조 공정에는 차이가 있다. b) 서로 다른 상태의 물질 병이 바로 인접하여 보관되고 있으며, <Redacted B4> 의 1차 병 라벨은 혼입을 방지하도록 적절히 설계되지 않았다. 마스터 미국 라벨(#02-00263 vl), 마스터 EU 라벨(1/02-003 l 8 vl), 마스터 엔지니어링 라벨(#02-00316 vl)은 크기(~2inch x 3inch), 글꼴, 색상(흰 바탕에 검은 글자)이 동일하다. 직접 전자적 관리를 위한 바코드가 없다. 합격 물질과 부적합 물질의 병 모두 초록 바탕에 검은 글자이고 글꼴이 동일한 \"RELEASED\" 라벨로 표시되어 있다. c) 방 <Redacted B4> 의 냉동고 <Redacted B4> 가 which i"
+ }
+]

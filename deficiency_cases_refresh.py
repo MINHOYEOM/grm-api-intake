@@ -11,6 +11,7 @@
   cases          **영어 지적 문장이 있는 행만**(PMDA 영문 별첨 · MHRA Trend PDF 예시) —
                  id(source_key#row_no)·src·row·agency·year·no·loc·acat(기관 분류 원문)·cat(우리 분류)·
                  keys(수집기가 문장에서 뽑은 조항 키)·text(지적 원문 그대로)
+                 ·text_ko(140 한국어 번역 — ko_source_hash == content_hash 일 때만)·acat_ko(기관 분류 한국어)
                  ★context(PMDA 배경 설명)·attrs·국가·제품 구분은 싣지 않는다(기존 지적 사례 화면과 같은 필드 수준).
                  ★PMDA 일본어판 행은 같은 지적의 일본어 원문 — 문장은 싣지 않고 건수만(totals.by_kind.pmda_ja),
                    화면은 원문 파일 링크로 낸다.
@@ -48,7 +49,9 @@ DEFAULT_OUT = _WEB / "data" / "deficiency_cases.json"
 ROW_TABLE = "deficiency_examples"
 SRC_TABLE = "deficiency_example_sources"
 ROW_FIELDS = ("source_key", "row_no", "agency", "year", "lang", "locator", "item_no", "statement",
-              "agency_category", "grade", "site_group", "clause_keys", "clauses", "grm_category")
+              "agency_category", "grade", "site_group", "clause_keys", "clauses", "grm_category",
+              # 140 한국어 칸 — ko_source_hash 가 지금 content_hash 와 같을 때만 싣는다(낡은 번역 차단).
+              "statement_ko", "agency_category_ko", "ko_source_hash", "content_hash")
 SRC_FIELDS = ("source_key", "agency", "year", "lang", "kind", "url")
 PAGE_SIZE = 1000
 DEFAULT_MAX_DROP_PCT = 20
@@ -158,12 +161,19 @@ def build_snapshot(sources: list[dict[str, Any]], rows: list[dict[str, Any]], *,
         if not text:
             continue
         keys = sorted({_text(x) for x in r.get("clause_keys") or [] if _text(x)})
-        cases.append({
+        case = {
             "id": f"{k}#{row_no}", "src": k, "row": row_no, "agency": s["agency"], "year": s["year"],
             "no": _text(r.get("item_no"))[:40], "loc": _text(r.get("locator"))[:120],
             "acat": " ".join(_text(r.get("agency_category")).split())[:300],
             "cat": cat, "keys": keys, "text": text,
-        })
+        }
+        text_ko = _text(r.get("statement_ko"))
+        if text_ko and _text(r.get("ko_source_hash")) == _text(r.get("content_hash")):
+            case["text_ko"] = text_ko
+        acat_ko = " ".join(_text(r.get("agency_category_ko")).split())[:300]
+        if acat_ko:
+            case["acat_ko"] = acat_ko
+        cases.append(case)
     cases.sort(key=lambda c: (c["src"], c["row"]))
     clause_counts = [{"key": key, "para": para, "critical": g["critical"], "major": g["major"],
                       "other": g["other"], "insp": len(g["insp"])}

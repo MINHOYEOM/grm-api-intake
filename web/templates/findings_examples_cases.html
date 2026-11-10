@@ -23,7 +23,11 @@
     <p class="dc-sum">{{ _('MHRA 가 GMP 실사 지적 경향 보고서에 예시로 실은 지적 문장 {n}건을 원문 그대로 모았습니다. {years}.', n="{:,}".format(dc.total), years=dc.years | join(' · ')) }}</p>
     <p class="dc-note">{{ _('업체명은 없습니다. 기관 분류(EU GMP 장·부속서)는 보고서의 쪽 제목을 따랐습니다.') }}</p>
     {%- endif %}
+    {%- if lang == 'ko' and dc.ko_rows %}
+    <p class="dc-note">{{ _('한국어는 생성형 AI 번역이며 원문을 사례마다 함께 싣습니다. 법적 판단은 원문을 기준으로 하십시오. 영역 분류는 기관 분류나 문장 낱말을 GRM 분류에 맞춘 것이어서 기관의 판단과 다를 수 있습니다. 긴 문장은 중간에서 자르고(…) 원문 파일로 잇습니다. {date} 기준.', date=dc.measured_on) }}</p>
+    {%- else %}
     <p class="dc-note">{{ _('번역하지 않았습니다. 영역 분류는 기관 분류나 문장 낱말을 GRM 분류에 맞춘 것이어서 기관의 판단과 다를 수 있습니다. 긴 문장은 중간에서 자르고(…) 원문 파일로 잇습니다. {date} 기준.', date=dc.measured_on) }}</p>
+    {%- endif %}
     {% with credit_agency = dc.agency, credit_kind = 'cases' %}{% include "partials/deficiency_cases_credit.html" %}{% endwith %}
     <ul class="dc-src">
       {%- for f in dc.files %}
@@ -34,7 +38,7 @@
 
     <form class="dc-bar" id="dc-bar" role="search" hidden>
       <label class="sr-only" for="dc-q">{{ _('낱말') }}</label>
-      <input id="dc-q" type="search" placeholder="{{ _('영어 낱말로 찾기 (예: audit trail)') }}" autocomplete="off" spellcheck="false" />
+      <input id="dc-q" type="search" placeholder="{% if lang == 'ko' and dc.ko_rows %}{{ _('한국어·영어 낱말로 찾기 (예: 일탈, audit trail)') }}{% else %}{{ _('영어 낱말로 찾기 (예: audit trail)') }}{% endif %}" autocomplete="off" spellcheck="false" />
       <label class="sr-only" for="dc-c">{{ _('영역') }}</label>
       <select id="dc-c">
         <option value="">{{ _('모든 영역') }}</option>
@@ -53,7 +57,7 @@
     <p class="dc-shown" id="dc-top">{{ _('조건에 맞는 사례') }} <b id="dc-shown">{{ "{:,}".format(dc.total) }}</b></p>
     <div class="dc-list" id="dc-rows">
       {%- for r in dc.rows %}
-      <article class="dc-i" data-c="{{ r.cat }}" data-y="{{ r.year }}"><blockquote lang="en">{{ r.text }}</blockquote><p class="dc-m"><span>{{ r.year }}{% if r.ref %} &middot; {{ r.ref }}{% endif %}</span>{% if r.cat_label %}<span>{{ r.cat_label }}</span>{% endif %}{% if r.acat %}<span lang="en">{{ r.acat }}</span>{% endif %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ _('원문 파일') }}</a></p></article>
+      <article class="dc-i" data-c="{{ r.cat }}" data-y="{{ r.year }}">{% if r.text_ko %}<p class="dc-ko">{{ r.text_ko }}</p><blockquote class="dc-orig" lang="en">{{ r.text }}</blockquote>{% else %}<blockquote lang="en">{{ r.text }}</blockquote>{% endif %}<p class="dc-m"><span>{{ r.year }}{% if r.ref %} &middot; {{ r.ref }}{% endif %}</span>{% if r.cat_label %}<span>{{ r.cat_label }}</span>{% endif %}{% if r.acat_ko %}<span>{{ r.acat_ko }}</span>{% elif r.acat %}<span lang="en">{{ r.acat }}</span>{% endif %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ _('원문 파일') }}</a></p></article>
       {%- endfor %}
     </div>
     <p class="dc-empty" id="dc-empty" hidden>{{ _('조건에 맞는 사례가 없습니다.') }}</p>

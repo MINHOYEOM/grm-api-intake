@@ -32,6 +32,7 @@ ZONE_PAGES = [
     ("findings/trends/index.html", "트렌드"),
     ("findings/inspections/index.html", "실사 결과"),
     ("findings/citations/index.html", "FDA 지적 조항"),
+    ("findings/citations/firms/index.html", "FDA 지적 조항"),
     ("findings/import-alerts/index.html", "FDA 수입경보"),
     ("findings/examples/index.html", "지적 사례"),
     ("findings/examples/pmda/index.html", "지적 사례"),
@@ -153,6 +154,19 @@ class NavCleanupRenderedTest(unittest.TestCase):
         foot = html[html.index('<footer class="site">'):]
         self.assertNotIn("규제 동향</a>", foot)
         self.assertEqual(foot.count('findings/trends/index.html"'), 1)
+
+    def test_footer_content_links_news_after_brief(self):
+        """[2026-11-10] /news/ 는 상단 nav 가 아니라 푸터 콘텐츠 열, 주간 브리프 바로 다음."""
+        for rel in ("index.html", "findings/index.html"):
+            html = self._read(rel)
+            i = html.index("<h5>콘텐츠</h5>")
+            col = html[i:html.index("</div>", i)]
+            labels = _labels(col)
+            self.assertEqual(labels[:2], ["주간 브리프", "최근 규제 소식"], rel)
+            href = re.search(r'href="([^"]*news/index\.html)"', col).group(1)
+            self.assertTrue((self.out / rel).parent.joinpath(href).resolve().is_file(), rel)
+            tabs, _ = _nav(html)
+            self.assertNotIn("news/", tabs, rel)
 
     # ── 다음으로 볼 것 ────────────────────────────────────────────────────
     def _strip_targets(self):

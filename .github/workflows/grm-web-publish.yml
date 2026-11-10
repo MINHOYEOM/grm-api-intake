@@ -161,7 +161,12 @@ jobs:
             --scaffold "_scaffold/brief_web_${{ steps.r.outputs.under }}.json" \
             --delta    "${{ steps.r.outputs.delta }}" \
             --out      "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json" \
+            --style-report style_lines.md \
             "${DEEP_ARGS[@]}"
+          # [2026-11-10 결정 4] 표현 검사(맺음 반복·금지 표현·용어 표기) — 경고만. 요약과 발행 PR 본문에 싣는다.
+          if [ -s style_lines.md ]; then
+            { echo "### 표현 검사(경고만)"; cat style_lines.md; } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       # [2026-11-09] 재발행은 같은 날짜의 옛 스캐폴드로 다시 조립한다. 발행 뒤 사실 값(facts)을
       # 정정한 경우(#1313 — HC 회수 업체·발행일) 재조립이 옛 값을 되살리므로, 발행본 값을 유지한다.
@@ -271,6 +276,12 @@ jobs:
 
           ⚠️ **FDA 본문 결손(이 발행본 기준)** — 아래 카드는 본문·상세 없이 나갑니다(483 은 '본문 미확보' 묶음 카드). 승인 전 확인:
           $(cat fda_coverage_lines.md)"
+          fi
+          if [ -s style_lines.md ]; then
+            BODY="${BODY}
+
+          📝 **표현 검사(경고만 — 발행 차단 아님, 11-16·11-23호 실측 뒤 차단 여부 결정)**
+          $(cat style_lines.md)"
           fi
           if [ "$STATE" = "OPEN" ]; then
             echo "::notice::기존 열린 발행 PR 재사용(force-push 로 갱신) — $BR"

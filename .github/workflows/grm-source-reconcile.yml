@@ -27,6 +27,11 @@ on:
         description: '소스 제한(공백/쉼표). 키는 source_reconcile.py SPECS 참조(예: fda483 wl ema hc_recall). 비우면 전체'
         type: string
         default: ''
+      check:
+        description: '무엇을 돌릴지 — all(원천 대조+내용 완전성) / reconcile / content'
+        type: choice
+        options: [all, reconcile, content]
+        default: all
 
 permissions:
   contents: read
@@ -40,6 +45,7 @@ jobs:
   reconcile:
     if: >-
       vars.ENABLE_SOURCE_RECONCILE != 'false' &&
+      (github.event_name != 'workflow_dispatch' || inputs.check != 'content') &&
       (github.event_name == 'workflow_dispatch' ||
        (github.event.workflow_run.conclusion == 'success' &&
         github.event.workflow_run.head_branch == 'main' &&
@@ -201,6 +207,126 @@ jobs:
                 await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `다시 실패 — 실행 ${context.runId}` });
               } else {
                 await github.rest.issues.create({ owner, repo, title, body, labels: ['reconciliation', label], assignees: [owner] });
+              }
+            } else if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `정상 실행으로 복귀해 닫습니다 (실행 ${context.runId}).` });
+              await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+            }
+
+  # ── 내용 완전성 — 잘린 내용·모아 놓고 안 쓰는 칸 ────────────────────────────────────────
+  # 원천 대조는 '건수'만 본다. 이 잡은 Supabase 원자료(raw_signals.raw_json 전 칸을 재귀로 편다)·findings·
+  # 본문 표를 읽어 (T) 같은 길이대에서 문장 중간에 끝나는 값의 몰림(잘림) (U) 사이트·브리프 어디에도 안 닿는
+  # 긴 칸을 찾는다. 칸 목록을 손으로 적지 않으므로 새 소스·새 칸도 저절로 검사된다(content_completeness.py 도크스트링).
+  # 읽기 전용(REST GET). 데이터는 고치지 않고 이슈 하나(라벨 content-completeness → 데이터품질팀)로 알린다.
+  # 끄기: repo 변수 ENABLE_CONTENT_COMPLETENESS=false.
+  content:
+    if: >-
+      vars.ENABLE_CONTENT_COMPLETENESS != 'false' &&
+      (github.event_name != 'workflow_dispatch' || inputs.check != 'reconcile') &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.event == 'schedule'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run content completeness (non-blocking)
+        id: content
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          python content_completeness.py --json content-completeness.json --report content-completeness.md --run-url "$RUN_URL" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: content-completeness
+          path: |
+            content-completeness.json
+            content-completeness.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      # 이슈 하나: 잘림·안 쓰이는 칸이 있으면 고정 제목 이슈를 만들거나 본문 갱신(목록이 바뀐 때만 댓글),
+      # 없으면 해소 댓글 후 닫는다. 계획은 content_completeness.plan_issues(시험 대상)가 JSON 에 싣는다.
+      - name: Open / update / close issue
+        if: steps.content.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const report = JSON.parse(fs.readFileSync('content-completeness.json', 'utf8'));
+            for (const plan of report.issues) {
+              for (const l of plan.labels) {
+                try { await github.rest.issues.getLabel({ owner, repo, name: l }); }
+                catch (e) { if (e.status !== 404) throw e;
+                  await github.rest.issues.createLabel({ owner, repo, name: l, color: 'fbca04',
+                    description: '내용 완전성 감시(content_completeness.py)' }); }
+              }
+              const { data: open } = await github.rest.issues.listForRepo({
+                owner, repo, state: 'open', labels: plan.labels[0], per_page: 20 });
+              const existing = open.find(i => i.title === plan.title);
+              if (plan.action === 'open') {
+                if (existing) {
+                  const changed = !(existing.body || '').includes(plan.fingerprint);
+                  await github.rest.issues.update({ owner, repo, issue_number: existing.number, body: plan.body });
+                  if (changed) await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                    body: `${plan.comment} — 실행 ${context.runId}` });
+                } else {
+                  const { data: created } = await github.rest.issues.create({
+                    owner, repo, title: plan.title, body: plan.body, labels: plan.labels, assignees: [owner] });
+                  core.notice(`이슈 #${created.number} 생성`);
+                }
+              } else if (plan.action === 'close' && existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                  body: `${plan.comment} (실행 ${context.runId})` });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+              }
+            }
+
+      # 감시 자체가 죽으면 별도 이슈(개발팀 — reconcile-monitor 라벨 규칙). 정상 실행이면 닫는다.
+      - name: Monitor crash issue
+        if: always()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          OUTCOME: ${{ steps.content.outcome }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const title = '[content-completeness] 내용 완전성 감시 자체가 실패했습니다';
+            const labels = ['content-completeness', 'reconcile-monitor'];
+            const outcome = process.env.OUTCOME;
+            if (outcome !== 'failure' && outcome !== 'success') return;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'reconcile-monitor', per_page: 20 });
+            const existing = open.find(i => i.title === title);
+            const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
+            if (outcome === 'failure') {
+              const body = 'content_completeness.py 실행이 실패했습니다(Supabase 읽기 실패·미처리 예외 등). 비차단 감시라 이 자체가 이상 신호입니다. 실행: ' + runUrl;
+              if (existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `다시 실패 — 실행 ${context.runId}` });
+              } else {
+                await github.rest.issues.create({ owner, repo, title, body, labels, assignees: [owner] });
               }
             } else if (existing) {
               await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `정상 실행으로 복귀해 닫습니다 (실행 ${context.runId}).` });

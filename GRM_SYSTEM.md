@@ -561,6 +561,7 @@ grm-api-intake/
 ├─ ci_shard.py                     # CI unittest 샤딩 러너(클래스 단위 LPT 균형, tests/ci_shard_timings.json) — grm-ci.yml 4 샤드
 ├─ intake_exclusion.py             # 수집 제외 장부 — 원천에서 받았지만 규칙으로 의도적으로 버린 문서의 기록(130). 규칙 버전이 같을 때만 재수신 생략
 ├─ source_reconcile.py             # 원천 대조 감시 — 원천 건수 = 수집 + 의도적 제외 + 미뤄짐 등식을 매일 센다(grm-source-reconcile)
+├─ content_completeness.py         # 내용 완전성 감시 — 원자료 전 칸을 펴서 잘림(같은 길이대에서 문장 중간에 끝나는 값의 몰림)·모아 놓고 사이트·브리프에 안 닿는 칸을 찾는다(grm-source-reconcile 의 content 잡, 읽기 전용)
 ├─ backfill_raw_signals_from_notion.py # Notion에만 있고 Supabase raw_signals 사본에 없는 행 채우기(1회성·멱등)
 ├─ hc_inspection_migration_check.py # HC 의약품 GMP 실사 DB의 새 도메인 이전 감지
 ├─ findings_review_queue.py        # needs_review 큐 나이 측정 + 사람 판정 적용(grm-findings-review-queue)
@@ -709,7 +710,7 @@ grm-api-intake/
    ├─ grm-approval-mail.yml               # [결재 메일] 발행 PR 준비 시 대표 메일 1통 — 기본 dry-run, GRM_APPROVAL_MAIL_ENABLED=true 일 때만 실발송
    ├─ grm-ops-decision-mail.yml          # [결정 알림] 30분마다 web/ops_decision_mail.py — 기본 dry-run, GRM_OPS_DECISION_MAIL_ENABLED=true 일 때만 실발송(수신자 GRM_APPROVAL_MAIL_TO)
    ├─ grm-ops-measure.yml                # [자동 측정] 매일 07:23 KST web/ops_measure_github.py — 기본 dry-run, GRM_OPS_MEASURE_ENABLED=true 일 때만 ops_goal_set·ops_member_touch 쓰기(SUPABASE_SERVICE_ROLE_KEY 재사용·마스킹·읽기 권한만)
-   ├─ grm-source-reconcile.yml           # [원천 대조] 매일 수집 뒤 source_reconcile.py — 원천 대비 누락 감시
+   ├─ grm-source-reconcile.yml           # [원천 대조] 매일 수집 뒤 source_reconcile.py — 원천 대비 누락 감시 + content 잡(content_completeness.py — 잘림·안 쓰이는 칸)
    ├─ grm-ops-alarm.yml                  # [경보 담당] 경보 라벨 이슈 → 운영 센터 업무(web/ops_alarm_sync.py), 매일 07:41 KST 점검
    ├─ grm-findings-review-queue.yml      # [검토 대기] needs_review 큐 나이 감시 — 데이터품질팀 업무
    ├─ grm-fda-import-alert.yml           # [수입경보] 66-40·66-41 스냅샷(현재 수집 꺼짐)

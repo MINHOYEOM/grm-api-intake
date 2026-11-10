@@ -42,6 +42,7 @@ LABEL_TEAM: tuple[tuple[str, str], ...] = (
     ("findings-facets", "quality"),
     ("findings-search-cache-sync", "quality"),
     ("grm-findings", "quality"),
+    ("content-completeness", "quality"),  # 내용 완전성(잘림·안 쓰이는 칸 · content_completeness.py)
     ("reconciliation", "infra"),
     ("source-verify", "infra"),
     ("grm-intake", "infra"),

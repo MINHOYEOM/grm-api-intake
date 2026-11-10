@@ -204,13 +204,17 @@ def _fetch_text(pdf_url: str) -> tuple[str, str]:
     return _collector()._fetch_fda483_pdf_text(pdf_url)
 
 
-def _fetch_rows(base_url: str, service_key: str, since: str) -> list[dict[str, Any]]:
+def _fetch_rows(base_url: str, service_key: str, since: str, until: str | None = None
+                ) -> list[dict[str, Any]]:
+    params = {"source": f"eq.{SOURCE_FDA_483}", "raw_json": f"like.*{_OBS_KEY}*"}
+    if until:   # 게시일 [since, until) — 옛 문서 전체를 기간으로 나눠 돌린다(PDF·OCR 시간)
+        params["and"] = f"(published_date.gte.{since},published_date.lt.{until})"
+    else:
+        params["published_date"] = f"gte.{since}"
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals",
         select="raw_signal_id,document_id,raw_json", page_size=500,
-        order="raw_signal_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_483}", "published_date": f"gte.{since}",
-                      "raw_json": f"like.*{_OBS_KEY}*"},
+        order="raw_signal_id.asc", extra_params=params,
     )
 
 
@@ -332,6 +336,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--apply", action="store_true", default=False, help="실제 PATCH. 기본 dry-run.")
     p.add_argument("--since", default=None,
                    help=f"게시일 하한(YYYY-MM-DD). 기본 {DEFAULT_SINCE}, --truncated-only 면 기본 전체 기간.")
+    p.add_argument("--until", default=None, help="게시일 상한(미포함, YYYY-MM-DD). 기간을 나눠 돌릴 때.")
     p.add_argument("--truncated-only", action="store_true", default=False,
                    help="옛 저장 상한(상세 1,200자·표제 280자+'...')에 걸린 관찰이 있는 문서만.")
     p.add_argument("--limit", type=int, default=None, help="처리 문서 수 상한.")
@@ -354,7 +359,7 @@ def main(argv: list[str] | None = None) -> int:
     base_url, service_key = creds
     base_url = _normalize_base_url(base_url)
     since = args.since or (_ALL_TIME if args.truncated_only else DEFAULT_SINCE)
-    rows = _fetch_rows(base_url, service_key, since)
+    rows = _fetch_rows(base_url, service_key, since, args.until)
     ids = {x for x in re.split(r"[\s,]+", args.doc_ids or "") if x}
     report = run(
         rows, dry_run=not args.apply, since=since, limit=args.limit, doc_ids=ids or None,

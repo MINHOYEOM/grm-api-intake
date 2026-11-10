@@ -21,6 +21,10 @@ on:
         description: '게시일 하한(YYYY-MM-DD). 비우면 2026-08-10(truncated_only 면 전체 기간).'
         type: string
         default: ''
+      until:
+        description: '게시일 상한(미포함, YYYY-MM-DD). 비우면 상한 없음. 옛 문서를 기간으로 나눠 돌릴 때(예: since 2016-01-01 · until 2024-01-01).'
+        type: string
+        default: ''
       limit:
         description: '처리 문서 수 상한. 비우면 전건.'
         type: string
@@ -73,6 +77,7 @@ jobs:
           IN_APPLY: ${{ inputs.apply }}
           IN_SINCE: ${{ inputs.since }}
           IN_TRUNC: ${{ inputs.truncated_only }}
+          IN_UNTIL: ${{ inputs.until }}
           IN_LIMIT: ${{ inputs.limit }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
           FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}
@@ -81,6 +86,9 @@ jobs:
           ARGS=(--report-path detail_refresh_report.json)
           if [ -n "${IN_SINCE}" ]; then
             ARGS+=(--since "${IN_SINCE}")
+          fi
+          if [ -n "${IN_UNTIL}" ]; then
+            ARGS+=(--until "${IN_UNTIL}")
           fi
           if [ "${IN_TRUNC}" = "true" ]; then
             ARGS+=(--truncated-only)

@@ -2008,6 +2008,45 @@ def _is_resume_line(line: str, est_hint: str) -> bool:
     return True
 
 
+_PAGE_HEADER_START_RE = re.compile(r"(?-i:FOOD AND DRUG ADMINISTRATION|DEPARTMENT OF HEALTH AND HUMAN SERVICES)")
+
+
+def _is_header_value_line(line: str, est_hint: str) -> bool:
+    """머리말 블록의 줄인가 — 양식 낱말·이메일·시설 유형 값·FEI 번호."""
+    s = line.strip()
+    if not s:
+        return False
+    if gf._FDA483_LABEL_RE.search(s) or _PAGE_HEADER_START_RE.search(s) or _EMAIL_RE.search(s):
+        return True
+    if re.fullmatch(r"[\d\s()\-./]{6,}", s):            # 전화·FEI·날짜 범위만 있는 줄
+        return True
+    return bool(est_hint) and re.sub(r"\W+", "", est_hint).lower() == re.sub(r"\W+", "", s).lower()
+
+
+def _resume_after_header_block(seg: str, start: int, est_hint: str) -> int | None:
+    """머리말 첫 줄 뒤 창 안에서, **마지막** 머리말 줄 다음에 오는 첫 본문 재개 줄의 위치."""
+    end = min(len(seg), start + _PAGE_HEADER_WINDOW)
+    lines: list[tuple[int, str]] = []
+    p = seg.find("\n", start)
+    while p != -1 and p < end:
+        nxt = seg.find("\n", p + 1)
+        lines.append((p + 1, seg[p + 1: nxt if nxt != -1 else len(seg)]))
+        p = nxt
+    # 머리말 줄은 **확실한 본문 줄**(소문자·전형적 첫 낱말로 시작) 앞에서만 센다 — 본문 속 날짜만 있는
+    # 줄 같은 것이 머리말로 오인돼 재개 위치를 뒤로 밀지 않게.
+    strong = next((i for i, (_o, ln) in enumerate(lines)
+                   if re.match(r"\s*(?:[a-z]|Specifically\b|For example\b)", ln)
+                   and not _is_header_value_line(ln, est_hint)), len(lines))
+    last_hdr = -1
+    for i, (_off, line) in enumerate(lines[:strong]):
+        if _is_header_value_line(line, est_hint):
+            last_hdr = i
+    for off, line in lines[last_hdr + 1:]:
+        if _is_resume_line(line, est_hint) and not _is_header_value_line(line, est_hint):
+            return off
+    return None
+
+
 def _join_483_pages(seg: str, est_hint: str = "") -> str:
     """관찰 구간에서 쪽 경계 블록(서명란~다음 쪽 머리말)을 걷어내고 본문을 잇는다(순수 함수).
 
@@ -2021,6 +2060,22 @@ def _join_483_pages(seg: str, est_hint: str = "") -> str:
     pos = 0
     while True:
         hdr = _PAGE_HEADER_END_RE.search(seg, pos)
+        hs = _PAGE_HEADER_START_RE.search(seg, pos)
+        if hs and (not hdr or hdr.start() - hs.start() > _PAGE_HEADER_WINDOW):
+            # 머리말 끝 낱말을 스캔 판독이 빠뜨린 쪽(11-10 표본 대조 실측 195637·195665) — 머리말
+            # **첫** 줄을 닻으로 삼고, 그 뒤 머리말 줄(양식 낱말·이메일·시설 유형 값)이 끝난 다음의
+            # 본문 재개 줄을 찾는다.
+            fs = _footer_start(seg, max(cursor, hs.start() - _PAGE_BLOCK_WINDOW), hs.start())
+            if fs is None:
+                pos = hs.end()
+                continue
+            resume = _resume_after_header_block(seg, hs.end(), est_hint)
+            out.append(seg[cursor:fs])
+            if resume is None:
+                return "".join(out)
+            out.append("\n")
+            cursor = pos = resume
+            continue
         if not hdr:
             out.append(seg[cursor:])
             break

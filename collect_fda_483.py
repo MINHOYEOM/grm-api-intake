@@ -1949,16 +1949,23 @@ def _extract_483_inspectors(text: str) -> list[str]:
 #   종전 상세로 시작하지 않으면(경계 판정이 어긋난 것) 종전 상세를 그대로 쓴다(회귀 0 방향).
 # ★쪽 경계를 확신할 수 없으면(서명란 마커가 없거나 다음 쪽 본문 재개 줄을 못 찾으면) 그 자리에서
 #   종전처럼 자른다 — 지어내지 않는다.
-_PAGE_END_RE = re.compile(r"\bPage\s*\d{1,3}\s*of\s*\d{1,3}(?:\s*Pages?)?\b", re.I)
-_PAGE_FOOTER_WINDOW = 900        # 쪽 번호 앞 이 범위 안에서 서명란 시작을 찾는다
-_PAGE_HEADER_WINDOW = 2400       # 쪽 번호 뒤 이 범위 안에서 머리말 끝을 찾는다
+_PAGE_BLOCK_WINDOW = 2000        # 머리말 끝 앞 이 범위 안에서 서명란 시작을 찾는다(서명란+머리말 실측 ~1,100자)
+_PAGE_HEADER_WINDOW = 1200       # 머리말 끝 뒤 이 범위 안에서 본문 재개 줄을 찾는다
 _PAGE_HEADER_END_RE = re.compile(r"TYPE\s+(?:OF\s+)?ESTABLISHMENT\s+INSPECTED", re.I)
 # 서명란 이름줄 — `<이름>, [약칭] <직함>`. 약칭(DDC·ORA 등 대문자 2~5자)이 끼면 종전 푸터
 # 정규식(`,\s*Investigator`)이 못 잡았다. 직함 뒤에 사람 이름이 오면 산문(`…, Investigator
 # Smith noted`)이므로 제외한다(종전 푸터 정규식과 같은 조건).
+# 실사관 이름 추출(`_INSPECTOR_TITLES`)보다 넓다 — 여기는 **지우는** 용도라 CBER 심사관 직함까지
+# 받는다(11-10 dry-run 실측 `Susan S. Butler, Staff Fellow`·`Jacob L. Bitterman, Biological Reviewer`).
+_SIGNER_TITLES = _INSPECTOR_TITLES + (
+    "Staff Fellow", "Biological Reviewer", "Reviewer", "Medical Officer", "Pharmacologist",
+    "Engineer", "Program Specialist", "Supervisory Consumer Safety Officer",
+)
 _SIGNER_TITLE_RE = re.compile(
-    r",[ \t]*(?:[A-Z]{2,5}[ \t]+)?(?:" + "|".join(re.escape(t) for t in _INSPECTOR_TITLES)
+    r",[ \t]*(?:[A-Z]{2,5}[ \t]+)?(?:" + "|".join(re.escape(t) for t in _SIGNER_TITLES)
     + r")\b(?![ \t]+[A-Z][a-z])")
+# 깨진 서명란 꼬리 — `SIGNATURE` 가 `aeGNATURE`·`'NATURE,` 로, 머리말 첫 낱말 `DISTRICT` 가 끝에 남는다.
+_DETAIL_TAIL_JUNK_RE = re.compile(r"(?-i:[A-Za-z']{0,4}NATURE\b|\bDISTRICT\b)")
 _SIGNER_NAME_BEFORE_RE = re.compile(r"(?:[A-Z][A-Za-z'.\-]*[ \t]+){0,3}[A-Z][A-Za-z'.\-]*[ \t]*$")
 _CITY_ZIP_LINE_RE = re.compile(r",.*\b\d{5}(?:-\d{4})?\b|,\s*(?:India|China|USA|United States)\b")
 
@@ -2005,25 +2012,25 @@ def _is_resume_line(line: str, est_hint: str) -> bool:
 def _join_483_pages(seg: str, est_hint: str = "") -> str:
     """관찰 구간에서 쪽 경계 블록(서명란~다음 쪽 머리말)을 걷어내고 본문을 잇는다(순수 함수).
 
-    경계를 확신할 수 없으면 그 쪽 서명란에서 잘라 끝낸다(= 종전 동작)."""
+    경계는 **다음 쪽 머리말의 끝**(`TYPE ESTABLISHMENT INSPECTED`)을 닻으로 찾는다 — 쪽 번호
+    (`Page 1 of 5`)는 스캔 판독이 `Page lof5` 처럼 깨뜨려 닻으로 못 쓴다(11-10 dry-run 실측).
+    닻 앞 `_PAGE_BLOCK_WINDOW` 안 가장 이른 서명란·양식 마커부터 닻 뒤 본문 재개 줄 직전까지를
+    걷어낸다. 닻이 없으면 입력을 그대로 돌려준다(뒤의 `_clean_observation_chunk` 가 첫 서명란에서
+    자르므로 = 종전 동작). 재개 줄을 못 찾으면 그 쪽 서명란에서 잘라 끝낸다."""
     out: list[str] = []
     cursor = 0
     pos = 0
     while True:
-        pe = _PAGE_END_RE.search(seg, pos)
-        if not pe:
+        hdr = _PAGE_HEADER_END_RE.search(seg, pos)
+        if not hdr:
             out.append(seg[cursor:])
             break
-        fs = _footer_start(seg, max(cursor, pe.start() - _PAGE_FOOTER_WINDOW), pe.start())
-        if fs is None:                       # 산문 속 "page 2 of 5" — 쪽 경계 아님
-            pos = pe.end()
+        fs = _footer_start(seg, max(cursor, hdr.start() - _PAGE_BLOCK_WINDOW), hdr.start())
+        if fs is None:                       # 마커 없는 머리말 낱말 — 쪽 경계로 보지 않는다
+            pos = hdr.end()
             continue
         out.append(seg[cursor:fs])
-        hdr = _PAGE_HEADER_END_RE.search(seg, pe.end(), pe.end() + _PAGE_HEADER_WINDOW)
-        if not hdr:
-            return "".join(out)              # 머리말 끝 미확정 — 여기서 자른다
-        off = hdr.end()
-        nl = seg.find("\n", off)
+        nl = seg.find("\n", hdr.end())
         resume = None
         while nl != -1 and nl < hdr.end() + _PAGE_HEADER_WINDOW:
             nxt = seg.find("\n", nl + 1)
@@ -2045,7 +2052,10 @@ def _join_483_pages(seg: str, est_hint: str = "") -> str:
 _REDACTION_GLYPH_RE = re.compile(
     r"\(?[A-Za-z]?[@©®]+\)?(?:[@©®]+\)?)*(?![A-Za-z0-9.\-]*\.[A-Za-z]{2,})")
 _REDACTION_CANON_RE = re.compile(r"\(\s*[b6]\s*\)\s*\(\s*\d\s*\)(?:\s*,\s*\(\s*[b6]\s*\)\s*\(\s*\d\s*\))*"
-                                 r"|<\s*Redacted[^<>]{0,20}>", re.I)
+                                 r"|<\s*Redacted[^<>]{0,20}>"
+                                 # 판독 변형(11-10 dry-run 실측): (1) (4)·(D)(4)·(9) (4)·(Bb) (4)·
+                                 # (1D) (4)·(6) (4~·(®)(4) — 앞 괄호 1~2자 + 뒤 괄호 4·6
+                                 r"|\(\s*(?:[0-9A-Za-z]{1,2}|[@©®])\s*\)\s*\(\s*[46]\s*[)~]?", re.I)
 _EMAIL_RE = re.compile(r"\S+@\S+\.[A-Za-z]{2,}")
 REDACTED_TOKEN = "[redacted]"
 
@@ -2102,6 +2112,9 @@ def _full_observation_detail(seg: str, deficiency: str, old_detail: str,
     cut = _signer_cut(detail)
     if cut is not None:
         detail = detail[:cut].rstrip(" :-\t")
+    junk = _DETAIL_TAIL_JUNK_RE.search(detail)
+    if junk:
+        detail = detail[:junk.start()].rstrip(" :-\t'\"")
     detail = gf.strip_fda483_page_header(detail, **hints)
     norm_old = re.sub(r"\s+", " ", old_detail or "").strip()
     norm_new = re.sub(r"\s+", " ", detail or "").strip()

@@ -1,0 +1,352 @@
+[
+  {
+    "finding_id": "finding-8c019b9777388e0919897ca8",
+    "finding_text_md5": "d87dc06065455b43b3f8b52205c9e03b",
+    "published_date": "2024-05-21",
+    "detail_text": "SpecificalIy, your firm has no written procedures for performing a supplemental visual inspection of drug products where the drug products and/or the container closure system permits limited inspection of the contents. Your firm fills Brompheniramine Maleate 10 mg/ml sterile injectable into <Redacted B4> vials. Lot # <Redacted B4> was compounded and <Redacted B4> on September 19, 2023 and filled on September 20, 2023. The lot was released for distribution on November 14, 2023.",
+    "detail_text_ko": "구체적으로, 귀사는 의약품 및/또는 용기 마개 시스템이 내용물의 검사를 제한하는 경우에 의약품에 대한 추가 육안검사를 수행하는 절차서를 작성해 두지 않았다. 귀사는 Brompheniramine Maleate 10 mg/ml 무균 주사제를 <Redacted B4> 바이알에 충전한다. Lot # <Redacted B4> 는 September 19, 2023 에 조제 및 <Redacted B4> 되었고 September 20, 2023 에 충전되었다. 이 로트는 November 14, 2023 에 출하 승인되었다."
+  },
+  {
+    "finding_id": "finding-636800a2010346ff43cbaea0",
+    "finding_text_md5": "f1f570b4aebe5519dd517fc3d795753f",
+    "published_date": "2024-05-21",
+    "detail_text": "Specifically, GMP-SOP-0024 Receipt, Evaluation. and Dispositioning of Materials, revision 3 effective July 20, 2021, does not define a statistically sound sampling plan for raw materials (APls and excipients) when more than one container is received in for a lot/batch . For example, on February 7, 2022, your received in <Redacted B4> of Brompheniramine Maleate, USP API and assigned it Raw Material Receiving # <Redacted B4> your firm sent <Redacted B4> containers to your contract testing laboratory for testing .",
+    "detail_text_ko": "구체적으로, GMP-SOP-0024 Receipt, Evaluation. and Dispositioning of Materials, 개정 3, 시행일 July 20, 2021 은 한 로트/배치에 대해 용기가 둘 이상 입고되는 경우의 원료(API 및 부형제)에 대한 통계적으로 타당한 시료채취 계획을 정하고 있지 않다. 예를 들어 February 7, 2022 에 귀사는 Brompheniramine Maleate, USP API <Redacted B4> 를 입고하고 Raw Material Receiving # <Redacted B4> 를 부여했으며, 귀사는 시험을 위해 <Redacted B4> 개의 용기를 위탁 시험기관에 보냈다."
+  },
+  {
+    "finding_id": "finding-de6bc4d284320929c464248e",
+    "finding_text_md5": "2fb5f8aa09e43e264c7d8877518e595a",
+    "published_date": "2024-05-13",
+    "detail_text": "1. During aseptic filling operations, procedure EP2-PRD-SOP-002, \"Personnel Behavior in Aseptic Area\" and line specific intervention procedures were not followed: (bY{4Jln. • a. During aseptic filling ofl ·1 ~ect10n: i. On April 16, 2024, for line assembly and filling on your t6JCl Line, U.S. market batch! Injectionjgram/vial, operators were observed 4 4 performing an Cb>< interv. ention where they ~sed (bY{ } ~ to assemble the (bJ , (Interv~ntion I-1.3) used to CbH 4j dispense (bY{-41 of sterile CbJC, into the empty sterile vial on the filling I line. During this step ofset up the operator's aims and upper torso were also observed reaching over the line blocking laminar air flow. This practice was consistent with that observed during line assembly for ROW1 · (liH\"J In• • b h ~ Cb)l4l • ·1 • • b d Ject10n, ate es ·i A s1m1 ar mtervenbon was o serve during media fill batch CbH 4j conducted in July of 2022 and dete1mined by investigation APL-AN-PNC-22-0125 to be the root cause ofa contaminated vial",
+    "detail_text_ko": "1. 무균 충전 작업 중 절차서 EP2-PRD-SOP-002, \"Personnel Behavior in Aseptic Area\" 및 라인별 개입 절차서가 지켜지지 않았다: (bY{4Jln. • a. During aseptic filling ofl ·1 ~ect10n: i. April 16, 2024 에 귀사의 t6JCl Line 에서 미국 시판 배치 Injectionjgram/vial 의 라인 조립 및 충전 중, 작업자들이 4 4 Cb>< interv. ention 을 수행하면서 ~sed (bY{ } ~ 로 (bJ , (Interv~ntion I-1.3) 를 조립하여 Cb>H 4j 충전 라인의 빈 멸균 바이알에 멸균 CbJC, 를 (bY{-41 분주하는 것이 관찰되었다. 세팅 단계에서 작업자의 팔과 상체가 라인 위로 뻗어 층류 공기 흐름을 가리는 것도 관찰되었다. 이 행위는 ROW1 · (liH\"J In• • b h ~ Cb)l4l • ·1 • • b d Ject10n, ate es ·i A s1m1 ar mtervenbon 의 라인 조립 중 관찰된 것과 일치했다. 2022년 7월에 수행된 배지충전 배치 CbH 4j 에서도 유사한 개입이 관찰되었고, 조사 APL-AN-PNC-22-0125 에서 오염된 바이알의 근본 원인으로 판정되었다"
+  },
+  {
+    "finding_id": "finding-c87c27ed7634d518ead5a757",
+    "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+    "published_date": "2024-05-13",
+    "detail_text": "Surface monitoring of the filling and stoppering machine is not perfo1med in a timely manner following the completion of aseptic filling operations to ensure the data is representative of the environmental conditions at the time of filling. For example: 1. Following the end offilling for (bT Injection batch (bT at 9:55 on April 20, 2024, the surface monitoring of the filling machine did not sta1t until (b 41on April 21, 2024. WCl at 2. Following the end of filling for WCl Injection batch -----­ ----­",
+    "detail_text_ko": "충전 및 타전 기계의 표면 모니터링이 무균 충전 작업 종료 후 적시에 수행되지 않아, 데이터가 충전 당시의 환경 상태를 대표한다고 보장할 수 없다. 예를 들어: 1. (bT Injection 배치 (bT 의 충전이 April 20, 2024 9:55 에 끝난 후, 충전기의 표면 모니터링은 April 21, 2024 의 (b 41 에야 시작되었다. WCl at 2. WCl Injection 배치 의 충전 종료 후 -----­ ----­"
+  },
+  {
+    "finding_id": "finding-a854ffcf7bd1a52eda6a495f",
+    "finding_text_md5": "c98c46d99a6082c6aba6d9233030a90d",
+    "published_date": "2024-05-13",
+    "detail_text": "1. Investigation APL-AN-PNC-22-0125 was ol]ned when one turbid vial in CbTCl #64, produced 4 during the aseptic process simulation for the ~ Line, perfo1med in July 2022, was found on r Tc] ~~of incubation. The organism was identified as Staphylococcus haemolyticus. This line is used to aseptically fill the U.S. marketed dtug product,! (b111gram and (b1141mg vials. Your",
+    "detail_text_ko": "1. 조사 APL-AN-PNC-22-0125 는 2022년 7월에 ~ Line 에 대해 수행된 무균공정 모의시험 중 생산된 CbTCl #64 의 탁한 바이알 1개가 배양 r Tc] ~~ 에서 발견되어 개시되었다. 해당 균은 Staphylococcus haemolyticus 로 동정되었다. 이 라인은 미국 시판 의약품 dtug product,! (b111gram 및 (b1141mg 바이알을 무균 충전하는 데 사용된다. 귀사의"
+  },
+  {
+    "finding_id": "finding-9501543535810e7db3037ea2",
+    "finding_text_md5": "7595e211cf7fb25c1cf9125067feadfb",
+    "published_date": "2024-05-13",
+    "detail_text": "1. Appropriate statistical sampling plans that would pe1mit evaluation of inti·a-batch variability have not been used during process perfo1mance qualification studies. I CbTC1 data points are taken from! Cb)l~ without justifying whether this sampling plan could detect variability r or CbH1 Injection from different points on the I Cb>1 4jor from (b)(41 different",
+    "detail_text_ko": "1. 배치 내 변동성을 평가할 수 있는 적절한 통계적 시료채취 계획이 공정 성능 적격성평가 연구에 사용되지 않았다. I CbTC1 개의 데이터 포인트가! Cb)l~ 에서 채취되었으나, 이 시료채취 계획이 (b)(4) Injection 의 변동성을 서로 다른 지점 또는 (b)(41 서로 다른 I Cb>1 4jor 에 걸쳐 검출할 수 있는지 타당성이 제시되지 않았다."
+  },
+  {
+    "finding_id": "finding-46395063c7bfc71352dd43cf",
+    "finding_text_md5": "162cb4e596c72f0a5967849622d4a505",
+    "published_date": "2024-05-13",
+    "detail_text": "1. In commercial production, sterile (bY{ 4LAJ>I is aseptically filled into canisters, approximately WCl batch. Cb>< 4 filling, Cb)C1canister is opened and manually sampled by inse1iing a sampling tool i!). a, \\D}\\ 4 j LAF. This repetitive manu~Hy intensive aseptic intervention for (b)C4l canister is only included in, (bY{4jmedia fil (b)C4l",
+    "detail_text_ko": "1. 상업 생산에서 멸균 (bY{ 4LAJ>I 는 캐니스터에 무균 충전되며, 약 WCl 배치마다 충전한다. Cb>< 4 filling, Cb)C1 캐니스터를 열고 a, \\D}\\ 4 j LAF 안에 시료채취 도구를 넣어 수작업으로 시료를 채취한다. (b)C4l 캐니스터마다 반복되는 이 수작업 중심의 무균 개입은 (bY{4jmedia fil (b)C4l 에만 포함되어 있다."
+  },
+  {
+    "finding_id": "finding-1b3c6afb81dd4440ba4b400a",
+    "finding_text_md5": "80ed003dd9ff723c44d12367139c1942",
+    "published_date": "2024-05-13",
+    "detail_text": "On April 29, 2024, _________ wc1 cleanjng wipes packaged and ready to ~b~ used forC:Tc 4 ) aseptic cleaning in the Grade A area of the (bH4 Injection (b>Cl filling line (b)C1 had(bloose 4 threads and fibers on them. The same wipes are~ also used for (b)l cleaning in the •ff Injection manufacturing lineJ (b) Upon receiving, the wipes are not inspected for the presence of loose threads and fibers.",
+    "detail_text_ko": "April 29, 2024 에, _________ wc1 의 포장되어 (b)(4) 무균 세척에 사용할 준비가 된 세척용 와이프가 (bH4 Injection (b>Cl 충전 라인의 Grade A 구역에서 사용되도록 되어 있었으나, (b)C1 had(bloose 4 threads and fibers on them 즉 풀린 실과 섬유가 붙어 있었다. 같은 와이프가 •ff Injection 제조 라인에서도 (b)l 세척에 사용된다. 입고 시 와이프에 대해 풀린 실과 섬유의 유무를 검사하지 않는다."
+  },
+  {
+    "finding_id": "finding-f95c25bf5029db0658983777",
+    "finding_text_md5": "2d2ba5112c46e0ca0fbd8a449cb7e8a6",
+    "published_date": "2024-04-29",
+    "detail_text": "1. Investigations for cross contamination due to inadequate cleaning after l (bTC4l Injection batches were not thorough in evaluating all impacted batches. Tliefoilowmg 6atclies 4 were reiected due to unknown impurity OOS/OOT resulttf : Ctirc Ll!!,jection batches I t\"rr1 (OOS) - (bn\"l (OOT), and (b>1\"j Injection lUJl'tl ( OOT). batchl The investigations identified the root cause for these batch rejections to be cross contamination with the product I t1,rr, Injection, which had not been adequatelr clea, ed from surfaces of shared eauioJ!lent including manufacturing vessels, holding vessel, (b)l tank, filling pumps, and! (bT'i The impact on the following other batches was not thoroughly investigated: a. Analysis ofl wci Injection batches detected the presence of an unknown . • ak • • h i (b)l4l • • Th b h implmty pe consistent wit Jcross contammat10n. ese ate es that were below the (b1141% lirmt unspecitiea\"\"im~unty limit for OOT were released to the • h • .fy. h f'I . (b>141 • • Us k mar et wit out JUSb mg t e presence o cross contammahon. The batches included",
+    "detail_text_ko": "1. l (bTC4l Injection 배치 후 부적절한 세척으로 인한 교차오염에 대한 조사가 영향받은 모든 배치를 철저히 평가하지 않았다. 다음 배치들은 미확인 불순물 OOS/OOT 결과로 부적합 처리되었다: Tliefoilowmg 6atclies 4 were reiected due to unknown impurity OOS/OOT resulttf : Ctirc Ll!!,jection 배치 I t\"rr1 (OOS) - (bn\"l (OOT), 및 (b>1\"j Injection lUJl'tl ( OOT). batchl 조사에서는 이들 배치 부적합의 근본 원인을 제품 I t1,rr, Injection 과의 교차오염으로 확인했으며, 이 제품은 제조 용기, 보관 용기, (b)l 탱크, 충전 펌프 및 ! (bT'i 를 포함한 공용 설비의 표면에서 적절히 세척되지 않았다. 다음의 다른 배치들에 미친 영향은 철저히 조사되지 않았다: a. l wci Injection 배치의 분석에서 교차오염과 일치하는 미확인 불순물 피크가 검출되었다 (wit Jcross contammat10n. (b>141). 불순물 (b1141% 한도 미만으로 OOT 에 해당하지 않은 이 배치들은 교차오염의 존재를 타당하게 설명하지 않은 채 시장으로 출하되었다. 해당 배치에는 다음이 포함되었다"
+  },
+  {
+    "finding_id": "finding-c898c4766b43a3362fa6bda7",
+    "finding_text_md5": "a68a07c07b48d72f5143d302ec3518a6",
+    "published_date": "2024-04-29",
+    "detail_text": "1~ (bY{il on line [ffiwere observed to have scratches, rough surfaces, and small 6 pieces that were not fully attached during aseptic filling ofl crc 4j bate lb 111on April 19, 2024. 2 tt>f(.il) on the inside ofth~ RA~ S (bY{ilj were observed to have a 1 (1,J(1 residue during aseptic 6 4 filling ofl crc ) batch (b>< 4j on April 19, 2024.",
+    "detail_text_ko": "1~ April 19, 2024 에 l crc 4j 배치 lb 111 의 무균 충전 중 line [ffiwere 의 (bY{il 에서 긁힘, 거친 표면, 완전히 부착되지 않은 작은 6 조각이 관찰되었다. 2 April 19, 2024 에 l crc ) 배치 (b>< 4j 의 무균 6 4 충전 중 RA~ S (bY{ilj 의 내부 tt>f(.il) 에서 1 (1,J(1 잔류물이 관찰되었다."
+  },
+  {
+    "finding_id": "finding-b58de56b412fa4e226a538e9",
+    "finding_text_md5": "c3e6e13b53f87179e3607bd76452d830",
+    "published_date": "2024-04-29",
+    "detail_text": "Your fnm's Equipment Cleaning Validation Master Plan (CVMP), Document ID CVMP/001-07 and Document LPL-CVAL-003-00, \"Cleaning Validation Protocol cum Report\", dated May 20, 2020, incon ectly identified the hardest to clean/most toxic API, manufactured on Lin[ ~~using non-dedicated . r (b D fi • • • h fi ' d • k lb~-' · 1 d £ ·1 eqmpment, as 1141 ·j e 1c1enc1es m_t e nm s pro uct ns me u e ai ure to (b)(4 d 1 b'l' ~ f . d' 'd 1 \\U/\\ fully assess an c eana 1 1ty o m 1v1 ua manufacturmg_surfaces. Your cleanmg validation study also failed to assess tfie cleanabili[ of t]e APis on the full ra_!lge of surfaces by excluding1 <\"ff 4j which is used in the consh11ction of the WCl of the I (b)<1 The following rejected batches off mished diug product, manufactured on Linej were found to be cross • d •hi (b)<4l contammate wit ·1 (bY{-4 In' . j)~(~mL B= (6)l4l Inj . USP~ m~ mL (b)(4 Inj. mL (b)(4 Inj. mL",
+    "detail_text_ko": "귀사의 설비 세척 밸리데이션 마스터 플랜(CVMP) Document ID CVMP/001-07 및 May 20, 2020 자 Document LPL-CVAL-003-00, \"Cleaning Validation Protocol cum Report\" 는, 전용이 아닌 설비를 사용하여 Lin[ ~~ 에서 제조되는 가장 세척하기 어렵거나 독성이 가장 큰 API 를 잘못 선정했다. 귀사 제품에 대한 as 1141 ·j e 1c1enc1es 결함에는 개별 제조 표면의 세척 가능성을 (b)(4) 충분히 평가하고 d 1 b'l' ~ f . d' 'd 1 \\U/\\ 확인하지 못한 점이 포함된다. 귀사의 세척 밸리데이션 연구는 또한 I (b)<1 의 consh11ction 인 WCl 구성에 사용되는 1 <\"ff 4j 를 제외하여 전체 범위의 표면에 대한 API 의 세척 가능성을 평가하지 못했다. Lin 에서 제조된 다음의 부적합 완제의약품 배치들은 (bY{-4 로 교차오염된 것으로 확인되었다: In' . j)~(~mL B= (6)l4l Inj. USP~ m~ mL (b)(4 Inj. mL (b)(4 Inj. mL"
+  },
+  {
+    "finding_id": "finding-b129f1d4407ec596aae8f7ee",
+    "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+    "published_date": "2024-04-29",
+    "detail_text": "(b1141 Review ofthe non-viable o~iicle count (NVPC) continuous monitoring from the~ , which is used to transpo1i I (bT'i vials from the filling line to the I (bT, show ·equent communication enors. These occur when the unit fails to have an adequate WIFI signal or power to the NVPC is lost, leaving gaps in the ability to repo1i NVPC data. These communication enors were first documented in a maintenance notification, July 23, 2020, but no effective actions have been taken to ensure NVPC data is available continuously during batch production activities. For example, during line set-up, filling, andl (bH 4lloading: (bH4l l (b)14) • • I.For batch ibatch ·i on Janua1y 19-20, 2024, there were 49 commun1cat10n ~ en ors totaling 1 hour and 30 minutes oftime. This included communication enors from1 (bT'1 I (b)l4l on Janua1y 19, 2024, when l (b)l1 vials were being \\UJ\\\"9 loaded into the I 2.For batch (bH 4ibatc~ (b)l1 on April 7-8, 2024, there were 45 communication enors totaling 2 hours and 3 minutes oftime. One communication en or lasted 41 minutes and 46 seconds. 3.For batch (b'H-41 batch I (b)l1 on April 1-2, 2024, there were 54 communication enors totaling 58 minutes oftime. The procedur",
+    "detail_text_ko": "(b1141 충전 라인에서 I (bT'i 로 I (bT'i 바이알을 이송하는 데 사용되는 ~ 의 부유입자 수(NVPC) 연속 모니터링을 검토한 결과, 빈번한 통신 오류가 나타났다. 이는 장비의 WIFI 신호나 전원이 충분하지 않거나 NVPC 전원이 끊겨 NVPC 데이터를 보고할 수 없는 공백이 생길 때 발생한다. 이러한 통신 오류는 July 23, 2020 의 정비 통보서에 처음 기록되었으나, 배치 생산 활동 중 NVPC 데이터를 연속적으로 확보하기 위한 효과적인 조치는 취해지지 않았다. 예를 들어 라인 세팅, 충전 및 (bH 4l 적재 중이다: (bH4l l (b)14) • • I. 1. January 19-20, 2024 의 배치 i batch ·i 에서는 통신 오류(commun1cat10n)가 49건 있었으며 총 1시간 30분이었다. 여기에는 January 19, 2024 에 l (b)l1 바이알이 \\UJ\\\"9 I 에 적재되던 때의 I (bT'1 I (b)l4l 통신 오류가 포함된다. 2. April 7-8, 2024 의 배치 (bH 4ibatc~ (b)l1 에서는 통신 오류가 45건 있었으며 총 2시간 3분이었다. 통신 오류 1건은 41분 46초 지속되었다. 3. April 1-2, 2024 의 배치 (b'H-41 batch I (b)l1 에서는 통신 오류가 54건 있었으며 총 58분이었다. 절차서는"
+  },
+  {
+    "finding_id": "finding-abf77caf093a80dd29d6cbe4",
+    "finding_text_md5": "3b4d0a11468c7352c05f06890b0f0f9c",
+    "published_date": "2024-04-29",
+    "detail_text": "I .Process validation studies fo1: (b)1l ~roducts that have been distributed to the US market including! {\"ff1 InJecbo°;~ {\"ff1 Injection, and I (b>14} Injection have not evaluated whether prope~ lti 1is achieved and maintained after stoppering throughout the batch. There has been no desbuctive 9r non-desbuctive testing for any ofthe products to show the presence ofan appropriate1 (bT'1 There have been six US market complaint investigations (694519, 710383, 749188, 753359, 783672, 832994) for difficulty in administeringl. (b)l4l Injection because they were not able to di·aw the full contents ofthe vial when ad.m1mstenng [ e product. None of these investigations evaluated whether the vials had an appropriate h (b)ll There was no evaluation of retains or data collected from validation or commercial bate es to emonstrate the vials had 4 • r (tif~ l ,)\"\"(4) ·1 (tif~4l appropn ate and were stoppered completely at the of to prevent ingress of environmental air. 2.Process validation studies do not establish statistical sampling plans that allow for evaluation of inter-batch and intt·a-batch variability. No acceptance criteria to evaluate intra-batch or inter- batch variability are establi",
+    "detail_text_ko": "1. 미국(US) 시장에 출하된 (b)1l ~ 제품 {\"ff1 InJecbo°;~ {\"ff1 Injection 및 I (b>14} Injection 을 포함한 제품의 공정 밸리데이션 연구는 마개 체결 이후 배치 전반에 걸쳐 적절한 prope~ lti 1 이 달성되고 유지되는지 평가하지 않았다. 적절한 1 (bT'1 의 존재를 보이기 위한 파괴 또는 비파괴 시험이 어느 제품에서도 수행되지 않았다. 바이알 내용물 전량을 뽑을 수 없어 I. (b)l4l Injection 투여가 어렵다는 미국 시장 불만 조사가 6건(694519, 710383, 749188, 753359, 783672, 832994) 있었다. 이 조사들 중 어느 것도 바이알이 적절한 h (b)ll 를 가졌는지 평가하지 않았다. 바이알이 적절했고 환경 공기의 유입을 막기 위해 of 에서 완전히 마개 체결되었음을 입증하기 위해, 밸리데이션 배치 또는 상업 배치에서 수집한 보관 시료나 데이터를 평가한 사실도 없었다. 2. 공정 밸리데이션 연구는 배치 간 및 배치 내 변동성을 평가할 수 있는 통계적 시료채취 계획을 수립하지 않는다. 배치 내 또는 배치 간 변동성을 평가하기 위한 허용 기준이 수립되어 있지 않다"
+  },
+  {
+    "finding_id": "finding-9d7d0e063159aa233f8bb46a",
+    "finding_text_md5": "53ef3122199197f5a294f5301f5f3612",
+    "published_date": "2024-04-29",
+    "detail_text": "The airflow visualization study conducted on Lin~ ~ Protocol Document CHL-QUA-00315-00, effectiv~ June 05, 2021, under dynami~ conditions did not demonstrate unidirectional airflow during I (b)C, interventions. When the (b)C4l to the RABs was1 (b111the airflow (smoke) was observed flowing out of the RABs and into the air intake duct located near the I (b 111line. Air 4 flow on the line was not visible when the (bTCl was1 (bH ) and thus was not able to be evaluated for unidirectional airflow. ,)14) Lins~ was observed to have the same design with air intakes located directly j (liH\"j where RABS ~ '",
+    "detail_text_ko": "Lin~ ~ 에 대해 Protocol Document CHL-QUA-00315-00(시행일 June 05, 2021)에 따라 동적 조건에서 수행된 기류 가시화 시험은 I (b)C, 개입 중 일방향 기류를 입증하지 못했다. RABs 로 (b)C4l 를 1 (b111 할 때, 기류(연기)가 RABs 밖으로 흘러 I (b 111 라인 근처에 있는 공기 흡입 덕트로 들어가는 것이 관찰되었다. 4 (bTCl 이 1 (bH ) 일 때는 라인의 기류가 보이지 않아 일방향 기류를 평가할 수 없었다. ,)14) Lins~ 도 공기 흡입구가 j (liH\"j 바로 옆에 있는 동일한 설계인 것으로 관찰되었다. 여기서 RABS ~"
+  },
+  {
+    "finding_id": "finding-5c0b214b34b923a5451b818e",
+    "finding_text_md5": "f123c8d5fc81ba16c320da4f9b178522",
+    "published_date": "2024-04-29",
+    "detail_text": "Your fnm' s manual vis:µal inspection process requires operators to inspec ~ mLL (bY{ilj vials that containI (bT'1Injection, USP for the presence of glass paiiicles. Your guahticat10n procedure for visual inspectors Annexure_No. 0317-SO P-P 11-00001-01, utilizes aJCb>C4> Jwhich include~ mL 1< 4 1 (b 1 vials of (bJC1Inj . seeded with glass paiiicles. This 6}( ~ ailed to challenge operators on identification ofpaiiiculates (glass particles) that are below <:> micrometers in size. Per",
+    "detail_text_ko": "귀사의 수동 육안검사 공정은 작업자가 I (bT'1 Injection, USP 가 들어 있는 ~ mLL (bY{ilj 바이알에 유리 입자가 있는지 검사하도록 요구한다. 육안검사자 적격성평가(guahticat10n) 절차서 Annexure_No. 0317-SO P-P 11-00001-01 은 유리 입자를 접종한 mL 1< 4 1 (b 1 바이알의 Inj. 을 포함하는 aJCb>C4> J 을 이용한다. 이 6}( ~ 은 <:> 마이크로미터 미만 크기의 입자(유리 입자)를 식별하는 작업자의 능력을 시험하지 못했다. Per"
+  },
+  {
+    "finding_id": "finding-3a1db748628dbdcff86c9049",
+    "finding_text_md5": "f724e1e0dcf2ad858764fbd607580ef6",
+    "published_date": "2024-04-29",
+    "detail_text": "Procedure 0317-SOP-MFG-00039 \"Clean room and aseptic behaviour\" was not followed to ensure sterilized components are only contacted with sterile forceps and aseptic manipulations are perfo1med from the side, so as not to dismpt the laminar air flow. For example: (br(41 I .During an intervention to adjust the stopper bowl alignment during asec ic filling of batch L _ (bTC4l (US market batch), the operator allowed thej RABS (b~l)l4l to contact sterile stoppers. Tliese stoppers were subsequently returned to the stopper bow . 2.During observation of aseptic filling activities forl (b)l1 batch! (bT'i (US market batch),",
+    "detail_text_ko": "절차서 0317-SOP-MFG-00039 \"Clean room and aseptic behaviour\" 는 멸균된 부품이 멸균 포셉에만 닿도록 하고 무균 조작을 옆에서 수행하여 층류 공기 흐름을 교란하지 않도록 하는 데 지켜지지 않았다. 예를 들어: (br(41 I. 배치 L _ (bTC4l (미국(US) 시판 배치)의 무균 충전 중 마개 보울 정렬을 조정하는 개입에서, 작업자는 j RABS (b~l)l4l 이 멸균 마개에 닿도록 했다. 이 마개들은 이후 마개 보울로 되돌려졌다. 2. l (b)l1 배치 ! (bT'i (미국(US) 시판 배치)의 무균 충전 작업 관찰 중,"
+  },
+  {
+    "finding_id": "finding-15212659d3c4fd88343ccb2c",
+    "finding_text_md5": "65c9cfd4c4809fab9d6b607e38c20c9b",
+    "published_date": "2024-04-29",
+    "detail_text": "1. Procedures 03 l 7-SOP-QC-00193 \"Sampling and Testing procedure ofl Cb>1\"j and 03 l 7-SOP-QC-00118 \"Quality monitoring of( ~ System\" were not followed for collecting (bfj samples. Scheduled samples for specified sample points were not collected. However, analytical records were made to document the samples were collected and used for testing, even though QC microbiology personnel confnmed samples were not collected. From April 4, 2024-April 13, 2024, there werer Cl2personnel that paiticipated in CbTC4l sampling. Each individual on one or more occasion during t is time period paiticipated in coilecting or documenting (b1141 samples that were not collected from the specified sampling point. For example: a. On A~ril 12, 2024, an employee collected CbTC4l extra bioburden Cb>1\"jsamples from p_oint - · H4 • (tif(41 These extra samples were represented as pomts (b)(4 . . (b)(4} which were not sampled. The documented samples for porn ts I (b)(4 Cb)l1 were repo1ted to have all been collected from use pointl",
+    "detail_text_ko": "1. 절차서 03 l 7-SOP-QC-00193 \"Sampling and Testing procedure ofl Cb>1\"j\" 및 03 l 7-SOP-QC-00118 \"Quality monitoring of( ~ System\" 이 (bfj 시료를 채취하는 데 지켜지지 않았다. 지정된 시료 채취 지점의 예정된 시료가 채취되지 않았다. 그런데도 QC 미생물 담당자가 시료가 채취되지 않았음을 확인했음에도 불구하고, 시료가 채취되어 시험에 사용되었다고 기록하는 분석 기록이 작성되었다. April 4, 2024-April 13, 2024 사이에 CbTC4l 시료채취에 참여한 인원은 r Cl2명이었다. 각 인원은 이 기간 중 한 번 이상, 지정된 시료 채취 지점에서 채취되지 않은 (b1141 시료를 채취하거나 기록하는 데 참여했다. 예를 들어: a. April 12, 2024 에 한 직원이 p_oint - · H4 • (tif(41 에서 CbTC4l 개의 추가 바이오버든 Cb>1\"j 시료를 채취했다. 이 추가 시료는 시료채취가 이루어지지 않은 지점 (b)(4 . . (b)(4} 의 시료인 것으로 나타내졌다. 지점 I (b)(4 Cb)l1 의 기록된 시료는 모두 사용 지점 l 에서 채취된 것으로 보고되었다"
+  },
+  {
+    "finding_id": "finding-f7f8516e100de1ee69b80d70",
+    "finding_text_md5": "98466951b533fe48d19cb4b83cb133f1",
+    "published_date": "2024-04-17",
+    "detail_text": "Specifically, Your fnm failed to submit a Field Ale1t for Product Quality Complaints (PQCs ). For example, A. In the period of Januaiy 2019 to 01-Dec-2023, your fnm received 468 complaints out of 1355 complaints relating to count variability (sho1t and excess count) issues globally of which ai·ound 457 complaints out of 1209 complaints were repo1ted from the US market. The details are as follows: Year Total Complaint No. of Short/Excess count % of Complaint received Received Complaint Received (Short/Excess) 2019 269 42 15.61 2020 282 119 f42.20 2021 230 77 33.48 2022 225 106 f47. ll Till 01st Dec 2023 203 113 55.67",
+    "detail_text_ko": "구체적으로, 귀사는 제품 품질 불만(PQC)에 대한 Field Alert 를 제출하지 않았다. 예를 들어, A. January 2019 부터 01-Dec-2023 까지의 기간에 귀사는 수량 편차(수량 부족 및 초과) 문제와 관련하여 전 세계에서 접수한 1355건의 불만 중 468건을 접수했으며, 이 중 약 457건은 미국(US) 시장에서 접수된 1209건의 불만 중에서 보고되었다. 상세 내역은 다음과 같다: Year Total Complaint No. of Short/Excess count % of Complaint received Received Complaint Received (Short/Excess) 2019 269 42 15.61 2020 282 119 f42.20 2021 230 77 33.48 2022 225 106 f47. ll Till 01st Dec 2023 203 113 55.67"
+  },
+  {
+    "finding_id": "finding-acb0a821e40a0b5d48ed9f73",
+    "finding_text_md5": "0f932fb90f0e822d38db2b398a705160",
+    "published_date": "2024-04-17",
+    "detail_text": "Specifically, A) Each lot of Controlled/Reserve (Retain) samples of di11g products is not examined at least once a 4 year for the evidence of deterioration and physical defects. Your fnm's rationale based on {b) < ) for the selection of limited number ofbatches is not justifiable while there are significant gaps identified in your film's Quality and Production Systems along with several repeated product quality complaints pertaining to count variability, broken, half tablets, and lack of efficacy. As per your procedure SOP018076, Titled: \"Sampling, Storage, Observation and Destruction of Finished Products Conti·ol Samples\", Version: 13 .0, Section: 5.4.1 \"For each product, lbll4l batch out of total commercial batches packed during calendar year shall be selected for visual inspection (All pack 4 style & counts)\". {b){ ) batches selection per section 5.4.4 for visual inspection is defined in table-I. For example, but not limited to: ~o. of batches of a Eroduct Eacked ~o. of batches of a Eroduct I",
+    "detail_text_ko": "구체적으로, A) 의약품(di11g products)의 관리/보관(보존) 시료의 각 로트가 변질 및 물리적 결함의 증거를 확인하기 위해 연 1회 이상 검사되지 않는다. 귀사의 품질 및 생산 시스템에서 상당한 공백이 확인되고 수량 편차, 파손, 반쪽 정제 및 효능 부족과 관련된 제품 품질 불만이 여러 차례 반복되는데도, 제한된 수의 배치를 선택한 {b) < ) 에 근거한 귀사의 사유는 타당하지 않다. 귀사의 절차서 SOP018076, Titled: \"Sampling, Storage, Observation and Destruction of Finished Products Conti·ol Samples\", Version: 13 .0, Section: 5.4.1 에 따르면 \"For each product, lbll4l batch out of total commercial batches packed during calendar year shall be selected for visual inspection (All pack 4 style & counts)\" 이다. 섹션 5.4.4 에 따른 육안검사용 {b){ ) 배치 선택은 table-I 에 정의되어 있다. 예를 들어, 이에 한정되지 않는다: ~o. of batches of a Eroduct Eacked ~o. of batches of a Eroduct I"
+  },
+  {
+    "finding_id": "finding-74d93a3f238869a6ab36f367",
+    "finding_text_md5": "d47bd56426b335537b2f7d38562853ce",
+    "published_date": "2024-04-17",
+    "detail_text": "Specifically, A) There is a lack of Quality Unit oversight on the issuance, handling, retrieval and reconciliation of GMP documents that are used in the manufacturing of diug products at your site. This lack of oversight violates the film's QA SOP 018075 for GMP form issuance. For example, 1) Controlled documents related to the following departments can be printed from the Electronic Document Management System (EDMS) without any oversight of the Quality Unit. These documents are used to record original GMP info1mation. For example, but not limited to: QC forms such as Fo1m 060789: Request Fo1m for Re-processing, Fo1m: 039593: Dissolution analysis checklist, Fo1m: 011918: Auto sampler validation record for model EDT-08LX, Fo1m: 034262: HPLC Chromatogram Checklist, Fo1m 011907: U.V. Vis Spectrophotometer graph checklist of fb) (4) Production forms such as Fo1m 011406: Equipment Cleaning Record Compression Machine, Fo1m 040690: Equipment Cleaning Record of~b) <4) ~",
+    "detail_text_ko": "구체적으로, A) 귀 사업장의 의약품 제조에 사용되는 GMP 문서의 발행, 취급, 회수 및 대조에 대한 품질 부서의 감독이 부족하다. 이러한 감독 부재는 GMP 양식 발행에 관한 귀사의 QA SOP 018075 를 위반한다. 예를 들어, 1) 다음 부서와 관련된 관리 문서가 품질 부서의 감독 없이 전자문서관리시스템(EDMS)에서 출력될 수 있다. 이 문서들은 GMP 원본 정보를 기록하는 데 사용된다. 예를 들어, 이에 한정되지 않는다: QC 양식으로 Fo1m 060789: Request Fo1m for Re-processing, Fo1m: 039593: Dissolution analysis checklist, Fo1m: 011918: Auto sampler validation record for model EDT-08LX, Fo1m: 034262: HPLC Chromatogram Checklist, Fo1m 011907: U.V. Vis Spectrophotometer graph checklist of fb) (4) 가 있고, 생산 양식으로 Fo1m 011406: Equipment Cleaning Record Compression Machine, Fo1m 040690: Equipment Cleaning Record of~b) <4) ~"
+  },
+  {
+    "finding_id": "finding-1ace3858e9a5a590aa2458a8",
+    "finding_text_md5": "146e006273f509c45718caa2c9aba573",
+    "published_date": "2024-04-17",
+    "detail_text": "Specifically, your Quality Unit has failed to investigate Product Quality Complaints (PQCs) thoroughly. For example,",
+    "detail_text_ko": "구체적으로, 귀사의 품질 부서는 제품 품질 불만(PQC)을 철저히 조사하지 않았다. 예를 들어,"
+  },
+  {
+    "finding_id": "finding-1093a7affef463c37fefe392",
+    "finding_text_md5": "dd2a72f1106f44b99596b5a66d92bac6",
+    "published_date": "2024-04-17",
+    "detail_text": "Specifically, A. On 04-Dec-2023, I observed about 450 mL o~b>l4) I \"stagnant liquid\" partially covered in sections with (b) {.J) ,_J layers inside the Air Purification Unit (APU) in between theJl~! ~L filter and the lbH4> of Processing Area (b){4) ID: GPN/EQ/285. Your fom state the accumulation of stagnant fiquid may have occuned after the last preventative maintenance of 13-Oct­ 4 4 2023 due to leakage of water from the (b) < > u,ocated inside fb) < > Iclose to the APU. This area gets verified for cleanliness during the lUJ l'+J preventative mamtenance. There is a potential for the growth of microorganism in the stagnant liquid in the area where the temperature is~! °C to~~ °C while",
+    "detail_text_ko": "구체적으로, A. 04-Dec-2023 에 실사관은 공정 구역 (b){4) ID: GPN/EQ/285 의 Jl~! ~L 필터와 lbH4> 사이에 있는 공기 정화 장치(APU) 안에서, 부분적으로 (b) {.J) ,_J 층으로 덮인 \"stagnant liquid\" 약 450 mL 를 관찰했다. 귀사는 이 고인 액체가 마지막 예방 정비일인 13-Oct­ 4 4 2023 이후 APU 근처 fb) < > Iclose 내부에 위치한 (b) < > u 에서 물이 새어 축적되었을 수 있다고 기술했다. 이 구역은 lUJ l'+J 예방 정비 때 청결 상태를 확인받는다. 온도가 ~! °C 에서 ~~ °C 인 구역의 고인 액체에서 미생물이 증식할 가능성이 있다"
+  },
+  {
+    "finding_id": "finding-0b193f63aaec0538d3e2e945",
+    "finding_text_md5": "3902d557fbb0b2129ce62af6ddcf3ead",
+    "published_date": "2024-04-17",
+    "detail_text": "Specifically, your laborato1y investigations pertaining to Out of Specification (OOS) investigations are not thoroughly investigated to dete1mine the root cause(s) for long-te1m (25°C/60%RH) stability samples failures for the drng products sold into the US market. For example, A) Your OOS Investigation PR ID #724426 was not thoroughly investigated for Product: (b) (..J) _ J 4 4 fbl < ) r,cil and fbl < ) J Tablets 1~ mg!~ mg, Batch Number: fbl <4) , date of initiation: 26-0ct-2020, Issue: \"Dissolution by HPLC test results was found not meeting SJ stage criteria due to a significantly lower result in vessel I of dissolution apparatus (ID: GQCIIN307) the dissolution test will not comply in S2 and S3 stage criteria\". Your fom filed an initial Field Ale1i on 28-0ct-2023 to the FDA for obtaining OOS test result at 18-month stability stage and based on your preliminaiy investigation. The dissolution test result at SI stage are as follows: !Dissolution Vessel I 12 13 14 15 16 (b) (4) (b) j% '(b) % l(b) % '(b) (b) 130% ltA, ltA, % % tA\\ tA\\ (b) (4) '(b) j% )(b) % ;~t) % '(b) % '(b) % I 18% .!(A) @ (4) !(A) m",
+    "detail_text_ko": "구체적으로, 귀사의 시험실 조사 중 기준 일탈(OOS) 조사는 미국(US) 시장에 판매되는 의약품의 장기(25°C/60%RH) 안정성 시료 부적합에 대한 근본 원인을 규명하도록 철저히 수행되지 않았다. 예를 들어, A) 귀사의 OOS 조사 PR ID #724426 은 제품: (b) (..J) _ J 4 4 fbl < ) r,cil 및 fbl < ) J Tablets 1~ mg!~ mg, Batch Number: fbl <4), 개시일: 26-0ct-2020, Issue: \"Dissolution by HPLC test results was found not meeting SJ stage criteria due to a significantly lower result in vessel I of dissolution apparatus (ID: GQCIIN307) the dissolution test will not comply in S2 and S3 stage criteria\" 에 대해 철저히 조사되지 않았다. 귀사는 18개월 안정성 단계에서 OOS 시험 결과를 얻은 것과 예비 조사에 근거하여 28-0ct-2023 에 FDA 에 최초 Field Alert 를 제출했다. SI 단계의 용출 시험 결과는 다음과 같다: !Dissolution Vessel I 12 13 14 15 16 (b) (4) (b) j% '(b) % l(b) % '(b) % '(b) (b) 130% ltA, ltA, % % tA\\ tA\\ (b) (4) '(b) j% )(b) % ;~t) % '(b) % '(b) % I 18% .!(A) @ (4) !(A) m"
+  },
+  {
+    "finding_id": "finding-75da372a4539a02051ef05e0",
+    "finding_text_md5": "5b8f3b8140f03f4da2c73b3c2ba535a1",
+    "published_date": "2024-04-16",
+    "detail_text": "Specifically, a. During review of raw - chromr ograph~ l data for of submission batches of I (bT(, I Cb)<, USP Cb < 4 %, I observed raw including but not limited to related substance (RS) of finished product, API RS, stability RS testing reprocessed without a reason",
+    "detail_text_ko": "구체적으로, a. I (bT(, I Cb)<, USP Cb < 4 %, 의 제출 배치에 대한 원시 크로마토그래피 데이터를 검토하던 중, 실사관은 완제품의 유연물질(RS), API RS, 안정성 RS 시험을 포함하되 이에 한정되지 않는 원시 데이터가 이유 없이 재처리된 것을 관찰했다"
+  },
+  {
+    "finding_id": "finding-551f00d00f8ea2d67a80ad50",
+    "finding_text_md5": "886f034ff5fbe31a25f3c83c2056fd27",
+    "published_date": "2024-04-16",
+    "detail_text": "Specifically, a. On April 2, 2024 during post roduction manual cleaning of line WCl RABS ID P[ c'RABS-001 1141mL used in the manufacture of CbT injection USF'l~% ::}mg!mL) Cb Cbn4) vial) batch Cb>< 4 tlie employee perfonmng tlie cleaning was observea cleaning the Cb>< 4 conveyor and other fillin§nstation surfaces located at the (bH 4 of the ~RABS rior to c eanmg surfaces located at the r 4 such as Cb)l4l Cb1141 Upon fmther review document EPS-PR-SOP-043-00-Procedure for Operation and '\"\"c...l-ean _ i_n_g_o\"\"'f,,f'\"'\"\"-'Cb)~1 Restricted Access BaiTier System in LinJCbT<4l Make: C6n4~ section 4.2.24 does not incluae mstmctions for operators to perfo1m cleaning the Cb)< 4 itollowing a CbTCl Cbn4 h d. d • 1 d · • £ 1 • h Cbn4 approac , an 1t oes not me u e mstmct1ons or c eanmg t e b. Per your summaiy repo1t for disinfectant efficacy validation perfo1med under protocol ES-GEN­ P-101 af roved on Januaiy 28, 2024, your fnm only tested the effectiveness of CbTCl on ~~ (bff4 • (bY{4 L ~ RABS __..,....__. the effectiveness of sporicida agent on this surface was not ven ried. A review of document EP5-PR-SOP-023 Cb>< 4 Procedure for Operation, Cleaning, and Changeover of (tif( 4 Am oule/vial",
+    "detail_text_ko": "구체적으로, a. April 2, 2024 에 WCl RABS ID P[ c'RABS-001 1141mL 라인의 생산 후 수동 세척 중, Cb 주사제 USF'l~% ::}mg!mL) Cb Cbn4) vial) 배치 Cb>< 4 제조에 사용된 설비에 대해, 세척을 수행하는 직원이 ~RABS 의 (bH 4 에 위치한 Cb>< 4 컨베이어와 기타 충전 스테이션 표면을 r 4 에 위치한 Cb)l4l Cb1141 같은 표면보다 먼저 세척하는 것이 관찰되었다. 이어서 문서 EPS-PR-SOP-043-00-Procedure for Operation and '\"\"c...l-ean _ i_n_g_o\"\"'f,,f'\"'\"\"-'Cb)~1 Restricted Access BaiTier System in LinJCbT<4l Make: C6n4~ 를 검토한 결과 섹션 4.2.24 는 작업자가 Cb)< 4 itollowing a CbTCl Cbn4 접근법에 따라 세척하도록 하는 지시를 포함하지 않으며, Cbn4 의 세척에 대한 지시도 포함하지 않는다. b. January 28, 2024 에 승인된 프로토콜 ES-GEN­ P-101 에 따라 수행된 소독제 효능 밸리데이션 요약 보고서에 따르면, 귀사는 ~~ (bff4 • (bY{4 L ~ RABS 표면에 대한 CbTCl 의 효과만 시험했으며 __..,....__. 이 표면에 대한 포자 사멸제의 효과는 검증되지 않았다. 문서 EP5-PR-SOP-023 Cb>< 4 Procedure for Operation, Cleaning, and Changeover of (tif( 4 Am oule/vial 의 검토"
+  },
+  {
+    "finding_id": "finding-052da117fa0a4e957e88ac09",
+    "finding_text_md5": "ca468bdd69d4d9b9e80ca04430b8211e",
+    "published_date": "2024-04-16",
+    "detail_text": "Specifically, on 4/3/24 I observed the manual visual ins ection process of USP~ batch WCl for approximately (bY{ 4 during this -.trm - e- ·I observea an operators observe vials that appeared to have white visible pa1ticles and classify them as good vials. During this time I also observed that during manual visual inspection the vials remained Cb)C4l after the [ Cb)l1 sterilization process, however there is no evaluation on how the presence of Cb> on the",
+    "detail_text_ko": "구체적으로, 4/3/24 에 실사관은 USP~ 배치 WCl 의 수동 육안검사 공정을 약 (bY{ 4 동안 관찰했다. -.trm - e- ·I observea 이 시간 중 작업자들이 흰색 가시 입자가 있는 것으로 보이는 바이알을 양품으로 분류하는 것을 관찰했다. 이 시간 중 실사관은 또한 수동 육안검사 중 바이알이 [ Cb)l1 멸균 공정 후에도 Cb)C4l 상태로 남아 있는 것을 관찰했으나, Cb> 의 존재가 ...에 미치는 영향에 대한 평가는 없다"
+  },
+  {
+    "finding_id": "finding-f28c9e0ce6ad829554a3834a",
+    "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+    "published_date": "2024-04-12",
+    "detail_text": "Specifically, A. From May 2023 until December 2023, your fnm manufactured and distributed human drng products intended to be sterile when your environmental monitoring program for viable Inicroorganisms was not in a state of control. During this time period, you documented 337 action level environmental monitoring excursions for bacterial and fungal recoveries in Grade-A and B aseptic processing areas for aseptic filling line] to include critical aseptic filling areas, equipment, and personnel. Your fnm's actions in response to the environmental monitoring excursions are inadequate as noted below: (bf{4~ Your fnm documented moisture and microbial contaminated! • environmental monitoring plates received from your supplier in July 2023 in excursion investigation IMDD-EM/23/010 (media lot (bf{-il Despite the documented containination of the media plates themselves, your fnm attributed multiple action level environmental monitoring excursions for the line] aseptic manufacturing area and the plate containination to a containinated incubator and continued using1 CtiJT1 plates from the same supplier until December 2023. fu December 2023, your fnm again documented (bf{ 4 media lots not mee",
+    "detail_text_ko": "구체적으로, A. May 2023 부터 December 2023 까지 귀사는 생균 미생물에 대한 환경 모니터링 프로그램이 관리 상태에 있지 않은 상태에서, 멸균 의도 인체용 의약품을 제조하고 유통했다. 이 기간에 귀사는 무균 충전 라인 ] 의 Grade-A 및 B 무균 공정 구역(핵심 무균 충전 구역, 설비 및 인원 포함)에서 세균 및 진균 검출에 대한 조치 한계 환경 모니터링 이탈 337건을 기록했다. 환경 모니터링 이탈에 대한 귀사의 조치는 아래와 같이 부적절하다: (bf{4~ 귀사는 July 2023 에 공급업체로부터 받은 습기 및 미생물에 오염된 ! • 환경 모니터링 평판(배지 로트 (bf{-il)을 이탈 조사 IMDD-EM/23/010 에 기록했다. 배지 평판 자체의 오염이 기록되었음에도 불구하고, 귀사는 line] 무균 제조 구역의 여러 조치 한계 환경 모니터링 이탈과 평판 오염의 원인을 오염된 배양기 탓으로 돌렸으며, December 2023 까지 같은 공급업체의 1 CtiJT1 평판을 계속 사용했다. December 2023 에 귀사는 다시 (bf{ 4 배지 로트가 기준을 충족하지 못함을 기록했다"
+  },
+  {
+    "finding_id": "finding-cebfee9207324256ca016c99",
+    "finding_text_md5": "077d9101cab3b69e81f83006d31c87c3",
+    "published_date": "2024-04-12",
+    "detail_text": "Specifically, A. On 3/20/2024, we inspected the HVAC mechanical space and I {\"ff1 the aseptic filling line~ ceiling. The roof of the building that covers this area was noted to have multiple holes and v1S1ble light to the exterior ofthe building. B. On 3/20/2024, we inspected the QC microbiology storage room1 (b111(controlled non- classified, CNC) and noted what appeared to be mold on and around the air vent in the ceiling of the room. Your fnm stores various QC microbiology supplies in room1 CbTc4 to include testing canisters for chug product sterility and environmental monitoring plates utilized for aseptic filling lin{m C. Various areas within your facility were observed to have what appeared to be water stained ceilings indicative ofprior water leakage events to include: • l (b)l, - CNC hallway leading into lina production area. AMENDM ENT 1",
+    "detail_text_ko": "구체적으로, A. 3/20/2024 에 우리는 HVAC 기계실을 점검했고 I {\"ff1 무균 충전 라인 ~ 천장을 점검했다. 이 구역을 덮고 있는 건물 지붕에 구멍이 여러 개 있고 건물 외부로 빛이 보이는 것이 확인되었다. B. 3/20/2024 에 우리는 QC 미생물 보관실 1 (b111(관리되는 비분류 구역, CNC)을 점검했고 실 천장의 공기 배출구 위와 주변에 곰팡이로 보이는 것이 있는 것을 확인했다. 귀사는 실 1 CbTc4 에 의약품 무균 시험용 시험 캐니스터와 무균 충전 라인 {m 에 사용되는 환경 모니터링 평판을 포함한 여러 QC 미생물 소모품을 보관한다. C. 귀사 시설의 여러 구역에서 과거 누수 사건을 나타내는 물 얼룩이 진 천장으로 보이는 것이 관찰되었으며, 여기에는 다음이 포함된다: • l (b)l, - 라인 a 생산 구역으로 이어지는 CNC 복도. AMENDMENT 1"
+  },
+  {
+    "finding_id": "finding-896cfa1e7a41ce5ff1f4a6b8",
+    "finding_text_md5": "4d101e2380a1bb1e568aadfba07ead69",
+    "published_date": "2024-04-12",
+    "detail_text": "Specifically, )1 4 On 3/26/2024, we inspected:~ vessel (bY{ 4 /MF~V/648 in the lin{]aseptic manufacturing 4 equipment storage area._Vessel (bH /MF~V/648 was documented as being in clean status. We inspected the I (b)C, from the interior side of the tank and noted what appeared to be discolored C--.:J tape hanging from the (bT, fittr . j he fitting also appeared to be discolored brown with a ~01i10n thatappeared to be rnstmg. Vessel (bY{-4 /MF~ V/648 is utilize_d to 1 (b)l, di-u g[ odlrt (bY{-4 (b)C4l d • h 1 fi ·1· £ • fill. fi • (bY{4 V 1 an 1s t e vesse your nm uh 1zes to per 01m aseptic 1 mg ·om m room esse (b)(4IMFqffiV/6 8 • 1 • d £ (bT(4l - - - r11j g/mL 1 ~ <4l 4 was uh 1ze to manu acture ·1 mJecbon, m o C4 1 (b)(, ,~)1 41which was shipped for the US market on 1 *DATES OF INSPECTION 3/1 8/2024(Mon), 3/19/2024(Tue), 3/20/2024(Wed), 3/21/2024(Thu), 3/22/2024(Fri), 3/26/2024(Tue), 3/27/2024(Wed) AM ENDMENT 1",
+    "detail_text_ko": "구체적으로, )1 4 3/26/2024 에 우리는 라인 ] 무균 제조 4 설비 보관 구역에 있는 ~ 용기 (bY{ 4 /MF~V/648 을 점검했다. 용기 (bH /MF~V/648 은 청결 상태로 기록되어 있었다. 우리가 탱크 내부에서 I (b)C, 를 점검한 결과 (bT, 피팅에서 변색된 C--.:J 테이프가 매달려 있는 것으로 보이는 것이 확인되었다. 피팅도 갈색으로 변색되었고 녹슬어 보이는(~01i10n) 부분이 있었다. 용기 (bY{-4 /MF~ V/648 은 1 (b)l, 의약품 odlrt (bY{-4 (b)C4l 에 사용되며 귀사가 방 용기 (b)(4IMFqffiV/6 8 에서 무균 충전을 수행하는 데 사용하는 per 01m 용기이다. 이 용기는 (bT(4l - - - r11j g/mL 1 ~ <4l 4 주사제를 제조하는 데 사용되었으며, 이는 41which 1 *DATES OF INSPECTION 3/1 8/2024(Mon), 3/19/2024(Tue), 3/20/2024(Wed), 3/21/2024(Thu), 3/22/2024(Fri), 3/26/2024(Tue), 3/27/2024(Wed) AM ENDMENT 1 에 미국(US) 시장으로 출하되었다"
+  },
+  {
+    "finding_id": "finding-22950fb4eedb9780021467bc",
+    "finding_text_md5": "1be9cc527957afb5ed7f6de8a060045b",
+    "published_date": "2024-04-12",
+    "detail_text": "Specifically, A. On 3/21/2024 we ins ected the aseptic filling lin~ Cb)l4l room and observed operators . 4 loading the WCl for load pattern 45 in pre ai·ation for the manufacture o~ CbH (bH 4 injection lot \\___Cb> 4lPer the load pattern, the (ti)7 } ai·e to be CbH4 • h CbH4l .. £ ·1· • Wh • d h (bf(41,--A ft - h m t e 1POS1t10n or sten 1zaj.10n. en we mspecte t e ~ r t e ,->Cl into the (bJ the Cb)l4l were noted in the CbH4 AMENDMENT 1",
+    "detail_text_ko": "구체적으로, A. 3/21/2024 에 우리는 무균 충전 라인 ~ Cb)l4l 실을 점검했고 작업자들이 . 4 주사제 로트 \\___Cb> 4l 제조를 준비하며 적재 패턴 45 에 따라 WCl 을 적재하는 것을 관찰했다. 적재 패턴에 따르면 (ti)7 } 는 CbH4 • h CbH4l .. £ ·1· • Wh • d h (bf(41,--A ft - h 멸균(sten 1zaj.10n)을 위한 위치에 있어야 한다. 우리가 ~ r t e ,->Cl 을 (bJ 안으로 점검했을 때 Cb)l4l 이 CbH4 에서 확인되었다 AMENDMENT 1"
+  },
+  {
+    "finding_id": "finding-af154ae010d82a554da9bb04",
+    "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+    "published_date": "2024-04-10",
+    "detail_text": "Specifically, The procedures 1035-G-0 196 \"Categorization and Handling ofAla_rm ,, n£LM.I29I \"O eration of S stem\" are not adequately followed in case an alarm occurs for high O,T('Jval ue m tne {I,)( o,n4'-rbis o,rr\"'is used for cleaning drug product manu\"-:£~ac_t_u-:ri_n_g_e_q_u~ip_m_e_n_t_a_n-.-as- a componentor various rug product formulations for the US market, including lifti ablets USP. 1035-G-0196 ·'Categorization and Handling ofAlarms\" defines a critical alarm as an alarm that may have a direct impact OUJ2,roduct quality. Annexure to MT291 (MT29 l/A5 \"List ofAlarms, Possible Causes, and Rectification\") 001 cJassifieS' s a noncritical alarm. Annexure MT29 I/A5 states on p. 9 that ifan alarm sounds for the system stopping due to very high tllRjn the o,rootbe rectification steps are to inform all user departments, acknowledge the alarm, check and ,.e_n_s_u-re~ fu_n_c__t~io_n__in_g_ o\"\"\"f...th o,rr-0 eter, and check th (li)OO'in the ijf-O It says ifthe oo-r ofthe 1 (liTT4J, h lD}l4J- hi b ----~(b)1l ....,.._ -~\"'\"!\"'-~~--- 41(1,)1-tJ ______...,.m t e 1s g , a ample should be sent to QC or checking of d1e On 3/ 16/2024 at 16:50 there was an audiovisual alann for oo-ooexceeding",
+    "detail_text_ko": "구체적으로, 절차서 1035-G-0 196 \"Categorization and Handling ofAla_rm\" 및 n£LM.I29I \"O eration of S stem\" 이 {I,)( o,n4'-rbis o,rr\"'is 의 높은 O,T('Jval ue 에 대한 경보가 발생한 경우에 적절히 지켜지지 않는다. 이 o,rr\"'is 는 미국 시장용 lifti ablets USP 를 포함한 여러 의약품 제형의 구성 성분으로 의약품 제조 설비 세척에 사용된다. 1035-G-0196 ·'Categorization and Handling ofAlarms\" 는 critical alarm 을 제품 품질(OUJ2,roduct)에 직접 영향을 줄 수 있는 경보로 정의한다. MT291 의 부록(MT29 l/A5 \"List ofAlarms, Possible Causes, and Rectification\") 001 은 이를 noncritical alarm 으로 분류한다. 부록 MT29 I/A5 는 9쪽에서, 매우 높은 tllRjn 으로 인해 시스템이 정지하는 경보가 울리면 시정 조치는 모든 사용 부서에 알리고, 경보를 확인하고, o,r 미터의 작동을 점검하고 보장하며, ijf-O 의 th (li)OO' 를 점검하는 것이라고 기술한다. 값이 높으면 시료를 QC 로 보내 d1e 41(1,)1-tJ 를 점검하도록 한다고 되어 있다. 3/ 16/2024 16:50 에 oo-oo 초과에 대한 시청각 경보가 발생했다"
+  },
+  {
+    "finding_id": "finding-7ba83c2604107ca5fa6d99af",
+    "finding_text_md5": "83192d5ce224238131328a0bdffb03c6",
+    "published_date": "2024-04-10",
+    "detail_text": "OOS-1030-2024-00013 remains open as ofthe current inspection for~~:~:;;::~{1111 USP lot-:-_____.and root cause(s) of the PSD 00S results remain to be determined. As of 4/3/2024 your firm has failed to holistically ~valuate the (l,TI USP API manufacturing process and PSD OOS results ~o en~ure all factors that contnbute t (l,)(\"IDSP particle size variation and ;,c41 re identified and remediated. Add Continuation Page EMPLOYEE(S} SIGNATURE",
+    "detail_text_ko": "OOS-1030-2024-00013 은 ~~:~:;;::~{1111 USP 로트 -:-_____. 에 대해 현 실사 시점에도 종결되지 않았으며 PSD OOS 결과의 근본 원인은 아직 규명되지 않았다. 4/3/2024 현재 귀사는 (l,TI USP API 제조 공정과 PSD OOS 결과를 전체적으로 평가하지 않아, (l,)(\"IDSP 입자 크기 변동에 기여하는 모든 요인과 ;,c41 이 확인되어 시정되도록 보장하지 못했다. Add Continuation Page EMPLOYEE(S} SIGNATURE"
+  },
+  {
+    "finding_id": "finding-77927c8ba7d458dd3fa233e3",
+    "finding_text_md5": "95c8837e590fb19bbd8331de11071b92",
+    "published_date": "2024-04-10",
+    "detail_text": "4 pharmaceuticai ingredient manufacture to helpl Cb><1duringL Cb><4)pperations to aadress particle size OOS events. Per procedure 1035-G-0042, your firm is to pertorm a risk assessment for new equipment to identify equipment criticality and guide qualifkation activities. As of4/3/2024, your firm has not conducted a risk assessment nor quaiification activities for th Cb)l,",
+    "detail_text_ko": "4 의약품 원료 제조에서 입자 크기 OOS 사건을 해결하기 위해 l Cb><1 동안 L Cb><4)pperations 를 돕는다. 절차서 1035-G-0042 에 따라 귀사는 신규 설비에 대해 설비 중요도를 파악하고 적격성평가 활동을 안내하기 위한 위험 평가를 수행해야 한다. 4/3/2024 현재 귀사는 th Cb)l, 에 대해 위험 평가도 적격성평가 활동도 수행하지 않았다"
+  },
+  {
+    "finding_id": "finding-2fdb4a1ebe211d474c9cb343",
+    "finding_text_md5": "ffbdacfb64820e507cec203e17ea71e9",
+    "published_date": "2024-04-10",
+    "detail_text": "Specifically, Your firm does not evaluate atypical events durino-1 {liJT~act· oh • • l .• • The ~ r API . b . , 1: ive armaceut1ca mgredient oacking. Cb>< ts to e packed mto, .___,<:..:..:...:.:..::.::; (6><<1 . 4 per proce me IiOD-39 - Packing with special_orotection.l CbH4 ofthe fimshed API and QC samolirnz ofthe batch Cb><;q ~-=\"\"--,•,-;::;:;::-h':~r:::7:-:-::::-::-::-::-:--.-~~--=-1 ,i2!:__,~·\\\\ch there were more thanl Cb1<4l h . events). Your tum has documented API batches CbT<-l.iAPI lot'r--____ CbH events t ::our firm cannot account for. For example,! (6,j ___J ave events occurritH! I (b)(4l (b)(4,i j Add Continuation Page",
+    "detail_text_ko": "구체적으로, 귀사는 {liJT~act· oh • • l .• • 중 비정형 사건을 평가하지 않는다. The ~ r API . b . , 1: ive armaceut1ca mgredient oacking. Cb>< 는 절차서 IiOD-39 - Packing with special_orotection. 에 따라 .___,<:..:..:...:.:..::.::; (6><<1 . 4 에 포장되어야 한다. l CbH4 ofthe fimshed API and QC samolirnz ofthe batch Cb><;q ~-=\"\"--,•,-;::;:;::-h':~r:::7:-:-::::-::-::-::-:--.-~~--=-1 ,i2!:__,~·\\\\ch there were more thanl Cb1<4l h . events). 귀사는 API 배치 CbT<-l.iAPI lot'r--____ CbH 사건을 기록했으며, 귀사가 설명할 수 없는 events t ::our firm cannot account for. 예를 들어,! (6,j ___J 에서 I (b)(4l (b)(4,i j 사이에 사건이 발생했다. Add Continuation Page"
+  },
+  {
+    "finding_id": "finding-744ed17d43ac80344ab8f8e2",
+    "finding_text_md5": "da8fd0e99fdeb98a0458b1d8375a4eb6",
+    "published_date": "2024-04-09",
+    "detail_text": "Specifically, A. During the preventive maintenance of Perkin Elmer UV Spectrophotometer ID #G/QC/225 connected to software and computer (UV WinLab ES 6.5.0.103 and computer ID #ABA/EQ/QC/COM/01187) on 06/28/2023, you encountered a failure for the instrument where the power supply and main board of instrument was not working. According to your service provider on 07/28/2023, the equipment could not be repaired. On 12/082023, you proposed to retire Perkin Elmer UV Spectrophotometer ID #G/QC/225 as change control PR ID #128741. Yet, you have not performed an investigation and any impact assessment on the previous generated test results from the UV Spectrophotometer before recording the instrument malfunction. You have tested batches of multiple products on that instrument which have been released into US market. For example, Date of Analysis Product Name Batch No. Shipped to US Release Date 3/30/2023 Tablets Yes 4/6/2023 Tablets Yes 4/13/2023 Tablets mg Yes",
+    "detail_text_ko": "구체적으로, A. 06/28/2023 에 소프트웨어 및 컴퓨터(UV WinLab ES 6.5.0.103 및 컴퓨터 ID #ABA/EQ/QC/COM/01187)에 연결된 Perkin Elmer UV Spectrophotometer ID #G/QC/225 의 예방 정비 중, 귀사는 기기의 전원 공급장치와 메인보드가 작동하지 않는 고장을 확인했다. 07/28/2023 에 귀사의 서비스 업체에 따르면 이 장비는 수리할 수 없었다. 12/082023 에 귀사는 Perkin Elmer UV Spectrophotometer ID #G/QC/225 를 변경 관리 PR ID #128741 로 폐기할 것을 제안했다. 그러나 귀사는 기기 고장을 기록하기 이전에 이 UV Spectrophotometer 에서 생성된 과거 시험 결과에 대한 조사와 영향 평가를 수행하지 않았다. 귀사는 해당 기기로 여러 제품의 배치를 시험했고 이들은 미국(US) 시장으로 출하되었다. 예를 들어, Date of Analysis Product Name Batch No. Shipped to US Release Date 3/30/2023 Tablets Yes 4/6/2023 Tablets Yes 4/13/2023 Tablets mg Yes"
+  },
+  {
+    "finding_id": "finding-ffe28a7f6bdb49d72048e051",
+    "finding_text_md5": "d47bd56426b335537b2f7d38562853ce",
+    "published_date": "2024-04-05",
+    "detail_text": "Specifically, A. During the walk-through inspection of your facility, we observed the presence of at least three uncontrolled investigation documents in a locked bin that were placed for shredding. Your SOP QA103, Rev R04, 'Investigation' section 6.3.3 requires, 'Responsible person shall perform the investigation and prepare the investigation report as per format F-QA-0314 m EDMS electronically as per SOP QA 116 \"Management of Electronic Document Management System (EDMS)\" for further review and approval'. However, the investigation documents found in the bin were prepared outside of EDMS and Track Wise with no document control number and traceability. For example, the signed copy of document identified in the destruction bin titled, \"Experimental analysis protocol\" which was signed on 26DEC2023 could neither be located in the corresponding TrackWise deviation record or EDMS system. No reference was found in the Track Wise for the existence of such document. Also, your log for the shredder does not identify what type ofdocuments are destroyed. 1:MM.OYEEt S) SIGN.rnt>RE­ EMPLO'Yl:EfS) NAME ANO7171.E-tPMtorType)' OATEl5'SUf;O 02 /0 2/2024 ~ Jeffrey P. Raimondi , cso",
+    "detail_text_ko": "구체적으로, A. 시설 순회 점검 중 우리는 파쇄를 위해 잠긴 수거함에 넣어 둔, 관리되지 않는 조사 문서를 최소 3건 확인했다. 귀사의 SOP QA103, Rev R04, 'Investigation' 섹션 6.3.3 은 'Responsible person shall perform the investigation and prepare the investigation report as per format F-QA-0314 m EDMS electronically as per SOP QA 116 \"Management of Electronic Document Management System (EDMS)\" for further review and approval' 이라고 요구한다. 그러나 수거함에서 발견된 조사 문서는 EDMS 와 Track Wise 밖에서 작성되었으며 문서 관리 번호와 추적성이 없었다. 예를 들어, 파기 수거함에서 확인된 \"Experimental analysis protocol\" 이라는 제목의 서명본 문서는 26DEC2023 에 서명되었으나 해당 TrackWise 일탈 기록이나 EDMS 시스템에서 찾을 수 없었다. 그러한 문서가 존재한다는 참조가 Track Wise 에서도 발견되지 않았다. 또한 귀사의 파쇄기 기록은 어떤 종류의 문서가 파기되는지 식별하지 않는다. 1:MM.OYEEt S) SIGN.rnt>RE­ EMPLO'Yl:EfS) NAME ANO7171.E-tPMtorType)' OATEl5'SUf;O 02 /0 2/2024 ~ Jeffrey P. Raimondi , cso"
+  },
+  {
+    "finding_id": "finding-85e6fc3247fb4af9ce27f56a",
+    "finding_text_md5": "4b0154197acf0c1d3191c33b4ce330e2",
+    "published_date": "2024-04-05",
+    "detail_text": "Specifically, As per you;rlilian.ioQ:~tlfi_catioln protocol (PR-CV-22-0021) you performed only [<6Jc4t1eaning verification in 2023 fo (b)( 4 USP. Deviation investigation (PR# 209693) was opened when unknown extraneous peaks were obtained during the l (bJC4' leaning verification residue test of swab samples collected from manufacturing equipment. The following unknown extraneous peaks were obtained from swab samples collected at different locations of the cleaned manufacturing equipment: Unknown manufactured before Cleaning Equipment / Swab Sample Product Name / Batch Extraneous Peak HPLC Retention Time Location (b,{4 (b) ,. (b)l (b~ / Inner surface Tablets USP~g / 1 \\UJW/-j (b Tablets USP <4 g/ <6><4j/ Gasketl(b5(4J 1(b)(4f 4 71 - (b Tablets USP <4 (b)(4l 1~ ~ \"}ot: ~ 1 g I 1 4>[i:1_ ~ (bf~ll (b>< 1 Tablets USP ~g / (b)(4~ urface­ (b)(4}2 (b)('12 7 EMPLOYEE($/NAM!: jl,flf) mt.E /Pnnt orType) OATEISSUEO EMPlOYEEfSJ SK,NAWRE 02/02/ 2024 Jeffrey P. Raimondi , cso ~,~­",
+    "detail_text_ko": "구체적으로, 귀사의 세척 적격성평가 프로토콜(PR-CV-22-0021)에 따라 귀사는 2023년에 (b)( 4 USP 에 대해 [<6Jc4t1eaning 확인만 수행했다. 제조 설비에서 채취한 면봉 시료의 l (bJC4' leaning 확인 잔류물 시험 중 미확인 외래 피크가 얻어졌을 때 일탈 조사(PR# 209693)가 개시되었다. 세척된 제조 설비의 서로 다른 위치에서 채취한 면봉 시료에서 다음 미확인 외래 피크가 얻어졌다: Unknown manufactured before Cleaning Equipment / Swab Sample Product Name / Batch Extraneous Peak HPLC Retention Time Location (b,{4 (b) ,. (b)l (b~ / Inner surface Tablets USP~g / 1 \\UJW/-j (b Tablets USP <4 g/ <6><4j/ Gasketl(b5(4J 1(b)(4f 4 71 - (b Tablets USP <4 (b)(4l 1~ ~ \"}ot: ~ 1 g I 1 4>[i:1_ ~ (bf~ll (b>< 1 Tablets USP ~g / (b)(4~ urface­ (b)(4}2 (b)('12 7 EMPLOYEE($/NAM!: jl,flf) mt.E /Pnnt orType) OATEISSUEO EMPlOYEEfSJ SK,NAWRE 02/02/ 2024 Jeffrey P. Raimondi , cso ~,~­"
+  },
+  {
+    "finding_id": "finding-3d2627c0f2a73ddeb82a9559",
+    "finding_text_md5": "dfbb6c2ca2cc7d9ea5bba61ac70cedcc",
+    "published_date": "2024-04-05",
+    "detail_text": "Specifically, ~necifically, the current hold time studies conducted ~ r c1JJ<' 4l and compresse.d tablets of (b) (41 iJ ' ~~ l]n (6 ablets US~ g, ~ g,rnng ~ g and <4> g do not repr senL,e commercial batch sizes ot the proctuct. The hold time $tudy conducted in 2008 to support the (bH4lused a r 11~quantity of ~(b11-\\g anq approximate!)ir (b111compressed tablets from the exhibit batches while the commercial batch size isrn<g andl (b)(.11 ablets.",
+    "detail_text_ko": "구체적으로, ~necifically, 현재 c1JJ<' 4l 및 (b) (41 iJ ' ~~ l]n (6 ablets US~ g, ~ g,rnng ~ g and <4> g 의 압축 정제에 대해 수행된 보관 시간 연구는 제품의 상업 배치 크기를 대표하지 않는다. (bH4l 을 뒷받침하기 위해 2008년에 수행된 보관 시간 연구는 노출 배치의 ~(b11-\\g 양과 약 ir (b111 압축 정제를 사용했으나, 상업 배치 크기는 rn<g 및 l (b)(.11 ablets 이다."
+  },
+  {
+    "finding_id": "finding-09e89a80248e4a07abf08b8c",
+    "finding_text_md5": "b86736da51ae6a357a196d4eaa123082",
+    "published_date": "2024-04-05",
+    "detail_text": "Specifically, (bf(4}n Thickness and hardness specifications fo (b11iusrl g were changed based on a challenge study performed under Protocol: PR-Misc-22-0098. At the conclusion of the study, the EMPLOYEE(SJ SfGNAWRE • \" PlOYEE(S} NA/lie ANDTITLE (Plfnl o, Typo)",
+    "detail_text_ko": "구체적으로, (bf(4}n 두께 및 경도 규격은 Protocol: PR-Misc-22-0098 에 따라 수행된 챌린지 연구에 근거하여 (b11iusrl g 에 대해 변경되었다. 연구가 종료되었을 때, EMPLOYEE(SJ SfGNAWRE • \" PlOYEE(S} NA/lie ANDTITLE (Plfnl o, Typo)"
+  },
+  {
+    "finding_id": "finding-ac9902079142c5296c0de31a",
+    "finding_text_md5": "629b48094fdf15e49a97104645e20754",
+    "published_date": "2024-04-03",
+    "detail_text": ". . Specifically, your fom was notified a highly pathogenic rmcroorgamsm was recovered during environmental monitoring of the production area and an incident repo1t (IR) was not initiated to conduct a documented investigation of the result. Brucella melitensis was recovered from an air sample taken on 08/02/2022 in Wash Up Room 'where production equipment is cleaned. Film procedure QC-250-24 Microbial Environmental Monitoring (EM) Program does not require !Rs to be initiated when action levels are not reached and lacks instructions to initiate an IR for pathogenic or objectionable microbial 4 recoveries. Quality Unit personnel approved both the _L . Cb>1 2022 Environmental Monitoring Repo1t and 2022 Envii·onmental Monitoring Annual Trena Repo1t which included the recove1y of Brucella melitensis. The 2022 Envii·onmental Monitoring Annual Trend Repo1t states Brucella melitensis is considered non-objectionable, however the identification report from your third-paity contract laborato1y received by your Quality Unit on 08/24/2022 states the Inicroorganism is highly pathogenic.",
+    "detail_text_ko": "구체적으로, 귀사는 생산 구역의 환경 모니터링에서 고병원성 미생물이 검출되었다는 통보를 받았으나 그 결과에 대한 문서화된 조사를 수행하기 위한 사건 보고서(IR)를 개시하지 않았다. Brucella melitensis 가 생산 설비를 세척하는 Wash Up Room 에서 08/02/2022 에 채취한 공기 시료에서 검출되었다. 귀사의 절차서 QC-250-24 Microbial Environmental Monitoring (EM) Program 은 조치 한계에 도달하지 않은 경우 IR 을 개시하도록 요구하지 않으며, 병원성 또는 부적합 미생물이 검출된 경우 IR 을 개시하라는 지시도 없다. 품질 부서 인원은 Brucella melitensis 의 검출이 포함된 _L . Cb>1 2022 Environmental Monitoring Repo1t 와 2022 Envii·onmental Monitoring Annual Trena Repo1t 를 모두 승인했다. 2022 Envii·onmental Monitoring Annual Trend Repo1t 는 Brucella melitensis 를 non-objectionable 로 간주한다고 기술하나, 08/24/2022 에 귀사의 품질 부서가 받은 외부 위탁 시험기관의 동정 보고서는 이 미생물이 고병원성이라고 명시한다."
+  },
+  {
+    "finding_id": "finding-fe83d5cacc51b76b122d18aa",
+    "finding_text_md5": "da8fd0e99fdeb98a0458b1d8375a4eb6",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, A. In 2022, your firm documented that 15 out of <Redacted B4> Tacrolimus AQ lots initially tested Out of Specification for potency. In 2023, your firm documented that 18 lots out of <Redacted B4> Tacrolimus AQ lots initially tested out of specification for potency. We reviewed 8 investigations into these 00S events and observed that none documented a definitive root cause with extension to other lots that may have been associated.",
+    "detail_text_ko": "구체적으로, A. 2022년에 귀사는 <Redacted B4> 개의 Tacrolimus AQ 로트 중 15개가 역가에서 초기에 기준 일탈(OOS)로 시험되었다고 기록했다. 2023년에 귀사는 <Redacted B4> 개의 Tacrolimus AQ 로트 중 18개가 역가에서 초기에 기준 일탈로 시험되었다고 기록했다. 우리는 이 00S 사건에 대한 조사 8건을 검토했으며, 관련되었을 수 있는 다른 로트로 확대된 확정적 근본 원인을 기록한 조사는 하나도 없음을 관찰했다."
+  },
+  {
+    "finding_id": "finding-d47d1df3697921a4e546a80e",
+    "finding_text_md5": "b949ac29652150d0be5827c0935e3ebb",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, under section 503B(a)(l0) of the FD&C Act, Outsourcing facilities are required to include certain information on the label and container of compounded drugs products. The following items were not observed, w hile reviewing your firms drug product labels and containers. For example, 1. The quantity or proportion of each inactive ingredient. Examples of your drug product labels that do not contain this information: • Tacrolimus (Aqueous) 0.02% Ophthalmic Suspension 10ml • Tacrolimus (Aqueous) 0.02% Ophthalmic Suspension 15ml • Tacrolimus (Aqueous) 0.03% Ophthalmic Suspension 15ml • Tacrolimus (Aqueous) 0.1% Ophthalmic Suspension 10ml • Tacrolimus (Aqueous) 0.3% Ophthalmic Suspension 10ml • Tacrolimus (Aqueous) 0.5% Ophthalmic Suspension 10ml • Tacrolimus (Aqueous) 1% Ophthalmic Suspension 10ml 2. The containers of your outsourcing facility's drug products do not include information required by section 503B(a)(10)(B). Specifically, your containers do not include the following information",
+    "detail_text_ko": "구체적으로, FD&C Act 섹션 503B(a)(l0) 에 따라 위탁 제조시설(Outsourcing facility)은 조제 의약품의 라벨과 용기에 특정 정보를 포함해야 한다. 귀사의 의약품 라벨과 용기를 검토하는 동안 다음 항목이 확인되지 않았다. 예를 들어, 1. 각 비활성 성분의 양 또는 비율. 이 정보가 없는 귀사 의약품 라벨의 예: • Tacrolimus (Aqueous) 0.02% Ophthalmic Suspension 10ml • Tacrolimus (Aqueous) 0.02% Ophthalmic Suspension 15ml • Tacrolimus (Aqueous) 0.03% Ophthalmic Suspension 15ml • Tacrolimus (Aqueous) 0.1% Ophthalmic Suspension 10ml • Tacrolimus (Aqueous) 0.3% Ophthalmic Suspension 10ml • Tacrolimus (Aqueous) 0.5% Ophthalmic Suspension 10ml • Tacrolimus (Aqueous) 1% Ophthalmic Suspension 10ml 2. 귀사 위탁 제조시설의 의약품 용기에는 섹션 503B(a)(10)(B) 가 요구하는 정보가 포함되어 있지 않다. 구체적으로, 귀사의 용기에는 다음 정보가 포함되어 있지 않다"
+  },
+  {
+    "finding_id": "finding-d064d07792ea4c6402c41efc",
+    "finding_text_md5": "648588974de0e358b63caa501a652d04",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, your pharmacy fail to provide an adequate justification for your facility's media fill program in order to simulate aseptic production operations for the worst-case activities and conditions. For example, your firm’s media fill program documented within procedure, Conduct High Risk Media Fill Test, PURE_SOP 3.9.6 Conduct High Risk Media Fill Test fail to represent actual aseptic production practices, which include the stopper placement and affixing the <Redacted B4> to the vial. Repeat Observation",
+    "detail_text_ko": "구체적으로, 귀 약국은 최악 조건의 활동과 조건에 대해 무균 생산 작업을 모사하기 위한 시설의 배지충전 프로그램에 대한 적절한 타당성을 제시하지 못했다. 예를 들어 귀사의 절차서 Conduct High Risk Media Fill Test, PURE_SOP 3.9.6 Conduct High Risk Media Fill Test 에 문서화된 귀사의 배지충전 프로그램은 마개 위치 설정과 <Redacted B4> 를 바이알에 부착하는 작업을 포함한 실제 무균 생산 관행을 대표하지 못한다. 반복 관찰사항"
+  },
+  {
+    "finding_id": "finding-cc104febf411ed053c254df1",
+    "finding_text_md5": "f8de8ecabfdd295825408952c691346f",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, your firm air returns are adjacent to your HEPA filters in the ceiling of the ISO 8 Anteroom and ISO 7 Cleanroo m <Redacted B4> used in the production of sterile drugs. Your pharmacy fail to provide records and/or documents (smoke study) in support of adequate air circulation in the prevention of an influx of poor quality air into a higher classified area. Repeat Observation",
+    "detail_text_ko": "구체적으로, 귀사의 공기 환기구(air return)는 멸균 의약품 생산에 사용되는 ISO 8 Anteroom 및 ISO 7 Cleanroom <Redacted B4> 천장의 HEPA 필터에 인접해 있다. 귀 약국은 더 높은 등급의 구역으로 품질이 낮은 공기가 유입되는 것을 막는 적절한 공기 순환을 뒷받침하는 기록 및/또는 문서(연기 시험)를 제시하지 못했다. 반복 관찰사항"
+  },
+  {
+    "finding_id": "finding-aee0132491a1afba834ab964",
+    "finding_text_md5": "2987e8f9d00e1d3f42ed209573f65e0d",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, unidirectional airflow was not verified under operational conditions. Your firm’s clean room re-certification reports tests dated 1/27/2021, 8/5/2020, 2/12/2020, and 8/15/2019 were documented as being performed in dynamic conditions. On 5/24/2021, PIC reported no aseptic production simulation was performed at the time of any of the documented cleanroom and ISO 5 aseptic production processing areas during re-certifications. Repeat Observation *DATES OF INSPECTION 5/11/2021 (Tue), 5/12/2021 (Wed), 5/13/2021 (Thu), 5/14/2021 (Fri), 5/24/2021 (Mon), 5/25/2021 (Tue), 5/26/2021 (Wed), 5/27/2021 (Thu), 6/07/2021 (Mon)",
+    "detail_text_ko": "구체적으로, 일방향 기류가 운전 조건에서 확인되지 않았다. 귀사의 청정실 재인증 보고서 시험일 1/27/2021, 8/5/2020, 2/12/2020 및 8/15/2019 는 동적 조건에서 수행된 것으로 기록되었다. 5/24/2021 에 PIC 는 재인증 중 기록된 어느 청정실 및 ISO 5 무균 생산 공정 구역에서도 그 시점에 무균공정 모의시험이 수행되지 않았다고 보고했다. 반복 관찰사항 *DATES OF INSPECTION 5/11/2021 (Tue), 5/12/2021 (Wed), 5/13/2021 (Thu), 5/14/2021 (Fri), 5/24/2021 (Mon), 5/25/2021 (Tue), 5/26/2021 (Wed), 5/27/2021 (Thu), 6/07/2021 (Mon)"
+  },
+  {
+    "finding_id": "finding-9347477cddcb35eb51f4827d",
+    "finding_text_md5": "ab35566d7d7514ba455cc6e04bfe377a",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, your firm failed to validate the sporicidal agent, <Redacted B4> Sporicidal Disinfectant Cleaner for its intended use within the cleanroom and aseptic production processing area. Repeat Observation",
+    "detail_text_ko": "구체적으로, 귀사는 포자 사멸제 <Redacted B4> Sporicidal Disinfectant Cleaner 를 청정실 및 무균 생산 공정 구역 내에서의 사용 목적에 대해 밸리데이션하지 않았다. 반복 관찰사항"
+  },
+  {
+    "finding_id": "finding-908cdb8ccb0855797011d8bf",
+    "finding_text_md5": "b6273ad6487109309f02470a867db9dd",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, A. The designs of Vial Lin e <Redacted B4> <Reda cted B 4> Systems <Red ac ted B4 >) , Vial line <Redacted B4> <Redacted B4>) S ystem <Re dac ted B4>), Flexib le F ill Line <Redacted B4> System <Red act ed B4>, Syr inge Line <Redacted B4> <Redacted B4> System <Redacted B4> do not allow all <Redacted B4> to be <Redacted B4> with <Redacted B4> <Redacted B4> .These include, but are not limited to, the following: . <Re da cted B4> (Vial Line <Red acted B4> <Redacted B4> <Redacted B4> and <Redacted B4> . <Redacted B4> (Vial Line<Redacted B4>): <Redacted B4> E MP LOYE E(S) SIGNATURE",
+    "detail_text_ko": "구체적으로, A. Vial Lin e <Redacted B4> <Reda cted B 4> Systems <Red ac ted B4 >) , Vial line <Redacted B4> <Redacted B4>) S ystem <Re dac ted B4>), Flexib le F ill Line <Redacted B4> System <Red act ed B4>, Syr inge Line <Redacted B4> <Redacted B4> System <Redacted B4> 의 설계는 모든 <Redacted B4> 가 <Redacted B4> <Redacted B4> 와 함께 <Redacted B4> 되도록 허용하지 않는다 .이에는 다음이 포함되며 이에 한정되지 않는다: . <Re da cted B4> (Vial Line <Red acted B4> <Redacted B4> <Redacted B4> 및 <Redacted B4> . <Redacted B4> (Vial Line<Redacted B4>): <Redacted B4> E MP LOYE E(S) SIGNATURE"
+  },
+  {
+    "finding_id": "finding-8de0e0c77d66671c28054da5",
+    "finding_text_md5": "da8fd0e99fdeb98a0458b1d8375a4eb6",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically A. Between 31 OCT 2121 and 31 OCT 2023, there have been approximately 194 deviations discussing <Redacted B6> <Re dact ed B7> X <Redacted C> <Redacted B4> failures. These failure s are reported ac ross the <Redacted B 4> systems of all <Redacte d B4> filling lines <Redacted B4> ). Of these deviations, nine were identified as requiring new ac tion(s) to prevent recurrence of the issue. Approximately 31 actions were initiated directly fr om these nine deviations. Six of the nine deviations were identified as requiring checks to ensure the action(s) taken were effective. 171 of these deviations do not identify a definite root cause; in these cases, for major deviat ions , governing procedure A-SOP-21-01-054, Drug Product <Redacted B4> Program, instru cts i nvestigators to indicate a pos sible/probable root cause as <Redacted B4> in the deviation's ro ot cause grid. 155 deviations list a possible/probable root cause as <Redacted B4>. There are approximately <Redacted B4> batches associated with these deviations, with approximately <Redacted B4> batches pertaining to commercial drug and biological drug products. No commerci al lots of drug and biological drug products have",
+    "detail_text_ko": "구체적으로 A. 31 OCT 2121 과 31 OCT 2023 사이에 <Redacted B6> <Re dact ed B7> X <Redacted C> <Redacted B4> 실패를 다룬 일탈이 약 194건 있었다. 이러한 실패는 모든 <Redacte d B4> 충전 라인 <Redacted B4> ) 의 <Redacted B4> 시스템 전반에서 보고된다. 이 일탈 중 9건은 재발 방지를 위한 새로운 조치가 필요한 것으로 확인되었다. 이 9건의 일탈에서 직접 약 31건의 조치가 개시되었다. 9건 중 6건은 취해진 조치의 유효성을 확인하는 점검이 필요한 것으로 확인되었다. 이 일탈 중 171건은 확정적 근본 원인을 규명하지 못했으며, 이러한 경우 주요 일탈에 대해 관련 절차서 A-SOP-21-01-054, Drug Product <Redacted B4> Program 은 조사자에게 일탈의 근본 원인 표에 가능성이 있는/개연성 있는 근본 원인을 <Redacted B4> 로 표시하도록 지시한다. 155건의 일탈은 가능성이 있는/개연성 있는 근본 원인을 <Redacted B4> 로 기재한다. 이 일탈과 관련된 배치는 약 <Redacted B4> 개이며, 이 중 상업용 의약품 및 생물의약품과 관련된 배치는 약 <Redacted B4> 개이다. 의약품 및 생물의약품의 상업 로트 중에는 ...하지 않았다"
+  },
+  {
+    "finding_id": "finding-7c4b6a19ca98055b50fcfa35",
+    "finding_text_md5": "f4675d06d7c9b88442cc21d9aaf1c221",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, There is a failure to validate the endotoxin sample storage of drug products under project code <Redacte d B4> at <R edacted B4> up to <Redacted B4> prior to the te sting. A <Redacted B4> hold st udy or low endotoxin recovery data demonstrates that th e ho ld period at <Redacted B4> does n ot negatively affect the endotoxin recovery from samples to ensure the microbial contamination is under control.",
+    "detail_text_ko": "구체적으로, 프로젝트 코드 <Redacte d B4> 의약품의 엔도톡신 시료를 시험 전에 <R edacted B4> 에서 <Redacted B4> 까지 보관하는 것에 대한 밸리데이션이 이루어지지 않았다. <Redacted B4> 보관 시간 연구 또는 낮은 엔도톡신 회수율(low endotoxin recovery) 데이터를 통해 <Redacted B4> 에서의 보관 기간이 시료의 엔도톡신 회수에 부정적인 영향을 주지 않음을 입증하여 미생물 오염이 관리되고 있음을 보장해야 한다."
+  },
+  {
+    "finding_id": "finding-6e54a2082118d7099f7b4b22",
+    "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+    "published_date": "2024-03-22",
+    "detail_text": "Specifically, according to your Director of Quality and your Director of Manufacturing your firm has not validated your cleaning procedures as described in SOP SC-SAN-1010, Cleaning and Maintenance of the Aseptic Manufacturing Areas which provides instructions for cleaning and sanitizing rooms C704, C706 and C709, where human and animal drug products intended to be sterile are manufactured. In addition, your firm's cleaning instructions state technicians are to use <Redacted B4> for <Redacted B4> dwell time which is outside of the manufacturer's instructions for sporicidal use of <Redacted B4> saturation. Furthermore, your technicians were observed on 10/03/2023 not keeping ISO 5 areas, cleaned with <Redacted B4> for the full <Redacted B4>. Your firm has not conducted an efficacy study to provide a justification for the <Redacted B4> dwell time.",
+    "detail_text_ko": "구체적으로, 귀사의 품질 책임자(Director of Quality)와 제조 책임자(Director of Manufacturing)에 따르면, 귀사는 멸균 의도 인체용 및 동물용 의약품이 제조되는 C704, C706 및 C709 실의 세척 및 소독 지침을 규정한 SOP SC-SAN-1010, Cleaning and Maintenance of the Aseptic Manufacturing Areas 에 기술된 세척 절차를 밸리데이션하지 않았다. 또한 귀사의 세척 지침은 기술자가 <Redacted B4> 를 <Redacted B4> 접촉 시간 동안 사용하도록 하고 있으며, 이는 <Redacted B4> 포화에 대한 포자 사멸 사용 시 제조업체의 지침을 벗어난다. 더욱이 10/03/2023 에 귀사의 기술자들이 <Redacted B4> 로 세척한 ISO 5 구역을 전체 <Redacted B4> 동안 유지하지 않는 것이 관찰되었다. 귀사는 <Redacted B4> 접촉 시간의 타당성을 제시하기 위한 효능 연구를 수행하지 않았다."
+  }
+]

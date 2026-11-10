@@ -287,7 +287,8 @@ class _WhopirRowParser(HTMLParser):
         self._depth = 0                              # 날짜 필드 div 중첩 깊이(0 = 필드 밖)
         self._isos: list[str] = []
         self._texts: list[str] = []
-        self._pending: tuple[str, str] | None = None
+        # `_pending` 이름 금지 — Python 3.12.16+ HTMLParser.feed 가 같은 이름의 내부 버퍼를 쓴다(덮어쓰면 feed 가 깨짐).
+        self._pending_date: tuple[str, str] | None = None
 
     def handle_starttag(self, tag, attrs):
         attr = dict(attrs)
@@ -298,14 +299,14 @@ class _WhopirRowParser(HTMLParser):
                 self._depth += 1
             return
         if tag == "article":
-            self._href, self._pending = "", None      # 행 경계 — 앞 행 상태를 물려주지 않는다
+            self._href, self._pending_date = "", None      # 행 경계 — 앞 행 상태를 물려주지 않는다
         elif tag == "a":
             href = str(attr.get("href") or "").strip()
             if _is_whopir_pdf(href):
                 self._href = href
-                if self._pending is not None:
-                    self.rows.setdefault(href, self._pending)
-                    self._pending = None
+                if self._pending_date is not None:
+                    self.rows.setdefault(href, self._pending_date)
+                    self._pending_date = None
         elif tag == "div" and _WHOPIR_DATES_FIELD in str(attr.get("class") or ""):
             self._depth, self._isos, self._texts = 1, [], []
 
@@ -320,7 +321,7 @@ class _WhopirRowParser(HTMLParser):
         if self._href:
             self.rows.setdefault(self._href, value)
         else:
-            self._pending = value
+            self._pending_date = value
 
     def handle_data(self, data):
         if self._depth and data.strip():

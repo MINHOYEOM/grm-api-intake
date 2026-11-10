@@ -80,22 +80,26 @@ class MhraRetroScopeTest(unittest.TestCase):
         self.assertIs(b._PRODUCERS["Recall(UK)"], cs._detail_mhra_recall)
 
 
-class MhraBodyCapTest(unittest.TestCase):
-    """#806 의 절단 결함 재발 방지 — 상한이 '발췌'가 아니라 '전문' 계열인지."""
+class MhraBodyNoCapTest(unittest.TestCase):
+    """#806 의 절단 결함 재발 방지 — [2026-11-10] 저장 단계 무절단: 상한 자체가 없다."""
 
-    #  gov.uk Content API 전건 실측(2026-08-27, 6/6): 최대 5222자.
-    OBSERVED_MAX = 5222
+    def test_no_storage_cap_constants(self):
+        self.assertFalse(hasattr(ci, "MHRA_ALERT_BODY_MAX_CHARS"))
+        self.assertFalse(hasattr(ci, "WL_BODY_FULL_MAX_CHARS"))
 
-    def test_cap_is_full_text_class_not_excerpt(self):
-        self.assertEqual(ci.MHRA_ALERT_BODY_MAX_CHARS, ci.WL_BODY_FULL_MAX_CHARS)
-
-    def test_cap_clears_observed_corpus_with_headroom(self):
-        """상한이 관측 최대치에 근접하면 다음 장문 한 건이 다시 잘린다."""
-        self.assertGreaterEqual(ci.MHRA_ALERT_BODY_MAX_CHARS, self.OBSERVED_MAX * 2)
-
-    def test_excerpt_caps_stay_separate(self):
-        """표시 상한과 전문 상한을 도로 합치지 않는다(경고서한 480자 절단 계열)."""
-        self.assertLess(ci.WL_BODY_MAX_CHARS, ci.MHRA_ALERT_BODY_MAX_CHARS)
+    def test_body_over_30000_chars_is_kept_whole(self):
+        from unittest import mock
+        last = "FINAL-PARAGRAPH-MARKER."
+        body_html = "<p>" + ("Patients should stop using the product. " * 1000) + "</p><p>" + last + "</p>"
+        self.assertGreater(len(body_html), 30000)
+        resp = mock.Mock()
+        resp.raise_for_status.return_value = None
+        resp.json.return_value = {"details": {"body": body_html}}
+        with mock.patch.object(ci.requests, "get", return_value=resp):
+            text = ci._fetch_mhra_alert_body(
+                "https://www.gov.uk/drug-device-alerts/some-alert")
+        self.assertGreater(len(text), 30000)
+        self.assertTrue(text.endswith(last))
 
 
 class MhraDetailTypeClassificationTest(unittest.TestCase):

@@ -45,7 +45,7 @@ FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures")
 # 합성 픽스처를 만들 때 상한(현재 6000)에 여유 있게 초과하도록 동적으로 크기를 잡는다 --
 # 상한 상수가 바뀌어도(테스트 6 이 그 변경을 사람이 검토하게 강제한다) 이 파일의 나머지
 # 테스트가 "우연히 상한 밑에 들어와 아무것도 검증 못 하는" 상태로 조용히 무너지지 않는다.
-_CAP = extractors._WL_BLOCK_CHAR_CAP
+_CAP = extractors._WL_BLOCK_UNSPLIT_THRESHOLD
 _SENTENCE_TERMINALS = ".。!?\"'”’)]"
 
 
@@ -81,14 +81,16 @@ class WlBlockCapContractTest(unittest.TestCase):
     # ------------------------------------------------------------------
     # 1) 문장 경계 절단
     # ------------------------------------------------------------------
-    def test_over_cap_block_cuts_at_sentence_boundary(self) -> None:
+    def test_over_cap_block_is_stored_whole(self) -> None:
+        """[2026-11-10] 저장 단계 무절단 — 6,000자 초과 블록도 전문 그대로(…없음)."""
         sentence = (
             "Investigators found that the batch record did not include a signed "
             "verification for the cleaning step performed prior to filling."
         )
-        repeat = (_CAP // len(sentence)) + 20  # 상한을 넉넉히 넘도록
+        repeat = (_CAP // len(sentence)) + 20  # 신호 임계값을 넉넉히 넘도록
         block1 = " ".join([sentence] * repeat)
-        self.assertGreater(len(block1), _CAP, "테스트 전제 붕괴: 합성 블록이 상한보다 짧다")
+        self.assertGreater(len(block1), _CAP, "테스트 전제 붕괴: 합성 블록이 임계값보다 짧다")
+        self.assertTrue(extractors._wl_block_looks_unsplit(block1))
 
         body = (
             "During our inspection, our investigators observed specific violations "
@@ -101,26 +103,15 @@ class WlBlockCapContractTest(unittest.TestCase):
         findings = _wl_findings(body)
         self.assertValidFindings(findings)
         self.assertEqual(len(findings), 2, "번호 리스트 2건이 2 findings 로 분해돼야 한다")
-
         text = findings[0]["finding_text"]
-        core = text[:-1] if text.endswith("…") else text
-        # 절단이 실제로 일어났는지(전제 확인) + 원문의 정확한 접두어인지(내용 왜곡 없음).
-        self.assertLess(len(core), len(block1), "블록이 상한을 넘었는데 절단이 일어나지 않았다")
-        self.assertTrue(block1.startswith(core), "절단 결과가 원문 접두어가 아니다 — 내용이 훼손됐다")
-        # 핵심 계약: 문장 중간이 아니라 문장 종결부호에서 끊겨야 한다.
-        self.assertTrue(
-            core and core[-1] in _SENTENCE_TERMINALS,
-            f"문장 중간에서 잘렸다(회귀!) — 결과 끝: {core[-60:]!r}",
-        )
-        # 실측 결함 패턴("...which…" 처럼 종결부호 없이 단어에서 바로 끊김)이 재발하지
-        # 않았는지 구체적으로 확인 -- 문장 템플릿의 마지막 단어가 온전히 보존돼야 한다.
-        self.assertTrue(core.endswith("filling."), f"문장이 온전히 안 남았다: {core[-30:]!r}")
+        self.assertEqual(text, block1, "6,000자 초과 블록이 전문 그대로 저장되지 않았다")
+        self.assertFalse(text.endswith("…"))
 
     # ------------------------------------------------------------------
     # 2) 상한 준수
     # ------------------------------------------------------------------
-    def test_capped_result_stays_within_the_limit(self) -> None:
-        sentence = "The equipment cleaning log lacked a supervisor signature for this batch."
+    def test_long_block_length_is_not_limited(self) -> None:
+        sentence = "Your firm failed to follow written procedures for the equipment cleaning log (21 CFR 211.67)."
         repeat = (_CAP // len(sentence)) + 20
         block1 = " ".join([sentence] * repeat)
         body = (
@@ -131,13 +122,7 @@ class WlBlockCapContractTest(unittest.TestCase):
 
         findings = _wl_findings(body)
         self.assertValidFindings(findings)
-        for finding in findings:
-            # +1 은 절단 시 붙는 "…" 한 글자 여유(단어 경계 되돌림·미완결 표시 공통).
-            self.assertLessEqual(
-                len(finding["finding_text"]),
-                _CAP + 1,
-                f"finding_text 가 상한을 넘었다: {len(finding['finding_text'])} > {_CAP}",
-            )
+        self.assertGreater(max(len(f["finding_text"]) for f in findings), _CAP)
 
     # ------------------------------------------------------------------
     # 3) 짧은 블록 무변형
@@ -192,48 +177,28 @@ class WlBlockCapContractTest(unittest.TestCase):
     # ------------------------------------------------------------------
     # 5) 문장 종결이 전혀 없는 극단 블록 -- 단어 경계 안전망
     # ------------------------------------------------------------------
-    def test_extreme_block_with_no_sentence_terminal_falls_back_to_word_boundary(self) -> None:
-        token_count = (_CAP // 10) + 200  # "TOKENnnnn " ~10자 * 개수 > 상한
+    def test_extreme_block_with_no_sentence_terminal_is_stored_whole(self) -> None:
+        token_count = (_CAP // 10) + 200  # "TOKENnnnn " ~10자 * 개수 > 임계값
         tokens = " ".join(f"TOKEN{i:04d}" for i in range(token_count))
         self.assertGreater(len(tokens), _CAP)
 
         body = (
             "During our inspection, our investigators observed the following: "
             "1. Your firm failed to maintain adequate cleaning records for "
-            f"equipment including {tokens}: "  # 문장부호(.?!) 전무, 콜론만 -- 안전망 유도
+            f"equipment including {tokens}: "  # 문장부호(.?!) 전무, 콜론만
             "2. Your firm failed to investigate a customer complaint related to "
             "product contamination (21 CFR 211.198). The complaint file did not "
             "include a documented root cause."
         )
 
-        try:
-            findings = _wl_findings(body)
-        except Exception as exc:  # noqa: BLE001 -- 스펙 요구사항: 예외가 나면 안 된다
-            self.fail(f"문장 종결 없는 극단 블록에서 예외 발생: {exc!r}")
-
+        findings = _wl_findings(body)
         self.assertValidFindings(findings)
         self.assertEqual(len(findings), 2)
         text = findings[0]["finding_text"]
-        self.assertLessEqual(len(text), _CAP + 1)
+        # 미완결 표시("…")만 붙고 토큰은 하나도 잘리지 않는다.
         self.assertTrue(text.endswith("…"), f"미완결 표시가 없다: {text[-20:]!r}")
-        core = text[:-1]
-        # 단어 경계에서 되돌렸는지 -- 마지막 토큰이 "TOKEN0123" 처럼 온전해야 한다
-        # (예: "TOKEN012" 로 반 토막 나면 단어 중간 절단 = 회귀).
-        last_token = core.rsplit(" ", 1)[-1]
-        self.assertRegex(
-            last_token,
-            r"^TOKEN\d{4}$",
-            f"단어 중간에서 잘렸다(안전망 실패) — 마지막 토큰: {last_token!r}",
-        )
-        # core 전체가 원문의 정확한 접두어인지(토큰이 하나도 훼손되지 않았는지) 전수 확인.
-        prefix_source = (
-            "Your firm failed to maintain adequate cleaning records for "
-            f"equipment including {tokens}:"
-        )
-        self.assertTrue(
-            prefix_source.startswith(core),
-            "절단 결과가 원문 접두어가 아니다 — 토큰이 훼손됐다",
-        )
+        self.assertTrue(text[:-1].endswith(f"TOKEN{token_count - 1:04d}"), "마지막 토큰이 잘렸다")
+        self.assertIn(tokens, text)
 
 
 class WlBlockCapRegressionAndClassificationTest(unittest.TestCase):
@@ -242,21 +207,12 @@ class WlBlockCapRegressionAndClassificationTest(unittest.TestCase):
     # ------------------------------------------------------------------
     # 6) ★회귀 가드 -- 480 으로 되돌아가면 실패
     # ------------------------------------------------------------------
-    def test_cap_constant_has_not_regressed_to_480(self) -> None:
-        """캡을 걷어내고 재현한 실측 조각 길이 분포(_split_wl_violation_blocks +
-        _wl_block_parts, raw_signals.wl_body_full 표본)의 **p90 이 6,119자**였다
-        (중앙값 2,198 · p99 11,415 · 최대 21,372). 즉 위반 문단의 90%가 6,000자 밑에서
-        자연히 끝난다 -- 그 위는 번호/헤딩 앵커가 성긴 편지에서 여러 위반이 한 블록으로
-        미분해된 경우일 가능성이 크므로(캡을 완전히 없애면 그런 미분해 덩어리가 "조각인
-        척" 그대로 들어온다) 6000 으로 잡는다. 이 값이 480 으로 되돌아가거나 근거 없이
-        재조정되면 이 테스트가 실패해 사람이 다시 판단해야 한다.
-        """
-        self.assertEqual(
-            extractors._WL_BLOCK_CHAR_CAP,
-            6000,
-            "WL 블록 표시 상한이 6000 이 아니다 — 480 회귀거나 무근거 재조정이다. "
-            "바꾸려면 새 실측 분포(p90/p99)를 근거로 사람이 재검토해야 한다.",
-        )
+    def test_signal_threshold_is_not_a_storage_cap(self) -> None:
+        """6000 은 '미분해 블록' 신호 임계값일 뿐 저장 절단 상한이 아니다(2026-11-10)."""
+        self.assertEqual(extractors._WL_BLOCK_UNSPLIT_THRESHOLD, 6000)
+        self.assertFalse(hasattr(extractors, "_WL_BLOCK_CHAR_CAP"))
+        self.assertFalse(extractors._wl_block_looks_unsplit("x" * 6000))
+        self.assertTrue(extractors._wl_block_looks_unsplit("x" * 6001))
 
     # ------------------------------------------------------------------
     # 7) ★분류는 전체 본문을 본다(캡 적용 후 표시 텍스트가 아니라)
@@ -440,13 +396,14 @@ class WlBlockCapRealLetterFixtureTest(unittest.TestCase):
                     f"{document_id} block {i}: 파이프라인 출력이 재현값과 다르다",
                 )
 
-        # 이 fixture(Sterling Pharmaceutical Services 편지의 항목 1·3)는 상한을 실제로
-        # 넘는 블록을 담고 있어야 한다 -- 전부 "unchanged" 라면 상한 절단 경로 자체가
-        # 발동하지 않은 것이라 이 real-data 테스트가 아무것도 증명하지 못한다.
-        self.assertGreater(
-            cut_status_counts["sentence"], 0,
-            f"실 데이터에서 문장 경계 절단이 한 번도 발동하지 않았다(상한 절단 미검증): "
-            f"{cut_status_counts}",
+        # [2026-11-10] 저장 단계 무절단 -- 절단 경로가 없으므로 "sentence"/"word" 는 0 이고,
+        # 6,000자를 넘는 실 블록이 있어도 전문이 그대로 저장돼야 한다(위 findings==capped_text 단언).
+        self.assertEqual(cut_status_counts["sentence"] + cut_status_counts["word"], 0, cut_status_counts)
+        self.assertTrue(
+            any(extractors._wl_block_looks_unsplit(p[0]) for letter in letters
+                for p in [q for q in (extractors._wl_block_parts(b) for b in extractors._split_wl_violation_blocks(
+                    extractors._cut_wl_footer(letter["wl_body_full"]) or letter["wl_body_full"])) if q]),
+            "실 데이터에 6,000자 초과 블록이 없다 -- 무절단 검증이 공허하다",
         )
 
 

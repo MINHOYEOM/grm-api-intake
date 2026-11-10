@@ -368,9 +368,15 @@ class WlExtractBodyFullTest(unittest.TestCase):
         self.assertGreater(len(full), len(excerpt))
         self.assertIn("Required Remediation", full)
 
-    def test_capped_at_full_max_chars(self) -> None:
-        html = "<p>During our inspection " + ("x" * (ci.WL_BODY_FULL_MAX_CHARS + 5000)) + "</p>"
-        self.assertLessEqual(len(ci._extract_wl_body_full(html)), ci.WL_BODY_FULL_MAX_CHARS)
+    def test_body_over_30000_chars_is_kept_whole(self) -> None:
+        """[2026-11-10] 저장 단계 무절단 — 30,000자 초과 편지도 마지막 문단까지 전부."""
+        last = "Please respond within 15 business days. FINAL-PARA."
+        html = ("<p>During our inspection " + ("x" * 35000) + ".</p><p>" + last + "</p>")
+        full = ci._extract_wl_body_full(html)
+        self.assertGreater(len(full), 30000)
+        self.assertTrue(full.endswith(last))
+        # 표시용 발췌는 여전히 짧다.
+        self.assertLessEqual(len(ci._extract_wl_body_excerpt(html)), ci.WL_BODY_MAX_CHARS)
 
 
 class WlFetchBodyFullTest(unittest.TestCase):

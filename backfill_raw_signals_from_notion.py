@@ -30,12 +30,14 @@ raw 를 복원하지 못한 행은 기본으로 **건너뛰고 보고만** 한�
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
 import time
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable
+from urllib.parse import urljoin
 
 import findings_supabase_append as fsa
 import findings_supabase_backfill as fsb
@@ -54,6 +56,8 @@ ROW_KEYS = (
 )
 _NOTION_MAX_PAGES = 200          # 100행 × 200 = 20,000행 — 소스 하나엔 충분한 안전 상한
 _RAW_FETCH_SLEEP_S = 0.34        # Notion 3 req/s
+_WHOPIR_ID_PREFIX = "who-whopir-"
+_WHOPIR_LIST_MAX_PAGES = 10      # 목록 페이지네이션 상한(수집기 WHOPIR_MAX_PAGES 와 별개의 안전 상한)
 
 
 @dataclass
@@ -64,6 +68,8 @@ class Report:
     missing: dict[str, int] = field(default_factory=dict)
     raw_unavailable: list[str] = field(default_factory=list)
     invalid: list[str] = field(default_factory=list)
+    date_filled_from_source: int = 0            # 원천 목록에서 읽어 채운 WHOPIR 실사일 수
+    date_unresolved: list[str] = field(default_factory=list)   # 목록에서 못 찾아 비운 document_id
     inserted: int = 0
     duplicate: int = 0
     failed: int = 0
@@ -104,10 +110,69 @@ def record_from_snapshot(snap: dict[str, Any], raw: dict[str, Any] | None) -> di
                                   extraction_status=status)
 
 
+def _whopir_source_dates(get_html: Callable[[str], str] | None = None) -> dict[str, str]:
+    """WHO WHOPIR 목록(page=0 부터 새 행이 없을 때까지, 상한 10)에서 {document_id: 실사 시작일 ISO}.
+
+    날짜 의미: **실사 시작일**. WHO 목록에는 게시일이 없어 수집기(`collect_who`)도 같은 값을
+    `date` 로 쓴다(`_whopir_row_dates` — `<time datetime>` 중 가장 이른 값). 목록에서 읽은 값만
+    쓰고 추정하지 않는다. 문서 id 규칙은 수집기와 같다: 'who-whopir-' + sha1(절대 PDF URL)[:12].
+    네트워크 실패는 거기서 멈추고 그때까지 얻은 것만 돌려준다(없으면 빈 맵 → 기존대로 invalid).
+    """
+    import collect_who as cw
+    fetch = get_html or cw._get_html
+    out: dict[str, str] = {}
+    seen: set[str] = set()
+    for page in range(_WHOPIR_LIST_MAX_PAGES):
+        url = cw.WHOPIR_MED_URL if page == 0 else f"{cw.WHOPIR_MED_URL}?page={page}"
+        try:
+            html_text = fetch(url)
+        except Exception as e:  # noqa: BLE001 — 실패는 날짜를 못 채울 뿐, 백필 자체는 계속
+            log("WARN", f"WHOPIR 목록 page={page} 실패 — 날짜 채움 중단: {type(e).__name__}")
+            break
+        rows = cw._whopir_row_dates(html_text)
+        new = {urljoin(cw.WHOPIR_MED_URL, h): v for h, v in rows.items()
+               if urljoin(cw.WHOPIR_MED_URL, h) not in seen}
+        if not new:
+            break
+        for abs_url, (iso, _text) in new.items():
+            seen.add(abs_url)
+            if iso:
+                out[_WHOPIR_ID_PREFIX + hashlib.sha1(abs_url.encode()).hexdigest()[:12]] = iso
+    return out
+
+
+def fill_whopir_dates(snaps: list[dict[str, Any]],
+                      get_html: Callable[[str], str] | None = None) -> tuple[int, list[str]]:
+    """소스 WHO · 'who-whopir-*' · date 빈 스냅샷의 date 를 원천 목록 값으로 채운다(제자리).
+
+    반환 (채운 수, 못 찾은 document_id 목록). 대상이 없으면 목록을 받지 않는다.
+    official_url 이 있으면 그 sha1 로, 없으면 document_id 자체로 조회한다.
+    """
+    targets = [s for s in snaps
+               if s.get("source") == "WHO" and not str(s.get("date") or "").strip()
+               and str(s.get("document_id") or "").startswith(_WHOPIR_ID_PREFIX)]
+    if not targets:
+        return 0, []
+    by_id = _whopir_source_dates(get_html)
+    filled, unresolved = 0, []
+    for s in targets:
+        url = str(s.get("official_url") or "").strip()
+        key = (_WHOPIR_ID_PREFIX + hashlib.sha1(url.encode()).hexdigest()[:12]
+               if url else s["document_id"])
+        iso = by_id.get(key) or by_id.get(s["document_id"])
+        if iso:
+            s["date"] = iso
+            filled += 1
+        else:
+            unresolved.append(s["document_id"])
+    return filled, unresolved
+
+
 def run(sources: list[str], *, notion_token: str, notion_db: str, supabase_url: str,
         service_key: str, apply: bool, allow_empty_raw: bool = False, limit: int = 0,
         fetch_raw: Callable[[str, str], dict[str, Any] | None] = fetch_intake_raw_payload,
-        sleep_s: float = _RAW_FETCH_SLEEP_S) -> Report:
+        sleep_s: float = _RAW_FETCH_SLEEP_S,
+        get_html: Callable[[str], str] | None = None) -> Report:
     rep = Report(sources=list(sources), applied=apply)
     todo: list[dict[str, Any]] = []
     for source in sources:
@@ -127,6 +192,8 @@ def run(sources: list[str], *, notion_token: str, notion_db: str, supabase_url: 
         todo.extend(miss)
     if limit:
         todo = todo[:limit]
+    # 08-10 수리 전에 수집된 WHOPIR 행은 Notion Date 가 비어 있다 — 원천 목록에서 읽어 채운다.
+    rep.date_filled_from_source, rep.date_unresolved = fill_whopir_dates(todo, get_html)
     for snap in todo:
         label = f"{snap['source']}::{snap['document_id']}"
         raw = fetch_raw(notion_token, snap["page_id"])
@@ -188,7 +255,8 @@ def main(argv: list[str] | None = None) -> int:
     mode = "적용" if rep.applied else "dry-run(쓰지 않음)"
     log("INFO", f"[{mode}] 없음 {sum(rep.missing.values())} · 넣음 {rep.inserted} · "
                 f"이미 있음 {rep.duplicate} · 실패 {rep.failed} · raw 복원 불가 "
-                f"{len(rep.raw_unavailable)} · 검증 실패 {len(rep.invalid)}")
+                f"{len(rep.raw_unavailable)} · 검증 실패 {len(rep.invalid)} · 날짜 원천 채움 "
+                f"{rep.date_filled_from_source} · 미해결 {len(rep.date_unresolved)}")
     return 1 if rep.failed else 0
 
 

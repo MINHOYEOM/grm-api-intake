@@ -542,6 +542,7 @@ grm-api-intake/
 ├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
+├─ backfill_483_detail_refresh.py  # 저장된 483 관찰 상세(detail)만 다시 읽어 제자리 교체(쪽 넘김·서명란·가림 표시 수리 소급 — 표제·원문 전문·실사관 불변, dry-run 기본)
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
@@ -635,6 +636,7 @@ grm-api-intake/
 │  ├─ migrations/136_findings_checklist_ref_join.sql # 체크리스트 매칭 해시 조인(적용 완료 2026-11-09, 반환 shape 불변)
 │  ├─ migrations/137_findings_similar_edges_public.sql # 문서 페이지 "다른 업체의 비슷한 지적" — 양 끝 공개 행인 finding_similar 엣지만 anon 에 여는 읽기 RPC(가산·**미적용**, 비서실 dry-run 후 적용)
 │  ├─ migrations/138_regulatory_news_public.sql # 최근 규제 소식 공개 읽기 RPC(raw_signals 공개 5컬럼 · 미적용 — 비서실 dry-run 후 적용)
+│  ├─ migrations/139_rum_anomaly_filter.sql # 방문 통계 자동 접속 급증 거르기 — 제외일(≥200·28일 중앙값×8)·급증 경로(≥100·×20) 판정 보기 + `rum_*_clean` 보기 6개, 보고 함수 4개(077·089·135·087)를 _clean 에 연결. 분석·보고는 원본 `rum_*` 대신 `_clean` 을 읽는다. 수동 판정은 `rum_anomaly_overrides`
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -732,6 +734,7 @@ grm-api-intake/
    ├─ grm-hc-inspection-backfill.yml     # [FIND-1] Health Canada GMP 실사 리포트카드 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-fda-inspections-backfill.yml   # FDA 실사 등급(NAI/VAI/OAI) DDAPI 적재(월 1일 15:47 UTC 크론 = 항상 --apply · 8/15/22일은 실패 이슈가 열렸을 때만 복구 재시도 · workflow_dispatch 는 dry_run 기본 true)
    ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
+   ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·Notion New 행 raw 동기화·잡별 예약 실패 경보)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
    ├─ grm-fda-coverage-gate.yml          # 발행 전 FDA 본문 결손 점검(월요일 정기 수집 완료 workflow_run → 결손 483 회수 → handoff·스캐폴드 재생성 → 남으면 automation-warning 이슈)

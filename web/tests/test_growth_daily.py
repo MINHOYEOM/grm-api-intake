@@ -256,5 +256,60 @@ class RoutineInstructionTest(unittest.TestCase):
         self.assertIn("web/growth_daily.py search", t)
 
 
+class RumAnomalyFilter139(unittest.TestCase):
+    """139 — 자동 접속 급증 거르기. 11-01 봇 1,312건이 "업체 페이지 1위"를 만든 일이 돌아오지 않게."""
+
+    MIG139 = WEB_DIR / "migrations" / "139_rum_anomaly_filter.sql"
+    REPORT_FUNCS = ("growth_daily_report", "growth_weekly_report", "growth_daily_v2", "funnel_zone_report")
+    RAW = re.compile(r"\bpublic\.rum_(daily|path_daily|referrer_daily|country_daily|device_daily|referrer_path_daily)\b(?!_)")
+
+    def test_rule_thresholds_are_pinned(self):
+        sql = self.MIG139.read_text(encoding="utf-8")
+        # 날짜 규칙: ≥200 이고 ≥ 직전 28일 중앙값 × 8 (실측 정상 최대 3.2배 · 11-01 72배)
+        self.assertIn("b.visits >= 200 and b.baseline_days >= 7 and b.visits >= 8 * b.baseline", sql)
+        # 경로 규칙: ≥100 이고 ≥ 경로 중앙값 × 20
+        self.assertIn("p.visits >= 100", sql)
+        self.assertIn("c.visits >= 20 * c.baseline", sql)
+        for v in ("rum_daily_clean", "rum_path_daily_clean", "rum_referrer_daily_clean",
+                  "rum_country_daily_clean", "rum_device_daily_clean", "rum_referrer_path_daily_clean"):
+            self.assertIn(f"create or replace view public.{v} with (security_invoker = true)", sql)
+        for f in self.REPORT_FUNCS:
+            self.assertIn(f, sql)
+
+    def test_later_migrations_keep_reports_on_clean_views(self):
+        """139 이후 마이그레이션이 보고 함수를 다시 만들면서 원본 표로 되돌리면 실패한다."""
+        for path in sorted((WEB_DIR / "migrations").glob("*.sql")):
+            m = re.match(r"(\d+)_", path.name)
+            if not m or int(m.group(1)) <= 139:
+                continue
+            sql = path.read_text(encoding="utf-8")
+            for f in self.REPORT_FUNCS:
+                for body in re.findall(rf"create\s+or\s+replace\s+function\s+public\.{f}\(.*?\n\$\$;",
+                                       sql, flags=re.S | re.I):
+                    raw = [x for x in self.RAW.finditer(body)]
+                    if f == "growth_daily_report":   # data_quality 블록(적재 사실)만 원본 허용
+                        cut = body.find("'rum_present_on_date'")
+                        raw = [x for x in raw if cut < 0 or x.start() < cut]
+                    self.assertEqual(raw, [], f"{path.name}: {f} 가 원본 RUM 표를 읽는다 — _clean 보기를 써라(139)")
+
+    def test_admin_reads_clean_views(self):
+        js = (WEB_DIR / "assets" / "admin.js").read_text(encoding="utf-8")
+        for t in ("rum_daily", "rum_referrer_daily", "rum_path_daily"):
+            self.assertNotIn(f'from("{t}")', js)
+            self.assertIn(f'from("{t}_clean")', js)
+
+    def test_daily_report_says_what_was_excluded(self):
+        anom = {"excluded_days": [{"date": "2026-11-01", "visits": 4085, "baseline": 56.5}],
+                "capped_paths": [{"date": "2026-11-05", "path": "/findings/firm/", "visits": 300,
+                                  "baseline": 2, "excess": 298}]}
+        on_day = gd.anomaly_lines(anom, "2026-11-01")
+        self.assertTrue(any("자동 접속 급증" in x and "4,085" in x for x in on_day), on_day)
+        later = gd.anomaly_lines(anom, "2026-11-07")
+        self.assertTrue(any("2026-11-01" in x and "뺐다" in x for x in later), later)
+        self.assertTrue(any("/findings/firm/" in x for x in later), later)
+        self.assertEqual(gd.anomaly_lines(None, "2026-11-07"), [])
+        self.assertEqual(gd.anomaly_lines({"excluded_days": [], "capped_paths": []}, "2026-11-07"), [])
+
+
 if __name__ == "__main__":
     unittest.main()

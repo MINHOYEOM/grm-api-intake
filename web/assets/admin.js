@@ -703,11 +703,11 @@
   function loadRum() {
     var days = GROWTH_SNAPSHOT_DAYS;
     return Promise.all([
-      state.client.from("rum_daily").select("snap_date,metric,value,sample_interval")
+      state.client.from("rum_daily_clean").select("snap_date,metric,value,sample_interval")
         .order("snap_date", { ascending: false }).limit(days * 2),
-      state.client.from("rum_referrer_daily").select("snap_date,referer_host,visits,sample_interval")
+      state.client.from("rum_referrer_daily_clean").select("snap_date,referer_host,visits,sample_interval")
         .order("snap_date", { ascending: false }).limit(days * 25),
-      state.client.from("rum_path_daily").select("snap_date,request_path,visits,sample_interval")
+      state.client.from("rum_path_daily_clean").select("snap_date,request_path,visits,sample_interval")
         .order("snap_date", { ascending: false }).limit(days * 40)
     ]).then(function (res) {
       if (res[0].error) throw res[0].error;

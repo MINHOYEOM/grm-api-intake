@@ -1,0 +1,112 @@
+name: GRM FDA 483 Detail Refresh
+
+# [2026-11-10] 지식 그래프 방향 전환 0단계 — 이미 저장된 FDA 483 관찰 **상세(detail)만** 다시 읽어
+# 제자리 교체한다(backfill_483_detail_refresh.py). 표제·번호·원문 전문·실사관 목록은 건드리지 않는다.
+# 수동 실행 전용. 기본 dry-run — 바뀔 관찰 수와 품질 지표 전후를 실행 요약에서 먼저 본다.
+# 저장된 원문 전문이 있는 문서는 PDF 를 받지 않는다. 없는 문서만 PDF 를 받아 OCR 한다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'true = 실제 raw_signals PATCH(대표 확인 후). false(기본) = dry-run.'
+        type: boolean
+        default: false
+      since:
+        description: '게시일 하한(YYYY-MM-DD).'
+        type: string
+        default: '2026-08-10'
+      limit:
+        description: '처리 문서 수 상한. 비우면 전건.'
+        type: string
+        default: ''
+      doc_ids:
+        description: '선택: document_id 목록(공백/쉼표 구분).'
+        type: string
+        default: ''
+      ocr_page_budget:
+        description: 'OCR 페이지 예산(실행 1회당).'
+        type: string
+        default: '600'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fda483-ocr-backfill      # 다른 483 백필과 같은 그룹(fda.gov 동시 요청 방지)
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: 483 상세 다시 읽기 → raw_signals detail PATCH
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install OCR engine (tesseract)
+        uses: ./.github/actions/setup-ocr
+        with:
+          required: 'true'
+
+      - name: Run detail refresh
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_APPLY: ${{ inputs.apply }}
+          IN_SINCE: ${{ inputs.since }}
+          IN_LIMIT: ${{ inputs.limit }}
+          IN_DOC_IDS: ${{ inputs.doc_ids }}
+          FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}
+        run: |
+          set -euo pipefail
+          ARGS=(--report-path detail_refresh_report.json --since "${IN_SINCE}")
+          if [ "${IN_APPLY}" = "true" ]; then
+            ARGS+=(--apply)
+          fi
+          if [ -n "${IN_LIMIT}" ]; then
+            ARGS+=(--limit "${IN_LIMIT}")
+          fi
+          if [ -n "${IN_DOC_IDS}" ]; then
+            ARGS+=(--doc-ids "${IN_DOC_IDS}")
+          fi
+          python backfill_483_detail_refresh.py "${ARGS[@]}"
+
+      - name: Write step summary
+        if: always()
+        run: |
+          if [ -f detail_refresh_report.json ]; then
+            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          r = json.load(open("detail_refresh_report.json", encoding="utf-8"))
+          print(f"### 483 상세 다시 읽기 (dry_run={r['dry_run']}, since={r['since']})\n")
+          print(f"후보 {r['candidates']} · 원문 전문 {r['from_body_full']} · PDF {r['from_pdf']} · 본문 없음 {r['no_text']} · 실패 {r['failed']}")
+          print(f"바뀐 문서 {r['docs_changed']} · 바뀐 관찰 {r['observations_changed']} (짝 맞음 {r['observations_matched']} / 짝 없음 {r['observations_unmatched']}) · PATCH {r['patched']}\n")
+          print("| 지표 | 전 | 후 |\n|---|---|---|")
+          b, a = r["before"], r["after"]
+          for k, label in (("observations", "상세 있는 관찰"), ("complete_sentence", "문장 온전"),
+                           ("signer_or_footer_trace", "서명란·양식 흔적"), ("garbled_redaction", "깨진 가림 표시"),
+                           ("total_chars", "총 글자 수")):
+              print(f"| {label} | {b[k]} | {a[k]} |")
+          PY
+          fi
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: detail-refresh-report
+          path: detail_refresh_report.json
+          if-no-files-found: ignore

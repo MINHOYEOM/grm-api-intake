@@ -43,7 +43,7 @@ def find_problems(doc: dict) -> list[str]:
         if not isinstance(en, dict) or not any(_filled(en.get(f)) for f in render.CARD_NARRATIVE_FIELDS):
             missing_all.append(cid)
         else:
-            gaps = [f for f in render.CARD_NARRATIVE_FIELDS if not _filled(en.get(f))]
+            gaps = render.card_english_gaps(c)
             partial.append(f"{cid}(빠짐: {','.join(gaps)})")
     if missing_all:
         out.append(f"en 없음 {len(missing_all)}/{len(cards)}장 (예: {', '.join(missing_all[:5])})")

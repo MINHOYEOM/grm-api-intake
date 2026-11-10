@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-e0f1d6f92e801c40cffe7a43",
+  "finding_text_md5": "2ba21197a793b0849362e8b114eacd5b",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, on 11/13/2023, during a review of selected [redacted] aseptically sterile lots that were produced within your firm's Formulation Room <R edacted B4> designated ISO 5 LAFUs (Asset IDs E4252 & E4689), the following poor aseptic techniques wer e ob served [redacted] A. During the aseptic production of Lipo (MIC) 30ml, processed on 10/31/2023, Lot 186017, BUD 04/24/2024, we observed the following deficiencies within your firm's ISO 5 LAF [redacted] Asset ID E4252): 1. Sterile compounding technician was observed reaching over open finished drug filled vials while filling empty vials. 2. Your firm's sterile compounding technician was observed dumping aluminum caps from [redacted] bag over top rubber stoppered vials and placing the caps on top of the stoppered vials while the [redacted] sterile compounding technician filled empty sterile vials. B. During the aseptic production of Lipo (MIC) 30ml, processed on 10/31/2023, Lot 186017, BUD 04/24/2024, we observed the following deficiencies within your firm's Formulation Room [redacted] LAFU [redacted] (Asset ID E4689): 1. Your firm's sterile compounding technician was observed obstructing first air by placing a large open bag of [redacted] rubber stoppers and metal caps in front of an un-stoppered tray of filled sterile vials. Producer o f Sterile and Non - sterile Drug Products 2. Your firm's sterile compounding technician was observed obstructing first air by placing an open bag of sterile rubber stoppers and aluminum caps in front of a tray of open sterile vials. C. During the aseptic production of Bi-Amino Injection (30ml) 100/100 ml, Lot 187369 BUD 04/28/2024, we observed the following deficiencies within your firm's ISO 5 LAFU [redacted] Asset ID E4252): 1. Your firm's sterile compounding technician was observed reaching over open exposed finished sterile drug vials while [redacted] aseptically filling empty sterile vials. 2. During aseptic filling of sterile vials by your firm's sterile compounding technician, we observed large open bags of stoppers, aluminum caps in front the tray of open filled sterile drug vials, and a hanging bottle of [redacted] disrupting airflow and first air during aseptic filling. 3. Compounding technician observed un-stoppered tray of vials filled with finished sterile drug product first air being blocked by an open large bag of [redacted] rubber stoppers and metal caps within ISO 5 LAFU."
+ },
+ {
+  "finding_id": "finding-dce82657b998add1bb514603",
+  "finding_text_md5": "9bbe32b30536640131139fa33fc749da",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, the visual inspection qualification program is inadequate. There is no assurance that personnel qualified for 100% visual inspection can identify all known critical defects found in your sterile drug products. Operators must score at least a [redacted] on the qualification, however, the Visual Inspection Qualification Test document shows [redacted] out of [redacted] operators who perform visual inspection failed to identify critical defects such as particles during their qualification."
+ },
+ {
+  "finding_id": "finding-8e3d542f82475756fed19a99",
+  "finding_text_md5": "21b88e54db5643ea3edac019b9ff8f98",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, your firm has designated hazardous (HD, room 121) and non-hazardous (NHD, room 120) production areas, however, it was noted both forms of drug products could be compounded at the same time within separate BSCs in the formulation room (room 118). For example, on 07/06/2023 Moxifloxacin 1mg/mL in Sterile Balance Salt Solution (BSS) lot # [redacted] (which is a NHD drug) was compounded at the same time as Tacrolimus 0.02% in Corn Oil lot [redacted] (which is a HD)."
+ },
+ {
+  "finding_id": "finding-89186e5c3c702403b196c323",
+  "finding_text_md5": "4b0154197acf0c1d3191c33b4ce330e2",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, A) Investigations are not always performed for environmental personnel monitoring excursions within the ISO-5 and ISO-7 (action limits of [redacted] and [redacted], respectively) areas as required by SOP 3.030, Environmental Monitoring, Version: 10, Date Effective: 09/22/2023. The following are examples where investigations were not peiformed to determine a root cause, product impact, and the need to implement a CAPA to prevent recurrence"
+ },
+ {
+  "finding_id": "finding-7552595ce05e3a9f361410da",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, disinfectant efficacy studies have not been performed for the [redacted], and the [redacted] cleaning solutions used within your IS0-5 and ISO-7 aseptic processing areas, to confirm these solutions are appropriate for use within these areas and against all surface types they are used on. The IS0-5 and IS0-7 aseptic processing areas are used for human and animal drug production."
+ },
+ {
+  "finding_id": "finding-7343f5fd910268c97763c4dd",
+  "finding_text_md5": "db865328b6367d03980cb04a7334a0f4",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, your firm's [redacted] management reported it has no data to ensure clean/deactivation reagents and methods used within the ISO 5 Cleanroom for the [redacted] filling/ stoppering/ capping equipment is adequate to prevent cross contamination of hazardous and non-hazardous sterile finished drug products. Your firm's quality manager reported all sterile drug products undergo sterility, endotoxin, and potency testing only. No other laboratory testing is performed to ensure cleaning effectiveness and deactivation of hazardous APis and or excipients in the prevention of cross contamination."
+ },
+ {
+  "finding_id": "finding-68d6545b98f8b2339310a2c4",
+  "finding_text_md5": "91a92d2a5d066523b76de614561e7a3d",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, A) Requalification of the [redacted] Sterilization Process for [redacted] Loads [redacted] Bottle Formats) in the [redacted] Model [redacted], Equipment ID# E-0832-W, performed 11/11/2022 failed to meet the minimum requirement of [redacted] on [redacted] reported a value of 120.05 during the qualification. The acceptance criteria states the minimum temperatures from all [redacted] during sterilization phase must be [redacted]. Additionally, [redacted] failed its pre-and post-calibration check and was used during the requalification. Although the requalification occurred 11/11/2022, to date, the final report has not been approved by the quality unit. This [redacted] is used to sterilize human and animal drug products inside 4H bottles, prior to these products being aseptically filled. Between 11/11/2022 and now, there have been approximately [redacted] batches of drug product sterilized with this equipment. I, Equipment ID# E-0832-W, perf01med 11/11/2022 failed to meet the minimum requirement o [redacted] J on [redacted] I. [ [redacted] I ■ reported a value of 120.05 during the qualification. The acceptance criteria states the minimum temperatures from all[ [redacted] } I during sterilization phase must bell:>) (4 f l. Additionally, [ [redacted] I failed its pre- and post- calibration check and was used during the requalification. Although the requalification occmTed 11/11/2022, to date, the final repo1i has not been approved by the quality unit. Thi~(6) 4) I is used to sterilize hmnan and animal drng products inside 4 H bottles, prior to these products being aseptically filled. Between 11/11/2022 and now, there have been approximatelyP»T4J batches of drng product sterilized with this equipment. B) Operators were observed blocking first pass air on 11/01/2023 while filling the following drug products: Tacrolimus 0.02% in Com Oil, Ophthalmic Solution, 15 mL lot # [redacted] Cyclosporine 2%/Tacrolimus 0.2% in Com Oil, Ophthalmic Solution, 15 mL lot [redacted] - C) Airflow visualization studies are inadequate for the following reason: 1. The generated smoke was not robust enough to show the flow of air. 2. Smoke was not always observed to be directly above the area where the activity was occurring during video [redacted] Process APR2023\". Smoke appeared to be in the back corner of the BSC while operator activities were occurring in the center of the BSC. 3. Unidirectional airflow was intenupted with [redacted] contents detected at timepoint [redacted] during video [redacted]. Dynamic Basic APR2023\". 4. While smoke studies were performed for [redacted] among the ISO-5 hoods, the entire filling process including setup and filling operations have not been evaluated within each hood under dynamic conditions as part of qualification."
+ },
+ {
+  "finding_id": "finding-62035adab566a336582c1ae1",
+  "finding_text_md5": "31967c75738f6361ccae47942aa3cf95",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, the following information is not found on your drug product labels: A) The name of the outsourcing facility. Example of your drug product labels that do not contain this information Moxifloxacin 1 mg/mL in Sterile Balanced Salt Solution Injection, 1 mL in 2 mL vial (NDC 79926-068-05)"
+ },
+ {
+  "finding_id": "finding-5fb3988c54e12109a66aca06",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, A) Surface sampling locations within the ISO-5 areas for processing human and animal drugs are not supported with appropriate studies. B) The non-viable particle monitoring probes within the ISO-5 Biological Safety Cabinets (BSC) (such as [redacted], and [redacted] and Laininar Airflow Hoods (LAF) (such as [redacted]) are not pointed into the direction of the airflow. Within the BSCs, probes were observed pointing towards the operator and perpendicular to the direction of airflow. The probes within the LAF were observed pointing the same direction as the airflow. C) The non-viable particle monitoring probes within the ISO-7 cleanrooms such as rooms 120 and 121 are not pointed into the direction of the airflow. Rather these probes are hanging from the ceiling and pointed towards the floor. D) The ISO-7 rooms containing the ISO-5 filling BSCs and LAFs are only required to be tested for viable (surface and active air) Inicroorganisms [redacted] as required by SOP 30.030, Environmental Monitoring, Version 10, Effective Date: 09/22/2023, Table 2: Frequency of Sampling in ISO-7 Classifications. The ISO-7 rooms are not required to be tested each day the ISO-5 BSC and LAFs are in use."
+ },
+ {
+  "finding_id": "finding-31cc5ae9151fd5991902a76c",
+  "finding_text_md5": "f49dce6fd8856d991fa3164504fcc9cf",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, your firm management reported your firm assigns expiry date to all [redacted] glassware used in the production of sterile drug products. Your firm's management failed to provide laboratory records/data in support of your firm's assigned expiry ensuring no endotoxins are present on the glassware used in drug production. ({£1-.fil"
+ },
+ {
+  "finding_id": "finding-289786485ddb6be985390f9f",
+  "finding_text_md5": "f95153540b4e385e1667db24f727de4a",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, during a review of your firm's environmental sampling results for your firm's ISO 5 classified areas and equipment, we found your firm's frequency for performing EM surface and viable air sampling is inadequate for ensuring adequacy for aseptic processing. For example, your firm performs EM surface and variable air sampling in your ISO 5 Classified Cleanroom and ISO 5 LAFUs where your firm conducts aseptic manipulations, the [redacted] vial filling, stoppering, and capping [redacted]. Your firm's COO reported your firm performs their [redacted] to sterilize the non-sterile drug product within the ISO 5 [redacted]. Your firm's management was unable to provide justification for the difference in frequency for EM sampling within the ISO 5 Classified areas and equipment. Your firm's management reported the firm follows the written procedure, Aseptic Environmental Sampling Plan SOP, A-SOP-QUA-0006, which documents EM sampling frequencies. 7601 N Sam Houst on Pkwy W Ste 100 Empower Pharma c y CITY. STATE. ZIP CODE. COUITTRY TYPE ESTABLI SHMENT IN SPECTED Houst on, TX 77 06 4- 3595 Producer of Steril e a nd Non- s teril e Dr ug Product s unable to provide justification for the difference in frequency for EM sampling within the ISO 5 Classified areas and equipment. Your fnm's management repoiied the fnm follows the written procedure, Aseptic Environmental Sampling Plan SOP, A-SOP-QUA-0006, which documents EM sampling frequencies."
+ },
+ {
+  "finding_id": "finding-1d4b92c732c220d2cab741cd",
+  "finding_text_md5": "b46cd9e4b4bdbf656e1b5620120c80a0",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, A. During a walk-though of your firm's warehouse for the storage of APis and drug components, we found the following API/drug component, Edetate Disodium Dihydt·ate (EDTA) USP, Lot [redacted] Expiry 3/24/2026, QC Approval 8/11/23, with a printed affixed label bearing the text, \"Not for Use As Drug/API, or Drug Product\". The product was received through your firm's unapproved supplier. The API manufacturer does not have an active registration with the FDA and is listed under Import Alert 66-79. The importer/distributor was also found not to have an active registration. Your firm used the \"Not for Use as Drug/API or Drug Product\" to compound the following sterile drug product: Producer of Sterile and Non- sterile Drug Products B. During a review of your firm's sterile drug production logs, the following finished sterile drugs products were selected in support of your firm's use of the non-pharmaceutical grade components: 1. Edetate Disodium Preservative Free (30 mL) 150 mg/mL Injectable, Lot 185526, Expiry 10/4/2024 Q!Y: [redacted] vials, using the API, EDTA Disodium Salt Dihydrate [redacted] CAS No. [redacted] (Received 1/11/2022). API Lot [redacted] was used to compound the finish drug product. API Lot [redacted] CAS No [redacted] Kg (Received 8/9/2023) of the same product was found in the firm's warehouse labeled in part, \"Not For Use As Drug/API, or Drug Product\". 2. LIPO ClO ML 15.50.50.5 MG/ML, Lot 179320 BUD 2/14/2024, dispensed with Rx [redacted] was found to contain EDTA, Lot [redacted] Expiiy 10/4/2024. Prod ucer o f Steril e a nd Non- steril e Dr ug Prod uct s 7 4. Rx [redacted] NAD+ (NICOTINAMIDE ADENINE DINUCLEOTIDE) (15 ML) 300 MG/ML Nasal Spray, Lot 182759, BUD 10/2/2023 was compounded using API lots: Lot [redacted], Expiry 11/10/24; Product Level -ER (Excelar Reagent) Grade; and Lot [redacted] Expiry 22 May 2024; Product Level -ER (Excelar Reagent) Grade."
+ },
+ {
+  "finding_id": "finding-0b33ba427b5eb00e69352dff",
+  "finding_text_md5": "bc55cf85ad195d4a85caddcfa422834e",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, during a review of our firm's non-conformances we found your firm initiated a total of 4 Non-conformance reports for [redacted] failures for [redacted] used during the [redacted] process. Your firm's reports documented only 1 out of the 44-H lots underwent a [redacted], process, the remaining [redacted] lots were released based on the [redacted] which occurred in your firm's Formulation Rooms. For example, your firm qualify unit reviewed, approved, and released finished drug product [redacted] within your firm's inadequately EM sampled ISO 5 [redacted] in Formulation Room [redacted]. Your firm's management reported all sterile drug products undergo a total of [redacted]. The initial occurs after formulation within Formulation Room [redacted]. The [redacted] occurs prior to undergoing the filling, stoppering, and filling process steps. Initiates non-conformances documenting only undergoing [redacted] that occurred within Formulation Room [redacted] include: A. NC-000004 dated 1/3/2022, LIPO-C 10ML Injectable, Lot 117845 BUD June 28, 2022, Qty. [redacted] released. B. NC-000008 dated 1/17/2022, LIPO-B Injection 30ML Injectable, Lot 119134 BUD Januaiy 13, 2023, Qty [redacted] released. C. NC-000009 dated 1/20/2022, Taurine Injection 50mg.mL, Lot 119650 BUD January 19, 2023, Qty [redacted] released."
+ },
+ {
+  "finding_id": "finding-005ba61fd007016220b950c9",
+  "finding_text_md5": "800b0dc661e473aad6a91cd31ddee767",
+  "published_date": "2024-02-12",
+  "detail_text": "Specifically, A. On 10/23/2023, during observation of your firm's automated vial filling operation within your firm's ISO 5 Cleanroom, for the drug product, NAD+ (Nicotinamide Adenine Dinucleotide) (L YO) 500mg Injectable, Lot 186001, BUD 10/15/2024 within the firm's ISO 5 Filling Room, we observed the firm's sterile compounding technician center, perform a designated task within the [redacted] filling machine, and restart the ISO filling machine without disinfecting their gloves prior to returning to stacking the vials into the [redacted] containers. Additionally, other technicians were observed entering the ISO 5 Classified production area, touching the entry door and proceeded to perform tasks within the room without disinfecting their gloves. Producer o f Steril e a nd Non- s teril e Dr ug Product s touching the entiy door and proceeded to perfo1m tasks within the room without disinfecting their gloves. B. Your firm's sterile compounding technician failed to disinfect gloves after performing an activity on the [redacted] table within the ISO 7 area prior to returning to the ISO 5 LAFU [redacted] (Asset ID E4252) to add sterile rubber stoppers and metal caps over top of finished sterile drug filled vials during the aseptic production LIPO (MIC) 30 ml, Lot 186017 processed on 10/31/2023, BUD 04/2712024. C. Your firm's sterile compounding technician was observed using there sterile gloves to push down trash inside garbage bin after unwrapping rubber stoppers and metal caps from [redacted] bag within ISO 5 LAFU)( (Asset ID E4252). Your firm's sterile compounding technician failed to change sterile gloves before returning to aseptic filling operations. This action was observed twice during the aseptic production of LIPO (MIC) 30ml, Lot 186017, BUD 04/27/2024."
+ },
+ {
+  "finding_id": "finding-b63f17e36921b0bc7f5cbfb1",
+  "finding_text_md5": "c509cfdc2231543ab4dbc75ca7f43246",
+  "published_date": "2024-01-30",
+  "detail_text": "Specifically, a. On 12/20/2023, it was observed that your quality unit documentation failed to demonstrate control over differential pressure in your production core to maintain aseptic conditions. For example: 1. During qualification activities taking place on 9/12/2023, total pressure for >(..f) rooms in 4 your aseptic processing core were out of specification, including Grade D b) Room~ at 56.25 Pa (specification n.ir), Grade C CoITidor i~at 22.23 Pa ( (b) <4> I<), and Grade c,b>l4'7Room ~b~at J 7.52 Pa (>j(b) 4>J). Additionally, your fnm requires positive pressure from Grade C (b>l 4>7 Filling Room to Grade C CoITidor tl However, during qualification activities taking place on 9/12/2023, your fnm recorded a total pressure of 21.83 Pa in the ' bfl.iJ>\"7Filling Room and 22.23 Pa in CoITidor 6> Your quality unit did not identify these failures and approved the HV AC pressure system as meeting specifi.cations and qualified on 11/16/2023. YouLfinn_use__s f(..f) lRoom__tl> C,orridD· 6>land 6} (.J) 4 [lijd d ~b> r Room~41 urmg pro uct10n o -------------------------­ 11. During qualification activities for your HV AC pressure system in the aseptic processing core taking place on 7/8/2022, your fnm repo1ted acceptance criteria for differential pressure as b)(<l) [redacted] IDuring the inspection, your quality unit was unable to provide the specification...c_o_n­te_m_p_o....raneous to the 2022 qualification for the designed room pressure!Cb) <4> fb> <\">l in the aseptic processing area. --------• Additionally, in your 2022 qualification, your fnm had no documentation or data to demonstrate that the rooms in your aseptic processing area, including Grade C areas, met your fnm's specifications for each room's ambient pressure with respect to the smTounding non-classified production coITidor. areas for which your fnm lacked qualification data include 6} (<f) Filling 4 Room ~r b) and CoITidor Your fnm used the ase tic rocessin core, including 4 these three Grade Crooms, for production of 6><.-,---,,---..,.....exhibit batches 4 CbH4> (manufactured 10/2/2022), 6>< (manufactured 10/9/2022 and (manufactured 10/14/2022), as well as for production of lif( 1 b)(4>.-­exh - ib....it batch ><4> (manufactured 2/16/2023). Y-o-u- la_c_k_ d_a-ta_ t_o_ demonstrate that your aseptic processing core room pressures were ualified as of roduction of your exhibit batches for 1>fl4) nd f(..f------------­ 111. Your specifications for periodic monitoring of differential pressure of your aseptic processing core are not scientifically justified. During the inspection, the Quality Unit was unable to provide documentation, for whether the aseptic processing core pressure monitors record differential pressure 6)1.il) rooms or between each room and the non­ classified production coITidor outside the aseptic processing core. Logbook MF078-201 -23 Daily Room Differential Pressure Monitoring Logbook repo1ts the specification as \"area difference pressure should be minimum o~>(..f1 inches of bf(..f (~ ~~pa) with respect to bf(..f \" This logbooks do not contain su 1c1ent data to demonstrate that the rooms meet this specification, including: no data for pressure readings fo1t6> <4> ·ooms; no details on if pressure data are differential (6)-(.il) spaces or betwee m and the non-classified coITidor; and on 12/20/2023, it was observed the operator signing off room pressures in the above logbook as meeting specifications based on recorded room data being greater than 6}-(4J inches of(<bH4>y ithout dete1mining pressure differential with respect to adjacent spaces. You do not have sufficient data to demonstrate tha~our rooms are meetin specifications. The aseptic processin core serves production of l rt and bf(4) b. During walkthroughs of your facility on 12/12/2023 and 12/13/2023, the following facility deficiencies were observed: 4 1. What appeared to be ~b) <4>\"1iamage on the HV AC mezzanine ph sically located (b) ·ooms in the classified aseJ)tic rocessin core associated with Line which our fnm uses for 4 production of (bf< r------' d l6}l.i1J It was also 4 observed what aooeared to be b) oamage due to ceiling leaks in the controlled production 4 coITidors and (b)< equipment room, which are located immediately adjacent to the aseptic process 11. A loose panel exposing the Grade C r f(..f Filling Room which hosts Filling Line b to 6 the non-conti~ol_led and unclassified.--..,...,.,,-,-... quipment room, which your fnm uses for 4 operation o [bf< Additionally, it was observed a hole approximately 2 cm in diameter in the ceiling of the b) __jequipment room leading to the non-conti·olled and unclassified HV AC mezzanine located nnmediately t6}-(.i1J the aseptic processin core. Your fnm uses Filling Linei~~ in Vial Filling Room mfor pro uction oflbT(-l) 4 l6}l 4> and bf{.il Additionally, your fnm uses b) b) <4> for production of(b) <4> --------..i c. On 12/11/2023, during the walkthrough of the facility, constiuction activities were observed in the following areas - product warehouse, which the fnm cmTently uses for storage of all components and materials other than product vials, including raw materials, finished product, retain samples, consumable equipment (tubing, filters, etc.), rejected exhibit batch units and spare gowning; stability chamber room, located across {fif(..f and approximately feet away from the fnm's microbiolo~ la~ rato1y; and the future expansion area, located adjacent to 4 the sterile core suppo1i ing Lines (6}l J and exposed to the material flow pathway for incoming shipments ti·ansiting from delive1y to the product warehouse. Additionally, your fnm lacks quality documentation, including change conti·ol documents, to govern conti·ol of contamination due to constmction activities in the future expansion area. Your fnm lacks adequate controls to prevent contamination of production areas due to ongoing constmction. These areas are all used to support production o 1 Cb) C4> !andf6}l ~1 I d. Your fnm lacks adequate space and control of environmental conditions for storage of retain samples, including for products~b>C4> nd f6}-C~J I Additionally, stored retain samples are at risk of cross-contamination with ongoing constmction activities cunently observed at the fnm. e. Your quality unit failed to assure an adequate qualification supported with documentation for 4 Incubation Room c~r,with regards to 6>C> !mapping, and there is a lacks documentation to demonstrate that Incubation Room[~~ and Incubation Ro~m were in calibration during fills suppo1ting aseptic production processes for all (fi) (~~ b) (..f) Ar\\1i:g/vial ~b)l4) 4 rn4>7 exhibit batches and the ~{l f6f~, l~~ g b) l b) () exhibit batch. Additionally, your quality unit failed to establish procedures governing cleaning of your incubation rooms, and cleaning of your incubation rooms."
+ },
+ {
+  "finding_id": "finding-8a49d9f2c73ce5c24200ab79",
+  "finding_text_md5": "221b0f8f2215870427e72d68594707f6",
+  "published_date": "2024-01-30",
+  "detail_text": "a. You failed to provide documentation of initial, o~erational, and perfonnance qualification (IQ, OQ, PQ), of eqtpment used for production offb> (.ii),, and Cb) <4> 6H4r-- includintlut not limited to Grade Al>< 4>. bsed for the production of b)(4) I b. You failed to install ~rdt: !JUalify (19, OQ, PQ) the necess_aiy equipment intended_to label and package P>fl-l) ~~, g/vial ~6>(.\\) land f6>l 4) ~Qn~filnl ~bfC4J I Additionally, the procedures for labeling and packaging for these diug products have not been written and or established."
+ },
+ {
+  "finding_id": "finding-74aa7db6cfb1d9d97a163beb",
+  "finding_text_md5": "013388f6bc7d846c0036feb70b185d9f",
+  "published_date": "2024-01-30",
+  "detail_text": "Specifically, On 12/19/2023, it was observed multiple rinstances of retain samnles for oroduct ~b) <4> ~Qng/vial fb) <4> Iexhibit batches b) <4> Ithat demonstrated deterioration o~(b)<4> 'fonnation as well as product spread throughout the vial and near the cap. Your fnm does not have any documentation of investigation into these discrepancies. These1b) l.iJ 1exhibit batches were produced in October of 2022."
+ },
+ {
+  "finding_id": "finding-f5927663d46a2779477cb278",
+  "finding_text_md5": "acbb8709670431ac34c3a1a80fae9162",
+  "published_date": "2024-01-25",
+  "detail_text": "Specifically, Amendment 1 Producer ofSterile and Non-Sterile Drug Products Your firm has not performed sterility testing for any sterile compounded drug products to determine an extended beyond use date (BUD). For example, you firm has assigned an extended BUD for 180 days for Ammonium Sulfate 0.75% Injection, Adenosine Monophosphate 200 Mg/Ml Injection, L-Arginine HCL 200 Mg/Ml Injection and Xylazine (BASE) 333 Mg/Ml Injection based on potency testing; however, sterility testing was only conducted at release of a batch, but not during stability study, so there is no assurance sterility could be maintained throughout the shelflife ofeach product. An example ofproduct label for Xylazine In Water For Injectio [redacted] 333 Mg/Ml Injectable, Lot# 04192023 [redacted] compounding date: 4/19/2023) associated with Rx [redacted] mi shows \"Discard After 10/16/2023\"."
+ },
+ {
+  "finding_id": "finding-8decf835842cc977a7740c2b",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2024-01-25",
+  "detail_text": "Specifically, The location of your viable and nonviable particle sample collection points inside your ISO-5 [redacted] Laminar Flow Hood in room [redacted] is inadequate as they are situated directly adjacent to the HEPA air filter grate at the back of the hood. Samples collected evaluate only the air flowing immediately out of the HEPA filter, not air that is representative of the operational sterile filling area where [redacted] aseptic filling manipulations are being conducted."
+ },
+ {
+  "finding_id": "finding-89635e661519c25e8b5e95d5",
+  "finding_text_md5": "bc6af0a4e23efc11e42a1fb992d133a0",
+  "published_date": "2024-01-25",
+  "detail_text": "Specifically, Specifically, Your firm's Quality Unit failed to perform a method transfer of your sterility test method used for release of drug products. Your firm utilizes the [redacted] Microbial Detection System for sterility testing. The associated test method was developed and validated at the CAPS Technical Services Laboratory located in Irvine, CA. Your firm failed to conduct a method transfer ensuring the [redacted] Microbial Detection System sterility method test method is suitable for release of your sterile drug products."
+ },
+ {
+  "finding_id": "finding-2b1b5cac679ee607299af1f0",
+  "finding_text_md5": "0188bdf51fd24e605a8d06745fe32bc1",
+  "published_date": "2024-01-25",
+  "detail_text": "Specifically, the ISO-7 buffer room{b!' flaming to include underneath the ISO-5 hood is constrncted of vinyl plank like surface with embedded grooves which are not easily cleanable. This is a repeat observation from the FDA inspection ending on 6/24/2019."
+ },
+ {
+  "finding_id": "finding-ff89ebf4fa57c83918ae4ff9",
+  "finding_text_md5": "6f211e1b55f8df94f607061536629fec",
+  "published_date": "2024-01-17",
+  "detail_text": "EMPt.DYEE(S) Specifically, your firm's 100% visual inspection of the finished product vials is inadequate. For example, A. There is no written procedure describing the process for 1 00% visual inspection of filled vials. B. No formal training process for the visual inspectors to ensure that inspectors are provided with adequate training to perform the inspection process. C. No qualification process for the visual inspectors to ensure that they are properly qualified to perform the inspection process. The finished sterile drug product vials are amber."
+ },
+ {
+  "finding_id": "finding-fd42c43735fb6e51b75e0bdf",
+  "finding_text_md5": "96df149b2ae868514d056bac0435a80f",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, on 10/12/16 we observed Glycopynolate 1mg/5mL (0.2mg/mL) syringes, lot 9174, were s tored in a REDACTED [redacted] touching a portable space heater reading between 91-92°F during the labeling process. Your batch record and labeling both states the product should be stored at room temperature. No impact assessment has been performed to determine the effect on the identity, quality, s trength, and purity of this product."
+ },
+ {
+  "finding_id": "finding-fd2d8a333b3eac5f931845d0",
+  "finding_text_md5": "6ea527ab7da05028324397e59093192c",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, your firm does not always adequately investigate and document investigations ofnon-conformances. On 3/19/2014, we reviewed your firm's investigation related to an incident involving \"dark specks\" found in Morphine lot #86511 (stock code: 3937) and documented as non-conformance report #9FZTZE (dated 3/12/20 14). This report ofinvestigation does not include microscopic examination or any other characterization ofthe \"dark specks\" found in the product that would allow for further investigation. This lot ofmorphine was later scrapped."
+ },
+ {
+  "finding_id": "finding-fd27914100957174f8d2e266",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2024-01-17",
+  "detail_text": "·; Your firm utilizes several different disinfectants in the ISO 5 areas of which two, REDAC TED [redacted] and REDACTED [redacted] are non-sterile.: 9/01/2016 (Thu), 9/02/20 16 (Fri), 9/07/2016(Wed), 9/09/2016 (Fri), 9/14/2016 (Wed)"
+ },
+ {
+  "finding_id": "finding-fd2681d50f468f0781bc968b",
+  "finding_text_md5": "dc823cf82894e95f90ce5b3a09c9a0ff",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, a Complaint No. 0 5160 I, filed Ma y 13, 2016, was issued for pain following TriMix injection. The \" Pati ent Complaint and Grievance Form\" included that no investigation was required, and another batch was made. Howev er, no additional information was provided regarding patient outcome on the \"Patient Complaint and Grievance Form\". A sterility failure was documented for TriMix Injectable Solution (Aiprostadil, Papaverine, Phentolamine 10 mcg/30 mg /1 mg/ml injection) f or lot# 04282016@ 19 produced on April 28, 2016. No additional in formation or investigation was conducted to identify the contaminant or source of contamination."
+ },
+ {
+  "finding_id": "finding-fd204c0341cd097508b5ab37",
+  "finding_text_md5": "9f9b692c3b0cf31fdee785a5089660a1",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, A. The firm failed to perform a microbiological assessment after penetrating leaks were found in building REDACTION [redacted] dripping above the clean room in 06/2012. During the inspection 10/2012 we observed totes placed in the location ofthe penetrating leaks containing water. There is no documented evidence that the leaks were permanently corrected. B. Walls were observed to be cracked, corrodedand covered with what appeared to be adhesive material in Room A of Building REDACTION [redacted], where sterile drug products are aseptically prepared. Ra\"\"'n I. Martinet"
+ },
+ {
+  "finding_id": "finding-fd1dde8a7b2abf97439ea486",
+  "finding_text_md5": "7162693758d3803768d8a58de5ff7ca6",
+  "published_date": "2024-01-17",
+  "detail_text": "- 10/07/2015* of Steril e and non-steri l e drug Specifically, No investigation was initiated to determine the root cause for several potency failure results for products produced in 2013, 2012 and 2011. For example, Diethysltilbestrol 1 mg (lot # 49011, dated 10/10/13), \"Bactroban, Sporonox, Triam, Xylitol\" (lot# 20085, dated 5/31/12), and Bactroban Nasal Spray 0.2% (lot# 2040103, dated 6/6112) had the following potency results: 80%, 80.5%, and 53.5% respectively, against a specification of REDACTED b4. Furthermore, there is no procedure in place for conducting investigations."
+ },
+ {
+  "finding_id": "finding-fd1b308ba65614b69c214ce7",
+  "finding_text_md5": "1bb58c869fb58ca1eea681e7500bd927",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, |RRR——__ prodscerofSterileDrugs a) The ISO-7 personnel ante-room is used as a material transfer and storage area as well as a gowning room for personnel to don the sterile gowning attire. However, the approximate space is insufficient in that there is no manner with which personnel can don their sterile attire without coming into contact with non-sterile attire and/or contaminated areas. b) There are [ [redacted] airflow cabinets airflow hoods) that are used to provide an ISO-5 environment for the aseptic operations. The ISO-5 room (approximate G8 BB) also contains a Lyophilizer andEY. During routine operations there can be up to technicians performing aseptic operations. The ISO-5 area has insufficient space to perform the aseptic operations."
+ },
+ {
+  "finding_id": "finding-fd0416af1d01dd161f2cfa28",
+  "finding_text_md5": "590b907acabdc5e7291be0aef4f88b0e",
+  "published_date": "2024-01-17",
+  "detail_text": "of the April 15, 2003 Consent Decree of Permanent Injunction. The decree status in part that ARC req uired in Paragraph X.D. of the April 15, 2003 Consent Decree of Permanent Injunction. The decree status in part that ARC must notif y the FDA Baltimore District and report the identification of all known distributed units and their lot n umb e rs, seria l numbers, unit numbers, whole blood numbers, and expiration dates; the name and address of involved facilities, and a description of the event that caused the unsuitability to occur 45 days after initially learning that an unsuitable unit was distributed. A review of American Red Cross Biomedical Services region exception reports, logged from December 200? through April 2008, revealed that ARC did not submit approximately 10 biological product deviation reports (BPDRs) to FDA within 45 days after initially learning that approximately 27 non-conforming blood products, as identified by ARc, were distributed. For Example: ARC logged int o redac ted [redacted] ap proximately three exception reports involving do nor suitability E? nd Donation Record deviations that were ultimately detected by ARC after failing to gain control of the product prior to performing the 200% review. The following exception reports are: ARC logged into redacted [redacted] approximately three exception reports involving donor suitability E? nd Dona tion Reco rd d eviations tha t were ultimatel y detected by ARC after failing to gain control of the product prior to performing the 200% review. The following exception reports are: Redacted [redacted] was discovered on 4/19/2007 and reported to FDA on 6/12/2007. was discovered on 7/22/2007 and reported to FDA on 11/ 9/2007. Redacted [redacted] Redacted [redacted] was discovered on 5/1/2007 and reported to FDA on 11/19/2007.was discovered on 5/1/2007 and reported to FDA on 11/19/2007. These problems resulted in the retrieval of approximately 5 blood products. ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008. [redacted] ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008. [redacted] ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008.* ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008.* ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008.* ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008.* ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008. ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008. ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008.* ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008. ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008. ARC logged into redacted [redacted] approximately one exception report involving the distribution of non-conforming blood products with unacceptable temperatures. Exception redacted [redacted] was discovered 9/19/2007 and was submitted to FDA as a BPDR on 3/11/2008. Tl,reISSUED l ly 3, 2008"
+ },
+ {
+  "finding_id": "finding-fd03b19551bfe650675e5803",
+  "finding_text_md5": "7e80ca537004c8b291e221901e0dd072",
+  "published_date": "2024-01-17",
+  "detail_text": "a. On 12/11/08 we observed a problem that occurred during packaging of Zolpidem Tartrate Tablet lot where, due to an alignment issue bottles were shorted tablets as the tablets were observed to be spilling onto the floor. The line had to be stopped, adjustments made, and bottles removed and their contents dumped. Review of the packaging record following the completion of the run revealed no notation of the problems we witnessed. b. Review of the batch record for Zolpidem Tartrate Tablet lot reveals no indication of a problem during packaging. However, review of Caraco's complaint data base reveals there have been complaints of incorrect tablet count received for lot 80311A. Caraco Pharmaceutical Laboratories, LTD"
+ },
+ {
+  "finding_id": "finding-fd009eaa116720360d2301f2",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, 9) Non-viable particulate monitoring is performed <Re dacted B4 and is not performed under dynamic conditions. 10) Active air sampling is performed [redacted] and is not performed under dynam ic conditions. I I This is a Repeat Observation from FDA inspection ending on 2/09/2016."
+ },
+ {
+  "finding_id": "finding-fcf093275100eb195d484b25",
+  "finding_text_md5": "c29224b9fdee7f34e6cdd1e044eca081",
+  "published_date": "2024-01-17",
+  "detail_text": "Specificially, there is no written stability program to support assigned expiration dates for sterile compounded sterile preparations. Additionally, when assigning expiry dates, you do not follow your written standard operating procedure titled \"Assignment of Beyond-Use Date for Sterile Compounded Preparations\". Examples include: I. Preservative-free products such as sterile ophthalmic solutions that do not have adequate s tability data AND lack a sterility test have been assigned beyond use dates/ expiry periods th at exceed the requirements of your written procedure. Specifically, the SOP states when a ssigning BUDs for \"compounded drug preparations\" that lack sterility testing, the date sho uld be NMT 3 days under refrigeration and NMT 24 hours for ambient room temperature for \" high risk drug products. Examples include: Glycerin 100% Lot Number 44462015 was assigned an expiry date of 5/14/2016, 180 days after compounding date of 11/6/2015. Additionally this lot of Glycerin was st erilized redacted b4, below the required sterilization redacted b4 Glycerin 72% (w/v) Injectable Lot number 032520 16@ 10 was assigned an expiry d ate of6/23/ 2016, 90 days after compounding date of 3/25/16. I ndustry Infor mation: www. fda. gov/oc/industry OATE{S) OF INSPECTION 0 4/04/ 20 16 - 04/20/2016* FEJ NUMBER NA1.. E AND IDLE OF IN DIVIDUAl TOWHOM REPORT ISSUED TO: Jos eph Nava r ra, President/ Owner FIRM NAM E Town Tot a l Compounding Center CITY, STATE. ZIP OOOE. COUNTRY Melville, NY 11747 STREET ADDRE SS 532 Broadhollow Roa d TYPE ESTASLISHMENT INSPECTED Producer of Ste rile & Non- sterile Dr ug Products Redacted b6 Glycerin 72%/ Lido 1%-Ep i I: 100000 was assigned an expiry date o f 6/30/16, 90 days after compounding date of 4/1/16. Pilocarpine HCl 2% Opth Soln was assigned an expiry date of 4/29/16, 28 days after compounding date of 4/1/16 Rx redacted b6 Ceftriaxone Nasal 2.5ml Nasal Soln was assigned an expiry date of 6/8/ 16, 90 days after compounding date of 3/10/ 1 6 Rx redacted b 6 was assigned an expiry date of 6/30/16, 90 days after compounding dat e of 3/28/1 6 Rx redac ted b6 was assigned an expiry date of 9/4/16, 180 days after compounding date of 3/8/ 16 II. Products with preservative that also lack stability and sterility date have been assigned be yond use dates (expiration dates) that exceed 48 hours at room temperature, or 14 days at re frigerated conditions as required by your procedure. Examples include: Mold Only Red Stage 4 indoor 5 was assigned a beyond use date of 12/ 1/ 17, 1095 days after compounding date of 3/ 10/ 16 Rx redacted b6 (Trimix #4) was filled on 3/28/ 16 and assigned an expiry date of 6/ 30/ 16, approximately 90 days later."
+ },
+ {
+  "finding_id": "finding-fce88faad52656f3687cc688",
+  "finding_text_md5": "d5e75781a8f2d08d12d2235bc646c2e9",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, your firm utilizes non-sterile, 12\"x12\" clean room wipes, to disinfect the lSO 5 classified aseptic processing area, to disinfect materials introduced into the ISO 5 work space, and as a placemat to rest sterile items placed on the ISO 5 work surface. Sl:E REVERSE"
+ },
+ {
+  "finding_id": "finding-fcdf83015724eab75e87e71e",
+  "finding_text_md5": "338e083245caf992c4a5c9748ab38970",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, There is no Quality Control Unit approved master batch record and the Logged Formula Worksheets lack the following information to prevent mixups: A. For 18/24 batch records (logged formula worksheets) reviewed, actual weight of ingredient was not recorded. B. There is no second verification of components added to each batch at the time ofcomponent weighi ng and addition to the batch. C. Product yield is not calculated. D. Labeling is not reconciled. FACILITIES & EQUIPMENT SYSTEM"
+ },
+ {
+  "finding_id": "finding-fcd491bdb48f6e73846db0ac",
+  "finding_text_md5": "69d0f5a31b9f141efd877fa3bc135a41",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, the firm does not cons istently test every batch of re dacted b4 drug product. All steri le drug products are rendered sterile by redacted b4; however these drug product s are not consistently checked prior to distribution. The pharma cy does n ot perform to ensure that th e product obtain redacted b4 is free fro m contamination. Since sterile compou nding started in March 2016, sterility has only been tested on the redacted b4. Since 03/15/2016, redacted b4 Trimix prescriptions, containing Alprostadil, have been administered. Producer ofSterile and Non-Sterile Drug Products"
+ },
+ {
+  "finding_id": "finding-fcc13f15e46761c29e1d97c3",
+  "finding_text_md5": "4b0154197acf0c1d3191c33b4ce330e2",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, 1. Per SOP 3.020, \"Cleaning and Maintenance of the Clean Room Facility, ver.1.0, eff.2/15/12013, the temperature range within the buffer room and ante room shall be maintained at\" [redacted] or colder. The humidity should be maintained in the range [redacted] of the [redacted] temperature and humidity monitoring records documented humidity excursions on the following days: DATE ANTEROOM BUFFER ROOM 1/12/2017 68% 11/1/2017 68% 11/2/2017 70% 11/6/2017 67% 74% 11/7/2017 69% 11/10/2017 71% 11/15/2017 70% 11/16/2017 71% 11/28/2017 68% 11/30/2017 68% 3/1/2018 67% 70% 3/5/2018 4040 North Central Expressway, Suite 300 Dallas, TX 75204 (214)253-5200 fax: (214)253-5314 NAM~ ANO TITLE OF INOIVFOUN.TO WHOM REPORT\" ISSUED Jack R. Munn, Owner FIRM\"\"\"\"c Guardian Pharmacy Services CITY, STATE. ZlPCOOE,COIJNTRY Dallas, TX 75247- 4933 OATE;S) OF INSPECTION 4/2/2018-4/20/2018* fEI NUMl!EA 3012669715 STR\"\"' \"\"DRESS 7920 Elmbrook Dr Ste 108 TYPE~.,.....,S!WENT IN,...,CTED Producer of Sterile and Non-Sterile Drug Products"
+ },
+ {
+  "finding_id": "finding-fc7307a97be9c6ff88dac622",
+  "finding_text_md5": "66171cf929c8080a1b0d43075953d2db",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, During the production of epinephrine 1 mg/mL, lot #C 16723 161 on 04/19/2016 and phenylephrine 2.5%/tropicamide 1%, lot # 125441/B59 on 04/20/2016 we observed: i. Not all garb worn into redacted b4 is sterile. Examples include hair nets, beard n ets, co tton gloves,(redacted b4), and street cloth es a nd shoes not covered by sterile garb. ii. Exposed skin (hands, forehead) in redacted b4 iii. Street clothes and shoes are worn into redacted b4 and are not completely covered by sterile garb. Sterile gown is open in back, leaving non-sterile street clothes partially uncovered."
+ },
+ {
+  "finding_id": "finding-fc6c09c28684e0f2cea6b160",
+  "finding_text_md5": "752af180a5d1c30c7e88856297eb402a",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, on 05/02/2016 and 05/04/2016, we observed the aseptic preparations of TESTOSTERONE CYP Lot# 04292016:35@11 and MEETHYLCOBALAMIN Lot# 05042016:98@11, respectively. During the production of these lots we observed the following: A. We observed exposed wood-like material underneath the R EDACTED [redacted] of the ISO 5 REDACTED [redacted]. The ISO 5 REDACTED [redacted] made REDACTED [redacted]. Underneath the REDACTED [redacted] we observed REDACTED [redacted] that exposes the wood-like material. The REDACTED [redacted]. The wood-like material is particle shedding, difficult to clean and disinfect, and may harbor microbial contamination. B. ln the ISO 8 clean room where the ISO 5 REDACTED [redacted] is located, we observed a countertop/work bench and several storage shelving are made of laminated particle board. We observed exposed wood-like material on the underneath sides of the countertop/work bench and the shelving. C. In addition, your firm's ISO 8 clean room ceiling is made of pop-up tiles. We observed numerous gaps in the ceiling tiles and unsmooth caulking along the edges where the ceiling meets the walls. We also observed 3 vertically aligned nail holes on the right side of the ISO 8 clean room wall above the REDACTED [redacted]. In addition, your firm's Lab Manager stated that the ISO 8 clean room ceiling and the storage shelving, with exception of the countertop/work bench, are not routinely cleaned."
+ },
+ {
+  "finding_id": "finding-fc651e0d39b51081f6913db0",
+  "finding_text_md5": "3c39b41322eb0e30473da144cb5919e1",
+  "published_date": "2024-01-17",
+  "detail_text": "The air flow pattern video does not present data to adequately assess the requested \"downward sweeping airflow pattern\" for the ISO 5 aseptic fill zone. The firm fai led to evaluate the potential product impact of the turbulence, air eddies observed in the middle of the ISO 5 hoods during dynamic operations. b. The smoke study did not include an evaluation ofthe personnel activities performed in the adjacent ISO 5 hoods to determine that the personnel activities do not negatively affect the air flow patterns within ISO 5 hoods. c. The study does not demonstrate critical aseptic connections performed during the assembly of ISO 5 hoods used to fill sterile pharmaceuticals."
+ },
+ {
+  "finding_id": "finding-fc5a4f02749b903df1bf1a41",
+  "finding_text_md5": "c957c02d29c2e06d4e5f0459a1a957cd",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, a) REDACTED [redacted] used for aseptic processing in the Laminar Air Flow Hoods (LAFH) (ISO 5 areas) are not sterile. Brandon C. Heitmeier"
+ },
+ {
+  "finding_id": "finding-fc543f286d81ff15746e3e3b",
+  "finding_text_md5": "add21577f97d87c5be9d0d47702252e3",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, the firm initiated investigation reports # 83109, 84180, 84184, 84224, and 88497 in November 2008 and January 2009 in response to \"water found inside the vials during Propofol filling process\". These 20wals with w (b) (b) were discovered as they were exiting the depyrogenatlon tunnel and prior to the filling machine on Lin.n Building [redacted] ~~~S)OONA~E OATEISSUED ~~~~.:~:~:~:~:~;~~~~O~;;;'t~:h'de SOmt or lOOmL Prapofo! pmd!!!\"!3 thftt are mftnuf\"~!illed on the sftme filling line"
+ },
+ {
+  "finding_id": "finding-fc51f49d596b556d7ad8d54e",
+  "finding_text_md5": "0c83fd0d88b99e26244c4659514fd88c",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, samp les o f incoming material are not collected randomly. For e xample reda cted [redacted] drums of re dacted [redacted] Starch lot redacted [redacted] were received on redacted [redacted] pallets on redacted [redacted] all redacted [redacted] samples were collected from redacted [redacted] pallet."
+ },
+ {
+  "finding_id": "finding-fc3c1cfa72159d778063a40b",
+  "finding_text_md5": "9143d59cccd75fab6b715a6819c80486",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, A k orn's written procedure, \"Adverse Drug Experience Reporting\", No. RA112, Effective Date 03/19/2007, does not include the new FDA provisions for postmarketing reporting requirements for drug product of Serious Adverse Event Reporting for Non- Prescription Drugs, Chapter VII, SubChapter H, Section 760 of the Food, Drug, and Cosmetic (FD&C) Act which established new adverse event reporting requirements which apply to the manufacturers, packers, and distributors whose names appear on the labels of over-the-counter (OTC) or behind-the­ counter (BTC) drugs marketed in the United States."
+ },
+ {
+  "finding_id": "finding-fc3aaf7eaea0266086f8e166",
+  "finding_text_md5": "fbe41625bea884eb4d2d9f217c4a0757",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, complaint files do not always include a copy of the reply sent to the complainant and hard copies of the complaint handling program) does not show documentation that the \"type of letter\" field is always complete when and if a reply is sent. For example closed complaint dated 11/29/06, dated 11/29/06. [redacted]"
+ },
+ {
+  "finding_id": "finding-fc379e93e6194b71379917ea",
+  "finding_text_md5": "8f935cf216b64b6ebb76fd7bafd180e2",
+  "published_date": "2024-01-17",
+  "detail_text": "and followed. Specifically, 1) Your quality unit did not appropriately review the results ofthe aseptic process simulations for all the sterile processing technicians, dated 10/20/14, 10/23/14, 10/24/14 and 11/10/14, and as delineated in the policy titled Quality Assurance Program, effective 09/03/13. 2) Non-sterile wipes are utilized to clean inside the ISO 5 personal workplace hood area as delineated in standard operating procedure 5.161, Clean Room Routine Maintenance, effective 01/05/15. 3) There is no standard operating procedure delineating the disinfection of the non-viable particle counter device which is placed inside the ISO 5 personal workplace hood area and transported from the ISO 7 and ISO 8 areas. 4) Active air samples for viables are not collected inside the ISO 5 personal workplace hood area as part ofthe current environmental monitoring program delineated in standard operating procedure 7.11 0, Environmental Monitoring, effective 10/01/14. DEPARTMENI' OFHEALTH AND Jll1l'dAN SERVICES 01/16/2015 FOOD AND DRUG ADMINlSTRA'DON 01/12/2015 - 253-1202 3004969894 Pkwy Ste 140 Car, NC 27518-8696 Outsourcin"
+ },
+ {
+  "finding_id": "finding-fc356739822b392ca030e4b8",
+  "finding_text_md5": "b38c37d3d3b3a9bd5e306cbd7204be27",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, the firm fails to ensure that each batch of aseptically processed sterile drugs, which it distributes, passes sterility and endotoxin testing before batch distribution. According to in process Investigation #06-130214-005, the firm received failing sterility testing results representing 18 orders of Cardioplegia that had already been released and distributed. For example, two of those 18 orders (numbers 690848 and 690849) of Cardioplegia with a BUD of 30 days were shipped to"
+ },
+ {
+  "finding_id": "finding-fc29a97c9b0fa2d6f0d64d69",
+  "finding_text_md5": "1483d89f64eed254c9a697bf25646b06",
+  "published_date": "2024-01-17",
+  "detail_text": "SpecificaJly, your firm does not have a procedure or process in place to thoroughly review sterility, p otency, yield or environmental monitoring failures. For example, (a) On 091i 1/2014 you determined that lot- ofVANCOmycin 1.5 gr:am added to 0.9% Sodium Chloride 500 ml BAG failed sterility testing with one positive result. You speciated the growth and found contamination with Rhodococcus baikonurensis I erythropolis I globerulus I qingshengii. You did not conduct any investigation to detennine the potential root cause nor detennine ifany other lots could be affected by this failure. (b) On 0112712015, you preparedlot- ofVANCOmyci.n 1.5 gram added to 0.9% Sodium Chloride 500 ml BAG. You noted that you ran out o · Vancomycin solution. bags before completing yom· lotoS bags. You sen! bags for potency testing and determined that 3 bags were superpotent (a t 123%, 121% and 122%). Yo)l r ejected e batch, but did not conduct an investigation to determine potential root cause ofthis failure or initiate a corrective action. ' (c) On 08104/2014, your fmn had ~lert levels met for personnel gloved fmgertip samples, surface samples inside the ISO 7 N on-Hazardous Con1potmding Room, zmd.surface samples iuslUe lhe ISO 8 Gowlli11g Room. Bacteria Arie C. Menachem, InvcRt i gator"
+ },
+ {
+  "finding_id": "finding-fc22e201aa39855de63bbdac",
+  "finding_text_md5": "6ade5ab1a9e551bd0a02e3d4b3556f6e",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, your firm has not conducted potency testing for the majority of the lots of drug products manufactured and distributed. For example, between 1/3/12 and 1/24/13 your firm manufactured and distributed approximately REDACTED [redacted] lots of drug product (Different formulations/container closures) and conducted potency testing on 20 lots. For example, The drug product, Heparin 2,000 Units per 1,000 ml (2 Units/ml) added to 0.9% Sodium Chloride Injection, USP, lot #13016002S (Expiration date: 3/22/13) was manufactured on 1/15/13 and shipped to a consignee on 1/16/13 without potency testing. The drug product, Magnesium Sulfate 1 g Added to 50ml 5% Dextrose Injection, USP, lot #13016004S (Expiration date: 3/2/13) was manufactured on 1/15/13 and shipped to a consignee on 1/16/13 without potency testing. The drug product, Calcium Gluconate 1 g (10 mg/ml) in 0.9% Sodium Chloride 10 0mL Fill in an IntraVia Bag, lot #130160038 (Expiration date: 3/2/13) was manufactured on 1/15/13 and shipped to a consignee on 1/16/13 without potency testing."
+ },
+ {
+  "finding_id": "finding-fbfd3684035e4ca38b47ced6",
+  "finding_text_md5": "ef2a42dbe5d26e3b553b04d9e07a6698",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifi<:ally, your SOP #9.008 entitled, \"Complaint and Mishap Rectification\" (Reviewed Date: 612/12) provides requirements for the evaluation of complaints. Review ofreturn logs for the period between 3/2012 and 3/2013 revealed at least 20 instances where a quality-related complaint occurred but was not investigated. Some examples consist ofthe following: 1. Methylocobalamin Buffered, 30ml, 1mg/ml, lot #20120608@34 (Production date: 6/8/2012 Beyond Use Date: 6/8/2013) Jnvoice#377054A dated 7/11/12 documented a customer complaint involving patients who had extreme pain at the injection site and were sent an older Jot as a replacement. 2. Methylcobalamin Buffered, 30ml,1mg/ml, lot #20l20904@7 (Production date: 9/4/ 12 Beyond Use Date: 8/ 1/13) Invoice #383247A dated 9/ll/12 documented a customer complaint involving pain and swelling at the injection site. 3. Methylcobalamin Buffered, 30mJ, 1 mg/ml, lot #20120702@13 (Production date: 7/2/12 Beyond Use Date: 7/211 3) Invoice #382353A dated 8/ 15/12 documented a customer complaint concerning painful ilijections from multiple patients. 4. Vitamin D3 50,000 RJ/ml 5ml, lot #2012090@27 lnvoice #383217 A dated ll/2/12 documented a customer complaint concerning crystallization ofthe product. 5. L-Phenylalanine 50 ml, lOmgl ml, lot #20120417@17 Invoice #35488A dated 6/27112 documented a customer complaint concerning precipitation with the produt-1."
+ }
+]

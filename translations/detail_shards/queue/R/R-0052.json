@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-1312be40c773597c69785682",
+  "finding_text_md5": "01c2c1b1cbe7dcb530f9f94126f1b8b6",
+  "published_date": "2020-01-07",
+  "detail_text": "Specifically, your firm is using the non-sterile cleaning product, [redacted] within your firm's LAF Hood [redacted] designated for the production of sterile drug product."
+ },
+ {
+  "finding_id": "finding-1045940a785915f997fb651f",
+  "finding_text_md5": "985e54ae33e244007b0de2931b89b8d0",
+  "published_date": "2020-01-07",
+  "detail_text": "Specifically, employees responsible for the sterility analysis by Scan RDI are two months late in their [redacted] recertification and continue to process sterility analysis using Scan RDI."
+ },
+ {
+  "finding_id": "finding-078a30f605e855a461d943d7",
+  "finding_text_md5": "5c22610fd8d19a9102f0865082151300",
+  "published_date": "2020-01-07",
+  "detail_text": "Specifically, on November 20, 2019, I observed an insect in the pharmacy area on the floor where compounding activities occur."
+ },
+ {
+  "finding_id": "finding-d07a8e422e755b5f55717d3c",
+  "finding_text_md5": "d7aef7f96fae3c18bec8c91d8124bb85",
+  "published_date": "2019-12-20",
+  "detail_text": "**REPEAT OBSERVATION** There are no written control procedures that describe2 in sufficient detail, the instmctions a microbiology 1 £ 11 d. h 1. £ tD)(4) 1 d. h fill. h. /tbH4> ana st must o ow unng tne samp mg process or ocate m t e I mg mac me {b)(4). -){6>14) ----,. ----- loadmg.i1 room manufacturmg ar.... 1. 1 c.. lb)l4) h.. Per Semor Executive QA-M1crob10 ogy, a swab sample IS col ected 1iom the t at IS used m critical operations such as; handling interventions near opened vials or near pro uc exposure zone at the end of the filling R,rocess. However, there is no mechanism in place which defmes the sampling \"b)(4). procedure and the areas that should be sampled at the end of the filhng process. Therefore, there is no assuran rent surface monitoring (i.e. swab sampling) is sufficiently robust and can Sun Pharmaceutical I ndustries Ltd. Halol - Baroda Highway CITY. STATE. ZIP CODE. COUITTRY TYPE ESTABUSHMENT INSPECTED Halol, Gujarat, 389350 I ndia Sterile and Non- Sterile Drug Manufacturer be used to detect potential microbiological contaminants. This discrepancy impacts the filling lines. (bll4> I located m Blocks i"
+ },
+ {
+  "finding_id": "finding-c7ee17e151bb4b7e48e88302",
+  "finding_text_md5": "d47bd56426b335537b2f7d38562853ce",
+  "published_date": "2019-12-20",
+  "detail_text": "Specifically, your fnm failed to establish and implement controls which ensure data integrity in the use of the environmental monitoring MODA EM PROD version 3.4 computerized system used by your Microbiology Laboratory for all microbiology samples including all sterile environmental monitoring. A. Your Quality Conb'ol (QC) Microbiology Laboratory failed to establish conb'ols which monitor and prevent all environmental monitoring data from being manipulated in the MODA-EM PROD version 3.4 computerized system, in which data from all environmental and personnel microbiology analyses at your facility are entered which are associated with all sterile manufacturing. Fmt her, your fnm failed to establish and implement procedures which require the review and evaluation of quality ti·ends of audit ti·ails in the MODA-EM PROD version 3.4 computerized system from 2016- 2019. Hence, your fnm failed to perfo1m reviews of audit trails and evaluate quality trends in this computerized system to date, to include, QCU oversight and corrective and preventive actions for minimizing and decreasing the likelihood of reoccmTence of identified trends. Your microbiology. ~b)(4) laborato1y processes approximately d <b><4 !samples per tt>><4 em was Sun Pharmaceutical Industries Ltd. Halol - Baroda Highway CITY. STATE. ZIP CODE. COUITTRY TYPE ESTABU SHMENT INSPECTED Halol, Gujarat, 389350 India Sterile and Non-Sterile Drug Manufacturer imQlemented in 2016 in your facility, your microbiology laborato1y has processed approximately lbH 4 here audit trails were not reviewed, and the results trended. For example, MODA-EM operating procedure, \"QCM-153/05, Operating procedure for MODA-EM and MODA-FDC system, Effective Date: 23/07/2019\" [dd/Illilliyyyy], establishes that users, who are not defined in the procedure, have access privileges to edit sample infonnation including the following: sample staii date (includes time), sample end date (includes time), sampling technician, environment (Dynainic/Static), person sampled, and personnel site (ai·ea sampled, such as, ~bH 4 >I. The procedure also does not require prior authorization for such edits from management. All user roles also have the ability to delete infonnation to be printed on the sample labels, such as, plate name, type rb)( 4):etc.), plate barcode, vendor, media/Lot, and media used. Additionally, the, MODA-EM operating procedure, \"QCM-153/05, Operating procedure for MODA- EM and MODA-FDC system, Effective Date: 23/07/2019\" [dd/Illilliyyyy], establishes in section 7.2.3. 7.1, \"Sample info1mation that has not yet been approved may be edited to conect enors or add info1mation that was not collected eai·lier in the sample life cycle. The edit sample info1mation for the cmTently selected sample, the user selects the Edit option on the Operation ribbon menu. Fmiher, global program operating procedure, \"Fo1m027545, Computerized Systems Administration Protocol for Lonza MODA, Version 1.0, Effective Date: 24 Dec 2018\" establishes in Attachement-3, List of pai·ameters for different authorization level for Lonza MODA, that the Administrator [IT], Functional Admin [QA], and the Supervisor have user access privileges to un-approve samples. Samples can be edited in an unapproved status. Fmiher, the MODA-EM PROD version 3.4 computerized softwai·e system used to manage microbiological environmental monitoring data, establishes via assigned user roles within the program Sun Pharmaceut ical I ndust ries Lt d. Halol - Baroda Highway CITY. STATE. ZIP CODE. COUITTRY TYPE ESTABUSHMENT INSPECTED Halol, Gujarat, 389350 I ndia St erile and Non- St erile Drug Manufact urer and procedure, \"Fo1m027545, Computerized Systems Administration Protocol for Lonza MODA, Version 1.0, Effective Date: 24 Dec 2018\", that all user roles including: Administrator, Lab Approver, and the Site Supervisor, have access privileges to edit all Inicrobiological test results in MODA without prior authorization from management, including, but not limited to, the following names: \"TestResultEdit\" \"TestResultincubation\" \"T estResultOrganism\" \"T estResul tProduct\" \"TestResultResults\" \"T estResultSampling\" \"T estResul tT esting\" There is no oversight of this data to include trending and CAP As. B. Trend reports procedure, \"QCM-147 /03, Trend reports in Quality Control Microbiology, Effective Date: 30/03/2018\" [dd/mm/yyyy], fails to establish that all identified Inicrobiological findings must be trended and coITective actions identified and implemented to Ininimize or coITect quality trends in MODA. CmTently, your fnm trends results data only. For example, your procedure, failed to require the trending of sample edits and edited test results. There is no evaluation with regards to dete1mining the root cause or coITective and preventive actions were taken to control editing, and to address miniinizing and decreasing the likelihood of reoccmTence of identified trends. C. The control Qrocedure SOP-ANA-017/10 entitled. \"Cleaning and operation od bH 41 I) ~bH 4 l.J; effective date 19 Apr 2021 establishes, \"if maximum cycle time andFH 4 value is ooserveo more tlian established liinit forj 1141 Jnjection (Non-USA- Sun Pharmaceutical I ndus tries Ltd. Halol - Baroda Hi ghway CITY. STATE. ZIP CODE. COUITTRY TYPE ESTABUSHMENT INSPECTED Halol, Gujarat, 389350 I ndia Sterile and Non- Sterile Drug Manufacturer product), then fmiher data is to be evaluated/investigated, and based on finished product results, batches will be released for commercial pmpose.\" [(ljf{4) f [redacted]:b)(4)}v On 17 Aug 2018, one (1) of~ !AN-026 located at Bloc~ as found,cgut-of-limit (OOL) durin{ 4> ol 0H41 (bH4>mg[Cb><4> pags; Lots [redacted]... Thej showed a value ofa C (acceptance range lllllit IS ]'\"' 0 \"\"~' 0 \" \" 1n dd' · h · \"'\"' ch r · · 1 to j. a Ibon, t e exposure time wasf,, t e acceptance llllit IS !4> Cb><4>. Your Quality Unit initiated the investigation PR ID #103640 which documented a damaged CbH4> h b bl f h...d was t e most pro a e root cause o t IS mcI ent. WW WW l Although the.___;cycle for Lots 1was found out-of-validated rangei the lots were sam12.led by the Q,A unit and released to QC laboratoiy for analyses. The failure of the{b>< I tb)(4) cycle was not repoiied to the QC Laboratoiy. On 5 Sep 2018 and 17 Sep 2018, out- of-trend (OOT) (PR ID #115388) and out-of-specification (OOS) (PR ID #123172) results were. till (4) ~. LI observed for Related Substance (~~ testm~. Lot showed OOT result - o and Lot ~b>< 4 d OOS 1 [(6><4> Y< £ J6><4> 1: Th l\". 1 owe resu t o or Impurity. e acceptance imit is NMT[ 4>(/o. After completion of Phase-1and2 investigations where no laboratory assignable cause was identified ~(b 114 '1ngF>< 4> lmjection (Non-US marketed product); Lots (bf{4). 1were rejected. p. Your fnm failed to ensure data integrity in raw material dispensing. During a walkthrough of the ~b>< 4 Block<b>< 4 ~Dn 03 Dec 2019, we observed that the material dispensed date on the container label for dispensed raw materials of productf:>< 4>._jablets USP,m_mg, batch n0J b><4> iwas missing on 3 (three):b><4>j of the sam e material. Fmifier tfie \"Material Dispensed By'' was typewritten and Sun Pharma ceutic a l I ndus tries Ltd. Ha lol - Baroda Hi ghway CITY. STATE. ZIP CODE. COUITTRY TYPE ESTABU SHMENT INSPECTED Ha lol, Gujarat, 389350 I ndia Steril e a nd Non- Steril e Drug Manufac turer completed by an employee ahead of time but was not completed contemporaneously. The Employee documented as the dispenser did not dispense the raw material but was the 2nd person verification."
+ },
+ {
+  "finding_id": "finding-c21c04f275dbbc6ce7def978",
+  "finding_text_md5": "e3cc1ea5e0120245c8bf14ac89a0ffe1",
+  "published_date": "2019-12-20",
+  "detail_text": "Specifically, A. Your fnm lacks written Qrocedures describing, in sufficient detail, the visual examination of sterile 16114) 1,. and[ rm1shed products, such as, tablets and capsules. lb)l4) For alli finished products, the amount of tablets and capsules, the time spent examining the tablets and capsules, as well as, the different steps the operator must follow are not established in the BMR or in tablet and capsule visual inspection procedure, \"TAB-063/20, fuspection of Tablet and Capsule Dosage Fo1m, Effective Date: 28 Jlm 2019\" [dd/mm/yyyy]. Sun Pharmaceut ical I ndust ries Lt d. Halol - Baroda Highway CITY. STATE. ZIP CODE. COUITTRY TYPE ESTABUSHMENT INSPECTED Halol, Gujarat, 389350 I ndia St erile and Non- St erile Drug Manufact urer tb)(4) [redacted] ~. i(b){4) I.For example, I, Investi~tor Hicks, observed uctf isual inspection ofL,Capsules [redacted] lb) 4).. ~g Batch numberi l(non-US proauct on 11Dec2018. Dunng my observa~1on one (1) Inspector perfo1med manual visual inspection in the following way 1) Take a handful o£ 1 b 1 4 1 fi ·1 ~b)( 4 1 bl · hih v· P ·d o · b)(4> capsu es ·om a p1 e o caQsu es on a ta m w c your ice res1 ent perat10ns, <bH rl d. 1 [redacted] ul {b) 41----,Th. d. 1 \" repo1te were approxrmate. caps es peri e operator examme, approximate y, capsules, in approximatelylbH 4 before discarding, rejects, if any, and placing the inspected capsules in a plastic bag. !nE41 me (1) operator inspects ~:' g of capsules which is approximately (6J< 4 ~capsules. None of the tablets were carefully examined during the manual visual inspection process that I observed. B. The amount of time spent by Inspectors examining all sterile finished liquid and tbJ< 4 !products is not consistent. Means of tracking time are not provided to each Inspector to ensure tlie consistency of the manual visual inspection amongst all visual inspectors. 1.. k b d ·1. 1.. rlb)(4l (b) For examp e, I, Investigator Hie s, o serve sten e v1sua mspect10n o <4> Solution tb> 4 Injection batch numberr 1141 tus product) on 11 Dec. 2018. I observed Inso,;ctors to b:£. l. l.. fi JCbH-4> I h h rH 4> d h tbJ~per mmT g manua v1sua mspect10n ·om,eac on t e n t e Visual inspection for parenteral products procedure, \"PAR-013/25, Visual Inspection of Parenteral Products, Effective Date: 27/06/2019\" [ dd/mm/y:m] section 7.11.1 establishes, \"Each container shall b b d.:£. f.. [redacted] l I lbJ~>o seuze m r e e r e n ce.J nne o mm1mum ~o enhance the detection of pa1ticulate Sun Pharmaceutical I ndustries Ltd. Halol - Baroda Highway CITY. STATE. ZIP CODE. COUITTRY TYPE ESTABUSHMENT INSPECTED Halol, Gujarat, 389350 I ndia Sterile and Non- Sterile Drug Manufacturer"
+ },
+ {
+  "finding_id": "finding-19a0a3518725edeef0243461",
+  "finding_text_md5": "6df5ba48f0dca515d183a0aedb6e0cf8",
+  "published_date": "2019-11-27",
+  "detail_text": "Specifically, the quality unit is inadequately staffed to keep up with the pace of production. For example, there is currently one quality unit member responsible for all out of specification and complaint investigations. In 2019, there have been more than 75 out of specification results obtained, each requiring an investigation. THIS IS A REPEAT OBSERVATION E114PlOYEE(S)"
+ },
+ {
+  "finding_id": "finding-eab86f17889bbc787f389221",
+  "finding_text_md5": "29741ddcaab2a1a3fabd5b5d5a6fe922",
+  "published_date": "2019-11-20",
+  "detail_text": "a) Filling equipment (b)Block Module~b>l4> grade A) is located in a position where aseptic procedures for A\\ ' operators during filling include bending down and squatting, which may result in bellowing of viable and non- viable particulate from perso~nel gowning during these activities having a potential affect on the sterile drug substance (e.g., Cb) ('I) njection-bulk). b) Goggles used by operalors to protect against exposed skin in the Grade A/B areas during aseptic operations have built-in unprotected openings (holes) in the top, creating a lack of protection against a source of particles generated by, and microorganisms shed from, the body, having a potential affect on the sterile drug substance.. Pashamylaram,Patancheru,Sanga Reddy,Telangana India 502307 Sterile & Non-Sterile Bulk Drug Manufacturer"
+ },
+ {
+  "finding_id": "finding-40372c7d951ec8dc11ce86fb",
+  "finding_text_md5": "fc0c5567c00da6ee7946c1ac563c98b3",
+  "published_date": "2019-11-20",
+  "detail_text": "For example: a) Validation of~b) <4> ~and 1b) (4) bag sealing processes (used in package sealing of non-sterile bulk drugs) and validation of (~ag sealing of packaged and sterilized gowning (used in aseptic operations) and sterilized stoppers (used in package sealing of sterile bulk drugs) are not complete in establishing optimum ranges for sealing parameters such as the temperature, pressure and time required to achieve consistent reproducible sealing results. Also, temperature, pressure and time used for sealing during packaging processes are not recorded/ documented, nor are the sealing machines used calibrated for temperature, pressure and time. b) ConcerningL [redacted] lmanufacturing (used in API manufacturing and the source;Cb) <4> fori(b) ('I) production, \"(b) ('I) I and used m cleaning), operating ranges for process parameters are not fully established, such as determining and monitoring acceptable levels/ranges of pressures and tlow for routine production, in order to sufficiently validate and control this manufacturing process. For example, appropriate ranges (upper and lower limits) for the monitoring of fl~~ure for retention time and proper tilterin!! and manufacturing have not been fully established for processing(b) <4> hrough(b) <4> 1and Pashamylaram,Patancheru,Sanga Reddy,Telangana India 502307 Sterile & Non-Sterile Bulk Drug Manufacturer (b) <4> Also, (b) <4> do not have sanitization procedures and schedules in order to control microbial pro 1 eration (biotilm growth) and govern a potential source of endotoxins."
+ },
+ {
+  "finding_id": "finding-079bbb20bc85bf926b130e4a",
+  "finding_text_md5": "4491f484461230f10400d23614ecb991",
+  "published_date": "2019-11-20",
+  "detail_text": "Specifically, the cleaning validation CV/NOI.AXJl-02, dated 4/02/14 foi_tb_H_4l I is not adequate in that:) the cleaning procedW'Cs currently in use, Equipment Cleaning Record (ECR) for the [redacted] effective /04/14, were not evaluated in the cleaning validation for the{b) <4l 'Equipment ID(b) <4> }01). AdditionalJy, this ECR as no document control number.) the cleaning validation report CV I NOL-001-02, dated 4/02/14, does not include an evaluation for the cleaning of the [redacted] (Equipment 1d<bl <4l 013).) the cleaning validation report CV/A/OL-001-02, dated 4/02/14, does not include aJI supporting documentation, such as the uipment Cleaning and Use Log and the logbook was reportedly not maintained, therefore the details pertaining to the ctual cleaning of the equipment could not be verified.. BSERVATION 2 vestigations into critical deviations are not always thorough including appropriate follow up, and/or fully documented. Specifically, investigations pertaining to out--0f-specification (OOS) residual solvents and/or water content results in [redacted] API. which were performed for several batches oi(b) <4l Af>I manufactured from 5/07/17 to 10/08/18 were ot thorough. For example,) Investigation into OOS-UOS-000734, OOS-UOS-000735, OOT-U08-000151, OOT-UOS-000154, initiated on 12/06/17, rting OOS for Residual Solvents (b) (:of)---, concluded that a malfunction pertaining to thelb) (4) circulation in(b) <4l ---- owever; there is no scientific data to support this conclusion and all potential root causes were not investigated and/or iscussed. Additional1y, the inv,estigation did not include a review of the equipment qualification for [redacted] 002), which was perfonned by the previous site owner in 2003, for which there has been no review ti.-y-.th.-e-.finn's uali Unit for its acce bili. Additionall, the finn does not maintain electronic batch rocessin data fore ui ment"
+ },
+ {
+  "finding_id": "finding-c6219da4f361de3ed8bee2d6",
+  "finding_text_md5": "ed654affba954193d8f5f398fe5dee7c",
+  "published_date": "2019-11-14",
+  "detail_text": "Specifically, 1. Your firm conducted recertification of your HEPA Laminar Airflow Workbench ID [redacted] Serial Number [redacted] on November 8, 2017, and discovered seven leaks within the filter, some indicated as unrepairable. Your firm did not conduct an investigation into potential impact on production of sterile drug products since the last passing certification in May, 2017 and did not conduct an investigation into the potential production days with deficient air supply. 2. You did not make adequate product evaluation and take remedial action where actionable microbial contamination on each hand of the technician was found to be present in the ISO 5 classified aseptic processing area during aseptic production of B-Complex B 1/B2/B3/B5/B6 Injectable batch 11272017@1on11/27/2017. Your fam released the batch for distribution on 12/15/2017. Your SOP 1.004 \"Environmental Monitoring of the Cleamoom Facility\" indicate ISO 5 action levels for samples as follows: 241 4 Babc ock Rd Ste 1 06 CITY. STATE. ZIP CODE. COUNTRY San Antonio, TX 78229- 4870 TYPE ESTABU SHMENT INSPECTED 5 03B Outsourcing Facility"
+ },
+ {
+  "finding_id": "finding-9e380abb6dae212d5f08e2f5",
+  "finding_text_md5": "1b322110e595eeef0c2d7e26f94a1336",
+  "published_date": "2019-11-14",
+  "detail_text": "Specifically, Your master batch production records and your batch records for sterile drug production do not include procedures on required minimum mixing time for your Ascorbic Acid Injection and do not include instructions on extended holding and storage of intermediate steps."
+ },
+ {
+  "finding_id": "finding-8e80aab07103aed5c549ec17",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2019-11-14",
+  "detail_text": "Specifically, Your firm is unable to provide documentation of positive pressure monitoring in the clean room during sterile drug production for the time period prior to March, 2018. x Oa.t59'le0 ~2~201 8 123950 TIONS"
+ },
+ {
+  "finding_id": "finding-47bd2a820bfde52149d3870e",
+  "finding_text_md5": "63d09d76713ccb9c7d692c7f106143fb",
+  "published_date": "2019-11-14",
+  "detail_text": "Specifically, Your firm has not conducted sterility hold time studies to confirm the indefinite hold times for in-house sterilized goggles and air sampling equipment, in-house depyrogenated glassware, and your [redacted] which are cleaned/sanitized in an unclassified environment and stored uncovered in your ISO 7 area for [redacted] IInjection sterile drug production. In addition, your firm has not validated the maximum amount of sterilization cycles that your in-house sterilized goggles can undergo before breakdown. You firm also does not have procedures for the cleaning and storage of the above mentioned [redacted] used in sterile drug production."
+ },
+ {
+  "finding_id": "finding-1da61b633d3073cf494713ad",
+  "finding_text_md5": "9d9a9aea5dabbf7b1a0a3d38d354cd25",
+  "published_date": "2019-11-14",
+  "detail_text": "Specifically, 1. Your firm has not conducted a [redacted] study to validate the usage [redacted] which are less stringent and lower than manufacturer recommendations of [redacted] None of your batch records indicate a specification for the [redacted] test in sterile drug production. Examples include, but are not limited to: J a. Zinc batch 08162018@1 result [redacted] using [redacted] b. Ascorbic acid batch 08092018@2 result [redacted] using [redacted] c. Dexpanthenol batch 07302018@2 result [redacted] using [redacted] d. Glutathione batch 07302018@1 result <Reda ct ed B4> using [redacted] e. Methylcobalamin batch 07182018@1 result [redacted] f. Ascorbic acid batch 07092018@2 result [redacted] using [redacted] g. Zinc batch 06182018@1 result [redacted] using [redacted] h. Glutathione batch 06112018@1 result [redacted] using [redacted] r i. Testosterone batch 03132018@1 result [redacted] using [redacted] 2. Your firm has not conducted media fills under the most challenging conditions such as failing to simulate your largest batch size and failing to simulate your most difficult sterile processing methods; your aseptic operators have not been qualified on all media fills prior to performing aseptic operations. Oate59'le0 ~2~201 8 123950"
+ },
+ {
+  "finding_id": "finding-e1f65738ba53fd0d6ae08987",
+  "finding_text_md5": "41c598515830f1cea2db8868e94fc3ce",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, a) On 7/3'0/19, your firm's ISO 7 [redacted] clean room contained 1 HEPA ftlter [redacted] to be visually un-clean (HEPA and ceiling around the HEPA appeared stained) and not properly sealed. b) On 7/30/19 [redacted] your firm's ISO 7 [redacted] clean room contained I HEPA filter [redacted] to contain gaps between the ceiling and HEPA frame making it difficult to properly clean and sanitize and chipping paint surrounding the ceiling frame. In addition, your firm's Pharmacist stated the chipping of paint surrounding the ceiling frame is monitored during his daily cleaning checklist."
+ },
+ {
+  "finding_id": "finding-dc8ef6eb122454be603aabed",
+  "finding_text_md5": "bb4a9c1407d1da5cacab4f080e8643dd",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, a) Your firm's Bio-Safety CabineaJ [redacted] ISO 5 work surface contained blue stains (resembling stamped ink). On 7 /31/ 19, the blue stains were observed on your Pharmacist's gloves and crimping handle during the production of Methylcobalamin, 5mg/mL injection, lot #07312019@ 1, BUD: 3 Days [redacted] clean room) and Chorionic Gonadotropin (HCG) 1,000U/mL Injection, lot #07312019@3, BUD: 3 Days [redacted] clean room) which can potentially cause product contamination. b) Your firm's [redacted] clean room (where sterile drug products are produced) contained cracks within the flooring in front of the Biosafety Cabinet Ill which appear difficult to clean and sanitize."
+ },
+ {
+  "finding_id": "finding-c8e0a5de988b70221c29939a",
+  "finding_text_md5": "52cac3ffaaf71652b27be6ea0f42da81",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, your firm's Pharmacist stated he cleans the ISO 5 BSC's with only [redacted]. This practice was observed on 7/31/19. Your firm's Pharmacist stated he does not use a sporicidal agent within the ISO 5 BSC's."
+ },
+ {
+  "finding_id": "finding-c5f8d5bffba64d196cc47c58",
+  "finding_text_md5": "f79f8d2b33b285a31c4e4d1aab41b0e2",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically. On 9/11/2019, you used wipes to clean the interior of your ISO 5 laminar flow hoods that were not labeled as sterile. These wipes are used for your pre-operational cleaning of the laminar flow hood. This ISO 5 laminar flow hood was used to produce l-123 Metaiodobenzylguanidine (MJBG) Rx [redacted] lot 119141 MIBG, a sterile drug product."
+ },
+ {
+  "finding_id": "finding-b7adb39906deac403fdafc2b",
+  "finding_text_md5": "3ae06cdd267b14848df33122cf5d8610",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, I observed (7/30/19) the storage of Tacrolimus 10mg/ML Base C Stock, lot #04262019@3, exp.: 7/25/19 and Alprosla<lil 500 MCG/mL Alcohol Stuck, lul #05012019@2, exp.: I 0/28/19 solutions in an unclassified area for further use after the container closure system had been punctured multiple times, and therefore compromised, throughout the assigned expi1y period. EMP!.O'l'Ee(S) Medoz Pharmacy of Pol k Inc 40230 Highway 27 Ste 100 Cn,, STA1t:. <!P\\)\\)ee;CQONIKY 11\"...._CTEO Davenport, FL 33837-7807 Producer of Sterile & Non-Sterile Drugs"
+ },
+ {
+  "finding_id": "finding-b21fe024d88ff2d416908d97",
+  "finding_text_md5": "2987e8f9d00e1d3f42ed209573f65e0d",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, uni-directional airflow was not verified under operational conditions. Your firm's Pharmacist-in-Charge reported that when recertification of the cleanrooms was performed on or around [redacted], dynamic conditions were simulated by the recertification company employees by moving their hands inside the hood and walking around the room."
+ },
+ {
+  "finding_id": "finding-aae36bb5d05ff73f0f740e5f",
+  "finding_text_md5": "ef2db6fa2c262adc91783f469b3fc73d",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, You do not maintain production records for the manufacture of drug products. Also your production records do not include a quality verification that the steps of production have been performed correctly. One example includes 1-123 Caps USP, Rx [redacted] lot ll 9105, made on 7/9/2019. Examples of omissions on the batch record for this product includes but is not limited to: lack of listing the steps taken to manufacture this product, the identity/ amounts of raw materials used in manufacturing, and these records are not signed and dated."
+ },
+ {
+  "finding_id": "finding-aa8b49e04c18b7f99f6f0adf",
+  "finding_text_md5": "8ec84c69cc766b6c17a531944106d538",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, a) Your firm stores all gowning components in an unclassified area(non-sterile hair net, sterile gloves, non­sterile gown, non-sterile shoe covers, non-sterile sleeve protectors and non-sterile face mask). Your Pharmacist was observed donning the non-sterile hair net, non-sterile shoe covers, and non-sterile face mask within the unclassified area. Medoz Pha rmac y of Polk Inc 40230 Highway 27 Ste 100 CITY, STATE, Zif' COO, COUNTRY Davenport, FL 33837 - 7807 Producer of Sterile & Non -Sterile Drugs b) Within the ISO 8 anteroom your firm's Pharmacist was observed (7/31/19) donning his non-sterile gown (which came into contact with the anteroom floor) and non-sterile sleeve protectors with his bare hands. c) Within the ISO 7 [redacted] clean room your firm's Pharmacist was observed with his bare hands inside the ISO 5 BSC donning his sterile gloves. d) Your firm's Pharmacist was observed moving from the ISO 7 [redacted] clean room, through the ISO 8 anteroom and into the ISO 71 clean room without changing his garb. Prior to conducting aseptic operations within the ISO 5 [redacted] BSC your Pharmacist changed his gloves, exposing his hands again to the ISO 5 environment (sleeve protectors were never changed)."
+ },
+ {
+  "finding_id": "finding-9b22aefdce0fe67dbcc8b7d8",
+  "finding_text_md5": "96d62969203d5c85ef01d717b8e5a656",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, a. Sterile lint-free wipes are stored outside the ISO 5 Laminar flow hood, on top of the hood. These wipesare exposed to the ISO 7 environment. During production on 07/08/2019, these wipes were placed inside the ISO 5 laminar flow hood without being sprayed with sterileH [redacted] and sterile syringes were placed on top of these wipes. b. During production of several batches on 07/09/2019, the Pharmacy Technician transferring materialsto the cart in the material entry room sprayed various materials with sterile [redacted] but did not cover all surfaces with [redacted] Materials include vials of sterile [redacted]., individually wrapped needles, and individually-wrapped sterile [redacted] wipes. The cart containing these materials were carted into Suite [redacted] and the materials were transferred into the ISO 5 laminar flow hood and used in production."
+ },
+ {
+  "finding_id": "finding-9485d7739630ec0e167a7a8c",
+  "finding_text_md5": "c6ee16eda5f777321ea64307a659b71e",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, LJ A.) An employee in the blending/granulation room (ISO 8) of cleanroom [redacted] was observed on 09/09/2019 with a beard cover that did not completely cover the beard. B.) On the same day, an umbrella was observed inverted on a plastic tray. Both the umbrella and tray were located in an unclassified area reserved for temporary storage of quarantine non-ingredient materials such as caps and vials."
+ },
+ {
+  "finding_id": "finding-89947cd4e76792ca6b246d57",
+  "finding_text_md5": "5c22610fd8d19a9102f0865082151300",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, (407) 475-4700 Fax: (407) 475-4768 NAME ANO Tm.E OF lNOIVtOOAL TO WHOM REPORT ISSUED Tushar Pal an, MS, RPh, Parti al Owne r & Pharmacist i n Charge FlRMNAME STREETAOORESS Medoz Pharmacy of Polk Inc 40230 Hi ghway 27 St e 100 CITY, STAIE, 11P CODE. COUNTRY TYPE ESTABUS,_..ENT INSPECTED Davenport, FL 33837-7807 Producer of Sterile & Non-Sterile Drugs a) Numerous dead ants were observed (7/30/19 and 7/3 l/l 9) on the [redacted] clean room (where sterile drug products are produced) floors ( comers of the room closest to the anteroom door). b) Numerous dead ants were observed (7 /30/ 19) along the comers of the walls within the non­sterile suite (where non-sterile dru roducts roduced. According to your firm's Pharmacist, house hold [redacted],was used to spray these areas. Your firm's Pharmacist stated he noticed the pest problem approximately three years ago when construction was occurring within close proximity of his facility. During the current FDA Inspection your firm failed to provide pest control records."
+ },
+ {
+  "finding_id": "finding-87f7d2e1b8d869290971f3b9",
+  "finding_text_md5": "969cd7a32c45e04b7de1ced383c517ec",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, A. The firm's SOP No. APS-SOP-0344 \"503B Bulle Formulation and Sealing Process\" states to wipe down all work surfaces and equipment with a clean room wiped that has thoroughly wetted witb [redacted]. However, on 08/20/2019 during the manufacturing of Norepinephrine lmg/ml, Lot# S1900185, an operator was obse1ved not wiping down all work smfaces and equipment with a clean room wipe that has been thoroughly wetted with [redacted] B. The firm's SOP No. APS-SOP-0308 \"503B Syringe Compounding Aseptic Plj°cess\" states to wipe the top seems around the raw syringe container with am (~) cloth. Wipe top of the container [redacted] Wipe bottom of the container( [redacted] making sure to get into crevices. Wipe all four sides of container [redacted] Rotation of the container may be done for better angles to wipe. However, on 08/23/2019 dming the manufacturing ofNeostigmine Methylsulfate 5mg/5ml syringe, Lot# F1900899, an operator was obse1ved wiping the bottom of the container [redacted] with the [redacted] cloth during production in the ISO 5 classified area. 8/19/2019 (Mon), 8/20/2019 (Tue), 8/21/2019 (Wed), 8/22/2019 (Thu), 8/23/2019 (Fri), 8/26/2019 (Mon), 8/28/2019 (Wed)"
+ },
+ {
+  "finding_id": "finding-7e93b7bbbe05f49b125068da",
+  "finding_text_md5": "0ecc540360ef3acf13e4e2fc8b7666f2",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, your firm is utilizing a non-calibrated AND, Model [redacted] balance to weigh active ingredients designated for your firm's non-sterile drug products, therefore lacking assurance if the required amounts are being added to a particular batch."
+ },
+ {
+  "finding_id": "finding-5192776ccecb4e8699209fe9",
+  "finding_text_md5": "c1103bff759a7bb19d278c7b6ce44466",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, on 10/31/18, according to formulation worksheets, your firm produced [redacted] of Chorionic Gonadotropin (HCG) 1,000U/mL Injection, lot #10312018@7, BUD: 3 Days and [redacted] of Cyclosporin (Corn Oil) New 2% Ophthalmic Solution, lot #10312018@ 10, BUD: 3 Days on the same production day without evidence that cleaning was conducted between batches of hazardous drug products. Both lots were released and dispensed. In addition, your firm failed to identify on the formulation worksheets which ISO 5 BSC [redacted] was used for these hazardous drug products."
+ },
+ {
+  "finding_id": "finding-2d036780df7909c0926c0dbc",
+  "finding_text_md5": "3728fdea8e376ec85558bb274830d66c",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, a) A small dead spider and small dead cockroach were observed (7/30/19) on the anteroom floor ( closest to the bench where gowning occurs). b) A colony of dead ants were observed (7/30/19) on [redacted] bag containing sterile stoppers located in the unclassified area (adjacent to the anteroom but separated by a door). c) Colonies of small dead ants and living spiders were observed (7/30/19) on the hallway floors and dead insects observed within the light fixtures leading into the non-sterile suite (where non-sterile drugs are produced)."
+ },
+ {
+  "finding_id": "finding-1980c0560cb23432e8359524",
+  "finding_text_md5": "59f237d35880ebaba8b618cf1aadf957",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, uni-directional airflow was not verified under operational conditions within your firm's [redacted] clean rooms where sterile products are produced."
+ },
+ {
+  "finding_id": "finding-06e7754e4abe6a07a43f2dc8",
+  "finding_text_md5": "1c47330ada29174cb22325694d7ca211",
+  "published_date": "2019-11-12",
+  "detail_text": "Specifically, your firm's Pharmacist was observed (7/31/19) manually stoppering and of the stoppers with his gloved hands to the vials of Methylcobalamin, Smg/mL [redacted] touching the inner surface lot #07312019@1, BUD: 3 Days clean room). On 8/2/19, Rx [redacted] of Methylcobalamin, Smg/mL injection, lot #07312019@1 was released and shipped."
+ },
+ {
+  "finding_id": "finding-f981004bce206fcb2b8efbb1",
+  "finding_text_md5": "10da0ce1d87f676ed7647459669cd8b7",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, a) The area surrounding the ISO 5 [redacted] hoods in all the satellite pharmacies (Medical ICU, PACU, and ED satellite pharmacies) are unclassified. Maimon ides Medical Center - Phar macy 48 02 10t h Avenue, Sub-Basement CITY, STATE. ZIP CODE, COUNTAV TYPE EST ABUSHMENT INSPECTED Brookl yn, NY 11219 Produce r of Steri l e and Non- Ster i le Drug Products b) The ISO 5 [redacted] hood in the ED pharmacy satellite is turned off in the evening [redacted] and is turned on in the morning [redacted] in the morning when the ISO 5 hood is turned on, it is set to run for [redacted] and then subsequently cleaned prior to the start of any compounding operations.:Morning cleaning includes spraying nonsterile [redacted] followed by wiping the hood with nonsterile wipes; then, laying out nonsterile wipes at the base of the hood and pouring sterile water on the wipes, followed by wiping down the hood with the soaked wipes, allowing the hood to dry; and lastly, laying out nonsterile wipes at the base of the hood and pouring sterile [redacted] on the wipes, followed by wiping down the hood with the soaked wipes. Cleaning is peifonned again at the [redacted] in the same manner, excluding the step with [redacted] LIii c) The ISO 7 anteroom and the ISO 7 cleanrooms are not adequately cleaned. Specifically, the ceilings and walls in the ISO 7 classified rooms, as well as the [redacted] between the [redacted] and the [redacted] are not cleaned. The only cleaning that is performed in the sterile compounding area is conducted by an Environmental Worker in the morning and in the evening, who clean the floors, glass windows, and then work surfaces of the ISO 7 anteroom, ISO 7 nonhazardous cleanroom, ISO 7 hazardous cleanroom, and unclassified refrigerator, respectively."
+ },
+ {
+  "finding_id": "finding-f6394218922b0fdc6a0c7ffa",
+  "finding_text_md5": "df25974754dfc0a7c37ef22542eb07ba",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, a) The door separating the [redacted] and [redacted] does not close completely when shut. b) Supplies and finished chemotherapeutic drug products are temporarily stored on a stainless-steel tabletop in the ISO 7 hazardous cleanroom without adequate space or separation. c) The air retum located in the ISO 7 nonhazardous cleanroom is dirty and in disrepair and is blocked by a stainless-steel cart. Maimon ides Medical Center - Phar macy 48 02 10t h Avenue, Sub-Basement CITY, STATE. ZIP CODE, COUNTAV TYPE EST ABUSHMENT INSPECTED Brooklyn, NY 11219 Produce r of Sterile and Non- Ster i le Drug Products"
+ },
+ {
+  "finding_id": "finding-f3894c4d34796d12a5a29146",
+  "finding_text_md5": "08c181633a47896c0a4a535033b88062",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, The cleaning of hazardous drug product is not adequate. Your firm's cleaning between compounded products included only a wipe down of the compounding area/compounding hood witn [redacted]. Your firm could not provide evidence that [redacted] cleaned the hazardous drugs compounded at your firm. Additionally, you could provide no evidence that the detergents used to wash utensils and equipment remove the hazardous drug products you work with. The compounding area/compounding hood, utensils, and equipment are shared amongst all products (both hazardous drugs and non-hazardous drugs) at your pharmacy. Hazardous drugs compounded at your firm include Chloramphenicol, Methimazole, Diethylstibestrol, Leflunomide, Estradiol, Apomorphine, Tretinoin, Oxytocin, Fluconazole, and Finasteride. Your firm did not provide adequate cleaning of the [redacted] hoods used to compound all hazardous drugs and non-hazardous drugs with [redacted] ingredients. On 8/26/20 I9, I observed particle build up on the wires and the power strip located in the back of hood serial number [redacted]. The wires and power strip are kept less than a foot from areas with open containers during compounding. On 8/26/2019, the balance in hood serial number [redacted], which used to weigh [redacted] ingredients for compounding, had a buildup of material. These items were not removed during that day of compounding."
+ },
+ {
+  "finding_id": "finding-e88a8e24a50cc44ea7eb0fbc",
+  "finding_text_md5": "d69baa95a84f98c5158b463adcf411d0",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, on 7/8/19, a chemo pharmacist was observed wearing non-sterile gloves in the ISO 7 hazardous cleanroom while handing another chemo pharmacist supplies in the ISO 5 hazardous [redacted] hood, so that he did not have to remove his gloved hands out of the ISO 5 hood."
+ },
+ {
+  "finding_id": "finding-c7b236d07e4568490879b7c9",
+  "finding_text_md5": "a8563f83e04494e8ce0ce1ea3535a4d0",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, environmental monitoring failures were identified in the following ISO classified areas: a) ISO Class 5, IV [redacted] (in ISO 7 nonhazardous cleamoom), [redacted] media, surface sampling: 1 CFU of Penicillium on 6/ 12/19; b) ISO Class 5, Hood [redacted] (in ISO 7 nonhazardous cleanroom), [redacted] plate, viable air sampling: 1 CFU of Gram-positive rods, performed by [redacted], on 4/ 10/ 19; c) ISO Class 5, Hood [redacted] (in ISO 7 nonhazardous cleanroom), [redacted] plate, viable air sampling: 1 CFU of Micrococcus, performed by [redacted] on 4/10/19; d) ISO Class 5, Hood [redacted] (in ISO 7 nonhazardous cleanroom), plate, viable air sampling: 3 CFU of Bacillus (2 CFU) and Micrococcus (1 CFU), performed by [redacted] on 4/22/19; e) ISO Class 5, ED Hood [redacted] (in ED Satellite Pharmacy), [redacted] plate, viable air sampling: 1 CFU of Micrococcus, performed by [redacted] on 4/15/19; and, t) ISO Class 7, Work cart adjacent to ISO 5 hood (in ISO 7 hazardous cleanroom), [redacted] with [redacted], -media, surface sampling: l CFU of Yeasts on 6/ 12/19. No investigation was performed, and no corrective and/or preventative actions were documented. Maimon ides Medical Center - Phar macy 48 02 10t h Avenue, Sub-Basement CITY, STATE. ZIP CODE, COUNTAV TYPE EST ABUSHMENT INSPECTED Brookl yn, NY 11219 Produce r of Steri l e and Non- Ster i le Drug Products"
+ },
+ {
+  "finding_id": "finding-c60f2f6e93eb5cc6d165c695",
+  "finding_text_md5": "80095b090cf03d628fec83703a221186",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, a) In August 2015, during installation and implementation of your firm 's [redacted] which is used to continuously monitor pressure differentials, temperature, and humidity, three out of the [redacted] of the V2-Differential Pressw·e (V2-DP) Sensors were installed incorrectly, including the following: Input [redacted] (Pharmacy Chemo RM DP [redacted] which measures the pressure differential between the [redacted] and [redacted] Input [redacted] IV ROOM DP), which measures the pressure differential between the [redacted] and [redacted] and, Input [redacted] ANTE ROOM DPl), which measures the pressure differential between the [redacted] and the [redacted] Since implementation of the [redacted] for continuous monitoring of pressure differentials, multiple out-of-specification (OOS) results were observed for the V2-DP Sensors. Additionally, the pressure differential results were OOS during your firm's most recent calibration of the V2-DP Sensors, in December 20 18, except for Input [redacted] ANTE ROOM DP2), which measures the pressure differential between the [redacted] and the [redacted]. There is no documented calibration for Input [redacted] during your firm's most recent calibration of the [redacted] in December 2018 [redacted] No investigation was performed, and no corrective and/or preventative actions were documented. Since implementation of the D 4 for continuous monitoring of pressure differentials, multiple out-of-specification (OOS) results were observed for the V2-DP Sensors. Additionally, the pressure differential results were OOS during your firm's most recent calibration of the V2-DP Sensors, in December 20 18, except for Input 4 tt>H•i ((bl ANTE ROOM DP2), which measures the pressure differential between the [redacted] and the [redacted]. There 1s no documented calibration for Input H•i during your firm's most recent calibration of the 15 4 - in December 2018. -~~-- No investigation was performed, and no corrective and/or preventative act.ions were documented. ~--- b) There are no alarms or alerts activated in the [redacted] when pressure differentials are OO S for any duration of time. --------- c) Pressure differentials are not monitored between the [redacted] and the [redacted]"
+ },
+ {
+  "finding_id": "finding-c3a3c45ba70ea3f599e026bb",
+  "finding_text_md5": "2a990b34e176383d14edfd5e4921f4c1",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, a) On 7/8 /19, I observed a pharmacist in Hood [redacted] (ISO 5 [redacted] hood) in the ISO 7 nonhazardous cleanroom bringing supplies into the hood without disinfecting them. b) On 7/9/19, I observed a pharmacist bringing a saline bag from the counter in the ISO 7 hazardous cleanroom to the ISO 5 [redacted] hood without disinfecting it."
+ },
+ {
+  "finding_id": "finding-be28ee33b7d446c8e155feca",
+  "finding_text_md5": "4b2ab7d54db23d9af52fbe2f500dfd24",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, you use non-sterile, low lint pads to wipe down all drug component containers, packaging materials and production equipment with sterile, [redacted] prior to placing these items into the [redacted] ISO 5 Biological Safety Cabinets (BSCs) and the ISO 5 Laminar Flow Hood (LFH). You also use non­sterile, low lint pads when you perform a \"Surface Safe\" cleaning of each BSC, which includes applying [redacted] disinfectant cleaner to the interior of each BSC. In addition, you use non-sterile, low lint pads when you perform a \"Surface Safe\" cleaning of the LFH, which includes applying non-sterile [redacted] disinfectant to the interior of the LFH."
+ },
+ {
+  "finding_id": "finding-b6697f5580509dbed7bd2d1a",
+  "finding_text_md5": "e8288634c4ee6d7231026ca1e221b0b7",
+  "published_date": "2019-11-05",
+  "detail_text": "Your firm's HEPA certification and smoke studies performed by [redacted] in April 2019, state that all smoke studies were performed under dynamic conditions; however, it does not state what that means. Upon confirmation with your firm's contractor, [redacted] your firm's management stated that [redacted] remembered that the smoke studies were performed while operators were in the room; yet, there is no documentation of the specific conditions that the smoke studies were performed under."
+ },
+ {
+  "finding_id": "finding-a40c7eca6aa11128cd56c6cf",
+  "finding_text_md5": "7214909b6e7eee4140ccfe9208b6dc7f",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, Yo ur firm's Pharmacist-in-Charge left vials of sterile drug product, Human Chorionic Gonadotropin, [redacted] Units, Lot #INX575, Production Date 07/26/2019, inside your [redacted] brand name [redacted] \", model [redacted], pending sterility testing results. Your firm's Pharmacist-In-Charge executes all capping and crimping of all sterile drug products outside of your ISO 5 biosafety cabinet. Your firm caps and crimps sterile drug products in the non-classified area of the general pharmacy."
+ },
+ {
+  "finding_id": "finding-8f2632786884073880d054fa",
+  "finding_text_md5": "b6496b604adeecd807164b673b4348ca",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, beta-lactam drug products are made from sterile commercially-available drug products in ISO 5 [redacted] Hood [redacted] in the ISO 7 nonhazardous cleanroom and not made in the ISO 5 [redacted] hood located in the ISO 7 hazardous cleanroom. Cleaning is performed in between all products using [redacted] and a nonsterile wipe to wipe down the base of the hood only."
+ },
+ {
+  "finding_id": "finding-821afa3891dbc6f71ce9289f",
+  "finding_text_md5": "b6b7051870bb2e86a2cecf30347f683b",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, On 08/27/2019, your firm failed to allow adequate contact times for cleaning agents in your biosafety cabinet, brand name [redacted], model [redacted] serial number [redacted] ISO 5 environment. Your firm's Pharma [redacted] cleaning agent, [redacted] Pharmacist-In-Charge allows for a contact time of [redacted] for your sporicidal rhe manufacturer's recommendations for contact time to achieve sporicidal activity for [redacted] is [redacted]"
+ },
+ {
+  "finding_id": "finding-71378a0548911e8af6f1846f",
+  "finding_text_md5": "a6d0ed5c25ef7c1fc541045fac0710ad",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, a) There are visible indications of the use of damaged, dirty, discolored HEPA filters as observed in nonhazardous ISO <R edacted B4> Hood [redacted], Hood [redacted], and Hood [redacted] as well as, in the ISO 5 [redacted] hood located in the Medical ICU pharmacy satellite. On 7/8/19, I observed multiple orange/brown-tinged rust stains on all four of these hoods. b) Multiple cracks in the top right comer were observed on 7/8/19 in the front glass shield of the ISO 5 [redacted] hood, located in the ISO 7 hazardous cleanroom. c) Cracks in the top of the hood where the light is located in both ISO 5 [redacted] hoods in the Medical ICU satellite pharmacy and the PACU satellite phannacy were observed on 7/9/19. d) Cracks in the floors, wall'>, ceilings, and doors in the ISO 7 hazardous cleanroom ISO 7 nonhazardous cleanroom, and ISO 7 anteroom were observed on 7 /8/ 19. e) On 7/8/19, I observed the stick')' matt, located in the unclassified pharmacy area prior to entrance into the ISO 7 anteroom, to be dirty. The entire matt appeared to be filled with dirt and dust"
+ },
+ {
+  "finding_id": "finding-62c745fe0c7b459dd3539f77",
+  "finding_text_md5": "40a9214c9221ff761597e67f1714fd8d",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, a) The wipes used to disinfect the ISO 5 hoods with [redacted] r J I b) [redacted] is used to clean/disinfect the ISO 5 hoods [redacted] and the ISO 5 IV [redacted] c) [redacted] are used in cleaning of the ISO 5 [redacted] hood in the ISO 7 hazardous cleanroom to deactivate any chemotherapeutic drug residues."
+ },
+ {
+  "finding_id": "finding-5c9a4f42136a8caaad5f2318",
+  "finding_text_md5": "ddd19f2ffa9853f403845aa289949392",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, the design of your facility requires personnel to [redacted] Room, where [redacted] are produced, into the [redacted] Room [redacted] are produced. Production personnel were observed during the inspection producing hazardous drug products in one of the [redacted] BSCs located in Room, and then moving into the -Room to produce non­hazardous drug products in the LFH without changing all of their gowning materials. The design of the facility creates the potential for cross contamination of non-hazardous materials and hazardous materials when personnel Room."
+ },
+ {
+  "finding_id": "finding-460592062b105edb96d07502",
+  "finding_text_md5": "39f7d69ad15d79a99d9b0e7da3b88e0d",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, in the ED satellite pharmacy, the sink is located right across from the ISO 5 [redacted] hood in the unclassified ED satellite pharmacy."
+ },
+ {
+  "finding_id": "finding-42b444930411bd531272ca63",
+  "finding_text_md5": "8ec84c69cc766b6c17a531944106d538",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, On 08/28/2019, your Pharmacist-In-Charge (PIC) failed to properly don the sterile gown and execute proper aseptic technique. While sterile gowning, the firm's Pharmacist-in-Charge allowed his sterile gown's arm sleeves and head hoodie to touch the floor of the anteroom and materials staijing tables in the anteroom. This was prior to the production of Human Chorionic Gonadotropin, [redacted] Units, Lot # SIM580, Production Date 08/28/2019. Your firm's PIC introduced this gown into the ISO 5 biosafety cabinet without disinfecting it. Your firm's PIC placed his head inside the biosafety cabinet during the set up of the repeater pump."
+ },
+ {
+  "finding_id": "finding-40d80d9705fb67346a464727",
+  "finding_text_md5": "ea8d7e22993900353b27211de9f48e66",
+  "published_date": "2019-11-05",
+  "detail_text": "Specifically, a) On 7/8/19, a chemo pharmacist was observed making chemotherapeutic drugs for the Chemo Center with exposed legs. b) Personnel engaged in aseptic processing did not wear protective eyewear. Specifically, on 7/8/19, I observed a chemo pharmacist making chemotherapeutic drug products in the ISO 5 hazardous [redacted] hood without any protective eyewear."
+ }
+]

@@ -4,7 +4,7 @@ name: GRM Deficiency Cases Snapshot Refresh
 # 과 조항·용어 페이지 블록의 정본 `web/data/deficiency_cases.json` 을 다시 뽑는다
 # (deficiency_cases_refresh.py -> 게이트 -> 변경 있을 때만 PR). 사람이 머지한다(자동 머지 없음).
 #
-# ★dispatch 전용 — 원천(PMDA 연차보고서 별첨·MHRA 지적 원자료)은 연 1회 바뀐다. 수집(grm-deficiency-examples.yml)
+# ★dispatch + 번역 정본 push(한국어 칸 채우기 → 스냅샷) — 원천(PMDA 연차보고서 별첨·MHRA 지적 원자료)은 연 1회 바뀐다. 수집(grm-deficiency-examples.yml)
 #   이 새 파일을 적재한 뒤 사람이 돌린다. schedule 은 붙이지 않는다.
 # ★service-role 키를 쓴다 - deficiency_examples(134)는 RLS 로 닫혀 있다(anon 회수, 그대로 둔다).
 #   스냅샷에는 공개 필드만(영어 지적 문장·기관·연도·기관 분류·우리 분류·조항 키 + MHRA 조항 집계).
@@ -13,6 +13,11 @@ name: GRM Deficiency Cases Snapshot Refresh
 #   내용이 같으면(measured_on 만 다름) PR 도 없다.
 
 on:
+  # [지적 사례 한국어 2026-11-11] 번역 정본이 main 에 들어오면 한국어 칸(141)을 채우고 스냅샷을 다시 뽑는다.
+  push:
+    branches: [main]
+    paths:
+      - translations/deficiency_examples_ko.json
   workflow_dispatch:
     inputs:
       max_drop_pct:
@@ -48,6 +53,24 @@ jobs:
           python-version: '3.12'
           cache: pip
       - run: pip install -r requirements.txt
+
+      # 한국어 칸(141) 채우기 — 번역 정본 translations/deficiency_examples_ko.json. 같은 값은 보내지 않는다.
+      # exit 3(남은 행 있음)은 요약에 적고 계속 간다(있는 번역은 화면에 싣는다). 2 = 실패.
+      - name: Apply Korean translations (service-role write)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set +e
+          python deficiency_ko_apply.py | tee "$RUNNER_TEMP/ko-apply.txt"
+          RC=${PIPESTATUS[0]}
+          set -e
+          { echo '### 한국어 칸 채우기'; echo '```'; cat "$RUNNER_TEMP/ko-apply.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$RC" -eq 3 ]; then
+            echo "한국어가 없는 행이 남았습니다(위 remaining)." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$RC" -ne 0 ]; then
+            exit 1
+          fi
 
       # 스크립트가 게이트를 판정한다: 0 = 썼다 · 10 = 변경 없음 · 그 밖 = 실패(파일 무변경).
       - name: Build snapshot (service-role read)

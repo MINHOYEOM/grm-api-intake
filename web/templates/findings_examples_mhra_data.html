@@ -22,12 +22,12 @@
     {% include "partials/deficiency_cases_tabs.html" %}
     <ul class="dc-jump">
       {%- for g in cc.groups %}
-      <li><a href="#{{ g.anchor }}">{{ g.label }} <span>{{ "{:,}".format(g.total) }}</span></a></li>
+      <li><a href="#{{ g.anchor }}">{{ g.label_ko if lang == 'ko' else g.label }} <span>{{ "{:,}".format(g.total) }}</span></a></li>
       {%- endfor %}
     </ul>
 
     {%- for g in cc.groups %}
-    <h2 class="dc-h2" id="{{ g.anchor }}" lang="en">EU GMP {{ g.label }}<small>Critical {{ "{:,}".format(g.critical) }} &middot; Major {{ "{:,}".format(g.major) }} &middot; Other {{ "{:,}".format(g.other) }}</small></h2>
+    <h2 class="dc-h2" id="{{ g.anchor }}"{% if lang != 'ko' %} lang="en"{% endif %}>EU GMP {{ g.label_ko if lang == 'ko' else g.label }}<small>Critical {{ "{:,}".format(g.critical) }} &middot; Major {{ "{:,}".format(g.major) }} &middot; Other {{ "{:,}".format(g.other) }}</small></h2>
     <div class="dc-wrapx"><table class="dc-tbl">
       <thead><tr><th>{{ _('문단') }}</th><th>Critical</th><th>Major</th><th>Other</th><th>{{ _('합계') }}</th><th>{{ _('실사 수') }}</th></tr></thead>
       <tbody>

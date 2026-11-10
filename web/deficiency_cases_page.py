@@ -112,6 +112,9 @@ def validate(data: dict[str, Any]) -> None:
             raise SnapshotError(f"사례 {c.get('id')}: 출처 {c.get('src')} 없음")
         if c.get("agency") not in ("PMDA", "MHRA") or not str(c.get("text") or "").strip():
             raise SnapshotError(f"사례 {c.get('id')}: 기관/본문")
+        for f in ("text_ko", "acat_ko"):
+            if f in c and not isinstance(c[f], str):
+                raise SnapshotError(f"사례 {c.get('id')}: {f} 형식")
     for r in data.get("clause_counts") or []:
         if not _EU_KEY.match(str(r.get("key") or "")):
             raise SnapshotError(f"조항 키 형식: {r.get('key')!r}")
@@ -144,6 +147,8 @@ def _cat_labels(labels: "dict[str, tuple[str, str]]", code: str, lang: str) -> s
 
 def _case_row(c: dict[str, Any], src: dict[str, Any], labels, lang: str, cap: int) -> dict[str, Any]:
     text, cut = clip(c["text"], cap)
+    # 한국어(141 statement_ko → 스냅샷 text_ko)는 ko 트리에만 싣는다. 원문은 그대로 함께 낸다.
+    text_ko, cut_ko = clip(str(c.get("text_ko") or ""), cap) if lang == "ko" else ("", False)
     loc = str(c.get("loc") or "")
     if c["agency"] == "PMDA":
         ref = f"No.{c['no']}" if c.get("no") else ""
@@ -153,7 +158,9 @@ def _case_row(c: dict[str, Any], src: dict[str, Any], labels, lang: str, cap: in
         "id": c["id"],
         "agency": c["agency"],
         "text": text,
-        "cut": cut,
+        "cut": cut or cut_ko,
+        "text_ko": text_ko,
+        "acat_ko": " ".join(str(c.get("acat_ko") or "").split()) if lang == "ko" else "",
         "year": year_label(c.get("year") or src.get("year"), src.get("year_basis", "calendar")),
         "ref": ref,
         "acat": " ".join(str(c.get("acat") or "").split()),
@@ -202,6 +209,7 @@ def cases_view(snap: "dict[str, Any] | None", agency: str,
         "rows": rows,
         "total": len(rows),
         "cut": sum(1 for r in rows if r["cut"]),
+        "ko_rows": sum(1 for r in rows if r["text_ko"]),
         "cats": cats,
         "years": years,
         "files": files,
@@ -221,6 +229,14 @@ def _para_sort(para: str) -> tuple:
     return tuple((0, int(p)) if p.isdigit() else (1, p) for p in re.split(r"(\d+)", para or "") if p)
 
 
+def eu_label_ko(key: str) -> str:
+    """'EU GMP Chapter 4' → '제4장' · 'EU GMP Annex 15' → '부속서 15'(ko 트리 표기). 형식 밖이면 원문."""
+    m = _EU_KEY.match(key or "")
+    if not m:
+        return (key or "").replace("EU GMP ", "")
+    return f"제{int(m[2])}장" if m[1] == "Chapter" else f"부속서 {int(m[2])}"
+
+
 def clause_counts_view(snap: "dict[str, Any] | None") -> "dict[str, Any] | None":
     """조항(장·부속서) → 문단별 등급 횟수. 횟수 = 그 문단이 지적에 인용된 행 수(원천 행 1개 = 1회)."""
     if not snap or not snap.get("clause_counts"):
@@ -228,6 +244,7 @@ def clause_counts_view(snap: "dict[str, Any] | None") -> "dict[str, Any] | None"
     groups: dict[str, dict[str, Any]] = {}
     for r in snap["clause_counts"]:
         g = groups.setdefault(r["key"], {"key": r["key"], "label": r["key"].replace("EU GMP ", ""),
+                                         "label_ko": eu_label_ko(r["key"]),
                                          "anchor": r["key"].replace("EU GMP ", "").lower().replace(" ", "-"),
                                          "critical": 0, "major": 0, "other": 0, "rows": []})
         row = {"para": r.get("para") or "", "critical": int(r.get("critical") or 0),

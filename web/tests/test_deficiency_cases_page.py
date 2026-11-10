@@ -37,6 +37,9 @@ LABELS = {"data_integrity": ("데이터 완전성", "Data integrity"),
           "deviation_capa": ("일탈·CAPA", "Deviation and CAPA"),
           "documentation_records": ("문서·기록", "Documentation and records")}
 
+KO_FRESH = "HPLC 시스템의 감사 추적을 출하 전에 검토하지 않았다."
+KO_STALE = "낡은 번역 — 화면에 나오면 안 된다"
+
 FILLER = ("the procedure for the operation was not defined and the records did not show who "
           "performed the step or when it was reviewed by the responsible person ")
 
@@ -76,7 +79,11 @@ def raw_data(*, scale: bool = True):
                      "lang": "en", "locator": f"Sheet1!R{i + 5}", "item_no": str(i),
                      "statement": _text(i, n_chars, lead), "agency_category": "Documents and records",
                      "grade": "", "site_group": "", "clause_keys": keys, "clauses": [],
-                     "grm_category": cat, "context": "BACKGROUND MUST NOT LEAK"})
+                     "grm_category": cat, "context": "BACKGROUND MUST NOT LEAK",
+                     # 141 한국어 칸: 1번 = 유효한 번역, 2번 = 원문이 바뀐 낡은 번역(싣지 않는다)
+                     "content_hash": "c" * 64, "agency_category_ko": "문서 및 기록",
+                     "statement_ko": KO_FRESH if i == 1 else (KO_STALE if i == 2 else ""),
+                     "ko_source_hash": "c" * 64 if i == 1 else ("d" * 64 if i == 2 else "")})
     rows.append({"source_key": "pmda:000283020", "row_no": 999, "agency": "PMDA", "year": 2025,
                  "lang": "en", "locator": "Sheet1!R999", "item_no": "99",
                  "statement": "데이터 한글이 섞인 행", "agency_category": "", "grade": "",
@@ -307,6 +314,25 @@ class ViewTest(unittest.TestCase):
         self.assertEqual({p["url"] for p in dcp.CREDIT["PMDA"]["pages"]}, set(cde.PMDA_INDEX.values()))
         self.assertEqual([p["url"] for p in dcp.CREDIT["MHRA"]["pages"]], [cde.MHRA_INDEX])
 
+    def test_korean_only_when_hash_matches_and_only_in_ko_tree(self):
+        by_id = {c["id"]: c for c in self.snap["cases"]}
+        fresh = next(c for c in by_id.values() if c["no"] == "1")
+        stale = next(c for c in by_id.values() if c["no"] == "2")
+        self.assertEqual(fresh["text_ko"], KO_FRESH)
+        self.assertNotIn("text_ko", stale, "content_hash 가 바뀐 행의 번역은 싣지 않는다")
+        self.assertEqual(fresh["acat_ko"], "문서 및 기록")
+        ko = {r["ref"]: r for r in dcp.cases_view(self.snap, "PMDA", LABELS, "ko")["rows"]}
+        en = {r["ref"]: r for r in dcp.cases_view(self.snap, "PMDA", LABELS, "en")["rows"]}
+        self.assertEqual(ko["No.1"]["text_ko"], KO_FRESH)
+        self.assertEqual(ko["No.1"]["acat_ko"], "문서 및 기록")
+        self.assertEqual((en["No.1"]["text_ko"], en["No.1"]["acat_ko"]), ("", ""))
+        self.assertEqual(dcp.cases_view(self.snap, "PMDA", LABELS, "ko")["ko_rows"], 1)
+
+    def test_eu_label_ko(self):
+        self.assertEqual(dcp.eu_label_ko("EU GMP Chapter 4"), "제4장")
+        self.assertEqual(dcp.eu_label_ko("EU GMP Annex 15"), "부속서 15")
+        self.assertEqual(dcp.clause_counts_view(self.snap)["groups"][0]["label_ko"], "제1장")
+
     def test_validate_rejects_broken(self):
         bad = json.loads(json.dumps(self.snap))
         bad["cases"][0]["src"] = "pmda:nope"
@@ -370,6 +396,17 @@ class RenderedPagesTest(unittest.TestCase):
             body = self._main(self.page("en", "findings", "examples", route, "index.html"))
             m = HANGUL.search(body)
             self.assertIsNone(m, m and body[max(0, m.start() - 80):m.start() + 40])
+
+    def test_ko_page_shows_korean_with_original(self):
+        pm = self._main(self.page("findings", "examples", "pmda", "index.html"))
+        self.assertIn(f'<p class="dc-ko">{KO_FRESH}</p><blockquote class="dc-orig" lang="en">'
+                      "The audit trail of the HPLC system", pm)
+        self.assertNotIn(KO_STALE, pm)
+        self.assertIn("생성형 AI 번역", pm)
+        en = self._main(self.page("en", "findings", "examples", "pmda", "index.html"))
+        self.assertNotIn('class="dc-ko"', en)
+        mh = self._main(self.page("findings", "examples", "mhra-data", "index.html"))
+        self.assertIn("EU GMP 제1장", mh)
 
     def test_inline_script_has_no_korean_and_bar_hidden(self):
         html = self.page("findings", "examples", "pmda", "index.html")

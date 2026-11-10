@@ -263,7 +263,7 @@ def _extract_date_iso(result: dict) -> str:
 
 
 def _extract_snippet(result: dict) -> str:
-    """검색 결과에서 최적 snippet 추출 (200자 이하).
+    """검색 결과에서 최적 snippet 추출 (전문 저장, 절단 없음).
     extra_snippets가 있으면 가장 긴 것 선택, 없으면 description 사용.
     """
     extra = result.get("extra_snippets", [])
@@ -271,9 +271,9 @@ def _extract_snippet(result: dict) -> str:
         # 가장 정보량이 많은 snippet 선택 (길이 기준)
         best = max(extra, key=len, default="")
         if best:
-            return truncate(best.strip(), 200)
+            return best.strip()
     desc = result.get("description", "")
-    return truncate(desc.strip(), 200)
+    return desc.strip()
 
 
 # ─────────────────────────────────────────────────────────────────────────────

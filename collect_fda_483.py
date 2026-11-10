@@ -2726,10 +2726,10 @@ def _to_item(nrow: dict[str, str], excerpt: str,
         source=SOURCE_FDA_483,
         document_id=f"fda483-{media_id}",            # media id 안정 → dedup
         date_iso=publish_iso,                        # 공개일(윈도우·카드 발행일)
-        headline=f"[{label}] {company or media_id}"[:240],
+        headline=f"[{label}] {company or media_id}",
         official_url=pdf_url,                        # 건별 483 PDF (per-item L1)
         type_or_class=type_or_class,
-        firm=company[:200],
+        firm=company,
         body=body,
         api_query=OII_READING_ROOM_URL,
         qa_relevance=relevance,

@@ -1,0 +1,352 @@
+[
+  {
+    "finding_id": "finding-4353df773b1e4175f04f74f0",
+    "finding_text_md5": "06889d96c9300f8aea5aa36254b295b6",
+    "published_date": "2026-11-05",
+    "detail_text": "Specifically, You have not established a written procedure for testing of objectionable organisms in [redacted] water that is used in the production process of APIs that are used for the manufacturing of [redacted] drug products. For example, [redacted] APT is used in [redacted] drug products.",
+    "detail_text_ko": "구체적으로, 귀사는 [redacted] 의약품 제조에 쓰이는 APIs의 생산 공정에 사용하는 [redacted] 용수의 유해 미생물 시험에 대한 서면 절차를 수립하지 않았다. 예를 들어, [redacted] APT는 [redacted] 의약품에 사용된다."
+  },
+  {
+    "finding_id": "finding-1db2abaeead90e3b9cbdd9cf",
+    "finding_text_md5": "2ea803084bd0df2b18d12f6534155110",
+    "published_date": "2026-11-05",
+    "detail_text": "Specifically, you failed to properly maintain the equipment inside the ISO 5 classified areas of your [redacted] Compounding Systems. During the inspection of the [redacted] systems located in [redacted] Room Suite [redacted] Room Number [redacted] the following conditions were observed: 1. On 09/09/2026, what appeared to be rust and chipping paint was observed at the fixed base of the [redacted] inside the ISO 5 classified area of [redacted], and at the junction between the fixed base and rotating section of the [redacted]. In addition, on 09/10/2026, a reddish-colored seal at the base of the [redacted] appeared to have been coated with paint after the base was repainted. 2. On 09/09/2026, what appeared to be extensive rust and chipping paint was observed at the fixed base of the [redacted] inside the ISO 5 classified area of [redacted], including significant deterioration and corrosion at the junction where the [redacted]. In addition, on 09/10/2026, a reddish-colored seal at the base of the [redacted] appeared to have been coated with paint after the base was repainted. On 09/09/2026, you were observed manufacturing Oxytocin 30U into 500mL 0.9% NaCl IV Bags, Lot_# [redacted] OXYT3020260909, in both [redacted] and [redacted]. In addition, from 08/24/2026 to 08/26/2026, [redacted] were used to perform sterile manufacturing operations for: Hepar.in Sodium 5000U into 500mL 0.9% NaCl IV Bags, Lot # HEPA500020260824, and Phenylephrine HCL 40mg into 250mL 0.9% NaCl IV Bags, Lot #s PHEN4020260824, PHEN4020260825 and PHEN4020260826. ·..----------~",
+    "detail_text_ko": "구체적으로, 귀사는 [redacted] 조제 시스템의 ISO 5 등급 구역 내부 장비를 적절하게 유지관리하지 않았다. [redacted] 실 구역 [redacted] 실 번호 [redacted]에 위치한 [redacted] 시스템 실사 중 다음 상태가 관찰되었다: 1. 09/09/2026에 [redacted]의 ISO 5 등급 구역 안 [redacted]의 고정 받침대와 [redacted]의 고정 받침대와 회전부 사이 접합부에서 녹과 벗겨지는 도료로 보이는 것이 관찰되었다. 또한 09/10/2026에 [redacted] 받침대의 붉은색 밀봉재는 받침대를 재도장한 후 도료로 덮인 것으로 보였다. 2. 09/09/2026에 [redacted]의 ISO 5 등급 구역 안 [redacted] 고정 받침대에서 광범위한 녹과 벗겨지는 도료로 보이는 것이 관찰되었으며, [redacted] 접합부의 심한 열화와 부식도 포함되었다. 또한 09/10/2026에 [redacted] 받침대의 붉은색 밀봉재는 받침대를 재도장한 후 도료로 덮인 것으로 보였다. 09/09/2026에 귀사가 [redacted]와 [redacted] 양쪽에서 Oxytocin 30U를 500mL 0.9% NaCl IV 주입백에 넣어 제조하는 것이 관찰되었다. 로트_# [redacted] OXYT3020260909이다. 또한 08/24/2026부터 08/26/2026까지 [redacted]는 다음 무균 제조 작업에 사용되었다: Hepar.in Sodium 5000U를 500mL 0.9% NaCl IV 주입백에 넣는 작업, 로트 # HEPA500020260824 및 Phenylephrine HCL 40mg을 250mL 0.9% NaCl IV 주입백에 넣는 작업, 로트 #s PHEN4020260824, PHEN4020260825 및 PHEN4020260826. ·..----------~"
+  },
+  {
+    "finding_id": "finding-050b9723ad7717fc79d76b8a",
+    "finding_text_md5": "a8155f4c320f85b532dcf50407936bd9",
+    "published_date": "2026-11-05",
+    "detail_text": "Your process validation studies for PUM do not show the critical process parameters that were going to be studied, review of batch records shows that the validation study did not include variation of parameters within the established ranges. In addition parameters such as the timer used to control the flow inhl: not defined as critical process parameters.",
+    "detail_text_ko": "귀사의 PUM 공정 밸리데이션 연구에는 연구할 예정이었던 중요 공정 변수가 나타나 있지 않으며, 배치 기록서를 검토한 결과 밸리데이션 연구에 설정된 범위 내 변수 변화가 포함되지 않았다. 또한 유량 제어에 사용되는 시간 조절기와 같은 변수는 inhl: 중요 공정 변수로 정의되지 않았다."
+  },
+  {
+    "finding_id": "finding-ffcf748bf47e87a1c8d73124",
+    "finding_text_md5": "40cbaf781b0c7e11ae8e9f5f5b046a44",
+    "published_date": "2026-10-30",
+    "detail_text": "a. Disinfectant effectiveness studies have not been performed for the sanitizing agents routinely utilized in the manufacturing facility. b. The procedures established and followed for cleaning the facility are inadequate; for example. i. Procedure GMP-SOP-060 is deficient in that it does not describe in detail the process for cleaning the [redacted] POY) YBSC: specifically, during observation of the simulated manufacturing operations, we noted the following: a) the operators cleaned the whole BSC with one surface ofa disposable sterile [redacted] pad using an [redacted] mop. b) the cleaning solution was dry before the {) [redacted]) set time required in the procedure. c) one wipe was used multiple times for wiping several items before placing them in the BSC. ii. Procedure GMP-SOP-066, includes two different procedures for cleaning the (SYA) incubator even though only one procedure is used at the facility. iii. Procedure GMP-SOP-006 states that [redacted] cleaning is required for the cleanrooms (floors and surfaces) even though the production room and supportive areas are used [redacted] for manufacturing product lots. iv. The cleaning ofthe passthroughs is not performed before or after use. It is cleaned— [redacted].",
+    "detail_text_ko": "a. 제조 시설에서 일상적으로 사용하는 위생 처리제에 대해 소독제 유효성 연구를 수행하지 않았다. b. 시설 세척을 위해 수립하고 따르는 절차가 부적절하다. 예를 들어. i. 절차 GMP-SOP-060은 [redacted] POY) YBSC 세척 과정을 상세히 설명하지 않아 미흡하다: 구체적으로 모의 제조 작업 관찰 중 다음을 확인했다: a) 작업자는 [redacted] 밀대를 사용하여 일회용 멸균 [redacted] 패드의 한쪽 면으로 BSC 전체를 세척했다. b) 세척액은 절차에서 요구하는 {) [redacted]) 설정 시간 전에 말랐다. c) 여러 물품을 BSC에 넣기 전 닦을 때 닦개 하나를 여러 번 사용했다. ii. 절차 GMP-SOP-066에는 시설에서 한 가지 절차만 사용하는데도 (SYA) 배양기 세척에 대한 두 가지 절차가 포함되어 있다. iii. 절차 GMP-SOP-006에는 생산실과 지원 구역을 제품 로트 제조에 [redacted] 사용하는데도 청정실(바닥과 표면)에 [redacted] 세척이 필요하다고 명시되어 있다. iv. 물품 전달함은 사용 전후에 세척하지 않는다. 세척은— [redacted] 한다."
+  },
+  {
+    "finding_id": "finding-fdbcbd53060b5fd9b2178cac",
+    "finding_text_md5": "d37b5fd6c5682114060f335f689eee73",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, a. Cleanroom recovery tests do not support‘your dela for differential pressure alarms contained in the building management system (BMS) [redacted] Specifically, you retain a delay setting for differential pressure alarms of [redacted] _despite the cleanroom installation and operational qualification (IOQ) demonstrating a much more rapid room recovery time (e.g., the IOQ for clean room suite, (4) recovers in less than or equal to [redacted] |). Thus, the differential pressures failures in areas used to manufacture [redacted] drug substance are not investigated. b. The Air Handling Unit (AHU) covers the Grade [redacted] and the Grade) [redacted] However, the qualification failed to evaluate all rooms supplied by For example, Rooms and [redacted] |were not included in the cleanroom qualification. Therefore, there is insufficient data to demonstrate that these rooms are ina state of control. c. Diagrams supporting airflow into cleanrooms are deficient. For example, document H-01-000- 621 in support of airflow of cleanroom suite} 4) does not demonstrate a scientifically founded air balance. Thus, the documentation does not support adequate airflow suitable for supporting the respective cleanroom.",
+    "detail_text_ko": "구체적으로, a. 청정실 회복 시험은 건물 관리 시스템(BMS) [redacted]에 포함된 차압 경보에 대한 귀사의 dela를 뒷받침하지 않는다. 구체적으로, 청정실 설치 및 운전 적격성평가(IOQ)에서 훨씬 빠른 실내 회복 시간(예: 청정실 구역의 IOQ, (4)는 [redacted] | 이하로 회복)을 입증했음에도 귀사는 차압 경보의 지연 설정을 [redacted] _유지하고 있다. 따라서 [redacted] 원료의약품 제조에 사용하는 구역의 차압 실패를 조사하지 않는다. b. 공기조화기(AHU)는 등급 [redacted]와 등급) [redacted]를 담당한다. 그러나 적격성평가에서 공급받는 모든 실을 평가하지 않았다. 예를 들어, 실 및 [redacted] |는 청정실 적격성평가에 포함되지 않았다. 따라서 이들 실이 관리 상태임을 입증하는 자료가 불충분하다. c. 청정실로의 기류를 뒷받침하는 도면이 미흡하다. 예를 들어, 청정실 구역} 4)의 기류를 뒷받침하는 문서 H-01-000- 621은 과학적 근거가 있는 공기 수지를 입증하지 않는다. 따라서 문서는 해당 청정실을 지원하기에 적합한 기류를 뒷받침하지 않는다."
+  },
+  {
+    "finding_id": "finding-f3a9b916a3f186b546f85c47",
+    "finding_text_md5": "0200bfcec352ce86574daa761852eac8",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, Your firm does not perform an [redacted] inspection ofyour reserve/retain samples for Shingrix vaccine. Adverse drug experiences which are both serious and unexpected have not been reported to FDA within 15 calenda days of initial receipt of the information by your firm. Specifically, A. A total of eighty-four (84) 15-Day Alert reports were reported late (after 15 days) for Shingrix Vaccine (BLA125614). Example of the 15-Day alert reports submitted late to the FDA include but are not limited tq the following cases: Case ID Initial GSK Receipt [Initial Date Submitted to [Number of Calendar Date FDA Days Late r (by 4) pay 2023 (yay 2024 [redacted] 2023 b) (4) 2024) b) (4)2023 b) (4) 2023; [redacted] b) (4) 2023 y2023 b) (4) 2023 a) 2023 bs SSC*d (bya) (8) 4) 2023)(4) 2024 B. Your firm failed to assign, initiated, and implemented corrective and preventative actions (CAPAs) at an appropriate time to prevent future reoccurrence of late 15-Day Alert reports.",
+    "detail_text_ko": "구체적으로, 귀사는 Shingrix 백신의 보관 검체에 대해 [redacted] 검사를 수행하지 않는다. 중대하면서 예상하지 못한 약물이상사례를 귀사가 정보를 최초 수령한 후 15일 이내에 FDA에 보고하지 않았다. 구체적으로, A. Shingrix 백신(BLA125614)에 대한 총 여든네(84)건의 15일 신속 보고가 지연 보고되었다(15일 후). FDA에 늦게 제출한 15일 신속 보고의 예에는 다음 사례가 포함되며 이에 국한되지 않는다: 사례 ID GSK 최초 수령 [최초 FDA 제출 일자 [지연 일수 일자 FDA 일수 지연 r (by 4) pay 2023 (yay 2024 [redacted] 2023 b) (4) 2024) b) (4)2023 b) (4) 2023; [redacted] b) (4) 2023 y2023 b) (4) 2023 a) 2023 bs SSC*d (bya) (8) 4) 2023)(4) 2024 B. 귀사는 향후 15일 신속 보고 지연의 재발을 방지하기 위해 적절한 시점에 시정 및 예방 조치(CAPAs)를 배정, 개시 및 이행하지 않았다."
+  },
+  {
+    "finding_id": "finding-f09dd1d9f55a6df1f5c1a733",
+    "finding_text_md5": "d3dcfac7d8a81b1a92215199b811c506",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, lab methods not adequately performed or scientifically valid to produce accurate results, for example: f. On 10 SEP 2024, we observed [redacted] used in bioburden testing circumferentially taped to reportedly prevent drying of [redacted]. This practice is not included in the written instructions #12-04-03-001, SOLUTION BIOBURDEN TESTING. Additionally, the growth promotion testing (Protocol # [redacted] |202023F27 rev A, dated 18 APR 2024) does not include the practice of completely [redacted] g. [redacted] study b)(4 dated 3 AUG 2016) using! [redacted] |of multiple representative surfaces such as [redacted] —_|and others shows recoveries between Mota) for b)(4 These, [redacted] _|with| [redacted] are used to sample product} [redacted] |surfaces such as b)(4. Your [redacted] |Lab supervisor stated there is no correction factor used in reporting routine monitoring with this method. h. ObservedFe [with aberrantmissing pattern of growth around b)(4) where instrument is heated by (4) and used to b)(4 creating inaccurate total bioburden counts. This| [redacted] |is documented with total count) [redacted] ( [redacted] unitlot# [redacted] i. Bioburden| [redacted] |for batch # b)(4 was observed with total count documented as [redacted] |. One of two technicians counted where counts are more than 10 different, SOP # MA-02-02-062 revE instructs to notify a supervisor, but no additional action was taken. This| (4) |was not counted for all! [redacted] but instead split into —(by(4) j. Written procedure (SOP #MA-02-02-062 rev E) is not followed to indicate “TNTC” ar counting of bioburden using methods where colonies are found above Solution bioburden test method is applicable to Blood Pack Units, Alyx, Intersol, and Amicus Products. pee |e",
+    "detail_text_ko": "구체적으로, 시험 방법을 적절하게 수행하지 않거나 정확한 결과를 얻기에 과학적으로 타당하지 않다. 예를 들어: f. 2024년 9월 10일(10 SEP 2024)에 실사관은 바이오버든 시험에 사용하는 [redacted]의 둘레에 테이프를 붙인 것을 관찰했으며, 이는 [redacted]의 건조를 방지하기 위한 것이라고 설명되었다. 이 관행은 서면 지침 #12-04-03-001, 용액 바이오버든 시험(SOLUTION BIOBURDEN TESTING)에 포함되지 않는다. 또한 발육촉진 시험(계획서 # [redacted] |202023F27 개정 A, 2024년 4월 18일(18 APR 2024)자)에는 완전히 [redacted] 하는 관행이 포함되지 않는다. g. [redacted] 연구 b)(4 2016년 8월 3일(3 AUG 2016)자)는 [redacted] —_| 및 기타 표면과 같은 여러 대표 표면의! [redacted] |를 사용하여 b)(4에 대해 Mota) 사이의 회수율을 보여준다. 이 [redacted] _|와| [redacted]는 b)(4와 같은 제품} [redacted] |표면의 검체 채취에 사용된다. 귀사의 [redacted] |시험실 책임자는 이 방법으로 일상 모니터링을 보고할 때 보정계수를 사용하지 않는다고 말했다. h. ObservedFe [성장 양상이 비정상적으로 누락된 것을 관찰했으며 b)(4) 주변에서 기구를 (4)로 가열하고 b)(4에 사용하여 총 바이오버든 수가 부정확해졌다. 이| [redacted] |는 총 계수) [redacted] ( [redacted] 단위 로트# [redacted]로 기록되어 있다. i. 배치 # b)(4의 바이오버든| [redacted] |는 총 계수가 [redacted] |로 기록된 것이 관찰되었다. 두 시험원 중 한 명이 계수했으며 계수 차이가 10을 초과하는 경우 SOP # MA-02-02-062 개정 E는 책임자에게 알리도록 지시하지만 추가 조치는 없었다. 이| (4) |는 모든! [redacted]를 계수하지 않고 대신 —(by(4)로 나누었다. j. 집락이 위에서 발견되는 방법으로 바이오버든을 계수할 때 “TNTC”를 표시하는 서면 절차(SOP #MA-02-02-062 개정 E)를 따르지 않는다 ar. 용액 바이오버든 시험법은 Blood Pack Units, Alyx, Intersol 및 Amicus 제품에 적용된다. pee |e"
+  },
+  {
+    "finding_id": "finding-ebee02a9b4fdc2154f6ae028",
+    "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, Risk assessments have failed to adequately evaluate cross-contamination risks in these laboratories where testing occurs for [redacted] containing products, as follows: The sterility laboratory, located within the [redacted] building [redacted] performs both internal and contracted sterility testing for both [redacted] products. The QC Microbiology Laboratory is located in the [redacted] section of [redacted] Building. This laboratory performs both internal and contracted testing, including environmental monitoring and solution bioburden testing, in the same laboratory where [redacted] samples are also processed. B. The oversight by the Quality Control (QC) unit is deficient in that there is no written procedure defining the roles and responsibilities of QC and R&D, including QC’s responsibility for reviewing, evaluating, and approving test results generated by R&D laboratories, who perform testing of commercial product. There are) [redacted] R&D personnel who currently execute and approve confirmatory testing for the detection of [redacted] in environmental samples collected from [redacted] your own GMP areas, as well those you collect from manufacturing suites of the co-located firm, who manufactures commercial drug product.",
+    "detail_text_ko": "구체적으로, 위해평가는 다음과 같이 [redacted] 함유 제품 시험을 수행하는 이들 시험실의 교차오염 위험을 적절하게 평가하지 못했다: [redacted] 건물 [redacted] 내 무균 시험실은 양쪽 [redacted] 제품에 대해 사내 및 수탁 무균 시험을 모두 수행한다. QC 미생물 시험실은 [redacted] 건물의 [redacted] 구획에 위치한다. 이 시험실은 [redacted] 검체도 처리하는 동일 시험실에서 환경 모니터링과 용액 바이오버든 시험 등 사내 및 수탁 시험을 수행한다. B. 상업용 제품을 시험하는 R&D 시험실이 생성한 시험 결과를 검토, 평가 및 승인하는 QC의 책임을 포함하여 QC와 R&D의 역할과 책임을 정의한 서면 절차가 없어 품질관리(QC) 부서의 감독이 미흡하다. 현재) [redacted]명의 R&D 직원이 귀사 자체 [redacted] GMP 구역과 상업용 의약품을 제조하는 동일 부지 업체의 제조 구역에서 채취한 환경 검체에서 [redacted] 검출 확인 시험을 수행하고 승인한다."
+  },
+  {
+    "finding_id": "finding-e70173f27930270674b7d852",
+    "finding_text_md5": "79aa4276f01eb67819861233494517e0",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, im =e [redacted] currently appliedto|.. _—_|used within the manufacturing and QC areas. In 2017, your firm used data provide by the vendor to support the vo You did not: conduct your own validation to support the assigned expiry. For example, you did not demons tate|- while being used by your personnel following your manufacturing procedure within your facilities, can remain sterile at thewm XY. ss TF",
+    "detail_text_ko": "구체적으로, im =e [redacted]는 현재 제조 및 QC 구역 내에서 사용하는|.. _—_|에 적용된다. 2017년에 귀사는 공급업체가 제공한 자료를 사용하여 vo를 뒷받침했다. 귀사는 지정한 사용기한을 뒷받침하는 자체 밸리데이션을 수행하지 않았다. 예를 들어 귀사는 입증하지 않았다|- 귀사의 시설 내에서 직원이 귀사의 제조 절차에 따라 사용하는 동안 thewm XY에서 무균 상태를 유지할 수 있는지. ss TF"
+  },
+  {
+    "finding_id": "finding-e4a1f5c336562ea1e6cc55df",
+    "finding_text_md5": "7fb2f52f2bf338684446a950e3fbdfd3",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, a. GMP-SOP-060, “Operation and Maintenance ofthe! (BY (4) Biosafety Cabinet”, dated July 29, 2019, states certification is performed every |) [redacted] 9 for every BioSafety Cabinet (BSC). Section 8.11.3 of GMP-SOP-060, states the airflow velocity, aerosol leak, airflow smoke pattern, light intensity at work surface, and particle counts are certified using standards traceable to the NIST, but does not include the acceptance criteria. Additionally. the acceptance criteria for airflow uniformity was not specified but was calculated in the most recent Bsc (Dyan certification, dated April 16, 2019. b. The Bsc System Qualification Summary Report (GMP-2019-025-E), dated March 25, 2019, Ongoing Monitoring, did not include acceptance criteria for Airflow Velocity and Airflow Uniformity, which were calculated in the supporting Bsc. [redacted] Testing Results from October 2018.",
+    "detail_text_ko": "구체적으로, a. 2019년 7월 29일자 GMP-SOP-060, “the! (BY (4) 생물안전작업대의 운전 및 유지관리”에는 각 생물안전작업대(BSC)에 대해 |) [redacted] 9마다 인증을 수행한다고 명시되어 있다. GMP-SOP-060의 8.11.3항에는 기류 속도, 에어로졸 누설, 기류 연기 양상, 작업 표면 조도 및 입자 수를 NIST 소급성 표준으로 인증한다고 명시되어 있으나 허용 기준은 포함하지 않는다. 또한 기류 균일성 허용 기준을 명시하지 않았으나 가장 최근인 2019년 4월 16일자 Bsc (Dyan 인증에서 계산했다. b. 2019년 3월 25일자 Bsc 시스템 적격성평가 요약 보고서(GMP-2019-025-E), 지속 모니터링에는 2018년 10월의 근거 Bsc. [redacted] 시험 결과에서 계산한 기류 속도와 기류 균일성의 허용 기준이 포함되지 않았다."
+  },
+  {
+    "finding_id": "finding-dfd369353aca9fe58e9d5f01",
+    "finding_text_md5": "bd42ce06697725b50b5b1e54d254f1b2",
+    "published_date": "2026-10-30",
+    "detail_text": "Lack of oversight of a sterilization firm: Sterilization of CellTrans equipment is not performed according to the validated process. Specifically, it was found that the ith CellTrans equipment and other hospital equipment based on [redacted] and available e validation report only describes load items from CellTrans. Sterilization load can be re-sterilized, however only documented final sterilization information is forwarded to CellTrans, initial failed or incomplete runs are not required to be reported to CellTrans as of this inspection.",
+    "detail_text_ko": "멸균 업체에 대한 감독 부족: CellTrans 장비의 멸균을 밸리데이션된 공정에 따라 수행하지 않는다. 구체적으로, ith CellTrans 장비 및 기타 병원 장비가 [redacted] 및 이용 가능한 e에 근거한 것으로 확인되었으며 밸리데이션 보고서는 CellTrans의 적재 물품만 기술한다. 멸균 적재물을 재멸균할 수 있으나 문서화된 최종 멸균 정보만 CellTrans에 전달하며, 이번 실사 시점에 최초 실패 또는 미완료 운전을 CellTrans에 보고할 의무는 없다."
+  },
+  {
+    "finding_id": "finding-dd66f1a7cc88bdcc1996dd3e",
+    "finding_text_md5": "b6273ad6487109309f02470a867db9dd",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, batch records for aseptic process simulation do not adequately describe steps to fully simulate manufacturing processes for cell therapy products. APS protocol #QA -00214 rev 6 (b) executed in Januaiy 2024 1 does not include a specific step for placing units (4) as is done for commercial production.",
+    "detail_text_ko": "구체적으로, 무균 공정 모의시험의 배치 기록서에는 세포치료제 제조 공정을 완전히 모사하기 위한 단계가 적절하게 기술되어 있지 않다. 2024년 1월 1에 수행한 APS 계획서 #QA -00214 개정 6 (b)에는 상업 생산에서 수행하는 것처럼 단위를 (4)에 넣는 특정 단계가 포함되지 않는다."
+  },
+  {
+    "finding_id": "finding-d816d4255ce6f0f78ef2fd75",
+    "finding_text_md5": "65a3fcb75689153d7eedd5a25f12b042",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, seal leaks were found.on the final container bottle head tubing ofthree DS batches (Batch # [redacted], (4), and [redacted] after sealing (NNN) [redacted] NN. FAD! OVEFIS)",
+    "detail_text_ko": "구체적으로, DS 배치 세 건(배치 # [redacted], (4) 및 [redacted]의 최종 용기 병 상부 관에서 밀봉(NNN) [redacted] NN 후 밀봉 누설이 발견되었다. FAD! OVEFIS)"
+  },
+  {
+    "finding_id": "finding-d713d831241635306b703186",
+    "finding_text_md5": "1b89a45ef51f6a550e9211b8568c6321",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, administrative staffmember performs essential tasks such as [redacted] with no evidence of training on updated procedures or non-existing procedures.",
+    "detail_text_ko": "구체적으로, 행정 직원이 갱신된 절차 또는 존재하지 않는 절차에 대한 교육 증거 없이 [redacted]와 같은 필수 업무를 수행한다."
+  },
+  {
+    "finding_id": "finding-d212aa70c9af85fe2bf46309",
+    "finding_text_md5": "8cfbda76b10015a03f7d0a9e1359b0ab",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, a. A review of the GMPPM batch record, Preparation of Final Product (GMP-SOP-031, FRM\" dated April 19, 2019) and the Roomew incubator use log form does not include: 1) verification or periodic recording ofe)) concentration and temperature during this time period, and/or 2) inclusion of the [redacted] graph printout, which shows continuous monitoring of(4) concentration and temperature over the 17 day time period, 3/26/2019-4/19/2019. The manufacturing process requires [redacted] 4) concentration to be maintained between [redacted] and the temperature [redacted] during the incubation period. b. Not all time limits for the completion of each process step follow limits defined by process validation, and batch record review does not confirm adherence to step times.",
+    "detail_text_ko": "구체적으로, a. GMPPM 배치 기록서인 최종 제품의 준비(GMP-SOP-031, FRM\" 2019년 4월 19일자)와 Roomew 배양기 사용 기록 양식 검토에는 다음이 포함되지 않는다: 1) 이 기간 동안 e)) 농도 및 온도의 확인 또는 주기적 기록 및/또는 2) 17일 동안인 3/26/2019-4/19/2019의 (4) 농도와 온도를 연속 모니터링한 [redacted] 그래프 출력물의 포함. 제조 공정에서는 배양 기간 동안 [redacted] 4) 농도를 [redacted] 사이로, 온도를 [redacted]로 유지해야 한다. b. 각 공정 단계 완료의 시간 한도가 모두 공정 밸리데이션에서 정한 한도를 따르는 것은 아니며, 배치 기록서 검토에서 단계별 시간 준수 여부를 확인하지 않는다."
+  },
+  {
+    "finding_id": "finding-cceb8d67fdbb9f106072d54f",
+    "finding_text_md5": "1a1ccdb6f656144d39b5d6a2022ffde9",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, a. Test runs are not documented during performance including [redacted] of electrophoresis gels, critical test parameter checks, and reagents lot numbers and expirations. b. Quality control of positive controls is recorded on an [redacted] with no record of [redacted] c. Receipt and identification of samples is tracked in non-validated excel spreadsheet database with no data verification checks. d. While observing test performance on June 17, 2025: i. Container for in-use [redacted] was observed to be mislabeled with erroneous lot number and expiration date. ii. [redacted] has no identification [redacted] e. Errors were discovered in multiple completed Master Mix Reaction Worksheet (Attachment A to SOP [redacted] SOP008, Protocol for PCR Setup and Reporting of Results) without any corrections or secondary review.",
+    "detail_text_ko": "구체적으로, a. 전기영동 겔의 [redacted], 중요 시험 변수 확인 및 시약 로트 번호와 사용기한을 포함하여 시험 운전을 수행 중에 기록하지 않는다. b. 양성 대조군의 품질관리는 [redacted] 기록 없이 [redacted]에 기록한다. c. 검체의 수령 및 식별은 자료 검증 확인 절차 없이 밸리데이션되지 않은 엑셀 표 데이터베이스로 추적한다. d. 2025년 6월 17일 시험 수행을 관찰하는 동안: i. 사용 중인 [redacted] 용기의 표시에는 잘못된 로트 번호와 사용기한이 기재되어 있었다. ii. [redacted]에는 식별 표시가 없다 [redacted] e. 완료된 여러 주 혼합액 반응 작업지(SOP [redacted] SOP008, PCR 준비 및 결과 보고 계획서의 첨부 A)에서 오류가 발견되었으나 수정 또는 이차 검토가 없었다."
+  },
+  {
+    "finding_id": "finding-cccf9439a83431608b919ffb",
+    "finding_text_md5": "c1ecae1280efd7117e8c3087bb63ce8c",
+    "published_date": "2026-10-30",
+    "detail_text": "cifically, theenvironment of solution [redacted] is not adequately controlled with c b)(4. For example: a. On 12 SEP 2024 and 14 SEP 2024, we observed the showed apparent biological growth on_ [redacted] |and from) (b)4) — [redacted] |along with b)(4 distributed through the equipment. This|s—”-—sSO(by(4)——“(«ts*‘“‘;*CS™CSCSSCOtrcOlled AS Grade} environment. b. On 12 SEP 2024 and 14 SEP 2024, we observed the showed apparent biological growth and [redacted] on supply b)(4. This [redacted] controlled as Grade“ environment. c. On 12 SEP 2024, we observed approximately [redacted] removed from [redacted] showed apparent biological growth. Fill [redacted] _|is controlled as Grade» environment. d. On 10 SEP 2024, we observed| b)(4 in [redacted] showed apparent biological growth. b)(4 is not a classified/controlled environment. e. On 13 SEP 2024, we observed a yellow/brown stain on in (bya) b)(4 with unknown cause. [redacted] is controlled as a Grade »™|environment. [redacted] is used in formulating solutions for Amicus, Alyx, and Intersol solutions.) [redacted] __|is used in the manufacture of Blood Pack Units. *This is a repeat observation from the previous inspection in September 2022*",
+    "detail_text_ko": "cifically, 용액 [redacted]의 환경은 c b)(4로 적절히 관리되지 않는다. 예를 들어: a. 2024년 9월 12일(12 SEP 2024)과 2024년 9월 14일(14 SEP 2024)에 실사관은 [redacted] |위와) (b)4) — [redacted] |에서 명백한 생물 증식이 나타났고 장비 전반에 b)(4가 분포한 것을 관찰했다. 이|s—”-—sSO(by(4)——“(«ts*‘“‘;*CS™CSCSSCOtrcOlled AS 등급} 환경이다. b. 2024년 9월 12일(12 SEP 2024)과 2024년 9월 14일(14 SEP 2024)에 실사관은 공급 b)(4에서 명백한 생물 증식 및 [redacted]가 나타난 것을 관찰했다. 이 [redacted]는 등급“ 환경으로 관리된다. c. 2024년 9월 12일(12 SEP 2024)에 실사관은 [redacted]에서 제거한 약 [redacted]에 명백한 생물 증식이 나타난 것을 관찰했다. 충전 [redacted] _|는 등급» 환경으로 관리된다. d. 2024년 9월 10일(10 SEP 2024)에 실사관은 [redacted]의| b)(4에서 명백한 생물 증식이 나타난 것을 관찰했다. b)(4는 등급 지정/관리 환경이 아니다. e. 2024년 9월 13일(13 SEP 2024)에 실사관은 (bya) b)(4 내에 원인을 알 수 없는 노란색/갈색 얼룩을 관찰했다. [redacted]는 등급 »™|환경으로 관리된다. [redacted]는 Amicus, Alyx 및 Intersol 용액의 조제에 사용된다.) [redacted] __|는 Blood Pack Units 제조에 사용된다. *이것은 2022년 9월의 이전 실사에서 반복된 관찰 사항이다*"
+  },
+  {
+    "finding_id": "finding-c983466c0f161c2bf385bd60",
+    "finding_text_md5": "cc5f78187eb06090c4bb35feb64cce4a",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, on APR-03-2025, while observing filling operations for delandistrogene moxeparvovec- rokl (ELEVIDYS) drug product batch number wna esas observed on the floor of room |- a personnel -. where operators perform)... and si the Grade. filling area. On APR-08-2025, you clarified that you had determined that the).. on the floor was due tothe floor) wu the floor of the personnel... during)... ‘sik of the|- Onthe same day, you provided a work order (4MNT-63353-2025) opened on APR-07-2025, to remove the|..__|and adjust the floor... to prevent future).. from occurring.",
+    "detail_text_ko": "구체적으로, 2025년 4월 3일(APR-03-2025)에 delandistrogene moxeparvovec- rokl (ELEVIDYS) 의약품 배치 번호 wna esas의 충전 작업을 관찰하는 동안, 작업자가)... 및 si 등급. 충전 구역을 수행하는 실 |- 인원 -.의 바닥에서 관찰되었다. 2025년 4월 8일(APR-08-2025)에 귀사는 바닥의 )..가 )... 중 인원...의 바닥 wu 바닥) 때문이라고 판단했다고 설명했다 ‘sik of the|-. 같은 날 귀사는 |..__|를 제거하고 바닥...을 조정하여 향후 )..의 발생을 방지하기 위해 2025년 4월 7일(APR-07-2025)에 개설한 작업지시서(4MNT-63353-2025)를 제공했다."
+  },
+  {
+    "finding_id": "finding-bde9caca827b8674ff257e26",
+    "finding_text_md5": "68ff1dc272de0610327a80088670755b",
+    "published_date": "2026-10-30",
+    "detail_text": "For example, a. Critical product contact [redacted] [used in the manufacture of [redacted] |DS is not adequately qualified or| [redacted] |monitored. Specifically, incoming quality control testing is not performed on the [redacted] |received from the vendor, and [redacted] _|monitoring program has not 2 been established for this utility that is supplied throughout the facility by| [redacted] Furthermore, utilization of| /has continued in the absence of a complete qualification of the system. b. [redacted] |water used in [redacted] incubators, which is changed [redacted] is not controlled for bioburden. Specifically, incoming| [redacted] |water does not have a bioburden specification on the certificate of analysis, and no incoming testing is performed. The incubators are used to support the [redacted] _used in the manufacture of [redacted] DS.",
+    "detail_text_ko": "예를 들어, a. [redacted] |DS 제조에 사용하는 중요 제품 접촉 [redacted] [는 적절하게 적격성평가되지 않았거나| [redacted] |모니터링되지 않는다. 구체적으로, 공급업체에서 수령한 [redacted] |에 대한 입고 품질관리 시험을 수행하지 않으며, | [redacted]를 통해 시설 전반에 공급되는 이 지원설비에 대한 [redacted] _|모니터링 프로그램을 수립하지 않았다 2. 또한 시스템의 완전한 적격성평가 없이| /의 사용을 계속했다. b. [redacted] 배양기에 사용하는 [redacted] 용수는 [redacted] 교체하며 바이오버든을 관리하지 않는다. 구체적으로, 입고| [redacted] |용수의 시험성적서에는 바이오버든 규격이 없으며 입고 시험도 수행하지 않는다. 배양기는 [redacted] DS 제조에 사용하는 [redacted] _를 지원하는 데 사용된다."
+  },
+  {
+    "finding_id": "finding-bcea5bed3bfda8613dcd593f",
+    "finding_text_md5": "cce4f0e495055948d3923fe402f4546a",
+    "published_date": "2026-10-30",
+    "detail_text": "The procedures have insufficient detail regarding when expanded investigational activities will be required, how hypothesis testing or retesting investigations will be designed, or how results of the expanded investigational activities will be used to make decisions.",
+    "detail_text_ko": "절차에는 언제 확대 조사 활동이 필요한지, 가설 검증이나 재시험 조사를 어떻게 설계할 것인지, 확대 조사 활동의 결과를 의사결정에 어떻게 사용할 것인지에 대한 세부사항이 불충분하다."
+  },
+  {
+    "finding_id": "finding-b06c3da5b7c36e6a2d42a33d",
+    "finding_text_md5": "31d5bd898549e57c7039e3199d9b01f6",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, the qualification was not performed under the conditions of use and the verification o [redacted] integrity was limited to visual inspection of the",
+    "detail_text_ko": "구체적으로, 적격성평가는 사용 조건에서 수행되지 않았으며 o [redacted] 완전성 확인은 해당 부분의 육안 검사로 제한되었다"
+  },
+  {
+    "finding_id": "finding-afe671663342fa200cad139e",
+    "finding_text_md5": "491f344b028605c8779c4c581515b955",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, that interfaces with the [redacted] instrument [redacted] in the R&D laboratory, for the performance of confirmatory testing of [redacted] As A Referee Method For Medical Products Procedure RD-02-01-020” for the detection of [redacted] ” in environmental samples, is deficient in that the raw data generated and captured can be modified and deleted without administrative-level permissions, audit trails, or electronic records documenting such modification. For example, on November 21, 2025, your R&D personnel demonstrated that the raw data generated from confirmation testing stored in computer folder [redacted] can be potentially modified and deleted. B. Data integrity gap assessment has not been performed to ensure adequate controls are in place to prevent unauthorized modification or deletion of raw data for the () (4) instrument [redacted] - [redacted] used to perform confirmatory testing. C. There is no training provided to R&D personnel regarding the handling, storage, and archiving of raw data.",
+    "detail_text_ko": "구체적으로, R&D 시험실에서 [redacted] 장비 [redacted]와 연결되어 환경 검체의 [redacted] ” 검출을 위한 의료 제품의 중재 시험법 절차 RD-02-01-020”으로서 [redacted] 확인 시험을 수행하는 것은 생성 및 수집한 원자료를 관리자 수준 권한, 감사 추적 또는 변경을 기록하는 전자기록 없이 수정하고 삭제할 수 있어 미흡하다. 예를 들어 2025년 11월 21일 귀사의 R&D 직원은 컴퓨터 폴더 [redacted]에 저장된 확인 시험에서 생성한 원자료를 수정 및 삭제할 수 있음을 시연했다. B. 확인 시험을 수행하는 () (4) 장비 [redacted] - [redacted]의 원자료를 무단 수정 또는 삭제하지 못하도록 적절한 관리가 마련되어 있는지 확인하는 데이터 완전성 격차 평가를 수행하지 않았다. C. 원자료의 취급, 보관 및 장기 보존에 대해 R&D 직원에게 제공하는 교육이 없다."
+  },
+  {
+    "finding_id": "finding-ae6fe869111d2872eef36d8e",
+    "finding_text_md5": "c15f0b4f7d09b482ec1ae1d22aafb4d1",
+    "published_date": "2026-10-30",
+    "detail_text": "For example, a. Deviation IR-0111 is regarding failures in the sterile packaging of~ [redacted] sterilized critical supplies, which resulted in modified packaging configurations as captured in Change Controls GMP-CCR-434. However, no CAPA was initiated. b. Deviation DEV-0602 is regarding personnel monitoring samples being discovered by the contract lab in the sample receipt area (i.e., “garage of disposed materials” per contract lab deviation DEV2018_0042) one week after receipt. As a corrective action, the contract lab tested the samples and found negative growth on any of the plates, including the control plates. No growth promotion testing results, if performed on these plates, was reported. No CAPA was initiated to capture the corrective action taken and no addition corrective and/or preventive action was deemed necessary. c. Deviation DEV-0556 is regarding incorrect lot number of fetal bovine serum (FBS) being recorded on Thymus Organ Medium (TOM) Batch Record due to failure in secondary verification by the operators. The error was not detected during QA review but was discovered 25 days later by the operator who initially reported the incorrect number. As a corrective action, the operator determined the correct lot of FBS and the batch record was corrected and re-reviewed. All staff were reminded of the importance of GDP entries. No CAPA was initiated to capture the corrective action taken and no additional corrective and/or preventive action was deemed necessary.",
+    "detail_text_ko": "예를 들어, a. 일탈 IR-0111은~ [redacted] 멸균 중요 물품의 무균 포장 실패에 관한 것으로, 변경관리 GMP-CCR-434에 기록한 포장 구성 변경으로 이어졌다. 그러나 CAPA를 개시하지 않았다. b. 일탈 DEV-0602는 위탁 시험실이 검체 수령 후 일주일이 지나 검체 수령 구역(즉, 위탁 시험실 일탈 DEV2018_0042에 따른 “폐기 물품 차고”)에서 작업자 모니터링 검체를 발견한 것에 관한 것이다. 시정 조치로 위탁 시험실은 검체를 시험하여 대조 평판을 포함한 모든 평판에서 증식 음성임을 확인했다. 이 평판에 발육촉진 시험을 수행했더라도 그 결과는 보고되지 않았다. 수행한 시정 조치를 기록할 CAPA를 개시하지 않았으며 추가 시정 및/또는 예방 조치는 필요하지 않다고 판단했다. c. 일탈 DEV-0556은 작업자의 이차 확인 실패로 소태아혈청(FBS)의 잘못된 로트 번호를 흉선 장기 배지(TOM) 배치 기록서에 기록한 것에 관한 것이다. 이 오류는 QA 검토에서 발견되지 않았으나 잘못된 번호를 최초 보고한 작업자가 25일 후 발견했다. 시정 조치로 작업자는 올바른 FBS 로트를 확인하고 배치 기록서를 수정하고 재검토했다. 모든 직원에게 GDP 기록의 중요성을 다시 알렸다. 수행한 시정 조치를 기록할 CAPA를 개시하지 않았으며 추가 시정 및/또는 예방 조치는 필요하지 않다고 판단했다."
+  },
+  {
+    "finding_id": "finding-ab9e48824892cdcc2cd40fcd",
+    "finding_text_md5": "8c9495053c28d3a5662fa1487ad63161",
+    "published_date": "2026-10-30",
+    "detail_text": "licensed product. SOP-0069233, entitled “General Procedure for Processing and Qualifying Critical Reagents”, v13.0 is not always followed. Specifically,|... are critical reagents designed by the) mS tst—“‘—s~s~s~s~™CCCCS* [redacted] S However, critical are not qualified priortouseinthe) mw ~SSsti<‘<«é‘;é‘s*~SCSCS tO determine iff the oe the genotypic and phenotypic properties of the ila ‘",
+    "detail_text_ko": "허가 제품. “중요 시약의 처리 및 적격성평가 일반 절차”라는 제목의 SOP-0069233, v13.0을 항상 따르지는 않는다. 구체적으로,|...는 ) mS tst—“‘—s~s~s~s~™CCCCS* [redacted] S가 설계한 중요 시약이다. 그러나 중요 물품은 ) mw ~SSsti<‘<«é‘;é‘s*~SCSCS에서 사용 전에 적격성평가하지 않아 oe가 ila ‘의 유전형 및 표현형 특성을 갖는지 판정하지 않는다"
+  },
+  {
+    "finding_id": "finding-a9cba81a478b71f7c2acd2f0",
+    "finding_text_md5": "d018ed13635f4bca5e4c7efbe7b4633d",
+    "published_date": "2026-10-30",
+    "detail_text": "The batch records for these lots were part ofyour BLA submission. Specifically Lots were released for with incomplete information of purity tests in the batch record. Lot was released for ith failed potency test.",
+    "detail_text_ko": "이 로트들의 배치 기록서는 귀사의 BLA 제출 자료의 일부였다. 구체적으로 로트들은 배치 기록서의 순도 시험 정보가 불완전한 상태로 출하 승인되었다. 로트는 역가 시험에 실패했는데도 ith 출하 승인되었다."
+  },
+  {
+    "finding_id": "finding-a77b127ba3361460d5149cf1",
+    "finding_text_md5": "9b948d2a6d7d52220b206bde53a8f14a",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, a. PQ ofthe 4) incubators,— [redacted] and [redacted] used to incubate the thymus tissue slices, was approved in March 2019. b. PQ ofthe)distribution system, used to maintain [redacted] level inside the incubators, was approved in March 2019. c. PQ of biological safety cabinet, used during the processing of [redacted]. was approved in March 2019.",
+    "detail_text_ko": "구체적으로, a. 흉선 조직 절편 배양에 사용하는 4) 배양기,— [redacted] 및 [redacted]의 PQ는 2019년 3월에 승인되었다. b. 배양기 내부의 [redacted] 수준을 유지하는 데 사용하는 )분배 시스템의 PQ는 2019년 3월에 승인되었다. c. [redacted] 처리 중 사용하는 생물안전작업대의 PQ는 2019년 3월에 승인되었다."
+  },
+  {
+    "finding_id": "finding-a4d7811c20067b9151743578",
+    "finding_text_md5": "133a13c0d9d3d0d79b5396457f782824",
+    "published_date": "2026-10-30",
+    "detail_text": "For example: a. A new container closure was implemented before approval by MC3 Quality Assurance for use in the MC3 facility on July 27, 2019. It was used for the manufacturing ofGMP lots GM [redacted] Gmp. [redacted] cGMP [redacted] initiated beginning on April 27, 2019. b. Sterility of critical product-contact equipment sterilized by external vendors (i.e., sterile Starclick specimen final container closure system, tissue slicer, is not being verified through periodic sampling of incoming lots. c. The firm does not have controls in place to ensure that critical product contact supplies, such as— [redacted] included in final product formulation, dissection instrument, and tissue culture implements are sterile and free of endotoxin. d. Identity tests are not in place for critical raw materials used in the manufacture of TOM media. These include HAMS-F 12 media, [redacted], HEPES buffer. cellulose filter, and surgical sponge. e. No expiration dates exist for critical materials for the final drug product container closure system or secondary sterile overlap for the final product. Materials that do not have an expiration date assigned by the vendor are to be assigned by MC3 according to SOP GEN-009. Expiration for these materials is currently designated “Not Applicable”. For other critical supplies that are sterile with direct product contact, such as tissue slicers, [redacted] and [redacted], expiration dates were not provided.",
+    "detail_text_ko": "예를 들어: a. 새 용기 마개를 MC3 시설에서 사용하도록 MC3 품질보증이 2019년 7월 27일 승인하기 전에 도입했다. 이는 2019년 4월 27일부터 개시한 GMP 로트 GM [redacted] Gmp. [redacted] cGMP [redacted]의 제조에 사용되었다. b. 외부 공급업체가 멸균한 중요 제품 접촉 장비(즉, 멸균 Starclick 검체 최종 용기 마개 시스템, 조직 절단기)의 무균성을 입고 로트의 주기적 검체 채취로 확인하지 않는다. c. 업체는 최종 제품 조성에 포함되는— [redacted], 해부 기구 및 조직 배양 도구와 같은 중요 제품 접촉 물품이 무균이며 엔도톡신이 없도록 보장하는 관리를 마련하지 않았다. d. TOM 배지 제조에 사용하는 중요 원자재의 확인 시험이 마련되어 있지 않다. 여기에는 HAMS-F 12 배지, [redacted], HEPES 완충액, 셀룰로스 여과기 및 수술용 스펀지가 포함된다. e. 최종 의약품 용기 마개 시스템 또는 최종 제품의 이차 무균 겹포장용 중요 자재에 사용기한이 없다. 공급업체가 사용기한을 지정하지 않은 자재는 SOP GEN-009에 따라 MC3가 지정해야 한다. 이 자재들의 사용기한은 현재 “해당 없음”으로 지정되어 있다. 조직 절단기, [redacted] 및 [redacted]와 같은 직접 제품 접촉 멸균 중요 물품에는 사용기한이 제공되지 않았다."
+  },
+  {
+    "finding_id": "finding-a2cfddb749003fcf213a3c4b",
+    "finding_text_md5": "e16965f940635f9172eb118c688ccd29",
+    "published_date": "2026-10-30",
+    "detail_text": "According to MLN-RPT-000381: “Summary report for GMP environmental monitoring: [redacted] effective 07/13/2023, there were a total of 19 non-viable particulate alarms during batch production in the presence ofpersonnel in Gride?™space from; [redacted], and 40 alarms for non-viable particulate in the absence ofpersonnel from [redacted]. The source ofthese particulates has not been investigated. b. According to MLN-SOP-000188: “Monitoring ofparticles classified area (Bresso)\", effective 04/14/2023, in the event of an out of action non-viable particulate result during operation in Grade\" “space, any unprotected exposed material in direct contact with the product must be removed, the hood air velocity must be verified, and the hood must be sanitized. It is not clear if the procedure regarding out of action result for non-viable particles was followed since these actions were not verified during the investigation nor documented in the batch record.",
+    "detail_text_ko": "MLN-RPT-000381: “GMP 환경 모니터링 요약 보고서: [redacted] 07/13/2023 발효에 따르면, [redacted]부터 Gride?™공간에 작업자가 있는 상태에서 배치 생산 중 비생물성 입자 경보가 총 19건 발생했으며, [redacted]부터 작업자가 없는 상태에서 비생물성 입자 경보가 40건 발생했다. 이 입자들의 발생원을 조사하지 않았다. b. 04/14/2023 발효 MLN-SOP-000188: “등급 지정 구역의 입자 모니터링(Bresso)”에 따르면, 등급\" “공간의 작업 중 비생물성 입자 결과가 조치 기준을 벗어나면 제품과 직접 접촉하는 보호되지 않은 노출 자재를 모두 제거하고 작업대 기류 속도를 확인하며 작업대를 위생 처리해야 한다. 이 조치들이 조사 중 확인되지 않았고 배치 기록서에도 기록되지 않아 비생물성 입자의 조치 기준 이탈 결과에 관한 절차를 따랐는지 명확하지 않다."
+  },
+  {
+    "finding_id": "finding-a19c54b2ce86b8855a314af6",
+    "finding_text_md5": "7a5472c36a3d059f2d835b3325f7378f",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, your hand washing facilities for employees entering manufacturing and lab areas are deficient as follows: a a. On 10 SEP 2024 and 13 SEP 2024, we observed cold water for hand washing in b)(4 for [redacted] f b. On 10 SEP 2024 and 11 SEP 2024, we observed cold water for hand washingin) —_ [redacted] _—_ for [redacted]. c. On 10 SEP 2024 and 13 SEP 2024, we observed hand cold air in [redacted] for.(YA).()(4)int by(4)——iand (YA) /C [redacted] ———~—~—Ss before employees enter production areas. d. We observed no hand washing stations for employees entering the, [redacted] lab. The firm does not have a procedure instructing employees to wash hands before entering the [redacted]",
+    "detail_text_ko": "구체적으로, 제조 및 시험실 구역에 출입하는 직원을 위한 귀사의 손 세척 시설은 다음과 같이 미흡하다: a a. 2024년 9월 10일(10 SEP 2024)과 2024년 9월 13일(13 SEP 2024)에 실사관은 [redacted]용 b)(4에서 손 세척용 냉수를 관찰했다 f b. 2024년 9월 10일(10 SEP 2024)과 2024년 9월 11일(11 SEP 2024)에 실사관은 [redacted]용) —_ [redacted] _—_에서 손 세척용 냉수를 관찰했다. c. 2024년 9월 10일(10 SEP 2024)과 2024년 9월 13일(13 SEP 2024)에 실사관은 직원의 생산 구역 진입 전 .(YA).()(4)int by(4)——iand (YA) /C [redacted] ———~—~—Ss용 [redacted]에서 손 건조용 냉풍을 관찰했다. d. 실사관은 [redacted] 시험실에 출입하는 직원을 위한 손 세척대가 없음을 관찰했다. 업체에는 직원에게 [redacted]에 들어가기 전 손을 씻도록 지시하는 절차가 없다"
+  },
+  {
+    "finding_id": "finding-a117fcc3937c99f86b4feb6d",
+    "finding_text_md5": "f8c288ea19016e4f6bb078a30b62c886",
+    "published_date": "2026-10-30",
+    "detail_text": "Therefore, the validation does not ensure assurance. Specificall a. have not been completed on [redacted] which is used to prepare the [redacted] lentiviral vector and which is used to prepare b. In the, the validation of he(DA demonstrate growth of [redacted] iin every validation run.",
+    "detail_text_ko": "따라서 밸리데이션은 보증을 확보하지 못한다. Specificall a. [redacted] 렌티바이러스 벡터를 준비하는 데 사용하는 [redacted] 및 준비하는 데 사용하는 것에 대해 완료되지 않았다 b. 그 안에서 he(DA의 밸리데이션은 모든 밸리데이션 수행에서 [redacted]의 증식을 입증한다 iin."
+  },
+  {
+    "finding_id": "finding-97aadd9820298e1e340a9b23",
+    "finding_text_md5": "7d43f3c12d3460598968c460c29c8e27",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, A. Your firm manufactured and released GAMMAGARD Liquid [redacted] and Cuvitru [redacted] in the [redacted] filling lin [redacted]. Filling parameters are embedded in ‘ ” and executed by [redacted]. The ‘ ” which controls [redacted] parameters such as fill and filling), are not documented in the batch records. For example, ‘ ” used to manufacture GAMMAGARD Liquid [redacted], lot no. [redacted]. manufacture date 7 October 2024 is not documented in the batch record. B. Your firm manufactured and released Glassia [redacted], used to treat lung problems (emphysema). alarms, such as fill [redacted] or [redacted]. generated during filling in filling lin [redacted] are not always reviewed/addressed/evaluated during batch record review. For example, alarms such as fill [redacted] and(BY(4Y) captured by the [redacted] filling line, during the filling process of Glassia manufacturing batch record no. BE23E022, release date, 4 July 2024, was not evaluated and reviewed. 11/14/2024(Thu), 11/15/2024(Fri), 11/18/2024(Mon), 11/19/2024(Tue), 11/20/2024(Wed), 11/21/2024(Thu), 11/22/2024(Fri) X BEEPPEE ono X seestrees aes",
+    "detail_text_ko": "구체적으로, A. 귀사는 [redacted] 충전 설비 [redacted]에서 GAMMAGARD Liquid [redacted] 및 Cuvitru [redacted]를 제조하고 출하 승인했다. 충전 변수는 ‘ ”에 내장되어 있으며 [redacted]가 실행한다. 충전 및 충전)과 같은 [redacted] 변수를 제어하는 ‘ ”를 배치 기록서에 기록하지 않는다. 예를 들어 제조일이 2024년 10월 7일인 로트 번호 [redacted]의 GAMMAGARD Liquid [redacted] 제조에 사용한 ‘ ”는 배치 기록서에 기록되어 있지 않다. B. 귀사는 폐 문제(폐기종)의 치료에 사용하는 Glassia [redacted]를 제조하고 출하 승인했다. 충전 설비 [redacted]의 충전 중 발생한 충전 [redacted] 또는 [redacted]와 같은 경보는 배치 기록서 검토 중 항상 검토/처리/평가하지 않는다. 예를 들어, Glassia 제조 배치 기록서 번호 BE23E022, 출하 승인일 2024년 7월 4일의 충전 공정 중 [redacted] 충전 설비가 포착한 충전 [redacted] 및(BY(4Y)와 같은 경보를 평가하고 검토하지 않았다. 11/14/2024(목), 11/15/2024(금), 11/18/2024(월), 11/19/2024(화), 11/20/2024(수), 11/21/2024(목), 11/22/2024(금) X BEEPPEE ono X seestrees aes"
+  },
+  {
+    "finding_id": "finding-971aa5b98f8c7d454054b459",
+    "finding_text_md5": "f6ddbe85f681c0de527f809cd81992c9",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, a. Technician was observed using out of calibration equipment (pipette and thermomixer) during the extraction step for mycoplasma testing on June 16, 2025. [redacted] o [redacted] pipettes on a rack were discovered to be out of calibration. b. Preventive maintenance (PM) and calibrations requirements are not established and routinely performed on critical equipment including the [redacted] PCR System (ID# [redacted]), [redacted] Thermomixers# [redacted] gel imaging system (ID #(6)@4)), Electropheresis [redacted] (ID #H [redacted], and [redacted] (ID # [redacted]), c. Qualification studies were not initially performed on the [redacted] and [redacted] freezers prior to use.",
+    "detail_text_ko": "구체적으로, a. 2025년 6월 16일 마이코플라스마 시험을 위한 추출 단계에서 시험원이 교정 상태를 벗어난 장비(피펫 및 가열 혼합기)를 사용하는 것이 관찰되었다. 받침대의 [redacted] o [redacted] 피펫이 교정 상태를 벗어난 것으로 발견되었다. b. [redacted] PCR 시스템(ID# [redacted]), [redacted] 가열 혼합기# [redacted] 겔 영상 시스템(ID #(6)@4)), 전기영동 [redacted] (ID #H [redacted] 및 [redacted] (ID # [redacted])를 포함한 중요 장비에 대한 예방 유지관리(PM)와 교정 요건을 수립하지 않았고 일상적으로 수행하지 않는다. c. [redacted] 및 [redacted] 냉동고 사용 전에 최초 적격성평가 연구를 수행하지 않았다."
+  },
+  {
+    "finding_id": "finding-91b2c0fe62e1c1a9a2756fbe",
+    "finding_text_md5": "00cf87722fe95bfe7ea84272fa34b1e0",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, your firm does not maintain adequate sample logs for environmental monitoring (EM) samples that failed the absence of [redacted] test per [redacted] for Determining the Absence of [redacted] in Environmental Samples (Document no. RD-02-01-020, Revision S). For example, between January 1 and November 20, 2025, a total o [redacted] EM samples failed the [redacted] test for absence of [redacted] However, there is no record of the receipt and tracking of these samples, which were subjected to [redacted] Test Method (Procedure RD-02-01-020, Document No. 1138932, Revision H).",
+    "detail_text_ko": "구체적으로, 귀사는 환경 검체 내 [redacted] 부재 판정용 [redacted](문서 번호 RD-02-01-020, 개정 S)에 따른 [redacted] 부재 시험에 실패한 환경 모니터링(EM) 검체의 적절한 검체 기록을 유지하지 않는다. 예를 들어, 2025년 1월 1일부터 11월 20일까지 총 o [redacted]건의 EM 검체가 [redacted] 부재에 대한 [redacted] 시험에 실패했다. 그러나 [redacted] 시험법(절차 RD-02-01-020, 문서 번호 1138932, 개정 H)을 적용한 이 검체들의 수령 및 추적 기록이 없다."
+  },
+  {
+    "finding_id": "finding-83861b46f43924b1d17eae99",
+    "finding_text_md5": "21b5bdf80f53182a310518f14902e110",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, On 07 March 2024 during the walk through ofthe aseptic filling area in Building [redacted] Lyo Line8 where US licensed Shingrix vaccine is filled, the [redacted]. covering ofthe vial (bY) was observed to have splinter-like cracks. The cracks were observed directly over the location where the vial enters the) [redacted]",
+    "detail_text_ko": "구체적으로, 2024년 3월 07일 미국(US) 허가 Shingrix 백신을 충전하는 건물 [redacted] Lyo Line8의 무균 충전 구역을 순회하는 동안 바이알 (bY)의 [redacted]. 덮개에 가시 모양 균열이 있는 것이 관찰되었다. 균열은 바이알이 ) [redacted]로 들어가는 위치의 바로 위에서 관찰되었다"
+  },
+  {
+    "finding_id": "finding-7c06dd976e28f4aebe2b4b00",
+    "finding_text_md5": "8b26e6b1ebddf84d612848b34bedd507",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, a. There is a lack of a separate and independent quality assurance unit needed to perform objective review. b. Internal audits are not performed at the defined frequency according to the Quality Manual. c. No independent review of final test reports and associated test data is performed. d. An administrative staff member was identified as acting Quality Assurance Manager, and no evidence was found that this individual performs any quality assurance activities as defined by Quality Manual and confirmed per employee. e. SOP ADMIN006, How to Write a Standard Operating Procedure, does not require review and approval of any technical or QA procedures. No evidence was found of any QA review of any controlled SOPs. f. Per the Clongen Quality Manual, [redacted] review is required to be conducted by the Laboratory Director and the Quality Assurance Manager to assess current policies, practices and procedures to determine effective changes. Clongen stated that [redacted] review has not been performed since 2023. However, that is no evidence of any reviews being performed.",
+    "detail_text_ko": "구체적으로, a. 객관적 검토를 수행하는 데 필요한 별도의 독립적인 품질보증 부서가 없다. b. 품질 매뉴얼에 따른 정해진 주기로 내부 감사를 수행하지 않는다. c. 최종 시험 보고서와 관련 시험 자료에 대한 독립적인 검토를 수행하지 않는다. d. 행정 직원 한 명이 품질보증 관리자를 대행하는 것으로 확인되었으며, 품질 매뉴얼에 정의된 품질보증 활동을 이 사람이 수행한다는 증거는 발견되지 않았고 직원에게도 이를 확인했다. e. SOP ADMIN006, 표준작업절차서 작성 방법은 기술 또는 QA 절차의 검토와 승인을 요구하지 않는다. 관리 대상 SOP에 대한 QA 검토 증거는 발견되지 않았다. f. Clongen 품질 매뉴얼에 따르면 시험실 책임자와 품질보증 관리자는 현행 방침, 관행 및 절차를 평가하고 효과적인 변경을 결정하기 위해 [redacted] 검토를 수행해야 한다. Clongen은 2023년 이후 [redacted] 검토를 수행하지 않았다고 밝혔다. 그러나 검토를 수행했다는 증거가 없다."
+  },
+  {
+    "finding_id": "finding-7490c67cb1aba857bd0d79c3",
+    "finding_text_md5": "c25eabe046bac4781d938292a6882b9b",
+    "published_date": "2026-10-30",
+    "detail_text": "For example, a. The disinfection efficacy study does not demonstrate effectiveness against viral contaminants. b. The disinfection efficacy study does not demonstrate effectiveness against microbial agents for all representative surfaces in areas used to manufacture) [redacted] DS. For example, the [redacted] that are used to transport material into and out of cleanrooms and store [redacted] lwere excluded from the study.",
+    "detail_text_ko": "예를 들어, a. 소독 유효성 연구는 바이러스 오염원에 대한 효과를 입증하지 않는다. b. 소독 유효성 연구는 ) [redacted] DS 제조에 사용하는 구역의 모든 대표 표면에서 미생물에 대한 효과를 입증하지 않는다. 예를 들어, 청정실로 자재를 반입 및 반출하고 [redacted] l를 보관하는 데 사용하는 [redacted]는 연구에서 제외되었다."
+  },
+  {
+    "finding_id": "finding-71a0af0840b9fb24ef211de1",
+    "finding_text_md5": "fb3a662616dccc453b80367abc970463",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, Annual product reviews fail to include data regarding [redacted] components used in manufacturing of blood pack units and apheresis components (Alyx, Amicus, and Intersol). For example APRs do not include defect rates, testing summaries, or supplier qualification status. Annual product reviews for BPU, Alyx, Amicus, and Intersol products for the calendar year 2023 were significantly delayed until being signed and approved on 12 SEP 2024.",
+    "detail_text_ko": "구체적으로, 연간 제품 검토에는 혈액백 단위 및 성분채집 구성품(Alyx, Amicus 및 Intersol)의 제조에 사용하는 [redacted] 구성품 관련 자료가 포함되지 않는다. 예를 들어 APRs에는 결함률, 시험 요약 또는 공급업체 적격성평가 상태가 포함되지 않는다. 2023년 역년의 BPU, Alyx, Amicus 및 Intersol 제품에 대한 연간 제품 검토는 2024년 9월 12일(12 SEP 2024)에 서명 및 승인될 때까지 크게 지연되었다."
+  },
+  {
+    "finding_id": "finding-672c9691fabb0e20da7d7f6d",
+    "finding_text_md5": "ac86399e31dd640533b8f51e08c228d7",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, your firm does not adequately monitor areas of distinct environmental classification. Environmental air samples are collected] [redacted] which does not provide adequate data on Grade| rooms where blood pack unit and apheresi products are [redacted] For example, b)(4) for Alyx, Amicus, and Intersol; as well as [redacted] for Blood Pack Units. Additionally, there is no continuous monitoring of differential pressures between rooms. of differing classifications. For example, (Gradei) to [redacted] (Grade) where the differential pressure is documented once per day of production.",
+    "detail_text_ko": "구체적으로, 귀사는 환경 등급이 다른 구역을 적절하게 모니터링하지 않는다. 환경 공기 검체는] [redacted] 채취하며, 이는 혈액백 단위 및 성분채집 제품을 [redacted] 하는 등급| 실에 대한 적절한 자료를 제공하지 않는다. 예를 들어 Alyx, Amicus 및 Intersol의 b)(4)와 Blood Pack Units의 [redacted]이다. 또한 등급이 다른 실 사이의 차압을 연속 모니터링하지 않는다. 예를 들어, (Gradei)에서 [redacted] (등급) 사이의 차압은 생산일마다 한 번 기록한다."
+  },
+  {
+    "finding_id": "finding-64caf826984b8093b2370b53",
+    "finding_text_md5": "ca113654b179072e4ae56a1681b02b48",
+    "published_date": "2026-10-30",
+    "detail_text": "A. Analytical method used to detect bacterial endotoxin in|~ _, LATV Monovalent Bulk (MVB), and LATV Finished Product are inadequate. Specifically, SOP-0067568, entitled “The Endotoxin Testing ofProduct b f= ’, V40.0 is deficient in that the mixing - requirement for the).. sample! and subsequent.._| preparations are not described. Without qualified mixing, your firm lacks assurance that endotoxin can be adequately recovered and detected when present in the samples. B.are being used to store - |and MVB samples. Endotoxin can adhere to ww sé. gitve false negative test results. Your firm conducted a study in 2016 to show, aw Suitability in recovering endotoxin spike at 5 EU/mL. However, this study was deficient, it did not, for example, demonstrate spike recovery at a lower endotoxin level of which is the action limit for MVB.",
+    "detail_text_ko": "A. |~ _, LATV Monovalent Bulk(MVB) 및 LATV Finished Product에서 세균 엔도톡신을 검출하는 분석법이 부적절하다. 구체적으로, “제품의 엔도톡신 시험 b f= ’”라는 제목의 SOP-0067568, V40.0은 ).. 검체! 및 후속 .._| 준비물의 혼합 요건을 기술하지 않아 미흡하다. 적격성평가된 혼합 없이는 귀사는 검체에 엔도톡신이 있을 때 적절하게 회수 및 검출할 수 있다는 보증이 부족하다. B.는 - | 및 MVB 검체 보관에 사용되고 있다. 엔도톡신은 ww sé.에 부착하여 위음성 시험 결과를 줄 수 있다. 귀사는 2016년에 5 EU/mL에서 첨가한 엔도톡신의 회수 적합성을 보여주는 aw 연구를 수행했다. 그러나 이 연구는 미흡하여 예를 들어 MVB의 조치 한도인 더 낮은 엔도톡신 수준에서 첨가 회수를 입증하지 않았다."
+  },
+  {
+    "finding_id": "finding-5ffdc07fe4c3693b61c43a13",
+    "finding_text_md5": "a41cd87bd6bfad9327ac572bbb73d14f",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, training of employees who work in cell therapy manufacturing is not adequate a.On 16 DEC 2024 video recording shows employee dropping paper batch record pages on the floor of a Gradelroom and subsequently returning the paper records to a table work surface and continuing with assisting to place materials into a Grade b.On 1 and 16 DEC 2024 video recording shows employees working with their hands in a Grade wiped their hands and work surfaces with a sterile wipe immediately c.On 1 DEC 2024 video recording shows an employee working in a Grade 'Pass processing suite place on top of paper batch records prior to placing the units in a cell culture d.As of 7 FEB 2025, your Senior QC Manager of Microbiology had not completed job specific training on revised SOPs such as: i.CGM-SOP-00042, Investigation of Environmental Alert Level Excursions, Action Level Excursions, Contamination Recovery Rate Excursions and Adverse Trends (Revision 03) ii.CGM-SOP-00027, Plate, Enumeration and Microbial Identification (Revision 02) iii.CGM-SOP-00241, Operation of the (Revision 01) e.Training status is not adequately monitored to ensure employees are up to date on current training requirements. Specifically, in 2024, only 30% of training tasks were completed umuyrEEmmrwmw Charles River Laboratories Inc 4600 E Shelby Dr Ste 108 CITY, STATE. ZIP CODE. COUNTRY Memphis, TN 38118-7427 on time. TYPE ESTABLISMENT INSPECTED Cell Therapy Manufacturer",
+    "detail_text_ko": "구체적으로, 세포치료제 제조에 종사하는 직원의 교육이 적절하지 않다 a.2024년 12월 16일(16 DEC 2024) 영상 기록에는 직원이 등급l실 바닥에 종이 배치 기록서 페이지를 떨어뜨린 후 종이 기록서를 작업대 표면에 다시 놓고 등급 안으로 자재를 넣는 보조 작업을 계속하는 모습이 나타난다 b.2024년 12월 1일 및 16일(1 및 16 DEC 2024) 영상 기록에는 등급 안에서 손으로 작업하는 직원들이 즉시 멸균 닦개로 손과 작업 표면을 닦은 모습이 나타난다 c.2024년 12월 1일(1 DEC 2024) 영상 기록에는 등급 'Pass 처리 구역에서 작업하는 직원이 단위를 세포 배양에 넣기 전에 종이 배치 기록서 위에 놓는 모습이 나타난다 d.2025년 2월 7일(7 FEB 2025) 현재 귀사의 미생물 QC 선임 관리자는 다음과 같은 개정 SOPs에 대한 직무별 교육을 완료하지 않았다: i.CGM-SOP-00042, 환경 경보 수준 이탈, 조치 수준 이탈, 오염 회수율 이탈 및 부정적 추세 조사(개정 03) ii.CGM-SOP-00027, 평판, 계수 및 미생물 동정(개정 02) iii.CGM-SOP-00241, 운전(개정 01) e.직원이 현행 교육 요건을 충족하도록 교육 상태를 적절하게 모니터링하지 않는다. 구체적으로, 2024년에는 교육 과제의 30%만 umuyrEEmmrwmw Charles River Laboratories Inc 4600 E Shelby Dr Ste 108 도시(CITY), 주(STATE). 우편번호(ZIP CODE). 국가(COUNTRY) Memphis, TN 38118-7427 기한 내에 완료되었다. 실사 대상 사업장 유형(TYPE ESTABLISMENT INSPECTED) 세포치료제 제조업체"
+  },
+  {
+    "finding_id": "finding-55c554bd0ebf545d64a35272",
+    "finding_text_md5": "7a99a6ab635814f2d5483abd1fae6e57",
+    "published_date": "2026-10-30",
+    "detail_text": "For example, a. The 2017 EMPQ performed following the modifications to the HVAC system is inadequate as it was limited in the number of samples collected and the type of sampling performed: (6) [redacted] sampling was limited to per location for both viable and non-viables; however, only non-viable sampling was performed ( for [redacted] (BAY per location under(H)4)Nconditions. b. The routine environmental monitoring program does not include [redacted] monitoring for active air viables and non-viables in the ISO7 and ISO8 areas. c. A single viable active air sample ( [redacted] 5 is collected during the aseptic processing in the BSC aso™ during the manufacturing process, which can take up tol [redacted]. d. Routine surface sampling for viables is not performed for the ISO7 manufacturing area and the associated passthroughs under [redacted] conditions. e. There is no surface sampling ( [redacted] 2) in the biosafety cabinet (ISOM used for the aseptic manufacturing of the product. f. There is no surface sampling, or sampling of the [redacted] in the incubator after the manufacturing of a lot. The incubator is located in manufacturing room [redacted] (1SO 7) and used for the in- process incubation ofthe product up g. The differential pressure between the ISO 7 and ISO 8 cleanrooms and between the ISO 8 and the CNC areas is not alarmed or recorded to ensure compliance with the established settings. h. The settings for humidity ( [redacted]) and temperature ( [redacted] are too wide.",
+    "detail_text_ko": "예를 들어, a. HVAC 시스템 변경 후 수행한 2017년 EMPQ는 채취한 검체 수와 수행한 검체 채취 유형이 제한되어 부적절하다: (6) [redacted] 검체 채취는 생물성과 비생물성 모두 위치당으로 제한되었으나, ( [redacted] (BAY의 경우 위치당 (H)4)N조건에서 비생물성 검체 채취만 수행했다. b. 일상 환경 모니터링 프로그램은 ISO7 및 ISO8 구역에서 능동 공기 생물성 및 비생물성 입자의 [redacted] 모니터링을 포함하지 않는다. c. 최대 l [redacted]까지 걸릴 수 있는 제조 공정 중 BSC aso™에서 무균 처리하는 동안 능동 공기 생물성 검체 한 개( [redacted] 5를 채취한다. d. ISO7 제조 구역과 관련 물품 전달함에서 [redacted] 조건하에 생물성 입자의 일상 표면 검체 채취를 수행하지 않는다. e. 제품의 무균 제조에 사용하는 생물안전작업대(ISOM에서 표면 검체 채취( [redacted] 2)를 수행하지 않는다. f. 로트 제조 후 배양기에서 표면 검체 또는 [redacted] 검체를 채취하지 않는다. 배양기는 제조실 [redacted] (1SO 7)에 위치하며 제품의 공정 중 배양에 사용된다 up g. ISO 7과 ISO 8 청정실 사이 및 ISO 8과 CNC 구역 사이의 차압은 정해진 설정값 준수를 보장하도록 경보되거나 기록되지 않는다. h. 습도( [redacted])와 온도( [redacted] 설정 범위가 너무 넓다."
+  },
+  {
+    "finding_id": "finding-5094ca884a6a115bbec00e14",
+    "finding_text_md5": "8969886d076191c6d028491dd6e4017d",
+    "published_date": "2026-10-30",
+    "detail_text": "According to MLN-SOP-000065: “Behavior and Hygiene for Aseptic Areas ofAGC Biologics”, 05/31/2023, operator movement in a Grade” space should be slow and deliberate and GMP manufacturing operators have to sample gloves before replacement. During the sterile filtration and filling of lot [redacted] batch [redacted], the Grade ™operator working in the BSC was observed executing rapid movements. Additionally, an operator was observed \" replacing gloves without first performing environmental monitoring. 1,",
+    "detail_text_ko": "05/31/2023자 MLN-SOP-000065: “AGC Biologics 무균 구역의 행동 및 위생”에 따르면 등급” 공간에서 작업자의 움직임은 느리고 신중해야 하며 GMP 제조 작업자는 교체 전 장갑 검체를 채취해야 한다. 로트 [redacted] 배치 [redacted]의 무균 여과 및 충전 중 BSC에서 작업하는 등급 ™작업자가 빠르게 움직이는 것이 관찰되었다. 또한 작업자가 먼저 환경 모니터링을 수행하지 않고 \" 장갑을 교체하는 것이 관찰되었다. 1,"
+  },
+  {
+    "finding_id": "finding-4eca7c122ac590be8c52c17a",
+    "finding_text_md5": "ad31363618cc2014c0936b5273b5bad5",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, we observed facility deficiencies related to the manufacturing of cell therapies in cryostorage i rooms and locker/change rooms for personnel, as follows: a.On 3 FEB 2025, we observed visibly dirty and rough floor surfaces in the (b)1,4) fmished product and intermediate product storage room --.\" b.On 3 FEB 2025 we observed hair and other residue in where these are used for personnel entering classified aseptic area for [redacted] production area c.On 3 FEB 2025, we observed a hand washing sink that lacked soap for employees entering classified aseptic areas for the production area d.On 3 FEB 2025, we observed a loose cejg access panel in personnel air lock leading to classified aseptic areas of the production area e.On 3 FEB 2025 we observed rooms intended to se environmental aseptic conditions such as MOMS [redacted] 11M.) that did not have a demarcation me tween gra [redacted] es an not identified for location/grade",
+    "detail_text_ko": "구체적으로, 실사관은 다음과 같이 세포치료제 제조와 관련된 극저온 보관 i 실 및 직원용 사물함/탈의실의 시설 결함을 관찰했다: a.2025년 2월 3일(3 FEB 2025)에 실사관은 (b)1,4) 완제품 및 중간제품 보관실 --.\"의 바닥 표면이 눈에 띄게 더럽고 거친 것을 관찰했다 b.2025년 2월 3일(3 FEB 2025)에 실사관은 [redacted] 생산 구역의 등급 지정 무균 구역에 진입하는 직원이 사용하는 곳에서 머리카락 및 기타 잔류물을 관찰했다 c.2025년 2월 3일(3 FEB 2025)에 실사관은 생산 구역의 등급 지정 무균 구역에 진입하는 직원용 손 세척대에 비누가 없는 것을 관찰했다 d.2025년 2월 3일(3 FEB 2025)에 실사관은 생산 구역의 등급 지정 무균 구역으로 이어지는 직원용 에어록에서 헐거운 cejg 점검판을 관찰했다 e.2025년 2월 3일(3 FEB 2025)에 실사관은 MOMS [redacted] 11M.)와 같이 환경 무균 조건을 se하려는 실에 등급 [redacted] 사이 구분 me tween gra가 없으며 위치/등급도 표시되지 않은 것을 관찰했다"
+  },
+  {
+    "finding_id": "finding-4dc5afbf2fe17364c8901f9e",
+    "finding_text_md5": "a41cd87bd6bfad9327ac572bbb73d14f",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, QC analysts responsible for testing of environmental samples (EM) for the absence of [redacted] are not trained by the quality team, resulting in inadequate oversight of personnel qualifications. For example, per the firm’s training procedure No. RD-03-01-019, Revision W, each analyst is required to complete, including but not limited to, [redacted] containment training (Training Code: [redacted] containment training (Training Code: [redacted]), and good documentation training. QC analysts performing [redacted] testing have not completed mandatory training requirements per the firm's training procedure (Document No. RD-03-01-019, Revision W).",
+    "detail_text_ko": "구체적으로, 환경 검체(EM)의 [redacted] 부재 시험을 담당하는 QC 분석자는 품질팀의 교육을 받지 않아 직원 자격에 대한 감독이 부적절하다. 예를 들어, 업체의 교육 절차 번호 RD-03-01-019, 개정 W에 따라 각 분석자는 [redacted] 봉쇄 교육(교육 코드: [redacted] 봉쇄 교육(교육 코드: [redacted]) 및 올바른 문서화 교육을 포함하되 이에 국한되지 않는 교육을 이수해야 한다. [redacted] 시험을 수행하는 QC 분석자는 업체의 교육 절차(문서 번호 RD-03-01-019, 개정 W)에 따른 의무 교육 요건을 완료하지 않았다."
+  },
+  {
+    "finding_id": "finding-4be7e84b32f0fb0df9c7afde",
+    "finding_text_md5": "e15d2eb1eb3266d2bfa12df0a15ba0ae",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, the validation testing of [redacted] 0 ets performed by collecting a from each [redacted] and routine monitoring is not performed. Ls Disiafectant tcc are inadequate to mitigate cross-contamination. Specifically, the disinfectant study does not include data to support the effectiveness against viral contaminants. EMPL OYFF(S) SIGNATURF",
+    "detail_text_ko": "구체적으로, [redacted] 0 ets의 밸리데이션 시험은 각 [redacted]에서 a를 채취하여 수행하며 일상 모니터링은 수행하지 않는다. Ls Disiafectant tcc는 교차오염을 완화하기에 부적절하다. 구체적으로, 소독제 연구에는 바이러스 오염원에 대한 효과를 뒷받침하는 자료가 포함되지 않는다. EMPL OYFF(S) SIGNATURF"
+  },
+  {
+    "finding_id": "finding-4b8a43df8bbf2c1f9c8b8006",
+    "finding_text_md5": "a326657bd9639b45b8e5e1afed5c3675",
+    "published_date": "2026-10-30",
+    "detail_text": "b.The rejected [redacted] were not manually inspected to verify that the [redacted] were in poor quality prior to concluding that the root cause was due to the malfunction of the light and camera. 4.Your firm’s batch record is not designed to capture critical information in support of 4 which are used in the production of flu vaccine monovalent: Specifically, Master Batch Record, MABR-0009649, entitled (by (4) v10.0, was used to document step. monovalent bulk [redacted]. strain serotype H1N1, strain A/Norway/3 1694/2022 V1, is not designed to capture all verification steps performed during Biologic Vaccine Drug Substance Manufacturer [redacted] of. such steps pertain to visual verifying that [redacted] is dosed into) __. Ina full batch [redacted] this verification step is performed [redacted]. However, in batch record MBR-0009649, it only allows for this step to be documented twice.",
+    "detail_text_ko": "b.조명과 카메라의 오작동이 근본 원인이라고 결론 내리기 전에 부적합 처리한 [redacted]를 수동 검사하여 [redacted]의 품질이 불량했는지 확인하지 않았다. 4.귀사의 배치 기록서는 독감 백신 단가 제조에 사용하는 4를 뒷받침하는 중요 정보를 기록하도록 설계되지 않았다: 구체적으로, 주 배치 기록서 MABR-0009649, 제목 (by (4) v10.0은 단계를 기록하는 데 사용되었다. 단가 벌크 [redacted]. 균주 혈청형 H1N1, 균주 A/Norway/3 1694/2022 V1은 생물학적 백신 원료의약품 제조업체 [redacted] 동안 수행하는 모든 확인 단계를 기록하도록 설계되지 않았다 of. 이 단계들은 [redacted]를 ) __에 투입하는지 육안으로 확인하는 것과 관련된다. 전체 배치 [redacted]에서는 이 확인 단계를 [redacted] 수행한다. 그러나 배치 기록서 MBR-0009649에는 이 단계를 두 번만 기록할 수 있다."
+  },
+  {
+    "finding_id": "finding-4a110bf52b2c392134d4a84d",
+    "finding_text_md5": "fa710a24cb39d572ba027ee52e1997d6",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, raw material and finished product inventory is not adequately controlled and/or withheld from use until appropriate in relation to cell therapy manufacturin as follows: a.On 3 FEB 2025, we observed missing (labeled) inside as compared to electronic inventory of mished product in software. Additionally, the software indicated the (\") holding 19 of cryostorage where thee is only b.On 3 FEB 2025, we observed missin labelled among others) inside storage. c.On 3 FEB 2025, we observed C retain stora or the name/identification of those two of seven were labeled. d.On 4 FEB 2025, we observed sterile water for 1 units) stored at location where electronic P019 inventory indicated the storage location as CO4A1. e.On 4 FEB 2025, we observed 372 units of (4) cell culture containers in location M(4) where software indicated the storage location as The change control, dated 13 JUN 2024) intended to incorporate finished chug product into the program for improved inventory control did not include an effectiveness check (or justification for not including an effectiveness check) for evaluation of this change. Christian Lrch X D 1 BY. 02-07-21%61r513713",
+    "detail_text_ko": "구체적으로, 세포치료제 제조와 관련하여 다음과 같이 원자재 및 완제품 재고를 적절하게 관리하지 않으며/않거나 적절한 시점까지 사용을 보류하지 않는다: a.2025년 2월 3일(3 FEB 2025)에 실사관은 소프트웨어의 완제품 전자 재고와 비교하여 내부에 (표시된) 것이 없는 것을 관찰했다. 또한 소프트웨어는 (\") 극저온 보관에 19개가 있다고 표시했으나 실제는 단지 b.2025년 2월 3일(3 FEB 2025)에 실사관은 보관 내부에서 표시된 것 등이 누락된 것을 관찰했다. c.2025년 2월 3일(3 FEB 2025)에 실사관은 C 보관 검체 보관 또는 그것의 명칭/식별을 관찰했으며 일곱 개 중 두 개에 표시가 있었다. d.2025년 2월 4일(4 FEB 2025)에 실사관은 1 단위용 멸균수가 전자 P019 재고의 보관 위치 CO4A1과 다른 위치에 보관된 것을 관찰했다. e.2025년 2월 4일(4 FEB 2025)에 실사관은 (4) 세포 배양 용기 372개가 소프트웨어에서 표시한 보관 위치와 달리 M(4) 위치에 있는 것을 관찰했다. 재고관리 개선을 위해 완제의약품을 프로그램에 편입하려는 2024년 6월 13일(13 JUN 2024)자 변경관리에는 이 변경을 평가할 유효성 확인(또는 유효성 확인을 포함하지 않는 근거)이 포함되지 않았다. Christian Lrch X D 1 BY. 02-07-21%61r513713"
+  },
+  {
+    "finding_id": "finding-43cbb400978f7e097018fac3",
+    "finding_text_md5": "7bc633af17ba48744801c853c74bb8d6",
+    "published_date": "2026-10-30",
+    "detail_text": "Your firm has not assessed for impurities for your drug product containers: (Specification (Specification Observation 1 Your firm failed to establish (PY [redacted] ompie program and did not retain samples for drug products for",
+    "detail_text_ko": "귀사는 의약품 용기의 불순물을 평가하지 않았다: (규격 (규격 관찰 1 귀사는 (PY [redacted] ompie 프로그램을 수립하지 않았으며 의약품 보관 검체를 보관하지 않았다"
+  },
+  {
+    "finding_id": "finding-3b41b995b778f883ffd7e624",
+    "finding_text_md5": "e117f7a8a85111300ccffcdfa19d131e",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, BI-RCV SOP 033-AA-VS-01719 “Packing Product \" for Shipping” does not describe the duration in which the drug substance final containers need to be loaded in the _In addition, the SOP lacks instructions on the activation ofRCV final container.",
+    "detail_text_ko": "구체적으로, BI-RCV SOP 033-AA-VS-01719 “운송용 제품 \" 포장”에는 원료의약품 최종 용기를 _에 적재해야 하는 기간이 기술되어 있지 않다. 또한 SOP에는 RCV 최종 용기의 활성화 지침이 없다."
+  },
+  {
+    "finding_id": "finding-36b76e6b42cc4aafbe8cbfac",
+    "finding_text_md5": "de8e917d33fbf3e8ef0e7f1f37ec1003",
+    "published_date": "2026-10-30",
+    "detail_text": "Specifically, the 4 is not adequately qualified to produce| [redacted] wa) for [redacted] ~—_[ products such as red cell preservation solution and anti-coagulant. a. On 11 SEP 24, we observed unknown white material b)(4 is [redacted] pieces of equipment producing b)(4 for (64) product formulation. b.| [redacted] _lis| [redacted] landusedtoclean’ —=——(B(4)—SSCid equipment. b)( and [redacted] L CA) equipment create b)(4 long _——— [redacted] ~———sinotused since 4 JUL 2024 d. Equipment connected tothe) ——— [redacted] ~—_—|suchas b)(4 4) |(Open to environment), an [redacted] connections not represented on approved drawings. e. Approved Drawing for product} (>)(4) module *|does not show product solution! [redacted] from; [redacted] ~~—_—| This module is used for Alyx, Amicus, and Intersol products. Red cell preservation solution and anti-coagulant solutions formulated with are used to manufacture Alyx, Amicus, Intersol, and Blood Pack Units. *This is a repeat observation from the previous inspection in September",
+    "detail_text_ko": "구체적으로, 4는 적혈구 보존액 및 항응고제와 같은 [redacted] ~—_[ 제품용| [redacted] wa)를 생산하도록 적절히 적격성평가되지 않았다. a. 24년 9월 11일(11 SEP 24)에 실사관은 (64) 제품 조성용 b)(4를 생산하는 [redacted] 장비들에서 정체불명의 흰색 물질 b)(4를 관찰했다. b.| [redacted] _lis| [redacted] land는 장비 세척에 사용된다’ —=——(B(4)—SSCid. b)( 및 [redacted] L CA) 장비는 b)(4 long _——— [redacted] ~———를 생성하며 2024년 7월 4일(4 JUL 2024) 이후 사용되지 않았다 d. ) ——— [redacted] ~—_—|에 연결된 b)(4 4) |(환경에 개방됨)와 같은 장비 및 [redacted] 연결부가 승인 도면에 표시되어 있지 않다. e. 제품} (>)(4) 모듈 *|의 승인 도면에는 제품 용액! [redacted] from; [redacted] ~~—_—|가 나타나지 않는다. 이 모듈은 Alyx, Amicus 및 Intersol 제품에 사용된다. 로 조제한 적혈구 보존액 및 항응고 용액은 Alyx, Amicus, Intersol 및 Blood Pack Units 제조에 사용된다. *이것은 이전 9월 실사에서 반복된 관찰 사항이다"
+  }
+]

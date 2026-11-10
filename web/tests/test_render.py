@@ -12907,12 +12907,22 @@ class WebLlmsTxtTest(unittest.TestCase):
         cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_llms_"))
         out = cls._tmp / "single"
         _build_single(out)
+        cls.out = out
         cls.txt = (out / "llms.txt").read_text(encoding="utf-8")
         cls.sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_indexnow_key_file_at_root_exact_content(self):
+        """IndexNow 키 파일 — dist 루트 `/{key}.txt`, 내용은 키 그대로(개행 없음)."""
+        import indexnow_submit
+        key = indexnow_submit.INDEXNOW_KEY
+        self.assertRegex(key, r"^[0-9a-f]{32}$")
+        f = self.out / f"{key}.txt"
+        self.assertTrue(f.exists(), "IndexNow 키 파일 누락")
+        self.assertEqual(f.read_bytes(), key.encode("utf-8"))
 
     def test_counts_derive_from_render_inputs(self):
         terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))

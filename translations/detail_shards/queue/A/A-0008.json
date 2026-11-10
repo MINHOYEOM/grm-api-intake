@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-f1438ec163f95eceee82e866",
+  "finding_text_md5": "24ba7c74a055307818ad6119bafce3cb",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, In WX-SOP-10217: Laboratory Investigation Report Procedure, Section 5.5.9.1, states: \"If no root cause is identified through phase 1 and 2 investigations, upon consultation with QA, the investigation may progress to retesting.\". Section 5.5.9.5 specifies: \"If all results meet specification, are within system suitability and sample acceptance criteria the re-testing can be reported and the original analysis invalidated.\". This SOP allows retesting and subsequently invalidate the original results if no root cause has been identified, which is inappropriate. When no clear laboratory error has been identified, the initial results may constitute valid analytical findings that should be reported and considered in the batch release decisions. SEE"
+ },
+ {
+  "finding_id": "finding-ea3f777756de89c3d8a169ef",
+  "finding_text_md5": "96df149b2ae868514d056bac0435a80f",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, a) On April 20, 2026, during thea)@ operation of w@ Tablets USP @@ mg, batch 0) thegy @ had an in-process limit of 0) (4) Theg a) documented in the batch manufacturing record was wq@ However, upon verification using the ow (Equipment # g@ used for the batch, the actual q@ was found to be ow Based on the manufacturing operator, it was unknown why theg@ was out of the specified in-process limit. He also stated that, during the previous interval, he had recorded a lower value than the actual @ @ displayed on the aya b) On April 20, 2026, at 12:32 PM, thea operation ol) Tablets USP, batch q@ was placed on hold due to failure to achieve the aw required by the batch manufacturing record. The production supervisor stated that engineering was notified of the machine issue via phone call. The tablets Unnee Ranjan, DDC Investigator _ aN ANAS i"
+ },
+ {
+  "finding_id": "finding-e789fc251ff203e284a29c28",
+  "finding_text_md5": "4c0d5edeae923e3ceb55861c5c719d64",
+  "published_date": "2026-07-27",
+  "detail_text": "Unnee Ranjan, DDC Investigator UNNEE RANJAN -S RANIAN-S"
+ },
+ {
+  "finding_id": "finding-e685806e5280a46023739b21",
+  "finding_text_md5": "44f9540917b5e08322af0f1dcbfdad31",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, a) On April 20, 2026, during inspectional walkthrough of Building ® which is utilized for the manufacturing of om products for the U.S market, the following was observed: Unnee Ranjan, DDC Investigator UNNEE RANJAN -S5 soasosar eos sae"
+ },
+ {
+  "finding_id": "finding-dc38b3a778442272cda7ff37",
+  "finding_text_md5": "b5d50c0b6070b074bc26d6ffad12e231",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm has not placed any© USP®® batches on stability in 2024 or 2025. In accordance with your approved stability procedure SOP 021 Stability Testing of Bulk Drug Substances, Rev. S, Effective Date 12/22/2020, at least one batch per year is required to be put on stability. In 2024, pe USP batches, were released and in 20254} batches of USP, © were released. Lyw ws 09/29/2025"
+ },
+ {
+  "finding_id": "finding-d622057373c945f85bb9eaf5",
+  "finding_text_md5": "60b530eb888a8144d1a849a3ff94d15d",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, during the execution dug substances manufacturing, Batch# @@ required pre- production environmental monitoring (EM) was not performed as specified in the procedure #SOP- XMS-8000.MF, including Airborne Viables and Non-Viable Particle monitoring of the production Laminar Flow Hood. Pre-production EM for the batch filling operation was performed during @@ ow prior to drug substances filling operations. As stated in the written procedure, pre- production EM is required to be performed duringg)@"
+ },
+ {
+  "finding_id": "finding-d391a05a6581b2e8ccbb91bd",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Excel spreadsheets used to perform GMP calculations, including system suitability assessments and analytical result calculations for HPLC analyses, were observed to be unvalidated and executed outside ofyour validated (b) (4) — system. Specifically, the following spreadsheets were observed in use: e (b) (4) SysSuit.xlsx — HPLC system suitability for (b) (4) e (b) (4) SysSuit.xlsx — HPLC system suitability for (b) (4) analysis e (b) (4) _BU_Calc.xlsx —(b) (4) bulk calculation e (©)(4)_ASCU_Calculation.xlsx— Assay/content uniformity calculation e (b) (4) _AS Calc.xlsx —(b) (4) assay calculation e (b) (4) _ASCU_Calculation.xlsx — Content uniformity calculation e (b) (4) Disso calc.xlsx — Dissolution calculation e (b) (4) CU By® @xlsx — Content uniformity calculation e (b) (4) BU Calc.xlsx — Bulk calculation e (b) (4) As Calc.xlsx — Assay calculation e (b) (4) Calculation.xlsx — Assay calculation e (b) (4) _Calce.xlsx —(b) (4) calculation e (b) (4) _Calc.xlsx — (b) (4) calculation e (b) (4) _DS_Calculation.xlsx — Dissolution calculation e (b) (4) _Calc.xlsx — Content uniformity calculation"
+ },
+ {
+  "finding_id": "finding-c783cd1aa60768374ce4f0eb",
+  "finding_text_md5": "53bbed3ab35c85d24c524f4cb04749d9",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, A.) Your analytical laboratory paper records do not include signature and date ofthe second person reviewing ©@ impurity data on HPLC-1 for batches © ©) 4) These batches were later released by QA without investigating whether they were reviewed or not. In addition, your firm does not include an electronic signature of review for HPLC data. B.) Your microbiology laboratory paper records do not include the signature of the second person reviewing the record for accuracy including for growth promotion studies and finished product testing. C.) used in production of USP does not have user login and parameters on the ®@ can be changed by anyone with access to the room. Non- production personnel such as engineering, regulatory affairs, and quality assurance can access these controls. In addition, without user login there is no electronic traceability of operators performing manual cycle switches. D.) contain a shared administrator password for all users. This causes there to be no electronic traceability of operators performing manual cycle switches."
+ },
+ {
+  "finding_id": "finding-c213c5aea1b475848b8ed7b2",
+  "finding_text_md5": "c777c2d105ce2a16994ca7560838f109",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, The number of containers to be sampled and the amount of material to be taken from each container for (b) (4) and (b) (4) testing of high-risk components is not based upon appropriate criteria. Specifically, your sampling procedure (SOP No. NL-QA-017.12) does not include a written scientific or statistical rationale for the amount of sample collected from each container for(b) (4) _ testing of high- risk drug components. You collect approximately (6)(4) per container; however, there is no documented justification establishing that this quantity is appropriate relative to container size or sufficient to perform all required testing, including repeat testing. Additionally, your written procedure does not establish criteria requiring that each individual container of each lot of high-risk drug"
+ },
+ {
+  "finding_id": "finding-b3f80ca472c0a35bb3a17a73",
+  "finding_text_md5": "b7018c42d3b41d999b2da5aee8f06d5c",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Critical analytical methods showed high invalid assay rates froma@ to current: m@ fora @@ ALaboratory Investigation Report (LIR) has been initiated, and operator training was identified as the main root cause. While some methods have shown improvement following enhanced training programs O@ invalid rates for the following critical analytical methods remain high in @@ for o@ @@ |!n addition, invalid rates are also high fotg@ iNey"
+ },
+ {
+  "finding_id": "finding-b0ef3a7efd37bd9661602e67",
+  "finding_text_md5": "e3865ed2f73c5c36d6130f8e8d0c189c",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm has not validated the production processes used to manufacture the over-the-counter finished human drug products intended for the U.S. market: (OS)"
+ },
+ {
+  "finding_id": "finding-a8c15b0c7796e39154df698a",
+  "finding_text_md5": "66b62b177b6da07edb48e4869684c9f8",
+  "published_date": "2026-07-27",
+  "detail_text": "A. On December 5\", 2025, while observing set-up onw@ Filling Line (Room @@ for the aseptically filled finished drug product m@ batchm@ poor aseptic processing behavior was observed. This filling line is used to manufacture US market product. Examples ofpoor aseptic behavior include: 1. An operator exited the filling room and returned with m@ for the mw filling apparatus, these m@ in total) are affixed to this filling apparatus in close proximity to aseptic connections, approximately m@ 2. Operators were specifically observed moving freely between Grade A and Grade B spaces without any record of their movements and activities throughout the entire setup process. 3. Operators were observed with exposed skin while performing maintenance activities on thes@ «assemblies in close proximity to the filling station and / or while performing aseptic connection. 4. Operators were observed wearing safety glasses with exposed skin around the glasses. In addition, operators were observed moving their protective eyewear (glasses) such that they rested on their forehead while their head was inside the Grade A area. 5. Operators were observed reaching into the open bag containing sterile bottles mu"
+ },
+ {
+  "finding_id": "finding-a7902659b7c20d0fbf225bd4",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2026-07-27",
+  "detail_text": "A. Personnel monitoring program has not been implemented for any aseptic operations. Personnel monitoring regarding aseptic connections has never been conducted. B. Surface monitoring has never been performed on any equipment surfaces including critical product contact surfaces such aso® product contact locations including C. Active viable air sampling has never been implemented in any aseptic processing areas. SEE Lisa L. Flores, Investigator LLF 12/10/2025 REVERSE OF | Robert Ham, Investigator THIS PAGE XK )g ZL"
+ },
+ {
+  "finding_id": "finding-a3b1ceee7db35bac8b4bd67c",
+  "finding_text_md5": "db2cedeea8981f1132be2b0102c4e097",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, a. Your firm does not perform any finished product testing (including but not limited to testing for contamination of objectionable microorganisms and assay) for drug products intended for the U.S. market other than checking for conformance to appearance and weight per unit specifications. There is no written documented agreement that testing and other GMP activities not performed by the firm is to be done by the customer, and that shipment is done so under quarantine. In 2025, your firm has manufactured and distributedm@ the following drug products intended for the U.S. market: ©)"
+ },
+ {
+  "finding_id": "finding-a2fb4b04bbeaf54d90bbac74",
+  "finding_text_md5": "cf5da805b5f2c68be125e1b83672e9b6",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, there are no incubation time requirements listed in the written procedures to initiate the growth test for exposed biological indicators, Iincubation time requirements are not listed in theg@ qualification protocol/report and exposed biological indicators were not placed on test for extended period of time. Biological indicators from aay qualification performed on@@ were not placed on test until m@ ! approximately @@ _ later. ww is used to perform sterilization on production equipment components, including the @@ assembly used during for the @@ drug substance filling operation."
+ },
+ {
+  "finding_id": "finding-a0c762971eb279ed3970ed0e",
+  "finding_text_md5": "81cbbc9e905f2f14a319ae7692d310a0",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm did not include specimens or copies of all completed labeling, including the label adhered to the m@ packaging bottle and labeling on the m@ packaging carton, in your batch production records for packaging finished over-the-counter human drug products intended for the U.S. market. Your firm did not include specimens or copies of full labeling in each of the respective batch packaging ; . : . . wa records for the following finished drug products: XC)"
+ },
+ {
+  "finding_id": "finding-9f6d0b7c5efd29f7692dba37",
+  "finding_text_md5": "d47bd56426b335537b2f7d38562853ce",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, A)Your quality unit does not clearly document that data review is performed and verified as outlined in the Laboratory Documentation Checklist form prior to approval of the Finished Product Test Summary form for the 1) review ofelectronic raw data, including but not limited to high- performance liquid chromatography (HPLC), Ultraviolet—visible (UV-Vis) spectra, bacterial endotoxin testing (BET), and particle size analysis, 2) review of file or run level audit trails for laboratory instruments such as HPLCs, 3) verification of all calculations when excel worksheets are used, and 4) review and resolution of out-of-specification (OOS) or other laboratory non- conformances associated with chemistry or microbiological testing. B)Your quality unit does not document review of 1) (b) (4) standard checks for expiration date as outlined in SOP AR-SOP-0462 Receipt, Handling, and Storage ofReference Standards (version 11.0, effective 09/07/2022) and 2) the review of reagents and discarding of expired reagents from laboratory inventory as outlined in SOP AR-SOP-0437 Preparation, Documentation, and Storage ofSolutions, Mobile Phase, and Reagents (version 16.0, effective 07/16/2025)"
+ },
+ {
+  "finding_id": "finding-9dcb0f1ab3dd228b6067f003",
+  "finding_text_md5": "3c13ec6339d3b41e7d5fbcaff6d3c009",
+  "published_date": "2026-07-27",
+  "detail_text": "The following were observed throughout productions areas used to manufacture products for the US market. A. Thewe Line consisting ofrooms o@ used to manufacture oe for the US market: 1. Apparent rusty equipment, apparent rusty components @@ , apparent rusty machine parts on and around filling zone such as the m@ parts and m@ OC) tracks 2. Stained / apparent rusty HEPA filters and / or HEPA filter m@@ as well asm@ OG) 3. we with apparent rust is used to transport the @@ product transfer vessel from wm@ room to filling room. B. Thewe Line consisting of rooms o@ we . used to manufacture @@ OX) SEE Lisa L. Flores, Investigator LLF 12/10/2025 REVERSE OF Robert Ham, Investigator THIS PAGE XK )g ZL."
+ },
+ {
+  "finding_id": "finding-98f208d7996d82a0b00d7c10",
+  "finding_text_md5": "9aa0eb4805b1fd0d66994d51baac9f06",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your manufacturing operators do not initiate deviation investigations after identifying out-of-specification (OOS) results during in-process testing of tablet formulations duringg~@ = —~—_—operations. A review of raw data from in-process testing revealed that several batches had failed in-process test results. No manufacturing deviations or documentation in the executed batch records were available for these failures. Your firm follows a similar approach for capsule products as well. Additionally, the Quality Unit’s review performed as part of batch release did not initiate deviations for these OOS in-process results. A review of approximately (@ batches revealed that aboutm@batcheswe %) had failed in- process test results for which no deviation investigations were initiated. There is no assurance that products manufactured meet established in-process control requirements. For example, this is not a comprehensive list: Table 7 _ 7 . . Digitally signed by UNNEE RANJAN Unnee Ranjan, DDC Investigator U f ~ Se MERE 14:59:52 40530 |"
+ },
+ {
+  "finding_id": "finding-948852bc56e9dd679ef951a1",
+  "finding_text_md5": "d346e6d67998636de733564fdf05add9",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, electronic test records fromg@ ‘Integrity Testy units are not reviewed or reconciled against the printed test reports and failed test results are not always identified or reported in the associated batch production records. Failedg integrity test reports are not always printed or included in the associated batch production records and not reviewed to ensure compliance to written retesting requirements. The written test procedure allows maximum Of@@ integrity tests petgyg ’, including gq re-tests after initial failed test result. Following failed gq) reports obtained from the stored electronic data were observed to be missing from the production batch records for ga) dug substances, Batch# q : A. Initial failed gq results for g @ on the drug substances ga) Filling operation was not"
+ },
+ {
+  "finding_id": "finding-903d7647d1c51a28bea1dd89",
+  "finding_text_md5": "06f6304550ba2ccbaaf6b280d885e1ba",
+  "published_date": "2026-07-27",
+  "detail_text": "A. You do not perform visual inspection of your aseptically filled product, and you have not established written procedures regarding this critical process. Your QA Manager reported you inspect the outside of each unit for defects to include particles but do not inspect the contents. B. You lack control over critical elements of your terminally sterilized m@ process for the following: C. You lack recordation of critical process parameter(s) in your BPRs regarding your 0) process such that »@ is not recorded. Your production personnel reported@ was required form@ 1. Enumeration of rejects is absent regarding your in-process visual inspection of filled ow for your»@ process, instead, your BPRs read in part, “OK”. Furthermore, critical attribute of@ integrity is apparently incorporated into your SEE Lisa L. Flores, Investigator LL a 12/10/2025 REVERSE OF | Robert Ham, Investigator THIS PAGE OW FORMFDA 483 (09/08)"
+ },
+ {
+  "finding_id": "finding-876c940301999ffe98a4ed40",
+  "finding_text_md5": "733ecb12d23e2c2328ad3c6f5139255d",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, during the inspection conducted on [01/15 and 01/16/2026 ], the following deficient conditions were observed: a live bird and bird droppings were found in the raw material warehouse, approximately 30 feet from m@ packaging materials; apparent unidentified black substance was observed covering over 25% of the ceiling surfaces in both the raw material warehouse and finished drug product storage warehouse; and a gap approximately 1 inch was observed in the dock door of the finished product storage warehouse."
+ },
+ {
+  "finding_id": "finding-839a25d0d132793705dee035",
+  "finding_text_md5": "9d9a9aea5dabbf7b1a0a3d38d354cd25",
+  "published_date": "2026-07-27",
+  "detail_text": "Your firm aseptically fills OTC finished drug products m@ for the US market. Your aseptic filling process includes: A. After sterilization of your@@ product transfer vessel via @@ performed in Washing and Sterilization Areag@@ you move this vessel into your Grade A space located in ©) Fillng Room@@ Your@@ product transfer vessel is moved via your@@ into youl®@ Filling Room@@ Your Washing and Sterilization Aream@ is a Grade B area, your corridor is a Grade B area and your@ Filling Roomm@ is a Grade B space with exception to your GradeA filling area located under your LAF. Your aseptic connection located on your@@ product transfer vessel is not covered or protected during this transfer. B. Your firm performs aseptic filling onw@ Filling Line (Room@@ _). On December Sth we observed setup on this line. This filling line has no barrier protection separating the filling line, to include the filling zone that harbors the m@ , area where m@ are loaded, area the m@ resides and the area whereby open sterile bottles pass, by design, between Grade A and Grade B spaces prior to being filled. C. Contact surfaces of the sterile m@ components are not sterilized. For example: 1. The ) 4 Filling Lin"
+ },
+ {
+  "finding_id": "finding-7dc67504692cf96fa1fa7a88",
+  "finding_text_md5": "f2afb0462050139493a0abd8d478bfbd",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Microbiologists responsible for performing sterility testing and collecting environmental monitoring, personnel monitoring, and@@ samples confirmed they do not collect, test, and incubate all samples. A. During inspection of the m@ Biological incubators in the microbiology laboratory on December 5, 2025.@ _ personnel monitoring plates were observed and photographed with visible microbial growth. On December 6, 2025,@@ of thes@ plates previously observed with growth were observed with no growth. Upon examination, the plates on December 6, 2025 were missing the initials of the microbiologist who plated them, and the plates appeared to be different although the labeling information was the same (except for the missing microbiologist initials). The remaining@@ plates were missing. When questioned about this discrepancy, Microbiologis(?® stated that he had labeled unused plates with the same information and discarded the plates with growth. Lisa L. Flores - piavaly signed by bisa. SEE Lisa L. Flores"
+ },
+ {
+  "finding_id": "finding-7b5ab38b1a242974b880ab6e",
+  "finding_text_md5": "1e056cdf93562d5fa3f63c27ee72d385",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm received a complaint via email on September 14, 2019, alleging that two of your Class II portable x-ray devices, the Cocoon - models DX-7017 and DX-7020: 1)May be incorrectly labeled as one device contained a removable label over the permanently affixed model label. 2)Did not clearly indicate the focal spot for the skin-source distance as the sticker indicating the focal spot was removable. 3)Had highly variable entrance skin exposure values - ~26% for the device identified as DX-7017 and ~48% for the device identified as DX-7020. This complaint was not analyzed and recorded in your Customer Complaint and Handling Ledger, F709- 1, as required by Section 5 of your complaint handling procedure, Customer Complaint Management, QP-801, Revision 5. Additionally, Section 4.1 of your complaint handling procedure requires complaints"
+ },
+ {
+  "finding_id": "finding-6a2007d328e0fabaf9bd6abc",
+  "finding_text_md5": "624979ce15992d2574cb72650239d62c",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, during the inspection, it was observed that your firm has not conducted Annual Product Quality Reviews (APQRs) for the majority of products manufactured at @@ manufacturing units. While your firm provided APQRs for oe numerous other OTC drug products manufactured during the review period lack APQRs. Based on batch records reviewed, products missing APQRs include various m@ products manufactured at Unile@ Your firm's own SOP APQR (SOP/QA/014-06, Section 8.5) acknowledges this requirement, stating \"Annual Product Quality Review shall be prepared for all products which are in the market oe"
+ },
+ {
+  "finding_id": "finding-692247fd55cdb0ce13b787bf",
+  "finding_text_md5": "6f211e1b55f8df94f607061536629fec",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, sample containers used to collect endotoxin test samples, including finished drug substances, are not made of suitable materials to ensure reliable and accurate results. The firm uses sample containers made of we to collect endotoxin samples for batch release testing and held up to @@ __prior to testing. No endotoxin recovery studies were performed to verify suitability of the sample containers, and to ensure Ory container surfaces do not interfere with the endotoxins in the sample. Endotoxins g@ are known to have affinity to adhere to @ materials, potentially resulting in false negative results."
+ },
+ {
+  "finding_id": "finding-6781ec1a7de6db9d5aa2c45d",
+  "finding_text_md5": "da2bc4eef5c4e6eacee9bea0f1015b78",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm failed to provide adequate assurance that gasket particulate does not ingress into the container closure (e.g., tank) during filling operations. We observed (6) (4) gaskets used in the filling hose to connect to the shipping containers of the trailer trucks to be cracked and fractured. Your firm has not validated that the (b) (4) installed in the filling line is effective at removing all potential gasket particulates. No studies have been conducted to provide assurance that microscopic particulates (smaller than (b) (4) ) do not bypass the (5) (4) and contaminate the finished drug product."
+ },
+ {
+  "finding_id": "finding-653680289800683985f3515d",
+  "finding_text_md5": "0f6d5d3649288dcdbe683b7d6a681848",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, During the inspection, batch manufacturing and analytical records for @ batches across @ products were reviewed: oe The following deficiencies were observed: A) Analytical data for residue on ignition and melting range tests recorded in BMRs and COAs did not match the corresponding entries in@@ analytical data books for O@"
+ },
+ {
+  "finding_id": "finding-5c0c7039d5daf7a5b650987a",
+  "finding_text_md5": "c2fdeb18618eadc4dec3f07cb797f541",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, your cleaning validation program for non-dedicated manufacturing equipment, used for multiple drug products, is inadequate."
+ },
+ {
+  "finding_id": "finding-5b929fec50d167fb0c4782de",
+  "finding_text_md5": "10367a864dfcab6878c7177d375e9186",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your procedures relating to complaint investigation (CQA/0153-008, Effective date: 30-Sep-2024), and Field Alert (CQA/0191-003, Effective date: 31-Jan-2025) are deficient. There is no information relating to impact assessment and market actions that need to be taken in the event of repeated market complaints received for the same product and batch number. For example, Digitally signed by UNNEE iN ef DL INI ON — a Unnee Ranjan, DDC Investigator JINN Date: 2026.05.01 15:02 +0530"
+ },
+ {
+  "finding_id": "finding-5acea72892e53afcc3729b24",
+  "finding_text_md5": "84353948680f1d440ac1135ceeedca5f",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm’s SOP entitled, “(b) (4) Test using (b) (4) * Document No. G-WI- RAD-QA-335, Revision 3.0, Effective November 30, 2020, states that the “(b) (4) test” must be performed on the (b) (4) to ensure the instruments (6) (4) accuracy. Initial failures attributed to sample preparation errors may be repeated but a repeated failure requires a written “Calibration Investigation Report”. There were several initial and repeated (b) (4) test failures that were not investigated and/or documented. Instead, the analyst repeats the (b) (4) test until it passes. There is no written explanation/justification for this current practice. Furthermore, your firm relies on the data from the (b) (4) to release batches of drug products that have undergone (b) (4) sterilization and to provide your customers a Certificate of Processing stating that the drug products have achieved adequate exposure during the sterilization process. QUALITY SYSTEM"
+ },
+ {
+  "finding_id": "finding-55b71a28b860889e6f0e5240",
+  "finding_text_md5": "7f86e271fe89b4580fc3f605fa8d4ea7",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, equipment cleaning procedures do not include drying procedures or designated equipment holding area to prevent residual liquid solution@ ‘from dripping into the classified production area. During the walkthrough of the production area, recently cleaned production @@ tank (equipmenttt @@ 1300) was observed dripping liquid into the classified area (Grade D), pooling under the equipment. This recently cleaned equipment was staged in the production corridor with the@@ _-valve in open position to drain. Liquid ga in the classified area could potentially allow proliferation of microorganisms, including bacteria and mold."
+ },
+ {
+  "finding_id": "finding-5154da01f694920f70558418",
+  "finding_text_md5": "acbb8709670431ac34c3a1a80fae9162",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm does not perform stability testing for drug products intended for the U.S. market. There is no written documented agreement that stability testing is to be performed by the customer. Additionally, your firm does not have any data to demonstrate drug products intended for the U.S. market meet their established specifications throughout their labeled shelf-life of no longer thane we In 2025, your firm has manufactured and distributed m@ the following drug products intended for the U.S. market"
+ },
+ {
+  "finding_id": "finding-50184a852af777c122de23fe",
+  "finding_text_md5": "2ea6d5e59e1a5290126a97082e93c3ef",
+  "published_date": "2026-07-27",
+  "detail_text": "During the inspection, your firm's laboratory operations were found to have significant deficiencies in data integrity, record maintenance, and analytical controls. Your quality control unit did not adequately oversee these operations to prevent systematic violations. Specifically: A) Inaccurate Laboratory Data: Review of records of over m@ finished product microbiology samples tested over oe revealed that 100% of the results were reported as \"<10\" (zero colonies) in laboratory records. However, during the inspection on January 12, 2026, investigator observed the presence of colonies on multiple plates during plate reading activities including two plates that were TNTC (too numerous to count) for the drug product m@ wo which was inconsistent with the documented trend. Your firm performs microbial release testing for US marketed OTC products including oe oe Additionally, @@ testing data exhibited repetitive number patterns for duplicate microbial m@ testing plates (example CFUs: m@ oe that suggest the data may not reflect actual analytical test results. Your facility uses m@ as a component in drug products, including »@ and multiple m@ as well as for cleaning of manufacturing equipm"
+ },
+ {
+  "finding_id": "finding-4fde1b68f4ecad274f8760c9",
+  "finding_text_md5": "9bec146d2c0dc94825bf78b38a1db8f1",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, during the inspection conducted on [01/15 to16/2026], hoses connected to points of use in the Unite@ area and Unite manufacturing area were found to contain stagnant OY) compromising @@ quality and creating microbiological contamination risks. The ©) in these hoses is used for cleaning m@ tanks utilized in the manufacturing of drug products."
+ },
+ {
+  "finding_id": "finding-3e6f823c5ce8ea986279bf1f",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, a) Your firm's SOP entitled, “Deficiency Handling”, Document No. G-WI-QA-002, Revision 14, Effective March 31, 2022 states that the Quality Control Unit is responsible for the timely completion of investigations however, your firm's Quality Control Unit (QCU) repeatedly failed to complete investigations of deficiencies (deviations & non-conformances) within the (b) (4) time frame with/without customer notification as written in your SOP. b) Similarly, your firm’s SOP entitled, “Corrective and Preventative Action (CAPA), Document No. G- WI-QA-005, Revision 15, Effective February 28, 2022 states that the QCU is responsible for closing CAPAs within a ®@ of initiation, However, your firm's QCU failed to close all corrective/preventative actions within the (b) (4) _ time frame as written in your SOP."
+ },
+ {
+  "finding_id": "finding-38994dbc7b4a9ab213027da3",
+  "finding_text_md5": "a56d7c1ae4e3f1a088c0238969d15fe4",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, A) Your firm failed to complete process validation studies for oe o@ manufactured at@@ as required bye@ B) Your firm lacks adequate controls over your stability testing program. Specifically, you do not maintain a complete inventory of stability samples under test nor establish procedures for reviewing stability data generated by o@"
+ },
+ {
+  "finding_id": "finding-2fe06da3963ced8d17a0495c",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your Quality Unit lacks adequate oversight into the integrity of data pertaining to QC testing on UV Spectrometry. For example, On 23-Apr-2026, the evaluation of Dissolution by UV test data revealed potential for lack of testing integrity. Your QC Analyst appeared to have analyzedg)@ separate test samples on UV Spectrometer ing@ However, when the same analyst demonstrated the analysis for the same product during the inspection on 23- Apr-2026, the analyst appeared to be rushing to complete the analyses and still ended up taking twice the amount of time i.e. about @ @ fora@ test sample. Few examples are included as follows: Table 4 b)@) Unnee Ranjan, DDC Investigator UNNEE RANJAN -S RANA"
+ },
+ {
+  "finding_id": "finding-2871d097a6f06d558e98f76d",
+  "finding_text_md5": "916f43d9cfb44bc859b7e5d9c6acbb24",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm does not perform identity testing for components used to manufacture drug products intended for the U.S. market. Components without identity testing performed include but are not limited to: OS) These components are the active pharmaceutical ingredients for O@ YC) drug products intended for the U.S. market."
+ },
+ {
+  "finding_id": "finding-277b91cdb379d6b826ef281f",
+  "finding_text_md5": "3087d3bf053987ce63f7b3fd3dbde0d5",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, From August 01, 2024, to August 12, 2025, your firm identified 750 defects but did not investigate them to determine root causes. In addition, you lack adequate written procedures for investigating discrepancies to determine whether corrective action or extension of the investigation to other lots is required. For example: (A) Defect ID 11880 identified a discrepancy regarding a unit dose that was distributed to a hospital containing two different tablets. (B) Ten defects identified as having “foreign particle packaged” were not investigated to determine the source of the contaminant. These include Defect ID: 11510, 11511, 11619, 11680, 11839, 12126, 12171, 12183, 12202, 12203."
+ },
+ {
+  "finding_id": "finding-20b57f2a7bf014475f08b687",
+  "finding_text_md5": "e1a84208d483aeb6f718a46fe9496f79",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, You failed to conduct a cleaning validation study to demonstrate that your cleaning procedures effectively remove penicillin residues from equipment that is used to repackage both penicillin and non- penicillin drug products. (A) From June 2023 to August 14, 2025, Bulk ® Packager, Bulk Packager, Bulk® Packager, Bulké Packager, and Bulk Packager were used to repackage approximately (b) (4) _ solid oral doses of drug products, of which approximately (b) (4) doses involved penicillin products. Your cleaning procedure for bulk packager was not established based on a cleaning validation study to assure effective removal of penicillin residues to prevent cross-contamination with non-penicillin drug products. (B) From June 2023 to August 14, 2025, the (b) (4) _—was used to repackage (b) (4) lots of drug products, ofwhich\"® lots involved penicillin products. You did not performa cleaning validation study to establish a detailed cleaning procedure for the (Bb) (4) _ to assure effective removal of penicillin residues to prevent cross contamination with non-penicillin drug products."
+ },
+ {
+  "finding_id": "finding-18cf59a0c7a31f2f40d617da",
+  "finding_text_md5": "619dc5067876e3e07bf9586d46f2ec89",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm’s process validation for® USP,i product codes, does not include validation of processing times listed in the batch record and in procedure SOP# 149. For example®® 4) cycle minimum times in the batch record were not tested, function was not monitored or recorded, maximum and minimum loads are not defined for stress testing the process, anc) being held throughout the cycle is not monitored. In addition, your firm manually switches cycle ®® and?) operation rather than using recipes for repeatability. Your firm processed ®® product code batches and®® _ product code batches during process validation due to various significant deviations and OOS results, such as product Color, atypical Loss on Drying, Total Plate Count failures, and other issues. This caused your firm to make additional batches in order to achieve process validation criteria of three consecutive product batches meeting specification. Your firm has released approximately { out off} batches of®® product code produced in the past two years and (} out off} batches off} product code produced in the past two years. In addition, your firm’s procedure, SOP# 149, “Operating the®® ” states to (b) (4)"
+ },
+ {
+  "finding_id": "finding-0c8820b12fb29081ea763b5d",
+  "finding_text_md5": "30373493a2c12dd5ffb2da869610bb2d",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, Your firm's SOP entitled, \"Customer Complaints\", Document No. G-WI-CUS-001, Revision No. 16, Effective December 31, 2021 states that the Preliminary Investigation and Risk Assessment is to be completed as soon as possible but within (b) (4) of receipt of customer complaint. In addition, it states that the customer follow up is to be conducted a (6) 4) after the preliminary investigation/risk assessment is completed. However, at time of inspection, there were at least seventeen (17) open complaints that exceeded the time frame that have not been resolved."
+ },
+ {
+  "finding_id": "finding-079cb2e837e84a2b1682c258",
+  "finding_text_md5": "e8fb98a6402109bd89034fb8b1e253de",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, During the investigation (LAB-00433) initiated on February 6, 2026, for an out-of-specification (OOS) (b) (4) result obtained for (6b) (4) , USP, Receiving Lot #(b) (4) (Retest Date: (b) (4) ), you determined that the root cause was the aging of the (Db) (4) =material, which decreases (b) (4) over time. (BD) (4) Lot #(b)(4) —_-was subsequently rejected. However, this same (Db) (4) lot had previously been used while meeting in-house (b) (4) limits at the time of use to manufacture the following finished product batches that were released to the market: e Bulk Batch(b) (4) - Filling Batch (b) (4) -—(b) (4) Batch(b) (4) ((b) (4) ; Manufacture Date: (b) (4) ; Expiry Date: (b) (4) ) e Bulk Batch(b)(4) - Filling Batch (b) (4) —(b) (4) Batch(b)(4) ((b) (4) ; Manufacture Date: (b) (4) ; Expiry Date: (b) (4) ) The investigation concluded that the associated drug product batches were not impacted because the (b) (4) material met in-house (b) (4) limits at the time of use and the finished product batches passed drug product specifications at release. However, the investigation was not extended to evaluate"
+ },
+ {
+  "finding_id": "finding-005094708371f04bc4dbcebc",
+  "finding_text_md5": "78376b84801dfd490f01083ba10fd870",
+  "published_date": "2026-07-27",
+  "detail_text": "Specifically, A.) Your manufacturer of has stated that “This product is unsuitable for use in the production ofAPIs as — do not follow required GMP practices and do not sell pharmaceutical grade products”. You proceeded to qualify this manufacturer of without obtaining a COA listing the identification and quantitation of all impurities as per the USP requirements. Additionally, you did not conduct a risk assessment to determine if this product would affect the quality of the final product. B.) Your firm has not completed additional testing of per USP standards at appropriate intervals since 2021 to assure that the manufacturer can consistently provide meeting specifications. C.) Your supplier of has not provided comprehensive certificates of analysis per USP requirements for every shipment/lot of received since 2021 and your firm has not checked and verified the reliability of certificates ofanalysis at regular intervals. | |"
+ },
+ {
+  "finding_id": "finding-e78d05e4ef0949549ee55565",
+  "finding_text_md5": "1b89a45ef51f6a550e9211b8568c6321",
+  "published_date": "2026-07-24",
+  "detail_text": "Specifically, administrative staffmember performs essential tasks such as (b) (4) with no evidence of training on updated procedures or non-existing procedures."
+ },
+ {
+  "finding_id": "finding-dfa48d448f95ea282c2bd4a5",
+  "finding_text_md5": "6487db645caa49364cc67fd1ec43af29",
+  "published_date": "2026-07-24",
+  "detail_text": "Specifically, there is no quality agreement established with (b) (4) regarding mycoplasma release testing."
+ },
+ {
+  "finding_id": "finding-b9559e7b1f8baf107f7c2435",
+  "finding_text_md5": "1a1ccdb6f656144d39b5d6a2022ffde9",
+  "published_date": "2026-07-24",
+  "detail_text": "Specifically, a. Test runs are not documented during performance including (b) (4) of electrophoresis gels, critical test parameter checks, and reagents lot numbers and expirations. b. Quality control of positive controls is recorded on an (b) (4) with no record of (b) (4) (b) (4)"
+ },
+ {
+  "finding_id": "finding-b3d7a84fd3df8b11cca3ac3c",
+  "finding_text_md5": "f6ddbe85f681c0de527f809cd81992c9",
+  "published_date": "2026-07-24",
+  "detail_text": "Specifically, a. Technician was observed using out of calibration equipment (pipette and thermomixer) during the extraction step for mycoplasma testing on June 16, 2025. (©) @) of® pipettes on a rack were discovered to be out of calibration. b. Preventive maintenance (PM) and calibrations requirements are not established and routinely performed on critical equipment including the (b) (4) PCR System (ID#(®)(4)), (b) (4) Thermomixers# (6) (4) (b) (4) gel imaging system (ID #(6)@4)), Electropheresis (b) (4) (ID #H(b) (4), and ©) @) (ID # ®)@)), c. Qualification studies were not initially performed on the (b) (4) and (b) (4) freezers prior to use."
+ }
+]

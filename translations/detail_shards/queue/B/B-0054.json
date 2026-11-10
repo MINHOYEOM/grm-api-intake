@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-db3ee96bf281296d601bddde",
+  "finding_text_md5": "828bd271ef4cba6aa5a45ccdede6ede5",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, Your firm does not initiate change controls when necessaiy and in a timely manner. For example, according to your Quality Assurance Director, you did not initiate a change control for the installation of your new ISO 5 Hoods <Redacted B4> with EQ ID: 2022-17913 1 & 2021-1 66295 respectively. These hoods per your Quality Director were installed on May 8th, 2022, in the Clean Room and has been used in the packaging of <Redacted B4> and <Redacted B4> per your Production log from January to August 2022."
+ },
+ {
+  "finding_id": "finding-b0098439310ec3b7e940dfda",
+  "finding_text_md5": "72e8fab32e0129fc0034c72d000e2362",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, your firm did not submit a serious and unexpected adverse event report to FDA within 15 calendar days after first receiving information about the adverse event. Examples include: •FDA !CSR ID 2081606, received 2/7/2020, submitted to FDA 3/13/2020 • FDA !CSR ID 2129150, received 4/12/2022, submitted to FDA 5/25/2022 •FDA !CSR ID 2112196, received 4/15/2021, submitted to FDA 6/1/2021 • FDA !CSR ID 2112195, received 4/15/2021, submitted to FDA 6/1/2021 • FDA !CSR ID 2100701, received 10/15/2020, submitted to FDA 12/7/2020 • FDA !CSR ID 2087366, received 6/3/2020, submitted to FDA 7/14/2020 • FDA !CSR ID 2087365, received 6/3/2020, submitted to FDA 7/14/2020 *DATES OF INSPECTION 8/31/2022 (Wed), 9/01/2022 (Thu), 9/06/2022 (Tue), 9/08/2022 (Thu), 9/12/2022 (Mon), 9/13/2022 (Tue), 9/16/2022 (Fri), 9/23/2022 (Fri)"
+ },
+ {
+  "finding_id": "finding-9465f34c76d858e753669d5e",
+  "finding_text_md5": "629b48094fdf15e49a97104645e20754",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, A You did not investigate Pressure differential discrepancies in ISO 7 Clean room and the incorrect dating for the logged data between 11/15/2021 to 01/03/2022. The following lots of <Redacted B4>, but not limited to were produced, approved, and distributed to your customers <Redacted B4> <Redacted B4> & <Redacted B4> B. In addition, your Cleanroom pressure log, dated 8/31/2022, shows at least 29 instances where your pressure differentials were observed to be from O to negative O .11 ranging in duration from 10 min to 30 min."
+ },
+ {
+  "finding_id": "finding-550f753d46749f20ec64d70a",
+  "finding_text_md5": "d47bd56426b335537b2f7d38562853ce",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, A. You pool and commingle different lots of finished re~packaged <Redacted B4> products for sterility and endotoxin testing by your Control testing Lab <REdacted B4> data base does not capture the individual product lots tested for repackaged <Redacted B4>. For example the following but not limited <Redacted B4> syringes lots <Redacted B4> were pooled together and sent for sterility, endotoxin ana particulate testing as Lot <Redacted B4> on 02/10/2022. The Certificate of Analysis (COA) did not have specifics on these <Redacted B4> lots tested. The COA only captured the commingled Lot number. Your QA approved the production batch records without any notation that the two (2 ) <Redacted B4> lots were commingled. The QA accepted the COA from <Redacted B4> failing to verify if the lot numbers were explicitly written on the COA. These 2 <Redacted B4> lots were released without sterility and endotoxin test results of the separate lots and distributed to your customers. B. Your procedure, SOP P3.9.l.3,\"QUALITY MANAGEMENT SYSTEM-SUPPLIER AUDIT-ALL OPERATIONS\", dated Nov 16,2022 for auditing your suppliers, had specifics that your suppliers to include third party testing labor"
+ },
+ {
+  "finding_id": "finding-44a8f58664ebaecc8e135b4d",
+  "finding_text_md5": "0536b299d7c77a5ea8290c074cfe9e2b",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, your firm's procedures, <Redacted B4>, HOU-QA-050 and Temperature, Humidity and Pressure Monitoring of Classified Areas, HOU-QC-002 used to document your firm's building monitoring systems environment conditions controls and monitoring requirements (differential pressure, temperature, and relative humidity) are inadequate. Your firm's procedure fails to adequately define and document differential pressure specifications, alert, and action limits for your firm's ISO 8 Anteroom, ISO 8 Gowning Room, and ISO 7 Cleanroom, which contain your firm's <Redacted B4> LAF units used in processing of aseptic sterile to sterile finished drug transfers along with sterile drug repackaging. *DATES OF INSPECTION 11/16/2022 (Wed), 11/17/2022 (Thu), 11/18/2022 (Fri), 11/29/2022 (Tue ), 11/30/2022 (Wed), 12/01/2022 (Thu), 12/02/2022 (Fri), 12/05/2022 (Mon), 12/06/2022 (Tue), 12/07/2022 (Wed), 12/08/2022 (Thu), 12/09/2022 (Fri), 12/14/2022 (Wed)"
+ },
+ {
+  "finding_id": "finding-31c6d40417b8526345b4e7ad",
+  "finding_text_md5": "2c1d69e7df0f8aaf28deb700c20f4bb8",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically your firm failed to adequately validate the electronic building monitoring system, <Redacted B4> <Redacted B4> prior to use. Your firm uses the system to control, monitor, and record differential pressure, temperature, and relative humidity for the ISO classified along with non-classified areas used in the production of sterile and non-sterile drug products. For example, your firm initially validated the <Redacted B4> on 3/10/2020 with the revalidation not being approved until 12/15/2021. Your firm's VP of Quality reported following a review of the validation report by your firm's quality unit, a re-validation was required. In my review of the initial documented <Redacted B4> Validation Report, I found it failed to it failed to include documented differential pressure measuring, monitoring, and recording as pait of the system's qualifications, IQ, OQ, and PQ along with providing adequate data in support of the system qualification. your firm's quality unit continued to review and approved differential pressure <Redacted B4> reports, while the software underwent revalidation for the selected and reviewed months: July 2021, September 2021, and November 2021 resulting in"
+ },
+ {
+  "finding_id": "finding-1faac595a4c0ff020d19a91a",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, A. Your firm's cleaning logs, from January 2022 -August 2022, do not document a contact time for the sporicidal <Redacted B4> used in the cleaning of your ISO 5 and ISO 7 areas. All sterile drug products, including <Redacted B4> and <Redacted B4> are repackaged in ISO 5 hoods <Redacted B4> located in your ISO 7 clean room. B. Your firm use <Redacted B4> located in the ISO 7 area approximately 6 inches from the opening of the ISO 5 Hood. Per your firm's pharmacist, the <Redacted B4> is covered with a water-resistant case. This <Redacted B4> does not appear to be easily cleanable. You do not have a cleaning specification for the <Redacted B4>. In addition, on 08/31/2022, I observed your aseptic operator touch the <Redacted B4> their gloved hand and and immediately proceed with the aseptic repackaging operations of <Redacted B4> lots <Redacted B4> without appropriately sanitizing their hands prior to entering the ISO 5 Hood."
+ },
+ {
+  "finding_id": "finding-046293262e68a4836bf02c8f",
+  "finding_text_md5": "2aa4debe1a2068897e6793029a73336d",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, I observed your aseptic technicians not wearing protective goggles during aseptic operations in ISO 5 Hoods. Parts of the skin around the eyes were exposed in the ISO 5 hoods and I saw aseptic operator <Redacted B4> leaning on <Redacted B4> elbow inside the ISO 5 during aseptic operations and repackaging of <Redacted B4> lots <Redacted B4> and Lot <Redacted B4>."
+ },
+ {
+  "finding_id": "finding-01ac1040b2b30790b6a46363",
+  "finding_text_md5": "af3c19e24abad2d36912d48f78fbc4e0",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, 1. Pressure gauges monitoring the pressure differential of the processing rooms are not continuously or periodically calibrated."
+ },
+ {
+  "finding_id": "finding-0191a480c602cf13a03db382",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, 1. You do not perform environmental monitoring which includes active viable air monitoring, surface, non-viable particle and PM for each lot of repackaged <Redacted B4> product since the installation of ISO 5 Hoods <Redacted B4> on May 9th, 2022. Your firm failed to conduct viable air sampling, during aseptic operations for each lot of repackaged <Redacted B4> (Bevacizumab) produced for sterile intraocular injections. I observed that you did not perform active viable air and non-viable articulating at the beginning I and middle while repackaging of <Redacted B4> lots, <Redacted B4> and Lot <Redacted B4> on 08/31/2022. These lots have been released and distribute to your customers. ** THIS IS A REPEAT OBSERVATION** 2 You failed to investigate the 1 CFU recovery from your Active Air <Redacted B4> sample in ISO 5 Hood active air sample which was obtained on 01/11/2022. Per your sample media lot number <Redacted B4> day 6 and 7 samples yielded I CFU and this was not properly investigated. Your action limit is not appropriate per your Procedure which stated that <Redacted B4> CFU is your action limit."
+ },
+ {
+  "finding_id": "finding-e3b8d73a84b9bda3a03caa30",
+  "finding_text_md5": "6b2ee0a6e00213c23ba4bb5c24d072c3",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the beyond use date (BUD) for mitomycin (1mg/1ml) 40mg/40 ml in 50 ml syringe for bladder irrigation was changed < Redacte d B4> on <Redacted B4>, < Redacted B4>, <Redacted B 4>, on <Re dacted B4> and from <Redacted B4> for lot <Redacted B4> . This BUD was e xtended based on the stability bat ch contrac t lab test results for lot <Redacted B4>. This stability ba tch was not te sted using a con tract test l ab val idat ed test met hod for assa y until after the valid ati on of the test method which according to documentation occurred on <Redacted B4>."
+ },
+ {
+  "finding_id": "finding-a9b30296eaa9527b690e3c9b",
+  "finding_text_md5": "f5d65bc8f810236f390169e6db0c3193",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the smoke studies performed to demonstrate the <Redacted B4> laminar air flow in the <Redacted B4> ISO 5 laminar air flow workbench used to produce drug products intended to be sterile do not have enough smoke to visualize the air flow at critical production areas, do not illustrate unidirectional airflow, and do not reflect all types of operations performed in the areas. Additionally, the <Redacted B4> airflow from the ISO 5 LAFW was observed bouncing back from the wall along the workbench and exiting at the point where the Plexiglas stopped causing first pass air to not appropriately sweep over and away from drug products intended to be sterile."
+ },
+ {
+  "finding_id": "finding-a583c61fc8ddf5a2fdcec944",
+  "finding_text_md5": "03716cca8551f6a32aa2762acb543f45",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, 1. On 11/04/2022, during the preparation of Prostaglandin EI 30CC/ML, Lot: t2022 I I 03@ <Redacted B4> we observed your employee's gloved hand directly over an open syringe in <Redacted B4> orientation that blocked first pass air in the <Redacted B4> ISO 5 LAWF. 2. On 11/07/2022, during the preparation of Papaverine/Phentolarnine 30MG/3MG/ML injectable Lot· t20221103@ <Redacted B4> we observed your employee holding the <Redacted B4> drug product filled syringe in <Redacted B4> position that blocked first pass air in the ISO 5 LAFW. Your employee was also observed removing drug product from the synnge to be placed into a vial in <Redacted B4> orientation that blocked the critical areas from receiving first pass air flow from the <Redacted B4> ISO 5 LAWF bench area."
+ },
+ {
+  "finding_id": "finding-952862720cd0de443436873d",
+  "finding_text_md5": "d5d663c36773a88aaadb8a39bd935626",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the following products were compounded during the reporting period 2022-1 according to your production log batch record, but were not identified on your report dated May 31, 2022 (2022-1 ): 1. Prednisolone Sodium Phosphate/ Moxifloxacin HCL/Bromfenac 1 %/0.5%/0.09% Ophth Solution produced March 3, 2022, in 5 mL volume was not reported for 2022-1 2. Prednisolone Sodium Phosphate/Moxifloxacin 1 %/0.05% Ophth Solution produced May 26, 2022, in 5 mL volume was not reported for 2022-1 3. Prednisolone Sodium Phosphate/Moxifloxacin 1 %/0.05% Ophth Solution produced May 26, 2022, in 8 mL volume was not reported for 2022-1."
+ },
+ {
+  "finding_id": "finding-924a70198a968a96eb375cfa",
+  "finding_text_md5": "2ea6d5e59e1a5290126a97082e93c3ef",
+  "published_date": "2023-01-30",
+  "detail_text": "The quality control unit (QCU) did not fully investigate laboratory test results before releasing finished drug products. Specifically, A. Your firm did not have a validated test method for assay testing of your drug products, Prednisolone Sodium Phosphate/Moxifloxacin HCL/Bromfenac 1 %/0.5%/0.09% and Prednisolone Sodium Phosphate/Moxifloxacin HCL 1 %/0.5% ophthalmic solutions before release and distribution of final product. Lot l, <Redacted B4> assigned no beyond use date (BUD) was used for your <Redacted B4> test method validation for both ophthalmic solutions that was completed on <Redacted B4>. Prior to 10/27/2022, the following lots were distributed to customers with final assay results using an unvalidated test method: • <Redacted B4> 8.6mL starting on 05/16/2022 <Redacted B4> units • <Redacted B4> 5.6mL starting on 07/06/2022 <Redacted B4> units • <Redacted B4> 5.6mL starting on 08/10/2022 <Redacted B4> units"
+ },
+ {
+  "finding_id": "finding-90ea8384908ff5b9faca0037",
+  "finding_text_md5": "934544b583370e1a1aa5f719d6c02d40",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, 1. Your aseptic employee changed their sterile gloves used during the sterile drug production of Prostaglandin El 30CC/ML, Lot: t2022l 103@ <Redacted B4> , with a new pair of sterile gloves outside of the ISO S LAF, enter the ISO 5 LAF, sprayed their hands and performed one task prior to completing their <Redacted B4> ,monitoring samples. This is not representative of actual processing conditions in the ISO 5 LAFW, an may not provide meaningful results. 2. Your aseptic employee lightly < Redacted B4> pla te rather than roll them side to side whe n performing personnel monitoring after the sterile drug production of Papaverine/Phentolamine 30MG/3MG/ ML injectable, Lot: t2022 I l 03@ <Red ac te d B4>"
+ },
+ {
+  "finding_id": "finding-8f8262ef44dbc847709763de",
+  "finding_text_md5": "0ac81e3f87cb419543f72a9666d041b6",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the stability batch <Redacted B4> was tested at the time points <Redacted B4> using an un-validated contract test lab test method for assay."
+ },
+ {
+  "finding_id": "finding-8df23948232bef690a839ae1",
+  "finding_text_md5": "b4e28383ba1db65d8dddeef1eb688a53",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, your written procedure titled Cleanroom Equipment Cleaning, SOP <Redacted B4>, version one, dated 03/18/22 does not include a deactivation agent when cleaning equipment and utensils used to produce hazardous sterile drug products. The equipment and utensils are non-dedicated and are used to produce both hazardous and non­hazardous sterile drug products. Since approximately 05/31/22, your firm has produced and dispensed approximately <Redacted B4> lots of sterile drug products which include approximately, <Redacted B4> lots of hazardous sterile drug products. *Date(s) of Inspection: 08/29/22 (MON), 08/30/22 (TUE), 08/31/22 (WED), 09/01/22 (THU), 09/06/22 (TUE), 09/12/22 (MON) Add Continuation Page"
+ },
+ {
+  "finding_id": "finding-8c6e3fd2be290ec77bc89a6e",
+  "finding_text_md5": "ffbedc7b4ed22b071a594e3b75e42b2c",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, 1. Your firm failed to use biological indicators (8.1.s) to ensure cycle effectiveness in <Redacted B4> cycles intended to sterilize <Redacted B4> drug products produced from March 2022 to July 2022. For example, your firm produced the following drug products without any biological indicators: a. Ph enol lnJection, Lot #s: t20220406@ <Redacted B4>, t2022062 l@ <Redacted B4>, t20220505@ <Redacted B4> , b. Vitamin D3. Lot #s: t20220303@ <Re dacted B4> t202 20 304@ <Redacted B4> t20220322@ < Redacted B4>,t202204 19@ <Redacted B4>, t20220504@ <Redacted B4, t20220506@ <Redacted B4>, t20220517@<Redacted B4>, t20220613@ <Redacted B4> c. Glycerin, Lot #s:t20220303@ <Redacted B4>, t20220309@ <Redacted B4>, t2022042l@<Redacted B4>, t20220603@<Redacted B4 > d. Prednisolone, Lot #s:t202205l9@<R edacted B4> Your firm failed to use B.I.s to ensure the cycle effectiveness in <Redacted B4> of the <Redacted B4> cycles used to sterilize <Redacted B4> that is added to sterile drug products and also used to <Redacted B4> glassware used in drug products intended to be sterile from January 2022 to September of 2022. Additionally, you carry the <Redacted B4> that is intended to be sterilize"
+ },
+ {
+  "finding_id": "finding-8ab7cbf5dd14fb7a6ed137e3",
+  "finding_text_md5": "c58a00cd1de1587e7aa7b628658a5b45",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, 1. On 11/09/2022, I observed employees clean the ISO 5 area while wearing non-sterile lab coats."
+ },
+ {
+  "finding_id": "finding-836b4b424961738a4bb81eac",
+  "finding_text_md5": "f0a5e6c50892d9e00df73a4c3b54fa66",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, I observed <Redacted B4> back panel of your <Redacted B4> ISO Class 5 LAFW (laminar airflow workstation), model number <Redacted B4>, serial number <Redacted B4> , which is used to produce all hazardous (hormone) sterile drug products since approximately April 2022. On 09/01/22, your Lead Sterile Technician stated the <Redacted B4> is used to cover the mounting holes for <Redacted B4> lamps. ISO class 5 equipment surfaces should be completely smooth and easy to clean. Add Continuation Page"
+ },
+ {
+  "finding_id": "finding-642830cce77805c36f7c05fa",
+  "finding_text_md5": "2987e8f9d00e1d3f42ed209573f65e0d",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, uni-directional airflow was not verified under operational conditions. You never performed any dynamic smoke studies for your <Redacted B4> ISO Class 5 LAFW (laminar airflow workstation), model number <Redacted B4> serial number <Redacted B4>, which is used to produce all hazardous (hormonee) stterile drug products since approximately April 2022. In addition, on 09/01/22, your Lead Sterile Technician stated <Redacted B4> sealed the approximate <Redacted B4> inch circular opening on the back panel of the <Redacted B4> ISO Class 5 LAFW with <Redacted B4> when it was installed around April 2022. No studies have been performed to ensure the sealed opening does not leak or disrupt laminar airflow. Since approximately 05/31/22, your firm has produced and dispensed approximately <Redacted B4> lots of hazardous sterile drug products using this ISO Class 5 LAWF."
+ },
+ {
+  "finding_id": "finding-507f28cf8e4f504416837fc6",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the <Redacted B4> contact time listed in you SOP S110108 Deactivation, Decontamination, Cleaning, and Disinfection Program (DDCD) for Receiving, Storage, and Manufacturing Areas Sections 7.1.1.1 and 7.2.4 and SOP S302002 Facility Cleaning and Maintenance Section 7.1.5.4.1 was not in keeping with the <Redacted B4> manufacturer's recommended <Redacted B4> contact time. lJ!~.ti±LJ Food, Drug, and Cosmetic Act"
+ },
+ {
+  "finding_id": "finding-47a7c5841535d0f8af209bb1",
+  "finding_text_md5": "5fdf0e0894934284be7c6e894c4e0403",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, A. While watching sterile cleanroom activities on 11/07/2022, we observed <Redacted B4>, <Redacted B4> remam open simultaneously for <Redacted B4> to the unclassified non-sterile non-hazardous laboratory area as an employee was leaving the non-hazardous sterile cleanroom suite. Additionally, this occurred while another employee was preparing to enter the ISO 5 LAF workbench for sterile drug production. B. During the walkthrough on 11/02/2022, we observed a rust-like discoloration on the diffuser of one HEPA filter in your ISO 7 anteroom of your non-hazardous sterile suite, where we observed employees prepare and mix drug products."
+ },
+ {
+  "finding_id": "finding-4475dbcea821d3e8f7edeb67",
+  "finding_text_md5": "da93faed9746255884978e375b208765",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, on l l/04/2?22 and 11/07/2022, we observed employees use <Redacted B4> to clean and sanitize materials entering into the ISO 5 LAFW areas. Your employee was observed spraying a <Redacted B4> and then cleaning the work surfaces and equipment inside of the ISO 5 LAFW bench area. Additionally, the <Redacted B4> was observed moving from the ISO 8 Anteroom/Gown <Redacted B4> to the ISO 8 <Redacted B4> cleanroom to be used and placed in the ISO 5 LAFW bench area without being sanitized. EIIAPLOYEE(S) SIGNATURE"
+ },
+ {
+  "finding_id": "finding-361cb8646a37e7733a9ad0df",
+  "finding_text_md5": "8aeb34d4c000be95fe69e7ad26119a35",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, A. Your media fill program is deficient in that your media fills are not representative of batch sizes and container types. Your media fills are performed in <Redacted B4>. However, your firm prepares <Redacted B4> using other container types that yield the following: up to <Redacted B4> filled at <Redacted B4>, up to <Redacted B4> syringes filled at <Redacted B4>, up to <Redacted B4> eye-drop-containers (filled at <Redacted B4>, and <Redacted B4> inhalation tubes (filled a <Redacted B4>. B. Your media fill program is deficient in that media fills do not include all equipment used in the preparation of drug products intended to be sterile. For instance, a <Redacted B4> is used to fill an IV bag to dose liquid drug product intended to be sterile into syringes for bladder irrigation prescriptions hM.uN_ EMPLOYEE!S) SIGNATURE"
+ },
+ {
+  "finding_id": "finding-ecd4ec62f96bd5ab4308b790",
+  "finding_text_md5": "c98c46d99a6082c6aba6d9233030a90d",
+  "published_date": "2023-01-18",
+  "detail_text": "1. The summaiy of closed laborato1y OOS investigations conducted by the fnm during the period beginning from Janua1y 2020 to November 22, 2022, is as follows: Samples OOS investi2ations i\\Talid Invalid % Invalid Raw materials/in­ ~79 l215 l264 55 process materials/finished products/ Review of the fnm's OOS investigation reports found that the original failed results were invalidated without a scientifically sound root cause, and results of passing re-test results were repo1ied as the result of record. For example,"
+ },
+ {
+  "finding_id": "finding-d5844022033eb424f7250b47",
+  "finding_text_md5": "854af6150ba11144ba9103329ab6f85f",
+  "published_date": "2023-01-18",
+  "detail_text": "Specifically, 1. Your drug product stability program for commercial drug products labeled with a <Redacted B4> does not include data from direct testing of those products produced in your facility. To -ate you ave not placed any drng products/lots produced in your facility on a stability testing program . Your stability program and current <Redacted B4> for all drug products is based on data derived from testing of stability products/lots produced for this purpose in other facilities."
+ },
+ {
+  "finding_id": "finding-bcb12dae2273e664475e5710",
+  "finding_text_md5": "eb25f00bbc0eafd84e76e6ab2a0720f9",
+  "published_date": "2023-01-18",
+  "detail_text": "I .Your air flow pattern study conducted on your Mobile Air Flow Unit (i.e., Mobile(bl (~) I; Equipment ID SR1047); Protocol MQP-SR000S-00; approved on 30 November 2019 and used to ensure unidirectional airflow during the commercial filling process for USA products is inadequate. The airflow pattern study video demonstrates how airflow from the mobile unit enters Zone ~I> through the l(b) <4) ] during the process ofmanually transfeITing sterilized equipment 4 paiis/components to the filling line. This process takes (b) <) Ito complete. During all this time, the (b) <4) j remains open. In addition, the routine operators' intervention \"loading offbl <4) Istoppers during filling\" is perfo1m ed by opening thefbl <4)"
+ },
+ {
+  "finding_id": "finding-ac1cb949ca441c519b6aedb9",
+  "finding_text_md5": "dfde1d4fb81a9b2c1d3e22d738a55b24",
+  "published_date": "2023-01-18",
+  "detail_text": "I.Environmental monitoring samples were not counted accurately. On November 22, 2022, review ofplates from QCl that had been counted by one analyst and checked by a second analyst, found the reported result to be less than the number of colonies on the plate. For example: a.Point (b) <4> , swab from the (b) <4> J.stopper chute parenteral line i (Block f ), associated with aseptically filled batch (b) <4>~ ·-·7 odb) <4> IInjection (US market) on November 16, 2022. The repo1ted result was \"Nil\", but the plate was observed to have~ CFU. This sample was collected from a Grade A area with an action limit of~ CFU. b.Point (b) <4> settle plate in the Grade C area of Manufacturing { , associated with batch fb) <4> 1offb) <4> IInjection on November 16, 20 2. The rep01ted result wast CFU, but the plate was observed to havel CFU. c.Point tb) <4>Left Hand, personnel monitoring sa~le from Grade C associated with the manufacturing of aseptically filled batch tb) <4> offb) <4> IInjection on November 16, 2022. The repo1ted result was1~ CFU, but the plate was observed to havet CFU."
+ },
+ {
+  "finding_id": "finding-a461d19efa0857a5091d8ae7",
+  "finding_text_md5": "bc44f99bf5326e5281c3e08d829cd0ce",
+  "published_date": "2023-01-18",
+  "detail_text": "There is no assurance that your process simulation studies (media fill ~ perfo1med onl(b) <4) JBlockt Line< (Equipment ID PP 049) and General Parenterals Block ~ 15 Line 1b (Equipment ID SR 1031) are representative of the cmTent commercial manufacturing operations. This is evidenced in that, although coITective and non-coITective operator's interventions are simulated during the media fills, the historical data of the previous commercial filled batches is not evaluated prior to cany out the~b)<4) Iprocess simulation activities. Your cmTent practice is to simulate operator's interventions that have been identified in previous media fills without considering those that were caITied out during the commercial fill process. Based on that, the duration at which the interventions are also simulated in the process simulations are not accurately established. In addition, Protocol No. RAPSSP/02-SR000l -03 entitled \"Requalification Protocol [Aseptic Process Simulation Study/Media Fill For Vial Filling Line~~~]; approved on 31 May 2022, states that a single non-routine intervention identified as \"maintenance ofmachine by engineeringperson\" should be simulated Not Less Thanfbl <4~ times. Howeve"
+ },
+ {
+  "finding_id": "finding-886a9fc4807542c9d7a9d969",
+  "finding_text_md5": "3340e2b1757b88b402da128fef8ed4b3",
+  "published_date": "2023-01-18",
+  "detail_text": "Your fom has not perfo1med analytical method validation of inhouse tests methods and verification of compendia! test methods for the approved and pending dmg applications. The number of raw materials pending for validation and verification is tabulated below: US Market Dmg Products StatusRaw Materials Pending for Validation of Inhouse Analytical MethodRaw Materials Pending for"
+ },
+ {
+  "finding_id": "finding-842e3d0729a8e1c3ce92d87d",
+  "finding_text_md5": "735f2c5aca8a06c1ce5f7a88159a29a8",
+  "published_date": "2023-01-18",
+  "detail_text": "Specifically: You have not evaluated the airflow pattern in all your ISO 5 <Redacted B4> Laminar Flow Hoods under <Redacted B4> conditions stimulating <Redacted B4> aseptic operation performed in each hood during sterile-to-sterile compounding and aseptic filling of your drug products intended to be sterile. Inspectional evaluation of your ISO 5 area airflow pattern studies; Document No: <Redacted B4> Risk Assessment Regarding the Equivalency of the LFH through the process of <Redacted B4> smoke studies, Approved Date: 05/26/2022; and List of Commercial Batches Compounded related with hood smoke studies in <Redacted B4> revealed that <Redacted B4> products/lots were roduced during the period 02/22/2022 to the present through ase tic operations performed in ISO 5 <Redacted B4> Laminar Flow Hoods for which there was no direct <Redacted B4> airflow pattern evaluation. For example Fentanyl Citrate 50 me /ml (100 mcg per 2 ml) in 0.9% Sodium Chloride Injection, NDC <Redacted B4> Lot No: <Redacted B4> Expiry: 07/15/2022 was produced in cleanroom suite <Redacted B4> and filled in ISO 5 <Redacted B4> .Laminar Flow Hood No.: <Redacted B4> which was not directly assessed in an airflow patter"
+ },
+ {
+  "finding_id": "finding-77af4315272f60d646131ef6",
+  "finding_text_md5": "4ffd69476efaa6eeb38320166daee081",
+  "published_date": "2023-01-18",
+  "detail_text": "I .Process validation studies do not include complete data to demonstrate the manufacturing process is in a state ofcontrol and there is no establishment of criteria to evaluate intra-batch or inter- batch variability. Failure to establish criteria to evaluate intra-batch and inter-batch variability during process validation is a common approach that has been used for all products distributed to the US market. For example: 4 a.During the (b) <> j Injection~~~ mg/vial process validation, batch tb) <4>~J was not ,evaluated for intra-batch variability. Samples collected from different{b) <4> on the 4 4 (b) <> Iranged from ~b) % to1<b) % for the1<b) <> I impurity, compared to a limit of ~o ~ W (4) 1/o. There was no evaluation of inter-batch vai·iability. Process validation data showed the"
+ },
+ {
+  "finding_id": "finding-75f324620d9e70c920acccff",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2023-01-18",
+  "detail_text": "Specifically: I. a. On 05/24/2022 during the aseptic filling of Ketamine HCL 50 mg per ml Injection, NDC <Redacted B4>, Lot No: <Redacted B4> in cleanroom 142-6 within ISO 5 <Redacted B4> Laminar Flow Hood: <Redacted B4>, we observed that airborne particulate monitoring was performed <Redacted B4> for approximately <Redacted B4> during the operation. You do not provide scientific justification for the frequency and duration of airborne particulate monitoring performed during aseptic operations in the critical zone of the ISO 5 <Redacted B4> Laminar Flow Hood. Your airborne particulate monitoring program for aseptic operations is not designed and conducted to provide meaningful data to support the quality of your drug products intended to be sterile. You do not monitor airborne particulates to ISO 5 air classifications throughout aseptic operations and the orientation of the particle counter <Redacted B4> is not directed into the flow of air during monitoring. For example: b. On 05/24/2022 during the aseptic filling of Ketamine HCL 50 mg per ml Injection, NDC <Redacted B4>, Lot No: <Redacted B4> in cleanroom 142-6 within ISO 5 <Redacted B4> Laminar Flow Hood No: <Redacted B4> we obs"
+ },
+ {
+  "finding_id": "finding-3ba90692ae8028549b9fa34c",
+  "finding_text_md5": "54f1cc7af4874e6ead4a851a28a6ee18",
+  "published_date": "2023-01-18",
+  "detail_text": "There is no procedure describing the use ofmanually entered integration events, including baseline points, tailing sensitivity, fronting sensitivity, and peak slice for processing chromatography data. The analysts are pennitted to manually enter these and other integration events and reprocess the chromatograms. The reviewers only review the final chromatogram and do not review the originally processed chromatogram to ensure the manually entered integration events are justified. Procedure SE/BQC/00165 \"Interpretation of Chromatograms\" requires manual integration be documented clearly stating the reason the manual integration was perfo1med and the initials of the section head for approval. But when analysts manually enter integration events to force the software to integrate in a specific way, there is no siinilar documented justification and approval process. The reviewers approved chromatograms integrated with manually entered integration events that were not consistent with procedure SE/BQC/00165. For example: 4 I.Stability analysis offb) <4> IInjection ~! mg/ml lotfb> < ~ at the 36-month 25°/60%RH condition was originally processed by the software with an area that fiave a resul"
+ },
+ {
+  "finding_id": "finding-3249716dac0cca760b9221f2",
+  "finding_text_md5": "ccb77f8376a7221663cdde8408dd38ce",
+  "published_date": "2023-01-18",
+  "detail_text": "I .Assessments to evaluate data integrity conti·ols were conducted for 183 manufacturing equipment and systems as pa1t of PQ160193. The assessment repo1t approved Mru.·ch 5, 2018, found there were 149 equipment that required upgraded individual access conti·ols and privileges; 76 that required resti·ictions for changing the clocks; 113 that needed upgrading for saving elecu-onic data; and 119 that needed upgrading for audit ti-ails. There was no documentation in the quality system to ensure proper conti·ols were implemented through upgrading of the softwai·e or"
+ },
+ {
+  "finding_id": "finding-16899fe44332565a50dac192",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2023-01-18",
+  "detail_text": "Specifically, There is a cascade of failure in your Quality Unit's lack of oversight on the control and management of GMP documents that are critical in ensuring the drng products manufactured and tested at your site are safe and effective. For example, I.On 22-Nov-2022, we observed your Quality Control (QC) Laborato1y, Production and Engineering department employees destroyed GMP documents pe1iaining to original records and raw data by tearing it into pieces and disposed inside your QC laborato1y and General Parenteral Scrap areas. These areas suppo1i the manufacturing and testing activities for the drng products sold in the USA market. Additionally, we found a trnck full of transparent plastic bags containing shredded documents and black plastic bags mostly containing documents tom randomly into pieces by hand mixed with other scrap materials. This tiuck was found about 150 meters away from your facility as it was waiting for the clearance to remove scrap materials from Specialized Economic Zone (SEZ). Upon interviewing the tiuck driver and verifying shredded and tom pieces of documents, we were told that the plastic bags containing disposed documents belonged to your facility th"
+ },
+ {
+  "finding_id": "finding-03cc3955d7f125a1d481d7fe",
+  "finding_text_md5": "289dbb3e09f807d3d08106bb9c29f2a6",
+  "published_date": "2023-01-18",
+  "detail_text": "On November 14E2022, a US market complaint w.as received for a caiion labeled as ~b)l4) Jmg that contained a b) <4> 1mg vial, lot (b) <4) 1- Accord Healthcare, the Intas US subsidiaiy, received the complaint sample and provided pictures on November 16, 2022, confnming the incon ect ca1ion was used. The ca1ion and vial were received on site on November 21, 2022, fmi her confnming the mix-up."
+ },
+ {
+  "finding_id": "finding-0277491799eaef8c6f841272",
+  "finding_text_md5": "92aa70d516a863c91472538121376c24",
+  "published_date": "2023-01-18",
+  "detail_text": "I.Change control SE/CRF/2O21/1O86 approved the chan~ of the expiration date for (b)(4) 4 ~ jection ~~! m ml {~~I ml from (b) (,J) to lb) < > __J. Stability data showed th-e\"\"'i_m_p_w\"\"'·i_ty_ 4 lb) < > increased during the shelf life and for the three stability 4 batches ((b) < > r­--,---. r­~..,....,.----,--.-.,) used to sueport the change, the value for this impurity wasmo/~~~) %, andl~l % (reportab e value of~~ ~ % ), compared to a specification of not more than m]%. There was no thorough evaluation ofwhether all commercial batches, including 4 batches released with a higher initial amount oflb) < > .------------' such as lot 4 4 lb) < > , would meet this specification until (b) < >---­ 2.Change control SE/CRF/2O21/1O86 approved the change of the expiration date for (b)(4) 4 4 Injection mmg/vial from tb) (4) to (b) < > . Stability batch (b) < > was u-s-e\"\"'d-to- su_p_p_O_Ii 4 the change. This batch had a repo1ied value of1~l % for the Slllll ofCb) < > Impurities at the 36-month time point, compared to a specification ofnot more than}~! %. The~·e was no thorough 4 evaluation of whether commercial batches would meet this specification until (b) < > if they have similar increases i"
+ },
+ {
+  "finding_id": "finding-e986f2692a5b4987b5a59dae",
+  "finding_text_md5": "08c181633a47896c0a4a535033b88062",
+  "published_date": "2023-01-11",
+  "detail_text": "Specifically, there is no deactivating agent used to clean work surfaces, utensils and <Redacted B4> in between production of different hazardous drug products. Hazardous drug products produced include but are not limited to, BI-EST 50:50 (Estriol/Estradiol) in Moisturizing Lotion 5% (50mg/ml) Cream, BI-EST 50:50 (Estriol/ Estradiol)/Pregnenolone 1.5mg/60mg per ml Cream, and BI-EST 50:50 (Estriol/Estradiol)/Progest/Testo/7-K-DHEA/Pregnen 0.25mg/35mg/0. 75mg/10mg/3mg per 0.5ml Cream."
+ },
+ {
+  "finding_id": "finding-e933ef46865f893411a04e9e",
+  "finding_text_md5": "08c181633a47896c0a4a535033b88062",
+  "published_date": "2023-01-11",
+  "detail_text": "Specifically, a) Your firm does not use a strong oxidizer capable of deactivating hazardous drug products to prevent cross-contamination of work surfaces and non-dedicated, shared equipment used in the production of hazardous drug products containing testosterone, progesterone, estriol and/or estradiol. b) Your firm has not established the use of <Redacted B4> is adequate to remove drug product residues to prevent contamination from shared equipment used in the production of hazardous drug products containing testosterone, progesterone, estriol and/or estradiol."
+ },
+ {
+  "finding_id": "finding-cab4dc28959c2c905450984a",
+  "finding_text_md5": "a6d0ed5c25ef7c1fc541045fac0710ad",
+  "published_date": "2023-01-11",
+  "detail_text": "Specifically, a) On 12/1/2022 during the initial walk through of the facility, I observed an unknown white powder-like substance on two separate <Redacted B4> capsule machines. According to your non-sterile technician <Reddacted B4> production of capsules occurred that day and the last time the machines were used to produce capsules were on 11/7/2022 to produce <Redacted B4> 25mg capsules and on 11/29/2022 to produce Ivermectin 18mg capsules. Your <Redacted B4> capsules machines are not dedicated equipment and are used to produce hazardous drug products containing progesterone."
+ },
+ {
+  "finding_id": "finding-7e248e90a695314ee8e61f44",
+  "finding_text_md5": "e048a9d10837fb973c3366f315919f44",
+  "published_date": "2022-12-28",
+  "detail_text": "Procedures to ensure accurate and consistent integration of chromatographic peaks have not been established. 1. Procedure CM/QC013 requires the use of the Apex Track Algorithm to be used for integrating all chromatograms. The procedure lists timed integration events that can be manually entered to modify the processing, but does not provide detail on when they should be used, how these events should be used, or how they are reviewed. For example, during the processing of{bH4> _I Tablets~~ mg batch fb><4>1 . The analyst manually entered events for percent fiftoff and percent touchdown that apphed to a single ~own~ urity peak in the chromatogram. These parameters generated results of~b) <4> 1% and (b) <4> %, reported as tl % for this peak. This is a passing result compared to a specification of NMT ~~~ %. If the percent liftoff and percent touchdown had b~en applied the same as all other impunty peaks and standard peaks the results would have been {b) <4>·7% and 4> fb) < 7 %,which would not have met specification. Even though the analyst is manually setting where the integration lines will be placed with the percent liftoff and percent touchdown, the practice is not captured in the r"
+ },
+ {
+  "finding_id": "finding-3f173568944e98cced8225b0",
+  "finding_text_md5": "b43ebeefcae066586af21aa7ca3fe861",
+  "published_date": "2022-12-28",
+  "detail_text": "of fbl (if) 1. fuvestigations that confomed leakage near the lb) <4) j dosage products were not thorf u~hJ7 investigated to identify a root cause and extended to all relevant products packaged into (b) 4) tubes that are distributed to the US market. For example: a. ,fuvestigation INI103211322 dated November 23j ~ was opened when a tube of 4 (b) < ) _J Gel ~% ff·om exhibit batch ~b) (if) for the European market was found to be leaking near the fbl <4)7 prior to testing for the six-month accelerated study timepoint. The product, tubes, equipment, and manufacturing process are the same as the aheady commercialized product for the US market. The investigation was closed without thoroughly investigating and did not identify a root cause for the leakage near thefbl <4)7 of the tube. Further, the il;?-vestigation stated there were no related market complaints for commercialized~6)l 4) ( Gel ~% product. However, US market complaints for 4 leaking tubes were received for fbl < ) IGel and other products manufactured on the same (b) <4) filling machine."
+ },
+ {
+  "finding_id": "finding-3d8f7dafb8b6741095640543",
+  "finding_text_md5": "aa9c1801abb1162d7ee97f1ecfb7206c",
+  "published_date": "2022-12-28",
+  "detail_text": "Specifically, three (3) dead legs with 3D values of (b) (.J) Iwere observed in theE <;) system that supplies ~6>l 4) ~ for the (bl (.J) and b) <4) [ of(b) <4) dosage diugs ( e.~., lUJ l'+J TabletLl01 ,..i 4 Tablets, l'u' 1\" ' Tablets, {bl <) ITablets, {bl 4) I Tablets, and~b) <4) ~ Tablets). *DATES OF INSPECTION 5/12/2022(Thu), 5/13/2022(Fri), 5/16/2022(Mon), 5/17/2022(Tue), 5/18/2022(Wed), 5/19/2022(Thu), 5/20/2022(Fri)"
+ },
+ {
+  "finding_id": "finding-19e85993f512a177b57cb25f",
+  "finding_text_md5": "a950003533f7d9041ef090d124a533ad",
+  "published_date": "2022-12-28",
+  "detail_text": "Procedure 19PD672 requires compression machine operators to calculate the tablet reject limits based on batch specific data from machine set-up. However, operators are using preset values without calculating the batch specific limits. If changes are made to the reject limits, these calculations are not documented in the batch record or reviewed to dete1mine if the parameters were set conectly to reject"
+ },
+ {
+  "finding_id": "finding-7299cbdfee97927fd3c9e522",
+  "finding_text_md5": "b35a748abf64c26ea2f946f65c65d456",
+  "published_date": "2022-12-23",
+  "detail_text": "Specifically, a) You have not the labeling and packaging line or performed any qualification for the labeling and packaging o njection. b) You did not adequately perform installation qualification of theMYO S rlling line for TS. specified in the qualification protocol."
+ },
+ {
+  "finding_id": "finding-fc7cb69a26cb839562e3993d",
+  "finding_text_md5": "5c22610fd8d19a9102f0865082151300",
+  "published_date": "2022-12-20",
+  "detail_text": "Specifically, Dead insects were observed behind the <Redacted B4> front facing of the <Redacted B4> biological safety cabinet <Redacted B4>. In addition, several live flying insects were observed within the production area."
+ },
+ {
+  "finding_id": "finding-e63ec73696846a6f837a6e2b",
+  "finding_text_md5": "ad509081977118ce2fb75813c3f65e1a",
+  "published_date": "2022-12-20",
+  "detail_text": "Specifically, D Your firm uses <Redacted B4> for use in production of non-sterile drug products. For example, the firm utilized <Redacted B4> instead of <Redacted B4> the production of <Redacted B4> lot# <Redacted B4>. The aforementioned lot of <Redacted B4> was used in the production of Ketaniine Nasal Spray lot# 0602202~ and lot# 08232022@ <Redacted B4>. D Your firm released multiple lots of non-sterile drug products that were produced from expired components. There is no assurance that the expired components continue to meet pharmaceutical grade specifications. For example"
+ }
+]

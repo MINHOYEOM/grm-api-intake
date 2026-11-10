@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-76cf652e7026be47c9e36631",
+  "finding_text_md5": "7de0f047f6b7b205955b376f7aa010d7",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, [ [redacted] L quality control testing is not performed on thef [redacted] receivedr [redacted] J and a routine monitoring program has not been established for these utilities that are supplied 1hroughout the facility (b)\u0012 Further, the utilization of these [redacted] has continued in the absence ofcompleted qualifications of theȔb) (4) [redacted]"
+ },
+ {
+  "finding_id": "finding-755a5e13f4145a8c83d559b5",
+  "finding_text_md5": "d35e1faaf79e45d460fb0d1a201c9ab1",
+  "published_date": "2026-10-26",
+  "detail_text": "A.Process Validation Master Plan, GDSE-VAL-VMP-000005, V21 & 22, indicates in part in section 9.3 that a verification approach is an alternative to re-validation in which manufacturing process performance is monitored and evaluated. Your firm used a process verification approach to address [redacted] for HCV c100-3 antigen [redacted] manufacturing (yeast [redacted], and yeast [redacted], as indicated by Process Verification Report GDSE-VAL-REP-000973. The Master Plan also indicates in part that a risk assessment will determine if a verification is appropriate. This was done as per Risk Assessment for [redacted] HCV c100-3 [redacted] in [redacted] GDSE-MFG-RSKA- 000652. The risk assessment indicates that “Run [redacted] ot [redacted] runs used for evaluation of risk) did not pass certain assays. This apparent failure was not addressed to substantiate the decision to perform a process verification (i.e., [redacted] run) instead of a full re-validation (i.e., PPQ) of the HCV c100-3 process [redacted] B.Your firm’s SOP, Process Validation Stage 3 — Continued Process Verification, GDSE-MFG-SOP-000071, Ver 17 and 18 requires, in part, the trend analysis of process output parameters and critical quality attributes across all your firm’s licensed and unlicensed antigen products, as part of [redacted] process verification reviews to ensure that manufacturing processes [redacted] are in a qualified/validated state. The last [redacted] review was documented to have occurred in the, [redacted] of 2023. Licensed Antigen Component Manufacturer for IVDs"
+ },
+ {
+  "finding_id": "finding-73c27fba6f7d7ec9625b9ff7",
+  "finding_text_md5": "304603467a6a8bb8cc13e7da74beedab",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, A. PNC-EP5-EN-25-0006 was initiated on June 07, 2025 due to power failure for all plant loads and during the [redacted] 4) process involving [redacted] injection me/vial, batch No. [redacted] However, the investigation report did not include details surrounding the change in [redacted] and its effect on the [redacted] process. In addition, there is no software limitation, internal limit, or study as to how long a [redacted] cycle can remain interrupted prior to continuation as per MSAT Manager. According to the Quality Head, batch No. (>) (4) ‘was initiated after the power failure incident. However, the batch No was ultimately rejected due to observed solution leakage from the product transfer line filling area. There was no attempt to repeat the [redacted] batch thereafter. B. OOS Number ESOOS240002 was initiated for R&D [redacted] Injection UsP [redacted] me/Vial, Test: Gross Content by HPLC, Date Initiated: February 03, 2024,, Batch Nowa) Results: [redacted] mg/vial (Specification Limit: NLT [redacted] and NMT [redacted]. The manufacturing investigation attributed the most probable root cause to potential issues with connections to manufacturing vessels during [redacted] —_calibration that may not have been accounted for during Guerlain Ulysse"
+ },
+ {
+  "finding_id": "finding-718adaaf78e1cb793aa5ba36",
+  "finding_text_md5": "0110520cd2e704746f9e0f12c4ad6888",
+  "published_date": "2026-10-26",
+  "detail_text": "Since validating and implementing your utilized for documenting V116 serotype production, quality review, and release on 07DEC2023, multiple deviations have been initiated pertaining to design limitations resulting in potential impact to product quality. For example: a) Deviation QN201223715 was initiated on 18OCT2024 for the following (not all inclusive): x MBC time out of C stored at 2-8˚C controlled storage (TOC) calculated but not verified within the to be within the allowed limit (. Since implementation, V116 serotype batches were released without MBC C stored at 2- 8˚C TOC verification. x MBC time out of 2-8˚C TOC not calculated nor verified within the to be within the allowed limit (. Since implementation, V116 serotype batches were released without MBC 2-8˚C TOC verification. x hold time not calculated and verified within the to be within the allowed Hold Time limit. Since implementation, V116 serotype batches were released without hold time verification."
+ },
+ {
+  "finding_id": "finding-6d69e11dbed047d36931189b",
+  "finding_text_md5": "3087d3bf053987ce63f7b3fd3dbde0d5",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, investigation related to of Aluminum Hydroxide is not adequate. Aluminum Hydroxide is an adjuvant used for Infanrix,, Pediarix, and Boostrix Vaccine products for US market. On 06Apr2023, and were observed on the [redacted] of, which is used for th of Aluminum Hydroxide bulk material (Deviation # 200991257). The root cause was identified as of [redacted] due to [redacted] contact with Aluminum Hydroxide suspension. Based on the investigation, you have identified that a contact time of more than can lead to [redacted] parts. However, the investigation was not extended to other surfaces to re-evaluate the established dirty hold times of 72 hours for fixed equipment, such as but not limited to, and for [redacted] parts, such as not limited to utilized for Aluminum Hydroxid production."
+ },
+ {
+  "finding_id": "finding-6d415ec671aeb0eef8db7f79",
+  "finding_text_md5": "b204f19fc22525e7c108cdae52fe7121",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, during the review of SOP NEL-STP-0077 Product Sterility, dated November 7, 2024, we noted that section 19.3.4 states [redacted]. The following was observed during document review: [redacted] had a human amniotic fluid product (unit ») test show a potentially positive result for the [redacted] media. A secondary review was required for the media type. The initial read for the () (4) by the technician requesting the secondary review stated, “media is clear but has floaties.” The secondary reviewer stated, “media is not turbid and does not have sediment or other signs of growth.” The secondary review did not address the “floaties” that the initial reviewer saw, and a media transfer was not performed. The [redacted] result was reported out as negative. Since 2023, your firm has conducted approximately [redacted] Sterility Assurance tests on [redacted] samples."
+ },
+ {
+  "finding_id": "finding-6c1d1199b27ef5009516e018",
+  "finding_text_md5": "a2d1e1fd23701d20ed5950055a0de7ee",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically: a. Numerous deviations were not addressed in a timely manner ( deviations:o be opened, - REVERSE OF THIS PAGE FORM F 483 (9/011) PREviuus hulTIONO%uLe r E deviations to be closed), creating a backlog of deviations which negatively impacted quality control of the RVV and DP. b. Delays in deviation management resulted in repeated testing failures. Out -of -specification (00S) results should have been retested per SOP -000061 for several assays described in DEV-00538 I - to open, to close), affecting multiple stability timepoints thus compromising assessment of the proposed RVV shelf -life. Unidentified gaps in - 1-000035 were not promptly addressed as observed in DEV-00530 ( to open,! - to close), leading to errors in - _PPQ runs and two subsequent stability timepoints. c. Corrective actions and preventative actions (CAPA) were initiated for deviation DEV-00188, a major deviation with multiple identified root causes. A CAPA should have been initiated and/or justification provided as per SOP -000046, \"Quality Events\" to prevent recurrence. d. Classification of deviations (minor, major, or critical) are not always based on appropriate risk of the incidences, and therefore, might not be investigated sufficiently. Many of the environmental monitoring excursions occurring during aseptic operations involving action levels for personnel monitoring and monitoring inside the - were classified as minor but this classification does not adequately reflect the risk of the event. e. Several product lots, despite 00S results, were released based on inadequate risk assessments. In DEV-00241 released for administration. In DEV-00258, three DP lots - -101 Lots 00) had inconclusive results for the presence of replication -competent retrovirus (RCR) but were considered low risk and were released for clinical use. I. During an investigation, the suspected root cause was not verified by confirmatory testing, as observed in DEV-00243. Specifically, - suspected RCR results were not confirmed by a [j. - based RCR assay."
+ },
+ {
+  "finding_id": "finding-6b976e34a18ffb4e949c5f5e",
+  "finding_text_md5": "f6bf6ed17c447ab9a7bc33336e5f45ec",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, during the review of the calibration certificate for the), used for the— [redacted] testing ofthe [redacted]) for the bulk formulated of Fluad. We observed that the September 2021 Calibration Certificate “As Found” data had not met the acceptance criteria for thePa measurement — [redacted] acceptance criteria). Your firm failed to follow procedure as documented in DOC-000134669 v8.0 Execution of Maintenance, in that quality unit was not notified and no investigation was initiated to determine impact on product since September 2020. Between April 23, 2021 - September 15, 2021, your firm manufactured and shipped|\" formulated bulk FLUAD Quadrivalent batches to the US."
+ },
+ {
+  "finding_id": "finding-6b8f1ce9d4d1d8cc8f2c03db",
+  "finding_text_md5": "ca9f412f84485d686f0a8204adb5759b",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, the air supply in the core manufacturing areas used to manufacture drug products does not provide assurance that it is free from dust and/or other undesirable particulates.: b) (4.:: For example, core drug manufacturing areas such as p filling, and packing are shared with the areas used to manufacture cosmetic products without appropriate airlock system. The firm’s QA Manager confirmed on 2/27/2026 that these areas are not maintained as classified areas and/or minimally Grade D areas. The firm’s air circulation system does not provide any assurance that is suitable for intended use. Additionally, the QA Manager confirmed that the pressure differential in core processing aeras including sampling, dispensing, pe filling, and packing areas is not monitored to demonstrate the sweep of the air from less clean area into the cleaner areas."
+ },
+ {
+  "finding_id": "finding-66f7fe6b342bf84afcd82cfa",
+  "finding_text_md5": "9dfc7e3cca86f6eb882e8f5c2d38c9cf",
+  "published_date": "2026-10-26",
+  "detail_text": "M11/01/22/04 was categorized as major deviation while M30/01/22/01 was categorized as a critical deviation with the same incident of media contamination due to|- clogging. ii, M23/08/21/01 and M15/01/22/01 were both categorized as major with the same incident of unusual peak observed in) ya L b. SOP for the reporting of deviations does not have instruction on the upgrading of the severity of deviation if a similar incident reoccurs. c. A|-_ {throughput study was performed to investigate the root cause ofthe clogged) - in deviations M11/01/22/04 and M23/08/21/01. The outcome of the study suggested that the current|- _|configuration is appropriate only for the etn and therefore).., are recommended (|.. the current number of|- —_|used) forthe! 0 si usedinthe|.. |stepofthe_.. bioreactor. The same iii study is also applicable to th process because the sam is used forthe)_|usedinthe|...|step; however, the firm did not re-evaluate ifan additional. _|maybeneededinthe| ~—=S——S—S—Sst mitigate the potential contamination caused by the clogging off d. Deviation M23/08/21/01 was initiated because an unusual peak was observed duringa The sii ofthe was substantially different from the i“ ofthe.. batches for the} process. According to the investigation, the root cause was the failure of) and of thehe However, the firm did not perform any product impact assessment by Manjari Bk., Pune 412 307 Biological Manufacturer including additional characterization testing nor stability study for this affected batch. The firm only relied on the release batch results to justify product quality. e. The investigation of Deviation M24/06/21/01 did not take place in a timely manner. The deviation was initiated on June 24, 2021, because the operator collected a sample from[- batch aw through the oe witha aw instead of a sample The contaminant}., —_| was possibly introduced inthe). __|bioreactor because ofthe incorrect sampling. The QA interview with the operator was not taken place till wil the occurrence ofthe deviation on July 26, 2021."
+ },
+ {
+  "finding_id": "finding-63ec2483adf705920b6613b3",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, A. Deviations are not always closed within the target dates defined by SOP) - /32 Version 15 “Deviation Management Section 10.3.16. Out of a total of 1144 deviations without extension: e Three out of four Critical deviations since CBER licensure were closed beyond the target of 45 days. The Critical deviations were open from| __|days. e A total of 119 Major deviations were closed beyond the target date of 30 or 45 days. The Major deviations were open from| _,,, days. e A total of 105 Minor deviations closed beyond the target date of 30 days. The Minor deviations were open from), days. B. Your firm’s training program is deficient in that it does not require the contemporaneous documentation of training attendance. Receipt of training is only captured in| which is not validated for attendance recording and verification. Examples include: [redacted] we GMP Refresher 2024 training was delivered on we The record of participation was captured in. The QC analyst signed for the receipt of training in - ew GMP Refresher 2024 training was delivered on| oe. The record of participation was captured in|. —_. The Production Operator signed for the receipt of training in ins [redacted] we GMP Refresher 2023 training was delivered on -. The record for participation was captured in|... The QC analyst signed for the receipt oftraining in|-"
+ },
+ {
+  "finding_id": "finding-6237edfcd7d580de79cf87fe",
+  "finding_text_md5": "0863e25c24350a9a0a8b2e0fd4ba5536",
+  "published_date": "2026-10-26",
+  "detail_text": "The preventative maintenance program did not) at a defined frequency. Specifically, A. The executed preventative maintenance records for the year 2016 and 2017 for thefb) (4) fb) (4) and the re ¢°<: not account for all components an requency of maintenance on each component. SEE B. No corrective and preventative measures were implemented for () ¢) detected in the [redacted] detected in 2017. C. On March 12, 2018, during a walk-through of the facility, (b) ( Aiiccaloratiail was observed [redacted]. The firm explained that the discoloration is due to [redacted] and that this level of [redacted] has no product impact."
+ },
+ {
+  "finding_id": "finding-5fcc1a2dc1ddb361e1a062f0",
+  "finding_text_md5": "f79da5f4eb6dfa27e3a30f5eb707c8b6",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, your written procedure SOP-29727 version gives instructions to use the [redacted] \" to track storage and movements of materials including those held for dispensing to manufacturing areas and finished product [redacted] — storage. On 22 SEP 2023, we observed inventory of the dispensing location identified as where inventory did not match the indication in the. For example; differen of were indicated in [redacted] but only of these items were located in the dispensing area. On 28 SEP 2023, we observed retrieved from [redacted] location while th showed of product in storage. This batch of finished product was manufactured as batch [redacted] in 2021."
+ },
+ {
+  "finding_id": "finding-5f0e1e960d7243dd933a5621",
+  "finding_text_md5": "8460be89ed67660284eb3d92ea2a9ee5",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, the following actions/behaviors do not conform to the instructions in your Aseptic Processing procedure (VV-SOP-00953). e During the review of video recording of filling operation of Aplisol (Stabilized Solution) [redacted] in Suite [redacted] — dated 30\" April 2025, we observed an operator repeatedly talking and moving his/her hands in a fast::: b) (4: and non-deliberate motion in a Grade [redacted] § manufacturing area. The employee observed was identified as a Trainer. e During the review of video recording of filling operation of [redacted] in Suite [redacted], dated 13\"\" January 2025, we observed operators talking and moving hands in a fast and non-deliberate motion in a Grade” manufacturing area. 5/28/2025(Wed), 5/29/2025(Thu), 5/30/2025(Fri), 6/02/2025(Mon), 6/03/2025(Tue), 6/04/2025(Wed), 6/05/2025(Thu) Richard L Bartlett Investigator X Boe Sted’0605-2008 11:83:44"
+ },
+ {
+  "finding_id": "finding-5c6dddfbdab00a26fec2c310",
+  "finding_text_md5": "fbfd2f875baf9fea9177e0277b61df9e",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, a. ” for the following steps in) the acceptance criteria or specification for the Microbial Purityteston). ——_—i isa b. There is insufficient bioburden and endotoxin monitoring throughout the manufacturin processes for the following bulk products:|: ins -, Shringrix, and),,., |...|. Forexample, during routine production, Shingrix is tested for bioburden from the si and bioburden and endotoxin samples are taken).. sterile filtration."
+ },
+ {
+  "finding_id": "finding-5963cf0013e89545058b9ac4",
+  "finding_text_md5": "c7eb8f1fa1858842e484830011afcdc7",
+  "published_date": "2026-10-26",
+  "detail_text": "Chemical sampling for total organic carbon, conductivity, and nitrogen is [redacted] bioburden sampling. ra a Pd ““, “ 2 a eb 4 a< \\: ] EMP OVEE(S)"
+ },
+ {
+  "finding_id": "finding-5933c136d1902888fc9b03de",
+  "finding_text_md5": "eb83413a61602f0a776f61e8ea61c729",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, While observing warehousing operations within temperature controlled (2-8C) finished product storage room [redacted] within the packaging warchouse, it was observed that one shrink wrapped pallet consisting of [redacted] boxes ( [redacted]) ofWFI diluent batch [redacted]) were not stored under appropriate"
+ },
+ {
+  "finding_id": "finding-58357ffcd49f038e6fdb9944",
+  "finding_text_md5": "d3eb49ec386e611d1f1aa75b02c6ddce",
+  "published_date": "2026-10-26",
+  "detail_text": "quarter) were observed in an exhaust vent which is (Equip reported as meeting an standard), and which continues as part of the air system. The (located in room is used to conduct key bioburden-controlled steps in of your firm's manufacturing process (e.g., processes such as b)Regarding the condition of room (in which of manufacturing occur and in which certain steps in the of manufacturing occurs; and reported as meeting an standard). i.Two room air intake vents appear to be partially blocked or positioned near cabinets such that effective air flow may be compromised. ii.The sealant used to fill ceiling interfaces appears to be cracked and discolored. used to cover cracks in the floor, appears to be buckling and/or deteriorating."
+ },
+ {
+  "finding_id": "finding-55d44f30c6b0cc711f5c8892",
+  "finding_text_md5": "d3793da23ad22438c5ec8586c9a448b0",
+  "published_date": "2026-10-26",
+  "detail_text": "Deviation 117124 due to operator not following SOP (version 12) “Production ofRhoGAM by incorrectly proceeding with the unnecessary and adding directly into the instead to the resulted in a ofan initiated PPQ Lot [redacted] ana rejection [redacted] due to not being suitable for further processing. b. Deviation 121827, the operator did not follow SOPA), ession 10) securting 1D octorn te and entered non-approved(by (4) results from the QC laboratory resulting in need to perform the adjustments based on the erroneous results which is not part ofthe soP 1(B) 4) (version 10) for PPQ Lot c. Deviation 121766, the operator did not follow SOP (version 10) “Production ofRhoGAM od and added the incorrect quantity o 0 [redacted] for PPQ Lot d. Deviation 123472, QA verified the dosage calculation for fill, but did not verify that the(b) (A)valne was transcribed appropriately per SOP GQC-00-025 “Review of Test Data and Release ofTest Kesults.” Therefore, the(by(4)based on the incorrectly transcribed(6) A)value for PPQ Lot64"
+ },
+ {
+  "finding_id": "finding-52f62b2f34ae948b6f3ed60c",
+  "finding_text_md5": "3087d3bf053987ce63f7b3fd3dbde0d5",
+  "published_date": "2026-10-26",
+  "detail_text": "Deviation investigation QN 201078686 initiated on 14MAR2023, documents a Grade~_ lenvironmental monitoring (EM) action limit excursion (..__) identified for... __|within building) - during the production of Capvaxive drug product Process Performance Qualification (PPQ) batch as (0.5mL/Dose) on soa The probable root cause for the deviation was identified as sample exposure and contamination outside the Grade environment during transfer and submission for. This conclusion was made without evidence supporting the sample was contaminated during sample transfer. Your investigation concluded that no sample handling errors occurred during transfer of the|. sample. However, additional evidence received during the investigation identified that sample contamination may have occurred during an intervention within the and this was not referenced as the probable root cause within the investigation. Capvaxive PPQ batch) wo was utilized to qualify the Capvaxive commercial manufacturing process within) aw"
+ },
+ {
+  "finding_id": "finding-528cc5864e1c11e181c2597a",
+  "finding_text_md5": "acbb8709670431ac34c3a1a80fae9162",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, Your firm has not established a stability testing program for your drug product to confirm and ensure that these products maintain their efficacy and quality attributes throughout the established shelf life? In addition, your stability program is deficient in that: Your most current stability study, study number 16/275ANA, was completed in 2018 and signed off in 2020. This study was performed under the requirements of the European Good Laboratory Practices (GLPs), and not the U.S. Current Good Manufacturing Practices (CGMPs). There have been no ongoing stability studies performed since, and stability samples included in your 2018 study did not include microbiological testing, and/or testing for impurities. Additionally, stability chambers used in the study for accelerated and real-time conditions were not controlled for relative humidity."
+ },
+ {
+  "finding_id": "finding-51b57a2d5c9f6afa6664b16a",
+  "finding_text_md5": "b00ba003f9cab89a91c6906aa067ef7a",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, you did not investigate complaint (ID CM 2022-02) received June 21st, 2022 that reported a patient had \"pain\" and \"minor swelling\" in their knee after receiving an injection of your product mVASC-lot ws Furthermore, you did not follow your written procedures entitled \"Complaint Handling\" Document Number - SOP-8001 which states: \"For all complaints, the evaluation shall include an assessment of whether there is potential for harm to a patient or end user ofthe device. Should sucha case arise, appropriate customer notification and failure investigation shall commence without delay\". Since commercial distribution beganin|, you have distributed approximately)... of mVASC (a product described by your Instructions For Use (IFU) as extracellular matrix derived from hypodermis skin)."
+ },
+ {
+  "finding_id": "finding-51939201167ec5b36d805844",
+  "finding_text_md5": "4b576d3586632c47375835f5ff111ea1",
+  "published_date": "2026-10-26",
+  "detail_text": "A. The CTP bulk requires the (6)I(4)ofthe bulk after the (NN(B)Z)NNN step in Bldg.(4) (Room PU), The ' [redacted] system is rinsed with a [redacted] solution and collected into ( [redacted] individual 4) [redacted] that are NN [redacted] 4) intoa [redacted] container, [redacted] i the CTP ( [redacted]) process. The CTP bulk is [MB) [redacted] NM by the technician| (w [redacted] y_ the \\(By(AyI container in a [redacted] () [redacted] mifor an unknown specified amount oftime under the biosafety cabinet. A bioburden sample is taken at this step at this step, (By(4y the CTP bulk [redacted] process. B. The production batch record does not include instructions for the [redacted] steps for the CTP bulk, [redacted]. C. There is no validated mixing time-frame established for the CTP bulk concentration [redacted] step to ensure [redacted]."
+ },
+ {
+  "finding_id": "finding-4fa36c7e769e10c618535972",
+  "finding_text_md5": "04675e6cc9c9987ff9515d5213b60083",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, On 01/03/2022, your firm discovered AHG Anti-IgG gel cards, lot number [redacted] distributed to the United States was out of specification with a negative specificity (false positive test results) of 20% equivalency (= 10 out of 50 samples). Your established specification for product release is less than or equal to ™) equivalency. On 01/03/2022, your firm discovered AHG Anti-IgG gel cards, lot number [redacted] distributed to the United States was out of specification with a negative specificity (false positive test results) of 20% equivalency (= 10 out of 50 samples). Your established specification for product release is less than or equal to equivalency. Your firm determined lot numbers [redacted] passed [redacted] testing. Your firm failed to control non-conforming product which was distributed to the United States. Approximately [redacted] (288 cards each) of lot number [redacted] and [redacted] (288 cards each) of lot number [redacted] have been distributed for sale to the United States."
+ },
+ {
+  "finding_id": "finding-4e7d5a2c28ff7653e5e38174",
+  "finding_text_md5": "6c46763f79b07c45804ec421bfebc7c2",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, you do not periodically validate your suppliers’ certificates of analysis for components or consumables used during [redacted] b/22/' et"
+ },
+ {
+  "finding_id": "finding-4e60ff6bae29d23ef8d31fb6",
+  "finding_text_md5": "f6d0fdcc6865e0b9f3b48127ab95496e",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, your firm failed to ensure correct [redacted] were applied to [redacted] drug product containers before release. The final [redacted] on your containers that hold [redacted] drug products contain incorrect expiration date. The expiration date on the [redacted] (4) was not based on the associated stability studies. Furthermore, your documentations that accompanied with the [redacted] drug product shipment, including the packing lists, contain incorrect information. The documents do not bear an expiration date determined by the associated stability studies and do not match with the expiration date on the container [redacted] that hold [redacted] drug products."
+ },
+ {
+  "finding_id": "finding-4cd3de5463eddd9165dcab89",
+  "finding_text_md5": "1731322ae7d64875df4661e260868f00",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, Manual cleaning for small parts used in [redacted] ind [redacted] does not include operator training qualification testing to ensure the cleaning is performed consistently and successfully by each operator. In addition, there is no routine monitoring of the manual cleaning performed by operations personnel to verify that cleaning acceptance criteria are continued to be met over time. a ["
+ },
+ {
+  "finding_id": "finding-4bd96d12940ba2b1e1e43e14",
+  "finding_text_md5": "0beb668aca28f5f023447b4d70a0130a",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, While observing sterile [redacted] operations for Imovax Rabies batch X1C16 (US Market) on [redacted] line [redacted] within OISTRICT 9/18/2023({Mon), 9/19/2023(Tue), 9/20/2023(Wed), 9/21/2023(Thu), 9/22/2023(Fri), 9/25/2023(Mon), 9/26/2023(Tue), 9/27/2023 (Wed), 9/28/2023(Thu), 9/29/2023{Fri) \"3 observations of obiectionabie conditions and oractices listed on the front of this form! *8 repomes:. 1."
+ },
+ {
+  "finding_id": "finding-4bc1762f378a371db3f279cf",
+  "finding_text_md5": "a44892f8a9cd512c2c836af152e39e06",
+  "published_date": "2026-10-26",
+  "detail_text": "For example: a Written procedures are not followed. For example: i. There are no approved quality agreements between Neurotech and suppliers of materials including the endothelial serum free media, gripper, scaffold yarn, hollow fiber membrane, titanium anchor loop,1181 adhesive, and primary container closure as required per SOP -1021.12 \"Supplier Qualification & Monitoring\". iii. On July 23, 2024, it was observed that an operator performed recounting instead of reprocessing of the drug iv. On July 24, 2024, it was observed that the operator performing endotoxin testing of the drug product used a Ito collect a sample from the primary container instead of a, as per -2183.06 \"Bacterial.... Fai Testing Using the 101.; 33 b. Written procedures for production and process control are inadequate or not established. For example: i. SOP -2100.15 \"Routine Environmental Monitoring of Aseptic Processing does not adequately describe the process of how environmental monitoring sampling is to be performed. Specifically, on July 23, 2024, it was observed that the encapsulation process, the were., and the air sampling for viable ISO area where occurs. -1 'Yarn Cleaning and Processing Method' do not specify that the (PAC, anchor loops, and - yarn) should be stored in sanitized containers Ito shipment to the, however, the operator who performs the 11,1.1 confirmed that the components should be placed in a sanitized container. 1:14 c. Training is inadequate to ensure personnel can independently perform their assigned responsibilities to manufacture the NT -501 combination product Specifically, on July 23, 2024, it was observed that a trained operator who was performing the of capsule batch requested instructions for the process from another operator executing the step. d. Deviations were not opened the deviation, as per SOP -1013.07 \"Quality Event Process\". i. Deviation DEV 00127 for the use of the appearance testing documentation that was \"not effective\" occurred on March g, 2023 but was opened (w) ort SEE Miriam Ngundi, Lead Inspector, CSO REVERSE OF 77-11S Alyssa Kitehel, Supervisory Biologist 07/26/2024 ii. Deviation DEV 00170 for extraneous DNA testing occurred on January 19, 2023 but was opened iii. Deviation DEV 00256 for the failure of the November 10, 2023 but was not opened until COO) certification of the 1-liEPA filter occurred on PICO e. Documentation practices are insufficient. For example, batch records for the NT -501 combination product do not consistently document all steps that are performed on all, nonconforming capsules. Specifically, on July 23, 2024, it was observed that a capsule from batch failed the but was advanced to the (primary packaging) process. The capsule was ultimately rejected. The batch record for"
+ },
+ {
+  "finding_id": "finding-4a6d1f256caadadce2060774",
+  "finding_text_md5": "fc158785a7379171bd519683ec518fe3",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, the following was observed: CAPA #204728 was initiated on 14MAY2024 in response to deviation #201944 pertaining to rework of batch [redacted] to [redacted] involving the identification of two product vials with missing labels from) [redacted] total packages during repackaging on 283MAR2024 (identified as major deviation). As a corrective action, procedure 0170-SOP-00004 (ver. 1.0) titled “Tasks of [redacted] packaging during manufacturing” was implemented (17SEP2024) [redacted]. No effectiveness check was assigned within the CAPA to verify effectiveness of the corrective action and to prevent future reoccurrence of the deviation. No justification was documented as required per procedure SOP6006/13 (ver. 13) titled “Deviation Control.” CAPAs #157434 and 157435 were initiated on 12DEC2021 in response to deviation 156341 (critical deviation) pertaining to the wrong [redacted] content printed on a label and folding carton of [redacted] for the U.S. market (units distributed to U.S. customers and returned/destroyed). This deviation was reported to the agency as a BPDR on 24NOV2021 [redacted]. As corrective actions, CAPA #157434 implemented the and CAPA #157435 implemented the [redacted]. No effectiveness check was assigned within both CAPAs to verify effectiveness of the corrective actions and to prevent future reoccurrence of the deviation. No justifications were documented within the CAPAs as required per procedure SOP6006/13 (ver. 13) titled “Deviation Control.” Your firm initiated deviations between 2021 through 2024 to address a known problem regarding the [redacted] which resulted in wrong expiration date applied to finished drug product labels. You initiated deviations 141664 and 161611 for products intended to be shipped to the U.S Market. Due to similar deviations in 2019 a change request ( [redacted]) for [redacted] was initiated on 08 August 2019 to address the discrepancies and was closed on 29 May 2020 without any corrections. Due to reoccurrence of the error, a new change request ( [redacted]) was initiated on 12 September 2022. However, at the time of the imspection, the request has not been completed to address the repeated deviation or error. Your firm continues to document in your deviation investigation reports that the repeated deviations is attributed to human error without appropriate corrective actions."
+ },
+ {
+  "finding_id": "finding-48a5824f0ef504c388b12fb8",
+  "finding_text_md5": "65d1ca13a150522793b4eb491842778c",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, your firm’s Procedure de controle final des commades diagnostics GMBH, DGM- QAC-SOP-030 Rev 08 (dated JAN-31-2023) fails to require any testing of the capping process for the Alpha2-Macroglobulin immunoturbidimetry IVD kits (Class I), [VD calibrator Kits (Class II), and [VD control kits (Class I)."
+ },
+ {
+  "finding_id": "finding-482da4b76a62f874cb281bec",
+  "finding_text_md5": "66b62b177b6da07edb48e4869684c9f8",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically,.... ow.. A. You do not routinely employ the use of sporicidal agent(s) in your Grade__ filling environments to include the inside and outside of your [redacted] Grade You have 48 documented recoveries of various spore forming microbes to include molds and bacillus species over the previous approximate two years. These spore forming recoveries are documented in your open [redacted].; [redacted].. filling enclosure, surrounding Grade areas as well as throughout your facility. i. You documented Deviation [redacted] regarding the recovery of [redacted] on [redacted] sampled [redacted] of filling operations inside the [redacted] door during batch [redacted] Your CAPA does not address operator error while the investigation includes operator error as a root cause. Sporicide use was not employed on the outside of the [redacted] doors before filling operations were started for batch [redacted] dated [redacted] B. Your environmental and personnel monitoring plan to include sampling locations and times lack::: [redacted].: scientific support in your Grade formulation and filling areas as follows: i. You do not perform personnel monitoring activities immediately after any of your approximately [redacted] aseptic connections. Personnel monitoring activities are only performed at the end of each series of operations whereby operator(s) who perform aseptic connections sanitize their hands one or more times before personnel monitoring occurs. ii. You do not require aseptic operators who perform Grade interventions are tested to Grade ipersonnel monitoring specifications. I observed your operator performa routine [redacted] intervention during batch [redacted] whereby their head entered your() (4) who was later tested to Grade oe specifications regarding head and mask testing. ii. Your [redacted] are not representative of your dynamic environment during setup activities in your Gradem filling areas located in room [redacted] While you have a [redacted] during setup activities, it is located in your [redacted] area which is separated from your filling area by a partition. You perform various setup activities in your filling area to include aseptic connections, filling head placement, etc. iv.Grade formulation arearoom surface sample locations are inadequate such that sampling does not occur proximal to the area where aseptic activities to include aseptic connections are performed. Instead, you surface sample near the [redacted] which is approximately [redacted] + more away from your aseptic connections. V. Your [redacted] located in your GradeM9 oom [redacted] formulation area are not in or near your work surface and therefore, are not representative of your dynamic / working environment. C. Areas and surfaces ofyour Grade\" open [redacted] are not cleaned adequately. I observed aseptic operators cleaning your open [redacted] during filling operations and after batch [redacted] was completed. The aseptic operator failed to completely clean the opened [redacted] door(s) upon completion of an open door [redacted] intervention. Operator(s) were also observed failing to clean the partition separating the [redacted] area from the filling area inside your [redacted]"
+ },
+ {
+  "finding_id": "finding-47fcebd1833d1c2abefbde76",
+  "finding_text_md5": "4a965f6874fa3b5d823fce92100827a0",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, A. Deviations are not closed in a timely manner. For example, Procedure A SOP 054 018, effective 20FEB2023, - «55: a a) “Deviation, CAPA, and Task Handling” requires that deviations be closed within days. In the year 2022, approximately 50% of deviations were not closed within this timeframe, with seventeen percent open up t [redacted] days, eleven percent open up to [redacted] days, and twenty three percent open over (/ [redacted] Hays. B. The late closure or extension of deviations from written production and process control procedures are not always adequately justified. The same reason, i.e., late completion of the deviations has no negative impact on product quality, was repeatedly used for extension ofthe deviations including but not limited to: a. Deviation 169048 [redacted], Overrun of temperature during [redacted] yeasurement (6) date opened 06JUL2022. b. Deviation 167652| [redacted] Exceeding the [redacted] ‘temperature, date opened 09JUN2022. c. Deviation 169447 [redacted] Use of wrong batch protocols for the [redacted] date opened 13JUL2022. d. Deviation 163933 [redacted] Total duration [redacted] exceeded, date opened 06APR2022. e. Deviation 164077| [redacted] Falling below the [redacted] of the! [redacted] (b)"
+ },
+ {
+  "finding_id": "finding-46d0484d4f50ea5fcd2f71f9",
+  "finding_text_md5": "b766c952d5879b6f5ac2f3b5d945401d",
+  "published_date": "2026-10-26",
+  "detail_text": "For example: a. Yimmugo drug product [redacted] are (0) ll (4) in an4) (4) where other drug products are concurrently [redacted] b. The Yimmugo drug product (by G4) are labeled with the lot number [redacted] crimp. This lot number can be removed from the crimp usinga [redacted] ENN that is near the(BY"
+ },
+ {
+  "finding_id": "finding-466aa4da12512b657e6f0b38",
+  "finding_text_md5": "68606aac48638b0ff3209f99fe5ca1b3",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, personnel responsible for performing sterility testing and cleaning were observed to lack documented, tissue-specific training related to the proper handling of Human Cells, Tissues, and Cellular and Tissue-Based Products (HCT/Ps). During review of records and observational walk-throughs, deficiencies were noted in employees' ability to carry out routine duties for which they were reportedly trained, including the incomplete cleaning of spills in classified cleanroom areas and improper handling of quarantined media lots. These gaps indicate that the firm has not ensured personnel possess the education, training, and experience necessary to perform their functions in compliance with established procedures and current good tissue Since 2023, your firm has conducted approximately: e [redacted] Bioburden tests on [redacted] samples e [redacted] Sterility Assurance tests on [redacted] samples e [redacted] Endotoxin tests on [redacted] samples"
+ },
+ {
+  "finding_id": "finding-45edd4ea9387fc9e8411aee8",
+  "finding_text_md5": "952046629cf3b69d7ebb05b3919facc2",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, a) Your firm provides a Certificate of Analysis (COA) to your customers which includes communicable disease testing results for your private label products [redacted]. and [redacted]. These COAs are provided to your firm by your contract manufacturer. [redacted] This COA is signed by the [redacted] —-Medical Director, however, the certificate lacks: e A statement of whether the donor is eligible or ineligible e A statement of donor eligibility based of donor screening results e A statement that the communicable disease testing was performed bya laboratory certified to perform such testing on human specimens under the Clinical Laboratory Improvement Act of 1988 or has met equivalent requirements determined by the Centers for Medicare and Medicaid Service. e The address of the establishment reviewing the donor records documents to make a donor eligibility determination. b) Your firm issues Certificates of Analysis (COAs) to customers for the private label product [redacted]. which include communicable disease testing results. While these COAs bear your contract manufacturer's name (_ [redacted] __). they originate from your cord blood manufacturer [redacted]. The COAs provided to customers lack a statement indicating donor eligibility status as follows: e A statement of whether the donor is eligible or ineligible e A statement of donor eligibility based of donor screening results A statement that the communicable disease testing was performed bya laboratory certified to perform such testing on human specimens under the Clinical Laboratory Improvement Act of 1988 or has met equivalent requirements determined by the Centers for Medicare and Medicaid Service. e The address of the establishment reviewing the donor records documents to make a donor eligibility determination. Your firm markets and distributes human umbilical cord-derived products that include but are not limited to: Wharton's Jelly and Exosome Products: e Private labels: [redacted] ¢ Customer private labels: [redacted] Umbilical Cord Blood Products: e Private label: [redacted] e Customer private labels: [redacted] Respectively, your firm has distributed [redacted] units marketed as Whartons Jelly labeled for [redacted] units marketed as exosomes labeled for [redacted] units marked as growth factor labeled for [redacted] and [redacted] units marked as cord blood marketed and labeled for [redacted]"
+ },
+ {
+  "finding_id": "finding-44b4672f5c6b325ad2d558cc",
+  "finding_text_md5": "ac8dcb255f74dd14d3233d56d18d6786",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, while reviewing test results the following was observed: Endotoxin Testing e On 05/21/2025, Bacterial Endotoxin Test (BET) [redacted] had two samples from [redacted] and one sample from [redacted] that resulted with the %CV values above the acceptability limit [redacted]. Procedure NEL-STP-0046 “Bacterial Endotoxins Test” states, inant A new test was not performed. The data was reviewed and accepted by the study director on 05/27/2025 and the results were sent to the clients on the same day. e [redacted] __. two devices were combined and tested in a [redacted] solution during Bacterial Endotoxin Testing, however, the validation test method specifies the use of one device per [redacted]. The pooling of two devices in the [redacted], violating the established test parameters. Despite this deviation, the results were reported to the client and considered valid. __, during bioburden testing for [redacted], unique donor identifiers were not tracked in the raw data. As a result of this loss of traceability, test results were reported using only the unit numbers assigned by the laboratory, rather than the original donor identifiers. Growth was observed in one of the ten units tested, but this positive result could not be tied back to a specific donor. You concluded that this traceability issue does not affect the overall validity of the bioburden results. Since 2023, your firm has conducted approximately: e [redacted] Bioburden tests on [redacted] samples e [redacted] Endotoxin tests on [redacted] samples"
+ },
+ {
+  "finding_id": "finding-442ad93c341b39dcb029b4b8",
+  "finding_text_md5": "cd2bfea6a495d78aaf36e54d537e712e",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, A. The environmental monitoring frequency of Grade [redacted] nanufacturing areas where open processing is performed is not adequately justified. For example, in Grad [redacted] reas [redacted] air particulates are monitored [redacted] and viable air, surfaces and floors are monitored [redacted] B. Maximum number of people allowed in Grade manufacturing areas is not determined."
+ },
+ {
+  "finding_id": "finding-4417273f6ed7bbb614b9d338",
+  "finding_text_md5": "13d8b0e26cc00654d5892e13b733def0",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, A. Sop)(4)-008/2. [redacted], Section 6.6.8 states that [redacted] may be [redacted] only at the time of dispensing. On 6/10/2025, [redacted] labeled as [redacted] with no expiration date or date of preparation were found in the [redacted] in the necropsy room [redacted]. B. In Building™Room [redacted] (immunocompromised Animal Room), rodent feed Lot # [redacted] with an expiration date of 25May25 was found to be available for use with no other feed present in the room. According to SOP ™-001, Animal Husbandry, feed is assigned an expiration date of [redacted] (>) the manufacturer's [redacted] A study utilizing mice was ongoing in the room. C. In Building [redacted] racks of ferret cages were observed being [redacted] with no label indicating the date of sanitization. SOP) [redacted] -007, Handling Clean Caging and Equipment, requires placement of a label indicating the date of sanitization. D. On at least” occasions when the cage wash was in use from [redacted] for verification of cage washer performance in Building [redacted] was not performed as per SOP [redacted] -004/2 Cage and General Equipment Cleaning, section 6.6."
+ },
+ {
+  "finding_id": "finding-44090ebae58a125c3cdff802",
+  "finding_text_md5": "de8708ea536cffcde5878e00ddfdc4f4",
+  "published_date": "2026-10-26",
+  "detail_text": "*DATES OF INSPECTION 8/31/2023(Thu), 9/01/2023(Fri), 9/04/2023(Mon), 9/05/2023(Tue), 9/06/2023(Wed), 9/07/2023(Thu), 9/08/2023(Fri) Laurel A Beer X BS Signed: 09-06-2023 18:00:15"
+ },
+ {
+  "finding_id": "finding-43f2bb23cb813494b775da2e",
+  "finding_text_md5": "c96ab818d65a0b67cec587e47c40069f",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, your current standard operating procedures 0170-SOP-00084 (ver. 2.0) titled “Assessment and process for issuing BPDRs,” 0170-SOP-00068 (ver. 2.0) titled “Handling of Product Quality Complaints,” and SOP6006/13 (ver. 13) titled “Deviation Control” are not aligned to support Biological Product Deviation Reporting (BPDR) requirements. On O7NOV2024, your Qualified Person (QP) stated that your current process for managing potential BPDRs relating to complaints follows complaint procedure 0170-SOP-00068 and [redacted] contacting the [redacted], who is responsible for classifying the event as reportable or non-reportable. This practice does not follow current BPDR and Deviation procedures 0170-SOP-00084 and SOP6006/13 which identify that your [redacted] has responsibility for classifying potential reportable events related to complaints and deviations. From 2021 to the present, the following events were observed: On O08NOV2023, you received complaint #R/US/2023/017 pertaining to a missing vial label from one package of [redacted] from the U.S. Market. This complaint was investigated and assessed by your [redacted] and not identified as a reportable event [redacted] to assure compliance with reporting BPDRs to the Agency. This batch was identified to still be within expiration [redacted] On 15JUL2021, you received complaint #R/US/2021/010 pertaining to a missing vial label from one package of [redacted] from the U.S. Market. This complaint was investigated by your [redacted] and not identified as a reportable event as required to assure compliance with reporting BPDRs to the Agency. This batch was identified as currently expired ™. [redacted]."
+ },
+ {
+  "finding_id": "finding-432f78c385905b3a511c0c93",
+  "finding_text_md5": "2f622e3fb22c9f1942d638d787c4ad13",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, data integrity remediation project as per Document #// [redacted] is ongoing as ofthis inspection (December 2-6, 2019); however, PPQ lots were prepared between November 2018 to January 2019. The following systems and equipment used during RhoGAMSEINE production are a part ofthis ongoing project"
+ },
+ {
+  "finding_id": "finding-41ced0ad9da2d5db1efb1a31",
+  "finding_text_md5": "8460be89ed67660284eb3d92ea2a9ee5",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, Inadequate aseptic operator gown was observed during the production of the following [redacted] A total of}... operators were observed on oa in the Grade. |manufacturing area wearing goggles thathad| Ss. ~— ~=———«s: exposing the operators’ skin. The goggles are part of the sterile gown worn by the operators in theGadd. operators include the Operator whose main duties are to perform process steps on the drug product in the Grade exe Biosafety Cabinet,,, and the Assistant Operator who provides assistance to the Grade perator in the..."
+ },
+ {
+  "finding_id": "finding-3f9c72dfdb3231536857cd9a",
+  "finding_text_md5": "092057df91ebf889d17bc51781fe4091",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, a) Deviation Report No. M26/06/21/03, dated 6/19/2021, - lew reported that the limit ofconductivity for) SS SSSSs«Wass documented a mo instead of,__|_in the following records: 1) Master Formula Record (MFR) for) wwe 0 sie 2) Batch Manufacturing Record(BMR) for; sw Ssés nd or scale for Manufacturing of Lie (BMR no. MBR sg and 3) SOP for Preparation of| me Aree fof] we (SOP No. 101 eet A typographical error occurred while preparing the SOP, BMR, and MFR where a|] was typed instead ofa b) Deviation Report No. M03/07/21/01lowe sd] reported on 7/3/2021, in the for GMP. [cleaning inthe |area, that ‘| was written on page no.- of[- after completion of cleaning on 6/30/2021, for the remaining entry lines. After the operator was accidentally hit by a page oii ag of|- |was inadvertently torn from thel w |, resulting in a damage (torn)| a. page. The operator discarded the completed page due to panic and fear of being caught by the supervisor. GMP cleaning was performed on 6/30/2021, but the - —_ cleaning entry on 6/30/2021, which was documented on page |, was not available. c) Deviation Report No. M19/07/21/O1, dated 7/18/2021, wy |was noted during processing of Batch no... ___|there was a typographical error in the Master Batch Record (MBR) for flowrate during continuous) ws stst=<‘<«sé‘;*s*sS‘* The lw atc was incorrectly documented aswo instead of, 4. during the drafting and typing ofthe MBR. Manjari Bk., Pune 412 307 Biological Manufacturer d) Deviation Report No. M13/11/21/03, dated 1/12/2021, ws ‘ia, hoted the following observations. i) Batch - On page number of- multiple errors were committed during the calculation. The operator corrected the errors and signed on the original date of the calculation (9/1/2021) and not the later correction date. The same errors were also reflected on page' - bf- and page [- of|- |. ii) Batcheswe and sie - On page number’ jof|-_ lof Batch ww «(| & pageno.|-lof JofBatch[.. _|, the as inadvertently made “NA” before completion of activity entries. Irrespective of the log being “NA”, the operator signed the|. sheet with the entry error. e) Deviation Report No, M29/11/21/02, dated 11/29/2021,, wy Swe «reported the)—SSS*S*é«w,:*S*‘“‘S;CO (AuditTrail’‘(was misplaced, The last audit trail of the} - Bioreactor was performed on 11/22/2021, and the) w. was found to be misplaced while performing the audit trail on 11/29/2021. The missing) ma _|was never found. In 2021, 131 of 416 Deviations were for Good Documentation Practice Error. Since January |, 2022 to present, 23 of 400 Deviations were for Good Documentation Practice Error."
+ },
+ {
+  "finding_id": "finding-3cb063fbe50e3063b4a889fa",
+  "finding_text_md5": "75db4539817f278deefc43ea86a7a8fc",
+  "published_date": "2026-10-26",
+  "detail_text": "i Centrifuges in use at the establishment. Specifically, when selecting the aie assay values from the manufacturer package insert, the firm selected assay values intended for - instruments usingoo — i The firm shouldhaveselectedtheassay values intended fo i Centrifuges using we The correct assay values are listed in a different table on the same manufacturer package insert. The acceptable ranges for the reference control material are significantly different forthe, —,,~==-s-/»-—s/ofinstruments. They, a Centrifuges are used in the qualification of donors. Proper execution of Performance Qualification is necessary to demonstrate the instruments perform as intended and to ensure compliance with Source Plasma manufacturing requirements."
+ },
+ {
+  "finding_id": "finding-3bf4135984bd04449a3db0c6",
+  "finding_text_md5": "ec64b3b63a77957acfa9f9990fcc1140",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, since beginning operations in January 2021 your firm has not established written procedure for recall operations. Your firm markets and distributes human umbilical cord-derived products that include but are not limited to: Wharton's Jelly and Exosome Products: e Private labels: [redacted] e Customer private labels: [redacted] Umbilical Cord Blood Products: e Private label: [redacted] e Customer private labels: [redacted] Respectively, your firm has distributed [redacted] 4) units marketed as Whartons Jelly labeled for [redacted] units marketed as exosomes labeled for [redacted] units marked as growth factor labeled for [redacted] and [redacted] units marked as cord blood marketed and labeled for [redacted]"
+ },
+ {
+  "finding_id": "finding-390f52dc489eb3f1ad7e251b",
+  "finding_text_md5": "3992e9add562c1acd4544a468cc22ae4",
+  "published_date": "2026-10-26",
+  "detail_text": "Specifically, Licensed Biological Drug Substance Manufacturer The Excel spreadsheet used for environmental monitoring data collection, trending, and analysis has not been validated. Your firm has not demonstrated that this system is accurate, reliable, and capable of ensuring the integrity of the data generated and maintained within your environmental monitoring program."
+ },
+ {
+  "finding_id": "finding-38ef0fc84bb9157edffbaf7f",
+  "finding_text_md5": "b50a6c27caa2a92db8141e59278398a5",
+  "published_date": "2026-10-26",
+  "detail_text": "For example: a. Procedure 9000075940-02, MZP: Alarm Managementand Audit Trail defines critical\" alarms (defined as [redacted] as [redacted] critical, [redacted] Since October 09, 2024, there have bee [redacted] critical ™alarms that are [redacted] critical. Despite these [redacted] critical alarms, [redacted] has not reviewed, evaluated, or otherwise acknowledged these alarms since October 09, 2024 (as of November 09, 2024). Without [redacted] of these alarms, the production department continues to issue batch records for the manufacture ofShingrix drug substance per SOP 9000080766 version 4 titled eBR Execution and Review and has initiated manufacture of() 4) batches of Shingrix drug substance without the evaluation of these [redacted] of alarms. b. High bioburden levels were discovered during a lifetime study of [redacted] has a [redacted] which was identified as a source of bioburden contamination to the Shingrix drug substance. Manufacture of Shingrix drug substance continues at risk with [redacted] Correction of the equipment design is not scheduled until March 2025."
+ },
+ {
+  "finding_id": "finding-374a366d4239baf2354ba8cc",
+  "finding_text_md5": "c4d6942a21507b7a57d543f4b7db5864",
+  "published_date": "2026-10-26",
+  "detail_text": "or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel. Specifically, used to isolate le cells during manufacturing of ~=S——S*é«ddrg prouicet doo noott access control, audit trails or any features that safeguard GMP electronic production data. A. On January 15th, 2025, mo batch lot eve was observed being loaded onto -—_ during the __,,, of the manufacturing operation. The Operator input only vii into the system after completingtheme B. The risk assessment performed for data integrity of ‘ss has identified deficiencies for access control and audit trails. However, your firm has used the to manufacture |- lots of lw including. |lots for the|. |market."
+ },
+ {
+  "finding_id": "finding-3231403cb80a2170d9b2abf5",
+  "finding_text_md5": "123b95c58b6a936521cb00b949527944",
+  "published_date": "2026-10-26",
+  "detail_text": "son material and a build-up of| ge was observed belowa leaking vom: b. AL —~«zwas observed forthe! jinroom|andi they SCioom. c. was Observed above the in various|... _|to include the diel d. Apieceofa|., _|was observed above the as in room) aw G. wm was observed dripping from a for the).. for i inthe! wv. += ~—~«room. The,,, from this|- _was also observed on the (bya) t SEE"
+ }
+]

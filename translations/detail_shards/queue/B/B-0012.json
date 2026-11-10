@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-dea27a69a0d316705f968367",
+  "finding_text_md5": "cc5f78187eb06090c4bb35feb64cce4a",
+  "published_date": "2025-12-29",
+  "detail_text": "Your facility is not maintained in a clean and sanitary condition to prevent contamination. During the inspection, we observed the following: 1. Active ceiling leaks and discolored ceiling tiles in the facility corridor used to transfer raw materials and finished products This corridor is also used for personnel movement, including access to the sterile manufacturing suites, QC laboratories, and capsule and tablet manufacturing areas. 2. An unknown black substance on ceilings, walls, and fans surfaces of cold rooms, which is used to store finished product and raw materials. The substance was sampled by your QC microbiology laboratory and microbial growth was observed on the plates. One sampling location »@ @«@ visually appeared to be mold. 3. HEPA filters and air diffusers in a Grade D gowning room, which is used by production personnel to enter the sterile manufacturing suite, covered in an unknown substance. This substance was also sampled by your QC microbiology laboratory and microbial growth was observed on the plates. 4. Plant debris on pallets inside cold rooms. There were active pharmaceutical ingredients, bulk, and semi-finished/finished product being stored on these palle"
+ },
+ {
+  "finding_id": "finding-98b164b8e2202e521fd7bf8b",
+  "finding_text_md5": "5d6595a475c46efe92cc3e05b068cdd5",
+  "published_date": "2025-12-29",
+  "detail_text": "1. On November 10, 2025, upon arrival in the microbiology, no documentation could be provided for ongoing testing. For example: a. Sterility testing including, but not limited to: m@ Injection batch mw (US batch) and 4) bulk batch m@ . b. Grade A and B environmental monitoring samples associated with batches m@ wo Analysts were observed filling out the sampling information onto the paperwork during plate reading. The records were not made at the time of sampling on November 3, 2025. C.H@ samples collected November 6, 2025. d. The@@ samples from November 6 and 7, 2025, had records that were only partially complete. 2. The IQVIA software is used for printing documents that are used for recording GMP production and laboratory data. It was observed that multiple copies of documents with the same unique serial number can be printed after the document is generated. There is no audit trail for this printing. There has been no"
+ },
+ {
+  "finding_id": "finding-8e83bc2e324a54de5db5a26f",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2025-12-29",
+  "detail_text": "1. Your firm failed to perform environmental monitoring in accordance with your procedure Microbial Environmental Monitoring of Production Areas of @m@ facility (SOP-144). SOP-144 identifies the highest-risk locations within the Grade A vial filling line; however, during aseptic filling operations observed on 10-NOV-2025 ©@ mg/vial) batch #@@ and on 13-NOV-2025 oe mg/vial) batch #@@ settle plate locations in the Grade A area were not positioned in accordance with the procedure. In addition, settle plates are routinely positioned away from areas where critical aseptic assembly and operator interventions occur. Your risk assessment for settle-plate placement did not include an evaluation of routine operator behavior in these high-movement areas when selecting monitoring locations. Furthermore, your environmental monitoring program does not include sampling of product-contact surfaces. For example, the stopper bowl, stopper track, om , or forceps are not sampled as part of your EM program for the vial filling line, nor are the stopper bowl, stopper track, or forceps included in the EM program for the m@ filling line. Not all om routinely used during interventions are included in the s"
+ },
+ {
+  "finding_id": "finding-88f66e99f2993b7e2b083033",
+  "finding_text_md5": "21b88e54db5643ea3edac019b9ff8f98",
+  "published_date": "2025-12-29",
+  "detail_text": "1. Differential pressures in the aseptic manufacturing areas have not been appropriately established and monitored. For example: a. The aseptic manufacturing area is designed with the aseptic filling rooms having a lower pressure than adjacent rooms. For example, the aseptic gowning room»@ where employees enter with exposed skin and put on their aseptic gowns has a pressure of +@@Pa. The adjacent gowning room where they proceed to put on goggles and sterile glovesm@ is lower at +@@Pa. They proceed to the general Grade B corridor in the aseptic manufacturing area which is +@@Pa. Personnel enter from this Grade B corridor"
+ },
+ {
+  "finding_id": "finding-752af7f6644b0ae9696a1bf4",
+  "finding_text_md5": "91a92d2a5d066523b76de614561e7a3d",
+  "published_date": "2025-12-29",
+  "detail_text": "Microbial failure investigations have identified human source microorganisms, but failed to identify specific root causes and implement effective preventive actions. For example: Media fill failure investigation DEVNe 2025-0281 for batch m@ filled January 8-13, 2025, identified seven contaminated vials spread across different portions of the batch. Vials identified Staphylococcus, Micrococcus, Kocuria, Acinetobacter, and Bacillus species. The root cause was attributed to poor aseptic behavior, but could not identify specific instances of poor aseptic behavior. Sterility failure investigation OOS/L/23/013 was initiated March 21, 2023, form@ Injection batch m@ aseptically filled on the m@ line. The investigation identified Corynebacteriumjeikeium. The investigation identified no root cause for the sterility failure. Environmental monitoring excursion investigations that identified human source microorganisms recovered in the Grade A aseptic manufacturing areas and attributed root causes to inadequate aseptic techniques from January 2025-September 2025: OOS-SAPES-2025-00000052, OOS- SAPES-2025- 00000084, OOS-SAPES-2025-00000120, OOS-SAPES-2025-00000200, OOS-SAPES-2025-00000203, OOS-SA"
+ },
+ {
+  "finding_id": "finding-5a5961f4a8cbedd2447df255",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2025-12-29",
+  "detail_text": "During review of the environmental and personnel monitoring (EM and PM), the following was noted: (b) . : A. From 01/2023 to date, a total of @batches were rejected due to EM or PM excursions. {fpfthe , . . . . 4 * + . * rejections involved manufacturing Block PM excursions (Action limits for Grade A: aa Grade B: (jcfu/plate or NMT ~ cfu!) gown locations)."
+ },
+ {
+  "finding_id": "finding-4c05a85d089dc2436e0c04bc",
+  "finding_text_md5": "b8b69d0927de1401f671fd8089b88e7e",
+  "published_date": "2025-12-29",
+  "detail_text": "Specifically, A. On 09/13/2025, I (EL) observed the aseptic assembly, set-up, and filling of oe . . 4). . . . ~~ ® “injection, U.S. Batch »° in Block ®®vial filling line © Room © Vhe following deficient aseptic practice was observed. a) The operator appeared unfamiliar with the sterile connection process. He did not sanitize his hands or use appropriate aseptic technique in performing sterile connections. Specifically, During the critical S2S (sterile-to-sterile) connection between the sterile product transfer tank (in Grade B) and the filling machine (in Grade A), ] observed that without sanitizing his hands, the operator grabbed the sterile connector end (in Mover) of the manifold tubing from the Grade A filling line. He attempted but failed to hang the tubing over the! GRABS He next took the tubing with the sterile connector from the transfer tank. He held both tubing in one hand, using a sterile pair of forceps he removed thel//(™@cover from each connector including the cover he previously handled with his unsanitized hand. He proceeded to use his unsanitized hands opening the ®® (cover) from each sterile connector to perform the sterile to sterile connection. He sanitized his"
+ },
+ {
+  "finding_id": "finding-4836699c1f4af8e2a4c7e713",
+  "finding_text_md5": "9d9a9aea5dabbf7b1a0a3d38d354cd25",
+  "published_date": "2025-12-29",
+  "detail_text": "1. Airflow smoke studies for the aseptic manufacturing area did not demonstrate appropriate airflow in critical areas. For example: a. During »® interventions at thea@ vial filling machine the smoke flows outward near the top of the m@ The study does not show the HEPA filtered air reaches the critical product contact 0) For example, during installation of the ore) and during@ Similar air flow that fails to reach the working surface was observed during »@ interventions at the ox) and where w@ vials are removed just after stoppering. b. During commercial m@ Injection batches on November 10 and November 13, 2025, the 4) LAF was placed behind the operators performing »@ interventions at the vial ©) (4) fillmg machine during machine assembly and filling. It was positioned with the exit air grate directed towards the operators back with air potentially flowing past the operator and towards the filling"
+ },
+ {
+  "finding_id": "finding-3b1a7599008184e6934b32c6",
+  "finding_text_md5": "a56d7c1ae4e3f1a088c0238969d15fe4",
+  "published_date": "2025-12-29",
+  "detail_text": "1. w@ Injection is a @@ filled into a vial. m@ is a ®® 0) There is no alternative destructive testing included as part of the visual inspection process for either of these products. This is a repeat observation from the 2022 FDA inspection. 2. The size and specific type of particles is unknown for the visual inspection qualification challenge kits to represent @@ vials, o@ 3. No documentation of the results of the mw 100% visual inspection was recorded for US market"
+ },
+ {
+  "finding_id": "finding-19661fd7a906a9ee59262124",
+  "finding_text_md5": "f4675d06d7c9b88442cc21d9aaf1c221",
+  "published_date": "2025-12-29",
+  "detail_text": "1. On November 10, 2025, product sample was observed on the side of the media bottles and not submerged in media during ongoing sterility tests for oe) . For example, batches OX) The we sterility test method uses@@ inoculation for the mw The method validation did not assess techniques to ensure the product could be effectively dispersed in the m@ ‘media."
+ },
+ {
+  "finding_id": "finding-02481ffc2131e4f44d3a7e27",
+  "finding_text_md5": "9fcd9ca7b16e480c7589448d687385ef",
+  "published_date": "2025-12-29",
+  "detail_text": "Specifically, A. FAR/25/001 was submitted on 01/17/2025 regarding bacteriological contamination observed in the aseptic process simulation (APS) Batch ™@On 01/13/2025, APS Batch meas . + 4 ee conducted in Block oeine (Room ™@On 01/16/2025, positive growth of Staphylococcus hominis was observed 1n all ® vials before incubation. Deviation was initiated on"
+ },
+ {
+  "finding_id": "finding-e9ec88ebc81ca935fbb8a34e",
+  "finding_text_md5": "e39aaa62aa3a234ca9506da3def2893c",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, your procedures SOP No. P3190 Version 07, Operating, Cleaning, and Maintenance Procedure of (6H 4 > Effective date 1/8/2024), SOP No. P3109 Version 15 Sterile CbH 4 > Liquid Vial Inspection Procedure (Effective date 12/9/2024), and SOP No. P801 Version 5 Sampling Plan and AQL Calculation (Effective date 3/10/2025) fail to ensure your sterile (b)(4) products are essentially free of visible particulates such that;"
+ },
+ {
+  "finding_id": "finding-e837e0d829d04f7a691a59e1",
+  "finding_text_md5": "2e1f263cb7ba681e5add6a7cb694ba0f",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, Protocol PQ/GT2.3.224 Version 01 Perfo1mance Qualification Protocol of Laminar Flow (li) (4) . (li) (4) (li) (4) . Hood for__________ Machme _____ID#___ Effective date 4/18/2023 and the Version 02 (Effective date 4/12/2024) provide procedure for perfo1ming and evaluating the air (li)(4> L . (b) • R (b)(4> hi gh k di F 1 .d d d f h flow of______ me <4> m oom t ·ou smo e stu es. or examp e, v1 eo recor e o t e • fl d. £ d Cb><4> d(b><4> d fi • • h £ 11 • au ow stu 1es per 01me ___ an were e c1ent m t e o owmg ways. (li)(4) A. In multiple intervention simulation studies, the purpose ofthe smoke study was not (bH4> • • • 1 • £ h (li)(4> S • (D N c1ear y 1 defimed. . E g. ____ mtervent10n SlffiU at10n or t e ___ ect10n ocument o. PQ/GT2.3.224 Version 01, Section 4.7.4 pages 20 and 21), the videos were evaluated for \"***The Air does not flow from operator to the filling area***\" and \"The air outside the LFH does not return to the LFH***\". Your Production Division Director (b)(6) acknowledged that the EMPLOYEE($} S IGNATURE"
+ },
+ {
+  "finding_id": "finding-e030639f1e3b28c0f53f1fbe",
+  "finding_text_md5": "0edc55312b5c68f8a871186e2d10e2e4",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, your firm's media fills failed to reflect actual production sizes based on vial fill/size. For example, during review of the firm's report, Summary Report ml <Redacted B4> Media Fill Report and Protocol, A-REP-SCP-0003 dated 30-May-2025 reported filling of <Redacted B4> vials verse the maximum of <Redacted B4> vials with a fill volume of <Redacted B4> mL. Documented within the procedure, A-SOP-SCP-0011, Aseptic <Redacted B4> process verification <Redacted B4> 1 mL vial <Redacted B4> is used for <Redacted B4> volumes ranging from <Redacted B4> mL <Redacted B4> mL with a Theoretical Batch Size of <Redacted B4> vials. A review of firm's production records since the previous FDA inspection, found Tirzepatide /Niacinamide Injection 8/2 mg/mL, Lot 218493 Compounded 9/17 /2022 <Redacted B4> Expiiy 6/14/2026 reported a Theoretical Batch Size of <Redacted B4> vials with an actual released quantity <Redacted B4> vials with a fill volume of <Redacted B4> mL. Tirzepatide /Niacinamide Injection 17 /2 mg/mL also has a fill volume of <Redacted B4> mL, which has a Theoretical Batch Size of <Redacted B4> vials. This is a repeat Observation. *DATES OF INSPECTION 11/03/2025 (Mon), 11/04"
+ },
+ {
+  "finding_id": "finding-dec5a14156e21f25d22a51e6",
+  "finding_text_md5": "a8bebfa9c92e822913473e5770ceb9da",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, Your firm does not have an established procedure for the review of audit trails to ensure the reliability of your analytical testing data. Your Quality unit did not review audit trails. Your batch record checklist does not include confirmatory documentation that audit trails in your analytical instruments and software were reviewed and evaluated as part of batch release."
+ },
+ {
+  "finding_id": "finding-d8a7727b1494dcb6ecdd292b",
+  "finding_text_md5": "3087d3bf053987ce63f7b3fd3dbde0d5",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, your firm did not adequately investigate microbial excursions recovered from your ISO <Redacted B4> classified areas during aseptic production before distributing partial lots. Your firm determined that the probable root cause of the microbial contamination was improper sanitization of materials before transfer into the ISO <Redacted B4> classified critical areas. In each case, you concluded that only the second portion of the batch was impacted by this contamination and subsequently rejected that portion of the batch. However, your firm did not demonstrate that the contamination was limited to the materials used during the second portion of the batch production, and that there was no impact on the first portion of the batch, despite these materials undergoing the same sanitization process. These investigations include"
+ },
+ {
+  "finding_id": "finding-d3f0bcd19b73e360804ff533",
+  "finding_text_md5": "bf55ad7b0b800ee2310b64e7464d2f10",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, your firm's April 2025 ISO <Redacted B4> cleanroom smoke studies failed to include the intervention involving the <Redacted B4> Filler equipment setup, sterile filling/capping, and cleaning disinfection method used for wiping down unit doors and sidewalls during production of sterile drug products used a rapid wipe down method (rapid back and forth strokes) potentially disrupting unidirectional flow within the ISO <Redacted B4> Cleanroom during dynamic conditions. This is a repeat Observation."
+ },
+ {
+  "finding_id": "finding-bea8e7a1671aa6cb2a23ffd1",
+  "finding_text_md5": "b99ff78c2f088d3c7155a024be5b5eb9",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, SOP-ILP-001 -LR Product Inspection and Defect Classification defines critical defects as those that may cause serious adverse reactions, including those that compromise the sterility of the drug product. However, your firm's defect classification system contains the following inadequacies: A. Your firm classifies all particulates/materials in the drug solution as major defects without distinguishing between extrinsic and intrinsic particles during the visual inspection process, some of which may increase risk of serious adverse reactions. B. Your firm has inappropriately classified foreign material trapped between stopper ribs as a minor defect despite the potential for these particles to impact the drug solution and compromise sterility. During visual inspection of prefilled syringes, foreign (unusual) material, including cardboard,"
+ },
+ {
+  "finding_id": "finding-be2640587dd16afd92e3b111",
+  "finding_text_md5": "b6f240a5546c8a9d173e357790df1d3e",
+  "published_date": "2025-12-18",
+  "detail_text": "t· (6)(4) Specifically, the visual inspection of your In~' ec 10n mL (6) (4) vials is caITied out in (b)(4) The resulting vials then undergo Acceptance Quality Limit (AQL) testing before releasing. You cany out AQL testing via (6)<4> R • f h 1·fi • f (6)<4> eVIew o t e qua 1 cat10n report o your (b)(4) ....,..-~---,---,-----­ P QR/GT 2.3.118.03 Version 01 Effective date 11/10/2018 confiimed that the tOH 41 .,.._wa_s_n_o_t_q_u_a_li_fi-ed for the defect categories for (6H4> Injection mcg/mL~~mL and~~ mL vials. The qualification is based on limited number of samples that '(6) tbl(4) (6)(6) includek4> defect samples and random samples. Your Production Manager could not produce a list of these vials nor was able to produce any documents with respect to the type of defects that~~ defect samples represented. (6) (4) You also useCbH4l defect samples to challenge your (6H4> . (6) VI d. n. d ____ _M___ (b)(6) h d £ . 1 pn or tOc4> . Accor mg to your rio uct10n anager t eseCbH4l e ect via s are randomly selected from a pool o H4l defect vials that have been collected from the reject vials during the"
+ },
+ {
+  "finding_id": "finding-a8f0b044b65295dd1cc2efff",
+  "finding_text_md5": "e2562368823f25fe4b189cfa76ba8403",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, A. You manufacture r (b)(.il) Iinjection (b)(.il) mcg/mL for the us market under a contract for your us custoinerr \"~' I yOU do not have a Quality Agreement with your us customer r(bH 4>] The initial QA was signed on 5/20/2019 and was effective for five years until 5/19/2024. d.d • / h Q • h (br<4> You i not review renew t e A wit your customer, B. Your initial QA did not have a provision for timely submission of Field Alert Repoits. Section 25.3 of Complaint Handling requires Acknowledgment of receipt of the complaint and notification wii~ (bH.il) Section 26.1 Adverse Event requires investigation should thin ~ • h. (b><4> ft h .fi • r (b)(.il>---, S • 1 f d happen wit m ______.... a er t e noti cat10n___I ect10n 4. o your proce ure, SOP No. P091 Version No. 04 The Procedure for Field Aleit Repoit (US) requires submission of FAR within 3 business days of problem being identified. C. Section 4.2 of SOP No. P091 Version No. 04 requires submission of FAR for diug product that fails to meet the specification established for it in the application. Since June 2023, (b)(.il) [ · • • (b)(.il) g/mL (b>mL . (b) mL • 1 d d 1 15 1 . £ I mJect10n me <4> iQ:4> via recor e at east c"
+ },
+ {
+  "finding_id": "finding-96a1cecdbdbeeb585583d5b9",
+  "finding_text_md5": "68b6864621f25d1aab247243fa737303",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, On 11/11/2025, during the filling of bevacizumab (Avastin), lot D25120, I observed an unidentified white string on the ceiling of the ISO <Redacted B4> filling room. The condition of the ceiling surface presents a potential source of particulate contamination within the classified area used for aseptic processing. *DATES OF INSPECTION 11/03/2025 (Mon), 11/04/2025 (Tue), 11/05/2025 (Wed), 11/06/2025 (Thu), 11/07/2025 (Fri), 11/10/2025 (Mon), 11/11/2025 (Tue), 11/12/2025 (Wed), 11/13/2025 (Thu), 11/14/2025 (Fri)"
+ },
+ {
+  "finding_id": "finding-8c1bd1ff4df38a42b478ea30",
+  "finding_text_md5": "98109570f3733d541634235ab3c06d2f",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, Your firm does not have an established system suitability procedure. Your firm performs the Light Obscuration Particle Count Test using your <Redacted B4> Particle Count {<Redacted B4>PC) for finished drug product release testing. However, your firm has not conducted method suitability testing for bevacizumab (Avastin) sterile intravitreal pre-filled syringes. Your firm utilizes the <Redacted B4> Technique to test for particle matter for sterile intravitreal injectables, including bevacizumab (Avastin) pre-filled syringes, lot D25 110 (BUD: l 7/SEP/2026)."
+ },
+ {
+  "finding_id": "finding-6b8f6d773be6f55e135e5042",
+  "finding_text_md5": "3bf0f05bd2bf175bb9e28b1f02dc9cbf",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, during observations of the <Redacted B4> Filler production equipment setup, sterile batch filling/capping, and cleaning of the sterile drug product, Tirzepatide/ Niacinamide (4 mL) 17 / 2 mg/mL, Lot# 221077, BUD 2/1/2026, Qty. <Redacted B4> vials, technicians within the ISO <Redacted B4> Filling Cleanroom while performing wipe down interventions of the doors and sidewalls used a rapid wipe down method (rapid back and forth strokes) potentially disrupting unidirectional flow."
+ },
+ {
+  "finding_id": "finding-497906bcd53c7e860079ff91",
+  "finding_text_md5": "2c47580d660e46098b533e073e41af3d",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, during a review of selected non-conformance reports, NC-00230)documented on August 21, 2024, at approximately 0925, a viable air sample collected from Location <Redacted B4> within ISO Class <Redacted B4> Filling Room 1267 recovered one (I) colony-forming unit (CFU during routine <Redacted B4> environmental monitoring (EM) activities ( exceed action limit of <Redacted B4> for ISO <RedactedB4> environments). Testosterone Cypionate in GSO Injection, 200 mg/mL (5 mL fill volume ., Lot #202364, BUD 5/28/2025, Qty. <Redacted B4> vials was being filled using the <Redacted B4> Filler. Your firm failed to adequately control microbial contamination within your firm's ISO <Redacted B4> rooms. Your firm's investigation documented the microbial was introduced by a technician introducing the contamination by hand or body positioning during setup in the ISO environment: or from an operator being in close proximity to the sampling site while performing an aseptic intervention. The batch was further processed, accepted by quality, and dispensed for patient specific prescriptions."
+ },
+ {
+  "finding_id": "finding-3d2cf45e1e733c2799753927",
+  "finding_text_md5": "a499422cddb37b78ea20de9b7f117f4b",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, the semaglutide finished product primary labels for batches 05-0325-001, 05-0425-001, 05-0525-001, 05-0525-002, and 05-0525-003, do not include the following information: Address of your firm, and the statements \"NOT FOR RESALE\" and \"OFFICE USE ONLY\". Material System"
+ },
+ {
+  "finding_id": "finding-2d90104d94c5980161c66d0a",
+  "finding_text_md5": "0ddaa73abf46190ed0308df06d701ecc",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, Your firm failed to establish adequate procedures to monitor personnel who directly interface with the sterile manufacturing environment, particularly during critical operations where personnel actions could impact product sterility. Video footage (AR01251010251125035913_BBeginning.mp4) from the aseptic filling of Lot 1125035913 demonstrates sterile technicians entering the ISO <Redacted B4> LFH environment between timestamps 9:37-9:56 and performing multiple critical tasks including: Removing filled syringes from the ISO <Redacted B4> LFH. Placing and removing the air sampling equipment. Despite direct contact with the critical aseptic environment, the sterile technician performing these operations was not sampled for recovery of viable microorganisms during or after these activities."
+ },
+ {
+  "finding_id": "finding-2abb5f2cdc092492f0a6034f",
+  "finding_text_md5": "dfb570f04243eb5b2b5d5c3335b1ba19",
+  "published_date": "2025-12-18",
+  "detail_text": "Specifically, the raw material, Sterile water for Injection, USP, lot <Redacted B4>, expiration date 31March2025, was used in the production of the finished product, Semaglutide 2.5mg/mL, product batch 02-0225-001, expiration date 02 April 2025. The lot produced <Redacted B4> vials which were distributed for commercial use. *DATES OF INSPECTION 11/10/2025 (Mon), 11/12/2025 (Wed), 11l/13/2025 (Thu), 11/14/2025v(Fri), 11/17/2025v(Mon), l l/21/2025v(Fri)"
+ },
+ {
+  "finding_id": "finding-04ef2d86ea86efce59053af8",
+  "finding_text_md5": "aae15b6e4f4509e92a0fe8f6af47b12f",
+  "published_date": "2025-12-18",
+  "detail_text": ".fi 11 £ (li)(4) • • • (li)(4) g/mL (Ii) mL • (Ii) mL • 1 (li) (4) Speci ica y, youmanu acture _______mJect10n me <4> m c4> via as 4 diug product. You received at least 15 market complaints for paitially filled vials, empty\"\"v_i_a-ls-, ...and crack/leak vial (Table 1). You investigated only 3 (three) of these market complaints; (bH 4 > (Batch No. (bH 4> Expiiy date (bH 4> (Batch No. (bH 4> Mfg. date 11/1/2023 Expiiy 41 4 4 date \\OJ\\ (Batch No. Cb>< > Mfg. date 12/3/2023 Expiiy date (bH > Section 5.1.2 of SOP No. P818 Version 08 Handling of Product Complaints (Effective date 12/13/2024) requires, \"QA supervisor should acquire the complaint sample(s) from the customer to facilitate the investigation\". You do not have any documentaiy evidence for acquiring the complaint samples. You conducted the investigation without the complaint sample and based on the manufacturing records, invalidated the complaints. Section 5.2.1.1 of SOP No. P818 Version 08 requires checking the complaint sample for counterfeit. It is not clear, how you deteimined that the complaint samples were not counterfeit without acquiring the complaint samples or pictures of the complaint samples. visual inspection repoi"
+ },
+ {
+  "finding_id": "finding-e59471b7325b7ed26acb15ef",
+  "finding_text_md5": "712e1645951e2acaa2171efe4e697bb0",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, your fnm relied on ce11ificate ofanalyses (COA) for incoming shipments ofhigh-risk components (b) (4) an (b I ( 4) j from your suppliers. You have not tested each lot and container of~) ( 4) ~ H•i J upon receipt to detect and quantitate diethylene glycol (DEG) and ethylene g!xcol J,G). (b) (4) and 41 tbH are used in the manufacture of drng products including ~ (-4) , aKE}d(,b) (4), 7 rn the last 3 years your fnm has manufactured over tb} (4jlots of drng products containing 6 '(4) and ltil<•i for distribution. The products have any an expiration date of 1 to 4 years. JOOHI Oigitally ogned"
+ },
+ {
+  "finding_id": "finding-c0fc087367255bf959c99808",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, Enviromnental monitoring during aseptic production ofsterile drng products is inadequate, as described below: • Non-viable particle counting in ISO Class 5 LAFH or BSC is conducted only eve1y[(o) (4) Iduring clean room certification by a third-party company, according to SOP 03-05.02, \"Viable and Non-Viable Sampling,\" dated Februa1y 2025. The two most recent clean room certifications were issued 011 [(6) (4)j [(6) (4 )!, and[(O) -(4) I, during which non-viable pai1icles were measured in the ISO Class 5 hoods; however, no non-viable pai1icle monitoring is conducted during routine batch processing. • Although settle plates are used during production of each batch, active air monitoring is conducted only[(l:5) (,4)J per the SOP; however, the Viable Air Sampling Log shows that viable air sampling was"
+ },
+ {
+  "finding_id": "finding-8f49a24acb0e09faf3b546f2",
+  "finding_text_md5": "05cd0b25707a1ba8c63d2143371ebaec",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. Limits are not cmTently established for individual defects found during 100% visual inspection operations; cmTently, they are only established for overall defect criticality categories (critical defects, major defects, minor defects). A-SOP-22-05-001, Manual Visual Inspection Using a [(6) (4) , requires action only ifthe overall catego1y defect rate is exceeded; meaning, atypical or othe1w ise unexplained increases ofan individual defect type are not required to be investigated so long as the overall defect catego1y rate remains below limits. B. Your automated visual inspection (AVI) system categorizes defects as \"cosmetic\" or \"paiticulate\" and does not identify individual defect types (e.g., hair, glass, fiber). Defect JOOHI Olg1tallYSigned0Y"
+ },
+ {
+  "finding_id": "finding-7ccfbaa9cb0a95493fe271a4",
+  "finding_text_md5": "a4f8d23432dd6d0f91554336f7366fa8",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. You do not document sterility samples counts when taken during interventions via your intervention fom1S. B. The fmn's UV-vis spectrophotometer is a legacy device that is not capable ofsaving and retaining electronic data. You have not established written procedures for electronic data review and data backup of your UV-vis spectrophotometer, and you have never backed up data from this stand- alone equipment. C. Your quality 1mit does not review audit trails on test results for UV-vis to ensure data integrity. The UV-vis is used to oerfonn protein assay testing and release testing of finished products such as [( b) ( 4) I, an4(b) ( 4) -, JOOHI o,g..,1y,;gne<1"
+ },
+ {
+  "finding_id": "finding-79861111963a12ce358e11c0",
+  "finding_text_md5": "7ba1f20b5828c57048e8ad38b2f1c9ea",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. Your finn is constrncting a new facility within the same building to manufacture sterile and non­ sterile products, separnted from the cmTent sterile facility by only a wall. Constluction activities (e.g., cleanroom build-out, equipment installation, floor renovation, and wall demolition) are ongoing while sterile manufacturing continues. No change control or risk assessment has been initiated. These activities pose a risk ofcross-contamination and loss of environmental control due to particulate and microbial intrnsion, personnel and material movement, and disruption offacility integrity. B. Your film has not adequately qualified operators conducting visual inspections of drug products intended to be sterile. For example, Operatorr ('~(ti) 11perfo1med visual inspection of Tirzepatide 72 mg/4 mL on September 10, 2025; however, operator visual qualification was based solely on eye examination records from physicians rather than comprehensive visual inspection competency testing, including using qualification kits containing critical, major and minor defects. C. Visual inspection failed to accurately classify vial defects that were approved by the quality unit. For"
+ },
+ {
+  "finding_id": "finding-52d384e89ea5336dc60413b1",
+  "finding_text_md5": "662612a134d2f8c4b5eb91d6611e4d8f",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. REC 831826 was initiated on Janua1y 31, 2024, in response to Lot[(D) -(4)I, Project Code 4 (bJ < > [ being released without identification of two atypical extrinsic particles found during 100% manual visual inspection. One ofthe particles was identified as cat hair, while the second was not evaluated. You stated that only one representative pa1iicle is required to be identified if other similar defects are found, meaning no detennination into the source or impact of the second paiiicle was evaluated. Additionally, your investigation failed to detennine a root cause for the contamination, assess the potential impact to the rest ofthe lot, or evaluate whether si.milai· issues may have occuned in upstream batches. The review ofrelated deviations was limited to a one year time frame, and no complaints were assessed. Although components were considered a potential root cause, no coITective or preventative actions were taken to address this. Si.nee this time, approximately 20 additional deviations related to hair contatnination during 100% manual visual inspection have occuned. In addition, approximately 14 other deviations were opened as a result of a gap analysis condu"
+ },
+ {
+  "finding_id": "finding-4cd15d5d103543455a9ee0cf",
+  "finding_text_md5": "233ffa59eec4d4bb0e5f1e57295dc104",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. Your media fill program does not include all high risk or critical interventions frequently observed. You categorize high risk or critical interventions, in part, via atypical unbracketed and atypical bracketed interventions. Your written media fill procedures do not require you to track and trend previous occurrences ofthese types of interventions for future inclusion into your media fill program. 1. You documented approximately 20 atypical unbracketed inte1ventions of[(b) (4) Ichange from 6/2023 through 6/2024. You failed to include this intervention into your media fill program. This inte1vention was documented as the root cause of a failing filling head surface EM sample dated 8/26/2023. 2. You documented approximately eight atypical unbracketed interventions ofrod bar assembly replacement. You failed to simulate this intervention into your media fill program. This JOOHI _ .,....,. SEEREVERSE Joohi Castelvetere, Investigator CASTELV=-VETBll·S 7 / 14 / 5 O«cl02S.O,.l 2025 XETERE - ,.,,,,, .... ,.. 4 OF THIS PAGE Robert J. Ham, Investigator Martin M. Kimani, Investigator Shannon L . Maisano, Investigator FORM FDA ~83 (09/08) PREVIOUS EDmON OBSOLETE"
+ },
+ {
+  "finding_id": "finding-44048ef58523b446f27aa126",
+  "finding_text_md5": "cf9a8fc44dbcfa26f63640f850a8642c",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, The labels of your outsourcing facility's drug products do not include infonnation required by section 503B(a)(10)(A). Specifically, the following inf01mation is not found on your drug product labels: A. The established name of the drng; Examples of your drng product labels that do not contain this info1mation, include but are not limited to: • NAD+ Injection 1200 mg (200 mg/mL), 6 mL Multidose Vial B. The statement \"Not for resale.\" Examples of your drng product labels that do not contain this infonnation, include but are not limited to: • Tirzepatide Injection 45 m/2.5 mL (18 mg/mL), 2.5 mL Multidose Vial • NAD+ Injection 1200 mg (200 mg/mL), 6 mL Multidose Vial • Glutathione Injection 2000 mg (200 111/mL), 10 mL Multidose Vial *DATES OF INSPECTION 9/09/2025(Tue), 9/I0/2025(Wed), 9/1 I/2025(Thu), 9/12/2025(Fri), 9/15/2025(Mon), 9/16/2025(Tue), 9/17/2025(Wed), 9/18/2025(Thu), 9/19/2025(Fri)"
+ },
+ {
+  "finding_id": "finding-3ee77c9b553a70b4bf523aed",
+  "finding_text_md5": "c98c46d99a6082c6aba6d9233030a90d",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. Your fum failed to investigate media fill vials with positive microbial growth. Operators (11)('~<• and 1>>{6);(11> conducte (b} (4) media fill batches on consecutive days (March24 -26, 2025), with each operator required to fill (6) {4> trays ofvials per batch for qualifying operators for aseptic production. On April 8, 2025, positive microbial growth was repo1ted for one vial from the first batch of each operator from the March 24, 2025 media fill batch. No positive growth was reported in the March 25 or the March 26, 2025 media fill batches. Your furn did not investigate the root cause of the positive growth events and did not perfo1m microbial identification of the affected vials. Despite these contamination events, both operators were subsequently qualified for aseptic operations. B. Despite positive environmental monitoring results in the ISO 5 area, your fum released batches of dmg products intended to be sterile without investigation or scientific justification. For example, your furn rep01ted microbial growth during enviromnental monitoring of the ISO 5 area and perfonned microbial identification, as follows: • Semaglutide 10 mg/4 mL, Lot# PRORX050925-1, Mf"
+ },
+ {
+  "finding_id": "finding-2514d10a5414fd836bbacbea",
+  "finding_text_md5": "7bf4c611ebcc94fb82bb251f88410fb0",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. Aseptic techniques were not adequately demonstrated during aseptic processing operations. On September 9, 2025, during the production of Tirzepatide Injection 45 mg/2.5 rn.L, Lot# 41 Pro1x09092025(6H ; Tirzepatide Injection 45 mg/2.5 mL, Lot# Pro1x0909202f l<4i; and Glutathione 2,000 mg/10 mL, Lot# Pro1x092025!6H 4I, the following deficiencies were obse1ved: • The operator working in the ISO Class 5 area disrnpted unidirectional airflow by extending their foreanns over the container to retrieve each stopper and place it onto a vial during the stoppering process inside the ISO Class 5 hood"
+ },
+ {
+  "finding_id": "finding-17bba981df5b38aa57b3e602",
+  "finding_text_md5": "cba6c689165513e209599d920cfdf52c",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. You do not pe1form direct surface monitoring of all ofyour filling heads. Instead, your written procedure specifically precludes direct contact ofyour filling head tips as it may render interpretation ofresults. difficult. Furthe1more, only[ ~) (4) ,__J is utilized for sampling. Syringe lineL~(li(Y is not cmTently affected by this gap as you perfonned change control 982857 migrating from 6) (4) Isampling to(15) (4}sampling May, 2025. This change was JOOHI Digitally signed"
+ },
+ {
+  "finding_id": "finding-05c1a6ca5f5e990f3ae28af6",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2025-12-15",
+  "detail_text": "Specifically, A. Your furn has not conducted disinfectant efficacy studies for disinfectants used in the cleaning and disinfection ofISO Class 5 LAFH or BSC and cleamoom environments. The production operators used (!u (4) . In 0 for disinfecting supply surfaces and ) (-4),~ leaning and disinfection ofISO Class 5 hoods, while b) ( 4 is used for [(b) ( 4 ) disinfection and (b) (-4) is used fo~(b) (4}I disinfection ofcleanrooms and ISO Class 5 hoods; however, your fum has not perfo1med disinfectant efficacy studies for these disinfectants, despite various microorganisms exceeding action levels, including mold detected in both ISO 5 and ISO 7 ru·eas during aseptic processing. B. The floor of the ISO Class 7 buffer room equipped with au ISO Class 5 LAFH and BSC showed significant visible sporadic discoloration, the cause ofwhich remains unlmown."
+ },
+ {
+  "finding_id": "finding-3c9a35402f39359aa389e557",
+  "finding_text_md5": "a730ba0fecf29b66bbdb2ae9d10d74a2",
+  "published_date": "2025-12-10",
+  "detail_text": "Specifically, CbHt • • • ~u,,(lTu g/ . 1 d u,,(l A) Your fnm's visual inspection of the I m1 ect1on m . via an g/ • 1 • • d ft • 11 • • h I (b)(4) f h f (b><4l • h • 1 m via 1s ma equate. A er v1sua ~ectmg t e ·i o t e m t e via s, £ ·1 fi I (b)l4l 1 1 • 1 • • { (bT(4l • 1 your finm ai s to per 01m ) supp ementa v1sua mspect1on o ·1 via s for visible paiticles. B) Your fnm's challenge test vials used for the qualification of the visual inspectors is inadequate, as it does not include pa1ticles that could potentially originate from the manufacturing CbTC441 t environment such as, I e C."
+ },
+ {
+  "finding_id": "finding-f3cf17913bee75d247f2e2ee",
+  "finding_text_md5": "11f69d05520d904cf3f3867c214dbe67",
+  "published_date": "2025-12-08",
+  "detail_text": "Specifically, your firm did not provide scientific justification or evaluate the material of construction for the <Redacted B4> totes used to transport drug products and drug components used in sterile operations from an unclassified area to higher areas of classification (ISO-7). Th totes that contain drug product and components come into direct contact with your firm's cleaning agents. However, your firm did not evaluate the degradation of the material when repeated exposure of your firm's cleaning agents occur over time to ensure emitted. AMENDMENTl EMPI_OYEE(S) SIGNATURE"
+ },
+ {
+  "finding_id": "finding-6a5f8c02ca05f51ee5664c1d",
+  "finding_text_md5": "491f344b028605c8779c4c581515b955",
+  "published_date": "2025-12-08",
+  "detail_text": "Specifically, A. Your firm utilizes a shared network that is accessible to all employees (operations, production, and quality) to access your firm' s Quality Control Documents. For example, but not limited to: 1. Environmental and Personnel Monitoring, Deviations, Complaints, Change Controls, Validation Protocols. Your non-quality personnel has unrestricted to access make changes to the following: 1. Uncontrolled excel spreadsheet used to track and trend your firm's environmental monitoring for classified areas. 11. Modify, delete, add data to complaint files. B. Your computerized software used for batch record release includes quality events associated with each batch record release ( complaints, deviations, recalls, non-conformances). However, your firm does not have any written procedures for electronic reviews and has not performed any electronic audit trails to track the creation, modification, or deletion ofsuch data to date. C. Your firm' s control documents, such as environmental and personnel monitoring result forms, visual inspection result forms are accessible for unlimited printing, without any means of reconciliation (i.e. no date/time-stamp) by non-QC personnel. In ad"
+ },
+ {
+  "finding_id": "finding-57e22cbfca6738dc9a9f862d",
+  "finding_text_md5": "735f2c5aca8a06c1ce5f7a88159a29a8",
+  "published_date": "2025-12-08",
+  "detail_text": "Specifically, your firm' s June 2025 airflow evaluation (smoke studies) of the 1SO-5 classified area where aseptic operations are performed shows unidirectional airflow is compromised and eddies/turbulence was observed under dynamic conditions. For example, but not limited to: A. Tirnestamp: at approximately 1. During critical manipulations in your aseptic operations, your aseptic operator was observed leaning against the workbench, which resulted in AMENDMENTl EMPI_OYEE(S) SIGNATURE"
+ },
+ {
+  "finding_id": "finding-5004a1318e1448de0460ec0c",
+  "finding_text_md5": "d7fc8bdfa36ed5fa110977328086d5c6",
+  "published_date": "2025-12-08",
+  "detail_text": "Specifically, a review ofyour firm's batch records found your firm released purportedly sterile drug products before reviewing the completed deviations or complaints associated with each batch. For example, but not limited to: AMENDMENTl EMPI_OYEE(S) SIGNATURE"
+ },
+ {
+  "finding_id": "finding-4a6d7dbeb7a6b792428ce8f5",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2025-12-08",
+  "detail_text": "Specifically, on 9/19/2025, during your firm's \"Terminal Cleaning\" of the ISO-7 classified buffer rooms, completed by your firm' s contracted vendor, we observed the following deficiencies: A. Cleaning technician used their gloved hands to adjust their sterile boot, exposing their skin to ISO 7 Buffer Room <Redacted B4> (Room 151 ). B. Cleaning technician in Buffer Room <Redacted B4> (Room 151) was observed kneeling on the ISO 7 floor with their knees to clean the wheels of a <Redacted B4> cart, then continue cleaning without changing their sterile coverall and sterile boots. C. Cleaning technician in Buffer Room <Redacted B4> (Room 149) was observed sitting on the ISO 7 floor to clean the bottom of the ISO 5 LAFH, then continue cleaning without changing their sterile coverall and sterile boots."
+ },
+ {
+  "finding_id": "finding-3f7e9a52c4e55fa459eb515d",
+  "finding_text_md5": "87191e9365d27affb5c434c9bd336c09",
+  "published_date": "2025-12-08",
+  "detail_text": "Specifically, A. Your firm lacks scientific justification for visual inspection re-inspection procedures: AMENDMENTl EMPI_OYEE(S) SIGNATURE"
+ },
+ {
+  "finding_id": "finding-0bc435da6bbae52e2699ae46",
+  "finding_text_md5": "b6273ad6487109309f02470a867db9dd",
+  "published_date": "2025-12-08",
+  "detail_text": "Specifically, A. Media fills completed by compounding operators are not representative of your firm's largest batch size. 1. Your firm 's media fill \"Process <Redacted B4> is designed with a batch size of <Redacted B4> units, while your firm's largest batch size produced and distributed from this facility is <Redacted B4> units. Your firm has not provided sufficient scientific justification for the discrepancy in units produced in the media fill \"Process <Redacted B4> 2. Your firm' s media fill \"Proces is designed with a batch size of <Redacted B4> firm's largest batch size of <Redacted B4> units, while your firm's largest batch size produced and distributed from this facility is <Redacted B4> firm has not provided sufficient scientific justification for the discrepancy in units produced in the media fill \"Proces B. Your firm's Media Fill records document the destruction of media fill units without adequate scientific justification. For example, but not limited to: With media fill \"Proces Lot# <Redacted B4> <Redacted B4> Qty units your firm documented manipulating and discarding 35 units. your firm does not have clear and specific written procedures describing interventions in whic"
+ },
+ {
+  "finding_id": "finding-e3440978134d7a422ddf7a28",
+  "finding_text_md5": "8460be89ed67660284eb3d92ea2a9ee5",
+  "published_date": "2025-12-03",
+  "detail_text": "Specifically, A. Your firm discontinued use of the <Redacted B4> system in May 2025, which previously provided continuous non-viable particulate monitoring within ISO Class 5, 7, and 8 areas. Since discontinuation, over <Redacted B4> batches have been manufactured using, <Redacted B4> the <Redacted B4> particle counter as an alternative. Per SOP-CAPS-4000582, the <Redacted B4> collects only <Redacted B4> non-viable particulate samples per session, providing intennittent rather than continuous monitoring in ISO 5 areas where sterile drug products are compounded. B. Per SOP-CAPS-4000710, each of the <Redacted B4> ISO 7 compounding conidors is monitored only <Redacted B4> for viable and non-viable particulates, despite active use across <Redacted B4>. Since Januaiy 2024, <Redacted B4> alarm and action level excursions for viable CFU recoveries have been documented across ISO 7 air, surface, and personnel monitoring samples."
+ },
+ {
+  "finding_id": "finding-9699b82129397ca2943a4763",
+  "finding_text_md5": "3087d3bf053987ce63f7b3fd3dbde0d5",
+  "published_date": "2025-12-03",
+  "detail_text": "Specifically, Your procedure SOP-CAPS-4000582 \"Environmental Monitoring-503B\" allows for non-viable particulate (NVP) sample retesting without investigation following alert or action level excursions in ISO 5, 7, and 8 areas. Specifically, Section 6.10.4.A states that no investigation is required if <Redacted B4> NVP samples collected after an alert or action alarm fall below the excursion threshold at the same location. Since January 2025, your firm has documented 8 instances of NVP excursion events where no investigations were initiated, instead relying on this retesting protocol. When questioned, your firm explained that this resampling practice provides \"a more representative snapshot of the environment.\" This practice allows potentially significant environmental excursions to go uninvestigated by using retesting to override initial alert and action level results. THIS OBSERVATION WAS PREVIOUSLY CITED IN 2023 AM ENDMENT 1"
+ }
+]

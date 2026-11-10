@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-15cc6ddc19016cf9566b434e",
+  "finding_text_md5": "20a99c48166725efc95416a8d7e92aa5",
+  "published_date": "2017-01-27",
+  "detail_text": "Specifically, your firm does not perform an annual visual assessment of retain samples in order to detect deterioration. SOP #QAP-124-S-1012, ver 8, states that an asscssment will only be completed if described in a technical agreement with the aplicationholder. -a"
+ },
+ {
+  "finding_id": "finding-15622eb85b10b9a989d012bd",
+  "finding_text_md5": "44e60aed0a0f5bd996eae5632c682632",
+  "published_date": "2017-01-27",
+  "detail_text": "Specifically, A) Your firm has not implemented a system to evaluate data from relevant process trends and quality of incoming"
+ },
+ {
+  "finding_id": "finding-f3a8a46bfafdb114410f0f0e",
+  "finding_text_md5": "84e53091285b94ccabf06c842d810a97",
+  "published_date": "2017-01-26",
+  "detail_text": "Corrections to entries shall be dated and signed and leave the original entry still legible and preserved. Specifically, A) | did not observe Quality Unit oversight/approvals required for the destruction and incineration of documents. For example on December 7, 2015, the following records were discovered torn/shredded in the scrap yard area awaiting incineration: 5 8 e (b) (4) (b) (4) i. Raw Material label for batch dated October 30, 2015 4 ii. Maintenance Work Order Permit for repairing leakage from®)@ gasket of() 4) ocated in®) area dated November 2, 2015 iii. Engineering Contractor Hot Work Permit for dismantling and cutting unwanted line for reactors removed from production building®)@ area dated October 7, 2015 B) On December 7, 2015 during a walk-through ofthe Process Development Laboratory, an uncontrolled private/ personal diary was discovered containing experimental protocol laboratory data. The Process Development Laboratory is used to conduct experimental quality failure investigation sample preparations, route of synthesis, and scale-up process related laboratory testing. Entries in the uncontrolled private/personal diary included calculations, molecular weights and exp"
+ },
+ {
+  "finding_id": "finding-dfd45c6b1da320b5da2f7b7a",
+  "finding_text_md5": "f04d90aeac6b7c3280884f3f61968d40",
+  "published_date": "2017-01-26",
+  "detail_text": "The degree of analytical validation performed shall also reflect the purpose of the analysis and the stage of the API production process. Specifically, On December 8, 2015 ME ) USP Finished Active Pharmaceutical Ingredient in-house developed test method Polymorphism by X-Ray Diffraction (XRD) (MOA-300937-02-2) that is used for the identification of the finished API had not been validated. FACILITIES AND EQUIPMENT"
+ },
+ {
+  "finding_id": "finding-beb55f3357cb12fd04d2bc24",
+  "finding_text_md5": "698ffcb02a0bf0fa4ac7de72b62ad430",
+  "published_date": "2017-01-26",
+  "detail_text": "Specifically, A) Prior to July 25, 2014, Quality Control Analysts had the ability to delete raw data files from Gas Chromatograph instrument ID QA/G07 used in the anufacturing facility for testing residual solvents for finished APIs and Raw Materials. B) The following Gas Chromatograph injections were performed but the firm did not maintain any supporting documentation why these injections occurred. i. On January 26, 2013, three (3) injections ofRaw Material©) canker truck Batc d solvent tank FNRI ples were performed corresponding to injection file E\\JAN13G07\\DATA 2601 4) 01.D; 02.D and 03.D. Gas C hy Injection file E:VANI3GO7\\DATAY. 2601 01D was performed on January 26, 2013 at d corresponds to Raw Material er truck Batch with a passing result purity o (Specification NLTO) 4) Gas Chromatography Injection file E: JAN|3G07\\DATA 2601) 03.p was performed on January 26, 2013 a nd corresponds to Raw Material olvent tank Batch) 1) with a failing result purity o © (SpecificationNLT) Gas Chromatography Injection file E:\\JAN13G0 2601 02.D was performed on January 26, 2013 a nd corresponds to Raw Materia olvent tank Batch) with a passing result purity o 6 (Specification NLTO%) However, only"
+ },
+ {
+  "finding_id": "finding-a8625ef5ca36fea7207d460c",
+  "finding_text_md5": "7c02939c0eccc57db28d3f2f996c82bf",
+  "published_date": "2017-01-26",
+  "detail_text": "Specifically, A) On October 14, 2015, a change in quality testing laboratories occurred and a change control was not initiated and reviewed by the quality unit. On thisdace Finished API batches and@o © were sent to a different contract testing laboratory to conduct routine quality release testing of Polymorphism by X-Ray Diffraction (XRD) (MOA-300937-02-2). B) On July 28, 2015, Total Organic Carbon (TOC) instrument ID QAI/T02 computer system hard drive and instrument software was removed from the laboratory and a new hard drive and instrument software version was installed. On December 7, 2015, there was no entry in the TOC instrument ID QAI/T02 equipment logbook discussing this change in computer system hard drive and instrument software. Furthermore, change control (CC/ AN-QC/15-092) associated with changing non-chromatographic laboratory computer system hard drives and instrument software versions does not discuss the quality testing laboratory instruments that are affected by this change."
+ },
+ {
+  "finding_id": "finding-932fc74764b85c5dcd43479d",
+  "finding_text_md5": "da8fdea48dae9f322fbab1808c4bf6c5",
+  "published_date": "2017-01-26",
+  "detail_text": "Specifically, F P (4 OnJanuary 10, 2015, the Total Organic Carbon Analyzer instrument QAI/T03 that was used to test Mt ) b) (4) and)@ Water samples failed Calibration acceptance criteria for Standard Deviation value of)@ (Specification ‘te and Coefficient Variation value of )@ 4 (Specification Oy). However, an assessment was not performed to evaluate if the calibration failure had any impact on the samples tested on the instrument since the previous passing calibration."
+ },
+ {
+  "finding_id": "finding-4db2d837794d0b20503a759c",
+  "finding_text_md5": "27112427db1c0f4aeb22cc539ae40591",
+  "published_date": "2017-01-26",
+  "detail_text": "In addition, appropriate installation and operational qualifications shall also demonstrate the suitability ofcomputer hardware and software to perform assigned tasks. Specifically, The following twelve (12) computerized system and instrument software used in the quality testing laboratory that ; are currently in use for routine testing have not been validated: Instrument Name Software Date of Installation in Laboratory FTNIR Omnic 9.2.86 June 18, 2015 Stability Chambers Newtronic IC DAS 1.2 May 29, 2015 TOC-L TOC Control L 1.02 July 25, 2015"
+ },
+ {
+  "finding_id": "finding-ff68ad3151d89f690ea8777c",
+  "finding_text_md5": "9ebf8eeaa2e61e8676e040164ad864ce",
+  "published_date": "2017-01-13",
+  "detail_text": "On December 9, 2016, all recently cleaned ® (® ) were in a condition unsuitable for the manufacture ofdrug products: All®® ss referenced below are not dedicated to a specific drug product. (a)°® PDE-369: This ”® equipment was in the “CLEANED” state. We observed white residue on the drug product contact surface ofthe” lining. Furthermore, white reside was ob- served on the surface above the” Additionally, the interior of the transfer line used to move drug product from the” to was soiled with? residue and a mold like ap- pearance. The” used for control of to the™® displayed®® residue / accumulation (the side of the facing the interior ofthe\" ). Moreover, the line between the) and®® that provides an“ displayed a reddish-brown discoloration consistent with rust."
+ },
+ {
+  "finding_id": "finding-d79c82279a30efd4a9ca0b9b",
+  "finding_text_md5": "5114bf86dcb1693a5ad99b80de2c6342",
+  "published_date": "2017-01-13",
+  "detail_text": "(a) Your firm received a complaint (MCU16-010 product tablets mg lot °® ) for “One tablet in bottle was twice the thickness of all others and it has same markings and color as the oth- er tablets.” Your firm then conducted an investigation identifying “the possibility to generate the higher thickness and higher weight tablets is” at the” stage.” The sample subject to the com- plaint was received form the consumer and your confirmed this weight disparity by measuring a"
+ },
+ {
+  "finding_id": "finding-be9e5bc6520bafa6a3a96543",
+  "finding_text_md5": "fa942940f9e0bec448784ac03a023672",
+  "published_date": "2017-01-13",
+  "detail_text": "I. Data derived from your firm’s programmable logic controller (PLC) for compression machines is in- consistent with batch records and validation reports in support of applications to the Agency"
+ },
+ {
+  "finding_id": "finding-b3475ff87ba9a6a40099c264",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2017-01-13",
+  "detail_text": "(1) Specifically, your QA technicians and other individuals were recorded destroying and altering rec- ords pertaining to commercial batch manufacturing immediately prior to this regulatory inspection. The loss ofdata and documents are evidenced by the following: Through a review of your firms Closed Circuit TV we identified the following: (a) A document shredder was introduced into your firm’s “DOCUMENTS STORAGE AREA” on December 03, 2016 at 15:44, approximately 4 days prior to the current US FDA inspection. (b) After introduction of the document shredder we observed extensive shredding of what ap- pears to be controlled documents and extensive signing of documents by QA. These documents were of a color consistent with batch packaging records and batch manufacturing records, among other documents. Your firm failed to maintain documentation ofwhat had been shredded. (c) On December 06, 2016, at™@ we observed that a contract employee with QA removed documents from the shredder and placed them in his pocket. (d) On December 07, 2016, at approximately 1:13 (in the middle of the night) individuals were shredding documents. Your firm stated this event represented cleaning staff shreddin"
+ },
+ {
+  "finding_id": "finding-7dd0bf9d30958aea39a6e73c",
+  "finding_text_md5": "250c4e2ccdde14d4a754389c3373a3da",
+  "published_date": "2017-01-13",
+  "detail_text": "Excursions in hold time are not investigated, trended or otherwise evaluated for product impact. The fol- lowing table contains examples of drug products and number of hold time excursions: Drug Product Number ofHold Time Excursions (b) (4) ns A Your firm’s Annual Product Quality Review was silent in regards to manufacturing hold time excur- sions. Your firm’s Quality Manager qualified this practice by referencing SOP QA058-07, which states “In case during commercial manufacturing if the product-exceeds the established hold time period at any IA"
+ },
+ {
+  "finding_id": "finding-17186b5f59895e94a79fde80",
+  "finding_text_md5": "8d21d71d15ba4aa84ead721140f66db5",
+  "published_date": "2017-01-13",
+  "detail_text": "Your firm’s Empower 3 based high-performance liquid chromatography (HPLC) system had approxi- mately 421 occurrences of a user abort since roughly September 23, 2016. The majority of these aborts are during data acquisition. However, a sub-set of these user abort events demonstrated a time gap be- tween the last injection (analytical testing) and the user abort event, such that the last injection occurred a significant amount of time prior to the user abort event. Your Deputy Manager ofQC stated that they have no documentation pertaining to events not captured between the last injection and the Empower system registering the user abort. There is no record of activity in the Empower system after the last in- jection recorded and prior to the registry of the user abort. Some examples of the time disparities with- out investigations are presented in the table below: Time of Last Run petectevent| yperabort | “Time | tanger | Timesee| 2409-2016 | 40min | Simm | PS"
+ },
+ {
+  "finding_id": "finding-f45997ceedf8f2dfae4f380e",
+  "finding_text_md5": "c81d3f5684a9c096f31e7ea2440b6077",
+  "published_date": "2017-01-10",
+  "detail_text": "Specifically, On 12/06/2016, 1 observed, the cleaning logbook for the Microbiology Laboratory ISO Class 8 room was cleaned three times by’ who was not trained on the SOPs titled “Cleaning Procedure for Microbiology” and “Enty and Exit Procedure for Microbiology” until 5 days after first cleaning."
+ },
+ {
+  "finding_id": "finding-a23ac87d20ec327d0b4cfb27",
+  "finding_text_md5": "c8f54875ebc1d909ebe35da8b6fe9c08",
+  "published_date": "2017-01-10",
+  "detail_text": "Specilically, Raw material 2 approved by QA on 8/10/2016 was observed being stored in the raw material ware- house which is maintained at ambient storage conditions. The labeled storage requirement for the material states “keep con- tainer cool and dry”. There is no assurance the ambient condition do not adversely affect the quality of the product. For ex- ample, during the storage period, temperatures in the log book were recorded as the following: Month] Mas Temperature °C CF [Max %RH Sd August 2016 34.7 (94.46) 89.9 September 2016 | 33.2 (91.8) 90.9 October2016 32.2 (90.1) .)ee November 2016 30.3(86.54 Bi4 Ew LOVERS)5 10 DATS ISSUED HL Samillah Selby, investigator GiAschSe/,(b4~— , OF THIS PAGE =| Doan T. Nguyen, Investigator bn. 12/9/2016"
+ },
+ {
+  "finding_id": "finding-1c6fcd9add60c4bfcdb8f9e7",
+  "finding_text_md5": "f2ba7d2e441f497bc641d1bcc2716bb7",
+  "published_date": "2017-01-10",
+  "detail_text": "On, 12/5/2016, during the walk though ofthe production area we observed the following: e The room used to store clean equipment contains a gap in the celling which spans across the length ofthe room that is approximately©) nches wide exposing the4) naterial ofthe adjacent room and extents up to the roof. e Cracks in the walls and peehng and chipping paint along the wall and light Gxtures. « The appearance ofwater damage to the drywall in various locations. MATERIAL SYSTEM"
+ },
+ {
+  "finding_id": "finding-183fb192f415b1e9ee025e19",
+  "finding_text_md5": "e7c4703c944de580c47e4e91e9b56483",
+  "published_date": "2017-01-10",
+  "detail_text": "Specifically, 1, Process Change Control PCR-MF1 P4996 for© parch™ sid not include sustificati ; i (0) (4) There is no technical a An adequate justification and evaluation of the addition ofa ; justification for the addition of the(©)(4) process, evaluation ofthe impact to the product, or specifica- tions for the equipment to be used. (b) (4) (b) (4) and (©) (4) 491.04 were not completely . Changes observed between. batch record B01-V03 an n ® documented and evaluated for the following: identification of Critical Parameters, the additional, removal or change ofmanufacturing instructions, (0)(4) speed, andrecording ©)(4) ntervals. |"
+ },
+ {
+  "finding_id": "finding-13f7058f6924c6cb4cabfd66",
+  "finding_text_md5": "2a29bc540b0d7d99c0817fc592ec5a08",
+  "published_date": "2017-01-10",
+  "detail_text": "| Specifically, | (b) (4) (b) (4) . «. of PD(4) (b) (4) lated Substances by HPLC for Basches and i 1 records for the analysisof Re’ u . a d (ye ewe observed yourrecordsdonotinclude documentation of the preparationperp agersPisce» depare am and reagents. In addition the quantity of the solution prepared, the d te of preparation and the expua are also not documented. | ! FACILITIES AND EQUIPMENT os BAPLO VEE) SKNATURE ‘yy : i y 2016 HL. Jamill h Selby"
+ },
+ {
+  "finding_id": "finding-0b6caabbd7d07981ef347a69",
+  "finding_text_md5": "1acc38e1829ad0f14c57db7b30f950ee",
+  "published_date": "2017-01-10",
+  "detail_text": "Specifically, o~ Your Remarks Forms # GP-0004-D07 and #GP-0004.Do7s, ver 2, effective 12-15-2014 used to report production deviations | are provided on an as needed basis by the Production Department directly to the production operators. | Traceability of these forms relies on the production operator to write in the form number and ensure all pages are include in the batch record. There are 21 cases where the production operator omitted or repeated numbering the forms. There is no as- surance all Remarks Forms are included inthebatch record andare reviewed by theQuality Unit prior tobatch release. | In addition, the Production department determines the need for further investigation based on the deviation reported in the Remarks Form. Therefore the Quality Unit cannot ensure appropriate actionsare of taken for each deviation reported in the Remark Form. n"
+ },
+ {
+  "finding_id": "finding-980b4eb08eac717ece4b3599",
+  "finding_text_md5": "a97463504f8a3ef2cc195c84074da322",
+  "published_date": "2017-01-06",
+  "detail_text": "Specifically, a) Equipment cleaning validation studies do not support a validated time period for holding dirty equipment before initiating the cleaning process. The equipment cleaning procedure~pOP AQA-020, effective date January 20, 2016, specifies the establishment of a holding period of before cleaning dirty equipment through the completion ofthree acceptable cleaning runs; this activity has not been performed for ali product-specific equipmenttrains. Current cleaning procedures rely on an unvalidated holding period of b) Equipment cleaning validation procedures do not include testing for the efficacy ofbioburden or endotoxin removal from those equipment trains where product with a bioburden or endotoxin specification is manufactured."
+ },
+ {
+  "finding_id": "finding-f4e3b363219f5239725d47ab",
+  "finding_text_md5": "a3dfa0e4d28b23fe744f3931541b52dd",
+  "published_date": "2016-12-28",
+  "detail_text": "Information pertaining to the IOM between QCD and \"R&D dated 13/04/14 were falsified. The document provided for photocopy was not consistent with the copy received. 2. The file provided for the inspection titled “Customer complaint log” is not accurate. During the inspection, we identified an interoffice memo dated 11-04-15 which describes “comments re- ceived from customer | ®® about three unknown solvents” which was not included in this list titled “Customer complaint log.” 3. On 12/1/16, we observed the incinerator contained several intact documents intermingled with ash which included documents signed from April 2016 as well as portions of interoffice memo- randums. A trash bin was observed directly outside the incinerator. 4. Equipment status tag for oO ‘Al-01 states last cleaned on 29/11/16, however, the equipment us- age log fails to capture the indicated cleaning."
+ },
+ {
+  "finding_id": "finding-49db9c3fdb0860490103e47c",
+  "finding_text_md5": "578d93e51b3e156659e4b0a7d3b3d95c",
+  "published_date": "2016-12-28",
+  "detail_text": "1. Your firm engages in extensive use of “Inhibit Integration” and other anomalous integration tech- niques for assessing US APIs such that unknown impurities are disregarded without scientific justi- fication. Furthermore, unknown impurities are not accurately assessed or reported. a. For example, below lists some APIs for the US market with corresponding use of inhibit in- tegration: Inhibit Integration mer, mS C a"
+ },
+ {
+  "finding_id": "finding-38a1f1a7fb11c40e7b569093",
+  "finding_text_md5": "b474e5d82a9eeef65d9b4adf880cffca",
+  "published_date": "2016-12-28",
+  "detail_text": "1. We observed examples of product failing to meet specification for various stages of production in which R&D instructed onward processing of the product or alternative analysis. We discussed the contents of these memorandums with your firm and they confirmed the incorporation of fail- ing material or alternative analysis for the product. For example, a. ””.OOS investigation reference 2-PLVOOS/FE.U/002 dated 08.10.15 states “From the above investigation no laboratory error is evident. Therefore, it is proposed to reject the sample B.No: ” Subsequently, QA with a consult from R&D determined to re-sample and re-test, then instructed QC to re-sample the product which led to passing results being obtained and reported. avy’"
+ },
+ {
+  "finding_id": "finding-27448169f5d628186d05d01f",
+  "finding_text_md5": "b295e00aa57953492d39ca6c8211e5f4",
+  "published_date": "2016-12-28",
+  "detail_text": "Your firm received complaints on 6-28-16 and 6-30-16 purporting the presence of »ma in © ‘4 These complaints affected products | | oe | © As part ofthe investigation, your conclusion and root cause states “***the definite root cause for presence of such amount of in batches could not be identified from the investigation as the data related to ®batches are in line with requirement and no abnormali- )"
+ },
+ {
+  "finding_id": "finding-20a4ff341010a2164cc43106",
+  "finding_text_md5": "0bdc42b269c7e34224dbc399a213a87f",
+  "published_date": "2016-12-28",
+  "detail_text": "(b) (4) (b) (4) (b) (4) 1. Unexplained®® colored product was observed on and . * ‘4 in© stages of API manufacturing (i.e. © Block): (b) (4) (b) . (b) (4) a. On 11/29/16, we observed your oe 1-01 contained a ° b) (4 . . e . ee » colored residue inside the comingled with product. This coloration is incon- sistent with the \"”“Loloration of , a US API manufactured in Block (b) - 4) 4), batch (\\ ) OATE ISSUED"
+ },
+ {
+  "finding_id": "finding-f445429764899434ccdfaffd",
+  "finding_text_md5": "43a7c8e75848fc3297861d63e99d1ff2",
+  "published_date": "2016-12-15",
+  "detail_text": "Specifically, the \"Indu Softweb Studio\" SCADA electronic recording system for temperatures found in the micro lab rooms for incubating Environmental Monitoring, Reference Cultures, and other media incubation shows multiple out-of-specification temperatures and loss of communication errors through June, July, and August 2016. As evidenced by repeated communication failures and out-of-specification data within a three month period, this equipment is not functioning adequately and has not been maintained to the criteria set in the qualification protocol #10443-01. *DATESOFINSPECTION = 8= =——“—————CO———— 9/06/2016(Tue),9/07/2016(Wed),9/08/201 6(Thu),9/09/201 6(Fri),9/12/201 6(Mon),9/13/20 16(Tue),9/14/ 2016(Wed),9/15/2016(Thu),9/16/20 16(Fri)"
+ },
+ {
+  "finding_id": "finding-8e07028bdbda27f1c7ebee5f",
+  "finding_text_md5": "2c20fd50262fbd417da6f051310617cb",
+  "published_date": "2016-12-15",
+  "detail_text": "Specifically, from 01/2013 to 08/2013, your firm initiated a totalof7 deviation investigations regarding | ®©excursions during OO of API. This OMimit is considereda critical control point. Our review ofthe 7th deviation found that your firm had concluded no further"
+ },
+ {
+  "finding_id": "finding-6e258c5293f4911ff7e7e2be",
+  "finding_text_md5": "9237fe54e24ba14b9dbcea1107e2122e",
+  "published_date": "2016-12-15",
+  "detail_text": ". . . . (b) (4) ; Specifically, during our review of the electronic potency raw data for collected using the ZY-300IV Multifunction Microbiology Analyzer, we noted the following deficiencies regarding data security: A) There is no provision in place to create raw data records for each analysis performed. Test results are required to be saved manually. B) There are no individual user names/passwords configured. All analysts use a common login ID/password. : . b) (4 C) There are no controls in place to prevent data from being deleted between the © server back-ups."
+ },
+ {
+  "finding_id": "finding-5cbc29af17bc169dd4af2598",
+  "finding_text_md5": "4c0d5edeae923e3ceb55861c5c719d64",
+  "published_date": "2016-12-15",
+  "detail_text": "Specifically, the qualification ofequipment is not adequate for its intended purpose including vial stoppering machine, and 2quipment. . 0) . . ae A. The Line #@stoppering equipment qualification document # SH10260Q Rev 1.0 and FU4-PN- ®@001-EQP-PQ-002 does not include a quantitative evaluation ofthe OCA for products intended for ®® During the inspection on September 7, 1 observed a large number. ofproduct vials with dislodged and variable© during production of Injection (batch . (b) (4) (b) (4) . . (b) (4) B. The 002 re-qualification document FU4-PN 002-EQP-RQ-001 and product validation reports such as FU4-SIPO-PVR-004) do not speak to the pressure needed to (0)4) cy (4). . . 4) « — up to vials in asingle load occupying This operation iscurrently controlled by visual indication of © through: © approximate as instructed by SOP #FU4-PR-MF-OPI-090."
+ },
+ {
+  "finding_id": "finding-3f2f5c072cc6b931fb1fb26c",
+  "finding_text_md5": "b0f2982e1c80a96357854069d270c42d",
+  "published_date": "2016-12-15",
+  "detail_text": "Specifically, your written test procedures for assay and related substances for all sterile injectable drug ° oge (b) (4) ) : ° ° products intended for the US market utilize of unit containers in sample preparation HPLC analysis with thejustification that ©)4)educes the variability of results."
+ },
+ {
+  "finding_id": "finding-1a1b786a6a364b8ba253375f",
+  "finding_text_md5": "6021f788c1f863f8cb939805041d881d",
+  "published_date": "2016-12-15",
+  "detail_text": ". . . . (b) (4) ees Specifically, during our inspection of the area within unit # ° we found there was no soap available at the entrance hand-washing station. Soap is required to be used per your posted entrance instructions. EMPLOVEESS)"
+ },
+ {
+  "finding_id": "finding-fa7299c0c887f95541d46e51",
+  "finding_text_md5": "5f58c5bfa3bde52d2e1eca880e953079",
+  "published_date": "2016-12-13",
+  "detail_text": "Specifically, OS-JK-2016-0078 was initiated 02FEB2016 for dissolution failure of finished product samples of oe OM tablets, | M@ng Batch © No root cause was identified during the laboratory investigation and the failure was referred to Production for investigation under IN- JK-2016-0151; IN-JK-2016-0151 identified no root cause of failure in production activities. A 2IMAY2016 i igati : () (4) (b) (4) (©)(4) (0), (©) (4) () (4) ; addendum to the OOS investigations for Batch #’s , and of 4) ng tablets references dissolution studies conducted by the OMin © @under Protocol MV1T/244/2015 which identified the de-acration of dissolution medium as the root cause ofthe failure of each batch. Data generated by O@ inder Protocol MV'1/244/2015 indicated an ~10% increased value ofmean drug releasewhen dissolution medium was not degassed. Analytical Test Procedures for @y ng, 4Myo and (ay ne for tablets were updated per Change Control CC-JK-2016-1335 on LOMAY2016 to preclude the de-aeration ofdissolution medium . Re-analysis of each failing batch wasperformed according toa revised test method without de-aeration of dissolution medium with results for active ingredients passing@ +@2 criterion, an"
+ },
+ {
+  "finding_id": "finding-f27874be1749f230ce32ac4b",
+  "finding_text_md5": "96c2879bf5f3a1672ce968f3fadd6880",
+  "published_date": "2016-12-13",
+  "detail_text": "mechanisms are not established to assure that components, drug product containers, closures, in-process materials, or drug products conform to appropriate standards of identity, strength, quality and purity. Specifically, (b) (4) ()(4) —(@) 4QB) (b) (4) 1}, Upon visual inspection following incubation of Media Fill Batch a (4) it ang Line and simulated O@>f fn vials using the we the entirety of Population-1 and -2 were suspected for turbidity and Incident IN-JK-2015-0137 was initiated A 4 unit from! Run of Population-1 (vials total) anda unit,from Population-2 were sent to the Microbiology Laboratory for evaluation. The notebook ofAnalyst ‘ ’, 568/2014, documents loading ofthe (b) an ‘ge . . (b) (4) samples at (@ 44 °C into Incubator QCC1090 from on intil visual inspection at Po a repeat visual inspection ofthe samples was performed following additional incubation at@ -@ °C at =~ onpe and. third re-inspection of the samples was performed following additional incubation at) jy °C at on? each of which identified no turbidity. The vials were then < : wiv) (0) (4) : + returned back to QA for reunion with Batch on The remainder of Population-1 and -2 of Batch ®@ vere immediately incubate"
+ },
+ {
+  "finding_id": "finding-efb18116f1fd2d67edc4f009",
+  "finding_text_md5": "e67fd882a58fe81ae04f89278465cbcc",
+  "published_date": "2016-12-13",
+  "detail_text": "Specifically, test schedules established by stability protocols are not adhered to so as to characterize the degradation of products over their actual shelf-lives. For example: ae , ‘ (b) (4) : oa! stability samples ofBuproprion HCI 150mg Batch JKL4403A (expiry , were not analyzed until ” WAIN ¢ shelf-life) at which time dissolution failure was documented by OOS L2/314/2014. No FAR was submitted for the 24M failure of Batch JKL4403A as it was expired at the time of analysis. + 22M stability samples of Buproprion HCI 150mg Batch JKN0236A (expiry OM, ere not analyzed until r@ (@M@NSof shelf-life) at which time dissolution failure was documented by OS-JK-2016-0275. No FAR was submitted for the 22M failure of Batch JKN0236A as it was expired at the time of analysis. + 18M stability samples ofBuproprion HCI 200mg Batch JKM4152A (expiry ©@) were not analyzed until EMPLOVEE(S)"
+ },
+ {
+  "finding_id": "finding-a50e5d2e7ff6d799197c6ad1",
+  "finding_text_md5": "f67206edec12fb04afac57507e263f3d",
+  "published_date": "2016-12-13",
+  "detail_text": "Specifically, — - (0) (4) ‘ , . : — 1} In response to Investigation WM 4/055, the frequency ofHEPA filter integrity testing for LAF/FFM modules of was reduced to —-”\". The change was not implemented according to a formal change control or pursuant to a Corrective Action Request. While implemented, the change was not formally reflected in the 20MAR2015 Revision 08 of SOP ENG-025. , . (b) (4) . . : 2) In response to Investigation IN-JK-2015-0331, the frequency ofHEPA filter integrity testing for LAF/ (4 f . FFM modules of “was reduced to 4 The change was not implemented according to a formal change control or pursuant to a Corrective Action Request. While implemented, the change had not been formalized as Section 7.3 of the current revision of SOP ENG-025/11 (eff. LYMAY2016) requires filter integrity and velocity tests to be completed sha ) vith no exception noted for the current M-equency applied to LAF/ OOiGMPLOYEE(S)"
+ },
+ {
+  "finding_id": "finding-9a82c62abeff9dca289fcd5f",
+  "finding_text_md5": "db31633c364b0a0e81d148a6a3226cb6",
+  "published_date": "2016-12-13",
+  "detail_text": "Specifically, 1) Investigation IN-JK-2015-0271 was initiated OSMAY2015 for dissolution failure of I8M long-term stability samples of Buproprion HCI extended release tablets, 200mg, Batch JKM4152A. An initial Field Alert Report (FAR) for batch JKM4152A was submitted to the agency 07MAY2015. Product impact assessment of the investigation included dissolution testing of reserve samples of Batch #’s JKM4737A and JKM5270A of Buproprion HCI extended release tablets, 200mg, completed 30-31MAY2015 with out-of-specification and borderline L3 results, respectively, recorded on O1JUN2015. However, no separate Field Alerts were submitted for the dissolution failure/borderline results of Batch #’s JKM4737A and JKM5270A, and no notice of their failing/borderline results were submitted to the agency until notification of their recall on 08JUL2015. No follow-up Field Alert was submitted for failing/borderline dissolution results of Batch #’s JKM4737A and JKM5270A, until final FAR submission for Batch JEM4152A on a1 JULZ0TS; 2) OS-JK-2016-0749 was initiated 090CT2016 for L3 dissolution failures of23M control samples of Buproprion HCI extended release tablets, 150mg Batch #’s JKN5125A and JKN5232A,"
+ },
+ {
+  "finding_id": "finding-786b5eaf433413e38908e88f",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2016-12-13",
+  "detail_text": "Specifically, aces faci : — 2 , : (0)(4) (by (4) 1) LV/076/20 18 was initiated 04SEP20 14 foray} dissolution failure of 3M long-term samples of tabs ng Batch . No assignable root cause was identified during the laboratory investigation, an initial Field Alert Keport for Batch was submitted on LOSEP2014, the investigation was extended as ER-QCC-14/189. and no assignable root cause was identified in production. Upon release testing, Batch was passing at3 only. Review ofdissolution result trend data for batches of similar age or older than the subject batch identified one additional batch released after meeting@3 a@ ae ae,a"
+ },
+ {
+  "finding_id": "finding-593d233cb9984cccf4c1120b",
+  "finding_text_md5": "d7b95d390f7e40b6f69e222ed4300ea1",
+  "published_date": "2016-12-13",
+  "detail_text": "Specifically, media fill BMRs include attachments of incubation room temperature graphs to verify the storage conditions of filled units. Raw data is transmitted to the M-947 Building Management System (BMS) unit in and compiled into” data reports and graphs by G-Tek software. The data reports and graphs generated are retained in .pdfform by the ” department, but source electronic data for media fill incubation rooms acquired prior to July 2015 has not been retained. For example, data for the following specific events/time periods were not retained: , . . : Sopa om OVO, .. + Source data for temperature recording during 0-7D incubation ofMedia Fill Batch we) at@) -@ °C in ENG-002, identifying “communication errors” in which no data from sensor Channels appears in the firm’s BMS system (approximately 1/2hr., around 15:00hrs. on 23MAR2015, 3hrs., 10:00-13:00hrs. on 24MAR2015, and 6hrs., 13:00-17:00hrs. on 24MAR2015). Additionally, source data for high temperature excursion s ofENG-002 totaling 04:1 5hrs. are identified from 13:58-21:13hrs. on 20MAR2015. . . = ; — (b) (4) ¢ Source data and .pdf reports for temperature recording during the 0-7D incubation of Media Fill Batch at eLENEC i"
+ },
+ {
+  "finding_id": "finding-49ddfb9f1ad8a5ed59025ca8",
+  "finding_text_md5": "d62e877af6e62302518cb7680d4a5feb",
+  "published_date": "2016-12-13",
+  "detail_text": "(b) (4) Specifically, the proposed expiries of Buproprion HCI extended release tablets af 1 50mg and 200mg strengths were based on 3M accelerated data for exhibit batches at the time of - filing. 24M of long- term data to support the proposed expiries were generated for exhibit batches as of O8AUG2008 and confirmed dissolution failures of samples at time points of 1 8.24M have been identified by (but not limited to) the following: 150mg + 1.2/314/2014, initiated 23SEP2014 for 24M long-term stability samples of Batch JKL4403A oO |"
+ },
+ {
+  "finding_id": "finding-fbf445a3079d4aaa8592dfef",
+  "finding_text_md5": "6079f8b182625bbcd93776be5f7044f4",
+  "published_date": "2016-11-29",
+  "detail_text": ". . 4) 1. (b) 4) Specifically, the container closure system used to package exhibit batch does not prevent product leakage. Both control samples © bottles) and stability study samples ( bottles) of oe Solution”mg/mL batch © stored in the ®®\\osition appear to leak drug : (4 product. The ®©® of all bottles also appear discolored from the drug product. Four of “a cartons ofcontrol samples showed signs of leakage on the secondary carton and four of hi cartons of stability study samples stored in the position showed signs of apparent leakage on the secondary carton."
+ },
+ {
+  "finding_id": "finding-fbac18f38817899a04a3cbfe",
+  "finding_text_md5": "e8fb98a6402109bd89034fb8b1e253de",
+  "published_date": "2016-11-29",
+  "detail_text": "Specifically, a. Regarding ao OO solution, approximately 7 complaints have been received for lot o | exp. ®)@). between April 2015 and June 2016, describing empty containers or similar issues. Approximately 9 complaints have been received for this issue across other lots. Investigation has found that the container-closure system was being damaged during the assembly of the ©)@) and sterile integrity of the containers was compromised, allowing product to evaporate or leak out of the container. Although line™ is believed to be an appropriate corrective action to eliminate the defect, prevalence and severity of the defect has not been thoroughly investigated, and inspection for the container-closure defect has not yet been assessed throughout an entire filling run. The product has not beenfilled since January, 2016, but there are approximately 11 lots on the market within expiry, in addition to lot for which the integrity of the sterile barrier may be questionable. (b) (4) (4) ee ge 4 b. oe Solution, lot , is failing to meet the specification limit for content of mo the 25° 4y RH stability condition at 18 months. Values were reported at & %, OY, and (4, and the limit is % to ',. The r"
+ },
+ {
+  "finding_id": "finding-fa7e91da7fd665bbf8e57772",
+  "finding_text_md5": "47da17fde3b9c4de6c83b9e5fe083c69",
+  "published_date": "2016-11-29",
+  "detail_text": "Specifically, at thea ofeach of “mr machines, the process includesa system, but it is only validated to holes that may occur at the7 of each vial_and not throughout the container itself This is nerformed following ® by whicha D) (4) There is no routine vial integrity testing performed after this. There is no assurance that if a leak were _ in any other part of the™® container that it would be™ —__ Products filled on these lines include is ® Suspension and OMond 4) solution. Postmarket Reporting"
+ },
+ {
+  "finding_id": "finding-f87c4624b2cd69f51488fb04",
+  "finding_text_md5": "f2afb0462050139493a0abd8d478bfbd",
+  "published_date": "2016-11-29",
+  "detail_text": "Specifically, a) your QC laboratory does not report all test results from OOS investigations. CQA/057 Handling OOS Results states to report the average of six results. 1/00S/003/16 initiated for API raw Material,w USP on January 12, 2016 stated to reported the average of repeat _analvsis. USP : (b) (4) (b) (4) (b) (4) (b) (4) was used in the manufacture of Capsules mg batch numbers and shipped to the US. b) your QC laboratory does not always report all in-specification test results. . (b) (4) (b) (4) () (4) (by (4) (b) (4) (b) op: i) You retested and mg/ mg/ml exhibit batch (b) (4) . . number for assay after OM of storage of solution and issued a second CoA reporting only the value of the second test even though the results of the first test were also in specification. .. {b) (4) (b) (4) (by (4) () (4) (b) (4) (b) a ii) You retested le and mg/ mg ml exhibit batch oe (4 ‘4 “4: numbers ©” ” and o ‘stability study 25°/60% RH 3 month for assay after of storage of solution as partof = 2/OOT/001/14. The incidence summary and final"
+ },
+ {
+  "finding_id": "finding-f40b03fba644e0f80e92281f",
+  "finding_text_md5": "96433afc09b85fadeda33bcabe1df469",
+  "published_date": "2016-11-29",
+  "detail_text": "; ; (b) ; _. Specifically, samples collected for BET testing, per SOP # @/QAD/0372, titled, \"Finished Product Sampling\", are not collected in sufficient quantity to be representative of the final batch."
+ },
+ {
+  "finding_id": "finding-f2ef806f682fd8316700674c",
+  "finding_text_md5": "6c9ba08f5d7886bae57c3d906dc3afda",
+  "published_date": "2016-11-29",
+  "detail_text": "Specifically, between January and August 2016, approximately 459 complaints describing leaking or empty bottles for sterile ®@ »roducts have been received. Although a failure-mode-evaluation-analysis has resulted in procedural revisions and other corrections, complaints continue for batches made subsequent to those corrections, with trends as high as 24 : (b) (4), . (b) (4) : . (b) (4) complaints for one batch or Solution, lot ; along with 13 complaints for lot and 9 complaints for lot . The investigation has failed to expand to consider all batches of this product, as well as others, which may be impacted. Although equipment to perform 100% ©@ leak testing on all units produced is planned for qualification, production . . oy (b) (4) . ; : continues, and there are approximately 4% _ lots of Solution on the market potentially impacted by this defect. Complaints of this nature have been seen at lower rates for the following products as well: b) (4 . ° OM, olution ° OMnd 45 olution ° OMsolution ° ©) solution"
+ },
+ {
+  "finding_id": "finding-ee284751e6925f3579ce80d7",
+  "finding_text_md5": "2f106bd5e5bf6b12388c2e2e6a957e71",
+  "published_date": "2016-11-29",
+  "detail_text": "For example ths non-viable pactsErte peut line is located nore than ww the height ofthe sterile at the o in the side ofthe © away from eoThe hen-viable particle probe in fill line @and_ pis located more than’ @ away from the oper in the"
+ },
+ {
+  "finding_id": "finding-edefb7ba92602a08172ff100",
+  "finding_text_md5": "d21d98a1123f1b6c191987ec82a050dd",
+  "published_date": "2016-11-29",
+  "detail_text": "Since March 2014, the firm has submitted 58 Field Alerts. The majority of these Field Alerts originate as single consumer product complaints and many ofthe complaints have not been confirmed by the company. For example, . : (0) (4) o@. A. The firm received a complaint on August 10, 2015 fora ee lot , in which the 24 OA riled to The returned complaint sample included a) in which the aad not been )(4) The QC department was able to) © the) Mand successfully” the , the complaint was not confirmed, The initial Field Alert was submitted on December 15, 2015 and the final Field Alert was submitted on December 24, 2015. . . : (b) (4) (4) B. The firm received a complaint on October 16, 2015 for an oe tot © for the prey me of the , The returned complaint sample included a filled) \"in which thes © had not been®™ and the complaint was not confirmed. The unsigned draft of the initial Field Alert was dated October 2 L 2015. The firm’s version 2 ofthe Final Report included a second complaint for the same | defect, for lot ©) in which the sample was returned and the defect was confirmed. The documents for the final Field Alert were not provided. , , (oa) (4) ow... sah C. The firm received a compla"
+ },
+ {
+  "finding_id": "finding-e6b87d9c5f8e938b375166d2",
+  "finding_text_md5": "bd77f6a20af095414579a4247195151e",
+  "published_date": "2016-11-29",
+  "detail_text": "Specifically, September 24, 2016 your SAP inventory system still showed an inventory of ©“bottles of Solution ‘mg/mL. The Batch Packaging Record for oe Solution mg/mL indicated “bottles were transferred to the warehouse after packaging on March 01, 2014. Your SAP inventory records show bottles of oo Solution” ‘mg/mL were received in the warehouse March 06, 2014. On September 21, 2016 I observed the actual count of bottles of ©) Solution ‘mg/mL in your warehouses is bottles. The SAP inventory system had of «bottles moving out of the warehouse either September 21, 2016 or September 24, 2016."
+ },
+ {
+  "finding_id": "finding-e138793efd1282db842e81e3",
+  "finding_text_md5": "a84c27371a7c049b6fea8cdcc95dd022",
+  "published_date": "2016-11-29",
+  "detail_text": "Specifically, : 5 : (>) (4) . (b) (4) A. While your cleaning procedure requires a@ contact time between | and (a OF ), your Disinfectant Efficacy Study does not contain data surrounding the required contact time between and in order to ensure aq) logig kill of non spore- forming bacteria and fungi and a logio kill ofspore-forming bacteria. | P , a j oO |, B. Your cleaning proceduregequires that your sanitization solution. w maintain a contact time of @ on glass and other surfaces to ensure a@) logio kill of fungi and non spore-forming bacteria. You apply the to the surface of your equipment using a non-sterile wipe; we observed that the solution does not make contact with . (4 . your equipment surfaces for a full @ m@ due to evaporation. , : Te ‘ om ... C. Your cleaning procedure requires that, vour sanitization solution, maintain a gcontact time of @ to ensure a@ logio kill ofnon spore-forming bacteria and fungi and a @) logio kill ofspore-forming bacteria for various surfaces, including ww . You apply the to the surface of your equipment using a non-sterile Wipe; we . . : (b) observed that the solution does not make contact with your equipment surfaces for a full @ due to evapora"
+ }
+]

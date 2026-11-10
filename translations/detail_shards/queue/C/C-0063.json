@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-a319b8cb56cd3b13daf42c09",
+  "finding_text_md5": "da0d552204ccfa00cb71038f828f67e6",
+  "published_date": "2019-08-09",
+  "detail_text": "Specifically, hormone and non-hormone containing drugs are prepared in your negative pressure, non-sterile room without any gowning controls or cleaning procedures in place to prevent cross-contamination between batches. On 02/04/2019, I observed the production of Testosterone LD Topical 8mg/mL Cream (lot 02042019@22) and BIEST (80:20)/Prog LD Topical 3/30mg/GM Cream (lot 02042019@23) in the same area as non-hazardous Bleach-Ease (Nourivan) 8% Cream (lot 02042019@1)."
+ },
+ {
+  "finding_id": "finding-9990bfd9dadb1c33986d6759",
+  "finding_text_md5": "d06dd4b130d8e749b6db5cbda409274c",
+  "published_date": "2019-08-09",
+  "detail_text": "Specifically, a gap was observed in the ceiling of the ISO 7 ante room around the HEPA filter."
+ },
+ {
+  "finding_id": "finding-337060a0a71c132244afcbbe",
+  "finding_text_md5": "963992613c3e17e253254a8907fce5cd",
+  "published_date": "2019-08-09",
+  "detail_text": "Specifically, A) Media fills are not representative of all routine aseptic operations. For example, media fills are not performed for vial filling operations. For example, your firm produced Glutathione Solution 200mg/mL Injectable, Lot 01292019@18 which was produced in a vial. B) There is no documentation or evidence to show that smoke studies are performed under dynamic conditions in your hazardous and non-hazardous ISO 5 glove boxes. C) Your firm does not perform endotoxin testing for each lot of intrathecal drug product prepared. For example, your firm produced Morphine Sulfate (PF) 20mg/mL Injectable, Lot 01312019@1 for intrathecal use however there was no endotoxin testing performed prior to release for use. D) Your firm has no evidence that filter integrity testing on filters were performed when dispensing finished drug products from stock solutions. For example, your firm produced Vitainin B Complex 100 Injectable, Lot 10292018@10, BUD 12/13/18 in a bulk syringe which was then frozen. The drug product was thawed for the filling of <Redacted B6> on 11/05/18, refrozen, and thawed again on 11/13/18 for the filling of <Redacted B6> There ai·e no formula worksheets documenting t"
+ },
+ {
+  "finding_id": "finding-c4fa987eae56f238ff7b4121",
+  "finding_text_md5": "3087d3bf053987ce63f7b3fd3dbde0d5",
+  "published_date": "2019-08-08",
+  "detail_text": "A. Non-conformance Report NCR-1922 (which was open at the time of the current inspection) was opened on 15 May 2019 due to a report that was made to the CQO (Chief Quality Officer) alleging that data derived from the AVXS -101 In-Vivo Relative Potency Assay Studies 1-10 may have been mismanaged or even potentially manipulated. Aside from evaluations of Studies 1-10 and a planned evaluation of toxicological studies under NCR-2018 there is no documentation in this NCR that an audit of all other potentially impacted data, studies, and reports was conducted or is planned to determine if there was evidence of data mismanagement or manipulation or a justification for not conducting or planning such an audit. Additionally, there is no documentation in NCR-1922 as to why the NCR was not opened until 15 May 2019 when the initial allegation is documented as having been reported on 14 March 2019. B. Non-conformance Report NCR-409 was opened on 31 Jan 2018 and has an \"Event Description\" of\"On 31 Jan 2018, during a historical data review of the potency results for Drug Product Lot 600156 per SOP-285, Determination of ln Vivo Relative Potency for A VXS-101 Drug Product, it was discovered that th"
+ },
+ {
+  "finding_id": "finding-c050babd6b9bf9e2b60c2fbc",
+  "finding_text_md5": "e3cf0d235b4fb4d3bdb2e8f4763fa765",
+  "published_date": "2019-08-08",
+  "detail_text": "Specifically, as per SOP-346 Version 3.0 \"In-vivo Functionality Test using a Single Dose AVXS-101 in SMN!17 Mouse Model\" the mouse date of death is in part defined as the \" ... date the animal first lost <Redacted B4> % of its body weight ... \". As per SOP-268 Version 2.0 \"Observation and Handling of Study Mice for AVXS-101 Potency Assay\" study animals are weighed '' <Redacted B4> (separated by at least <Redacted B4> until end of study ... \" AveXis has interpreted the date the animal first lost <Redacted B4> % of its body weight as the date this loss is first documented. Since mice are not weighed daily there is no documentation showing the exact date the mouse lost <Redacted B4> % of its body weight. *DATES OF INSPECTION 7/24/2019 (Wed), 7/25/2019 (Thu), 7/26/2019 (Fri), 7/29/2019 (Mon), 7/30/2019 (Tue), 7/31/2019 (Wed), 8/01/2019 (Thu), 8/02/2019 (Fri)"
+ },
+ {
+  "finding_id": "finding-7d70ae756f88c9826671b5c3",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2019-08-08",
+  "detail_text": "Specifically, vivarium employees who have responsibilities for GMP functions such as animal dosing, tail snips for genotyping, weighing, death determination, and contemporaneous documentation report directly to an R&D manager. This is not in accordance with the \"Quality Manual\" version 3. There are <Redacted B4> employees that perform these functions for commercial product testing (SOP-346 -In-vivo Functionality Test using a Single Dose AVSX-101 in SMNA7 Mouse Model) who directly report and are supervised by a \"Senior Scientist\" in the Research and Development team. This Senior Scientist has self-described no direct prior experience in GMP controlled lab work."
+ },
+ {
+  "finding_id": "finding-46d9aac4898007170e5b9750",
+  "finding_text_md5": "f2afb0462050139493a0abd8d478bfbd",
+  "published_date": "2019-08-08",
+  "detail_text": "A. Analytical Balance ID #: <Redacted B4> which is used to weigh mice handled under SOP-268 Version 2.0 entitled \"Observation and Handling of Study Mice for AVXS-101 Potency Assay\" does not have audit trail capability. These mice are used for SOP-346 Version 3.0 entitled \"In-vivo Functionality Test using a Single Dose A VXS-101 in SMNt:,, 7 Mouse Model.\" B. Printouts for the weighing of mice are not made and included in the logbook where the weights are currently manually recorded. Analytical Balance ID #: <Redacted B4> which is used to weigh the mice is capable of producing printouts of weighings; however printouts of mouse weights are not made and included with the data that is manually recorded in the logbook, that as an example can be seen in Logbook ID Number 000139 \"A VXS-101 In-vivo Functionality\" on FORM-339 \"Weight and Survival Data for AVXS-101 Functionality Test\". These mice are used for SOP-346 Version 3.0 entitled \"In-vivo Functionality Test using a Single Dose AVXS-101 in SMN.6. 7 Mouse Model\"."
+ },
+ {
+  "finding_id": "finding-ba9925b77efb7a90cc13c4f0",
+  "finding_text_md5": "2acd27395fa046444ba4604c5372a5d2",
+  "published_date": "2019-07-30",
+  "detail_text": "Specifically, your lack oforganization and preparation for this inspection delayed the progress of this inspection due to lack oftimely delivery of documents, photographs, and personnel. Examples include, but are not limited to: You were not able to provide the requested photographs of raw materials located in Warehouses 1, 3, 7, and 18 in a timely fashion. Because of the materials stored in your warehouses, we allowed your personnel to collect photographs using firm-provided explosion proof cameras that we requested. However, it took several attempts to collect proper photos even after we personally escorted your staff and instructed them how to collect the photos. The photos came back incomplete, blurry, partially captured, or not at all. It took three attempts to collect all of the EMPL Ef S)"
+ },
+ {
+  "finding_id": "finding-948140b9a38ca2ac684de5c1",
+  "finding_text_md5": "3a1385f3c0ba0619551ffb47f717aca0",
+  "published_date": "2019-07-30",
+  "detail_text": "Specifically, your stability protocol for USP API (Protocol: SP/BL/DS/2)001) states that the USP stability samples are to be packaged in and (®)(4)_ bags which contain and ()@) and placed in drums. This is not in accordance with the batch packaging records for(b)(4) “USP, where the API material is packaged without and not(h)@) You are not conducting long-term and accelerated stability studies for USP in the same container closure systems as which you package the material for shipment. Your projected shelf life is O/@))"
+ },
+ {
+  "finding_id": "finding-7072de8f0955330c3a5c3c73",
+  "finding_text_md5": "55c98e36d06473449fa88e871f59faec",
+  "published_date": "2019-07-30",
+  "detail_text": "Specifically, your batch manufacturing record for states that packaging of the intermediate must be performed in a dry environment and packaged You do not have a detailed written procedure for packaging ®)@) or identify the line used for packaging in the batch manufacturing record. Furthermore, your firm management informed us during the inspection that the packaging rooms are not controlled or monitored for temperature and humidity. As such, you have no way to identify or confirm if personnel are performing packaging of the intermediate under the specified conditions. Note that ©)@) intermediate is temperature, moisture, and oxygen sensitive and can easily form degradation/ decomposition products upon exposure to these conditions."
+ },
+ {
+  "finding_id": "finding-66ef96da6783e112c3144f5e",
+  "finding_text_md5": "30cfeadef37f64eaa4e7e6a30a5bd036",
+  "published_date": "2019-07-30",
+  "detail_text": ". . ; . . . 4 . Specifically, you did not perform all required waterquality testing during Phase) trials for the performance qualification ofyour”)water system installed in the) ‘Block ofyour site. You did not perform any total organic carbon (TOC) or endotoxin testing at any ofyour®) points-of-use (in the) recirculating loop) for Phase” ™ as specified in your protocol, with the justification that an inline TOC monitor is an acceptable substitute fon pertonning TOC analysis at all points-of-use during PQ. Note that TOC is a required parameter for USP water. Additionally, you do not perform TOC testing for any points ofuse during routine monitoring ofyour™) (4) water system, with the justification that there is an inline TOC monitor on the recirculating loop. However, you did not select the location ofthe inline TOC monitor in the™recirculation loop using a worst-case approach during the qualification, by determining where the highest TOC values appear at the points-of-use, since you did not perform the TOC testing specified in your protocol."
+ },
+ {
+  "finding_id": "finding-30647b2c068fb436fdf9a67d",
+  "finding_text_md5": "f7beaa3a46b2b1c1d0105641d4a77463",
+  "published_date": "2019-07-30",
+  "detail_text": "Specifically, you did not appropriately qualify/validate your SAP inventory management system in accordance with ICH and Part 11 requirements for validation of electronic systems. You did not effectively develop the vaildation protocol with the required challenges ofyour warehouse management system to demonstrate that the system would perform in a first-in/first-expiry/first-out (FI/FE/FO) manner, or that a reconciliation of materials challenge was performed by reconciling the quantities from your goods issue slip with the consumption bill of materials with any leftover returned raw materials, since you do not always return all raw materials specific to a batch production order to the warehouse."
+ },
+ {
+  "finding_id": "finding-0ed256ae58d89d9fc84af40f",
+  "finding_text_md5": "33e684a478db95753da1a257367b1413",
+  "published_date": "2019-07-30",
+  "detail_text": "Specifically, you did not adequately perform the process validation for the manufacture of O)@) in APIL{b) block as described in Change Control: 1024-P-18-00012. You did not perform an appropriate comparative analysis of all proposed manufacturing equipment, you did not perform all process validation manufacturing using only the equipment ini Block, and you did not place all API lots manufactured (using the O@) API intermediate process validation lots) on stability monitoring."
+ },
+ {
+  "finding_id": "finding-0be760e18ba70b36c9fa259a",
+  "finding_text_md5": "2acd27395fa046444ba4604c5372a5d2",
+  "published_date": "2019-07-30",
+  "detail_text": "Specifically, you were not able to provide the requested photographs of raw materials located in the APIO) dispensed material staging areas and the control panel display for ®@)) £3-()(4)-19 in API lock manufacturing area. Because of explosion-prone conditions in production areas and warehouses, we allowed your personnel to collect photographs, which your staff explained were to be taken with explosion-proof cameras. You did not capture all requested photographs in real time and did not verify all photos before rearranging items which we wanted captured. Additionally, all ofthe photographs collected by your staff were acquired using a normal camera with a flash option, despite your instruction to us that we were not allowed to have cellular phones or our own cameras in those areas where photos were collected. CL ( i == MPLOYEE(S) NAMEAND TITLE (Printor Type) DATEISSUED SEE 3 ’ ? REVERSE Up Christopher S. Keating, Investigator PAGE Q , [ Ralph H. Vocque, Analyst 07/19/2019 ¥ fi O"
+ },
+ {
+  "finding_id": "finding-e7bf7bbc9997c4c29a04077b",
+  "finding_text_md5": "bd250027e114749fca3b162fa00cedb2",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, On 4/23/2019, during the sterile processing of Dexamethasone Ophthalmic Soln (Pres Free) 0 .1% Drop, Lot# 04232019@5, technician constantlv tilted sterile <Redacted B4> to a certain angle to facilitate <Redacted B4> capping sterile dropper tips <Redacted B4> Both of his hands and the <Redacted B4> were placed in the path of unidirectional airflow. The caps with dropper tips were used to <Redacted B4> filled ®14) containers inside the ISO 5 LAFW <Redacted B4> . Technician <Redacted B4> operated in the same way as I observed on 4/26/2019 through a screen outside the sterile compounding lab. •"
+ },
+ {
+  "finding_id": "finding-dd82fac29b5dd231dbe17066",
+  "finding_text_md5": "40a9214c9221ff761597e67f1714fd8d",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically on 3/14/ 19, I observed an aseptic operator using non-sterile <Redacted B4> Wipes <Redacted B4>, to disinfect the ISO 5 <Redacted B4> !laminar flow hood and as a place mat where syringes, needles, and sterile <Redacted B4> were placed upon during aseptic filling."
+ },
+ {
+  "finding_id": "finding-d1726bf080ce3666d36ee01b",
+  "finding_text_md5": "8ec84c69cc766b6c17a531944106d538",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, On 4/23/2019, I observed technician <Redacted B4> donned gowning apparel improperly before she stated producing 5% acetylcysteine ophthalmic solution, lot fl 04232019@3 as follows: 5 A. While the phaimacy technician <Redacted B4> is washing her hands in a small sink prior to gowning, the water spilled out onto the ground. While she was gowning, the bottom of the gown touched the floor surface, including the wet spillage. B. A string of the sterile gown touched the ground while technician <Redacted B4> was gowning."
+ },
+ {
+  "finding_id": "finding-ccd788994cbc0e1b12d96c9d",
+  "finding_text_md5": "21f9777bc51a50af04f966d70d35e0d8",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, Non-sterile wipes were used in the ISO 5 LAFWs. For example, On 04/24/2019 technician <Redacted B4> sprayed <Redacted B4> (sporicidal), sterile water and sterile <Redacted B4> on different non-sterile <Redacted B4> Wipes sequentially to wipe the ISO 5 LAFWs <Redacted B4> after the compounding of Trimix # llC 10/1/12 Injectable Lot # 04242019@5 was completed. Also, a wipe was not completely covered with each of the disinfection agents."
+ },
+ {
+  "finding_id": "finding-bd73177ce9998b120fd6c579",
+  "finding_text_md5": "f51de6f02129e8439b04a25e21a21096",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your firm has failed to perform stability testing on <Redacted B4> out of <Redacted B4> sterile diug formulas and <Redacted B4> 'out of ' non-sterile diug formulas. Examples indude, but are not limited to the following sterile and non-sterile drug products: • Hydroxocobalamin 1000 mcg/mL injectable, Lot 35710/B, BUD 08/30/19 (330 days)"
+ },
+ {
+  "finding_id": "finding-a8b0e591fb94e5a407dffd07",
+  "finding_text_md5": "e19c11460f6c0c96d6934eed4d81f3a6",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your firm does not perform potency testing prior to release for <Redacted B4> out of <Redacted B4> sterile drug formulations and <Redacted B4> out of <Redacted B4> non-sterile drug formulations. Examples include, but are not limited to the following sterile and non-sterile drug products"
+ },
+ {
+  "finding_id": "finding-a14896cb09a73a82e33845d3",
+  "finding_text_md5": "fe40b97f363738b697e1efd1ed57e645",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, The gowning room inside the ISO 7 anteroom occupies an area of <Redacted B4> if that includes a sink and drain, a trash bin, and an open metal shelf for the storage of sterile materials used for compounding such as <Redacted B4> syringes,<Redacted B4> water, and a small space for gowning. For example, water spills out onto the gowning area while washing hands, and gowning apparels were observed to touch the wet spillage, wall, trash bin or doorframe before technician <Redacted B4> moved into the ISO 7 buffer room on 4/23/2019. *DATES OF INSPECTION"
+ },
+ {
+  "finding_id": "finding-8a952471b2909c2a201af4d9",
+  "finding_text_md5": "9d9a9aea5dabbf7b1a0a3d38d354cd25",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, A. High risk media fills are not representative of the maximum batch size for aseptic operations for non-radiopharmaceutical drugs produced in vials and IV bags. For example: Operators performed high risk media fills consisting of your firm's maximum batch size of <Redacted B4> vials only <Redacted B4>. • • Ooerators performed high risk media fills consisting of your firm's maximum batch size <Redacted B4> bags only <Redacted B4> B. Your firm lacks validations for your <Redacted B4> machines used in the production of sterile Sincalide (CCK), Sodium I-123 MIBG, Bicisate (ECD), Exametazime (HMPAO), Mebrofenin, Mertiatide, Pentetate (DTPA), Pyrophosphate (PYP), Red Blood Cell (RBC), Succimer (DMSA), Sestamibi, and Tetrofosmin. (This is a repeat observation from the inspection performed 04/09/18-05/07/I8.) C. A < Redacted B4> clean was not performed per your firm's procedurern:P-304 Cleaning and Disinfection of <Redacted B4> the Compounding Area, after an actionable microorganism <Redacted B4> , Penicillium decumbens) was observed during active air sampling on 06/12/18 in ISO 5 Hood <Redacted B4> located in non-radiopharmaceutical room <Redacted B4> and an actionable micr"
+ },
+ {
+  "finding_id": "finding-836821fc855b44047c7252f3",
+  "finding_text_md5": "2987e8f9d00e1d3f42ed209573f65e0d",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, unidirectional airflow was not verified under dynamic conditions. The most recent smoke pattern tests were perfonned on <Redacted B4> on the fnm's ISO 5 biological safety cabinet and ISO 5 laminai· flow clean bench under static conditions."
+ },
+ {
+  "finding_id": "finding-7b664edb22eb4763a2615941",
+  "finding_text_md5": "3ff2d2027e53abd2c5baa4d9bb654f29",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, during the cleaning of the ISO 7 Filling Room, we observed that the ceiling tiles were moving up and down when the technicians were wiping them with a mop. Within the ISO 7 Filling Room, the ISO 5 Laminar Air Flow Hood is used for the filling of sterile ophthalmic and injectable drug products."
+ },
+ {
+  "finding_id": "finding-77f9729d83a973e567d247c8",
+  "finding_text_md5": "068a136983afe80028b3c002437d7969",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your firm does not perform identity testing on any lot of active drug ingredient used in the production of drug products."
+ },
+ {
+  "finding_id": "finding-71df1d765356f87c5b9e5ab9",
+  "finding_text_md5": "ec21522a396ab6fffd9f7f687d80b179",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, pressure differential readings <Redacted B4> j, which monitors the pressure from the ISO 7 Hazardous Prep Room to the ISO 8 Non-Hazardous Prep/Buffer Room (established negative pressure differential limi <Redated B4> were out of specification on 1/14/19 to 1/15/19 all of December 2018, and 11/1/18 to 11/27 /18. Mixing of non-sterile active pharmaceutical ingredients and non-sterile commercial products is conducted in the <Redacted B4> hoods <Redaceted B4> located in both the ISO 7 Hazardous Prep Room and the ISO 8 Non-Hazardous Prep/Buffer Room. No product impact assessment was conducted and recorded. *DATES OF INSPECTION 3/14/2019 (Thu), 3/15/2019 (Fri), 3/18/2019 (Mon), 3/19/2019 (Tue), 3/25/2019 (Mon), 3/26/2019 (Tue), 3/28/2019 (Thu), 3/29/2019 (Fri), 4/04/2019 (Thu), 4/05/2019 (Fri)"
+ },
+ {
+  "finding_id": "finding-70c4186572dd5c9e02eb420a",
+  "finding_text_md5": "6f15ff6d69547fc26f7abfe83479db23",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your stability test results for radiopharmaceutical and non-radiopharmaceutical sterile drugs prepared by your firm does not include testing and results at meaningful time intervals for your established beyond use dates for the following: Chemical impurities • Microorganisms • Yeasts and molds • Endotoxins • This is a repeat observation from the inspection performed 04/09/18 - 05/07/18."
+ },
+ {
+  "finding_id": "finding-6ed7166761a3064260c8278a",
+  "finding_text_md5": "ad509081977118ce2fb75813c3f65e1a",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your firm failed to use pharmaceutical grade components for which there is a USP/NF monograph: • • ••• (b) <Redacted B4> used to prepare radiophaimaceuticals such as In-111-DTP A for cistemography I Diethylenetriaminepentaacetic acid (DTPA) used to prepare radiopharmaceuticals ls such as In-111-DTPA and non-radiophaimaceuticals such as DTPA Cold Kits Sodium Iodide I-123 used to prepare radiopharmaceuticals such as I-123 MIBG Sodium Iodide I-131 used to prepare radiopharmaceuticals is such as I-131 capsules <Redacted B4> used to prepare radiopharmaceuticals such as 51 Chromium Chromate 0.l00mCi/mL I"
+ },
+ {
+  "finding_id": "finding-6bd14350b194ee53211c4b53",
+  "finding_text_md5": "b0f2982e1c80a96357854069d270c42d",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, A) Reach-in incubator NJ-INC-0006, with Operating Range <Redacted B4>: -degrees Celsius, is used to incubate environmental monitoring (EM) and personnel monitoring (PM) samples. However, it has not been evaluated to determine whether the loaded chamber works within-the-specified limits of temperature through-out the chamber. The effect of opening doors at different lengths of time, and the effect of a power failure on the incubator's ability to get back into the temperature profile have not been evaluated either. Temperature mapping studies were conducted using empty incubator conditions. B) Walk-in refrigerator NJ-REF-0006, with Operating Range <Redacted B4> degrees Celsius, is used to store finished product lots requiring refrigerated conditions prior to shipment, including that of: Lidocaine I% Bicarbonate I 0 mL syringes and Vancomycin 1.25g -250 mL bags. However, it has not been evaluated to determine whether the loaded refrigerator works within-the-specified limits of temperature through-out the chamber. The effect of opening doors at different lengths of time, and the effect of a power failure on the refrigerator's ability to get back into the temperature profi"
+ },
+ {
+  "finding_id": "finding-6b9b746a13f46b391c4360d3",
+  "finding_text_md5": "2e3834ddfd396f040c397a0ad472a604",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, a) Your fnm did not evaluate any conditions that provide a challenge to aseptic operations as part of the firm's media fill. For example operators do leave and reenter the ISO 5 ai·ea during production; however, this was not addressed in any of the media fills. b) One of your phaimacy technicians was not qualified by a media fill prior to prepaiing sterile drug products and continued to perfo1m aseptic processing of sterile mug products despite failing a media fill perfo1med on 1/17/19."
+ },
+ {
+  "finding_id": "finding-6605b4438a4fedfef4406512",
+  "finding_text_md5": "8f1eafee929bf91b09a670acf37b0599",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your firm failed to use sterile cleaning agents in the routine cleaning of ISO 5 LAFW and BSC hoods and the nuclear and pain medicine ISO 7 clean rooms. Examples of non-sterile cleaning agents include, but are not limited to the following: • <Redacte d B4> <Redacted B4> does not appear to be high enough to be sporicidal <Redacted B4> of <Redacted B4> with <Redacted B4> of non-stenle water). J •"
+ },
+ {
+  "finding_id": "finding-626381433429eaba00508c1c",
+  "finding_text_md5": "a8056ab2c20642b9719ff160e42b975c",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, Test results of Active Pharmaceutical Ingredients (APis) suppliers used for compounding bulk drug products have not been appropriately validated at appropriate intervals. This includes the lack of qualification for related substances, organic impurities and/or residual solvents test results received for: A) Norepinephrine Bitartate API, Expiry Date: five (5) years B) Phenylephrine HCL API, Retest Date: five (5) years C) Epinephrine API, Retest Date: two (2) years *DATES OF INSPECTION 5/07/2019 (Tue), 5/08/2019 (Wed), 5/09/2019 (Thu), 5/10/2019 (Fri), 5/14/2019 (Tue), 5/15/2019 (Wed), 5/16/2019 (Thu), 5/31/2019 (Fri)"
+ },
+ {
+  "finding_id": "finding-50ab658f55da6c417ff41a32",
+  "finding_text_md5": "456394dc26d696683fe7cfdd456bf424",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, the following out-of-specification potency results were observed: • T3 6mcg capsules S/R, lot #01082019@9, Liothyronine Sodium (T3) potency: 86.3%; • T3 20mcg capsules SIR, lot #01252019@7, Liothyronine Sodium (T3) potency: 116%; • T3 30mcg lot #01252019@14, Liothyronine Sodium (T3) potency: 75.0%; • Estriol/ DHEA/ Testosterone/ Pregnenolone 100mg/4mg/45mg/mg/mL, lot #02 1420 19@1, DHEA potency: 81.3%, Estriol potency: 77 .2%, and Testosterone potency: 84.5%; • Methylcobalamin lO00mcg/mL (PF) injectable, lot #02212019@1, Methylcobalamin potency: 53.3%;"
+ },
+ {
+  "finding_id": "finding-4b39c1fb9a7d093604a81eb8",
+  "finding_text_md5": "f6473f654e83c91307b81c7f2333df44",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, There is no standard operating procedure or batch record instructions for the number of IV bag units allowed within the ISO 5 hood at a time. For example: < Redacted B4> units were compounded as part of Oxytocin II Units added to <Redacted B4> ml 0.9% Sodium Chloride solution bag, Lot# 30003332, Exp. Date: 07/23/2019. However, there is no documentation or batch record instructions for the number of units allowed within the ISO 5 hood during each dosing set of the total <Redacted B4> · units processed."
+ },
+ {
+  "finding_id": "finding-46f51704cebeae2a5f86b984",
+  "finding_text_md5": "52b67527baee851bfa1e53e325b88b5f",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, you compound drug products that: a) are identical or nearly identical to an approved drug that is not on the drug shortage list in effect under section 506E at the time of compounding, distribution, and dispensing; or b) are not identical or nearly identical to an approved drug but contain a bulk drug substance that is also a component of an approved drug and for which there is no change that produces for an individual patient a clinical difference, as determined by the prescribing practitioner, between the compounded drug and the comparable approved drug. Examples of compounded dtug products that are essentially a copy of one or more approved drugs include"
+ },
+ {
+  "finding_id": "finding-45bbf83bc6a7ce2f6866ac04",
+  "finding_text_md5": "371a484c11afceb8d7ce2b20148384b1",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your cleaning procedure is inadequate in that it does not include a cleaning agent to deactivate the hormonal drug products produced at your facility. *DATES OF INSPECTION 4/08/2019 (Mon), 4/09/2019 (Tue), 4/12/2019 (Fri) SEE REVERS E OF THIS PAGE"
+ },
+ {
+  "finding_id": "finding-37893b414228f646da06c7a1",
+  "finding_text_md5": "b05637515c97a506b083d6b9e710c9b9",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, A. For OOS-2019-0003: a sterility failure (Bacillus subtilus) was received by your firm on 01/31/19 for ACD solution, Lot ACD190129RA, produced on 01/29/19 in ISO 5 Hood <Redacted B4> located in non­radiophamaceutical room, <Redacted B4> Per OOS-2019-0003, the root cause of the sterility failure was identified as \"the environment in room[~ The <Redacted B4> table was contaminated with B. subtilus group\" In addition, Bacillus subtilus was cultureoon 01/16719 from surface sampling taken of the <Redacted B4> table used to prep vials prior to placement into the ISO 5 Hood and to <Redacted B4> vials after the placement of the cap after lyophilization. ACD solution, Lot ACD190129RA was d1scru·ded however your firm failed to evaluate the potential impact on additional sterile drug products produced in room <Redacted B4> from 01/16/19 to 01/29/19. Additional batches produced in room <Redacted B4> from 01/16/19 to 01/29/19 and later distiibuted include: • • • • • • • • On 01/16/19: <Redacted B4> bags of Lysine Arginine Batch, Lot LA-Bl90116DS-A On 01/16/19: <Redacted B4> bags of Lysine Arginine Batch, Lot LA-Bl90116DS-B On 01/18/19 <Redacted B4> vials of DTPA, Lot DTPA19011 8A"
+ },
+ {
+  "finding_id": "finding-2af41069d759620330a0e516",
+  "finding_text_md5": "bb4a9c1407d1da5cacab4f080e8643dd",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, On 4/23/2019, I observed the ISO 5 Laminar Flow Workstations (LAFWs) had visibly dirty equipment or surfaces as follows: A. Unknown yellowish-brown stains were observed on the stainless steel surfaces on the back side and left side inside the ISO 5 LAFW <Redacted B4> on the top of <Redacted B4> curved metal hooks hung on a metal pole inside the ISO 5 LAFW <Redacted B4> and on two cap screws digging in a faceplate on the back side inside the ISO 5 LAFW <Redacted B4> B. The HEPA filter cover positioned above the work surface inside the ISO 5 LAFW <Redacted B4> contained yellowish-brown spots on its surface. C. The front glass shield of ISO 5 LAFW <Redacted B4> contained an unknown white layer at its joints with the LAFW on both sides and part of it was discolored."
+ },
+ {
+  "finding_id": "finding-22bc0b30909a4fc2fead4f63",
+  "finding_text_md5": "da8fd0e99fdeb98a0458b1d8375a4eb6",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your firm failed to perform and document investigations for stability failures for the following drug products: Atropine Sulfate 0.4mg/rnL <Redacted B4> syringe, Lot 33226/H: Accelerated testing documented a potency of 108% and room temperature testing documented a potency of 107 .8% (specifications <Redacted B4> at day 8. • • • Epinephrine O. lmg/mI <Redacted B4> syringe, Lot 34523/C: Accelerated testing documented a potency of 89.2 % at 31 days and 79.9% at 48 days (specification <Redacted B4. Succinylcholine Chloride PF <Redacted B4> 2omg/mL S}'!mge, Lot 32995/C: Accelerated testing documented a potency of 79.7% (specification <Redacted B4> at day 63."
+ },
+ {
+  "finding_id": "finding-225b30c29ad9a527245c504b",
+  "finding_text_md5": "a6d0ed5c25ef7c1fc541045fac0710ad",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, I observed non-microbial contamination in the ISO 7 buffer room and ISO 7 anteroom at the sterile compounding lab as follows: A. The recessed ceiling above the ISO 5 LAFW <Redacted B4> in the buffer room chipped off with thin small pieces loosely adhered to a side wall. Also, the ceiling above the compounding preparation area broke of fat four spots. B. Two bolt screws in the <Redacted B4> beside the ISO 5 LAFW <Redacted B4> was observed with yellowish-brown color. During the filling of T1imix # llC, 10/1/12 Iniectable, Lot# 04252019/lllll on 4/25/2019, technician <Redacted B4> used his gloved hands to place a sterile Dr <Redacted B4> into a <Redacted B4> near those two screws for filling. C. The HEP A filter cover in the buffer room near the entrance showed yellowish color in some spots on 4/23/2019, but it was cleaned the next day."
+ },
+ {
+  "finding_id": "finding-1c48b660382d333edd1526fb",
+  "finding_text_md5": "a1204ec92a63eea94e144be743bb072a",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, your firm has no evidence that you perfonn visual inspections of your sterile drug products after labeling and prior to release for distribution. For example, your firm does not document visual inspections of finished, labeled drug products nor does your firm have a procedure describing a visual inspection of finished, labeled drug products prior to release for distribution."
+ },
+ {
+  "finding_id": "finding-0669bcee84bee750f8b4c998",
+  "finding_text_md5": "2c83265354a83b0750385e0396ef1196",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, A) <Redacted B4> missing media <Redacted B4> 10 mL syringe units of <Redacted B4> total units processed during aseptic process simulation conducted on 09/20/2018 for Lot #0920 18LR were not incubated and tested for microbial growth as part of the performance qualification for Building manufacturing Suite/Cleanroorrf'..j ln addition, the l'ire syringes used to prime and calibrate equipment were not incubated and tested for microbial growth. No explanation was documented for the missing media fill units. B)"
+ },
+ {
+  "finding_id": "finding-000c5f7aeb4eb02212dcc5e7",
+  "finding_text_md5": "96d62969203d5c85ef01d717b8e5a656",
+  "published_date": "2019-07-25",
+  "detail_text": "Specifically, On 04/25/2019, during the aseptic processing of Trimix #llC, 10/1/12 Injectable, Lot# 04252019@11, a depyrogenated <Redacted B4> covered with foil wrap was observed to be opened <Redacted B4> buffer room for disinfection of the outer surface before it was placed into the ISO 5 LAFW <Redacted B4> . That <Redacted B4> was used to hold a <Redacted B4> and thero TT4-n used during the filling process."
+ },
+ {
+  "finding_id": "finding-faec2dc6cf2932e11b2a3dca",
+  "finding_text_md5": "96ad2a7515deb7015c071e7f6e0ebd7a",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, A) Your firm 's stools located in all ISO 7 Cleanrooms, used by your compounding technicians during aseptic processing, is covered with a material which cannot be adequately disinfected. B) On 4/5/2019 during a walk-through ofyour firm 's aseptic processing areas, I observed in LAF hood <Redacted B4> HEPA grate with white and black residue, while aseptic processing Morphine PF lmg/ml 100 ml (I mg/ml) in 0.9% Sodium Chloride solution <Redacted B4>, ltem 70092151875, Lot I 0023288, Expiry 7/4/2019, Qty <Redacted B4>units. Your firm 's Senior Director of Production Operations stated compounding technicians cleaned the HEPA filter grate. He continued in stating the firm believes it was caused by sterile drug product splash during aseptic processing. No laboratory analysis was performed on the foreign material to confirm its identity."
+ },
+ {
+  "finding_id": "finding-ea5bd3a0c8b688572e59b85e",
+  "finding_text_md5": "0764f3218168d55e93108326f4b34c83",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, Your pharmacy does not have dedicated utensils for hazardous drugs. Dirty utensils (used to produce hazardous drug products) are cleaned with detergent and sanitized with <Redacted B4> and placed into a drawer comingling with utensils for non-hazardous drugs. Between 01/10/2019 to 04/10/2019, your pharmacy produced approximately different hazardous drugs with approximately <Redacted B4> to <Redacted B4>patient-specific prescriptions per day and <Redacted B4> different non-hazardous drugs with approximately <Redacted B4> patient-specific prescriptions per day. •"
+ },
+ {
+  "finding_id": "finding-c57cdea2630ba0dc52a44783",
+  "finding_text_md5": "8b0944e730e82092d37e484b12860a96",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, Your firm is using non-pharmaceutical grade <Redacted B4> <Redacted B4> to produce the following drug products. • Loperamide HCI Oral lmg/5mL Suspension Lot# 03182019@23 • 7+DBCGT: Diclofenac, Baclofen, Cyclobenzaprine, Gabapentin, Tetracaine 3%,2%,2%,6%,2% Cream Lot# 04032019@7 • Lidocaine 2%/Mylanta/Diphenhydramine/Nystatin/Prednisolone Liquid Lot # 04082019@28 In addition, your firm also uses non-pharmaceutical gradei <Redacted B4> to produce<Redacted B4> <Redacted B4> These lots of: <Redacted B4> were used to produce the following drug products. • Ketamine Nasal Spray 100 mg/ml Lot# 03182019@35 • Dyclonine HCI Solution 1% Lot# 03252019@32 • Oxytocin Nasal Spray 40 units/mL Lot# 04012019@35 • Itraconazole/EDTA/Gentamycin 2%/0.1%/0.25% Nasal Spray Lot# 04082019@36"
+ },
+ {
+  "finding_id": "finding-97d511e513eb72abe25aeec2",
+  "finding_text_md5": "c556afc2b3a9d4279732a56c2e6addb0",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, your compounded drug products that: a) are identical or nearly identical to an approved drug that is not on the drug shortage list in effect under Section 506E at the time of compounding, distribution, and dispensing; of b) are not identical or nearly identical to an approved drug, but that contain a bulk drug substance that is also a component of an approved drug, and for which there is no change that produces for an individual patient a clinical difference, as determined by the prescribing practitioner, between the compounded drug and the comparable approved drug. El-'PI.OVEE(S) SIONA1U<E"
+ },
+ {
+  "finding_id": "finding-8fe7a646bbe7eb9569883ba4",
+  "finding_text_md5": "dd3faf584de16696665670e5d098e253",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, your firm failed to adequately implement procedure, QuVa Phanna Facility Standard, COR-SOP-FM-0002, Rev. 4, concerning measuring, recording, and monitoring of conntrolled space temperature relative humidity and differential pressure. For example, your firm <Redacted B4> system <Redacted B4> failed to electronically measure, record, and transfer environmental conditions data in Cleanrooms <Redacted B4> or the dates/times 313.(Ji.0 19 @ 8:00am -3/5/2019 @8:00 am & 3/5/19@ 11 :00 pm -3/7/2019 @ 5:00 pm for Cleanrooms I -to a designated server. During these dates and times, your finn facilities management and quality unit was unaware of the condition and continued to aseptically process sterile drug products. Your firrn's <Redacted B4> failed to send notifications to the Facilities Management Department regarding the issue of missing me.asurement data."
+ },
+ {
+  "finding_id": "finding-5a23379255459f599e0954b7",
+  "finding_text_md5": "78f86d0805391ca3de0705274e3f6849",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, between 04/10/2017-04/09/2019, your pharmacy produced <Redacted B4> beta-lactam drug products in your non-hazardous area on work surfaces also used for the production of non-beta lactam products. a) Your pharmacy cleans work surfaces <Redacted B4> in your non-hazardous area with <Redacted B4> b) Your pharmacy does not have dedicated equipment for beta-lactam and non-beta lactam products. Production equipment is shared between both beta-lactam and non-beta lactam products. c) Equipment used to produce beta-lactam products is cleaned with <Redacted B4> and rinsed with distilled water. Following cleaning, this equipment is used for any non-hazardous product, including a non-beta lactam product."
+ },
+ {
+  "finding_id": "finding-51c52af74358e34dd1cb75c9",
+  "finding_text_md5": "a466963bc20ad93f5ca4c32afc6a3142",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, during review of Recall# D-0295-2019, Norepinephrine 8 mg (32 mcg/mL) added to 0.9% Sodium Chloride Injection 250 mL Bag, your firm's investigation identified the issue to be a drug component picking issue. Your firm's compounding technician aseptically admixed 250mL 5% Dextrose Injection 250 mL Bag in error. Your firm 's quality unit failed to investigate why your firm 's <Redacted B4> Testing Laboratory failed to report an unusual peak found during potency testing. l requested the lot laboratory test data, which resulted in the firm finding the presence of an unknown peak of the finished sterile drug product sample. Your firm's director ofquality reported the firm will be reopening the CAPA to further investigate this finding made during this inspection. Your firm failed to adequately investigate the unusual laboratory test results. DEPARTMENT OF UEALTH AND HUMAN SERVlCES FOOi) AND DRUG AOMINISTRATION OOTRICTAllllleS AHIJ PttONE NUM8ER 4040 North Central Expressway, Suite 300 Dallas, TX 75204 (214) 253-5200 Fax : (214) 253-5314 NMIE AND t II Lt,_,.. Jr,u,v,uv,,i. TOW.._,,,, l<l:l'U<T lliSUED Ill'., \"l• J OF IH$PECTOI 4/5/2019-4 /23/2019* FEI NUMtltJ< 3012053582 Trav"
+ }
+]

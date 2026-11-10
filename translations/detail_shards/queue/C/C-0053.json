@@ -1,0 +1,302 @@
+[
+ {
+  "finding_id": "finding-8ec9c2bf25c5dde9d0b25402",
+  "finding_text_md5": "6c6529f50128bb9d78cd11aaee8caa0c",
+  "published_date": "2023-07-05",
+  "detail_text": "On May 1, 2023, during the inspectional walkthrough of General lb) (4) IDosaget, a non-dedicated fbl <4!] container (ID: 803) used to store raw material was observed to contain whitish residue. Per the displayed status label, the container was cleaned on May 1, 2023, prior to the inspectional walkthrough with a clean hold time of ~bll4) j. The label shows that the equipment was verifie1 clean by the production supervisor on May 1, 2023. Per production, raw materials are placed in a lbll4l bag and then placed in the fbl <4)7 container wliich is then transfened to the manufacturing area. Traceability of potential products stored in the (b) <4) is unknown as a usage log is not kept. An assessment has not been"
+ },
+ {
+  "finding_id": "finding-7b2b98b5d4ec8bc7474087f3",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2023-07-05",
+  "detail_text": "Specifically, the quality unit failed to control the laboratory test methods created and then transferred in LES Development server as per SOP CSOP/2016/047, “Method Creation on Method Builder Software”. Computerized system LES (Laboratory Execution System) is used by the quality control laboratory for documentation and to perform analysis. LES has three servers: Development, Validation, and Production. Test methods are created as per SOP CSOP/2016/047, “Method Creation on Method Builder Software” and then moved in LES Development server. After verification, the test methods in Development server are transferred on Production server. CSOP/2016/047 requires all methods to be names with the product such as USP. However, it was observed numerous procedures (about more than 60) were not associated with any product. Instead, the procedure name was showing as “Trail, Test, 0, 123, *, Test 123, Testing, TESTING” etc. Few examples are shown as below: CATEGORY PROCEDURE PROCEDURE ID VERSION STATUS NAME Formulation Testing Trial_29 1.0 Current Formulation Testing Trial_007 1.0 Draft Formulation TRIAL XYZ 0.0 Current Formulation Testing Final verification 0.0 Draft Raw Material Testing Testin"
+ },
+ {
+  "finding_id": "finding-7a5888b125fee30738069b1f",
+  "finding_text_md5": "31d8d60fb7dd362a8619e3c7e28e8a33",
+  "published_date": "2023-07-05",
+  "detail_text": "Your fnm has not perfo1med analytical method validation of inhouse test methods and verification of compendia! test methods for the approved and pending dn~ applications. The number ofraw materials !?ending for validation and verification is approximately~~ materials, for approximatelytbll4) 4 (I~! approved, ~~ pending). The analytical test methods mclude but are not limited to1(b) < ) 1 by GC, Related substance by GC, Assay by GC, Assay by HPLC, and Related Substance by HPLC. *DATES OF INSPECTION 5/0l/2023(Mon), 5/02/2023(Tue), 5/03/2023(Wed), 5/04/2023(Thu), 5/05/2023(Fri), 5/08/2023(Mon), 5/09/2023(Tue), 5/10/2023(Wed), 5/1 l/2023(Thu), 5/12/2023(Fri) RhKKabaso ~or• ted Drug Cadre ~ere;2001767329 -·~ X Date Signed: 05-12-2023 09:13:03 X ~Si~'Ts~1~f52"
+ },
+ {
+  "finding_id": "finding-62defd7b9a807815e66890a5",
+  "finding_text_md5": "dfde1d4fb81a9b2c1d3e22d738a55b24",
+  "published_date": "2023-07-05",
+  "detail_text": "Environmental monitoring samples were not counted accurately. On May 1, 2023, our review of plates 4 from (b)<> QC microbiology laborato1y that had been counted by your analyst found the repo1ied result to be less than the number of colonies on the plate. This was an interim reading. For example: 4 4 4 A) Point (b) <> , Aseptic area (b)<> -4, settle plate in the Grade C area of~b) <> 4 4 manufacturing Line~~, associated with aseptically filled batch (b)<> of (b) <> Injection on April 27, 2023. The repo1ied result was \"Nil\", but the plate was observed to have 2 CFU, which the analyst had marked with a marker upon reading. B) Point1<:> Right Hand personnel monitoring sample from Grade C area oflb)<4> 4 manu¥i cturing Line~~, associated with aseptically filled batch lbll4) of(b) <) Injection on April 27, 2023. The repo1ied result was I CFU, but the plate was observed to have 2 CFU. C) Point1<:> Chest, personnel monitoring sample from Grade C area oflb) <4> parenteral 4 15H4 manu¥i cturing LineJ~, associated with aseptically filled batchl(b) <) of < ) Injection on April 27, 2023. The repo1ied result was 3 CFU, but the plate was observed to have 6 CFU. D) Point1<:) Elbow, personnel moni"
+ },
+ {
+  "finding_id": "finding-5c4229206f6ccbf19353c284",
+  "finding_text_md5": "aa5881a9cd4797861f5751c0e928d91f",
+  "published_date": "2023-07-05",
+  "detail_text": "A)The (b) <4) Jassociated with (b) (.J) Line l:~were not sealed to the wall on May 1, 2023. Air coufcl be felt moving from t e Grade A side o the wall, where ~6ll4) Ivials are loaded, to the Grade D technical area along the sides of the1<bll4l 1­ B)The fbl<4l J for fillinr (General Facility) had a Inissin~ ~arjt and Lf]~~ incompletely mstalled gaskets in the 6l <4) zone, which ai·e intended to seal the b) 4) zone from the Grade C room. C)There was a gap in the cover intended to protect the vials from the Grade C environment after vial washing, before entering the ~6ll4) 1­"
+ },
+ {
+  "finding_id": "finding-56d7010edbb4131e43ac7fce",
+  "finding_text_md5": "f4675d06d7c9b88442cc21d9aaf1c221",
+  "published_date": "2023-07-05",
+  "detail_text": "Specifically, scientifically sound, and appropriate test procedures are not deployed to establish the identity, strength, quality, and purity of the drug products manufactured at the site. For example: On 6/19/2023, I observed the dissolution test that was performed for(b) (4) Tablets, (b) (4)mg batch using Dissolution apparatus (ID: QCD-333) connected with an (b) (4) autosampler. Both batches were stability batches stored under long-term stability conditions (25 C, 60% RH) and were tested for dissolution at 24-month stability interval as per Test Method STP # TP/DR/0178. This test method requires, dissolution test to run for (b) (4) (b) (4) (b) (4) using (b) (4) at the speed of rpm. Batch did not pass the S-1 dissolution stage and was tested for S-2 stage on 6/21/2023. Following deficiencies were observed when lab analyst performed the test: A. The dissolution test did not start when the (b) (4) (b) (4) tablets are immersed into the dissolution (b) (4) (b) (4) media. Instead, the test was manually started after about when temperature sensor read the temperature of the dissolution media in the specified range i.e., (b) (4)C. The addition time of about when the drug product stays in"
+ },
+ {
+  "finding_id": "finding-3e3c600341aca30ab4ce6425",
+  "finding_text_md5": "491f344b028605c8779c4c581515b955",
+  "published_date": "2023-07-05",
+  "detail_text": "GMP related computerized systems and equipment have not been validated/qualified to demonstrate the suitability of computer hardware and software to perfo1m assigned tasks. For Example: A) The fnm has initiated an assessment to evaluate data integrity controls for your manufacturing equipment infb> <4>1 and general parenteral blocks per Protocol No. ISP/2022/0190, titled \"Protocol for Review and Impact Assessment of Quality System\", dated 12/29/2022, where deficiencies regarding individual access controls and privileges, restrictions for changing clocks, saving electronic data, and audit trails have been identified. However, the quality unit has not implemented interim controls as a result of this assessment. For example: 1. Your fnm operates ~bll4)7 po1table non-viable paiticle monitoring equipment used to perfo1m and generate test data for non-viable paiticle (NVP) count used in environmental monitoring/cleanroom qualification activities in class B, class C, and class D areas in suppo1t of ,~eneral and ~b) <4> parenteral manufacturing operations. During our review ofyour{b) {.J) 4 f >< > Iequipment and softwai·e, it was observed that the fnm was not aware of the equipment data st"
+ },
+ {
+  "finding_id": "finding-31ee6eb346eb242dc7be66d3",
+  "finding_text_md5": "6c6e68e48db9d19f463b6a41363541cc",
+  "published_date": "2023-07-05",
+  "detail_text": "Specifically, personal gowning used in the core manufacturing areas including dispensing and compression areas is not maintained clean to prevent contamination. On 6/15/2023, during the"
+ },
+ {
+  "finding_id": "finding-2087228ae6de15ca567f90cc",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2023-07-05",
+  "detail_text": "Your Quality Unit has not been effective in cany ing-out its duties of ensuring that diu g products are"
+ },
+ {
+  "finding_id": "finding-0cd29e58339d27e10e4b7641",
+  "finding_text_md5": "cd8c6edbde8bd6e786d53b04228d6f43",
+  "published_date": "2023-07-05",
+  "detail_text": "Specifically, Your firm’s Corporate Standard Operating Procedure for Handling of Product Complaint (CSOP Number: CSOP/2013/004/R09, Effective Date: June 02, 2022; CSOP/2013/004/R08, Effective Date: Feb 03, 2022; CSOP/2013/004/R07, Effective Date: Sept 16, 2020) requires that all CAPAs initiated in reference to product complaints shall be reviewed for effectiveness check; if the CAPA is found to be ineffective, a new CAPA shall be assigned by reinvestigating the complaint."
+ },
+ {
+  "finding_id": "finding-03ea6bdc8f4876f16c2983be",
+  "finding_text_md5": "31d73cfd9aad8e24cb892f20f05246a8",
+  "published_date": "2023-07-05",
+  "detail_text": "A) Periodic perfo1mance qualification is not adequately perfo1med to ensure thai~l of the!~~ automated visual inspection machines are perfo1ming as intended. Per MA/G AT00016- , perfo1mance verification is conducted \"as expected under simulated real-world conditions\". However, evaluation of the qualification documents revealed that periodic verification is conducted using operation qualification parameters, which include evaluating the physical condition of the machine, operational ranges, and safety features of the equipment. A logical explanation was not provided demonstrating that the cunent periodic perfo1mance process is suitable. During initial perfo1mance qualification, a defect kit was generated however, qualification conducted was inadequate. For example, 1. ~b) <~ S-1248 qualification repo1i (PQR-GS-1248-01) approved on May 26, 2016, failed to include assessment ofrot surface, color, and shape variation. Specifically, for the round1(b) <4) Itablets, mdefect tablets were created and challenged on the equipment. A justification is not provided for the quantity selection for each defect or detailed instiuftions on how the defect kit will be generated. After challenge of the"
+ },
+ {
+  "finding_id": "finding-03e2ff210f25e5a294ac44b4",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2023-07-05",
+  "detail_text": "The~b)(4) IRABS on General Parenteral aseptic filling Line~~~ is where the sterile stopper bowl and"
+ },
+ {
+  "finding_id": "finding-2eb172d6853803eecbc8d50f",
+  "finding_text_md5": "d47bd56426b335537b2f7d38562853ce",
+  "published_date": "2023-06-28",
+  "detail_text": "Specifically, Your firm's documented procedure for responding to your firm's <Redacted B4> monitoring System is inadequate. For example, your firm's procedure, Addressing Alarms [ssued by <Redacted B4> Monitoring System, SOP.QC.006 fail to include a list of possible responses when an Alert/ Action Limit has been reached and a criteria/specification for the selection of each firm created responses. On 6/1/2022 at 10:30 pm, during a review of your firm's differential pressure alerts, one of the responses found was \"Self-Correction\". Your firm's procedure failed to establish a definition to the meaning/ specification for the selection of this response. EMPt.Ove.(S) SGNAlVRE"
+ },
+ {
+  "finding_id": "finding-208dd159410e1ce56d9ddf32",
+  "finding_text_md5": "75f44be6a1b5ead669ef169989c4e9d2",
+  "published_date": "2023-06-28",
+  "detail_text": "Specifically, A. Your firm use <Redacted B4> trash cans, which has a hard to clean and disinfect surface within your ISO 7 Gowning and ISO 7 Filling suite containing your firm's <Redacted B4> ISO 5 LAFU. The surface has the potential of retaining foreign particulates and microbiological organisms that may pose a risk to aseptically processed drug products. B. Your firm uses a laptop computer on a stainless steel table within your firm's ISO 7 Filling Suite used for data entry during aseptic processing. The none protected laptop keyboard has hard to clean areas that prevent adequate cleaning and disinfecting resulting in potential sites for microbiological growth and possible site for cross contamination. Your firm's technician was observed during the production of the sterile drug, Ketamine HCL Injection Solution 30 mg/6 mL (5mg/mL) Syringe, Qty. <Redacted B4> syringes, Lot <Redacted B4>, fail to disinfect <Redacted B4> sterile gloves prior to returning to the ISO 5 LAFU following data entry. Additionally, you firm's Pharmacy Supervisor reported the laptop keyboard is not included in its EM sampling plan."
+ },
+ {
+  "finding_id": "finding-1dba7a592cf86e94097f828c",
+  "finding_text_md5": "0ddaa73abf46190ed0308df06d701ecc",
+  "published_date": "2023-06-28",
+  "detail_text": "Specifically, A. Your firm was found d to have a plastic sleeve used to hold a laminated form affixed the side of your ISO 5 LAFUs within your firm's ISO 7 Filling Suite to show the operational status and manufacturing activities occurring within the unit. Neither the plastic sleeve nor the laminated sheet was part of your firm's cleaning and disinfectant schedule. It has not been deemed cleaned/disinfected the pharmacist/interim quality personnel. B. Your firm's compounding technicians were observed writing on paper batch records within your firm's ISO 7 Filling Suite during aseptic processing of the sterile drug, Ketamine 30mg/6mL, Lot <Redacted B4> processed on 2/24/2023. Paper within the cleanroom has the potential of shedding and increasing the particulate count in addition to being a source of cross contamination within the ISO 7 Filling suite. The paper batch records were observed being placed atop the nonprotected laptop keyboard sitting on the stainless steel table. C. Your firm hangs a bottle off <Redacted B4> on the bar along the top of the ISO 5 LAFU during aseptic processing. Your firm failed to adequately assess the affect it potential have on the unidirectional air f"
+ },
+ {
+  "finding_id": "finding-429aa9c776b68788cba011a7",
+  "finding_text_md5": "bd96f0e05ae2b30b881eae5c390bc095",
+  "published_date": "2023-05-25",
+  "detail_text": "a. Swab sampling after filling of yringes in the RABS is inadequate. For example, only ae are swabbed after manufacturing. The stopper contact surfaces such as stopper ©)(4) is) - - ow i stoppe stopper support, stoppering handling and (o) (4) (mp (4) . asa support and are not swabbed after manufacturing."
+ },
+ {
+  "finding_id": "finding-397e83535345714a6a61e2c3",
+  "finding_text_md5": "c11ec2c224acb8f070f4f3ac2d4c1d09",
+  "published_date": "2023-05-25",
+  "detail_text": "Specifically, Your procedure SOP-004943, Version 11.0, Main Warehouses: Management of Rejected Items and Returns to Supplier, fails to address the handling and rejection of in-process materials. SOP-004836, Version 8.0, Destruction of Goods on Braine Site, does not require the rejection of materials prior to issuance of destruction work orders. During the walkthrough ofthe” warehouse on April 17, 2023, the following in-process materials were stored in a locked cage labeled as rejected when they had a quarantined status in your firm’s SAP system. These materials are pending for destruction. - Tablets,i mg, Material#_ Batch#”™” -™ Tablets,a mg, Material# | Batch#”” The observations of objectionable conditions and practices listed on the front of this form are reported: 1. Pursuant to Section 704(b) of the Federal Food, Drug and Cosmetic Act, or 2. To assist firms inspected in complying with the Acts and regulations enforced by the Food and Drug Administration. Section 704(b) of the Federal Food, Drug, and Cosmetic Act (21 USC 374(b)) provides: \"Upon completion of any such inspection of a factory, warehouse, consulting laboratory, or other establishment, and prior to leaving the premi"
+ },
+ {
+  "finding_id": "finding-2fb8be255f8853f6a4a5082b",
+  "finding_text_md5": "506af0997bbe7a0068045f115be705d8",
+  "published_date": "2023-05-25",
+  "detail_text": "Specifically, a. Uncontrolled blank forms have been used for the in-process sample logs that are attached to the production master records. b. Uncontrolled facility cleaning logs are used to record cleaning activities of classified areas. c. Uncontrol,,. ecklist de vérification et de libération des dossiers de lot de remplissage (seringues Sop-af-104853, version 1.0, is used by the Qualified Person for batch release. - Shredded material was observed on April 19 and 21 in Building office area. The shredded material of April 21 contained referenced to SOP-af-001086, fréquence de test de remplacements des filtres, and . re) (@) (4) (b)(4) . 7 “sae (my (4) : mentioned Point inroom™” in Building There is no assurance that the shredded material did not contain quality documents."
+ },
+ {
+  "finding_id": "finding-d32e388651a6206c3b128008",
+  "finding_text_md5": "d2a1a166793a57e3f9b2c2b23d30ff7e",
+  "published_date": "2023-05-16",
+  "detail_text": "Specifically, Your firm does not have a quality control unit even though quality activities are taking place such as <Redacted B4> retain examination. The most recent retain exam was conducted by warehouse personnel on 11/12/2022."
+ },
+ {
+  "finding_id": "finding-ce4cbfc852f53c38be19fdbe",
+  "finding_text_md5": "199dfda09ef9792a1f139124949350d4",
+  "published_date": "2023-05-16",
+  "detail_text": "Specifically, The personnel performing the <Redacted B4> retain inspection are not adequately trained. The warehouse personnel conducted the <Redacted B4> retain inspection on 11/12/2021, however, finished product inspection training was not performed until 4/14/2022. Additionally, only read and understand training has been given to the warehouse personnel for the \".Finished Product <Redacted B4> Examination of Retained Samples\" procedure SOP-SC-QA-3251. Sealed foil pouches containing approximately <Redacted B4> vials, <Redacted B4> non-foil sealed sterile bottles/vials, and an additional <Redacted B4> IV bags were inspected during the retain sample audit performed on l 1/12/2021 in a single shift by a single employee. The personnel performing the audit have also not been qualified to demonstrate their ability to detect defects such as discoloration, particulates, or leakage. This inspection inclµded but is not limited to the following products: Ipratropium Bromide and Albuterol Sulfate 3mg/3mL . 5mg/3mL -lots t 28071, 128121, and 128141; Asthmanefrin, 11.25 mg/ .5mL -lots l 261 l l and I 26231; and Racepinephrine Hydrochloride l l .25mg/.5inL ~ lots 12610 l and 126121. , . . .. ."
+ },
+ {
+  "finding_id": "finding-9cbdef26f569b848e9f583eb",
+  "finding_text_md5": "0aa49b0eee8721a8bbb52a28699d4e26",
+  "published_date": "2023-05-16",
+  "detail_text": "Specifically, Your firm did not establish worst case monitoring locations for the temperature monitoring done in your warehouse. The warehouse temperature mapping study is inadequate for the storage conditions listed on your finished drug product label. Many of your firm's finished drug products are labeled for storage between 2-25 degrees C (36-77 F). According to your warehouse manager, the current warehouse temperature specifications are <Redacted B4> degrees F. The temperature mapping study consisted of a <Redacted B4> study with <Redacted B4> monitors throughout the warehouse in January of 2020. An additional 3-year review of the temperature data from the <Redacted B4> monitors currently in place was also performed, however, these monitor locations are not based on a scientific justification. Your firm does not have data to support the temperature sensor locations and heights chosen to demonstrate control throughout the warehouse during seasonal temperature fluctuations. Products stored in your warehouse include but are not limited to: Racepinephrine Inhalation Solution 2.25% lot 226731, exp 3/2024; Albuterol Sulfate Inhalation Solution 0.042% lot 227551, exp 2/2024; and Albut"
+ },
+ {
+  "finding_id": "finding-5d5372e67b85a8edabf482b9",
+  "finding_text_md5": "0200bfcec352ce86574daa761852eac8",
+  "published_date": "2023-05-16",
+  "detail_text": "Specifically, Your firm does not have a documented scientific justification for not inspecting vials that are packaged in a secondary foil wrapper. According to procedure, SOP-SC-QA-3251 titled, \"Finished Product <Redacted B4> Examination of Retained Samples\", QA or designee will \"visually inspect the retained finished product samples for <Redacted B4>. Additionally, the procedure indicates that <Redacted B4> are attributes to be examined. Your personnel only inspect retain samples of sterile inhalation/injectable products packaged in sealed secondary foil pouches for leakage during the <Redacted B4> retain audit. Approximatey <Redacted B4> vials were packaged in sealed foil during the <Redacted B4> inspection on 11/12/2021. The sealed foil package inhibits direct inspection of the finished product vials for defects. Not a single foil pouch is opened for examination of the product vial during the retain exam. fMPLOVEE(S) ~GHATURE __,,--::; I OATEISSUEO"
+ },
+ {
+  "finding_id": "finding-b38e576708a6b3c23745d2d7",
+  "finding_text_md5": "3902d557fbb0b2129ce62af6ddcf3ead",
+  "published_date": "2023-05-15",
+  "detail_text": "Specifically, oos A. Your fnm failed to follow validated analytical test method ~ef.._.Err ocol No. SILCC'> ,AMV/SIM/07/00 (Effective date 6 Jul 2007) fo1(b)('' Assay by HPLC and failed to conduct a complete investigation as established by OOS procedure, CSOP/2017/115 C'..JOut of Specification Result Management (Effective date 14 May 2022). 1 For example, on 29 Nov 2022, your fnm reported an OOS No. SIL/OOS/2022/013 foif' ''7 assay test by HPLC for r l'J (b)I') mg tablets Batch No_r\" 1 '(non-US market). This OOS result 001'1 • • 001'1 ~I') was reported for the low assay value of[__fo (Spec1fication LJlo ­I Yo). The Phase I investigation did not reveal any assignable root cause. Your fum proceeded to Phase IIB without conducting the Phase TIA-Manufacturing Investigation. Based on the higher assay results obtained 1 from ther l'J ;samples (non-validated method) compared tot ' ~arnples (validated"
+ },
+ {
+  "finding_id": "finding-8b9d61a104c64b37b810a8a4",
+  "finding_text_md5": "adfbad86c19da7427f750d86c861b5aa",
+  "published_date": "2023-05-15",
+  "detail_text": "Specifically, A. Your fnm failed to ensure deviation investigations and associated coITective and preventive actions (CAPAs) m·e timely, accurate, and documented contemporaneously. For example, investigations and the associated CAP As including but not limited to"
+ },
+ {
+  "finding_id": "finding-f88c6f71e7895c78fa2f3f51",
+  "finding_text_md5": "c489db46c5b24f2667c372352ccedade",
+  "published_date": "2023-05-05",
+  "detail_text": "For example, a. Document RL-SOP-00830 \"GMP-Occurrences: Documentation, Event, Deviation\" (Rev. 13, Effective Date 29 Jan 2023) requires that batch-related deviations with potential risks on product quality should be clas$itied as m_naJ.,or. DEV-2022-0428 was raised due to thetbf<4>--inmning l!l_arks on theE:J i bf<4> yste_!!!J'..:rr4 _.....,,.....,....___ sed for11iJ 14J )md rbl(4l Y rocess duringltif<il) Q \"ficatiol] OTQ_C-~....-1hel61141 liia~ditect.conta .__--.,.,---.-...J\"'\"'!t' . -....---....1(b)(4 ) (b)(4) with roducts durm the manufacture o batcb,es4 4 ll>fl\" ,,,_.,,.,---,----,....,..-,---- nd'b>< > PPQ batches (b>< > 1141 indicating potential impact on product quality ofthe as ..s_o_c.,..ia-ted --,-b'\"\"a-t\"\"'ch:-e-s-. _... However, both the initial and final classification ofthe deviation was minor. . ~ti)(il) . b. The mventory o ...,..,........., e ce standards m LIMS was updated on ~~t~ 5, 2022, including removal of 1141 _ials ot1b> <4> rimary reference standardltiJ <llJ1,ials o~rimary reference standard, and bJ <4>1,ials o (bl 141 econdary reference standard. However, no documentation or event cou d be located regarding these changes."
+ },
+ {
+  "finding_id": "finding-91e405e420eac7824a9e4b0b",
+  "finding_text_md5": "1b4649802a223d390342a8e818b45f69",
+  "published_date": "2023-05-05",
+  "detail_text": "For example, a. Your finn continuously recovered endospore formers, objectionable microorganisms, and human isolates in GMP suites that are used for upstream and downstream processing ofthef1>><4> and~l>ll4 > rug substance intermediates, and product samples. For example .., -nu- m- er_o_u_s_•J deviations (DEV-2021-0027, 2021-0046, 2021-0058, 2021-0060, 2021-0133, 2021-0145, 2021- 0196, 2021-0268, 2021-0322, 2021-0324, 2021-0436, 2021-0544, 2022-0004, 2022-0030, 2022- 0066, 2022-0230, 2022-0264, 2022-0313, and 2023-003) were raised between 2021-2022 for recoveries ofBacillus spp, Paenibacillus glucanolyticus spore formers, Enterococcus spp, and various human isolates during environmenta] monitoring, and in product samples as per OOS­ OOT-202 l-0077,,\"g}?.£Q.Ptj-fi102\\°080, OOS-OOT-2021-0161, and OOS-OOT-0 131 which resulted in batch ~ o (bl 41 eing rejected and designated as ''Not for Human Use\" due to Bacillus spp. contamination m the product or product samples. b. Th >Y<4 > J oint ofUse (POU) identified as:ET 4 > y sed"
+ },
+ {
+  "finding_id": "finding-21d163b1251dab039631c5e3",
+  "finding_text_md5": "e9675726f7f55df3916c431c949df9aa",
+  "published_date": "2023-05-05",
+  "detail_text": "The bags were in blocked status in SAP, but they were still stored in the high-rack warehouse at the time ofthe inspection on 3/1/23. DATES OF INSPECTION: 2/27/2023 (Mon), 2/287/2023 (Tue), 3/01/2023 (Wed), 3/0212023 (I'hurs), 3/03/2023(Fri), 3/06/2023(Mon}, 3/07/2023(Tue) I"
+ },
+ {
+  "finding_id": "finding-9de435082cf1b2d01328d60d",
+  "finding_text_md5": "33700f322d9492843f66cf316e0eeb2f",
+  "published_date": "2023-05-01",
+  "detail_text": "AbD a) . . a . . Specifically, following critical activities involvingRABS- interventions and priorto” monitoring, production operators would, either sanitize their directly with and/or indirectly sanitize™ with wipes while sanitizing the . This act ofexposing their . acl may : ae me) always occurred prior to the monitoring of their for critical RABS interventions."
+ },
+ {
+  "finding_id": "finding-6709f08277c57ba245fb4978",
+  "finding_text_md5": "dcbd6a2974f9e00dc7d2a7f632151b5a",
+  "published_date": "2023-05-01",
+  "detail_text": "‘ * 1.8 a) . = during the setup and production activities of drug product filling operations for both the — Filling Line and the — Filling Line."
+ },
+ {
+  "finding_id": "finding-9d2f2e497fcb55e0f04cb1d3",
+  "finding_text_md5": "d9149cdd3a55867aa8bb642efc358770",
+  "published_date": "2023-04-26",
+  "detail_text": "Specifically, The purpose ofthe container closure integrity assay is to detect at>><•> lfor microbial imuess. As oer Container Closure Integrity TestinJZ: SOP-1455 version 7.0 effective 25Jan2023:ii>H•> '(ti)(l } •--~--..,.,..-------,~~--------·~•)(•) The maximum allowable OD limit was originally set tq !which was too low resulting in six out-of-specification (00S) events. Each OOS event was determined by the Quality Unit to be not indicative of microbial ingress. The firm is proposing to widen the maximum allowable OD limit."
+ },
+ {
+  "finding_id": "finding-9821f8ef251e27d58245a011",
+  "finding_text_md5": "1e23fa6c072b7df99b25e44ac1ff5072",
+  "published_date": "2023-04-26",
+  "detail_text": "Specifically Your Quality Unit has not been effective in carrying-out its duties of ensuring that drug products are manufactured in accordance with current good manufacturing practices ( cGMP) to ensure safety, efficacy, purity, and overall quality of drug substances (used to manufacture drug products) and drug products manufactured at your firm. This is demonstrated by observed deficiencies in your Quality Unit responsibilities related to controls on review of laboratory testing data, conducting investigations, and conducting activities per written procedures. The"
+ },
+ {
+  "finding_id": "finding-690b811f23dbbad681e23e0a",
+  "finding_text_md5": "78db8c124a9ef0a45063fe6244058068",
+  "published_date": "2023-04-26",
+  "detail_text": "Specifically, A. Your firm maintains~H•i 1non-viable particle monitoring equipment used to perform and generate test data tor non-via t5le particle (NVP) count used in environmental monitoring/cleanroom qualification activities in class B and class C areas in support of manufacturing operations. The qualification of this equipment has not been performed, with at least one equipment in usage since the year 2018. As a result, the Quality Unit has not demonstrated the suitability of the equipment to perform assigned tasks and has not reviewed the electronic data since the implementation ofthese equipment. B. Per deviation DEV-002123, dated 05/02/2022, your firm documented that equipment requalification activities had not been performed and were overdue for a total of:]freezers, refrigerators, cold storage rooms, controlled rate freezer and i)(') I The identified equipment were/are used for storage of samples for testing, tested samples, raw materials, reagents, reference materials, reference samples, stability samples ( ongoing stability samples) in support testing operations, and bioburden reduction in suJ2_port of continuous chromatography and viral inactivation (CC & VI) and re•, _"
+ },
+ {
+  "finding_id": "finding-5fb9c78e0811af7d81c9d333",
+  "finding_text_md5": "a9105a629efb19a97eeb6767dde18acb",
+  "published_date": "2023-04-26",
+  "detail_text": "Specifically, After implementing multiple CAPAs at '(bH•> j (\"\" ;, ~ pr r supplier) and Alvotech regarding (bl(• ) procedural controls and defect characterization of incoming · · stopper quality, four j ots 'ltiH•> J rom the last ttiH•f1received lots still failed to meet Alvotech's tightened visual inspection criteria for acceptable;n•> ;stopper quality. 1 No in-house data was provided to demonstrate that the s~ g plan to evaluatl 1 '> ·topp~E_q~ity is appropriate.lb)(•> _stoppers arrive at the facility inf><'> )bags with sampling performed'!bH•> I lbH•>1---\"'•---=------.---...J! ____. oag."
+ },
+ {
+  "finding_id": "finding-4368dafe9b49536c5f8a62db",
+  "finding_text_md5": "8d0312c81925c9fcac49f623d3fca155",
+  "published_date": "2023-04-26",
+  "detail_text": "Specifically, Aseptic process simulation studies performed in the RABS are not fully representative ofthe conditions during routine aseutic filline._.ouerations ot 1 ~' ' For instance, a'tbH•i y tervention resulting in Dev­ '(bJC•> }i 002366, along with terventions res ung in Dev-002383 and Dev 002164 were previously part of ~)(4) aseptic simulation studies, however, these interventions were removed from SOP-0434 DPMl J,ine Interventions version 14.0. The interventions were not added back to the aseptic simulations even though they reoccurred. Unidirectional air flow studies were not fully representative of routine Grade A operations as the smoke generator was not always placed near the HEPA filter. In addition, flow pattern videos do not always evaluate the interaction ofthe unidirectional airflow with the manufacturing operator when the operator is performing interventions. There is no defined time limit from the end of RABS setup to the beginning of aseptic filling for routine drug product manufacturing or aseptic process simulations."
+ },
+ {
+  "finding_id": "finding-37456a4ad71cd0811b867fdb",
+  "finding_text_md5": "3ffe0f993f605c612b02ee925bd8758b",
+  "published_date": "2023-04-26",
+  "detail_text": "Specifically, GMP related computerized systems and equipment have not been validated/qualified to demonstrate the suitability of computer hardware and software to perform assigned tasks. For example: 'ttiH•J !tiH•,.---­ A. Your firm maintains _ Jnon-viable particle monitoring equipment used to perform and generate test data for non-via6Ie particle (NVP) count used in environmental monitoring/cleanroom qualification activities in class Band class C areas in suoport of manufacturing operations. Subsequently, during our review of the (bl(• 1equipment and firmware, it was observed that the firm was not aware ofthe equipment data storage"
+ },
+ {
+  "finding_id": "finding-302620b91c7a151515be1b9f",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2023-04-26",
+  "detail_text": "Specifically, Your firm's Technical Summary Report for Disinfectant Qualification Studies (REP 2989, version 3.0 effective 26Jan2023) does not adequately support the sanitization procedures for the(tiH'> J and (ti)(•> 1effectiveness ofthe disinfectants and (OH•> 'for all representative manufacturing • ' • (ti)(-, (tif(4) surfaces m the Grade ARABS. For example, which can be used for successive drug product batches before replacing were not included m tnestudies. S£E REVERSE OF THIS PAG£"
+ },
+ {
+  "finding_id": "finding-53feb9c58149b193db6b85c7",
+  "finding_text_md5": "3ea321e6d356293b0744a0108ee37e22",
+  "published_date": "2023-04-25",
+  "detail_text": "Specifically, a. The Building <Redacted B4> Filling Line <Redacted B4> capping and <Redacted B4> machine was validated using only one batch run and not three for the study, VAL-1764, rev. 1.0, effective date 09/23/2021, Final Report for the Container Closure Integrity Testing (CCIT) for the <Redacted B4> DP <Redacted B4> mL Container Closure Configuration. b. The Quality Control Microbiology Laboratory's cGMP material ambient (20-25 degrees Celsius) storage room, Rm. 902, is not qualified for 20-25 degrees Celsius."
+ },
+ {
+  "finding_id": "finding-165183059980e00b1a290bcf",
+  "finding_text_md5": "3fdabf45dd0ada6a26e912b439b7a9b5",
+  "published_date": "2023-04-25",
+  "detail_text": "Specifically, a. SOP-1021, rev. 5.0, effective date 05/31/2021, Cleaning and Sanitization for Building ~ Line <Redacted B4> Area, directs cleaning to be a <Redacted B4> contact time using disinfectants for the facility cleaning procedures. This contact time is not validated by the efficacy studies, VAL-1209, rev. 3.0, effective date 07/14/2022, Disinfectant Coupon Efficacy Study, or 8-SR-363, rev. 1.0, issue date 01/28/2015, Disinfectant Coupon Efficacy Study. Additionally, SOP-1021 does not direct the capture of the exposure time for the cleaning records. b. During the Production Suite tour on 01/12/2023, it was noted that the Pre-wash Room, Rm. 1015, has a sink with a <Redacted B4> trap. There is no microbial control maintenance or sanitization procedure practiced or described in SOP-1021, rev. 5.0, effective date 05/31/2021, Cleaning and Sanitization for Building <Redacted B4> Line <Redacted B4> Area, for sinks with a <Redacted B4> trap in manufacturing areas. c. During the facilities area tour on O1/11/2023, it was noted that the <Redacted B4> sensor for the <Redacted B4> used in the production of <Redacted B4> with equipment ID 2027-006 SN3116-12 was due for maintenance on 12/"
+ },
+ {
+  "finding_id": "finding-fecabbdedc276eac2cb00526",
+  "finding_text_md5": "ccb732a6d0389917dc7a7e6e4962d7ab",
+  "published_date": "2023-04-19",
+  "detail_text": "Specifically, you failed to requalify 1 the HVAC systems (HEP A) forj>' ~ uilding,&Jnit classifi~d as ISO Class) 8 per ISO standai·d utilized by (b)(•J (b)C4 your fum. You requalified the HVAC for Building( However, ISO 14644-2:2000 (E) states they must be perfo1med at f1'1 maxim time interval. 1"
+ },
+ {
+  "finding_id": "finding-de5ebd409a638b12702bae00",
+  "finding_text_md5": "9ae12a7c7174ad80e30406a11344a1d0",
+  "published_date": "2023-04-19",
+  "detail_text": "Specifically, r c•J 1 Your finn lacks sterility assurance for dmo products already distributed to the U.S. market. il'H'l Specifically, yom! ~onducted in the itiH•i !filling line °'Room tbH•i jis deficient in that tbH•i jbottle~ instead of'(6JC•i bottles are being used r=jl>)(<I) nc, for Specifically, ;:11.nLb ttl r •i 1. d ll>H•i ml b tt r •i ,an o es jl>){<I) )(41 o es \"')(4) are being used to conduc operations. During these bottles are filled with growth media 'l!>H•J then incubated for 14 days. However, these j ,bottles do not allow for fH 41 Nisualization of microbial growth that maybe present after incubation. Your furn lacks appropriately designed visual inspector qualification program that demonstrates visual inspectors can accurately identify different degree (including low level) ofmicrobial contamination in thestf c• ilJottles. This deficient practice 1 of using r\" ~ les for l!>JC•J operation has been used since the commercial distribution of f)(') dmg product in 2012."
+ },
+ {
+  "finding_id": "finding-cd694992ce37c8d4828c3596",
+  "finding_text_md5": "1eb50900d72b0c6d079f677372ef3b78",
+  "published_date": "2023-04-19",
+  "detail_text": "Specifically, A. During our inspectional walkthrough ofthe packaging operations 9n March 21, 2023, we observed the fim1 utilizes Laminar Air Flow (ID #LAF-303) in Bulk Packing(!>)() which is classified as ISO Class­ 8 during operation where the bottles are wi ..---­ However, the fnm does not perform testing of the r•J bottles~)(•) perations. B. (l>;you ha.ve not established action limit, ll>~c!Jert limit. ~nd limit, for environmental monitoring (EM) of 7 I ,which is being utilized inl ;:irea fort '' lbags that are filled with raw materials going to manufacturing In addition, we reviewed several sampling for (l>JC•, l I where you recorded the following EM testing results and you concluded that all com1ts 1 mits: (l>H•J•-------------------------i • Jllile 29, 2020 sampling: Location! \\l>)(A) r)(•) I The Limit fo1 H•J lstates \"Informative\". ------­ EMPLOYEE(S} SIGNATURE"
+ },
+ {
+  "finding_id": "finding-bebd47c1b667c7233362a9c9",
+  "finding_text_md5": "b3a061a8820abef2ae1d162e075bd5cb",
+  "published_date": "2023-04-19",
+  "detail_text": "Specifically, The Electronic Logbook (eLog) System Vl.0.0 is used for Instrument, Equipment, Area Operation and Cleaning usage log for Production, Warehouse, and Quality Control depaiiments of Lupin Limited. The eLog is not adequately controlled. A. Your firm cannot assure us that access to the eLog system is adequately controlled. According to Annex_MUM_ITP _004403 (page otH•> of SOP _MUM_ITP _004150 Rev. 4.0 (User Management for Elog System), the Service Vendor/Service.Engineer is assigned the same rights and privileges as the System Administrator at Lupin (Page (I>)() where under \"Admin and Security\", the system administrator and service provider/vendor is able to set security profile, register new role, Set Global Profile, Register New User, Activate New User Account, Set User Account Status, Register Standai·d Reason, tempora1y password reset, etc. B. In general, you do not document alaims in the batch records, review, investigate, assess, and trends ala1ms recorded in the data acquisition software during manufacturing and packagin.g_gperations at the facility. We observed on March 22, 2021, the HMI screens fo/n•> __}08) 1 andrH•> f3 11) located in r\" :(Room(I>){') a message d"
+ },
+ {
+  "finding_id": "finding-7052257c7ab8362b522415b7",
+  "finding_text_md5": "625e9081b8bfd59534b6b4fc1317720c",
+  "published_date": "2023-04-19",
+  "detail_text": "You failed to monitor and ensure that personnel complete their assigned training by the due date. Training is assigned in SABA software ( which was validated in 2011) and you do not assign the due dates in SABA. For example, the following personnel were assigned training in SABA and they are cunently overdue. In addition, you failed to provide on-going CGMP training to contracted personnel at leas lbH•> -, 'lbh•1 (b)(•) Ctill•l (ti)('I)- • Employee ID #, I(Manager, - Overdue onl !For New Joinee in l___ 1 Production assigned on 09/28/2016 and not yet completed. ----­ EMPLOYEE(S} SIGNATURE"
+ },
+ {
+  "finding_id": "finding-6aee2d46b7b9b8116cca155f",
+  "finding_text_md5": "f74220ee373d1d861f1660598943cfcb",
+  "published_date": "2023-04-19",
+  "detail_text": "Specifically, IJ>Qp 09.Ll.6/2021 during stability stu~i samole analysis ofr c•, !Solution IJ>H•> 1/o Batch [ (9-Month Lonij TennL ~ test result did not comply with specification limit. The 'IJ> (4) •IJ>JC4) ll'JC•J '(ti)(4) obse1ved test result was i ij,1 bile the Limit was NMTLJlo OOS-IO-153-21-0027 was initiated on 09/16/2021. The [ inveCti~<t~olltion did not identify any eITors. Hence, the Out of Specification (OOS) result stood valid. The lmanufacturin12. investi12.ation concluded that surface imperfections/abe1Tation obse1ved on somt:t1 rofQC Batch<Dn•> have led to product loss under conditions of stability study at H•> onentation. Howev~ s Garch of r •> Junde1went a successful incoming material inspection when they were received at the warehouse and was released by your QA on 09/11/2020. No issues ofsurface imperfections/abe1Tation were repo1ted at that time. • (ti)(') Your furn perfo1med Impa~ti, Assessment and t~~•> sub1ect OOS Batch I IJ>H•> wa5i,.){,recallet IJ>>Q?-.CT Lrn2L2.104 1OD 812021). ~ ore batches ofj 1so1utionc:.Jlo were also recalled (RCL/IN the same batch . IJ>JC•> Jatch. The investigation fuither identified the defective rJC•>7 Batchr \" 1 OATE ISSUEO EMPLOYEE"
+ },
+ {
+  "finding_id": "finding-2ea9a876bb56131de63be830",
+  "finding_text_md5": "71fd3e58a2c54d6c2aef9dad563b9e6f",
+  "published_date": "2023-04-19",
+  "detail_text": "Specifically, your comolaint investigations are deficient. You have received several repeated market , J H•l tbH•> ·(bH•>Jn (li)l4) ~-(.?mnlamt.., fo · Tab USP I g (US Market), Caosules I tbH•> JIab lets USPLJng, tbH•> g, H•> tbH•> m~ tbH•> . . Tablet USP, a and I .fablets for the marketed fimshed products m the U.S.A. fu all resulting investigations, you co ese complaints are unconfinned. However, our inspectional walkthroughs and some of the investigations revealed some of the foreign tablets are actually manufactured at your facility and are being filled into capsule products. However, you have not taken any effective measures to prevent recmTence. A. You received several complaints for foreign tablets/capsules including two complaints fol 1 ' ' [b)l4) I, , I 1Capsules USP (Complamt #DPC-1O-134-21-0041 on July 19, 2021 and DPC-1O­ 134-22-0069 on July 1, 2022) where the complainant reported that a foreign tablet with no marking"
+ },
+ {
+  "finding_id": "finding-141013c299a0e491efc989c7",
+  "finding_text_md5": "a1d9942291114ae399ce0e2185f76bba",
+  "published_date": "2023-04-19",
+  "detail_text": "Specifically, A. You failed to adequately classify and assess Change control #CCP-MM-941-21-0003 initiated on Januaiy 14, 2023 for upgrading the Windows operating system from 2008 to 2016. You classified the change as \"Minor\" where revalidation is required and did not perfo1m an assessment of the change. B. You have not established auali1Y ai;rr.eements with the following suppliers;E IUSP (Excipient RM 1t1'1 . jL .(Excipient, RM H•> ),ancrr •> , and 1 '(b)(4} I . tt;H•> I I Exc1p1ent, RM _ : . Facilities & Equipment System"
+ },
+ {
+  "finding_id": "finding-0dfba907f5ffd4b54e32d6f1",
+  "finding_text_md5": "a28ac936fd778bf72033d4646d9f9411",
+  "published_date": "2023-04-19",
+  "detail_text": "Specifically, A. Your furn failed to document deviations/equipment failures occmTing during manufacturing and packaging in the batch record, initiate investigations, including risk assessments, and appropriate con-ective and preventive actions (CAPAs) into the breakdown of critical process equipment/critical breakdown notifications in thefH'> ·7 manufacturing area for several US marketed products in (D){4) -~)(' ) You recorded 1695 breakdown notifications from Januay 2019 to March 2023 forl lbH•> 1and 64 qreakdown notifications fo1f '' However, ou investigated 41 breakdown . - • D t') d b kd \"fi • D (b)(() I nobhcabons 01 ,an 7 rea own nob 1caho11s or1"
+ },
+ {
+  "finding_id": "finding-df006a1799eb997510fa855a",
+  "finding_text_md5": "625e9081b8bfd59534b6b4fc1317720c",
+  "published_date": "2023-04-14",
+  "detail_text": "You failed to monitor and ensure that personnel complete their assigned training by the due date. Training is assigned in SABA software ( which was validated in 2011) and you do not assign the due dates in SABA. For example, the following personnel were assigned training in SABA and they are cunently overdue. In addition, you failed to provide on-going CGMP training to contracted personnel at leas lbH•> -, 'lbh•1 (b)(•) Ctill•l (ti)('I)- • Employee ID #, I(Manager, - Overdue onl !For New Joinee in l___ 1 Production assigned on 09/28/2016 and not yet completed. ----­ EMPLOYEE(S} SIGNATURE"
+ },
+ {
+  "finding_id": "finding-d77d239953d8ed1fdba15770",
+  "finding_text_md5": "b3a061a8820abef2ae1d162e075bd5cb",
+  "published_date": "2023-04-14",
+  "detail_text": "Specifically, The Electronic Logbook (eLog) System Vl.0.0 is used for Instrument, Equipment, Area Operation and Cleaning usage log for Production, Warehouse, and Quality Control depaiiments of Lupin Limited. The eLog is not adequately controlled. A. Your firm cannot assure us that access to the eLog system is adequately controlled. According to Annex_MUM_ITP _004403 (page otH•> of SOP _MUM_ITP _004150 Rev. 4.0 (User Management for Elog System), the Service Vendor/Service.Engineer is assigned the same rights and privileges as the System Administrator at Lupin (Page (I>)() where under \"Admin and Security\", the system administrator and service provider/vendor is able to set security profile, register new role, Set Global Profile, Register New User, Activate New User Account, Set User Account Status, Register Standai·d Reason, tempora1y password reset, etc. B. In general, you do not document alaims in the batch records, review, investigate, assess, and trends ala1ms recorded in the data acquisition software during manufacturing and packagin.g_gperations at the facility. We observed on March 22, 2021, the HMI screens fo/n•> __}08) 1 andrH•> f3 11) located in r\" :(Room(I>){') a message d"
+ },
+ {
+  "finding_id": "finding-c598655b101b9dbe2431fd58",
+  "finding_text_md5": "1eb50900d72b0c6d079f677372ef3b78",
+  "published_date": "2023-04-14",
+  "detail_text": "Specifically, A. During our inspectional walkthrough ofthe packaging operations 9n March 21, 2023, we observed the fim1 utilizes Laminar Air Flow (ID #LAF-303) in Bulk Packing(!>)() which is classified as ISO Class­ 8 during operation where the bottles are wi ..---­ However, the fnm does not perform testing of the r•J bottles~)(•) perations. B. (l>;you ha.ve not established action limit, ll>~c!Jert limit. ~nd limit, for environmental monitoring (EM) of 7 I ,which is being utilized inl ;:irea fort '' lbags that are filled with raw materials going to manufacturing In addition, we reviewed several sampling for (l>JC•, l I where you recorded the following EM testing results and you concluded that all com1ts 1 mits: (l>H•J•-------------------------i • Jllile 29, 2020 sampling: Location! \\l>)(A) r)(•) I The Limit fo1 H•J lstates \"Informative\". ------­ EMPLOYEE(S} SIGNATURE"
+ }
+]

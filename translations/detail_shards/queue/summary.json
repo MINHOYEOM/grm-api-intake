@@ -1,0 +1,26 @@
+{
+  "stats": {
+    "findings": 11254,
+    "queued": 10349,
+    "no_detail": 895,
+    "ambiguous": 10,
+    "chars": 7425051
+  },
+  "shards": {
+    "A": {
+      "files": 69,
+      "items": 3450,
+      "chars": 2469887
+    },
+    "B": {
+      "files": 69,
+      "items": 3450,
+      "chars": 2484399
+    },
+    "C": {
+      "files": 69,
+      "items": 3449,
+      "chars": 2470765
+    }
+  }
+}

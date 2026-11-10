@@ -158,7 +158,7 @@ def validate_injection(brief: dict[str, Any], delta: dict[str, Any]) -> Injectio
         # ★전부 채우거나 전부 비운다. 하나라도 빠지면 영어 화면에 한국어 한 문단이
         #   섞이므로, 부분 제공은 **경고가 아니라 오류**로 막는다(반쪽 영어 금지).
         if "en" in d:
-            _validate_en_block(report, cid, d["en"])
+            _validate_en_block(report, cid, d["en"], ko=d)
 
     # [다국어 5단계] brief 영문 tldr — 제공되면 한국어와 같은 규약(정확히 3개·평문).
     if "tldr_en" in delta:
@@ -197,6 +197,14 @@ def validate_injection(brief: dict[str, Any], delta: dict[str, Any]) -> Injectio
 _EN_REQUIRED = ("title_issue", "summary", "implication", "key_facts", "checks")
 # `en` 이 받는 모든 필드 = 필수 다섯 + 선택 `hook_line`. 여기 없는 키는 "모르는 필드" 로 거부된다.
 _EN_FIELDS = _EN_REQUIRED + ("hook_line",)
+# 한국어 칸이 비었으면 영문도 비어도 되는 둘 — web/render.py CARD_NARRATIVE_OPTIONAL 과 같다.
+_EN_OPTIONAL_IF_KO_EMPTY = ("implication", "checks")
+
+
+def _slot_filled(value: Any) -> bool:
+    if isinstance(value, list):
+        return bool([v for v in value if isinstance(v, str) and v.strip()])
+    return isinstance(value, str) and bool(value.strip())
 
 
 def _check_hook_line(report: InjectionReport, cid: str, value: Any, lang: str) -> None:
@@ -215,7 +223,8 @@ def _check_hook_line(report: InjectionReport, cid: str, value: Any, lang: str) -
         report.errors.append(f"{label}: {len(text)}자 — ≤{_HOOK_LINE_MAX[lang]} 초과")
 
 
-def _validate_en_block(report: InjectionReport, cid: str, en: Any) -> None:
+def _validate_en_block(report: InjectionReport, cid: str, en: Any,
+                       ko: dict[str, Any] | None = None) -> None:
     """[다국어 5단계] 카드 영문 갈래 검증 — 한국어 슬롯과 **같은 규약**.
 
     ★부분 제공을 오류로 막는 이유: 다섯 중 넷만 영어면 그 카드가 영어 화면에서 한국어
@@ -230,38 +239,39 @@ def _validate_en_block(report: InjectionReport, cid: str, en: Any) -> None:
         report.errors.append(f"{cid}.en: 모르는 필드 {unknown}")
     if "hook_line" in en:
         _check_hook_line(report, cid, en["hook_line"], "en")
-    filled = []
-    for key in _EN_REQUIRED:
-        value = en.get(key)
-        if isinstance(value, list):
-            ok = bool([v for v in value if isinstance(v, str) and v.strip()])
-        else:
-            ok = isinstance(value, str) and bool(value.strip())
-        if ok:
-            filled.append(key)
-    if filled and len(filled) != len(_EN_REQUIRED):
-        missing = [k for k in _EN_REQUIRED if k not in filled]
+    ko = ko if isinstance(ko, dict) else {}
+    filled = [key for key in _EN_REQUIRED if _slot_filled(en.get(key))]
+    # [2026-11-10] implication·checks 는 한국어가 비었으면 영어도 비어도 된다(쓸 원문 정보가
+    # 없는 카드). 한국어가 채운 칸은 영어도 채워야 한다 — 짝이 어긋나면 반쪽 영어다.
+    needed = [key for key in _EN_REQUIRED
+              if key not in _EN_OPTIONAL_IF_KO_EMPTY or _slot_filled(ko.get(key))]
+    if filled and any(k not in filled for k in needed):
+        missing = [k for k in needed if k not in filled]
         report.errors.append(
-            f"{cid}.en: 부분 제공 — 빠진 슬롯 {missing}. 다섯을 전부 채우거나 en 을 생략하라")
+            f"{cid}.en: 부분 제공 — 빠진 슬롯 {missing}. 한국어가 채운 칸은 영문도 전부 채우거나 "
+            "en 을 생략하라")
         return
     if not filled:
         report.warnings.append(f"카드 {cid!r}: en 비어있음 — 이 호는 영어로 발행되지 않는다")
         return
     for key in ("title_issue", "summary", "implication"):
-        _check_str_slot(report, f"{cid}.en", key, en[key])
+        if key in en:
+            _check_str_slot(report, f"{cid}.en", key, en[key])
     if len(en["title_issue"]) > _MAX_TITLE_ISSUE * 2:
         # 영어는 같은 뜻에 글자가 더 든다 — 한도를 두 배로 두되 무한정은 아니다.
         report.errors.append(
             f"{cid}.en.title_issue: {len(en['title_issue'])}자 — 너무 김")
     for key in ("key_facts", "checks"):
-        _check_list_slot(report, f"{cid}.en", key, en[key])
+        if key in en:
+            _check_list_slot(report, f"{cid}.en", key, en[key])
     if len(en["key_facts"]) > _MAX_KEY_FACTS:
         report.errors.append(
             f"{cid}.en.key_facts: {len(en['key_facts'])}개 — ≤{_MAX_KEY_FACTS} 초과")
     lo, hi = _CHECKS_RANGE
-    if not (lo <= len(en["checks"]) <= hi):
+    en_checks = en.get("checks") or []
+    if en_checks and not (lo <= len(en_checks) <= hi):
         report.errors.append(
-            f"{cid}.en.checks: {len(en['checks'])}개 — {lo}~{hi} 범위 벗어남")
+            f"{cid}.en.checks: {len(en_checks)}개 — {lo}~{hi} 범위 벗어남")
 
 
 def _validate_quotes(report: InjectionReport, cid: str, quotes: list[dict[str, Any]],
@@ -332,13 +342,14 @@ def inject_llm_slots(brief: dict[str, Any], delta: dict[str, Any], *,
         # 제공을 이미 막지만, 주입도 같은 판정을 해야 검증을 건너뛴 경로에서도 안전하다).
         en = d.get("en")
         if isinstance(en, dict):
+            # [2026-11-10] 한국어가 비운 implication·checks 는 영문도 비어도 완결로 친다.
             complete = all(
-                bool([v for v in en.get(k) or [] if str(v).strip()])
-                if isinstance(en.get(k), list)
-                else bool(str(en.get(k) or "").strip())
+                _slot_filled(en.get(k))
+                or (k in _EN_OPTIONAL_IF_KO_EMPTY and not _slot_filled(card.get(k)))
                 for k in _EN_REQUIRED)
             if complete:
-                card["en"] = {k: (list(en[k]) if isinstance(en[k], list) else en[k])
+                card["en"] = {k: (list(en.get(k) or []) if k in _LIST_SLOTS
+                                  else (en.get(k) or ""))
                               for k in _EN_REQUIRED}
                 en_hook = en.get("hook_line")
                 if isinstance(en_hook, str) and en_hook.strip():

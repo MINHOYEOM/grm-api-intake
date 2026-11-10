@@ -23,8 +23,16 @@ class GateTest(unittest.TestCase):
         self.assertTrue(any("1/2" in p and "a" in p for p in out))
 
     def test_partial_names_missing_field(self):
-        out = g.find_problems(_doc([{"id": "a", "en": dict(FULL, checks=[])}]))
+        # 한국어 checks 가 채워졌는데 영문만 비었다 = 반쪽 영어.
+        out = g.find_problems(_doc([{"id": "a", "checks": ["확인?", "둘?"],
+                                     "en": dict(FULL, checks=[])}]))
         self.assertTrue(any("checks" in p for p in out))
+
+    def test_both_empty_optional_passes(self):
+        """[2026-11-10] 쓸 원문 정보가 없어 한국어도 시사점·점검을 비운 카드는 완결이다."""
+        card = {"id": "a", "implication": "", "checks": [],
+                "en": dict(FULL, implication="", checks=[])}
+        self.assertEqual(g.find_problems(_doc([card])), [])
 
     def test_missing_tldr(self):
         out = g.find_problems(_doc([{"id": "a", "en": FULL}], tldr=None))

@@ -40,8 +40,12 @@ import inspection_card
 from grm_taxonomy import is_out_of_scope_483
 
 # 발행 카드가 반드시 채워야 하는 LLM 슬롯(빈값이면 발행 불가).
-_REQUIRED_STR_SLOTS = ("title_issue", "summary", "implication")
-_REQUIRED_LIST_SLOTS = ("key_facts", "checks")
+# [2026-11-10 브리프 재정비 — 결정 2·9] `implication`·`checks` 는 빠졌다: 쓸 원문 정보가 없는
+# 카드(사유 한 단어 회수·지적 없는 실사·본문 미확보 고시)는 Routine 이 일부러 비운다. Routine 이
+# 카드를 통째로 빠뜨린 경우는 제목·요약이 비어 여전히 여기서 걸린다. 빈 칸 수는 경고로 센다.
+_REQUIRED_STR_SLOTS = ("title_issue", "summary")
+_REQUIRED_LIST_SLOTS = ("key_facts",)
+_OPTIONAL_PROSE_SLOTS = ("implication", "checks")
 
 # [업계 브리핑 노트 2026-07-13, v2 명칭개편 2026-07-13] 해설·교육성 2차 소스(전문 매체) —
 # 이벤트 카드가 아닌 '전문지 브리핑'으로 렌더(구 '업계 브리핑 노트'). 향후 RAPS·European
@@ -725,6 +729,12 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
         for k in _REQUIRED_LIST_SLOTS:
             if not c.get(k):
                 report.errors.append(f"채택 카드 {c.get('id')!r}: 빈 슬롯 {k}")
+    for k in _OPTIONAL_PROSE_SLOTS:
+        empty = [str(c.get("id")) for c in adopted_cards if not c.get(k)]
+        if empty:
+            report.warnings.append(
+                f"{k} 비움 {len(empty)}/{len(adopted_cards)}장(쓸 원문 정보 없음 — 정상일 수 있음, "
+                f"예: {', '.join(empty[:3])})")
 
     report.adopted = len(adopted_cards)
     report.resources = len(resource_notes)

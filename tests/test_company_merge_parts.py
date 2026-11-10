@@ -67,7 +67,8 @@ class MergePartsTest(unittest.TestCase):
         self.assertTrue(any("영문 슬롯" in p and "c2" in p for p in mp.merge(d)[2]))
 
     def test_partial_en_blocks(self):
-        part = {"en": dict(EN["en"], checks=[])}
+        # 한국어 checks 는 채웠는데 영문만 비었다 = 반쪽 영어(한국어도 비면 2026-11-10 부터 정상).
+        part = {"checks": ["확인?", "확인 둘?"], "en": dict(EN["en"], checks=[])}
         d = self._folder(**{"delta.A.json": {"status": "완료", "cards": {"c1": EN, "c2": part}}})
         self.assertTrue(any("checks" in p for p in mp.merge(d)[2]))
 

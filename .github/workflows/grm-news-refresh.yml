@@ -1,0 +1,134 @@
+name: GRM Recent Regulatory News Refresh
+
+# [최근 규제 소식 2026-11-10] /news/ 정본(web/data/news.json)을 매일 다시 만든다(news_refresh.py).
+# 소식 원천은 raw_signals 의 비-findings 소스이고, anon 에는 막혀 있어 공개 RPC `regulatory_news`
+# (마이그 138 — 공개 안전 5컬럼만)로 읽는다. ★마이그 138 이 적용되기 전에는 RPC 404 로 이 잡이
+# 실패하고 지난 정본이 그대로 남는다(페이지는 그 정본으로 계속 선다).
+#
+# 골든은 건드리지 않는다 — 이 페이지는 골든 목록에 없고 sitemap 항목은 lastmod 가 없다.
+# 그래서 소식이 바뀐 날의 PR 은 데이터 파일 1개짜리다.
+#
+# 크론: 23:47 UTC(= 08:47 KST). 수집(grm-intake 18:17 UTC)이 끝난 뒤 · 다른 갱신기 창과 겹치지 않게.
+# ★anon 키만 쓴다(service-role 금지) — 공개 집합을 RPC 가 정의한다.
+
+on:
+  schedule:
+    - cron: '47 23 * * *'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '최근 며칠치를 담을지(1~400)'
+        required: true
+        default: '60'
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: grm-news-auto-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60   # CI 게이트(gh run watch) 대기가 이 잡 안에 있다 — CI 가 20~40분
+    env:
+      DAYS: ${{ inputs.days || '60' }}
+      BRANCH: automation/news-auto-${{ github.run_id }}
+      GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      DATA_PATH: web/data/news.json
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Create isolated candidate branch
+        run: git switch -c "$BRANCH"
+
+      # 스크립트가 0건 가드·형식 위반 제외를 스스로 판정하고, 0건이면 아무것도 쓰지 않은 채 exit 1 한다.
+      - name: Refresh news data (regulatory_news RPC, anon)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          python news_refresh.py \
+            --supabase-url "$SUPABASE_URL" \
+            --supabase-anon-key "$SUPABASE_ANON_KEY" \
+            --days "$DAYS"
+
+      # measured_on 은 매일 바뀌므로 diff 판정에서 뺀다 — 소식이 그대로면 PR 을 만들지 않는다.
+      - name: Detect meaningful changes
+        id: changes
+        run: |
+          if git diff --quiet -I'"measured_on"' -- "$DATA_PATH"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "소식 변경 없음 — PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and open candidate PR
+        if: steps.changes.outputs.changed == 'true'
+        id: pr
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$DATA_PATH"
+          git commit -m "chore: refresh recent regulatory news"
+          git push -u origin "$BRANCH"
+          TOTAL=$(jq -r '.totals.items' "$DATA_PATH")
+          BYSRC=$(jq -r '.by_source | map("- \(.v): \(.c)건") | join("\n")' "$DATA_PATH")
+          cat > /tmp/pr-body.md <<EOF
+          최근 규제 소식 정본 일일 재측정(\`regulatory_news\` RPC · anon 키 = 공개 5컬럼).
+
+          ## 실측
+          최근 ${DAYS}일 ${TOTAL}건
+
+          $BYSRC
+
+          데이터 파일 1개만 바뀝니다(골든 불변). 자동 머지는 GRM CI 디스패치가 green 일 때만.
+          EOF
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: refresh recent regulatory news" \
+            --body-file /tmp/pr-body.md
+          echo "number=$(gh pr view "$BRANCH" --json number -q .number)" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch CI gate
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          HEAD_SHA=$(git rev-parse HEAD)
+          STARTED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run grm-ci.yml --ref "$BRANCH"
+          RUN_ID=""
+          for _ in $(seq 1 30); do
+            RUN_ID=$(gh run list --workflow grm-ci.yml --branch "$BRANCH" \
+              --event workflow_dispatch --limit 10 \
+              --json databaseId,headSha,createdAt \
+              --jq ".[] | select(.headSha == \"$HEAD_SHA\" and .createdAt >= \"$STARTED\") | .databaseId" \
+              | head -n 1)
+            [ -n "$RUN_ID" ] && break
+            sleep 5
+          done
+          [ -n "$RUN_ID" ] || { echo "CI dispatch run not found" >&2; exit 1; }
+          gh run watch "$RUN_ID" --exit-status
+
+      - name: Merge only after green CI
+        if: steps.changes.outputs.changed == 'true'
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f "$DATA_PATH" ]; then
+            jq -r '"측정일 \(.measured_on) · 최근 \(.window_days)일 \(.totals.items)건"' \
+              "$DATA_PATH" >> "$GITHUB_STEP_SUMMARY"
+          fi

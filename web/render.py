@@ -150,6 +150,7 @@ import example_page  # noqa: E402  [지적 사례 화면 2026-11-09]
 import import_alerts_page  # noqa: E402  [수입경보 2단계 2026-11-10] 전체 목록 화면 뷰
 import citation_firms_page  # noqa: E402  [FDA 지적 조항 × 업체 전체 목록 2026-11-10]
 import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
+import news_page  # noqa: E402  [최근 규제 소식 2026-11-10]
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -5321,6 +5322,7 @@ TRENDS_DESCRIPTION = N_("식약처·FDA 중 기관을 골라 최근 12개월에 
 INSPECTIONS_DESCRIPTION = N_("FDA가 의약품 제조소를 실사하고 매긴 등급(NAI·VAI·OAI) 통계 — "
                              "연도별·국가별 중대 지적 비율로 보는 FDA GMP 실사 결과.")
 EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관리 등)별로 규제기관(PMDA·MHRA)이 실제 실사에서 지적한 문장을 모았습니다. 원문 영어와 참고용 한국어 번역, 출처 링크 포함.")
+NEWS_DESCRIPTION = N_("주간 브리프에 싣지 않은 규제기관·업계 단체의 최근 소식 — 식약처·EMA·FDA 회수·미국 관보·ECA·ISPE 등을 날짜순으로.")
 CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
                            "조항별 인용 실사 수·비율과 회계연도별 추이.")
 DEFICIENCY_CASES_DESCRIPTION = {
@@ -5849,6 +5851,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                                    load_glossary() or [])
         env.globals["intl_cases"] = _dc_blocks
         en_env.globals["intl_cases"] = _dc_blocks
+    # [최근 규제 소식 2026-11-10] 정본(web/data/news.json)이 있을 때만 양 트리에 선언한다.
+    news_data = news_page.load_news()
+    if news_data:
+        en_paths.add(news_page.ROUTE)
     # ★모음(분류·국가·기관)도 여기서 넣는다 — 종전에는 그 트리를 그리기 직전(한참 아래)
     #   에 넣었는데, 그때는 이미 둘러보기 면이 그려진 뒤라 **영어 진입 카드가 자기
     #   트리에 난 면을 못 봤다**(실측: 영어 둘러보기 카드 1장 / 한국어 4장). 면 집합은
@@ -5915,6 +5921,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             nav_active="board",
             description=en_tr(ARCHIVE_DESCRIPTION),
             issues=en_issues,
+            news_link=bool(news_data),
             # [다국어 2026-09-05] 자료실 스트립은 **영어로도 성립한다** — 머리글·건수·
             # 링크 라벨은 전부 문구 사전을 타고, 제목은 카탈로그의 `title_en` 에서 온다.
             # 종전 주석("한국어 큐레이션 문구")은 실측과 다르다: 큐레이션한 문장은 없고
@@ -5939,6 +5946,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         nav_active="board",
         description=tr(ARCHIVE_DESCRIPTION),
         issues=issues,
+        news_link=bool(news_data),
         lib_update=library_updates["compact"],
     )
 
@@ -6580,6 +6588,27 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 topics=_ex_topics, curated_on=example_data.get("curated_on", ""),
             )
         facet_paths.append((example_page.ROUTE, ""))
+
+    # [최근 규제 소식] 월요일 브리프 사이의 상설 면. 최상단 nav 에는 아직 없다(nav PR 머지 후 연결).
+    #   정본이 없어도 한국어 면은 빈 상태 문구로 선다(링크·sitemap·영어 면은 정본이 있을 때만).
+    #   sitemap lastmod 는 비운다 — 정본이 매일 바뀌어도 sitemap 골든이 흔들리지 않게.
+    _en_news_slugs = sorted(en_brief_slugs)
+    for _pg, _em, _tr, _lg, _slug in (
+            (page, emit, tr, "ko", latest_slug),
+            (en_page, en_emit, en_tr, "en", _en_news_slugs[-1] if _en_news_slugs else "")):
+        if _lg == "en" and not news_data:
+            continue
+        _np = _pg(news_page.ROUTE)
+        _em("news.html", _np,
+            page_title=_tr("최근 규제 소식 · GRM"),
+            nav_active="board",
+            description=_tr(NEWS_DESCRIPTION),
+            json_ld=_np.breadcrumb_json_ld([(_tr("홈"), "/"), (_tr("최근 규제 소식"), "")]),
+            news=news_page.build_view(news_data, _lg),
+            news_brief_slug=_slug,
+        )
+    if news_data:
+        facet_paths.append((news_page.ROUTE, ""))
 
     # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(임계 3 + 소스 소거 면제).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지

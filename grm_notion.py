@@ -449,12 +449,20 @@ def notion_query_existing_keys(token: str, db_id: str, run_date: date,
     return ExistingKeys(doc_ids=existing, url_keys=url_keys)
 
 
+# Notion API 한도: rich_text 배열은 최대 100 요소. 저장 단계 절단 금지 원칙의 유일한 예외이며,
+# 전문은 Supabase raw_json/row_json 에 그대로 남는다.
+NOTION_RICH_TEXT_MAX_ELEMENTS = 100
+# create/append 요청 하나가 받는 children 블록 최대 100개 (append 는 여유를 두고 90개씩).
+NOTION_CREATE_CHILDREN_MAX = 100
+NOTION_APPEND_BATCH = 90
+
+
 def _rich_text(text: str) -> list[dict[str, Any]]:
-    """Notion rich_text 배열로 분할 (각 element ≤ 2000자)."""
+    """Notion rich_text 배열로 분할 (각 element ≤ 2000자, 배열 ≤ 100 요소)."""
     if not text:
         return []
-    return [{"type": "text", "text": {"content": chunk}}
-            for chunk in chunk_text(text, NOTION_RICH_TEXT_CHUNK)]
+    chunks = chunk_text(text, NOTION_RICH_TEXT_CHUNK)[:NOTION_RICH_TEXT_MAX_ELEMENTS]
+    return [{"type": "text", "text": {"content": chunk}} for chunk in chunks]
 
 
 def _select(name: str) -> dict[str, Any]:
@@ -500,15 +508,15 @@ def build_notion_properties(item: IntakeItem, run_date: date,
     }
     prefix = _prefix_map.get(item.source, item.source)
     if item.source in (SOURCE_RECALL, SOURCE_FDA_WL):
-        name = f"{prefix} {item.document_id} — {truncate(item.firm or item.headline, 100)}"
+        name = f"{prefix} {item.document_id} — {item.firm or item.headline}"
     else:
-        name = f"{prefix} {item.document_id} — {truncate(item.headline, 100)}"
+        name = f"{prefix} {item.document_id} — {item.headline}"
 
     props: dict[str, Any] = {
         PROP_NAME: {"title": _rich_text(name)},
         PROP_SOURCE: _select(item.source),
         PROP_DOC_ID: {"rich_text": _rich_text(item.document_id)},
-        PROP_HEADLINE: {"rich_text": _rich_text(truncate(item.headline, NOTION_RICH_TEXT_CHUNK))},
+        PROP_HEADLINE: {"rich_text": _rich_text(item.headline)},
         PROP_COLLECTED_AT: _datetime_iso(collected_at),
         PROP_RUN_DATE: {"date": {"start": run_date.isoformat()}},
         PROP_QA_RELEVANCE: _select(item.qa_relevance),
@@ -548,11 +556,11 @@ def build_notion_properties(item: IntakeItem, run_date: date,
         # Select 옵션은 자동 생성됨
         props[PROP_TYPE_CLASS] = _select(item.type_or_class[:100])
     if item.firm:
-        props[PROP_FIRM] = {"rich_text": _rich_text(truncate(item.firm, NOTION_RICH_TEXT_CHUNK))}
+        props[PROP_FIRM] = {"rich_text": _rich_text(item.firm)}
     if item.body:
-        props[PROP_BODY] = {"rich_text": _rich_text(truncate(item.body, NOTION_RICH_TEXT_CHUNK))}
+        props[PROP_BODY] = {"rich_text": _rich_text(item.body)}
     if item.distribution:
-        props[PROP_DISTRIBUTION] = {"rich_text": _rich_text(truncate(item.distribution, NOTION_RICH_TEXT_CHUNK))}
+        props[PROP_DISTRIBUTION] = {"rich_text": _rich_text(item.distribution)}
     if item.comments_close_iso:
         d = _date_iso(item.comments_close_iso)
         if d:
@@ -569,11 +577,11 @@ def build_notion_properties(item: IntakeItem, run_date: date,
             props[PROP_SOURCE_URL] = u
     if item.raw_excerpt:
         props[PROP_RAW_EXCERPT] = {
-            "rich_text": _rich_text(truncate(item.raw_excerpt, 200))
+            "rich_text": _rich_text(item.raw_excerpt)
         }
     if item.search_query:
         props[PROP_SEARCH_QUERY] = {
-            "rich_text": _rich_text(truncate(item.search_query, NOTION_RICH_TEXT_CHUNK))
+            "rich_text": _rich_text(item.search_query)
         }
     if item.evidence_candidate:
         props[PROP_EVIDENCE_CANDIDATE] = _select(item.evidence_candidate)
@@ -582,7 +590,7 @@ def build_notion_properties(item: IntakeItem, run_date: date,
     if item.region_jurisdiction:
         props[PROP_REGION_JURISDICTION] = _select(item.region_jurisdiction)
     if item.site_country:
-        props[PROP_SITE_COUNTRY] = {"rich_text": _rich_text(truncate(item.site_country, NOTION_RICH_TEXT_CHUNK))}
+        props[PROP_SITE_COUNTRY] = {"rich_text": _rich_text(item.site_country)}
 
     return props
 
@@ -617,17 +625,41 @@ def build_raw_payload_children(raw_payload: dict[str, Any]) -> list[dict[str, An
     return blocks
 
 
+def _append_overflow_children(token: str, resp: Any, doc_id: str,
+                              children: list[dict[str, Any]]) -> None:
+    """페이지 생성 후 남은 블록을 90개씩 PATCH /blocks/{id}/children 로 덧붙인다.
+
+    페이지는 이미 만들어졌으므로 실패해도 예외를 올리지 않는다(재삽입 시 중복 방지).
+    """
+    try:
+        page_id = resp.json()["id"]
+    except (ValueError, KeyError, TypeError) as e:
+        log("ERROR", f"Notion 추가 블록 append 불가 — 페이지 id 없음 doc={doc_id} err={e}")
+        return
+    url = f"https://api.notion.com/v1/blocks/{page_id}/children"
+    for i in range(0, len(children), NOTION_APPEND_BATCH):
+        batch = children[i:i + NOTION_APPEND_BATCH]
+        try:
+            notion_api_request("PATCH", url, token, body={"children": batch})
+        except NotionHandoffError as e:
+            log("ERROR", f"Notion 추가 블록 append 실패 doc={doc_id} "
+                         f"batch={i // NOTION_APPEND_BATCH + 1} err={e}")
+            return
+
+
 def notion_create_page(token: str, db_id: str, item: IntakeItem,
                        run_date: date, collected_at: datetime,
                        retries: int = 2, *,
                        modality_enabled: bool | None = None) -> bool:
     """Notion 페이지 생성. 429/5xx 는 재시도, 4xx(429 제외)는 즉시 실패."""
+    all_children = build_notion_children(item)
     body = {
         "parent": {"database_id": db_id},
         "properties": build_notion_properties(item, run_date, collected_at,
                                               modality_enabled=modality_enabled),
-        "children": build_notion_children(item),
+        "children": all_children[:NOTION_CREATE_CHILDREN_MAX],
     }
+    overflow_children = all_children[NOTION_CREATE_CHILDREN_MAX:]
     # 재시도 불필요 상태 코드 (클라이언트 에러 — 재시도해도 동일 결과)
     _NO_RETRY_CODES = {400, 401, 403, 404, 409}
 
@@ -637,6 +669,9 @@ def notion_create_page(token: str, db_id: str, item: IntakeItem,
             resp = requests.post(NOTION_PAGES_URL, json=body,
                                  headers=notion_headers(token), timeout=30)
             if resp.status_code < 400:
+                if overflow_children:
+                    _append_overflow_children(token, resp, item.document_id,
+                                              overflow_children)
                 return True
             if resp.status_code in _NO_RETRY_CODES:
                 log("ERROR", f"Notion 페이지 생성 실패 ({resp.status_code}, 재시도 없음) "

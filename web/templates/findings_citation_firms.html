@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [FDA 지적 조항 × 업체 전체 목록 2026-11-10] /findings/citations/firms/ — 전 제조소 서버 렌더.
+    뷰 = citation_firms_page.list_view. 필터·검색은 인라인 스크립트가 행에 hidden 을 붙였다 뗄 뿐
+    (스크립트가 없으면 필터 막대는 숨은 채 전체 목록이 보인다). 수입경보 목록 화면과 같은 골격.
+    ★사실만 — 제조소·실사 수·인용 조항. 업체/조항 링크는 그 언어 트리에 선 페이지만. -#}
+<style>
+  .cf-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .cf-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .cf-crumb a:hover{color:var(--coral)}
+  .cf-crumb i{font-style:normal;color:var(--line-2)}
+  .cf-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .cf-sum{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);margin:14px 0 0;max-width:780px;word-break:keep-all}
+  .cf-note{font-family:var(--sans);font-size:13px;line-height:1.7;color:var(--muted);margin:8px 0 0;max-width:780px;word-break:keep-all}
+  .cf-bar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin:22px 0 0}
+  .cf-bar[hidden]{display:none}
+  .cf-bar select,.cf-bar input{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:7px 10px;min-width:0;max-width:100%}
+  .cf-bar input{flex:1 1 200px}
+  .cf-shown{font-family:var(--sans);font-size:13px;color:var(--muted);margin:12px 0 0}
+  .cf-shown b{color:var(--ink);font-weight:600}
+  .cf-wrapx{overflow-x:auto;margin:10px 0 0;border:1px solid var(--line-2);border-radius:var(--rad-s)}
+  .cf-tbl{border-collapse:collapse;width:100%;min-width:720px;font-family:var(--sans);font-size:13.5px}
+  .cf-tbl th,.cf-tbl td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .cf-tbl th{color:var(--muted);font-weight:500;font-size:12.5px;white-space:nowrap}
+  .cf-tbl td{color:var(--body)}
+  .cf-tbl td:first-child{color:var(--ink);overflow-wrap:anywhere}
+  .cf-tbl td a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--coral)}
+  .cf-tbl td a:hover{color:var(--coral)}
+  .cf-tbl td:nth-child(4),.cf-tbl td:nth-child(5){font-variant-numeric:tabular-nums;white-space:nowrap}
+  .cf-tbl td.cf-cd{font-size:12.5px;line-height:1.75}
+  .cf-cd span,.cf-cd a{white-space:nowrap}
+  .cf-cd sup{color:var(--muted);font-size:10.5px;margin-left:1px}
+  .cf-tbl tr[hidden]{display:none}
+  .cf-empty{font-family:var(--sans);font-size:14px;color:var(--muted);margin:14px 0 0}
+  .cf-empty[hidden]{display:none}
+  .cf-leg{font-family:var(--sans);font-size:13px;color:var(--muted);margin:18px 0 0}
+  .cf-leg summary{cursor:pointer}
+  .cf-leg dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;margin:10px 0 0}
+  .cf-leg dt{color:var(--ink);font-variant-numeric:tabular-nums}
+  .cf-leg dd{margin:0}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="cf-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/citations/">{{ _('FDA 지적 조항') }}</a><i>&rsaquo;</i><span>{{ _('조항별 지적 제조소') }}</span>
+    </nav>
+    <p class="kick">FDA &middot; 21 CFR</p>
+    <h1 class="cf-h1">{{ _('FDA 실사에서 조항 지적을 받은 제조소') }}</h1>
+    <p class="cf-sum">{{ _('{date} 확인 기준 · 제조소 {n}곳 · {c}개국', date=cf.as_of, n="{:,}".format(cf.total), c="{:,}".format(cf.n_countries)) }}</p>
+    <p class="cf-note">{{ _('FDA Data Dashboard 의 실사 지적(Inspections Citations)을 제조소별로 모았습니다. 조항 옆 작은 숫자는 그 조항이 지적된 실사 수입니다. 사실만 옮겼으며 평가나 해석은 싣지 않습니다.') }}</p>
+    <p class="cf-note">{{ _('GRM 업체 페이지와 확실히 같은 곳으로 확인된 제조소만 이름에 링크가 있습니다. 조항 코드의 짧은 제목은 표 아래에서 볼 수 있고, 조항 페이지가 있는 코드는 눌러서 이동할 수 있습니다.') }}</p>
+
+    <form class="cf-bar" id="cf-bar" role="search" hidden>
+      <label class="sr-only" for="cf-q">{{ _('업체명') }}</label>
+      <input id="cf-q" type="search" placeholder="{{ _('업체명으로 찾기') }}" autocomplete="off" spellcheck="false" />
+      <label class="sr-only" for="cf-k">{{ _('조항') }}</label>
+      <input id="cf-k" type="search" placeholder="{{ _('조항으로 찾기 (예: 211.192)') }}" autocomplete="off" spellcheck="false" />
+      <label class="sr-only" for="cf-c">{{ _('국가') }}</label>
+      <select id="cf-c">
+        <option value="">{{ _('모든 국가') }}</option>
+        {%- for c in cf.countries %}
+        <option value="{{ c.key }}">{{ c.label }} ({{ "{:,}".format(c.n) }})</option>
+        {%- endfor %}
+      </select>
+    </form>
+    <p class="cf-shown" id="cf-list">{{ _('조건에 맞는 곳') }} <b id="cf-shown">{{ "{:,}".format(cf.total) }}</b></p>
+    <div class="cf-wrapx"><table class="cf-tbl">
+      <thead><tr>
+        <th>{{ _('제조소') }}</th><th>{{ _('도시') }}</th><th>{{ _('국가') }}</th><th>{{ _('실사 수') }}</th><th>{{ _('최근 실사') }}</th><th>{{ _('지적된 조항') }}</th>
+      </tr></thead>
+      <tbody id="cf-rows">
+      {%- for r in cf.rows %}
+      <tr data-c="{{ r.country_key }}"><td>{% if r.slug %}<a href="{{ rel_root }}findings/firm/{{ r.slug }}/">{{ r.name }}</a>{% else %}{{ r.name }}{% endif %}</td><td>{{ r.place }}</td><td>{{ r.country_label }}</td><td>{{ r.inspections }}</td><td>{{ r.last }}</td><td class="cf-cd">{% for c in r.codes %}{% if c.href %}<a href="{{ rel_root }}findings/clause/{{ c.href }}/">{{ c.label }}</a>{% else %}<span>{{ c.label }}</span>{% endif %}{% if c.n > 1 %}<sup>{{ c.n }}</sup>{% endif %} {% endfor %}</td></tr>
+      {%- endfor %}
+      </tbody>
+    </table></div>
+    <p class="cf-empty" id="cf-empty" hidden>{{ _('조건에 맞는 제조소가 없습니다.') }}</p>
+    <details class="cf-leg">
+      <summary>{{ _('조항 코드 제목 ({n}개)', n="{:,}".format(cf.legend|length)) }}</summary>
+      <dl>{% for l in cf.legend %}<dt>{{ l.label }}</dt><dd lang="en">{{ l.title }}</dd>{% endfor %}</dl>
+    </details>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}<script>
+(function () {
+  var bar = document.getElementById("cf-bar");
+  var body = document.getElementById("cf-rows");
+  if (!bar || !body) return;
+  var q = document.getElementById("cf-q"), k = document.getElementById("cf-k"), c = document.getElementById("cf-c");
+  var shown = document.getElementById("cf-shown"), empty = document.getElementById("cf-empty");
+  var rows = Array.prototype.map.call(body.rows, function (tr) {
+    return { tr: tr, name: (tr.cells[0].textContent || "").toLowerCase(),
+             codes: (tr.cells[5].textContent || "").toLowerCase(), c: tr.getAttribute("data-c") };
+  });
+  function hasOpt(sel, v) {
+    for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === v) return true;
+    return false;
+  }
+  function apply() {
+    var term = (q.value || "").trim().toLowerCase();
+    var code = (k.value || "").trim().toLowerCase().replace(/^21\s*cfr\s*/, ""), n = 0;
+    rows.forEach(function (r) {
+      var ok = (!c.value || r.c === c.value) && (!term || r.name.indexOf(term) >= 0) &&
+               (!code || r.codes.indexOf(code) >= 0);
+      r.tr.hidden = !ok;
+      if (ok) n++;
+    });
+    shown.textContent = n.toLocaleString("en-US");
+    empty.hidden = n > 0;
+  }
+  var params = new URLSearchParams(location.search);
+  var pc = params.get("country") || "", pk = params.get("code") || "";
+  if (hasOpt(c, pc)) c.value = pc;
+  if (pk) k.value = pk;
+  [q, k, c].forEach(function (el) { el.addEventListener(el === c ? "change" : "input", apply); });
+  bar.addEventListener("submit", function (e) { e.preventDefault(); });
+  bar.hidden = false;
+  apply();
+})();
+</script>{% endblock %}

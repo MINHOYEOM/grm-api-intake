@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.304` |
+| 문서 버전 | `v1.306` |
 | 최종 수정일 | 2026-11-10 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -646,6 +646,7 @@ grm-api-intake/
 │  ├─ graph_export.py             # [지식 그래프 2026-11-04] 사이트 빌드 때 `graph/`(manifest·nodes-<유형>·edges-<rel> jsonl) 공개 정적 파일 생성 — 순수 함수·결정론, 개인정보 허용목록·끊긴 엣지/id 중복 가드(테스트 `web/tests/test_graph_export.py`)
 │  ├─ clause_citations_guard.py   # [지적 조항 월간 갱신 가드 2026-11-09] 급감 20%·스냅샷 검증·as_of 만 변경 시 무PR 판정(테스트 `web/tests/test_clause_citations_guard.py`)
 │  ├─ clause_firms_page.py        # [지적 조항 × 업체 2026-11-10] 업체 페이지 "FDA 실사에서 지적받은 21 CFR 조항"(조항별 실사 수·최근 실사일)·조항 페이지 "이 조항으로 FDA 실사 지적을 받은 업체"(상위 10곳+전체 수) 로더·매칭·뷰. 매칭 = 업체 정본 키(정규화+별칭) 일치 + 법인격 일치 + 같은 이름 두 나라 이상 제외. 스냅샷 없으면 두 블록 생략(테스트 `web/tests/test_clause_firms_page.py`)
+│  ├─ citation_firms_page.py      # [지적 조항 제조소 전체 목록 2026-11-10] `/findings/citations/firms/`(ko·en) — `data/fda_citation_firms.json` 전 제조소(FEI) 한 장 서버 렌더(제조소·도시·국가·실사 수·최근 실사일·지적 조항+횟수, 조항 코드 제목 범례). 국가·업체명·조항 필터는 인라인 스크립트. 업체 링크 = `clause_firms_page` 매칭 결과(그 언어 트리에 선 페이지만), 조항 링크 = 선 조항 페이지만. 템플릿 `findings_citation_firms.html`(테스트 `web/tests/test_citation_firms_page.py`)
 │  ├─ clause_citations.py         # [FDA 지적 조항 화면] 133 원장 집계(build_snapshot, 수동 CLI 또는 월간 `grm-fda-citations-snapshot.yml`)·조항 순위/섹션 뷰. 데이터 `data/fda_citations.json`, 화면 `/findings/citations/`(ko·en)+조항 페이지 블록(테스트 `web/tests/test_clause_citations.py`)
 │  ├─ growth_weekly.py            # [성장 2026-09-23] 주간 성장 리포트 — growth_weekly_report(089) JSON → 한국어 HTML → Brevo 트랜잭션 메일(운영자). 숫자는 로그에 안 찍는다(공개 저장소)
 │  ├─ approval_mail.py            # [결재 메일 11-02] 발행 PR(publish/brief-*) 체크 전부 success → 대표 메일함 1통(Brevo 트랜잭션·수신자 변수 1개·PR 표식 댓글로 중복 0)

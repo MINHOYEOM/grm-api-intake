@@ -1,0 +1,3077 @@
+{
+ "schema_version": "grm-web-card/v1",
+ "brief": {
+  "run_date_kst": "2026-11-11",
+  "window": "2026-11-04 ~ 2026-11-11",
+  "publish_date": "2026-11-11",
+  "agencies": [
+   "FDA",
+   "ECA",
+   "ISPE",
+   "EMA",
+   "MFDS"
+  ],
+  "categories": [
+   "Warning Letter",
+   "Other",
+   "Guidance"
+  ],
+  "tldr": [],
+  "coverage": {
+   "intake_total": 65,
+   "rendered": 43,
+   "evidence": {
+    "A": 26,
+    "B": 17,
+    "C": 0
+   }
+  },
+  "ai_disclosure": true
+ },
+ "cards": [
+  {
+   "id": "0f65bd3c5c70",
+   "render_order": 0,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Nanjing Hanxin Pharmaceutical Technology Co. Ltd.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "0f65bd3c5c70"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Nanjing Hanxin Pharmaceutical Technology Co. Ltd."
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 11/03/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/nanjing-hanxin-pharmaceutical-technology-co-ltd-734913-11032026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "7e7545ebb190",
+   "render_order": 1,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Chongqing Qiancan Technology Co., Ltd.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "7e7545ebb190"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Chongqing Qiancan Technology Co., Ltd."
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 10/29/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chongqing-qiancan-technology-co-ltd-736416-10292026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "bfbb158a522f",
+   "render_order": 2,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "USV Private Limited",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "bfbb158a522f"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "USV Private Limited"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 11/02/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 3,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
+      "citation": "21 CFR 211.113(b)"
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups. Your firm also failed to use equipment in the manufacture, processing, packing, or holding of drug products that is of appropriate design, adequate size, and suitably located to facilitate operations for its intended use and for its cleaning and maintenance. (21 CFR 211.42(c) and 21 CFR 211.63).",
+      "citation": "21 CFR 211.42(c) · 21 CFR 211.63"
+     },
+     {
+      "number": "3",
+      "statement": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)).",
+      "citation": "21 CFR 211.160(b)"
+     }
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/usv-private-limited-735938-11022026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "00ae76e635bb",
+   "render_order": 3,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "CGMP",
+   "headline_target": "Tianjin Healthcare Medical Technology Co., Ltd.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "00ae76e635bb"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Tianjin Healthcare Medical Technology Co., Ltd."
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 10/29/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/tianjin-healthcare-medical-technology-co-ltd-736415-10292026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "949016d08856",
+   "render_order": 4,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "FDA Warning Letter to US based Manufacturer: Sterile Manufac…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "949016d08856"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "FDA Warning Letter to US based Manufacturer: Sterile Manufacturing Failures"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-to-us-based-manufacturer-sterile-manufacturing-failures",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "dba4d011e02b",
+   "render_order": 5,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "FDA Cites Airflow, Aseptic Conditions and Visual Inspection…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "dba4d011e02b"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "FDA Cites Airflow, Aseptic Conditions and Visual Inspection at Korean Manufactur…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/fda-cites-airflow-aseptic-conditions-and-visual-inspection-at-korean-manufacturer",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "758874567fae",
+   "render_order": 6,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ISPE",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "Expanding the Pharmaceutical Quality Framework: Part 1 - Lev…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "758874567fae"
+    },
+    {
+     "label": "발행기관",
+     "value": "ISPE"
+    },
+    {
+     "label": "주제",
+     "value": "Expanding the Pharmaceutical Quality Framework: Part 1 - Leveraging AI-Derived I…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://ispe.org/pharmaceutical-engineering/ispeak-blogs/rss.xml",
+    "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/expanding-pharmaceutical-quality-framework-part-1-leveraging-ai",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "d73760194096",
+   "render_order": 7,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Artificial Intelligence in Medical Devices - The MHRA&#39;s…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "d73760194096"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Artificial Intelligence in Medical Devices - The MHRA&#39;s Perspective"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/artificial-intelligence-in-medical-devices-the-mhras-perspective",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "dcb74ff1d982",
+   "render_order": 8,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Proposals by the Notified Bodies to amend the Medical Device…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "dcb74ff1d982"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Proposals by the Notified Bodies to amend the Medical Devices Regulation"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/proposals-by-the-notified-bodies-to-amend-the-medical-devices-regulation",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-22865",
+   "render_order": 9,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Color Additive Petition From Environmental Defense Fund et a…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-22865"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Color Additive Petition From Environmental Defense Fund et al."
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA or we) is partially granting a color additive petition submitted by Environmental Defense Fund et al.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-11-04&conditions%5Bpublication_date%5D%5Blte%5D=2026-11-11&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/11/10/2026-22865/color-additive-petition-from-environmental-defense-fund-et-al-request-to-amend-the-color-additive",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-22866",
+   "render_order": 10,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Color Additive Petition From the International Association o…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-22866"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Color Additive Petition From the International Association of Color Manufacturer…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA or we) is partially granting a color additive petition submitted by the International Association of Color Manufacturers (IACM or petitioner), by amending our color additive regulations, on the basis of abandonme…",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-11-04&conditions%5Bpublication_date%5D%5Blte%5D=2026-11-11&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/11/10/2026-22866/color-additive-petition-from-the-international-association-of-color-manufacturers-request-to-amend",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2026-22883",
+   "render_order": 11,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "지침·안내서",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Guidance",
+   "headline_target": "Validation of Certain In Vitro Diagnostic Devices for Emergi…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "2026-22883"
+    },
+    {
+     "label": "발행기관",
+     "value": "FDA"
+    },
+    {
+     "label": "주제",
+     "value": "Validation of Certain In Vitro Diagnostic Devices for Emerging Pathogens During…"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The Food and Drug Administration (FDA or Agency) is announcing the availability of a final guidance titled \"Validation of Certain In Vitro Diagnostic Devices for Emerging Pathogens During a Section 564 Declared Emergency.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-11-04&conditions%5Bpublication_date%5D%5Blte%5D=2026-11-11&per_page=100&order=newest",
+    "official_url": "https://www.federalregister.gov/documents/2026/11/10/2026-22883/validation-of-certain-in-vitro-diagnostic-devices-for-emerging-pathogens-during-a-section-564",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "07a3a718b700",
+   "render_order": 12,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Cross-Contamination: The Particular Risk Posed by Beta-Lacta…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "07a3a718b700"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Cross-Contamination: The Particular Risk Posed by Beta-Lactam Antibiotics"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/cross-contamination-the-particular-risk-posed-by-beta-lactam-antibiotics",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "7fa722915a01",
+   "render_order": 13,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "FDA Updates how it Evaluates and Inspects Human Drug Facilit…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "7fa722915a01"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "FDA Updates how it Evaluates and Inspects Human Drug Facilities"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/fda-updates-how-it-evaluates-and-inspects-human-drug-facilities",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "aac9e26b10ce",
+   "render_order": 14,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "EMA Procedural Advice Updates: Centralised Procedure",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "aac9e26b10ce"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "EMA Procedural Advice Updates: Centralised Procedure"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/ema-procedural-advice-updates-centralised-procedure",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "c5c74bf4bb6e",
+   "render_order": 15,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Single-Temperature Incubation in Ambient Monitoring – Is it…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "c5c74bf4bb6e"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Single-Temperature Incubation in Ambient Monitoring – Is it Permissible and Advi…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/single-temperature-incubation-in-ambient-monitoring-is-it-permissible-and-advisable",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "cc5a05fe4dae",
+   "render_order": 16,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Revision of USP Chapter <1033> on the Validation of Bioassay…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "cc5a05fe4dae"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Revision of USP Chapter <1033> on the Validation of Bioassays"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/revision-of-usp-chapter-1033-on-the-validation-of-bioassays",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "2e33f5284e4d",
+   "render_order": 17,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "EMA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "규제 소식",
+   "headline_target": "Draft guideline on predictive biomarker assays in the contex…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "2e33f5284e4d"
+    },
+    {
+     "label": "발행기관",
+     "value": "EMA"
+    },
+    {
+     "label": "주제",
+     "value": "Draft guideline on predictive biomarker assays in the context of medicinal produ…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.ema.europa.eu/en/scientific-guidelines.xml",
+    "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-predictive-biomarker-assays-context-medicinal-product-lifecycle_en.pdf",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "57304bd6c641",
+   "render_order": 18,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "EMA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "규제 소식",
+   "headline_target": "Draft guideline on risk assessment of medicinal products in…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "57304bd6c641"
+    },
+    {
+     "label": "발행기관",
+     "value": "EMA"
+    },
+    {
+     "label": "주제",
+     "value": "Draft guideline on risk assessment of medicinal products in human reproduction a…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.ema.europa.eu/en/scientific-guidelines.xml",
+    "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-risk-assessment-medicinal-products-human-reproduction-breastfeeding-data-product-information-revision-1_en.pdf",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "69eed1c9ebe1",
+   "render_order": 19,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "EMA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "규제 소식",
+   "headline_target": "Pharmacovigilance-related regulatory recommendations for cen…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "69eed1c9ebe1"
+    },
+    {
+     "label": "발행기관",
+     "value": "EMA"
+    },
+    {
+     "label": "주제",
+     "value": "Pharmacovigilance-related regulatory recommendations for centrally authorised ve…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.ema.europa.eu/en/regulatory-and-procedural-guideline.xml",
+    "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/pharmacovigilance-related-regulatory-recommendations-centrally-authorised-veterinary-medicinal-products-during-2026_en.pdf",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q73JiEyrIf",
+   "render_order": 20,
+   "group": "국내",
+   "group_label": "GMP실사",
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "GMP실사",
+   "headline_target": "ABIOGEN PHARMA S.p.A",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q73JiEyrIf"
+    },
+    {
+     "label": "제조소",
+     "value": "ABIOGEN PHARMA S.p.A"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-05-19~2026-05-21"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 있음 분야1) 구분2) 근거 법령 지적(보완)사항 요약 비고 시험실 기타 [별표 1] 제7.1호 배지에 대한 관리상황을 적절히 기록할 것 시험실 기타 [별표 1] 제7.1호 시험 판정에 대한 데이터 완전성 보완 대책 등을 마련할 것 시설장비 기타 [별표 1] 제2.1호 제조설비의 운전 적격성평가를 적절히 수행할 것 1) GMP 감시 분야(6개): 품질, 시설장비, 제조, 시험실, 원자재, 포…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 3,
+    "severity_summary": {
+     "기타": 3
+    },
+    "rows": [
+     {
+      "area": "시험실",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제7.1호",
+      "summary": "배지에 대한 관리상황을 적절히 기록할 것",
+      "followup": ""
+     },
+     {
+      "area": "시험실",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제7.1호",
+      "summary": "시험 판정에 대한 데이터 완전성 보완 대책 등을 마련할 것",
+      "followup": ""
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제2.1호",
+      "summary": "제조설비의 운전 적격성평가를 적절히 수행할 것",
+      "followup": ""
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q73JiEyrIf",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q73JiEyqbl",
+   "render_order": 21,
+   "group": "국내",
+   "group_label": "GMP실사",
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Cosma S.P.A",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q73JiEyqbl"
+    },
+    {
+     "label": "제조소",
+     "value": "Cosma S.P.A"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-05-12~2026-05-14"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제조방법 비고 비무균-일반제제-합성 원료",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q73JiEyqbl",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q73JiEyrFI",
+   "render_order": 22,
+   "group": "국내",
+   "group_label": "GMP실사",
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Shilpa Pharma Lifesciences Limited Unit-2",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q73JiEyrFI"
+    },
+    {
+     "label": "제조소",
+     "value": "Shilpa Pharma Lifesciences Limited Unit-2"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-05-19~2026-05-21"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제조방법 비고 비무균-세포독성항암제제-합성 원료",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q73JiEyrFI",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q73JiEyrUH",
+   "render_order": 23,
+   "group": "국내",
+   "group_label": "GMP실사",
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "Intas Pharmaceuticals Ltd.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q73JiEyrUH"
+    },
+    {
+     "label": "제조소",
+     "value": "Intas Pharmaceuticals Ltd."
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-05-19~2026-05-21"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 무균-세포독성항암제제-주사제 완제",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q73JiEyrUH",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q73uE9xd4-",
+   "render_order": 24,
+   "group": "국내",
+   "group_label": "GMP실사",
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "A. Menarini Manufacturing Logistics and Services s.r.l.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q73uE9xd4-"
+    },
+    {
+     "label": "제조소",
+     "value": "A. Menarini Manufacturing Logistics and Services s.r.l."
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-05-12~2026-05-14"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 무균-일반제제-주사제 완제",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q73uE9xd4-",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026007935",
+   "render_order": 25,
+   "group": "국내",
+   "group_label": "행정처분",
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "제이더블유중외제약(주)",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026007935"
+    },
+    {
+     "label": "업체",
+     "value": "제이더블유중외제약(주)"
+    },
+    {
+     "label": "처분",
+     "value": "해당 임상시험 업무정지 1개월(2026.11.9.~2026.12.8.), 1차"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "① 기준서 미준수 ② 임상시험용의약품 제조 및 품질관리기준 위반",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026007935",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026007955",
+   "render_order": 26,
+   "group": "국내",
+   "group_label": "행정처분",
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "(주)안트로젠",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026007955"
+    },
+    {
+     "label": "업체",
+     "value": "(주)안트로젠"
+    },
+    {
+     "label": "처분",
+     "value": "해당 임상시험 업무정지 1개월(2026.11.9.~2026.12.8.), 1차"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "① 임상시험계획 변경 미보고 및 지연 보고\n② 임상시험용 의약품 표시기재 위반\n③ 임상시험 품질보증 및 임상시험자료 품질관리 위반",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026007955",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026007975",
+   "render_order": 27,
+   "group": "국내",
+   "group_label": "행정처분",
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "재단법인아산사회복지재단서울아산병원",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-09"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026007975"
+    },
+    {
+     "label": "업체",
+     "value": "재단법인아산사회복지재단서울아산병원"
+    },
+    {
+     "label": "처분",
+     "value": "해당 품목 임상시험 업무정지 3개월(2026.11.9.~2027.2.8.)과 임상시험 책임자 변경(1차) "
+    }
+   ],
+   "quotes": [
+    {
+     "original": "임상시험 대상자의 동의 절차 위반",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026007975",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026008055",
+   "render_order": 28,
+   "group": "국내",
+   "group_label": "행정처분",
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "행정처분",
+   "headline_target": "비오신코리아(주)",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-10"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026008055"
+    },
+    {
+     "label": "업체",
+     "value": "비오신코리아(주)"
+    },
+    {
+     "label": "처분",
+     "value": "○ 해당 품목* 판매업무정지 10일(2026. 11. 24. ~ 2026. 12. 3.)\n * 해당 품목: 셀레나제티프로주사(품목기준코드: 200610824)\n ※ 보고기한이 지난 날부터 1개월 이내 공급내역을 보고한 경우로 Ⅰ. 일반기준 제12호 하목에 따라 감경"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "○ 의약품 공급내역 기한 내 미보고\n- 의약품공급자는 ｢약사법｣ 제47조의3제2항 및 같은 법 시행규칙 제45조에 따라 완제의약품을 공급하는 경우 제품을 출하할 때 의약품관리종합정보센터의 장에게 보고하여야 하나, 동 업체는 2026년 1분기‘셀레나제티프로주사’의 공급내역을 기한 내* 보고하지 아니한 사실이 있음\n    * 출하일자: 2026. 2. 11., 보고일자: 2026. 2. 13.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026008055",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0073-2027",
+   "render_order": 30,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "The Ritedose Corporation",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0073-2027"
+    },
+    {
+     "label": "업체",
+     "value": "The Ritedose Corporation"
+    },
+    {
+     "label": "제품",
+     "value": "Formoterol Fumarate Inhalation Solution, 20mcg/2mL, packaged in cartons of 30 in…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Failed Impurities/Degradation Specification",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "3210 Cartons",
+    "distribution": "Nationwide within the U.S",
+    "code_info": "Lot: 25BL0, Expires: 02/28/2027",
+    "firm_location": "Columbia, SC, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-15"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-23"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "FORMOTEROL FUMARATE INHALATION SOLUTION"
+     },
+     {
+      "label": "성분명",
+      "value": "FORMOTEROL FUMARATE DIHYDRATE"
+     },
+     {
+      "label": "주성분",
+      "value": "FORMOTEROL FUMARATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "RESPIRATORY (INHALATION)"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA216486"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0074-2027",
+   "render_order": 31,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Glenmark Pharmaceuticals Inc., USA",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0074-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Glenmark Pharmaceuticals Inc., USA"
+    },
+    {
+     "label": "제품",
+     "value": "Abiraterone Acetate Tablets USP 500 mg, 60-count bottles, Rx only, Distributed b…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Labeling: Not Elsewhere Classified",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "quantity": "1296 bottles",
+    "distribution": "Nationwide within the United States",
+    "code_info": "Lot #: 13250135, Exp. Date 11/2027",
+    "firm_location": "Elmwood Park, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-09"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-23"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "ABIRATERONE ACETATE"
+     },
+     {
+      "label": "성분명",
+      "value": "ABIRATERONE ACETATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA209227"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0075-2027",
+   "render_order": 32,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Safecor Health, LLC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0075-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Safecor Health, LLC"
+    },
+    {
+     "label": "제품",
+     "value": "Metoclopramide Tablets, USP, 5 mg, 100 Tablets per bottle, Rx Only, Manufactured…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Manufacturer is recalling batches due to co-mingled tablet.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "E-Mail",
+    "notification_ko": "이메일",
+    "distribution": "US Nationwide",
+    "code_info": "Lot # 3116509, Expiry: 07/31/2027.",
+    "firm_location": "Rockford, IL, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-06"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-23"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "METOCLOPRAMIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "METOCLOPRAMIDE"
+     },
+     {
+      "label": "주성분",
+      "value": "METOCLOPRAMIDE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA072801"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0077-2027",
+   "render_order": 33,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "MACLEODS PHARMA USA, INC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0077-2027"
+    },
+    {
+     "label": "업체",
+     "value": "MACLEODS PHARMA USA, INC"
+    },
+    {
+     "label": "제품",
+     "value": "Olmesartan Medoxomil, Amlodipine, and Hydrochlorothiazide Tablets 40 mg/10 mg/12…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Failed Dissolution Specifications.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "3528 30-count and 216 90-count bottles",
+    "distribution": "Nationwide in the USA",
+    "code_info": "Lot #: a) 12251163A, Exp 05-31-2027; b) 12251163B, Exp 05-31-2027",
+    "firm_location": "Princeton, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-07"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-26"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "OLMESARTAN MEDOXOMIL AMLODIPINE AND HYDROCHLOROTHIAZIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "OLMESARTAN MEDOXOMIL AMLODIPINE AND HYDROCHLOROTHIAZIDE"
+     },
+     {
+      "label": "주성분",
+      "value": "OLMESARTAN MEDOXOMIL, AMLODIPINE BESYLATE, HYDROCHLOROTHIAZIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA207088"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0080-2027",
+   "render_order": 34,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Huons Co., Ltd.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0080-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Huons Co., Ltd."
+    },
+    {
+     "label": "제품",
+     "value": "Carboxymethylcellulose Sodium, 0.5% Lubricant Eye Drops, Sterile, 30 Single-Use…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Failed Impurities/Degradation Specification; detection of polyethylene (PE)-related oligomers",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Two or more of the following: Email, Fax, Letter, Press Release, Telephone, Visit",
+    "notification_ko": "2가지 이상 병행",
+    "quantity": "6,633,570 tubes",
+    "distribution": "Nationwide within U.S.",
+    "code_info": "Lot: 2EQH501, Exp. 3/12/2027; 2EQH502, 2EQH503, 2EQH504, 2EQH505, Exp. 3/16/2027; 2EQH506, 2EQH507, Exp. 5/22/2027; 2EQH508, Exp. 5/26/2027; 2EQH509, Exp. 5/27/2027; 2EQH510, 2EQH511, 2EQH512, 2EQH513, Exp. 10/13/2028.",
+    "firm_location": "Jecheon, Korea (the Republic of)",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-02"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-26"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0085-2027",
+   "render_order": 35,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "ABC Compounding Co., Inc.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0085-2027"
+    },
+    {
+     "label": "업체",
+     "value": "ABC Compounding Co., Inc."
+    },
+    {
+     "label": "제품",
+     "value": "Palm Antiseptic Hand Soap Net Contents: 1 Gallon (3.8 L). Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808196498 외 18품목"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "quantity": "9220 bottles",
+    "distribution": "US Nationwide",
+    "code_info": "9220 bottles",
+    "firm_location": "Conyers, GA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-09-22"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-27"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 19,
+   "merged_items": [
+    "Palm Antiseptic Hand Soap Net Contents: 1 Gallon (3.8 L). Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808196498",
+    "Aerocare Sani Mango Antiseptic Hand and Body Wash, Net Contents: 1 Gallon (3.8 L), Manufactured By: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA 33013, UPC 711808198249",
+    "Aero Foamy Mango Aloe Vera Antiseptic Hand & Body Wash, Net Contents: 1 Gallon (3.8 L), Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, 30013, UPC 711808198393",
+    "Certus Medical Satin Foam, 750 ml (25.4 fl. oz.), Manufactured for: Cartus Medical, 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808250930",
+    "Freshhands Premium Foamy Antibacterial Hand Soap Antiseptic, Net Contents: 18 oz (532 mL), Sold By; Consolidated Chemicals, LLC, 3191 W Tharpe St. Tallahassee, FL 32303 USA, UPC",
+    "Delta Foremost Sani-Foam Mango, Net Contents: 1000 ML, 33.8 FL OZ, Manufactured Expressly For: Delta Foremost Chemical Corp., 3915 Air Park Street, Memphis, TN 38118,",
+    "Antiseptic Hand Soap, Net Contents: 1 Gallon (3.8 L) Distributed By: image supply, inc., P.O. Box 1108, 5081 Dawn Drive, Lumberton, NC28359",
+    "Lynx, LX0864 peachy-foam antiseptic handsoap, 1000 ML (33.8 FL OZ.) Manufactured by: ABC Compounding Co., INC., 2500 Dogwood Dr., Conyers, GA 30013, UPC 711808210804.",
+    "Lynx, antibacterial hand soap, Net Contents 1 Gallon, (3.8 L), Manufactured by: ABC Compounding Co., INC., 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808199925.",
+    "Lynx, antibacterial hand soap, Refill, Net Contents 1 Gallon, (3.8 L), Manufactured by: ABC Compounding Co., INC., 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808200027.",
+    "Handtastic Foamy Mango Antiseptic Foam Soap Hand & Body Wash, Net Contents : 18oz (532ml), Sold by, Momar Incorporated, 1880 Ellsworth Industrial Drive, N.W., Atlanta, Georgia, 80818.",
+    "People's FM-24 FOAMING High Foaming Antiseptic Hand and Body Wash, NET CONTENTS: 1000 ML 33.8 FL OZ, Distributed by: People's Janitorial Supply, 955 Main Street, Forest Park, GA  30298, 404-363-2226.",
+    "PRO CHEM Fresh Start, Antibacterial Hand Soap, Antiseptic Hand Soap, 800mL bag, Sold by: PRO CHEM, Inc.,1475 Bluegrass Lakes Parkway, Alpharetta, GA 30064.",
+    "PRO CHEM BAN AID, Antiseptic Hand Soap, Net Contents: 1 GALLON (3.8 L), Sold by: PRO CHEM, Inc.,1475 Bluegrass Lakes Parkway, Alpharetta, GA 30004.",
+    "Pro Chem Suds Hand Soap, Net Contents: 18 OZ (532 ml), Sold by Pro Chem Inc., 1475 Bluegrass Lakes Parkway, Alpharetta, GA 30004",
+    "Chemseptic, Net Contents: 1 Gallon (3.8 L), Distributed By: RMC Rochester Midland Corporation, 155 Paragon Drive, Rochester, NY 14624 USA, Made in USA",
+    "Spurrier, Antimicrobial Hand Soap, Net Contents: 1 Gallon (3.8 L), Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA, 30013, UPC 726133100508",
+    "SunCoast Paper Inc. Surgent Antiseptic Hand Soap, Net Contents : 1 Gallon (3.8 L), SunCoast Paper In., 4111 Community Rd., Brunswick, GA 31520, UPC 654441P10219",
+    "Wechem Hand Guard8/1000mL Bag, Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA, 30013"
+   ],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0104-2027",
+   "render_order": 36,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Fei Fah Medical Manufacturing Pte. Ltd.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0104-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Fei Fah Medical Manufacturing Pte. Ltd."
+    },
+    {
+     "label": "제품",
+     "value": "ULTRA STRENTGH, ELECTRIC MIDICATED BALM (menthol 16% and methyl salicylate 32%)…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "171,120 units",
+    "distribution": "Nationwide within the U.S",
+    "code_info": "Lot: a)23FEBU7001-019, Exp. Date: October 2028; 24FEBU7001-020, Exp. Date: November 2029. b) 23FEBU1001-9, Exp. Date: October 2028; 24FEBU1001-004, Exp. Date: November 2029.",
+    "firm_location": "Singapore, Singapore",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-23"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-27"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "MENTHOL AND METHYL SALICYLATE"
+     },
+     {
+      "label": "성분명",
+      "value": "ELECTRIC MEDICATED BALM ULTRA STRENGTH"
+     },
+     {
+      "label": "주성분",
+      "value": "MENTHOL, METHYL SALICYLATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "M017"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0105-2027",
+   "render_order": 37,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Eagle Pharma Outsourcing LLC PHENYLephrine HCL Infusion, 100…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0105-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Eagle Pharma Outsourcing LLC"
+    },
+    {
+     "label": "제품",
+     "value": "PHENYLephrine HCL Infusion, 100 mg per 250 mL in 0.9% Sodium Chloride (0.4 mg/mL), Sterile, Rx Only, Single-Use Container, EAGLE PHARMA OUTSOURCING, 2200 Riverchase Center, Suite 675, Hoover, AL 35244, UPC: 6985210025. NDC 69852-100-25 외 1품목"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Lack of Assurance of Sterility",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "E-Mail",
+    "notification_ko": "이메일",
+    "quantity": "50 250 mL-containers",
+    "distribution": "Nationwide within the U.S",
+    "code_info": "Lot: PHENYL100-1004, Expiry: 12/31/2026.",
+    "firm_location": "Hoover, AL, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-08"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-28"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 2,
+   "merged_items": [
+    "PHENYLephrine HCL Infusion, 100 mg per 250 mL in 0.9% Sodium Chloride (0.4 mg/mL), Sterile, Rx Only, Single-Use Container, EAGLE PHARMA OUTSOURCING, 2200 Riverchase Center, Suite 675, Hoover, AL 35244, UPC: 6985210025. NDC 69852-100-25",
+    "OXYTOCIN, 30 USP UNITS, Added to 0.9% Sodium Chloride 500 mL - Single-Use Container, Rx Only, EAGLE PHARMA OUTSOURCING, 2200 Riverchase Center, Suite 675, Hoover, AL 35244, UPC: 6985203050. NDC 69852-030-50"
+   ],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0107-2027",
+   "render_order": 38,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Direct Rx",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0107-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Direct Rx"
+    },
+    {
+     "label": "제품",
+     "value": "Lidocaine Ointment USP, 5.0 % 50g JAR, Rx only, Packaged and Distributed by: Dir…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Subpotent Drug",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "493 jars",
+    "distribution": "Nationwide within the United States",
+    "code_info": "LOT#: 03AP2511, 30AP2518, 18JU2519, 18JU2520, Exp. Date 04/30/2027.",
+    "firm_location": "Dawsonville, GA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-09-29"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-29"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0108-2027",
+   "render_order": 39,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Meitheal Pharmaceuticals, Inc Vecuronium Bromide for Injecti…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0108-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Meitheal Pharmaceuticals, Inc"
+    },
+    {
+     "label": "제품",
+     "value": "Vecuronium Bromide for Injection, 10mg, 10 Single-Dose Vials per carton, Sterile, Rx Only, Mfd. for Meitheal Pharmaceuticals, Chicago, IL.  NDC: 71288-744-11 외 1품목"
+    },
+    {
+     "label": "Class",
+     "value": "Class III"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Labeling: Label Lacks Warning or Rx Legend",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "121,800 vials",
+    "distribution": "US. Nationwide",
+    "code_info": "Lot# T1P0213A: Exp.  30-Apr-29  Lot# T1P0313A: Exp.  30-Apr-29  Lot# T1P0412A: Exp. 30-Sep-28  Lot# T1P0413A: Exp. 30-Apr-29  Lot# T1P0512A: Exp.  30-Sep-28  Lot# T1P0513A: Exp.  30-Apr-29",
+    "firm_location": "Chicago, IL, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-08"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-29"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "VECURONIUM BROMIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "VECURONIUM BROMIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "INTRAVENOUS"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA074688"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 2,
+   "merged_items": [
+    "Vecuronium Bromide for Injection, 10mg, 10 Single-Dose Vials per carton, Sterile, Rx Only, Mfd. for Meitheal Pharmaceuticals, Chicago, IL.  NDC: 71288-744-11",
+    "Vecuronium Bromide for Injection, 20mg, 10 Single-Dose Vials per carton, Sterile, Rx Only, Mfd. for Meitheal Pharmaceuticals, Chicago, IL.  NDC: 71288-745-21"
+   ],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0110-2027",
+   "render_order": 40,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Brandywine Pharmaceuticals, LLC Theophylline Extended-Releas…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0110-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Brandywine Pharmaceuticals, LLC"
+    },
+    {
+     "label": "제품",
+     "value": "Theophylline Extended-Release Tablets, 100 mg, Rx Only, 100-count bottle, Distributed by: Brandywine Pharmaceuticals, LLC, West Chester, PA 19382, NDC: 71321-500-10 외 1품목"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "CGMP Deviations: interruption in the ongoing stability testing program conducted at a third-party laboratory",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Two or more of the following: Email, Fax, Letter, Press Release, Telephone, Visit",
+    "notification_ko": "2가지 이상 병행",
+    "quantity": "1,620 100-count bottles",
+    "distribution": "Nationwide within U.S",
+    "code_info": "Lot: 405617, Expiry: 03/31/2028",
+    "firm_location": "West Chester, PA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-06"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-29"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 2,
+   "merged_items": [
+    "Theophylline Extended-Release Tablets, 100 mg, Rx Only, 100-count bottle, Distributed by: Brandywine Pharmaceuticals, LLC, West Chester, PA 19382, NDC: 71321-500-10",
+    "Theophylline Extended-Release Tablets, 200 mg, Rx Only, 100-count bottle, Distributed by: Brandywine Pharmaceuticals, LLC, West Chester, PA 19382, NDC: 71321-501-10."
+   ],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0113-2027",
+   "render_order": 41,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "MSN Laboratories Private Limited (Formulations Division, Uni…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0113-2027"
+    },
+    {
+     "label": "업체",
+     "value": "MSN Laboratories Private Limited (Formulations Division, Unit-II)"
+    },
+    {
+     "label": "제품",
+     "value": "Atorvastatin Calcium Tablets, USP, 40mg, 1000 tablets per bottle, Rx only, Manuf…"
+    },
+    {
+     "label": "Class",
+     "value": "Class II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Presence of Foreign Tablets/Capsules",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "13,296 1,000-count bottles",
+    "distribution": "Nationwide in the USA.",
+    "code_info": "Lot: DRF09618A, Exp 08-31-2029, DRG02110A, Exp 01-31-2030.",
+    "firm_location": "Rangareddy District, India",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-21"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-29"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "ATORVASTATIN CALCIUM"
+     },
+     {
+      "label": "성분명",
+      "value": "ATORVASTATIN CALCIUM"
+     },
+     {
+      "label": "주성분",
+      "value": "ATORVASTATIN CALCIUM TRIHYDRATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA211933"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "D-0081-2027",
+   "render_order": 42,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Recall",
+   "headline_target": "Prodose, Inc.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "D-0081-2027"
+    },
+    {
+     "label": "업체",
+     "value": "Prodose, Inc."
+    },
+    {
+     "label": "제품",
+     "value": "ValuHealth Extra Strength Pain Relief Acetaminophen 500 mg, 40-caplets per bottl…"
+    },
+    {
+     "label": "Class",
+     "value": "Class III"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Incorrect label placed on product: Outer carton label correctly identifies drug product in bottle as ValuHealth Extra Strength Pain Relief Acetaminophen 500 mg,but inner label on bottle says ValuHealth Extra Strength Pain Relief PM",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "100,134 40-count bottles",
+    "distribution": "Nationwide in the USA",
+    "code_info": "Lot #: P260252, Exp 4/30/2029",
+    "firm_location": "Ronkonkoma, NY, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-14"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-10-26"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-fb-1037817d7ef0b173",
+   "render_order": 43,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "FDA",
+   "card_type": "Recall",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "Recall",
+   "headline_target": "Trifluent Pharma LLC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-04"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-fb-1037817d7ef0b173"
+    },
+    {
+     "label": "업체",
+     "value": "Trifluent Pharma LLC"
+    },
+    {
+     "label": "제품",
+     "value": "Tridacaine III / Lidocaine Patch 5%, 15 envelopes containing 1 patch each per po…"
+    },
+    {
+     "label": "Class",
+     "value": "Not Yet Classified"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Labeling: Incorrect or Missing Lot and/or Exp Date.",
+     "translation": ""
+    },
+    {
+     "original": "Incorrect expiration date printed on the label.",
+     "translation": ""
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Telephone",
+    "notification_ko": "전화",
+    "quantity": "68 pouches",
+    "distribution": "US",
+    "code_info": "Lot #: L2606225A, Exp. Date 06/22/2029.",
+    "firm_location": "San Antonio, TX, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-10-16"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-11-04"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "TRIDACAINE III"
+     },
+     {
+      "label": "성분명",
+      "value": "LIDOCAINE"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA209190"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://api.fda.gov/drug/enforcement.json?search=report_date:[20261012+TO+20261111]&limit=100&skip=0",
+    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  }
+ ]
+}

@@ -341,6 +341,21 @@ def dump_texts(doc_ids: list[str], out_dir: str, *,
     return rows
 
 
+def _def_key(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", (text or "").lower())[:80]
+
+
+def _keeps_old_deficiencies(old: list[dict[str, Any]], new: list[dict[str, Any]]) -> bool:
+    """기존 관찰의 표제(앞 80 영숫자)가 새 관찰 표제에 모두 남아 있는가(순수 함수).
+    옛 표제가 짧게 잘린 경우("…" 절단)는 새 표제의 앞부분이면 같은 것으로 본다."""
+    new_keys = [_def_key(str(o.get("deficiency") or "")) for o in new]
+    for o in old:
+        k = _def_key(str(o.get("deficiency") or ""))
+        if k and not any(n == k or (min(len(n), len(k)) >= 20 and (n.startswith(k) or k.startswith(n))) for n in new_keys):
+            return False
+    return True
+
+
 _OBS_HEAD_RE = re.compile(r"(?i)\bOBSERVATION\s*#?\s*(\d{1,3})\b")
 
 
@@ -379,17 +394,37 @@ def scan_mixed_pdfs(rows: list[dict[str, Any]], *, delay_seconds: float = 0.3,
             failed += 1
             continue
         heads = [int(m.group(1)) for m in _OBS_HEAD_RE.finditer(layer)]
-        docs.append({"doc": str(r.get("document_id") or ""), "pages": pages, "unread_pages": unread,
-                     "layer_max_obs": max(heads) if heads else 0,
-                     "stored_obs": len(raw.get("fda_483_observations") or [])})
+        # [11-12 보강] 문서 전체 텍스트층이 이미 OCR 경로(_needs_ocr 의 엔진 무관 조건)에 들면 수집 때
+        # 쪽 단위 OCR 을 **이미 했다** — 그 문서의 이미지 쪽은 누락이 아니다. 첫 실행(43090296882)은
+        # 이걸 가르지 않아 전면 스캔본까지 547건에 섞였다. 누락 후보 = 섞임 + OCR 경로를 건너뛴 문서.
+        bp = c._repeated_lines(layer.splitlines())
+        ocr_path = (not layer.strip()) or c._is_notice_only(layer) or not c._is_substantive_text(layer, bp)
+        # 텍스트층에서 관찰이 0건이면 수집기가 전면 OCR 폴백(_full_ocr_fallback)을 이미 탔다 — 역시 누락 아님.
+        if not ocr_path and not c._extract_483_observations_from_text(layer):
+            ocr_path = True
+        stored = len(raw.get("fda_483_observations") or [])
+        d = {"doc": str(r.get("document_id") or ""), "pages": pages, "unread_pages": unread,
+             "layer_max_obs": max(heads) if heads else 0, "stored_obs": stored,
+             "ocr_path": ocr_path}
+        docs.append(d)
+        if unread and not ocr_path:
+            # 아티팩트 업로드가 실패해도 목록이 남게 로그에 한 줄씩(43090296882 — CreateArtifact 오류).
+            print(f"MIXED {d['doc']} pages={pages} unread={unread} layer_max_obs={d['layer_max_obs']} "
+                  f"stored_obs={stored}", flush=True)
     mixed = [d for d in docs if d["unread_pages"] > 0]
+    gap = [d for d in mixed if not d["ocr_path"]]
     return {
         "scanned": len(docs), "failed": failed,
         "mixed_docs": len(mixed),
+        "mixed_already_ocr_path": len(mixed) - len(gap),
+        "gap_docs": len(gap),
+        "gap_unread_pages": sum(d["unread_pages"] for d in gap),
+        "gap_with_stored_obs": sum(1 for d in gap if d["stored_obs"] > 0),
+        "gap_without_stored_obs": sum(1 for d in gap if d["stored_obs"] == 0),
         "mixed_with_stored_obs": sum(1 for d in mixed if d["stored_obs"] > 0),
         "mixed_without_stored_obs": sum(1 for d in mixed if d["stored_obs"] == 0),
         "unread_pages_total": sum(d["unread_pages"] for d in mixed),
-        "mixed": sorted(mixed, key=lambda d: -d["unread_pages"]),
+        "mixed": sorted(gap, key=lambda d: -d["unread_pages"]),
     }
 
 
@@ -817,6 +852,13 @@ def run(
             # 다시 읽어도 관찰이 늘지 않는다 — 기존 행(다시 읽기로 다듬은 상세 포함)을 지키고 넘긴다.
             report.named_no_gain += 1
             _bump(report, "named_no_gain")
+            continue
+        if mode == MODE_NAMED and not _keeps_old_deficiencies(raw.get("fda_483_observations") or [],
+                                                              observations):
+            # [11-12] 관찰 수는 늘었어도 **기존 표제가 하나라도 사라지면** 교체하지 않는다 — 표제가 바뀌면
+            # finding_id 가 바뀌어 옛 findings·번역이 고아로 남고 새 행과 겹친다(대량 재추출 전 가드).
+            report.named_no_gain += 1
+            _bump(report, "named_would_drop_deficiency")
             continue
 
         if len(report.samples) < _MAX_SAMPLES:

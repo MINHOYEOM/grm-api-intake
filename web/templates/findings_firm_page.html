@@ -70,6 +70,12 @@
   .ff-about{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:10px}
   .ff-about p{font-family:var(--sans);font-size:13.5px;line-height:1.75;color:var(--muted);margin:0;max-width:780px;word-break:keep-all}
   .ff-about b{color:var(--body);font-weight:500}
+  /* [식약처 GMP 적합판정 2026-11-11] 업체 머리 아래 한 줄 — 공개 현황표 사실만(해석 없음). */
+  .ff-gmp{margin:14px 0 0;max-width:780px;display:flex;flex-direction:column;gap:4px}
+  .ff-gmp-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);margin:0}
+  .ff-gmp-row{font-family:var(--sans);font-size:13.5px;line-height:1.65;color:var(--body);margin:0;word-break:keep-all;overflow-wrap:anywhere}
+  .ff-gmp-row span{color:var(--muted)}
+  .ff-gmp-note{font-family:var(--sans);font-size:12px;color:var(--muted);margin:2px 0 0;word-break:keep-all}
   /* [수입경보 1단계 2026-11-10] 업체 페이지 맨 위 — FDA 공개 목록 등재 사실만(사유·해석 없음). */
   .ff-ia{margin:14px 0 0;border:1px solid var(--line-2);border-left:3px solid var(--coral);border-radius:var(--rad-s);background:var(--soft);padding:12px 16px;display:flex;flex-direction:column;gap:10px;max-width:780px}
   .ff-ia-row{display:flex;flex-direction:column;gap:4px}
@@ -116,6 +122,17 @@
       <span class="ff-chip">{{ _("문서 {n}건", n=firm.doc_count) }}</span>
       <span class="ff-chip">{{ _("지적 {n}건", n=firm.finding_count) }}</span>
     </p>
+    {#- [식약처 GMP 적합판정 2026-11-11] DB 가 업체와 연결한 판정서만(render.firm_gmp_cert_index).
+        한국어 트리에만 넘어온다(원천 값이 한국어). 판정일은 원천에 없어 유효기한만 적는다. -#}
+    {%- if gmp_certs %}
+    <div class="ff-gmp" role="group" aria-label="{{ _('식약처 GMP 적합판정 이력') }}">
+      <p class="ff-gmp-h">{{ _('식약처 GMP 적합판정 이력') }}</p>
+      {%- for c in gmp_certs %}
+      <p class="ff-gmp-row">{{ c.product_kind }}{% if c.dosage_group %} · {{ c.dosage_group }}{% endif %} · {{ _('유효기한 {date}', date=c.valid_until) }}{% if c.factory_addr %} <span>· {{ c.factory_addr }}</span>{% endif %}{% if not c.listed_now %} <span>· {{ _('현재 목록에 없음') }}</span>{% endif %}</p>
+      {%- endfor %}
+      <p class="ff-gmp-note">{{ _('{date}에 확인한 식약처 GMP 적합판정서 발급 현황(공공데이터포털) 기준입니다.', date=gmp_certs_on) }}</p>
+    </div>
+    {%- endif %}
   </div>
 
   <div class="wrap ff-body">

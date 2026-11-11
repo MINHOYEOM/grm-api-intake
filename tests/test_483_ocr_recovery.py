@@ -551,3 +551,74 @@ class DumpTextTest(unittest.TestCase):
             self.assertEqual(rec.main(["--dump-text-dir", d]), 2)
             self.assertEqual(rec.main(["--dump-text-dir", d, "--doc-ids", "fda483-1234"]), 0)
             self.assertTrue(os.path.exists(os.path.join(d, "fda483-1234.txt")))
+
+
+
+def _mixed_pdf_bytes() -> bytes:
+    """1쪽 = 글자층(관찰 1), 2쪽 = 글자 없는 이미지(스캔 쪽) — 195468 꼴."""
+    import fitz  # type: ignore[import-not-found]
+    doc = fitz.open()
+    p1 = doc.new_page()
+    p1.insert_text((72, 72), "OBSERVATION 1 Procedures designed to prevent microbiological "
+                             "contamination are not established. Specifically, the firm did not.")
+    p2 = doc.new_page()
+    pix = fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, 40, 40), False)
+    pix.clear_with(200)
+    p2.insert_image(fitz.Rect(72, 72, 300, 300), pixmap=pix)
+    data = doc.tobytes()
+    doc.close()
+    return data
+
+
+class MixedPdfTest(unittest.TestCase):
+    """[11-12] 섞인 PDF — 문서 전체로는 글자가 충분해도 이미지 쪽은 OCR 해야 한다."""
+
+    def test_count_unread_image_pages(self):
+        self.assertEqual(f.count_unread_image_pages(_mixed_pdf_bytes()), 1)
+        self.assertEqual(f.count_unread_image_pages(b"not a pdf"), 0)
+
+    def test_read_path_ocrs_mixed_pdf_and_never_shrinks(self):
+        data = _mixed_pdf_bytes()
+        layer = ("OBSERVATION 1 Procedures designed to prevent microbiological contamination are not "
+                 "established. Specifically, the firm did not. " * 3)
+
+        def extract(_data, max_chars):
+            return layer, "pdf-ok"
+
+        longer = layer + " OBSERVATION 2 Second observation from the scanned page."
+        with mock.patch.object(f, "_ocr_enabled", return_value=True), \
+                mock.patch.object(f, "_needs_ocr", return_value=False), \
+                mock.patch.object(f, "_ocr_483_pdf_text", return_value=(longer, "pdf-ok-ocr")) as ocr:
+            text, status = f._read_fda483_pdf_text(data, 200000, extract)
+        ocr.assert_called_once()
+        self.assertEqual((text, status), (longer, "pdf-ok-ocr"))
+        with mock.patch.object(f, "_ocr_enabled", return_value=True), \
+                mock.patch.object(f, "_needs_ocr", return_value=False), \
+                mock.patch.object(f, "_ocr_483_pdf_text", return_value=("short", "pdf-ok-ocr")):
+            self.assertEqual(f._read_fda483_pdf_text(data, 200000, extract), (layer, "pdf-ok"))  # 축소 금지
+
+
+class NamedModeTest(unittest.TestCase):
+    """[11-12] mode=named — 지목한 문서만, 관찰이 늘 때만 교체."""
+
+    def test_named_candidate_requires_explicit(self):
+        self.assertTrue(rec.is_recovery_candidate({"fda_483_observations": [{}]}, rec.MODE_NAMED, explicit=True))
+        self.assertFalse(rec.is_recovery_candidate({}, rec.MODE_NAMED, explicit=False))
+
+    def test_named_without_doc_ids_is_refused(self):
+        report, code = rec.run(base_url="https://x.supabase.co", service_key="k", dry_run=True,
+                               mode=rec.MODE_NAMED, fetch_raw_signals=lambda *a, **k: [])
+        self.assertEqual(code, 2)
+        self.assertTrue(report.errors)
+
+    def test_named_fetch_passes_doc_ids(self):
+        seen = {}
+
+        def fetch(base, key, **kw):
+            seen.update(kw)
+            return []
+
+        rec.run(base_url="https://x.supabase.co", service_key="k", dry_run=True, mode=rec.MODE_NAMED,
+                doc_ids=["fda483-195468"], fetch_raw_signals=fetch)
+        self.assertEqual(seen.get("doc_ids"), ["fda483-195468"])
+        self.assertEqual(seen.get("mode"), rec.MODE_NAMED)

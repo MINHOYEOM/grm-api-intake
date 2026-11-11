@@ -102,8 +102,12 @@ MODE_COLLECTION_CAPPED = "collection-capped"
 # OCR 이 글자 0)는 대상이 아니고, 다시 읽어 확정 사유가 나오면 표식을 그 사유로 바꿔
 # 무한 재시도를 끊는다(collection-capped 와 같은 규칙).
 MODE_RECOVERABLE = "recoverable"
+# [2026-11-12] 이름으로 지목한 문서만 다시 읽어 재구성한다(상태값 무관 · --doc-ids 필수).
+# 관찰이 이미 있는 문서의 누락(섞인 PDF — 195468: 텍스트층 1쪽 + 이미지 3쪽 → 관찰 1/4)을 고치는 용도.
+# 다시 읽어 관찰이 **늘 때만** 교체한다(축소 금지) · 확정 사유 표식은 적지 않는다.
+MODE_NAMED = "named"
 RECOVERY_MODES = (MODE_OCR_UNAVAILABLE, MODE_MISSING_OBSERVATIONS, MODE_COLLECTION_CAPPED,
-                  MODE_RECOVERABLE)
+                  MODE_RECOVERABLE, MODE_NAMED)
 # [2026-10-27 #1209] 수집 **상한** 때문에 본문 없이 적재된 행의 상태값. 문서 사정이 아니라
 # 그날 실행의 사정(PDF 건수 상한·OCR 페이지 예산)이라 다시 읽으면 대개 본문이 나온다.
 # collect_fda_483 가 기록하는 문자열과 같아야 한다 — tests 가 두 값이 같음을 고정한다.
@@ -129,6 +133,7 @@ class OcrRecoveryReport:
     attempted: int = 0                  # 실제 PDF fetch 를 시도한 문서 수
     recovered: int = 0                  # 본문 확보(dry-run=교체 예정, apply=upsert 성공)
     recovered_excerpt_only: int = 0     # 그 중 관찰문 0건 — 발췌만 살고 findings 는 0
+    named_no_gain: int = 0              # named: 다시 읽어도 관찰 수가 늘지 않아 교체하지 않음
     still_empty: int = 0                # ↓ 두 사건의 합(하위호환 유지). 진단에는 쓰지 말 것.
     # ★ still_empty 를 쪼갠 이유(재발 방지):
     #   v1 은 "본문을 못 받았다"와 "본문은 받았는데 추출이 0건"을 한 칸에 더했다. 두 사건의
@@ -246,6 +251,8 @@ def is_recovery_candidate(raw: dict[str, Any], mode: str, *, explicit: bool = Fa
     (2026-10-28: 양식 상용구 오판으로 의약품 483 이 out-of-scope 로 찍힘). 이름 지목일 때만
     여는 이유 — 예약 실행(doc-ids 없음)이 진짜 범위 밖 문서를 매일 다시 받지 않게.
     """
+    if mode == MODE_NAMED:
+        return explicit
     if (explicit and mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE)
             and str(raw.get("fda483_text_status") or "") == OUT_OF_SCOPE_STATUS):
         return True
@@ -334,6 +341,58 @@ def dump_texts(doc_ids: list[str], out_dir: str, *,
     return rows
 
 
+_OBS_HEAD_RE = re.compile(r"(?i)\bOBSERVATION\s*#?\s*(\d{1,3})\b")
+
+
+def scan_mixed_pdfs(rows: list[dict[str, Any]], *, delay_seconds: float = 0.3,
+                    fetch_bytes: Callable[[str], bytes] | None = None,
+                    sleep_fn: Callable[[float], None] | None = None) -> dict[str, Any]:
+    """[11-12 진단 전용·쓰기 없음] 섞인 PDF(글자 없는 이미지 쪽이 있는 문서) 규모를 센다. OCR 은 하지 않는다.
+
+    문서마다: 쪽 수 · 글자 없는 이미지 쪽 수 · 텍스트층의 `OBSERVATION n` 최대 번호 · 저장된 관찰 수.
+    `unread_pages>0` 이고 저장 관찰이 있는 문서가 "관찰이 일부만 들어갔을 수 있는" 후보다(195468 꼴)."""
+    import fitz  # type: ignore[import-not-found]
+    import collect_fda_483 as c
+    from grm_common import http_get_bytes
+
+    def _default_fetch(url: str) -> bytes:
+        return http_get_bytes(url, timeout=30, retries=2, headers={"Accept": "application/pdf"},
+                              label="FDA 483 PDF(scan)")
+
+    get = fetch_bytes or _default_fetch
+    pause = sleep_fn or time.sleep
+    docs: list[dict[str, Any]] = []
+    failed = 0
+    for r in rows:
+        raw = _json_object(r.get("raw_json"))
+        url = str(raw.get("pdf_url") or "")
+        if not url or str(raw.get("fda483_text_status") or "") == OUT_OF_SCOPE_STATUS:
+            continue
+        pause(delay_seconds)
+        try:
+            data = get(url)
+            with fitz.open(stream=data, filetype="pdf") as doc:
+                pages = doc.page_count
+                layer = "\n".join(p.get_text("text") for p in doc)
+            unread = c.count_unread_image_pages(data)
+        except Exception:  # noqa: BLE001 — 진단: 건별 실패는 세고 계속
+            failed += 1
+            continue
+        heads = [int(m.group(1)) for m in _OBS_HEAD_RE.finditer(layer)]
+        docs.append({"doc": str(r.get("document_id") or ""), "pages": pages, "unread_pages": unread,
+                     "layer_max_obs": max(heads) if heads else 0,
+                     "stored_obs": len(raw.get("fda_483_observations") or [])})
+    mixed = [d for d in docs if d["unread_pages"] > 0]
+    return {
+        "scanned": len(docs), "failed": failed,
+        "mixed_docs": len(mixed),
+        "mixed_with_stored_obs": sum(1 for d in mixed if d["stored_obs"] > 0),
+        "mixed_without_stored_obs": sum(1 for d in mixed if d["stored_obs"] == 0),
+        "unread_pages_total": sum(d["unread_pages"] for d in mixed),
+        "mixed": sorted(mixed, key=lambda d: -d["unread_pages"]),
+    }
+
+
 def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
     """라이브 수집과 **같은 함수**로 IntakeItem 재구성. None 이면 도메인 게이트 드롭."""
     from collect_fda_483 import (
@@ -362,6 +421,7 @@ def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
 def _fetch_raw_signals(
     base_url: str, service_key: str, *, page_size: int = _DEFAULT_PAGE_SIZE,
     mode: str = MODE_OCR_UNAVAILABLE, include_out_of_scope: bool = False,
+    doc_ids: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     """source='FDA 483' raw_signals 중 이번 모드의 후보 행만.
 
@@ -371,7 +431,9 @@ def _fetch_raw_signals(
     `out-of-scope` 표식도 넣는다(`--doc-ids` 재회수 — `is_recovery_candidate(explicit=)` 참조).
     """
     extra = (OUT_OF_SCOPE_STATUS,) if include_out_of_scope else ()
-    if mode == MODE_MISSING_OBSERVATIONS:
+    if mode == MODE_NAMED:
+        narrow = {"document_id": "in.(" + ",".join(doc_ids or []) + ")"}
+    elif mode == MODE_MISSING_OBSERVATIONS:
         # 관찰 키가 **없는** 행. `not.like` 로 서버에서 1차로 좁힌다.
         narrow = {"raw_json": f"not.like.*{_OBSERVATIONS_KEY}*"}
     elif mode == MODE_COLLECTION_CAPPED:
@@ -596,8 +658,15 @@ def run(
         return report, 2
 
     explicit = bool(doc_ids)
+    if mode == MODE_NAMED and not explicit:
+        report.errors.append("mode=named 는 --doc-ids 가 필요하다")
+        return report, 2
     try:
-        rows = fetch_raw(base, service_key, mode=mode, include_out_of_scope=explicit)
+        if mode == MODE_NAMED:
+            rows = fetch_raw(base, service_key, mode=mode, include_out_of_scope=True,
+                             doc_ids=list(doc_ids or []))
+        else:
+            rows = fetch_raw(base, service_key, mode=mode, include_out_of_scope=explicit)
     except (RuntimeError, ValueError) as exc:
         report.errors.append(str(exc))
         log("ERROR", f"483 OCR 복구 조회 실패: {exc}")
@@ -744,12 +813,19 @@ def run(
                 )
             continue
 
+        if mode == MODE_NAMED and len(observations) <= len(raw.get("fda_483_observations") or []):
+            # 다시 읽어도 관찰이 늘지 않는다 — 기존 행(다시 읽기로 다듬은 상세 포함)을 지키고 넘긴다.
+            report.named_no_gain += 1
+            _bump(report, "named_no_gain")
+            continue
+
         if len(report.samples) < _MAX_SAMPLES:
             report.samples.append({
                 "raw_signal_id": rid,
                 "document_id": doc_id,
                 "pdf_status": status,
                 "observations": len(observations),
+                "observations_before": len(raw.get("fda_483_observations") or []),
                 "excerpt_chars": len(str(new_raw.get("fda483_excerpt") or "")),
             })
 
@@ -805,6 +881,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "라이브 수집과 같은 함수로 재구성해 제자리 upsert. 예약 실행은 collection-capped 모드.",
     )
     p.add_argument(
+        "--scan-mixed", action="store_true", default=False,
+        help="진단 전용(쓰기 없음): FDA 483 PDF 를 받아 글자 없는 이미지 쪽이 있는 문서(섞인 PDF)를 센다.",
+    )
+    p.add_argument(
         "--dump-text-dir", default="",
         help="진단 전용(쓰기 없음): --doc-ids 문서의 판독 전문을 이 폴더에 <doc>.txt 로 남기고 끝낸다.",
     )
@@ -855,6 +935,27 @@ def main(argv: list[str] | None = None) -> int:
         rows = dump_texts(ids, args.dump_text_dir)
         payload = json.dumps({"dump_text": rows}, ensure_ascii=False, indent=2)
         print(payload)
+        if args.report_path:
+            Path(args.report_path).write_text(payload + "\n", encoding="utf-8")
+        return 0
+
+    if args.scan_mixed:
+        creds = _resolve_credentials(args)
+        if creds is None:
+            print("--scan-mixed 는 조회용 자격증명이 필요하다(쓰기 없음).", file=sys.stderr)
+            return 2
+        rows = fsb._fetch_all_pages(
+            creds[0], creds[1], "raw_signals", select="raw_signal_id,document_id,raw_json",
+            page_size=_DEFAULT_PAGE_SIZE, order="raw_signal_id.asc",
+            extra_params={"source": f"eq.{SOURCE_FDA_483}"})
+        ids = set(_parse_doc_ids(args.doc_ids))
+        if ids:
+            rows = [r for r in rows if str(r.get("document_id") or "") in ids]
+        if args.limit:
+            rows = rows[:args.limit]
+        result = scan_mixed_pdfs(rows, delay_seconds=args.delay_seconds)
+        payload = json.dumps({"scan_mixed": result}, ensure_ascii=False, indent=2)
+        print(json.dumps({k: v for k, v in result.items() if k != "mixed"}, ensure_ascii=False))
         if args.report_path:
             Path(args.report_path).write_text(payload + "\n", encoding="utf-8")
         return 0

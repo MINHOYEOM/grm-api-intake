@@ -131,8 +131,7 @@ def obs_header_context(text: str, width: int = 70) -> "list[str]":
     out = []
     for m in anchors:
         a, b = max(0, m.start() - width), min(len(body), m.end() + width)
-        out.append(f"#{m.group(1)}@{m.start()}: " + body[a:b].replace("
-", "\n"))
+        out.append(f"#{m.group(1)}@{m.start()}: " + body[a:b].replace(chr(10), " / "))
     return out
 
 

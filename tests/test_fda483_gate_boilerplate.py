@@ -129,6 +129,20 @@ class GenuineOutOfScopeStillDroppedTest(unittest.TestCase):
         nrow = _nrow("Acme Beauty", "Manufacturer", "999002")
         self.assertIsNone(f._to_item(nrow, body, [], "", "pdf-ok"))
 
+    def test_pharma_facility_keeps_food_words_as_observation_content(self):
+        """[11-12 실측 195803] 무균 조제 약국 483 의 지적이 '건기식 등급 원료 사용'이면 본문에
+        dietary supplement 가 들어간다. 시설 유형이 의약품이면 제외 키워드로 버리지 않는다."""
+        body = ("OBSERVATION 1 Your firm used non-pharmaceutical grade components in the formulation of "
+                "sterile drug production. Specifically, on August 31, 2026, the following dietary "
+                "supplement grade APIs were observed in your firm's raw material storage. ") + self._BACK
+        est = "Producer of Sterile and Non Sterile Drug Products"
+        self.assertEqual(compute_relevance(est, "483", f.strip_483_form_boilerplate(body)), "Unrelated")  # 전제
+        self.assertIsNotNone(f._to_item(_nrow("Victory Medical Center Pharmacy", est, "999004"),
+                                        body, [], "", "pdf-ok"))
+        # 시설 유형에 의약품 단서가 없으면 종전대로 버린다
+        self.assertIsNone(f._to_item(_nrow("Acme Foods", "Manufacturer", "999005"),
+                                     body.replace("sterile drug production", "production"), [], "", "pdf-ok"))
+
     def test_checkbox_alone_does_not_make_device(self):
         """유형이 그냥 'Manufacturer' 인 의약품 483 — 체크박스 안내문만으로 기기 판정하지 않는다."""
         head = _LINDE[:_LINDE.index("DISTRICT OFFICE")]

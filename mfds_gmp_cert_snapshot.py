@@ -256,7 +256,8 @@ def main(argv: list[str] | None = None) -> int:
             link = rest.rpc("grm_link_mfds_gmp_cert")
             report["link"] = link
             unlinked = rest.get_all("mfds_gmp_cert", {
-                "select": "cert_id,firm_name,bizrno,factory_addr,link_note",
+                "select": "cert_id,firm_name,bizrno,factory_addr,link_note,"
+                          "candidate_firm_key,candidate_method,candidate_confidence,candidate_evidence",
                 "firm_key": "is.null", "order": "link_note,firm_name"})
             Path(a.unlinked_output).write_text(
                 json.dumps(unlinked, ensure_ascii=False, indent=2), "utf-8")

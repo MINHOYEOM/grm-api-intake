@@ -1,0 +1,352 @@
+[
+ {
+  "finding_id": "finding-faec2dc6cf2932e11b2a3dca",
+  "finding_text_md5": "96ad2a7515deb7015c071e7f6e0ebd7a",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, A) Your firm 's stools located in all ISO 7 Cleanrooms, used by your compounding technicians during aseptic processing, is covered with a material which cannot be adequately disinfected. B) On 4/5/2019 during a walk-through ofyour firm 's aseptic processing areas, I observed in LAF hood [redacted] HEPA grate with white and black residue, while aseptic processing Morphine PF lmg/ml 100 ml (I mg/ml) in 0.9% Sodium Chloride solution [redacted], ltem 70092151875, Lot I 0023288, Expiry 7/4/2019, Qty [redacted] units. Your firm 's Senior Director of Production Operations stated compounding technicians cleaned the HEPA filter grate. He continued in stating the firm believes it was caused by sterile drug product splash during aseptic processing. No laboratory analysis was performed on the foreign material to confirm its identity.",
+  "detail_text_ko": "구체적으로, A) 귀사의 ISO 7 청정실 전체에 설치되어 무균 공정 중 조제 기술자가 사용하는 의자는 충분히 소독할 수 없는 재질로 덮여 있다. B) 2019년 4월 5일(4/5/2019) 귀사의 무균 공정 구역을 둘러보던 중, 실사관은 Morphine PF lmg/ml 100 ml (I mg/ml) in 0.9% Sodium Chloride solution [redacted], ltem 70092151875, Lot I 0023288, Expiry 7/4/2019, Qty [redacted] units를 무균 공정 처리하는 동안 LAF hood [redacted]의 HEPA 그릴에 흰색과 검은색 잔류물이 있는 것을 관찰했다. 귀사의 생산운영 수석이사(Senior Director of Production Operations)는 조제 기술자가 HEPA 필터 그릴을 세척했다고 진술했다. 그는 이어서 무균 공정 중 무균 의약품이 튄 것이 원인이라고 회사가 보고 있다고 진술했다. 이물질의 정체를 확인하기 위한 실험실 분석은 수행되지 않았다."
+ },
+ {
+  "finding_id": "finding-ea5bd3a0c8b688572e59b85e",
+  "finding_text_md5": "0764f3218168d55e93108326f4b34c83",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, Your pharmacy does not have dedicated utensils for hazardous drugs. Dirty utensils (used to produce hazardous drug products) are cleaned with detergent and sanitized with [redacted] and placed into a drawer comingling with utensils for non-hazardous drugs. Between 01/10/2019 to 04/10/2019, your pharmacy produced approximately different hazardous drugs with approximately [redacted] to [redacted] patient-specific prescriptions per day and [redacted] different non-hazardous drugs with approximately [redacted] patient-specific prescriptions per day.",
+  "detail_text_ko": "구체적으로, 귀 약국은 유해 의약품 전용 기구를 갖추고 있지 않다. 유해 의약품 제품을 만드는 데 사용한 더러운 기구는 세제로 세척하고 [redacted]로 소독한 뒤, 비유해 의약품용 기구와 뒤섞어 서랍에 넣는다. 2019년 01/10/2019부터 04/10/2019까지 귀 약국은 약 가지의 서로 다른 유해 의약품을 하루 약 [redacted]건에서 [redacted]건의 환자별 처방으로 생산했고, [redacted]가지의 서로 다른 비유해 의약품을 하루 약 [redacted]건의 환자별 처방으로 생산했다."
+ },
+ {
+  "finding_id": "finding-c57cdea2630ba0dc52a44783",
+  "finding_text_md5": "8b0944e730e82092d37e484b12860a96",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, Your firm is using non-pharmaceutical grade [redacted] to produce the following drug products. Loperamide HCI Oral lmg/5mL Suspension Lot# 03182019@23 7+DBCGT: Diclofenac, Baclofen, Cyclobenzaprine, Gabapentin, Tetracaine 3%,2%,2%,6%,2% Cream Lot# 04032019@7 Lidocaine 2%/Mylanta/Diphenhydramine/Nystatin/Prednisolone Liquid Lot # 04082019@28 In addition, your firm also uses non-pharmaceutical gradei [redacted] to produce [redacted] These lots of: [redacted] were used to produce the following drug products. Ketamine Nasal Spray 100 mg/ml Lot# 03182019@35 Dyclonine HCI Solution 1% Lot# 03252019@32 Oxytocin Nasal Spray 40 units/mL Lot# 04012019@35 Itraconazole/EDTA/Gentamycin 2%/0.1%/0.25% Nasal Spray Lot# 04082019@36 Producer ofnon-sterile drug products",
+  "detail_text_ko": "구체적으로, 귀사는 다음 의약품을 만들면서 의약품 등급이 아닌 [redacted]를 사용하고 있다. Loperamide HCI Oral lmg/5mL Suspension Lot# 03182019@23 7+DBCGT: Diclofenac, Baclofen, Cyclobenzaprine, Gabapentin, Tetracaine 3%,2%,2%,6%,2% Cream Lot# 04032019@7 Lidocaine 2%/Mylanta/Diphenhydramine/Nystatin/Prednisolone Liquid Lot # 04082019@28 또한 귀사는 [redacted]를 만드는 데에도 의약품 등급이 아닌 gradei [redacted]를 사용한다. [redacted]의 이 로트들은 다음 의약품을 만드는 데 사용되었다. Ketamine Nasal Spray 100 mg/ml Lot# 03182019@35 Dyclonine HCI Solution 1% Lot# 03252019@32 Oxytocin Nasal Spray 40 units/mL Lot# 04012019@35 Itraconazole/EDTA/Gentamycin 2%/0.1%/0.25% Nasal Spray Lot# 04082019@36 Producer ofnon-sterile drug products"
+ },
+ {
+  "finding_id": "finding-97d511e513eb72abe25aeec2",
+  "finding_text_md5": "c556afc2b3a9d4279732a56c2e6addb0",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, your compounded drug products that: a) are identical or nearly identical to an approved drug that is not on the drug shortage list in effect under Section 506E at the time of compounding, distribution, and dispensing; of b) are not identical or nearly identical to an approved drug, but that contain a bulk drug substance that is also a component of an approved drug, and for which there is no change that produces for an individual patient a clinical difference, as determined by the prescribing practitioner, between the compounded drug and the comparable approved drug. El-'PI.OVEE(S) SIONA1U<E Examples of compounded drug products that are essentially a copy of one or more approved drugs include: A. Phenylephrine HCL, 50mg added to 250ml 0.9% Sodium Chloride Solution Bag, Item 70092104505, Lot 10019552, Expiry 4/12/20l9. B. Neostigmine, Img/ml 5 ml Syringe, Item 70092118944, Lot 10022441, Expiry 6/1 6/2019.",
+  "detail_text_ko": "구체적으로, 귀사의 조제 의약품은 다음에 해당한다. a) 조제, 유통 및 조제 투여 시점에 Section 506E에 따라 시행 중인 의약품 부족 목록에 없는 승인 의약품과 동일하거나 거의 동일하다. 또는 b) 승인 의약품과 동일하거나 거의 동일하지는 않지만, 승인 의약품의 구성 성분이기도 한 벌크 의약품 물질을 함유하고 있으며, 처방 의료인이 판단하기에 개별 환자에게 조제 의약품과 이에 상응하는 승인 의약품 사이에 임상적 차이를 만드는 변경이 없다. El-'PI.OVEE(S) SIONA1U<E 하나 이상의 승인 의약품을 본질적으로 복제한 조제 의약품의 예는 다음과 같다. A. Phenylephrine HCL, 50mg added to 250ml 0.9% Sodium Chloride Solution Bag, Item 70092104505, Lot 10019552, Expiry 4/12/20l9. B. Neostigmine, Img/ml 5 ml Syringe, Item 70092118944, Lot 10022441, Expiry 6/1 6/2019."
+ },
+ {
+  "finding_id": "finding-8fe7a646bbe7eb9569883ba4",
+  "finding_text_md5": "dd3faf584de16696665670e5d098e253",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, your firm failed to adequately implement procedure, QuVa Phanna Facility Standard, COR-SOP-FM-0002, Rev. 4, concerning measuring, recording, and monitoring of conntrolled space temperature relative humidity and differential pressure. For example, your firm [redacted] system [redacted] failed to electronically measure, record, and transfer environmental conditions data in Cleanrooms [redacted] or the dates/times 313.(Ji.0 19 @ 8:00am -3/5/2019 @8:00 am & 3/5/19@ 11:00 pm -3/7/2019 @ 5:00 pm for Cleanrooms I -to a designated server. During these dates and times, your finn facilities management and quality unit was unaware of the condition and continued to aseptically process sterile drug products. Your firrn's [redacted] failed to send notifications to the Facilities Management Department regarding the issue of missing me.asurement data.",
+  "detail_text_ko": "구체적으로, 귀사는 관리 공간의 온도, 상대습도, 차압의 측정·기록·모니터링에 관한 절차인 QuVa Phanna Facility Standard, COR-SOP-FM-0002, Rev. 4를 적절히 이행하지 않았다. 예를 들어 귀사의 [redacted] 시스템 [redacted]은(는) 청정실 [redacted]에 대해 313.(Ji.0 19 @ 8:00am -3/5/2019 @8:00 am 및 3/5/19@ 11:00 pm -3/7/2019 @ 5:00 pm의 일시에 환경 조건 데이터를 전자적으로 측정, 기록하여 지정된 서버로 전송하지 못했다(Cleanrooms I). 이 일시 동안 귀사의 finn 시설관리 부서와 품질 부서는 이 상태를 알지 못한 채 무균 의약품을 계속 무균 공정으로 처리했다. 귀사의 [redacted]은(는) 측정 데이터 누락 문제에 대해 시설관리 부서(Facilities Management Department)에 알림을 보내지 못했다(me.asurement)."
+ },
+ {
+  "finding_id": "finding-5a23379255459f599e0954b7",
+  "finding_text_md5": "78f86d0805391ca3de0705274e3f6849",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, between 04/10/2017-04/09/2019, your pharmacy produced [redacted] beta-lactam drug products in your non-hazardous area on work surfaces also used for the production of non-beta lactam products. a) Your pharmacy cleans work surfaces [redacted] in your non-hazardous area with [redacted] b) Your pharmacy does not have dedicated equipment for beta-lactam and non-beta lactam products. Production equipment is shared between both beta-lactam and non-beta lactam products. c) Equipment used to produce beta-lactam products is cleaned with [redacted] and rinsed with distilled water. Following cleaning, this equipment is used for any non-hazardous product, including a non-beta lactam product.",
+  "detail_text_ko": "구체적으로, 04/10/2017-04/09/2019 동안 귀 약국은 비유해 구역에서 [redacted]개의 베타락탐 의약품을, 베타락탐이 아닌 제품의 생산에도 쓰이는 작업대 표면에서 생산했다. a) 귀 약국은 비유해 구역의 작업대 표면 [redacted]을(를) [redacted]로 세척한다. b) 귀 약국은 베타락탐 제품과 비베타락탐 제품 전용 설비를 갖추고 있지 않다. 생산 설비는 베타락탐 제품과 비베타락탐 제품이 공용한다. c) 베타락탐 제품을 생산하는 데 쓴 설비는 [redacted]로 세척하고 증류수로 헹군다. 세척 후 이 설비는 비베타락탐 제품을 포함한 모든 비유해 제품에 사용된다."
+ },
+ {
+  "finding_id": "finding-51c52af74358e34dd1cb75c9",
+  "finding_text_md5": "a466963bc20ad93f5ca4c32afc6a3142",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, during review of Recall# D-0295-2019, Norepinephrine 8 mg (32 mcg/mL) added to 0.9% Sodium Chloride Injection 250 mL Bag, your firm's investigation identified the issue to be a drug component picking issue. Your firm's compounding technician aseptically admixed 250mL 5% Dextrose Injection 250 mL Bag in error. Your firm 's quality unit failed to investigate why your firm 's [redacted] Testing Laboratory failed to report an unusual peak found during potency testing. l requested the lot laboratory test data, which resulted in the firm finding the presence of an unknown peak of the finished sterile drug product sample. Your firm's director ofquality reported the firm will be reopening the CAPA to further investigate this finding made during this inspection. Your firm failed to adequately investigate the unusual laboratory test results. DEPARTMENT OF UEALTH AND HUMAN SERVlCES FOOi) AND DRUG AOMINISTRATION OOTRICTAllllleS AHIJ PttONE NUM8ER 4040 North Central Expressway, Suite 300 Dallas, TX 75204 (214) 253-5200 Fax: (214) 253-5314 NMIE AND t II Lt,_,.. Jr,u,v,uv,,i. TOW.._,,,, l<l:l'U<T lliSUED Ill'., \"l• J OF IH$PECTOI 4/5/2019-4 /23/2019* FEI NUMtltJ< 3012053582 Travis M. McGrady, Senior Dir ector Production Oper ations FIRM NIIME STREET~ QuVa Pharma, Inc. 1075 W Park One Dr Ste 100,.:>TATE. ZP COUNTRY TYPE EST AIIUSHME~,......,,_ ED Sugar Land, TX 77478 - 2576 Outsourcing Faci lity [(oH 4) ITesting Laboratory failed to report an unusual peak found during potency testing. l requested the lot laboratory test data, which resulted in the finn finding the presence ofan unknown peak ofthe finished sterile drug product sample. Your firm's director ofquality reported the firm will be reopening the CAPA to further investigate this finding made during this inspection. Your firm failed to adequately investigate the unusual laboratory test results.",
+  "detail_text_ko": "구체적으로, Recall# D-0295-2019, Norepinephrine 8 mg (32 mcg/mL) added to 0.9% Sodium Chloride Injection 250 mL Bag에 대한 검토 중, 귀사의 조사는 원인을 의약품 구성 성분 선택(picking) 오류로 규명했다. 귀사의 조제 기술자는 250mL 5% Dextrose Injection 250 mL Bag을 잘못 무균 혼합했다. 귀사의 품질 부서는 귀사의 [redacted] 시험실(Testing Laboratory)이 역가 시험 중 발견된 비정상 피크를 보고하지 않은 이유를 조사하지 않았다. 실사관이 해당 로트의 실험실 시험 데이터를 요청했고, 그 결과 회사는 무균 완제의약품 시료에서 알 수 없는 피크가 있음을 확인하게 되었다. 귀사의 품질 책임자(director ofquality)는 이번 실사에서 확인된 이 사항을 추가로 조사하기 위해 CAPA를 다시 열겠다고 보고했다. 귀사는 비정상적인 실험실 시험 결과를 적절히 조사하지 않았다. DEPARTMENT OF UEALTH AND HUMAN SERVlCES FOOi) AND DRUG AOMINISTRATION OOTRICTAllllleS AHIJ PttONE NUM8ER 4040 North Central Expressway, Suite 300 Dallas, TX 75204 (214) 253-5200 Fax: (214) 253-5314 NMIE AND t II Lt,_,.. Jr,u,v,uv,,i. TOW.._,,,, l<l:l'U<T lliSUED Ill'., \"l• J OF IH$PECTOI 4/5/2019-4 /23/2019* FEI NUMtltJ< 3012053582 Travis M. McGrady, Senior Dir ector Production Oper ations FIRM NIIME STREET~ QuVa Pharma, Inc. 1075 W Park One Dr Ste 100,.:>TATE. ZP COUNTRY TYPE EST AIIUSHME~,......,,_ ED Sugar Land, TX 77478 - 2576 Outsourcing Faci lity [(oH 4) ITesting Laboratory가 역가 시험 중 발견된 비정상 피크를 보고하지 않았다. 실사관이 해당 로트의 실험실 시험 데이터를 요청했고, 그 결과 회사는 무균 완제의약품 시료에서 알 수 없는 피크(ofan unknown peak)가 있음을 확인하게 되었다. 귀사의 품질 책임자는 이번 실사에서 확인된 이 사항을 추가로 조사하기 위해 CAPA를 다시 열겠다고 보고했다. 귀사는 비정상적인 실험실 시험 결과를 적절히 조사하지 않았다."
+ },
+ {
+  "finding_id": "finding-422218d3d48f9b24c5eba5f4",
+  "finding_text_md5": "0f6d5d3649288dcdbe683b7d6a681848",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, during a walk-though of your firm's non-controlled sterile drug finjshed drug storage located at 1005 fndustrial Blvd., Sugar Land TX, I found your firm's quality unit failed to review and approve [redacted] tefrigeration unit maintenance/monitoring logs since l 0/2018 used for storage of sterile non-controlled finished drug products. Your finn's quality manager stated the logs should have been reviewed and approved by the quality unit.",
+  "detail_text_ko": "구체적으로, 1005 fndustrial Blvd., Sugar Land TX에 위치한 귀사의 비관리(non-controlled) 무균 완제의약품 보관소를 둘러보던 중, 실사관은 귀사의 품질 부서가 무균 비관리 완제의약품 보관에 사용되는 [redacted] 냉장 장치(tefrigeration unit)의 유지보수/모니터링 기록을 l 0/2018 이후 검토하고 승인하지 않은 것을 확인했다. 귀사의 품질 관리자는 이 기록을 품질 부서가 검토하고 승인했어야 한다고 진술했다."
+ },
+ {
+  "finding_id": "finding-3572400c522bbf4c79491fd2",
+  "finding_text_md5": "8460be89ed67660284eb3d92ea2a9ee5",
+  "published_date": "2019-07-24",
+  "detail_text": "Specifically, A) On 4/5/2019, while conducting observations of the firm's compounding technician aseptically processing Heparin 30,000 units added to I 000ml 0.9% Sodium Chloride solution bag, Item 7009128108, Lot 10023176, Expiry 7/4/20 I 9, 1 observed processing supplies and drug components blocking the movement of first pass air during filling sterile to sterile product transfer, which potentially may result in cross-contamination in LAF hood [redacted] 4040 North Central Expr essway, Suite 300 4/5/2019-4/23/2019* Dallas, TX 75204,a,.,'\"\"\"\" (214) 253-5200 Fax: (214) 253-5314 3012053582 \"\"\"\"\"N«JTm.E C#'INDMllllOL TO WHOM REl'ORTISSI.ED Travis M. McGrady, Senior Director Production Operations FIRMH'WE QuVa Pharma, Inc...,.,. STA•t.ZP-.-... ~tKT Sugar Land, TX 77478-2576 o, MlORESS 1075 W Park One Dr Ste 100,r,.;;~,ABU~, Outsourcing Facility 1 B) On 4/8/2019, while observing environmental sampling of Cleanroom [redacted] environmental sampling technician fail to re-sanitize gloves following performing tasks in the ISO 7 area prior to placing air sampling unit in BSC [redacted] where the compounding technician was aseptically process Cefazolin PF 2 gadded to l00mL NS Bag, ltem 70092101803, Lot 10023328.",
+  "detail_text_ko": "구체적으로, A) 4/5/2019 귀사의 조제 기술자가 Heparin 30,000 units added to I 000ml 0.9% Sodium Chloride solution bag, Item 7009128108, Lot 10023176, Expiry 7/4/20 I 9를 무균 공정 처리하는 것을 관찰하던 중, 실사관은 무균에서 무균으로 제품을 옮기며 충전하는 동안 공정 소모품과 의약품 구성 성분이 제1통과 공기(first pass air)의 흐름을 막고 있는 것을 관찰했으며, 이는 LAF hood [redacted]에서 교차오염을 일으킬 수 있다. 4040 North Central Expr essway, Suite 300 4/5/2019-4/23/2019* Dallas, TX 75204,a,.,' (214) 253-5200 Fax: (214) 253-5314 3012053582 \"N«JTm.E C#'INDMllllOL TO WHOM REl'ORTISSI.ED Travis M. McGrady, Senior Director Production Operations FIRMH'WE QuVa Pharma, Inc...,.,. STA•t.ZP-.-... ~tKT Sugar Land, TX 77478-2576 o, MlORESS 1075 W Park One Dr Ste 100,r,.;;~,ABU~, Outsourcing Facility 1 B) 4/8/2019 청정실 [redacted]의 환경 시료 채취를 관찰하던 중, 환경 시료 채취 기술자는 ISO 7 구역에서 작업을 수행한 뒤 장갑을 다시 소독하지 않은 채 BSC [redacted]에 공기 시료 채취 장치를 놓았으며, 이곳에서는 조제 기술자가 Cefazolin PF 2 gadded to l00mL NS Bag, ltem 70092101803, Lot 10023328을 무균 공정 처리하고 있었다."
+ },
+ {
+  "finding_id": "finding-31d2ab260ffae636b1057bc5",
+  "finding_text_md5": "4fee55ffbd2cd589ec1a18b550d32b5b",
+  "published_date": "2019-07-24",
+  "detail_text": "Your pharmacy produces approximately [redacted] different drug products in your hazardous room and approximately [redacted] patient-specific prescriptions per day. Specifically, between 04/12/2018 to 04/12/2019, your pharmacy produced [redacted] testosterone prescriptions from the Active Pharmaceutical Ingredient (API) testosterone and [redacted] progesterone tprescriptions from the API progesterone. Q Producer ofNon-Sterile Drng Products",
+  "detail_text_ko": "귀 약국은 유해 약품실에서 약 [redacted]가지의 서로 다른 의약품을 생산하며 하루 약 [redacted]건의 환자별 처방을 처리한다. 구체적으로, 04/12/2018부터 04/12/2019까지 귀 약국은 원료의약품(API)인 testosterone으로 testosterone 처방 [redacted]건을, API인 progesterone으로 progesterone 처방 [redacted]건(tprescriptions)을 생산했다. Q Producer ofNon-Sterile Drng Products"
+ },
+ {
+  "finding_id": "finding-d83a1b6a37cf2f7b66056681",
+  "finding_text_md5": "8fb2b9e4e52dfda60b8e2f16e4bc0c0e",
+  "published_date": "2019-07-16",
+  "detail_text": "Specifically, review of your media fill dated 9/28/18 revealed that a total of [redacted] vials were sterile filled. However, during actual production, your firm routinely fills at least [redacted] vials per batch. For example, on 2/18/19, your firm produced Poli.docano 15% for Injection, lot #5P02 l 8 l9 which consisted of [redacted] of approximately [redacted] vials.",
+  "detail_text_ko": "구체적으로, 9/28/18자 귀사의 배지충전을 검토한 결과 무균 충전된 바이알은 총 [redacted]개였다. 그러나 실제 생산에서 귀사는 배치당 통상 최소 [redacted]개의 바이알을 충전한다. 예를 들어 2/18/19에 귀사는 Poli.docano 15% for Injection, lot #5P02 l 8 l9를 생산했으며, 이는 약 [redacted]개의 바이알 [redacted]로 구성되었다."
+ },
+ {
+  "finding_id": "finding-d7edd3dcd192fca96876f702",
+  "finding_text_md5": "0ecc540360ef3acf13e4e2fc8b7666f2",
+  "published_date": "2019-07-16",
+  "detail_text": "Specifically, Your firm does not have assurance that your intrathecal drug products contain safe levels of bacterial endotoxin (BET). The non-sterile active pharmacetuical ingredients (API) baclofen, bupivacaine. clonidine. hydromorphone, and morphine sulfate used in the production of those intrathccal drugs do not contain results for BET testing on their Certificates of Analysis (CoA). Due to this, and combined with the fact that you do not perform testing on your intrathecal drug products -the result is a lack of assurance that your intrathccal products produced with those API are free from BET.",
+  "detail_text_ko": "구체적으로, 귀사는 귀사의 척수강내(intrathecal) 의약품에 안전한 수준의 세균 엔도톡신(BET)이 들어 있다는 확신이 없다. 이 척수강내 의약품(intrathccal drugs)의 생산에 사용된 비무균 원료의약품(API)인 baclofen, bupivacaine. clonidine. hydromorphone, morphine sulfate는 시험성적서(CoA)에 BET 시험 결과가 없다. 이 때문에, 그리고 귀사가 척수강내 의약품에 대해 시험을 수행하지 않는다는 사실이 더해져, 이 API로 생산한 척수강내 제품(intrathccal products)에 BET가 없다는 확신이 없는 결과가 된다."
+ },
+ {
+  "finding_id": "finding-8b5b10eca716c4875830805c",
+  "finding_text_md5": "2c41d1ffd21014528c12381427286f69",
+  "published_date": "2019-07-16",
+  "detail_text": "Specifically, Your firm uses [redacted] and [redacted] in your ISO 5 area. Neither oflhcse products is considered self-sterilizing and you do not use sterile versions, or perform sterilization actions on these cleaners. This could result in contamination of your sterile production area by microorganisms and thus risk contamination of your product.",
+  "detail_text_ko": "구체적으로, 귀사는 ISO 5 구역에서 [redacted]와 [redacted]를 사용한다. 이 제품들(oflhcse products)은 둘 다 자가 멸균성으로 간주되지 않으며, 귀사는 멸균 제품을 사용하지 않고 이 세척제에 대해 멸균 조치도 수행하지 않는다. 이는 미생물에 의한 귀사 무균 생산 구역의 오염으로 이어질 수 있고, 따라서 제품 오염의 위험이 있다."
+ },
+ {
+  "finding_id": "finding-0a8fe6257486841e4008c629",
+  "finding_text_md5": "4a8296f3e1949169bdb83b1f0848426a",
+  "published_date": "2019-07-16",
+  "detail_text": "The contact time of minutes has not been substantiated.",
+  "detail_text_ko": "분(minutes) 단위의 접촉 시간은 입증되지 않았다."
+ },
+ {
+  "finding_id": "finding-a3520d0b532f32903fcbc78d",
+  "finding_text_md5": "b5aac9306b0209f70a712ebf7379458f",
+  "published_date": "2019-07-15",
+  "detail_text": "topical creams used to treat severe muscular pain. Specifically, your firm used EVERCLEAR 95% GRAIN ALCOHOL to produce approximately 200 prescriptions made in non-sterile drug production from 2012 to 2019. For example: A. Ketoprofen 5% Gel was prepared using EVERCLEAR 95% GRAIN ALCOHOL for a total of [redacted] times from 2012 to 2019. B. [redacted] base [redacted], is used as a component in over [redacted] different non-sterile drug formulas. Your firm prepared [redacted] using EVERCLEAR 95% GRAIN ALCOHOL in [redacted] prescriptions from 2012 to 2019. OC6f(4.L':7 r6fP!l7-, C. From 2013 to 2019, your firm formulated prescriptions of a cream, Ultracaine-Benzocaine 20%, Ljdocaine 8%, Tetracaine 4%, Ibuprofen 2%, Bupivacaine 0.5%, that used EVERCLEAR 95% GRAIN ALCOHOL. LI There is no evidence that EVERCLEAR 95% GRAIN ALCOHOL used to produce creams and liquid non-sterile drug products is ofan appropriate quality for its intended use. *Dates of the Inspection: 02/07/2019, 02/11/2019, 02/12/2019, and 02/14/2019",
+  "detail_text_ko": "심한 근육통 치료에 쓰는 외용 크림. 구체적으로, 귀사는 2012년부터 2019년까지 비무균 의약품 생산에서 만든 약 200건의 처방을 만들기 위해 EVERCLEAR 95% GRAIN ALCOHOL을 사용했다. 예를 들면 다음과 같다. A. Ketoprofen 5% Gel은 2012년부터 2019년까지 총 [redacted]회 EVERCLEAR 95% GRAIN ALCOHOL을 사용해 조제되었다. B. [redacted] base [redacted]은(는) [redacted]가지가 넘는 서로 다른 비무균 의약품 처방의 구성 성분으로 쓰인다. 귀사는 2012년부터 2019년까지 [redacted]건의 처방에서 EVERCLEAR 95% GRAIN ALCOHOL을 사용해 [redacted]을(를) 조제했다. OC6f(4.L':7 r6fP!l7-, C. 2013년부터 2019년까지 귀사는 EVERCLEAR 95% GRAIN ALCOHOL을 사용한 크림 처방, Ultracaine-Benzocaine 20%, Ljdocaine 8%, Tetracaine 4%, Ibuprofen 2%, Bupivacaine 0.5%를 조제했다. LI 크림과 액상 비무균 의약품을 만드는 데 사용된 EVERCLEAR 95% GRAIN ALCOHOL이 의도한 용도에 적합한 품질이라는 증거가 없다. *실사 일자: 02/07/2019, 02/11/2019, 02/12/2019, 02/14/2019"
+ },
+ {
+  "finding_id": "finding-6539f53d8ed18ec7989ab719",
+  "finding_text_md5": "02865eea7ae113c337a43bbd29b51332",
+  "published_date": "2019-07-15",
+  "detail_text": "Specitically, a. Your firm failed to conduct [redacted] testing only [redacted] used to sterilize Atropine Sulfate 0.01% Sterile Ophthalmic Solution, lot 021219OS1010, manufactured on 02/12/19, with a beyond-use date (BUD) of 180 days. b. Your firm released products purported to be sterile despite the failure of the [redacted] used in their production to meet the manufacturer's [redacted] test specifications. For example: Prednisolone/Ketorolac 1 %/0.5% Ophthalmic Solution, lot 021319OS1001, manufactured on 02/13/19, with a BUD of 180 days, was released with a [redacted] testing result of [redacted] which is below the manufacturer's specification of [redacted] Timolol/Brimonidine/Dozolamide 0.5%/0.2%/2% Ophthalmic Solution, lot 020720190S I006, manufactured on 02/07/19, with a BUD of 180 days, was released with a [redacted] testing result of [redacted] which is below the manufacturer's specification of [redacted] 1120 Kensington Ave Unit E TYPE ESTABUSMMENT INSPECTED Compounding Pharmacy Chr!slopllor R Cza1ca lnvasllg!!tor Signed B. R. Cm kD -S X Oa1DS~~1910:4i:37",
+  "detail_text_ko": "구체적으로, a. 귀사는 Atropine Sulfate 0.01% Sterile Ophthalmic Solution, lot 021219OS1010(02/12/19 제조, 사용 기한(BUD) 180일)을 멸균하는 데 사용된 [redacted]에 대해서만 [redacted] 시험을 수행하지 않았다. b. 귀사는 생산에 사용된 [redacted]이(가) 제조업체의 [redacted] 시험 규격을 충족하지 못했음에도 멸균되었다고 표방하는 제품을 출하했다. 예를 들면 다음과 같다. Prednisolone/Ketorolac 1 %/0.5% Ophthalmic Solution, lot 021319OS1001(02/13/19 제조, BUD 180일)은 [redacted] 시험 결과 [redacted]으로 출하되었으며, 이는 제조업체의 규격인 [redacted] 미만이다. Timolol/Brimonidine/Dozolamide 0.5%/0.2%/2% Ophthalmic Solution, lot 020720190S I006(02/07/19 제조, BUD 180일)은 [redacted] 시험 결과 [redacted]으로 출하되었으며, 이는 제조업체의 규격인 [redacted] 미만이다. 1120 Kensington Ave Unit E TYPE ESTABUSMMENT INSPECTED Compounding Pharmacy Chr!slopllor R Cza1ca lnvasllg!!tor Signed B. R. Cm kD -S X Oa1DS~~1910:4i:37"
+ },
+ {
+  "finding_id": "finding-efbba9fe4f68af32bf361e02",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, a) You only conduct environmental monito1ing including personnel monitoring every [redacted] b) You do not monitor the pressure in the classified rooms. Since the end of December 2018, you have not monitored and documented the pressure. ***This is a repeat observation",
+  "detail_text_ko": "구체적으로, a) 귀사는 인원 모니터링을 포함한 환경 모니터링(monito1ing)을 [redacted]마다 한 번만 수행한다. b) 귀사는 등급 구역(classified rooms)의 압력을 모니터링하지 않는다. 2018년 12월 말 이후 귀사는 압력을 모니터링하거나 기록하지 않았다. ***이는 반복 관찰 사항이다"
+ },
+ {
+  "finding_id": "finding-dc68f73ade6de9c125ad773a",
+  "finding_text_md5": "8460be89ed67660284eb3d92ea2a9ee5",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, c) Your media fill does not mimic actual operations to include the quantities, different size vials/containers and multiple manipulaions. d) You have no records to qualify the [redacted] you use for [redacted] sterilization. (o} ***This is a repeat observation.***",
+  "detail_text_ko": "구체적으로, c) 귀사의 배지충전은 수량, 서로 다른 크기의 바이알/용기, 여러 차례의 조작(manipulaions)을 포함한 실제 작업을 모사하지 않는다. d) 귀사가 [redacted] 멸균에 사용하는 [redacted]을(를) 적격성 평가했다는 기록이 없다. (o} ***이는 반복 관찰 사항이다.***"
+ },
+ {
+  "finding_id": "finding-dbd6d69e6fd53a9144321a84",
+  "finding_text_md5": "e7fdfc84ea7ca3649c5f4c6ddd232538",
+  "published_date": "2019-07-12",
+  "detail_text": "For example, no records for a complaint investigation involving a prescription refill of phenobarbital capsules 6mg on 10/19/2017 (Rx [redacted] for super potency were provided.",
+  "detail_text_ko": "예를 들어 10/19/2017에 phenobarbital capsules 6mg의 처방 재조제(Rx [redacted])에서 발생한 초과 역가(super potency) 관련 불만 조사 기록이 제공되지 않았다."
+ },
+ {
+  "finding_id": "finding-d82c52fd0209d3b7cd2c1364",
+  "finding_text_md5": "ff1c3779139c4eaea65d26a650e7a720",
+  "published_date": "2019-07-12",
+  "detail_text": "CATE ISSUED Producer of non-sterile drugs Specifically, a.) Materials/components used to produce drugs are not all classified and/or identified upon receipt as either being non-hazardous, hazardous/highly potent, containing beta-lactams, or controlled substances. b.) Storage of hazardous/highly potent materials, controlled substances, and beta-lactam containing materials are not always segregated or accounted for appropriately. c.) Inventory records for materials/components used to produce drugs are not maintained for those currently on­hand. d.) Pertinent information on incoming materials/components used to produce drugs, such as the name of manufacturers and whether they are an approved supplier, lot numbers, and if an accompanying CoA for bulk chemical materials/components is received, are not recorded and/or checked for as per a written procedure.",
+  "detail_text_ko": "CATE ISSUED Producer of non-sterile drugs 구체적으로, a.) 의약품 생산에 사용되는 물질/구성 성분이 입고 시 비유해, 유해/고역가, 베타락탐 함유, 관리 물질 중 어느 것인지 모두 분류 및/또는 식별되지 않는다. b.) 유해/고역가 물질, 관리 물질, 베타락탐 함유 물질의 보관이 항상 적절하게 분리되거나 수량 관리되는 것은 아니다. c.) 의약품 생산에 사용되는 물질/구성 성분 중 현재 보유 중인 것의 재고 기록이 유지되지 않는다. d.) 의약품 생산에 사용되는 입고 물질/구성 성분의 제조업체 명칭, 승인된 공급업체 여부, 로트 번호, 벌크 화학 물질/구성 성분에 딸린 CoA의 수령 여부 같은 관련 정보가 서면 절차에 따라 기록 및/또는 확인되지 않는다."
+ },
+ {
+  "finding_id": "finding-cc475b2483bdefba986f4a14",
+  "finding_text_md5": "08c181633a47896c0a4a535033b88062",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, your firm does not have cleaning procedures in place to ensure the prevention of cross-contamination of hazardous drugs. Examples include, but are not limited to, the cleaning of work surfaces, compounding equipment, and utensils, which are located and/or used to produce hazardous drug products in the non-sterile compounding room. Examples of hazardous drug products made at your firm include, but are not limited to, C-Oxytocin Sublingual Tablets and C-Oxytocin Nasal Spray.",
+  "detail_text_ko": "구체적으로, 귀사는 유해 의약품의 교차오염 방지를 보장하는 세척 절차를 갖추고 있지 않다. 예로는 비무균 조제실에서 유해 의약품을 생산하는 데 쓰이는 작업대 표면, 조제 설비, 기구의 세척이 있으며 이에 한정되지 않는다. 귀사에서 만드는 유해 의약품의 예로는 C-Oxytocin Sublingual Tablets와 C-Oxytocin Nasal Spray가 있으며 이에 한정되지 않는다."
+ },
+ {
+  "finding_id": "finding-c23b66ac7b40dd70e2bd88f4",
+  "finding_text_md5": "60235c980b4d161b491840712c4d2785",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, a.) Drug product production equipment such as capsule filling trays and spatulas/mortars/pestles/spinners are not rinsed with purified water and/or sanitized with appropriate sanitizing agents after cleaning with hot water and dish soap. b.) There are no defined/labeled areas for storage of\"clean\" and \"unclean\" drug production equipment/utensils and cloth cleaning towels. These items were observed on cowiter tops in the cleaning area by the 2-compartment sink without identification of \"clean\" or \"unclean\" status or any other unique identifier. c.) There are no cleaning procedures defming what cleaning/sanitizing agents are acceptable and when/how to use them. For example, [redacted] is used to clean/sanitize benchtops and analytical balances after use for each drug product produced (witnessed after production of budesonide capsules 1mg: Rx [redacted] and metronidazole capsules 62.5mg: Rx [redacted] however [redacted] may also be used to clean/sanitize benchtops as well, as reported by the pharmacist-in-charge. Additionally, there are no specified cleaning/sanitizing agents (bleach and IPA 70%) or instructions for cleaning work surfaces and equipment after production of beta­Iactam containing drug products. Producer of non-sterile drugs",
+  "detail_text_ko": "구체적으로, a.) 캡슐 충전 트레이, 주걱/막자사발/막자/스피너 같은 의약품 생산 설비는 뜨거운 물과 주방 세제로 세척한 뒤 정제수로 헹구거나 및/또는 적절한 소독제로 소독하지 않는다. b.) \"청결\" 및 \"비청결\" 의약품 생산 설비/기구와 천 세척 수건을 보관하는 정해진/표시된 구역이 없다. 이 품목들이 2구획 싱크 옆 세척 구역의 조리대(cowiter tops) 위에서 \"청결\" 또는 \"비청결\" 상태 표시나 다른 고유 식별 표시 없이 관찰되었다. c.) 어떤 세척/소독제가 허용되는지와 언제/어떻게 사용하는지를 정의하는(defming) 세척 절차가 없다. 예를 들어 [redacted]은(는) 의약품을 생산할 때마다 그 사용 후 작업대와 분석 저울을 세척/소독하는 데 쓰이며(budesonide capsules 1mg: Rx [redacted] 및 metronidazole capsules 62.5mg: Rx [redacted] 생산 후 목격됨), 책임 약사의 보고에 따르면 [redacted]도 작업대를 세척/소독하는 데 쓰일 수 있다. 또한 베타락탐 함유 의약품 생산 후 작업 표면과 설비를 세척하기 위한 지정된 세척/소독제(bleach 및 IPA 70%)나 지침이 없다. Producer of non-sterile drugs"
+ },
+ {
+  "finding_id": "finding-bebadd4fa85a9c0fee58db8d",
+  "finding_text_md5": "8bcce8c0b856c49942e37f4e3b73fd08",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, d) You have no records to document the proper [redacted] tor [redacted] 5terilization were used. [redacted] e) You do not conduct [redacted] testing and I observed [redacted] being thrown away prior to being tested. ***This is a repeat observation.***",
+  "detail_text_ko": "구체적으로, d) 올바른 [redacted] tor [redacted] 5terilization이 사용되었음을 문서화한 기록이 없다. [redacted] e) 귀사는 [redacted] 시험을 수행하지 않으며, 실사관은 [redacted]이(가) 시험되기 전에 버려지는 것을 관찰했다. ***이는 반복 관찰 사항이다.***"
+ },
+ {
+  "finding_id": "finding-a1cca10cdbf2905082bdb4f1",
+  "finding_text_md5": "ad509081977118ce2fb75813c3f65e1a",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, your firm used components that were not pharmaceutical grade to produce drug products that included, but were not limited to, the items listed below. A.) Non-pharmaceutical grade [redacted] water was purchased by your firm and it was used to produce multiple nasal spray drug products. Examples include, but are not limited to, the drug products listed below. l. Approximately [redacted] lots of C-Ketamine NasaJ Spray were produced between February 2019 and May 2019. 2. Approximately [redacted] lots of C-Oxytocin 24 units/ml Nasal Spray were produced between February 2019 and May 2019. 3. Approximately [redacted] lot of C-Lidocaine HCI 4% Glycerin Nasal Spray was produced in April 2019. Your firm has not submitted any samples of this [redacted] water to your contract laboratory to test for microbial limits and/or other analytical properties to show it is equivalent to pharmaceutical grade water. B.) Non-pharmaceutical grade ingredient, Oxytocin, was purchased and used by your firm to produce non-sterile sublingual tablet and non-sterile nasal spray drug products. Examples include, but are not limited to, the drug products listed below. I. Approximately [redacted] lots of C-Oxytocin Sublingual Tablets were produced between February 2019 and May 2019. DEPARTl\\'lENT OF H EAL.111 AND IIUMAN SERVICES Ol3TRJCT AOOffl;SSANO PHONE NUMBER 19701 Fairchild Irvine, CA 92612- 2445 (949)608 - 2900 Fax: (949)608-441 7 NAME ANO TITLE Of INDIVIDUAi. TO WHOM REPORT ISSUED OATE(S)OF INSPeCTION 5/13/2019- 5/17/2019* FEIN\\JMBER 3015131323 George W. Kridner IV, Pharm. D, Chief Executive Officer CllY, STATE. lJP CC.OE. COUNTRY Whittier, CA 90601-4206 SlREEf AOORESS 13027 Hadley St Ste B HPE ESTABLISHMENT INSPECTED Producer of Non-Sterile Drug Products May 2019. 2. Approximately [redacted] lots of C-Oxytocin 24 units/mL Nasal Spray were produced between February 2019 and May 2019. The Certificate of Analysis and container label for the Oxytocin states that this ingredient is \"Not for Human or Vet use without sterile processing.\"",
+  "detail_text_ko": "구체적으로, 귀사는 아래 목록의 품목을 포함하되 이에 한정되지 않는 의약품을 만들면서 의약품 등급이 아닌 구성 성분을 사용했다. A.) 의약품 등급이 아닌 [redacted] 물은 귀사가 구입하여 여러 비강 스프레이 의약품을 만드는 데 사용했다. 예로는 아래에 열거한 의약품이 있으며 이에 한정되지 않는다. l. C-Ketamine NasaJ Spray 약 [redacted]개 로트가 2019년 2월부터 2019년 5월 사이에 생산되었다. 2. C-Oxytocin 24 units/ml Nasal Spray 약 [redacted]개 로트가 2019년 2월부터 2019년 5월 사이에 생산되었다. 3. C-Lidocaine HCI 4% Glycerin Nasal Spray 약 [redacted]개 로트가 2019년 4월에 생산되었다. 귀사는 이 [redacted] 물이 의약품 등급 물과 동등함을 보이기 위한 미생물 한도 및/또는 기타 분석 특성 시험을 위해 이 물의 시료를 위탁 시험소에 보낸 적이 없다. B.) 의약품 등급이 아닌 성분인 Oxytocin을 귀사가 구입하여 비무균 설하정 및 비무균 비강 스프레이 의약품을 만드는 데 사용했다. 예로는 아래에 열거한 의약품이 있으며 이에 한정되지 않는다. I. C-Oxytocin Sublingual Tablets 약 [redacted]개 로트가 2019년 2월부터 2019년 5월 사이에 생산되었다. DEPARTl\\\\'lENT OF H EAL.111 AND IIUMAN SERVICES Ol3TRJCT AOOffl;SSANO PHONE NUMBER 19701 Fairchild Irvine, CA 92612- 2445 (949)608 - 2900 Fax: (949)608-441 7 NAME ANO TITLE Of INDIVIDUAi. TO WHOM REPORT ISSUED OATE(S)OF INSPeCTION 5/13/2019- 5/17/2019* FEIN\\\\JMBER 3015131323 George W. Kridner IV, Pharm. D, Chief Executive Officer CllY, STATE. lJP CC.OE. COUNTRY Whittier, CA 90601-4206 SlREEf AOORESS 13027 Hadley St Ste B HPE ESTABLISHMENT INSPECTED Producer of Non-Sterile Drug Products May 2019. 2. C-Oxytocin 24 units/mL Nasal Spray 약 [redacted]개 로트가 2019년 2월부터 2019년 5월 사이에 생산되었다. Oxytocin의 시험성적서와 용기 라벨에는 이 성분이 \"Not for Human or Vet use without sterile processing.\"라고 기재되어 있다."
+ },
+ {
+  "finding_id": "finding-91d68348b2696e1fe8da6e16",
+  "finding_text_md5": "953609f862c0310a5fea9d9210274446",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, Your firm failed to utilize an oxidizing agent to clean immediately following the handling of testosterone, estrogen, and morphine containing drug products in your [redacted] hoods, [redacted] serial number [redacted] and [redacted] serial number [redacted] your firm only utilizes [redacted] to clean between compounding drug products, per your standard operating procedure, \"Room Cleaning Procedures and Spill Handling\", SOP #3.007.",
+  "detail_text_ko": "구체적으로, 귀사는 귀사의 [redacted] 후드, 일련번호 [redacted]의 [redacted], 일련번호 [redacted]의 [redacted]에서 testosterone, estrogen, morphine을 함유한 의약품을 취급한 직후 산화제를 사용해 세척하지 않았다. 귀사는 표준작업절차 \"Room Cleaning Procedures and Spill Handling\", SOP #3.007에 따라 의약품 조제 사이의 세척에 [redacted]만 사용한다."
+ },
+ {
+  "finding_id": "finding-8334d45f65249356f56aa4c7",
+  "finding_text_md5": "272d07bf99eabfc7c68a9b14727ce5c6",
+  "published_date": "2019-07-12",
+  "detail_text": "- identification of any automated, mechanical, or electronic equipment that is used during drug processing; e.g. analytical balances. - proof or second-check verification of weights/volumes recorded for each component used. For example, the prescription production records for a prescription fill of a tramadol suspension 20mg/mL (Rx [redacted] on 7/09/2018 lack these aforementioned items. 407 West Silver Spring Drive TYPE OF EST ABUSI-IAENT INSPECTED Producer of non-sterile drugs",
+  "detail_text_ko": "- 의약품 처리 중 사용되는 자동, 기계 또는 전자 장비(예: 분석 저울)의 식별. - 사용된 각 구성 성분에 대해 기록된 중량/부피의 증빙 또는 제2자 확인 검증. 예를 들어 7/09/2018 tramadol suspension 20mg/mL 처방 조제(Rx [redacted])의 처방 생산 기록에는 앞서 말한 항목이 없다. 407 West Silver Spring Drive TYPE OF EST ABUSI-IAENT INSPECTED Producer of non-sterile drugs"
+ },
+ {
+  "finding_id": "finding-80b386b05d219e7c12b9ee50",
+  "finding_text_md5": "4c0d5edeae923e3ceb55861c5c719d64",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, a) The Formula Worksheets do not include instructions for mixing times or number of times the ointment mill should be used. b) I observed no final check to verify the correct ingredients and amounts were added during this inspection.",
+  "detail_text_ko": "구체적으로, a) 처방 작업지시서(Formula Worksheets)에는 혼합 시간이나 연고 롤밀(ointment mill)을 사용해야 하는 횟수에 대한 지시가 없다. b) 이번 실사 중 올바른 성분과 양이 첨가되었는지 확인하는 최종 점검이 없는 것을 실사관은 관찰했다."
+ },
+ {
+  "finding_id": "finding-6af2366b5e1d9089440b3df0",
+  "finding_text_md5": "b499ce3557e3fb080731f1a97f4bbc99",
+  "published_date": "2019-07-12",
+  "detail_text": "Examples include, but not limited to: 1-: [redacted] Model [redacted] 1 [redacted] (Model[ [redacted] I<R edacted B4 I• [redacted] SIN [redacted] No calibration or maintenance records for the aforementioned analytical balances, used for drug product production, were provided. During production of a prescription fill for budesonide capsules 1mg on 7/27/2018 (Rx [redacted] it was observed that a non-calibrated analytical balance was used.",
+  "detail_text_ko": "예로는 다음이 있으며 이에 한정되지 않는다. 1-: [redacted] Model [redacted] 1 [redacted] (Model[ [redacted] I<R edacted B4 I• [redacted] SIN [redacted] 의약품 생산에 사용된 위 분석 저울에 대한 교정 또는 유지보수 기록이 제공되지 않았다. 7/27/2018 budesonide capsules 1mg 처방 조제(Rx [redacted]) 생산 중 교정되지 않은 분석 저울이 사용되는 것이 관찰되었다."
+ },
+ {
+  "finding_id": "finding-63a34581529c079299532e08",
+  "finding_text_md5": "127147070a3541381bc5aca725fc1c5f",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, several technicians were observed producing drug formulations without hair nets and/or designated gowning/apparel during the inspection. For example, during production of metronidazole capsules 62.5mg (Rx [redacted] on 7/31/2018 a technician with long hair was observed without a hairnet.",
+  "detail_text_ko": "구체적으로, 실사 중 여러 기술자가 헤어넷 및/또는 지정된 무균복 착의/의복 없이 의약품 처방을 생산하는 것이 관찰되었다. 예를 들어 7/31/2018 metronidazole capsules 62.5mg(Rx [redacted]) 생산 중 머리가 긴 기술자가 헤어넷 없이 있는 것이 관찰되었다."
+ },
+ {
+  "finding_id": "finding-4108ad52585f630d1cf53900",
+  "finding_text_md5": "6c6e68e48db9d19f463b6a41363541cc",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, the gown, mask, hairnet and booties used in the classified area is not sterile. ***This is a repeat observation.***",
+  "detail_text_ko": "구체적으로, 등급 구역에서 사용하는 가운, 마스크, 헤어넷, 덧신이 멸균 상태가 아니다. ***이는 반복 관찰 사항이다.***"
+ },
+ {
+  "finding_id": "finding-3c51993c09a12bdf9cc6f609",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, a) You do not have cleaning records prior to Januaiy 2019 and they do not include documentation of contact times for the cleaning agents you use. This includes documentation to show you conducted triple cleaning after you had growth in the ISO 7 rooms on March 28, 2017, September 13, 2017 and March 26, 2018. b) You use a product called [redacted] that is not labeled as sterile to clean the ISO 5 [redacted] and laminar flow hood. c) You use non-sterile wipes and mop covers to clean the classified area including inside the [redacted] and laminar flow hood. I ( ***This is a repeat observation. Producer of Sterile and Non-sterile Drugs",
+  "detail_text_ko": "구체적으로, a) 2019년 1월 이전의 세척 기록이 없으며, 기록에는 귀사가 사용하는 세척제의 접촉 시간 문서화가 포함되어 있지 않다. 여기에는 2017년 3월 28일, 2017년 9월 13일, 2018년 3월 26일 ISO 7 실에서 균 증식이 있은 뒤 3중 세척(triple cleaning)을 수행했음을 보여주는 문서화가 포함된다. b) 귀사는 멸균이라고 표시되지 않은 [redacted]라는 제품을 ISO 5 [redacted] 및 층류 후드를 세척하는 데 사용한다. c) 귀사는 [redacted] 및 층류 후드 내부를 포함한 등급 구역을 세척하는 데 비멸균 와이프와 걸레 커버를 사용한다. I ( ***이는 반복 관찰 사항이다. Producer of Sterile and Non-sterile Drugs"
+ },
+ {
+  "finding_id": "finding-36a2a9efdccec47ca6aa6a81",
+  "finding_text_md5": "eb5cb9868293e23374a921190dc155a5",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, you do not conduct sterility testing beyond the initial production date on finished products where you apply extended beyond use dates up to [redacted] years. In addition, the data you use to support your extended beyond use dates is several years old and do not reflect any changes made in the process or to suppliers of components or bulk drug substances. Producer of Sterile and Non- sterile Drugs use dates is several years old and do not reflect any changes made in the process or to suppliers of components or bulk chug substances.",
+  "detail_text_ko": "구체적으로, 귀사는 최대 [redacted]년까지의 연장된 사용 기한(beyond use dates)을 적용하는 완제품에 대해 최초 생산일 이후의 무균시험을 수행하지 않는다. 또한 귀사가 연장된 사용 기한을 뒷받침하기 위해 사용하는 데이터는 수년 전의 것이며 공정이나 구성 성분 또는 벌크 의약품 물질 공급업체에 이루어진 변경을 반영하지 않는다. Producer of Sterile and Non- sterile Drugs use dates is several years old and do not reflect any changes made in the process or to suppliers of components or bulk chug substances."
+ },
+ {
+  "finding_id": "finding-2fb9113deaa270dd4bdb23cf",
+  "finding_text_md5": "cb54ed0bd783a6576f320c9a92ffb7d2",
+  "published_date": "2019-07-12",
+  "detail_text": "Dosage fonns prepared by technicians range from aqueous solutions, oils/suspensions, capsules, chew treats, eye drops, to ttansdermals.",
+  "detail_text_ko": "기술자가 조제하는 제형은 수용액, 오일/현탁액, 캡슐, 츄 트릿(chew treats), 점안액, 경피제(ttansdermals)에 이른다."
+ },
+ {
+  "finding_id": "finding-2e8fa7fb544a547e32021ebc",
+  "finding_text_md5": "57d07f16635e995e136543888beabe09",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, a) The anteroom (ISO 7) is crowded with several carts, cabinets and the [redacted] that make operations difficult. b) Rust is on floor in the anteroom. c) You do not have written procedures for handling spills or cleaning for hazardous drugs or blood derived components. d) Scales used to weigh powders in the hoods for non-sterile products have dirt and rnst stains. e) Spatulas used for non-sterile products are worn, stained and have nicks.",
+  "detail_text_ko": "구체적으로, a) 전실(ISO 7)에 여러 대의 카트, 캐비닛과 [redacted]이(가) 빽빽이 놓여 작업이 어렵다. b) 전실 바닥에 녹이 있다. c) 유해 의약품 또는 혈액 유래 성분의 유출 처리나 세척에 대한 서면 절차가 없다. d) 비무균 제품용 후드에서 분말을 칭량하는 데 쓰는 저울에 오물과 녹(rnst) 얼룩이 있다. e) 비무균 제품에 쓰는 주걱이 닳고 얼룩지고 흠집이 나 있다."
+ },
+ {
+  "finding_id": "finding-262cf978d01ec8e537fa27f5",
+  "finding_text_md5": "6ade5ab1a9e551bd0a02e3d4b3556f6e",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, a) You do not test each lot/batch of sterile drug product for potency for each active ingredient prior to release for distribution. b) You use [redacted] that does not meet the definition of purified water in your non-sterile products. Producer of Sterile and Non-sterile Drugs TIONS",
+  "detail_text_ko": "구체적으로, a) 귀사는 유통 출하 전에 무균 의약품의 각 로트/배치를 각 유효 성분별로 역가 시험하지 않는다. b) 귀사는 비무균 제품에 정제수의 정의를 충족하지 않는 [redacted]을(를) 사용한다. Producer of Sterile and Non-sterile Drugs TIONS"
+ },
+ {
+  "finding_id": "finding-0a90c15427d70133cc59d6f5",
+  "finding_text_md5": "288463a4f4b7f5dfeddfb6e72884d390",
+  "published_date": "2019-07-12",
+  "detail_text": "For example, no cited literature or other evidence was provided in support of a BUD of 60 days for a phenobarbital suspension 6mg/mL (Rx [redacted].",
+  "detail_text_ko": "예를 들어 phenobarbital suspension 6mg/mL(Rx [redacted])의 60일 BUD를 뒷받침하는 인용 문헌이나 기타 증거가 제공되지 않았다."
+ },
+ {
+  "finding_id": "finding-03effa8b83d79344c7e3384d",
+  "finding_text_md5": "69d0f5a31b9f141efd877fa3bc135a41",
+  "published_date": "2019-07-12",
+  "detail_text": "Specifically, you only perform potency testing of your non-sterile products.",
+  "detail_text_ko": "구체적으로, 귀사는 비무균 제품에 대해서만 역가 시험을 수행한다."
+ },
+ {
+  "finding_id": "finding-f9edeaae79521db11d2c4487",
+  "finding_text_md5": "05ce2f2ea6398459ec6a887c21ebc254",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, your Acceptance Quality Limit [AQL] does not take into account the component critical dimensions specification during receipt of components for the manufacture of Injection hid ngnL such as and stoppers. 6/13/2019(Thu), 6/14/2019(Fri), 6/17/2019(Mon), 6/18/2019(Tue), 6/19/2019(Wed), 6/20/2019(Thu), 6/21/2019(Fri)",
+  "detail_text_ko": "구체적으로, 귀사의 허용 품질 한계(AQL)는 Injection hid ngnL 제조용 구성 성분(예: 마개(stoppers))의 입고 시 구성 성분 주요 치수 규격을 고려하지 않는다. 6/13/2019(Thu), 6/14/2019(Fri), 6/17/2019(Mon), 6/18/2019(Tue), 6/19/2019(Wed), 6/20/2019(Thu), 6/21/2019(Fri)"
+ },
+ {
+  "finding_id": "finding-ca28ca8b955bc1d3985d9027",
+  "finding_text_md5": "d9c0e916f2a864cf4ab88b26cfcb0c39",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, on 04/16/2019, I observed your pharmacy technician,, whom is not considered a Quality Unit employee, enter your firm's software program to print batch labels for bevacizumab. The user name and password to access this computer is displayed on your firm's monitor, allowing unrestricted and uncontrolled access. The computer is displayed in a high traffic area ( e.g. [redacted] During this inspection, I observed outside contractors pass by this computer on multiple occasions.",
+  "detail_text_ko": "구체적으로, 04/16/2019 실사관은 품질 부서 직원으로 간주되지 않는 귀 약국의 약국 기술자가 bevacizumab 배치 라벨을 출력하기 위해 귀사의 소프트웨어 프로그램에 들어가는 것을 관찰했다. 이 컴퓨터에 접속하기 위한 사용자 이름과 비밀번호가 귀사 모니터에 표시되어 있어, 제한 없고 통제되지 않는 접근이 가능했다. 이 컴퓨터는 사람의 왕래가 많은 구역(예: [redacted])에 놓여 있다. 이번 실사 중 실사관은 외부 계약업체 직원이 이 컴퓨터 옆을 여러 차례 지나가는 것을 관찰했다."
+ },
+ {
+  "finding_id": "finding-c5bb99e262f602217951947a",
+  "finding_text_md5": "788f248fa14f7a1733c4943726ef1f14",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, your outsourcing facility lacked valid analytical and sterility data to support the following: ***THIS IS A REPEAT OBSERVATION*** A. According to your Director of Quality Operations, your firm has not conducted any stability testing to suppori the 30-day beyond use date (BUD) assigned to [redacted] (Bevacizumab/Dexamethasone), used for sterile intrnvitreal injections. B. According to your Stability Study Protocol, conducted by your third party laboratory contractor, A vastin (Bevacizumab) repackaged in [redacted] syringes failed stability testing at [redacted] in the last passing stability testing result [redacted] unit [redacted] is [redacted] days. However, your firm applies a 105-day BUD to A vastin (Bevacizumab) [redacted] syringes. (CDICJIII, eSg'le(I 06-20--20l9060523",
+  "detail_text_ko": "구체적으로, 귀사의 위탁 제조 시설(outsourcing facility)은 다음을 뒷받침할 유효한 분석 및 무균 데이터가 없었다. ***THIS IS A REPEAT OBSERVATION*** A. 귀사의 품질운영 책임자(Director of Quality Operations)에 따르면, 귀사는 무균 유리체내 주사에 사용되는 [redacted](Bevacizumab/Dexamethasone)에 부여한 30일 사용 기한(BUD)을 뒷받침하는 안정성 시험을 전혀 수행하지 않았다. B. 제3자 시험 계약업체가 수행한 귀사의 안정성 시험 계획서(Stability Study Protocol)에 따르면, [redacted] 주사기에 재포장된 A vastin(Bevacizumab)은 [redacted]에서 안정성 시험에 부적합했고, 마지막으로 적합했던 안정성 시험 결과 [redacted] 단위 [redacted]은(는) [redacted]일이다. 그러나 귀사는 A vastin(Bevacizumab) [redacted] 주사기에 105일 BUD를 적용한다. (CDICJIII, eSg'le(I 06-20--20l9060523"
+ },
+ {
+  "finding_id": "finding-b098dae2b6026d17be2cc664",
+  "finding_text_md5": "92ba5042c993896102feee2aef14a1cf",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, A. Syringes used during visual inspection trainings are not representative of the actual syringes used m processmg. For example, but are not limited to: Your firm uses Monoject syringes (not [redacted] syringes) during the visual trnining of your Pharmacist when conducting final visual inspections (i.e. visible particulates, inaccurate dosage, presence of bubbles, discoloration, other). June P Page, Investigato r Br andon C Heitmeier, Investigato r.ll'lePPage S By 2000405709 Philip F Istafanos, Micr obi o l ogist X eSg'le(I 06-20--20l9060523 Susan T Hadman, Micr obi o l ogist",
+  "detail_text_ko": "구체적으로, A. 육안 검사 교육에 사용되는 주사기는 공정에 실제로 사용되는 주사기를 대표하지 않는다. 예를 들면 다음과 같으며 이에 한정되지 않는다. 귀사는 약사의 최종 육안 검사(즉, 가시 입자, 부정확한 용량, 기포 존재, 변색, 기타) 시 육안 검사 교육(trnining)에 [redacted] 주사기가 아닌 Monoject 주사기를 사용한다. June P Page, Investigato r Br andon C Heitmeier, Investigato r.ll'lePPage S By 2000405709 Philip F Istafanos, Micr obi o l ogist X eSg'le(I 06-20--20l9060523 Susan T Hadman, Micr obi o l ogist"
+ },
+ {
+  "finding_id": "finding-ab310038b036141604974f2a",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, ***THIS IS A REPEAT OBSERVATION*** A. I observed visible discoloration that appears to be moist on a staging/supply cart located in your firm's cleanroom [redacted], approximately 3' from the LAFH (ISO 5 classified), EQ ID: [redacted] where aseptic operations occur for sterile intravitreal injections. In addition, your firm's Director of Quality Operations could not provide documentation supporting the suitability of these carts in a classified area.",
+  "detail_text_ko": "구체적으로, ***THIS IS A REPEAT OBSERVATION*** A. 무균 유리체내 주사제를 위한 무균 작업이 이루어지는 귀사 청정실 [redacted]의 LAFH(ISO 5 등급)에서 약 3' 떨어진 대기/공급 카트에서 젖은 것으로 보이는 눈에 띄는 변색을 실사관은 관찰했다. EQ ID: [redacted]. 또한 귀사의 품질운영 책임자는 등급 구역에서 이 카트의 적합성을 뒷받침하는 문서를 제공하지 못했다."
+ },
+ {
+  "finding_id": "finding-7a6851c240316ebe3512f4ea",
+  "finding_text_md5": "25548a04f31e455018400349eb5d246a",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, A. Your firm uses, including but are not limited to: spikes, syringes, vials, forceps, and decappers, during aseptic operations of your firm's sterile intravitreal injectable drug products: Avastin (Bevacizumab) and [redacted] (Bevacizumab/Dexamethasone). However, your firm failed to conduct any additional testing prior to the use of these components in your firm's aseptic operations ensuring the validity of the manufacturer's test results. In addition, your firm does not have a quality agreement with the suppliers and your firm have not qualified these vendors. B. In addition, your firm does not conduct final release testing for identity, strength, quality and purity for any of the following sterile drug products produced/repackaged at your firm: 1. <R edacted B4> '(Bevacizumab/Dexamethasone) 2. A vastin (Bevacizumab)",
+  "detail_text_ko": "구체적으로, A. 귀사는 귀사의 무균 유리체내 주사용 의약품인 Avastin(Bevacizumab)과 [redacted](Bevacizumab/Dexamethasone)의 무균 작업 중 스파이크, 주사기, 바이알, 핀셋, 캡 제거기(decappers) 등을 사용하며 이에 한정되지 않는다. 그러나 귀사는 제조업체의 시험 결과가 유효함을 확인하기 위해 이 구성 성분을 귀사의 무균 작업에 사용하기 전에 어떠한 추가 시험도 수행하지 않았다. 또한 귀사는 공급업체와 품질 협약(quality agreement)이 없으며 이 공급업체들을 적격성 평가하지 않았다. B. 또한 귀사는 귀사에서 생산/재포장하는 다음 무균 의약품 중 어느 것에 대해서도 확인, 함량, 품질, 순도에 대한 최종 출하 시험을 수행하지 않는다. 1. <R edacted B4> '(Bevacizumab/Dexamethasone) 2. A vastin (Bevacizumab)"
+ },
+ {
+  "finding_id": "finding-3f8a22814e8993cd8dad6d90",
+  "finding_text_md5": "2f1e4f4185f884cca676d721e1097149",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, ***THIS IS A REPEAT OBSERVATION*** Your firm failed to follow your written procedures, QS 2.2: Quality Complaint Handling, as it states the QA Manger will determine whether a complaint requires a non-conformance investigation. In addition, complaints categorized with the following require an investigation: Critical Complaint: A complaint that indicates that the strength, quality, purity, identity, safety or efficacy of the drug product may be compromised and has the potential to cause a life threatening or serious health situation. Serious Complaint: A complaint that indicates that the strength, quality, purity, identity, safety or efficacy of the dirug product may be compromised, however, does not pose a potential to cause a life threatening or serious health situation. Standard Complaint (Trend for 3 or more, investigation required if trend is identified or warranted): A complaint that does not indicate the strength, quality, purity, identity, safety or efficacy of the drug product has been compromised. However, your Quality Unit failed to conduct a thorough investigation for the following complaints, including, but are not limited to: A. Since 2016, your firm has received approximately 287 consumer complaints relating to patients experiencing the following, but are not limited to: floaters, plunger not advancing, fibers found on the needles, eye inflammation, loss of visual acuity, etc. According to the last FDA inspection, your firm has been aware of are the complaint issues regarding the plunger not advancing since the 2009 Examination of Blocked A vastin Syringes Study which attributed the root cause as low levels of silicone polymers mixing with the A vastin causing needle blockage. Your firm still has not taken the appropriate corrective and preventative actions to address the issue. Since 2016, your firm has received a total of 111 consumer complaints for the plunger not advancing. According to your firm's Director of Quality Operations, these complaints have never been reviewed or investigated by your firm. 1. In addition, on 05/17/2019, your firm's National Sales Manager, JM, received a complaint for ten (10) syringes of Avastin (Bevacizumab) l.25mg/0.05mL Monoject Syringe, Lot #190325-N, Exp. 07/08/2019, for the plunger not advancing. However, the National Sales Manager stated they did not complete a complaint form. This negligence resulted in a critical failure for the Pharmacy Quality Unit to conduct an investigation. This incident resulted in the physician \"had to repair at least one patient's eye three times because of this.\" Your firm has dispensed syringes of Avastin (Bevacizumab) 1.25mg/0.05mL Monoject Syringe, Lot #190325-N into the market.",
+  "detail_text_ko": "구체적으로, ***THIS IS A REPEAT OBSERVATION*** 귀사는 서면 절차 QS 2.2: Quality Complaint Handling을 따르지 않았다. 이 절차는 QA 관리자(QA Manger)가 불만이 부적합 조사를 필요로 하는지 판단한다고 정하고 있다. 또한 다음과 같이 분류된 불만은 조사가 필요하다. 중대 불만(Critical Complaint): 의약품의 함량, 품질, 순도, 확인, 안전성 또는 유효성이 훼손되었을 수 있음을 나타내며 생명을 위협하거나 중대한 건강 상황을 일으킬 가능성이 있는 불만. 심각 불만(Serious Complaint): 의약품의 함량, 품질, 순도, 확인, 안전성 또는 유효성이 훼손되었을 수 있음을 나타내지만 생명을 위협하거나 중대한 건강 상황을 일으킬 가능성은 없는 불만. 일반 불만(Standard Complaint)(3건 이상은 경향 분석, 경향이 확인되거나 필요하다고 판단되면 조사 필요): 의약품의 함량, 품질, 순도, 확인, 안전성 또는 유효성이 훼손되었음을 나타내지 않는 불만. 그러나 귀사의 품질 부서는 다음 불만들에 대해 철저한 조사를 수행하지 않았으며 이에 한정되지 않는다. A. 2016년 이후 귀사는 환자들이 겪은 부유물(floaters), 플런저가 앞으로 나아가지 않음, 바늘에서 섬유 발견, 눈 염증, 시력 저하 등과 관련된 소비자 불만을 약 287건 접수했으며 이에 한정되지 않는다. 지난 FDA 실사에 따르면, 귀사는 2009 Examination of Blocked A vastin Syringes Study 이후 플런저가 앞으로 나아가지 않는 불만 문제를 알고 있었으며, 그 연구는 근본 원인을 낮은 수준의 실리콘 중합체가 A vastin과 섞여 바늘이 막히는 것으로 보았다. 귀사는 여전히 이 문제를 해결하기 위한 적절한 시정 및 예방 조치를 취하지 않았다. 2016년 이후 귀사는 플런저가 앞으로 나아가지 않는다는 소비자 불만을 총 111건 접수했다. 귀사의 품질운영 책임자에 따르면 이 불만들은 귀사가 검토하거나 조사한 적이 없다. 1. 또한 05/17/2019에 귀사의 영업 총괄 관리자(National Sales Manager) JM은 플런저가 앞으로 나아가지 않는다는 Avastin (Bevacizumab) l.25mg/0.05mL Monoject Syringe, Lot #190325-N, Exp. 07/08/2019 주사기 열(10)개에 대한 불만을 접수했다. 그러나 영업 총괄 관리자는 불만 양식을 작성하지 않았다고 진술했다. 이 태만은 약국 품질 부서가 조사를 수행하지 못하는 중대한 실패로 이어졌다. 이 사건으로 의사는 \"이 때문에 적어도 한 명의 환자 눈을 세 번 수술해야 했다\"고 했다. 귀사는 Avastin (Bevacizumab) 1.25mg/0.05mL Monoject Syringe, Lot #190325-N 주사기를 시장에 출하했다."
+ },
+ {
+  "finding_id": "finding-35b042709c0d3c2287177b7f",
+  "finding_text_md5": "531ba7b1525cfbbe922a0678f8b4d5e4",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, your firm does not have any retain samples from previously manufactured lots.",
+  "detail_text_ko": "구체적으로, 귀사에는 이전에 제조한 로트의 보관 시료(retain samples)가 전혀 없다."
+ },
+ {
+  "finding_id": "finding-27a5d10ba7b27db79c746b6f",
+  "finding_text_md5": "37c6e15c9d1ed49516938dd9036c47de",
+  "published_date": "2019-07-09",
+  "detail_text": "P:, diced [redacted]:, Specifically, is not clear how your firm determined the acceptance criteria for the Functionality Testing (Break loose force & Glide force) conducted as part of finished product release specification for abi Injection mg [redacted] nL. For example, your firm explained that the worst-case condition was considered for the applied injection [redacted] based on the container size as part of the criteria to test thesamples. Your data was only obtained bos,the” samples from stability study for 24 months for (Batches: ae as reference data for Break loose force of 4)Newton and Glide force ofNewton.; as (b) ‘ However, your firm established the test limit for Break loose force as [redacted] Newton and for Glide force as (, Newton as the finished product release specification test limits. This was not supported by scientific data that demonstrated the impact to the end user or to the finished product functionality.",
+  "detail_text_ko": "P:, diced [redacted]:, 구체적으로, abi Injection mg [redacted] nL의 완제품 출하 규격의 일부로 수행되는 기능성 시험(Break loose force & Glide force)의 허용 기준을 귀사가 어떻게 정했는지 명확하지 않다. 예를 들어 귀사는 시료 시험 기준으로서 용기 크기에 따라 적용된 주사 [redacted]에 대해 최악 조건을 고려했다고 설명했다. 귀사의 데이터는 24개월 안정성 시험의 bos,the” 시료에서만 얻은 것이었고(Batches: ae), Break loose force 4)Newton 및 Glide force ofNewton의 기준 데이터로 쓰였다. as (b) ‘ 그러나 귀사는 완제품 출하 규격 시험 한도로서 Break loose force를 [redacted] Newton, Glide force를 (, Newton으로 설정했다. 이는 최종 사용자 또는 완제품 기능성에 미치는 영향을 입증하는 과학적 데이터로 뒷받침되지 않았다."
+ },
+ {
+  "finding_id": "finding-152c341668212d551d8089a2",
+  "finding_text_md5": "f6357770d2814d6586be095fafafc0b1",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, according to your Pharmacist-in-Charge, during the aseptic repackaging operation of Avastin (Bevacizumab) using Monoject syringes, for sterile intraviti-eal injections, your aseptic operators remove the sterile cap of the [redacted] ml vial, exposing A vastin (Bevacizumab) in an open vial during the aseptic repackaI, ging operation for approximately [redacted] I open vial of Avastin (Bevacizumab) approximately of \"Avastin\" [redacted] (Bevacizumab) in each Monoject syringe. Your firm has not established a hold time study to suppori there is not an increase in bioburden or endotoxin levels.",
+  "detail_text_ko": "구체적으로, 약사 책임자(Pharmacist-in-Charge)에 따르면 무균 유리체내 주사용으로 Monoject 주사기를 사용해 Avastin(Bevacizumab)을 무균 재포장하는 작업 중, 귀사의 무균 작업자는 [redacted] ml 바이알의 무균 캡을 제거하여, 무균 재포장 작업(repackaI, ging operation) 동안 약 [redacted] 동안 열린 바이알 속의 A vastin(Bevacizumab)을 노출시킨다. 열린 바이알 1개 I open vial of Avastin (Bevacizumab) 약 of \"Avastin\" [redacted] (Bevacizumab)을 각 Monoject 주사기에 담는다. 귀사는 바이오버든이나 엔도톡신 수준이 증가하지 않음을 뒷받침하는 보관 시간(hold time) 연구를 수립하지 않았다."
+ },
+ {
+  "finding_id": "finding-137adea1e3ba9ddd4917b722",
+  "finding_text_md5": "3340e2b1757b88b402da128fef8ed4b3",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, your Quality Unit failed to conduct any container closure integrity testing for your sterile drug products, A vastin (Bevacizumab) and [redacted] '(bevacizumab/ dexamethasone). In addition, your firm received a letter from BD Medication Delivery Solutions on or around 06/14/2018, which states, BD has become aware that some BD Hypodermic products are being used for intraocular injections. Intraocular use of these products has been associated with events such as 'floaters' and endophthalmitis (inflammation of the interior of the eye).\" However, your firm continued to use BD syringes as a primary container closure with a beyond use date (BUD) of 105 days, until approximately 02/2019.",
+  "detail_text_ko": "구체적으로, 귀사의 품질 부서는 귀사의 무균 의약품 A vastin(Bevacizumab)과 [redacted] '(bevacizumab/ dexamethasone)에 대해 용기 마개 완전성 시험을 전혀 수행하지 않았다. 또한 귀사는 2018년 06/14/2018경 BD Medication Delivery Solutions로부터 편지를 받았는데, 여기에는 \"BD는 일부 BD Hypodermic 제품이 안구내 주사에 사용되고 있음을 알게 되었다. 이 제품들을 안구내에 사용하면 'floaters' 및 안내염(endophthalmitis, 눈 안쪽의 염증)과 같은 사례가 보고되었다.\"라고 적혀 있다. 그러나 귀사는 사용 기한(BUD) 105일로 BD 주사기를 1차 용기 마개로 약 02/2019까지 계속 사용했다."
+ },
+ {
+  "finding_id": "finding-0fa15ff8c47df0efed063cac",
+  "finding_text_md5": "0d9995f2449242adf55d6785bbbbb512",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, There is no assurance that the amount ofAQL samples visually inspected during the 100% visual:: [redacted] ss [redacted] inspection of drug products Injection (batches # and re: Injection (batches #° and pe Injection (batches #° and #0) were representative ofthe amount of samples needed to be collected as per a defined Statistical sampling plan. During the 100% visual inspection of these batches, the AQL samples were inspected at a rate of (during the execution ofthe visual inspection process). AQL samples ofthese batches, collected as per a defined statistical sampling plan, were collected after packing operations, when the product vials had been labeled and packed. The AQL sample collected after packing operations was not inspected under the same conditions used for the 100% visual inspection because the collected units are labeled).",
+  "detail_text_ko": "구체적으로, 100% 육안 검사 [redacted] ss [redacted] 동안 육안 검사한 AQL 시료의 양이, 정해진 통계적 샘플링 계획에 따라 채취해야 하는 시료의 양을 대표한다는 확신이 없다. 의약품 Injection(배치 # 및 re: Injection(배치 #° 및 pe Injection(배치 #° 및 #0)이 대상이었다. 이 배치들의 100% 육안 검사 중 AQL 시료는 ( 검사 공정을 수행하는 동안)의 속도로 검사되었다. 정해진 통계적 샘플링 계획에 따라 채취한 이 배치들의 AQL 시료는 포장 작업 후, 제품 바이알이 라벨링되고 포장된 뒤에 채취되었다. 포장 작업 후 채취한 AQL 시료는 채취한 단위에 라벨이 붙어 있기 때문에 100% 육안 검사에 사용된 것과 같은 조건에서 검사되지 않았다)."
+ },
+ {
+  "finding_id": "finding-0e3c49ed4dc2eecd5bd7d55b",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2019-07-09",
+  "detail_text": "Specifically, A. On 04/18/2019, I observed your firm's Director of Quality Operations, instructed your pharmacist to discard positive personnel monitoring of [redacted] plates into the dumpster after observing possible CFU growth. I followed your pharmacist outside your firm and observed your pharmacist discard the [redacted] plates into the dumpster. Your pharmacist documented \"0\" CFUs on the batch record for Bevacizumab 2.Smg/0. lmL [redacted] Syringe, Lot #190415X, BUD 07/29/2019. However, your Director of Quality Operations and your Sterile Phaimacist admitted they saw a ''white dot\". According to your written procedures, EP 1-6 for Chest and Cuff Samples, \"all CFU growth will be sent to a third-party laboratory for identification of the microbe to the genus level.\" B. Your firm's aseptic operators routinely use [redacted] pads to rest their elbows, foreaims, and wrists during aseptic operations for intrnvitreal injections repackaged and produced at your firm. The non-sterile gel pads ai·e located inside the LAFH (ISO 5 Classified Area). On multiple days, I observed your aseptic operators touch the non-sterile gel wrist pads with their cuffs, foreaims, and elbows during aseptic operations. According to your firm's Director of Quality Operations, your firm has not conducted any environmental monitoring of these non-sterile gel wrist pads. June P Page, I nvest igat or Brandon C Heit meier, I nvest igat or.ll'lePPage S By 2000405709 Philip F I s t afanos",
+  "detail_text_ko": "구체적으로, A. 04/18/2019 실사관은 귀사의 품질운영 책임자가 약사에게 가능한 CFU 증식을 관찰한 후 양성 인원 모니터링 [redacted] 플레이트를 쓰레기통에 버리라고 지시하는 것을 관찰했다. 실사관은 귀사 약사를 따라 밖으로 나가 약사가 [redacted] 플레이트를 쓰레기통에 버리는 것을 관찰했다. 귀사 약사는 Bevacizumab 2.Smg/0. lmL [redacted] Syringe, Lot #190415X, BUD 07/29/2019의 배치 기록서에 CFU를 \"0\"으로 기록했다. 그러나 귀사의 품질운영 책임자와 무균 약사(Sterile Phaimacist)는 \"white dot\"을 보았다고 인정했다. 귀사의 서면 절차 EP 1-6 for Chest and Cuff Samples에 따르면 \"all CFU growth will be sent to a third-party laboratory for identification of the microbe to the genus level.\" B. 귀사의 무균 작업자는 귀사에서 재포장 및 생산하는 유리체내 주사제(intrnvitreal injections)의 무균 작업 중 팔꿈치, 팔뚝(foreaims), 손목을 올려놓는 데 [redacted] 패드를 상시 사용한다. 비멸균 젤 패드는 LAFH(ISO 5 등급 구역) 안에 놓여 있다. 여러 날에 걸쳐 실사관은 무균 작업자가 무균 작업 중 소맷부리, 팔뚝, 팔꿈치로 비멸균 젤 손목 패드를 건드리는 것을 관찰했다. 귀사의 품질운영 책임자에 따르면 귀사는 이 비멸균 젤 손목 패드에 대해 환경 모니터링을 전혀 수행하지 않았다. June P Page, I nvest igat or Brandon C Heit meier, I nvest igat or.ll'lePPage S By 2000405709 Philip F I s t afanos"
+ }
+]

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-11T03:00:01Z",
+ "generated_at": "2026-11-11T10:50:20Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42865232680,
+    "databaseId": 43004789204,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-10T17:28:01Z",
-    "updatedAt": "2026-11-10T17:33:55Z",
+    "createdAt": "2026-11-11T10:34:43Z",
+    "updatedAt": "2026-11-11T10:40:05Z",
     "headBranch": "main",
-    "displayTitle": "chore: refresh PMDA·MHRA deficiency cases snapshot (#1505)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42865232680"
+    "displayTitle": "feat(mfds-gmp-cert): 근거 확인 규칙 표 + 후보 칸 (migration 143) (#1534)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43004789204"
    },
    {
-    "databaseId": 42861652532,
+    "databaseId": 43004185155,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-11T10:30:29Z",
+    "updatedAt": "2026-11-11T10:34:58Z",
+    "headBranch": "main",
+    "displayTitle": "feat(findings): 지적사항 탭 3묶음(찾기·경향·점검) · 둘러보기 삭제 · 바닥글 정렬 (#1533)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43004185155"
+   },
+   {
+    "databaseId": 43002446862,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-10T17:07:31Z",
-    "updatedAt": "2026-11-10T17:13:13Z",
-    "headBranch": "automation/deficiency-cases-snapshot-42854606762",
-    "displayTitle": "chore: refresh PMDA·MHRA deficiency cases snapshot",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42861652532"
+    "createdAt": "2026-11-11T10:18:03Z",
+    "updatedAt": "2026-11-11T10:23:40Z",
+    "headBranch": "claude/mfds-gmp-cert-link-more",
+    "displayTitle": "feat(mfds-gmp-cert): 미연결 판정서 근거 확인 규칙 + 후보 칸 (143)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43002446862"
    },
    {
-    "databaseId": 42861637597,
+    "databaseId": 43002427409,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-10T17:07:26Z",
-    "updatedAt": "2026-11-10T17:13:53Z",
-    "headBranch": "automation/deficiency-cases-snapshot-42854606762",
-    "displayTitle": "test: dc-xk·dc-xo 허용을 glossary/* 군으로 옮김",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42861637597"
+    "createdAt": "2026-11-11T10:17:54Z",
+    "updatedAt": "2026-11-11T10:23:34Z",
+    "headBranch": "claude/mfds-gmp-cert-link-more",
+    "displayTitle": "feat(mfds-gmp-cert): 근거 확인 규칙 표 + 후보 칸 (migration 143)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43002427409"
    },
    {
-    "databaseId": 42860056574,
+    "databaseId": 43001309393,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-10T16:58:25Z",
-    "updatedAt": "2026-11-10T17:04:39Z",
-    "headBranch": "automation/deficiency-cases-snapshot-42854606762",
-    "displayTitle": "chore: refresh PMDA·MHRA deficiency cases snapshot",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42860056574"
-   },
-   {
-    "databaseId": 42858970948,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-10T16:52:12Z",
-    "updatedAt": "2026-11-10T16:57:37Z",
-    "headBranch": "automation/deficiency-cases-snapshot-42854606762",
-    "displayTitle": "test: 지적 사례 한국어 번역 줄 언어판 구조 허용 + sitemap 골든 재동결",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42858970948"
+    "createdAt": "2026-11-11T10:10:06Z",
+    "updatedAt": "2026-11-11T10:15:59Z",
+    "headBranch": "feat/findings-tabs-3groups",
+    "displayTitle": "feat(findings): 지적사항 탭 3묶음(찾기·경향·점검) · 둘러보기 삭제 · 바닥글 정렬",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43001309393"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -402,6 +402,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 42977251249,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-11T07:07:53Z",
+    "updatedAt": "2026-11-11T07:08:37Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1509 from MINHOYEOM/claude/findings-translate-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42977251249"
+   },
+   {
     "databaseId": 42888750140,
     "status": "completed",
     "conclusion": "success",
@@ -444,20 +455,20 @@
     "headBranch": "main",
     "displayTitle": "chore(findings): WL 절단 복원 번역 배치 r01 - 52건 (#1494)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42844450931"
-   },
-   {
-    "databaseId": 42833540931,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-10T14:23:11Z",
-    "updatedAt": "2026-11-10T14:23:41Z",
-    "headBranch": "main",
-    "displayTitle": "chore(findings): WL 절단 복원 outbox 12개 → applied 이동 (#1486)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42833540931"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 42973613673,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-11T06:36:25Z",
+    "updatedAt": "2026-11-11T09:58:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42973613673"
+   },
    {
     "databaseId": 42888998525,
     "status": "completed",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42575031678"
-   },
-   {
-    "databaseId": 42485603695,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-08T13:34:25Z",
-    "updatedAt": "2026-11-08T16:54:10Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42485603695"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 42977218802,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-11T07:07:37Z",
+    "updatedAt": "2026-11-11T07:07:56Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42977218802"
+   },
+   {
     "databaseId": 42890813498,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42577625325"
-   },
-   {
-    "databaseId": 42530400358,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-08T22:28:25Z",
-    "updatedAt": "2026-11-08T22:28:35Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42530400358"
    }
   ],
   "grm-cloud-request.yml": [

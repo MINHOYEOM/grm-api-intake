@@ -247,28 +247,49 @@ class VerifyPublishedSourcesTest(unittest.TestCase):
         row = {"shown": 0, "found": 2, "db_total": 0, "db_ok": 0}
         self.assertEqual(vps.classify(row), "extraction-gap")
 
-    def test_count_drift_when_card_already_shows_all_db_findings(self):
-        # #1214 fda483-195468 실측: 카드 1·DB 1/1·원문 4(OCR 이 하위항목 A~C 를 관찰로 읽음).
-        # findings 가 있으니 "findings 자체가 없다"는 extraction-gap 이 아니다.
-        row = {"shown": 1, "found": 4, "db_total": 1, "db_ok": 1}
+    def test_count_drift_when_obs_headers_fit_in_db(self):
+        # #1214 fda483-195468: 카드 1·DB 1/1·파서 4. 번호 머리는 1개뿐(하위항목 A~C 는 안 센다).
+        row = {"shown": 1, "found": 4, "db_total": 1, "db_ok": 1, "obs_headers": 1}
         self.assertEqual(vps.classify(row), "count-drift")
+
+    def test_partial_extraction_stays_extraction_gap(self):
+        # 번호 머리 3개인데 DB 1건 → 진짜 부분 누락. 묻히면 안 된다.
+        row = {"shown": 1, "found": 3, "db_total": 1, "db_ok": 1, "obs_headers": 3}
+        self.assertEqual(vps.classify(row), "extraction-gap")
+
+    def test_uncountable_headers_stay_extraction_gap(self):
+        # 번호 머리 없는 양식(195467 형태): 셀 수 없으면 경보 유지.
+        row = {"shown": 0, "found": 1, "db_total": 0, "db_ok": 0, "obs_headers": None}
+        self.assertEqual(vps.classify(row), "extraction-gap")
+        row = {"shown": 1, "found": 4, "db_total": 1, "db_ok": 1, "obs_headers": None}
+        self.assertEqual(vps.classify(row), "extraction-gap")
+
+    def test_count_drift_needs_card_to_show_all_ok_findings(self):
+        # 머리 수가 DB 이하여도 DB 공개분을 카드가 덜 보였으면 count-drift 가 아니다.
+        row = {"shown": 0, "found": 4, "db_total": 1, "db_ok": 1, "obs_headers": 1}
+        self.assertEqual(vps.classify(row), "extraction-gap")
 
     def test_count_drift_is_not_a_mismatch_but_is_reported(self):
         rows = [{"date": "d", "id": "fda483-195468", "shown": 1, "found": 4,
-                 "status": "pdf-ok-ocr", "db_total": 1, "db_ok": 1, "verdict": "count-drift"}]
+                 "status": "pdf-ok-ocr", "db_total": 1, "db_ok": 1, "obs_headers": 1,
+                 "verdict": "count-drift"}]
         out = vps.format_report([], rows)
         self.assertIn("불일치 0", out)
         self.assertIn("fda483-195468", out)
         self.assertIn("추출 실패 아님", out)
 
-    def test_partial_extraction_with_unpublished_findings_is_still_publish_gap(self):
-        # 과도 면제 방지: DB 에 공개분이 더 있는데 카드가 덜 보였으면 count-drift 가 아니다.
-        row = {"shown": 1, "found": 4, "db_total": 2, "db_ok": 2}
-        self.assertEqual(vps.classify(row), "publish-gap")
+    def test_count_obs_headers_ignores_subitems_observed_word_and_xrefs(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED:\n"
+                "OBSERVATION 1\nProcedures designed to prevent contamination are not followed.\n"
+                "Specifically, we observed that:\nA. You do not use sporicidal agents.\n"
+                "B. Monitoring lacks support.\nC. Please refer to Observation 1.\n")
+        self.assertEqual(vps.count_obs_headers(text), 1)
+        two = text + "OBSERVATION 2\nThe quality unit failed to review records.\n"
+        self.assertEqual(vps.count_obs_headers(two), 2)
 
-    def test_zero_db_findings_is_still_extraction_gap_even_if_card_shows_nothing(self):
-        row = {"shown": 0, "found": 1, "db_total": 0, "db_ok": 0}
-        self.assertEqual(vps.classify(row), "extraction-gap")
+    def test_count_obs_headers_none_without_numbered_headings(self):
+        self.assertIsNone(vps.count_obs_headers("Inspectional observations: A. B. C."))
+        self.assertIsNone(vps.count_obs_headers(""))
 
     def test_no_db_credentials_degrades_but_does_not_go_silent(self):
         # DB 를 못 보면 **조용히 통과시키지 않는다** — 판정 불가로 남겨 알림에 싣는다.

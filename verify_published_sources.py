@@ -104,6 +104,22 @@ def _fetch_483(card_id: str) -> "tuple[int, str, str]":
     return len(f._extract_483_observations_from_text(text)), status, text
 
 
+def count_obs_headers(text: str) -> "int | None":
+    """원문의 `OBSERVATION n` **번호 머리** 수(고유 번호 기준). 셀 수 없으면 None.
+
+    상호참조("refer to Observation 3")는 조립기와 같은 선택기로 거른다. 하위항목 A·B·C 와
+    'observed' 낱말은 애초에 세지 않는다. 번호 머리가 하나도 없는 양식은 None —
+    호출자는 이를 '확인 불가'로 다룬다(경보 유지)."""
+    if not text:
+        return None
+    import collect_fda_483 as f
+    body = f._scope_to_observation_list(f.normalize_pdf_ligatures(text))
+    body = f._cut_at_annotations(body)
+    anchors = f._select_observation_anchors(body, list(f._OBS_RE.finditer(body)))
+    nums = {m.group(1) for m in anchors}
+    return len(nums) or None
+
+
 def _found_483(card_id: str) -> "tuple[int, str]":
     found, status, _ = _fetch_483(card_id)
     return found, status
@@ -219,19 +235,15 @@ def classify(row: dict[str, Any]) -> str:
     if total is None or ok is None:
         return "unknown-no-db"      # DB 를 못 봤다 → 종전 판정(보수적으로 불일치 취급)
     if found > total:
-        if total > 0 and ok <= shown:
-            # ★[count-drift 2026-11-12, #1214 fda483-195468] DB 에 findings 가 **있고** 카드는 그
-            # 공개분을 전부 보여준다 — 문서는 추출된 것이다. 이때 `원문 > DB` 는 "추출 실패"가
-            # 아니라 **재파싱 건수가 저장 건수와 다르다**는 뜻이다(스캔 OCR 이 하위항목 A~C 를
-            # 관찰 표제처럼 읽는 등 — 실제 관찰 1건인데 원문 4건으로 센 오탐). 종전엔 이걸
-            # extraction-gap("findings 자체가 없습니다")으로 올려 오경보를 냈다. 알리진 않되
-            # 보고서 `참고` 에 남긴다(조용한 축소 금지). `total == 0` 이면 진짜 추출 격차다.
+        hdr = row.get("obs_headers")
+        if total > 0 and ok <= shown and hdr is not None and hdr <= total:
+            # ★[count-drift 2026-11-12, #1214 fda483-195468] 원문의 **`OBSERVATION n` 번호 머리 수**
+            # (하위항목 A·B·C·'observed' 낱말은 세지 않는다)가 DB 관찰 수 이하이고 카드가 공개분을
+            # 전부 보여줄 때만 '재파싱 건수 오차'로 내린다. 번호 머리를 못 세면(`hdr is None`:
+            # 번호 머리 없는 양식 등 — 195467) 또는 머리 수가 DB 보다 많으면(진짜 부분 누락)
+            # 종전대로 extraction-gap 이다 — 원천 정보 누락 감지를 약하게 하지 않는다.
             return "count-drift"
-        if total == 0:
-            return "extraction-gap"     # 원문에 있는데 우리가 뽑지 못했다(findings 0건)
-        if ok > shown:
-            return "publish-gap" if not row.get("oos_483") else "scope-excluded"
-        return "scope-excluded"
+        return "extraction-gap"         # 원문에 있는데 우리가 뽑지 못했다(0건·부분 누락·셀 수 없음)
     if ok > shown:
         if row.get("oos_483"):
             # DB scope 는 'ok' 지만 조립기 범위 판정(is_out_of_scope_483)이 기기·생식 시설 등으로
@@ -256,13 +268,15 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
               "진행(허위경보 가능)", flush=True)
     rows: list[dict[str, Any]] = []
     for i, (cid, info) in enumerate(sorted(state.items()), 1):
-        text = ""
+        text, hdr = "", None
         if info["kind"] == "483":
             found, status, text = _fetch_483(cid)
+            hdr = count_obs_headers(text)
         else:
             found, status = _found_wl(info["url"])
         counts = (scope or {}).get(cid)
         row = {**info, "id": cid, "found": found, "status": status,
+               "obs_headers": hdr,
                "db_total": counts["total"] if counts else None,
                "db_ok": counts["ok"] if counts else None}
         # 조립기가 범위 밖으로 뺀 483 은 발행 격차가 아니다. 격차 후보일 때만 판정한다

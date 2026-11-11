@@ -622,3 +622,25 @@ class NamedModeTest(unittest.TestCase):
                 doc_ids=["fda483-195468"], fetch_raw_signals=fetch)
         self.assertEqual(seen.get("doc_ids"), ["fda483-195468"])
         self.assertEqual(seen.get("mode"), rec.MODE_NAMED)
+
+
+class NamedGuardAndScanTest(unittest.TestCase):
+    """[11-12] 대량 named 재추출 전 가드 · 섞인 PDF 진단 분류."""
+
+    def test_keeps_old_deficiencies(self):
+        old = [{"deficiency": "Procedures designed to prevent microbiological contamination are not established..."}]
+        same = [{"deficiency": "Procedures designed to prevent microbiological contamination are not established, "
+                               "written and followed."}, {"deficiency": "Employees lack training."}]
+        changed = [{"deficiency": "Procedures to prevent contamination were missing."}, {"deficiency": "X."}]
+        self.assertTrue(rec._keeps_old_deficiencies(old, same))
+        self.assertFalse(rec._keeps_old_deficiencies(old, changed))
+        self.assertTrue(rec._keeps_old_deficiencies([], changed))
+
+    def test_scan_reports_gap_split(self):
+        data = _mixed_pdf_bytes()
+        rows = [{"document_id": "fda483-1", "raw_json": {"pdf_url": "u", "fda_483_observations": [{}]}}]
+        out = rec.scan_mixed_pdfs(rows, delay_seconds=0, fetch_bytes=lambda u: data, sleep_fn=lambda s: None)
+        self.assertEqual(out["mixed_docs"], 1)
+        self.assertEqual(out["gap_docs"] + out["mixed_already_ocr_path"], 1)
+        for k in ("gap_unread_pages", "gap_with_stored_obs", "gap_without_stored_obs"):
+            self.assertIn(k, out)

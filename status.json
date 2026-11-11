@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-11T10:50:20Z",
+ "generated_at": "2026-11-11T18:40:00Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43004789204,
+    "databaseId": 43065789746,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-11T10:34:43Z",
-    "updatedAt": "2026-11-11T10:40:05Z",
+    "createdAt": "2026-11-11T17:11:55Z",
+    "updatedAt": "2026-11-11T17:18:30Z",
     "headBranch": "main",
-    "displayTitle": "feat(mfds-gmp-cert): 근거 확인 규칙 표 + 후보 칸 (migration 143) (#1534)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43004789204"
+    "displayTitle": "fix(inspector): 기관 전환을 보기 전환 모양으로 · 라벨 FDA / 식약처(MFDS) (#1560)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43065789746"
    },
    {
-    "databaseId": 43004185155,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-11T10:30:29Z",
-    "updatedAt": "2026-11-11T10:34:58Z",
-    "headBranch": "main",
-    "displayTitle": "feat(findings): 지적사항 탭 3묶음(찾기·경향·점검) · 둘러보기 삭제 · 바닥글 정렬 (#1533)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43004185155"
-   },
-   {
-    "databaseId": 43002446862,
+    "databaseId": 43060376746,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-11T10:18:03Z",
-    "updatedAt": "2026-11-11T10:23:40Z",
-    "headBranch": "claude/mfds-gmp-cert-link-more",
-    "displayTitle": "feat(mfds-gmp-cert): 미연결 판정서 근거 확인 규칙 + 후보 칸 (143)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43002446862"
+    "createdAt": "2026-11-11T16:38:48Z",
+    "updatedAt": "2026-11-11T16:44:44Z",
+    "headBranch": "fix/inspector-source-toggle",
+    "displayTitle": "fix(inspector): 기관 전환을 보기 전환 모양으로 · 라벨 FDA / 식약처(MFDS)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43060376746"
    },
    {
-    "databaseId": 43002427409,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-11T10:17:54Z",
-    "updatedAt": "2026-11-11T10:23:34Z",
-    "headBranch": "claude/mfds-gmp-cert-link-more",
-    "displayTitle": "feat(mfds-gmp-cert): 근거 확인 규칙 표 + 후보 칸 (migration 143)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43002427409"
-   },
-   {
-    "databaseId": 43001309393,
+    "databaseId": 43034787763,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-11T10:10:06Z",
-    "updatedAt": "2026-11-11T10:15:59Z",
-    "headBranch": "feat/findings-tabs-3groups",
-    "displayTitle": "feat(findings): 지적사항 탭 3묶음(찾기·경향·점검) · 둘러보기 삭제 · 바닥글 정렬",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43001309393"
+    "createdAt": "2026-11-11T14:03:22Z",
+    "updatedAt": "2026-11-11T14:08:47Z",
+    "headBranch": "fix/inspector-source-toggle",
+    "displayTitle": "fix(inspector): 기관 전환을 보기 전환 모양으로 · 라벨 FDA / 식약처(MFDS)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43034787763"
+   },
+   {
+    "databaseId": 43034751507,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-11T14:03:08Z",
+    "updatedAt": "2026-11-11T14:08:39Z",
+    "headBranch": "fix/inspector-source-toggle",
+    "displayTitle": "fix(inspector): 기관 전환을 보기 전환 모양으로 · 라벨 FDA / 식약처(MFDS)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43034751507"
+   },
+   {
+    "databaseId": 43017993478,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-11T12:10:06Z",
+    "updatedAt": "2026-11-11T12:15:29Z",
+    "headBranch": "claude/glossary-fig-daily-20261111-2108",
+    "displayTitle": "glossary(fig): 2026-11-11 새 그림 0 · 다시 그림 0 · 보류 5 — recall-classification·raw-material·packaging-material·archive·labeling-control",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43017993478"
    }
   ],
   "grm-scaffold-mirror.yml": [

@@ -3859,6 +3859,55 @@ def firm_similar_view(firm_docs: list[dict[str, Any]],
     return [{k: v for k, v in a.items() if k != "docs"} for a in rows[:limit]]
 
 
+# ── [식약처 GMP 적합판정 2026-11-11] 업체 페이지 "식약처 GMP 적합판정 이력" 한 줄 ──────────
+# 원장 mfds_gmp_cert(142)는 닫혀 있다 → 업체와 연결된 행만 공개 칸으로 뽑은 스냅샷
+# (web/data/mfds_gmp_cert.json, findings_docs_refresh.py 가 mfds_gmp_cert_public RPC 로 주 1회 갱신).
+# 연결은 DB 가 정한다(사업자번호 > 업체명 원문 > 법인격만 접은 이름, 모호하면 미연결) — 렌더는
+# 키만 맞춘다. 원천 값이 전부 한국어라 **한국어 트리에만** 싣는다. 파일이 없거나 모양이 다르면 표시만 꺼진다.
+MFDS_GMP_CERT_FILE = WEB_DIR / "data" / "mfds_gmp_cert.json"
+MFDS_GMP_CERT_SCHEMA = "grm-mfds-gmp-cert-public/v1"
+
+
+def load_mfds_gmp_certs(path: Path) -> "dict[str, Any] | None":
+    if not path.is_file():
+        return None
+    try:
+        obj = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return None
+    if not isinstance(obj, dict) or obj.get("schema_version") != MFDS_GMP_CERT_SCHEMA:
+        return None
+    if not _IA_DATE_RE.match(str(obj.get("measured_on") or "")) or not isinstance(obj.get("by_firm"), dict):
+        return None
+    return obj
+
+
+def firm_gmp_cert_index(snapshot: "dict[str, Any] | None", canon) -> dict[str, list[dict[str, Any]]]:
+    """정본 업체 키 → 화면 행(현재 목록 먼저, 유효기한 늦은 순). 깨진 행은 버린다."""
+    out: dict[str, list[dict[str, Any]]] = {}
+    for key, rows in ((snapshot or {}).get("by_firm") or {}).items():
+        if not isinstance(rows, list):
+            continue
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            until = str(r.get("valid_until") or "")
+            kind = str(r.get("product_kind") or "").strip()
+            if not kind or not _IA_DATE_RE.match(until):
+                continue
+            out.setdefault(canon(key), []).append({
+                "product_kind": kind,
+                "dosage_group": str(r.get("dosage_group") or "").strip(),
+                "factory_addr": " ".join(str(r.get("factory_addr") or "").split()),
+                "valid_until": until,
+                "listed_now": r.get("listed_now") is True,
+            })
+    for rows in out.values():
+        rows.sort(key=lambda r: r["valid_until"], reverse=True)
+        rows.sort(key=lambda r: not r["listed_now"])
+    return out
+
+
 # ── [수입경보 1단계 2026-11-10] 업체 페이지 상단 "FDA 수입경보 대상" ─────────────────────
 # 원천 표 import_alert_listing(132)은 RLS 로 닫혀 있다(service_role 전용) → 공개 필드만 뽑은
 # 스냅샷(web/data/import_alerts.json, import_alerts_refresh.py)을 커밋하고 정적으로 렌더한다.
@@ -7204,6 +7253,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                           _ia_index)
             for fp in firm_pages} if _ia_index else {}
         import_alerts_on = (_ia_snapshot or {}).get("measured_on", "")
+        _gmp_snapshot = load_mfds_gmp_certs(MFDS_GMP_CERT_FILE) if render_doc_pages else None
+        gmp_certs_by_key = firm_gmp_cert_index(_gmp_snapshot, _canonical_firm_key)
+        gmp_certs_on = (_gmp_snapshot or {}).get("measured_on", "")
         if render_doc_pages:
             for _lg, _fps in ((DEFAULT_LANG, firm_pages), ("en", en_firm_pages)):
                 for fp in sorted(_fps, key=lambda f: f["slug"]):
@@ -7257,6 +7309,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              if _lg == DEFAULT_LANG
                              or not _HANGUL_RE.search(a["firm_name"] + a["place"])],
                          import_alerts_on=import_alerts_on,
+                         # [식약처 GMP 적합판정 2026-11-11] 원천 값이 한국어라 한국어 트리에만.
+                         gmp_certs=(gmp_certs_by_key.get(fp["key"], [])
+                                    if _lg == DEFAULT_LANG else []),
+                         gmp_certs_on=gmp_certs_on,
                          # [FDA 지적 조항 × 업체 2026-11-10] 원천(FDA)이 영문이라 두 트리 같은 값.
                          fda_cit=clause_firms_page.firm_view(
                              firm_cit_sites.get(fp["key"], []), _cf_snapshot or {}),

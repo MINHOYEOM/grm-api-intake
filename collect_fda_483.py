@@ -1950,7 +1950,12 @@ def _extract_483_inspectors(text: str) -> list[str]:
 #   종전처럼 자른다 — 지어내지 않는다.
 _PAGE_BLOCK_WINDOW = 2000        # 머리말 끝 앞 이 범위 안에서 서명란 시작을 찾는다(서명란+머리말 실측 ~1,100자)
 _PAGE_HEADER_WINDOW = 1200       # 머리말 끝 뒤 이 범위 안에서 본문 재개 줄을 찾는다
-_PAGE_HEADER_END_RE = re.compile(r"TYPE\s+(?:OF\s+)?ESTABLISHMENT\s+INSPECTED", re.I)
+# [11-11] 스캔 판독이 머리말 끝 낱말을 깨뜨린 꼴도 닻으로 받는다 — 실측 `TYPE ESTABUSHMEITT INSPECTED`
+# (162642)·`TYPE ESTAllUSHMENT NSPECTEO`(112298)·`lYPE ESTIIIIUS-NT II'ISPEC'II!D`(84656). 깨진 꼴은
+# 대문자 고정(`YPE` + `EST…` + 낱말 하나)이라 산문과 겹치지 않고, 닻은 앞쪽 서명란이 있어야만 쓰인다.
+_PAGE_HEADER_END_RE = re.compile(
+    r"(?i:TYPE\s+(?:OF\s+)?ESTABLISHMENT\s+INSPECTED)"
+    r"|(?-i:\S?YPE\s+(?:OF\s+)?EST[A-Za-z!|'£$\-]{5,12}\s+[A-Za-z!|'£$\-]{5,14})")
 # 서명란 이름줄 — `<이름>, [약칭] <직함>`. 약칭(DDC·ORA 등 대문자 2~5자)이 끼면 종전 푸터
 # 정규식(`,\s*Investigator`)이 못 잡았다. 직함 뒤에 사람 이름이 오면 산문(`…, Investigator
 # Smith noted`)이므로 제외한다(종전 푸터 정규식과 같은 조건).
@@ -2005,10 +2010,40 @@ def _is_resume_line(line: str, est_hint: str) -> bool:
         return False
     if est_hint and re.sub(r"\s+", "", est_hint).lower() in re.sub(r"\s+", "", s).lower():
         return False
+    if _looks_like_est_value(s, est_hint):
+        return False
     return True
 
 
-_PAGE_HEADER_START_RE = re.compile(r"(?-i:FOOD AND DRUG ADMINISTRATION|DEPARTMENT OF HEALTH AND HUMAN SERVICES)")
+def _est_words(text: str) -> list[str]:
+    return [w[:-1] if w.endswith("s") and len(w) > 3 else w
+            for w in re.findall(r"[a-z]+", (text or "").lower())]
+
+
+def _looks_like_est_value(line: str, est_hint: str) -> bool:
+    """머리말 `시설 유형` 값 줄이 힌트와 표기만 다른 꼴인가(`Producer of Sterile and Non-Sterile Drugs`
+    ↔ 힌트 `Producer of Sterile and Non Sterile Drug Products`, 실측 162642). 낱말 8개 이하이고
+    그 80% 이상이 힌트 낱말이면 값 줄이다 — 본문 첫 줄로 받지 않는다."""
+    words = _est_words(line)
+    if not est_hint or not words or len(words) > 8:
+        return False
+    hint = set(_est_words(est_hint))
+    return sum(w in hint for w in words) >= 0.8 * len(words)
+
+
+# [11-11] 깨진 꼴(`FOOD AND DRUG ADMINlSTRATION`·`FOOD ANO DRUG`·`DEPARTMENT OF HEALm AND`)도 받는다 —
+# 실측 162642·77669·91384·85899. 대문자 고정이라 산문 "Food and Drug Administration" 은 걸리지 않는다.
+# [11-11] 깨진 닻으로 이은 쪽에서 재개 줄을 찾다가 **다음 관찰 표제**(앵커가 판독 잡음으로 못 잡힌
+# `OBSERVATION· 5`, 실측 83807)를 만나면 이 관찰은 끝난 것이다 — 그 뒤 본문을 앞 관찰에 붙이지 않는다.
+# 정상 닻(아래 EXACT)으로 잇는 종전 경로에는 걸지 않는다 — 이미 저장된 상세가 다시 읽기에서 짧아지지 않게
+# (실측 110129 obs10: 종전 경로가 `OBSERVATlON 11` 뒤 본문을 이어 왔다).
+_OBS_HEADING_LINE_RE = re.compile(r"\s*OBSERV\S{2,6}?\W{0,3}\s*(?:#|No\.?)?\s*[0-9IlL|]{1,3}\b", re.I)
+_PAGE_HEADER_END_EXACT_RE = re.compile(r"TYPE\s+(?:OF\s+)?ESTABLISHMENT\s+INSPECTED", re.I)
+_PAGE_HEADER_START_EXACT_RE = re.compile(r"(?-i:FOOD AND DRUG ADMINISTRATION|DEPARTMENT OF HEALTH AND HUMAN SERVICES)")
+_PAGE_HEADER_START_RE = re.compile(
+    r"(?-i:FOOD AND DRUG ADMINISTRATION|DEPARTMENT OF HEALTH AND HUMAN SERVICES"
+    r"|F[O0]{2}[DO0]\s+AN[DO0]\s+DR[UV][GC]\s+AD[A-Za-z!|'\\/.\-]{6,14}"
+    r"|DEPA[A-Za-z!|'\\:.\-]{2,10}\s*OF\s*HEA[A-Za-z!|'.\-]{1,4}\s+AN[DO0]\b)")
 
 
 def _is_header_value_line(line: str, est_hint: str) -> bool:
@@ -2023,7 +2058,7 @@ def _is_header_value_line(line: str, est_hint: str) -> bool:
     return bool(est_hint) and re.sub(r"\W+", "", est_hint).lower() == re.sub(r"\W+", "", s).lower()
 
 
-def _resume_after_header_block(seg: str, start: int, est_hint: str) -> int | None:
+def _resume_after_header_block(seg: str, start: int, est_hint: str, stop_at_heading: bool = False) -> int | None:
     """머리말 첫 줄 뒤 창 안에서, **마지막** 머리말 줄 다음에 오는 첫 본문 재개 줄의 위치."""
     end = min(len(seg), start + _PAGE_HEADER_WINDOW)
     lines: list[tuple[int, str]] = []
@@ -2042,6 +2077,8 @@ def _resume_after_header_block(seg: str, start: int, est_hint: str) -> int | Non
         if _is_header_value_line(line, est_hint):
             last_hdr = i
     for off, line in lines[last_hdr + 1:]:
+        if stop_at_heading and _OBS_HEADING_LINE_RE.match(line):
+            return None                      # 다음 관찰 표제(앵커로 못 잡힌 꼴) — 이 관찰은 여기서 끝났다
         if _is_resume_line(line, est_hint) and not _is_header_value_line(line, est_hint):
             return off
     return None
@@ -2069,7 +2106,8 @@ def _join_483_pages(seg: str, est_hint: str = "") -> str:
             if fs is None:
                 pos = hs.end()
                 continue
-            resume = _resume_after_header_block(seg, hs.end(), est_hint)
+            resume = _resume_after_header_block(seg, hs.end(), est_hint,
+                                                stop_at_heading=not _PAGE_HEADER_START_EXACT_RE.match(hs.group(0)))
             out.append(seg[cursor:fs])
             if resume is None:
                 return "".join(out)
@@ -2086,9 +2124,12 @@ def _join_483_pages(seg: str, est_hint: str = "") -> str:
         out.append(seg[cursor:fs])
         nl = seg.find("\n", hdr.end())
         resume = None
+        fuzzy = not _PAGE_HEADER_END_EXACT_RE.match(hdr.group(0))
         while nl != -1 and nl < hdr.end() + _PAGE_HEADER_WINDOW:
             nxt = seg.find("\n", nl + 1)
             line = seg[nl + 1: nxt if nxt != -1 else len(seg)]
+            if fuzzy and _OBS_HEADING_LINE_RE.match(line):
+                break                        # 다음 관찰 표제 — 이 관찰은 이 쪽에서 끝났다
             if _is_resume_line(line, est_hint):
                 resume = nl + 1
                 break
@@ -2097,6 +2138,154 @@ def _join_483_pages(seg: str, est_hint: str = "") -> str:
             return "".join(out)              # 이 관찰은 이 쪽에서 끝났다(뒤는 머리말뿐)
         out.append("\n")
         cursor = pos = resume
+    return "".join(out)
+
+
+# ── [483 상세 쪽 넘김 2단 2026-11-11] 머리말 닻이 없거나 서명란 **뒤**에 머리말이 오는 쪽 ─────────
+# `_join_483_pages` 는 "서명란 → 머리말(닻) → 본문" 순서만 잇는다. 다시 읽기 뒤 잘림 띠에 남은 관찰을
+# 원문과 대조하니(11-11 진단 63건) 텍스트층이 쪽 블록을 다른 순서로 내놓는 꼴이 남아 있었다.
+#   ① 머리말 → 서명란 → 본문 (104451 obs2 `…TYPE ESTABLISHMENT INSPECTED / Producer of… / SEE REVERSE
+#      … PAGE 3 OF 5PAGES / e)no environmental monitoring…`, 84656·106706·175135 같은 꼴)
+#   ② 서명란 → 라벨 없는 머리말 값 → 본문 (96388 obs2 `…check of the / EMPLOYEE(S) SIGNATURE … /
+#      3012038236 / Austin, TX / pressure differential only documents…`), 머리말 값 → 서명란 → 본문
+#      (82819 obs2 `…Donor Center / SEE REVERSE / … OF THIS PAGe / c) Case ID# …`)
+# 어느 꼴이든 닻이 없어 서명란에서 잘렸다. 여기서는 **서명란 블록 자체**를 닻으로 삼는다.
+# ★확신 조건(하나라도 어긋나면 그 자리에서 종전처럼 자른다 — 지어내지 않는다):
+#   · 블록 안에 서로 다른 서명란·양식 마커가 2종 이상(`SEE REVERSE`+`OF THIS PAGE` 등) — 본문 속
+#     `…, Investigator` 한 번으로는 쪽 경계로 보지 않는다.
+#   · 블록 뒤 첫 **산문 줄**(소문자 낱말 3개 이상, 서명·양식 고지 아님)이 이어지는 본문다워야 한다:
+#     소문자로 시작(낱말이 쪽에서 끊김)·항목 표지(`c)`·`e)`·`•`·`ii.`)·`Specifically` 류로 시작해야 한다.
+#     대문자 새 문장·양식 뒷면 고지(`The observations of objectionable…`)·회신 편지(`Date: …`·`Dear …`)·
+#     다음 관찰 표제(`OBSERVATION· 5`)는 붙지 않는다.
+#   · 블록 바로 앞이 머리말(닻 줄부터 서명란까지 산문 줄 없음)이면 머리말도 함께 걷는다.
+# 블록과 재개 줄 사이의 짧은 비산문 줄(표 칸·서명 스탬프 판독 잔재)은 함께 걷힌다.
+_FOOTER_JOIN_WINDOW = 1500        # 서명란 시작 뒤 이 범위 안에서 재개 줄을 찾는다(서명자 15명 블록 실측 ~900자)
+# 낱말 하나짜리 마커는 대문자 고정이다 — 산문 `Previously`·`signature` 를 마커로 세지 않게.
+_FOOTER_MARK_RE = re.compile(
+    r"(?i:\bSEE\s*RE\s*VERSE\b|\bOF\s*-?\s*TH[I1l]S\s*(?:PAGE|\[?\S?A[GC]E)\b|\bDATE\s*[I1l]SSU"
+    r"|\bFORM\s+[FT]DA\s*\S|\bPREVIOUS\s+EDITION|\bINSPECTIONAL\s+OBSERVATION|\bPAGE\s*\S{1,3}\s*OF\s*\S{1,3}\s*PAGES?\b)"
+    r"|(?-i:EMP\S{0,6}?O[YV]|SIGNAT|PREVIOUS|EDITION|EDmON|INSPECTIONAL|\bSEE\b|\bREVERSE\b)")
+_FORM_NOTICE_SKIP_RE = re.compile(
+    r"inspectional\s+observations|final\s+agency\s+determination|regarding\s+your\s+compliance"
+    r"|objection\s+regarding|corrective\s+action\s+in\s+response|FDA\s+representative|address\s+above"
+    r"|phone\s+number|This\s+document\s+lists|DURING\s+AN\s+INSPECTION"
+    r"|Industry\s*I\s*n\s*f|www\.|fda\s*\.\s*gov|\bgov\s*/|\S@\S|Fax\s*:", re.I)
+_FORM_NOTICE_END_RE = re.compile(
+    r"objectionable\s+conditions|Section\s+704|Pursuant\s+to|^\s*(?:Dear\b|Date\s*:|Subject\s*:)", re.I)
+_CONTINUATION_START_RE = re.compile(
+    r"\s*(?:[a-z]|[•·\-–*]|\(?[A-Za-z0-9]{1,3}[).]|[ivxIVX]{1,4}[.)\-]"
+    r"|(?:Specifically|For example|In addition|Additionally|Furthermore|However)\b)")
+_LOWER_WORD_RE = re.compile(r"(?<![A-Za-z])[a-z]{3,}(?![A-Za-z])")
+# 공백을 지운 줄에서 찾는 서명자 직함 — 본문 `investigation` 과 갈리게 `…gator`/`…gato` 꼴만.
+_SPACED_SIGNER_RE = re.compile(
+    r"(?i)vest[il1]ga?t[o0]|Microbiolog[i1]st|ConsumerSafety|Nat[i1]onalExpert|\bCSO\b")
+
+
+def _is_prose_line(line: str) -> bool:
+    s = line.strip()
+    if len(_LOWER_WORD_RE.findall(s)) < 3 or _FORM_NOTICE_SKIP_RE.search(s):
+        return False
+    visible = re.sub(r"\s+", "", s)
+    if sum(c.isalpha() for c in visible) < 0.7 * len(visible):
+        return False                                 # 서명 스탬프·괘선 판독 잔재(기호 투성이)
+    if len(visible) < 80 and _SPACED_SIGNER_RE.search(visible):
+        return False                                 # 글자 사이가 벌어진 서명자 줄(`Gayl e S La wson , I n ve s tig ato r`)
+    if re.match(r"\s*TO\s*:", s):
+        return False                                 # 머리말 수신인 줄
+    return not (_SIGNER_TITLE_RE.search(s) or _FOOTER_MARK_RE.search(s))
+
+
+def _footer_block_resume(text: str, fs: int, before: str, est_hint: str) -> int | None:
+    """서명란 시작(fs) 뒤 본문 재개 줄의 시작 위치. 확신 조건을 못 넘으면 None."""
+    end = min(len(text), fs + _FOOTER_JOIN_WINDOW)
+    p = text.find("\n", fs)
+    while p != -1 and p < end:
+        nxt = text.find("\n", p + 1)
+        line = text[p + 1: nxt if nxt != -1 else len(text)]
+        if _FORM_NOTICE_END_RE.search(line) or _OBS_HEADING_LINE_RE.match(line):
+            return None                              # 양식 뒷면 고지·회신 편지·다음 관찰 표제 — 관찰은 여기서 끝났다
+        if _is_prose_line(line) and not _is_header_value_line(line, est_hint) \
+                and not _looks_like_est_value(line, est_hint):
+            marks = {m.group(0).upper()[:5] for m in _FOOTER_MARK_RE.finditer(text, fs, p)}
+            if len(marks) < 2 or not before.strip():
+                return None
+            # 대문자로 시작하는 새 문장은 받지 않는다 — 앵커를 잃은 **다음 관찰 표제**(실측 90268
+            # `Compliant records are deficient…`)가 앞 관찰 상세에 붙는 것을 막는다.
+            return p + 1 if _CONTINUATION_START_RE.match(line) else None
+        p = nxt
+    return None
+
+
+_SIGNER_WALKBACK_LINES = 12
+
+
+def _signer_lines_start(text: str, lo: int, ls: int) -> int:
+    """마커 줄(ls) 위로 올라가며, 산문 줄을 만나기 전 **가장 위의 서명자·양식 줄**의 시작.
+    마커보다 먼저 찍힌 서명란 이름·스탬프 잔재(`Gayle S Lawson, Investigato r / (CTNH) / X Usa BOrr`,
+    104451)를 함께 걷는다. 서명자·양식 줄이 없으면 ls 그대로 — 그 사이 짧은 줄은 건드리지 않는다."""
+    best = ls
+    cur = ls
+    for _ in range(_SIGNER_WALKBACK_LINES):
+        if cur <= lo:
+            break
+        prev = text.rfind("\n", 0, cur - 1) + 1
+        line = text[prev:cur]
+        if _is_prose_line(line):
+            break
+        visible = re.sub(r"\s+", "", line)
+        if (_FOOTER_MARK_RE.search(line) or _SIGNER_TITLE_RE.search(line)
+                or (len(visible) < 80 and _SPACED_SIGNER_RE.search(visible))):
+            best = prev
+        cur = prev
+    return max(best, lo)
+
+
+def _header_block_start(text: str, lo: int, fs: int) -> int:
+    """서명란(fs) 바로 앞이 머리말이면 머리말 첫 줄의 시작, 아니면 fs."""
+    starts = [m.start() for m in _PAGE_HEADER_START_RE.finditer(text, lo, fs)]
+    ends = [m.start() for m in _PAGE_HEADER_END_RE.finditer(text, lo, fs)]
+    if not starts and not ends:
+        return fs
+    anchor = starts[-1] if starts else ends[-1]      # 머리말 첫 줄이 잡히면 거기부터
+    ls = text.rfind("\n", 0, anchor) + 1
+    if any(_is_prose_line(ln) for ln in text[ls:fs].splitlines()):
+        return fs                                    # 머리말과 서명란 사이에 본문이 있다 — 머리말만 따로 둔다
+    prev_ls = text.rfind("\n", 0, max(0, ls - 1)) + 1  # 깨진 `DEPART!\fi:NT OF HEALTH …` 윗줄
+    if ls > lo and re.search(r"(?-i:HEAL|SERVI|DEPAR)", text[prev_ls:ls]) and prev_ls >= lo:
+        ls = prev_ls
+    return ls
+
+
+def _join_footer_pages(seg: str, est_hint: str = "") -> str:
+    """`_join_483_pages` 가 못 이은 쪽 경계(머리말 닻 없음·서명란 뒤 머리말)를 잇는다(순수 함수).
+    확신 조건을 못 넘는 첫 서명란에서 멈추고 나머지는 그대로 둔다(뒤의 `_clean_observation_chunk` 가
+    그 서명란에서 자른다 = 종전 동작)."""
+    out: list[str] = []
+    cursor = 0
+    while True:
+        m = _FDA483_FOOTER_RE.search(seg, cursor)
+        if not m:
+            break
+        fs = m.start()
+        ls = seg.rfind("\n", 0, fs) + 1
+        prev_ls = seg.rfind("\n", 0, max(0, ls - 1)) + 1   # 마커 윗줄의 서명자 이름(`…, DDC Investigator`)
+        signer = _signer_cut(seg, max(cursor, prev_ls), fs)
+        if signer is not None:
+            fs = signer
+            ls = seg.rfind("\n", 0, fs) + 1
+        if seg[ls:fs].strip() and _is_prose_line(seg[ls:fs]):
+            ls = fs                                   # 서명란이 본문 줄 끝에 붙은 꼴 — 줄 앞은 본문
+        else:
+            ls = _signer_lines_start(seg, max(cursor, fs - _PAGE_BLOCK_WINDOW), ls)
+        start = _header_block_start(seg, max(cursor, fs - _PAGE_BLOCK_WINDOW), ls)
+        before = seg[cursor:start].rstrip()
+        resume = _footer_block_resume(seg, fs, before, est_hint)
+        if resume is None:
+            break
+        out.append(seg[cursor:start])
+        out.append("\n")
+        cursor = resume
+    out.append(seg[cursor:])
     return "".join(out)
 
 
@@ -2173,7 +2362,8 @@ def _full_observation_detail(seg: str, deficiency: str, old_detail: str,
                              hints: dict[str, str]) -> str:
     """쪽 넘김을 이은 상세. 표제가 종전과 다르거나 종전 상세로 시작하지 않으면 종전 상세를
     돌려준다(종전 상세 꼬리의 서명란 이름·양식 낱말만 지운다)."""
-    joined = _join_483_pages(_skip_pagebreak_block(seg), hints.get("establishment_type", ""))
+    est = hints.get("establishment_type", "")
+    joined = _join_footer_pages(_join_483_pages(_skip_pagebreak_block(seg), est), est)
     chunk = _clean_observation_chunk(joined)
     chunk = gf.strip_fda483_page_header(chunk, **hints)
     head, detail = _first_sentence(chunk)

@@ -531,6 +531,59 @@ def write_similar(path: Path, docs: list[dict[str, Any]],
     return len(by_doc)
 
 
+# ── [식약처 GMP 적합판정 2026-11-11] 업체 페이지 "식약처 GMP 적합판정 이력" 한 줄의 정본 ──
+# 원장은 `mfds_gmp_cert`(142, 월 1회 전체 목록 — mfds_gmp_cert_snapshot.py)이고 anon 에 닫혀 있다.
+# 업체와 **연결된 행만**, 사업자번호를 뺀 칸으로 돌려주는 RPC `mfds_gmp_cert_public` 으로 읽는다.
+# 부가 정보라 실패하면 파일을 건드리지 않고 지난 값을 둔다(비슷한 지적과 같은 규율).
+GMP_CERT_SCHEMA_VERSION = "grm-mfds-gmp-cert-public/v1"
+GMP_CERT_RPC_NAME = "mfds_gmp_cert_public"
+DEFAULT_GMP_CERT_OUT = DEFAULT_OUT.parent / "mfds_gmp_cert.json"
+_GMP_CERT_FIELDS = ("firm_key", "firm_name", "factory_addr", "product_kind", "dosage_group",
+                    "valid_until", "listed_now")
+
+
+def fetch_gmp_certs(base_url: str, anon_key: str, *, post=None) -> list[dict[str, Any]]:
+    if post is None:
+        response = requests.post(
+            f"{base_url}/rest/v1/rpc/{GMP_CERT_RPC_NAME}",
+            headers={"apikey": anon_key, "Authorization": f"Bearer {anon_key}",
+                     "Content-Type": "application/json"},
+            json={}, timeout=60)
+        response.raise_for_status()
+        rows = response.json()
+    else:
+        rows = post()
+    if not isinstance(rows, list):
+        raise RuntimeError("invalid mfds_gmp_cert_public response")
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get("firm_key"), str) or not row["firm_key"]:
+            raise RuntimeError("invalid mfds_gmp_cert_public row")
+    return rows
+
+
+def write_gmp_certs(path: Path, rows: list[dict[str, Any]]) -> int:
+    """업체 키 한 줄 = diff 한 줄. 0행이면 쓰지 않는다(원장이 비었으면 지난 파일 유지)."""
+    if not rows:
+        raise RuntimeError("mfds_gmp_cert_public 0행")
+    by_firm: dict[str, list[dict[str, Any]]] = {}
+    for r in rows:
+        by_firm.setdefault(r["firm_key"], []).append(
+            {k: r.get(k) for k in _GMP_CERT_FIELDS if k != "firm_key"})
+    measured = max(str(r.get("measured_on") or "") for r in rows)
+    head = {"schema_version": GMP_CERT_SCHEMA_VERSION, "measured_on": measured,
+            "source": "data.go.kr 15097207 (식약처 의약품 GMP 적합판정서 발급 현황)"}
+    lines = [json.dumps(head, ensure_ascii=False)[:-1] + ', "by_firm": {']
+    keys = sorted(by_firm)
+    for i, k in enumerate(keys):
+        lines.append(json.dumps(k, ensure_ascii=False) + ": "
+                     + json.dumps(by_firm[k], ensure_ascii=False, separators=(",", ":"))
+                     + ("," if i < len(keys) - 1 else ""))
+    lines.append("}}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    return len(by_firm)
+
+
 def main(argv: "list[str] | None" = None) -> int:
     # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다 — 아래 요약의 em-dash
     # 한 글자가 cp949 에서 UnicodeEncodeError 를 낸다. findings_facets_refresh.py 와 동형.
@@ -550,6 +603,8 @@ def main(argv: "list[str] | None" = None) -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--similar-out", type=Path, default=DEFAULT_SIMILAR_OUT)
     ap.add_argument("--skip-similar", action="store_true")
+    ap.add_argument("--gmp-cert-out", type=Path, default=DEFAULT_GMP_CERT_OUT)
+    ap.add_argument("--skip-gmp-cert", action="store_true")
     args = ap.parse_args(argv)
 
     if not args.supabase_url or not args.supabase_anon_key:
@@ -599,6 +654,14 @@ def main(argv: "list[str] | None" = None) -> int:
             log(f"비슷한 지적: 엣지 {len(edges):,}개 → 문서 {n_sim:,}건에 연결 ({args.similar_out})")
         except Exception as exc:  # noqa: BLE001 — 부가 정보라 본 정본을 실패시키지 않는다
             log(f"비슷한 지적 갱신 건너뜀(지난 파일 유지): {type(exc).__name__}: {exc}")
+
+    if not args.dry_run and not args.skip_gmp_cert:
+        try:
+            n_gmp = write_gmp_certs(args.gmp_cert_out,
+                                    fetch_gmp_certs(base_url, args.supabase_anon_key))
+            log(f"식약처 GMP 적합판정: 업체 {n_gmp:,}곳 ({args.gmp_cert_out})")
+        except Exception as exc:  # noqa: BLE001 — 부가 정보라 본 정본을 실패시키지 않는다
+            log(f"식약처 GMP 적합판정 갱신 건너뜀(지난 파일 유지): {type(exc).__name__}: {exc}")
 
     log(f"문서 {len(docs):,}건 · 지적 {payload['totals']['findings']:,}건")
     log(f"MFDS 실사자 표 보강 문서 {mfds_enriched:,}건")

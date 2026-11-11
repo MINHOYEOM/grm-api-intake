@@ -168,9 +168,12 @@ class OldStorageCapTest(unittest.TestCase):
 
     def test_fragment_completion_needs_a_unique_hit_and_a_sentence_end(self):
         frag = self._fragment()
-        twice = [{"number": "1", "deficiency": "A.", "detail": frag + "re documented."},
-                 {"number": "3", "deficiency": "C.", "detail": frag + "re documented."}]
-        self.assertIsNone(b.completed_sentence(frag, twice))      # 두 곳 — 어느 쪽인지 모른다
+        differ = [{"number": "1", "deficiency": "A.", "detail": frag + "re documented."},
+                  {"number": "3", "deficiency": "C.", "detail": frag + "re not documented."}]
+        self.assertIsNone(b.completed_sentence(frag, differ))     # 두 곳, 뒤 문장이 다름 — 어느 쪽인지 모른다
+        same = [{"number": "1", "deficiency": "A.", "detail": frag + "re documented."},
+                {"number": "3", "deficiency": "C.", "detail": frag + "re documented."}]
+        self.assertTrue(b.completed_sentence(frag, same).endswith("re documented."))  # 뒤 문장이 같으면 모호하지 않다
         no_end = [{"number": "1", "deficiency": "A.", "detail": frag + "re documented " + "and more " * 100}]
         self.assertIsNone(b.completed_sentence(frag, no_end))     # 600자 안에 문장 끝 없음
         ended = frag[:-len(self._FRAG_TAIL)].rstrip() + " The deviations were documented."
@@ -187,8 +190,9 @@ class OldStorageCapTest(unittest.TestCase):
         self.assertTrue(out[0]["detail"].endswith("re documented for Quality Unit review."))
         # 원문 없이는 종전대로(짝 없음)
         self.assertEqual(b.refreshed_observations(old, [])[1:], (0, 1))
-        # 원문에 두 곳이면 잇지 않는다
-        self.assertIsNone(b.completed_sentence(frag, [], source + " " + frag + rest))
+        # 원문에 두 곳이고 뒤 문장이 다르면 잇지 않는다 / 같으면(쪽 중복) 잇는다
+        self.assertIsNone(b.completed_sentence(frag, [], source + " " + frag + "re lost. X."))
+        self.assertTrue(b.completed_sentence(frag, [], source + " " + frag + rest).endswith("Quality Unit review."))
         # 붙일 문장에 양식 머리말 낱말이 섞이면 잇지 않는다(쪽 경계 블록)
         hdr = frag + "TRY TYPE ESTABLISHMENT INSPECTED Livonia MI Producer of Sterile Drugs ii. The ISO 5 area."
         self.assertIsNone(b.completed_sentence(frag, [], hdr))

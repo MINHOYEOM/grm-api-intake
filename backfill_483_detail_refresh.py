@@ -170,18 +170,21 @@ _FORM_TRACE_RE = re.compile(r"(?i)seereverse|ofthispage|employee|signature|formf
                             r"|inspected|zipcode|firmname|pageof|previousedition|datesofinspection")
 
 
-def _unique_tail_rest(probe: str, haystacks: list[str]) -> str | None:
-    """probe 가 haystacks 전체에서 딱 한 곳일 때 그 바로 뒤 600자(없으면 None)."""
-    hits: list[tuple[str, int]] = []
+def _agreed_continuation(probe: str, haystacks: list[str]) -> str | None:
+    """probe 뒤에 오는 첫 문장(양식 낱말 금지). probe 가 여러 곳이면 **모든 자리의 뒤 문장이 같을 때만**.
+
+    [11-12] 딱 한 곳만 받던 규칙은 PDF 텍스트에 쪽이 두 번 실리거나(실측 96468·85303) 같은 문장이
+    두 관찰에 반복되는(91684) 문서에서 전부 놓쳤다(dry run 43072002057: 66 → 60). 자리마다 이어지는
+    문장이 같으면 어느 자리든 결과가 같으므로 모호하지 않다. 다르면 종전대로 None."""
+    found: set[str | None] = set()
     for h in haystacks:
         start = h.find(probe)
         while start != -1:
-            hits.append((h, start))
+            found.add(_first_sentence_rest(h[start + len(probe): start + len(probe) + _SENTENCE_TAIL_MAX]))
             start = h.find(probe, start + 1)
-    if len(hits) != 1:
+    if len(found) != 1:
         return None
-    h, at = hits[0]
-    return h[at + len(probe): at + len(probe) + _SENTENCE_TAIL_MAX]
+    return next(iter(found))
 
 
 def _first_sentence_rest(rest: str | None) -> str | None:
@@ -207,7 +210,7 @@ def completed_deficiency(old_def: str, source_text: str) -> str | None:
     head = _norm(old_def[:-len(TRUNC_DEFICIENCY_SUFFIX)])
     if len(head) < _TAIL_PROBE:
         return None
-    added = _first_sentence_rest(_unique_tail_rest(head[-_TAIL_PROBE:], [_norm(source_text)]))
+    added = _agreed_continuation(head[-_TAIL_PROBE:], [_norm(source_text)])
     return head + added if added else None
 
 
@@ -227,10 +230,9 @@ def completed_sentence(old_detail: str, new: list[dict[str, Any]], source_text: 
     if not is_truncated_detail(old_detail) or _COMPLETE_END_RE.search(od) or len(od) < _TAIL_PROBE:
         return None
     probe = od[-_TAIL_PROBE:]
-    rest = _unique_tail_rest(probe, [_norm(str(n.get("detail") or "")) for n in new])
-    if rest is None and source_text:
-        rest = _unique_tail_rest(probe, [_norm(source_text)])
-    added = _first_sentence_rest(rest)
+    added = _agreed_continuation(probe, [_norm(str(n.get("detail") or "")) for n in new])
+    if added is None and source_text:
+        added = _agreed_continuation(probe, [_norm(source_text)])
     return od + added if added else None
 
 

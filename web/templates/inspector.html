@@ -52,9 +52,9 @@
         html)의 마크업을 그대로 이식한다. rel_root 는 이 페이지가 findings/browse 와 같은
         깊이("../../")라 파셜을 손대지 않고 그대로 include 할 수 있다. -#}
     {% with seg_active = "inspector" %}{% include "partials/findings_seg.html" %}{% endwith %}
-    <nav class="fnd-seg" aria-label="{{ _('실사 보고서 구분') }}">
-      <a id="ip-source-fda" href="?source=fda" class="on" aria-current="page">FDA 483</a>
-      <a id="ip-source-mfds" href="?source=mfds">MFDS</a>
+    <nav class="fnd-views" aria-label="{{ _('실사 보고서 구분') }}">
+      <a id="ip-source-fda" href="?source=fda" class="on" aria-current="page">FDA</a>
+      <a id="ip-source-mfds" href="?source=mfds">{{ _("식약처(MFDS)") }}</a>
     </nav>
     {% include "partials/mfds_inspector.html" %}
 

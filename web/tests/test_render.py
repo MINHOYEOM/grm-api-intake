@@ -16281,6 +16281,17 @@ class WebInspectorEntryPointsTest(unittest.TestCase):
         self.assertLess(self.inspector.index('class="fnd-seg"'),
                          self.inspector.index('id="ip-lookup"'))
 
+    def test_source_toggle_is_view_switch_with_agency_names(self):
+        """[11-11 회귀] 기관 전환은 탭 줄(fnd-seg)이 아니라 보기 전환(fnd-views) 모양이고,
+        라벨은 문서 종류('FDA 483')가 아니라 기관 이름이다."""
+        i = self.inspector.index('id="ip-source-fda"')
+        nav = self.inspector[self.inspector.rindex("<nav", 0, i):self.inspector.index("</nav>", i)]
+        self.assertIn('class="fnd-views"', nav)
+        self.assertIn('aria-current="page">FDA</a>', nav)
+        self.assertIn(">식약처(MFDS)</a>", nav)
+        self.assertNotIn("FDA 483", nav)
+        self.assertEqual(self.inspector.count('<nav class="fnd-seg"'), 1)
+
     # ── (2) 검색 화면 상단 안내 스트립 — [탭 3묶음 2026-11-11] 없앴다(탭 '찾기 › 실사관'이 대신) ──
     def test_strip_retired(self):
         self.assertNotIn('class="fnd-insp-cta"', self.search)

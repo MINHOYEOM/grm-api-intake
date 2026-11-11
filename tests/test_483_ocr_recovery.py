@@ -521,3 +521,33 @@ class MissingObservationsMarkerTest(unittest.TestCase):
         self.assertEqual(report.status_resolved, 1)
         self.assertEqual(rec._json_object(upsert.call_args[0][2]["raw_json"])
                          ["fda483_text_status"], rec.OUT_OF_SCOPE_STATUS)
+
+
+class DumpTextTest(unittest.TestCase):
+    """[11-12] 진단 전용 원문 덤프 — DB 없이 PDF URL 을 만들어 판독 전문만 남긴다."""
+
+    def test_dump_writes_text_per_doc_without_db(self):
+        import tempfile
+        calls = []
+
+        def fake_fetch(url):
+            calls.append(url)
+            return ("OBSERVATION 1 text", "pdf-ok-ocr") if url.endswith("195467/download") else ("", "scan-no-text")
+
+        with tempfile.TemporaryDirectory() as d:
+            rows = rec.dump_texts(["fda483-195467", "195468", "bogus"], d, fetch_text=fake_fetch)
+            self.assertEqual(calls, ["https://www.fda.gov/media/195467/download",
+                                     "https://www.fda.gov/media/195468/download"])
+            with open(os.path.join(d, "fda483-195467.txt"), encoding="utf-8") as fh:
+                self.assertEqual(fh.read(), "OBSERVATION 1 text")
+            self.assertFalse(os.path.exists(os.path.join(d, "fda483-195468.txt")))   # 빈 본문은 파일 없음
+        self.assertEqual([r["status"] for r in rows], ["pdf-ok-ocr", "scan-no-text", "bad_doc_id"])
+
+    def test_main_dump_needs_doc_ids_and_no_credentials(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d, \
+                mock.patch.object(rec, "_fetch_text", return_value=("T", "pdf-ok")), \
+                mock.patch.dict(os.environ, {"SUPABASE_URL": "", "SUPABASE_SERVICE_ROLE_KEY": ""}):
+            self.assertEqual(rec.main(["--dump-text-dir", d]), 2)
+            self.assertEqual(rec.main(["--dump-text-dir", d, "--doc-ids", "fda483-1234"]), 0)
+            self.assertTrue(os.path.exists(os.path.join(d, "fda483-1234.txt")))

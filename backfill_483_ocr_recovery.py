@@ -305,6 +305,35 @@ def _fetch_text(pdf_url: str) -> tuple[str, str]:
     return _fetch_fda483_pdf_text(pdf_url)
 
 
+_MEDIA_ID_RE = re.compile(r"(\d{4,})$")
+
+
+def dump_texts(doc_ids: list[str], out_dir: str, *,
+               fetch_text: Callable[[str], tuple[str, str]] | None = None) -> list[dict[str, Any]]:
+    """[11-12 진단 전용·쓰기 없음] 지목한 483 의 판독 전문(OCR 포함)을 `<out_dir>/<doc>.txt` 로 남긴다.
+
+    파서를 고치려면 원문이 필요한데, 스캔본은 OCR 엔진이 있는 러너에서만 글자가 나온다(회사PC 엔진 없음,
+    티로 PC 는 fda.gov 무응답 — 195467). DB 를 읽지도 쓰지도 않는다: document_id 끝 숫자로 PDF URL 을 만든다."""
+    text_fn = fetch_text or _fetch_text
+    Path(out_dir).mkdir(parents=True, exist_ok=True)
+    rows: list[dict[str, Any]] = []
+    for doc in doc_ids:
+        m = _MEDIA_ID_RE.search(doc)
+        if not m:
+            rows.append({"doc": doc, "status": "bad_doc_id", "chars": 0})
+            continue
+        url = f"https://www.fda.gov/media/{m.group(1)}/download"
+        try:
+            text, status = text_fn(url)
+        except Exception as exc:  # noqa: BLE001 — 진단 도구: 건별 실패를 적고 계속
+            text, status = "", f"fetch_raised:{type(exc).__name__}"
+        name = f"fda483-{m.group(1)}"
+        if text:
+            Path(out_dir, f"{name}.txt").write_text(text, encoding="utf-8")
+        rows.append({"doc": name, "url": url, "status": status, "chars": len(text or "")})
+    return rows
+
+
 def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
     """라이브 수집과 **같은 함수**로 IntakeItem 재구성. None 이면 도메인 게이트 드롭."""
     from collect_fda_483 import (
@@ -776,6 +805,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "라이브 수집과 같은 함수로 재구성해 제자리 upsert. 예약 실행은 collection-capped 모드.",
     )
     p.add_argument(
+        "--dump-text-dir", default="",
+        help="진단 전용(쓰기 없음): --doc-ids 문서의 판독 전문을 이 폴더에 <doc>.txt 로 남기고 끝낸다.",
+    )
+    p.add_argument(
         "--apply", action="store_true", default=False,
         help="실제 upsert 수행. 기본은 dry-run(조회+PDF fetch+재구성까지 하되 쓰기는 생략).",
     )
@@ -813,6 +846,18 @@ def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     args = build_arg_parser().parse_args(argv)
+
+    if args.dump_text_dir:
+        ids = _parse_doc_ids(args.doc_ids)
+        if not ids:
+            print("--dump-text-dir 는 --doc-ids 와 함께 쓴다(진단 전용).", file=sys.stderr)
+            return 2
+        rows = dump_texts(ids, args.dump_text_dir)
+        payload = json.dumps({"dump_text": rows}, ensure_ascii=False, indent=2)
+        print(payload)
+        if args.report_path:
+            Path(args.report_path).write_text(payload + "\n", encoding="utf-8")
+        return 0
 
     creds = _resolve_credentials(args)
     if creds is None:

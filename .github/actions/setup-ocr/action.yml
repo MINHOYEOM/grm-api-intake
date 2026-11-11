@@ -41,15 +41,62 @@ runs:
     # (복합 액션의 스텝에는 continue-on-error 를 쓸 수 없어 rc 를 셸에서 흡수한다.)
     # `-qq` 를 쓰지 않는 이유: 2026-07-30 조사에서 이 스텝의 실패 사유를 로그에서 읽을 수
     # 없다는 점이 오진의 출발점이었다. 조용한 성공보다 시끄러운 로그가 낫다.
+    # [2026-11-12] apt 에 시간 상한을 둔다. 11-11 14:42~16:05 UTC 러너가 Ubuntu 미러
+    # (archive/security/azure.archive.ubuntu.com) 이름을 못 풀어 apt-get update 하나가 15분을 쓰고
+    # 실패했다(3회 연속, 이미지 'resolute'). 그동안 다른 호스트(pypi·fda.gov)는 정상이었다.
     - name: Install tesseract (apt)
       shell: bash
       run: |
         set +e
-        sudo apt-get update -o Acquire::Retries=3
+        APT_OPTS="-o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
+        sudo timeout 300 apt-get update ${APT_OPTS}
         rc_update=$?
-        sudo apt-get install -y -o Acquire::Retries=3 tesseract-ocr tesseract-ocr-eng
+        sudo timeout 600 apt-get install -y ${APT_OPTS} tesseract-ocr tesseract-ocr-eng
         rc_install=$?
         echo "apt-get update rc=${rc_update} / install rc=${rc_install}"
+        exit 0
+
+    # 대체 경로 — apt 로 바이너리나 eng 언어팩을 못 얻었을 때만 conda-forge 에서 받는다
+    # (micromamba 정적 바이너리는 GitHub 릴리스, 패키지는 conda.anaconda.org — Ubuntu 미러와 다른 호스트).
+    # 버전 고정: micromamba 2.0.5-0. conda-forge tesseract 는 share/tessdata 에 eng 를 함께 싣는다.
+    # 그래도 eng 가 없으면 tessdata_fast(4.1.0 태그)의 eng.traineddata 를 받는다 — apt 판과 같은 fast 계열.
+    # 결과 판정은 여전히 verify 스텝 한 곳이 한다(여기서는 실패를 삼키고 경로만 심는다).
+    - name: Install tesseract (fallback, conda-forge)
+      shell: bash
+      run: |
+        set +e
+        has_eng() { tesseract --list-langs 2>/dev/null | tail -n +2 | grep -qx eng; }
+        if command -v tesseract >/dev/null 2>&1 && has_eng; then
+          echo "apt 경로로 설치됨 — 대체 경로 생략"
+          exit 0
+        fi
+        echo "::warning title=OCR 대체 설치::apt 경로 실패 — conda-forge 에서 tesseract 를 받는다"
+        root="${RUNNER_TEMP}/ocr-mamba"
+        prefix="${RUNNER_TEMP}/ocr-env"
+        mkdir -p "${root}/bin"
+        url="https://github.com/mamba-org/micromamba-releases/releases/download/2.0.5-0/micromamba-linux-64"
+        for i in 1 2 3; do
+          curl -fsSL --retry 3 --max-time 120 -o "${root}/bin/micromamba" "${url}" && break
+          sleep 10
+        done
+        chmod +x "${root}/bin/micromamba"
+        for i in 1 2 3; do
+          timeout 600 "${root}/bin/micromamba" create -y -q -r "${root}" -p "${prefix}" -c conda-forge tesseract && break
+          sleep 15
+        done
+        if [ ! -x "${prefix}/bin/tesseract" ]; then
+          echo "conda-forge 설치 실패 — verify 스텝이 판정한다"
+          exit 0
+        fi
+        tessdata="${prefix}/share/tessdata"
+        if [ ! -f "${tessdata}/eng.traineddata" ]; then
+          mkdir -p "${tessdata}"
+          curl -fsSL --retry 3 --max-time 120 -o "${tessdata}/eng.traineddata" \
+            "https://github.com/tesseract-ocr/tessdata_fast/raw/4.1.0/eng.traineddata"
+        fi
+        echo "${prefix}/bin" >> "$GITHUB_PATH"
+        echo "TESSDATA_PREFIX=${tessdata}" >> "$GITHUB_ENV"
+        echo "대체 경로 설치: ${prefix}/bin/tesseract / tessdata=${tessdata}"
         exit 0
 
     # 설치 성공을 **바이너리와 언어팩으로** 확인한다. "tesseract 는 있는데 eng 가 없다"는
@@ -85,7 +132,7 @@ runs:
 
         echo "available=false" >> "$GITHUB_OUTPUT"
         detail="binary_present=${present} / version='${version}' / langs='${langs}'"
-        msg="OCR 엔진(tesseract+eng) 사용 불가 — 스캔 483 은 본문 없이 처리된다(scan-ocr-unavailable)."
+        msg="OCR 엔진(tesseract+eng) 설치 실패(apt·conda-forge 둘 다) — 스캔 483 은 본문 없이 처리된다(scan-ocr-unavailable)."
         echo "::warning title=OCR 엔진 없음::${msg} ${detail}"
         {
           echo "### ⚠️ OCR 엔진 없음 (tesseract)"

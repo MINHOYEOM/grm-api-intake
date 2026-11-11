@@ -135,6 +135,27 @@ class OcrEngineWiringTest(unittest.TestCase):
                          "apt-get -qq 는 실패 사유까지 지운다 — 설치 실패가 조용해진다")
         self.assertIn("tesseract-ocr-eng", body, "eng 언어팩이 없으면 tessdata 탐색이 실패한다")
 
+    def test_apt_is_time_bounded_and_has_fallback(self) -> None:
+        """[2026-11-12] Ubuntu 미러 DNS 장애로 apt-get update 가 15분을 쓰고 실패해 OCR 필수
+        워크플로가 3회 연속 죽었다. apt 줄에는 시간 상한이 있고, apt 가 실패하면 다른 호스트
+        (conda-forge)에서 받는 대체 스텝이 verify 보다 **앞에** 있어야 한다."""
+        action = os.path.join(REPO, ".github", "actions", "setup-ocr", "action.yml")
+        with open(action, encoding="utf-8") as fh:
+            body = fh.read()
+        apt_lines = [ln for ln in body.splitlines()
+                     if "apt-get" in ln and not ln.lstrip().startswith("#")
+                     and not ln.lstrip().startswith("echo")]
+        self.assertTrue(apt_lines)
+        self.assertEqual([ln.strip() for ln in apt_lines if "timeout " not in ln], [],
+                         "apt-get 에 시간 상한(timeout)이 없다 — 미러 장애 때 잡 시간을 다 쓴다")
+        fb = body.find("Install tesseract (fallback")
+        verify = body.find("name: Verify OCR engine")
+        self.assertGreater(fb, 0, "apt 실패 시 대체 설치 스텝이 없다")
+        self.assertLess(fb, verify, "대체 설치는 verify 보다 앞에 있어야 판정에 반영된다")
+        self.assertIn("conda-forge tesseract", body)
+        self.assertIn("TESSDATA_PREFIX=", body, "대체 경로의 tessdata 를 이후 스텝에 알려야 한다")
+        self.assertIn('>> "$GITHUB_PATH"', body, "대체 경로 바이너리를 PATH 에 올려야 CLI 재판독이 찾는다")
+
     def test_action_verifies_cli_binary(self) -> None:
         """[CLI 판독 2026-10-28] `collect_fda_483._reocr_483_pdf_text` 는 tessdata 만이 아니라
         `tesseract` **실행 파일**을 subprocess 로 부른다. 검증 스텝이 바이너리 존재를 계속

@@ -133,5 +133,71 @@ class WlPermanent403LineTest(unittest.TestCase):
         self.assertTrue(status.startswith("fetch-403:permanent"))
 
 
+class KnownOutageTest(unittest.TestCase):
+    """#1274 — 알려진 장애 표시·승격·fail-open·WHO 면제(순수 함수)."""
+
+    @staticmethod
+    def _silent(src):
+        from reconciliation_service import Anomaly
+        return Anomaly(src, "silent_drop", 0, 6.0, f"{src}: 이번 주 수집 0건")
+
+    def test_open_issue_downgrades_to_info_note(self):
+        from reconciliation_service import split_anomalies
+        alerts, notes = split_anomalies([self._silent("Health Canada Inspection")],
+                                        {"Health Canada Inspection": (1255, 12)})
+        self.assertEqual(alerts, [])
+        self.assertEqual(len(notes), 1)
+        self.assertIn("#1255", notes[0])
+        self.assertIn("12일째", notes[0])
+        self.assertNotIn("⚠", notes[0])  # 워크플로가 grep 하는 마커 금지
+
+    def test_escalates_after_thirty_days(self):
+        from reconciliation_service import split_anomalies
+        alerts, notes = split_anomalies([self._silent("Health Canada Inspection")],
+                                        {"Health Canada Inspection": (1255, 31)})
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(notes, [])
+        self.assertIn("승격", alerts[0].message)
+        # 정확히 30일은 아직 안내
+        alerts, notes = split_anomalies([self._silent("Health Canada Inspection")],
+                                        {"Health Canada Inspection": (1255, 30)})
+        self.assertEqual(alerts, [])
+
+    def test_lookup_failure_is_fail_open(self):
+        from reconciliation_service import split_anomalies
+        for outages in (None, {}):
+            alerts, notes = split_anomalies([self._silent("Health Canada Inspection")], outages)
+            self.assertEqual(len(alerts), 1)
+            self.assertEqual(notes, [])
+
+    def test_other_sources_never_downgraded_by_outage(self):
+        from reconciliation_service import split_anomalies
+        alerts, _ = split_anomalies([self._silent("MFDS")],
+                                    {"Health Canada Inspection": (1255, 3)})
+        self.assertEqual([a.source for a in alerts], ["MFDS"])
+
+    def test_who_silent_drop_exempt_but_volume_drop_is_not(self):
+        from reconciliation_service import Anomaly, split_anomalies
+        alerts, notes = split_anomalies([self._silent("WHO")], None)
+        self.assertEqual(alerts, [])
+        self.assertIn("silence_days=35", notes[0])
+        vol = Anomaly("WHO", "volume_drop", 1, 10.0, "WHO: 급감")
+        alerts, _ = split_anomalies([vol], None)
+        self.assertEqual(len(alerts), 1)
+
+    def test_find_open_outages_matches_title_and_skips_prs(self):
+        now = datetime(2026, 11, 12, tzinfo=timezone.utc)
+        issues = [
+            {"number": 1255, "title": "HC 실사 주간 재수집 실패",
+             "created_at": "2026-10-31T22:34:38Z"},
+            {"number": 9, "title": "HC 실사 주간 재수집 실패", "pull_request": {},
+             "created_at": "2026-01-01T00:00:00Z"},
+            {"number": 5, "title": "다른 이슈", "created_at": "2026-10-01T00:00:00Z"},
+        ]
+        self.assertEqual(ra.find_open_outages(issues, now),
+                         {"Health Canada Inspection": (1255, 11)})
+        self.assertEqual(ra.find_open_outages([], now), {})
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -208,3 +208,65 @@ def summarize_url_contamination(rows: list[dict[str, Any]]) -> list[dict[str, An
         groups.values(),
         key=lambda g: (g["reason"], g["source"], g["document_type"]),
     )
+
+
+# ---------------------------------------------------------------------------
+# 알려진 장애 · 면제 (#1274 — 2026-11-12)
+#
+# 배경: 주간 silent_drop 이 (a) 이미 별도 이슈(#1255)로 추적 중인 원천 장애와 (b) 설계상
+# 저빈도인 소스의 주간 0건을 매주 새 경보로 다시 올려, 사람이 "이미 아는 것"과 "새 것"을
+# 구별하지 못하게 했다. 둘 다 **조용히 묻히면 안 된다** — 그래서 영구 제외가 아니라
+# ① 면제(무음 감시가 대신 본다) ② 알려진 장애(이슈가 열려 있는 동안만, 30일 넘으면 승격).
+# ---------------------------------------------------------------------------
+
+# 주간 silent_drop 에서 면제하는 소스 → 사유. 면제는 "감시 안 함"이 아니라 **다른 감시로
+# 위임**이다 — 사유에 어디가 대신 보는지 반드시 적는다.
+SILENT_DROP_EXEMPT: dict[str, str] = {
+    # WHO: PQ RSS 게시가 산발(간격 13~123일)이라 주간 0건이 정상 상태다(주간 기준선 ≈2 는
+    # 건강한 주의 중앙값일 뿐). grm_common 의 소스별 무음 감시 silence_days=35(#1163)가
+    # "신규 적재 0건이 35일 넘게 이어짐"을 잡고, 하드 고장은 who_error·WHOPIR 0건이 잡는다.
+    "WHO": "저빈도 소스 — grm_common 무음 감시(silence_days=35)에 위임",
+}
+
+# 알려진 장애: 소스 → 추적 이슈 제목. 러너가 이 제목의 **열린** 이슈를 찾는다.
+KNOWN_OUTAGE_ISSUE_TITLES: dict[str, str] = {
+    # 캐나다 보건부 GMP 실사 DB 이전 중(#1255). 원천 장애라 우리가 못 고친다.
+    "Health Canada Inspection": "HC 실사 주간 재수집 실패",
+}
+
+# 알려진 장애 이슈가 이 일수를 넘겨 열려 있으면 다시 경보로 승격한다(묻힘 방지).
+KNOWN_OUTAGE_ESCALATE_DAYS = 30
+
+
+def split_anomalies(
+    anomalies: list[Anomaly],
+    open_outages: dict[str, tuple[int, int]] | None,
+) -> tuple[list[Anomaly], list[str]]:
+    """이상 낙차를 (경보, 안내 줄) 로 나눈다. 순수 함수.
+
+    open_outages: {source: (이슈 번호, 열린 지 N일)} — 열린 추적 이슈가 있는 소스만.
+        None/빈 dict(조회 실패 포함)이면 **fail-open**: 면제 외 전부 경보 그대로.
+    안내 줄은 `ℹ️` 로 시작한다 — 워크플로가 grep 하는 `⚠️` 마커를 쓰지 않는다.
+    """
+    open_outages = open_outages or {}
+    alerts: list[Anomaly] = []
+    notes: list[str] = []
+    for a in anomalies:
+        if a.severity == "silent_drop" and a.source in SILENT_DROP_EXEMPT:
+            notes.append(f"ℹ️ {a.source}: 주간 0건 — 면제({SILENT_DROP_EXEMPT[a.source]})")
+            continue
+        outage = open_outages.get(a.source)
+        if a.severity == "silent_drop" and outage is not None:
+            number, days = outage
+            if days > KNOWN_OUTAGE_ESCALATE_DAYS:
+                alerts.append(Anomaly(
+                    source=a.source, severity=a.severity, current=a.current,
+                    baseline=a.baseline,
+                    message=(f"{a.message} [알려진 장애 #{number} 가 {days}일째 열림 — "
+                             f"{KNOWN_OUTAGE_ESCALATE_DAYS}일 초과로 경보 승격]"),
+                ))
+            else:
+                notes.append(f"ℹ️ {a.source}: 주간 0건 — 알려진 장애(#{number}, {days}일째)")
+            continue
+        alerts.append(a)
+    return alerts, notes

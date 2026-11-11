@@ -1,38 +1,38 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-10",
+ "measured_on": "2026-11-11",
  "window_days": 60,
  "totals": {
-  "items": 402
+  "items": 442
  },
  "by_source": [
   {
    "v": "OpenFDA Recall",
-   "c": 106
+   "c": 141
   },
   {
    "v": "ECA Academy",
-   "c": 75
+   "c": 81
   },
   {
    "v": "Federal Register",
-   "c": 74
+   "c": 75
   },
   {
    "v": "EMA",
-   "c": 51
+   "c": 50
   },
   {
    "v": "MFDS",
-   "c": 44
+   "c": 43
   },
   {
    "v": "Health Canada",
-   "c": 21
+   "c": 20
   },
   {
    "v": "ISPE",
-   "c": 17
+   "c": 18
   },
   {
    "v": "MHRA Inspectorate",
@@ -48,6 +48,104 @@
   }
  ],
  "items": [
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-10",
+   "title": "Validation of Certain In Vitro Diagnostic Devices for Emerging Pathogens During a Section 564 Declared Emergency; Guidance for Industry and Food and Drug Administration Staff; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/10/2026-22883/validation-of-certain-in-vitro-diagnostic-devices-for-emerging-pathogens-during-a-section-564"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Rule",
+   "published_date": "2026-11-10",
+   "title": "Color Additive Petition From Environmental Defense Fund et al.; Request To Amend the Color Additive Regulations To Remove the Solvents Ethylene Dichloride, Methylene Chloride, and Trichloroethylene",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/10/2026-22865/color-additive-petition-from-environmental-defense-fund-et-al-request-to-amend-the-color-additive"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Rule",
+   "published_date": "2026-11-10",
+   "title": "Color Additive Petition From the International Association of Color Manufacturers; Request To Amend the Color Additive Regulations To Remove the Solvents Methylene Chloride, Trichloroethylene, and Ethylene Dichloride",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/10/2026-22866/color-additive-petition-from-the-international-association-of-color-manufacturers-request-to-amend"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-09",
+   "title": "Cross-Contamination: The Particular Risk Posed by Beta-Lactam Antibiotics",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/cross-contamination-the-particular-risk-posed-by-beta-lactam-antibiotics"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-09",
+   "title": "EMA Procedural Advice Updates: Centralised Procedure",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-procedural-advice-updates-centralised-procedure"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-09",
+   "title": "FDA Cites Airflow, Aseptic Conditions and Visual Inspection at Korean Manufacturer",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-cites-airflow-aseptic-conditions-and-visual-inspection-at-korean-manufacturer"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-09",
+   "title": "FDA Updates how it Evaluates and Inspects Human Drug Facilities",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-updates-how-it-evaluates-and-inspects-human-drug-facilities"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-09",
+   "title": "FDA Warning Letter to US based Manufacturer: Sterile Manufacturing Failures",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-to-us-based-manufacturer-sterile-manufacturing-failures"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-09",
+   "title": "Revision of USP Chapter <1033> on the Validation of Bioassays",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/revision-of-usp-chapter-1033-on-the-validation-of-bioassays"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-09",
+   "title": "Single-Temperature Incubation in Ambient Monitoring – Is it Permissible and Advisable?",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/single-temperature-incubation-in-ambient-monitoring-is-it-permissible-and-advisable"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-11-09",
+   "title": "Draft guideline on predictive biomarker assays in the context of medicinal product lifecycle",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-predictive-biomarker-assays-context-medicinal-product-lifecycle_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-11-09",
+   "title": "Draft guideline on risk assessment of medicinal products in human reproduction and breastfeeding: from data to product information - Revision 1",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-risk-assessment-medicinal-products-human-reproduction-breastfeeding-data-product-information-revision-1_en.pdf"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-09",
+   "title": "Expanding the Pharmaceutical Quality Framework: Part 1 - Leveraging AI-Derived Insights Across CMC, Process Validation, and Quality Systems",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/expanding-pharmaceutical-quality-framework-part-1-leveraging-ai"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-11-09",
+   "title": "「생물학적제제 기준 및 시험방법」 일부개정고시(안) 행정예고 알림(공고 제2026-547호, 2026.11.9.)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44319"
+  },
   {
    "source": "Federal Register",
    "source_kind": "Rule",
@@ -138,6 +236,251 @@
    "published_date": "2026-11-04",
    "title": "Beyond Human-in-the-Loop: Can Machine-in-the-Loop Address Coverage Failure in GxP Validation?",
    "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/beyond-human-loop-can-machine-loop-address-coverage-failure-gxp"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Abiraterone Acetate Tablets USP 500 mg, 60-count bottles, Rx only, Distributed by: Glenmark Pharmaceuticals USA, Elmwood Park, NJ 07407, NDC 68462-882-60",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Aero Foamy Mango Aloe Vera Antiseptic Hand & Body Wash, Net Contents: 1 Gallon (3.8 L), Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, 30013, UPC 711808198393",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Aerocare Sani Mango Antiseptic Hand and Body Wash, Net Contents: 1 Gallon (3.8 L), Manufactured By: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA 33013, UPC 711808198249",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Antiseptic Hand Soap, Net Contents: 1 Gallon (3.8 L) Distributed By: image supply, inc., P.O. Box 1108, 5081 Dawn Drive, Lumberton, NC28359",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Atorvastatin Calcium Tablets, USP, 40mg, 1000 tablets per bottle, Rx only, Manufactured by: MSL Laboratories Private Limited, Telangana - 509228, India; Distributed by: Novadoz Pharmaceuticals LLC, Piscataway, NJ 08854-3714. NDC: 72205-024-99",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Carboxymethylcellulose Sodium, 0.5% Lubricant Eye Drops, Sterile, 30 Single-Use Containers, 0.02 FL OZ (0.5 mL) each, Manufactured by: Huons Co., Ltd, Jecheon-si, Chungcheongbuk-do, 27159, South Korea; Marketed by: GSMS Incorporated, Camarillo, CA 93012, USA. NDC 51407-945-30 Pouch Label: Carboxymethylcellulose Sodium, Lubricant Eye Drops, 0.5 mL, Single-Use, gsms.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Certus Medical Satin Foam, 750 ml (25.4 fl. oz.), Manufactured for: Cartus Medical, 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808250930",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Chemseptic, Net Contents: 1 Gallon (3.8 L), Distributed By: RMC Rochester Midland Corporation, 155 Paragon Drive, Rochester, NY 14624 USA, Made in USA",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Delta Foremost Sani-Foam Mango, Net Contents: 1000 ML, 33.8 FL OZ, Manufactured Expressly For: Delta Foremost Chemical Corp., 3915 Air Park Street, Memphis, TN 38118,",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Formoterol Fumarate Inhalation Solution, 20mcg/2mL, packaged in cartons of 30 individually wrapped vials (NDC 76204-030-01) and 60 individually wrapped vials (NDC 76204-030-02), Rx only, Manufactured for and by: Ritedose Pharmaceuticals, LLC, Columbia, SC",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Freshhands Premium Foamy Antibacterial Hand Soap Antiseptic, Net Contents: 18 oz (532 mL), Sold By; Consolidated Chemicals, LLC, 3191 W Tharpe St. Tallahassee, FL 32303 USA, UPC",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Handtastic Foamy Mango Antiseptic Foam Soap Hand & Body Wash, Net Contents : 18oz (532ml), Sold by, Momar Incorporated, 1880 Ellsworth Industrial Drive, N.W., Atlanta, Georgia, 80818.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Lidocaine Ointment USP, 5.0 % 50g JAR, Rx only, Packaged and Distributed by: Direct Rx Dawsonville, GA 30534, NDC 72189-0211-50",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Lynx, LX0864 peachy-foam antiseptic handsoap, 1000 ML (33.8 FL OZ.) Manufactured by: ABC Compounding Co., INC., 2500 Dogwood Dr., Conyers, GA 30013, UPC 711808210804.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Lynx, antibacterial hand soap, Net Contents 1 Gallon, (3.8 L), Manufactured by: ABC Compounding Co., INC., 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808199925.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Lynx, antibacterial hand soap, Refill, Net Contents 1 Gallon, (3.8 L), Manufactured by: ABC Compounding Co., INC., 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808200027.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Metoclopramide Tablets, USP, 5 mg, 100 Tablets per bottle, Rx Only, Manufactured for: Teva Pharmaceuticals, Parsippany, NJ 07054. NDC: 51079-886-20.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "OXYTOCIN, 30 USP UNITS, Added to 0.9% Sodium Chloride 500 mL - Single-Use Container, Rx Only, EAGLE PHARMA OUTSOURCING, 2200 Riverchase Center, Suite 675, Hoover, AL 35244, UPC: 6985203050. NDC 69852-030-50",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Olmesartan Medoxomil, Amlodipine, and Hydrochlorothiazide Tablets 40 mg/10 mg/12.5mg, packaged as a) 30-count bottle, NDC 33342-246-07; b) 90-count bottle, NDC 33342-246-10; Rx Only, Manufactured for : Macleods Pharma USA, Inc. Princeton, NJ 08540, Manufactured by: Macleods Pharmaceuticals Ltd, Daman, 396210, India",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "PHENYLephrine HCL Infusion, 100 mg per 250 mL in 0.9% Sodium Chloride (0.4 mg/mL), Sterile, Rx Only, Single-Use Container, EAGLE PHARMA OUTSOURCING, 2200 Riverchase Center, Suite 675, Hoover, AL 35244, UPC: 6985210025. NDC 69852-100-25",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "PRO CHEM BAN AID, Antiseptic Hand Soap, Net Contents: 1 GALLON (3.8 L), Sold by: PRO CHEM, Inc.,1475 Bluegrass Lakes Parkway, Alpharetta, GA 30004.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "PRO CHEM Fresh Start, Antibacterial Hand Soap, Antiseptic Hand Soap, 800mL bag, Sold by: PRO CHEM, Inc.,1475 Bluegrass Lakes Parkway, Alpharetta, GA 30064.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Palm Antiseptic Hand Soap Net Contents: 1 Gallon (3.8 L). Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA 30013, UPC 711808196498",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "People's FM-24 FOAMING High Foaming Antiseptic Hand and Body Wash, NET CONTENTS: 1000 ML 33.8 FL OZ, Distributed by: People's Janitorial Supply, 955 Main Street, Forest Park, GA 30298, 404-363-2226.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Pro Chem Suds Hand Soap, Net Contents: 18 OZ (532 ml), Sold by Pro Chem Inc., 1475 Bluegrass Lakes Parkway, Alpharetta, GA 30004",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Spurrier, Antimicrobial Hand Soap, Net Contents: 1 Gallon (3.8 L), Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA, 30013, UPC 726133100508",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "SunCoast Paper Inc. Surgent Antiseptic Hand Soap, Net Contents : 1 Gallon (3.8 L), SunCoast Paper In., 4111 Community Rd., Brunswick, GA 31520, UPC 654441P10219",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Theophylline Extended-Release Tablets, 100 mg, Rx Only, 100-count bottle, Distributed by: Brandywine Pharmaceuticals, LLC, West Chester, PA 19382, NDC: 71321-500-10",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Theophylline Extended-Release Tablets, 200 mg, Rx Only, 100-count bottle, Distributed by: Brandywine Pharmaceuticals, LLC, West Chester, PA 19382, NDC: 71321-501-10.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "ULTRA STRENTGH, ELECTRIC MIDICATED BALM (menthol 16% and methyl salicylate 32%) packaged in a) Net 2.45 oz (70g) (NDC 63299-001-01) and b) 10g (NDC 63299-001-02), Manufactured by Fei Fah Medical Mfg Pte Ltd, Singapore, U.S Distributor: SOLISTICE MEDICINE COMPANY, 215 West Ann Street, Los Angeles, CA 90012",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
+   "title": "Wechem Hand Guard8/1000mL Bag, Manufactured by: ABC Compounding Co., Inc., 2600 Dogwood Dr., Conyers, GA, 30013",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-11-04",
+   "title": "ValuHealth Extra Strength Pain Relief Acetaminophen 500 mg, 40-caplets per bottle, Distributed by:Prodose, Inc. Ronkonkoma, NY 11779, Made in India. UPC 8 50026 88900 0",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-11-04",
+   "title": "Vecuronium Bromide for Injection, 10mg, 10 Single-Dose Vials per carton, Sterile, Rx Only, Mfd. for Meitheal Pharmaceuticals, Chicago, IL. NDC: 71288-744-11",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-11-04",
+   "title": "Vecuronium Bromide for Injection, 20mg, 10 Single-Dose Vials per carton, Sterile, Rx Only, Mfd. for Meitheal Pharmaceuticals, Chicago, IL. NDC: 71288-745-21",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Not Yet Classified",
+   "published_date": "2026-11-04",
+   "title": "Tridacaine III / Lidocaine Patch 5%, 15 envelopes containing 1 patch each per pouch, Rx only, Distributed by: Trifluent Pharma San Antonio, TX 78213, NDC 73352-835-15.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
   },
   {
    "source": "EMA",
@@ -2798,69 +3141,6 @@
    "published_date": "2026-09-14",
    "title": "[HC] TZIELD (teplizumab) and the Risk of Viral Reactivation",
    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/tzield-teplizumab-and-risk-viral-reactivation"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-09-11",
-   "title": "Meeting highlights from the Committee for Veterinary Medicinal Products (CVMP) 8-10 September 2026",
-   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-veterinary-medicinal-products-cvmp-8-10-september-2026"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-11",
-   "title": "Draft guideline on the investigation of interactions in the gastrointestinal tract",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-investigation-interactions-gastrointestinal-tract_en.pdf"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-11",
-   "title": "Amending Over-the-Counter Monograph M020: Sunscreen Drug Products for Over-the-Counter Human Use, and Related Information; Aminobenzoic Acid (PABA) and Trolamine Salicylate",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/11/2026-18551/amending-over-the-counter-monograph-m020-sunscreen-drug-products-for-over-the-counter-human-use-and"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-10",
-   "title": "Herbal Drugs: USP introduces Acceptance Criteria for PAHs",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/herbal-drugs-usp-introduces-acceptance-criteria-for-pahs"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-10",
-   "title": "Draft guideline on clinical investigation of medicinal products for the treatment of migraine and cluster headache - Revision 2",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-clinical-investigation-medicinal-products-treatment-migraine-cluster-headache-revision-2_en.pdf"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Proposed Rule",
-   "published_date": "2026-09-10",
-   "title": "Green Innovation GmbH; Withdrawal of Food Additive Petition (Animal Use)",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/10/2026-18469/green-innovation-gmbh-withdrawal-of-food-additive-petition-animal-use"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-10",
-   "title": "[HC] Generic acetaminophen by Teva recalled because it may contain foreign material",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/generic-acetaminophen-teva-recalled-because-it-may-contain-foreign-material"
-  },
-  {
-   "source": "MFDS",
-   "source_kind": "guidance-industry",
-   "published_date": "2026-09-10",
-   "title": "디지털의료기기 제조 및 품질관리 기준 질의·응답집",
-   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15950"
-  },
-  {
-   "source": "MFDS",
-   "source_kind": "guidance-industry",
-   "published_date": "2026-09-10",
-   "title": "첨단바이오의약품 제조에 사용되는 사람 및 동물 유래 원료물질 관리 가이드라인",
-   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15949"
   }
  ]
 }

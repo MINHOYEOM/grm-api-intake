@@ -57,6 +57,7 @@ from grm_taxonomy import (
     is_out_of_scope_483,
     is_out_of_scope_483_establishment,
     is_pharma_establishment_483,
+    is_veterinary_domain,
 )
 from grm_common import _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log
 from collect_intake import (
@@ -2911,10 +2912,19 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     # Hankook Cosmetics 가 이름의 "Cosmetics" 때문에 Unrelated 로 버려졌다. 수의 하드 드롭은
     # 위에서 업체명까지 이미 봤으므로 그대로다. compute_relevance 자체는 손대지 않는다(FR·회수·
     # MFDS 도 같은 함수를 쓴다).
+    pharma_est = is_pharma_establishment_483(establishment_type)
     relevance_parts = ((establishment_type, record_type, gate_excerpt)
-                       if is_pharma_establishment_483(establishment_type)
+                       if pharma_est
                        else (company, establishment_type, record_type, gate_excerpt))
     relevance = compute_relevance(*relevance_parts)
+    # [2026-11-12] 같은 원칙을 본문 낱말에도 적용한다 — 의약품 시설의 483 본문이 식품·기기 낱말을
+    # **지적 내용으로** 담는 경우(실측 195803 무균 조제 약국: "dietary supplement grade APIs were
+    # observed in your firm's raw material storage" — 건기식 등급 원료를 의약품에 쓴 것 자체가 지적)
+    # 제외 키워드가 Unrelated 를 냈다. 시설 유형이 의약품이면 제외 키워드로는 버리지 않는다.
+    # 수의/동물용(위 하드 드롭 + 성질 판정)은 그대로 버린다.
+    if (relevance == "Unrelated" and pharma_est
+            and not is_veterinary_domain(" ".join(relevance_parts).lower())):
+        relevance = "Possible"
     if relevance == "Unrelated":           # 기기/식품/화장품 도메인 → 드롭(QA 범위 밖)
         _record_483_exclusion(nrow, "unrelated_domain", ledger_basis)
         return None

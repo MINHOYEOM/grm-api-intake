@@ -6572,7 +6572,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 axis=meta, items=items, excluded=excluded_view,
                 # [B2] 화면 빵부스러기와 동일한 순서·이름(findings_facet_index.html 참조).
                 json_ld=axis_page.breadcrumb_json_ld([
-                    (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"), (meta["title"], "")]),
+                    (tr("홈"), "/"), (tr("지적사항"), "findings/"), (meta["title"], "")]),
                 # 문서 목록 입구 — 문서 정본이 없으면 링크를 만들지 않는다(없는 페이지로
                 # 보내는 링크는 무링크보다 나쁘다).
                 doc_index_total=((docs_data or {}).get("totals") or {}).get("documents", 0)
@@ -6607,7 +6607,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     crumb_last=item_label,
                     # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
                     json_ld=item_page.breadcrumb_json_ld([
-                        (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
+                        (tr("홈"), "/"), (tr("지적사항"), "findings/"),
                         (meta["title"], f"findings/{meta['path']}/"),
                         (item_label, "")]),
                     headline=tr("{label} {suffix}", label=item_label,
@@ -6657,7 +6657,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     crumb_last=agency_label,
                     # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
                     json_ld=combo_page.breadcrumb_json_ld([
-                        (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
+                        (tr("홈"), "/"), (tr("지적사항"), "findings/"),
                         (cat_meta["title"], f"findings/{cat_meta['path']}/"),
                         (category_label, base),
                         (agency_label, "")]),
@@ -6718,7 +6718,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=tr("미국 GMP 규정(21 CFR Part 210·211) 조항별로 실제 지적사항을 "
                            "우리말로 모았습니다. 조항 {n}개.", n=len(clause_views)),
             json_ld=clause_index.breadcrumb_json_ld([
-                (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"), (tr("조항별"), "")]),
+                (tr("홈"), "/"), (tr("지적사항"), "findings/"), (tr("조항별"), "")]),
             clauses=clause_views, min_documents=CLAUSE_MIN_DOCUMENTS,
             citations_ready=bool(citations_data),
         )
@@ -6732,7 +6732,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 nav_active="findings",
                 description=clause_description(clause, tr),
                 json_ld=clause_page.breadcrumb_json_ld([
-                    (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
+                    (tr("홈"), "/"), (tr("지적사항"), "findings/"),
                     (tr("조항별"), "findings/clause/"), (clause["code"], "")]),
                 clause=clause, siblings=sibs, agency_labels=clause_agency_labels,
                 cit=clause_citations.section_view(citations_data, clause["section"]),
@@ -6750,7 +6750,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             nav_active="findings",
             description=tr(CITATIONS_DESCRIPTION),
             json_ld=cp.breadcrumb_json_ld([
-                (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
+                (tr("홈"), "/"), (tr("지적사항"), "findings/"),
                 (tr("FDA 지적 조항"), "")]),
             cit=clause_citations.ranking_view(citations_data), clause_slugs=slugs,
             # [제조소 전체 목록 2026-11-10] 홈→지적사항→FDA 지적 조항→제조소 목록 도달 경로
@@ -6778,7 +6778,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 nav_active="findings",
                 description=_tr(EXAMPLES_DESCRIPTION),
                 json_ld=_ep.breadcrumb_json_ld([
-                    (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                    (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
                     (_tr("지적 사례"), "")]),
                 topics=_ex_topics, curated_on=example_data.get("curated_on", ""),
             )
@@ -7061,7 +7061,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                  " 우리말로 볼 수 있습니다.", n=_total),
                  # [B2] 화면 빵부스러기와 동일(findings_doc_list.html index 모드).
                  json_ld=_idx_page.breadcrumb_json_ld([
-                     (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                     (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
                      (_tr("문서로 찾기"), "")]),
                  mode="index", heading=_tr("문서로 찾기"),
                  lede=_lede,
@@ -7101,7 +7101,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                          n=f"{y['count']:,}"),
                          # [B2] 화면 빵부스러기와 동일(list 모드는 '문서로 찾기'가 낀다).
                          json_ld=list_page.breadcrumb_json_ld([
-                             (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                             (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
                              (_tr("문서로 찾기"), "findings/docs/"),
                              (heading, "")]),
                          mode="list",
@@ -7359,7 +7359,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=_tr(IMPORT_ALERTS_DESCRIPTION, n=f"{_iav['total']:,}",
                                 k=f"{_iav['korea']:,}"),
                 json_ld=_iap.breadcrumb_json_ld([
-                    (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                    (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
                     (_tr("FDA 수입경보"), "")]),
                 ia=_iav,
             )
@@ -7382,7 +7382,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 nav_active="findings",
                 description=_tr(CITATION_FIRMS_DESCRIPTION, n=f"{_cfv['total']:,}"),
                 json_ld=_cfp.breadcrumb_json_ld([
-                    (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                    (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
                     (_tr("FDA 지적 조항"), "findings/citations/"),
                     (_tr("조항별 지적 제조소"), "")]),
                 cf=_cfv,
@@ -7407,7 +7407,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     nav_active="findings",
                     description=_tr(DEFICIENCY_CASES_DESCRIPTION[_ag], n=f"{_dcv['total']:,}"),
                     json_ld=_dcp.breadcrumb_json_ld([
-                        (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                        (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
                         (_tr("지적 사례"), "findings/examples/"), (_ag, "")]),
                     dc=_dcv, dc_tabs=_dc_tabs, dc_on=_ag, dc_credit=deficiency_cases_page.CREDIT,
                 )
@@ -7421,7 +7421,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     description=_tr(DEFICIENCY_CASES_DESCRIPTION["MHRA_DATA"],
                                     n=f"{_dc_cc['rows_total']:,}"),
                     json_ld=_dcp.breadcrumb_json_ld([
-                        (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                        (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
                         (_tr("지적 사례"), "findings/examples/"), (_tr("MHRA 조항별 집계"), "")]),
                     cc=_dc_cc, dc_tabs=_dc_tabs, dc_on="MHRA_DATA", dc_credit=deficiency_cases_page.CREDIT,
                 )

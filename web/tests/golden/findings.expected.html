@@ -71,36 +71,45 @@
 
 <main><div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
-    <h1 class="reveal" style="animation-delay:.08s">지적사항 검색</h1><p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 6,694건에서 추출한 지적사항 26,552건(2026-11-03 기준)을 원문 문장 단위로 모았습니다.</p>
+    <h1 class="reveal" style="animation-delay:.08s">지적사항</h1><p class="reveal" style="animation-delay:.14s">세계 규제기관이 제약 현장에서 지적한 내용을 원문 그대로 한국어로 찾아봅니다.</p>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="" data-key="" data-root="../" data-asset-root="../" hidden></div>
 <nav class="fnd-seg" aria-label="지적사항 면 전환">
-  <a href="../findings/index.html" class="on" aria-current="page">검색</a>
-  <a href="../findings/browse/index.html">둘러보기</a>
-  <a href="../findings/trends/index.html">트렌드</a>
-  <a href="../findings/inspections/index.html">실사 결과</a>
-  <a href="../findings/citations/index.html">FDA 지적 조항</a>
-  <a href="../findings/import-alerts/index.html">FDA 수입경보</a>
-  <a href="../findings/examples/index.html">지적 사례</a>
-  <a href="../findings/inspector/index.html">실사관</a>
-</nav>
-<style>
-.fnd-seg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 34px;padding-bottom:0;border-bottom:1px solid var(--line)}
-.fnd-seg a{display:inline-block;padding:9px 16px 11px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
-.fnd-seg a:hover{color:var(--ink)}
-.fnd-seg a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--coral)}
-.fnd-seg a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
-@media(max-width:520px){.fnd-seg a{padding:9px 11px 11px;font-size:13.5px}}
+  <div class="fnd-seg-g">
+    <a href="../findings/index.html" class="on" aria-current="true">찾기</a>
+    <a href="../findings/trends/index.html">경향</a>
+    <a href="../findings/examples/index.html">점검</a>
+  </div>  <div class="fnd-seg-s">
+    <a href="../findings/index.html" class="on" aria-current="page">검색</a>    <a href="../findings/docs/index.html">문서</a>    <a href="../findings/c/index.html">분류</a>    <span class="fnd-seg-div" aria-hidden="true"></span>
+    <a href="../findings/firm/index.html">업체</a>
+    <a href="../findings/inspector/index.html">실사관</a>
+  </div></nav><style>
+.fnd-seg{margin:0 0 30px}
+.fnd-seg-g{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.fnd-seg-g a{display:inline-block;padding:9px 18px 11px;font-size:15px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
+.fnd-seg-g a:hover{color:var(--ink)}
+.fnd-seg-g a.on{color:var(--ink);font-weight:700;border-bottom-color:var(--coral)}
+.fnd-seg-s{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:12px}
+.fnd-seg-s a{flex:none;font-size:14px;padding:5px 14px;border-radius:999px;color:var(--muted);border:1px solid var(--line);transition:color var(--tr),border-color var(--tr)}
+.fnd-seg-s a:hover{color:var(--ink);border-color:var(--line-2)}
+.fnd-seg-s a.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.fnd-seg-s .fnd-seg-side{margin-left:auto;border:0;padding:5px 0;font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
+.fnd-seg-s .fnd-seg-side.on{background:none;color:var(--ink)}
+.fnd-seg-div{flex:none;width:1px;height:18px;background:var(--line-2);margin:0 4px}
+.fnd-seg a:focus-visible,.fnd-views a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}.fnd-views{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--rad-s);overflow:hidden;margin:-12px 0 24px;font-size:13.5px}
+.fnd-views a{padding:6px 14px;color:var(--muted);border-right:1px solid var(--line-2)}
+.fnd-views a:last-child{border-right:0}
+.fnd-views a:hover{color:var(--ink)}
+.fnd-views a.on{background:var(--soft);color:var(--ink);font-weight:600}
+@media(max-width:520px){
+  .fnd-seg-g a{flex:1;text-align:center;padding:9px 4px 11px}
+  .fnd-seg-s{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-22px;padding-right:22px}
+  .fnd-seg-s::-webkit-scrollbar{display:none}
+  .fnd-seg-s .fnd-seg-side{margin-left:6px}
+}
 </style>
-
-    <p class="fnd-lead">업체명·문서번호·조항·본문 문구로 검색하고, 소스·카테고리·기간·국가로 좁힙니다.</p><aside class="fnd-insp-cta" aria-label="실사관 조회 안내">
-      <div class="fnd-insp-cta-h">
-        <span class="fnd-insp-cta-k"><i class="ti ti-user-search" aria-hidden="true"></i>실사관으로 찾기</span>
-        <span class="fnd-insp-cta-sum">FDA 483 문서에 서명한 실사관이 어떤 분야를 확인했고 어느 제조소를 다녀갔는지 문서 단위로 모아 봅니다.</span>
-        <a class="fnd-insp-cta-go" href="../findings/inspector/index.html">실사관 조회 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-      </div>
-    </aside><section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
+<section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
       <div class="fnd-search">
         <i class="ti ti-search" aria-hidden="true"></i>
         <input id="fnd-q" type="text" placeholder="업체·문서번호·조항·내용 검색" autocomplete="off" aria-label="지적사항 검색" />
@@ -121,10 +130,14 @@
         <div class="fnd-field fnd-field--sort"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>      <p class="fnd-textonlynote" id="fnd-textonlynote" hidden></p>
+    </section>    <p class="fnd-total">문서 6,694건 · 지적 26,552건 · 2026-11-03 기준</p><section class="fnd-mine" id="fnd-mine" aria-label="내 범위의 최근 공개" hidden>
+      <h2 class="fnd-mine-h">내 범위의 최근 공개</h2>
+      <p class="fnd-mine-p" id="fnd-mine-sub"></p>
+      <div class="fnd-rc-list" id="fnd-mine-list"></div>
     </section><section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
-      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">세부 지표<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
-      <div class="fnd-dash-grid" id="fnd-dash-grid">
+      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="false" aria-controls="fnd-dash-grid">세부 지표<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
+      <div class="fnd-dash-grid fnd-dash-grid--collapsed" id="fnd-dash-grid">
         <div class="fnd-dash-block">
           <h2 class="fnd-dash-h">카테고리 분포<span class="fnd-dash-unit">지적사항 기준</span></h2>
           <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
@@ -183,21 +196,11 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    balance 가 아니라 pretty: balance 는 두 줄 길이를 맞추려고 한 줄로 들어갈 문장도 굳이
    쪼갠다. */
 .page-head p{max-width:none;text-wrap:pretty}
-/* 검색 리드 한 줄 — 세그 아래·툴바 위. */
-.fnd-lead{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 20px;max-width:760px;word-break:keep-all}
-/* [실사관 진입점 2026-08-31] 상단 안내 스트립 — archive.html/brief.html 의 .arc-lib*
-   규칙과 같은 결(soft 배경+테두리+라운드, 머리글/설명/링크 3분할)을 옮겨오되 이 스트립엔
-   목록(.arc-lib-l)이 없어 클래스는 새로 둔다(fnd-insp-cta) — grm.css 는 무접촉. */
-.fnd-insp-cta{margin:0 0 22px;padding:13px 18px 12px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
-.fnd-insp-cta-h{display:flex;align-items:center;gap:8px 13px;flex-wrap:wrap}
-.fnd-insp-cta-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}
-.fnd-insp-cta-k .ti{font-size:15px;color:var(--coral-2)}
-.fnd-insp-cta-sum{flex:1;min-width:0;font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
-.fnd-insp-cta-go{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
-.fnd-insp-cta-go:hover{text-decoration:underline}
-.fnd-insp-cta-go .ti{font-size:14px;transition:transform .16s var(--ease)}
-.fnd-insp-cta-go:hover .ti{transform:translateX(3px)}
-@media (max-width:640px){ .fnd-insp-cta{padding:12px 14px 11px} .fnd-insp-cta-sum{flex-basis:100%} }
+/* [탭 3묶음] 건수 한 줄·내 범위의 최근 공개 */
+.fnd-total{font-size:12.5px;color:var(--muted);margin:-6px 2px 18px}
+.fnd-mine{margin:0 0 26px}
+.fnd-mine-h{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0;font-weight:600}
+.fnd-mine-p{font-size:13.5px;line-height:1.7;color:var(--muted);margin:6px 0 10px}
 /* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
 .fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
 /* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */
@@ -494,7 +497,8 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 <style>
 .foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}
 .foot .b1 .foot-srclink:hover{color:#fff;border-bottom-color:rgba(255,255,255,.35)}
-.foot .b1 .foot-srclink .ti{font-size:14px;line-height:1}
+.foot .b1 .foot-srclink .ti{font-size:14px;line-height:1}.foot .foot-fnd .foot-grp{font-size:12px;color:#fff;opacity:.6;padding:10px 0 2px}
+.foot .foot-fnd .foot-grp:first-of-type{padding-top:0}
 .foot-copy .foot-policy a{margin-left:12px;color:inherit;text-decoration:underline}
 .foot-copy .foot-contact{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
@@ -544,8 +548,8 @@ main{word-break:keep-all;overflow-wrap:anywhere}
       <p>국내외 의약품 GMP·품질 규제 동향을 한국어와 영어로 제공하는 무료 정보 서비스입니다.</p>
       <a class="foot-srclink" href="../findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
     <div data-feedback-slot><h5>서비스 안내</h5><a href="../about/index.html">서비스 소개</a><a href="../guide/index.html">이용안내</a><a href="../index.html#notice">AI 활용 안내</a><a href="../findings/coverage/index.html">데이터 현황</a><a href="../rss.xml">RSS 피드</a></div>
-    <div><h5>콘텐츠</h5><a href="../archive/index.html">주간 브리프</a><a href="../news/index.html">최근 규제 소식</a><a href="../findings/index.html">실사 지적사항</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../quiz/index.html">주간 퀴즈</a></div>
-    <div><h5>도구</h5><a href="../findings/trends/index.html">트렌드</a><a href="../findings/inspections/index.html">실사 결과</a><a href="../findings/citations/index.html">FDA 지적 조항</a><a href="../findings/examples/index.html">지적 사례</a><a href="../findings/inspector/index.html">실사관</a><a href="../findings/checklist/index.html">자가점검 체크리스트</a><a href="../findings/firm/index.html">업체 조회</a><a href="../findings/docs/index.html">문서로 찾기</a></div>
+    <div><h5>콘텐츠</h5><a href="../archive/index.html">주간 브리프</a><a href="../news/index.html">최근 규제 소식</a><a href="../findings/index.html">지적사항</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../quiz/index.html">주간 퀴즈</a></div>
+    <div class="foot-fnd"><h5>지적사항</h5><span class="foot-grp">찾기</span><a href="../findings/index.html">검색</a><a href="../findings/docs/index.html">문서</a><a href="../findings/c/index.html">분류</a><a href="../findings/firm/index.html">업체</a><a href="../findings/inspector/index.html">실사관</a><span class="foot-grp">경향</span><a href="../findings/trends/index.html">지적 영역</a><a href="../findings/citations/index.html">지적 조항</a><a href="../findings/inspections/index.html">실사 결과</a><span class="foot-grp">점검</span><a href="../findings/examples/index.html">지적 사례</a><a href="../findings/checklist/index.html">체크리스트</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
@@ -622,7 +626,7 @@ if(_nt&&_nm){
 </div>
 <script src="/assets/pet.js?v=e470de1f" defer></script>
 <script src="/assets/site-popup.js?v=3d7ce8a4" defer></script>
-<script src="../assets/findings.js?v=c44f5dc6" defer></script>
+<script src="../assets/findings.js?v=4469f851" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

@@ -76,7 +76,41 @@
     <p class="reveal" style="animation-delay:.14s">특정 업체의 FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항 누적 이력을 한 곳에서 확인합니다.</p>
   </div>
   <div class="wrap">
-    <div id="grm-firm-cfg" data-url="" data-key="" data-root="../../" data-asset-root="../../" hidden></div>
+<nav class="fnd-seg" aria-label="지적사항 면 전환">
+  <div class="fnd-seg-g">
+    <a href="../../findings/index.html" class="on" aria-current="true">찾기</a>
+    <a href="../../findings/trends/index.html">경향</a>
+    <a href="../../findings/examples/index.html">점검</a>
+  </div>  <div class="fnd-seg-s">
+    <a href="../../findings/index.html">검색</a>    <a href="../../findings/docs/index.html">문서</a>    <a href="../../findings/c/index.html">분류</a>    <span class="fnd-seg-div" aria-hidden="true"></span>
+    <a href="../../findings/firm/index.html" class="on" aria-current="page">업체</a>
+    <a href="../../findings/inspector/index.html">실사관</a>
+  </div></nav><style>
+.fnd-seg{margin:0 0 30px}
+.fnd-seg-g{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.fnd-seg-g a{display:inline-block;padding:9px 18px 11px;font-size:15px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
+.fnd-seg-g a:hover{color:var(--ink)}
+.fnd-seg-g a.on{color:var(--ink);font-weight:700;border-bottom-color:var(--coral)}
+.fnd-seg-s{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:12px}
+.fnd-seg-s a{flex:none;font-size:14px;padding:5px 14px;border-radius:999px;color:var(--muted);border:1px solid var(--line);transition:color var(--tr),border-color var(--tr)}
+.fnd-seg-s a:hover{color:var(--ink);border-color:var(--line-2)}
+.fnd-seg-s a.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.fnd-seg-s .fnd-seg-side{margin-left:auto;border:0;padding:5px 0;font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
+.fnd-seg-s .fnd-seg-side.on{background:none;color:var(--ink)}
+.fnd-seg-div{flex:none;width:1px;height:18px;background:var(--line-2);margin:0 4px}
+.fnd-seg a:focus-visible,.fnd-views a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}.fnd-views{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--rad-s);overflow:hidden;margin:-12px 0 24px;font-size:13.5px}
+.fnd-views a{padding:6px 14px;color:var(--muted);border-right:1px solid var(--line-2)}
+.fnd-views a:last-child{border-right:0}
+.fnd-views a:hover{color:var(--ink)}
+.fnd-views a.on{background:var(--soft);color:var(--ink);font-weight:600}
+@media(max-width:520px){
+  .fnd-seg-g a{flex:1;text-align:center;padding:9px 4px 11px}
+  .fnd-seg-s{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-22px;padding-right:22px}
+  .fnd-seg-s::-webkit-scrollbar{display:none}
+  .fnd-seg-s .fnd-seg-side{margin-left:6px}
+}
+</style>
+    <nav class="fnd-views" aria-label="업체 보기 전환"><a href="../../findings/firm/index.html" class="on" aria-current="page">업체 찾기</a><a href="../../findings/import-alerts/index.html">수입경보 목록</a></nav>    <div id="grm-firm-cfg" data-url="" data-key="" data-root="../../" data-asset-root="../../" hidden></div>
 
     <div class="fp-state" id="fp-loading" role="status" aria-live="polite">불러오는 중…</div>
     <div class="fp-state fp-state-error" id="fp-error" hidden>업체 프로파일 준비 중입니다.</div>
@@ -90,9 +124,7 @@
         <input class="tr-look-input" id="fp-look-input" type="search" name="q" placeholder="예: Lupin" autocomplete="off" spellcheck="false" />
         <button class="tr-look-btn" id="fp-look-btn" type="submit">찾기</button>
       </form>
-      <div id="fp-look-res" class="tr-look-res" aria-live="polite"></div>
-      <p class="tr-look-hint"><a href="../../findings/import-alerts/">FDA 수입경보 대상 업체 전체 목록 보기 →</a></p>
-    </div>
+      <div id="fp-look-res" class="tr-look-res" aria-live="polite"></div>    </div>
 
     <div id="fp-content" hidden>
       <div class="fp-head">
@@ -321,7 +353,8 @@ button.fp-cat-row[aria-pressed="true"] .fp-cat-label{color:var(--coral-2);font-w
 <style>
 .foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}
 .foot .b1 .foot-srclink:hover{color:#fff;border-bottom-color:rgba(255,255,255,.35)}
-.foot .b1 .foot-srclink .ti{font-size:14px;line-height:1}
+.foot .b1 .foot-srclink .ti{font-size:14px;line-height:1}.foot .foot-fnd .foot-grp{font-size:12px;color:#fff;opacity:.6;padding:10px 0 2px}
+.foot .foot-fnd .foot-grp:first-of-type{padding-top:0}
 .foot-copy .foot-policy a{margin-left:12px;color:inherit;text-decoration:underline}
 .foot-copy .foot-contact{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
@@ -371,8 +404,8 @@ button.fp-cat-row[aria-pressed="true"] .fp-cat-label{color:var(--coral-2);font-w
       <p>국내외 의약품 GMP·품질 규제 동향을 한국어와 영어로 제공하는 무료 정보 서비스입니다.</p>
       <a class="foot-srclink" href="../../findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
     <div data-feedback-slot><h5>서비스 안내</h5><a href="../../about/index.html">서비스 소개</a><a href="../../guide/index.html">이용안내</a><a href="../../index.html#notice">AI 활용 안내</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../rss.xml">RSS 피드</a></div>
-    <div><h5>콘텐츠</h5><a href="../../archive/index.html">주간 브리프</a><a href="../../news/index.html">최근 규제 소식</a><a href="../../findings/index.html">실사 지적사항</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
-    <div><h5>도구</h5><a href="../../findings/trends/index.html">트렌드</a><a href="../../findings/inspections/index.html">실사 결과</a><a href="../../findings/citations/index.html">FDA 지적 조항</a><a href="../../findings/examples/index.html">지적 사례</a><a href="../../findings/inspector/index.html">실사관</a><a href="../../findings/checklist/index.html">자가점검 체크리스트</a><a href="../../findings/firm/index.html">업체 조회</a><a href="../../findings/docs/index.html">문서로 찾기</a></div>
+    <div><h5>콘텐츠</h5><a href="../../archive/index.html">주간 브리프</a><a href="../../news/index.html">최근 규제 소식</a><a href="../../findings/index.html">지적사항</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
+    <div class="foot-fnd"><h5>지적사항</h5><span class="foot-grp">찾기</span><a href="../../findings/index.html">검색</a><a href="../../findings/docs/index.html">문서</a><a href="../../findings/c/index.html">분류</a><a href="../../findings/firm/index.html">업체</a><a href="../../findings/inspector/index.html">실사관</a><span class="foot-grp">경향</span><a href="../../findings/trends/index.html">지적 영역</a><a href="../../findings/citations/index.html">지적 조항</a><a href="../../findings/inspections/index.html">실사 결과</a><span class="foot-grp">점검</span><a href="../../findings/examples/index.html">지적 사례</a><a href="../../findings/checklist/index.html">체크리스트</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">

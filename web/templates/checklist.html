@@ -26,6 +26,7 @@
     <p class="reveal" style="animation-delay:.14s"><span class="ln">{{ _("규제기관이 실제로 인용한 조항을 많이 인용된 순으로 뽑고, 조항마다 실제 지적 문장을 붙여 점검표로 만듭니다.") }}</span> <span class="ln">{{ _("인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰시면 됩니다.") }}</span></p>
   </div>
   <div class="wrap">
+    <div class="cl-screen-only">{% with seg_active = "checklist" %}{% include "partials/findings_seg.html" %}{% endwith %}</div>
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
 
     {#- 설정·내보내기 — 화면 전용(인쇄에서 사라진다). form 이 아니라 버튼 묶음이라

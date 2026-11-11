@@ -224,9 +224,15 @@ class RenderedListPageTest(unittest.TestCase):
         self.assertIn("/en/findings/import-alerts/", self.llms)
 
     def test_entry_link_on_firm_lookup(self):
-        self.assertIn('href="../../findings/import-alerts/">FDA 수입경보 대상 업체 전체 목록 보기 →</a>',
-                      self.firm_ko)
-        self.assertIn("See all facilities on FDA Import Alerts →", self.firm_en)
+        """[탭 3묶음 2026-11-11] 수입경보 목록은 '찾기 › 업체' 화면 안의 보기 — 두 화면 위에 같은 보기 전환."""
+        self.assertIn('<a href="../../findings/firm/index.html" class="on" aria-current="page">업체 찾기</a>'
+                      '<a href="../../findings/import-alerts/index.html">수입경보 목록</a>', self.firm_ko)
+        self.assertIn('<a href="../../findings/firm/index.html">업체 찾기</a>'
+                      '<a href="../../findings/import-alerts/index.html" class="on" aria-current="page">수입경보 목록</a>',
+                      self.ko)
+        self.assertIn(">Import Alert list</a>", self.firm_en)
+        # 수입경보 목록 화면에서 켜지는 탭은 '업체'(찾기 묶음)다.
+        self.assertIn('class="on" aria-current="page">업체</a>', self.ko)
 
     def test_no_firm_links_without_doc_pages(self):
         self.assertNotIn("findings/firm/", self._main(self.ko).split('id="ia-rows"', 1)[1])

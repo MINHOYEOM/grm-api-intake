@@ -12,34 +12,14 @@
       이 면은 조회 도구다. 면 전환은 findings_seg.html(트렌드 존 세그와 동형). -#}
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
-    <h1 class="reveal" style="animation-delay:.08s">{{ _("지적사항 검색") }}</h1>
-    {#- 설명문은 한 문장(M15 사용자 피드백 — 첫 화면 밀도) — 건수는 별도 문장이 아니라
-        문장 안에 녹인다. 수치는 render 가 정본에서 계산(하드코딩 금지).
-        ★기준일도 **문장 안**에 넣는다. 이 수는 주 1회 스냅샷이라 바로 아래 런타임 목록과
-          며칠씩 어긋나는데(실측 24,895 vs 24,956) 시점을 안 밝히면 결함으로 읽힌다.
-          그렇다고 뒤에 괄호 문장을 덧붙이면 마침표가 둘이 되어 한 문장 계약이 깨진다 —
-          날짜를 그 수 바로 옆에 붙여 둘 다 지킨다. -#}
-    <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 {docs}건에서 추출한 지적사항 {n}건({asof} 기준)을 원문 문장 단위로 모았습니다.", docs=zone_totals.documents, n=zone_totals.findings, asof=zone_totals.as_of) }}{% else %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문 문장 단위로 추출해 모았습니다.") }}{% endif %}</p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _("지적사항") }}</h1>
+    {#- [탭 3묶음 2026-11-11 · 대표 승인] 첫 화면 우선순위 = 제목·한 줄 → 탭 → 검색창 → 결과.
+        기관 나열·건수 긴 문장은 검색창 아래 작은 한 줄(.fnd-total)로 내렸다. -#}
+    <p class="reveal" style="animation-delay:.14s">{{ _("세계 규제기관이 제약 현장에서 지적한 내용을 원문 그대로 한국어로 찾아봅니다.") }}</p>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-asset-root="{{ asset_root }}" hidden></div>
     {% with seg_active = "search" %}{% include "partials/findings_seg.html" %}{% endwith %}
-
-    <p class="fnd-lead">{{ _("업체명·문서번호·조항·본문 문구로 검색하고, 소스·카테고리·기간·국가로 좁힙니다.") }}</p>
-
-    {#- [실사관 진입점 2026-08-31] 검색 화면 상단 안내 스트립 — archive.html/brief.html
-        의 arc-lib 스트립과 같은 결(soft 배경+1px 테두리+라운드, 머리글/설명/우측 화살표
-        링크 3분할)이지만 내용 성격이 달라(자료실 최신 갱신 요약이 아니라 다른 도구로의
-        안내) 클래스는 별도로 둔다(fnd-insp-cta, 아래 페이지 스코프 style). #fnd-tools
-        바로 위 — 검색을 쓰기 전에 "실사관으로도 찾을 수 있다"를 알린다. /findings/browse/
-        에는 넣지 않는다(그 면은 세그 탭만으로 충분 — 스펙 §2 참조). -#}
-    <aside class="fnd-insp-cta" aria-label="{{ _('실사관 조회 안내') }}">
-      <div class="fnd-insp-cta-h">
-        <span class="fnd-insp-cta-k"><i class="ti ti-user-search" aria-hidden="true"></i>{{ _("실사관으로 찾기") }}</span>
-        <span class="fnd-insp-cta-sum">{{ _("FDA 483 문서에 서명한 실사관이 어떤 분야를 확인했고 어느 제조소를 다녀갔는지 문서 단위로 모아 봅니다.") }}</span>
-        <a class="fnd-insp-cta-go" href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회 ") }}<i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-      </div>
-    </aside>
 
     {#- [M15] 툴바(검색+필터+정렬)를 대시보드보다 위로(검색이 최우선 도구), sticky
         컴팩트화. §4 전면 재설계 — 소스/증거등급/검토상태 칩 그룹을 카테고리·발행월과
@@ -98,6 +78,19 @@
       {% endif %}
     </section>
 
+    {%- if zone_totals %}
+    <p class="fnd-total">{{ _("문서 {docs}건 · 지적 {n}건 · {asof} 기준", docs=zone_totals.documents, n=zone_totals.findings, asof=zone_totals.as_of) }}</p>
+    {%- endif %}
+
+    {#- [P2 개인화 · 067 → 탭 3묶음 2026-11-11 둘러보기에서 이동] 내 범위의 최근 공개.
+        기본은 없는 것처럼 동작한다 — 정적 셸은 hidden 이고, 로그인 + 관심 범위 또는 관심 업체가
+        있을 때만 reactions.js 가 채워 펼친다(id 로 찾으므로 면이 바뀌어도 그대로 동작). -#}
+    <section class="fnd-mine" id="fnd-mine" aria-label="{{ _('내 범위의 최근 공개') }}" hidden>
+      <h2 class="fnd-mine-h">{{ _("내 범위의 최근 공개") }}</h2>
+      <p class="fnd-mine-p" id="fnd-mine-sub"></p>
+      <div class="fnd-rc-list" id="fnd-mine-list"></div>
+    </section>
+
     {#- FIND-1 M7 — 대시보드 밴드(콤팩트 조망: 스탯·카테고리 분포·월별 추이·업체 상위).
         정적 셸은 빈 컨테이너+hidden 만 렌더(골든 결정론) — findings.js 가 필터 결과 기준
         render() 마다 재계산해 채운다(데이터 로드 실패/0건이면 hidden 유지).
@@ -108,8 +101,8 @@
         안 적는 것**이 문제였다. -#}
     <section class="fnd-dash" id="fnd-dash" aria-label="{{ _('지적사항 현황 대시보드') }}" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
-      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">{{ _("세부 지표") }}<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
-      <div class="fnd-dash-grid" id="fnd-dash-grid">
+      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="false" aria-controls="fnd-dash-grid">{{ _("세부 지표") }}<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
+      <div class="fnd-dash-grid fnd-dash-grid--collapsed" id="fnd-dash-grid">
         <div class="fnd-dash-block">
           <h2 class="fnd-dash-h">{{ _("카테고리 분포") }}<span class="fnd-dash-unit">{{ _("지적사항 기준") }}</span></h2>
           <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
@@ -152,8 +145,7 @@
           첫 성공 응답에서 `resultsEl.textContent = ""` 로 이 영역을 통째로 비우고 다시
           채운다(기존 render() 계약 — 이 목록은 그 순간까지만 존재하는 초기 콘텐츠).
           실패 시(#fnd-error 노출)엔 아무 코드도 resultsEl 을 건드리지 않아 이 목록이
-          그대로 남는다 — "오류만 보이는 것"보다 낫다. 마크업은 둘러보기 면(findings_
-          browse.html)의 "최근 공개된 문서" 섹션과 같은 `.fnd-rc-*` 컴포넌트를 그대로
+          그대로 남는다 — "오류만 보이는 것"보다 낫다. 마크업은 `.fnd-rc-*` 컴포넌트(옛 둘러보기 면의 "최근 공개된 문서"와 같은 것)를
           재사용한다(신규 시각 언어를 만들지 않는다 — 아래 CSS 도 그 사본). -#}
       <div id="fnd-results" class="fnd-results">
         {%- if static_docs %}
@@ -182,21 +174,11 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    balance 가 아니라 pretty: balance 는 두 줄 길이를 맞추려고 한 줄로 들어갈 문장도 굳이
    쪼갠다. */
 .page-head p{max-width:none;text-wrap:pretty}
-/* 검색 리드 한 줄 — 세그 아래·툴바 위. */
-.fnd-lead{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 20px;max-width:760px;word-break:keep-all}
-/* [실사관 진입점 2026-08-31] 상단 안내 스트립 — archive.html/brief.html 의 .arc-lib*
-   규칙과 같은 결(soft 배경+테두리+라운드, 머리글/설명/링크 3분할)을 옮겨오되 이 스트립엔
-   목록(.arc-lib-l)이 없어 클래스는 새로 둔다(fnd-insp-cta) — grm.css 는 무접촉. */
-.fnd-insp-cta{margin:0 0 22px;padding:13px 18px 12px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
-.fnd-insp-cta-h{display:flex;align-items:center;gap:8px 13px;flex-wrap:wrap}
-.fnd-insp-cta-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}
-.fnd-insp-cta-k .ti{font-size:15px;color:var(--coral-2)}
-.fnd-insp-cta-sum{flex:1;min-width:0;font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
-.fnd-insp-cta-go{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
-.fnd-insp-cta-go:hover{text-decoration:underline}
-.fnd-insp-cta-go .ti{font-size:14px;transition:transform .16s var(--ease)}
-.fnd-insp-cta-go:hover .ti{transform:translateX(3px)}
-@media (max-width:640px){ .fnd-insp-cta{padding:12px 14px 11px} .fnd-insp-cta-sum{flex-basis:100%} }
+/* [탭 3묶음] 건수 한 줄·내 범위의 최근 공개 */
+.fnd-total{font-size:12.5px;color:var(--muted);margin:-6px 2px 18px}
+.fnd-mine{margin:0 0 26px}
+.fnd-mine-h{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0;font-weight:600}
+.fnd-mine-p{font-size:13.5px;line-height:1.7;color:var(--muted);margin:6px 0 10px}
 /* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
 .fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
 /* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */

@@ -1,49 +1,93 @@
-{#- [지적사항 존 면 전환 2026-08-27 · 2026-11-10 1안] 검색 · 둘러보기 · 트렌드 · 실사 결과 ·
-    FDA 지적 조항 · 지적 사례 · 실사관.
+{#- [지적사항 탭 3묶음 2026-11-11 · 대표 승인] 위 줄 = 묶음 3개(찾기·경향·점검), 아래 줄 = 지금 묶음의 화면.
 
-    ★왜 갈랐나(사용자 피드백): 발견 허브(#811)가 목적 카드·최근 문서·축 탐색·상세 검색을
-    한 페이지에 쌓아 "너무 많은 정보가 한 페이지에 담겨 잘 못 쓰겠다"는 피드백을 받았다.
-    허브의 발견성 가치는 유지하되(둘러보기 면), 검색이라는 핵심 도구는 첫 화면에서 바로
-    쓸 수 있어야 한다(검색 면 기본). 트렌드 존의 세그먼트(#810 trends_seg)와 같은 패턴 —
-    실제 <a> 라 JS 없이도 오갈 수 있고, 크롤러가 두 면을 발견하는 경로이기도 하다.
+    ★왜: 대표 지적 "탭이 너무 많아. 뭐가 무슨 기능인지 알기도 어렵다" + "사용량순 나열이 아니라
+    그룹핑·순서·통일감". 컨셉 문장의 동사(원문을 찾아보고 → 우리 회사에 대어 본다)를 그대로
+    따른다 — 찾기(원문 기록) → 경향(숫자로 본 흐름) → 점검(우리 현장에 옮겨 쓰기).
+    메뉴는 2단까지만. 더 잘게 나누는 건 각 화면 안의 보기 전환이 맡는다(업체/수입경보 목록 등).
+    시안·근거: 워크스페이스 루트 GRM_지적사항탭_구조안·보완안_2026-11-11.md.
 
-    ★[진입점 3종 2026-08-31] 실사관 프로파일(findings/inspector/index.html)은 이미
-    라이브였지만(#862) 닿는 길이 사실상 없었다 — 실측: 상단 nav 없음, 이 존 본문에도
-    없음, footer 도구 열 링크 1개가 스크롤 17,120px 지점. 이 세그먼트에 세 번째 탭을
-    더해 검색·둘러보기와 같은 자리에서 오갈 수 있게 한다. inspector.html 은 findings/
-    browse 와 같은 깊이(rel_root="../../")라 이 파셜을 그대로 include 할 수 있다.
+    ★이름·순서의 단일 원천: 이 파셜과 base.html 바닥글 '지적사항' 열이 같은 이름·같은 순서를
+    쓴다(test_nav_cleanup 이 지킨다). 화면 제목(h1)도 탭 이름과 같다.
 
-    스타일은 이 파셜이 자체 보유(.fnd-seg — grm.css 불가침, tr-seg 는 trends_style 스코프라
-    재사용 불가). 페이지당 1회 include 라 <style> 중복 없음. -#}
+    seg_active → 묶음: search·docs·facets·firm·inspector = 찾기 / trends·citations·inspections·coverage
+    = 경향 / examples·checklist = 점검. 수입경보 목록은 '업체' 탭 안의 보기라 seg_active="firm".
+    데이터 현황(coverage)은 탭이 아니라 경향 줄 끝의 작은 링크다.
+
+    면이 없는 빌드에서는 그 탭을 그리지 않는다 — 분류는 `fnd_facets_root`(트리별 env 전역),
+    나머지는 면 집합(en_paths). 실제 <a> 라 JS 없이도 오가고, 크롤러의 진입 경로이기도 하다.
+    스타일은 이 파셜이 자체 보유(grm.css 불가침). 페이지당 1회 include. -#}
+{%- set _sa = seg_active | default('') -%}
+{%- set _grp = 'find' if _sa in ('search', 'docs', 'facets', 'firm', 'inspector') else ('trend' if _sa in ('trends', 'citations', 'inspections', 'coverage') else ('check' if _sa in ('examples', 'checklist') else '')) -%}
+{%- set _has_docs = lang == 'ko' or 'findings/docs/' in en_paths -%}
+{%- set _has_cit = 'findings/citations/' in en_paths -%}
+{%- set _has_ex = 'findings/examples/' in en_paths -%}
 <nav class="fnd-seg" aria-label="{{ _('지적사항 면 전환') }}">
-  <a href="{{ rel_root }}findings/index.html"{% if seg_active == 'search' %} class="on" aria-current="page"{% endif %}>{{ _("검색") }}</a>
-{# [다국어 3단계] 둘러보기 면은 커밋 스냅샷의 국문 지적 발췌로 채워져 영어판에 없다
-   (설계 문서 §7 4단계 데이터가 선행). 없는 페이지로 보내는 링크는 만들지 않는다.
-   들여쓰기는 조건 안에 둔다(참일 때 원래 바이트 보존 · 거짓일 때 빈 줄 0). #}
-{% if lang == 'ko' or 'findings/browse/' in en_paths %}  <a href="{{ rel_root }}findings/browse/index.html"{% if seg_active == 'browse' %} class="on" aria-current="page"{% endif %}>{{ _("둘러보기") }}</a>
-{% endif %}
-{# [1안 메뉴 정리 2026-11-10] 트렌드 존(지적 경향·실사 결과)을 이 세그로 합쳤다 — 상단 nav 의
-   '트렌드' 탭과 존 전용 세그(trends_seg)는 없앴다. 지적사항 안 어느 화면에서든 같은 탭 한 줄. #}
-  <a href="{{ rel_root }}findings/trends/index.html"{% if seg_active == 'trends' %} class="on" aria-current="page"{% endif %}>{{ _("트렌드") }}</a>
-  <a href="{{ rel_root }}findings/inspections/index.html"{% if seg_active == 'inspections' %} class="on" aria-current="page"{% endif %}>{{ _("실사 결과") }}</a>
-{# [진입점 2026-11-09] 지적 조항·지적 사례 화면은 둘러보기 카드 안 링크 하나뿐이라 대표가
-   메뉴에서 못 찾았다 — 지적사항 존의 하위 진입(이 세그)에 같은 줄로 둔다. 면 집합(en_paths)
-   에 있을 때만 — 정본이 없는 빌드에서 없는 페이지로 보내지 않는다(ko·en 공통 선언). #}
-{% if 'findings/citations/' in en_paths %}  <a href="{{ rel_root }}findings/citations/index.html"{% if seg_active == 'citations' %} class="on" aria-current="page"{% endif %}>{{ _("FDA 지적 조항") }}</a>
-{% endif %}
-{# [진입점 2026-11-10] 수입경보 전체 목록(#1436)도 같은 줄에. 사례 전체(PMDA·MHRA)는 '지적 사례' 탭이
-   켜진 채로 이 줄을 단다(사례 화면 안 dc-tabs 가 기관을 가른다). #}
-{% if 'findings/import-alerts/' in en_paths %}  <a href="{{ rel_root }}findings/import-alerts/index.html"{% if seg_active == 'import-alerts' %} class="on" aria-current="page"{% endif %}>{{ _("FDA 수입경보") }}</a>
-{% endif %}
-{% if 'findings/examples/' in en_paths %}  <a href="{{ rel_root }}findings/examples/index.html"{% if seg_active == 'examples' %} class="on" aria-current="page"{% endif %}>{{ _("지적 사례") }}</a>
-{% endif %}
-  <a href="{{ rel_root }}findings/inspector/index.html"{% if seg_active == 'inspector' %} class="on" aria-current="page"{% endif %}>{{ _("실사관") }}</a>
+  <div class="fnd-seg-g">
+    <a href="{{ rel_root }}findings/index.html"{% if _grp == 'find' %} class="on" aria-current="true"{% endif %}>{{ _("찾기") }}</a>
+    <a href="{{ rel_root }}findings/trends/index.html"{% if _grp == 'trend' %} class="on" aria-current="true"{% endif %}>{{ _("경향") }}</a>
+    <a href="{{ rel_root }}findings/{{ 'examples' if _has_ex else 'checklist' }}/index.html"{% if _grp == 'check' %} class="on" aria-current="true"{% endif %}>{{ _("점검") }}</a>
+  </div>
+  {%- if _grp == 'find' %}
+  <div class="fnd-seg-s">
+    <a href="{{ rel_root }}findings/index.html"{% if _sa == 'search' %} class="on" aria-current="page"{% endif %}>{{ _("검색") }}</a>
+    {%- if _has_docs %}
+    <a href="{{ rel_root }}findings/docs/index.html"{% if _sa == 'docs' %} class="on" aria-current="page"{% endif %}>{{ _("문서") }}</a>
+    {%- endif %}
+    {%- if fnd_facets_root %}
+    <a href="{{ rel_root }}{{ fnd_facets_root }}index.html"{% if _sa == 'facets' %} class="on" aria-current="page"{% endif %}>{{ _("분류") }}</a>
+    {%- endif %}
+    <span class="fnd-seg-div" aria-hidden="true"></span>
+    <a href="{{ rel_root }}findings/firm/index.html"{% if _sa == 'firm' %} class="on" aria-current="page"{% endif %}>{{ _("업체") }}</a>
+    <a href="{{ rel_root }}findings/inspector/index.html"{% if _sa == 'inspector' %} class="on" aria-current="page"{% endif %}>{{ _("실사관") }}</a>
+  </div>
+  {%- elif _grp == 'trend' %}
+  <div class="fnd-seg-s">
+    <a href="{{ rel_root }}findings/trends/index.html"{% if _sa == 'trends' %} class="on" aria-current="page"{% endif %}>{{ _("지적 영역") }}</a>
+    {%- if _has_cit %}
+    <a href="{{ rel_root }}findings/citations/index.html"{% if _sa == 'citations' %} class="on" aria-current="page"{% endif %}>{{ _("지적 조항") }}</a>
+    {%- endif %}
+    <a href="{{ rel_root }}findings/inspections/index.html"{% if _sa == 'inspections' %} class="on" aria-current="page"{% endif %}>{{ _("실사 결과") }}</a>
+    <a class="fnd-seg-side{% if _sa == 'coverage' %} on{% endif %}" href="{{ rel_root }}findings/coverage/index.html"{% if _sa == 'coverage' %} aria-current="page"{% endif %}>{{ _("데이터 현황") }}</a>
+  </div>
+  {%- elif _grp == 'check' %}
+  <div class="fnd-seg-s">
+    {%- if _has_ex %}
+    <a href="{{ rel_root }}findings/examples/index.html"{% if _sa == 'examples' %} class="on" aria-current="page"{% endif %}>{{ _("지적 사례") }}</a>
+    {%- endif %}
+    <a href="{{ rel_root }}findings/checklist/index.html"{% if _sa == 'checklist' %} class="on" aria-current="page"{% endif %}>{{ _("체크리스트") }}</a>
+  </div>
+  {%- endif %}
 </nav>
+{#- 분류 화면 안 보기 전환(분류 · 기관 · 국가) — 세 축 색인을 모두 잇는 유일한 곳(옛 둘러보기 면의 역할). `axis` 는 모음 템플릿 문맥 값. #}
+{%- if _sa == 'facets' and fnd_facet_axes and fnd_facet_axes | length > 1 %}
+<nav class="fnd-views" aria-label="{{ _('분류 보기 전환') }}">
+  {%- for a in fnd_facet_axes %}<a href="{{ rel_root }}findings/{{ a.path }}/index.html"{% if axis and axis.path == a.path %} class="on" aria-current="page"{% endif %}>{{ _(a.label) }}</a>{% endfor -%}
+</nav>
+{%- endif %}
 <style>
-.fnd-seg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 34px;padding-bottom:0;border-bottom:1px solid var(--line)}
-.fnd-seg a{display:inline-block;padding:9px 16px 11px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
-.fnd-seg a:hover{color:var(--ink)}
-.fnd-seg a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--coral)}
-.fnd-seg a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
-@media(max-width:520px){.fnd-seg a{padding:9px 11px 11px;font-size:13.5px}}
+.fnd-seg{margin:0 0 30px}
+.fnd-seg-g{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.fnd-seg-g a{display:inline-block;padding:9px 18px 11px;font-size:15px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
+.fnd-seg-g a:hover{color:var(--ink)}
+.fnd-seg-g a.on{color:var(--ink);font-weight:700;border-bottom-color:var(--coral)}
+.fnd-seg-s{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:12px}
+.fnd-seg-s a{flex:none;font-size:14px;padding:5px 14px;border-radius:999px;color:var(--muted);border:1px solid var(--line);transition:color var(--tr),border-color var(--tr)}
+.fnd-seg-s a:hover{color:var(--ink);border-color:var(--line-2)}
+.fnd-seg-s a.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.fnd-seg-s .fnd-seg-side{margin-left:auto;border:0;padding:5px 0;font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
+.fnd-seg-s .fnd-seg-side.on{background:none;color:var(--ink)}
+.fnd-seg-div{flex:none;width:1px;height:18px;background:var(--line-2);margin:0 4px}
+.fnd-seg a:focus-visible,.fnd-views a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
+{#- 화면 안 보기 전환(업체 찾기 / 수입경보 목록 등) — 메뉴는 2단까지, 3단째는 화면 안에서. 영어 화면에도 그대로 나가므로 CSS 주석에 한글을 두지 않는다. #}
+.fnd-views{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--rad-s);overflow:hidden;margin:-12px 0 24px;font-size:13.5px}
+.fnd-views a{padding:6px 14px;color:var(--muted);border-right:1px solid var(--line-2)}
+.fnd-views a:last-child{border-right:0}
+.fnd-views a:hover{color:var(--ink)}
+.fnd-views a.on{background:var(--soft);color:var(--ink);font-weight:600}
+@media(max-width:520px){
+  .fnd-seg-g a{flex:1;text-align:center;padding:9px 4px 11px}
+  .fnd-seg-s{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-22px;padding-right:22px}
+  .fnd-seg-s::-webkit-scrollbar{display:none}
+  .fnd-seg-s .fnd-seg-side{margin-left:6px}
+}
 </style>

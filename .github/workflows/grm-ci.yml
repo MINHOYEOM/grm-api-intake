@@ -61,7 +61,7 @@ jobs:
   unittest:
     name: unittest (shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45  # 11-12: GitHub 실행기 장애로 샤드가 24~25분(평소 8~10분) 걸려 25분 제한에 반복 취소됐다
     strategy:
       fail-fast: false
       matrix:

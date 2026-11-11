@@ -10,8 +10,9 @@
   없던 행이라 문제가 없었다). 여기서는 **detail 칸 외에는 아무것도 바꾸지 않는다.**
 ★번호·관찰 수는 바꾸지 않는다. 다시 읽은 관찰을 (번호, 표제)가 같은 기존 관찰에 대응시킨다. 옛 저장 상한에
   잘린 관찰(표제 280자+"..."·상세 1,200자)은 번호가 같고 새 판이 옛 앞부분으로 시작할 때만 대응시켜 표제·상세를
-  잘리지 않은 판으로 바꾼다(`--truncated-only` 는 그런 문서만 고른다). 짝이 없는 관찰은 기존 상세를 그대로 두되
-  서명란 이름·가림 표시만 정리한다.
+  잘리지 않은 판으로 바꾼다(`--truncated-only` 는 그런 문서만 고른다). 그래도 짝이 없는 1,200자 절단 조각은
+  끝 80자가 다시 읽은 원문 한 곳에만 있을 때 **끊긴 문장 하나만** 마저 잇는다(`completed_sentence`).
+  짝이 없는 관찰은 기존 상세를 그대로 두되 서명란 이름·가림 표시만 정리한다.
 ★표제가 바뀐 관찰의 findings 행(finding_text = 표제)은 여기서 바꾸지 않는다 — finding_id 가 본문 해시라
   `backfill_wl_truncation_restore.py --source fda483` 계획 → 번역 outbox restore 경로로 영문·국문을 함께 바꾼다.
 ★원문: 저장된 `fda483_body_full` 이 있으면 그것을 쓴다(PDF 요청·OCR 없음). 없으면 PDF 를 다시 받는다.
@@ -161,6 +162,45 @@ def _extends_detail(old_detail: str, new_detail: str) -> bool:
     return len(mid) >= 200 and mid in nd and tail in nd
 
 
+_TAIL_PROBE = 80
+_SENTENCE_TAIL_MAX = 600
+_SENTENCE_END_RE = re.compile(r"[.!?][)\"'”’]?(?=\s|$)")
+# 공백을 지운 조각에서 찾는다(`s ee r e vers e o f th is page` 같은 벌어진 판독, 실측 107200).
+_FORM_TRACE_RE = re.compile(r"(?i)seereverse|ofthispage|employee|signature|formfda|investigator|dateissued")
+
+
+def completed_sentence(old_detail: str, new: list[dict[str, Any]]) -> str | None:
+    """[11-11] 옛 1,200자 절단 상세의 **끊긴 문장만** 원문으로 마저 잇는다(순수 함수). 못 하면 None.
+
+    다시 읽은 관찰과 번호·표제가 어긋나 짝 ①~③ 이 모두 실패한 조각(옛 수집기가 하위 항목 `B.`·`G.` 를
+    따로 떼어 저장한 행 — 실측 175708·173408·80115·158445)도, 그 끝 80자는 다시 읽은 원문 어딘가에
+    그대로 있다. 그 자리가 **다시 읽은 관찰 전체에서 딱 한 곳**일 때만, 바로 뒤를 첫 문장 끝(`.`·`!`·`?`)
+    까지 붙인다. 조각이 원래 어디서 끝났는지는 알 수 없으므로 문장 하나보다 더 붙이지 않는다(경계 불확실
+    → 덜 붙인다). 문장 끝이 600자 안에 없으면 None(종전대로 둔다)."""
+    od = _norm(old_detail)
+    if not is_truncated_detail(old_detail) or _COMPLETE_END_RE.search(od) or len(od) < _TAIL_PROBE:
+        return None
+    probe = od[-_TAIL_PROBE:]
+    hits: list[tuple[str, int]] = []
+    for n in new:
+        nd = _norm(str(n.get("detail") or ""))
+        start = nd.find(probe)
+        while start != -1:
+            hits.append((nd, start))
+            start = nd.find(probe, start + 1)
+    if len(hits) != 1:
+        return None
+    nd, at = hits[0]
+    rest = nd[at + len(probe): at + len(probe) + _SENTENCE_TAIL_MAX]
+    m = _SENTENCE_END_RE.search(rest)
+    if not rest or not m:
+        return None
+    added = rest[:m.end()]
+    if _FORM_TRACE_RE.search(re.sub(r"\s+", "", added)):
+        return None                       # 붙일 조각에 서명란·양식 낱말 — 원문 경계가 아니라 쪽 블록이다
+    return od + added
+
+
 def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]
                            ) -> tuple[list[dict[str, Any]], int, int]:
     """기존 관찰 목록의 detail(과 잘린 표제)을 바꾼 새 목록 + (짝 맞은 수, 짝 없는 수). 순수 함수.
@@ -169,6 +209,7 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]
        ② 번호가 같고 옛 표제가 280자+"..." 절단, 새 표제가 그 앞부분으로 시작 → 표제도 새 것으로.
           (그때 옛 상세가 표제 문장의 나머지였다면 새 상세가 빈 값일 수 있다 — 새 것을 그대로 쓴다.)
        ③ 번호가 같고 새 상세가 옛 상세의 앞부분으로 시작하며 더 김(옛 1,200자 절단) → 상세만.
+       ④ 옛 상세가 1,200자 절단 조각이고 그 끝이 다시 읽은 관찰 한 곳에만 있음 → 끊긴 문장만 잇는다.
     다시 읽은 상세가 비면(①·③) 기존 상세(정리본)를 둔다."""
     by_key = {(str(o.get("number")), str(o.get("deficiency") or "")): o for o in new}
     by_num: dict[str, list[dict[str, Any]]] = {}
@@ -196,6 +237,11 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]
         if len(extended) == 1:
             matched += 1
             out.append({**o, "detail": str(extended[0]["detail"])})
+            continue
+        completed = completed_sentence(old_detail, new)
+        if completed is not None:
+            matched += 1
+            out.append({**o, "detail": completed})
             continue
         unmatched += 1
         out.append({**o, "detail": tidy_old_detail(old_detail)})

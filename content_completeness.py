@@ -25,6 +25,7 @@
 
 의도된 것은 경보하지 않는다 — `INTENTIONAL_CAPS`(설계상 발췌)·`INTENTIONAL_UNSHOWN`(추출 원료·정형 문구)에
   이유와 함께 적는다. 표에 없는 새 칸은 기본이 경보다(사람이 판단해 표에 올리거나 고친다).
+  원문 자체가 상한 언저리에서 끝나는 개별 값은 `INTENTIONAL_SOURCE_ENDS`(문서·관찰 번호)로 잘림 집계에서만 뺀다.
 
 읽기 전용: Supabase REST GET 만 한다. 데이터는 고치지 않는다(찾은 것은 목록·이슈로 알린다).
 비차단: 이상이 있어도 exit 0. 이슈 계획은 source_reconcile 와 같은 모양(`issues`)으로 JSON 에 싣는다.
@@ -115,6 +116,34 @@ INTENTIONAL_UNSHOWN: dict[tuple[str, str], str] = {
     ("Federal Register", "excerpts"): "FR 검색 발췌 — 같은 내용을 abstract 로 쓴다",
 }
 
+# 문서 단위 예외 — 값이 상한 언저리 길이에서 문장 중간에 끝나지만 **원문 자체가 거기서 끝나는** 관찰.
+# 2026-11-11 진단(483 상세 다시 읽기 뒤 잘림 띠 잔존 63건을 원문과 대조): 아래 19건은 상세 끝 바로 뒤가
+# 다음 관찰·양식 서명란·문서 끝이었다(표가 가림 처리로 빠진 자리·스캔 판독이 끊긴 자리 포함). 수집기 결함이
+# 아니므로 잘림 몰림 집계에서만 뺀다(값은 그대로 두고, 미사용 검사에는 그대로 센다).
+# 키: 소스 → {document_id: (관찰 번호, …)}. 다시 수집해 상세가 바뀌면 값 비교가 아니라 번호로 빠지므로,
+# 원문을 다시 대조해 더는 해당 없으면 여기서 지운다.
+INTENTIONAL_SOURCE_ENDS: dict[str, dict[str, tuple[str, ...]]] = {
+    "FDA 483": {
+        "fda483-85828": ("9",), "fda483-101055": ("10",), "fda483-95350": ("1",), "fda483-89608": ("7",),
+        "fda483-80191": ("6",), "fda483-82026": ("4",), "fda483-163365": ("3",), "fda483-130374": ("1",),
+        "fda483-93327": ("7",), "fda483-88289": ("7",), "fda483-110129": ("7",), "fda483-77353": ("17",),
+        "fda483-158445": ("9",), "fda483-159977": ("6",), "fda483-89973": ("3",), "fda483-135881": ("4",),
+        "fda483-195522": ("2",), "fda483-135874": ("15",), "fda483-82813": ("1",),
+    },
+}
+_SOURCE_ENDS_LIST_KEY = {"FDA 483": "fda_483_observations"}
+
+
+def source_end_values(source: str, document_id: str, raw: Any) -> set[str]:
+    """INTENTIONAL_SOURCE_ENDS 에 오른 관찰의 상세 값(앞뒤 공백 제거). 순수 함수."""
+    numbers = INTENTIONAL_SOURCE_ENDS.get(source, {}).get(document_id)
+    list_key = _SOURCE_ENDS_LIST_KEY.get(source)
+    if not numbers or not list_key or not isinstance(raw, dict):
+        return set()
+    return {str(o.get("detail") or "").strip() for o in raw.get(list_key) or []
+            if isinstance(o, dict) and str(o.get("number")) in numbers and str(o.get("detail") or "").strip()}
+
+
 # 사이트 계층으로 보는 파일(지적사항·업체·그래프 화면을 만드는 쪽)
 SITE_DIRS = ("web", "supabase")
 SITE_PREFIXES = ("findings_", "kg_")
@@ -164,13 +193,14 @@ class FieldStats:
     url_like: int = 0
     reach_pairs: list[tuple[str, str]] = field(default_factory=list)   # (raw_signal_id, 조각)
 
-    def add(self, value: str, *, ref: str, collected: str, raw_signal_id: str = "") -> None:
+    def add(self, value: str, *, ref: str, collected: str, raw_signal_id: str = "",
+            source_ends: bool = False) -> None:
         v = value.strip()
         if not v:
             return
         self.total += 1
         n = len(v)
-        if n >= MIN_LEN and is_cut(v):
+        if n >= MIN_LEN and is_cut(v) and not source_ends:
             tail = v[-TAIL_LEN:]
             self.long_cut[n][hashlib.md5(v.encode("utf-8")).hexdigest()] = tail
             self.long_rows[n].append((ref, collected, tail))
@@ -417,8 +447,10 @@ def collect_stats(raw_rows: Iterable[dict[str, Any]], finding_rows: Iterable[dic
                 raw = None
         if raw is None:
             continue
+        ends = source_end_values(src, str(r.get("document_id") or ""), raw)
         for path, val in iter_leaves(raw):
-            fs(src, path).add(val, ref=rid, collected=coll, raw_signal_id=rid)
+            fs(src, path).add(val, ref=rid, collected=coll, raw_signal_id=rid,
+                              source_ends=bool(ends) and val.strip() in ends)
 
     findings_text: dict[str, list[str]] = defaultdict(list)
     for f in finding_rows:
@@ -555,7 +587,7 @@ def run(env: dict[str, str], *, today: date, run_url: str = "", session: Any = N
     key = str(env.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
     if not base.startswith("https://") or not key:
         raise StoreReadError("SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정")
-    raw = list(fetch_table(base, key, "raw_signals", "raw_signal_id,source,collected_at,raw_json",
+    raw = list(fetch_table(base, key, "raw_signals", "raw_signal_id,document_id,source,collected_at,raw_json",
                            "raw_signal_id.asc", session))
     finds = list(fetch_table(base, key, "findings", "finding_id,raw_signal_id,source,finding_text,finding_text_ko",
                              "finding_id.asc", session))

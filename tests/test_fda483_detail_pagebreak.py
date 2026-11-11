@@ -125,6 +125,117 @@ class PageJoinTest(unittest.TestCase):
         self.assertEqual(t(mid), mid)
 
 
+def _joined(seg: str, est: str = "") -> str:
+    return c._clean_observation_chunk(c._join_footer_pages(c._join_483_pages(seg, est), est))
+
+
+class FooterBlockJoinTest(unittest.TestCase):
+    """[11-11] 다시 읽기 뒤 잘림 띠 잔존 63건 진단 — 쪽 블록 순서가 '서명란 → 머리말 → 본문' 이 아닌 꼴.
+    고정 자료는 실제 문서의 쪽 경계 원문을 줄인 것이다(서명자·수신인 이름은 가상 이름으로 바꿨다)."""
+
+    def test_header_then_footer_then_body(self):
+        # fda483-104451 obs2: 머리말 → 서명란 → 다음 쪽 본문(`e)no environmental…`).
+        seg = ("d)cleaning procedures for the sterile compounding room include dry sweeping the floor which may\n"
+               "cause an increase in airborne particulates immediately preceding production operations.\n"
+               "DEPARTMENT OF HEALTH AND HUMAN SERVICES\nFOOD AND DRUG ADMINISTRATION\n"
+               "DISTRICT ADDRESS AND PHONE NUMBER\nUS Customhouse Rm900 2nd & Chestnut St\nPhiladelphia, PA 19106\n"
+               "CITY. STATE. ZIP CODE. COUNTRY\nPittsburgh, PA 15213- 3337\nTYPE ESTABLISHMENT INSPECTED\n"
+               "Pro duc er of Sterile Drug Pro duc ts\nSEE REVERSE\nOF THIS PAGE\nEMPLOYEE(S) SIGNATURE\n"
+               "Jane Q Doe, Investigato r\n(CTNH)\nl/l7/l0l7\nJohn R Roe, I n vestigato r\nX Jahn R Rae\n"
+               "OATE lSSUEO\n2/17/2017\nFORM FDA 483 (09108)\nPREVIOUS EDmON OBSOlEJE\nINSPECTIONAL OBSERVATIONS\n"
+               "PAGE 3 OF 5PAGES\n"
+               "e)no environmental monitoring is performed during production in <Redacted B4> glovebox isolator or in the steri\n"
+               "le Compounding Room.\n")
+        out = _joined(seg, "Producer of Sterile Drug Products")
+        self.assertTrue(out.startswith("d)cleaning procedures"), out)
+        self.assertTrue(out.endswith("glovebox isolator or in the steri le Compounding Room."), out)
+        for junk in ("Doe", "Roe", "Customhouse", "Pittsburgh", "SEE REVERSE", "PAGE 3"):
+            self.assertNotIn(junk, out)
+
+    def test_footer_then_unlabeled_header_values_then_body(self):
+        # fda483-96388 obs2: 서명란 → 라벨 없는 머리말 값(FEI·주소·시설 유형) → 끊긴 문장의 나머지.
+        seg = ("Specifically, there is no documentation of the actual pressure differential measurement during "
+               "operations. The documentation of the <Redacted B4> check of the\n"
+               "EMPLOYEE(&) SIGNATLJRE\nDATE ISSUED\n;\nJane Q. Doe, CSO fYl~-&~1\\1., ~\nSEE REVERSE\n"
+               "John P. Roe, CSO ,f~f.~ . t ,~\n03/02/2016\nOF THIS PAGE\nI\nFORM TDA 483 (09/08)\n"
+               "PIISVIOUS EDmON OBSOLI!'Il!\nINSPECT~ON.~\nL OBSERVATIONS\nPAGE20P8PAGBS\n- 03/02/2016\n"
+               "3012038236\nDr i ve\nSte 203\nAustin, TX\n78745-525 5\nProducer of Sterile\nProducts\n"
+               "pressure differential only documents \"pass\" or \"fail\" for the reading.\n")
+        out = _joined(seg, "Producer of Sterile Drug Products")
+        self.assertTrue(out.endswith('check of the pressure differential only documents "pass" or "fail" '
+                                     'for the reading.'), out)
+        for junk in ("Doe", "Roe", "Austin", "3012038236", "OBSERVATIONS"):
+            self.assertNotIn(junk, out)
+
+    def test_header_values_then_footer_then_list_item(self):
+        # fda483-82819 obs2: 라벨 없는 머리말 값 → 서명란(`SEE REVERSE`·`OF THIS PAGe`) → 다음 하위 항목 `c)`.
+        seg = ("b) Case ID# C200911161408olm, an adverse reaction was reported on 11/14/09. The final quality "
+               "review did not occur until 01/05/10 (approximately 6 weeks later).\n\n"
+               "2010*\n3002345935\nRed Cross, The\nBlvd\nAZ\nB57l0-1404\nDonor Center\n"
+               "SEE REVERSE\nJane L. Doe, Investigator\nOF THIS PAGe\n"
+               "c) Case ID# C2009122912550r, an adverse reaction was reported involving LOC less than 1 minute.\n")
+        out = _joined(seg, "Donor Center")
+        self.assertTrue(out.endswith("c) Case ID# C2009122912550r, an adverse reaction was reported involving "
+                                     "LOC less than 1 minute."), out)
+        self.assertNotIn("Doe", out)
+        self.assertNotIn("SEE REVERSE", out)
+
+    def test_garbled_header_anchor_words(self):
+        # fda483-162642 obs4: 머리말 낱말이 `ADMINlSTRATION`·`ESTABUSHMEITT` 로 깨졌고, 시설 유형 값이
+        # 힌트(`Producer of Sterile and Non Sterile Drug Products`)와 표기만 다르다.
+        seg = ("The light panel is located above the bench top where production of sterile injectable drug "
+               "product is occurring. For example:\n"
+               "EMPLOYEE(S) NAME AND TITLE (Print or Ty~)\nDATE ISSUED\nSEE REVERSE\nJane N. Doe, Investigator\n"
+               "03/14/2022\nOF THIS PAGE\nFORM FDA 483 (09/08)\nPREVIOUS EDmON 08$01.lrrE\n"
+               "INSPECTION AL OBSERVATlONS\nPAGE 6 OF 16PAGES\n\nDEPARTMENT OF IIEALTH AND HUMAN SERVICES\n"
+               "FOOD AND DRUG ADMINlSTRATION\nDISTRICT AOORESS AND PHONE NUMBER\n550 Main Street\n"
+               "Cincinnati, OH 45202\nNAME ANO TITLE OF INOIVIOUAL TO WHOM REPORT ISSUED\n"
+               "John E. Roe, Pharmacist-in-Charge\nFIRMNANE\nSTREET ADORESS\nTYPE ESTABUSHMEITT INSPECTED\n"
+               "Nicholasville, KY 40356-8512\nProducer of Sterile and Non-Sterile Drugs\nFor example:\n•\n"
+               "On 02/14/2022 your technician placed an opened bag of stoppers on the bench top under the light panel.\n")
+        out = _joined(seg, "Producer of Sterile and Non Sterile Drug Products")
+        self.assertTrue(out.endswith("placed an opened bag of stoppers on the bench top under the light panel."), out)
+        for junk in ("Doe", "Roe", "Cincinnati", "Producer of", "Nicholasville"):
+            self.assertNotIn(junk, out)
+
+    def test_form_notice_after_footer_is_not_joined(self):
+        # fda483-195550 obs5: 마지막 쪽 서명란 뒤는 양식 뒷면 고지 — 관찰은 거기서 끝났다.
+        seg = ("did not include an effectiveness check for evaluation of this change.\n"
+               "EMPLOYEE(S) SIGNATURE\nSEE REVERSE Jane T Doe, Investigator\nOF THIS PAGE\n"
+               "FORM FDA 483 (09/08) PREVIOUS EDITION OBSOLETE\nINSPECTIONAL OBSERVATIONS\nPAGE 4 of 4 PAGES\n"
+               "The observations of objectionable conditions and practices listed on the front of this form\n"
+               "are reported:\n")
+        self.assertEqual(c._join_footer_pages(seg), seg)
+        self.assertEqual(_joined(seg), "did not include an effectiveness check for evaluation of this change.")
+
+    def test_capitalized_sentence_after_footer_is_not_joined(self):
+        # fda483-90268: 서명란 뒤 대문자 새 문장은 앵커를 잃은 다음 관찰 표제일 수 있다 — 붙이지 않는다.
+        seg = ("Specifically, the complaint was not investigated\n"
+               "EMPLOYEE(S) SIGNATURE\nSEE REVERSE\nJane S Doe, Investigator\nOF THIS PAGE\nDATE ISSUED\n"
+               "Compliant records are deficient in that they do not include the findings of the investigation.\n")
+        self.assertEqual(c._join_footer_pages(seg), seg)
+
+    def test_single_marker_in_prose_is_not_a_page_block(self):
+        seg = ("Specifically, the sample was reviewed by Jane Doe, Investigator\n"
+               "and the results were not documented in the laboratory notebook as required.\n")
+        self.assertEqual(c._join_footer_pages(seg), seg)
+
+    def test_full_extraction_extends_only_the_detail(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM I OBSERVED:\nOBSERVATION 1\n"
+                "Procedures designed to prevent microbiological contamination are not established.\n"
+                "Specifically, the documentation of the <Redacted B4> check of the\n"
+                "EMPLOYEE(S) SIGNATURE\nDATE ISSUED\nJane Q. Doe, CSO\nSEE REVERSE\n03/02/2016\nOF THIS PAGE\n"
+                "FORM FDA 483 (09/08)\nINSPECTIONAL OBSERVATIONS\nPAGE 2 OF 8 PAGES\n3012038236\nAustin, TX\n"
+                "pressure differential only documents \"pass\" or \"fail\" for the reading.\n"
+                "OBSERVATION 2\nClothing of personnel is not appropriate for the duties they perform.\n"
+                "Specifically, the gowns worn in the ISO 7 cleanroom were not sterile.\n")
+        obs = c._extract_483_observations_from_text(text, {"establishment_type": "Producer of Sterile Drug Products"})
+        self.assertEqual([o["number"] for o in obs], ["1", "2"])
+        self.assertTrue(obs[0]["detail"].endswith('check of the pressure differential only documents "pass" or '
+                                                  '"fail" for the reading.'), obs[0]["detail"])
+        self.assertEqual(obs[1]["detail"], "Specifically, the gowns worn in the ISO 7 cleanroom were not sterile.")
+
+
 class RedactionTest(unittest.TestCase):
     def test_garbled_and_canonical_marks_become_one_token(self):
         n = c.normalize_483_redactions

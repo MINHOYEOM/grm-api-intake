@@ -1,18 +1,18 @@
 {
   "mode": "stale",
   "stats": {
-    "findings": 10902,
-    "queued": 4,
+    "findings": 10934,
+    "queued": 0,
     "no_detail": 6,
     "ambiguous": 0,
-    "unchanged": 10892,
-    "chars": 15636
+    "unchanged": 10928,
+    "chars": 0
   },
   "shards": {
     "S": {
-      "files": 1,
-      "items": 4,
-      "chars": 15636
+      "files": 0,
+      "items": 0,
+      "chars": 0
     }
   }
 }

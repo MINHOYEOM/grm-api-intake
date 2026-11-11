@@ -120,6 +120,22 @@ def count_obs_headers(text: str) -> "int | None":
     return len(nums) or None
 
 
+def obs_header_context(text: str, width: int = 70) -> "list[str]":
+    """진단용: count_obs_headers 가 센 번호 머리마다 앞뒤 문맥(오인 여부를 사람이 판정)."""
+    if not text:
+        return []
+    import collect_fda_483 as f
+    body = f._scope_to_observation_list(f.normalize_pdf_ligatures(text))
+    body = f._cut_at_annotations(body)
+    anchors = f._select_observation_anchors(body, list(f._OBS_RE.finditer(body)))
+    out = []
+    for m in anchors:
+        a, b = max(0, m.start() - width), min(len(body), m.end() + width)
+        out.append(f"#{m.group(1)}@{m.start()}: " + body[a:b].replace("
+", "\n"))
+    return out
+
+
 def _found_483(card_id: str) -> "tuple[int, str]":
     found, status, _ = _fetch_483(card_id)
     return found, status
@@ -285,6 +301,10 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
                 and (counts or {}).get("ok", 0) > info["shown"]):
             row["oos_483"] = _is_out_of_scope_483(_establishment_type(cid), text)
         row["verdict"] = classify(row)
+        if info["kind"] == "483" and hdr and counts and hdr > counts["total"]:
+            row["obs_context"] = obs_header_context(text)
+            for c in row["obs_context"]:
+                print(f"::notice title=obs-context {cid}::{c}", flush=True)
         rows.append(row)
         print(f"[{i:>3}/{len(state)}] {cid:<18} {info['date']:<18} "
               f"카드{info['shown']:>2} 원문{found:>2} "

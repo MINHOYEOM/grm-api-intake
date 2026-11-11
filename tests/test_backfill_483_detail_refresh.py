@@ -176,6 +176,42 @@ class OldStorageCapTest(unittest.TestCase):
         ended = frag[:-len(self._FRAG_TAIL)].rstrip() + " The deviations were documented."
         self.assertIsNone(b.completed_sentence(ended, [{"number": "1", "detail": ended + " More."}]))  # 이미 끝난 문장
 
+    def test_fragment_completed_from_whole_source_when_new_parse_lost_it(self):
+        """[11-12] 새 파서가 그 관찰을 빠뜨려도(new 에 없음) 원문 전체에서 딱 한 곳이면 문장 하나를 잇는다."""
+        frag = self._fragment()
+        rest = "re documented for Quality Unit review. Next sentence stays out."
+        source = "OBSERVATION 1 Heading. Specifically, " + frag + rest + " OBSERVATION 2 Other."
+        old = [{"number": "5", "deficiency": ".", "detail": frag}]
+        out, matched, unmatched = b.refreshed_observations(old, [], source)
+        self.assertEqual((matched, unmatched), (1, 0))
+        self.assertTrue(out[0]["detail"].endswith("re documented for Quality Unit review."))
+        # 원문 없이는 종전대로(짝 없음)
+        self.assertEqual(b.refreshed_observations(old, [])[1:], (0, 1))
+        # 원문에 두 곳이면 잇지 않는다
+        self.assertIsNone(b.completed_sentence(frag, [], source + " " + frag + rest))
+        # 붙일 문장에 양식 머리말 낱말이 섞이면 잇지 않는다(쪽 경계 블록)
+        hdr = frag + "TRY TYPE ESTABLISHMENT INSPECTED Livonia MI Producer of Sterile Drugs ii. The ISO 5 area."
+        self.assertIsNone(b.completed_sentence(frag, [], hdr))
+
+    def test_truncated_deficiency_completed_from_source(self):
+        head = ("Your firm has not ensured that your facility is suitably designed with respect to adequate "
+                "separation of operations and that it is properly maintained, including areas protected from "
+                "particulate and microbial contamination by appropriate engineering controls that include "
+                "protect from heating ventilation and air conditioning (HVAC), air")
+        old_def = (head + " " + "z" * 300)[:280] + "..."
+        cut = old_def[:-3]
+        source = ("OBSERVATION #1 - " + cut + " pressurization, and unidirectional airflow, to prevent "
+                  "contamination. OBSERVATION #2 - Next.")
+        got = b.completed_deficiency(old_def, source)
+        self.assertIsNotNone(got)
+        self.assertTrue(got.endswith("unidirectional airflow, to prevent contamination."), got[-80:])
+        old = [{"number": "2", "deficiency": old_def, "detail": "Short detail."}]
+        out, matched, _ = b.refreshed_observations(old, [{"number": "2", "deficiency": "", "detail": ""}], source)
+        self.assertEqual(matched, 1)
+        self.assertEqual(out[0]["deficiency"], got)
+        self.assertEqual(out[0]["detail"], "Short detail.")
+        self.assertIsNone(b.completed_deficiency("Short heading...", source))
+
     def test_band_helpers(self):
         self.assertTrue(b.is_truncated_deficiency("x" * 280 + "..."))
         self.assertFalse(b.is_truncated_deficiency("Short heading..."))

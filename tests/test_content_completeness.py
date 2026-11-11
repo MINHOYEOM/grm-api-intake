@@ -137,8 +137,8 @@ class FindCapsTest(unittest.TestCase):
         self.assertEqual(sum(len(v) for v in det.long_cut.values()), 1)   # 예외 아닌 관찰 하나만
         self.assertEqual(det.total, 2)                                     # 미사용 검사에는 그대로 센다
 
-    def test_source_ends_list_has_19_documented_cases(self):
-        self.assertEqual(sum(len(v) for v in cc.INTENTIONAL_SOURCE_ENDS["FDA 483"].values()), 19)
+    def test_source_ends_list_has_25_documented_cases(self):
+        self.assertEqual(sum(len(v) for v in cc.INTENTIONAL_SOURCE_ENDS["FDA 483"].values()), 25)
 
 
 class LeavesTest(unittest.TestCase):

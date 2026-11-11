@@ -143,6 +143,18 @@ def compute_edges(rows: list[dict[str, str]], terms: list[dict]) -> tuple[list[d
     return kg_edges.build_term_edges([{"findings": rows}], terms)
 
 
+def link_gmp_cert(base: str, key: str, timeout: float = 120.0) -> dict[str, Any] | None:
+    """식약처 GMP 적합판정서 ↔ 업체 연결(142·143). 새 지적으로 업체가 생기면 다음 날 이어진다.
+    미적용(404)이면 None."""
+    resp = _call(lambda: requests.post(f"{base}/rest/v1/rpc/grm_link_mfds_gmp_cert", headers=_headers(key),
+                                       json={}, timeout=timeout))
+    if resp.status_code == 404:
+        return None
+    if resp.status_code != 200:
+        raise RuntimeError(f"grm_link_mfds_gmp_cert HTTP {resp.status_code}")
+    return resp.json()
+
+
 def main(argv: list[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -196,6 +208,13 @@ def main(argv: list[str] | None = None) -> int:
             print("[kg-link] fei·조항: " + (json.dumps(db, ensure_ascii=False) if db is not None else "SKIP(108 미적용)"))
             n_text = link_text_clauses(base, key, a.days)
             print("[kg-link] 본문 조항: " + (f"신규 {n_text:,}" if n_text is not None else "SKIP(113 미적용)"))
+            try:
+                g = link_gmp_cert(base, key)
+                print("[kg-link] GMP 적합판정 연결: "
+                      + (json.dumps({k: g.get(k) for k in ("linked_rows", "linked_firms", "unlinked_rows")},
+                                    ensure_ascii=False) if g is not None else "SKIP(142 미적용)"))
+            except RuntimeError as exc:  # 부가 단계 — 지적 연결을 실패시키지 않는다
+                print(f"[kg-link] GMP 적합판정 연결 건너뜀: {exc}", file=sys.stderr)
         terms = json.loads(Path(a.glossary).read_text(encoding="utf-8"))
         rows = fetch_recent_texts(base, key, since)
         edges, _stats = compute_edges(rows, terms)

@@ -561,8 +561,37 @@ def fetch_gmp_certs(base_url: str, anon_key: str, *, post=None) -> list[dict[str
     return rows
 
 
-def write_gmp_certs(path: Path, rows: list[dict[str, Any]]) -> int:
-    """업체 키 한 줄 = diff 한 줄. 0행이면 쓰지 않는다(원장이 비었으면 지난 파일 유지)."""
+GMP_NEW_FIRMS_RPC_NAME = "mfds_gmp_cert_new_firms_public"
+_GMP_NEW_FIRM_FIELDS = ("node_key", "firm_name", "cert_count", "product_kinds", "listed_now")
+
+
+def fetch_gmp_new_firms(base_url: str, anon_key: str, *, post=None) -> list[dict[str, Any]]:
+    """우리 업체 목록에 없는 판정서 업체(144) — 지식 그래프 업체 노드로만 쓴다(페이지 없음)."""
+    if post is None:
+        response = requests.post(
+            f"{base_url}/rest/v1/rpc/{GMP_NEW_FIRMS_RPC_NAME}",
+            headers={"apikey": anon_key, "Authorization": f"Bearer {anon_key}",
+                     "Content-Type": "application/json"},
+            json={}, timeout=60)
+        response.raise_for_status()
+        rows = response.json()
+    else:
+        rows = post()
+    if not isinstance(rows, list):
+        raise RuntimeError("invalid mfds_gmp_cert_new_firms_public response")
+    for row in rows:
+        if (not isinstance(row, dict) or not isinstance(row.get("node_key"), str)
+                or not row["node_key"].startswith("mfds-gmp-") or not row.get("firm_name")):
+            raise RuntimeError("invalid mfds_gmp_cert_new_firms_public row")
+    return rows
+
+
+def write_gmp_certs(path: Path, rows: list[dict[str, Any]],
+                    new_firms: "list[dict[str, Any]] | None" = None) -> int:
+    """업체 키 한 줄 = diff 한 줄. 0행이면 쓰지 않는다(원장이 비었으면 지난 파일 유지).
+
+    `new_firms`(144)는 `new_firms` 배열로 덧붙인다 — 노드 하나 = 한 줄.
+    """
     if not rows:
         raise RuntimeError("mfds_gmp_cert_public 0행")
     by_firm: dict[str, list[dict[str, Any]]] = {}
@@ -578,7 +607,16 @@ def write_gmp_certs(path: Path, rows: list[dict[str, Any]]) -> int:
         lines.append(json.dumps(k, ensure_ascii=False) + ": "
                      + json.dumps(by_firm[k], ensure_ascii=False, separators=(",", ":"))
                      + ("," if i < len(keys) - 1 else ""))
-    lines.append("}}")
+    if new_firms:
+        lines.append("}, \"new_firms\": [")
+        nf = sorted(new_firms, key=lambda r: r["node_key"])
+        for i, r in enumerate(nf):
+            lines.append(json.dumps({k: r.get(k) for k in _GMP_NEW_FIRM_FIELDS},
+                                    ensure_ascii=False, separators=(",", ":"))
+                         + ("," if i < len(nf) - 1 else ""))
+        lines.append("]}")
+    else:
+        lines.append("}}")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     return len(by_firm)
@@ -657,9 +695,15 @@ def main(argv: "list[str] | None" = None) -> int:
 
     if not args.dry_run and not args.skip_gmp_cert:
         try:
-            n_gmp = write_gmp_certs(args.gmp_cert_out,
-                                    fetch_gmp_certs(base_url, args.supabase_anon_key))
-            log(f"식약처 GMP 적합판정: 업체 {n_gmp:,}곳 ({args.gmp_cert_out})")
+            gmp_rows = fetch_gmp_certs(base_url, args.supabase_anon_key)
+            try:
+                gmp_new = fetch_gmp_new_firms(base_url, args.supabase_anon_key)
+            except Exception as exc:  # noqa: BLE001 — 노드 목록만 빠지고 업체 페이지 줄은 갱신
+                log(f"식약처 GMP 새 업체 노드 건너뜀: {type(exc).__name__}: {exc}")
+                gmp_new = None
+            n_gmp = write_gmp_certs(args.gmp_cert_out, gmp_rows, gmp_new)
+            log(f"식약처 GMP 적합판정: 업체 {n_gmp:,}곳 · 새 업체 노드 {len(gmp_new or []):,}곳 "
+                f"({args.gmp_cert_out})")
         except Exception as exc:  # noqa: BLE001 — 부가 정보라 본 정본을 실패시키지 않는다
             log(f"식약처 GMP 적합판정 갱신 건너뜀(지난 파일 유지): {type(exc).__name__}: {exc}")
 

@@ -150,8 +150,13 @@ class EvaluateSilenceTest(unittest.TestCase):
         # ★느슨해진 것이지 꺼진 게 아니다 — 임계를 넘기면 그대로 울린다.
         much_later = _codes(evaluate_silence(last_seen=seen, run_date=date(2026, 12, 1),
                                              source_enabled=ALL_ON))
-        for must in ("PIC/S", "MHRA GMP NCR", "EU GMP NCR (EudraGMDP)"):
+        for must in ("PIC/S", "EU GMP NCR (EudraGMDP)"):
             self.assertIn(must, much_later)
+        # MHRA GMP NCR 은 2026-11-10(#1457) 원천 대조로 140일 무음이 정상임을 확인해 임계 180일 — 그 너머에선 울린다.
+        self.assertNotIn("MHRA GMP NCR", much_later)
+        past_180 = _codes(evaluate_silence(last_seen=seen, run_date=date(2027, 2, 10),
+                                           source_enabled=ALL_ON))
+        self.assertIn("MHRA GMP NCR", past_180)
 
     def test_thresholds_exceed_probe_verified_healthy_silence(self) -> None:
         """임계는 **"원천이 건강한데 조용하다"가 확인된 일수보다 길어야 한다.**

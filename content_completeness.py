@@ -137,6 +137,37 @@ INTENTIONAL_SOURCE_ENDS: dict[str, dict[str, tuple[str, ...]]] = {
 _SOURCE_ENDS_LIST_KEY = {"FDA 483": "fda_483_observations"}
 
 
+# [2026-11-12] 알려진 잔여 잘림 — 옛 수집 때 1,200자에서 잘려 저장됐고, 다시 읽어도 짝을 못 찾은 관찰
+# (진단 run 43067755299 · 반영 43077152298 뒤). 원문 PDF 의 OCR 판본이 달라 조각 끝을 찾을 수 없거나(16),
+# 조각 끝이 원문에 반복되는데 뒤 문장이 자리마다 달라 이을 자리를 정할 수 없다(6). 대표 위임 결정(비서실):
+# 저장값은 그대로 두고 **구체 내용 화면에서 "원문 일부 — 전체는 원문 PDF 에서 확인"** 을 붙인다.
+# `partial_detail_notice` 가 그 판정이다 — 상세가 문장으로 끝나면(다음 재수집에서 온전해지면) 표시하지 않는다.
+# 쪽 머리말·서명란 꼬리(19)는 잘림이 아니라 꼬리 정리 대상이므로 넣지 않는다.
+KNOWN_PARTIAL_DETAILS: dict[str, dict[str, tuple[str, ...]]] = {
+    "FDA 483": {
+        # OCR 판본 차이(원문에서 조각 끝을 못 찾음)
+        "fda483-110395": ("2",), "fda483-111108": ("2",), "fda483-135875": ("2",), "fda483-145539": ("1",),
+        "fda483-153336": ("2",), "fda483-161809": ("1", "5"), "fda483-163788": ("4", "5", "9", "14"),
+        "fda483-175123": ("3",), "fda483-190645": ("6",), "fda483-77292": ("1",), "fda483-93492": ("1",),
+        "fda483-96222": ("7",), "fda483-96641": ("8",),
+        # 조각 끝 반복·뒤 문장 불일치
+        "fda483-107200": ("7",), "fda483-84935": ("5",), "fda483-85303": ("5",), "fda483-91684": ("2", "7"),
+    },
+}
+_SENTENCE_END_RE = re.compile(r"[.!?][)\"'”’]?\s*$")
+
+
+def partial_detail_notice(source: str, document_id: str, number: Any, detail: str) -> bool:
+    """구체 내용 화면에 "원문 일부" 표시를 붙일 관찰인가(순수 함수).
+
+    목록에 있고 **상세가 아직 문장 중간에서 끝날 때만** 참 — 재수집으로 온전해지면 저절로 빠진다."""
+    numbers = KNOWN_PARTIAL_DETAILS.get(source, {}).get(document_id)
+    if not numbers or str(number) not in numbers:
+        return False
+    d = (detail or "").strip()
+    return bool(d) and not _SENTENCE_END_RE.search(d)
+
+
 def source_end_values(source: str, document_id: str, raw: Any) -> set[str]:
     """INTENTIONAL_SOURCE_ENDS 에 오른 관찰의 상세 값(앞뒤 공백 제거). 순수 함수."""
     numbers = INTENTIONAL_SOURCE_ENDS.get(source, {}).get(document_id)

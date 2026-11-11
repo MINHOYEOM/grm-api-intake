@@ -104,6 +104,22 @@ def _fetch_483(card_id: str) -> "tuple[int, str, str]":
     return len(f._extract_483_observations_from_text(text)), status, text
 
 
+def count_obs_headers(text: str) -> "int | None":
+    """원문의 `OBSERVATION n` **번호 머리** 수(고유 번호 기준). 셀 수 없으면 None.
+
+    상호참조("refer to Observation 3")는 조립기와 같은 선택기로 거른다. 하위항목 A·B·C 와
+    'observed' 낱말은 애초에 세지 않는다. 번호 머리가 하나도 없는 양식은 None —
+    호출자는 이를 '확인 불가'로 다룬다(경보 유지)."""
+    if not text:
+        return None
+    import collect_fda_483 as f
+    body = f._scope_to_observation_list(f.normalize_pdf_ligatures(text))
+    body = f._cut_at_annotations(body)
+    anchors = f._select_observation_anchors(body, list(f._OBS_RE.finditer(body)))
+    nums = {m.group(1) for m in anchors}
+    return len(nums) or None
+
+
 def _found_483(card_id: str) -> "tuple[int, str]":
     found, status, _ = _fetch_483(card_id)
     return found, status
@@ -219,7 +235,15 @@ def classify(row: dict[str, Any]) -> str:
     if total is None or ok is None:
         return "unknown-no-db"      # DB 를 못 봤다 → 종전 판정(보수적으로 불일치 취급)
     if found > total:
-        return "extraction-gap"     # 원문에 있는데 우리가 뽑지 못했다
+        hdr = row.get("obs_headers")
+        if total > 0 and ok <= shown and hdr is not None and hdr <= total:
+            # ★[count-drift 2026-11-12, #1214 fda483-195468] 원문의 **`OBSERVATION n` 번호 머리 수**
+            # (하위항목 A·B·C·'observed' 낱말은 세지 않는다)가 DB 관찰 수 이하이고 카드가 공개분을
+            # 전부 보여줄 때만 '재파싱 건수 오차'로 내린다. 번호 머리를 못 세면(`hdr is None`:
+            # 번호 머리 없는 양식 등 — 195467) 또는 머리 수가 DB 보다 많으면(진짜 부분 누락)
+            # 종전대로 extraction-gap 이다 — 원천 정보 누락 감지를 약하게 하지 않는다.
+            return "count-drift"
+        return "extraction-gap"         # 원문에 있는데 우리가 뽑지 못했다(0건·부분 누락·셀 수 없음)
     if ok > shown:
         if row.get("oos_483"):
             # DB scope 는 'ok' 지만 조립기 범위 판정(is_out_of_scope_483)이 기기·생식 시설 등으로
@@ -244,13 +268,15 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
               "진행(허위경보 가능)", flush=True)
     rows: list[dict[str, Any]] = []
     for i, (cid, info) in enumerate(sorted(state.items()), 1):
-        text = ""
+        text, hdr = "", None
         if info["kind"] == "483":
             found, status, text = _fetch_483(cid)
+            hdr = count_obs_headers(text)
         else:
             found, status = _found_wl(info["url"])
         counts = (scope or {}).get(cid)
         row = {**info, "id": cid, "found": found, "status": status,
+               "obs_headers": hdr,
                "db_total": counts["total"] if counts else None,
                "db_ok": counts["ok"] if counts else None}
         # 조립기가 범위 밖으로 뺀 483 은 발행 격차가 아니다. 격차 후보일 때만 판정한다
@@ -299,6 +325,13 @@ def format_report(mismatches: list[dict[str, Any]],
                 f"{why} **의도대로 제외된 것**이라 불일치로 "
                 f"세지 않았습니다: " + ", ".join(f"`{r['id']}`" for r in excluded[:12])
                 + ("…" if len(excluded) > 12 else ""))
+    drift = [r for r in (rows or []) if r.get("verdict") == "count-drift"]
+    if drift:
+        tail += (f"\n\n참고: {len(drift)}개 카드는 DB 에 findings 가 있고 카드가 그 공개분을 전부 "
+                 "보여주지만 원문 재파싱 건수가 저장 건수보다 많습니다(스캔 OCR 의 하위항목 오독 "
+                 "등 — 추출 실패 아님, 불일치로 세지 않음). 건수 차이가 크면 원문을 직접 확인: "
+                 + ", ".join(f"`{r['id']}`(카드 {r['shown']}·DB {r['db_total']}·원문 {r['found']})"
+                             for r in drift[:12]) + ("…" if len(drift) > 12 else ""))
     if not mismatches:
         return "발행 카드와 원문이 전부 일치합니다(불일치 0)." + tail
 

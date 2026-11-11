@@ -23,7 +23,7 @@ jobs:
   apply:
     name: Apply 483 detail outbox → Supabase
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120  # 11-11: 수동 전체 재적용(폴더 전체 약 1만 건)이 30분을 넘겨 두 번 취소됐다
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

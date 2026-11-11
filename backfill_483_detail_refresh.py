@@ -166,42 +166,75 @@ _TAIL_PROBE = 80
 _SENTENCE_TAIL_MAX = 600
 _SENTENCE_END_RE = re.compile(r"[.!?][)\"'”’]?(?=\s|$)")
 # 공백을 지운 조각에서 찾는다(`s ee r e vers e o f th is page` 같은 벌어진 판독, 실측 107200).
-_FORM_TRACE_RE = re.compile(r"(?i)seereverse|ofthispage|employee|signature|formfda|investigator|dateissued")
+_FORM_TRACE_RE = re.compile(r"(?i)seereverse|ofthispage|employee|signature|formfda|investigator|dateissued"
+                            r"|inspected|zipcode|firmname|pageof|previousedition|datesofinspection")
 
 
-def completed_sentence(old_detail: str, new: list[dict[str, Any]]) -> str | None:
+def _unique_tail_rest(probe: str, haystacks: list[str]) -> str | None:
+    """probe 가 haystacks 전체에서 딱 한 곳일 때 그 바로 뒤 600자(없으면 None)."""
+    hits: list[tuple[str, int]] = []
+    for h in haystacks:
+        start = h.find(probe)
+        while start != -1:
+            hits.append((h, start))
+            start = h.find(probe, start + 1)
+    if len(hits) != 1:
+        return None
+    h, at = hits[0]
+    return h[at + len(probe): at + len(probe) + _SENTENCE_TAIL_MAX]
+
+
+def _first_sentence_rest(rest: str | None) -> str | None:
+    """뒤 조각에서 첫 문장 끝까지(양식 낱말이 섞이면 None)."""
+    if not rest:
+        return None
+    m = _SENTENCE_END_RE.search(rest)
+    if not m:
+        return None
+    added = rest[:m.end()]
+    if _FORM_TRACE_RE.search(re.sub(r"\s+", "", added)):
+        return None                       # 붙일 조각에 서명란·양식 낱말 — 원문 경계가 아니라 쪽 블록이다
+    return added
+
+
+def completed_deficiency(old_def: str, source_text: str) -> str | None:
+    """[11-12] 280자+"..." 로 잘린 표제를 원문 전체에서 첫 문장 끝까지 잇는다(순수 함수). 못 하면 None.
+
+    다시 읽은 관찰이 표제를 빈 값으로 내는 문서(실측 92522 — 새 관찰 3건 모두 표제 0자)는 짝 ② 가
+    걸리지 않는다. 표제 끝 80자가 원문에 딱 한 곳이면 바로 뒤를 문장 끝까지 붙인다."""
+    if not is_truncated_deficiency(old_def) or not source_text:
+        return None
+    head = _norm(old_def[:-len(TRUNC_DEFICIENCY_SUFFIX)])
+    if len(head) < _TAIL_PROBE:
+        return None
+    added = _first_sentence_rest(_unique_tail_rest(head[-_TAIL_PROBE:], [_norm(source_text)]))
+    return head + added if added else None
+
+
+def completed_sentence(old_detail: str, new: list[dict[str, Any]], source_text: str = "") -> str | None:
     """[11-11] 옛 1,200자 절단 상세의 **끊긴 문장만** 원문으로 마저 잇는다(순수 함수). 못 하면 None.
 
     다시 읽은 관찰과 번호·표제가 어긋나 짝 ①~③ 이 모두 실패한 조각(옛 수집기가 하위 항목 `B.`·`G.` 를
     따로 떼어 저장한 행 — 실측 175708·173408·80115·158445)도, 그 끝 80자는 다시 읽은 원문 어딘가에
     그대로 있다. 그 자리가 **다시 읽은 관찰 전체에서 딱 한 곳**일 때만, 바로 뒤를 첫 문장 끝(`.`·`!`·`?`)
     까지 붙인다. 조각이 원래 어디서 끝났는지는 알 수 없으므로 문장 하나보다 더 붙이지 않는다(경계 불확실
-    → 덜 붙인다). 문장 끝이 600자 안에 없으면 None(종전대로 둔다)."""
+    → 덜 붙인다). 문장 끝이 600자 안에 없으면 None(종전대로 둔다).
+
+    [11-12] 다시 읽은 관찰 목록에 그 관찰 자체가 없는 문서(새 파서가 번호를 다르게 자르거나 빠뜨림 —
+    실측 85303·84935·96468·120638·91684·78684·83807, 진단 run 43067755299)는 관찰 안에서 못 찾는다.
+    관찰 전체에서 못 찾으면 **원문 전체**(`source_text`)에서 같은 규칙(딱 한 곳·문장 하나·양식 낱말 금지)으로 찾는다."""
     od = _norm(old_detail)
     if not is_truncated_detail(old_detail) or _COMPLETE_END_RE.search(od) or len(od) < _TAIL_PROBE:
         return None
     probe = od[-_TAIL_PROBE:]
-    hits: list[tuple[str, int]] = []
-    for n in new:
-        nd = _norm(str(n.get("detail") or ""))
-        start = nd.find(probe)
-        while start != -1:
-            hits.append((nd, start))
-            start = nd.find(probe, start + 1)
-    if len(hits) != 1:
-        return None
-    nd, at = hits[0]
-    rest = nd[at + len(probe): at + len(probe) + _SENTENCE_TAIL_MAX]
-    m = _SENTENCE_END_RE.search(rest)
-    if not rest or not m:
-        return None
-    added = rest[:m.end()]
-    if _FORM_TRACE_RE.search(re.sub(r"\s+", "", added)):
-        return None                       # 붙일 조각에 서명란·양식 낱말 — 원문 경계가 아니라 쪽 블록이다
-    return od + added
+    rest = _unique_tail_rest(probe, [_norm(str(n.get("detail") or "")) for n in new])
+    if rest is None and source_text:
+        rest = _unique_tail_rest(probe, [_norm(source_text)])
+    added = _first_sentence_rest(rest)
+    return od + added if added else None
 
 
-def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]
+def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]], source_text: str = ""
                            ) -> tuple[list[dict[str, Any]], int, int]:
     """기존 관찰 목록의 detail(과 잘린 표제)을 바꾼 새 목록 + (짝 맞은 수, 짝 없는 수). 순수 함수.
 
@@ -209,7 +242,9 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]
        ② 번호가 같고 옛 표제가 280자+"..." 절단, 새 표제가 그 앞부분으로 시작 → 표제도 새 것으로.
           (그때 옛 상세가 표제 문장의 나머지였다면 새 상세가 빈 값일 수 있다 — 새 것을 그대로 쓴다.)
        ③ 번호가 같고 새 상세가 옛 상세의 앞부분으로 시작하며 더 김(옛 1,200자 절단) → 상세만.
-       ④ 옛 상세가 1,200자 절단 조각이고 그 끝이 다시 읽은 관찰 한 곳에만 있음 → 끊긴 문장만 잇는다.
+       ④ 옛 상세가 1,200자 절단 조각이고 그 끝이 다시 읽은 관찰(없으면 원문 전체) 한 곳에만 있음
+          → 끊긴 문장만 잇는다.
+    짝 ②가 안 된 280자+"..." 표제는 원문 전체에서 첫 문장 끝까지 잇는다(`completed_deficiency`).
     다시 읽은 상세가 비면(①·③) 기존 상세(정리본)를 둔다."""
     by_key = {(str(o.get("number")), str(o.get("deficiency") or "")): o for o in new}
     by_num: dict[str, list[dict[str, Any]]] = {}
@@ -238,10 +273,12 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]
             matched += 1
             out.append({**o, "detail": str(extended[0]["detail"])})
             continue
-        completed = completed_sentence(old_detail, new)
-        if completed is not None:
+        fixed_def = completed_deficiency(old_def, source_text)
+        base = {**o, "deficiency": fixed_def} if fixed_def else o
+        completed = completed_sentence(old_detail, new, source_text)
+        if completed is not None or fixed_def:
             matched += 1
-            out.append({**o, "detail": completed})
+            out.append({**base, "detail": completed if completed is not None else tidy_old_detail(old_detail)})
             continue
         unmatched += 1
         out.append({**o, "detail": tidy_old_detail(old_detail)})
@@ -372,7 +409,7 @@ def run(
             report.failed += 1
             report.errors.append(f"{doc}: extract_raised:{type(exc).__name__}")
             continue
-        refreshed, matched, unmatched = refreshed_observations(old, new)
+        refreshed, matched, unmatched = refreshed_observations(old, new, text)
         if doc_ids:
             report.diagnostics.extend(diagnose_residual(doc, refreshed, new, text))
         report.observations_matched += matched

@@ -3301,60 +3301,6 @@ FACET_AXES: dict[str, dict[str, str]] = {
 }
 
 
-# 둘러보기(findings/browse/) 진입 카드의 한 줄 설명 — 축 하나에 한 줄. 여기 없는 축은
-# 설명 없이 제목만 나간다(축이 늘어도 빌드가 서지 않는다). 문구 사전 키로 등록해 두므로
-# 두 언어 트리가 같은 값을 서로 다른 언어로 낸다(`browse_axis_cards` 가 tr 을 건다).
-BROWSE_AXIS_BLURB: dict[str, str] = {
-    "category": N_("무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다."),
-    "country": N_("제조소가 어느 나라에 있는지로 묶어 봅니다."),
-    "agency": N_("FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다."),
-}
-
-
-def browse_axis_cards(facets_data: "dict[str, Any] | None", *,
-                      docs_present: bool, doc_count: int,
-                      tr: Translator = _KO,
-                      allowed: "set[str] | None" = None) -> list[dict[str, str]]:
-    """둘러보기(`findings/browse/`) 진입 카드 — **그 트리의 데이터**에서 축을 뽑고,
-    `allowed`(그 언어 트리에 실제로 산출되는 라우트 집합)로 한 번 더 거른다.
-    `allowed=None` 은 "거르지 않는다"(한국어 트리 — 모든 면이 그 트리에 있다).
-
-    ★갈래를 손으로 적지 않는다. 종전에는 렌더 안에서 영어 트리에만 "문서 축 하나"를
-      손으로 박아 뒀는데, 그 뒤 분류·국가·기관 모음이 영어로 실제로 생겼는데도 카드는
-      1장에 머물렀다(실측 2026-09-05: 한국어 4장 / 영어 1장 — `/en/findings/c/`·
-      `country/`·`agency/` 는 그때 이미 색인 3장 + 하위 35장이 서 있었다).
-      손목록은 트리가 자라는 순간 낡는다(README 불변식 #16).
-
-    모듈 수준 순수 함수인 이유: 게이트(`allowed`)를 **직접** 물어볼 수 있어야 하기
-    때문이다. 렌더 결과로만 보면 두 트리의 축이 우연히 같은 동안에는 게이트가 빠져도
-    초록이라, 정작 갈라지는 날 처음 알게 된다.
-    """
-    out: list[dict[str, str]] = []
-    for axis in (facets_data.get("axes") if facets_data else []) or []:
-        meta = FACET_AXES.get(axis["axis"])
-        if not meta or not axis.get("items"):
-            continue
-        href = f"findings/{meta['path']}/"
-        if allowed is not None and href not in allowed:
-            continue
-        blurb = BROWSE_AXIS_BLURB.get(axis["axis"], "")
-        out.append({"href": href, "title": tr(meta["title"]),
-                    "blurb": tr(blurb) if blurb else ""})
-    # ★sitemap 과 같은 규칙: **데이터에서 파생**하지 렌더 결과에서 파생하지 않는다.
-    # `render_doc_pages` 로 가르면 테스트 빌드의 골든이 프로덕션과 다른 것을 고정하게
-    # 되어(골든에 이 카드가 없는데 라이브엔 있는 상태) 대조가 의미를 잃는다.
-    if docs_present and (allowed is None or "findings/docs/" in allowed):
-        # [분모 고지 2026-09-06] 이 수는 **개별 페이지를 만든 문서**이지 보유한 문서 전량이
-        # 아니다(3,305 vs 6,187). 지적 3건 이상 + 발행일이 있는 문서만 페이지가 되고, 그
-        # 임계가 어떤 소스의 문서를 하나도 남기지 못하면 그 소스는 면제된다(findings_docs
-        # _refresh 헤더). 분모를 안 밝히면 "우리가 가진 문서가 3,305건"으로 읽힌다.
-        out.append({"href": "findings/docs/", "title": tr("문서로 찾기"),
-                    "blurb": tr("지적이 3건 이상이고 발행일이 있는 실사 문서 {n}건을 "
-                                "기관·연도로 묶어 봅니다(보유 문서 전량은 아닙니다).",
-                                n=f"{doc_count:,}")})
-    return out
-
-
 _FACET_COPY_KEYS = ("title", "headline_suffix", "lede_prefix", "sibling_title", "index_lede")
 
 
@@ -3578,6 +3524,32 @@ def facet_tree_paths(facets_data: "dict[str, Any] | None") -> "set[str]":
     out |= {f"findings/{cat}/{c['category_slug']}/{c['slug']}/"
             for c in ((facets_data.get("combos") or {}).get("items") or [])}
     return out
+
+
+def facets_root(facets_data: "dict[str, Any] | None") -> "str | None":
+    """지적사항 탭 `찾기 › 분류`가 가리킬 모음 첫 화면 — 분류 → 기관 → 국가 중 이 트리에 선 첫 축.
+
+    [탭 3묶음 2026-11-11] 모음 페이지는 둘러보기 면에서만 링크됐다 — 둘러보기를 없애면
+    입구가 사라지므로 탭으로 옮긴다. 면이 없으면 None(탭을 그리지 않는다)."""
+    axes = facets_axes(facets_data)
+    return f"findings/{axes[0]['path']}/" if axes else None
+
+
+#: 분류 화면 안 보기 전환(분류 · 기관 · 국가)의 순서와 라벨 — 탭 '분류'의 3단째.
+FACET_VIEW_ORDER: tuple[tuple[str, str], ...] = (
+    ("category", N_("분류")), ("agency", N_("기관")), ("country", N_("국가")))
+
+
+def facets_axes(facets_data: "dict[str, Any] | None") -> "list[dict[str, str]]":
+    """이 트리에 선 모음 축 — [{"path", "label"}] (분류 → 기관 → 국가). 화면 안 보기 전환이 쓴다.
+
+    둘러보기 면이 세 축 색인을 모두 링크하던 유일한 곳이라, 그 면을 없애면 국가·기관 축이 고아가
+    된다(도달성 가드가 잡았다) — 분류 화면 위 보기 전환이 그 자리를 잇는다. 라벨은 문구 키(N_)라
+    템플릿이 `_()` 로 그 트리의 언어로 찍는다."""
+    paths = facet_tree_paths(facets_data)
+    return [{"path": FACET_AXES[key]["path"], "label": label}
+            for key, label in FACET_VIEW_ORDER
+            if f"findings/{FACET_AXES[key]['path']}/" in paths]
 
 
 def facet_excluded_reason(reason: str, tr: Translator = _KO) -> str:
@@ -4631,7 +4603,7 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
 
 # ── 페이지 주소(단일 원천) ────────────────────────────────────────────────────
 # [다국어 1단계 2026-09-03] 페이지 하나의 주소는 **사이트 루트 기준 상대 디렉터리 경로
-# 하나**(`"findings/browse/"`)에서 전부 파생한다 — 출력 파일·템플릿의 rel_root·canonical·
+# 하나**(`"findings/docs/"`)에서 전부 파생한다 — 출력 파일·템플릿의 rel_root·canonical·
 # sitemap 경로·빵부스러기 절대 URL. 종전에는 이 넷을 렌더 호출마다 손으로 따로 적었다
 # (rel_root 27곳 + 출력 경로 15곳 = 42곳). 깊이를 세는 규칙이 한 곳에 있어야 `/en/` 처럼
 # 트리를 하나 더 얹을 때 42곳을 다시 세지 않는다
@@ -5065,12 +5037,22 @@ def build_firm_alias_redirects(
     return rules
 
 
+#: [탭 3묶음 2026-11-11 · 대표 승인] 없앤 화면의 옛 주소 → 대신하는 화면. 둘러보기 면은 탭 묶음
+#: (찾기·경향·점검)이 그 역할을 맡아 없앴다 — 옛 주소는 검색 면으로 넘긴다.
+RETIRED_PAGE_REDIRECTS: tuple[tuple[str, str], ...] = (
+    ("/findings/browse/", "/findings/"),
+    ("/findings/browse/index.html", "/findings/"),
+    ("/en/findings/browse/", "/en/findings/"),
+    ("/en/findings/browse/index.html", "/en/findings/"),
+)
+
+
 def build_redirects_txt(rules: "list[tuple[str, str]]") -> str:
     """_redirects — `옛 새 301` 한 줄씩(정렬·중복 제거로 결정론). 규칙이 없어도 머리말은 낸다."""
     uniq = sorted(set(rules))
     if len(uniq) > REDIRECTS_STATIC_MAX:
         raise RuntimeError(f"_redirects 정적 규칙 {len(uniq)}개 > 상한 {REDIRECTS_STATIC_MAX}")
-    head = "# 업체 별칭 병합으로 사라진 옛 업체 페이지 주소 → 정본 주소 (Cloudflare Pages _redirects)\n"
+    head = "# 사라진 옛 주소 → 지금 주소 (Cloudflare Pages _redirects) — 업체 별칭 병합·없앤 화면\n"
     return head + "".join(f"{a} {b} 301\n" for a, b in uniq)
 
 
@@ -5156,8 +5138,6 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         "## 규제 지적사항 데이터",
         f"- [지적사항 검색]({base_url}/findings/): FDA 483 · Warning Letter · EU/영국"
         " GMP 비준수 · 캐나다 실사 · 식약처 지적사항 통합 검색",
-        f"- [지적사항 둘러보기]({base_url}/findings/browse/): 업무별 바로가기 ·"
-        " 최근 공개 문서 · 분류·국가·기관 축별 탐색",
         f"- [문서로 찾기]({base_url}/findings/docs/): 실사 문서 단위 한국어 정리"
         f" {n_docs:,}건 — 기관·연도별 색인",
         f"- [지적 경향]({base_url}/findings/trends/): 최근 12개월 지적 영역 순위 ·"
@@ -5194,8 +5174,6 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
      "Search inspection findings in the regulator's original English — FDA 483s,"
      " Warning Letters, EU/UK GMP non-compliance reports, Health Canada inspections."
      " Defaults to English-original findings; one click widens it to the full corpus"),
-    ("findings/browse/", "Browse findings",
-     "Entry points by task, recent documents, and the category/country/agency axes"),
     ("findings/docs/", "Documents by agency and year",
      "{docs:,} inspection documents whose source text is English"),
     ("findings/clause/", "Findings by 21 CFR section",
@@ -5292,8 +5270,6 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         f"  <url><loc>{base_url}/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/archive/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/</loc><lastmod>{latest_pub}</lastmod></url>",
-        # [2면 분리 2026-08-27] 둘러보기 면 — 정적 콘텐츠 면이라 등록한다.
-        f"  <url><loc>{base_url}/findings/browse/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/trends/</loc><lastmod>{latest_pub}</lastmod></url>",
         # [존 재편 2026-08-26] 트렌드 존 2·3면 — 조회 파라미터 없이 그 자체로 완결된
         # 집계 페이지라 체크리스트와 같은 근거로 등록한다(개인·업체 식별 정보 없음).
@@ -5547,9 +5523,6 @@ ARCHIVE_DESCRIPTION = N_("GRM 주간 브리프 아카이브 — 전 세계 제�
 FINDINGS_DESCRIPTION = N_("FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · "
                           "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. "
                           "검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다.")
-# [2면 분리 2026-08-27] 둘러보기 면 — 업무별 진입·최근 공개 문서·축별 탐색.
-FINDINGS_BROWSE_DESCRIPTION = N_("규제 지적사항 데이터 둘러보기 — 업무별 바로가기, "
-                                 "최근 공개된 실사 문서, 분류·국가·기관 축별 탐색.")
 # [존 재편 2026-08-26] 트렌드 존이 세 면으로 갈리면서 이 설명도 '지적 경향' 면만 가리킨다 —
 # 연도별 구성비·업체 랭킹은 데이터 현황 면으로 옮겼으므로 문안에서도 뺐다(설명이 실제
 # 페이지 내용과 어긋나면 검색결과 스니펫이 먼저 거짓말을 한다).
@@ -6050,7 +6023,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if en_docs:
         en_paths |= {f"findings/doc/{d['slug']}/" for d in en_docs}
         en_paths.add("findings/docs/")
-        en_paths.add("findings/browse/")
         # 기관×연도 목록은 **영어로 낼 문서가 있는 묶음만** 만든다(빈 목록 금지).
         en_paths |= {f"findings/docs/{d['agency'].lower()}/{d['published_date'][:4]}/"
                      for d in en_docs}
@@ -6088,6 +6060,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                                    load_glossary() or [])
         env.globals["intl_cases"] = _dc_blocks
         en_env.globals["intl_cases"] = _dc_blocks
+    # [탭 3묶음 2026-11-11] `찾기 › 분류` 탭 — 트리마다 그 트리의 모음 정본에서 정한다.
+    env.globals["fnd_facets_root"] = facets_root(facets)
+    en_env.globals["fnd_facets_root"] = facets_root(facets_en)
+    env.globals["fnd_facet_axes"] = facets_axes(facets)
+    en_env.globals["fnd_facet_axes"] = facets_axes(facets_en)
     # [최근 규제 소식 2026-11-10] 정본(web/data/news.json)이 있을 때만 양 트리에 선언한다.
     news_data = news_page.load_news()
     if news_data:
@@ -6191,50 +6168,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 공용). 모음 페이지의 사례가 문서 페이지로 이어지려면 "그 문서에 페이지가 있는가"
     # (doc_slugs)도 필요하다.
 
-    # 진입 카드는 **데이터가 있는 축만** 만든다 — 없는 페이지로 보내는 링크는 무링크보다
-    # 나쁘다. 문서 축은 렌더 스위치가 꺼진 테스트 빌드에서 페이지가 없으므로 함께 건다.
-    browse_axes = browse_axis_cards(
-        facets, tr=tr,
-        docs_present=bool(docs_data and docs_data.get("documents")),
-        doc_count=(docs_data or {}).get("totals", {}).get("documents", 0))
-    # 영어판은 **영어 모집단으로 다시 잰 정본**(findings_facets_en.json)에서 축을 뽑고,
-    # 문서 건수도 영어로 낼 문서만 센다(불변식 #12 — 머리 숫자와 그 아래 목록이 어긋나면
-    # 안 된다). `en_paths` 가 최종 판정이라 없는 면은 어느 쪽에서도 새지 않는다.
-    en_browse_axes = browse_axis_cards(
-        facets_en, tr=en_tr, docs_present=bool(en_docs), doc_count=len(en_docs),
-        allowed=en_paths)
-
-    # [발견 허브] 최근 공개 문서 — 문서 페이지 정본(findings_docs.json)에서 공개일
-    # 내림차순 5건(동일 날짜는 slug 로 갈라 결정론 유지). 검색 결과와 달리 fetch 없이
-    # 첫 화면에서 바로 보이는 정적 미리보기라, 스냅샷 기준일(measured_on)을 함께 적는다.
-    def _recent_doc_views(pool: "list[dict[str, Any]]", lang_: str,
-                          tr_: Translator) -> list[dict[str, Any]]:
-        """최근 공개 문서 미리보기 — 발췌는 **읽는 언어의 본문**에서 뽑는다."""
-        out: list[dict[str, Any]] = []
-        for d in sorted(pool, key=lambda x: (x.get("published_date", ""),
-                                             x.get("slug", "")), reverse=True)[:5]:
-            first = (d.get("findings") or [{}])[0]
-            snippet = " ".join(finding_body(first, lang_).split())
-            if len(snippet) > 92:
-                snippet = snippet[:92].rstrip() + "…"
-            agency = d.get("agency", "")
-            raw_label = ((facets or {}).get("agency_labels") or {}).get(agency, agency)
-            agency_label = tr_(raw_label) if raw_label != agency else agency
-            out.append({
-                "date": d.get("published_date", ""),
-                "src_label": doc_source_label(d) or agency_label,
-                "firm": d.get("firm_name", ""),
-                "slug": d.get("slug", ""),
-                "cats": [tr_(c) for c in (d.get("categories") or [])[:2]],
-                "snippet": snippet,
-            })
-        return out
-
-    recent_docs = (_recent_doc_views(docs_data.get("documents", []), lang, tr)
-                   if docs_data else [])
-    # 영어 둘러보기 면의 최근 문서 — 영어로 낼 문서만(정의가 위 함수라 여기서 만든다).
-    en_recent_docs = _recent_doc_views(en_docs, "en", en_tr) if en_docs else []
-
     # [검색엔진 인덱싱 2026-09-11] 검색 면(#fnd-results)의 정적 초안 — 최근 공개 문서
     # 24건(findings.js 의 DOCS_PER_PAGE=24 와 같은 수, 1페이지 분량). 이 면은 여태 서버가
     # 셸(로딩 상태)만 내고 findings.js 의 findings_search RPC 성공 이후에야 결과가 채워져,
@@ -6292,36 +6225,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         description=tr(FINDINGS_DESCRIPTION),
     )
 
-    # [2면 분리] 둘러보기 면 — 정적 렌더 전용(fetch 0, 커밋된 스냅샷에서 나옴).
-    # [다국어 4단계] 영어판에도 낸다 — 문서 표면이 생겼으므로 진입면이 필요하다.
-    #   ★진입 카드는 `browse_axis_cards()` 가 **그 트리의 데이터 + en_paths** 로 만든다
-    #     (위 참조). 여기서 갈래를 다시 적지 않는다 — 두 벌이 되는 순간 갈라진다.
-    for _lg, _mkpage, _emit, _tr in trees:
-        if _lg != DEFAULT_LANG and "findings/browse/" not in en_paths:
-            continue
-        _axes = browse_axes if _lg == DEFAULT_LANG else en_browse_axes
-        _recent = recent_docs if _lg == DEFAULT_LANG else en_recent_docs
-        _emit("findings_browse.html", _mkpage("findings/browse/"),
-            auto_crumbs=[(_tr("홈"), ""), (_tr("지적사항"), "findings/"), (_tr("둘러보기"), None)],
-            browse_axes=_axes,
-            zone_totals=(findings_zone if _lg == DEFAULT_LANG else findings_zone_en),
-            recent_docs=_recent,
-            recent_asof=(docs_data or {}).get("measured_on", ""),
-            # '문서로 찾기' 바로가기도 그 트리에 그 면이 있을 때만 — 한국어 데이터로
-            # 판정하면 영어 화면이 없는 페이지를 가리킨다.
-            has_docs=(bool(docs_data and docs_data.get("documents"))
-                      if _lg == DEFAULT_LANG else "findings/docs/" in en_paths),
-            page_title=_tr("지적사항 둘러보기 · GRM"),
-            nav_active="findings",
-            description=_tr(FINDINGS_BROWSE_DESCRIPTION),
-        )
-
     # 트렌드 대시보드(FIND-1 F3b) — findings 와 동일 이유로 라이브 데이터는 빌드시 고정할
     # 수 없다(집계는 Supabase RPC findings_stats/findings_firm_stats 를 trends.js 가 직접
     # fetch). 서버는 셸(로딩 상태)만 렌더.
     # [1안 메뉴 정리 2026-11-10] 트렌드·실사 결과는 지적사항 존의 탭이다 — 상단 nav 의
     # '트렌드' 탭은 없앴고(nav_active="findings"), 면 전환은 partials/findings_seg.html
-    # 하나가 맡는다(seg_active 가 활성 탭). 데이터 현황·체크리스트는 탭이 아니다(seg_active="").
+    # 하나가 맡는다(seg_active 가 활성 탭). 데이터 현황은 탭이 아니라 경향 줄 끝 링크다(seg_active="coverage").
     # 세 면 모두 trends.html 계열 셸이라 nav_active 는 동일하고, 셸의
     # cfg data-page 로 trends.js 가 "이 면이 그릴 수 있는 것"만 fetch 한다.
     emit("trends.html", page("findings/trends/"),
@@ -6355,7 +6264,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("데이터 현황"), None)],
         page_title=tr("데이터 현황 · GRM"),
         nav_active="findings",
-        seg_active="",
+        seg_active="coverage",
         description=tr(COVERAGE_DESCRIPTION),
     )
 
@@ -7708,7 +7617,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_emit("coverage.html", en_page("findings/coverage/"),
         auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("데이터 현황"), None)],
         page_title=en_tr("데이터 현황 · GRM"),
-        nav_active="findings", seg_active="",
+        nav_active="findings", seg_active="coverage",
         description=en_tr(COVERAGE_DESCRIPTION),
     )
     en_emit("checklist.html", en_page("findings/checklist/"),
@@ -7866,8 +7775,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # robots.txt 와 나란히 둔다(Pages 관례).
     _write(out_dir / "_headers", build_headers_txt())
     written.append("_headers")
-    # _redirects — 별칭 병합으로 잃은 옛 업체 페이지 주소의 301(정본이 있는 것만).
-    _write(out_dir / "_redirects", build_redirects_txt(firm_alias_redirects))
+    # _redirects — 별칭 병합으로 잃은 옛 업체 페이지 주소(정본이 있는 것만)·없앤 화면의 301.
+    _write(out_dir / "_redirects",
+           build_redirects_txt(firm_alias_redirects + list(RETIRED_PAGE_REDIRECTS)))
     written.append("_redirects")
     # llms.txt — AI 어시스턴트용 안내. sitemap 과 같은 입력에서 파생(결정론).
     _write(out_dir / "llms.txt",

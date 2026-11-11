@@ -2461,14 +2461,10 @@
         filtersToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
       });
     }
-    // [FIND-1 M10c] 대시보드 세부지표(3블록 그리드) 접기 — 기본값은 matchMedia 1회 판정
-    // (데스크톱 펼침·≤700px 접힘), 이후는 버튼 클릭으로만 토글.
+    // [FIND-1 M10c → 탭 3묶음 2026-11-11 · 대표 승인] 대시보드 세부지표(3블록 그리드)는 화면 폭과
+    // 무관하게 기본 접힘 — 첫 화면은 검색창이 먼저다. 셸(findings.html)이 이미 접힌 상태로 오고,
+    // 여기서는 버튼 클릭 토글만 단다.
     if (dashToggleBtn && dashGridEl) {
-      var collapsedByDefault = typeof matchMedia === "function" && matchMedia("(max-width:700px)").matches;
-      if (collapsedByDefault) {
-        dashGridEl.classList.add("fnd-dash-grid--collapsed");
-        dashToggleBtn.setAttribute("aria-expanded", "false");
-      }
       dashToggleBtn.addEventListener("click", function () {
         var collapsed = dashGridEl.classList.toggle("fnd-dash-grid--collapsed");
         dashToggleBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");

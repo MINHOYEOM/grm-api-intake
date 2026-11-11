@@ -283,8 +283,6 @@ SINGLE_GOLDENS = [
     ("en/about/index.html", "en_about.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
-    # [2면 분리 2026-08-27] 둘러보기 면 — 위 주석 그대로: 손열거라 여기 없으면 골든 없이 산다.
-    ("findings/browse/index.html", "findings_browse.expected.html"),
     ("findings/trends/index.html", "trends.expected.html"),
     # [존 재편 2026-08-26] 트렌드 존 신설 2면. ★이 목록은 손열거라 새 라우트를 넣는 걸
     #   잊으면 그 페이지는 **골든 없이 살게 된다**(초록인데 미검증). WebZoneIaTest 가
@@ -1679,9 +1677,8 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("이번 주 소식", more)
 
     def test_footer_link_present(self):
-        # [푸터 확정 2026-09-06] 푸터 라벨은 헤더보다 한 겹 더 설명적이다 — 헤더는 이미 그
-        # 화면에 있는 사람이 읽고, 푸터는 아직 무엇인지 모르는 사람이 읽는다.
-        self.assertIn('<a href="../findings/index.html">실사 지적사항</a>', self.html)
+        # [탭 3묶음 2026-11-11] 푸터 콘텐츠 열도 상단 메뉴·탭과 같은 이름 '지적사항'.
+        self.assertIn('<a href="../findings/index.html">지적사항</a>', self.html)
         self.assertNotIn(">이번 주</a>", self.html)
 
     def test_canonical_and_description(self):
@@ -2018,7 +2015,8 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIsNotNone(m)
         text = m.group(1)
         self.assertEqual(text.count("."), 1, f"한 문장이 아닌 것으로 보임: {text!r}")
-        self.assertTrue(text.endswith("모았습니다."), text)
+        # [탭 3묶음 2026-11-11] 설명은 컨셉 한 줄 — 건수는 검색창 아래 작은 한 줄(.fnd-total)로 내렸다.
+        self.assertTrue(text.endswith("찾아봅니다."), text)
 
     def test_review_card_boundary_markers_present(self):
         """[M14] 검토 필요(needs_review) 카드는 article 에 fnd-card--review 클래스가 붙는다.
@@ -2271,13 +2269,13 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function updateFiltersToggleBadge()", js_src)
 
     def test_dashboard_grid_collapse_toggle_present(self):
-        """대시보드는 스탯 줄은 항상 노출, 3블록 그리드만 토글로 접는다(모바일 기본 접힘)."""
-        self.assertIn('id="fnd-dash-toggle"', self.html)
-        self.assertIn('aria-controls="fnd-dash-grid"', self.html)
-        self.assertIn('id="fnd-dash-grid"', self.html)
+        """대시보드는 스탯 줄은 항상 노출, 3블록 그리드만 토글로 접는다.
+        [탭 3묶음 2026-11-11 · 대표 승인] 화면 폭과 무관하게 기본 접힘 — 셸부터 접힌 상태로 낸다."""
+        self.assertIn('id="fnd-dash-toggle" type="button" aria-expanded="false" aria-controls="fnd-dash-grid"', self.html)
+        self.assertIn('<div class="fnd-dash-grid fnd-dash-grid--collapsed" id="fnd-dash-grid">', self.html)
         self.assertIn(".fnd-dash-grid--collapsed{display:none}", self.html)
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn('matchMedia("(max-width:700px)")', js_src)
+        self.assertNotIn('matchMedia("(max-width:700px)")', js_src)
         self.assertIn('classList.toggle("fnd-dash-grid--collapsed")', js_src)
 
     def test_url_sync_uses_replacestate_only_no_pushstate(self):
@@ -3976,7 +3974,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_page_generated(self):
-        self.assertIn("규제 지적사항 트렌드", self.html)
+        self.assertIn(">지적 영역</h1>", self.html)
         self.assertIn("Findings Intelligence", self.html)
 
     def test_cfg_div_env_gated_empty_by_default_with_root(self):
@@ -4020,20 +4018,18 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertEqual(tabs.count("<a "), 5)  # 주간 브리프·지적사항·자료실·용어사전·이용안내
         seg = self.html[self.html.index('<nav class="fnd-seg"'):]
         seg = seg[:seg.index("</nav>")]
-        self.assertIn('href="../../findings/trends/index.html" class="on" aria-current="page">트렌드</a>', seg)
+        self.assertIn('href="../../findings/trends/index.html" class="on" aria-current="page">지적 영역</a>', seg)
 
     def test_footer_link_present(self):
-        # [1안 2026-11-10] 푸터 도구 열은 지적사항 탭과 같은 이름 '트렌드'(종전 콘텐츠 열의 '규제 동향'은 중복이라 뺐다).
-        self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
+        # [탭 3묶음 2026-11-11] 푸터 '지적사항' 열은 탭과 같은 이름 '지적 영역'.
+        self.assertIn('<a href="../../findings/trends/index.html">지적 영역</a>', self.html)
         self.assertNotIn("규제 동향</a>", self.html)
 
     def test_findings_zone_links_to_trends(self):
-        """[2면 분리 2026-08-27] 검색 면의 히어로 링크 행("전체 트렌드 보기")은 세그와
-        함께 정리됐다 — 트렌드 진입은 nav 탭 + 둘러보기 면의 업무별 카드가 승계한다.
-        존 안에서 트렌드로 가는 길이 있는지를 지키는 것이 이 테스트의 본래 목적이다."""
-        browse = (self.single / "findings" / "browse" / "index.html"
-                  ).read_text(encoding="utf-8")
-        self.assertIn('href="../../findings/trends/index.html"', browse)
+        """존 안에서 트렌드로 가는 길 — [탭 3묶음 2026-11-11] 검색 면 탭 위 줄 '경향' 묶음이 연다."""
+        search = (self.single / "findings" / "index.html").read_text(encoding="utf-8")
+        seg = search[search.index('<nav class="fnd-seg"'):]
+        self.assertIn('href="../findings/trends/index.html">경향</a>', seg[:seg.index("</nav>")])
 
     def test_canonical_and_description(self):
         self.assertIn(
@@ -6225,8 +6221,8 @@ class WebChecklistRenderTest(unittest.TestCase):
         # 진입로 셋.
         self.assertIn('<a class="tr-cta-go" href="../../findings/checklist/index.html">',
                       self.trends)
-        self.assertIn('href="../../findings/checklist/index.html">자가점검 체크리스트</a>',
-                      self.trends)          # footer 도구 열
+        self.assertIn('href="../../findings/checklist/index.html">체크리스트</a>',
+                      self.trends)          # footer '지적사항' 열(탭 3묶음 2026-11-11)
         findings = (self.single / "findings" / "index.html").read_text(encoding="utf-8")
         self.assertIn('href="../findings/checklist/index.html"', findings)  # 도구 카드
 
@@ -15146,8 +15142,11 @@ class WebAboutTest(unittest.TestCase):
         """[확정안 2026-09-06] 열 순서 = 서비스 안내 → 콘텐츠 → 도구. 처음 온 사람이 먼저
         묻는 것("여기가 무엇인가")을 앞에 둔다."""
         foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
-        self.assertEqual(re.findall(r"<h5>([^<]+)</h5>", foot), ["서비스 안내", "콘텐츠", "도구"])
+        # [탭 3묶음 2026-11-11] '도구' 열 → '지적사항' 열(탭과 같은 묶음·이름·순서).
+        self.assertEqual(re.findall(r"<h5>([^<]+)</h5>", foot), ["서비스 안내", "콘텐츠", "지적사항"])
         self.assertNotIn("<span>", foot)                            # 클릭 안 되는 라벨 열 0
+        # 클릭 안 되는 라벨은 '지적사항' 열의 묶음 소제목(찾기·경향·점검) 셋뿐이다.
+        self.assertEqual(re.findall(r'<span class="foot-grp">([^<]+)</span>', foot), ["찾기", "경향", "점검"])
         self.assertIn('href="../../about/index.html">서비스 소개</a>', foot)
         self.assertNotIn("index.html#why", foot)                     # 종전 홈 앵커 소개 없음
         self.assertEqual(foot.count("index.html#notice"), 1)        # 같은 앵커 링크 둘 → 하나
@@ -15764,11 +15763,11 @@ class WebZoneIaTest(unittest.TestCase):
         for rel in ("findings/trends/index.html", "findings/inspections/index.html",
                     "findings/coverage/index.html"):
             self.assertIn(rel, self.pages, f"{rel} 미산출")
-        # 데이터 현황은 세그먼트에 자기 탭이 없다(활성 표시도 없다).
+        # [탭 3묶음 2026-11-11] 데이터 현황은 탭이 아니라 '경향' 줄 끝의 작은 링크다 — 그 면에서는
+        # 그 링크가 켜진다(묶음 '경향'도 켜진다).
         cov = self.pages["findings/coverage/index.html"]
-        # [1안 2026-11-10] 트렌드 존 세그는 지적사항 세그(fnd-seg)로 합쳤다.
         self.assertIn('class="fnd-seg"', cov)
-        self.assertNotIn('aria-current="page"', cov)
+        self.assertIn('class="fnd-seg-side on" href="../../findings/coverage/index.html" aria-current="page">데이터 현황</a>', cov)
         # 대신 두 면의 꼬리 각주가 이 페이지를 연다.
         for face in ("findings/trends/index.html", "findings/inspections/index.html"):
             self.assertIn("findings/coverage/index.html", self.pages[face])
@@ -15913,8 +15912,8 @@ class WebZoneIaTest(unittest.TestCase):
 
 # ── 발견 허브 (2026-08-26 — findings 첫 화면 재배열 + 랜딩 데이터 존 진입) ──────
 class WebDiscoveryHubTest(unittest.TestCase):
-    """[2면 분리 2026-08-27] 지적사항 존 — 검색 면(/findings/)과 둘러보기 면
-    (/findings/browse/)의 분업·세그 전환·워딩 규율을 검증한다.
+    """[2면 분리 2026-08-27 → 탭 3묶음 2026-11-11] 지적사항 존 검색 면의 분업·탭·워딩 규율.
+    둘러보기 면은 2026-11-11 대표 승인으로 없앴다(탭 묶음 찾기·경향·점검이 그 역할을 맡는다).
 
     ★왜 갈랐나(사용자 피드백): #811 발견 허브가 목적 카드·최근 문서·축 탐색·상세 검색을
     한 페이지에 쌓아 "너무 많은 정보가 한 페이지에 담겨 잘 못 쓰겠다"는 피드백을 받았다.
@@ -15928,7 +15927,6 @@ class WebDiscoveryHubTest(unittest.TestCase):
         _build_single(cls.single)
         cls.html = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
         cls.en_html = (cls.single / "en" / "findings" / "index.html").read_text(encoding="utf-8")
-        cls.browse = (cls.single / "findings" / "browse" / "index.html").read_text(encoding="utf-8")
         cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
         cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
         cls.llms = (cls.single / "llms.txt").read_text(encoding="utf-8")
@@ -15948,31 +15946,15 @@ class WebDiscoveryHubTest(unittest.TestCase):
         self.assertLess(self.html.index('class="fnd-seg"'),
                         self.html.index('id="fnd-tools"'))
 
-    def test_browse_face_carries_the_hub(self):
-        """둘러보기 면 = 업무별 바로가기 → 최근 공개 문서 → 축별 탐색."""
-        i_purpose = self.browse.index('id="fnd-purpose"')
-        i_recent = self.browse.index('id="fnd-recent"')
-        self.assertLess(i_purpose, i_recent)
-        self.assertIn("축별 탐색", self.browse)
-        self.assertNotIn('id="fnd-tools"', self.browse,
-                         "둘러보기 면에 검색 툴바가 있으면 다시 한 페이지 과밀로 돌아간다")
-
-    def test_seg_nav_on_both_faces_with_correct_active(self):
-        for page, face in ((self.html, "검색"), (self.browse, "둘러보기")):
-            self.assertIn('class="fnd-seg"', page)
+    def test_seg_on_search_face_with_correct_active(self):
+        self.assertIn('class="fnd-seg"', self.html)
         self.assertIn('class="on" aria-current="page">검색</a>', self.html)
-        self.assertIn('class="on" aria-current="page">둘러보기</a>', self.browse)
+        self.assertIn('class="on" aria-current="true">찾기</a>', self.html)
 
-    def test_purpose_cards_link_every_tool_route(self):
-        # 도달성 — 상시 도구 라우트가 전부 카드 안에 남아야 한다(#807 이전으로 후퇴 금지).
-        for path in ("findings/checklist/index.html", "findings/firm/index.html",
-                     "findings/inspector/index.html", "findings/inspections/index.html",
-                     "findings/coverage/index.html", "findings/trends/index.html"):
-            self.assertIn(f'href="../../{path}"', self.browse, path)
-
-    def test_browse_face_registered_in_sitemap_and_llms(self):
-        self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/browse/</loc>", self.sitemap)
-        self.assertIn("/findings/browse/", self.llms)
+    def test_browse_face_retired(self):
+        self.assertFalse((self.single / "findings" / "browse").exists())
+        self.assertNotIn("/findings/browse/", self.sitemap)
+        self.assertNotIn("/findings/browse/", self.llms)
 
     # ── 워딩 규율(사용자 피드백 2026-08-27) ─────────────────────────────────
     def test_no_feature_absence_advertisement(self):
@@ -15981,31 +15963,11 @@ class WebDiscoveryHubTest(unittest.TestCase):
         ★정책(037 순위 금지)과 그 부재의 광고는 다르다 — 정책은 RPC 게이트가 지키고,
         화면 문구는 있는 것을 설명한다. 측정 정직성 문구(건수의 의미)는 별개로 유지된다
         (inspector 면 가드가 따로 검증)."""
-        for page in (self.html, self.browse):
-            self.assertNotIn("제공하지 않습니다", page)
+        self.assertNotIn("제공하지 않습니다", self.html)
         insp = (WEB_DIR / "templates" / "inspector.html").read_text(encoding="utf-8")
         self.assertNotIn("순위나 비교를 제공하지 않습니다", insp)
         # 측정 정직성은 유지 — 건수를 평가 지표로 오독하는 것을 막는 문구.
         self.assertIn("실사관에 대한 평가 지표가 아닙니다", insp)
-
-    def test_hub_copy_is_professional_not_conversational(self):
-        """구어투 제목이 돌아오지 않는다 — "어떤 일로 오셨나요?" → "업무별 바로가기"."""
-        self.assertIn("업무별 바로가기", self.browse)
-        for casual in ("어떤 일로 오셨나요", "알면 됩니다", "내려가셔도 됩니다"):
-            self.assertNotIn(casual, self.browse)
-
-    def test_recent_docs_from_canon_newest_first(self):
-        # 최근 공개 문서 5건 — 정본과 같은 정렬(공개일 desc, slug 로 결정론 타이브레이크).
-        docs = json.loads(render.FINDINGS_DOCS_FILE.read_text(encoding="utf-8"))["documents"]
-        ordered = sorted(docs, key=lambda d: (d["published_date"], d["slug"]),
-                         reverse=True)[:5]
-        hrefs = re.findall(r'class="fnd-rc-row" href="\.\./\.\./findings/doc/([^/"]+)/"',
-                           self.browse)
-        self.assertEqual(hrefs, [d["slug"] for d in ordered])
-
-    def test_recent_section_states_date_semantics(self):
-        # 공개일≠실사일 — 숫자 해석에 필요한 정직성 고지는 워딩 스윕에서도 살아남는다.
-        self.assertIn("문서가 공개된 날", self.browse)
 
     # ── [검색엔진 인덱싱 2026-09-11] 검색 면(#fnd-results) 정적 목록 24건 ──────
     # ★왜: findings.js 가 findings_search RPC 로 채우기 전까지 #fnd-results 는 빈
@@ -16141,7 +16103,7 @@ class WebDiscoveryHubTest(unittest.TestCase):
         self.assertIn('id="records"', self.landing)
         self.assertIn(f"문서 {docs_fmt}건", self.landing)
         self.assertIn(f"지적사항 {find_fmt}건", self.landing)
-        for tpl in ("landing.html", "findings.html", "findings_browse.html"):
+        for tpl in ("landing.html", "findings.html"):
             src = (WEB_DIR / "templates" / tpl).read_text(encoding="utf-8")
             self.assertIsNone(re.search(r"\d{1,3},\d{3}\s*건", src),
                               f"{tpl}: 건수 하드코딩 금지 — render 가 정본에서 계산해야")
@@ -16186,7 +16148,7 @@ class WebDeficiencyExamplesEntryTest(unittest.TestCase):
     사례 두 화면은 둘러보기 카드 안 링크 하나뿐이라 대표가 못 찾았다 — 홈 #records 카드·
     지적사항 세그·푸터 도구 열에 입구를 낸다(ko·en 공통, 면이 선 빌드에서만)."""
 
-    ROUTES = (("findings/citations/", "FDA 지적 조항", "FDA citations"),
+    ROUTES = (("findings/citations/", "지적 조항", "Cited clauses"),
               ("findings/examples/", "지적 사례", "Deficiency examples"))
 
     @classmethod
@@ -16249,17 +16211,19 @@ class WebDeficiencyExamplesEntryTest(unittest.TestCase):
     def test_footer_tools_column_links_both(self):
         for html, lang in ((self.landing, "ko"), (self.en_landing, "en"), (self.search, "ko")):
             foot = html[html.index('<div class="foot">'):html.index('<div class="foot-legal">')]
-            tools = foot[foot.index("<h5>" + ("도구" if lang == "ko" else "Tools")):]
+            tools = foot[foot.index("<h5>" + ("지적사항" if lang == "ko" else "Findings")):]
             tools = tools[:tools.index("</div>")]
             for path, ko, en in self.ROUTES:
                 with self.subTest(lang=lang, path=path):
                     self.assertRegex(tools, rf'findings/{path[9:]}index.html">{re.escape(ko if lang == "ko" else en)}</a>')
 
     def test_en_findings_seg_has_shortcuts(self):
-        seg = self.en_search[self.en_search.index('<nav class="fnd-seg"'):]
-        seg = seg[:seg.index("</nav>")]
+        """[탭 3묶음] 영어판도 같은 묶음 — 지적 조항은 '경향', 지적 사례는 '점검' 줄에 선다."""
         for path, _, en in self.ROUTES:
-            self.assertIn(f'{path}index.html">{en}</a>', seg)
+            page = (self.single / "en" / path / "index.html").read_text(encoding="utf-8")
+            seg = page[page.index('<nav class="fnd-seg"'):]
+            seg = seg[:seg.index("</nav>")]
+            self.assertIn(f'{path}index.html" class="on" aria-current="page">{en}</a>', seg)
 
 
 # ── [진입점 3종 2026-08-31] 실사관 프로파일까지 가는 길 ─────────────────────────
@@ -16276,7 +16240,6 @@ class WebInspectorEntryPointsTest(unittest.TestCase):
         cls.single = cls._tmp / "single"
         _build_single(cls.single)
         cls.search = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
-        cls.browse = (cls.single / "findings" / "browse" / "index.html").read_text(encoding="utf-8")
         cls.inspector = (cls.single / "findings" / "inspector" / "index.html").read_text(encoding="utf-8")
 
     @classmethod
@@ -16288,48 +16251,28 @@ class WebInspectorEntryPointsTest(unittest.TestCase):
         start = html.index('<nav class="fnd-seg"')
         return html[start:html.index("</nav>", start)]
 
-    def test_all_three_pages_carry_the_same_three_tabs(self):
-        # [진입점 2026-11-09] 면 탭 3개 뒤에 지적 조항·지적 사례 바로가기 — 페이지가 선
-        # 빌드에서만 붙는다(없는 페이지로 보내지 않는다).
-        extra = [(p, t) for p, t in (("findings/citations/", "FDA 지적 조항"),
-                                     ("findings/import-alerts/", "FDA 수입경보"),
-                                     ("findings/examples/", "지적 사례"))
-                 if (self.single / p / "index.html").is_file()]
-        self.assertEqual(len(extra), 3, "커밋 정본이 있으면 세 화면이 모두 선다")
-        for label, html in (("search", self.search), ("browse", self.browse),
-                             ("inspector", self.inspector)):
+    def test_search_and_inspector_carry_the_same_find_tabs(self):
+        """[탭 3묶음 2026-11-11] 실사관은 '찾기' 묶음의 화면 — 검색·실사관 두 면에서 같은 줄이다."""
+        want = ["검색", "문서", "분류", "업체", "실사관"]
+        for label, html in (("search", self.search), ("inspector", self.inspector)):
             with self.subTest(page=label):
                 seg = self._seg_block(html)
-                # [1안 2026-11-10] 트렌드·실사 결과 탭이 합류 — 5 + 바로가기.
-                self.assertEqual(seg.count("<a "), 5 + len(extra), f"{label} 페이지 세그먼트 탭 수")
-                for text in ("검색", "둘러보기", "트렌드", "실사 결과", "실사관"):
-                    self.assertIn(f">{text}</a>", seg, f"{label} 페이지에 '{text}' 탭 없음")
-                for path, text in extra:
-                    self.assertIn(f'findings/{path[len("findings/"):]}index.html">{text}</a>', seg,
-                                  f"{label} 페이지에 '{text}' 바로가기 없음")
+                sub = seg[seg.index('<div class="fnd-seg-s">'):]
+                self.assertEqual(re.findall(r'>([^<>]+)</a>', sub), want)
 
     def test_each_page_marks_only_itself_active(self):
-        cases = (
-            ("search", self.search, "검색"),
-            ("browse", self.browse, "둘러보기"),
-            ("inspector", self.inspector, "실사관"),
-        )
-        for label, html, own_text in cases:
+        for label, html, own_text in (("search", self.search, "검색"),
+                                      ("inspector", self.inspector, "실사관")):
             with self.subTest(page=label):
                 seg = self._seg_block(html)
-                self.assertIn(f'class="on" aria-current="page">{own_text}</a>', seg,
-                               f"{label} 페이지에서 자기 탭이 활성 표시가 아니다")
-                # 활성 표시는 정확히 1개(다른 두 탭은 활성이 아니어야 한다).
-                self.assertEqual(seg.count('class="on"'), 1,
-                                  f"{label} 페이지에 활성 탭이 2개 이상이거나 없다")
+                self.assertIn(f'class="on" aria-current="page">{own_text}</a>', seg)
+                self.assertEqual(seg.count('aria-current="page"'), 1)
+                self.assertEqual(seg.count('aria-current="true"'), 1)
 
     def test_inspector_seg_link_paths_match_sibling_depth(self):
-        """inspector.html 은 findings/browse 와 같은 깊이(rel_root="../../")다 — 세그
-        안 링크 경로가 findings_browse.html 이 쓰는 것과 동일해야 한다(둘 다 같은
-        파셜을 그대로 include 하므로, rel_root 배선이 어긋나면 여기서 갈린다)."""
+        """inspector.html 은 rel_root="../../" — 탭 링크가 그 깊이로 풀려야 한다."""
         seg = self._seg_block(self.inspector)
         self.assertIn('href="../../findings/index.html"', seg)
-        self.assertIn('href="../../findings/browse/index.html"', seg)
         self.assertIn('href="../../findings/inspector/index.html"', seg)
 
     def test_seg_appears_before_ip_lookup_state(self):
@@ -16338,41 +16281,11 @@ class WebInspectorEntryPointsTest(unittest.TestCase):
         self.assertLess(self.inspector.index('class="fnd-seg"'),
                          self.inspector.index('id="ip-lookup"'))
 
-    # ── (2) 검색 화면 상단 안내 스트립 ───────────────────────────────────────────
-    def test_strip_present_on_search_face_only(self):
-        self.assertIn('class="fnd-insp-cta"', self.search)
-        self.assertNotIn('class="fnd-insp-cta"', self.browse,
-                          "둘러보기 면에는 스트립을 넣지 않는다(스펙 §2) — 세그 탭만으로 충분")
-
-    def test_strip_content_and_link_path(self):
-        start = self.search.index('class="fnd-insp-cta"')
-        block = self.search[start:self.search.index("</aside>", start)]
-        self.assertIn("실사관으로 찾기", block)
-        self.assertIn("ti-user-search", block)
-        self.assertIn(
-            "FDA 483 문서에 서명한 실사관이 어떤 분야를 확인했고 어느 제조소를 다녀갔는지 "
-            "문서 단위로 모아 봅니다.", block)
-        self.assertIn('href="../findings/inspector/index.html"', block,
-                       "검색 화면 rel_root는 '../'다")
-        self.assertIn("실사관 조회", block)
-        self.assertIn("ti-arrow-right", block)
-
-    def test_strip_sits_directly_above_fnd_tools(self):
-        i_strip = self.search.index('class="fnd-insp-cta"')
-        i_tools = self.search.index('<section class="fnd-tools"')
-        self.assertLess(i_strip, i_tools)
-        # "바로 위" — 스트립 닫힘과 툴바 시작 사이에 다른 aside/section 이 끼어들지 않는다.
-        i_strip_close = self.search.index("</aside>", i_strip) + len("</aside>")
-        between = self.search[i_strip_close:i_tools]
-        self.assertNotIn("<section", between)
-        self.assertNotIn("<aside", between)
-
-    def test_strip_css_is_page_scoped_not_in_grm_css(self):
-        """grm.css 무접촉 — 스타일은 findings.html 자체 <style> 안에만 있어야 한다."""
-        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
-        self.assertNotIn(".fnd-insp-cta", css)
+    # ── (2) 검색 화면 상단 안내 스트립 — [탭 3묶음 2026-11-11] 없앴다(탭 '찾기 › 실사관'이 대신) ──
+    def test_strip_retired(self):
+        self.assertNotIn('class="fnd-insp-cta"', self.search)
         template = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
-        self.assertIn(".fnd-insp-cta{", template)
+        self.assertNotIn(".fnd-insp-cta{", template)
 
 
 # ── P1 해석층 (2026-08-27 — 마이그 065 + 프로파일 3종 개편) ─────────────────────
@@ -17456,7 +17369,7 @@ class WebPagePathTest(unittest.TestCase):
         cases = {
             "": ("", "index.html"),
             "archive/": ("../", "archive/index.html"),
-            "findings/browse/": ("../../", "findings/browse/index.html"),
+            "findings/docs/": ("../../", "findings/docs/index.html"),
             "findings/doc/hc-1/": ("../../../", "findings/doc/hc-1/index.html"),
             "findings/c/x/fda/": ("../../../../", "findings/c/x/fda/index.html"),
         }
@@ -17475,11 +17388,11 @@ class WebPagePathTest(unittest.TestCase):
     def test_english_tree_adds_prefix_and_splits_roots(self):
         """영어 트리: 출력·canonical 에는 `en/` 이 붙고, rel_root 는 **언어 트리 루트**를,
         asset_root 는 **사이트 루트**를 가리킨다(한 단계 차이)."""
-        pp = render.PagePath("findings/browse/", "en")
+        pp = render.PagePath("findings/docs/", "en")
         self.assertEqual(pp.prefix, "en/")
-        self.assertEqual(pp.site_path, "en/findings/browse/")
-        self.assertEqual(pp.out_file, "en/findings/browse/index.html")
-        self.assertEqual(pp.canonical, f"{render.SITE_BASE_URL}/en/findings/browse/")
+        self.assertEqual(pp.site_path, "en/findings/docs/")
+        self.assertEqual(pp.out_file, "en/findings/docs/index.html")
+        self.assertEqual(pp.canonical, f"{render.SITE_BASE_URL}/en/findings/docs/")
         self.assertEqual(pp.depth, 3)
         self.assertEqual(pp.rel_root, "../../")        # → /en/
         self.assertEqual(pp.asset_root, "../../../")   # → /
@@ -19622,7 +19535,7 @@ class WebEnTreeTest(unittest.TestCase):
             quiz_en=render.load_quiz_bank(),
             about_en=render.load_guide(render.ABOUT_EN_FILE))
         if cls.en_docs:
-            cls.expected |= {"findings/docs/", "findings/browse/"}
+            cls.expected |= {"findings/docs/"}
             cls.expected |= {f"findings/docs/{d['agency'].lower()}"
                              f"/{d['published_date'][:4]}/" for d in cls.en_docs}
         cls.expected_doc_paths = {f"findings/doc/{d['slug']}/" for d in cls.en_docs}
@@ -19959,77 +19872,6 @@ class WebEnTreeTest(unittest.TestCase):
                 checked += 1
         self.assertGreater(checked, 100, "검사한 링크가 너무 적다 — 추출이 깨졌나?")
 
-    def test_en_browse_cards_cover_every_axis_the_english_tree_actually_has(self):
-        """★둘러보기 진입 카드 = **그 트리에 실제로 난 축 전부**, 그 이상도 이하도 아니다.
-
-        종전에는 영어 트리에만 "문서 축 하나"를 손으로 박아 뒀다. 그 뒤 분류·국가·기관
-        모음이 영어로 실제로 생겼는데도(색인 3장 + 하위 35장) 카드는 1장에 머물렀다 —
-        실측 2026-09-05: 한국어 4장 / 영어 1장. 손목록은 트리가 자라는 순간 낡는다
-        (README 불변식 #16). 그래서 기대값을 여기서도 손으로 적지 않고 **렌더가 보는
-        같은 레지스트리(`FACET_AXES`) + 같은 선언(`expected`)** 에서 파생한다.
-        """
-        page = self.en.get("en/findings/browse/index.html")
-        if page is None:
-            self.skipTest("영어 둘러보기 면이 없는 빌드")
-        # 축 후보 = 모음 축 레지스트리 + 문서 축. 실제로 낼지는 선언이 정한다.
-        candidates = ({f"findings/{m['path']}/" for m in render.FACET_AXES.values()}
-                      | {"findings/docs/"})
-        want = candidates & self.expected
-        got = set(re.findall(r'<a class="fnd-browse-card" href="\.\./\.\./([^"]+)"', page))
-        self.assertEqual(got, want,
-                         f"영어 둘러보기 카드가 선언과 다르다: 빠짐 {sorted(want - got)} /"
-                         f" 없는 면을 가리킴 {sorted(got - want)}")
-        self.assertGreaterEqual(len(got), 2,
-                                "카드가 1장 이하다 — 축이 실제로 있는데 못 보고 있다")
-        # 카드가 가리키는 면이 정말 났는지 파일로 확인한다(선언과 산출이 갈라지는 자리).
-        for href in sorted(got):
-            self.assertIn(f"en/{href}index.html", self.pages, f"없는 면을 가리킨다: {href}")
-
-    def test_browse_axis_cards_drop_axes_the_tree_does_not_have(self):
-        """게이트를 **직접** 물어본다 — 렌더 결과로만 보면 두 트리의 축이 우연히 같은
-        동안에는 게이트가 빠져도 초록이고, 정작 갈라지는 날 처음 알게 된다.
-
-        `allowed` 는 "그 언어 트리에 실제로 난 라우트"다. 거기 없는 축은 카드가 되면
-        안 된다(없는 페이지로 보내는 링크는 무링크보다 나쁘다)."""
-        data = {"axes": [{"axis": "category", "items": [{"slug": "a"}]},
-                         {"axis": "country", "items": [{"slug": "b"}]},
-                         {"axis": "agency", "items": []}]}
-        # 거르지 않으면(한국어 트리) 항목이 있는 두 축 + 문서 축.
-        allc = render.browse_axis_cards(data, docs_present=True, doc_count=7)
-        self.assertEqual([c["href"] for c in allc],
-                         ["findings/c/", "findings/country/", "findings/docs/"])
-        self.assertIn("7", allc[-1]["blurb"], "문서 건수가 카드에 실리지 않았다")
-        # 국가 축과 문서 축이 그 트리에 없으면 카드도 없다.
-        gated = render.browse_axis_cards(data, docs_present=True, doc_count=7,
-                                         allowed={"findings/c/"})
-        self.assertEqual([c["href"] for c in gated], ["findings/c/"])
-        # 항목이 0인 축은 선언에 있어도 카드가 되지 않는다(빈 페이지로 보내지 않는다).
-        self.assertEqual(
-            render.browse_axis_cards(data, docs_present=False, doc_count=0,
-                                     allowed={"findings/agency/"}), [])
-        # 라벨은 언어를 탄다 — 뷰가 번역해 넘기고 템플릿은 그대로 찍는다(불변식 #13).
-        en = render.browse_axis_cards(
-            data, docs_present=False, doc_count=0,
-            tr=grm_i18n.Translator("en", grm_i18n.load_catalog("en")))
-        self.assertEqual([c["title"] for c in en],
-                         ["Findings by category", "Findings by country"])
-        for card in en:
-            self.assertIsNone(re.search("[가-힣]", card["title"] + card["blurb"]),
-                              f"영어 카드에 한글: {card}")
-
-    def test_browse_cards_never_leave_their_own_language_tree(self):
-        """두 트리 모두 — 진입 카드는 자기 트리 안의 면만 가리킨다. 한국어 카드가
-        영어 전용 축을 가리키거나 그 반대가 되면 그대로 404 다."""
-        for prefix, rel in (("", "findings/browse/index.html"),
-                            ("en/", "en/findings/browse/index.html")):
-            page = self.pages.get(rel)
-            if page is None:
-                continue
-            for href in re.findall(
-                    r'<a class="fnd-browse-card" href="\.\./\.\./([^"]+)"', page):
-                self.assertIn(f"{prefix}{href}index.html", self.pages,
-                              f"{rel} 의 카드가 없는 면을 가리킨다: {href}")
-
     #: nav 라벨 → 그 섹션의 경로. **뜨는지 여부는 손으로 적지 않는다** — 아래에서
     #: 선언(`expected`)에 있으면 떠야 하고 없으면 뜨면 안 된다로 뒤집어 본다.
     NAV_SECTIONS = (("Weekly brief", "archive/"), ("Findings", "findings/"),
@@ -20182,7 +20024,7 @@ class WebEnTreeTest(unittest.TestCase):
             self.skipTest("두 모집단의 값이 같아 대조가 성립하지 않는다")
         ko_n = f"{ko['totals']['findings']:,}"
         en_n = f"{en['totals']['findings']:,}"
-        for rel in ("en/index.html", "en/findings/index.html", "en/findings/browse/index.html"):
+        for rel in ("en/index.html", "en/findings/index.html"):
             html = self.pages.get(rel)
             if html is None:
                 continue
@@ -20196,9 +20038,7 @@ class WebEnTreeTest(unittest.TestCase):
         ko = render.load_findings_facets()
         en = render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
         for rel, data in (("index.html", ko), ("findings/index.html", ko),
-                          ("findings/browse/index.html", ko),
-                          ("en/index.html", en), ("en/findings/index.html", en),
-                          ("en/findings/browse/index.html", en)):
+                          ("en/index.html", en), ("en/findings/index.html", en)):
             html = self.pages.get(rel)
             if html is None or not data or not data.get("measured_on"):
                 continue
@@ -20206,15 +20046,12 @@ class WebEnTreeTest(unittest.TestCase):
 
     def test_counts_with_a_different_denominator_say_so(self):
         """정의가 다른 수는 통일하지 않는다 — 대신 분모를 적는다. '문서로 찾기'의 수는
-        개별 페이지를 만든 문서(지적 3건 이상 + 발행일)이지 보유 문서 전량이 아니다."""
-        browse = self.pages.get("findings/browse/index.html")
-        if browse is None:
-            self.skipTest("둘러보기 면 없음")
-        docs = render.load_findings_docs()
-        if not (docs and docs.get("documents")):
-            self.skipTest("문서 정본 없음")
-        self.assertIn("지적이 3건 이상이고 발행일이 있는", browse)
-        self.assertIn("보유 문서 전량은 아닙니다", browse)
+        개별 페이지를 만든 문서(지적 3건 이상 + 발행일)이지 보유 문서 전량이 아니다.
+        [탭 3묶음 2026-11-11] 이 고지를 싣던 둘러보기 카드는 없앴다 — 문서 면 자체의 각주가 진다."""
+        page = self.pages.get("findings/docs/index.html")
+        if page is None:
+            self.skipTest("문서 면 없음")
+        self.assertIn("지적 3건 이상", page)
 
     def test_glossary_case_count_discloses_its_as_of_date(self):
         """사례 건수는 주 1회 스냅샷이고 누르면 나오는 검색은 오늘 값이라 어긋난다

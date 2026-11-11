@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=d658e371" defer></script>
+<script src="/assets/i18n-en.js?v=f4ef4e14" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -51,36 +51,45 @@
 
 <main><div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
-    <h1 class="reveal" style="animation-delay:.08s">Findings search</h1><p class="reveal" style="animation-delay:.14s">24,285 findings (as of 2026-11-03) extracted sentence by sentence from 5,214 FDA 483, Warning Letter, Health Canada inspection, MFDS, and EU/UK GMP documents.</p>
+    <h1 class="reveal" style="animation-delay:.08s">Findings</h1><p class="reveal" style="animation-delay:.14s">Search what regulators worldwide cited at pharmaceutical sites, in the original wording.</p>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="" data-key="" data-root="../" data-asset-root="../../" hidden></div>
 <nav class="fnd-seg" aria-label="Findings views">
-  <a href="../findings/index.html" class="on" aria-current="page">Search</a>
-  <a href="../findings/browse/index.html">Explore</a>
-  <a href="../findings/trends/index.html">Trends</a>
-  <a href="../findings/inspections/index.html">Inspection outcomes</a>
-  <a href="../findings/citations/index.html">FDA citations</a>
-  <a href="../findings/import-alerts/index.html">FDA Import Alert</a>
-  <a href="../findings/examples/index.html">Deficiency examples</a>
-  <a href="../findings/inspector/index.html">Inspectors</a>
-</nav>
-<style>
-.fnd-seg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 34px;padding-bottom:0;border-bottom:1px solid var(--line)}
-.fnd-seg a{display:inline-block;padding:9px 16px 11px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
-.fnd-seg a:hover{color:var(--ink)}
-.fnd-seg a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--coral)}
-.fnd-seg a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
-@media(max-width:520px){.fnd-seg a{padding:9px 11px 11px;font-size:13.5px}}
+  <div class="fnd-seg-g">
+    <a href="../findings/index.html" class="on" aria-current="true">Find</a>
+    <a href="../findings/trends/index.html">Patterns</a>
+    <a href="../findings/examples/index.html">Check</a>
+  </div>  <div class="fnd-seg-s">
+    <a href="../findings/index.html" class="on" aria-current="page">Search</a>    <a href="../findings/docs/index.html">Documents</a>    <a href="../findings/c/index.html">Categories</a>    <span class="fnd-seg-div" aria-hidden="true"></span>
+    <a href="../findings/firm/index.html">Companies</a>
+    <a href="../findings/inspector/index.html">Inspectors</a>
+  </div></nav><style>
+.fnd-seg{margin:0 0 30px}
+.fnd-seg-g{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.fnd-seg-g a{display:inline-block;padding:9px 18px 11px;font-size:15px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
+.fnd-seg-g a:hover{color:var(--ink)}
+.fnd-seg-g a.on{color:var(--ink);font-weight:700;border-bottom-color:var(--coral)}
+.fnd-seg-s{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:12px}
+.fnd-seg-s a{flex:none;font-size:14px;padding:5px 14px;border-radius:999px;color:var(--muted);border:1px solid var(--line);transition:color var(--tr),border-color var(--tr)}
+.fnd-seg-s a:hover{color:var(--ink);border-color:var(--line-2)}
+.fnd-seg-s a.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.fnd-seg-s .fnd-seg-side{margin-left:auto;border:0;padding:5px 0;font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
+.fnd-seg-s .fnd-seg-side.on{background:none;color:var(--ink)}
+.fnd-seg-div{flex:none;width:1px;height:18px;background:var(--line-2);margin:0 4px}
+.fnd-seg a:focus-visible,.fnd-views a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}.fnd-views{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--rad-s);overflow:hidden;margin:-12px 0 24px;font-size:13.5px}
+.fnd-views a{padding:6px 14px;color:var(--muted);border-right:1px solid var(--line-2)}
+.fnd-views a:last-child{border-right:0}
+.fnd-views a:hover{color:var(--ink)}
+.fnd-views a.on{background:var(--soft);color:var(--ink);font-weight:600}
+@media(max-width:520px){
+  .fnd-seg-g a{flex:1;text-align:center;padding:9px 4px 11px}
+  .fnd-seg-s{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-22px;padding-right:22px}
+  .fnd-seg-s::-webkit-scrollbar{display:none}
+  .fnd-seg-s .fnd-seg-side{margin-left:6px}
+}
 </style>
-
-    <p class="fnd-lead">Search by company name, document number, section, or wording, and narrow by source, category, period, or country.</p><aside class="fnd-insp-cta" aria-label="About inspector lookup">
-      <div class="fnd-insp-cta-h">
-        <span class="fnd-insp-cta-k"><i class="ti ti-user-search" aria-hidden="true"></i>Find by inspector</span>
-        <span class="fnd-insp-cta-sum">See, document by document, which areas the inspectors who signed FDA 483s examined and which sites they visited.</span>
-        <a class="fnd-insp-cta-go" href="../findings/inspector/index.html">Inspector lookup <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-      </div>
-    </aside><section class="fnd-tools" id="fnd-tools" aria-label="Search and filters">
+<section class="fnd-tools" id="fnd-tools" aria-label="Search and filters">
       <div class="fnd-search">
         <i class="ti ti-search" aria-hidden="true"></i>
         <input id="fnd-q" type="text" placeholder="Search company, document number, section, or text" autocomplete="off" aria-label="Findings search" />
@@ -102,10 +111,14 @@
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>      <p class="fnd-textonlynote" id="fnd-textonlynote" hidden></p>
       <p class="fnd-langnote" id="fnd-langnote" hidden></p>
+    </section>    <p class="fnd-total">5,214 documents · 24,285 findings · as of 2026-11-03</p><section class="fnd-mine" id="fnd-mine" aria-label="Recently published in my scope" hidden>
+      <h2 class="fnd-mine-h">Recently published in my scope</h2>
+      <p class="fnd-mine-p" id="fnd-mine-sub"></p>
+      <div class="fnd-rc-list" id="fnd-mine-list"></div>
     </section><section class="fnd-dash" id="fnd-dash" aria-label="Findings dashboard" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
-      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">Details<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
-      <div class="fnd-dash-grid" id="fnd-dash-grid">
+      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="false" aria-controls="fnd-dash-grid">Details<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
+      <div class="fnd-dash-grid fnd-dash-grid--collapsed" id="fnd-dash-grid">
         <div class="fnd-dash-block">
           <h2 class="fnd-dash-h">Category distribution<span class="fnd-dash-unit">by findings</span></h2>
           <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
@@ -164,21 +177,11 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    balance 가 아니라 pretty: balance 는 두 줄 길이를 맞추려고 한 줄로 들어갈 문장도 굳이
    쪼갠다. */
 .page-head p{max-width:none;text-wrap:pretty}
-/* 검색 리드 한 줄 — 세그 아래·툴바 위. */
-.fnd-lead{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 20px;max-width:760px;word-break:keep-all}
-/* [실사관 진입점 2026-08-31] 상단 안내 스트립 — archive.html/brief.html 의 .arc-lib*
-   규칙과 같은 결(soft 배경+테두리+라운드, 머리글/설명/링크 3분할)을 옮겨오되 이 스트립엔
-   목록(.arc-lib-l)이 없어 클래스는 새로 둔다(fnd-insp-cta) — grm.css 는 무접촉. */
-.fnd-insp-cta{margin:0 0 22px;padding:13px 18px 12px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
-.fnd-insp-cta-h{display:flex;align-items:center;gap:8px 13px;flex-wrap:wrap}
-.fnd-insp-cta-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}
-.fnd-insp-cta-k .ti{font-size:15px;color:var(--coral-2)}
-.fnd-insp-cta-sum{flex:1;min-width:0;font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
-.fnd-insp-cta-go{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
-.fnd-insp-cta-go:hover{text-decoration:underline}
-.fnd-insp-cta-go .ti{font-size:14px;transition:transform .16s var(--ease)}
-.fnd-insp-cta-go:hover .ti{transform:translateX(3px)}
-@media (max-width:640px){ .fnd-insp-cta{padding:12px 14px 11px} .fnd-insp-cta-sum{flex-basis:100%} }
+/* [탭 3묶음] 건수 한 줄·내 범위의 최근 공개 */
+.fnd-total{font-size:12.5px;color:var(--muted);margin:-6px 2px 18px}
+.fnd-mine{margin:0 0 26px}
+.fnd-mine-h{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0;font-weight:600}
+.fnd-mine-p{font-size:13.5px;line-height:1.7;color:var(--muted);margin:6px 0 10px}
 /* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
 .fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
 /* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */
@@ -482,7 +485,8 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 <style>
 .foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}
 .foot .b1 .foot-srclink:hover{color:#fff;border-bottom-color:rgba(255,255,255,.35)}
-.foot .b1 .foot-srclink .ti{font-size:14px;line-height:1}
+.foot .b1 .foot-srclink .ti{font-size:14px;line-height:1}.foot .foot-fnd .foot-grp{font-size:12px;color:#fff;opacity:.6;padding:10px 0 2px}
+.foot .foot-fnd .foot-grp:first-of-type{padding-top:0}
 .foot-copy .foot-policy a{margin-left:12px;color:inherit;text-decoration:underline}
 .foot-copy .foot-contact{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
@@ -532,8 +536,8 @@ main{word-break:keep-all;overflow-wrap:anywhere}
       <p>A free information service on GMP and quality regulation for medicinal products, in Korean and English.</p>
       <a class="foot-srclink" href="../findings/coverage/index.html">Where the information comes from <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
     <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../index.html#notice">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
-    <div><h5>Content</h5><a href="../news/index.html">Recent regulatory news</a><a href="../findings/index.html">Inspection findings</a><a href="../library/index.html">Library</a><a href="../glossary/index.html">Glossary</a><a href="../quiz/index.html">Weekly quiz</a></div>
-    <div><h5>Tools</h5><a href="../findings/trends/index.html">Trends</a><a href="../findings/inspections/index.html">Inspection outcomes</a><a href="../findings/citations/index.html">FDA citations</a><a href="../findings/examples/index.html">Deficiency examples</a><a href="../findings/inspector/index.html">Inspectors</a><a href="../findings/checklist/index.html">Self-inspection checklist</a><a href="../findings/firm/index.html">Company lookup</a><a href="../findings/docs/index.html">Browse by document</a></div>
+    <div><h5>Content</h5><a href="../news/index.html">Recent regulatory news</a><a href="../findings/index.html">Findings</a><a href="../library/index.html">Library</a><a href="../glossary/index.html">Glossary</a><a href="../quiz/index.html">Weekly quiz</a></div>
+    <div class="foot-fnd"><h5>Findings</h5><span class="foot-grp">Find</span><a href="../findings/index.html">Search</a><a href="../findings/docs/index.html">Documents</a><a href="../findings/c/index.html">Categories</a><a href="../findings/firm/index.html">Companies</a><a href="../findings/inspector/index.html">Inspectors</a><span class="foot-grp">Patterns</span><a href="../findings/trends/index.html">Top areas</a><a href="../findings/citations/index.html">Cited clauses</a><a href="../findings/inspections/index.html">Inspection outcomes</a><span class="foot-grp">Check</span><a href="../findings/examples/index.html">Deficiency examples</a><a href="../findings/checklist/index.html">Checklist</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
@@ -590,7 +594,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e470de1f" defer></script>
-<script src="../../assets/findings.js?v=c44f5dc6" defer></script>
+<script src="../../assets/findings.js?v=cfdc7eab" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

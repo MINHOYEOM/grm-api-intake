@@ -32,7 +32,7 @@ ABSOLUTE_CLAIM = "실사한 날이 아니라"
 MULTI_SOURCE_SURFACES = (
     "templates/coverage.html",
     "templates/trends.html",
-    "templates/findings_browse.html",
+    "templates/findings.html",
     "templates/findings_firm_page.html",
     "assets/reactions.js",
 )

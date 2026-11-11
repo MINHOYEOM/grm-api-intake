@@ -1,0 +1,84 @@
+name: GRM MFDS GMP Certificate Monthly Snapshot
+
+# [식약처 GMP 적합판정서 2026-11-11] 공공데이터포털 15097207 발급 현황 **전체 목록**을 월 1회 받아
+# Supabase `mfds_gmp_cert`(migration 142)에 멱등 적재하고, 식약처 지적사항 업체(firm_key)와 연결한다.
+#
+# ★브리프·Notion 무접촉(대표 결정). 기존 collect_mfds_gmp_cert.py(ENABLE_MFDS_GMP_CERT, 기본 off)는
+#   Notion→핸드오프 경로라 켜지 않는다 — 켜면 전 행이 New 로 브리프에 쏟아지고 30일마다 재유입된다.
+# ★git 쓰기 없음. 업체 페이지 표시는 웹 빌드가 공개 RPC(mfds_gmp_cert_public)로 읽는다.
+# ★exit 3 = 전량 미수집(페이지 실패·상한) → 잡이 빨갛게 끝난다. 멱등이니 재실행하면 된다.
+# ★매달 2일 03:40 KST. 현황표라 날짜 창이 없고 매번 전체를 받는다.
+
+on:
+  schedule:
+    - cron: '40 18 1 * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'probe = 칸·건수만 / dry-run = 수집+연결 계산(적재 없음) / apply = 적재'
+        type: choice
+        options: ['probe', 'dry-run', 'apply']
+        default: 'dry-run'
+
+permissions:
+  contents: read
+
+concurrency:
+  # 매일 수집·MFDS 백필과 data.go.kr 호출을 놓고 경합하지 않도록 직렬화.
+  group: mfds-backfill
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+
+      - name: Run snapshot
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # schedule 이벤트엔 inputs 가 빈 문자열 → apply.
+          GRM_MODE: ${{ inputs.mode || 'apply' }}
+        run: |
+          ARGS=(--output mfds_gmp_cert_report.json --unlinked-output mfds_gmp_cert_unlinked.json)
+          case "$GRM_MODE" in
+            probe) ARGS+=(--probe) ;;
+            dry-run) ARGS+=(--dry-run) ;;
+            apply) ;;
+            *) echo "unknown mode $GRM_MODE"; exit 2 ;;
+          esac
+          python mfds_gmp_cert_snapshot.py "${ARGS[@]}"
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mfds-gmp-cert-report
+          path: |
+            mfds_gmp_cert_report.json
+            mfds_gmp_cert_unlinked.json
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: Step summary
+        if: always()
+        run: |
+          {
+            echo "### MFDS GMP 적합판정서 월간 스냅샷 (mode: ${{ inputs.mode || 'apply' }})"
+            if [ -f mfds_gmp_cert_report.json ]; then
+              echo '```json'
+              jq 'del(.samples)' mfds_gmp_cert_report.json
+              echo '```'
+            else
+              echo "리포트 미생성 — 자격증명/수집 실패로 조기 종료"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -136,6 +136,46 @@ class OldStorageCapTest(unittest.TestCase):
         self.assertTrue(diag[0]["found_in_text"])
         self.assertIn("and continues here", diag[0]["text_after"][:30])
 
+    # [11-11] 옛 수집기가 하위 항목을 따로 떼어 저장한 조각(번호·표제가 새 관찰과 어긋남) — 실측 fda483-175708
+    # 의 "…There is no assurance that all incidents/deviations a" 는 다시 읽은 관찰 **1번** 상세 가운데에 있다.
+    _FRAG_HEAD = "B. Your procedure, SOP-CAPS-4000101 Notification of Quality Event, states the operator shall " \
+                 "complete the Notification of Quality Event Form and submit to Quality systems. "
+    _FRAG_TAIL = "There is no assurance that all incidents/deviations a"
+
+    def _fragment(self) -> str:
+        filler = " ".join(f"Event {i} was recorded on the batch record but not escalated." for i in range(40))
+        body = (self._FRAG_HEAD + filler)[:1195 - len(self._FRAG_TAIL) - 1].rstrip() + " " + self._FRAG_TAIL
+        self.assertTrue(b.is_truncated_detail(body), len(body))
+        return body
+
+    def test_fragment_cut_sentence_is_completed_from_source(self):
+        frag = self._fragment()
+        rest = ("re documented for Quality Unit review throughout the subsequent production stages, including "
+                "aseptic processing in ISO 5. During the inspection, we observed three different methods.")
+        new = [{"number": "1", "deficiency": "There is a failure to thoroughly review.",
+                "detail": "Specifically, A. Earlier text. " + frag + rest + " C. Later item."},
+               {"number": "2", "deficiency": "Other.", "detail": "Unrelated detail text."}]
+        old = [{"number": "2", "deficiency": ".", "detail": frag}]
+        out, matched, unmatched = b.refreshed_observations(old, new)
+        self.assertEqual((matched, unmatched), (1, 0))
+        self.assertEqual(out[0]["number"], "2")                  # 번호·표제는 그대로
+        self.assertEqual(out[0]["deficiency"], ".")
+        self.assertTrue(out[0]["detail"].startswith(self._FRAG_HEAD.strip()[:60]))
+        self.assertTrue(out[0]["detail"].endswith(
+            "incidents/deviations are documented for Quality Unit review throughout the subsequent "
+            "production stages, including aseptic processing in ISO 5."), out[0]["detail"][-200:])
+        self.assertNotIn("three different methods", out[0]["detail"])   # 문장 하나만 붙인다
+
+    def test_fragment_completion_needs_a_unique_hit_and_a_sentence_end(self):
+        frag = self._fragment()
+        twice = [{"number": "1", "deficiency": "A.", "detail": frag + "re documented."},
+                 {"number": "3", "deficiency": "C.", "detail": frag + "re documented."}]
+        self.assertIsNone(b.completed_sentence(frag, twice))      # 두 곳 — 어느 쪽인지 모른다
+        no_end = [{"number": "1", "deficiency": "A.", "detail": frag + "re documented " + "and more " * 100}]
+        self.assertIsNone(b.completed_sentence(frag, no_end))     # 600자 안에 문장 끝 없음
+        ended = frag[:-len(self._FRAG_TAIL)].rstrip() + " The deviations were documented."
+        self.assertIsNone(b.completed_sentence(ended, [{"number": "1", "detail": ended + " More."}]))  # 이미 끝난 문장
+
     def test_band_helpers(self):
         self.assertTrue(b.is_truncated_deficiency("x" * 280 + "..."))
         self.assertFalse(b.is_truncated_deficiency("Short heading..."))

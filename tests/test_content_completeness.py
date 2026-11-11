@@ -120,6 +120,26 @@ class FindCapsTest(unittest.TestCase):
         self.assertTrue(found[0]["intentional"])
         self.assertEqual(found[0]["recent_rows"], 0)
 
+    def test_source_ends_document_is_not_counted_as_cut(self):
+        """[11-11] 원문 자체가 거기서 끝나는 관찰(문서·번호 예외)은 잘림 몰림 집계에서 빠진다 — 같은 길이
+        같은 문서라도 예외 번호가 아닌 관찰은 그대로 센다."""
+        doc, num = next(iter(cc.INTENTIONAL_SOURCE_ENDS["FDA 483"].items()))
+        rng = random.Random(11)
+        listed, other = capped(rng, 1200), capped(rng, 1200)
+        raw = {"fda_483_observations": [{"number": num[0], "deficiency": "d", "detail": listed},
+                                        {"number": "99", "deficiency": "d", "detail": other}]}
+        self.assertEqual(cc.source_end_values("FDA 483", doc, raw), {listed.strip()})
+        self.assertEqual(cc.source_end_values("FDA 483", "fda483-0", raw), set())
+        rows = [{"raw_signal_id": "r1", "document_id": doc, "source": "FDA 483",
+                 "collected_at": "2026-11-01", "raw_json": json.dumps(raw)}]
+        stats, _ = cc.collect_stats(rows, [], {})
+        det = {(s.source, s.path): s for s in stats}[("FDA 483", "fda_483_observations[].detail")]
+        self.assertEqual(sum(len(v) for v in det.long_cut.values()), 1)   # 예외 아닌 관찰 하나만
+        self.assertEqual(det.total, 2)                                     # 미사용 검사에는 그대로 센다
+
+    def test_source_ends_list_has_19_documented_cases(self):
+        self.assertEqual(sum(len(v) for v in cc.INTENTIONAL_SOURCE_ENDS["FDA 483"].values()), 19)
+
 
 class LeavesTest(unittest.TestCase):
     def test_nested_paths(self):

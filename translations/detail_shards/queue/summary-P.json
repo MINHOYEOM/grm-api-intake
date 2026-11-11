@@ -1,0 +1,18 @@
+{
+  "mode": "pending",
+  "stats": {
+    "findings": 386,
+    "queued": 23,
+    "no_detail": 360,
+    "ambiguous": 3,
+    "unchanged": 0,
+    "chars": 29565
+  },
+  "shards": {
+    "P": {
+      "files": 1,
+      "items": 23,
+      "chars": 29565
+    }
+  }
+}

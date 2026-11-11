@@ -1,18 +1,18 @@
 {
   "mode": "pending",
   "stats": {
-    "findings": 386,
-    "queued": 23,
+    "findings": 395,
+    "queued": 32,
     "no_detail": 360,
     "ambiguous": 3,
     "unchanged": 0,
-    "chars": 29565
+    "chars": 48341
   },
   "shards": {
     "P": {
       "files": 1,
-      "items": 23,
-      "chars": 29565
+      "items": 32,
+      "chars": 48341
     }
   }
 }

@@ -259,6 +259,21 @@ class RunBackfillDryRunTest(unittest.TestCase):
         self.assertEqual(report.findings_duplicate, 0)
         self.assertEqual(report.errors, ())
 
+    def test_document_ids_include_rows_that_already_have_findings(self) -> None:
+        """[11-12] 섞인 PDF 재추출로 관찰이 늘어난 문서 -- findings 가 있어도 지목하면 다시 뽑는다."""
+        fda_483 = _raw_signal("fda_483_observations")
+        wl = _wl_numbered_list_raw_signal()
+        doc = str(fda_483.get("document_id") or "")
+        self.assertTrue(doc)
+        with mock.patch("findings_supabase_backfill.fetch_raw_signals",
+                         return_value=[fda_483, wl]),              mock.patch("findings_supabase_backfill.fetch_existing_finding_raw_ids",
+                         return_value={str(fda_483["raw_signal_id"]), str(wl["raw_signal_id"])}):
+            plain = backfill.run_backfill(_BASE_URL, _SERVICE_KEY, dry_run=True)
+            named = backfill.run_backfill(_BASE_URL, _SERVICE_KEY, dry_run=True, document_ids=[doc])
+        self.assertEqual(plain.unbackfilled, 0)
+        self.assertEqual(named.unbackfilled, 1)
+        self.assertEqual(named.with_findings, 1)
+
     def test_dry_run_respects_limit_on_unbackfilled_set(self) -> None:
         fda_483 = _raw_signal("fda_483_observations")
         wl = _wl_numbered_list_raw_signal()

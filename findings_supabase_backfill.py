@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import asdict, dataclass, field
 from typing import Any
@@ -260,6 +261,7 @@ def run_backfill(
     *,
     dry_run: bool,
     limit: int | None = None,
+    document_ids: list[str] | None = None,
 ) -> BackfillReport:
     """Fetch raw_signals + existing findings, plan the backfill, and (unless
     dry_run) append the missing findings via
@@ -279,7 +281,14 @@ def run_backfill(
     except (RuntimeError, ValueError) as exc:
         return BackfillReport(errors=(str(exc),))
 
-    unbackfilled = select_unbackfilled(raw_signals, existing_ids)
+    if document_ids:
+        # [2026-11-12] 지목한 문서는 findings 가 이미 있어도 다시 뽑아 **빠진 것만** 더한다
+        # (append 는 finding_id 충돌을 중복으로 세므로 기존 행은 그대로다). 섞인 PDF 재추출
+        # (backfill_483_ocr_recovery mode=named)로 관찰이 늘어난 문서용 — 195468 은 1 → 4.
+        wanted = set(document_ids)
+        unbackfilled = [rs for rs in raw_signals if str(rs.get("document_id") or "") in wanted]
+    else:
+        unbackfilled = select_unbackfilled(raw_signals, existing_ids)
     if limit is not None and limit >= 0:
         unbackfilled = unbackfilled[:limit]
 
@@ -346,6 +355,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Only process the first N unbackfilled raw_signals (default: all).",
     )
     parser.add_argument(
+        "--document-ids", default="",
+        help="Only these document_ids (space/comma separated), even if they already have "
+        "findings -- missing findings are appended, existing ones count as duplicates.",
+    )
+    parser.add_argument(
         "--supabase-url",
         help="Supabase project URL (falls back to $SUPABASE_URL)",
     )
@@ -365,7 +379,9 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     base_url, service_key = creds
 
-    report = run_backfill(base_url, service_key, dry_run=args.dry_run, limit=args.limit)
+    ids = [x for x in re.split(r"[,\s]+", args.document_ids or "") if x]
+    report = run_backfill(base_url, service_key, dry_run=args.dry_run, limit=args.limit,
+                          document_ids=ids or None)
     print(json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2))
 
     # Findings-level errors are intentionally NOT a failure exit -- appends

@@ -1110,6 +1110,16 @@ def _read_fda483_pdf_text(
     text, status = extract_pdf_text(data, max_chars=max_chars)
     text = normalize_pdf_ligatures(text)           # [2026-07-20] 서브셋 폰트 합자 복원
     if not _needs_ocr(text):
+        # [2026-11-12 섞인 PDF] 문서 전체로는 글자가 충분해도 **관찰 쪽 일부만 스캔 이미지**인
+        # PDF 가 있다(실측 195468: 텍스트층 = 1쪽 + 뒷면, OBSERVATION 2~4 쪽은 이미지 → 관찰 1건만
+        # 적재). 문서 단위 판정은 이걸 못 본다. 글자 없는 이미지 쪽이 하나라도 있으면 쪽 단위 OCR
+        # (`_ocr_483_pdf_text` — 글자 있는 쪽은 그대로, 빈 쪽만 OCR)로 다시 읽는다. 결과가
+        # 텍스트층보다 짧으면 버린다(축소 금지).
+        if _ocr_enabled() and count_unread_image_pages(data) > 0:
+            ocr_text, ocr_status = _ocr_483_pdf_text(data, max_chars=max_chars)
+            ocr_text = normalize_pdf_ligatures(ocr_text) if ocr_text else ""
+            if len(ocr_text) > len(text):
+                return ocr_text, ocr_status
         return text, status
     # [스캔 483 OCR 폴백 2026-07-27] 텍스트층이 아예 없거나 뒷장 정형 고지문뿐이다 —
     # 관찰은 이미지 안에 있다. 페이지 단위 OCR 로 되살린다. 실패해도 기존 산출은 보존.
@@ -1132,6 +1142,24 @@ def _read_fda483_pdf_text(
     if _is_notice_only(text) or not (text or "").strip():
         return "", ocr_status
     return text, status
+
+
+def count_unread_image_pages(data: bytes) -> int:
+    """텍스트층에 실질 글자가 없고 이미지가 있는 쪽 수(= OCR 해야 읽히는 쪽). 순수 판정(OCR 안 함).
+
+    `_ocr_483_pdf_text_uncounted` 의 쪽 판정과 같은 규칙(반복 머리말 제외 후 `_is_substantive_text`).
+    PDF 를 못 열면 0(종전 동작 유지)."""
+    try:
+        import fitz  # type: ignore[import-not-found]
+        with fitz.open(stream=data, filetype="pdf") as doc:
+            if doc.needs_pass or doc.is_encrypted:
+                return 0
+            natives = [page.get_text("text") for page in doc]
+            boilerplate = _repeated_lines(natives)
+            return sum(1 for page, native in zip(doc, natives)
+                       if not _is_substantive_text(native, boilerplate) and page.get_images(full=True))
+    except Exception:  # noqa: BLE001 — 진단 실패가 수집을 멈추지 않는다
+        return 0
 
 
 def _is_notice_only(text: str) -> bool:

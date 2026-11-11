@@ -188,6 +188,12 @@ class Rest:
 # ── main ─────────────────────────────────────────────────────────────────────────
 
 def main(argv: list[str] | None = None) -> int:
+    # 좁은 콘솔 인코딩(Windows cp949 등)에서도 한글·기호 출력이 죽지 않게(test_cli_stdout_encoding).
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--dry-run", action="store_true")

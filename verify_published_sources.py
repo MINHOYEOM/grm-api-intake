@@ -219,7 +219,19 @@ def classify(row: dict[str, Any]) -> str:
     if total is None or ok is None:
         return "unknown-no-db"      # DB 를 못 봤다 → 종전 판정(보수적으로 불일치 취급)
     if found > total:
-        return "extraction-gap"     # 원문에 있는데 우리가 뽑지 못했다
+        if total > 0 and ok <= shown:
+            # ★[count-drift 2026-11-12, #1214 fda483-195468] DB 에 findings 가 **있고** 카드는 그
+            # 공개분을 전부 보여준다 — 문서는 추출된 것이다. 이때 `원문 > DB` 는 "추출 실패"가
+            # 아니라 **재파싱 건수가 저장 건수와 다르다**는 뜻이다(스캔 OCR 이 하위항목 A~C 를
+            # 관찰 표제처럼 읽는 등 — 실제 관찰 1건인데 원문 4건으로 센 오탐). 종전엔 이걸
+            # extraction-gap("findings 자체가 없습니다")으로 올려 오경보를 냈다. 알리진 않되
+            # 보고서 `참고` 에 남긴다(조용한 축소 금지). `total == 0` 이면 진짜 추출 격차다.
+            return "count-drift"
+        if total == 0:
+            return "extraction-gap"     # 원문에 있는데 우리가 뽑지 못했다(findings 0건)
+        if ok > shown:
+            return "publish-gap" if not row.get("oos_483") else "scope-excluded"
+        return "scope-excluded"
     if ok > shown:
         if row.get("oos_483"):
             # DB scope 는 'ok' 지만 조립기 범위 판정(is_out_of_scope_483)이 기기·생식 시설 등으로
@@ -299,6 +311,13 @@ def format_report(mismatches: list[dict[str, Any]],
                 f"{why} **의도대로 제외된 것**이라 불일치로 "
                 f"세지 않았습니다: " + ", ".join(f"`{r['id']}`" for r in excluded[:12])
                 + ("…" if len(excluded) > 12 else ""))
+    drift = [r for r in (rows or []) if r.get("verdict") == "count-drift"]
+    if drift:
+        tail += (f"\n\n참고: {len(drift)}개 카드는 DB 에 findings 가 있고 카드가 그 공개분을 전부 "
+                 "보여주지만 원문 재파싱 건수가 저장 건수보다 많습니다(스캔 OCR 의 하위항목 오독 "
+                 "등 — 추출 실패 아님, 불일치로 세지 않음). 건수 차이가 크면 원문을 직접 확인: "
+                 + ", ".join(f"`{r['id']}`(카드 {r['shown']}·DB {r['db_total']}·원문 {r['found']})"
+                             for r in drift[:12]) + ("…" if len(drift) > 12 else ""))
     if not mismatches:
         return "발행 카드와 원문이 전부 일치합니다(불일치 0)." + tail
 

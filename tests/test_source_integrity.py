@@ -247,6 +247,29 @@ class VerifyPublishedSourcesTest(unittest.TestCase):
         row = {"shown": 0, "found": 2, "db_total": 0, "db_ok": 0}
         self.assertEqual(vps.classify(row), "extraction-gap")
 
+    def test_count_drift_when_card_already_shows_all_db_findings(self):
+        # #1214 fda483-195468 실측: 카드 1·DB 1/1·원문 4(OCR 이 하위항목 A~C 를 관찰로 읽음).
+        # findings 가 있으니 "findings 자체가 없다"는 extraction-gap 이 아니다.
+        row = {"shown": 1, "found": 4, "db_total": 1, "db_ok": 1}
+        self.assertEqual(vps.classify(row), "count-drift")
+
+    def test_count_drift_is_not_a_mismatch_but_is_reported(self):
+        rows = [{"date": "d", "id": "fda483-195468", "shown": 1, "found": 4,
+                 "status": "pdf-ok-ocr", "db_total": 1, "db_ok": 1, "verdict": "count-drift"}]
+        out = vps.format_report([], rows)
+        self.assertIn("불일치 0", out)
+        self.assertIn("fda483-195468", out)
+        self.assertIn("추출 실패 아님", out)
+
+    def test_partial_extraction_with_unpublished_findings_is_still_publish_gap(self):
+        # 과도 면제 방지: DB 에 공개분이 더 있는데 카드가 덜 보였으면 count-drift 가 아니다.
+        row = {"shown": 1, "found": 4, "db_total": 2, "db_ok": 2}
+        self.assertEqual(vps.classify(row), "publish-gap")
+
+    def test_zero_db_findings_is_still_extraction_gap_even_if_card_shows_nothing(self):
+        row = {"shown": 0, "found": 1, "db_total": 0, "db_ok": 0}
+        self.assertEqual(vps.classify(row), "extraction-gap")
+
     def test_no_db_credentials_degrades_but_does_not_go_silent(self):
         # DB 를 못 보면 **조용히 통과시키지 않는다** — 판정 불가로 남겨 알림에 싣는다.
         row = {"shown": 0, "found": 2, "db_total": None, "db_ok": None}

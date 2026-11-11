@@ -64,6 +64,7 @@ def build_graph(
     cfr_section_of: "Callable[[Any], str]",
     clause_slugs: "set[str]",
     clause_slug_of: "Callable[[str], str]",
+    gmp_new_firms: "Iterable[dict[str, Any]]" = (),
 ) -> "dict[str, list[dict[str, Any]]]":
     """파일 이름(확장자 제외) → 행 목록. 키: nodes-<type>, edges-<rel>."""
     briefs = sorted({s for s in brief_slugs if s})
@@ -161,6 +162,16 @@ def build_graph(
         add_node("firm", fk, {"label": name or fk, "doc_count": len(group),
                               "url": f"/findings/firm/{slug}/" if slug else "",
                               "alias_keys": sorted(alias_keys.get(fk, ()))})
+
+    # [식약처 GMP 적합판정 새 업체 2026-11-11] 지적·처분이 아직 없는 판정서 업체 — 노드만,
+    # 업체 페이지는 만들지 않는다(대표 결정 "지적 생기면 페이지"). 지적이 들어와 판정서가
+    # 그 업체에 이어지면 원천 목록(144)에서 빠져 이 노드도 사라진다.
+    for g in sorted(gmp_new_firms, key=lambda r: str(r.get("node_key") or "")):
+        nk = str(g.get("node_key") or "")
+        if not nk.startswith("mfds-gmp-") or f"firm:{nk}" in nodes["firm"]:
+            continue
+        add_node("firm", nk, {"label": g.get("firm_name") or nk, "agency": "MFDS",
+                              "source": "mfds_gmp_cert", "doc_count": 0})
 
     # ── 정렬 고정 ─────────────────────────────────────────────────────────────
     out: dict[str, list[dict[str, Any]]] = {}

@@ -7338,7 +7338,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 firm_page_slug_by_key=firm_page_slug_by_key,
                 canonical_firm_key=_canonical_firm_key,
                 cfr_section_of=_cfr_section_of,
-                clause_slugs=clause_slugs, clause_slug_of=clause_slug)
+                clause_slugs=clause_slugs, clause_slug_of=clause_slug,
+                gmp_new_firms=[r for r in ((_gmp_snapshot or {}).get("new_firms") or [])
+                               if isinstance(r, dict)])
             _g_errs = graph_export.validate_graph(_g_rows)
             if _g_errs:
                 raise RuntimeError("graph/ 가드 위반 %d건: %s" % (len(_g_errs), _g_errs[:5]))

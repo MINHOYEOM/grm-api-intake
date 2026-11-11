@@ -1,0 +1,20 @@
+[
+  {
+    "finding_id": "finding-84e07dd7a0e77b47fa905903",
+    "finding_text": "① 기준서 미준수 ② 임상시험용의약품 제조 및 품질관리기준 위반",
+    "finding_text_ko": "기준서를 준수하지 않았고, 임상시험용의약품 제조 및 품질관리기준을 위반했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-865c610dd75bf65f40401da4",
+    "finding_text": "임상시험 대상자의 동의 절차 위반",
+    "finding_text_ko": "임상시험 대상자의 동의 절차를 위반했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b0ca1f2b01e62360097e4100",
+    "finding_text": "① 임상시험계획 변경 미보고 및 지연 보고 ② 임상시험용 의약품 표시기재 위반 ③ 임상시험 품질보증 및 임상시험자료 품질관리 위반",
+    "finding_text_ko": "임상시험계획 변경을 보고하지 않았거나 지연 보고했고, 임상시험용 의약품 표시기재를 위반했으며, 임상시험 품질보증 및 임상시험자료 품질관리를 위반했다.",
+    "translation_method": "llm_assisted"
+  }
+]

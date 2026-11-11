@@ -19,7 +19,12 @@ from typing import Any
 import requests
 
 from grm_handoff import COVERAGE_SOURCE_LABELS
-from reconciliation_service import detect_coverage_anomalies, summarize_url_contamination
+from reconciliation_service import (
+    KNOWN_OUTAGE_ISSUE_TITLES,
+    detect_coverage_anomalies,
+    split_anomalies,
+    summarize_url_contamination,
+)
 
 _TIMEOUT = 30
 _PAGE = 1000
@@ -201,6 +206,51 @@ def coverage_report_lines(current: dict[str, int],
     return lines
 
 
+def find_open_outages(issues: list[dict[str, Any]], now: datetime
+                      ) -> dict[str, tuple[int, int]]:
+    """열린 이슈 목록에서 알려진 장애 소스 → (이슈 번호, 열린 지 N일). 순수 함수.
+
+    PR 은 issues API 에 섞여 오므로 `pull_request` 키가 있는 항목은 버린다."""
+    by_title = {t: src for src, t in KNOWN_OUTAGE_ISSUE_TITLES.items()}
+    out: dict[str, tuple[int, int]] = {}
+    for it in issues:
+        if "pull_request" in it:
+            continue
+        src = by_title.get(str(it.get("title") or "").strip())
+        opened = _parse_iso(str(it.get("created_at") or ""))
+        if src is None or opened is None or not it.get("number"):
+            continue
+        days = max(0, (now - opened).days)
+        prev = out.get(src)
+        if prev is None or days > prev[1]:  # 여러 건이면 가장 오래된 것 기준(승격이 먼저)
+            out[src] = (int(it["number"]), days)
+    return out
+
+
+def _fetch_open_outages(now: datetime) -> dict[str, tuple[int, int]]:
+    """GitHub 열린 이슈에서 알려진 장애를 조회. **fail-open**: 토큰 없음·조회 실패는 빈 dict
+    (= 면제 없이 그대로 ⚠️) 로 돌려 장애를 가리지 않는다."""
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    repo = os.environ.get("GITHUB_REPOSITORY", "").strip()
+    if not token or not repo:
+        return {}
+    try:
+        resp = requests.get(
+            f"https://api.github.com/repos/{repo}/issues",
+            params={"state": "open", "labels": "automation-failure", "per_page": "100"},
+            headers={"Authorization": f"Bearer {token}",
+                     "Accept": "application/vnd.github+json"},
+            timeout=_TIMEOUT,
+        )
+        if resp.status_code >= 400:
+            _emit(f"::warning title=reconciliation::알려진 장애 이슈 조회 HTTP {resp.status_code} — 면제 없이 판정")
+            return {}
+        return find_open_outages(resp.json() or [], now)
+    except (requests.exceptions.RequestException, ValueError) as exc:
+        _emit(f"::warning title=reconciliation::알려진 장애 이슈 조회 실패({type(exc).__name__}) — 면제 없이 판정")
+        return {}
+
+
 def _emit(line: str) -> None:
     print(line, flush=True)
 
@@ -232,7 +282,8 @@ def main() -> int:
         return 0
 
     current, history = _bucket_by_week(rows, now)
-    anomalies = detect_coverage_anomalies(current, history)
+    anomalies, known_notes = split_anomalies(
+        detect_coverage_anomalies(current, history), _fetch_open_outages(now))
 
     _emit(f"# 수집 reconciliation ({now.date()} 기준, 최근 7일 vs 과거 {_LOOKBACK_WEEKS}주)")
     _emit(f"- raw_signals 조회 행수: {len(rows)}")

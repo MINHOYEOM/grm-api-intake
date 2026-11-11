@@ -119,5 +119,37 @@ class MigrationContract(unittest.TestCase):
         self.assertNotIn("collect_intake", src)
 
 
+class LinkRuleMigrationContractTests(unittest.TestCase):
+    SQL = (ROOT / "web" / "migrations" / "143_mfds_gmp_cert_link_rules.sql").read_text(encoding="utf-8")
+
+    def test_rule_table_closed_and_function_service_role_only(self):
+        self.assertIn("revoke all on table public.mfds_gmp_cert_link_rule from public, anon, authenticated", self.SQL)
+        self.assertIn("revoke all on function public.grm_link_mfds_gmp_cert() from public, anon, authenticated", self.SQL)
+        self.assertIn("revoke all on function public.grm_link_mfds_gmp_cert_auto() from public, anon, authenticated", self.SQL)
+
+    def test_confirmed_rule_methods_are_in_link_method_vocabulary(self):
+        import re
+        vocab = self.SQL.split("add constraint mfds_gmp_cert_link_method_check")[1].split(";")[0]
+        pat = r"'[0-9]{10}', '[^']*', '[^']*', '(confirmed|candidate)', '([a-z_]+)'"
+        rules = re.findall(pat, self.SQL)
+        self.assertGreaterEqual(len(rules), 6)
+        for status, meth in rules:
+            if status == "confirmed":
+                self.assertIn(f"'{meth}'", vocab)
+
+    def test_candidates_never_set_firm_key(self):
+        body = self.SQL.split("create or replace function public.grm_link_mfds_gmp_cert()")[1].split("$$")[1]
+        cand = body.split("set candidate_firm_key = c.firm_key")[1].split(";")[0]
+        self.assertNotIn("firm_key = ", cand.replace("candidate_firm_key = ", ""))
+        self.assertIn("t.firm_key is null", cand)
+
+    def test_rules_require_both_bizrno_and_cert_name(self):
+        self.assertIn("t.bizrno = r.bizrno and t.firm_name = r.cert_firm_name", self.SQL)
+
+    def test_unlinked_output_carries_candidates(self):
+        src = (ROOT / "mfds_gmp_cert_snapshot.py").read_text(encoding="utf-8")
+        self.assertIn("candidate_firm_key,candidate_method,candidate_confidence,candidate_evidence", src)
+
+
 if __name__ == "__main__":
     unittest.main()

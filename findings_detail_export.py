@@ -38,6 +38,22 @@ def _compact(text: str) -> str:
     return re.sub(r"\s+", " ", str(text or "")).strip()
 
 
+# [2026-11-12] 표제 앞 OCR 잡음 — 원문(raw) 관찰 표제에만 남고 findings 표제는 예전 수리로 정리돼,
+# 완전 일치 비교가 실패했다(국문 없는 옛 483 98건 중 95건: "j Aseptic…", "| Equipment…", "· Procedures…",
+# "\x01 Samples…", "| | | The responsibilities…"). **앞쪽** 비문자(글자·숫자·여는 괄호·따옴표가 아닌 것)와
+# 그 뒤 **소문자 한 글자 + 공백 + 대문자** 조각만 뗀다. 문구가 달라진 표제는 그대로 실패한다.
+_LEAD_NONWORD_RE = re.compile(r"^[^A-Za-z0-9(\"“']+")
+_LEAD_STRAY_LETTER_RE = re.compile(r"^[a-z] (?=[A-Z])")
+
+
+def _heading_key(text: str) -> str:
+    """짝 비교용 표제 키 — 공백 접기 + 앞 잡음 제거(순수 함수)."""
+    t = _compact(text)
+    t = _LEAD_NONWORD_RE.sub("", t)
+    t = _LEAD_STRAY_LETTER_RE.sub("", t)
+    return _LEAD_NONWORD_RE.sub("", t).strip()
+
+
 def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]], *, stale_only: bool = False
                 ) -> tuple[list[dict[str, Any]], dict]:
     """(대기열 — 최신 먼저, 집계). 순수 함수.
@@ -50,10 +66,10 @@ def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]], *, s
         raw = json.loads(raw) if isinstance(raw, str) else (raw or {})
         for o in raw.get("fda_483_observations") or []:
             if isinstance(o, dict) and str(o.get("detail") or "").strip():
-                by_key[(str(r.get("raw_signal_id")), _compact(o.get("deficiency")))].append(str(o["detail"]))
+                by_key[(str(r.get("raw_signal_id")), _heading_key(o.get("deficiency")))].append(str(o["detail"]))
     queue, stats = [], {"findings": len(findings), "queued": 0, "no_detail": 0, "ambiguous": 0, "unchanged": 0}
     for f in findings:
-        hits = by_key.get((str(f.get("raw_signal_id")), _compact(f.get("finding_text"))), [])
+        hits = by_key.get((str(f.get("raw_signal_id")), _heading_key(f.get("finding_text"))), [])
         if not hits:
             stats["no_detail"] += 1
             continue

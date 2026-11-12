@@ -102,12 +102,23 @@ def supabase_doc_ids(base_url: str, service_key: str, source: str) -> set[str]:
     return {str(r.get("document_id") or "") for r in rows} - {""}
 
 
+# [2026-11-12 대표 결정 "채워서 옮기기"] Brave Search 행(5~6월, 수집 중단)은 Notion `Type or Class`
+# 가 비어 raw_signals.source_kind required 에 걸린다. 같은 행의 Notion `Source Type` 이 "Search Result"
+# 이므로 그 값을 기계 키로 옮겨 source_kind 칸만 채운다. row_json(Notion 원값 사본)은 손대지 않는다.
+SOURCE_KIND_FILL = {"Brave Search": "search-result"}
+
+
 def record_from_snapshot(snap: dict[str, Any], raw: dict[str, Any] | None) -> dict[str, Any]:
     """Notion 스냅샷 + 복원 raw → raw_signals 레코드(수집기와 같은 빌더)."""
     row = {k: str(snap.get(k) or "").strip() for k in ROW_KEYS}
     status = "captured" if raw is not None else "notion_backfill_raw_unavailable"
-    return gf.raw_signal_from_row(row, raw or {}, collected_at=str(snap.get("collected_at") or ""),
-                                  extraction_status=status)
+    record = gf.raw_signal_from_row(row, raw or {},
+                                    collected_at=str(snap.get("collected_at") or ""),
+                                    extraction_status=status)
+    fill = SOURCE_KIND_FILL.get(record.get("source") or "")
+    if fill and not str(record.get("source_kind") or "").strip():
+        record["source_kind"] = fill
+    return record
 
 
 def _whopir_source_dates(get_html: Callable[[str], str] | None = None) -> dict[str, str]:

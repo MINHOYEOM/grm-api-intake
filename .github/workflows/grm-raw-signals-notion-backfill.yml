@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       sources:
-        description: 'Notion Source 값(공백 구분). 예: "WHO" 또는 "WHO ICH"'
+        description: 'Notion Source 값. 띄어쓰기 있는 이름은 쉼표로 구분(예: "Federal Register,ECA Academy"). 쉼표가 없으면 공백 구분(예: "WHO ICH")'
         type: string
         default: 'WHO'
       apply:
@@ -58,14 +58,22 @@ jobs:
           IN_LIMIT: ${{ inputs.limit }}
         run: |
           set -uo pipefail
-          if ! printf '%s' "${IN_SOURCES:-}" | grep -qE '^[A-Za-z0-9 /_.()-]*$'; then
+          if ! printf '%s' "${IN_SOURCES:-}" | grep -qE '^[A-Za-z0-9 ,/_.()-]*$'; then
             echo "::error::sources 에 허용되지 않는 문자가 있다"; exit 2
           fi
           if [ -n "${IN_LIMIT:-}" ] && ! printf '%s' "$IN_LIMIT" | grep -qE '^[0-9]+$'; then
             echo "::error::limit 은 숫자만 허용"; exit 2
           fi
           args=()
-          for s in $IN_SOURCES; do args+=(--source "$s"); done
+          if printf "%s" "$IN_SOURCES" | grep -q ","; then
+            IFS="," read -ra _srcs <<< "$IN_SOURCES"
+          else
+            read -ra _srcs <<< "$IN_SOURCES"
+          fi
+          for s in "${_srcs[@]}"; do
+            s="$(printf "%s" "$s" | sed -E "s/^ +| +$//g")"
+            [ -n "$s" ] && args+=(--source "$s")
+          done
           if [ ${#args[@]} -eq 0 ]; then
             echo "::error::sources 가 비었다"; exit 2
           fi

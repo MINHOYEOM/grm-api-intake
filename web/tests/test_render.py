@@ -15766,23 +15766,32 @@ class WebZoneIaTest(unittest.TestCase):
         for rel in ("findings/trends/index.html", "findings/inspections/index.html",
                     "findings/coverage/index.html"):
             self.assertIn(rel, self.pages, f"{rel} 미산출")
-        # [탭 3묶음 2026-11-11] 데이터 현황은 탭이 아니라 '경향' 줄 끝의 작은 링크다 — 그 면에서는
-        # 그 링크가 켜진다(묶음 '경향'도 켜진다).
+        # [찾아보기 2026-11-12] 탭 줄은 폐기 — 세 면은 찾아보기 색인이 잇고, 각 면은 위치 표시
+        # (홈 › 찾아보기 › 면)로 색인에 돌아간다. 라우트(옛 URL)는 하나도 없애지 않았다.
+        browse = self.pages["browse/index.html"]
+        for rel, name in (("findings/trends/", "업무 영역별 경향"),
+                          ("findings/inspections/", "FDA 실사 결과"),
+                          ("findings/coverage/", "데이터 현황")):
+            self.assertIn(f'href="../{rel}index.html"><b>{name}</b>', browse, rel)
         cov = self.pages["findings/coverage/index.html"]
-        self.assertIn('class="fnd-seg"', cov)
-        self.assertIn('class="fnd-seg-side on" href="../../findings/coverage/index.html" aria-current="page">데이터 현황</a>', cov)
+        self.assertNotIn('class="fnd-seg"', cov)
+        self.assertIn('<a href="../../browse/">찾아보기</a><i>&rsaquo;</i><span>데이터 현황</span>', cov)
+        self.assertIn('class="on">찾아보기</a>', cov)
         # 대신 두 면의 꼬리 각주가 이 페이지를 연다.
         for face in ("findings/trends/index.html", "findings/inspections/index.html"):
             self.assertIn("findings/coverage/index.html", self.pages[face])
 
     def test_segment_nav_links_all_faces_and_marks_active(self):
-        for rel, seg in self.ZONE_FACES.items():
+        """[찾아보기 2026-11-12] 면끼리 잇는 탭 줄 대신: 각 면 → 위치 표시 → 찾아보기 → 다른 면.
+        메뉴에서는 '찾아보기'가 켜진다(활성 표시)."""
+        browse = self.pages["browse/index.html"]
+        for rel in self.ZONE_FACES:
             html = self.pages[rel]
-            self.assertIn('class="fnd-seg"', html, f"{rel} 에 면 전환 세그먼트가 없다")
+            self.assertNotIn('class="fnd-seg"', html, rel)
+            self.assertIn('<a href="../../browse/">찾아보기</a>', html, f"{rel} → 찾아보기 길 없음")
+            self.assertIn('class="on">찾아보기</a>', html, f"{rel} 활성 메뉴 표시 없음")
             for other in self.ZONE_FACES:
-                href = "../../" + other.rsplit("/index.html", 1)[0] + "/index.html"
-                self.assertIn(f'href="{href}"', html, f"{rel} → {other} 링크 없음")
-            self.assertIn('aria-current="page"', html, f"{rel} 활성 탭 표시 없음")
+                self.assertIn(f'href="../{other}"', browse, f"찾아보기 → {other} 링크 없음")
 
     def test_cfg_declares_page_kind(self):
         """세 면이 trends.js 하나를 공유하므로, 어느 면인지를 셸이 말해야 한다.

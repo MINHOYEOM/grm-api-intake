@@ -573,6 +573,7 @@ grm-api-intake/
 ├─ raw_update.py                   # [원문 갱신 규칙 R4] 건너뛴 항목의 오늘 판을 정본 위에 얹어 소스별 본문 칸 지문이 바뀌고 나빠지지 않았을 때만 `raw_signal_apply_version` 으로 갱신(하루 상한 `RAW_UPDATE_MAX`·끄기 `RAW_UPDATE_APPLY=false`) · 지적사항은 같은 ordinal 짝 → restore 계획(번역 경로, grm-raw-update 아티팩트)
 ├─ source_reconcile.py             # 원천 대조 감시 — 원천 건수 = 수집 + 의도적 제외 + 미뤄짐 등식을 매일 센다(grm-source-reconcile)
 ├─ content_completeness.py         # 내용 완전성 감시 — 원자료 전 칸을 펴서 잘림(같은 길이대에서 문장 중간에 끝나는 값의 몰림)·모아 놓고 사이트·브리프에 안 닿는 칸을 찾는다(grm-source-reconcile 의 content 잡, 읽기 전용)
+├─ partial_detail_map.py          # 483 구체 내용 "원문 일부" 대상 표 — content_completeness.partial_detail_notice 판정을 관찰 번호→지적 id 로 옮겨 web/data/partial_detail_findings.json 에 적는다(관리자 SQL 로 뽑은 행 입력)
 ├─ backfill_raw_signals_from_notion.py # Notion에만 있고 Supabase raw_signals 사본에 없는 행 채우기(1회성·멱등)
 ├─ backfill_raw_signals_modality.py  # raw_signals.modality 빈칸을 수집기와 같은 compute_modality 로 소급(빈칸만·근거 없으면 그대로·dry 기본)
 ├─ hc_inspection_migration_check.py # HC 의약품 GMP 실사 DB의 새 도메인 이전 감지
@@ -629,6 +630,7 @@ grm-api-intake/
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ web/
 │  ├─ partials/mfds_inspector.html · assets/mfds-doc-inspectors.js # MFDS 보기·동적 코호트 링크
+│  ├─ assets/doc-detail.js # 483 문서 페이지 "구체 내용" — findings.detail_text(_ko)를 지적 id 로 읽어 접어 붙이고, 원문 일부 대상엔 고지·원문 PDF 링크
 │  ├─ migrations/094_mfds_inspector_profiles.sql # MFDS 조회 RPC·FDA 응답 불변 가드
 │  ├─ migrations/095_extraction_gap_out_of_scope.sql # 추출 격차 감시에서 회수가 범위 밖으로 확정한 문서 제외
 │  ├─ migrations/096_extraction_gap_revoke_anon.sql # 추출 격차 RPC 실행 권한을 service_role 전용으로(anon·authenticated 회수)

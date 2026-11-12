@@ -1848,9 +1848,10 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderDashCategories(stats)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("var rows = stats.categories.slice(0, 8).map(", fn)
+        # [미분류 막대 2026-11-12] 캐치올은 상위 8 순위에 들지 않는다 — 분류된 것(classified)에서 자른다.
+        self.assertIn("var rows = classified.slice(0, 8).map(", fn)
         self.assertIn(
-            "var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);",
+            "var restCount = classified.slice(8).reduce(function (s, c) { return s + c.count; }, 0);",
             fn,
         )
         self.assertIn('rows.push({ label: _t("그 외"), count: restCount, code: null });', fn)
@@ -1874,7 +1875,7 @@ class WebFindingsRenderTest(unittest.TestCase):
 
         (3)이 재발 방지의 본체다 — (1)(2)는 산술이고 (3)만이 산술과 무관하게 성립한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code)"):]
+        fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code, rest)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         # (2) 상한 클램프 — Math.max 하한만 있던 옛 코드가 정확히 이 결함의 통로였다.
         self.assertIn(
@@ -1908,7 +1909,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("text-overflow:ellipsis", css)
         self.assertIn("white-space:nowrap", css)
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code)"):]
+        fn = js_src[js_src.index("function buildCatRow(label, count, maxCount, code, rest)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("labelEl.title = label;", fn)
 
@@ -21504,6 +21505,60 @@ class HookLineTest(unittest.TestCase):
         self.assertEqual(self._view(cid, self.SAMPLES[cid], "en", en_hook=en)["hook_line"], en)
         self.assertEqual(self._view(cid, None, "en", en_hook="무효율 53%")["hook_line"], "")  # 한글 노출 금지
         self.assertEqual(self._view(cid, None, "en", en_hook="Rate of 61% was not investigated")["hook_line"], "")
+
+
+
+class WebTier1BarsAndDatesTest(unittest.TestCase):
+    """[UI 1단 2026-11-12] (1) 분류 막대 — 캐치올('기타 품질시스템')은 막대 순위에서 빼고 맨 아래
+    막대 없는 한 줄로. (2) 목록 줄에 실사일 — 정렬은 공개일 그대로, 실사일이 다를 때만 적는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_tier1c_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.js = {n: (WEB_DIR / "assets" / n).read_text(encoding="utf-8")
+                  for n in ("findings.js", "firm.js", "inspector.js")}
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_catch_all_is_not_ranked_by_bar_length(self):
+        for name in ("firm.js", "inspector.js"):
+            js = self.js[name]
+            fn = js[js.index("function renderCategories("):]
+            fn = fn[:fn.index("renderCatNote(")]
+            with self.subTest(asset=name):
+                self.assertIn("c.category_code !== CATCH_ALL", fn)
+                self.assertIn("var maxCnt = (ranked[0] && ranked[0].cnt) || 1;", fn)
+                # 캐치올 줄은 순위 줄 다음에, 막대 없이(rest=true)
+                self.assertLess(fn.index("total, false)"), fn.index("total, true)"))
+        js = self.js["findings.js"]
+        fn = js[js.index("function renderDashCategories("):js.index("function buildCatRow(label")]
+        self.assertIn('c.code !== "other_quality_system"', fn)
+        self.assertLess(fn.index("r.code, false)"), fn.index("c.code, true)"))
+        row = js[js.index("function buildCatRow(label"):js.index("function renderDashMonths(")]
+        self.assertIn("if (!rest) {", row)
+
+    def test_inspection_dates_asset(self):
+        p = self.single / "assets" / "doc-inspection-dates.json"
+        self.assertTrue(p.is_file(), "doc-inspection-dates.json 이 빌드되지 않았다")
+        d = json.loads(p.read_text(encoding="utf-8"))
+        self.assertEqual(d["schema"], "grm-doc-inspection-dates/v1")
+        m = d["inspection_date_by_document_id"]
+        for k, v in m.items():
+            self.assertRegex(v, r"^\d{4}-\d{2}-\d{2}$", k)
+
+    def test_list_line_shows_inspection_date_without_changing_sort(self):
+        js = self.js["findings.js"]
+        self.assertIn('fetch(assetRoot + "assets/doc-inspection-dates.json")', js)
+        head = js[js.index("function buildDocHead(rows)"):]
+        head = head[:head.index("function ", 10)]
+        self.assertIn('"fnd-doc-count fnd-doc-insp"', head)
+        self.assertIn('_t("실사일")', head)
+        # 공개일 표기는 그대로 앞에 남는다(정렬 기준 원칙 불변)
+        self.assertLess(head.index('"fnd-doc-date", head.published_date'), head.index("fnd-doc-insp"))
 
 
 if __name__ == "__main__":

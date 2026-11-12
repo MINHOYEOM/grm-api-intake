@@ -671,24 +671,32 @@
     // 그 외 6,226 > 최대 4,347 → scaleX(1.43) → 막대가 건수 글자를 68px 침범).
     // "스케일은 실제로 그리는 행들에서만 나온다"를 구조로 못박아, 앞으로 합산행을 더
     // 붙이거나 상위 N 을 바꿔도 같은 결함이 되살아날 수 없게 한다.
-    var rows = stats.categories.slice(0, 8).map(function (c) {
+    // [미분류 막대 2026-11-12] 캐치올('기타 품질시스템')은 막대 순위에서도 뺀다 — 분류된 것만
+    // 길이를 견주고, 캐치올은 맨 아래 막대 없는 한 줄로 둔다(건수·비중은 그대로). 가장 긴
+    // 막대가 '분류 안 됨'이면 화면이 약점을 머리기사로 만든다(UI/UX 점검 11-11).
+    var catchAll = stats.categories.filter(function (c) { return c.code === "other_quality_system"; });
+    var classified = stats.categories.filter(function (c) { return c.code !== "other_quality_system"; });
+    var rows = classified.slice(0, 8).map(function (c) {
       return { label: c.ko, count: c.count, code: c.code };
     });
-    var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);
+    var restCount = classified.slice(8).reduce(function (s, c) { return s + c.count; }, 0);
     if (restCount > 0) rows.push({ label: _t("그 외"), count: restCount, code: null });
-    if (!rows.length) {
+    if (!rows.length && !catchAll.length) {
       dashCatEl.appendChild(el("p", "fnd-dash-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     var maxCount = rows.reduce(function (m, r) { return Math.max(m, r.count); }, 0) || 1;
     rows.forEach(function (r) {
-      dashCatEl.appendChild(buildCatRow(r.label, r.count, maxCount, r.code));
+      dashCatEl.appendChild(buildCatRow(r.label, r.count, maxCount, r.code, false));
+    });
+    catchAll.forEach(function (c) {
+      dashCatEl.appendChild(buildCatRow(c.ko, c.count, maxCount, c.code, true));
     });
   }
 
   // [M14 §4] 회색 트랙 제거 — 바 자체가 flex 셀(flex:1 1 auto)을 채우고, 비율은
   // transform:scaleX() 로 표현한다(레이아웃 폭은 항상 셀 전체 — width 축소가 아니다).
-  function buildCatRow(label, count, maxCount, code) {
+  function buildCatRow(label, count, maxCount, code, rest) {
     var row = document.createElement("div");
     row.className = "fnd-dash-cat-row";
     if (code) {
@@ -709,10 +717,12 @@
     // maxCount 를 넘겨도 막대가 트랙을 넘지 못하게. 트랙(렌더층)+클램프(산술층)+호출부에서
     // 그릴 행으로부터 maxCount 를 뽑는 것(renderDashCategories)이 3중 방어다.
     var track = el("div", "fnd-dash-cat-track");
-    var bar = el("div", "fnd-dash-cat-bar");
-    var ratio = maxCount > 0 ? count / maxCount : 0;
-    bar.style.transform = "scaleX(" + Math.min(1, Math.max(0.02, ratio)) + ")";
-    track.appendChild(bar);
+    if (!rest) {
+      var bar = el("div", "fnd-dash-cat-bar");
+      var ratio = maxCount > 0 ? count / maxCount : 0;
+      bar.style.transform = "scaleX(" + Math.min(1, Math.max(0.02, ratio)) + ")";
+      track.appendChild(bar);
+    }
     row.appendChild(track);
     row.appendChild(el("span", "fnd-dash-cat-count", String(count)));
     return row;
@@ -900,6 +910,37 @@
     var slug = (id && _DOC_PAGES) ? _DOC_PAGES[id] : "";
     if (!slug) return "";
     return root + "findings/doc/" + encodeURIComponent(slug) + "/";
+  }
+
+  // [목록 실사일 2026-11-12] 문서 → 실사일(공개일과 다를 때만). 목록 정렬은 공개일 그대로이고,
+  // 줄에 실사일을 같이 적어 옛 실사가 이번 주 일로 읽히지 않게 한다. 맵이 늦게 오면 이미
+  // 그린 줄의 빈 자리(.fnd-doc-insp[data-doc-id])를 그때 채운다. 실패하면 아무것도 안 적는다.
+  var _INSP_DATES = null;
+  function _fillInspDates() {
+    if (!_INSP_DATES) return;
+    var spots = document.querySelectorAll(".fnd-doc-insp[data-doc-id]");
+    for (var i = 0; i < spots.length; i++) {
+      var d = _INSP_DATES[spots[i].getAttribute("data-doc-id")];
+      if (d && !spots[i].textContent) {
+        spots[i].textContent = _t("실사일") + " " + d;
+        spots[i].hidden = false;
+      }
+    }
+  }
+  function _fetchInspDates(assetRoot) {
+    fetch(assetRoot + "assets/doc-inspection-dates.json")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        var m = data && data.schema === "grm-doc-inspection-dates/v1" && data.inspection_date_by_document_id;
+        if (!m || typeof m !== "object") return;
+        var safe = {};
+        Object.keys(m).forEach(function (k) {
+          if (typeof m[k] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(m[k])) safe[k] = m[k];
+        });
+        _INSP_DATES = safe;
+        _fillInspDates();
+      })
+      .catch(function () { /* 실사일 없이 목록만 */ });
   }
 
   function safeUrl(u) {
@@ -1547,6 +1588,14 @@
     var meta = el("div", "fnd-doc-meta");
     if (head.source) meta.appendChild(el("span", "fnd-b", head.source));
     if (head.published_date) meta.appendChild(el("span", "fnd-doc-date", head.published_date));
+    if (head.document_id) {
+      var inspSpot = el("span", "fnd-doc-count fnd-doc-insp");
+      inspSpot.setAttribute("data-doc-id", String(head.document_id));
+      var inspD = _INSP_DATES && _INSP_DATES[String(head.document_id)];
+      if (inspD) inspSpot.textContent = _t("실사일") + " " + inspD;
+      else inspSpot.hidden = true;
+      meta.appendChild(inspSpot);
+    }
     meta.appendChild(el("span", "fnd-doc-count", _t("지적 {n}건", { n: rows.length })));
     // [FDA 483 실사관 표기] 값이 있을 때만 span 을 만든다(빈 라벨 금지). 기존 .fnd-doc-count
     // 클래스를 그대로 재사용해 신규 CSS 0(§ 최소화 원칙) — 시각적으로 동일한 보조 메타
@@ -2760,6 +2809,7 @@
   // 초기화 fetch 와 완전히 독립적이라 실패해도 검색 본기능·문서 카드 렌더에 영향 없다.
   fetchInspectorCohort();
   _fetchDocPages(assetRoot);
+  _fetchInspDates(assetRoot);
   // [PR-0 딥링크] finding_id 파라미터가 있으면 목록 fetch 와 병렬로 문서 조회를 시작한다 —
   // 어느 쪽이 먼저 끝나든 maybeFinishInit() 이 둘 다 끝난 뒤 한 번만 확정 렌더한다(깜빡임
   // 없음). 파라미터 자체가 없으면 deepLinkPending=false 로 시작해 아래 로직 전체가 기존

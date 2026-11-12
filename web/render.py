@@ -6870,6 +6870,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 i for i, sl in doc_slug_by_id.items() if sl not in en_doc_slugs),
         })
         written.append("assets/doc-pages.json")
+        # [목록 실사일 2026-11-12] 목록은 공개일(published_date) 순이 원칙이다(그대로 둔다).
+        # 다만 공개일만 적으면 8년 전 실사가 이번 주 일로 읽힌다 — 실사일이 공개일과 다른
+        # 문서만 document_id → 실사일 맵으로 따로 싣는다. doc-pages.json(세 자산 공유 명단)
+        # 에 붙이지 않는 이유: 그 파일은 실사관·업체 화면도 받으므로 쓰지 않는 무게를 늘린다.
+        _write_json(dist_assets / "doc-inspection-dates.json", {
+            "schema": "grm-doc-inspection-dates/v1",
+            "inspection_date_by_document_id": {
+                d["document_id"]: d["inspection_date"] for d in sorted(documents, key=lambda x: x["document_id"])
+                if d.get("inspection_date") and d.get("inspection_date") != d.get("published_date")},
+        })
+        written.append("assets/doc-inspection-dates.json")
 
         # 본문 → 용어 페이지 자동 링크(희소 용어 우선). 언어마다 본문·표제어가 달라
         # 색인과 문서 빈도도 같은 언어로 다시 잰다. 용어 정본이 없으면 조용히 꺼진다.

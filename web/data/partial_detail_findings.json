@@ -1,0 +1,21 @@
+{
+  "schema": "grm-partial-detail/v1",
+  "measured_on": "2026-11-12",
+  "finding_ids": [
+    "finding-01c2717666fb8623572ff5e6",
+    "finding-34244d85ebe03f8d2f166f9d",
+    "finding-42a47bb437b0a04046dd4b71",
+    "finding-5ab3c95862ab41f1f1ba743e",
+    "finding-78dd560b8ea6743149f9f3de",
+    "finding-791db05c0321968fe878e773",
+    "finding-8475d5de5d8b307ee3ea4616",
+    "finding-acfe11a6194bdfd7f3e8b215",
+    "finding-b5b83d850b9ad6959de8b220",
+    "finding-b7f7bb3e5aa0763003446407",
+    "finding-ba937734d7c6bba1ac506603",
+    "finding-c66fbf1e365ffd601813213f",
+    "finding-d5fb944a00a3ecd776d8b325",
+    "finding-ec5f35390f0630231c2a414f",
+    "finding-fde78810e2ada562e9b01e3d"
+  ]
+}

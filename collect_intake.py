@@ -3497,6 +3497,12 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
     Notion 에 있어도 모른다, ICH 스냅샷이 매일 재유입될 위험 · 조회 뒤에 수집된 검색 항목)과 정규화
     URL 2차 dedup 소스(URL 키를 Supabase 에서 얻을 수 없다)는 **쓰지 않고 다음 실행으로 미룬다**.
     원천이 다음 실행에 다시 내주므로(수집 창 7~35일) 유실이 아니다.
+    또 이 모드에서는 Supabase 가 "새로 저장됨"(saved)이라고 답한 항목만 Notion 에 쓴다. failed·duplicate
+    는 "Notion 에는 이미 있는데 Supabase 가 거부해 온 행"일 수 있어 미룬다(지난 소식 재게재 방지).
+
+    평소(대체 모드가 아닐 때) 중복 판정은 **Notion 단독**이다. Notion ∪ Supabase 합집합으로 하지 않는
+    이유: Supabase 저장은 됐는데 Notion 생성만 실패한 항목이 다음 실행에 "이미 있음"으로 건너뛰어져
+    주간 대기열에서 영영 빠진다.
 
     [수집 완전성 2026-11-08] heal_candidates(리스트)를 주면 Notion 에 이미 있어 건너뛴 항목을
     거기에 모은다 — 호출부가 `heal_supabase_copies` 로 Supabase 사본에 없는 것만 채운다.
@@ -3570,6 +3576,15 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                 "saved": "supabase_saved", "duplicate": "supabase_duplicate",
                 "failed": "supabase_failed", "undated": "supabase_skipped_undated",
             }[supa_status])
+        if fallback_checked is not None and supa_status != "saved":
+            # 대체 판정 모드에서는 Supabase 가 "새로 저장됨"이라고 답한 항목만 Notion 에 쓴다.
+            # failed(유효성 거부 등 — Notion 에는 이미 있을 수 있다)·duplicate 는 판정이 확실하지
+            # 않으므로 미룬다. 지난 소식이 Notion 에 다시 들어가 다음 브리프에 재게재되는 것을 막는다.
+            log("INFO", f"중복 판정 대체 모드 — Supabase 응답 {supa_status or '없음'} 이라 "
+                        f"Notion 적재를 다음 실행으로 미룸 source={item.source} id={item.document_id}")
+            _store_count(store_counters, "fallback_deferred")
+            skipped += 1
+            continue
         # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
         time.sleep(0.34)
         ok = notion_create_page(token, db_id, item, run_date, collected_at,

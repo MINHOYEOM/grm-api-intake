@@ -162,6 +162,37 @@ class FallbackDedupInsertTest(unittest.TestCase):
         self.assertEqual(got, (0, 1, 0))
         create.assert_not_called()
 
+    def test_supabase_not_saved_defers_notion_in_fallback(self):
+        # 재검토 0-2: 대체 모드에서는 Supabase 가 "새로 저장됨"이라고 답한 항목만 Notion 에 쓴다.
+        cases = [("failed", mock.Mock(side_effect=OSError("down"))),
+                 ("duplicate", mock.Mock(return_value=_ok("duplicate")))]
+        for name, append in cases:
+            with self.subTest(name), mock.patch.object(ci.time, "sleep"), \
+                    mock.patch.object(ci, "append_intake_item_to_supabase", append), \
+                    mock.patch.object(ci, "notion_create_page") as create:
+                counters = ci._new_store_counters()
+                got = _insert([_item()], findings_supabase=_SUPABASE, store_counters=counters,
+                              fallback_checked={"FDA Warning Letter::wl-0001"})
+                self.assertEqual(got, (0, 1, 0))
+                create.assert_not_called()
+                self.assertEqual(counters["fallback_deferred"], 1)
+
+    def test_fallback_without_supabase_config_defers(self):
+        with mock.patch.object(ci.time, "sleep"), \
+                mock.patch.object(ci, "notion_create_page") as create:
+            got = _insert([_item()], fallback_checked={"FDA Warning Letter::wl-0001"})
+        self.assertEqual(got, (0, 1, 0))
+        create.assert_not_called()
+
+    def test_normal_mode_supabase_failure_still_writes_notion(self):
+        # 평소 모드는 Supabase 실패와 무관하게 Notion 에 쓴다(대기열 우선 — 합집합 금지와 짝).
+        with mock.patch.object(ci.time, "sleep"), \
+                mock.patch.object(ci, "append_intake_item_to_supabase", return_value=_ok("duplicate")), \
+                mock.patch.object(ci, "notion_create_page", return_value=True) as create:
+            got = _insert([_item()], findings_supabase=_SUPABASE)
+        self.assertEqual(got, (1, 0, 0))
+        create.assert_called_once()
+
     def test_checked_new_key_is_inserted(self):
         with mock.patch.object(ci.time, "sleep"), \
                 mock.patch.object(ci, "append_intake_item_to_supabase", return_value=_ok()), \

@@ -342,7 +342,8 @@ def _evaluate_health(
             "Notion",
             "Notion 중복 조회 실패 — Supabase 키로 대신 판정해 적재를 계속함",
             (f"사유 {store.get('dedup_error') or '?'}. 판정할 수 없는 항목 "
-             f"{int(store.get('fallback_deferred') or 0)}건(게시일 없음·URL 2차 dedup 소스)은 "
+             f"{int(store.get('fallback_deferred') or 0)}건(게시일 없음·URL 2차 dedup 소스·Supabase 가 "
+             "'새로 저장됨'이라고 답하지 않은 항목)은 "
              "다음 실행으로 미뤘습니다. Notion 이 계속 실패하면 같은 KST 날짜 안에 재실행하세요."),
         )
     supa_failed = int(store.get("supabase_failed") or 0)

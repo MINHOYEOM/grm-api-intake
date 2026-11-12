@@ -7345,8 +7345,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     _a = doc_finding_anatomy(doc, f, _lg, _link)
                     _views.append(_a if _a is not None else {"body": _link(finding_body(f, _lg))})
                 _anat = _views if any("lead" in v for v in _views) else None
+                # [UI 2단 2026-11-12] 관련 용어 칸 — 본문에 실제로 링크된 용어만(선정 순서).
+                _doc_terms = [{"id": tid, "label": surface} for surface, tid in _sel
+                              if tid in _used]
                 _emit("findings_doc.html", _pp,
                     next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
+                    doc_terms=_doc_terms,
                     page_title=_tr("{title} · GRM",
                                    title=doc_titles_by_lang[_lg][doc["slug"]]),
                     nav_active="findings",

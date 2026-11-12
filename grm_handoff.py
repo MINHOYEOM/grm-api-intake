@@ -1238,7 +1238,10 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          web_brief_dir: str | None = None,
                          silent_sources: Iterable[str] = (),
                          sealed_dates: list[str] | None = None,
+                         payload_out: list[dict[str, Any]] | None = None,
                          ) -> tuple[int, str]:
+    # payload_out(선택): 만든 payload 를 여기에 append 한다 — 대기열 그림자(grm_queue)가 DB 로 만든
+    # handoff 와 비교할 때 쓴다. 반환값·노션 쓰기는 그대로다(미지정이면 종전과 완전히 같다).
     # B1 조회/표시 분리: window_days(조회 lookback, 기본 30 — 미소비 New 누락 방지
     # 안전망)와 payload 의 window_start~window_end 는 역할이 다르다. 후자는 v16
     # 프롬프트가 발행 브리프의 "검색 기간" 속성으로 그대로 렌더하므로 발행 cadence
@@ -1321,4 +1324,6 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
         # emit 표시는 handoff page 확정(upsert 성공) **후** — page 없는 ref 가 생기지
         # 않게 한다. 대상은 dedupe 전 전체 rows(중복 row 도 이 handoff 가 가져감).
         notion_mark_rows_handoff_ref(token, rows, handoff_id)
+    if payload_out is not None:
+        payload_out.append(payload)
     return payload["row_count"], page_url

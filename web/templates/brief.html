@@ -35,6 +35,22 @@
       {%- endfor %}
     </ul></div>
     {%- endif %}
+    {%- if glance %}
+    {#- [브리프 4단 2026-11-12] 주간 현황 — 카드 묶음·종류로 센 건수와 DB 국가·분류 값으로 센 한 줄
+        (render.build_brief_glance · 정본 web/data/brief_glance.json). 줄이 없으면 건수 칸만. -#}
+    <section class="glance" aria-label="{{ _('주간 현황') }}">
+      <div class="l">{{ _("주간 현황") }}</div>
+      <div class="glance-g">
+      {%- for g in glance.groups %}
+        <div class="glance-c"><b class="glance-n">{{ g.n }}</b><span class="glance-nm">{{ g.name }}</span><span class="glance-pt">{% for p in g.parts %}{{ p.t }} {{ _("{n}건", n=p.n) }}{% if not loop.last %} · {% endif %}{% endfor %}</span></div>
+      {%- endfor %}
+      </div>
+      {%- if glance.line %}
+      <p class="glance-line">{{ glance.line }}</p>
+      <p class="glance-src">{{ _("국가·분류: 지적사항 DB 기준") }}</p>
+      {%- endif %}
+    </section>
+    {%- endif %}
     {%- if brief.ai_disclosure %}
     <div class="ai-badge"><i class="ti ti-robot" aria-hidden="true"></i><div class="ai-badge-b"><b>{{ _("AI 자동 생성 안내") }}</b><p>{{ _("요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, 수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. 본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오.") }}</p><a href="#ai-notice">{{ _("전문 보기 ↓") }}</a></div></div>
     {%- endif %}
@@ -273,6 +289,15 @@ body.brief-summary #cards .rowc[open]>article.card{display:block}
 .dt-xref-go:hover .ti{transform:translateX(3px)}
 @media (max-width:640px){ .dt-xref-go{margin-left:0} }
 {% endif %}
+.glance{margin:22px 0 0;padding:18px 0 0;border-top:1px solid var(--line-2)}
+.glance .l{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);margin:0 0 12px}
+.glance-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.glance-c{display:flex;flex-direction:column;gap:3px;padding:12px 14px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad)}
+.glance-n{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);line-height:1.1}
+.glance-nm{font-size:14px;font-weight:600;color:var(--ink)}
+.glance-pt{font-size:12.5px;line-height:1.55;color:var(--muted);word-break:keep-all}
+.glance-line{margin:14px 0 0;font-size:14.5px;color:var(--ink);word-break:keep-all}
+.glance-src{margin:4px 0 0;font-size:12px;color:var(--muted)}
 </style>
 {% endblock %}
 {% block ai_disclosure %}

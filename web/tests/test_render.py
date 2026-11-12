@@ -21542,6 +21542,69 @@ class WebTier1BarsAndDatesTest(unittest.TestCase):
         self.assertLess(head.index('"fnd-doc-date", head.published_date'), head.index("fnd-doc-insp"))
 
 
+
+# ── [브리프 4단 2026-11-12] 주간 현황 ────────────────────────────────────────────
+class WebBriefGlanceTest(unittest.TestCase):
+    """주간 현황 — 건수는 카드 묶음·종류로, 몰린 것 한 줄은 DB 정본(brief_glance.json) 값으로.
+    업체 이름으로 국가를 세지 않는다. 페이지는 따로 원격 호출을 하지 않는다(정적)."""
+
+    @staticmethod
+    def _cards(spec):
+        raw, views = [], []
+        for i, (t, url) in enumerate(spec):
+            raw.append({"card_type": t, "sources": {"official_url": url}})
+            views.append({"card_type": t})
+        return raw, views
+
+    def test_country_line_from_db_values(self):
+        spec = [("FDA 483 실사 관찰", f"https://x/{i}") for i in range(12)] + \
+               [("Warning Letter", f"https://w/{i}") for i in range(5)]
+        raw, views = self._cards(spec)
+        db = {f"https://x/{i}": {"c": "JP", "k": []} for i in range(6)}
+        db.update({f"https://x/{i}": {"c": "US", "k": []} for i in range(6, 10)})
+        line = render._glance_line(views, raw, db, render._KO)
+        self.assertEqual(line, "FDA 483 실사 관찰 12건 중 6건이 일본 소재 제조소")
+
+    def test_falls_back_to_category_and_skips_catchall(self):
+        raw, views = self._cards([("FDA 483 실사 관찰", f"https://x/{i}") for i in range(6)])
+        db = {f"https://x/{i}": {"c": ["US", "JP", "KR", "DK", "IN", "CN"][i],
+                                 "k": ["other_quality_system", "data_integrity"]}
+              for i in range(6)}
+        line = render._glance_line(views, raw, db, render._KO)
+        self.assertEqual(line, "문서 6건 중 6건에 데이터 완전성 지적")
+
+    def test_no_line_without_db_or_concentration(self):
+        raw, views = self._cards([("FDA 483 실사 관찰", f"https://x/{i}") for i in range(4)])
+        self.assertEqual(render._glance_line(views, raw, {}, render._KO), "")
+        db = {"https://x/0": {"c": "JP", "k": []}, "https://x/1": {"c": "JP", "k": []}}
+        self.assertEqual(render._glance_line(views, raw, db, render._KO), "")
+
+    def test_other_card_types_are_not_counted(self):
+        raw, views = self._cards([("Recall", f"https://r/{i}") for i in range(5)])
+        db = {f"https://r/{i}": {"c": "JP", "k": []} for i in range(5)}
+        self.assertEqual(render._glance_line(views, raw, db, render._KO), "")
+
+    def test_groups_count_card_types_in_order(self):
+        sections = [{"name": "글로벌", "count": 3,
+                     "cards": [{"card_type": "Warning Letter"}, {"card_type": "FDA 483 실사 관찰"},
+                               {"card_type": "FDA 483 실사 관찰"}]}]
+        g = render.build_brief_glance(sections, [], [], {}, render._KO)
+        self.assertEqual(g["groups"][0]["parts"],
+                         [{"t": "FDA 483 실사 관찰", "n": 2}, {"t": "Warning Letter", "n": 1}])
+        self.assertEqual(g["line"], "")
+
+    def test_template_is_static_and_snapshot_sits_next_to_live_briefs(self):
+        tpl = (WEB_DIR / "templates" / "brief.html").read_text(encoding="utf-8")
+        sec = tpl[tpl.index('<section class="glance"'):tpl.index("</section>", tpl.index('<section class="glance"'))]
+        self.assertNotIn("<script", sec)
+        self.assertNotIn("data-docs", tpl)
+        self.assertEqual(render.BRIEF_GLANCE_FILE.parent, render.DATA_DIR.parent)
+        snap = json.loads(render.BRIEF_GLANCE_FILE.read_text(encoding="utf-8"))
+        self.assertEqual(snap["schema"], "grm-brief-glance/v1")
+        for v in snap["items"].values():
+            self.assertEqual(set(v), {"c", "k"})
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

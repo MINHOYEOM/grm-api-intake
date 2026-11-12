@@ -315,6 +315,10 @@ jobs:
           # 수집기 제외 장부(migration 130). 기본 off - 130 적용 전에는 켜지 않는다. 켜도 장부 읽기·저장
           # 실패는 수집을 멈추지 않는다(실행 요약 카운터). SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 재사용.
           ENABLE_INTAKE_EXCLUSION_LEDGER: ${{ vars.ENABLE_INTAKE_EXCLUSION_LEDGER || 'false' }}
+          # [대기열 그림자 2026-11-12] 같은 handoff 를 DB(intake_queue + raw_signals)로 한 번 더 만들어
+          # 노션 것과 비교한다(grm_queue.py · migration 149 전제). 기본 꺼짐. 켜도 발행은 노션 handoff 그대로이고,
+          # 실패는 경고로만 남는다. 결과는 실행 요약과 grm-queue-shadow 아티팩트에 남는다.
+          ENABLE_INTAKE_QUEUE_SHADOW: ${{ vars.ENABLE_INTAKE_QUEUE_SHADOW || 'false' }}
           # §1-B(ENABLE_WEB_BRIEF_EMIT·GRM_WEB_BRIEF_DIR)는 job-level env 에 정의(upload 스텝과 공유).
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
@@ -399,6 +403,16 @@ jobs:
         with:
           name: grm-web-brief
           path: ${{ env.GRM_WEB_BRIEF_DIR }}/brief_web_*.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+      # [대기열 그림자] DB 로 만든 handoff·빈 슬롯 브리프·비교 보고서. 꺼져 있으면 폴더가 없어 무해 스킵.
+      - name: Upload queue shadow (DB handoff · 비교 보고서)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: grm-queue-shadow
+          path: _queue_shadow/
           if-no-files-found: ignore
           retention-days: 30
 

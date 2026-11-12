@@ -47,6 +47,7 @@ from zoneinfo import ZoneInfo
 
 import requests
 
+import grm_queue
 import intake_exclusion as _xl
 from grm_common import (
     HTTPClientError,
@@ -3479,7 +3480,8 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  findings_supabase_include_findings: bool = False,
                  heal_candidates: list[IntakeItem] | None = None,
                  store_counters: dict[str, Any] | None = None,
-                 fallback_checked: set[str] | None = None) -> tuple[int, int, int]:
+                 fallback_checked: set[str] | None = None,
+                 queue_new_items: list[IntakeItem] | None = None) -> tuple[int, int, int]:
     """삽입 실행. 반환: (inserted, skipped, failed)
 
     [대기열 0단계 2026-11-12] 저장 순서: **Supabase(정본) 먼저 → Notion(주간 대기열) 다음**.
@@ -3590,6 +3592,9 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             existing_ids.add(dedup_key)
             if url_key:
                 existing_url_keys.add(url_key)
+            if queue_new_items is not None:
+                # [대기열 그림자 2026-11-12] 노션 대기열에 새로 들어간 항목 = DB 대기열에도 넣을 항목.
+                queue_new_items.append(item)
             if findings_sqlite_path:
                 try:
                     if findings_sqlite_include_findings:
@@ -4916,6 +4921,10 @@ def main() -> int:
     # 사본 append 가 켜져 있을 때 기본으로 돈다. 끄려면 RAW_SIGNALS_HEAL=false.
     heal_candidates: list[IntakeItem] | None = (
         [] if findings_supabase and env_flag("RAW_SIGNALS_HEAL", True) else None)
+    # [대기열 그림자 2026-11-12] 노션 대기열에 새로 들어간 항목을 모아 DB 대기열(intake_queue)에도
+    # 넣는다. ENABLE_INTAKE_QUEUE_SHADOW 가 꺼져 있으면 None = 종전과 완전히 같다.
+    queue_new_items: list[IntakeItem] | None = (
+        [] if findings_supabase and not args.dry_run and grm_queue.shadow_enabled() else None)
     for spec in INTAKE_SOURCE_SPECS:
         if spec.prefix == "search":
             continue  # search 는 아래 결합 블록에서 처리
@@ -4930,7 +4939,8 @@ def main() -> int:
             findings_supabase_include_findings=findings_supabase_include_findings,
             heal_candidates=heal_candidates,
             store_counters=store_counters,
-            fallback_checked=fallback_checked)
+            fallback_checked=fallback_checked,
+            queue_new_items=queue_new_items)
         setattr(stats, f"{spec.prefix}_inserted", ins)
         setattr(stats, f"{spec.prefix}_skipped_dup", sk)
         setattr(stats, f"{spec.prefix}_insert_failed", fail)
@@ -4992,6 +5002,7 @@ def main() -> int:
             findings_supabase_include_findings=findings_supabase_include_findings,
             store_counters=store_counters,
             fallback_checked=fallback_checked,
+            queue_new_items=queue_new_items,
         )
         stats.search_inserted = src_in
         stats.search_skipped_dup = src_sk
@@ -5062,6 +5073,7 @@ def main() -> int:
     handoff_error_msg = ""
     # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
     handoff_window_days = cfg.handoff_window_days
+    handoff_payloads: list[dict[str, Any]] = []   # 대기열 그림자 비교용(노션으로 만든 payload)
     if args.emit_routine_handoff:
         if args.dry_run:
             log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
@@ -5111,12 +5123,32 @@ def main() -> int:
                     web_brief_dir=web_brief_dir,
                     # 무음 소스는 coverage 줄에 `0(점검필요)` 로 찍힌다(§3 2026-09-14).
                     silent_sources=coverage_silent_sources,
-                    sealed_dates=handoff_sealed_dates)
+                    sealed_dates=handoff_sealed_dates,
+                    payload_out=handoff_payloads)
                 handoff_emitted = True
             except NotionHandoffError as e:
                 handoff_failed = True
                 handoff_error_msg = str(e)
                 log("ERROR", f"Routine handoff 생성 실패: {handoff_error_msg}")
+
+    # [대기열 그림자 2026-11-12] 같은 handoff 를 DB(intake_queue + raw_signals)만으로 한 번 더 만들어
+    # 노션 것과 비교하고, 행 상태를 main 발행 파일에서 다시 계산한다. 발행은 노션 handoff 그대로다.
+    # 어떤 실패도 수집 결과를 바꾸지 않는다(경고만).
+    if queue_new_items is not None and findings_supabase:
+        try:
+            grm_queue.run_shadow(
+                findings_supabase, run_date=run_date, generated_at=collected_at,
+                window_days=handoff_window_days, display_window_days=args.window_days,
+                new_items=queue_new_items,
+                notion_payload=(handoff_payloads[-1] if handoff_payloads else None),
+                notion_status_lookup=(
+                    (lambda handoff_date, _keys: grm_queue.notion_status_map(
+                        notion_token, notion_db, handoff_date, handoff_window_days))
+                    if notion_token and notion_db else None),
+                silent_sources=coverage_silent_sources)
+        except Exception as e:  # noqa: BLE001 — 그림자가 수집을 깨면 안 된다
+            log("WARN", f"대기열 그림자 실패(수집·노션 handoff 는 정상): "
+                        f"{type(e).__name__}: {truncate(str(e), 160)}")
 
     # B1 임시 방어 ②: 윈도우 밖 미소비 New 카운트(읽기전용 — dry-run 도 자격증명이
     # 있으면 수행해 검증 루프로 쓸 수 있다). 실패는 조용한 0 이 아니라 경고로 표면화.

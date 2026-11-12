@@ -1,0 +1,94 @@
+name: GRM Intake Queue (대기열 초기 이관 · 상태 다시 계산)
+
+# [대기열 그림자 · 2026-11-12] grm_queue.py 의 수동 도구 두 가지(migration 149 전제).
+#   seed      — 그림자를 켜기 전에 이미 수집된 행을 대기열(intake_queue)에 한 번 옮긴다.
+#               since = 직전 발행 호 handoff 생성 시각(그 뒤에 수집된 행만). 이미 있는 행은 그대로 둔다.
+#   reconcile — main 의 발행 파일(델타·발행본)로 행 상태를 다시 계산한다(일일 수집도 매번 한다).
+# 기본은 dry-run(apply=false) — 쓰지 않고 계획·집계만 보고한다. 확인 후 apply=true 로 다시 돌린다.
+# 노션에는 쓰지 않는다. 발행 경로와 무관하다.
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'seed(초기 이관) 또는 reconcile(상태 다시 계산)'
+        type: choice
+        options: [seed, reconcile]
+        default: seed
+      since:
+        description: 'seed 전용 — 이 시각 뒤에 수집된 행만(ISO, 예: 2026-11-09T03:40:00+09:00)'
+        type: string
+        default: ''
+      apply:
+        description: '실제로 쓴다(기본 false = dry-run)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-intake-queue
+  cancel-in-progress: false
+
+jobs:
+  queue:
+    name: Intake queue tool
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run (dry-run unless apply=true)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_COMMAND: ${{ inputs.command }}
+          IN_SINCE: ${{ inputs.since }}
+          IN_APPLY: ${{ inputs.apply }}
+        run: |
+          set -uo pipefail
+          args=()
+          case "${IN_COMMAND:-}" in
+            seed)
+              if ! printf '%s' "${IN_SINCE:-}" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+(Z|[+-][0-9]{2}:[0-9]{2})$'; then
+                echo "::error::since 는 시간대가 붙은 ISO 시각이어야 한다(예: 2026-11-09T03:40:00+09:00)"; exit 2
+              fi
+              args=(seed --since "$IN_SINCE") ;;
+            reconcile)
+              args=(reconcile --repo-root .) ;;
+            *)
+              echo "::error::command 는 seed 또는 reconcile"; exit 2 ;;
+          esac
+          if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
+          python grm_queue.py "${args[@]}" > intake_queue_report.json
+          rc=$?
+          {
+            echo "### 대기열 도구 — ${IN_COMMAND}"
+            echo "- apply: \`${IN_APPLY:-false}\` · since: \`${IN_SINCE:-없음}\` · exit: \`${rc}\`"
+            echo '```json'
+            head -c 6000 intake_queue_report.json
+            echo
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: intake-queue-report
+          path: intake_queue_report.json
+          retention-days: 30
+          if-no-files-found: warn

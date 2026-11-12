@@ -749,6 +749,9 @@
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
     nameEl.textContent = data.display_name || "";
+    // [UI 3단 2026-11-12] 페이지의 주인은 실사관 이름 — 일반 제목은 접고 이름을 h1 로 둔다.
+    var generic = document.querySelector("main .page-head");
+    if (generic) generic.style.display = "none";
     LAST_NAME = data.display_name || "";
     LAST_DOCS = data.documents || [];
     activeCat = null;

@@ -937,6 +937,12 @@ def _cli_store() -> QueueStore:
 
 
 def main(argv: "list[str] | None" = None) -> int:
+    # 좁은 콘솔 인코딩(cp949 등)에서 한글·기호 출력이 죽지 않게 한다.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description="GRM 주간 대기열(DB) 도구")
     sub = ap.add_subparsers(dest="cmd", required=True)
     seed = sub.add_parser("seed", help="그림자 시작 전 수집분을 대기열에 한 번 옮긴다")

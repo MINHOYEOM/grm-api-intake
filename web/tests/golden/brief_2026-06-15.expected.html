@@ -71,7 +71,9 @@
       <span>발행일 <b class="mono">2026-06-15</b></span>
       <span>수집 <b>19</b>건 · 카드 <b>1</b>장</span>
       <span>Evidence <b class="mono">A 1 · B 0 · C 0</b></span>
-    </div>    <div class="ai-badge"><i class="ti ti-robot" aria-hidden="true"></i><div class="ai-badge-b"><b>AI 자동 생성 안내</b><p>요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, 수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. 본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오.</p><a href="#ai-notice">전문 보기 ↓</a></div></div>  </div>
+    </div><section class="glance" aria-label="주간 현황">
+      <div class="l">주간 현황</div>
+      <div class="glance-g">        <div class="glance-c"><b class="glance-n">1</b><span class="glance-nm">Recall</span><span class="glance-pt">회수·판매중지 1건</span></div>      </div>    </section>    <div class="ai-badge"><i class="ti ti-robot" aria-hidden="true"></i><div class="ai-badge-b"><b>AI 자동 생성 안내</b><p>요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, 수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. 본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오.</p><a href="#ai-notice">전문 보기 ↓</a></div></div>  </div>
   <div class="wrap layout"><aside class="toc" id="toc"><div class="l">목차<button class="toc-close" type="button" aria-label="목차 닫기"><i class="ti ti-x"></i></button></div><div>      <details class="toc-grp" data-slug="Recall">
         <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">Recall</span><span class="n">1</span></summary>        <a href="#recall-syn-merged">한국제약(주) 아세트아미노펜정 500mg 외 2품목</a>      </details>    </div></aside>
     <div id="cards" data-issue-no="2" data-date="2026-06-15"><div id="grm-brief-firm-cfg" data-url="" data-key="" data-root="../../" hidden></div>
@@ -156,6 +158,16 @@
 .c-doclink .ti{font-size:14px;transition:transform .16s var(--ease)}
 .c-doclink:hover .ti{transform:translateX(3px)}
 @media(prefers-reduced-motion:reduce){.c-doclink .ti{transition:none}}
+.glance{margin:22px 0 0;padding:18px 0 0;border-top:1px solid var(--line-2)}
+.glance .l{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);margin:0 0 12px}
+.glance-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.glance-c{display:flex;flex-direction:column;gap:3px;padding:12px 14px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad)}
+.glance-n{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);line-height:1.1}
+.glance-nm{font-size:14px;font-weight:600;color:var(--ink)}
+.glance-pt{font-size:12.5px;line-height:1.55;color:var(--muted);word-break:keep-all}
+.glance-line{margin:14px 0 0;font-size:14.5px;color:var(--ink);word-break:keep-all}
+.glance-src{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.glance-line[hidden],.glance-src[hidden]{display:none}
 </style>
 <section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
   <span class="kick">AI Disclosure</span>
@@ -255,6 +267,53 @@ if(_nt&&_nm){
 <script src="/assets/pet.js?v=e470de1f" defer></script>
 <script src="/assets/site-popup.js?v=8b64d29c" defer></script>
 <script>
+/* [brief glance 2026-11-12] one line from DB values (findings.country_key, category_code) via
+   the public read policy. No URL/key (local and CI builds) or any failure: the line stays hidden. */
+(function(){
+  var line=document.getElementById('briefGlance'); if(!line || !window.fetch) return;
+  var cfg=document.getElementById('grm-brief-firm-cfg'); if(!cfg) return;
+  var base=cfg.getAttribute('data-url')||'', key=cfg.getAttribute('data-key')||'';
+  if(!base || !key) return;
+  var docs, labels;
+  try{ docs=JSON.parse(line.getAttribute('data-docs')||'[]'); labels=JSON.parse(line.getAttribute('data-labels')||'{}'); }catch(e){ return; }
+  if(!docs.length) return;
+  var urls=[], seen={};
+  docs.forEach(function(d){ if(!seen[d.u]){ seen[d.u]=1; urls.push(d.u); } });
+  var inList=urls.map(function(u){ return '"'+u.replace(/"/g,'')+'"'; }).join(',');
+  var q=base.replace(/\/$/,'')+'/rest/v1/findings?select=evidence_url,country_key,category_code&evidence_url=in.('+encodeURIComponent(inList)+')';
+  function fill(t, o){ return t.replace(/\{(\w+)\}/g, function(m,k){ return (k in o)?String(o[k]):m; }); }
+  fetch(q,{headers:{apikey:key,Authorization:'Bearer '+key}}).then(function(r){ return r.ok?r.json():[]; }).then(function(rows){
+    if(!rows || !rows.length) return;
+    var byUrl={};
+    rows.forEach(function(r){
+      var u=r.evidence_url; if(!u) return;
+      var e=byUrl[u]||(byUrl[u]={c:'',k:{}});
+      if(!e.c && r.country_key) e.c=r.country_key;
+      if(r.category_code) e.k[r.category_code]=1;
+    });
+    var cl=labels.c||{}, kl=labels.k||{}, best=null;
+    var types={};
+    docs.forEach(function(d){ (types[d.t]||(types[d.t]=[])).push(d.u); });
+    Object.keys(types).forEach(function(t){
+      var us=types[t], n=us.length, cnt={};
+      us.forEach(function(u){ var e=byUrl[u]; if(e && e.c && cl[e.c]) cnt[e.c]=(cnt[e.c]||0)+1; });
+      Object.keys(cnt).forEach(function(c){
+        var k=cnt[c];
+        if(k>=3 && k*2>=n && (!best || k/n>best.r)) best={r:k/n,text:fill(line.getAttribute('data-tpl-country'),{type:t,n:n,k:k,country:cl[c]})};
+      });
+    });
+    if(!best){
+      var matched=urls.filter(function(u){ return byUrl[u]; }), m=matched.length, kc={};
+      matched.forEach(function(u){ Object.keys(byUrl[u].k).forEach(function(k){ if(kl[k]) kc[k]=(kc[k]||0)+1; }); });
+      Object.keys(kc).sort(function(a,b){ return kc[b]-kc[a] || (a<b?-1:1); }).slice(0,1).forEach(function(k){
+        if(kc[k]>=3 && kc[k]*3>=m) best={r:0,text:fill(line.getAttribute('data-tpl-cat'),{n:m,k:kc[k],cat:kl[k]})};
+      });
+    }
+    if(!best) return;
+    line.textContent=best.text; line.hidden=false;
+    var src=document.getElementById('briefGlanceSrc'); if(src) src.hidden=false;
+  }).catch(function(){});
+})();
 /* P1-2: 모바일 목차 점프 내비(≤900px) — FAB 탭 → 바텀시트. 데스크톱 미사용. 슬라이드는 reduced-motion 시 CSS 가 제거. */
 (function(){
   var fab=document.getElementById('tocFab'),toc=document.getElementById('toc'),bd=document.getElementById('tocBackdrop');

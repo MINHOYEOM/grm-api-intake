@@ -662,10 +662,22 @@ def extract_delta(page: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] 
             for i, p in enumerate(parsed))
         raise DeltaBridgeError(
             f"페이지 {title!r}: 델타 envelope(cards+tldr)를 어떤 결합으로도 못 찾음 — {diag}")
+    return finalize_delta(delta, deep, title_date)
+
+
+def finalize_delta(delta: dict[str, Any], deep: "dict[str, Any] | None",
+                   fallback_date: str) -> tuple[dict[str, Any], dict[str, Any] | None, str]:
+    """envelope 를 찾은 뒤의 공통 검증·정규화 — **노션 예치와 git 반납이 같은 문을 지난다.**
+
+    [2026-11-12] 결과 반납 git 길(편집팀 `claude/company-{date}` 의 `delta.json`)이 생기면서
+    `extract_delta` 의 뒷부분을 떼어 냈다. 두 길이 서로 다른 검증을 지나면 "어느 쪽이 맞나"
+    비교가 검증 차이까지 섞여 의미가 없어진다.
+    """
+    delta = _validate_envelope(delta, what="delta envelope")
     if deep is not None:
         deep = _validate_deep(deep)  # 구조 파싱만(게이트는 write 직전 main 에서 — 파싱/검증 분리)
 
-    publish_date = delta.get("publish_date") or title_date
+    publish_date = delta.get("publish_date") or fallback_date
     if not isinstance(publish_date, str) or not _DATE_RE.match(publish_date):
         raise DeltaBridgeError(
             f"publish_date 형식 오류: {publish_date!r} — ^\\d{{4}}-\\d{{2}}-\\d{{2}}$ 필요")
@@ -828,6 +840,378 @@ def write_deep_only(deep: dict[str, Any], date_str: str) -> bool:
     return _write_deep_file(deep, date_str)
 
 
+# ── 결과 반납 git 길 (재검토안 3절 1단계, 2026-11-12) ─────────────────────────────────
+#
+# 편집팀(클라우드)은 결과를 브랜치 `claude/company-{date}` 의 `company/run/{date}/` 에 쓰고, 교열이
+# `merge_parts.py` 로 `delta.json`·`deep_delta.json` 을 만든다. 지금까지는 교열이 그것을 다시
+# 노션에 **옮겨 적어** 예치했고, 이 브릿지는 노션에서 읽었다(git → 노션 → git 왕복). 노션 코드
+# 블록 경계에서 공백이 깎이는 오류(`in the`→`inthe`)가 이 왕복에서 생긴다.
+#
+# 어느 길이 정본인가 — 플래그 `GRM_DELTA_SOURCE`(저장소 변수 · dispatch 입력 `source`):
+#   · `notion`(기본) : 지금과 같다. 노션 예치가 정본이고, git 쪽은 **비교만** 한다(쓰지 않는다).
+#                     11-16 은 이 모드로 두 길을 나란히 받아 차이표를 남긴다.
+#   · `git`          : git 반납을 **먼저** 본다. 채택 조건을 채우면 그것을 쓰고, 아니면 지금처럼
+#                     노션 예치로 넘어간다(노션 = 예비).
+# 같은 날짜에 두 길이 다른 내용을 주면 **먼저 main 에 기록된 쪽이 이긴다.** git 모드에서 git 이
+# 늦게 와 이미 기록된 파일과 다르면 오류로 멈추지 않고 차이표만 남긴다(발행 흐름을 막지 않는다).
+# 노션 모드에서 git 쪽은 어떤 경우에도 파일을 쓰지 않는다.
+
+ENV_DELTA_SOURCE = "GRM_DELTA_SOURCE"
+SOURCE_NOTION = "notion"
+SOURCE_GIT = "git"
+GIT_BRANCH_TPL = "claude/company-{date}"
+GIT_RUN_DIR_TPL = "company/run/{date}"
+COMPARE_DIR = "_delta_compare"  # 워크플로가 아티팩트로 올린다(커밋 대상 아님)
+
+
+def resolve_source(cli_value: "str | None") -> str:
+    """정본 길 결정 — CLI > 환경변수 > 기본 `notion`. 모르는 값은 안전한 `notion` 으로(WARN)."""
+    raw = (cli_value or os.environ.get(ENV_DELTA_SOURCE) or SOURCE_NOTION).strip().lower()
+    if raw not in (SOURCE_NOTION, SOURCE_GIT):
+        log("WARN", f"{ENV_DELTA_SOURCE}={raw!r} 는 모르는 값 — 기본 `notion` 으로 진행")
+        return SOURCE_NOTION
+    return raw
+
+
+def _kst_today() -> str:
+    from datetime import datetime, timedelta, timezone
+    return datetime.now(timezone(timedelta(hours=9))).date().isoformat()
+
+
+_GIT_FETCHED: dict[str, bool] = {}
+
+
+def git_read_run_file(date_str: str, name: str) -> "str | None":
+    """`origin/claude/company-{date}:company/run/{date}/{name}` 원문. 브랜치·파일이 없으면 None.
+
+    실패는 전부 None(WARN) — git 길은 선택 경로라 이 함수가 노션 길을 막으면 안 된다.
+    """
+    import subprocess
+    branch = GIT_BRANCH_TPL.format(date=date_str)
+    ref = f"refs/remotes/origin/{branch}"
+    if date_str not in _GIT_FETCHED:
+        try:
+            r = subprocess.run(
+                ["git", "fetch", "--quiet", "--no-tags", "origin",
+                 f"+refs/heads/{branch}:{ref}"],
+                capture_output=True, text=True, timeout=120)
+            _GIT_FETCHED[date_str] = r.returncode == 0
+            if r.returncode != 0:
+                log("INFO", f"git 반납 브랜치 {branch} 없음/fetch 실패 — {r.stderr.strip()[:200]}")
+        except (OSError, subprocess.SubprocessError) as e:
+            log("WARN", f"git fetch 실행 실패({branch}): {e}")
+            _GIT_FETCHED[date_str] = False
+    if not _GIT_FETCHED[date_str]:
+        return None
+    path = f"{GIT_RUN_DIR_TPL.format(date=date_str)}/{name}"
+    try:
+        r = subprocess.run(["git", "show", f"{ref}:{path}"],
+                           capture_output=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as e:
+        log("WARN", f"git show 실행 실패({path}): {e}")
+        return None
+    if r.returncode != 0:
+        return None
+    return r.stdout.decode("utf-8")
+
+
+def load_git_run(date_str: str, read=None) -> dict[str, Any]:
+    """git 반납 한 주를 읽어 채택 여부를 판정한다(순수 판정 + 주입 가능한 reader).
+
+    채택 조건(전부): ① `copyedit.json` 이 있고 `status=="완료"` ② 교열 코드 검사
+    `code_gate.ran` 이고 `exit==0` ③ reject 0(`counts.reject` 와 `cards[].verdict` 둘 다)
+    ④ `delta.json` 이 JSON dict ⑤ `deep_delta.json` 이 있으면 JSON dict.
+    샤드 미완은 `merge_parts.py` 가 `delta.json` 을 만들지 않고, 교열은 그때 `보류`로 끝나므로
+    ①이 그 판정을 이어받는다.
+
+    채택 불가여도 `delta`·`deep` 은 읽을 수 있으면 채워 둔다 — **비교에는 쓰고, 기록에는 안 쓴다.**
+    반환: {"date","branch","found","adoptable","reason","delta","deep"}.
+    """
+    read = read or git_read_run_file
+    out: dict[str, Any] = {"date": date_str, "branch": GIT_BRANCH_TPL.format(date=date_str),
+                           "found": False, "adoptable": False, "reason": "",
+                           "delta": None, "deep": None}
+    reasons: list[str] = []
+
+    delta_text = read(date_str, "delta.json")
+    deep_text = read(date_str, "deep_delta.json")
+    copy_text = read(date_str, "copyedit.json")
+    out["found"] = any(t is not None for t in (delta_text, deep_text, copy_text))
+    if not out["found"]:
+        out["reason"] = f"브랜치 {out['branch']} 에 반납 파일 없음"
+        return out
+
+    if delta_text is None:
+        reasons.append("delta.json 없음(샤드 합치기 전·실패)")
+    else:
+        out["delta"] = _try_json_dict(delta_text)
+        if out["delta"] is None:
+            reasons.append("delta.json JSON 파싱 실패")
+    if deep_text is not None:
+        out["deep"] = _try_json_dict(deep_text)
+        if out["deep"] is None:
+            reasons.append("deep_delta.json JSON 파싱 실패")
+
+    copyedit = _try_json_dict(copy_text) if copy_text is not None else None
+    if copy_text is None:
+        reasons.append("copyedit.json 없음(교열 미완)")
+    elif copyedit is None:
+        reasons.append("copyedit.json JSON 파싱 실패")
+    else:
+        if copyedit.get("status") != "완료":
+            reasons.append(f"교열 status={copyedit.get('status')!r}(완료 아님)")
+        gate = copyedit.get("code_gate") if isinstance(copyedit.get("code_gate"), dict) else {}
+        if not gate.get("ran") or gate.get("exit") != 0:
+            reasons.append(f"교열 코드 검사 미통과(ran={gate.get('ran')!r}, exit={gate.get('exit')!r})")
+        counts = copyedit.get("counts") if isinstance(copyedit.get("counts"), dict) else {}
+        rejects = [c for c in (copyedit.get("cards") or [])
+                   if isinstance(c, dict) and c.get("verdict") != "pass"]
+        if (counts.get("reject") or 0) > 0 or rejects:
+            reasons.append(f"교열 reject {max(counts.get('reject') or 0, len(rejects))}장")
+
+    out["adoptable"] = not reasons
+    out["reason"] = " · ".join(reasons) if reasons else "채택 조건 충족"
+    return out
+
+
+def _scalar_ws(v: Any) -> Any:
+    """공백만 다른 차이를 가려내려고 모든 공백을 지운 비교용 사본."""
+    if isinstance(v, str):
+        return re.sub(r"\s+", "", v)
+    if isinstance(v, list):
+        return [_scalar_ws(x) for x in v]
+    if isinstance(v, dict):
+        return {k: _scalar_ws(x) for k, x in v.items()}
+    return v
+
+
+def _diff_mapping(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
+    """카드(또는 deep 항목) 단위 차이. a=노션, b=git."""
+    only_a = sorted(set(a) - set(b))
+    only_b = sorted(set(b) - set(a))
+    changed = []
+    for k in sorted(set(a) & set(b)):
+        va, vb = a[k], b[k]
+        if va == vb:
+            continue
+        if isinstance(va, dict) and isinstance(vb, dict):
+            slots = sorted(s for s in set(va) | set(vb) if va.get(s) != vb.get(s))
+        else:
+            slots = ["(값)"]
+        changed.append({"id": k, "slots": slots,
+                        "whitespace_only": _scalar_ws(va) == _scalar_ws(vb)})
+    return {"only_notion": only_a, "only_git": only_b, "changed": changed}
+
+
+def compare_deltas(notion_delta: "dict[str, Any] | None", notion_deep: "dict[str, Any] | None",
+                   git_delta: "dict[str, Any] | None", git_deep: "dict[str, Any] | None"
+                   ) -> dict[str, Any]:
+    """두 길의 최종본(검증·정규화·게이트까지 지난 것)을 바이트·카드 단위로 비교(순수 함수)."""
+    nd, gd = notion_delta or {}, git_delta or {}
+    report: dict[str, Any] = {
+        "delta_bytes_equal": notion_delta is not None and git_delta is not None
+                             and _dumps(notion_delta) == _dumps(git_delta),
+        "deep_bytes_equal": _dumps(notion_deep or {}) == _dumps(git_deep or {}),
+        "cards": _diff_mapping(nd.get("cards") or {}, gd.get("cards") or {}),
+        "deep": _diff_mapping(notion_deep or {}, git_deep or {}),
+        "tldr_equal": nd.get("tldr") == gd.get("tldr"),
+        "other_keys_changed": sorted(
+            k for k in (set(nd) | set(gd)) - {"cards", "tldr"} if nd.get(k) != gd.get(k)),
+        "counts": {"notion_cards": len(nd.get("cards") or {}),
+                   "git_cards": len(gd.get("cards") or {}),
+                   "notion_deep": len(notion_deep or {}), "git_deep": len(git_deep or {})},
+    }
+    report["identical"] = report["delta_bytes_equal"] and report["deep_bytes_equal"]
+    return report
+
+
+def render_compare_md(report: dict[str, Any], meta: dict[str, Any]) -> str:
+    """Actions 요약용 차이표(한국어)."""
+    c, d = report["cards"], report["deep"]
+    n = report["counts"]
+    ws = sum(1 for x in c["changed"] if x["whitespace_only"])
+    lines = [
+        f"## 델타 두 길 비교 — {meta.get('date', '')}",
+        "",
+        f"- 정본 길: `{meta.get('source')}` · 이번 기록: {meta.get('written_from') or '없음'}",
+        f"- git 반납: `{meta.get('branch', '')}` — {'채택 가능' if meta.get('adoptable') else '채택 불가'}"
+        f" ({meta.get('reason', '')})",
+        f"- 결과: **{'완전히 같음' if report['identical'] else '다름'}**",
+        "",
+        "| 항목 | 노션 | git |",
+        "|---|---|---|",
+        f"| 카드 수 | {n['notion_cards']} | {n['git_cards']} |",
+        f"| 심층분석 수 | {n['notion_deep']} | {n['git_deep']} |",
+        f"| 한쪽에만 있는 카드 | {len(c['only_notion'])} | {len(c['only_git'])} |",
+        f"| 내용이 다른 카드 | {len(c['changed'])} (공백만 다름 {ws}) | |",
+        f"| 내용이 다른 심층분석 | {len(d['changed'])} | |",
+        f"| 요약(tldr) | {'같음' if report['tldr_equal'] else '다름'} | |",
+    ]
+    if report["other_keys_changed"]:
+        lines.append(f"| 그 밖에 다른 키 | {', '.join(report['other_keys_changed'])} | |")
+    rows = c["changed"][:30]
+    if rows:
+        lines += ["", "### 내용이 다른 카드 (최대 30)", "", "| 카드 | 다른 칸 | 공백만 다름 |",
+                  "|---|---|---|"]
+        lines += [f"| `{x['id']}` | {', '.join(x['slots'])} | {'예' if x['whitespace_only'] else ''} |"
+                  for x in rows]
+    for label, ids in (("노션에만 있는 카드", c["only_notion"]), ("git 에만 있는 카드", c["only_git"])):
+        if ids:
+            lines += ["", f"- {label}: " + ", ".join(f"`{i}`" for i in ids[:20])
+                      + (" …" if len(ids) > 20 else "")]
+    return "\n".join(lines) + "\n"
+
+
+def _publish_compare(report: dict[str, Any], meta: dict[str, Any]) -> None:
+    """차이표를 Actions 요약과 `_delta_compare/` 파일로 남긴다(실패해도 조용히 WARN)."""
+    try:
+        md = render_compare_md(report, meta)
+        summary = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary:
+            with open(summary, "a", encoding="utf-8") as f:
+                f.write(md)
+        os.makedirs(COMPARE_DIR, exist_ok=True)
+        base = os.path.join(COMPARE_DIR, f"compare_{_under(meta.get('date', 'unknown'))}")
+        with open(base + ".json", "w", encoding="utf-8") as f:
+            json.dump({"meta": meta, "report": report}, f, ensure_ascii=False, indent=1)
+        with open(base + ".md", "w", encoding="utf-8") as f:
+            f.write(md)
+        log("INFO", f"두 길 비교: {'같음' if report['identical'] else '다름'} — "
+                    f"카드 차이 {len(report['cards']['changed'])} · 노션만 "
+                    f"{len(report['cards']['only_notion'])} · git만 {len(report['cards']['only_git'])}")
+    except Exception as e:  # noqa: BLE001 — 비교는 관측 장치, 발행 경로를 막지 않는다
+        log("WARN", f"비교 결과 기록 실패(무시): {e}")
+
+
+def prepare_git_run(token: str, db_id: str, run: dict[str, Any]
+                    ) -> tuple[dict[str, Any], dict[str, Any] | None, str]:
+    """git 반납을 노션 예치와 **같은 문**(finalize → handoff 원문 정본화 → 게이트)에 통과시킨다."""
+    if run.get("delta") is None:
+        raise DeltaBridgeError(f"git 반납 {run.get('branch')}: delta.json 없음/파싱 실패")
+    delta = json.loads(json.dumps(run["delta"], ensure_ascii=False))  # 원본 보존(비교용)
+    deep = json.loads(json.dumps(run["deep"], ensure_ascii=False)) if run.get("deep") else None
+    delta, deep, date_str = finalize_delta(delta, deep, run["date"])
+    if date_str != run["date"]:
+        raise DeltaBridgeError(
+            f"git 반납 publish_date={date_str} 가 브랜치 날짜 {run['date']} 와 다릅니다")
+    if deep is not None:
+        _authoritative_source_text(token, db_id, date_str, deep)
+        deep = _gate_deep_analysis(deep)
+    return delta, deep, date_str
+
+
+def _compare_with_git(token: str, db_id: str, date_str: str, source: str,
+                      delta: dict[str, Any], deep: "dict[str, Any] | None",
+                      written_from: str, run: "dict[str, Any] | None" = None,
+                      read=None) -> None:
+    """노션 쪽 최종본과 git 반납을 비교해 남긴다 — **어떤 실패도 밖으로 내보내지 않는다.**"""
+    try:
+        run = run or load_git_run(date_str, read=read)
+        meta = {"date": date_str, "source": source, "written_from": written_from,
+                "branch": run["branch"], "adoptable": run["adoptable"], "reason": run["reason"]}
+        if not run["found"] or run.get("delta") is None:
+            log("INFO", f"git 반납 비교 생략 — {run['reason']}")
+            _publish_compare(compare_deltas(delta, deep, None, None), meta)
+            return
+        try:
+            g_delta, g_deep, _ = prepare_git_run(token, db_id, run)
+        except DeltaBridgeError as e:
+            meta["reason"] += f" · git 쪽 검증 실패: {e}"
+            g_delta, g_deep = run.get("delta"), run.get("deep")
+        _publish_compare(compare_deltas(delta, deep, g_delta, g_deep), meta)
+    except Exception as e:  # noqa: BLE001
+        log("WARN", f"git 반납 비교 실패(무시 — 발행 경로는 계속): {e}")
+
+
+def _existing_conflicts(delta: dict[str, Any], deep: "dict[str, Any] | None",
+                        date_str: str) -> list[str]:
+    """이미 main 에 있는 파일 중 이번 내용과 **다른** 것의 경로(없거나 같으면 빈 목록)."""
+    bad = []
+    for path, payload in ((_delta_path(date_str), delta), (_deep_path(date_str), deep)):
+        if payload is None or not os.path.exists(path):
+            continue
+        with open(path, "r", encoding="utf-8") as f:
+            if f.read() != _dumps(payload):
+                bad.append(path)
+    return bad
+
+
+def _load_existing(date_str: str) -> tuple["dict[str, Any] | None", "dict[str, Any] | None"]:
+    out = []
+    for path in (_delta_path(date_str), _deep_path(date_str)):
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                out.append(_try_json_dict(f.read()))
+        else:
+            out.append(None)
+    return out[0], out[1]
+
+
+def bridge_from_git(token: str, db_id: str, date_str: str, read=None) -> "int | None":
+    """git 모드: 채택 가능한 git 반납이 있으면 기록하고 종료코드를, 아니면 None(노션으로 넘김).
+
+    git 쪽 검증이 실패해도 None 을 돌려 노션 예비 길로 넘어간다 — 노션은 예비이자 검증된 길이다.
+    """
+    run = load_git_run(date_str, read=read)
+    if not run["adoptable"]:
+        log("INFO", f"git 반납 채택 안 함({run['branch']}): {run['reason']} — 노션 예치로 넘어감")
+        return None
+    try:
+        delta, deep, date_str = prepare_git_run(token, db_id, run)
+    except DeltaBridgeError as e:
+        log("WARN", f"git 반납 검증 실패 — 노션 예치로 넘어감: {e}")
+        return None
+    except NotionHandoffError as e:
+        log("WARN", f"git 반납 처리 중 노션 조회 실패 — 노션 예치로 넘어감: {e}")
+        return None
+
+    conflicts = _existing_conflicts(delta, deep, date_str)
+    if conflicts:
+        # 먼저 기록된 쪽이 이긴다 — 오류로 멈추면 30분마다 빨간 run 이 쌓이고 발행이 꼬인다.
+        log("WARN", f"이미 main 에 다른 내용이 있음({', '.join(conflicts)}) — 먼저 기록된 것을 "
+                    "유지하고 git 반납은 비교만 남깁니다.")
+        e_delta, e_deep = _load_existing(date_str)
+        meta = {"date": date_str, "source": SOURCE_GIT, "written_from": "이미 기록됨(유지)",
+                "branch": run["branch"], "adoptable": True, "reason": run["reason"]}
+        _publish_compare(compare_deltas(e_delta, e_deep, delta, deep), meta)
+        wrote = False
+    else:
+        wrote = write_delta(delta, deep, date_str)
+        # 같은 날 노션 예치도 있으면 비교만 하고 그 페이지는 OPEN 으로 둔다(사람이 볼 물증).
+        try:
+            page = select_open_delta(token, db_id, publish_date=date_str)
+            if page is not None:
+                n_delta, n_deep, _ = extract_delta(_attach_code_blocks(token, page))
+                if n_deep is not None:
+                    _authoritative_source_text(token, db_id, date_str, n_deep)
+                    n_deep = _gate_deep_analysis(n_deep)
+                meta = {"date": date_str, "source": SOURCE_GIT, "written_from": "git",
+                        "branch": run["branch"], "adoptable": True, "reason": run["reason"]}
+                _publish_compare(compare_deltas(n_delta, n_deep, delta, deep), meta)
+                log("WARN", f"노션 OPEN 델타({date_str})도 있습니다 — git 을 기록했고 노션 페이지는 "
+                            "OPEN 으로 남깁니다(중복 반납 확인).")
+        except Exception as e:  # noqa: BLE001 — 관측 전용
+            log("WARN", f"노션 예치 비교 실패(무시): {e}")
+
+    _github_output("wrote", "true" if wrote else "false")
+    _github_output("date", date_str)
+    _github_output("source", SOURCE_GIT)
+    print(f"브릿지 완료(git 반납): date={date_str} wrote={wrote}")
+    return 0
+
+
+def compare_only(token: str, db_id: str, date_str: str, read=None) -> int:
+    """이미 main 에 기록된 그 주 델타와 git 반납을 비교만 한다(쓰기·노션 마감 없음)."""
+    e_delta, e_deep = _load_existing(date_str)
+    if e_delta is None:
+        log("WARN", f"{_delta_path(date_str)} 없음 — 비교할 기록본이 없습니다")
+    _compare_with_git(token, db_id, date_str, "compare-only", e_delta or {}, e_deep,
+                      written_from="(비교 전용)", read=read)
+    _github_output("wrote", "false")
+    _github_output("date", date_str)
+    return 0
+
+
 def consume_delta(token: str, page: dict[str, Any]) -> None:
     """페이지 Status→Processed, Title→CONSUMED. 커밋·push 성공 **후**에만 호출할 것
     (handoff PL-10 순서 동형 — 소비=영구 처리이므로 커밋 전에 하지 않는다)."""
@@ -959,12 +1343,34 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--consume", action="store_true",
                      help="write 없이, 지정된(또는 최신) OPEN 페이지를 CONSUMED 처리만 한다. "
                           "커밋·push 성공 뒤 워크플로의 별도 단계에서 호출할 것.")
+    ap.add_argument("--source", choices=(SOURCE_NOTION, SOURCE_GIT), default=None,
+                     help="정본 길. 미지정 시 환경변수 GRM_DELTA_SOURCE, 그것도 없으면 notion.")
+    ap.add_argument("--compare-only", action="store_true",
+                     help="쓰지 않고, main 에 이미 기록된 그 주 델타와 git 반납을 비교만 한다 "
+                          "(--publish-date 필수).")
     args = ap.parse_args(argv)
+    source = resolve_source(args.source)
 
     token = os.environ.get("NOTION_TOKEN", "")
     if not token:
         print("ERROR: NOTION_TOKEN 환경변수 없음", file=sys.stderr)
         return 1
+
+    if args.compare_only:
+        if not args.publish_date:
+            print("ERROR: --compare-only 는 --publish-date 가 필요합니다", file=sys.stderr)
+            return 1
+        return compare_only(token, args.db, args.publish_date)
+
+    if source == SOURCE_GIT and not args.consume:
+        git_date = args.publish_date or _kst_today()
+        try:
+            rc = bridge_from_git(token, args.db, git_date)
+        except DeltaBridgeError as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 1
+        if rc is not None:
+            return rc
 
     try:
         page = select_open_delta(token, args.db, publish_date=args.publish_date)
@@ -1009,6 +1415,9 @@ def main(argv: list[str] | None = None) -> int:
             # 게이트를 돌린다 — 순서 불가침. 게이트가 보는 원문이 곧 판정이다.
             _authoritative_source_text(token, args.db, date_str, deep)
             deep = _gate_deep_analysis(deep)  # 클라우드 생성 deep 근거 검증(write 직전)
+        # [2026-11-12] 노션 길로 기록하기 **전에** git 반납과 비교해 차이표를 남긴다(비차단).
+        # 기록 뒤에 하면 중복 가드 오류로 기록이 멈춘 run 에서 비교가 빠진다.
+        _compare_with_git(token, args.db, date_str, source, delta, deep, written_from="노션")
         wrote = write_delta(delta, deep, date_str)
     except DeltaBridgeError as e:
         print(f"ERROR: {e}", file=sys.stderr)
@@ -1019,6 +1428,7 @@ def main(argv: list[str] | None = None) -> int:
 
     _github_output("wrote", "true" if wrote else "false")
     _github_output("date", date_str)
+    _github_output("source", SOURCE_NOTION)
     print(f"브릿지 완료: date={date_str} wrote={wrote}")
     return 0
 

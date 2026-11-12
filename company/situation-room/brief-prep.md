@@ -13,9 +13,10 @@ Notion Intake data source = `collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288`.
 
 ## 확인 (순서대로, 고치지 않는다)
 1. **델타 예치** — Notion 에서 `Type or Class`=`web-delta` 이고 이름에 `$D` 가 든 행. `OPEN`(New) 또는 `CONSUMED` 가 있으면 정상.
-   행이 없으면 `search` 로 제목 `OPEN GRM Web Delta $D` 를 찾는다 — 부모 없는 독립 페이지면 `★델타 오예치(독립 페이지)`, 그것도 없으면 `★델타 없음`.
+   행이 없으면 `search` 로 제목 `OPEN GRM Web Delta $D` 를 찾는다 — 부모 없는 독립 페이지면 `★델타 오예치(독립 페이지)`, 그것도 없으면 다음 줄을 본다.
+   **git 반납**도 본다 — `git fetch origin claude/company-$D` 후 `company/run/$D/delta.json` 이 있고 `copyedit.json` 의 `status` 가 `완료`면 `git 반납 있음`. 저장소 변수 `GRM_DELTA_SOURCE` 가 `git` 이면 이것만으로 정상이다(브릿지가 브랜치에서 가져간다). 기본(`notion`)이면 비교용일 뿐이라 노션 행이 없으면 `★델타 없음(git 반납만 있음)`. 둘 다 없으면 `★델타 없음`.
 2. **main 반영** — `git fetch origin main` 후 `web/data/deltas/delta_$UNDER.json`·`deep_$UNDER.json` 이 있는지.
-   델타가 OPEN 인데 파일이 없으면 브릿지가 아직 안 돈 것이다(크론이 13:37 까지 30분마다 돈다) → `대기: 브릿지`.
+   델타가 OPEN(또는 git 모드에서 git 반납 있음)인데 파일이 없으면 브릿지가 아직 안 돈 것이다(크론이 13:37 까지 30분마다 돈다) → `대기: 브릿지`.
 3. **발행 PR** — 열린 PR 중 head 가 `publish/brief-$D` 인 것. head sha 의 check-runs 가 전부 `success` 인지.
 4. **심층분석** — PR 브랜치의 `web/data/briefs/brief_web_$UNDER.json` 을 `git show` 로 읽어, `"deep_analysis" in card` 인 카드마다
    ① `deep_analysis` 가 비어 있지 않은가 ② `fda-483` 카드는 `observations_ko` 의 `number` 가 `deterministic_detail.observations[].number` 와 1:1 이고
@@ -38,7 +39,7 @@ Notion Intake data source = `collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288`.
 
 ## 복구 — 워크플로 재실행 요청 (확인 2·3번에서 막혔을 때만, 한 번씩)
 `git fetch origin claude/ops-status` 후 `git show FETCH_HEAD:status.json` 으로 최근 실행을 먼저 본다(이미 돌고 있으면 요청하지 않는다).
-- 델타가 OPEN 인데 `delta_$UNDER.json` 이 main 에 없고 `grm-delta-bridge.yml` 최근 실행이 `in_progress` 가 아니다 → `delta-bridge` 요청(`publish_date=$D`).
+- 델타가 OPEN(또는 git 모드에서 git 반납 있음)인데 `delta_$UNDER.json` 이 main 에 없고 `grm-delta-bridge.yml` 최근 실행이 `in_progress` 가 아니다 → `delta-bridge` 요청(`publish_date=$D`).
 - 델타 파일은 있는데 발행 PR 이 없고 `grm-web-publish.yml` 최근 실행이 `in_progress` 가 아니다 → `web-publish` 요청(`publish_date=$D`, `intake_run_id` 는 비운다 — 날짜로 찾는다).
 - 요청 방법·형식은 `company/CLOUD.md` "Actions 다리". 브랜치는 `claude/request-$D-<delta-bridge|web-publish>`. 요청 id 는 `YYYYMMDD-HHMM-bridge` 처럼 만든다.
 - 요청 뒤 결과 파일(`claude/ops-status` 의 `requests/<id>.json`)을 5분쯤 뒤 한 번 확인한다. `rejected`·`dispatch-failed` 면 이유를 적고 `상태: 보류`. `dispatched` 여도 이번 실행의 판정은 바꾸지 않는다(`대기: 재실행 요청함` 으로 적는다).

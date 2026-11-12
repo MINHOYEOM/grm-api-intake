@@ -81,7 +81,7 @@
     <div class="dl-rows">
       {%- for d in documents %}
       <a class="dl-row" href="{{ rel_root }}findings/doc/{{ d.slug }}/">
-        <span class="dl-firm">{{ d.firm_name }}{% if d.categories %}<span class="dl-cats">{{ d.categories | join(' · ') }}</span>{% endif %}</span>
+        <span class="dl-firm">{{ d.firm_name }}{% if d.categories %}<span class="dl-cats">{{ d.categories[:2] | join(' · ') }}{% if d.categories | length > 2 %} {{ _("외 {n}건", n=(d.categories | length) - 2) }}{% endif %}</span>{% endif %}</span>
         <span class="dl-date">{{ d.published_date }}</span>
         <span class="dl-n">{{ _("지적 <b>{n}</b>건", n=d.findings | length) }}</span>
       </a>

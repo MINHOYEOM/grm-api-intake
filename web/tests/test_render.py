@@ -2424,8 +2424,10 @@ class WebFindingsRenderTest(unittest.TestCase):
         head_block = js_src[js_src.index('el("div", "fnd-card-head")'):js_src.index("card.appendChild(head)")]
         self.assertNotIn("row.agency", head_block)
         # date 배지가 head 조립부의 마지막 appendChild 호출이어야 우측 고정이 실제로 동작한다.
+        # [UI 2단 2026-11-12 지적 한 줄] 문서 카드 안(inDoc)에서는 날짜를 다시 적지 않는다
+        # (문서 머리에 한 번) — 홀로 쓰이는 카드에서만 head 의 마지막 자식으로 붙는다.
         self.assertTrue(head_block.rstrip().endswith(
-            'head.appendChild(el("span", "fnd-b date", row.published_date || ""));'
+            'if (!inDoc) head.appendChild(el("span", "fnd-b date", row.published_date || ""));'
         ), "date 배지가 head 의 마지막 자식으로 추가되지 않음(우측 고정 깨짐)")
 
     def test_translation_note_generated_inside_orig_details(self):
@@ -2643,7 +2645,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function buildDocCard(rows, query)", js_src)
         fn = js_src[js_src.index("function buildDocCard(rows, query)"):]
         fn = fn[:fn.index("return { card: doc, built: built };")]
-        self.assertEqual(fn.count("buildCard(row, query)"), 2)  # 보이는 5개 + 접힌 나머지 양쪽 경로
+        self.assertEqual(fn.count("buildCard(row, query, true)"), 2)  # 보이는 5개 + 접힌 나머지 양쪽 경로
 
     def test_document_collapse_threshold_and_toggle_present(self):
         """[긴 문서 접기] 6개 이상이면 처음 5개만 펼치고 나머지는 "지적 N건 모두 보기"
@@ -3228,7 +3230,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         포함) 항상 id="f-<finding_id>" 를 부여해야 한다 — 딥링크 조건부 게이트가
         없어야 무해하게 항상 존재한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function buildCard(row, query) {"):]
+        fn = js_src[js_src.index("function buildCard(row, query, inDoc) {"):]
         fn = fn[:fn.index("\n    if (row.review_status === \"needs_review\") card.classList.add")]
         self.assertIn('if (row.finding_id) card.id = "f-" + row.finding_id;', fn)
         self.assertNotIn("deepLink", fn)  # 딥링크 상태를 참조하는 조건부가 아니다.
@@ -3456,7 +3458,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('evidence_level: item.evidence_level || "",', fn)
         self.assertIn('review_status: item.review_status || "",', fn)
         # buildCard() 가 실제로 이 두 필드로 배지를 그리는지(계약의 반대편) 확인.
-        card_fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        card_fn = js_src[js_src.index("  function buildCard(row, query, inDoc) {"):]
         card_fn = card_fn[:card_fn.index("\n  }\n") + 4]
         self.assertIn("EVIDENCE_LABEL[row.evidence_level]", card_fn)
         self.assertIn('if (row.review_status === "needs_review") {', card_fn)
@@ -3809,7 +3811,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         "유사 사례" 버튼을 actions 행에 나란히 붙이고, 펼침 블록은 actions 뒤에 붙인다 —
         finding_id 없는 방어적 행은 simCases 가 null 이라 아무것도 추가되지 않는다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        fn = js_src[js_src.index("  function buildCard(row, query, inDoc) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("var simCases = buildSimilarCasesControl(row);", fn)
         self.assertIn("if (simCases) actions.appendChild(simCases.btn);", fn)
@@ -3828,14 +3830,14 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('buildCard(row, "")', render_fn)
         doc_fn = js_src[js_src.index("function buildDocCard(rows, query) {"):]
         doc_fn = doc_fn[:doc_fn.index("\n  }\n") + 4]
-        self.assertEqual(doc_fn.count("buildCard(row, query)"), 2)
+        self.assertEqual(doc_fn.count("buildCard(row, query, true)"), 2)
 
     def test_similar_to_regression_buildcard_return_shape_unchanged(self):
         """[§6 회귀 0] buildCard() 의 반환 계약({card,textEl,extraEl,moreBtn})은 신규
         기능 추가로 바뀌지 않는다 — render()/renderDeepLinkDoc() 등 기존 소비자가
         item.textEl/item.extraEl/item.moreBtn 을 그대로 읽는 계약을 깨면 안 된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        fn = js_src[js_src.index("  function buildCard(row, query, inDoc) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn(
             "return { card: card, textEl: textEl, extraEl: extra, moreBtn: moreBtn };", fn
@@ -3847,7 +3849,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         block = js_src[
             js_src.index("function fetchSimilarTo(findingId, limit) {"):
-            js_src.index("  function buildCard(row, query) {")
+            js_src.index("  function buildCard(row, query, inDoc) {")
         ]
         self.assertNotIn("innerHTML", block)
 

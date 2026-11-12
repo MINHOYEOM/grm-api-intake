@@ -78,6 +78,7 @@
       {% endif %}
     </section>
 
+    {#- [총계 하나로 2026-11-12] 스냅샷 총계 — findings.js 가 툴바 실시간 총계를 그리면 숨긴다. -#}
     {%- if zone_totals %}
     <p class="fnd-total">{{ _("문서 {docs}건 · 지적 {n}건 · {asof} 기준", docs=zone_totals.documents, n=zone_totals.findings, asof=zone_totals.as_of) }}</p>
     {%- endif %}

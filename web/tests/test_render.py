@@ -2399,12 +2399,13 @@ class WebFindingsRenderTest(unittest.TestCase):
         문서→지적사항→기관 순회→검토필요(>0) 순으로 블록을 만든다.
 
         (054 에서 순서가 전체→문서→기관 에서 바뀌고 "전체" 라벨이 "지적사항"이 됐다 —
-        단위 표기 계약 자체는 test_dash_stats_documents_first_and_findings_labeled 가
+        단위 표기 계약 자체는 test_dash_agency_stats_declare_their_unit_in_tooltip 가
         담당하고, 여기선 M14 의 블록 마크업 계약만 계속 고정한다.)"""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function renderDashStats(stats)", js_src)
         self.assertIn("function buildStatBlock(num, label, warn)", js_src)
-        self.assertIn('buildStatBlock(String(stats.total), _t("지적사항"), false)', js_src)
+        # [총계 하나로 2026-11-12] 총계 블록은 없다(test_dash_stats_draw_no_second_total).
+        self.assertNotIn('buildStatBlock(String(stats.total)', js_src)
         self.assertIn('buildStatBlock(String(a.count), a.agency, false)', js_src)
         self.assertIn('buildStatBlock(String(stats.needsReview), _t("검토 필요"), true)', js_src)
         self.assertNotIn("fnd-dash-chip", js_src)
@@ -2985,28 +2986,26 @@ class WebFindingsRenderTest(unittest.TestCase):
     # 월·업체)를 통째로 반환하므로, 무필터일 때만 별도 findings_stats RPC 값을 조건부로
     # 끼워 넣거나 다음 청크를 미리 당겨올 필요가 없다(renderDash() 는 이제 인자도 없다).
 
-    def test_dash_stats_documents_first_and_findings_labeled(self):
-        """[문서 축 054] renderDashStats() 는 stats.documents 가 있을 때만 "문서" 스탯
-        카드를 끼워 넣고(없으면 조용히 생략 — 레이아웃 안 깨짐), 그 **다음에** 총건수를
-        "지적사항" 라벨로 그린다.
-
-        ★순서와 라벨이 이 테스트의 본체다. 옛 화면은 [전체][문서][FDA]… 였는데 "전체"가
-        무엇의 전체인지 말하지 않아, 기관 숫자(지적사항)와 문서 숫자가 같은 줄에 단위 표시
-        없이 나란히 섰다. 문서당 지적 건수가 소스마다 6.01(483)~1.00(MFDS 회수)로 달라서
-        그 줄만 보면 편중이 실제의 두 배 넘게 보인다(지적사항 축 87:13 vs 문서 축 69:31)."""
+    def test_dash_stats_draw_no_second_total(self):
+        """[총계 하나로 2026-11-12] 대시보드는 문서·지적사항 총계 블록을 그리지 않는다 —
+        보이는 총계는 하나다 — 툴바 실시간 총계가 그려지면 검색창 아래 스냅샷 줄(.fnd-total)은
+        숨는다(HTML 에는 남아 JS 미실행·크롤러용 총계와 기준일을 맡는다). 같은 화면에 스냅샷 총계와
+        현재 결과 총계가 위아래로 서면(6,694/26,552 vs 6,745/26,670) 숫자가 다른 DB로
+        읽힌다(UI/UX 점검 11-11). 기관별 블록·검토 필요 블록은 그대로 둔다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderDashStats(stats)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("if (stats.documents !== undefined && stats.documents !== null) {", fn)
-        self.assertIn('buildStatBlock(String(stats.documents), _t("문서"), false)', fn)
-        self.assertIn('buildStatBlock(String(stats.total), _t("지적사항"), false)', fn)
-        # 문서 블록이 총건수 블록보다 **앞**에 온다(라벨만 맞고 순서가 뒤집히면 무의미).
-        self.assertLess(
-            fn.index('String(stats.documents), _t("문서")'),
-            fn.index('String(stats.total), _t("지적사항")'),
-            "문서 스탯이 지적사항 스탯보다 앞에 와야 한다(기관 스탯의 기준선 역할)",
-        )
+        self.assertNotIn("String(stats.documents)", fn)
+        self.assertNotIn("String(stats.total)", fn)
+        self.assertIn("stats.agencies.forEach", fn)
         self.assertNotIn("agenciesExact", fn, "옛 추정치 툴팁 분기는 054 로 사라졌다")
+        tpl = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertEqual(tpl.count('class="fnd-total"'), 1)
+        # 툴바 실시간 총계를 그리는 순간 스냅샷 줄을 숨겨, 화면에 보이는 총계는 하나다.
+        draw = js_src[js_src.index('// [문서 중심 열람] "전체 N문서'):]
+        draw = draw[:draw.index('countEl.appendChild(document.createTextNode(_t("전체 ")));')]
+        self.assertIn('var snapTotal = document.querySelector(".fnd-total");', draw)
+        self.assertIn("if (snapTotal) snapTotal.hidden = true;", draw)
 
     def test_dash_agency_stats_declare_their_unit_in_tooltip(self):
         """[문서 축 054] 기관 스탯은 문서 수로 그리되, 툴팁에 **두 축을 병기**한다 —
@@ -13110,15 +13109,13 @@ class WebBacklinkPanelTest(unittest.TestCase):
                                         rel_root="../../../", tr=tr)
         hrefs = [c["href"] for c in p["cells"][0]["chips"]]
         self.assertEqual(hrefs[0], "../../../briefs/2026-11-02/#fda483-1")
-        # 영문 트리에 없는 호는 링크하지 않는다 → 회색 사유
+        # 영문 트리에 없는 호는 링크하지 않는다 → 칸이 비면 패널을 내지 않는다(빈 제목 금지)
         p = render.build_backlink_panel("doc", "fda483-1", index=idx, lang="en",
                                         issue_slugs=set(), rel_root="../../../en/", tr=tr)
-        self.assertEqual(p["cells"][0]["chips"], [])
-        self.assertTrue(p["cells"][0]["empty"])
+        self.assertEqual(p["cells"], [])
         p = render.build_backlink_panel("doc", "nope", index=idx, lang="ko",
                                         issue_slugs={"2026-11-02"}, rel_root="", tr=tr)
-        self.assertEqual(p["cells"][0]["chips"], [])
-        self.assertNotEqual(p["cells"][0]["empty"], "")
+        self.assertEqual(p["cells"], [])
 
     def test_unrendered_card_not_counted(self):
         idx = render.build_card_issue_index(
@@ -13870,6 +13867,7 @@ class WebGurumiPetTest(unittest.TestCase):
         cls.single = cls._tmp / "single"
         _build_single(cls.single)
         cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.quiz = (cls.single / "quiz" / "index.html").read_text(encoding="utf-8")
         cls.pet_js = (WEB_DIR / "assets" / "pet.js").read_text(encoding="utf-8")
         cls.pet_css = (WEB_DIR / "assets" / "pet.css").read_text(encoding="utf-8")
 
@@ -13877,17 +13875,30 @@ class WebGurumiPetTest(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
-    def test_sitewide_pet_markup_and_assets_present(self):
-        self.assertIn('id="grm-pet"', self.landing)
-        self.assertIn('id="grm-pet-panel"', self.landing)
-        self.assertIn('class="grm-pet-face-rig"', self.landing)
-        self.assertIn('class="grm-pet-grab-hint"', self.landing)
-        self.assertIn('id="grm-pet-drag-handle"', self.landing)
-        self.assertIn('id="grm-pet-state-chip"', self.landing)
-        self.assertIn('id="grm-pet-state-name"', self.landing)
-        self.assertIn('assets/pet.js?v=', self.landing)
-        self.assertIn('assets/pet.css?v=', self.landing)
-        self.assertIn('assets/gurumi-egg.png', self.landing)
+    def test_pet_only_on_quiz_and_me(self):
+        """[마스코트 위치 2026-11-12] 구름이는 퀴즈·마이페이지에만 — 다른 화면에서 우하단에
+        떠 모바일 본문을 가렸다(UI/UX 점검 11-11)."""
+        self.assertNotIn('id="grm-pet"', self.landing)
+        self.assertIn('id="grm-pet"', self.quiz)
+        me = self.single / "me" / "index.html"
+        if me.is_file():
+            self.assertIn('id="grm-pet"', me.read_text(encoding="utf-8"))
+        for rel in ("findings/index.html", "glossary/index.html", "archive/index.html"):
+            page = self.single / rel
+            if page.is_file():
+                self.assertNotIn('id="grm-pet"', page.read_text(encoding="utf-8"), rel)
+
+    def test_pet_markup_and_assets_present(self):
+        self.assertIn('id="grm-pet"', self.quiz)
+        self.assertIn('id="grm-pet-panel"', self.quiz)
+        self.assertIn('class="grm-pet-face-rig"', self.quiz)
+        self.assertIn('class="grm-pet-grab-hint"', self.quiz)
+        self.assertIn('id="grm-pet-drag-handle"', self.quiz)
+        self.assertIn('id="grm-pet-state-chip"', self.quiz)
+        self.assertIn('id="grm-pet-state-name"', self.quiz)
+        self.assertIn('assets/pet.js?v=', self.quiz)
+        self.assertIn('assets/pet.css?v=', self.quiz)
+        self.assertIn('assets/gurumi-egg.png', self.quiz)
 
     def test_old_inline_mascot_is_replaced(self):
         self.assertNotIn('id="grm-mascot"', self.landing)
@@ -13912,7 +13923,7 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn('function setDock(', self.pet_js)
         self.assertIn('data-pet-state', self.pet_js)
         self.assertIn('is-blink', self.pet_js)
-        self.assertIn('id="grm-pet-reset-pos"', self.landing)
+        self.assertIn('id="grm-pet-reset-pos"', self.quiz)
         self.assertIn("prefers-reduced-motion", self.pet_js)
         self.assertIn("prefers-reduced-motion:reduce", self.pet_css)
 
@@ -15087,13 +15098,13 @@ class WebAboutTest(unittest.TestCase):
         **조건 자체**를 본다(안 보이는 것을 가드가 안 보는 것이 이 저장소의 재발 함정)."""
         self.assertNotIn('id="grm-pet"', self.html)
         self.assertNotIn('id="grm-pet"', self.en_html)
-        self.assertIn('id="grm-pet"', self.landing)          # 다른 면에서는 그대로
+        self.assertNotIn('id="grm-pet"', self.landing)       # [2026-11-12] 퀴즈·마이페이지에만
         base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
         # [2026-09-28] 구독 확인 도착 페이지(/welcome/)도 밴드를 접는다(hide_subscribe) — about 조건은 그대로.
         # [2026-10-18] 언어 조건은 빠졌다 — 영어 페이지는 영문 리스트 폼을 render.py 가 넣는다.
         self.assertIn("{% if newsletter_form_action and nav_active != 'about'"
                       " and not hide_subscribe %}", base)
-        self.assertIn("{% if nav_active != 'about' %}\n<div class=\"grm-pet\"", base)
+        self.assertIn("{% if show_pet %}\n<div class=\"grm-pet\"", base)
 
     def test_hero_offers_the_next_step(self):
         """리드 아래 진입 둘(주간 브리프·이용안내) — 소개를 읽고 나면 갈 곳이 있어야 한다."""
@@ -21418,9 +21429,22 @@ class WebSitePopupTest(unittest.TestCase):
         for p in c.get("skip_paths", []):
             self.assertRegex(p, r"^/(?!/)")
 
-    def test_three_close_paths_and_local_fetch_only(self):
-        for label in ("오늘 하루 보지 않기", "다시 보지 않기", 'aria-label", "닫기"'):
-            self.assertIn(label, self.js)
+    def test_band_not_modal_and_only_on_listed_paths(self):
+        """[띠로 전환 2026-11-12] 첫 화면을 막는 모달이 아니라 관련 화면(only_paths)의 <main>
+        맨 위 띠다 — 홈·용어처럼 목적이 다른 화면에는 뜨지 않는다(UI/UX 점검 11-11)."""
+        for banned in ('aria-modal', 'role", "dialog"', "position:fixed", ".focus("):
+            self.assertNotIn(banned, self.js)
+        self.assertIn('aria-label", "닫기"', self.js)
+        self.assertIn("main.insertBefore(band, main.firstChild)", self.js)
+        self.assertIn("Array.isArray(c.only_paths) && c.only_paths.length > 0", self.js)
+        if self.cfg_path.is_file():
+            c = json.loads(self.cfg_path.read_text(encoding="utf-8"))
+            self.assertTrue(c.get("only_paths"), "only_paths 가 없으면 띠가 어디에도 안 뜬다")
+            for p in c["only_paths"]:
+                self.assertRegex(p, r"^/(?!/)")
+                self.assertNotEqual(p, "/", "사이트 전체에 띄우지 않는다")
+
+    def test_local_fetch_only(self):
         self.assertIn('fetch("/assets/site-popup.json"', self.js)
         self.assertEqual(self.js.count("fetch("), 1)
         for banned in ("XMLHttpRequest", "sendBeacon", "WebSocket", "http://", "https://"):

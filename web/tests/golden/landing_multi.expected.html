@@ -116,13 +116,11 @@
       <div><b>12</b><span>규제 소스</span></div>
       <div><b>주 1회</b><span>정기 발행</span></div>
       <div><b>A·B·C</b><span>신뢰 등급</span></div>
-      <div><b>100%</b><span>원문 추적</span></div>
     </div>
     <div class="srcs reveal" style="animation-delay:.44s">
       <span class="l">수집 대상 — 12 sources</span>
       <div class="marquee"><div class="track">
         <span>FDA</span><span>EMA</span><span>EudraGMDP</span><span>MHRA</span><span>PIC/S</span><span>ICH</span><span>MFDS</span><span>WHO</span><span>Health&nbsp;Canada</span><span>ECA</span><span>ISPE</span><span>OpenFDA</span>
-        <span aria-hidden="true">FDA</span><span aria-hidden="true">EMA</span><span aria-hidden="true">EudraGMDP</span><span aria-hidden="true">MHRA</span><span aria-hidden="true">PIC/S</span><span aria-hidden="true">ICH</span><span aria-hidden="true">MFDS</span><span aria-hidden="true">WHO</span><span aria-hidden="true">Health&nbsp;Canada</span><span aria-hidden="true">ECA</span><span aria-hidden="true">ISPE</span><span aria-hidden="true">OpenFDA</span>
       </div></div>
     </div>
   </div><section class="section soft" id="why"><div class="wrap">
@@ -132,7 +130,7 @@
         <div class="feat-prev"><div class="feat-prev-in feat-chips" aria-hidden="true"><span class="fchip mono">FDA 483</span><span class="fchip mono">EMA</span><span class="fchip mono">MFDS</span><span class="fchip mono">PIC/S</span><span class="fchip mono">ICH</span></div></div></div>
       <div class="feat"><span class="no">02</span><div class="ic"><i class="ti ti-rosette-discount-check"></i></div><h3>사실과 해석의 분리</h3><p>객관적 사실(Fact)은 원문 그대로 유지하고, 편집 해석(Insight)은 색상과 위치를 통해 명확히 분리하여 표기합니다.</p>
         <div class="feat-prev"><div class="feat-prev-in feat-split" aria-hidden="true"><span class="fblock fact">사실 <span class="en">Fact</span></span><span class="fblock insight">시사점 <span class="en">Insight</span></span></div></div></div>
-      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>신뢰도 및 신호 등급화</h3><p>사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 도웁니다.</p>
+      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>신뢰도 및 신호 등급화</h3><p>사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 돕습니다.</p>
         <div class="feat-prev"><div class="feat-prev-in feat-grades">
           <span class="grade ev" tabindex="0" title="신뢰도 A — 공식 처분·원문으로 확인된 1차 근거 (B=공식 인덱스+보조 자료, 원문 대조 권장. C=보조 자료 단독)" aria-label="신뢰도 A: 공식 처분·원문으로 확인된 1차 근거. B는 공식 인덱스와 보조 자료(원문 대조 권장), C는 보조 자료 단독."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
           <span class="grade sig" tabindex="0" title="신호 강도 T3 (최상) — 업무 영향도 높음, 즉시 점검 권장 (T2=중간, T1=참고)" aria-label="신호 강도 T3 최상: 업무 영향도 높음, 즉시 점검 권장. T2는 중간, T1은 참고."><span class="enc"><i class="bar b1"></i><i class="bar b2"></i><i class="bar b3"></i></span>Signal T3</span>
@@ -185,6 +183,13 @@
   </div></section>
 </main>
 <style>
+/* [1단 정리 2026-11-12] 통계 3칸('100% 원문 추적' 단정 제거) · 소스 띠는 흐르는 사본 없이 한 벌 고정 줄.
+   grm.css 동결이라 스코프로 덮는다. */
+.hero .stats{grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){.hero .stats{grid-template-columns:repeat(3,1fr)}}
+.srcs .marquee{-webkit-mask-image:none;mask-image:none}
+.srcs .track{width:auto;flex-wrap:wrap;row-gap:8px;animation:none;will-change:auto}
+.srcs .track span{margin-right:28px}
 /* [발견 허브] 데이터 존 진입(#records) — grm.css 토큰만, 스코프 한정. 질문형 카드. */
 .records-sub{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--muted);margin:10px 0 0;max-width:760px;word-break:keep-all}
 .records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -280,9 +285,15 @@
       여유가 남는다. 두 조치 모두 ≤900px 에서 이미 쓰던 것을 위 구간으로 넓힌 것뿐이다.
    §4 한글안전: 자간·대문자 미사용. grm.css 동결이라 스코프 인라인(footer 선례). */
 .nav-in > .btn.coral,.nav-in > .grm-lang{flex:none;white-space:nowrap}
+/* [헤더 줄꺾임 2026-11-12] 로그인 칸이 붙으면 901px 근처에서 탭 이름('주간 브리프')이 두 줄로
+   접혔다. 탭 이름·로그인은 접지 않고, 그 구간은 탭 여백을 한 번 더 줄여 한 줄에 맞춘다. */
+@media(min-width:901px){
+  .nav nav a,.grm-auth .grm-acct-login{white-space:nowrap}
+}
 @media(min-width:901px) and (max-width:1000px){
   .brand-full{display:none}
-  .nav nav a{padding-left:9px;padding-right:9px}
+  .nav nav{gap:2px}
+  .nav nav a{padding-left:8px;padding-right:8px}
 }
 </style>
 <footer class="site"><div class="wrap">
@@ -346,29 +357,8 @@ if(_nt&&_nm){
   b.hidden=false;
 })();
 </script>
-<div class="grm-pet" id="grm-pet" data-page="home">
-  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="구름이 펫 열기" aria-expanded="false" aria-controls="grm-pet-panel" title="드래그해 이동 · 눌러 관리">
-    <span class="grm-pet-aura" aria-hidden="true"></span><span class="grm-pet-shadow" aria-hidden="true"></span>
-    <img class="grm-pet-sprite" id="grm-pet-sprite" src="/assets/gurumi-egg.png" width="512" height="512" alt="" aria-hidden="true" draggable="false">
-    <span class="grm-pet-face-rig" aria-hidden="true"><i class="grm-pet-lid grm-pet-lid-l"></i><i class="grm-pet-lid grm-pet-lid-r"></i></span><span class="grm-pet-dot" aria-hidden="true"></span>
-    <span class="grm-pet-grab-hint" aria-hidden="true"><i class="ti ti-grip-horizontal"></i>이동</span>
-  </button>
-  <span class="grm-pet-state-chip" id="grm-pet-state-chip" aria-hidden="true"><i></i><b>쉬는 중</b></span>
-  <p class="grm-pet-talk" id="grm-pet-talk" role="status" aria-live="polite"></p>
-  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="구름이 관리" hidden>
-    <header class="grm-pet-head" id="grm-pet-drag-handle" title="빈 곳을 드래그해 구름이 이동"><div><span>MY GRM PET</span><h2>구름이 관리</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="구름이 위치 초기화" title="위치 초기화"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="구름이 관리 닫기">×</button></div></header>
-    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>도감 미리보기</span></div>
-    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">알</h3><p id="grm-pet-mood">퀴즈를 풀면 부화가 시작돼요</p></div><span id="grm-pet-level">Lv.1</span></div>
-    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">쉬는 중</b></span><small id="grm-pet-state-copy">새로운 소식을 기다리고 있어요</small></div>
-    <div class="grm-pet-progress"><div><span id="grm-pet-points">0 포인트</span><span id="grm-pet-next">50 포인트 남음</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
-    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>정답</span><span><b id="grm-pet-weeks">0</b>주 참여</span><span><b id="grm-pet-streak">0</b>주 연속</span></div>
-    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>쓰다듬기</button><a href="quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>함께 성장하기</a></div>
-    <div class="grm-pet-atlas-head"><b>성장 도감</b><span>단계를 눌러 미리 볼 수 있어요</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
-    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>성장 기록은 이 브라우저에 안전하게 보관돼요.</p>
-  </section>
-</div>
 <script src="/assets/pet.js?v=e470de1f" defer></script>
-<script src="/assets/site-popup.js?v=3d7ce8a4" defer></script>
+<script src="/assets/site-popup.js?v=8b64d29c" defer></script>
 
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}

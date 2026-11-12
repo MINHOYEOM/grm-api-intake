@@ -621,7 +621,7 @@
     });
   }
 
-  // [M14 §4] 스탯 줄 → 스탯 블록(큰 숫자+라벨 가로 나열): [N 전체][N FDA][N MFDS]…[N 검토 필요].
+  // [M14 §4] 스탯 줄 → 스탯 블록(큰 숫자+라벨 가로 나열): [N FDA][N MFDS]…[N 검토 필요].
   // 숫자는 textContent 로만 채운다(XSS 계약). 검토 필요 블록은 needsReview 0 이면 생략.
   function buildStatBlock(num, label, warn) {
     var block = el("div", "fnd-dash-stat");
@@ -637,10 +637,8 @@
     // 않아 축 혼동의 출발점이었다(기관 숫자는 지적사항, 바로 옆 전체도 지적사항, 그 사이에
     // 낀 문서만 다른 단위). 라벨을 "지적사항"으로 못박아 단위를 화면에 드러낸다.
     // 옵셔널 스탯 관례 유지 — 값이 없으면 블록 자체를 생략한다(레이아웃 깨짐 없음).
-    if (stats.documents !== undefined && stats.documents !== null) {
-      dashStatsEl.appendChild(buildStatBlock(String(stats.documents), _t("문서"), false));
-    }
-    dashStatsEl.appendChild(buildStatBlock(String(stats.total), _t("지적사항"), false));
+    // [총계 하나로 2026-11-12] 문서·지적사항 총계 블록은 그리지 않는다 — 검색창 아래
+    // .fnd-total 한 줄과 같은 화면에 숫자가 둘이 되어(스냅샷 vs 현재 결과) 의심을 샀다.
     stats.agencies.forEach(function (a) {
       var block = buildStatBlock(String(a.count), a.agency, false);
       // 툴팁에 두 축을 병기한다 — "FDA 가 왜 이렇게 큰가"의 답이 문서당 지적 건수(483
@@ -2389,6 +2387,11 @@
     if (currentPage < 1) currentPage = 1;
 
     // [문서 중심 열람] "전체 N문서 · M지적 · 페이지 X / Y"
+    // [총계 하나로 2026-11-12] 실시간 총계가 그려지면 검색창 아래 스냅샷 줄(.fnd-total, 기준일
+    // 표기)은 숨긴다 — 같은 화면에 총계가 둘(6,694 vs 6,747)이던 것. 스냅샷 줄은 HTML 에는
+    // 남는다(JS 가 안 돌거나 RPC 가 실패한 화면·크롤러의 총계, 영문은 영문 말뭉치 기준).
+    var snapTotal = document.querySelector(".fnd-total");
+    if (snapTotal) snapTotal.hidden = true;
     countEl.textContent = "";
     countEl.appendChild(document.createTextNode(_t("전체 ")));
     var bDocs = document.createElement("b");

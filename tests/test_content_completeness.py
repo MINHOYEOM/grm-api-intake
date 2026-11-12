@@ -140,6 +140,21 @@ class FindCapsTest(unittest.TestCase):
     def test_source_ends_list_has_25_documented_cases(self):
         self.assertEqual(sum(len(v) for v in cc.INTENTIONAL_SOURCE_ENDS["FDA 483"].values()), 25)
 
+    def test_partial_detail_notice(self):
+        """[11-12] 알려진 잔여 잘림 22건 — 문장 중간에서 끝날 때만 표시, 온전해지면 저절로 빠진다."""
+        self.assertEqual(sum(len(v) for v in cc.KNOWN_PARTIAL_DETAILS["FDA 483"].values()), 22)
+        cut = "Specifically, the operator was observed touching the"
+        self.assertTrue(cc.partial_detail_notice("FDA 483", "fda483-163788", "4", cut))
+        self.assertTrue(cc.partial_detail_notice("FDA 483", "fda483-163788", 4, cut))          # 번호 타입 무관
+        self.assertFalse(cc.partial_detail_notice("FDA 483", "fda483-163788", "4", cut + " gloves."))  # 온전
+        self.assertFalse(cc.partial_detail_notice("FDA 483", "fda483-163788", "1", cut))       # 목록 밖 번호
+        self.assertFalse(cc.partial_detail_notice("FDA 483", "fda483-99999", "4", cut))
+        self.assertFalse(cc.partial_detail_notice("FDA 483", "fda483-163788", "4", ""))
+        # 원문 끝 예외와 겹치지 않는다(한 관찰은 한 범주)
+        for doc, nums in cc.KNOWN_PARTIAL_DETAILS["FDA 483"].items():
+            ends = cc.INTENTIONAL_SOURCE_ENDS["FDA 483"].get(doc, ())
+            self.assertFalse(set(nums) & set(ends), doc)
+
 
 class LeavesTest(unittest.TestCase):
     def test_nested_paths(self):

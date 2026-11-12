@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/" />
-<script src="/assets/i18n-en.js?v=45fbc801" defer></script>
+<script src="/assets/i18n-en.js?v=dd0aa413" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -82,13 +82,11 @@
       <div><b>12</b><span>regulatory sources</span></div>
       <div><b>Weekly</b><span>publication</span></div>
       <div><b>A·B·C</b><span>evidence grades</span></div>
-      <div><b>100%</b><span>source traceability</span></div>
     </div>
     <div class="srcs reveal" style="animation-delay:.44s">
       <span class="l">Coverage — 12 sources</span>
       <div class="marquee"><div class="track">
         <span>FDA</span><span>EMA</span><span>EudraGMDP</span><span>MHRA</span><span>PIC/S</span><span>ICH</span><span>MFDS</span><span>WHO</span><span>Health&nbsp;Canada</span><span>ECA</span><span>ISPE</span><span>OpenFDA</span>
-        <span aria-hidden="true">FDA</span><span aria-hidden="true">EMA</span><span aria-hidden="true">EudraGMDP</span><span aria-hidden="true">MHRA</span><span aria-hidden="true">PIC/S</span><span aria-hidden="true">ICH</span><span aria-hidden="true">MFDS</span><span aria-hidden="true">WHO</span><span aria-hidden="true">Health&nbsp;Canada</span><span aria-hidden="true">ECA</span><span aria-hidden="true">ISPE</span><span aria-hidden="true">OpenFDA</span>
       </div></div>
     </div>
   </div><section class="section soft" id="why"><div class="wrap">
@@ -151,6 +149,13 @@
   </div></section>
 </main>
 <style>
+/* [1단 정리 2026-11-12] 통계 3칸('100% 원문 추적' 단정 제거) · 소스 띠는 흐르는 사본 없이 한 벌 고정 줄.
+   grm.css 동결이라 스코프로 덮는다. */
+.hero .stats{grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){.hero .stats{grid-template-columns:repeat(3,1fr)}}
+.srcs .marquee{-webkit-mask-image:none;mask-image:none}
+.srcs .track{width:auto;flex-wrap:wrap;row-gap:8px;animation:none;will-change:auto}
+.srcs .track span{margin-right:28px}
 /* [발견 허브] 데이터 존 진입(#records) — grm.css 토큰만, 스코프 한정. 질문형 카드. */
 .records-sub{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--muted);margin:10px 0 0;max-width:760px;word-break:keep-all}
 .records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -246,9 +251,15 @@
       여유가 남는다. 두 조치 모두 ≤900px 에서 이미 쓰던 것을 위 구간으로 넓힌 것뿐이다.
    §4 한글안전: 자간·대문자 미사용. grm.css 동결이라 스코프 인라인(footer 선례). */
 .nav-in > .btn.coral,.nav-in > .grm-lang{flex:none;white-space:nowrap}
+/* [헤더 줄꺾임 2026-11-12] 로그인 칸이 붙으면 901px 근처에서 탭 이름('주간 브리프')이 두 줄로
+   접혔다. 탭 이름·로그인은 접지 않고, 그 구간은 탭 여백을 한 번 더 줄여 한 줄에 맞춘다. */
+@media(min-width:901px){
+  .nav nav a,.grm-auth .grm-acct-login{white-space:nowrap}
+}
 @media(min-width:901px) and (max-width:1000px){
   .brand-full{display:none}
-  .nav nav a{padding-left:9px;padding-right:9px}
+  .nav nav{gap:2px}
+  .nav nav a{padding-left:8px;padding-right:8px}
 }
 </style>
 <footer class="site"><div class="wrap">
@@ -293,27 +304,6 @@ if(_nt&&_nm){
   }catch(e){}
 })();
 </script>
-<div class="grm-pet" id="grm-pet" data-page="home">
-  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="Open Gurumi" aria-expanded="false" aria-controls="grm-pet-panel" title="Drag to move · click to manage">
-    <span class="grm-pet-aura" aria-hidden="true"></span><span class="grm-pet-shadow" aria-hidden="true"></span>
-    <img class="grm-pet-sprite" id="grm-pet-sprite" src="/assets/gurumi-egg.png" width="512" height="512" alt="" aria-hidden="true" draggable="false">
-    <span class="grm-pet-face-rig" aria-hidden="true"><i class="grm-pet-lid grm-pet-lid-l"></i><i class="grm-pet-lid grm-pet-lid-r"></i></span><span class="grm-pet-dot" aria-hidden="true"></span>
-    <span class="grm-pet-grab-hint" aria-hidden="true"><i class="ti ti-grip-horizontal"></i>Move</span>
-  </button>
-  <span class="grm-pet-state-chip" id="grm-pet-state-chip" aria-hidden="true"><i></i><b>Resting</b></span>
-  <p class="grm-pet-talk" id="grm-pet-talk" role="status" aria-live="polite"></p>
-  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="Manage Gurumi" hidden>
-    <header class="grm-pet-head" id="grm-pet-drag-handle" title="Drag an empty area to move Gurumi"><div><span>MY GRM PET</span><h2>Manage Gurumi</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="Reset Gurumi's position" title="Reset position"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="Close Gurumi settings">×</button></div></header>
-    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>Growth stages preview</span></div>
-    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">Egg</h3><p id="grm-pet-mood">Solve a quiz to start hatching</p></div><span id="grm-pet-level">Lv.1</span></div>
-    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">Resting</b></span><small id="grm-pet-state-copy">Waiting for new news</small></div>
-    <div class="grm-pet-progress"><div><span id="grm-pet-points">0 points</span><span id="grm-pet-next">50 points to go</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
-    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>Correct</span><span><b id="grm-pet-weeks">0</b>weeks joined</span><span><b id="grm-pet-streak">0</b>week streak</span></div>
-    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>Pet</button><a href="quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>Grow together</a></div>
-    <div class="grm-pet-atlas-head"><b>Growth stages</b><span>Click a stage to preview it</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
-    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>Your growth record is stored safely in this browser.</p>
-  </section>
-</div>
 <script src="/assets/pet.js?v=e470de1f" defer></script>
 
 <style>

@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.314` |
-| 최종 수정일 | 2026-11-11 |
+| 문서 버전 | `v1.315` |
+| 최종 수정일 | 2026-11-12 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -387,7 +387,7 @@ flowchart TD
 | M1 | `raw_signals`·`findings` 스키마 동결 + 7월 내부 백필(raw 112 / findings 24) |
 | M2 | 로컬 read-only 조회 계층 + 정적 검색 export/뷰어 |
 | M3 | Supabase 적재(Postgres) + `/findings/` 웹 검색 페이지 라이브 |
-| M4 | 매일 수집분 Supabase 직행 자동 적재(1·2단계 모두 활성) |
+| M4 | 매일 수집분 Supabase 직행 자동 적재(1·2단계 모두 활성). **저장 순서 = Supabase 먼저 → Notion 다음**(Notion 실패해도 정본 보존, 다음 수집이 Notion 행 재시도). Notion 중복 조회가 실패하면 Supabase 키로 대신 판정(게시일 없음·URL 2차 dedup 소스는 다음 실행으로 미룸, 둘 다 안 되면 중단). health JSON `store` 키·경고 `notion-dedupe-fallback-supabase`·`supabase-append-failed` |
 | M5 | taxonomy v2(단어경계 분류기·v1/v2 이중 수용 마이그레이션) |
 | M6 | 국문 번역 + 웹 국문 우선 표시·카테고리 영문 병기 |
 | M7 | `/findings/` 대시보드 밴드(필터 연동 분포·추이·업체 통계) |
@@ -567,6 +567,7 @@ grm-api-intake/
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ ci_shard.py                     # CI unittest 샤딩 러너(클래스 단위 LPT 균형, tests/ci_shard_timings.json) — grm-ci.yml 4 샤드
 ├─ intake_exclusion.py             # 수집 제외 장부 — 원천에서 받았지만 규칙으로 의도적으로 버린 문서의 기록(130). 규칙 버전이 같을 때만 재수신 생략
+├─ raw_drift.py                    # [원문 갱신 규칙 R0] 이미 받은 문서의 오늘 판을 정본 raw_json 과 비교해 소스별 같음·다름·흔들린 칸·줄어듦을 health `store.drift` 로 **보고만**(쓰기 없음, `RAW_DRIFT_MEASURE`)
 ├─ source_reconcile.py             # 원천 대조 감시 — 원천 건수 = 수집 + 의도적 제외 + 미뤄짐 등식을 매일 센다(grm-source-reconcile)
 ├─ content_completeness.py         # 내용 완전성 감시 — 원자료 전 칸을 펴서 잘림(같은 길이대에서 문장 중간에 끝나는 값의 몰림)·모아 놓고 사이트·브리프에 안 닿는 칸을 찾는다(grm-source-reconcile 의 content 잡, 읽기 전용)
 ├─ backfill_raw_signals_from_notion.py # Notion에만 있고 Supabase raw_signals 사본에 없는 행 채우기(1회성·멱등)

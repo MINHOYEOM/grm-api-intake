@@ -775,6 +775,11 @@ class CollectionStats:
     # LEDGER.summary(): 소스별 excluded·skipped_known·이유별 건수 + 읽기/저장 실패 카운터.
     exclusion_ledger: dict[str, Any] = field(default_factory=dict)
 
+    # ── [대기열 0단계 2026-11-12] 저장 순서 요약 — 가산 필드 ──────────────────────
+    # Supabase(정본)를 먼저 쓰고 Notion(주간 대기열)을 뒤에 쓴다. 두 곳의 성공·실패와
+    # 중복 판정 기준(notion / supabase-fallback)을 따로 센다. 키는 `_new_store_counters()`.
+    store_summary: dict[str, Any] = field(default_factory=dict)
+
     def total_insert_failures(self) -> int:
         return (
             self.fr_insert_failed + self.recall_insert_failed
@@ -3393,6 +3398,76 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+def _new_store_counters() -> dict[str, Any]:
+    """[대기열 0단계] 저장 순서 요약 카운터(health JSON `store` 키·경고 판정에 쓴다)."""
+    return {
+        "order": "supabase-first",
+        "dedup_mode": "notion",           # notion | supabase-fallback
+        "dedup_error": "",                # fallback 일 때 Notion 조회 실패 사유(짧게)
+        "supabase_saved": 0,              # 새로 저장(inserted)
+        "supabase_duplicate": 0,          # 이미 있음(ignore-duplicates)
+        "supabase_failed": 0,             # 예외·거부 — 정본이 빈다
+        "supabase_skipped_undated": 0,    # 게시일 없음(published_date NOT NULL) — 시도 안 함
+        "notion_failed": 0,               # Notion 생성 최종 실패
+        "notion_failed_supabase_kept": 0,  # 그중 Supabase 에는 저장된 건
+        "fallback_deferred": 0,           # Notion 조회 실패일 때 판정 불가로 다음 실행에 미룬 건
+    }
+
+
+def _store_count(counters: dict[str, Any] | None, key: str) -> None:
+    if counters is not None:
+        counters[key] = int(counters.get(key) or 0) + 1
+
+
+def _append_supabase_copy(findings_supabase: tuple[str, str], item: IntakeItem,
+                          collected_at: datetime, *, include_findings: bool) -> str:
+    """Supabase raw_signals(+findings) 에 1건 쓴다. 반환: saved | duplicate | failed | undated.
+
+    [대기열 0단계 2026-11-12] Notion 보다 **먼저** 부른다 — DB(정본)가 Notion 성패에 묶이지 않게.
+    게시일 없는 항목(ICH 토픽 스냅샷 등)도 쓴다 — published_date 는 null 로 저장된다(migration 147,
+    2026-11-12). 날짜를 지어 넣지 않는다. ("undated" 반환값은 하위호환으로만 남아 있다.)
+    """
+    supabase_url, supabase_service_key = findings_supabase
+    mode = "raw_signals+findings" if include_findings else "raw_signals"
+    try:
+        if include_findings:
+            result = append_intake_item_with_findings_to_supabase(
+                supabase_url, supabase_service_key, item, collected_at=collected_at)
+            if result.status in {"inserted", "raw_signal_inserted"}:
+                log("INFO", f"FIND-1 raw_signals+findings Supabase append 완료 "
+                            f"doc={item.document_id} raw={result.raw_signal_status} "
+                            f"findings_inserted={result.findings_inserted} "
+                            f"duplicates={result.findings_duplicate} "
+                            f"invalid={result.findings_invalid}")
+                return "saved"
+            if result.status == "duplicate":
+                log("INFO", f"FIND-1 raw_signals+findings Supabase append 중복 skip "
+                            f"doc={item.document_id} raw={result.raw_signal_status} "
+                            f"findings_duplicate={result.findings_duplicate}")
+                return "duplicate"
+            log("WARN", f"FIND-1 raw_signals+findings Supabase append skip "
+                        f"doc={item.document_id} status={result.status} "
+                        f"raw={result.raw_signal_status} errors={list(result.errors)}")
+            # 원문(raw_signal)은 들어갔고 findings 일부만 거부된 경우는 정본 보존으로 본다.
+            if getattr(result, "raw_signal_status", "") in {"inserted", "duplicate"}:
+                return "saved" if result.raw_signal_status == "inserted" else "duplicate"
+            return "failed"
+        result = append_intake_item_to_supabase(
+            supabase_url, supabase_service_key, item, collected_at=collected_at)
+        if result.status == "inserted":
+            log("INFO", f"FIND-1 raw_signals Supabase append 완료 doc={item.document_id}")
+            return "saved"
+        if result.status == "duplicate":
+            log("INFO", f"FIND-1 raw_signals Supabase append 중복 skip doc={item.document_id}")
+            return "duplicate"
+        log("WARN", f"FIND-1 raw_signals Supabase append skip doc={item.document_id} "
+                    f"status={result.status} errors={list(result.errors)}")
+        return "failed"
+    except Exception as e:  # noqa: BLE001 — Supabase 실패가 Notion 대기열 적재를 막지 않는다.
+        log("WARN", f"FIND-1 {mode} Supabase append 실패 doc={item.document_id}: {e}")
+        return "failed"
+
+
 def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  run_date: date, collected_at: datetime,
                  existing_ids: set[str], dry_run: bool, *,
@@ -3402,8 +3477,28 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  findings_sqlite_include_findings: bool = False,
                  findings_supabase: tuple[str, str] | None = None,
                  findings_supabase_include_findings: bool = False,
-                 heal_candidates: list[IntakeItem] | None = None) -> tuple[int, int, int]:
+                 heal_candidates: list[IntakeItem] | None = None,
+                 store_counters: dict[str, Any] | None = None,
+                 fallback_checked: set[str] | None = None) -> tuple[int, int, int]:
     """삽입 실행. 반환: (inserted, skipped, failed)
+
+    [대기열 0단계 2026-11-12] 저장 순서: **Supabase(정본) 먼저 → Notion(주간 대기열) 다음**.
+    종전엔 Notion 이 성공해야만 Supabase 에 썼다 — Notion 이 멈추면 DB 도 비었다. 이제 Notion 이
+    실패해도 Supabase 사본은 남고(`notion_failed_supabase_kept`), 다음 실행의 Notion 중복 조회에
+    그 키가 없으므로 Notion 행은 다시 시도된다(Supabase 는 ignore-duplicates 라 무해).
+    반환값의 failed 는 종전과 같이 **Notion 생성 실패** 건수다(주간 대기열에서 빠질 수 있는 건).
+
+    fallback_checked(Notion 중복 조회 실패 → Supabase 키로 대신 판정한 모드)를 주면, 그 집합은
+    "Supabase 에 물어본 dedup 키" 전체다. 거기 없는 항목(게시일 없음 — Supabase 에 없으므로 이미
+    Notion 에 있어도 모른다, ICH 스냅샷이 매일 재유입될 위험 · 조회 뒤에 수집된 검색 항목)과 정규화
+    URL 2차 dedup 소스(URL 키를 Supabase 에서 얻을 수 없다)는 **쓰지 않고 다음 실행으로 미룬다**.
+    원천이 다음 실행에 다시 내주므로(수집 창 7~35일) 유실이 아니다.
+    또 이 모드에서는 Supabase 가 "새로 저장됨"(saved)이라고 답한 항목만 Notion 에 쓴다. failed·duplicate
+    는 "Notion 에는 이미 있는데 Supabase 가 거부해 온 행"일 수 있어 미룬다(지난 소식 재게재 방지).
+
+    평소(대체 모드가 아닐 때) 중복 판정은 **Notion 단독**이다. Notion ∪ Supabase 합집합으로 하지 않는
+    이유: Supabase 저장은 됐는데 Notion 생성만 실패한 항목이 다음 실행에 "이미 있음"으로 건너뛰어져
+    주간 대기열에서 영영 빠진다.
 
     [수집 완전성 2026-11-08] heal_candidates(리스트)를 주면 Notion 에 이미 있어 건너뛴 항목을
     거기에 모은다 — 호출부가 `heal_supabase_copies` 로 Supabase 사본에 없는 것만 채운다.
@@ -3441,6 +3536,14 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             if heal_candidates is not None:
                 heal_candidates.append(item)
             continue
+        if fallback_checked is not None and (dedup_key not in fallback_checked
+                                             or item.source in _CANONICAL_URL_DEDUP_SOURCES):
+            # Supabase 키로는 "이미 Notion 에 있음"을 판정할 수 없는 항목 — 쓰지 않고 미룬다.
+            log("INFO", f"중복 판정 대체 모드 — 판정 불가로 다음 실행에 미룸 "
+                        f"source={item.source} id={item.document_id}")
+            _store_count(store_counters, "fallback_deferred")
+            skipped += 1
+            continue
         # 2차: 같은 기사가 날짜만 바꿔 다시 온 경우(doc_id 가 달라져 위 검사를 빠져나간다).
         # 누적(insert 후 add)이라 **배치 안 중복**과 **실행 간 중복**을 한자리에서 함께 막는다.
         url_key = ""
@@ -3458,6 +3561,25 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             existing_ids.add(dedup_key)
             if url_key:
                 existing_url_keys.add(url_key)
+            continue
+        # [대기열 0단계] 정본(Supabase) 먼저. 실패해도 Notion 대기열 적재는 계속한다.
+        supa_status = ""
+        if findings_supabase:
+            supa_status = _append_supabase_copy(
+                findings_supabase, item, collected_at,
+                include_findings=findings_supabase_include_findings)
+            _store_count(store_counters, {
+                "saved": "supabase_saved", "duplicate": "supabase_duplicate",
+                "failed": "supabase_failed", "undated": "supabase_skipped_undated",
+            }[supa_status])
+        if fallback_checked is not None and supa_status != "saved":
+            # 대체 판정 모드에서는 Supabase 가 "새로 저장됨"이라고 답한 항목만 Notion 에 쓴다.
+            # failed(유효성 거부 등 — Notion 에는 이미 있을 수 있다)·duplicate 는 판정이 확실하지
+            # 않으므로 미룬다. 지난 소식이 Notion 에 다시 들어가 다음 브리프에 재게재되는 것을 막는다.
+            log("INFO", f"중복 판정 대체 모드 — Supabase 응답 {supa_status or '없음'} 이라 "
+                        f"Notion 적재를 다음 실행으로 미룸 source={item.source} id={item.document_id}")
+            _store_count(store_counters, "fallback_deferred")
+            skipped += 1
             continue
         # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
         time.sleep(0.34)
@@ -3500,42 +3622,14 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                 except Exception as e:  # noqa: BLE001 — additive sidecar must not break Notion flow.
                     mode = "raw_signals+findings" if findings_sqlite_include_findings else "raw_signals"
                     log("WARN", f"FIND-1 {mode} SQLite append 실패 doc={item.document_id}: {e}")
-            if findings_supabase:
-                supabase_url, supabase_service_key = findings_supabase
-                try:
-                    if findings_supabase_include_findings:
-                        result = append_intake_item_with_findings_to_supabase(
-                            supabase_url, supabase_service_key, item, collected_at=collected_at)
-                        if result.status in {"inserted", "raw_signal_inserted"}:
-                            log("INFO", f"FIND-1 raw_signals+findings Supabase append 완료 "
-                                        f"doc={item.document_id} raw={result.raw_signal_status} "
-                                        f"findings_inserted={result.findings_inserted} "
-                                        f"duplicates={result.findings_duplicate} "
-                                        f"invalid={result.findings_invalid}")
-                        elif result.status == "duplicate":
-                            log("INFO", f"FIND-1 raw_signals+findings Supabase append 중복 skip "
-                                        f"doc={item.document_id} raw={result.raw_signal_status} "
-                                        f"findings_duplicate={result.findings_duplicate}")
-                        else:
-                            log("WARN", f"FIND-1 raw_signals+findings Supabase append skip "
-                                        f"doc={item.document_id} status={result.status} "
-                                        f"raw={result.raw_signal_status} errors={list(result.errors)}")
-                    else:
-                        result = append_intake_item_to_supabase(
-                            supabase_url, supabase_service_key, item, collected_at=collected_at)
-                        if result.status == "inserted":
-                            log("INFO", f"FIND-1 raw_signals Supabase append 완료 doc={item.document_id}")
-                        elif result.status == "duplicate":
-                            log("INFO", f"FIND-1 raw_signals Supabase append 중복 skip doc={item.document_id}")
-                        else:
-                            log("WARN", f"FIND-1 raw_signals Supabase append skip doc={item.document_id} "
-                                        f"status={result.status} errors={list(result.errors)}")
-                except Exception as e:  # noqa: BLE001 — additive sidecar must not break Notion flow.
-                    mode = "raw_signals+findings" if findings_supabase_include_findings else "raw_signals"
-                    log("WARN", f"FIND-1 {mode} Supabase append 실패 doc={item.document_id}: {e}")
         else:
             failed += 1
-            log("WARN", f"insert 최종 실패 — 다음 항목으로 진행 doc={item.document_id}")
+            _store_count(store_counters, "notion_failed")
+            kept = supa_status in {"saved", "duplicate"}
+            if kept:
+                _store_count(store_counters, "notion_failed_supabase_kept")
+            log("WARN", f"insert 최종 실패 — 다음 항목으로 진행 doc={item.document_id} "
+                        f"(Supabase 정본: {'저장됨' if kept else (supa_status or '꺼짐')})")
     return inserted, skipped, failed
 
 
@@ -3566,11 +3660,7 @@ def heal_supabase_copies(supabase_url: str, service_key: str, items: list[Intake
         if item.source == SOURCE_WHO and _bare(item.raw_payload):
             summary["skipped_bare"] += 1
             continue
-        # 게시일이 없는 항목(ICH 토픽 스냅샷 — 날짜를 단언하지 않는다)은 raw_signals.published_date
-        # required 로 매번 거부된다 → 시도하지 않는다(매일 WARN 31건 소음). 날짜를 지어 넣지도 않는다.
-        if not str(getattr(item, "date_iso", "") or "").strip():
-            summary["skipped_undated"] = summary.get("skipped_undated", 0) + 1
-            continue
+        # 게시일이 없는 항목(ICH 토픽 스냅샷)도 채운다 — published_date null 허용(migration 147).
         record = raw_signal_from_intake_item(item, collected_at=collected_at)
         rid = str(record.get("raw_signal_id") or "")
         if rid:
@@ -3611,6 +3701,40 @@ def heal_supabase_copies(supabase_url: str, service_key: str, items: list[Intake
                 f"다음 실행으로 미룸 {summary['deferred']} · WHO 보강 전 건너뜀 {summary['skipped_bare']} · "
                 f"게시일 없음 건너뜀 {summary.get('skipped_undated', 0)}")
     return summary
+
+
+def supabase_fallback_dedup_keys(supabase_url: str, service_key: str,
+                                 items: Iterable[IntakeItem], collected_at: datetime,
+                                 ) -> tuple[set[str], set[str]] | None:
+    """[대기열 0단계 2026-11-12] Notion 중복 조회가 실패했을 때 Supabase 로 대신 판정한다.
+
+    09-27 사고: Notion 조회 30초 무응답 1회 → 그날 적재 0건. 이제 Supabase raw_signals 에
+    이번에 수집한 항목의 키를 직접 물어 "이미 받음"을 판정한다(창 제한 없음 — 고유 키).
+    반환: (물어본 dedup 키 전체, 그중 이미 있는 키). Supabase 조회도 실패하면 None
+    → 호출부는 종전처럼 중단한다(모르는 채로 전부 넣지 않는다).
+    게시일 없는 항목도 묻는다(published_date null 허용 — migration 147).
+    """
+    by_id: dict[str, str] = {}
+    for item in items:
+        if not item.document_id:
+            continue
+        try:
+            record = raw_signal_from_intake_item(item, collected_at=collected_at)
+        except Exception as e:  # noqa: BLE001 — 키를 못 만들면 판정 불가(미룸)로 둔다
+            log("WARN", f"중복 판정 대체: raw_signal_id 계산 실패 source={item.source} "
+                        f"id={item.document_id}: {type(e).__name__}")
+            continue
+        rid = str(record.get("raw_signal_id") or "")
+        if rid:
+            by_id[rid] = f"{item.source}::{item.document_id}"
+    if not by_id:
+        return set(), set()
+    present = existing_raw_signal_ids(supabase_url, service_key, list(by_id))
+    if present is None:
+        return None
+    checked = set(by_id.values())
+    existing = {key for rid, key in by_id.items() if rid in present}
+    return checked, existing
 
 
 _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
@@ -3672,6 +3796,8 @@ def _health_payload(
         "sources": _source_health_rows(stats),
         # 제외 장부 - 소스별 excluded 가 원천 대조(원천=수집+제외+미뤄짐)의 '제외' 항이다(가산 키).
         "exclusion_ledger": dict(stats.exclusion_ledger),
+        # [대기열 0단계] 저장 순서·두 저장소 성패·중복 판정 기준(가산 키).
+        "store": dict(stats.store_summary),
         "handoff": {
             "emitted": handoff_emitted,
             "failed": handoff_failed,
@@ -4650,6 +4776,9 @@ def main() -> int:
     _SNAPSHOT_DEDUP_WINDOW_DAYS = 1095
     _SNAPSHOT_SOURCES = {SOURCE_ICH, SOURCE_WHO}
 
+    # [대기열 0단계 2026-11-12] Notion 조회 실패를 곧바로 중단하지 않고 기록만 해 둔다.
+    # 아래에서 Supabase 설정이 정해진 뒤 Supabase 키로 대신 판정한다(그것도 안 되면 종전처럼 중단).
+    notion_dedupe_error: Exception | None = None
     if args.dry_run:
         existing: set[str] = set()
         existing_url_keys: set[str] = set()
@@ -4660,15 +4789,12 @@ def main() -> int:
             existing = _keys.doc_ids
             existing_url_keys = _keys.url_keys
         except NotionDedupeQueryError as e:
-            # 중복 조회 실패 시 빈 set으로 진행하면 대량 중복 insert 위험 → 중단
-            log("ERROR", f"중복 조회 실패 — duplicate insert 방지를 위해 insert 단계 중단: {e}")
-            _write_health_json(health_json_path, _dedupe_abort_health_payload(
-                error=e, stats=stats, run_date=run_date, start=start, end=end,
-                event_name=event_name, dry_run=args.dry_run,
-                requested_sources=list(requested_sources), active=active))
-            return 1
+            log("ERROR", f"Notion 중복 조회 실패 — Supabase 키로 대신 판정을 시도한다: {e}")
+            notion_dedupe_error = e
+            existing = set()
+            existing_url_keys = set()
         snapshot_active = ({SOURCE_ICH} if enable_ich else set()) | ({SOURCE_WHO} if enable_who else set())
-        if snapshot_active:
+        if snapshot_active and notion_dedupe_error is None:
             try:
                 snap_existing = notion_query_existing_doc_ids(
                     notion_token, notion_db, run_date,
@@ -4678,12 +4804,8 @@ def main() -> int:
                 log("INFO", f"snapshot dedup({sorted(snapshot_active)}) +{len(snap_existing)}건 "
                             f"(최근 {_SNAPSHOT_DEDUP_WINDOW_DAYS}일)")
             except NotionDedupeQueryError as e:
-                log("ERROR", f"snapshot dedup 조회 실패 — 중복 삽입 방지를 위해 중단: {e}")
-                _write_health_json(health_json_path, _dedupe_abort_health_payload(
-                    error=e, stats=stats, run_date=run_date, start=start, end=end,
-                    event_name=event_name, dry_run=args.dry_run,
-                    requested_sources=list(requested_sources), active=active))
-                return 1
+                log("ERROR", f"snapshot dedup 조회 실패 — Supabase 키로 대신 판정을 시도한다: {e}")
+                notion_dedupe_error = e
 
     collected_at = now_k
     findings_sqlite_path = None
@@ -4718,6 +4840,37 @@ def main() -> int:
     elif cfg.findings_supabase_findings_append_requested:
         log("WARN", "ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND=true 이지만 "
                     "ENABLE_FINDINGS_SUPABASE_APPEND=false 이므로 Supabase append 비활성")
+
+    # [대기열 0단계 2026-11-12] Notion 중복 조회가 실패했으면 Supabase 로 대신 판정한다.
+    store_counters = _new_store_counters()
+    stats.store_summary = store_counters
+    fallback_checked: set[str] | None = None
+    if notion_dedupe_error is not None:
+        _all_collected: list[IntakeItem] = [
+            it for group in (
+                fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items,
+                eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items,
+                mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
+                mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items,
+                ispe_items, eu_gmp_ncr_items, mhra_gmp_ncr_items)
+            for it in group]
+        fb = (supabase_fallback_dedup_keys(findings_supabase[0], findings_supabase[1],
+                                           _all_collected, now_k)
+              if findings_supabase else None)
+        if fb is None:
+            # Supabase 도 판정 불가(꺼짐·조회 실패) → 빈 set 으로 진행하면 대량 중복 → 종전처럼 중단
+            log("ERROR", "Supabase 대체 판정도 불가 — duplicate insert 방지를 위해 insert 단계 중단")
+            _write_health_json(health_json_path, _dedupe_abort_health_payload(
+                error=notion_dedupe_error, stats=stats, run_date=run_date, start=start, end=end,
+                event_name=event_name, dry_run=args.dry_run,
+                requested_sources=list(requested_sources), active=active))
+            return 1
+        fallback_checked, _fb_existing = fb
+        existing |= _fb_existing
+        store_counters["dedup_mode"] = "supabase-fallback"
+        store_counters["dedup_error"] = f"{type(notion_dedupe_error).__name__}"
+        log("WARN", f"중복 판정 대체 모드(Supabase): 물어본 키 {len(fallback_checked)} · "
+                    f"이미 있음 {len(_fb_existing)} — 게시일 없음·URL 2차 dedup 소스는 다음 실행으로 미룸")
 
     # 4) 삽입 (반환: inserted, skipped, failed)
     # [배치6 Phase2] 소스별 insert_items + stats 대입 19블록을 INTAKE_SOURCE_SPECS 레지스트리로
@@ -4775,7 +4928,9 @@ def main() -> int:
             findings_sqlite_include_findings=findings_sqlite_include_findings,
             findings_supabase=findings_supabase,
             findings_supabase_include_findings=findings_supabase_include_findings,
-            heal_candidates=heal_candidates)
+            heal_candidates=heal_candidates,
+            store_counters=store_counters,
+            fallback_checked=fallback_checked)
         setattr(stats, f"{spec.prefix}_inserted", ins)
         setattr(stats, f"{spec.prefix}_skipped_dup", sk)
         setattr(stats, f"{spec.prefix}_insert_failed", fail)
@@ -4788,6 +4943,17 @@ def main() -> int:
                 max_heal=_env_int("RAW_SIGNALS_HEAL_MAX", RAW_SIGNALS_HEAL_MAX_DEFAULT))
         except Exception as e:  # noqa: BLE001 — 사본 보충은 부가 장치
             log("WARN", f"Supabase 사본 보충 중 예외(무시): {type(e).__name__}")
+        # [원문 갱신 규칙 R0 2026-11-12] 건너뛴 항목의 오늘 판을 정본과 비교해 **보고만** 한다
+        # (health JSON store.drift). 쓰기 없음. 끄려면 RAW_DRIFT_MEASURE=false.
+        if env_flag("RAW_DRIFT_MEASURE", True):
+            try:
+                import raw_drift
+                store_counters["drift"] = raw_drift.measure_drift(
+                    findings_supabase[0], findings_supabase[1], heal_candidates,
+                    collected_at=collected_at,
+                    max_items=_env_int("RAW_DRIFT_MAX", raw_drift._MAX_ITEMS_DEFAULT))
+            except Exception as e:  # noqa: BLE001 — 측정은 부가 장치
+                log("WARN", f"원문 비교(R0) 중 예외(무시): {type(e).__name__}")
 
     # 제외 장부 저장(실패해도 수집 결과·종료 코드에 영향 없음 - 카운터로만 남는다).
     try:
@@ -4824,6 +4990,8 @@ def main() -> int:
             findings_sqlite_include_findings=findings_sqlite_include_findings,
             findings_supabase=findings_supabase,
             findings_supabase_include_findings=findings_supabase_include_findings,
+            store_counters=store_counters,
+            fallback_checked=fallback_checked,
         )
         stats.search_inserted = src_in
         stats.search_skipped_dup = src_sk

@@ -310,6 +310,53 @@ class VerifyPublishedSourcesTest(unittest.TestCase):
         self.assertIn("fda483-193695", out)
         self.assertIn("의도대로 제외", out)
 
+    # ── 카드 발행 + findings 전부 비공개(2026-11-12, 11-02호 Henogen 195517 사례) ─────────
+    def test_findings_hidden_when_card_shown_but_no_ok_findings(self):
+        # 카드 1·원문 1·DB 1/1 이 전부 non_pharma(과차단) → 건수는 일치하지만 사이트에선 사라졌다.
+        row = {"shown": 1, "found": 1, "db_total": 1, "db_ok": 0}
+        self.assertEqual(vps.classify(row), "findings-hidden")
+
+    def test_findings_hidden_even_when_counts_exceed(self):
+        # 원문이 더 많아도(부분 카드) 공개 findings 가 0 이면 findings-hidden 이 먼저다.
+        row = {"shown": 2, "found": 5, "db_total": 5, "db_ok": 0}
+        self.assertEqual(vps.classify(row), "findings-hidden")
+
+    def test_findings_hidden_not_raised_when_some_findings_are_public(self):
+        row = {"shown": 3, "found": 3, "db_total": 5, "db_ok": 2}
+        self.assertEqual(vps.classify(row), "ok")
+
+    def test_findings_hidden_requires_a_shown_card(self):
+        # 카드가 0이면 기존 scope-excluded(의도 제외) 경로 그대로다.
+        row = {"shown": 0, "found": 15, "db_total": 15, "db_ok": 0}
+        self.assertEqual(vps.classify(row), "scope-excluded")
+
+    def test_findings_hidden_needs_db_rows_and_a_db_reading(self):
+        # DB 못 봄 → 기존 규칙, findings 가 아예 없음 → 추출 격차 쪽(새 판정이 가리지 않는다).
+        self.assertEqual(vps.classify({"shown": 1, "found": 1, "db_total": None, "db_ok": None}), "ok")
+        self.assertEqual(vps.classify({"shown": 1, "found": 3, "db_total": 0, "db_ok": 0}),
+                         "extraction-gap")
+
+    def test_findings_hidden_is_a_mismatch_and_reports_why(self):
+        r = {"date": "2026_11_02", "id": "fda483-195517", "shown": 1, "found": 1, "status": "pdf-ok",
+             "db_total": 1, "db_ok": 0, "db_non_pharma": 1, "db_fragment": 0, "verdict": "findings-hidden"}
+        out = vps.format_report([r], [r])
+        self.assertIn("findings-hidden", out)
+        self.assertIn("fda483-195517", out)
+        self.assertIn("non_pharma 1건", out)
+        self.assertIn("grm_classify_483_scope", out)
+
+    def test_old_judgement_misses_findings_hidden(self):
+        # 뮤테이션 확인: 옛 판정(`found <= shown` 이면 ok)은 이 사례를 놓친다. 이 재현이 깨지면
+        # 새 가드의 존재 이유가 사라진 것이다.
+        def old_classify(row):
+            found, shown = row["found"], row["shown"]
+            if found <= shown:
+                return "ok"
+            return "x"
+        row = {"shown": 1, "found": 1, "db_total": 1, "db_ok": 0}
+        self.assertEqual(old_classify(row), "ok")              # 옛 판정: 놓침
+        self.assertEqual(vps.classify(row), "findings-hidden")  # 새 판정: 잡음
+
     # ── 조립기 범위 판정 재적용(이슈 #1214 오탐 4건) ───────────────────────────────
     _DEVICE_TEXT = "Design controls were not established per 820.30 for the medical device."
     _DRUG_TEXT = "Aseptic processing: media fill failures for the drug product were not investigated."

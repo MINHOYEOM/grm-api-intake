@@ -34,6 +34,13 @@
   .ff-chip.ag{color:var(--on-coral);background:var(--coral);border-color:var(--coral)}
   .ff-chip.dt{font-size:12px;color:var(--muted)}
   .ff-chip.dt b{font-family:var(--mono);font-weight:400;font-variant-numeric:tabular-nums}
+  .ff-sub{font-family:var(--sans);font-size:13px;color:var(--muted);margin:10px 0 0}
+  .ff-sub b{font-family:var(--mono);font-weight:400;font-variant-numeric:tabular-nums}
+  .ff-rel3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0}
+  .ff-rel3-col{min-width:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px 14px}
+  .ff-rel3-col .ff-sec-h{margin:0 0 2px;flex-basis:100%}
+  .ff-rel3-col a{font-family:var(--sans);font-size:14.5px;line-height:1.5;color:var(--body);text-decoration:none;border-bottom:1px solid var(--line-2);word-break:keep-all}
+  .ff-rel3-col a:hover{color:var(--coral);border-color:var(--coral)}
   .ff-body{margin-top:34px;display:flex;flex-direction:column;gap:26px}
   .ff-sec-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
   /* 문서 목록 — 한 줄이 문서 하나(공개일·기관·건수·분류). */
@@ -116,12 +123,8 @@
         모순**이었고, 캐나다 실사는 그 '공개' 자리에 실사일이 들어간다. 한 문장으로
         단정하는 대신 행이 스스로 말한다는 사실을 가리킨다. -#}
     <p class="ff-lede">{{ _("규제기관이 공개한 실사 문서 <b>{a}건</b>에서 확인된 지적 <b>{b}건</b>입니다. 아래 <b>행마다 그 날짜가 무엇인지</b> 적혀 있어요.", a=firm.doc_count, b=firm.finding_count) }}</p>
-    <p class="ff-meta">
-      {%- for a in firm.agencies %}<span class="ff-chip ag">{{ agency_labels.get(a, a) }}</span>{% endfor %}
-      <span class="ff-chip dt"><b>{{ firm.first_seen }}</b> ~ <b>{{ firm.last_seen }}</b></span>
-      <span class="ff-chip">{{ _("문서 {n}건", n=firm.doc_count) }}</span>
-      <span class="ff-chip">{{ _("지적 {n}건", n=firm.finding_count) }}</span>
-    </p>
+    {#- [UI 3단 2026-11-12] 칩 걷어냄 — 기관·기간은 한 줄 평문(문서·지적 건수는 위 한 줄 요약에 있다). -#}
+    <p class="ff-sub">{% for a in firm.agencies %}{{ agency_labels.get(a, a) }}{% if not loop.last %} · {% endif %}{% endfor %} · <b>{{ firm.first_seen }}</b> ~ <b>{{ firm.last_seen }}</b></p>
     {#- [식약처 GMP 적합판정 2026-11-11] DB 가 업체와 연결한 판정서만(render.firm_gmp_cert_index).
         한국어 트리에만 넘어온다(원천 값이 한국어). 판정일은 원천에 없어 유효기한만 적는다. -#}
     {%- if gmp_certs %}
@@ -136,6 +139,27 @@
   </div>
 
   <div class="wrap ff-body">
+    {#- [UI 3단 2026-11-12] 관련 조항·용어·기록 한 줄 — 용어·문서 페이지와 같은 틀. 값은 아래 섹션과
+        같은 원천(FDA 인용 조항·비슷한 지적 업체)이고 빈 칸은 그리지 않는다. 이 업체에 연결된 용어는
+        원천이 없어 칸을 내지 않는다. -#}
+    {%- set _rel_cl = [] %}
+    {%- if fda_cit %}{% for c in fda_cit.codes %}{% if c.section and (c.section | replace('.', '-')) in clause_slugs and _rel_cl | length < 8 %}{% set _ignored = _rel_cl.append(c) %}{% endif %}{% endfor %}{% endif %}
+    {%- if _rel_cl or similar_firms %}
+    <nav class="ff-rel3" aria-label="{{ _('관련 조항·용어·기록') }}">
+      {%- if _rel_cl %}
+      <div class="ff-rel3-col">
+        <h2 class="ff-sec-h">{{ _('관련 조항') }}</h2>
+        {%- for c in _rel_cl %}<a href="{{ rel_root }}findings/clause/{{ c.section | replace('.', '-') }}/">{{ c.code }}</a>{% endfor %}
+      </div>
+      {%- endif %}
+      {%- if similar_firms %}
+      <div class="ff-rel3-col">
+        <h2 class="ff-sec-h">{{ _('관련 기록') }}</h2>
+        {%- for s in similar_firms[:6] %}<a href="{% if s.firm_slug %}{{ rel_root }}findings/firm/{{ s.firm_slug }}/{% else %}{{ rel_root }}findings/doc/{{ s.slug }}/#{{ s.finding_id }}{% endif %}">{{ s.name }}</a>{% endfor %}
+      </div>
+      {%- endif %}
+    </nav>
+    {%- endif %}
     {% if firm.categories %}
     <section>
       <h2 class="ff-sec-h">{{ _('지적된 영역') }}</h2>

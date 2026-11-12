@@ -816,6 +816,9 @@
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
     nameEl.textContent = decodeFirmDisplay(data.display_name || "");
+    // [UI 3단 2026-11-12] 페이지의 주인은 업체 이름 — 일반 제목("업체 프로파일")은 접고 이름을 h1 로 둔다.
+    var generic = document.querySelector("main .page-head");
+    if (generic) generic.style.display = "none";
     // [맥락 유지] q 값은 원문 display_name — DB blob 과 부분일치해야 하므로 decode 금지.
     LAST_NAME = data.display_name || "";
     LAST_DOCS = data.documents || [];

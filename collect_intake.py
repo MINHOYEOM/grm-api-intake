@@ -5155,7 +5155,7 @@ def main() -> int:
     # 어떤 실패도 수집 결과를 바꾸지 않는다(경고만).
     if queue_new_items is not None and findings_supabase:
         try:
-            grm_queue.run_shadow(
+            shadow_report = grm_queue.run_shadow(
                 findings_supabase, run_date=run_date, generated_at=collected_at,
                 window_days=handoff_window_days, display_window_days=args.window_days,
                 new_items=queue_new_items,
@@ -5165,6 +5165,8 @@ def main() -> int:
                         notion_token, notion_db, handoff_date, handoff_window_days))
                     if notion_token and notion_db else None),
                 silent_sources=coverage_silent_sources)
+            # health JSON 의 `store.queue` 로 남긴다(가산 키) — 넣기·보충·동결·경고 수.
+            store_counters["queue"] = grm_queue.health_summary(shadow_report)
         except Exception as e:  # noqa: BLE001 — 그림자가 수집을 깨면 안 된다
             log("WARN", f"대기열 그림자 실패(수집·노션 handoff 는 정상): "
                         f"{type(e).__name__}: {truncate(str(e), 160)}")

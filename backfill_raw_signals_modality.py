@@ -125,6 +125,11 @@ def apply_plan(result: dict[str, Any], *, base_url: str, service_key: str,
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):   # Windows cp949 콘솔에서 한글·기호 출력 보호
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     ap.add_argument("--apply", action="store_true", help="실제로 쓴다(기본 dry-run)")
     ap.add_argument("--source", default="", help="한 소스만(예: 'FDA 483'). 비우면 전부")

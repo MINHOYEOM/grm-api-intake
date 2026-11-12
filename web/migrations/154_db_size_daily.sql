@@ -1,5 +1,5 @@
--- 153 ops_db_size_daily — DB 크기를 하루 한 번 기록해, 무료 플랜 한도(500MB)에 언제 닿을지 미리 본다.
--- Max local web/migrations prefix was 152 on main. Additive only — 기존 표·함수 무변경.
+-- 154 ops_db_size_daily — DB 크기를 하루 한 번 기록해, 무료 플랜 한도(500MB)에 언제 닿을지 미리 본다.
+-- Max local web/migrations prefix was 153 (#1635 기간 필터) — 번호 충돌로 153→154. Additive only — 기존 표·함수 무변경.
 --
 -- ★왜(2026-11-12 실측): DB 366MB / 무료 한도 500MB(73%). 한도를 넘으면 DB 가 읽기 전용이 돼 수집이 멈춘다.
 --   지금은 크기를 기록하는 곳이 없어 "한 달에 얼마나 느는지"를 모른다 → 유료 전환 시점을 판단할 근거가 없다.
@@ -30,7 +30,7 @@ create table if not exists public.ops_db_size_daily (
   recorded_at timestamptz not null default now()
 );
 comment on table public.ops_db_size_daily is
-  '153: DB 크기 일일 기록(무료 한도 500MB 대비 증가 추세). grm_db_size_record()(pg_cron) 가 쓰고 grm_db_size_status()(service_role) 가 읽는다.';
+  '154: DB 크기 일일 기록(무료 한도 500MB 대비 증가 추세). grm_db_size_record()(pg_cron) 가 쓰고 grm_db_size_status()(service_role) 가 읽는다.';
 alter table public.ops_db_size_daily enable row level security;
 revoke all on table public.ops_db_size_daily from public, anon, authenticated;
 

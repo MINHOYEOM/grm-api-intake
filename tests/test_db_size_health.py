@@ -1,4 +1,4 @@
-"""153 DB 크기 감시 — db_size_health.evaluate·워크플로·migration·알림 배선 고정.
+"""154 DB 크기 감시 — db_size_health.evaluate·워크플로·migration·알림 배선 고정.
 
 뮤테이션: WARN_RATIO 를 1.0 으로, RUNWAY_DAYS 를 0 으로 바꾸면 경보 시험이 실패한다.
 """
@@ -20,7 +20,7 @@ import ops_alarm_sync as al  # noqa: E402
 MB = 1024 * 1024
 NOW = dt.datetime(2026, 11, 13, 1, 0, tzinfo=dt.timezone.utc)
 WF = (ROOT / ".github" / "workflows" / "grm-db-size-health.yml").read_text(encoding="utf-8")
-MIG = (ROOT / "web" / "migrations" / "153_db_size_daily.sql").read_text(encoding="utf-8")
+MIG = (ROOT / "web" / "migrations" / "154_db_size_daily.sql").read_text(encoding="utf-8")
 
 
 def _status(db_mb: float, growth_mb: float | None = None, recorded: str = "2026-11-13T00:05:00Z") -> dict:

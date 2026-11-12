@@ -15941,14 +15941,13 @@ class WebDiscoveryHubTest(unittest.TestCase):
         for hub_id in ('id="fnd-purpose"', 'id="fnd-recent"'):
             self.assertNotIn(hub_id, self.html,
                              "허브 섹션이 검색 면으로 되돌아왔다 — 2면 분리 회귀")
-        # 세그가 툴바보다 앞(면 전환 장치가 첫 화면에 보인다).
-        self.assertLess(self.html.index('class="fnd-seg"'),
-                        self.html.index('id="fnd-tools"'))
+        # [찾아보기 2026-11-12] 탭 3묶음은 폐기 — 위치는 빵부스러기(홈 › 찾아보기 › 지적 문장 검색).
+        self.assertNotIn('class="fnd-seg"', self.html)
 
     def test_seg_on_search_face_with_correct_active(self):
-        self.assertIn('class="fnd-seg"', self.html)
-        self.assertIn('class="on" aria-current="page">검색</a>', self.html)
-        self.assertIn('class="on" aria-current="true">찾기</a>', self.html)
+        self.assertIn('<nav class="grm-crumbs"', self.html)
+        self.assertIn('href="../browse/">찾아보기</a>', self.html)
+        self.assertIn('class="on">찾아보기</a>', self.html)
 
     def test_browse_face_retired(self):
         self.assertFalse((self.single / "findings" / "browse").exists())
@@ -19887,9 +19886,21 @@ class WebEnTreeTest(unittest.TestCase):
 
     #: nav 라벨 → 그 섹션의 경로. **뜨는지 여부는 손으로 적지 않는다** — 아래에서
     #: 선언(`expected`)에 있으면 떠야 하고 없으면 뜨면 안 된다로 뒤집어 본다.
-    NAV_SECTIONS = (("Weekly brief", "archive/"), ("Findings", "findings/"),
-                    ("Library", "library/"), ("Glossary", "glossary/"),
-                    ("Guide", "guide/"))
+    #: [메뉴 3개 2026-11-12] 자료실·용어사전·이용안내·지적 문장 검색은 찾아보기(/browse/) 안에서 닿는다
+    #: (`test_en_browse_reaches_sections` 가 그 길을 본다).
+    NAV_SECTIONS = (("Weekly brief", "archive/"), ("Browse", "browse/"))
+    BROWSE_SECTIONS = (("Finding search", "findings/"), ("Guidance and regulations", "library/"),
+                       ("Term", "glossary/"), ("Guide", "guide/"))
+
+    def test_en_browse_reaches_sections(self):
+        html = self.en["en/browse/index.html"]
+        main = html[html.index('<main class="bw">'):html.index("</main>")]
+        for label, path in self.BROWSE_SECTIONS:
+            with self.subTest(section=path):
+                if path in self.expected:
+                    self.assertIn(f'href="../{path}index.html"><b>{label}</b>', main)
+                else:
+                    self.assertNotIn(f'href="../{path}index.html"', main)
 
     def test_en_nav_shows_only_sections_that_exist_in_english(self):
         """★[2026-09-04] "Glossary 는 nav 에 없다"를 손으로 적어 뒀더니, 영어 용어사전

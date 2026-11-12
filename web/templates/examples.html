@@ -33,9 +33,8 @@
 <main>
   <div class="wrap">
     <nav class="ex-crumb" aria-label="{{ _('현재 위치') }}">
-      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항') }}</a><i>&rsaquo;</i><span>{{ _('지적 사례') }}</span>
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><span>{{ _('지적 사례') }}</span>
     </nav>
-    <div style="margin-top:16px">{% with seg_active = "examples" %}{% include "partials/findings_seg.html" %}{% endwith %}</div>
     <p class="kick">PMDA &middot; MHRA</p>
     <h1 class="ex-h1">{{ _('지적 사례') }}</h1>
     <p class="ex-sum">{{ _('내 업무 영역에서 규제기관이 실제로 어떤 점을 지적했는지 사례로 봅니다. 영역을 고르면 대표 문장과 출처가 나옵니다. 사례는 점검 체크리스트에 옮겨 적을 문장으로 쓰세요.') }}</p>

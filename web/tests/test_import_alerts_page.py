@@ -231,8 +231,9 @@ class RenderedListPageTest(unittest.TestCase):
                       '<a href="../../findings/import-alerts/index.html" class="on" aria-current="page">수입경보 목록</a>',
                       self.ko)
         self.assertIn(">Import Alert list</a>", self.firm_en)
-        # 수입경보 목록 화면에서 켜지는 탭은 '업체'(찾기 묶음)다.
-        self.assertIn('class="on" aria-current="page">업체</a>', self.ko)
+        # [메뉴 3개 2026-11-12] 탭 3묶음은 폐기 — 상단 메뉴의 '찾아보기'가 켜진다.
+        self.assertIn('class="on">찾아보기</a>', self.ko)
+        self.assertNotIn('class="fnd-seg"', self.ko)
 
     def test_no_firm_links_without_doc_pages(self):
         self.assertNotIn("findings/firm/", self._main(self.ko).split('id="ia-rows"', 1)[1])

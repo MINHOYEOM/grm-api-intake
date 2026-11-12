@@ -9,9 +9,8 @@
 <main>
   <div class="wrap">
     <nav class="dc-crumb" aria-label="{{ _('현재 위치') }}">
-      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항') }}</a><i>&rsaquo;</i>{% if 'findings/examples/' in en_paths %}<a href="{{ rel_root }}findings/examples/">{{ _('지적 사례') }}</a><i>&rsaquo;</i>{% endif %}<span>{{ dc.agency }}</span>
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i>{% if 'findings/examples/' in en_paths %}<a href="{{ rel_root }}findings/examples/">{{ _('지적 사례') }}</a><i>&rsaquo;</i>{% endif %}<span>{{ dc.agency }}</span>
     </nav>
-    <div style="margin-top:16px">{% with seg_active = "examples" %}{% include "partials/findings_seg.html" %}{% endwith %}</div>
     {%- if dc.agency == 'PMDA' %}
     <p class="kick">PMDA &middot; Japan</p>
     <h1 class="dc-h1">{{ _('일본 PMDA 실사 지적 사례 전체') }}</h1>

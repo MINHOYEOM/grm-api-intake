@@ -197,6 +197,19 @@ jobs:
           echo "### 영문 슬롯 게이트: $MSG" >> "$GITHUB_STEP_SUMMARY"
           if [ "$RC" -ne 0 ]; then echo "::error::$MSG"; exit "$RC"; fi
 
+      # [브리프 4단 2026-11-12] 주간 현황 국가·분류 정본 — 방금 조립한 호의 483·경고서한 카드까지
+      # 넣어 발행본에 바로 국가 줄이 서게 한다(일일 소식 갱신 PR 을 기다리지 않는다). 공개 읽기(anon).
+      # 실패해도 발행은 계속한다 — 정본이 그대로면 그 호는 건수 칸만 나온다. 골든은 이 파일을 안 본다.
+      - name: 주간 현황 정본 갱신(브리프 국가·분류, 실패해도 계속)
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          python brief_glance_refresh.py \
+            --supabase-url "$SUPABASE_URL" \
+            --supabase-anon-key "$SUPABASE_ANON_KEY"
+
       - name: 골든 재동결(기본 env — prod 변수 미주입) + 렌더 스모크
         run: |
           set -euo pipefail
@@ -249,7 +262,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$BR"
-          git add "$OUT" web/tests/golden
+          git add "$OUT" web/tests/golden web/data/brief_glance.json
           # ★ [2026-07-29] zero-diff 는 실패가 아니다. 방금 조립한 결과가 main 의 발행본과
           #   바이트 단위로 같다는 뜻 = 낼 것이 없고 정합하다는 증명이다.
           #   종전엔 `git commit` 이 "nothing added to commit" 으로 exit 1 을 내고 set -e 가

@@ -63,7 +63,7 @@
         용어사전 표제어(조항 원문이 영문뿐이라 국문 맥락을 채운다 · 상호 진입 간선), 기록은 아래 최근 사례의
         문서. 빈 칸은 그리지 않는다. 다른 조항 목록은 맨 아래 '다른 조항'이 맡는다. -#}
     {%- set _rel_docs = [] %}
-    {%- for s in clause.samples %}{% if s.doc_slug and s.firm_name and _rel_docs | length < 6 %}{% set _ignored = _rel_docs.append(s) %}{% endif %}{% endfor %}
+    {%- for s in clause.samples %}{% if s.doc_slug and s.firm_name and _rel_docs | length < 6 and s.firm_name not in (_rel_docs | map(attribute='firm_name') | list) %}{% set _ignored = _rel_docs.append(s) %}{% endif %}{% endfor %}
     {%- if clause.terms or _rel_docs %}
     <nav class="fx-rel3" aria-label="{{ _('관련 조항·용어·기록') }}">
       {%- if clause.terms %}

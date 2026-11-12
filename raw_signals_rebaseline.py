@@ -162,6 +162,11 @@ def run(base_url: str, service_key: str, *, sources: list[str], apply: bool, cha
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     ap.add_argument("--source", action="append", help="소스(기본: FDA 483, MFDS)")
     ap.add_argument("--apply", action="store_true", help="실제로 쓴다(기본 dry-run)")

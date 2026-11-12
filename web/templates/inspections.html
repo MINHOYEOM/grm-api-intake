@@ -37,7 +37,6 @@
     <p class="reveal" style="animation-delay:.14s"><span class="ln">{{ _("FDA가 의약품 제조소를 직접 실사하고 매긴 등급(NAI·VAI·OAI)입니다.") }}</span> <span class="ln">{{ _("지적사항을 센 것이 아니라 <b>실사 한 건이 어떻게 끝났는지</b>를 셉니다.") }}</span></p>
   </div>
   <div class="wrap">
-    {% include "partials/findings_seg.html" %}
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-page="inspections" hidden></div>
 
     <div class="tr-state" id="tr-loading" role="status" aria-live="polite">

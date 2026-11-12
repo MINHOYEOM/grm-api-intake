@@ -1,0 +1,87 @@
+name: GRM raw_signals Modality Backfill
+
+# [제품군 소급 · 2026-11-12] raw_signals.modality 가 빈 행을 수집기와 같은 함수(compute_modality)로 채운다.
+# backfill_raw_signals_modality.py. 기본은 dry-run(apply=false) — 쓰지 않고 소스별·판정별 건수만 보고한다.
+# 바꾸는 칸은 modality 하나이고, 이미 값이 있는 행·판별 근거가 없는 행은 건드리지 않는다. 재실행은 안전하다.
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: '한 소스만(예: "FDA 483"). 비우면 전부'
+        type: string
+        default: ''
+      apply:
+        description: '실제로 쓴다(기본 false = dry-run)'
+        type: boolean
+        default: false
+      limit:
+        description: '처리할 최대 행 수(비우면 전부)'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: raw-signals-modality-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: Backfill raw_signals.modality
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Backfill (dry-run unless apply=true)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_SOURCE: ${{ inputs.source }}
+          IN_APPLY: ${{ inputs.apply }}
+          IN_LIMIT: ${{ inputs.limit }}
+        run: |
+          set -uo pipefail
+          if ! printf '%s' "${IN_SOURCE:-}" | grep -qE '^[A-Za-z0-9 /_.()-]*$'; then
+            echo "::error::source 에 허용되지 않는 문자가 있다"; exit 2
+          fi
+          if [ -n "${IN_LIMIT:-}" ] && ! printf '%s' "$IN_LIMIT" | grep -qE '^[0-9]+$'; then
+            echo "::error::limit 은 숫자만 허용"; exit 2
+          fi
+          args=(--report modality_backfill_report.json)
+          if [ -n "${IN_SOURCE:-}" ]; then args+=(--source "$IN_SOURCE"); fi
+          if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
+          if [ -n "${IN_LIMIT:-}" ]; then args+=(--limit "$IN_LIMIT"); fi
+          python backfill_raw_signals_modality.py "${args[@]}"
+          rc=$?
+          {
+            echo "### raw_signals modality backfill"
+            echo "- source: \`${IN_SOURCE:-전부}\` · apply: \`${IN_APPLY:-false}\` · limit: \`${IN_LIMIT:-전부}\` · exit: \`${rc}\`"
+            echo '```json'
+            head -c 6000 modality_backfill_report.json 2>/dev/null || echo '(리포트 없음)'
+            echo
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: modality-backfill-report
+          path: modality_backfill_report.json
+          if-no-files-found: ignore
+          retention-days: 30

@@ -28,9 +28,9 @@
 <main>
   <div class="wrap">
     <nav class="fi-crumb" aria-label="{{ _('현재 위치') }}">
-      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항') }}</a><i>&rsaquo;</i><span>{{ axis.title }}</span>
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><span>{{ axis.title }}</span>
     </nav>
-    <div style="margin-top:16px">{% with seg_active = "facets" %}{% include "partials/findings_seg.html" %}{% endwith %}</div>
+    <div style="margin-top:16px">{% include "partials/facet_views.html" %}</div>
     <p class="kick">{{ axis.kick }}</p>
     <h1 class="fi-h1">{{ axis.title }}</h1>
     <p class="fi-lede">{{ axis.index_lede }}</p>

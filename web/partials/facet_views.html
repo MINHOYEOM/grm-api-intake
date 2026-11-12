@@ -1,0 +1,16 @@
+{#- [찾아보기 2026-11-12] 탭 3묶음(findings_seg.html)을 걷어 내며, 그 파셜이 함께 들고 있던 분류 화면의
+    보기 전환(분류 · 기관 · 국가)만 여기로 옮겼다. 분류 모음 화면(findings_facet*.html)에서만 쓴다. -#}
+{#- 분류 화면 안 보기 전환(분류 · 기관 · 국가) — 세 축 색인을 모두 잇는 유일한 곳(옛 둘러보기 면의 역할). `axis` 는 모음 템플릿 문맥 값. #}
+{%- if fnd_facet_axes and fnd_facet_axes | length > 1 %}
+<nav class="fnd-views" aria-label="{{ _('분류 보기 전환') }}">
+  {%- for a in fnd_facet_axes %}<a href="{{ rel_root }}findings/{{ a.path }}/index.html"{% if axis and axis.path == a.path %} class="on" aria-current="page"{% endif %}>{{ _(a.label) }}</a>{% endfor -%}
+</nav>
+{%- endif %}
+<style>
+.fnd-views a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
+.fnd-views{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--rad-s);overflow:hidden;margin:16px 0 24px;font-size:13.5px}
+.fnd-views a{padding:6px 14px;color:var(--muted);border-right:1px solid var(--line-2)}
+.fnd-views a:last-child{border-right:0}
+.fnd-views a:hover{color:var(--ink)}
+.fnd-views a.on{background:var(--soft);color:var(--ink);font-weight:600}
+</style>

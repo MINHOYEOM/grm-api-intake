@@ -9,17 +9,15 @@
   {#- [2면 분리 2026-08-27] 이 페이지는 **검색 면**이다. 발견 허브(#811)의 세 섹션
       (업무별 진입·최근 공개 문서·축 탐색)은 둘러보기 면(findings_browse.html)으로 옮겼다 —
       사용자 피드백: "너무 많은 정보가 한 페이지에 담겨 잘 못 쓰겠다." 화면당 일은 하나:
-      이 면은 조회 도구다. 면 전환은 findings_seg.html(트렌드 존 세그와 동형). -#}
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
-    <h1 class="reveal" style="animation-delay:.08s">{{ _("지적사항") }}</h1>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _("지적 문장 검색") }}</h1>
     {#- [탭 3묶음 2026-11-11 · 대표 승인] 첫 화면 우선순위 = 제목·한 줄 → 탭 → 검색창 → 결과.
         기관 나열·건수 긴 문장은 검색창 아래 작은 한 줄(.fnd-total)로 내렸다. -#}
     <p class="reveal" style="animation-delay:.14s">{{ _("세계 규제기관이 제약 현장에서 지적한 내용을 원문 그대로 한국어로 찾아봅니다.") }}</p>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-asset-root="{{ asset_root }}" hidden></div>
-    {% with seg_active = "search" %}{% include "partials/findings_seg.html" %}{% endwith %}
 
     {#- [M15] 툴바(검색+필터+정렬)를 대시보드보다 위로(검색이 최우선 도구), sticky
         컴팩트화. §4 전면 재설계 — 소스/증거등급/검토상태 칩 그룹을 카테고리·발행월과

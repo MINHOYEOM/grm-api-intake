@@ -1645,16 +1645,17 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/</loc>", self.sitemap)
 
     def test_nav_link_present_and_active_state(self):
-        # [네이밍 2026-08-27] M15 의 "지적사항"→"찾아보기"(캐주얼 대구)를 사용자 피드백
-        # ("전문성이 보이는 워딩")이 뒤집었다 — 내용을 그대로 이름으로: "지적사항".
-        self.assertIn('href="../findings/index.html" class="on">지적사항</a>', self.html)
-        self.assertIn('href="findings/index.html">지적사항</a>', self.landing)
-        self.assertNotIn('href="../findings/index.html" class="on">지적사항</a>', self.archive)
-        self.assertIn('href="../findings/index.html">지적사항</a>', self.archive)
-        # 옛 라벨이 어디에도 안 남았는지 — 라벨 교체는 전 표면 동시가 계약이다.
+        # [메뉴 3개 2026-11-12 · 대표 확정안 1] "지적사항" 메뉴는 폐기 — 지적 문장 검색 면에서는
+        # 찾아보기(/browse/)가 켜진다. 메뉴 이름은 주간 브리프 / 찾아보기 / 관심 목록.
+        self.assertIn('href="../browse/index.html" class="on">찾아보기</a>', self.html)
+        self.assertIn('href="browse/index.html">찾아보기</a>', self.landing)
+        self.assertNotIn('class="on">찾아보기</a>', self.archive)
+        self.assertIn('href="../browse/index.html">찾아보기</a>', self.archive)
+        import re as _re
         for page in (self.html, self.landing, self.archive):
-            self.assertNotIn(">찾아보기</a>", page)
-            self.assertNotIn(">모아보기</a>", page)
+            tabs = _re.search(r'<nav id="navmenu">(.*?)</nav>', page, _re.S).group(1)
+            self.assertNotIn(">지적사항</a>", tabs)
+            self.assertNotIn(">모아보기</a>", tabs)
 
     def test_nav_this_week_tab_removed_but_cta_kept(self):
         # [M15] nav 탭에서 "이번 주" 링크는 제거됐다(CTA "이번 주 소식" 버튼과 중복) —
@@ -1666,19 +1667,18 @@ class WebFindingsRenderTest(unittest.TestCase):
         # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
         # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
         tabs, sep, more = nav_m.group(1).partition('<span class="navmore">')
-        self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
         self.assertNotIn(">이번 주<", tabs)
-        self.assertEqual(tabs.count("<a "), 5, "nav 탭은 주간 브리프·지적사항·자료실·용어사전·이용안내 5개여야 함(1안: 트렌드는 지적사항 탭)")
+        # [메뉴 3개 2026-11-12] 주간 브리프·찾아보기(+관심 목록 — 반응 계층이 켜진 빌드만).
+        self.assertEqual(tabs.count("<a "), 2, "nav 탭은 주간 브리프·찾아보기(관심 목록은 반응 계층 빌드만)")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
-        # 서랍에는 헤더 한 줄에서 밀려난 것들이 들어간다 — 휴대폰에서 유일한 도달 경로다.
-        self.assertIn("주간 퀴즈", more, "서랍에 '주간 퀴즈' 가 없다(휴대폰에서 도달 불가)")
-        # [1안 2026-11-10] 서랍의 '이번 주 소식'은 주간 브리프 탭과 중복이라 뺐다 —
-        # 이번 주 호는 아카이브 맨 위 블록이 연다.
+        # 주간 퀴즈는 사이트 얼굴에서 내렸다(대표 확정안 7) — 바닥글 콘텐츠 열에만 있다.
+        self.assertNotIn("주간 퀴즈", more)
+        self.assertIn("quiz/index.html", self.html[self.html.index('<footer class="site">'):])
         self.assertNotIn("이번 주 소식", more)
 
     def test_footer_link_present(self):
-        # [탭 3묶음 2026-11-11] 푸터 콘텐츠 열도 상단 메뉴·탭과 같은 이름 '지적사항'.
-        self.assertIn('<a href="../findings/index.html">지적사항</a>', self.html)
+        # [찾아보기 2026-11-12] 푸터 '찾아보기' 열에서 지적 문장 검색 면으로.
+        self.assertIn('<a href="../findings/index.html">지적 문장 검색</a>', self.html)
         self.assertNotIn(">이번 주</a>", self.html)
 
     def test_canonical_and_description(self):
@@ -4013,23 +4013,21 @@ class WebTrendsRenderTest(unittest.TestCase):
         # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
         # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
         tabs = nav_m.group(1).partition('<span class="navmore">')[0]
-        self.assertIn('class="on">지적사항', tabs)
+        # [메뉴 3개 2026-11-12] 트렌드 화면에서는 '찾아보기'가 켜진다(탭 3묶음 폐기).
+        self.assertIn('class="on">찾아보기', tabs)
         self.assertNotIn("findings/trends/", tabs)
-        self.assertEqual(tabs.count("<a "), 5)  # 주간 브리프·지적사항·자료실·용어사전·이용안내
-        seg = self.html[self.html.index('<nav class="fnd-seg"'):]
-        seg = seg[:seg.index("</nav>")]
-        self.assertIn('href="../../findings/trends/index.html" class="on" aria-current="page">지적 영역</a>', seg)
+        self.assertEqual(tabs.count("<a "), 2)  # 주간 브리프·찾아보기
+        self.assertNotIn('class="fnd-seg"', self.html)
 
     def test_footer_link_present(self):
-        # [탭 3묶음 2026-11-11] 푸터 '지적사항' 열은 탭과 같은 이름 '지적 영역'.
-        self.assertIn('<a href="../../findings/trends/index.html">지적 영역</a>', self.html)
+        # [찾아보기 2026-11-12] 푸터 '찾아보기' 열은 찾아보기 색인과 같은 이름 '업무 영역별 경향'.
+        self.assertIn('<a href="../../findings/trends/index.html">업무 영역별 경향</a>', self.html)
         self.assertNotIn("규제 동향</a>", self.html)
 
     def test_findings_zone_links_to_trends(self):
-        """존 안에서 트렌드로 가는 길 — [탭 3묶음 2026-11-11] 검색 면 탭 위 줄 '경향' 묶음이 연다."""
-        search = (self.single / "findings" / "index.html").read_text(encoding="utf-8")
-        seg = search[search.index('<nav class="fnd-seg"'):]
-        self.assertIn('href="../findings/trends/index.html">경향</a>', seg[:seg.index("</nav>")])
+        """트렌드로 가는 길 — [찾아보기 2026-11-12] 찾아보기 색인이 연다."""
+        browse = (self.single / "browse" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="../findings/trends/index.html"><b>업무 영역별 경향</b>', browse)
 
     def test_canonical_and_description(self):
         self.assertIn(
@@ -6221,8 +6219,8 @@ class WebChecklistRenderTest(unittest.TestCase):
         # 진입로 셋.
         self.assertIn('<a class="tr-cta-go" href="../../findings/checklist/index.html">',
                       self.trends)
-        self.assertIn('href="../../findings/checklist/index.html">체크리스트</a>',
-                      self.trends)          # footer '지적사항' 열(탭 3묶음 2026-11-11)
+        self.assertIn('href="../../findings/checklist/index.html">자가점검표</a>',
+                      self.trends)          # footer '찾아보기' 열(2026-11-12)
         findings = (self.single / "findings" / "index.html").read_text(encoding="utf-8")
         self.assertIn('href="../findings/checklist/index.html"', findings)  # 도구 카드
 
@@ -6758,7 +6756,7 @@ class WebFirmRenderTest(unittest.TestCase):
         # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
         # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
         tabs, _sep, more = nav_m.group(1).partition('<span class="navmore">')
-        self.assertEqual(tabs.count("<a "), 5)  # 주간 브리프·지적사항·자료실·용어사전·이용안내
+        self.assertEqual(tabs.count("<a "), 2)  # [메뉴 3개 2026-11-12] 주간 브리프·찾아보기(관심 목록은 반응 계층 빌드만)
         # 서랍의 언어 전환 링크는 **같은 페이지의 영어판**을 가리키므로 경로가 통째로
         # 겹친다(en/{route}/) — 그 하나 때문에 부분일치가 오탐한다. 탭 승격 여부를
         # 묻는 가드이므로 탭 행을 보고, 서랍은 언어 링크만 뺀 나머지로 본다(서랍에
@@ -7016,7 +7014,7 @@ class WebInspectorRenderTest(unittest.TestCase):
         # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
         # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
         tabs, _sep, more = nav_m.group(1).partition('<span class="navmore">')
-        self.assertEqual(tabs.count("<a "), 5)  # 주간 브리프·지적사항·자료실·용어사전·이용안내
+        self.assertEqual(tabs.count("<a "), 2)  # [메뉴 3개 2026-11-12] 주간 브리프·찾아보기(관심 목록은 반응 계층 빌드만)
         # 서랍의 언어 전환 링크는 **같은 페이지의 영어판**을 가리키므로 경로가 통째로
         # 겹친다(en/{route}/) — 그 하나 때문에 부분일치가 오탐한다. 탭 승격 여부를
         # 묻는 가드이므로 탭 행을 보고, 서랍은 언어 링크만 뺀 나머지로 본다(서랍에
@@ -7932,7 +7930,9 @@ class WebMePageTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.me, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertNotIn('class="on"', nav_m.group(1), "/me 에서 무관한 nav 탭이 활성화됨")
+        # [메뉴 3개 2026-11-12] /me = 상단 메뉴 '관심 목록' — 그 탭만 켜진다.
+        self.assertEqual(_re.findall(r'class="on">([^<]+)</a>', nav_m.group(1)), ["관심 목록"],
+                         "/me 에서 무관한 nav 탭이 활성화됨")
 
     def test_three_sections_present_in_order(self):
         """구름이를 스크랩보다 위에 둔다 — 로그인 여부와 무관하게 항상 내용이 있는 유일한
@@ -8028,24 +8028,13 @@ class WebMePageTest(unittest.TestCase):
         self.assertNotIn("마이페이지", self.landing_off)      # env-off 면 어디에도 없다
         import re as _re0
         nav0 = _re0.search(r'<nav id="navmenu">(.*?)</nav>', self.landing_on, _re0.S).group(1)
-        _, sep0, drawer = nav0.partition('<span class="navmore">')
-        self.assertTrue(sep0, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
-        self.assertIn('me/index.html">마이페이지</a>', drawer)   # 헤더 서랍(정적)
+        tabs0 = nav0.partition('<span class="navmore">')[0]
+        # [메뉴 3개 2026-11-12 · 대표 확정안 1] 마이페이지는 상단 메뉴 '관심 목록'(셋째 탭)이다 —
+        # 탭 행은 좁은 폭에서 햄버거 서랍으로 접히므로 휴대폰에서도 같은 링크가 닿는다.
+        self.assertIn('<a href="me/index.html">관심 목록</a>', tabs0)
+        self.assertEqual(tabs0.count("<a "), 3)                 # 주간 브리프·찾아보기·관심 목록
         self.assertIn("me/index.html", self.reactions_js)        # 계정 메뉴(런타임)
-        # nav 탭 수는 5개(과밀 금지 · 1안에서 트렌드가 지적사항 탭으로).
-        import re as _re
-        nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.landing_on, _re.S)
-        # [모바일 헤더 2026-09-06] nav 안은 두 묶음이다 — 데스크톱 탭 행과, 좁은 폭
-        # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
-        # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
-        tabs, sep, more = nav_m.group(1).partition('<span class="navmore">')
-        self.assertTrue(sep)
-        self.assertEqual(tabs.count("<a "), 5)
-        self.assertNotIn("마이페이지", tabs)
-        # [모바일 헤더 2026-09-06] 세 번째 진입점 — 햄버거 서랍. 휴대폰에는 헤더 계정
-        # 메뉴가 뜰 자리가 없고 footer 는 스크롤 끝이라, 같은 env-gate 로 서랍에도 둔다.
-        self.assertIn('<a href="me/index.html">마이페이지</a>', more)
-        self.assertNotIn("마이페이지", self.landing_off)   # env-off = 서랍에도 없다
+        self.assertNotIn("관심 목록", self.landing_off)          # env-off = 메뉴에도 없다
         # 헤더 계정 메뉴 항목도 실제 페이지 내용과 이름을 맞췄다(링크·아이콘은 그대로).
         self.assertIn(
             "'<i class=\"ti ti-bookmark\" aria-hidden=\"true\"></i>' + _t(\"마이페이지\") + '</a>'",
@@ -15154,11 +15143,10 @@ class WebAboutTest(unittest.TestCase):
         """[확정안 2026-09-06] 열 순서 = 서비스 안내 → 콘텐츠 → 도구. 처음 온 사람이 먼저
         묻는 것("여기가 무엇인가")을 앞에 둔다."""
         foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
-        # [탭 3묶음 2026-11-11] '도구' 열 → '지적사항' 열(탭과 같은 묶음·이름·순서).
-        self.assertEqual(re.findall(r"<h5>([^<]+)</h5>", foot), ["서비스 안내", "콘텐츠", "지적사항"])
+        # [찾아보기 2026-11-12] '지적사항' 열 → '찾아보기' 열(묶음 소제목 없음).
+        self.assertEqual(re.findall(r"<h5>([^<]+)</h5>", foot), ["서비스 안내", "콘텐츠", "찾아보기"])
         self.assertNotIn("<span>", foot)                            # 클릭 안 되는 라벨 열 0
-        # 클릭 안 되는 라벨은 '지적사항' 열의 묶음 소제목(찾기·경향·점검) 셋뿐이다.
-        self.assertEqual(re.findall(r'<span class="foot-grp">([^<]+)</span>', foot), ["찾기", "경향", "점검"])
+        self.assertNotIn('class="foot-grp"', foot)
         self.assertIn('href="../../about/index.html">서비스 소개</a>', foot)
         self.assertNotIn("index.html#why", foot)                     # 종전 홈 앵커 소개 없음
         self.assertEqual(foot.count("index.html#notice"), 1)        # 같은 앵커 링크 둘 → 하나
@@ -15187,9 +15175,9 @@ class WebAboutTest(unittest.TestCase):
         foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
         self.assertNotIn("me/index.html", foot)
         base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
-        _, sep, drawer = base.partition('<span class="navmore">')
-        self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 사라졌다 — 마이페이지 정적 진입 경로")
-        self.assertIn("me/index.html", drawer[:drawer.index("</span>")])
+        # [메뉴 3개 2026-11-12] 정적 진입 경로 = 상단 메뉴 '관심 목록'(좁은 폭에선 햄버거 서랍 안).
+        nav = base[base.index('<nav id="navmenu">'):]
+        self.assertIn('me/index.html"', nav[:nav.index("</nav>")])
         reactions = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
         self.assertIn("me/index.html", reactions)
         self.assertIn("grm-acct-item", reactions)
@@ -15203,8 +15191,7 @@ class WebAboutTest(unittest.TestCase):
         # 펼쳐지는 서랍 전용 묶음(.navmore). "탭 6개"가 지키려는 것은 탭 행이므로 세는
         # 대상도 탭 행이다(서랍은 헤더 한 줄에서 밀려난 것들의 유일한 도달 경로).
         tabs, sep, more = nav.partition('<span class="navmore">')
-        self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
-        self.assertEqual(tabs.count("<a "), 5)
+        self.assertEqual(tabs.count("<a "), 2)   # [메뉴 3개 2026-11-12] 주간 브리프·찾아보기
         self.assertNotIn('class="on"', nav)
         # 소개는 탭에도 서랍에도 올리지 않는다 — 진입은 푸터 '서비스' 열 하나로 유지한다.
         # 단 서랍의 언어 전환 링크는 **이 페이지의 영어판**(`../en/about/`)을 가리켜

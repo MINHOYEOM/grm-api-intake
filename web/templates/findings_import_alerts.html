@@ -45,9 +45,8 @@
 <main>
   <div class="wrap">
     <nav class="ia-crumb" aria-label="{{ _('현재 위치') }}">
-      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항') }}</a><i>&rsaquo;</i><span>{{ _('FDA 수입경보') }}</span>
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><span>{{ _('FDA 수입경보') }}</span>
     </nav>
-    <div style="margin-top:16px">{% with seg_active = "firm" %}{% include "partials/findings_seg.html" %}{% endwith %}</div>
     <nav class="fnd-views" aria-label="{{ _('업체 보기 전환') }}"><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 찾기") }}</a><a href="{{ rel_root }}findings/import-alerts/index.html" class="on" aria-current="page">{{ _("수입경보 목록") }}</a></nav>
     <p class="kick">FDA &middot; Import Alert</p>
     <h1 class="ia-h1">{{ _('FDA 수입경보 대상 업체') }}</h1>

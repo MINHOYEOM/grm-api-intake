@@ -62,8 +62,8 @@
   <button type="button" id="grmLangHintX" aria-label="Dismiss">&times;</button>
 </div>
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../library/index.html" class="on">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a><span class="navmore"><a href="../../quiz/index.html">주간 퀴즈</a><a class="navmore-lang" href="../../en/library/pmda/index.html" hreflang="en" lang="en">English</a></span></nav>
-  <span class="sp"></span>
+  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">주간 브리프</a><a href="../../browse/index.html" class="on">찾아보기</a><span class="navmore"><a class="navmore-lang" href="../../en/library/pmda/index.html" hreflang="en" lang="en">English</a></span></nav>
+  <span class="sp"></span>  <form class="nav-search" action="../../search/index.html" method="get" role="search"><input name="q" type="search" autocomplete="off" placeholder="업체명, 조항, 용어" aria-label="검색어"><button type="submit" aria-label="검색"><i class="ti ti-search" aria-hidden="true"></i></button></form>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="grm-lang" href="../../en/library/pmda/index.html" hreflang="en" lang="en" rel="alternate"><i class="ti ti-language" aria-hidden="true"></i>English</a>
   <a class="btn coral" href="../../briefs/2026-07-06/index.html">이번 주 소식</a>
@@ -340,6 +340,21 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
 @media(min-width:901px){
   .nav nav a,.grm-auth .grm-acct-login{white-space:nowrap}
 }
+/* [전역 검색 2026-11-12] 헤더 검색칸. 넓은 화면은 입력칸, 1000px 이하는 돋보기 버튼만(헤더 한 줄 유지). */
+.nav-search{display:flex;align-items:center;flex:0 1 230px;min-width:0;height:38px;margin-right:12px;padding:0 2px 0 14px;border:1px solid var(--line-2);border-radius:999px;background:var(--canvas)}
+.nav-search input{flex:1 1 auto;min-width:0;border:0;background:transparent;font:inherit;font-size:14px;color:var(--ink);outline:none}
+.nav-search input::-webkit-search-cancel-button{display:none}
+.nav-search button{flex:none;display:inline-grid;place-items:center;width:34px;height:34px;border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer}
+.nav-search:focus-within{border-color:var(--ink)}
+@media(max-width:1000px){
+  .nav-search{flex:none;width:auto;height:auto;margin-right:0;padding:0;border:0;background:none}
+  .nav-search input{display:none}
+  .nav-search button{width:44px;height:44px;font-size:21px;color:var(--ink)}
+}
+@media(max-width:900px){ .nav-search{order:1} }
+/* 검색칸이 들어간 1001~1100px 은 브랜드 부제가 세 줄로 접혔다(실측 높이 58px) — 그 구간도 부제를 감춘다. */
+.nav-in > .brand{flex:none}
+@media(max-width:1100px){ .brand-full{display:none} }
 @media(min-width:901px) and (max-width:1000px){
   .brand-full{display:none}
   .nav nav{gap:2px}
@@ -352,8 +367,8 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
       <p>국내외 의약품 GMP·품질 규제 동향을 한국어와 영어로 제공하는 무료 정보 서비스입니다.</p>
       <a class="foot-srclink" href="../../findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
     <div data-feedback-slot><h5>서비스 안내</h5><a href="../../about/index.html">서비스 소개</a><a href="../../guide/index.html">이용안내</a><a href="../../index.html#notice">AI 활용 안내</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../rss.xml">RSS 피드</a></div>
-    <div><h5>콘텐츠</h5><a href="../../archive/index.html">주간 브리프</a><a href="../../news/index.html">최근 규제 소식</a><a href="../../findings/index.html">지적사항</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
-    <div class="foot-fnd"><h5>지적사항</h5><span class="foot-grp">찾기</span><a href="../../findings/index.html">검색</a><a href="../../findings/docs/index.html">문서</a><a href="../../findings/c/index.html">분류</a><a href="../../findings/firm/index.html">업체</a><a href="../../findings/inspector/index.html">실사관</a><span class="foot-grp">경향</span><a href="../../findings/trends/index.html">지적 영역</a><a href="../../findings/citations/index.html">지적 조항</a><a href="../../findings/inspections/index.html">실사 결과</a><span class="foot-grp">점검</span><a href="../../findings/examples/index.html">지적 사례</a><a href="../../findings/checklist/index.html">체크리스트</a></div>
+    <div><h5>콘텐츠</h5><a href="../../archive/index.html">주간 브리프</a><a href="../../news/index.html">최근 규제 소식</a><a href="../../browse/index.html">찾아보기</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
+    <div class="foot-fnd"><h5>찾아보기</h5><a href="../../findings/firm/index.html">업체</a><a href="../../findings/inspector/index.html">실사관</a><a href="../../findings/clause/index.html">조항</a><a href="../../findings/trends/index.html">업무 영역별 경향</a><a href="../../findings/docs/index.html">공개 문서</a><a href="../../findings/index.html">지적 문장 검색</a><a href="../../findings/checklist/index.html">자가점검표</a><a href="../../browse/index.html">전체 색인</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">

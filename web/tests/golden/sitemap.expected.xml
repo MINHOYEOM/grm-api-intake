@@ -2,6 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://grm-solutions.com/</loc><lastmod>2026-07-06</lastmod></url>
   <url><loc>https://grm-solutions.com/archive/</loc><lastmod>2026-07-06</lastmod></url>
+  <url><loc>https://grm-solutions.com/browse/</loc><lastmod>2026-07-06</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/</loc><lastmod>2026-07-06</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/trends/</loc><lastmod>2026-07-06</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/inspections/</loc><lastmod>2026-07-06</lastmod></url>
@@ -4677,6 +4678,7 @@
   <url><loc>https://grm-solutions.com/quiz/</loc></url>
   <url><loc>https://grm-solutions.com/en/</loc></url>
   <url><loc>https://grm-solutions.com/en/about/</loc></url>
+  <url><loc>https://grm-solutions.com/en/browse/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/agency/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/agency/ema/</loc></url>

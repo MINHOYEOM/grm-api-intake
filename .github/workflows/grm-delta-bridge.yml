@@ -40,6 +40,17 @@ on:
         description: '발행일 YYYY-MM-DD (선택 — 미지정 시 최신 OPEN Web Delta 페이지 날짜)'
         required: false
         type: string
+      source:
+        description: '정본 길 — default 면 저장소 변수 GRM_DELTA_SOURCE(없으면 notion). notion=노션 정본·git 은 비교만 / git=편집팀 브랜치 먼저·노션 예비'
+        required: false
+        type: choice
+        default: 'default'
+        options: ['default', 'notion', 'git']
+      compare_only:
+        description: '쓰지 않고 비교만 — main 에 기록된 그 주 델타 vs claude/company-{날짜} 반납 (publish_date 필수)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # 델타 커밋
@@ -59,6 +70,10 @@ jobs:
     timeout-minutes: 10
     env:
       GRM_INTAKE_DB_ID: '7784c71fb7b343749b2bee5d04db7926'
+      # [2026-11-12] 결과 반납 정본 길(재검토안 3절 1단계). 기본 notion = 지금과 같고 git 반납은
+      #   비교만(차이표는 Actions 요약 + 아티팩트 delta-compare). git 으로 바꾸려면 저장소 변수
+      #   GRM_DELTA_SOURCE=git. 같은 날 두 길이 다르면 먼저 main 에 기록된 쪽이 이긴다.
+      GRM_DELTA_SOURCE: ${{ (github.event.inputs.source != 'default' && github.event.inputs.source) || vars.GRM_DELTA_SOURCE || 'notion' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -89,7 +104,19 @@ jobs:
           if [ -n "${{ github.event.inputs.publish_date }}" ]; then
             ARGS+=(--publish-date "${{ github.event.inputs.publish_date }}")
           fi
+          if [ "${{ github.event.inputs.compare_only }}" = "true" ]; then
+            ARGS+=(--compare-only)
+          fi
+          echo "정본 길: $GRM_DELTA_SOURCE"
           python delta_bridge.py "${ARGS[@]}"
+
+      - name: 두 길 비교표 보관
+        if: always() && hashFiles('_delta_compare/**') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: delta-compare-${{ github.run_id }}
+          path: _delta_compare/
+          retention-days: 90
 
       - name: 커밋 + push (wrote=true 일 때만)
         if: steps.bridge.outputs.wrote == 'true'
@@ -104,11 +131,14 @@ jobs:
           if [ -f "web/data/deltas/deep_${U}.json" ]; then
             git add "web/data/deltas/deep_${U}.json"
           fi
-          git commit -m "bridge(web): ${{ steps.bridge.outputs.date }} 라우틴 델타 커밋 (자동)"
+          SRC="${{ steps.bridge.outputs.source }}"
+          if [ "$SRC" = "git" ]; then MSG="편집팀 git 반납"; else MSG="라우틴 델타"; fi
+          git commit -m "bridge(web): ${{ steps.bridge.outputs.date }} ${MSG} 커밋 (자동)"
           git push
 
       - name: Notion 마감(CONSUMED) — 커밋+push 성공 후에만
-        if: steps.bridge.outputs.wrote == 'true'
+        # git 반납으로 기록한 run 은 노션 페이지를 닫지 않는다 — 닫을 대상은 노션에서 읽은 페이지뿐이다.
+        if: steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source != 'git'
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: |

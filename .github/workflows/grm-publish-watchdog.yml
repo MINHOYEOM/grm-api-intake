@@ -362,6 +362,7 @@ jobs:
               '복구까지 실패했다면 크론 지각이 아니라 **Notion 에 OPEN 델타 자체가 없다**는 뜻일 가능성이 높습니다(브릿지는 예치가 있으면 기동만으로 복구된다). 다음을 확인하세요:',
               '- Claude Routine(월 07:30 KST 예약 에이전트) 실행 여부 · MCP 연결 상태',
               '- Notion Intake DB 에 `OPEN GRM Web Delta` 페이지가 예치됐는지(Status=New)',
+              `- 편집팀 git 반납: 브랜치 \`claude/company-${pubDate}\` 의 \`company/run/${pubDate}/delta.json\`·\`copyedit.json\`(status 완료) — 저장소 변수 GRM_DELTA_SOURCE=git 일 때만 브릿지가 이것으로 기록합니다(기본 notion 은 비교만)`,
               '- 델타 브릿지 run 로그 — 예치가 있는데도 실패했다면 그쪽이 원인입니다',
               '',
               '사람 복구(멱등 — 이미 이관됐으면 무해 skip): `gh workflow run grm-delta-bridge.yml`',

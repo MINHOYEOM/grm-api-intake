@@ -20,9 +20,9 @@ tesseract 설치 스텝을 `grm-intake.yml` 에만 추가한 탓에, 같은 PDF 
       nrow(복원) → collect_fda_483._to_item(...) → findings_store.raw_signal_from_intake_item
   `raw_signal_id = "rawsig-" + stable_hash({schema_version, source, document_id})[:24]` 라
   **내용이 아니라 document_id 에만** 의존한다 → 재구성해도 id 가 같다. 그래서 DELETE 없이
-  `Prefer: resolution=merge-duplicates` upsert 한 번으로 제자리 교체가 된다.
+  제자리 교체가 된다 — [R3 2026-11-12] raw_signal_apply_version(148) 경유(옛 판 보관·지문 검증).
   DELETE 를 쓰지 않는 이유: `findings.raw_signal_id` 가 ON DELETE CASCADE 라, 지웠다가 삽입에
-  실패하면 그 사이 findings 까지 사라진다. upsert 는 그 창이 없다.
+  실패하면 그 사이 findings 까지 사라진다. 함수 교체는 그 창이 없다.
 
   nrow 복원의 근거: `_to_item` 이 읽는 nrow 키는 9개(record_type·media_id·company·fei·
   state·country·establishment_type·record_date·publish_date)뿐이고, 그 9개가 전부
@@ -64,8 +64,8 @@ from pathlib import Path
 from typing import Any, Callable
 
 import findings_store
-import findings_supabase_append as fsa
 import findings_supabase_backfill as fsb
+import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import SOURCE_FDA_483, log
@@ -482,7 +482,7 @@ def _fetch_raw_signals(
         narrow = {"raw_json": f"like.*{OCR_UNAVAILABLE_PREFIX}*"}
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals",
-        select="raw_signal_id,document_id,collected_at,raw_json",
+        select="raw_signal_id,document_id,collected_at,raw_sha256,raw_json,row_json",
         page_size=page_size, order="raw_signal_id.asc",
         extra_params={"source": f"eq.{SOURCE_FDA_483}", **narrow},
     )
@@ -493,36 +493,33 @@ def _upsert_raw_signal(
     service_key: str,
     record: dict[str, Any],
     *,
+    row: dict[str, Any] | None = None,
     timeout: int = DEFAULT_TIMEOUT_SECONDS,
 ) -> tuple[int, list[dict[str, Any]] | None, str]:
-    """재구성된 raw_signals 행을 제자리 교체(upsert).
+    """재구성된 raw_signals 행을 제자리 교체 — [원문 갱신 규칙 R3 2026-11-12] raw_signal_apply_version 경유.
 
-    `resolution=merge-duplicates` — 기본 적재 경로(`ignore-duplicates`)와 의도적으로 다르다.
-    일상 수집은 "이미 있으면 두기"가 옳지만, 여기서는 **있는 것을 고치는 게** 목적이다.
+    예전에는 merge-duplicates upsert 로 덮어써 옛 판이 남지 않았다. 지금은 읽은 시점 지문(row.raw_sha256)을
+    expected 로 넘겨, 그 사이 다른 도구가 바꿨으면 conflict 로 멈추고 옛 판은 보관표에 남긴다.
+    반환 모양 (status, returned, err) 은 예전 그대로다.
     """
-    return fsa._post_rows(
-        base_url, service_key, "raw_signals",
-        [fsa._raw_signal_payload(record)], "raw_signal_id",
-        timeout=timeout, resolution="merge-duplicates",
-    )
+    del timeout   # 함수 호출 쪽 시간 상한(raw_versioning) 을 쓴다
+    return rv.apply_record(base_url, service_key, record, row, change_kind="reextract",
+                           changed_by=rv.run_label("backfill_483_ocr_recovery"),
+                           reason="483_ocr_recovery")
 
 
 def _patch_raw_json(
     base_url: str, service_key: str, raw_signal_id: str, raw: dict[str, Any],
-    *, timeout: int = DEFAULT_TIMEOUT_SECONDS,
+    *, row: dict[str, Any] | None = None, timeout: int = DEFAULT_TIMEOUT_SECONDS,
 ) -> None:
-    """raw_json 한 칸만 제자리 교체(PATCH) — 재구성이 게이트에 드롭되는 행의 표식 갱신용."""
-    import requests
-    resp = requests.patch(
-        f"{base_url}/rest/v1/raw_signals",
-        params={"raw_signal_id": f"eq.{raw_signal_id}", "source": f"eq.{SOURCE_FDA_483}"},
-        headers={"apikey": service_key, "Authorization": f"Bearer {service_key}",
-                 "Content-Type": "application/json", "Prefer": "return=minimal"},
-        json={"raw_json": json.dumps(raw, ensure_ascii=False)},
-        timeout=timeout,
-    )
-    if resp.status_code >= 400:
-        raise RuntimeError(f"PATCH HTTP {resp.status_code}")
+    """raw_json 표식만 바꾼 판으로 교체 — 재구성이 게이트에 드롭되는 행의 표식 갱신용.
+
+    [R3] PATCH 대신 raw_signal_apply_version 경유(지문 재계산·옛 판 보관).
+    """
+    del timeout
+    rv.replace_raw(base_url, service_key, {**(row or {}), "raw_signal_id": raw_signal_id}, raw,
+                   change_kind="repair", changed_by=rv.run_label("backfill_483_ocr_recovery"),
+                   diff_summary={"reason": "483_status_marker"})
 
 
 def _mark_out_of_scope_in_place(
@@ -534,14 +531,15 @@ def _mark_out_of_scope_in_place(
     base: str,
     service_key: str,
     dry_run: bool,
-    patch_fn: Callable[[str, str, str, dict[str, Any]], None],
+    patch_fn: Callable[..., None],
+    row: dict[str, Any] | None = None,
 ) -> None:
     """시설 유형으로 범위 밖인 행의 표식을 `out-of-scope` 로 — 다른 키는 그대로 둔다."""
     if dry_run:
         report.status_resolved += 1
         return
     try:
-        patch_fn(base, service_key, rid, {**raw, "fda483_text_status": OUT_OF_SCOPE_STATUS})
+        patch_fn(base, service_key, rid, {**raw, "fda483_text_status": OUT_OF_SCOPE_STATUS}, row=row)
     except Exception as exc:  # noqa: BLE001
         report.failed += 1
         _bump(report, f"patch_failed:{type(exc).__name__}")
@@ -636,7 +634,7 @@ def _resolve_capped_status(
         report.status_resolved += 1
         return
     try:
-        _status, _returned, err = upsert_fn(base, service_key, record)
+        _status, _returned, err = upsert_fn(base, service_key, record, row=row)
     except Exception as exc:  # noqa: BLE001
         err = f"raised:{type(exc).__name__}"
     if err:
@@ -753,7 +751,7 @@ def run(
             if str(raw.get("fda483_text_status") or "") != OUT_OF_SCOPE_STATUS:
                 _mark_out_of_scope_in_place(
                     report, rid, raw, label=label, base=base, service_key=service_key,
-                    dry_run=dry_run, patch_fn=patch_fn,
+                    dry_run=dry_run, patch_fn=patch_fn, row=r,
                 )
             continue
 
@@ -876,7 +874,7 @@ def run(
             continue
 
         try:
-            _status, returned, err = upsert_fn(base, service_key, record)
+            _status, returned, err = upsert_fn(base, service_key, record, row=r)
         except Exception as exc:  # noqa: BLE001
             report.failed += 1
             reason = f"upsert_raised:{type(exc).__name__}"

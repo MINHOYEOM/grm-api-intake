@@ -48,6 +48,9 @@ from typing import Any
 
 import requests
 
+import mfds_inspection_attendees_store as mas
+import raw_versioning as rv
+
 from collect_mfds_gmp_inspection import (
     _assess_deficiency,
     _extract_deficiency_excerpt,
@@ -115,7 +118,7 @@ def fetch_rows(base: str, key: str) -> list[dict[str, Any]]:
     offset = 0
     while True:
         params = {
-            "select": "raw_signal_id,raw_json",
+            "select": "raw_signal_id,document_id,source_kind,raw_sha256,raw_json,row_json",
             "source": f"eq.{SOURCE}",
             "source_kind": f"eq.{SOURCE_KIND}",
             "order": "raw_signal_id.asc",
@@ -178,17 +181,20 @@ def plan_row(row: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
-def _patch(base: str, key: str, raw_signal_id: str, payload: dict[str, Any]) -> None:
-    headers = {
-        "apikey": key, "Authorization": f"Bearer {key}",
-        "Content-Type": "application/json", "Prefer": "return=minimal",
-    }
-    url = f"{base}/rest/v1/raw_signals"
-    params = {"raw_signal_id": f"eq.{raw_signal_id}"}
-    body = {"raw_json": json.dumps(payload, ensure_ascii=False)}
-    resp = requests.patch(url, params=params, headers=headers, json=body, timeout=_TIMEOUT)
-    if resp.status_code >= 400:
-        raise RuntimeError(f"PATCH HTTP {resp.status_code}")
+def _patch(base: str, key: str, row: dict[str, Any], payload: dict[str, Any]) -> None:
+    """[원문 갱신 규칙 R3 2026-11-12] raw_json PATCH 대신 raw_signal_apply_version 경유.
+
+    지문이 바뀌므로, 실사자 표(mfds_inspection_attendees.source_raw_sha256)를 같은 자리에서 새 지문으로
+    다시 맞춘다 — 안 그러면 실사관 화면에서 이 문서가 '표 없음'으로 떨어진다(R2 재매김과 같은 처리).
+    """
+    res = rv.replace_raw(base, key, row, payload, change_kind="repair",
+                         changed_by=rv.run_label("backfill_mfds_gmp_assessment"),
+                         diff_summary={"reason": "mfds_deficiency_assessment"})
+    if res.get("status") == "applied":
+        mas.sync_attendees(base, key, {
+            "source": SOURCE, "source_kind": str(row.get("source_kind") or SOURCE_KIND),
+            "document_id": str(row.get("document_id") or ""),
+            "raw_sha256": res["new_raw_sha256"], "raw_json": res["new_raw_json"]})
 
 
 def run(apply: bool) -> Report:
@@ -227,9 +233,9 @@ def run(apply: bool) -> Report:
         if not apply:
             continue
         try:
-            _patch(base, key, str(row.get("raw_signal_id")), plan["raw_json"])
+            _patch(base, key, row, plan["raw_json"])
             report.applied += 1
-        except RuntimeError as exc:
+        except RuntimeError as exc:   # rv.ApplyVersionError 포함(conflict·not_found)
             report.failed += 1
             report.errors.append(f"{row.get('raw_signal_id')}: {exc}")
     return report

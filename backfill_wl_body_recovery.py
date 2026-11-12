@@ -15,8 +15,9 @@ WL 편지 본문(`wl_body_full`)은 일일 수집(`collect_intake.collect_fda_wa
 
   · **행 전체 재구성.** raw_json 을 손으로 기우지 않고 라이브 수집과 **같은 함수**로 만든다:
         저장 raw → collect_intake.build_wl_item(...) → findings_store.raw_signal_from_intake_item
-    `raw_signal_id` 는 document_id 에만 의존하므로 DELETE 없이 upsert(merge-duplicates)
-    한 번으로 제자리 교체된다(findings CASCADE 위험 없음). `collected_at` 은 원본 보존.
+    `raw_signal_id` 는 document_id 에만 의존하므로 DELETE 없이 제자리 교체된다(findings CASCADE
+    위험 없음). `collected_at` 은 원본 보존. 교체는 raw_signal_apply_version(148) 경유다(R3 11-12 —
+    옛 판 보관·지문 검증·읽은 뒤 바뀌었으면 conflict).
   · **본문을 못 얻으면 쓰지 않는다**(빈손을 빈손으로 덮지 않는다). 예외: 다시 읽어 본 결과가
     **확정 사유**(404·no-anchor)면 그 사유만 표식으로 남겨 매일 같은 편지를 다시 받는 일을 끊는다.
   · 재구성한 document_id/raw_signal_id 가 기존과 다르면 건너뛴다(떠돌이 행 금지).
@@ -69,8 +70,8 @@ from pathlib import Path
 from typing import Any, Callable
 
 import findings_store
-import findings_supabase_append as fsa
 import findings_supabase_backfill as fsb
+import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import SOURCE_FDA_WL, log
@@ -272,7 +273,7 @@ def _fetch_raw_signals(base_url: str, service_key: str, *, with_body: bool = Fal
     `with_body` 면 반대로 본문이 있는 행(`--rebuild-body-start`)."""
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals",
-        select="raw_signal_id,document_id,collected_at,raw_json",
+        select="raw_signal_id,document_id,collected_at,raw_sha256,raw_json,row_json",
         page_size=page_size, order="raw_signal_id.asc",
         extra_params={"source": f"eq.{SOURCE_FDA_WL}",
                       "raw_json": ("like" if with_body else "not.like") + ".*wl_body_full*"},
@@ -280,14 +281,17 @@ def _fetch_raw_signals(base_url: str, service_key: str, *, with_body: bool = Fal
 
 
 def _upsert_raw_signal(base_url: str, service_key: str, record: dict[str, Any], *,
+                       row: dict[str, Any] | None = None,
                        timeout: int = DEFAULT_TIMEOUT_SECONDS,
                        ) -> tuple[int, list[dict[str, Any]] | None, str]:
-    """제자리 교체(merge-duplicates) — 일상 적재(ignore-duplicates)와 의도적으로 다르다."""
-    return fsa._post_rows(
-        base_url, service_key, "raw_signals",
-        [fsa._raw_signal_payload(record)], "raw_signal_id",
-        timeout=timeout, resolution="merge-duplicates",
-    )
+    """제자리 교체 — [원문 갱신 규칙 R3 2026-11-12] raw_signal_apply_version 경유(옛 판 보관·지문 검증).
+
+    예전 merge-duplicates upsert 는 옛 판을 남기지 않았다. 반환 모양은 그대로다.
+    """
+    del timeout
+    return rv.apply_record(base_url, service_key, record, row, change_kind="reextract",
+                           changed_by=rv.run_label("backfill_wl_body_recovery"),
+                           reason="wl_body_recovery")
 
 
 def _is_broad_failure(report: WlBodyRecoveryReport) -> bool:
@@ -320,7 +324,7 @@ def _write(report: WlBodyRecoveryReport, *, label: str, row: dict[str, Any], ite
     if dry_run:
         return True
     try:
-        _status, _returned, err = upsert_fn(base, service_key, record)
+        _status, _returned, err = upsert_fn(base, service_key, record, row=row)
     except Exception as exc:  # noqa: BLE001
         err = f"raised:{type(exc).__name__}"
     if err:

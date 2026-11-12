@@ -224,5 +224,105 @@ class HealthWiringTest(unittest.TestCase):
         self.assertIn("source-silence-query-failed", [w.code for w in health.warnings])
 
 
+
+class SupabaseSilenceShadowTest(unittest.TestCase):
+    """무음 판정을 DB 대기열(intake_queue) 기준으로도 계산해 차이만 남긴다 — 판정은 노션 기준 그대로."""
+
+    def _session(self, rows_by_source, history="2026-01-01", fail=()):
+        from unittest.mock import MagicMock
+        http = MagicMock()
+
+        def get(url, params, headers, timeout):
+            r = MagicMock()
+            r.status_code = 200
+            src = (params.get("source") or "")[3:]
+            if "source" not in params:
+                r.json.return_value = [{"first_seen_run_date": history}] if history else []
+            elif src in fail:
+                r.status_code = 500
+            else:
+                day = rows_by_source.get(src)
+                r.json.return_value = [{"first_seen_run_date": day}] if day else []
+            return r
+        http.get.side_effect = get
+        return http
+
+    def _query(self, rows, **kw):
+        from source_silence import query_last_seen_supabase
+        return query_last_seen_supabase("https://x.supabase.co", "KEY", ["WHO", "PIC/S", "ICH"],
+                                        run_date=RUN, session=self._session(rows, **kw))
+
+    def test_reads_last_run_date_per_source_from_the_queue(self) -> None:
+        seen, errors, hist = self._query({"WHO": "2026-09-10", "PIC/S": "2026-07-30"})
+        self.assertEqual(seen, {"WHO": date(2026, 9, 10), "PIC/S": date(2026, 7, 30), "ICH": None})
+        self.assertEqual((errors, hist), ([], date(2026, 1, 1)))
+
+    def test_short_queue_history_does_not_report_silence(self) -> None:
+        # 대기열 기록이 룩백(120일)보다 짧다 — 행이 없는 소스는 '모름'이지 '무음'이 아니다.
+        seen, _errors, hist = self._query({"WHO": "2026-09-10"}, history="2026-09-01")
+        self.assertEqual(seen, {"WHO": date(2026, 9, 10)})
+        self.assertEqual(hist, date(2026, 9, 1))
+        seen, _errors, hist = self._query({}, history="")       # 대기열이 비어 있다
+        self.assertEqual((seen, hist), ({}, None))
+
+    def test_failed_source_is_left_out_and_key_never_leaks(self) -> None:
+        seen, errors, _ = self._query({"WHO": "2026-09-10"}, fail=("PIC/S",))
+        self.assertNotIn("PIC/S", seen)
+        self.assertEqual(errors, ["PIC/S: http_500"])
+        self.assertNotIn("KEY", " ".join(errors))
+
+    def test_shadow_reports_only_differences_and_which_side_is_silent(self) -> None:
+        from source_silence import silence_shadow
+        notion = {"WHO": date(2026, 9, 10), "PIC/S": date(2026, 7, 30), "Health Canada": None}
+        same = silence_shadow(notion_last_seen=notion, db_last_seen=dict(notion), run_date=RUN,
+                              source_enabled=ALL_ON)
+        self.assertTrue(same["same"])
+        self.assertEqual(same["silent_notion"], same["silent_db"])
+        self.assertEqual(same["verdict_differs"], [])
+        # DB 쪽에서만 WHO 가 오래 멎어 있다 → 한쪽만 무음.
+        db = dict(notion, WHO=date(2026, 6, 1))
+        diff = silence_shadow(notion_last_seen=notion, db_last_seen=db, run_date=RUN,
+                              source_enabled=ALL_ON, history_start=date(2026, 1, 1))
+        self.assertFalse(diff["same"])
+        self.assertEqual(diff["verdict_differs"], ["WHO"])
+        self.assertIn("WHO", diff["silent_db"])
+        self.assertNotIn("WHO", diff["silent_notion"])
+        self.assertEqual(diff["date_differs"], [{"source": "WHO", "notion": "2026-09-10",
+                                                 "db": "2026-06-01"}])
+        self.assertEqual(diff["history_start"], "2026-01-01")
+
+    def test_sources_read_by_one_side_only_are_not_compared(self) -> None:
+        from source_silence import silence_shadow
+        out = silence_shadow(notion_last_seen={"WHO": None, "PIC/S": date(2026, 9, 1)},
+                             db_last_seen={"PIC/S": date(2026, 9, 1)}, run_date=RUN,
+                             source_enabled=ALL_ON, db_errors=["WHO: http_500"])
+        self.assertEqual(out["compared"], 1)
+        self.assertIn("WHO", out["not_compared"])
+        self.assertEqual(out["silent_notion"], [])        # WHO 는 비교에서 빠졌으므로 양쪽 다 세지 않는다
+        self.assertEqual(out["db_errors"], 1)
+        self.assertTrue(out["same"])
+
+    def test_same_verdict_function_as_the_live_watchdog(self) -> None:
+        from source_silence import silence_shadow
+        seen = {w.notion_source: None for w in watched_sources()}
+        out = silence_shadow(notion_last_seen=seen, db_last_seen=dict(seen), run_date=RUN,
+                             source_enabled=ALL_ON)
+        live = _codes(evaluate_silence(last_seen=seen, run_date=RUN, source_enabled=ALL_ON))
+        self.assertEqual(out["silent_notion"], live)
+        self.assertEqual(out["silent_db"], live)
+
+    def test_collector_wiring_is_gated_and_cannot_break_the_watchdog(self) -> None:
+        src = open(os.path.join(REPO, "collect_intake.py"), encoding="utf-8").read()
+        i = src.index('env_flag("ENABLE_SILENCE_SUPABASE_SHADOW")')
+        block = src[i:i + 1400]
+        self.assertIn("query_last_seen_supabase(", block)
+        self.assertIn('store_counters.setdefault("monitor_shadow", {})["silence"]', block)
+        self.assertIn("except Exception as e:  # noqa: BLE001 — 그림자가 감시·수집을 죽이면 안 된다", block)
+        # 노션 기준 판정(coverage_silent_sources)이 그림자보다 먼저 확정된다.
+        self.assertLess(src.index("coverage_silent_sources = {\n                finding.notion_source"), i)
+        wf = open(os.path.join(REPO, ".github", "workflows", "grm-intake.yml"), encoding="utf-8").read()
+        self.assertIn("ENABLE_SILENCE_SUPABASE_SHADOW: ${{ vars.ENABLE_SILENCE_SUPABASE_SHADOW || 'false' }}", wf)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -344,6 +344,43 @@ def check_findings_search_cache_fresh(name: str, base_url_norm: str | None, anon
     return CheckResult(name, "ok", elapsed, detail)
 
 
+# [2026-11-13 ⑤ RPC 시간초과 진단] findings_similar_to 500 4건이 전부 이 감시기였다 — 고정 id 가 092 캐시 밖이라
+# 늘 원 계산(콜드면 3초 벽)을 밟았다. 감시 대상 id 를 findings_similar_cache 안(신선한 행)에서 고른다.
+# 그 표는 anon·authenticated 에 막혀 있어(092 revoke) service 키로만 읽는다 — 키가 없거나 조회가 실패하면
+# 기존 고정 id + 명시 경고로 돌아간다(조용한 강등 금지). 키는 요청 헤더에만 쓰고 출력에 싣지 않는다.
+SIMILAR_CACHE_FRESH_DAYS = 8  # 092 findings_similar_to 가 캐시를 믿는 기간과 같다
+
+
+def pick_similar_probe_target(base_url_norm: str | None, service_key: str, fallback_id: str,
+                              timeout: float, *, now: dt.datetime | None = None) -> tuple[str, str | None]:
+    """(감시 대상 finding_id, 폴백 사유). 사유가 None 이면 id 는 092 캐시 안에서 골랐다."""
+    if base_url_norm is None:
+        return fallback_id, "SUPABASE_URL 미설정 — 고정 id 로 점검(캐시 밖일 수 있음)"
+    if not service_key:
+        return fallback_id, ("SUPABASE_SERVICE_ROLE_KEY 미설정 — 캐시를 읽지 못해 고정 id 로 점검"
+                             "(캐시 밖이면 콜드 지연이 경보로 보인다)")
+    cutoff = ((now or dt.datetime.now(dt.timezone.utc)) - dt.timedelta(days=SIMILAR_CACHE_FRESH_DAYS))
+    headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
+    params = {"select": "finding_id", "refreshed_at": f"gt.{cutoff.strftime('%Y-%m-%dT%H:%M:%SZ')}",
+              "order": "refreshed_at.desc", "limit": "1"}
+    try:
+        resp = requests.get(f"{base_url_norm}/rest/v1/findings_similar_cache", headers=headers,
+                            params=params, timeout=timeout)
+    except requests.exceptions.RequestException as exc:
+        return fallback_id, f"유사 사례 캐시 조회 실패({type(exc).__name__}) — 고정 id 로 점검"
+    if resp.status_code != 200:
+        return fallback_id, f"유사 사례 캐시 조회 HTTP {resp.status_code} — 고정 id 로 점검"
+    try:
+        rows = json.loads(resp.text)
+    except (TypeError, ValueError):
+        return fallback_id, "유사 사례 캐시 응답이 JSON 이 아님 — 고정 id 로 점검"
+    if isinstance(rows, list) and rows and isinstance(rows[0], dict):
+        fid = str(rows[0].get("finding_id") or "").strip()
+        if fid:
+            return fid, None
+    return fallback_id, "신선한 유사 사례 캐시 행 없음 — 고정 id 로 점검"
+
+
 def check_findings_similar_cache_fresh(name: str, base_url_norm: str | None, anon_key: str,
                                        timeout: float, *,
                                        warn_ratio: float = SIMILAR_WARN_RATIO,
@@ -399,6 +436,7 @@ def _overall_status(checks: list[CheckResult]) -> str:
 
 def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date,
               finding_id: str = FIXED_FINDING_ID,
+              service_key: str = "",
               timeout: float = DEFAULT_TIMEOUT) -> dict[str, Any]:
     base_url = (base_url or DEFAULT_SITE_BASE_URL).rstrip("/")
     checks: list[CheckResult] = []
@@ -461,16 +499,22 @@ def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date
         "RPC fda_inspection_stats", base_norm, anon_key, "fda_inspection_stats", {}, timeout))
     checks.append(check_rpc(
         "RPC findings_stats", base_norm, anon_key, "findings_stats", {}, timeout))
-    # [2026-11-09 #1365] FIXED_FINDING_ID 는 092 캐시 대상(검색 화면에 뜨는 약 2,260건) 밖이라 늘
-    # 원 계산(079) 경로를 잰다. 실측: 데운 상태 평균 0.6s·최대 1.6s, 콜드 첫 호출만 3s 를 넘는다
-    # (6.6s 관측). 지난 24h 실제 방문자의 캐시 밖 호출은 0건이었다. 결과를 바꾸지 않는 속도 개선은
-    # 4% 뿐(079 결론과 같음)이고, 캐시를 전 지적으로 넓히는 것은 cron 예산상 불가능하다.
-    # 그래서 이 점검은 fail 이 아니라 warn 으로 남긴다 — 숨기지 않고 요약에 계속 보인다.
-    # 방문자 경로(캐시)는 아래 `findings_similar_cache_status` 신선도 점검이 fail 로 지킨다.
-    checks.append(_downgrade_fail_to_warn(check_rpc(
-        "RPC findings_similar_to", base_norm, anon_key, "findings_similar_to",
-        {"p_finding_id": finding_id, "p_limit": 5}, timeout),
-        "캐시 밖 원 계산 경로 — 콜드 첫 호출 지연, 방문자 경로는 캐시 신선도 점검이 본다"))
+    # [2026-11-09 #1365] 고정 id(FIXED_FINDING_ID)는 092 캐시 대상 밖이라 늘 원 계산(079) 경로를 잰다
+    # (콜드 첫 호출만 3s 초과). 그래서 폴백일 때는 fail 이 아니라 warn 으로 남긴다.
+    # [2026-11-13 ⑤] service 키가 있으면 대상 id 를 092 캐시 안에서 골라 방문자 경로(캐시 적중)를 잰다 —
+    # 이 경우는 정상 판정(fail 가능). 키·조회가 없으면 고정 id + 경고 행(조용한 강등 금지).
+    similar_id, similar_fallback = pick_similar_probe_target(
+        base_norm, service_key, finding_id, timeout)
+    if similar_fallback is None:
+        checks.append(check_rpc(
+            "RPC findings_similar_to", base_norm, anon_key, "findings_similar_to",
+            {"p_finding_id": similar_id, "p_limit": 5}, timeout))
+    else:
+        checks.append(CheckResult("유사 사례 감시 대상 선택", "warn", 0.0, similar_fallback))
+        checks.append(_downgrade_fail_to_warn(check_rpc(
+            "RPC findings_similar_to", base_norm, anon_key, "findings_similar_to",
+            {"p_finding_id": similar_id, "p_limit": 5}, timeout),
+            "캐시 밖 원 계산 경로 — 콜드 첫 호출 지연, 방문자 경로는 캐시 신선도 점검이 본다"))
 
     # 4) [085] 스냅샷 신선도 — 폴백이 가리는 cron 사망을 밖으로 낸다
     checks.append(check_rpc_snapshot_fresh(
@@ -492,6 +536,7 @@ def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date
         "site_base_url": base_url,
         "most_recent_monday_kst": date_str,
         "finding_id": finding_id,
+        "similar_probe_finding_id": similar_id,
         "overall": _overall_status(checks),
         "checks": [c.to_dict() for c in checks],
     }
@@ -529,11 +574,12 @@ def main(argv: list[str] | None = None) -> int:
     base_url = os.environ.get("SITE_BASE_URL") or DEFAULT_SITE_BASE_URL
     supabase_url = os.environ.get("SUPABASE_URL", "")
     anon_key = os.environ.get("SUPABASE_ANON_KEY", "")
+    service_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     today = resolve_today()
 
     report = run_probe(
         base_url=base_url, supabase_url=supabase_url, anon_key=anon_key,
-        today=today, timeout=args.timeout)
+        today=today, service_key=service_key, timeout=args.timeout)
 
     print(render_markdown(report))
 

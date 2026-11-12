@@ -271,7 +271,7 @@
   }
 
   // ── 분류 구성(상위 분류 코럴 농도 바) ────────────────────────────────────────
-  function buildCatRow(entry, maxCnt, personName, total) {
+  function buildCatRow(entry, maxCnt, personName, total, rest) {
     var row = document.createElement(filterable ? "button" : "a");
     row.className = "ip-cat-row";
     if (filterable) {
@@ -284,11 +284,13 @@
     row.appendChild(el("span", "ip-cat-label", catLabel(entry.category_code)));
     var track = document.createElement("div");
     track.className = "ip-cat-track";
-    var bar = document.createElement("div");
-    bar.className = "ip-cat-bar";
-    var ratio = maxCnt > 0 ? entry.cnt / maxCnt : 0;
-    bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
-    track.appendChild(bar);
+    if (!rest) {
+      var bar = document.createElement("div");
+      bar.className = "ip-cat-bar";
+      var ratio = maxCnt > 0 ? entry.cnt / maxCnt : 0;
+      bar.style.transform = "scaleX(" + Math.min(1, Math.max(0.02, ratio)) + ")";
+      track.appendChild(bar);
+    }
     row.appendChild(track);
     row.appendChild(el("span", "ip-cat-count", _t("{n}건", { n: fmtNum(entry.cnt) })));
     if (total > 0) {
@@ -431,10 +433,18 @@
     }
     // RPC 가 이미 cnt desc 로 정렬해 반환한다(findings_firm_profile by_category 와 동일
     // 계약) — 재정렬 없음.
-    var maxCnt = LAST_CATS[0].cnt || 1;
+    // [미분류 막대 2026-11-12] 캐치올('기타 품질시스템')은 막대 순위에서도 뺀다 — 분류된 것만
+    // 길이를 견주고, 캐치올은 맨 아래 막대 없는 한 줄로 둔다(건수·비중은 그대로). 가장 긴
+    // 막대가 '분류 안 됨'이면 화면이 약점을 머리기사로 만든다(UI/UX 점검 11-11).
+    var ranked = LAST_CATS.filter(function (c) { return c.category_code !== CATCH_ALL; });
+    var rest = LAST_CATS.filter(function (c) { return c.category_code === CATCH_ALL; });
+    var maxCnt = (ranked[0] && ranked[0].cnt) || 1;
     var total = LAST_CATS.reduce(function (s, c) { return s + (Number(c.cnt) || 0); }, 0);
-    LAST_CATS.forEach(function (c) {
-      catEl.appendChild(buildCatRow(c, maxCnt, personName, total));
+    ranked.forEach(function (c) {
+      catEl.appendChild(buildCatRow(c, maxCnt, personName, total, false));
+    });
+    rest.forEach(function (c) {
+      catEl.appendChild(buildCatRow(c, maxCnt, personName, total, true));
     });
     renderCatNote(LAST_CATS, total);
   }

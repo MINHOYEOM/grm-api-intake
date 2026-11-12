@@ -1,0 +1,68 @@
+name: GRM raw_signals 지문 기준선 재매김 (R2)
+
+# [원문 갱신 규칙 R2 · 2026-11-12] 지문(raw_sha256)이 내용과 어긋난 정본 행(483·MFDS)의 기준선을
+# raw_signals_rebaseline.py 로 다시 잡는다. 기본은 dry-run(apply=false) — 대상 수·보관표 추정 크기·MFDS 참석자
+# 표 비교만 보고한다. apply=true 는 migration 148 적용 뒤, 사람 승인 뒤에만 쓴다.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: '실제로 쓴다(기본 false = dry-run). migration 148 적용 뒤에만'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: raw-signals-rebaseline
+  cancel-in-progress: false
+
+jobs:
+  rebaseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Rebaseline (dry-run unless apply=true)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_APPLY: ${{ inputs.apply }}
+        run: |
+          set -uo pipefail
+          args=()
+          if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
+          python raw_signals_rebaseline.py "${args[@]}" > raw_signals_rebaseline_report.json
+          rc=$?
+          {
+            echo "### raw_signals 지문 기준선 재매김"
+            echo "- apply: \`${IN_APPLY:-false}\` · exit: \`${rc}\`"
+            echo '```json'
+            head -c 6000 raw_signals_rebaseline_report.json
+            echo
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: raw-signals-rebaseline-report
+          path: raw_signals_rebaseline_report.json
+          retention-days: 30
+          if-no-files-found: warn

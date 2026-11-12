@@ -53,6 +53,9 @@ ROW_KEYS = (
     "body", "distribution", "comments_close", "api_query", "qa_relevance", "osd_relevance",
     "source_type", "signal_tier", "source_url", "raw_excerpt", "search_query",
     "evidence_candidate", "language", "region_jurisdiction", "site_country",
+    # [2026-11-12] 수집기 레코드(findings_store.raw_signal_from_intake_item)도 modality 를 싣는다 —
+    # 키 집합을 맞춘다. Notion 행의 제품군 값을 그대로 옮긴다.
+    "modality",
 )
 _NOTION_MAX_PAGES = 200          # 100행 × 200 = 20,000행 — 소스 하나엔 충분한 안전 상한
 _RAW_FETCH_SLEEP_S = 0.34        # Notion 3 req/s

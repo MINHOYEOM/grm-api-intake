@@ -550,7 +550,9 @@ grm-api-intake/
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
 ├─ backfill_483_detail_refresh.py  # 저장된 483 관찰 상세(detail)만 다시 읽어 제자리 교체(쪽 넘김·서명란·가림 표시 수리 소급 — 표제·원문 전문·실사관 불변, dry-run 기본)
+├─ raw_versioning.py, raw_signals_rebaseline.py # [원문 갱신 규칙 R1·R2] 정본 원문을 바꾸는 유일한 길(DB 함수 `raw_signal_apply_version`·보관표 `raw_signal_versions`, 148) · 지문이 내용과 어긋난 483·MFDS 행 기준선 재매김(+MFDS 참석자 재동기화, dry-run 기본, `grm-raw-signals-rebaseline.yml`). 직접 PATCH 는 `tests/test_raw_signals_write_guard.py` 가 막는다
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
+├─ backfill_483_body_full.py      # 전문(fda483_body_full) 없이 굳은 최근 483 소급 — Notion 원문 → 없으면 PDF 재독(일일 규칙) → raw_signal_apply_version(repair, 전문 키 하나만 추가)·dry 기본
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
 ├─ backfill_eu_ncr_additional_plan.py # EU NCR ncr_additional(후속 설명) 소급 계획(같은 계획 스키마·기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
@@ -571,6 +573,7 @@ grm-api-intake/
 ├─ source_reconcile.py             # 원천 대조 감시 — 원천 건수 = 수집 + 의도적 제외 + 미뤄짐 등식을 매일 센다(grm-source-reconcile)
 ├─ content_completeness.py         # 내용 완전성 감시 — 원자료 전 칸을 펴서 잘림(같은 길이대에서 문장 중간에 끝나는 값의 몰림)·모아 놓고 사이트·브리프에 안 닿는 칸을 찾는다(grm-source-reconcile 의 content 잡, 읽기 전용)
 ├─ backfill_raw_signals_from_notion.py # Notion에만 있고 Supabase raw_signals 사본에 없는 행 채우기(1회성·멱등)
+├─ backfill_raw_signals_modality.py  # raw_signals.modality 빈칸을 수집기와 같은 compute_modality 로 소급(빈칸만·근거 없으면 그대로·dry 기본)
 ├─ hc_inspection_migration_check.py # HC 의약품 GMP 실사 DB의 새 도메인 이전 감지
 ├─ findings_review_queue.py        # needs_review 큐 나이 측정 + 사람 판정 적용(grm-findings-review-queue)
 ├─ collect_fda_import_alert.py     # FDA 수입경보 66-40·66-41 Red List 스냅샷 수집기(독립 경로, 수집 꺼짐·재설계 중, 132)
@@ -749,9 +752,11 @@ grm-api-intake/
    ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
    ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·Notion New 행 raw 동기화·잡별 예약 실패 경보)
+   ├─ grm-fda483-body-full-backfill.yml # 483 전문 소급(workflow_dispatch·apply 기본 false·probe_pdf·since·limit) → 아티팩트 fda483-body-full-report(30일)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
    ├─ grm-eu-ncr-additional-plan.yml # EU NCR additional 소급 계획 생성(workflow_dispatch·GET 만) → 아티팩트 eu-ncr-additional-plan(90일)
    ├─ grm-raw-signals-notion-backfill.yml # Notion 에만 있는 행(예: WHO WHOPIR)을 raw_signals 로 채움(workflow_dispatch·apply 기본 false=dry-run) → 아티팩트 raw-signals-notion-backfill-report(30일)
+   ├─ grm-raw-signals-modality-backfill.yml # raw_signals.modality 소급(workflow_dispatch·apply 기본 false=dry-run) → 아티팩트 modality-backfill-report(30일)
    ├─ grm-fda-coverage-gate.yml          # 발행 전 FDA 본문 결손 점검(월요일 정기 수집 완료 workflow_run → 결손 483 회수 → handoff·스캐폴드 재생성 → 남으면 automation-warning 이슈)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지 · decide 게이트가 주간 결손도 복구(2026-08-11)
    ├─ grm-library-linkcheck.yml          # [트랙 C] 자료실 링크 상태 점검(status 4값: ok·broken·needs_review·blocked)

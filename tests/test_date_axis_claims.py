@@ -68,7 +68,7 @@ class DateAxisClaimTest(unittest.TestCase):
             src = self._read(rel)
             if rel.endswith("findings_firm_page.html"):
                 # 이 면은 행마다 날짜 종류를 적으므로 머리글이 그 사실을 가리킨다.
-                self.assertIn("행마다 그 날짜가 무엇인지", src, rel)
+                self.assertIn("행마다 날짜의 종류", src, rel)
                 continue
             self.assertIn("캐나다", src, f"{rel} 이 예외를 밝히지 않는다")
 

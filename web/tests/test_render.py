@@ -11277,7 +11277,7 @@ class WebFirmPageTest(unittest.TestCase):
         #   머리글의 단정과 자기 화면이 어긋나 있었다.
         #   지키려던 뜻은 "날짜의 정체를 말한다"이지 "그 문장이 있다"가 아니었으므로,
         #   행 라벨이 실제로 붙어 있는지로 잰다 — 화면이 스스로 말하는 편이 더 정확하다.
-        self.assertIn("행마다 그 날짜가 무엇인지", html)
+        self.assertIn("행마다 날짜의 종류", html)
         for label in ("공개", "실사"):
             self.assertIn(label, html, f"타임라인 행이 날짜 종류('{label}')를 적지 않는다")
         self.assertIn("이것은 그 시점의 기록입니다", html)  # 후속 시정 고지

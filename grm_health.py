@@ -322,12 +322,38 @@ def _evaluate_health(
             "이번 실행 handoff 는 기존 v1 멱등성으로 진행됨.",
         )
 
+    store = getattr(stats, "store_summary", None) or {}
     if stats.has_insert_failures():
+        kept = int(store.get("notion_failed_supabase_kept") or 0)
+        detail = "해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다."
+        if kept:
+            detail += (f" 그중 {kept}건은 Supabase 정본에는 저장됐고, 다음 수집 때 Notion 행을 "
+                       "다시 시도합니다.")
         health.add_failure(
             "notion-insert-failed",
             "Notion",
             f"Notion insert 최종 실패 {stats.total_insert_failures()}건",
-            "해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다.",
+            detail,
+        )
+    # [대기열 0단계 2026-11-12] 저장 순서를 Supabase 먼저로 바꾸며 생긴 두 신호.
+    if store.get("dedup_mode") == "supabase-fallback":
+        health.add_warning(
+            "notion-dedupe-fallback-supabase",
+            "Notion",
+            "Notion 중복 조회 실패 — Supabase 키로 대신 판정해 적재를 계속함",
+            (f"사유 {store.get('dedup_error') or '?'}. 판정할 수 없는 항목 "
+             f"{int(store.get('fallback_deferred') or 0)}건(게시일 없음·URL 2차 dedup 소스·Supabase 가 "
+             "'새로 저장됨'이라고 답하지 않은 항목)은 "
+             "다음 실행으로 미뤘습니다. Notion 이 계속 실패하면 같은 KST 날짜 안에 재실행하세요."),
+        )
+    supa_failed = int(store.get("supabase_failed") or 0)
+    if supa_failed:
+        health.add_warning(
+            "supabase-append-failed",
+            "Supabase",
+            f"Supabase 정본 저장 실패 {supa_failed}건",
+            ("Notion 대기열에는 들어갔으므로 이번 주 브리프에는 영향이 없습니다. 다음 수집의 "
+             "사본 보충(heal)이 원천에 다시 나온 항목을 채웁니다 — 반복되면 raw_signals 를 확인하세요."),
         )
     if handoff_failed:
         health.add_failure(

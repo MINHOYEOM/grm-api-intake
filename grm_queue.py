@@ -85,6 +85,103 @@ def is_publish_day(handoff_date: str) -> bool:
         return False
 
 
+# ─────────────── 중복 판정·넣기 기준을 DB 로 (5단계 본체, 기본 꺼짐) ───────────────
+DEDUP_SOURCE_ENV = "GRM_INTAKE_DEDUP_SOURCE"     # notion(기본) | supabase
+DEDUP_HEAL_DAYS = 35      # 정본에 있고 대기열에 없는 문서를 '보충'으로 볼 기간(가장 긴 수집 창 30일 + 여유)
+
+DEDUP_NEW = "new"         # 정본에 없다 → 저장하고 대기열에 넣는다
+DEDUP_HAVE = "have"       # 정본·대기열 둘 다 있다 → 이미 받음
+DEDUP_HEAL = "heal"       # 정본에 있고 대기열에 없고 저장이 최근 → 대기열에만 넣는다(보충)
+DEDUP_OLD = "old"         # 정본에 있고 대기열에 없고 저장이 오래전 → 이미 받음(대기열 기록 이전)
+
+
+def dedup_source() -> str:
+    """중복 판정·대기열 넣기 기준을 어디에 두나 — 저장소 변수 GRM_INTAKE_DEDUP_SOURCE(없으면 notion)."""
+    return "supabase" if os.environ.get(DEDUP_SOURCE_ENV, "").strip().lower() == "supabase" else "notion"
+
+
+def dedup_shadow_enabled() -> bool:
+    """판정은 노션 기준 그대로 두고, DB 기준이었다면 어땠을지를 health 에 남긴다(기본 꺼짐)."""
+    return env_flag("ENABLE_INTAKE_DEDUP_SHADOW")
+
+
+def classify_dedup(keys: Iterable[str], raw_ingested: dict[str, str], queue_keys: set[str],
+                   now: datetime, heal_days: int = DEDUP_HEAL_DAYS) -> dict[str, str]:
+    """수집한 문서 키마다 new·have·heal·old 를 정한다(순수 함수).
+
+    `raw_ingested` = {키: 정본 저장 시각} — 키가 없으면 정본에 없는 문서다.
+    heal 과 old 를 가르는 것은 **정본 저장 시각**이다. ICH·WHO 처럼 매일 목록 전체를 다시 주는 소스의
+    옛 문서는 정본에 오래전에 들어와 있고 대기열 기록(11-10 이후)에는 없다 — 이것을 heal 로 보면
+    한꺼번에 재유입된다. 저장 시각을 읽을 수 없으면 old 로 본다(모르면 넣지 않는다).
+    """
+    cutoff = (to_kst(now) or datetime.now(KST)) - timedelta(days=heal_days)
+    out: dict[str, str] = {}
+    for key in keys:
+        if key not in raw_ingested:
+            out[key] = DEDUP_NEW
+        elif key in queue_keys:
+            out[key] = DEDUP_HAVE
+        else:
+            stored = to_kst(raw_ingested.get(key))
+            out[key] = DEDUP_HEAL if stored is not None and stored >= cutoff else DEDUP_OLD
+    return out
+
+
+def lookup_dedup(store: Any, pairs: Iterable[tuple[str, str]], now: datetime
+                 ) -> "dict[str, str] | None":
+    """수집한 문서들의 DB 기준 판정. 정본·대기열 조회가 하나라도 실패하면 None(모르는 채로 판정하지 않는다)."""
+    pairs = sorted({(s, d) for s, d in pairs if s and d})
+    if not pairs:
+        return {}
+    try:
+        raw_ingested = store.raw_ingested_at(pairs)
+        if raw_ingested is None:
+            return None
+        queue_keys = set(store.queue_rows(pairs))
+    except QueueStoreError:
+        return None
+    return classify_dedup([row_key(s, d) for s, d in pairs], raw_ingested, queue_keys, now)
+
+
+def dedup_shadow_summary(classes: dict[str, str], notion_existing: set[str],
+                         sample: int = 5) -> dict[str, Any]:
+    """노션 기준 판정과 DB 기준 판정을 나란히 놓은 요약(health JSON 용, 순수 함수).
+
+    `heal_by_source` 는 소스별 보충 건수와 표본 문서 번호다 — 옛 문서가 재유입되는지 사람이 본다.
+    `only_notion_new` = 노션 기준에서만 새 문서(DB 는 이미 받았다고 본다) · `only_db_new` = DB 기준에서만
+    새 문서·보충(노션은 이미 있다고 본다).
+    """
+    counts = {c: 0 for c in (DEDUP_NEW, DEDUP_HAVE, DEDUP_HEAL, DEDUP_OLD)}
+    heal: dict[str, dict[str, Any]] = {}
+    only_notion: list[str] = []
+    only_db: list[str] = []
+    notion_new = 0
+    for key in sorted(classes):
+        cls = classes[key]
+        counts[cls] += 1
+        n_new = key not in notion_existing
+        d_new = cls in (DEDUP_NEW, DEDUP_HEAL)
+        notion_new += 1 if n_new else 0
+        if n_new and not d_new:
+            only_notion.append(key)
+        elif d_new and not n_new:
+            only_db.append(key)
+        if cls == DEDUP_HEAL:
+            source, _, doc = key.partition("::")
+            slot = heal.setdefault(source, {"count": 0, "sample": []})
+            slot["count"] += 1
+            if len(slot["sample"]) < sample:
+                slot["sample"].append(doc)
+    return {
+        "collected": len(classes), "db": counts,
+        "notion_new": notion_new, "db_new_or_heal": counts[DEDUP_NEW] + counts[DEDUP_HEAL],
+        "only_notion_new": len(only_notion), "only_notion_new_sample": only_notion[:10],
+        "only_db_new": len(only_db), "only_db_new_sample": only_db[:10],
+        "heal_by_source": dict(sorted(heal.items())),
+        "same": not only_notion and not only_db,
+    }
+
+
 def shadow_enabled() -> bool:
     """그림자 스위치(기본 꺼짐). 켜도 발행 경로는 바뀌지 않는다."""
     return env_flag("ENABLE_INTAKE_QUEUE_SHADOW")
@@ -635,6 +732,41 @@ class QueueStore:
                 if key:
                     found.add(key)
         return found
+
+    def raw_ingested_at(self, pairs: list[tuple[str, str]]) -> "dict[str, str] | None":
+        """정본(raw_signals)에 있는 문서의 저장 시각 {키: ingested_at}. 조회가 실패하면 None."""
+        ids = {raw_signal_id_for(s, d): row_key(s, d) for s, d in pairs}
+        found: dict[str, str] = {}
+        ordered = sorted(ids)
+        for i in range(0, len(ordered), 150):
+            chunk = ordered[i:i + 150]
+            try:
+                rows = self._call("GET", "raw_signals", params={
+                    "select": "raw_signal_id,ingested_at",
+                    "raw_signal_id": "in.(" + ",".join(chunk) + ")"})
+            except QueueStoreError:
+                return None
+            for r in rows if isinstance(rows, list) else []:
+                key = ids.get(str(r.get("raw_signal_id") or ""))
+                if key:
+                    found[key] = str(r.get("ingested_at") or "")
+        return found
+
+    def source_url_keys(self, sources: Iterable[str]) -> "set[str] | None":
+        """기사형 소스의 정규화 URL 2차 중복 키(`source::정규화URL`)를 정본에서 만든다. 실패하면 None."""
+        from grm_notion import canonical_url_key
+        out: set[str] = set()
+        for source in sources:
+            try:
+                rows = self._get_all("raw_signals", {"select": "official_url", "source": f"eq.{source}",
+                                                     "order": "raw_signal_id.asc"})
+            except QueueStoreError:
+                return None
+            for r in rows:
+                key = canonical_url_key(source, str(r.get("official_url") or ""))
+                if key:
+                    out.add(key)
+        return out
 
     def get_handoff_manifest(self, handoff_date: str) -> "dict[str, Any] | None":
         rows = self._call("GET", "intake_handoffs", params={

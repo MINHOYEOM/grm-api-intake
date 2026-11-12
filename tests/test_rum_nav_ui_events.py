@@ -1,4 +1,4 @@
-"""[154 · 2026-11-13] 이동·클릭 익명 카운터.
+"""[155 · 2026-11-13] 이동·클릭 익명 카운터.
 
   · migration: 표 둘·bump 둘(anon 실행)·_clean 보기 둘(139 봇 날 제외)·판독 함수는 _clean 만 읽음.
   · 개인정보 0: 표 열에 경로·쿼리·값 자리가 없고, 형식 위반은 'other' 로 접는다.
@@ -12,13 +12,13 @@ import re
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SQL = (ROOT / "web" / "migrations" / "154_rum_nav_ui_events.sql").read_text(encoding="utf-8")
+SQL = (ROOT / "web" / "migrations" / "155_rum_nav_ui_events.sql").read_text(encoding="utf-8")
 CODE = "\n".join(l for l in SQL.splitlines() if not l.strip().startswith("--"))
 BASE = (ROOT / "web" / "templates" / "base.html").read_text(encoding="utf-8")
 
 
 def _block() -> str:
-    i = BASE.index("{% if reactions_enabled %}\n{#- [154 · 2026-11-13]")
+    i = BASE.index("{% if reactions_enabled %}\n{#- [155 · 2026-11-13]")
     return BASE[i:BASE.index("{% endif %}\n", i)]
 
 
@@ -29,7 +29,7 @@ def _script() -> str:
 
 class MigrationTest(unittest.TestCase):
     def test_no_crlf(self):
-        self.assertNotIn(b"\r\n", (ROOT / "web" / "migrations" / "154_rum_nav_ui_events.sql").read_bytes())
+        self.assertNotIn(b"\r\n", (ROOT / "web" / "migrations" / "155_rum_nav_ui_events.sql").read_bytes())
 
     def test_columns_have_no_path_or_value_slot(self):
         for table in ("rum_nav_daily", "rum_ui_daily"):

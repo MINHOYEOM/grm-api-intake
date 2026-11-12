@@ -583,7 +583,7 @@ class QueueStore:
     # handoff 기록 --------------------------------------------------------
     def handoffs_since(self, start: str) -> list[dict[str, Any]]:
         return self._get_all("intake_handoffs", {
-            "select": "handoff_date,generated_at,status,manifest,consumed_evidence",
+            "select": "handoff_date,generated_at,status,manifest,consumed_evidence,payload_sha256",
             "handoff_date": f"gte.{start}", "order": "handoff_date.asc"})
 
     def get_handoff(self, handoff_date: str) -> "dict[str, Any] | None":
@@ -725,6 +725,11 @@ def reconcile(store: QueueStore, repo_root: str, run_date: date, *, apply: bool 
         if delta is None:
             continue
         manifest = h.get("manifest") if isinstance(h.get("manifest"), list) else []
+        # 편집팀이 읽은 handoff 와 DB 가 기록한 handoff 가 같은지(델타의 handoff_ref — git handoff 길만 싣는다).
+        # 다르면 행 목록이 어긋났을 수 있다: 편집팀이 못 본 행이 '미채택'으로 닫힌다. 경고로 드러낸다.
+        ref = delta.get("handoff_ref") if isinstance(delta.get("handoff_ref"), dict) else {}
+        if ref.get("sha256") and h.get("payload_sha256") and ref["sha256"] != h["payload_sha256"]:
+            summary.setdefault("ref_mismatch", []).append(handoff_date)
         states = compute_states(manifest, delta, brief, handoff_date)
         summary["handoffs"] += 1
         summary["rows"] += len(states)
@@ -856,6 +861,13 @@ def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
     return {"staled": staled, "frozen": ""}
 
 
+def handoff_ref(payload: dict[str, Any]) -> dict[str, Any]:
+    """handoff payload → 데스크가 `desk.json` 에 적을 참조(날짜·지문·행 수). 지문은 DB 기록과 같은 산식."""
+    return {"date": str(payload.get("run_date_kst") or ""),
+            "sha256": payload_sha256(payload),
+            "rows": len(payload.get("rows") or [])}
+
+
 def handoff_file_name(run_date: date, frozen: str = "") -> str:
     """DB handoff 파일 이름. 그 날짜가 이미 닫힌 뒤의 재실행분은 `.rerun` 을 붙인다.
 
@@ -910,6 +922,9 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
     try:
         reconciled = reconcile(store, repo_root, run_date)
         report["reconcile"] = {k: v for k, v in reconciled.items() if k != "by_date"}
+        for d in reconciled.get("ref_mismatch") or []:
+            report["warnings"].append(
+                f"{d} 호: 편집팀이 읽은 handoff 지문이 DB 기록과 다르다 — 행 상태를 사람이 확인할 것")
     except QueueStoreError as e:
         report["warnings"].append(f"상태 다시 계산 실패: {e}")
 
@@ -1091,11 +1106,20 @@ def main(argv: "list[str] | None" = None) -> int:
     seed.add_argument("--since", required=True,
                       help="이 시각 뒤에 수집된 행만(직전 발행 호 handoff 생성 시각, ISO)")
     seed.add_argument("--apply", action="store_true", help="실제로 쓴다(기본은 계획만 출력)")
+    ref = sub.add_parser("handoff-ref", help="handoff 파일의 날짜·지문·행 수(desk.json 의 handoff_ref)")
+    ref.add_argument("path")
     rec = sub.add_parser("reconcile", help="main 발행 파일로 행 상태를 다시 계산한다")
     rec.add_argument("--run-date", default="")
     rec.add_argument("--repo-root", default=".")
     rec.add_argument("--apply", action="store_true")
     args = ap.parse_args(argv)
+    if args.cmd == "handoff-ref":          # DB 접근 없음 — 편집팀(클라우드)이 자격증명 없이 돌린다
+        payload = _read_json(args.path)
+        if payload is None or not isinstance(payload.get("rows"), list) or not payload.get("run_date_kst"):
+            print(f"handoff 파일을 읽을 수 없다: {args.path}", file=sys.stderr)
+            return 1
+        print(json.dumps(handoff_ref(payload), ensure_ascii=False))
+        return 0
     try:
         store = _cli_store()
         if args.cmd == "seed":

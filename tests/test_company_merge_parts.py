@@ -44,6 +44,31 @@ class MergePartsTest(unittest.TestCase):
         self.assertEqual(sorted(delta["cards"]), ["c1", "c2", "c3"])
         self.assertEqual(list(deep), ["fda483-1"])
 
+    def test_notion_handoff_issue_is_byte_identical_to_before(self):
+        d = self._folder(**{"desk.json": {"status": "완료", "shards": PLAN, "rows": [
+            {"source": "FR", "document_id": "x", "action": "defer"}]}})
+        delta, _, problems = mp.merge(d)
+        self.assertEqual(problems, [])
+        self.assertEqual(sorted(delta), ["cards", "tldr", "tldr_en"])      # 새 키 없음
+
+    def test_git_handoff_issue_carries_ref_and_deferred(self):
+        ref = {"date": "2026-11-23", "sha256": "a" * 64, "rows": 3, "extra": "버린다"}
+        d = self._folder(**{"desk.json": {"status": "완료", "shards": PLAN, "handoff_ref": ref, "rows": [
+            {"source": "FR", "document_id": "b", "action": "defer"},
+            {"source": "FR", "document_id": "a", "action": "defer"},
+            {"source": "FR", "document_id": "c", "action": "render"},
+            {"source": "", "document_id": "nokey", "action": "defer"}]}})
+        delta, _, problems = mp.merge(d)
+        self.assertEqual(problems, [])
+        self.assertEqual(delta["handoff_ref"], {"date": "2026-11-23", "sha256": "a" * 64, "rows": 3})
+        self.assertEqual(delta["deferred"], ["FR::a", "FR::b"])
+
+    def test_git_handoff_issue_without_defer_says_so(self):
+        d = self._folder(**{"desk.json": {"status": "완료", "shards": PLAN,
+                                          "handoff_ref": {"date": "2026-11-23", "sha256": "b" * 64}}})
+        delta, _, _ = mp.merge(d)
+        self.assertEqual(delta["deferred"], [])
+
     def test_missing_card_blocks(self):
         d = self._folder(**{"delta.A.json": {"status": "완료", "cards": {"c1": EN}}})
         self.assertTrue(mp.merge(d)[2])

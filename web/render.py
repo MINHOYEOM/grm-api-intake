@@ -1391,6 +1391,94 @@ def _build_sections(card_views: list[dict[str, Any]],
     return sections
 
 
+# ── [브리프 4단 2026-11-12] 주간 현황 ────────────────────────────────────────────
+# 대표 확정안 0절 5번: 이번 주 핵심 → "주간 현황"(카드 태그로 센 건수 + 몰린 것 한 줄) → 목록.
+# 건수는 카드에 이미 붙은 묶음(group)·카드 종류(card_type)로 센다(글을 새로 쓰지 않는다).
+# 몰린 것 한 줄의 국가·분류는 **DB 값**(findings.country_key·category_code)으로만 센다 —
+# 업체 이름으로 국가를 추정하지 않는다. 렌더러는 네트워크를 타지 않으므로 그 값은 커밋 정본
+# `web/data/brief_glance.json`(brief_glance_refresh.py, 공개 읽기·일일 갱신)에서 온다. 정본에
+# 없는 카드는 세지 않고, 규칙을 넘는 몰림이 없으면 줄을 내지 않는다(건수 칸은 그대로).
+BRIEF_GLANCE_FILE = WEB_DIR / "data" / "brief_glance.json"
+GLANCE_DOC_TYPES = ("FDA 483 실사 관찰", "Warning Letter")
+GLANCE_CATCHALL = "other_quality_system"
+GLANCE_MIN = 3
+
+
+def load_brief_glance(path: Path = BRIEF_GLANCE_FILE) -> dict[str, dict[str, Any]]:
+    """원문 URL → {"c": 국가 코드, "k": [분류 코드]}. 파일이 없으면 빈 표(줄이 안 나온다)."""
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return dict(data.get("items") or {})
+
+
+def _glance_line(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any]],
+                 db: dict[str, dict[str, Any]], tr: Translator) -> str:
+    """몰린 것 한 줄. ① 한 종류 안에서 같은 국가가 3건 이상·절반 이상이면 국가 줄(비율이 가장
+    높은 종류). ② 아니면 정본에 잡힌 문서 중 같은 분류(캐치올 제외)가 3건 이상·1/3 이상이면
+    분류 줄. ③ 둘 다 아니면 빈 문자열."""
+    import grm_findings as _gf
+    by_type: dict[str, list[str]] = {}
+    for raw, cv in zip(cards_raw, card_views):
+        if raw.get("card_type") not in GLANCE_DOC_TYPES:
+            continue
+        u = ((raw.get("sources") or {}).get("official_url") or "").strip()
+        if u.startswith("http"):
+            by_type.setdefault(cv.get("card_type") or "", []).append(u)
+    country_ko: dict[str, str] = {}
+    for name, code in _gf._COUNTRY_CODE_MAP.items():
+        if code not in country_ko and _HANGUL_RE.search(name):
+            country_ko[code] = name
+    best: "tuple[float, str] | None" = None
+    for t, urls in by_type.items():
+        n = len(urls)
+        cnt: dict[str, int] = {}
+        for u in urls:
+            c = (db.get(u) or {}).get("c") or ""
+            if c in country_ko:
+                cnt[c] = cnt.get(c, 0) + 1
+        for c, k in sorted(cnt.items()):
+            if k >= GLANCE_MIN and k * 2 >= n and (best is None or k / n > best[0]):
+                best = (k / n, tr("{type} {n}건 중 {k}건이 {country} 소재 제조소",
+                                  type=t, n=n, k=k, country=tr(country_ko[c])))
+    if best:
+        return best[1]
+    labels = {c.code: c.label_ko for c in _gf.FINDING_TAXONOMY if c.code != GLANCE_CATCHALL}
+    matched = sorted({u for urls in by_type.values() for u in urls if u in db})
+    kc: dict[str, int] = {}
+    for u in matched:
+        for k in db[u].get("k") or []:
+            if k in labels:
+                kc[k] = kc.get(k, 0) + 1
+    if kc:
+        k, v = sorted(kc.items(), key=lambda kv: (-kv[1], kv[0]))[0]
+        if v >= GLANCE_MIN and v * 3 >= len(matched):
+            return tr("문서 {n}건 중 {k}건에 {cat} 지적", n=len(matched), k=v, cat=tr(labels[k]))
+    return ""
+
+
+def build_brief_glance(sections: list[dict[str, Any]], card_views: list[dict[str, Any]],
+                       cards_raw: list[dict[str, Any]], db: dict[str, dict[str, Any]],
+                       tr: Translator = _KO) -> "dict[str, Any] | None":
+    """주간 현황 뷰모델 — 묶음별 건수·종류 내역 + DB 값으로 센 한 줄.
+
+    `cards_raw` 는 `card_views` 와 같은 순서의 원본 카드다(종류 판정은 번역 전 값으로 한다)."""
+    if not sections:
+        return None
+    groups = []
+    for s in sections:
+        counts: dict[str, int] = {}
+        for cv in s["cards"]:
+            t = cv.get("card_type") or ""
+            if t:
+                counts[t] = counts.get(t, 0) + 1
+        order = {t: i for i, t in enumerate(counts)}
+        parts = sorted(counts.items(), key=lambda kv: (-kv[1], order[kv[0]]))
+        groups.append({"name": s["name"], "n": s["count"],
+                       "parts": [{"t": t, "n": n} for t, n in parts]})
+    return {"groups": groups, "line": _glance_line(card_views, cards_raw, db, tr)}
+
+
 def _order_by_weight(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """[카드 무게 2026-11-10 · 재정비안 §2-2] 각 묶음 안에서 깊이 → 표준 → 표 한 줄.
 
@@ -7716,6 +7804,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # 브리프 상세(주차별).
     brief_tmpl = env.get_template("brief.html")
+    # [브리프 4단] 주간 현황 국가·분류(DB 정본) — 브리프 데이터 폴더의 **옆**에서 읽는다
+    # (운영 web/data/briefs → web/data/brief_glance.json). 픽스처 빌드에는 그 파일이 없어
+    # 골든이 매일 갱신되는 정본에 흔들리지 않는다. 줄 계산은 단위 테스트가 본다.
+    glance_db = load_brief_glance(Path(data_dir).parent / BRIEF_GLANCE_FILE.name)
     for b in briefs:
         pub = b["brief"].get("publish_date", "")
         issue_no = issue_no_by_date[pub]
@@ -7752,6 +7844,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=_brief_description(b["brief"], tr),
             brief=ctx,
             sections=sections,
+            glance=build_brief_glance(sections, card_views, cards_sorted, glance_db, tr),
             card_weighted=any(cv.get("weight") for cv in card_views),
             lib_update_week=lib_update_week,
             json_ld=build_brief_article_json_ld(
@@ -7791,7 +7884,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 nav_active="detail",
                 description=_brief_description(b["brief"], en_tr, "en"),
                 brief=en_ctx,
-                sections=_build_sections(en_card_views, en_tr),
+                sections=(_en_sections := _build_sections(en_card_views, en_tr)),
+                glance=build_brief_glance(_en_sections, en_card_views, cards_sorted, glance_db,
+                                          en_tr),
                 card_weighted=any(cv.get("weight") for cv in en_card_views),
                 ko_only_names=count_ko_only_names(en_card_views),
                 # [다국어 2026-09-05] 한국어판과 **같은 창(window)** 을 영어 카탈로그로

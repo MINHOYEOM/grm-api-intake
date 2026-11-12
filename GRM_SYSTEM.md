@@ -600,7 +600,7 @@ grm-api-intake/
 ├─ findings_store.py, findings_views.py
 ├─ findings_supabase.py, findings_supabase_append.py   # Postgres DDL/로드 · 직행 append
 ├─ findings_translate.py, findings_translate_apply_service.py  # 번역 export/apply · CI 반영
-├─ findings_detail_apply.py, findings_detail_qa.py  # 483 관찰 상세 국문 배치 반영·결정론 번역 검증(수치·코드·가림 표시·한자·길이)
+├─ findings_detail_export.py, findings_detail_apply.py, findings_detail_qa.py  # 483 관찰 상세 번역 대기열 내보내기(읽기 전용, finding↔raw 관찰 짝)·국문 배치 반영·결정론 번역 검증(수치·코드·가림 표시·한자·길이)
 ├─ findings_search_export.py, findings_search_page.py  # 검색 export · 오프라인 뷰어
 ├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구(M12, 내부 소급 적재)
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터

@@ -206,8 +206,11 @@ _FDA483_OUT_OF_SCOPE_EST_RE = re.compile(
     r"\bblood\b|\btransfusion|\bdonor\b|\bdonation\b|plasmapheresis"
     r"|\bsource\s+plasma\b|\bplasma\s+(?:center|collection|firm|establishment)"
     r"|\btissue\b|\breproductive\b|hct/?p|\bfertility\b|\bcryobank|\bsperm\b|\beye\s+bank"
-    r"|clinical\s+investigator|\bsponsor\b|institutional\s+review\s+board|\birb\b"
-    r"|contract\s+research\s+organi[sz]ation"
+    # [2026-11-12 대표 결정] 의약품 임상 스폰서(GCP)·생물분석 CRO 는 범위 안 — 지적사항 범위
+    # (migration 146)와 같게 `sponsor`·`contract research organization` 을 이 목록에서 뺐다.
+    # 의약품 단서가 없는 스폰서·CRO 는 아래 본문 축(기기·식품 신호)에서 그대로 걸러진다.
+    # 임상시험자(Clinical Investigator)·IRB 는 146 과 같이 계속 범위 밖이다.
+    r"|clinical\s+investigator|institutional\s+review\s+board|\birb\b"
     r"|\bbakery\b|\bfood\b|dietary\s+supplement|\bbeverage|\bseafood\b|\bdairy\b"
     r"|infant\s+formula"
     # [2026-11-07] 계란 안전 규정(21 CFR 118) 483 — "Shell Egg Producer"·"Farm"·가금류가

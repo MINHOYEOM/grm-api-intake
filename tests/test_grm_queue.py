@@ -419,13 +419,50 @@ class FreezeTest(unittest.TestCase):
                          "carded_not_published")
         self.assertEqual(self.store.queue["Federal Register::2026-1"]["state_reason"], "published")
 
-    def test_same_day_rerun_before_publish_still_refreshes(self):
+    def test_publish_day_first_record_is_frozen_before_publish_too(self):
+        self.assertEqual(RUN.weekday(), gh.PUBLISH_WEEKDAY)          # 11-16 은 월요일
+        self._shadow()
+        first = dict(self.store.handoffs["2026-11-16"])
+        self.store.add_raw(_record("Federal Register", "2026-3"))
+        os.environ.pop("GRM_QUEUE_HANDOFF_REFRESH", None)
+        report = self._shadow(new_items=[_Item("Federal Register", "2026-3")])
+        self.assertEqual(report["handoff_frozen"], gq.FROZEN_PUBLISH_DAY)
+        after = self.store.handoffs["2026-11-16"]
+        self.assertEqual((after["manifest"], after["payload_sha256"], after["status"]),
+                         (first["manifest"], first["payload_sha256"], gq.HANDOFF_OPEN))
+        self.assertEqual(self.store.queue["Federal Register::2026-3"]["state"], "new")
+        self.assertTrue(os.path.exists(os.path.join(self.root, "handoff_db_2026-11-16.rerun.json")))
+        self.assertIn("GRM_QUEUE_HANDOFF_REFRESH", gq.render_report_md(report))
+
+    def test_refresh_switch_rebuilds_an_open_publish_day_record_only(self):
         self._shadow()
         self.store.add_raw(_record("Federal Register", "2026-3"))
-        report = self._shadow(new_items=[_Item("Federal Register", "2026-3")])
+        with patch.dict(os.environ, {"GRM_QUEUE_HANDOFF_REFRESH": "true"}):
+            report = self._shadow(new_items=[_Item("Federal Register", "2026-3")])
+            self.assertEqual(report["handoff_frozen"], "")
+            self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 3)
+            # 닫힌 기록은 스위치로도 못 바꾼다.
+            self._write("deltas", "delta_2026_11_16.json",
+                        {"publish_date": "2026-11-16", "cards": {"2026-1": {}}})
+            self._shadow()
+            report = self._shadow()
+            self.assertEqual(report["handoff_frozen"], gq.HANDOFF_CONSUMED)
+
+    def test_other_weekdays_refresh_on_same_day_rerun(self):
+        tue = date(2026, 11, 17)
+        gen = datetime(2026, 11, 17, 3, 40, tzinfo=gq.KST)
+
+        def shadow(**kw):
+            with patch.object(gq, "log"), patch.object(gh, "log"), \
+                    patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
+                return gq.run_shadow(("u", "k"), run_date=tue, generated_at=gen, window_days=30,
+                                     display_window_days=7, store=self.store, out_dir=self.root,
+                                     repo_root=self.root, **kw)
+        shadow()
+        self.store.add_raw(_record("Federal Register", "2026-3"))
+        report = shadow(new_items=[_Item("Federal Register", "2026-3")])
         self.assertEqual(report["handoff_frozen"], "")
-        self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 3)
-        self.assertEqual(self.store.handoffs["2026-11-16"]["status"], gq.HANDOFF_OPEN)
+        self.assertEqual(len(self.store.handoffs["2026-11-17"]["manifest"]), 3)
 
 
 class HealTest(unittest.TestCase):

@@ -68,6 +68,23 @@ _ID_CHUNK = 20                    # raw_json 이 커서 한 번에 조금씩 읽
 _KEY_CHUNK = 100
 
 
+FROZEN_PUBLISH_DAY = "publish-day-first-record"
+
+
+def handoff_refresh_requested() -> bool:
+    """발행 요일 handoff 를 일부러 다시 만들라는 스위치(기본 꺼짐). 쓰고 나면 반드시 끈다."""
+    return env_flag("GRM_QUEUE_HANDOFF_REFRESH")
+
+
+def is_publish_day(handoff_date: str) -> bool:
+    """그 날짜가 발행 요일(월)인가. 요일 정본은 `grm_handoff.PUBLISH_WEEKDAY`."""
+    import grm_handoff as gh
+    try:
+        return date.fromisoformat(str(handoff_date)[:10]).weekday() == gh.PUBLISH_WEEKDAY
+    except ValueError:
+        return False
+
+
 def shadow_enabled() -> bool:
     """그림자 스위치(기본 꺼짐). 켜도 발행 경로는 바뀌지 않는다."""
     return env_flag("ENABLE_INTAKE_QUEUE_SHADOW")
@@ -398,7 +415,10 @@ def render_report_md(report: dict[str, Any]) -> str:
     if heal:
         lines += [f"- 대기열 보충(노션 handoff 에 있는데 대기열에 없던 행): 없던 행 {heal.get('missing', 0)} · "
                   f"다시 넣음 {heal.get('inserted', 0)} · 실패 {heal.get('failed', 0)}"]
-    if report.get("handoff_frozen"):
+    if report.get("handoff_frozen") == FROZEN_PUBLISH_DAY:
+        lines += ["- 오늘(발행 요일) handoff 는 첫 기록이 동결돼 있어 다시 쓰지 않았다. 새 행은 내일 handoff 에 들어간다. "
+                  "일부러 다시 만들려면 저장소 변수 GRM_QUEUE_HANDOFF_REFRESH=true 로 수집을 다시 돌린 뒤 변수를 끈다"]
+    elif report.get("handoff_frozen"):
         lines += [f"- 오늘 handoff 기록은 이미 {report['handoff_frozen']} 상태라 다시 쓰지 않았다(동결)"]
     rec = report.get("reconcile") or {}
     if rec:
@@ -845,6 +865,13 @@ def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
     existing = store.get_handoff(handoff_date)
     if existing is not None and existing.get("status") != HANDOFF_OPEN:
         return {"staled": 0, "frozen": str(existing.get("status") or "")}
+    if existing is not None and is_publish_day(handoff_date) and not handoff_refresh_requested():
+        # 발행 요일(월)의 handoff 는 **첫 기록이 동결**된다. 편집팀은 아침에 이 기록의 사본을 읽고 일한다.
+        # 그 뒤 같은 날 수집을 다시 돌려 행 목록을 바꾸면, 편집팀이 못 본 행이 그 호의 '미채택'으로 닫힌다.
+        # 재실행의 새 행은 대기열에 new 로 남아 화요일 handoff 에 들어간다.
+        # 일부러 다시 만들 때(새벽 수집이 일부 소스 실패로 끝남 — 편집팀이 읽기 전)는
+        # GRM_QUEUE_HANDOFF_REFRESH=true 로 수집을 다시 돌린다. 닫힌(consumed) 기록은 그래도 못 바꾼다.
+        return {"staled": 0, "frozen": FROZEN_PUBLISH_DAY}
     staled = store.stale_prior_open(handoff_date)
     store.upsert_handoff({
         "handoff_date": handoff_date,

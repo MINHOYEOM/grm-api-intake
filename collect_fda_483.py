@@ -2449,6 +2449,49 @@ def _at_line_start(body: str, pos: int) -> bool:
     return not body[max(0, body.rfind("\n", 0, pos) + 1):pos].strip()
 
 
+# ── [조각 표제 2026-11-12] ────────────────────────────────────────────────────
+# `OBSERVATION 3.` 다음이 줄바꿈+`(REPEAT OBSERVATION) …` · `... Records…` · `. Your…` ·
+# 줄 중간 `OBSERVATION 3. A. Annual…` 꼴이면 `_first_sentence` 가 선두 마침표(또는 `A.`)만
+# 첫 문장으로 잡아 표제가 "." 가 된다. 그러면 앵커 선택 ②가 이 앵커를 상호참조로 보고 기각해
+# **그 관찰 전문이 앞 관찰 상세 끝에 합쳐지고 행이 사라졌다**(실측 151431 관찰 3 · 91684 관찰 2).
+# 걷어 낼 머리는 `findings_extractors._FDA483_DETAIL_LEAD_RES`(PR #1614, 이미 저장된 "." 표제를
+# 상세 첫 문장으로 되살리는 규칙)와 **같다** — 같은 관찰이 소급(추출기)과 재수집(여기) 어느 쪽으로
+# 되살아나도 표제가 같아야 finding_id(raw_signal_id + 번호 + 표제 해시)가 갈리지 않는다.
+# 걷는 것은 표지(마침표 잔재·`(REPEAT OBSERVATION)`·열거자)뿐이고 원문 source_text 는 그대로다.
+_FRAGMENT_LEAD_RES = (
+    re.compile(r"^[\s.…,;:]+"),
+    re.compile(r"^\(\s*repeat\s+observation\s*\)\s*", re.I),
+    re.compile(r"^(?:[A-Za-z]|\d{1,2}[A-Za-z]?|[ivxIVX]{1,4})[.)]\s+"),
+    re.compile(r"^\((?:[A-Za-z]|\d{1,2}|[ivxIVX]{1,4})\)\s+"),
+)
+# 소문자 낱자 열거자(`b.`·`c)`)는 상호참조 뒤 하위 항목("refer to OBSERVATION 2: .\nb. …")의
+# 전형이다 — 앵커 **선택**에서는 이 머리를 걷어야만 문장이 나오는 앵커를 살리지 않는다.
+_FRAGMENT_LOWER_ENUM_RE = re.compile(r"^\(?(?-i:[a-z])[.)]\s+")
+# 앵커 바로 앞이 **같은 줄의 산문 낱말·쉼표**로 끝나면 문장 중간 참조다("…as noted in
+# Observation 2. The quality unit…" — test_fda_483 116184 회귀 고정). 줄 머리·문장 경계 뒤·
+# 표 잔재(`() ()`, 실측 70711) 뒤만 조각 표제 후보로 본다.
+_MID_SENTENCE_BEFORE_RE = re.compile(r"[A-Za-z,;][ \t]*\Z")   # `$` 는 끝 줄바꿈 앞에도 맞는다
+
+
+def _split_past_fragment_head(text: str) -> tuple[str, str, bool]:
+    """조각 표제를 건너뛴 (표제, 상세, 소문자 열거자를 걷었는가). 순수 함수."""
+    t = re.sub(r"\s+", " ", text or "").strip()
+    lower_enum = False
+    while True:
+        before = t
+        for lead_re in _FRAGMENT_LEAD_RES:
+            lower_enum = lower_enum or bool(_FRAGMENT_LOWER_ENUM_RE.match(t))
+            t = lead_re.sub("", t, count=1)
+        if t == before:
+            break
+    head, rest = _first_sentence(t)
+    return head, rest, lower_enum
+
+
+def _alpha_count(text: str) -> int:
+    return len(re.sub(r"[^A-Za-z]", "", text or ""))
+
+
 def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list[re.Match[str]]:
     """`OBSERVATION N` 매치 중 **진짜 항목 표제**만 남긴다(순수 함수).
 
@@ -2483,9 +2526,24 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
       ② 앵커 뒤 첫 문장에 실질 알파벳 내용이 없다(마침표·기호뿐)
       ③ 앵커 뒤 첫 문장이 소문자로 시작한다(문장 중간에 낀 참조)
     셋 다 결함의 직접 증거라, 번호가 건너뛰거나 중복돼도 **정상 관찰은 그대로 살아남는다**.
+
+    [②의 예외 2026-11-12 — 조각 표제] ②는 표제가 "." 인 **진짜 관찰**도 기각했다
+    (`OBSERVATION 3.⏎(REPEAT OBSERVATION) …` · `OBSERVATION 3. A. …` · `OBSERVATION 10⏎... …`).
+    기각된 앵커의 본문은 앞 관찰 상세 끝에 합쳐져 행이 소리 없이 사라졌다. 그래서 ②로만
+    기각된 앵커는 조각(`_split_past_fragment_head`)을 건너뛴 문장을 다시 보고, 다음을 **모두**
+    만족할 때만 살린다:
+      · 조각 뒤 문장이 실질 문장이고 대문자로 시작한다(소문자 낱자 열거자 `b.` 를 걷어야만
+        나오는 문장은 상호참조 뒤 하위 항목의 전형이라 제외)
+      · 앵커 앞이 같은 줄의 산문 낱말·쉼표로 끝나지 않는다(문장 중간 참조 제외)
+      · 같은 번호의 정상 표제가 문서에 **없다**(고아 번호) — 상호참조는 참조 대상 관찰이
+        같은 문서에 정상 표제로 있으므로 여기서 걸러진다(2026-11-12 전수 판정 기준과 동일)
+    ①·③ 기각과 ②를 통과한 앵커는 손대지 않으므로, 정상 표제만 있는 문서의 출력은 불변이다.
     """
-    selected: list[re.Match[str]] = []
+    normal: list[bool] = []
+    fragment_ok: list[bool] = []
     for i, m in enumerate(matches):
+        normal.append(False)
+        fragment_ok.append(False)
         before = body[max(0, m.start() - _XREF_LOOKBEHIND):m.start()]
         if _XREF_PREFIX_RE.search(before) and not _XREF_FORMPRINT_RE.search(before):
             continue                                   # ① 문장 속 상호참조
@@ -2494,14 +2552,22 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
         if _LINE_HEAD_DOT_RE.match(after) and _at_line_start(body, m.start()):
             after = after.lstrip(" .")             # 줄 머리 `Observation 1. There is…` 꼴
         head, _ = _first_sentence(after.lstrip(" :\t\r\n"))
-        if len(re.sub(r"[^A-Za-z]", "", head)) < _HEADING_MIN_ALPHA:
-            continue                                   # ② 뒤따르는 실질 문장 없음
+        if _alpha_count(head) < _HEADING_MIN_ALPHA:
+            # ② 뒤따르는 실질 문장 없음 — 단, 조각 표제 뒤에 실질 문장이 있으면 후보로 둔다.
+            frag_head, _, lower_enum = _split_past_fragment_head(after)
+            first = next((c for c in frag_head if c.isalpha()), "")
+            fragment_ok[i] = (not lower_enum and first.isupper()
+                              and _alpha_count(frag_head) >= _HEADING_MIN_ALPHA
+                              and not _MID_SENTENCE_BEFORE_RE.search(before))
+            continue
         first_alpha = next((c for c in head if c.isalpha()), "")
         if (first_alpha and first_alpha.islower()
                 and not _SENTENCE_BOUNDARY_RE.search(before)):
             continue                                   # ③ 문장 중간에 낀 참조
-        selected.append(m)
-    return selected
+        normal[i] = True
+    headed = {m.group(1) for m, ok in zip(matches, normal) if ok}
+    return [m for m, ok, frag in zip(matches, normal, fragment_ok)
+            if ok or (frag and m.group(1) not in headed)]
 
 
 def _extract_483_observations_from_text(
@@ -2540,6 +2606,7 @@ def _extract_483_observations_from_text(
             s, _select_observation_anchors(s, list(_OBS_RE.finditer(s)))),
         hints,
         gate=_is_publishable_deficiency,
+        fragment_heads=True,
     )
     if primary:
         return primary
@@ -2606,9 +2673,15 @@ def _observations_from_anchors(
     finder: Callable[[str], list[re.Match[str]]],
     hints: dict[str, str],
     gate: Callable[[str], bool],
+    fragment_heads: bool = False,
 ) -> list[dict[str, str]]:
     """앵커 목록 → Observation rows. 앵커 찾기(finder)와 표제 통과 기준(gate)만 갈아끼운다
-    — 정상 경로와 회수 경로가 **같은 조립 코드**를 쓰게 해 둘이 갈라지지 않도록 한다."""
+    — 정상 경로와 회수 경로가 **같은 조립 코드**를 쓰게 해 둘이 갈라지지 않도록 한다.
+
+    `fragment_heads`(`_select_observation_anchors` 를 쓰는 경로만 켠다): 표제가 조각(".")이라
+    gate 에서 버려질 행만, 조각 머리를 건너뛴 문장(`_split_past_fragment_head`)으로 다시 본다.
+    gate 를 통과하던 행은 이 분기에 닿지 않으므로 종전 출력이 그대로다. 회수 경로(②~⑤)는
+    앵커에 상호참조 거름(①~③·고아 번호)이 없어 켜지 않는다."""
     matches = finder(body)
     if not matches:
         return []
@@ -2627,6 +2700,10 @@ def _observations_from_anchors(
         # 남는다(실측: 신규 727건 중 23건이 정상 경로로 들어오면서 "| There is a failure…"
         # 형태로 저장됐다). 순수 접두 제거라 정상 표제에는 영향이 없다(내용 절단 상한 있음).
         deficiency = strip_leading_observation_noise(deficiency)
+        if not gate(deficiency) and fragment_heads:
+            frag_head, frag_rest, lower_enum = _split_past_fragment_head(chunk)
+            if not lower_enum and gate(frag_head):
+                deficiency, detail = frag_head, frag_rest
         if not gate(deficiency):
             continue
         clean_detail = _clean_observation_detail(detail)
@@ -2666,7 +2743,7 @@ def _recover_483_observations(
             found = _observations_from_anchors(
                 _cut_at_annotations(body),
                 lambda s: _select_observation_anchors(s, list(_OBS_RE.finditer(s))),
-                hints, gate=gate,
+                hints, gate=gate, fragment_heads=True,
             )
             if found:
                 return found

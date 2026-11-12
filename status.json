@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-12T17:04:22Z",
+ "generated_at": "2026-11-12T22:43:17Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43300317431,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-12T20:26:24Z",
+    "updatedAt": "2026-11-12T20:32:43Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1625 from MINHOYEOM/claude/glossary-fig-daily-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43300317431"
+   },
+   {
+    "databaseId": 43266874214,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-12T17:12:03Z",
+    "updatedAt": "2026-11-12T17:18:07Z",
+    "headBranch": "main",
+    "displayTitle": "feat(방문 기록): 이동·클릭·펼침 익명 카운터 — migration 155 (적용은 대표 승인 뒤) (#1640)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43266874214"
+   },
+   {
+    "databaseId": 43266816880,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-12T17:11:44Z",
+    "updatedAt": "2026-11-12T17:12:19Z",
+    "headBranch": "main",
+    "displayTitle": "fix(접근성): 산호색 글자·버튼을 --coral-2 로 — 용어·문서·업체·조항 대비 4.5:1 이상 (#1645)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43266816880"
+   },
+   {
     "databaseId": 43264550651,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-12T16:59:06Z",
-    "updatedAt": "2026-11-12T16:59:10Z",
+    "updatedAt": "2026-11-12T17:05:41Z",
     "headBranch": "ui-a11y-coral-text",
     "displayTitle": "fix(접근성): 산호색 글자·버튼 대비 4.5:1 (용어·문서·업체·조항)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43264550651"
    },
    {
     "databaseId": 43264536390,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-12T16:59:01Z",
-    "updatedAt": "2026-11-12T16:59:04Z",
+    "updatedAt": "2026-11-12T17:05:41Z",
     "headBranch": "ui-a11y-coral-text",
     "displayTitle": "fix(접근성): 산호색 글자·버튼을 --coral-2 로 — 용어·문서·업체·조항 대비 4.5:1 이상",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43264536390"
-   },
-   {
-    "databaseId": 43263257679,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-12T16:51:46Z",
-    "updatedAt": "2026-11-12T16:57:12Z",
-    "headBranch": "ui-search/rum-ui-events",
-    "displayTitle": "feat(방문 기록): 이동·클릭·펼침 익명 카운터 — migration 155 (적용은 대표 승인 뒤)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43263257679"
-   },
-   {
-    "databaseId": 43263251251,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-12T16:51:44Z",
-    "updatedAt": "2026-11-12T16:57:37Z",
-    "headBranch": "ui-search/rum-ui-events",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into ui-search/rum-ui-events",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43263251251"
-   },
-   {
-    "databaseId": 43263137982,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-12T16:51:06Z",
-    "updatedAt": "2026-11-12T16:57:17Z",
-    "headBranch": "main",
-    "displayTitle": "feat(운영): DB 크기 일일 기록 + 무료 한도 근접 주간 감시 (migration 154) (#1631)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43263137982"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 43296055757,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-12T20:01:11Z",
+    "updatedAt": "2026-11-12T21:59:18Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43296055757"
+   },
+   {
     "databaseId": 43174401906,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42888998525"
-   },
-   {
-    "databaseId": 42775271596,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-10T07:26:11Z",
-    "updatedAt": "2026-11-10T10:43:14Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42775271596"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 43300265475,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-12T20:26:05Z",
+    "updatedAt": "2026-11-12T20:26:27Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43300265475"
+   },
+   {
     "databaseId": 43177296622,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42890813498"
-   },
-   {
-    "databaseId": 42777374486,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-10T07:44:16Z",
-    "updatedAt": "2026-11-10T07:44:27Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42777374486"
    }
   ],
   "grm-cloud-request.yml": [

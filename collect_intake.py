@@ -3424,13 +3424,9 @@ def _append_supabase_copy(findings_supabase: tuple[str, str], item: IntakeItem,
     """Supabase raw_signals(+findings) 에 1건 쓴다. 반환: saved | duplicate | failed | undated.
 
     [대기열 0단계 2026-11-12] Notion 보다 **먼저** 부른다 — DB(정본)가 Notion 성패에 묶이지 않게.
-    게시일 없는 항목은 raw_signals.published_date NOT NULL 로 매번 거부되므로 시도하지 않는다
-    (heal_supabase_copies 와 같은 규칙. 날짜를 지어 넣지 않는다 — 스키마 수리는 별도 migration).
+    게시일 없는 항목(ICH 토픽 스냅샷 등)도 쓴다 — published_date 는 null 로 저장된다(migration 147,
+    2026-11-12). 날짜를 지어 넣지 않는다. ("undated" 반환값은 하위호환으로만 남아 있다.)
     """
-    if not str(getattr(item, "date_iso", "") or "").strip():
-        log("INFO", f"FIND-1 raw_signals Supabase append 생략(게시일 없음) "
-                    f"source={item.source} doc={item.document_id}")
-        return "undated"
     supabase_url, supabase_service_key = findings_supabase
     mode = "raw_signals+findings" if include_findings else "raw_signals"
     try:
@@ -3664,11 +3660,7 @@ def heal_supabase_copies(supabase_url: str, service_key: str, items: list[Intake
         if item.source == SOURCE_WHO and _bare(item.raw_payload):
             summary["skipped_bare"] += 1
             continue
-        # 게시일이 없는 항목(ICH 토픽 스냅샷 — 날짜를 단언하지 않는다)은 raw_signals.published_date
-        # required 로 매번 거부된다 → 시도하지 않는다(매일 WARN 31건 소음). 날짜를 지어 넣지도 않는다.
-        if not str(getattr(item, "date_iso", "") or "").strip():
-            summary["skipped_undated"] = summary.get("skipped_undated", 0) + 1
-            continue
+        # 게시일이 없는 항목(ICH 토픽 스냅샷)도 채운다 — published_date null 허용(migration 147).
         record = raw_signal_from_intake_item(item, collected_at=collected_at)
         rid = str(record.get("raw_signal_id") or "")
         if rid:
@@ -3720,11 +3712,11 @@ def supabase_fallback_dedup_keys(supabase_url: str, service_key: str,
     이번에 수집한 항목의 키를 직접 물어 "이미 받음"을 판정한다(창 제한 없음 — 고유 키).
     반환: (물어본 dedup 키 전체, 그중 이미 있는 키). Supabase 조회도 실패하면 None
     → 호출부는 종전처럼 중단한다(모르는 채로 전부 넣지 않는다).
-    게시일 없는 항목은 Supabase 에 들어갈 수 없으니 묻지 않는다(→ insert_items 가 미룬다).
+    게시일 없는 항목도 묻는다(published_date null 허용 — migration 147).
     """
     by_id: dict[str, str] = {}
     for item in items:
-        if not item.document_id or not str(getattr(item, "date_iso", "") or "").strip():
+        if not item.document_id:
             continue
         try:
             record = raw_signal_from_intake_item(item, collected_at=collected_at)
@@ -4951,6 +4943,17 @@ def main() -> int:
                 max_heal=_env_int("RAW_SIGNALS_HEAL_MAX", RAW_SIGNALS_HEAL_MAX_DEFAULT))
         except Exception as e:  # noqa: BLE001 — 사본 보충은 부가 장치
             log("WARN", f"Supabase 사본 보충 중 예외(무시): {type(e).__name__}")
+        # [원문 갱신 규칙 R0 2026-11-12] 건너뛴 항목의 오늘 판을 정본과 비교해 **보고만** 한다
+        # (health JSON store.drift). 쓰기 없음. 끄려면 RAW_DRIFT_MEASURE=false.
+        if env_flag("RAW_DRIFT_MEASURE", True):
+            try:
+                import raw_drift
+                store_counters["drift"] = raw_drift.measure_drift(
+                    findings_supabase[0], findings_supabase[1], heal_candidates,
+                    collected_at=collected_at,
+                    max_items=_env_int("RAW_DRIFT_MAX", raw_drift._MAX_ITEMS_DEFAULT))
+            except Exception as e:  # noqa: BLE001 — 측정은 부가 장치
+                log("WARN", f"원문 비교(R0) 중 예외(무시): {type(e).__name__}")
 
     # 제외 장부 저장(실패해도 수집 결과·종료 코드에 영향 없음 - 카운터로만 남는다).
     try:

@@ -471,8 +471,12 @@ class MainIntegrationTest(unittest.TestCase):
         self._env_patch = mock.patch.dict(
             os.environ, {"NOTION_TOKEN": "tok", "GITHUB_OUTPUT": self._out_path})
         self._env_patch.start()
+        # git 반납 비교(노션 모드에서도 돈다)가 실제 git 을 부르지 않게 — 반납 없음으로 고정.
+        self._git_patch = mock.patch.object(db, "git_read_run_file", return_value=None)
+        self._git_patch.start()
 
     def tearDown(self) -> None:
+        self._git_patch.stop()
         self._env_patch.stop()
         os.chdir(self._cwd)
         self._tmp.cleanup()
@@ -910,6 +914,284 @@ class HandoffIdFormulaTest(unittest.TestCase):
     def test_accepts_date_and_str(self) -> None:
         from datetime import date
         self.assertEqual(gh.handoff_id_for(date(2026, 7, 13)), gh.handoff_id_for("2026-07-13"))
+
+
+# ── [2026-11-12] 결과 반납 git 길 (재검토안 3절 1단계) ─────────────────────────────────
+#
+# 11-16 월요일은 노션이 정본이고 git 반납은 비교만 한다. 이 묶음이 지키는 것:
+#   · 기본(노션) 모드에서 git 쪽은 **어떤 경우에도** 파일을 쓰지 않고, git 쪽 실패가 발행을 막지 않는다.
+#   · git 모드에서는 채택 조건(교열 완료·코드 검사 0·reject 0)을 채운 반납만 쓰고, 아니면 노션으로 넘어간다.
+#   · 같은 날 다른 내용이면 먼저 기록된 쪽이 이기고, 빨간 run 대신 차이표가 남는다.
+
+_COPYEDIT_OK = {"status": "완료", "published": True,
+                "code_gate": {"ran": True, "exit": 0, "message": ""},
+                "cards": [{"web_card_id": "mfds-1", "verdict": "pass", "fails": []}],
+                "counts": {"cards": 1, "pass": 1, "reject": 0, "fails_total": 0}}
+# 11-09 실제 copyedit.json 의 모양(보류 · exit 2).
+_COPYEDIT_HELD = {"status": "보류", "published": False,
+                  "code_gate": {"ran": True, "exit": 2, "message": "조립 거부"},
+                  "cards": [], "counts": {"cards": 63, "pass": 0, "reject": 0, "fails_total": 0}}
+
+
+def _git_delta(summary: str = "요약") -> dict:
+    d = _valid_delta()
+    d["cards"]["mfds-1"]["summary"] = summary
+    return d
+
+
+def _git_reader(files: dict, date_str: str = "2026-07-13"):
+    """`git_read_run_file(date, name)` 대역 — 그 날짜 브랜치에 있는 파일만 돌려준다."""
+    def read(d, name):
+        if d != date_str or name not in files:
+            return None
+        v = files[name]
+        return v if isinstance(v, str) else json.dumps(v, ensure_ascii=False, separators=(",", ":"))
+    return read
+
+
+class LoadGitRunTest(unittest.TestCase):
+    def test_adoptable_when_copyedit_passed(self) -> None:
+        run = db.load_git_run("2026-07-13", read=_git_reader(
+            {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_OK}))
+        self.assertTrue(run["found"])
+        self.assertTrue(run["adoptable"], run["reason"])
+        self.assertEqual(run["branch"], "claude/company-2026-07-13")
+
+    def test_held_copyedit_not_adoptable_but_delta_kept_for_compare(self) -> None:
+        run = db.load_git_run("2026-07-13", read=_git_reader(
+            {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_HELD}))
+        self.assertFalse(run["adoptable"])
+        self.assertIn("보류", run["reason"])
+        self.assertIn("exit=2", run["reason"])
+        self.assertIsNotNone(run["delta"])  # 비교에는 쓴다
+
+    def test_missing_copyedit_not_adoptable(self) -> None:
+        run = db.load_git_run("2026-07-13", read=_git_reader({"delta.json": _git_delta()}))
+        self.assertFalse(run["adoptable"])
+        self.assertIn("copyedit.json 없음", run["reason"])
+
+    def test_reject_not_adoptable(self) -> None:
+        ce = json.loads(json.dumps(_COPYEDIT_OK))
+        ce["cards"][0]["verdict"] = "reject"
+        run = db.load_git_run("2026-07-13", read=_git_reader(
+            {"delta.json": _git_delta(), "copyedit.json": ce}))
+        self.assertFalse(run["adoptable"])
+        self.assertIn("reject", run["reason"])
+
+    def test_missing_delta_not_adoptable(self) -> None:
+        run = db.load_git_run("2026-07-13", read=_git_reader({"copyedit.json": _COPYEDIT_OK}))
+        self.assertFalse(run["adoptable"])
+        self.assertIn("delta.json 없음", run["reason"])
+
+    def test_broken_deep_not_adoptable(self) -> None:
+        run = db.load_git_run("2026-07-13", read=_git_reader(
+            {"delta.json": _git_delta(), "deep_delta.json": "{broken",
+             "copyedit.json": _COPYEDIT_OK}))
+        self.assertFalse(run["adoptable"])
+
+    def test_no_branch(self) -> None:
+        run = db.load_git_run("2026-07-13", read=_git_reader({}))
+        self.assertFalse(run["found"])
+        self.assertFalse(run["adoptable"])
+
+
+class CompareDeltasTest(unittest.TestCase):
+    def test_identical(self) -> None:
+        r = db.compare_deltas(_valid_delta(), None, _valid_delta(), None)
+        self.assertTrue(r["identical"])
+        self.assertEqual(r["cards"]["changed"], [])
+
+    def test_whitespace_loss_is_flagged(self) -> None:
+        """노션 왕복의 알려진 결함 — 코드 블록 경계에서 공백이 깎인다(`in the`→`inthe`)."""
+        r = db.compare_deltas(_git_delta("found inthe room"), None,
+                              _git_delta("found in the room"), None)
+        self.assertFalse(r["identical"])
+        self.assertEqual(r["cards"]["changed"],
+                         [{"id": "mfds-1", "slots": ["summary"], "whitespace_only": True}])
+
+    def test_card_sets_differ(self) -> None:
+        g = _valid_delta()
+        g["cards"]["mfds-2"] = g["cards"].pop("mfds-1")
+        r = db.compare_deltas(_valid_delta(), None, g, None)
+        self.assertEqual(r["cards"]["only_notion"], ["mfds-1"])
+        self.assertEqual(r["cards"]["only_git"], ["mfds-2"])
+        md = db.render_compare_md(r, {"date": "2026-07-13", "source": "notion"})
+        self.assertIn("mfds-2", md)
+
+    def test_resolve_source(self) -> None:
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop(db.ENV_DELTA_SOURCE, None)
+            self.assertEqual(db.resolve_source(None), "notion")
+            os.environ[db.ENV_DELTA_SOURCE] = "GIT"
+            self.assertEqual(db.resolve_source(None), "git")
+            os.environ[db.ENV_DELTA_SOURCE] = "weird"
+            self.assertEqual(db.resolve_source(None), "notion")
+            self.assertEqual(db.resolve_source("notion"), "notion")
+
+
+class GitReturnMainTest(MainIntegrationTest):
+    """main() — 두 길 모드. 부모의 setUp(임시 cwd·환경·git 대역)과 부모 시험을 그대로 다시 돈다."""
+
+    _DELTA = "web/data/deltas/delta_2026_07_13.json"
+
+    def setUp(self) -> None:
+        super().setUp()
+        os.environ.pop(db.ENV_DELTA_SOURCE, None)
+        self._summary = os.path.join(self._tmp.name, "summary.md")
+        os.environ["GITHUB_STEP_SUMMARY"] = self._summary
+
+    def _git(self, files):
+        self._git_patch.stop()
+        self._git_patch = mock.patch.object(db, "git_read_run_file", side_effect=_git_reader(files))
+        self._git_patch.start()
+
+    def _written(self) -> dict:
+        return json.loads(pathlib.Path(self._DELTA).read_text(encoding="utf-8"))
+
+    # ── 11-16 (노션 정본) ───────────────────────────────────────────────────
+    def test_default_mode_writes_notion_and_only_compares_git(self) -> None:
+        self._git({"delta.json": _git_delta("in the room"), "copyedit.json": _COPYEDIT_OK})
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13")],
+                                blocks={"p1": [_code_block(_git_delta("inthe room"))]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid"])
+        self.assertEqual(rc, 0)
+        out = self._read_outputs()
+        self.assertEqual((out.get("wrote"), out.get("source")), ("true", "notion"))
+        self.assertEqual(self._written()["cards"]["mfds-1"]["summary"], "inthe room")  # 노션이 이김
+        rep = json.loads(pathlib.Path("_delta_compare/compare_2026_07_13.json")
+                         .read_text(encoding="utf-8"))
+        self.assertFalse(rep["report"]["identical"])
+        self.assertTrue(rep["report"]["cards"]["changed"][0]["whitespace_only"])
+        self.assertIn("두 길 비교", pathlib.Path(self._summary).read_text(encoding="utf-8"))
+
+    def test_default_mode_git_crash_does_not_block_publish(self) -> None:
+        self._git_patch.stop()
+        self._git_patch = mock.patch.object(db, "git_read_run_file",
+                                            side_effect=RuntimeError("git 고장"))
+        self._git_patch.start()
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13")],
+                                blocks={"p1": [_code_block(_valid_delta())]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._read_outputs().get("wrote"), "true")
+
+    def test_default_mode_never_writes_from_git_alone(self) -> None:
+        """노션 예치가 없으면 git 반납이 채택 가능해도 노션 모드는 쓰지 않는다(백업 대기)."""
+        self._git({"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_OK})
+        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])):
+            rc = db.main(["--db", "dbid", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._read_outputs().get("wrote"), "false")
+        self.assertFalse(pathlib.Path(self._DELTA).exists())
+
+    # ── git 모드 (다음 주부터, 저장소 변수로 전환) ──────────────────────────
+    def test_git_mode_writes_git_and_does_not_consume(self) -> None:
+        self._git({"delta.json": _git_delta("in the room"), "copyedit.json": _COPYEDIT_OK})
+        fake = _TypeAwareNotion([])
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        out = self._read_outputs()
+        self.assertEqual((out.get("wrote"), out.get("source"), out.get("date")),
+                         ("true", "git", "2026-07-13"))
+        self.assertEqual(self._written()["cards"]["mfds-1"]["summary"], "in the room")
+        self.assertEqual(fake.patches, [])
+
+    def test_git_mode_via_env_flag(self) -> None:
+        os.environ[db.ENV_DELTA_SOURCE] = "git"
+        self._git({"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_OK})
+        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])):
+            rc = db.main(["--db", "dbid", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._read_outputs().get("source"), "git")
+
+    def test_git_mode_held_falls_back_to_notion(self) -> None:
+        self._git({"delta.json": _git_delta("git"), "copyedit.json": _COPYEDIT_HELD})
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13")],
+                                blocks={"p1": [_code_block(_git_delta("notion"))]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._read_outputs().get("source"), "notion")
+        self.assertEqual(self._written()["cards"]["mfds-1"]["summary"], "notion")
+
+    def test_git_mode_bad_publish_date_falls_back_to_notion(self) -> None:
+        g = _git_delta("git")
+        g["publish_date"] = "2026-07-06"
+        self._git({"delta.json": g, "copyedit.json": _COPYEDIT_OK})
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13")],
+                                blocks={"p1": [_code_block(_git_delta("notion"))]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._written()["cards"]["mfds-1"]["summary"], "notion")
+
+    def test_git_mode_first_writer_wins_without_red_run(self) -> None:
+        """노션 길이 먼저 기록한 뒤 git 이 다른 내용으로 오면 — 오류 대신 유지 + 차이표."""
+        os.makedirs("web/data/deltas")
+        pathlib.Path(self._DELTA).write_bytes(db._dumps(_git_delta("inthe room")).encode("utf-8"))
+        self._git({"delta.json": _git_delta("in the room"), "copyedit.json": _COPYEDIT_OK})
+        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])):
+            rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._read_outputs().get("wrote"), "false")
+        self.assertEqual(self._written()["cards"]["mfds-1"]["summary"], "inthe room")
+        self.assertTrue(pathlib.Path("_delta_compare/compare_2026_07_13.json").exists())
+
+    def test_git_mode_leaves_notion_page_open(self) -> None:
+        self._git({"delta.json": _git_delta("git"), "copyedit.json": _COPYEDIT_OK})
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13")],
+                                blocks={"p1": [_code_block(_git_delta("notion"))]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._written()["cards"]["mfds-1"]["summary"], "git")
+        self.assertEqual(fake.patches, [])  # 노션 페이지는 OPEN 유지
+        self.assertTrue(pathlib.Path("_delta_compare/compare_2026_07_13.json").exists())
+
+    def test_compare_only_writes_nothing(self) -> None:
+        os.makedirs("web/data/deltas")
+        pathlib.Path(self._DELTA).write_bytes(db._dumps(_valid_delta()).encode("utf-8"))
+        before = pathlib.Path(self._DELTA).read_bytes()
+        self._git({"delta.json": _valid_delta(), "copyedit.json": _COPYEDIT_OK})
+        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])):
+            rc = db.main(["--db", "dbid", "--compare-only", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._read_outputs().get("wrote"), "false")
+        self.assertEqual(pathlib.Path(self._DELTA).read_bytes(), before)
+        rep = json.loads(pathlib.Path("_delta_compare/compare_2026_07_13.json")
+                         .read_text(encoding="utf-8"))
+        self.assertTrue(rep["report"]["identical"])
+
+    def test_compare_only_requires_date(self) -> None:
+        with redirect_stderr(io.StringIO()):
+            rc = db.main(["--db", "dbid", "--compare-only"])
+        self.assertEqual(rc, 1)
+
+
+class DeltaBridgeWorkflowGuardTest(unittest.TestCase):
+    """월요일 발행 흐름 가드 — 워크플로 배선이 11-16 을 깨지 않는지 텍스트로 고정한다."""
+
+    WF = ROOT / ".github" / "workflows" / "grm-delta-bridge.yml"
+
+    def setUp(self) -> None:
+        self.text = self.WF.read_text(encoding="utf-8")
+
+    def test_default_source_is_notion(self) -> None:
+        self.assertIn("|| vars.GRM_DELTA_SOURCE || 'notion' }}", self.text)
+
+    def test_consume_skipped_for_git_writes(self) -> None:
+        self.assertIn("steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source != 'git'",
+                      self.text)
+
+    def test_compare_dir_is_never_committed(self) -> None:
+        adds = [ln for ln in self.text.splitlines() if ln.strip().startswith("git add")]
+        self.assertTrue(adds)
+        for line in adds:
+            self.assertNotIn(db.COMPARE_DIR, line)
+            self.assertIn("web/data/deltas/", line)
 
 
 if __name__ == "__main__":

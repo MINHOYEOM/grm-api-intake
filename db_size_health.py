@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """db_size_health — DB 크기가 무료 플랜 한도(500MB)에 언제 닿을지 주 1회 본다.
 
-왜: 2026-11-12 실측 366MB / 500MB(73%). 한도를 넘으면 DB 가 읽기 전용이 돼 수집이 멈춘다. 155 가 하루
+왜: 2026-11-12 실측 366MB / 500MB(73%). 한도를 넘으면 DB 가 읽기 전용이 돼 수집이 멈춘다. 154 가 하루
 한 번 크기를 기록하고(ops_db_size_daily), 이 점검이 RPC `grm_db_size_status()`(service_role 전용)를 읽어
   1) 사용률이 WARN_RATIO(80%) 이상인가
   2) 최근 하루 증가량으로 한도까지 RUNWAY_DAYS(60일) 미만인가
@@ -66,7 +66,7 @@ def evaluate(status: dict[str, Any], *, now: dt.datetime | None = None) -> list[
     problems: list[str] = []
     now = now or dt.datetime.now(dt.timezone.utc)
     if not status.get("db_bytes"):
-        return ["DB 크기 기록이 없습니다 — 155 미적용 또는 pg_cron grm-db-size-daily 정지"]
+        return ["DB 크기 기록이 없습니다 — 154 미적용 또는 pg_cron grm-db-size-daily 정지"]
     used = float(status.get("db_bytes") or 0)
     limit = float(status.get("limit_bytes") or 0) or 1.0
     ratio = used / limit

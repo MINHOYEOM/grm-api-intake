@@ -1,11 +1,11 @@
 {
   "mode": "stale",
   "stats": {
-    "findings": 10934,
+    "findings": 10984,
     "queued": 0,
     "no_detail": 6,
     "ambiguous": 0,
-    "unchanged": 10928,
+    "unchanged": 10978,
     "chars": 0
   },
   "shards": {

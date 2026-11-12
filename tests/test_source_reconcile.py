@@ -288,6 +288,101 @@ class ReportTest(unittest.TestCase):
         self.assertEqual(rep["totals"]["missed"], 0)
 
 
+class SupabaseShadowTest(unittest.TestCase):
+    """'수집됨'을 정본(Supabase) 기준으로 다시 판정해 차이만 기록한다 — 판정은 Notion 기준 그대로."""
+
+    ENV = {"NOTION_TOKEN": "t", "NOTION_DATABASE_ID": "d", "SUPABASE_URL": "https://x.supabase.co",
+           "SUPABASE_SERVICE_ROLE_KEY": "KEY"}
+
+    def _run(self, *, notion_ids, db_ids, flag="true", db_error=None):
+        from unittest.mock import patch
+        spec = sr.SPEC_BY_KEY["wl"]
+        env = dict(self.ENV, ENABLE_RECONCILE_SUPABASE_SHADOW=flag)
+
+        def db_keys(*_a, **_k):
+            if db_error:
+                raise db_error
+            return {f"{spec.source}::{i}" for i in db_ids}, set()
+        with patch.object(sr, "load_collected_keys",
+                          return_value=({f"{spec.source}::{i}" for i in notion_ids}, set())), \
+                patch.object(sr, "load_ledger", return_value={spec.source: {}}), \
+                patch.object(sr, "load_collected_keys_supabase", side_effect=db_keys) as db_call:
+            rep = sr.run(run_date=RUN, base_days=7, enf_days=30, specs=[spec],
+                         fetchers={"wl": lambda s, e: sr.FetchOutcome(docs=[doc("a"), doc("b")])},
+                         env=env)
+        return rep, db_call
+
+    def test_off_by_default_and_never_reads_the_database(self):
+        rep, db_call = self._run(notion_ids=["a", "b"], db_ids=["a", "b"], flag="")
+        self.assertNotIn("shadow_supabase", rep)
+        db_call.assert_not_called()
+
+    def test_same_verdict_is_reported_as_same(self):
+        rep, _ = self._run(notion_ids=["a", "b"], db_ids=["a", "b", "old"])
+        sh = rep["shadow_supabase"]
+        self.assertEqual((sh["ok"], sh["same"], sh["differences"]), (True, True, []))
+        self.assertEqual(sh["collected_keys"], 3)
+        self.assertIn("차이 없음", sr.render_markdown(rep))
+
+    def test_difference_is_recorded_and_the_verdict_stays_notion(self):
+        rep, _ = self._run(notion_ids=["a"], db_ids=["a", "b"])       # b: 노션 창 밖, 정본에는 있음
+        self.assertEqual(rep["sources"][0]["verdict"], sr.V_MISSED)    # 판정은 Notion 기준
+        self.assertEqual(rep["totals"]["missed"], 1)
+        self.assertEqual(len(rep["issues"]), 1)                        # 이슈 계획도 그대로
+        sh = rep["shadow_supabase"]
+        self.assertFalse(sh["same"])
+        d = sh["differences"][0]
+        self.assertEqual((d["verdict_notion"], d["verdict_supabase"]), (sr.V_MISSED, sr.V_OK))
+        self.assertEqual((d["missed_only_notion"], d["missed_only_supabase"]), (["b"], []))
+        self.assertEqual((sh["missed_total_notion"], sh["missed_total_supabase"]), (1, 0))
+        md = sr.render_markdown(rep)
+        self.assertIn("그림자 — 정본(Supabase) 기준", md)
+        self.assertIn("| 1 / 0 |", md)
+
+    def test_database_failure_does_not_touch_the_report(self):
+        base, _ = self._run(notion_ids=["a"], db_ids=[], flag="")
+        rep, _ = self._run(notion_ids=["a"], db_ids=[],
+                           db_error=sr.StoreReadError("정본(raw_signals) 조회 HTTP 500"))
+        sh = rep.pop("shadow_supabase")
+        self.assertEqual((sh["ok"], sh["error"]), (False, "정본(raw_signals) 조회 HTTP 500"))
+        for volatile in ("generated_at",):
+            rep.pop(volatile), base.pop(volatile)
+        self.assertEqual(rep, base)
+        rep2, _ = self._run(notion_ids=["a"], db_ids=[], db_error=RuntimeError("boom KEY"))
+        self.assertNotIn("KEY", json.dumps(rep2["shadow_supabase"], ensure_ascii=False))
+
+    def test_loader_reads_all_rows_of_each_source_without_leaking_key(self):
+        http = MagicMock()
+
+        def get(url, params, headers, timeout):
+            r = MagicMock()
+            r.status_code = 200
+            first = params["offset"] == "0"
+            r.json.return_value = ([{"document_id": f"d{i}", "official_url": "https://EX.org/p/#x"}
+                                    for i in range(1000)] if first
+                                   else [{"document_id": "last", "official_url": ""}])
+            return r
+        http.get.side_effect = get
+        ids, urls = sr.load_collected_keys_supabase("https://x.supabase.co", "KEY",
+                                                    ["FDA Warning Letter"], session=http)
+        self.assertEqual(len(ids), 1001)
+        self.assertIn("FDA Warning Letter::last", ids)
+        self.assertEqual(http.get.call_count, 2)
+        self.assertEqual(http.get.call_args.kwargs["params"]["source"], "eq.FDA Warning Letter")
+        from grm_notion import canonical_url_key
+        self.assertEqual(urls, {canonical_url_key("FDA Warning Letter", "https://EX.org/p/#x")})
+        bad = MagicMock()
+        bad.get.return_value = MagicMock(status_code=401)
+        with self.assertRaises(sr.StoreReadError) as cm:
+            sr.load_collected_keys_supabase("https://x.supabase.co", "SECRETKEY", ["X"], session=bad)
+        self.assertNotIn("SECRETKEY", str(cm.exception))
+
+    def test_workflow_passes_the_switch_default_off(self):
+        wf = (ROOT / ".github" / "workflows" / "grm-source-reconcile.yml").read_text(encoding="utf-8")
+        self.assertIn("ENABLE_RECONCILE_SUPABASE_SHADOW: ${{ vars.ENABLE_RECONCILE_SUPABASE_SHADOW || 'false' }}",
+                      wf)
+
+
 class LedgerLoadTest(unittest.TestCase):
     def _resp(self, status=200, body=None):
         r = MagicMock()

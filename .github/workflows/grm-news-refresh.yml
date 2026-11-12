@@ -39,6 +39,7 @@ jobs:
       BRANCH: automation/news-auto-${{ github.run_id }}
       GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
       DATA_PATH: web/data/news.json
+      GLANCE_PATH: web/data/brief_glance.json
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -63,11 +64,23 @@ jobs:
             --supabase-anon-key "$SUPABASE_ANON_KEY" \
             --days "$DAYS"
 
+      # [브리프 주간 현황] 브리프 카드(483·경고서한) 원문 URL → DB 국가·분류 표. 같은 공개 읽기(anon).
+      # 실패해도 소식 갱신은 막지 않는다(표가 그대로면 브리프 화면은 지난 값으로 그린다).
+      - name: Refresh brief glance data (findings public read, anon)
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          python brief_glance_refresh.py \
+            --supabase-url "$SUPABASE_URL" \
+            --supabase-anon-key "$SUPABASE_ANON_KEY"
+
       # measured_on 은 매일 바뀌므로 diff 판정에서 뺀다 — 소식이 그대로면 PR 을 만들지 않는다.
       - name: Detect meaningful changes
         id: changes
         run: |
-          if git diff --quiet -I'"measured_on"' -- "$DATA_PATH"; then
+          if git diff --quiet -I'"measured_on"' -- "$DATA_PATH" "$GLANCE_PATH"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "소식 변경 없음 — PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
           else
@@ -81,7 +94,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$DATA_PATH"
+          git add -- "$DATA_PATH" "$GLANCE_PATH"
           git commit -m "chore: refresh recent regulatory news"
           git push -u origin "$BRANCH"
           TOTAL=$(jq -r '.totals.items' "$DATA_PATH")

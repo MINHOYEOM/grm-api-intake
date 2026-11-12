@@ -1392,6 +1392,94 @@ def _build_sections(card_views: list[dict[str, Any]],
     return sections
 
 
+# ── [브리프 4단 2026-11-12] 주간 현황 ────────────────────────────────────────────
+# 대표 확정안 0절 5번: 이번 주 핵심 → "주간 현황"(카드 태그로 센 건수 + 몰린 것 한 줄) → 목록.
+# 건수는 카드에 이미 붙은 묶음(group)·카드 종류(card_type)로 센다(글을 새로 쓰지 않는다).
+# 몰린 것 한 줄의 국가·분류는 **DB 값**(findings.country_key·category_code)으로만 센다 —
+# 업체 이름으로 국가를 추정하지 않는다. 렌더러는 네트워크를 타지 않으므로 그 값은 커밋 정본
+# `web/data/brief_glance.json`(brief_glance_refresh.py, 공개 읽기·일일 갱신)에서 온다. 정본에
+# 없는 카드는 세지 않고, 규칙을 넘는 몰림이 없으면 줄을 내지 않는다(건수 칸은 그대로).
+BRIEF_GLANCE_FILE = WEB_DIR / "data" / "brief_glance.json"
+GLANCE_DOC_TYPES = ("FDA 483 실사 관찰", "Warning Letter")
+GLANCE_CATCHALL = "other_quality_system"
+GLANCE_MIN = 3
+
+
+def load_brief_glance(path: Path = BRIEF_GLANCE_FILE) -> dict[str, dict[str, Any]]:
+    """원문 URL → {"c": 국가 코드, "k": [분류 코드]}. 파일이 없으면 빈 표(줄이 안 나온다)."""
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return dict(data.get("items") or {})
+
+
+def _glance_line(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any]],
+                 db: dict[str, dict[str, Any]], tr: Translator) -> str:
+    """몰린 것 한 줄. ① 한 종류 안에서 같은 국가가 3건 이상·절반 이상이면 국가 줄(비율이 가장
+    높은 종류). ② 아니면 정본에 잡힌 문서 중 같은 분류(캐치올 제외)가 3건 이상·1/3 이상이면
+    분류 줄. ③ 둘 다 아니면 빈 문자열."""
+    import grm_findings as _gf
+    by_type: dict[str, list[str]] = {}
+    for raw, cv in zip(cards_raw, card_views):
+        if raw.get("card_type") not in GLANCE_DOC_TYPES:
+            continue
+        u = ((raw.get("sources") or {}).get("official_url") or "").strip()
+        if u.startswith("http"):
+            by_type.setdefault(cv.get("card_type") or "", []).append(u)
+    country_ko: dict[str, str] = {}
+    for name, code in _gf._COUNTRY_CODE_MAP.items():
+        if code not in country_ko and _HANGUL_RE.search(name):
+            country_ko[code] = name
+    best: "tuple[float, str] | None" = None
+    for t, urls in by_type.items():
+        n = len(urls)
+        cnt: dict[str, int] = {}
+        for u in urls:
+            c = (db.get(u) or {}).get("c") or ""
+            if c in country_ko:
+                cnt[c] = cnt.get(c, 0) + 1
+        for c, k in sorted(cnt.items()):
+            if k >= GLANCE_MIN and k * 2 >= n and (best is None or k / n > best[0]):
+                best = (k / n, tr("{type} {n}건 중 {k}건이 {country} 소재 제조소",
+                                  type=t, n=n, k=k, country=tr(country_ko[c])))
+    if best:
+        return best[1]
+    labels = {c.code: c.label_ko for c in _gf.FINDING_TAXONOMY if c.code != GLANCE_CATCHALL}
+    matched = sorted({u for urls in by_type.values() for u in urls if u in db})
+    kc: dict[str, int] = {}
+    for u in matched:
+        for k in db[u].get("k") or []:
+            if k in labels:
+                kc[k] = kc.get(k, 0) + 1
+    if kc:
+        k, v = sorted(kc.items(), key=lambda kv: (-kv[1], kv[0]))[0]
+        if v >= GLANCE_MIN and v * 3 >= len(matched):
+            return tr("문서 {n}건 중 {k}건에 {cat} 지적", n=len(matched), k=v, cat=tr(labels[k]))
+    return ""
+
+
+def build_brief_glance(sections: list[dict[str, Any]], card_views: list[dict[str, Any]],
+                       cards_raw: list[dict[str, Any]], db: dict[str, dict[str, Any]],
+                       tr: Translator = _KO) -> "dict[str, Any] | None":
+    """주간 현황 뷰모델 — 묶음별 건수·종류 내역 + DB 값으로 센 한 줄.
+
+    `cards_raw` 는 `card_views` 와 같은 순서의 원본 카드다(종류 판정은 번역 전 값으로 한다)."""
+    if not sections:
+        return None
+    groups = []
+    for s in sections:
+        counts: dict[str, int] = {}
+        for cv in s["cards"]:
+            t = cv.get("card_type") or ""
+            if t:
+                counts[t] = counts.get(t, 0) + 1
+        order = {t: i for i, t in enumerate(counts)}
+        parts = sorted(counts.items(), key=lambda kv: (-kv[1], order[kv[0]]))
+        groups.append({"name": s["name"], "n": s["count"],
+                       "parts": [{"t": t, "n": n} for t, n in parts]})
+    return {"groups": groups, "line": _glance_line(card_views, cards_raw, db, tr)}
+
+
 def _order_by_weight(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """[카드 무게 2026-11-10 · 재정비안 §2-2] 각 묶음 안에서 깊이 → 표준 → 표 한 줄.
 
@@ -4732,6 +4820,113 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
     }
 
 
+# ── [홈 4단 2026-11-12] '제공 정보' 세 칸 + 신규 공개 문서 ─────────────────────
+# 홈이 기능 설명 대신 **실제 결과 한 건씩**을 보여 준다(대표 확정안 0절 2번). 값은 전부
+# 커밋 스냅샷(findings_docs·findings_facets·glossary·glossary_cases)에서 파생한다 — 손으로
+# 적은 예시는 낡는다. 칸마다 데이터가 없으면 그 칸만 빠진다.
+HOME_TERM_PREFERRED = ("cleanroom", "data-integrity", "audit-trail", "cleaning-validation")
+HOME_AGENCY_BY_LANG = {DEFAULT_LANG: "MFDS", "en": "FDA"}
+HOME_CATCHALL_KEY = "other_quality_system"
+HOME_CATCHALL_LABEL = "기타 품질시스템"
+HOME_NEW_DOCS = 5
+
+
+def build_home_showcase(docs_data: "dict[str, Any] | None",
+                        facets: "dict[str, Any] | None",
+                        glossary_terms: "list[dict[str, Any]] | None",
+                        glossary_cases: "dict[str, dict[str, Any]] | None",
+                        tr: Translator = _KO,
+                        lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    """홈의 업체·용어·기관 예시 한 건씩과 신규 공개 문서 목록.
+
+    · 업체: 가장 최근 공개 문서의 업체 중 문서 2건 이상인 곳(업체 페이지 임계와 같다).
+    · 용어: 선호 목록에서 사례가 있는 첫 용어, 없으면 사례가 가장 많은 용어.
+    · 기관: 그 언어 독자에게 가까운 기관 하나의 분류 상위 둘(캐치올 분류는 순위 밖).
+    · 신규 문서: 공개일 최신순 다섯 건. 영어 트리는 원문이 영어인 문서만.
+    """
+    out: dict[str, Any] = {"firm": None, "term": None, "agency": None, "new_docs": []}
+    docs = list((docs_data or {}).get("documents") or [])
+    if lang != DEFAULT_LANG:
+        docs = [d for d in docs if doc_is_english(d)]
+    docs.sort(key=lambda d: (d.get("published_date") or "", d.get("slug") or ""),
+              reverse=True)
+
+    def _cats(d: dict[str, Any]) -> list[str]:
+        # 캐치올 분류는 아무것도 말하지 않는다 — 줄에 싣지 않는다(1단 미분류 규칙과 같다).
+        return [tr(c) for c in (d.get("categories") or [])
+                if c != HOME_CATCHALL_LABEL][:2]
+
+    for d in docs[:HOME_NEW_DOCS]:
+        out["new_docs"].append({
+            "slug": d["slug"],
+            "date": (d.get("published_date") or "")[5:].replace("-", "."),
+            "source": doc_source_label(d) or tr((facets or {}).get("agency_labels", {})
+                                                .get(d.get("agency") or "", "")
+                                                or d.get("agency") or ""),
+            "firm": d.get("firm_name") or "",
+            "cats": " · ".join(_cats(d)),
+        })
+
+    by_firm: dict[str, list[dict[str, Any]]] = {}
+    for d in docs:
+        key = _canonical_firm_key(d.get("firm_key") or "")
+        if key:
+            by_firm.setdefault(key, []).append(d)
+    for d in docs:
+        key = _canonical_firm_key(d.get("firm_key") or "")
+        group = by_firm.get(key) or []
+        if len(group) < 2:
+            continue
+        out["firm"] = {
+            "name": d.get("firm_name") or "",
+            "key": d.get("firm_key") or "",
+            "documents": len(group),
+            "findings": sum(len(g.get("findings") or []) for g in group),
+            "latest_source": doc_source_label(d),
+            "latest_cats": " · ".join(_cats(d)),
+        }
+        break
+
+    if glossary_terms and glossary_cases:
+        by_id = {t["id"]: t for t in glossary_terms}
+        pick = next((i for i in HOME_TERM_PREFERRED
+                     if i in by_id and _glossary_case_count(glossary_cases.get(i))), None)
+        if pick is None:
+            ranked = sorted((i for i in by_id if _glossary_case_count(glossary_cases.get(i))),
+                            key=lambda i: (-_glossary_case_count(glossary_cases.get(i)), i))
+            pick = ranked[0] if ranked else None
+        if pick:
+            t = by_id[pick]
+            out["term"] = {
+                "id": pick,
+                "name": (t.get("term_ko") if lang == DEFAULT_LANG else t.get("term_en"))
+                        or t.get("term_en") or pick,
+                "findings": f"{_glossary_case_count(glossary_cases.get(pick)):,}",
+            }
+
+    agency = HOME_AGENCY_BY_LANG.get(lang, "FDA")
+    if facets:
+        rows = []
+        for axis in facets.get("axes") or []:
+            if axis.get("axis") != "category":
+                continue
+            for it in axis.get("items") or []:
+                if it.get("key") == HOME_CATCHALL_KEY:
+                    continue
+                c = next((b["c"] for b in it.get("by_agency") or [] if b.get("v") == agency), 0)
+                if c:
+                    rows.append((c, it.get("label_ko") or ""))
+        rows.sort(key=lambda r: (-r[0], r[1]))
+        if len(rows) >= 2:
+            out["agency"] = {
+                "code": agency,
+                "label": tr((facets.get("agency_labels") or {}).get(agency) or agency),
+                "top": [{"label": tr(lbl), "n": f"{n:,}"} for n, lbl in rows[:2]],
+                "as_of": facets.get("measured_on", ""),
+            }
+    return out
+
+
 # ── 페이지 주소(단일 원천) ────────────────────────────────────────────────────
 # [다국어 1단계 2026-09-03] 페이지 하나의 주소는 **사이트 루트 기준 상대 디렉터리 경로
 # 하나**(`"findings/docs/"`)에서 전부 파생한다 — 출력 파일·템플릿의 rel_root·canonical·
@@ -5931,7 +6126,8 @@ def _write_json(path: Path, obj: Any) -> None:
 
 def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 assets_dir: Path = ASSETS_DIR,
-                render_doc_pages: bool = True) -> dict[str, Any]:
+                render_doc_pages: bool = True,
+                glance_file: "Path | None" = None) -> dict[str, Any]:
     """data_dir → out_dir 정적 사이트 빌드. 산출 메타(쓴 파일 목록) 반환.
 
     `render_doc_pages=False` 는 **테스트 전용 속도 스위치**다. 문서 단위 페이지는 3천 장이
@@ -6309,6 +6505,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         cover=_cover_context(latest_brief, latest_issue_no, tr),
         library=library_summary,
         findings_zone=findings_zone,
+        showcase=build_home_showcase(docs_data, facets, glossary_terms,
+                                     load_glossary_cases(), tr, DEFAULT_LANG),
     )
 
     # 아카이브(최신호 desc 정렬).
@@ -7737,6 +7935,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # 브리프 상세(주차별).
     brief_tmpl = env.get_template("brief.html")
+    # [브리프 4단] 주간 현황 국가·분류(DB 정본) — 경로는 **호출자가 넘긴다**(CLI 기본값 =
+    # web/data/brief_glance.json). ★종전에는 브리프 데이터 폴더 옆에서 찾았는데, 배포는 링크체크한
+    # 사본(runner.temp)으로 렌더해 옆에 파일이 없었다 — 라이브에서 줄이 통째로 빠졌다(11-12).
+    # 테스트·픽스처 빌드는 넘기지 않아(None) 골든이 매일 갱신되는 정본에 흔들리지 않는다.
+    glance_db = load_brief_glance(glance_file) if glance_file else {}
     for b in briefs:
         pub = b["brief"].get("publish_date", "")
         issue_no = issue_no_by_date[pub]
@@ -7773,6 +7976,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=_brief_description(b["brief"], tr),
             brief=ctx,
             sections=sections,
+            glance=build_brief_glance(sections, card_views, cards_sorted, glance_db, tr),
             card_weighted=any(cv.get("weight") for cv in card_views),
             lib_update_week=lib_update_week,
             json_ld=build_brief_article_json_ld(
@@ -7812,7 +8016,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 nav_active="detail",
                 description=_brief_description(b["brief"], en_tr, "en"),
                 brief=en_ctx,
-                sections=_build_sections(en_card_views, en_tr),
+                sections=(_en_sections := _build_sections(en_card_views, en_tr)),
+                glance=build_brief_glance(_en_sections, en_card_views, cards_sorted, glance_db,
+                                          en_tr),
                 card_weighted=any(cv.get("weight") for cv in en_card_views),
                 ko_only_names=count_ko_only_names(en_card_views),
                 # [다국어 2026-09-05] 한국어판과 **같은 창(window)** 을 영어 카탈로그로
@@ -7856,6 +8062,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         library={"catalog_count": len(en_catalogs),
                  "item_count": sum(v["count"] for v in en_catalogs)},
         findings_zone=findings_zone_en,
+        showcase=build_home_showcase(docs_data, facets_en, glossary_terms,
+                                     load_glossary_cases(GLOSSARY_CASES_EN_FILE),
+                                     en_tr, "en"),
     )
     en_emit("findings.html", en_page("findings/"),
         zone_totals=findings_zone_en,
@@ -8382,9 +8591,11 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="GRM 웹 렌더러 (JSON → 정적 사이트)")
     ap.add_argument("--data", type=Path, default=DATA_DIR, help="브리프 JSON 디렉터리")
     ap.add_argument("--out", type=Path, default=DIST_DIR, help="정적 사이트 출력 디렉터리")
+    ap.add_argument("--glance", type=Path, default=BRIEF_GLANCE_FILE,
+                    help="브리프 주간 현황 국가·분류 정본(brief_glance_refresh.py 산출)")
     args = ap.parse_args(argv)
     _validate_briefs_or_raise(args.data)  # fail-closed — 위반 시 여기서 raise, exit 0 도달 안 함
-    meta = render_site(args.data, args.out)
+    meta = render_site(args.data, args.out, glance_file=args.glance)
     print(f"빌드 완료: {meta['briefs']}개 브리프 → {meta['out_dir']}  "
           f"(최신호 {meta['latest']}, {len(meta['written'])}개 파일)")
     for w in meta["written"]:

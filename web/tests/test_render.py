@@ -2424,8 +2424,10 @@ class WebFindingsRenderTest(unittest.TestCase):
         head_block = js_src[js_src.index('el("div", "fnd-card-head")'):js_src.index("card.appendChild(head)")]
         self.assertNotIn("row.agency", head_block)
         # date 배지가 head 조립부의 마지막 appendChild 호출이어야 우측 고정이 실제로 동작한다.
+        # [UI 2단 2026-11-12 지적 한 줄] 문서 카드 안(inDoc)에서는 날짜를 다시 적지 않는다
+        # (문서 머리에 한 번) — 홀로 쓰이는 카드에서만 head 의 마지막 자식으로 붙는다.
         self.assertTrue(head_block.rstrip().endswith(
-            'head.appendChild(el("span", "fnd-b date", row.published_date || ""));'
+            'if (!inDoc) head.appendChild(el("span", "fnd-b date", row.published_date || ""));'
         ), "date 배지가 head 의 마지막 자식으로 추가되지 않음(우측 고정 깨짐)")
 
     def test_translation_note_generated_inside_orig_details(self):
@@ -2643,7 +2645,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function buildDocCard(rows, query)", js_src)
         fn = js_src[js_src.index("function buildDocCard(rows, query)"):]
         fn = fn[:fn.index("return { card: doc, built: built };")]
-        self.assertEqual(fn.count("buildCard(row, query)"), 2)  # 보이는 5개 + 접힌 나머지 양쪽 경로
+        self.assertEqual(fn.count("buildCard(row, query, true)"), 2)  # 보이는 5개 + 접힌 나머지 양쪽 경로
 
     def test_document_collapse_threshold_and_toggle_present(self):
         """[긴 문서 접기] 6개 이상이면 처음 5개만 펼치고 나머지는 "지적 N건 모두 보기"
@@ -3228,7 +3230,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         포함) 항상 id="f-<finding_id>" 를 부여해야 한다 — 딥링크 조건부 게이트가
         없어야 무해하게 항상 존재한다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function buildCard(row, query) {"):]
+        fn = js_src[js_src.index("function buildCard(row, query, inDoc) {"):]
         fn = fn[:fn.index("\n    if (row.review_status === \"needs_review\") card.classList.add")]
         self.assertIn('if (row.finding_id) card.id = "f-" + row.finding_id;', fn)
         self.assertNotIn("deepLink", fn)  # 딥링크 상태를 참조하는 조건부가 아니다.
@@ -3456,7 +3458,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('evidence_level: item.evidence_level || "",', fn)
         self.assertIn('review_status: item.review_status || "",', fn)
         # buildCard() 가 실제로 이 두 필드로 배지를 그리는지(계약의 반대편) 확인.
-        card_fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        card_fn = js_src[js_src.index("  function buildCard(row, query, inDoc) {"):]
         card_fn = card_fn[:card_fn.index("\n  }\n") + 4]
         self.assertIn("EVIDENCE_LABEL[row.evidence_level]", card_fn)
         self.assertIn('if (row.review_status === "needs_review") {', card_fn)
@@ -3809,7 +3811,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         "유사 사례" 버튼을 actions 행에 나란히 붙이고, 펼침 블록은 actions 뒤에 붙인다 —
         finding_id 없는 방어적 행은 simCases 가 null 이라 아무것도 추가되지 않는다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        fn = js_src[js_src.index("  function buildCard(row, query, inDoc) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("var simCases = buildSimilarCasesControl(row);", fn)
         self.assertIn("if (simCases) actions.appendChild(simCases.btn);", fn)
@@ -3828,14 +3830,14 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('buildCard(row, "")', render_fn)
         doc_fn = js_src[js_src.index("function buildDocCard(rows, query) {"):]
         doc_fn = doc_fn[:doc_fn.index("\n  }\n") + 4]
-        self.assertEqual(doc_fn.count("buildCard(row, query)"), 2)
+        self.assertEqual(doc_fn.count("buildCard(row, query, true)"), 2)
 
     def test_similar_to_regression_buildcard_return_shape_unchanged(self):
         """[§6 회귀 0] buildCard() 의 반환 계약({card,textEl,extraEl,moreBtn})은 신규
         기능 추가로 바뀌지 않는다 — render()/renderDeepLinkDoc() 등 기존 소비자가
         item.textEl/item.extraEl/item.moreBtn 을 그대로 읽는 계약을 깨면 안 된다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("  function buildCard(row, query) {"):]
+        fn = js_src[js_src.index("  function buildCard(row, query, inDoc) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn(
             "return { card: card, textEl: textEl, extraEl: extra, moreBtn: moreBtn };", fn
@@ -3847,7 +3849,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         block = js_src[
             js_src.index("function fetchSimilarTo(findingId, limit) {"):
-            js_src.index("  function buildCard(row, query) {")
+            js_src.index("  function buildCard(row, query, inDoc) {")
         ]
         self.assertNotIn("innerHTML", block)
 
@@ -8237,18 +8239,16 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn("전체 3품목", h)
 
     def test_hero_issuecard_binds_latest_brief(self):
-        # 히어로 이슈카드 호별 수치가 최신호(06-29) 파생값 반영(stale 아님).
-        # 11차 정리로 콜아웃(#this-week)은 철거 — 랜딩의 수치 바인딩은 이슈카드가 유일하다.
+        """[홈 4단] 홈의 브리프 링크는 최신호를 가리킨다(stale 아님)."""
         older = _minimal_brief("2026-06-22")
         latest = _minimal_brief("2026-06-29",
                                 coverage={"intake_total": 99, "rendered": 88,
                                           "evidence": {"A": 7, "B": 5, "C": 0}})
         out = self._render_site([older, latest])
         landing = (out / "index.html").read_text(encoding="utf-8")
-        self.assertIn("수집 <b>99</b>", landing)
-        self.assertIn("카드 88장", landing)
-        self.assertIn("A 7 · B 5", landing)            # §1-6 표기 일관성: '/' → '·'
-        self.assertNotIn("수집 36건", landing)         # 옛 정적 수치 잔존 금지
+        self.assertIn('href="briefs/2026-06-29/index.html">주간 브리프 2호', landing)
+        self.assertNotIn('href="briefs/2026-06-22/index.html"', landing)
+
 
     def test_duplicate_publish_date_rejected(self):
         data, out = self.tmp / "data", self.tmp / "out"
@@ -13921,59 +13921,38 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn("prefers-reduced-motion:reduce", self.pet_css)
 
     def test_landing_section_order_final(self):
-        # 확정 재배치(12차, 2026-08-27 — 발견 허브): 히어로 → 기능 3종(soft, id=why —
-        # footer '소개' 앵커 승계) → 데이터 존(#records) → 참여 존(#engage) → 뉴스레터
-        # → AI 고지. Card Anatomy 는 12차에서 걷어냈다 — 홈 실측 최대 블록(1,000px)이며
-        # 유일한 무CTA 순수 설명이었고, 히어로 라이브 이슈 카드·#why 미리보기 칩·실제
-        # 브리프가 같은 내용을 이미 보여준다(3회 설명 → 1회).
-        order = [
-            'class="wrap hero"',
-            '<section class="section soft" id="why">',
-            '<section class="section" id="records">',
-            '<section class="section" id="engage">',
-        ]
+        """[홈 4단 2026-11-12] 대표 확정안 0절 2번 순서: 소개 한 문장 → 검색 → 제공 정보 세 칸 →
+        이번 주 핵심 / 신규 공개 문서 → 찾아보기. 마케팅 히어로·기능 소개·참여 존은 내렸다."""
+        order = ['class="home-h"', 'class="home-search"', ">제공 정보</h2>",
+                 ">이번 주 핵심</h2>", ">신규 공개 문서</h2>", ">찾아보기</h2>"]
         pos = [self.landing.index(m) for m in order]
-        self.assertEqual(pos, sorted(pos), "랜딩 섹션 순서가 확정안과 다름")
-        # 걷어낸 섹션이 되살아나지 않는다 — 단독 WHY 섹션·This Week 콜아웃(수치 3중
-        # 반복)·Card Anatomy 쇼케이스(12차).
-        self.assertNotIn('id="this-week"', self.landing)
-        self.assertNotIn("Why GRM", self.landing)
-        self.assertNotIn('class="callout"', self.landing)
-        self.assertNotIn(">Card Anatomy</span>", self.landing)
-        self.assertNotIn('class="showcase"', self.landing)
+        self.assertEqual(pos, sorted(pos), "홈 구역 순서가 확정안과 다름")
+        for gone in ('class="wrap hero"', 'id="why"', 'id="records"', 'id="engage"',
+                     'class="quiz-cta"', 'id="grm-popular"', 'id="this-week"',
+                     'class="showcase"', 'class="marquee"'):
+            self.assertNotIn(gone, self.landing, gone)
+
 
     def test_landing_features_are_exactly_three(self):
-        # 기능 6종 → 3종(11차) — 카드 차원 기능(원문 연결·번역 병기·체크리스트)은 히어로
-        # 라이브 이슈 카드와 실제 브리프 본문이 보여주므로 기능 그리드에 되살리지 않는다
-        # (12차에서 Card Anatomy 를 걷어낸 뒤에도 같은 판단 — 홈은 설명이 아니라 실물로).
-        self.assertEqual(self.landing.count('<div class="feat">'), 3)
-        self.assertNotIn("원문 대비 한국어 번역", self.landing)
-        self.assertNotIn("실무 맞춤형 점검 리스트", self.landing)
-        self.assertNotIn("원문·출처 직접 연결", self.landing)
+        """[홈 4단] '제공 정보'는 업체·용어·기관 세 칸이고 칸마다 실제 결과 한 건을 싣는다."""
+        self.assertEqual(self.landing.count('class="home-demo"'), 3)
+        for label in ("업체별 지적 이력", "용어 해설과 지적 사례", "기관별 지적 경향"):
+            self.assertIn(label, self.landing)
+
 
     def test_engage_zone_popular_then_quiz(self):
-        # 참여 존(#engage) — 인기 카드가 먼저, 퀴즈 CTA 가 뒤(한 섹션 응집).
-        zone = self.landing[self.landing.index('id="engage"'):]
-        zone = zone[:zone.index("</section>")]
-        self.assertIn('id="popular"', zone)
-        self.assertIn('id="grm-popular"', zone)
-        self.assertIn('class="quiz-cta"', zone)
-        self.assertLess(zone.index('id="popular"'), zone.index('class="quiz-cta"'))
+        """[홈 4단] 퀴즈·인기 카드는 홈 얼굴에서 내렸다(대표 확정 0절 7번). 퀴즈 면 자체는 남는다."""
+        self.assertNotIn('class="quiz-cta"', self.landing)
+        self.assertNotIn('id="grm-popular"', self.landing)
+        self.assertIn('id="grm-pet"', self.quiz)
 
-    def test_engage_zone_is_the_closing_section(self):
-        # 11차 정리 — This Week 콜아웃 철거 후 참여 존(#engage)이 content 블록의 마지막
-        # 섹션(=뉴스레터 직전)이다. 새 최상위 섹션을 그 뒤에 덧붙이지 않는다.
-        tail = self.landing[self.landing.index('<section class="section" id="engage">'):]
-        tail = tail[:tail.index("</main>")]
-        self.assertEqual(tail.count("<section"), 1)
 
     def test_brief_cta_exactly_one(self):
-        # CTA 중복 정리(불가침 상한) — 같은 브리프로 가는 버튼은 히어로("이번 주 소식
-        # 읽기") 1개만(헤더 상시 '이번 주 소식' 버튼은 base 공통이라 별도). 구 하단
-        # 콜아웃 CTA("이번 주 소식 보기")·인기 카드 빈 상태의 이동 버튼은 되살리지 않는다.
-        self.assertEqual(self.landing.count("이번 주 소식 읽기"), 1)
+        """[홈 4단] 이번 주 브리프로 가는 링크는 '이번 주 핵심' 아래 한 줄뿐."""
+        self.assertEqual(self.landing.count('class="home-links"><a href="briefs/'), 1)
+        self.assertNotIn("이번 주 소식 읽기", self.landing)
         self.assertNotIn("이번 주 소식 보기", self.landing)
-        self.assertNotIn("이번 주 카드 보러 가기", self.landing)
+
 
 
 # ── 랜딩 자료실 카드(#engage 존) ──────────────────────────────────────────────
@@ -13997,26 +13976,23 @@ class WebLandingLibraryCardTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_card_is_inside_the_engage_zone(self):
-        """확정 섹션 순서(…→#engage→#this-week→뉴스레터)를 바꾸지 않는다 —
-        새 최상위 <section> 이 아니라 기존 참여 존 안의 카드다."""
-        engage = self.landing.split('id="engage"', 1)[1].split('id="this-week"', 1)[0]
-        self.assertIn('class="quiz-cta lib-cta"', engage, "자료실 카드가 #engage 존 안에 없다")
-        self.assertIn("자료실 열기", engage)
+        """[홈 4단] 자료실은 '찾아보기' 줄의 한 항목이다(별도 배너 없음)."""
+        browse = self.landing.split(">찾아보기</h2>", 1)[1].split("</section>", 1)[0]
+        self.assertIn('href="library/index.html">자료실</a>', browse)
+        self.assertNotIn("lib-cta", self.landing)
+
 
     def test_counts_are_derived_from_the_catalogs_not_hardcoded(self):
-        expected_catalogs = len(self.catalogs)
-        expected_items = sum(v["count"] for v in self.catalogs)
-        self.assertIn(f"카탈로그 {expected_catalogs}종", self.landing)
-        self.assertIn(f"총 {expected_items}건", self.landing)
+        """[홈 4단] 홈은 자료실 수치를 싣지 않는다 — 템플릿에도 손으로 적은 건수가 없어야 한다."""
         tpl = (WEB_DIR / "templates" / "landing.html").read_text(encoding="utf-8")
-        self.assertNotIn(f"카탈로그 {expected_catalogs}종", tpl,
-                         "템플릿에 수치를 하드코딩하면 카탈로그가 늘 때 낡는다")
+        self.assertIsNone(re.search(r"\d+\s*종", tpl))
+        self.assertIsNone(re.search(r"\d{1,3},\d{3}\s*건", tpl))
+
 
     def test_cta_targets_the_library_not_a_brief(self):
-        """브리프행 CTA 1개 불가침(11차) — 이 카드는 /library/ 로만 간다."""
-        self.assertIn('href="library/index.html">자료실 열기', self.landing)
-        self.assertEqual(self.landing.count("이번 주 소식 읽기"), 1)
-        self.assertNotIn("이번 주 소식 보기", self.landing)
+        self.assertIn('href="library/index.html">자료실</a>', self.landing)
+        self.assertNotIn("이번 주 소식 읽기", self.landing)
+
 
     def test_card_is_omitted_when_there_is_no_library(self):
         """데이터가 없으면 빈 카드를 그리지 않는다(빈 상태 광고 금지).
@@ -14059,11 +14035,10 @@ class WebPopularCardsTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_static_section_present_on_landing(self):
-        self.assertIn('id="grm-popular"', self.landing)
-        self.assertIn("이번 주 반응이 모인 카드", self.landing)
-        self.assertIn("하트·스크랩 기준", self.landing)
-        self.assertIn("아직 이번 주 하트·스크랩이 없어요.", self.landing)
-        self.assertIn("관심 있는 카드에 ♥를 눌러 주세요", self.landing)
+        """[홈 4단] 인기 카드 구역은 홈에서 내렸다. popular.js 자산은 남아 있어도 홈이 부르지 않는다."""
+        self.assertNotIn('id="grm-popular"', self.landing)
+        self.assertNotIn("이번 주 반응이 모인 카드", self.landing)
+
 
     def test_no_view_count_framing(self):
         # "가장 많이 본"·조회수 기준 표현 금지 — 반응(하트·스크랩) 기준만.
@@ -14071,10 +14046,8 @@ class WebPopularCardsTest(unittest.TestCase):
         self.assertNotIn("조회수 Top", self.landing)
 
     def test_popular_js_script_env_gated(self):
-        # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정(reactions_enabled=False) — 기본 렌더엔
-        # popular.js 스크립트 태그가 없다(reactions.js 관례 동형).
+        """[홈 4단] 반응 계층을 켠 빌드에서도 홈은 popular.js 를 싣지 않는다."""
         self.assertNotIn("assets/popular.js", self.landing)
-
         u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_popular_on_"))
         try:
@@ -14086,37 +14059,17 @@ class WebPopularCardsTest(unittest.TestCase):
         finally:
             render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
             shutil.rmtree(tmp, ignore_errors=True)
-        import re as _re
-        m = _re.search(r'assets/popular\.js\?v=([0-9a-f]{8})"', landing_on)
-        self.assertIsNotNone(m, "popular.js 캐시버스팅 해시 미발견(활성 렌더)")
-        # 활성 렌더에서도 정적 빈 상태 마크업은 그대로(런타임 교체는 popular.js 소관).
-        self.assertIn('id="grm-popular"', landing_on)
+        self.assertNotIn("assets/popular.js", landing_on)
+        # 관심 업체 알림 줄은 회원 기능이라 켠 빌드에만 — 뉴스레터(newsletter.py)가 이 앵커로 직링크한다.
+        self.assertIn('id="watchlist"', landing_on)
+        self.assertIn('findings/firm/index.html">업체 조회</a>', landing_on)
+
 
     def test_watchlist_banner_env_gated(self):
-        """[성장 2차] 워치리스트 진입 배너 — 회원 기능이라 reactions 게이트 안(/me 푸터
-        링크 선례). env-off(기본 테스트 빌드·골든)엔 무흔적, env-on 렌더에서만 나타나며
-        CTA 는 검색 페이지로 간다(업체 프로파일은 key 없이 열면 막다른 화면)."""
-        self.assertNotIn("watch-cta", self.landing)
-        self.assertNotIn("관심 업체의 새 지적사항", self.landing)
-        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
-        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_watchcta_on_"))
-        try:
-            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
-            render.SUPABASE_ANON_KEY = "anon-key"
-            out = tmp / "out"
-            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
-            landing_on = (out / "index.html").read_text(encoding="utf-8")
-        finally:
-            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
-            shutil.rmtree(tmp, ignore_errors=True)
-        self.assertIn("watch-cta", landing_on)
-        self.assertIn("관심 업체의 새 지적사항, 메일로 받아보세요.", landing_on)
-        # [존 재편 2026-08-26] CTA 목적지가 검색 페이지 → 업체 조회 페이지로 바뀌었다.
-        # 예전 우회의 근거는 "업체 프로파일은 key 없이 열면 막다른 화면"이었는데, 그
-        # 페이지가 이제 이름으로 찾는 랜딩을 갖는다(그 전제가 사라졌다).
-        self.assertIn('findings/firm/index.html">업체 조회하러 가기', landing_on)
-        # 뉴스레터 사다리(newsletter.py)가 이 앵커로 직링크한다 — 파일 간 계약을 여기서 고정.
-        self.assertIn('id="watchlist"', landing_on)
+        """[홈 4단] 관심 업체 알림 줄 — env-off(기본 테스트 빌드·골든)엔 무흔적."""
+        self.assertNotIn('id="watchlist"', self.landing)
+        self.assertNotIn("관심 업체 알림", self.landing)
+
 
     def test_popular_js_copied_to_dist(self):
         built = (self.single / "assets" / "popular.js").read_bytes()
@@ -14327,7 +14280,9 @@ class WebGurumiGrowthTest(unittest.TestCase):
         # "기록 미저장" 카피는 성장 시스템과 모순 — 로컬 저장 명시 카피로 교체됐다.
         self.assertNotIn("순위나 기록은 남기지 않으니", self.quiz)
         self.assertIn("이 브라우저에만 저장", self.quiz)
-        self.assertIn("풀수록 구름이가 자라나요", self.landing)
+        # [홈 4단] 퀴즈 배너는 홈에서 내렸다.
+        self.assertNotIn("풀수록 구름이가 자라나요", self.landing)
+
 
     def test_stage_ladder_five_stages(self):
         # 5단계 사다리(알→아기→소년→어른→전설) — 명칭·순서 가드(카피 조정 시 의도 확인).
@@ -15251,18 +15206,11 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
         self.assertIn("findings/coverage/index.html", block)
 
     def test_marquee_source_count_matches_chips(self):
-        """랜딩 마퀴 '수집 대상 — N sources' 의 N 이 실제 표기 소스 칩 수와 일치해야 한다
-        — 마퀴에 소스를 넣고 카운트를 안 고치거나(불일치), 없는 소스를 광고하던(TGA 사고)
-        재발을 막는다."""
+        """[홈 4단] 홈의 소스 띠는 내렸다 — 손으로 적은 '수집 대상 — N sources' 줄이 되살아나지 않는다."""
         tpl = (WEB_DIR / "templates" / "landing.html").read_text(encoding="utf-8")
-        m = re.search(r"수집 대상 — (\d+) sources", tpl)
-        self.assertIsNotNone(m, "마퀴 '수집 대상 — N sources' 문구를 찾지 못함")
-        declared = int(m.group(1))
-        track = re.search(r'class="track">(.*?)</div>', tpl, re.S)
-        self.assertIsNotNone(track, "마퀴 track 을 찾지 못함")
-        chips = re.findall(r"<span>([^<]+)</span>", track.group(1))   # 보이는 칩(비 aria-hidden)만
-        self.assertEqual(declared, len(chips),
-                         f"마퀴 카운트({declared}) ≠ 실제 칩 수({len(chips)}): {chips}")
+        self.assertIsNone(re.search(r"수집 대상 — (\d+) sources", tpl))
+        self.assertNotIn('class="track"', tpl)
+
 
     # ★[가드가 낡는 것을 막는 가드 2026-08-11] 아래 매핑은 findings 추출기 → 그 소스를
     # 가리키는 사이트 카피 키워드다. 옛 버전은 REQUIRED 를 손으로 적은 리스트로 뒀는데,
@@ -16112,29 +16060,22 @@ class WebDiscoveryHubTest(unittest.TestCase):
 
     # ── 랜딩 #records(기존 계약 유지) ────────────────────────────────────────
     def test_landing_records_counts_derived_not_hardcoded(self):
+        """[홈 4단] 홈 '제공 정보'의 수는 스냅샷에서 계산한다 — 템플릿에 건수를 적지 않는다."""
         facets = json.loads(render.FINDINGS_FACETS_FILE.read_text(encoding="utf-8"))
-        docs_fmt = f"{facets['totals']['documents']:,}"
-        find_fmt = f"{facets['totals']['findings']:,}"
-        self.assertIn('id="records"', self.landing)
-        self.assertIn(f"문서 {docs_fmt}건", self.landing)
-        self.assertIn(f"지적사항 {find_fmt}건", self.landing)
+        self.assertIn(f"{facets['measured_on']} 기준", self.landing)
         for tpl in ("landing.html", "findings.html"):
             src = (WEB_DIR / "templates" / tpl).read_text(encoding="utf-8")
             self.assertIsNone(re.search(r"\d{1,3},\d{3}\s*건", src),
                               f"{tpl}: 건수 하드코딩 금지 — render 가 정본에서 계산해야")
 
-    def test_landing_records_between_why_and_engage(self):
-        self.assertLess(self.landing.index('id="why"'),
-                        self.landing.index('id="records"'))
-        self.assertLess(self.landing.index('id="records"'),
-                        self.landing.index('id="engage"'))
 
     def test_landing_records_question_entries(self):
+        """[홈 4단] 찾아보기·제공 정보가 조회 화면으로 간다."""
         for path in ("findings/firm/index.html", "findings/inspector/index.html",
-                     "findings/checklist/index.html", "findings/trends/index.html",
-                     "findings/index.html"):
-            self.assertIn(f'href="{path}"', self.landing, path)
-        self.assertIn("이 거래처, 과거에 무엇을 지적받았나요?", self.landing)
+                     "findings/trends/index.html", "glossary/index.html"):
+            self.assertIn(f'href="{path}', self.landing, path)
+        self.assertIn('action="search/index.html"', self.landing)
+
 
     # ── 프로파일 맥락 유지(소스 계약 — firm/inspector.js 는 비골든 런타임 파일) ──
     def test_profile_category_links_carry_context(self):
@@ -16206,22 +16147,13 @@ class WebDeficiencyExamplesEntryTest(unittest.TestCase):
         self.assertEqual(self.ex_en.count('class="ex-q"'), len(self.data["examples"]))
 
     def test_landing_records_has_six_question_cards(self):
+        """[홈 4단] 지적 조항·지적 사례는 '찾아보기' 줄에 — 면이 선 트리에서만."""
         for html, lang in ((self.landing, "ko"), (self.en_landing, "en")):
             with self.subTest(lang=lang):
-                sec = html[html.index('id="records"'):html.index('id="engage"')]
-                self.assertEqual(sec.count('class="records-card"'), 6)
-                for path, _, _ in self.ROUTES:
-                    self.assertIn(f'href="{path}index.html"', sec, path)
-        self.assertIn("이 조항, FDA 는 얼마나 자주 지적했나요?", self.landing)
-        self.assertIn("우리 업무 영역에서는 실제로 어떤 지적이 나왔나요?", self.landing)
-        self.assertIn("How often has FDA cited this clause?", self.en_landing)
+                browse = html.split('class="home-idx"', 1)[1].split("</p>", 1)[0]
+                for path, ko, en in self.ROUTES:
+                    self.assertIn(f'href="{path}index.html"', browse, path)
 
-    def test_records_grid_lays_six_cards_evenly(self):
-        """6장이 4+2 로 갈리지 않게 3열 → 2열 → 1열."""
-        src = (WEB_DIR / "templates" / "landing.html").read_text(encoding="utf-8")
-        self.assertIn(".records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}", src)
-        self.assertIn("@media(max-width:860px){.records-grid{grid-template-columns:repeat(2,1fr)}}", src)
-        self.assertIn("@media(max-width:520px){.records-grid{grid-template-columns:1fr}}", src)
 
     #: [찾아보기 2026-11-12] 두 화면의 입구는 찾아보기 색인(+푸터 '찾아보기' 열 → 전체 색인).
     BROWSE_NAMES = {"findings/citations/": ("FDA 지적 조항 순위", "FDA cited sections"),
@@ -19710,12 +19642,12 @@ class WebEnTreeTest(unittest.TestCase):
                          "영어 전용 랜딩 템플릿이 되살아났다")
 
     def test_popular_cards_read_the_index_of_their_own_language(self):
-        """인기 카드 제목은 런타임에 검색 인덱스에서 온다 — 하나만 가리키면 영어 홈에
-        **한국어 카드 제목**이 뜬다(HTML 에 없는 내용이라 다른 검사가 못 본다)."""
-        self.assertIn('data-index="/assets/search-index.json"',
-                      self.pages["index.html"])
-        self.assertIn('data-index="/assets/search-index.en.json"',
-                      self.pages["en/index.html"])
+        """[홈 4단] 인기 카드는 홈에서 내렸다. 영어 홈의 신규 문서 줄은 영어 트리에 선 문서만 가리킨다."""
+        self.assertNotIn("data-index=", self.pages["index.html"].split("<main", 1)[1].split("</main>", 1)[0])
+        en_main = self.pages["en/index.html"].split("<main", 1)[1].split("</main>", 1)[0]
+        for slug in re.findall(r'href="findings/doc/([^/]+)/index.html"', en_main):
+            self.assertIn(f"findings/doc/{slug}/", self.expected_doc_paths, slug)
+
 
     # ── 루트 진입 안내 ──────────────────────────────────────────────────────
     def _hint(self, html):
@@ -21206,13 +21138,11 @@ class WebVisitorCopyFixSweepTest(unittest.TestCase):
 
     # ── D1 ──────────────────────────────────────────────────────────────────
     def test_landing_evidence_tooltip_defines_b_c_correctly(self):
-        self.assertNotIn("2차 보도", self.landing_ko)
-        self.assertNotIn("추정·미확인", self.landing_ko)
-        self.assertIn("공식 인덱스", self.landing_ko)
-        self.assertIn("보조 자료 단독", self.landing_ko)
-        self.assertIn("official index", self.landing_en)
-        self.assertIn("secondary sources only", self.landing_en)
+        """[홈 4단] 홈의 등급 툴팁은 기능 소개와 함께 내렸다. 옛 오정의가 되살아나지 않는다."""
+        for bad in ("2차 보도", "추정·미확인"):
+            self.assertNotIn(bad, self.landing_ko)
         self.assertNotIn("secondary reporting", self.landing_en)
+
 
     # ── D3 ──────────────────────────────────────────────────────────────────
     def test_brief_view_toggle_is_localized_not_english_literal(self):
@@ -21612,6 +21542,97 @@ class WebTier1BarsAndDatesTest(unittest.TestCase):
         self.assertIn('_t("실사일")', head)
         # 공개일 표기는 그대로 앞에 남는다(정렬 기준 원칙 불변)
         self.assertLess(head.index('"fnd-doc-date", head.published_date'), head.index("fnd-doc-insp"))
+
+
+
+# ── [브리프 4단 2026-11-12] 주간 현황 ────────────────────────────────────────────
+class WebBriefGlanceTest(unittest.TestCase):
+    """주간 현황 — 건수는 카드 묶음·종류로, 몰린 것 한 줄은 DB 정본(brief_glance.json) 값으로.
+    업체 이름으로 국가를 세지 않는다. 페이지는 따로 원격 호출을 하지 않는다(정적)."""
+
+    @staticmethod
+    def _cards(spec):
+        raw, views = [], []
+        for i, (t, url) in enumerate(spec):
+            raw.append({"card_type": t, "sources": {"official_url": url}})
+            views.append({"card_type": t})
+        return raw, views
+
+    def test_country_line_from_db_values(self):
+        spec = [("FDA 483 실사 관찰", f"https://x/{i}") for i in range(12)] + \
+               [("Warning Letter", f"https://w/{i}") for i in range(5)]
+        raw, views = self._cards(spec)
+        db = {f"https://x/{i}": {"c": "JP", "k": []} for i in range(6)}
+        db.update({f"https://x/{i}": {"c": "US", "k": []} for i in range(6, 10)})
+        line = render._glance_line(views, raw, db, render._KO)
+        self.assertEqual(line, "FDA 483 실사 관찰 12건 중 6건이 일본 소재 제조소")
+
+    def test_falls_back_to_category_and_skips_catchall(self):
+        raw, views = self._cards([("FDA 483 실사 관찰", f"https://x/{i}") for i in range(6)])
+        db = {f"https://x/{i}": {"c": ["US", "JP", "KR", "DK", "IN", "CN"][i],
+                                 "k": ["other_quality_system", "data_integrity"]}
+              for i in range(6)}
+        line = render._glance_line(views, raw, db, render._KO)
+        self.assertEqual(line, "문서 6건 중 6건에 데이터 완전성 지적")
+
+    def test_no_line_without_db_or_concentration(self):
+        raw, views = self._cards([("FDA 483 실사 관찰", f"https://x/{i}") for i in range(4)])
+        self.assertEqual(render._glance_line(views, raw, {}, render._KO), "")
+        db = {"https://x/0": {"c": "JP", "k": []}, "https://x/1": {"c": "JP", "k": []}}
+        self.assertEqual(render._glance_line(views, raw, db, render._KO), "")
+
+    def test_other_card_types_are_not_counted(self):
+        raw, views = self._cards([("Recall", f"https://r/{i}") for i in range(5)])
+        db = {f"https://r/{i}": {"c": "JP", "k": []} for i in range(5)}
+        self.assertEqual(render._glance_line(views, raw, db, render._KO), "")
+
+    def test_groups_count_card_types_in_order(self):
+        sections = [{"name": "글로벌", "count": 3,
+                     "cards": [{"card_type": "Warning Letter"}, {"card_type": "FDA 483 실사 관찰"},
+                               {"card_type": "FDA 483 실사 관찰"}]}]
+        g = render.build_brief_glance(sections, [], [], {}, render._KO)
+        self.assertEqual(g["groups"][0]["parts"],
+                         [{"t": "FDA 483 실사 관찰", "n": 2}, {"t": "Warning Letter", "n": 1}])
+        self.assertEqual(g["line"], "")
+
+    def test_template_is_static_and_snapshot_sits_next_to_live_briefs(self):
+        tpl = (WEB_DIR / "templates" / "brief.html").read_text(encoding="utf-8")
+        sec = tpl[tpl.index('<section class="glance"'):tpl.index("</section>", tpl.index('<section class="glance"'))]
+        self.assertNotIn("<script", sec)
+        self.assertNotIn("data-docs", tpl)
+        self.assertEqual(render.BRIEF_GLANCE_FILE.parent, render.DATA_DIR.parent)
+        # 배포는 링크체크 사본 폴더로 렌더한다 — 정본 경로는 데이터 폴더가 아니라 CLI 가 넘긴다.
+        src = (WEB_DIR / "render.py").read_text(encoding="utf-8")
+        self.assertIn("render_site(args.data, args.out, glance_file=args.glance)", src)
+        self.assertIn('ap.add_argument("--glance", type=Path, default=BRIEF_GLANCE_FILE', src)
+
+    def test_cli_build_from_a_copied_data_dir_still_draws_the_line(self):
+        """링크체크 사본처럼 브리프를 다른 폴더로 옮겨 렌더해도 줄이 선다(11-12 라이브 누락 회귀)."""
+        brief = json.loads((render.DATA_DIR / "brief_web_2026_11_09.json").read_text(encoding="utf-8")) \
+            if (render.DATA_DIR / "brief_web_2026_11_09.json").is_file() else None
+        if brief is None:
+            self.skipTest("11-09 호 없음")
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glance_cli_"))
+        try:
+            data = tmp / "checked"
+            data.mkdir()
+            (data / "brief_web_2026_11_09.json").write_text(json.dumps(brief, ensure_ascii=False),
+                                                           encoding="utf-8")
+            snap = tmp / "glance.json"
+            urls = [c["sources"]["official_url"] for c in brief["cards"]
+                    if c.get("card_type") == "FDA 483 실사 관찰"]
+            snap.write_text(json.dumps({"schema": "grm-brief-glance/v1", "items": {
+                u: {"c": "JP", "k": []} for u in urls}}), encoding="utf-8")
+            out = tmp / "out"
+            render.render_site(data, out, render_doc_pages=False, glance_file=snap)
+            html = (out / "briefs" / "2026-11-09" / "index.html").read_text(encoding="utf-8")
+            self.assertIn(f"FDA 483 실사 관찰 {len(urls)}건 중 {len(urls)}건이 일본 소재 제조소", html)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        snap = json.loads(render.BRIEF_GLANCE_FILE.read_text(encoding="utf-8"))
+        self.assertEqual(snap["schema"], "grm-brief-glance/v1")
+        for v in snap["items"].values():
+            self.assertEqual(set(v), {"c", "k"})
 
 
 if __name__ == "__main__":

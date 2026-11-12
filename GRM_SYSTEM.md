@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.318` |
+| 문서 버전 | `v1.319` |
 | 최종 수정일 | 2026-11-12 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -325,6 +325,7 @@ flowchart TD
 - `grm-stranded-batch-pr.yml`(신설) — 초록인 일일 번역 배치 PR 이 3시간 넘게 안 머지되면 PAT 로 자동 머지, 검사 실패·충돌·outbox 잔류는 이슈로만. 이슈 `일일 번역 배치 PR 방치 — 검사 실패 또는 충돌`.
 - `grm-db-backup.yml` 실패 이슈(신설) — 주간 암호화 DB 백업(행 수 대조 검증) 실패 시 표면화. 이슈 `GRM DB 백업 실패`.
 - `grm-findings-backfill-fetch.yml` backfill-fetch 3연속 실패 이슈(신설) — 483/WL 백필 fetch 가 스케줄 실행에서 3회 연속 실패(예: 리딩룸 봇차단)하면 표면화. 이슈 `GRM Findings Backfill Fetch 연속 실패`.
+- `grm-findings-search-cache-health.yml` — 검색 캐시 daily 갱신(pg_cron 03:10·20·30·40 UTC, 4배치×60행 — 151)이 매일 살아 있는지 본다(`findings_search_cache_health.py`, service_role 전용 `findings_search_cache_job_status()`). 최근 실행 실패·26시간 성공 없음·신선 행 부족이면 전용 라벨 `findings-search-cache-health` 이슈(→ 운영 센터 infra 업무). 11-11·12 갱신이 2분 한도에 걸려 194행 전부 롤백된 뒤 신설 — 갱신은 이제 배치마다 커밋돼 한 번 실패에 배치 하나만 잃는다.
 - `grm-findings-search-cache-sync.yml` — 검색 캐시 daily 목록을 용어사전 사례 링크와 맞추는 동기화(088)가 실패하면 표면화(실패해도 화면은 폴백으로 살아 있어 이슈가 없으면 새 용어 링크가 조용히 느린 채 남는다). 이슈 `[findings-search-cache-sync] 검색 캐시 용어 목록 동기화가 실패했습니다`, 다음 성공 시 자동 종료.
 
 ---
@@ -531,6 +532,7 @@ flowchart TD
 grm-api-intake/
 ├─ GRM_SYSTEM.md, CLAUDE.md, requirements.txt
 ├─ collect_intake.py               # 수집 오케스트레이터(단일 진입점)
+├─ findings_search_cache_health.py # [151] 검색 캐시 daily 갱신 감시(실패·신선 부족 → exit 1, grm-findings-search-cache-health.yml)
 ├─ indexnow_submit.py              # [검색 노출 2026-11-10] IndexNow 제출 — 배포 직후 새/변경 URL 을 네이버·빙에 통지(키 상수=공개값, render 가 /{키}.txt 방출). 수동 전수는 grm-indexnow-full.yml. tests/test_indexnow_submit.py
 ├─ collect_mfds*.py                # 식약처 수집기(recall/admin/gmp_inspection/law/gmp_cert/safety_letter)
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
@@ -620,6 +622,7 @@ grm-api-intake/
 ├─ import_alerts_refresh.py        # [수입경보 1단계] 업체 페이지 "FDA 수입경보 대상" 정본 web/data/import_alerts.json 재생성(import_alert_listing 132 · service_role 읽기 · 공개 필드만, 주소 없음 · 0행/형식/등재 20% 급감 게이트 · 변경 없으면 exit 10)
 ├─ deficiency_cases_refresh.py    # [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 지적 사례 화면·블록 정본 web/data/deficiency_cases.json 재생성(deficiency_examples 134 · service_role 읽기 · 공개 필드만: 영어 지적 문장·기관·연도·기관 분류·우리 분류·조항 키 + MHRA xlsx 조항·문단별 등급 집계, PMDA 배경 설명·익명 실사 ID·국가 없음, PMDA 일본어판은 건수만 · 0행/형식/전체 행 20% 급감 게이트 · 변경 없으면 exit 10)
 ├─ findings_docs_refresh.py        # [검색 유입] 문서 단위 페이지 정본 재측정(지적 3건 이상 · 발행일/원문링크 필수 · 본문 무절단 · 문서 id 정렬로 작은 diff)
+├─ brief_glance_refresh.py         # [브리프 주간 현황] 브리프 483·경고서한 카드 원문 URL → findings 국가·분류(공개 읽기·anon) 정본 web/data/brief_glance.json — grm-news-refresh.yml 이 매일, grm-web-publish.yml 이 발행 때 갱신(실패해도 계속)
 ├─ news_refresh.py                 # [최근 규제 소식] `/news/` 정본(web/data/news.json) 재측정 — 공개 RPC regulatory_news(138·anon·공개 5컬럼)로 최근 60일 비-findings 소식(ECA·ISPE·EMA·관보·회수·PIC/S·WHO·MFDS 지침/공고)
 ├─ firm_history_stamp.py           # 브리프 카드 '이 업체 앞선 지적 기록' 사이드카(web/data/firm_history/<발행일>.json) 생성 — RPC findings_card_history(120) 조회 → 확실/참고용/숨김 판정(시범: 483 FEI 일치 + 식약처 3종)
 ├─ collect_rum_analytics.py        # [성장·유입] Cloudflare Web Analytics(RUM) → Supabase 일별 적재(072/073/075/077 · 그룹마다 별도 GraphQL 요청 · avg{sampleInterval} 동반 저장 · 정확값을 추정값으로 덮지 않음(계층 래칫 PRECISION_BAND=3.0) · 창은 upsert 아닌 삭제 후 삽입 · **질의를 CHUNK_DAYS=3 조각으로 자른다** — ★Cloudflare 의 전수(비표본) 데이터셋 보존이 약 7일이고 그 밖을 조금이라도 건드리는 질의는 통째로 표본으로 떨어진다(2026-09-05 통제 실측: 한 실행·같은 1일 창에서 8/28=간격 12.5 표본, 8/29=간격 1.07 전수). 놓친 날은 영구히 회수 불가라 어릴 때 짧은 창으로 받아 둔다 — 8/10~8/28 이 8일 창 단일 질의로만 물어와 그렇게 굳었다. 조각은 겹치지 않게 자른다(datetime_leq 라 자정에서 맞대면 앞 조각이 다음 날 한 순간을 삼켜 멀쩡한 하루를 ~0 으로 덮는다))
@@ -766,7 +769,7 @@ grm-api-intake/
    ├─ grm-glossary-cases.yml             # [트랙 C] 용어사전 사례연결 건수 주간 재측정(금 03:15 KST) — q·excluded 무변형·건수만·PR→CI green→자동 머지
    ├─ grm-findings-facets.yml            # [검색 유입] 분류·국가·기관 모음 페이지 정본 주간 재측정(수 03:20 KST) — 표본 미달 제외 고지·페이지 20% 축소 시 사람 검토·PR→CI green→자동 머지
    ├─ grm-findings-docs.yml              # [검색 유입] 문서 단위 페이지 정본 주간 재측정(일 03:25 KST) — 발행일/원문링크 필수·문서 10% 축소 시 사람 검토·PR→CI green→자동 머지
-   ├─ grm-news-refresh.yml               # [최근 규제 소식] news_refresh.py 일일 실행(23:47 UTC) — 데이터 파일 1개 PR + CI 게이트 후 머지(골든 불변)
+   ├─ grm-news-refresh.yml               # [최근 규제 소식] news_refresh.py·brief_glance_refresh.py 일일 실행(23:47 UTC) — 데이터 파일 PR + CI 게이트 후 머지(골든 불변)
    ├─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
    ├─ grm-findings-taxonomy-drift.yml    # 분류 표류 감시(주 1회 크론, 읽기 전용 — 적용은 사람이 위 워크플로로)
    └─ grm-findings-embed.yml             # [FIND-1 S2] 임베딩 적재(cron=ENABLE_FINDINGS_EMBED 게이트, dispatch=플래그 무관 dry-run 가능)

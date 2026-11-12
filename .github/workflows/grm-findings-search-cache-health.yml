@@ -1,0 +1,126 @@
+name: GRM Findings Search Cache Health
+
+# [151 · 2026-11-12] 검색 캐시 daily 갱신 잡(pg_cron grm-findings-search-cache-daily — 03:10·20·30·40 UTC
+# 4배치)이 살아 있는지 매일 본다. 11-11·12 이 잡이 2분 한도에 걸려 194행 전부 롤백됐는데 화면은 폴백으로
+# 살아 있었고, site_probe 의 fail 은 다른 실패와 한 이슈(automation-failure)에 묻혔다. 이 워크플로는 이 잡
+# 하나만 보고 **전용 라벨**(findings-search-cache-health → 운영 센터 infra 업무, web/ops_alarm_sync.py)
+# 이슈를 연다. 판정은 findings_search_cache_health.py(최근 실행 실패 · 26시간 성공 없음 · 신선 부족).
+# DB 읽기 RPC 하나뿐(service_role 전용 findings_search_cache_job_status) — git 쓰기·DB 쓰기 0.
+on:
+  schedule:
+    # 03:55 UTC = 12:55 KST — 마지막 배치(03:40) 뒤.
+    - cron: '55 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write        # 실패 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: findings-search-cache-health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    name: Check daily search cache refresh
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check cache refresh job and freshness
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python findings_search_cache_health.py --output cache_health_report.json
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Search Cache Health"
+            echo ""
+            if [ -f cache_health_report.json ]; then
+              echo '```json'
+              cat cache_health_report.json
+              echo '```'
+            else
+              echo "cache_health_report.json 이 생성되지 않았습니다 — 자격증명 미설정 또는 151 미적용."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update cache-health issue
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const title = '[findings-search-cache-health] 검색 캐시 daily 갱신이 멈췄습니다';
+            const label = 'findings-search-cache-health';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            let lines = ['(cache_health_report.json 을 읽지 못함 — Actions 로그 참조)'];
+            try {
+              const report = JSON.parse(fs.readFileSync('cache_health_report.json', 'utf8'));
+              if ((report.problems || []).length) lines = report.problems.map((p) => `- ${p}`);
+            } catch (err) { lines = [`(report 파싱 실패: ${err.message})`]; }
+            const body = [
+              '검색 캐시 daily 갱신(pg_cron `grm-findings-search-cache-daily`)에 문제가 있습니다.',
+              '',
+              ...lines,
+              '',
+              '**왜 중요한가**: 캐시가 죽어도 화면은 원 계산으로 폴백해 살아 있다 — 대신 용어 사례·검색 화면의 첫 호출이 ' +
+                'anon 3초 한도에 걸려 "불러오지 못했습니다"가 뜬다(2026-11-12 실측).',
+              '',
+              '확인(SQL 에디터): `select jsonb_pretty(public.findings_search_cache_job_status());` · ' +
+                '수동 복구: `select public.findings_search_cache_refresh_batch(\'daily\', 60);` 를 남은 행이 없을 때까지.',
+              '',
+              `실행: ${runUrl}`,
+              '',
+              '_다음 실행이 정상이면 자동으로 닫힙니다._',
+            ].join('\n');
+            try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label }); }
+            catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo,
+                name: label, color: 'b60205', description: '검색 캐시 daily 갱신 정지(151)' });
+            }
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find((i) => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `여전히 문제가 있습니다.\n\n${body}` });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner] });
+            }
+
+      - name: Close cache-health issue on recovery
+        if: success() && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[findings-search-cache-health] 검색 캐시 daily 갱신이 멈췄습니다';
+            const label = 'findings-search-cache-health';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter((i) => i.title === title)) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body: `복구됐습니다 — 실행 ${context.runId}` });
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed' });
+            }

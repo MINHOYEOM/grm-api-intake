@@ -581,14 +581,109 @@ def apply_handoff_source_text(deep: dict[str, Any],
     return stats
 
 
+ENV_HANDOFF_BODY_SOURCE = "GRM_HANDOFF_BODY_SOURCE"   # notion(기본) | git
+HANDOFF_MIRROR_BRANCH = "claude/queue-handoff"        # grm-queue-handoff-mirror.yml 이 쓰는 브랜치
+_HANDOFF_FETCHED: dict[str, bool] = {}
+
+
+def handoff_body_source() -> str:
+    """심층분석 원문 정본을 어디서 읽나 — 저장소 변수 GRM_HANDOFF_BODY_SOURCE(없으면 notion).
+
+    notion  그 주 Notion handoff 페이지(종전).
+    git     DB 로 만든 handoff 의 브랜치 사본(`claude/queue-handoff:handoff_{날짜}.json`). 못 읽으면 Notion.
+    델타에 `handoff_ref` 가 있는 호(편집팀이 git handoff 로 만든 호)는 이 변수와 무관하게 git 을 읽는다 —
+    정본은 "분석기가 실제로 본 입력"이어야 하기 때문이다(`_authoritative_source_text`).
+    """
+    value = os.environ.get(ENV_HANDOFF_BODY_SOURCE, "").strip().lower()
+    return SOURCE_GIT if value == SOURCE_GIT else SOURCE_NOTION
+
+
+def git_read_handoff(date_str: str) -> "str | None":
+    """`origin/claude/queue-handoff:handoff_{date}.json` 원문. 브랜치·파일이 없으면 None(WARN 없이).
+
+    사본은 최신 8일분만 남는다 — 오래된 호를 다시 돌리면 None 이 정상이다.
+    """
+    import subprocess
+    ref = f"refs/remotes/origin/{HANDOFF_MIRROR_BRANCH}"
+    if HANDOFF_MIRROR_BRANCH not in _HANDOFF_FETCHED:
+        try:
+            r = subprocess.run(
+                ["git", "fetch", "--quiet", "--no-tags", "origin",
+                 f"+refs/heads/{HANDOFF_MIRROR_BRANCH}:{ref}"],
+                capture_output=True, text=True, timeout=120)
+            _HANDOFF_FETCHED[HANDOFF_MIRROR_BRANCH] = r.returncode == 0
+        except (OSError, subprocess.SubprocessError) as e:
+            log("WARN", f"git fetch 실행 실패({HANDOFF_MIRROR_BRANCH}): {e}")
+            _HANDOFF_FETCHED[HANDOFF_MIRROR_BRANCH] = False
+    if not _HANDOFF_FETCHED[HANDOFF_MIRROR_BRANCH]:
+        return None
+    try:
+        r = subprocess.run(["git", "show", f"{ref}:handoff_{date_str}.json"],
+                           capture_output=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as e:
+        log("WARN", f"git show 실행 실패(handoff_{date_str}.json): {e}")
+        return None
+    return r.stdout.decode("utf-8") if r.returncode == 0 else None
+
+
+def fetch_handoff_body_full_git(date_str: str, expected_sha: str = "",
+                                read=None) -> "dict[str, str] | None":
+    """DB handoff 의 브랜치 사본에서 카드별 심층분석 입력 원문을 읽는다. 쓸 수 없으면 None.
+
+    None 인 경우: 파일 없음 · JSON 아님 · 날짜가 다름 · (expected_sha 를 줬는데) 지문이 다름.
+    지문이 다르다는 것은 편집팀이 읽은 handoff 와 지금 사본이 다르다는 뜻이다 — 다른 원문으로
+    대조하면 멀쩡한 인용이 거짓 FAIL 나거나 틀린 인용이 통과한다. 그럴 때는 쓰지 않는다.
+    """
+    text = (read or git_read_handoff)(date_str)
+    if text is None:
+        return None
+    payload = _try_json_dict(text)
+    if payload is None or payload.get("run_date_kst") != date_str:
+        log("WARN", f"handoff 사본(handoff_{date_str}.json)이 그 날짜의 payload 가 아님 — 사용 안 함")
+        return None
+    if expected_sha:
+        import grm_queue
+        got = grm_queue.payload_sha256(payload)
+        if got != expected_sha:
+            log("WARN", f"handoff 사본 지문이 델타의 handoff_ref 와 다름({got[:12]} != {expected_sha[:12]}) "
+                        "— 사용 안 함")
+            return None
+    bodies = extract_handoff_body_full(payload)
+    log("INFO", f"handoff 심층분석 입력 원문 {len(bodies)}건 확보(git 사본 {date_str})")
+    return bodies
+
+
 def _authoritative_source_text(token: str, db_id: str, date_str: str,
-                               deep: dict[str, Any]) -> None:
+                               deep: dict[str, Any],
+                               handoff_ref: "dict[str, Any] | None" = None) -> None:
     """deep 델타의 `source_text` 를 그 주 handoff 원문으로 맞춘다(얇은 I/O·**비차단**).
 
     `_merge_deep_from_separate_page` 와 같은 이유로 실패가 delta 브릿지를 죽이면 안 된다 —
     이건 선택 계층(deep)의 품질 개선이고, delta 기록은 주간 발행의 필수 경로다. 실패하면
     예치된 `source_text` 로 종전과 100% 동일하게 진행한다(WARN 만 남긴다).
+
+    [노션 은퇴 준비 2026-11-13] 어느 handoff 에서 읽나:
+      - 델타에 `handoff_ref` 가 있다(편집팀이 git handoff 로 만든 호) → **git 사본만**, 지문까지 맞아야 쓴다.
+        맞지 않으면 Notion 으로 넘어가지 않는다 — Notion handoff 는 그 분석기가 본 입력이 아니다.
+      - 없다 + 변수 `GRM_HANDOFF_BODY_SOURCE=git` → git 사본, 못 읽으면 Notion.
+      - 없다 + 변수 없음(기본) → Notion(종전과 같다).
     """
+    ref = handoff_ref if isinstance(handoff_ref, dict) else None
+    if ref is not None or handoff_body_source() == SOURCE_GIT:
+        try:
+            bodies = fetch_handoff_body_full_git(date_str, str((ref or {}).get("sha256") or ""))
+        except Exception as e:  # noqa: BLE001 — 선택 계층. 어떤 실패도 델타 기록을 막지 않는다
+            log("WARN", f"handoff git 사본 조회 실패({date_str}): {type(e).__name__}: {e}")
+            bodies = None
+        if bodies is not None:
+            if bodies:
+                apply_handoff_source_text(deep, bodies)
+            return
+        if ref is not None:
+            log("WARN", f"git handoff 로 만든 호({date_str})인데 사본을 쓸 수 없음 — "
+                        "반납된 source_text 로 계속(Notion handoff 로 대신하지 않는다)")
+            return
+        log("WARN", f"handoff git 사본 없음({date_str}) — Notion handoff 로 넘어감")
     try:
         bodies = fetch_handoff_body_full(token, db_id, date_str)
     except (DeltaBridgeError, NotionHandoffError) as e:
@@ -1100,7 +1195,8 @@ def prepare_git_run(token: str, db_id: str, run: dict[str, Any]
         raise DeltaBridgeError(
             f"git 반납 publish_date={date_str} 가 브랜치 날짜 {run['date']} 와 다릅니다")
     if deep is not None:
-        _authoritative_source_text(token, db_id, date_str, deep)
+        _authoritative_source_text(token, db_id, date_str, deep,
+                                   handoff_ref=delta.get("handoff_ref"))
         deep = _gate_deep_analysis(deep)
     return delta, deep, date_str
 

@@ -10,14 +10,18 @@ on:
   workflow_dispatch:
     inputs:
       command:
-        description: 'seed(초기 이관) 또는 reconcile(상태 다시 계산)'
+        description: 'seed(초기 이관) · reconcile(상태 다시 계산) · backfill-history(노션 지난 N일 행으로 과거 기록 채우기)'
         type: choice
-        options: [seed, reconcile]
+        options: [seed, reconcile, backfill-history]
         default: seed
       since:
         description: 'seed 전용 — 이 시각 뒤에 수집된 행만(ISO, 예: 2026-11-09T03:40:00+09:00)'
         type: string
         default: ''
+      days:
+        description: 'backfill-history 전용 — 며칠 전까지(기본 120, 1~400)'
+        type: string
+        default: '120'
       apply:
         description: '실제로 쓴다(기본 false = dry-run)'
         type: boolean
@@ -56,7 +60,11 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           IN_COMMAND: ${{ inputs.command }}
           IN_SINCE: ${{ inputs.since }}
+          IN_DAYS: ${{ inputs.days }}
           IN_APPLY: ${{ inputs.apply }}
+          # backfill-history 만 노션을 읽는다(쓰지 않는다).
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: |
           set -uo pipefail
           args=()
@@ -68,8 +76,13 @@ jobs:
               args=(seed --since "$IN_SINCE") ;;
             reconcile)
               args=(reconcile --repo-root .) ;;
+            backfill-history)
+              if ! printf '%s' "${IN_DAYS:-}" | grep -qE '^[0-9]{1,3}$'; then
+                echo "::error::days 는 숫자(1~400)"; exit 2
+              fi
+              args=(backfill-history --days "$IN_DAYS") ;;
             *)
-              echo "::error::command 는 seed 또는 reconcile"; exit 2 ;;
+              echo "::error::command 는 seed · reconcile · backfill-history"; exit 2 ;;
           esac
           if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
           python grm_queue.py "${args[@]}" > intake_queue_report.json

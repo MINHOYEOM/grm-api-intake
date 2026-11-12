@@ -74,6 +74,9 @@ jobs:
       #   비교만(차이표는 Actions 요약 + 아티팩트 delta-compare). git 으로 바꾸려면 저장소 변수
       #   GRM_DELTA_SOURCE=git. 같은 날 두 길이 다르면 먼저 main 에 기록된 쪽이 이긴다.
       GRM_DELTA_SOURCE: ${{ (github.event.inputs.source != 'default' && github.event.inputs.source) || vars.GRM_DELTA_SOURCE || 'notion' }}
+      # [노션 은퇴 준비] 심층분석 원문 정본을 어디서 읽나 — notion(기본) | git(DB handoff 의 브랜치 사본, 못 읽으면 노션).
+      #   델타에 handoff_ref 가 있는 호(편집팀이 git handoff 로 만든 호)는 이 값과 무관하게 git 사본을 읽는다.
+      GRM_HANDOFF_BODY_SOURCE: ${{ vars.GRM_HANDOFF_BODY_SOURCE || 'notion' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:

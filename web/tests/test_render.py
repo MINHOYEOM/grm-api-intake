@@ -16069,7 +16069,7 @@ class WebDiscoveryHubTest(unittest.TestCase):
         for path in ("findings/firm/index.html", "findings/inspector/index.html",
                      "findings/trends/index.html", "glossary/index.html"):
             self.assertIn(f'href="{path}', self.landing, path)
-        self.assertIn('action="findings/index.html"', self.landing)
+        self.assertIn('action="search/index.html"', self.landing)
 
 
     # ── 프로파일 맥락 유지(소스 계약 — firm/inspector.js 는 비골든 런타임 파일) ──

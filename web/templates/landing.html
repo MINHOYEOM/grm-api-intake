@@ -5,14 +5,14 @@
     이번 주 핵심+구독 / 신규 공개 문서 → 찾아보기. 알 마스코트·퀴즈·인기 카드·기능 소개는
     홈에서 내렸다. 예시 값은 render.build_home_showcase 가 커밋 스냅샷에서 계산한다(손으로
     적은 예시는 낡는다). 칸마다 데이터가 없으면 그 칸만 빠진다.
-    검색 칸은 지금 있는 지적사항 검색(?q=)을 부른다. 전역 검색 화면이 생기면 action 만 바꾼다.
+    검색 칸은 전역 검색 화면(search/?q=, 헤더 검색과 같은 곳)을 부른다.
     id=watchlist 는 뉴스레터(newsletter.py)가 직링크하는 앵커라 남긴다(파일 간 계약). -#}
 <main class="home">
   <section class="wrap home-top">
     <h1 class="home-h">{{ _("세계 규제기관이 제약 현장에서 지적한 내용을 한국어로 찾아봅니다.") }}</h1>
     <p class="home-lede">{{ _("FDA 483·경고서한, 식약처 실사·행정처분, 캐나다·EU·영국·일본의 공개 기록을 원문과 함께 제공합니다. 주간 브리프는 매주 월요일 발행합니다.") }}</p>
-    <form class="home-search" action="{{ rel_root }}findings/index.html" method="get" role="search">
-      <input type="search" name="q" placeholder="{{ _('업체명, 조항, 용어') }}" aria-label="{{ _('지적사항 검색') }}" autocomplete="off">
+    <form class="home-search" action="{{ rel_root }}search/index.html" method="get" role="search">
+      <input type="search" name="q" placeholder="{{ _('업체명, 조항, 용어, 지적 문장') }}" aria-label="{{ _('검색어') }}" autocomplete="off">
       <button type="submit" class="btn coral">{{ _("검색") }}</button>
     </form>
   </section>

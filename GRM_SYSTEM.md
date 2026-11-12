@@ -571,6 +571,7 @@ grm-api-intake/
 ├─ source_reconcile.py             # 원천 대조 감시 — 원천 건수 = 수집 + 의도적 제외 + 미뤄짐 등식을 매일 센다(grm-source-reconcile)
 ├─ content_completeness.py         # 내용 완전성 감시 — 원자료 전 칸을 펴서 잘림(같은 길이대에서 문장 중간에 끝나는 값의 몰림)·모아 놓고 사이트·브리프에 안 닿는 칸을 찾는다(grm-source-reconcile 의 content 잡, 읽기 전용)
 ├─ backfill_raw_signals_from_notion.py # Notion에만 있고 Supabase raw_signals 사본에 없는 행 채우기(1회성·멱등)
+├─ backfill_raw_signals_modality.py  # raw_signals.modality 빈칸을 수집기와 같은 compute_modality 로 소급(빈칸만·근거 없으면 그대로·dry 기본)
 ├─ hc_inspection_migration_check.py # HC 의약품 GMP 실사 DB의 새 도메인 이전 감지
 ├─ findings_review_queue.py        # needs_review 큐 나이 측정 + 사람 판정 적용(grm-findings-review-queue)
 ├─ collect_fda_import_alert.py     # FDA 수입경보 66-40·66-41 Red List 스냅샷 수집기(독립 경로, 수집 꺼짐·재설계 중, 132)
@@ -751,6 +752,7 @@ grm-api-intake/
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
    ├─ grm-eu-ncr-additional-plan.yml # EU NCR additional 소급 계획 생성(workflow_dispatch·GET 만) → 아티팩트 eu-ncr-additional-plan(90일)
    ├─ grm-raw-signals-notion-backfill.yml # Notion 에만 있는 행(예: WHO WHOPIR)을 raw_signals 로 채움(workflow_dispatch·apply 기본 false=dry-run) → 아티팩트 raw-signals-notion-backfill-report(30일)
+   ├─ grm-raw-signals-modality-backfill.yml # raw_signals.modality 소급(workflow_dispatch·apply 기본 false=dry-run) → 아티팩트 modality-backfill-report(30일)
    ├─ grm-fda-coverage-gate.yml          # 발행 전 FDA 본문 결손 점검(월요일 정기 수집 완료 workflow_run → 결손 483 회수 → handoff·스캐폴드 재생성 → 남으면 automation-warning 이슈)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지 · decide 게이트가 주간 결손도 복구(2026-08-11)
    ├─ grm-library-linkcheck.yml          # [트랙 C] 자료실 링크 상태 점검(status 4값: ok·broken·needs_review·blocked)

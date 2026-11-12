@@ -761,6 +761,7 @@ grm-api-intake/
    ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
    ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·Notion New 행 raw 동기화·잡별 예약 실패 경보)
+   ├─ grm-483-obs-split.yml             # 483 관찰 분할 소급(backfill_483_obs_split.py)을 자격증명 러너에서 실행(workflow_dispatch 전용·apply 기본 false·apply 는 main ref 만·doc_ids 선택) → 아티팩트 fda483-obs-split-report-{dry|apply}(30일)
    ├─ grm-fda483-body-full-backfill.yml # 483 전문 소급(workflow_dispatch·apply 기본 false·probe_pdf·since·limit) → 아티팩트 fda483-body-full-report(30일)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
    ├─ grm-eu-ncr-additional-plan.yml # EU NCR additional 소급 계획 생성(workflow_dispatch·GET 만) → 아티팩트 eu-ncr-additional-plan(90일)

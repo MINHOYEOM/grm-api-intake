@@ -1,0 +1,122 @@
+name: GRM 483 Observation Split
+
+# [2026-11-13] 앞 관찰 상세가 다음 관찰을 삼킨 저장 raw 를 PDF 없이 나누는 소급 도구
+# (backfill_483_obs_split.py, PR #1647)를 Supabase 자격이 있는 러너에서 돌린다.
+# 로컬에는 자격증명이 없어 dry 도 못 돌렸다.
+#
+# 사용: Actions > "GRM 483 Observation Split" > Run workflow.
+#   · 기본(apply=false)은 dry-run — 무엇을 몇 건 나누는지 리포트만 만들고 DB 에 쓰지 않는다.
+#   · apply=true 로 켠 실행만 `--apply` 를 붙인다(raw 판 교체는 raw_signal_apply_version 경유 — 옛 판 보관).
+#   · apply=true 는 main 에서 띄운 실행만 허용한다(미머지 브랜치 코드로 DB 를 쓰지 않는다).
+#   · doc_ids 를 비우면 도구 기본 대상 전건. 지목하면 그 document_id/raw_signal_id 만.
+# 결과: 아티팩트 fda483-obs-split-report-{dry|apply}(JSON 리포트·로그, 30일) + 잡 요약.
+# 트리거는 workflow_dispatch 뿐이다 — 예약·push 없음. 이 워크플로는 findings 를 쓰지 않는다
+# (새 관찰 행은 추출기 재실행, 앞 관찰 국문은 findings_detail_export --mode stale 경로).
+#
+# dispatch 입력은 env 로만 받는다(셸 본문 직접 삽입 금지 — 저장소 관례). 서비스키는 env 로만 전달하며
+# 어떤 스텝도 출력하지 않는다(secrets 는 Actions 가 로그에서 가린다).
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'true = 실제 반영(raw 판 교체). false(기본) = dry-run — 쓰기 없이 분할 규모만 리포트. main 에서 띄운 실행만 apply 가능.'
+        type: boolean
+        default: false
+      doc_ids:
+        description: '선택: 처리할 document_id 또는 raw_signal_id 목록(공백/쉼표 구분). 비우면 도구 기본 대상 전건.'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fda483-ocr-backfill      # 483 raw_signals 를 쓰는 다른 백필·복구와 같은 그룹 — 동시 쓰기 방지
+  cancel-in-progress: false
+
+jobs:
+  split:
+    name: 483 관찰 분할 (dry 기본)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Guard apply to main
+        env:
+          IN_APPLY: ${{ inputs.apply }}
+          REF_NAME: ${{ github.ref }}
+        run: |
+          if [ "${IN_APPLY}" = "true" ] && [ "${REF_NAME}" != "refs/heads/main" ]; then
+            echo "::error::apply=true 는 main 에서 띄운 실행만 허용한다(현재 ref: ${REF_NAME})."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run 483 observation split
+        id: split
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_APPLY: ${{ inputs.apply }}
+          IN_DOC_IDS: ${{ inputs.doc_ids }}
+        run: |
+          set -euo pipefail
+          ARGS=(--report-path obs_split_report.json)
+          if [ "${IN_APPLY}" = "true" ]; then
+            ARGS+=(--apply)
+          fi
+          if [ -n "${IN_DOC_IDS}" ]; then
+            ARGS+=("--doc-ids=${IN_DOC_IDS}")
+          fi
+          python backfill_483_obs_split.py "${ARGS[@]}" 2>&1 | tee obs_split.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Write step summary
+        if: always()
+        env:
+          IN_APPLY: ${{ inputs.apply }}
+          IN_DOC_IDS: ${{ inputs.doc_ids }}
+        run: |
+          {
+            if [ "${IN_APPLY}" = "true" ]; then
+              echo "### :warning: GRM 483 관찰 분할 — APPLY (DB 반영)"
+            else
+              echo "### GRM 483 관찰 분할 — DRY-RUN (쓰기 없음)"
+            fi
+            echo ""
+            echo "apply: \`${IN_APPLY}\` / doc_ids: \`${IN_DOC_IDS}\`"
+            echo ""
+            if [ -f obs_split_report.json ]; then
+              echo '```json'
+              head -c 60000 obs_split_report.json
+              echo ""
+              echo '```'
+            else
+              echo "obs_split_report.json 미생성 — 자격증명(SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY)·조회 실패로 조기 종료 가능. obs_split.log 확인."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fda483-obs-split-report-${{ inputs.apply && 'apply' || 'dry' }}
+          path: |
+            obs_split_report.json
+            obs_split.log
+          retention-days: 30
+          if-no-files-found: warn

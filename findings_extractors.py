@@ -196,6 +196,103 @@ def _from_fda_483_observations(
     raw: dict[str, Any],
     row: dict[str, Any],
 ) -> list[dict[str, Any]]:
+    return [finding for finding, _ordinal, _detail in _fda_483_observation_rows(raw_signal, raw, row)]
+
+
+# [483 추출 수리 2026-11-12] 관찰 하나가 행이 되기 전에 거르는 두 가지.
+# (1) 주석란 잡문 — 483 뒷면 주석란·업체 회신문이 관찰처럼 잘려 들어온 것. 표제 **첫머리**가 이
+#     문구일 때만 잡문이다(실측: "Not annotated *DATES OF INSPECTION…", "Promised to correct within
+#     24 weeks.", "on the FDA 483 dated 03/07/2014 and", "response: Advanced Care Infusion will…").
+#     "AMENDMENT 1" 은 넣지 않는다 — 정상 표제 끝에 쪽 꼬리말로 붙은 실측(270자 표제)이 있다.
+_FDA483_ANNOTATION_TITLE_RE = re.compile(
+    r"^\W*(?:not\s+annotated|promised\s+to\s+correct|reported\s+corrected|response\s*:"
+    r"|on\s+the\s+fda\s+483\s+dated)",
+    re.I,
+)
+# 상세가 실사일 꼬리말로 시작 — 표제가 조각일 때만 잡문으로 본다(정상 표제 + 꼬리말 상세는 실측
+# 10건이 진짜 관찰이라 지우면 안 된다).
+_FDA483_DATES_FOOTER_DETAIL_RE = re.compile(r"^\W*dates\s+of\s+inspection", re.I)
+# (2) 조각 표제 — 30자 미만이면서 두 글자 이상 영단어가 3개 미만('.', 'A.', 'for details.', ', above.').
+_FDA483_FRAGMENT_MAX_LEN = 30
+_FDA483_WORD_RE = re.compile(r"[A-Za-z]{2,}")
+# 표제를 잃은 진짜 관찰을 상세 첫 문장으로 되살릴 때 걷어 낼 머리(반복 적용).
+_FDA483_DETAIL_LEAD_RES = (
+    re.compile(r"^[\s.…,;:]+"),
+    re.compile(r"^\(\s*repeat\s+observation\s*\)\s*", re.I),
+    re.compile(r"^(?:[A-Za-z]|\d{1,2}[A-Za-z]?|[ivxIVX]{1,4})[.)]\s+"),
+    re.compile(r"^\((?:[A-Za-z]|\d{1,2}|[ivxIVX]{1,4})\)\s+"),
+)
+_FDA483_RETITLE_MIN_LEN = 30
+_FDA483_RETITLE_MIN_WORDS = 3
+
+
+def _fda483_is_annotation(deficiency: str) -> bool:
+    return bool(_FDA483_ANNOTATION_TITLE_RE.search(deficiency or ""))
+
+
+def _fda483_is_fragment_title(deficiency: str) -> bool:
+    d = (deficiency or "").strip()
+    return len(d) < _FDA483_FRAGMENT_MAX_LEN and len(_FDA483_WORD_RE.findall(d)) < 3
+
+
+def _fda483_has_lost_title(deficiency: str) -> bool:
+    """제목이 통째로 사라진 꼴('.'·'A.'·'l , .') — 두 글자 이상 영단어가 하나도 없다.
+
+    상호참조 꼬리('for details.'·', above.')는 여기 들지 않는다 — 그쪽은 다른 관찰 본문 속
+    "refer to OBSERVATION N for details" 에서 잘린 하위 항목이라 표제를 되살릴 대상이 아니다
+    (실측 182460 관찰 3 "c) CAPA…" 는 관찰 1 의 하위 항목)."""
+    return not _FDA483_WORD_RE.search(deficiency or "")
+
+
+def _fda483_first_sentence(text: str) -> tuple[str, str]:
+    """`collect_fda_483._first_sentence` 와 같은 규칙(그 모듈은 네트워크 의존이 있어 이 순수 층에서
+    import 하지 않는다). 문장 경계가 없으면 전체가 표제다."""
+    t = re.sub(r"\s+", " ", text or "").strip()
+    if not t:
+        return "", ""
+    m = re.search(r"(?<=[.!?])\s+", t)
+    if m:
+        return t[:m.start()].strip(), t[m.end():].strip()
+    return t, ""
+
+
+def _fda483_title_from_detail(detail: str) -> tuple[str, str] | None:
+    """상세 첫 문장을 표제로(머리의 `.`·`...`·`(REPEAT OBSERVATION)`·열거자 `A.` `a)` 를 걷고).
+    표제가 30자 이상·영단어 3개 이상일 때만 (표제, 나머지 상세), 아니면 None(종전대로 둔다).
+    표제 + 나머지 = 원 상세 — 자르지 않는다."""
+    t = re.sub(r"\s+", " ", detail or "").strip()
+    while True:
+        before = t
+        for lead_re in _FDA483_DETAIL_LEAD_RES:
+            t = lead_re.sub("", t, count=1)
+        if t == before:
+            break
+    title, rest = _fda483_first_sentence(t)
+    if len(title) < _FDA483_RETITLE_MIN_LEN or len(_FDA483_WORD_RE.findall(title)) < _FDA483_RETITLE_MIN_WORDS:
+        return None
+    return title, rest
+
+
+def _fda_483_observation_rows(
+    raw_signal: dict[str, Any],
+    raw: dict[str, Any],
+    row: dict[str, Any],
+) -> list[tuple[dict[str, Any], int, str]]:
+    """관찰 하나 → (finding, 관찰 번호, 그 관찰의 상세). 상세는 findings 행에 싣지 않지만 짝을 같은 경로에서
+    내야 상세 채움이 표제 md5 가 아니라 관찰(= finding_id: raw_signal_id + 관찰 번호 + 표제)로 맞는다.
+
+    [483 추출 수리 2026-11-12 · 보고서 _ops/reports/GRM_483추출수리_dry_2026-11-12.md]
+      - 주석란 잡문(위 정규식)은 행을 만들지 않는다.
+      - 같은 문서에서 **같은 조각 표제가 2번 이상** 나오면(표제 dedup 이 그것들을 1행으로 묶어
+        fragment 로 숨기던 꼴):
+          · 그 번호에 정상 표제(30자 이상) 관찰이 있으면 건너뛴다 — 상호참조 하위 항목이라 내용이
+            부모 관찰 상세에 이미 있다(가짜 조각).
+          · 없고 표제가 통째로 사라진 꼴이면 상세 첫 문장을 표제로 삼는다(고아 번호 = 진짜 관찰).
+            못 하면 종전대로 둔다.
+        한 번만 나오는 조각 표제는 이번 범위 밖이라 종전 그대로다(별도 과제).
+      - finding_id 규칙·ordinal(관찰 번호)·dedup 키(표제)는 바꾸지 않는다. 같은 제목의 서로 다른
+        관찰은 여전히 1행이다 — findings 의 (raw_signal_id, md5(finding_text)) 유일 인덱스가
+        같은 제약이라 키만 바꿔도 저장층에서 막힌다(대표 결정 대기)."""
     observations = _dicts(raw.get("fda_483_observations"))
     if not observations:
         return []
@@ -215,7 +312,7 @@ def _from_fda_483_observations(
     # 한 건에서 나오는 모든 observation/finding 이 동일한 리스트를 공유한다. 그래서 루프
     # 밖에서 한 번만 정규화한다(observation 별로 달라질 이유가 없다).
     inspector_names = _inspector_names(raw.get("fda483_inspectors"))
-    out: list[dict[str, Any]] = []
+    cleaned: list[tuple[int, str, str, str]] = []
     for index, observation in enumerate(observations, start=1):
         deficiency = _compact(
             gf.strip_fda483_page_header(_compact(observation.get("deficiency")), **header_hints)
@@ -225,11 +322,35 @@ def _from_fda_483_observations(
         detail = _compact(
             gf.strip_fda483_page_header(_compact(observation.get("detail")), **header_hints)
         )
-        refs = _extract_us_legal_refs(" ".join(part for part in (deficiency, detail) if part))
-        out.append(gf.finding_from_raw_signal(
+        if _fda483_is_annotation(deficiency):
+            continue
+        if _fda483_is_fragment_title(deficiency) and _FDA483_DATES_FOOTER_DETAIL_RE.search(detail):
+            continue
+        ordinal = _positive_int(observation.get("number"), default=index)
+        cleaned.append((ordinal, deficiency, detail, str(observation.get("detail") or "").strip()))
+
+    title_counts: dict[str, int] = {}
+    titled_ordinals: set[int] = set()
+    for ordinal, deficiency, _detail, _raw_detail in cleaned:
+        key = deficiency.casefold()
+        title_counts[key] = title_counts.get(key, 0) + 1
+        if len(deficiency) >= _FDA483_FRAGMENT_MAX_LEN:
+            titled_ordinals.add(ordinal)
+
+    out: list[tuple[dict[str, Any], int, str]] = []
+    for ordinal, deficiency, detail, raw_detail in cleaned:
+        finding_text, finding_detail = deficiency, raw_detail
+        if _fda483_is_fragment_title(deficiency) and title_counts[deficiency.casefold()] > 1:
+            if ordinal in titled_ordinals:
+                continue
+            retitled = _fda483_title_from_detail(detail) if _fda483_has_lost_title(deficiency) else None
+            if retitled is not None:
+                finding_text, finding_detail = retitled
+        refs = _extract_us_legal_refs(" ".join(part for part in (finding_text, detail) if part))
+        out.append((gf.finding_from_raw_signal(
             raw_signal,
-            finding_text=deficiency,
-            ordinal=_positive_int(observation.get("number"), default=index),
+            finding_text=finding_text,
+            ordinal=ordinal,
             evidence_level="A",
             evidence_url=evidence_url,
             finding_language=_language(row, "EN"),
@@ -237,7 +358,41 @@ def _from_fda_483_observations(
             cfr_refs=refs,
             confidence=0.95,
             review_status="accepted",
-        ))
+        ), ordinal, finding_detail))
+    return out
+
+
+def fda_483_observation_details(raw_signal: dict[str, Any]) -> list[dict[str, Any]]:
+    """[483 상세 짝] 추출기가 남기는 FDA 483 finding 마다 그 관찰의 상세를 짝지어 낸다(순수 함수).
+
+    반환 원소: {"finding_id", "raw_signal_id", "ordinal"(관찰 번호), "finding_text", "detail_text"}.
+    짝은 관찰 단위다 — finding_id(raw_signal_id + 관찰 번호 + 표제 해시, 규칙 불변)로 묶으므로
+    같은 표제가 둘인 문서에서도 남은 행이 **자기 관찰**의 상세를 받는다(표제 md5 단독 짝은 둘 중
+    어느 상세인지 모른다). 표제 dedup 으로 버려진 관찰의 상세는 내지 않는다.
+    detail_text 는 원 관찰 상세(앞뒤 공백만 걷음). 상세 첫 문장으로 표제를 되살린 관찰은 그 나머지다.
+    """
+    if gf.validate_raw_signal(raw_signal):
+        return []
+    raw = _json_object(raw_signal.get("raw_json"))
+    row = _json_object(raw_signal.get("row_json"))
+    if not raw:
+        return []
+    signal = _raw_signal_with_firm_fallback(raw_signal, raw, row)
+    kept = {f["finding_id"] for f in findings_from_raw_signal(raw_signal)}
+    out: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for finding, ordinal, detail in _fda_483_observation_rows(signal, raw, row):
+        fid = finding["finding_id"]
+        if fid not in kept or fid in seen:
+            continue
+        seen.add(fid)
+        out.append({
+            "finding_id": fid,
+            "raw_signal_id": finding["raw_signal_id"],
+            "ordinal": ordinal,
+            "finding_text": finding["finding_text"],
+            "detail_text": detail,
+        })
     return out
 
 

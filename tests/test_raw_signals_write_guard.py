@@ -20,13 +20,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 _WINDOW = 12   # 앞뒤 줄 수
 
-# 파일 → (PATCH 수, merge-duplicates 수). R3 에서 0 으로 줄인다.
-DEBT: dict[str, tuple[int, int]] = {
-    "backfill_483_detail_refresh.py": (1, 0),
-    "backfill_483_ocr_recovery.py": (1, 1),
-    "backfill_mfds_gmp_assessment.py": (1, 0),
-    "backfill_wl_body_recovery.py": (0, 1),
-}
+# 파일 → (PATCH 수, merge-duplicates 수). R3(2026-11-12)에서 4개 도구(483 상세·483 OCR·식약처 평가·
+# WL 본문)를 raw_signal_apply_version 경유로 옮겨 0 이 됐다. 이제 이 목록은 비어 있어야 한다 —
+# DB 쪽도 migration 150 트리거가 함수 밖 원문 변경을 거부한다.
+DEBT: dict[str, tuple[int, int]] = {}
 
 # 원문이 아닌 **파생 칸 하나**만 PATCH 하는 도구(원문·지문·row_json 은 건드리지 않는다). 옛 판 보관
 # 대상이 아니므로 함수를 거치지 않는다 — 대신 PATCH 본문에 원문 칸이 없는지를 아래 시험이 확인한다.

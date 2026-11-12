@@ -1,11 +1,13 @@
 name: raw_signal versions SQL checks
 # [원문 갱신 규칙 R1 2026-11-12] 148_raw_signal_versions.sql 의 함수 계약(지문 검증·낙관적 동시성·
 # 옛 판 보관·baseline 규칙·권한)을 격리 PostgreSQL 에서 확인한다. 운영 DB 에는 닿지 않는다.
+# [R3 2026-11-12] 150_raw_signals_write_lock.sql — 함수 밖 원문 변경 거부·보관표 append-only 도 같은 곳에서.
 on:
   pull_request:
     paths:
       - 'web/migrations/*raw_signal*'
       - 'tests/sql/raw_signal_versions.sql'
+      - 'tests/sql/raw_signals_write_lock.sql'
       - '.github/workflows/grm-raw-signal-versions-check.yml'
   workflow_dispatch:
 permissions:
@@ -21,3 +23,7 @@ jobs:
           sudo systemctl start postgresql
           sudo -u postgres createdb raw_signal_versions_test
           sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d raw_signal_versions_test -f tests/sql/raw_signal_versions.sql
+      - name: Check raw_signals write lock (150) in an isolated PostgreSQL database
+        run: |
+          sudo -u postgres createdb raw_signals_write_lock_test
+          sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d raw_signals_write_lock_test -f tests/sql/raw_signals_write_lock.sql

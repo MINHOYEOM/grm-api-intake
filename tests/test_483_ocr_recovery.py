@@ -290,11 +290,41 @@ class PostResolutionTest(unittest.TestCase):
             fsa._post_rows("https://x.supabase.co", "k", "raw_signals", [{}], "raw_signal_id")
         self.assertIn("resolution=ignore-duplicates", post.call_args[1]["headers"]["Prefer"])
 
-    def test_recovery_opts_into_merge_duplicates(self) -> None:
-        with mock.patch("findings_supabase_append.requests.post") as post:
-            post.return_value = mock.MagicMock(status_code=200, json=lambda: [])
-            rec._upsert_raw_signal("https://x.supabase.co", "k", {"raw_signal_id": "r"})
-        self.assertIn("resolution=merge-duplicates", post.call_args[1]["headers"]["Prefer"])
+    def test_recovery_goes_through_apply_version(self) -> None:
+        """[원문 갱신 규칙 R3 2026-11-12] 회수는 merge-duplicates upsert 가 아니라 함수(148) 경유다 —
+        읽은 시점 지문을 expected 로 넘기고, 옛 판 보관은 DB 가 한다."""
+        import grm_findings as gf
+        import hashlib
+        raw = gf.canonical_json({"a": 1})
+        record = {"raw_signal_id": "r", "raw_json": raw, "row_json": "{}",
+                  "raw_sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest()}
+        with mock.patch("raw_versioning.requests.post") as post:
+            post.return_value = mock.MagicMock(status_code=200, json=lambda: {"status": "applied"})
+            got = rec._upsert_raw_signal("https://x.supabase.co", "k", record,
+                                         row={"raw_signal_id": "r", "raw_sha256": "e" * 64})
+        self.assertEqual(got, (200, [{"raw_signal_id": "r"}], ""))
+        self.assertTrue(post.call_args[0][0].endswith("/rest/v1/rpc/raw_signal_apply_version"))
+        body = post.call_args[1]["json"]
+        self.assertEqual(body["p_expected_raw_sha256"], "e" * 64)
+        self.assertEqual(body["p_change_kind"], "reextract")
+
+    def test_recovery_without_read_fingerprint_refuses(self) -> None:
+        with mock.patch("raw_versioning.requests.post") as post:
+            got = rec._upsert_raw_signal("https://x.supabase.co", "k", {"raw_signal_id": "r"})
+        post.assert_not_called()
+        self.assertEqual(got[2], "missing_expected_raw_sha256")
+
+    def test_conflict_is_a_failure_not_a_silent_success(self) -> None:
+        import grm_findings as gf
+        import hashlib
+        raw = gf.canonical_json({"a": 1})
+        record = {"raw_signal_id": "r", "raw_json": raw, "row_json": "{}",
+                  "raw_sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest()}
+        with mock.patch("raw_versioning.requests.post") as post:
+            post.return_value = mock.MagicMock(status_code=200, json=lambda: {"status": "conflict"})
+            got = rec._upsert_raw_signal("https://x.supabase.co", "k", record,
+                                         row={"raw_signal_id": "r", "raw_sha256": "e" * 64})
+        self.assertEqual(got[2], "apply_version_conflict")
 
 
 class CollectionCappedModeTest(unittest.TestCase):

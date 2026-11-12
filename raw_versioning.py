@@ -29,7 +29,7 @@ def apply_version(base_url: str, service_key: str, *, raw_signal_id: str,
                   expected_raw_sha256: str, record: dict[str, Any], change_kind: str,
                   changed_by: str, content_sha256: str = "",
                   diff_summary: dict[str, Any] | None = None,
-                  post: Callable[..., Any] = requests.post) -> dict[str, Any]:
+                  post: Callable[..., Any] | None = None) -> dict[str, Any]:
     """RPC 호출. 반환: {'status': applied|unchanged|conflict|not_found|error, ...}.
 
     record 는 새 판의 raw_signals 열 값이다. raw_json·row_json·raw_sha256 은 필수이고,
@@ -53,6 +53,7 @@ def apply_version(base_url: str, service_key: str, *, raw_signal_id: str,
     headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}",
                "Content-Type": "application/json"}
     url = f"{base_url.rstrip('/')}/rest/v1/rpc/raw_signal_apply_version"
+    post = post or requests.post   # 호출 시점에 찾는다(시험의 mock.patch 가 닿게)
     for attempt in range(2):
         try:
             resp = post(url, headers=headers, json=body, timeout=_TIMEOUT_S)
@@ -75,3 +76,72 @@ def apply_version(base_url: str, service_key: str, *, raw_signal_id: str,
         return data if isinstance(data, dict) and data.get("status") else {
             "status": "error", "error": "invalid_rpc_response"}
     return {"status": "error", "error": "retry_exhausted"}
+
+
+def run_label(tool: str) -> str:
+    """changed_by 값: 도구 이름 + Actions run id(로컬이면 'local')."""
+    import os
+    return f"{tool}:{os.environ.get('GITHUB_RUN_ID', 'local')}"
+
+
+class ApplyVersionError(RuntimeError):
+    """apply_version 이 applied/unchanged 가 아닌 상태를 돌려줬다(conflict·not_found·error)."""
+
+    def __init__(self, status: str, detail: str = "") -> None:
+        super().__init__(f"apply_version {status}{':' + detail if detail else ''}")
+        self.status = status
+
+
+def replace_raw(base_url: str, service_key: str, row: dict[str, Any], new_raw: dict[str, Any], *,
+                change_kind: str, changed_by: str, diff_summary: dict[str, Any] | None = None,
+                record_extra: dict[str, Any] | None = None, content_sha256: str = "",
+                post: Callable[..., Any] | None = None) -> dict[str, Any]:
+    """[R3] 수리 도구 공용: 읽어 둔 행(row)의 원문을 new_raw 로 바꾼다 — 함수 경유·옛 판 보관.
+
+    row 에는 raw_signal_id·raw_sha256 이 있어야 한다(읽은 시점 지문 = expected).
+    row_json 은 record_extra 에 새 값이 없으면 row 의 것을 그대로 쓴다(PATCH 시절과 같은 동작).
+    applied/unchanged 가 아니면 ApplyVersionError — 호출자는 건별 실패로 세고 넘긴다(멱등 재실행).
+    """
+    rid = str(row.get("raw_signal_id") or "")
+    expected = str(row.get("raw_sha256") or "")
+    if not rid or not expected:
+        raise ApplyVersionError("error", "row 에 raw_signal_id·raw_sha256 필요")
+    text, sha = canonical_raw(new_raw)
+    record: dict[str, Any] = dict(record_extra or {})
+    record["raw_json"] = text
+    record["raw_sha256"] = sha
+    if not isinstance(record.get("row_json"), str) or not record.get("row_json"):
+        record["row_json"] = str(row.get("row_json") or "") or "{}"
+    res = apply_version(base_url, service_key, raw_signal_id=rid, expected_raw_sha256=expected,
+                        record=record, change_kind=change_kind, changed_by=changed_by,
+                        content_sha256=content_sha256, diff_summary=diff_summary, post=post)
+    status = str(res.get("status") or "error")
+    if status not in ("applied", "unchanged"):
+        raise ApplyVersionError(status, str(res.get("error") or ""))
+    return {**res, "new_raw_sha256": sha, "new_raw_json": text}
+
+
+def apply_record(base_url: str, service_key: str, record: dict[str, Any], row: dict[str, Any] | None,
+                 *, change_kind: str, changed_by: str, reason: str,
+                 post: Callable[..., Any] | None = None,
+                 ) -> tuple[int, list[dict[str, Any]] | None, str]:
+    """[R3] 재구성한 raw_signals 레코드 전체(수집기와 같은 함수로 만든 것)를 함수 경유로 교체.
+
+    예전 merge-duplicates upsert 자리에 그대로 들어가도록 반환 모양을 (status, returned, err) 로 맞춘다.
+    row 는 읽어 둔 현재 행(raw_sha256 = expected). 레코드의 raw_json·raw_sha256 은 수집기 경로
+    (grm_findings.raw_signal_from_row)가 정규화해 만든 값이라 DB 검증을 그대로 통과한다.
+    """
+    rid = str(record.get("raw_signal_id") or "")
+    expected = str((row or {}).get("raw_sha256") or "")
+    if not rid or not expected:
+        return 0, None, "missing_expected_raw_sha256"
+    try:
+        res = apply_version(base_url, service_key, raw_signal_id=rid, expected_raw_sha256=expected,
+                            record=record, change_kind=change_kind, changed_by=changed_by,
+                            diff_summary={"reason": reason}, post=post)
+    except ValueError:
+        return 0, None, "invalid_record"
+    status = str(res.get("status") or "error")
+    if status not in ("applied", "unchanged"):
+        return 0, None, f"apply_version_{status}"
+    return 200, [{"raw_signal_id": rid}], ""

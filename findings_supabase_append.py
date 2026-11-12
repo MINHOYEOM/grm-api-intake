@@ -114,11 +114,13 @@ def _post_rows(
 
     `resolution` picks the PostgREST conflict policy and **defaults to the
     append-only behaviour every collector relies on** (`ignore-duplicates`: an
-    existing row is left untouched and simply not returned). The one caller that
-    passes `merge-duplicates` is `backfill_483_ocr_recovery.py`, whose whole job
-    is to repair rows that were stored empty — there, "leave the existing row
-    alone" would be exactly the wrong outcome. Do not flip the default: silently
-    overwriting on re-collection would let a degraded run clobber good data.
+    existing row is left untouched and simply not returned). Repairing an existing
+    raw_signals row never goes through here: since R3 (2026-11-12) it goes through
+    `raw_versioning.apply_record` / `replace_raw` → `raw_signal_apply_version`
+    (migration 148), and migration 150's trigger rejects raw_json/row_json/raw_sha256
+    changes made any other way (including `merge-duplicates`). Do not flip the
+    default: silently overwriting on re-collection would let a degraded run clobber
+    good data.
     """
     url = f"{base_url}/rest/v1/{table}"
     headers = {

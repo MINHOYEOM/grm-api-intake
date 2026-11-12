@@ -27,7 +27,9 @@ name: GRM FDA 483 OCR Recovery
 # (_fetch_fda483_pdf_text / _extract_fda483_excerpt / _extract_483_observations_from_text /
 # _to_item)와 findings_store.raw_signal_from_intake_item 을 그대로 호출해 행을 재구성한다 —
 # 신규 파싱·해시 로직 없음. raw_signal_id 가 document_id 에만 의존하므로 DELETE 없이
-# upsert(merge-duplicates) 한 번으로 교체된다(findings CASCADE 위험 없음). git 쓰기 전무.
+# 제자리 교체된다(findings CASCADE 위험 없음). git 쓰기 전무.
+# [원문 갱신 규칙 R3 2026-11-12] 교체는 raw_signal_apply_version(148) 경유 — 옛 판이 보관표에 남고,
+# 읽은 뒤 다른 도구가 바꿨으면 conflict 로 멈춘다. migration 150 트리거가 다른 길을 거부한다.
 #
 # concurrency: 기존 FDA 483 백필들과 같은 그룹 — 같은 fda.gov 호스트를 두드리므로 직렬화한다.
 #

@@ -30,6 +30,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 import findings_supabase_backfill as fsb
+import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import SOURCE_FDA_483
@@ -337,23 +338,16 @@ def _fetch_rows(base_url: str, service_key: str, since: str, until: str | None =
         params["published_date"] = f"gte.{since}"
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals",
-        select="raw_signal_id,document_id,raw_json", page_size=500,
+        select="raw_signal_id,document_id,raw_sha256,raw_json,row_json", page_size=500,
         order="raw_signal_id.asc", extra_params=params,
     )
 
 
-def _patch(base_url: str, service_key: str, rid: str, raw: dict[str, Any]) -> None:
-    import requests
-    resp = requests.patch(
-        f"{base_url}/rest/v1/raw_signals",
-        params={"raw_signal_id": f"eq.{rid}", "source": f"eq.{SOURCE_FDA_483}"},
-        headers={"apikey": service_key, "Authorization": f"Bearer {service_key}",
-                 "Content-Type": "application/json", "Prefer": "return=minimal"},
-        json={"raw_json": json.dumps(raw, ensure_ascii=False)},
-        timeout=60,
-    )
-    if resp.status_code >= 400:
-        raise RuntimeError(f"PATCH HTTP {resp.status_code}")
+def _patch(base_url: str, service_key: str, row: dict[str, Any], raw: dict[str, Any]) -> None:
+    """[원문 갱신 규칙 R3] raw_json PATCH 대신 raw_signal_apply_version(148) 경유 — 지문·옛 판 보관."""
+    rv.replace_raw(base_url, service_key, row, raw, change_kind="reextract",
+                   changed_by=rv.run_label("backfill_483_detail_refresh"),
+                   diff_summary={"reason": "483_detail_refresh"})
 
 
 def run(
@@ -366,7 +360,7 @@ def run(
     truncated_only: bool = False,
     delay_seconds: float = 0.5,
     text_fn: Callable[[str], tuple[str, str]] = _fetch_text,
-    patch_fn: Callable[[str, dict[str, Any]], None] | None = None,
+    patch_fn: Callable[[dict[str, Any], dict[str, Any]], None] | None = None,
     sleep_fn: Callable[[float], None] = time.sleep,
 ) -> DetailRefreshReport:
     c = _collector()
@@ -448,7 +442,7 @@ def run(
         if dry_run or patch_fn is None:
             continue
         try:
-            patch_fn(rid, {**raw, _OBS_KEY: refreshed})
+            patch_fn(r, {**raw, _OBS_KEY: refreshed})
         except Exception as exc:  # noqa: BLE001
             report.failed += 1
             report.errors.append(f"{doc}: patch_failed:{type(exc).__name__}")
@@ -491,7 +485,7 @@ def main(argv: list[str] | None = None) -> int:
         rows, dry_run=not args.apply, since=since, limit=args.limit, doc_ids=ids or None,
         truncated_only=args.truncated_only,
         delay_seconds=args.delay_seconds,
-        patch_fn=lambda rid, raw: _patch(base_url, service_key, rid, raw),
+        patch_fn=lambda row, raw: _patch(base_url, service_key, row, raw),
     )
     payload = json.dumps(asdict(report), ensure_ascii=False, indent=2)
     print(payload)

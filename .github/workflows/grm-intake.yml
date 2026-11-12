@@ -416,6 +416,18 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
+      # [원문 갱신 규칙 R4] 원문이 고쳐져 지적사항 본문이 바뀐 짝의 restore 계획(WL 복원과 같은 형식
+      # grm-wl-truncation-restore-plan/v1). 번역 세션이 내려받아 `findings_translate.py --export-restore` 로
+      # 영문·국문을 한 PATCH 로 교체한다. 바뀐 짝이 없으면 파일이 없어 무해 스킵.
+      - name: Upload raw update restore plan (R4)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: grm-raw-update
+          path: _raw_update/
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Open issue on failure
         if: failure() && github.event_name == 'schedule'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0

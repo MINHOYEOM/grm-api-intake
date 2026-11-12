@@ -34,19 +34,22 @@
   // 고정값: tests/test_partial_detail_map.py (걷는 예·걷으면 안 되는 예).
   var FOOTER_RULES = [
     ["fda_rep", /(?:\bTHIS\s+DOCUMENT\s+LISTS\s+)?(?:\bOBSERVATIONS?\s+MAD\S*\s+BY\s+\S+\s+)?\bFDA\s+R\S{0,3}PRESENTATIVE[\s\S]{0,120}$/i],
-    ["fda_rep", /\uc774\s*\ubb38\uc11c\ub294\s*\uadc0\uc0ac\s*\uc2dc\uc124[\s\S]{0,20}FDA\s*\ub2f4\ub2f9\uc790[\s\S]{0,80}$/],
+    ["fda_rep", /\uc774\s*\ubb38\uc11c\ub294[^.]{0,40}FDA\s*(?:\ub2f4\ub2f9\uc790|\ub300\ud45c)[\s\S]{0,90}$/],
     ["doc_lists", /(?:\b\w{2,4}\s+)?\bDOCUMENT\s+LISTS?\b[\s\S]{0,60}$/i],
     ["signature", /\bEMPL\S{2,5}\(?S\)?\s*SIGNAT[\s\S]{0,150}$/i],
     ["see_reverse", /\bSEE\s+REVERSE\s*OF\s*THIS\s+PAGE[\s\S]{0,40}$/i],
     ["address", /\b(?:NAME\s+AN\S\s+TITLE\s+OF\s+IND\S*|TITLE\s+OF\s+IND\S*|TO\s+WHOM\s+REPORT\s+ISSUED|F\s?IRM\s?NAME|STREET\s+AD\S{3,5}|C\S{1,3}Y[\s.,~]*(?:AND\s+)?STA\S{0,3}[\s.,~]+(?:\(?Z\S{1,2}P|\S{0,4}\s*<?\.?\.?ODE)|COUNTRY\s+TYPE|TYPE\s+EST\S*\s+INSPECTED)[\s\S]{0,320}$/i],
+    ["district", /\b(?:\S{0,3}ST\S{0,2}RICT\s?(?:OFFICE\s+)?ADD?RESS(?:\s+AND\s+PHONE\s+NUMBER)?|FE\S?\s?I\s?NUMBER|Industry\s+Information:|\(\d{3}\)\s?\d{3}-\s?\d{4}\s+Fax)[\s\S]{0,170}$/i],
+    ["district", /(?:\bDEP\s?ART[\s\S]{0,14}?)?(?:\S{0,8}\s+)?\bOF\s+[HI]{1,2}EAL\s?TH\s+A\S{1,3}\s+H\s?UMA\S{0,4}\s+SER\s?VICES[\s\S]{0,140}$/i],
     ["page_mark", /\bPAGE\s+\S{1,3}\s+OF\s*\S{0,3}\s+PAGES?\b[\s\S]{0,60}$/i],
     ["system_heading", /([.!?"'”)\]])\s+(?:FACILIT\S*|EQUIPMENT|PRODUCTION|LABORATOR\S*|MATERIALS?|PACKAGING|LABELING|QUALITY|AND|&)(?:[\s.]*(?:FACILIT\S*|EQUIPMENT|PRODUCTION|LABORATOR\S*|MATERIALS?|PACKAGING|LABELING|QUALITY|AND|&))*[\s.]*SYSTEMS?(?:[\s.]+(?:FACILIT\S*|EQUIPMENT|PRODUCTION|LABORATOR\S*|MATERIALS?|PACKAGING|LABELING|QUALITY|AND|&)(?:[\s.]*(?:FACILIT\S*|EQUIPMENT|PRODUCTION|LABORATOR\S*|MATERIALS?|PACKAGING|LABELING|QUALITY|AND|&))*[\s.]*SYSTEMS?)*\s*(?:\([^)]{0,24}\))?\s*$/i],
+    ["system_heading", /([.!?"'\u201d)\]\ub2e4])\s+(?:(?:FACILIT\S*|EQUIPMENT|PRODUCTION|LABORATOR\S*|MATERIALS?|PACKAGING|LABELING|QUALITY|AND|&)(?:[\s.]*(?:FACILIT\S*|EQUIPMENT|PRODUCTION|LABORATOR\S*|MATERIALS?|PACKAGING|LABELING|QUALITY|AND|&))*[\s.]*SYSTEMS?\s*)?(?:\ud488\uc9c8|\uc2dc\uc124|\uc124\ube44|\uc7a5\ube44|\ud3ec\uc7a5|\ub77c\ubca8\ub9c1|\ud45c\uc2dc|\uc2dc\ud5d8\uc2e4|\uc2e4\ud5d8\uc2e4|\ubb3c\uc9c8|\uc790\uc7ac|\uc6d0\ub8cc|\uc0dd\uc0b0|\uc81c\uc870|\ubc0f|&|,|\u00b7)(?:\([A-Za-z &.]{2,40}\))?(?:\s*(?:\ud488\uc9c8|\uc2dc\uc124|\uc124\ube44|\uc7a5\ube44|\ud3ec\uc7a5|\ub77c\ubca8\ub9c1|\ud45c\uc2dc|\uc2dc\ud5d8\uc2e4|\uc2e4\ud5d8\uc2e4|\ubb3c\uc9c8|\uc790\uc7ac|\uc6d0\ub8cc|\uc0dd\uc0b0|\uc81c\uc870|\ubc0f|&|,|\u00b7)(?:\([A-Za-z &.]{2,40}\))?)*\s*\uc2dc\uc2a4\ud15c(?:\s*\([A-Za-z &.]{3,60}\))?\s*$/i],
     ["investigator", /([.!?])\s+[A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]*){0,3},\s*Invest\s?igator,?\s*$/],
     ["stray_see", /([.!?\]])[\s\-–—·•.,~_|=*wm]*\s?[$S]EE\.?\s*$/],
     ["trailing_junk", /([.!?\]])[\s\-–—·•‘’'"~,_|=]+$/]
   ];
   var FOOTER_MIN_BODY = 40;
-  var TAIL_SENT_END = /[a-z0-9)\]]\s*[.!?]+["'\u201d\u2019)]?\s*$/;
+  var TAIL_SENT_END = /[a-z0-9)\]\uac00-\ud7a3]\s*[.!?]+["'\u201d\u2019)]?\s*$/;
   var ADDR_LAST_LABEL = /INSPECT\S*|CO\S{0,3}NT\S{0,3}Y\b|ISS\S{0,3}E\S?D?\b/gi;
   var PROSE_RUN = /(?:\b[a-z]{3,}\b[\s,]+){3}\b[a-z]{3,}\b/;
   function addressTailOk(removed) {
@@ -73,6 +76,7 @@
         // 주소 칸은 양식 머리 칸이 쪽 넘김으로 본문 **사이**에 끼는 일이 있다(실측: 칸 뒤에 제품 목록·
         // "This failure also impacts…" 가 이어짐). 마지막 칸 표지 뒤 꼬리가 짧고 산문이 아닐 때만 걷는다.
         if (FOOTER_RULES[i][0] === "address" && !addressTailOk(t.slice(keep))) continue;
+        if (FOOTER_RULES[i][0] === "district" && PROSE_RUN.test(t.slice(keep))) continue;
         t = rest; cuts.push(FOOTER_RULES[i][0]); changed = true;
       }
       if (!changed) break;

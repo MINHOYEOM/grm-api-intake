@@ -83,7 +83,23 @@ TRIM_CUT = [  # (원문 꼬리, 걷힌 뒤 끝, 걷힌 규칙 하나)
      "ZIP CODE, COUNTRY TYPE ESTABLISHMENT INSPECTED Houston, TX 77032-1901 Producer of Sterile Drugs",
      "15340 Vantage Pkwy E Ste 220", "address"),
     ("These methods are capable of accurately quantitating non-viable particulates. - ‘",
-     "quantitating non-viable particulates.", "trailing_junk"),
+     "quantitating non-viable particulates.", "trailing_junk"),    # [11-12 2차] 국문 번역된 바닥글 · 지방청 머리글 줄
+    ("실사 중 파티클 모니터링 기록이 검토되지 않았고 일탈 조사도 수행되지 않았다. -·------· "
+     "이 문서는 실사 중 FDA 담당자가 작성한 관찰사항을 기재한 것이다. 이는",
+     "일탈 조사도 수행되지 않았다.", "fda_rep"),
+    ("출하 시험 중 OOT 처리 방법을 설명하는 절차가 추세 한도 없이 운영되고 있다. "
+     "시설 및 장비 시스템(FACILITIES AND EQUIPMENT SYSTEM)",
+     "추세 한도 없이 운영되고 있다.", "system_heading"),
+    ("입자 시험 결과가 제품과 관련됨을 추가로 시사하는 자료가 검토되지 않았다. "
+     "시설(FACILITY) 및 장비 시스템(SYSTEM)",
+     "검토되지 않았다.", "system_heading"),
+    ("The firm did not perform adequate environmental monitoring of the aseptic area during production. "
+     "DISTRICT ADDRESS ANO PHONE NUMBER 6th & Kipling St. (P. 0. Box 25087) Denver, co 80225- 0087 "
+     "FEJNUMBER (303) 236- 3000 Fax: (303) 236- 3100 3002946837",
+     "aseptic area during production.", "district"),
+    ("The firm did not perform adequate environmental monitoring of the aseptic area during production. "
+     "DEP ART!\\fi:NT OF HEALTH AND HUMAi'l SERVICES FOODAND DRUG ADMINISTRATION D",
+     "aseptic area during production.", "district"),
 ]
 TRIM_KEEP = [  # 걷으면 안 되는 것 — 정상 문장 끝·본문이 뒤에 이어진 바닥글·짧은 본문
     "Ophthalmic Solution, 0.01%, Lot 022621A was compounded on 2/26/2021 using the LF [redacted]",
@@ -94,7 +110,10 @@ TRIM_KEEP = [  # 걷으면 안 되는 것 — 정상 문장 끝·본문이 뒤�
     "The firm validated the process. COUNTRY TYPE ESTABLISHMENT INSPECTED Outsourcing Facility being "
     "conducted as described in SOP-SC-PR-4347, Version 12.0 dated October 31, 2022.",
     "Short note. SEE REVERSE OF THIS PAGE",
-    "Colic Calm® Plus is a homeopathic product marketed for infants.",
+    "Colic Calm® Plus is a homeopathic product marketed for infants.",    # 국문 문장 끝도 본문 — 주소·지방청 칸 뒤에 국문 문장이 이어지면 걷지 않는다
+    "본 시설은 규정을 준수하지 않았다. DISTRICT ADDRESS AND PHONE NUMBER (214)253-5200 이 실패는 다음 충전 라인에도 영향을 미친다.",
+    "Examples of non-sterile powders include Hydromorphone, Morphine, Fentanyl, Bupivacaine and Clonidine.",
+    "The deviation was not recorded in the quality system",
 ]
 
 

@@ -55,7 +55,8 @@ jobs:
           IN_LIMIT: ${{ inputs.limit }}
         run: |
           set -uo pipefail
-          if ! printf '%s' "${IN_SOURCE:-}" | grep -qE '^[A-Za-z0-9 /_.()-]*$'; then
+          # 빈 값 = 전부. printf '' 는 줄이 없어 grep 이 1 을 돌려주므로 빈 값은 검사하지 않는다(run 43146592319).
+          if [ -n "${IN_SOURCE:-}" ] && ! printf '%s' "$IN_SOURCE" | grep -qE '^[A-Za-z0-9 /_.()-]+$'; then
             echo "::error::source 에 허용되지 않는 문자가 있다"; exit 2
           fi
           if [ -n "${IN_LIMIT:-}" ] && ! printf '%s' "$IN_LIMIT" | grep -qE '^[0-9]+$'; then

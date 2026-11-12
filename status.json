@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-12T22:43:17Z",
+ "generated_at": "2026-11-12T23:59:09Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 43330822634,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-12T23:40:26Z",
+    "updatedAt": "2026-11-12T23:58:58Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43330822634"
+   },
    {
     "databaseId": 43129764971,
     "status": "completed",
@@ -45,17 +56,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42528904181"
-   },
-   {
-    "databaseId": 42418072357,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-07T21:54:31Z",
-    "updatedAt": "2026-11-07T22:07:20Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42418072357"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43330878884,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-12T23:40:50Z",
+    "updatedAt": "2026-11-12T23:46:35Z",
+    "headBranch": "automation/glossary-cases-auto-43329750080",
+    "displayTitle": "chore: refresh glossary case counts",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43330878884"
+   },
+   {
     "databaseId": 43300317431,
     "status": "completed",
     "conclusion": "success",
@@ -216,20 +227,20 @@
     "headBranch": "ui-a11y-coral-text",
     "displayTitle": "fix(접근성): 산호색 글자·버튼 대비 4.5:1 (용어·문서·업체·조항)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43264550651"
-   },
-   {
-    "databaseId": 43264536390,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-12T16:59:01Z",
-    "updatedAt": "2026-11-12T17:05:41Z",
-    "headBranch": "ui-a11y-coral-text",
-    "displayTitle": "fix(접근성): 산호색 글자·버튼을 --coral-2 로 — 용어·문서·업체·조항 대비 4.5:1 이상",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43264536390"
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 43333329287,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "workflow_run",
+    "createdAt": "2026-11-12T23:59:02Z",
+    "updatedAt": "2026-11-12T23:59:06Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43333329287"
+   },
    {
     "databaseId": 43130896237,
     "status": "completed",
@@ -273,17 +284,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42530000049"
-   },
-   {
-    "databaseId": 42419098100,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-07T22:07:22Z",
-    "updatedAt": "2026-11-07T22:07:31Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42419098100"
    }
   ],
   "grm-watchlist-notify.yml": [
@@ -655,6 +655,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 43330822634,
+   "created_at": "2026-11-12T23:40:26Z",
+   "has_web_brief": true
+  },
+  {
    "run_id": 43129764971,
    "created_at": "2026-11-12T00:46:38Z",
    "has_web_brief": true
@@ -672,11 +677,6 @@
   {
    "run_id": 42528904181,
    "created_at": "2026-11-08T22:10:37Z",
-   "has_web_brief": true
-  },
-  {
-   "run_id": 42418072357,
-   "created_at": "2026-11-07T21:54:31Z",
    "has_web_brief": true
   }
  ]

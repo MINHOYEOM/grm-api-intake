@@ -764,6 +764,11 @@ def _delta_path(date_str: str) -> str:
     return os.path.join("web", "data", "deltas", f"delta_{_under(date_str)}.json")
 
 
+def _scaffold_path(date_str: str) -> str:
+    """main 에 동결하는 그 호의 스캐폴드(빈 슬롯 브리프). `grm-web-publish.yml` 이 있으면 이것을 쓴다."""
+    return os.path.join("web", "data", "scaffolds", f"brief_web_{_under(date_str)}.json")
+
+
 def _deep_path(date_str: str) -> str:
     return os.path.join("web", "data", "deltas", f"deep_{_under(date_str)}.json")
 
@@ -1147,6 +1152,62 @@ def _load_existing(date_str: str) -> tuple["dict[str, Any] | None", "dict[str, A
     return out[0], out[1]
 
 
+SCAFFOLD_RUN_NAME = "scaffold.json"   # 교열이 코드 검사에 쓴 스캐폴드를 실행 폴더에 복사해 둔 것
+
+
+def load_run_scaffold(run: dict[str, Any], delta: dict[str, Any], read=None) -> "str | None":
+    """git handoff 로 만든 호의 스캐폴드 원문. 해당 없으면 None, 있어야 하는데 못 쓰면 DeltaBridgeError.
+
+    [대기열 3단계 2026-11-13] 편집팀이 DB handoff(`claude/queue-handoff`)를 읽고 만든 호는 델타에
+    `handoff_ref` 가 붙는다. 그 호의 기자는 **DB 로 만든 스캐폴드**의 사실 칸을 보고 썼다. 발행 조립이
+    수집 실행의 아티팩트(노션 길로 만든 스캐폴드)를 쓰면 사실 칸이 다를 수 있으므로, 교열이 검사에 쓴
+    바로 그 파일을 main 에 동결해 발행이 그것을 쓰게 한다.
+      - 델타에 `handoff_ref` 없음(노션 handoff 로 만든 호) → None. 실행 폴더에 파일이 있어도 쓰지 않는다.
+      - 있음 → `scaffold.json` 이 있어야 하고, 그 날짜의 것이어야 하고, 델타의 카드를 전부 갖고 있어야 한다.
+        하나라도 아니면 예외 — 호출부가 git 반납을 버리고 노션 예비 길로 넘긴다(틀린 재료로 발행하지 않는다).
+    돌려주는 것은 **원문 그대로**다(다시 직렬화하지 않는다 — 교열이 검사한 바이트를 그대로 동결).
+    """
+    if not isinstance(delta.get("handoff_ref"), dict):
+        return None
+    read = read or git_read_run_file
+    text = read(run["date"], SCAFFOLD_RUN_NAME)
+    if text is None:
+        raise DeltaBridgeError(
+            f"git handoff 로 만든 호인데 {run.get('branch')} 에 {SCAFFOLD_RUN_NAME} 이 없다")
+    obj = _try_json_dict(text)
+    cards = obj.get("cards") if obj is not None else None
+    if not isinstance(cards, list):
+        raise DeltaBridgeError(f"{SCAFFOLD_RUN_NAME}: 스캐폴드 모양이 아니다(cards 목록 없음)")
+    brief = obj.get("brief") if isinstance(obj.get("brief"), dict) else {}
+    if brief.get("run_date_kst") != run["date"]:
+        raise DeltaBridgeError(
+            f"{SCAFFOLD_RUN_NAME}: run_date_kst={brief.get('run_date_kst')!r} 가 {run['date']} 가 아니다")
+    have = {str(c.get("id")) for c in cards if isinstance(c, dict)}
+    missing = sorted(k for k in (delta.get("cards") or {}) if k not in have)
+    if missing:
+        raise DeltaBridgeError(
+            f"{SCAFFOLD_RUN_NAME}: 델타 카드 {len(missing)}장이 스캐폴드에 없다(예: {missing[:3]})")
+    return text
+
+
+def write_scaffold(text: str, date_str: str) -> bool:
+    """스캐폴드 원문을 main 경로에 쓴다. 반환 = 새로 썼는가. 이미 있으면 **건드리지 않는다**(동결).
+
+    이미 있는 파일과 내용이 다르면 경고만 한다 — 먼저 동결된 것이 그 호의 발행 재료다.
+    """
+    path = _scaffold_path(date_str)
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8", newline="") as f:
+            if f.read() != text:
+                log("WARN", f"스캐폴드 {path} 가 이미 있고 내용이 다릅니다 — 먼저 동결된 것을 유지합니다.")
+        return False
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
+        f.write(text.encode("utf-8"))
+    log("INFO", f"스캐폴드 동결: {path}")
+    return True
+
+
 def bridge_from_git(token: str, db_id: str, date_str: str, read=None) -> "int | None":
     """git 모드: 채택 가능한 git 반납이 있으면 기록하고 종료코드를, 아니면 None(노션으로 넘김).
 
@@ -1164,6 +1225,11 @@ def bridge_from_git(token: str, db_id: str, date_str: str, read=None) -> "int | 
     except NotionHandoffError as e:
         log("WARN", f"git 반납 처리 중 노션 조회 실패 — 노션 예치로 넘어감: {e}")
         return None
+    try:
+        scaffold_text = load_run_scaffold(run, delta, read=read)
+    except DeltaBridgeError as e:
+        log("WARN", f"git 반납의 스캐폴드를 쓸 수 없음 — 노션 예치로 넘어감: {e}")
+        return None
 
     conflicts = _existing_conflicts(delta, deep, date_str)
     if conflicts:
@@ -1177,6 +1243,8 @@ def bridge_from_git(token: str, db_id: str, date_str: str, read=None) -> "int | 
         wrote = False
     else:
         wrote = write_delta(delta, deep, date_str)
+        if scaffold_text is not None and write_scaffold(scaffold_text, date_str):
+            wrote = True
         # 같은 날 노션 예치도 있으면 비교만 하고 그 페이지는 OPEN 으로 둔다(사람이 볼 물증).
         try:
             page = select_open_delta(token, db_id, publish_date=date_str)

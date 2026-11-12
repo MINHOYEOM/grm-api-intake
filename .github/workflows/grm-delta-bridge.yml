@@ -131,6 +131,10 @@ jobs:
           if [ -f "web/data/deltas/deep_${U}.json" ]; then
             git add "web/data/deltas/deep_${U}.json"
           fi
+          # [대기열 3단계] git handoff 로 만든 호는 교열이 검사한 스캐폴드를 함께 동결한다(delta_bridge.write_scaffold).
+          if [ -f "web/data/scaffolds/brief_web_${U}.json" ]; then
+            git add "web/data/scaffolds/brief_web_${U}.json"
+          fi
           SRC="${{ steps.bridge.outputs.source }}"
           if [ "$SRC" = "git" ]; then MSG="편집팀 git 반납"; else MSG="라우틴 델타"; fi
           git commit -m "bridge(web): ${{ steps.bridge.outputs.date }} ${MSG} 커밋 (자동)"

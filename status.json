@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-12T00:56:01Z",
+ "generated_at": "2026-11-12T01:01:38Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43131548436,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-12T01:01:26Z",
+    "updatedAt": "2026-11-12T01:01:30Z",
+    "headBranch": "fix/ui-tier1-popup-mascot",
+    "displayTitle": "fix(web): 공지 팝업 → 지적사항 화면 띠 · 구름이는 퀴즈·마이페이지에만 (UI 1단)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43131548436"
+   },
+   {
     "databaseId": 43122876390,
     "status": "completed",
     "conclusion": "success",
@@ -216,27 +227,16 @@
     "headBranch": "main",
     "displayTitle": "fix(inspector): 기관 전환을 보기 전환 모양으로 · 라벨 FDA / 식약처(MFDS) (#1560)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43065789746"
-   },
-   {
-    "databaseId": 43060376746,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-11T16:38:48Z",
-    "updatedAt": "2026-11-11T16:44:44Z",
-    "headBranch": "fix/inspector-source-toggle",
-    "displayTitle": "fix(inspector): 기관 전환을 보기 전환 모양으로 · 라벨 FDA / 식약처(MFDS)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43060376746"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 43130896237,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-12T00:55:55Z",
-    "updatedAt": "2026-11-12T00:55:59Z",
+    "updatedAt": "2026-11-12T00:56:05Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43130896237"

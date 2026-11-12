@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [찾아보기 2026-11-12 · 대표 확정안 1] 사이트 색인. "지적사항" 메뉴와 탭 3묶음(찾기·경향·점검)을
+    대신한다 — 메뉴는 주간 브리프 / 찾아보기 / 관심 목록 셋이고, 나머지 면은 전부 이 한 화면에서
+    보인다. 목록은 render.py BROWSE_SECTIONS(그 트리에 실제로 쓰인 면만). 맨 위 검색칸은 헤더와
+    같은 검색 결과 화면으로 보낸다. grm.css 동결 — 토큰만 쓰는 스코프 style.
+    §4 한글안전: 자간·대문자·mono 미사용. -#}
+<style>
+.bw{padding:40px 0 72px}
+.bw h1{font-family:var(--serif);font-size:clamp(26px,3.6vw,34px);color:var(--ink);margin:0 0 10px}
+.bw-lede{color:var(--body);margin:0 0 22px;line-height:1.7;word-break:keep-all;max-width:44em}
+.bw-form{display:flex;gap:8px;max-width:640px;margin:0 0 40px}
+.bw-form input{flex:1 1 auto;min-width:0;font:inherit;font-size:16px;padding:11px 16px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--canvas);color:var(--ink)}
+.bw-form input:focus{outline:2px solid var(--coral);outline-offset:1px}
+.bw-form button{flex:none;font:inherit;font-size:15px;padding:0 20px;border:0;border-radius:var(--rad);background:var(--ink);color:#fff;cursor:pointer}
+.bw-sec{margin:0 0 34px}
+.bw-sec h2{font-size:15px;color:var(--muted);font-weight:600;margin:0 0 4px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.bw-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:36px}
+.bw-list li{border-bottom:1px solid var(--line)}
+.bw-list a{display:block;padding:13px 0;text-decoration:none}
+.bw-list b{display:block;font-size:16px;color:var(--ink);font-weight:600}
+.bw-list span{display:block;font-size:13.5px;color:var(--muted);margin-top:3px;line-height:1.55;word-break:keep-all}
+.bw-list a:hover b{color:var(--coral)}
+@media(max-width:700px){ .bw{padding-top:26px} .bw-list{grid-template-columns:minmax(0,1fr)} }
+</style>
+<main class="bw">
+  <div class="wrap">
+    <h1>{{ _("찾아보기") }}</h1>
+    <p class="bw-lede">{{ _("업체, 실사관, 조항, 용어부터 기관별 경향과 공개 문서까지 사이트의 모든 색인") }}</p>
+    <form class="bw-form" action="{{ rel_root }}search/index.html" method="get" role="search">
+      <input name="q" type="search" autocomplete="off" placeholder="{{ _('업체명, 조항, 용어, 지적 문장') }}" aria-label="{{ _('검색어') }}">
+      <button type="submit">{{ _("검색") }}</button>
+    </form>
+    {% for sec in browse %}
+    <section class="bw-sec">
+      <h2>{{ sec.title }}</h2>
+      <ul class="bw-list">
+        {% for it in sec["items"] %}
+        <li><a href="{{ rel_root }}{{ it.path }}index.html"><b>{{ it.name }}</b>{% if it.desc %}<span>{{ it.desc }}</span>{% endif %}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}

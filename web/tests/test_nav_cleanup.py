@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""[1안 메뉴 정리 2026-11-10] 상단 메뉴·지적사항 탭·푸터 도구 열·'다음으로 볼 것'.
+"""[메뉴 3개·찾아보기·전역 검색 2026-11-12 · 대표 확정안] 상단 메뉴·찾아보기·푸터·'다음으로 볼 것'.
 
-  · 상단 nav: '트렌드' 탭 없음(지적사항 탭으로 이동) · 서랍의 '이번 주 소식' 없음
-  · 지적사항 탭(2026-11-11): 위 줄 묶음 3개(찾기·경향·점검) + 아래 줄 그 묶음의 화면, 존 모든 면에서 같다
-  · 푸터 지적사항 열: 탭과 같은 묶음·이름·순서 · 둘러보기 면 없음(옛 주소 301)
+  · 상단 nav: 주간 브리프 / 찾아보기 / 관심 목록(반응 계층이 켜진 빌드만) — "지적사항" 메뉴 없음
+  · 탭 3묶음(찾기·경향·점검, #1533)은 폐기 — 어느 면에도 `fnd-seg` 가 없다
+  · 찾아보기(/browse/): 옛 탭이 잇던 면을 전부 잇고, 링크는 전부 실재하는 페이지로
+  · 헤더 검색칸 → /search/(noindex·sitemap 제외), 색인 assets/lookup*.json
+  · 푸터 '찾아보기' 열 · 옛 둘러보기 주소(/findings/browse/)는 /browse/ 로 301
   · 다음으로 볼 것: 용어 낱장·문서·업체 페이지에만, 링크는 전부 실재하는 페이지로
 
 CI 는 `tests/test_web_nav_cleanup.py` shim 으로 순회한다. 직접:
@@ -11,6 +13,7 @@ CI 는 `tests/test_web_nav_cleanup.py` shim 으로 순회한다. 직접:
 """
 from __future__ import annotations
 
+import json
 import pathlib
 import re
 import shutil
@@ -25,30 +28,22 @@ import render  # noqa: E402
 
 SINGLE_FIXTURES = pathlib.Path(__file__).resolve().parent / "fixtures" / "single"
 
-# [탭 3묶음 2026-11-11 · 대표 승인] 지적사항 존의 면 — (경로, 켜질 묶음, 켜질 화면)
-GROUPS = ["찾기", "경향", "점검"]
-SUBS = {
-    "찾기": ["검색", "문서", "분류", "업체", "실사관"],
-    "경향": ["지적 영역", "지적 조항", "실사 결과", "데이터 현황"],
-    "점검": ["지적 사례", "체크리스트"],
-}
+# 옛 탭 3묶음이 잇던 면 — 이제 찾아보기가 잇는다(nav 의 '찾아보기'가 켜진다).
 ZONE_PAGES = [
-    ("findings/index.html", "찾기", "검색"),
-    ("findings/docs/index.html", "찾기", "문서"),
-    ("findings/c/index.html", "찾기", "분류"),
-    ("findings/agency/index.html", "찾기", "분류"),
-    ("findings/firm/index.html", "찾기", "업체"),
-    ("findings/import-alerts/index.html", "찾기", "업체"),
-    ("findings/inspector/index.html", "찾기", "실사관"),
-    ("findings/trends/index.html", "경향", "지적 영역"),
-    ("findings/citations/index.html", "경향", "지적 조항"),
-    ("findings/citations/firms/index.html", "경향", "지적 조항"),
-    ("findings/inspections/index.html", "경향", "실사 결과"),
-    ("findings/coverage/index.html", "경향", "데이터 현황"),
-    ("findings/examples/index.html", "점검", "지적 사례"),
-    ("findings/examples/pmda/index.html", "점검", "지적 사례"),
-    ("findings/examples/mhra/index.html", "점검", "지적 사례"),
-    ("findings/checklist/index.html", "점검", "체크리스트"),
+    "findings/index.html", "findings/docs/index.html", "findings/c/index.html",
+    "findings/agency/index.html", "findings/firm/index.html",
+    "findings/import-alerts/index.html", "findings/inspector/index.html",
+    "findings/trends/index.html", "findings/citations/index.html",
+    "findings/citations/firms/index.html", "findings/inspections/index.html",
+    "findings/coverage/index.html", "findings/examples/index.html",
+    "findings/examples/pmda/index.html", "findings/examples/mhra/index.html",
+    "findings/checklist/index.html",
+]
+# 찾아보기가 반드시 잇는 면(옛 탭의 화면 전부 + 용어사전·자료실·이용안내).
+BROWSE_MUST = [
+    "findings/firm/", "findings/inspector/", "glossary/", "findings/trends/",
+    "findings/c/", "findings/inspections/", "findings/docs/", "findings/",
+    "findings/checklist/", "findings/coverage/", "library/", "guide/",
 ]
 STRIP_H = "다음으로 볼 것"
 
@@ -60,23 +55,13 @@ def _nav(html: str) -> tuple[str, str]:
     return tabs, more
 
 
-def _seg(html: str) -> str:
-    i = html.index('<nav class="fnd-seg"')
-    return html[i:html.index("</nav>", i)]
-
-
 def _labels(fragment: str) -> list[str]:
     return [re.sub(r"<[^>]+>", "", t).strip()
             for t in re.findall(r"<a [^>]*>(.*?)</a>", fragment, re.S)]
 
 
-def _part(seg: str, cls: str) -> str:
-    i = seg.index(f'<div class="{cls}">')
-    return seg[i:seg.index("</div>", i)]
-
-
-def _fnd_col(html: str) -> str:
-    i = html.index('<div class="foot-fnd"><h5>지적사항</h5>')
+def _fnd_col(html: str, h5: str = "찾아보기") -> str:
+    i = html.index(f'<div class="foot-fnd"><h5>{h5}</h5>')
     return html[i:html.index("</div>", i)]
 
 
@@ -103,20 +88,20 @@ class NavCleanupRenderedTest(unittest.TestCase):
         return sorted(self.out.rglob("index.html"))
 
     # ── 상단 nav ─────────────────────────────────────────────────────────
-    def test_nav_has_no_trends_tab_and_no_this_week_item(self):
+    def test_nav_is_brief_browse_watchlist(self):
         for rel in ("index.html", "archive/index.html", "findings/trends/index.html",
-                    "glossary/index.html"):
+                    "glossary/index.html", "browse/index.html"):
             tabs, more = _nav(self._read(rel))
-            self.assertNotIn("findings/trends/", tabs, rel)
-            self.assertNotIn(">트렌드<", tabs, rel)
             self.assertNotIn("이번 주 소식", tabs + more, rel)
-            self.assertEqual(_labels(tabs),
-                             ["주간 브리프", "지적사항", "자료실", "용어사전", "이용안내"], rel)
+            # 반응 계층(관심 목록)은 로컬·CI 빌드에서 꺼져 있다.
+            self.assertEqual(_labels(tabs), ["주간 브리프", "찾아보기"], rel)
+            self.assertNotIn("지적사항", tabs, rel)
+            self.assertNotIn("주간 퀴즈", tabs + more, rel)
 
-    def test_trends_zone_lights_findings_tab(self):
-        for rel, _group, _active in ZONE_PAGES:
+    def test_zone_pages_light_browse_tab(self):
+        for rel in ZONE_PAGES + ["glossary/index.html", "library/index.html", "browse/index.html"]:
             tabs, _ = _nav(self._read(rel))
-            self.assertIn('class="on">지적사항</a>', tabs, rel)
+            self.assertIn('class="on">찾아보기</a>', tabs, rel)
 
     def test_archive_top_links_latest_issue(self):
         html = self._read("archive/index.html")
@@ -127,71 +112,79 @@ class NavCleanupRenderedTest(unittest.TestCase):
         self.assertEqual(m.group(1), latest.group(1))
         self.assertTrue((self.out / "archive" / m.group(1)).resolve().is_file())
 
-    # ── 지적사항 탭(묶음 3 · 화면) ─────────────────────────────────────────
-    def test_segment_groups_and_subs_across_zone(self):
-        group_dests = None
-        sub_dests: dict[str, list] = {}
-        for rel, group, active in ZONE_PAGES:
-            seg = _seg(self._read(rel))
-            g, sub = _part(seg, "fnd-seg-g"), _part(seg, "fnd-seg-s")
-            self.assertEqual(_labels(g), GROUPS, rel)
-            self.assertEqual(re.findall(r'class="on" aria-current="true">([^<]+)</a>', g), [group], rel)
-            self.assertEqual(_labels(sub), SUBS[group], rel)
-            self.assertEqual(re.findall(r'aria-current="page">([^<]+)</a>', sub), [active], rel)
-            # 면마다 깊이가 달라(../ vs ../../) 상대 경로 문자열은 다르다 — 해석한 목적지로 비교한다.
-            here = (self.out / rel).parent
-            gd = [here.joinpath(h).resolve() for h in re.findall(r'href="([^"]+)"', g)]
-            sd = [here.joinpath(h).resolve() for h in re.findall(r'href="([^"]+)"', sub)]
-            group_dests = group_dests or gd
-            self.assertEqual(gd, group_dests, f"{rel} 의 묶음 링크가 다른 면과 다르다")
-            sub_dests.setdefault(group, sd)
-            self.assertEqual(sd, sub_dests[group], f"{rel} 의 화면 링크가 같은 묶음의 다른 면과 다르다")
-            for d in gd + sd:
-                self.assertTrue(d.is_file(), f"{rel} → {d}")
-            self.assertNotIn('class="tr-seg"', self._read(rel), rel)
-        self.assertEqual(set(sub_dests), set(GROUPS))
-
-    def test_segment_on_facet_item_pages(self):
-        pages = sorted((self.out / "findings" / "c").glob("*/index.html"))[:3]
-        self.assertTrue(pages, "분류 모음 하위 페이지가 픽스처 빌드에 없다")
-        for p in pages:
-            seg = _seg(p.read_text(encoding="utf-8"))
-            self.assertEqual(re.findall(r'aria-current="page">([^<]+)</a>', seg), ["분류"], str(p))
-
-    def test_en_segment_matches(self):
-        segs = {rel: _seg(self._read("en/" + rel)) for rel, _g, _a in ZONE_PAGES
-                if (self.out / "en" / rel).is_file()}
-        self.assertIn("findings/trends/index.html", segs)
-        for rel, seg in segs.items():
-            g = _part(seg, "fnd-seg-g")
-            self.assertEqual(_labels(g), ["Find", "Patterns", "Check"], rel)
-            for h in re.findall(r'href="([^"]+)"', seg):
-                self.assertTrue((self.out / "en" / rel).parent.joinpath(h).resolve().is_file(), f"en/{rel} → {h}")
-
-    def test_browse_face_retired_with_redirect(self):
-        """둘러보기 면은 없앴다 — 페이지·sitemap 에 없고, 옛 주소는 검색 면으로 301."""
-        self.assertFalse((self.out / "findings" / "browse").exists())
-        self.assertFalse((self.out / "en" / "findings" / "browse").exists())
-        self.assertNotIn("findings/browse/", (self.out / "sitemap.xml").read_text(encoding="utf-8"))
-        red = (self.out / "_redirects").read_text(encoding="utf-8")
-        self.assertIn("/findings/browse/ /findings/ 301\n", red)
-        self.assertIn("/en/findings/browse/ /en/findings/ 301\n", red)
+    # ── 탭 3묶음 폐기 · 찾아보기 ─────────────────────────────────────────
+    def test_no_segment_tabs_anywhere(self):
         for p in self._all_pages():
-            self.assertNotIn("findings/browse/", p.read_text(encoding="utf-8"), str(p))
+            html = p.read_text(encoding="utf-8")
+            self.assertNotIn('class="fnd-seg"', html, str(p))
 
-    # ── 푸터 '지적사항' 열 ────────────────────────────────────────────────
-    def test_footer_findings_column_follows_tabs(self):
+    def test_browse_links_every_former_tab_target(self):
+        for root in ("", "en/"):
+            html = self._read(root + "browse/index.html")
+            main = html[html.index('<main class="bw">'):html.index("</main>")]
+            here = (self.out / root / "browse")
+            dests = {here.joinpath(h).resolve() for h in re.findall(r'href="([^"]+)"', main)
+                     if not h.startswith("#")}
+            for d in dests:
+                self.assertTrue(d.is_file(), f"{root}browse → {d}")
+            for must in BROWSE_MUST:
+                target = (self.out / root / must / "index.html").resolve()
+                if root and not target.is_file():
+                    continue  # 영어 트리에 없는 면은 광고하지 않는다
+                self.assertIn(target, dests, f"{root}browse 에 {must} 없음")
+
+    def test_facet_views_kept_on_facet_pages(self):
+        html = self._read("findings/c/index.html")
+        self.assertIn('class="fnd-views"', html)
+
+    def test_browse_redirect_and_sitemap(self):
+        self.assertFalse((self.out / "findings" / "browse").exists())
+        sm = (self.out / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertNotIn("findings/browse/", sm)
+        self.assertIn("/browse/</loc>", sm)
+        self.assertNotIn("/search/", sm)
+        red = (self.out / "_redirects").read_text(encoding="utf-8")
+        self.assertIn("/findings/browse/ /browse/ 301\n", red)
+        self.assertIn("/en/findings/browse/ /en/browse/ 301\n", red)
+
+    # ── 전역 검색 ─────────────────────────────────────────────────────────
+    def test_header_search_form_and_search_page(self):
+        for root in ("", "en/"):
+            html = self._read(root + "glossary/index.html")
+            m = re.search(r'<form class="nav-search" action="([^"]+)"', html)
+            self.assertIsNotNone(m, root)
+            self.assertTrue((self.out / root / "glossary").joinpath(m.group(1)).resolve().is_file())
+            sp = self._read(root + "search/index.html")
+            self.assertIn('name="robots" content="noindex', sp)
+            self.assertNotIn('class="nav-search"', sp)  # 검색 화면 자신은 헤더 칸이 없다
+            self.assertIn('id="grm-search-cfg"', sp)
+        for name, lang in (("lookup.json", "ko"), ("lookup.en.json", "en")):
+            d = json.loads((self.out / "assets" / name).read_text(encoding="utf-8"))
+            self.assertEqual(d["schema"], "grm-lookup/v1")
+            self.assertEqual(d["lang"], lang)
+            self.assertTrue(d["terms"])
+            pfx = "" if lang == "ko" else "en/"
+            for t in d["terms"][:20]:
+                self.assertTrue((self.out / pfx / "glossary" / t["id"] / "index.html").is_file(), t["id"])
+            for f in d["firms"]:
+                self.assertTrue((self.out / pfx / "findings" / "firm" / f["slug"] / "index.html").is_file(), f["slug"])
+            for c in d["clauses"]:
+                self.assertTrue((self.out / pfx / "findings" / "clause" / c["slug"] / "index.html").is_file(), c["slug"])
+            if lang == "en":
+                blob = json.dumps(d, ensure_ascii=False)
+                self.assertIsNone(re.search(r'"n": "[^"]*[가-힣]', blob), "영어 색인 표제에 한글")
+
+    # ── 푸터 '찾아보기' 열 ────────────────────────────────────────────────
+    def test_footer_browse_column(self):
         for rel in ("index.html", "findings/trends/index.html", "glossary/index.html"):
             html = self._read(rel)
             col = _fnd_col(html)
-            self.assertEqual(re.findall(r'<span class="foot-grp">([^<]+)</span>', col), GROUPS, rel)
-            want = [t for g in GROUPS for t in SUBS[g] if t != "데이터 현황"]
-            self.assertEqual(_labels(col), want, rel)
+            self.assertEqual(_labels(col)[-1], "전체 색인", rel)
             for h in re.findall(r'href="([^"]+)"', col):
                 self.assertTrue((self.out / rel).parent.joinpath(h).resolve().is_file(), f"{rel} → {h}")
             foot = html[html.index('<footer class="site">'):]
-            self.assertNotIn("<h5>도구</h5>", foot, rel)
-            self.assertNotIn("실사 지적사항</a>", foot, rel)
+            self.assertNotIn("<h5>지적사항</h5>", foot, rel)
+            self.assertNotIn('class="foot-grp"', foot, rel)
 
     def test_footer_content_links_news_after_brief(self):
         """[2026-11-10] /news/ 는 상단 nav 가 아니라 푸터 콘텐츠 열, 주간 브리프 바로 다음."""
@@ -273,10 +266,11 @@ class NavCleanupTemplateTest(unittest.TestCase):
         self.assertEqual(sorted(set(wired)),
                          ["findings_doc.html", "findings_firm_page.html", "glossary_term.html"])
 
-    def test_trends_seg_partial_removed(self):
-        self.assertFalse((WEB_DIR / "partials" / "trends_seg.html").exists())
-        for tpl in (WEB_DIR / "templates").glob("*.html"):
-            self.assertNotIn("trends_seg", tpl.read_text(encoding="utf-8"), tpl.name)
+    def test_seg_partials_removed(self):
+        for name in ("trends_seg.html", "findings_seg.html"):
+            self.assertFalse((WEB_DIR / "partials" / name).exists(), name)
+            for tpl in (WEB_DIR / "templates").glob("*.html"):
+                self.assertNotIn(name, tpl.read_text(encoding="utf-8"), tpl.name)
 
 
 if __name__ == "__main__":

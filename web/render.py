@@ -2702,6 +2702,62 @@ def build_glossary_index(view: dict[str, Any],
                       for g in view["groups"] for t in g["terms"]]}
 
 
+# ── [전역 검색 2026-11-12 · 대표 확정안 3] 검색 결과 맨 위 '가장 가까운 답' 색인 ──────────
+# 헤더 검색칸 → /search/?q= → search.js 가 이 파일로 **대상 한 건**(용어·업체·조항)을 고르고,
+# 지적 문장은 findings_search RPC(본문 전용 모드)로 받는다. 비용 0 — 정적 JSON 하나.
+# ★값은 이미 화면에 나가는 뷰에서만 가져온다(용어 뷰·업체 페이지 뷰·조항 뷰). 새 문구를
+#   만들지 않고, 그 언어 트리에 **실제로 있는 페이지**만 싣는다(없는 페이지로 보내지 않는다).
+# ★실사관은 싣지 않는다 — 실명 개인 집계는 noindex·sitemap 제외 정책이라, 크롤러가 읽는
+#   공개 JSON 에 이름 목록을 두면 그 정책을 우회한다.
+# 매칭 재료(`m`)는 소문자 결합 문자열 — 한국어판 용어는 동의어 전량, 영어판은 한글 제외.
+_LOOKUP_EASY_MAX = 200
+
+
+def _lookup_first_sentence(text: str, limit: int = _LOOKUP_EASY_MAX) -> str:
+    s = " ".join(str(text or "").split())
+    m = re.search(r"(?<=[.。!?])\s", s)
+    if m and m.start() <= limit:
+        return s[:m.start()]
+    return s if len(s) <= limit else s[:limit].rstrip() + "…"
+
+
+def build_lookup_index(glossary_view: "dict[str, Any] | None",
+                       raw_terms: "list[dict[str, Any]] | None",
+                       firm_pages: "list[dict[str, Any]] | None",
+                       clause_views: "list[dict[str, Any]] | None",
+                       lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    is_ko = lang == DEFAULT_LANG
+    raw_by_id = {t["id"]: t for t in (raw_terms or [])}
+    terms: list[dict[str, Any]] = []
+    for g in (glossary_view or {}).get("groups", []):
+        for t in g["terms"]:
+            raw = raw_by_id.get(t["id"], {})
+            names = [t["term"], t.get("term_sub") or ""]
+            if is_ko:
+                names += [raw.get("term_en") or ""] + list(raw.get("aliases") or [])
+            else:
+                names += list(t.get("aliases") or [])
+            terms.append({
+                "id": t["id"], "n": t["term"], "s": t.get("term_sub") or "",
+                "e": _lookup_first_sentence(t.get("easy") or ""),
+                "m": " | ".join(x for x in dict.fromkeys(names) if x).lower(),
+                "q": t.get("case_q") or "", "c": int(t.get("case_findings") or 0),
+                "r": [{"id": r["id"], "n": r["label"]} for r in (t.get("related") or [])[:5]],
+                "g": [r["label"] for r in (t.get("reg_refs") or [])[:3]],
+            })
+    firms = [{"slug": f["slug"], "n": f["name"], "d": f["doc_count"],
+              "f": f["finding_count"], "a": f["agencies"], "l": f["last_seen"],
+              "m": " | ".join(dict.fromkeys([f["name"], f["key"]])).lower()}
+             for f in sorted(firm_pages or [], key=lambda x: x["slug"])]
+    clauses = [{"slug": c["slug"], "n": c["code"], "t": c.get("title_en") or "",
+                "d": c["documents"], "f": c["findings"],
+                "m": " | ".join([c["code"], c["section"], c.get("title_en") or ""]).lower(),
+                "r": [{"id": x["id"], "n": x["label"]} for x in (c.get("terms") or [])[:5]]}
+               for c in sorted(clause_views or [], key=lambda x: x["slug"])]
+    return {"schema": "grm-lookup/v1", "lang": lang,
+            "terms": terms, "firms": firms, "clauses": clauses}
+
+
 # ── [용어사전 낱개] 검색 유입용 per-term 페이지의 SEO 파생(결정론 — 값 무변형 절단·조립) ──
 # 색인 페이지 1건으로는 226 어가 URL 하나에 묶여 "OOS 뜻" 같은 실제 검색어에 걸릴 대상이
 # 없다. 용어당 페이지를 내고 각각에 description·JSON-LD 를 준다. 문구는 **생성하지 않고**
@@ -2925,8 +2981,24 @@ def build_glossary_case_excerpts(
             if len(picked) == _GLOSSARY_CASE_MAX:
                 break
         if len(picked) >= _GLOSSARY_CASE_MIN:
+            # [UI 2단 2026-11-12] 먼저 보이는 예문은 짧고 온전한 것 — 가림 표기((b)(4) 등)가
+            # 적고, 문장 끝맺음이 있고, 짧은 순. 배정(어느 문장을 고르는가)은 그대로 두고
+            # **고른 것 안에서 보이는 순서만** 바꾼다. sort 는 안정 정렬이라 결정론 유지.
+            picked.sort(key=_glossary_quote_read_key)
             out[tid] = picked
     return out
+
+
+_GLOSSARY_REDACT_RE = re.compile(r"\(b\)\s*\(\d\)|\[redacted\]|\*{3,}|█", re.IGNORECASE)
+_GLOSSARY_SENT_END_RE = re.compile(r"(다|함|음|됨|임|[.!?。])[\"'”’)\]]*$")
+
+
+def _glossary_quote_read_key(c: dict[str, Any]) -> tuple[int, int, int]:
+    """(가림 표기 수, 끝맺음 없음 0/1, 길이) — 작을수록 먼저 보인다."""
+    q = c.get("quote") or ""
+    return (len(_GLOSSARY_REDACT_RE.findall(q)),
+            0 if _GLOSSARY_SENT_END_RE.search(q.strip()) else 1,
+            len(q))
 
 
 # ── [내부 링크] 문서 본문 → 용어 페이지 자동 링크 ────────────────────────────────
@@ -4810,6 +4882,10 @@ EN_TREE_STATIC: tuple[str, ...] = (
     # [법무 2026-11-03] 개인정보처리방침·이용약관 — 영문 번역본(web/data/legal/*_en.md)이 커밋돼 있다.
     "privacy/",
     "terms/",
+    # [전역 검색 2026-11-12] 검색 결과 화면 — 셸 + 런타임(search.js). sitemap 제외.
+    "search/",
+    # [찾아보기 2026-11-12] 사이트 색인 — 메뉴 셋 중 하나.
+    "browse/",
 )
 
 
@@ -4826,7 +4902,7 @@ EN_TREE_DATA_GATED: frozenset[str] = frozenset(
 #   언어판이라고 정책이 느슨해지면 안 된다(영어판에서 색인되면 정책 우회가 된다).
 #   마이페이지도 같다 — 개인화 면이라 한국어 트리에서도 sitemap·canonical 에 넣지
 #   않는다. 언어판이라고 정책이 달라지면 안 된다.
-EN_SITEMAP_EXCLUDED: frozenset[str] = frozenset({"findings/inspector/", "me/"})
+EN_SITEMAP_EXCLUDED: frozenset[str] = frozenset({"findings/inspector/", "me/", "search/"})
 
 
 def glossary_tree_paths(terms: "list[dict[str, Any]] | None") -> "set[str]":
@@ -5193,11 +5269,74 @@ def build_firm_alias_redirects(
 #: [탭 3묶음 2026-11-11 · 대표 승인] 없앤 화면의 옛 주소 → 대신하는 화면. 둘러보기 면은 탭 묶음
 #: (찾기·경향·점검)이 그 역할을 맡아 없앴다 — 옛 주소는 검색 면으로 넘긴다.
 RETIRED_PAGE_REDIRECTS: tuple[tuple[str, str], ...] = (
-    ("/findings/browse/", "/findings/"),
-    ("/findings/browse/index.html", "/findings/"),
-    ("/en/findings/browse/", "/en/findings/"),
-    ("/en/findings/browse/index.html", "/en/findings/"),
+    # [찾아보기 2026-11-12] 옛 '둘러보기'(/findings/browse/)는 이제 사이트 색인 /browse/ 로 잇는다.
+    ("/findings/browse/", "/browse/"),
+    ("/findings/browse/index.html", "/browse/"),
+    ("/en/findings/browse/", "/en/browse/"),
+    ("/en/findings/browse/index.html", "/en/browse/"),
 )
+
+
+# ── [찾아보기 2026-11-12 · 대표 확정안 1] 사이트 색인 /browse/ ──────────────────────────
+# "지적사항" 메뉴와 #1533 탭 3묶음(찾기·경향·점검)을 대신한다. 메뉴는 주간 브리프 / 찾아보기 /
+# 관심 목록 셋이고, 그 밖의 면은 전부 여기서 한 번에 보인다(대상 → 기관·영역 → 문서 → 자료).
+# ★목록은 손으로 적되 **그 트리에 실제로 쓰인 페이지만** 그린다(`written` 대조) — 없는 면을
+#   광고하지 않는다. 분류 축(분류·기관·국가)은 facets_axes 가 정한 경로를 그대로 쓴다.
+# ★설명은 숫자 없이 명사형 한 줄(낡는 숫자 금지).
+BROWSE_SECTIONS: tuple[tuple[str, tuple[tuple[str, str, str], ...]], ...] = (
+    (N_("대상"), (
+        ("findings/firm/", N_("업체"), N_("업체별 공개 실사 문서와 지적 이력")),
+        ("findings/inspector/", N_("실사관"), N_("FDA 483 서명 실사관과 식약처 실사 부서별 이력")),
+        ("findings/clause/", N_("조항"), N_("21 CFR 조항별 지적 문장")),
+        ("glossary/", N_("용어"), N_("규제 용어의 정의, 그림, 지적 사례")),
+    )),
+    (N_("기관·영역"), (
+        ("findings/trends/", N_("업무 영역별 경향"), N_("기관별로 많이 지적된 업무 영역과 실제 문장")),
+        ("@facets", "", ""),
+        ("findings/citations/", N_("FDA 지적 조항 순위"), N_("FDA 실사에서 자주 인용된 조항")),
+        ("findings/inspections/", N_("FDA 실사 결과"), N_("실사 판정 등급 분포")),
+    )),
+    (N_("문서·원문"), (
+        ("findings/docs/", N_("공개 문서"), N_("기관·연도별 공개 실사 문서 목록")),
+        ("findings/", N_("지적 문장 검색"), N_("분류, 증거 등급, 검토 상태, 월, 국가 조건 검색")),
+        ("findings/examples/", N_("지적 사례"), N_("PMDA·MHRA 공개 지적 사례와 국문 병기")),
+        ("findings/import-alerts/", N_("FDA 수입경보"), N_("FDA 수입경보 대상 업체 목록")),
+    )),
+    (N_("자료·도구"), (
+        ("library/", N_("지침·고시"), N_("규제기관 지침과 고시 원문 목록")),
+        ("findings/checklist/", N_("자가점검표"), N_("지적 문장 기반 자가점검 항목")),
+        ("findings/coverage/", N_("데이터 현황"), N_("수집 출처, 연도별 확보량, 수집 범위와 한계")),
+        ("guide/", N_("이용안내"), N_("화면별 사용법과 자주 묻는 질문")),
+    )),
+)
+_FACET_AXIS_ITEM: dict[str, tuple[str, str]] = {
+    "분류": (N_("분류별 모음"), N_("지적 분류별 지적 문장")),
+    "기관": (N_("기관별 모음"), N_("규제기관별 지적 문장")),
+    "국가": (N_("국가별 모음"), N_("제조소 국가별 지적 문장")),
+}
+
+
+def build_browse_view(lang_prefix: str, written: "list[str]",
+                      facet_axes: "list[dict[str, str]]", tr: Translator = _KO) -> list[dict[str, Any]]:
+    """찾아보기 뷰 — [{"title", "items": [{"path", "name", "desc"}]}]. 그 트리에 실제로 쓰인
+    페이지만 남긴다(`written` 은 렌더 산출 목록, `lang_prefix` 는 "" 또는 "en/")."""
+    have = set(written)
+    out = []
+    for title, rows in BROWSE_SECTIONS:
+        items = []
+        for path, name, desc in rows:
+            if path == "@facets":
+                for a in facet_axes:
+                    pth = f"findings/{a['path']}/"
+                    nm, ds = _FACET_AXIS_ITEM.get(a["label"], (a["label"], ""))
+                    if f"{lang_prefix}{pth}index.html" in have:
+                        items.append({"path": pth, "name": tr(nm), "desc": tr(ds) if ds else ""})
+                continue
+            if f"{lang_prefix}{path}index.html" in have:
+                items.append({"path": path, "name": tr(name), "desc": tr(desc)})
+        if items:
+            out.append({"title": tr(title), "items": items})
+    return out
 
 
 def build_redirects_txt(rules: "list[tuple[str, str]]") -> str:
@@ -5422,6 +5561,7 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
         f"  <url><loc>{base_url}/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/archive/</loc><lastmod>{latest_pub}</lastmod></url>",
+        f"  <url><loc>{base_url}/browse/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/trends/</loc><lastmod>{latest_pub}</lastmod></url>",
         # [존 재편 2026-08-26] 트렌드 존 2·3면 — 조회 파라미터 없이 그 자체로 완결된
@@ -5949,6 +6089,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["inspectorjs_ver"] = _asset_ver("inspector.js")
     env.globals["mfdsdocjs_ver"] = _asset_ver("mfds-doc-inspectors.js")
     env.globals["glossaryjs_ver"] = _asset_ver("glossary.js")
+    env.globals["searchjs_ver"] = _asset_ver("search.js")
     env.globals["quizjs_ver"] = _asset_ver("quiz.js")
     env.globals["growthjs_ver"] = _asset_ver("growth.js")
     env.globals["petcss_ver"] = _asset_ver("pet.css")
@@ -6378,6 +6519,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         page_title=tr("지적사항 검색 · GRM"),
         nav_active="findings",
         description=tr(FINDINGS_DESCRIPTION),
+        auto_crumbs=[(tr("홈"), ""), (tr("찾아보기"), "browse/"), (tr("지적 문장 검색"), None)],
     )
 
     # 트렌드 대시보드(FIND-1 F3b) — findings 와 동일 이유로 라이브 데이터는 빌드시 고정할
@@ -6389,7 +6531,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 세 면 모두 trends.html 계열 셸이라 nav_active 는 동일하고, 셸의
     # cfg data-page 로 trends.js 가 "이 면이 그릴 수 있는 것"만 fetch 한다.
     emit("trends.html", page("findings/trends/"),
-        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("트렌드"), None)],
+        auto_crumbs=[(tr("홈"), ""), (tr("찾아보기"), "browse/"), (tr("트렌드"), None)],
         page_title=tr("규제 지적사항 트렌드 · GRM"),
         nav_active="findings",
         seg_active="trends",
@@ -6401,7 +6543,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # "두 수치를 서로 나누지 마세요"라는 경고문이 필요했는데, 면을 가르면 그 경고가
     # 필요 없어진다 — 분모가 다른 것을 같은 페이지에 두지 않는 것이 이 재편의 핵심이다.
     emit("inspections.html", page("findings/inspections/"),
-        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("실사 결과"), None)],
+        auto_crumbs=[(tr("홈"), ""), (tr("찾아보기"), "browse/"), (tr("실사 결과"), None)],
         page_title=tr("FDA 실사 결과 · GRM"),
         nav_active="findings",
         seg_active="inspections",
@@ -6416,7 +6558,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   nav 여섯 탭 어느 job 에도 속하지 않는다. 라우트·sitemap·footer 도구 열은 그대로
     #   두고, 두 면의 꼬리 각주가 이 페이지를 연다(숫자를 의심하는 사람만 마주친다).
     emit("coverage.html", page("findings/coverage/"),
-        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("데이터 현황"), None)],
+        auto_crumbs=[(tr("홈"), ""), (tr("찾아보기"), "browse/"), (tr("데이터 현황"), None)],
         page_title=tr("데이터 현황 · GRM"),
         nav_active="findings",
         seg_active="coverage",
@@ -6436,7 +6578,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 없다(042 findings_cfr_ranking 로 조항 순위 + 043 findings_checklist 로 사례를 받아
     # checklist.js 가 조립). 서버는 셸(설정 바 + 로딩 상태)만 렌더한다.
     emit("checklist.html", page("findings/checklist/"),
-        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("자가점검 체크리스트"), None)],
+        auto_crumbs=[(tr("홈"), ""), (tr("찾아보기"), "browse/"), (tr("자가점검 체크리스트"), None)],
         page_title=tr("자가점검 체크리스트 · GRM"),
         nav_active="findings",
         description=tr(CHECKLIST_DESCRIPTION),
@@ -6449,7 +6591,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 넣지 않는다. noindex 는 inspector.html 자체 <head> 오버라이드(meta_robots 블록)로
     # 배선하고, canonical 은 중복 URL 정리 목적으로 그대로 둔다.
     emit("inspector.html", page("findings/inspector/"),
-        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("실사관"), None)],
+        auto_crumbs=[(tr("홈"), ""), (tr("찾아보기"), "browse/"), (tr("실사관"), None)],
         page_title=tr("실사관 프로파일 · GRM"),
         nav_active="findings",
         description=tr(INSPECTOR_DESCRIPTION),
@@ -6535,6 +6677,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 검색 인덱스와 같은 자리에서 쓴다(자산 쓰기 관례를 한 곳에 모은다).
     glossary_index: "dict[str, Any] | None" = None
     glossary_index_en: "dict[str, Any] | None" = None
+    # [전역 검색] '가장 가까운 답' 색인 재료 — 언어 트리별 용어 뷰·업체 페이지 뷰.
+    lookup_glossary_views: "dict[str, Any]" = {}
+    lookup_firm_pages: "dict[str, list[dict[str, Any]]]" = {}
     if glossary_terms:
         # B2: 관련 조항 라벨 → 공식 원문 URL — 자료실 커밋 카탈로그 재사용(신규 수집 0).
         # [C1] 용어→사례 링크: glossary_cases.json(정본, findings_search RPC 실측치).
@@ -6548,6 +6693,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             glossary=glossary_view,
         )
         glossary_index = build_glossary_index(glossary_view)
+        lookup_glossary_views[DEFAULT_LANG] = glossary_view
 
         # ── [다국어 2026-09-04] 영어판 용어사전 ──────────────────────────────
         # 표제어(`term_en`)는 데이터에 이미 있었고, 설명 두 필드(`easy_en`·`detail_en`)를
@@ -6568,6 +6714,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 glossary=glossary_en_view,
             )
             glossary_index_en = build_glossary_index(glossary_en_view, lang="en")
+            lookup_glossary_views["en"] = glossary_en_view
             # 제외된 용어에는 정본 사례가 없으므로 인용 후보도 만들지 않는다. 이 필터는
             # 결과를 바꾸지 않고, 영문 문장 탐색 범위만 정본 링크 대상에 맞춘다.
             glossary_en_case_terms = [term for term in glossary_terms
@@ -6678,7 +6825,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 axis=meta, items=items, excluded=excluded_view,
                 # [B2] 화면 빵부스러기와 동일한 순서·이름(findings_facet_index.html 참조).
                 json_ld=axis_page.breadcrumb_json_ld([
-                    (tr("홈"), "/"), (tr("지적사항"), "findings/"), (meta["title"], "")]),
+                    (tr("홈"), "/"), (tr("찾아보기"), "browse/"), (meta["title"], "")]),
                 # 문서 목록 입구 — 문서 정본이 없으면 링크를 만들지 않는다(없는 페이지로
                 # 보내는 링크는 무링크보다 나쁘다).
                 doc_index_total=((docs_data or {}).get("totals") or {}).get("documents", 0)
@@ -6713,7 +6860,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     crumb_last=item_label,
                     # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
                     json_ld=item_page.breadcrumb_json_ld([
-                        (tr("홈"), "/"), (tr("지적사항"), "findings/"),
+                        (tr("홈"), "/"), (tr("찾아보기"), "browse/"),
                         (meta["title"], f"findings/{meta['path']}/"),
                         (item_label, "")]),
                     headline=tr("{label} {suffix}", label=item_label,
@@ -6763,7 +6910,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     crumb_last=agency_label,
                     # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
                     json_ld=combo_page.breadcrumb_json_ld([
-                        (tr("홈"), "/"), (tr("지적사항"), "findings/"),
+                        (tr("홈"), "/"), (tr("찾아보기"), "browse/"),
                         (cat_meta["title"], f"findings/{cat_meta['path']}/"),
                         (category_label, base),
                         (agency_label, "")]),
@@ -6824,7 +6971,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=tr("미국 GMP 규정(21 CFR Part 210·211) 조항별로 실제 지적사항을 "
                            "우리말로 모았습니다. 조항 {n}개.", n=len(clause_views)),
             json_ld=clause_index.breadcrumb_json_ld([
-                (tr("홈"), "/"), (tr("지적사항"), "findings/"), (tr("조항별"), "")]),
+                (tr("홈"), "/"), (tr("찾아보기"), "browse/"), (tr("조항별"), "")]),
             clauses=clause_views, min_documents=CLAUSE_MIN_DOCUMENTS,
             citations_ready=bool(citations_data),
         )
@@ -6838,7 +6985,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 nav_active="findings",
                 description=clause_description(clause, tr),
                 json_ld=clause_page.breadcrumb_json_ld([
-                    (tr("홈"), "/"), (tr("지적사항"), "findings/"),
+                    (tr("홈"), "/"), (tr("찾아보기"), "browse/"),
                     (tr("조항별"), "findings/clause/"), (clause["code"], "")]),
                 clause=clause, siblings=sibs, agency_labels=clause_agency_labels,
                 cit=clause_citations.section_view(citations_data, clause["section"]),
@@ -6851,12 +6998,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         """[FDA 지적 조항 화면] 조항별 인용 빈도 순위 — ko·en 같은 함수(두 벌 금지)."""
         cp = mkpage("findings/citations/")
         emit_page("clause_citations.html", cp,
-            auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("FDA 지적 조항"), None)],
+            auto_crumbs=[(tr("홈"), ""), (tr("찾아보기"), "browse/"), (tr("FDA 지적 조항"), None)],
             page_title=tr("FDA 가 자주 지적하는 조항 · GRM"),
             nav_active="findings",
             description=tr(CITATIONS_DESCRIPTION),
             json_ld=cp.breadcrumb_json_ld([
-                (tr("홈"), "/"), (tr("지적사항"), "findings/"),
+                (tr("홈"), "/"), (tr("찾아보기"), "browse/"),
                 (tr("FDA 지적 조항"), "")]),
             cit=clause_citations.ranking_view(citations_data), clause_slugs=slugs,
             # [제조소 전체 목록 2026-11-10] 홈→지적사항→FDA 지적 조항→제조소 목록 도달 경로
@@ -6884,7 +7031,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 nav_active="findings",
                 description=_tr(EXAMPLES_DESCRIPTION),
                 json_ld=_ep.breadcrumb_json_ld([
-                    (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                    (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                     (_tr("지적 사례"), "")]),
                 topics=_ex_topics, curated_on=example_data.get("curated_on", ""),
             )
@@ -7052,6 +7199,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             if len(en_rows) >= FIRM_PAGE_MIN_DOCS:
                 en_firm_pages.append(firm_page_view(fp["key"], fp["slug"], en_rows))
         en_firm_slugs = {fp["slug"] for fp in en_firm_pages}
+        if render_doc_pages:
+            lookup_firm_pages = {DEFAULT_LANG: firm_pages, "en": en_firm_pages}
         if en_firm_slugs:
             en_paths |= {f"findings/firm/{sl}/" for sl in en_firm_slugs}
         firm_alias_redirects = build_firm_alias_redirects(
@@ -7178,7 +7327,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                  " 우리말로 볼 수 있습니다.", n=_total),
                  # [B2] 화면 빵부스러기와 동일(findings_doc_list.html index 모드).
                  json_ld=_idx_page.breadcrumb_json_ld([
-                     (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                     (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                      (_tr("문서로 찾기"), "")]),
                  mode="index", heading=_tr("문서로 찾기"),
                  lede=_lede,
@@ -7218,7 +7367,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                          n=f"{y['count']:,}"),
                          # [B2] 화면 빵부스러기와 동일(list 모드는 '문서로 찾기'가 낀다).
                          json_ld=list_page.breadcrumb_json_ld([
-                             (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                             (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                              (_tr("문서로 찾기"), "findings/docs/"),
                              (heading, "")]),
                          mode="list",
@@ -7305,8 +7454,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     _a = doc_finding_anatomy(doc, f, _lg, _link)
                     _views.append(_a if _a is not None else {"body": _link(finding_body(f, _lg))})
                 _anat = _views if any("lead" in v for v in _views) else None
+                # [UI 2단 2026-11-12] 관련 용어 칸 — 본문에 실제로 링크된 용어만(선정 순서).
+                _doc_terms = [{"id": tid, "label": surface} for surface, tid in _sel
+                              if tid in _used]
                 _emit("findings_doc.html", _pp,
                     next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
+                    doc_terms=_doc_terms,
                     page_title=_tr("{title} · GRM",
                                    title=doc_titles_by_lang[_lg][doc["slug"]]),
                     nav_active="findings",
@@ -7412,7 +7565,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              y1=fp["first_seen"][:4], y2=fp["last_seen"][:4]),
                          # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
                          json_ld=firm_page.breadcrumb_json_ld([
-                             (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                             (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                              (_tr("문서로 찾기"), "findings/docs/"), (fp["name"], "")]),
                          firm=_fp, agency_labels=agency_labels_by_lang[_lg],
                          thin_page=is_thin_firm_page(fp, _lg),
@@ -7478,7 +7631,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=_tr(IMPORT_ALERTS_DESCRIPTION, n=f"{_iav['total']:,}",
                                 k=f"{_iav['korea']:,}"),
                 json_ld=_iap.breadcrumb_json_ld([
-                    (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                    (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                     (_tr("FDA 수입경보"), "")]),
                 ia=_iav,
             )
@@ -7501,7 +7654,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 nav_active="findings",
                 description=_tr(CITATION_FIRMS_DESCRIPTION, n=f"{_cfv['total']:,}"),
                 json_ld=_cfp.breadcrumb_json_ld([
-                    (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                    (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                     (_tr("FDA 지적 조항"), "findings/citations/"),
                     (_tr("조항별 지적 제조소"), "")]),
                 cf=_cfv,
@@ -7526,7 +7679,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     nav_active="findings",
                     description=_tr(DEFICIENCY_CASES_DESCRIPTION[_ag], n=f"{_dcv['total']:,}"),
                     json_ld=_dcp.breadcrumb_json_ld([
-                        (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                        (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                         (_tr("지적 사례"), "findings/examples/"), (_ag, "")]),
                     dc=_dcv, dc_tabs=_dc_tabs, dc_on=_ag, dc_credit=deficiency_cases_page.CREDIT,
                 )
@@ -7540,7 +7693,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     description=_tr(DEFICIENCY_CASES_DESCRIPTION["MHRA_DATA"],
                                     n=f"{_dc_cc['rows_total']:,}"),
                     json_ld=_dcp.breadcrumb_json_ld([
-                        (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                        (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                         (_tr("지적 사례"), "findings/examples/"), (_tr("MHRA 조항별 집계"), "")]),
                     cc=_dc_cc, dc_tabs=_dc_tabs, dc_on="MHRA_DATA", dc_credit=deficiency_cases_page.CREDIT,
                 )
@@ -7584,6 +7737,25 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if glossary_index_en is not None:
         _write_json(dist_assets / "glossary-index.en.json", glossary_index_en)
         written.append("assets/glossary-index.en.json")
+
+    # [전역 검색 2026-11-12] 검색 결과 화면(/search/)과 그 '가장 가까운 답' 색인. 화면은
+    # 셸만 정적이고 결과는 search.js 가 채운다(검색어가 URL 쿼리라 빌드시 고정 불가).
+    # 개인화·검색 결과 면이라 색인하지 않는다(noindex·sitemap 제외).
+    for _lg, _mkpage, _emit, _tr in trees:
+        _lk = build_lookup_index(
+            lookup_glossary_views.get(_lg), glossary_terms,
+            lookup_firm_pages.get(_lg),
+            clause_views if _lg == DEFAULT_LANG else clause_views_en, _lg)
+        _lk_name = "lookup.json" if _lg == DEFAULT_LANG else f"lookup.{_lg}.json"
+        _write_json(dist_assets / _lk_name, _lk)
+        written.append(f"assets/{_lk_name}")
+        _emit("search.html", _mkpage("search/"),
+              page_title=_tr("검색 · GRM"),
+              nav_active="search",
+              description=_tr("업체명, 조항, 용어, 지적 문장 검색 결과"),
+              lookup_file=_lk_name,
+              hide_subscribe=True,
+              )
 
     # 마이페이지(/me) — 반응 계층 활성 시에만 생성(env-off=페이지 부재→골든 byte-diff 0).
     # 개인화 페이지라 sitemap/canonical 제외(비색인). 스크랩·관심 업체는 reactions.js 가,
@@ -7782,27 +7954,28 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         page_title=en_tr("지적사항 검색 · GRM"),
         nav_active="findings",
         description=en_tr(FINDINGS_DESCRIPTION),
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("찾아보기"), "browse/"), (en_tr("지적 문장 검색"), None)],
     )
     en_emit("trends.html", en_page("findings/trends/"),
-        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("트렌드"), None)],
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("찾아보기"), "browse/"), (en_tr("트렌드"), None)],
         page_title=en_tr("규제 지적사항 트렌드 · GRM"),
         nav_active="findings", seg_active="trends",
         description=en_tr(TRENDS_DESCRIPTION),
     )
     en_emit("inspections.html", en_page("findings/inspections/"),
-        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("실사 결과"), None)],
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("찾아보기"), "browse/"), (en_tr("실사 결과"), None)],
         page_title=en_tr("FDA 실사 결과 · GRM"),
         nav_active="findings", seg_active="inspections",
         description=en_tr(INSPECTIONS_DESCRIPTION),
     )
     en_emit("coverage.html", en_page("findings/coverage/"),
-        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("데이터 현황"), None)],
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("찾아보기"), "browse/"), (en_tr("데이터 현황"), None)],
         page_title=en_tr("데이터 현황 · GRM"),
         nav_active="findings", seg_active="coverage",
         description=en_tr(COVERAGE_DESCRIPTION),
     )
     en_emit("checklist.html", en_page("findings/checklist/"),
-        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("자가점검 체크리스트"), None)],
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("찾아보기"), "browse/"), (en_tr("자가점검 체크리스트"), None)],
         page_title=en_tr("자가점검 체크리스트 · GRM"),
         nav_active="findings",
         description=en_tr(CHECKLIST_DESCRIPTION),
@@ -7813,7 +7986,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         description=en_tr(FIRM_DESCRIPTION),
     )
     en_emit("inspector.html", en_page("findings/inspector/"),
-        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("실사관"), None)],
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("찾아보기"), "browse/"), (en_tr("실사관"), None)],
         page_title=en_tr("실사관 프로파일 · GRM"),
         nav_active="findings",
         description=en_tr(INSPECTOR_DESCRIPTION),
@@ -7943,6 +8116,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             alternates=[], alt_other=None,
         ))
         written.append(not_found)
+
+    # [찾아보기 2026-11-12] 사이트 색인 — 모든 면을 쓴 **뒤에** 낸다(written 대조).
+    for _lg, _mkpage, _emit, _tr in trees:
+        _pfx = "" if _lg == DEFAULT_LANG else f"{_lg}/"
+        _emit("browse.html", _mkpage("browse/"),
+              page_title=_tr("찾아보기 · GRM"),
+              nav_active="browse",
+              description=_tr("업체, 실사관, 조항, 용어, 기관별 경향, 공개 문서, 지침·고시 색인"),
+              browse=build_browse_view(
+                  _pfx, written,
+                  (env if _lg == DEFAULT_LANG else en_env).globals.get("fnd_facet_axes") or [],
+                  _tr),
+              )
 
     emit_not_found(lang, page, render_page, tr)
     emit_not_found("en", en_page, _en_render, en_tr)

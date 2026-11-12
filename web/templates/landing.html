@@ -87,7 +87,7 @@
     <p class="home-idx">
       <a href="{{ rel_root }}findings/firm/index.html">{{ _("업체") }}</a>
       <a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관") }}</a>
-{% if 'findings/citations/' in en_paths %}      <a href="{{ rel_root }}findings/citations/index.html">{{ _("지적 조항") }}</a>
+{% if 'findings/citations/' in en_paths %}      <a href="{{ rel_root }}findings/citations/index.html">{{ _("FDA 지적 조항") }}</a>
 {% endif %}
       <a href="{{ rel_root }}glossary/index.html">{{ _("용어사전") }}</a>
 {% for ax in fnd_facet_axes or [] %}      <a href="{{ rel_root }}findings/{{ ax.path }}/index.html">{{ _(ax.label) }}</a>
@@ -95,6 +95,8 @@
 {% if 'findings/examples/' in en_paths %}      <a href="{{ rel_root }}findings/examples/index.html">{{ _("지적 사례") }}</a>
 {% endif %}
 {% if library and library.catalog_count %}      <a href="{{ rel_root }}library/index.html">{{ _("자료실") }}</a>
+{% endif %}
+{% if lang == 'ko' or 'browse/' in en_paths %}      <a class="home-idx-all" href="{{ rel_root }}browse/index.html">{{ _("전체 보기") }}</a>
 {% endif %}
     </p>
 {% if reactions_enabled %}

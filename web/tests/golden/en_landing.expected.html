@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/" />
-<script src="/assets/i18n-en.js?v=dd0aa413" defer></script>
+<script src="/assets/i18n-en.js?v=d194c484" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -67,136 +67,107 @@
   <a class="grm-lang" href="../index.html" hreflang="ko" lang="ko" rel="alternate"><i class="ti ti-language" aria-hidden="true"></i>한국어</a>
 </div></header>
 
-<main>
-  <div class="wrap hero">
-    <div class="hero-grid">
-      <div>
-        <span class="kick reveal" style="animation-delay:.05s">Global Regulatory Monitor</span>
-        <h1 class="reveal" style="animation-delay:.12s">Every regulatory signal,<br><span class="c">in one place</span>.</h1>
-        <p class="lede reveal" style="animation-delay:.2s">Cut the hours spent gathering regulatory information down to one weekly page. Key facts, implications, and practical check points on a single page, ready to use the moment it is shared.</p>
-        <div class="lede-tags reveal" style="animation-delay:.24s"><span class="tag fact">Fact</span><span class="tag insight">Insight</span><span class="tag check">Check</span></div>
-        <div class="btns reveal" style="animation-delay:.28s">
-        </div>
-      </div>
-    </div><div class="stats reveal" style="animation-delay:.4s">
-      <div><b>12</b><span>regulatory sources</span></div>
-      <div><b>Weekly</b><span>publication</span></div>
-      <div><b>A·B·C</b><span>evidence grades</span></div>
+<main class="home">
+  <section class="wrap home-top">
+    <h1 class="home-h">What regulators worldwide cited at pharmaceutical sites, in one searchable place.</h1>
+    <p class="home-lede">Public records from FDA 483s and warning letters, MFDS inspections and actions, and Canada, the EU, the UK and Japan, each with its original source. The weekly brief is published every Monday.</p>
+    <form class="home-search" action="findings/index.html" method="get" role="search">
+      <input type="search" name="q" placeholder="Company, clause or term" aria-label="Findings search" autocomplete="off">
+      <button type="submit" class="btn coral">Search</button>
+    </form>
+  </section>
+
+  <section class="wrap home-sec">
+    <h2 class="home-h2">What you can find</h2>
+    <div class="home-three">
+      <a class="home-demo" href="findings/firm/index.html?key=yuki%20gosei%20kogyo">
+        <span class="hd-ask">Findings by company</span>
+        <span class="hd-in">Yuki Gosei Kogyo, Co., Ltd</span>
+        <span class="hd-out">2 public documents · 10 findings</span>
+        <span class="hd-meta">Latest: FDA 483 Contamination control · Material and supplier control</span>
+        <span class="hd-go">Company lookup</span>
+      </a>
+      <a class="home-demo" href="glossary/cleanroom/index.html">
+        <span class="hd-ask">Terms with real findings</span>
+        <span class="hd-in">Cleanroom</span>
+        <span class="hd-out">Definition · clauses · 165 related findings</span>
+        <span class="hd-go">Glossary</span>
+      </a>
+      <a class="home-demo" href="findings/trends/index.html">
+        <span class="hd-ask">Findings by agency</span>
+        <span class="hd-in">US FDA</span>
+        <span class="hd-out">Aseptic processing and sterility assurance 3,472 · Equipment and facility 1,534</span>
+        <span class="hd-meta">Cumulative · as of 2026-11-03</span>
+        <span class="hd-go">Finding trends</span>
+      </a>
     </div>
-    <div class="srcs reveal" style="animation-delay:.44s">
-      <span class="l">Coverage — 12 sources</span>
-      <div class="marquee"><div class="track">
-        <span>FDA</span><span>EMA</span><span>EudraGMDP</span><span>MHRA</span><span>PIC/S</span><span>ICH</span><span>MFDS</span><span>WHO</span><span>Health&nbsp;Canada</span><span>ECA</span><span>ISPE</span><span>OpenFDA</span>
-      </div></div>
+  </section>
+
+  <section class="wrap home-sec home-half">
+    <div>
+      <h2 class="home-h2">Newly published documents</h2>
+      <ul class="home-rows">
+        <li><span class="hr-d">11.06</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196243/index.html">American Contract Systems, Inc</a></li>
+        <li><span class="hr-d">11.06</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196231/index.html">Cardionxt<span class="hr-c">Complaint and recall handling · Labeling and packaging</span></a></li>
+        <li><span class="hr-d">11.05</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196225/index.html">Titan Kogyo, Ltd<span class="hr-c">Laboratory and QC controls · Quality unit oversight</span></a></li>
+        <li><span class="hr-d">11.05</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196224/index.html">Central Glass Co., Ltd.<span class="hr-c">Validation and qualification · Material and supplier control</span></a></li>
+        <li><span class="hr-d">11.05</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196223/index.html">Sumitomo Osaka Cement Co., Ltd<span class="hr-c">Material and supplier control · Cleaning validation</span></a></li>
+      </ul>
+      <p class="home-links"><a href="findings/docs/index.html">All public documents</a></p>
     </div>
-  </div><section class="section soft" id="why"><div class="wrap">
-    <span class="kick">What it does</span><h2 class="sec-title">From data collection to check items.</h2>
-    <div class="feats">
-      <div class="feat"><span class="no">01</span><div class="ic"><i class="ti ti-world-search"></i></div><h3>Automatic collection from global sources</h3><p>Key regulatory news from FDA Warning Letters and 483s, OpenFDA (open data) and recalls, EMA, MHRA, PIC/S, ECA, MFDS, ICH, WHO, Health Canada, and more, collected automatically every day.</p>
-        <div class="feat-prev"><div class="feat-prev-in feat-chips" aria-hidden="true"><span class="fchip mono">FDA 483</span><span class="fchip mono">EMA</span><span class="fchip mono">MFDS</span><span class="fchip mono">PIC/S</span><span class="fchip mono">ICH</span></div></div></div>
-      <div class="feat"><span class="no">02</span><div class="ic"><i class="ti ti-rosette-discount-check"></i></div><h3>Fact separated from interpretation</h3><p>Objective facts are kept as written in the source, and editorial insight is clearly set apart by colour and position.</p>
-        <div class="feat-prev"><div class="feat-prev-in feat-split" aria-hidden="true"><span class="fblock fact">Fact <span class="en">Fact</span></span><span class="fblock insight">Insight <span class="en">Insight</span></span></div></div></div>
-      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>Evidence and signal grading</h3><p>Every card carries an evidence grade (A, B, C) and a signal tier (1–3) at a glance, to help you set priorities.</p>
-        <div class="feat-prev"><div class="feat-prev-in feat-grades">
-          <span class="grade ev" tabindex="0" title="Evidence A — confirmed from an official action or primary document (B = official index + secondary sources, check the original; C = secondary sources only)" aria-label="Evidence A: confirmed from an official action or primary document. B is an official index plus secondary sources (check the original), C is secondary sources only."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
-          <span class="grade sig" tabindex="0" title="Signal T3 (highest) — high impact on operations, immediate check recommended (T2 = medium, T1 = for reference)" aria-label="Signal T3, highest: high impact on operations, immediate check recommended. T2 is medium; T1 is for reference."><span class="enc"><i class="bar b1"></i><i class="bar b2"></i><i class="bar b3"></i></span>Signal T3</span>
-          <span class="grade-tip t-ev" aria-hidden="true"><b>Evidence A</b> — confirmed from an official action or primary document. <span class="dim">B = official index + secondary sources (check the original), C = secondary sources only.</span></span>
-          <span class="grade-tip t-sig" aria-hidden="true"><b>Signal T3 (highest)</b> — high impact on operations, immediate check recommended. <span class="dim">T2 = medium, T1 = for reference.</span></span>
-        </div></div></div>
-    </div>
-  </div></section>  <section class="section" id="records"><div class="wrap">
-    <span class="kick">Findings Database</span>
-    <h2 class="sec-title">Where the weekly brief comes from — the sentences actually cited in inspections</h2>
-    <p class="records-sub">Look up the source records the brief summarises. 5,214 documents and 24,285 findings extracted from FDA 483s, Warning Letters, Canadian and EU inspection reports, and MFDS actions (as of 2026-11-03 — the search page shows today's figures).</p>
-    <div class="records-grid">
-      <a class="records-card" href="findings/firm/index.html"><b>What has this supplier been cited for?</b><span>Findings history by company name</span></a>
-      <a class="records-card" href="findings/inspector/index.html"><b>What was in the documents this inspector signed?</b><span>Published documents by inspector name</span></a>
-      <a class="records-card" href="findings/checklist/index.html"><b>Preparing for an inspection — where to start?</b><span>A self-inspection checklist backed by real findings</span></a>
-      <a class="records-card" href="findings/trends/index.html"><b>Which findings are on the rise?</b><span>Trends of the last 12 months</span></a>
-      <a class="records-card" href="findings/citations/index.html"><b>How often has FDA cited this clause?</b><span>FDA citation frequency by clause</span></a>
-      <a class="records-card" href="findings/examples/index.html"><b>What has actually been cited in our area of work?</b><span>PMDA and MHRA deficiency statements by area</span></a>
-    </div>
-    <a class="records-all" href="findings/index.html">Open the full findings view →</a>
-  </div></section>
-<section class="section" id="engage"><div class="wrap">
-    <div id="popular">
-      <span class="kick">Weekly Reactions</span>
-      <h2 class="sec-title">This week's most-reacted cards</h2>
-      <p class="popular-sub">Based on hearts and saves — readers' reactions, not page views.</p>
-      <div id="grm-popular" data-index="/assets/search-index.en.json">
-        <div class="popular-empty">
-          <p class="popular-empty-t">No hearts or saves yet this week.</p>
-          <p class="popular-empty-s">Press ♥ on the cards you care about — once reactions gather, they appear here.</p>
-        </div>
-      </div>
-    </div><div class="quiz-cta">
-      <div class="quiz-cta-txt">
-        <span class="kick">Weekly Quiz</span>
-        <h3>This week's regulatory quiz takes three minutes.</h3>
-        <p>A short review of regulatory and quality terms and recently published cases. Pick an answer and see the correct answer, explanation, and source link immediately. No leaderboard — the more you solve, the more Gurumi grows.</p>
-      </div>
-      <a class="btn coral lg" href="quiz/index.html">Take the quiz <i class="ti ti-arrow-right"></i></a>
-    </div>    <div class="mini-ctas">
-      <div class="quiz-cta lib-cta">
-        <div class="quiz-cta-txt">
-          <span class="kick">Reference Library</span>
-          <h3>The reference material is always in the library.</h3>
-          <p>GMP guidance, notices, and standards from Korean and international regulators, in 11 catalogues by agency with 553 items in total. Every item links to the official source, refreshed automatically each Monday.</p>
-        </div>
-        <a class="btn" href="library/index.html">Open the library <i class="ti ti-arrow-right"></i></a>
-      </div>
-    </div>
-  </div></section>
+  </section>
+
+  <section class="wrap home-sec">
+    <h2 class="home-h2">Browse</h2>
+    <p class="home-idx">
+      <a href="findings/firm/index.html">Companies</a>
+      <a href="findings/inspector/index.html">Inspectors</a>
+      <a href="findings/citations/index.html">Cited clauses</a>
+      <a href="glossary/index.html">Glossary</a>
+      <a href="findings/c/index.html">Categories</a>
+      <a href="findings/agency/index.html">Agency</a>
+      <a href="findings/country/index.html">Country</a>
+      <a href="findings/examples/index.html">Deficiency examples</a>
+      <a href="library/index.html">Library</a>
+    </p>
+  </section>
 </main>
 <style>
-/* [1단 정리 2026-11-12] 통계 3칸('100% 원문 추적' 단정 제거) · 소스 띠는 흐르는 사본 없이 한 벌 고정 줄.
-   grm.css 동결이라 스코프로 덮는다. */
-.hero .stats{grid-template-columns:repeat(3,1fr)}
-@media(max-width:900px){.hero .stats{grid-template-columns:repeat(3,1fr)}}
-.srcs .marquee{-webkit-mask-image:none;mask-image:none}
-.srcs .track{width:auto;flex-wrap:wrap;row-gap:8px;animation:none;will-change:auto}
-.srcs .track span{margin-right:28px}
-/* [발견 허브] 데이터 존 진입(#records) — grm.css 토큰만, 스코프 한정. 질문형 카드. */
-.records-sub{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--muted);margin:10px 0 0;max-width:760px;word-break:keep-all}
-.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-@media(max-width:860px){.records-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.records-grid{grid-template-columns:1fr}}
-.records-card{display:flex;flex-direction:column;gap:6px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;text-decoration:none}
-.records-card:hover{border-color:var(--coral)}
-.records-card b{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);line-height:1.45;word-break:keep-all}
-.records-card:hover b{color:var(--coral-2)}
-.records-card span{font-size:12.5px;color:var(--muted);word-break:keep-all}
-.records-all{display:inline-block;margin-top:16px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
-.records-all:hover{color:var(--coral)}
-/* 참여 존(#engage) — grm.css 토큰만(프리즈 보존). 스코프 한정. 퀴즈 배너는 인기 카드와
-   28px 로 근접 배치해 한 존으로 읽히게 한다. */
-.popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0;word-break:keep-all}
-.popular-empty{margin-top:20px;padding:26px 28px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad);text-align:center}
-.popular-empty-t{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0 0 6px;word-break:keep-all}
-.popular-empty-s{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);margin:0;word-break:keep-all}
-.popular-list{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.popular-item{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
-.popular-item:first-child{border-color:var(--coral)}
-.popular-rank{font-family:var(--serif);font-size:22px;color:var(--muted)}
-.popular-item:first-child .popular-rank{color:var(--coral)}
-.popular-agency{font-family:var(--mono);font-size:11px;color:var(--muted)}
-.popular-title{font-family:var(--serif);font-size:16px;line-height:1.4;color:var(--ink);text-decoration:none;word-break:keep-all}
-.popular-title:hover{color:var(--coral)}
-.popular-count{font-family:var(--sans);font-size:12.5px;color:var(--muted)}
-@media (max-width:640px){ .popular-list{grid-template-columns:1fr} }
-/* 주간 퀴즈 진입 배너 — 참여 존 내부(인기 카드 뒤). callout 과 시각 위계 구분(soft 톤). */
-.quiz-cta{display:flex;align-items:center;justify-content:space-between;gap:20px 28px;flex-wrap:wrap;margin-top:28px;padding:26px 30px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad)}
-.quiz-cta-txt{flex:1;min-width:260px}
-.quiz-cta-txt h3{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink);margin:6px 0 8px}
-.quiz-cta-txt p{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--body);margin:0}
-/* 보조 진입 카드 2종(자료실·워치리스트, 11차 정리) — 배너 세로 나열 대신 반폭 카드 한 줄.
-   퀴즈 배너와 같은 틀(.quiz-cta)에 세로 배치·캔버스 배경으로 위계를 낮춘다(강조는 퀴즈).
-   한쪽만 렌더되면(auto-fit) 남은 카드가 전폭을 차지한다. */
-.mini-ctas{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:16px}
-.mini-ctas .quiz-cta{flex-direction:column;align-items:flex-start;margin-top:0;background:var(--canvas)}
-.mini-ctas .quiz-cta-txt{min-width:0}
-.mini-ctas .quiz-cta-txt h3{font-size:19px}
-@media (max-width:640px){ .quiz-cta{padding:22px 20px} }
+.home{padding:40px 0 56px}
+.home-top{display:flex;flex-direction:column;gap:14px}
+.home-h{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.35;color:var(--ink);margin:0;max-width:30em;word-break:keep-all}
+.home-lede{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--body);margin:0;max-width:44em;word-break:keep-all}
+.home-search{display:flex;gap:8px;max-width:640px;margin-top:6px}
+.home-search input{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--canvas);color:var(--ink)}
+.home-search input:focus{outline:2px solid var(--coral);outline-offset:1px}
+.home-sec{margin-top:44px}
+.home-h2{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--ink);margin:0 0 14px}
+.home-three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:860px){.home-three{grid-template-columns:1fr}}
+.home-demo{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);text-decoration:none;color:var(--body)}
+.home-demo:hover{border-color:var(--coral)}
+.hd-ask{font-size:12.5px;color:var(--muted)}
+.hd-in{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);word-break:keep-all}
+.hd-out{font-size:14px;color:var(--ink);word-break:keep-all}
+.hd-meta{font-size:12.5px;color:var(--muted);word-break:keep-all}
+.hd-go{margin-top:auto;padding-top:6px;font-size:13px;font-weight:500;color:var(--coral-2)}
+.home-half{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+@media(max-width:860px){.home-half{grid-template-columns:1fr}}
+.home-tl{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.6;color:var(--ink);word-break:keep-all}
+.home-links{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px}
+.home-links a,.home-idx a,.home-watch a{color:var(--coral-2);text-decoration:none}
+.home-links a:hover,.home-idx a:hover,.home-watch a:hover{color:var(--coral)}
+.home-rows{list-style:none;margin:0;padding:0}
+.home-rows li{display:grid;grid-template-columns:44px 96px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line-2);font-size:14px;align-items:baseline}
+.home-rows li:last-child{border-bottom:1px solid var(--line-2)}
+.hr-d{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.hr-a{font-size:12.5px;color:var(--muted)}
+.hr-t{color:var(--ink);text-decoration:none;word-break:keep-all;min-width:0}
+.hr-t:hover{color:var(--coral)}
+.hr-c{display:block;font-size:12.5px;color:var(--muted)}
+@media(max-width:520px){.home-rows li{grid-template-columns:44px 1fr}.hr-a{grid-column:2}.hr-t{grid-column:1 / -1}}
+.home-idx{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;font-size:15px}
+.home-watch{margin:16px 0 0;font-size:13.5px;color:var(--muted);word-break:keep-all}
 </style>
 <section class="ai-disclosure" id="notice" aria-label="AI-generated content notice"><div class="wrap">
   <span class="kick">AI Disclosure</span>

@@ -4647,6 +4647,113 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
     }
 
 
+# ── [홈 4단 2026-11-12] '제공 정보' 세 칸 + 신규 공개 문서 ─────────────────────
+# 홈이 기능 설명 대신 **실제 결과 한 건씩**을 보여 준다(대표 확정안 0절 2번). 값은 전부
+# 커밋 스냅샷(findings_docs·findings_facets·glossary·glossary_cases)에서 파생한다 — 손으로
+# 적은 예시는 낡는다. 칸마다 데이터가 없으면 그 칸만 빠진다.
+HOME_TERM_PREFERRED = ("cleanroom", "data-integrity", "audit-trail", "cleaning-validation")
+HOME_AGENCY_BY_LANG = {DEFAULT_LANG: "MFDS", "en": "FDA"}
+HOME_CATCHALL_KEY = "other_quality_system"
+HOME_CATCHALL_LABEL = "기타 품질시스템"
+HOME_NEW_DOCS = 5
+
+
+def build_home_showcase(docs_data: "dict[str, Any] | None",
+                        facets: "dict[str, Any] | None",
+                        glossary_terms: "list[dict[str, Any]] | None",
+                        glossary_cases: "dict[str, dict[str, Any]] | None",
+                        tr: Translator = _KO,
+                        lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    """홈의 업체·용어·기관 예시 한 건씩과 신규 공개 문서 목록.
+
+    · 업체: 가장 최근 공개 문서의 업체 중 문서 2건 이상인 곳(업체 페이지 임계와 같다).
+    · 용어: 선호 목록에서 사례가 있는 첫 용어, 없으면 사례가 가장 많은 용어.
+    · 기관: 그 언어 독자에게 가까운 기관 하나의 분류 상위 둘(캐치올 분류는 순위 밖).
+    · 신규 문서: 공개일 최신순 다섯 건. 영어 트리는 원문이 영어인 문서만.
+    """
+    out: dict[str, Any] = {"firm": None, "term": None, "agency": None, "new_docs": []}
+    docs = list((docs_data or {}).get("documents") or [])
+    if lang != DEFAULT_LANG:
+        docs = [d for d in docs if doc_is_english(d)]
+    docs.sort(key=lambda d: (d.get("published_date") or "", d.get("slug") or ""),
+              reverse=True)
+
+    def _cats(d: dict[str, Any]) -> list[str]:
+        # 캐치올 분류는 아무것도 말하지 않는다 — 줄에 싣지 않는다(1단 미분류 규칙과 같다).
+        return [tr(c) for c in (d.get("categories") or [])
+                if c != HOME_CATCHALL_LABEL][:2]
+
+    for d in docs[:HOME_NEW_DOCS]:
+        out["new_docs"].append({
+            "slug": d["slug"],
+            "date": (d.get("published_date") or "")[5:].replace("-", "."),
+            "source": doc_source_label(d) or tr((facets or {}).get("agency_labels", {})
+                                                .get(d.get("agency") or "", "")
+                                                or d.get("agency") or ""),
+            "firm": d.get("firm_name") or "",
+            "cats": " · ".join(_cats(d)),
+        })
+
+    by_firm: dict[str, list[dict[str, Any]]] = {}
+    for d in docs:
+        key = _canonical_firm_key(d.get("firm_key") or "")
+        if key:
+            by_firm.setdefault(key, []).append(d)
+    for d in docs:
+        key = _canonical_firm_key(d.get("firm_key") or "")
+        group = by_firm.get(key) or []
+        if len(group) < 2:
+            continue
+        out["firm"] = {
+            "name": d.get("firm_name") or "",
+            "key": d.get("firm_key") or "",
+            "documents": len(group),
+            "findings": sum(len(g.get("findings") or []) for g in group),
+            "latest_source": doc_source_label(d),
+            "latest_cats": " · ".join(_cats(d)),
+        }
+        break
+
+    if glossary_terms and glossary_cases:
+        by_id = {t["id"]: t for t in glossary_terms}
+        pick = next((i for i in HOME_TERM_PREFERRED
+                     if i in by_id and _glossary_case_count(glossary_cases.get(i))), None)
+        if pick is None:
+            ranked = sorted((i for i in by_id if _glossary_case_count(glossary_cases.get(i))),
+                            key=lambda i: (-_glossary_case_count(glossary_cases.get(i)), i))
+            pick = ranked[0] if ranked else None
+        if pick:
+            t = by_id[pick]
+            out["term"] = {
+                "id": pick,
+                "name": (t.get("term_ko") if lang == DEFAULT_LANG else t.get("term_en"))
+                        or t.get("term_en") or pick,
+                "findings": f"{_glossary_case_count(glossary_cases.get(pick)):,}",
+            }
+
+    agency = HOME_AGENCY_BY_LANG.get(lang, "FDA")
+    if facets:
+        rows = []
+        for axis in facets.get("axes") or []:
+            if axis.get("axis") != "category":
+                continue
+            for it in axis.get("items") or []:
+                if it.get("key") == HOME_CATCHALL_KEY:
+                    continue
+                c = next((b["c"] for b in it.get("by_agency") or [] if b.get("v") == agency), 0)
+                if c:
+                    rows.append((c, it.get("label_ko") or ""))
+        rows.sort(key=lambda r: (-r[0], r[1]))
+        if len(rows) >= 2:
+            out["agency"] = {
+                "code": agency,
+                "label": tr((facets.get("agency_labels") or {}).get(agency) or agency),
+                "top": [{"label": tr(lbl), "n": f"{n:,}"} for n, lbl in rows[:2]],
+                "as_of": facets.get("measured_on", ""),
+            }
+    return out
+
+
 # ── 페이지 주소(단일 원천) ────────────────────────────────────────────────────
 # [다국어 1단계 2026-09-03] 페이지 하나의 주소는 **사이트 루트 기준 상대 디렉터리 경로
 # 하나**(`"findings/docs/"`)에서 전부 파생한다 — 출력 파일·템플릿의 rel_root·canonical·
@@ -6154,6 +6261,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         cover=_cover_context(latest_brief, latest_issue_no, tr),
         library=library_summary,
         findings_zone=findings_zone,
+        showcase=build_home_showcase(docs_data, facets, glossary_terms,
+                                     load_glossary_cases(), tr, DEFAULT_LANG),
     )
 
     # 아카이브(최신호 desc 정렬).
@@ -7663,6 +7772,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         library={"catalog_count": len(en_catalogs),
                  "item_count": sum(v["count"] for v in en_catalogs)},
         findings_zone=findings_zone_en,
+        showcase=build_home_showcase(docs_data, facets_en, glossary_terms,
+                                     load_glossary_cases(GLOSSARY_CASES_EN_FILE),
+                                     en_tr, "en"),
     )
     en_emit("findings.html", en_page("findings/"),
         zone_totals=findings_zone_en,

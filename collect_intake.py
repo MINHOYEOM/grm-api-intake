@@ -4964,6 +4964,25 @@ def main() -> int:
                     max_items=_env_int("RAW_DRIFT_MAX", raw_drift._MAX_ITEMS_DEFAULT))
             except Exception as e:  # noqa: BLE001 — 측정은 부가 장치
                 log("WARN", f"원문 비교(R0) 중 예외(무시): {type(e).__name__}")
+        # [원문 갱신 규칙 R4 2026-11-12] 본문 칸이 바뀌었고 나빠지지 않았을 때만 정본을 갱신한다
+        # (raw_signal_apply_version — 옛 판 보관). 지적사항은 restore 계획만 만든다(쓰기는 번역 경로).
+        # 끄려면 RAW_UPDATE_APPLY=false. 하루 상한 RAW_UPDATE_MAX(기본 50).
+        if env_flag("RAW_UPDATE_APPLY", True):
+            try:
+                import raw_update
+                upd_summary, upd_plan = raw_update.apply_updates(
+                    findings_supabase[0], findings_supabase[1], heal_candidates,
+                    collected_at=collected_at, dry_run=args.dry_run,
+                    max_apply=_env_int("RAW_UPDATE_MAX", raw_update.MAX_APPLY_DEFAULT))
+                store_counters["raw_update"] = upd_summary
+                if upd_plan["items"]:
+                    from pathlib import Path as _Path
+                    plan_dir = _Path(os.environ.get("RAW_UPDATE_PLAN_DIR", "_raw_update"))
+                    plan_dir.mkdir(parents=True, exist_ok=True)
+                    (plan_dir / f"raw-update-restore-plan-{run_date}.json").write_text(
+                        json.dumps(upd_plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            except Exception as e:  # noqa: BLE001 — 갱신은 부가 장치(수집을 막지 않는다)
+                log("WARN", f"원문 갱신(R4) 중 예외(무시): {type(e).__name__}")
 
     # 제외 장부 저장(실패해도 수집 결과·종료 코드에 영향 없음 - 카운터로만 남는다).
     try:

@@ -116,6 +116,9 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('findings_extractors.py', '_WL_CLASSIFY_CHAR_CAP = 480'): ('decision', '분류기 입력 전용(저장은 원문)'),
     ('findings_extractors.py', 'if len(block) <= _WL_CLASSIFY_CHAR_CAP:'): ('decision', '분류기 입력 전용(저장은 원문)'),
     ('findings_extractors.py', 'truncated = block[:_WL_CLASSIFY_CHAR_CAP]'): ('decision', '분류기 입력 전용(저장은 원문)'),
+    ('findings_extractors.py', '_FDA483_FRAGMENT_MAX_LEN = 30'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
+    ('findings_extractors.py', 'if len(deficiency) >= _FDA483_FRAGMENT_MAX_LEN:'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
+    ('findings_extractors.py', 'return len(d) < _FDA483_FRAGMENT_MAX_LEN and len(_FDA483_WORD_RE.findall(d)) < 3'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
     ('grm_notion.py', 'props[PROP_TYPE_CLASS] = _select(item.type_or_class[:100])'): ('genuine', 'Notion select 옵션 이름 100자 한도'),
 }
 

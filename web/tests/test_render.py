@@ -15629,6 +15629,10 @@ class WebZoneIaTest(unittest.TestCase):
         "admin/index.html": "운영자 전용 콘솔 — 공개 링크를 두지 않는 것이 의도다.",
         "welcome/index.html": "구독 확인 도착 페이지(2026-09-28) — Brevo 확인 메일의 버튼으로만 온다. "
                               "사이트에서 링크하면 '구독해야 용어집 PDF 를 받는다'가 무너진다.",
+        # [전역 검색 2026-11-12] 검색 결과 화면은 <a> 가 아니라 헤더·찾아보기의 검색 **폼**(GET)으로
+        # 온다 — 전 페이지 헤더 폼의 action 이 이 주소인지는 test_nav_cleanup 이 지킨다.
+        "search/index.html": "헤더 검색 폼(GET ?q=)으로만 오는 검색 결과 화면 — 링크 대상이 아니다.",
+        "en/search/index.html": "위와 같다(영어 트리).",
     }
 
     #: 세그먼트에 서는 면. [컨셉 재정의] '데이터 현황'은 세그먼트에서 내렸다 — 그 면이

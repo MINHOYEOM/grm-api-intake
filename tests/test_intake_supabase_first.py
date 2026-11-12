@@ -103,16 +103,27 @@ class SupabaseFirstOrderTest(unittest.TestCase):
         self.assertEqual(counters["supabase_failed"], 1)
         self.assertEqual(counters["notion_failed"], 0)
 
-    def test_undated_item_skips_supabase_but_reaches_notion(self):
+    def test_undated_item_is_written_to_supabase_and_notion(self):
+        # migration 147(2026-11-12): published_date null 허용 — 게시일 없는 항목도 정본에 쓴다.
         counters = ci._new_store_counters()
         with mock.patch.object(ci.time, "sleep"), \
-                mock.patch.object(ci, "append_intake_item_to_supabase") as supa, \
+                mock.patch.object(ci, "append_intake_item_to_supabase", return_value=_ok()) as supa, \
                 mock.patch.object(ci, "notion_create_page", return_value=True):
             got = _insert([_item(source="ICH", document_id="ich-q1", date_iso="")],
                           findings_supabase=_SUPABASE, store_counters=counters)
         self.assertEqual(got, (1, 0, 0))
-        supa.assert_not_called()
-        self.assertEqual(counters["supabase_skipped_undated"], 1)
+        supa.assert_called_once()
+        self.assertEqual(counters["supabase_saved"], 1)
+        self.assertEqual(counters["supabase_skipped_undated"], 0)
+
+    def test_undated_record_has_null_published_date_and_is_valid(self):
+        import grm_findings as gf
+        rec = ci.raw_signal_from_intake_item(
+            _item(source="ICH", document_id="ich-q1", date_iso=""), collected_at=_AT)
+        self.assertIsNone(rec["published_date"])          # 날짜를 지어 넣지 않는다
+        self.assertEqual(gf.validate_raw_signal(rec), [])
+        dated = ci.raw_signal_from_intake_item(_item(), collected_at=_AT)
+        self.assertEqual(dated["published_date"], "2026-11-10")
 
     def test_findings_mode_raw_saved_but_findings_error_counts_as_saved(self):
         counters = ci._new_store_counters()
@@ -205,7 +216,7 @@ class FallbackDedupInsertTest(unittest.TestCase):
 
 class SupabaseFallbackKeysTest(unittest.TestCase):
 
-    def test_returns_checked_and_existing_keys_and_skips_undated(self):
+    def test_returns_checked_and_existing_keys_including_undated(self):
         dated_old = _item(document_id="wl-old")
         dated_new = _item(document_id="wl-new")
         undated = _item(source="ICH", document_id="ich-q1", date_iso="")
@@ -219,9 +230,10 @@ class SupabaseFallbackKeysTest(unittest.TestCase):
         with mock.patch.object(ci, "existing_raw_signal_ids", side_effect=fake_existing):
             got = ci.supabase_fallback_dedup_keys(*_SUPABASE, [dated_old, dated_new, undated], _AT)
         checked, existing = got
-        self.assertEqual(checked, {"FDA Warning Letter::wl-old", "FDA Warning Letter::wl-new"})
+        self.assertEqual(checked, {"FDA Warning Letter::wl-old", "FDA Warning Letter::wl-new",
+                                   "ICH::ich-q1"})
         self.assertEqual(existing, {"FDA Warning Letter::wl-old"})
-        self.assertEqual(len(asked[0]), 2)       # 게시일 없는 항목은 묻지 않는다
+        self.assertEqual(len(asked[0]), 3)       # migration 147 이후 게시일 없는 항목도 묻는다
 
     def test_lookup_failure_returns_none(self):
         with mock.patch.object(ci, "existing_raw_signal_ids", return_value=None):

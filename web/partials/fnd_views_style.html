@@ -1,0 +1,10 @@
+{#- [찾아보기 2026-11-12] 보기 전환(.fnd-views) 공용 스타일 — 옛 탭 파셜(findings_seg.html)이 들고 있던 것.
+    분류 모음·업체 찾기/수입경보 목록·실사관 기관 전환이 쓴다. -#}
+<style>
+.fnd-views a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
+.fnd-views{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--rad-s);overflow:hidden;margin:16px 0 24px;font-size:13.5px}
+.fnd-views a{padding:6px 14px;color:var(--muted);border-right:1px solid var(--line-2)}
+.fnd-views a:last-child{border-right:0}
+.fnd-views a:hover{color:var(--ink)}
+.fnd-views a.on{background:var(--soft);color:var(--ink);font-weight:600}
+</style>

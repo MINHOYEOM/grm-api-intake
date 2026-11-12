@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% include "partials/fnd_views_style.html" %}
 {#- FIND-1 업체 프로파일(FIND-FIRM-ALIAS 웹 절반) — 013_findings_firm_key.sql 의
     findings_firm_profile(p_firm_key) RPC 를 라이브 fetch 해 특정 업체의 누적 지적사항
     이력을 보여준다. URL 파라미터(?key=firm_key)로 조회하는 순수 파라미터 페이지라

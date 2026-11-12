@@ -9,6 +9,7 @@
 <meta name="robots" content="noindex, nofollow" />
 {% endblock %}
 {% block content %}
+{% include "partials/fnd_views_style.html" %}
 {#- FDA 483 실사관 프로파일 — findings_inspector_index()/findings_inspector_profile(p_inspector_key)
     RPC 를 라이브 fetch 해 특정 실사관(서명 검사관)이 서명한 FDA 483 문서·지적사항 이력을
     보여준다. **firm.html/firm.js 의 미러링** — URL 파라미터(?key=inspector_key)로 조회하는

@@ -193,11 +193,11 @@
     } else if (e.kind === "firm") {
       var ag = (it.a || []).map(function (x) { return label(AGENCY_LABEL, x); }).join(", ");
       bestEl.appendChild(el("span", "sr-meta",
-        _t("공개 문서 {d}건 · 지적 {f}건", { d: fmt(it.d), f: fmt(it.f) }) +
+        _t("공개 문서 {n}건", { n: fmt(it.d) }) + " · " + _t("지적 {n}건", { n: fmt(it.f) }) +
         (ag ? " · " + ag : "") + (it.l ? " · " + _t("최근 공개 {date}", { date: it.l }) : "")));
     } else {
       bestEl.appendChild(el("span", "sr-meta",
-        _t("공개 문서 {d}건 · 지적 {f}건", { d: fmt(it.d), f: fmt(it.f) })));
+        _t("공개 문서 {n}건", { n: fmt(it.d) }) + " · " + _t("지적 {n}건", { n: fmt(it.f) })));
     }
     bestEl.hidden = false;
   }

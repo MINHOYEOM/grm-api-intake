@@ -9272,12 +9272,14 @@ class WebLibraryRenderTest(unittest.TestCase):
                           f"{e['slug']} 허브 건수 표기 불일치")
 
     def test_nav_link_present_and_active(self):
-        # 자료실 페이지에서만 nav 'on' 이 붙는다. 타 페이지엔 링크만.
-        self.assertIn('library/index.html" class="on">자료실</a>', self.hub)
+        # [메뉴 3개 2026-11-12] 자료실은 찾아보기 안의 면 — 자료실 면에서 nav '찾아보기'가 켜지고,
+        # 홈에서는 링크만. 자료실로 가는 길은 찾아보기 색인('지침·고시')과 푸터 콘텐츠 열.
+        self.assertIn('browse/index.html" class="on">찾아보기</a>', self.hub)
         for html in self.pages.values():
-            self.assertIn('library/index.html" class="on">자료실</a>', html)
-        self.assertIn('href="library/index.html">자료실</a>', self.landing)
-        self.assertNotIn('class="on">자료실</a>', self.landing)
+            self.assertIn('browse/index.html" class="on">찾아보기</a>', html)
+        self.assertIn('href="browse/index.html">찾아보기</a>', self.landing)
+        self.assertNotIn('class="on">찾아보기</a>', self.landing)
+        self.assertIn('href="library/index.html">자료실</a>', self.landing)   # 푸터 콘텐츠 열
 
     def test_sitemap_includes_all_catalogs(self):
         for path in ["/library/"] + [f"/library/{e['slug']}/" for e in render.LIBRARY_REGISTRY]:
@@ -9753,9 +9755,10 @@ class WebGuideRenderTest(unittest.TestCase):
         self.assertIn('href="../glossary/index.html"', self.html)
 
     def test_nav_active_and_meta(self):
-        self.assertIn('guide/index.html" class="on">이용안내</a>', self.html)
-        self.assertIn('href="guide/index.html">이용안내</a>', self.landing)
-        self.assertNotIn('class="on">이용안내</a>', self.landing)
+        # [메뉴 3개 2026-11-12] 이용안내는 찾아보기 안의 면 — nav '찾아보기'가 켜진다.
+        self.assertIn('browse/index.html" class="on">찾아보기</a>', self.html)
+        self.assertNotIn('class="on">찾아보기</a>', self.landing)
+        self.assertIn('href="guide/index.html">이용안내</a>', self.landing)   # 푸터 서비스 안내 열
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/guide/" />', self.html)
         self.assertIn('<meta name="description" content="', self.html)
 
@@ -9986,9 +9989,10 @@ class WebGlossaryRenderTest(unittest.TestCase):
             self.assertIn(str(_esc(combined)), self.html)
 
     def test_nav_active_and_meta(self):
-        # [8차 웨이브 A] 용어사전 전용 nav 탭 신설 — glossary 탭이 점등된다(이용안내 아님).
-        self.assertIn('glossary/index.html" class="on">용어사전</a>', self.html)
-        self.assertNotIn('guide/index.html" class="on">이용안내</a>', self.html)
+        # [메뉴 3개 2026-11-12] 용어사전은 찾아보기 안의 면 — nav '찾아보기' 하나만 켜진다.
+        nav = self.html[self.html.index('<nav id="navmenu">'):]
+        nav = nav[:nav.index("</nav>")]
+        self.assertEqual(re.findall(r'class="on">([^<]+)</a>', nav), ["찾아보기"])
         self.assertIn(f'<link rel="canonical" href="{render.SITE_BASE_URL}/glossary/" />', self.html)
         self.assertIn('<meta name="description" content="', self.html)
 
@@ -16206,22 +16210,30 @@ class WebDeficiencyExamplesEntryTest(unittest.TestCase):
         self.assertIn("@media(max-width:860px){.records-grid{grid-template-columns:repeat(2,1fr)}}", src)
         self.assertIn("@media(max-width:520px){.records-grid{grid-template-columns:1fr}}", src)
 
+    #: [찾아보기 2026-11-12] 두 화면의 입구는 찾아보기 색인(+푸터 '찾아보기' 열 → 전체 색인).
+    BROWSE_NAMES = {"findings/citations/": ("FDA 지적 조항 순위", "FDA cited sections"),
+                    "findings/examples/": ("지적 사례", "Deficiency examples")}
+
     def test_footer_tools_column_links_both(self):
+        """푸터 '찾아보기' 열은 전체 색인으로 잇고, 색인이 두 화면을 잇는다(ko·en)."""
         for html, lang in ((self.landing, "ko"), (self.en_landing, "en"), (self.search, "ko")):
             foot = html[html.index('<div class="foot">'):html.index('<div class="foot-legal">')]
-            tools = foot[foot.index("<h5>" + ("지적사항" if lang == "ko" else "Findings")):]
-            tools = tools[:tools.index("</div>")]
-            for path, ko, en in self.ROUTES:
-                with self.subTest(lang=lang, path=path):
-                    self.assertRegex(tools, rf'findings/{path[9:]}index.html">{re.escape(ko if lang == "ko" else en)}</a>')
+            col = foot[foot.index('<div class="foot-fnd">'):]
+            col = col[:col.index("</div>")]
+            self.assertIn("browse/index.html", col, lang)
+        for root, i in (("", 0), ("en/", 1)):
+            browse = (self.single / root / "browse" / "index.html").read_text(encoding="utf-8")
+            for path, _ko, _en in self.ROUTES:
+                with self.subTest(root=root, path=path):
+                    name = self.BROWSE_NAMES[path][i]
+                    self.assertIn(f'href="../{path}index.html"><b>{name}</b>', browse)
 
     def test_en_findings_seg_has_shortcuts(self):
-        """[탭 3묶음] 영어판도 같은 묶음 — 지적 조항은 '경향', 지적 사례는 '점검' 줄에 선다."""
+        """[찾아보기 2026-11-12] 탭 줄은 없다 — 영어판 두 화면도 빵부스러기로 찾아보기에 잇는다."""
         for path, _, en in self.ROUTES:
             page = (self.single / "en" / path / "index.html").read_text(encoding="utf-8")
-            seg = page[page.index('<nav class="fnd-seg"'):]
-            seg = seg[:seg.index("</nav>")]
-            self.assertIn(f'{path}index.html" class="on" aria-current="page">{en}</a>', seg)
+            self.assertNotIn('class="fnd-seg"', page)
+            self.assertIn('browse/">Browse</a>', page)
 
 
 # ── [진입점 3종 2026-08-31] 실사관 프로파일까지 가는 길 ─────────────────────────
@@ -16244,51 +16256,50 @@ class WebInspectorEntryPointsTest(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
-    # ── (1) 세그먼트 탭 3페이지 일관성 ──────────────────────────────────────────
-    def _seg_block(self, html):
-        start = html.index('<nav class="fnd-seg"')
+    # ── (1) [찾아보기 2026-11-12] 탭 3묶음 폐기 뒤의 길 — 메뉴 '찾아보기' · 빵부스러기 · 색인 ──
+    def _crumbs(self, html):
+        start = html.index('<nav class="grm-crumbs"')
         return html[start:html.index("</nav>", start)]
 
     def test_search_and_inspector_carry_the_same_find_tabs(self):
-        """[탭 3묶음 2026-11-11] 실사관은 '찾기' 묶음의 화면 — 검색·실사관 두 면에서 같은 줄이다."""
-        want = ["검색", "문서", "분류", "업체", "실사관"]
-        for label, html in (("search", self.search), ("inspector", self.inspector)):
+        """검색·실사관 두 면 모두 탭 줄 없이 같은 위치 표시(홈 › 찾아보기 › 면)를 단다."""
+        for label, html, own in (("search", self.search, "지적 문장 검색"),
+                                 ("inspector", self.inspector, "실사관")):
             with self.subTest(page=label):
-                seg = self._seg_block(html)
-                sub = seg[seg.index('<div class="fnd-seg-s">'):]
-                self.assertEqual(re.findall(r'>([^<>]+)</a>', sub), want)
+                self.assertNotIn('class="fnd-seg"', html)
+                self.assertEqual(re.findall(r">([^<>]+)</(?:a|span)>", self._crumbs(html)),
+                                 ["홈", "찾아보기", own])
 
     def test_each_page_marks_only_itself_active(self):
-        for label, html, own_text in (("search", self.search, "검색"),
-                                      ("inspector", self.inspector, "실사관")):
+        for label, html in (("search", self.search), ("inspector", self.inspector)):
             with self.subTest(page=label):
-                seg = self._seg_block(html)
-                self.assertIn(f'class="on" aria-current="page">{own_text}</a>', seg)
-                self.assertEqual(seg.count('aria-current="page"'), 1)
-                self.assertEqual(seg.count('aria-current="true"'), 1)
+                nav = html[html.index('<nav id="navmenu">'):]
+                nav = nav[:nav.index("</nav>")]
+                self.assertEqual(re.findall(r'class="on">([^<]+)</a>', nav), ["찾아보기"])
 
     def test_inspector_seg_link_paths_match_sibling_depth(self):
-        """inspector.html 은 rel_root="../../" — 탭 링크가 그 깊이로 풀려야 한다."""
-        seg = self._seg_block(self.inspector)
-        self.assertIn('href="../../findings/index.html"', seg)
-        self.assertIn('href="../../findings/inspector/index.html"', seg)
+        """inspector.html 은 rel_root="../../" — 위치 표시 링크가 그 깊이로 풀려야 하고,
+        찾아보기 색인이 실사관 면을 잇는다."""
+        crumbs = self._crumbs(self.inspector)
+        self.assertIn('href="../../browse/"', crumbs)
+        browse = (self.single / "browse" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="../findings/inspector/index.html"><b>실사관</b>', browse)
 
     def test_seg_appears_before_ip_lookup_state(self):
-        """세그가 본문(조회 랜딩)보다 앞 — 진입하자마자 다른 면으로도 오갈 수 있어야
-        한다(검색 화면의 '세그가 툴바보다 앞' 계약과 동형, WebDiscoveryHubTest 참조)."""
-        self.assertLess(self.inspector.index('class="fnd-seg"'),
-                         self.inspector.index('id="ip-lookup"'))
+        """위치 표시가 본문(조회 랜딩)보다 앞 — 진입하자마자 다른 면으로 오갈 수 있다."""
+        self.assertLess(self.inspector.index('class="grm-crumbs"'),
+                        self.inspector.index('id="ip-lookup"'))
 
     def test_source_toggle_is_view_switch_with_agency_names(self):
-        """[11-11 회귀] 기관 전환은 탭 줄(fnd-seg)이 아니라 보기 전환(fnd-views) 모양이고,
-        라벨은 문서 종류('FDA 483')가 아니라 기관 이름이다."""
+        """[11-11 회귀 · #1560] 기관 전환은 탭 줄이 아니라 보기 전환(fnd-views) 모양이고,
+        라벨은 문서 종류('FDA 483')가 아니라 기관 이름이다. 탭 3묶음 폐기 뒤에도 살아 있다."""
         i = self.inspector.index('id="ip-source-fda"')
         nav = self.inspector[self.inspector.rindex("<nav", 0, i):self.inspector.index("</nav>", i)]
         self.assertIn('class="fnd-views"', nav)
         self.assertIn('aria-current="page">FDA</a>', nav)
         self.assertIn(">식약처(MFDS)</a>", nav)
         self.assertNotIn("FDA 483", nav)
-        self.assertEqual(self.inspector.count('<nav class="fnd-seg"'), 1)
+        self.assertEqual(self.inspector.count('<nav class="fnd-seg"'), 0)
 
     # ── (2) 검색 화면 상단 안내 스트립 — [탭 3묶음 2026-11-11] 없앴다(탭 '찾기 › 실사관'이 대신) ──
     def test_strip_retired(self):

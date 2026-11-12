@@ -6,11 +6,4 @@
   {%- for a in fnd_facet_axes %}<a href="{{ rel_root }}findings/{{ a.path }}/index.html"{% if axis and axis.path == a.path %} class="on" aria-current="page"{% endif %}>{{ _(a.label) }}</a>{% endfor -%}
 </nav>
 {%- endif %}
-<style>
-.fnd-views a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
-.fnd-views{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--rad-s);overflow:hidden;margin:16px 0 24px;font-size:13.5px}
-.fnd-views a{padding:6px 14px;color:var(--muted);border-right:1px solid var(--line-2)}
-.fnd-views a:last-child{border-right:0}
-.fnd-views a:hover{color:var(--ink)}
-.fnd-views a.on{background:var(--soft);color:var(--ink);font-weight:600}
-</style>
+{% include "partials/fnd_views_style.html" %}

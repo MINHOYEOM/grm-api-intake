@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% include "partials/fnd_views_style.html" %}
 {#- [수입경보 2단계 2026-11-10] /findings/import-alerts/ — FDA 수입경보 66-40·66-41 전체 목록.
     데이터 = web/data/import_alerts.json(1단계 스냅샷) → import_alerts_page.list_view. 네트워크 0.
     ★전 행을 서버가 HTML 로 낸다(검색엔진이 읽는다). 필터·검색은 아래 인라인 스크립트가 행에

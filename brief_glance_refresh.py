@@ -91,7 +91,12 @@ def build_items(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+    ap =argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--supabase-url", required=True)
     ap.add_argument("--supabase-anon-key", required=True)
     ap.add_argument("--briefs", type=Path, default=DEFAULT_BRIEFS)

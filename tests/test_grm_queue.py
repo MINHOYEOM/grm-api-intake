@@ -471,6 +471,91 @@ class HealTest(unittest.TestCase):
         self.assertTrue(all(not isinstance(v, (list, dict)) for v in health.values()))
 
 
+class BuilderConditionsTest(unittest.TestCase):
+    """재생 대조 10절에서 나온 빌더 조건 — 공백 · 483 범위."""
+
+    def setUp(self):
+        self.store = FakeStore()
+
+    def _enq(self, source, doc, **rec):
+        self.store.add_raw(_record(source, doc, **rec))
+        self.store.enqueue([{"source": source, "document_id": doc,
+                             "first_seen_run_date": "2026-11-12",
+                             "first_seen_at": "2026-11-12T03:30:00+09:00"}])
+
+    def test_edge_whitespace_is_trimmed_like_the_notion_reader(self):
+        self._enq("MFDS", "recall-1", headline="회수 공지\r", firm="  가나제약\r\n",
+                  body="첫 줄\r\n둘째 줄")
+        rows, _, _ = gq.load_candidates(self.store, RUN, 30, gh._HANDOFF_V2_ROW_KEEP)
+        self.assertEqual(rows[0]["headline"], "회수 공지")
+        self.assertEqual(rows[0]["firm"], "가나제약")
+        self.assertEqual(rows[0]["body"], "첫 줄\r\n둘째 줄")          # 글 안쪽은 그대로
+
+    def test_notion_snapshot_reader_trims_the_same_way(self):
+        # 정규화 기준이 노션 읽기 규칙이라는 것을 잠근다 — 그쪽이 바뀌면 여기도 다시 봐야 한다.
+        page = {"properties": {"Headline": {"rich_text": [{"plain_text": "회수 공지\r"}]}}}
+        import grm_notion
+        snap = gh._intake_page_snapshot(
+            {"properties": {grm_notion.PROP_HEADLINE: page["properties"]["Headline"]}})
+        self.assertEqual(snap["headline"], "회수 공지")
+
+    def test_483_out_of_scope_by_current_rule_is_closed_before_handoff(self):
+        self._enq("FDA 483", "blood", raw={"establishment_type": "Blood Bank",
+                                           "fda_483_observations": []})
+        self._enq("FDA 483", "drug", raw={"establishment_type": "Drug Manufacturer",
+                                          "fda_483_observations": [
+                                              {"deficiency": "Batch records", "detail": "x"}]})
+        rows, _, stats = gq.load_candidates(self.store, RUN, 30, gh._HANDOFF_V2_ROW_KEEP)
+        self.assertEqual([r["document_id"] for r in rows], ["drug"])
+        self.assertEqual(stats["pre_skipped"], 1)
+        self.assertEqual(self.store.queue["FDA 483::blood"]["state_reason"], "out_of_scope_483_rule")
+
+    def test_scope_verdict_is_the_taxonomy_function_not_a_copy(self):
+        import grm_taxonomy
+        raw = {"establishment_type": "Whatever", "fda_483_observations": [
+            {"deficiency": "d", "detail": "t"}]}
+        with patch.object(gq, "is_out_of_scope_483", return_value=True) as fn:
+            self.assertEqual(gq.pre_handoff_skip_reason("FDA 483", raw), "out_of_scope_483_rule")
+        fn.assert_called_once_with("Whatever", "d t")
+        self.assertIs(gq.is_out_of_scope_483, grm_taxonomy.is_out_of_scope_483)
+        with patch.object(gq, "is_out_of_scope_483", return_value=True):
+            self.assertEqual(gq.pre_handoff_skip_reason("FDA Warning Letter", raw), "")   # 483 만
+
+    def test_sponsor_and_cro_stay_in_scope(self):
+        # 11-12 대표 결정(#1602): 의약품 임상 스폰서·CRO 는 범위 안.
+        import grm_taxonomy
+        for est in ("Sponsor", "Contract Research Organization"):
+            want = "out_of_scope_483_rule" if grm_taxonomy.is_out_of_scope_483(est, "") else ""
+            self.assertEqual(gq.pre_handoff_skip_reason(
+                "FDA 483", {"establishment_type": est, "fda_483_observations": []}), want)
+
+    def test_only_notion_rows_closed_as_out_of_scope_are_reported_as_explained(self):
+        self._enq("FDA 483", "blood", raw={"establishment_type": "Blood Bank"})
+        self._enq("FDA 483", "drug", raw={"establishment_type": "Drug Manufacturer"})
+        notion = {"rows": [{"source": "FDA 483", "document_id": d, "run_date": "2026-11-12"}
+                           for d in ("blood", "drug", "missing")]}
+        with tempfile.TemporaryDirectory() as tmp, patch.object(gq, "log"), \
+                patch.object(gh, "log"), patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
+            report = gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
+                                   display_window_days=7, store=self.store, out_dir=tmp,
+                                   repo_root=tmp, notion_payload=notion)
+        cmp_ = report["compare"]
+        self.assertEqual(cmp_["only_notion_out_of_scope"], ["FDA 483::blood"])
+        self.assertEqual(cmp_["only_notion"], ["FDA 483::missing"])
+        self.assertIn("설명됨", gq.render_report_md(report))
+
+
+class OrderTest(unittest.TestCase):
+    def test_shadow_runs_after_the_daily_raw_update(self):
+        src = (ROOT / "collect_intake.py").read_text(encoding="utf-8")
+        update = src.index("raw_update.apply_updates(")
+        notion_emit = src.index("handoff_row_count, handoff_url = emit_routine_handoff(")
+        shadow = src.index("grm_queue.run_shadow(")
+        self.assertLess(update, notion_emit)      # 노션 handoff 도 R4 뒤
+        self.assertLess(notion_emit, shadow)      # DB handoff 는 그 뒤(비교 대상이 있어야 한다)
+        self.assertEqual(src.count("grm_queue.run_shadow("), 1)
+
+
 class CompareTest(unittest.TestCase):
     def test_classifies_who_is_richer(self):
         n = {"rows": [{"source": "FR", "document_id": "1", "body": "abc…", "modality": "Bio",

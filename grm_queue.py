@@ -38,6 +38,7 @@ import requests
 import grm_findings as gf
 from grm_cli import normalize_supabase_url
 from grm_common import SOURCE_FDA_483, env_flag, log, truncate
+from grm_taxonomy import is_out_of_scope_483
 
 KST = timezone(timedelta(hours=9))
 
@@ -133,7 +134,10 @@ def snapshot_from_raw_signal(record: dict[str, Any], queue_row: dict[str, Any],
     for k in snap:
         v = rj.get(k)
         if v is not None:
-            snap[k] = v
+            # 노션 길은 속성 값을 읽을 때 앞뒤 공백을 떼어 낸다(`_plain_text().strip()`). 원천이 남긴
+            # 줄 끝 `\r` 같은 문자가 DB 에는 그대로 있어 헤드라인이 1글자 달랐다(재생 대조 10-3).
+            # 같은 규칙으로 맞춘다 — 앞뒤만 뗀다. 글 안쪽은 건드리지 않는다.
+            snap[k] = v.strip() if isinstance(v, str) else v
     snap["source"] = str(record.get("source") or "")
     snap["document_id"] = str(record.get("document_id") or "")
     seen = to_kst(queue_row.get("first_seen_at")) or to_kst(record.get("collected_at"))
@@ -146,12 +150,24 @@ def snapshot_from_raw_signal(record: dict[str, Any], queue_row: dict[str, Any],
 
 
 def pre_handoff_skip_reason(source: str, raw: dict[str, Any]) -> str:
-    """handoff 에 싣기 전에 코드가 닫는 행. 지금은 483 범위 밖 한 가지다.
+    """handoff 에 싣기 전에 코드가 닫는 행 — FDA 483 범위 밖 두 가지.
 
-    노션에서는 `fda483_notion_raw_sync` 가 같은 행을 Status=Skipped 로 닫는다.
+    out_of_scope_483       수집 때 찍힌 표식(`fda483_text_status=out-of-scope`). 노션에서는
+                           `fda483_notion_raw_sync` 가 같은 행을 Status=Skipped 로 닫는다.
+    out_of_scope_483_rule  표식은 없지만 지금 규칙(`grm_taxonomy.is_out_of_scope_483`)으로 범위 밖.
+                           범위 규칙이 넓어지기 전에 저장된 행이다. 노션 길에서는 handoff 에 실렸다가
+                           발행 조립(`assemble_publish_brief._is_out_of_scope_483_card`)에서 빠진다.
+                           같은 함수에 같은 재료(시설 유형 + 관찰 본문)를 넘긴다 — 판정 사본을 두지 않는다.
     """
-    if source == SOURCE_FDA_483 and (raw or {}).get("fda483_text_status") == "out-of-scope":
+    if source != SOURCE_FDA_483:
+        return ""
+    raw = raw or {}
+    if raw.get("fda483_text_status") == "out-of-scope":
         return "out_of_scope_483"
+    body = " ".join(f"{o.get('deficiency', '')} {o.get('detail', '')}"
+                    for o in (raw.get("fda_483_observations") or []) if isinstance(o, dict))
+    if is_out_of_scope_483(str(raw.get("establishment_type") or ""), body):
+        return "out_of_scope_483_rule"
     return ""
 
 
@@ -316,6 +332,27 @@ def compare_payloads(notion_payload: dict[str, Any], db_payload: dict[str, Any])
     }
 
 
+def _explain_only_notion(store: Any, cmp_: dict[str, Any]) -> None:
+    """'노션에만' 행 중 코드가 범위 밖 483 으로 이미 닫은 행을 따로 뺀다.
+
+    노션 길은 그 행을 handoff 에 싣고 발행 조립에서 뺀다. DB 길은 handoff 전에 뺀다. 발행 결과는 같다.
+    남은 `only_notion` 이 진짜로 설명되지 않은 차이다. 조회 실패는 분류만 못 할 뿐 비교는 남긴다.
+    """
+    cmp_["only_notion_out_of_scope"] = []
+    keys = [tuple(k.split("::", 1)) for k in cmp_.get("only_notion") or [] if "::" in k]
+    if not keys:
+        return
+    try:
+        rows = store.queue_rows(keys)
+    except QueueStoreError:
+        return
+    closed = sorted(k for k, r in rows.items()
+                    if r.get("state") == STATE_SKIPPED
+                    and str(r.get("state_reason") or "").startswith("out_of_scope_483"))
+    cmp_["only_notion_out_of_scope"] = closed
+    cmp_["only_notion"] = [k for k in cmp_["only_notion"] if k not in set(closed)]
+
+
 def compare_states(computed: dict[str, dict[str, str]],
                    notion_status: dict[str, str]) -> dict[str, Any]:
     """코드가 계산한 상태 vs 노션에 실제로 찍힌 Status(그림자 b)."""
@@ -381,6 +418,10 @@ def render_report_md(report: dict[str, Any]) -> str:
                   f"{'같음' if cmp_['coverage_same'] else '다름'} |"]
         if cmp_["only_notion"]:
             lines += ["", "노션에만: " + ", ".join(cmp_["only_notion"][:30])]
+        if cmp_.get("only_notion_out_of_scope"):
+            lines += ["", f"노션에만 있지만 설명됨(범위 밖 483 — 노션 길은 발행 조립에서 뺀다) "
+                          f"{len(cmp_['only_notion_out_of_scope'])}건: "
+                          + ", ".join(cmp_["only_notion_out_of_scope"][:30])]
         if cmp_["only_db"]:
             lines += ["", "DB에만: " + ", ".join(cmp_["only_db"][:30])]
         if cmp_["field_diff"]:
@@ -886,6 +927,7 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
     if payload is not None and notion_payload is not None:
         try:
             report["compare"] = compare_payloads(notion_payload, payload)
+            _explain_only_notion(store, report["compare"])
         except Exception as e:  # noqa: BLE001
             report["warnings"].append(f"handoff 비교 실패: {type(e).__name__}")
 

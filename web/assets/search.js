@@ -4,7 +4,8 @@
  *     영문·약어·동의어 일치. 비용 0(정적 파일).
  *  2) 지적 문장: findings_search RPC 본문 전용 모드(p_text_only). 용어가 답이면 그 용어의
  *     사례 검색어(용어 페이지의 사례 수와 같은 기준)로, 초성 검색이면 답의 이름으로 찾는다.
- *     첫 호출이 서버 시간 제한(57014)에 걸리는 일이 있어 한 번 다시 시도한다.
+ *     첫 호출이 서버 시간 제한(57014)에 걸리는 일이 있어 간격을 두고 두 번 더 시도하고,
+ *     그래도 실패하면 '다시 시도' 버튼을 낸다(11-12 라이브: 첫 검색 두 번 연속 실패 실측).
  *  3) 필터 두 묶음(기관·문서 종류)은 응답 집계로 그리고, 나머지 조건은 '상세 필터'(기존
  *     지적 문장 검색 화면)로 넘긴다. 값은 전부 textContent 로 넣는다(innerHTML 미사용). */
 (function () {
@@ -236,7 +237,11 @@
       if (!d || !Array.isArray(d.documents) || !d.totals) throw new Error("shape");
       return d;
     }).catch(function (err) {
-      if ((attempt || 0) < 1) return rpc(q, textOnly, 1);
+      var a = attempt || 0;
+      if (a < 2) {
+        return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
+          .then(function () { return rpc(q, textOnly, a + 1); });
+      }
       throw err;
     });
   }
@@ -322,7 +327,10 @@
       // 뒤로 보낸다. 같은 묶음 안에서는 서버 순서(최신순)를 지킨다.
       var rough = function (row) {
         var t = _bodyText(row.f);
-        return (/\(b\)\s*\(\d\)|판독 누락|�/.test(t) ? 2 : 0) + (t.length > 260 ? 1 : 0);
+        // 판독이 깨진 OCR 문장(`~r> (.iJ)` 같은 기호 잔해)도 가림 표기와 같이 뒤로.
+        var junk = (t.match(/[~<>{}|^]/g) || []).length;
+        return (/\(b\)\s*\(\d\)|판독 누락|�|\(\.\w+\)/.test(t) || junk >= 2 ? 2 : 0) +
+          (t.length > 260 ? 1 : 0);
       };
       rows = rows.map(function (r, i) { return { r: r, i: i, k: rough(r) }; })
         .sort(function (a, b) { return a.k - b.k || a.i - b.i; })
@@ -350,7 +358,11 @@
         hitsEl.appendChild(li);
       });
     }).catch(function () {
-      noteEl.textContent = _t("지적 문장을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주십시오.");
+      noteEl.textContent = _t("지적 문장을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주십시오.") + " ";
+      var b = el("button", "sr-retry", _t("다시 시도"));
+      b.type = "button";
+      b.addEventListener("click", rerun);
+      noteEl.appendChild(b);
     });
   }
 

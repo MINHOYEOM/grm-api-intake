@@ -36,6 +36,7 @@
 .sr-hit p{margin:0 0 6px;line-height:1.7;color:var(--ink);word-break:keep-all;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
 .sr-hit mark{background:color-mix(in srgb,var(--coral) 22%,transparent);color:inherit;padding:0 1px;border-radius:2px}
 .sr-note{color:var(--muted);font-size:14px;padding:14px 0;margin:0;line-height:1.6;word-break:keep-all}
+.sr-retry{font:inherit;font-size:13px;margin-left:6px;padding:3px 12px;border:1px solid var(--line-2);border-radius:999px;background:var(--canvas);color:var(--ink);cursor:pointer}
 .sr-more{margin:28px 0 0}
 .sr-more[hidden]{display:none}
 .sr-pills{display:flex;flex-wrap:wrap;gap:6px;padding-top:12px}
@@ -52,7 +53,8 @@
 @media(max-width:900px){
   .sr{padding-top:22px}
   .sr-grid{grid-template-columns:minmax(0,1fr);gap:24px}
-  .sr-side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:16px;order:-1}
+  /* 휴대폰은 결과가 먼저(필터를 위에 두면 첫 결과가 375×812 화면 맨 아래로 밀렸다 — 11-12 라이브 실측). */
+  .sr-side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:16px}
   .sr-filt{flex-direction:row;flex-wrap:wrap;gap:4px 14px}
   .sr-filt legend{width:100%}
 }

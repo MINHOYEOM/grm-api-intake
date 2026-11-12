@@ -657,7 +657,7 @@ grm-api-intake/
 │  ├─ migrations/137_findings_similar_edges_public.sql # 문서 페이지 "다른 업체의 비슷한 지적" — 양 끝 공개 행인 finding_similar 엣지만 anon 에 여는 읽기 RPC(가산·**미적용**, 비서실 dry-run 후 적용)
 │  ├─ migrations/138_regulatory_news_public.sql # 최근 규제 소식 공개 읽기 RPC(raw_signals 공개 5컬럼 · 미적용 — 비서실 dry-run 후 적용)
 │  ├─ migrations/139_rum_anomaly_filter.sql # 방문 통계 자동 접속 급증 거르기 — 제외일(≥200·28일 중앙값×8)·급증 경로(≥100·×20) 판정 보기 + `rum_*_clean` 보기 6개, 보고 함수 4개(077·089·135·087)를 _clean 에 연결. 분석·보고는 원본 `rum_*` 대신 `_clean` 을 읽는다. 수동 판정은 `rum_anomaly_overrides`
-│  ├─ migrations/154_rum_nav_ui_events.sql # 페이지 간 이동(이전 종류→다음 종류)·탭/칩/토글/필터 클릭·펼침 하루 익명 카운터(`rum_nav_daily`·`rum_ui_daily`, anon bump 2개, 경로·쿼리·값 없음) + 봇 날 제외 `_clean` 보기 2개 + 판독 `rum_ui_report`(483 펼침 날짜별 포함). 수집은 base.html `[154]` 스크립트(env 게이트)
+│  ├─ migrations/155_rum_nav_ui_events.sql # 페이지 간 이동(이전 종류→다음 종류)·탭/칩/토글/필터 클릭·펼침 하루 익명 카운터(`rum_nav_daily`·`rum_ui_daily`, anon bump 2개, 경로·쿼리·값 없음) + 봇 날 제외 `_clean` 보기 2개 + 판독 `rum_ui_report`(483 펼침 날짜별 포함). 수집은 base.html `[155]` 스크립트(env 게이트)
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -715,7 +715,7 @@ grm-api-intake/
 │  ├─ ops_db_backup_key_custody.md       # DB 백업 열쇠 보관·복원 시험 안내서(위치·절차만, 열쇠 값 없음)
 │  ├─ ops_brevo_signup_path_attributes.md # 구독 가입 경로 기록 — Brevo 속성 만들기·켜는 순서(GRM_SIGNUP_PATH_FIELDS)
 │  ├─ specs/FDA483_OCR_판독개선_벤치마크_2026-10-28.md     # 483 OCR 엔진·모델·전처리·psm·오픈소스 엔진 비교(판독 실패 44·대조군 60, 무료·로컬만)
-│  ├─ specs/GRM_방문기록_이동·클릭_설계_2026-11-13.md        # 154 이동·클릭 카운터 설계(무엇을 세나·싣지 않는 것·봇 정합·쓰는 법)
+│  ├─ specs/GRM_방문기록_이동·클릭_설계_2026-11-13.md        # 155 이동·클릭 카운터 설계(무엇을 세나·싣지 않는 것·봇 정합·쓰는 법)
 │  ├─ specs/GRM_규제인텔리전스_업그레이드_설계_2026-07-15.md  # 승인 대기 중인 다음 구현 설계
 │  ├─ specs/GRM_퀴즈_운영설계_2026-07-18.md               # 주간 퀴즈 v1 운영 설계(/quiz/ 라이브)
 │  ├─ specs/GRM_인기카드_구르미위젯_설계조사_2026-07-18.md   # 인기 카드 랭킹·구르미 위젯 설계 조사(위젯=라이브, 인기카드=RPC 적용 완료·웹 통합 대기)

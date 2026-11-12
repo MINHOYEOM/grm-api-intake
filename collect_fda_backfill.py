@@ -81,7 +81,7 @@ import re
 import sys
 import time
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import urlencode, urljoin
@@ -136,6 +136,10 @@ class BackfillFetchReport:
     # raw_signals 는 append-only 이고 dedup 이 document_id 로 걸리므로, 빈 본문으로 한 번
     # 넣으면 그 문서는 영구히 빈손이 된다(실측 31건). 보류하면 다음 실행이 다시 집는다.
     skipped_ocr_unavailable: int = 0
+    # [2026-11-12 최근 483 은 일일 수집 몫] 게시일이 일일 수집 창(기본 30일) 안인 483 은 받지 않는다.
+    # 이 백필이 먼저 넣으면 전문(fda483_body_full) 없는 판이 DB 에 굳고, 몇 시간 뒤 일일 수집이
+    # 가져온 전문 판은 document_id dedup 으로 버려진다(11-12 재생 대조: 10-26 호 심층 입력 70장 누락).
+    skipped_recent: int = 0
     fetched: int = 0
     appended: int = 0
     invalid: int = 0
@@ -279,6 +283,41 @@ def _483_json_sort_key(row: dict[str, str]) -> tuple[str, str]:
     return (fda483._parse_mdy(row.get("publish_date", "")), row.get("media_id", ""))
 
 
+# ---------------------------------------------------------------------------
+# [2026-11-12] 최근 483 은 일일 수집에 맡긴다.
+# ---------------------------------------------------------------------------
+def recent_483_skip_days() -> int:
+    """백필이 건너뛰는 '최근' 범위(일). 일일 수집의 483 창과 같은 값을 쓴다.
+
+    일일 수집(collect_intake)은 483 을 `MFDS_ENFORCEMENT_WINDOW_DAYS`(기본 30) 창으로 받는다.
+    백필 전용 덮어쓰기 `FDA_BACKFILL_SKIP_RECENT_DAYS` 가 있으면 그 값을 쓰고, 0 이면 끈다.
+    """
+    raw = os.environ.get("FDA_BACKFILL_SKIP_RECENT_DAYS", "").strip()
+    if not raw:
+        raw = os.environ.get("MFDS_ENFORCEMENT_WINDOW_DAYS", "").strip() or "30"
+    try:
+        return max(int(raw), 0)
+    except ValueError:
+        return 30
+
+
+def is_recent_483_row(nrow: dict[str, Any], today: date, days: int) -> bool:
+    """게시일(publish_date, MM/DD/YYYY)이 `today - days` 이후면 True — 일일 수집 창 안.
+
+    게시일을 못 읽으면 False(=백필이 맡는다). 창 판정을 모르는 행을 버리면 아무도 안 받는다.
+    """
+    if days <= 0:
+        return False
+    iso = fda483._parse_mdy(str(nrow.get("publish_date", "") or ""))
+    if not iso:
+        return False
+    try:
+        published = date.fromisoformat(iso)
+    except ValueError:
+        return False
+    return published >= today - timedelta(days=days)
+
+
 def run_483(
     *,
     offset: int,
@@ -289,9 +328,12 @@ def run_483(
     service_key: str,
     sleeper: Sleeper | None = None,
     existing_ids: set[str] | None = None,
+    today: date | None = None,
 ) -> tuple[BackfillFetchReport, int]:
     sleeper = sleeper or _default_sleep
     report = BackfillFetchReport(source="fda483", offset=offset, max_docs=max_docs)
+    today = today or datetime.now(timezone.utc).date()
+    recent_days = recent_483_skip_days()
     fda483.reset_ocr_health()   # 실행별 OCR 관측 리셋(일일 경로의 collect_fda_483 과 동형)
 
     if existing_ids is None:  # --auto pre-fetches this set (to compute the offset) and passes it in.
@@ -350,9 +392,11 @@ def run_483(
 
         report.backbone = fda483.BACKBONE_LEGACY_JSON
         rows = sorted(json_rows, key=_483_json_sort_key, reverse=True)
-        candidates = [r for r in rows if f"fda483-{r['media_id']}" not in existing_ids]
+        not_existing = [r for r in rows if f"fda483-{r['media_id']}" not in existing_ids]
+        candidates = [r for r in not_existing if not is_recent_483_row(r, today, recent_days)]
         report.listed = len(rows)
-        report.skipped_existing += len(rows) - len(candidates)
+        report.skipped_existing += len(rows) - len(not_existing)
+        report.skipped_recent += len(not_existing) - len(candidates)
         nrows = candidates[:max_docs]
         report.source_total = len(rows)
         report.remaining = len(candidates) - len(nrows)
@@ -384,6 +428,10 @@ def run_483(
         doc_id = f"fda483-{media_id}"
         if doc_id in existing_ids:
             report.skipped_existing += 1
+            continue
+        # 일일 수집 창 안의 최근 문서는 일일 수집이 전문과 함께 받는다 — 여기서 먼저 넣지 않는다.
+        if is_recent_483_row(nrow, today, recent_days):
+            report.skipped_recent += 1
             continue
 
         if dry_run:
@@ -887,6 +935,7 @@ def run_auto(
         # OCR 엔진 부재로 적재를 보류한 건수(2026-07-30) — 단일 소스 리포트와 키 이름을
         # 맞춰 두어야 워크플로가 두 모드를 분기 없이 읽는다.
         "skipped_ocr_unavailable": sum(r.skipped_ocr_unavailable for r in attempts),
+        "skipped_recent": sum(r.skipped_recent for r in attempts),
         "fetched": sum(r.fetched for r in attempts),
         "appended": sum(r.appended for r in attempts),
         "invalid": sum(r.invalid for r in attempts),

@@ -1057,7 +1057,7 @@ class AutoReportSchemaTest(unittest.TestCase):
     _EXISTING_FIELDS = {
         "schema_version": str, "source": str, "offset": int, "max_docs": int,
         "listed": int, "skipped_existing": int, "skipped_gated": int,
-        "skipped_ocr_unavailable": int,
+        "skipped_ocr_unavailable": int, "skipped_recent": int,
         "fetched": int, "appended": int, "invalid": int, "errors": list,
         "next_offset": int, "exhausted": bool, "backbone": str, "would_fetch": list,
         "source_total": (int, type(None)), "remaining": (int, type(None)),
@@ -1269,6 +1269,72 @@ class OcrEngineUnavailableTest(unittest.TestCase):
         report, _code, _post, _pdf, _sleeper = _run_483(
             pdf_side_effect=[self._ENGINE_MISSING])
         self.assertIn("skipped_ocr_unavailable", asdict(report))
+
+
+class RecentDocsLeftToDailyCollectorTest(unittest.TestCase):
+    """[2026-11-12] 게시일이 일일 수집 창 안인 483 은 백필이 받지 않는다.
+
+    백필이 먼저 넣으면 전문 없는 판이 DB 에 굳고, 일일 수집의 전문 판은 document_id dedup 으로
+    버려진다(재생 대조: 10-26 호 심층 입력 70장 누락). 창 = MFDS_ENFORCEMENT_WINDOW_DAYS(기본 30).
+    """
+
+    _ENV_CLEAR = {"FDA_BACKFILL_SKIP_RECENT_DAYS": "", "MFDS_ENFORCEMENT_WINDOW_DAYS": ""}
+
+    def _row(self, media_id: str, publish_date: str) -> list:
+        row = list(_483_AJAX_ROW)
+        row[3] = f'<a href="/media/{media_id}/download">483</a>'
+        row[7] = publish_date
+        return row
+
+    def test_recent_row_skipped_old_row_fetched(self) -> None:
+        rows = [self._row("555101", "06/20/2026"), self._row("555102", "05/01/2026")]
+        with mock.patch.dict(os.environ, self._ENV_CLEAR):
+            report, code, post, pdf, _s = _run_483(ajax_rows=rows, today=date(2026, 6, 30))
+        self.assertEqual(code, 0)
+        self.assertEqual(report.skipped_recent, 1)
+        self.assertEqual(report.fetched, 1)
+        self.assertEqual([r["document_id"] for r in _posted_records(post)], ["fda483-555102"])
+        pdf.assert_called_once()
+
+    def test_boundary_day_is_recent(self) -> None:
+        # today - 30일 당일 게시분은 일일 수집 창 안(_within_window 는 양끝 포함).
+        with mock.patch.dict(os.environ, self._ENV_CLEAR):
+            report, _c, post, _p, _s = _run_483(ajax_rows=[self._row("555103", "05/31/2026")],
+                                                today=date(2026, 6, 30))
+        self.assertEqual(report.skipped_recent, 1)
+        self.assertEqual(_posted_records(post), [])
+
+    def test_env_zero_disables_and_window_env_followed(self) -> None:
+        rows = [self._row("555104", "06/20/2026")]
+        with mock.patch.dict(os.environ, {"FDA_BACKFILL_SKIP_RECENT_DAYS": "0"}):
+            report, *_ = _run_483(ajax_rows=rows, today=date(2026, 6, 30))
+        self.assertEqual(report.skipped_recent, 0)
+        self.assertEqual(report.fetched, 1)
+        with mock.patch.dict(os.environ, {"FDA_BACKFILL_SKIP_RECENT_DAYS": "",
+                                          "MFDS_ENFORCEMENT_WINDOW_DAYS": "5"}):
+            report, *_ = _run_483(ajax_rows=rows, today=date(2026, 6, 30))
+        self.assertEqual(report.skipped_recent, 0)   # 10일 전 > 5일 창
+
+    def test_unparseable_date_is_left_to_backfill(self) -> None:
+        with mock.patch.dict(os.environ, self._ENV_CLEAR):
+            report, *_ = _run_483(ajax_rows=[self._row("555105", "")], today=date(2026, 6, 30))
+        self.assertEqual(report.skipped_recent, 0)
+        self.assertEqual(report.fetched, 1)
+
+    def test_json_backbone_excludes_recent_from_candidates(self) -> None:
+        rows = [dict(_483_JSON_ROW_A), dict(_483_JSON_ROW_B), dict(_483_JSON_ROW_C)]
+        with mock.patch.dict(os.environ, self._ENV_CLEAR):
+            report, code, post, _pdf, _s = _run_483(
+                reading_room_html=_HTML_NO_DRUPAL_SETTINGS,
+                legacy_json_rows=rows, legacy_json_total=len(rows),
+                max_docs=5, today=date(2026, 6, 25),
+                pdf_side_effect=[("", "fetch-fail:test")],
+            )
+        self.assertEqual(code, 0)
+        # A(06/05)·B(06/01) 은 창 안, C(05/20) 만 받는다.
+        self.assertEqual(report.skipped_recent, 2)
+        self.assertEqual(report.remaining, 0)
+        self.assertEqual([r["document_id"] for r in _posted_records(post)], ["fda483-555004"])
 
 
 if __name__ == "__main__":

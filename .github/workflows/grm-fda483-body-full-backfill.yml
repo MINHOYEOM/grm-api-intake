@@ -23,6 +23,10 @@ on:
         description: '처리할 최대 행 수(비우면 전부)'
         type: string
         default: ''
+      ocr_page_budget:
+        description: '스캔 PDF OCR 쪽수 상한(비우면 수집기 기본 200). 예산 소진(scan-ocr-budget)으로 남은 행을 다시 돌릴 때 올린다'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -66,6 +70,7 @@ jobs:
           IN_PROBE: ${{ inputs.probe_pdf }}
           IN_SINCE: ${{ inputs.since }}
           IN_LIMIT: ${{ inputs.limit }}
+          IN_OCR_BUDGET: ${{ inputs.ocr_page_budget }}
         run: |
           set -uo pipefail
           if ! printf '%s' "${IN_SINCE:-}" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
@@ -73,6 +78,12 @@ jobs:
           fi
           if [ -n "${IN_LIMIT:-}" ] && ! printf '%s' "$IN_LIMIT" | grep -qE '^[0-9]+$'; then
             echo "::error::limit 은 숫자만 허용"; exit 2
+          fi
+          if [ -n "${IN_OCR_BUDGET:-}" ]; then
+            if ! printf '%s' "$IN_OCR_BUDGET" | grep -qE '^[0-9]+$'; then
+              echo "::error::ocr_page_budget 은 숫자만 허용"; exit 2
+            fi
+            export FDA483_OCR_PAGE_BUDGET="$IN_OCR_BUDGET"
           fi
           args=(--since "$IN_SINCE" --report fda483_body_full_report.json)
           if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
@@ -82,7 +93,7 @@ jobs:
           rc=$?
           {
             echo "### FDA 483 body-full backfill"
-            echo "- apply: \`${IN_APPLY:-false}\` · probe_pdf: \`${IN_PROBE:-false}\` · since: \`${IN_SINCE}\` · limit: \`${IN_LIMIT:-전부}\` · exit: \`${rc}\`"
+            echo "- apply: \`${IN_APPLY:-false}\` · probe_pdf: \`${IN_PROBE:-false}\` · since: \`${IN_SINCE}\` · limit: \`${IN_LIMIT:-전부}\` · ocr_page_budget: \`${IN_OCR_BUDGET:-기본}\` · exit: \`${rc}\`"
             echo '```json'
             head -c 6000 fda483_body_full_report.json 2>/dev/null || echo '(리포트 없음)'
             echo

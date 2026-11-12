@@ -60,6 +60,8 @@ jobs:
           SITE_BASE_URL: https://grm-solutions.com
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          # [⑤] 유사 사례 감시 대상 id 를 092 캐시(anon 차단)에서 고르는 읽기 전용 조회에만 쓴다. 없으면 고정 id+경고.
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
           python site_probe.py --output probe_report.json | tee -a "$GITHUB_STEP_SUMMARY"

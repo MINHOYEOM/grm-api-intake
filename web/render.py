@@ -2925,8 +2925,24 @@ def build_glossary_case_excerpts(
             if len(picked) == _GLOSSARY_CASE_MAX:
                 break
         if len(picked) >= _GLOSSARY_CASE_MIN:
+            # [UI 2단 2026-11-12] 먼저 보이는 예문은 짧고 온전한 것 — 가림 표기((b)(4) 등)가
+            # 적고, 문장 끝맺음이 있고, 짧은 순. 배정(어느 문장을 고르는가)은 그대로 두고
+            # **고른 것 안에서 보이는 순서만** 바꾼다. sort 는 안정 정렬이라 결정론 유지.
+            picked.sort(key=_glossary_quote_read_key)
             out[tid] = picked
     return out
+
+
+_GLOSSARY_REDACT_RE = re.compile(r"\(b\)\s*\(\d\)|\[redacted\]|\*{3,}|█", re.IGNORECASE)
+_GLOSSARY_SENT_END_RE = re.compile(r"(다|함|음|됨|임|[.!?。])[\"'”’)\]]*$")
+
+
+def _glossary_quote_read_key(c: dict[str, Any]) -> tuple[int, int, int]:
+    """(가림 표기 수, 끝맺음 없음 0/1, 길이) — 작을수록 먼저 보인다."""
+    q = c.get("quote") or ""
+    return (len(_GLOSSARY_REDACT_RE.findall(q)),
+            0 if _GLOSSARY_SENT_END_RE.search(q.strip()) else 1,
+            len(q))
 
 
 # ── [내부 링크] 문서 본문 → 용어 페이지 자동 링크 ────────────────────────────────

@@ -1408,9 +1408,9 @@
     return { btn: btn, block: block };
   }
 
-  // 판독 잔해 표지 — 상표·저작권 기호, 대체 문자, "(판독 누락)" 표기, 낱말 속 기호 덩어리.
-  // 넓게 잡으면 정상 문장(로트 번호의 @ 등)을 깨졌다고 부르게 되므로 확실한 표지만 본다.
-  var OCR_NOISE_RE = /[\u2122\u00ae\u00a9\u00a2\u00a4\u00a6\u00a8\ufffd]|\((?:\ud310\ub3c5 \ub204\ub77d|illegible)\)/i;
+  // 판독 잔해 표지 — 대체 문자·깨진 기호(¢ ¤ ¦ ¨), "(판독 누락)" 표기, 그리고 상표·저작권 기호가
+  // 낱말에 엉겨 붙은 꼴("GMP-™@", "®4")만. 상표 기호 자체는 정상 제품명("Colic Calm® Plus")에 흔해 잡지 않는다 — 공개 지적 실측: 단독 기호로 잡으면 193건 중 165건이 오탐, 이 규칙은 12건 전부 실제 잔해(11-12).
+  var OCR_NOISE_RE = /[\u00a2\u00a4\u00a6\u00a8\ufffd]|\((?:\ud310\ub3c5 \ub204\ub77d|illegible)\)|[\u2122\u00ae\u00a9][@\d~]|-[\u2122\u00ae\u00a9]/i;
   function hasOcrNoise(text) { return OCR_NOISE_RE.test(String(text || "")); }
 
   function buildCard(row, query, inDoc) {

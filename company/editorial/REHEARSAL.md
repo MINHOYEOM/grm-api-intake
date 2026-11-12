@@ -47,12 +47,13 @@
 
 ## 점검
 (사람 또는 비서실 세션, PC 에서)
-   ```
-   git fetch origin claude/company-rehearsal-{회차} claude/queue-handoff
-   git worktree add ../_rehearsal FETCH_HEAD            # 또는 git show 로 폴더만 꺼낸다
-   git show origin/claude/queue-handoff:handoff_2026-11-16.json > _handoff_2026-11-16.json
-   python company/editorial/rehearsal_check.py ../_rehearsal/company/run/rehearsal-{회차} _handoff_2026-11-16.json
-   ```
+```
+git fetch origin claude/company-rehearsal-{회차} claude/queue-handoff
+git worktree add --detach ../_rehearsal-{회차} origin/claude/company-rehearsal-{회차}
+git show origin/claude/queue-handoff:handoff_2026-11-16.json > _handoff_2026-11-16.json
+python company/editorial/rehearsal_check.py ../_rehearsal-{회차}/company/run/rehearsal-{회차} _handoff_2026-11-16.json
+```
+저장소 루트(main 체크아웃)에서 돌린다 — 점검 도구는 main 의 코드로 판정한다. 끝나면 `git worktree remove ../_rehearsal-{회차}`.
 
 ## 성공 판정 — `rehearsal_check.py` 가 전부 `통과` 를 내고, 아래 6번을 사람이 확인하면 1회 성공
 1. `desk.json` 이 `완료`이고 `handoff_ref` 가 handoff 파일의 지문과 같다.

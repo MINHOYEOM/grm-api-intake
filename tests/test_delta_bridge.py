@@ -1107,6 +1107,77 @@ class GitReturnMainTest(MainIntegrationTest):
         self.assertEqual(rc, 0)
         self.assertEqual(self._read_outputs().get("source"), "git")
 
+    # ── 스캐폴드 동결 (3단계 — git handoff 로 만든 호) ─────────────────────────
+    _SCAFFOLD = "web/data/scaffolds/brief_web_2026_07_13.json"
+    _REF = {"date": "2026-07-13", "sha256": "a" * 64, "rows": 1}
+
+    @staticmethod
+    def _scaffold_text(ids=("mfds-1",), run_date="2026-07-13") -> str:
+        # 일부러 들여쓰기·공백을 넣는다 — 다시 직렬화하지 않고 원문 그대로 동결하는지 본다.
+        return json.dumps({"schema_version": "grm-web-card/v1", "brief": {"run_date_kst": run_date},
+                           "cards": [{"id": i} for i in ids]}, ensure_ascii=False, indent=1) + "\n"
+
+    def _run_git(self, files):
+        self._git(files)
+        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])):
+            rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        return self._read_outputs()
+
+    def test_git_handoff_issue_freezes_the_checked_scaffold_verbatim(self) -> None:
+        g = dict(_git_delta("git"), handoff_ref=self._REF, deferred=[])
+        text = self._scaffold_text(ids=("mfds-1", "other"))
+        out = self._run_git({"delta.json": g, "copyedit.json": _COPYEDIT_OK, "scaffold.json": text})
+        self.assertEqual((out.get("wrote"), out.get("source")), ("true", "git"))
+        self.assertEqual(pathlib.Path(self._SCAFFOLD).read_bytes(), text.encode("utf-8"))
+        self.assertEqual(self._written()["handoff_ref"], self._REF)
+
+    def test_git_handoff_issue_without_scaffold_is_not_published_from_git(self) -> None:
+        g = dict(_git_delta("git"), handoff_ref=self._REF)
+        out = self._run_git({"delta.json": g, "copyedit.json": _COPYEDIT_OK})
+        self.assertEqual(out.get("wrote"), "false")              # 노션 예치도 없으므로 아무것도 안 씀
+        self.assertFalse(pathlib.Path(self._DELTA).exists())
+        self.assertFalse(pathlib.Path(self._SCAFFOLD).exists())
+
+    def test_scaffold_must_be_that_date_and_hold_every_delta_card(self) -> None:
+        g = dict(_git_delta("git"), handoff_ref=self._REF)
+        for bad in (self._scaffold_text(ids=("other",)),
+                    self._scaffold_text(run_date="2026-07-06"),
+                    "{\"cards\": \"x\"}", "not json"):
+            with self.subTest(bad=bad[:30]):
+                out = self._run_git({"delta.json": g, "copyedit.json": _COPYEDIT_OK,
+                                     "scaffold.json": bad})
+                self.assertEqual(out.get("wrote"), "false")
+                self.assertFalse(pathlib.Path(self._DELTA).exists())
+                self.assertFalse(pathlib.Path(self._SCAFFOLD).exists())
+                os.remove(self._out_path)
+
+    def test_notion_handoff_issue_ignores_a_scaffold_file(self) -> None:
+        out = self._run_git({"delta.json": _git_delta("git"), "copyedit.json": _COPYEDIT_OK,
+                             "scaffold.json": self._scaffold_text()})
+        self.assertEqual(out.get("wrote"), "true")
+        self.assertFalse(pathlib.Path(self._SCAFFOLD).exists())   # handoff_ref 없는 호는 종전 그대로
+
+    def test_frozen_scaffold_is_never_overwritten(self) -> None:
+        os.makedirs(os.path.dirname(self._SCAFFOLD))
+        pathlib.Path(self._SCAFFOLD).write_bytes(b"first")
+        g = dict(_git_delta("git"), handoff_ref=self._REF)
+        self._run_git({"delta.json": g, "copyedit.json": _COPYEDIT_OK,
+                       "scaffold.json": self._scaffold_text()})
+        self.assertEqual(pathlib.Path(self._SCAFFOLD).read_bytes(), b"first")
+
+    def test_workflows_carry_the_frozen_scaffold(self) -> None:
+        root = pathlib.Path(db.__file__).resolve().parent
+        bridge = (root / ".github" / "workflows" / "grm-delta-bridge.yml").read_text(encoding="utf-8")
+        publish = (root / ".github" / "workflows" / "grm-web-publish.yml").read_text(encoding="utf-8")
+        self.assertEqual(db._scaffold_path("2026-07-13").replace(os.sep, "/"), self._SCAFFOLD)
+        self.assertIn('git add "web/data/scaffolds/brief_web_${U}.json"', bridge)
+        self.assertIn('FROZEN="web/data/scaffolds/brief_web_${{ steps.r.outputs.under }}.json"', publish)
+        # 동결본이 있으면 아티팩트를 받지 않고, 사람이 run id 를 주면 그쪽이 우선한다.
+        self.assertLess(publish.index('if [ -z "$RID" ] && [ -f "$FROZEN" ]; then'),
+                        publish.index('elif [ -z "$RID" ]; then'))
+        self.assertLess(publish.index('elif [ -z "$RID" ]; then'), publish.index("gh run list -R"))
+
     def test_git_mode_held_falls_back_to_notion(self) -> None:
         self._git({"delta.json": _git_delta("git"), "copyedit.json": _COPYEDIT_HELD})
         fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13")],
@@ -1191,7 +1262,9 @@ class DeltaBridgeWorkflowGuardTest(unittest.TestCase):
         self.assertTrue(adds)
         for line in adds:
             self.assertNotIn(db.COMPARE_DIR, line)
-            self.assertIn("web/data/deltas/", line)
+            # 커밋 대상은 그 호의 델타와, git handoff 로 만든 호의 동결 스캐폴드 한 파일뿐이다.
+            self.assertTrue("web/data/deltas/" in line
+                            or 'web/data/scaffolds/brief_web_${U}.json' in line, line)
 
 
 if __name__ == "__main__":

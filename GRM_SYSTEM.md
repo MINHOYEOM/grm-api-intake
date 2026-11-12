@@ -550,6 +550,7 @@ grm-api-intake/
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
 ├─ backfill_483_detail_refresh.py  # 저장된 483 관찰 상세(detail)만 다시 읽어 제자리 교체(쪽 넘김·서명란·가림 표시 수리 소급 — 표제·원문 전문·실사관 불변, dry-run 기본)
+├─ raw_versioning.py, raw_signals_rebaseline.py # [원문 갱신 규칙 R1·R2] 정본 원문을 바꾸는 유일한 길(DB 함수 `raw_signal_apply_version`·보관표 `raw_signal_versions`, 148) · 지문이 내용과 어긋난 483·MFDS 행 기준선 재매김(+MFDS 참석자 재동기화, dry-run 기본, `grm-raw-signals-rebaseline.yml`). 직접 PATCH 는 `tests/test_raw_signals_write_guard.py` 가 막는다
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄

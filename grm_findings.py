@@ -341,7 +341,8 @@ RAW_SIGNAL_REQUIRED_FIELDS = (
     "source",
     "source_kind",
     "document_id",
-    "published_date",
+    # published_date 는 필수가 아니다(2026-11-12, migration 147) — 게시일을 단언하지 않는 원천
+    # (ICH 토픽 스냅샷·실사일 미상 WHOPIR)은 null 로 저장한다. 날짜를 지어 넣지 않는다.
     "title",
     "raw_sha256",
     "raw_json",
@@ -1159,7 +1160,7 @@ def raw_signal_from_row(
         "source": source,
         "source_kind": source_kind,
         "document_id": document_id,
-        "published_date": _text(row.get("date")),
+        "published_date": _text(row.get("date")) or None,   # 게시일 없음 = null(migration 147)
         "collected_at": _text(collected_at),
         "title": _text(row.get("headline")),
         "firm_name": _first_text(row.get("firm"), raw.get("firm"), raw.get("company"), raw.get("manufacturer")),

@@ -141,8 +141,8 @@ class HealSupabaseCopiesTest(unittest.TestCase):
 
 
 class HealUndatedTest(unittest.TestCase):
-    def test_undated_item_is_not_attempted(self):
-        """ICH 토픽 스냅샷처럼 게시일이 없으면 published_date required 로 거부되므로 시도하지 않는다."""
+    def test_undated_item_is_healed_too(self):
+        """migration 147(2026-11-12) 이후 게시일 없는 항목(ICH 토픽 스냅샷)도 채운다(published_date null)."""
         undated = _item("u")
         undated.date_iso = ""
         dated = _item("d")
@@ -150,8 +150,8 @@ class HealUndatedTest(unittest.TestCase):
         with patch.object(ci, "existing_raw_signal_ids", return_value=set()), \
                 patch.object(ci, "append_intake_item_to_supabase", return_value=ok) as app:
             s = ci.heal_supabase_copies(URL, KEY, [undated, dated], ci.now_kst())
-        self.assertEqual([x.args[2].document_id for x in app.call_args_list], ["d"])
-        self.assertEqual((s["candidates"], s["skipped_undated"]), (1, 1))
+        self.assertEqual(sorted(x.args[2].document_id for x in app.call_args_list), ["d", "u"])
+        self.assertEqual((s["candidates"], s.get("skipped_undated", 0)), (2, 0))
 
 
 def _snap(doc_id: str, source: str = "WHO", page_id: str = "") -> dict:
@@ -289,21 +289,22 @@ class WhopirDateFillTest(unittest.TestCase):
                              _fake_html({0: _LIST_P0, 1: _LIST_P0}, calls))
         self.assertEqual(len(calls), 2)               # page=1 이 새 행 없음 → 멈춤
 
-    def test_network_failure_keeps_old_behavior_invalid(self):
+    def test_network_failure_inserts_with_null_date_not_invented(self):
+        """원천 목록을 못 읽어 실사일을 못 찾으면 — migration 147 이후 — 날짜를 지어 넣지 않고 null 로 넣는다."""
         snap = _wsnap(_PDF_A, _wid(_PDF_A))
         snap["type_or_class"] = "who-inspection"
-        post = MagicMock()
+        post = MagicMock(return_value=fsa.SupabaseRawSignalAppendResult("inserted"))
         with patch.object(bf, "notion_rows_for_source", return_value=[snap]), \
                 patch.object(bf, "supabase_doc_ids", return_value=set()), \
                 patch.object(bf.fsa, "_append_raw_signal", post):
             rep = bf.run(["WHO"], notion_token="t", notion_db="d", supabase_url=URL,
                          service_key=KEY, apply=True, fetch_raw=lambda _t, _p: {"id": 1},
                          sleep_s=0, get_html=_fake_html({}))
-        post.assert_not_called()
         self.assertEqual((rep.date_filled_from_source, rep.date_unresolved),
                          (0, [snap["document_id"]]))
-        self.assertEqual(len(rep.invalid), 1)
-        self.assertIn("published_date", rep.invalid[0])
+        self.assertEqual(rep.invalid, [])
+        post.assert_called_once()
+        self.assertIsNone(post.call_args.args[2]["published_date"])
 
     def test_run_fills_then_inserts(self):
         snap = _wsnap(_PDF_A, _wid(_PDF_A))

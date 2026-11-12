@@ -79,11 +79,14 @@
   var input = $("sr-q"), bestEl = $("sr-best"), hitsEl = $("sr-hits"), noteEl = $("sr-note");
   var hitsH = $("sr-hits-h"), allA = $("sr-all"), advA = $("sr-adv");
   var moreEl = $("sr-more"), pillsEl = $("sr-pills");
-  var fAgency = $("sr-f-agency"), fSource = $("sr-f-source");
+  var fAgency = $("sr-f-agency"), fSource = $("sr-f-source"), fPeriod = $("sr-f-period");
 
   var params = new URLSearchParams(location.search);
   var Q = (params.get("q") || "").trim().slice(0, 120);
-  var state = { agency: params.get("agency") || "", source: params.get("src") || "" };
+  var PERIODS = { "1y": 12, "3y": 36 };
+  var state = { agency: params.get("agency") || "", source: params.get("src") || "",
+    period: PERIODS[params.get("period")] ? params.get("period") : "" };
+  var periodUnsupported = false;
   if (input) input.value = Q;
 
   var AGENCY_LABEL = {
@@ -95,6 +98,7 @@
     "MFDS": _t("식약처 실사"), "EU GMP NCR (EudraGMDP)": _t("EU GMP 부적합 보고서"),
     "MHRA GMP NCR": _t("영국 MHRA"), "Health Canada Inspection": _t("캐나다 실사")
   };
+  var PERIOD_LABEL = { "1y": _t("최근 1년"), "3y": _t("최근 3년") };
   var label = function (map, v) { return Object.prototype.hasOwnProperty.call(map, v) ? map[v] : v; };
 
   function el(tag, cls, text) {
@@ -219,6 +223,15 @@
     moreEl.hidden = !pillsEl.childNodes.length;
   }
 
+  // 기간: 최근 n개월 = 이번 달 포함 n개월 → 서버에는 월 범위 "YYYY-MM.."(153)로 보낸다.
+  function periodRange(code) {
+    var n = PERIODS[code] || 0;
+    if (!n) return "";
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth() + 1 - (n - 1);
+    while (m <= 0) { m += 12; y -= 1; }
+    return y + "-" + (m < 10 ? "0" : "") + m + "..";
+  }
+
   // ── 지적 문장 ──────────────────────────────────────────────────────────────
   function rpc(q, textOnly, attempt) {
     var body = {
@@ -228,6 +241,9 @@
       p_agency: state.agency, p_source: state.source,
       p_orig_lang: _isEn ? "en" : ""
     };
+    // 기간을 고르지 않으면 p_month 를 아예 안 보낸다 — 캐시 키(086)가 종전과 같다.
+    var period = periodUnsupported ? "" : periodRange(state.period);
+    if (period) body.p_month = period;
     return fetch(URL_ + "/rest/v1/rpc/findings_search", {
       method: "POST",
       headers: { apikey: KEY, Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
@@ -293,6 +309,17 @@
     }
     group(fAgency, "agency", f.by_agency, AGENCY_LABEL);
     group(fSource, "source", f.by_source, SOURCE_LABEL);
+    // 기간 칸: 월별 분포(by_month — 월 조건을 안 거는 패싯)에서 각 기간의 건수를 더한다.
+    if (fPeriod) {
+      fPeriod.hidden = periodUnsupported;
+      var months = f.by_month || [];
+      var sumFrom = function (from) {
+        return months.reduce(function (n, r) { return n + (!from || r.v >= from ? (r.c || 0) : 0); }, 0);
+      };
+      group(fPeriod, "period", ["1y", "3y"].map(function (k) {
+        return { v: k, c: sumFrom(periodRange(k).slice(0, 7)) };
+      }), PERIOD_LABEL);
+    }
   }
 
   function syncUrl() {
@@ -300,6 +327,7 @@
     if (Q) u.set("q", Q);
     if (state.agency) u.set("agency", state.agency);
     if (state.source) u.set("src", state.source);
+    if (state.period) u.set("period", state.period);
     try { history.replaceState(null, "", location.pathname + (u.toString() ? "?" + u.toString() : "")); } catch (e) {}
   }
 
@@ -315,7 +343,17 @@
     var tokens = sq.toLowerCase().split(/\s+/).filter(function (t) { return t.length >= 1; });
     Promise.all([rpc(sq, textOnly), _fetchDocPages(ASSET_ROOT)]).then(function (res) {
       var d = res[0];
-      if (textOnly && !d.totals.findings && !state.agency && !state.source) {
+      // 옛 함수(153 적용 전)는 월 범위를 한 달 값으로 읽어 0건을 낸다. 월별 분포에는 그 기간
+      // 행이 있는데 결과가 0 이면 기간 축을 끄고 다시 부른다(화면이 먼저 배포돼도 안전).
+      var pr = periodRange(state.period).slice(0, 7);
+      if (pr && !d.totals.findings && ((d.facets && d.facets.by_month) || []).some(function (r) { return r.v >= pr && r.c; })) {
+        periodUnsupported = true;
+        state.period = "";
+        syncUrl();
+        rerun();
+        return;
+      }
+      if (textOnly && !d.totals.findings && !state.agency && !state.source && !state.period) {
         runHits(sq, basisNote, false);
         return;
       }

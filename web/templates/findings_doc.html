@@ -108,6 +108,11 @@
   .fd-detail-note{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:8px 0 0}
   .fd-detail-note a{color:var(--muted);border-bottom:1px solid var(--line-2);text-decoration:none}
   .fd-detail-note a:hover{color:var(--coral)}
+  .fd-rel3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0}
+  .fd-rel3-col{min-width:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px 14px}
+  .fd-rel3-col .fd-sec-h{margin:0 0 2px;flex-basis:100%}
+  .fd-rel3-col a{font-family:var(--sans);font-size:14.5px;line-height:1.5;color:var(--body);text-decoration:none;border-bottom:1px solid var(--line-2);word-break:keep-all}
+  .fd-rel3-col a:hover{color:var(--coral);border-color:var(--coral)}
 </style>
 <main>
   <div class="wrap">
@@ -174,6 +179,32 @@
   </div>
 
   <div class="wrap fd-body">
+    {#- [UI 2단 2026-11-12] 관련 조항·용어·기록 한 줄 — 용어 페이지와 같은 틀. 값은 아래
+        섹션과 같은 원천(cited_clauses·본문 용어 링크·업체 이력)이고, 빈 칸은 그리지 않는다. -#}
+    {%- set _rec = firm_page_slug or same_firm %}
+    {%- if cited_clauses or doc_terms or _rec %}
+    <nav class="fd-rel3" aria-label="{{ _('관련 조항·용어·기록') }}">
+      {%- if cited_clauses %}
+      <div class="fd-rel3-col">
+        <h2 class="fd-sec-h">{{ _('관련 조항') }}</h2>
+        {%- for c in cited_clauses %}<a href="{{ rel_root }}findings/clause/{{ c.slug }}/">{{ c.code }}</a>{% endfor %}
+      </div>
+      {%- endif %}
+      {%- if doc_terms %}
+      <div class="fd-rel3-col">
+        <h2 class="fd-sec-h">{{ _('관련 용어') }}</h2>
+        {%- for t in doc_terms %}<a href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.label }}</a>{% endfor %}
+      </div>
+      {%- endif %}
+      {%- if _rec %}
+      <div class="fd-rel3-col">
+        <h2 class="fd-sec-h">{{ _('관련 기록') }}</h2>
+        {#- 업체 이력 페이지가 있으면 그리로, 없으면 아래 '같은 업체의 다른 기록' 목록으로. -#}
+        {%- if firm_page_slug %}<a href="{{ rel_root }}findings/firm/{{ firm_page_slug }}/">{{ doc.firm_name }}</a>{% elif same_firm %}<a href="#same-firm">{{ doc.firm_name }}</a>{% endif %}
+      </div>
+      {%- endif %}
+    </nav>
+    {%- endif %}
     <section>
       <h2 class="fd-sec-h">{{ _('지적 내용') }}</h2>
       <div class="fd-list">
@@ -254,7 +285,7 @@
     </section>
 
     {% if same_firm %}
-    <section class="fd-sec">
+    <section class="fd-sec" id="same-firm">
       {#- 같은 업체의 다른 기록. 묶는 기준은 표시명이 아니라 정규화 키(firm_key)다 —
           "… Limited"와 "… Ltd."는 표시명이 달라도 같은 업체이기 때문. -#}
       <h2 class="fd-sec-h">{{ _("같은 업체의 다른 기록") }}</h2>

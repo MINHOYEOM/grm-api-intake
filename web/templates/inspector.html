@@ -9,6 +9,7 @@
 <meta name="robots" content="noindex, nofollow" />
 {% endblock %}
 {% block content %}
+{% include "partials/fnd_views_style.html" %}
 {#- FDA 483 실사관 프로파일 — findings_inspector_index()/findings_inspector_profile(p_inspector_key)
     RPC 를 라이브 fetch 해 특정 실사관(서명 검사관)이 서명한 FDA 483 문서·지적사항 이력을
     보여준다. **firm.html/firm.js 의 미러링** — URL 파라미터(?key=inspector_key)로 조회하는
@@ -51,7 +52,6 @@
         수 있어야 한다는 사용자 지적 반영 — 다른 두 템플릿(findings.html/findings_browse.
         html)의 마크업을 그대로 이식한다. rel_root 는 이 페이지가 findings/browse 와 같은
         깊이("../../")라 파셜을 손대지 않고 그대로 include 할 수 있다. -#}
-    {% with seg_active = "inspector" %}{% include "partials/findings_seg.html" %}{% endwith %}
     <nav class="fnd-views" aria-label="{{ _('실사 보고서 구분') }}">
       <a id="ip-source-fda" href="?source=fda" class="on" aria-current="page">FDA</a>
       <a id="ip-source-mfds" href="?source=mfds">{{ _("식약처(MFDS)") }}</a>

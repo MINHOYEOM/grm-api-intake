@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block meta_robots %}
+{#- 검색 결과 면 — 검색어마다 내용이 달라지는 셸이라 색인하지 않는다(sitemap 에도 없다). -#}
+<meta name="robots" content="noindex, follow" />
+{% endblock %}
+{% block content %}
+{#- [전역 검색 2026-11-12 · 대표 확정안 3] 검색 결과 화면.
+    순서: 맨 위 가장 가까운 답 한 칸(용어·업체·조항 중 하나) → 종류별 묶음(지적 문장이 본문,
+    관련 용어·조항·업체는 작은 칸) → 오른쪽 필터 두 묶음(기관·문서 종류). 나머지 조건(분류·
+    증거 등급·검토 상태·월·국가)은 '상세 필터' = 기존 지적 문장 검색 화면에 그대로 있다.
+    셸만 정적이고 결과는 search.js 가 채운다. 대상 색인은 assets/lookup*.json(빌드 파생),
+    지적 문장은 findings_search RPC(본문 전용 모드). JS 가 없으면 아래 폼이 같은 주소로
+    다시 보내고, '상세 필터' 링크가 기존 검색 화면으로 잇는다.
+    grm.css 동결 — 토큰만 쓰는 스코프 style. §4 한글안전: 자간·대문자·mono 미사용. -#}
+<style>
+.sr{padding:34px 0 64px}
+.sr-form{display:flex;gap:8px;max-width:720px;margin:0 0 26px}
+.sr-form input{flex:1 1 auto;min-width:0;font:inherit;font-size:17px;padding:12px 16px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--canvas);color:var(--ink)}
+.sr-form input:focus{outline:2px solid var(--coral);outline-offset:1px}
+.sr-form button{flex:none;font:inherit;font-size:15px;padding:0 20px;border:0;border-radius:var(--rad);background:var(--ink);color:#fff;cursor:pointer}
+.sr-best{border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad);padding:18px 22px;margin:0 0 28px;display:flex;flex-direction:column;gap:6px}
+.sr-best[hidden]{display:none}
+.sr-kind{font-size:12.5px;color:var(--muted)}
+.sr-best-t{font-family:var(--serif);font-weight:700;font-size:22px;color:var(--ink);text-decoration:none;word-break:keep-all}
+.sr-best-t span{font-family:var(--sans);font-weight:500;font-size:15px;color:var(--muted);margin-left:6px}
+.sr-best-t:hover{color:var(--coral)}
+.sr-best p{margin:0;color:var(--body);line-height:1.65;word-break:keep-all}
+.sr-meta{font-size:13px;color:var(--muted);line-height:1.6;word-break:keep-all}
+.sr-meta a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.sr-grid{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:36px;align-items:start}
+.sr-sec{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:8px;margin:0 0 4px}
+.sr-sec h2{font-size:16px;margin:0;color:var(--ink)}
+.sr-sec a{font-size:14px;color:var(--body);text-decoration:underline;text-underline-offset:3px}
+.sr-hits{list-style:none;margin:0;padding:0}
+.sr-hit{padding:14px 0;border-bottom:1px solid var(--line)}
+.sr-hit p{margin:0 0 6px;line-height:1.7;color:var(--ink);word-break:keep-all;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.sr-hit mark{background:color-mix(in srgb,var(--coral) 22%,transparent);color:inherit;padding:0 1px;border-radius:2px}
+.sr-note{color:var(--muted);font-size:14px;padding:14px 0;margin:0;line-height:1.6;word-break:keep-all}
+.sr-retry{font:inherit;font-size:13px;margin-left:6px;padding:3px 12px;border:1px solid var(--line-2);border-radius:999px;background:var(--canvas);color:var(--ink);cursor:pointer}
+.sr-more{margin:28px 0 0}
+.sr-more[hidden]{display:none}
+.sr-pills{display:flex;flex-wrap:wrap;gap:6px;padding-top:12px}
+.sr-pills a{font-size:14px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;color:var(--body);text-decoration:none}
+.sr-pills a:hover{border-color:var(--line-2);color:var(--ink)}
+.sr-pills small{color:var(--muted);margin-left:4px;font-size:12px}
+.sr-side{border-left:1px solid var(--line);padding-left:22px}
+.sr-side h2{font-size:14px;color:var(--muted);font-weight:600;margin:0 0 10px}
+.sr-filt{border:0;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:4px}
+.sr-filt legend{font-size:13px;color:var(--ink);font-weight:600;padding:0;margin:0 0 6px}
+.sr-filt label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--body);cursor:pointer;min-height:30px}
+.sr-filt label small{margin-left:auto;color:var(--muted);font-size:12px}
+.sr-side a{font-size:14px;color:var(--body);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:900px){
+  .sr{padding-top:22px}
+  .sr-grid{grid-template-columns:minmax(0,1fr);gap:24px}
+  /* 휴대폰은 결과가 먼저(필터를 위에 두면 첫 결과가 375×812 화면 맨 아래로 밀렸다 — 11-12 라이브 실측). */
+  .sr-side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:16px}
+  .sr-filt{flex-direction:row;flex-wrap:wrap;gap:4px 14px}
+  .sr-filt legend{width:100%}
+}
+</style>
+<main class="sr">
+  <div class="wrap">
+    <h1 class="sr-h1" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">{{ _("검색") }}</h1>
+    <form class="sr-form" action="index.html" method="get" role="search">
+      <input id="sr-q" name="q" type="search" autocomplete="off" placeholder="{{ _('업체명, 조항, 용어, 지적 문장') }}" aria-label="{{ _('검색어') }}">
+      <button type="submit">{{ _("검색") }}</button>
+    </form>
+    <div class="sr-best" id="sr-best" hidden></div>
+    <div class="sr-grid">
+      <div>
+        <div class="sr-sec"><h2 id="sr-hits-h">{{ _("지적 문장") }}</h2><a id="sr-all" href="{{ rel_root }}findings/index.html">{{ _("전체 보기") }}</a></div>
+        <ul class="sr-hits" id="sr-hits"></ul>
+        <p class="sr-note" id="sr-note">{{ _("업체명, 조항 번호, 용어로 검색합니다. 예: 청정실, 211.192, 감사추적") }}</p>
+        <div class="sr-more" id="sr-more" hidden>
+          <div class="sr-sec"><h2>{{ _("관련 용어·조항·업체") }}</h2></div>
+          <div class="sr-pills" id="sr-pills"></div>
+        </div>
+      </div>
+      <aside class="sr-side" aria-label="{{ _('필터') }}">
+        <h2>{{ _("필터") }}</h2>
+        <fieldset class="sr-filt" id="sr-f-agency"><legend>{{ _("기관") }}</legend></fieldset>
+        <fieldset class="sr-filt" id="sr-f-source"><legend>{{ _("문서 종류") }}</legend></fieldset>
+        <a id="sr-adv" href="{{ rel_root }}findings/index.html">{{ _("상세 필터") }}</a>
+      </aside>
+    </div>
+  </div>
+  <div id="grm-search-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-asset-root="{{ asset_root }}" data-lookup="{{ asset_root }}assets/{{ lookup_file }}" hidden></div>
+</main>
+{% endblock %}
+{% block scripts %}<script src="{{ asset_root }}assets/search.js?v={{ searchjs_ver }}" defer></script>{% endblock %}

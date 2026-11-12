@@ -7216,8 +7216,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 _doc_terms = [{"id": tid, "label": surface} for surface, tid in _sel
                               if tid in _used]
                 _emit("findings_doc.html", _pp,
-                    doc_terms=_doc_terms,
                     next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
+                    doc_terms=_doc_terms,
                     page_title=_tr("{title} · GRM",
                                    title=doc_titles_by_lang[_lg][doc["slug"]]),
                     nav_active="findings",

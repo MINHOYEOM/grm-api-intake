@@ -187,8 +187,8 @@
       {%- if _rec %}
       <div class="fd-rel3-col">
         <h2 class="fd-sec-h">{{ _('관련 기록') }}</h2>
-        {%- if firm_page_slug %}<a href="{{ rel_root }}findings/firm/{{ firm_page_slug }}/">{{ doc.firm_name }}</a>{% endif %}
-        {%- if same_firm %}<a href="#same-firm">{{ _("같은 업체의 다른 기록") }}</a>{% endif %}
+        {#- 업체 이력 페이지가 있으면 그리로, 없으면 아래 '같은 업체의 다른 기록' 목록으로. -#}
+        {%- if firm_page_slug %}<a href="{{ rel_root }}findings/firm/{{ firm_page_slug }}/">{{ doc.firm_name }}</a>{% elif same_firm %}<a href="#same-firm">{{ doc.firm_name }}</a>{% endif %}
       </div>
       {%- endif %}
     </nav>

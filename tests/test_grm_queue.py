@@ -405,6 +405,10 @@ class FreezeTest(unittest.TestCase):
         self.assertEqual(after["payload_sha256"], first["payload_sha256"])
         self.assertEqual(report["handoff_frozen"], gq.HANDOFF_CONSUMED)
         self.assertEqual(self.store.queue["Federal Register::2026-3"]["state"], "new")  # 다음 날 몫
+        # 재실행분 파일은 다른 이름으로 나간다 — 브랜치 사본이 그 호의 파일을 덮어쓰지 않게.
+        self.assertTrue(os.path.exists(os.path.join(self.root, "handoff_db_2026-11-16.rerun.json")))
+        with open(os.path.join(self.root, "handoff_db_2026-11-16.json"), encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["row_count"], 2)             # 첫 실행분 그대로
         # 발행본이 늦게 들어와도 임시 상태가 확정된다(행 목록이 남아 있으므로).
         self.assertEqual(self.store.queue["Federal Register::2026-2"]["state_reason"],
                          "carded_pending_publish")
@@ -543,6 +547,37 @@ class BuilderConditionsTest(unittest.TestCase):
         self.assertEqual(cmp_["only_notion_out_of_scope"], ["FDA 483::blood"])
         self.assertEqual(cmp_["only_notion"], ["FDA 483::missing"])
         self.assertIn("설명됨", gq.render_report_md(report))
+
+
+class HandoffMirrorWorkflowTest(unittest.TestCase):
+    """브랜치 사본 워크플로와 수집기의 파일 이름 계약."""
+
+    def setUp(self):
+        self.wf = (ROOT / ".github" / "workflows" / "grm-queue-handoff-mirror.yml").read_text(
+            encoding="utf-8")
+
+    def test_mirror_glob_takes_the_normal_file_and_not_the_rerun_file(self):
+        import fnmatch
+        glob = "handoff_db_????-??-??.json"
+        self.assertIn(glob, self.wf)
+        self.assertTrue(fnmatch.fnmatch(gq.handoff_file_name(RUN), glob))
+        self.assertFalse(fnmatch.fnmatch(gq.handoff_file_name(RUN, "consumed"), glob))
+        self.assertFalse(fnmatch.fnmatch(gq.handoff_file_name(RUN, "stale"), glob))
+
+    def test_mirror_reads_the_artifact_the_intake_uploads(self):
+        intake = (ROOT / ".github" / "workflows" / "grm-intake.yml").read_text(encoding="utf-8")
+        self.assertIn("name: grm-queue-shadow", intake)
+        self.assertIn("-n grm-queue-shadow", self.wf)
+        self.assertIn(f"path: {gq.DEFAULT_SHADOW_DIR}/", intake)
+        self.assertIn('workflows: ["GRM API Intake (Daily)"]', self.wf)
+        self.assertRegex(intake, r"(?m)^name: GRM API Intake \(Daily\)")
+
+    def test_branch_is_rewritten_as_a_single_parentless_commit(self):
+        self.assertIn("git checkout -q --orphan mirror", self.wf)
+        self.assertIn("git checkout -q FETCH_HEAD -- .", self.wf)
+        self.assertNotIn("checkout -q -b mirror FETCH_HEAD", self.wf)     # 기록을 잇지 않는다
+        self.assertIn("contents: write", self.wf)
+        self.assertNotIn("secrets.", self.wf)
 
 
 class OrderTest(unittest.TestCase):

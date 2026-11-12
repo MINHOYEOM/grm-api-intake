@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import json
 import pathlib
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -56,6 +58,78 @@ class BuildTest(unittest.TestCase):
         js = (ROOT / "web" / "assets" / "doc-detail.js").read_text(encoding="utf-8")
         self.assertIn(r"""var SENT_END = /[.!?][)"'”’]?\s*$/;""", js)
         self.assertEqual(cc._SENTENCE_END_RE.pattern, r"[.!?][)\"'”’]?\s*$")
+
+
+# [11-12 대표 결정] 상세는 끝맺음과 무관하게 싣고, 끝의 483 양식 바닥글 잡음만 화면에서 걷는다.
+# 고정값은 공개 상세 10,992행 실측 표본에서 그대로 옮겼다(OCR 표기 그대로).
+TRIM_CUT = [  # (원문 꼬리, 걷힌 뒤 끝, 걷힌 규칙 하나)
+    ("mixing blades stored as clean and ready for use in production. SEE REVERSEOF THIS PAGE",
+     "ready for use in production.", "see_reverse"),
+    ("Records of the aseptic process simulation were not reviewed by the unit. THIS DOCUMENT LISTS "
+     "OBSERVATIONS MADE BY THE FDA REPRESENTATIVE(S) DURING THE INSPECTION OF YOUR FACILITY. THEY ARE",
+     "were not reviewed by the unit.", "fda_rep"),
+    ("No written procedure covers the [redacted] cleaning step. Ths document lists O!ISl:RVATIONS MADE BY THE",
+     "covers the [redacted] cleaning step.", "doc_lists"),
+    ("Trend limits for APIs were not calculated from the [redacted] batches. FACILITIES AND EQUIPMENT SYSTEM",
+     "calculated from the [redacted] batches.", "system_heading"),
+    ("Your firm did not prepare to determine that the fill weight for each capsule is the same. "
+     "Employee(s) Signature: Joanne E. Kind",
+     "for each capsule is the same.", "signature"),
+    ("Product sterilized when produced can be [redacted] to ensure sterility remains. Liatte Krueger, Invest igator,",
+     "to ensure sterility remains.", "investigator"),
+    ("The 45 day notification was sent to the Baltimore District Office on June 5, 2007. SEE",
+     "Office on June 5, 2007.", "stray_see"),
+    ("Monitoring was not performed in the area of the [redacted]. 15340 Vantage Pkwy E Ste 220 CITY, STATE, "
+     "ZIP CODE, COUNTRY TYPE ESTABLISHMENT INSPECTED Houston, TX 77032-1901 Producer of Sterile Drugs",
+     "15340 Vantage Pkwy E Ste 220", "address"),
+    ("These methods are capable of accurately quantitating non-viable particulates. - ‘",
+     "quantitating non-viable particulates.", "trailing_junk"),
+]
+TRIM_KEEP = [  # 걷으면 안 되는 것 — 정상 문장 끝·본문이 뒤에 이어진 바닥글·짧은 본문
+    "Ophthalmic Solution, 0.01%, Lot 022621A was compounded on 2/26/2021 using the LF [redacted]",
+    "The deviation was not entered into the quality system",
+    "CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABUSI-NENT INSPECTED Laurel, MS 39440-4226 Producer of "
+    "Non-Sterile Drugs A.Triple H cream lot AJCECAB [redacted] 6 that contains testosterone B. "
+    "Progesterone capsules 100 mg lot",
+    "The firm validated the process. COUNTRY TYPE ESTABLISHMENT INSPECTED Outsourcing Facility being "
+    "conducted as described in SOP-SC-PR-4347, Version 12.0 dated October 31, 2022.",
+    "Short note. SEE REVERSE OF THIS PAGE",
+    "Colic Calm® Plus is a homeopathic product marketed for infants.",
+]
+
+
+@unittest.skipUnless(shutil.which("node"), "node 없음")
+class FormFooterTrimTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        src = (ROOT / "web" / "assets" / "doc-detail.js").read_text(encoding="utf-8")
+        cls.block = src[src.index("// <form-footer-trim>"):src.index("// </form-footer-trim>")]
+
+    def run_trim(self, texts):
+        prog = (self.block + "\nconst fs=require('fs');const xs=JSON.parse(fs.readFileSync(0,'utf8'));"
+                "process.stdout.write(JSON.stringify(xs.map(trimFormFooter)));")
+        out = subprocess.run(["node", "-e", prog], input=json.dumps(texts).encode("utf-8"),
+                             capture_output=True, check=True)
+        return json.loads(out.stdout.decode("utf-8"))
+
+    def test_cuts_footer_tails(self):
+        got = self.run_trim([t for t, _, _ in TRIM_CUT])
+        for (src, end, rule), g in zip(TRIM_CUT, got):
+            self.assertTrue(g["text"].endswith(end), (rule, g["text"][-80:]))
+            self.assertIn(rule, g["cuts"], (rule, g["cuts"]))
+            self.assertTrue(src.startswith(g["text"]), "앞부분은 한 글자도 바뀌면 안 된다")
+
+    def test_keeps_body_text(self):
+        got = self.run_trim(TRIM_KEEP)
+        for src, g in zip(TRIM_KEEP, got):
+            self.assertEqual(g["text"], src, src[-80:])
+            self.assertEqual(g["cuts"], [])
+
+    def test_display_shows_unfinished_details(self):
+        js = (ROOT / "web" / "assets" / "doc-detail.js").read_text(encoding="utf-8")
+        self.assertNotIn("if (!whole && !partial[fid]) return;", js)
+        self.assertIn("text = trimFormFooter(text).text;", js)
+        self.assertIn("if (!whole && partial[fid]) {", js)
 
 
 if __name__ == "__main__":

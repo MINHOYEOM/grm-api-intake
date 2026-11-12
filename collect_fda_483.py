@@ -442,6 +442,23 @@ _PAREN_NUMBERED_OBS_RE = re.compile(r"(?:^|\s)(\d{1,2})\s*\.?\)\s+(?=[A-Z\"“])
 _HYPHEN_NUMBERED_OBS_RE = re.compile(
     r"(?:^|(?<=[.:;)])\s+|\n)\s*(\d{1,2})\s?[-‐-—]\s?(?=[A-Z][a-z]*\s)")
 
+# [서식 뒷면 안내문 2026-11-13] 483 양식 뒷면 인쇄문 "…are reported: 1. Pursuant to Section 704(b) of
+# the Federal Food, Drug and Cosmetic Act, or 2. To assist firms inspected in complying with the Acts
+# and regulations enforced by the Food and Drug Administration." 번호 목록 앵커가 이 `1.`·`2.` 를
+# 관찰 번호로 잡아 안내문이 관찰 표제로 공개됐다(실측 4문서: 195517 Henogen·165565 `Toassist firms…`,
+# 70841 `Pursuant te Section 704(b)…`, 89974 `P ursuant to Section 704(b)…`). OCR 이 단어를 붙이거나
+# 가르므로(`Toassist` · `P ursuant` · `in spected`) 글자 사이 공백 하나까지 허용한다.
+# ★좁게 둔다 — 정상 경로 게이트(_is_publishable_deficiency)에도 걸리므로 진짜 관찰을 지우면 안 된다.
+#   · 704 는 **(b)** 만: 704(a) 는 실사 통지·기록 요청 근거라 진짜 관찰 문장에 나온다(실측 145127
+#     "pursuant to Section 704(a)(1)" · 189059 "records requests pursuant to Section 704 …").
+#   · `_FORM_BOILERPLATE_RE` 전체를 정상 경로에 걸지 않는다 — `EMPLOYEE(S) SIGNATURE` 등은 진짜 표제
+#     꼬리에도 붙는다(실측 83317 obs 4 = 진짜 관찰 + 서명란 꼬리). 그 정규식은 회수 경로 전용으로 둔다.
+_FORM_NOTICE_PATTERN = (
+    r"T\s?O\s*A\s?S\s?S\s?I\s?S\s?T\s*F\s?I\s?R\s?M\s?S\s*I\s?N\s?S\s?P\s?E\s?C\s?T\s?E\s?D"
+    r"|P\s?U\s?R\s?S\s?U\s?A\s?N\s?T\s*T\w\s*S\s?E\s?C\s?T\s?I\s?O\s?N\s*7\s?0\s?4\s*\(\s*[B6]\s*\)"
+)
+_FORM_NOTICE_RE = re.compile(_FORM_NOTICE_PATTERN, re.I)
+
 # 483 **양식 문구**(관찰이 아니다). 회수 경로는 앵커를 느슨하게 잡으므로 양식 보일러플레이트가
 # deficiency 자리에 들어올 수 있다 — 실측 2건: "OR PLAN TO IMPLEMENT CORRECTIVE ACTION IN
 # RESPONSE TO AN OBSERVATION…"(양식 안내문), "Pursuant to Section 704(b) of the Federal Food,
@@ -462,7 +479,9 @@ _FORM_BOILERPLATE_RE = re.compile(
     r"|NAME\s+AND\s+TITLE\s+OF\s+INDIVIDUAL"
     # 양식 뒷면 안내문(실측 192341) — "To assist firms inspected in complying with the Acts
     # and regulations enforced by the Food and Drug Administration…"
-    r"|TO\s+ASSIST\s+FIRMS\s+INSPECTED\s+IN\s+COMPLYING",
+    r"|TO\s+ASSIST\s+FIRMS\s+INSPECTED\s+IN\s+COMPLYING"
+    # OCR 붙음·갈라짐 꼴(`Toassist` · `Pursuant te` · `P ursuant`) — 위 두 줄이 놓친다(2026-11-13).
+    r"|" + _FORM_NOTICE_PATTERN,
     re.I,
 )
 
@@ -1506,8 +1525,16 @@ def _has_function_word(deficiency: str) -> bool:
 
 
 def _is_publishable_deficiency(deficiency: str) -> bool:
-    """정상 경로 표제 게이트 — 글자 실질 하한 + 영문 산문 여부(순수 함수)."""
-    return _is_legible_deficiency(deficiency) and _has_function_word(deficiency)
+    """정상 경로 표제 게이트 — 글자 실질 하한 + 영문 산문 여부 + 서식 뒷면 안내문이 아님(순수 함수).
+
+    ★2026-11-13 서식 안내문 검사(_FORM_NOTICE_RE)를 더했다 — '정상 경로 출력 byte 보존' 원칙의
+      **의도적 예외**다. 출력이 바뀌는 문서는 안내문이 표제로 나오던 문서뿐이고(라이브 실측 4문서·
+      4행), 그 문서의 다른 행 표제·상세는 그대로다(앵커 구간은 다음 앵커가 정한다 — 시험
+      test_fda483_form_notice_gate 로 고정). 안내문 행만 있던 문서는 정상 경로가 0건이 되어 회수
+      경로로 간다.
+    """
+    return (_is_legible_deficiency(deficiency) and _has_function_word(deficiency)
+            and not _FORM_NOTICE_RE.search(deficiency or ""))
 
 
 def _strip_redaction_markers(text: str) -> str:
@@ -1563,7 +1590,8 @@ def _is_recovered_deficiency_publishable(deficiency: str) -> bool:
 
     ★정상 경로에는 적용하지 않는다 — 오늘 관찰이 나오는 1,545개 문서의 출력은 byte 단위로
     그대로 둔다(회귀 0을 측정이 아니라 **구조로** 보장). 이 게이트는 앵커를 느슨하게 잡는
-    회수 경로에만 걸린다. 통과 조건 셋:
+    회수 경로에만 걸린다. (예외 2026-11-13: ②의 일부인 서식 뒷면 안내문 검사 _FORM_NOTICE_RE
+    만은 ①을 통해 정상 경로에도 걸린다 — _is_publishable_deficiency 참고.) 통과 조건 셋:
       ① 기존 가독성 하한 + 영문 산문 여부(_is_publishable_deficiency)
       ② 483 **양식 문구**가 아니다(_FORM_BOILERPLATE_RE)
       ③ 토큰 깨짐률이 하한 이하(_deficiency_garble_ratio)
@@ -2621,6 +2649,8 @@ def _extract_483_observations_from_text(
     # ── 여기부터 회수 경로 ────────────────────────────────────────────────────
     # 오늘 관찰이 **0건인 문서에만** 도달한다(위에서 1건이라도 나오면 그대로 반환했다) —
     # 정상 문서 1,545개의 출력이 byte 단위로 불변임을 측정이 아니라 구조로 보장한다.
+    # (예외 2026-11-13: 정상 게이트가 서식 뒷면 안내문 표제를 거르므로, 안내문 행만 내던 문서는
+    #  여기로 넘어온다 — _is_publishable_deficiency 참고.)
     return _recover_483_observations(body, m, hints)
 
 

@@ -151,6 +151,34 @@ jobs:
           fi
           python delta_bridge.py "${ARGS[@]}"
 
+      # [대기열 3단계 2026-11-13] git handoff 로 만든 호는 행에 노션 page_id 가 없어 교열이 행 Status 를
+      # 손으로 찍지 못한다. 백업 길이 노션에 남아 있는 동안 노션 행 Status 가 맞아야 지난 행이 다음 주 노션
+      # handoff 에 다시 들어오지 않는다 → 코드가 계산한 상태(grm_queue)를 노션에 찍는다.
+      #   · 기본 꺼짐(vars.ENABLE_QUEUE_NOTION_STATUS_SYNC). 꺼져 있으면 계획만 실행 요약에 남긴다.
+      #   · 델타에 handoff_ref 가 없는 호(노션 handoff 로 만든 호)는 도구가 스스로 건너뛴다.
+      #   · 지금 New 인 행만 바꾼다. 실패해도 발행은 이미 끝났다 — 경고로 남기고 수동 재실행한다.
+      - name: 노션 행 Status 기록 (git handoff 호 · 코드 계산)
+        if: steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source == 'git'
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ENABLE_QUEUE_NOTION_STATUS_SYNC: ${{ vars.ENABLE_QUEUE_NOTION_STATUS_SYNC || 'false' }}
+        run: |
+          set -uo pipefail
+          python grm_queue.py notion-sync --date "${{ steps.bridge.outputs.date }}" --db "$GRM_INTAKE_DB_ID" --apply > notion_sync.json
+          rc=$?
+          {
+            echo "### 노션 행 Status 기록 (ENABLE_QUEUE_NOTION_STATUS_SYNC=${ENABLE_QUEUE_NOTION_STATUS_SYNC})"
+            echo '```json'
+            head -c 4000 notion_sync.json
+            echo
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning::노션 행 Status 기록 실패(exit $rc) — 발행에는 영향 없음. grm_queue.py notion-sync 로 다시 돌릴 것"
+          fi
+
       - name: OPEN 델타 없음 — 클린 skip
         if: steps.bridge.outputs.wrote != 'true'
         run: echo "no OPEN web-delta — nothing to bridge (또는 이미 동일 내용 커밋됨)"

@@ -26,6 +26,8 @@ site_probe.RETRY_SLEEP_S = 0.0
 
 BASE = "https://grm-solutions.com"
 SUPABASE = "https://example.supabase.co"
+CACHE_URL = f"{SUPABASE}/rest/v1/findings_similar_cache"
+SVC_KEY = "svc-secret-key-123"
 
 
 class FakeResponse:
@@ -415,13 +417,15 @@ class RunProbeAllOkTest(unittest.TestCase):
         today = dt.date(2026, 3, 10)
         get_map = _ok_get_map(today)
         post_map = _ok_post_map()
+        get_map[CACHE_URL] = FakeResponse(200, text=json.dumps([{"finding_id": "finding-cached-1"}]))
         with mock.patch("site_probe.requests.get", side_effect=_dispatch(get_map)), \
              mock.patch("site_probe.requests.post", side_effect=_dispatch(post_map)):
             report = site_probe.run_probe(
                 base_url=BASE, supabase_url=SUPABASE, anon_key="anon-key",
-                today=today, timeout=5.0)
+                service_key=SVC_KEY, today=today, timeout=5.0)
 
         self.assertEqual(report["overall"], "ok")
+        self.assertEqual(report["similar_probe_finding_id"], "finding-cached-1")
         statuses = {c["status"] for c in report["checks"]}
         self.assertNotIn("fail", statuses)
         table = site_probe.render_markdown(report)
@@ -570,9 +574,87 @@ class SimilarToUncachedIsWarnTest(unittest.TestCase):
         self.assertIn("HTTP 500", r.detail)
 
     def test_run_probe_wraps_only_similar_to(self):
-        src = open(site_probe.__file__, encoding="utf-8").read()
-        self.assertIn('_downgrade_fail_to_warn(check_rpc(\n        "RPC findings_similar_to"', src)
+        with open(site_probe.__file__, encoding="utf-8") as fh:
+            src = fh.read()
+        self.assertIn('_downgrade_fail_to_warn(check_rpc(\n            "RPC findings_similar_to"', src)
         self.assertNotIn('_downgrade_fail_to_warn(check_rpc(\n        "RPC findings_stats"', src)
+
+
+class SimilarProbeTargetTest(unittest.TestCase):
+    """[⑤] 감시 대상 id 는 092 캐시(신선한 행) 안에서 고른다. 키·조회가 없으면 고정 id + 명시 경고."""
+
+    FALLBACK = "finding-fixed"
+
+    def _pick(self, resp=None, *, key=SVC_KEY, exc=None, base=SUPABASE):
+        getter = mock.Mock(return_value=resp, side_effect=exc)
+        with mock.patch("site_probe.requests.get", getter):
+            return site_probe.pick_similar_probe_target(base, key, self.FALLBACK, 5.0), getter
+
+    def test_picks_id_from_cache_and_queries_fresh_rows_with_service_key(self):
+        now = dt.datetime(2026, 11, 13, 0, 0, tzinfo=dt.timezone.utc)
+        getter = mock.Mock(return_value=FakeResponse(200, text='[{"finding_id": "finding-cached-9"}]'))
+        with mock.patch("site_probe.requests.get", getter):
+            got = site_probe.pick_similar_probe_target(SUPABASE, SVC_KEY, self.FALLBACK, 5.0, now=now)
+        self.assertEqual(got, ("finding-cached-9", None))
+        args, kwargs = getter.call_args
+        self.assertEqual(args[0], CACHE_URL)
+        self.assertEqual(kwargs["headers"]["apikey"], SVC_KEY)
+        self.assertEqual(kwargs["params"]["refreshed_at"], "gt.2026-11-05T00:00:00Z")
+        self.assertEqual(kwargs["params"]["select"], "finding_id")
+
+    def test_no_service_key_falls_back_with_explicit_reason_and_no_request(self):
+        (fid, why), getter = self._pick(key="")
+        self.assertEqual(fid, self.FALLBACK)
+        self.assertIn("SUPABASE_SERVICE_ROLE_KEY 미설정", why)
+        getter.assert_not_called()
+
+    def test_http_error_and_empty_and_bad_json_fall_back_with_reason(self):
+        for resp, frag in ((FakeResponse(401), "HTTP 401"),
+                           (FakeResponse(200, text="[]"), "캐시 행 없음"),
+                           (FakeResponse(200, text="<html>"), "JSON 이 아님")):
+            (fid, why), _ = self._pick(resp)
+            self.assertEqual(fid, self.FALLBACK)
+            self.assertIn(frag, why)
+
+    def test_network_exception_falls_back_and_never_leaks_key(self):
+        import requests
+        (fid, why), _ = self._pick(exc=requests.exceptions.ConnectionError(f"boom {SVC_KEY}"))
+        self.assertEqual(fid, self.FALLBACK)
+        self.assertIn("ConnectionError", why)
+        self.assertNotIn(SVC_KEY, why)
+
+    def test_fallback_run_probe_emits_warn_row_and_keeps_similar_warn_only(self):
+        today = dt.date(2026, 3, 10)
+        post_map = _ok_post_map()
+        post_map[f"{SUPABASE}/rest/v1/rpc/findings_similar_to"] = FakeResponse(500, elapsed_s=3.4)
+        with mock.patch("site_probe.requests.get", side_effect=_dispatch(_ok_get_map(today))), \
+             mock.patch("site_probe.requests.post", side_effect=_dispatch(post_map)):
+            report = site_probe.run_probe(base_url=BASE, supabase_url=SUPABASE, anon_key="anon-key",
+                                          today=today, timeout=5.0)
+        rows = {c["name"]: c for c in report["checks"]}
+        self.assertEqual(rows["유사 사례 감시 대상 선택"]["status"], "warn")
+        self.assertEqual(rows["RPC findings_similar_to"]["status"], "warn")
+        self.assertEqual(report["similar_probe_finding_id"], site_probe.FIXED_FINDING_ID)
+
+    def test_cached_target_failure_is_real_fail_and_report_has_no_key(self):
+        today = dt.date(2026, 3, 10)
+        get_map = _ok_get_map(today)
+        get_map[CACHE_URL] = FakeResponse(200, text='[{"finding_id": "finding-cached-1"}]')
+        post_map = _ok_post_map()
+        post_map[f"{SUPABASE}/rest/v1/rpc/findings_similar_to"] = FakeResponse(500, elapsed_s=3.4)
+        with mock.patch("site_probe.requests.get", side_effect=_dispatch(get_map)), \
+             mock.patch("site_probe.requests.post", side_effect=_dispatch(post_map)):
+            report = site_probe.run_probe(base_url=BASE, supabase_url=SUPABASE, anon_key="anon-key",
+                                          service_key=SVC_KEY, today=today, timeout=5.0)
+        rows = {c["name"]: c for c in report["checks"]}
+        self.assertEqual(rows["RPC findings_similar_to"]["status"], "fail")
+        self.assertNotIn("유사 사례 감시 대상 선택", rows)
+        self.assertNotIn(SVC_KEY, json.dumps(report) + site_probe.render_markdown(report))
+
+    def test_workflow_passes_service_secret(self):
+        with open(os.path.join(os.path.dirname(__file__), "..", ".github", "workflows",
+                               "grm-site-probe.yml"), encoding="utf-8") as fh:
+            self.assertIn("SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}", fh.read())
 
 
 if __name__ == "__main__":

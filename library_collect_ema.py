@@ -52,7 +52,10 @@ MANUFACTURING_GUIDELINES_URL = (
 )
 HTTP_TIMEOUT_SECONDS = 40
 HTTP_RETRIES = 2
-REQUEST_DELAY_SECONDS = 1.0
+# [11-12 #1456] EMA 가 상세 페이지 연속 요청에 429(Too Many Requests)를 3일 연속 냈다 → 간격 1s→3s,
+# 그리고 실패한 상세 페이지는 목록을 다 돈 뒤 한 번 쉬고(COOLDOWN) 다시 받는다.
+REQUEST_DELAY_SECONDS = 3.0
+RETRY_COOLDOWN_SECONDS = 60.0
 MIN_EXPECTED_PROCEDURES = 10   # 이보다 적으면 페이지 구조 변경 의심
 MIN_EXPECTED_GUIDELINES = 5
 
@@ -269,15 +272,25 @@ def collect_library_items(run_date: date) -> tuple[list[dict[str, str]], str | N
         return procedures, (f"EMA 과학 가이드라인 링크 {len(links)}건"
                             f"(<{MIN_EXPECTED_GUIDELINES}) — 페이지 구조 변경 의심")
 
-    guidelines: list[dict[str, str]] = []
-    errors: list[str] = []
-    for url, title in links:
+    pages: dict[str, str] = {}
+    failed: list[str] = []
+    for url, _title in links:
         try:
-            page_html = _get(url)
-        except Exception as exc:  # noqa: BLE001
-            errors.append(f"{_slug(url)}: {exc}")
-            page_html = ""
-        guidelines.append(build_guideline_item(url, title, page_html))
+            pages[url] = _get(url)
+        except Exception:  # noqa: BLE001
+            failed.append(url)
+    errors: list[str] = []
+    if failed:
+        # 한 번 쉬고 실패분만 다시 받는다 — 일시 429 로 소스 전체가 격리되지 않게.
+        log("WARN", f"EMA 상세 {len(failed)}건 실패 → {RETRY_COOLDOWN_SECONDS:.0f}s 쉬고 재시도")
+        time.sleep(RETRY_COOLDOWN_SECONDS)
+        for url in failed:
+            try:
+                pages[url] = _get(url)
+            except Exception as exc:  # noqa: BLE001
+                errors.append(f"{_slug(url)}: {exc}")
+    guidelines: list[dict[str, str]] = [
+        build_guideline_item(url, title, pages.get(url, "")) for url, title in links]
 
     items = procedures + guidelines
     scanned = len(_BLOCK_SPLIT_RE.split(compilation_html)) - 1 + len(links)

@@ -1,5 +1,5 @@
--- 155 방문 기록 넓히기 — 페이지 간 이동(이전 종류 → 다음 종류)과 탭·칩·펼침 클릭을 하루 단위 익명 카운터로.
--- 153 = 기간 필터(#1635), 154 = DB 크기 기록(#1631) — 그 다음 번호. Additive only — 기존 표·보기·함수 무변경.
+-- 154 방문 기록 넓히기 — 페이지 간 이동(이전 종류 → 다음 종류)과 탭·칩·펼침 클릭을 하루 단위 익명 카운터로.
+-- Max local web/migrations prefix was 153(#1635) on its branch, 152 on main. Additive only — 기존 표·보기·함수 무변경.
 --
 -- ★왜(2026-11-13, 대표 요청 ⑤⑥): UI 개선(#1599 메뉴 개편·찾아보기·검색 화면, 브리프 카드)의 효과를
 --   재야 하는데, 지금 RUM(072~083, Cloudflare)은 **페이지별 방문 수**만 있다. "용어 페이지에서 어디로
@@ -60,7 +60,7 @@ create table if not exists public.rum_nav_daily (
   primary key (snap_date, lang, from_kind, to_kind)
 );
 comment on table public.rum_nav_daily is
-  '155: 페이지 간 이동(이전 페이지 종류 → 다음 페이지 종류) 하루 익명 카운트. 경로·쿼리·사람 식별자 없음. 쓰기는 rum_nav_bump(anon) 하나.';
+  '154: 페이지 간 이동(이전 페이지 종류 → 다음 페이지 종류) 하루 익명 카운트. 경로·쿼리·사람 식별자 없음. 쓰기는 rum_nav_bump(anon) 하나.';
 
 create table if not exists public.rum_ui_daily (
   snap_date  date    not null,
@@ -74,7 +74,7 @@ create table if not exists public.rum_ui_daily (
   primary key (snap_date, lang, page_kind, ui_kind, ui_id, ctx)
 );
 comment on table public.rum_ui_daily is
-  '155: 탭·칩·토글·필터 클릭과 펼침(details 열기) 하루 익명 카운트. ui_id=요소 클래스 이름, ctx=카드 종류 등 묶음. 고른 값·화면 글자 없음. 쓰기는 rum_ui_bump(anon) 하나.';
+  '154: 탭·칩·토글·필터 클릭과 펼침(details 열기) 하루 익명 카운트. ui_id=요소 클래스 이름, ctx=카드 종류 등 묶음. 고른 값·화면 글자 없음. 쓰기는 rum_ui_bump(anon) 하나.';
 
 alter table public.rum_nav_daily enable row level security;
 alter table public.rum_ui_daily enable row level security;

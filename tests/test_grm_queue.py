@@ -591,6 +591,80 @@ class OrderTest(unittest.TestCase):
         self.assertEqual(src.count("grm_queue.run_shadow("), 1)
 
 
+class HandoffRefTest(unittest.TestCase):
+    """편집팀이 읽은 handoff 를 델타가 가리키고, 상태 계산이 그것을 DB 기록과 대조한다."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = self.tmp.name
+        os.makedirs(os.path.join(self.root, "web", "data", "deltas"))
+        self.store = FakeStore()
+        for doc in ("a", "b"):
+            self.store.add_raw(_record("FR", doc))
+        self.store.enqueue([{"source": "FR", "document_id": d, "first_seen_run_date": "2026-11-12",
+                             "first_seen_at": "2026-11-12T03:30:00+09:00"} for d in "ab"])
+        self.payload = {"run_date_kst": "2026-11-16", "generated_at_kst": "x", "row_count": 2,
+                        "rows": [{"source": "FR", "document_id": d, "web_card_id": d} for d in "ab"]}
+        gq.record_handoff(self.store, self.payload, 30, GEN)
+
+    def _delta(self, **extra):
+        with open(os.path.join(self.root, "web", "data", "deltas", "delta_2026_11_16.json"), "w",
+                  encoding="utf-8") as f:
+            json.dump(dict({"publish_date": "2026-11-16", "cards": {"a": {}}, "tldr": []}, **extra), f)
+
+    def test_ref_is_the_recorded_fingerprint_and_ignores_generation_time(self):
+        ref = gq.handoff_ref(self.payload)
+        self.assertEqual(ref, {"date": "2026-11-16", "rows": 2,
+                               "sha256": self.store.handoffs["2026-11-16"]["payload_sha256"]})
+        self.assertEqual(gq.handoff_ref(dict(self.payload, generated_at_kst="y")), ref)
+
+    def test_cli_prints_ref_without_database_access(self):
+        import contextlib
+        import io as _io
+        path = os.path.join(self.root, "handoff_2026-11-16.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(self.payload, f)
+        out = _io.StringIO()
+        with patch.dict(os.environ, {"SUPABASE_URL": "", "SUPABASE_SERVICE_ROLE_KEY": ""}), \
+                contextlib.redirect_stdout(out):
+            self.assertEqual(gq.main(["handoff-ref", path]), 0)
+        self.assertEqual(json.loads(out.getvalue()), gq.handoff_ref(self.payload))
+        with contextlib.redirect_stderr(_io.StringIO()):
+            self.assertEqual(gq.main(["handoff-ref", os.path.join(self.root, "none.json")]), 1)
+
+    def test_matching_ref_is_quiet_and_deferred_reenters(self):
+        self._delta(handoff_ref=gq.handoff_ref(self.payload), deferred=["FR::b"])
+        out = gq.reconcile(self.store, self.root, RUN)
+        self.assertNotIn("ref_mismatch", out)
+        self.assertEqual(self.store.queue["FR::b"]["state"], "deferred")
+        rows, _, _ = gq.load_candidates(self.store, RUN, 30, gh._HANDOFF_V2_ROW_KEEP)
+        self.assertEqual([r["document_id"] for r in rows], ["b"])
+
+    def test_mismatching_ref_is_reported(self):
+        self._delta(handoff_ref={"date": "2026-11-16", "sha256": "0" * 64, "rows": 9})
+        out = gq.reconcile(self.store, self.root, RUN)
+        self.assertEqual(out["ref_mismatch"], ["2026-11-16"])
+        with patch.object(gq, "log"), patch.object(gh, "log"), \
+                patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
+            report = gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
+                                   display_window_days=7, store=self.store, out_dir=self.root,
+                                   repo_root=self.root)
+        self.assertTrue(any("지문이 DB 기록과 다르다" in w for w in report["warnings"]))
+
+    def test_bridge_keeps_the_two_keys(self):
+        import delta_bridge
+        delta = {"publish_date": "2026-11-16", "cards": {}, "tldr": [], "tldr_en": [],
+                 "handoff_ref": {"date": "2026-11-16", "sha256": "c" * 64, "rows": 2},
+                 "deferred": ["FR::b"]}
+        with patch.object(delta_bridge, "log"):
+            out, _, day = delta_bridge.finalize_delta(json.loads(json.dumps(delta)), None, "2026-11-16")
+        self.assertEqual(day, "2026-11-16")
+        self.assertEqual(out["handoff_ref"], delta["handoff_ref"])
+        self.assertEqual(out["deferred"], ["FR::b"])
+        self.assertEqual(json.loads(delta_bridge._dumps(out))["deferred"], ["FR::b"])
+
+
 class CompareTest(unittest.TestCase):
     def test_classifies_who_is_richer(self):
         n = {"rows": [{"source": "FR", "document_id": "1", "body": "abc…", "modality": "Bio",

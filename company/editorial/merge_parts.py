@@ -121,7 +121,28 @@ def merge(folder):
     if problems:
         return None, None, problems
     delta = {"cards": cards, "tldr": tldr, "tldr_en": tldr_en}
+    delta.update(_queue_keys(desk))
     return delta, deep, []
+
+
+def _queue_keys(desk):
+    """git handoff(`claude/queue-handoff`)로 만든 호에만 붙는 두 키 — 없으면 빈 dict(종전과 바이트 동일).
+
+    handoff_ref  데스크가 읽은 handoff 의 날짜·지문·행 수(`python grm_queue.py handoff-ref <파일>` 출력).
+                 상태 계산(grm_queue.reconcile)이 "편집팀이 읽은 것 = DB 가 기록한 것"인지 대조한다.
+    deferred     데스크가 `defer`(용량 초과 보류)로 배정한 행의 `source::document_id`. 다음 주 handoff 에
+                 다시 들어간다. 보류가 없어도 빈 목록을 싣는다("보류 없음"을 분명히).
+    노션 handoff 로 만든 호는 DEFERRED 블록을 노션 페이지에 적으므로 여기 싣지 않는다.
+    """
+    ref = desk.get("handoff_ref")
+    if not (isinstance(ref, dict) and ref.get("sha256") and ref.get("date")):
+        return {}
+    deferred = sorted({f"{r.get('source', '')}::{r.get('document_id', '')}"
+                       for r in desk.get("rows") or []
+                       if isinstance(r, dict) and r.get("action") == "defer"
+                       and r.get("source") and r.get("document_id")})
+    return {"handoff_ref": {k: ref[k] for k in ("date", "sha256", "rows") if k in ref},
+            "deferred": deferred}
 
 
 def main(argv):

@@ -619,6 +619,7 @@ grm-api-intake/
 ├─ import_alerts_refresh.py        # [수입경보 1단계] 업체 페이지 "FDA 수입경보 대상" 정본 web/data/import_alerts.json 재생성(import_alert_listing 132 · service_role 읽기 · 공개 필드만, 주소 없음 · 0행/형식/등재 20% 급감 게이트 · 변경 없으면 exit 10)
 ├─ deficiency_cases_refresh.py    # [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 지적 사례 화면·블록 정본 web/data/deficiency_cases.json 재생성(deficiency_examples 134 · service_role 읽기 · 공개 필드만: 영어 지적 문장·기관·연도·기관 분류·우리 분류·조항 키 + MHRA xlsx 조항·문단별 등급 집계, PMDA 배경 설명·익명 실사 ID·국가 없음, PMDA 일본어판은 건수만 · 0행/형식/전체 행 20% 급감 게이트 · 변경 없으면 exit 10)
 ├─ findings_docs_refresh.py        # [검색 유입] 문서 단위 페이지 정본 재측정(지적 3건 이상 · 발행일/원문링크 필수 · 본문 무절단 · 문서 id 정렬로 작은 diff)
+├─ brief_glance_refresh.py         # [브리프 주간 현황] 브리프 483·경고서한 카드 원문 URL → findings 국가·분류(공개 읽기·anon) 정본 web/data/brief_glance.json — grm-news-refresh.yml 이 매일, grm-web-publish.yml 이 발행 때 갱신(실패해도 계속)
 ├─ news_refresh.py                 # [최근 규제 소식] `/news/` 정본(web/data/news.json) 재측정 — 공개 RPC regulatory_news(138·anon·공개 5컬럼)로 최근 60일 비-findings 소식(ECA·ISPE·EMA·관보·회수·PIC/S·WHO·MFDS 지침/공고)
 ├─ firm_history_stamp.py           # 브리프 카드 '이 업체 앞선 지적 기록' 사이드카(web/data/firm_history/<발행일>.json) 생성 — RPC findings_card_history(120) 조회 → 확실/참고용/숨김 판정(시범: 483 FEI 일치 + 식약처 3종)
 ├─ collect_rum_analytics.py        # [성장·유입] Cloudflare Web Analytics(RUM) → Supabase 일별 적재(072/073/075/077 · 그룹마다 별도 GraphQL 요청 · avg{sampleInterval} 동반 저장 · 정확값을 추정값으로 덮지 않음(계층 래칫 PRECISION_BAND=3.0) · 창은 upsert 아닌 삭제 후 삽입 · **질의를 CHUNK_DAYS=3 조각으로 자른다** — ★Cloudflare 의 전수(비표본) 데이터셋 보존이 약 7일이고 그 밖을 조금이라도 건드리는 질의는 통째로 표본으로 떨어진다(2026-09-05 통제 실측: 한 실행·같은 1일 창에서 8/28=간격 12.5 표본, 8/29=간격 1.07 전수). 놓친 날은 영구히 회수 불가라 어릴 때 짧은 창으로 받아 둔다 — 8/10~8/28 이 8일 창 단일 질의로만 물어와 그렇게 굳었다. 조각은 겹치지 않게 자른다(datetime_leq 라 자정에서 맞대면 앞 조각이 다음 날 한 순간을 삼켜 멀쩡한 하루를 ~0 으로 덮는다))
@@ -764,7 +765,7 @@ grm-api-intake/
    ├─ grm-glossary-cases.yml             # [트랙 C] 용어사전 사례연결 건수 주간 재측정(금 03:15 KST) — q·excluded 무변형·건수만·PR→CI green→자동 머지
    ├─ grm-findings-facets.yml            # [검색 유입] 분류·국가·기관 모음 페이지 정본 주간 재측정(수 03:20 KST) — 표본 미달 제외 고지·페이지 20% 축소 시 사람 검토·PR→CI green→자동 머지
    ├─ grm-findings-docs.yml              # [검색 유입] 문서 단위 페이지 정본 주간 재측정(일 03:25 KST) — 발행일/원문링크 필수·문서 10% 축소 시 사람 검토·PR→CI green→자동 머지
-   ├─ grm-news-refresh.yml               # [최근 규제 소식] news_refresh.py 일일 실행(23:47 UTC) — 데이터 파일 1개 PR + CI 게이트 후 머지(골든 불변)
+   ├─ grm-news-refresh.yml               # [최근 규제 소식] news_refresh.py·brief_glance_refresh.py 일일 실행(23:47 UTC) — 데이터 파일 PR + CI 게이트 후 머지(골든 불변)
    ├─ grm-findings-reclassify.yml        # taxonomy 재분류(workflow_dispatch 전용, dry_run 기본 true, 버전 무관 재사용)
    ├─ grm-findings-taxonomy-drift.yml    # 분류 표류 감시(주 1회 크론, 읽기 전용 — 적용은 사람이 위 워크플로로)
    └─ grm-findings-embed.yml             # [FIND-1 S2] 임베딩 적재(cron=ENABLE_FINDINGS_EMBED 게이트, dispatch=플래그 무관 dry-run 가능)

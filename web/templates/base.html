@@ -376,9 +376,15 @@
       여유가 남는다. 두 조치 모두 ≤900px 에서 이미 쓰던 것을 위 구간으로 넓힌 것뿐이다.
    §4 한글안전: 자간·대문자 미사용. grm.css 동결이라 스코프 인라인(footer 선례). */
 .nav-in > .btn.coral,.nav-in > .grm-lang{flex:none;white-space:nowrap}
+/* [헤더 줄꺾임 2026-11-12] 로그인 칸이 붙으면 901px 근처에서 탭 이름('주간 브리프')이 두 줄로
+   접혔다. 탭 이름·로그인은 접지 않고, 그 구간은 탭 여백을 한 번 더 줄여 한 줄에 맞춘다. */
+@media(min-width:901px){
+  .nav nav a,.grm-auth .grm-acct-login{white-space:nowrap}
+}
 @media(min-width:901px) and (max-width:1000px){
   .brand-full{display:none}
-  .nav nav a{padding-left:9px;padding-right:9px}
+  .nav nav{gap:2px}
+  .nav nav a{padding-left:8px;padding-right:8px}
 }
 </style>
 <footer class="site"><div class="wrap">

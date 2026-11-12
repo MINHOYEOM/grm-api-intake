@@ -325,8 +325,8 @@ def build_backlink_panel(kind: str, node_id: str, *, index: "dict[str, list[dict
                          lang: str, issue_slugs: "set[str]", rel_root: str, tr) -> "dict[str, Any]":
     """백링크 패널 뷰모델 — 칸 구조는 노드 유형(doc·firm·term)이 달라도 같다.
 
-    이번에는 kind="doc" 의 첫 칸(실린 브리프 호)만 채운다. 칸마다 chips 가 비면 `empty`
-    사유를 회색으로 보인다(숨기지 않는다). 링크는 **그 언어 트리에 실제로 있는 호**로만 건다.
+    이번에는 kind="doc" 의 첫 칸(실린 브리프 호)만 채운다. 링크가 없는 칸은 내지 않고,
+    칸이 모두 비면 패널도 내지 않는다. 링크는 **그 언어 트리에 실제로 있는 호**로만 건다.
     """
     cells: list[dict[str, Any]] = []
     if kind == "doc":
@@ -334,13 +334,10 @@ def build_backlink_panel(kind: str, node_id: str, *, index: "dict[str, list[dict
         chips = [{"href": f"{rel_root}briefs/{e['date']}/" + (f"#{e['anchor']}" if e["anchor"] else ""),
                   "label": tr("{date} 호", date=e["date"])} for e in hits]
         if chips:
-            empty = ""
-        elif index.get(node_id):
-            empty = tr("한국어 브리프에만 실렸고 영문 호는 아직 없습니다.")
-        else:
-            empty = tr("아직 주간 브리프 카드로 다루지 않은 문서입니다.")
-        cells.append({"key": "briefs", "label": tr("이 문서가 실린 브리프 호"),
-                      "chips": chips, "empty": empty})
+            cells.append({"key": "briefs", "label": tr("이 문서가 실린 브리프 호"),
+                          "chips": chips, "empty": ""})
+    # [빈 패널 숨김 2026-11-12] 채워진 칸이 하나도 없으면 cells 를 비워 패널 자체를 내지
+    # 않는다(템플릿이 `backlinks.cells` 로 거른다) — 빈 제목만 보이던 화면(UI/UX 점검 11-11).
     return {"title": tr("연결된 글 (백링크)"), "cells": cells}
 
 

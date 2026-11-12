@@ -2398,7 +2398,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         문서→지적사항→기관 순회→검토필요(>0) 순으로 블록을 만든다.
 
         (054 에서 순서가 전체→문서→기관 에서 바뀌고 "전체" 라벨이 "지적사항"이 됐다 —
-        단위 표기 계약 자체는 test_dash_stats_documents_first_and_findings_labeled 가
+        단위 표기 계약 자체는 test_dash_agency_stats_declare_their_unit_in_tooltip 가
         담당하고, 여기선 M14 의 블록 마크업 계약만 계속 고정한다.)"""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function renderDashStats(stats)", js_src)
@@ -2984,28 +2984,20 @@ class WebFindingsRenderTest(unittest.TestCase):
     # 월·업체)를 통째로 반환하므로, 무필터일 때만 별도 findings_stats RPC 값을 조건부로
     # 끼워 넣거나 다음 청크를 미리 당겨올 필요가 없다(renderDash() 는 이제 인자도 없다).
 
-    def test_dash_stats_documents_first_and_findings_labeled(self):
-        """[문서 축 054] renderDashStats() 는 stats.documents 가 있을 때만 "문서" 스탯
-        카드를 끼워 넣고(없으면 조용히 생략 — 레이아웃 안 깨짐), 그 **다음에** 총건수를
-        "지적사항" 라벨로 그린다.
-
-        ★순서와 라벨이 이 테스트의 본체다. 옛 화면은 [전체][문서][FDA]… 였는데 "전체"가
-        무엇의 전체인지 말하지 않아, 기관 숫자(지적사항)와 문서 숫자가 같은 줄에 단위 표시
-        없이 나란히 섰다. 문서당 지적 건수가 소스마다 6.01(483)~1.00(MFDS 회수)로 달라서
-        그 줄만 보면 편중이 실제의 두 배 넘게 보인다(지적사항 축 87:13 vs 문서 축 69:31)."""
+    def test_dash_stats_draw_no_second_total(self):
+        """[총계 하나로 2026-11-12] 대시보드는 문서·지적사항 총계 블록을 그리지 않는다 —
+        검색창 아래 .fnd-total 한 줄이 이 화면의 유일한 총계다. 같은 화면에 스냅샷 총계와
+        현재 결과 총계가 위아래로 서면(6,694/26,552 vs 6,745/26,670) 숫자가 다른 DB로
+        읽힌다(UI/UX 점검 11-11). 기관별 블록·검토 필요 블록은 그대로 둔다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function renderDashStats(stats)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("if (stats.documents !== undefined && stats.documents !== null) {", fn)
-        self.assertIn('buildStatBlock(String(stats.documents), _t("문서"), false)', fn)
-        self.assertIn('buildStatBlock(String(stats.total), _t("지적사항"), false)', fn)
-        # 문서 블록이 총건수 블록보다 **앞**에 온다(라벨만 맞고 순서가 뒤집히면 무의미).
-        self.assertLess(
-            fn.index('String(stats.documents), _t("문서")'),
-            fn.index('String(stats.total), _t("지적사항")'),
-            "문서 스탯이 지적사항 스탯보다 앞에 와야 한다(기관 스탯의 기준선 역할)",
-        )
+        self.assertNotIn("String(stats.documents)", fn)
+        self.assertNotIn("String(stats.total)", fn)
+        self.assertIn("stats.agencies.forEach", fn)
         self.assertNotIn("agenciesExact", fn, "옛 추정치 툴팁 분기는 054 로 사라졌다")
+        tpl = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertEqual(tpl.count('class="fnd-total"'), 1)
 
     def test_dash_agency_stats_declare_their_unit_in_tooltip(self):
         """[문서 축 054] 기관 스탯은 문서 수로 그리되, 툴팁에 **두 축을 병기**한다 —
@@ -13109,15 +13101,13 @@ class WebBacklinkPanelTest(unittest.TestCase):
                                         rel_root="../../../", tr=tr)
         hrefs = [c["href"] for c in p["cells"][0]["chips"]]
         self.assertEqual(hrefs[0], "../../../briefs/2026-11-02/#fda483-1")
-        # 영문 트리에 없는 호는 링크하지 않는다 → 회색 사유
+        # 영문 트리에 없는 호는 링크하지 않는다 → 칸이 비면 패널을 내지 않는다(빈 제목 금지)
         p = render.build_backlink_panel("doc", "fda483-1", index=idx, lang="en",
                                         issue_slugs=set(), rel_root="../../../en/", tr=tr)
-        self.assertEqual(p["cells"][0]["chips"], [])
-        self.assertTrue(p["cells"][0]["empty"])
+        self.assertEqual(p["cells"], [])
         p = render.build_backlink_panel("doc", "nope", index=idx, lang="ko",
                                         issue_slugs={"2026-11-02"}, rel_root="", tr=tr)
-        self.assertEqual(p["cells"][0]["chips"], [])
-        self.assertNotEqual(p["cells"][0]["empty"], "")
+        self.assertEqual(p["cells"], [])
 
     def test_unrendered_card_not_counted(self):
         idx = render.build_card_issue_index(

@@ -856,6 +856,16 @@ def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
     return {"staled": staled, "frozen": ""}
 
 
+def handoff_file_name(run_date: date, frozen: str = "") -> str:
+    """DB handoff 파일 이름. 그 날짜가 이미 닫힌 뒤의 재실행분은 `.rerun` 을 붙인다.
+
+    `grm-queue-handoff-mirror.yml` 은 `handoff_db_YYYY-MM-DD.json` 만 브랜치에 복사한다. 닫힌 뒤
+    재실행분(남은 새 행뿐인 작은 payload)이 같은 이름으로 나가면 발행에 쓰인 날짜의 파일을 덮어쓴다.
+    """
+    suffix = ".rerun" if frozen else ""
+    return f"handoff_db_{run_date.isoformat()}{suffix}.json"
+
+
 def _write(path: str, text: str) -> None:
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "wb") as f:
@@ -919,7 +929,7 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
         recorded = record_handoff(store, payload, window_days, generated_at)
         report["staled"] = recorded["staled"]
         report["handoff_frozen"] = recorded["frozen"]
-        _write(os.path.join(out_dir, f"handoff_db_{run_date.isoformat()}.json"),
+        _write(os.path.join(out_dir, handoff_file_name(run_date, recorded["frozen"])),
                json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n")
     except Exception as e:  # noqa: BLE001 — 그림자가 수집을 죽이면 안 된다
         report["warnings"].append(f"DB handoff 생성 실패: {type(e).__name__}: {truncate(str(e), 160)}")

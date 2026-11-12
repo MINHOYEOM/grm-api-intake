@@ -1,0 +1,108 @@
+name: GRM Queue Handoff Mirror (DB handoff → 브랜치 사본)
+
+# [대기열 3단계 준비 · 2026-11-13] DB(intake_queue + raw_signals)로 만든 handoff 는 지금 수집 실행의
+# 아티팩트(grm-queue-shadow)로만 남는다. 편집팀(클라우드)은 `/actions/…` 를 읽을 수 없으므로
+# (company/CLOUD.md), 수집이 성공할 때마다 그 파일을 저장소 브랜치에 복사해 둔다.
+#   읽는 법: git fetch origin claude/queue-handoff
+#            git show FETCH_HEAD:handoff_YYYY-MM-DD.json      (handoff v2 payload 전체)
+#            git show FETCH_HEAD:brief_web_YYYY_MM_DD.json    (같은 행으로 만든 빈 슬롯 브리프)
+#
+# 안전 계약
+#   · 읽기 전용 사본 — 발행 경로(노션 handoff · grm-web-brief 아티팩트)는 그대로다. 이 브랜치는
+#     아직 어떤 발행 단계도 읽지 않는다(편집팀 지시문이 바뀌기 전까지 그림자).
+#   · 브랜치는 매번 **부모 없는 단일 커밋**으로 덮어쓴다(기록이 쌓이지 않음) · 최신 날짜 KEEP 개만 유지.
+#   · 그 날짜 handoff 가 이미 닫힌 뒤(consumed)의 재실행분은 수집기가 `.rerun` 이름으로 따로 쓴다
+#     → 여기서 복사하지 않으므로 발행에 쓰인 날짜의 파일이 덮어써지지 않는다.
+#   · 비밀값 없음 · github.token 만 · 내용은 공개 사이트에 올라가는 규제 정보의 재료다.
+
+on:
+  workflow_run:
+    workflows: ["GRM API Intake (Daily)"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      intake_run_id:
+        description: '사본을 만들 grm-intake run id (그 run 의 grm-queue-shadow 아티팩트)'
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: grm-queue-handoff-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    name: grm-queue-shadow → claude/queue-handoff
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MIRROR_BRANCH: claude/queue-handoff
+      KEEP: '8'
+    steps:
+      - name: DB handoff 내려받기
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IN_RUN_ID: ${{ inputs.intake_run_id }}
+          WR_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          RID="${IN_RUN_ID:-$WR_ID}"
+          printf '%s' "$RID" | grep -qE '^[0-9]+$' || { echo "::error::run id 는 숫자"; exit 1; }
+          mkdir -p _in
+          if ! gh run download "$RID" -R "$GITHUB_REPOSITORY" -n grm-queue-shadow -D _in 2>/dev/null; then
+            echo "::notice::run $RID 에 grm-queue-shadow 아티팩트 없음 — 사본 생략(ENABLE_INTAKE_QUEUE_SHADOW off 이거나 만료)"
+            echo "SKIP=1" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          ls -l _in
+          ls _in/handoff_db_????-??-??.json >/dev/null 2>&1 || { echo "::notice::handoff_db_*.json 없음 — 사본 생략(그날 DB handoff 생성 실패 또는 동결 뒤 재실행)"; echo "SKIP=1" >> "$GITHUB_ENV"; }
+
+      - name: 브랜치 갱신 (부모 없는 단일 커밋)
+        if: ${{ env.SKIP != '1' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir _mirror && cd _mirror
+          git init -q
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan mirror
+          if git ls-remote --exit-code --heads origin "$MIRROR_BRANCH" >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin "$MIRROR_BRANCH"
+            git checkout -q FETCH_HEAD -- .          # 지난 사본 파일만 가져온다(기록은 잇지 않는다)
+          fi
+          # 오늘 것: handoff_db_YYYY-MM-DD.json → handoff_YYYY-MM-DD.json, 빈 슬롯 브리프는 이름 그대로.
+          for f in ../_in/handoff_db_????-??-??.json; do
+            d="$(basename "$f" .json)"; d="${d#handoff_db_}"
+            python3 -c 'import json,sys; p=json.load(open(sys.argv[1],encoding="utf-8")); assert p["run_date_kst"]==sys.argv[2] and isinstance(p["rows"],list)' "$f" "$d" \
+              || { echo "::error::$f 가 handoff payload 가 아니거나 날짜가 파일명과 다르다"; exit 1; }
+            cp "$f" "handoff_${d}.json"
+            b="../_in/brief_web_${d//-/_}.json"
+            if [ -f "$b" ]; then cp "$b" .; fi
+          done
+          # 최신 날짜(파일명 정렬) KEEP 개만 남긴다 — 두 종류 각각.
+          ls handoff_????-??-??.json | sort -r | tail -n +$((KEEP + 1)) | xargs -r rm -f
+          ls brief_web_????_??_??.json 2>/dev/null | sort -r | tail -n +$((KEEP + 1)) | xargs -r rm -f
+          printf 'DB 로 만든 handoff 사본 — grm-queue-handoff-mirror.yml 이 쓴다. 손대지 않는다.\n' > README.txt
+          git add -A
+          git commit -q -m "queue handoff mirror: $(ls handoff_????-??-??.json | tr '\n' ' ')"
+          if git ls-remote --exit-code --heads origin "$MIRROR_BRANCH" >/dev/null 2>&1 \
+             && [ "$(git rev-parse 'HEAD^{tree}')" = "$(git rev-parse 'FETCH_HEAD^{tree}')" ]; then
+            echo "::notice::변경 없음"
+            exit 0
+          fi
+          git push -q --force origin "mirror:refs/heads/${MIRROR_BRANCH}"
+          {
+            echo "### DB handoff 사본 (claude/queue-handoff)"
+            ls -l handoff_*.json brief_web_*.json 2>/dev/null | awk '{print "- " $9 " (" $5 " bytes)"}'
+          } >> "$GITHUB_STEP_SUMMARY"

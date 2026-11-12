@@ -222,7 +222,9 @@
   // ── 지적 문장 ──────────────────────────────────────────────────────────────
   function rpc(q, textOnly, attempt) {
     var body = {
-      p_q: q, p_text_only: !!textOnly, p_page: 1, p_docs_per_page: 8,
+      // 쪽당 24건 = 서버 캐시(findings_search_cache, 086)의 키와 같은 값 — 용어 사례 검색어는
+      // 미리 계산된 답을 받는다(8건이면 키가 달라 매번 새로 계산, 3초 제한에 걸렸다). 화면은 10줄만 쓴다.
+      p_q: q, p_text_only: !!textOnly, p_page: 1, p_docs_per_page: 24,
       p_agency: state.agency, p_source: state.source,
       p_orig_lang: _isEn ? "en" : ""
     };

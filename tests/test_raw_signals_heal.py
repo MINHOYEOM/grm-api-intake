@@ -206,6 +206,24 @@ class BackfillFromNotionTest(unittest.TestCase):
         self.assertEqual(rec["raw_sha256"], coll["raw_sha256"])
         self.assertEqual(list(json.loads(rec["row_json"])), list(json.loads(coll["row_json"])))
 
+    def test_brave_empty_source_kind_is_filled_and_valid(self):
+        """11-12 대표 결정 '채워서 옮기기' — Brave 행은 source_kind 만 search-result 로 채운다."""
+        snap = dict(_snap("s1", source="Brave Search"), type_or_class="")
+        rec = bf.record_from_snapshot(snap, {"title": "x"})
+        self.assertEqual(rec["source_kind"], "search-result")
+        self.assertEqual(bf.gf.validate_raw_signal(rec), [])
+        self.assertEqual(json.loads(rec["row_json"])["type_or_class"], "")   # Notion 원값은 그대로
+
+    def test_other_sources_empty_source_kind_still_invalid(self):
+        snap = dict(_snap("w1"), type_or_class="")
+        rec = bf.record_from_snapshot(snap, {"id": "w1"})
+        self.assertEqual(rec["source_kind"], "")
+        self.assertIn("raw_signals.source_kind required", bf.gf.validate_raw_signal(rec))
+
+    def test_brave_existing_source_kind_is_kept(self):
+        snap = dict(_snap("s2", source="Brave Search"), type_or_class="Notice")
+        self.assertEqual(bf.record_from_snapshot(snap, {})["source_kind"], "Notice")
+
     def test_failed_post_gives_exit_1(self):
         bad = MagicMock(return_value=fsa.SupabaseRawSignalAppendResult("error", errors=("x",)))
         rep, _ = self._run(apply=True, snaps=[_snap("b")], have=set(),

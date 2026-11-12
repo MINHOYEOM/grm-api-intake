@@ -4943,6 +4943,17 @@ def main() -> int:
                 max_heal=_env_int("RAW_SIGNALS_HEAL_MAX", RAW_SIGNALS_HEAL_MAX_DEFAULT))
         except Exception as e:  # noqa: BLE001 — 사본 보충은 부가 장치
             log("WARN", f"Supabase 사본 보충 중 예외(무시): {type(e).__name__}")
+        # [원문 갱신 규칙 R0 2026-11-12] 건너뛴 항목의 오늘 판을 정본과 비교해 **보고만** 한다
+        # (health JSON store.drift). 쓰기 없음. 끄려면 RAW_DRIFT_MEASURE=false.
+        if env_flag("RAW_DRIFT_MEASURE", True):
+            try:
+                import raw_drift
+                store_counters["drift"] = raw_drift.measure_drift(
+                    findings_supabase[0], findings_supabase[1], heal_candidates,
+                    collected_at=collected_at,
+                    max_items=_env_int("RAW_DRIFT_MAX", raw_drift._MAX_ITEMS_DEFAULT))
+            except Exception as e:  # noqa: BLE001 — 측정은 부가 장치
+                log("WARN", f"원문 비교(R0) 중 예외(무시): {type(e).__name__}")
 
     # 제외 장부 저장(실패해도 수집 결과·종료 코드에 영향 없음 - 카운터로만 남는다).
     try:

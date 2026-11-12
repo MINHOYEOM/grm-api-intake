@@ -2,6 +2,7 @@
   "id": "2026-10-mfds-inspectors",
   "lang": "ko",
   "until": "2026-11-30",
+  "only_paths": ["/findings/"],
   "skip_paths": ["/findings/inspector/", "/admin/"],
   "watermark": "MFDS",
   "kicker": "식약처 실사 통보, 받으셨나요?",

@@ -451,10 +451,11 @@ if(_nt&&_nm){
 })();
 {% endif %}
 </script>
-{# [소개 2026-09-06] 마스코트는 소개 면에서 내지 않는다 — 우하단에 떠서 본문·연락 버튼을
-   가린다. pet.js 는 `#grm-pet` 이 없으면 첫 줄에서 return 하므로 스크립트는 그대로 둬도
-   아무 일도 하지 않는다(성장 기록은 localStorage 라 손실 0). #}
-{% if nav_active != 'about' %}
+{# [마스코트 위치 2026-11-12] 구름이는 퀴즈·마이페이지에만 낸다(`show_pet` — render.py 가 그 두
+   면에만 넘긴다). 다른 화면에서는 우하단에 떠서 본문을 가렸다(모바일). pet.js 는 `#grm-pet` 이
+   없으면 첫 줄에서 return 하므로 스크립트는 그대로 둬도 아무 일도 하지 않는다(성장 기록은
+   localStorage 라 손실 0). #}
+{% if show_pet %}
 <div class="grm-pet" id="grm-pet" data-page="{{ nav_active }}">
   <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="{{ _('구름이 펫 열기') }}" aria-expanded="false" aria-controls="grm-pet-panel" title="{{ _('드래그해 이동 · 눌러 관리') }}">
     <span class="grm-pet-aura" aria-hidden="true"></span><span class="grm-pet-shadow" aria-hidden="true"></span>

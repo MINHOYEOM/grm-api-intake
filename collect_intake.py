@@ -5057,25 +5057,39 @@ def main() -> int:
             source_last_seen, source_silence_errors = _seen, tuple(_errs)
             # coverage 줄용 무음 집합 — health 와 **같은 판정 함수·같은 활성 매핑**을 쓴다
             # (두 계기가 다른 답을 내면 사람이 어느 쪽도 못 믿는다).
+            _enabled_map = source_enabled_map(
+                active=active, enable_search=enable_search,
+                enable_mfds=enable_mfds, enable_mfds_law=enable_mfds_law,
+                enable_mfds_recall=enable_mfds_recall,
+                enable_mfds_admin=enable_mfds_admin,
+                enable_mfds_gmp_cert=enable_mfds_gmp_cert,
+                enable_mfds_safety_letter=enable_mfds_safety_letter,
+                enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
+                enable_ich=enable_ich, enable_who=enable_who, enable_hc=enable_hc,
+                enable_fda483=enable_fda483, enable_ispe=enable_ispe,
+                enable_eu_gmp_ncr=enable_eu_gmp_ncr,
+                enable_mhra_gmp_ncr=enable_mhra_gmp_ncr,
+            )
             coverage_silent_sources = {
                 finding.notion_source
                 for finding in evaluate_silence(
-                    last_seen=_seen, run_date=run_date,
-                    source_enabled=source_enabled_map(
-                        active=active, enable_search=enable_search,
-                        enable_mfds=enable_mfds, enable_mfds_law=enable_mfds_law,
-                        enable_mfds_recall=enable_mfds_recall,
-                        enable_mfds_admin=enable_mfds_admin,
-                        enable_mfds_gmp_cert=enable_mfds_gmp_cert,
-                        enable_mfds_safety_letter=enable_mfds_safety_letter,
-                        enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
-                        enable_ich=enable_ich, enable_who=enable_who, enable_hc=enable_hc,
-                        enable_fda483=enable_fda483, enable_ispe=enable_ispe,
-                        enable_eu_gmp_ncr=enable_eu_gmp_ncr,
-                        enable_mhra_gmp_ncr=enable_mhra_gmp_ncr,
-                    ),
-                )
+                    last_seen=_seen, run_date=run_date, source_enabled=_enabled_map)
             }
+            # [노션 은퇴 준비 2026-11-13] 같은 판정을 DB 대기열(intake_queue) 기준으로도 계산해 차이를
+            # health JSON `store.monitor_shadow.silence` 에 남긴다. 판정·경고·coverage 줄은 노션 기준 그대로.
+            # 기본 꺼짐. 실패해도 위 판정에는 영향이 없다(아래에서 따로 잡는다).
+            if findings_supabase and env_flag("ENABLE_SILENCE_SUPABASE_SHADOW"):
+                try:
+                    from source_silence import query_last_seen_supabase, silence_shadow
+                    _db_seen, _db_errs, _hist = query_last_seen_supabase(
+                        findings_supabase[0], findings_supabase[1],
+                        [w.notion_source for w in watched_sources()], run_date=run_date)
+                    store_counters.setdefault("monitor_shadow", {})["silence"] = silence_shadow(
+                        notion_last_seen=_seen, db_last_seen=_db_seen, run_date=run_date,
+                        source_enabled=_enabled_map, db_errors=_db_errs, history_start=_hist)
+                except Exception as e:  # noqa: BLE001 — 그림자가 감시·수집을 죽이면 안 된다
+                    store_counters.setdefault("monitor_shadow", {})["silence"] = {
+                        "error": type(e).__name__}
         except Exception as e:  # noqa: BLE001 — 감시가 수집을 죽이면 안 된다
             source_last_seen = None
             source_silence_errors = (f"watchdog: {e}",)

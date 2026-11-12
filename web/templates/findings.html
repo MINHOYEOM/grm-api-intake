@@ -14,7 +14,7 @@
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ _("지적사항") }}</h1>
     {#- [탭 3묶음 2026-11-11 · 대표 승인] 첫 화면 우선순위 = 제목·한 줄 → 탭 → 검색창 → 결과.
-        건수는 검색창 옆 툴바 한 곳("전체 N문서 · N지적")에만 둔다. -#}
+        기관 나열·건수 긴 문장은 검색창 아래 작은 한 줄(.fnd-total)로 내렸다. -#}
     <p class="reveal" style="animation-delay:.14s">{{ _("세계 규제기관이 제약 현장에서 지적한 내용을 원문 그대로 한국어로 찾아봅니다.") }}</p>
   </div>
   <div class="wrap">
@@ -78,8 +78,10 @@
       {% endif %}
     </section>
 
-    {#- [총계 하나로 2026-11-12] 검색창 아래 스냅샷 총계 줄(.fnd-total)은 뺐다 — 바로 위 툴바의
-        "전체 N문서 · N지적"(현재 결과, 실시간)과 숫자가 달라 같은 화면에 총계가 둘이었다. -#}
+    {#- [총계 하나로 2026-11-12] 스냅샷 총계 — findings.js 가 툴바 실시간 총계를 그리면 숨긴다. -#}
+    {%- if zone_totals %}
+    <p class="fnd-total">{{ _("문서 {docs}건 · 지적 {n}건 · {asof} 기준", docs=zone_totals.documents, n=zone_totals.findings, asof=zone_totals.as_of) }}</p>
+    {%- endif %}
 
     {#- [P2 개인화 · 067 → 탭 3묶음 2026-11-11 둘러보기에서 이동] 내 범위의 최근 공개.
         기본은 없는 것처럼 동작한다 — 정적 셸은 hidden 이고, 로그인 + 관심 범위 또는 관심 업체가
@@ -174,6 +176,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    쪼갠다. */
 .page-head p{max-width:none;text-wrap:pretty}
 /* [탭 3묶음] 건수 한 줄·내 범위의 최근 공개 */
+.fnd-total{font-size:12.5px;color:var(--muted);margin:-6px 2px 18px}
 .fnd-mine{margin:0 0 26px}
 .fnd-mine-h{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0;font-weight:600}
 .fnd-mine-p{font-size:13.5px;line-height:1.7;color:var(--muted);margin:6px 0 10px}

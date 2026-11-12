@@ -762,6 +762,7 @@
   "문서": "Documents",
   "문서 ": "Documents ",
   "문서 {docs} · 지적 {finds}": "{docs} documents · {finds} findings",
+  "문서 {docs}건 · 지적 {n}건 · {asof} 기준": "{docs} documents · {n} finding{s} · as of {asof}",
   "문서 {n}건": "{n} document{s}",
   "문서 {n}건과 연결": "linked to {n} document{s}",
   "문서 {prev}건 → {cur}건": "Documents {prev} → {cur}",

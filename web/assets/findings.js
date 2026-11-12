@@ -2338,6 +2338,11 @@
     if (currentPage < 1) currentPage = 1;
 
     // [문서 중심 열람] "전체 N문서 · M지적 · 페이지 X / Y"
+    // [총계 하나로 2026-11-12] 실시간 총계가 그려지면 검색창 아래 스냅샷 줄(.fnd-total, 기준일
+    // 표기)은 숨긴다 — 같은 화면에 총계가 둘(6,694 vs 6,747)이던 것. 스냅샷 줄은 HTML 에는
+    // 남는다(JS 가 안 돌거나 RPC 가 실패한 화면·크롤러의 총계, 영문은 영문 말뭉치 기준).
+    var snapTotal = document.querySelector(".fnd-total");
+    if (snapTotal) snapTotal.hidden = true;
     countEl.textContent = "";
     countEl.appendChild(document.createTextNode(_t("전체 ")));
     var bDocs = document.createElement("b");

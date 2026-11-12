@@ -5153,6 +5153,9 @@ def main() -> int:
     # [대기열 그림자 2026-11-12] 같은 handoff 를 DB(intake_queue + raw_signals)만으로 한 번 더 만들어
     # 노션 것과 비교하고, 행 상태를 main 발행 파일에서 다시 계산한다. 발행은 노션 handoff 그대로다.
     # 어떤 실패도 수집 결과를 바꾸지 않는다(경고만).
+    # ★순서: 반드시 원문 갱신(R4, 위의 raw_update.apply_updates) **뒤**에 돈다. 노션 handoff 는 오늘
+    #   다시 받은 판으로 카드를 만들므로, DB 도 오늘 판이 반영된 뒤에 읽어야 둘이 같다(재생 대조 10-1).
+    #   시험(test_grm_queue.OrderTest)이 이 순서를 잠근다.
     if queue_new_items is not None and findings_supabase:
         try:
             shadow_report = grm_queue.run_shadow(

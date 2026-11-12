@@ -49,7 +49,12 @@ def build(rows: list[dict[str, Any]], measured_on: str) -> dict[str, Any]:
 
 
 def main(argv: "list[str] | None" = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+    ap =argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--rows", required=True, type=Path)
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     ap.add_argument("--measured-on", required=True)

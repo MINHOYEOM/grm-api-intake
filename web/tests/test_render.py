@@ -18798,6 +18798,10 @@ EN_NAMED_ORIGINAL_BLOCKS = (
     re.compile(r'<div class="gl-refs">.*?</div>', re.S),
     re.compile(r'<section class="gt-sec(?: gt-src)?">\s*<h2 class="gt-sec-h">'
                r'(?:Related sections|Source)</h2>.*?</section>', re.S),
+    # [UI 2단 2026-11-12] 관련 조항은 정의 아래 한 줄(세 칸)의 첫 칸으로 옮겼다 — 같은
+    # 값(reg_refs, 실제 법령 이름)이라 같은 판단으로 들어낸다.
+    re.compile(r'<div class="gt-rel3-col">\s*<h2 class="gt-sec-h">'
+               r'Related sections</h2>.*?</div>', re.S),
     # [2026-09-07 용어 저장] 정의 바로 아래 출처 한 줄 — 아래 `gt-src` 섹션과 **같은
     # 값**(`definition_source`)을 한 번 더 보이는 자리다. 근거는 정의를 읽은 자리에서
     # 보여야 하고, 그 값은 실제 문서 이름이라 옮기지도 빼지도 않는다(위 세 줄과 같은

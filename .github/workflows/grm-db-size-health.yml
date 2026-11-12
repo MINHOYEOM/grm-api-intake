@@ -1,6 +1,6 @@
 name: GRM DB Size Health
 
-# [154 · 2026-11-12] DB 크기가 무료 플랜 한도(500MB)에 언제 닿을지 주 1회 본다. 154 가 하루 한 번 크기를
+# [155 · 2026-11-12] DB 크기가 무료 플랜 한도(500MB)에 언제 닿을지 주 1회 본다. 155 가 하루 한 번 크기를
 # 기록하고(pg_cron grm-db-size-daily 00:05 UTC), 이 워크플로가 db_size_health.py 로 사용률 80% 이상 ·
 # 한도까지 60일 미만 · 기록 정지를 판정해 **전용 라벨**(db-size-health → 운영 센터 infra 업무,
 # web/ops_alarm_sync.py) 이슈를 연다. DB 읽기 RPC 하나뿐(service_role 전용 grm_db_size_status) — git 쓰기·DB 쓰기 0.
@@ -55,7 +55,7 @@ jobs:
               cat db_size_report.json
               echo '```'
             else
-              echo "db_size_report.json 이 생성되지 않았습니다 — 자격증명 미설정 또는 154 미적용."
+              echo "db_size_report.json 이 생성되지 않았습니다 — 자격증명 미설정 또는 155 미적용."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -91,7 +91,7 @@ jobs:
             catch (error) {
               if (error.status !== 404) throw error;
               await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo,
-                name: label, color: 'b60205', description: 'DB 크기 무료 한도 근접(154)' });
+                name: label, color: 'b60205', description: 'DB 크기 무료 한도 근접(155)' });
             }
             const { data: open } = await github.rest.issues.listForRepo({
               owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 20,

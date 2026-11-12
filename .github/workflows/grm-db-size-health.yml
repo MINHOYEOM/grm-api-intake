@@ -1,0 +1,123 @@
+name: GRM DB Size Health
+
+# [153 · 2026-11-12] DB 크기가 무료 플랜 한도(500MB)에 언제 닿을지 주 1회 본다. 153 이 하루 한 번 크기를
+# 기록하고(pg_cron grm-db-size-daily 00:05 UTC), 이 워크플로가 db_size_health.py 로 사용률 80% 이상 ·
+# 한도까지 60일 미만 · 기록 정지를 판정해 **전용 라벨**(db-size-health → 운영 센터 infra 업무,
+# web/ops_alarm_sync.py) 이슈를 연다. DB 읽기 RPC 하나뿐(service_role 전용 grm_db_size_status) — git 쓰기·DB 쓰기 0.
+on:
+  schedule:
+    # 월 01:30 UTC = 월 10:30 KST.
+    - cron: '30 1 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write        # 실패 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: db-size-health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    name: Check DB size against free-plan limit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check DB size and runway
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python db_size_health.py --output db_size_report.json
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM DB Size Health"
+            echo ""
+            if [ -f db_size_report.json ]; then
+              echo '```json'
+              cat db_size_report.json
+              echo '```'
+            else
+              echo "db_size_report.json 이 생성되지 않았습니다 — 자격증명 미설정 또는 153 미적용."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update db-size issue
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const title = '[db-size-health] DB 크기가 무료 한도에 가까워지고 있습니다';
+            const label = 'db-size-health';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            let lines = ['(db_size_report.json 을 읽지 못함 — Actions 로그 참조)'];
+            try {
+              const report = JSON.parse(fs.readFileSync('db_size_report.json', 'utf8'));
+              if ((report.problems || []).length) lines = report.problems.map((p) => `- ${p}`);
+            } catch (err) { lines = [`(report 파싱 실패: ${err.message})`]; }
+            const body = [
+              'DB 크기가 무료 플랜 한도(500MB)에 가까워지고 있습니다.',
+              '',
+              ...lines,
+              '',
+              '**왜 중요한가**: 한도를 넘으면 DB 가 읽기 전용이 돼 매일 수집·번역 반영이 멈춘다.',
+              '',
+              '확인(SQL 에디터): `select jsonb_pretty(public.grm_db_size_status());` — top_tables 로 큰 표를 본다. ' +
+                '대응: 파생 캐시 줄이기·오래된 백업 표 정리, 그래도 부족하면 유료 플랜 판단(대표 결정).',
+              '',
+              `실행: ${runUrl}`,
+              '',
+              '_다음 실행이 정상이면 자동으로 닫힙니다._',
+            ].join('\n');
+            try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label }); }
+            catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo,
+                name: label, color: 'b60205', description: 'DB 크기 무료 한도 근접(153)' });
+            }
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find((i) => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `여전히 문제가 있습니다.\n\n${body}` });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner] });
+            }
+
+      - name: Close db-size issue on recovery
+        if: success() && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[db-size-health] DB 크기가 무료 한도에 가까워지고 있습니다';
+            const label = 'db-size-health';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter((i) => i.title === title)) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body: `복구됐습니다 — 실행 ${context.runId}` });
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed' });
+            }

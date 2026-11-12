@@ -42,6 +42,7 @@ LABEL_TEAM: tuple[tuple[str, str], ...] = (
     ("findings-facets", "quality"),
     ("findings-search-cache-sync", "quality"),
     ("findings-search-cache-health", "infra"),  # 검색 캐시 daily 갱신 잡 실패·신선 부족(151 · grm-findings-search-cache-health.yml)
+    ("db-size-health", "infra"),  # DB 크기 무료 한도 근접(153 · grm-db-size-health.yml)
     ("grm-findings", "quality"),
     ("content-completeness", "quality"),  # 내용 완전성(잘림·안 쓰이는 칸 · content_completeness.py)
     ("reconciliation", "infra"),

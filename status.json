@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-12T08:17:26Z",
+ "generated_at": "2026-11-12T17:04:22Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43181535644,
+    "databaseId": 43264550651,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-12T08:16:04Z",
-    "updatedAt": "2026-11-12T08:16:08Z",
-    "headBranch": "ui2-finding-line",
-    "displayTitle": "feat(지적 한 줄): 문장 먼저 · 분류 둘까지+외 n · 판독 깨짐 별도 표기 (UI 2단)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43181535644"
+    "createdAt": "2026-11-12T16:59:06Z",
+    "updatedAt": "2026-11-12T16:59:10Z",
+    "headBranch": "ui-a11y-coral-text",
+    "displayTitle": "fix(접근성): 산호색 글자·버튼 대비 4.5:1 (용어·문서·업체·조항)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43264550651"
    },
    {
-    "databaseId": 43181523134,
+    "databaseId": 43264536390,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-12T08:15:59Z",
-    "updatedAt": "2026-11-12T08:16:02Z",
-    "headBranch": "ui2-finding-line",
-    "displayTitle": "test(골든): main(#1599) 병합 뒤 영문 골든 5장 재동결",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43181523134"
+    "createdAt": "2026-11-12T16:59:01Z",
+    "updatedAt": "2026-11-12T16:59:04Z",
+    "headBranch": "ui-a11y-coral-text",
+    "displayTitle": "fix(접근성): 산호색 글자·버튼을 --coral-2 로 — 용어·문서·업체·조항 대비 4.5:1 이상",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43264536390"
    },
    {
-    "databaseId": 43181061622,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 43263257679,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-12T16:51:46Z",
+    "updatedAt": "2026-11-12T16:57:12Z",
+    "headBranch": "ui-search/rum-ui-events",
+    "displayTitle": "feat(방문 기록): 이동·클릭·펼침 익명 카운터 — migration 155 (적용은 대표 승인 뒤)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43263257679"
+   },
+   {
+    "databaseId": 43263251251,
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-12T08:12:33Z",
-    "updatedAt": "2026-11-12T08:12:37Z",
+    "createdAt": "2026-11-12T16:51:44Z",
+    "updatedAt": "2026-11-12T16:57:37Z",
+    "headBranch": "ui-search/rum-ui-events",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into ui-search/rum-ui-events",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43263251251"
+   },
+   {
+    "databaseId": 43263137982,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-12T16:51:06Z",
+    "updatedAt": "2026-11-12T16:57:17Z",
     "headBranch": "main",
-    "displayTitle": "fix(검색): 라이브 확인 수리 — 첫 검색 재시도, 깨진 OCR 문장 뒤로, 휴대폰은 결과 먼저 (#1603)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43181061622"
-   },
-   {
-    "databaseId": 43179273297,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-12T07:59:01Z",
-    "updatedAt": "2026-11-12T08:04:31Z",
-    "headBranch": "feat/ui4-brief-glance",
-    "displayTitle": "feat(브리프 4단): 주간 현황 — 카드 건수 + DB 국가·분류 한 줄",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43179273297"
-   },
-   {
-    "databaseId": 43179267332,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-12T07:58:58Z",
-    "updatedAt": "2026-11-12T08:04:51Z",
-    "headBranch": "feat/ui4-brief-glance",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into feat/ui4-brief-glance",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43179267332"
+    "displayTitle": "feat(운영): DB 크기 일일 기록 + 무료 한도 근접 주간 감시 (migration 154) (#1631)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43263137982"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -402,6 +402,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 43259996302,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-12T16:33:39Z",
+    "updatedAt": "2026-11-12T16:35:37Z",
+    "headBranch": "main",
+    "displayTitle": "data(483 번역): 표제 143·상세 0 — 소급분 포함 (#1642)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43259996302"
+   },
+   {
     "databaseId": 43155707713,
     "status": "completed",
     "conclusion": "success",
@@ -444,27 +455,16 @@
     "headBranch": "main",
     "displayTitle": "chore(findings): 반영 끝난 outbox 2개 → applied 이동(WL 2차 52·EU NCR 추가정보 54…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42856553877"
-   },
-   {
-    "databaseId": 42852638191,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-10T16:15:08Z",
-    "updatedAt": "2026-11-10T16:16:23Z",
-    "headBranch": "main",
-    "displayTitle": "chore(findings): EU NCR 추가정보 번역 배치 r01 - 54건 (#1499)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42852638191"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 43174401906,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-12T07:19:26Z",
-    "updatedAt": "2026-11-12T07:19:30Z",
+    "updatedAt": "2026-11-12T09:14:11Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43174401906"

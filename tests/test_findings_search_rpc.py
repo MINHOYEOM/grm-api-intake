@@ -955,7 +955,7 @@ class ReceiverVariableNamingConventionTest(unittest.TestCase):
         self.assertIn(match.group(1), _RECEIVER_NAMES)
 
     def test_build_card_param_name_is_within_whitelist(self) -> None:
-        match = re.search(r"function buildCard\((\w+), query\)", self.js)
+        match = re.search(r"function buildCard\((\w+), query, inDoc\)", self.js)
         self.assertIsNotNone(match, "buildCard 의 첫 파라미터명을 찾지 못함")
         self.assertIn(match.group(1), _RECEIVER_NAMES)
 

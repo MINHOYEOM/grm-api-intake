@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=58ecaab9" defer></script>
+<script src="/assets/i18n-en.js?v=eb70e27b" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -381,7 +381,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 /* M10b P0 — 검토 필요 카드 시각 경계. [M14] 배경 틴트 제거(얼룩 방지) — 왼쪽 coral 보더만
    신호로 남긴다(coral=주의 전용 원칙). border-left 3px 만큼 padding-left 로 보정(22-3=19). */
 .fnd-card.fnd-card--review{border-left:3px solid var(--coral);padding-left:19px}
-.fnd-card-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.fnd-card-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 6px}
 /* [M14] 배지 통일: height 22px, font-size 11.5px, padding 0 8px. */
 .fnd-b{display:inline-flex;align-items:center;height:22px;font-size:11.5px;font-weight:600;line-height:1;border-radius:var(--rad-s);padding:0 8px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
 /* [M14] date 는 배지가 아니라 우측 여백 텍스트 — margin-left:auto 로 head 우측에 고정. */
@@ -392,6 +392,9 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-b.needs-review{background:var(--coral-tint);color:var(--coral-2);border-color:rgba(194,96,63,.22)}
 .fnd-firm{font-family:var(--serif);font-size:18px;color:var(--ink);margin:0 0 2px}
 .fnd-cat{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+/* [UI 2단 2026-11-12 지적 한 줄] 문장 아래 한 줄 — 분류는 글자, 판독 깨짐은 흐린 배지. */
+.fnd-card-head .fnd-cat{margin:0}
+.fnd-b.fnd-ocr{background:transparent;color:var(--muted);font-weight:500}
 .fnd-text{font-size:14px;line-height:1.6;color:var(--body);margin:0 0 10px;white-space:pre-wrap}
 /* M10b P1 — 카드 기본 접힘: 접힌 상태(.fnd-card.fnd-collapsed)에서만 본문 3줄 클램프 +
    부가 섹션(.fnd-extra: 원문 접기/refs/메타줄) 숨김. 펼치면(버튼 클릭) 클래스 제거. */
@@ -566,7 +569,7 @@ if(_nt&&_nm){
 })();
 </script>
 <script src="/assets/pet.js?v=e470de1f" defer></script>
-<script src="../../assets/findings.js?v=ae714955" defer></script>
+<script src="../../assets/findings.js?v=12239f52" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

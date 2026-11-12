@@ -357,6 +357,12 @@ def render_report_md(report: dict[str, Any]) -> str:
     if enq:
         lines += [f"- 대기열에 넣음: 요청 {enq.get('requested', 0)} · 새로 {enq.get('inserted', 0)} · "
                   f"실패 {enq.get('failed', 0)}"]
+    heal = report.get("heal") or {}
+    if heal:
+        lines += [f"- 대기열 보충(노션 handoff 에 있는데 대기열에 없던 행): 없던 행 {heal.get('missing', 0)} · "
+                  f"다시 넣음 {heal.get('inserted', 0)} · 실패 {heal.get('failed', 0)}"]
+    if report.get("handoff_frozen"):
+        lines += [f"- 오늘 handoff 기록은 이미 {report['handoff_frozen']} 상태라 다시 쓰지 않았다(동결)"]
     rec = report.get("reconcile") or {}
     if rec:
         lines += [f"- 상태 다시 계산: handoff {rec.get('handoffs', 0)}건 · 행 {rec.get('rows', 0)}건 "
@@ -539,6 +545,12 @@ class QueueStore:
             "select": "handoff_date,generated_at,status,manifest,consumed_evidence",
             "handoff_date": f"gte.{start}", "order": "handoff_date.asc"})
 
+    def get_handoff(self, handoff_date: str) -> "dict[str, Any] | None":
+        rows = self._call("GET", "intake_handoffs", params={
+            "select": "handoff_date,status,row_count,consumed_evidence",
+            "handoff_date": f"eq.{handoff_date}", "limit": "1"})
+        return rows[0] if isinstance(rows, list) and rows else None
+
     def upsert_handoff(self, row: dict[str, Any]) -> None:
         self._call("POST", "intake_handoffs", params={"on_conflict": "handoff_date"}, body=[row],
                    prefer="resolution=merge-duplicates,return=minimal")
@@ -595,6 +607,46 @@ def enqueue_items(store: QueueStore, items: Iterable[Any], run_date: date,
             summary["failed"] += 1
             log("WARN", f"대기열 넣기 실패(정본에 없거나 표 오류) "
                         f"{row['source']}::{row['document_id']}: {e}")
+    return summary
+
+
+def heal_from_notion(store: QueueStore, notion_payload: dict[str, Any],
+                     generated_at: datetime) -> dict[str, int]:
+    """노션 handoff 에는 있는데 DB 대기열에 없는 행을 다시 넣는다(매일).
+
+    대기열 넣기는 "그 실행에 노션 행이 새로 생긴 문서"에만 한 번 일어난다. 그날 넣기가 실패하면
+    (표 오류·그림자 꺼짐·정본 저장 지연) 다음 날에는 노션 중복이라 다시 시도되지 않는다. 노션이
+    대기열 정본인 동안에는 노션 handoff(=지금 Status=New 인 행 전부)가 기준이므로, 거기 있는 행은
+    대기열에도 있어야 한다. 이미 있는 행은 상태가 무엇이든 건드리지 않는다.
+    수집일은 노션 행의 Run Date·Collected At 을 쓴다(둘 다 없으면 넣지 않고 failed 로 센다 —
+    지어내지 않는다).
+    """
+    wanted: dict[str, dict[str, Any]] = {}
+    for row in notion_payload.get("rows") or []:
+        if isinstance(row, dict) and row.get("source") and row.get("document_id"):
+            wanted.setdefault(row_key(row["source"], row["document_id"]), row)
+    summary = {"checked": len(wanted), "missing": 0, "inserted": 0, "failed": 0}
+    if not wanted:
+        return summary
+    have = store.queue_rows([(r["source"], r["document_id"]) for r in wanted.values()])
+    for key in sorted(set(wanted) - set(have)):
+        row = wanted[key]
+        summary["missing"] += 1
+        seen = to_kst(row.get("collected_at"))
+        run_date = str(row.get("run_date") or "")[:10] or (seen.date().isoformat() if seen else "")
+        if not run_date:
+            summary["failed"] += 1
+            continue
+        if seen is None:
+            seen = datetime.fromisoformat(run_date + "T00:00:00").replace(tzinfo=KST)
+        try:
+            summary["inserted"] += store.enqueue([{
+                "source": row["source"], "document_id": row["document_id"],
+                "first_seen_run_date": run_date, "first_seen_at": seen.isoformat(),
+                "enqueued_by": "heal"}])
+        except QueueStoreError as e:
+            summary["failed"] += 1
+            log("WARN", f"대기열 보충 실패(정본에 없거나 표 오류) {key}: {e}")
     return summary
 
 
@@ -734,9 +786,19 @@ def build_db_handoff(store: QueueStore, run_date: date, window_days: int,
 
 
 def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
-                   generated_at: datetime) -> int:
-    """오늘 handoff 를 표에 남기고(open), 이전 open 을 stale 로 닫는다. 반환 = 닫은 건수."""
+                   generated_at: datetime) -> dict[str, Any]:
+    """오늘 handoff 를 표에 남기고(open), 이전 open 을 stale 로 닫는다.
+
+    **이미 닫힌 날짜는 다시 쓰지 않는다(동결).** 월요일 델타가 main 에 들어와 consumed 가 된 뒤
+    같은 날 수집을 다시 돌리면, 그때의 후보는 '남은 새 행'뿐이라 그대로 덮어쓰면 그 호의 행 목록이
+    사라진다 — 발행본이 늦게 들어와도 상태를 확정할 근거가 없어진다(노션 길의 P1 부활 금지 가드 대응).
+    그 실행의 새 행은 대기열에 new 로 남아 다음 날 handoff 에 들어간다.
+    반환 {"staled": 닫은 건수, "frozen": 동결돼 쓰지 않았으면 그 상태(아니면 "")}.
+    """
     handoff_date = payload["run_date_kst"]
+    existing = store.get_handoff(handoff_date)
+    if existing is not None and existing.get("status") != HANDOFF_OPEN:
+        return {"staled": 0, "frozen": str(existing.get("status") or "")}
     staled = store.stale_prior_open(handoff_date)
     store.upsert_handoff({
         "handoff_date": handoff_date,
@@ -750,7 +812,7 @@ def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
         "manifest": build_manifest(payload),
         "updated_at": _now_iso(),
     })
-    return staled
+    return {"staled": staled, "frozen": ""}
 
 
 def _write(path: str, text: str) -> None:
@@ -785,6 +847,14 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
     except QueueStoreError as e:
         report["warnings"].append(f"대기열 넣기 실패: {e}")
 
+    if notion_payload is not None:
+        try:
+            report["heal"] = heal_from_notion(store, notion_payload, generated_at)
+            if report["heal"]["failed"]:
+                report["warnings"].append(f"대기열 보충 실패 {report['heal']['failed']}건")
+        except QueueStoreError as e:
+            report["warnings"].append(f"대기열 보충 실패: {e}")
+
     reconciled: dict[str, Any] = {}
     try:
         reconciled = reconcile(store, repo_root, run_date)
@@ -805,7 +875,9 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
         aged = store.aged_open_count(start)
         if aged:
             report["warnings"].append(f"창({window_days}일) 밖에 남은 미소비 행 {aged}건")
-        report["staled"] = record_handoff(store, payload, window_days, generated_at)
+        recorded = record_handoff(store, payload, window_days, generated_at)
+        report["staled"] = recorded["staled"]
+        report["handoff_frozen"] = recorded["frozen"]
         _write(os.path.join(out_dir, f"handoff_db_{run_date.isoformat()}.json"),
                json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n")
     except Exception as e:  # noqa: BLE001 — 그림자가 수집을 죽이면 안 된다
@@ -882,6 +954,24 @@ def notion_status_map(token: str, db_id: str, handoff_date: str,
             break
         cursor = data.get("next_cursor")
     return {k: v[1] for k, v in best.items()}
+
+
+def health_summary(report: dict[str, Any]) -> dict[str, Any]:
+    """그림자 보고서 → health JSON 에 남길 짧은 요약(숫자·짧은 문자열만)."""
+    enq, heal = report.get("enqueue") or {}, report.get("heal") or {}
+    cmp_ = report.get("compare") or {}
+    return {
+        "enqueued": int(enq.get("inserted") or 0),
+        "enqueue_failed": int(enq.get("failed") or 0),
+        "healed": int(heal.get("inserted") or 0),
+        "heal_missing": int(heal.get("missing") or 0),
+        "heal_failed": int(heal.get("failed") or 0),
+        "handoff_rows": int((report.get("candidates") or {}).get("handoff") or 0),
+        "handoff_frozen": str(report.get("handoff_frozen") or ""),
+        "only_notion": len(cmp_.get("only_notion") or []),
+        "only_db": len(cmp_.get("only_db") or []),
+        "warnings": len(report.get("warnings") or []),
+    }
 
 
 # ─────────────────────────────── 초기 이관(seed) ───────────────────────────────

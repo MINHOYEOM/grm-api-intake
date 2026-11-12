@@ -82,6 +82,9 @@ class FakeStore:
     def handoffs_since(self, start):
         return [h for d, h in sorted(self.handoffs.items()) if d >= start]
 
+    def get_handoff(self, handoff_date):
+        return self.handoffs.get(handoff_date)
+
     def upsert_handoff(self, row):
         self.handoffs[row["handoff_date"]] = dict(row)
 
@@ -342,8 +345,8 @@ class DbHandoffTest(unittest.TestCase):
         with patch.object(gh, "log"):
             payload, _ = gq.build_db_handoff(self.store, RUN, 30, 7, GEN)
         self.store.upsert_handoff({"handoff_date": "2026-11-15", "status": gq.HANDOFF_OPEN})
-        staled = gq.record_handoff(self.store, payload, 30, GEN)
-        self.assertEqual(staled, 1)
+        recorded = gq.record_handoff(self.store, payload, 30, GEN)
+        self.assertEqual(recorded, {"staled": 1, "frozen": ""})
         self.assertEqual(self.store.handoffs["2026-11-15"]["status"], gq.HANDOFF_STALE)
         today = self.store.handoffs["2026-11-16"]
         self.assertEqual(today["status"], gq.HANDOFF_OPEN)
@@ -356,6 +359,116 @@ class DbHandoffTest(unittest.TestCase):
             a, _ = gq.build_db_handoff(self.store, RUN, 30, 7, GEN)
             b, _ = gq.build_db_handoff(self.store, RUN, 30, 7, GEN.replace(hour=9))
         self.assertEqual(gq.payload_sha256(a), gq.payload_sha256(b))
+
+
+class FreezeTest(unittest.TestCase):
+    """월요일 발행 뒤 같은 날 수집을 다시 돌려도 그 호의 행 목록이 바뀌지 않는다."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = self.tmp.name
+        os.makedirs(os.path.join(self.root, "web", "data", "deltas"))
+        os.makedirs(os.path.join(self.root, "web", "data", "briefs"))
+        self.store = FakeStore()
+        for doc in ("2026-1", "2026-2"):
+            self.store.add_raw(_record("Federal Register", doc))
+        self.store.enqueue([{"source": "Federal Register", "document_id": d,
+                             "first_seen_run_date": "2026-11-13",
+                             "first_seen_at": "2026-11-13T03:30:00+09:00"}
+                            for d in ("2026-1", "2026-2")])
+
+    def _shadow(self, **kw):
+        with patch.object(gq, "log"), patch.object(gh, "log"), \
+                patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
+            return gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
+                                 display_window_days=7, store=self.store, out_dir=self.root,
+                                 repo_root=self.root, **kw)
+
+    def _write(self, kind, name, payload):
+        with open(os.path.join(self.root, "web", "data", kind, name), "w", encoding="utf-8") as f:
+            json.dump(payload, f)
+
+    def test_rerun_after_publish_keeps_the_issue_manifest(self):
+        self._shadow()                                             # 월요일 새벽 수집
+        first = dict(self.store.handoffs["2026-11-16"])
+        self.assertEqual(len(first["manifest"]), 2)
+        # 발행: 델타만 먼저 main 에 들어온다(발행본은 아직).
+        self._write("deltas", "delta_2026_11_16.json",
+                    {"publish_date": "2026-11-16", "cards": {"2026-1": {}, "2026-2": {}}})
+        # 같은 날 재실행 — 새 문서 1건이 더 들어왔다.
+        self.store.add_raw(_record("Federal Register", "2026-3"))
+        report = self._shadow(new_items=[_Item("Federal Register", "2026-3")])
+        after = self.store.handoffs["2026-11-16"]
+        self.assertEqual(after["status"], gq.HANDOFF_CONSUMED)
+        self.assertEqual(after["manifest"], first["manifest"])      # 행 목록 그대로
+        self.assertEqual(after["payload_sha256"], first["payload_sha256"])
+        self.assertEqual(report["handoff_frozen"], gq.HANDOFF_CONSUMED)
+        self.assertEqual(self.store.queue["Federal Register::2026-3"]["state"], "new")  # 다음 날 몫
+        # 발행본이 늦게 들어와도 임시 상태가 확정된다(행 목록이 남아 있으므로).
+        self.assertEqual(self.store.queue["Federal Register::2026-2"]["state_reason"],
+                         "carded_pending_publish")
+        self._write("briefs", "brief_web_2026_11_16.json", {"cards": [{"id": "2026-1"}]})
+        self._shadow()
+        self.assertEqual(self.store.queue["Federal Register::2026-2"]["state"], "skipped")
+        self.assertEqual(self.store.queue["Federal Register::2026-2"]["state_reason"],
+                         "carded_not_published")
+        self.assertEqual(self.store.queue["Federal Register::2026-1"]["state_reason"], "published")
+
+    def test_same_day_rerun_before_publish_still_refreshes(self):
+        self._shadow()
+        self.store.add_raw(_record("Federal Register", "2026-3"))
+        report = self._shadow(new_items=[_Item("Federal Register", "2026-3")])
+        self.assertEqual(report["handoff_frozen"], "")
+        self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 3)
+        self.assertEqual(self.store.handoffs["2026-11-16"]["status"], gq.HANDOFF_OPEN)
+
+
+class HealTest(unittest.TestCase):
+    def setUp(self):
+        self.store = FakeStore()
+        for doc in ("in-queue", "lost", "done"):
+            self.store.add_raw(_record("FR", doc))
+        self.store.enqueue([{"source": "FR", "document_id": d,
+                             "first_seen_run_date": "2026-11-10",
+                             "first_seen_at": "2026-11-10T03:30:00+09:00"}
+                            for d in ("in-queue", "done")])
+        self.store.queue["FR::done"]["state"] = "processed"
+        self.payload = {"rows": [
+            {"source": "FR", "document_id": "in-queue", "run_date": "2026-11-10"},
+            {"source": "FR", "document_id": "lost", "run_date": "2026-11-11",
+             "collected_at": "2026-11-11T03:31:00.000+09:00"},
+            {"source": "FR", "document_id": "done", "run_date": "2026-11-10"},
+            {"source": "FR", "document_id": "no-raw", "run_date": "2026-11-11",
+             "collected_at": "2026-11-11T03:31:00.000+09:00"},
+        ]}
+
+    def test_reenqueues_only_missing_rows_with_notion_run_date(self):
+        with patch.object(gq, "log"):
+            out = gq.heal_from_notion(self.store, self.payload, GEN)
+        self.assertEqual(out, {"checked": 4, "missing": 2, "inserted": 1, "failed": 1})
+        lost = self.store.queue["FR::lost"]
+        self.assertEqual((lost["first_seen_run_date"], lost["enqueued_by"], lost["state"]),
+                         ("2026-11-11", "heal", "new"))
+        self.assertEqual(self.store.queue["FR::done"]["state"], "processed")   # 있던 행은 그대로
+        with patch.object(gq, "log"):
+            again = gq.heal_from_notion(self.store, self.payload, GEN)
+        self.assertEqual((again["missing"], again["inserted"]), (1, 0))        # no-raw 만 남는다
+
+    def test_shadow_reports_heal_and_health_summary(self):
+        with tempfile.TemporaryDirectory() as tmp, patch.object(gq, "log"), \
+                patch.object(gh, "log"), patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
+            report = gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
+                                   display_window_days=7, store=self.store, out_dir=tmp,
+                                   repo_root=tmp, notion_payload=self.payload)
+            with open(os.path.join(tmp, "queue_shadow_2026-11-16.md"), encoding="utf-8") as f:
+                md = f.read()
+        self.assertEqual(report["heal"]["inserted"], 1)
+        self.assertIn("대기열 보충", md)
+        health = gq.health_summary(report)
+        self.assertEqual((health["healed"], health["heal_missing"], health["heal_failed"]), (1, 2, 1))
+        self.assertEqual(health["handoff_frozen"], "")
+        self.assertTrue(all(not isinstance(v, (list, dict)) for v in health.values()))
 
 
 class CompareTest(unittest.TestCase):

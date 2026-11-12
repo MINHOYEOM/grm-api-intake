@@ -16130,7 +16130,7 @@ class WebDiscoveryHubTest(unittest.TestCase):
         for name in ("inspector.js", "firm.js"):
             src = (WEB_DIR / "assets" / name).read_text(encoding="utf-8")
             self.assertIn('href += "&q=" + encodeURIComponent(qValue)', src, name)
-            self.assertRegex(src, r"buildCatRow\(c, maxCnt, \w+Name, total\)", name)
+            self.assertRegex(src, r"buildCatRow\(c, maxCnt, \w+Name, total, (?:false|true)\)", name)
 
     def test_deep_link_landing_scroll_removed_with_its_reason(self):
         """허브 착지 스크롤은 존재 이유(허브가 검색을 밀어내림)와 함께 사라져야 한다.
@@ -16428,7 +16428,8 @@ class WebProfileInterpretationTest(unittest.TestCase):
         self.assertNotIn("가장 많이 지적한", self._js_code(self.insp_js))
 
     def test_catch_all_excluded_from_ranking_but_kept_in_denominator(self):
-        """캐치올 분류는 순위 문장·반복 목록에서 빼되 분모·막대에는 남긴다(#810 규율).
+        """캐치올 분류는 순위 문장·반복 목록·막대 순위에서 빼되 분모와 화면에는 남긴다(#810 규율,
+        2026-11-12 막대까지 확장 — 가장 긴 막대가 '분류 안 됨'이던 화면, UI/UX 점검 11-11).
 
         "이 업체에서 가장 많이 확인된 영역 = 기타 품질시스템"은 그 업체의 성질이 아니라
         분류기 상태라 조치로 이어지지 않는다. 라이브 프리뷰에서 업체·실사관 **양쪽 다**
@@ -16436,13 +16437,15 @@ class WebProfileInterpretationTest(unittest.TestCase):
         for name, src in (("firm.js", self.firm_js), ("inspector.js", self.insp_js)):
             code = self._js_code(src)
             self.assertIn('var CATCH_ALL = "other_quality_system";', code, name)
-            # 순위 문장과 반복 목록 두 곳에서 걸러야 한다.
+            # 순위 문장·반복 목록·막대 순위 세 곳에서 걸러야 한다.
             self.assertEqual(
-                len(re.findall(r"category_code !== CATCH_ALL", code)), 2, name)
+                len(re.findall(r"category_code !== CATCH_ALL", code)), 3, name)
             # 뺐다는 사실을 화면에 적는다(조용히 빼지 않는다).
             self.assertIn("세부 분류 전이라", code, name)
-            # 막대(buildCatRow 루프)는 전량을 그대로 그린다 — 여기서 거르면 안 된다.
-            self.assertIn("LAST_CATS.forEach(function (c) {", code, name)
+            # 캐치올 줄은 지우지 않는다 — 순위 막대 뒤에 막대 없는 한 줄(rest=true)로 남는다.
+            self.assertIn("ranked.forEach(function (c) {", code, name)
+            self.assertIn("rest.forEach(function (c) {", code, name)
+            self.assertLess(code.index("ranked.forEach(function (c) {"), code.index("rest.forEach(function (c) {"), name)
 
     # ── 037 정책: 의도적 비대칭 ──────────────────────────────────────────────
     def test_density_metric_is_firm_only(self):

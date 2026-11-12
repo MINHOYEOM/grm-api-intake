@@ -2015,7 +2015,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIsNotNone(m)
         text = m.group(1)
         self.assertEqual(text.count("."), 1, f"한 문장이 아닌 것으로 보임: {text!r}")
-        # [탭 3묶음 2026-11-11] 설명은 컨셉 한 줄 — 건수는 검색창 아래 작은 한 줄(.fnd-total)로 내렸다.
+        # [탭 3묶음 2026-11-11] 설명은 컨셉 한 줄 — 건수는 툴바 한 곳에만(2026-11-12 총계 하나로).
         self.assertTrue(text.endswith("찾아봅니다."), text)
 
     def test_review_card_boundary_markers_present(self):
@@ -2403,7 +2403,8 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function renderDashStats(stats)", js_src)
         self.assertIn("function buildStatBlock(num, label, warn)", js_src)
-        self.assertIn('buildStatBlock(String(stats.total), _t("지적사항"), false)', js_src)
+        # [총계 하나로 2026-11-12] 총계 블록은 없다(test_dash_stats_draw_no_second_total).
+        self.assertNotIn('buildStatBlock(String(stats.total)', js_src)
         self.assertIn('buildStatBlock(String(a.count), a.agency, false)', js_src)
         self.assertIn('buildStatBlock(String(stats.needsReview), _t("검토 필요"), true)', js_src)
         self.assertNotIn("fnd-dash-chip", js_src)
@@ -2986,7 +2987,7 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_dash_stats_draw_no_second_total(self):
         """[총계 하나로 2026-11-12] 대시보드는 문서·지적사항 총계 블록을 그리지 않는다 —
-        검색창 아래 .fnd-total 한 줄이 이 화면의 유일한 총계다. 같은 화면에 스냅샷 총계와
+        검색창 옆 툴바("전체 N문서 · N지적")가 이 화면의 유일한 총계다. 같은 화면에 스냅샷 총계와
         현재 결과 총계가 위아래로 서면(6,694/26,552 vs 6,745/26,670) 숫자가 다른 DB로
         읽힌다(UI/UX 점검 11-11). 기관별 블록·검토 필요 블록은 그대로 둔다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
@@ -2997,7 +2998,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("stats.agencies.forEach", fn)
         self.assertNotIn("agenciesExact", fn, "옛 추정치 툴팁 분기는 054 로 사라졌다")
         tpl = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
-        self.assertEqual(tpl.count('class="fnd-total"'), 1)
+        self.assertNotIn('class="fnd-total"', tpl)
 
     def test_dash_agency_stats_declare_their_unit_in_tooltip(self):
         """[문서 축 054] 기관 스탯은 문서 수로 그리되, 툴팁에 **두 축을 병기**한다 —

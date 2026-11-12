@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-11",
+ "measured_on": "2026-11-12",
  "window_days": 60,
  "totals": {
-  "items": 442
+  "items": 448
  },
  "by_source": [
   {
@@ -16,7 +16,7 @@
   },
   {
    "v": "Federal Register",
-   "c": 75
+   "c": 80
   },
   {
    "v": "EMA",
@@ -28,7 +28,7 @@
   },
   {
    "v": "Health Canada",
-   "c": 20
+   "c": 21
   },
   {
    "v": "ISPE",
@@ -48,6 +48,41 @@
   }
  ],
  "items": [
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-12",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Veterinary Feed Directive",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/12/2026-22964/agency-information-collection-activities-proposed-collection-comment-request-veterinary-feed"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-12",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Voluntary Qualified Importer Program",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/12/2026-22965/agency-information-collection-activities-proposed-collection-comment-request-voluntary-qualified"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-12",
+   "title": "Early-Phase IND Protocol Recommendations for Solid Tumors; Draft Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/12/2026-22970/early-phase-ind-protocol-recommendations-for-solid-tumors-draft-guidance-for-industry-availability"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-12",
+   "title": "Patient-Level Data for Drugs and Biological Products Submissions Containing Real-World Data and Real-World Evidence; Request for Information",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/12/2026-22996/patient-level-data-for-drugs-and-biological-products-submissions-containing-real-world-data-and"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Proposed Rule",
+   "published_date": "2026-11-12",
+   "title": "Hematology and Pathology Devices; Reclassification of Immunohistochemistry Test Systems for Use With a Corresponding Approved Oncology Therapeutic Product",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/12/2026-23005/hematology-and-pathology-devices-reclassification-of-immunohistochemistry-test-systems-for-use-with"
+  },
   {
    "source": "Federal Register",
    "source_kind": "Notice",
@@ -131,6 +166,13 @@
    "published_date": "2026-11-09",
    "title": "Draft guideline on risk assessment of medicinal products in human reproduction and breastfeeding: from data to product information - Revision 1",
    "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-risk-assessment-medicinal-products-human-reproduction-breastfeeding-data-product-information-revision-1_en.pdf"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-09",
+   "title": "[HC] PDP-DIPHENHYDRAMINE 25 MG and 50 MG CAPSULES: Out-of-specification (Impurity)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/pdp-diphenhydramine-25-mg-and-50-mg-capsules-out-specification-impurity"
   },
   {
    "source": "ISPE",

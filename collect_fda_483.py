@@ -434,6 +434,14 @@ _NUMBERED_OBS_RE = re.compile(r"(?:^|(?<=[.)\:])\s|\n)\s*(\d{1,2})\.\s+(?=[A-Z\"
 # ★`(b) (4)` 마스킹은 걸리지 않는다 — `4)` 앞이 여는 괄호라 `(?:^|\s)` 경계를 못 만족한다.
 _PAREN_NUMBERED_OBS_RE = re.compile(r"(?:^|\s)(\d{1,2})\s*\.?\)\s+(?=[A-Z\"“])")
 
+# [하이픈 번호 2026-11-13] GCP/BIMO 양식(임상 스폰서·CRO 483) — `OBSERVED: 1-In study … 2-In study …
+# 3- In study …`(실측 fda483-193617 ICON). "OBSERVATION" 단어도 `N.` 도 없어 ②~④ 가 전부 놓쳤다.
+# 경계: 문장 경계/줄 머리 뒤 + 하이픈 뒤 **대문자 단어 + 공백**(`7-In-process` 처럼 하이픈으로 이어진
+# 복합어는 공백 요구에서 걸린다). 이것만으로는 `15-Day Report`(실측 82100) 같은 산문도 잡히므로,
+# 실제 채택은 `_select_hyphen_numbered_anchors` 가 "마커 바로 뒤 1번 + 순차 번호" 로만 한다.
+_HYPHEN_NUMBERED_OBS_RE = re.compile(
+    r"(?:^|(?<=[.:;)])\s+|\n)\s*(\d{1,2})\s?[-‐-—]\s?(?=[A-Z][a-z]*\s)")
+
 # 483 **양식 문구**(관찰이 아니다). 회수 경로는 앵커를 느슨하게 잡으므로 양식 보일러플레이트가
 # deficiency 자리에 들어올 수 있다 — 실측 2건: "OR PLAN TO IMPLEMENT CORRECTIVE ACTION IN
 # RESPONSE TO AN OBSERVATION…"(양식 안내문), "Pursuant to Section 704(b) of the Federal Food,
@@ -2823,6 +2831,15 @@ def _run_recovery_ladder(
     # ③ 번호 목록 — 마커가 있는 문서로 한정(없으면 목차·별첨까지 관찰이 된다).
     if marker is None:
         return []
+
+    # ②c 하이픈 번호(GCP/BIMO 양식 `1-In study …`). 마커 바로 뒤가 `1-` 인 문서에서만 켜진다 —
+    #    ③ 이 잡는 `1. ` 양식 문서는 첫 앵커 조건에서 빠지므로 지금 회수되는 문서의 출력은 불변이다.
+    found = _observations_from_anchors(
+        scoped, lambda s: _select_hyphen_numbered_anchors(
+            s, list(_HYPHEN_NUMBERED_OBS_RE.finditer(s))), hints, gate=gate)
+    if found:
+        return found
+
     found = _observations_from_anchors(
         scoped, lambda s: list(_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
     if found:
@@ -2839,6 +2856,25 @@ def _run_recovery_ladder(
     #   곧 지적문인데 ②③④ 는 전부 **번호를 전제**해 아무것도 못 잡는다(실측 36건).
     #   여기까지 왔다는 것은 정상 경로와 ①~④ 가 **모두 0건**이라는 뜻이다.
     return _single_unnumbered_observation(scoped, hints, gate)
+
+
+def _select_hyphen_numbered_anchors(
+    scoped: str, matches: list[re.Match[str]],
+) -> list[re.Match[str]]:
+    """하이픈 번호 앵커(②c) 중 관찰 표제만 남긴다(순수 함수).
+
+    · 첫 앵커는 번호 1 이고 마커 바로 뒤(사이에 공백·`:`·`.` 만)여야 한다 — 아니면 전부 버린다.
+    · 이후는 **직전 번호 + 1** 인 앵커만 채택하고 나머지(본문 속 `15-Day` 등)는 건너뛴다.
+    """
+    if not matches or matches[0].group(1) != "1":
+        return []
+    if scoped[:matches[0].start()].strip(" :.\t\r\n"):
+        return []
+    out = [matches[0]]
+    for m in matches[1:]:
+        if int(m.group(1)) == int(out[-1].group(1)) + 1:
+            out.append(m)
+    return out
 
 
 def _repair_ocr_leading_digit(rows: list[dict[str, str]]) -> list[dict[str, str]]:

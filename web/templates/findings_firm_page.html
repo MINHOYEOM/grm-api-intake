@@ -59,7 +59,7 @@
   .ff-doc-ag{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--body-s)}
   .ff-doc-n{font-family:var(--sans);font-size:12.5px;color:var(--coral-2)}
   .ff-doc-cats{font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
-  .ff-doc-ex{display:block;margin-top:6px;font-family:var(--sans);font-size:14px;line-height:1.75;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
+  .ff-doc-ex{display:block;margin:0 0 6px;font-family:var(--sans);font-size:14px;line-height:1.75;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
   .ff-doc:hover .ff-doc-ex{color:var(--ink)}
   .ff-doc:hover .ff-doc-ag{color:var(--coral-2)}
   /* 원문은 규제기관 사이트로 나간다 — 문서 페이지로 가는 위 링크와 시각적으로 구분한다. */
@@ -175,17 +175,18 @@
         {%- for d in firm.documents %}
         <div class="ff-doc-row">
         <a class="ff-doc" href="{{ rel_root }}findings/doc/{{ d.slug }}/">
+          {#- [UI 2단 2026-11-12 지적 한 줄] 문장 먼저, 그 아래 공개일·기관·건수·분류(둘까지 + 외 n). -#}
+          {%- if d.excerpt %}<span class="ff-doc-ex">{{ d.excerpt }}</span>{% endif %}
           <span class="ff-doc-h">
             <span class="ff-doc-dt">{{ d.published_date }}</span>
             <span class="ff-doc-ag">{{ agency_labels.get(d.agency, d.agency) }}</span>
             <span class="ff-doc-n">{{ _("지적 {n}건", n=d.findings | length) }}</span>
-            {%- if d.categories %}<span class="ff-doc-cats">{{ d.categories | join(" · ") }}</span>{% endif %}
+            {%- if d.categories %}<span class="ff-doc-cats">{{ d.categories[:2] | join(" · ") }}{% if d.categories | length > 2 %} {{ _("외 {n}건", n=(d.categories | length) - 2) }}{% endif %}</span>{% endif %}
           </span>
           {#- 대표 지적 한 문장 — 목록이 날짜 나열로 끝나지 않게 실물을 보여준다.
               원문 무변형(잘림 없이 그대로) — 우리 요약을 만들지 않는다.
               ★[다국어] 어느 언어의 본문인지는 **뷰가 정한다**(render.finding_body) —
               종전처럼 `text_ko` 를 못박으면 영어 페이지에 한국어 문장이 실린다. -#}
-          {%- if d.excerpt %}<span class="ff-doc-ex">{{ d.excerpt }}</span>{% endif %}
         </a>
         {#- 규제기관이 공개한 그 문서. 이름은 사이트 전체 한 벌이다(문서·분야·조항 페이지,
             검색 카드, 업체·실사관 프로파일과 같은 문구). 값이 없으면 링크를 만들지 않는다. -#}

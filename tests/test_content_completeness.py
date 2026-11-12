@@ -186,6 +186,26 @@ class LeavesTest(unittest.TestCase):
         self.assertIn(("FDA 483", "findings.finding_text"), by)
 
 
+    def test_collect_stats_reach_483_detail_text_column(self):
+        """#1463 오경보 회귀: 483 상세는 findings.detail_text(·_ko)에 담긴다 — 도달률이 이 칸도 세야 한다.
+        옛 감시기는 finding_text(·_ko)만 세어 상세 도달률이 0%로 나왔다."""
+        rng = random.Random(9)
+        raws, finds = [], []
+        for i in range(30):
+            deficiency = "Procedures for corrective and preventive action have not been adequately established " + str(i)
+            detail = natural(rng)
+            raws.append({"raw_signal_id": f"r{i}", "source": "FDA 483", "collected_at": "2026-11-01T00:00:00Z",
+                         "raw_json": json.dumps({"fda_483_observations": [{"deficiency": deficiency, "detail": detail}]})})
+            finds.append({"finding_id": f"f{i}", "raw_signal_id": f"r{i}", "source": "FDA 483",
+                          "finding_text": deficiency, "finding_text_ko": "시정 예방 조치 절차 미흡",
+                          "detail_text": detail, "detail_text_ko": "상세 번역"})
+        stats, ftext = cc.collect_stats(raws, finds, {})
+        by = {(s.source, s.path): s for s in stats}
+        det = by[("FDA 483", "fda_483_observations[].detail")]
+        self.assertEqual(cc.compute_reach(det.reach_pairs, ftext), (30, 30))
+        self.assertIn(("FDA 483", "findings.detail_text"), by)
+
+
 class UsageTest(unittest.TestCase):
     def test_data_beats_code_for_findings_sources(self):
         """코드가 칸 이름을 읽어도(사이트 파일) 화면 표본에 안 닿으면 '사이트'가 아니다."""

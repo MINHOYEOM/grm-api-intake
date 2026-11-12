@@ -101,6 +101,7 @@ FINDINGS_FACETS_FILE = WEB_DIR / "data" / "findings_facets.json"  # [검색 유�
 # 걸러 쓰지 않는 이유는, 그러면 표본만 고쳐지고 건수·문서수·기관 구성이 한국어인 채로
 # 남아 **화면의 머리 숫자가 거짓**이 되기 때문이다.
 FINDINGS_FACETS_EN_FILE = WEB_DIR / "data" / "findings_facets_en.json"
+PARTIAL_DETAIL_FILE = WEB_DIR / "data" / "partial_detail_findings.json"  # [UI 2단] 483 구체 내용 "원문 일부" 대상(partial_detail_map.py)
 FINDINGS_DOCS_FILE = WEB_DIR / "data" / "findings_docs.json"      # [검색 유입] 문서 단위 페이지 정본(findings_docs_refresh.py · 임계 3 + 소스 소거 면제)
 QUIZ_FILE = WEB_DIR / "data" / "quiz_bank.json"      # [주간 퀴즈] 정본 문항 뱅크(커밋 데이터)
 ASSETS_DIR = WEB_DIR / "assets"
@@ -4217,6 +4218,18 @@ def doc_is_english(doc: dict[str, Any]) -> bool:
     return not any(_HANGUL_RE.search(finding_body(f, "en")) for f in findings)
 
 
+def load_partial_detail_ids(path: Path = PARTIAL_DETAIL_FILE) -> frozenset[str]:
+    """483 '구체 내용' 에 "원문 일부" 를 붙일 지적 id. 판정은 content_completeness.
+    partial_detail_notice 가 이미 했다(partial_detail_map.py). 없거나 깨지면 빈 집합."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return frozenset()
+    if not isinstance(data, dict) or data.get("schema") != "grm-partial-detail/v1":
+        return frozenset()
+    return frozenset(str(i) for i in data.get("finding_ids") or [] if i)
+
+
 def load_findings_docs(path: Path = FINDINGS_DOCS_FILE) -> "dict[str, Any] | None":
     """문서 단위 페이지 정본 로드. 부재 시 None → 섹션이 조용히 꺼진다.
 
@@ -6177,6 +6190,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["checklistjs_ver"] = _asset_ver("checklist.js")
     env.globals["inspectorjs_ver"] = _asset_ver("inspector.js")
     env.globals["mfdsdocjs_ver"] = _asset_ver("mfds-doc-inspectors.js")
+    env.globals["docdetailjs_ver"] = _asset_ver("doc-detail.js")
     env.globals["glossaryjs_ver"] = _asset_ver("glossary.js")
     env.globals["searchjs_ver"] = _asset_ver("search.js")
     env.globals["quizjs_ver"] = _asset_ver("quiz.js")
@@ -7479,6 +7493,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
         # [SEO 2단계 2026-11-09] GRM 고유 맥락 입력 — 비슷한 지적(정본 파일)·조항(뷰 재사용).
         similar_by_doc = load_findings_similar() if render_doc_pages else {}
+        partial_detail_ids = load_partial_detail_ids() if render_doc_pages else frozenset()
         docs_by_id = {d["document_id"]: d for d in documents}
         clause_by_section_by_lang = {
             DEFAULT_LANG: {c["section"]: c for c in clause_views},
@@ -7587,6 +7602,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     similar_cases=doc_similar_view(
                         doc, similar_by_doc.get(doc["document_id"]), docs_by_id, _lg,
                         _doc_slugs_by_lang.get(_lg), _canonical_firm_key),
+                    # [UI 2단 2026-11-12] 483 '구체 내용' — 본문은 런타임(doc-detail.js)이
+                    # findings 의 상세 칸을 읽어 붙인다(파일에 싣지 않는다 — 국문만 830만 자).
+                    detail_runtime=(doc.get("source") == "FDA 483"),
+                    detail_partial_ids=sorted(
+                        f["finding_id"] for f in (doc.get("findings") or [])
+                        if f.get("finding_id") in partial_detail_ids),
                     cited_clauses=doc_clause_view(
                         doc, clause_by_section_by_lang.get(_lg, {}), _lg),
                     backlinks=build_backlink_panel(

@@ -197,10 +197,14 @@ def _db_scope_counts(state: dict[str, dict[str, Any]]) -> "dict[str, dict[str, i
     def _tally(rows: "list[dict[str, Any]]", bucket: dict[str, int]) -> None:
         for r in rows:
             bucket["total"] += 1
-            if (r.get("scope_status") or "") == "ok":
+            st = r.get("scope_status") or ""
+            if st == "ok":
                 bucket["ok"] += 1
+            elif st in ("non_pharma", "fragment"):
+                bucket[st] += 1      # 비공개 사유 분포 — findings-hidden 알림에 싣는다
 
-    out: dict[str, dict[str, int]] = {cid: {"total": 0, "ok": 0} for cid in state}
+    out: dict[str, dict[str, int]] = {cid: {"total": 0, "ok": 0, "non_pharma": 0, "fragment": 0}
+                                      for cid in state}
     ids_483 = [cid for cid, i in state.items() if i["kind"] == "483"]
     # 483: id 는 `fda483-\d+` 라 예약문자가 없어 in.() 에 그대로 넣어도 안전하다.
     for chunk in (ids_483[i:i + 100] for i in range(0, len(ids_483), 100)):
@@ -229,9 +233,16 @@ def classify(row: dict[str, Any]) -> str:
     ★세 사건을 한 카운터에 합치지 않는다 — 처방이 전부 다르다.
     """
     found, shown = row["found"], row["shown"]
+    total, ok = row.get("db_total"), row.get("db_ok")
+    # ★[findings-hidden 2026-11-12] 카드는 발행됐는데 그 문서의 findings 가 **하나도 공개되지 않는**(전부
+    # scope_status≠ok) 경우. 사이트 /findings/ 에서 그 지적이 통째로 사라진 것이라 원문 건수와
+    # 무관하게 본다 — 아래 `found <= shown` 은 건수만 보므로 이 경우를 '일치(ok)'로 지나쳤다
+    # (11-02호 Henogen 195517: 생물의약품 CDMO 가 non_pharma 로 과차단되어 브리프엔 실리고 사이트엔 없음).
+    # 자동 수리 없음 — 분류기가 틀렸는지 조립기 관문이 틀렸는지 사람이 가른다.
+    if shown > 0 and total is not None and ok is not None and total > 0 and ok == 0:
+        return "findings-hidden"
     if found <= shown:
         return "ok"
-    total, ok = row.get("db_total"), row.get("db_ok")
     if total is None or ok is None:
         return "unknown-no-db"      # DB 를 못 봤다 → 종전 판정(보수적으로 불일치 취급)
     if found > total:
@@ -278,7 +289,9 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
         row = {**info, "id": cid, "found": found, "status": status,
                "obs_headers": hdr,
                "db_total": counts["total"] if counts else None,
-               "db_ok": counts["ok"] if counts else None}
+               "db_ok": counts["ok"] if counts else None,
+               "db_non_pharma": counts["non_pharma"] if counts else None,
+               "db_fragment": counts["fragment"] if counts else None}
         # 조립기가 범위 밖으로 뺀 483 은 발행 격차가 아니다. 격차 후보일 때만 판정한다
         # (목록 조회 1회 비용을 격차 없는 카드에는 쓰지 않는다).
         if (info["kind"] == "483" and found > info["shown"]
@@ -295,7 +308,8 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
     # (카드가 더 많음)도 알리지 않는다 — 파서가 뒤에 더 보수적으로 바뀐 경우라 발행물이
     # 틀렸다는 뜻이 아니다.
     mismatches = [r for r in rows
-                  if r["verdict"] in ("extraction-gap", "publish-gap", "unknown-no-db")]
+                  if r["verdict"] in ("extraction-gap", "publish-gap", "findings-hidden",
+                                   "unknown-no-db")]
     return rows, mismatches
 
 
@@ -305,6 +319,10 @@ _VERDICT_HELP = {
     "publish-gap": ("발행 격차 — findings 가 있고 공개 대상(`scope_status='ok'`)인데 카드가 "
                     "덜 보여줬습니다. 조치: deep 델타에 `source_text`(+483 이면 "
                     "`observations_ko`)를 넣고 발행 재조립."),
+    "findings-hidden": ("사이트 비공개 — 카드는 발행됐는데 그 문서의 findings 가 **전부 비공개**"
+                        "(`scope_status≠ok`)라 `/findings/` 에서 사라졌습니다. 조치: ① 분류기 과차단이면 "
+                        "시설 유형·업체명을 보고 `grm_classify_483_scope` 재분류 후보로(11-12 Henogen "
+                        "사례) ② 분류가 맞으면 조립기 범위 관문(`is_out_of_scope_483`)이 새는 것."),
     "unknown-no-db": ("판정 불가 — DB 자격증명이 없어 scope 분해를 못 했습니다. 이 행들은 "
                       "허위경보일 수 있습니다(워크플로에 `SUPABASE_*` 를 넣으면 갈립니다)."),
 }
@@ -348,6 +366,10 @@ def format_report(mismatches: list[dict[str, Any]],
             db = "?" if r.get("db_total") is None else f"{r['db_ok']}/{r['db_total']}"
             lines.append(f"| {r['date']} | `{r['id']}` | {r['shown']} | {db} | "
                          f"{r['found']} | {r['status']} |")
+        if verdict == "findings-hidden":
+            lines.append("")
+            lines += [f"- `{r['id']}` 비공개 사유: non_pharma {r.get('db_non_pharma') or 0}건 · "
+                      f"fragment {r.get('db_fragment') or 0}건" for r in rs]
         lines += ["", _VERDICT_HELP.get(verdict, ""), ""]
     return "\n".join(lines).rstrip() + tail
 

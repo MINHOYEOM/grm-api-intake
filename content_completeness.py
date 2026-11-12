@@ -491,7 +491,7 @@ def collect_stats(raw_rows: Iterable[dict[str, Any]], finding_rows: Iterable[dic
         rid = str(f.get("raw_signal_id") or "")
         src = str(f.get("source") or "?")
         coll = collected_at.get(rid, "")
-        for col in ("finding_text", "finding_text_ko"):
+        for col in ("finding_text", "finding_text_ko", "detail_text", "detail_text_ko"):
             v = f.get(col)
             if isinstance(v, str) and v.strip():
                 fs(src, f"findings.{col}").add(v, ref=str(f.get("finding_id") or rid), collected=coll)
@@ -623,7 +623,7 @@ def run(env: dict[str, str], *, today: date, run_url: str = "", session: Any = N
         raise StoreReadError("SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정")
     raw = list(fetch_table(base, key, "raw_signals", "raw_signal_id,document_id,source,collected_at,raw_json",
                            "raw_signal_id.asc", session))
-    finds = list(fetch_table(base, key, "findings", "finding_id,raw_signal_id,source,finding_text,finding_text_ko",
+    finds = list(fetch_table(base, key, "findings", "finding_id,raw_signal_id,source,finding_text,finding_text_ko,detail_text,detail_text_ko",
                              "finding_id.asc", session))
     extra = {}
     for table, id_col, src_col, cols in EXTRA_TABLES:

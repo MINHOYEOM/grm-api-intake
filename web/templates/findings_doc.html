@@ -101,6 +101,13 @@
   .fd-bl-chips a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
   .fd-bl-chips a:hover{border-color:var(--coral);color:var(--coral)}
   .fd-bl-none{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0;word-break:keep-all}
+  .fd-detail{margin-top:10px;border-left:3px solid var(--line-2);padding:2px 0 2px 14px}
+  .fd-detail summary{cursor:pointer;font-family:var(--sans);font-size:13.5px;color:var(--muted);min-height:32px;display:flex;align-items:center}
+  .fd-detail summary:hover{color:var(--coral)}
+  .fd-detail p{font-family:var(--sans);font-size:15px;line-height:1.75;color:var(--body);margin:6px 0 0;word-break:keep-all}
+  .fd-detail-note{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:8px 0 0}
+  .fd-detail-note a{color:var(--muted);border-bottom:1px solid var(--line-2);text-decoration:none}
+  .fd-detail-note a:hover{color:var(--coral)}
   .fd-rel3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0}
   .fd-rel3-col{min-width:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px 14px}
   .fd-rel3-col .fd-sec-h{margin:0 0 2px;flex-basis:100%}
@@ -160,6 +167,11 @@
       <a class="fd-insp-go" href="{{ rel_root }}findings/inspector/index.html?source=mfds">{{ _('MFDS 공개 이력') }}</a>
     </div>
     {% endif %}
+    {%- if detail_runtime %}
+    {#- [UI 2단 2026-11-12] 483 '구체 내용' 설정 — doc-detail.js 가 읽는다. partial = "원문 일부"
+        대상(content_completeness.partial_detail_notice 판정, partial_detail_map.py). -#}
+    <div id="fd-detail-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-doc="{{ doc.document_id }}" data-pdf="{{ doc.evidence_url }}" data-partial="{{ detail_partial_ids | join(' ') }}" hidden></div>
+    {%- endif %}
     <p class="fd-src">
       <a href="{{ doc.evidence_url }}" target="_blank" rel="noopener">{{ _('규제기관 공개 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
       <span>{{ _('판단의 근거는 언제나 원문입니다.') }}</span>
@@ -320,4 +332,4 @@
   </div>
 </main>
 {% endblock %}
-{% block scripts %}{% if mfds_attendees %}<script src="{{ asset_root }}assets/mfds-doc-inspectors.js?v={{ mfdsdocjs_ver }}" defer></script>{% endif %}{% endblock %}
+{% block scripts %}{% if mfds_attendees %}<script src="{{ asset_root }}assets/mfds-doc-inspectors.js?v={{ mfdsdocjs_ver }}" defer></script>{% endif %}{% if detail_runtime %}<script src="{{ asset_root }}assets/doc-detail.js?v={{ docdetailjs_ver }}" defer></script>{% endif %}{% endblock %}

@@ -1408,7 +1408,12 @@
     return { btn: btn, block: block };
   }
 
-  function buildCard(row, query) {
+  // 판독 잔해 표지 — 대체 문자·깨진 기호(¢ ¤ ¦ ¨), "(판독 누락)" 표기, 그리고 상표·저작권 기호가
+  // 낱말에 엉겨 붙은 꼴("GMP-™@", "®4")만. 상표 기호 자체는 정상 제품명("Colic Calm® Plus")에 흔해 잡지 않는다 — 공개 지적 실측: 단독 기호로 잡으면 193건 중 165건이 오탐, 이 규칙은 12건 전부 실제 잔해(11-12).
+  var OCR_NOISE_RE = /[\u00a2\u00a4\u00a6\u00a8\ufffd]|\((?:\ud310\ub3c5 \ub204\ub77d|illegible)\)|[\u2122\u00ae\u00a9][@\d~]|-[\u2122\u00ae\u00a9]/i;
+  function hasOcrNoise(text) { return OCR_NOISE_RE.test(String(text || "")); }
+
+  function buildCard(row, query, inDoc) {
     var card = el("article", "fnd-card");
     // [PR-0 딥링크] 안정 DOM id — 일반 모드 포함 항상 부여한다(무해). 딥링크 자동 도달
     // (revealAndFocusTarget)이 document.getElementById("f-"+finding_id) 로 대상을 찾는다.
@@ -1416,12 +1421,21 @@
     if (row.review_status === "needs_review") card.classList.add("fnd-card--review");
     card.classList.add("fnd-collapsed"); // 기본 접힘(카드 단위 로컬 상태, 재렌더시 초기화 허용)
 
-    // [M14 §5] head 재구성 — 좌측 [소스][증거][검토 필요(해당 시)], 우측 date(margin-left:
-    // auto, 배지 줄의 마지막 자식으로 붙여야 flex 행에서 실제로 우측 끝에 고정된다). 기관
-    // (agency) 배지는 제거했다 — 소스(FDA 483/FDA Warning Letter/MFDS)가 기관을 포함하는
-    // 상위 구분이라 "FDA"+"FDA 483" 같은 중복 표기를 없앤다.
+    // [UI 2단 2026-11-12 지적 한 줄] 문장이 먼저다. 그 아래 한 줄에 [분류][증거][검토]와
+    // 판독 깨짐 표기. 문서 카드 안(inDoc)에서는 업체·소스·공개일을 다시 적지 않는다 — 문서
+    // 머리(buildDocHead)에 한 번 있다. 홀로 쓰이는 카드(유사 사례 등)는 업체 줄과 소스·날짜를
+    // 그대로 둔다. [M14 §5] date 는 배지 줄 마지막 자식(margin-left:auto 우측 고정).
+    var textEl = appendMainText(card, row, query);
+    if (!inDoc && row.firm_name) card.appendChild(elHL("h3", "fnd-firm", decodeFirmDisplay(row.firm_name), query));
     var head = el("div", "fnd-card-head");
-    if (row.source) head.appendChild(el("span", "fnd-b", row.source));
+    if (!inDoc && row.source) head.appendChild(el("span", "fnd-b", row.source));
+    var cat = CATEGORY_LABELS[row.category_code];
+    // 표에 없는 코드일 때의 폴백은 DB 의 한국어 라벨이라, 영어 화면에는 싣지 않는다
+    // — 라벨 하나를 잃는 것보다 영어 화면에 한국어를 남기는 쪽이 나쁘다(firm.js 와 동일 계약).
+    var fallbackCat = row.category_label_ko || "";
+    var catText = cat ? cat.ko
+      : (_isEn && _HANGUL.test(fallbackCat) ? "" : fallbackCat);
+    if (catText) head.appendChild(el("span", "fnd-cat", catText));
     var evLabel = EVIDENCE_LABEL[row.evidence_level] || row.evidence_level || "";
     if (evLabel) {
       var evBadge = el("span", "fnd-b" + (row.evidence_level === "A" ? " ev-a" : ""), evLabel);
@@ -1442,19 +1456,14 @@
       if (statusTitle) statusBadge.setAttribute("title", statusTitle);
       head.appendChild(statusBadge);
     }
-    head.appendChild(el("span", "fnd-b date", row.published_date || ""));
+    // 판독 깨짐 — 원문 PDF 판독(OCR)이 남긴 잔해가 본문에 보이면 따로 알린다(본문은 고치지 않는다).
+    if (hasOcrNoise(_bodyText(row))) {
+      var ocrBadge = el("span", "fnd-b fnd-ocr", _t("판독 깨짐 포함"));
+      ocrBadge.setAttribute("title", _t("원문 PDF 판독 과정에서 깨진 글자가 섞여 있습니다. 원문과 대조가 필요합니다."));
+      head.appendChild(ocrBadge);
+    }
+    if (!inDoc) head.appendChild(el("span", "fnd-b date", row.published_date || ""));
     card.appendChild(head);
-
-    if (row.firm_name) card.appendChild(elHL("h3", "fnd-firm", decodeFirmDisplay(row.firm_name), query));
-    var cat = CATEGORY_LABELS[row.category_code];
-    // 표에 없는 코드일 때의 폴백은 DB 의 한국어 라벨이라, 영어 화면에는 싣지 않는다
-    // — 라벨 하나를 잃는 것보다 영어 화면에 한국어를 남기는 쪽이 나쁘다(firm.js 와 동일 계약).
-    var fallbackCat = row.category_label_ko || "";
-    var catText = cat ? cat.ko
-      : (_isEn && _HANGUL.test(fallbackCat) ? "" : fallbackCat);
-    if (catText) card.appendChild(el("p", "fnd-cat", catText));
-
-    var textEl = appendMainText(card, row, query);
 
     var extra = el("div", "fnd-extra"); // 접힘 상태에서 숨기는 부가 섹션(원문/refs/번역고지/메타)
     appendOrigAndNote(extra, row, query);
@@ -1677,7 +1686,7 @@
     var overflows = rows.length >= DOC_OBS_VISIBLE_LIMIT;
     var visibleCount = overflows ? DOC_OBS_INITIAL_SHOW : rows.length;
     rows.slice(0, visibleCount).forEach(function (row) {
-      var b = buildCard(row, query);
+      var b = buildCard(row, query, true);
       obsWrap.appendChild(b.card);
       built.push(b);
     });
@@ -1688,7 +1697,7 @@
       var hiddenWrap = el("div", "fnd-doc-obs fnd-doc-obs-more");
       hiddenWrap.hidden = true;
       rest.forEach(function (row) {
-        var b = buildCard(row, query);
+        var b = buildCard(row, query, true);
         hiddenWrap.appendChild(b.card);
         built.push(b);
       });

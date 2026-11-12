@@ -21671,6 +21671,34 @@ class WebBriefGlanceTest(unittest.TestCase):
         self.assertNotIn("<script", sec)
         self.assertNotIn("data-docs", tpl)
         self.assertEqual(render.BRIEF_GLANCE_FILE.parent, render.DATA_DIR.parent)
+        # 배포는 링크체크 사본 폴더로 렌더한다 — 정본 경로는 데이터 폴더가 아니라 CLI 가 넘긴다.
+        src = (WEB_DIR / "render.py").read_text(encoding="utf-8")
+        self.assertIn("render_site(args.data, args.out, glance_file=args.glance)", src)
+        self.assertIn('ap.add_argument("--glance", type=Path, default=BRIEF_GLANCE_FILE', src)
+
+    def test_cli_build_from_a_copied_data_dir_still_draws_the_line(self):
+        """링크체크 사본처럼 브리프를 다른 폴더로 옮겨 렌더해도 줄이 선다(11-12 라이브 누락 회귀)."""
+        brief = json.loads((render.DATA_DIR / "brief_web_2026_11_09.json").read_text(encoding="utf-8")) \
+            if (render.DATA_DIR / "brief_web_2026_11_09.json").is_file() else None
+        if brief is None:
+            self.skipTest("11-09 호 없음")
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glance_cli_"))
+        try:
+            data = tmp / "checked"
+            data.mkdir()
+            (data / "brief_web_2026_11_09.json").write_text(json.dumps(brief, ensure_ascii=False),
+                                                           encoding="utf-8")
+            snap = tmp / "glance.json"
+            urls = [c["sources"]["official_url"] for c in brief["cards"]
+                    if c.get("card_type") == "FDA 483 실사 관찰"]
+            snap.write_text(json.dumps({"schema": "grm-brief-glance/v1", "items": {
+                u: {"c": "JP", "k": []} for u in urls}}), encoding="utf-8")
+            out = tmp / "out"
+            render.render_site(data, out, render_doc_pages=False, glance_file=snap)
+            html = (out / "briefs" / "2026-11-09" / "index.html").read_text(encoding="utf-8")
+            self.assertIn(f"FDA 483 실사 관찰 {len(urls)}건 중 {len(urls)}건이 일본 소재 제조소", html)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
         snap = json.loads(render.BRIEF_GLANCE_FILE.read_text(encoding="utf-8"))
         self.assertEqual(snap["schema"], "grm-brief-glance/v1")
         for v in snap["items"].values():

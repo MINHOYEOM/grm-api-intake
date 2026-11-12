@@ -6006,7 +6006,8 @@ def _write_json(path: Path, obj: Any) -> None:
 
 def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 assets_dir: Path = ASSETS_DIR,
-                render_doc_pages: bool = True) -> dict[str, Any]:
+                render_doc_pages: bool = True,
+                glance_file: "Path | None" = None) -> dict[str, Any]:
     """data_dir → out_dir 정적 사이트 빌드. 산출 메타(쓴 파일 목록) 반환.
 
     `render_doc_pages=False` 는 **테스트 전용 속도 스위치**다. 문서 단위 페이지는 3천 장이
@@ -7804,10 +7805,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # 브리프 상세(주차별).
     brief_tmpl = env.get_template("brief.html")
-    # [브리프 4단] 주간 현황 국가·분류(DB 정본) — 브리프 데이터 폴더의 **옆**에서 읽는다
-    # (운영 web/data/briefs → web/data/brief_glance.json). 픽스처 빌드에는 그 파일이 없어
-    # 골든이 매일 갱신되는 정본에 흔들리지 않는다. 줄 계산은 단위 테스트가 본다.
-    glance_db = load_brief_glance(Path(data_dir).parent / BRIEF_GLANCE_FILE.name)
+    # [브리프 4단] 주간 현황 국가·분류(DB 정본) — 경로는 **호출자가 넘긴다**(CLI 기본값 =
+    # web/data/brief_glance.json). ★종전에는 브리프 데이터 폴더 옆에서 찾았는데, 배포는 링크체크한
+    # 사본(runner.temp)으로 렌더해 옆에 파일이 없었다 — 라이브에서 줄이 통째로 빠졌다(11-12).
+    # 테스트·픽스처 빌드는 넘기지 않아(None) 골든이 매일 갱신되는 정본에 흔들리지 않는다.
+    glance_db = load_brief_glance(glance_file) if glance_file else {}
     for b in briefs:
         pub = b["brief"].get("publish_date", "")
         issue_no = issue_no_by_date[pub]
@@ -8456,9 +8458,11 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="GRM 웹 렌더러 (JSON → 정적 사이트)")
     ap.add_argument("--data", type=Path, default=DATA_DIR, help="브리프 JSON 디렉터리")
     ap.add_argument("--out", type=Path, default=DIST_DIR, help="정적 사이트 출력 디렉터리")
+    ap.add_argument("--glance", type=Path, default=BRIEF_GLANCE_FILE,
+                    help="브리프 주간 현황 국가·분류 정본(brief_glance_refresh.py 산출)")
     args = ap.parse_args(argv)
     _validate_briefs_or_raise(args.data)  # fail-closed — 위반 시 여기서 raise, exit 0 도달 안 함
-    meta = render_site(args.data, args.out)
+    meta = render_site(args.data, args.out, glance_file=args.glance)
     print(f"빌드 완료: {meta['briefs']}개 브리프 → {meta['out_dir']}  "
           f"(최신호 {meta['latest']}, {len(meta['written'])}개 파일)")
     for w in meta["written"]:

@@ -17,6 +17,8 @@ Notion Intake data source = `collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288`.
    **git 반납**도 본다 — `git fetch origin claude/company-$D` 후 `company/run/$D/delta.json` 이 있고 `copyedit.json` 의 `status` 가 `완료`면 `git 반납 있음`. 저장소 변수 `GRM_DELTA_SOURCE` 가 `git` 이면 이것만으로 정상이다(브릿지가 브랜치에서 가져간다). 기본(`notion`)이면 비교용일 뿐이라 노션 행이 없으면 `★델타 없음(git 반납만 있음)`. 둘 다 없으면 `★델타 없음`.
 2. **main 반영** — `git fetch origin main` 후 `web/data/deltas/delta_$UNDER.json`·`deep_$UNDER.json` 이 있는지.
    델타가 OPEN(또는 git 모드에서 git 반납 있음)인데 파일이 없으면 브릿지가 아직 안 돈 것이다(크론이 13:37 까지 30분마다 돈다) → `대기: 브릿지`.
+   **스캐폴드 동결**도 본다 — main 의 `delta_$UNDER.json` 에 `handoff_ref` 키가 있으면(편집팀이 git handoff 로 만든 호) `web/data/scaffolds/brief_web_$UNDER.json` 도 main 에 있어야 한다.
+   없으면 `★스캐폴드 동결 없음`(발행 조립이 다른 스캐폴드를 쓰게 된다 — `상태: 보류`). `handoff_ref` 가 없는 호(백업이 발행한 호)는 이 파일이 없는 것이 정상이다.
 3. **발행 PR** — 열린 PR 중 head 가 `publish/brief-$D` 인 것. head sha 의 check-runs 가 전부 `success` 인지.
 4. **심층분석** — PR 브랜치의 `web/data/briefs/brief_web_$UNDER.json` 을 `git show` 로 읽어, `"deep_analysis" in card` 인 카드마다
    ① `deep_analysis` 가 비어 있지 않은가 ② `fda-483` 카드는 `observations_ko` 의 `number` 가 `deterministic_detail.observations[].number` 와 1:1 이고
@@ -25,6 +27,7 @@ Notion Intake data source = `collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288`.
 5. **편집팀 작동 여부** — 판정만 하고 `상태:` 판정(1~4)에는 넣지 않는다. 읽기만 한다.
    - 브랜치 `claude/company-$D` 의 `company/run/$D/` 에서 `desk.json` 의 `status`, `reporter.md` 첫 줄 `상태:`, `copyedit.json` 의 `status` 와 `published` 를 본다. 파일이 없으면 "없음".
    - Notion 인계서(제목 `OPEN … $D`, Intake) 의 Status 가 `CONSUMED` 인지 본다. 닫은 쪽은 `copyedit.json` 의 `published: true` 면 교열 마감, 그렇지 않고 `CONSUMED` 면 백업(09:30) 발행으로 본다.
+   - `copyedit.json` 이 `published: true` 인데 인계서가 아직 `OPEN` 이면 `★인계서 미마감(이중 발행 위험)` 을 적는다 — 백업이 같은 호를 한 번 더 만들 수 있다.
    - 세 파일 중 `완료` 가 아닌 첫 단계(데스크 → 기자 → 교열)와 그 `상태:` 줄의 보류 사유를 적는다.
 
 ## 판정

@@ -26,14 +26,14 @@
   var stateChip = root.querySelector("#grm-pet-state-chip b"), stateName = $("grm-pet-state-name"), stateCopy = $("grm-pet-state-copy");
   var currentStage = -1, talkTimer, stateTimer, blinkTimer, scrollTimer, hideTimer, previewStage = null, drag = null, suppressClick = false, activeDock = null, nearDock = null;
   var states = {
-    idle: { name: _t("쉬는 중"), copy: _t("새로운 소식을 기다리고 있어요") },
-    reading: { name: _t("읽는 중"), copy: _t("지금 보고 있는 내용을 따라가고 있어요") },
-    thinking: { name: _t("생각 중"), copy: _t("답을 고르는 중이에요") },
-    ready: { name: _t("완료"), copy: _t("정답과 성장 포인트를 확인했어요") },
-    retry: { name: _t("다시 도전"), copy: _t("다음 문제를 함께 풀어봐요") },
-    moving: { name: _t("이동 중"), copy: _t("새 자리를 찾고 있어요") },
-    sleeping: { name: _t("잠든 중"), copy: _t("돌아오면 다시 깨어나요") },
-    together: { name: _t("함께 보는 중"), copy: _t("성장 기록을 살펴보고 있어요") }
+    idle: { name: _t("쉬는 중"), copy: _t("새 소식 기다리는 중") },
+    reading: { name: _t("읽는 중"), copy: _t("보고 있는 내용 따라 읽는 중") },
+    thinking: { name: _t("생각 중"), copy: _t("답 고르는 중") },
+    ready: { name: _t("완료"), copy: _t("정답과 성장 포인트 확인 완료") },
+    retry: { name: _t("다시 도전"), copy: _t("다음 문제 대기") },
+    moving: { name: _t("이동 중"), copy: _t("새 자리 찾는 중") },
+    sleeping: { name: _t("잠든 중"), copy: _t("돌아오면 다시 깨어남") },
+    together: { name: _t("함께 보는 중"), copy: _t("성장 기록 살펴보는 중") }
   };
 
   function restingState() { return panel.hidden ? "idle" : "together"; }

@@ -44,6 +44,11 @@
      --out company/run/{run_date_kst}/brief_check.json [--deep company/run/{run_date_kst}/deep_delta.json]
    ```
    를 돌린다. 실패(exit≠0)면 그 메시지를 그대로 적는다 — 발행 경로에 넘겼다면 **발행이 멈췄을 것**이다.
+   **`--deep` 에는 원문을 붙인 검사용 사본을 넘긴다**(`deep_delta.json` 이 있을 때):
+   `python company/editorial/precheck.py deep-source _handoff/handoff_$D.json company/run/{run_date_kst}/deep_delta.json --out _scaffold/deep_check.json`
+   → `--deep _scaffold/deep_check.json`. 심층분석의 근거 대조는 그 주 handoff 의 원문(`deep_analysis_input.body_full`)이 기준선인데,
+   기자는 원문을 델타에 옮겨 적지 않는다(v16). 발행 브릿지는 조립 직전에 같은 원문을 붙인다 — 붙이지 않고 검사하면 조항 인용이 전부 '원문에 없음'으로 나와
+   교열의 검사 결과가 발행 결과와 달라진다(리허설 1113c: 26장 중 11장). 사본은 커밋하지 않는다 — 반납하는 `deep_delta.json` 은 기자가 낸 그대로다.
    사본을 못 받아 검사를 못 하면 그것도 **통과가 아니다**(결과에 `막힘: scaffold 사본 — <사유>` 한 줄).
 2. **의미 점검.** 카드마다 v16 [발행 전 산문 자가 점검] 1~10번과 [핵심 원칙] 2-1(원문 부재 주장 금지)을 O/X 로 판정한다.
    X 는 근거(슬롯 이름 + 코드 `facts`/`prose_input` 의 어느 값과 어긋나는지)를 적는다.

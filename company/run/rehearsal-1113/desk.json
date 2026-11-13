@@ -1,0 +1,1 @@
+{"status":"보류","run_date_kst":"2026-11-13","reason":"handoff 파일 읽기 실패 — company/editorial/handoff_ref.py 가 main 에 없음(next/desk.md 0번이 요구). handoff_2026-11-13.json(95행)은 claude/queue-handoff 에서 정상 수신."}

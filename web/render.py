@@ -7684,7 +7684,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
                          json_ld=firm_page.breadcrumb_json_ld([
                              (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
-                             (_tr("문서로 찾기"), "findings/docs/"), (fp["name"], "")]),
+                             (_tr("업체"), "findings/firm/"), (fp["name"], "")]),
                          firm=_fp, agency_labels=agency_labels_by_lang[_lg],
                          thin_page=is_thin_firm_page(fp, _lg),
                          similar_firms=firm_similar_view(

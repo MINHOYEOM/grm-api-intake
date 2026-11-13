@@ -3,7 +3,7 @@
   "lang": "ko",
   "until": "2026-11-30",
   "only_paths": ["/findings/"],
-  "skip_paths": ["/findings/inspector/", "/admin/"],
+  "skip_paths": ["/findings/inspector/", "/findings/firm/", "/findings/clause/", "/findings/doc/", "/findings/docs/", "/findings/agency/", "/findings/c/", "/findings/checklist/", "/findings/citations/", "/findings/coverage/", "/findings/examples/", "/findings/import-alerts/", "/findings/inspections/", "/findings/trends/", "/admin/"],
   "watermark": "MFDS",
   "kicker": "식약처 실사 통보, 받으셨나요?",
   "title": "실사관 이름만\n알면 됩니다.",

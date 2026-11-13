@@ -304,7 +304,6 @@
   "{names} 외 {n}명": "{names} and {n} more",
   "{name} 미리보기": "{name} preview",
   "{name} 전체 이력 조회 &mdash; 실사 등급까지": "Full history of {name} &mdash; including inspection classifications",
-  "{name} 지적사항 이력": "{name} findings history",
   "{name} 지적사항 이력 · GRM": "{name} findings history · GRM",
   "{name}의 공개 실사 문서 {d}건에서 확인된 지적 {n}건을 우리말로 정리했습니다({y1}~{y2}).": "{n} finding{s} from {d} published inspection documents for {name} ({y1}–{y2}).",
   "{n} 포인트 남음": "{n} point{s} to go",

@@ -100,6 +100,19 @@ def dedup_source() -> str:
     return "supabase" if os.environ.get(DEDUP_SOURCE_ENV, "").strip().lower() == "supabase" else "notion"
 
 
+HANDOFF_SOURCE_ENV = "GRM_HANDOFF_SOURCE"        # notion(기본) | db
+
+
+def handoff_source() -> str:
+    """그날 handoff·스캐폴드의 정본을 어디서 만드나 — 저장소 변수 GRM_HANDOFF_SOURCE(없으면 notion).
+
+    db 면 `run_shadow` 가 만든 DB handoff 가 정본이다: 발행 스캐폴드(`brief_web_*.json`)를 수집기의
+    스캐폴드 자리(GRM_WEB_BRIEF_DIR)에 내고, health 의 handoff 성패도 그 결과로 정한다.
+    노션 handoff 페이지는 노션 쓰기가 살아 있는 동안 거울로 계속 만든다(백업 Routine 이 읽는다).
+    """
+    return "db" if os.environ.get(HANDOFF_SOURCE_ENV, "").strip().lower() == "db" else "notion"
+
+
 def dedup_shadow_enabled() -> bool:
     """판정은 노션 기준 그대로 두고, DB 기준이었다면 어땠을지를 health 에 남긴다(기본 꺼짐)."""
     return env_flag("ENABLE_INTAKE_DEDUP_SHADOW")
@@ -1118,23 +1131,49 @@ def _write(path: str, text: str) -> None:
         f.write(text.encode("utf-8"))
 
 
+def _copy_web_brief(src_dir: str, dst_dir: str, run_date: date) -> str:
+    """`src_dir` 의 발행 스캐폴드를 `dst_dir` 에 같은 이름·같은 바이트로 둔다. 반환: 쓴 경로."""
+    import grm_handoff as gh
+    name = gh.web_brief_filename(run_date)
+    src, dst = os.path.join(src_dir, name), os.path.join(dst_dir, name)
+    if os.path.abspath(src) == os.path.abspath(dst):
+        return dst
+    with open(src, "rb") as f:
+        data = f.read()
+    os.makedirs(dst_dir or ".", exist_ok=True)
+    with open(dst, "wb") as f:
+        f.write(data)
+    return dst
+
+
 def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datetime,
                window_days: int, display_window_days: int, new_items: Iterable[Any] = (),
                notion_payload: "dict[str, Any] | None" = None,
                notion_status_lookup: "Callable[[str, list[str]], dict[str, str]] | None" = None,
                silent_sources: Iterable[str] = (), repo_root: str = ".",
-               out_dir: "str | None" = None, store: "QueueStore | None" = None) -> dict[str, Any]:
+               out_dir: "str | None" = None, store: "QueueStore | None" = None,
+               canonical: bool = False,
+               canonical_web_brief_dir: "str | None" = None) -> dict[str, Any]:
     """그림자 한 바퀴: 넣기 → 상태 다시 계산 → DB handoff → 노션 것과 비교 → 파일로 남기기.
 
     `notion_status_lookup(handoff_date, keys)` 를 주면 최근 consumed 호의 계산 상태를 노션 Status 와
     비교한다. 어느 단계가 실패해도 예외를 올리지 않고 `warnings` 에 적는다(발행 경로 보호).
+
+    `canonical=True`(GRM_HANDOFF_SOURCE=db) 면 이 handoff 가 정본이다. 보고서에 `canonical` 키를 더해
+    성패를 돌려주고(`ok`·`rows`·`frozen`·`aged_open`·`error`), `canonical_web_brief_dir` 를 주면 발행
+    스캐폴드를 그 자리에도 낸다. 미지정(기본)이면 보고서·파일이 종전과 완전히 같다.
     """
     out_dir = out_dir or shadow_dir()
     report: dict[str, Any] = {"run_date": run_date.isoformat(), "warnings": []}
+    if canonical:
+        report["canonical"] = {"ok": False, "rows": 0, "frozen": "", "aged_open": 0,
+                               "web_brief": "", "error": ""}
     try:
         store = store or QueueStore(supabase[0], supabase[1])
     except QueueStoreError as e:
         report["warnings"].append(f"대기열 표 접근 불가: {e}")
+        if canonical:
+            report["canonical"]["error"] = f"대기열 표 접근 불가: {truncate(str(e), 160)}"
         return report
 
     try:
@@ -1180,8 +1219,19 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
         report["handoff_frozen"] = recorded["frozen"]
         _write(os.path.join(out_dir, handoff_file_name(run_date, recorded["frozen"])),
                json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n")
+        if canonical:
+            report["canonical"].update(
+                rows=int(payload["row_count"]), frozen=recorded["frozen"], aged_open=int(aged))
+            if canonical_web_brief_dir and not recorded["frozen"]:
+                # 정본 스캐폴드 = 방금 DB 로 만든 그 파일의 바이트 사본. 동결된 날의 재실행분은 내지 않는다
+                # (브랜치 사본과 같은 규칙) — 발행 워크플로는 그 날짜 스캐폴드를 가진 앞선 실행을 쓴다.
+                report["canonical"]["web_brief"] = _copy_web_brief(
+                    out_dir, canonical_web_brief_dir, run_date)
+            report["canonical"]["ok"] = True
     except Exception as e:  # noqa: BLE001 — 그림자가 수집을 죽이면 안 된다
         report["warnings"].append(f"DB handoff 생성 실패: {type(e).__name__}: {truncate(str(e), 160)}")
+        if canonical:
+            report["canonical"]["error"] = f"DB handoff 생성 실패: {type(e).__name__}: {truncate(str(e), 160)}"
 
     if payload is not None and notion_payload is not None:
         try:

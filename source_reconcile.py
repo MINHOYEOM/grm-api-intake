@@ -1012,6 +1012,83 @@ def load_collected(run_date: date, window_days: int, sources: set[str],
     return load_collected_keys(run_date, window_days, sources, token, db_id)[0]
 
 
+def load_collected_keys_supabase(base_url: str, service_key: str, sources: Iterable[str],
+                                 session: Any = None) -> tuple[set[str], set[str]]:
+    """[노션 은퇴 준비] '수집됨'을 정본(Supabase raw_signals)에서 읽는다 — 그림자 판정용.
+
+    반환은 `load_collected_keys` 와 같은 모양: (`source::document_id` 집합, `source::정규화URL` 집합).
+    Notion 조회와 달리 **수집일 창이 없다** — 그 소스의 정본 전체다. 창 밖(오래전)에 받은 문서도
+    '수집됨'으로 세므로, Notion 기준에서 놓침으로 보이던 것이 여기서는 수집됨일 수 있다(그쪽이 맞다).
+    실패하면 StoreReadError(키·예외 문구는 싣지 않는다).
+    """
+    from grm_notion import canonical_url_key
+    http = session or requests
+    headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
+    url = f"{base_url.rstrip('/')}/rest/v1/raw_signals"
+    ids: set[str] = set()
+    urls: set[str] = set()
+    for source in sources:
+        offset = 0
+        for _page in range(100):
+            params = {"select": "document_id,official_url", "source": f"eq.{source}",
+                      "order": "raw_signal_id.asc", "limit": "1000", "offset": str(offset)}
+            try:
+                resp = http.get(url, params=params, headers=headers, timeout=HTTP_TIMEOUT)
+            except requests.exceptions.RequestException as exc:
+                raise StoreReadError(f"정본(raw_signals) 조회 실패: {type(exc).__name__}") from None
+            if resp.status_code >= 400:
+                raise StoreReadError(f"정본(raw_signals) 조회 HTTP {resp.status_code}")
+            try:
+                page = resp.json()
+            except ValueError:
+                raise StoreReadError("정본(raw_signals) 응답 JSON 아님") from None
+            page = page if isinstance(page, list) else []
+            for r in page:
+                if not isinstance(r, dict) or not r.get("document_id"):
+                    continue
+                ids.add(f"{source}::{r['document_id']}")
+                key = canonical_url_key(source, str(r.get("official_url") or ""))
+                if key:
+                    urls.add(key)
+            if len(page) < 1000:
+                break
+            offset += 1000
+        else:
+            raise StoreReadError("정본(raw_signals)이 상한(100,000행)을 넘어 절단됐다")
+    return ids, urls
+
+
+def shadow_diff(notion_report: dict[str, Any], db_report: dict[str, Any],
+                db_keys: int) -> dict[str, Any]:
+    """Notion 기준 보고서와 Supabase 기준 보고서의 차이(순수 함수). 판정은 바꾸지 않는다 — 기록만.
+
+    소스마다 '놓침' 문서 집합이 같은지 본다. 다르면 어느 쪽에서만 놓침인지 document_id 를 남긴다.
+    """
+    db_by_key = {s["key"]: s for s in db_report.get("sources") or []}
+    rows: list[dict[str, Any]] = []
+    for s in notion_report.get("sources") or []:
+        d = db_by_key.get(s["key"])
+        if d is None:
+            continue
+        n_missed = {m["document_id"] for m in s.get("missed") or []}
+        d_missed = {m["document_id"] for m in d.get("missed") or []}
+        if s["verdict"] == d["verdict"] and n_missed == d_missed \
+                and s["counts"]["collected"] == d["counts"]["collected"]:
+            continue
+        rows.append({
+            "key": s["key"], "label": s["label"],
+            "verdict_notion": s["verdict"], "verdict_supabase": d["verdict"],
+            "collected_notion": s["counts"]["collected"], "collected_supabase": d["counts"]["collected"],
+            "missed_notion": len(n_missed), "missed_supabase": len(d_missed),
+            "missed_only_notion": sorted(n_missed - d_missed)[:MAX_LISTED_IN_ISSUE],
+            "missed_only_supabase": sorted(d_missed - n_missed)[:MAX_LISTED_IN_ISSUE],
+        })
+    return {"ok": True, "error": "", "collected_keys": db_keys,
+            "same": not rows, "sources_differ": len(rows), "differences": rows,
+            "missed_total_notion": notion_report["totals"]["missed"],
+            "missed_total_supabase": db_report["totals"]["missed"]}
+
+
 def load_ledger(base_url: str, service_key: str, sources: Iterable[str],
                 session: Any = None) -> dict[str, dict[str, LedgerRow]]:
     """제외 장부 읽기(소스 → document_id → 행). 실패하면 StoreReadError(키·예외 문구는 싣지 않는다)."""
@@ -1101,6 +1178,25 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines += ["", f"- 수집됨 조회 불가: {st['collected_error']}"]
     if not st["ledger_ok"]:
         lines += ["", f"- 제외 장부 조회 불가: {st['ledger_error']}"]
+    sh = report.get("shadow_supabase")
+    if sh is not None:
+        lines += ["", "## 그림자 — 정본(Supabase) 기준으로 다시 판정 (판정·이슈는 Notion 기준 그대로)"]
+        if not sh["ok"]:
+            lines += [f"- 비교 못 함: {sh['error']}"]
+        elif sh["same"]:
+            lines += [f"- 차이 없음 (정본 키 {sh['collected_keys']}건 · 놓침 {sh['missed_total_supabase']}건 동일)"]
+        else:
+            lines += [f"- 차이 나는 소스 {sh['sources_differ']}개 · 놓침 합계 Notion {sh['missed_total_notion']} / "
+                      f"정본 {sh['missed_total_supabase']}", "",
+                      "| 소스 | 판정 Notion → 정본 | 수집 Notion / 정본 | 놓침 Notion / 정본 | Notion 에서만 놓침 | 정본에서만 놓침 |",
+                      "|---|---|---:|---:|---|---|"]
+            for d in sh["differences"]:
+                lines.append(
+                    f"| {d['label']} | {d['verdict_notion']} → {d['verdict_supabase']} "
+                    f"| {d['collected_notion']} / {d['collected_supabase']} "
+                    f"| {d['missed_notion']} / {d['missed_supabase']} "
+                    f"| {_md_cell(', '.join(d['missed_only_notion']), 60)} "
+                    f"| {_md_cell(', '.join(d['missed_only_supabase']), 60)} |")
     for s in report["sources"]:
         extra: list[str] = []
         if s["error"]:
@@ -1191,9 +1287,38 @@ def run(*, run_date: date, base_days: int, enf_days: int, specs: Iterable[Source
                 ledger = load_ledger(sb_url, sb_key, names)
             except StoreReadError as exc:
                 ledger_error = str(exc)
-    return build_report(run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
-                        collected=collected, store_error=store_error, ledger=ledger,
-                        ledger_error=ledger_error, run_url=run_url, collected_urls=collected_urls)
+    report = build_report(run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
+                          collected=collected, store_error=store_error, ledger=ledger,
+                          ledger_error=ledger_error, run_url=run_url, collected_urls=collected_urls)
+    # [노션 은퇴 준비 2026-11-13] 같은 원천 목록을 **정본(Supabase raw_signals) 기준**으로 한 번 더 판정해
+    # 차이를 보고서에 남긴다(그림자). 판정·이슈는 Notion 기준 그대로다 — 위 report 를 건드리지 않는다.
+    # 기본 꺼짐(ENABLE_RECONCILE_SUPABASE_SHADOW). 실패해도 본 보고서에는 영향이 없다.
+    if use_store and _flag(env, "ENABLE_RECONCILE_SUPABASE_SHADOW", False):
+        report["shadow_supabase"] = _supabase_shadow(
+            report, run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
+            ledger=ledger, ledger_error=ledger_error, sb_url=sb_url, sb_key=sb_key, names=names)
+    return report
+
+
+def _supabase_shadow(report: dict[str, Any], *, run_date: date, specs: tuple[SourceSpec, ...],
+                     outcomes: dict[str, FetchOutcome], windows: dict[str, tuple[date, date]],
+                     ledger: "dict[str, dict[str, LedgerRow]] | None", ledger_error: str,
+                     sb_url: str, sb_key: str, names: set[str]) -> dict[str, Any]:
+    fail = {"ok": False, "same": None, "sources_differ": None, "differences": []}
+    if not report["store"]["collected_ok"] or ledger is None:
+        return dict(fail, error="Notion 기준 대조가 성립하지 않아 비교하지 않음")
+    if not sb_url.lower().startswith("https://") or not sb_key:
+        return dict(fail, error="SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정")
+    try:
+        ids, urls = load_collected_keys_supabase(sb_url, sb_key, sorted(names))
+        db_report = build_report(run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
+                                 collected=ids, store_error="", ledger=ledger,
+                                 ledger_error=ledger_error, collected_urls=urls)
+        return shadow_diff(report, db_report, len(ids))
+    except StoreReadError as exc:
+        return dict(fail, error=str(exc))
+    except Exception as exc:  # noqa: BLE001 — 그림자가 본 감시를 죽이면 안 된다
+        return dict(fail, error=f"그림자 판정 실패: {type(exc).__name__}")
 
 
 def _emit(line: str) -> None:

@@ -204,9 +204,12 @@ def _from_fda_483_observations(
 #     문구일 때만 잡문이다(실측: "Not annotated *DATES OF INSPECTION…", "Promised to correct within
 #     24 weeks.", "on the FDA 483 dated 03/07/2014 and", "response: Advanced Care Infusion will…").
 #     "AMENDMENT 1" 은 넣지 않는다 — 정상 표제 끝에 쪽 꼬리말로 붙은 실측(270자 표제)이 있다.
+# [OCR 변형 흡수 2026-11-13] 스캔본은 글자를 바꾸고(`Repolted`) 공백을 흘린다. 실측 77380:
+# "Repolted corrected not verified." 가 위 정확일치를 빠져나가 ok 로 남았다(같은 문서의
+# "Promised to correct." 는 잡혔다). 머리 고정 + 꼬리 어휘(corrected / to correct) 요구라 산문 표제는 안 걸린다.
 _FDA483_ANNOTATION_TITLE_RE = re.compile(
-    r"^\W*(?:not\s+annotated|promised\s+to\s+correct|reported\s+corrected|response\s*:"
-    r"|on\s+the\s+fda\s+483\s+dated)",
+    r"^\W*(?:not\s*annot\w*|prom\w{2,5}d\s*to\s*correct|rep\w{2,6}d\s*corrected|corrected\s+not\s+verified"
+    r"|response\s*:|on\s+the\s+fda\s+483\s+dated)",
     re.I,
 )
 # 상세가 실사일 꼬리말로 시작 — 표제가 조각일 때만 잡문으로 본다(정상 표제 + 꼬리말 상세는 실측
@@ -256,6 +259,26 @@ def _fda483_first_sentence(text: str) -> tuple[str, str]:
     return t, ""
 
 
+# [재표제화 표 가드 2026-11-13] 상세 첫 문장이 문장부호 없이 표(안정성 시험 등)를 지나면 표 찌꺼기가
+# 표제가 된다(실측 163754 40e4d18d: "Both batches were not manufactured under Month/Stability
+# Condition Initial Release % % 1 M Accelerated % …"). 표 신호가 있으면 대체하지 않고 종전대로 둔다
+# (조각 표제 그대로 -> 분류기 fragment, 숨김 쪽이 잡음 공개보다 낫다).
+_FDA483_LONE_PERCENT_RE = re.compile(r"(?:^|\s)%(?=\s|$)")
+_FDA483_TABLE_CELL_RE = re.compile(r"\b\d+\s*M\s+(?:Accelerated|Long)\b|\bMonth/Stability\b", re.I)
+
+
+def _fda483_looks_like_table(text: str) -> bool:
+    t = text or ""
+    if len(_FDA483_LONE_PERCENT_RE.findall(t)) >= 2 or _FDA483_TABLE_CELL_RE.search(t):
+        return True
+    tokens = t.split()
+    if len(tokens) >= 8:
+        numeric = sum(1 for tok in tokens if not re.search(r"[A-Za-z]{2,}", tok))
+        if numeric >= 6 and numeric / len(tokens) >= 0.3:
+            return True
+    return False
+
+
 def _fda483_title_from_detail(detail: str) -> tuple[str, str] | None:
     """상세 첫 문장을 표제로(머리의 `.`·`...`·`(REPEAT OBSERVATION)`·열거자 `A.` `a)` 를 걷고).
     표제가 30자 이상·영단어 3개 이상일 때만 (표제, 나머지 상세), 아니면 None(종전대로 둔다).
@@ -268,6 +291,8 @@ def _fda483_title_from_detail(detail: str) -> tuple[str, str] | None:
         if t == before:
             break
     title, rest = _fda483_first_sentence(t)
+    if _fda483_looks_like_table(title):
+        return None
     if len(title) < _FDA483_RETITLE_MIN_LEN or len(_FDA483_WORD_RE.findall(title)) < _FDA483_RETITLE_MIN_WORDS:
         return None
     return title, rest

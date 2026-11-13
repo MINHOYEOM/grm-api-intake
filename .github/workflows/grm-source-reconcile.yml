@@ -81,6 +81,9 @@ jobs:
           MFDS_RSS_BOARD_IDS: ${{ vars.MFDS_RSS_BOARD_IDS || '' }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # [노션 은퇴 준비] '수집됨'을 정본(Supabase raw_signals) 기준으로도 판정해 차이를 보고서에 남긴다(그림자).
+          # 판정·이슈는 Notion 기준 그대로. 기본 꺼짐.
+          ENABLE_RECONCILE_SUPABASE_SHADOW: ${{ vars.ENABLE_RECONCILE_SUPABASE_SHADOW || 'false' }}
           # 수집기가 꺼 둔 소스는 대조에서 뺀다(수집기와 같은 변수·같은 기본값).
           ENABLE_MFDS: ${{ vars.ENABLE_MFDS || 'true' }}
           ENABLE_FDA_483: ${{ vars.ENABLE_FDA_483 || 'true' }}

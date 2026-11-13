@@ -19,9 +19,9 @@
     참조로 보고 버린다 — 저장 상세는 줄바꿈이 접혀 있어 원문 줄 머리 여부를 알 수 없으므로 **나누지 않는다**
     (덜 나눈다). 그런 문서는 원문 재추출 대상으로 남긴다.
 
-바꾸는 것: 앞 관찰 상세는 표지 앞까지로 **옮겨 낸다**(지우는 글자 없음 — 표지 뒤 전문은 새 관찰 칸으로 간다).
-  같은 번호의 조각 표제 관찰('.'·'A.')이 이미 그 내용을 상세 첫머리에 갖고 있으면 새 관찰을 더하지 않는다
-  (중복만 걷는다 — 표제는 PR #1614 추출기 규칙이 상세 첫 문장으로 되살린다).
+바꾸는 것: 앞 관찰 상세는 표지 앞까지로 **옮겨 낸다**. 같은 번호의 조각 표제 관찰('.'·'A.')은
+  전문을 비교해 중복이면 유지하고, 잘린 사본이면 실질 본문만 상세 끝에 보강한다. 저장 직전 문서 전체
+  본문 손실이 남으면 그 문서는 막는다.
 바꾸지 않는 것: 표제·번호·다른 관찰·원문 전문·실사관. findings 행은 이 도구가 쓰지 않는다 —
   새 관찰 행은 추출기 재실행(finding_id = raw_signal_id + 관찰 번호 + 표제 해시)으로, 앞 관찰 행의
   detail_text·국문은 `findings_detail_export.py --mode stale` 경로로 다시 맞춘다.
@@ -37,10 +37,13 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
+from backfill_483_ocr_recovery import NAMED_TEXT_LOSS_MIN_CHARS, text_loss
+
 _OBS_KEY = "fda_483_observations"
 _TITLED_MIN_LEN = 30          # findings_extractors._FDA483_FRAGMENT_MAX_LEN 과 같은 문턱
 _WORD_RE = re.compile(r"[A-Za-z]{2,}")
 _DUP_PROBE = 40               # 조각 관찰 상세 첫머리와 새 표제를 견줄 앞 글자 수(공백 접음)
+_OBS_MARK_RE = re.compile(r"\bO\s?B\s?S\s?E\s?R\s?V\s?A\s?T\s?I\s?O\s?N\s+(\d+)\b", re.I)
 
 
 def _collector():
@@ -71,21 +74,139 @@ class SplitPlan:
     moved_chars: int                 # 앞 관찰 상세에서 옮겨 나간 글자 수
     added: list[dict[str, str]] = field(default_factory=list)       # 새로 더한 관찰
     deduped: list[dict[str, str]] = field(default_factory=list)     # 조각 관찰이 이미 가진 것(더하지 않음)
+    extended: list[dict[str, Any]] = field(default_factory=list)    # 잘린 조각 관찰에 실질 본문 보강
 
 
-def _fragment_holder(observations: list[dict[str, Any]], number: str, heading: str) -> int | None:
-    """같은 번호의 조각 표제 관찰 중 상세 첫머리(조각 머리를 걷은 뒤)가 heading 으로 시작하는 것의 위치."""
+def _fragment_text(observation: dict[str, Any]) -> str:
+    """조각 표제 관찰의 상세에서 조각 머리를 걷은 전문."""
     c = _collector()
+    head, rest, _ = c._split_past_fragment_head(str(observation.get("detail") or ""))
+    return _norm(f"{head} {rest}")
+
+
+def _fragment_holder(observations: list[dict[str, Any]], number: str, heading: str,
+                     excluded: set[int] | None = None) -> int | None:
+    """같은 번호의 조각 표제 관찰 중 상세 첫머리(조각 머리를 걷은 뒤)가 heading 으로 시작하는 것의 위치."""
     probe = _norm(heading)[:_DUP_PROBE]
     if not probe:
         return None
     for j, o in enumerate(observations):
+        if excluded and j in excluded:
+            continue
         if str(o.get("number") or "").strip() != number or _is_titled(o.get("deficiency")):
             continue
-        head, rest, _ = c._split_past_fragment_head(str(o.get("detail") or ""))
-        if _norm(f"{head} {rest}").startswith(probe):
+        if _fragment_text(o).startswith(probe):
             return j
     return None
+
+
+def _common_prefix_len(left: str, right: str) -> int:
+    limit = min(len(left), len(right))
+    i = 0
+    while i < limit and left[i] == right[i]:
+        i += 1
+    return i
+
+
+def _loss_raw(raw: dict[str, Any]) -> dict[str, Any]:
+    """[11-13] OCR 띄어쓰기 표지는 본문이 아니라 평문 표지와 같은 양식 낱말로 센다."""
+    out = dict(raw)
+    observations: list[Any] = []
+    for observation in raw.get(_OBS_KEY) or []:
+        if not isinstance(observation, dict):
+            observations.append(observation)
+            continue
+        item = dict(observation)
+        for key in ("deficiency", "detail"):
+            if key in item:
+                item[key] = _OBS_MARK_RE.sub(lambda m: f"OBSERVATION {m.group(1)}", str(item[key] or ""))
+        observations.append(item)
+    out[_OBS_KEY] = observations
+    return out
+
+
+def _substantial_gap(gap: str, observations: list[dict[str, Any]]) -> bool:
+    """[11-13] 다른 관찰에 없는 세 낱말 이상 실질 본문인가."""
+    loss = text_loss({_OBS_KEY: [{"detail": gap}]}, {_OBS_KEY: observations})
+    return loss["lost_chars"] > 0
+
+
+def _append_gap(holder: dict[str, Any], holder_text: str, gap: str, *, full_prefix: bool) -> int:
+    """[11-13] 잘린 단어는 붙이고, 나머지 실질 틈은 공백 하나로 잇는다."""
+    addition = gap.strip()
+    if not addition:
+        return 0
+    raw_detail = str(holder.get("detail") or "").rstrip()
+    joiner = " "
+    if full_prefix and gap[0].isalnum() and holder_text[-1:].isalnum():
+        joiner = ""
+    holder["detail"] = raw_detail + joiner + addition
+    return len(joiner + addition)
+
+
+def _record_extension(plan: SplitPlan, holder: dict[str, Any], holder_index: int,
+                      appended_chars: int) -> None:
+    number = str(holder.get("number") or "")
+    for item in plan.extended:
+        if item["number"] == number and item["holder_index"] == holder_index:
+            item["appended_chars"] += appended_chars
+            return
+    plan.extended.append({"number": number, "holder_index": holder_index,
+                          "appended_chars": appended_chars})
+
+
+def _extend_or_dedupe(plan: SplitPlan, item: dict[str, Any], holder: dict[str, Any],
+                      holder_index: int, observations: list[dict[str, Any]],
+                      host_indexes: set[int], coverage: list[dict[str, Any]]) -> tuple[bool, int]:
+    """[11-13] 전체 사본과 조각 사슬의 실질 틈을 보강하고 마지막 원 배열 위치를 돌려준다."""
+    moved = _norm(f"{item.get('deficiency')} {item.get('detail')}")
+    holder_text = (_fragment_text(holder) if holder_index >= 0
+                   else _norm(f"{holder.get('deficiency')} {holder.get('detail')}"))
+    common = _common_prefix_len(holder_text, moved)
+    copies: list[dict[str, Any]] = [{
+        "holder": holder, "holder_index": holder_index, "text": holder_text,
+        "start": 0, "end": common,
+    }]
+    used = {holder_index} if holder_index >= 0 else set()
+    cursor = common
+    while cursor < len(moved):
+        best: tuple[int, int, str] | None = None
+        for j, candidate in enumerate(observations):
+            if j in host_indexes or j in used or _is_titled(candidate.get("deficiency")):
+                continue
+            candidate_text = _fragment_text(candidate)
+            probe = candidate_text[:_DUP_PROBE]
+            if not probe:
+                continue
+            pos = moved.find(probe, cursor)
+            if pos < 0:
+                continue
+            if best is None or (pos, j) < (best[0], best[1]):
+                best = (pos, j, candidate_text)
+        if best is None:
+            break
+        pos, j, candidate_text = best
+        common = _common_prefix_len(candidate_text, moved[pos:])
+        copies.append({
+            "holder": observations[j], "holder_index": j, "text": candidate_text,
+            "start": pos, "end": pos + common,
+        })
+        used.add(j)
+        cursor = pos + common
+
+    extended = False
+    for i, copy in enumerate(copies):
+        next_start = copies[i + 1]["start"] if i + 1 < len(copies) else len(moved)
+        gap = moved[copy["end"]:next_start]
+        if not _substantial_gap(gap, coverage):
+            continue
+        appended = _append_gap(copy["holder"], copy["text"], gap,
+                               full_prefix=(copy["end"] - copy["start"] == len(copy["text"])))
+        if appended:
+            _record_extension(plan, copy["holder"], copy["holder_index"], appended)
+            extended = True
+    indexes = [copy["holder_index"] for copy in copies if copy["holder_index"] >= 0]
+    return extended, max(indexes, default=holder_index)
 
 
 def plan_host_split(observations: list[dict[str, Any]], index: int,
@@ -95,12 +216,12 @@ def plan_host_split(observations: list[dict[str, Any]], index: int,
     host = observations[index]
     host_num = _num(host.get("number"))
     detail = str(host.get("detail") or "")
-    if host_num is None or not c._OBS_RE.search(detail):
+    if host_num is None or not _OBS_MARK_RE.search(detail):
         return None, []
     titled = {str(o.get("number") or "").strip() for o in observations if _is_titled(o.get("deficiency"))}
     header = f"OBSERVATION {host_num}\n{_norm(host.get('deficiency'))}\n"
     synth = header + detail
-    selected = c._select_observation_anchors(synth, list(c._OBS_RE.finditer(synth)))
+    selected = c._select_observation_anchors(synth, list(_OBS_MARK_RE.finditer(synth)))
     cands = [m for m in selected
              if m.start() >= len(header) and int(m.group(1)) > host_num and m.group(1) not in titled]
     if not cands:
@@ -122,27 +243,51 @@ def split_swallowed(observations: list[dict[str, Any]], hints: dict[str, str] | 
     """저장된 관찰 배열 → (나눈 새 배열, 계획 목록). 바뀔 것이 없으면 원 배열 그대로(순수 함수)."""
     obs = [dict(o) for o in observations if isinstance(o, dict)]
     plans: list[SplitPlan] = []
-    inserts: dict[int, list[dict[str, Any]]] = {}
-    seen: set[tuple[str, str]] = set()   # 같은 관찰을 두 상세가 삼킨 문서(쪽 중복 실림) — 한 번만 더한다
+    staged: list[tuple[SplitPlan, list[dict[str, str]]]] = []
     for i in range(len(obs)):
         plan, rows = plan_host_split(obs, i, hints)
         if plan is None:
             continue
-        for r in rows:
-            item = {"number": r["number"], "deficiency": r["deficiency"], "detail": r["detail"]}
-            key = (r["number"], _norm(r["deficiency"])[:_DUP_PROBE])
-            if key in seen or _fragment_holder(obs, r["number"], r["deficiency"]) is not None:
-                plan.deduped.append({"number": r["number"], "deficiency": r["deficiency"]})
-            else:
-                plan.added.append(item)
-                seen.add(key)
         plans.append(plan)
+        staged.append((plan, rows))
     if not plans:
         return list(observations), []
+
+    # [11-13] 옮긴 글이 host 에 남은 채면 text_loss 가 덮인 본문으로 오판한다 — 전부 먼저 자른다.
     for p in plans:
         host = obs[p.host_index]
         host["detail"] = str(host.get("detail") or "")[:p.cut_at].rstrip()
-        inserts[p.host_index] = p.added
+    coverage = [dict(o) for o in obs]
+    host_indexes = {p.host_index for p in plans}
+    added_holders: dict[tuple[str, str], tuple[dict[str, Any], int]] = {}
+    inserts: dict[int, list[dict[str, Any]]] = {}
+    for plan, rows in staged:
+        insert_after = plan.host_index
+        for r in rows:
+            item: dict[str, Any] = {
+                "number": r["number"], "deficiency": r["deficiency"], "detail": r["detail"],
+            }
+            key = (r["number"], _norm(r["deficiency"])[:_DUP_PROBE])
+            added_holder = added_holders.get(key)
+            holder = added_holder[0] if added_holder else None
+            holder_index = -1
+            if added_holder:
+                insert_after = added_holder[1]
+            if holder is None:
+                holder_index = _fragment_holder(obs, r["number"], r["deficiency"], host_indexes)
+                holder = obs[holder_index] if holder_index is not None else None
+            if holder is None:
+                plan.added.append(item)
+                inserts.setdefault(insert_after, []).append(item)
+                added_holders[key] = (item, insert_after)
+                continue
+            extended, last_holder_index = _extend_or_dedupe(
+                plan, item, holder, holder_index, obs, host_indexes, coverage,
+            )
+            if last_holder_index >= 0:
+                insert_after = max(insert_after, last_holder_index)
+            if not extended:
+                plan.deduped.append({"number": r["number"], "deficiency": r["deficiency"]})
     out: list[dict[str, Any]] = []
     for i, o in enumerate(obs):
         out.append(o)
@@ -161,9 +306,11 @@ class ObsSplitReport:
     observations_added: int = 0
     observations_deduped: int = 0
     moved_chars: int = 0
+    docs_blocked: int = 0
     patched: int = 0
     failed: int = 0
     errors: list[str] = field(default_factory=list)
+    blocked_text_loss: list[dict[str, Any]] = field(default_factory=list)
     docs: list[dict[str, Any]] = field(default_factory=list)
 
 
@@ -197,14 +344,27 @@ def run(rows: list[dict[str, Any]], *, dry_run: bool = True, doc_ids: set[str] |
             continue
         if not plans:
             continue
+        loss = text_loss(_loss_raw(raw), _loss_raw({**raw, _OBS_KEY: new}))
+        holder_cut = any(p.deduped or p.extended for p in plans)
+        reason = ("threshold" if loss["lost_chars"] >= NAMED_TEXT_LOSS_MIN_CHARS
+                  else "holder_cut" if holder_cut and loss["lost_chars"] > 0 else "")
+        doc_report = {"document_id": doc, "raw_signal_id": rid,
+                      "observations_before": len(old), "observations_after": len(new),
+                      "plans": [asdict(p) for p in plans], "text_loss": loss["lost_chars"]}
+        if reason:
+            report.docs_blocked += 1
+            report.blocked_text_loss.append({
+                "document_id": doc, "raw_signal_id": rid, "lost_chars": loss["lost_chars"],
+                "runs": loss["runs"], "sample": loss["sample"], "reason": reason,
+            })
+            report.docs.append({**doc_report, "blocked_text_loss": True})
+            continue
         report.docs_changed += 1
         report.hosts_cut += len(plans)
         report.observations_added += sum(len(p.added) for p in plans)
         report.observations_deduped += sum(len(p.deduped) for p in plans)
         report.moved_chars += sum(p.moved_chars for p in plans)
-        report.docs.append({"document_id": doc, "raw_signal_id": rid,
-                            "observations_before": len(old), "observations_after": len(new),
-                            "plans": [asdict(p) for p in plans]})
+        report.docs.append(doc_report)
         if dry_run or patch_fn is None:
             continue
         try:

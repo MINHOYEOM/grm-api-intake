@@ -1,0 +1,573 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-13",
+ "shard": "A",
+ "cards": {
+  "fda483-195377": {
+   "title_issue": "시정 및 예방조치 절차 미흡",
+   "hook_line": "세척 밸리데이션 표본 수를 9개로 바꾼 근거 문서화 미흡",
+   "summary": "FDA가 몰타의 의료기기 제조소에 Form 483(관찰사항 4건)을 발행했다. 시정 및 예방조치(CAPA) 절차, 밸리데이션 표본 수 설정 절차, 조직 구조, 공정 밸리데이션 문서화를 지적했다.",
+   "key_facts": [
+    "관찰 1: CAPA 기록 3건에서 효과성 확인 계획(중간 점검 없음)·조사·시정조치 범위가 미흡함",
+    "관찰 2: 밸리데이션 표본 수를 외부 표준이 내부 기준을 대신할 수 있는 경우에 대한 절차 지침이 없음",
+    "관찰 3: 약 2024년 12월~2025년 9월 핵심 인력 이탈로 CAPA·변경요청·부적합 처리가 지연·일부 중단됨",
+    "관찰 4: 밸리데이션 프로토콜의 목적이 해당 결과 보고서의 결론과 맞지 않음"
+   ],
+   "implication": "CAPA 00002 조사에는 생산에 실제 쓴 텀블러 장비와 회전수 등 공정 변수가 밸리데이션 값과 같다는 기록이 없었다. 같은 CAPA의 범위는 하청업체 1곳과 해당 제조번호 1건으로 한정돼 다른 제조기록서의 장비 식별 누락 여부를 확인하지 않았다. 수동 세척 밸리데이션은 표본 수를 6개로 정했다가 9개로 바꿨으나 두 표본 수의 선정 근거가 보고서에 충분히 기록되지 않았다.",
+   "checks": [
+    "CAPA 효과성 확인 계획에 최종 확인 전 중간 점검 시점이 정해져 있는가? (관찰 1)",
+    "밸리데이션 표본 수를 외부 표준에 따를 때 내부 기준과의 차이를 설명하는 근거를 보고서에 남기는가? (관찰 2)",
+    "밸리데이션 프로토콜의 목적과 결과 보고서의 결론을 승인 전에 대조하는가? (관찰 4)"
+   ],
+   "en": {
+    "title_issue": "Inadequate CAPA procedures",
+    "hook_line": "Rationale for changing validation sample size from six to 9 not adequately documented",
+    "summary": "FDA issued a Form 483 with four observations to a medical device manufacturer in Malta, covering CAPA procedures, validation sampling procedures, organizational structure and process validation documentation.",
+    "key_facts": [
+     "Observation 1: three CAPA records had inadequate corrective actions, investigation, scope or effectiveness check plans (no interim checks)",
+     "Observation 2: procedures for validation sample sizes lack guidance on when an external standard can override internal criteria",
+     "Observation 3: between approximately December 2024 and September 2025, departure of key staff delayed and partly interrupted CAPAs, change requests and nonconformances",
+     "Observation 4: the stated purpose of a validation protocol was not congruent with the conclusions of its output report"
+    ],
+    "implication": "The CAPA 00002 investigation had no record that the tumbler used in production and its speed and rpm matched the values in the original validation reports. The scope of that CAPA was limited to a single subcontractor and one batch, without checking other batch records for the same missing equipment identification. The manual cleaning validation changed its sample size from six to 9 without adequately documenting the rationale for either size.",
+    "checks": [
+     "Do CAPA effectiveness check plans define interim checks before the final check? (Observation 1)",
+     "When an external standard sets a validation sample size, does the report explain the deviation from internal criteria? (Observation 2)",
+     "Is the protocol's stated purpose compared with the report's conclusions before approval? (Observation 4)"
+    ]
+   }
+  },
+  "fda483-196245": {
+   "title_issue": "임상시험 모니터링 감독 미흡",
+   "hook_line": "임상 데이터 질의가 9-13개월 동안 해결되지 않음",
+   "summary": "FDA가 임상시험 의뢰자에게 Form 483(관찰사항 1건)을 발행했다. 의뢰자가 모니터링을 맡은 수탁기관을 적절히 감독·모니터링하지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 2022년 4월~10월 시험별 모니터링 계획이 없어 약 6개월의 공백이 생김",
+    "관찰 1: 전자자료수집 시스템의 데이터 질의가 9-13개월 동안 해결되지 않음(계획상 기한은 약 3영업일)",
+    "관찰 1: 기관 10-101의 중간 모니터링 보고서 6건, 기관 10-108의 2건에 서명이 없음",
+    "관찰 1: 기관 42-107의 기관 적격성 평가 문서를 시험 마스터 파일에서 찾지 못함"
+   ],
+   "implication": "2022년 4월 모니터링 책임이 지역별 수탁기관으로 넘어갔고, 이 기관들은 2022년 10월에 만든 모니터링 계획을 따랐다. FSH 미채취(프로토콜 일탈)를 확인하는 질의는 2022년 6월·9월에 열려 2023년 7월에야 해결됐다. 가임력 분류 오류에 관한 질의는 2022년 12월에 열려 2023년 9월에 해결됐다. 모니터링 계획은 방문 보고서를 방문 후 15영업일 안에 승인·서명하도록 정하고 있었다.",
+   "checks": [
+    "모니터링 책임을 다른 수탁기관으로 넘길 때 새 모니터링 계획이 이관 시점부터 적용되는가? (관찰 1)",
+    "미해결 데이터 질의의 경과일을 모니터링 계획의 해결 기한과 대조해 추적하는가? (관찰 1)",
+    "방문 모니터링 보고서의 서명 기한 초과 건을 목록으로 관리하는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Inadequate clinical study monitoring oversight",
+    "hook_line": "EDC data queries left unresolved for 9-13 months",
+    "summary": "FDA issued a Form 483 with one observation to a clinical study sponsor for failing to adequately oversee and monitor the CROs responsible for monitoring.",
+    "key_facts": [
+     "Observation 1: no study-specific monitoring plan between April 2022 and October 2022, an approximate 6 month gap",
+     "Observation 1: data queries in the EDC were not resolved for 9-13 months, against a timeline of approximately 3 business days",
+     "Observation 1: six IMV reports at site 10-101 and two at site 10-108 were not signed",
+     "Observation 1: site qualification documentation for site 42-107 could not be located in the TMF"
+    ],
+    "implication": "In April 2022 monitoring responsibilities were transferred to regional CROs, which followed a monitoring plan developed in October 2022. Queries confirming FSH was not collected per protocol, an acknowledged protocol deviation, were opened in June 2022 and September 2022 and not resolved until July 2023. A query on incorrect childbearing potential classification was opened in December 2022 and not resolved until September 2023. The monitoring plan required site visit reports to be approved and signed no later than 15 weekdays from the visit.",
+    "checks": [
+     "When monitoring moves to another CRO, does a new monitoring plan apply from the transfer date? (Observation 1)",
+     "Do you track open data queries against the resolution timeline in the monitoring plan? (Observation 1)",
+     "Are monitoring visit reports past their sign-off deadline listed and followed up? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196251": {
+   "title_issue": "프로토콜 일탈 모니터링 미흡",
+   "hook_line": "선정기준을 충족하지 못한 대상자를 최대 2년 뒤에야 발견함",
+   "summary": "FDA가 임상시험 의뢰자에게 Form 483(관찰사항 1건)을 발행했다. 시험자에게 프로토콜 일탈 보고 방법을 알리지 않았고 모니터가 프로토콜 준수를 제대로 검토하지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 선정기준을 충족하지 못한 대상자가 등록·투약됐고 모니터링은 이 일탈을 최대 2년 뒤에 발견함",
+    "관찰 1: 인터페론 안정 용량 조건 미충족 일탈 2건은 모니터가 찾지 못하고 최대 2년 뒤 데이터 목록 검토에서 확인됨",
+    "관찰 1: 모니터링 계획 2판(2019-12-11)에 첫 대상자 투약 후 첫 모니터링 방문 시점이 정해져 있지 않음",
+    "관찰 1: 다른 시험에서는 첫 방문을 2주(필요 시 3주) 안에 하도록 정했으나 일탈·이상사례를 최대 3개월 동안 검토하지 않음"
+   ],
+   "implication": "골수 생검을 하지 않은 일탈은 2023-02-17에 발생해 2024-12-18에 모니터가 확인했다. 채혈 시점 일탈은 2023-02-08에 발생해 2025-02-11에 확인됐다. 첫 모니터링 방문 전에 여러 기관에서 프로토콜 일탈과 이상사례가 발생했다.",
+   "checks": [
+    "시험자에게 프로토콜 일탈을 시작하고 보고하는 방법을 문서로 전달했는가? (관찰 1)",
+    "모니터링 계획에 첫 대상자 투약 후 첫 모니터링 방문 기한이 정해져 있는가? (관찰 1)",
+    "선정기준 충족 여부를 모니터가 투약 전후 어느 시점에 원자료와 대조하는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Inadequate monitoring of protocol deviations",
+    "hook_line": "Subjects not meeting inclusion criteria detected by monitoring up to 2 years later",
+    "summary": "FDA issued a Form 483 with one observation to a clinical study sponsor: investigators did not receive information on how to report protocol deviations, and monitors did not ensure proper review of protocol compliance.",
+    "key_facts": [
+     "Observation 1: subjects were enrolled and treated despite not meeting inclusion criteria, and monitoring did not detect this until up to 2 years later",
+     "Observation 1: two deviations on stable interferon dosing were not detected by monitors and were found in a data listing review up to two years later",
+     "Observation 1: Monitoring Plan Version 2 (December 11, 2019) set no timeframe for the first monitoring visit after the initial subject was treated",
+     "Observation 1: in another study, deviations and adverse events were not reviewed by monitors for up to three months"
+    ],
+    "implication": "A deviation for no bone marrow biopsy occurred on 17-Feb-2023 and was identified by the monitor on 18-Dec-2024. A phlebotomy timeframe deviation occurred on 8-Feb-2023 and was identified on 11-Feb-2025. Protocol deviations and adverse events occurred at several sites before the first monitoring visit.",
+    "checks": [
+     "Have investigators received written instructions on how to initiate and report protocol deviations? (Observation 1)",
+     "Does the monitoring plan set a deadline for the first visit after the initial subject is treated? (Observation 1)",
+     "At what point do monitors verify inclusion criteria against source documents? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196252": {
+   "title_issue": "시료 보관 기록·시설 관리 미흡",
+   "hook_line": "보관 소프트웨어엔 습윤 조직 63봉, 실물 확인은 62봉",
+   "summary": "FDA가 중국의 비임상시험기관에 Form 483(관찰사항 2건)을 발행했다. 시험기관 운영자가 직원의 업무 이해를 보증하지 않은 점과 시설 규모·구조가 적합하지 않은 점을 지적했다.",
+   "key_facts": [
+    "관찰 1: 보관 관리 소프트웨어에는 습윤 조직 63봉이 기록됐으나 실물은 62봉이었고, 블록 34트레이의 임시 보관 위치가 시스템에 반영되지 않음",
+    "관찰 1: 뇌 절편 슬라이드 2장의 블록 코드가 서로 바뀌어 표시되고, 이동상에 유효기한 표시가 없음",
+    "관찰 1: 습도계 보정값을 2026-04-02부터 2026-05-12까지 온습도 기록에 적용하지 않음",
+    "관찰 2: 동물실 바닥이 배수구 쪽으로 기울지 않아 액체가 고였고, 출입문 잠금장치가 고정되지 않아 원숭이가 문을 밀어 엶"
+   ],
+   "implication": "보관 절차서는 시험번호·보관일·시료 종류·보관 위치·수량을 데이터베이스에 기록하도록 정하고 있었다. 블록 34트레이는 시료 보관실 공간이 부족해 문서 보관실에 임시로 두었다. 동물 건물 복도 근처의 PVC 바닥 표면에 기포와 균열이 있었다.",
+   "checks": [
+    "시료 보관 데이터베이스의 수량과 실물 수량을 정기적으로 대조하는가? (관찰 1)",
+    "임시 보관 위치로 옮긴 시료도 보관 시스템 위치 정보가 같은 날 갱신되는가? (관찰 1)",
+    "외부 보정한 습도계의 보정값이 기록 양식에 반영되는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Specimen archive records and facility upkeep",
+    "hook_line": "Archive software listed 63 wet tissue bags, but 62 were physically verified",
+    "summary": "FDA issued a Form 483 with two observations to a nonclinical laboratory in China, citing failure by testing facility management to assure personnel understood their functions and a facility not of suitable size and construction.",
+    "key_facts": [
+     "Observation 1: archive software listed 63 wet tissue bags while 62 were found, and the temporary location of thirty-four trays of blocks was not updated in the system",
+     "Observation 1: two brain section slides were labeled with each other's block codes, and a mobile phase was not labeled with an expiration date",
+     "Observation 1: hygrometer corrected values were not applied to temperature and humidity records from April 2, 2026, through May 12, 2026",
+     "Observation 2: an animal room floor did not slope toward the drain and had pooling liquid, and a door lock would not stay in place so non-human primates pushed it open"
+    ],
+    "implication": "The archive SOP required study number, archive date, specimen type, storage location and amount to be documented in the database. The trays of blocks were temporarily stored in the document archives due to space limitations in the specimen archives. Bubbling and cracking were observed in the surface of the PVC floor near an animal room corridor.",
+    "checks": [
+     "Are specimen counts in the archive database reconciled with physical counts? (Observation 1)",
+     "Is the archive system location updated when specimens move to temporary storage? (Observation 1)",
+     "Are corrected values for externally calibrated hygrometers applied in the records? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196253": {
+   "title_issue": "생체시료 기록·백업 관리 미흡",
+   "hook_line": "백업이 실패했는데도 백업 확인 일지에는 검증된 것으로 기록",
+   "summary": "FDA가 인도의 임상시험수탁기관에 Form 483(관찰사항 5건)을 발행했다. 절차서 미준수, 시험 활동을 재구성할 수 없는 원자료, 일관되지 않은 기록 관행, 수정 이력 미기록, 전산 백업 절차 미준수를 지적했다.",
+   "key_facts": [
+    "관찰 1: 품질보증이 분석 런을 최종 기각하기 전에 시료를 재분석했고, 사용기한 1년을 넘긴 혈장 로트를 폐기하지 않음",
+    "관찰 2: 혈장 로트의 현재 보관 위치를 찾지 못했고, 시료 폐기일·수량·로트 번호가 기록마다 다름",
+    "관찰 4: 원자료 양식을 수정하면서 수정한 날짜와 수정자를 기록하지 않음",
+    "관찰 5: 장비 API2000-01의 백업이 2025-04-30~2025-07-14에 여러 차례 실패했으나 백업 확인 일지에는 검증된 것으로 기록됨"
+   ],
+   "implication": "분석 런 251024는 2024년 10월 29일 품질보증이 기각으로 확정했으나 해당 대상자 시료는 그 전날인 2024년 10월 28일에 재분석됐다. 혈장 로트가 보관됐다고 기록된 냉동고 INS/ANA/505는 더 이상 시설에 없었다. 체외 시험 시료 폐기 기록은 2380건을, 냉동고 일지는 2378건을 폐기한 것으로 적었다. 2022·2023·2024년 시료 폐기 기록 일부가 해당 연도 보관 바인더가 아닌 2025년 바인더에 있었다. 시료 정보 입력과 이송 기록 업로드가 시험마다 일관되지 않았다(관찰 3).",
+   "checks": [
+    "분석 런의 품질보증 최종 판정 전에 재분석을 막는 절차가 있는가? (관찰 1)",
+    "생체시료 폐기 수량을 폐기 기록서와 냉동고 일지 양쪽에서 대조하는가? (관찰 2)",
+    "전산 백업 실패 기록을 확인한 뒤에 백업 검증 일지에 서명하는가? (관찰 5)"
+   ],
+   "en": {
+    "title_issue": "Biosample records and backups",
+    "hook_line": "Backups failed, yet the backup verification logbook recorded them as verified",
+    "summary": "FDA issued a Form 483 with five observations to a contract research organization in India, citing SOPs not followed, source documents inadequate to reconstruct study activities, inconsistent practices, undocumented raw data corrections and failure to follow the backup SOP.",
+    "key_facts": [
+     "Observation 1: samples were reanalyzed before QA finalized the analytical run as rejected, and pooled plasma lots past the one-year expiration were not discarded",
+     "Observation 2: staff could not locate the storage location of a plasma lot, and disposal dates, sample counts and lot numbers differed between records",
+     "Observation 4: corrections were made to raw data forms without documenting when and who made the change",
+     "Observation 5: backups for instrument API2000-01 failed several times between April 30 and July 14, 2025, yet were indicated as verified in the backup logbook"
+    ],
+    "implication": "Run 251024 was finalized as rejected by QA on 29/Oct/2024, but samples from the subject were reanalyzed on 28/Oct/2024. The freezer INS/ANA/505 where a plasma lot was recorded as stored is no longer present at the facility. An in vitro sample disposal record documented 2380 samples discarded, while the freezer logbook documented 2378. Sample discard records from 2022, 2023 and 2024 were found in a binder with records for 2025. Entry of sample information and upload of transfer records were not consistent across studies (Observation 3).",
+    "checks": [
+     "Is reanalysis blocked until QA has finalized the status of an analytical run? (Observation 1)",
+     "Are biosample disposal counts reconciled between disposal records and freezer logbooks? (Observation 2)",
+     "Is the backup verification logbook signed only after checking for backup failures? (Observation 5)"
+    ]
+   }
+  },
+  "fda483-196254": {
+   "title_issue": "이전 지적 시정조치 관리 미흡",
+   "hook_line": "2019년 실사 지적의 시정조치를 일탈 처리 절차로 관리하지 않음",
+   "summary": "FDA가 미국의 위탁시험기관에 Form 483(관찰사항 2건)을 발행했다. 품질관리부서의 책임과 절차가 문서화·이행되지 않은 점과 시험 기록에 2차 검토자 서명이 없는 점을 지적했다.",
+   "key_facts": [
+    "관찰 1: 2019년 2월 실사의 Form 483 관찰 4건과 구두 지적 2건에 대한 시정조치를 절차서 SOP-1005로 관리하지 않음",
+    "관찰 1: 원제약 시험에 쓴 HPLC 컬럼 공급업체를 적격성 평가하지 않았고, 공급업체 감사 주기를 위험 수준에 따라 정하지 않음",
+    "관찰 1: 기준일탈(OOS) 2단계 조사 중 재시험을 기준일탈 절차서가 다루지 않으며, 시스템 적합성에 실패한 시험법이 4회 재시험됨",
+    "관찰 2: GMP 의약품 시험 원자료 보고 부분에 2차 확인자 검토 서명이 없음"
+   ],
+   "implication": "HPLC 안정성 분석 소프트웨어 미밸리데이션에 대해 2019-05-13 CAPA 006을 열었으나 FDA는 이를 미흡하다고 판단했다. 안정성 챔버와 USP 표준품 보관 냉장고는 밸리데이션·온도 매핑이 되지 않았고 일탈이나 CAPA도 열리지 않았다. 기준일탈 조사 절차와 불만 처리 절차가 없다는 이전 지적에도 CAPA를 열지 않았다. 그 결과 근본원인과 시정조치의 효과성을 판단할 수 없었다.",
+   "checks": [
+    "규제 실사 지적사항마다 시정 및 예방조치(CAPA)를 열어 효과성을 확인하는가? (관찰 1)",
+    "시험에 쓰는 HPLC 컬럼 공급업체가 공급업체 승인 목록에 있는가? (관찰 1)",
+    "시험 원자료 보고 양식에 2차 확인자 서명란이 있는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "Prior inspection CAPAs not governed",
+    "hook_line": "Corrective actions for 2019 inspection observations not governed under the CAPA SOP",
+    "summary": "FDA issued a Form 483 with two observations to a contract testing laboratory in the United States, citing quality control unit procedures not in writing or followed, and laboratory records lacking second-person review.",
+    "key_facts": [
+     "Observation 1: corrective actions for the four FDA Form 483 observations and two verbal observations from the February 2019 inspection were not governed under SOP-1005",
+     "Observation 1: suppliers of HPLC columns used for GMP drug product testing were not qualified, and supplier audit frequency was not defined by risk level",
+     "Observation 1: the OOS SOP fails to govern retesting in Phase 2 investigations, and a method that failed system suitability was retested four times",
+     "Observation 2: raw data reporting sections of executed GMP test methods lacked a second verifier"
+    ],
+    "implication": "CAPA 006 was initiated on 13 May 2019 for unvalidated HPLC stability analysis software, but FDA found it inadequate. A stability chamber and a refrigerator storing USP references were not validated or mapped, and no deviation or CAPA was initiated. No CAPA was initiated for the prior observations on the missing OOS investigation and complaint handling procedures. As a result, adequate root causes and effectiveness of corrective actions could not be determined.",
+    "checks": [
+     "Is a CAPA opened and checked for effectiveness for each regulatory inspection observation? (Observation 1)",
+     "Are suppliers of HPLC columns used in testing on the approved supplier list? (Observation 1)",
+     "Do raw data reporting forms include a second verifier signature? (Observation 2)"
+    ]
+   }
+  },
+  "fda483-196255": {
+   "title_issue": "원료 전 용기 확인시험 미실시",
+   "hook_line": "세척 완료 표시된 혼합 탱크 안에 흰 가루와 분홍빛 잔류물",
+   "summary": "FDA가 미국의 일반의약품 위탁제조소에 Form 483(관찰사항 5건)을 발행했다. 원료 시험, 안정성 시험, 보관 검체 점검, 세척 기록, 설비 세척을 지적했다.",
+   "key_facts": [
+    "관찰 1: 원료를 여러 드럼으로 받고 일부 드럼만 확인시험해 시험하지 않은 원료로 일반의약품을 제조함",
+    "관찰 2: 공정 밸리데이션 때의 초기 시험 뒤 계속 안정성 시험을 하지 않음(2016년 첫 제조 품목 포함)",
+    "관찰 3: 보관 검체를 첫해만 육안검사하고 유효기간 안의 다음 해에는 점검하지 않음",
+    "관찰 4: 비전용 설비의 세척 기록에 어떤 세척 방법을 썼는지 남기지 않음(반복 지적)"
+   ],
+   "implication": "고위험 원료를 받은 용기마다 확인시험과 불순물 시험을 하기 위한 검체 채취 절차서가 없었다. 2026-04-08 현장 확인 때 세척 완료·소독 대기 표시가 붙은 혼합 탱크 내부에서 정체불명의 흰 가루와 큰 분홍빛 잔류물 덩어리가 발견됐다(관찰 5). 관찰 4의 세척 기록 미유지는 이전 실사에서도 지적된 반복 관찰이다.",
+   "checks": [
+    "고위험 원료를 받으면 용기마다 확인시험을 하는가? (관찰 1)",
+    "공정 밸리데이션 이후 매년 제조 배치를 계속 안정성 시험에 넣는가? (관찰 2)",
+    "세척 완료 표시를 붙이기 전에 설비 내부를 육안검사한 기록이 있는가? (관찰 5)"
+   ],
+   "en": {
+    "title_issue": "Component drums not each tested",
+    "hook_line": "White powder and pinkish residue found inside a mixing tank labeled as cleaned",
+    "summary": "FDA issued a Form 483 with five observations to an OTC drug contract manufacturer in the United States, covering component testing, stability testing, reserve sample examination, cleaning records and equipment cleaning.",
+    "key_facts": [
+     "Observation 1: multiple drums of a component were received but only some were tested for identity, and untested material was used in OTC drug manufacturing",
+     "Observation 2: no ongoing stability studies beyond the initial studies during process validation, including products first manufactured in 2016",
+     "Observation 3: reserve samples were visually examined only in the first year and not in subsequent years within expiry",
+     "Observation 4: cleaning records for non-dedicated equipment did not identify the cleaning method used (repeat observation)"
+    ],
+    "implication": "The firm had no written procedure describing sampling of high-risk components for identity and impurity testing of each container received. During the walk-through on April 8, 2026, mixing tanks labeled as cleaned and waiting for sanitization had unidentified white powder and large pinkish clumps of residue inside (Observation 5). The failure to keep cleaning records in Observation 4 is a repeat observation.",
+    "checks": [
+     "Is each container of a high-risk component tested for identity on receipt? (Observation 1)",
+     "Are batches placed on ongoing stability every year after process validation? (Observation 2)",
+     "Is there a record of visual inspection of equipment interiors before a cleaned label is applied? (Observation 5)"
+    ]
+   }
+  },
+  "fda483-196257": {
+   "title_issue": "원료·완제품 적합성 시험 미실시",
+   "hook_line": "품질보증 책임자가 입고 원료와 완제품 모두 해당 시험을 안 한다고 진술",
+   "summary": "FDA가 스위스의 동종요법 의약품 제조소에 Form 483(관찰사항 3건)을 발행했다. 원료 적합성 시험, 공정 밸리데이션, 충전기 관리를 지적했다.",
+   "key_facts": [
+    "관찰 1: 동종요법 제제에 쓰는 원료를 원료 단계와 완제품 단계에서 사용 적합성 시험을 하지 않음",
+    "관찰 2: 공정 밸리데이션 배치 크기가 상업 배치 크기를 대표하지 않고 상한 배치 크기를 다루지 않음",
+    "관찰 3: 충전기의 충전 속도를 작업자가 바꿀 수 있으나 장비가 배치 데이터를 남기지 않고 실제 속도도 제조기록서에 기록하지 않음"
+   ],
+   "implication": "품질보증 책임자는 2026-04-23 해당 원료가 입고 때 시험되지 않으며 완제품도 시험하지 않는다고 확인했다. 공정 밸리데이션 보고서 QUAL VAL 124124는 2023-06-27에 효력이 생겼다. 충전 속도가 바뀌어도 알아챌 수 없는 상태였고 다른 충전기에서도 같은 문제가 있었다. 충전 중 충전량 확인은 통계적 근거가 있는 검체 채취 계획을 갖추지 않았다.",
+   "checks": [
+    "입고 원료마다 사용 적합성을 확인하는 시험 항목이 규격에 들어 있는가? (관찰 1)",
+    "공정 밸리데이션 배치가 제조기록서가 허용하는 최대 배치 크기를 포함하는가? (관찰 2)",
+    "충전 속도를 바꾸면 그 값이 제조기록서나 장비 데이터로 남는가? (관찰 3)"
+   ],
+   "en": {
+    "title_issue": "Components and products not tested",
+    "hook_line": "QA Manager stated the test is not done on incoming materials or finished products",
+    "summary": "FDA issued a Form 483 with three observations to a homeopathic drug manufacturer in Switzerland, covering component testing, process validation and filling machine controls.",
+    "key_facts": [
+     "Observation 1: materials used in homeopathic formulations are not tested at raw material or finished product stage to demonstrate suitability for intended use",
+     "Observation 2: process validation batch size was not representative of commercial batch size and did not cover the upper batch size range",
+     "Observation 3: filling speed can be modified by manufacturing personnel, but the machine retains no batch data and actual speed is not documented on batch records"
+    ],
+    "implication": "On 4/23/2026 the QA Manager stated these materials are not tested when received and confirmed finished products are not tested either. Validation Report QUAL VAL 124124 had an effective date of 6/27/2023. A modified filling speed could go undetected, and similar deficiencies were observed on another filling machine. In-process fill weight checks did not include statistically sound sampling plans.",
+    "checks": [
+     "Do specifications for each incoming component include a test for suitability for intended use? (Observation 1)",
+     "Do process validation batches include the maximum batch size allowed by master batch records? (Observation 2)",
+     "Is a change in filling speed captured in batch records or equipment data? (Observation 3)"
+    ]
+   }
+  },
+  "fda483-196258": {
+   "title_issue": "반복되는 시험 실수, 재교육 효과 없음",
+   "hook_line": "같은 분석자의 수분 측정 칭량 실수가 약 6개월 만에 재발함",
+   "summary": "FDA가 인도의 원료의약품(API) 제조소에 Form 483(관찰사항 2건)을 발행했다. 시험 데이터 검토자의 직무 교육과 품질관리 시험 절차 준수를 지적했다.",
+   "key_facts": [
+    "관찰 1: 잔류용매 가스크로마토그래피 시험 데이터를 교육·자격 인정을 받지 않은 검토자가 검토함(2024-02-14·2023-09-26 시험)",
+    "관찰 2: 2021년 1월 이후 기준일탈(OOS)·사건 조사 100건 넘게 사람 실수로 결론 남",
+    "관찰 2: 시료 정보 입력, 희석·조제, 칭량 실수가 재교육·재자격 인정에도 반복됨"
+   ],
+   "implication": "2023-09-15 수분 측정 기준일탈을 조사한 INC-01-23-0342는 분석자의 칭량 이송 실수로 결론 냈다. 약 6개월 전인 2023-03-30에도 같은 분석자의 같은 시험 기준일탈로 INC-01-23-0145를 열었다. FDA는 인식 교육을 포함한 시정조치가 효과가 없었다고 지적했다.",
+   "checks": [
+    "시험 데이터 검토자가 해당 시험법에 대해 검토자 자격을 인정받았는가? (관찰 1)",
+    "사람 실수로 종결한 기준일탈이 같은 분석자·같은 시험에서 재발했는지 추세를 보는가? (관찰 2)",
+    "재교육으로 종결한 시정조치가 재발 건수로 효과를 확인하는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "Recurring lab errors despite retraining",
+    "hook_line": "Same analyst repeated a Water Content by KF weight transfer error about 6 months later",
+    "summary": "FDA issued a Form 483 with two observations to an API manufacturer in India, citing reviewer training for test data and QC laboratory adherence to testing procedures.",
+    "key_facts": [
+     "Observation 1: residual solvents GC test data were reviewed by a QC reviewer not trained and qualified for the review (tests on 02/14/2024 and 09/26/2023)",
+     "Observation 2: over one hundred OOS/incident investigations have been concluded as human errors since Jan 2021",
+     "Observation 2: errors such as incorrect LIMS entry, dilution, preparation and weighing errors recurred despite retraining and requalification"
+    ],
+    "implication": "INC-01-23-0342, opened on 09/15/2023 for OOS Water Content by KF results, found the analyst did not properly perform a weight transfer. A similar incident, INC-01-23-0145, was opened about 6 months earlier on 03/30/2023 for the same test by the same QC Analyst. FDA stated the corrective actions, including awareness training, had proven ineffective.",
+    "checks": [
+     "Is each data reviewer qualified as a reviewer for that test method? (Observation 1)",
+     "Do you trend human-error OOS results by analyst and test? (Observation 2)",
+     "Is the effectiveness of retraining-based CAPAs checked against recurrence? (Observation 2)"
+    ]
+   }
+  },
+  "fda483-196259": {
+   "title_issue": "세척 후 잔류물, 용출 기준일탈 반복",
+   "hook_line": "세척 완료 판정된 비전용 설비 덕트에서 이전 제품 원료 성분 검출",
+   "summary": "FDA가 대만의 의약품 제조소에 Form 483(관찰사항 4건)을 발행했다. 비전용 설비 세척, 기준일탈·이물 조사, 캡슐 중량 검사기 전산 관리, 폐기 자재 관리를 지적했다.",
+   "key_facts": [
+    "관찰 1: 세척·확인을 마치고 사용 승인된 비전용 설비의 덕트와 내부에서 잔류물이 보였고 면봉 시험에서 이전 제품의 원료의약품(API) 여러 개가 검출됨",
+    "관찰 2: 2021~2026년 같은 시점의 용출 기준일탈(OOS)이 반복됐으나 근본원인을 다루는 CAPA를 시행하지 않음",
+    "관찰 3: 작업자가 캡슐 중량 검사기의 레시피를 바꾸고 삭제할 수 있고 배치마다 원시 중량 데이터와 감사추적기록을 검토하지 않음",
+    "관찰 4: 폐기 대기 구역에 제품·제조번호·폐기 사유 표시가 없는 정제 봉투가 있었고 폐기 기록에도 없음"
+   ],
+   "implication": "세척 밸리데이션은 잔류물이 발견된 덕트 부위를 평가하지 않았고 세척 절차서도 그 부위의 세척을 정하지 않았다. 용출 기준일탈은 공정 재밸리데이션 뒤에도 같은 시점에서 계속 나왔고 2024년 11월과 2026년 1월 조사는 확정된 근본원인을 찾지 못했다. 제조 중 발견된 이물은 분석 확인시험 없이 육안으로만 판단했고, 그중 한 제조번호는 출하됐다. 레시피 중 검증된 목표 충전 중량 범위를 넘는 버전이 있었고, 삭제된 레시피의 메타데이터는 열람할 수 없었다.",
+   "checks": [
+    "세척 밸리데이션 범위에 덕트·챔버처럼 세척 절차서에 없는 부위가 포함되는가? (관찰 1)",
+    "같은 제품의 같은 시험 기준일탈이 반복되면 이전 CAPA의 효과성을 다시 평가하는가? (관찰 2)",
+    "제조 중 발견된 이물을 분석 시험으로 확인한 뒤 원인을 결론 내는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "Cleaning residues and repeated dissolution OOS",
+    "hook_line": "Residues with APIs from prior products found in ducts of equipment documented as cleaned",
+    "summary": "FDA issued a Form 483 with four observations to a drug manufacturer in Taiwan, covering cleaning of non-dedicated equipment, OOS and foreign matter investigations, controls over a capsule check weigher system and management of materials for disposal.",
+    "key_facts": [
+     "Observation 1: residues were observed in ducts and chambers of non-dedicated equipment documented as cleaned and released, and swabs identified multiple APIs from previously manufactured products",
+     "Observation 2: repeated OOS dissolution results at the same time point from 2021 through 2026 were not adequately investigated, and CAPAs did not address the root cause",
+     "Observation 3: operators can modify, create and delete recipes in the capsule check weigher system, and raw weight data and audit trails are not reviewed for each batch",
+     "Observation 4: an unlabeled bag of tablets without product, batch or reason for disposal was found staged for disposal and not recorded on the rejection record"
+    ],
+    "implication": "The cleaning validation did not evaluate the duct areas where residues were found, and the cleaning procedure did not specify cleaning them. Similar OOS dissolution results continued after process revalidation, and investigations in November 2024 and January 2026 did not identify a definitive root cause. Foreign matter found during manufacturing was attributed by visual examination without analytical identification testing, and one batch was released. Some recipe versions exceeded the validated target fill weight range, and metadata for deleted recipes could not be accessed.",
+    "checks": [
+     "Does cleaning validation cover areas such as ducts and chambers not listed in the cleaning procedure? (Observation 1)",
+     "When the same OOS recurs for the same product, is the prior CAPA re-evaluated? (Observation 2)",
+     "Is foreign matter identified by analytical testing before a cause is concluded? (Observation 2)"
+    ]
+   }
+  },
+  "fda483-196260": {
+   "title_issue": "세척·공정 밸리데이션 미흡, 기준일탈 미조사",
+   "hook_line": "안정성 시작 시점 기준일탈 제조번호를 조사 없이 미국에 출하",
+   "summary": "FDA가 영국의 일반의약품 제조소에 Form 483을 발행했다. 세척 절차와 밸리데이션, 품질부서 책임, 시험 관리, 공정 밸리데이션, 기준일탈 조사, 전산 기록, 원료 검체 채취와 보관을 지적했다.",
+   "key_facts": [
+    "관찰 1: 세척 밸리데이션 보고서가 제조번호를 알 수 없는 1배치 데이터뿐이고 비전용 이송 배관·호스는 밸리데이션에 포함되지 않음",
+    "관찰 2: 모든 시험을 끝내기 전에 제조번호를 출하했고 변경관리 없이 제조기록서를 고침",
+    "관찰 4: 공정 밸리데이션 첫 배치가 실패해 배치를 추가했고 상업 배치 크기가 밸리데이션 크기와 다름",
+    "관찰 5: 장기 안정성 시작 시점(t = 0)의 pH·점도 기준일탈(OOS) 3건을 조사하지 않았고 해당 제조번호를 미국에 출하함"
+   ],
+   "implication": "2026-02-17 현장 확인 때 상태 표시 없이 벽에 걸린 호스를 품질 책임자는 세척 상태라고 했으나 실사관이 종이 타월로 안쪽을 닦자 오염물이 묻어났다. 수탁 안정성 시험기관이 2단계 제조 조사를 요청했으나 2026-02-20까지 조치나 조사 보고서가 없었다. 규제·품질 책임자는 pH와 점도 차이가 작아 환자·사용자에게 해를 끼칠 것 같지 않다고 진술했다. 2022년에 설치한 물 시스템은 적격성 평가를 하지 않았고 사용기한이 2026-01-28인 pH 7.0 표준액이 생산 시험실에 있었다. 생산 시험실 노트에서 작성자를 알 수 없는 수기 시험 데이터가 발견됐다.",
+   "checks": [
+    "세척 밸리데이션에 비전용 이송 배관과 호스의 면봉 채취 위치가 포함되는가? (관찰 1)",
+    "모든 출하 시험이 끝나기 전에 제조번호 출하를 막는 절차가 있는가? (관찰 2)",
+    "수탁 시험기관이 보고한 기준일탈마다 기한 안에 조사를 열고 종결하는가? (관찰 5)"
+   ],
+   "en": {
+    "title_issue": "Cleaning and process validation gaps, OOS not investigated",
+    "hook_line": "Batches with OOS results at stability initiation shipped to the US without investigation",
+    "summary": "FDA issued a Form 483 to an OTC drug manufacturer in the United Kingdom, covering cleaning procedures and validation, quality unit responsibilities, laboratory controls, process validation, OOS investigations, computerized records, and component sampling and storage.",
+    "key_facts": [
+     "Observation 1: cleaning validation reports contained data from a single batch whose batch number was not available, and non-dedicated transfer pipes and hoses were not part of cleaning validation",
+     "Observation 2: batches were released before all tests were completed, and batch manufacturing records were revised without change control",
+     "Observation 4: the first process validation batch failed and a batch was added, and commercial batch sizes differed from validation batch sizes",
+     "Observation 5: three OOS pH and viscosity results at the initiation (t = 0) of long-term stability were not investigated, and units of these batches were shipped to the US market"
+    ],
+    "implication": "On 2/17/2026, hoses hanging on walls without status were said by the Quality Head to be clean, but a paper towel rubbed inside one hose became soiled. The contract stability vendor asked the firm to initiate a Phase II manufacturing investigation, but as of 2/20/2026 no action was taken and no report was shared. The Regulatory Head and Quality Head stated the pH and viscosity differences were minor and not likely to cause harm. The water system installed in 2022 was not qualified, and a pH 7.0 standard with a use-by date of 1/28/2026 was found in the production lab. A notebook with handwritten test data that its owner said he did not write was found in the production lab.",
+    "checks": [
+     "Does cleaning validation include swab locations on non-dedicated transfer pipes and hoses? (Observation 1)",
+     "Is batch release blocked until all release tests are complete? (Observation 2)",
+     "Is an investigation opened and closed on time for every OOS result reported by a contract lab? (Observation 5)"
+    ]
+   }
+  },
+  "fda483-196261": {
+   "title_issue": "무균 충전 설비 조립 무균 미유지",
+   "hook_line": "멸균 부품 조립 중 소독만 한 장갑으로 접속부를 만지고 기류를 막음",
+   "summary": "FDA가 아일랜드의 완제의약품 제조소에 Form 483(관찰사항 4건)을 발행했다. 무균 의약품의 미생물 오염 방지 절차, 유틸리티 시스템 유지관리, 절차서 미준수, 미생물 시험실 장비 관리를 지적했다.",
+   "key_facts": [
+    "관찰 1: 충전 라인의 마개 공급 설비를 무균적으로 조립하지 않고 제품 접촉 부품을 멸균 대신 소독에 의존하며 설치 개입의 연기 시험을 하지 않음",
+    "관찰 2: 2025-01-09 유틸리티 시스템 바닥과 분석기 공급부에서 누출, 분배 탱크 맨웨이에서 물방울이 떨어짐",
+    "관찰 3: 경향이탈 기록용 일지가 없었고 일지 3종의 독립 검토자 페이지 검토를 하지 않음",
+    "관찰 4: 공정 중 바이오버든 시험용 층류 후드의 HEPA 필터 망이 변색됐고 업체는 녹이라고 함"
+   ],
+   "implication": "2025-01-13 설치 작업 중 작업자가 소독만 한 장갑으로 멸균 부품의 접속부를 만지며 그 위의 일방향 기류를 막았다. 제조 중 작업자 바로 위에 있는 부품도 멸균이 아닌 소독된 표면이었다. 마개 공급 부품을 C등급 구역에서 A등급 구역으로 들일 때마다 소독하지 않았다. 다른 층류 후드 여러 대에서도 같은 변색이 관찰됐다.",
+   "checks": [
+    "무균 충전 설비의 제품 접촉 부품이 멸균 상태로 조립되는가? (관찰 1)",
+    "설치 개입 작업에 대해 연기 시험으로 기류 영향을 확인했는가? (관찰 1)",
+    "시험실 층류 후드의 HEPA 필터 망 상태를 정기 점검 항목에 넣었는가? (관찰 4)"
+   ],
+   "en": {
+    "title_issue": "Aseptic setup of filling equipment",
+    "hook_line": "Operator touched sterile connection interfaces with a sanitized glove, blocking first air",
+    "summary": "FDA issued a Form 483 with four observations to a drug product manufacturer in Ireland, covering procedures to prevent microbial contamination of sterile products, utility system maintenance, SOPs not followed and QC microbiology lab equipment maintenance.",
+    "key_facts": [
+     "Observation 1: the stoppering system was not set up aseptically, relying on sanitization of product contact equipment instead of sterility, and no smoke studies were done for installation interventions",
+     "Observation 2: on 09 January 2025, leaks were observed at a utility skid and analyzer supply, with dripping from a distribution tank manway",
+     "Observation 3: no logbook was available to document OOT results for trending, and independent page reviews of three logbooks were not completed",
+     "Observation 4: the HEPA filter screen of a laminar flow hood used for in-process bioburden testing was discolored, which the firm indicated was rust"
+    ],
+    "implication": "On 13 January 2025 an operator touched the connection interface of sterile components with a sanitized glove, blocking first air over them. A component located directly over the operation during manufacture was a sanitized surface, not sterile. Stoppering components moved from Grade C into Grade A space were not sanitized for each event. The same discoloration was observed on many other laminar flow units.",
+    "checks": [
+     "Are product contact parts of aseptic filling equipment assembled in a sterile state? (Observation 1)",
+     "Have smoke studies been performed for installation interventions? (Observation 1)",
+     "Is the condition of HEPA filter screens on lab laminar flow hoods part of routine checks? (Observation 4)"
+    ]
+   }
+  },
+  "fda483-196262": {
+   "title_issue": "미생물 시험 결과 교체·기록 조작",
+   "hook_line": "엔도톡신 기준일탈 결과를 다른 검체의 적합 결과로 바꿔 보고",
+   "summary": "FDA가 한국의 무균 의약품 제조소에 Form 483(관찰사항 6건)을 발행했다. 시험 기록의 완전성, 불만 조사, 기준일탈 조사, 무균 공정 밸리데이션, 감사추적기록 검토, 장갑 세척·소독을 지적했다.",
+   "key_facts": [
+    "관찰 1: 2025-11-03 엔도톡신 기준일탈(OOS) 결과를 기록하지 않고 다른 검체의 적합 결과로 바꿔 시험성적서(COA)에 보고했고, 경고한계 균이 자란 바이오버든 평판을 기록 없이 폐기함",
+    "관찰 2: 2023년 1월 이후 미국 시장에서 효과 없음 불만 39건을 받았으나 근본원인을 정하지 않음",
+    "관찰 3: 기준일탈 조사에서 근거 없이 오염된 유리기구·시간 부족을 근본원인으로 정하고 재시험 적합 결과로 제조번호를 미국에 출하함",
+    "관찰 4: 앰플·바이알 충전 라인 기류 시각화 영상에서 작업자의 머리·상체가 A등급 구역에 들어가고 넘어진 개봉 바이알 위로 손이 지나간 뒤에도 바이알을 불량 처리하지 않음"
+   ],
+   "implication": "2025-11-12 FDA 실사관이 묻자 미생물 시험 책임자는 카메라 날짜·시각을 바꿔 균이 자란 평판을 촬영하고 팀원에게 날짜를 소급한 작업지를 만들게 했다. 같은 책임자는 2025-10-31 일탈 조사 검체가 적힌 배양기 사용 일지 60~62쪽을 뜯어내고 빈 양식으로 바꿔 그 검체만 빼고 다시 쓰게 했다. 미생물 시험실에서 통제되지 않은 GMP 빈 양식이 30종 넘게 발견됐고, 다시 한 엔도톡신 시험의 원래 양식은 검토 없이 시험 기록에서 빠졌다. 앰플 라인 A등급 구역의 HEPA 그릴이 약 2cm 휘어 있었으나 언제부터인지 기록이 없었다. 출하 기록에 붙은 감사추적기록 출력물은 시험 시작 부분만 있었다(관찰 5).",
+   "checks": [
+    "기준일탈 시험 결과를 다른 검체 결과로 대체하지 못하도록 원자료가 모두 기록·보고되는가? (관찰 1)",
+    "미생물 시험실의 GMP 빈 양식이 발행 번호로 통제되는가? (관찰 1)",
+    "기준일탈 조사에서 근본원인으로 정한 시험실 오류에 과학적 근거 자료가 첨부되는가? (관찰 3)"
+   ],
+   "en": {
+    "title_issue": "Micro test results replaced, records altered",
+    "hook_line": "Endotoxin OOS results replaced with passing results from different samples in the COA",
+    "summary": "FDA issued a Form 483 with six observations to a sterile drug manufacturer in Korea, covering incomplete laboratory records, complaint and OOS investigations, sterilization process validation, audit trail review, and glove cleaning and disinfection.",
+    "key_facts": [
+     "Observation 1: endotoxin OOS results from 11/03/2025 were not recorded and were replaced with passing results from different samples in the final COA, and bioburden plates showing alert level CFU were discarded without documentation",
+     "Observation 2: since January 2023 a total of 39 complaints from the U.S. market reported the injection as ineffective, with no root cause assigned",
+     "Observation 3: OOS investigations assigned dirty glassware or insufficient time as root cause without scientific evidence, and batches were released to the U.S. after passing retests",
+     "Observation 4: smoke study videos showed operators' heads and upper bodies inside Grade A areas, and vials under an operator's hand and arm were not rejected"
+    ],
+    "implication": "On 11/12/2025, when asked by the FDA investigator, the QC Microbiology Team Lead changed the camera time and date to photograph plates with growth and instructed a team member to create backdated worksheets. On 10/31/2025 she removed pages 60 to 62 of the incubator usage logbook containing deviation samples, replaced them with blank forms and had them backfilled without those samples. Over thirty (30) uncontrolled CGMP blank form types were found in the microbiology laboratory, and the original form of a redone endotoxin test was left out of the test package without review. A HEPA grill in the ampoule line Grade A area appeared bent approximately 2cm, with no record of how long. Audit trail printouts attached to release records covered only the beginning of laboratory testing (Observation 5).",
+    "checks": [
+     "Are all raw results, including OOS, recorded and reported so they cannot be replaced by other samples? (Observation 1)",
+     "Are blank GMP forms in the microbiology lab issued and controlled by number? (Observation 1)",
+     "Is scientific evidence attached when a laboratory error is assigned as the OOS root cause? (Observation 3)"
+    ]
+   }
+  },
+  "fda483-196264": {
+   "title_issue": "임상 영상 데이터 시스템 미밸리데이션",
+   "hook_line": "최종 데이터 전송에서 보정값이 덮어써져 대상자 31명에 영향",
+   "summary": "FDA가 중국의 임상시험수탁기관에 Form 483을 발행했다. 임상 데이터 처리 전산 시스템을 밸리데이션하지 않은 점과 데이터 신뢰성 확보 절차가 미흡한 점을 지적했다.",
+   "key_facts": [
+    "관찰 1: 골밀도 데이터 분석에 밸리데이션하지 않은 소프트웨어를 썼고 감사추적기록 없이 수정·삭제가 가능했음",
+    "관찰 1: 상류 데이터 처리 단계가 밸리데이션 범위에 없어 변경자·변경 사유를 기록하지 못함",
+    "관찰 1: 2024-06-26 최종 데이터 전송에서 보정값이 덮어써져 대상자 31명 데이터에 영향",
+    "관찰 1: 분석에 필요한 고관절 데이터 3건이 데이터 전송 파일에서 빠짐"
+   ],
+   "implication": "업체는 2023년 6월 상용 소프트웨어 평가에서 21 CFR Part 11 요건을 인지했으나 해당 소프트웨어를 밸리데이션하지 않았다. 품질 사건 DEV-06296에 따르면 이전 전송의 보정은 표준 절차대로 덧붙여야 했으나 새 데이터로 덮어써졌다. 보정값 누락과 데이터 제외는 품질 사건 DEV-06296·DEV-06317로 기록됐다.",
+   "checks": [
+    "임상 데이터를 분석하는 소프트웨어마다 밸리데이션과 감사추적기록 기능이 확인됐는가? (관찰 1)",
+    "최종 데이터 전송 전에 이전 보정이 유지됐는지 대조하는 단계가 있는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Unvalidated clinical imaging data systems",
+    "hook_line": "Prior corrections overwritten in the final data transfer, affecting 31 subjects",
+    "summary": "FDA issued a Form 483 to a contract research organization in China for failing to validate computer systems used for clinical investigation data and failing to establish adequate procedures for data reliability.",
+    "key_facts": [
+     "Observation 1: unvalidated software was used to analyze bone mineral density data, and edits and deletions could be made with no audit trail",
+     "Observation 1: validation did not address upstream data processing, so users making changes and reasons for changes could not be identified",
+     "Observation 1: correction factors were not properly applied in the final data transfer on June 26, 2024, affecting 31 subjects",
+     "Observation 1: hip data for three cases were improperly excluded from the data transfer file"
+    ],
+    "implication": "The firm's June 2023 COTS assessments acknowledged Part 11 requirements, but the software was not validated. Quality Event DEV-06296 states that prior IQC corrections were overwritten with new data instead of appended, contrary to the standard process. The missed corrections and excluded data were recorded as Quality Events DEV-06296 and DEV-06317.",
+    "checks": [
+     "Has each software used to analyze clinical data been validated with audit trail functions confirmed? (Observation 1)",
+     "Is there a check that prior corrections are retained before the final data transfer? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196270": {
+   "title_issue": "나노 표면처리 공정 밸리데이션 미흡",
+   "hook_line": "헹굼수 일반세균 22~451 집락형성단위, 허용 상한 기준 없음",
+   "summary": "FDA가 미국의 의료기기 제조소에 Form 483(관찰사항 6건)을 발행했다. 티타늄 임플란트 나노 표면처리 공정의 밸리데이션, 공정 변수 모니터링, 작업 환경, 구매 요건, CAPA, 변경관리를 지적했다.",
+   "key_facts": [
+    "관찰 1: 나노튜브 피복 면적·직경 분포의 허용기준과 표본 수 근거를 공정 밸리데이션에 정하지 않음",
+    "관찰 2: 핵심 공정 변수인 산 농도를 하루 시작 때 한 번 참고용 적정량으로만 확인함(하루 여러 로트 생산)",
+    "관찰 4: 외부 공급 공정수의 구매 요건과 미생물 허용 상한이 없고 시험에서 일반세균 22~451 CFU가 나옴",
+    "관찰 5: 효과 있음으로 종결한 CAPA 2건에서 같은 부적합이 재발했고 내부 감사 부적합 2건에 CAPA를 열지 않음"
+   ],
+   "implication": "밸리데이션 이미지에서 100nm 이상인 나노튜브가 보였으나 수석 과학자는 육안 평균이 규격 범위 안이라 적합으로 평가했다고 진술했다. 최종 세척 뒤 멸균 예정 제품을 처리하는 나노 표면처리실의 환경 모니터링 요건이 절차서에 없었다(관찰 3). 밸리데이션된 장비를 건물 안에서 옮기고 작업실을 넓혔으나 의료기기 영향 평가를 문서화하지 않았다(관찰 6). 업체는 관찰 6건 모두 시정을 약속했다.",
+   "checks": [
+    "공정 밸리데이션에 표면 특성 허용기준과 표본 수의 통계 근거가 들어 있는가? (관찰 1)",
+    "핵심 공정 변수가 생산 로트마다 검증된 범위 안인지 기록되는가? (관찰 2)",
+    "외부에서 받는 공정수에 미생물 허용 상한과 구매 요건이 정해져 있는가? (관찰 4)"
+   ],
+   "en": {
+    "title_issue": "Nano surface treatment validation gaps",
+    "hook_line": "Rinse water showed 22 to 451 CFU with no documented upper limit",
+    "summary": "FDA issued a Form 483 with six observations to a medical device manufacturer in the United States, covering validation, process monitoring, work environment, purchasing requirements, CAPA and change control for a titanium implant nano surface treatment.",
+    "key_facts": [
+     "Observation 1: process validation did not establish acceptance criteria for nanotube coverage and diameter distribution or a rationale for sample sizes",
+     "Observation 2: acid concentration, a critical process parameter, is checked by titration volume for reference only at the beginning of the day, while multiple lots are produced daily",
+     "Observation 4: no purchasing requirements or microbial upper limit for externally supplied process water, which tested at between 22 CFU and 451 CFU for HPC",
+     "Observation 5: nonconformances recurred after two CAPAs closed as effective, and 2 internal audit nonconformances were not entered as CAPA"
+    ],
+    "implication": "Validation images showed nanotubes at or greater than 100nm, but the Principle Scientist stated they were evaluated as passing because the visual average appeared within specification. No environmental monitoring requirements were documented for the nanosurfacing room, where cleaned product intended for sterilization is processed (Observation 3). Validated equipment was moved within the building and the room expanded without a documented evaluation of impact on devices (Observation 6). The firm promised to correct all six observations.",
+    "checks": [
+     "Does process validation include surface characteristic acceptance criteria and a statistical rationale for sample size? (Observation 1)",
+     "Is each critical process parameter recorded within the validated range for every lot? (Observation 2)",
+     "Is there a microbial upper limit and purchasing requirement for externally supplied process water? (Observation 4)"
+    ]
+   }
+  },
+  "0f65bd3c5c70": {
+   "title_issue": "공급업체 적격성 평가 미흡, 수입경보",
+   "hook_line": "수입경보 66-40 대상 업체를 핵심 출발물질 공급업체로 승인",
+   "summary": "FDA가 중국의 원료의약품(API) 제조소에 FD&C Act 704(a)(4)에 따른 기록 제출 요청 검토 결과로 경고서한을 발행했다. 품질부서가 핵심 원자재 공급업체를 적절히 적격성 평가하지 않았다고 지적했다.",
+   "key_facts": [
+    "위반 1: 품질부서가 원료의약품 제조용 핵심 원자재 공급업체를 적절히 적격성 평가하지 않음",
+    "당국 조치: 2026-06-22 이 업체가 미국에 수입하려는 모든 의약품을 수입경보 66-40에 등재",
+    "당국 조치: 서한 수령 후 15영업일 안에 서면 회신 요구"
+   ],
+   "implication": "FDA는 2025-11-18 기록 제출을 요청했으나 업체는 해당 원료의약품 제조 문서를 내지 않았다. 업체는 2025년 11월 이후 생산을 자회사로 옮겼다고 회신했다. 업체가 핵심 출발물질 공급업체로 적격 인정한 곳은 FDA 실사에서 CGMP 미준수로 판정돼 그 의약품이 수입경보 66-40에 올랐다. FDA는 실제 제조사가 아닌 이 업체를 제조자로 표시한 것이 안전장치 우회 시도였는지 문제를 제기했다. 등록된 원료 중 하나는 503A·503B 조제에 쓸 수 없는 원료의약품이라고 FDA가 알렸다.",
+   "checks": [
+    "핵심 출발물질 공급업체가 FDA 수입경보 목록에 있는지 승인 전과 정기적으로 확인하는가? (위반 1)",
+    "생산을 다른 사업장이나 자회사로 옮기면 실제 제조소를 공급업체 기록과 고객 문서에 반영하는가? (위반 1)",
+    "최근 3년 출하 원료의약품마다 원래 제조사와 출발물질 공급업체를 목록으로 추적할 수 있는가? (위반 1)"
+   ],
+   "en": {
+    "title_issue": "Supplier qualification failure, import alert",
+    "hook_line": "Qualified a supplier of a critical starting material whose drugs were placed on IA 66-40",
+    "summary": "FDA issued a warning letter to an API manufacturer in China after reviewing records submitted under a 704(a)(4) request, citing failure of the quality unit to adequately qualify suppliers of critical raw materials.",
+    "key_facts": [
+     "Violation 1: the quality unit failed to adequately qualify suppliers of critical raw materials for API manufacturing",
+     "Agency action: all drugs offered for import from the firm were placed on Import Alert 66-40 on June 22, 2026",
+     "Agency action: written response required within fifteen (15) business days of receipt"
+    ],
+    "implication": "FDA requested records on November 18, 2025, but the firm provided no documentation on manufacture of the API. The firm responded that after November 2025 production was moved to a subsidiary. The supplier the firm qualified for a critical starting material was found by FDA inspection not to conform to CGMP, and its drugs were placed on IA 66-40. FDA stated concern that identifying the firm and not the actual manufacturer may have been an attempt to circumvent safeguards. FDA advised that one API listed under the firm's registration is not permissible for compounding under sections 503A or 503B.",
+    "checks": [
+     "Are critical starting material suppliers checked against FDA import alerts before approval and periodically? (Violation 1)",
+     "When production moves to another site or subsidiary, is the actual manufacturer reflected in supplier records and customer documents? (Violation 1)",
+     "Can you list the original manufacturer and starting material supplier for every API distributed in the last three years? (Violation 1)"
+    ]
+   }
+  },
+  "7e7545ebb190": {
+   "title_issue": "기록 제출 거부, 수입경보 66-79",
+   "hook_line": "회신 하루 전에 등록을 말소하고 요청 기록을 끝내 미제출",
+   "summary": "FDA가 중국의 원료의약품(API) 제조소에 경고서한을 발행했다. FD&C Act 704(a)(4)에 따른 기록 제출 요청을 거부한 것을 위반으로 지적했다.",
+   "key_facts": [
+    "위반 1: 704(a)(4) 기록 제출 요청에 기록을 제출하지 않음(FD&C Act 301(e) 금지 행위)",
+    "당국 조치: 2026-08-26 이 업체가 미국에 수입하려는 모든 의약품을 수입경보 66-79에 등재",
+    "당국 조치: 서한 수령 후 15영업일 안에 서면 회신 요구, FDA 실사 일정 요청 가능"
+   ],
+   "implication": "수입 기록 검토에서 이 업체를 제조사로 신고한 조제용 원료의약품 선적이 여러 건 확인됐다. FDA는 2026-06-17 등록된 연락처로 기록을 요청했다. 업체는 2026-06-29 등록과 의약품 목록을 말소했고, 다음 날인 2026-06-30 FDA 요건을 충족할 수 없다고 회신했다. 업체가 만든 원료의약품이 미국에 수입돼 유효기간 안에 있는데도 기록은 제출되지 않았다. 업체는 2026-07-13 다시 등록했다.",
+   "checks": [
+    "조제용 원료의약품을 사들일 때 신고된 제조사가 FDA 기록 요청에 응하는 곳인지 확인하는가? (위반 1)",
+    "공급업체의 FDA 등록 말소·재등록 이력을 공급업체 평가에서 추적하는가? (위반 1)"
+   ],
+   "en": {
+    "title_issue": "Refusal to provide records, IA 66-79",
+    "hook_line": "De-registered one day before replying and never provided the requested records",
+    "summary": "FDA issued a warning letter to an API manufacturer in China for refusing to provide records requested under section 704(a)(4) of the FD&C Act.",
+    "key_facts": [
+     "Violation 1: the firm refused to provide records requested under section 704(a)(4), a prohibited act under section 301(e) of the FD&C Act",
+     "Agency action: all drugs offered for import from the firm were placed on Import Alert 66-79 on August 26, 2026",
+     "Agency action: written response required within fifteen (15) business days, and the firm may request an FDA inspection"
+    ],
+    "implication": "Import records showed multiple shipments of API intended for prescription compounding that declared the firm as manufacturer. FDA sent an electronic records request on June 17, 2026. The firm de-registered and discontinued its drug listing on June 29, 2026, one day before replying on June 30, 2026 that it was unable to meet FDA requirements. The records were never provided although APIs made by the firm had been imported and were still within expiry. The firm re-registered on July 13, 2026.",
+    "checks": [
+     "When buying APIs for compounding, do you confirm the declared manufacturer responds to FDA records requests? (Violation 1)",
+     "Does supplier evaluation track a supplier's FDA de-registration and re-registration history? (Violation 1)"
+    ]
+   }
+  }
+ }
+}

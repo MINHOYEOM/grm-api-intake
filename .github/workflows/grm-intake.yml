@@ -418,6 +418,21 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
+      # [그림자 기록 보관 2026-11-13] 중복 판정·무음 감시 그림자는 health JSON 의 `store` 에만 남는데,
+      # 그 파일은 아티팩트로 올라가지 않아 실행이 끝나면 사라졌다(11-13 첫 실행에서 확인 — 읽을 곳이 없었다).
+      # `store` 만 떼어 그림자 아티팩트 폴더에 넣고, 핵심 숫자를 실행 요약에 적는다. 읽기만 한다.
+      - name: 그림자 판정 기록 보관 (health 의 store → 아티팩트)
+        if: ${{ always() }}
+        run: |
+          set -uo pipefail
+          if [ ! -f "${GRM_HEALTH_JSON:-grm-health.json}" ]; then
+            echo "::notice::health JSON 없음 — 그림자 판정 기록 생략"
+            exit 0
+          fi
+          mkdir -p _queue_shadow
+          python3 keep_shadow_health.py "${GRM_HEALTH_JSON:-grm-health.json}" _queue_shadow >> "$GITHUB_STEP_SUMMARY" \
+            || echo "::warning::그림자 판정 기록 보관 실패 — 수집 결과에는 영향 없음"
+
       # [대기열 그림자] DB 로 만든 handoff·빈 슬롯 브리프·비교 보고서. 꺼져 있으면 폴더가 없어 무해 스킵.
       - name: Upload queue shadow (DB handoff · 비교 보고서)
         if: ${{ always() }}

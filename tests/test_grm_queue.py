@@ -949,6 +949,79 @@ class HistoryBackfillTest(unittest.TestCase):
         self.assertIn("grep -qE '^[0-9]{1,3}$'", wf)
 
 
+class KeepShadowHealthTest(unittest.TestCase):
+    """중복 판정·무음 감시 그림자가 실행 뒤에도 읽을 수 있게 남는가(11-13 첫 실행에서 읽을 곳이 없었다)."""
+
+    def _mod(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("keep_shadow_health", ROOT / "keep_shadow_health.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    STORE = {"dedup_mode": "notion",
+             "dedup_shadow": {"collected": 40, "db": {"new": 3, "have": 30, "heal": 2, "old": 5},
+                              "notion_new": 4, "only_notion_new": 1, "only_notion_new_sample": ["FR::x"],
+                              "only_db_new": 0, "only_db_new_sample": [],
+                              "heal_by_source": {"WHO": {"count": 2, "sample": ["a", "b"]}}, "same": False},
+             "monitor_shadow": {"silence": {"compared": 12, "silent_notion": ["WHO"], "silent_db": [],
+                                            "verdict_differs": ["WHO"], "not_compared": ["ICH"],
+                                            "history_start": "2026-07-16", "same": False,
+                                            "date_differs": [{"source": "WHO", "notion": "2026-10-01",
+                                                              "db": "2026-11-01"}]}},
+             "queue": {"enqueued": 24, "healed": 0}}
+
+    def test_writes_store_into_the_artifact_folder_and_prints_summary(self):
+        import contextlib
+        import io as _io
+        mod = self._mod()
+        with tempfile.TemporaryDirectory() as tmp:
+            hp = os.path.join(tmp, "grm-health.json")
+            with open(hp, "w", encoding="utf-8") as f:
+                json.dump({"schema_version": "grm-health/v1", "run_date_kst": "2026-11-14",
+                           "store": self.STORE, "health": {"failures": []}}, f, ensure_ascii=False)
+            out = _io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(mod.main(["x", hp, os.path.join(tmp, "_queue_shadow")]), 0)
+            with open(os.path.join(tmp, "_queue_shadow", "store_health_2026-11-14.json"),
+                      encoding="utf-8") as f:
+                kept = json.load(f)
+        self.assertEqual(kept, {"run_date": "2026-11-14", "store": self.STORE})   # store 만, 그대로
+        md = out.getvalue()
+        for needle in ("보충 2", "보충 WHO: 2건 (예: a, b)", "노션에서만 새 문서 예: FR::x",
+                       "판정이 다른 소스 ['WHO']", "비교 안 함 ['ICH']",
+                       "마지막 수집일이 다름 WHO: 노션 2026-10-01 / DB 2026-11-01", "enqueued 24"):
+            self.assertIn(needle, md)
+
+    def test_missing_shadow_sections_and_bad_input_are_handled(self):
+        import contextlib
+        import io as _io
+        mod = self._mod()
+        md = mod.summary_md("2026-11-14", {"dedup_mode": "notion"})
+        self.assertIn("중복 판정 그림자: 기록 없음(변수 꺼짐)", md)
+        self.assertIn("무음 감시 그림자: 기록 없음(변수 꺼짐)", md)
+        self.assertIn("조회 실패", mod.summary_md("d", {"dedup_shadow": {"error": "정본·대기열 조회 실패"}}))
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stderr(_io.StringIO()):
+            bad = os.path.join(tmp, "h.json")
+            with open(bad, "w", encoding="utf-8") as f:
+                f.write("{}")
+            self.assertEqual(mod.main(["x", bad, tmp]), 1)
+            self.assertEqual(mod.main(["x", os.path.join(tmp, "none.json"), tmp]), 1)
+            self.assertEqual(os.listdir(tmp), ["h.json"])                     # 아무것도 쓰지 않았다
+
+    def test_workflow_keeps_it_before_the_upload_and_out_of_the_mirror_glob(self):
+        import fnmatch
+        wf = (ROOT / ".github" / "workflows" / "grm-intake.yml").read_text(encoding="utf-8")
+        keep = wf.index("python3 keep_shadow_health.py")
+        self.assertLess(keep, wf.index("name: grm-queue-shadow"))
+        self.assertIn('"${GRM_HEALTH_JSON:-grm-health.json}" _queue_shadow', wf)
+        step = wf[wf.index("그림자 판정 기록 보관 (health 의 store"):keep + 300]
+        self.assertIn("if: ${{ always() }}", step)
+        self.assertIn("::warning::", step)                                    # 실패해도 수집을 빨갛게 세우지 않는다
+        for glob in ("handoff_db_????-??-??.json", "brief_web_????_??_??.json"):
+            self.assertFalse(fnmatch.fnmatch("store_health_2026-11-14.json", glob))
+
+
 class CompareTest(unittest.TestCase):
     def test_classifies_who_is_richer(self):
         n = {"rows": [{"source": "FR", "document_id": "1", "body": "abc…", "modality": "Bio",

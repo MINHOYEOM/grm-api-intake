@@ -166,7 +166,7 @@
       if (toggle) { toggle.textContent = _t("전체 {n}문항 풀기", { n: cards.length }); toggle.setAttribute("aria-pressed", "false"); }
     } else {
       if (titleEl) titleEl.textContent = _t("전체 문항");
-      if (subEl) subEl.textContent = _t("정본 문항 {total}개 중 {shown}개를 보고 있어요.", { total: cards.length, shown: shown });
+      if (subEl) subEl.textContent = _t("정본 문항 {total}개 중 {shown}개를 표시합니다.", { total: cards.length, shown: shown });
       if (toggle) { toggle.textContent = _t("이번 주 문항만 보기"); toggle.setAttribute("aria-pressed", "true"); }
     }
     updateResult();

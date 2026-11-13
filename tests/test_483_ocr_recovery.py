@@ -674,3 +674,441 @@ class NamedGuardAndScanTest(unittest.TestCase):
         self.assertEqual(out["gap_docs"] + out["mixed_already_ocr_path"], 1)
         for k in ("gap_unread_pages", "gap_with_stored_obs", "gap_without_stored_obs"):
             self.assertIn(k, out)
+
+
+_P85637_OBS6 = ("Sterility testing was only performed at 106 days. OBSERVATION6 Each batch of dmg product required to be free of objectionable microorganisms is not tested through appropriate laboratory testing, Specifically, your firm does not conduct routine sterility or endotoxin testing for all injectable drug products currently produced. You stated that the stock solutions are routinely tested for sterility and endotoxins but that finished product is not Toutinely tested unless(J units or more are filed or fi re. Stock solutions are used to fill finished product.. For example, [redacted] lot #02262013M8of Fentanyl (NICU Syringe) 10mcg/mL Injectable was not tested for sterility [redacted] fot #03182013S18 afDMPS (Dimercaptopropanesulfonic Acid) (Preservative Free) 5% Injectable was not tested for sterflity or endotoxins [redacted] fot 403112013823 of Sodium Phenylbutyrate 200 mg/mL Injectable was not tested for sterility or endotoxins e fot #03132013832 of Glutathione/Adenosine Triphosphate 100mg/img/ml. Injectable was not tested for sterility or endotoxins e tot #0315201388 ofHydrogen Peroxide (Preservative Free) 3.75% Injectable was not tested for sterility or endotoxins ¢ fot #03152013824 ofMethylcobalamin (Preservative Free) 12.5mg/mL, Injectable was not tested for sterility or endotoxins ¢ lot 40318201313 ofMethylcobalamin/Folic Acid (Preservative Free) 1mg/l0mg/mL Injectable wasnot tested for sterility or endotoxins")
+_P85637_OBS7_DEF = "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the final specifications and identity and strength of each active ingredient prior to release."
+_P85637_OBS7_DETAIL = "Specifically, your firm does not conduct routine potency testing for all injectable drug products currently produced. You stated that the stock solutions are routinely tested for potency but that finished preduct is not routinely tested unless [jj units or more are filled or J Stock solutions are used to fill finished product. For example, Ela CYPE TS)"
+# 3판에서 사라진 블록(머리글 + 역가 미시험 로트 6줄, 서명자 실명은 [signature] 로 가림)
+_P85637_LOST = ("GKSNATURE OATE ISSUED [signature], lot 403182013518 of DMPS (Dimercaptopropanesulfonic Acid) (Preservative Free) 5% Injectable was not tested for potency [redacted] Jot 403112013823 ofSodium Phenylbutyrate 200 mg/mL Injectable was not tested for potency [redacted] lot 49313213832 of Ghitathione/Adenosine Triphosphate 100mg/I mg/mL Injectable was not tested for potency [redacted] lot #03152013S8 ofHydrogen Peroxide (Preservative Free) 3.75% Injectable was not tested for potency [redacted] lot #03152013S24 ofMethyicobalamin (Preservative Free} 12.5mg/mL Injectable was not tested for potency. [redacted] Jot #03182013S13 ofMethylcobalamit/Folic Acid (Preservative Free) img/10mg/mL Injectable was not tested for potency")
+_P85637_META = {"firm": "Specialty Compounding Pharmacy", "establishment_type": "Producer of Sterile Drug Products", "site_state": "Texas", "country": "United States", "product_type": "Producer of Sterile Drug Products"}
+_P85637_DEF5 = "There is no written testing program designed to assess the stability characteristics of drug products."
+# 2판: 관찰 5 상세에 관찰 6·7 본문과 손실 블록이 병합돼 있었다
+OLD_85637 = {**_P85637_META, "fda_483_observations": [{"number": "5", "deficiency": _P85637_DEF5, "detail": _P85637_OBS6 + " OBSERVATION 7. " + _P85637_OBS7_DEF + " " + _P85637_OBS7_DETAIL + " " + _P85637_LOST}]}
+# 3판: 관찰 7 이 분리됐지만 상세가 'For example, Ela CYPE TS)' 에서 끝나 손실 블록이 어디에도 없다
+NEW_85637 = {**_P85637_META, "fda_483_observations": [{"number": "5", "deficiency": _P85637_DEF5, "detail": _P85637_OBS6}, {"number": "7", "deficiency": _P85637_OBS7_DEF, "detail": _P85637_OBS7_DETAIL}]}
+# 4판(현행, 수동 복원): 로트 6줄을 관찰 7 상세 뒤에 되붙였다(머리글은 뺌)
+_P85637_LOT_LINES = _P85637_LOST.split("[signature], ", 1)[1]
+V4_85637 = {**_P85637_META, "fda_483_observations": [{"number": "5", "deficiency": _P85637_DEF5, "detail": _P85637_OBS6}, {"number": "7", "deficiency": _P85637_OBS7_DEF, "detail": _P85637_OBS7_DETAIL + " " + _P85637_LOT_LINES}]}
+
+_P85401_META = {"firm": "Central Admixture Pharmacy Services, Inc. (CAPS)", "establishment_type": "Sterile Drug Manufacturer", "site_state": "Alabama", "country": "United States", "product_type": "Sterile Drug Manufacturer"}
+_P85401_DEF8 = "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use."
+_P85401_NEW8 = "Specifically, tape was observed holding up clipboards on the outside sash of the ISO 5 TPN hood in the room identified by the firm as aredfil"
+_P85401_DEF9 = "There is no written testing program designed to assess the stability characteristics of drug products."
+_P85401_NEW9 = "Specifically, the firm has no written stability program which requires ongoing stability studies to show that the aseptically processed sterile drug products which they distribute, continue to meet all relevant chemical and sterility specifications all the way to product expiry, or beyond use dates (BUD)."
+_P85401_HEADER = "Central Admixture Pharmacy Services, 211 Summit Parkway #122 Inc. City, STATE, 2 CODE, COUNTRYS TABS INSPECTED Homewood, AL 35209 Producer of Sterile Drug Products"
+# 2판: 관찰 8 상세(730자)에 관찰 9 와 페이지 머리글(주소)이 붙어 있었다 → 3판은 8(141자)·9 로 나뉘고 머리글은 버려졌다 — 정상
+OLD_85401 = {**_P85401_META, "fda_483_observations": [{"number": "8", "deficiency": _P85401_DEF8, "detail": _P85401_NEW8 + " OBSERVATION 9. " + _P85401_DEF9 + " " + _P85401_NEW9 + " " + _P85401_HEADER}]}
+NEW_85401 = {**_P85401_META, "fda_483_observations": [{"number": "8", "deficiency": _P85401_DEF8, "detail": _P85401_NEW8}, {"number": "9", "deficiency": _P85401_DEF9, "detail": _P85401_NEW9}]}
+
+
+class NamedTextLossGuardTest(unittest.TestCase):
+
+    def test_85637_lost_block_is_detected(self):
+        loss = rec.text_loss(OLD_85637, NEW_85637)
+        self.assertGreaterEqual(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+        self.assertIn("potency", loss["sample"])
+
+    def test_85401_split_and_header_drop_is_allowed(self):
+        loss = rec.text_loss(OLD_85401, NEW_85401)
+        self.assertLess(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_identical_is_zero(self):
+        self.assertEqual(rec.text_loss(OLD_85637, OLD_85637)["lost_chars"], 0)
+
+    def test_footer_only_reduction_is_allowed(self):
+        footer = ("EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE OF THIS PAGE FORM FDA 483 "
+                  "(09/08) PREVIOUS EDITION OBSOLETE INSPECTIONAL OBSERVATIONS PAGE 2 OF 5 PAGES")
+        observations = [
+            {"number": str(i),
+             "deficiency": f"Quality procedure {i} was not adequately established and followed.",
+             "detail": f"The documented control process for operation {i} was reviewed by investigators."}
+            for i in range(1, 4)
+        ]
+        old = {"fda_483_observations": [
+            {**observation, "detail": observation["detail"] + " " + footer}
+            for observation in observations
+        ]}
+        new = {"fda_483_observations": observations}
+        self.assertLess(rec.text_loss(old, new)["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_duplicate_cleanup_is_allowed(self):
+        detail2 = " ".join(f"duplicatedqualityword{i}" for i in range(30))
+        deficiency2 = "Laboratory controls did not include complete documented review procedures."
+        duplicate = deficiency2 + " " + detail2
+        old = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Written controls were not followed during production.",
+             "detail": "Investigators reviewed the complete production process and records. " + duplicate},
+            {"number": "2", "deficiency": deficiency2, "detail": detail2},
+        ]}
+        new = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Written controls were not followed during production.",
+             "detail": "Investigators reviewed the complete production process and records."},
+            {"number": "2", "deficiency": deficiency2, "detail": detail2},
+        ]}
+        self.assertLess(rec.text_loss(old, new)["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_whole_observation_body_dropped_is_detected(self):
+        body = " ".join(f"uniquecompoundword{i}" for i in range(35))
+        old = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Production records were incomplete.",
+             "detail": "The first observation remains unchanged in the replacement document."},
+            {"number": "2", "deficiency": "Laboratory review procedures were deficient.",
+             "detail": body},
+        ]}
+        new = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Production records were incomplete.",
+             "detail": "The first observation remains unchanged in the replacement document."},
+            {"number": "2", "deficiency": "Laboratory review procedures were deficient.",
+             "detail": ""},
+        ]}
+        self.assertGreaterEqual(rec.text_loss(old, new)["lost_chars"],
+                                rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def _run_named(self, old_observations, new_observations, *, dry_run):
+        import findings_store
+        import json
+
+        base_item = rec._rebuild_item(_nrow(), "", "")
+        record = findings_store.raw_signal_from_intake_item(base_item, collected_at="")
+        rid = record["raw_signal_id"]
+        pdf_url = "https://example.test/fda483.pdf"
+        old_raw = {**base_item.raw_payload, "pdf_url": pdf_url,
+                   "fda_483_observations": old_observations}
+        new_raw = {**base_item.raw_payload, "pdf_url": pdf_url,
+                   "fda_483_observations": new_observations}
+        rebuilt = rec._rebuild_item(_nrow(), "", "")
+        rebuilt.raw_payload = new_raw
+        row = {
+            "raw_signal_id": rid,
+            "document_id": base_item.document_id,
+            "collected_at": "2026-07-28T01:02:03Z",
+            "raw_json": json.dumps(old_raw, ensure_ascii=False, sort_keys=True),
+        }
+        return _run(
+            mode=rec.MODE_NAMED,
+            doc_ids=[base_item.document_id],
+            dry_run=dry_run,
+            rows=[row],
+            fetch_text=lambda _url: ("stub text", "pdf-ok"),
+            rebuild_item=lambda _nrow, _text, _status: rebuilt,
+        )
+
+    def test_run_named_blocks_text_loss_dry_and_apply(self):
+        shared = "The unchanged process description remains present throughout the replacement document."
+        lost = " ".join(f"uniquelostword{i}" for i in range(35))
+        old = [{"number": "1", "deficiency": "Written procedures were not adequately followed.",
+                "detail": shared + " " + lost}]
+        new = [
+            {"number": "1", "deficiency": "Written procedures were not adequately followed.",
+             "detail": shared},
+            {"number": "2", "deficiency": "Equipment controls were not adequately documented.",
+             "detail": "A separate observation was recovered from the final scanned page."},
+        ]
+        for dry_run in (True, False):
+            with self.subTest(dry_run=dry_run):
+                report, code, upsert, _rid = self._run_named(old, new, dry_run=dry_run)
+                self.assertEqual(report.failure_reasons["named_would_drop_text"], 1)
+                self.assertEqual(report.named_no_gain, 1)
+                self.assertEqual(report.recovered, 0)
+                self.assertEqual(len(report.named_text_loss), 1)
+                self.assertEqual(report.named_text_loss[0]["document_id"], "fda483-555001")
+                upsert.assert_not_called()
+                self.assertEqual(code, 0)
+
+    def test_run_named_allows_split_without_loss(self):
+        detail1 = "The documented production controls remained unchanged in the replacement document."
+        deficiency2 = "Equipment controls were not adequately documented."
+        detail2 = "A separate observation was recovered from the final scanned page."
+        old = [{"number": "1", "deficiency": "Written procedures were not adequately followed.",
+                "detail": detail1 + " " + deficiency2 + " " + detail2}]
+        new = [
+            {"number": "1", "deficiency": "Written procedures were not adequately followed.",
+             "detail": detail1},
+            {"number": "2", "deficiency": deficiency2, "detail": detail2},
+        ]
+        report, code, upsert, _rid = self._run_named(old, new, dry_run=False)
+        self.assertNotIn("named_would_drop_text", report.failure_reasons)
+        self.assertEqual(report.recovered, 1)
+        upsert.assert_called_once()
+        self.assertEqual(code, 0)
+
+    # [11-13] 4판(현행, 수동 복원 — 관찰 7 상세 1,043자·'tested for potency' 7회) 보호: 다시 읽은 결과가
+    # 3판처럼 관찰 7 이 354자에서 끊기면 관찰 수가 늘어도 named 교체를 막아야 한다(85637 재실행 차단 보장).
+    def test_85637_v4_to_v3_shape_is_blocked(self):
+        loss = rec.text_loss(V4_85637, NEW_85637)
+        self.assertGreaterEqual(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+        self.assertIn("potency", loss["sample"])
+
+    def test_85637_v2_to_v4_restore_is_not_loss(self):
+        # 4판은 2판의 손실 블록을 관찰 7 로 옮긴 것 — 머리글 낱말만 빠졌다.
+        self.assertLess(rec.text_loss(OLD_85637, V4_85637)["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_run_named_rerun_of_85637_v4_is_blocked(self):
+        extra = {"number": "8", "deficiency": "Aseptic processing areas are deficient regarding the system for "
+                 "cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+                 "detail": "Specifically, sporicidal agents are not used in the cleanroom."}
+        old = V4_85637["fda_483_observations"]
+        new = NEW_85637["fda_483_observations"] + [extra]      # 관찰 +1·표제 유지·관찰 7 은 354자 판
+        for dry_run in (True, False):
+            with self.subTest(dry_run=dry_run):
+                report, code, upsert, _rid = self._run_named(old, new, dry_run=dry_run)
+                self.assertNotIn("named_would_drop_deficiency", report.failure_reasons)
+                self.assertEqual(report.failure_reasons.get("named_would_drop_text"), 1)
+                self.assertEqual(report.recovered, 0)
+                upsert.assert_not_called()
+                self.assertEqual(code, 0)
+
+
+# 94989 (rawsig-9889752e…): 2판 host #5 상세 1,651자 → 현행 298자. holder #6 은 'procedure h' 에서 끊긴 사본(두 판 동일).
+_P94989_HEAD5 = ("Weights used for balance calibration are not NIST traceable as required in firm's procedure 4.060 version 1.0, "
+                 "Use Calibration and Maintenance of the REDACTED [redacted] Balances. B. Thermometers used for monitoring "
+                 "temperatures of freezers, incubators, and REDACTED [redacted] were not calibrated.")
+_P94989_HOLDER6 = ("A. The clean room including ISO 5 LAFH was certified by an outside contractor REDACTED [redacted] on a REDACTED "
+                   "[redacted] basis. The REDACTED [redacted] from the viable air monitoring were incubated in-house. "
+                   "prepared a certification report using the results provided. There was no record showing who performed the "
+                   "results reading and no record indicating that the results were reviewed In addition,[l5) (.()=:J "
+                   "identification, such as lot number and expiration date, was not recorded. B. No written procedure h")
+_P94989_REST = "as been established to provide a schedule for HEPA filter changes in the ISO classified rooms."
+OLD_94989 = {"fda_483_observations": [
+    {"number": "5", "deficiency": "Specifically, A.", "detail": _P94989_HEAD5 + " OBSERVATION 6 A. " + _P94989_HOLDER6 + _P94989_REST},
+    {"number": "6", "deficiency": "A.", "detail": _P94989_HOLDER6}]}
+NEW_94989 = {"fda_483_observations": [
+    {"number": "5", "deficiency": "Specifically, A.", "detail": _P94989_HEAD5},
+    {"number": "6", "deficiency": "A.", "detail": _P94989_HOLDER6}]}
+
+# 82333 (rawsig-95da32be…): 2판 host #2 상세 2,235자 → 현행 235자. holder #4 는 '1 A' 에서 끝남.
+_P82333_DEF2 = "All required records do not include your name and the location of your farm."
+_P82333_DET2 = ('Specifically, Your documents titled REDA CTED [redacted] FLY Counts", "Sparboe REDACTED [redacted] Cooler Monitoring Log", '
+                'and the document that you identified as your "Fly Control log" fails to identify your firm by name and location.')
+_P82333_DET3 = ('All required records do not have the signature or initials of the person performing the operation or creating the record. '
+                'Specifically, Your documents title RED ACTED [redacted] FLY Counts", "Sparboe REDACTED [redacted] Cooler Monitoring Log", '
+                'and the document that you identified as your "Fly Control log" fails to include the signature or initials of the person performing the operation.')
+_P82333_HOLDER4 = ("e You lack adequate review of records created to document your SE Prevention measures. E. Page 24, IV. D. 3) c) states "
+                   '"Threshold per barn is REDACTED [redacted] fly counts or higher." This statement as written does not indicate a threshold. 1 A')
+_P82333_REST = (' W 2. Your documents titled "REDA CTED [redacted] FLY Counts", "Sparboe REDACTED [redacted] cooler Monitoring Log", and the '
+                'document that you identified as your "Fly Control log" have not been reviewed. Additionally your document titled '
+                '"REDACTED [redacted] FLY Counts" and the document that you identified as your "Fly Control log" as prepared do not include space for review.')
+OLD_82333 = {"fda_483_observations": [
+    {"number": "2", "deficiency": _P82333_DEF2, "detail": _P82333_DET2 + " OBSERVATION 4. " + _P82333_HOLDER4 + _P82333_REST},
+    {"number": "3", "deficiency": ".", "detail": _P82333_DET3},
+    {"number": "4", "deficiency": ".", "detail": _P82333_HOLDER4}]}
+NEW_82333 = {"fda_483_observations": [
+    {"number": "2", "deficiency": _P82333_DEF2, "detail": _P82333_DET2},
+    {"number": "3", "deficiency": ".", "detail": _P82333_DET3},
+    {"number": "4", "deficiency": ".", "detail": _P82333_HOLDER4}]}
+
+# 74389 (정상 감소): holder #9 가 'rtt: <서명자> a' 에서 끝나고 옛 host #8 의 그 뒤는 실사관 서명란뿐(실명 가림).
+_P74389_DET8 = ("Specifically, the sink located in the peanut butter room is used interchangeably as a point for cleaning hands "
+                "and utensils and for washin~ out mops.")
+_P74389_HOLDER9 = ("rs ofthis conveyor were covered 'Nitha slimy, black-brown residue. Additionally, the bottom. sections- ofthe wash "
+                   "room walls had areas of mold. AMENDED EMPt.=CS] SlC31'1ATVRF. DATCISSUfO rtt: Nnnnn a")
+_P74389_SIG = " Xxxx, Investigator Yyyyy ~. Zzzzzzzz, Microbic ogis~ Wwwwww:i:. Vvvv. Investi.gater -;:::?0 /"
+OLD_74389 = {"fda_483_observations": [
+    {"number": "8", "deficiency": "Plumbing is not adequately maintained.", "detail": _P74389_DET8 + " " + _P74389_HOLDER9 + _P74389_SIG},
+    {"number": "9", "deficiency": ".", "detail": _P74389_HOLDER9}]}
+NEW_74389 = {"fda_483_observations": [
+    {"number": "8", "deficiency": "Plumbing is not adequately maintained.", "detail": _P74389_DET8},
+    {"number": "9", "deficiency": ".", "detail": _P74389_HOLDER9}]}
+
+# 88096·95350 (정상): 끊긴 듯 끝나지만 옛 판도 같은 곳에서 관찰이 끝나고 다음 관찰이 새 판에 그대로 있다.
+_P88096_TAIL = ("sent non-sterile gloves to us during this inspection.. 2046 W Silver Springs Blvd CITY, STATE, ZiP CODE, COUNTRY eee "
+                "TYPE ESTASLIBHENT INSPECTED Ocala, FL 34475. Producer of sterile drugs pn")
+_P88096_NEXT = "Employees engaged in the processing and packing of a drug product lack the education, training, and experience required."
+_P95350_TAIL = ("For example, the following lots of injectable drug products were also produced on 8/12/15: Glutathione, 200mg/ml, "
+                "lot#17477 GHRP-2/GHRP-6/Sermorelin,lot # 17475 GHRP-2/GHRP-6/Sermorelin,lot #17473")
+_P95350_NEXT = "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate validation."
+_FORM_PAGE_TAIL = " FORM FDA 483 (09/08) PREVIOUS EDITION OBSOLETE INSPECTIONAL OBSERVATIONS PAGE 3 OF 5 PAGES"
+OLD_88096 = {"fda_483_observations": [
+    {"number": "2", "deficiency": "Procedures were not followed.", "detail": _P88096_TAIL},
+    {"number": "3", "deficiency": _P88096_NEXT, "detail": "Specifically, training records were incomplete for aseptic operators." + _FORM_PAGE_TAIL}]}
+NEW_88096 = {"fda_483_observations": [
+    {"number": "2", "deficiency": "Procedures were not followed.", "detail": _P88096_TAIL},
+    {"number": "3", "deficiency": _P88096_NEXT, "detail": "Specifically, training records were incomplete for aseptic operators."}]}
+OLD_95350 = {"fda_483_observations": [
+    {"number": "1", "deficiency": "Batch records were incomplete.", "detail": _P95350_TAIL},
+    {"number": "2", "deficiency": _P95350_NEXT, "detail": "Specifically, media fills were not performed." + _FORM_PAGE_TAIL}]}
+NEW_95350 = {"fda_483_observations": [
+    {"number": "1", "deficiency": "Batch records were incomplete.", "detail": _P95350_TAIL},
+    {"number": "2", "deficiency": _P95350_NEXT, "detail": "Specifically, media fills were not performed."}]}
+
+
+class HolderCutGuardTest(unittest.TestCase):
+
+    def test_94989_holder_cut_is_detected(self):
+        loss = rec.text_loss(OLD_94989, NEW_94989)
+        self.assertLess(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+        self.assertIs(loss["holder_cut"], True)
+        self.assertIn("schedule", loss["holder_cut_sample"])
+        self.assertEqual(loss["holder_cut_number"], "6")
+        self.assertEqual(rec.text_loss_reason(loss), "holder_cut")
+
+    def test_82333_holder_cut_is_detected(self):
+        loss = rec.text_loss(OLD_82333, NEW_82333)
+        self.assertLess(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+        self.assertIs(loss["holder_cut"], True)
+        self.assertIn("have not been reviewed", loss["holder_cut_sample"])
+        self.assertEqual(loss["holder_cut_number"], "4")
+        self.assertEqual(rec.text_loss_reason(loss), "holder_cut")
+
+    def test_74389_signature_tail_is_not_holder_cut(self):
+        loss = rec.text_loss(OLD_74389, NEW_74389)
+        self.assertIs(loss["holder_cut"], False)
+        self.assertEqual(rec.text_loss_reason(loss), "")
+
+    def test_88096_95350_seams_are_not_holder_cut(self):
+        for old, new in ((OLD_88096, NEW_88096), (OLD_95350, NEW_95350)):
+            with self.subTest(old=old):
+                loss = rec.text_loss(old, new)
+                self.assertIs(loss["holder_cut"], False)
+                self.assertEqual(rec.text_loss_reason(loss), "")
+
+    def test_existing_normal_cases_are_not_holder_cut(self):
+        footer = ("EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE OF THIS PAGE FORM FDA 483 "
+                  "(09/08) PREVIOUS EDITION OBSOLETE INSPECTIONAL OBSERVATIONS PAGE 2 OF 5 PAGES")
+        observations = [
+            {"number": str(i),
+             "deficiency": f"Quality procedure {i} was not adequately established and followed.",
+             "detail": f"The documented control process for operation {i} was reviewed by investigators."}
+            for i in range(1, 4)
+        ]
+        footer_old = {"fda_483_observations": [
+            {**observation, "detail": observation["detail"] + " " + footer}
+            for observation in observations
+        ]}
+        footer_new = {"fda_483_observations": observations}
+
+        detail2 = " ".join(f"duplicatedqualityword{i}" for i in range(30))
+        deficiency2 = "Laboratory controls did not include complete documented review procedures."
+        duplicate = deficiency2 + " " + detail2
+        duplicate_old = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Written controls were not followed during production.",
+             "detail": "Investigators reviewed the complete production process and records. " + duplicate},
+            {"number": "2", "deficiency": deficiency2, "detail": detail2},
+        ]}
+        duplicate_new = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Written controls were not followed during production.",
+             "detail": "Investigators reviewed the complete production process and records."},
+            {"number": "2", "deficiency": deficiency2, "detail": detail2},
+        ]}
+
+        cases = (
+            (OLD_85401, NEW_85401),
+            (OLD_85637, V4_85637),
+            (footer_old, footer_new),
+            (duplicate_old, duplicate_new),
+        )
+        for old, new in cases:
+            with self.subTest(old=old):
+                loss = rec.text_loss(old, new)
+                self.assertIs(loss["holder_cut"], False)
+                self.assertEqual(rec.text_loss_reason(loss), "")
+
+    def test_existing_loss_cases_keep_reason(self):
+        for old in (OLD_85637, V4_85637):
+            with self.subTest(old=old):
+                self.assertTrue(rec.text_loss_reason(rec.text_loss(old, NEW_85637)).startswith("lost_chars"))
+
+    def test_sentence_boundary_end_is_left_to_threshold(self):
+        # 끊김형은 '단어/문장 중간에서 끊긴 holder' 만 본다. holder 가 마침표로 끝나면 뒤 손실은 200자 임계 소관.
+        holder = _P94989_HOLDER6.rsplit(" B. ", 1)[0]          # '...was not recorded.'
+        rest = " B. No written procedure has been established to provide a schedule for HEPA filter changes in the ISO classified rooms."
+        old = {"fda_483_observations": [
+            {"number": "5", "deficiency": "Specifically, A.", "detail": _P94989_HEAD5 + " OBSERVATION 6 A. " + holder + rest},
+            {"number": "6", "deficiency": "A.", "detail": holder}]}
+        new = {"fda_483_observations": [
+            {"number": "5", "deficiency": "Specifically, A.", "detail": _P94989_HEAD5},
+            {"number": "6", "deficiency": "A.", "detail": holder}]}
+        loss = rec.text_loss(old, new)
+        self.assertIs(loss["holder_cut"], False)
+        self.assertLess(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_holder_cut_needs_lost_text_right_after_cut(self):
+        # 끊긴 바로 뒤('has been established…')가 새 판의 다른 관찰로 살아 있으면 끊김형이 아니다(정상 분리).
+        # 그 뒤 문장 손실(tail, 200자 미만)은 끊김형이 아니라 200자 임계 소관이다.
+        moved = "has been established to provide a schedule for HEPA filter changes in the ISO classified rooms."
+        tail = " Records were not reviewed by the quality unit and there was no review of the data in the file."
+        old = {"fda_483_observations": [
+            {"number": "5", "deficiency": "Specifically, A.", "detail": _P94989_HEAD5 + " OBSERVATION 6 A. " + _P94989_HOLDER6 + _P94989_REST + tail},
+            {"number": "6", "deficiency": "A.", "detail": _P94989_HOLDER6}]}
+        new = {"fda_483_observations": [
+            {"number": "5", "deficiency": "Specifically, A.", "detail": _P94989_HEAD5},
+            {"number": "6", "deficiency": "A.", "detail": _P94989_HOLDER6},
+            {"number": "7", "deficiency": "B. No written procedure " + moved, "detail": ""}]}
+        loss = rec.text_loss(old, new)
+        self.assertIs(loss["holder_cut"], False)
+
+    def test_cut_word_must_be_prefix_of_old_word(self):
+        # 마지막 낱말이 옛 낱말의 앞부분이 아니면(다시 읽어 다른 낱말) 끊긴 지점으로 보지 않는다.
+        holder = _P94989_HOLDER6[:-1] + "exists"                 # '...No written procedure exists'
+        old = {"fda_483_observations": [
+            {"number": "5", "deficiency": "Specifically, A.", "detail": _P94989_HEAD5 + " OBSERVATION 6 A. " + _P94989_HOLDER6 + _P94989_REST},
+            {"number": "6", "deficiency": "A.", "detail": _P94989_HOLDER6}]}
+        new = {"fda_483_observations": [
+            {"number": "5", "deficiency": "Specifically, A.", "detail": _P94989_HEAD5},
+            {"number": "6", "deficiency": "A.", "detail": holder}]}
+        self.assertIs(rec.text_loss(old, new)["holder_cut"], False)
+
+    def test_holder_cut_stays_inside_old_observation(self):
+        # 옛 판의 holder 도 같은 곳에서 끝났다면(옛 관찰 경계) 그 뒤 다음 관찰의 변화는 끊김형이 아니다
+        # (표제가 바뀐 것은 _keeps_old_deficiencies 가드 소관).
+        old = {"fda_483_observations": [
+            {"number": "6", "deficiency": "A.", "detail": _P94989_HOLDER6},
+            {"number": "7", "deficiency": "Records were not reviewed by the quality unit and there was no review of the data.",
+             "detail": "Specifically, cleaning logs were missing."}]}
+        new = {"fda_483_observations": [
+            {"number": "6", "deficiency": "A.", "detail": _P94989_HOLDER6},
+            {"number": "7", "deficiency": "Quality unit review was not documented.",
+             "detail": "Specifically, cleaning logs were missing."}]}
+        self.assertIs(rec.text_loss(old, new)["holder_cut"], False)
+
+    def test_unchanged_doc_is_not_holder_cut(self):
+        loss = rec.text_loss(OLD_94989, OLD_94989)
+        self.assertIs(loss["holder_cut"], False)
+        self.assertEqual(loss["lost_chars"], 0)
+
+    def _run_named(self, old_observations, new_observations, *, dry_run):
+        import findings_store
+        import json
+
+        base_item = rec._rebuild_item(_nrow(), "", "")
+        record = findings_store.raw_signal_from_intake_item(base_item, collected_at="")
+        rid = record["raw_signal_id"]
+        pdf_url = "https://example.test/fda483.pdf"
+        old_raw = {**base_item.raw_payload, "pdf_url": pdf_url,
+                   "fda_483_observations": old_observations}
+        new_raw = {**base_item.raw_payload, "pdf_url": pdf_url,
+                   "fda_483_observations": new_observations}
+        rebuilt = rec._rebuild_item(_nrow(), "", "")
+        rebuilt.raw_payload = new_raw
+        row = {
+            "raw_signal_id": rid,
+            "document_id": base_item.document_id,
+            "collected_at": "2026-07-28T01:02:03Z",
+            "raw_json": json.dumps(old_raw, ensure_ascii=False, sort_keys=True),
+        }
+        return _run(
+            mode=rec.MODE_NAMED,
+            doc_ids=[base_item.document_id],
+            dry_run=dry_run,
+            rows=[row],
+            fetch_text=lambda _url: ("stub text", "pdf-ok"),
+            rebuild_item=lambda _nrow, _text, _status: rebuilt,
+        )
+
+    def test_run_named_blocks_holder_cut_dry_and_apply(self):
+        extra = {"number": "7", "deficiency": "Equipment cleaning was not documented.",
+                 "detail": "Specifically, cleaning logs were missing."}
+        old = OLD_94989["fda_483_observations"]
+        new = NEW_94989["fda_483_observations"] + [extra]
+        for dry_run in (True, False):
+            with self.subTest(dry_run=dry_run):
+                report, code, upsert, _rid = self._run_named(old, new, dry_run=dry_run)
+                self.assertEqual(report.failure_reasons["named_would_drop_text"], 1)
+                self.assertEqual(report.recovered, 0)
+                upsert.assert_not_called()
+                entry = report.named_text_loss[0]
+                self.assertEqual(entry["reason"], "holder_cut")
+                self.assertTrue({"lost_chars", "runs", "sample"} <= entry.keys())
+                self.assertGreaterEqual(entry["holder_cut_chars"], rec.NAMED_HOLDER_CUT_MIN_CHARS)
+                self.assertEqual(code, 0)

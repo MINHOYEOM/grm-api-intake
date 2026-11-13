@@ -3053,6 +3053,10 @@ def build_glossary_case_excerpts(
                                   "finding_id": fid})
                     seen_docs.add(doc["document_id"])
                     break
+        # [UI 2단 후속 2026-11-13] 고르는 순서도 '짧고 온전한 것 먼저'로 — 종전엔 문서 순서대로
+        # 앞의 2~3건을 가져가, 후보가 많아도 가림 표기((b)(4))가 박힌 문장이 먼저 뽑혔다(청정실).
+        # 안정 정렬이라 같은 점수면 문서 순서 그대로(결정론). 문서당 1건 규칙은 위에서 이미 지켰다.
+        found.sort(key=_glossary_quote_read_key)
         return found
 
     pool = {t["id"]: _candidates(t) for t in terms}
@@ -3082,10 +3086,14 @@ _GLOSSARY_REDACT_RE = re.compile(r"\(b\)\s*\(\d\)|\[redacted\]|\*{3,}|█", re.I
 _GLOSSARY_SENT_END_RE = re.compile(r"(다|함|음|됨|임|[.!?。])[\"'”’)\]]*$")
 
 
+# 번역 잡음 표지 — 겹친 어미("관찰되었했다")·같은 말 중첩 괄호("무균공정(무균공정(…))").
+_GLOSSARY_GARBLE_RE = re.compile(r"(?:었|았|웠|였)했다|\([^()]*\(")
+
+
 def _glossary_quote_read_key(c: dict[str, Any]) -> tuple[int, int, int]:
-    """(가림 표기 수, 끝맺음 없음 0/1, 길이) — 작을수록 먼저 보인다."""
+    """(가림 표기 + 번역 잡음 수, 끝맺음 없음 0/1, 길이) — 작을수록 먼저 보이고 먼저 골린다."""
     q = c.get("quote") or ""
-    return (len(_GLOSSARY_REDACT_RE.findall(q)),
+    return (len(_GLOSSARY_REDACT_RE.findall(q)) + len(_GLOSSARY_GARBLE_RE.findall(q)),
             0 if _GLOSSARY_SENT_END_RE.search(q.strip()) else 1,
             len(q))
 

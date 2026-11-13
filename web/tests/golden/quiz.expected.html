@@ -55,7 +55,7 @@
   .grm-langhint button:hover{color:var(--ink)}
 </style>
 </head>
-<body>
+<body><a class="grm-skip" href="#grm-main">본문 바로가기</a>
 <div class="grm-langhint" id="grmLangHint" role="region" aria-label="Language" lang="en" hidden>
   <span>This page is also available in English.</span>
   <a href="../en/quiz/index.html" hreflang="en" lang="en" rel="alternate">Read in English &rarr;</a>
@@ -69,11 +69,12 @@
   <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
 </div></header>
 
+<div id="grm-main" tabindex="-1"></div>
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Weekly Quiz</span>
     <h1 class="reveal" style="animation-delay:.08s">주간 퀴즈</h1>
-    <p class="reveal" style="animation-delay:.14s">규제·품질 용어와 최근 공개 사례를 짧게 복습하는 퀴즈입니다. 선택하면 바로 정답과 해설, 그리고 근거로 이동하는 링크를 보여드려요. 순위 경쟁은 없어요 — 풀이 기록은 이 브라우저에만 저장되어 구름이가 자라나요. 정답과 해설은 모두 GRM의 공개 근거에서 다시 확인할 수 있습니다.</p>
+    <p class="reveal" style="animation-delay:.14s">규제·품질 용어와 최근 공개 사례를 짧게 복습하는 퀴즈입니다. 선택하면 바로 정답과 해설, 그리고 근거로 이동하는 링크를 보여 줍니다. 순위 경쟁은 없습니다 — 풀이 기록은 이 브라우저에만 저장되어 구름이가 자랍니다. 정답과 해설은 모두 GRM의 공개 근거에서 다시 확인할 수 있습니다.</p>
   </div><section class="wrap qz-growth" id="grm-growth" hidden aria-label="구름이 성장 현황"></section>
 
   <div class="wrap qz-tools reveal" style="animation-delay:.2s"
@@ -4045,7 +4046,7 @@
         <button class="qz-result-btn is-primary" id="grm-qz-retry" type="button" hidden>틀린 문제만 다시 풀기</button>
         <button class="qz-result-btn" id="grm-qz-share" type="button">결과 복사</button>
       </div>
-    </section><p class="qz-empty" id="grm-qz-empty" hidden>조건에 맞는 문항이 없어요. 다른 필터를 눌러보세요.</p>
+    </section><p class="qz-empty" id="grm-qz-empty" hidden>조건에 맞는 문항이 없습니다. 다른 필터를 선택하세요.</p>
   </div>
 </main>
 <button class="grm-top" id="grmTop" type="button" aria-label="맨 위로" hidden><i class="ti ti-arrow-up" aria-hidden="true"></i></button>
@@ -4297,6 +4298,13 @@
   .nav nav{gap:2px}
   .nav nav a{padding-left:8px;padding-right:8px}
 }
+/* [접근성 2026-11-13] 산호색 강조 버튼(.btn.coral) — 흰 글자 대비 3.67:1 → 기존 토큰 --coral-2
+   (5.6:1)로. #1645 의 페이지별 버튼과 같은 계열. grm.css 는 동결이라 여기서 덮는다. 색 토큰 신설 0. */
+.btn.coral{background:var(--coral-2);border-color:var(--coral-2)}
+.btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
+.grm-skip:focus{left:16px}
+#grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
   <div class="foot">
@@ -4372,17 +4380,17 @@ if(_nt&&_nm){
     <header class="grm-pet-head" id="grm-pet-drag-handle" title="빈 곳을 드래그해 구름이 이동"><div><span>MY GRM PET</span><h2>구름이 관리</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="구름이 위치 초기화" title="위치 초기화"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="구름이 관리 닫기">×</button></div></header>
     <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>도감 미리보기</span></div>
     <div class="grm-pet-identity"><div><h3 id="grm-pet-name">알</h3><p id="grm-pet-mood">퀴즈를 풀면 부화가 시작돼요</p></div><span id="grm-pet-level">Lv.1</span></div>
-    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">쉬는 중</b></span><small id="grm-pet-state-copy">새로운 소식을 기다리고 있어요</small></div>
+    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">쉬는 중</b></span><small id="grm-pet-state-copy">새 소식 기다리는 중</small></div>
     <div class="grm-pet-progress"><div><span id="grm-pet-points">0 포인트</span><span id="grm-pet-next">50 포인트 남음</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
     <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>정답</span><span><b id="grm-pet-weeks">0</b>주 참여</span><span><b id="grm-pet-streak">0</b>주 연속</span></div>
     <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>쓰다듬기</button><a href="../quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>함께 성장하기</a></div>
-    <div class="grm-pet-atlas-head"><b>성장 도감</b><span>단계를 눌러 미리 볼 수 있어요</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
+    <div class="grm-pet-atlas-head"><b>성장 도감</b><span>단계를 누르면 미리 보기</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
     <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>성장 기록은 이 브라우저에 안전하게 보관돼요.</p>
   </section>
 </div>
-<script src="/assets/pet.js?v=e470de1f" defer></script>
+<script src="/assets/pet.js?v=4433fce6" defer></script>
 <script src="/assets/site-popup.js?v=8b64d29c" defer></script>
-<script src="/assets/quiz.js?v=283dfc1c" defer></script>
+<script src="/assets/quiz.js?v=e1c8a4db" defer></script>
 <script src="/assets/growth.js?v=d784ab7b" defer></script>
 
 <style>

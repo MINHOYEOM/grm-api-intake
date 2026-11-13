@@ -1,0 +1,104 @@
+[
+  {
+    "finding_id": "finding-e988a7c5c2f0c642ee1d2a86",
+    "finding_text": "Visual inspection process qualification is deficient.",
+    "finding_text_ko": "육안검사 공정의 적격성 평가가 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9cb24f630127c7531fa555cf",
+    "finding_text": "Facility is not in a state ofgood repair, leading to pest control issues.",
+    "finding_text_ko": "시설이 적절한 보수 상태로 유지되지 않아 방충·방서 관리 문제가 발생했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-be5166c1edd36ad246e0c6de",
+    "finding_text": "Specific identification tests are not conducted on components that have been accepted based on the supplier's report of analysis.",
+    "finding_text_ko": "공급업체 시험성적서에 근거해 입고 승인한 원료에 대해 특정 확인시험을 실시하지 않는다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a465f6aba074e7e942761882",
+    "finding_text": "The quality system to approve contract laboratories to perform microbiological testing of APIs, and excipients is deficient.",
+    "finding_text_ko": "원료의약품(API)과 첨가제의 미생물 시험을 수행할 위탁시험기관을 승인하는 품질시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-666cafef719241a3c04324f2",
+    "finding_text": "Written procedures have not been developed for the of post marketing adverse drug experiences.",
+    "finding_text_ko": "시판 후 의약품 이상사례 처리에 관한 서면 절차가 마련되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5c71b167fa3e905154ef11b6",
+    "finding_text": "In study JO for the Te a run was stopped due to instrument related errors and samples already injected were reinjected, but samples reinjection was not included in the study report.",
+    "finding_text_ko": "시험 JO for the Te 에서 기기 관련 오류로 분석 런(run)이 중단되어 이미 주입한 검체를 재주입했으나, 검체 재주입 사실을 시험 보고서에 넣지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4009d535149ecc6c81d3ac1c",
+    "finding_text": "In study JO for theA, samples for subject (@) were reprocessed but not reported.",
+    "finding_text_ko": "시험 JO for theA 에서 시험대상자 (@) 의 검체를 재처리했으나 보고하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1820f20a545c6b66658535d4",
+    "finding_text": "In study Je for theOA the firm used calibration standards and QC samples outside the established stability time period of 35 days.",
+    "finding_text_ko": "시험 Je for theOA 에서 회사는 설정된 안정성 기간 35일을 넘긴 검량선 표준시료와 QC 시료를 사용했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d5bd5d4e103b596e7c8c0210",
+    "finding_text": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "finding_text_ko": "공정 중 물질과 완제의약품 특성에 변동을 일으킬 수 있는 제조공정에 대해 그 결과물을 모니터링하고 공정 성능을 밸리데이션하는 관리 절차가 수립되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cbc03bc8bf45aca54f324e8e",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균 공정 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c59b15bc53cb496096dfe715",
+    "finding_text": "Changes in methods and procedures needed to correct and prevent identified quality problems are not implemented and effective.",
+    "finding_text_ko": "확인된 품질 문제를 시정·예방하는 데 필요한 방법 및 절차 변경이 시행되지 않았고 효과적이지도 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8087e3e6a883fb0eb12ab1fd",
+    "finding_text": "Testing and release ofdrug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "유통을 위한 완제의약품 시험 및 출하 시, 출하 전에 각 유효성분의 확인 및 함량 적합 여부를 적절한 시험으로 판정하지 않는다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51286de2b7c1903258054850",
+    "finding_text": "Procedures describing the handling of all written and oral complaints regarding a drug product are not established, written, and followed,, In December 2013, you stated that you were informed b ORGY that one or two patients had eye infections.",
+    "finding_text_ko": "의약품에 관한 모든 서면·구두 불만 처리 절차가 수립·문서화되어 있지 않고 준수되지 않는다. 귀사는 2013년 12월 ORGY로부터 환자 1~2명에게 눈 감염이 있었다는 통보를 받았다고 진술했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7c0aa2f50bdf2f32520907d0",
+    "finding_text": "Batch production and control records do not include complete information relating to the production and control of each batch.",
+    "finding_text_ko": "제조 및 관리 기록서(배치 기록)에 각 배치의 생산·관리에 관한 완전한 정보가 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f86fe85afa27dbc6eb78c349",
+    "finding_text": "Out-of-specification results are not thoroughly investigated in that assessments ofwhether significant problems exist, allocation ofthe tasks for corrective actions, and conclusions are not documented.",
+    "finding_text_ko": "기준일탈(OOS) 결과를 철저히 조사하지 않는다. 중대한 문제가 있는지에 대한 평가, 시정조치 업무 배정, 결론이 문서화되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-23bd3fd4b387021fdbb0adac",
+    "finding_text": "Waterused in the manufacture ofAPIs has not been demonstrated to be suitable for its intended use.",
+    "finding_text_ko": "원료의약품(API) 제조에 사용하는 물이 의도한 용도에 적합함을 입증하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1ccf556735bfc29d1dfecb6a",
+    "finding_text": "Laboratory controls do not include the establishment ofscientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  }
+]

@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.319` |
-| 최종 수정일 | 2026-11-12 |
+| 문서 버전 | `v1.320` |
+| 최종 수정일 | 2026-11-13 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -552,6 +552,7 @@ grm-api-intake/
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
 ├─ backfill_483_detail_refresh.py  # 저장된 483 관찰 상세(detail)만 다시 읽어 제자리 교체(쪽 넘김·서명란·가림 표시 수리 소급 — 표제·원문 전문·실사관 불변, dry-run 기본)
+├─ backfill_483_obs_split.py  # 앞 관찰 상세가 삼킨 483 관찰을 저장 raw 에서 나눔(현행 수집기 앵커 규칙 재사용·PDF 불필요·`raw_signal_apply_version` 경유, dry-run 기본)
 ├─ raw_versioning.py, raw_signals_rebaseline.py # [원문 갱신 규칙 R1·R2] 정본 원문을 바꾸는 유일한 길(DB 함수 `raw_signal_apply_version`·보관표 `raw_signal_versions`, 148) · 지문이 내용과 어긋난 483·MFDS 행 기준선 재매김(+MFDS 참석자 재동기화, dry-run 기본, `grm-raw-signals-rebaseline.yml`). 직접 PATCH 는 `tests/test_raw_signals_write_guard.py` 가 막는다 — R3: 수리 도구 4개도 이 경로(`replace_raw`·`apply_record`), 함수 밖 원문 변경은 DB 트리거가 거부(150)
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
 ├─ backfill_483_body_full.py      # 전문(fda483_body_full) 없이 굳은 최근 483 소급 — Notion 원문 → 없으면 PDF 재독(일일 규칙) → raw_signal_apply_version(repair, 전문 키 하나만 추가)·dry 기본
@@ -587,6 +588,7 @@ grm-api-intake/
 ├─ site_error_watch.py             # 사이트 오류 징후 일일 감시 — Cloudflare 5xx·404 급증·배포 실패 → 경보 이슈(grm-site-error-watch, 기본 꺼짐)
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
 ├─ grm_queue.py                    # 주간 대기열(DB, 그림자) — intake_queue·intake_handoffs(149). 일일 수집이 넣은 문서만 후보 · 행 상태는 main 의 델타·발행본에서 매번 다시 계산 · DB 로 만든 handoff 를 노션 것과 비교(ENABLE_INTAKE_QUEUE_SHADOW, 발행은 노션 그대로)
+├─ keep_shadow_health.py          # 수집 health JSON 의 store(중복 판정·무음 감시 그림자 기록)를 grm-queue-shadow 아티팩트에 남기고 실행 요약에 적는다 — health JSON 은 아티팩트로 안 올라가 실행 뒤 읽을 곳이 없었다(11-13)
 ├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, inspection_card.py(실사 결과 카드 앞면 블록 — 등급·지적 목록·당국 조치 결정론, 11-08), card_weight.py(카드 무게 — 깊이·표준·표 한 줄을 유형·등급·지적 건수·사유 길이로 판정, 11-16호부터, 11-10), check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
@@ -600,7 +602,7 @@ grm-api-intake/
 ├─ findings_store.py, findings_views.py
 ├─ findings_supabase.py, findings_supabase_append.py   # Postgres DDL/로드 · 직행 append
 ├─ findings_translate.py, findings_translate_apply_service.py  # 번역 export/apply · CI 반영
-├─ findings_detail_apply.py, findings_detail_qa.py  # 483 관찰 상세 국문 배치 반영·결정론 번역 검증(수치·코드·가림 표시·한자·길이)
+├─ findings_detail_export.py, findings_detail_apply.py, findings_detail_qa.py  # 483 관찰 상세 번역 대기열 내보내기(읽기 전용, finding↔raw 관찰 짝)·국문 배치 반영·결정론 번역 검증(수치·코드·가림 표시·한자·길이)
 ├─ findings_search_export.py, findings_search_page.py  # 검색 export · 오프라인 뷰어
 ├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구(M12, 내부 소급 적재)
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터
@@ -657,6 +659,7 @@ grm-api-intake/
 │  ├─ migrations/137_findings_similar_edges_public.sql # 문서 페이지 "다른 업체의 비슷한 지적" — 양 끝 공개 행인 finding_similar 엣지만 anon 에 여는 읽기 RPC(가산·**미적용**, 비서실 dry-run 후 적용)
 │  ├─ migrations/138_regulatory_news_public.sql # 최근 규제 소식 공개 읽기 RPC(raw_signals 공개 5컬럼 · 미적용 — 비서실 dry-run 후 적용)
 │  ├─ migrations/139_rum_anomaly_filter.sql # 방문 통계 자동 접속 급증 거르기 — 제외일(≥200·28일 중앙값×8)·급증 경로(≥100·×20) 판정 보기 + `rum_*_clean` 보기 6개, 보고 함수 4개(077·089·135·087)를 _clean 에 연결. 분석·보고는 원본 `rum_*` 대신 `_clean` 을 읽는다. 수동 판정은 `rum_anomaly_overrides`
+│  ├─ migrations/155_rum_nav_ui_events.sql # 페이지 간 이동(이전 종류→다음 종류)·탭/칩/토글/필터 클릭·펼침 하루 익명 카운터(`rum_nav_daily`·`rum_ui_daily`, anon bump 2개, 경로·쿼리·값 없음) + 봇 날 제외 `_clean` 보기 2개 + 판독 `rum_ui_report`(483 펼침 날짜별 포함). 수집은 base.html `[155]` 스크립트(env 게이트)
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -714,6 +717,7 @@ grm-api-intake/
 │  ├─ ops_db_backup_key_custody.md       # DB 백업 열쇠 보관·복원 시험 안내서(위치·절차만, 열쇠 값 없음)
 │  ├─ ops_brevo_signup_path_attributes.md # 구독 가입 경로 기록 — Brevo 속성 만들기·켜는 순서(GRM_SIGNUP_PATH_FIELDS)
 │  ├─ specs/FDA483_OCR_판독개선_벤치마크_2026-10-28.md     # 483 OCR 엔진·모델·전처리·psm·오픈소스 엔진 비교(판독 실패 44·대조군 60, 무료·로컬만)
+│  ├─ specs/GRM_방문기록_이동·클릭_설계_2026-11-13.md        # 155 이동·클릭 카운터 설계(무엇을 세나·싣지 않는 것·봇 정합·쓰는 법)
 │  ├─ specs/GRM_규제인텔리전스_업그레이드_설계_2026-07-15.md  # 승인 대기 중인 다음 구현 설계
 │  ├─ specs/GRM_퀴즈_운영설계_2026-07-18.md               # 주간 퀴즈 v1 운영 설계(/quiz/ 라이브)
 │  ├─ specs/GRM_인기카드_구르미위젯_설계조사_2026-07-18.md   # 인기 카드 랭킹·구르미 위젯 설계 조사(위젯=라이브, 인기카드=RPC 적용 완료·웹 통합 대기)
@@ -758,6 +762,7 @@ grm-api-intake/
    ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
    ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·Notion New 행 raw 동기화·잡별 예약 실패 경보)
+   ├─ grm-483-obs-split.yml             # 483 관찰 분할 소급(backfill_483_obs_split.py)을 자격증명 러너에서 실행(workflow_dispatch 전용·apply 기본 false·apply 는 main ref 만·doc_ids 선택) → 아티팩트 fda483-obs-split-report-{dry|apply}(30일)
    ├─ grm-fda483-body-full-backfill.yml # 483 전문 소급(workflow_dispatch·apply 기본 false·probe_pdf·since·limit) → 아티팩트 fda483-body-full-report(30일)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
    ├─ grm-eu-ncr-additional-plan.yml # EU NCR additional 소급 계획 생성(workflow_dispatch·GET 만) → 아티팩트 eu-ncr-additional-plan(90일)

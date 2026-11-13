@@ -949,6 +949,105 @@ def _git_reader(files: dict, date_str: str = "2026-07-13"):
     return read
 
 
+class HandoffBodySourceTest(unittest.TestCase):
+    """심층분석 원문 정본을 Notion handoff 대신 DB handoff 의 git 사본에서 읽는 길(노션 은퇴 준비)."""
+
+    DATE = "2026-07-13"
+
+    def setUp(self) -> None:
+        self._env = mock.patch.dict(os.environ, {})
+        self._env.start()
+        os.environ.pop(db.ENV_HANDOFF_BODY_SOURCE, None)
+        self.payload = {"run_date_kst": self.DATE, "generated_at_kst": "t", "rows": [
+            {"web_card_id": "fda483-1", "deep_analysis_input": {"body_full": "GIT BODY"}}]}
+        self.text = json.dumps(self.payload, ensure_ascii=False)
+        import grm_queue
+        self.sha = grm_queue.payload_sha256(self.payload)
+        self.notion_calls = 0
+
+    def tearDown(self) -> None:
+        self._env.stop()
+
+    def _run(self, *, git_text, handoff_ref=None, notion_bodies=None):
+        deep = {"fda483-1": {"deep_analysis": {}, "source_text": "DEPOSITED"}}
+
+        def notion(_t, _d, _date):
+            self.notion_calls += 1
+            return notion_bodies or {}
+        with mock.patch.object(db, "git_read_handoff", return_value=git_text), \
+                mock.patch.object(db, "fetch_handoff_body_full", side_effect=notion), \
+                mock.patch.object(db, "log"):
+            db._authoritative_source_text("tok", "dbid", self.DATE, deep, handoff_ref=handoff_ref)
+        return deep["fda483-1"]["source_text"]
+
+    def test_default_reads_notion_and_never_touches_git(self) -> None:
+        with mock.patch.object(db, "git_read_handoff", side_effect=AssertionError("git 을 읽으면 안 된다")), \
+                mock.patch.object(db, "fetch_handoff_body_full",
+                                  return_value={"fda483-1": "NOTION BODY"}), mock.patch.object(db, "log"):
+            deep = {"fda483-1": {"deep_analysis": {}, "source_text": "DEPOSITED"}}
+            db._authoritative_source_text("tok", "dbid", self.DATE, deep)
+        self.assertEqual(deep["fda483-1"]["source_text"], "NOTION BODY")
+        self.assertEqual(db.handoff_body_source(), "notion")
+
+    def test_variable_git_reads_the_mirror_and_skips_notion(self) -> None:
+        os.environ[db.ENV_HANDOFF_BODY_SOURCE] = "git"
+        self.assertEqual(self._run(git_text=self.text), "GIT BODY")
+        self.assertEqual(self.notion_calls, 0)
+
+    def test_variable_git_falls_back_to_notion_when_the_mirror_is_gone(self) -> None:
+        os.environ[db.ENV_HANDOFF_BODY_SOURCE] = "git"
+        self.assertEqual(self._run(git_text=None, notion_bodies={"fda483-1": "NOTION BODY"}),
+                         "NOTION BODY")
+        self.assertEqual(self.notion_calls, 1)
+
+    def test_git_handoff_issue_reads_git_even_without_the_variable(self) -> None:
+        ref = {"date": self.DATE, "sha256": self.sha, "rows": 1}
+        self.assertEqual(self._run(git_text=self.text, handoff_ref=ref), "GIT BODY")
+        self.assertEqual(self.notion_calls, 0)
+
+    def test_git_handoff_issue_never_substitutes_the_notion_handoff(self) -> None:
+        ref = {"date": self.DATE, "sha256": "0" * 64, "rows": 1}
+        for git_text in (self.text, None, "not json",
+                         json.dumps(dict(self.payload, run_date_kst="2026-07-06"))):
+            with self.subTest(git=str(git_text)[:20]):
+                got = self._run(git_text=git_text, handoff_ref=ref,
+                                notion_bodies={"fda483-1": "NOTION BODY"})
+                self.assertEqual(got, "DEPOSITED")       # 반납된 원문 그대로
+        self.assertEqual(self.notion_calls, 0)
+
+    def test_a_crash_in_the_git_path_does_not_block_the_bridge(self) -> None:
+        os.environ[db.ENV_HANDOFF_BODY_SOURCE] = "git"
+        deep = {"fda483-1": {"deep_analysis": {}, "source_text": "DEPOSITED"}}
+        with mock.patch.object(db, "git_read_handoff", side_effect=RuntimeError("git 고장")), \
+                mock.patch.object(db, "fetch_handoff_body_full",
+                                  return_value={"fda483-1": "NOTION BODY"}), mock.patch.object(db, "log"):
+            db._authoritative_source_text("tok", "dbid", self.DATE, deep)
+        self.assertEqual(deep["fda483-1"]["source_text"], "NOTION BODY")
+
+    def test_mirror_branch_name_matches_the_mirror_workflow(self) -> None:
+        root = pathlib.Path(db.__file__).resolve().parent
+        wf = (root / ".github" / "workflows" / "grm-queue-handoff-mirror.yml").read_text(encoding="utf-8")
+        self.assertIn(f"MIRROR_BRANCH: {db.HANDOFF_MIRROR_BRANCH}", wf)
+        self.assertIn('cp "$f" "handoff_${d}.json"', wf)
+        bridge = (root / ".github" / "workflows" / "grm-delta-bridge.yml").read_text(encoding="utf-8")
+        self.assertIn("GRM_HANDOFF_BODY_SOURCE: ${{ vars.GRM_HANDOFF_BODY_SOURCE || 'notion' }}", bridge)
+
+    def test_prepare_git_run_passes_the_ref(self) -> None:
+        seen = {}
+
+        def fake(_t, _d, _date, _deep, handoff_ref=None):
+            seen["ref"] = handoff_ref
+        ref = {"date": self.DATE, "sha256": self.sha, "rows": 1}
+        run = {"date": self.DATE, "branch": "b",
+               "delta": dict(_git_delta(), handoff_ref=ref),
+               "deep": {"mfds-1": {"deep_analysis": {"x": 1}, "source_text": "s"}}}
+        with mock.patch.object(db, "_authoritative_source_text", side_effect=fake), \
+                mock.patch.object(db, "_gate_deep_analysis", side_effect=lambda d: d), \
+                mock.patch.object(db, "log"):
+            db.prepare_git_run("tok", "dbid", run)
+        self.assertEqual(seen["ref"], ref)
+
+
 class LoadGitRunTest(unittest.TestCase):
     def test_adoptable_when_copyedit_passed(self) -> None:
         run = db.load_git_run("2026-07-13", read=_git_reader(

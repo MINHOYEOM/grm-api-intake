@@ -55,7 +55,7 @@
   .grm-langhint button:hover{color:var(--ink)}
 </style>
 </head>
-<body>
+<body><a class="grm-skip" href="#grm-main">본문 바로가기</a>
 <div class="grm-langhint" id="grmLangHint" role="region" aria-label="Language" lang="en" hidden>
   <span>This page is also available in English.</span>
   <a href="../../en/findings/trends/index.html" hreflang="en" lang="en" rel="alternate">Read in English &rarr;</a>
@@ -69,6 +69,7 @@
   <a class="btn coral" href="../../briefs/2026-07-06/index.html">이번 주 소식</a>
 </div></header>
 
+<div id="grm-main" tabindex="-1"></div>
 <style>
   .grm-crumbs{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:14px}
   .grm-crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
@@ -92,7 +93,7 @@
     <div class="tr-state tr-state-error" id="tr-error" hidden>통계 서비스 준비 중입니다.</div>
 
     <div id="tr-content" hidden><div class="tr-agency" id="tr-agency" role="group" aria-label="기관 선택" hidden>
-        <span class="tr-agency-lab">어느 기관 기준으로 볼까요?</span>
+        <span class="tr-agency-lab">기준 기관</span>
         <div class="tr-agency-btns" id="tr-agency-btns"></div>
       </div><section class="tr-block tr-rank-block" id="tr-rank-block" aria-label="가장 많이 지적된 영역" hidden>
         <h2 class="tr-h">가장 많이 지적된 영역</h2>
@@ -125,7 +126,7 @@
         </details>
       </section><section class="tr-block tr-cfr-block" id="tr-cfr-block" aria-label="많이 인용된 조항" hidden>
         <h2 class="tr-h">많이 인용된 조항</h2>
-        <p class="tr-read" id="tr-cfr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 &mdash; 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
+        <p class="tr-read" id="tr-cfr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있습니다 &mdash; 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
         <p class="tr-cfr-sub" id="tr-cfr-sub"></p>
         <div id="tr-cfr" class="tr-cfr"></div>
         <div class="tr-cta">
@@ -586,6 +587,13 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .nav nav{gap:2px}
   .nav nav a{padding-left:8px;padding-right:8px}
 }
+/* [접근성 2026-11-13] 산호색 강조 버튼(.btn.coral) — 흰 글자 대비 3.67:1 → 기존 토큰 --coral-2
+   (5.6:1)로. #1645 의 페이지별 버튼과 같은 계열. grm.css 는 동결이라 여기서 덮는다. 색 토큰 신설 0. */
+.btn.coral{background:var(--coral-2);border-color:var(--coral-2)}
+.btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
+.grm-skip:focus{left:16px}
+#grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
   <div class="foot">
@@ -648,9 +656,9 @@ if(_nt&&_nm){
   b.hidden=false;
 })();
 </script>
-<script src="/assets/pet.js?v=e470de1f" defer></script>
+<script src="/assets/pet.js?v=4433fce6" defer></script>
 <script src="/assets/site-popup.js?v=8b64d29c" defer></script>
-<script src="../../assets/trends.js?v=0e725bef" defer></script>
+<script src="../../assets/trends.js?v=2613d433" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

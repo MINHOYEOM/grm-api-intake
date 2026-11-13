@@ -3481,7 +3481,9 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  heal_candidates: list[IntakeItem] | None = None,
                  store_counters: dict[str, Any] | None = None,
                  fallback_checked: set[str] | None = None,
-                 queue_new_items: list[IntakeItem] | None = None) -> tuple[int, int, int]:
+                 queue_new_items: list[IntakeItem] | None = None,
+                 queue_on_store: bool = False,
+                 queue_only_keys: set[str] | None = None) -> tuple[int, int, int]:
     """삽입 실행. 반환: (inserted, skipped, failed)
 
     [대기열 0단계 2026-11-12] 저장 순서: **Supabase(정본) 먼저 → Notion(주간 대기열) 다음**.
@@ -3538,6 +3540,15 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             if heal_candidates is not None:
                 heal_candidates.append(item)
             continue
+        if queue_only_keys and dedup_key in queue_only_keys:
+            # [대기열 5단계] 보충 — 정본에는 이미 있고 대기열에만 없는 문서다(넣기 실패분·과거분 백필이
+            # 먼저 받은 최근 문서). 정본·노션에는 다시 쓰지 않고 대기열에만 넣는다.
+            if queue_new_items is not None and not dry_run:
+                queue_new_items.append(item)
+            _store_count(store_counters, "queue_healed")
+            existing_ids.add(dedup_key)
+            skipped += 1
+            continue
         if fallback_checked is not None and (dedup_key not in fallback_checked
                                              or item.source in _CANONICAL_URL_DEDUP_SOURCES):
             # Supabase 키로는 "이미 Notion 에 있음"을 판정할 수 없는 항목 — 쓰지 않고 미룬다.
@@ -3574,6 +3585,10 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                 "saved": "supabase_saved", "duplicate": "supabase_duplicate",
                 "failed": "supabase_failed", "undated": "supabase_skipped_undated",
             }[supa_status])
+        if queue_on_store and queue_new_items is not None and supa_status in {"saved", "duplicate"}:
+            # [대기열 5단계] 넣기 기준 = 정본에 있다는 것이 확인된 문서. 노션 행 생성의 성패와 무관하다.
+            # 정본 저장이 실패한 문서는 넣지 않는다(FK) — 내일 다시 새 문서로 온다.
+            queue_new_items.append(item)
         if fallback_checked is not None and supa_status != "saved":
             # 대체 판정 모드에서는 Supabase 가 "새로 저장됨"이라고 답한 항목만 Notion 에 쓴다.
             # failed(유효성 거부 등 — Notion 에는 이미 있을 수 있다)·duplicate 는 판정이 확실하지
@@ -3592,8 +3607,9 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             existing_ids.add(dedup_key)
             if url_key:
                 existing_url_keys.add(url_key)
-            if queue_new_items is not None:
+            if queue_new_items is not None and not queue_on_store:
                 # [대기열 그림자 2026-11-12] 노션 대기열에 새로 들어간 항목 = DB 대기열에도 넣을 항목.
+                # (queue_on_store 면 위에서 정본 저장 직후에 이미 넣었다.)
                 queue_new_items.append(item)
             if findings_sqlite_path:
                 try:
@@ -4850,15 +4866,57 @@ def main() -> int:
     store_counters = _new_store_counters()
     stats.store_summary = store_counters
     fallback_checked: set[str] | None = None
+    _all_collected: list[IntakeItem] = [
+        it for group in (
+            fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items,
+            eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items,
+            mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
+            mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items,
+            ispe_items, eu_gmp_ncr_items, mhra_gmp_ncr_items)
+        for it in group]
+
+    # [대기열 5단계 2026-11-13] 중복 판정·대기열 넣기 기준을 DB(정본 raw_signals + 대기열 intake_queue)로.
+    #   GRM_INTAKE_DEDUP_SOURCE=supabase  → DB 기준으로 판정한다. 조회가 실패하면 그날은 노션 기준(아래 종전 길).
+    #   ENABLE_INTAKE_DEDUP_SHADOW=true   → 판정은 노션 기준 그대로, DB 기준이었다면 어땠을지를 health 에 남긴다.
+    #   둘 다 꺼져 있으면(기본) 이 블록은 아무것도 하지 않는다 — DB 를 읽지도 않는다.
+    queue_db_dedup = False
+    queue_only_keys: set[str] = set()
+    _want_db_dedup = grm_queue.dedup_source() == "supabase"
+    if findings_supabase and not args.dry_run and (_want_db_dedup or grm_queue.dedup_shadow_enabled()):
+        try:
+            _qstore = grm_queue.QueueStore(findings_supabase[0], findings_supabase[1])
+            _classes = grm_queue.lookup_dedup(
+                _qstore, [(it.source, it.document_id) for it in _all_collected], now_k)
+        except Exception as e:  # noqa: BLE001 — 판정 준비가 수집을 죽이면 안 된다(노션 기준으로 간다)
+            log("WARN", f"DB 기준 중복 판정 준비 실패 — 노션 기준으로 진행: {type(e).__name__}")
+            _qstore, _classes = None, None
+        if _classes is None:
+            store_counters["dedup_shadow"] = {"error": "정본·대기열 조회 실패"}
+            if _want_db_dedup:
+                log("WARN", "GRM_INTAKE_DEDUP_SOURCE=supabase 이지만 정본·대기열 조회 실패 — 오늘은 노션 기준으로 판정")
+        else:
+            if notion_dedupe_error is None:
+                store_counters["dedup_shadow"] = grm_queue.dedup_shadow_summary(_classes, existing)
+            else:
+                store_counters["dedup_shadow"] = dict(
+                    grm_queue.dedup_shadow_summary(_classes, set()), same=None,
+                    note="노션 조회 실패 — 비교 없음")
+            if _want_db_dedup:
+                _url_keys = _qstore.source_url_keys(sorted(_CANONICAL_URL_DEDUP_SOURCES))
+                if _url_keys is None:
+                    log("WARN", "DB 기준 URL 2차 중복 키 조회 실패 — 오늘은 노션 기준으로 판정")
+                else:
+                    existing = {k for k, c in _classes.items()
+                                if c in (grm_queue.DEDUP_HAVE, grm_queue.DEDUP_OLD)}
+                    existing_url_keys = _url_keys
+                    queue_only_keys = {k for k, c in _classes.items() if c == grm_queue.DEDUP_HEAL}
+                    queue_db_dedup = True
+                    notion_dedupe_error = None      # 노션 조회가 죽었어도 DB 기준으로 계속한다
+                    store_counters["dedup_mode"] = "supabase"
+                    log("INFO", "중복 판정 DB 기준: "
+                                + " · ".join(f"{k} {v}" for k, v in store_counters["dedup_shadow"]["db"].items()))
+
     if notion_dedupe_error is not None:
-        _all_collected: list[IntakeItem] = [
-            it for group in (
-                fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items,
-                eca_items, wl_items, mfds_items, mfds_law_items, mfds_recall_items,
-                mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
-                mfds_gmp_inspection_items, ich_items, who_items, hc_items, fda483_items,
-                ispe_items, eu_gmp_ncr_items, mhra_gmp_ncr_items)
-            for it in group]
         fb = (supabase_fallback_dedup_keys(findings_supabase[0], findings_supabase[1],
                                            _all_collected, now_k)
               if findings_supabase else None)
@@ -4924,7 +4982,8 @@ def main() -> int:
     # [대기열 그림자 2026-11-12] 노션 대기열에 새로 들어간 항목을 모아 DB 대기열(intake_queue)에도
     # 넣는다. ENABLE_INTAKE_QUEUE_SHADOW 가 꺼져 있으면 None = 종전과 완전히 같다.
     queue_new_items: list[IntakeItem] | None = (
-        [] if findings_supabase and not args.dry_run and grm_queue.shadow_enabled() else None)
+        [] if findings_supabase and not args.dry_run
+        and (grm_queue.shadow_enabled() or queue_db_dedup) else None)
     for spec in INTAKE_SOURCE_SPECS:
         if spec.prefix == "search":
             continue  # search 는 아래 결합 블록에서 처리
@@ -4940,7 +4999,8 @@ def main() -> int:
             heal_candidates=heal_candidates,
             store_counters=store_counters,
             fallback_checked=fallback_checked,
-            queue_new_items=queue_new_items)
+            queue_new_items=queue_new_items,
+            queue_on_store=queue_db_dedup, queue_only_keys=queue_only_keys)
         setattr(stats, f"{spec.prefix}_inserted", ins)
         setattr(stats, f"{spec.prefix}_skipped_dup", sk)
         setattr(stats, f"{spec.prefix}_insert_failed", fail)
@@ -5022,6 +5082,7 @@ def main() -> int:
             store_counters=store_counters,
             fallback_checked=fallback_checked,
             queue_new_items=queue_new_items,
+            queue_on_store=queue_db_dedup, queue_only_keys=queue_only_keys,
         )
         stats.search_inserted = src_in
         stats.search_skipped_dup = src_sk
@@ -5057,25 +5118,39 @@ def main() -> int:
             source_last_seen, source_silence_errors = _seen, tuple(_errs)
             # coverage 줄용 무음 집합 — health 와 **같은 판정 함수·같은 활성 매핑**을 쓴다
             # (두 계기가 다른 답을 내면 사람이 어느 쪽도 못 믿는다).
+            _enabled_map = source_enabled_map(
+                active=active, enable_search=enable_search,
+                enable_mfds=enable_mfds, enable_mfds_law=enable_mfds_law,
+                enable_mfds_recall=enable_mfds_recall,
+                enable_mfds_admin=enable_mfds_admin,
+                enable_mfds_gmp_cert=enable_mfds_gmp_cert,
+                enable_mfds_safety_letter=enable_mfds_safety_letter,
+                enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
+                enable_ich=enable_ich, enable_who=enable_who, enable_hc=enable_hc,
+                enable_fda483=enable_fda483, enable_ispe=enable_ispe,
+                enable_eu_gmp_ncr=enable_eu_gmp_ncr,
+                enable_mhra_gmp_ncr=enable_mhra_gmp_ncr,
+            )
             coverage_silent_sources = {
                 finding.notion_source
                 for finding in evaluate_silence(
-                    last_seen=_seen, run_date=run_date,
-                    source_enabled=source_enabled_map(
-                        active=active, enable_search=enable_search,
-                        enable_mfds=enable_mfds, enable_mfds_law=enable_mfds_law,
-                        enable_mfds_recall=enable_mfds_recall,
-                        enable_mfds_admin=enable_mfds_admin,
-                        enable_mfds_gmp_cert=enable_mfds_gmp_cert,
-                        enable_mfds_safety_letter=enable_mfds_safety_letter,
-                        enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
-                        enable_ich=enable_ich, enable_who=enable_who, enable_hc=enable_hc,
-                        enable_fda483=enable_fda483, enable_ispe=enable_ispe,
-                        enable_eu_gmp_ncr=enable_eu_gmp_ncr,
-                        enable_mhra_gmp_ncr=enable_mhra_gmp_ncr,
-                    ),
-                )
+                    last_seen=_seen, run_date=run_date, source_enabled=_enabled_map)
             }
+            # [노션 은퇴 준비 2026-11-13] 같은 판정을 DB 대기열(intake_queue) 기준으로도 계산해 차이를
+            # health JSON `store.monitor_shadow.silence` 에 남긴다. 판정·경고·coverage 줄은 노션 기준 그대로.
+            # 기본 꺼짐. 실패해도 위 판정에는 영향이 없다(아래에서 따로 잡는다).
+            if findings_supabase and env_flag("ENABLE_SILENCE_SUPABASE_SHADOW"):
+                try:
+                    from source_silence import query_last_seen_supabase, silence_shadow
+                    _db_seen, _db_errs, _hist = query_last_seen_supabase(
+                        findings_supabase[0], findings_supabase[1],
+                        [w.notion_source for w in watched_sources()], run_date=run_date)
+                    store_counters.setdefault("monitor_shadow", {})["silence"] = silence_shadow(
+                        notion_last_seen=_seen, db_last_seen=_db_seen, run_date=run_date,
+                        source_enabled=_enabled_map, db_errors=_db_errs, history_start=_hist)
+                except Exception as e:  # noqa: BLE001 — 그림자가 감시·수집을 죽이면 안 된다
+                    store_counters.setdefault("monitor_shadow", {})["silence"] = {
+                        "error": type(e).__name__}
         except Exception as e:  # noqa: BLE001 — 감시가 수집을 죽이면 안 된다
             source_last_seen = None
             source_silence_errors = (f"watchdog: {e}",)

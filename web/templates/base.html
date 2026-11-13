@@ -98,6 +98,9 @@
 {% endif %}
 </head>
 <body>
+{#- [접근성 2026-11-13] 본문 건너뛰기 — 키보드로 들어오면 첫 Tab 에 보이고, 누르면 머리말·메뉴를
+    건너 본문 시작(#grm-main)으로 간다. 평소에는 화면 밖. -#}
+<a class="grm-skip" href="#grm-main">{{ _("본문 바로가기") }}</a>
 {# P0-4: 'AI 자동 생성 고지' = 홈의 고지 섹션(#notice). 홈에선 순수 프래그먼트(새로고침 0),
    타 페이지에선 홈으로 이동 후 스크롤. [소개 2026-09-06] 종전 '소개'(about_href → 홈 #why
    기능 섹션)는 전용 페이지 /about/ 로 바뀌어 변수가 사라졌다 — 푸터 '서비스' 열 참조. #}
@@ -156,6 +159,7 @@
 {% endif %}
 </div></header>
 
+<div id="grm-main" tabindex="-1"></div>
 {% if auto_crumbs %}{% include "partials/crumbs.html" %}{% endif %}
 {% block content %}{% endblock %}
 {% if next_strip %}{% include "partials/next_strip.html" %}{% endif %}
@@ -408,6 +412,13 @@
   .nav nav{gap:2px}
   .nav nav a{padding-left:8px;padding-right:8px}
 }
+/* [접근성 2026-11-13] 산호색 강조 버튼(.btn.coral) — 흰 글자 대비 3.67:1 → 기존 토큰 --coral-2
+   (5.6:1)로. #1645 의 페이지별 버튼과 같은 계열. grm.css 는 동결이라 여기서 덮는다. 색 토큰 신설 0. */
+.btn.coral{background:var(--coral-2);border-color:var(--coral-2)}
+.btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
+.grm-skip:focus{left:16px}
+#grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
   <div class="foot">
@@ -497,11 +508,11 @@ if(_nt&&_nm){
     <header class="grm-pet-head" id="grm-pet-drag-handle" title="{{ _('빈 곳을 드래그해 구름이 이동') }}"><div><span>MY GRM PET</span><h2>{{ _("구름이 관리") }}</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="{{ _('구름이 위치 초기화') }}" title="{{ _('위치 초기화') }}"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="{{ _('구름이 관리 닫기') }}">×</button></div></header>
     <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>{{ _("도감 미리보기") }}</span></div>
     <div class="grm-pet-identity"><div><h3 id="grm-pet-name">{{ _("알") }}</h3><p id="grm-pet-mood">{{ _("퀴즈를 풀면 부화가 시작돼요") }}</p></div><span id="grm-pet-level">Lv.1</span></div>
-    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">{{ _("쉬는 중") }}</b></span><small id="grm-pet-state-copy">{{ _("새로운 소식을 기다리고 있어요") }}</small></div>
+    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">{{ _("쉬는 중") }}</b></span><small id="grm-pet-state-copy">{{ _("새 소식 기다리는 중") }}</small></div>
     <div class="grm-pet-progress"><div><span id="grm-pet-points">{{ _("0 포인트") }}</span><span id="grm-pet-next">{{ _("50 포인트 남음") }}</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
     <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>{{ _("정답") }}</span><span><b id="grm-pet-weeks">0</b>{{ _("주 참여") }}</span><span><b id="grm-pet-streak">0</b>{{ _("주 연속") }}</span></div>
     <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>{{ _("쓰다듬기") }}</button>{% if lang == 'ko' or 'quiz/' in en_paths %}<a href="{{ rel_root }}quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>{{ _("함께 성장하기") }}</a>{% endif %}</div>
-    <div class="grm-pet-atlas-head"><b>{{ _("성장 도감") }}</b><span>{{ _("단계를 눌러 미리 볼 수 있어요") }}</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
+    <div class="grm-pet-atlas-head"><b>{{ _("성장 도감") }}</b><span>{{ _("단계를 누르면 미리 보기") }}</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
     <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>{{ _("성장 기록은 이 브라우저에 안전하게 보관돼요.") }}</p>
   </section>
 </div>
@@ -1095,6 +1106,114 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
     var b=document.getElementById(id);
     if(b)b.addEventListener('click',function(){bump('cta_dismiss');});
   });
+})();
+</script>
+{% endif %}
+{% if reactions_enabled %}
+{#- [155 · 2026-11-13] 이동·클릭 익명 카운터(대표 요청 ⑤⑥, 설계: docs/specs/GRM_방문기록_이동·클릭_설계_2026-11-13.md).
+    페이지가 열릴 때 "이전 페이지 종류 → 이 페이지 종류" 1(새로고침 제외, 바깥 유입은 entry)과,
+    탭·칩·토글·필터 클릭·펼침(details 열기)마다 1을 rum_nav_bump·rum_ui_bump 로 보낸다.
+    ★싣지 않는 것: 경로·쿼리·검색어·업체명·사람 이름·고른 값·화면 글자. 종류는 경로 앞 두 조각을
+    아래 화이트리스트로 접은 이름이고, 요소는 우리가 지은 CSS 클래스 이름(또는 묶음 id)이다.
+    게이트는 위 퍼널·아래 RUM 과 같다(프로덕션 호스트·자동화 브라우저·/admin·운영자 grm-op).
+    env 게이트(reactions_enabled) 안이라 env-off 골든 출력 0. 페이지당 전송 상한 60.
+    이동은 새로고침 제외·같은 사이트 리퍼러만 종류로(나머지 entry). 요소 이름은 상태·아이콘 클래스를 뺀
+    클래스 앞 두 개(없으면 조상 3단). 펼침은 열릴 때만(toggle 은 capture). 필터는 묶음(fieldset·select 의
+    id/클래스)만 싣고 고른 값은 안 싣는다. 반응 버튼·메뉴·헤더 검색·푸터는 뺀다. 카드 종류(data-card-type)는
+    CT 표로 영문 slug 로 바꾼다(영문 페이지 한글 0 규칙 때문에 한글 키는 u-이스케이프). -#}
+<script>
+(function(){
+  var cfg=document.getElementById('grm-reactions-cfg');
+  if(!cfg||!window.fetch)return;
+  var hn=location.hostname;
+  if(hn!=='{{ site_host }}'&&hn!=='www.{{ site_host }}')return;
+  if(navigator.webdriver===true||/\bHeadless|\bClaude\//.test(navigator.userAgent||''))return;
+  var p0=location.pathname||'/';
+  if(p0==='/admin'||p0.indexOf('/admin/')===0)return;
+  var u=cfg.getAttribute('data-url')||'',k=cfg.getAttribute('data-key')||'';
+  if(!u||!k)return;
+  var TOP=['archive','briefs','glossary','findings','search','browse','guide','library','quiz','news','me','about','graph','welcome','privacy','terms'];
+  var SUB={doc:1,firm:1,inspector:1,clause:1,c:1,agency:1,country:1,trends:1,inspections:1,examples:1,checklist:1,citations:1,docs:1,coverage:1,'import-alerts':1};
+  function kindOf(path){
+    var s=String(path||'/').toLowerCase().replace(/index\.html?$/,'').replace(/^\/+|\/+$/g,'').split('/');
+    if(s[0]==='en')s.shift();
+    if(!s[0])return 'home';
+    if(TOP.indexOf(s[0])<0)return 'other';
+    if(s[0]==='briefs')return s[1]?'brief':'briefs';
+    if(s[0]==='glossary')return s[1]?'term':'glossary';
+    if(s[0]==='findings'){
+      if(!s[1])return 'findings';
+      if(!SUB[s[1]])return 'findings-other';
+      var n=s[1]==='c'?'category':s[1];
+      return s[2]?n:'findings-'+n;
+    }
+    return s[0];
+  }
+  var lang=/^\/en(\/|$)/.test(p0)?'en':'ko',page=kindOf(p0),sent=0;
+  function send(fn,body){
+    try{if(localStorage.getItem('grm-op')==='1')return;}catch(_){}
+    if(sent>=60)return;sent++;
+    try{fetch(u+'/rest/v1/rpc/'+fn,{method:'POST',keepalive:true,
+      headers:{'Content-Type':'application/json',apikey:k,Authorization:'Bearer '+k},
+      body:JSON.stringify(body)}).catch(function(){});}catch(_){}
+  }
+  var nt='';
+  try{var ne=performance.getEntriesByType('navigation')[0];nt=(ne&&ne.type)||'';}catch(_){}
+  if(nt!=='reload'){
+    var from='entry';
+    try{
+      if(document.referrer){
+        var r=new URL(document.referrer),rh=r.hostname.replace(/^www\./,'');
+        if(rh===hn.replace(/^www\./,''))from=kindOf(r.pathname);
+      }
+    }catch(_){}
+    send('rum_nav_bump',{p_lang:lang,p_from:from,p_to:page});
+  }
+  var SKIP=/^(on|active|open|sel|selected|is-[a-z-]*|ti|ti-[a-z0-9-]*|lab|sub)$/;
+  function nameOf(el){
+    for(var i=0;el&&el.getAttribute&&i<4;i++,el=el.parentElement){
+      var cs=(el.getAttribute('class')||'').split(/\s+/),out=[];
+      for(var j=0;j<cs.length&&out.length<2;j++){
+        if(/^[a-z][a-z0-9-]{0,39}$/.test(cs[j])&&!SKIP.test(cs[j]))out.push(cs[j]);
+      }
+      if(out.length)return out.join('-').slice(0,40);
+    }
+    return 'other';
+  }
+  var CT={'FDA 483 \uc2e4\uc0ac \uad00\ucc30':'fda-483','Warning Letter':'fda-wl','Recall':'recall-us','\ud68c\uc218\u00b7\ud310\ub9e4\uc911\uc9c0':'recall-kr',
+    'GMP\uc2e4\uc0ac':'mfds-gmp','\ud589\uc815\ucc98\ubd84':'mfds-admin','Recall(HC)':'recall-ca','Recall(UK)':'recall-uk',
+    '\uc9c0\uce68\u00b7\uc548\ub0b4\uc11c':'guidance','WHO':'who','\uaddc\uc81c \uc18c\uc2dd':'news','EU GMP \ube44\uc900\uc218':'eu-ncr','UK GMP \ube44\uc900\uc218':'uk-ncr',
+    '\uace0\uc2dc\u00b7\uac1c\uc815\ubc95\ub839':'law'};
+  function ctxOf(el){
+    var a=el.closest&&el.closest('article[data-card-type]');
+    if(!a)return '';
+    var t=a.getAttribute('data-card-type')||'';
+    return Object.prototype.hasOwnProperty.call(CT,t)?CT[t]:'card';
+  }
+  function ui(kind,el,id){send('rum_ui_bump',{p_lang:lang,p_page:page,p_kind:kind,p_id:id||nameOf(el),p_ctx:ctxOf(el)});}
+  document.addEventListener('toggle',function(e){
+    var d=e.target;
+    if(d&&d.tagName==='DETAILS'&&d.open)ui('expand',d);
+  },true);
+  document.addEventListener('change',function(e){
+    var t=e.target;
+    if(!t||!t.tagName)return;
+    var tag=t.tagName,ty=(t.type||'').toLowerCase();
+    if(tag==='SELECT'||(tag==='INPUT'&&(ty==='radio'||ty==='checkbox'))){
+      var g=tag==='SELECT'?t:(t.closest('fieldset,[role="radiogroup"]')||t);
+      var gid=(g.id||'').toLowerCase();
+      ui('filter',t,/^[a-z][a-z0-9-]{0,39}$/.test(gid)?gid:nameOf(g));
+    }
+  },true);
+  document.addEventListener('click',function(e){
+    var t=e.target&&e.target.closest&&e.target.closest('button,a[role="tab"],a[aria-pressed],[role="tab"]');
+    if(!t||t.closest('.grm-ca-react,#navmenu,.nav-search,footer'))return;
+    var role=t.getAttribute('role')||'',cl=((t.getAttribute('class')||'')+' '+((t.parentElement&&t.parentElement.getAttribute('class'))||'')).toLowerCase();
+    var kind=role==='tab'||t.hasAttribute('aria-selected')||/(^|[\s-])tabs?([\s-]|$)/.test(cl)?'tab'
+      :t.hasAttribute('aria-pressed')||/chip|pill/.test(cl)?'chip'
+      :t.hasAttribute('aria-expanded')||/toggle/.test(cl)?'toggle':'';
+    if(kind)ui(kind,t);
+  },true);
 })();
 </script>
 {% endif %}

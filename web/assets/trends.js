@@ -2520,15 +2520,39 @@
   // 026_findings_search.sql — 카테고리별 실제 지적 사례(공개 게이트 RLS 통과분만).
   // 이 페이지에서 유일하게 지적 **문장**을 가져오는 경로다(집계 RPC 아님, 위 §계약 참조).
   function fetchCategoryExamples(code) {
-    return fetch(rpcEndpoint("findings_search"), {
-      method: "POST",
-      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        p_category: code, p_sort: "date_desc", p_page: 1, p_docs_per_page: EXAMPLE_ROWS,
-      }),
-    }).then(function (r) {
-      if (!r.ok) throw new Error("findings_search " + r.status);
+    return retry5xx(function () {
+      return fetch(rpcEndpoint("findings_search"), {
+        method: "POST",
+        headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          p_category: code, p_sort: "date_desc", p_page: 1, p_docs_per_page: EXAMPLE_ROWS,
+        }),
+      }).then(okJson("findings_search"));
+    });
+  }
+
+  // [157 · 2026-11-13 식은 첫 호출 재시도] findings_search 는 오래 쉰 뒤 첫 호출이 서버 시간
+  // 제한(57014 → HTTP 500)에 걸리는 일이 있다. 같은 질의를 다시 보내면 첫 시도가 데운 페이지를
+  // 읽어 대개 성공한다. search.js 와 같은 규칙: 5xx·네트워크 오류만 간격을 두고 두 번 더 시도.
+  function okJson(name) {
+    return function (r) {
+      if (!r.ok) {
+        var e = new Error(name + " " + r.status);
+        e.status = r.status;
+        throw e;
+      }
       return r.json();
+    };
+  }
+
+  function retry5xx(once, attempt) {
+    return once().catch(function (err) {
+      var a = attempt || 0;
+      if (a < 2 && !(err && err.status && err.status < 500)) {
+        return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
+          .then(function () { return retry5xx(once, a + 1); });
+      }
+      throw err;
     });
   }
 
@@ -2549,15 +2573,14 @@
   // 조항 번호 질의가 그 조항을 인용한 지적을 잡는다. 문서 단위 페이지네이션이라
   // 필터 후 3건을 확보하려면 문서를 조금 넉넉히 받는다.
   function fetchCfrExamples(section) {
-    return fetch(rpcEndpoint("findings_search"), {
-      method: "POST",
-      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        p_q: section, p_sort: "date_desc", p_page: 1, p_docs_per_page: EXAMPLE_ROWS * 2,
-      }),
-    }).then(function (r) {
-      if (!r.ok) throw new Error("findings_search " + r.status);
-      return r.json();
+    return retry5xx(function () {
+      return fetch(rpcEndpoint("findings_search"), {
+        method: "POST",
+        headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          p_q: section, p_sort: "date_desc", p_page: 1, p_docs_per_page: EXAMPLE_ROWS * 2,
+        }),
+      }).then(okJson("findings_search"));
     });
   }
 

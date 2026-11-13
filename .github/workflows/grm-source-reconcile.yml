@@ -73,6 +73,8 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          # [노션 끄기] off 면 '수집됨' 키를 노션이 아니라 정본(raw_signals)에서 읽는다. 수집기와 같은 변수.
+          GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
           OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
           MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
           # 식약처 회수·행정처분(data.go.kr) — 수집기와 같은 시크릿. 읽기(GET)만 한다.

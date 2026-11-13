@@ -182,6 +182,18 @@ def dedup_shadow_summary(classes: dict[str, str], notion_existing: set[str],
     }
 
 
+# 대기열 표의 handoff 상태 → 노션 handoff 페이지 Status 와 같은 낱말(쓰는 쪽 코드가 이 낱말로 분기한다).
+HANDOFF_STATUS_AS_NOTION = {HANDOFF_OPEN: "New", HANDOFF_CONSUMED: "Processed", HANDOFF_STALE: "Skipped"}
+
+
+def handoff_status_as_notion(store: Any, handoff_date: str) -> str:
+    """그 날짜 DB handoff 기록의 상태를 노션 낱말로 — `New`·`Processed`·`Skipped`·`missing`."""
+    row = store.get_handoff(handoff_date)
+    if not row:
+        return "missing"
+    return HANDOFF_STATUS_AS_NOTION.get(str(row.get("status") or ""), "missing")
+
+
 def shadow_enabled() -> bool:
     """그림자 스위치(기본 꺼짐). 켜도 발행 경로는 바뀌지 않는다."""
     return env_flag("ENABLE_INTAKE_QUEUE_SHADOW")
@@ -804,6 +816,14 @@ class QueueStore:
                 if key:
                     out.add(key)
         return out
+
+    def queue_keys_for_source(self, source: str, since: str) -> set[str]:
+        """그 소스의 대기열 문서 키 중 수집일이 `since`(YYYY-MM-DD) 이후인 것."""
+        return {row_key(source, r.get("document_id", ""))
+                for r in self._get_all("intake_queue", {
+                    "select": "document_id", "source": f"eq.{source}",
+                    "first_seen_run_date": f"gte.{since}", "order": "document_id.asc"})
+                if r.get("document_id")}
 
     def get_handoff_manifest(self, handoff_date: str) -> "dict[str, Any] | None":
         rows = self._call("GET", "intake_handoffs", params={

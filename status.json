@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-13T11:33:30Z",
+ "generated_at": "2026-11-13T18:46:16Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43422823287,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-13T12:09:39Z",
+    "updatedAt": "2026-11-13T12:15:37Z",
+    "headBranch": "claude/glossary-fig-daily-20261113-2108",
+    "displayTitle": "glossary(fig): 2026-11-13 새 그림 0 · 다시 그림 0 · 보류 8 — gmp·api·api-starting-material·manufacture·production·packaging·authorized-person·batch-release",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43422823287"
+   },
+   {
+    "databaseId": 43422816730,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-13T12:09:36Z",
+    "updatedAt": "2026-11-13T12:14:38Z",
+    "headBranch": "claude/glossary-fig-daily-20261113-2108",
+    "displayTitle": "glossary(fig): 2026-11-13 새 그림 0 · 다시 그림 0 · 보류 8 — gmp·api·api-start…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43422816730"
+   },
+   {
     "databaseId": 43397622835,
     "status": "completed",
     "conclusion": "success",
@@ -205,28 +227,6 @@
     "headBranch": "claude/ui-tone-1113",
     "displayTitle": "test: 영문 골든 5장 재동결(i18n-en.js 해시)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43392957882"
-   },
-   {
-    "databaseId": 43392629055,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-13T08:21:49Z",
-    "updatedAt": "2026-11-13T08:26:49Z",
-    "headBranch": "main",
-    "displayTitle": "fix(UI): 업체 빵부스러기·제목, 검색 h1, 공지 띠 범위 — 11-13 재점검 3~6 (#1681)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43392629055"
-   },
-   {
-    "databaseId": 43390914837,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-13T08:08:40Z",
-    "updatedAt": "2026-11-13T08:14:24Z",
-    "headBranch": "main",
-    "displayTitle": "perf(DB): 유사 사례 캐시 갱신 — payload 같으면 쓰기 건너뛰기 (migration 158) (#1672)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43390914837"
    }
   ],
   "grm-scaffold-mirror.yml": [

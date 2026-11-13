@@ -323,7 +323,10 @@ def _evaluate_health(
         )
 
     store = getattr(stats, "store_summary", None) or {}
-    if stats.has_insert_failures():
+    # [노션 끄기] GRM_INTAKE_NOTION=off 면 "insert 실패" = 정본 저장 실패다. 같은 문서가 매일 거부될 수
+    # 있어(유효성) failure 로 수집을 세우지 않는다 — 아래 `supabase-append-failed` 경고가 그 건수를 말한다.
+    notion_off = store.get("notion") == "off"
+    if stats.has_insert_failures() and not notion_off:
         kept = int(store.get("notion_failed_supabase_kept") or 0)
         detail = "해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다."
         if kept:

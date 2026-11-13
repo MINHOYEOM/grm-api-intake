@@ -95,8 +95,23 @@ DEDUP_HEAL = "heal"       # 정본에 있고 대기열에 없고 저장이 최�
 DEDUP_OLD = "old"         # 정본에 있고 대기열에 없고 저장이 오래전 → 이미 받음(대기열 기록 이전)
 
 
+NOTION_INTAKE_ENV = "GRM_INTAKE_NOTION"          # on(기본) | off
+
+
+def notion_intake_off() -> bool:
+    """수집기가 노션 Intake DB 를 **쓰지도 읽지도 않는가** — 저장소 변수 GRM_INTAKE_NOTION=off 일 때만 참.
+
+    off 면 행 생성·handoff 페이지·중복 조회·무음 감시·창 밖 미소비 수·그림자 비교의 노션 호출이 전부
+    사라진다. 그러면 중복 판정과 handoff 는 DB 밖에 근거가 없으므로 아래 두 getter 도 DB 로 답한다
+    (변수 셋을 따로 맞출 필요가 없고, 어긋난 조합이 생기지 않는다).
+    """
+    return os.environ.get(NOTION_INTAKE_ENV, "").strip().lower() == "off"
+
+
 def dedup_source() -> str:
     """중복 판정·대기열 넣기 기준을 어디에 두나 — 저장소 변수 GRM_INTAKE_DEDUP_SOURCE(없으면 notion)."""
+    if notion_intake_off():
+        return "supabase"
     return "supabase" if os.environ.get(DEDUP_SOURCE_ENV, "").strip().lower() == "supabase" else "notion"
 
 
@@ -110,6 +125,8 @@ def handoff_source() -> str:
     스캐폴드 자리(GRM_WEB_BRIEF_DIR)에 내고, health 의 handoff 성패도 그 결과로 정한다.
     노션 handoff 페이지는 노션 쓰기가 살아 있는 동안 거울로 계속 만든다(백업 Routine 이 읽는다).
     """
+    if notion_intake_off():
+        return "db"
     return "db" if os.environ.get(HANDOFF_SOURCE_ENV, "").strip().lower() == "db" else "notion"
 
 
@@ -1167,7 +1184,7 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
     report: dict[str, Any] = {"run_date": run_date.isoformat(), "warnings": []}
     if canonical:
         report["canonical"] = {"ok": False, "rows": 0, "frozen": "", "aged_open": 0,
-                               "web_brief": "", "error": ""}
+                               "web_brief": "", "error": "", "staled_dates": []}
     try:
         store = store or QueueStore(supabase[0], supabase[1])
     except QueueStoreError as e:
@@ -1214,6 +1231,14 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
         aged = store.aged_open_count(start)
         if aged:
             report["warnings"].append(f"창({window_days}일) 밖에 남은 미소비 행 {aged}건")
+        open_before: list[str] = []
+        if canonical:
+            # 오늘 기록이 닫을(stale) 지난 open handoff 의 날짜 — 발행 요일 것이 섞여 있으면 그 호가
+            # 발행 기록 없이 닫히는 것이다(노션 길의 'handoff-not-consumed' 경고와 같은 신호).
+            open_before = [str(h.get("handoff_date") or "") for h in store.handoffs_since(
+                (run_date - timedelta(days=RECONCILE_LOOKBACK_DAYS)).isoformat())
+                if h.get("status") == HANDOFF_OPEN
+                and str(h.get("handoff_date") or "") != run_date.isoformat()]
         recorded = record_handoff(store, payload, window_days, generated_at)
         report["staled"] = recorded["staled"]
         report["handoff_frozen"] = recorded["frozen"]
@@ -1221,7 +1246,8 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
                json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n")
         if canonical:
             report["canonical"].update(
-                rows=int(payload["row_count"]), frozen=recorded["frozen"], aged_open=int(aged))
+                rows=int(payload["row_count"]), frozen=recorded["frozen"], aged_open=int(aged),
+                staled_dates=([] if recorded["frozen"] else sorted(open_before)))
             if canonical_web_brief_dir and not recorded["frozen"]:
                 # 정본 스캐폴드 = 방금 DB 로 만든 그 파일의 바이트 사본. 동결된 날의 재실행분은 내지 않는다
                 # (브랜치 사본과 같은 규칙) — 발행 워크플로는 그 날짜 스캐폴드를 가진 앞선 실행을 쓴다.

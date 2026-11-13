@@ -3483,7 +3483,8 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  fallback_checked: set[str] | None = None,
                  queue_new_items: list[IntakeItem] | None = None,
                  queue_on_store: bool = False,
-                 queue_only_keys: set[str] | None = None) -> tuple[int, int, int]:
+                 queue_only_keys: set[str] | None = None,
+                 notion_write: bool = True) -> tuple[int, int, int]:
     """삽입 실행. 반환: (inserted, skipped, failed)
 
     [대기열 0단계 2026-11-12] 저장 순서: **Supabase(정본) 먼저 → Notion(주간 대기열) 다음**.
@@ -3514,6 +3515,10 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
     [기사 permalink 2차 dedup 2026-08-24] existing_url_keys 를 주면
     `_CANONICAL_URL_DEDUP_SOURCES` 소스에 한해 정규화 URL 로도 중복을 막는다. 미지정(None)이면
     종전과 완전히 동일하게 동작한다 — 이 인자를 넘기지 않는 호출부는 영향받지 않는다.
+
+    [노션 끄기 2026-11-13] notion_write=False(GRM_INTAKE_NOTION=off) 면 노션 행을 만들지 않는다.
+    "들어갔다"의 기준은 **정본에 있다는 것이 확인됨**(saved·duplicate)이고, 반환값의 failed 는
+    **정본 저장 실패** 건수다(그 문서는 다음 수집에 새 문서로 다시 온다). 기본값(True)이면 종전과 같다.
     """
     inserted = 0
     skipped = 0
@@ -3598,10 +3603,13 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             _store_count(store_counters, "fallback_deferred")
             skipped += 1
             continue
-        # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
-        time.sleep(0.34)
-        ok = notion_create_page(token, db_id, item, run_date, collected_at,
-                                modality_enabled=modality_enabled)
+        if notion_write:
+            # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
+            time.sleep(0.34)
+            ok = notion_create_page(token, db_id, item, run_date, collected_at,
+                                    modality_enabled=modality_enabled)
+        else:
+            ok = supa_status in {"saved", "duplicate"}
         if ok:
             inserted += 1
             existing_ids.add(dedup_key)
@@ -3643,6 +3651,10 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                 except Exception as e:  # noqa: BLE001 — additive sidecar must not break Notion flow.
                     mode = "raw_signals+findings" if findings_sqlite_include_findings else "raw_signals"
                     log("WARN", f"FIND-1 {mode} SQLite append 실패 doc={item.document_id}: {e}")
+        elif not notion_write:
+            failed += 1
+            log("WARN", f"정본 저장 실패 — 대기열에 넣지 않음(다음 수집에 다시 온다) "
+                        f"source={item.source} doc={item.document_id} status={supa_status or '꺼짐'}")
         else:
             failed += 1
             _store_count(store_counters, "notion_failed")
@@ -3842,8 +3854,11 @@ def _dedupe_abort_health_payload(
     dry_run: bool,
     requested_sources: list[str],
     active: set[str],
+    db_basis: bool = False,
 ) -> dict[str, Any]:
     """중복 조회 실패로 insert 전에 멈출 때 쓰는 health JSON.
+
+    db_basis=True(GRM_INTAKE_NOTION=off): 멈춘 조회가 노션이 아니라 정본·대기열이다 — 코드·문구만 다르다.
 
     ★[2026-09-27] 이 경로는 health JSON 을 쓰기 전에 `return 1` 했다. 그래서 실패 이슈
       #1084 에는 "Health status: unavailable · health JSON 없음"만 찍혀 원인이 없었고,
@@ -3852,6 +3867,21 @@ def _dedupe_abort_health_payload(
       어떻게 되살리는지만 이슈까지 보낸다. 수집 결과(sources)는 이미 나와 있으니 함께 싣는다.
     """
     health = HealthCheckResult()
+    if db_basis:
+        health.add_failure(
+            "intake-dedupe-db-failed", "Supabase",
+            "정본·대기열 중복 조회 실패 — 중복 삽입을 막으려고 적재 전에 중단(이날 수집분 미적재·"
+            "handoff 미생성). 노션을 꺼 둔 상태(GRM_INTAKE_NOTION=off)라 되돌아갈 기준이 없다. 일시 "
+            "장애면 실패 job 재실행으로 복구한다(넘기면 다음 정기 실행이 수집 윈도우로 되받는다)",
+            str(error),
+        )
+        health.finalize()
+        return _health_payload(
+            health=health, stats=stats, run_date=run_date, start=start, end=end,
+            event_name=event_name, dry_run=dry_run, requested_sources=requested_sources,
+            active=active, flags={}, handoff_emitted=False, handoff_failed=False,
+            handoff_row_count=0, handoff_url="", handoff_error_msg="",
+        )
     health.add_failure(
         "notion-dedupe-query-failed", "Notion",
         "Notion 중복 조회 실패 — 중복 삽입을 막으려고 적재 전에 중단(이날 수집분 미적재·"
@@ -3909,6 +3939,9 @@ def _fda483_known_document_ids(
         return None
     window = max(1, (end - enf_start).days + 1)
     try:
+        if not token or not db_id:
+            # GRM_INTAKE_NOTION=off — 노션에 묻지 않는다(자격증명을 비워서 들어온다).
+            raise RuntimeError("노션 자격증명 없음(GRM_INTAKE_NOTION=off)")
         known = notion_query_existing_doc_ids(
             token, db_id, run_date, window_days=window,
             source_names={SOURCE_FDA_483})
@@ -4591,7 +4624,11 @@ def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
                         for _src, _label, _title in TIER_OBSERVER.near_miss_samples:
                             f.write(f"- `{_src}` · **{_label}** · {_title}\n")
                         f.write("\n</details>\n")
-                if stats.has_insert_failures():
+                if stats.has_insert_failures() and (stats.store_summary or {}).get("notion") == "off":
+                    f.write(f"\n> ⚠️ **정본 저장 실패 {stats.total_insert_failures()}건** — "
+                            f"오늘 handoff 에 없는 문서입니다. 다음 수집에 다시 들어옵니다 "
+                            f"(Actions 로그의 '정본 저장 실패' 줄에서 doc ID 확인).\n")
+                elif stats.has_insert_failures():
                     total_fail = stats.total_insert_failures()
                     f.write(f"\n> ⚠️ **Notion 삽입 실패 {total_fail}건** — "
                             f"해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다. "
@@ -4686,7 +4723,19 @@ def main() -> int:
     if enable_scrape:
         log("WARN", "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현 — 건너뜀")
 
-    if not args.dry_run:
+    # [노션 끄기 2026-11-13] GRM_INTAKE_NOTION=off — 이 실행은 노션 Intake DB 를 쓰지도 읽지도 않는다.
+    # 자격증명을 비워 두면 아래 "자격증명이 있을 때만" 도는 노션 조회(preflight·무음 감시·창 밖 미소비 수·
+    # 그림자 상태 비교)가 전부 꺼진다. 기본(on)이면 이 블록은 아무것도 하지 않는다.
+    notion_off = grm_queue.notion_intake_off()
+    if notion_off:
+        notion_token = notion_db = ""
+        log("INFO", "GRM_INTAKE_NOTION=off — 노션 Intake DB 를 쓰지도 읽지도 않는다(정본·대기열은 Supabase)")
+        if not args.dry_run and not (cfg.findings_supabase_append_requested and cfg.findings_supabase_url
+                                     and os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()):
+            log("ERROR", "GRM_INTAKE_NOTION=off 는 Supabase 저장이 켜져 있어야 한다 — "
+                         "ENABLE_FINDINGS_SUPABASE_APPEND=true · SUPABASE_URL · SUPABASE_SERVICE_ROLE_KEY 필요")
+            return 2
+    elif not args.dry_run:
         if not notion_token or not notion_db:
             log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
             return 2
@@ -4800,7 +4849,7 @@ def main() -> int:
     # [대기열 0단계 2026-11-12] Notion 조회 실패를 곧바로 중단하지 않고 기록만 해 둔다.
     # 아래에서 Supabase 설정이 정해진 뒤 Supabase 키로 대신 판정한다(그것도 안 되면 종전처럼 중단).
     notion_dedupe_error: Exception | None = None
-    if args.dry_run:
+    if args.dry_run or notion_off:
         existing: set[str] = set()
         existing_url_keys: set[str] = set()
     else:
@@ -4895,7 +4944,11 @@ def main() -> int:
             if _want_db_dedup:
                 log("WARN", "GRM_INTAKE_DEDUP_SOURCE=supabase 이지만 정본·대기열 조회 실패 — 오늘은 노션 기준으로 판정")
         else:
-            if notion_dedupe_error is None:
+            if notion_off:
+                store_counters["dedup_shadow"] = dict(
+                    grm_queue.dedup_shadow_summary(_classes, set()), same=None,
+                    note="노션 끔 — 비교 없음")
+            elif notion_dedupe_error is None:
                 store_counters["dedup_shadow"] = grm_queue.dedup_shadow_summary(_classes, existing)
             else:
                 store_counters["dedup_shadow"] = dict(
@@ -4915,6 +4968,17 @@ def main() -> int:
                     store_counters["dedup_mode"] = "supabase"
                     log("INFO", "중복 판정 DB 기준: "
                                 + " · ".join(f"{k} {v}" for k, v in store_counters["dedup_shadow"]["db"].items()))
+
+    if notion_off and not args.dry_run and not queue_db_dedup:
+        # 노션을 끈 상태에서 정본·대기열 조회가 실패했다 — 되돌아갈 노션 기준이 없다. 모르는 채로 전부
+        # 새 문서로 넣지 않고 적재 전에 멈춘다(재실행으로 복구. 원천은 다음 실행에 같은 문서를 다시 준다).
+        log("ERROR", "GRM_INTAKE_NOTION=off 인데 정본·대기열 중복 조회 실패 — 적재 단계 중단")
+        store_counters["notion"] = "off"
+        _write_health_json(health_json_path, _dedupe_abort_health_payload(
+            error=RuntimeError("raw_signals·intake_queue 조회 실패"), stats=stats, run_date=run_date,
+            start=start, end=end, event_name=event_name, dry_run=args.dry_run,
+            requested_sources=list(requested_sources), active=active, db_basis=True))
+        return 1
 
     if notion_dedupe_error is not None:
         fb = (supabase_fallback_dedup_keys(findings_supabase[0], findings_supabase[1],
@@ -5007,7 +5071,8 @@ def main() -> int:
             store_counters=store_counters,
             fallback_checked=fallback_checked,
             queue_new_items=queue_new_items,
-            queue_on_store=queue_db_dedup, queue_only_keys=queue_only_keys)
+            queue_on_store=queue_db_dedup, queue_only_keys=queue_only_keys,
+            notion_write=not notion_off)
         setattr(stats, f"{spec.prefix}_inserted", ins)
         setattr(stats, f"{spec.prefix}_skipped_dup", sk)
         setattr(stats, f"{spec.prefix}_insert_failed", fail)
@@ -5090,6 +5155,7 @@ def main() -> int:
             fallback_checked=fallback_checked,
             queue_new_items=queue_new_items,
             queue_on_store=queue_db_dedup, queue_only_keys=queue_only_keys,
+            notion_write=not notion_off,
         )
         stats.search_inserted = src_in
         stats.search_skipped_dup = src_sk
@@ -5113,15 +5179,27 @@ def main() -> int:
     source_last_seen: dict[str, Any] | None = None
     source_silence_errors: tuple[str, ...] = ()
     coverage_silent_sources: set[str] = set()
+    # [노션 끄기] 노션을 껐으면 같은 판정을 DB 대기열(intake_queue)의 소스별 마지막 수집일로 한다.
+    silence_from_db = bool(notion_off and findings_supabase)
     if (env_flag("ENABLE_SOURCE_SILENCE_WATCHDOG", True)
-            and notion_token and notion_db and not args.dry_run):
+            and ((notion_token and notion_db) or silence_from_db) and not args.dry_run):
         try:
             from source_silence import evaluate_silence, query_last_seen, watched_sources
-            _seen, _errs = query_last_seen(
-                notion_token, notion_db,
-                [w.notion_source for w in watched_sources()],
-                run_date=run_date,
-            )
+            if silence_from_db:
+                from source_silence import query_last_seen_supabase
+                _seen, _errs, _hist = query_last_seen_supabase(
+                    findings_supabase[0], findings_supabase[1],
+                    [w.notion_source for w in watched_sources()], run_date=run_date)
+                store_counters.setdefault("monitor", {})["silence"] = {
+                    "basis": "intake_queue",
+                    "history_start": _hist.isoformat() if _hist else "",
+                    "judged": len(_seen), "errors": len(_errs)}
+            else:
+                _seen, _errs = query_last_seen(
+                    notion_token, notion_db,
+                    [w.notion_source for w in watched_sources()],
+                    run_date=run_date,
+                )
             source_last_seen, source_silence_errors = _seen, tuple(_errs)
             # coverage 줄용 무음 집합 — health 와 **같은 판정 함수·같은 활성 매핑**을 쓴다
             # (두 계기가 다른 답을 내면 사람이 어느 쪽도 못 믿는다).
@@ -5146,7 +5224,7 @@ def main() -> int:
             # [노션 은퇴 준비 2026-11-13] 같은 판정을 DB 대기열(intake_queue) 기준으로도 계산해 차이를
             # health JSON `store.monitor_shadow.silence` 에 남긴다. 판정·경고·coverage 줄은 노션 기준 그대로.
             # 기본 꺼짐. 실패해도 위 판정에는 영향이 없다(아래에서 따로 잡는다).
-            if findings_supabase and env_flag("ENABLE_SILENCE_SUPABASE_SHADOW"):
+            if findings_supabase and not silence_from_db and env_flag("ENABLE_SILENCE_SUPABASE_SHADOW"):
                 try:
                     from source_silence import query_last_seen_supabase, silence_shadow
                     _db_seen, _db_errs, _hist = query_last_seen_supabase(
@@ -5174,8 +5252,11 @@ def main() -> int:
     handoff_error_msg = ""
     # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
     handoff_window_days = cfg.handoff_window_days
+    aged_unconsumed_new = 0
     handoff_payloads: list[dict[str, Any]] = []   # 대기열 그림자 비교용(노션으로 만든 payload)
-    if args.emit_routine_handoff:
+    if args.emit_routine_handoff and notion_off:
+        log("INFO", "GRM_INTAKE_NOTION=off — 노션 handoff 페이지를 만들지 않는다(정본은 DB handoff)")
+    elif args.emit_routine_handoff:
         if args.dry_run:
             log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
         elif stats.has_insert_failures():
@@ -5273,7 +5354,8 @@ def main() -> int:
         _canon = (shadow_report or {}).get("canonical") or {}
         store_counters["handoff_source"] = {
             "source": "db",
-            "notion_mirror": ("ok" if handoff_emitted else "failed" if handoff_failed else "skipped"),
+            "notion_mirror": ("off" if notion_off else "ok" if handoff_emitted
+                              else "failed" if handoff_failed else "skipped"),
             "notion_mirror_rows": handoff_row_count,
             "notion_mirror_error": truncate(handoff_error_msg, 160),
             "frozen": str(_canon.get("frozen") or ""),
@@ -5289,10 +5371,15 @@ def main() -> int:
             str(_canon.get("error") or "") or "DB handoff 를 만들지 못했다(대기열 그림자 실패)")
         if handoff_failed:
             log("ERROR", f"DB handoff(정본) 생성 실패: {handoff_error_msg}")
+        if notion_off:
+            # 노션의 '봉인된 handoff 날짜'·'창 밖 미소비 New 수'에 해당하는 값을 DB 기록에서 받는다.
+            handoff_sealed_dates = [str(d) for d in (_canon.get("staled_dates") or [])]
+            aged_unconsumed_new = int(_canon.get("aged_open") or 0)
+    if notion_off:
+        store_counters["notion"] = "off"
 
     # B1 임시 방어 ②: 윈도우 밖 미소비 New 카운트(읽기전용 — dry-run 도 자격증명이
     # 있으면 수행해 검증 루프로 쓸 수 있다). 실패는 조용한 0 이 아니라 경고로 표면화.
-    aged_unconsumed_new = 0
     aged_new_query_error = ""
     if notion_token and notion_db:
         try:

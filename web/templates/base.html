@@ -98,6 +98,9 @@
 {% endif %}
 </head>
 <body>
+{#- [접근성 2026-11-13] 본문 건너뛰기 — 키보드로 들어오면 첫 Tab 에 보이고, 누르면 머리말·메뉴를
+    건너 본문 시작(#grm-main)으로 간다. 평소에는 화면 밖. -#}
+<a class="grm-skip" href="#grm-main">{{ _("본문 바로가기") }}</a>
 {# P0-4: 'AI 자동 생성 고지' = 홈의 고지 섹션(#notice). 홈에선 순수 프래그먼트(새로고침 0),
    타 페이지에선 홈으로 이동 후 스크롤. [소개 2026-09-06] 종전 '소개'(about_href → 홈 #why
    기능 섹션)는 전용 페이지 /about/ 로 바뀌어 변수가 사라졌다 — 푸터 '서비스' 열 참조. #}
@@ -156,6 +159,7 @@
 {% endif %}
 </div></header>
 
+<div id="grm-main" tabindex="-1"></div>
 {% if auto_crumbs %}{% include "partials/crumbs.html" %}{% endif %}
 {% block content %}{% endblock %}
 {% if next_strip %}{% include "partials/next_strip.html" %}{% endif %}
@@ -408,6 +412,13 @@
   .nav nav{gap:2px}
   .nav nav a{padding-left:8px;padding-right:8px}
 }
+/* [접근성 2026-11-13] 산호색 강조 버튼(.btn.coral) — 흰 글자 대비 3.67:1 → 기존 토큰 --coral-2
+   (5.6:1)로. #1645 의 페이지별 버튼과 같은 계열. grm.css 는 동결이라 여기서 덮는다. 색 토큰 신설 0. */
+.btn.coral{background:var(--coral-2);border-color:var(--coral-2)}
+.btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
+.grm-skip:focus{left:16px}
+#grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
   <div class="foot">

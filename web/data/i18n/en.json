@@ -883,6 +883,7 @@
   "본 서비스는 규제 및 품질 관련 정보 제공을 목적으로 하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문 또는 공식 해석을 제공하지 않습니다.": "This service is reference material intended to provide regulatory and quality information; it does not provide legal, regulatory, quality, or compliance advice or official interpretation.",
   "본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.": "This is an information service. Final judgement on, and responsibility for, the use of the information rests with the user.",
   "본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·캐나다 실사보고서(Health Canada)·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서(EudraGMDP·MHRA) 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.": "The findings on this page are extracted and split automatically from public source documents — FDA 483 observations, Warning Letters, Health Canada inspection reports, MFDS GMP inspections, and EU/UK GMP non-compliance reports (EudraGMDP, MHRA) — and normalised so that each item can be searched individually.",
+  "본문 바로가기": "Skip to content",
   "본문 일치만 표시 중": "Showing text matches only",
   "본문에 이 용어가 있는 지적사례 <b>{n}</b>건 보기": "See <b>{n}</b> findings whose text contains this term",
   "부적합": "Fail",

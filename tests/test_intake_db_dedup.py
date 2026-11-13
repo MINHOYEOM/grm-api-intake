@@ -309,5 +309,132 @@ class MainDbDedupTest(unittest.TestCase):
         self.assertEqual(gq.dedup_source(), "notion")
 
 
+
+class Fda483PrefetchDbTest(unittest.TestCase):
+    """FDA 483 선조회(PDF·OCR 건너뛰기)를 DB 대기열 기준으로 — 중복 판정과 같은 변수를 따른다."""
+
+    START = datetime(2026, 10, 21, tzinfo=timezone.utc).date()
+
+    def _known(self, **kw):
+        return ci._fda483_known_document_ids("tok", "db", _RUN, self.START, _RUN, enabled=True, **kw)
+
+    def test_default_reads_notion_and_never_the_queue(self):
+        with mock.patch.object(gq, "QueueStore", side_effect=AssertionError("대기열을 읽으면 안 된다")), \
+                mock.patch.object(ci, "notion_query_existing_doc_ids", return_value={"FDA 483::n1"}), \
+                mock.patch.object(ci, "log"):
+            self.assertEqual(self._known(), {"FDA 483::n1"})
+
+    def test_db_basis_reads_queued_483_within_the_window(self):
+        seen = {}
+
+        class Store:
+            def __init__(self, url, key):
+                seen["cred"] = (url, key)
+
+            def queue_keys_for_source(self, source, since):
+                seen["args"] = (source, since)
+                return {"FDA 483::q1", "FDA 483::q2"}
+        with mock.patch.object(gq, "QueueStore", Store), \
+                mock.patch.object(ci, "notion_query_existing_doc_ids",
+                                  side_effect=AssertionError("노션을 읽으면 안 된다")), \
+                mock.patch.object(ci, "log"):
+            got = self._known(db=_SUPABASE)
+        self.assertEqual(got, {"FDA 483::q1", "FDA 483::q2"})
+        self.assertEqual(seen["cred"], _SUPABASE)
+        self.assertEqual(seen["args"], ("FDA 483", "2026-10-20"))      # 창 = 집행 시작~오늘(31일)
+
+    def test_db_failure_falls_back_to_notion(self):
+        class Broken:
+            def __init__(self, url, key):
+                pass
+
+            def queue_keys_for_source(self, source, since):
+                raise gq.QueueStoreError("intake_queue GET: http_500")
+        with mock.patch.object(gq, "QueueStore", Broken), \
+                mock.patch.object(ci, "notion_query_existing_doc_ids", return_value={"FDA 483::n1"}), \
+                mock.patch.object(ci, "log"):
+            self.assertEqual(self._known(db=_SUPABASE), {"FDA 483::n1"})
+
+    def test_db_connection_follows_the_dedup_switch(self):
+        cfg = mock.MagicMock()
+        cfg.findings_supabase_url = _SUPABASE[0]
+        env = {"SUPABASE_SERVICE_ROLE_KEY": _SUPABASE[1]}
+        with mock.patch.dict(os.environ, env):
+            os.environ.pop(gq.DEDUP_SOURCE_ENV, None)
+            self.assertIsNone(ci._fda483_prefetch_db(cfg, False))                 # 기본 = 노션
+            os.environ[gq.DEDUP_SOURCE_ENV] = "supabase"
+            self.assertEqual(ci._fda483_prefetch_db(cfg, False), _SUPABASE)
+            self.assertIsNone(ci._fda483_prefetch_db(cfg, True))                  # dry-run 은 읽지 않는다
+            os.environ.pop("SUPABASE_SERVICE_ROLE_KEY")
+            self.assertIsNone(ci._fda483_prefetch_db(cfg, False))
+
+    def test_store_query_is_scoped_to_source_and_window(self):
+        calls = []
+
+        class Http:
+            def request(self, method, url, params=None, json=None, headers=None, timeout=None):
+                calls.append(dict(params or {}))
+                r = mock.MagicMock()
+                r.status_code = 200
+                r.json.return_value = [{"document_id": "fda483-1"}, {"document_id": ""}]
+                return r
+        st = gq.QueueStore(_SUPABASE[0], _SUPABASE[1], session=Http())
+        self.assertEqual(st.queue_keys_for_source("FDA 483", "2026-10-20"), {"FDA 483::fda483-1"})
+        self.assertEqual(calls[0]["source"], "eq.FDA 483")
+        self.assertEqual(calls[0]["first_seen_run_date"], "gte.2026-10-20")
+
+
+class HandoffStatusDbTest(unittest.TestCase):
+    """coverage gate 의 handoff 상태 조회를 DB 대기열 기록으로 — 반환 낱말은 노션과 같다."""
+
+    def test_status_words_match_the_notion_vocabulary(self):
+        import fda_body_coverage as cov
+
+        class Store:
+            def __init__(self, row):
+                self.row = row
+
+            def get_handoff(self, day):
+                return self.row
+        for db_status, word in (("open", "New"), ("consumed", "Processed"), ("stale", "Skipped"),
+                                ("weird", "missing")):
+            self.assertEqual(cov.handoff_status_db("2026-11-16", base_url="u", service_key="k",
+                                                   store=Store({"status": db_status})), word)
+        self.assertEqual(cov.handoff_status_db("2026-11-16", base_url="u", service_key="k",
+                                               store=Store(None)), "missing")
+
+    def test_cli_default_is_notion_and_db_needs_the_switch(self):
+        import contextlib
+        import io as _io
+        import fda_body_coverage as cov
+
+        def run(env):
+            out = _io.StringIO()
+            with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
+                for name in ("GRM_HANDOFF_STATUS_SOURCE", "NOTION_TOKEN", "NOTION_DATABASE_ID",
+                             "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"):
+                    if name not in env:
+                        os.environ.pop(name, None)
+                with mock.patch.object(cov, "handoff_status", return_value="New") as notion, \
+                        mock.patch.object(cov, "handoff_status_db", return_value="Processed") as dbf:
+                    self.assertEqual(cov.main(["handoff-status", "--date", "2026-11-16"]), 0)
+                    return out.getvalue().strip(), notion.call_count, dbf.call_count
+        self.assertEqual(run({"NOTION_TOKEN": "t", "NOTION_DATABASE_ID": "d"}),
+                         ("handoff_status=New", 1, 0))
+        self.assertEqual(run({"GRM_HANDOFF_STATUS_SOURCE": "db", "SUPABASE_URL": _SUPABASE[0],
+                              "SUPABASE_SERVICE_ROLE_KEY": _SUPABASE[1]}),
+                         ("handoff_status=Processed", 0, 1))
+        # DB 기준인데 접속 정보가 없으면 '모름' — 재생성하지 않는 쪽으로 간다.
+        self.assertEqual(run({"GRM_HANDOFF_STATUS_SOURCE": "db"})[0], "handoff_status=error:KeyError")
+
+    def test_workflow_passes_the_switch_default_notion(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, ".github", "workflows", "grm-fda-coverage-gate.yml"),
+                  encoding="utf-8") as f:
+            wf = f.read()
+        self.assertIn("GRM_HANDOFF_STATUS_SOURCE: ${{ vars.GRM_HANDOFF_STATUS_SOURCE || 'notion' }}", wf)
+        self.assertIn("steps.handoff.outputs.handoff_status == 'New'", wf)   # 재생성 조건은 그대로 이 낱말
+
+
 if __name__ == "__main__":
     unittest.main()

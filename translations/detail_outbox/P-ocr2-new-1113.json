@@ -1,0 +1,16 @@
+[
+ {
+  "finding_id": "finding-ec3eb504499e3765bfe07a6d",
+  "finding_text_md5": "db2cedeea8981f1132be2b0102c4e097",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, your firm does not conduct routine potency testing for all injectable drug products currently produced. You stated that the stock solutions are routinely tested for potency but that finished preduct is not routinely tested unless [jj units or more are filled or J Stock solutions are used to fill finished product. For example, Ela CYPE TS)",
+  "detail_text_ko": "구체적으로, 업체는 현재 생산 중인 모든 주사제에 대해 일상적인 역가 시험을 실시하지 않는다. 업체는 원액은 역가를 일상적으로 시험하지만 완제품(preduct)은 [jj 단위 이상이 충전되거나 J 되지 않는 한 일상적으로 시험하지 않는다고 진술했다. 원액은 완제품 충전에 사용된다. 예를 들어, Ela CYPE TS)"
+ },
+ {
+  "finding_id": "finding-914153f4c4bfd4a8eed135bf",
+  "finding_text_md5": "acbb8709670431ac34c3a1a80fae9162",
+  "published_date": "2024-01-17",
+  "detail_text": "Specifically, the firm has no written stability program which requires ongoing stability studies to show that the aseptically processed sterile drug products which they distribute, continue to meet all relevant chemical and sterility specifications all the way to product expiry, or beyond use dates (BUD).",
+  "detail_text_ko": "구체적으로, 업체에는 유통하는 무균 공정 제조 무균 의약품이 제품 유효기간 또는 사용 기한(BUD)까지 관련 화학 규격과 무균 규격을 계속 충족함을 보여 주는 지속적 안정성 시험을 요구하는 문서화된 안정성 프로그램이 없다."
+ }
+]

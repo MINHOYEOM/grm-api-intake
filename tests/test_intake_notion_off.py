@@ -69,6 +69,22 @@ class SwitchTest(unittest.TestCase):
         self._env(GRM_INTAKE_NOTION="off", GRM_INTAKE_DEDUP_SOURCE="notion", GRM_HANDOFF_SOURCE="notion")
         self.assertEqual((gq.dedup_source(), gq.handoff_source()), ("supabase", "db"))
 
+    def test_off_sends_the_483_prefetch_to_the_queue(self):
+        # 483 선조회(PDF·OCR 건너뛰기)는 중복 판정과 같은 getter 를 따른다 — off 면 대기열에 묻는다.
+        cfg = mock.MagicMock()
+        cfg.findings_supabase_url = _SUPABASE[0]
+        self._env(SUPABASE_SERVICE_ROLE_KEY=_SUPABASE[1])
+        self.assertIsNone(ci._fda483_prefetch_db(cfg, False))
+        self._env(SUPABASE_SERVICE_ROLE_KEY=_SUPABASE[1], GRM_INTAKE_NOTION="off")
+        self.assertEqual(ci._fda483_prefetch_db(cfg, False), _SUPABASE)
+        # 대기열 조회가 죽어도 노션에는 묻지 않는다(자격증명이 비어 들어온다) — 전량 재수집으로 간다.
+        with mock.patch.object(gq, "QueueStore", side_effect=gq.QueueStoreError("http_500")), \
+                mock.patch.object(ci, "notion_query_existing_doc_ids",
+                                  side_effect=AssertionError("노션을 읽으면 안 된다")), \
+                mock.patch.object(ci, "log"):
+            self.assertIsNone(ci._fda483_known_document_ids(
+                "", "", _RUN, _RUN, _RUN, enabled=True, db=_SUPABASE))
+
     def test_workflow_and_env_example_default_on(self):
         wf = (ROOT / ".github" / "workflows" / "grm-intake.yml").read_text(encoding="utf-8")
         self.assertIn("GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}", wf)
@@ -344,8 +360,8 @@ class StaledDatesTest(unittest.TestCase):
                              "first_seen_run_date": "2026-11-13",
                              "first_seen_at": "2026-11-13T03:30:00+09:00"}])
 
-    def _shadow(self, run, **kw):
-        gen = datetime(run.year, run.month, run.day, 3, 40, tzinfo=gq.KST)
+    def _shadow(self, run, hour=3, **kw):
+        gen = datetime(run.year, run.month, run.day, hour, 40, tzinfo=gq.KST)
         with mock.patch.object(gq, "log"), mock.patch.object(gh, "log"), \
                 mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
             os.environ.pop("GRM_QUEUE_HANDOFF_REFRESH", None)
@@ -374,7 +390,7 @@ class StaledDatesTest(unittest.TestCase):
         # 동결된 재실행은 아무것도 닫지 않는다 — 열린 기록이 남아 있어도 '닫았다'고 보고하지 않는다.
         self.store.upsert_handoff({"handoff_date": "2026-11-09", "status": gq.HANDOFF_OPEN,
                                    "manifest": [], "consumed_evidence": ""})
-        report = self._shadow(date(2026, 11, 16), canonical=True)        # 월요일 재실행 = 동결
+        report = self._shadow(date(2026, 11, 16), hour=8, canonical=True)   # 월요일 07:00 뒤 재실행 = 동결
         self.assertEqual(self.store.handoffs["2026-11-09"]["status"], gq.HANDOFF_OPEN)
         self.assertEqual(report["canonical"]["frozen"], gq.FROZEN_PUBLISH_DAY)
         self.assertEqual(report["canonical"]["staled_dates"], [])

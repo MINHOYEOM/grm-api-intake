@@ -1,0 +1,338 @@
+{
+ "status": "완료",
+ "published": false,
+ "rehearsal": true,
+ "run_date_kst": "2026-11-13",
+ "code_gate": {
+  "ran": true,
+  "exit": 0,
+  "message": "assemble_publish_brief.py --scaffold _scaffold/brief_web_2026_11_13.json --delta delta.json --deep deep_delta.json → exit 0, 채택 47카드(스킵 22) · deep_analysis 병합 15카드(11건은 게이트 FAIL 로 병합 보류)"
+ },
+ "cards": [
+  {
+   "web_card_id": "fda483-195377",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196245",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196251",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196252",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196253",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196254",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196255",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196257",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196258",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196259",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "용어·표기",
+     "slot": "implication",
+     "evidence": "'CAPA' 가 이 카드에서 처음 나오는데 단독 표기 — '시정 및 예방조치(CAPA)' 로 처음 한 번 풀어야 함(조립 표현 검사도 같은 건을 WARN 으로 셌다: \"용어 표기 'CAPA' 단독 1장\")"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196260",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196261",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196262",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196264",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196270",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0f65bd3c5c70",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "7e7545ebb190",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "bfbb158a522f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007929",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007930",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007935",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007955",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007975",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008096",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrIf",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "575464327e0c",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "949016d08856",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "dba4d011e02b",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "00ae76e635bb",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "2026-23005",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82928",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "758874567fae",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008055",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyqbl",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrFI",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrUH",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73uE9xd4-",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "c3b4f61a28c7",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0073-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "용어·표기",
+     "slot": "title_issue",
+     "evidence": "'규격 부적합' — 시험 결과 뜻이므로 [용어·표기] 표 왼쪽 표기(기준일탈(OOS)로 써야 함). 코드 facts 에 없는 표현(prose_input.issue_or_reason 'Failed Impurities/Degradation Specification' 의 번역)이라 원문 인용 예외가 아니다"
+    },
+    {
+     "item": "용어·표기",
+     "slot": "summary",
+     "evidence": "'불순물·분해물 규격 부적합' — 같은 호 hc-82928 은 같은 뜻을 '불순물 기준일탈(OOS)' 로 썼다(같은 뜻 한 가지로)"
+    },
+    {
+     "item": "용어·표기",
+     "slot": "key_facts[0]",
+     "evidence": "'사유: 불순물·분해물 규격 부적합'"
+    },
+    {
+     "item": "hook_line",
+     "slot": "hook_line",
+     "evidence": "STYLE §12 R7 — 사전 표기('기준일탈') 대신 '규격 부적합'"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0074-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0075-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0077-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "용어·표기",
+     "slot": "title_issue",
+     "evidence": "'용출 규격 부적합' — 'Failed Dissolution Specifications' 의 번역, 기준일탈(OOS) 로 써야 함"
+    },
+    {
+     "item": "용어·표기",
+     "slot": "summary",
+     "evidence": "'용출 규격 부적합'"
+    },
+    {
+     "item": "용어·표기",
+     "slot": "key_facts[0]",
+     "evidence": "'사유: 용출 규격 부적합'"
+    },
+    {
+     "item": "hook_line",
+     "slot": "hook_line",
+     "evidence": "STYLE §12 R7 — '용출 규격 부적합'"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0080-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "용어·표기",
+     "slot": "summary",
+     "evidence": "'불순물·분해물 규격 부적합' — 기준일탈(OOS)"
+    },
+    {
+     "item": "용어·표기",
+     "slot": "key_facts[0]",
+     "evidence": "'사유: 불순물·분해물 규격 부적합, …'"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0085-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0104-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0105-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0107-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0108-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0110-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0113-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "b0fc253f04b7",
+   "verdict": "pass",
+   "fails": []
+  }
+ ],
+ "counts": {
+  "cards": 51,
+  "pass": 47,
+  "reject": 4,
+  "fails_total": 11
+ },
+ "이의": [
+  "심층 게이트: deep_delta 에 source_text 가 없어(v16 [2단계] 2026-08-17 개정이 넣지 말라고 한다) WL·행정처분 11건의 조항 인용이 전부 '원문에 없음' FAIL 로 병합 보류됐다. 기자 잘못이 아니다 — handoff 의 deep_analysis_input.body_full 을 web_card_id 로 붙여 같은 명령을 돌리면 FAIL 0 · 26건 전부 병합된다(확인함). Notion 길에서는 델타 브릿지가 그 일을 했다. next/copyedit.md 1번(코드 검사)에 body_full 주입 단계가 빠져 있다 — 전환 전에 고쳐야 교열의 검사 결과가 발행 결과와 같아진다.",
+  "조립 표현 검사는 '규격 이탈·규격 외 결과'만 세고 '규격 부적합'은 세지 않는다(inject_slots.py). [용어·표기] 표 왼쪽에는 '규격 부적합(시험 결과 뜻)'이 있으므로 코드와 표가 어긋난다 — 한쪽을 맞춰야 한다."
+ ],
+ "판정 밖 메모": "reject 4장은 모두 용어·표기 한 항목이다. 실발행이었다면 마감(반납·CONSUMED)을 하지 않고 09:30 백업으로 넘어갔을 자리다."
+}

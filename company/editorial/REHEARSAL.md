@@ -20,6 +20,12 @@
 | 검색 보강(v16 [1단계]) | WebSearch 9·WebFetch 5 | 그대로(한도 같음) |
 | 교열 마감 4번 | 반납 push → Notion CONSUMED | **1번(실행 폴더 push)까지만.** `copyedit.json` 은 `status: 완료`, `published: false`, `"rehearsal": true` |
 
+## 브랜치는 방금 받은 main 에서 만든다
+리허설 브랜치도 `next/RUN.md` 3항의 순서 그대로 올라탄다(`B` = `claude/company-rehearsal-{회차}`): 원격에 있으면 그 위에, 없으면 `git fetch origin main` 한 `FETCH_HEAD` 에서.
+`origin/main` 이라는 이름으로 만들지 않는다 — 실행 환경의 `origin/main` 이 낡아 `next/` 와 이 파일이 사라진 적이 있다(회차 1113 첫 시도).
+올라탄 뒤 `test -f company/editorial/next/RUN.md && test -f company/editorial/handoff_ref.py` 가 실패하면 아무것도 쓰지 말고 `상태: 실패`(사유 `낡은 main 에서 만든 브랜치`)로 끝낸다.
+이미 낡은 커밋에서 만들어진 리허설 브랜치가 원격에 있으면 그 회차 이름은 버리고 새 이름(예: `1113b`)으로 처음부터 다시 한다 — 브랜치·폴더 이름만 그 이름을 따른다.
+
 ## 금지 (하나라도 어기면 그 회차는 실패)
 - Notion 에 쓰기 — 어떤 페이지·속성도. (읽기는 리허설에서 필요 없다.)
 - 브랜치 `claude/company-{YYYY-MM-DD}` 꼴의 **날짜 브랜치**에 쓰기, `main` 에 쓰기, PR 열기.
@@ -30,6 +36,7 @@
 ## 실행표 — 회차마다 같은 순서 (비서실이 직무 Routine 을 수동 실행한다)
 | 회차 | 날짜 | 재료 날짜 `D` | 브랜치 | 폴더 |
 |---|---|---|---|---|
+| `1113` | 11-13(목) 밤 | `2026-11-13` | `claude/company-rehearsal-1113` | `company/run/rehearsal-1113/` |
 | `1114` | 11-14(금) | `2026-11-13` | `claude/company-rehearsal-1114` | `company/run/rehearsal-1114/` |
 | `1115` | 11-15(토) | `2026-11-13` | `claude/company-rehearsal-1115` | `company/run/rehearsal-1115/` |
 

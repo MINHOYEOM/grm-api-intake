@@ -33,7 +33,13 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 - 월요일 파일은 **07:00 KST 부터 동결**된다 — 그 뒤에 수집을 다시 돌려도 바뀌지 않는다(그 전의 재실행은 파일을 갱신한다). 그래서 데스크·기자·교열이 같은 파일을 본다.
 
 ## 3. 중간 결과는 git 브랜치에
-- 브랜치: `claude/company-{run_date_kst}` (예: `claude/company-2026-11-02`). 없으면 `origin/main` 에서 만든다.
+- 브랜치: `claude/company-{run_date_kst}` (예: `claude/company-2026-11-02`). 아래 순서로 올라탄다(`B` = 브랜치 이름).
+  ```
+  if git fetch origin "$B"; then git checkout -B "$B" FETCH_HEAD; else git fetch origin main && git checkout -b "$B" FETCH_HEAD; fi
+  ```
+  - **`origin/main` 이라는 이름을 쓰지 않는다.** 실행 환경에 저장된 `origin/main` 은 며칠 전 것일 수 있다(2026-11-13 리허설: 11-06 커밋이었고,
+    거기서 브랜치를 만들자 이 폴더와 `handoff_ref.py` 가 사라졌다). 새 브랜치는 반드시 방금 `git fetch origin main` 한 `FETCH_HEAD` 에서 만든다.
+  - 브랜치에 올라탄 직후 `test -f company/editorial/handoff_ref.py` 를 확인한다. 없으면 낡은 커밋 위에 있는 것이다 — 아무것도 쓰지 말고 `상태: 실패`, 사유 `낡은 main 에서 만든 브랜치` 로 종료한다.
 - 폴더: `company/run/{run_date_kst}/` 에 직무별 파일만 쓴다. 다른 경로는 건드리지 않는다.
 - 기자 샤드는 **같은 브랜치에 동시에** 쓴다. 각자 자기 파일만 `git add <파일>` 로 커밋하고, push 전에 `git pull --rebase origin claude/company-{run_date_kst}`,
   push 가 거절되면 같은 방식으로 3번까지 다시 시도한다. 그래도 안 되면 `보류`.

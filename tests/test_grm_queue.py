@@ -1109,6 +1109,17 @@ class EditorialGitHandoffTest(unittest.TestCase):
         self.assertIn("GRM_DELTA_SOURCE", run)
         self.assertIn("vars.GRM_DELTA_SOURCE", bridge)
 
+    def test_run_branch_is_cut_from_a_fresh_fetch_not_the_stale_tracking_ref(self):
+        # 2026-11-13 리허설: 실행 환경의 origin/main 이 11-06 이라, 거기서 만든 브랜치에 next/ 와 handoff_ref.py 가 없었다.
+        run = self._read(*self.NEXT, "RUN.md")
+        self.assertIn('git fetch origin main && git checkout -b "$B" FETCH_HEAD', run)
+        self.assertIn('git fetch origin "$B"; then git checkout -B "$B" FETCH_HEAD', run)
+        self.assertNotIn("`origin/main` 에서 만든다", run)
+        self.assertIn("test -f company/editorial/handoff_ref.py", run)
+        reh = self._read("company", "editorial", "REHEARSAL.md")
+        self.assertIn("test -f company/editorial/next/RUN.md", reh)
+        self.assertNotIn("checkout -b claude/company-rehearsal", reh)
+
     def test_live_instructions_are_untouched_and_rehearsal_reads_next(self):
         # 이 PR 은 실발행 지시문을 바꾸지 않는다 — 월요일 발행은 여전히 노션 handoff 를 읽는다.
         for name in ("RUN.md", "desk.md", "reporter.md", "copyedit.md"):

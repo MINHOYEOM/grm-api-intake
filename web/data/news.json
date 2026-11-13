@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-12",
+ "measured_on": "2026-11-13",
  "window_days": 60,
  "totals": {
-  "items": 448
+  "items": 454
  },
  "by_source": [
   {
@@ -12,7 +12,7 @@
   },
   {
    "v": "ECA Academy",
-   "c": 81
+   "c": 85
   },
   {
    "v": "Federal Register",
@@ -36,11 +36,11 @@
   },
   {
    "v": "MHRA Inspectorate",
-   "c": 11
+   "c": 12
   },
   {
    "v": "PIC/S",
-   "c": 2
+   "c": 3
   },
   {
    "v": "WHO",
@@ -48,6 +48,34 @@
   }
  ],
  "items": [
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-12",
+   "title": "GMP & GDP Forum 2027 in Berlin: Exhibition & Sponsorship Opportunities",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/gmp-gdp-forum-2027-in-berlin-exhibition-sponsorship-opportunities"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-12",
+   "title": "Hong Kong Implements GDP Guide for Pharmaceutical Products",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/hong-kong-implements-gdp-guide-for-pharmaceutical-products"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-12",
+   "title": "Oversight of Cross-Border Online Pharmacies and Compliance with GDP Requirements",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/oversight-of-cross-border-online-pharmacies-and-compliance-with-gdp-requirements"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-12",
+   "title": "USP <1079.5>: USP Publishes Responses to Comments",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/usp-1079-5-usp-publishes-responses-to-comments"
+  },
   {
    "source": "Federal Register",
    "source_kind": "Notice",
@@ -82,6 +110,20 @@
    "published_date": "2026-11-12",
    "title": "Hematology and Pathology Devices; Reclassification of Immunohistochemistry Test Systems for Use With a Corresponding Approved Oncology Therapeutic Product",
    "official_url": "https://www.federalregister.gov/documents/2026/11/12/2026-23005/hematology-and-pathology-devices-reclassification-of-immunohistochemistry-test-systems-for-use-with"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 4 Medicines Defect Notification",
+   "published_date": "2026-11-12",
+   "title": "Class 4 Medicines Defect Notification: Star Pharmaceuticals Ltd, Enalapril maleate/ Hydrochlorothiazide 20 mg/12.5 mg Tablets, EL(26)A/48",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-star-pharmaceuticals-ltd-enalapril-maleate-slash-hydrochlorothiazide-20-mg-slash-12-dot-5-mg-tablets-el-26-a-slash-48"
+  },
+  {
+   "source": "PIC/S",
+   "source_kind": "PIC/S",
+   "published_date": "2026-11-12",
+   "title": "Revision of the PIC Scheme (PIC/S 1/95 (Rev. 7))",
+   "official_url": "http://www.picscheme.org/en/news/152/revision-of-the-pic-scheme-pics-195-rev-7"
   },
   {
    "source": "Federal Register",

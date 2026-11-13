@@ -33,6 +33,12 @@
 | 4 | 전 샤드 완료 직후 (15:00 쯤) | 같음 | 교열 (1개) | `copyedit.json` 이 push 됐다 |
 | 5 | 교열 뒤 | 같음 | (Routine 아님) 아래 "점검" — 비서실 세션이 PC 에서 | `rehearsal_check.py` 결과 + 6번 확인을 적는다 |
 
+- **반납 push 확인이 첫 판정이다.** 데스크가 끝났다고 하면 가장 먼저 `git ls-remote origin claude/company-rehearsal-{회차}` 로 브랜치가 원격에 생겼는지,
+  `git fetch origin claude/company-rehearsal-{회차} && git show FETCH_HEAD:company/run/rehearsal-{회차}/desk.json` 이 읽히는지 본다.
+  브랜치가 없으면 Routine 이 push 하지 못한 것이다 — 여기서 멈추고 Routine 의 출력(거절 사유)을 적는다. 교열 뒤에도 같은 방법으로
+  `delta.json`·`scaffold.json`·`copyedit.json` 세 파일이 원격 브랜치에 있는지 본다(반납 = 이 push 다).
+  근거: 편집팀 Routine 은 2026-11-09 에 `claude/company-2026-11-09` 로 데스크·워커·교열 결과를 모두 push 했다(Routine 설정의 outcomes 가 비어 있어도 —
+  `company/CLOUD.md` 의 규칙은 "`claude/` 로 시작하는 브랜치에만 push"다). 리허설 브랜치 이름도 `claude/` 로 시작한다. 다만 새 이름의 브랜치·새 파일(`scaffold.json`)은 처음이라 직접 확인한다.
 - 시각은 어림이다. **앞 순서의 조건이 채워지면 바로 다음을 돌린다.** 월요일용 시한은 리허설에 적용하지 않는다:
   워커 루프의 "08:55 KST 를 넘었으면 종료", 교열의 "09:20 까지 재확인"·"09:25 까지 마감", 데스크의 07:45 재시도.
 - 워커 수는 월요일(델타 4·심층 3·보강 4)보다 적다. 샤드 수는 계획대로이고, 한 워커가 빈 샤드를 이어서 가져간다(RUN.md 7항 루프 그대로 — 점유 25분 규칙도 그대로).

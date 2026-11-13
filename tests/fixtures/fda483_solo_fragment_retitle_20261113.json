@@ -1,0 +1,966 @@
+{
+ "_note": "11-13 손 SQL 로 넣은 483 단독 조각 대체 행(B 43 + 복원 2)과 대체하면 안 되는 대조 관찰. 운영 raw_signals.raw_json.fda_483_observations 의 해당 관찰 하나만 그대로 옮겼다(SELECT, 2026-11-13). expected 는 운영 findings 행(finding_id·finding_text·md5(detail_text)).",
+ "reproduce": [
+  {
+   "document_id": "fda483-104654",
+   "raw_signal_id": "rawsig-5029caec92ba432821b4da31",
+   "firm_name": "Delta Pharma Inc.",
+   "raw_firm": "Delta Pharma Inc.",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3004034796",
+   "observation": {
+    "number": "11",
+    "deficiency": "·· · \" .",
+    "detail": ". i' Time limits are not established when appropriate for the completion of each production phase to assure the quality of the drug product. ' · · ·, ', · ·.. · · ~- · · ·-·.,. ·...·. · · \"..,·..,'...: · ·~. ' ·.: · •.: Specifically, ·.,.., Your firm sterilizes and depyrogenates product containers, closures, and glassware used injectable drug production. These items are stored[(l:)f(4r 1or~t>H 4 J 1·After depyrogenation this items are held in unclassified areas until used in drug production. Hold times studies have not been perfonned for all storage conditions. Additionally, the [redacted] completed on [redacted] did not include growth promotion of the media used and the test media was not stored and transported to the lab under controlled storage conditions. This is a repeat observation from FDA inspection ending on 05/24/2016"
+   },
+   "expected": {
+    "finding_id": "finding-b6fef40fc30bb8943bd81dc3",
+    "finding_text": "Time limits are not established when appropriate for the completion of each production phase to assure the quality of the drug product.",
+    "detail_md5": "c4b271e6c16a92946a8bff1fbfe15c2f",
+    "detail_len": 698
+   }
+  },
+  {
+   "document_id": "fda483-106479",
+   "raw_signal_id": "rawsig-3155b05e1bc54cb12c2148ea",
+   "firm_name": "Millers of Wyckoff, Inc.",
+   "raw_firm": "Millers of Wyckoff, Inc.",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3004600183",
+   "observation": {
+    "number": "1",
+    "deficiency": "'· ..",
+    "detail": "- •: Drug products do not bear an expiration date determined by appropriate stability data to assure they meet applicable standards of identity strength, quality and purity at the time of use. Specifically, the firm has no stability data to support the 90 day beyond use date for Coenzyme Q-10 in Oil 25mg/ml injectable lot #02062017@21 (coenzyme Q10)."
+   },
+   "expected": {
+    "finding_id": "finding-16666567bf41f6505f67e38a",
+    "finding_text": "Drug products do not bear an expiration date determined by appropriate stability data to assure they meet applicable standards of identity strength, quality and purity at the time of use.",
+    "detail_md5": "6f4fe7aac2dfd27367352b7cea762380",
+    "detail_len": 159
+   }
+  },
+  {
+   "document_id": "fda483-107150",
+   "raw_signal_id": "rawsig-e039721fa03332448bc156ab",
+   "firm_name": "Imprimis NJOF, LLC",
+   "raw_firm": "Imprimis NJOF, LLC",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3013024146",
+   "observation": {
+    "number": "2",
+    "deficiency": ".",
+    "detail": "... Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate ·validation of the sterilization process. Specifically, the smoke study of the ISO 5 laminar air flow hood was either not provided or lacked critical activities to demonstrate that the HEPA filtered air supply can maintain aseptic conditions. For example: a. The initial visualization of the unidirectional air flow (smoke study) to support the sterile filling operations in the lSO 5 [redacted] laminar air flow hood during January and February 2017 was not found or provided during the inspection. b. The air flow pattern visualization (smoke study) conducted on <Redacte d B4> failed to include cri tical activities, such as product filling, manipulation and actions whe n the <R edacted B4> is present wi th [redacted] operators in the laminar air flow hood. The smoke study was conduct ed with [redacted] p resent without the [redacted] that holds the bulk product while no pr oduct filling occurred. This smoke study also failed to demonstrate a continued pattern of unidirectional ai r flow. The video lasted [redacted]."
+   },
+   "expected": {
+    "finding_id": "finding-8f0320e0f6bcfdecb770742a",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate ·validation of the sterilization process.",
+    "detail_md5": "5040d8b909d081445f4f9b2c73b7c1fe",
+    "detail_len": 985
+   }
+  },
+  {
+   "document_id": "fda483-107157",
+   "raw_signal_id": "rawsig-73638c6073000a081cfde6d8",
+   "firm_name": "Biomed PA Inc. dba Soleo Health",
+   "raw_firm": "Biomed PA Inc. dba Soleo Health",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3013456913",
+   "observation": {
+    "number": "2",
+    "deficiency": "Specifically, 1.",
+    "detail": "A spray bottle was observed in the ISO 7 Buffer Room. The firm reported that the spray bottle contains REDACTED [redacted] used to clean up residue resulting from spills in the ISO 5 area. The spray bottle is non-sterile but sanitized using sterile REDACTED [redacted] 2. Disinfecting agents and cleaning wipes used in the ISO 5 area are not sterile. DEPARTMENT OF llEALTll AND HUMAN SERVICES FOOD AND DRUG ADMINlSTRATlON DISTRICT ADORE88 AND PHONe NUM8ER llA'l\\!(S)Oi'INSPECuvN US Customhouse Rm900 2nd & Chestnut St 6/28/2017-7/6/2017* Philadi=!lph i.a, PA 19106 FeUUMJlllR (215)597-4390 Ext: 4200 Fax: (215)597- 0875 3013456913 NM!E 11ND \"'\"' ut\" INDIVIDUAi. TO\"\"\"\"\" FIEPORT ISSUED Chri stine M. Miller, Pharmacist i n Charge J'<RMNAME STREET ADORE.88 Biorned PA Inc. dba Soleo Health 950 Calcon Hook Rd Ste 15 CITY, STATE, ZIP......,c. COUNTRY 1wEE$TA8U..... tH1 IN>l'tClal Sharon Hill, PA 19079- 1822 Producer of Steril e Products '\"\"\"'' X 'lllolnafEFlld.,._..,......,_.. ~triii....f.M!I..."
+   },
+   "expected": {
+    "finding_id": "finding-7d3c89cf1dae9936d1c48832",
+    "finding_text": "A spray bottle was observed in the ISO 7 Buffer Room.",
+    "detail_md5": "e8551cd22f0eab2941222bd7f388d4f0",
+    "detail_len": 941
+   }
+  },
+  {
+   "document_id": "fda483-120638",
+   "raw_signal_id": "rawsig-58447fe84ce0d02a10cf5ddd",
+   "firm_name": "JCB Laboratories LLC",
+   "raw_firm": "JCB Laboratories LLC",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3004839646",
+   "observation": {
+    "number": "4",
+    "deficiency": "There is a.",
+    "detail": "failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether the batch has been already distributed. Specifically, A. You failed to respond timely to the aberrant test results which later tested as 00S test results for your Cefuroxime Ophthalmic Solution for Injection, Lot no. C274-000002528. On 10/17/17 this lot was tested for potency and received test results of90.4% (specifications art [redacted] This lot was retested in triplicate on 11/16/17 and the results reviewed on 11/20/17 with 00S results of 82.5%, 83.5% and 83.8%. Deviation no. 2017-2017-080 initiated l/18/18 summarizes these results including a review of the original BUD information which found two of the three BUD studies performed in 2014 indicates the potency of Cefuroxi.me drops significantly over a short period [redacted] days)\". DEV-2018-004 initiated on 1/18/18 documents Quality Assurance performed a review of DEV-2017-080 on 1/8/2018. Your Risk Assessment was not approved until l/12/18, almost 2 months after confirmed 00S test results were received; you initiated NOE 2018-023 on 1/17/28 for Quality Assurance review on 1/8/2018 for stability failure and questionable BUD date approval."
+   },
+   "expected": {
+    "finding_id": "finding-08a691ce17fe5441d26e9649",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether the batch has been already distributed.",
+    "detail_md5": "6cdf4e55a90556247f7c683b9f37d9b1",
+    "detail_len": 1071
+   }
+  },
+  {
+   "document_id": "fda483-131520",
+   "raw_signal_id": "rawsig-e0dd8c3bcf60112dcfececa7",
+   "firm_name": "Infuscience, Inc. dba Bioscrip Infusion Services",
+   "raw_firm": "Infuscience, Inc. dba Bioscrip Infusion Services",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3013352224",
+   "observation": {
+    "number": "7",
+    "deficiency": "ISO 5 classified areas were.",
+    "detail": "not certified under dynamic conditions. Specifically, unidirectional airflow was not verified under dynamic operational conditions representative of your aseptic processing practices. Smoke studies performed in the [redacted] ISO 5 classified laminar flow hoods did not demonstrate unidirectional airflow, for example, around IV bags hung in each hood and the presence of a repeater or [redacted] pump."
+   },
+   "expected": {
+    "finding_id": "finding-76e3343418eeb93b7a922967",
+    "finding_text": "ISO 5 classified areas were not certified under dynamic conditions.",
+    "detail_md5": "59336cbf81ab09d0fed06d92c0697307",
+    "detail_len": 362
+   }
+  },
+  {
+   "document_id": "fda483-145527",
+   "raw_signal_id": "rawsig-82a50409b51c39f6e5dc2b6d",
+   "firm_name": "Surgery Pharmacy Services, Inc.",
+   "raw_firm": "Surgery Pharmacy Services, Inc.",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3010704905",
+   "observation": {
+    "number": "8",
+    "deficiency": "·~ ..",
+    "detail": "-- Your firm released drug product in which the strength differs from, or its purity or quality falls below, that which it purports or is represented to possess. Specifically, the [redacted] and [redacted] irrigation solutions have failed assay testing for epinephrine since 02/2019 but they were still produced and dispensed without resolving the failures. Additionally, testing data lacks supporting documentation with the date of production to verify the the assigned 9-day BUD is appropriate for the irrigation solutions."
+   },
+   "expected": {
+    "finding_id": "finding-2267a3d70bccf37a7791f5fe",
+    "finding_text": "Your firm released drug product in which the strength differs from, or its purity or quality falls below, that which it purports or is represented to possess.",
+    "detail_md5": "41380855ba183abc510d556852529639",
+    "detail_len": 363
+   }
+  },
+  {
+   "document_id": "fda483-151431",
+   "raw_signal_id": "rawsig-86a6cd36b96135125d923aa8",
+   "firm_name": "Imprimis NJOF, -LLC",
+   "raw_firm": "Imprimis NJOF, -LLC",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3013024146",
+   "observation": {
+    "number": "9",
+    "deficiency": "l , .",
+    "detail": ".. You compound drugs that are essentially a copy of one or more approved drugs within the meaning of sections 503B(a)(5) and S03B(d)(2). Specifically, You compound drug products that: (a) are identical or nearly identical to an approved drug that is not on the drug shortage list in effect ·under section 506E at the time of compounding, distribution, and dispensing; or (b) are not identical or nearly identical to an approved drug but contain a bulk drug substance that is also a component of an approved drug, and for which there 'is no change that produces for an individual patient a clinical difference, as determined by the prescribing practitioner, between the-compounded drug and the comparable approved drug. Examples of compounded drug products that are essentially a copy of one or: more approved drugs include"
+   },
+   "expected": {
+    "finding_id": "finding-8044e15c1b99cdfcdf25eadf",
+    "finding_text": "You compound drugs that are essentially a copy of one or more approved drugs within the meaning of sections 503B(a)(5) and S03B(d)(2).",
+    "detail_md5": "d92ce1ec9aa37f19a4886392f533ee60",
+    "detail_len": 685
+   }
+  },
+  {
+   "document_id": "fda483-159977",
+   "raw_signal_id": "rawsig-c980673665e1c7e3b030ad13",
+   "firm_name": "Westlab Pharmacy Inc. dba Westlab Pharmacy",
+   "raw_firm": "Westlab Pharmacy Inc. dba Westlab Pharmacy",
+   "establishment_type": "Producer of Sterile and Non Sterile Drug Products",
+   "fei_number": "3007426960",
+   "observation": {
+    "number": "2",
+    "deficiency": "!",
+    "detail": "Non-microbial contamination was observed in your production area. Specifically, A. From 9/27-9/29/21, brown stains were observed in the middle of your firm's HEPA filter with the ISO-5 laminar airflow hood. B. During the walk thru of your firm's non-sterile suite. The [redacted] Mode [redacted], Serial [redacted] was observed to contain a circular opening on the right side that was covered with clear tape which cannot be cleaned and sanitized. Your firm's Pharmacy Technician stated [redacted] replaces the tape [redacted]. On 9/27/21, your firm produced [redacted] drug products which include, but are not limited to, Progesterone 200mg capsules, lot #09272021@76, BUD: 3/2/22 dispensed under RX [redacted] on 9/28/21. C. During the walk-thru of your firm's non-sterile suite, a fire sprinkler located in the ceiling between your [redacted] designated hazardous [redacted] containment hoods contained an accumulation of dust. SEE RE VERSE"
+   },
+   "expected": {
+    "finding_id": "finding-85ad15a48e31141fad4ee529",
+    "finding_text": "Non-microbial contamination was observed in your production area.",
+    "detail_md5": "32b5809340b2a593755a2c641444269c",
+    "detail_len": 877
+   }
+  },
+  {
+   "document_id": "fda483-164725",
+   "raw_signal_id": "rawsig-d31c938bc14dcff675f516c9",
+   "firm_name": "Southern Tier Home Infusion, Inc. dba Pharmacy Innovations",
+   "raw_firm": "Southern Tier Home Infusion, Inc. dba Pharmacy Innovations",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3004858203",
+   "observation": {
+    "number": "1",
+    "deficiency": ") 4.",
+    "detail": "During the walkthrough on 11/2/2022, we observed yellowing discoloration on three out of the [redacted] HEPA filters installed in your [redacted] ISO 5 LAFW where sterile drug products intended to be sterile are produced. 5. Your HEPA filter on the left side of your [redacted] ISO 5 LAFW appears to have evidence of [redacted] in the diffuser screen and HEPA filter. Additionally, there appears to be [redacted] on the HEPA filter in the ISO 7 [redacted] cleanroom of the non-hazardous sterile cleanroom suite."
+   },
+   "expected": {
+    "finding_id": "finding-1c4eeb988cb2eb2ae78b9acb",
+    "finding_text": "During the walkthrough on 11/2/2022, we observed yellowing discoloration on three out of the [redacted] HEPA filters installed in your [redacted] ISO 5 LAFW where sterile drug products intended to be sterile are produced.",
+    "detail_md5": "d362a59e553717c01e982c47eb550f4a",
+    "detail_len": 289
+   }
+  },
+  {
+   "document_id": "fda483-169841",
+   "raw_signal_id": "rawsig-fdabf71715f621f44c2ea4f3",
+   "firm_name": "Prisma Health",
+   "raw_firm": "Prisma Health",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3015162096",
+   "observation": {
+    "number": "4",
+    "deficiency": "Reporting Issue 1.",
+    "detail": "Your facility failed to submit a complete report to FDA for the June 2021, December 2021, June 2022, and December 2022 product reporting periods, identifying all the drug products that you compounded during the previous 6-month period, such as Ketamine HCI injection solution 10mg/2mL, Ketamine injection solution 100mg/20mL, Ketamine injection solution 30mg/6mL, and Phenylephrine HCI in NS 50mg/250mL. [Section 503B [redacted] of the FDCA [21 U.S.C. §353b [redacted] ]]. *DATES OF INSPECTION 2/23/2023 (Thu), 2/24/2023 (Fri), 2/27/2023 (Mon), 2/28/2023 (Tue), 3/01/2023 (Wed), 3/02/2023 (Thu), 3/03/2023 (Fri)"
+   },
+   "expected": {
+    "finding_id": "finding-ba187d514880fc1161e97026",
+    "finding_text": "Your facility failed to submit a complete report to FDA for the June 2021, December 2021, June 2022, and December 2022 product reporting periods, identifying all the drug products that you compounded during the previous 6-month period, such as Ketamine HCI injection solution 10mg/2mL, Ketamine injection solution 100mg/20mL, Ketamine injection solution 30mg/6mL, and Phenylephrine HCI in NS 50mg/250mL.",
+    "detail_md5": "8b3c5f29466f8d6bf5b9b4e6742e9048",
+    "detail_len": 207
+   }
+  },
+  {
+   "document_id": "fda483-183227",
+   "raw_signal_id": "rawsig-e69085f0634611af412beaa3",
+   "firm_name": "Mark Cuban Cost Plus",
+   "raw_firm": "Mark Cuban Cost Plus",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3024611767",
+   "observation": {
+    "number": "6",
+    "deficiency": "Labeling 1.",
+    "detail": "The container of your outsourcing facility's miglustat suspension drug product did not include information required by section 503B(a)(I0)(B). Specifically, your container did not include the following information. a. Information to facilitate adverse event reporting www.fda.gov/medwatch and 1800FDA 1088 <http:/ /www.fda.gov/medwatch%20and%201800FDA1088>; b. Directions for use, including, as appropriate, dosage and administration. 2. The label of your outsourcing facility's miglustat suspension drug product does not include information required by section 503B(a)(I0)(A). Specifically, the following information is not found on your miglustat suspension bottle label"
+   },
+   "expected": {
+    "finding_id": "finding-67e58f2b4266c33551508f83",
+    "finding_text": "The container of your outsourcing facility's miglustat suspension drug product did not include information required by section 503B(a)(I0)(B).",
+    "detail_md5": "7f8967d9011df0888209630ed88eceb6",
+    "detail_len": 529
+   }
+  },
+  {
+   "document_id": "fda483-183227",
+   "raw_signal_id": "rawsig-e69085f0634611af412beaa3",
+   "firm_name": "Mark Cuban Cost Plus",
+   "raw_firm": "Mark Cuban Cost Plus",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3024611767",
+   "observation": {
+    "number": "7",
+    "deficiency": "PRODUCT REPORTING I .",
+    "detail": "Your outsourcing facility did not submit a report to FDA at the time of initial registration on November 2, 2022, as required for an outsourcing facility that registers with FDA under section 503B. *DATES OF INSPECTION 8/26/2024 (Mon), 8/27/2024 (Tue), 8/28/2024 (Wed), 8/29/2024 (Thu), 8/30/2024 (Fri), 9/03/2024 (Tue), 9/04/2024 (Wed), 9/05/2024 (Thu), 9/06/2024 (Fri) Rodney l Tinzie Investigator X Si~ Sy: Rod~Tinzie Jr -S Date Signed: 09 202-4 16:02:53"
+   },
+   "expected": {
+    "finding_id": "finding-10832c4dee044f3931b2c70f",
+    "finding_text": "Your outsourcing facility did not submit a report to FDA at the time of initial registration on November 2, 2022, as required for an outsourcing facility that registers with FDA under section 503B.",
+    "detail_md5": "6ef82a6dc843419c8b73fdbca2c4acbc",
+    "detail_len": 259
+   }
+  },
+  {
+   "document_id": "fda483-70754",
+   "raw_signal_id": "rawsig-3dcb3b4760005623bfa728b1",
+   "firm_name": "Schering-Plough Products, LLC",
+   "raw_firm": "Schering-Plough Products, LLC",
+   "establishment_type": "Pharmaceutical Manufacturer",
+   "fei_number": "100176708",
+   "observation": {
+    "number": "12",
+    "deficiency": "Your analytical method no.",
+    "detail": "632 “Determination of assay, identification and estimation of chromatographic impurities of theophyline drug substance” is inadequate, in that, it does not assure the detection and quantitation of the possible impties LaLa <a RN"
+   },
+   "expected": {
+    "finding_id": "finding-e97294852adc58e3e8780458",
+    "finding_text": "Your analytical method no. 632 “Determination of assay, identification and estimation of chromatographic impurities of theophyline drug substance” is inadequate, in that, it does not assure the detection and quantitation of the possible impties LaLa <a RN",
+    "detail_md5": "d41d8cd98f00b204e9800998ecf8427e",
+    "detail_len": 0
+   }
+  },
+  {
+   "document_id": "fda483-70841",
+   "raw_signal_id": "rawsig-0f2a233f3f12493fcacca21e",
+   "firm_name": "Bioport Corporation",
+   "raw_firm": "Bioport Corporation",
+   "establishment_type": "Vaccine/Blood Products Manufacturer",
+   "fei_number": "1873886",
+   "observation": {
+    "number": "17",
+    "deficiency": "Regarding documentation: .",
+    "detail": ". A. Documentation of destruction for lots AV824 and AV825 was incorrect and/or inadequate in that the records show that the Jots were destroyed but the lots remain in quarantined inventory. { B. There is no documentation ofdestruction for gallons DPT intermediate product listed as having been destroyed in the Product Discard Log. C.. Expired reagent (QQgmmggQPme lot 121703SA) was used as the toxin diluent for bioassay for IG 141] without prior supervisory approval. -; D. Numerous incidences were observed where QA did not sign final approval as required by procedure.;"
+   },
+   "expected": {
+    "finding_id": "finding-71a89032b132927c64013cb2",
+    "finding_text": "Documentation of destruction for lots AV824 and AV825 was incorrect and/or inadequate in that the records show that the Jots were destroyed but the lots remain in quarantined inventory.",
+    "detail_md5": "4d2a00e1103593dbdb78ea623ac67ae3",
+    "detail_len": 383
+   }
+  },
+  {
+   "document_id": "fda483-74401",
+   "raw_signal_id": "rawsig-e3ea354e8dcd4c2cc29f4671",
+   "firm_name": "Peanut Corporation of America",
+   "raw_firm": "Peanut Corporation of America",
+   "establishment_type": "Peanut Butter Manufacturer",
+   "fei_number": "1036857",
+   "observation": {
+    "number": "4",
+    "deficiency": ".",
+    "detail": "Failure to store finished food under conditions that would protect against microbial contamination. Specifically, on 1/9/09 redacted [redacted] 200 lb. totes of raw peanuts were observed to be stored directly next to 2000 lb. totes of finished, roasted peanuts in the firm's production/packaging room. The totes of finished product included the following: Honey Roasted Peanuts under lot # 8339; Dry Roasted Peanuts under lot # 9002; Peanut Meal under lot # 9005; and Dark Roasted Peanuts (paste line) under lot # 9009. The redacted [redacted] totes of raw peanuts were all under lot # 40147. On 1/26/09, an additional 2000 lb. tote of raw peanuts under lot # 16195-08 was observed to be stored in the production/packaging room along with the same lots of finished goods listed above. It was visually difficult to discern which of these totest were finished products and which were raw products. ------.----- Specifically, on 1/9/09 redacted [redacted] 2000 lb. totes of raw peanuts were observed to be stored directly next to 200 0 lb. totes of finished, roasted p eanuts in the firm's production/packaging room. The totes of finished prod uct incl uded the following: Honey Roasted Pea nu ts under lot # 8339;"
+   },
+   "expected": {
+    "finding_id": "finding-0eabdd13c985ea2eed17161e",
+    "finding_text": "Failure to store finished food under conditions that would protect against microbial contamination.",
+    "detail_md5": "545ded2364131438593ebae0d00d1ab8",
+    "detail_len": 1111
+   }
+  },
+  {
+   "document_id": "fda483-77158",
+   "raw_signal_id": "rawsig-1e28ff525730ef389677e113",
+   "firm_name": "Peregrina Cheese Company",
+   "raw_firm": "Peregrina Cheese Company",
+   "establishment_type": "Cheese Manufacturer",
+   "fei_number": "3002119179",
+   "observation": {
+    "number": "9",
+    "deficiency": "Failure to operate.",
+    "detail": "fans and other air-blowing equipment in a manner that minimizes the potential for contaminating food, food-contact surfaces, and food~packagingmaterials. Specifically, on 3/6/09 a build up of black residue and dust was observed on the fan blades and rusted metal protective grill covers on the cooling fans attached to the cooling unit on the ceiling along the north wall ofthe finished product packaging room directly above exposed ready-to-eat Queso Fresco. These fans were observed to be in operation during production and blowing air past the rusted metal protective grill covers directly above exposed ready-to-eat Queso Fresco."
+   },
+   "expected": {
+    "finding_id": "finding-0ac502bac50b700dc76ac200",
+    "finding_text": "Failure to operate fans and other air-blowing equipment in a manner that minimizes the potential for contaminating food, food-contact surfaces, and food~packagingmaterials.",
+    "detail_md5": "42119fdad714e7e211a6b8258a0749d5",
+    "detail_len": 479
+   }
+  },
+  {
+   "document_id": "fda483-81871",
+   "raw_signal_id": "rawsig-e954bf7c1f0a4723a850705b",
+   "firm_name": "Sandoz, Inc.",
+   "raw_firm": "Sandoz, Inc.",
+   "establishment_type": "Drug Manufacturer",
+   "fei_number": "1717759",
+   "observation": {
+    "number": "11",
+    "deficiency": "..",
+    "detail": "... -... --· -... There is a lack of rotation so that the oldest approved stock of components is used first. Specifically, For at least two productions of metformin tablets REDACTED [redacted] multiple older lots of metformin API REDACTED [redacted] were available for use and a newer lot of API REDACTED [redacted] was selected by warehouse personnel to send to production. Employee Signature Eri ka V. Butler, Inves tigato r, Kimb erley"
+   },
+   "expected": {
+    "finding_id": "finding-9c44db993cffd9a7dd04d0f6",
+    "finding_text": "There is a lack of rotation so that the oldest approved stock of components is used first.",
+    "detail_md5": "68a6323aed55e59445efbba074baf11d",
+    "detail_len": 329
+   }
+  },
+  {
+   "document_id": "fda483-82813",
+   "raw_signal_id": "rawsig-fc4b0c6ae42a319b700cf0a5",
+   "firm_name": "Stuart Egg Farm, Inc. (Rose Acre Farms, Inc.)",
+   "raw_firm": "Stuart Egg Farm, Inc. (Rose Acre Farms, Inc.)",
+   "establishment_type": "Shell Egg Producer",
+   "fei_number": "3004382194",
+   "observation": {
+    "number": "1",
+    "deficiency": "; ..",
+    "detail": ". All required records do not include your name and the location of your farm. Specifically, the documents reviewed listed below lack the name and/or location of your farm: Document No: 7.1.3, Title; Pullet Procurement Document No: 7.1.8, Title: Poultry House Environmental Sampling Collection Document No: 7.1.10.1; Title: Sample Collection and Processing of Shell Eggs Document No: 7.1.10.2, Title: Segregation and Processing of House Restricted Eggs Document No: 7.1.4.0, Title: Bio-Security Policy IPM 1.3.1F1 REDACTED [redacted] Trap Count Form IPM Form A IPM Form B PIT CHART HOUSE CHART Document No: 7.1.6F1, Title: RAF Cleaning and Disinfection Procedures IPM Form C Document No: 4.4.3.2 Title: Refrigeration Requirements for Shell Eggs IPM 1.0.2 Pest Management for Caged Layer/Pullet and Breeder Operation, IPM 1.3.1 (a) Rodent Indexing Sysstem (RC) Document No: 7.1.1, Title: Definitions Biosecurity Plan dated July 2010. ~1 l l I I I I I I I I \\ 5 t I f i I t 1l l I 1 f 11630 752-2111 Stuart Egg Farm, Inc. (Rose Acre Farms, Inc. Stuart IA 50250 2011 3004382194 2650 350th Rd Shell Candace STucker, Invest' Brittany D. Phillips, Invest· 03/31/2011"
+   },
+   "expected": {
+    "finding_id": "finding-faed7efb01bfb8e12b713187",
+    "finding_text": "All required records do not include your name and the location of your farm.",
+    "detail_md5": "de2905cf8696aaa941c5ed9e28c832b1",
+    "detail_len": 1081
+   }
+  },
+  {
+   "document_id": "fda483-82943",
+   "raw_signal_id": "rawsig-0f89989b0937b83bb9b3c8f1",
+   "firm_name": "Goenner Poultry LLC",
+   "raw_firm": "Goenner Poultry LLC",
+   "establishment_type": "Egg Manufacturer",
+   "fei_number": "3007164479",
+   "observation": {
+    "number": "2",
+    "deficiency": "!.",
+    "detail": "The presence.of flies is not monitored by appropriate monitoring methods. Specifical1y, your current monitoring methOds do not quantify or record fly activity levels in your barns"
+   },
+   "expected": {
+    "finding_id": "finding-f71a43219ae7bf25ccd2dc49",
+    "finding_text": "The presence.of flies is not monitored by appropriate monitoring methods.",
+    "detail_md5": "ea1aff16226b851e9ec583d1d7775502",
+    "detail_len": 105
+   }
+  },
+  {
+   "document_id": "fda483-83446",
+   "raw_signal_id": "rawsig-40c579bfe6bb95791992bb48",
+   "firm_name": "Farmer John Egg Enterprises, Inc. (Panama Lane)",
+   "raw_firm": "Farmer John Egg Enterprises, Inc. (Panama Lane)",
+   "establishment_type": "Shell Egg Producer",
+   "fei_number": "3008874269",
+   "observation": {
+    "number": "5",
+    "deficiency": "' i I !",
+    "detail": "Potential harborages for pests in and outside your poultry house have not been eliminated by removing debris and vegetation outside the poultry house. I Specifically, on 6/15/11, a vegetable garden was noticed have been planted and currently growing east of house number #23. Also, two trees, one tree containing a wild birds nest, were growing onto multiple houses between houses #34 and #30 lo cated on the south side of your egg farm. I"
+   },
+   "expected": {
+    "finding_id": "finding-a6897cc1530f404bbfd4e215",
+    "finding_text": "Potential harborages for pests in and outside your poultry house have not been eliminated by removing debris and vegetation outside the poultry house.",
+    "detail_md5": "9a0cbff10244754af695895fb552c1c4",
+    "detail_len": 288
+   }
+  },
+  {
+   "document_id": "fda483-83446",
+   "raw_signal_id": "rawsig-40c579bfe6bb95791992bb48",
+   "firm_name": "Farmer John Egg Enterprises, Inc. (Panama Lane)",
+   "raw_firm": "Farmer John Egg Enterprises, Inc. (Panama Lane)",
+   "establishment_type": "Shell Egg Producer",
+   "fei_number": "3008874269",
+   "observation": {
+    "number": "7",
+    "deficiency": "!",
+    "detail": "i The presence of rodents is not monitored by appropriate monitoring methods. i Specifically, during review of your written \"SE MONITORING AND CONTROL PROGRAM\", on 6/14/2011 it was noted that your plan states, \"Rodent monitoring and rodent control are conducted on a whole ranch basis\".; f I i EMPLOYEE"
+   },
+   "expected": {
+    "finding_id": "finding-986d9689b5876f2a03fd36f6",
+    "finding_text": "The presence of rodents is not monitored by appropriate monitoring methods.",
+    "detail_md5": "28679bb36f18bd77601d4e4445e6e0ca",
+    "detail_len": 224
+   }
+  },
+  {
+   "document_id": "fda483-83772",
+   "raw_signal_id": "rawsig-a1321de221c95a9fed3984c3",
+   "firm_name": "L & W Farms, LLC",
+   "raw_firm": "L &amp; W Farms, LLC",
+   "establishment_type": "Shell Egg Producer",
+   "fei_number": "3008780010",
+   "observation": {
+    "number": "2",
+    "deficiency": "...",
+    "detail": ".. Your written SE prevention plan is not fully implemented and followed ': ' Specifically, you failed to implement fly monitoring using the redacted [redacted] method from 07/09/10 to 12/21/10.Specifically, you failed to implement fly monitoring using the redacted [redacted] method from 07/09/10 to 12/21/10.Specifically, you failed to implement fly monitoring using the redacted [redacted] method from 07/09/10 to 12/21/10.Specifically, you failed to implement fly monitoring using the redacted [redacted] method from 07/09/10 to 12/21/10. ·. -~. ·.~~. '. '. '. '. I.. '... 1..,"
+   },
+   "expected": {
+    "finding_id": "finding-425454eebed17b0ff41ff919",
+    "finding_text": "Your written SE prevention plan is not fully implemented and followed ': ' Specifically, you failed to implement fly monitoring using the redacted [redacted] method from 07/09/10 to 12/21/10.",
+    "detail_md5": "fd1bc21e23b1c92fefe944d3b8224267",
+    "detail_len": 387
+   }
+  },
+  {
+   "document_id": "fda483-83807",
+   "raw_signal_id": "rawsig-dd444e9066775c789d55399d",
+   "firm_name": "Donald J. Martin Farm",
+   "raw_firm": "Donald J. Martin Farm",
+   "establishment_type": "Shell Egg Producer",
+   "fei_number": "3008780158",
+   "observation": {
+    "number": "2",
+    "deficiency": ".",
+    "detail": ".. You did not perform environmental testing for SE 4 to 6 weeks after the end of the molting process each time a flock or group within the flock was molted.You did not perform environmental testing for SE 4 to 6 weeks after the end of the molting process each time a flock or group within the flock was molted.You did not perform environmental testing for SE 4 to 6 weeks after the end of the molting process each time a flock or group within the flock was molted.You did not perform environmental testing for SE 4 to 6 weeks after the end of the molting process each time a flock or group within the flock was molted.You did not perform environmental testing for SE 4 to 6 weeks after the end of the molting process each time a flock or group within the flock was molted.You did not perform environmental testing for SE 4 to 6 weeks after the end of the molting process each time a flock or group within the flock was molted. ', l,·, Specifically, your production records revealed that the end of the molt (when production had reached 50%) was on 01/23/11. SE environmental testing was conducted on 02/02/11 which was not 4-6 weeks after the molt ended as required.Specifically, your production records revealed that the end of the molt (when production had reached 50%) was on 01/23/11."
+   },
+   "expected": {
+    "finding_id": "finding-810ed87df87c02194efab2c6",
+    "finding_text": "You did not perform environmental testing for SE 4 to 6 weeks after the end of the molting process each time a flock or group within the flock was molted.",
+    "detail_md5": "e87dbf56182a511d6c558a765a00de47",
+    "detail_len": 1132
+   }
+  },
+  {
+   "document_id": "fda483-83807",
+   "raw_signal_id": "rawsig-dd444e9066775c789d55399d",
+   "firm_name": "Donald J. Martin Farm",
+   "raw_firm": "Donald J. Martin Farm",
+   "establishment_type": "Shell Egg Producer",
+   "fei_number": "3008780158",
+   "observation": {
+    "number": "6",
+    "deficiency": "; ' .",
+    "detail": "; '. All required records do not have the signature or initials of the person performing the operation or· creating the record. Specifically, refrigeration, rodent, and fly monitoring records do not include your initials or signature.Specifically, refrigeration, rodent, and fly monitoring records do not include your initials or signature.Specifically, refrigeration, rodent, and fly monitoring records do not include your initials or signature.Specifically, refrigeration, rodent, and fly monitoring records do not include your initials or signature.Specifically, refrigeration, rodent, and fly monitoring records do not include your initials or signature.Specifically, refrigeration, rodent, and fly monitoring records do not include your initials or signature.Specifically, refrigeration, rodent, and fly monitoring records do not include your initials or signature.Specifically, refrigeration, rodent, and fly monitoring records do not include your initials or signature.. ·.:·.::?.; !;:. ~· ·: 'J~:) •':... i.'·;'........:,..-.:·. - -·"
+   },
+   "expected": {
+    "finding_id": "finding-beb0c6301f6be3d540c17a83",
+    "finding_text": "All required records do not have the signature or initials of the person performing the operation or· creating the record.",
+    "detail_md5": "525f43d338e31fa537c699d6cafbca35",
+    "detail_len": 913
+   }
+  },
+  {
+   "document_id": "fda483-84896",
+   "raw_signal_id": "rawsig-91c274d229402b882eb2db89",
+   "firm_name": "St. Jude Medical IESD",
+   "raw_firm": "St. Jude Medical IESD",
+   "establishment_type": "Manufacturer",
+   "fei_number": "2017865",
+   "observation": {
+    "number": "3",
+    "deficiency": "Design Validation: A.",
+    "detail": "Your Durata risk analyses (2007) identified canine testing as a mitigation addressing REDACTED [redacted]. In the mitigation you reference study REDACTED [redacted] as your design verification and it was inadequate in that: a. It did not include predetermined acceptance criteria corresponding to REDACTED [redacted] b. A review of your approval of the verification found 4 of the total population of 30 canines implanted to support a sample size of 21 canines tested had REDACTED [redacted] REDA CTED [redacted] c. You failed to evaluate on e of the study results which stated REDAC TED [redacted] REDACTED [redacted] I B. Your Durata design risk analysis RE D A CT ED [redacted] is inadequate in that it combines dif ferent recalled and not recalled devices, for example: a. Your REDACTED [redacted] out for all REDACTED [redacted] leads states a sever ity of REDACTED [redacted] and probability of REDACTED [redacted] when your design team sta ted the Durata design decreased the risk of this REDACTED [redacted] root cause. a. Your RE DACTED [redacted] out for all REDACTED [redacted] leads states a severity of REDACTED [redacted] and probability of REDACTED [redacted] when your design team stated the Durata design decreased the risk of this REDACTED [redacted] root cause. b. Your \"REDA CT ED [redacted] \" for a ll REDACTED [redacted] leads states a severit y of REDACTED [redacted] and a probability of REDACTED [redacted] when your design team stated the Durat a design decreased the risk of this REDACTED [redacted] root cause. Annotation: Promise to correct. DEPA RTMENT OF HEALTH A ND HUMA N SERVICES DISTRICT OFfiCE ADDRESS AND PHONE NUMBER US Food and Drug Administration 09125-10/ 1712012 1970 I Fairchild Irvine, CA 92612-2506 FEINUMBER 949-608-2900 2017865 Industry Information: www.fdagov/oc/industry STREET ADDIRESS St. Jude Medical IESD 15900 Valley View Court ~----------------------------------------~-------------------------------------------~"
+   },
+   "expected": {
+    "finding_id": "finding-7b566c5e29e35e6ed0e75a99",
+    "finding_text": "Your Durata risk analyses (2007) identified canine testing as a mitigation addressing REDACTED [redacted].",
+    "detail_md5": "a603fe13ed1b3cbd26523724a05a7085",
+    "detail_len": 1861
+   }
+  },
+  {
+   "document_id": "fda483-85793",
+   "raw_signal_id": "rawsig-3ff41db4a0ca982414f5774c",
+   "firm_name": "Medi-Fare Drug & Home Health Center, Inc.",
+   "raw_firm": "Medi-Fare Drug &amp; Home Health Center, Inc.",
+   "establishment_type": "Compounding Pharmacy",
+   "fei_number": "3009925820",
+   "observation": {
+    "number": "1",
+    "deficiency": ".",
+    "detail": "There is no assurance that containers, closures, and drug products are free from objectionable microorganisms. (a). There is n o documentation available of the REDACTED [redacted] validations conducted to ensure appropriateness for use prior to REDACTED [redacted] glassware and finished product. (b). Section 5.3 of your REDACTED [redacted], P&P 8.040, dated 9/15/03 require that \"monitoring data from each cycle shall be recorded to ensure that processes are performed properly and that all critical parameters are within specified limits during processing\". Your firm does not maintain REDACTED [redacted] cycle printouts to show the cycle parameters were met. During the inspection, sterilization cycle printouts were requested but never received. In addition your REDACTED [redacted] Use, Cleaning & Spore Testing Log\" does not list the lot number of the articles being sterilized, lot number of biological indicators used within the load or document cycle parameters. (c). There are no records documenting that procedures were followed in the REDACTED [redacted] verification of your REDACTED [redacted] cycle, per your procedure entitled, REDACTED [redacted] Cycle Verification\", SOP No. E.023.1, dated 1/11/12. Durin"
+   },
+   "expected": {
+    "finding_id": "finding-d2dda38106a9b97a0e634d9c",
+    "finding_text": "There is no assurance that containers, closures, and drug products are free from objectionable microorganisms.",
+    "detail_md5": "f4a43a31734fa5bd45ffa0adc12b4d4d",
+    "detail_len": 1113
+   }
+  },
+  {
+   "document_id": "fda483-86649",
+   "raw_signal_id": "rawsig-5a2a2c2ff08369d8fe2328d5",
+   "firm_name": "Burzynski Research Institute/ IRB",
+   "raw_firm": "Burzynski Research Institute/ IRB",
+   "establishment_type": "Institutional Review Board",
+   "fei_number": "1000220451",
+   "observation": {
+    "number": "2",
+    "deficiency": ".",
+    "detail": "The IRB has no written procedure for determining which projects require review more often than annually."
+   },
+   "expected": {
+    "finding_id": "finding-fed2e9c2fcb27c9dad2979bc",
+    "finding_text": "The IRB has no written procedure for determining which projects require review more often than annually.",
+    "detail_md5": "d41d8cd98f00b204e9800998ecf8427e",
+    "detail_len": 0
+   }
+  },
+  {
+   "document_id": "fda483-86679",
+   "raw_signal_id": "rawsig-2a2255ae8df72598f72ad2ff",
+   "firm_name": "Grandpa's Compounding Pharmacy, Inc.",
+   "raw_firm": "Grandpa&#039;s Compounding Pharmacy, Inc.",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3006365166",
+   "observation": {
+    "number": "9",
+    "deficiency": ".",
+    "detail": "Equipment surfaces that contact drug products are reactive, additive or absorptive so as to alter the safety, identity, strenglh., quality, or purity ofthe drug product beyond the.o:ffidal or other established requirem.eli.ts. Specifically, peeling (white color) paint is observed inside and outside the horizontal air flow hood as w ell as what appears to be “rust” like material inside of and on the exterior surfaces of the hood; When asked the PIC confirmed that he was unaware of the rust-like material. k __v.:_ D v \\~ v -~'-· \\ · ' J.:L.,..._ \\ fllF~~A.<.. J>J... G:l-1:> '\\"
+   },
+   "expected": {
+    "finding_id": "finding-bc006b12788ab06cac5f8a3e",
+    "finding_text": "Equipment surfaces that contact drug products are reactive, additive or absorptive so as to alter the safety, identity, strenglh., quality, or purity ofthe drug product beyond the.o:ffidal or other established requirem.eli.ts.",
+    "detail_md5": "6b2ec3ea9d41d2c3fb3126b8ff28a10c",
+    "detail_len": 354
+   }
+  },
+  {
+   "document_id": "fda483-88106",
+   "raw_signal_id": "rawsig-ddea9a20690d85b9ae7fafa3",
+   "firm_name": "Pharmacia and Upjohn Company, LLC",
+   "raw_firm": "Pharmacia and Upjohn Company, LLC",
+   "establishment_type": "Drug Manufacturer",
+   "fei_number": "1810189",
+   "observation": {
+    "number": "6",
+    "deficiency": ".",
+    "detail": "Employees performing the ATNAA remediation process were not trained according to written procedures. Specifically, SOP 29173, Kalamazoo Curricula Management, states employees are to complete the training items in their job specific curricula prior to performing job-related tasks. Example discrepancies are noted as follows: a. Employee REDACTED [redacted] worked on ATNAA remediation batch 2M1257 which ran from 6/8-6/11/13 REDACTED [redacted] did not complete training on the written SOP for the 100% manual check of assembled and labeled units for low upper chamber fill volume until 6/15/13 (training item PGM-KZO-TE08002223 and SOP-MAN-INS-00002). This training item is part of the curricula for operators working on the remediation process. It is a prerequisite for completing the OJT training item (PGM-KZ0-0108001802) which qualifies the employee to work independently on the fill volume check. b. Contract employ REDACTED [redacted] was signed in to work on remediation batch 2M1257 on 6/10/13 without any restriction from performing the upper chamber low fill inspection REDACTED [redacted] had not completed the OJT training (PGM-KZOOJ08001802) for this task, Management stated that employees were frequently rotated through different tasks throughout their shifts REDACTED [redacted] was enrolled in the ATNAA Operator Remediation curricula PGM-KZ0-0000105520 which requires the upper chamber low fill inspection OJT training. If such training could not be completed it was to be noted on the sign in sheet of the batch record. c. Employee REDACTED [redacted] signed in to work on batch 2M1257 on 6/10/13 REDACTED [redacted] performed line ope rator duties by signing off on two item on this batch record. REDACTED [redacted] was enrolled in the l ine coordinator curriculum (PGM-KZ0-0000105519) which includes record training item PGM-KZO-T£0800221 w hich required review of the batch record. REDACTED [redacted] did not complete this training item until 7/31/13."
+   },
+   "expected": {
+    "finding_id": "finding-e99a05bc08f23f6277720180",
+    "finding_text": "Employees performing the ATNAA remediation process were not trained according to written procedures.",
+    "detail_md5": "7225c390330d973ac4a10e35a28f4419",
+    "detail_len": 1875
+   }
+  },
+  {
+   "document_id": "fda483-90268",
+   "raw_signal_id": "rawsig-ad11a25145b613ea7d38d1ce",
+   "firm_name": "Triangle Compounding",
+   "raw_firm": "Triangle Compounding",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3004969894",
+   "observation": {
+    "number": "4",
+    "deficiency": "!",
+    "detail": "I ' Laboratory controls do not include the establishment of scientifically sound and appropriate standards and test procedur es designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity. Specifically, Laboratory controls do not include the establishment of scientifically sound and appropriate standards and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity. Specifically, 1 There is no training procedure for employees to perform 100% visual inspection checks of sterile drug prod ucts. Currently operators are only (bsc 9/22/14) trained on the established procedure which does (bsc 9/22/14) descrie the defect categories that may appear in the finished product.There is no training procedure for employees to perform 100% vi sual inspection checks of sterile drug products. Currently operators are only (bsc 9/22/14) trained on the established procedure which does (bsc 9/22/14) descrie the defect categories that may appear in the finished product. There is no training procedure for employees to perform 100% visual inspection checks of sterile drug products. Currently operators are only (bsc 9/22/14) trained on the established procedure which does (bsc 9/22/14) descrie the defect categories that may appear in the finished product.) 2. There has been no established procedures or methods employed to evaluate the effectiveness of pre servatives used in finished sterile products, such as hydroxyprogesterone caproate injection."
+   },
+   "expected": {
+    "finding_id": "finding-793062c2ac43eeb56e3edce5",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate standards and test procedur es designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "detail_md5": "ca5d1aeb6b20fc792438dd0d2b31f21f",
+    "detail_len": 1327
+   }
+  },
+  {
+   "document_id": "fda483-90268",
+   "raw_signal_id": "rawsig-ad11a25145b613ea7d38d1ce",
+   "firm_name": "Triangle Compounding",
+   "raw_firm": "Triangle Compounding",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3004969894",
+   "observation": {
+    "number": "6",
+    "deficiency": "i I _.",
+    "detail": "The written stability testing program is not followed. Yo ur current procedures governing stability testing of sterile drug products, DOC No.: 8.001, has not been executed for any sterile drug products formulated to support labeled expiration date (beyond use dates 30,45 60,90, 180 days) and storage conditions. The written stability testing program is not followed. Your current procedures governing stability testing of sterile drug pr odu cts, DOC No.: 8.001, has not been executed for any sterile drug products formulated to support labele d expiration date (bey ond use dates 30,45 60,90, 180 days) and storage conditions. j"
+   },
+   "expected": {
+    "finding_id": "finding-899d99e0c963c61fc54c4e2f",
+    "finding_text": "The written stability testing program is not followed.",
+    "detail_md5": "19a35c2320a55b863c932f646d18d6e1",
+    "detail_len": 575
+   }
+  },
+  {
+   "document_id": "fda483-91285",
+   "raw_signal_id": "rawsig-0c0cf3e64b2268bb0b026461",
+   "firm_name": "Absolute Pharmacy, LLC",
+   "raw_firm": "Absolute Pharmacy, LLC",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3011116100",
+   "observation": {
+    "number": "12",
+    "deficiency": "A.",
+    "detail": "The labels of your outsourcing facility's drug products do not include information required by section 503B(a)(l0). Specifically, 1. Your firm's labels affixed to the drug products do not contain the date for which the drug was compounded, as required by 503B(a)(lO)(A)(iii)(V); and 2. The statement \"Not for resale\" is not present on certain drug product labels, as required by section 503B(a)(10)(A)(iii)(IX). Examples include the following drug product labels: HCG Injection 5,000 USP Units/Vial; Cyanocobalamin USP l,OOOmcg/mL; Sennorelin/GHRP-2/GHRP-6 10mg/3mg/3mg Vial; MIC +812 25/50/SOmg/mL + 20mcg/mL; and Melatonin II Acetate lOmg/Vial. B. The containers from which the individual units ofthe drug are removed for dispensing or for administration do not adequately display the phone number to facilitate adverse event reporting (1-800-FDA-1 088), nor does it display www.fda.gov/medwatch} as required by section 503B(a)(l O)(B)(ii). DATES OF INSPECTION: 10/27/2014(Mon), l0/2812014(Tue), 10/29/2014(Wed), I0/30/2014(Thu), 1!103/2014(Mon), ll/04/20l4(Tue), II/12/2014(Wed), ll/ 19/2014(Wed)"
+   },
+   "expected": {
+    "finding_id": "finding-e9591baae5bfb74c8851bd65",
+    "finding_text": "The labels of your outsourcing facility's drug products do not include information required by section 503B(a)(l0).",
+    "detail_md5": "1ebb995140a977539c6b19266bb0b89b",
+    "detail_len": 983
+   }
+  },
+  {
+   "document_id": "fda483-91878",
+   "raw_signal_id": "rawsig-afe461ddcae18004b2d77003",
+   "firm_name": "Brown’s Compounding Center, Inc.",
+   "raw_firm": "Brown’s Compounding Center, Inc.",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3010894019",
+   "observation": {
+    "number": "6",
+    "deficiency": "A.",
+    "detail": "T he labels of your outsourcing facility's drug products do not include information required by section 503B(a)(10). S pecifically, Y our firm's labels affixed to the drug products do not contain the date f or which the drug was compounded, as required by 503B(a)(10)(A)( iii)(V). <(}.If) J OATEISSUE.O EMPlOYEI;($) SIGNATIJRE Erika V, Butl er B. The containers from which the individual units of the drug are removed for dispensing or for administration do not include the following information to facilitate adverse event reporting: www.fda.gov/medwatch an d 1-800-FD A-1088 as required by section 503B(a)(10)(B)(ii). F or example the following drug products do not contain this i nformation: Vancomycin 150mg/ml, Morphine sulfate/Ketorolac/Tromethamine/Bupivacine HCL.067mg/0.5ml, Gen tamicin nasal spray 1,g /ml, and Hydroxyprogesterone caporate 250mg/ml."
+   },
+   "expected": {
+    "finding_id": "finding-8c091af986f5274282ea8483",
+    "finding_text": "T he labels of your outsourcing facility's drug products do not include information required by section 503B(a)(10).",
+    "detail_md5": "5cf6202cfbbed742bceb808bcb8c710d",
+    "detail_len": 742
+   }
+  },
+  {
+   "document_id": "fda483-92186",
+   "raw_signal_id": "rawsig-501ddfbeb0516fb9f53dcab1",
+   "firm_name": "US Specialty Formulations LLC.",
+   "raw_firm": "US Specialty Formulations LLC.",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3010680515",
+   "observation": {
+    "number": "1",
+    "deficiency": ".",
+    "detail": "Specifically, a). You perform visual inspections prior to a acceptance quality limit (AQL) inspection for product release. Vials found to have defects are removed from the batch during the visual inspections [redacted]. You have not established any limits for the number or type of defects found during the visual inspections which would cause an investigation to be initiated. The following is a summary of product lots which were found to have critical defects on initial visual inspections: 1. Dexamethasone Acetate l6mg/mL (1OmL Vial for Injection) a. Lot #01RG0407A), [redacted] visual inspections were performed [redacted]. The with \"aggregates\". b. Lot #01RG0224A - 2 of [redacted] vials with black/brown particles and 1 vials with \"particle aggregates\". c. Lot 01RG0409A - 2 of [redacted] vials with white particles and 1 w1th crimp defect. d. Lot OIRGOI29A - 2 of [redacted] vials with black/brown particles. ve No te: The [redacted] of Dexamethasone listed above [redacted]. 2. 72% Glycerol 1OOmL Vial for Injection (Lot #01RG0204A) a. 4 of [redacted] vials found to contain white fibers. None of these critical defects observed during visual inspections initiated further investigation or corrective action. All of the above lots were approved for release and distributed. b.) When the action Jirojt (~particles/cubicft.) for non-viable particle count<; are exceeded, during production ofsterile When the action limit ( [redacted] particl es/cubic ft.) for non-viable particle counts are exceeded, during production of sterile DEPARTMENT OF lii'ALTH AND HUMAN SERVrC.~ES~------ FOOD AND DRUG AD:\\iJN!STRATlON O!STRICT A00.'ES$M~PHONEkJIABER ]''o0\"';.5TC;;;/~(S)l:-;.:OF1\"'o\"/\"\"os2\"'PEQ\"\"c~ln>5~\"'------- ·- US Customhouse, Rm 900 2nd & Chestnut St - 05/29/2015* _:_.;;:_~_;_----t Philadelphia, PA 19106 FEJ\"-WIII'R (215) 597-4390 Fax: (215) 597-0875 301068051 5 Industry Information: WI'I'ILfda.gov/oc/ino.ustry ·- - -- - - - -­ --1 KAN.e. ANO Tmior. ~~'OMDOAtro\\\\\\lo!AREPORT ISSUF.o ~' Kyle Y. Flanigan, C£0~----------~~~~N~~-------------------------~ A~ IVWS SlliEETAPQRESS US Specialty Formulations LLC 116 Research Dr Bethlehem, PA 18015-4731 503B Pharmace,utical_Outsourcing _Facility - ·---­ 1-------.,--,EI.!\"'~=Ye;,~'-· \"'\"'s=JCri\\TVRE -----------· -..--,=oA=~=I$$VEo i.'s) · ----- =\"\"_ drug products in the ISO 5 area, a deviation investigation is not initiated. For example, during production of a sterile drug product, Pyridoxine HCL lOOmg/mL vials (Lot #OIRG0311A), the non viable particle counts exceeded the action limit of greater than [redacted] particles per cubic foot for 17 minutes with recorded levels as high as 78,300 particles per cubic foot in the ISO 5 area. There was no investigation or action initiate d in response to th is deviation. Additionally, when limits for non-viable counts are exceeded there is no documentation of actions taken su ch as ha lting production and performing a wipe down with [redacted]. ations, sterile drug products can be released without consideration for the results of environmental and personnel monitoring. Asepti c processing areas are deficient regarding the system for monitoring envirorunental conditions. Specifically, The following applies to all lots of sterile drug products manufactured and released to date; a.) You have not oonducted any monitoring of personnel as part ofyour environmental monitoring program. b.) Your environmental monitoring program has not identified the species ofany ofthe micro-organisms found to date. For example, the environmental monitoring results for Pyridoxine HCL 1OOmgfmL (Lot 1#0 l RG031l A) was found to have counts of3 CFU!plate and 2 CFU/plate for the left and right isolator gloves, respectively. However, the test results only differentiated them to be either gram positive spore fonning or gram positive non-spore forming. c.) Your release criteria for all sterile dmg products does not include specifications for the results ofenvironm·ental or personnel monitoring conducted during the production of sterile drug products. Using your current product release specifications, sterile drug products can be released without consideration for the results of envir~nmental aod persom1elmonitoring. ------------ ----------- ------1"
+   },
+   "expected": {
+    "finding_id": "finding-50e722db471e92769b6eb116",
+    "finding_text": "You perform visual inspections prior to a acceptance quality limit (AQL) inspection for product release.",
+    "detail_md5": "be3670d8fc5d1fecff6b700a9549957c",
+    "detail_len": 4127
+   }
+  },
+  {
+   "document_id": "fda483-93695",
+   "raw_signal_id": "rawsig-c68a1c848b9d9838cac0cdb1",
+   "firm_name": "US Compounding, Inc.",
+   "raw_firm": "US Compounding, Inc.",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3006031801",
+   "observation": {
+    "number": "5",
+    "deficiency": ".",
+    "detail": "Written procedures for sampling and testing plans are not followed for each drug product. r-_......,. ~-.........:..--~c-.:I'~·~..I.. ~T...._.,J~,.....--=--- i.WA.~--·~~TIII~--·---~"
+   },
+   "expected": {
+    "finding_id": "finding-3d499cf56b096181149aec26",
+    "finding_text": "Written procedures for sampling and testing plans are not followed for each drug product.",
+    "detail_md5": "dce3f50b515446649b675545e7934aae",
+    "detail_len": 91
+   }
+  },
+  {
+   "document_id": "fda483-94270",
+   "raw_signal_id": "rawsig-fbaea134c3acd939e204e107",
+   "firm_name": "Pacific Healthcare, Inc. dba B & B Pharmacy",
+   "raw_firm": "Pacific Healthcare, Inc. dba B &amp; B Pharmacy",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3005530267",
+   "observation": {
+    "number": "4",
+    "deficiency": "Specifically, A.",
+    "detail": "Policy# 1751.4, date effective 11/15/10, date revised 07/29/13 titled \"Facility and Equipment Standards for Sterile Injectable Compounding\" is deficient in that it does not have detailed descriptions of how to conduct cleaning including contact time requirement of cleaning reagents (no contact time studies). Per the PIC, the firm <R ed ac ti on [redacted] >. <Redaction [redacted] while sterile <Redaction [redacted] is used on a <Redaction [redacted] basis. Cleaning is conducted on <Redaction [redacted] basis <Redaction [redacted] with either non-sterile <Redaction [redacted] or non-sterile <Redaction [redacted] and sterile <Redaction [redacted] >. Cleaning <Redaction [redacted] is conducted with sterile <Redaction [redacted] >. B. On 08/03/15 we observed the following deficiencies with the firm's cleaning practice of ISO 5, 7, and 8 areas: a. Use of non-sterile <Redacti on [redacted] to clean IS O 5 hoods <Redaction [redacted] ISO 7 clean rooms#<Redaction [redacted] i and ISO 8 ante room. b. Us e of non-sterile wipes <Redaction [redacted] to cle an ISO 5 hoods with sterile <Redaction [redacted] >. c. Use of non-sterile gl ove s while cleaning surfaces including ISO 5 hoods. d. Use of non-sterile gow nin g inside the ISO 7 and while cleaning ISO 5 A r e a. e. Use of non-sterile mops to clean IS O 7 rooms <Redaction [redacted] Mops ar e s tored upright behind the sink in ISO 8 area when not in used. f. The operator carne out of t he clean room area with cleanroom garment to get a trash can an d w ent back to the ISO 8 ante room without changing the gowning. g. The opera tor used a liquid from an unidentified container to scrub (b)(e) hands (firm said this was non-sterile <Redaction [redacted] whil e cleaning the I SO 7 and ISO 8 areas. h. The operator e nter <Redaction [redacted] head into the hood (ISO 5 <Redaction [redacted] h ood) to clean the interior of the hood while exposing sk in such as nec k, forehead, eyes, an d eye brows. i. Goggle s are not worn du ring the c leaning process. j. On 08/17/2015 we observed that the hand sanitizer <Redaction [redacted] >used inside the Ante room was expired on 09/14. C. On 08/03/15, we observed the technician <Redaction [redacted] cleaned <Redaction [redacted] sterile gloves with a non-labeled bottle while making Trimix lot # 08032015@2 BUD 01/30/15. <Redaction [redacted] stated that the bottle was non-sterile <Redaction [redacted] >. Pacific Healthcare, Inc dba B&B Pharmacy 10244 Rosecrans Ave CITY, STATE, ZIP COVE:, COUNTRY lYPE ESTA8liS11MENTINSI'ECTEO Bellf lower, CA 90706 Producer of St er ile Drug Products"
+   },
+   "expected": {
+    "finding_id": "finding-4683b2df449c2365d7866efa",
+    "finding_text": "Policy# 1751.4, date effective 11/15/10, date revised 07/29/13 titled \"Facility and Equipment Standards for Sterile Injectable Compounding\" is deficient in that it does not have detailed descriptions of how to conduct cleaning including contact time requirement of cleaning reagents (no contact time studies).",
+    "detail_md5": "4121ae94b30db7844343a71a1645dfea",
+    "detail_len": 2289
+   }
+  },
+  {
+   "document_id": "fda483-94355",
+   "raw_signal_id": "rawsig-9f123f8b3a5ab77f503d1102",
+   "firm_name": "Diabetes Corporation of America",
+   "raw_firm": "Diabetes Corporation of America",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3002708794",
+   "observation": {
+    "number": "6",
+    "deficiency": ".",
+    "detail": "Clothing of personnel engaged in the processing ofdrug products is not appropriate for the duties they perform. Specifically, I) The gowning components your firm uses during aseptic processing are not sterile, except for gloves. The hair covers, face masks, and shoe covers are stored in open containers in the ante room. Also, there is no cover for the eyes, eyebrows, and forehead area. 2) Per your firm’s SOP 9.100, “Required Garb for Clean Room Facility Access,” redacted b4. Your firm allows redacted b4. r •I.Per your firm’s SOP 9.100, “Required Garb for Clean Room Facility Access,” redacted b4. Your firm allows redacted b4.Per your firm’s SOP 9.100, “Required Garb for Clean Room Facility Access,” redacted b4. Your firm allows redacted b4.Per your firm’s SOP 9.100, “Required Garb for Clean Room Facility Access,” redacted b4. Your firm allows redacted b4. Per you r firm ’s SOP 9.100, “Required Garb for Clean Room Facility Access,” redacted b4. Your firm allows redacted b4."
+   },
+   "expected": {
+    "finding_id": "finding-fe7fcb52264ef135e782a7ec",
+    "finding_text": "Clothing of personnel engaged in the processing ofdrug products is not appropriate for the duties they perform.",
+    "detail_md5": "3131e003c43133c3773706e12214a3c2",
+    "detail_len": 874
+   }
+  },
+  {
+   "document_id": "fda483-94989",
+   "raw_signal_id": "rawsig-9889752e4e894b90e436e72d",
+   "firm_name": "Jones Drug Company Inc. dba Reed’s Compounding Pharmacy",
+   "raw_firm": "Jones Drug Company Inc. dba Reed’s Compounding Pharmacy",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3005468616",
+   "observation": {
+    "number": "5",
+    "deficiency": "Specifically, A.",
+    "detail": "Weights used for balance calibration are not NIST traceable as required in firm's procedure 4.060 version 1.0, Use Calibration and Maintenance of the REDACTED [redacted] Balances. B. Thermometers used for monitoring temperatures of freezers, incubators, and REDACTED [redacted] were not calibrated."
+   },
+   "expected": {
+    "finding_id": "finding-78d5e9f5569f0ac73fdaf940",
+    "finding_text": "Weights used for balance calibration are not NIST traceable as required in firm's procedure 4.060 version 1.0, Use Calibration and Maintenance of the REDACTED [redacted] Balances.",
+    "detail_md5": "a95d48fa15f537777dc55ba47e994786",
+    "detail_len": 118
+   }
+  },
+  {
+   "document_id": "fda483-94989",
+   "raw_signal_id": "rawsig-9889752e4e894b90e436e72d",
+   "firm_name": "Jones Drug Company Inc. dba Reed’s Compounding Pharmacy",
+   "raw_firm": "Jones Drug Company Inc. dba Reed’s Compounding Pharmacy",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3005468616",
+   "observation": {
+    "number": "6",
+    "deficiency": "A.",
+    "detail": "A. The clean room including ISO 5 LAFH was certified by an outside contractor REDACTED [redacted] on a REDACTED [redacted] basis. The REDACTED [redacted] from the viable air monitoring were incubated in-house. A result summary sheet was provided to REDACTED [redacted] upon completion of the REDACTED [redacted] incubation and REDACTED [redacted] prepared a certification report using the results provided. There was no record showing who performed the results reading and no record indicating that the results were reviewed In addition, REDACTED [redacted] identification, such as lot number and expiration date, was not recorded. Specifically, A. The clean room including ISO 5 LAFH was certified by an outside contractor; [redacted] Y, on a[ [redacted] J basis. The [redacted] ] from the viable air monitoring were incubated in-house. A result summary sheet was provided to (b)l4J upon completion ofthe[tb) (4) J incubation and lb) {4) prepared a certification report using the results provided. There was no record showing who performed the results reading and no record indicating that the results were reviewed In addition,[l5) (.()=:J identification, such as lot number and expiration date, was not recorded. B. No written procedure has been established to provide a schedule for HEPA filter changes in the ISO classified rooms."
+   },
+   "expected": {
+    "finding_id": "finding-b9f670ade1fb4aac8d752955",
+    "finding_text": "The clean room including ISO 5 LAFH was certified by an outside contractor REDACTED [redacted] on a REDACTED [redacted] basis.",
+    "detail_md5": "230d238954882c2ea51c7bd481f221bc",
+    "detail_len": 1205
+   }
+  },
+  {
+   "document_id": "fda483-95350",
+   "raw_signal_id": "rawsig-24abd010fe076b616edd6cd3",
+   "firm_name": "Empower Clinic Services LLC",
+   "raw_firm": "Empower Clinic Services LLC",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3011887629",
+   "observation": {
+    "number": "1",
+    "deficiency": "\"'·:\".",
+    "detail": "There is a failure to thoroughly review the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed. Specifically, the sterility test dated 9/10/15 which was conducted by your contract laboratory determined that Lipo-C Injectable, lot # 17478 (Production date: 8/12/15, Beyond Use Date: 1/31/16) was not sterile. Subsequent speciation via Redacted [redacted] dated 9/22/15 which was also performed by the contract laboratory determined that the contaminating organism was Streptomyces galbus. An investigation performed by the contracting laboratory dated 9/3/15 documented that the source of the contamination was caused by \"external error\". A second sample tested for sterility from the same lot passed sterility testing. There was no documentation of an investigation by your firm into the initial failing sterility result or potential impact on lots of injectable drug products produced on the same date. For example, the following lots of injectable drug products were also produced on 8/12/15: Glutathione, 200mg/ml, lot#17477 GHRP-2/GHRP-6/Sermorelin,lot # 17475 GHRP-2/GHRP-6/Sermorelin,lot #17473"
+   },
+   "expected": {
+    "finding_id": "finding-eb073f431eeedbeb1e2e628c",
+    "finding_text": "There is a failure to thoroughly review the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "detail_md5": "4fd02a846f1fe198954f1b2538b51fe4",
+    "detail_len": 1004
+   }
+  },
+  {
+   "document_id": "fda483-95618",
+   "raw_signal_id": "rawsig-8638fcdd90d34610699a6123",
+   "firm_name": "Central Admixture Pharmacy Services, Inc.",
+   "raw_firm": "Central Admixture Pharmacy Services, Inc.",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "1000306306",
+   "observation": {
+    "number": "3",
+    "deficiency": "Specifically, i.",
+    "detail": "Data was not provided to support that the disinfectant efficacy studies performed are equivalent to current cleaning practices [redacted] states to [redacted]. However, SOP 4000183, Cleaning Procedure, describes cleaning of most surfaces within the ISO 5 areas by [redacted]. i. Data w as not provided to support that the disinfectant efficacy studies performed are equivalent to current cleaning practices [redacted] states to [redacted]. However, SOP 4000183, Cleaning Procedure, describes cleaning of most surfaces within the ISO 5 areas by [redacted]. EM?LOYEE(5) SIGNATURE OA'I'E ISSUEO SEE REVE RSE Sarah M Meng, I nvestigator 12/4/2015 OF THIS PAGE xS FOAM FDA 483 (09/01) PR!!VIOVS EDffiOi'l OBSOLE'l'E lNSPECTIONAL OBSERVATIONS PAGEl OF 4 PAGES DEPARTMENT OF KEALTH AND HUMAN SERVICES DISTRICT ADDRESS AND PHONE NUMBER DATE(S OF INSPECTION 300 River Place, Suite 5900 11/16/2015-12/4/2015* FEINUMBER Detroit, MI 48207 1000306306 (313) 393-81 00 Fax: (313)393-8139 NAME ANO TlTI.fOF INDIVIDUAL TO WHOM REPORT ISSUED Glenn J_ Pangrazzi, Director of Pharmacy FrRMNAME SffiEET ADDRESS Central Admixture Pharmacy Ser vices, 37497 Schoolcraft Rd Inc. CITY. STATE. ZIP CODE, COUN"
+   },
+   "expected": {
+    "finding_id": "finding-e4dc2429aef3f12917ab1145",
+    "finding_text": "Data was not provided to support that the disinfectant efficacy studies performed are equivalent to current cleaning practices [redacted] states to [redacted].",
+    "detail_md5": "40958d40d1af9de6a8cae9f0974c4956",
+    "detail_len": 1021
+   }
+  },
+  {
+   "document_id": "fda483-97132",
+   "raw_signal_id": "rawsig-2d691b81ba689dee1b4afb36",
+   "firm_name": "South Coast Specialty Compounding, Inc.",
+   "raw_firm": "South Coast Specialty Compounding, Inc.",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3003436217",
+   "observation": {
+    "number": "5",
+    "deficiency": "B.",
+    "detail": "Policy and Procedure Number 3.9.0 titled \"Lyophilizer Standard Operating Procedure\" is deficient in that it does not state a. whether REDACTED B4 and REDACTED B4 are sterile -in actual practice, the firm used non-sterile REDACTED B4 per the Director of Corporate Development a. whether REDACTED B4 and REDACTED B4 are sterile -in actual practice, the firm used non-sterile REDACTED B4 per the Director of Corporate Development b. the lyophilizer cleaning log only documents the use of the REDACTED B4 and no REDACTED B 4 1 c. the location ofcleani ng (ISO 7 or non-classified area) where the lyophilizer is to be cleaned I"
+   },
+   "expected": {
+    "finding_id": "finding-6106e9d5a8abdd385c0870a5",
+    "finding_text": "Policy and Procedure Number 3.9.0 titled \"Lyophilizer Standard Operating Procedure\" is deficient in that it does not state a.",
+    "detail_md5": "d41dc8e267b49d7981f9bdf1f9978529",
+    "detail_len": 496
+   }
+  },
+  {
+   "document_id": "fda483-98447",
+   "raw_signal_id": "rawsig-273858872fc0e39aee3773fa",
+   "firm_name": "Pharmakon Compounding Pharmacy Inc.",
+   "raw_firm": "Pharmakon Compounding Pharmacy Inc.",
+   "establishment_type": "Producer of Sterile Drug Products",
+   "fei_number": "3012248018",
+   "observation": {
+    "number": "4",
+    "deficiency": "v.",
+    "detail": "The redacted b4 incubators, redacted [redacted] used to incubate media for sterility testing, media fills, and environmental monitoring, have not been adequately qualified (temperature mapped). Thermometers used in redacted b4 incubators have not been calibrated, as reported. Additionally, there is no record of the date when media is visually examined so as to assure that the required incubation time period has been met; only the redacted b4 [redacted] in the corresponding logs. For example: Aseptic processing areas are deficient regarding the system for monitoring environmental conditions. Specifically,"
+   },
+   "expected": {
+    "finding_id": "finding-843c7bf2425bd73536e8cfba",
+    "finding_text": "The redacted b4 incubators, redacted [redacted] used to incubate media for sterility testing, media fills, and environmental monitoring, have not been adequately qualified (temperature mapped).",
+    "detail_md5": "4a79ca7b77a10742808d4892b378d49b",
+    "detail_len": 417
+   }
+  },
+  {
+   "document_id": "fda483-99557",
+   "raw_signal_id": "rawsig-827410d5a9ec0da64f0b3924",
+   "firm_name": "US Compounding Inc.",
+   "raw_firm": "US Compounding Inc.",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3006031801",
+   "observation": {
+    "number": "5",
+    "deficiency": "..",
+    "detail": "Laboratory controls do not include the establishment of scientifically sound and appropriate sampling plans designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity. Specifically, your firm manufacturers batches of sterile product ranging from REDACTED [redacted] units; however, per SOP QA-007 entitled \"Sterile Finished Product Testing REDACTED [redacted] assessed for endotoxin levels. No scientific rationale for sampling on REDACTED [redacted] was provided. For example, the following batc hes (with quantity indicated) have been tested for endotoxin levels using REDACTED [redacted] for endotoxin levels: Triamcinolone Diacetate PF Iot #20162704@1 processed 04/28/16 -- REDACTED [redacted] units. This product was distributed on 06/13/2016. methylPREDNISolone PF lot #20161005@9 processed 05/11/16 -- REDACTED [redacted] units. This product was distributed on 06/15/2016. Triamcinolone Diacetate PF lot #20160905@1 processed 05/09/16 -- REDACTED [redacted] units. This product was distributed on 07/11/2016. -Ill"
+   },
+   "expected": {
+    "finding_id": "finding-bfd85f3677f3b2d659610ddc",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate sampling plans designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "detail_md5": "bf0918c7ddb967ab54cb469533d7921a",
+    "detail_len": 852
+   }
+  }
+ ],
+ "unchanged": [
+  {
+   "document_id": "fda483-82552",
+   "raw_signal_id": "rawsig-78e1746d79ef6e3c76a85c1c",
+   "firm_name": "Novartis Consumer Health",
+   "raw_firm": "Novartis Consumer Health",
+   "establishment_type": "Drug Manufacturer",
+   "fei_number": "1911445",
+   "observation": {
+    "number": "6",
+    "deficiency": ") .",
+    "detail": ". Eric.M'• 'Mueller·,:tovesi:igator s'EE:REVE,RSE·. ·~dre~ N.... M~i,t;II.C!.~. ~nv~at.ig4~C?r.. 'OF THIS PAGE.:1/~rren J•. !:.OP:ic!ta•,, t-nyea~i9~~9r,.,:·;r.lhly T... •Ng\\\\y~t;t.. Il}yeeti~.ator · '.JNS\"E<ITIONAII'OBS~RY4t'IONS Specifically, the report documents 390 complaints for \"Dosen't Dissolve in Liquid\" during the timeframe for review, 2/10-1/11. e.:. · fat. review, iJ.l Q'-1{·11.. Your recommendation rea ds \"Due to the amount of complaints received for this product, it was discontinued REDACTION b(4) Your conclusion reads \"Based on the data reviewed, no changes in the manufacturing process are required,\" This statement is not justified based on your recommendation. Additionally. Your 2010 Annual Product Review for Benefiber Plus Calcium is deficient in that your report fails to address approximately 760 consumer complaints received for Novartis Product Supply QA. In 2010, none of the 760 consumer complaints (for complaints such as \"Dosen't dissolve in liquid, abnormal consistency, Lot/Exp legibility, insect in product\", etc.) were described or evaluated in the report as required procedurally. The failure by your firm to conduct accurate and through Annual Product Reviews is a pattern of problems at your facility."
+   }
+  },
+  {
+   "document_id": "fda483-181823",
+   "raw_signal_id": "rawsig-6510daf68462b75ad808911d",
+   "firm_name": "SSM Health Care St Louis",
+   "raw_firm": "SSM Health Care St Louis",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "1972829",
+   "observation": {
+    "number": "10",
+    "deficiency": "SEE Lisa L.",
+    "detail": "Flo res, Investi gator 02/08/2024 REVERSE"
+   }
+  },
+  {
+   "document_id": "fda483-179134",
+   "raw_signal_id": "rawsig-ea3faffc4c8a81df5f04f0dd",
+   "firm_name": "Jiangsu Hengrui Pharmceuticals Co., Ltd",
+   "raw_firm": "Jiangsu Hengrui Pharmceuticals Co., Ltd",
+   "establishment_type": "Finished Pharmaceutical Manufacturer",
+   "fei_number": "3007373503",
+   "observation": {
+    "number": "4",
+    "deficiency": ".",
+    "detail": "These events along with the review of the contents of the documents introduced a delay in our ability to perform the remainder ofthe inspection in a timely and effective manner."
+   }
+  },
+  {
+   "document_id": "fda483-101661",
+   "raw_signal_id": "rawsig-6152c8e36d05c2b4697daeaa",
+   "firm_name": "DCA Inc. dba Beacon Prescriptions",
+   "raw_firm": "DCA Inc. dba Beacon Prescriptions",
+   "establishment_type": "Compounding Pharmacy",
+   "fei_number": "3005823862",
+   "observation": {
+    "number": "2",
+    "deficiency": "CONT: 1.",
+    "detail": "Your firm produced a teratogenic drug product (e.g. Allopurinol/Colchicine, [redacted] in the same hood and with the same equipment used for the production of other drug products (i.e. Prednisolone Liquid, [redacted], both produced on 140CT2016). No cleaning validation data was provided to demonstrate the cleaning performed is adequate for these materials."
+   }
+  },
+  {
+   "document_id": "fda483-171873",
+   "raw_signal_id": "rawsig-8340bc46921c34ba5b40a6c9",
+   "firm_name": "Nephron Sterile Compounding Center LLC",
+   "raw_firm": "Nephron Sterile Compounding Center LLC",
+   "establishment_type": "Outsourcing Facility",
+   "fei_number": "3011158388",
+   "observation": {
+    "number": "11",
+    "deficiency": ".2 for details.",
+    "detail": "2. The responsibilities and procedures applicable to the quality control unit are not in writing. a. Comprehensive procedures for quality review of audit trails and electronic data review have not been established. AMENDMENT 1 EMPI.OYEE{S)"
+   }
+  },
+  {
+   "document_id": "fda483-158757",
+   "raw_signal_id": "rawsig-49a9e48d67c3cd11fe693d84",
+   "firm_name": "BPI Labs LLC",
+   "raw_firm": "BPI Labs LLC",
+   "establishment_type": "Sterile Drug Manufacturer",
+   "fei_number": "3015156709",
+   "observation": {
+    "number": "3",
+    "deficiency": "Risk analysis is inadequate.",
+    "detail": "Specifically, your firm's risk analysis conducted as part of the Combination Product Compliance 21 CFR Part 4 Drug and Device Constituent Ports document you identified as the design history file for your firm's 1 ml epinephrine syringe does not adequately identify the hazards, estimated risks, and mitigations associated with the use of your finished combination product. For example, your firm identifies the glass syringe and rubber plunger components of your finished 1 ml epinephrine syringe as high risk for particulate matter, bacterial endotoxin, and lack of sterility in the Product Development Report for Epinephrine Injection, USP 1 mG/mL under section 2.1.3. In your firm's design history file your risk analysis conducted for the finished 1 ml epinephrine syringe device does not evaluate the risk levels for the eight risks identified by your firm. Additionally, one of the mitigations listed for risk of particulates is \"incoming materials controls\". Your firm's supplier control's do not adequately evaluate your supplier's capabilities of meeting the supplier requirements established by your firm, including technical and regulatory requirements. Your firm's supplier of syringes for this combination product was not subject to a quality agreement and did not provide evidence to support their abilities to meet your firm's established supplier requirements during their initial self-audit approved on 02/26/2019.. f:MP'LOYEl!.(S) SIGNATUFU! J:?_,,£./✓,4,... DA.Tl; tSSUE.O 12 393 Belcher Rd S Ste 450 CITY, STATE, ZIP CODE. COUNTRY TYPE ESTASUSHo,IENT INSPECTEO Largo, FL 33773-3097 Sterile Drug Manufacturer and 503B Outsourcing Facility agreement and did not provide evidence to support their abilities to meet your firm's established supplier requirements during their initial self-audit approved on 02/26/2019. OBS ERVATION 4 Procedure for design transfer have not been adequately established. Specifically, your firm's design history file for your 1 ml epinephrine syringe combination product did not contain a documented design transfer that supported the device's design was correctly translated into production specifications. Under design transfer your firm documented \"there is no transfer involved.\" OBS ERVATIO N 5 The type and extent of control to be exercised over the product and suppliers was not clearly defined. Specifically, your firm did not establish a quality agreement with your supplier that defined the type and extent of control to be exercised over the sterile 1 ml syringe that is a component of your firm's sterile 1 ml epinephrine syringe combination product until 04/22/2021. This is required per SOP IGN-034 Section 6.3.6 upon vendor approval. Your firm's supplier of sterile 1 ml syringes was approved on 02/26/2019. 555 Wi nderl e y Place, Suite 200 Maitland, FL 32751 (407)475- 4700 Fa x: (407)475- 4768 0RAPHARM2_RESP0NSE [redacted] fda. hhs.gov OATE(S) OF INSPECTION 4/19/2021-4 /30/2021* FEI NUMGER 3015156709 NAME ANO Tm..EOF l'IOIVIOUAL TOWHOII Rl:P<mTISSI.EO Jugal K. Taneja, Managing Member FIRM HAME BPI Labs LLC STREET AODRESS 12393 Belcher Rd S St e 450 QTY, ST ATE, ZIP COOE, COt.lNTRY Largo, FL 33773- 3097 TYPE ESTABUSI-IMENI INSPECTED Sterile Drug Manufacturer and 503B Outsourcing Facility"
+   }
+  },
+  {
+   "document_id": "fda483-80072",
+   "raw_signal_id": "rawsig-36ec492546c63fcb95576dd9",
+   "firm_name": "H & P Industries, Inc.",
+   "raw_firm": "H &amp; P Industries, Inc.",
+   "establishment_type": "OTC Drug Manufacturer",
+   "fei_number": "2128643",
+   "observation": {
+    "number": "3",
+    "deficiency": ".",
+    "detail": "Triad Group will review our Procedure for investigating customer complaints to assure that every complaint is investigated and recorded properly. As discussed with the Investigators, the manufacturer of the kits used in obtaining Pap smears specifically states in their labeling that no lubricant should be used in conjunction with the procedure because any lubricant has the potential to interfere with the test. Occasionally, medical facilities or practices fail to comply with this instruction and submit a complaint related to our product. Triad Group provides a copy of the manufacturer's labeling in the cases. We respectfully disagree that failure to comply with another device's labeling resulting in abnormal results represents a legitimate complaint regarding the quality, safety, or efficacy of Triad Group Sterile Lubricating Jelly. A baelioe report 011 FDA Form 3411 or approved olectrDoJc oquMlcol was DOt following the first MOR report on a device model. Specifically, cbe firm faiIod to report Im.dvcne cw:at rclltcld to c:ompIaiII& ID 13012 diad 211112010 alIclgiD& over 30 p.aiIIIID baYing CUUtl8CtIiid wginaI irritation after physician used die s..\"ilo IubricIdio&joUy. The compJlint aUcged that........"
+   }
+  },
+  {
+   "document_id": "fda483-87719",
+   "raw_signal_id": "rawsig-ed05da89004e577ff39c5693",
+   "firm_name": "Allergy Laboratories, Inc.",
+   "raw_firm": "Allergy Laboratories, Inc.",
+   "establishment_type": "Manufacturer",
+   "fei_number": "1621802",
+   "observation": {
+    "number": "18",
+    "deficiency": "Batch records are inadequate.",
+    "detail": "Specifically, A. he batch records for Ephedrine Sulfate Injection, Phenylephrine HCI Injection. and L-Cysteine Injection do n ot include documentation of, or limits for, pressure and RE DACTION [redacted] during REDAC TION [redacted] Additionall y SOPs FAE-017.00 \"Operation of the REDACTION [redacted] Fill ing and Stopperi ng Assembly for Filled Vials\" and SOP Operation of th e REDACT ION [redacted] do not specifY the maximum allowable pressure on REDACTION [redacted] during REDACTION [redacted]. B REDACTION [redacted] pressure is not documented in allergenic extract batch records. Additionally, no second operator verification is performed of the REDACTION [redacted] (the test is performed manually)."
+   }
+  }
+ ]
+}

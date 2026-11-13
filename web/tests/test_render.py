@@ -7857,7 +7857,7 @@ class WebFirmWatchlistTest(unittest.TestCase):
         self.assertIn('from("firm_watchlist").select("firm_key,firm_display,created_at")', self.reactions_js)
         # 015 미적용/비로그인 방어 — 오류처럼 보이지 않는 노트 폴백.
         self.assertIn("관심 업체 목록 준비 중입니다.", self.reactions_js)
-        self.assertIn("로그인하면 관심 업체를 모아볼 수 있어요.", self.reactions_js)
+        self.assertIn("로그인하면 관심 업체를 모아볼 수 있습니다.", self.reactions_js)
         # 빈 목록 안내 + 프로파일 링크 + 해제 버튼.
         self.assertIn("아직 등록한 업체가 없습니다", self.reactions_js)
         self.assertIn("업체 프로파일에서 관심 업체로 등록하세요.", self.reactions_js)
@@ -7994,7 +7994,7 @@ class WebMePageTest(unittest.TestCase):
         fn = self.reactions_js[self.reactions_js.index("function renderMeGuestHead(head)"):]
         fn = fn[:fn.index("\n  }")]
         self.assertIn("가입하고 시작하기", fn)
-        self.assertIn("이미 계정이 있어요 · 로그인", fn)
+        self.assertIn("계정이 있으면 로그인", fn)
         self.assertIn('openLogin({ mode: "signup" })', fn)
         # 비로그인 분기가 빈 카드로 남지 않는다(13차 이전 동작 회귀 방지).
         head_fn = self.reactions_js[self.reactions_js.index("function renderMeHead(count)"):]
@@ -8006,8 +8006,8 @@ class WebMePageTest(unittest.TestCase):
         """같은 화면에 로그인 버튼이 여러 개 뜨지 않게, 스크랩 섹션의 비로그인 버튼은
         제거하고 상단 게스트 카드 하나로 모았다(문구 안내는 유지)."""
         self.assertNotIn('className = "grm-my-login"', self.reactions_js)
-        self.assertIn("로그인하면 스크랩한 카드를 이곳에 모아볼 수 있어요.", self.reactions_js)
-        self.assertIn("로그인하면 관심 업체를 모아볼 수 있어요.", self.reactions_js)
+        self.assertIn("로그인하면 스크랩한 카드를 이곳에 모아볼 수 있습니다.", self.reactions_js)
+        self.assertIn("로그인하면 관심 업체를 모아볼 수 있습니다.", self.reactions_js)
 
     def test_growth_fallback_note_hidden_by_css_when_panel_renders(self):
         """growth.js 미로드·localStorage 차단 시 제목만 덩그러니 남지 않도록 정적 폴백
@@ -14396,8 +14396,8 @@ class WebGurumiGrowthSyncTest(unittest.TestCase):
     def test_pet_panel_cta_copy_no_pressure(self):
         # 펫 패널 CTA — 확정 카피(보관 프레이밍). 강요 톤·게스트 경험 폄하 문구 금지.
         self.assertIn("구름이 안전하게 보관하기", self.sync_js)
-        self.assertIn("로그인하면 어느 기기에서든 이어서 키울 수 있어요", self.sync_js)
-        self.assertIn("구름이가 계정에 안전하게 보관되고 있어요", self.sync_js)
+        self.assertIn("로그인하면 어느 기기에서든 이어서 키울 수 있습니다", self.sync_js)
+        self.assertIn("구름이는 계정에 보관됩니다", self.sync_js)
         for banned in ("로그인해야", "사라져요", "잃어버", "지워져요"):
             self.assertNotIn(banned, self.sync_js, f"강요 톤 금지 위반: {banned}")
         # 기존 로그인 플로우 재사용(firm.js 관례 — 헤더 로그인 버튼 클릭 위임).
@@ -14809,7 +14809,7 @@ class WebQuizLearningLoopTest(unittest.TestCase):
 class WebLoginFrictionTest(unittest.TestCase):
     """가입 마찰 3종 개선의 정적 계약을 가드한다.
     ① openLogin({mode:"signup"}) 가입 직행(펫 CTA) — 로그인 화면 경유 1클릭 제거,
-       단 "이미 계정이 있어요" 전환은 가입 화면에 상시.
+       단 "계정이 있으면 로그인" 전환은 가입 화면에 상시.
     ② 가입 진행 상태 sessionStorage 보존 → 팝업을 닫았다 열어도 코드 입력 단계로 복원
        (재전송 쿨다운 30초 유지·세션 정본 grm-public-auth-v1 불침범·비밀번호/토큰 미저장).
     ③ 미확인 계정 로그인 실패 분기 — Supabase 공식 코드 email_not_confirmed 기반
@@ -14825,7 +14825,7 @@ class WebLoginFrictionTest(unittest.TestCase):
         self.assertIn("window.GRM_AUTH.open = openLogin;", self.js)
         self.assertIn('setMode(o.mode === "signup" ? "signup" : "login");', self.js)
         # 가입 화면엔 로그인 전환이 항상 있다(막다른 길 0).
-        self.assertIn('addLink(_t("이미 계정이 있어요 · 로그인"), "login")', self.js)
+        self.assertIn('addLink(_t("계정이 있으면 로그인"), "login")', self.js)
         # 펫 CTA(가입 의도 분명) → 가입 직행 + reactions.js 미로드 시 기존 헤더 위임 폴백.
         self.assertIn('window.GRM_AUTH.open({ mode: "signup" })', self.sync_js)
         self.assertIn('querySelector(".grm-auth .grm-acct-login")', self.sync_js)
@@ -14865,8 +14865,8 @@ class WebLoginFrictionTest(unittest.TestCase):
         body = "\n".join(ln.split("//")[0] for ln in body.splitlines())
         for bad in ["오류 코드", "인증 토큰", "OTP", "실패했습니다. 관리자", "차단"]:
             self.assertNotIn(bad, body, f"대중성 톤 위반 후보: {bad}")
-        self.assertIn("가입 확인이 아직이에요", self.js)
-        self.assertIn("코드가 맞지 않거나 시간이 지났어요", self.js)
+        self.assertIn("가입 확인이 끝나지 않았습니다", self.js)
+        self.assertIn("코드가 맞지 않거나 유효 시간이 지났습니다", self.js)
 
     @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — 분류 경로 고정은 CI에서 수행")
     def test_classify_auth_error_paths_pinned_via_node(self):

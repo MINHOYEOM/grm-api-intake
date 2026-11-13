@@ -1,0 +1,20 @@
+[
+  {
+    "finding_id": "finding-8005d6c7dc148b5bceedbaad",
+    "finding_text": "Your outsourcing facility has not submitted an adverse event report to FDA in accordance with the content and format requirements established through guidance or regulation under 21 CFR 310.305 as required by secdon S03_B(b)(S)..",
+    "finding_text_ko": "아웃소싱 시설이 secdon S03_B(b)(S).. 에서 요구하는 대로 21 CFR 310.305에 따른 지침 또는 규정으로 정한 내용·형식 요건에 맞춰 FDA에 이상사례 보고서를 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-793062c2ac43eeb56e3edce5",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate standards and test procedur es designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 의약품이 적절한 확인, 함량, 품질 및 순도 기준에 부합하도록 보장하기 위한 과학적으로 타당하고 적절한 기준 및 시험 절차의 수립이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8c091af986f5274282ea8483",
+    "finding_text": "T he labels of your outsourcing facility's drug products do not include information required by section 503B(a)(10).",
+    "finding_text_ko": "아웃소싱 시설의 의약품 라벨에는 503B(a)(10) 조항에서 요구하는 정보가 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  }
+]

@@ -55,7 +55,7 @@
   .grm-langhint button:hover{color:var(--ink)}
 </style>
 </head>
-<body>
+<body><a class="grm-skip" href="#grm-main">본문 바로가기</a>
 <div class="grm-langhint" id="grmLangHint" role="region" aria-label="Language" lang="en" hidden>
   <span>This page is also available in English.</span>
   <a href="../../en/library/ich/index.html" hreflang="en" lang="en" rel="alternate">Read in English &rarr;</a>
@@ -69,6 +69,7 @@
   <a class="btn coral" href="../../briefs/2026-07-06/index.html">이번 주 소식</a>
 </div></header>
 
+<div id="grm-main" tabindex="-1"></div>
 <main>
   <div class="wrap page-head lib-head"><nav class="lib-crumb reveal" aria-label="상위로"><a href="../../library/index.html"><i class="ti ti-arrow-left" aria-hidden="true"></i>자료실</a></nav>
     <span class="kick reveal" style="animation-delay:.02s">ICH · Guidelines</span>
@@ -459,6 +460,13 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
   .nav nav{gap:2px}
   .nav nav a{padding-left:8px;padding-right:8px}
 }
+/* [접근성 2026-11-13] 산호색 강조 버튼(.btn.coral) — 흰 글자 대비 3.67:1 → 기존 토큰 --coral-2
+   (5.6:1)로. #1645 의 페이지별 버튼과 같은 계열. grm.css 는 동결이라 여기서 덮는다. 색 토큰 신설 0. */
+.btn.coral{background:var(--coral-2);border-color:var(--coral-2)}
+.btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
+.grm-skip:focus{left:16px}
+#grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
   <div class="foot">

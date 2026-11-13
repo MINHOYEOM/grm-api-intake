@@ -180,6 +180,10 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          # [노션 은퇴 준비] handoff 상태를 어디서 읽나 — notion(기본) | db(대기열 표 intake_handoffs).
+          GRM_HANDOFF_STATUS_SOURCE: ${{ vars.GRM_HANDOFF_STATUS_SOURCE || 'notion' }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           RUN_DATE: ${{ steps.ctx.outputs.run_date }}
         run: |
           set -euo pipefail

@@ -185,6 +185,19 @@ def handoff_status(run_date: str, *, token: str, db_id: str,
     return str(grm_handoff._intake_page_snapshot(page).get("status") or "missing")
 
 
+HANDOFF_STATUS_SOURCE_ENV = "GRM_HANDOFF_STATUS_SOURCE"     # notion(기본) | db
+
+
+def handoff_status_db(run_date: str, *, base_url: str, service_key: str, store: Any = None) -> str:
+    """[노션 은퇴 준비] 같은 판정을 DB 대기열 기록(`intake_handoffs`)으로 — 반환 낱말은 노션과 같다.
+
+    `New`=open(재생성해도 된다) · `Processed`=consumed · `Skipped`=stale · `missing`=그 날짜 기록 없음.
+    """
+    import grm_queue
+    store = store or grm_queue.QueueStore(base_url, service_key)
+    return grm_queue.handoff_status_as_notion(store, run_date)
+
+
 def _emit(pairs: dict[str, object]) -> None:
     try:
         sys.stdout.reconfigure(encoding="utf-8")   # publish_watchdog._emit 와 같은 이유(cp949)
@@ -216,9 +229,14 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "handoff-status":
         import os
+        source = (os.environ.get(HANDOFF_STATUS_SOURCE_ENV, "") or "notion").strip().lower()
         try:
-            status = handoff_status(args.date, token=os.environ["NOTION_TOKEN"],
-                                    db_id=os.environ["NOTION_DATABASE_ID"])
+            if source == "db":
+                status = handoff_status_db(args.date, base_url=os.environ["SUPABASE_URL"],
+                                           service_key=os.environ["SUPABASE_SERVICE_ROLE_KEY"])
+            else:
+                status = handoff_status(args.date, token=os.environ["NOTION_TOKEN"],
+                                        db_id=os.environ["NOTION_DATABASE_ID"])
         except Exception as e:  # noqa: BLE001 — 모르면 재생성하지 않는다(안전 쪽)
             status = f"error:{type(e).__name__}"
         _emit({"handoff_status": status})

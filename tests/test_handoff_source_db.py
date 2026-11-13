@@ -72,8 +72,8 @@ class CanonicalShadowTest(unittest.TestCase):
                              "first_seen_at": "2026-11-13T03:30:00+09:00"}
                             for d in ("2026-1", "2026-2")])
 
-    def _shadow(self, run=RUN, **kw):
-        gen = datetime(run.year, run.month, run.day, 3, 40, tzinfo=gq.KST)
+    def _shadow(self, run=RUN, hour=3, **kw):
+        gen = datetime(run.year, run.month, run.day, hour, 40, tzinfo=gq.KST)
         with mock.patch.object(gq, "log"), mock.patch.object(gh, "log"), \
                 mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
             os.environ.pop("GRM_QUEUE_HANDOFF_REFRESH", None)
@@ -124,7 +124,8 @@ class CanonicalShadowTest(unittest.TestCase):
         self._shadow(canonical=True, canonical_web_brief_dir=self.canon_dir)
         first = self._bytes(self.canon_dir)
         self.store.add_raw(_record("Federal Register", "2026-3"))
-        report = self._shadow(new_items=[_Item("Federal Register", "2026-3")],
+        # 07:00 KST 뒤의 재실행 = 동결(편집팀이 이미 읽고 있다).
+        report = self._shadow(hour=8, new_items=[_Item("Federal Register", "2026-3")],
                               canonical=True, canonical_web_brief_dir=self.canon_dir)
         canon = report["canonical"]
         self.assertEqual((canon["ok"], canon["frozen"], canon["web_brief"]),
@@ -132,8 +133,20 @@ class CanonicalShadowTest(unittest.TestCase):
         self.assertEqual(self._bytes(self.canon_dir), first)
         # 재실행 실행기(새 러너)에는 정본 자리가 비어 있다 — 그 실행은 스캐폴드를 내지 않는다.
         fresh = os.path.join(self.root, "fresh")
-        self._shadow(canonical=True, canonical_web_brief_dir=fresh)
+        self._shadow(hour=8, canonical=True, canonical_web_brief_dir=fresh)
         self.assertFalse(os.path.exists(os.path.join(fresh, BRIEF)))
+
+    def test_publish_day_rerun_before_0700_refreshes_the_scaffold(self):
+        # 월요일 새벽 coverage gate 가 483 본문을 회수한 뒤 수집을 다시 돌린다 — 그 재실행분이 정본이다.
+        self._shadow(canonical=True, canonical_web_brief_dir=self.canon_dir)
+        first = self._bytes(self.canon_dir)
+        self.store.add_raw(_record("Federal Register", "2026-3"))
+        report = self._shadow(hour=6, new_items=[_Item("Federal Register", "2026-3")],
+                              canonical=True, canonical_web_brief_dir=self.canon_dir)
+        canon = report["canonical"]
+        self.assertEqual((canon["ok"], canon["frozen"], canon["rows"]), (True, "", 3))
+        self.assertNotEqual(self._bytes(self.canon_dir), first)
+        self.assertEqual(self._bytes(self.canon_dir), self._bytes(self.shadow_dir))
 
     def test_other_weekday_rerun_refreshes_the_scaffold(self):
         self._shadow(run=TUE, canonical=True, canonical_web_brief_dir=self.canon_dir)

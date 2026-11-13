@@ -76,6 +76,15 @@ def handoff_refresh_requested() -> bool:
     return env_flag("GRM_QUEUE_HANDOFF_REFRESH")
 
 
+PUBLISH_DAY_FREEZE_HOUR_KST = 7     # 편집팀 데스크 07:20 · coverage gate 의 재생성 마감 07:00 과 같은 시각
+
+
+def past_publish_freeze(generated_at: Any) -> bool:
+    """이 실행 시각이 발행 요일 동결 시각(07:00 KST)을 지났나. 시각을 못 읽으면 지난 것으로 본다(안전한 쪽)."""
+    kst = to_kst(generated_at)
+    return kst is None or kst.hour >= PUBLISH_DAY_FREEZE_HOUR_KST
+
+
 def is_publish_day(handoff_date: str) -> bool:
     """그 날짜가 발행 요일(월)인가. 요일 정본은 `grm_handoff.PUBLISH_WEEKDAY`."""
     import grm_handoff as gh
@@ -180,6 +189,18 @@ def dedup_shadow_summary(classes: dict[str, str], notion_existing: set[str],
         "heal_by_source": dict(sorted(heal.items())),
         "same": not only_notion and not only_db,
     }
+
+
+# 대기열 표의 handoff 상태 → 노션 handoff 페이지 Status 와 같은 낱말(쓰는 쪽 코드가 이 낱말로 분기한다).
+HANDOFF_STATUS_AS_NOTION = {HANDOFF_OPEN: "New", HANDOFF_CONSUMED: "Processed", HANDOFF_STALE: "Skipped"}
+
+
+def handoff_status_as_notion(store: Any, handoff_date: str) -> str:
+    """그 날짜 DB handoff 기록의 상태를 노션 낱말로 — `New`·`Processed`·`Skipped`·`missing`."""
+    row = store.get_handoff(handoff_date)
+    if not row:
+        return "missing"
+    return HANDOFF_STATUS_AS_NOTION.get(str(row.get("status") or ""), "missing")
 
 
 def shadow_enabled() -> bool:
@@ -544,7 +565,7 @@ def render_report_md(report: dict[str, Any]) -> str:
         lines += [f"- 대기열 보충(노션 handoff 에 있는데 대기열에 없던 행): 없던 행 {heal.get('missing', 0)} · "
                   f"다시 넣음 {heal.get('inserted', 0)} · 실패 {heal.get('failed', 0)}"]
     if report.get("handoff_frozen") == FROZEN_PUBLISH_DAY:
-        lines += ["- 오늘(발행 요일) handoff 는 첫 기록이 동결돼 있어 다시 쓰지 않았다. 새 행은 내일 handoff 에 들어간다. "
+        lines += ["- 오늘(발행 요일) handoff 는 07:00 KST 부터 동결돼 있어 다시 쓰지 않았다. 새 행은 내일 handoff 에 들어간다. "
                   "일부러 다시 만들려면 저장소 변수 GRM_QUEUE_HANDOFF_REFRESH=true 로 수집을 다시 돌린 뒤 변수를 끈다"]
     elif report.get("handoff_frozen"):
         lines += [f"- 오늘 handoff 기록은 이미 {report['handoff_frozen']} 상태라 다시 쓰지 않았다(동결)"]
@@ -804,6 +825,14 @@ class QueueStore:
                 if key:
                     out.add(key)
         return out
+
+    def queue_keys_for_source(self, source: str, since: str) -> set[str]:
+        """그 소스의 대기열 문서 키 중 수집일이 `since`(YYYY-MM-DD) 이후인 것."""
+        return {row_key(source, r.get("document_id", ""))
+                for r in self._get_all("intake_queue", {
+                    "select": "document_id", "source": f"eq.{source}",
+                    "first_seen_run_date": f"gte.{since}", "order": "document_id.asc"})
+                if r.get("document_id")}
 
     def get_handoff_manifest(self, handoff_date: str) -> "dict[str, Any] | None":
         rows = self._call("GET", "intake_handoffs", params={
@@ -1072,12 +1101,16 @@ def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
     existing = store.get_handoff(handoff_date)
     if existing is not None and existing.get("status") != HANDOFF_OPEN:
         return {"staled": 0, "frozen": str(existing.get("status") or "")}
-    if existing is not None and is_publish_day(handoff_date) and not handoff_refresh_requested():
-        # 발행 요일(월)의 handoff 는 **첫 기록이 동결**된다. 편집팀은 아침에 이 기록의 사본을 읽고 일한다.
+    if (existing is not None and is_publish_day(handoff_date)
+            and past_publish_freeze(generated_at) and not handoff_refresh_requested()):
+        # 발행 요일(월)의 handoff 는 **07:00 KST 부터 동결**된다. 편집팀은 07:20 부터 이 기록의 사본을 읽고 일한다.
         # 그 뒤 같은 날 수집을 다시 돌려 행 목록을 바꾸면, 편집팀이 못 본 행이 그 호의 '미채택'으로 닫힌다.
         # 재실행의 새 행은 대기열에 new 로 남아 화요일 handoff 에 들어간다.
-        # 일부러 다시 만들 때(새벽 수집이 일부 소스 실패로 끝남 — 편집팀이 읽기 전)는
-        # GRM_QUEUE_HANDOFF_REFRESH=true 로 수집을 다시 돌린다. 닫힌(consumed) 기록은 그래도 못 바꾼다.
+        #
+        # 07:00 전의 재실행은 **갱신한다.** 월요일 새벽에는 `grm-fda-coverage-gate.yml` 이 483 본문을 회수한 뒤
+        # 수집을 다시 돌려 handoff·스캐폴드를 재생성한다(그 워크플로도 07:00 이후에는 재생성하지 않는다).
+        # 그때 DB handoff 만 옛 것으로 남으면 노션 handoff 에는 있는 483 전문이 DB handoff 에는 없다.
+        # 07:00 뒤에 일부러 다시 만들 때는 GRM_QUEUE_HANDOFF_REFRESH=true. 닫힌(consumed) 기록은 그래도 못 바꾼다.
         return {"staled": 0, "frozen": FROZEN_PUBLISH_DAY}
     staled = store.stale_prior_open(handoff_date)
     store.upsert_handoff({

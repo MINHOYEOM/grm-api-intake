@@ -140,8 +140,12 @@ class Fda483LostTitleTest(unittest.TestCase):
             "Records are not maintained so that data therein can be reviewed [redacted] to evaluate tbe "
             "quality standards of each drug product to determine tine need for changes in specifications "
             "or manufacturing or control procedures.", texts)
-        # 한 번만 나오는 조각 표제는 이번 범위 밖 — 종전 그대로.
-        self.assertIn("l , .", texts)
+        # 한 번만 나오는 조각 표제(관찰 9 'l , .')는 단독 조각 대체(2026-11-13)로 상세 첫 문장이 표제다
+        # — 11-13 손 SQL 로 넣은 운영 행(finding-8044e15c…)과 같은 표제.
+        self.assertNotIn("l , .", texts)
+        self.assertIn(
+            "You compound drugs that are essentially a copy of one or more approved drugs within the "
+            "meaning of sections 503B(a)(5) and S03B(d)(2).", texts)
         self.assertEqual(len(findings), 6)
 
     def test_retitled_rows_keep_finding_id_rule_and_observation_number(self) -> None:

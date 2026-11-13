@@ -54,8 +54,8 @@ class FakeStore:
             if key not in self.raw:
                 raise gq.QueueStoreError("intake_queue POST: http_409")   # FK
             if key not in self.queue:
-                self.queue[key] = dict(r, state="new", state_reason="", handoff_date=None,
-                                       brief_publish_date=None)
+                self.queue[key] = dict({"state": "new", "state_reason": "", "handoff_date": None,
+                                        "brief_publish_date": None}, **r)
                 n += 1
         return n
 
@@ -87,6 +87,12 @@ class FakeStore:
 
     def get_handoff_manifest(self, handoff_date):
         return self.handoffs.get(handoff_date)
+
+    def all_queue_keys(self):
+        return set(self.queue)
+
+    def existing_raw_keys(self, pairs):
+        return {gq.row_key(s, d) for s, d in pairs if gq.row_key(s, d) in self.raw}
 
     def closed_out_of_scope(self, start, end):
         return [q for q in self.queue.values()
@@ -841,6 +847,179 @@ class NotionSyncTest(unittest.TestCase):
         self.assertIn("::warning::", step)
         self.assertNotIn("continue-on-error", step)
         self.assertNotRegex(step, r"(?m)^\s*exit[ $]")        # 실패해도 워크플로를 빨갛게 세우지 않는다
+
+
+class HistoryBackfillTest(unittest.TestCase):
+    """노션의 지난 N일 행으로 대기열 과거 기록을 채운다(상태 포함)."""
+
+    def setUp(self):
+        self.store = FakeStore()
+        for doc in ("done", "skipped", "open", "inq", "dup"):
+            self.store.add_raw(_record("FR", doc))
+        self.store.enqueue([{"source": "FR", "document_id": "inq", "first_seen_run_date": "2026-11-10",
+                             "first_seen_at": "2026-11-10T03:30:00+09:00"}])
+        self.rows = [
+            {"source": "FR", "document_id": "done", "run_date": "2026-09-01",
+             "collected_at": "2026-09-01T03:31:00.000+09:00", "status": "Processed", "type_or_class": "Rule"},
+            {"source": "FR", "document_id": "skipped", "run_date": "2026-09-02", "collected_at": "",
+             "status": "Skipped", "type_or_class": "Rule"},
+            {"source": "FR", "document_id": "open", "run_date": "2026-11-09", "collected_at": "",
+             "status": "New", "type_or_class": "Rule"},
+            {"source": "FR", "document_id": "inq", "run_date": "2026-11-10", "collected_at": "",
+             "status": "Processed", "type_or_class": "Rule"},                     # 이미 대기열에 있음
+            {"source": "FR", "document_id": "noraw", "run_date": "2026-09-03", "collected_at": "",
+             "status": "Processed", "type_or_class": "Rule"},                     # 정본에 없음
+            {"source": "FR", "document_id": "dup", "run_date": "2026-08-01", "collected_at": "",
+             "status": "Processed", "type_or_class": "Rule"},
+            {"source": "FR", "document_id": "dup", "run_date": "2026-10-01", "collected_at": "",
+             "status": "Skipped", "type_or_class": "Rule"},                       # 같은 문서 재유입 — 늦은 쪽
+            {"source": "GRM Handoff", "document_id": "routine-handoff::2026-09-07", "run_date": "2026-09-07",
+             "collected_at": "", "status": "Processed", "type_or_class": "routine-handoff"},
+            {"source": "FR", "document_id": "web-delta::2026-09-07", "run_date": "2026-09-07",
+             "collected_at": "", "status": "Processed", "type_or_class": "web-delta"},
+            {"source": "FR", "document_id": "weird", "run_date": "2026-09-05", "collected_at": "",
+             "status": "Archived", "type_or_class": "Rule"},
+            {"source": "FR", "document_id": "", "run_date": "2026-09-05", "collected_at": "",
+             "status": "New", "type_or_class": "Rule"},
+        ]
+        self.store.add_raw(_record("FR", "weird"))
+
+    def _run(self, **kw):
+        return gq.backfill_history(self.store, "tok", "db", end=date(2026, 11, 13), days=120,
+                                   reader=lambda *a: self.rows, **kw)
+
+    def test_dry_run_reports_plan_and_writes_nothing(self):
+        before = dict(self.store.queue)
+        out = self._run()
+        self.assertEqual(self.store.queue, before)
+        st = out["stats"]
+        self.assertEqual(st["planned"], 4)
+        self.assertEqual(st["by_state"], {"processed": 1, "skipped": 2, "new": 1})
+        self.assertEqual(st["by_source"], {"FR": 4})
+        self.assertEqual((st["already_in_queue"], st["no_raw"], st["duplicates_in_notion"],
+                          st["not_queue_rows"], st["unknown_status"], st["no_key_or_date"]),
+                         (1, 1, 1, 2, 1, 1))
+        self.assertEqual(st["no_raw_examples"], ["FR::noraw"])
+        self.assertEqual((st["run_date_min"], st["run_date_max"]), ("2026-09-01", "2026-11-09"))
+        self.assertEqual(out["rollback_sql"], gq.HISTORY_ROLLBACK_SQL)
+        self.assertEqual(out["window"], {"start": "2026-07-16", "end": "2026-11-13", "days": 120})
+        self.assertNotIn("applied", out)
+
+    def test_apply_copies_notion_status_and_leaves_existing_rows_alone(self):
+        out = self._run(apply=True)
+        self.assertEqual(out["applied"], {"inserted": 4})
+        q = self.store.queue
+        self.assertEqual((q["FR::done"]["state"], q["FR::done"]["enqueued_by"],
+                          q["FR::done"]["first_seen_run_date"]), ("processed", "history", "2026-09-01"))
+        self.assertEqual(q["FR::done"]["first_seen_at"], "2026-09-01T03:31:00+09:00")
+        self.assertEqual(q["FR::skipped"]["first_seen_at"], "2026-09-02T00:00:00+09:00")   # 시각 없으면 그날 0시
+        self.assertEqual((q["FR::dup"]["state"], q["FR::dup"]["first_seen_run_date"]),
+                         ("skipped", "2026-10-01"))
+        self.assertEqual((q["FR::open"]["state"], q["FR::open"]["state_reason"]), ("new", ""))
+        self.assertEqual(q["FR::inq"]["state"], "new")                 # 이미 있던 행은 그대로
+        self.assertNotIn("enqueued_by", q["FR::inq"])
+        self.assertNotIn("FR::noraw", q)
+        again = self._run(apply=True)
+        self.assertEqual(again["applied"], {"inserted": 0})            # 다시 돌려도 중복 0
+        self.assertEqual(again["stats"]["planned"], 0)
+
+    def test_never_writes_when_the_raw_check_failed(self):
+        out = self._run(apply=True, raw_lookup=lambda pairs: None)
+        self.assertIn("error", out["applied"])
+        self.assertNotIn("FR::done", self.store.queue)
+        self.assertIn("적용 금지", out["raw_check"])
+
+    def test_rollback_sql_only_touches_history_rows(self):
+        self.assertEqual(gq.HISTORY_ROLLBACK_SQL,
+                         "delete from public.intake_queue where enqueued_by = 'history';")
+        plan, _ = gq.plan_history(self.rows, set(), None)
+        self.assertTrue(plan and all(p["enqueued_by"] == gq.HISTORY_ENQUEUED_BY for p in plan))
+
+    def test_reader_refuses_a_truncated_read(self):
+        with patch.object(gh, "notion_api_request",
+                          return_value={"results": [], "has_more": True, "next_cursor": "c"}):
+            with self.assertRaises(gq.QueueStoreError):
+                gq.notion_history_rows("tok", "db", date(2026, 7, 1), date(2026, 11, 13), max_pages=3)
+
+    def test_workflow_offers_the_command_and_validates_days(self):
+        wf = (ROOT / ".github" / "workflows" / "grm-intake-queue.yml").read_text(encoding="utf-8")
+        self.assertIn("options: [seed, reconcile, backfill-history]", wf)
+        self.assertIn('args=(backfill-history --days "$IN_DAYS")', wf)
+        self.assertIn("NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}", wf)
+        self.assertIn("grep -qE '^[0-9]{1,3}$'", wf)
+
+
+class KeepShadowHealthTest(unittest.TestCase):
+    """중복 판정·무음 감시 그림자가 실행 뒤에도 읽을 수 있게 남는가(11-13 첫 실행에서 읽을 곳이 없었다)."""
+
+    def _mod(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("keep_shadow_health", ROOT / "keep_shadow_health.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    STORE = {"dedup_mode": "notion",
+             "dedup_shadow": {"collected": 40, "db": {"new": 3, "have": 30, "heal": 2, "old": 5},
+                              "notion_new": 4, "only_notion_new": 1, "only_notion_new_sample": ["FR::x"],
+                              "only_db_new": 0, "only_db_new_sample": [],
+                              "heal_by_source": {"WHO": {"count": 2, "sample": ["a", "b"]}}, "same": False},
+             "monitor_shadow": {"silence": {"compared": 12, "silent_notion": ["WHO"], "silent_db": [],
+                                            "verdict_differs": ["WHO"], "not_compared": ["ICH"],
+                                            "history_start": "2026-07-16", "same": False,
+                                            "date_differs": [{"source": "WHO", "notion": "2026-10-01",
+                                                              "db": "2026-11-01"}]}},
+             "queue": {"enqueued": 24, "healed": 0}}
+
+    def test_writes_store_into_the_artifact_folder_and_prints_summary(self):
+        import contextlib
+        import io as _io
+        mod = self._mod()
+        with tempfile.TemporaryDirectory() as tmp:
+            hp = os.path.join(tmp, "grm-health.json")
+            with open(hp, "w", encoding="utf-8") as f:
+                json.dump({"schema_version": "grm-health/v1", "run_date_kst": "2026-11-14",
+                           "store": self.STORE, "health": {"failures": []}}, f, ensure_ascii=False)
+            out = _io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(mod.main(["x", hp, os.path.join(tmp, "_queue_shadow")]), 0)
+            with open(os.path.join(tmp, "_queue_shadow", "store_health_2026-11-14.json"),
+                      encoding="utf-8") as f:
+                kept = json.load(f)
+        self.assertEqual(kept, {"run_date": "2026-11-14", "store": self.STORE})   # store 만, 그대로
+        md = out.getvalue()
+        for needle in ("보충 2", "보충 WHO: 2건 (예: a, b)", "노션에서만 새 문서 예: FR::x",
+                       "판정이 다른 소스 ['WHO']", "비교 안 함 ['ICH']",
+                       "마지막 수집일이 다름 WHO: 노션 2026-10-01 / DB 2026-11-01", "enqueued 24"):
+            self.assertIn(needle, md)
+
+    def test_missing_shadow_sections_and_bad_input_are_handled(self):
+        import contextlib
+        import io as _io
+        mod = self._mod()
+        md = mod.summary_md("2026-11-14", {"dedup_mode": "notion"})
+        self.assertIn("중복 판정 그림자: 기록 없음(변수 꺼짐)", md)
+        self.assertIn("무음 감시 그림자: 기록 없음(변수 꺼짐)", md)
+        self.assertIn("조회 실패", mod.summary_md("d", {"dedup_shadow": {"error": "정본·대기열 조회 실패"}}))
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stderr(_io.StringIO()):
+            bad = os.path.join(tmp, "h.json")
+            with open(bad, "w", encoding="utf-8") as f:
+                f.write("{}")
+            self.assertEqual(mod.main(["x", bad, tmp]), 1)
+            self.assertEqual(mod.main(["x", os.path.join(tmp, "none.json"), tmp]), 1)
+            self.assertEqual(os.listdir(tmp), ["h.json"])                     # 아무것도 쓰지 않았다
+
+    def test_workflow_keeps_it_before_the_upload_and_out_of_the_mirror_glob(self):
+        import fnmatch
+        wf = (ROOT / ".github" / "workflows" / "grm-intake.yml").read_text(encoding="utf-8")
+        keep = wf.index("python3 keep_shadow_health.py")
+        self.assertLess(keep, wf.index("name: grm-queue-shadow"))
+        self.assertIn('"${GRM_HEALTH_JSON:-grm-health.json}" _queue_shadow', wf)
+        step = wf[wf.index("그림자 판정 기록 보관 (health 의 store"):keep + 300]
+        self.assertIn("if: ${{ always() }}", step)
+        self.assertIn("::warning::", step)                                    # 실패해도 수집을 빨갛게 세우지 않는다
+        for glob in ("handoff_db_????-??-??.json", "brief_web_????_??_??.json"):
+            self.assertFalse(fnmatch.fnmatch("store_health_2026-11-14.json", glob))
 
 
 class CompareTest(unittest.TestCase):

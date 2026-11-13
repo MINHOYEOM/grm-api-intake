@@ -27,6 +27,10 @@ on:
         description: 'Optional: only process the first N unbackfilled raw_signals (blank = all)'
         type: string
         default: ''
+      document_ids:
+        description: '선택: 다시 추출할 document_id 목록(공백/쉼표 구분). 지목하면 findings 행이 이미 있어도 건너뛰지 않고(append-only, 중복은 무시) 문서별 차이 보고서(--report)를 artifact 로 남긴다.'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -39,7 +43,7 @@ jobs:
   backfill:
     name: Backfill findings for already-ingested raw_signals
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -64,6 +68,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_DOC_IDS: ${{ inputs.document_ids }}
         run: |
           ARGS=()
           if [ "${{ inputs.dry_run }}" = "true" ]; then
@@ -71,6 +76,9 @@ jobs:
           fi
           if [ -n "${{ inputs.limit }}" ]; then
             ARGS+=(--limit "${{ inputs.limit }}")
+          fi
+          if [ -n "${IN_DOC_IDS}" ]; then
+            ARGS+=(--document-ids "${IN_DOC_IDS}" --report m12_doc_report.md)
           fi
           python findings_supabase_backfill.py "${ARGS[@]}" | tee backfill_report.json
 
@@ -89,4 +97,19 @@ jobs:
             else
               echo "backfill_report.json 이 생성되지 않았습니다 (스크립트가 exit 2 로 조기 종료했을 수 있습니다 -- SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
             fi
+            if [ -f m12_doc_report.md ]; then
+              echo ""
+              cat m12_doc_report.md
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload per-document report
+        if: always() && inputs.document_ids != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: m12-doc-report-${{ inputs.dry_run && 'dry' || 'apply' }}
+          path: |
+            m12_doc_report.md
+            backfill_report.json
+          if-no-files-found: ignore
+          retention-days: 30

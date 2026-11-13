@@ -222,8 +222,8 @@
   var pop, resetEmail = "", pendingSignupEmail = "", pendingOptin = false, resendTimer = null, holdPop = false;
   var MODE_COPY = {
     login:   { title: _t("로그인"),          sub: _t("이메일과 비밀번호만 있으면 됩니다.") },
-    signup:  { title: _t("회원가입"),        sub: _t("이메일과 비밀번호만 정하면 끝이에요. 확인 코드를 메일로 보내드립니다.") },
-    confirm: { title: _t("이메일 확인"),      sub: _t("메일로 받은 코드를 넣으면 가입이 끝나요.") },
+    signup:  { title: _t("회원가입"),        sub: _t("이메일과 비밀번호만 정하면 됩니다. 확인 코드는 메일로 보냅니다.") },
+    confirm: { title: _t("이메일 확인"),      sub: _t("메일로 받은 코드를 입력하면 가입이 끝납니다.") },
     done:    { title: _t("가입이 완료되었습니다"), sub: _t("스크랩·관심 업체·구름이가 이 계정에 보관됩니다.") },
     reqcode: { title: _t("비밀번호 재설정"),   sub: _t("가입한 이메일로 재설정 코드를 보내드립니다.") },
     newpw:   { title: _t("새 비밀번호 설정"),  sub: _t("메일로 받은 코드와 새 비밀번호를 입력하세요.") }
@@ -303,7 +303,7 @@
       '<p class="grm-f-err" id="grm-e-consent"></p>' +
       (SUB_ACTION && !lsGet(SUB_OK_KEY)
         ? '<label class="grm-login-optin"><input type="checkbox" class="grm-login-optin-cb" />' +
-          '<span>' + _t("(선택) 주간 브리프·새 기능 안내 메일 받기") + '<small>' + _t("매주 월요일 규제 소식(브리프)과 사이트 새 기능 안내를 이메일로 받습니다. 가입 확인 코드를 입력하면 구독도 함께 완료되며, 모든 메일 하단의 수신거부 링크로 언제든 해지할 수 있어요.") + '</small></span></label>'
+          '<span>' + _t("(선택) 주간 브리프·새 기능 안내 메일 받기") + '<small>' + _t("매주 월요일 규제 소식(브리프)과 사이트 새 기능 안내를 이메일로 받습니다. 가입 확인 코드를 입력하면 구독도 함께 완료되며, 모든 메일 하단의 수신거부 링크로 언제든 해지할 수 있습니다.") + '</small></span></label>'
         : '') +
       '</div>' +
       '<button type="submit" class="grm-login-primary">' + _t("로그인") + '</button></form>' +
@@ -409,7 +409,7 @@
       var ageCb = authForm.querySelector(".grm-c-age"), termsCb = authForm.querySelector(".grm-c-terms");
       if (signup && !(ageCb.checked && termsCb.checked)) {
         bad(!ageCb.checked ? ageCb : termsCb, authForm.querySelector("#grm-e-consent"),
-          !ageCb.checked ? _t("만 14세 이상만 가입할 수 있어요.") : _t("이용약관과 개인정보처리방침에 동의해 주세요."));
+          !ageCb.checked ? _t("만 14세 이상만 가입할 수 있습니다.") : _t("이용약관과 개인정보처리방침에 동의해 주세요."));
       }
       if (firstBad) { firstBad.focus(); return; }
       var optinCb = authForm.querySelector(".grm-login-optin-cb");
@@ -431,7 +431,7 @@
           if (!signup && classifyAuthError(res.error) === "unconfirmed") {
             pendingSignupEmail = email; saveSignupProgress(email);
             setMode("confirm");
-            m.textContent = _t("가입 확인이 아직이에요 — {email} 로 보낸 확인 코드를 입력해 주세요. 코드가 없으면 아래에서 다시 받을 수 있어요.", { email: email });
+            m.textContent = _t("가입 확인이 끝나지 않았습니다. {email} 로 보낸 확인 코드를 입력해 주세요. 코드가 없으면 아래에서 다시 받을 수 있습니다.", { email: email });
             return;
           }
           hint.textContent = authErr(res.error, signup);
@@ -455,7 +455,7 @@
       holdPop = true;
       sb.auth.verifyOtp({ email: pendingSignupEmail, token: token, type: "signup" }).then(function (res) {
         setBusy(confirmForm, false);
-        if (res && res.error) { holdPop = false; m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
+        if (res && res.error) { holdPop = false; m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 유효 시간이 지났습니다. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
         clearSignupProgress();
         setMode("done");
         // 이메일 확인이 끝난 지금에서야 구독을 서버에 요청한다(가입 화면에서 체크한 기록이 user_metadata 에 있을 때만 서버가 받는다).
@@ -488,7 +488,7 @@
       if (!resetEmail) { setMode("reqcode"); return; }
       setBusy(newpwForm, true); m.textContent = _t("확인 중…");
       sb.auth.verifyOtp({ email: resetEmail, token: token, type: "recovery" }).then(function (res) {
-        if (res && res.error) { setBusy(newpwForm, false); m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
+        if (res && res.error) { setBusy(newpwForm, false); m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 유효 시간이 지났습니다. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
         return sb.auth.updateUser({ password: pw }).then(function (up) {
           setBusy(newpwForm, false);
           if (up && up.error) { m.textContent = ""; hint.textContent = _t("비밀번호 변경에 실패했습니다. 다시 시도해 주세요."); return; }
@@ -511,7 +511,7 @@
       call.then(function (res) {
         if (res && res.error) {
           m.textContent = classifyAuthError(res.error) === "rate_limit"
-            ? _t("메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.")
+            ? _t("메일 요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요.")
             : _t("재전송에 실패했습니다. 잠시 후 다시 시도해 주세요.");
         }
       }).catch(function () {});
@@ -522,10 +522,10 @@
   // 맥락별 기본 문구로 떨어진다(가입/로그인 각각 기존 문구 그대로 — 무회귀).
   function authErr(err, signup) {
     switch (classifyAuthError(err)) {
-      case "exists":         return _t("이미 가입된 이메일이에요. 로그인하거나 비밀번호를 재설정해 주세요.");
+      case "exists":         return _t("이미 가입된 이메일입니다. 로그인하거나 비밀번호를 재설정해 주세요.");
       case "weak_password":  return _t("비밀번호는 8자 이상, 영문과 숫자를 함께 넣어 주세요.");
-      case "rate_limit":     return _t("메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.");
-      case "unconfirmed":    return _t("가입 확인이 아직이에요. 메일로 받은 확인 코드를 입력해 주세요.");
+      case "rate_limit":     return _t("메일 요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요.");
+      case "unconfirmed":    return _t("가입 확인이 끝나지 않았습니다. 메일로 받은 확인 코드를 입력해 주세요.");
       default:               return signup ? _t("가입에 실패했습니다. 잠시 후 다시 시도해 주세요.")
                                            : _t("이메일 또는 비밀번호가 올바르지 않습니다.");
     }
@@ -609,12 +609,12 @@
     nudgeEl = document.createElement("div");
     nudgeEl.className = "grm-nudge";
     nudgeEl.setAttribute("role", "dialog");
-    nudgeEl.setAttribute("aria-label", _t("주간 뉴스레터, 받아보시겠어요?"));
+    nudgeEl.setAttribute("aria-label", _t("주간 뉴스레터 구독"));
     nudgeEl.innerHTML =
-      '<b>' + _t("주간 뉴스레터, 받아보시겠어요?") + '</b>' +
-      '<p>' + _t("매주 월요일 규제 소식과 새 기능 안내를 보내드려요. 누르면 바로 구독되며, 메일 하단 수신거부 링크로 언제든 해지할 수 있어요.") + '</p>' +
+      '<b>' + _t("주간 뉴스레터 구독") + '</b>' +
+      '<p>' + _t("매주 월요일 규제 소식과 새 기능 안내를 보냅니다. 누르면 바로 구독되며, 메일 하단 수신거부 링크로 언제든 해지할 수 있습니다.") + '</p>' +
       '<div class="grm-nudge-row"><button type="button" class="grm-nudge-yes">' + _t("구독하기") + '</button>' +
-      '<button type="button" class="grm-nudge-no">' + _t("괜찮아요") + '</button></div>';
+      '<button type="button" class="grm-nudge-no">' + _t("받지 않음") + '</button></div>';
     document.body.appendChild(nudgeEl);
     lsSet(NUDGE_KEY);   // 보인 것으로 기록 — 닫거나 새로고침해도 다시 묻지 않는다
     function close() {
@@ -632,9 +632,9 @@
       subscribeServer(tok, "login-nudge", NUDGE_CONSENT_VER).then(function (b) {
         var msg = (b && b.ok)
           ? (b.status === "blocked_unsubscribed"
-              ? _t("이전에 수신거부한 주소예요. 페이지 아래 구독 폼에서 다시 신청할 수 있어요.")
-              : _t("구독이 완료되었습니다. 매주 월요일에 보내드려요."))
-          : _t("구독을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.");
+              ? _t("이전에 수신거부한 주소입니다. 페이지 아래 구독 폼에서 다시 신청할 수 있습니다.")
+              : _t("구독이 완료되었습니다. 매주 월요일에 발송합니다."))
+          : _t("구독을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.");
         if (!(b && b.ok)) { yes.disabled = false; }
         nudgeEl.innerHTML = '<p style="margin:0" role="status">' + msg + '</p>';
         if (b && b.ok) setTimeout(close, 5000);
@@ -702,7 +702,7 @@
       pop.querySelector(".grm-login-msg").textContent = "";
       var dn = pop.querySelector(".grm-done-news");
       dn.style.display = (pendingOptin && SUB_ACTION) ? "block" : "none";
-      dn.textContent = _t("뉴스레터 구독도 함께 신청되었어요. 매주 월요일에 보내드려요.");
+      dn.textContent = _t("뉴스레터 구독도 함께 신청되었습니다. 매주 월요일에 발송합니다.");
     }
     authForm.style.display    = isAuth ? "flex" : "none";
     confirmForm.style.display = (mode === "confirm") ? "flex" : "none";
@@ -741,8 +741,8 @@
       });
       alt.appendChild(b);
     }
-    if (mode === "login") { addLink(_t("회원가입"), "signup"); addLink(_t("비밀번호를 잊으셨나요?"), "reqcode"); }
-    else if (mode === "signup") { addLink(_t("이미 계정이 있어요 · 로그인"), "login"); }
+    if (mode === "login") { addLink(_t("회원가입"), "signup"); addLink(_t("비밀번호 찾기"), "reqcode"); }
+    else if (mode === "signup") { addLink(_t("계정이 있으면 로그인"), "login"); }
     else if (mode === "confirm") {
       // 복원된 가입 흐름에서 빠져나갈 두 출구(막다른 길 0) — "다른 이메일"은 진행 상태를 버린다.
       addLink(_t("로그인으로 돌아가기"), "login");
@@ -759,7 +759,7 @@
 
   // openLogin(opts) — opts 는 문자열(기존 호출부: 안내 문구) 또는 {mode, msg}.
   //   · mode:"signup" → 가입 의도가 분명한 진입점(펫 "구름이 안전하게 보관하기" 등)은
-  //     로그인 화면을 한 번 거치지 않고 가입 폼으로 직행한다(하단에 "이미 계정이 있어요" 상시).
+  //     로그인 화면을 한 번 거치지 않고 가입 폼으로 직행한다(하단에 "계정이 있으면 로그인" 상시).
   //   · 진행 중인 가입(sessionStorage)이 있으면 요청 모드보다 **복원이 우선**한다 —
   //     팝업을 닫았다 다시 열어도 코드 입력 단계로 돌아오고, 재전송 버튼(쿨다운 30초)이 그대로 있다.
   function openLogin(opts) {
@@ -777,7 +777,7 @@
     if (resume) {
       pendingSignupEmail = resume;
       setMode("confirm");
-      msg = _t("가입을 이어서 마무리할 수 있어요 — {resume} 로 보낸 확인 코드를 입력해 주세요.", { resume: resume });
+      msg = _t("가입을 이어서 마무리할 수 있습니다. {resume} 로 보낸 확인 코드를 입력해 주세요.", { resume: resume });
     } else {
       setMode(o.mode === "signup" ? "signup" : "login");
     }
@@ -999,11 +999,11 @@
       '<div class="grm-me-card grm-me-guest">' +
       '<span class="grm-acct-av grm-acct-av-xl" aria-hidden="true"><i class="ti ti-user"></i></span>' +
       '<div class="grm-me-idbox"><div class="grm-me-label">' + _t("게스트") + '</div>' +
-      '<div class="grm-me-email">' + _t("아직 로그인하지 않았어요") + '</div>' +
-      '<p class="grm-me-guest-s">' + _t("가입하면 저장한 용어·스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 아래 구름이 기록은 지금도 이 브라우저에 쌓이고 있어요.") + '</p>' +
+      '<div class="grm-me-email">' + _t("로그인 전") + '</div>' +
+      '<p class="grm-me-guest-s">' + _t("가입하면 저장한 용어·스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 아래 구름이 기록은 지금도 이 브라우저에 쌓입니다.") + '</p>' +
       '<div class="grm-me-metaline">' +
       '<button type="button" class="grm-me-signup">' + _t("가입하고 시작하기") + '</button>' +
-      '<button type="button" class="grm-me-out grm-me-login">' + _t("이미 계정이 있어요 · 로그인") + '</button>' +
+      '<button type="button" class="grm-me-out grm-me-login">' + _t("계정이 있으면 로그인") + '</button>' +
       '</div></div></div>';
     // 가입 의도가 분명한 진입점이라 로그인 화면을 한 번 거치지 않고 가입 폼으로 직행한다
     // (growth-sync.js 펫 CTA 와 동일 계약 — window.GRM_AUTH.open({mode:"signup"})).
@@ -1039,7 +1039,7 @@
     if (!session || !session.user) {
       // 로그인 버튼은 상단 게스트 카드 하나로 모았다(같은 화면에 CTA 난립 금지) —
       // 여기선 무엇이 모이는지만 알려 주고 조용히 폴백한다. 관심 업체 섹션과 동형.
-      myScrapsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 스크랩한 카드를 이곳에 모아볼 수 있어요.") + '</p>';
+      myScrapsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 스크랩한 카드를 이곳에 모아볼 수 있습니다.") + '</p>';
       return;
     }
     myScrapsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오는 중…") + '</p>';
@@ -1056,7 +1056,7 @@
       if (!scraps.length) {
         myScrapsEl.innerHTML =
           '<div class="grm-my-empty"><span class="grm-my-empty-ic"><i class="ti ti-bookmark" aria-hidden="true"></i></span>' +
-          '<p class="grm-my-empty-t">' + _t("아직 스크랩한 카드가 없어요") + '</p>' +
+          '<p class="grm-my-empty-t">' + _t("스크랩한 카드 없음") + '</p>' +
           '<p class="grm-my-empty-s">' + _t("카드의 스크랩 버튼을 누르면 이곳에 모여요.") + '</p>' +
           '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'archive/index.html">' + _t("규제뉴스 둘러보기") + '</a></div>';
         renderMeHead(0);
@@ -1110,7 +1110,7 @@
   function renderMyTerms() {
     if (!myTermsEl) return;
     if (!session || !session.user) {
-      myTermsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 저장한 용어를 이곳에 모아볼 수 있어요.") + '</p>';
+      myTermsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 저장한 용어를 이곳에 모아볼 수 있습니다.") + '</p>';
       return;
     }
     myTermsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오는 중…") + '</p>';
@@ -1125,7 +1125,7 @@
       if (!saved.length) {
         myTermsEl.innerHTML =
           '<div class="grm-my-empty"><span class="grm-my-empty-ic"><i class="ti ti-bookmark" aria-hidden="true"></i></span>' +
-          '<p class="grm-my-empty-t">' + _t("아직 저장한 용어가 없어요") + '</p>' +
+          '<p class="grm-my-empty-t">' + _t("저장한 용어 없음") + '</p>' +
           '<p class="grm-my-empty-s">' + _t("용어사전에서 저장 버튼을 누르면 이곳에 모여요.") + '</p>' +
           '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'glossary/index.html">' + _t("용어사전 둘러보기") + '</a></div>';
         return;
@@ -1177,7 +1177,7 @@
   function renderMyFirms() {
     if (!myFirmsEl) return;
     if (!session || !session.user) {
-      myFirmsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 관심 업체를 모아볼 수 있어요.") + '</p>';
+      myFirmsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 관심 업체를 모아볼 수 있습니다.") + '</p>';
       return;
     }
     myFirmsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오는 중…") + '</p>';
@@ -1243,7 +1243,7 @@
   function renderMyInterests() {
     if (!myIntEl) return;
     if (!session || !session.user) {
-      myIntEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 관심 범위를 저장할 수 있어요.") + '</p>';
+      myIntEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 관심 범위를 저장할 수 있습니다.") + '</p>';
       return;
     }
     var vocab = intVocab();

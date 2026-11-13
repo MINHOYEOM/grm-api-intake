@@ -197,10 +197,10 @@
     if (loggedIn) {
       var on = document.createElement("p");
       on.className = "grm-pet-sync-on";
-      on.innerHTML = '<i class="ti ti-cloud-check" aria-hidden="true"></i>' + _t("구름이가 계정에 안전하게 보관되고 있어요");
+      on.innerHTML = '<i class="ti ti-cloud-check" aria-hidden="true"></i>' + _t("구름이는 계정에 보관됩니다");
       var sub = document.createElement("p");
       sub.className = "grm-pet-sync-s";
-      sub.textContent = _t("어느 기기에서든 이어서 키울 수 있어요");
+      sub.textContent = _t("어느 기기에서든 이어서 키울 수 있습니다");
       slot.appendChild(on);
       slot.appendChild(sub);
     } else {
@@ -220,7 +220,7 @@
       });
       var hint = document.createElement("p");
       hint.className = "grm-pet-sync-s";
-      hint.textContent = _t("로그인하면 어느 기기에서든 이어서 키울 수 있어요");
+      hint.textContent = _t("로그인하면 어느 기기에서든 이어서 키울 수 있습니다");
       slot.appendChild(btn);
       slot.appendChild(hint);
     }

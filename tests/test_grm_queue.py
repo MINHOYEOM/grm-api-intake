@@ -1120,6 +1120,25 @@ class EditorialGitHandoffTest(unittest.TestCase):
         self.assertIn("test -f company/editorial/next/RUN.md", reh)
         self.assertNotIn("checkout -b claude/company-rehearsal", reh)
 
+    def test_instructions_state_the_same_length_limits_the_code_enforces(self):
+        # 2026-11-13 리허설 1113b: 교열이 영문 hook_line 에 한국어 상한(40자)을 적용해 49장을 반려했고,
+        # 기자는 en.title_issue 상한(50자)을 몰라 한 장이 조립을 막았다. 지시문의 숫자 = 코드의 숫자.
+        import inject_slots
+        ko, en = inject_slots._HOOK_LINE_MAX["ko"], inject_slots._HOOK_LINE_MAX["en"]
+        en_title = inject_slots._MAX_TITLE_ISSUE * 2
+        style = self._read("company", "editorial", "STYLE.md")
+        self.assertIn(f"한국어 공백 포함 {ko}자 이내", style)
+        self.assertIn(f"영문 `en.hook_line` 공백 포함 {en}자 이내", style)
+        for folder in (("company", "editorial"), self.NEXT):
+            copyedit = self._read(*folder, "copyedit.md")
+            self.assertIn(f"한국어 {ko}자 이내 · 영문 {en}자 이내", copyedit, folder)
+            self.assertNotIn(f"② 공백 포함 {ko}자 이내 ③", copyedit, folder)
+            reporter = self._read(*folder, "reporter.md")
+            self.assertIn(f"한국어 {ko}자 이내 · 영문 {en}자 이내", reporter, folder)
+            self.assertIn(f"`title_issue` {inject_slots._MAX_TITLE_ISSUE}자 이내, `en.title_issue` {en_title}자 이내",
+                          reporter, folder)
+        self.assertIn(f"영문 `en.title_issue` ≤{en_title}자", self._read("docs", "prompts", "GRM_Prompt_v16.md"))
+
     def test_live_instructions_are_untouched_and_rehearsal_reads_next(self):
         # 이 PR 은 실발행 지시문을 바꾸지 않는다 — 월요일 발행은 여전히 노션 handoff 를 읽는다.
         for name in ("RUN.md", "desk.md", "reporter.md", "copyedit.md"):

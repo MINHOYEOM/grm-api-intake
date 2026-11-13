@@ -298,6 +298,117 @@ def _fda483_title_from_detail(detail: str) -> tuple[str, str] | None:
     return title, rest
 
 
+# [단독 조각 대체 2026-11-13] 같은 조각 표제가 문서에 **한 번만** 나오는 관찰. 11-13 손 SQL(B 43행 +
+# 복원 2행, _ops/reports/GRM_483단독조각_적용_sql_2026-11-13.sql · GRM_483복원2행_단독조각_sql_2026-11-13.sql)
+# 의 규칙을 그대로 옮겼다 — 같은 규칙이어야 다음 재추출이 손으로 넣은 행과 같은 finding_id 를 낸다.
+# 머리 스트립 5단(각 1회, 이 순서): 기호 전반 · 한 글자+비단어 머리(`I ' Laboratory`) · `Specifically,`
+# (+열거자) · 열거자 `A.` `a)` `iv.` · 남은 기호. #1614 경로(`_FDA483_DETAIL_LEAD_RES`)와 다르다 —
+# 그쪽은 이미 나간 id 를 지키려고 손대지 않는다.
+_FDA483_SOLO_LEAD_RES = (
+    re.compile(r"^[^A-Za-z0-9(\[]+"),
+    re.compile(r"^[A-Za-z]\W+(?=[A-Z][a-z])"),
+    re.compile(r"^Specifically,\s*(?:\(?[A-Za-z0-9]{1,3}[.)]+\s+)?"),
+    re.compile(r"^(?:[A-Za-z]|\d{1,2}[A-Za-z]?|[ivxIVX]{1,4})[.)]\s+"),
+    re.compile(r"^[^A-Za-z0-9(\[]+"),
+)
+# ① 대체 표제는 대문자로 시작해야 한다(소문자 시작은 문장 중간 — ④ 이거나 애매. 숫자·`(` 시작은
+# 실측이 주소·실사일 꼬리말 `1'11 3000203232 4001 McEwen Rd` · 하위 항목 `(B) …` 뿐이었다).
+_FDA483_SOLO_TITLE_START_RE = re.compile(r"^[A-Z]")
+# ④ 표제가 문장 중간에서 끊긴 꼴("There is a." · "ISO 5 classified areas were." · "Failure to operate.")
+# — 상세가 소문자로 이어지면 둘을 잇는다. 끊김의 증거는 **끝 낱말**이다: 관사·be 동사·전치사·접속사
+# 이거나 `to + 동사`. "Risk analysis is inadequate." · "Batch records are inadequate." 같은 완결 짧은
+# 표제(11-13 ② — 표제 유지가 결정)는 끝 낱말이 내용어라 잇지 않는다.
+# 끝 마침표는 버리되 `no.`(번호 약어 — 상세가 숫자로 이어진다)는 둔다.
+_FDA483_CUT_TITLE_RE = re.compile(
+    r"(?:\b(?:a|an|the|is|are|was|were|be|been|not|no|to|of|for|and|or|with|by|that)"
+    r"|\bto\s+[a-z]+)\.$"
+)
+_FDA483_CUT_TITLE_ABBREV_RE = re.compile(r"(?<=\s)no\.$")
+# "Specifically, accuracy." + "accuracy calculations…" 처럼 상세와 겹치는 머리는 이으면 어색하다(11-13 제외분).
+_FDA483_CUT_TITLE_SKIP_RE = re.compile(r"^\W*specifically\b", re.I)
+# 표제가 상호참조 꼬리('… for details.' · ', above.')면 다른 관찰의 하위 항목이다 — 되살리지 않는다
+# (`_fda483_has_lost_title` 와 같은 판단. 실측 171873 '.2 for details.').
+_FDA483_CROSS_REF_TAIL_RE = re.compile(r"(?:for\s+details|above)\W*$", re.I)
+# 대체 표제가 되면 안 되는 것(실측 전수 138 후보 중 잡문):
+#   483 양식 꼬리말 — "Flo res, Investi gator 02/08/2024 REVERSE" · "s'EE:REVE,RSE" · "TYPE STABUSHMENT
+#   INSPECTED" · "HEALTH AND HUMAN SERVICES FOOD:AND DRUG…"(OCR 변형이라 글자 사이 비단어 허용).
+#   'investigator'·'Food and Drug Administration' 은 정상 표제에도 나와(임상시험 483) 넣지 않는다.
+#   업체 회신문(1인칭 `our`) — "Triad Group will review our Procedure…".
+#   면담 진술(`stated`) — "TJW stated that…" · "The Associate Director … stated they…"(증거 서술이지 관찰 표제가 아니다).
+#   이어지는 문장(접속어 시작) — "These events along with…" · "For example, …" · "In addition, …".
+#   약어 마침표에서 끊긴 첫 문장 — "… (e.g." · "(Rm.".
+_FDA483_SOLO_JUNK_TITLE_RE = re.compile(
+    r"s\W*e\W*e\W*r\W*e\W*v\W*e\W*r\W*s\W*e|\breverse\W*$|human\W+services"
+    r"|stab\w*ment\W+inspected|\bour\b|\bstated\b",
+    re.I,
+)
+_FDA483_SOLO_CONTINUATION_START_RE = re.compile(
+    r"^(?:For\s+example|In\s+addition|In\s+\d{4}|Furthermore|Additionally|Moreover|However|Also|These|This)\b"
+)
+_FDA483_SOLO_ABBREV_END_RE = re.compile(r"(?:\be\.g|\bi\.e|\bRm|\bNo|\bMr|\bMs|\bDr|\bvs|\betc)\.$", re.I)
+
+
+# 문장 경계: 마침표류 뒤 공백, 또는 공백 없이 바로 대문자+소문자(OCR 이 반복 문단을 붙인 꼴 —
+# 실측 83772 "…to 12/21/10.Specifically, you…" · 83807 "…was molted.You did not…" 는 경계를 못 찾으면
+# 같은 문장이 4~6번 붙은 539·924자 표제가 된다. 11-13 손 SQL 도 여기서 끊었다).
+_FDA483_SOLO_SENTENCE_END_RE = re.compile(r"(?<=[.!?])(?:\s+|(?=[A-Z][a-z]))")
+
+
+def _fda483_solo_first_sentence(s: str) -> tuple[str, str]:
+    m = _FDA483_SOLO_SENTENCE_END_RE.search(s)
+    if m:
+        return s[:m.start()].strip(), s[m.end():].strip()
+    return s, ""
+
+
+def _fda483_solo_strip(detail: str) -> str:
+    s = re.sub(r"\s+", " ", detail or "").strip()
+    for lead_re in _FDA483_SOLO_LEAD_RES:
+        s = lead_re.sub("", s, count=1)
+    return s
+
+
+def _fda483_solo_title_ok(title: str) -> bool:
+    return (
+        len(title) >= _FDA483_RETITLE_MIN_LEN
+        and len(_FDA483_WORD_RE.findall(title)) >= _FDA483_RETITLE_MIN_WORDS
+        and not _fda483_looks_like_table(title)
+        and not _fda483_is_annotation(title)
+        and not _FDA483_SOLO_JUNK_TITLE_RE.search(title)
+    )
+
+
+def _fda483_solo_retitle(deficiency: str, detail: str) -> tuple[str, str] | None:
+    """한 번만 나오는 짧은 표제(30자 미만)의 관찰 → (새 표제, 나머지 상세) 또는 None(종전대로).
+
+    ④ 끊긴 표제 + 소문자(또는 `no.` 뒤 숫자) 상세 머리 → `표제 + " " + 상세 첫 문장`.
+    ① 표제가 조각(영단어 3개 미만)이면 → 상세 첫 문장(대문자·숫자·`(` 시작).
+    둘 다 새 표제는 30자 이상·영단어 3개 이상·표 아님·주석란 잡문 아님.
+    나머지 상세 = 스트립한 상세에서 첫 문장을 뺀 전부 — 자르지 않는다."""
+    d = (deficiency or "").strip()
+    s = _fda483_solo_strip(detail)
+    if not s:
+        return None
+    first, rest = _fda483_solo_first_sentence(s)
+    if (
+        _FDA483_CUT_TITLE_RE.search(d)
+        and not _FDA483_CUT_TITLE_SKIP_RE.search(d)
+        and (s[0].islower() or (s[0].isdigit() and _FDA483_CUT_TITLE_ABBREV_RE.search(d)))
+    ):
+        head = d if _FDA483_CUT_TITLE_ABBREV_RE.search(d) else d[:-1]
+        title = f"{head} {first}"
+        return (title, rest) if _fda483_solo_title_ok(title) else None
+    if (
+        not _fda483_is_fragment_title(d)
+        or _FDA483_CROSS_REF_TAIL_RE.search(d)
+        or not _FDA483_SOLO_TITLE_START_RE.match(first)
+        or _FDA483_SOLO_CONTINUATION_START_RE.match(first)
+        or _FDA483_SOLO_ABBREV_END_RE.search(first)
+    ):
+        return None
+    return (first, rest) if _fda483_solo_title_ok(first) else None
+
+
 def _fda_483_observation_rows(
     raw_signal: dict[str, Any],
     raw: dict[str, Any],
@@ -314,7 +425,8 @@ def _fda_483_observation_rows(
             부모 관찰 상세에 이미 있다(가짜 조각).
           · 없고 표제가 통째로 사라진 꼴이면 상세 첫 문장을 표제로 삼는다(고아 번호 = 진짜 관찰).
             못 하면 종전대로 둔다.
-        한 번만 나오는 조각 표제는 이번 범위 밖이라 종전 그대로다(별도 과제).
+      - 한 번만 나오는 짧은 표제(30자 미만)는 `_fda483_solo_retitle`(2026-11-13 단독 조각 대체)로
+        상세에서 표제를 되살린다. 같은 번호에 정상 표제가 있으면 둔다.
       - finding_id 규칙·ordinal(관찰 번호)·dedup 키(표제)는 바꾸지 않는다. 같은 제목의 서로 다른
         관찰은 여전히 1행이다 — findings 의 (raw_signal_id, md5(finding_text)) 유일 인덱스가
         같은 제약이라 키만 바꿔도 저장층에서 막힌다(대표 결정 대기)."""
@@ -369,6 +481,15 @@ def _fda_483_observation_rows(
             if ordinal in titled_ordinals:
                 continue
             retitled = _fda483_title_from_detail(detail) if _fda483_has_lost_title(deficiency) else None
+            if retitled is not None:
+                finding_text, finding_detail = retitled
+        elif (
+            len(deficiency) < _FDA483_FRAGMENT_MAX_LEN
+            and title_counts[deficiency.casefold()] == 1
+            and ordinal not in titled_ordinals
+        ):
+            # [단독 조각 대체 2026-11-13] 같은 번호에 정상 표제가 있으면 상호참조 하위 항목이라 둔다.
+            retitled = _fda483_solo_retitle(deficiency, detail)
             if retitled is not None:
                 finding_text, finding_detail = retitled
         refs = _extract_us_legal_refs(" ".join(part for part in (finding_text, detail) if part))

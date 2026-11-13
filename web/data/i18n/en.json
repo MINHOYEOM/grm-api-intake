@@ -1752,6 +1752,8 @@
   "최근 12개월 인용순": "Citations in the last 12 months",
   "최근 12개월 지적 {n}건 · 문서 {d}건": "Last 12 months: {n} finding{s} · {d} documents",
   "최근 12개월과 직전 12개월의 비중 차이": "Difference in share between the last 12 months and the 12 before",
+  "최근 1년": "Last 12 months",
+  "최근 3년": "Last 3 years",
   "최근 {days}일 · {n}건 · {date} 기준. 제목은 각 기관·단체가 공개한 원제이며, 링크는 원문 페이지로 연결됩니다. 브리프 선별과 별개로 수집된 소식이라 업무 관련성은 직접 판단하세요.": "Past {days}-day window · {n} item{s} · as of {date}. Titles are the originals published by each agency or body and link to the source page. These were collected separately from the brief's selection, so judge their relevance to your work yourself.",
   "최근 개정 {date}": "Last revised {date}",
   "최근 공개 {date}": "Latest {date}",

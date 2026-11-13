@@ -588,6 +588,7 @@ grm-api-intake/
 ├─ site_error_watch.py             # 사이트 오류 징후 일일 감시 — Cloudflare 5xx·404 급증·배포 실패 → 경보 이슈(grm-site-error-watch, 기본 꺼짐)
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
 ├─ grm_queue.py                    # 주간 대기열(DB, 그림자) — intake_queue·intake_handoffs(149). 일일 수집이 넣은 문서만 후보 · 행 상태는 main 의 델타·발행본에서 매번 다시 계산 · DB 로 만든 handoff 를 노션 것과 비교(ENABLE_INTAKE_QUEUE_SHADOW, 발행은 노션 그대로)
+├─ keep_shadow_health.py          # 수집 health JSON 의 store(중복 판정·무음 감시 그림자 기록)를 grm-queue-shadow 아티팩트에 남기고 실행 요약에 적는다 — health JSON 은 아티팩트로 안 올라가 실행 뒤 읽을 곳이 없었다(11-13)
 ├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, inspection_card.py(실사 결과 카드 앞면 블록 — 등급·지적 목록·당국 조치 결정론, 11-08), card_weight.py(카드 무게 — 깊이·표준·표 한 줄을 유형·등급·지적 건수·사유 길이로 판정, 11-16호부터, 11-10), check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수

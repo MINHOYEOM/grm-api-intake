@@ -2,6 +2,7 @@
 
   · 153 의 원 계산 본문 = 082 본문에 "월 조건 6곳 치환 + p CTE 두 열 추가"만 한 것(글자 그대로 대조).
   · 공개 RPC·캐시 키 함수(086)는 다시 정의하지 않는다 — 키 정규화가 그대로라 캐시가 어긋나지 않는다.
+  · 화면(search.js)이 보내는 범위 값의 모양과 옛 함수 방어가 있다.
 """
 from __future__ import annotations
 
@@ -13,6 +14,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 MIG = ROOT / "web" / "migrations"
 SQL_153 = (MIG / "153_findings_search_month_range.sql").read_text(encoding="utf-8")
 SQL_082 = (MIG / "082_findings_search_text_only.sql").read_text(encoding="utf-8")
+SEARCH_JS = (ROOT / "web" / "assets" / "search.js").read_text(encoding="utf-8")
 
 
 def _code(sql: str) -> str:
@@ -71,6 +73,17 @@ class MonthRangeMigrationTest(unittest.TestCase):
         self.assertNotIn("drop function", code.lower())
         self.assertNotIn("grant ", code.lower())
         self.assertNotIn("revoke ", code.lower())
+
+
+class SearchScreenPeriodTest(unittest.TestCase):
+    def test_sends_range_shape(self):
+        self.assertIn('return y + "-" + (m < 10 ? "0" : "") + m + "..";', SEARCH_JS)
+        self.assertIn("if (period) body.p_month = period;", SEARCH_JS)  # 안 고르면 안 보낸다(캐시 키 불변)
+        self.assertRegex(SEARCH_JS, r"function periodRange\(")
+
+    def test_guards_old_function(self):
+        # 옛 함수는 범위를 한 달 값으로 보고 0건 — by_month 에 그 기간 행이 있으면 기간 축을 끈다.
+        self.assertIn("periodUnsupported", SEARCH_JS)
 
 
 if __name__ == "__main__":

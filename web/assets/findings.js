@@ -2538,23 +2538,7 @@
   // 하므로 클라이언트 검증은 불필요 — 신뢰 경계는 서버다).
   // 응답을 LAST 에 대입하지 않고 그대로 반환한다 — 대입 시점은 호출부가 navToken 세대
   // 검사를 통과시킨 뒤여야 한다(늦게 도착한 옛 응답이 최신 결과를 덮어쓰는 것 방지).
-  // [157 · 2026-11-13 식은 첫 호출 재시도] 오래 쉰 뒤 첫 검색은 DB 페이지가 식어 서버 시간
-  // 제한(57014 → HTTP 500)에 걸리는 일이 있다. 같은 질의를 다시 보내면 첫 시도가 데운 페이지를
-  // 읽어 대개 1~3초 안에 성공한다(11-12~13 edge 로그: 500 뒤 4초 안팎 재요청 성공). search.js 와
-  // 같은 규칙으로 5xx·네트워크 오류만 간격을 두고 두 번 더 시도한다. 4xx·봉투 모양 오류는 즉시 실패.
-  function fetchSearch(page, attempt) {
-    return fetchSearchOnce(page).catch(function (err) {
-      var a = attempt || 0;
-      var transient = !(err && err.noRetry) && !(err && err.status && err.status < 500);
-      if (a < 2 && transient) {
-        return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
-          .then(function () { return fetchSearch(page, a + 1); });
-      }
-      throw err;
-    });
-  }
-
-  function fetchSearchOnce(page) {
+  function fetchSearch(page) {
     return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_search", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
@@ -2600,6 +2584,22 @@
         return data;
       });
   }
+  // [157 · 2026-11-13 식은 첫 호출 재시도] 오래 쉰 뒤 첫 검색은 DB 페이지가 식어 서버 시간
+  // 제한(57014 → HTTP 500)에 걸리는 일이 있다. 같은 질의를 다시 보내면 첫 시도가 데운 페이지를
+  // 읽어 대개 1~3초 안에 성공한다(11-12~13 edge 로그: 500 뒤 4초 안팎 재요청 성공). search.js 와
+  // 같은 규칙으로 5xx·네트워크 오류만 간격을 두고 두 번 더 시도한다. 4xx·봉투 모양 오류는 즉시 실패.
+  function fetchSearchRetry(page, attempt) {
+    return fetchSearch(page).catch(function (err) {
+      var a = attempt || 0;
+      var transient = !(err && err.noRetry) && !(err && err.status && err.status < 500);
+      if (a < 2 && transient) {
+        return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
+          .then(function () { return fetchSearchRetry(page, a + 1); });
+      }
+      throw err;
+    });
+  }
+
 
   // [페이지 이동] navToken 세대 카운터로 연타(빠른 재클릭)를 방어한다 — 오래된 요청의
   // 응답은 LAST/currentPage/render() 를 건드리지 않고 조용히 버려지므로, 항상 "가장
@@ -2613,7 +2613,7 @@
     var doScroll = pendingScrollAfterNav;
     pendingScrollAfterNav = false;
     setPagerLoading(true);
-    fetchSearch(target)
+    fetchSearchRetry(target)
       .then(function (data) {
         if (myToken !== navToken) return; // 더 최근 조작에 의해 취소됨
         // 범위 밖 페이지(옛 북마크·손으로 고친 ?page= 등): 서버는 빈 documents 를 준다.
@@ -2867,7 +2867,7 @@
   // 둘러보기 면으로 옮겨져 검색 툴바가 다시 첫 화면에 있다(보정할 거리 소멸).
   navToken += 1;
   var initToken = navToken;
-  fetchSearch(currentPage)
+  fetchSearchRetry(currentPage)
     .then(function (data) {
       if (initToken !== navToken) return; // 첫 응답 도착 전에 이미 다른 조작이 앞질렀다
       LAST = data;

@@ -39,15 +39,18 @@ class ClientRetry(unittest.TestCase):
 
     def test_findings_js_retries_5xx_only(self):
         s = self._src("findings.js")
-        self.assertIn("function fetchSearch(page, attempt)", s)
-        self.assertIn("function fetchSearchOnce(page)", s)
+        self.assertIn("function fetchSearch(page) {", s)          # 1회 호출 본문은 종전 이름 그대로
+        self.assertIn("function fetchSearchRetry(page, attempt)", s)
+        self.assertEqual(s.count("fetchSearchRetry(target)"), 1)    # 페이지 이동
+        self.assertEqual(s.count("fetchSearchRetry(currentPage)"), 1)  # 첫 로드
         self.assertIn("err.status < 500", s)
         self.assertIn("shapeErr.noRetry = true", s)
 
     def test_trends_js_search_calls_use_retry(self):
         s = self._src("trends.js")
-        self.assertIn("function postSearchRetry(body, attempt)", s)
-        self.assertEqual(s.count('rpcEndpoint("findings_search")'), 1)  # 재시도 함수 한 곳만 직접 호출
+        self.assertIn("function retry5xx(once, attempt)", s)
+        self.assertEqual(s.count('rpcEndpoint("findings_search")'), 2)
+        self.assertEqual(s.count("return retry5xx(function () {"), 2)  # 사례 2곳 모두 재시도
 
     def test_checklist_js_rpc_retry(self):
         s = self._src("checklist.js")

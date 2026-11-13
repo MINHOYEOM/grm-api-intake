@@ -40,9 +40,9 @@ class ClientRetry(unittest.TestCase):
     def test_findings_js_retries_5xx_only(self):
         s = self._src("findings.js")
         self.assertIn("function fetchSearch(page) {", s)          # 1회 호출 본문은 종전 이름 그대로
-        self.assertIn("function fetchSearchRetry(page, attempt)", s)
-        self.assertEqual(s.count("fetchSearchRetry(target)"), 1)    # 페이지 이동
-        self.assertEqual(s.count("fetchSearchRetry(currentPage)"), 1)  # 첫 로드
+        self.assertIn("function retrySearch(page)", s)
+        self.assertEqual(s.count(".catch(retrySearch(target))"), 1)       # 페이지 이동
+        self.assertEqual(s.count(".catch(retrySearch(currentPage))"), 1)  # 첫 로드
         self.assertIn("err.status < 500", s)
         self.assertIn("shapeErr.noRetry = true", s)
 

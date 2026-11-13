@@ -2588,16 +2588,17 @@
   // 제한(57014 → HTTP 500)에 걸리는 일이 있다. 같은 질의를 다시 보내면 첫 시도가 데운 페이지를
   // 읽어 대개 1~3초 안에 성공한다(11-12~13 edge 로그: 500 뒤 4초 안팎 재요청 성공). search.js 와
   // 같은 규칙으로 5xx·네트워크 오류만 간격을 두고 두 번 더 시도한다. 4xx·봉투 모양 오류는 즉시 실패.
-  function fetchSearchRetry(page, attempt) {
-    return fetchSearch(page).catch(function (err) {
-      var a = attempt || 0;
-      var transient = !(err && err.noRetry) && !(err && err.status && err.status < 500);
-      if (a < 2 && transient) {
-        return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
-          .then(function () { return fetchSearchRetry(page, a + 1); });
-      }
-      throw err;
-    });
+  // 호출부는 `fetchSearch(page).catch(retrySearch(page))` 로 쓴다(fetchSearch 본문은 1회 호출 그대로).
+  function retrySearch(page) {
+    return function (err) { return retrySearchFrom(page, err, 0); };
+  }
+
+  function retrySearchFrom(page, err, a) {
+    var transient = !(err && err.noRetry) && !(err && err.status && err.status < 500);
+    if (a >= 2 || !transient) return Promise.reject(err);
+    return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
+      .then(function () { return fetchSearch(page); })
+      .catch(function (err2) { return retrySearchFrom(page, err2, a + 1); });
   }
 
 
@@ -2613,7 +2614,8 @@
     var doScroll = pendingScrollAfterNav;
     pendingScrollAfterNav = false;
     setPagerLoading(true);
-    fetchSearchRetry(target)
+    fetchSearch(target)
+      .catch(retrySearch(target))
       .then(function (data) {
         if (myToken !== navToken) return; // 더 최근 조작에 의해 취소됨
         // 범위 밖 페이지(옛 북마크·손으로 고친 ?page= 등): 서버는 빈 documents 를 준다.
@@ -2867,7 +2869,8 @@
   // 둘러보기 면으로 옮겨져 검색 툴바가 다시 첫 화면에 있다(보정할 거리 소멸).
   navToken += 1;
   var initToken = navToken;
-  fetchSearchRetry(currentPage)
+  fetchSearch(currentPage)
+    .catch(retrySearch(currentPage))
     .then(function (data) {
       if (initToken !== navToken) return; // 첫 응답 도착 전에 이미 다른 조작이 앞질렀다
       LAST = data;

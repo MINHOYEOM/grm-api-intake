@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-12T23:59:09Z",
+ "generated_at": "2026-11-13T03:24:12Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,69 +174,69 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43330878884,
+    "databaseId": 43350412111,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-13T02:11:49Z",
+    "updatedAt": "2026-11-13T02:17:32Z",
+    "headBranch": "main",
+    "displayTitle": "fix(문구): 영문 경향 라벨 'Agency' · 구름이 상태 문구를 담백한 명사형으로 (#1662)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43350412111"
+   },
+   {
+    "databaseId": 43348425839,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-12T23:40:50Z",
-    "updatedAt": "2026-11-12T23:46:35Z",
-    "headBranch": "automation/glossary-cases-auto-43329750080",
-    "displayTitle": "chore: refresh glossary case counts",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43330878884"
+    "createdAt": "2026-11-13T01:55:25Z",
+    "updatedAt": "2026-11-13T02:01:29Z",
+    "headBranch": "ui2-copy-tone-2",
+    "displayTitle": "fix(문구): 영문 경향 라벨 'Agency' · 구름이 상태 문구 명사형",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43348425839"
    },
    {
-    "databaseId": 43300317431,
+    "databaseId": 43348408673,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-12T20:26:24Z",
-    "updatedAt": "2026-11-12T20:32:43Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1625 from MINHOYEOM/claude/glossary-fig-daily-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43300317431"
+    "createdAt": "2026-11-13T01:55:17Z",
+    "updatedAt": "2026-11-13T02:01:17Z",
+    "headBranch": "ui2-copy-tone-2",
+    "displayTitle": "fix(문구): 영문 경향 라벨 'Agency' · 구름이 상태 문구를 담백한 명사형으로",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43348408673"
    },
    {
-    "databaseId": 43266874214,
+    "databaseId": 43345693417,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-12T17:12:03Z",
-    "updatedAt": "2026-11-12T17:18:07Z",
+    "createdAt": "2026-11-13T01:32:35Z",
+    "updatedAt": "2026-11-13T01:38:34Z",
     "headBranch": "main",
-    "displayTitle": "feat(방문 기록): 이동·클릭·펼침 익명 카운터 — migration 155 (적용은 대표 승인 뒤) (#1640)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43266874214"
+    "displayTitle": "perf(DB): 검색 캐시 갱신 — payload 같으면 쓰기 건너뛰기 (migration 156) (#1658)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43345693417"
    },
    {
-    "databaseId": 43266816880,
+    "databaseId": 43345517181,
     "status": "completed",
     "conclusion": "cancelled",
     "event": "push",
-    "createdAt": "2026-11-12T17:11:44Z",
-    "updatedAt": "2026-11-12T17:12:19Z",
+    "createdAt": "2026-11-13T01:31:08Z",
+    "updatedAt": "2026-11-13T01:32:52Z",
     "headBranch": "main",
-    "displayTitle": "fix(접근성): 산호색 글자·버튼을 --coral-2 로 — 용어·문서·업체·조항 대비 4.5:1 이상 (#1645)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43266816880"
-   },
-   {
-    "databaseId": 43264550651,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-12T16:59:06Z",
-    "updatedAt": "2026-11-12T17:05:41Z",
-    "headBranch": "ui-a11y-coral-text",
-    "displayTitle": "fix(접근성): 산호색 글자·버튼 대비 4.5:1 (용어·문서·업체·조항)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43264550651"
+    "displayTitle": "fix(문구): 정적 화면 구어체를 합니다체·명사형으로 (#1659)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43345517181"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 43333329287,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-12T23:59:02Z",
-    "updatedAt": "2026-11-12T23:59:06Z",
+    "updatedAt": "2026-11-12T23:59:13Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43333329287"
@@ -402,6 +402,50 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 43353423020,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-13T02:37:07Z",
+    "updatedAt": "2026-11-13T02:39:04Z",
+    "headBranch": "main",
+    "displayTitle": "data(483 번역): 단독 조각 새 행 — 표제 38·상세 37 (#1664)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43353423020"
+   },
+   {
+    "databaseId": 43348415368,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-13T01:55:20Z",
+    "updatedAt": "2026-11-13T01:56:08Z",
+    "headBranch": "main",
+    "displayTitle": "data(483 번역): 85401·85637 ocr-recovery 후속 — 새 관찰 2·재번역 1 (#1661)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43348415368"
+   },
+   {
+    "databaseId": 43339872834,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-13T00:47:34Z",
+    "updatedAt": "2026-11-13T00:48:44Z",
+    "headBranch": "main",
+    "displayTitle": "data(483 번역): 관찰 분할 후속 — 앞 관찰 재번역 22·새 관찰 17 (#1656)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43339872834"
+   },
+   {
+    "databaseId": 43335621086,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-13T00:15:34Z",
+    "updatedAt": "2026-11-13T00:16:27Z",
+    "headBranch": "main",
+    "displayTitle": "chore(findings): 일일 번역 배치 2026-11-13 - 26건 (#1646)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43335621086"
+   },
+   {
     "databaseId": 43259996302,
     "status": "completed",
     "conclusion": "success",
@@ -411,50 +455,6 @@
     "headBranch": "main",
     "displayTitle": "data(483 번역): 표제 143·상세 0 — 소급분 포함 (#1642)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43259996302"
-   },
-   {
-    "databaseId": 43155707713,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-12T04:34:39Z",
-    "updatedAt": "2026-11-12T04:35:13Z",
-    "headBranch": "main",
-    "displayTitle": "chore(findings): 일일 번역 배치 2026-11-12 - 17건 (#1571)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43155707713"
-   },
-   {
-    "databaseId": 42977251249,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-11T07:07:53Z",
-    "updatedAt": "2026-11-11T07:08:37Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1509 from MINHOYEOM/claude/findings-translate-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42977251249"
-   },
-   {
-    "databaseId": 42888750140,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-10T19:47:17Z",
-    "updatedAt": "2026-11-10T19:48:09Z",
-    "headBranch": "main",
-    "displayTitle": "data(483 표제 복원): 옛 280자+'...' 절단 표제 28건 영문·국문 restore (#1510)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42888750140"
-   },
-   {
-    "databaseId": 42856553877,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-10T16:38:25Z",
-    "updatedAt": "2026-11-10T16:38:50Z",
-    "headBranch": "main",
-    "displayTitle": "chore(findings): 반영 끝난 outbox 2개 → applied 이동(WL 2차 52·EU NCR 추가정보 54…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42856553877"
    }
   ],
   "grm-findings-backfill-fetch.yml": [

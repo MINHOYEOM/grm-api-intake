@@ -26,7 +26,7 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 - 파일이 없거나 비어 있으면 `상태: 보류` 로 종료한다(수집이 아직 안 끝났거나 DB handoff 생성 실패 — 백업이 한다). 다른 날짜의 파일로 대신하지 않는다.
 - 그리고 Notion 에서 제목 `OPEN GRM Routine Handoff $D` 페이지가 **OPEN(Status=New)** 인지 읽기만 한다. 없거나 이미 `CONSUMED` 면 `상태: 보류`(이미 누가 처리했다는 뜻).
 - 이 파일의 `rows[]` 가 유일한 입력이다. 행에 Notion `page_id` 는 없다(쓰지 않는다). 카드 키는 `web_card_id`.
-- 월요일 파일은 그날 처음 만들어진 것으로 **동결**된다 — 뒤에 수집을 다시 돌려도 바뀌지 않는다. 그래서 데스크·기자·교열이 같은 파일을 본다.
+- 월요일 파일은 **07:00 KST 부터 동결**된다 — 그 뒤에 수집을 다시 돌려도 바뀌지 않는다(그 전의 재실행은 파일을 갱신한다). 그래서 데스크·기자·교열이 같은 파일을 본다.
 
 ## 3. 중간 결과는 git 브랜치에
 - 브랜치: `claude/company-{run_date_kst}` (예: `claude/company-2026-11-02`). 없으면 `origin/main` 에서 만든다.
@@ -85,5 +85,7 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 - 예약작업이 다른 예약작업을 깨우거나 세션을 새로 여는 길은 **이 저장소에서 실측하지 못했다**. 확인되면 이 항을 고친다 — 그 전까지는 고정 슬롯(5항)만 쓴다.
 
 ## 8. 월요일 handoff 를 다시 만들어야 할 때 (사람만 — 편집팀 직무는 하지 않는다)
-월요일 새벽 수집이 일부 소스 실패로 끝났고 **데스크가 아직 읽기 전(07:20 전)**이면: 저장소 변수 `GRM_QUEUE_HANDOFF_REFRESH=true` →
-`GRM API Intake (Daily)` 재실행 → 끝나면 변수를 `false` 로. 이미 발행돼 닫힌 호에는 듣지 않는다. 07:20 뒤에는 쓰지 않는다(직무마다 다른 파일을 보게 된다).
+- **07:00 KST 전**: 수집을 다시 돌리기만 하면 된다(`GRM API Intake (Daily)` 재실행). 그 시각 전의 재실행은 월요일 파일을 스스로 갱신한다
+  (FDA 483 본문 회수 뒤의 자동 재생성 `grm-fda-coverage-gate.yml` 도 이 길이다).
+- **07:00~07:20**(파일은 동결됐고 데스크는 아직 읽기 전): 저장소 변수 `GRM_QUEUE_HANDOFF_REFRESH=true` → 수집 재실행 → 끝나면 변수를 `false` 로.
+- **07:20 뒤에는 다시 만들지 않는다**(직무마다 다른 파일을 보게 된다). 이미 발행돼 닫힌 호에는 스위치도 듣지 않는다.

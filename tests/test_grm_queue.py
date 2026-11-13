@@ -1038,6 +1038,46 @@ class CompareTest(unittest.TestCase):
                                              "FR|modality|notion_only_value": 1})
         self.assertIn("db_richer", gq.render_report_md({"run_date": "x", "compare": out}))
 
+    def _rows(self, order):
+        return {"rows": [{"source": "FR", "document_id": d, "render_order": o, "headline": d}
+                         for d, o in order]}
+
+    def test_order_shift_from_a_one_sided_row_is_recognised_not_guessed(self):
+        # 노션에는 x 가 순번 1 에 있고 DB 에는 없다 → 그 뒤 b·c 의 순번이 하나씩 당겨진다.
+        notion = self._rows([("a", 0), ("x", 1), ("b", 2), ("c", 3)])
+        db = self._rows([("a", 0), ("b", 1), ("c", 2)])
+        out = gq.compare_payloads(notion, db)
+        self.assertEqual((out["common"], out["identical"], out["render_order_only"]), (3, 1, 2))
+        self.assertTrue(out["order_same"])
+        self.assertEqual(out["identical_or_order_shift"], 3)
+        self.assertEqual(out["field_diff"], {"FR|render_order|differs": 2})    # 원래 차이표는 그대로 보인다
+        self.assertIn("상대 순서는 같다", gq.render_report_md({"run_date": "x", "compare": out}))
+
+    def test_real_reordering_is_not_excused(self):
+        notion = self._rows([("a", 0), ("b", 1), ("c", 2)])
+        db = self._rows([("a", 0), ("c", 1), ("b", 2)])                        # b 와 c 가 뒤바뀜
+        out = gq.compare_payloads(notion, db)
+        self.assertFalse(out["order_same"])
+        self.assertEqual((out["identical"], out["render_order_only"], out["identical_or_order_shift"]),
+                         (1, 2, 1))
+        self.assertIn("상대 순서도 다르다", gq.render_report_md({"run_date": "x", "compare": out}))
+
+    def test_order_shift_does_not_hide_other_field_differences(self):
+        notion = self._rows([("a", 0), ("x", 1), ("b", 2)])
+        db = self._rows([("a", 0), ("b", 1)])
+        db["rows"][1]["headline"] = "다른 제목"
+        out = gq.compare_payloads(notion, db)
+        self.assertTrue(out["order_same"])
+        self.assertEqual((out["render_order_only"], out["identical_or_order_shift"]), (0, 1))
+
+    def test_no_ordered_cards_gives_no_order_verdict(self):
+        out = gq.compare_payloads({"rows": [{"source": "FR", "document_id": "m", "merged_into": "FR::r"}]},
+                                  {"rows": [{"source": "FR", "document_id": "m", "merged_into": "FR::r"}]})
+        self.assertIsNone(out["order_same"])
+        self.assertEqual(out["identical_or_order_shift"], 1)
+        health = gq.health_summary({"compare": out})
+        self.assertEqual((health["common"], health["identical"], health["order_same"]), (1, 1, None))
+
     def test_state_compare_treats_deferred_as_notion_new(self):
         computed = {"FR::a": {"state": "processed", "reason": "published"},
                     "FR::b": {"state": "deferred", "reason": "deferred"},

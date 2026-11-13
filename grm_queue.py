@@ -417,26 +417,38 @@ def compare_payloads(notion_payload: dict[str, Any], db_payload: dict[str, Any])
               for r in db_payload.get("rows") or [] if isinstance(r, dict)}
     common = sorted(set(n_rows) & set(d_rows))
     identical = 0
+    order_only = 0
     field_diff: dict[str, int] = {}
     examples: dict[str, list[str]] = {}
     for key in common:
         a, b = n_rows[key], d_rows[key]
         clean = True
+        differing: list[str] = []
         for f in sorted((set(a) | set(b)) - COMPARE_SKIP_FIELDS):
             if _norm(a.get(f)) == _norm(b.get(f)):
                 continue
             clean = False
+            differing.append(f)
             label = f"{a.get('source', '')}|{f}|{_classify_diff(a.get(f), b.get(f))}"
             field_diff[label] = field_diff.get(label, 0) + 1
             examples.setdefault(label, [])
             if len(examples[label]) < 3:
                 examples[label].append(str(a.get("document_id", "")))
         identical += 1 if clean else 0
+        order_only += 1 if differing == ["render_order"] else 0
+    order_same = _same_relative_order(n_rows, d_rows, common)
     return {
         "notion_rows": len(n_rows),
         "db_rows": len(d_rows),
         "common": len(common),
         "identical": identical,
+        # 한쪽에만 있는 행이 있으면 그 뒤 카드의 순번(render_order)이 통째로 밀린다. 내용 차이가 아니다.
+        # 순번 숫자가 아니라 **공통 카드의 상대 순서**가 같은지를 직접 본다(order_same).
+        #   render_order_only = 다른 칸이 render_order 하나뿐인 행 수
+        #   identical_or_order_shift = 상대 순서가 같을 때, 그 행들을 '같음'에 더한 수(순서가 다르면 identical 그대로)
+        "order_same": order_same,
+        "render_order_only": order_only,
+        "identical_or_order_shift": identical + (order_only if order_same else 0),
         "only_notion": sorted(set(n_rows) - set(d_rows)),
         "only_db": sorted(set(d_rows) - set(n_rows)),
         "field_diff": dict(sorted(field_diff.items(), key=lambda kv: (-kv[1], kv[0]))),
@@ -444,6 +456,25 @@ def compare_payloads(notion_payload: dict[str, Any], db_payload: dict[str, Any])
         "coverage_same": (notion_payload.get("coverage_collected_md")
                           == db_payload.get("coverage_collected_md")),
     }
+
+
+def _same_relative_order(n_rows: dict[str, dict[str, Any]], d_rows: dict[str, dict[str, Any]],
+                         common: list[str]) -> "bool | None":
+    """공통 카드를 각자의 render_order 로 줄 세웠을 때 순서가 같은가. 순번 있는 공통 카드가 없으면 None.
+
+    순번은 카드(대표·단독 행)에만 있다. 한쪽에만 순번이 있는 행은 순서 비교에서 빼고, 그 자체가
+    칸 차이(render_order 의 only_value)로 이미 드러난다.
+    """
+    def _num(row: dict[str, Any]) -> "float | None":
+        v = row.get("render_order")
+        return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+    both = [k for k in common if _num(n_rows[k]) is not None and _num(d_rows[k]) is not None]
+    if not both:
+        return None
+    by_notion = sorted(both, key=lambda k: (_num(n_rows[k]), k))
+    by_db = sorted(both, key=lambda k: (_num(d_rows[k]), k))
+    return by_notion == by_db
 
 
 def _explain_only_notion(store: Any, cmp_: dict[str, Any]) -> None:
@@ -533,6 +564,12 @@ def render_report_md(report: dict[str, Any]) -> str:
                   f"| {cmp_['notion_rows']} | {cmp_['db_rows']} | {cmp_['common']} | {cmp_['identical']} | "
                   f"{len(cmp_['only_notion'])} | {len(cmp_['only_db'])} | "
                   f"{'같음' if cmp_['coverage_same'] else '다름'} |"]
+        if cmp_.get("render_order_only"):
+            if cmp_.get("order_same"):
+                lines += ["", f"순번만 다른 행 {cmp_['render_order_only']}건 — 공통 카드의 상대 순서는 같다(한쪽에만 있는 행 때문에 "
+                              f"순번이 밀린 것). 이를 같음으로 치면 {cmp_['identical_or_order_shift']} / {cmp_['common']}행 일치."]
+            else:
+                lines += ["", f"순번만 다른 행 {cmp_['render_order_only']}건 — **공통 카드의 상대 순서도 다르다.** 정렬 재료가 다른 것이니 확인할 것."]
         if cmp_["only_notion"]:
             lines += ["", "노션에만: " + ", ".join(cmp_["only_notion"][:30])]
         if cmp_.get("only_notion_out_of_scope"):
@@ -1466,6 +1503,10 @@ def health_summary(report: dict[str, Any]) -> dict[str, Any]:
         "handoff_frozen": str(report.get("handoff_frozen") or ""),
         "only_notion": len(cmp_.get("only_notion") or []),
         "only_db": len(cmp_.get("only_db") or []),
+        "common": int(cmp_.get("common") or 0),
+        "identical": int(cmp_.get("identical") or 0),
+        "identical_or_order_shift": int(cmp_.get("identical_or_order_shift") or 0),
+        "order_same": cmp_.get("order_same"),
         "warnings": len(report.get("warnings") or []),
     }
 

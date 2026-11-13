@@ -5302,7 +5302,7 @@ def main() -> int:
             "source": "db",
             "notion_mirror": ("ok" if handoff_emitted else "failed" if handoff_failed else "skipped"),
             "notion_mirror_rows": handoff_row_count,
-            "notion_mirror_error": truncate(handoff_error_msg, 160),
+            "notion_mirror_error": handoff_error_msg,
             "frozen": str(_canon.get("frozen") or ""),
             "web_brief": bool(_canon.get("web_brief")),
         }

@@ -37,6 +37,7 @@
 | 회차 | 날짜 | 재료 날짜 `D` | 브랜치 | 폴더 |
 |---|---|---|---|---|
 | `1113` | 11-13(목) 밤 | `2026-11-13` | `claude/company-rehearsal-1113` | `company/run/rehearsal-1113/` |
+| `1113b`·`1113c` | 11-13(목) 밤 | `2026-11-13` | (1113 을 다시 돌린 회차 — b: 영문 길이 상한 불일치로 보류, c: reject 4 로 미성공) | |
 | `1114` | 11-14(금) | `2026-11-13` | `claude/company-rehearsal-1114` | `company/run/rehearsal-1114/` |
 | `1115` | 11-15(토) | `2026-11-13` | `claude/company-rehearsal-1115` | `company/run/rehearsal-1115/` |
 
@@ -85,7 +86,7 @@ python company/editorial/rehearsal_check.py ../_rehearsal-{회차}/company/run/r
 1. `desk.json` 이 `완료`이고 `handoff_ref` 가 handoff 파일의 지문과 같다.
 2. 계획한 샤드가 전부 `완료`이고 `delta.json` 이 있다(`merge_parts.py` exit 0 의 결과).
 3. `copyedit.json` 의 코드 검사가 `ran: true`, `exit: 0` 이다.
-4. 교열 reject 가 0 이다.
+4. 교열 reject 가 0 이다. (실발행의 마감 조건과 같다 — `copyedit.md` 4번은 코드 검사 exit 0 **이고** reject 0 일 때만 반납한다. reject 가 하나라도 있으면 월요일에는 반납하지 않고 09:30 백업이 발행한다. 그래서 `copyedit.json` 이 `완료`·exit 0 이어도 reject 가 남았으면 그 회차는 성공이 아니다.)
 5. `scaffold.json` 이 그 날짜의 것이고 델타의 카드를 전부 갖고 있다. handoff 의 모든 행이 상태를 하나씩 받는다(발행·미채택·보류·오류 중 하나 — 빈 행 0).
 6. (사람) Notion·main·날짜 브랜치에 리허설이 쓴 것이 없다 — Notion handoff·Intake 행의 마지막 수정 시각, `git log origin/main`, `git ls-remote origin 'claude/company-20*'` 로 본다.
 

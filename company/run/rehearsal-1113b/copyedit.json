@@ -1,0 +1,573 @@
+{
+ "status": "보류",
+ "published": false,
+ "rehearsal": true,
+ "code_gate": {
+  "ran": true,
+  "exit": 2,
+  "message": "조립 거부: LLM 슬롯 주입 검증 실패: fda483-196260.en.title_issue: 58자 — 너무 김"
+ },
+ "note": "의미 점검은 hook_line 기계 검사(금칙어·길이·숫자 원문 대조)만 수행. 카드별 자가점검 1~10번 전수 O/X 는 코드 검사 실패로 마감 불가가 확정돼 생략. 숫자 대조 이상 없음(196270 '22~451' 은 원문 'between 22 CFU and 451 CFU' 근거). Notion 쓰기 없음.",
+ "cards": [
+  {
+   "web_card_id": "fda483-195377",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 85자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196245",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 48자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196251",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 82자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196252",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 75자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196253",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 77자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196254",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 83자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196255",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 78자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196257",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 81자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196258",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 86자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196259",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 88자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196260",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 88자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    },
+    {
+     "item": "코드 검사",
+     "slot": "en.title_issue",
+     "evidence": "58자 — 너무 김(assemble_publish_brief 거부)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196261",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 89자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196262",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 85자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196264",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 79자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196270",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 63자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "0f65bd3c5c70",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 88자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "7e7545ebb190",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 78자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "bfbb158a522f",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 74자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007929",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 76자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007930",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 69자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007935",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 84자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007955",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 79자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007975",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 78자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008096",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 84자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrIf",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 75자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "575464327e0c",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "949016d08856",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 77자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "dba4d011e02b",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 84자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "00ae76e635bb",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 74자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "2026-23005",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 75자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "hc-82928",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 76자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "758874567fae",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008055",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 59자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyqbl",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 64자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrFI",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 75자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrUH",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 90자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73uE9xd4-",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 69자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "c3b4f61a28c7",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 67자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0073-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 74자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0074-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 59자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0075-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 68자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0077-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 64자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0080-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 90자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0085-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 79자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0104-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 74자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0105-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 84자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0107-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 60자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0108-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 78자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0110-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 82자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0113-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 82자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "b0fc253f04b7",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "en.hook_line",
+     "evidence": "영문 70자 — STYLE §12 공백 포함 40자 초과(각각 적용)"
+    }
+   ]
+  }
+ ],
+ "counts": {
+  "cards": 51,
+  "pass": 2,
+  "reject": 49,
+  "fails_total": 50
+ }
+}

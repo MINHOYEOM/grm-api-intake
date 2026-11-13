@@ -119,6 +119,12 @@ _OBSERVATIONS_KEY = "fda_483_observations"
 _TEXT_LOSS_NGRAM = 8
 _TEXT_LOSS_MIN_RUN_WORDS = 3
 NAMED_TEXT_LOSS_MIN_CHARS = 200
+NAMED_HOLDER_CUT_MIN_CHARS = 40
+_HOLDER_CUT_MIN_FUNCTION_WORDS = 3
+_HOLDER_CUT_FUNCTION_WORDS = frozenset(
+    "a an the is was were are be been has have had not no for in on with that which as by or "
+    "your you it its from at do does did there their any".split()
+)
 _FORM_WORDS = frozenset(
     "employee employees signature date dates issued see reverse of this page pages form fda 483 "
     "previous edition obsolete inspectional observations observation department health and human "
@@ -379,19 +385,26 @@ def _keeps_old_deficiencies(old: list[dict[str, Any]], new: list[dict[str, Any]]
 # · 임계 200자 실측(raw_signal_versions 연속 판 중 관찰이 바뀐 30쌍): 실손실 85637 410 · 90268 259 ·
 #   91878 410 · 88106 662 · 151431 2,591 / 정상 감소 85401 59 · 88096 41 · 74389 75 · 94989 92 ·
 #   82333 130 · 나머지 0. 시험 고정값(최소 조각)은 85637 367 · 85401 59.
+# · [11-13 끊김형] holder 끝을 옛 host 내부에 정렬해 94989 92자·82333 130자처럼
+#   200자 미만인 문장 중간 손실도 막는다. 74389 서명란은 기능어 0개라 통과한다.
 def text_loss(old_raw: dict, new_raw: dict) -> dict:
     """옛 관찰 본문 중 새 판 어디에도 남지 않은 실질 텍스트를 센다(순수 함수)."""
-    def tokens(raw: dict) -> list[str]:
+    def tokens(raw: dict) -> tuple[list[str], list[int], dict[int, int]]:
         out: list[str] = []
-        for observation in raw.get(_OBSERVATIONS_KEY) or []:
+        owners: list[int] = []
+        observation_ends: dict[int, int] = {}
+        for observation_index, observation in enumerate(raw.get(_OBSERVATIONS_KEY) or []):
             if not isinstance(observation, dict):
                 continue
             for key in ("deficiency", "detail"):
-                out.extend(re.findall(r"[a-z0-9]+", str(observation.get(key) or "").lower()))
-        return out
+                field_tokens = re.findall(r"[a-z0-9]+", str(observation.get(key) or "").lower())
+                out.extend(field_tokens)
+                owners.extend([observation_index] * len(field_tokens))
+            observation_ends[observation_index] = len(out)
+        return out, owners, observation_ends
 
-    old_tokens = tokens(old_raw)
-    new_tokens = tokens(new_raw)
+    old_tokens, old_owners, old_observation_ends = tokens(old_raw)
+    new_tokens, _, _ = tokens(new_raw)
     n = _TEXT_LOSS_NGRAM
     new_ngrams = {
         tuple(new_tokens[i:i + n])
@@ -432,7 +445,83 @@ def text_loss(old_raw: dict, new_raw: dict) -> dict:
                 largest_run_chars = run_chars
                 sample = " ".join(run[:30])
         start = end
-    return {"lost_chars": lost_chars, "runs": runs, "sample": sample}
+    holder_cut = False
+    holder_cut_chars = 0
+    holder_cut_sample = ""
+    holder_cut_number = ""
+    for observation in new_raw.get(_OBSERVATIONS_KEY) or []:
+        if not isinstance(observation, dict):
+            continue
+        detail = str(observation.get("detail") or "").rstrip()
+        if not detail or not detail[-1].isalnum():
+            continue
+        detail_tokens = re.findall(r"[a-z0-9]+", detail.lower())
+        if len(detail_tokens) < 4:
+            continue
+        context_size = min(_TEXT_LOSS_NGRAM, len(detail_tokens))
+        context = detail_tokens[-context_size:]
+        last = context[-1]
+        for position in range(context_size - 1, len(old_tokens)):
+            if (old_tokens[position - context_size + 1:position] != context[:-1]
+                    or not old_tokens[position].startswith(last)):
+                continue
+            cut_start = position if old_tokens[position] != last else position + 1
+            observation_end = old_observation_ends[old_owners[position]]
+            if cut_start >= observation_end or covered[cut_start]:
+                continue
+
+            candidate_chars = 0
+            candidate_function_words = 0
+            candidate_words: list[str] = []
+            run_start = cut_start
+            while run_start < observation_end:
+                if covered[run_start]:
+                    run_start += 1
+                    continue
+                run_end = run_start + 1
+                while run_end < observation_end and not covered[run_end]:
+                    run_end += 1
+                candidate_run = old_tokens[run_start:run_end]
+                if len(candidate_run) >= _TEXT_LOSS_MIN_RUN_WORDS:
+                    candidate_chars += sum(
+                        0 if word.isdigit() or word in ignored else len(word) + 1
+                        for word in candidate_run
+                    )
+                    candidate_function_words += sum(
+                        word not in ignored and word in _HOLDER_CUT_FUNCTION_WORDS
+                        for word in candidate_run
+                    )
+                    candidate_words.extend(candidate_run)
+                run_start = run_end
+
+            if (candidate_chars >= NAMED_HOLDER_CUT_MIN_CHARS
+                    and candidate_function_words >= _HOLDER_CUT_MIN_FUNCTION_WORDS
+                    and (not holder_cut or candidate_chars > holder_cut_chars)):
+                holder_cut = True
+                holder_cut_chars = candidate_chars
+                # 표본 = 끊긴 뒤 사라진 구간(3단어 이상 run)의 낱말들(앞 30개).
+                holder_cut_sample = " ".join(candidate_words[:30])
+                holder_cut_number = str(observation.get("number") or "")
+
+    return {
+        "lost_chars": lost_chars,
+        "runs": runs,
+        "sample": sample,
+        "holder_cut": holder_cut,
+        "holder_cut_chars": holder_cut_chars,
+        "holder_cut_sample": holder_cut_sample,
+        "holder_cut_number": holder_cut_number,
+    }
+
+
+def text_loss_reason(loss: dict) -> str:
+    """'' | 'lost_chars' | 'holder_cut' | 'lost_chars+holder_cut'"""
+    reasons = []
+    if loss.get("lost_chars", 0) >= NAMED_TEXT_LOSS_MIN_CHARS:
+        reasons.append("lost_chars")
+    if loss.get("holder_cut"):
+        reasons.append("holder_cut")
+    return "+".join(reasons)
 
 
 _OBS_HEAD_RE = re.compile(r"(?i)\bOBSERVATION\s*#?\s*(\d{1,3})\b")
@@ -939,7 +1028,8 @@ def run(
             continue
         if mode == MODE_NAMED:
             loss = text_loss(raw, new_raw)
-            if loss["lost_chars"] >= NAMED_TEXT_LOSS_MIN_CHARS:
+            reason = text_loss_reason(loss)
+            if reason:
                 # [11-13] 관찰 수·표제가 늘어도 옛 본문이 사라지면 교체하지 않는다.
                 report.named_no_gain += 1
                 _bump(report, "named_would_drop_text")
@@ -949,8 +1039,11 @@ def run(
                     "lost_chars": loss["lost_chars"],
                     "runs": loss["runs"],
                     "sample": loss["sample"],
+                    "reason": reason,
+                    "holder_cut_chars": loss["holder_cut_chars"],
+                    "holder_cut_sample": loss["holder_cut_sample"],
                 })
-                log("WARN", f"named 본문 손실 차단 {label}: lost_chars={loss['lost_chars']} "
+                log("WARN", f"named 본문 손실 차단 {label}: reason={reason} lost_chars={loss['lost_chars']} "
                             f"sample={loss['sample']}")
                 continue
 
@@ -1125,6 +1218,7 @@ def main(argv: list[str] | None = None) -> int:
 __all__ = [
     "OcrRecoveryReport",
     "text_loss",
+    "text_loss_reason",
     "run",
     "main",
     "build_arg_parser",

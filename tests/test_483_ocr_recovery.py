@@ -674,3 +674,187 @@ class NamedGuardAndScanTest(unittest.TestCase):
         self.assertEqual(out["gap_docs"] + out["mixed_already_ocr_path"], 1)
         for k in ("gap_unread_pages", "gap_with_stored_obs", "gap_without_stored_obs"):
             self.assertIn(k, out)
+
+
+_P85637_OBS6 = ("Sterility testing was only performed at 106 days. OBSERVATION6 Each batch of dmg product required to be free of objectionable microorganisms is not tested through appropriate laboratory testing, Specifically, your firm does not conduct routine sterility or endotoxin testing for all injectable drug products currently produced. You stated that the stock solutions are routinely tested for sterility and endotoxins but that finished product is not Toutinely tested unless(J units or more are filed or fi re. Stock solutions are used to fill finished product.. For example, [redacted] lot #02262013M8of Fentanyl (NICU Syringe) 10mcg/mL Injectable was not tested for sterility [redacted] fot #03182013S18 afDMPS (Dimercaptopropanesulfonic Acid) (Preservative Free) 5% Injectable was not tested for sterflity or endotoxins [redacted] fot 403112013823 of Sodium Phenylbutyrate 200 mg/mL Injectable was not tested for sterility or endotoxins e fot #03132013832 of Glutathione/Adenosine Triphosphate 100mg/img/ml. Injectable was not tested for sterility or endotoxins e tot #0315201388 ofHydrogen Peroxide (Preservative Free) 3.75% Injectable was not tested for sterility or endotoxins ¢ fot #03152013824 ofMethylcobalamin (Preservative Free) 12.5mg/mL, Injectable was not tested for sterility or endotoxins ¢ lot 40318201313 ofMethylcobalamin/Folic Acid (Preservative Free) 1mg/l0mg/mL Injectable wasnot tested for sterility or endotoxins")
+_P85637_OBS7_DEF = "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the final specifications and identity and strength of each active ingredient prior to release."
+_P85637_OBS7_DETAIL = "Specifically, your firm does not conduct routine potency testing for all injectable drug products currently produced. You stated that the stock solutions are routinely tested for potency but that finished preduct is not routinely tested unless [jj units or more are filled or J Stock solutions are used to fill finished product. For example, Ela CYPE TS)"
+# 3판에서 사라진 블록(머리글 + 역가 미시험 로트 6줄, 서명자 실명은 [signature] 로 가림)
+_P85637_LOST = ("GKSNATURE OATE ISSUED [signature], lot 403182013518 of DMPS (Dimercaptopropanesulfonic Acid) (Preservative Free) 5% Injectable was not tested for potency [redacted] Jot 403112013823 ofSodium Phenylbutyrate 200 mg/mL Injectable was not tested for potency [redacted] lot 49313213832 of Ghitathione/Adenosine Triphosphate 100mg/I mg/mL Injectable was not tested for potency [redacted] lot #03152013S8 ofHydrogen Peroxide (Preservative Free) 3.75% Injectable was not tested for potency [redacted] lot #03152013S24 ofMethyicobalamin (Preservative Free} 12.5mg/mL Injectable was not tested for potency. [redacted] Jot #03182013S13 ofMethylcobalamit/Folic Acid (Preservative Free) img/10mg/mL Injectable was not tested for potency")
+_P85637_META = {"firm": "Specialty Compounding Pharmacy", "establishment_type": "Producer of Sterile Drug Products", "site_state": "Texas", "country": "United States", "product_type": "Producer of Sterile Drug Products"}
+_P85637_DEF5 = "There is no written testing program designed to assess the stability characteristics of drug products."
+# 2판: 관찰 5 상세에 관찰 6·7 본문과 손실 블록이 병합돼 있었다
+OLD_85637 = {**_P85637_META, "fda_483_observations": [{"number": "5", "deficiency": _P85637_DEF5, "detail": _P85637_OBS6 + " OBSERVATION 7. " + _P85637_OBS7_DEF + " " + _P85637_OBS7_DETAIL + " " + _P85637_LOST}]}
+# 3판: 관찰 7 이 분리됐지만 상세가 'For example, Ela CYPE TS)' 에서 끝나 손실 블록이 어디에도 없다
+NEW_85637 = {**_P85637_META, "fda_483_observations": [{"number": "5", "deficiency": _P85637_DEF5, "detail": _P85637_OBS6}, {"number": "7", "deficiency": _P85637_OBS7_DEF, "detail": _P85637_OBS7_DETAIL}]}
+# 4판(현행, 수동 복원): 로트 6줄을 관찰 7 상세 뒤에 되붙였다(머리글은 뺌)
+_P85637_LOT_LINES = _P85637_LOST.split("[signature], ", 1)[1]
+V4_85637 = {**_P85637_META, "fda_483_observations": [{"number": "5", "deficiency": _P85637_DEF5, "detail": _P85637_OBS6}, {"number": "7", "deficiency": _P85637_OBS7_DEF, "detail": _P85637_OBS7_DETAIL + " " + _P85637_LOT_LINES}]}
+
+_P85401_META = {"firm": "Central Admixture Pharmacy Services, Inc. (CAPS)", "establishment_type": "Sterile Drug Manufacturer", "site_state": "Alabama", "country": "United States", "product_type": "Sterile Drug Manufacturer"}
+_P85401_DEF8 = "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use."
+_P85401_NEW8 = "Specifically, tape was observed holding up clipboards on the outside sash of the ISO 5 TPN hood in the room identified by the firm as aredfil"
+_P85401_DEF9 = "There is no written testing program designed to assess the stability characteristics of drug products."
+_P85401_NEW9 = "Specifically, the firm has no written stability program which requires ongoing stability studies to show that the aseptically processed sterile drug products which they distribute, continue to meet all relevant chemical and sterility specifications all the way to product expiry, or beyond use dates (BUD)."
+_P85401_HEADER = "Central Admixture Pharmacy Services, 211 Summit Parkway #122 Inc. City, STATE, 2 CODE, COUNTRYS TABS INSPECTED Homewood, AL 35209 Producer of Sterile Drug Products"
+# 2판: 관찰 8 상세(730자)에 관찰 9 와 페이지 머리글(주소)이 붙어 있었다 → 3판은 8(141자)·9 로 나뉘고 머리글은 버려졌다 — 정상
+OLD_85401 = {**_P85401_META, "fda_483_observations": [{"number": "8", "deficiency": _P85401_DEF8, "detail": _P85401_NEW8 + " OBSERVATION 9. " + _P85401_DEF9 + " " + _P85401_NEW9 + " " + _P85401_HEADER}]}
+NEW_85401 = {**_P85401_META, "fda_483_observations": [{"number": "8", "deficiency": _P85401_DEF8, "detail": _P85401_NEW8}, {"number": "9", "deficiency": _P85401_DEF9, "detail": _P85401_NEW9}]}
+
+
+class NamedTextLossGuardTest(unittest.TestCase):
+
+    def test_85637_lost_block_is_detected(self):
+        loss = rec.text_loss(OLD_85637, NEW_85637)
+        self.assertGreaterEqual(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+        self.assertIn("potency", loss["sample"])
+
+    def test_85401_split_and_header_drop_is_allowed(self):
+        loss = rec.text_loss(OLD_85401, NEW_85401)
+        self.assertLess(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_identical_is_zero(self):
+        self.assertEqual(rec.text_loss(OLD_85637, OLD_85637)["lost_chars"], 0)
+
+    def test_footer_only_reduction_is_allowed(self):
+        footer = ("EMPLOYEE(S) SIGNATURE DATE ISSUED SEE REVERSE OF THIS PAGE FORM FDA 483 "
+                  "(09/08) PREVIOUS EDITION OBSOLETE INSPECTIONAL OBSERVATIONS PAGE 2 OF 5 PAGES")
+        observations = [
+            {"number": str(i),
+             "deficiency": f"Quality procedure {i} was not adequately established and followed.",
+             "detail": f"The documented control process for operation {i} was reviewed by investigators."}
+            for i in range(1, 4)
+        ]
+        old = {"fda_483_observations": [
+            {**observation, "detail": observation["detail"] + " " + footer}
+            for observation in observations
+        ]}
+        new = {"fda_483_observations": observations}
+        self.assertLess(rec.text_loss(old, new)["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_duplicate_cleanup_is_allowed(self):
+        detail2 = " ".join(f"duplicatedqualityword{i}" for i in range(30))
+        deficiency2 = "Laboratory controls did not include complete documented review procedures."
+        duplicate = deficiency2 + " " + detail2
+        old = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Written controls were not followed during production.",
+             "detail": "Investigators reviewed the complete production process and records. " + duplicate},
+            {"number": "2", "deficiency": deficiency2, "detail": detail2},
+        ]}
+        new = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Written controls were not followed during production.",
+             "detail": "Investigators reviewed the complete production process and records."},
+            {"number": "2", "deficiency": deficiency2, "detail": detail2},
+        ]}
+        self.assertLess(rec.text_loss(old, new)["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_whole_observation_body_dropped_is_detected(self):
+        body = " ".join(f"uniquecompoundword{i}" for i in range(35))
+        old = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Production records were incomplete.",
+             "detail": "The first observation remains unchanged in the replacement document."},
+            {"number": "2", "deficiency": "Laboratory review procedures were deficient.",
+             "detail": body},
+        ]}
+        new = {"fda_483_observations": [
+            {"number": "1", "deficiency": "Production records were incomplete.",
+             "detail": "The first observation remains unchanged in the replacement document."},
+            {"number": "2", "deficiency": "Laboratory review procedures were deficient.",
+             "detail": ""},
+        ]}
+        self.assertGreaterEqual(rec.text_loss(old, new)["lost_chars"],
+                                rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def _run_named(self, old_observations, new_observations, *, dry_run):
+        import findings_store
+        import json
+
+        base_item = rec._rebuild_item(_nrow(), "", "")
+        record = findings_store.raw_signal_from_intake_item(base_item, collected_at="")
+        rid = record["raw_signal_id"]
+        pdf_url = "https://example.test/fda483.pdf"
+        old_raw = {**base_item.raw_payload, "pdf_url": pdf_url,
+                   "fda_483_observations": old_observations}
+        new_raw = {**base_item.raw_payload, "pdf_url": pdf_url,
+                   "fda_483_observations": new_observations}
+        rebuilt = rec._rebuild_item(_nrow(), "", "")
+        rebuilt.raw_payload = new_raw
+        row = {
+            "raw_signal_id": rid,
+            "document_id": base_item.document_id,
+            "collected_at": "2026-07-28T01:02:03Z",
+            "raw_json": json.dumps(old_raw, ensure_ascii=False, sort_keys=True),
+        }
+        return _run(
+            mode=rec.MODE_NAMED,
+            doc_ids=[base_item.document_id],
+            dry_run=dry_run,
+            rows=[row],
+            fetch_text=lambda _url: ("stub text", "pdf-ok"),
+            rebuild_item=lambda _nrow, _text, _status: rebuilt,
+        )
+
+    def test_run_named_blocks_text_loss_dry_and_apply(self):
+        shared = "The unchanged process description remains present throughout the replacement document."
+        lost = " ".join(f"uniquelostword{i}" for i in range(35))
+        old = [{"number": "1", "deficiency": "Written procedures were not adequately followed.",
+                "detail": shared + " " + lost}]
+        new = [
+            {"number": "1", "deficiency": "Written procedures were not adequately followed.",
+             "detail": shared},
+            {"number": "2", "deficiency": "Equipment controls were not adequately documented.",
+             "detail": "A separate observation was recovered from the final scanned page."},
+        ]
+        for dry_run in (True, False):
+            with self.subTest(dry_run=dry_run):
+                report, code, upsert, _rid = self._run_named(old, new, dry_run=dry_run)
+                self.assertEqual(report.failure_reasons["named_would_drop_text"], 1)
+                self.assertEqual(report.named_no_gain, 1)
+                self.assertEqual(report.recovered, 0)
+                self.assertEqual(len(report.named_text_loss), 1)
+                self.assertEqual(report.named_text_loss[0]["document_id"], "fda483-555001")
+                upsert.assert_not_called()
+                self.assertEqual(code, 0)
+
+    def test_run_named_allows_split_without_loss(self):
+        detail1 = "The documented production controls remained unchanged in the replacement document."
+        deficiency2 = "Equipment controls were not adequately documented."
+        detail2 = "A separate observation was recovered from the final scanned page."
+        old = [{"number": "1", "deficiency": "Written procedures were not adequately followed.",
+                "detail": detail1 + " " + deficiency2 + " " + detail2}]
+        new = [
+            {"number": "1", "deficiency": "Written procedures were not adequately followed.",
+             "detail": detail1},
+            {"number": "2", "deficiency": deficiency2, "detail": detail2},
+        ]
+        report, code, upsert, _rid = self._run_named(old, new, dry_run=False)
+        self.assertNotIn("named_would_drop_text", report.failure_reasons)
+        self.assertEqual(report.recovered, 1)
+        upsert.assert_called_once()
+        self.assertEqual(code, 0)
+
+    # [11-13] 4판(현행, 수동 복원 — 관찰 7 상세 1,043자·'tested for potency' 7회) 보호: 다시 읽은 결과가
+    # 3판처럼 관찰 7 이 354자에서 끊기면 관찰 수가 늘어도 named 교체를 막아야 한다(85637 재실행 차단 보장).
+    def test_85637_v4_to_v3_shape_is_blocked(self):
+        loss = rec.text_loss(V4_85637, NEW_85637)
+        self.assertGreaterEqual(loss["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+        self.assertIn("potency", loss["sample"])
+
+    def test_85637_v2_to_v4_restore_is_not_loss(self):
+        # 4판은 2판의 손실 블록을 관찰 7 로 옮긴 것 — 머리글 낱말만 빠졌다.
+        self.assertLess(rec.text_loss(OLD_85637, V4_85637)["lost_chars"], rec.NAMED_TEXT_LOSS_MIN_CHARS)
+
+    def test_run_named_rerun_of_85637_v4_is_blocked(self):
+        extra = {"number": "8", "deficiency": "Aseptic processing areas are deficient regarding the system for "
+                 "cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+                 "detail": "Specifically, sporicidal agents are not used in the cleanroom."}
+        old = V4_85637["fda_483_observations"]
+        new = NEW_85637["fda_483_observations"] + [extra]      # 관찰 +1·표제 유지·관찰 7 은 354자 판
+        for dry_run in (True, False):
+            with self.subTest(dry_run=dry_run):
+                report, code, upsert, _rid = self._run_named(old, new, dry_run=dry_run)
+                self.assertNotIn("named_would_drop_deficiency", report.failure_reasons)
+                self.assertEqual(report.failure_reasons.get("named_would_drop_text"), 1)
+                self.assertEqual(report.recovered, 0)
+                upsert.assert_not_called()
+                self.assertEqual(code, 0)

@@ -1,0 +1,471 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-13",
+ "shard": "B",
+ "cards": {
+  "bfbb158a522f": {
+   "title_issue": "무균공정 기류·육안검사 결함",
+   "hook_line": "연기시험에서 무균 충전 구역 기류가 소용돌이치며 위로 흐름",
+   "summary": "FDA가 인도의 무균 주사제 제조소에 경고서한을 발행했다. 무균공정의 기류·설계 결함, 오염 방지 설비 설계 미흡, 가시성 이물 육안검사 기준 미흡 등 위반 3건을 지적했다.",
+   "key_facts": [
+    "위반 1: 무균공정 오염 방지 절차·밸리데이션 미흡 — 연기시험에서 ISO 5 바이알 충전 구역 일방향 기류가 확인되지 않음, 작업자가 멸균 설비 위로 팔을 뻗음(21 CFR 211.113(b))",
+    "위반 2: 오염 방지 구역·설비 설계 부적절 — 컨베이어가 ISO 5 일방향 기류를 막음(21 CFR 211.42(c), 211.63)",
+    "위반 3: 가시성 이물 육안검사에 조치한계가 없고 외인성·내인성 이물 분류를 하지 않음(21 CFR 211.160(b))",
+    "당국 조치: 신규 허가 보류 가능, 수입 거부 가능, 서한 수령 후 15영업일 내 회신"
+   ],
+   "implication": "회사는 회신에서 무균 작업과 기류 시각화 시험의 결함을 인정하고 외부 컨설턴트를 고용했다고 밝혔다. 회사의 회고적 위험평가는 무균시험·엔도톡신·배지충전(무균공정 모의시험) 결과가 적합하다는 이유로 공정이 관리 상태에 있다고 결론 냈다. FDA는 설계 자체의 결함은 밸리데이션으로 해결할 수 없고 재설계가 필요하다며 회신을 받아들이지 않았다. 회사는 2026-03-28 이전에 한 제품의 모든 배치를 적절한 가시성 이물 평가 없이 출하했다. FDA는 유효기간 내 배치의 회고적 파괴시험이 생산 당시 없던 특성 평가와 관리를 대신할 수 없다고 판단했다. 회사는 해당 충전 라인의 미국 시장용 상업 생산을 중단하기로 FDA에 통보했다.",
+   "checks": [
+    "ISO 5 충전 구역 연기시험을 동적 조건에서 개입 작업까지 포함해 수행했는가? (위반 1)",
+    "충전 라인 컨베이어 등 설비가 노출된 멸균 용기 위 일방향 기류를 가리지 않는지 확인했는가? (위반 2)",
+    "가시성 이물 육안검사에 제품별 경고한계·조치한계와 외인성·내인성 분류 기준이 있는가? (위반 3)"
+   ],
+   "en": {
+    "title_issue": "Aseptic airflow and visual inspection gaps",
+    "hook_line": "Smoke studies showed ISO 5 filling-line airflow swirling and moving upward",
+    "summary": "FDA issued a warning letter to an aseptic injectable manufacturing site in India, citing three violations covering aseptic process design and airflow, contamination-control facility and equipment design, and visible particulate inspection.",
+    "key_facts": [
+     "Violation 1: inadequate procedures and validation to prevent contamination in aseptic processing; smoke studies did not show unidirectional airflow in the ISO 5 vial filling area and operators breached first air (21 CFR 211.113(b))",
+     "Violation 2: inadequate separate areas and equipment design; a conveyor blocked ISO 5 unidirectional airflow (21 CFR 211.42(c) and 211.63)",
+     "Violation 3: no action limits for visible particulates and no extrinsic/intrinsic particle classification (21 CFR 211.160(b))",
+     "Agency action: possible withholding of new approvals and refusal of admission; response due within 15 business days"
+    ],
+    "implication": "The firm acknowledged deficiencies in aseptic practices and airflow visualization studies and engaged an independent consultant. Its retrospective risk assessment concluded the process was in control, citing compliant sterility, endotoxin and media fill results. FDA rejected the response, stating that inherent design flaws cannot be validated and require redesign. Before March 28, 2026, the firm released all batches of one product without adequate visible particulate assessment. FDA stated that retrospective destructive testing cannot substitute for the characterization and control lacking at the time of production. The firm notified FDA that it would discontinue commercial manufacturing from the filling line for the U.S. market.",
+    "checks": [
+     "Are ISO 5 smoke studies performed under dynamic conditions, including interventions? (Violation 1)",
+     "Have you confirmed that conveyors and other equipment do not block unidirectional airflow over exposed sterile containers? (Violation 2)",
+     "Does your visual inspection program define product-specific alert and action limits and classify extrinsic versus intrinsic particles? (Violation 3)"
+    ]
+   }
+  },
+  "admin-2026007929": {
+   "title_issue": "한약재 시험 부적합 제조업무정지",
+   "hook_line": "한약재 시험 결과 기준 부적합, 제조업무 정지 3개월",
+   "summary": "식약처가 한약재 제조업체에 해당 품목 제조업무 정지 3개월을 처분했다. 해당 한약재의 시험 결과가 기준에 부적합했다.",
+   "key_facts": [
+    "위반: 한약재 또는 한약제제의 시험 결과가 기준에 부적합",
+    "처분: 해당 품목 제조업무 정지 3개월(2026-11-18~2027-02-17)",
+    "근거: 약사법 제62조 위반, 약사법 제76조 및 의약품 등의 안전에 관한 규칙 제95조 [별표8] Ⅱ.개별기준 39호 라목 11)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Herbal medicine test failure",
+    "hook_line": "Herbal medicine failed test specifications; 3-month manufacturing suspension",
+    "summary": "MFDS suspended a herbal medicine manufacturer's manufacturing operations for the product for 3 months after the product's test results failed specifications.",
+    "key_facts": [
+     "Violation: test results of the herbal medicine did not meet specifications",
+     "Sanction: 3-month suspension of manufacturing operations for the product (2026-11-18 to 2027-02-17)",
+     "Basis: Pharmaceutical Affairs Act Article 62 (violation); Article 76 and Enforcement Rule on Safety of Drugs Article 95 [Annex 8] (sanction)"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026007930": {
+   "title_issue": "한약재 카드뮴 부적합 제조업무정지",
+   "hook_line": "수거검사 카드뮴 결과 0.7ppm, 기준은 0.3 이하",
+   "summary": "식약처가 한약재 제조업체에 해당 품목 제조업무 정지 3개월을 처분했다. 수거검사에서 한약재 품목의 카드뮴이 기준에 부적합했다.",
+   "key_facts": [
+    "위반: 수거검사 결과 카드뮴(ppm) 부적합",
+    "경위: 시험·검사 기준 0.3 이하 대비 곡기생 0.5, 절패모 0.7, 해방풍 0.6",
+    "처분: 해당 품목 제조업무 정지 3개월(2026-11-18~2027-02-17)",
+    "근거: 약사법 제62조 위반, 약사법 제76조 및 의약품 등의 안전에 관한 규칙 제95조 [별표8] Ⅱ.개별기준 39호 라목 11)"
+   ],
+   "implication": "같은 처분이 품목허가번호가 다른 세 품목에 함께 내려졌다.",
+   "checks": [
+    "입고 한약재마다 카드뮴 시험을 하고 기준 0.3ppm 이하를 확인한 뒤 사용하는가?",
+    "카드뮴 결과가 기준에 가까운 원료 로트를 따로 추적하는가?"
+   ],
+   "en": {
+    "title_issue": "Cadmium failure in herbal medicines",
+    "hook_line": "Post-market sampling found cadmium at 0.7 ppm against a 0.3 ppm limit",
+    "summary": "MFDS suspended a herbal medicine manufacturer's manufacturing operations for the affected products for 3 months after post-market sampling found cadmium above specification.",
+    "key_facts": [
+     "Violation: cadmium (ppm) failed in post-market sampling tests",
+     "Timeline: results of 0.5, 0.7 and 0.6 against a limit of 0.3 or less",
+     "Sanction: 3-month suspension of manufacturing operations for the products (2026-11-18 to 2027-02-17)",
+     "Basis: Pharmaceutical Affairs Act Article 62 (violation); Article 76 and Enforcement Rule on Safety of Drugs Article 95 [Annex 8] (sanction)"
+    ],
+    "implication": "The same sanction applies to products with separate product license numbers.",
+    "checks": [
+     "Is every incoming herbal material lot tested for cadmium against the 0.3 ppm limit before use?",
+     "Do you track material lots whose cadmium results are close to the limit?"
+    ]
+   }
+  },
+  "admin-2026007935": {
+   "title_issue": "임상시험약 GMP 위반 업무정지",
+   "hook_line": "기준서 미준수로 해당 임상시험 업무정지 1개월(1차)",
+   "summary": "식약처가 제약사에 해당 임상시험 업무정지 1개월(1차)을 처분했다. 기준서를 지키지 않았고 임상시험용의약품 제조 및 품질관리기준을 위반했다.",
+   "key_facts": [
+    "위반: ① 기준서 미준수 ② 임상시험용의약품 제조 및 품질관리기준 위반",
+    "처분: 해당 임상시험 업무정지 1개월(2026-11-09~2026-12-08), 1차",
+    "근거: 약사법 제34조제3항제2호 및 의약품 등의 안전에 관한 규칙 제30조제1항제9호 위반, 약사법 제76조제1항제3호 및 같은 규칙 제95조 [별표 8] Ⅱ. 개별기준 제15호마목4)·6)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Clinical trial drug GMP violation",
+    "hook_line": "SOP non-compliance led to a 1-month suspension of the clinical trial (first offense)",
+    "summary": "MFDS suspended a pharmaceutical company's clinical trial for 1 month (first offense) for not following its SOPs and violating the GMP standard for investigational medicinal products.",
+    "key_facts": [
+     "Violation: (1) SOP non-compliance (2) violation of the manufacturing and quality control standard for investigational medicinal products",
+     "Sanction: 1-month suspension of the clinical trial (2026-11-09 to 2026-12-08), first offense",
+     "Basis: Pharmaceutical Affairs Act Article 34(3)(2) and Enforcement Rule on Safety of Drugs Article 30(1)(9) (violation); Act Article 76(1)(3) and Rule Article 95 [Annex 8] (sanction)"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026007955": {
+   "title_issue": "임상시험 변경 미보고 등 업무정지",
+   "hook_line": "임상시험계획 변경 미보고·지연 보고, 업무정지 1개월",
+   "summary": "식약처가 바이오 제약사에 해당 임상시험 업무정지 1개월(1차)을 처분했다. 임상시험계획 변경 미보고, 임상시험용 의약품 표시기재 위반, 품질보증 위반 등 3건이 적용됐다.",
+   "key_facts": [
+    "위반: ① 임상시험계획 변경 미보고 및 지연 보고 ② 임상시험용 의약품 표시기재 위반 ③ 임상시험 품질보증 및 임상시험자료 품질관리 위반",
+    "처분: 해당 임상시험 업무정지 1개월(2026-11-09~2026-12-08), 1차",
+    "근거: 약사법 제34조제1항 및 제3항제2호, 의약품 등의 안전에 관한 규칙 제24조제5항제1호·제2호 및 제30조제1항제9호 위반"
+   ],
+   "implication": "처분 근거에는 [별표 8] 행정처분의 기준 Ⅱ. 개별기준 제10호나목, 제15호마목5), 제16호바목이 함께 적용됐다.",
+   "checks": [
+    "임상시험계획 변경 사항을 보고 기한 안에 식약처에 보고했는지 추적하는 대장이 있는가?",
+    "임상시험용 의약품 표시기재를 출고 전에 승인된 계획서 기준과 대조하는가?"
+   ],
+   "en": {
+    "title_issue": "Unreported clinical trial protocol changes",
+    "hook_line": "Clinical trial protocol changes unreported or reported late; 1-month suspension",
+    "summary": "MFDS suspended a biopharmaceutical company's clinical trial for 1 month (first offense) for violations including unreported protocol changes, investigational product labeling, and quality assurance.",
+    "key_facts": [
+     "Violation: (1) protocol changes not reported or reported late (2) labeling violation for investigational medicinal products (3) violation of clinical trial quality assurance and trial data quality control",
+     "Sanction: 1-month suspension of the clinical trial (2026-11-09 to 2026-12-08), first offense",
+     "Basis: Pharmaceutical Affairs Act Article 34(1) and 34(3)(2); Enforcement Rule on Safety of Drugs Article 24(5)(1)-(2) and Article 30(1)(9)"
+    ],
+    "implication": "The sanction applied Annex 8, Part II individual criteria items 10-Na, 15-Ma-5) and 16-Ba together.",
+    "checks": [
+     "Do you keep a log tracking whether protocol changes were reported to MFDS within the deadline?",
+     "Is investigational product labeling checked against the approved protocol before release?"
+    ]
+   }
+  },
+  "admin-2026007975": {
+   "title_issue": "대상자 동의 절차 위반 업무정지",
+   "hook_line": "대상자 동의 절차 위반, 임상시험 업무정지 3개월·책임자 변경",
+   "summary": "식약처가 임상시험 실시기관에 해당 품목 임상시험 업무정지 3개월과 임상시험 책임자 변경(1차)을 처분했다. 임상시험 대상자의 동의 절차를 위반했다.",
+   "key_facts": [
+    "위반: 임상시험 대상자의 동의 절차 위반",
+    "처분: 해당 품목 임상시험 업무정지 3개월(2026-11-09~2027-02-08)과 임상시험 책임자 변경(1차)",
+    "근거: 약사법 제34조의2제3항제3호 및 의약품 등의 안전에 관한 규칙 제30조제1항제4호 위반, 약사법 제76조의2제1항제4호·제3항"
+   ],
+   "implication": "",
+   "checks": [
+    "임상시험 대상자 동의서 서명일이 첫 시험 절차일보다 앞서는지 대상자마다 확인하는가?",
+    "동의 취득자가 임상시험계획서에 지정된 사람인지 기록으로 확인하는가?"
+   ],
+   "en": {
+    "title_issue": "Informed consent procedure violation",
+    "hook_line": "Consent procedure violated; 3-month trial suspension and investigator replaced",
+    "summary": "MFDS suspended a clinical trial site's trial for the product for 3 months and ordered a change of principal investigator (first offense) for violating the subject informed consent procedure.",
+    "key_facts": [
+     "Violation: violation of the informed consent procedure for trial subjects",
+     "Sanction: 3-month suspension of the clinical trial for the product (2026-11-09 to 2027-02-08) and change of principal investigator (first offense)",
+     "Basis: Pharmaceutical Affairs Act Article 34-2(3)(3) and Enforcement Rule on Safety of Drugs Article 30(1)(4) (violation); Act Article 76-2(1)(4) and 76-2(3) (sanction)"
+    ],
+    "implication": "",
+    "checks": [
+     "Do you confirm for each subject that consent was signed before the first trial procedure?",
+     "Do records show that consent was obtained by personnel designated in the protocol?"
+    ]
+   }
+  },
+  "admin-2026008096": {
+   "title_issue": "자율점검 미실시 기준서 미준수",
+   "hook_line": "연 1회 자율점검 규정에도 실시 이력 없음, 전 제조업무 정지 1개월",
+   "summary": "식약처가 한약재 제조업체에 전(全) 제조업무 정지 1개월을 처분했다. 자사 기준서가 정한 자율점검을 실시하지 않았다.",
+   "key_facts": [
+    "위반: 자사 기준서 자율점검 관리규정에 정기 점검을 원칙적으로 연 1회 실시한다고 정했으나 GMP 정기감시일까지 자율점검 실시 이력이 없음",
+    "처분: 전(全) 제조업무 정지 1개월(2026-11-11~2026-12-10)",
+    "근거: 약사법 제38조제1항 및 의약품 등의 안전에 관한 규칙 제48조제9호바목 위반"
+   ],
+   "implication": "처분 근거에는 [별표 8] Ⅰ. 일반기준 제6호와 Ⅱ. 개별기준 제25호 다목 3)이 적용됐다.",
+   "checks": [
+    "기준서에 정한 자율점검 주기대로 최근 점검을 실시한 기록이 있는가?",
+    "자율점검 일정이 지나면 품질부서에 알림이 가는가?"
+   ],
+   "en": {
+    "title_issue": "Self-inspection not performed per SOP",
+    "hook_line": "No self-inspection record despite an annual self-inspection rule; 1-month suspension",
+    "summary": "MFDS suspended all manufacturing operations of a manufacturer for 1 month for not performing the self-inspection required by its own SOP.",
+    "key_facts": [
+     "Violation: the firm's self-inspection procedure required periodic inspection once a year in principle, but there was no record of self-inspection up to the date of the routine GMP surveillance",
+     "Sanction: suspension of all manufacturing operations for 1 month (2026-11-11 to 2026-12-10)",
+     "Basis: Pharmaceutical Affairs Act Article 38(1) and Enforcement Rule on Safety of Drugs Article 48(9)(Ba)"
+    ],
+    "implication": "The sanction applied Annex 8, Part I general criterion 6 and Part II individual criterion 25-Da-3).",
+    "checks": [
+     "Do you have a record of the latest self-inspection performed at the interval set in your SOP?",
+     "Is the quality unit alerted when a scheduled self-inspection becomes overdue?"
+    ]
+   }
+  },
+  "gmpinspect-1Q73JiEyrIf": {
+   "title_issue": "시험실·설비 지적 3건(기타)",
+   "hook_line": "시험 판정 데이터 완전성 보완 대책 마련 지적, 기타 3건",
+   "summary": "식약처가 이탈리아의 완제의약품(비무균 내용액제) 제조소를 현지실사해 지적(보완)사항이 있다고 평가했다. 시험실 2건, 시설장비 1건이 모두 기타 등급으로 지적됐다.",
+   "key_facts": [
+    "지적 1: 배지에 대한 관리상황을 적절히 기록할 것(시험실, 기타, [별표 1] 제7.1호)",
+    "지적 2: 시험 판정에 대한 데이터 완전성 보완 대책 등을 마련할 것(시험실, 기타, [별표 1] 제7.1호)",
+    "지적 3: 제조설비의 운전 적격성평가를 적절히 수행할 것(시설장비, 기타, [별표 1] 제2.1호)",
+    "평가 결과: 지적(보완)사항 있음"
+   ],
+   "implication": "이번 실사는 약사법 제69조의5에 따른 수입의약품 해외제조소 사후 현지실사로, 대전지방식품의약품안전청이 수행했다.",
+   "checks": [
+    "시험용 배지의 입고·조제·사용·폐기 이력이 기록으로 남는가? (지적 1)",
+    "시험 판정에 쓰인 원자료와 판정 결과를 제3자가 대조할 수 있게 보관하는가? (지적 2)",
+    "제조설비마다 운전 적격성평가 보고서가 승인돼 있는가? (지적 3)"
+   ],
+   "en": {
+    "title_issue": "Three minor lab and equipment findings",
+    "hook_line": "Data integrity measures for test decisions cited among other-level findings",
+    "summary": "MFDS conducted an on-site inspection of an Italian finished-product site (non-sterile oral liquids) and found deficiencies: two in the laboratory and one in facilities and equipment, all classified as other.",
+    "key_facts": [
+     "Finding 1: record the control status of culture media properly (laboratory, other, Annex 1 item 7.1)",
+     "Finding 2: establish data integrity measures for test result decisions (laboratory, other, Annex 1 item 7.1)",
+     "Finding 3: perform operational qualification of manufacturing equipment properly (facilities and equipment, other, Annex 1 item 2.1)",
+     "Outcome: deficiencies found"
+    ],
+    "implication": "This was a post-approval on-site inspection of an overseas site supplying imported drugs under Article 69-5 of the Pharmaceutical Affairs Act, conducted by the Daejeon Regional Office of Food and Drug Safety.",
+    "checks": [
+     "Are receipt, preparation, use and disposal of culture media recorded? (Finding 1)",
+     "Are raw data behind each test decision retained so a third party can reconcile them with the result? (Finding 2)",
+     "Does each manufacturing equipment item have an approved operational qualification report? (Finding 3)"
+    ]
+   }
+  },
+  "575464327e0c": {
+   "title_issue": "GMP·GDP 포럼 2027 전시 안내",
+   "summary": "ECA가 2027-06-22~24 베를린에서 열리는 제4회 GMP & GDP Forum의 전시·후원 참가 안내를 게시했다.",
+   "key_facts": [
+    "행사: 제4회 GMP & GDP Forum",
+    "일정: 2027-06-22~24, 베를린",
+    "내용: 전시·후원 참가 안내"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "GMP & GDP Forum 2027 exhibition call",
+    "summary": "ECA posted exhibition and sponsorship information for the 4th GMP & GDP Forum, held in Berlin from 22 to 24 June 2027.",
+    "key_facts": [
+     "Event: 4th GMP & GDP Forum",
+     "Dates: 22-24 June 2027, Berlin",
+     "Content: exhibition and sponsorship opportunities"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "949016d08856": {
+   "title_issue": "미국 무균 제조 경고서한 해설",
+   "hook_line": "FDA가 미국 제약사에 무균 제조 실패로 경고서한 발행",
+   "summary": "ECA가 FDA의 미국 제조업체 경고서한을 소개했다. FDA가 Baxter International Inc.에 무균 제조 실패를 이유로 경고서한을 발행했다는 내용이다.",
+   "key_facts": [
+    "주제: FDA 경고서한 — 무균 제조 실패",
+    "대상: 미국 소재 제조업체 Baxter International Inc."
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "FDA warning letter on sterile failures",
+    "hook_line": "FDA warning letter to a U.S. manufacturer over sterile manufacturing failures",
+    "summary": "ECA reported that FDA issued a warning letter to Baxter International Inc., a U.S.-based manufacturer, over sterile manufacturing failures.",
+    "key_facts": [
+     "Topic: FDA warning letter on sterile manufacturing failures",
+     "Recipient: Baxter International Inc., a U.S.-based manufacturer"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "dba4d011e02b": {
+   "title_issue": "국내 무균 제조소 기류·육안검사 지적",
+   "hook_line": "FDA가 2026년 4월 한국 무균 제조소 실사에서 기류·육안검사 지적",
+   "summary": "ECA가 FDA의 한국 무균의약품 제조소 지적 사례를 소개했다. FDA는 2026년 4월 이 제조소를 실사하고 기류, 무균 조건, 육안검사를 지적했다.",
+   "key_facts": [
+    "주제: FDA의 한국 무균의약품 제조소 지적 — 기류, 무균 조건, 육안검사",
+    "실사 시기: 2026년 4월"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "FDA cites Korean sterile site",
+    "hook_line": "FDA cited airflow, aseptic conditions and visual inspection at a Korean sterile site",
+    "summary": "ECA reported on FDA findings at a sterile drug manufacturer in South Korea. FDA inspected the site in April 2026 and cited airflow, aseptic conditions and visual inspection.",
+    "key_facts": [
+     "Topic: FDA findings at a South Korean sterile manufacturer — airflow, aseptic conditions, visual inspection",
+     "Inspection: April 2026"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "00ae76e635bb": {
+   "title_issue": "기록 제출 요청 거부, 수입경보",
+   "hook_line": "기록 제출 요청을 두 차례 거부해 수입경보 66-79 등재",
+   "summary": "FDA가 중국의 원료의약품 제조소에 경고서한을 발행했다. FD&C Act 704(a)(4)에 따른 기록 제출 요청을 거부한 것을 금지행위로 지적했다.",
+   "key_facts": [
+    "위반 1: 704(a)(4) 기록 제출 요청 거부 — FD&C Act 301(e) 금지행위",
+    "경위: 2026-06-17 전자 기록 요청, 2026-06-24 회사가 미국 시장용 생산 중단 의사를 밝히며 거부, 2026-06-25 재요청에도 거부",
+    "당국 조치: 2026-08-25 해당 업체의 모든 의약품을 수입경보 66-79에 등재, 신규 허가 보류 가능, 서한 수령 후 15영업일 내 회신"
+   ],
+   "implication": "FDA는 수입 기록에서 이 업체가 제조사로 신고된 약국 조제용 원료의약품 선적을 여러 건 확인했다. FDA는 해당 원료의약품이 아직 유효기간 내에 있어 기록이 여전히 필요하다고 회사에 알렸다. FDA는 상업 유통을 멈추거나 생산 중단 의사를 밝히는 것으로 규제 의무가 소급해 면제되지 않는다고 밝혔다. FDA는 생산을 그만두면 21 CFR 207.29(a)(3)에 따라 30일 이내에 등록을 갱신해야 한다고 적었다. 회사는 회신에서 FDA 실사 일정을 요청할 수 있다.",
+   "checks": [
+    "FDA의 704(a)(4) 기록 요청을 받는 등록 연락처 이메일을 누가 확인하고 응답 기한을 관리하는가? (위반 1)",
+    "미국 시장 공급을 중단한 품목도 유효기간 내 제품의 기록을 제출할 수 있게 보관하는가? (위반 1)"
+   ],
+   "en": {
+    "title_issue": "Refused FDA records request",
+    "hook_line": "Firm refused two FDA records requests and was placed on Import Alert 66-79",
+    "summary": "FDA issued a warning letter to an API manufacturing site in China for refusing to provide records requested under section 704(a)(4) of the FD&C Act.",
+    "key_facts": [
+     "Violation 1: refused section 704(a)(4) records request, a prohibited act under FD&C Act section 301(e)",
+     "Timeline: records requested June 17, 2026; firm refused on June 24, 2026, citing discontinued U.S. production; follow-up request on June 25, 2026 also refused",
+     "Agency action: all drugs from the firm placed on Import Alert 66-79 on August 25, 2026; possible withholding of new approvals; response due within 15 business days"
+    ],
+    "implication": "FDA found multiple import shipments of APIs intended for pharmacy compounding that declared the firm as manufacturer. FDA told the firm that the APIs were still within expiry, so the records were still required. FDA stated that ceasing distribution or intending to stop production does not retroactively relieve regulatory obligations. FDA noted that under 21 CFR 207.29(a)(3) a registration must be updated within 30 calendar days of ceasing operations. The firm may request an FDA inspection in its response.",
+    "checks": [
+     "Who monitors the registration contact email for FDA 704(a)(4) records requests and tracks response deadlines? (Violation 1)",
+     "Are records for products still within expiry retained and retrievable after U.S. supply stops? (Violation 1)"
+    ]
+   }
+  },
+  "2026-23005": {
+   "title_issue": "항암제 동반 IHC 시험 재분류안",
+   "hook_line": "면역조직화학 시험을 class III에서 class II로 재분류 제안",
+   "summary": "FDA가 승인된 항암 치료제와 함께 쓰는 면역조직화학(IHC) 시험 시스템을 class III(시판 전 승인)에서 class II(특별 관리)로 재분류하는 규칙안을 공고했다.",
+   "key_facts": [
+    "바뀌는 것: class III(시판 전 승인)에서 class II(특별 관리, 시판 전 신고 대상)로 재분류",
+    "적용 대상: 승인된 항암 치료제와 함께 쓰는 면역조직화학 시험 시스템(제품코드 MVC, NKF, QQT, NQF, PLS, PKW, QUL, QNH, QZJ, SBL, SER, SHF)"
+   ],
+   "implication": "FDA는 기존 분류 규정의 소폭 개정과 함께 새 기기 분류 규정과 특별 관리 사항을 제안했다.",
+   "checks": [],
+   "quotes_translation": [
+    "FDA는 승인된 항암 치료제와 함께 쓰도록 표시된 면역조직화학(IHC) 시험 시스템(제품코드 MVC, NKF, QQT, NQF, PLS, PKW, QUL, QNH, QZJ, SBL, SER, SHF)을 재분류할 것을 제안한다."
+   ],
+   "en": {
+    "title_issue": "Proposed reclassification of oncology IHC tests",
+    "hook_line": "FDA proposes moving oncology companion IHC tests from class III to class II",
+    "summary": "FDA proposed reclassifying immunohistochemistry (IHC) test systems indicated for use with a corresponding approved oncology therapeutic product from class III (premarket approval) into class II (special controls).",
+    "key_facts": [
+     "What changes: reclassification from class III (premarket approval) to class II (special controls), subject to premarket notification",
+     "Applies to: IHC test systems for use with a corresponding approved oncology therapeutic product (product codes MVC, NKF, QQT, NQF, PLS, PKW, QUL, QNH, QZJ, SBL, SER, SHF)"
+    ],
+    "implication": "FDA is also proposing minor revisions to an existing classification regulation and a new device classification regulation with special controls.",
+    "checks": []
+   }
+  },
+  "hc-82928": {
+   "title_issue": "불순물 기준일탈 회수",
+   "hook_line": "디펜히드라민 25·50mg 캡슐, 불순물 기준일탈로 Type II 회수",
+   "summary": "디펜히드라민 25mg·50mg 캡슐이 불순물 기준일탈(OOS)로 캐나다에서 회수됐다(Type II).",
+   "key_facts": [
+    "사유: 제품 품질 — 불순물 기준일탈",
+    "제품·범위: PDP-DIPHENHYDRAMINE 25 MG 및 50 MG 캡슐",
+    "등급: Type II",
+    "조치: 해당 제품 여부를 확인하고 사용 중단 전 의료인과 상담하도록 안내"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "제품 품질"
+   ],
+   "en": {
+    "title_issue": "Recall for impurity out of specification",
+    "hook_line": "Diphenhydramine 25 mg and 50 mg capsules recalled for impurity OOS (Type II)",
+    "summary": "Diphenhydramine 25 mg and 50 mg capsules were recalled in Canada for an out-of-specification impurity result (Type II).",
+    "key_facts": [
+     "Reason: product quality — impurity out of specification",
+     "Product and scope: PDP-DIPHENHYDRAMINE 25 MG and 50 MG capsules",
+     "Class: Type II",
+     "Type: consumers advised to check whether their product is affected and consult a healthcare provider before discontinuing use"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "758874567fae": {
+   "title_issue": "AI 활용 품질 체계 확장(1부)",
+   "summary": "ISPE가 인공지능·머신러닝에서 얻은 통찰을 화학·제조·품질관리(CMC), 공정 밸리데이션, 품질 시스템에 활용하는 방안을 다룬 연재 1부를 게시했다.",
+   "key_facts": [
+    "주제: 인공지능·머신러닝에서 얻은 통찰의 의약품 품질 체계 활용",
+    "적용 대상: 화학·제조·품질관리(CMC), 공정 밸리데이션, 품질 위험관리, 실사 준비"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "AI insights in pharma quality, part 1",
+    "summary": "ISPE published the first part of a series on using AI- and ML-derived insights across CMC, process validation and quality systems.",
+    "key_facts": [
+     "Topic: applying AI- and ML-derived insights to the pharmaceutical quality framework",
+     "Applies to: CMC, process validation, quality risk management, inspection readiness"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026008055": {
+   "title_issue": "공급내역 보고 지연 판매업무정지",
+   "hook_line": "출하 이틀 뒤 공급내역 보고, 판매업무 정지 10일",
+   "summary": "식약처가 의약품 수입·판매 업체에 해당 품목 판매업무 정지 10일을 처분했다. 주사제의 2026년 1분기 공급내역을 기한 내 보고하지 않았다.",
+   "key_facts": [
+    "위반: 완제의약품 출하 시 의약품관리종합정보센터에 공급내역 보고 의무를 기한 내 이행하지 않음",
+    "경위: 출하일자 2026-02-11, 보고일자 2026-02-13",
+    "처분: 해당 품목 판매업무 정지 10일(2026-11-24~2026-12-03)",
+    "근거: 약사법 제47조의3제2항 및 같은 법 시행규칙 제45조"
+   ],
+   "implication": "보고기한이 지난 날부터 1개월 이내에 공급내역을 보고해 [별표 8] Ⅰ. 일반기준 제12호 하목에 따라 감경됐다.",
+   "checks": [
+    "완제의약품 출하일에 공급내역 보고가 함께 처리되는지 출하 기록과 대조하는가?",
+    "공급내역 보고가 출하일보다 늦은 건을 분기마다 집계하는가?"
+   ],
+   "en": {
+    "title_issue": "Late supply report",
+    "hook_line": "Supply report filed after shipment; 10-day sales suspension",
+    "summary": "MFDS suspended sales of an injectable product for 10 days because the firm did not report its Q1 2026 supply records on time.",
+    "key_facts": [
+     "Violation: supply records for a finished drug were not reported to the Korea Pharmaceutical Information Service at shipment within the deadline",
+     "Timeline: shipped 2026-02-11, reported 2026-02-13",
+     "Sanction: 10-day suspension of sales for the product (2026-11-24 to 2026-12-03)",
+     "Basis: Pharmaceutical Affairs Act Article 47-3(2) and Enforcement Rule Article 45"
+    ],
+    "implication": "The sanction was reduced under Annex 8, Part I general criterion 12-Ha because the report was filed within 1 month after the deadline.",
+    "checks": [
+     "Do you reconcile supply report submissions against shipment dates for finished drugs?",
+     "Do you count each quarter how many supply reports were filed after the shipment date?"
+    ]
+   }
+  },
+  "gmpinspect-1Q73JiEyqbl": {
+   "title_issue": "지적사항 없음",
+   "hook_line": "합성 원료의약품 제조소 현지실사, 지적(보완)사항 없음",
+   "summary": "식약처가 이탈리아의 합성 원료의약품(비무균) 제조소를 현지실사해 지적(보완)사항이 없다고 평가했다.",
+   "key_facts": [
+    "평가 결과: 지적(보완)사항 없음",
+    "실사 대상: 비무균-일반제제-합성 원료",
+    "후속: 경인지방식품의약품안전청이 약사법 제69조의5에 따른 사후 현지실사로 수행"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "No deficiencies",
+    "hook_line": "On-site inspection of a synthetic API site found no deficiencies",
+    "summary": "MFDS conducted an on-site inspection of an Italian synthetic API (non-sterile) site and found no deficiencies.",
+    "key_facts": [
+     "Outcome: no deficiencies",
+     "Scope: non-sterile synthetic active substance",
+     "Follow-up: post-approval on-site inspection under Article 69-5 of the Pharmaceutical Affairs Act, conducted by the Gyeongin Regional Office of Food and Drug Safety"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  }
+ }
+}

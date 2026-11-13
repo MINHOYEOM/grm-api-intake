@@ -3890,8 +3890,23 @@ def _fda483_prefetch_enabled(cfg: RunConfig, dry_run: bool) -> bool:
     return cfg.enable_fda483 and not dry_run
 
 
+def _fda483_prefetch_db(cfg: "RunConfig", dry_run: bool) -> "tuple[str, str] | None":
+    """FDA 483 선조회를 DB 대기열로 할 때의 접속 정보 — 중복 판정이 DB 기준일 때만(아니면 None = 노션).
+
+    중복 판정과 같은 변수(GRM_INTAKE_DEDUP_SOURCE)를 따른다 — 선조회와 적재 판정이 서로 다른 곳을 보면
+    "건너뛴 문서"와 "새 문서"가 어긋난다.
+    """
+    if dry_run or grm_queue.dedup_source() != "supabase":
+        return None
+    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    if not cfg.findings_supabase_url or not key:
+        return None
+    return cfg.findings_supabase_url, key
+
+
 def _fda483_known_document_ids(
     token: str, db_id: str, run_date: date, enf_start: date, end: date, *, enabled: bool,
+    db: "tuple[str, str] | None" = None,
 ) -> set[str] | None:
     """FDA 483 수집 **전에** 이미 저장된 문서 키를 조회한다(없으면 None → 종전 동작).
 
@@ -3908,6 +3923,17 @@ def _fda483_known_document_ids(
     if not enabled:
         return None
     window = max(1, (end - enf_start).days + 1)
+    if db is not None:
+        # [대기열 5단계] DB 기준: **대기열(intake_queue)에 들어온** 483 만 기보유로 본다 — 노션 행과 같은 뜻이다.
+        # 정본(raw_signals) 전체로 보면 과거분 백필이 본문 없이 먼저 넣은 문서까지 건너뛰어 전문을 영영 못 받는다.
+        # 실패하면 아래 노션 조회로 넘어간다.
+        try:
+            since = (run_date - timedelta(days=window)).isoformat()
+            known = grm_queue.QueueStore(db[0], db[1]).queue_keys_for_source(SOURCE_FDA_483, since)
+            log("INFO", f"FDA 483 기보유 {len(known)}건(대기열, 최근 {window}일) — PDF·OCR 건너뛰기 대상")
+            return known
+        except Exception as e:  # noqa: BLE001 — 어떤 실패도 수집을 멈추지 않는다
+            log("WARN", f"FDA 483 기보유 대기열 조회 실패 — 노션 조회로 넘어감: {type(e).__name__}")
     try:
         known = notion_query_existing_doc_ids(
             token, db_id, run_date, window_days=window,
@@ -4775,7 +4801,8 @@ def main() -> int:
         cfg, active, run_date, start, end, enf_start,
         fda483_known_ids=_fda483_known_document_ids(
             notion_token, notion_db, run_date, enf_start, end,
-            enabled=_fda483_prefetch_enabled(cfg, args.dry_run)))
+            enabled=_fda483_prefetch_enabled(cfg, args.dry_run),
+            db=_fda483_prefetch_db(cfg, args.dry_run)))
 
     # 3) Notion 기존 row (중복 제거)
     # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장

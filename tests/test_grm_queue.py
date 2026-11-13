@@ -392,10 +392,13 @@ class FreezeTest(unittest.TestCase):
                              "first_seen_at": "2026-11-13T03:30:00+09:00"}
                             for d in ("2026-1", "2026-2")])
 
-    def _shadow(self, **kw):
+    LATE = datetime(2026, 11, 16, 8, 5, tzinfo=gq.KST)       # 07:00 뒤 — 편집팀이 이미 읽기 시작한 시각
+    EARLY = datetime(2026, 11, 16, 5, 30, tzinfo=gq.KST)     # 07:00 전 — coverage gate 가 재생성하는 시간대
+
+    def _shadow(self, at=GEN, **kw):
         with patch.object(gq, "log"), patch.object(gh, "log"), \
                 patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
-            return gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
+            return gq.run_shadow(("u", "k"), run_date=RUN, generated_at=at, window_days=30,
                                  display_window_days=7, store=self.store, out_dir=self.root,
                                  repo_root=self.root, **kw)
 
@@ -439,7 +442,7 @@ class FreezeTest(unittest.TestCase):
         first = dict(self.store.handoffs["2026-11-16"])
         self.store.add_raw(_record("Federal Register", "2026-3"))
         os.environ.pop("GRM_QUEUE_HANDOFF_REFRESH", None)
-        report = self._shadow(new_items=[_Item("Federal Register", "2026-3")])
+        report = self._shadow(at=self.LATE, new_items=[_Item("Federal Register", "2026-3")])
         self.assertEqual(report["handoff_frozen"], gq.FROZEN_PUBLISH_DAY)
         after = self.store.handoffs["2026-11-16"]
         self.assertEqual((after["manifest"], after["payload_sha256"], after["status"]),
@@ -448,11 +451,36 @@ class FreezeTest(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.root, "handoff_db_2026-11-16.rerun.json")))
         self.assertIn("GRM_QUEUE_HANDOFF_REFRESH", gq.render_report_md(report))
 
+    def test_publish_day_rerun_before_0700_refreshes_the_record(self):
+        # 월요일 새벽 coverage gate 가 483 본문을 회수하고 수집을 다시 돌린다 — DB handoff 도 따라가야 한다.
+        self._shadow()
+        self.store.add_raw(_record("Federal Register", "2026-3"))
+        os.environ.pop("GRM_QUEUE_HANDOFF_REFRESH", None)
+        report = self._shadow(at=self.EARLY, new_items=[_Item("Federal Register", "2026-3")])
+        self.assertEqual(report["handoff_frozen"], "")
+        self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 3)
+        with open(os.path.join(self.root, "handoff_db_2026-11-16.json"), encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["row_count"], 3)          # 브랜치 사본이 집는 이름으로 갱신됐다
+        self.assertFalse(os.path.exists(os.path.join(self.root, "handoff_db_2026-11-16.rerun.json")))
+        # 같은 실행을 07:00 정각에 하면 동결이다(경계).
+        self.store.add_raw(_record("Federal Register", "2026-4"))
+        edge = self._shadow(at=datetime(2026, 11, 16, 7, 0, tzinfo=gq.KST),
+                            new_items=[_Item("Federal Register", "2026-4")])
+        self.assertEqual(edge["handoff_frozen"], gq.FROZEN_PUBLISH_DAY)
+        self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 3)
+
+    def test_first_record_after_0700_is_still_written(self):
+        # 크론이 늦어 첫 수집이 07:00 뒤에 돈 날(11-02 07:05 · 11-09 07:11) — 기록이 없으므로 쓴다.
+        report = self._shadow(at=self.LATE)
+        self.assertEqual(report["handoff_frozen"], "")
+        self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 2)
+        self.assertTrue(gq.past_publish_freeze(None))               # 시각을 못 읽으면 동결 쪽
+
     def test_refresh_switch_rebuilds_an_open_publish_day_record_only(self):
         self._shadow()
         self.store.add_raw(_record("Federal Register", "2026-3"))
         with patch.dict(os.environ, {"GRM_QUEUE_HANDOFF_REFRESH": "true"}):
-            report = self._shadow(new_items=[_Item("Federal Register", "2026-3")])
+            report = self._shadow(at=self.LATE, new_items=[_Item("Federal Register", "2026-3")])
             self.assertEqual(report["handoff_frozen"], "")
             self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 3)
             # 닫힌 기록은 스위치로도 못 바꾼다.

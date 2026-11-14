@@ -41,6 +41,35 @@ class QaTest(unittest.TestCase):
         self.assertTrue(any(p.startswith("redacted_count") for p in qa.check(EN, KO.replace("[redacted] ", ""))))
         self.assertTrue(any(p.startswith("codes_missing") for p in qa.check(EN, KO.replace("HEPA", "헤파"))))
 
+    def test_strict_good_translation_passes(self):
+        self.assertEqual(qa.check(EN, KO, strict=True), [])
+
+    def test_strict_blocks_ocr_leftovers(self):
+        """11-15 대표 신고 화면 그대로 — 옛 규칙은 통과, strict 는 실격."""
+        en = ("The [redacted] tot# [redacted] c0A from [redacted] lists the following analyses: appearance. "
+              "The firm's verification testing only included: purity and ignition on residue, "
+              "Ube, Yamaguchi, Japan 759-0204 API Manufacturer Theb) (4) lot [redacted] cOA from [redacted] lists "
+              "viscosity. The firm's veritication testing only included: [redacted] concentration.() (4) and gravity.")
+        bad = ("[redacted] tot# [redacted] 의 [redacted] 발행 c0A는 다음 분석 항목을 기재한다. 외관. 귀사의 검증 시험에는 "
+               "다음만 포함되었다. 순도와 강열 잔분, Ube, Yamaguchi, Japan 759-0204 API Manufacturer b) (4) lot "
+               "[redacted] 의 cOA from [redacted] 는 점도를 기재한다. 귀사의 veritication 시험에는 [redacted] 농도 () (4) 및 비중.")
+        good = ("[redacted] 로트 [redacted] 에 대한 [redacted] 의 시험성적서(COA)는 외관을 기재한다. 귀사의 검증 시험에는 "
+                "순도와 강열 잔분만 포함되었다. [redacted] 로트 [redacted] 에 대한 [redacted] 의 COA 는 점도를 기재한다. "
+                "귀사의 검증 시험에는 [redacted] 농도, [redacted] 및 비중만 포함되었다.")
+        probs = qa.check(en, bad, strict=True)
+        kinds = {p.split(":", 1)[0] for p in probs}
+        self.assertTrue({"estab_header", "redact_variant", "ocr_token"} <= kinds, probs)
+        self.assertEqual(qa.check(en, good, strict=True), [])
+
+    def test_strict_form_block_and_untranslated(self):
+        self.assertTrue(any(p.startswith("form_block") for p in qa.readability(
+            "귀사는 조사하지 않았다. DISTRICT ADDRESS AND PHONE NUMBER Industry Information: www.fda.gov/oc/industry")))
+        self.assertTrue(any(p.startswith("untranslated") for p in qa.readability(
+            "구체적으로, Should growth occur, the unit being tested is not released to the market.")))
+        # 따옴표 안 공식 제목·제품명은 통과
+        self.assertEqual(qa.readability('귀사의 절차 "Protocol for Review and Impact of the Deviation" 은 '
+                                        "Sodium Chloride for Injection 을 다루지 않는다. q12h 투여."), [])
+
     def test_length_ratio(self):
         self.assertTrue(any(p.startswith("length_ratio") for p in qa.check(EN, "구체적으로 23-0412 3/27/2023")))
 
@@ -50,12 +79,15 @@ class OutboxFilesQaTest(unittest.TestCase):
 
     def test_committed_batches_pass_qa(self):
         files = sorted((ROOT / "translations" / "detail_outbox").glob("*.json"))
+        legacy = {ln.strip() for ln in (ROOT / "tests" / "fixtures" / "detail_outbox_legacy.txt")
+                  .read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")}
         failures = {}
         for p in files:
             items = json.loads(p.read_text(encoding="utf-8"))
             for it in items:
                 self.assertEqual(app.validate_item(it), "", f"{p.name} {it.get('finding_id')}")
-            res = qa.check_items(items)
+            # [11-15] 새 배치는 읽기 좋음(strict) 규칙까지 — docs/specs/483_detail_translation_brief.md
+            res = qa.check_items(items, strict=p.name not in legacy)
             if res:
                 failures[p.name] = dict(list(res.items())[:5])
         self.assertEqual(failures, {})

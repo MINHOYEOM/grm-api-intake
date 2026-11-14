@@ -47,8 +47,15 @@ FORM_BLOCK_RE = re.compile(
     r"Industry\s*Info|www\.?\s*fda\.?\s*gov|DISTRICT\s+(?:OFFICE\s+)?ADD?RESS|NAME\s+AN[DO]\s+TITLE"
     r"|TO\s+WHOM\s+REPORT|FEI\s+NUMBER|DATE\(?S\)?\s+OF\s+INSPEC|\bFax\s*:|\bPhone\s*:"
     r"|ESTABLISHMENT\s+INSPECTED|STREET\s+ADDRESS|EMPLOYEE\(?S\)?\s+SIGNATURE|SEE\s+REVERSE"
-    r"|INSPECTIONAL\s+OBSERVATIONS|\bPAGE\s+\d+\s+OF\s+\d+|PREVIOUS\s+EDITION|HEALTH\s+AND\s+HUMAN\s+SERVICES",
+    r"|INSPECTIONAL\s+OBSERVATIONS|\bPAGE\s+\d+\s+OF\s+\d+|PREVIOUS\s+EDITION|HEALTH\s+AND\s+HUMAN\s+SERVICES"
+    # OCR 로 철자가 깨진 양식 칸(실측: "Sff REVERSE Of THIS PAGE"·"STATEANDZIPCODE"·"ESTABLISMENTINPECTED"·"FORM FOA 483")
+    r"|REVERSE\s*O\S?\s*THIS\s*PAGE|STATE\s*AND\s*ZIP|ZIP\s*CODE|ESTABL\w*\s*IN\w{0,3}PECTED|\bFORM\s+F\S{1,2}\s+483"
+    # 실측: "CHY, STATE. ZJPCOOE, COUNTRY"·"c1rv, STAT!:. ZIPCC0E"·"DATEiSJ OF INSPtiCTtON"·"STREET ACCRESS"·"TYPE ESTAB.ISMMENT"
+    r"|\b\S{1,4}[,.]?\s*STAT\S{0,3}[,.]?\s*Z\S{1,2}P\s*\S{2,4}E\b|ZIP\s*\S{3,4}E[,.]?\s*COUNTRY|\bCOUNTRY\s+\S{0,2}\s*T\S?PE\b"
+    r"|DATE\S{0,4}\s*OF\s*INSP\S*|STRE?E?T\s+A\S{1,3}RESS|TYPE\s+EST\S*",
     re.IGNORECASE)
+# 대문자 낱말 3개 이상이 잇따르면 약어가 아니라 양식 칸·강조 문장이다("THIS IS A REPEAT OBSERVATION") — 번역 대상.
+_CAPS_RUN_RE = re.compile(r"\b[A-Z]{2,}\b(?:[\s,.*:;/-]+\b[A-Z]{1,}\b){2,}")
 ESTAB_HEADER_RE = re.compile(
     r"\b(?:API|Drug|Device|Outsourcing|Pharmaceutical|Biologics?|Sterile|Human\s+Drug|Medical\s+Device)\s+"
     r"(?:Manufacturer|Facility|Packager|Relabeler|Repacker)\b|\bproducer\s+of\b|\bCompounding\s+Pharmacy\b",
@@ -62,15 +69,25 @@ _FUNC_WORD_RE = re.compile(
 OCR_TOKEN_RE = re.compile(r"[A-Za-z]*(?:[a-z][0-9|!~\\][A-Za-z]|[A-Za-z][0-9|!~\\][a-z])[A-Za-z]*")
 _OCR_TOKEN_ALLOW = re.compile(r"^q\d+h$", re.IGNORECASE)  # 투약 간격(q12h)
 _NUM_STRICT_RE = re.compile(r"(?<![A-Za-z])\d+(?:[.,/:\-]\d+)*(?![A-Za-z])")
-_HEADER_LEAD = 90   # 머리글 줄은 업소 유형 앞에 도시·우편번호가 온다
-_FORM_SPAN = 220    # 양식 칸 표지 앞뒤의 주소·전화·날짜
+_REDACT_DIGITS_RE = re.compile(r"(?<!\d)(0?[67]?1{0,2}[46][1l]{0,2}[46]?[1l]{0,2})(?![\d.,/:\-]\d)")
+_HEADER_LEAD = 90  # 머리글 줄은 업소 유형 앞에 도시·우편번호가 온다
+_FORM_BACK = 80     # 양식 칸 표지 앞(서명·날짜)
+_FORM_SPAN = 220    # 양식 칸 표지 뒤의 주소·전화·날짜
 
 
 def _header_mask(en: str) -> list[tuple[int, int]]:
     spans = [(max(0, m.start() - _HEADER_LEAD), m.end()) for m in ESTAB_HEADER_RE.finditer(en)]
-    spans += [(max(0, m.start() - _FORM_SPAN), m.end() + _FORM_SPAN) for m in FORM_BLOCK_RE.finditer(en)]
+    spans += [(max(0, m.start() - _FORM_BACK), m.end() + _FORM_SPAN) for m in FORM_BLOCK_RE.finditer(en)]
     # 가림 표시 (b)(4) 의 4 는 수치가 아니다 — [redacted] 로 바로잡으면 사라진다.
     spans += [(m.start(), m.end()) for m in REDACT_VARIANT_RE.finditer(en)]
+    # OCR 이 (b)(4)·(b)(6) 을 숫자로 읽은 꼴(실측 "forf61141"·"r 1141"·"~bf<4>") — 1·4·6·7 로만 된 숫자가
+    # 4자리 이상이거나, 글자·기호에 들러붙어 있으면 수치가 아니라 가림 표시다.
+    for m in _REDACT_DIGITS_RE.finditer(en):
+        d = m.group(1)
+        glued = bool(re.match(r"[A-Za-z()<>~|!{}'\[\]]", en[m.start(1) - 1:m.start(1)] or " ")
+                     or re.match(r"[A-Za-z()<>~|!{}'\[\]]", en[m.end(1):m.end(1) + 1] or " "))
+        if len(d) >= 4 or glued:
+            spans.append((m.start(1), m.end(1)))
     return spans
 
 
@@ -128,8 +145,10 @@ def _check_strict(en: str, ko: str) -> list[str]:
         ratio = len(ko) / len(en)
         if not RATIO_MIN <= ratio <= RATIO_MAX:
             problems.append(f"length_ratio:{ratio:.2f}")
+    caps = [(m.start(), m.end()) for m in _CAPS_RUN_RE.finditer(en)]
     lost = sorted({m.group(0) for m in _CODE_RE.finditer(en)
                    if m.group(0) not in _CODE_ALLOW and len(m.group(0)) >= 2 and _outside(mask, m.start())
+                   and (_outside(caps, m.start()) or re.search(r"[\d-]", m.group(0)))
                    and m.group(0) not in ko})
     if lost:
         problems.append("codes_missing:" + ",".join(lost[:5]))

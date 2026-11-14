@@ -61,6 +61,14 @@ class QaTest(unittest.TestCase):
         self.assertTrue({"estab_header", "redact_variant", "ocr_token"} <= kinds, probs)
         self.assertEqual(qa.check(en, good, strict=True), [])
 
+    def test_strict_does_not_force_keeping_shouted_or_broken_form_text(self):
+        """대문자 강조문·철자 깨진 양식 칸의 낱말은 '약어 코드'가 아니다 — 번역·삭제해도 통과."""
+        en = ("Specifically, the HEPA filter in room 12 was not certified. ***THIS IS A REPEAT OBSERVATION*** "
+              "Sff REVERSE Of THIS PAGE CITY, STATEANDZIPCODE 262-271 ESTABLISMENTINPECTED")
+        ko = "구체적으로, 12호실의 HEPA 필터는 인증되지 않았다. ***반복 관찰사항***"
+        self.assertEqual(qa.check(en, ko, strict=True), [])
+        self.assertTrue(any(p.startswith("codes_missing:HEPA") for p in qa.check(en, ko.replace("HEPA ", ""), strict=True)))
+
     def test_strict_form_block_and_untranslated(self):
         self.assertTrue(any(p.startswith("form_block") for p in qa.readability(
             "귀사는 조사하지 않았다. DISTRICT ADDRESS AND PHONE NUMBER Industry Information: www.fda.gov/oc/industry")))

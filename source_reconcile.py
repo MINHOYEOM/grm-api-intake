@@ -1255,10 +1255,22 @@ def run(*, run_date: date, base_days: int, enf_days: int, specs: Iterable[Source
     sb_url = str(env.get("SUPABASE_URL") or "").strip()
     sb_key = str(env.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
     names = {s.source for s in specs}
+    # [노션 끄기 2026-11-13] GRM_INTAKE_NOTION=off 면 '수집됨' 키를 노션이 아니라 정본(raw_signals)에서
+    # 읽는다 — 수집기가 노션에 행을 만들지 않으므로 노션 기준이면 전부 '놓침'으로 보인다. 기본(on)은 종전.
+    notion_off = str(env.get("GRM_INTAKE_NOTION") or "").strip().lower() == "off"
     if not use_store:
         store_error = ledger_error = "저장소 대조 생략(--no-store)"
     else:
-        if not token or not db_id:
+        if notion_off:
+            if not sb_url.lower().startswith("https://") or not sb_key:
+                store_error = "SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정"
+            else:
+                try:
+                    collected, collected_urls = load_collected_keys_supabase(sb_url, sb_key, sorted(names))
+                except StoreReadError as exc:
+                    collected = collected_urls = None
+                    store_error = str(exc)
+        elif not token or not db_id:
             store_error = "NOTION_TOKEN/NOTION_DATABASE_ID 미설정"
         else:
             # 창 소스는 가장 넓은 게시 창 + 여유로 한 번, 스냅샷 소스(ICH·WHO)는 수집기 스냅샷 dedup 과
@@ -1293,7 +1305,9 @@ def run(*, run_date: date, base_days: int, enf_days: int, specs: Iterable[Source
     # [노션 은퇴 준비 2026-11-13] 같은 원천 목록을 **정본(Supabase raw_signals) 기준**으로 한 번 더 판정해
     # 차이를 보고서에 남긴다(그림자). 판정·이슈는 Notion 기준 그대로다 — 위 report 를 건드리지 않는다.
     # 기본 꺼짐(ENABLE_RECONCILE_SUPABASE_SHADOW). 실패해도 본 보고서에는 영향이 없다.
-    if use_store and _flag(env, "ENABLE_RECONCILE_SUPABASE_SHADOW", False):
+    if notion_off:
+        report["collected_basis"] = "supabase"      # 가산 키 — 이 보고서의 '수집됨' 근거가 정본이다
+    elif use_store and _flag(env, "ENABLE_RECONCILE_SUPABASE_SHADOW", False):
         report["shadow_supabase"] = _supabase_shadow(
             report, run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
             ledger=ledger, ledger_error=ledger_error, sb_url=sb_url, sb_key=sb_key, names=names)

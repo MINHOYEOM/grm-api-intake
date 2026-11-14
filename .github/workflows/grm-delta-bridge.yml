@@ -165,7 +165,8 @@ jobs:
       #   · 델타에 handoff_ref 가 없는 호(노션 handoff 로 만든 호)는 도구가 스스로 건너뛴다.
       #   · 지금 New 인 행만 바꾼다. 실패해도 발행은 이미 끝났다 — 경고로 남기고 수동 재실행한다.
       - name: 노션 행 Status 기록 (git handoff 호 · 코드 계산)
-        if: steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source == 'git'
+        # [노션 끄기] vars.GRM_INTAKE_NOTION=off 면 건너뛴다 — 노션에 찍을 행이 더 생기지 않는다.
+        if: steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source == 'git' && vars.GRM_INTAKE_NOTION != 'off'
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}

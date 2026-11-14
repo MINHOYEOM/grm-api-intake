@@ -1006,6 +1006,12 @@
     "other_quality_system"
    ]
   },
+  "https://www.fda.gov/media/193610/download": {
+   "c": "US",
+   "k": [
+    "other_quality_system"
+   ]
+  },
   "https://www.fda.gov/media/193611/download": {
    "c": "US",
    "k": [
@@ -1184,6 +1190,13 @@
     "quality_unit_oversight"
    ]
   },
+  "https://www.fda.gov/media/193864/download": {
+   "c": "US",
+   "k": [
+    "deviation_capa",
+    "other_quality_system"
+   ]
+  },
   "https://www.fda.gov/media/193865/download": {
    "c": "US",
    "k": [
@@ -1330,13 +1343,6 @@
     "other_quality_system"
    ]
   },
-  "https://www.fda.gov/media/193897/download": {
-   "c": "AU",
-   "k": [
-    "complaint_recall",
-    "other_quality_system"
-   ]
-  },
   "https://www.fda.gov/media/193898/download": {
    "c": "US",
    "k": [
@@ -1383,6 +1389,7 @@
    "c": "US",
    "k": [
     "equipment_facility",
+    "material_supplier_control",
     "qc_lab_controls",
     "quality_unit_oversight",
     "stability_storage"
@@ -1715,8 +1722,14 @@
   "https://www.fda.gov/media/195264/download": {
    "c": "US",
    "k": [
+    "aseptic_sterility_assurance",
     "deviation_capa",
-    "quality_unit_oversight"
+    "documentation_records",
+    "equipment_facility",
+    "material_supplier_control",
+    "qc_lab_controls",
+    "quality_unit_oversight",
+    "training_personnel"
    ]
   },
   "https://www.fda.gov/media/195265/download": {
@@ -2034,13 +2047,6 @@
     "process_validation",
     "qc_lab_controls",
     "stability_storage"
-   ]
-  },
-  "https://www.fda.gov/media/195332/download": {
-   "c": "US",
-   "k": [
-    "equipment_facility",
-    "other_quality_system"
    ]
   },
   "https://www.fda.gov/media/195336/download": {
@@ -2485,7 +2491,10 @@
   "https://www.fda.gov/media/195468/download": {
    "c": "IL",
    "k": [
-    "aseptic_sterility_assurance"
+    "aseptic_sterility_assurance",
+    "deviation_capa",
+    "quality_unit_oversight",
+    "training_personnel"
    ]
   },
   "https://www.fda.gov/media/195469/download": {
@@ -2884,6 +2893,13 @@
     "quality_unit_oversight"
    ]
   },
+  "https://www.fda.gov/media/195584/download": {
+   "c": "US",
+   "k": [
+    "equipment_facility",
+    "validation_qualification"
+   ]
+  },
   "https://www.fda.gov/media/195591/download": {
    "c": "US",
    "k": [
@@ -3181,6 +3197,6 @@
    ]
   }
  },
- "measured_on": "2026-11-12",
+ "measured_on": "2026-11-14",
  "schema": "grm-brief-glance/v1"
 }

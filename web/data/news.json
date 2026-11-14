@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-13",
+ "measured_on": "2026-11-14",
  "window_days": 60,
  "totals": {
-  "items": 454
+  "items": 448
  },
  "by_source": [
   {
@@ -11,12 +11,12 @@
    "c": 141
   },
   {
-   "v": "ECA Academy",
-   "c": 85
+   "v": "Federal Register",
+   "c": 81
   },
   {
-   "v": "Federal Register",
-   "c": 80
+   "v": "ECA Academy",
+   "c": 77
   },
   {
    "v": "EMA",
@@ -24,11 +24,11 @@
   },
   {
    "v": "MFDS",
-   "c": 43
+   "c": 45
   },
   {
    "v": "Health Canada",
-   "c": 21
+   "c": 20
   },
   {
    "v": "ISPE",
@@ -48,6 +48,48 @@
   }
  ],
  "items": [
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-11-13",
+   "title": "Meeting highlights from the Committee for Medicinal Products for Human Use (CHMP) 9-12 November 2026",
+   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-9-12-november-2026"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-11-13",
+   "title": "Draft guideline on veterinary good pharmacovigilance practices (VGVP) - List of medically important (MI) VeDDRA terms",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-veterinary-good-pharmacovigilance-practices-vgvp-list-medically-important-mi-veddra-terms_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-13",
+   "title": "Determination That DIBENZYLINE (Phenoxybenzamine Hydrochloride) Oral Capsule, 10 Milligrams, and Other Drug Products Were Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/13/2026-23141/determination-that-dibenzyline-phenoxybenzamine-hydrochloride-oral-capsule-10-milligrams-and-other"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Rule",
+   "published_date": "2026-11-13",
+   "title": "Revocation of the Color Additive Listing for Use of Orange B on Casings or Surfaces of Frankfurters and Sausages; Confirmation of Effective Date",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/13/2026-23112/revocation-of-the-color-additive-listing-for-use-of-orange-b-on-casings-or-surfaces-of-frankfurters"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-13",
+   "title": "의약외품의 점자 표시 등에 대한 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15995"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-11-13",
+   "title": "「바이오의약품 원료물질 및 원료의약품의 수입절차 특례 등에 관한 규정」 제정고시안 행정예고(식품의약품안전처 공고 제 2026-553호)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44321"
+  },
   {
    "source": "ECA Academy",
    "source_kind": "GMP News",
@@ -3141,90 +3183,6 @@
    "published_date": "2026-09-15",
    "title": "[HC] Organika® Gummies: Foreign site not listed on site licence",
    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/organikar-gummies-foreign-site-not-listed-site-licence"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-14",
-   "title": "EMA updates Procedural Guidance for Application Preparation",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-updates-procedural-guidance-for-application-preparation"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-14",
-   "title": "Equipment Design in the FDA&#39;s Focus",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/equipment-design-in-the-fdas-focus"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-14",
-   "title": "GMP Requirements for Blood Components and Plasma-derived Medicinal Products",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/gmp-requirements-for-blood-components-and-plasma-derived-medicinal-products"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-14",
-   "title": "How GMP Non-Compliance can stop a Marketing Authorisation Application",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/how-gmp-non-compliance-can-stop-a-marketing-authorisation-application"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-14",
-   "title": "IPEC: Updated Qualification-Guide published",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/ipec-updated-qualification-guide-published"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-14",
-   "title": "PFAS restriction: Commission highlights Importance of critical Medical Applications",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/pfas-restriction-commission-highlights-importance-of-critical-medical-applications"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-14",
-   "title": "USP-NF Publishes Responses to Comments on Stimuli Article on Apex Vessel Geometries",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/usp-nf-publishes-responses-to-comments-on-stimuli-article-on-apex-vessel-geometries"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-14",
-   "title": "What is meant by Operational and Personnel Hygiene in a GMP Environment?",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/what-is-meant-by-operational-and-personnel-hygiene-in-a-gmp-environment"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "inspections",
-   "published_date": "2026-09-14",
-   "title": "International collaboration on GMP inspections",
-   "official_url": "https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-manufacturing-practice/international-collaboration-gmp-inspections"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "inspections",
-   "published_date": "2026-09-14",
-   "title": "Report on the International Active Pharmaceutical Ingredient Inspection Programme 2017 – 2024",
-   "official_url": "https://www.ema.europa.eu/system/files/documents/report/report-international-active-pharmaceutical-ingredient-inspection-programme-2017-2024_en.pdf"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-14",
-   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Customer/Partner Customer Service Satisfaction Surveys",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/14/2026-18691/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-14",
-   "title": "[HC] TZIELD (teplizumab) and the Risk of Viral Reactivation",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/tzield-teplizumab-and-risk-viral-reactivation"
   }
  ]
 }

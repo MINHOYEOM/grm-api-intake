@@ -21,7 +21,9 @@ _spec.loader.exec_module(precheck)
 
 def _card(**kw):
     base = {"title_issue": "무균공정 관리 미흡", "summary": "FDA가 관찰사항 3건을 적었다.",
-            "key_facts": ["관찰사항: 3건"], "implication": "", "checks": []}
+            "key_facts": ["관찰사항: 3건"], "implication": "", "checks": [],
+            "en": {"title_issue": "Aseptic control gaps", "summary": "FDA listed three observations.",
+                   "key_facts": ["Observations: 3"], "implication": "", "checks": []}}
     base.update(kw)
     return base
 
@@ -35,7 +37,7 @@ class TermsTest(unittest.TestCase):
         delta = {"cards": {"a": _card(implication="CAPA 절차가 수립되지 않았다."),
                            "b": _card(summary="규격 이탈 결과를 조사하지 않았다."),
                            "c": _card(implication="시정 및 예방조치(CAPA) 절차가 없었다. CAPA 기록도 없었다.")}}
-        lines = precheck.term_lines(delta)
+        lines = [x for x in precheck.term_lines(delta) if x.startswith("용어 표기")]
         self.assertEqual(len(lines), 2)
         self.assertTrue(any("'CAPA' 단독" in x and "a" in x for x in lines))
         self.assertTrue(any("기준일탈(OOS)" in x and "b" in x for x in lines))
@@ -48,13 +50,36 @@ class TermsTest(unittest.TestCase):
         ko, en = inject_slots._HOOK_LINE_MAX["ko"], inject_slots._HOOK_LINE_MAX["en"]
         t = inject_slots._MAX_TITLE_ISSUE
         ok = _card(title_issue="가" * t, hook_line="가" * ko,
-                   en={"title_issue": "a" * (t * 2), "hook_line": "a" * en})
+                   en=dict(_card()["en"], title_issue="a" * (t * 2), hook_line="a" * en))
         self.assertEqual(precheck.term_lines({"cards": {"a": ok}}), [])
         over = _card(title_issue="가" * (t + 1), hook_line="가" * (ko + 1),
-                     en={"title_issue": "a" * (t * 2 + 1), "hook_line": "a" * (en + 1)})
+                     en=dict(_card()["en"], title_issue="a" * (t * 2 + 1), hook_line="a" * (en + 1)))
         lines = precheck.term_lines({"cards": {"a": over}})
         self.assertEqual(len(lines), 4)
         self.assertTrue(any(f"a.en.title_issue: {t * 2 + 1}자" in x for x in lines))
+
+    def test_empty_required_slot_and_missing_english_pair_are_caught(self):
+        # 리허설 1114: 소식 카드 4장의 key_facts 가 한국어·영문 모두 [] → merge_parts 가 호 전체를 거부했다.
+        thin = _card(key_facts=[])
+        thin["en"] = dict(thin["en"], key_facts=[])
+        self.assertEqual(precheck.term_lines({"cards": {"n1": thin}}),
+                         ["빈 필수 칸 n1: key_facts", "영문 슬롯 미완결 n1: en.key_facts"])
+        # 한국어가 채운 시사점은 영문도 채워야 한다. 한국어가 비운 칸은 영문도 비어 있는 것이 맞다.
+        half = _card(implication="원문은 재발 방지 계획을 요구했다.")
+        self.assertEqual(precheck.term_lines({"cards": {"h": half}}), ["영문 슬롯 미완결 h: en.implication"])
+        no_en = _card()
+        del no_en["en"]
+        self.assertEqual(precheck.term_lines({"cards": {"x": no_en}}),
+                         ["영문 슬롯 미완결 x: en.title_issue, en.summary, en.key_facts"])
+
+    def test_pairing_rule_is_the_merge_rule(self):
+        import importlib.util as _u
+        spec = _u.spec_from_file_location("company_merge_parts_x", ROOT / "company" / "editorial" / "merge_parts.py")
+        mp = _u.module_from_spec(spec)
+        spec.loader.exec_module(mp)
+        for card in (_card(), _card(key_facts=[]), _card(implication="문장."), {"title_issue": "가"}):
+            got = [x for x in precheck.term_lines({"cards": {"c": card}}) if x.startswith("영문 슬롯 미완결")]
+            self.assertEqual(bool(got), bool(mp._en_gaps(card)), card)
 
     def test_cli_exit_codes(self):
         with tempfile.TemporaryDirectory() as tmp:

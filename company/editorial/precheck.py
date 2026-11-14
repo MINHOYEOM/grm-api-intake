@@ -6,6 +6,8 @@
         (`inject_slots.lint_prose_style`)와 **같은 규칙**으로 본다 — 금지 표현, [용어·표기] 표 왼쪽 표기,
         약어 단독(CAPA·OOS·COA 가 한글 풀이 없이 나온 카드). 걸린 것이 있으면 한 줄씩 내고 exit 1.
         기자는 샤드를 `완료`로 내기 전에 돌려 0 으로 만든다. 길이 상한도 같이 본다(제목 이슈·hook_line).
+        **빈 필수 칸과 영문 짝**도 본다 — 합치기(`merge_parts.py`)가 호 전체를 거부하는 것과 같은 규칙이다:
+        한국어 `title_issue`·`summary`·`key_facts` 는 반드시 채우고, 영문 `en` 은 그 셋 + 한국어가 채운 `implication`·`checks` 를 채운다.
 
     python company/editorial/precheck.py deep-source <handoff 파일> <deep_delta 파일> --out <검사용 파일>
         심층분석 델타의 각 카드에 그 주 handoff 의 `deep_analysis_input.body_full` 을 `source_text` 로 붙인
@@ -27,7 +29,12 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import inject_slots  # noqa: E402
+import merge_parts  # noqa: E402
+
+KO_REQUIRED = tuple(f for f in merge_parts.EN_FIELDS if f not in merge_parts.EN_OPTIONAL)
 
 
 def _load(path):
@@ -45,6 +52,12 @@ def term_lines(delta):
         if not isinstance(card, dict):
             continue
         en = card.get("en") if isinstance(card.get("en"), dict) else {}
+        ko_gaps = [f for f in KO_REQUIRED if not merge_parts._filled(card.get(f))]
+        if ko_gaps:
+            out.append(f"빈 필수 칸 {cid}: {', '.join(ko_gaps)}")
+        en_gaps = merge_parts._en_gaps(card)
+        if en_gaps:
+            out.append(f"영문 슬롯 미완결 {cid}: en.{', en.'.join(en_gaps)}")
         for label, text, limit in (
                 ("title_issue", card.get("title_issue"), title),
                 ("en.title_issue", en.get("title_issue"), title * 2),

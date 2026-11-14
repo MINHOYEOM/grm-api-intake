@@ -52,6 +52,7 @@
 | 2 | 데스크 완료 직후 (13:30 쯤) | 같음 | 델타 워커 2개(`델타-1`·`델타-2`) + 심층 워커 2개(`심층-1`·`심층-2`) | — (동시에 시작) |
 | 3 | 순서 2 시작 40분 뒤 (14:10 쯤) | 같음 | 보강 워커: 델타 1개(`델타-1+`) + 심층 1개(`심층-1+`) | `python company/editorial/shard_claim.py status <실행 폴더>` 가 전 샤드 완료 + `delta.T.json` 완료. 미완이 남으면 보강 워커를 한 번 더 돌린다 |
 | 4 | 전 샤드 완료 직후 (15:00 쯤) | 같음 | 교열 (1개) | `copyedit.json` 이 push 됐다 |
+| 4-1 | 교열이 `재작업` 을 남겼을 때만 | 같음 | 델타 워커 1개(이름 무관 — `copyedit.json` 이 `재작업` 이면 재작업 절을 한다) → 끝나면 교열을 한 번 더 | `rework.json` 이 `완료` → 다시 돌린 교열의 `copyedit.json` 이 `round: 2` 로 push 됐다 |
 | 5 | 교열 뒤 | 같음 | (Routine 아님) 아래 "점검" — 비서실 세션이 PC 에서 | `rehearsal_check.py` 결과 + 6번 확인을 적는다 |
 
 - **반납 push 확인이 첫 판정이다.** 데스크가 끝났다고 하면 가장 먼저 `git ls-remote origin claude/company-rehearsal-{회차}` 로 브랜치가 원격에 생겼는지,
@@ -86,7 +87,7 @@ python company/editorial/rehearsal_check.py ../_rehearsal-{회차}/company/run/r
 1. `desk.json` 이 `완료`이고 `handoff_ref` 가 handoff 파일의 지문과 같다.
 2. 계획한 샤드가 전부 `완료`이고 `delta.json` 이 있다(`merge_parts.py` exit 0 의 결과).
 3. `copyedit.json` 의 코드 검사가 `ran: true`, `exit: 0` 이다.
-4. 교열 reject 가 0 이다. (실발행의 마감 조건과 같다 — `copyedit.md` 4번은 코드 검사 exit 0 **이고** reject 0 일 때만 반납한다. reject 가 하나라도 있으면 월요일에는 반납하지 않고 09:30 백업이 발행한다. 그래서 `copyedit.json` 이 `완료`·exit 0 이어도 reject 가 남았으면 그 회차는 성공이 아니다.)
+4. 교열 reject 가 0 이다 — 재작업 1회(`next/RUN.md` 5-1항)를 거친 2차 판정이어도 된다. 그때는 `rework.json` 이 `완료` 이고 1차 기록 `copyedit.r1.json` 이 남아 있어야 한다. (실발행의 마감 조건과 같다 — `copyedit.md` 4번은 코드 검사 exit 0 **이고** reject 0 일 때만 반납한다. reject 가 하나라도 있으면 월요일에는 반납하지 않고 09:30 백업이 발행한다. 그래서 `copyedit.json` 이 `완료`·exit 0 이어도 reject 가 남았으면 그 회차는 성공이 아니다.)
 5. `scaffold.json` 이 그 날짜의 것이고 델타의 카드를 전부 갖고 있다. handoff 의 모든 행이 상태를 하나씩 받는다(발행·미채택·보류·오류 중 하나 — 빈 행 0).
 6. (사람) Notion·main·날짜 브랜치에 리허설이 쓴 것이 없다 — Notion handoff·Intake 행의 마지막 수정 시각, `git log origin/main`, `git ls-remote origin 'claude/company-20*'` 로 본다.
 

@@ -56,8 +56,16 @@ def check(folder, handoff_path):
 
     rejects = [c for c in copyedit.get("cards") or [] if isinstance(c, dict) and c.get("verdict") != "pass"]
     n_reject = max(int((copyedit.get("counts") or {}).get("reject") or 0), len(rejects))
-    out.append((4, "교열 reject 0", copyedit.get("status") == "완료" and n_reject == 0,
-                f"status={copyedit.get('status')!r} reject={n_reject}"))
+    # 재작업 1회를 거친 2차 판정(round 2)이면 기자의 재작업 기록과 1차 교열 기록이 남아 있어야 한다.
+    rnd = copyedit.get("round") or 1
+    rework_ok = True
+    if rnd != 1:
+        rework = _load(os.path.join(folder, "rework.json")) or {}
+        first = _load(os.path.join(folder, "copyedit.r1.json")) or {}
+        rework_ok = rnd == 2 and rework.get("status") == "완료" and first.get("status") == "재작업"
+    out.append((4, "교열 reject 0", copyedit.get("status") == "완료" and n_reject == 0 and rework_ok,
+                f"status={copyedit.get('status')!r} reject={n_reject} round={rnd!r}"
+                + ("" if rework_ok else " — 재작업 기록(rework.json 완료 · copyedit.r1.json 재작업)이 없다")))
 
     detail, ok = "", False
     if isinstance(delta, dict) and isinstance(handoff, dict):

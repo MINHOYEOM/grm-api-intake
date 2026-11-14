@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-14T22:53:48Z",
+ "generated_at": "2026-11-14T22:59:14Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -232,11 +232,11 @@
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 43650445111,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-14T22:53:41Z",
-    "updatedAt": "2026-11-14T22:53:45Z",
+    "updatedAt": "2026-11-14T22:53:53Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43650445111"

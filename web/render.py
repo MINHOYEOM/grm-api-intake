@@ -5383,6 +5383,12 @@ RETIRED_PAGE_REDIRECTS: tuple[tuple[str, str], ...] = (
     ("/findings/browse/index.html", "/browse/"),
     ("/en/findings/browse/", "/en/browse/"),
     ("/en/findings/browse/index.html", "/en/browse/"),
+    # [2026-11-15] 브리프 주소는 /briefs/{날짜}/ 인데 /briefs/ 자체는 면이 없어 404 였다(주소창에서
+    # 날짜를 지워 올라가는 방문자). 지난 호 목록 /archive/ 로 잇는다.
+    ("/briefs/", "/archive/"),
+    ("/briefs/index.html", "/archive/"),
+    ("/en/briefs/", "/en/archive/"),
+    ("/en/briefs/index.html", "/en/archive/"),
 )
 
 
@@ -6235,6 +6241,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (아래 `en_paths = en_tree_paths(catalogs)`). 첫 렌더(랜딩)는 그 뒤라 항상 채워져 있고,
     # 어긋나면 `WebEnTreeTest.test_emitted_en_paths_match_the_declared_set` 이 잡는다.
     en_paths: set[str] = set()
+    # [2026-11-15] 영어 정본에만 있는 모음 면(한국어 정본엔 없는 분류×기관 조합 등).
+    # 영어 페이지는 그리되 **언어 짝은 걸지 않는다** — 두 정본은 언어별 모집단으로 따로
+    # 재서 표본 문턱을 넘는 조합이 갈린다(실측: en 에만 training-personnel × HC).
+    # 짝을 걸면 없는 한국어 페이지로 가는 깨진 링크가 된다(facets PR #1697 CI).
+    en_only_paths: set[str] = set()
     # 영어 피드가 실제로 나오는가 — `en_brief_slugs` 확정 직후 채워진다(en_paths 와 같은
     # 관례: 클로저는 호출 시점의 값을 읽는다). 영어 피드가 없으면 영어 페이지는 피드
     # 링크를 아예 걸지 않는다 — 한국어 피드를 자기 대체본이라고 말하지 않기 위해서다.
@@ -6262,7 +6273,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                       + "index.html",
                       "label": LANG_ENDONYM[lg], "current": lg == tree_lang}
                      for lg in SUPPORTED_LANGS]
-                    if pp.path in en_paths else [])
+                    if pp.path in en_paths and pp.path not in en_only_paths else [])
             return tree_env.get_template(template).render({
                 "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
                 "canonical": pp.canonical, "latest_slug": latest_slug,
@@ -6480,6 +6491,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   "무엇을 그릴지"의 선언이므로 **어떤 렌더보다도 먼저** 확정한다.
     if facets_en:
         en_paths |= facet_tree_paths(facets_en)
+        en_only_paths |= facet_tree_paths(facets_en) - facet_tree_paths(facets)
     # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
     # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
     # → 해당 섹션이 조용히 꺼진다(load_findings_facets 관례 동형).

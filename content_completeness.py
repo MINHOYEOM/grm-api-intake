@@ -114,6 +114,10 @@ INTENTIONAL_UNSHOWN: dict[tuple[str, str], str] = {
     ("EU GMP NCR (EudraGMDP)", "ncr_operations"): "부적합 제조 범위 목록(정형 번호 목록)",
     ("EU GMP NCR (EudraGMDP)", "product_description"): "ncr_operations 와 같은 제조 범위 목록",
     ("Federal Register", "excerpts"): "FR 검색 발췌 — 같은 내용을 abstract 로 쓴다",
+    # [2026-11-15 #1463] 검색 API 가 준 설명 원본(출처 보존). 같은 내용(더 긴 extra_snippets 가
+    # 있으면 그것)을 collect_search._extract_snippet 이 raw_excerpt 로 넘겨 그쪽이 쓰인다.
+    # raw_update.py 는 이 칸을 판 비교에만 읽는다.
+    ("Brave Search", "brave_description"): "검색 결과 설명 원본 — 같은 내용을 raw_excerpt 로 쓴다",
 }
 
 # 문서 단위 예외 — 값이 상한 언저리 길이에서 문장 중간에 끝나지만 **원문 자체가 거기서 끝나는** 관찰.

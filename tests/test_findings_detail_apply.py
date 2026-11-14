@@ -79,6 +79,17 @@ class QaTest(unittest.TestCase):
         self.assertTrue(any(p.startswith("ocr_dropped_invalid") for p in
                             qa.check(en, ko, strict=True, ocr_dropped=["LJMS", "XYZ"])))
 
+    def test_strict_kept_tokens_and_redacted_drop(self):
+        en = "Specifically, the Anti-C3d assay for LZRSE-Col7A1 was not validated. [redacted] [redacted] lot."
+        ko = "구체적으로, LZRSE-Col7A1 에 대한 Anti-C3d 시험은 밸리데이션되지 않았다. [redacted] 로트."
+        probs = qa.check(en, ko, strict=True)
+        self.assertTrue(any(p.startswith("ocr_token") for p in probs), probs)
+        self.assertTrue(any(p.startswith("redacted_count") for p in probs), probs)
+        self.assertEqual(qa.check(en, ko, strict=True, kept_tokens=["Anti-C3d", "LZRSE-Col7A1"],
+                                  ocr_dropped=["[redacted]"]), [])
+        self.assertTrue(any(p.startswith("kept_tokens_invalid") for p in
+                            qa.check(en, ko, strict=True, kept_tokens=["c0A"])))
+
     def test_strict_form_block_and_untranslated(self):
         self.assertTrue(any(p.startswith("form_block") for p in qa.readability(
             "귀사는 조사하지 않았다. DISTRICT ADDRESS AND PHONE NUMBER Industry Information: www.fda.gov/oc/industry")))

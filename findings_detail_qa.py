@@ -98,8 +98,12 @@ def _outside(spans: list[tuple[int, int]], pos: int) -> bool:
     return not any(a <= pos < b for a, b in spans)
 
 
-def readability(ko: str) -> list[str]:
-    """국문이 읽히는 글인지 — 영문 찌꺼기 검사(strict 전용). 순수 함수."""
+def readability(ko: str, kept: Any = None) -> list[str]:
+    """국문이 읽히는 글인지 — 영문 찌꺼기 검사(strict 전용). 순수 함수.
+
+    kept: 낱말 속 숫자 때문에 찌꺼기처럼 보이지만 원문 그대로인 실제 이름(Anti-C3d·LZRSE-Col7A1) — 항목의 kept_tokens.
+    """
+    kept_set = {str(t) for t in kept} if isinstance(kept, list) else set()
     plain = str(ko or "").replace(_REDACTED, " ")
     problems: list[str] = []
     m = FORM_BLOCK_RE.search(plain)
@@ -116,7 +120,8 @@ def readability(ko: str) -> list[str]:
         if len(_FUNC_WORD_RE.findall(run.group(0))) >= 2:
             problems.append("untranslated:" + run.group(0)[:40])
             break
-    toks = [t for t in OCR_TOKEN_RE.findall(plain) if not _OCR_TOKEN_ALLOW.match(t)]
+    toks = [t for t in OCR_TOKEN_RE.findall(plain) if not _OCR_TOKEN_ALLOW.match(t)
+            and not any(t in k for k in kept_set)]
     if toks:
         problems.append("ocr_token:" + ",".join(toks[:5]))
     return problems
@@ -133,7 +138,7 @@ def _codes(text: str) -> set[str]:
 OCR_DROPPED_MAX = 10
 
 
-def _check_strict(en: str, ko: str, dropped: Any = None) -> list[str]:
+def _check_strict(en: str, ko: str, dropped: Any = None, kept: Any = None) -> list[str]:
     problems: list[str] = []
     if not _HANGUL_RE.search(ko):
         problems.append("no_hangul")
@@ -148,13 +153,20 @@ def _check_strict(en: str, ko: str, dropped: Any = None) -> list[str]:
         if bad or len(toks) > OCR_DROPPED_MAX:
             problems.append("ocr_dropped_invalid:" + ",".join(bad[:5] or [str(len(toks))]))
         drop = {t for t in toks if t and t in en}
+    # "[redacted]" 를 적은 만큼 가림 개수 하한을 내린다 — OCR 이 두 번 찍은 구절을 한 번만 옮긴 경우.
+    redact_dropped = sum(1 for t in (dropped if isinstance(dropped, list) else []) if str(t) == _REDACTED)
+    if kept:
+        ktoks = [str(t) for t in kept] if isinstance(kept, list) else ["<not-a-list>"]
+        kbad = [t for t in ktoks if not t or t not in en or t not in ko]
+        if kbad or len(ktoks) > OCR_DROPPED_MAX:
+            problems.append("kept_tokens_invalid:" + ",".join(kbad[:5] or [str(len(ktoks))]))
     mask = _header_mask(en)
     need: Counter = Counter(m.group(0).rstrip(".,") for m in _NUM_STRICT_RE.finditer(en) if _outside(mask, m.start()))
     have = _nums(ko)
     missing = [n for n, c in need.items() if have[n] < c and n not in ko and n not in drop]
     if missing:
         problems.append("numbers_missing:" + ",".join(missing[:5]))
-    if ko.count(_REDACTED) < en.count(_REDACTED):
+    if ko.count(_REDACTED) < en.count(_REDACTED) - redact_dropped:
         problems.append(f"redacted_count:{en.count(_REDACTED)}->{ko.count(_REDACTED)}")
     # 길이 비율은 양식 칸·머리글을 뺀 본문 기준(머리글이 큰 항목에서 머리글을 덧붙이게 만들지 않게).
     body_len = sum(1 for i in range(len(en)) if _outside(mask, i)) if mask else len(en)
@@ -169,14 +181,14 @@ def _check_strict(en: str, ko: str, dropped: Any = None) -> list[str]:
                    and m.group(0) not in ko and m.group(0) not in drop})
     if lost:
         problems.append("codes_missing:" + ",".join(lost[:5]))
-    problems.extend(readability(ko))
+    problems.extend(readability(ko, kept))
     return problems
 
 
-def check(en: str, ko: str, *, strict: bool = False, ocr_dropped: Any = None) -> list[str]:
+def check(en: str, ko: str, *, strict: bool = False, ocr_dropped: Any = None, kept_tokens: Any = None) -> list[str]:
     """어긴 규칙 목록(빈 목록 = 통과). 순수 함수. strict=True 는 11-15 읽기 좋음 규칙까지 본다."""
     if strict:
-        return _check_strict(str(en or ""), str(ko or ""), ocr_dropped)
+        return _check_strict(str(en or ""), str(ko or ""), ocr_dropped, kept_tokens)
     problems: list[str] = []
     en, ko = str(en or ""), str(ko or "")
     if not _HANGUL_RE.search(ko):
@@ -203,7 +215,7 @@ def check_items(items: list[dict[str, Any]], *, strict: bool = False) -> dict[st
     out: dict[str, list[str]] = {}
     for it in items:
         probs = check(it.get("detail_text", ""), it.get("detail_text_ko", ""), strict=strict,
-                      ocr_dropped=it.get("ocr_dropped"))
+                      ocr_dropped=it.get("ocr_dropped"), kept_tokens=it.get("kept_tokens"))
         if probs:
             out[str(it.get("finding_id"))] = probs
     return out

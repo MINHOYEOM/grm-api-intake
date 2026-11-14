@@ -1120,6 +1120,23 @@ class EditorialGitHandoffTest(unittest.TestCase):
         self.assertIn("test -f company/editorial/next/RUN.md", reh)
         self.assertNotIn("checkout -b claude/company-rehearsal", reh)
 
+    def test_other_cloud_jobs_also_cut_branches_from_a_fresh_fetch(self):
+        # 같은 낡은 origin/main 이 편집팀 밖 클라우드 직무(교육·번역·검증·브리프 준비)에도 남아 있었다(2026-11-15).
+        import re
+        jobs = [
+            ("company", "education", "glossary-fig-daily.md"),
+            ("company", "education", "glossary-weekly.md"),
+            ("company", "education", "quiz-weekly.md"),
+            ("company", "situation-room", "brief-prep.md"),
+            ("company", "translation", "findings-daily.md"),
+            ("company", "verification", "monthly.md"),
+        ]
+        stale = re.compile(r"(checkout -b \S+ origin/main|push origin origin/main:|--format=%H origin/main|에서 만든다\.\)|`origin/main` 에서 브랜치)")
+        for parts in jobs:
+            text = self._read(*parts)
+            self.assertIsNone(stale.search(text), "/".join(parts))
+            self.assertIn("FETCH_HEAD", text, "/".join(parts))
+
     def test_instructions_state_the_same_length_limits_the_code_enforces(self):
         # 2026-11-13 리허설 1113b: 교열이 영문 hook_line 에 한국어 상한(40자)을 적용해 49장을 반려했고,
         # 기자는 en.title_issue 상한(50자)을 몰라 한 장이 조립을 막았다. 지시문의 숫자 = 코드의 숫자.

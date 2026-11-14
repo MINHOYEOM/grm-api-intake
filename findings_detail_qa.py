@@ -52,7 +52,8 @@ FORM_BLOCK_RE = re.compile(
     r"|REVERSE\s*O\S?\s*THIS\s*PAGE|STATE\s*AND\s*ZIP|ZIP\s*CODE|ESTABL\w*\s*IN\w{0,3}PECTED|\bFORM\s+F\S{1,2}\s+483"
     # 실측: "CHY, STATE. ZJPCOOE, COUNTRY"·"c1rv, STAT!:. ZIPCC0E"·"DATEiSJ OF INSPtiCTtON"·"STREET ACCRESS"·"TYPE ESTAB.ISMMENT"
     r"|\b\S{1,4}[,.]?\s*STAT\S{0,3}[,.]?\s*Z\S{1,2}P\s*\S{2,4}E\b|ZIP\s*\S{3,4}E[,.]?\s*COUNTRY|\bCOUNTRY\s+\S{0,2}\s*T\S?PE\b"
-    r"|DATE\S{0,4}\s*OF\s*INSP\S*|STRE?E?T\s+A\S{1,3}RESS|TYPE\s+EST\S*",
+    r"|DATE\S{0,4}\s*OF\s*INSP\S*|STRE?E?T\s+A\S{1,3}RESS|TYPE\s+EST\S*"
+    r"|,\s*(?:Senior\s+|Lead\s+)?Invest\s?igator\b|\bDATE\s+ISSUED\b",
     re.IGNORECASE)
 # 대문자 낱말 3개 이상이 잇따르면 약어가 아니라 양식 칸·강조 문장이다("THIS IS A REPEAT OBSERVATION") — 번역 대상.
 _CAPS_RUN_RE = re.compile(r"\b[A-Z]{2,}\b(?:[\s,.*:;/-]+\b[A-Z]{1,}\b){2,}")
@@ -153,11 +154,13 @@ def _check_strict(en: str, ko: str, dropped: Any = None) -> list[str]:
         problems.append("numbers_missing:" + ",".join(missing[:5]))
     if ko.count(_REDACTED) < en.count(_REDACTED):
         problems.append(f"redacted_count:{en.count(_REDACTED)}->{ko.count(_REDACTED)}")
-    if en.strip():
-        ratio = len(ko) / len(en)
-        if not RATIO_MIN <= ratio <= RATIO_MAX:
+    # 길이 비율은 양식 칸·머리글을 뺀 본문 기준(머리글이 큰 항목에서 머리글을 덧붙이게 만들지 않게).
+    body_len = sum(1 for i in range(len(en)) if _outside(mask, i)) if mask else len(en)
+    if en.strip() and body_len:
+        ratio = len(ko) / body_len
+        if ratio < RATIO_MIN or len(ko) / len(en) > RATIO_MAX:
             problems.append(f"length_ratio:{ratio:.2f}")
-    caps = [(m.start(), m.end()) for m in _CAPS_RUN_RE.finditer(en)]
+    caps =[(m.start(), m.end()) for m in _CAPS_RUN_RE.finditer(en)]
     lost = sorted({m.group(0) for m in _CODE_RE.finditer(en)
                    if m.group(0) not in _CODE_ALLOW and len(m.group(0)) >= 2 and _outside(mask, m.start())
                    and (_outside(caps, m.start()) or re.search(r"[\d-]", m.group(0)))

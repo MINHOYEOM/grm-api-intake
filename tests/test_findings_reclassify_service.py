@@ -151,6 +151,13 @@ class RunReclassifyDryRunTest(unittest.TestCase):
             report["category_migration_matrix"],
             {"documentation_records->process_validation": 1},
         )
+        # #1515: 바뀌는 행을 id 로 남겨야 사람이 검토하고 apply 뒤 되돌릴 수 있다.
+        self.assertEqual(
+            report["category_change_rows"],
+            [{"finding_id": "f-1", "source": "", "old_category": "documentation_records",
+              "new_category": "process_validation",
+              "old_taxonomy_version": "grm-finding-taxonomy/v2"}],
+        )
         self.assertEqual(report["patched"], 0)
         self.assertEqual(report["errors"], [])
 

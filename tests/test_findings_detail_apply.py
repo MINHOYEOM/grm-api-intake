@@ -69,6 +69,16 @@ class QaTest(unittest.TestCase):
         self.assertEqual(qa.check(en, ko, strict=True), [])
         self.assertTrue(any(p.startswith("codes_missing:HEPA") for p in qa.check(en, ko.replace("HEPA ", ""), strict=True)))
 
+    def test_strict_ocr_dropped_declaration(self):
+        en = "Specifically, the LJMS record for Lot 2017-04 dated March 14, 201'1 was not reviewed."
+        ko = "구체적으로, 로트 2017-04 의 LIMS 기록(2017년 3월 14일자)은 검토되지 않았다."
+        probs = qa.check(en, ko, strict=True)
+        self.assertTrue(any(p.startswith("codes_missing:LJMS") for p in probs), probs)
+        self.assertEqual(qa.check(en, ko, strict=True, ocr_dropped=["LJMS", "201", "1"]), [])
+        # 원문에 없는 토큰을 면제로 내세우면 실격
+        self.assertTrue(any(p.startswith("ocr_dropped_invalid") for p in
+                            qa.check(en, ko, strict=True, ocr_dropped=["LJMS", "XYZ"])))
+
     def test_strict_form_block_and_untranslated(self):
         self.assertTrue(any(p.startswith("form_block") for p in qa.readability(
             "귀사는 조사하지 않았다. DISTRICT ADDRESS AND PHONE NUMBER Industry Information: www.fda.gov/oc/industry")))

@@ -127,16 +127,28 @@ def _codes(text: str) -> set[str]:
     return {c for c in _CODE_RE.findall(text or "") if c not in _CODE_ALLOW and len(c) >= 2}
 
 
-def _check_strict(en: str, ko: str) -> list[str]:
+OCR_DROPPED_MAX = 10
+
+
+def _check_strict(en: str, ko: str, dropped: Any = None) -> list[str]:
     problems: list[str] = []
     if not _HANGUL_RE.search(ko):
         problems.append("no_hangul")
     if _HANJA_RE.search(ko):
         problems.append("hanja")
+    # ocr_dropped: 번역자가 "OCR 이 깨뜨린 원문 토큰이라 옮기지 않았다"고 밝힌 숫자·코드(실측: 201'1 의 1·LJMS→LIMS·
+    # IO→10·POR→PQR). 원문에 실제로 있는 토큰만, 항목당 10개까지 — 배치 파일에 남아 사람이 검토한다.
+    drop: set[str] = set()
+    if dropped:
+        toks = [str(t) for t in dropped] if isinstance(dropped, list) else ["<not-a-list>"]
+        bad = [t for t in toks if not t or t not in en]
+        if bad or len(toks) > OCR_DROPPED_MAX:
+            problems.append("ocr_dropped_invalid:" + ",".join(bad[:5] or [str(len(toks))]))
+        drop = {t for t in toks if t and t in en}
     mask = _header_mask(en)
     need: Counter = Counter(m.group(0).rstrip(".,") for m in _NUM_STRICT_RE.finditer(en) if _outside(mask, m.start()))
     have = _nums(ko)
-    missing = [n for n, c in need.items() if have[n] < c and n not in ko]
+    missing = [n for n, c in need.items() if have[n] < c and n not in ko and n not in drop]
     if missing:
         problems.append("numbers_missing:" + ",".join(missing[:5]))
     if ko.count(_REDACTED) < en.count(_REDACTED):
@@ -149,17 +161,17 @@ def _check_strict(en: str, ko: str) -> list[str]:
     lost = sorted({m.group(0) for m in _CODE_RE.finditer(en)
                    if m.group(0) not in _CODE_ALLOW and len(m.group(0)) >= 2 and _outside(mask, m.start())
                    and (_outside(caps, m.start()) or re.search(r"[\d-]", m.group(0)))
-                   and m.group(0) not in ko})
+                   and m.group(0) not in ko and m.group(0) not in drop})
     if lost:
         problems.append("codes_missing:" + ",".join(lost[:5]))
     problems.extend(readability(ko))
     return problems
 
 
-def check(en: str, ko: str, *, strict: bool = False) -> list[str]:
+def check(en: str, ko: str, *, strict: bool = False, ocr_dropped: Any = None) -> list[str]:
     """어긴 규칙 목록(빈 목록 = 통과). 순수 함수. strict=True 는 11-15 읽기 좋음 규칙까지 본다."""
     if strict:
-        return _check_strict(str(en or ""), str(ko or ""))
+        return _check_strict(str(en or ""), str(ko or ""), ocr_dropped)
     problems: list[str] = []
     en, ko = str(en or ""), str(ko or "")
     if not _HANGUL_RE.search(ko):
@@ -185,7 +197,8 @@ def check_items(items: list[dict[str, Any]], *, strict: bool = False) -> dict[st
     """finding_id → 어긴 규칙(통과 항목은 빠짐)."""
     out: dict[str, list[str]] = {}
     for it in items:
-        probs = check(it.get("detail_text", ""), it.get("detail_text_ko", ""), strict=strict)
+        probs = check(it.get("detail_text", ""), it.get("detail_text_ko", ""), strict=strict,
+                      ocr_dropped=it.get("ocr_dropped"))
         if probs:
             out[str(it.get("finding_id"))] = probs
     return out

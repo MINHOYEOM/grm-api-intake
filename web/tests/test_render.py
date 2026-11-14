@@ -18637,8 +18637,10 @@ class WebEnFacetTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def _en_paths_from_data(self):
-        """영어 정본이 선언한 면 집합 — 렌더가 쓰는 **그 함수**에서 파생한다."""
-        return render.facet_tree_paths(self.en_data)
+        """영어 정본이 선언한 면 집합 — 렌더가 쓰는 **그 함수**에서 파생한다.
+        (한국어 짝이 없는 면은 렌더가 그리지 않는다 — restrict_facets_to_tree.)"""
+        return render.facet_tree_paths(
+            render.restrict_facets_to_tree(self.en_data, self.ko_data))
 
     def test_english_facet_data_declares_its_population(self):
         """파일 이름이 아니라 **데이터 자신**이 어느 모집단인지 말해야 한다."""
@@ -19536,7 +19538,8 @@ class WebEnTreeTest(unittest.TestCase):
         # 함수를 쓴다(테스트가 따로 세면 두 목록이 갈라지고, 그건 이 가드가 막으려던 것이다).
         cls.en_facets = (render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
                          if render.FINDINGS_FACETS_EN_FILE.exists() else None)
-        cls.expected |= render.facet_tree_paths(cls.en_facets)
+        cls.expected |= render.facet_tree_paths(
+            render.restrict_facets_to_tree(cls.en_facets, render.load_findings_facets()))
         cls.expected |= render.glossary_tree_paths(render.load_glossary())
         cls.expected |= render.clause_tree_paths(render.build_clause_views(
             docs, render.load_cfr_catalog(), render.load_glossary(), lang="en"))

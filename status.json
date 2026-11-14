@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-14T14:07:12Z",
+ "generated_at": "2026-11-14T19:09:31Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43593251730,
+    "databaseId": 43626847553,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-14T18:29:11Z",
+    "updatedAt": "2026-11-14T18:35:13Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1695 from MINHOYEOM/claude/glossary-fig-daily-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43626847553"
+   },
+   {
+    "databaseId": 43619435634,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-14T17:08:11Z",
+    "updatedAt": "2026-11-14T17:13:23Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh findings facet pages (#1697)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43619435634"
+   },
+   {
+    "databaseId": 43619204300,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-14T12:07:28Z",
-    "updatedAt": "2026-11-14T12:13:10Z",
-    "headBranch": "claude/glossary-fig-daily-20261114-2106",
-    "displayTitle": "glossary(fig): 2026-11-14 새 그림 0 · 다시 그림 0 · 보류 5 — 재시험일자·규격·품질·품질보증·품질관리",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43593251730"
+    "createdAt": "2026-11-14T17:05:43Z",
+    "updatedAt": "2026-11-14T17:11:31Z",
+    "headBranch": "claude/firm-alias-159",
+    "displayTitle": "feat(업체 별칭 159): OCR 로 갈라진 업체 키 3쌍 묶기 (DB 적용은 대표 승인 뒤)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43619204300"
    },
    {
-    "databaseId": 43593249027,
+    "databaseId": 43619194370,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-14T12:07:25Z",
-    "updatedAt": "2026-11-14T12:12:54Z",
-    "headBranch": "claude/glossary-fig-daily-20261114-2106",
-    "displayTitle": "glossary(fig): 2026-11-14 새 그림 0 · 다시 그림 0 · 보류 5 — 재시험일자·규격·품질·품질보증·…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43593249027"
+    "createdAt": "2026-11-14T17:05:36Z",
+    "updatedAt": "2026-11-14T17:11:27Z",
+    "headBranch": "claude/firm-alias-159",
+    "displayTitle": "feat(업체 별칭 159): OCR 로 갈라진 업체 키 3쌍 묶기 — 원문 불변, firm_alias 가산",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43619194370"
    },
    {
-    "databaseId": 43553719379,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-14T03:51:07Z",
-    "updatedAt": "2026-11-14T03:56:23Z",
-    "headBranch": "main",
-    "displayTitle": "chore: refresh recent regulatory news (#1691)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43553719379"
-   },
-   {
-    "databaseId": 43552534560,
+    "databaseId": 43617900551,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-14T03:36:48Z",
-    "updatedAt": "2026-11-14T03:42:18Z",
-    "headBranch": "automation/news-auto-43552478222",
-    "displayTitle": "chore: refresh recent regulatory news",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43552534560"
-   },
-   {
-    "databaseId": 43531158239,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-14T00:00:13Z",
-    "updatedAt": "2026-11-14T00:06:17Z",
-    "headBranch": "main",
-    "displayTitle": "chore: refresh live regulatory library (#1690)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43531158239"
+    "createdAt": "2026-11-14T16:51:38Z",
+    "updatedAt": "2026-11-14T16:56:38Z",
+    "headBranch": "automation/findings-facets-auto-43608789716",
+    "displayTitle": "chore: refresh findings facet pages",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43617900551"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 43625314453,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-14T18:12:44Z",
+    "updatedAt": "2026-11-14T18:12:48Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43625314453"
+   },
+   {
     "databaseId": 43567128402,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43296055757"
-   },
-   {
-    "databaseId": 43174401906,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-12T07:19:26Z",
-    "updatedAt": "2026-11-12T09:14:11Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43174401906"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 43626819966,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-14T18:28:52Z",
+    "updatedAt": "2026-11-14T18:29:14Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43626819966"
+   },
+   {
     "databaseId": 43569072448,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43300265475"
-   },
-   {
-    "databaseId": 43177296622,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-12T07:42:58Z",
-    "updatedAt": "2026-11-12T07:43:07Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43177296622"
    }
   ],
   "grm-cloud-request.yml": [

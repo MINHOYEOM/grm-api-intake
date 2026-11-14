@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-13T23:55:48Z",
+ "generated_at": "2026-11-14T00:19:29Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43531158239,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-14T00:00:13Z",
+    "updatedAt": "2026-11-14T00:06:17Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh live regulatory library (#1690)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43531158239"
+   },
+   {
     "databaseId": 43529560015,
     "status": "completed",
     "conclusion": "success",
@@ -216,27 +227,16 @@
     "headBranch": "claude/glossary-fig-daily-20261113-2108",
     "displayTitle": "glossary(fig): 2026-11-13 새 그림 0 · 다시 그림 0 · 보류 8 — gmp·api·api-start…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43422816730"
-   },
-   {
-    "databaseId": 43397622835,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-13T08:59:53Z",
-    "updatedAt": "2026-11-13T09:05:49Z",
-    "headBranch": "main",
-    "displayTitle": "fix(문구): 가입·로그인·구독·마이페이지 안내 구어체 정리 — 11-13 재점검 7 (#1684)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43397622835"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 43530661740,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-13T23:55:41Z",
-    "updatedAt": "2026-11-13T23:55:45Z",
+    "updatedAt": "2026-11-13T23:55:51Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43530661740"

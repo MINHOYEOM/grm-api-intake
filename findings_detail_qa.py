@@ -55,6 +55,9 @@ FORM_BLOCK_RE = re.compile(
     r"|DATE\S{0,4}\s*OF\s*INSP\S*|STRE?E?T\s+A\S{1,3}RESS|TYPE\s+EST\S*"
     # 실사관 서명 칸(실측: "Muna Alghari beh, Investi gator"·"PREVIOUS EDmON OBSOLEJE"·"FORM FDA ~83 (09/08)")
     r"|,\s*(?:Senior\s+|Lead\s+)?I\s?n\s?v\s?e\s?s\s?t\s?i\s?g\s?a\s?t\s?o\s?r\b|\bDATE\s+ISSUED\b"
+    # 실측: "FEINUMBER 300382.1988"·"OATE(S) Of INSPECTl::>N"·"…483response@fda.hhs.gov"·"TO WiOM REPORT ISSUED"
+    r"|\bFEI\s*NUMBER|\b[OD]ATE\(?S\)?\s+O[Ff]\s+INSP|483\s*response\S*|REPORT\s+IS\S*ED\b"
+    r"|\b[CQO]\S?[TI]?Y[,.]?\s*STAT\S{0,3}[,.]?\s*Z\S{1,2}P|\bF\s?I\s?R\s?M\s?N\s?A\s?M\s?E\b|STREET\s+AD\S{2,5}"
     r"|PREVIOUS\s+ED\S{2,5}\s+OBSOL|\bFORM\s+FDA\s+\S{2,4}\s*\(\d\d/\d\d\)|Digitally\s+signed",
     re.IGNORECASE)
 # 대문자 낱말 3개 이상이 잇따르면 약어가 아니라 양식 칸·강조 문장이다("THIS IS A REPEAT OBSERVATION") — 번역 대상.

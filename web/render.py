@@ -5383,6 +5383,12 @@ RETIRED_PAGE_REDIRECTS: tuple[tuple[str, str], ...] = (
     ("/findings/browse/index.html", "/browse/"),
     ("/en/findings/browse/", "/en/browse/"),
     ("/en/findings/browse/index.html", "/en/browse/"),
+    # [2026-11-15] 브리프 주소는 /briefs/{날짜}/ 인데 /briefs/ 자체는 면이 없어 404 였다(주소창에서
+    # 날짜를 지워 올라가는 방문자). 지난 호 목록 /archive/ 로 잇는다.
+    ("/briefs/", "/archive/"),
+    ("/briefs/index.html", "/archive/"),
+    ("/en/briefs/", "/en/archive/"),
+    ("/en/briefs/index.html", "/en/archive/"),
 )
 
 

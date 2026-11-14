@@ -335,7 +335,8 @@
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
 .foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
 .foot-copy .foot-ico .ti{font-size:13px;line-height:1}
-@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
+{# [면책 문구 줄바꿈 2026-11-14] 종전 max-width:60ch(=411px)가 한글 문장을 접어 '있습니다.' 한 어절만 오른쪽 아래로 떨어졌다. 폭 제한을 풀어 남는 폭이면 한 줄, 좁은 데스크톱에서 접힐 때만 balance 로 두 줄을 고르게. -#}
+@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:none;text-wrap:balance}}
 </style>
 {# [모바일·태블릿 헤더 2026-09-06] 좁은 폭에서 헤더 한 줄이 넘쳐 로그인(.grm-auth)이 화면
    **밖으로** 나가던 결함 수리. 로컬 빌드 실측(320/375/641/753/885px): 헤더 행이 요구하는

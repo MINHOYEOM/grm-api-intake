@@ -1033,6 +1033,21 @@ class WebRenderGoldenTest(unittest.TestCase):
         self.assertIn("overflow-wrap:break-word", rule)
         self.assertNotIn("overflow-wrap:anywhere", rule)
 
+    def test_korean_orphan_line_defaults_and_footer_disclaimer_uncapped(self):
+        """★[한국어 고아 줄 2026-11-14] 실측(1440·375, 14쪽): 마지막 줄에 '있습니다.'·'활동입니다.'
+        한 어절만 떨어지는 곳이 데스크톱 69 · 모바일 113곳. 문단 pretty·제목 balance 를 전역 기본값으로
+        둔다. 푸터 면책 문구는 60ch(=411px) 상한이 남는 폭에서도 문장을 접어 '있습니다.' 만 오른쪽
+        아래로 떨어뜨렸다 — ch 상한이 되살아나면 실패한다."""
+        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
+        self.assertRegex(css, r"\nbody\{text-wrap:pretty\}", "전역 문단 pretty 기본값이 사라졌다")
+        self.assertRegex(css, r"\nh1,h2,h3,h4,h5,h6\{text-wrap:balance\}", "제목 balance 기본값이 사라졌다")
+        m = re.search(r"\n\.foot-disclaimer\{([^}]*)\}", css)
+        self.assertIsNotNone(m, "grm.css .foot-disclaimer 규칙 미발견")
+        self.assertNotRegex(m.group(1), r"max-width:\s*\d+ch")
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        for rule in re.findall(r"\.foot-disclaimer\{([^}]*)\}", base):
+            self.assertNotRegex(rule, r"max-width:\s*\d+ch", "base.html 면책 문구에 ch 폭 상한이 되살아났다")
+
     def test_page_head_paragraph_has_no_ch_cap(self):
         """★[62ch 캡 폐기 2026-08-12] `ch` 는 숫자 `0` 의 폭이라 한글에는 62ch ≈ 31자다 —
         컨테이너 1,180px 인데 609px 에서 접혔다. 그래서 **12개 템플릿 중 10개가 이미

@@ -8497,6 +8497,27 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn('class="subscribe"', welcome)
         self.assertNotIn('id="grm-cta"', welcome)
 
+    def test_subscribe_links_jump_focus_or_hide(self):
+        """[2026-11-15 대표 신고] '무료 구독'(#subscribe)을 눌러도 아무 일이 없어 보였다 — 밴드가 링크
+        바로 아래라 스크롤이 거의 안 움직이고, 이미 구독한 브라우저는 밴드가 숨어 링크가 빈 곳을 가리켰다.
+        밴드가 있으면 이메일 칸에 커서+강조, 숨었으면 링크를 감춘다(hidden 속성 말고 style)."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            html = self._render_detail(_minimal_brief("2026-06-06"))
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        i = html.index("a[href=\"#subscribe\"]")
+        js = html[i:html.index("</script>", i)]
+        self.assertIn("grm-sub-email", js)
+        self.assertIn(".focus(", js)
+        self.assertIn("sub-flash", js)
+        self.assertIn("style.display='none'", js)
+        self.assertIn("prefers-reduced-motion", js)
+        self.assertIn(".subscribe.sub-flash{", html)
+        # 밴드를 숨기는 구독 완료 스크립트가 먼저 돌아야 sec.hidden 을 읽을 수 있다.
+        self.assertLess(html.index("localStorage.getItem('grm-sub-ok')"), i)
+
     def test_subscribe_band_remembers_completed_subscription(self):
         """[2026-09-23 마케팅 계획 C-06 감사] 배너는 `grm-sub-ok` 를 읽어 다시 뜨지 않는데
         밴드는 안 그랬다 — 이미 구독한 방문자도 다음 페이지에서 빈 폼을 또 만난다(이중

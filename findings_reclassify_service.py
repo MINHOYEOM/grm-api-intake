@@ -123,6 +123,7 @@ def plan_reclassification(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         plan.append({
             "finding_id": finding_id,
+            "source": str(row.get("source") or ""),
             "old_category": old_category,
             "new_category": new_category,
             "old_taxonomy_version": old_taxonomy_version,
@@ -229,6 +230,11 @@ def run_reclassify(
         "category_changes": 0,
         "version_only_stamps": 0,
         "category_migration_matrix": {},
+        # [2026-11-15 #1515] 바뀌는 행 목록. 예전 보고서는 건수·이동 매트릭스만 남겨
+        # apply 뒤 "어느 행이 어디서 왔는지"를 알 수 없었다(되돌릴 수 없었다).
+        # dry-run 에서 대상을 사람이 검토하고, apply 뒤엔 이 목록이 되돌림 원장이다.
+        # version-only 스탬프는 category 가 그대로라 되돌릴 것이 없어 뺀다.
+        "category_change_rows": [],
         "patched": 0,
         "matched_zero": 0,
         "errors": [],
@@ -255,6 +261,12 @@ def run_reclassify(
     report["category_changes"] = sum(1 for item in plan if item["old_category"] != item["new_category"])
     report["version_only_stamps"] = report["changes_planned"] - report["category_changes"]
     report["category_migration_matrix"] = _category_migration_matrix(plan)
+    report["category_change_rows"] = [
+        {"finding_id": item["finding_id"], "source": item.get("source", ""),
+         "old_category": item["old_category"], "new_category": item["new_category"],
+         "old_taxonomy_version": item["old_taxonomy_version"]}
+        for item in plan if item["old_category"] != item["new_category"]
+    ]
 
     if dry_run:
         return report

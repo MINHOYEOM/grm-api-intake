@@ -5008,9 +5008,16 @@ def main() -> int:
         [] if findings_supabase and env_flag("RAW_SIGNALS_HEAL", True) else None)
     # [대기열 그림자 2026-11-12] 노션 대기열에 새로 들어간 항목을 모아 DB 대기열(intake_queue)에도
     # 넣는다. ENABLE_INTAKE_QUEUE_SHADOW 가 꺼져 있으면 None = 종전과 완전히 같다.
+    # [handoff 정본 DB 2026-11-13] GRM_HANDOFF_SOURCE=db 면 아래 DB handoff 가 정본이다(스캐폴드·health).
+    # 꺼져 있으면(기본 notion) 이 값은 False 이고 아래 모든 분기가 종전 길을 탄다.
+    handoff_db = bool(grm_queue.handoff_source() == "db" and args.emit_routine_handoff
+                      and findings_supabase and not args.dry_run)
+    if grm_queue.handoff_source() == "db" and args.emit_routine_handoff and not handoff_db \
+            and not args.dry_run:
+        log("WARN", "GRM_HANDOFF_SOURCE=db 이지만 Supabase 설정이 없어 노션 handoff 를 정본으로 진행")
     queue_new_items: list[IntakeItem] | None = (
         [] if findings_supabase and not args.dry_run
-        and (grm_queue.shadow_enabled() or queue_db_dedup) else None)
+        and (grm_queue.shadow_enabled() or queue_db_dedup or handoff_db) else None)
     for spec in INTAKE_SOURCE_SPECS:
         if spec.prefix == "search":
             continue  # search 는 아래 결합 블록에서 처리
@@ -5235,6 +5242,8 @@ def main() -> int:
                 # §1-B: web brief emit 활성 시 산출 디렉터리(없으면 None=비활성). raw 가
                 # 살아있는 handoff v2 경로 내부에서만 산출(빈슬롯 grm-web-card/v1).
                 web_brief_dir = resolve_web_brief_dir() if _enable_web_brief_emit() else None
+                if handoff_db:
+                    web_brief_dir = None    # 스캐폴드는 DB handoff 가 낸다(아래) — 노션 것은 거울이라 내지 않는다
                 handoff_row_count, handoff_url = emit_routine_handoff(
                     notion_token, notion_db, run_date, handoff_window_days, collected_at,
                     source_names=handoff_sources, doc_ids=handoff_doc_ids,
@@ -5258,8 +5267,15 @@ def main() -> int:
     # ★순서: 반드시 원문 갱신(R4, 위의 raw_update.apply_updates) **뒤**에 돈다. 노션 handoff 는 오늘
     #   다시 받은 판으로 카드를 만들므로, DB 도 오늘 판이 반영된 뒤에 읽어야 둘이 같다(재생 대조 10-1).
     #   시험(test_grm_queue.OrderTest)이 이 순서를 잠근다.
+    shadow_report: dict[str, Any] | None = None
     if queue_new_items is not None and findings_supabase:
         try:
+            _canonical_kwargs: dict[str, Any] = {}
+            if handoff_db:
+                _canonical_kwargs = {
+                    "canonical": True,
+                    "canonical_web_brief_dir": (
+                        resolve_web_brief_dir() if _enable_web_brief_emit() else None)}
             shadow_report = grm_queue.run_shadow(
                 findings_supabase, run_date=run_date, generated_at=collected_at,
                 window_days=handoff_window_days, display_window_days=args.window_days,
@@ -5269,12 +5285,37 @@ def main() -> int:
                     (lambda handoff_date, _keys: grm_queue.notion_status_map(
                         notion_token, notion_db, handoff_date, handoff_window_days))
                     if notion_token and notion_db else None),
-                silent_sources=coverage_silent_sources)
+                silent_sources=coverage_silent_sources, **_canonical_kwargs)
             # health JSON 의 `store.queue` 로 남긴다(가산 키) — 넣기·보충·동결·경고 수.
             store_counters["queue"] = grm_queue.health_summary(shadow_report)
         except Exception as e:  # noqa: BLE001 — 그림자가 수집을 깨면 안 된다
+            shadow_report = None
             log("WARN", f"대기열 그림자 실패(수집·노션 handoff 는 정상): "
                         f"{type(e).__name__}: {truncate(str(e), 160)}")
+
+    # [handoff 정본 DB 2026-11-13] GRM_HANDOFF_SOURCE=db — 그날 handoff 의 성패는 DB handoff 가 정한다.
+    # 노션 handoff 페이지(위)는 거울이다: 그 결과는 `store.handoff_source.notion_mirror` 에만 남기고,
+    # 실패해도 handoff 실패로 치지 않는다(노션 행 생성 실패는 종전대로 따로 failure 로 잡힌다).
+    if handoff_db:
+        _canon = (shadow_report or {}).get("canonical") or {}
+        store_counters["handoff_source"] = {
+            "source": "db",
+            "notion_mirror": ("ok" if handoff_emitted else "failed" if handoff_failed else "skipped"),
+            "notion_mirror_rows": handoff_row_count,
+            "notion_mirror_error": handoff_error_msg,
+            "frozen": str(_canon.get("frozen") or ""),
+            "web_brief": bool(_canon.get("web_brief")),
+        }
+        if handoff_failed:
+            log("WARN", f"노션 handoff 거울 실패(정본은 DB handoff): {handoff_error_msg}")
+        handoff_emitted = bool(_canon.get("ok"))
+        handoff_failed = not handoff_emitted
+        handoff_row_count = int(_canon.get("rows") or 0)
+        handoff_url = ""
+        handoff_error_msg = "" if handoff_emitted else (
+            str(_canon.get("error") or "") or "DB handoff 를 만들지 못했다(대기열 그림자 실패)")
+        if handoff_failed:
+            log("ERROR", f"DB handoff(정본) 생성 실패: {handoff_error_msg}")
 
     # B1 임시 방어 ②: 윈도우 밖 미소비 New 카운트(읽기전용 — dry-run 도 자격증명이
     # 있으면 수행해 검증 루프로 쓸 수 있다). 실패는 조용한 0 이 아니라 경고로 표면화.

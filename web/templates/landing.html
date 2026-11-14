@@ -1,57 +1,86 @@
 {% extends "base.html" %}
 {% block content %}
-{#- [홈 4단 2026-11-12] 대표 확정안(GRM_웹사이트UIUX_개선안_2026-11-11_Fable.md 0절 2번) 순서:
-    사이트 소개 한 문장 → 검색 → 제공 정보 세 칸(업체·용어·기관, 실제 결과 한 건씩) →
-    이번 주 핵심+구독 / 신규 공개 문서 → 찾아보기. 알 마스코트·퀴즈·인기 카드·기능 소개는
-    홈에서 내렸다. 예시 값은 render.build_home_showcase 가 커밋 스냅샷에서 계산한다(손으로
-    적은 예시는 낡는다). 칸마다 데이터가 없으면 그 칸만 빠진다.
+{#- [홈 4단 2026-11-12 · 내용 먼저 2026-11-14] 대표 확정안(GRM_웹사이트UIUX_개선안_2026-11-11_Fable.md
+    0절 2번) 순서는 그대로다: 사이트 소개 한 문장 → 검색 → 제공 정보 세 칸 → 이번 주 핵심 /
+    신규 공개 문서 → 찾아보기. 11-14 시안 선택("A 바탕 + 지적 한 건 칸")으로 세 칸이 건수 요약
+    대신 **실제 내용**을 싣는다 — 첫 칸은 최근 공개된 지적 한 건과 거기서 이어지는 업체·실사관·
+    분류·용어·문서, 둘째 칸은 용어의 뜻, 셋째 칸은 기관의 지적 영역 막대. 색·글꼴은 그대로다.
+    값은 render.build_home_showcase 가 커밋 스냅샷에서 계산한다(손으로 적은 예시는 낡는다).
+    칸마다 데이터가 없으면 그 칸만 빠진다. 이 화면은 원격 호출을 하지 않는다.
+    실사관 이름은 문서 화면과 같이 평문이고 줄은 실사관 조회 화면으로 간다(프로파일 유무는
+    런타임이 안다 — doc_inspector_line 주석). 분류 줄은 그 모음 화면이 있는 언어 트리에서만 링크다.
     검색 칸은 전역 검색 화면(search/?q=, 헤더 검색과 같은 곳)을 부른다.
+    [2026-11-15] 이번 주 핵심은 번호·출처 표지·명조 제목(첫 줄이 가장 크다), 신규 공개 문서는
+    출처 색 표지. 표지 색은 기관마다 하나(.hs-*)이고 값은 render.home_source_tag 가 정한다.
+    검색 단추는 누르면 '검색 중'으로 바뀐다(검색 화면으로 넘어가는 동안의 진행 표시).
     id=watchlist 는 뉴스레터(newsletter.py)가 직링크하는 앵커라 남긴다(파일 간 계약). -#}
 <main class="home">
   <section class="wrap home-top">
     <h1 class="home-h">{{ _("세계 규제기관이 제약 현장에서 지적한 내용을 한국어로 찾아봅니다.") }}</h1>
-    <p class="home-lede">{{ _("FDA 483·경고서한, 식약처 실사·행정처분, 캐나다·EU·영국·일본의 공개 기록을 원문과 함께 제공합니다. 주간 브리프는 매주 월요일 발행합니다.") }}</p>
-{#- 총계는 그 언어 트리의 정본(findings_facets / findings_facets_en)에서 온다 — 영문 홈이 한국어판 수를
-    쓰지 않게 하는 계약(WebEnTreeTest). 기준일을 함께 적는다(스냅샷이라 검색 화면과 며칠 어긋난다). #}
-{% if findings_zone %}
-    <p class="home-count">{{ _("문서 {docs}건 · 지적 {n}건 · {asof} 기준", docs=findings_zone.documents, n=findings_zone.findings, asof=findings_zone.as_of) }}</p>
-{% endif %}
+    <p class="home-lede">{{ _("FDA 483·경고서한, 식약처 실사·행정처분, 캐나다·EU·영국의 공개 기록을 원문과 함께 제공합니다. 주간 브리프는 매주 월요일 발행합니다.") }}</p>
     <form class="home-search" action="{{ rel_root }}search/index.html" method="get" role="search">
       <input type="search" name="q" placeholder="{{ _('업체명, 조항, 용어, 지적 문장') }}" aria-label="{{ _('검색어') }}" autocomplete="off">
-      <button type="submit" class="btn coral">{{ _("검색") }}</button>
+      <button type="submit" class="btn coral" data-busy="{{ _('검색 중') }}">{{ _("검색") }}</button>
     </form>
+{% if showcase and showcase.examples %}
+    <p class="home-eg"><span>{{ _("예시") }}</span>{% for ex in showcase.examples %}<a href="{{ rel_root }}search/index.html?q={{ ex | urlencode }}">{{ ex }}</a>{% endfor %}</p>
+{% endif %}
+{#- [4-A 2026-11-15] 누적 건수 줄(문서·지적·기준일)은 홈에서 뺐다 — 주 1회 스냅샷이라 기준일이
+    늘 며칠 낡아 보인다(대표 결정). 같은 수는 찾아보기·지적 검색 화면에 그대로 있다. #}
   </section>
 
-{% if showcase and (showcase.firm or showcase.term or showcase.agency) %}
+{% if showcase and (showcase.case or showcase.term or showcase.agency) %}
   <section class="wrap home-sec">
     <h2 class="home-h2">{{ _("제공 정보") }}</h2>
     <div class="home-three">
-{% if showcase.firm %}
-      <a class="home-demo" href="{{ rel_root }}findings/firm/index.html?key={{ showcase.firm.key | urlencode }}">
-        <span class="hd-ask">{{ _("업체별 지적 이력") }}</span>
-        <span class="hd-in">{{ showcase.firm.name }}</span>
-        <span class="hd-out">{{ _("공개 문서 {d}건 · 지적 {n}건", d=showcase.firm.documents, n=showcase.firm.findings) }}</span>
-{% if showcase.firm.latest_cats %}
-        <span class="hd-meta">{{ _("최근: {src} {cats}", src=showcase.firm.latest_source, cats=showcase.firm.latest_cats) }}</span>
+{% if showcase.case %}
+{% set c = showcase.case %}
+      <div class="home-cell home-case">
+        <p class="hc-lab">{{ _("최근 공개된 지적 한 건") }}</p>
+        <p class="hc-quote">{{ c.body }}</p>
+{% if c.orig %}
+        <p class="hc-orig" lang="en">{{ c.orig }}</p>
 {% endif %}
-        <span class="hd-go">{{ _("업체 조회") }}</span>
-      </a>
+        <p class="hc-meta">{{ c.source }} · {{ _("공개 {d}", d=c.published) }}{% if c.inspected %} · {{ _("실사 {d}", d=c.inspected) }}{% endif %}</p>
+        <ul class="hc-links">
+          <li><a href="{{ rel_root }}findings/firm/index.html?key={{ c.firm_key | urlencode }}"><span class="hc-k">{{ _("업체") }}</span><span class="hc-v">{{ c.firm }}</span><span class="hc-go">{{ _("지적 이력") }}</span></a></li>
+{% if c.inspector %}
+          <li><a href="{{ rel_root }}findings/inspector/index.html"><span class="hc-k">{{ _("실사관") }}</span><span class="hc-v">{{ c.inspector }}</span><span class="hc-go">{{ _("실사관 이력 조회") }}</span></a></li>
+{% endif %}
+{% if c.category_slug and (lang == 'ko' or ('findings/c/' ~ c.category_slug ~ '/') in en_paths) %}
+          <li><a href="{{ rel_root }}findings/c/{{ c.category_slug }}/index.html"><span class="hc-k">{{ _("분류") }}</span><span class="hc-v">{{ c.category }}</span><span class="hc-go">{{ _("같은 분류 지적") }}</span></a></li>
+{% else %}
+          <li><span class="hc-row"><span class="hc-k">{{ _("분류") }}</span><span class="hc-v">{{ c.category }}</span></span></li>
+{% endif %}
+{% if c.term %}
+          <li><a href="{{ rel_root }}glossary/{{ c.term.id }}/index.html"><span class="hc-k">{{ _("용어") }}</span><span class="hc-v">{{ c.term.name }}</span><span class="hc-go">{{ _("뜻과 근거 조항") }}</span></a></li>
+{% endif %}
+          <li><a href="{{ rel_root }}findings/doc/{{ c.slug }}/index.html"><span class="hc-k">{{ _("문서") }}</span><span class="hc-v">{{ c.source }}</span><span class="hc-go">{{ _("지적 전체") }}</span></a></li>
+        </ul>
+      </div>
 {% endif %}
 {% if showcase.term %}
-      <a class="home-demo" href="{{ rel_root }}glossary/{{ showcase.term.id }}/index.html">
-        <span class="hd-ask">{{ _("용어 해설과 지적 사례") }}</span>
-        <span class="hd-in">{{ showcase.term.name }}</span>
-        <span class="hd-out">{{ _("정의 · 근거 조항 · 관련 지적 {n}건", n=showcase.term.findings) }}</span>
-        <span class="hd-go">{{ _("용어사전") }}</span>
+      <a class="home-cell" href="{{ rel_root }}glossary/{{ showcase.term.id }}/index.html">
+        <span class="hc-lab">{{ _("용어 해설과 지적 사례") }}</span>
+        <span class="hc-name">{{ showcase.term.name }}{% if showcase.term.alt %} <span class="hc-alt" lang="en">{{ showcase.term.alt }}</span>{% endif %}</span>
+{% if showcase.term.definition %}
+        <span class="hc-def">{{ showcase.term.definition }}</span>
+{% endif %}
+        <span class="hc-meta">{% if showcase.term.ref %}{{ showcase.term.ref }} · {% endif %}{{ _("관련 지적 {n}건", n=showcase.term.findings) }}</span>
+        <span class="hc-more">{{ _("용어사전") }}</span>
       </a>
 {% endif %}
 {% if showcase.agency %}
-      <a class="home-demo" href="{{ rel_root }}findings/trends/index.html">
-        <span class="hd-ask">{{ _("기관별 지적 경향") }}</span>
-        <span class="hd-in">{{ showcase.agency.label }}</span>
-        <span class="hd-out">{% for t in showcase.agency.top %}{{ _("{label} {n}건", label=t.label, n=t.n) }}{% if not loop.last %} · {% endif %}{% endfor %}</span>
-        <span class="hd-meta">{{ _("누적 · {d} 기준", d=showcase.agency.as_of) }}</span>
-        <span class="hd-go">{{ _("지적 영역 경향") }}</span>
+      <a class="home-cell" href="{{ rel_root }}findings/trends/index.html">
+        <span class="hc-lab">{{ _("기관별 지적 경향") }}</span>
+        <span class="hc-name">{{ showcase.agency.label }}</span>
+        <span class="hc-bars">
+{% for t in showcase.agency.top %}
+          <span class="hc-bar"><span class="hb-l">{{ t.label }}</span><span class="hb-t"><i style="width:{{ t.pct }}%"></i></span><span class="hb-n">{{ t.n }}</span></span>
+{% endfor %}
+        </span>
+        <span class="hc-meta">{{ _("누적 · {d} 기준", d=showcase.agency.as_of) }}</span>
+        <span class="hc-more">{{ _("지적 영역 경향") }}</span>
       </a>
 {% endif %}
     </div>
@@ -64,8 +93,8 @@
       <h2 class="home-h2">{{ _("이번 주 핵심") }}</h2>
 {% if cover.tldr %}
       <ul class="home-tl">
-{% for t in cover.tldr %}
-        <li>{{ t }}</li>
+{% for t in cover.tldr_items %}
+        <li><span class="ht-b">{% if t.src_cls %}<span class="hs hs-{{ t.src_cls }}">{{ t.src_label }}</span>{% endif %}<span class="ht-t">{{ t.text }}</span></span></li>
 {% endfor %}
       </ul>
 {% endif %}
@@ -77,7 +106,7 @@
       <h2 class="home-h2">{{ _("신규 공개 문서") }}</h2>
       <ul class="home-rows">
 {% for d in showcase.new_docs %}
-        <li><span class="hr-d">{{ d.date }}</span><span class="hr-a">{{ d.source }}</span><a class="hr-t" href="{{ rel_root }}findings/doc/{{ d.slug }}/index.html">{{ d.firm }}{% if d.cats %}<span class="hr-c">{{ d.cats }}</span>{% endif %}</a></li>
+        <li><span class="hr-d">{{ d.date }}</span><span class="hr-a">{% if d.src_cls %}<span class="hs hs-{{ d.src_cls }}">{{ d.source }}</span>{% else %}{{ d.source }}{% endif %}</span><a class="hr-t" href="{{ rel_root }}findings/doc/{{ d.slug }}/index.html">{{ d.firm }}{% if d.cats %}<span class="hr-c">{{ d.cats }}</span>{% endif %}</a></li>
 {% endfor %}
       </ul>
 {% if lang == 'ko' or 'findings/docs/' in en_paths %}
@@ -110,43 +139,116 @@
   </section>
 </main>
 <style>
-.home{padding:40px 0 56px}
-.home-top{display:flex;flex-direction:column;gap:14px}
-.home-h{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.35;color:var(--ink);margin:0;max-width:30em;word-break:keep-all}
-.home-lede{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--body);margin:0;max-width:44em;word-break:keep-all}
-.home-count{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0}
-.home-search{display:flex;gap:8px;max-width:640px;margin-top:6px}
-.home-search input{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--canvas);color:var(--ink)}
+.home{padding:34px 0 56px}
+.home-top{display:flex;flex-direction:column;gap:12px}
+.home-h{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.25;letter-spacing:-.015em;color:var(--ink);margin:0;max-width:22em;word-break:keep-all}
+.home-lede{font-family:var(--sans);font-size:15.5px;line-height:1.7;color:var(--body);margin:0;max-width:44em;word-break:keep-all}
+.home-search{display:flex;gap:8px;max-width:680px;margin-top:4px}
+.home-search input{flex:1;min-width:0;font:inherit;font-size:16px;padding:14px 16px;border:1.5px solid var(--ink);border-radius:var(--rad);background:#fff;color:var(--ink)}
 .home-search input:focus{outline:2px solid var(--coral);outline-offset:1px}
-.home-sec{margin-top:44px}
-.home-h2{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--ink);margin:0 0 14px}
-.home-three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-@media(max-width:860px){.home-three{grid-template-columns:1fr}}
-.home-demo{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);text-decoration:none;color:var(--body)}
-.home-demo:hover{border-color:var(--coral)}
-.hd-ask{font-size:12.5px;color:var(--muted)}
-.hd-in{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);word-break:keep-all}
-.hd-out{font-size:14px;color:var(--ink);word-break:keep-all}
-.hd-meta{font-size:12.5px;color:var(--muted);word-break:keep-all}
-.hd-go{margin-top:auto;padding-top:6px;font-size:13px;font-weight:500;color:var(--coral-2)}
-.home-half{display:grid;grid-template-columns:1fr 1fr;gap:32px}
-@media(max-width:860px){.home-half{grid-template-columns:1fr}}
-.home-tl{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.6;color:var(--ink);word-break:keep-all}
-.home-links{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px}
-.home-links a,.home-idx a,.home-watch a{color:var(--coral-2);text-decoration:none}
-.home-links a:hover,.home-idx a:hover,.home-watch a:hover{color:var(--coral)}
+.home-search .btn{padding-left:22px;padding-right:22px}
+.home-eg{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0;font-size:13.5px;color:var(--muted)}
+.home-eg a{color:var(--coral-2);text-decoration:none;border-bottom:1px solid var(--coral-tint)}
+.home-eg a:hover{color:var(--coral);border-bottom-color:var(--coral)}
+.home-search .btn.is-busy{display:inline-flex;align-items:center;gap:8px;background:var(--coral-2)}
+.home-search .btn.is-busy::before{content:"";width:13px;height:13px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:home-spin .8s linear infinite}
+@keyframes home-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.home-search .btn.is-busy::before{animation:none;border-right-color:#fff}}
+/* 출처 색 표지 — 기관마다 하나, 채도를 낮춘 색. 홈 전용(공용 CSS 를 건드리지 않는다). */
+.hs{display:inline-block;font-family:var(--sans);font-weight:600;font-size:11.5px;line-height:1.5;padding:1px 8px;border-radius:4px;white-space:nowrap}
+.hs-fda{background:#E3E9F0;color:#3E5C76}
+.hs-mfds{background:#E2EDE8;color:#2F6B5E}
+.hs-eu{background:#EDE6EE;color:#6B4E71}
+.hs-uk{background:#ECEBDA;color:#66652F}
+.hs-hc{background:#F3EAD9;color:#8A6426}
+.home-sec{margin-top:30px}
+.home-h2{font-family:var(--sans);font-weight:600;font-size:13px;color:var(--muted);margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.home-three{display:grid;grid-template-columns:1.35fr 1fr 1fr;background:#fff;border:1px solid var(--line-2);border-radius:var(--rad);overflow:hidden}
+.home-cell{display:flex;flex-direction:column;gap:8px;min-width:0;padding:22px 24px;border-left:1px solid var(--line);text-decoration:none;color:var(--body)}
+.home-cell:first-child{border-left:0}
+a.home-cell:hover{background:var(--canvas)}
+.hc-lab{margin:0;font-size:12.5px;font-weight:600;color:var(--coral-2)}
+.hc-quote{margin:0;font-family:var(--serif);font-weight:500;font-size:17.5px;line-height:1.6;color:var(--ink);word-break:keep-all}
+.hc-orig{margin:0;font-family:var(--serif);font-size:13px;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hc-meta{margin:0;font-size:12.5px;color:var(--muted);word-break:keep-all}
+.hc-links{list-style:none;margin:6px 0 0;padding:0;border-top:1px solid var(--line)}
+.hc-links a,.hc-row{display:grid;grid-template-columns:52px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline;text-decoration:none}
+.hc-links li:last-child a{border-bottom:0;padding-bottom:0}
+.hc-k{font-size:12.5px;color:var(--muted)}
+.hc-v{color:var(--ink);font-weight:600;min-width:0;word-break:keep-all}
+.hc-go{font-size:12.5px;color:var(--coral-2);white-space:nowrap}
+.hc-links a:hover .hc-v,.hc-links a:hover .hc-go{color:var(--coral)}
+.hc-name{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.3;color:var(--ink);margin-top:2px;word-break:keep-all}
+.hc-alt{font-family:var(--sans);font-weight:400;font-size:14px;color:var(--muted)}
+.hc-def{font-size:14.5px;line-height:1.65;color:var(--body);word-break:keep-all}
+.hc-more{margin-top:auto;padding-top:8px;font-size:13.5px;font-weight:600;color:var(--coral-2)}
+a.home-cell:hover .hc-more{color:var(--coral)}
+.hc-bars{display:flex;flex-direction:column;gap:9px;margin:4px 0 2px}
+.hc-bar{display:grid;grid-template-columns:minmax(0,7.5em) 1fr auto;gap:8px;align-items:center;font-size:13px;color:var(--body)}
+.hb-l{word-break:keep-all;line-height:1.3}
+.hb-t{display:block;height:8px}
+.hb-t i{display:block;height:8px;background:var(--coral);border-radius:2px}
+.hb-n{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;min-width:2.6em}
+.home-half{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.home-tl{list-style:none;margin:0;padding:0;color:var(--ink);word-break:keep-all;counter-reset:home-n}
+.home-tl li{counter-increment:home-n;display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px;padding:14px 0;border-bottom:1px solid var(--line)}
+.home-tl li:first-child{padding-top:2px}
+.home-tl li::before{content:counter(home-n);font-family:var(--serif);font-weight:500;font-size:28px;line-height:1.1;color:var(--coral)}
+.ht-b{display:block;min-width:0}
+.ht-t{display:block;margin-top:5px;font-family:var(--serif);font-weight:500;font-size:17px;line-height:1.5}
+.ht-nb{white-space:nowrap}
+.home-tl li:first-child .ht-t{font-size:21px;line-height:1.42}
+.home-links{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;font-weight:600}
+.home-links a,.home-watch a{color:var(--coral-2);text-decoration:none}
+.home-links a:hover,.home-watch a:hover{color:var(--coral)}
 .home-rows{list-style:none;margin:0;padding:0}
-.home-rows li{display:grid;grid-template-columns:44px 96px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line-2);font-size:14px;align-items:baseline}
-.home-rows li:last-child{border-bottom:1px solid var(--line-2)}
+.home-rows li{display:grid;grid-template-columns:44px 84px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
+.home-rows li:first-child{padding-top:0}
 .hr-d{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .hr-a{font-size:12.5px;color:var(--muted)}
-.hr-t{color:var(--ink);text-decoration:none;word-break:keep-all;min-width:0}
+.hr-t{color:var(--ink);font-weight:500;text-decoration:none;word-break:keep-all;min-width:0}
 .hr-t:hover{color:var(--coral)}
-.hr-c{display:block;font-size:12.5px;color:var(--muted)}
-@media(max-width:520px){.home-rows li{grid-template-columns:44px 1fr}.hr-a{grid-column:2}.hr-t{grid-column:1 / -1}}
-.home-idx{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;font-size:15px}
+.hr-c{display:block;font-size:12.5px;font-weight:400;color:var(--muted)}
+.home-idx{display:flex;flex-wrap:wrap;gap:8px;margin:0;font-size:14px}
+.home-idx a{padding:8px 14px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:#fff;color:var(--ink);text-decoration:none}
+.home-idx a:hover{border-color:var(--coral);color:var(--coral-2)}
+.home-idx a.home-idx-all{background:none;border-color:transparent;color:var(--coral-2);font-weight:600}
 .home-watch{margin:16px 0 0;font-size:13.5px;color:var(--muted);word-break:keep-all}
+@media(max-width:980px){
+  .home-three{grid-template-columns:1fr}
+  .home-cell{border-left:0;border-top:1px solid var(--line)}
+  .home-cell:first-child{border-top:0}
+}
+@media(max-width:860px){.home-half{grid-template-columns:1fr;gap:32px}}
+@media(max-width:600px){
+  .home{padding:22px 0 44px}
+  .home-sec{margin-top:26px}
+  .home-h{font-size:25px;line-height:1.32}
+  .home-lede{font-size:14.5px}
+  .home-search .btn{padding-left:16px;padding-right:16px}
+  .home-cell{padding:18px}
+  .hc-quote{font-size:16.5px}
+  .hc-links a,.hc-row{grid-template-columns:48px 1fr}
+  .hc-go{display:none}
+  .home-rows li{grid-template-columns:44px 1fr}.hr-a{grid-column:2}.hr-t{grid-column:1 / -1}
+  .home-tl li{grid-template-columns:28px minmax(0,1fr)}
+  .home-tl li::before{font-size:24px}
+  .ht-t{font-size:16px}
+  .home-tl li:first-child .ht-t{font-size:18.5px}
+}
 </style>
+{% endblock %}
+{% block scripts %}
+{#- 검색 단추 진행 표시 — 누르면 '검색 중'으로 바뀌고, 뒤로 가기로 돌아오면(bfcache) 되돌린다.
+    단추를 잠그지 않는다(느릴 때 검색어를 고쳐 다시 보낼 수 있어야 한다). -#}
+<script>
+(function(){
+  var f=document.querySelector(".home-search"); if(!f) return;
+  var b=f.querySelector("button"), idle=b&&b.textContent;
+  f.addEventListener("submit",function(){ if(!b||!f.q||!f.q.value.trim()) return; b.textContent=b.getAttribute("data-busy")||idle; b.classList.add("is-busy"); });
+  window.addEventListener("pageshow",function(){ if(b){ b.textContent=idle; b.classList.remove("is-busy"); } });
+})();
+</script>
 {% endblock %}
 {% block ai_disclosure %}
 <section class="ai-disclosure" id="notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">

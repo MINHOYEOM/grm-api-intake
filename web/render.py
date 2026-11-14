@@ -4825,18 +4825,159 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
         "window": bm.get("window", ""),
         "title": _brief_title(bm, tr, lang),
         "tldr": _brief_tldr(bm, lang),
+        # [홈 2026-11-15] 핵심 줄마다 출처 표지(줄 머리의 기관 이름에서 읽는다).
+        "tldr_items": [{"text": home_nobreak_middot(t), **home_source_tag(t)}
+                       for t in _brief_tldr(bm, lang)],
     }
 
 
-# ── [홈 4단 2026-11-12] '제공 정보' 세 칸 + 신규 공개 문서 ─────────────────────
-# 홈이 기능 설명 대신 **실제 결과 한 건씩**을 보여 준다(대표 확정안 0절 2번). 값은 전부
-# 커밋 스냅샷(findings_docs·findings_facets·glossary·glossary_cases)에서 파생한다 — 손으로
-# 적은 예시는 낡는다. 칸마다 데이터가 없으면 그 칸만 빠진다.
+# ── [홈 출처 색 표지 2026-11-15] ───────────────────────────────────────────────
+# 기관마다 색 하나(landing.html 의 .hs-*). 핵심 줄은 구조화된 기관 필드가 없어 **줄 머리의
+# 기관 이름**으로 읽는다("FDA, …"·"식약처, …"). 표지 글자는 그 줄에 적힌 이름 그대로다
+# (새 말을 만들지 않는다). 목록에 없는 기관(WHO·PIC/S·ECA 등)은 표지 없이 나간다.
+HOME_SOURCE_CLASS = {"FDA": "fda", "MFDS": "mfds", "EMA": "eu", "MHRA": "uk", "HC": "hc"}
+_HOME_TLDR_PREFIXES: tuple[tuple[str, str], ...] = (
+    ("Health Canada", "hc"), ("캐나다 보건부", "hc"), ("캐나다", "hc"),
+    ("미국 FDA", "fda"), ("US FDA", "fda"), ("U.S. FDA", "fda"), ("FDA", "fda"),
+    ("식품의약품안전처", "mfds"), ("식약처", "mfds"), ("MFDS", "mfds"),
+    ("영국 MHRA", "uk"), ("MHRA", "uk"),
+    ("유럽 EMA", "eu"), ("EMA", "eu"), ("EU", "eu"),
+)
+
+
+_HOME_MIDDOT_RE = re.compile(r"(\S)·")
+
+
+def home_nobreak_middot(line: str) -> Markup:
+    """가운뎃점 앞에서 줄이 끊기지 않게 한다 — "위조·DEG" 가 "위조 / ·DEG" 로 갈라지면 다음
+    줄이 점으로 시작한다(375px 실측). 글자는 그대로 두고 앞 글자와 점만 한 덩어리로 묶는다."""
+    return Markup(_HOME_MIDDOT_RE.sub(r'<span class="ht-nb">\1·</span>', str(_escape(line or ""))))
+
+
+def home_source_tag(line: str) -> dict[str, str]:
+    """핵심 한 줄 → {"src_cls", "src_label"}. 줄 머리가 아는 기관 이름이 아니면 둘 다 빈 값."""
+    text = (line or "").lstrip()
+    for prefix, cls in _HOME_TLDR_PREFIXES:
+        if text.startswith(prefix) and not text[len(prefix):len(prefix) + 1].isalnum():
+            return {"src_cls": cls, "src_label": prefix}
+    return {"src_cls": "", "src_label": ""}
+
+
+# ── [홈 4단 2026-11-12 · 내용 먼저 2026-11-14] '제공 정보' 세 칸 + 신규 공개 문서 ──
+# 홈이 기능 설명 대신 **실제 내용**을 보여 준다(대표 확정안 0절 2번 + 11-14 시안 선택
+# "A 바탕 + 지적 한 건 칸"). 첫 칸은 최근 공개된 지적 한 건과 거기서 이어지는 업체·실사관·
+# 영역·용어·문서, 둘째 칸은 용어의 뜻, 셋째 칸은 기관의 지적 영역 막대다. 값은 전부 커밋
+# 스냅샷(findings_docs·findings_facets·glossary·glossary_cases)에서 파생한다 — 손으로 적은
+# 예시는 낡는다. 칸마다 데이터가 없으면 그 칸만 빠진다. 페이지는 원격 호출을 하지 않는다.
 HOME_TERM_PREFERRED = ("cleanroom", "data-integrity", "audit-trail", "cleaning-validation")
 HOME_AGENCY_BY_LANG = {DEFAULT_LANG: "MFDS", "en": "FDA"}
 HOME_CATCHALL_KEY = "other_quality_system"
 HOME_CATCHALL_LABEL = "기타 품질시스템"
 HOME_NEW_DOCS = 5
+HOME_AGENCY_TOP = 3
+# 지적 한 건 — 최근 문서 몇 장 안에서만 찾는다('최근 공개'라는 말이 참이어야 한다). 길이
+# 범위는 한 칸에서 한눈에 읽히는 문장만 고르려는 것이다(고르는 기준이지 자르는 게 아니다).
+HOME_CASE_SCAN_DOCS = 30
+HOME_CASE_LEN = {DEFAULT_LANG: (30, 150), "en": (50, 240)}
+# 홈은 제약 GMP 독자의 얼굴이다 — 의료기기 실사 문서는 지적 한 건 후보에서 뺀다(문서에
+# 제품군 필드가 없어 본문 낱말로 가린다. 문서 자체는 검색·목록에 그대로 있다).
+HOME_CASE_SKIP_WORDS = ("의료기기", "device")
+# 검색 예시의 조항 한 건 — 조항 번호는 낡지 않는다.
+HOME_SEARCH_CLAUSE = "21 CFR 211.192"
+
+
+def _home_case(docs: list[dict[str, Any]], facets: "dict[str, Any] | None",
+               glossary_terms: "list[dict[str, Any]] | None",
+               glossary_cases: "dict[str, dict[str, Any]] | None",
+               tr: Translator, lang: str) -> "dict[str, Any] | None":
+    """홈 첫 칸 '최근 공개된 지적 한 건'.
+
+    최신 문서부터 훑어, **쓸 만한 지적이 있는 첫 문서**에서 한 건을 고른다.
+    · 후보: 분류가 붙어 있고(캐치올 제외) 길이가 알맞은 지적. 한국어판은 원문이 영어인
+      지적을 먼저 찾는다("원문과 함께"라는 소개가 이 칸에서 보여야 한다) — 창 안에 없으면
+      그 조건만 푼다.
+    · 그 문서 안에서는 **가장 드문 용어가 걸리는 지적**을 고른다(문서 화면 용어 링크의
+      희소 우선과 같은 생각 — '생산'·'품질' 같은 흔한 말보다 '변경관리'가 이어 볼 값이 있다).
+      드문 정도는 용어 사례 수로 잰다(사례 0건 용어는 사례 화면이 비어 있어 뺀다).
+    · 용어가 걸리는 지적이 창 안에 없으면 용어 줄 없이 첫 후보를 쓴다.
+    같은 입력이면 같은 결과다(문서 정렬·지적 순서·용어 색인이 모두 결정론).
+    """
+    lo, hi = HOME_CASE_LEN.get(lang, HOME_CASE_LEN["en"])
+    index = build_doc_term_link_index(glossary_terms, lang) if glossary_terms else []
+    by_id = {t["id"]: t for t in (glossary_terms or [])}
+
+    def _rarest(body: str) -> "tuple[int, str] | None":
+        hits: dict[str, int] = {}
+        for surface, tid in index:
+            if tid not in hits and _doc_term_find(body, surface, lang=lang) >= 0:
+                # 사례 정본이 없으면(픽스처·부분 빌드) 걸린 순서(긴 표면형 먼저)를 그대로 쓴다.
+                n = (_glossary_case_count(glossary_cases.get(tid)) if glossary_cases
+                     else len(hits) + 1)
+                if n:
+                    hits[tid] = n
+        return min(((n, tid) for tid, n in hits.items()), default=None)
+
+    def _scan(need_english_orig: bool):
+        fallback = None
+        for d in docs[:HOME_CASE_SCAN_DOCS]:
+            blob = " ".join(f"{f.get('text_ko') or ''} {f.get('text_orig') or ''}"
+                            for f in d.get("findings") or []).lower()
+            if any(w in blob for w in HOME_CASE_SKIP_WORDS):
+                continue
+            best = None
+            for f in d.get("findings") or []:
+                label = f.get("category_label_ko") or ""
+                body = finding_body(f, lang)
+                orig = (f.get("text_orig") or "").strip()
+                if not label or label == HOME_CATCHALL_LABEL or not lo <= len(body) <= hi:
+                    continue
+                if need_english_orig and (not orig or _HANGUL_RE.search(orig)):
+                    continue
+                rare = _rarest(body)
+                if rare and (best is None or rare[0] < best[0]):
+                    best = (rare[0], d, f, body, label, rare[1])
+                fallback = fallback or (d, f, body, label, None)
+            if best:
+                return best[1:]
+        return fallback
+
+    picked = (_scan(True) if lang == DEFAULT_LANG else None) or _scan(False)
+    if not picked:
+        return None
+    d, f, body, label, tid = picked
+    orig = (f.get("text_orig") or "").strip()
+    cat_slug = ""
+    for axis in (facets or {}).get("axes") or []:
+        if axis.get("axis") == "category":
+            cat_slug = next((it.get("slug") or "" for it in axis.get("items") or []
+                             if it.get("label_ko") == label), "")
+    term = None
+    if tid:
+        t = by_id[tid]
+        term = {"id": tid,
+                "name": (t.get("term_ko") if lang == DEFAULT_LANG else t.get("term_en"))
+                        or t.get("term_en") or tid}
+    published = d.get("published_date") or ""
+    inspected = (d.get("inspection_date") or "").strip()
+    return {
+        "body": body,
+        # 한국어판만, 원문이 영어일 때만 함께 싣는다(영어판은 본문이 곧 원문이고, 식약처
+        # 원문은 같은 한국어라 두 번 적는 셈이 된다).
+        "orig": (orig if lang == DEFAULT_LANG and orig and orig != body
+                 and not _HANGUL_RE.search(orig) else ""),
+        "source": doc_source_label(d) or tr((facets or {}).get("agency_labels", {})
+                                            .get(d.get("agency") or "", "")
+                                            or d.get("agency") or ""),
+        "published": published,
+        "inspected": inspected if inspected != published else "",
+        "slug": d["slug"],
+        "firm": d.get("firm_name") or "",
+        "firm_key": d.get("firm_key") or "",
+        "inspector": doc_inspector_line(d, tr),
+        "category": tr(label),
+        "category_slug": cat_slug,
+        "term": term,
+    }
 
 
 def build_home_showcase(docs_data: "dict[str, Any] | None",
@@ -4845,14 +4986,16 @@ def build_home_showcase(docs_data: "dict[str, Any] | None",
                         glossary_cases: "dict[str, dict[str, Any]] | None",
                         tr: Translator = _KO,
                         lang: str = DEFAULT_LANG) -> dict[str, Any]:
-    """홈의 업체·용어·기관 예시 한 건씩과 신규 공개 문서 목록.
+    """홈의 지적 한 건·용어·기관 칸과 신규 공개 문서 목록, 검색 예시.
 
-    · 업체: 가장 최근 공개 문서의 업체 중 문서 2건 이상인 곳(업체 페이지 임계와 같다).
-    · 용어: 선호 목록에서 사례가 있는 첫 용어, 없으면 사례가 가장 많은 용어.
-    · 기관: 그 언어 독자에게 가까운 기관 하나의 분류 상위 둘(캐치올 분류는 순위 밖).
+    · 지적 한 건: `_home_case` — 최근 공개 문서의 지적 하나와 이어지는 다섯 갈래.
+    · 용어: 선호 목록에서 사례가 있는 첫 용어, 없으면 사례가 가장 많은 용어. 뜻을 함께 싣는다.
+    · 기관: 그 언어 독자에게 가까운 기관 하나의 분류 상위 셋(캐치올 분류는 순위 밖).
     · 신규 문서: 공개일 최신순 다섯 건. 영어 트리는 원문이 영어인 문서만.
+    · 검색 예시: 위 칸들에 실린 업체명·용어와 조항 한 건.
     """
-    out: dict[str, Any] = {"firm": None, "term": None, "agency": None, "new_docs": []}
+    out: dict[str, Any] = {"case": None, "term": None, "agency": None, "new_docs": [],
+                           "examples": []}
     docs = list((docs_data or {}).get("documents") or [])
     if lang != DEFAULT_LANG:
         docs = [d for d in docs if doc_is_english(d)]
@@ -4873,27 +5016,10 @@ def build_home_showcase(docs_data: "dict[str, Any] | None",
                                                 or d.get("agency") or ""),
             "firm": d.get("firm_name") or "",
             "cats": " · ".join(_cats(d)),
+            "src_cls": HOME_SOURCE_CLASS.get(d.get("agency") or "", ""),
         })
 
-    by_firm: dict[str, list[dict[str, Any]]] = {}
-    for d in docs:
-        key = _canonical_firm_key(d.get("firm_key") or "")
-        if key:
-            by_firm.setdefault(key, []).append(d)
-    for d in docs:
-        key = _canonical_firm_key(d.get("firm_key") or "")
-        group = by_firm.get(key) or []
-        if len(group) < 2:
-            continue
-        out["firm"] = {
-            "name": d.get("firm_name") or "",
-            "key": d.get("firm_key") or "",
-            "documents": len(group),
-            "findings": sum(len(g.get("findings") or []) for g in group),
-            "latest_source": doc_source_label(d),
-            "latest_cats": " · ".join(_cats(d)),
-        }
-        break
+    out["case"] = _home_case(docs, facets, glossary_terms, glossary_cases, tr, lang)
 
     if glossary_terms and glossary_cases:
         by_id = {t["id"]: t for t in glossary_terms}
@@ -4905,10 +5031,15 @@ def build_home_showcase(docs_data: "dict[str, Any] | None",
             pick = ranked[0] if ranked else None
         if pick:
             t = by_id[pick]
+            ko = lang == DEFAULT_LANG
             out["term"] = {
                 "id": pick,
-                "name": (t.get("term_ko") if lang == DEFAULT_LANG else t.get("term_en"))
+                "name": (t.get("term_ko") if ko else t.get("term_en"))
                         or t.get("term_en") or pick,
+                # 한국어판은 영문 표제어를 곁에 적는다(현장에서 두 말을 함께 쓴다).
+                "alt": (t.get("term_en") or "") if ko else "",
+                "definition": ((t.get("easy_ko") if ko else t.get("easy_en")) or "").strip(),
+                "ref": next((r for r in (t.get("reg_refs") or []) if r), ""),
                 "findings": f"{_glossary_case_count(glossary_cases.get(pick)):,}",
             }
 
@@ -4926,12 +5057,23 @@ def build_home_showcase(docs_data: "dict[str, Any] | None",
                     rows.append((c, it.get("label_ko") or ""))
         rows.sort(key=lambda r: (-r[0], r[1]))
         if len(rows) >= 2:
+            top = rows[:HOME_AGENCY_TOP]
             out["agency"] = {
                 "code": agency,
                 "label": tr((facets.get("agency_labels") or {}).get(agency) or agency),
-                "top": [{"label": tr(lbl), "n": f"{n:,}"} for n, lbl in rows[:2]],
+                # pct = 막대 길이(첫 줄이 100). 값이 작아도 막대가 보이게 바닥을 둔다.
+                "top": [{"label": tr(lbl), "n": f"{n:,}",
+                         "pct": max(4, round(n * 100 / top[0][0]))} for n, lbl in top],
                 "as_of": facets.get("measured_on", ""),
             }
+
+    seen: set[str] = set()
+    for ex in ((out["case"] or {}).get("firm"), HOME_SEARCH_CLAUSE,
+               (out["term"] or {}).get("name"),
+               ((out["case"] or {}).get("term") or {}).get("name")):
+        if ex and ex not in seen:
+            seen.add(ex)
+            out["examples"].append(ex)
     return out
 
 

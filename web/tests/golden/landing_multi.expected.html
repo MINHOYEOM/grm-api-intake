@@ -91,35 +91,46 @@
 <main class="home">
   <section class="wrap home-top">
     <h1 class="home-h">세계 규제기관이 제약 현장에서 지적한 내용을 한국어로 찾아봅니다.</h1>
-    <p class="home-lede">FDA 483·경고서한, 식약처 실사·행정처분, 캐나다·EU·영국·일본의 공개 기록을 원문과 함께 제공합니다. 주간 브리프는 매주 월요일 발행합니다.</p>    <p class="home-count">문서 6,694건 · 지적 26,552건 · 2026-11-03 기준</p>
+    <p class="home-lede">FDA 483·경고서한, 식약처 실사·행정처분, 캐나다·EU·영국의 공개 기록을 원문과 함께 제공합니다. 주간 브리프는 매주 월요일 발행합니다.</p>
     <form class="home-search" action="search/index.html" method="get" role="search">
       <input type="search" name="q" placeholder="업체명, 조항, 용어, 지적 문장" aria-label="검색어" autocomplete="off">
-      <button type="submit" class="btn coral">검색</button>
+      <button type="submit" class="btn coral" data-busy="검색 중">검색</button>
     </form>
+    <p class="home-eg"><span>예시</span><a href="search/index.html?q=Titan%20Kogyo%2C%20Ltd">Titan Kogyo, Ltd</a><a href="search/index.html?q=21%20CFR%20211.192">21 CFR 211.192</a><a href="search/index.html?q=%EC%B2%AD%EC%A0%95%EC%8B%A4">청정실</a><a href="search/index.html?q=%EC%9B%90%EB%A3%8C%EC%9D%98%EC%95%BD%ED%92%88">원료의약품</a></p>
   </section>
 
   <section class="wrap home-sec">
     <h2 class="home-h2">제공 정보</h2>
     <div class="home-three">
-      <a class="home-demo" href="findings/firm/index.html?key=yuki%20gosei%20kogyo">
-        <span class="hd-ask">업체별 지적 이력</span>
-        <span class="hd-in">Yuki Gosei Kogyo, Co., Ltd</span>
-        <span class="hd-out">공개 문서 2건 · 지적 10건</span>
-        <span class="hd-meta">최근: FDA 483 오염/교차오염 관리 · 원자재/공급업체 관리</span>
-        <span class="hd-go">업체 조회</span>
+      <div class="home-cell home-case">
+        <p class="hc-lab">최근 공개된 지적 한 건</p>
+        <p class="hc-quote">미국 시장용 API 생산에 사용하는 설비와 기구가 원료의약품의 안전성, 확인(identity), 순도 및 품질을 변화시킬 수 있는 오염을 방지하기 위해 적절한 주기로 세척·유지관리되지 않는다.</p>
+        <p class="hc-orig" lang="en">Equipment and utensils utilized in the production of API for the US Market are not cleaned or maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, purity and quality of the drug substance.</p>
+        <p class="hc-meta">FDA 483 · 공개 2026-11-05 · 실사 2023-12-08</p>
+        <ul class="hc-links">
+          <li><a href="findings/firm/index.html?key=titan%20kogyo"><span class="hc-k">업체</span><span class="hc-v">Titan Kogyo, Ltd</span><span class="hc-go">지적 이력</span></a></li>
+          <li><a href="findings/c/equipment-facility/index.html"><span class="hc-k">분류</span><span class="hc-v">설비/시설</span><span class="hc-go">같은 분류 지적</span></a></li>
+          <li><a href="glossary/api/index.html"><span class="hc-k">용어</span><span class="hc-v">원료의약품</span><span class="hc-go">뜻과 근거 조항</span></a></li>
+          <li><a href="findings/doc/fda483-196225/index.html"><span class="hc-k">문서</span><span class="hc-v">FDA 483</span><span class="hc-go">지적 전체</span></a></li>
+        </ul>
+      </div>
+      <a class="home-cell" href="glossary/cleanroom/index.html">
+        <span class="hc-lab">용어 해설과 지적 사례</span>
+        <span class="hc-name">청정실 <span class="hc-alt" lang="en">Cleanroom</span></span>
+        <span class="hc-def">공기 중 입자 농도를 관리하고 미생물·입자의 유입, 발생과 잔류를 줄이도록 설계·관리하는 방입니다.</span>
+        <span class="hc-meta">EU GMP Annex 1 §§4.1–4.32 · 관련 지적 226건</span>
+        <span class="hc-more">용어사전</span>
       </a>
-      <a class="home-demo" href="glossary/cleanroom/index.html">
-        <span class="hd-ask">용어 해설과 지적 사례</span>
-        <span class="hd-in">청정실</span>
-        <span class="hd-out">정의 · 근거 조항 · 관련 지적 226건</span>
-        <span class="hd-go">용어사전</span>
-      </a>
-      <a class="home-demo" href="findings/trends/index.html">
-        <span class="hd-ask">기관별 지적 경향</span>
-        <span class="hd-in">식품의약품안전처</span>
-        <span class="hd-out">불만/회수 465건 · 세척밸리데이션 133건</span>
-        <span class="hd-meta">누적 · 2026-11-03 기준</span>
-        <span class="hd-go">지적 영역 경향</span>
+      <a class="home-cell" href="findings/trends/index.html">
+        <span class="hc-lab">기관별 지적 경향</span>
+        <span class="hc-name">식품의약품안전처</span>
+        <span class="hc-bars">
+          <span class="hc-bar"><span class="hb-l">불만/회수</span><span class="hb-t"><i style="width:100%"></i></span><span class="hb-n">465</span></span>
+          <span class="hc-bar"><span class="hb-l">세척밸리데이션</span><span class="hb-t"><i style="width:29%"></i></span><span class="hb-n">133</span></span>
+          <span class="hc-bar"><span class="hb-l">설비/시설</span><span class="hb-t"><i style="width:25%"></i></span><span class="hb-n">116</span></span>
+        </span>
+        <span class="hc-meta">누적 · 2026-11-03 기준</span>
+        <span class="hc-more">지적 영역 경향</span>
       </a>
     </div>
   </section>
@@ -132,11 +143,11 @@
     <div>
       <h2 class="home-h2">신규 공개 문서</h2>
       <ul class="home-rows">
-        <li><span class="hr-d">11.06</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196243/index.html">American Contract Systems, Inc</a></li>
-        <li><span class="hr-d">11.06</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196231/index.html">Cardionxt<span class="hr-c">불만/회수 · 표시/포장</span></a></li>
-        <li><span class="hr-d">11.05</span><span class="hr-a">식품의약품안전처</span><a class="hr-t" href="findings/doc/gmpinspect-1Q6fJiSER3Z/index.html">(주)삼양바이오팜<span class="hr-c">안정성/보관 · 세척밸리데이션</span></a></li>
-        <li><span class="hr-d">11.05</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196225/index.html">Titan Kogyo, Ltd<span class="hr-c">시험실/품질관리 · 품질부서 관리감독</span></a></li>
-        <li><span class="hr-d">11.05</span><span class="hr-a">FDA 483</span><a class="hr-t" href="findings/doc/fda483-196224/index.html">Central Glass Co., Ltd.<span class="hr-c">밸리데이션/적격성평가 · 원자재/공급업체 관리</span></a></li>
+        <li><span class="hr-d">11.06</span><span class="hr-a"><span class="hs hs-fda">FDA 483</span></span><a class="hr-t" href="findings/doc/fda483-196243/index.html">American Contract Systems, Inc</a></li>
+        <li><span class="hr-d">11.06</span><span class="hr-a"><span class="hs hs-fda">FDA 483</span></span><a class="hr-t" href="findings/doc/fda483-196231/index.html">Cardionxt<span class="hr-c">불만/회수 · 표시/포장</span></a></li>
+        <li><span class="hr-d">11.05</span><span class="hr-a"><span class="hs hs-mfds">식품의약품안전처</span></span><a class="hr-t" href="findings/doc/gmpinspect-1Q6fJiSER3Z/index.html">(주)삼양바이오팜<span class="hr-c">안정성/보관 · 세척밸리데이션</span></a></li>
+        <li><span class="hr-d">11.05</span><span class="hr-a"><span class="hs hs-fda">FDA 483</span></span><a class="hr-t" href="findings/doc/fda483-196225/index.html">Titan Kogyo, Ltd<span class="hr-c">시험실/품질관리 · 품질부서 관리감독</span></a></li>
+        <li><span class="hr-d">11.05</span><span class="hr-a"><span class="hs hs-fda">FDA 483</span></span><a class="hr-t" href="findings/doc/fda483-196224/index.html">Central Glass Co., Ltd.<span class="hr-c">밸리데이션/적격성평가 · 원자재/공급업체 관리</span></a></li>
       </ul>
       <p class="home-links"><a href="findings/docs/index.html">공개 문서 전체</a></p>
     </div>
@@ -159,42 +170,103 @@
   </section>
 </main>
 <style>
-.home{padding:40px 0 56px}
-.home-top{display:flex;flex-direction:column;gap:14px}
-.home-h{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.35;color:var(--ink);margin:0;max-width:30em;word-break:keep-all}
-.home-lede{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--body);margin:0;max-width:44em;word-break:keep-all}
-.home-count{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0}
-.home-search{display:flex;gap:8px;max-width:640px;margin-top:6px}
-.home-search input{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--canvas);color:var(--ink)}
+.home{padding:34px 0 56px}
+.home-top{display:flex;flex-direction:column;gap:12px}
+.home-h{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.25;letter-spacing:-.015em;color:var(--ink);margin:0;max-width:22em;word-break:keep-all}
+.home-lede{font-family:var(--sans);font-size:15.5px;line-height:1.7;color:var(--body);margin:0;max-width:44em;word-break:keep-all}
+.home-search{display:flex;gap:8px;max-width:680px;margin-top:4px}
+.home-search input{flex:1;min-width:0;font:inherit;font-size:16px;padding:14px 16px;border:1.5px solid var(--ink);border-radius:var(--rad);background:#fff;color:var(--ink)}
 .home-search input:focus{outline:2px solid var(--coral);outline-offset:1px}
-.home-sec{margin-top:44px}
-.home-h2{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--ink);margin:0 0 14px}
-.home-three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-@media(max-width:860px){.home-three{grid-template-columns:1fr}}
-.home-demo{display:flex;flex-direction:column;gap:6px;padding:18px 20px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);text-decoration:none;color:var(--body)}
-.home-demo:hover{border-color:var(--coral)}
-.hd-ask{font-size:12.5px;color:var(--muted)}
-.hd-in{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);word-break:keep-all}
-.hd-out{font-size:14px;color:var(--ink);word-break:keep-all}
-.hd-meta{font-size:12.5px;color:var(--muted);word-break:keep-all}
-.hd-go{margin-top:auto;padding-top:6px;font-size:13px;font-weight:500;color:var(--coral-2)}
-.home-half{display:grid;grid-template-columns:1fr 1fr;gap:32px}
-@media(max-width:860px){.home-half{grid-template-columns:1fr}}
-.home-tl{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.6;color:var(--ink);word-break:keep-all}
-.home-links{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px}
-.home-links a,.home-idx a,.home-watch a{color:var(--coral-2);text-decoration:none}
-.home-links a:hover,.home-idx a:hover,.home-watch a:hover{color:var(--coral)}
+.home-search .btn{padding-left:22px;padding-right:22px}
+.home-eg{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0;font-size:13.5px;color:var(--muted)}
+.home-eg a{color:var(--coral-2);text-decoration:none;border-bottom:1px solid var(--coral-tint)}
+.home-eg a:hover{color:var(--coral);border-bottom-color:var(--coral)}
+.home-search .btn.is-busy{display:inline-flex;align-items:center;gap:8px;background:var(--coral-2)}
+.home-search .btn.is-busy::before{content:"";width:13px;height:13px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:home-spin .8s linear infinite}
+@keyframes home-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.home-search .btn.is-busy::before{animation:none;border-right-color:#fff}}
+/* 출처 색 표지 — 기관마다 하나, 채도를 낮춘 색. 홈 전용(공용 CSS 를 건드리지 않는다). */
+.hs{display:inline-block;font-family:var(--sans);font-weight:600;font-size:11.5px;line-height:1.5;padding:1px 8px;border-radius:4px;white-space:nowrap}
+.hs-fda{background:#E3E9F0;color:#3E5C76}
+.hs-mfds{background:#E2EDE8;color:#2F6B5E}
+.hs-eu{background:#EDE6EE;color:#6B4E71}
+.hs-uk{background:#ECEBDA;color:#66652F}
+.hs-hc{background:#F3EAD9;color:#8A6426}
+.home-sec{margin-top:30px}
+.home-h2{font-family:var(--sans);font-weight:600;font-size:13px;color:var(--muted);margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.home-three{display:grid;grid-template-columns:1.35fr 1fr 1fr;background:#fff;border:1px solid var(--line-2);border-radius:var(--rad);overflow:hidden}
+.home-cell{display:flex;flex-direction:column;gap:8px;min-width:0;padding:22px 24px;border-left:1px solid var(--line);text-decoration:none;color:var(--body)}
+.home-cell:first-child{border-left:0}
+a.home-cell:hover{background:var(--canvas)}
+.hc-lab{margin:0;font-size:12.5px;font-weight:600;color:var(--coral-2)}
+.hc-quote{margin:0;font-family:var(--serif);font-weight:500;font-size:17.5px;line-height:1.6;color:var(--ink);word-break:keep-all}
+.hc-orig{margin:0;font-family:var(--serif);font-size:13px;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hc-meta{margin:0;font-size:12.5px;color:var(--muted);word-break:keep-all}
+.hc-links{list-style:none;margin:6px 0 0;padding:0;border-top:1px solid var(--line)}
+.hc-links a,.hc-row{display:grid;grid-template-columns:52px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline;text-decoration:none}
+.hc-links li:last-child a{border-bottom:0;padding-bottom:0}
+.hc-k{font-size:12.5px;color:var(--muted)}
+.hc-v{color:var(--ink);font-weight:600;min-width:0;word-break:keep-all}
+.hc-go{font-size:12.5px;color:var(--coral-2);white-space:nowrap}
+.hc-links a:hover .hc-v,.hc-links a:hover .hc-go{color:var(--coral)}
+.hc-name{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.3;color:var(--ink);margin-top:2px;word-break:keep-all}
+.hc-alt{font-family:var(--sans);font-weight:400;font-size:14px;color:var(--muted)}
+.hc-def{font-size:14.5px;line-height:1.65;color:var(--body);word-break:keep-all}
+.hc-more{margin-top:auto;padding-top:8px;font-size:13.5px;font-weight:600;color:var(--coral-2)}
+a.home-cell:hover .hc-more{color:var(--coral)}
+.hc-bars{display:flex;flex-direction:column;gap:9px;margin:4px 0 2px}
+.hc-bar{display:grid;grid-template-columns:minmax(0,7.5em) 1fr auto;gap:8px;align-items:center;font-size:13px;color:var(--body)}
+.hb-l{word-break:keep-all;line-height:1.3}
+.hb-t{display:block;height:8px}
+.hb-t i{display:block;height:8px;background:var(--coral);border-radius:2px}
+.hb-n{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;min-width:2.6em}
+.home-half{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.home-tl{list-style:none;margin:0;padding:0;color:var(--ink);word-break:keep-all;counter-reset:home-n}
+.home-tl li{counter-increment:home-n;display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px;padding:14px 0;border-bottom:1px solid var(--line)}
+.home-tl li:first-child{padding-top:2px}
+.home-tl li::before{content:counter(home-n);font-family:var(--serif);font-weight:500;font-size:28px;line-height:1.1;color:var(--coral)}
+.ht-b{display:block;min-width:0}
+.ht-t{display:block;margin-top:5px;font-family:var(--serif);font-weight:500;font-size:17px;line-height:1.5}
+.ht-nb{white-space:nowrap}
+.home-tl li:first-child .ht-t{font-size:21px;line-height:1.42}
+.home-links{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;font-weight:600}
+.home-links a,.home-watch a{color:var(--coral-2);text-decoration:none}
+.home-links a:hover,.home-watch a:hover{color:var(--coral)}
 .home-rows{list-style:none;margin:0;padding:0}
-.home-rows li{display:grid;grid-template-columns:44px 96px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line-2);font-size:14px;align-items:baseline}
-.home-rows li:last-child{border-bottom:1px solid var(--line-2)}
+.home-rows li{display:grid;grid-template-columns:44px 84px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
+.home-rows li:first-child{padding-top:0}
 .hr-d{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .hr-a{font-size:12.5px;color:var(--muted)}
-.hr-t{color:var(--ink);text-decoration:none;word-break:keep-all;min-width:0}
+.hr-t{color:var(--ink);font-weight:500;text-decoration:none;word-break:keep-all;min-width:0}
 .hr-t:hover{color:var(--coral)}
-.hr-c{display:block;font-size:12.5px;color:var(--muted)}
-@media(max-width:520px){.home-rows li{grid-template-columns:44px 1fr}.hr-a{grid-column:2}.hr-t{grid-column:1 / -1}}
-.home-idx{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;font-size:15px}
+.hr-c{display:block;font-size:12.5px;font-weight:400;color:var(--muted)}
+.home-idx{display:flex;flex-wrap:wrap;gap:8px;margin:0;font-size:14px}
+.home-idx a{padding:8px 14px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:#fff;color:var(--ink);text-decoration:none}
+.home-idx a:hover{border-color:var(--coral);color:var(--coral-2)}
+.home-idx a.home-idx-all{background:none;border-color:transparent;color:var(--coral-2);font-weight:600}
 .home-watch{margin:16px 0 0;font-size:13.5px;color:var(--muted);word-break:keep-all}
+@media(max-width:980px){
+  .home-three{grid-template-columns:1fr}
+  .home-cell{border-left:0;border-top:1px solid var(--line)}
+  .home-cell:first-child{border-top:0}
+}
+@media(max-width:860px){.home-half{grid-template-columns:1fr;gap:32px}}
+@media(max-width:600px){
+  .home{padding:22px 0 44px}
+  .home-sec{margin-top:26px}
+  .home-h{font-size:25px;line-height:1.32}
+  .home-lede{font-size:14.5px}
+  .home-search .btn{padding-left:16px;padding-right:16px}
+  .home-cell{padding:18px}
+  .hc-quote{font-size:16.5px}
+  .hc-links a,.hc-row{grid-template-columns:48px 1fr}
+  .hc-go{display:none}
+  .home-rows li{grid-template-columns:44px 1fr}.hr-a{grid-column:2}.hr-t{grid-column:1 / -1}
+  .home-tl li{grid-template-columns:28px minmax(0,1fr)}
+  .home-tl li::before{font-size:24px}
+  .ht-t{font-size:16px}
+  .home-tl li:first-child .ht-t{font-size:18.5px}
+}
 </style>
 <section class="ai-disclosure" id="notice" aria-label="AI 자동 생성 고지"><div class="wrap">
   <span class="kick">AI Disclosure</span>
@@ -345,6 +417,14 @@ if(_nt&&_nm){
 </script>
 <script src="/assets/pet.js?v=4433fce6" defer></script>
 <script src="/assets/site-popup.js?v=8b64d29c" defer></script>
+<script>
+(function(){
+  var f=document.querySelector(".home-search"); if(!f) return;
+  var b=f.querySelector("button"), idle=b&&b.textContent;
+  f.addEventListener("submit",function(){ if(!b||!f.q||!f.q.value.trim()) return; b.textContent=b.getAttribute("data-busy")||idle; b.classList.add("is-busy"); });
+  window.addEventListener("pageshow",function(){ if(b){ b.textContent=idle; b.classList.remove("is-busy"); } });
+})();
+</script>
 
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}

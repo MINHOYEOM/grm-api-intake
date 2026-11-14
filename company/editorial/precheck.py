@@ -13,7 +13,14 @@
         심층분석 델타의 각 카드에 그 주 handoff 의 `deep_analysis_input.body_full` 을 `source_text` 로 붙인
         **검사용 사본**을 쓴다. 발행 브릿지가 조립 직전에 하는 일과 같다(`delta_bridge.apply_handoff_source_text`).
         교열의 코드 검사는 이 사본을 `--deep` 에 넘긴다 — 붙이지 않으면 근거 대조가 전부 '원문에 없음'이 된다.
+        브릿지의 **중첩 방어**도 같이 한다: 국문 병기(`observations_ko`·`violations_ko`)가 `deep_analysis` 안에 들어 있으면
+        카드 층으로 끌어올린다(안 올리면 조립이 번역을 못 보고 483 관찰 국문 없음으로 호 전체를 거부한다 — 리허설 1114b).
         사본은 실행 폴더에 두지 않고 커밋하지 않는다(반납하는 `deep_delta.json` 은 그대로).
+
+    python company/editorial/precheck.py deep <handoff 파일> <심층 샤드 deep.S.json>
+        심층 기자가 샤드를 `완료`로 내기 전에 돌린다. FDA 483 카드마다 `observations_ko` 가 **카드 층**
+        (`items.<id>.observations_ko` — `deep_analysis` 안이 아니다)에 있고 항목마다 `number`·`deficiency_ko` 가 있는지,
+        국문 병기가 `deep_analysis` 안에 잘못 들어가 있지 않은지 본다. 걸리면 한 줄씩 내고 exit 1.
 
     python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json>
         재작업(반려 카드만 한 번 고치기) 뒤에 다시 합친 델타가 **반려 카드만** 바뀌었는지 본다.
@@ -82,15 +89,67 @@ def handoff_bodies(payload):
     return bodies
 
 
+NESTED_TRANSLATION_KEYS = ("observations_ko", "violations_ko")   # delta_bridge 의 중첩 예치 방어와 같은 키
+
+
+def lift_nested(entry):
+    """`deep_analysis` 안에 실린 국문 병기를 카드 층으로 끌어올린 사본(순수). 브릿지 게이트와 같은 규칙."""
+    da = entry.get("deep_analysis") if isinstance(entry, dict) else None
+    if not isinstance(da, dict) or not any(k in da for k in NESTED_TRANSLATION_KEYS):
+        return entry
+    da = dict(da)
+    entry = dict(entry, deep_analysis=da)
+    for key in NESTED_TRANSLATION_KEYS:
+        nested = da.pop(key, None)
+        if nested and key not in entry:
+            entry[key] = nested
+    return entry
+
+
 def with_source_text(deep, bodies):
-    """deep 델타 사본에 `source_text` 를 붙인다(순수). handoff 에 원문이 없는 카드는 그대로 둔다."""
+    """deep 델타 사본에 `source_text` 를 붙이고 중첩된 국문 병기를 끌어올린다(순수). handoff 에 원문이 없는 카드는 원문만 그대로 둔다."""
     out, filled = {}, 0
     for cid, entry in deep.items():
-        if isinstance(entry, dict) and bodies.get(cid):
-            entry = dict(entry, source_text=bodies[cid])
-            filled += 1
+        if isinstance(entry, dict):
+            entry = lift_nested(entry)
+            if bodies.get(cid):
+                entry = dict(entry, source_text=bodies[cid])
+                filled += 1
         out[cid] = entry
     return out, filled
+
+
+def fda483_ids(payload):
+    """handoff payload → 심층 대상 FDA 483 카드 id 집합."""
+    return {row["web_card_id"] for row in payload.get("rows") or []
+            if isinstance(row, dict) and isinstance(row.get("web_card_id"), str)
+            and row.get("kind") == "fda-483"}
+
+
+def deep_lines(shard, ids_483):
+    """심층 샤드의 국문 병기 자리·결손 줄(순수)."""
+    out = []
+    items = shard.get("items") if isinstance(shard.get("items"), dict) else {}
+    for cid, entry in items.items():
+        if not isinstance(entry, dict):
+            out.append(f"항목이 객체가 아니다: {cid}")
+            continue
+        da = entry.get("deep_analysis") if isinstance(entry.get("deep_analysis"), dict) else {}
+        for key in NESTED_TRANSLATION_KEYS:
+            if key in da:
+                out.append(f"자리 틀림 {cid}: {key} 가 deep_analysis 안에 있다 — items.{cid}.{key} 로 옮긴다")
+        if cid not in ids_483:
+            continue
+        obs = entry.get("observations_ko")
+        if not isinstance(obs, list) or not obs:
+            if "observations_ko" not in da:
+                out.append(f"483 관찰 국문 없음 {cid}: observations_ko(★필수)")
+            continue
+        for i, o in enumerate(obs):
+            if not (isinstance(o, dict) and str(o.get("number") or "").strip()
+                    and str(o.get("deficiency_ko") or "").strip()):
+                out.append(f"483 관찰 국문 불완전 {cid}: observations_ko[{i}] 에 number·deficiency_ko 가 있어야 한다")
+    return out
 
 
 def rejected_ids(copyedit):
@@ -149,6 +208,9 @@ def main(argv=None):
     d.add_argument("handoff")
     d.add_argument("deep")
     d.add_argument("--out", required=True)
+    p = sub.add_parser("deep")
+    p.add_argument("handoff")
+    p.add_argument("shard")
     r = sub.add_parser("rework-diff")
     r.add_argument("old")
     r.add_argument("new")
@@ -163,6 +225,15 @@ def main(argv=None):
             for line in lines:
                 print(line)
             print(f"사전 점검: {len(lines)}건" + ("" if lines else " — 통과"))
+            return 1 if lines else 0
+        if args.cmd == "deep":
+            handoff, shard = _load(args.handoff), _load(args.shard)
+            if not isinstance(handoff, dict) or not isinstance(shard, dict):
+                raise ValueError("handoff·심층 샤드가 객체가 아니다")
+            lines = deep_lines(shard, fda483_ids(handoff))
+            for line in lines:
+                print(line)
+            print(f"심층 사전 점검: {len(lines)}건" + ("" if lines else " — 통과"))
             return 1 if lines else 0
         if args.cmd == "rework-diff":
             old, new, copyedit = _load(args.old), _load(args.new), _load(args.copyedit)

@@ -195,6 +195,8 @@
 {# [구독 밴드 실물 링크 2026-09-07] 밴드는 "메일로 보내드립니다"라고 말할 뿐 무엇이 오는지 보여 주지 않는다. 메일 본문은 주간 브리프의 핵심 요약과 바로가기라서 **최신 브리프 페이지가 곧 메일 내용의 실물**이다 — 링크 한 줄이면 구독 판단이 선다. 낱말은 헤더 CTA 와 같은 '이번 주 소식'을 재사용한다(새 낱말 만들지 않는다). 스타일은 grm.css(디자인 동결) 대신 하단 배너와 같은 관례로 이 게이트 안에 두되, **밴드 안**(`<section class="subscribe">` 뒤)에 둔다 — 기존 한글안전 가드가 재는 범위가 거기서 시작하기 때문이다. 게이트가 꺼진 로컬·CI 빌드에서는 이 <style> 도 함께 생략되므로 골든 byte-diff 는 그대로 0. #}
 <style>
 .subscribe .sub-peek{margin:6px auto 14px;font-family:var(--sans);font-size:14px}
+.subscribe.sub-flash{box-shadow:inset 0 0 0 3px var(--coral);transition:box-shadow .3s}
+@media (prefers-reduced-motion:reduce){.subscribe.sub-flash{transition:none}}
 .subscribe .sub-peek a{color:var(--coral-2);text-decoration:none}
 .subscribe .sub-peek a:hover{color:var(--coral)}
 .subscribe .sub-peek .ti{font-size:13px;vertical-align:-1px}
@@ -301,6 +303,30 @@
       setTimeout(reveal,170);
     }else{reveal();}
   });
+})();
+</script>
+{# [구독 바로가기 2026-11-15] '무료 구독'·'메일 구독'(#subscribe) 링크를 눌러도 아무 일이 없어 보였다(대표 신고).
+   두 가지였다: ① 밴드가 링크 바로 아래·페이지 끝이라 스크롤이 거의 안 움직인다 ② 이미 구독한 브라우저는 위
+   스크립트가 밴드를 hidden 으로 감춰 링크가 숨은 곳을 가리킨다. → 밴드가 보이면 그리로 옮기고 이메일 칸에
+   커서를 넣고 잠깐 강조한다. 밴드가 숨어 있으면(구독함) 링크 자체를 감춘다. JS 가 없으면 종전 앵커 이동. #}
+<script>
+(function(){
+  var sec=document.querySelector('.subscribe');
+  var links=document.querySelectorAll('a[href="#subscribe"]');
+  if(!sec||!links.length)return;
+  // hidden 속성은 author display(.grm-next a·.home-links a)에 진다 — style 로 직접 끈다.
+  if(sec.hidden){for(var i=0;i<links.length;i++){var li=links[i].closest&&links[i].closest('li');(li||links[i]).style.display='none';}return;}
+  function go(e){
+    if(sec.hidden)return;
+    e.preventDefault();
+    var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try{sec.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});}catch(_){sec.scrollIntoView();}
+    var em=document.getElementById('grm-sub-email');
+    if(em){try{em.focus({preventScroll:true});}catch(_){em.focus();}}
+    sec.classList.remove('sub-flash');void sec.offsetWidth;sec.classList.add('sub-flash');
+    setTimeout(function(){sec.classList.remove('sub-flash');},1600);
+  }
+  for(var j=0;j<links.length;j++)links[j].addEventListener('click',go);
 })();
 </script>
 {# [구독 언어 선택] 고른 언어의 폼 주소로 action 을 바꾼다(밴드·배너 공통). 스크립트가 돌 때만 선택지를 보인다. #}

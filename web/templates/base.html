@@ -965,7 +965,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       try{ localStorage.setItem(DONE,'1'); }catch(_){}
       var t=el.querySelector('.grm-cta-txt');
       // 2026-09-23 C-06 — 밴드와 같은 문장(발신자 GRM Solutions Brief 명시)으로 맞춘다.
-      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다") }}</b><span>{% if sub_zone == 'glossary' %}{{ _("메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}{% else %}{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}{% endif %}</span>';}
+      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다")|js_sq }}</b><span>{% if sub_zone == 'glossary' %}{{ _("메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.")|js_sq }}{% else %}{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.")|js_sq }}{% endif %}</span>';}
       f.hidden=true;
       setTimeout(function(){dismiss(true);},4000);
     });

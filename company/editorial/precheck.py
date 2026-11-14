@@ -13,6 +13,11 @@
         교열의 코드 검사는 이 사본을 `--deep` 에 넘긴다 — 붙이지 않으면 근거 대조가 전부 '원문에 없음'이 된다.
         사본은 실행 폴더에 두지 않고 커밋하지 않는다(반납하는 `deep_delta.json` 은 그대로).
 
+    python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json>
+        재작업(반려 카드만 한 번 고치기) 뒤에 다시 합친 델타가 **반려 카드만** 바뀌었는지 본다.
+        카드가 늘거나 줄었거나, 반려되지 않은 카드·`tldr` 가 한 글자라도 바뀌었으면 exit 1 — 교열은 판정하지 않고 보류한다.
+        통과면 반려 카드마다 바뀐 슬롯을 한 줄씩 낸다(안 바뀐 반려 카드도 적는다 — 다시 반려될 카드다).
+
 저장소 루트에서 돌린다. 읽을 수 없으면 exit 2(메시지는 stderr).
 """
 import argparse
@@ -75,6 +80,48 @@ def with_source_text(deep, bodies):
     return out, filled
 
 
+def rejected_ids(copyedit):
+    """1차 교열 기록 → 반려 카드 id 집합. `rework.cards` 와 `cards[].verdict` 를 합친다."""
+    ids = set()
+    rework = copyedit.get("rework") if isinstance(copyedit.get("rework"), dict) else {}
+    ids.update(str(x) for x in rework.get("cards") or [] if isinstance(x, str))
+    for card in copyedit.get("cards") or []:
+        if isinstance(card, dict) and card.get("verdict") != "pass" and card.get("web_card_id"):
+            ids.add(str(card["web_card_id"]))
+    return ids
+
+
+def rework_diff(old, new, rejected):
+    """(문제 줄, 알림 줄) — 문제 줄이 하나라도 있으면 재작업이 범위를 넘은 것이다(순수)."""
+    problems, notes = [], []
+    a = old.get("cards") if isinstance(old.get("cards"), dict) else {}
+    b = new.get("cards") if isinstance(new.get("cards"), dict) else {}
+    if not rejected:
+        problems.append("1차 교열 기록에 반려 카드가 없다")
+    for cid in sorted(set(a) - set(b)):
+        problems.append(f"카드가 사라졌다: {cid}")
+    for cid in sorted(set(b) - set(a)):
+        problems.append(f"카드가 새로 생겼다: {cid}")
+    for cid in sorted(rejected - set(a)):
+        problems.append(f"반려 카드가 1차 델타에 없다: {cid}")
+    for cid in sorted(set(a) & set(b)):
+        if a[cid] == b[cid]:
+            if cid in rejected:
+                notes.append(f"안 바뀜(반려 카드) {cid}")
+            continue
+        ca = a[cid] if isinstance(a[cid], dict) else {}
+        cb = b[cid] if isinstance(b[cid], dict) else {}
+        slots = sorted(k for k in set(ca) | set(cb) if ca.get(k) != cb.get(k))
+        if cid in rejected:
+            notes.append(f"고침 {cid}: {', '.join(slots)}")
+        else:
+            problems.append(f"반려되지 않은 카드가 바뀌었다: {cid} ({', '.join(slots)})")
+    for key in sorted((set(old) | set(new)) - {"cards"}):
+        if old.get(key) != new.get(key):
+            problems.append(f"카드 밖의 값이 바뀌었다: {key}")
+    return problems, notes
+
+
 def main(argv=None):
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -89,6 +136,10 @@ def main(argv=None):
     d.add_argument("handoff")
     d.add_argument("deep")
     d.add_argument("--out", required=True)
+    r = sub.add_parser("rework-diff")
+    r.add_argument("old")
+    r.add_argument("new")
+    r.add_argument("copyedit")
     args = ap.parse_args(argv)
     try:
         if args.cmd == "terms":
@@ -100,6 +151,15 @@ def main(argv=None):
                 print(line)
             print(f"사전 점검: {len(lines)}건" + ("" if lines else " — 통과"))
             return 1 if lines else 0
+        if args.cmd == "rework-diff":
+            old, new, copyedit = _load(args.old), _load(args.new), _load(args.copyedit)
+            if not all(isinstance(x, dict) for x in (old, new, copyedit)):
+                raise ValueError("델타·교열 기록이 객체가 아니다")
+            problems, notes = rework_diff(old, new, rejected_ids(copyedit))
+            for line in problems + notes:
+                print(line)
+            print("재작업 대조: " + (f"범위를 넘음 {len(problems)}건" if problems else "통과 — 반려 카드만 바뀌었다"))
+            return 1 if problems else 0
         handoff, deep = _load(args.handoff), _load(args.deep)
         if not isinstance(handoff, dict) or not isinstance(deep, dict):
             raise ValueError("handoff·deep 델타가 객체가 아니다")

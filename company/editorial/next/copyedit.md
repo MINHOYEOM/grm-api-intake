@@ -54,6 +54,19 @@
    X 는 근거(슬롯 이름 + 코드 `facts`/`prose_input` 의 어느 값과 어긋나는지)를 적는다.
 2-1. **`hook_line` 점검(있는 카드만).** 한국어 `hook_line` 과 `en.hook_line` 각각 `STYLE.md` §12 로 O/X: ① 금칙어 없음(신호, 볼 만, 필요가, 가능성, 시사, 우려, 느낌표·물음표·이모지) ② 공백 포함 **한국어 40자 이내 · 영문 90자 이내**(영문에 40자를 적용하지 않는다) ③ **숫자 원문 대조** — 문장의 모든 숫자가 같은 카드의 코드 `facts`·483 `observations`·WL `violations` 본문에 글자 그대로 있어야 한다(세어서 만든 숫자·반올림 X) ④ 근거 없는 사실·원문보다 강한 단정 없음(진술은 "진술" 표기) ⑤ 사전 용어는 사전 표기, 영문 약어 없음 ⑥ 업체명·제목 반복 없음. 근거를 못 찾으면 X 로 적고(`item: "hook_line"`) 기자가 필드를 비우도록 되돌린다. `hook_line` 이 없는 카드는 점검 대상이 아니다(없는 것이 정상).
 3. **직접 고치지 않는다.** 판정만 한다. 기준표에 없는 취향 지적을 하지 않는다.
+3-1. **반려가 있으면 기자에게 한 번 되돌린다(재작업 1회 — 2026-11-14 대표 결정).** 조건: 코드 검사 exit 0 · reject 1~10장 · 이 호의 첫 판정(`copyedit.json` 이 아직 없었다).
+   그러면 마감하지 않고 `copyedit.json` 을 `"status": "재작업"`, `"round": 1`, `"published": false`, `"rework": {"cards": ["<반려 카드 id>", …]}` 로 써서
+   `delta.json`(판정한 그대로)과 함께 커밋·push 하고 끝낸다. Notion 에는 아무것도 쓰지 않는다. reject 가 10장을 넘거나 코드 검사가 실패면 되돌리지 않고 종전대로 `보류`.
+3-2. **다시 판정(2차).** 시작할 때 `copyedit.json` 이 이미 `재작업` 이면 이 실행은 2차다(`완료`·`보류`·`실패` 면 곧바로 종료).
+   `rework.json` 이 `완료` 가 될 때까지 09:20 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 아니면 `copyedit.json` 을 `보류` 로 고쳐 push 하고 끝낸다. `완료` 면:
+   ```
+   mkdir -p _scaffold && cp company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.r1.json && cp company/run/{run_date_kst}/delta.json _scaffold/delta.r1.json
+   python company/editorial/merge_parts.py company/run/{run_date_kst}
+   python company/editorial/precheck.py rework-diff _scaffold/delta.r1.json company/run/{run_date_kst}/delta.json _scaffold/copyedit.r1.json
+   ```
+   `rework-diff` 가 exit≠0 이면(반려되지 않은 카드가 바뀌었거나 카드가 늘고 줄었다) 판정하지 않고 `보류`. exit 0 이면 1번(코드 검사)을 다시 돌리고,
+   **반려됐던 카드만** 2·2-1번 전 항목으로 다시 판정한다(나머지 카드는 글자가 그대로이므로 1차 판정 `pass` 를 그대로 옮긴다).
+   결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남으면 `보류`** — 더 되돌리지 않는다(백업이 발행한다).
 4. **마감 — 코드 검사 exit 0 이고 reject 0 일 때만.** 하나라도 아니면 Notion 에 아무것도 쓰지 않고 끝낸다
    (Notion handoff 가 OPEN 으로 남아 09:30 백업 Routine 이 발행한다). 통과면 이 순서로 (`RUN.md` 0항 `반납 길: git` 인 호):
    1. **반납 = 실행 폴더 push.** 코드 검사에 쓴 스캐폴드를 **그 파일 그대로** 실행 폴더에 복사한다(다시 저장·정렬하지 않는다):
@@ -71,7 +84,8 @@
 ## 결과 — `company/run/{run_date_kst}/copyedit.json`
 ```
 {
-  "status": "완료|보류|실패",
+  "status": "완료|보류|실패|재작업",
+  "round": 1,
   "code_gate": {"ran": true, "exit": 0, "message": ""},
   "cards": [{"web_card_id": "...", "verdict": "pass|reject",
              "fails": [{"item": "자가점검 9", "slot": "key_facts", "evidence": "한 줄"}]}],
@@ -83,4 +97,4 @@
 `copyedit.json` 에 `"published": true|false` 를 더해, 마감까지 했는지 적는다.
 
 ## 하지 않는 것
-슬롯 수정, 카드 채택 변경, 검색, 마감 4번 밖의 Notion 쓰기(행 Status 포함), 다른 직무 파일 수정.
+슬롯 수정(반려 카드는 기자가 고친다 — 3-1), 카드 채택 변경, 검색, 마감 4번 밖의 Notion 쓰기(행 Status 포함), 다른 직무 파일 수정.

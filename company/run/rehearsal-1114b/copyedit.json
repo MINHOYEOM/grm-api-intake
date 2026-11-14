@@ -1,0 +1,19 @@
+{
+ "status": "보류",
+ "round": 1,
+ "rehearsal": true,
+ "published": false,
+ "code_gate": {
+  "ran": true,
+  "exit": 2,
+  "message": "조립 거부: 발행본 조립 검증 실패 16건 — 카드 fda483-196258(관찰 #1~2)·fda483-196262(관찰 #1~6): 관찰마다 deficiency_ko 없음, detail 이 있는데 detail_ko 없음. (merge_parts exit 0 · deep-source 26/26 · 카드 51장·심층 26건)"
+ },
+ "cards": [],
+ "counts": {
+  "cards": 51,
+  "pass": 0,
+  "reject": 0,
+  "fails_total": 0
+ },
+ "note": "코드 검사 실패 → 의미 점검 생략, 재작업 대상 아님(3-1: 코드 검사 실패는 보류). 원인 후보: 심층(deep.B 등)의 483 관찰 번역 슬롯 deficiency_ko·detail_ko 누락."
+}

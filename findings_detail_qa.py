@@ -53,7 +53,9 @@ FORM_BLOCK_RE = re.compile(
     # 실측: "CHY, STATE. ZJPCOOE, COUNTRY"·"c1rv, STAT!:. ZIPCC0E"·"DATEiSJ OF INSPtiCTtON"·"STREET ACCRESS"·"TYPE ESTAB.ISMMENT"
     r"|\b\S{1,4}[,.]?\s*STAT\S{0,3}[,.]?\s*Z\S{1,2}P\s*\S{2,4}E\b|ZIP\s*\S{3,4}E[,.]?\s*COUNTRY|\bCOUNTRY\s+\S{0,2}\s*T\S?PE\b"
     r"|DATE\S{0,4}\s*OF\s*INSP\S*|STRE?E?T\s+A\S{1,3}RESS|TYPE\s+EST\S*"
-    r"|,\s*(?:Senior\s+|Lead\s+)?Invest\s?igator\b|\bDATE\s+ISSUED\b",
+    # 실사관 서명 칸(실측: "Muna Alghari beh, Investi gator"·"PREVIOUS EDmON OBSOLEJE"·"FORM FDA ~83 (09/08)")
+    r"|,\s*(?:Senior\s+|Lead\s+)?I\s?n\s?v\s?e\s?s\s?t\s?i\s?g\s?a\s?t\s?o\s?r\b|\bDATE\s+ISSUED\b"
+    r"|PREVIOUS\s+ED\S{2,5}\s+OBSOL|\bFORM\s+FDA\s+\S{2,4}\s*\(\d\d/\d\d\)|Digitally\s+signed",
     re.IGNORECASE)
 # 대문자 낱말 3개 이상이 잇따르면 약어가 아니라 양식 칸·강조 문장이다("THIS IS A REPEAT OBSERVATION") — 번역 대상.
 _CAPS_RUN_RE = re.compile(r"\b[A-Z]{2,}\b(?:[\s,.*:;/-]+\b[A-Z]{1,}\b){2,}")

@@ -323,7 +323,10 @@ def _evaluate_health(
         )
 
     store = getattr(stats, "store_summary", None) or {}
-    if stats.has_insert_failures():
+    # [노션 끄기] GRM_INTAKE_NOTION=off 면 "insert 실패" = 정본 저장 실패다. 같은 문서가 매일 거부될 수
+    # 있어(유효성) failure 로 수집을 세우지 않는다 — 아래 `supabase-append-failed` 경고가 그 건수를 말한다.
+    notion_off = store.get("notion") == "off"
+    if stats.has_insert_failures() and not notion_off:
         kept = int(store.get("notion_failed_supabase_kept") or 0)
         detail = "해당 항목은 이번 주 다이제스트에서 누락될 수 있습니다."
         if kept:
@@ -347,7 +350,18 @@ def _evaluate_health(
              "다음 실행으로 미뤘습니다. Notion 이 계속 실패하면 같은 KST 날짜 안에 재실행하세요."),
         )
     supa_failed = int(store.get("supabase_failed") or 0)
-    if supa_failed:
+    handoff_from_db = (store.get("handoff_source") or {}).get("source") == "db"
+    if supa_failed and handoff_from_db:
+        # [handoff 정본 DB] 정본에 못 들어간 문서는 DB 대기열에도 없다(FK) → 오늘 handoff 에 없다.
+        health.add_warning(
+            "supabase-append-failed",
+            "Supabase",
+            f"Supabase 정본 저장 실패 {supa_failed}건 — 오늘 handoff(DB 정본)에 없는 문서",
+            ("handoff 를 DB 로 만드는 중이라(GRM_HANDOFF_SOURCE=db) 이 문서들은 오늘 handoff·스캐폴드에 "
+             "실리지 않았습니다. 다음 수집에서 다시 저장·대기열에 들어갑니다 — 발행 요일이면 실행 로그의 "
+             "'Supabase append 실패' 문서를 확인하고, 필요하면 GRM_QUEUE_HANDOFF_REFRESH=true 로 다시 돌리세요."),
+        )
+    elif supa_failed:
         health.add_warning(
             "supabase-append-failed",
             "Supabase",

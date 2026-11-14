@@ -331,6 +331,16 @@ jobs:
           #   그림자: 판정은 노션 기준 그대로 두고 DB 기준이었다면 어땠을지(새 문서·보충·건너뜀, 소스별 보충 표본)를
           #   health JSON `store.dedup_shadow` 에 남긴다. 읽기만 한다.
           ENABLE_INTAKE_DEDUP_SHADOW: ${{ vars.ENABLE_INTAKE_DEDUP_SHADOW || 'false' }}
+          # [노션 끄기 준비] 그날 handoff·발행 스캐폴드의 정본. notion(기본) | db.
+          #   db 면 DB(intake_queue + raw_signals)로 만든 handoff 가 정본이다: 스캐폴드(brief_web_*.json)를
+          #   GRM_WEB_BRIEF_DIR 에 내고(→ grm-web-brief 아티팩트), health 의 handoff 성패도 그 결과로 정한다.
+          #   노션 handoff 페이지는 거울로 계속 만든다. Supabase 설정이 없으면 노션 길로 되돌아간다.
+          GRM_HANDOFF_SOURCE: ${{ vars.GRM_HANDOFF_SOURCE || 'notion' }}
+          # [노션 끄기] 수집기가 노션 Intake DB 를 쓰지도 읽지도 않게 한다. on(기본) | off.
+          #   off 면 행 생성·handoff 페이지·중복 조회·무음 감시·창 밖 미소비 수·그림자 비교의 노션 호출이 전부
+          #   사라지고, 중복 판정과 handoff 는 DB 기준이 된다(위 두 변수 값과 무관). Supabase 저장이 꺼져 있으면
+          #   실행을 거부한다(exit 2). **은퇴 목록 7절 조건을 모두 채우고 대표 승인을 받은 뒤에만 off.**
+          GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
           # §1-B(ENABLE_WEB_BRIEF_EMIT·GRM_WEB_BRIEF_DIR)는 job-level env 에 정의(upload 스텝과 공유).
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음

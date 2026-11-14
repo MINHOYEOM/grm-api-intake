@@ -9,7 +9,7 @@
 
 ## 값
 `D` = 오늘(KST). 결과 파일 = 브랜치 `claude/company-$D` 의 `company/run/$D/verification.md` 하나.
-(브랜치 사용법은 `situation-room/brief-prep.md` "기록"과 같다: 있으면 그 위에, 없으면 `origin/main` 에서 만든다.)
+(브랜치 사용법은 `situation-room/brief-prep.md` "기록"과 같다: 있으면 그 위에, 없으면 방금 `git fetch origin main` 한 `FETCH_HEAD` 에서 만든다 — `origin/main` 이라는 이름은 쓰지 않는다.)
 시작할 때 이번 달(KST)의 `company/run/*/verification.md`(브랜치 `claude/company-*` 포함, `git ls-remote`·`git show`)에 첫 줄 `상태: 완료` 인 것이 있으면 `상태: 완료 — 이번 달 이미 함` 한 줄로 끝낸다(파일을 새로 쓰지 않는다). `보류`·`실패` 는 "이미 함"이 아니다 — 다시 한다.
 
 ## 입력 (읽기 전용)

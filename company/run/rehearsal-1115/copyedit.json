@@ -1,0 +1,275 @@
+{
+ "status": "완료",
+ "round": 1,
+ "rehearsal": true,
+ "published": false,
+ "code_gate": {
+  "ran": true,
+  "exit": 0,
+  "message": "조립 완료: 채택 47카드 (스킵 22), deep 병합 26카드, Evidence A27/B20/C0"
+ },
+ "cards": [
+  {
+   "web_card_id": "fda483-195377",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196245",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196251",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196252",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196253",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196254",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196255",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196257",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196258",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196259",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196260",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196261",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196262",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196264",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196270",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0f65bd3c5c70",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "7e7545ebb190",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "bfbb158a522f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007929",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007930",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007935",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007955",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007975",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008096",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrIf",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "575464327e0c",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "949016d08856",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "dba4d011e02b",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "00ae76e635bb",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "2026-23005",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82928",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "758874567fae",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008055",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyqbl",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrFI",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrUH",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73uE9xd4-",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "c3b4f61a28c7",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0073-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0074-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0075-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0077-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0080-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0085-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0104-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0105-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0107-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0108-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0110-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0113-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "b0fc253f04b7",
+   "verdict": "pass",
+   "fails": []
+  }
+ ],
+ "counts": {
+  "cards": 51,
+  "pass": 51,
+  "reject": 0,
+  "fails_total": 0
+ },
+ "note": "hook_line 숫자 5건은 원문 표기 차이(9-13·2. 11.·Prior to March 28, 2026·22 CFU~451 CFU)로 대조 통과. hc-82928 '불순물 기준일탈(OOS)' 은 원문 제목 Out-of-specification (Impurity) 근거 — 용어 예외(Failed…Specification)는 해당 없음으로 pass."
+}

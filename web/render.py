@@ -3692,6 +3692,33 @@ def facet_tree_paths(facets_data: "dict[str, Any] | None") -> "set[str]":
     return out
 
 
+def restrict_facets_to_tree(facets_en: "dict[str, Any] | None",
+                            facets_ko: "dict[str, Any] | None") -> "dict[str, Any] | None":
+    """영어 정본에서 **한국어 정본에도 있는 면**만 남긴다(항목·조합 단위).
+
+    [2026-11-15] 두 정본은 언어별 모집단으로 따로 재서 표본 문턱을 넘는 면이 갈린다
+    (실측: 영어에만 training-personnel × HC 조합). 영어 트리 계약은 "모든 영어 페이지에
+    한국어 짝이 있다"(WebEnTreeTest.test_every_en_page_has_a_korean_counterpart)라,
+    짝 없는 영어 면은 그리지 않는다. 건수(totals)·제외 목록은 영어 정본 그대로 둔다."""
+    if not facets_en:
+        return facets_en
+    if not facets_ko:
+        return None
+    ko_axes = {a["axis"]: {it["slug"] for it in a.get("items") or []}
+               for a in facets_ko.get("axes") or []}
+    ko_combos = {(c["category_slug"], c["slug"])
+                 for c in ((facets_ko.get("combos") or {}).get("items") or [])}
+    out = dict(facets_en)
+    out["axes"] = [dict(a, items=[it for it in a.get("items") or []
+                                  if it["slug"] in ko_axes.get(a["axis"], set())])
+                   for a in facets_en.get("axes") or [] if a["axis"] in ko_axes]
+    if facets_en.get("combos") is not None:
+        combos = facets_en["combos"]
+        out["combos"] = dict(combos, items=[c for c in combos.get("items") or []
+                                            if (c["category_slug"], c["slug"]) in ko_combos])
+    return out
+
+
 def facets_root(facets_data: "dict[str, Any] | None") -> "str | None":
     """지적사항 탭 `찾기 › 분류`가 가리킬 모음 첫 화면 — 분류 → 기관 → 국가 중 이 트리에 선 첫 축.
 
@@ -6250,11 +6277,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (아래 `en_paths = en_tree_paths(catalogs)`). 첫 렌더(랜딩)는 그 뒤라 항상 채워져 있고,
     # 어긋나면 `WebEnTreeTest.test_emitted_en_paths_match_the_declared_set` 이 잡는다.
     en_paths: set[str] = set()
-    # [2026-11-15] 영어 정본에만 있는 모음 면(한국어 정본엔 없는 분류×기관 조합 등).
-    # 영어 페이지는 그리되 **언어 짝은 걸지 않는다** — 두 정본은 언어별 모집단으로 따로
-    # 재서 표본 문턱을 넘는 조합이 갈린다(실측: en 에만 training-personnel × HC).
-    # 짝을 걸면 없는 한국어 페이지로 가는 깨진 링크가 된다(facets PR #1697 CI).
-    en_only_paths: set[str] = set()
     # 영어 피드가 실제로 나오는가 — `en_brief_slugs` 확정 직후 채워진다(en_paths 와 같은
     # 관례: 클로저는 호출 시점의 값을 읽는다). 영어 피드가 없으면 영어 페이지는 피드
     # 링크를 아예 걸지 않는다 — 한국어 피드를 자기 대체본이라고 말하지 않기 위해서다.
@@ -6282,7 +6304,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                       + "index.html",
                       "label": LANG_ENDONYM[lg], "current": lg == tree_lang}
                      for lg in SUPPORTED_LANGS]
-                    if pp.path in en_paths and pp.path not in en_only_paths else [])
+                    if pp.path in en_paths else [])
             return tree_env.get_template(template).render({
                 "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
                 "canonical": pp.canonical, "latest_slug": latest_slug,
@@ -6403,7 +6425,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     facets = load_findings_facets()
     # 파일이 없으면 영어 모음 페이지가 0장이 된다 — 그건 의도된 상태다(생기면 저절로
     # 선다). 스키마가 어긋나면 로더가 실패한다 — 빈 페이지 수십 장을 내보내지 않는다.
-    facets_en = load_findings_facets(FINDINGS_FACETS_EN_FILE)
+    facets_en = restrict_facets_to_tree(load_findings_facets(FINDINGS_FACETS_EN_FILE), facets)
     docs_data = load_findings_docs()
     # [조항 페이지] 조항 뷰는 **용어사전보다 먼저** 만든다 — 용어사전의 "관련 조항"이
     # 실제로 만들어진 조항 페이지에만 링크를 걸어야 하기 때문(없는 페이지로 보내는 링크는
@@ -6500,7 +6522,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   "무엇을 그릴지"의 선언이므로 **어떤 렌더보다도 먼저** 확정한다.
     if facets_en:
         en_paths |= facet_tree_paths(facets_en)
-        en_only_paths |= facet_tree_paths(facets_en) - facet_tree_paths(facets)
     # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
     # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
     # → 해당 섹션이 조용히 꺼진다(load_findings_facets 관례 동형).

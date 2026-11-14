@@ -131,6 +131,80 @@ class DeepSourceTest(unittest.TestCase):
             self.assertNotIn("source_text", json.loads(Path(d).read_text(encoding="utf-8"))["wl-1"])
 
 
+class NestedTranslationTest(unittest.TestCase):
+    """리허설 1114b: 심층 기자가 observations_ko 를 deep_analysis 안에 넣어, 교열의 조립 검사가 483 관찰 국문 없음으로 거부했다."""
+
+    OBS = [{"number": "1", "deficiency_ko": "교육을 받지 않았다.", "detail_ko": "구체적으로 …"}]
+
+    def _nested(self):
+        return {"deep_analysis": {"key_violations": [], "observations_ko": list(self.OBS),
+                                  "violations_ko": [{"number": "1"}]}}
+
+    def test_lift_matches_the_bridge_gate(self):
+        entry = self._nested()
+        before = json.dumps(entry, ensure_ascii=False, sort_keys=True)
+        lifted = precheck.lift_nested(entry)
+        self.assertEqual(json.dumps(entry, ensure_ascii=False, sort_keys=True), before)      # 원본은 그대로
+        self.assertEqual(lifted["observations_ko"], self.OBS)
+        self.assertNotIn("observations_ko", lifted["deep_analysis"])
+        self.assertNotIn("violations_ko", lifted["deep_analysis"])
+        # 브릿지 게이트가 같은 입력을 어떻게 바꾸는지와 비교한다(게이트 판정은 통과로 고정).
+        bridged = {"x": json.loads(before)}
+        gate = mock.MagicMock()
+        gate.run_deep_analysis_gate.return_value = mock.MagicMock(ok=True)
+        with mock.patch.object(delta_bridge, "_vda", gate), mock.patch.object(delta_bridge, "log"):
+            kept = delta_bridge._gate_deep_analysis(bridged)
+        self.assertEqual(kept["x"], lifted)
+        self.assertEqual(set(precheck.NESTED_TRANSLATION_KEYS), {"observations_ko", "violations_ko"})
+
+    def test_card_level_translation_wins_over_nested(self):
+        entry = dict(self._nested(), observations_ko=[{"number": "9", "deficiency_ko": "카드 층"}])
+        self.assertEqual(precheck.lift_nested(entry)["observations_ko"][0]["number"], "9")
+
+    def test_untouched_when_nothing_is_nested(self):
+        entry = {"deep_analysis": {"key_violations": []}, "observations_ko": self.OBS}
+        self.assertIs(precheck.lift_nested(entry), entry)
+
+    def test_deep_source_copy_is_lifted_and_assemblable(self):
+        out, filled = precheck.with_source_text({"fda483-1": self._nested()}, {"fda483-1": "원문"})
+        self.assertEqual(filled, 1)
+        self.assertEqual(out["fda483-1"]["observations_ko"], self.OBS)
+        self.assertEqual(out["fda483-1"]["source_text"], "원문")
+
+    def test_shard_check_flags_nested_missing_and_incomplete(self):
+        handoff = {"rows": [{"web_card_id": "fda483-1", "kind": "fda-483"}, {"web_card_id": "fda483-2", "kind": "fda-483"},
+                            {"web_card_id": "fda483-3", "kind": "fda-483"}, {"web_card_id": "wl-1", "kind": "warning-letter"}]}
+        ids = precheck.fda483_ids(handoff)
+        self.assertEqual(ids, {"fda483-1", "fda483-2", "fda483-3"})
+        shard = {"items": {"fda483-1": {"deep_analysis": {}, "observations_ko": self.OBS},
+                           "fda483-2": self._nested(),
+                           "fda483-3": {"deep_analysis": {}, "observations_ko": [{"number": "1"}]},
+                           "wl-1": {"deep_analysis": {}}}}
+        lines = precheck.deep_lines(shard, ids)
+        self.assertEqual(len(lines), 3)
+        self.assertTrue(any(x.startswith("자리 틀림 fda483-2: observations_ko") for x in lines))
+        self.assertTrue(any(x.startswith("자리 틀림 fda483-2: violations_ko") for x in lines))
+        self.assertTrue(any(x.startswith("483 관찰 국문 불완전 fda483-3") for x in lines))
+        gone = {"items": {"fda483-1": {"deep_analysis": {}}}}
+        self.assertEqual(precheck.deep_lines(gone, ids), ["483 관찰 국문 없음 fda483-1: observations_ko(★필수)"])
+
+    def test_cli_and_instructions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            h, good, bad = (os.path.join(tmp, n) for n in ("h.json", "g.json", "b.json"))
+            Path(h).write_text(json.dumps({"rows": [{"web_card_id": "fda483-1", "kind": "fda-483"}]}), encoding="utf-8")
+            Path(good).write_text(json.dumps({"items": {"fda483-1": {"deep_analysis": {}, "observations_ko": self.OBS}}},
+                                             ensure_ascii=False), encoding="utf-8")
+            Path(bad).write_text(json.dumps({"items": {"fda483-1": self._nested()}}, ensure_ascii=False), encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(precheck.main(["deep", h, good]), 0)
+                self.assertEqual(precheck.main(["deep", h, bad]), 1)
+        for folder in (("company", "editorial"), ("company", "editorial", "next")):
+            text = ROOT.joinpath(*folder, "reporter.md").read_text(encoding="utf-8")
+            self.assertIn("`items.<web_card_id>.observations_ko` 이고 `deep_analysis` 안이 아니다", text, folder)
+        self.assertIn("python company/editorial/precheck.py deep _handoff/handoff_{run_date_kst}.json",
+                      ROOT.joinpath("company", "editorial", "next", "reporter.md").read_text(encoding="utf-8"))
+
+
 class ReworkDiffTest(unittest.TestCase):
     OLD = {"cards": {"a": _card(), "b": _card(summary="용출 규격 이탈로 회수했다."), "c": _card()},
            "tldr": ["하나", "둘", "셋"], "handoff_ref": {"date": "2026-11-13"}}

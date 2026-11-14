@@ -1,0 +1,10 @@
+{
+  "status": "보류",
+  "rehearsal": true,
+  "round": 1,
+  "published": false,
+  "code_gate": {"ran": false, "exit": null, "message": "merge_parts.py exit 1: 합치기 실패: 영문 슬롯 미완결 4/51장 — 이 호는 영어로 나가지 않는다 (예: 575464327e0c(key_facts), 949016d08856(key_facts), dba4d011e02b(key_facts))"},
+  "cards": [],
+  "counts": {"cards": 0, "pass": 0, "reject": 0, "fails_total": 0},
+  "note": "미완결 4장은 모두 delta.B.json: 575464327e0c, 949016d08856, dba4d011e02b, 758874567fae — 한국어·영문 key_facts 둘 다 빈 배열(key_facts 는 필수 슬롯, 비워도 되는 칸은 implication·checks 뿐). 기자(델타-B 샤드) 되돌림 필요. 교열은 직접 고치지 않으므로 판정·코드 검사 미실시. handoff sha256 은 desk.json handoff_ref 와 일치(e808ea48…). Notion 쓰기 없음."
+}

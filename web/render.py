@@ -6108,6 +6108,14 @@ def build_site_webmanifest() -> str:
 
 
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
+def _js_single_quoted(value) -> str:
+    """작은따옴표 JS 문자열 리터럴 안에 번역문을 넣을 때의 이스케이프.
+    번역문(It's 등)의 어포스트로피가 문자열을 닫아 스크립트 전체가 죽는 것을 막는다. 한글은 그대로 둔다."""
+    from markupsafe import Markup
+    t = str(value).replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
+    return Markup(t.replace("</", "<\\/"))
+
+
 def _make_env(lang: str = DEFAULT_LANG,
               translator: "Translator | None" = None) -> Environment:
     env = Environment(
@@ -6118,6 +6126,7 @@ def _make_env(lang: str = DEFAULT_LANG,
         keep_trailing_newline=True,
     )
     # [상세 가독성 2026-07-27] 표현층 전용 필터 — 데이터는 verbatim, 렌더만 분해한다.
+    env.filters["js_sq"] = _js_single_quoted
     env.filters["detail_blocks"] = split_detail_blocks
     env.filters["gmp_operations"] = split_gmp_operations
     # [다국어 2단계] 템플릿 전역 `_("…")` — 문구 사전. 한국어는 항등(Markup 으로 그대로),

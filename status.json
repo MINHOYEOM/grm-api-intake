@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-14T00:19:29Z",
+ "generated_at": "2026-11-14T07:01:32Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43553719379,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-14T03:51:07Z",
+    "updatedAt": "2026-11-14T03:56:23Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh recent regulatory news (#1691)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43553719379"
+   },
+   {
+    "databaseId": 43552534560,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-14T03:36:48Z",
+    "updatedAt": "2026-11-14T03:42:18Z",
+    "headBranch": "automation/news-auto-43552478222",
+    "displayTitle": "chore: refresh recent regulatory news",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43552534560"
+   },
+   {
     "databaseId": 43531158239,
     "status": "completed",
     "conclusion": "success",
@@ -205,28 +227,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1686 from MINHOYEOM/claude/glossary-fig-daily-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43497705043"
-   },
-   {
-    "databaseId": 43422823287,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-13T12:09:39Z",
-    "updatedAt": "2026-11-13T12:15:37Z",
-    "headBranch": "claude/glossary-fig-daily-20261113-2108",
-    "displayTitle": "glossary(fig): 2026-11-13 새 그림 0 · 다시 그림 0 · 보류 8 — gmp·api·api-starting-material·manufacture·production·packaging·authorized-person·batch-release",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43422823287"
-   },
-   {
-    "databaseId": 43422816730,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-13T12:09:36Z",
-    "updatedAt": "2026-11-13T12:14:38Z",
-    "headBranch": "claude/glossary-fig-daily-20261113-2108",
-    "displayTitle": "glossary(fig): 2026-11-13 새 그림 0 · 다시 그림 0 · 보류 8 — gmp·api·api-start…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43422816730"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -402,6 +402,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 43569096953,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-14T07:01:18Z",
+    "updatedAt": "2026-11-14T07:01:23Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1689 from MINHOYEOM/claude/findings-translate-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43569096953"
+   },
+   {
     "databaseId": 43391130814,
     "status": "completed",
     "conclusion": "success",
@@ -444,20 +455,20 @@
     "headBranch": "main",
     "displayTitle": "data(483 번역): 단독 조각 새 행 — 표제 38·상세 37 (#1664)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43353423020"
-   },
-   {
-    "databaseId": 43348415368,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-13T01:55:20Z",
-    "updatedAt": "2026-11-13T01:56:08Z",
-    "headBranch": "main",
-    "displayTitle": "data(483 번역): 85401·85637 ocr-recovery 후속 — 새 관찰 2·재번역 1 (#1661)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43348415368"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 43567128402,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-14T06:35:58Z",
+    "updatedAt": "2026-11-14T06:36:03Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43567128402"
+   },
    {
     "databaseId": 43495607337,
     "status": "completed",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43174401906"
-   },
-   {
-    "databaseId": 43089410679,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-11T19:40:37Z",
-    "updatedAt": "2026-11-11T23:02:07Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43089410679"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 43569072448,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-14T07:01:01Z",
+    "updatedAt": "2026-11-14T07:01:21Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43569072448"
+   },
+   {
     "databaseId": 43497655386,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43177296622"
-   },
-   {
-    "databaseId": 43091046552,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-11T19:51:18Z",
-    "updatedAt": "2026-11-11T19:51:46Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43091046552"
    }
   ],
   "grm-cloud-request.yml": [

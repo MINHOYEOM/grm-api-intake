@@ -1,0 +1,113 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "water-system", "as_of": "2026-11-15",
+  "area_ko": "무균·오염 관리", "area_en": "Sterility and contamination control",
+  "title_ko": "제약용수", "title_en": "Pharmaceutical water systems",
+  "glossary_ids": ["water-system", "purified-water"],
+  "aliases_ko": ["정제수", "주사용수", "용수 시스템"],
+  "aliases_en": ["water system", "purified water", "water for injection"],
+  "search_q_ko": "용수 시스템", "search_q_en": "water system",
+  "lead_ko": "FDA 는 용수 시스템을 갖췄는지보다, 그 시스템이 용도에 맞는 물을 일관되게 만든다는 점이 밸리데이션과 모니터링으로 확인되는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a water system is installed than at whether validation and monitoring confirm that it consistently produces water suitable for its use. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "용수 시스템을 밸리데이션했음을 보이지 않았다",
+      "title_en": "The water system was not shown to be validated",
+      "quotes": [
+        { "finding_id": "finding-64daaa4cf74b1b3a83081bab", "raw_signal_id": "rawsig-23e0192a9f1281c1d56e56a5", "document_id": "ceaed256bdd9", "source": "FDA Warning Letter",
+          "firm": "Naturich Cosmetique Labs", "date": "2025-10-07",
+          "quote_ko": "귀사는 용수 생산 공정이 의도한 용도에 적합한 품질의 용수를 일관되게 생산하는 시스템임을 보장하도록 적절히 밸리데이션하지 않았다.",
+          "quote_en": "You failed to adequately validate your water production process to ensure the system was consistently producing water of appropriate quality for its intended use." },
+        { "finding_id": "finding-c4c21b804d21ff26bcd19969", "raw_signal_id": "rawsig-885289dbb70441b589066faa", "document_id": "75b2e0175fac", "source": "FDA Warning Letter",
+          "firm": "Nature’s Fusions LLC", "date": "2025-07-22",
+          "quote_ko": "귀사는 물 시스템이 밸리데이션되었음을 입증하는 적절한 문서를 제공하지 못했다.",
+          "quote_en": "You were unable to provide adequate documentation demonstrating that your water system is validated." }
+      ]
+    },
+    {
+      "title_ko": "용수에 유해 미생물이 없는지 확인하지 않았다",
+      "title_en": "Water was not checked for the absence of objectionable microorganisms",
+      "quotes": [
+        { "finding_id": "finding-a417937a12e3d5410b69a7d3", "raw_signal_id": "rawsig-bf4534e15f09476a21ea7058", "document_id": "5d33e5c1dcbe", "source": "FDA Warning Letter",
+          "firm": "Harbin Jixianglong Biotech Co., Ltd.", "date": "2026-05-19",
+          "quote_ko": "예를 들어 귀사의 비무균 semaglutide 및 tirzepatide API는 무균 주사제에 사용하기 위한 것인데도, 귀사의 (b)(4) 용수 시스템은 부적합 미생물이 없는지에 대해 평가된 적이 없다.",
+          "quote_en": "For example, your non-sterile semaglutide and tirzepatide API are intended for sterile injectable drug products, and your (b)(4) water system has not been evaluated for the absence of objectionable microorganisms." },
+        { "finding_id": "finding-62208d8ee5981aec10c63874", "raw_signal_id": "rawsig-005bf89b716c1d555d1f1bab", "document_id": "fda483-193727", "source": "FDA 483",
+          "firm": "Sincerus Florida, LLC", "date": "2026-07-22",
+          "quote_ko": "구체적으로, 귀사의 비무균 외용 의약품 및 그 생산에 사용하는 [redacted] 용수를 Burkholderia cepacia complex(BCC) 같은 유해 미생물에 대해 일상 시험하지 않는다.",
+          "quote_en": "Specifically, The firm's non-sterile topical drug products and [redacted] Water, used in producing the non-sterile drug products, are not routinely tested for objectionable microorganisms such as Burkholderia cepacia complex (BCC)." }
+      ]
+    },
+    {
+      "title_ko": "데드레그가 있고 물이 순환하지 않는 시스템을 그대로 두었다",
+      "title_en": "The system had dead legs and water that did not circulate",
+      "quotes": [
+        { "finding_id": "finding-e76d8c4fede2e31bfc45f470", "raw_signal_id": "rawsig-4d634749d0757bc13efbfd56", "document_id": "4b308690a1f1", "source": "FDA Warning Letter",
+          "firm": "Evi Labs LLC", "date": "2025-06-03",
+          "quote_ko": "예를 들어, 귀사의 용수 시스템에는 데드 레그(dead leg)가 있었고, 지속적으로 순환되지 않았으며, 밸리데이션된 소독 공정을 거치지 않았다.",
+          "quote_en": "For example, your water system included a dead leg, was not continuously circulating, and was not subjected to validated sanitization processes." },
+        { "finding_id": "finding-24684a0918b06945a5091401", "raw_signal_id": "rawsig-59a717d43377434a92dffdec", "document_id": "b2bad93da38b", "source": "FDA Warning Letter",
+          "firm": "Multaler et Cie SAS", "date": "2024-11-12",
+          "quote_ko": "예를 들어 순환하지 않는 (b)(4) 용수 시스템에는 생물막(biofilm) 형성을 촉진할 수 있는 데드레그(dead leg)가 있었다. 이 시스템의 물은 사용하지 않을 때 정체되어 있었으며, 의약품 제조에 물을 공급하는 배관도 마찬가지였다.",
+          "quote_en": "For example, your non-circulating (b)(4) water system included dead legs, which could foster the development of biofilms. When not in use, water from this system sat stagnant, including in a line that was used to dispense water for your drug product." }
+      ]
+    },
+    {
+      "title_ko": "총유기탄소 시험을 하지 않았다",
+      "title_en": "Total organic carbon testing was not performed",
+      "quotes": [
+        { "finding_id": "finding-c9e79dfdc168955d96271cf0", "raw_signal_id": "rawsig-75dd8d9b1148664933fceb2c", "document_id": "2d0949c48d0e", "source": "FDA Warning Letter",
+          "firm": "Medical Chemical Corporation", "date": "2025-07-22",
+          "quote_ko": "귀사는 물 시스템 밸리데이션이 없었고, 원료인 물이 (b)(4) Water 미국약전(USP) 개별 규격을 충족하는지 확인하기 위한 총유기탄소(TOC) 시험을 수행하지 않았다.",
+          "quote_en": "You lacked water system validation and failed to conduct total organic carbon (TOC) testing to ensure that your component water met (b)(4) Water United States Pharmacopeia (USP) monograph specifications." },
+        { "finding_id": "finding-c4c21b804d21ff26bcd19969", "raw_signal_id": "rawsig-885289dbb70441b589066faa", "document_id": "75b2e0175fac", "source": "FDA Warning Letter",
+          "firm": "Nature’s Fusions LLC", "date": "2025-07-22",
+          "quote_ko": "귀사는 전도도 및 총유기탄소 한도와 시험이 없었고 특정 objectionable microorganism에 대한 시험도 하지 않았다.",
+          "quote_en": "You lacked conductivity and total organic carbon limits and testing and did not test for specific objectionable microorganisms." }
+      ]
+    },
+    {
+      "title_ko": "용수 시스템을 적절히 모니터링했음을 입증하지 못했다",
+      "title_en": "Adequate monitoring of the water system was not demonstrated",
+      "quotes": [
+        { "finding_id": "finding-526a0260bc725de587b1b38f", "raw_signal_id": "rawsig-910a4c0d61062fab47c3f798", "document_id": "2798a8d62e73", "source": "FDA Warning Letter",
+          "firm": "Hangzhou Yiqi Biotechnology Co., Ltd", "date": "2026-05-19",
+          "quote_ko": "귀사가 제공한 기록과 정보에 근거할 때, 귀사는 무균 의약품으로 추가 가공될 API의 제조에 적합한 용수를 (b)(4) 용수 시스템이 일관되게 생산하도록 적절히 모니터링하고 있음을 입증하지 못했다.",
+          "quote_en": "Based on the records and information you provided, you failed to demonstrate that your (b)(4) water system is adequately monitored to ensure that it consistently produces water suitable for use in the manufacture of APIs intended for further processing into sterile drug products." },
+        { "finding_id": "finding-64daaa4cf74b1b3a83081bab", "raw_signal_id": "rawsig-23e0192a9f1281c1d56e56a5", "document_id": "ceaed256bdd9", "source": "FDA Warning Letter",
+          "firm": "Naturich Cosmetique Labs", "date": "2025-10-07",
+          "quote_ko": "더 나아가 귀사는 용수 시스템이 적절한 화학적 및 미생물학적 품질 기준을 충족하는 용수를 일관되게 생산하도록 적절히 모니터링되었음을 입증하지 못했다.",
+          "quote_en": "Furthermore, you failed to demonstrate that your water system was adequately monitored to ensure it consistently produced water that met appropriate chemical and microbial quality standards." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.100(a)", "finding_id": "finding-c9e79dfdc168955d96271cf0", "firm": "Medical Chemical Corporation", "date": "2025-07-22",
+      "quote_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인, 함량, 품질 및 순도를 갖도록 보증하기 위한 생산 및 공정 관리의 적절한 서면 절차를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess",
+      "note_ko": "물 시스템 밸리데이션이 없고 원료인 물의 총유기탄소 시험을 하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Lacking water system validation and not conducting total organic carbon testing of component water was cited under this clause." },
+    { "key": "21 CFR 211.63", "finding_id": "finding-24684a0918b06945a5091401", "firm": "Multaler et Cie SAS", "date": "2024-11-12",
+      "quote_ko": "귀사는 의약품의 제조, 가공, 포장 또는 보관에 사용하는 설비가 의도된 용도에 맞고 세척 및 유지보수가 용이하도록 적절한 설계, 충분한 크기, 적합한 위치를 갖추게 하지 않았다",
+      "quote_en": "Your firm failed to use equipment in the manufacture, processing, packing, or holding of drug products that is of appropriate design, adequate size, and suitably located to facilitate operations for its intended use and for its cleaning and maintenance",
+      "note_ko": "순환하지 않는 용수 시스템에 데드레그가 있고 사용하지 않을 때 물이 정체된 점이 이 조항으로 지적됐습니다.",
+      "note_en": "A non-circulating water system with dead legs and water sitting stagnant when not in use was cited under this clause." }
+  ],
+  "checks_ko": [
+    "용수 시스템이 용도에 맞는 품질의 물을 일관되게 만든다는 밸리데이션 문서를 제시할 수 있습니까",
+    "용수에 Burkholderia cepacia complex 같은 유해 미생물이 없는지 정기적으로 시험합니까",
+    "무균 주사제에 쓰일 API 의 제조 용수에 대해 유해 미생물 평가를 했습니까",
+    "용수 시스템에 데드레그나 사용하지 않을 때 물이 정체되는 배관이 없습니까",
+    "용수 시스템이 계속 순환하고, 밸리데이션된 소독 공정을 거칩니까",
+    "총유기탄소와 전도도의 한도를 정하고 시험해, 화학적·미생물학적 품질 기준을 충족하는지 모니터링합니까"
+  ],
+  "checks_en": [
+    "Can you present validation documents showing that the water system consistently produces water of suitable quality for its use?",
+    "Is water routinely tested for the absence of objectionable microorganisms such as Burkholderia cepacia complex?",
+    "Has water used to manufacture APIs intended for sterile injectables been evaluated for objectionable microorganisms?",
+    "Is the water system free of dead legs and of lines where water sits stagnant when not in use?",
+    "Does the water system circulate continuously, and is it subjected to a validated sanitization process?",
+    "Are limits set and tests run for total organic carbon and conductivity, so that monitoring shows the water meets chemical and microbial quality standards?"
+  ],
+  "further_reading": [],
+  "related": ["cleanroom", "microbiological-testing"]
+}

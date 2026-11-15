@@ -1,0 +1,108 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "calibration-maintenance", "as_of": "2026-11-15",
+  "area_ko": "시험실", "area_en": "Laboratory",
+  "title_ko": "교정과 예방정비", "title_en": "Calibration and preventive maintenance",
+  "glossary_ids": ["calibration", "preventive-maintenance"],
+  "aliases_ko": ["교정", "예방 정비", "예방적 유지보수"],
+  "aliases_en": ["calibration", "preventive maintenance"],
+  "search_q_ko": "교정", "search_q_en": "calibration",
+  "lead_ko": "FDA 는 교정과 예방정비 절차가 있는지보다, 계측기와 설비가 실제 사용 범위에서 기한 안에 교정·정비되고 그 기록이 남아 있는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether calibration and preventive maintenance procedures exist than at whether instruments and equipment are calibrated and maintained on time, across their actual range of use, with records to show it. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "계측기를 정기적으로 교정하지 않았다",
+      "title_en": "Instruments were not calibrated regularly",
+      "quotes": [
+        { "finding_id": "finding-96cee649c21fda8217ca4409", "raw_signal_id": "rawsig-97022605a8da3ecc937f6aa2", "document_id": "44365703ab8b", "source": "FDA Warning Letter",
+          "firm": "Greco Gas, Inc.", "date": "2024-09-17",
+          "quote_ko": "예를 들어 압력 및 진공 게이지는 2020년 11월 이후 교정되지 않았는데도 그 장비를 사용한 의료용 가스 제조는 계속되었다.",
+          "quote_en": "For example, your pressure and vacuum gauges had not been calibrated since November 2020, despite subsequent continued manufacturing of medical gases using this equipment." },
+        { "finding_id": "finding-8a6c31288f08041be1ed3ec7", "raw_signal_id": "rawsig-feaf377ba22a2376f17a4579", "document_id": "fda483-195433", "source": "FDA 483",
+          "firm": "SAFC Pharma Carlsbad", "date": "2026-10-26",
+          "quote_ko": "구체적으로, 귀사의 액체질소 듀어 용기의 온도 및 LN2 초과를 모니터링하는 탐침은 정기적으로 교정되지 않는다.",
+          "quote_en": "Specifically, probes used to monitor your Liquid Nitrogen Dewars for temperature and LN2 excursions are not regularly calibrated." }
+      ]
+    },
+    {
+      "title_ko": "저울을 실제 사용 범위에 맞춰 교정하지 않았다",
+      "title_en": "Scales and balances were not calibrated across their actual range of use",
+      "quotes": [
+        { "finding_id": "finding-3234e2d59f2c100dedb30684", "raw_signal_id": "rawsig-f4fbdc675325101b3e2ccb43", "document_id": "009ffad3df01", "source": "FDA Warning Letter",
+          "firm": "Lex Inc.", "date": "2023-09-05",
+          "quote_ko": "귀사는 API를 포함한 의약품 구성성분의 칭량에 사용하는 생산용 저울을 실제 사용 범위를 반영하도록 일상적으로 교정하지 않았다. 예를 들어, 귀사의 (b)(4) 교정 점검은 하나의 중량만 기록했다.",
+          "quote_en": "You did not routinely calibrate your production scales used for weighing drug product components, including API, to reflect actual operating ranges. For example, your (b)(4) calibration check only documented one weight." },
+        { "finding_id": "finding-4cc338e668dd581dbe533c44", "raw_signal_id": "rawsig-789f175ea02d328616e8cfa8", "document_id": "fda483-190687", "source": "FDA 483",
+          "firm": "Petscript Inc", "date": "2026-01-22",
+          "quote_ko": "구체적으로, 귀사는 무균 및 비무균 의약품 조제 중 원료 칭량 및/또는 공정 중 중량 확인에 사용하는 분석용 저울 교정 시 사용범위를 포괄하지 않는다.",
+          "quote_en": "Specifically, your firm is not bracketing the range of use when calibrating the analytical balances used to weigh raw materials and/or perform in process weight checks during the preparation of sterile and non-sterile drug products." }
+      ]
+    },
+    {
+      "title_ko": "교정 기한이 지났거나 교정 상태를 벗어난 계측기를 사용했다",
+      "title_en": "Instruments past their calibration due date or out of calibration were used",
+      "quotes": [
+        { "finding_id": "finding-62580e27232ceca3ee5d7360", "raw_signal_id": "rawsig-135e6ce7d44511afa72a6f81", "document_id": "fda483-195381", "source": "FDA 483",
+          "firm": "Galaxy Medical Products LLC", "date": "2026-10-27",
+          "quote_ko": "구체적으로, 귀사는 [redacted] 실린더 충전 중 교정 기한이 지난 온도계를 사용한 것을 문서화하고 조사하지 않았다.",
+          "quote_en": "Specifically, Your firm failed to document and investigate the use of an out-of-calibration thermometer during the filling of [redacted] cylinders." },
+        { "finding_id": "finding-971aa5b98f8c7d454054b459", "raw_signal_id": "rawsig-2403dee9aacb2956f09c7436", "document_id": "fda483-195545", "source": "FDA 483",
+          "firm": "Clongen Laboratories, LLC", "date": "2026-10-30",
+          "quote_ko": "2025년 6월 16일 마이코플라스마 시험을 위한 추출 단계에서 시험원이 교정 상태를 벗어난 장비(피펫 및 가열 혼합기)를 사용하는 것이 관찰되었다.",
+          "quote_en": "Technician was observed using out of calibration equipment (pipette and thermomixer) during the extraction step for mycoplasma testing on June 16, 2025." }
+      ]
+    },
+    {
+      "title_ko": "저울의 교정 기록을 제대로 갖추지 않았다",
+      "title_en": "Calibration records for scales were missing or not properly kept",
+      "quotes": [
+        { "finding_id": "finding-2e4c7c0e530ec45ab6b83e86", "raw_signal_id": "rawsig-ec600093dfa7384f4b2d6aa1", "document_id": "8fb90c60bc40", "source": "FDA Warning Letter",
+          "firm": "Dynamic Blending Specialists, Inc.", "date": "2025-07-08",
+          "quote_ko": "저울 교정 기록은 고유 식별자 없이 인쇄된 낱장으로 구성되어 있었다.",
+          "quote_en": "Your scale calibration logs consisted of loose pages printed without unique identifiers." },
+        { "finding_id": "finding-3906f538ce88e3836af85daa", "raw_signal_id": "rawsig-0db5d7a199fa47e23ccb2c52", "document_id": "fda483-196273", "source": "FDA 483",
+          "firm": "Qingdao Kangyuan Pharmaceutical Co., LTD", "date": "2026-11-13",
+          "quote_ko": "원료 칭량 및 불출실(raw material weighing and dispensing room)에서 발견된 저울에 대한 식별 표시, 교정 기록 또는 사용 일지가 없었다.",
+          "quote_en": "There was no identification, calibration record, or usage log on a scale found in the raw material weighing and dispensing room." }
+      ]
+    },
+    {
+      "title_ko": "예방 유지보수 프로그램을 제대로 수립하지 않았다",
+      "title_en": "The preventive maintenance program was not adequately established",
+      "quotes": [
+        { "finding_id": "finding-e2c6cf1c8610bf85d69299b1", "raw_signal_id": "rawsig-592076ccf9007eb6d0c2704a", "document_id": "fda483-195473", "source": "FDA 483",
+          "firm": "Biotest AG", "date": "2026-10-26",
+          "quote_ko": "중요 장비의 예방 유지보수가 없다.",
+          "quote_en": "Preventive maintenance of critical equipment is not established." },
+        { "finding_id": "finding-be7c8e5c970038186dd78cfc", "raw_signal_id": "rawsig-feaf377ba22a2376f17a4579", "document_id": "fda483-195433", "source": "FDA 483",
+          "firm": "SAFC Pharma Carlsbad", "date": "2026-10-26",
+          "quote_ko": "SOP [redacted] 버전 7.0, 예방 유지보수(PM) 프로그램에는 PM 또는 교정 기한이 지난 장비 평가 지침이 없다.",
+          "quote_en": "SOP, [redacted] Version 7.0, Preventative Maintenance (PM) Program, does not provide instructions for the assessment of equipment that is overdue for PM or calibration." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.68(a)", "finding_id": "finding-96cee649c21fda8217ca4409", "firm": "Greco Gas, Inc.", "date": "2024-09-17",
+      "quote_ko": "귀사는 의약품의 제조, 가공, 포장 및 보관에 사용되는 자동, 기계, 전자 장비 또는 컴퓨터를 포함한 기타 유형의 장비가 적절히 작동함을 보증하도록 설계된 서면 프로그램에 따라 정기적으로 교정·점검·확인하지 않았고, 교정 확인 및 점검에 대한 적절한 서면 기록을 유지하지 않았다",
+      "quote_en": "Your firm failed to routinely calibrate, inspect, or check according to a written program designed to assure proper performance of and to maintain adequate written records of calibration checks and inspections of automatic, mechanical, electronic equipment, or other types of equipment, including computers, used in the manufacture, processing, packing, and holding of a drug product",
+      "note_ko": "압력 및 진공 게이지를 오랫동안 교정하지 않은 채 의료용 가스 제조를 계속한 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Continuing to manufacture medical gases with pressure and vacuum gauges that had long gone uncalibrated was cited under this clause." }
+  ],
+  "checks_ko": [
+    "게이지와 탐침 같은 계측기를 정해진 주기로 교정합니까",
+    "저울 교정이 실제로 칭량하는 범위를 포괄합니까",
+    "교정 기한이 지났거나 교정 상태를 벗어난 계측기가 작업에 쓰이고 있지 않습니까",
+    "교정 기한이 지난 계측기를 사용한 사실을 문서화하고 조사합니까",
+    "저울마다 식별 표시와 교정 기록, 사용 일지가 있고 그 기록이 낱장으로 흩어져 있지 않습니까",
+    "중요 장비에 예방 유지보수를 정해 두었고, 기한이 지난 장비를 평가하는 지침이 절차에 있습니까"
+  ],
+  "checks_en": [
+    "Are instruments such as gauges and probes calibrated at a defined interval?",
+    "Does scale and balance calibration cover the range actually weighed?",
+    "Is any instrument that is past its calibration due date or out of calibration in use?",
+    "Is the use of an instrument past its calibration due date documented and investigated?",
+    "Does each scale have identification, a calibration record and a usage log, and are those records kept as more than loose pages?",
+    "Is preventive maintenance established for critical equipment, and does the procedure say how to assess equipment that is overdue?"
+  ],
+  "further_reading": [],
+  "related": ["method-validation", "cleanroom"]
+}

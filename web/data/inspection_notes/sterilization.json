@@ -1,0 +1,102 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "sterilization", "as_of": "2026-11-15",
+  "area_ko": "무균·오염 관리", "area_en": "Sterility and contamination control",
+  "title_ko": "멸균", "title_en": "Sterilization",
+  "glossary_ids": ["sterilization"],
+  "aliases_ko": ["멸균 밸리데이션", "오토클레이브", "고압증기멸균", "건열 멸균"],
+  "aliases_en": ["sterilization", "autoclave", "depyrogenation"],
+  "search_q_ko": "멸균", "search_q_en": "sterilization",
+  "lead_ko": "FDA 는 멸균 설비를 갖추었는지보다, 멸균 공정이 밸리데이션되어 있고 그 효과와 멸균 뒤의 상태가 확인되는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether sterilization equipment is in place than at whether the sterilization process is validated and its effect and the state of items after sterilization are confirmed. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "멸균 공정이나 멸균 주기를 밸리데이션하지 않았다", "title_en": "Did not validate the sterilization process or cycle",
+      "quotes": [
+        { "finding_id": "finding-d7cf362fd77be8d729475683", "raw_signal_id": "rawsig-def6bb22ad0a5ed60bfd520e", "document_id": "45ebc0843df3", "source": "FDA Warning Letter",
+          "firm": "Neobiosis, LLC", "date": "2024-06-18",
+          "quote_ko": "귀사 제품과 직접 접촉하는 장비에 사용되는 (b)(4) 멸균공정은 적절히 밸리데이션되지 않았습니다.",
+          "quote_en": "The (b)(4) sterilization process used for equipment that comes into direct contact with your products has not been adequately validated." },
+        { "finding_id": "finding-cc5513cf387a76fa8471de7e", "raw_signal_id": "rawsig-085733c54eb56dc1eec4dbdb", "document_id": "fda483-85330", "source": "FDA 483",
+          "firm": "Celltex Therapeutics Corporation", "date": "2024-01-17",
+          "quote_ko": "또한 고압증기멸균 주기의 밸리데이션/적격성평가를 뒷받침하는 데이터가 없다.",
+          "quote_en": "In addition there is no data to support the validation/qualification of the autoclave cycle." }
+      ] },
+    { "title_ko": "생물학적 지시제를 쓰지 않거나 관리하지 않았다", "title_en": "Did not use or control biological indicators",
+      "quotes": [
+        { "finding_id": "finding-c21c8518742d85ca52fa94e6", "raw_signal_id": "rawsig-243b6fc9e61ebe22093d9044", "document_id": "e29881ba34c7", "source": "FDA Warning Letter",
+          "firm": "CareFusion 213, LLC", "date": "2026-05-05",
+          "quote_ko": "귀사는 (b)(4) 멸균 (b)(4) 공정에 사용하는 자체 제조 생물학적 지시제(BI)에 대해 적절한 포자 개체수 확인(spore population verification)을 하지 않았다.",
+          "quote_en": "Your firm lacked appropriate spore population verification on in-house prepared biological indicators (BIs) used in your (b)(4) sterilization (b)(4) process." },
+        { "finding_id": "finding-d7e034e7da5b3e294bf4188a", "raw_signal_id": "rawsig-d9fbb6cc3f6fa0b20824fb88", "document_id": "fda483-195057", "source": "FDA 483",
+          "firm": "TAILSTORM HEALTH INC", "date": "2026-09-29",
+          "quote_ko": "작업자는 멸균 [redacted]에 생물학적 지표(BI)를 사용하지 않는다.",
+          "quote_en": "Operators do not use Biological Indicators (Bis) [redacted] sterilization [redacted]." }
+      ] },
+    { "title_ko": "완전성 시험을 배치마다 하지 않았거나 불합격 결과를 보고하지 않았다", "title_en": "Did not integrity test every batch or did not report failing integrity test results",
+      "quotes": [
+        { "finding_id": "finding-dc0fb1ddb0db723e56b7ff08", "raw_signal_id": "rawsig-f62164d53de38d811101a0e6", "document_id": "9162d2a754b2", "source": "FDA Warning Letter",
+          "firm": "Aspen Pharmacare Holdings Limited", "date": "2025-03-18",
+          "quote_ko": "예를 들어 2024년 8월 8일 두 명의 작업자가 (b)(4) 배치 (b)(4)에 대해 사용 후 멸균 필터 완전성 시험을 네 차례 수행했다. 네 번의 시험에는 세 번의 불합격 결과와 마지막 합격 결과가 포함되었다. 작업자는 합격 결과만 보고했다.",
+          "quote_en": "For example: On August 8, 2024, two operators performed four post-use sterilizing filter integrity tests for (b)(4) batch (b)(4) . The four tests included three failing results and the final passing result. Your operators only reported the passing result." },
+        { "finding_id": "finding-716d65a48f3e6bd7b5c5db17", "raw_signal_id": "rawsig-723dc6a6beb5908c5ace8014", "document_id": "b9398b5811d4", "source": "FDA Warning Letter",
+          "firm": "BRS Analytical Services, LLC", "date": "2025-10-21",
+          "quote_ko": "멸균 (b)(4) 는 제조된 의약품의 매 배치마다 완전성 시험(integrity test)을 하지 않았다.",
+          "quote_en": "Sterilizing (b)(4) were not integrity tested for each batch of drug products manufactured." }
+      ] },
+    { "title_ko": "용기·마개나 조제 기구를 멸균하고 발열성 물질을 제거하지 않았다", "title_en": "Did not sterilize and depyrogenate containers, closures or compounding equipment",
+      "quotes": [
+        { "finding_id": "finding-52a618b398b85a4f8909bcc8", "raw_signal_id": "rawsig-4f8987149fecfafeafd5b55c", "document_id": "fda483-195122", "source": "FDA 483",
+          "firm": "Houston Rx LLC", "date": "2026-10-01",
+          "quote_ko": "구체적으로, 귀사는 멸균 의약품을 제조하는 데 쓰는 유리 비커, [redacted] 눈금 실린더, 교반 막대를 멸균/발열성 물질 제거하지 않는다.",
+          "quote_en": "Specifically, your firm does not sterilize/depyrogenate the glass beakers, [redacted] graduated cylinders, and stir bars used to make sterile drug products." },
+        { "finding_id": "finding-05d6bca445455a8c0b2c1091", "raw_signal_id": "rawsig-255f3bd1eb38da40edb158bb", "document_id": "fda483-196842", "source": "FDA 483",
+          "firm": "Hybrid Pharma LLC", "date": "2026-11-13",
+          "quote_ko": "완제의약품 용기 및 마개가 의도된 용도에 적합함을 보증하기 위해 발열성 물질(pyrogenic) 제거를 위한 멸균 및 처리가 되지 않았다.",
+          "quote_en": "Drug product containers and closures were not sterilized and processed to remove pyrogenic properties to assure that they are suitable for their intended use." }
+      ] },
+    { "title_ko": "멸균 후 보관 시간을 정하지 않았거나 초과 여부를 확인할 수 없었다", "title_en": "Did not establish a sterile hold time or could not tell whether it had been exceeded",
+      "quotes": [
+        { "finding_id": "finding-07dc5ab1f92a2e8e426904e7", "raw_signal_id": "rawsig-992b494062fb08aa4cc6304a", "document_id": "fda483-191891", "source": "FDA 483",
+          "firm": "Orchid Pharma Limited", "date": "2026-04-09",
+          "quote_ko": "귀사의 세척 밸리데이션은 세척 후 보관 시간(CHT)과 멸균 후 보관 시간(SHT)을 설정하지 않았으므로, 제조 시점에 제조 설비가 미생물 및 엔도톡신 수준 규격을 충족하거나 이를 벗어나지 않는다는 보증이 없다.",
+          "quote_en": "Your cleaning validation did not establish the clean hold time (CHT) and sterile hold time (SHT) such that there is no assurance that your manufacturing equipment are free of/meet the specifications for microbiological and endotoxin levels at the time of manufacturing." },
+        { "finding_id": "finding-73d57aac04acfe5acc291495", "raw_signal_id": "rawsig-c8d2221481487c6b8011889f", "document_id": "fda483-195123", "source": "FDA 483",
+          "firm": "OPS International Inc dba Olympia Pharmaceuticals", "date": "2026-10-01",
+          "quote_ko": "구성품에는 확립된 무균 보관 시간을 초과했는지 직원이 판단하는 데 필요한 해당 [redacted] 및 멸균일 식별 정보가 없었다.",
+          "quote_en": "The components lacked information identifying the applicable [redacted] and sterilization date needed for personnel to determine whether the established sterile hold time had been exceeded." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.113(b)", "finding_id": "finding-716d65a48f3e6bd7b5c5db17", "firm": "BRS Analytical Services, LLC", "date": "2025-10-21",
+      "quote_ko": "귀사는 무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립하고 따르지 않았다",
+      "quote_en": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes",
+      "note_ko": "멸균 (b)(4) 의 완전성 시험을 배치마다 하지 않은 점이 이 조항 아래에서 지적됐습니다.",
+      "note_en": "Sterilizing (b)(4) not being integrity tested for each batch was cited under this provision." },
+    { "key": "21 CFR 211.160(b)", "finding_id": "finding-c21c8518742d85ca52fa94e6", "firm": "CareFusion 213, LLC", "date": "2026-05-05",
+      "quote_ko": "귀사는 구성 성분, 의약품 용기, 마개, 공정 중 물질, 표시사항, 의약품이 확인시험(identity), 함량(strength), 품질, 순도에 관한 적절한 기준에 부합하도록 보장하기 위한, 과학적으로 타당하고 적절한 규격, 표준, 샘플링 계획, 시험 절차를 포함하는 시험실 관리를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity",
+      "note_ko": "멸균 공정에 쓰는 자체 제조 생물학적 지시제의 포자 개체수를 확인하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Spore population was not verified on in-house prepared biological indicators used in the sterilization process." },
+    { "key": "21 CFR 211.68(b)", "finding_id": "finding-dc0fb1ddb0db723e56b7ff08", "firm": "Aspen Pharmacare Holdings Limited", "date": "2025-03-18",
+      "quote_ko": "귀사는 허가된 담당자만 마스터 생산 및 관리 기록 또는 기타 기록을 변경하도록 보장하기 위해 컴퓨터 또는 관련 시스템에 대한 적절한 관리를 수행하지 않았다",
+      "quote_en": "Your firm failed to exercise appropriate controls over computer or related systems to assure that only authorized personnel institute changes in master production and control records, or other records",
+      "note_ko": "멸균 필터 완전성 시험의 불합격 결과를 남기지 않고 합격 결과만 보고한 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Failing sterilizing filter integrity test results were not kept and only the passing result was reported." }
+  ],
+  "checks_ko": [
+    "제품과 직접 접촉하는 장비의 멸균 공정이 밸리데이션되어 있습니까",
+    "오토클레이브 주기의 밸리데이션·적격성평가를 뒷받침하는 데이터가 있습니까",
+    "일상 멸균에 생물학적 지시제를 사용하며, 자체 제조한 지시제는 포자 개체수를 확인합니까",
+    "멸균 필터의 사용 후 완전성 시험을 배치마다 하고, 불합격 결과도 모두 기록하고 보고합니까",
+    "용기, 마개, 유리 기구를 사용 전에 멸균하고 발열성 물질을 제거합니까",
+    "멸균 후 보관 시간이 정해져 있고, 부품마다 멸균일을 확인할 수 있습니까"
+  ],
+  "checks_en": [
+    "Is the sterilization process for equipment in direct contact with product validated?",
+    "Is there data to support the validation and qualification of the autoclave cycle?",
+    "Are biological indicators used in routine sterilization, and is the spore population of in-house prepared indicators verified?",
+    "Are post-use sterilizing filter integrity tests done for every batch, and are failing results all recorded and reported?",
+    "Are containers, closures and glassware sterilized and depyrogenated before use?",
+    "Is a sterile hold time established, and can the sterilization date of each part be identified?"
+  ],
+  "further_reading": [], "related": ["media-fill", "disinfection"]
+}

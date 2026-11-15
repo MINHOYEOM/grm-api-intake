@@ -1,0 +1,118 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "method-validation", "as_of": "2026-11-15",
+  "area_ko": "시험실", "area_en": "Laboratory",
+  "title_ko": "시험방법 밸리데이션", "title_en": "Analytical method validation",
+  "glossary_ids": ["analytical-procedure", "analytical-procedure-validation"],
+  "aliases_ko": ["시험법 밸리데이션", "분석법 밸리데이션", "시험법 검증", "시험방법 적합성 확인"],
+  "aliases_en": ["method validation", "method verification", "analytical method"],
+  "search_q_ko": "시험법", "search_q_en": "method validation",
+  "lead_ko": "FDA 는 시험법이 문서로 정해져 있는지보다, 그 시험법이 해당 제품의 시험에 적합하다는 것이 자료로 입증됐는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a test method is written down than at whether data show the method is suitable for testing the product in question. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "시험에 쓰는 시험법을 밸리데이션하지 않았다",
+      "title_en": "Test methods in use were not validated",
+      "quotes": [
+        { "finding_id": "finding-ce2d136e47c6e52d15c264ea", "raw_signal_id": "rawsig-a68a37c1396fadeaa4a9f2b7", "document_id": "98b0ec48f22e", "source": "FDA Warning Letter",
+          "firm": "Tianjin Kilo Pharmaceutical Sci-tech Co., Ltd.", "date": "2026-08-18",
+          "quote_ko": "귀사가 제출한 기록과 정보에 따르면, 귀사는 미국으로 유통되는 의약품에 사용한 각 시험법에 대해 시험법 밸리데이션(공정서 시험법을 사용하는 경우에는 검증)을 수행하지 않았다.",
+          "quote_en": "Based on the records and information you provided, your firm failed to perform test method validation (or verification if compendial testing is used) for each test method used for drugs distributed to the United States." },
+        { "finding_id": "finding-210e7ee687c92a16e276148a", "raw_signal_id": "rawsig-5d3a571a2dea358e00e6bdae", "document_id": "fda483-195295", "source": "FDA 483",
+          "firm": "Unilab Chemicals and Pharmaceuticals Private Ltd.", "date": "2026-10-22",
+          "quote_ko": "또한 기체크로마토그래피(GC) 순도시험에 사용하는 비USP 자체 시험법이 밸리데이션되지 않았다.",
+          "quote_en": "In addition, the non-USP in-house test method used for Gas Chromatography (GC) purity testing has not been validated." }
+      ]
+    },
+    {
+      "title_ko": "시험법 베리피케이션(verification)을 수행하지 않았다",
+      "title_en": "Method verification was not performed",
+      "quotes": [
+        { "finding_id": "finding-5145900a88bc1e48a29a146f", "raw_signal_id": "rawsig-bf4534e15f09476a21ea7058", "document_id": "5d33e5c1dcbe", "source": "FDA Warning Letter",
+          "firm": "Harbin Jixianglong Biotech Co., Ltd.", "date": "2026-05-19",
+          "quote_ko": "더욱이 2025년에 귀사는 세균 엔도톡신 시험에 대한 시험법 베리피케이션(verification)을 완료하지 않은 채 tirzepatide API 의약품 (b)(4) 로트(총 중량 약 (b)(4) )를 출하했다.",
+          "quote_en": "Furthermore, in 2025, your firm shipped (b)(4) lots of tirzepatide API drugs (about (b)(4) total weight) without completing method verification for the bacterial endotoxin test." },
+        { "finding_id": "finding-39f71676c13e465a19538eb3", "raw_signal_id": "rawsig-99e3de620b7863add0439178", "document_id": "fda483-195322", "source": "FDA 483",
+          "firm": "Shimoga Chemicals", "date": "2026-10-23",
+          "quote_ko": "구체적으로, 귀사는 [redacted] USP API 원료의약품에 사용하는 USP 공정서 함량 시험법과 잔류 용매 시험법에 대해 시험법 검증(verification) 연구를 수립하거나 문서화하지 않았다.",
+          "quote_en": "Specifically, Your firm has not established or documented method verification studies for the USP compendial assay and residual solvent test methods used for [redacted] USP API." }
+      ]
+    },
+    {
+      "title_ko": "완제품 미생물 시험법을 밸리데이션하지 않았다",
+      "title_en": "Microbiological test methods for finished products were not validated",
+      "quotes": [
+        { "finding_id": "finding-6d4457face71b3cf96bef9c3", "raw_signal_id": "rawsig-21051f05529a46fad620b036", "document_id": "530821d5b169", "source": "FDA Warning Letter",
+          "firm": "Suretec Innovations, LLC", "date": "2026-08-18",
+          "quote_ko": "완제 OTC 의약품의 미생물학적 특성(예: 총균수, 유해미생물)을 판정하기 위해 사용한 비공정서(non-compendial) 시험법이 부적절했다. 구체적으로 적절한 배양시간이 설정되어 있지 않았고, 적절한 시험법 적합성(method suitability)이 확인되지 않았으며, 양성 및 음성 대조가 없었다. 또한 이 비공정서 시험법을 밸리데이션하지 않았다.",
+          "quote_en": "Your non-compendial test method used to determine microbiological attributes (e.g., total count, objectionable microorganisms) for your finished OTC drug product was inadequate. Specifically, you lacked appropriate incubation times, lacked appropriate method suitability, and lacked positive and negative controls. In addition, you did not validate this non-compendial method." },
+        { "finding_id": "finding-33729bb459fd87032c274ad3", "raw_signal_id": "rawsig-6b176a4156cbd1e67eab33f5", "document_id": "fda483-195314", "source": "FDA 483",
+          "firm": "Blossom Pharmaceuticals", "date": "2026-10-22",
+          "quote_ko": "또한 총 미생물 계수(호기성 미생물 수, 총 효모·곰팡이 수) 및 황색포도상구균, 녹농균, Candida albicans 등 특정 미생물 부재 시험을 포함한 완제품 출하용 미생물 시험법 중 어느 것도 OTC 제품에 밸리데이션·확인되지 않았다.",
+          "quote_en": "Additionally, none of the microbiological test methods used for finished product release testing, including total microbial enumeration testes (aerobic microbial count, total yeast and mold count), and testing for the absence of specified microorganisms, including, but not limited to, staphylococcus aureus, Pseudomonas aeruginosa, and Candida albicans have been validated or verified for any OTC drug product." }
+      ]
+    },
+    {
+      "title_ko": "시험 전에 시스템 적합성을 적절히 확인하지 않았다",
+      "title_en": "System suitability was not adequately determined before testing",
+      "quotes": [
+        { "finding_id": "finding-afa07e3990828d66d849b9c0", "raw_signal_id": "rawsig-9357d5b93b162ae928b17fc2", "document_id": "c0f3b8ff757d", "source": "FDA Warning Letter",
+          "firm": "K.C. Pharmaceuticals, Inc.", "date": "2026-08-18",
+          "quote_ko": "귀사는 (b)(4) 및 기타 중요 검체를 시험하기 전에 실험실 장비에 대한 시스템 적합성(system suitability) 시험을 적절히 수행하지 않았다.",
+          "quote_en": "Your firm did not adequately perform system suitability testing for laboratory equipment before testing your (b)(4) and other critical samples." },
+        { "finding_id": "finding-2a44aab5878c991bbe8b9476", "raw_signal_id": "rawsig-2bda5cef3046377ade742c78", "document_id": "539e6f3e8d21", "source": "FDA Warning Letter",
+          "firm": "Taizhou Kangping Medical Science and Technology Co., Ltd.", "date": "2025-11-11",
+          "quote_ko": "(b)(4) 함량시험(Assay Content)을 위한 귀사의 고성능 액체 크로마토그래피(HPLC) 분석은 검체 주입 전에 USP <621>에 명시된 시스템 적합성 판정을 적절히 수행하지 않았다.",
+          "quote_en": "Your high-performance liquid chromatography (HPLC) analyses for (b)(4) Assay Content lacked an appropriate determination of system suitability, as outlined in USP <621>, before sample injections." }
+      ]
+    },
+    {
+      "title_ko": "시험법의 정확성과 특이성을 입증하지 않았다",
+      "title_en": "The accuracy and specificity of test methods were not demonstrated",
+      "quotes": [
+        { "finding_id": "finding-8572546daf47e5e43c2f871c", "raw_signal_id": "rawsig-d57ba5177deb37bec32b1655", "document_id": "c96ceec50f8f", "source": "FDA Warning Letter",
+          "firm": "Respilon Production S.R.O.", "date": "2026-05-05",
+          "quote_ko": "귀사의 분석법은 특이성, 정확성, 정밀성, 완건성(robustness)을 입증하지 못한다.",
+          "quote_en": "Your analytical method does not demonstrate specificity, accuracy, precision, and robustness." },
+        { "finding_id": "finding-1a74ee97246ad218e11be6f2", "raw_signal_id": "rawsig-255f3bd1eb38da40edb158bb", "document_id": "fda483-196842", "source": "FDA 483",
+          "firm": "Hybrid Pharma LLC", "date": "2026-11-13",
+          "quote_ko": "시험방법의 정확성, 감도, 특이성 및 재현성이 확립되고 문서화되지 않았다.",
+          "quote_en": "The accuracy, sensitivity, specificity and reproducibility of test methods have not been established and documented." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.165(e)", "finding_id": "finding-8572546daf47e5e43c2f871c", "firm": "Respilon Production S.R.O.", "date": "2026-05-05",
+      "quote_ko": "귀사는 시험법의 정확성(accuracy), 감도(sensitivity), 특이성(specificity), 재현성(reproducibility)을 수립하고 문서화하지 않았다",
+      "quote_en": "Your firm failed to establish and document the accuracy, sensitivity, specificity, and reproducibility of its test methods",
+      "note_ko": "분석법이 특이성, 정확성, 정밀성, 완건성을 입증하지 못한 점이 이 조항으로 지적됐습니다.",
+      "note_en": "An analytical method that did not demonstrate specificity, accuracy, precision and robustness was cited under this clause." },
+    { "key": "21 CFR 211.160(b)", "finding_id": "finding-2a44aab5878c991bbe8b9476", "firm": "Taizhou Kangping Medical Science and Technology Co., Ltd.", "date": "2025-11-11",
+      "quote_ko": "적절한 제품 규격과 과학적으로 타당한 시험 절차를 수립하지 않았다",
+      "quote_en": "Failure to establish appropriate product specifications and scientifically sound testing procedures",
+      "note_ko": "HPLC 함량시험에서 검체 주입 전에 시스템 적합성 판정을 적절히 수행하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "HPLC assay analyses that lacked an appropriate determination of system suitability before sample injections were cited under this clause." },
+    { "key": "21 CFR 211.165(b)", "finding_id": "finding-6d4457face71b3cf96bef9c3", "firm": "Suretec Innovations, LLC", "date": "2026-08-18",
+      "quote_ko": "귀사는 유해미생물(objectionable microorganisms)이 없어야 하는 완제의약품의 각 배치에 대하여 필요한 적절한 실험실 시험을 수행하지 않았다",
+      "quote_en": "Your firm failed to conduct appropriate laboratory testing, as necessary, for each batch of drug product required to be free of objectionable microorganisms",
+      "note_ko": "밸리데이션하지 않은 비공정서 미생물 시험법으로 완제품을 시험한 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Testing finished product with a non-compendial microbiological method that had not been validated was cited under this clause." }
+  ],
+  "checks_ko": [
+    "미국으로 유통되는 의약품에 쓰는 시험법마다 밸리데이션 자료가 있습니까",
+    "자체 시험법을 밸리데이션한 뒤에 시험에 쓰고 있습니까",
+    "공정서 시험법에 대해 베리피케이션 연구를 수립하고 문서화했습니까",
+    "완제품 출하용 미생물 시험법이 제품별로 밸리데이션되거나 확인됐습니까",
+    "미생물 시험법에 배양시간, 시험법 적합성, 양성·음성 대조가 갖춰져 있습니까",
+    "검체를 시험하기 전에 시스템 적합성을 확인하고 있습니까"
+  ],
+  "checks_en": [
+    "Is there validation data for each test method used for drugs distributed to the United States?",
+    "Are in-house test methods validated before they are used for testing?",
+    "Have verification studies been established and documented for compendial test methods?",
+    "Are the microbiological methods used for finished product release validated or verified for each product?",
+    "Do microbiological methods have incubation times, method suitability, and positive and negative controls in place?",
+    "Is system suitability determined before samples are tested?"
+  ],
+  "further_reading": [],
+  "related": ["oos-investigation", "stability"]
+}

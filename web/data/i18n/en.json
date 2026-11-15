@@ -320,7 +320,7 @@
   "{n}장": "{n} card{s}",
   "{part} 조항만 셌고(표시·OTC 모노그래프·임상 조항 제외), ": "Only {part} sections were counted (labeling, OTC monograph, and clinical sections excluded), ",
   "{points} 포인트": "{points} points",
-  "{q} 관련 지적 전체 보기": "See all findings on {q}",
+  "{q} 관련 지적 모두 보기": "See all findings on {q}",
   "{source} {date} 지적사항 펼치기": "Expand {source} {date} findings",
   "{source} {docs}건": "{source} {docs}",
   "{source}(직전 {prev}건 → 최근 {cur}건, {reason})": "{source} (previous {prev} → recent {cur}, {reason})",

@@ -63,7 +63,7 @@
         <div class="in-card">
           <h2>{{ _('더 읽기') }}</h2>
           <ul class="in-links">
-            <li><a href="{{ rel_root }}{{ note.search_href }}">{{ _('{q} 관련 지적 전체 보기', q=note.search_q) }}</a></li>
+            <li><a href="{{ rel_root }}{{ note.search_href }}">{{ _('{q} 관련 지적 모두 보기', q=note.search_q) }}</a></li>
             {%- for f in note.further %}
             <li><a href="{{ f.url }}" target="_blank" rel="noopener">{{ f.label }}</a></li>
             {%- endfor %}

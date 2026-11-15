@@ -536,6 +536,7 @@ grm-api-intake/
 ├─ indexnow_submit.py              # [검색 노출 2026-11-10] IndexNow 제출 — 배포 직후 새/변경 URL 을 네이버·빙에 통지(키 상수=공개값, render 가 /{키}.txt 방출). 수동 전수는 grm-indexnow-full.yml. tests/test_indexnow_submit.py
 ├─ collect_mfds*.py                # 식약처 수집기(recall/admin/gmp_inspection/law/gmp_cert/safety_letter)
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
+├─ clause_text_collect.py         # [기준 원문 2026-11-15] 21 CFR 210·211(eCFR XML)·EU GMP Part I 1~9장+Annex 1·ICH Q7/Q9(R1)/Q10(PDF) 원문 → 조항 단위 `web/data/clauses/{cfr21,eu_gmp,ich}.json`(무절단·DB 아님) + `translation_queue.json`(국문 번역 대기). 수동 CLI·이용 조건은 `web/data/clauses/SOURCES.md`. ★`library_collect_*` 이름 금지(자료실 플러그인 자동 발견에 걸린다)
 ├─ collect_eu_gmp_ncr.py           # EU GMP NCR(EudraGMDP) 수집기 — News+Findings 이중편입
 ├─ eudragmdp_client.py             # EudraGMDP GMP 비준수 requests 클라이언트(세션·페이징·상세·PDF)
 ├─ collect_mhra_gmp_ncr.py         # MHRA GMP NCR 수집기 — EU NCR 영국판(News+Findings·아카이브 없음)

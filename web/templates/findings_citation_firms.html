@@ -48,8 +48,7 @@
     <p class="kick">FDA &middot; 21 CFR</p>
     <h1 class="cf-h1">{{ _('FDA 실사에서 조항 지적을 받은 제조소') }}</h1>
     <p class="cf-sum">{{ _('{date} 확인 기준 · 제조소 {n}곳 · {c}개국', date=cf.as_of, n="{:,}".format(cf.total), c="{:,}".format(cf.n_countries)) }}</p>
-    <p class="cf-note">{{ _('FDA Data Dashboard 의 실사 지적(Inspections Citations)을 제조소별로 모았습니다. 조항 옆 작은 숫자는 그 조항이 지적된 실사 수입니다. 사실만 옮겼으며 평가나 해석은 싣지 않습니다.') }}</p>
-    <p class="cf-note">{{ _('GRM 업체 페이지와 확실히 같은 곳으로 확인된 제조소만 이름에 링크가 있습니다. 조항 코드의 짧은 제목은 표 아래에서 볼 수 있고, 조항 페이지가 있는 코드는 눌러서 이동할 수 있습니다.') }}</p>
+    <p class="cf-note">{{ _('FDA Data Dashboard 의 실사 지적을 제조소별로 모았습니다. 조항 옆 숫자는 그 조항이 지적된 실사 수입니다.') }}</p>
 
     <form class="cf-bar" id="cf-bar" role="search" hidden>
       <label class="sr-only" for="cf-q">{{ _('업체명') }}</label>

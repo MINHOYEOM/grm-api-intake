@@ -135,7 +135,7 @@
 <h2 id="sec-7">뉴스레터 구독</h2>
 <p>각 페이지 하단의 구독 폼에 이메일을 입력하면, 매주 월요일 그 주 브리프의 핵심 요약과 바로가기를 메일로 보내드립니다. 구독 신청 시 확인 메일이 발송되며, 메일의 확인 버튼을 눌러야 구독이 완료됩니다. 수신거부는 모든 메일 하단에서 한 번의 클릭으로 가능합니다.</p>
 <h2 id="sec-8">이용 시 유의사항</h2>
-<ul><li>GRM의 번역·요약과 시사점에는 AI가 사용될 수 있습니다. 전문용어·부정 표현·조건·수치·날짜·적용 범위가 원문과 다르게 전달될 가능성이 있습니다.</li><li>법적·규제적 판단은 규제기관이 공개한 공식 원문과 최신 법령·가이드라인을 기준으로 해야 합니다.</li><li>문서의 발행일과 최신 개정 여부, 적용 대상 제품·제조소·공정, 후속 답변·정정·철회·추가 조치의 존재 여부를 함께 확인하세요.</li><li>허가·품질·법무·규제 대응에 영향을 주는 사안은 관련 전문부서와 검토한 뒤 결정하십시오. 본 서비스의 요약·해석은 공식 규제기관의 견해가 아니며, 법률·규제·품질 자문이 아닙니다.</li></ul>
+<ul><li>지적사항은 FDA 483·Warning Letter(경고서한), 캐나다 실사보고서, 식약처 GMP 실태조사, EU·영국 GMP 비준수 보고서 등 공개 원문에서 자동으로 뽑아 항목별로 나눈 것입니다. 국문은 AI 번역이며 항목마다 원문을 함께 싣습니다.</li><li>지적은 문서가 공개된 시점의 기록입니다. 이후 업체의 소명·시정 결과는 담지 않으니 현재 상태는 원 기관 발표로 확인하세요.</li><li>공개 문서 목록에는 국문으로 정리된 지적이 3건 이상인 문서를 싣습니다. EU·영국 GMP 비준수 보고서처럼 문서 하나에 지적이 한 건씩 담기는 경우는 예외이고, 나머지 문서는 지적 문장 검색에서 찾습니다.</li><li>영역 분류는 기관의 분류나 문장 속 낱말을 GRM 분류에 맞춘 것이라 기관의 판단과 다를 수 있습니다. 업체는 표시명이 아니라 정규화한 이름으로 묶습니다(&#34;… Limited&#34;와 &#34;… Ltd.&#34;는 같은 업체).</li><li>근거 수준(Evidence A·B·C)은 내용을 어떤 자료에서 가져왔는지를, &#39;검토 필요&#39;는 사람이 아직 확인하지 않았다는 뜻입니다.</li><li>GRM의 번역·요약과 시사점에는 AI가 사용될 수 있습니다. 전문용어·부정 표현·조건·수치·날짜·적용 범위가 원문과 다르게 전달될 가능성이 있습니다.</li><li>법적·규제적 판단은 규제기관이 공개한 공식 원문과 최신 법령·가이드라인을 기준으로 해야 합니다.</li><li>문서의 발행일과 최신 개정 여부, 적용 대상 제품·제조소·공정, 후속 답변·정정·철회·추가 조치의 존재 여부를 함께 확인하세요.</li><li>허가·품질·법무·규제 대응에 영향을 주는 사안은 관련 전문부서와 검토한 뒤 결정하십시오. 본 서비스의 요약·해석은 공식 규제기관의 견해가 아니며, 법률·규제·품질 자문이 아닙니다.</li></ul>
     <aside class="guide-x">
       <div class="guide-x-t">
         <b>규제 용어가 낯설다면</b>
@@ -259,6 +259,12 @@ main:not(#_) > .wrap:last-child{padding-bottom:0}
 @media(max-width:640px){ main:not(#_){margin-bottom:56px} }
 /* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
 main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -266,7 +272,7 @@ main:not(#_):has(> .toc-fab){margin-bottom:0}
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>국내외 의약품 GMP·품질 규제 동향을 한국어와 영어로 제공하는 무료 정보 서비스입니다.</p>
       <a class="foot-srclink" href="../findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
-    <div data-feedback-slot><h5>서비스 안내</h5><a href="../about/index.html">서비스 소개</a><a href="../guide/index.html">이용안내</a><a href="../index.html#notice">AI 활용 안내</a><a href="../findings/coverage/index.html">데이터 현황</a><a href="../rss.xml">RSS 피드</a></div>
+    <div data-feedback-slot><h5>서비스 안내</h5><a href="../about/index.html">서비스 소개</a><a href="../guide/index.html">이용안내</a><a href="../guide/index.html#sec-8">AI 활용 안내</a><a href="../findings/coverage/index.html">데이터 현황</a><a href="../rss.xml">RSS 피드</a></div>
     <div><h5>콘텐츠</h5><a href="../archive/index.html">주간 브리프</a><a href="../news/index.html">최근 규제 소식</a><a href="../browse/index.html">찾아보기</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../quiz/index.html">주간 퀴즈</a></div>
     <div class="foot-fnd"><h5>찾아보기</h5><a href="../findings/firm/index.html">업체</a><a href="../findings/inspector/index.html">실사관</a><a href="../findings/clause/index.html">조항</a><a href="../findings/trends/index.html">업무 영역별 경향</a><a href="../findings/inspections/index.html">FDA 실사 결과</a><a href="../findings/docs/index.html">공개 문서</a><a href="../findings/index.html">지적 문장 검색</a><a href="../findings/checklist/index.html">자가점검표</a><a href="../browse/index.html">전체 색인</a></div>
   </div>

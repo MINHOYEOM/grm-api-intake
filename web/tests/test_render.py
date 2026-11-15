@@ -2182,7 +2182,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         두 노출 지점(부제·AI 고지)에 실제로 실렸는지 확인한다. 전 페이지 범위의 정합은
         WebSourceCopyConsistencyTest 가 추출기 배선에서 파생해 검증한다."""
         self.assertIn("캐나다 실사", self.html)                        # 페이지 부제
-        self.assertIn("캐나다 실사보고서(Health Canada)", self.html)   # AI 고지
+        # [고지 정리 2026-11-15] AI 고지가 한 줄로 줄며 출처 나열은 이용안내로 옮겼다 —
+        # 이 면의 하단 한 줄은 대신 날짜 예외(캐나다=실사일)를 이름으로 말한다.
+        self.assertIn("캐나다 실사는 실사일", self.html)
 
     def test_uniform_select_style(self):
         """[M15] 전 셀렉트 동일 컴포넌트 — height 36px, font-size 13px."""
@@ -11512,8 +11514,9 @@ class WebInspectionDateTest(unittest.TestCase):
                       "같은 날짜가 '실사'와 '공개'로 두 번 나간다")
         # 본문의 출처 문장도 같은 규칙을 따라야 한다(갈래마다 문장 전체가 하나의 키다).
         self.assertIn("{% if doc.published_date == doc.inspection_date %}", tpl)
-        self.assertIn('_("{agency}가 <b>{date}</b>에 실사한 문서에서', tpl)
-        self.assertIn('_("{agency}가 <b>{date}</b>에 공개한 문서에서', tpl)
+        # [고지 정리 2026-11-15] 문서 페이지 하단 고지가 한 줄로 줄었다 — 날짜 종류 구분은 그대로.
+        self.assertIn('_("{agency} {date} 실사 문서에서 옮긴', tpl)
+        self.assertIn('_("{agency} {date} 공개 문서에서 옮긴', tpl)
 
 
 class WebFindingsDocPageTest(unittest.TestCase):

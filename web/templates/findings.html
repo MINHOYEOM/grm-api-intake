@@ -507,6 +507,6 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 {% block ai_disclosure %}
 {#- [고지 정리 2026-11-15 · 대표 지적 "AI 경고글이 작위적"] 제목·네 단락 → 한 줄. 출처·증거 등급·면책 설명은
     이용안내 '이용 시 유의사항'(#sec-8) 한 곳으로 모았다. 사이트 공통 면책 한 줄은 푸터에 그대로. -#}
-<section class="ai-line" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap"><p>{{ _('국문 해석은 생성형 AI 번역이며 항목마다 원문을 함께 싣습니다. 판단은 원문을 기준으로 하세요.') }} {% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html#sec-8">{{ _("자료와 AI 활용 안내") }}</a>{% endif %}</p></div></section>
+<section class="ai-line" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap"><p>{{ _('국문 해석은 생성형 AI 번역이며 항목마다 원문을 함께 싣습니다. 날짜는 공개일(캐나다 실사는 실사일)이고, 판단은 원문을 기준으로 하세요.') }} {% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html#sec-8">{{ _("자료와 AI 활용 안내") }}</a>{% endif %}</p></div></section>
 {% endblock %}
 {% block scripts %}<script src="{{ asset_root }}assets/findings.js?v={{ findingsjs_ver }}" defer></script>{% endblock %}

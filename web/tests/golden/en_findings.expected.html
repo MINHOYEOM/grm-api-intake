@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=0393a0af" defer></script>
+<script src="/assets/i18n-en.js?v=aa542336" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -76,7 +76,7 @@
       </button>
       <div class="fnd-filters" id="fnd-filters">
         <div class="fnd-field"><label for="fnd-f-source">Source</label><select id="fnd-f-source" data-key="source"><option value="">All</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-evidence">Evidence grade</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">All</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-evidence">Evidence level</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">All</option></select></div>
         <div class="fnd-field"><label for="fnd-f-status">Review status</label><select id="fnd-f-status" data-key="review_status"><option value="">All</option></select></div>
         <div class="fnd-field"><label for="fnd-f-category">Category</label><select id="fnd-f-category" data-key="category_code"><option value="">All</option></select></div>
         <div class="fnd-field"><label for="fnd-f-month">Month published</label><select id="fnd-f-month" data-key="month"><option value="">All</option></select></div><div class="fnd-field"><label for="fnd-f-country">Country</label><select id="fnd-f-country" data-key="country"><option value="">All</option></select></div>
@@ -459,7 +459,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   <div class="disc-body">
     <div class="disc-sec"><p>The findings on this page are extracted and split automatically from public source documents — FDA 483 observations, Warning Letters, Health Canada inspection reports, MFDS GMP inspections, and EU/UK GMP non-compliance reports (EudraGMDP, MHRA) — and normalised so that each item can be searched individually.</p></div>
     <div class="disc-sec"><p>Korean renderings are generative-AI translations; the original (English) text is provided with every item. Base any legal judgement on the original.</p></div>
-    <div class="disc-sec"><p>Each item's evidence grade (A, B, C) indicates how reliable the extraction basis is, and 'Needs review' marks items not yet checked by a person. Every item links to the official source so you can trace and verify it against the primary document.</p></div>
+    <div class="disc-sec"><p>Each item's evidence level (Evidence A·B·C) tells you which source the content came from; 'Needs review' means a person has not checked it yet. Every item links to the official original so you can check it there.</p></div>
     <div class="disc-sec"><p>This service is reference material to support regulatory awareness and must not be taken as legal, regulatory, quality, or compliance advice. Review important decisions against the official source and with professional advisers.</p></div>
   </div>
 </div></section>
@@ -537,6 +537,15 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
 .grm-skip:focus{left:16px}
+/* [본문 끝 여백 2026-11-15 · 대표 지적 "푸터에 마지막 글이 바짝 붙어 있다"] 페이지마다 아래 여백을
+   main·main>.wrap 의 padding(0~90px)으로 따로 주던 것을 한 규칙으로 — padding 은 걷고 main 의
+   margin 으로만 띄운다. margin 은 안쪽 마지막 요소의 margin 과 겹쳐(collapse) 큰 쪽만 남으므로
+   두 번 더해지지 않는다. :not(#_) 는 템플릿의 main.home·main.sr 같은 개별 규칙보다 앞서려는 것. */
+main:not(#_){padding-bottom:0;margin-bottom:72px}
+main:not(#_) > .wrap:last-child{padding-bottom:0}
+@media(max-width:640px){ main:not(#_){margin-bottom:56px} }
+/* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
+main:not(#_):has(> .toc-fab){margin-bottom:0}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -582,7 +591,7 @@ if(_nt&&_nm){
 })();
 </script>
 <script src="/assets/pet.js?v=4433fce6" defer></script>
-<script src="../../assets/findings.js?v=d1d62334" defer></script>
+<script src="../../assets/findings.js?v=2287d344" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

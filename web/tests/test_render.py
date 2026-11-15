@@ -2052,12 +2052,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("coral-tint", rule)
         self.assertNotIn("background", rule)
 
-    def test_review_note_confidence_percent_marker(self):
-        """신뢰도 표시는 Math.round(confidence*100) 로 산출되고, confidence 없으면
-        생략되는 분기가 있어야 한다(소스 마커)."""
+    def test_review_note_confidence_percent_not_shown(self):
+        """[11-15] 추출 신뢰도(%)는 내부 지표 — 독자 카드에 내지 않는다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("Math.round(Number(row.confidence) * 100)", js_src)
-        self.assertIn("신뢰도 ", js_src)
+        self.assertNotIn("Math.round(Number(row.confidence) * 100)", js_src)
+        self.assertNotIn('" · 신뢰도 {pct}%"', js_src)
 
     def test_card_default_collapsed_and_more_toggle(self):
         """카드는 기본 접힘(.fnd-collapsed)이고, "자세히 보기"/"접기" 토글 버튼이
@@ -2096,7 +2095,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("var(--mono)", m.group(1), "한글 칩에 mono 적용(§4 위반 위험)")
 
     def test_meta_line_document_id_and_confidence_marker(self):
-        """펼침 영역 하단 메타 줄 = 문서번호(mono, ASCII) · 신뢰도(퍼센트)."""
+        """펼침 영역 하단 메타 줄 = 문서번호(mono, ASCII)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function appendMetaLine(extra, row, query)", js_src)
         self.assertIn('meta.appendChild(document.createTextNode(_t("문서번호 ")))', js_src)
@@ -14047,6 +14046,19 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertNotIn("goBtn.disabled", js)   # 느릴 때 다시 보낼 수 있어야 한다
         self.assertIn('data-busy="검색 중"', self.landing)
         self.assertIn("prefers-reduced-motion:reduce", self.landing)
+
+    def test_main_bottom_gap_is_one_global_rule(self):
+        """[본문 끝 여백 2026-11-15 · 대표 지적] 본문 마지막 글이 구독 띠·푸터에 3~4px 로 붙던
+        페이지(지적 경향·공개 문서·조항·지적 사례 등 11종)를 base.html 한 규칙으로 띄운다 —
+        padding 은 걷고 main 의 margin(겹침으로 큰 쪽만)으로만. 브리프 본문은 11-16 발행 뒤."""
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        self.assertIn("main:not(#_){padding-bottom:0;margin-bottom:72px}", base)
+        self.assertIn("main:not(#_) > .wrap:last-child{padding-bottom:0}", base)
+        self.assertIn("main:not(#_){margin-bottom:56px}", base)
+        self.assertIn("main:not(#_):has(> .toc-fab){margin-bottom:0}", base)
+        page = (self.single / "findings" / "examples" / "mhra" / "index.html")
+        if page.exists():
+            self.assertIn("margin-bottom:72px", page.read_text(encoding="utf-8"))
 
     def test_search_filters_sit_above_results(self):
         """[필터 위로 2026-11-15 · 대표 선택] 오른쪽 세로 필터(sr-side)를 없애고 결과 위 한 줄로 —

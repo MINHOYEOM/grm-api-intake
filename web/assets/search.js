@@ -10,6 +10,18 @@
  *     지적 문장 검색 화면)로 넘긴다. 값은 전부 textContent 로 넣는다(innerHTML 미사용). */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      var t = setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o).then(function (r) { clearTimeout(t); return r; },
+                            function (e) { clearTimeout(t); throw e; });
+  }
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
@@ -264,7 +276,10 @@
   }
 
   // ── 지적 문장 ──────────────────────────────────────────────────────────────
+  var rpcDeadline = 0;
   function rpc(q, textOnly, attempt) {
+    // [11-15] 재시도 포함 15초 안에 결과 또는 실패 안내(시도당 최대 9초).
+    if (!attempt) rpcDeadline = Date.now() + 15000;
     var body = {
       // 쪽당 24건 = 서버 캐시(findings_search_cache, 086)의 키와 같은 값 — 용어 사례 검색어는
       // 미리 계산된 답을 받는다(8건이면 키가 달라 매번 새로 계산, 3초 제한에 걸렸다). 화면은 10줄만 쓴다.
@@ -275,7 +290,8 @@
     // 기간을 고르지 않으면 p_month 를 아예 안 보낸다 — 캐시 키(086)가 종전과 같다.
     var period = periodUnsupported ? "" : periodRange(state.period);
     if (period) body.p_month = period;
-    return fetch(URL_ + "/rest/v1/rpc/findings_search", {
+    return _fetchT(URL_ + "/rest/v1/rpc/findings_search", {
+      timeoutMs: Math.max(2000, Math.min(9000, rpcDeadline - Date.now())),
       method: "POST",
       headers: { apikey: KEY, Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -287,7 +303,7 @@
       return d;
     }).catch(function (err) {
       var a = attempt || 0;
-      if (a < 2) {
+      if (a < 2 && Date.now() + 700 * (a + 1) + 2000 <= rpcDeadline) {
         return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
           .then(function () { return rpc(q, textOnly, a + 1); });
       }

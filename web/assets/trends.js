@@ -70,6 +70,18 @@
  */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      var t = setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o).then(function (r) { clearTimeout(t); return r; },
+                            function (e) { clearTimeout(t); throw e; });
+  }
 
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
@@ -2452,7 +2464,7 @@
   }
 
   function fetchStats() {
-    return fetch(rpcEndpoint("findings_stats"), {
+    return _fetchT(rpcEndpoint("findings_stats"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -2465,7 +2477,7 @@
   // 008_findings_category_matrix.sql — findings_stats() 와 별개 RPC(H1). 008 미적용
   // 라이브에서 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다(아래 오케스트레이션).
   function fetchCategoryMatrix() {
-    return fetch(rpcEndpoint("findings_category_matrix"), {
+    return _fetchT(rpcEndpoint("findings_category_matrix"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -2479,7 +2491,7 @@
   // RPC(파라미터 없음). 미배포 라이브에서 404 를 반환하므로 이 fetch 만 독립적으로
   // 실패 처리한다(아래 오케스트레이션, fetchCategoryMatrix 와 동일 원칙).
   function fetchZoneCategory() {
-    return fetch(rpcEndpoint("findings_zone_category"), {
+    return _fetchT(rpcEndpoint("findings_zone_category"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -2493,7 +2505,7 @@
   // 058 미적용 라이브에서 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다
   // (fetchZoneCategory 와 동일 원칙).
   function fetchFdaInspectionStats() {
-    return fetch(rpcEndpoint("fda_inspection_stats"), {
+    return _fetchT(rpcEndpoint("fda_inspection_stats"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -2507,7 +2519,7 @@
   // 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다(fetchCategoryMatrix/
   // fetchZoneCategory 와 동일 원칙).
   function fetchRecentWindow() {
-    return fetch(rpcEndpoint("findings_recent_window"), {
+    return _fetchT(rpcEndpoint("findings_recent_window"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_months: 12 }),
@@ -2521,7 +2533,7 @@
   // 이 페이지에서 유일하게 지적 **문장**을 가져오는 경로다(집계 RPC 아님, 위 §계약 참조).
   function fetchCategoryExamples(code) {
     return retry5xx(function () {
-      return fetch(rpcEndpoint("findings_search"), {
+      return _fetchT(rpcEndpoint("findings_search"), {
         method: "POST",
         headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -2559,7 +2571,7 @@
   // 042_findings_cfr_ranking.sql — findings_stats/findings_recent_window 와 별개 RPC.
   // 042 미적용 라이브에서 404 를 반환하므로 이 fetch 만 독립적으로 실패 처리한다.
   function fetchCfrRanking() {
-    return fetch(rpcEndpoint("findings_cfr_ranking"), {
+    return _fetchT(rpcEndpoint("findings_cfr_ranking"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_months: 12 }),
@@ -2574,7 +2586,7 @@
   // 필터 후 3건을 확보하려면 문서를 조금 넉넉히 받는다.
   function fetchCfrExamples(section) {
     return retry5xx(function () {
-      return fetch(rpcEndpoint("findings_search"), {
+      return _fetchT(rpcEndpoint("findings_search"), {
         method: "POST",
         headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -2585,7 +2597,7 @@
   }
 
   function fetchFirmStats(firmName) {
-    return fetch(rpcEndpoint("findings_firm_stats"), {
+    return _fetchT(rpcEndpoint("findings_firm_stats"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_firm: firmName }),

@@ -1,6 +1,18 @@
 /* Document facts remain plain text until the runtime cohort index confirms a profile exists. */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      var t = setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o).then(function (r) { clearTimeout(t); return r; },
+                            function (e) { clearTimeout(t); throw e; });
+  }
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
@@ -16,7 +28,7 @@
   var key = cfg.getAttribute("data-key") || "";
   var root = cfg.getAttribute("data-root") || "";
   if (!url || !key) return;
-  fetch(url + "/rest/v1/rpc/mfds_inspector_index", {
+  _fetchT(url + "/rest/v1/rpc/mfds_inspector_index", {
     method: "POST", body: "{}",
     headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
   }).then(function (response) {

@@ -329,7 +329,25 @@ class CollectDocumentsTest(unittest.TestCase):
             fdr.collect_documents("u", "k", min_findings=3, page_size=10,
                                   log=lambda m: None)
         self.assertIn("불완전", str(cm.exception))
-        self.assertEqual(self.calls[2], fdr.PAGE_ATTEMPTS)
+        self.assertEqual(self.calls[2],
+                         fdr.PAGE_ATTEMPTS * (1 + len(fdr.DEFERRED_RETRY_COOLDOWNS_SEC)))
+
+    def test_page_failing_past_immediate_retries_recovers_in_deferred_round(self):
+        """★즉시 재시도를 다 써도 바로 포기하지 않는다 — 끝에 식힌 뒤 다시 친다.
+
+        [2026-11-15] 52/69 장이 즉시 재시도 4회(3분 남짓) 내내 500 이라 런 전체가 중단됐고,
+        나머지 68장은 멀쩡했다. DB 가 바쁜 구간을 지나가게 쉰 뒤 다시 치면 회복된다.
+        회복된 장은 실패로 세지 않고, 쉬는 시간이 실제로 들어갔는지도 본다."""
+        self._stub(3, {p: [_doc(f"doc{p}")] for p in range(1, 4)},
+                   fail_times={2: fdr.PAGE_ATTEMPTS + 1})
+        logs = []
+        docs, reject = fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                             log=logs.append)
+        self.assertEqual(len(docs), 3, "미뤘다 회복한 페이지의 문서가 빠졌다")
+        self.assertEqual([k for k in reject if "페이지 조회 실패" in k], [])
+        self.assertIn(fdr.DEFERRED_RETRY_COOLDOWNS_SEC[0], self.slept, "식히는 시간 없이 다시 쳤다")
+        self.assertTrue(any("재조회 성공" in m for m in logs), "회복이 로그에 남지 않았다")
+        self.assertEqual([d["document_id"] for d in docs], sorted(d["document_id"] for d in docs))
 
     def test_zero_documents_aborts(self):
         """RPC 장애를 '문서가 없다'로 커밋하면 다음 렌더가 페이지 수천 장을 지운다.

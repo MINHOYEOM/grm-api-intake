@@ -84,6 +84,12 @@ PAGE_RETRY_BACKOFF_SEC = 2.0
 # 호출 사이 간격. RPC 한 장이 약 0.76초인데 anon 역할의 statement_timeout 은 3초라
 # 여유가 4배뿐이다 — 62장을 쉼 없이 몰아치는 것이 타임아웃의 직접 원인이었다.
 PAGE_PACING_SEC = 0.3
+# 즉시 재시도(PAGE_ATTEMPTS)로도 안 된 페이지는 바로 포기하지 않고 맨 끝에 식힌 뒤 다시
+# 친다 — 라운드마다 쉬는 초. [2026-11-15] 52/69 장이 3분 남짓한 즉시 재시도 4회 내내
+# 500(statement timeout)이었고, 나머지 68장은 멀쩡했다. DB 가 잠깐 바쁜 구간에 같은 장을
+# 연달아 친 것이 문제라, 시간을 두고 다시 치면 대개 지나간다. 그래도 남으면 종전대로
+# 전면 중단한다(부분 스냅샷은 만들지 않는다).
+DEFERRED_RETRY_COOLDOWNS_SEC = (30.0, 90.0)
 
 # document_id 가 그대로 URL 경로가 된다 — 안전하지 않은 값은 페이지를 만들지 않는다.
 _SLUG_OK = re.compile(r"^[A-Za-z0-9._-]{1,120}$")
@@ -352,6 +358,7 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
                 out.append(view)
 
     absorb(first)
+    deferred: list[int] = []
     for page in range(2, pages + 1):
         # 호출 사이에 짧게 쉰다 — 62장을 쉼 없이 몰아치는 것이 타임아웃의 직접 원인이다
         # (한 장 0.76초 / anon 한계 3초). 전체로는 20초 남짓이라 값싼 보험이다.
@@ -359,13 +366,33 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
         try:
             absorb(fetch_page(base_url, anon_key, page, page_size, log, total=pages))
         except Exception as exc:                          # noqa: BLE001 — 페이지별 격리
-            failures += 1
-            log(f"  ! page {page}/{pages} 실패({PAGE_ATTEMPTS}회 시도): {exc}")
-            # ★실패도 사유로 센다. log 로만 흘리면 그 페이지에 있던 문서 100건이 조용히
-            # 사라지고, 축소 게이트(10%)를 넘지 않으면 그대로 자동 머지된다.
-            reject[f"페이지 조회 실패(문서 최대 {page_size}건 누락)"] += 1
+            deferred.append(page)
+            log(f"  ! page {page}/{pages} 즉시 재시도 {PAGE_ATTEMPTS}회 실패 — 끝에 다시 친다: {exc}")
         if page % 10 == 0:
             log(f"  · {page}/{pages} 페이지 · 채택 {len(out)}건")
+
+    # 미룬 장은 식힌 뒤 라운드마다 다시 친다. 끝내 못 읽은 장만 실패로 센다.
+    for rnd, cool in enumerate(DEFERRED_RETRY_COOLDOWNS_SEC, 1):
+        if not deferred:
+            break
+        log(f"  · 미룬 페이지 {len(deferred)}장 {cool:.0f}초 뒤 재조회(라운드 {rnd}/"
+            f"{len(DEFERRED_RETRY_COOLDOWNS_SEC)}): {deferred}")
+        time.sleep(cool)
+        still: list[int] = []
+        for page in deferred:
+            time.sleep(PAGE_PACING_SEC)
+            try:
+                absorb(fetch_page(base_url, anon_key, page, page_size, log, total=pages))
+                log(f"  · page {page}/{pages} 재조회 성공(라운드 {rnd})")
+            except Exception as exc:                      # noqa: BLE001 — 페이지별 격리
+                still.append(page)
+                log(f"  ! page {page}/{pages} 재조회 실패(라운드 {rnd}): {exc}")
+        deferred = still
+    for page in deferred:
+        failures += 1
+        # ★실패도 사유로 센다. log 로만 흘리면 그 페이지에 있던 문서 100건이 조용히
+        # 사라지고, 축소 게이트(10%)를 넘지 않으면 그대로 자동 머지된다.
+        reject[f"페이지 조회 실패(문서 최대 {page_size}건 누락)"] += 1
 
     out = apply_thickness_gate(out, min_findings=min_findings, reject=reject, log=log)
 
@@ -375,7 +402,8 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
     # 3일간 빨갰다. 부분 스냅샷은 "덜 수집된 것"이지 "세상이 바뀐 것"이 아니다.
     if failures:
         raise SystemExit(
-            f"페이지 수집 실패 {failures}/{pages} — 재시도({PAGE_ATTEMPTS}회) 후에도 조회하지 "
+            f"페이지 수집 실패 {failures}/{pages} — 즉시 재시도({PAGE_ATTEMPTS}회)와 식힌 뒤 재조회"
+            f"({len(DEFERRED_RETRY_COOLDOWNS_SEC)}라운드) 후에도 조회하지 "
             f"못한 페이지가 있어 불완전한 스냅샷입니다. 아무것도 쓰지 않습니다.")
     if not out:
         raise SystemExit("문서 0건 — 0건 가드. 아무것도 쓰지 않습니다.")

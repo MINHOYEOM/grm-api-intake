@@ -593,6 +593,15 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
 .btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
 .grm-skip:focus{left:16px}
+/* [본문 끝 여백 2026-11-15 · 대표 지적 "푸터에 마지막 글이 바짝 붙어 있다"] 페이지마다 아래 여백을
+   main·main>.wrap 의 padding(0~90px)으로 따로 주던 것을 한 규칙으로 — padding 은 걷고 main 의
+   margin 으로만 띄운다. margin 은 안쪽 마지막 요소의 margin 과 겹쳐(collapse) 큰 쪽만 남으므로
+   두 번 더해지지 않는다. :not(#_) 는 템플릿의 main.home·main.sr 같은 개별 규칙보다 앞서려는 것. */
+main:not(#_){padding-bottom:0;margin-bottom:72px}
+main:not(#_) > .wrap:last-child{padding-bottom:0}
+@media(max-width:640px){ main:not(#_){margin-bottom:56px} }
+/* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
+main:not(#_):has(> .toc-fab){margin-bottom:0}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">

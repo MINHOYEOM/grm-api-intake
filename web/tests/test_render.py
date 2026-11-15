@@ -14048,6 +14048,19 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn('data-busy="검색 중"', self.landing)
         self.assertIn("prefers-reduced-motion:reduce", self.landing)
 
+    def test_main_bottom_gap_is_one_global_rule(self):
+        """[본문 끝 여백 2026-11-15 · 대표 지적] 본문 마지막 글이 구독 띠·푸터에 3~4px 로 붙던
+        페이지(지적 경향·공개 문서·조항·지적 사례 등 11종)를 base.html 한 규칙으로 띄운다 —
+        padding 은 걷고 main 의 margin(겹침으로 큰 쪽만)으로만. 브리프 본문은 11-16 발행 뒤."""
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        self.assertIn("main:not(#_){padding-bottom:0;margin-bottom:72px}", base)
+        self.assertIn("main:not(#_) > .wrap:last-child{padding-bottom:0}", base)
+        self.assertIn("main:not(#_){margin-bottom:56px}", base)
+        self.assertIn("main:not(#_):has(> .toc-fab){margin-bottom:0}", base)
+        page = (self.single / "findings" / "examples" / "mhra" / "index.html")
+        if page.exists():
+            self.assertIn("margin-bottom:72px", page.read_text(encoding="utf-8"))
+
     def test_search_filters_sit_above_results(self):
         """[필터 위로 2026-11-15 · 대표 선택] 오른쪽 세로 필터(sr-side)를 없애고 결과 위 한 줄로 —
         기관은 펼친 탭, 문서 종류·기간은 칩을 누르면 열리는 목록. 결과 문장은 화면에서만 3줄."""

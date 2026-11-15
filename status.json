@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-15T02:37:37Z",
+ "generated_at": "2026-11-15T09:55:51Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43668519147,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-15T02:35:39Z",
-    "updatedAt": "2026-11-15T02:35:43Z",
-    "headBranch": "fix/ux-search-fail-notice",
-    "displayTitle": "fix(web): 지적 검색이 실패할 때 알리고 다시 시도하게 — 이전 목록을 검색 결과처럼 보이던 문제",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43668519147"
-   },
-   {
-    "databaseId": 43668514522,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-15T02:35:36Z",
-    "updatedAt": "2026-11-15T02:35:39Z",
-    "headBranch": "fix/ux-search-fail-notice",
-    "displayTitle": "fix: 검색 안내 클래스 이름을 fnd-searchmsg 로(옛 fnd-notice 금지 테스트), 딥링크 catch 첫 …",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43668514522"
-   },
-   {
-    "databaseId": 43667223684,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-15T02:19:19Z",
-    "updatedAt": "2026-11-15T02:26:05Z",
-    "headBranch": "fix/ux-search-fail-notice",
-    "displayTitle": "fix(web): 지적 검색이 실패할 때 알리고 다시 시도하게 — 이전 목록을 검색 결과처럼 보이던 문제",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43667223684"
-   },
-   {
-    "databaseId": 43667219804,
+    "databaseId": 43690708022,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-15T02:19:17Z",
-    "updatedAt": "2026-11-15T02:26:53Z",
-    "headBranch": "fix/ux-search-fail-notice",
-    "displayTitle": "merge origin/main into fix/ux-search-fail-notice — 골든 재동결",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43667219804"
+    "createdAt": "2026-11-15T07:36:33Z",
+    "updatedAt": "2026-11-15T07:42:42Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1734 from MINHOYEOM/fix/ux-mhra-chapter10-other",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43690708022"
    },
    {
-    "databaseId": 43666943910,
+    "databaseId": 43688906810,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-15T02:15:47Z",
-    "updatedAt": "2026-11-15T02:23:46Z",
-    "headBranch": "fix/ux-color-tokens-aa",
-    "displayTitle": "fix(web): 주황·회색 기준색을 AA 대비로 — 사이트 전역",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43666943910"
+    "createdAt": "2026-11-15T07:12:32Z",
+    "updatedAt": "2026-11-15T07:18:41Z",
+    "headBranch": "fix/ux-mhra-chapter10-other",
+    "displayTitle": "fix(web): MHRA 조항 집계 'EU GMP 제10장' → '기타·미상'",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43688906810"
+   },
+   {
+    "databaseId": 43688903221,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-15T07:12:30Z",
+    "updatedAt": "2026-11-15T07:18:03Z",
+    "headBranch": "fix/ux-mhra-chapter10-other",
+    "displayTitle": "merge origin/main — 골든 재동결",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43688903221"
+   },
+   {
+    "databaseId": 43688674065,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-15T07:09:34Z",
+    "updatedAt": "2026-11-15T07:15:29Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1730 from MINHOYEOM/fix/ux-findings-jargon",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43688674065"
+   },
+   {
+    "databaseId": 43687692073,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-15T06:56:31Z",
+    "updatedAt": "2026-11-15T07:02:31Z",
+    "headBranch": "main",
+    "displayTitle": "fix(web): 본문 끝과 구독 띠·푸터 사이 여백을 전역 한 규칙으로 (2026-11-15 대표 지적) (#1733)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43687692073"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 43686721027,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-15T06:43:12Z",
+    "updatedAt": "2026-11-15T08:39:33Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43686721027"
+   },
+   {
     "databaseId": 43625314453,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43381756923"
-   },
-   {
-    "databaseId": 43296055757,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-12T20:01:11Z",
-    "updatedAt": "2026-11-12T21:59:18Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43296055757"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 43688796050,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-15T07:11:06Z",
+    "updatedAt": "2026-11-15T07:11:15Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43688796050"
+   },
+   {
     "databaseId": 43649638743,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43497655386"
-   },
-   {
-    "databaseId": 43384654321,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-13T07:17:10Z",
-    "updatedAt": "2026-11-13T07:17:20Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43384654321"
    }
   ],
   "grm-cloud-request.yml": [

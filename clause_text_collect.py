@@ -621,7 +621,8 @@ def write_source(key: str, built: dict[str, Any], retrieved: str) -> Path:
     obj = {"schema": SCHEMA, "source": {"key": key, **meta, "retrieved": retrieved},
            "docs": built["docs"], "clauses": built["clauses"]}
     p = OUT_DIR / f"{key}.json"
-    p.write_text(json.dumps(obj, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    p.write_text(json.dumps(obj, ensure_ascii=False, indent=1) + "\n", encoding="utf-8",
+                 newline="\n")
     return p
 
 
@@ -642,7 +643,8 @@ def write_translation_queue(retrieved: str) -> Path:
     q.write_text(json.dumps({"schema": "grm-clause-translation-queue/v1", "as_of": retrieved,
                              "target_lang": "ko", "total": len(rows),
                              "total_chars": sum(r["chars"] for r in rows), "items": rows},
-                            ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+                            ensure_ascii=False, indent=1) + "\n", encoding="utf-8",
+                 newline="\n")
     return q
 
 

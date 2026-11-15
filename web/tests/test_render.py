@@ -21659,6 +21659,39 @@ class WebBriefGlanceTest(unittest.TestCase):
             self.assertEqual(set(v), {"c", "k"})
 
 
+
+class CssCustomPropertyDefinedTest(unittest.TestCase):
+    """[11-15 선택 칩 대비] `var(--paper)` 가 어디에도 정의되지 않아, 지적 사례의 선택된 칩
+    ('MHRA 조항별 집계')이 검은 바탕에 검은 글자로 나왔다 — 정의 안 된 변수는 조용히 상속값이 된다.
+    대체값 없는 `var(--x)` 는 반드시 어딘가(:root 또는 지역 스타일)에서 `--x:` 로 정의돼야 한다."""
+
+    def test_every_var_without_fallback_is_defined(self):
+        files = [*(WEB_DIR / "templates").glob("*.html"), *(WEB_DIR / "partials").glob("*.html"),
+                 *(WEB_DIR / "assets").glob("*.css")]
+        used, defined = {}, set()
+        for f in files:
+            src = f.read_text(encoding="utf-8")
+            defined.update(re.findall(r"(?<![\w-])(--[a-z0-9-]+)\s*:", src))
+            for name in re.findall(r"var\(\s*(--[a-z0-9-]+)\s*\)", src):
+                used.setdefault(name, f.name)
+        for js in (WEB_DIR / "assets").glob("*.js"):  # style.setProperty('--x', ...) 로 JS 가 채우는 변수
+            defined.update(re.findall(r"['\"](--[a-z0-9-]+)['\"]", js.read_text(encoding="utf-8")))
+        missing = {k: v for k, v in used.items() if k not in defined}
+        self.assertEqual(missing, {}, "정의 없는 CSS 변수(대체값도 없음) — 색·배경이 조용히 사라진다")
+
+    def test_selected_chip_contrast_meets_aa(self):
+        """선택 상태(.on·aria-pressed)를 칠하는 지역 규칙은 흰 글자 + --coral-2(5.9:1)로 통일했다.
+        --coral(4.2:1) 바탕에 흰 글자, --coral-tint 위 --coral 글자(3.4:1)는 AA 미달."""
+        bad = []
+        for f in [*(WEB_DIR / "templates").glob("*.html"), *(WEB_DIR / "partials").glob("*.html")]:
+            for rule in re.findall(r"[^{}\n]*(?:\.on|aria-pressed=\"true\"\])[^{}\n]*\{[^}]*\}", f.read_text(encoding="utf-8")):
+                body = rule.split("{", 1)[1]
+                if re.search(r"background:var\(--coral[,)]", body) and re.search(r"color:(#fff|var\(--on-coral)", body):
+                    bad.append((f.name, rule.strip()[:90]))
+                if re.search(r"background:var\(--coral-tint\)", body) and re.search(r"(?<!-)color:var\(--coral[,)]", body):
+                    bad.append((f.name, rule.strip()[:90]))
+        self.assertEqual(bad, [], "선택 칩 대비 AA 미달 — --coral-2 를 써라")
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

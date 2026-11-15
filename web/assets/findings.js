@@ -2622,14 +2622,14 @@
   function searchNotice(kind, retryPage) {
     if (!noticeEl) {
       noticeEl = document.createElement("div");
-      noticeEl.id = "fnd-notice";
-      noticeEl.className = "fnd-notice";
+      noticeEl.id = "fnd-searchmsg";
+      noticeEl.className = "fnd-searchmsg";
       noticeEl.setAttribute("role", "status");
       resultsEl.parentNode.insertBefore(noticeEl, resultsEl);
     }
     while (noticeEl.firstChild) noticeEl.removeChild(noticeEl.firstChild);
     noticeEl.hidden = !kind;
-    noticeEl.className = "fnd-notice" + (kind === "fail" ? " is-fail" : "");
+    noticeEl.className = "fnd-searchmsg" + (kind === "fail" ? " is-fail" : "");
     if (kind === "slow") {
       noticeEl.appendChild(document.createTextNode(_t("검색 중입니다. 검색어가 있으면 시간이 조금 걸릴 수 있습니다.")));
     } else if (kind === "fail") {
@@ -2638,7 +2638,7 @@
         : _t("검색 결과를 가져오지 못했습니다.")));
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "fnd-notice-retry";
+      btn.className = "fnd-searchmsg-retry";
       btn.textContent = _t("다시 시도");
       btn.addEventListener("click", function () { goToPage(retryPage); });
       noticeEl.appendChild(btn);
@@ -2932,9 +2932,9 @@
       maybeFinishInit();
     })
     .catch(function () {
+      // [PR-0 딥링크] 목록 fetch 가 실패해도 이미 확정된 딥링크 단건 렌더는 덮어쓰지 않는다.
       clearTimeout(slowTimer);
       if (initToken === navToken) searchNotice(null);
-      // [PR-0 딥링크] 목록 fetch 가 실패해도 이미 확정된 딥링크 단건 렌더는 덮어쓰지 않는다.
       if (deepLinkStatus !== "found") showState("error");
       // ★[첫 응답 실패] syncControlsFromState()·wire() 는 성공 분기에만 있다. 그래서 첫
       //   응답이 실패하면 **URL 의 검색어가 입력창에 들어가지 못한 채** 빈 안내 문구만

@@ -2052,12 +2052,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("coral-tint", rule)
         self.assertNotIn("background", rule)
 
-    def test_review_note_confidence_percent_marker(self):
-        """신뢰도 표시는 Math.round(confidence*100) 로 산출되고, confidence 없으면
-        생략되는 분기가 있어야 한다(소스 마커)."""
+    def test_review_note_confidence_percent_not_shown(self):
+        """[11-15] 추출 신뢰도(%)는 내부 지표 — 독자 카드에 내지 않는다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("Math.round(Number(row.confidence) * 100)", js_src)
-        self.assertIn("신뢰도 ", js_src)
+        self.assertNotIn("Math.round(Number(row.confidence) * 100)", js_src)
+        self.assertNotIn('" · 신뢰도 {pct}%"', js_src)
 
     def test_card_default_collapsed_and_more_toggle(self):
         """카드는 기본 접힘(.fnd-collapsed)이고, "자세히 보기"/"접기" 토글 버튼이
@@ -2096,7 +2095,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("var(--mono)", m.group(1), "한글 칩에 mono 적용(§4 위반 위험)")
 
     def test_meta_line_document_id_and_confidence_marker(self):
-        """펼침 영역 하단 메타 줄 = 문서번호(mono, ASCII) · 신뢰도(퍼센트)."""
+        """펼침 영역 하단 메타 줄 = 문서번호(mono, ASCII)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function appendMetaLine(extra, row, query)", js_src)
         self.assertIn('meta.appendChild(document.createTextNode(_t("문서번호 ")))', js_src)

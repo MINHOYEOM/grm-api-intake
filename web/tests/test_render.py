@@ -14048,6 +14048,26 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn('data-busy="검색 중"', self.landing)
         self.assertIn("prefers-reduced-motion:reduce", self.landing)
 
+    def test_search_filters_sit_above_results(self):
+        """[필터 위로 2026-11-15 · 대표 선택] 오른쪽 세로 필터(sr-side)를 없애고 결과 위 한 줄로 —
+        기관은 펼친 탭, 문서 종류·기간은 칩을 누르면 열리는 목록. 결과 문장은 화면에서만 3줄."""
+        page = (self.single / "search" / "index.html").read_text(encoding="utf-8")
+        js = (WEB_DIR / "assets" / "search.js").read_text(encoding="utf-8")
+        self.assertNotIn("sr-side", page)
+        self.assertNotIn('type = "radio"', js)
+        bar, hits = page.index('id="sr-bar"'), page.index('id="sr-hits"')
+        self.assertLess(bar, hits, "필터 줄이 결과보다 위에 있어야 한다")
+        for needle in ('role="tablist"', 'id="sr-f-source"', 'id="sr-f-period"', 'id="sr-adv"',
+                       'id="sr-clear"', "-webkit-line-clamp:3"):
+            self.assertIn(needle, page, needle)
+        for needle in ('"role", "tab"', '"aria-haspopup", "listbox"', '"role", "option"',
+                       'e.key === "Escape"'):
+            self.assertIn(needle, js, needle)
+        # 영어판은 새 문구 없이 기존 사전 키만 쓴다(골든 재동결 없이 같은 구조).
+        en = (self.single / "en" / "search" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Clear all", en)
+        self.assertNotIn("모두 지우기", en)
+
     def test_home_case_selection_rule(self):
         """최신 문서부터, 분류가 있고(캐치올 제외) 길이가 맞는 지적 — 용어가 걸리는 것을 먼저."""
         terms = [{"id": "change-control", "term_ko": "변경관리", "term_en": "Change control"}]

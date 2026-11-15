@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-14",
+ "measured_on": "2026-11-15",
  "window_days": 60,
  "totals": {
-  "items": 448
+  "items": 447
  },
  "by_source": [
   {
@@ -12,7 +12,7 @@
   },
   {
    "v": "Federal Register",
-   "c": 81
+   "c": 80
   },
   {
    "v": "ECA Academy",
@@ -75,6 +75,13 @@
    "published_date": "2026-11-13",
    "title": "Revocation of the Color Additive Listing for Use of Orange B on Casings or Surfaces of Frankfurters and Sausages; Confirmation of Effective Date",
    "official_url": "https://www.federalregister.gov/documents/2026/11/13/2026-23112/revocation-of-the-color-additive-listing-for-use-of-orange-b-on-casings-or-surfaces-of-frankfurters"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-13",
+   "title": "[HC] SECARIS NASAL GEL: Affected lot may contain foreign matter",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/secaris-nasal-gel-affected-lot-may-contain-foreign-matter"
   },
   {
    "source": "MFDS",
@@ -3169,20 +3176,6 @@
    "published_date": "2026-09-16",
    "title": "Povidone Iodine 1.25% / Proparacaine HCl 0.5% Ophthalmic Solution, 10 mL per dropper bottle, For Office Use Only, Imprimis NJOF, LLC, 1705 Route 46 West, Unit 6B, Ledgewood, NJ 07852, NDC 71384-732-10",
    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-15",
-   "title": "Statistical Considerations for the Design of Rare Disease Clinical Investigations; Establishment of a Public Docket; Request for Information and Comments",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/15/2026-18805/statistical-considerations-for-the-design-of-rare-disease-clinical-investigations-establishment-of-a"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-15",
-   "title": "[HC] Organika® Gummies: Foreign site not listed on site licence",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/organikar-gummies-foreign-site-not-listed-site-licence"
   }
  ]
 }

@@ -649,6 +649,11 @@ def write_translation_queue(retrieved: str) -> Path:
 
 
 def main(argv: Iterable[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--download-dir", required=True, type=Path)
     ap.add_argument("--only", default="cfr21,eu_gmp,ich")

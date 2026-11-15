@@ -505,15 +505,8 @@ main{word-break:keep-all;overflow-wrap:anywhere}
     으로 이전 — 신규 CSS 없음, grm.css 기존 클래스만 사용. id="notice" 는 landing 전용이라
     findings 전용 id="ai-notice" + aria-label 을 쓴다(원문 요청). -#}
 {% block ai_disclosure %}
-<section class="ai-disclosure" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
-  <span class="kick">AI Disclosure</span>
-  <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
-  <div class="disc-body">
-    <div class="disc-sec"><p>{{ _("본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·캐나다 실사보고서(Health Canada)·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서(EudraGMDP·MHRA) 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("국문 해석은 생성형 AI 번역이며 원문(영문)을 항목마다 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("각 항목의 근거 수준(Evidence A·B·C)은 내용을 어떤 자료에서 가져왔는지를, '검토 필요' 표시는 사람이 아직 확인하지 않았다는 뜻입니다. 모든 항목에 공식 원문 링크가 있어 원문으로 바로 확인할 수 있습니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.") }}</p></div>
-  </div>
-</div></section>
+{#- [고지 정리 2026-11-15 · 대표 지적 "AI 경고글이 작위적"] 제목·네 단락 → 한 줄. 출처·증거 등급·면책 설명은
+    이용안내 '이용 시 유의사항'(#sec-8) 한 곳으로 모았다. 사이트 공통 면책 한 줄은 푸터에 그대로. -#}
+<section class="ai-line" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap"><p>{{ _('국문 해석은 생성형 AI 번역이며 항목마다 원문을 함께 싣습니다. 날짜는 공개일(캐나다 실사는 실사일)이고, 판단은 원문을 기준으로 하세요.') }} {% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html#sec-8">{{ _("자료와 AI 활용 안내") }}</a>{% endif %}</p></div></section>
 {% endblock %}
 {% block scripts %}<script src="{{ asset_root }}assets/findings.js?v={{ findingsjs_ver }}" defer></script>{% endblock %}

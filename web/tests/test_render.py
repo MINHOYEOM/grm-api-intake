@@ -19737,6 +19737,9 @@ class WebEnTreeTest(unittest.TestCase):
         # (렌더와 같은 로더·같은 함수 — routes_present 가 실제로 그릴 면만 돌려준다).
         cls.expected |= set(render.deficiency_cases_page.routes_present(
             render.deficiency_cases_page.load_snapshot(render.DEFICIENCY_CASES_FILE)))
+        # [기준 조항 원문 2026-11-15] 정본(web/data/clauses/*.json)에서 파생 — 렌더와 같은 함수.
+        cls.expected |= render.clause_text_page.tree_paths(
+            render.clause_text_page.build(render.clause_text_page.load_sources()))
 
     @classmethod
     def tearDownClass(cls):

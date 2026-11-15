@@ -174,7 +174,7 @@ _CFR_SEC = re.compile(r"^21 CFR (\d{3}\.\d+)(?:\([A-Za-z0-9]+\))*$")
 _CFR_PART = re.compile(r"^21 CFR Part (\d{3})$")
 _EU_CH = re.compile(r"^EU GMP Part I,? Chapter (\d)\b(.*)$")
 _EU_AN1 = re.compile(r"^EU GMP Annex 1\b(?!\d)(.*)$")
-_ICH = re.compile(r"^ICH (Q7|Q9(?:\(R1\))?|Q10)\b(.*)$")
+_ICH = re.compile(r"^ICH (Q7|Q9(?:\(R1\))?|Q10)(?=\s|$)(.*)$")
 
 
 def ref_href(view: dict[str, Any], label: str) -> str:

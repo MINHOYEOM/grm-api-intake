@@ -15454,10 +15454,11 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
         소스 추가 시 수집기·DB 만 고치고 설명을 빠뜨리던 재발 방지."""
         REQUIRED = sorted(set(self.EXTRACTOR_COPY_KEYWORDS.values()))
         # ① 템플릿(인트로·고지) — 파일 전체 텍스트에 전부 존재해야 한다.
-        for label, rel in (("findings 템플릿", "findings.html"),
-                           ("firm 템플릿", "firm.html"),
-                           ("trends 템플릿", "trends.html")):
-            text = (WEB_DIR / "templates" / rel).read_text(encoding="utf-8")
+        # [고지 정리 2026-11-15] findings·firm 하단 AI 고지가 한 줄로 줄며 출처 나열은 이용안내
+        # '이용 시 유의사항' 한 곳으로 옮겼다 — 그 정본(guide_content.md)을 대신 잰다.
+        for label, path in (("이용안내 정본", WEB_DIR / "data" / "guide_content.md"),
+                            ("trends 템플릿", WEB_DIR / "templates" / "trends.html")):
+            text = path.read_text(encoding="utf-8")
             for kw in REQUIRED:
                 self.assertIn(kw, text, f"{label} 에 소스 키워드 '{kw}' 누락 — 신규 소스 카피 갱신 필요")
         # ② render.py 메타 설명 3종 — 상수 본문을 개별 검증(하나만 고치고 나머지 빠뜨리는 것 방지).

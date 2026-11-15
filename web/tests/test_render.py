@@ -21838,6 +21838,19 @@ class CssCustomPropertyDefinedTest(unittest.TestCase):
                     bad.append((f.name, rule.strip()[:90]))
         self.assertEqual(bad, [], "선택 칩 대비 AA 미달 — --coral-2 를 써라")
 
+    def test_signal_dot_color_not_used_for_text(self):
+        """[11-15] --lo(#8E8B82)는 신호 강도 점 색이다. 글자색으로 쓰이면 바탕에 따라 3.0~3.2:1
+        (자료실 안내문·퀴즈 번호·'기록은 이 브라우저에만 저장돼요' 등). 보조 글자는 --muted-2."""
+        bad = []
+        for f in [*(WEB_DIR / "templates").glob("*.html"), *(WEB_DIR / "partials").glob("*.html")]:
+            src = f.read_text(encoding="utf-8")
+            for m in re.finditer(r"(?<![-\w])color:\s*var\(--lo\)", src):
+                sel = src[src.rfind("}", 0, m.start()) + 1:m.start()]
+                if "::before" in sel or "::after" in sel:   # 구분점 같은 장식 글리프는 글자가 아니다
+                    continue
+                bad.append(f.name)
+        self.assertEqual(bad, [], "--lo 를 글자색으로 쓰지 마라 — var(--muted-2)")
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

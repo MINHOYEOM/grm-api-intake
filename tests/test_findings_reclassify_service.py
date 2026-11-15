@@ -477,3 +477,32 @@ class CategoryDriftExitCodeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReviewedKeepTest(unittest.TestCase):
+    """#1515: 사람이 원문 대조로 현행 유지를 판정한 행은 표류로 세지 않는다."""
+
+    _TEXT = ("There is no assurance that the firm always challenges the validity of all testing "
+             "results provided in container supplier's certificates of analysis; the bags are "
+             "sterile and endotoxin free.")
+
+    def test_kept_row_with_matching_category_is_skipped(self) -> None:
+        fid = "finding-e5eefc76a97ad321aeae8a68"
+        self.assertEqual(svc._REVIEWED_KEEP[fid], "material_supplier_control")
+        rows = [_row(fid, self._TEXT, "material_supplier_control", gf.TAXONOMY_VERSION)]
+        self.assertEqual(svc.plan_reclassification(rows), [])
+        with _mock_get_all(rows):
+            report = svc.run_reclassify(_BASE_URL, _SERVICE_KEY, dry_run=True)
+        self.assertEqual(report["reviewed_keep_skipped"], 1)
+        self.assertEqual(report["category_changes"], 0)
+
+    def test_kept_row_counts_again_if_category_was_changed(self) -> None:
+        fid = "finding-e5eefc76a97ad321aeae8a68"
+        rows = [_row(fid, self._TEXT, "documentation_records", gf.TAXONOMY_VERSION)]
+        plan = svc.plan_reclassification(rows)
+        self.assertEqual(len(plan), 1)
+        self.assertEqual(plan[0]["old_category"], "documentation_records")
+
+    def test_keep_values_are_known_category_codes(self) -> None:
+        for fid, code in svc._REVIEWED_KEEP.items():
+            self.assertIn(code, gf.CATEGORY_BY_CODE, fid)

@@ -254,8 +254,8 @@
     ["q", _t("검색"), function (v) { return v; }],
     ["agency", _t("기관"), function (v) { return v; }],
     ["source", _t("소스"), function (v) { return v; }],
-    ["evidence_level", _t("증거 등급"), function (v) { return EVIDENCE_LABEL[v] || v; }],
-    ["review_status", _t("검토 상태"), function (v) { return STATUS_LABEL[v] || v; }],
+    ["evidence_level", _t("근거 수준"), function (v) { return EVIDENCE_LABEL[v] || v; }],
+    ["review_status", _t("확인 상태"), function (v) { return STATUS_LABEL[v] || v; }],
     ["category_code", _t("카테고리"), function (v) { var c = CATEGORY_LABELS[v]; return c ? c.ko : v; }],
     ["month", _t("발행월"), function (v) { return v; }],
     ["country", _t("국가"), function (v) { return countryLabelKo(v); }],
@@ -1121,8 +1121,8 @@
     extra.appendChild(refsWrap);
   }
 
-  // [M10b P0] 메타 줄 — 문서번호(ASCII, mono 허용) · 신뢰도. 문서번호 표시 위치이므로
-  // 매칭어 하이라이트 대상(P1)이기도 하다.
+  // [M10b P0] 메타 줄 — 문서번호(ASCII, mono 허용). 문서번호 표시 위치이므로
+  // 매칭어 하이라이트 대상(P1)이기도 하다. [11-15] 추출 신뢰도(%)는 내부 지표라 독자 화면에서 뺐다.
   function appendMetaLine(extra, row, query) {
     var docId = row.document_id || "";
     var meta = document.createElement("p");
@@ -1130,10 +1130,6 @@
     meta.appendChild(document.createTextNode(_t("문서번호 ")));
     var docSpan = elHL("span", "fnd-meta-doc", docId, query);
     meta.appendChild(docSpan);
-    if (row.confidence !== undefined && row.confidence !== null && row.confidence !== "") {
-      var pct = Math.round(Number(row.confidence) * 100);
-      if (!isNaN(pct)) meta.appendChild(document.createTextNode(_t(" · 신뢰도 {pct}%", { pct: pct })));
-    }
     extra.appendChild(meta);
   }
 

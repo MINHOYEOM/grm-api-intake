@@ -1,0 +1,211 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "data-integrity",
+  "as_of": "2026-11-15",
+  "area_ko": "데이터와 기록",
+  "area_en": "Data and records",
+  "title_ko": "데이터 완전성",
+  "title_en": "Data integrity",
+  "glossary_ids": [
+    "data-integrity",
+    "alcoa-plus"
+  ],
+  "aliases_ko": [
+    "데이터 완전성",
+    "데이터완전성",
+    "자료 완전성",
+    "데이터 무결성"
+  ],
+  "aliases_en": [
+    "data integrity",
+    "ALCOA"
+  ],
+  "search_q_ko": "데이터 완전성",
+  "search_q_en": "data integrity",
+  "lead_ko": "FDA 는 데이터 완전성 방침이 있는지보다, 기록을 누가 언제 만들었고 고치거나 지울 수 있었는지를 장비와 문서에서 직접 확인합니다. 아래는 경고서한과 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a data integrity policy exists than at who created a record, when, and whether it could be changed or deleted, checking this directly on instruments and documents. The findings below are quoted from warning letters and Form 483s.",
+  "patterns": [
+    {
+      "title_ko": "전자 원자료를 지우거나 고칠 수 있었다",
+      "title_en": "Electronic raw data could be deleted or modified",
+      "quotes": [
+        {
+          "finding_id": "finding-de01e2a844b135be50e96ecd",
+          "raw_signal_id": "rawsig-9861ff9075b3a9916af4ef5d",
+          "document_id": "e060c184a33d",
+          "source": "FDA Warning Letter",
+          "firm": "Outin Futures Corp.",
+          "date": "2024-10-15",
+          "quote_ko": "구체적으로, 현재 미국 시장에 있는 배치(예: (b)(4) )의 출하 시험에 사용된 전자 원시 데이터(raw data)가 삭제되어 접근할 수 없었다.",
+          "quote_en": "Specifically, electronic raw data used for release testing of batches (e.g., (b)(4) ) currently in the U.S. market was deleted and not accessible."
+        },
+        {
+          "finding_id": "finding-afe671663342fa200cad139e",
+          "raw_signal_id": "rawsig-78d4bb048a6bf5cbf5e97166",
+          "document_id": "fda483-195554",
+          "source": "FDA 483",
+          "firm": "Baxter Healthcare Corporation",
+          "date": "2026-10-30",
+          "quote_ko": "예를 들어 2025년 11월 21일 귀사의 R&D 직원은 컴퓨터 폴더 [redacted] 에 저장된 확인시험에서 생성된 원자료가 수정 및 삭제될 수 있음을 시연했다.",
+          "quote_en": "For example, on November 21, 2025, your R&D personnel demonstrated that the raw data generated from confirmation testing stored in computer folder [redacted] can be potentially modified and deleted."
+        }
+      ]
+    },
+    {
+      "title_ko": "시험 장비에 감사 추적 기능이 없었다",
+      "title_en": "Laboratory instruments had no audit trail",
+      "quotes": [
+        {
+          "finding_id": "finding-7657781151b0df73acbf6c42",
+          "raw_signal_id": "rawsig-40e8d69191fbfb46f9c6c2e3",
+          "document_id": "6fcab5ae9913",
+          "source": "FDA Warning Letter",
+          "firm": "Guangxi Yulin Pharmaceutical Group Co. Ltd.",
+          "date": "2025-10-21",
+          "quote_ko": "예를 들어 귀사의 자외선-가시선(UV-vis) 및 적외선(IR) 분광 장비에는 감사추적(audit-trail) 기능이 없었고, 분석자들이 데이터, 파일 및 폴더를 변경하고 삭제할 수 있었다.",
+          "quote_en": "For example, your ultraviolet-visible (UV-vis) and infrared (IR) spectroscopy equipment was found to lack audit-trail functionality, and your analysts were able to alter and delete data, files, and folders."
+        },
+        {
+          "finding_id": "finding-f9b48ac0c14b28538db3a9e4",
+          "raw_signal_id": "rawsig-fbc374a4d99e611551fbf52a",
+          "document_id": "fda483-195243",
+          "source": "FDA 483",
+          "firm": "Zen Chemicals Pvt. Ltd",
+          "date": "2026-10-19",
+          "quote_ko": "UV Probe 2.70 소프트웨어를 사용하는 UV(장비 # QC/INST/13)는 감사추적 기능이 없다.",
+          "quote_en": "UV which uses software UV Probe 2.70 (equipment # QC/INST/13) does not have audit trail capabilities."
+        }
+      ]
+    },
+    {
+      "title_ko": "기록을 수행 시점에 적지 않고 미리 또는 소급해 적었다",
+      "title_en": "Records were pre-signed or backdated instead of made at the time of the work",
+      "quotes": [
+        {
+          "finding_id": "finding-49dcd617458996cb5afbf0ec",
+          "raw_signal_id": "rawsig-be6c42cf01e74a12bec881de",
+          "document_id": "32bd6b7bc56a",
+          "source": "FDA Warning Letter",
+          "firm": "Tentamus India Private Limited",
+          "date": "2026-03-10",
+          "quote_ko": "실사 중 \"수행자(Performed by)\" 란에 2025년 1월 9일자로 미리 서명·날짜가 기입된 빈 예방 정비 문서 5건이 발견되었다.",
+          "quote_en": "Five blank preventative maintenance documents were discovered during the inspection that had been pre-signed and dated to January 9, 2025, in the “Performed by” section."
+        },
+        {
+          "finding_id": "finding-c3064ea1b9333b929181ee1f",
+          "raw_signal_id": "rawsig-de778271dcf683e5f84e7a42",
+          "document_id": "fda483-195470",
+          "source": "FDA 483",
+          "firm": "Serum Institute of India Private Ltd.",
+          "date": "2026-10-26",
+          "quote_ko": "부총괄 관리자는 시작 시간을 동시 기록하지 않는 문서 처리 절차를 설명했다. 이후 멸균 시작 시간이 소급 입력되었다.",
+          "quote_en": "Your firm’s Deputy General Manager explained a procedural handling of documentation whereby the sterilization start time is not contemporaneously documented. Subsequently, a backdated sterilization start time was entered."
+        }
+      ]
+    },
+    {
+      "title_ko": "원본 기록과 시험 증거를 버렸다",
+      "title_en": "Original records and test evidence were discarded",
+      "quotes": [
+        {
+          "finding_id": "finding-bf53061ca7e3dc247c070251",
+          "raw_signal_id": "rawsig-3f16a77575d2e142ca6f3818",
+          "document_id": "eb5152bfcf02",
+          "source": "FDA Warning Letter",
+          "firm": "Huons Co., Ltd.",
+          "date": "2026-06-23",
+          "quote_ko": "그러나 귀사의 팀장은 직원들에게 상당한 증식이 있는 바이오버든 배지(plate)를 폐기하도록 지시했고, 카메라 타임스탬프를 조작하여 소급 작성한 문서를 만들었다.",
+          "quote_en": "However, your team leader had instructed staff to discard the bioburden plates with significant growth and had manipulated camera timestamps to create backdated documentation."
+        },
+        {
+          "finding_id": "finding-d2d7e62ecd15a655641ff2f3",
+          "raw_signal_id": "rawsig-99e3de620b7863add0439178",
+          "document_id": "fda483-195322",
+          "source": "FDA 483",
+          "firm": "Shimoga Chemicals",
+          "date": "2026-10-23",
+          "quote_ko": "2026년 1월 19일 QC 시험실 현장 점검 중 폐기된 출력물이 쓰레기통에서 발견되었다.",
+          "quote_en": "During our walkthrough of the QC laboratory on January 19, 2026, a discarded printout was found in a trash bin."
+        }
+      ]
+    },
+    {
+      "title_ko": "계정과 비밀번호를 여럿이 함께 썼다",
+      "title_en": "User accounts and passwords were shared",
+      "quotes": [
+        {
+          "finding_id": "finding-3e124434d36ec4e87aefb5ca",
+          "raw_signal_id": "rawsig-2ff0b576e54295edd81ba072",
+          "document_id": "250af6c39367",
+          "source": "FDA Warning Letter",
+          "firm": "Persōn & Covey, Inc.",
+          "date": "2025-09-30",
+          "quote_ko": "실사에서 (b)(4) 소프트웨어에 귀속 가능한 사용자 유형은 \"System Administrator\"뿐이었고, 실험실 직원들이 Windows 및 (b)(4) 소프트웨어 시스템에 공용 비밀번호를 공유한 것이 확인되었다.",
+          "quote_en": "The inspection documented that “System Administrator” was the only user type attributable in the (b)(4) Software and laboratory personnel shared a common password for the Windows and (b)(4) software systems."
+        },
+        {
+          "finding_id": "finding-b42ec44141f6cec1df238de9",
+          "raw_signal_id": "rawsig-8c17a80ddfb7ac73567366a6",
+          "document_id": "fda483-195363",
+          "source": "FDA 483",
+          "firm": "Fagron Analytical Services, LLC",
+          "date": "2026-10-26",
+          "quote_ko": "개별 작업자 고유 사용자 이름 및 로그인도 없다. 대신 직원들은 공유 사용자 이름 \"Analyst\"를 사용한다.",
+          "quote_en": "Additionally, the pH meter does not have unique usernames and logins for individual operators. Instead, a shared username, \"Analyst,\" is used by personnel."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.68(b)",
+      "finding_id": "finding-7657781151b0df73acbf6c42",
+      "firm": "Guangxi Yulin Pharmaceutical Group Co. Ltd.",
+      "date": "2025-10-21",
+      "quote_ko": "귀사는 승인된 인원만이 마스터 생산 및 관리 기록 또는 기타 기록에 변경을 가할 수 있도록 보증하기 위해 컴퓨터 또는 관련 시스템에 대한 적절한 관리를 하지 않았다",
+      "quote_en": "Your firm failed to exercise appropriate controls over computer or related systems to assure that only authorized personnel institute changes in master production and control records, or other records",
+      "note_ko": "Outin Futures 사례도 이 조항 아래 적혔습니다.",
+      "note_en": "The Outin Futures finding was also cited under this section."
+    },
+    {
+      "key": "21 CFR 211.194(a)",
+      "finding_id": "finding-bf53061ca7e3dc247c070251",
+      "firm": "Huons Co., Ltd.",
+      "date": "2026-06-23",
+      "quote_ko": "귀사는 확립된 규격과 기준에 대한 적합성을 보장하는 데 필요한 모든 시험에서 얻은 완전한 데이터가 시험실 기록에 포함되도록 보장하지 않았다",
+      "quote_en": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards",
+      "note_ko": "시험 증거 폐기와 소급 작성이 이 조항으로 지적됐습니다.",
+      "note_en": "Discarded test evidence and backdated documentation were cited under this section."
+    },
+    {
+      "key": "21 CFR 211.160(a)",
+      "finding_id": "finding-49dcd617458996cb5afbf0ec",
+      "firm": "Tentamus India Private Limited",
+      "date": "2026-03-10",
+      "quote_ko": "귀사는 요구되는 시험실 관리 기전을 수행 시점에 문서화하지 않았다",
+      "quote_en": "Your firm failed to document at the time of performance required laboratory control mechanisms",
+      "note_ko": "미리 서명한 문서와 소급 기재가 이 조항으로 지적됐습니다.",
+      "note_en": "Pre-signed documents and backdating were cited under this section."
+    }
+  ],
+  "checks_ko": [
+    "분석자가 일반 권한으로 전자 원자료나 파일, 폴더를 지우거나 고칠 수 있습니까? 직접 시연해 확인했습니까?",
+    "출하 시험에 쓴 전자 원자료를 지금 모두 불러올 수 있습니까?",
+    "UV, IR, pH 측정기 같은 독립형 장비까지 감사 추적 기능이 있습니까?",
+    "서명과 날짜가 미리 적힌 빈 양식이나, 작업 뒤에 날짜를 소급해 적은 기록이 있습니까? 시작 시간 같은 항목을 작업하는 그 시점에 적습니까?",
+    "시험실 쓰레기통에 출력물이 버려져 있습니까? 중복 수행하거나 부적합이 나온 시험의 출력물과 배지도 기록으로 남깁니까?",
+    "장비마다 작업자별 고유 계정이 있습니까? 공용 사용자 이름이나 공용 비밀번호, 관리자 계정으로 시험하는 일이 있습니까?"
+  ],
+  "checks_en": [
+    "Can an analyst with ordinary access delete or modify electronic raw data, files or folders? Has this been checked by demonstration?",
+    "Can all electronic raw data used for release testing be retrieved today?",
+    "Do standalone instruments such as UV, IR and pH meters also have an audit trail?",
+    "Are there blank forms already signed and dated, or records dated back after the work? Are entries such as start times made at the moment of the work?",
+    "Are printouts found in laboratory trash bins? Are printouts and plates from duplicate or failing tests also kept as records?",
+    "Does each instrument have a unique account for each operator? Is testing ever done under a shared username, a shared password or an administrator account?"
+  ],
+  "further_reading": [],
+  "related": [
+    "oos-investigation"
+  ]
+}

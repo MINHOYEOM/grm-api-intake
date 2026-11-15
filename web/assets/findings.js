@@ -1089,6 +1089,7 @@
       details.appendChild(el("span", "fnd-tr-note", _t("AI 번역 — 원문 대조 권장")));
     }
     var p = elHL("p", null, altText, query);
+    p.lang = _HANGUL.test(altText) ? "ko" : "en";   // 화면 낭독기가 접기 안의 언어를 맞게 읽게
     details.appendChild(p);
     extra.appendChild(details);
   }

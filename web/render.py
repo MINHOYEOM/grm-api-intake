@@ -2655,9 +2655,9 @@ def build_glossary_view(
             for ref in reg_refs:
                 ref["cases_href"] = ""
         # [기준 조항 원문 2026-11-15] 근거 조항 → 사이트 안 원문 페이지(확실할 때만 · 두 트리 공통).
-        for ref in reg_refs:
-            ref["text_href"] = (clause_text_page.ref_href(clause_text_view, ref["label"])
-                                if clause_text_view else "")
+        if clause_text_view:  # 뷰가 없으면 키도 없다(종전 reg_refs 모양 그대로)
+            for ref in reg_refs:
+                ref["text_href"] = clause_text_page.ref_href(clause_text_view, ref["label"])
         term = t["term_ko"] if is_ko else t["term_en"]
         easy = t["easy_ko"] if is_ko else (t.get("easy_en") or "")
         detail = (t.get("detail_ko") or "") if is_ko else (t.get("detail_en") or "")

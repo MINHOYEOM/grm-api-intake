@@ -126,6 +126,16 @@ class TermEdges(unittest.TestCase):
         e = self._edges("품질 기록 제조 관리가 미흡했다.")
         self.assertEqual(e, {})
 
+    def test_spacing_variant_links_same_term(self):
+        # 사전 `무균공정`·`공정관리` ↔ 번역문 "무균 공정"·"공정 관리"(띄어쓰기만 다름, 2026-11-16)
+        tight = self._edges("무균공정 구역의 공정관리 절차가 미흡했다.")
+        spaced = self._edges("무균 공정 구역의 공정 관리 절차가 미흡했다.")
+        for tid in ("aseptic-processing", "in-process-control"):
+            self.assertIn(tid, tight)
+            self.assertIn(tid, spaced)
+            self.assertEqual(spaced[tid]["surface"], tight[tid]["surface"])  # 저장 표면형은 사전 표기
+            self.assertEqual(spaced[tid]["confidence"], tight[tid]["confidence"])
+
     def test_no_edge_below_threshold(self):
         docs = [{"findings": [{"finding_id": "f", "text_ko": "완제품 출하판정 밸리데이션 SOP 품질관리"}]}]
         edges, stats = kg_edges.build_term_edges(docs, self.terms)

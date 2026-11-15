@@ -237,6 +237,44 @@ def eu_label_ko(key: str) -> str:
     return f"제{int(m[2])}장" if m[1] == "Chapter" else f"부속서 {int(m[2])}"
 
 
+# EU GMP Part I 장·부속서 제목(EudraLex Vol.4 목차 그대로 — 바뀌지 않는 고유명). 없는 번호는 제목 없이 번호만.
+EU_TITLES: dict[tuple[str, int], tuple[str, str]] = {
+    ("Chapter", 1): ("Pharmaceutical Quality System", "의약품 품질 시스템"),
+    ("Chapter", 2): ("Personnel", "인력"),
+    ("Chapter", 3): ("Premises and Equipment", "시설·장비"),
+    ("Chapter", 4): ("Documentation", "문서화"),
+    ("Chapter", 5): ("Production", "생산"),
+    ("Chapter", 6): ("Quality Control", "품질관리"),
+    ("Chapter", 7): ("Outsourced Activities", "위탁 업무"),
+    ("Chapter", 8): ("Complaints and Product Recall", "불만·제품 회수"),
+    ("Chapter", 9): ("Self Inspection", "자체 점검"),
+    ("Annex", 1): ("Manufacture of Sterile Medicinal Products", "무균 의약품 제조"),
+    ("Annex", 2): ("Biological Active Substances and Medicinal Products", "생물학적 원료·제제"),
+    ("Annex", 3): ("Radiopharmaceuticals", "방사성의약품"),
+    ("Annex", 4): ("Veterinary Medicinal Products", "동물용 의약품"),
+    ("Annex", 5): ("Immunological Veterinary Medicinal Products", "동물용 면역학적 의약품"),
+    ("Annex", 6): ("Medicinal Gases", "의료용 가스"),
+    ("Annex", 7): ("Herbal Medicinal Products", "생약 의약품"),
+    ("Annex", 8): ("Sampling of Starting and Packaging Materials", "원료·포장재 검체 채취"),
+    ("Annex", 9): ("Liquids, Creams and Ointments", "액제·크림·연고"),
+    ("Annex", 10): ("Pressurised Metered Dose Aerosol Preparations for Inhalation", "정량 분무 흡입제"),
+    ("Annex", 11): ("Computerised Systems", "컴퓨터화 시스템"),
+    ("Annex", 12): ("Use of Ionising Radiation", "이온화 방사선 사용"),
+    ("Annex", 13): ("Investigational Medicinal Products", "임상시험용 의약품"),
+    ("Annex", 14): ("Medicinal Products Derived from Human Blood or Plasma", "혈액·혈장 유래 의약품"),
+    ("Annex", 15): ("Qualification and Validation", "적격성평가·밸리데이션"),
+    ("Annex", 16): ("Certification by a Qualified Person and Batch Release", "QP 인증·배치 출하"),
+    ("Annex", 17): ("Real Time Release Testing and Parametric Release", "실시간 출하시험·파라메트릭 출하"),
+    ("Annex", 19): ("Reference and Retention Samples", "대조·보관 검체"),
+}
+
+
+def eu_title(key: str) -> tuple[str, str]:
+    """'EU GMP Annex 11' → ('Computerised Systems', '컴퓨터화 시스템'). 모르는 번호는 ('', '')."""
+    m = _EU_KEY.match(key or "")
+    return EU_TITLES.get((m[1], int(m[2])), ("", "")) if m else ("", "")
+
+
 def clause_counts_view(snap: "dict[str, Any] | None") -> "dict[str, Any] | None":
     """조항(장·부속서) → 문단별 등급 횟수. 횟수 = 그 문단이 지적에 인용된 행 수(원천 행 1개 = 1회)."""
     if not snap or not snap.get("clause_counts"):
@@ -259,7 +297,12 @@ def clause_counts_view(snap: "dict[str, Any] | None") -> "dict[str, Any] | None"
         g = groups[key]
         g["total"] = g["critical"] + g["major"] + g["other"]
         g["rows"].sort(key=lambda x: (-x["total"], _para_sort(x["para"])))
+        g["kind"] = "annex" if g["label"].startswith("Annex") else "chapter"
+        g["title"], g["title_ko"] = eu_title(key)
         out.append(g)
+    top = max((g["total"] for g in out), default=0) or 1
+    for g in out:  # 개요 막대 폭(가장 많이 인용된 조항 = 100). 최소 1 — 0 이 아닌 값이 사라지지 않게.
+        g["pct"] = max(1, round(g["total"] * 100 / top)) if g["total"] else 0
     meta = snap.get("mhra_data") or {}
     return {
         "measured_on": str(snap.get("measured_on") or ""),

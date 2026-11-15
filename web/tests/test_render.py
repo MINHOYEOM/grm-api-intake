@@ -21692,6 +21692,30 @@ class CssCustomPropertyDefinedTest(unittest.TestCase):
                     bad.append((f.name, rule.strip()[:90]))
         self.assertEqual(bad, [], "선택 칩 대비 AA 미달 — --coral-2 를 써라")
 
+    def test_sr_only_rule_present_where_used(self):
+        """[11-15] `.sr-only` 는 grm.css 에 없고 lookup_style 에만 있었다 — 지적 사례·인용 업체·
+        수입경보 화면의 숨김 라벨('낱말·영역·연도')이 입력칸 옆에 그대로 보였다.
+        class="sr-only" 를 쓰는 페이지 템플릿은 자신 또는 include 한 조각에서 규칙을 가져야 한다."""
+        tdir, pdir = WEB_DIR / "templates", WEB_DIR / "partials"
+        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
+        base = (tdir / "base.html").read_text(encoding="utf-8")
+        if ".sr-only{" in css.replace(" ", "") or ".sr-only{" in base:
+            return
+        def text_with_includes(path, seen=()):
+            src = path.read_text(encoding="utf-8")
+            out = [src]
+            for inc in re.findall(r'include "partials/([^"]+)"', src):
+                q = pdir / inc
+                if q.is_file() and q not in seen:
+                    out.append(text_with_includes(q, (*seen, q)))
+            return "\n".join(out)
+        missing = []
+        for f in sorted(tdir.glob("*.html")):
+            full = text_with_includes(f)
+            if 'class="sr-only"' in full and ".sr-only{" not in full:
+                missing.append(f.name)
+        self.assertEqual(missing, [], "sr-only 라벨이 화면에 그대로 보인다 — 규칙 없음")
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

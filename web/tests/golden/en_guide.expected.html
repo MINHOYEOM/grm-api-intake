@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/guide/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/guide/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/guide/" />
-<script src="/assets/i18n-en.js?v=17378512" defer></script>
+<script src="/assets/i18n-en.js?v=f10223fb" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -116,7 +116,7 @@
 <h2 id="sec-7">Newsletter subscription</h2>
 <p>Newsletter subscription is not offered in the English edition because the email itself is in Korean. You can receive English brief updates through the RSS feed (<code>/en/rss.xml</code>).</p>
 <h2 id="sec-8">Before you rely on this</h2>
-<ul><li>AI may be used in GRM&#39;s translation, summarisation and implications. Technical terms, negations, conditions, figures, dates and scope of application may be conveyed differently from the original.</li><li>Legal and regulatory judgements must be based on the official originals published by regulators and on current law and guidance.</li><li>Check the document&#39;s issue date and whether it has since been revised, the products, sites and processes it applies to, and whether any follow-up response, correction, withdrawal or further action exists.</li><li>Matters affecting licensing, quality, legal or regulatory response should be decided after review with the relevant specialist department. The summaries and interpretations in this service are not the views of any regulator, and are not legal, regulatory or quality advice.</li></ul>
+<ul><li>Findings are extracted automatically from public originals — FDA 483s and warning letters, Health Canada inspection reports, MFDS GMP inspections, and EU and UK GMP non-compliance reports — and split into individual items. The Korean is an AI translation, shown with the original for each item.</li><li>A finding is a record as of the date the document was published. Later responses and corrective actions are not included; check the agency&#39;s own announcements for current status.</li><li>The public document list includes documents with three or more translated findings. EU and UK GMP non-compliance reports, which carry one finding per document, are the exception; find other documents through findings search.</li><li>Area classifications map the agency&#39;s own categories or the wording of the sentence onto GRM&#39;s scheme and may differ from the agency&#39;s view. Firms are grouped by a normalised name, not the displayed one (&#34;… Limited&#34; and &#34;… Ltd.&#34; are the same firm).</li><li>Evidence levels (A, B, C) show which source the content was taken from; &#34;needs review&#34; means a person has not yet checked it.</li><li>AI may be used in GRM&#39;s translation, summarisation and implications. Technical terms, negations, conditions, figures, dates and scope of application may be conveyed differently from the original.</li><li>Legal and regulatory judgements must be based on the official originals published by regulators and on current law and guidance.</li><li>Check the document&#39;s issue date and whether it has since been revised, the products, sites and processes it applies to, and whether any follow-up response, correction, withdrawal or further action exists.</li><li>Matters affecting licensing, quality, legal or regulatory response should be decided after review with the relevant specialist department. The summaries and interpretations in this service are not the views of any regulator, and are not legal, regulatory or quality advice.</li></ul>
     <aside class="guide-x">
       <div class="guide-x-t">
         <b>New to the regulatory terms?</b>
@@ -240,6 +240,12 @@ main:not(#_) > .wrap:last-child{padding-bottom:0}
 @media(max-width:640px){ main:not(#_){margin-bottom:56px} }
 /* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
 main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -247,7 +253,7 @@ main:not(#_):has(> .toc-fab){margin-bottom:0}
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>A free information service on GMP and quality regulation for medicinal products, in Korean and English.</p>
       <a class="foot-srclink" href="../findings/coverage/index.html">Where the information comes from <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
-    <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../index.html#notice">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
+    <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../guide/index.html#sec-8">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
     <div><h5>Content</h5><a href="../news/index.html">Recent regulatory news</a><a href="../browse/index.html">Browse</a><a href="../library/index.html">Library</a><a href="../glossary/index.html">Glossary</a><a href="../quiz/index.html">Weekly quiz</a></div>
     <div class="foot-fnd"><h5>Browse</h5><a href="../findings/firm/index.html">Companies</a><a href="../findings/inspector/index.html">Inspectors</a><a href="../findings/clause/index.html">Section</a><a href="../findings/trends/index.html">Patterns by area</a><a href="../findings/inspections/index.html">FDA inspection outcomes</a><a href="../findings/docs/index.html">Public documents</a><a href="../findings/index.html">Finding search</a><a href="../findings/checklist/index.html">Self-inspection checklist</a><a href="../browse/index.html">Full index</a></div>
   </div>

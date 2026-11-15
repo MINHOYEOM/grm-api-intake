@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=17378512" defer></script>
+<script src="/assets/i18n-en.js?v=f10223fb" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -453,16 +453,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   #fnd-coverage-note[hidden]{min-height:94px}
 }
 </style>
-<section class="ai-disclosure" id="ai-notice" aria-label="AI-generated content notice"><div class="wrap">
-  <span class="kick">AI Disclosure</span>
-  <h2>How this content is produced, and caveats</h2>
-  <div class="disc-body">
-    <div class="disc-sec"><p>The findings on this page are extracted and split automatically from public source documents — FDA 483 observations, Warning Letters, Health Canada inspection reports, MFDS GMP inspections, and EU/UK GMP non-compliance reports (EudraGMDP, MHRA) — and normalised so that each item can be searched individually.</p></div>
-    <div class="disc-sec"><p>Korean renderings are generative-AI translations; the original (English) text is provided with every item. Base any legal judgement on the original.</p></div>
-    <div class="disc-sec"><p>Each item's evidence level (Evidence A·B·C) tells you which source the content came from; 'Needs review' means a person has not checked it yet. Every item links to the official original so you can check it there.</p></div>
-    <div class="disc-sec"><p>This service is reference material to support regulatory awareness and must not be taken as legal, regulatory, quality, or compliance advice. Review important decisions against the official source and with professional advisers.</p></div>
-  </div>
-</div></section>
+<section class="ai-line" id="ai-notice" aria-label="AI-generated content notice"><div class="wrap"><p>The Korean is a generative-AI translation shown with the original for each item. Dates are publication dates (inspection dates for Health Canada); rely on the original. <a href="../guide/index.html#sec-8">About sources and AI use</a></p></div></section>
 <style>
 .foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}
 .foot .b1 .foot-srclink:hover{color:#fff;border-bottom-color:rgba(255,255,255,.35)}
@@ -546,6 +537,12 @@ main:not(#_) > .wrap:last-child{padding-bottom:0}
 @media(max-width:640px){ main:not(#_){margin-bottom:56px} }
 /* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
 main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -553,7 +550,7 @@ main:not(#_):has(> .toc-fab){margin-bottom:0}
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>A free information service on GMP and quality regulation for medicinal products, in Korean and English.</p>
       <a class="foot-srclink" href="../findings/coverage/index.html">Where the information comes from <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
-    <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../index.html#notice">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
+    <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../guide/index.html#sec-8">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
     <div><h5>Content</h5><a href="../news/index.html">Recent regulatory news</a><a href="../browse/index.html">Browse</a><a href="../library/index.html">Library</a><a href="../glossary/index.html">Glossary</a><a href="../quiz/index.html">Weekly quiz</a></div>
     <div class="foot-fnd"><h5>Browse</h5><a href="../findings/firm/index.html">Companies</a><a href="../findings/inspector/index.html">Inspectors</a><a href="../findings/clause/index.html">Section</a><a href="../findings/trends/index.html">Patterns by area</a><a href="../findings/inspections/index.html">FDA inspection outcomes</a><a href="../findings/docs/index.html">Public documents</a><a href="../findings/index.html">Finding search</a><a href="../findings/checklist/index.html">Self-inspection checklist</a><a href="../browse/index.html">Full index</a></div>
   </div>

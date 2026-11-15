@@ -51,14 +51,14 @@
 
     <h2 class="dc-sec" id="about-source">{{ _('출처와 읽는 법') }}</h2>
     {%- if dc.agency == 'PMDA' %}
-    <p class="dc-note">{{ _('업체명은 원문에서 이미 지워져 있고 수치·로트는 ● 로 가려져 있습니다. 연도는 일본 회계연도(FY2025 = 2025년 4월~2026년 3월)입니다. 같은 지적의 일본어 원문은 아래 연도별 원문 파일에 있습니다.') }}</p>
+    <p class="dc-note">{{ _('업체명은 원문에서 지워져 있고 수치·로트는 ● 로 가려져 있습니다. 연도는 일본 회계연도(4월 시작)입니다.') }}</p>
     {%- else %}
     <p class="dc-note">{{ _('업체명은 없습니다. 기관 분류(EU GMP 장·부속서)는 보고서의 쪽 제목을 따랐습니다.') }}</p>
     {%- endif %}
     {%- if lang == 'ko' and dc.ko_rows %}
-    <p class="dc-note">{{ _('한국어는 생성형 AI 번역이며 원문을 사례마다 함께 싣습니다. 법적 판단은 원문을 기준으로 하십시오. 영역 분류는 기관 분류나 문장 낱말을 GRM 분류에 맞춘 것이어서 기관의 판단과 다를 수 있습니다. 긴 문장은 중간에서 자르고(…) 원문 파일로 잇습니다. {date} 기준.', date=dc.measured_on) }}</p>
+    <p class="dc-note">{{ _('국문은 생성형 AI 번역이며 사례마다 원문을 함께 싣습니다. 긴 문장은 줄이고 원문 파일로 잇습니다. {date} 기준.', date=dc.measured_on) }}</p>
     {%- else %}
-    <p class="dc-note">{{ _('번역하지 않았습니다. 영역 분류는 기관 분류나 문장 낱말을 GRM 분류에 맞춘 것이어서 기관의 판단과 다를 수 있습니다. 긴 문장은 중간에서 자르고(…) 원문 파일로 잇습니다. {date} 기준.', date=dc.measured_on) }}</p>
+    <p class="dc-note">{{ _('번역하지 않았습니다. 긴 문장은 줄이고 원문 파일로 잇습니다. {date} 기준.', date=dc.measured_on) }}</p>
     {%- endif %}
     {% with credit_agency = dc.agency, credit_kind = 'cases' %}{% include "partials/deficiency_cases_credit.html" %}{% endwith %}
     <ul class="dc-src">

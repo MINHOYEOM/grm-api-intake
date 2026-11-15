@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-15T09:55:51Z",
+ "generated_at": "2026-11-15T17:06:40Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43690708022,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-15T07:36:33Z",
-    "updatedAt": "2026-11-15T07:42:42Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1734 from MINHOYEOM/fix/ux-mhra-chapter10-other",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43690708022"
+    "databaseId": 43738937790,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-15T17:03:33Z",
+    "updatedAt": "2026-11-15T17:05:23Z",
+    "headBranch": "feat/inspection-notes-glossary-block",
+    "displayTitle": "feat(web): 용어 페이지에 '실사 대비 노트' 링크 블록 (ko·en)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738937790"
    },
    {
-    "databaseId": 43688906810,
+    "databaseId": 43738925997,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-15T17:03:26Z",
+    "updatedAt": "2026-11-15T17:03:29Z",
+    "headBranch": "feat/inspection-notes-glossary-block",
+    "displayTitle": "feat(web): 용어 페이지에 '실사 대비 노트' 링크 블록 (ko·en)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738925997"
+   },
+   {
+    "databaseId": 43738925461,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-15T17:03:25Z",
+    "updatedAt": "2026-11-15T17:03:28Z",
+    "headBranch": "feat/clause-text-pages",
+    "displayTitle": "fix(clauses): 영문 복수 표지 {s} · 뷰가 없으면 reg_refs 에 text_href 키를 넣지 않음 + 영…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738925461"
+   },
+   {
+    "databaseId": 43738580902,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-15T07:12:32Z",
-    "updatedAt": "2026-11-15T07:18:41Z",
-    "headBranch": "fix/ux-mhra-chapter10-other",
-    "displayTitle": "fix(web): MHRA 조항 집계 'EU GMP 제10장' → '기타·미상'",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43688906810"
+    "createdAt": "2026-11-15T17:00:02Z",
+    "updatedAt": "2026-11-15T17:05:40Z",
+    "headBranch": "data/inspection-notes-batch2",
+    "displayTitle": "data(web): 실사 대비 노트 14건 추가 (합계 19건)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738580902"
    },
    {
-    "databaseId": 43688903221,
+    "databaseId": 43738549403,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-15T07:12:30Z",
-    "updatedAt": "2026-11-15T07:18:03Z",
-    "headBranch": "fix/ux-mhra-chapter10-other",
-    "displayTitle": "merge origin/main — 골든 재동결",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43688903221"
-   },
-   {
-    "databaseId": 43688674065,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-15T07:09:34Z",
-    "updatedAt": "2026-11-15T07:15:29Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1730 from MINHOYEOM/fix/ux-findings-jargon",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43688674065"
-   },
-   {
-    "databaseId": 43687692073,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-15T06:56:31Z",
-    "updatedAt": "2026-11-15T07:02:31Z",
-    "headBranch": "main",
-    "displayTitle": "fix(web): 본문 끝과 구독 띠·푸터 사이 여백을 전역 한 규칙으로 (2026-11-15 대표 지적) (#1733)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43687692073"
+    "createdAt": "2026-11-15T16:59:40Z",
+    "updatedAt": "2026-11-15T17:05:16Z",
+    "headBranch": "data/inspection-notes-batch2",
+    "displayTitle": "Merge branch 'main' of https://github.com/MINHOYEOM/grm-api-intake in…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738549403"
    }
   ],
   "grm-scaffold-mirror.yml": [

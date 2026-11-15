@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-15T17:06:40Z",
+ "generated_at": "2026-11-15T21:45:06Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43741324770,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-15T17:28:49Z",
+    "updatedAt": "2026-11-15T17:34:36Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1751 from MINHOYEOM/feat/inspection-notes-glossar…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43741324770"
+   },
+   {
+    "databaseId": 43740744500,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-15T17:22:27Z",
+    "updatedAt": "2026-11-15T17:28:07Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1750 from MINHOYEOM/data/inspection-notes-batch2",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43740744500"
+   },
+   {
     "databaseId": 43738937790,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-15T17:03:33Z",
-    "updatedAt": "2026-11-15T17:05:23Z",
+    "updatedAt": "2026-11-15T17:11:38Z",
     "headBranch": "feat/inspection-notes-glossary-block",
     "displayTitle": "feat(web): 용어 페이지에 '실사 대비 노트' 링크 블록 (ko·en)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738937790"
    },
    {
     "databaseId": 43738925997,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-15T17:03:26Z",
-    "updatedAt": "2026-11-15T17:03:29Z",
+    "updatedAt": "2026-11-15T17:09:32Z",
     "headBranch": "feat/inspection-notes-glossary-block",
     "displayTitle": "feat(web): 용어 페이지에 '실사 대비 노트' 링크 블록 (ko·en)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738925997"
    },
    {
     "databaseId": 43738925461,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-15T17:03:25Z",
-    "updatedAt": "2026-11-15T17:03:28Z",
+    "updatedAt": "2026-11-15T17:09:27Z",
     "headBranch": "feat/clause-text-pages",
     "displayTitle": "fix(clauses): 영문 복수 표지 {s} · 뷰가 없으면 reg_refs 에 text_href 키를 넣지 않음 + 영…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738925461"
-   },
-   {
-    "databaseId": 43738580902,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-15T17:00:02Z",
-    "updatedAt": "2026-11-15T17:05:40Z",
-    "headBranch": "data/inspection-notes-batch2",
-    "displayTitle": "data(web): 실사 대비 노트 14건 추가 (합계 19건)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738580902"
-   },
-   {
-    "databaseId": 43738549403,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-15T16:59:40Z",
-    "updatedAt": "2026-11-15T17:05:16Z",
-    "headBranch": "data/inspection-notes-batch2",
-    "displayTitle": "Merge branch 'main' of https://github.com/MINHOYEOM/grm-api-intake in…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738549403"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 43749463109,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-15T18:55:22Z",
+    "updatedAt": "2026-11-15T20:49:55Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43749463109"
+   },
+   {
     "databaseId": 43686721027,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43495607337"
-   },
-   {
-    "databaseId": 43381756923,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-13T06:52:48Z",
-    "updatedAt": "2026-11-13T08:48:52Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43381756923"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 43750479756,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-15T19:05:54Z",
+    "updatedAt": "2026-11-15T19:06:04Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43750479756"
+   },
+   {
     "databaseId": 43688796050,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43569072448"
-   },
-   {
-    "databaseId": 43497655386,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-13T20:01:27Z",
-    "updatedAt": "2026-11-13T20:01:49Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43497655386"
    }
   ],
   "grm-cloud-request.yml": [

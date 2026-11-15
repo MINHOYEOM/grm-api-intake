@@ -1033,6 +1033,21 @@ class WebRenderGoldenTest(unittest.TestCase):
         self.assertIn("overflow-wrap:break-word", rule)
         self.assertNotIn("overflow-wrap:anywhere", rule)
 
+    def test_korean_orphan_line_defaults_and_footer_disclaimer_uncapped(self):
+        """★[한국어 고아 줄 2026-11-14] 실측(1440·375, 14쪽): 마지막 줄에 '있습니다.'·'활동입니다.'
+        한 어절만 떨어지는 곳이 데스크톱 69 · 모바일 113곳. 문단 pretty·제목 balance 를 전역 기본값으로
+        둔다. 푸터 면책 문구는 60ch(=411px) 상한이 남는 폭에서도 문장을 접어 '있습니다.' 만 오른쪽
+        아래로 떨어뜨렸다 — ch 상한이 되살아나면 실패한다."""
+        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
+        self.assertRegex(css, r"\nbody\{text-wrap:pretty\}", "전역 문단 pretty 기본값이 사라졌다")
+        self.assertRegex(css, r"\nh1,h2,h3,h4,h5,h6\{text-wrap:balance\}", "제목 balance 기본값이 사라졌다")
+        m = re.search(r"\n\.foot-disclaimer\{([^}]*)\}", css)
+        self.assertIsNotNone(m, "grm.css .foot-disclaimer 규칙 미발견")
+        self.assertNotRegex(m.group(1), r"max-width:\s*\d+ch")
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        for rule in re.findall(r"\.foot-disclaimer\{([^}]*)\}", base):
+            self.assertNotRegex(rule, r"max-width:\s*\d+ch", "base.html 면책 문구에 ch 폭 상한이 되살아났다")
+
     def test_page_head_paragraph_has_no_ch_cap(self):
         """★[62ch 캡 폐기 2026-08-12] `ch` 는 숫자 `0` 의 폭이라 한글에는 62ch ≈ 31자다 —
         컨테이너 1,180px 인데 609px 에서 접혔다. 그래서 **12개 템플릿 중 10개가 이미
@@ -11645,16 +11660,37 @@ class WebFindingsDocPageTest(unittest.TestCase):
         전체 일치라 절단·치환·중복이 전부 잡힌다).
         """
         import html as _html
-        checked = 0
+
+        def _plain(x: str) -> str:
+            return _html.unescape(re.sub(r"<[^>]+>", "", x))
+
+        def _norm(x: str) -> str:
+            return re.sub(r"\s+", " ", x).strip()
+
+        checked = split_checked = 0
         for doc in self._sample_docs(8):
             page = self._page(doc["slug"])
-            bodies = re.findall(r'<p class="fd-text">(.*?)</p>', page, re.S)
-            self.assertEqual(len(bodies), len(doc["findings"]),
-                             f'본문 개수 불일치: {doc["slug"]}')
-            for f, body in zip(doc["findings"], bodies):
-                plain = _html.unescape(re.sub(r"<[^>]+>", "", body))
-                self.assertEqual(plain, f["text_ko"],
-                                 f'본문이 무변형이 아님: {f["finding_id"]}')
+            articles = re.findall(r'<article class="fd-item" id="([^"]+)">(.*?)</article>', page, re.S)
+            self.assertEqual([a[0] for a in articles], [f["finding_id"] for f in doc["findings"]],
+                             f'본문 개수·순서 불일치: {doc["slug"]}')
+            for f, (_, art) in zip(doc["findings"], articles):
+                if 'class="fd-text fd-lead"' in art:
+                    # [WL 해부 2026-10-31] 경고서한 지적은 '요지·지적 내용·회사 회신·FDA 판단·FDA 요구'로
+                    # 나뉘어 여러 문단이 된다(라벨만 우리 것). 11-14 재측정에서 480자 절단이 풀린 서한이
+                    # 나뉘기 시작해 예전 단언(`<p class="fd-text">` 한 개)이 개수부터 어긋났다.
+                    # 계약은 wl_anatomy.rejoin 과 같다 — 라벨을 빼고 문단을 순서대로 이으면 원문과
+                    # 공백 정규화 후 완전히 같아야 한다(절단·치환·중복이 여전히 전부 잡힌다).
+                    art = re.sub(r'<span class="fd-lab">.*?</span>', "", art, flags=re.S)
+                    pieces = [_plain(m.group(2)) for m in
+                              re.finditer(r"<(p|h3|li)\b[^>]*>(.*?)</\1>", art, re.S)]
+                    self.assertEqual(_norm(" ".join(pieces)), _norm(f["text_ko"]),
+                                     f'나눈 본문을 이으면 원문과 달라진다: {f["finding_id"]}')
+                    split_checked += 1
+                else:
+                    bodies = re.findall(r'<p class="fd-text">(.*?)</p>', art, re.S)
+                    self.assertEqual(len(bodies), 1, f'본문 문단이 하나가 아님: {f["finding_id"]}')
+                    self.assertEqual(_plain(bodies[0]), f["text_ko"],
+                                     f'본문이 무변형이 아님: {f["finding_id"]}')
                 checked += 1
         self.assertGreater(checked, 0)
 
@@ -13955,10 +13991,96 @@ class WebGurumiPetTest(unittest.TestCase):
 
 
     def test_landing_features_are_exactly_three(self):
-        """[홈 4단] '제공 정보'는 업체·용어·기관 세 칸이고 칸마다 실제 결과 한 건을 싣는다."""
-        self.assertEqual(self.landing.count('class="home-demo"'), 3)
-        for label in ("업체별 지적 이력", "용어 해설과 지적 사례", "기관별 지적 경향"):
+        """[홈 4단 · 내용 먼저 2026-11-14] '제공 정보'는 지적 한 건·용어·기관 세 칸이고 칸마다
+        건수 요약이 아니라 실제 내용(지적 문장·용어 뜻·영역 막대)을 싣는다."""
+        self.assertEqual(self.landing.count('class="home-cell'), 3)
+        for label in ("최근 공개된 지적 한 건", "용어 해설과 지적 사례", "기관별 지적 경향"):
             self.assertIn(label, self.landing)
+        for cls in ('class="hc-quote"', 'class="hc-def"', 'class="hc-bar"'):
+            self.assertIn(cls, self.landing, cls)
+
+    def test_landing_case_links_lead_to_real_pages(self):
+        """지적 한 건 칸의 줄은 전부 그 빌드에 실제로 있는 화면으로 간다(없는 페이지 링크 금지)."""
+        cell = self.landing.split('class="home-cell home-case"', 1)[1].split("</ul>", 1)[0]
+        hrefs = re.findall(r'href="([^"]+)"', cell)
+        self.assertGreaterEqual(len(hrefs), 3, hrefs)
+        for href in hrefs:
+            # 문서 페이지는 픽스처 빌드가 내지 않는다(신규 공개 문서 줄과 같은 사정) — 주소 꼴만 본다.
+            if href.startswith("findings/doc/"):
+                self.assertRegex(href, r"^findings/doc/[^/]+/index\.html$")
+                continue
+            target = self.single / href.split("?", 1)[0]
+            self.assertTrue(target.is_file(), href)
+
+    def test_landing_has_no_stale_totals_line(self):
+        """[4-A 2026-11-15] 누적 건수·기준일 줄은 홈에 없다(주 1회 스냅샷이라 늘 낡아 보인다)."""
+        self.assertNotIn('class="home-count"', self.landing)
+        top = self.landing.split('class="wrap home-top"', 1)[1].split("</section>", 1)[0]
+        self.assertIsNone(re.search(r"\d{4}-\d{2}-\d{2} 기준", top))
+        self.assertNotIn("일본", top)
+
+    def test_landing_headlines_are_numbered_with_source_tags(self):
+        """이번 주 핵심은 줄마다 명조 제목이고, 줄 머리 기관을 아는 줄에는 출처 표지가 붙는다."""
+        block = self.landing.split(">이번 주 핵심</h2>", 1)[1].split("</ul>", 1)[0]
+        self.assertGreaterEqual(block.count('class="ht-t"'), 1)
+        self.assertEqual(render.home_source_tag("FDA, 주사제 Class I 회수"),
+                         {"src_cls": "fda", "src_label": "FDA"})
+        self.assertEqual(str(render.home_nobreak_middot("위조·DEG <b>")),
+                         '위<span class="ht-nb">조·</span>DEG &lt;b&gt;')
+        self.assertEqual(render.home_source_tag("식약처, 제조업무정지 3개월")["src_cls"], "mfds")
+        self.assertEqual(render.home_source_tag("Health Canada recalls a product")["src_cls"], "hc")
+        # 기관 이름이 낱말의 앞부분일 뿐이면(EUDAMED·FDA483) 표지를 달지 않는다.
+        self.assertEqual(render.home_source_tag("EUDAMED 등록 의무화")["src_cls"], "")
+        self.assertEqual(render.home_source_tag("WHO, 사전적격성평가 개정")["src_cls"], "")
+
+    def test_search_loading_states_are_wired(self):
+        """[검색 로딩 2026-11-15] 진행선·자리 표시·0건/오류 칸이 화면과 스크립트 양쪽에 있고,
+        움직임 줄이기를 지킨다. 홈 검색 단추도 '검색 중'으로 바뀐다."""
+        page = (self.single / "search" / "index.html").read_text(encoding="utf-8")
+        js = (WEB_DIR / "assets" / "search.js").read_text(encoding="utf-8")
+        for needle in ('id="sr-prog"', 'id="sr-go"', ".sr-sk", ".sr-note.is-err",
+                       "prefers-reduced-motion:reduce"):
+            self.assertIn(needle, page, needle)
+        for needle in ('_t("검색 중")', 'noteBox("zero")', 'noteBox("err")', "SLOW_MS = 400",
+                       "seq !== runSeq"):
+            self.assertIn(needle, js, needle)
+        self.assertNotIn("goBtn.disabled", js)   # 느릴 때 다시 보낼 수 있어야 한다
+        self.assertIn('data-busy="검색 중"', self.landing)
+        self.assertIn("prefers-reduced-motion:reduce", self.landing)
+
+    def test_home_case_selection_rule(self):
+        """최신 문서부터, 분류가 있고(캐치올 제외) 길이가 맞는 지적 — 용어가 걸리는 것을 먼저."""
+        terms = [{"id": "change-control", "term_ko": "변경관리", "term_en": "Change control"}]
+        long_ko = "가" * 200
+
+        def doc(slug, date, findings):
+            return {"slug": slug, "document_id": slug, "agency": "FDA", "source": "FDA 483",
+                    "firm_name": slug.upper(), "firm_key": slug, "published_date": date,
+                    "findings": findings}
+
+        docs = {"documents": [
+            doc("old", "2026-01-01", [{"text_ko": "오래된 문서의 변경관리 절차가 문서화되어 있지 않다는 지적이다.",
+                                       "category_label_ko": "규제보고/변경관리"}]),
+            doc("new", "2026-02-01", [
+                {"text_ko": "캐치올 분류의 지적은 고르지 않는다. 길이는 충분히 길게 적는다.",
+                 "category_label_ko": render.HOME_CATCHALL_LABEL},
+                {"text_ko": long_ko, "category_label_ko": "시험실/품질관리"},
+                {"text_ko": "용어가 걸리지 않는 평범한 지적 문장이며 길이는 범위 안에 든다.",
+                 "category_label_ko": "시험실/품질관리", "text_orig": "A plain observation."},
+                {"text_ko": "변경이 공식 변경관리 시스템으로 처리되지 않은 사례가 확인되었다는 지적.",
+                 "category_label_ko": "규제보고/변경관리", "text_orig": "Changes are not handled."},
+            ]),
+        ]}
+        case = render.build_home_showcase(docs, None, terms, None)["case"]
+        self.assertEqual(case["slug"], "new")
+        self.assertEqual(case["term"], {"id": "change-control", "name": "변경관리"})
+        self.assertEqual(case["orig"], "Changes are not handled.")
+        self.assertIn("변경관리 시스템", case["body"])
+        # 용어 정본이 없으면 용어 줄 없이 첫 후보를 쓴다.
+        plain = render.build_home_showcase(docs, None, None, None)["case"]
+        self.assertEqual((plain["slug"], plain["term"]), ("new", None))
+        self.assertTrue(plain["body"].startswith("용어가 걸리지 않는"))
+        self.assertIsNone(render.build_home_showcase({"documents": []}, None, None, None)["case"])
 
 
     def test_engage_zone_popular_then_quiz(self):
@@ -19272,6 +19394,18 @@ def class_signature(html: str) -> "collections.Counter":
 INTENTIONAL_CLASS_DIFFS: dict[str, str] = {
     # 한국어 화면에서만 뜨는 "영어판이 있다" 안내(영어 화면에 권할 이유가 없다).
     "grm-langhint": "한국어 전용 진입 안내",
+    # [홈 2026-11-15] 홈의 '지적 한 건'·출처 표지는 **그 언어 트리의 데이터**에서 고른다 —
+    # 한국어판과 영어판이 서로 다른 지적·문서를 실을 수 있어 줄 수와 표지 수가 달라진다
+    # (실사관·용어 줄은 있을 때만, 영어판에는 원문 줄·영문 표제어 병기가 없다).
+    # 칸 자체(home-cell·home-case·hc-quote)는 예외가 아니다 — 구조는 계속 대조된다.
+    "hc-orig": "한국어판만 원문을 함께 싣는다(영어판은 본문이 원문)",
+    "hc-alt": "한국어판만 영문 표제어를 곁에 적는다",
+    "hc-k": "지적 한 건의 연결 줄 수는 고른 지적에 따라 다르다",
+    "hc-v": "위와 같음", "hc-go": "위와 같음", "hc-row": "분류 모음 화면이 없는 트리에서는 링크 없는 줄",
+    "hs-fda": "출처 표지 수는 그 트리의 문서·핵심 줄에 따라 다르다",
+    "hs-mfds": "위와 같음", "hs-eu": "위와 같음", "hs-uk": "위와 같음", "hs-hc": "위와 같음",
+    "hs": "위와 같음",
+    "ht-nb": "가운뎃점 묶음 수는 핵심 줄 글자에 따라 다르다",
 }
 
 
@@ -19295,6 +19429,15 @@ def page_family(path: str) -> str:
 INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
     "*": {
         "grm-langhint": "한국어 전용 진입 안내(영어 화면에 권할 이유가 없다)",
+    },
+    # [홈 2026-11-15] 홈의 지적 한 건·출처 표지는 그 언어 트리의 데이터에서 고른다
+    # (INTENTIONAL_CLASS_DIFFS 의 같은 항목 참조).
+    "(home)": {
+        "hc-orig": "한국어판만 원문을 함께 싣는다(영어판은 본문이 원문)",
+        "hc-alt": "한국어판만 영문 표제어를 곁에 적는다",
+        "hc-row": "분류 모음 화면이 없는 트리에서는 링크 없는 줄",
+        "hs-*": "출처 표지는 그 트리에 실린 문서·핵심 줄의 기관에 따라 달라진다",
+        "ht-nb": "가운뎃점 묶음은 핵심 줄 글자에 따라 달라진다",
     },
     "glossary/*": {
         "gt-en": "영문 병기 — 영어판은 표제어 자체가 영문이라 덧붙일 것이 없다",
@@ -20036,7 +20179,10 @@ class WebEnTreeTest(unittest.TestCase):
             html = self.pages.get(rel)
             if html is None:
                 continue
-            self.assertIn(en_n, html, f"{rel}: 영어 모집단 수가 없다")
+            # [4-A 2026-11-15] 홈은 누적 건수 줄을 뺐다 — 영어 수가 '있어야 한다'는 요구는
+            # 검색 화면에만 남고, 한국어 수가 새어 들면 안 된다는 요구는 홈에도 그대로다.
+            if rel != "en/index.html":
+                self.assertIn(en_n, html, f"{rel}: 영어 모집단 수가 없다")
             self.assertNotIn(ko_n, html, f"{rel}: 한국어 모집단 수가 영어 페이지에 있다")
 
     def test_snapshot_counts_disclose_their_as_of_date(self):
@@ -21715,6 +21861,19 @@ class CssCustomPropertyDefinedTest(unittest.TestCase):
             if 'class="sr-only"' in full and ".sr-only{" not in full:
                 missing.append(f.name)
         self.assertEqual(missing, [], "sr-only 라벨이 화면에 그대로 보인다 — 규칙 없음")
+
+    def test_signal_dot_color_not_used_for_text(self):
+        """[11-15] --lo(#8E8B82)는 신호 강도 점 색이다. 글자색으로 쓰이면 바탕에 따라 3.0~3.2:1
+        (자료실 안내문·퀴즈 번호·'기록은 이 브라우저에만 저장돼요' 등). 보조 글자는 --muted-2."""
+        bad = []
+        for f in [*(WEB_DIR / "templates").glob("*.html"), *(WEB_DIR / "partials").glob("*.html")]:
+            src = f.read_text(encoding="utf-8")
+            for m in re.finditer(r"(?<![-\w])color:\s*var\(--lo\)", src):
+                sel = src[src.rfind("}", 0, m.start()) + 1:m.start()]
+                if "::before" in sel or "::after" in sel:   # 구분점 같은 장식 글리프는 글자가 아니다
+                    continue
+                bad.append(f.name)
+        self.assertEqual(bad, [], "--lo 를 글자색으로 쓰지 마라 — var(--muted-2)")
 
 if __name__ == "__main__":
     if "--freeze" in sys.argv:

@@ -8084,7 +8084,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         interest_vocab = _interest_vocab(tr)
         # 개인화 페이지 — canonical 을 템플릿에 넘기지 않던 종전 계약 그대로(비색인).
         emit("me.html", page("me/"),
-            page_title=tr("마이페이지 · GRM"),
+            page_title=tr("관심 목록 · GRM"),
             nav_active="me",
             show_pet=True,
             canonical="",
@@ -8095,7 +8095,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 그린다. 빠져 있던 건 라우트 하나뿐이었다. Admin 은 운영자 전용 한국어 콘솔이라
         # 짝을 내지 않는다(영어 트리 선언에도 없다).
         en_emit("me.html", en_page("me/"),
-            page_title=en_tr("마이페이지 · GRM"),
+            page_title=en_tr("관심 목록 · GRM"),
             nav_active="me",
             show_pet=True,
             canonical="",

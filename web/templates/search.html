@@ -6,7 +6,7 @@
 {% block content %}
 {#- [전역 검색 2026-11-12 · 대표 확정안 3] 검색 결과 화면.
     순서: 맨 위 가장 가까운 답 한 칸(용어·업체·조항 중 하나) → 종류별 묶음(지적 문장이 본문,
-    관련 용어·조항·업체는 작은 칸) → 오른쪽 필터 두 묶음(기관·문서 종류). 나머지 조건(분류·
+    관련 용어·조항·업체는 작은 칸). 필터는 11-15 부터 결과 위 한 줄(기관 탭 + 문서 종류·기간 칩). 나머지 조건(분류·
     증거 등급·검토 상태·월·국가)은 '상세 필터' = 기존 지적 문장 검색 화면에 그대로 있다.
     셸만 정적이고 결과는 search.js 가 채운다. 대상 색인은 assets/lookup*.json(빌드 파생),
     지적 문장은 findings_search RPC(본문 전용 모드). JS 가 없으면 아래 폼이 같은 주소로
@@ -51,13 +51,12 @@
 .sr-best p{margin:0;color:var(--body);line-height:1.65;word-break:keep-all}
 .sr-meta{font-size:13px;color:var(--muted);line-height:1.6;word-break:keep-all}
 .sr-meta a{color:inherit;text-decoration:underline;text-underline-offset:3px}
-.sr-grid{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:36px;align-items:start}
-.sr-sec{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:8px;margin:0 0 4px}
+.sr-sec{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--ink);padding-bottom:8px;margin:18px 0 4px}
 .sr-sec h2{font-size:16px;margin:0;color:var(--ink)}
 .sr-sec a{font-size:14px;color:var(--body);text-decoration:underline;text-underline-offset:3px}
 .sr-hits{list-style:none;margin:0;padding:0}
 .sr-hit{padding:14px 0;border-bottom:1px solid var(--line)}
-.sr-hit p{margin:0 0 6px;line-height:1.7;color:var(--ink);word-break:keep-all;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.sr-hit p{margin:0 0 6px;line-height:1.7;color:var(--ink);word-break:keep-all;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
 .sr-hit mark{background:color-mix(in srgb,var(--coral) 22%,transparent);color:inherit;padding:0 1px;border-radius:2px}
 .sr-note{color:var(--muted);font-size:14px;padding:14px 0;margin:0;line-height:1.6;word-break:keep-all}
 .sr-retry{font:inherit;font-size:13px;margin-left:6px;padding:3px 12px;border:1px solid var(--line-2);border-radius:999px;background:var(--canvas);color:var(--ink);cursor:pointer}
@@ -67,20 +66,51 @@
 .sr-pills a{font-size:14px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;color:var(--body);text-decoration:none}
 .sr-pills a:hover{border-color:var(--line-2);color:var(--ink)}
 .sr-pills small{color:var(--muted);margin-left:4px;font-size:12px}
-.sr-side{border-left:1px solid var(--line);padding-left:22px}
-.sr-side h2{font-size:14px;color:var(--muted);font-weight:600;margin:0 0 10px}
-.sr-filt{border:0;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:4px}
-.sr-filt legend{font-size:13px;color:var(--ink);font-weight:600;padding:0;margin:0 0 6px}
-.sr-filt label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--body);cursor:pointer;min-height:30px}
-.sr-filt label small{margin-left:auto;color:var(--muted);font-size:12px}
-.sr-side a{font-size:14px;color:var(--body);text-decoration:underline;text-underline-offset:3px}
-@media(max-width:900px){
+/* [필터 위로 2026-11-15 · 대표 선택 'A·B 섞기'] 오른쪽 세로 필터를 결과 위로 올린다.
+   기관 = 펼친 탭(한 번 누르면 바뀜) · 문서 종류·기간 = 칩을 누르면 그 자리에서 목록이 열린다.
+   휴대폰은 탭·칩 줄이 가로로 밀리고, 목록은 화면 아래에서 올라온다. */
+.sr-bar{margin:4px 0 0}
+.sr-bar[hidden]{display:none}
+.sr-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line-2);overflow-x:auto;scrollbar-width:none}
+.sr-tabs::-webkit-scrollbar{display:none}
+.sr-tab{flex:none;font:inherit;font-size:15px;background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px 8px;color:var(--body);cursor:pointer;white-space:nowrap}
+.sr-tab small{font-size:13px;color:var(--muted);margin-left:5px}
+.sr-tab:hover{color:var(--ink)}
+.sr-tab[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--coral)}
+.sr-tab[aria-selected="true"] small{color:var(--coral-2)}
+.sr-chips{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.sr-dd{position:relative;flex:none}
+.sr-chip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 13px;font:inherit;font-size:14px;border:1px solid var(--line-2);border-radius:999px;background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap}
+.sr-chip small{font-size:13px;color:var(--muted)}
+.sr-chip::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);opacity:.6;margin-left:2px}
+.sr-chip[aria-expanded="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.sr-chip.is-on{background:var(--ink);border-color:var(--ink);color:#fff}
+.sr-chip.is-on small{color:#DCD6CC}
+.sr-x{font:inherit;font-size:13px;margin-left:-4px;height:36px;padding:0 8px;border:0;background:none;color:var(--muted);cursor:pointer}
+.sr-menu{position:absolute;top:42px;left:0;z-index:30;min-width:240px;background:#fff;border:1px solid var(--line-2);border-radius:var(--rad);box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column}
+.sr-menu[hidden]{display:none}
+.sr-menu h3{display:none}
+.sr-opt{display:flex;justify-content:space-between;align-items:center;gap:18px;font:inherit;font-size:14px;text-align:left;padding:9px 10px;border:0;border-radius:var(--rad-s);background:none;color:var(--ink);cursor:pointer;white-space:nowrap}
+.sr-opt small{font-size:12.5px;color:var(--muted)}
+.sr-opt:hover,.sr-opt:focus-visible{background:var(--soft);outline:none}
+.sr-opt[aria-selected="true"]{background:var(--soft);font-weight:700}
+.sr-opt[aria-selected="true"] small{color:var(--coral-2)}
+.sr-adv-a{font-size:14px;color:var(--coral-2);text-decoration:underline;text-underline-offset:3px;margin-left:4px;white-space:nowrap}
+.sr-clear{font:inherit;font-size:13.5px;margin-left:auto;padding:4px 2px;border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.sr-clear[hidden]{display:none}
+.sr-scrim{position:fixed;inset:0;z-index:29;background:rgba(26,24,21,.32)}
+.sr-scrim[hidden]{display:none}
+@media(min-width:641px){ .sr-scrim{display:none!important} }
+@media(max-width:640px){
   .sr{padding-top:22px}
-  .sr-grid{grid-template-columns:minmax(0,1fr);gap:24px}
-  /* 휴대폰은 결과가 먼저(필터를 위에 두면 첫 결과가 375×812 화면 맨 아래로 밀렸다 — 11-12 라이브 실측). */
-  .sr-side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:16px}
-  .sr-filt{flex-direction:row;flex-wrap:wrap;gap:4px 14px}
-  .sr-filt legend{width:100%}
+  .sr-tab{font-size:14.5px;padding:10px 11px}
+  .sr-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-16px;padding-right:16px}
+  .sr-chips::-webkit-scrollbar{display:none}
+  .sr-chip{height:34px;font-size:13.5px;padding:0 11px}
+  .sr-clear{margin-left:4px;flex:none}
+  .sr-menu{position:fixed;top:auto;left:0;right:0;bottom:0;min-width:0;border-radius:16px 16px 0 0;padding:10px 12px calc(14px + env(safe-area-inset-bottom));max-height:70vh;overflow:auto}
+  .sr-menu h3{display:block;font-size:15px;color:var(--ink);margin:4px 8px 8px}
+  .sr-opt{font-size:15px;padding:13px 10px}
 }
 </style>
 <main class="sr">
@@ -92,23 +122,22 @@
     </form>
     <div class="sr-prog" id="sr-prog" aria-hidden="true"><i></i></div>
     <div class="sr-best" id="sr-best" hidden></div>
-    <div class="sr-grid">
-      <div>
-        <div class="sr-sec"><h2 id="sr-hits-h">{{ _("지적 문장") }}</h2><a id="sr-all" href="{{ rel_root }}findings/index.html">{{ _("전체 보기") }}</a></div>
-        <ul class="sr-hits" id="sr-hits"></ul>
-        <p class="sr-note" id="sr-note">{{ _("업체명, 조항 번호, 용어로 검색합니다. 예: 청정실, 211.192, 감사추적") }}</p>
-        <div class="sr-more" id="sr-more" hidden>
-          <div class="sr-sec"><h2>{{ _("관련 용어·조항·업체") }}</h2></div>
-          <div class="sr-pills" id="sr-pills"></div>
-        </div>
+    <div class="sr-bar" id="sr-bar" hidden>
+      <div class="sr-tabs" id="sr-f-agency" role="tablist" aria-label="{{ _('기관') }}"></div>
+      <div class="sr-chips">
+        <div class="sr-dd" id="sr-f-source" data-name="{{ _('문서 종류') }}"></div>
+        <div class="sr-dd" id="sr-f-period" data-name="{{ _('기간') }}"></div>
+        <a class="sr-adv-a" id="sr-adv" href="{{ rel_root }}findings/index.html">{{ _("상세 필터") }}</a>
+        <button type="button" class="sr-clear" id="sr-clear" hidden>{{ _("모두 지우기") }}</button>
       </div>
-      <aside class="sr-side" aria-label="{{ _('필터') }}">
-        <h2>{{ _("필터") }}</h2>
-        <fieldset class="sr-filt" id="sr-f-agency"><legend>{{ _("기관") }}</legend></fieldset>
-        <fieldset class="sr-filt" id="sr-f-source"><legend>{{ _("문서 종류") }}</legend></fieldset>
-        <fieldset class="sr-filt" id="sr-f-period"><legend>{{ _("기간") }}</legend></fieldset>
-        <a id="sr-adv" href="{{ rel_root }}findings/index.html">{{ _("상세 필터") }}</a>
-      </aside>
+    </div>
+    <div class="sr-scrim" id="sr-scrim" hidden></div>
+    <div class="sr-sec"><h2 id="sr-hits-h">{{ _("지적 문장") }}</h2><a id="sr-all" href="{{ rel_root }}findings/index.html">{{ _("전체 보기") }}</a></div>
+    <ul class="sr-hits" id="sr-hits"></ul>
+    <p class="sr-note" id="sr-note">{{ _("업체명, 조항 번호, 용어로 검색합니다. 예: 청정실, 211.192, 감사추적") }}</p>
+    <div class="sr-more" id="sr-more" hidden>
+      <div class="sr-sec"><h2>{{ _("관련 용어·조항·업체") }}</h2></div>
+      <div class="sr-pills" id="sr-pills"></div>
     </div>
   </div>
   <div id="grm-search-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-asset-root="{{ asset_root }}" data-lookup="{{ asset_root }}assets/{{ lookup_file }}" hidden></div>

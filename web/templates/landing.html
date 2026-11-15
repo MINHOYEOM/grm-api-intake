@@ -251,14 +251,7 @@ a.home-cell:hover .hc-more{color:var(--coral)}
 </script>
 {% endblock %}
 {% block ai_disclosure %}
-<section class="ai-disclosure" id="notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
-  <span class="kick">AI Disclosure</span>
-  <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
-  <div class="disc-body">
-    <div class="disc-sec"><p>{{ _("본 서비스는 FDA, EMA, MHRA, PIC/S, ICH, WHO, Health Canada, ECA, 식약처 등 주요 규제기관 및 공신력 있는 전문기관의 공개 자료를 정기적으로 수집·분석하여 생성형 AI 기반의 한국어 브리핑 카드로 제공합니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("수치·코드·일자·영문 원문 인용·출처 링크 및 기계 추출 표는 원문 정보를 기준으로 제공되며, 생성형 AI 요약과 구분하여 표시합니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("각 정보는 신뢰도(Evidence A·B·C) 및 신호 강도(Tier 1~3) 기준에 따라 분류되며, 정보출처와 공식 원문 링크를 함께 제공하여 사용자가 1차 자료까지 추적·검증할 수 있도록 설계되었습니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("본 서비스는 규제 동향 및 품질 이슈 파악을 지원하기 위한 참고자료입니다. 제공되는 요약, 분석 및 해석은 공식 규제기관의 견해를 대변하지 않으며, 법률·규제·품질·컴플라이언스 자문이나 인증 의견으로 간주되어서는 안 됩니다. 중요한 의사결정은 반드시 공식 원문 및 전문 자문을 통해 검토하시기 바랍니다.") }}</p></div>
-  </div>
-</div></section>
+{#- [고지 정리 2026-11-15 · 대표 지적 "AI 경고글이 작위적"] 제목·네 단락 → 한 줄. 출처·증거 등급·면책 설명은
+    이용안내 '이용 시 유의사항'(#sec-8) 한 곳으로 모았다. 사이트 공통 면책 한 줄은 푸터에 그대로. -#}
+<section class="ai-line" id="notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap"><p>{{ _('요약·번역은 생성형 AI가 쓰고, 수치·인용·출처 링크는 원문 그대로 싣습니다.') }} {% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html#sec-8">{{ _("자료와 AI 활용 안내") }}</a>{% endif %}</p></div></section>
 {% endblock %}

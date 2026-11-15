@@ -431,6 +431,31 @@ class InspectionNotesRenderTest(unittest.TestCase):
                 for word in inp.FORBIDDEN_WORDS:
                     self.assertNotIn(word, main)
 
+    def test_glossary_term_pages_link_to_their_note(self):
+        """노트의 glossary_ids 에 든 용어 페이지마다 링크 블록 하나 — 노트 제목 + lead 첫 문장(ko·en)."""
+        seen = 0
+        for n in self.notes:
+            for gid in n["glossary_ids"]:
+                for prefix, sfx in (("", "_ko"), ("en/", "_en")):
+                    main = self._main(f"{prefix}glossary/{gid}")
+                    want = (f'<a class="gt-inote" href="../../inspection-notes/{n["id"]}/">'
+                            f'<b>{render._escape(n["title" + sfx])}</b>'
+                            f'<span>{render._escape(inp.first_sentence(n["lead" + sfx]))}</span></a>')
+                    self.assertIn(want, main, f"{prefix}glossary/{gid}")
+                    if prefix:
+                        block = main[main.index('class="gt-inote"'):]
+                        self.assertIsNone(HANGUL.search(block[:block.index("</section>")]), gid)
+                    seen += 1
+        self.assertGreater(seen, 0)
+
+    def test_glossary_terms_without_a_note_get_no_block(self):
+        with_note = {g for n in self.notes for g in n["glossary_ids"]}
+        others = [t["id"] for t in (render.load_glossary() or []) if t["id"] not in with_note][:20]
+        self.assertTrue(others)
+        for gid in others:
+            for prefix in ("", "en/"):
+                self.assertNotIn('class="gt-inote"', self._html(f"{prefix}glossary/{gid}"), gid)
+
     def test_style_keeps_the_hangul_rules(self):
         css = (WEB_DIR / "partials" / "inspection_notes_style.html").read_text(encoding="utf-8")
         self.assertNotIn("letter-spacing", css)
@@ -452,6 +477,9 @@ class NoNotesNoPagesTest(unittest.TestCase):
             self.assertNotIn("inspection-notes", (tmp / "dist" / "sitemap.xml").read_text(encoding="utf-8"))
             self.assertNotIn("inspection-notes",
                              (tmp / "dist" / "browse" / "index.html").read_text(encoding="utf-8"))
+            for rel in ("glossary/capa", "en/glossary/capa"):
+                self.assertNotIn('class="gt-inote"',
+                                 (tmp / "dist" / rel / "index.html").read_text(encoding="utf-8"))
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 

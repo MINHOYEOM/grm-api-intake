@@ -6664,6 +6664,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (목록 1 + 노트 N). 미리 지어 커밋한 파일을 그릴 뿐이다 — 빌드는 아무것도 부르지 않는다.
     inspection_notes = inspection_notes_page.load_notes()
     en_paths |= inspection_notes_page.routes_present(inspection_notes)
+    # 용어 페이지의 '실사 대비 노트' 링크 블록 재료 — 트리마다 그 언어의 제목·첫 문장으로.
+    env.globals["inspection_note_links"] = inspection_notes_page.glossary_links(
+        inspection_notes, DEFAULT_LANG)
+    en_env.globals["inspection_note_links"] = inspection_notes_page.glossary_links(
+        inspection_notes, "en")
     # [최근 규제 소식 2026-11-10] 정본(web/data/news.json)이 있을 때만 양 트리에 선언한다.
     news_data = news_page.load_news()
     if news_data:

@@ -304,15 +304,8 @@ a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
 </style>
 {% endblock %}
 {% block ai_disclosure %}
-<section class="ai-disclosure" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
-  <span class="kick">AI Disclosure</span>
-  <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
-  <div class="disc-body">
-    <div class="disc-sec" id="ip-fda-ai-facts"><p>{{ _("이 페이지는 공개된 FDA Form 483 문서의 서명란에서 기계적으로 추출한 사실만 집계합니다. 실사관 개인에 대한 평가나 성향 판단이 아니며, 문서 5건 이상이 확인된 경우에만 제공됩니다.") }}</p></div>
-    <div class="disc-sec" id="ip-fda-ai-translation"><p>{{ _("실사 문서 목록에서 펼쳐 보는 개별 지적사항의 국문 해석은 생성형 AI 번역이며 원문(영문)을 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.") }}</p></div>
-    <div class="disc-sec" id="mfds-ai-facts" hidden><p>{{ _('MFDS 참여 이력은 공개 보고서의 표에서 추출한 성명·기관·부서·참관 표기를 문서 단위로 모은 정보입니다.') }}</p></div>
-    <div class="disc-sec"><p>{{ _("본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.") }}</p></div>
-  </div>
-</div></section>
+{#- [고지 정리 2026-11-15 · 대표 지적 "AI 경고글이 작위적"] 제목·네 단락 → 한 줄. 출처·증거 등급·면책 설명은
+    이용안내 '이용 시 유의사항'(#sec-8) 한 곳으로 모았다. 사이트 공통 면책 한 줄은 푸터에 그대로. -#}
+<section class="ai-line" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap"><p><span id="ip-fda-ai-facts">{{ _("이 페이지는 공개된 FDA Form 483 문서의 서명란에서 기계적으로 추출한 사실만 집계합니다. 실사관 개인에 대한 평가나 성향 판단이 아니며, 문서 5건 이상이 확인된 경우에만 제공됩니다.") }}</span> <span id="mfds-ai-facts" hidden>{{ _("MFDS 참여 이력은 공개 보고서의 표에서 추출한 성명·기관·부서·참관 표기를 문서 단위로 모은 정보입니다.") }}</span> <span id="ip-fda-ai-translation">{{ _("국문은 생성형 AI 번역이며 원문을 함께 싣습니다.") }}</span> {% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html#sec-8">{{ _("자료와 AI 활용 안내") }}</a>{% endif %}</p></div></section>
 {% endblock %}
 {% block scripts %}<script src="{{ asset_root }}assets/inspector.js?v={{ inspectorjs_ver }}" defer></script>{% endblock %}

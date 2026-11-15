@@ -104,7 +104,8 @@
 {# P0-4: 'AI 자동 생성 고지' = 홈의 고지 섹션(#notice). 홈에선 순수 프래그먼트(새로고침 0),
    타 페이지에선 홈으로 이동 후 스크롤. [소개 2026-09-06] 종전 '소개'(about_href → 홈 #why
    기능 섹션)는 전용 페이지 /about/ 로 바뀌어 변수가 사라졌다 — 푸터 '서비스' 열 참조. #}
-{% set notice_href = '#notice' if nav_active == 'home' else rel_root ~ 'index.html#notice' %}
+{#- [고지 정리 2026-11-15] 홈 하단 긴 고지를 한 줄로 줄이고 설명은 이용안내 '이용 시 유의사항'(sec-8)으로 모았다. -#}
+{% set notice_href = rel_root ~ 'guide/index.html#sec-8' if (lang == 'ko' or 'guide/' in en_paths) else rel_root ~ 'index.html#notice' %}
 {#- [루트 진입 2026-09-05] 영어 사용자가 `grm-solutions.com` 을 직접 치면 한국어 홈을
     만난다. 헤더에 "English" 칩이 있지만 한국어 화면을 처음 본 사람이 그걸 찾을 이유가
     없다 — 검색 유입은 hreflang 으로 `/en/` 에 바로 착지하지만 직접·공유 링크 진입은 그
@@ -454,6 +455,12 @@ main:not(#_) > .wrap:last-child{padding-bottom:0}
 @media(max-width:640px){ main:not(#_){margin-bottom:56px} }
 /* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
 main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">

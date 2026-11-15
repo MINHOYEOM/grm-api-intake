@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/about/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/about/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/about/" />
-<script src="/assets/i18n-en.js?v=aa542336" defer></script>
+<script src="/assets/i18n-en.js?v=bc9cd020" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -221,6 +221,12 @@ main:not(#_) > .wrap:last-child{padding-bottom:0}
 @media(max-width:640px){ main:not(#_){margin-bottom:56px} }
 /* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
 main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -228,7 +234,7 @@ main:not(#_):has(> .toc-fab){margin-bottom:0}
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>A free information service on GMP and quality regulation for medicinal products, in Korean and English.</p>
       <a class="foot-srclink" href="../findings/coverage/index.html">Where the information comes from <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
-    <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../index.html#notice">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
+    <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../guide/index.html#sec-8">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
     <div><h5>Content</h5><a href="../news/index.html">Recent regulatory news</a><a href="../browse/index.html">Browse</a><a href="../library/index.html">Library</a><a href="../glossary/index.html">Glossary</a><a href="../quiz/index.html">Weekly quiz</a></div>
     <div class="foot-fnd"><h5>Browse</h5><a href="../findings/firm/index.html">Companies</a><a href="../findings/inspector/index.html">Inspectors</a><a href="../findings/clause/index.html">Section</a><a href="../findings/trends/index.html">Patterns by area</a><a href="../findings/inspections/index.html">FDA inspection outcomes</a><a href="../findings/docs/index.html">Public documents</a><a href="../findings/index.html">Finding search</a><a href="../findings/checklist/index.html">Self-inspection checklist</a><a href="../browse/index.html">Full index</a></div>
   </div>

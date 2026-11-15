@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=9397f790" defer></script>
+<script src="/assets/i18n-en.js?v=cc08aedd" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -319,7 +319,12 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .fnd-search i{top:22px}
 }
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
-.fnd-state-error{color:var(--coral-2)}#fnd-loading,#fnd-error{min-height:max(240px,calc(100vh - 400px))}.wrap:has(#fnd-loading:not([hidden])) #fnd-dash[hidden],
+.fnd-state-error{color:var(--coral-2)}
+.fnd-searchmsg{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 14px;padding:11px 14px;border:1px solid var(--line-2);border-left:3px solid var(--muted-2);border-radius:var(--rad-s);background:var(--soft);font-size:14px;line-height:1.55;color:var(--body)}
+.fnd-searchmsg[hidden]{display:none}
+.fnd-searchmsg.is-fail{border-left-color:var(--coral-2);color:var(--ink)}
+.fnd-searchmsg-retry{font-size:13.5px;font-weight:600;color:#fff;background:var(--coral-2);border:0;border-radius:999px;padding:6px 14px}
+.fnd-searchmsg-retry:hover,.fnd-searchmsg-retry:focus-visible{background:var(--ink)}#fnd-loading,#fnd-error{min-height:max(240px,calc(100vh - 400px))}.wrap:has(#fnd-loading:not([hidden])) #fnd-dash[hidden],
 .wrap:has(#fnd-error:not([hidden])) #fnd-dash[hidden]{display:block;visibility:hidden;min-height:430px}
 #fnd-coverage-note[hidden]{display:block;visibility:hidden;min-height:69px}
 @media (max-width:860px){
@@ -577,7 +582,7 @@ if(_nt&&_nm){
 })();
 </script>
 <script src="/assets/pet.js?v=4433fce6" defer></script>
-<script src="../../assets/findings.js?v=f89dab90" defer></script>
+<script src="../../assets/findings.js?v=f6ee08d1" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

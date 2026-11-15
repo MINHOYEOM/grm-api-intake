@@ -2539,8 +2539,14 @@
   // 하므로 클라이언트 검증은 불필요 — 신뢰 경계는 서버다).
   // 응답을 LAST 에 대입하지 않고 그대로 반환한다 — 대입 시점은 호출부가 navToken 세대
   // 검사를 통과시킨 뒤여야 한다(늦게 도착한 옛 응답이 최신 결과를 덮어쓰는 것 방지).
+  var SEARCH_ATTEMPT_MS = 9000;
   function fetchSearch(page) {
+    // [11-15 사용성 점검] 검색어가 있는 질의가 서버에서 20초 가까이 걸린 뒤 끊기는 일이 있었다.
+    // 시도마다 9초 상한을 두고 넘으면 끊어 재시도로 넘긴다(재시도 규칙은 retrySearchFrom 그대로).
+    var ctl = typeof AbortController === "function" ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, SEARCH_ATTEMPT_MS) : null;
     return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_search", {
+      signal: ctl ? ctl.signal : undefined,
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2568,6 +2574,7 @@
       }),
     })
       .then(function (r) {
+        if (timer) clearTimeout(timer);
         if (!r.ok) {
           var httpErr = new Error("findings_search " + r.status);
           httpErr.status = r.status;
@@ -2608,10 +2615,43 @@
   // 최근 조작"만 화면에 반영된다.
   // ★진행 중에 이전 결과를 지우지 않는다 — setPagerLoading(true) 로 진행만 알리고, 교체는
   // 응답이 도착한 뒤 render() 가 한 번에 한다(입력할 때마다 목록이 사라졌다 나타나는 깜빡임 방지).
+  // [11-15 사용성 점검] 검색이 실패하면 예전엔 이전 목록을 말없이 다시 그렸다 — 검색어를 넣은
+  // 사람은 그 목록을 자기 검색 결과로 읽는다. 지금은 결과 위에 한 줄로 알리고 다시 시도하게 한다.
+  // 오래 걸릴 때(2.5초~)도 같은 자리에서 진행 중임을 알린다.
+  var noticeEl = null, slowTimer = null;
+  function searchNotice(kind, retryPage) {
+    if (!noticeEl) {
+      noticeEl = document.createElement("div");
+      noticeEl.id = "fnd-searchmsg";
+      noticeEl.className = "fnd-searchmsg";
+      noticeEl.setAttribute("role", "status");
+      resultsEl.parentNode.insertBefore(noticeEl, resultsEl);
+    }
+    while (noticeEl.firstChild) noticeEl.removeChild(noticeEl.firstChild);
+    noticeEl.hidden = !kind;
+    noticeEl.className = "fnd-searchmsg" + (kind === "fail" ? " is-fail" : "");
+    if (kind === "slow") {
+      noticeEl.appendChild(document.createTextNode(_t("검색 중입니다. 검색어가 있으면 시간이 조금 걸릴 수 있습니다.")));
+    } else if (kind === "fail") {
+      noticeEl.appendChild(document.createTextNode(LAST
+        ? _t("검색 결과를 가져오지 못했습니다. 아래 목록은 검색어가 반영되지 않은 이전 결과입니다.")
+        : _t("검색 결과를 가져오지 못했습니다.")));
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "fnd-searchmsg-retry";
+      btn.textContent = _t("다시 시도");
+      btn.addEventListener("click", function () { goToPage(retryPage); });
+      noticeEl.appendChild(btn);
+    }
+  }
+
   function goToPage(n) {
     var target = Math.max(1, Math.floor(n) || 1);
     navToken += 1;
     var myToken = navToken;
+    clearTimeout(slowTimer);
+    searchNotice(null);
+    slowTimer = setTimeout(function () { if (myToken === navToken) searchNotice("slow"); }, 2500);
     var doScroll = pendingScrollAfterNav;
     pendingScrollAfterNav = false;
     setPagerLoading(true);
@@ -2619,6 +2659,8 @@
       .catch(retrySearch(target))
       .then(function (data) {
         if (myToken !== navToken) return; // 더 최근 조작에 의해 취소됨
+        clearTimeout(slowTimer);
+        searchNotice(null);
         // 범위 밖 페이지(옛 북마크·손으로 고친 ?page= 등): 서버는 빈 documents 를 준다.
         // 그대로 그리면 "결과 없음"에 페이저까지 숨겨져 되돌아갈 길이 사라진다 — 결과가
         // 존재하는데 페이지만 넘친 경우에 한해 마지막 페이지로 1회 되돌린다(재귀 아님:
@@ -2650,8 +2692,10 @@
         // 이전 결과가 있으면 그대로 두고 조용히 실패한다 — 일시적 네트워크 오류로 사용자가
         // 보던 목록을 통째로 날리지 않는다. render() 재호출은 로딩 표시(setPagerLoading)를
         // 되돌리기 위한 것이다. 그릴 것이 아예 없을 때만 오류 상태로 간다.
-        if (!LAST) { showState("error"); return; }
+        clearTimeout(slowTimer);
+        if (!LAST) { showState("none"); searchNotice("fail", target); return; }
         render();
+        searchNotice("fail", target);
       });
   }
 
@@ -2870,10 +2914,13 @@
   // 둘러보기 면으로 옮겨져 검색 툴바가 다시 첫 화면에 있다(보정할 거리 소멸).
   navToken += 1;
   var initToken = navToken;
+  slowTimer = setTimeout(function () { if (initToken === navToken) searchNotice("slow"); }, 2500);
   fetchSearch(currentPage)
     .catch(retrySearch(currentPage))
     .then(function (data) {
       if (initToken !== navToken) return; // 첫 응답 도착 전에 이미 다른 조작이 앞질렀다
+      clearTimeout(slowTimer);
+      searchNotice(null);
       LAST = data;
       buildFacetSkeleton();
       buildCountrySelect(); // [056] 국가 옵션 골격 — syncControlsFromState() 보다 먼저(값 대입 전 옵션 존재 필요)
@@ -2886,6 +2933,8 @@
     })
     .catch(function () {
       // [PR-0 딥링크] 목록 fetch 가 실패해도 이미 확정된 딥링크 단건 렌더는 덮어쓰지 않는다.
+      clearTimeout(slowTimer);
+      if (initToken === navToken) searchNotice(null);
       if (deepLinkStatus !== "found") showState("error");
       // ★[첫 응답 실패] syncControlsFromState()·wire() 는 성공 분기에만 있다. 그래서 첫
       //   응답이 실패하면 **URL 의 검색어가 입력창에 들어가지 못한 채** 빈 안내 문구만

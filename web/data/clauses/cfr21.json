@@ -1,0 +1,1226 @@
+{
+ "schema": "grm-clause-text/v1",
+ "source": {
+  "key": "cfr21",
+  "title": "21 CFR Part 210·211 (Current Good Manufacturing Practice)",
+  "publisher": "U.S. Office of the Federal Register / GPO — eCFR",
+  "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C",
+  "license": "U.S. federal government work — public domain (17 U.S.C. §105). eCFR is an editorial compilation, not an official legal edition of the CFR.",
+  "license_url": "https://www.ecfr.gov/reader-aids/understanding-the-ecfr/what-is-the-ecfr",
+  "full_text": true,
+  "retrieved": "2026-11-15"
+ },
+ "docs": [
+  {
+   "key": "210",
+   "code": "21 CFR Part 210",
+   "title": "Current Good Manufacturing Practice in Manufacturing, Processing, Packing, or Holding of Drugs; General",
+   "url": "https://www.ecfr.gov/current/title-21/part-210",
+   "version": "eCFR, up to date as of 2026-11-12",
+   "front_matter": "Authority:21 U.S.C. 321, 351, 352, 355, 360b, 360ddd, 360ddd-1, 371, 374; 42 U.S.C. 216, 262, 263a, 264.\n\nSource:43 FR 45076, Sept. 29, 1978, unless otherwise noted."
+  },
+  {
+   "key": "211",
+   "code": "21 CFR Part 211",
+   "title": "Current Good Manufacturing Practice for Finished Pharmaceuticals",
+   "url": "https://www.ecfr.gov/current/title-21/part-211",
+   "version": "eCFR, up to date as of 2026-11-12",
+   "front_matter": "Authority:21 U.S.C. 321, 351, 352, 355, 360b, 360ddd, 360ddd-1, 371, 374; 42 U.S.C. 216, 262, 263a, 264.\n\nSource:43 FR 45077, Sept. 29, 1978, unless otherwise noted."
+  }
+ ],
+ "clauses": [
+  {
+   "id": "cfr21/210/210-1",
+   "source": "cfr21",
+   "doc": "210",
+   "number": "210.1",
+   "slug": "210-1",
+   "code": "21 CFR 210.1",
+   "title": "Status of current good manufacturing practice regulations.",
+   "path": [
+    "21 CFR Part 210"
+   ],
+   "text": "(a) The regulations set forth in this part and in parts 211, 213, 225, and 226 of this chapter contain the minimum current good manufacturing practice for methods to be used in, and the facilities or controls to be used for, the manufacture, processing, packing, or holding of a drug to assure that such drug meets the requirements of the act as to safety, and has the identity and strength and meets the quality and purity characteristics that it purports or is represented to possess.\n\n(b) The failure to comply with any regulation set forth in this part and in parts 211, 213, 225, and 226 of this chapter in the manufacture, processing, packing, or holding of a drug shall render such drug to be adulterated under section 501(a)(2)(B) of the act and such drug, as well as the person who is responsible for the failure to comply, shall be subject to regulatory action.\n\n(c) Owners and operators of establishments engaged in the recovery, donor screening, testing (including donor testing), processing, storage, labeling, packaging, or distribution of human cells, tissues, and cellular and tissue-based products (HCT/Ps), as defined in § 1271.3(d) of this chapter, that are drugs (subject to review under an application submitted under section 505 of the act or under a biological product license application under section 351 of the Public Health Service Act), are subject to the donor-eligibility and applicable current good tissue practice procedures set forth in part 1271 subparts C and D of this chapter, in addition to the regulations in this part and in parts 211, 225, and 226 of this chapter. Failure to comply with any applicable regulation set forth in this part, in parts 211, 225, and 226 of this chapter, in part 1271 subpart C of this chapter, or in part 1271 subpart D of this chapter with respect to the manufacture, processing, packing or holding of a drug, renders an HCT/P adulterated under section 501(a)(2)(B) of the act. Such HCT/P, as well as the person who is responsible for the failure to comply, is subject to regulatory action.",
+   "notes": [
+    "[43 FR 45076, Sept. 29, 1978, as amended at 69 FR 29828, May 25, 2004; 74 FR 65431, Dec. 10, 2009; 89 FR 51769, June 18, 2024]"
+   ],
+   "chars": 2060,
+   "sha": "8568b3f3ea5d0aaa",
+   "url": "https://www.ecfr.gov/current/title-21/part-210/section-210.1"
+  },
+  {
+   "id": "cfr21/210/210-2",
+   "source": "cfr21",
+   "doc": "210",
+   "number": "210.2",
+   "slug": "210-2",
+   "code": "21 CFR 210.2",
+   "title": "Applicability of current good manufacturing practice regulations.",
+   "path": [
+    "21 CFR Part 210"
+   ],
+   "text": "(a) The regulations in this part and in parts 211, 213, 225, and 226 of this chapter as they may pertain to a drug; in parts 600 through 680 of this chapter as they may pertain to a biological product for human use; and in part 1271 of this chapter as they are applicable to a human cell, tissue, or cellular or tissue-based product (HCT/P) that is regulated as a drug (subject to premarket review under an application submitted under section 505 of the act or under a biologics license application under section 351 of the Public Health Service Act); shall be considered to supplement, not supersede, each other, unless the regulations explicitly provide otherwise. In the event of a conflict between applicable regulations in this part and in other parts of this chapter, the regulation specifically applicable to the drug product in question shall supersede the more general.\n\n(b) If a person engages in only some operations subject to the regulations in this part and in parts 211, 213, 225, 226, 600 through 680, and 1271 of this chapter, and not in others, that person need only comply with those regulations applicable to the operations in which the person is engaged.\n\n(c) An investigational drug for use in a phase 1 study, as described in § 312.21(a) of this chapter, is subject to the statutory requirements set forth in 21 U.S.C. 351(a)(2)(B). The production of such drug is exempt from compliance with the regulations in part 211 of this chapter. However, this exemption does not apply to an investigational drug for use in a phase 1 study once the investigational drug has been made available for use by or for the sponsor in a phase 2 or phase 3 study, as described in § 312.21(b) and (c) of this chapter, or the drug has been lawfully marketed. If the investigational drug has been made available in a phase 2 or phase 3 study or the drug has been lawfully marketed, the drug for use in the phase 1 study must comply with part 211.",
+   "notes": [
+    "[69 FR 29828, May 25, 2004, as amended at 73 FR 40462, July 15, 2008; 74 FR 65431, Dec. 10, 2009; 89 FR 51769, June 18, 2024]"
+   ],
+   "chars": 1947,
+   "sha": "41892f554bfb287a",
+   "url": "https://www.ecfr.gov/current/title-21/part-210/section-210.2"
+  },
+  {
+   "id": "cfr21/210/210-3",
+   "source": "cfr21",
+   "doc": "210",
+   "number": "210.3",
+   "slug": "210-3",
+   "code": "21 CFR 210.3",
+   "title": "Definitions.",
+   "path": [
+    "21 CFR Part 210"
+   ],
+   "text": "(a) The definitions and interpretations contained in section 201 of the act shall be applicable to such terms when used in this part and in parts 211, 225, and 226 of this chapter.\n\n(b) The following definitions of terms apply to this part and to parts 211, 225, and 226 of this chapter.\n\n(1) Act means the Federal Food, Drug, and Cosmetic Act, as amended (21 U.S.C. 301 et seq.).\n\n(2) Batch means a specific quantity of a drug or other material that is intended to have uniform character and quality, within specified limits, and is produced according to a single manufacturing order during the same cycle of manufacture.\n\n(3) Component means any ingredient intended for use in the manufacture of a drug product, including those that may not appear in such drug product.\n\n(4) Drug product means a finished dosage form, for example, tablet, capsule, solution, etc., that contains an active drug ingredient generally, but not necessarily, in association with inactive ingredients. The term also includes a finished dosage form that does not contain an active ingredient but is intended to be used as a placebo.\n\n(5) Fiber means any particulate contaminant with a length at least three times greater than its width.\n\n(6) Nonfiber releasing filter means any filter, which after appropriate pretreatment such as washing or flushing, will not release fibers into the component or drug product that is being filtered.\n\n(7) Active ingredient means any component that is intended to furnish pharmacological activity or other direct effect in the diagnosis, cure, mitigation, treatment, or prevention of disease, or to affect the structure or any function of the body of man or other animals. The term includes those components that may undergo chemical change in the manufacture of the drug product and be present in the drug product in a modified form intended to furnish the specified activity or effect.\n\n(8) Inactive ingredient means any component other than an active ingredient.\n\n(9) In-process material means any material fabricated, compounded, blended, or derived by chemical reaction that is produced for, and used in, the preparation of the drug product.\n\n(10) Lot means a batch, or a specific identified portion of a batch, having uniform character and quality within specified limits; or, in the case of a drug product produced by continuous process, it is a specific identified amount produced in a unit of time or quantity in a manner that assures its having uniform character and quality within specified limits.\n\n(11) Lot number, control number, or batch number means any distinctive combination of letters, numbers, or symbols, or any combination of them, from which the complete history of the manufacture, processing, packing, holding, and distribution of a batch or lot of drug product or other material can be determined.\n\n(12) Manufacture, processing, packing, or holding of a drug product includes packaging and labeling operations, testing, and quality control of drug products.\n\n(13) The term medicated feed means any Type B or Type C medicated feed as defined in § 558.3 of this chapter. The feed contains one or more drugs as defined in section 201(g) of the act. The manufacture of medicated feeds is subject to the requirements of part 225 of this chapter.\n\n(14) The term medicated premix means a Type A medicated article as defined in § 558.3 of this chapter. The article contains one or more drugs as defined in section 201(g) of the act. The manufacture of medicated premixes is subject to the requirements of part 226 of this chapter.\n\n(15) Quality control unit means any person or organizational element designated by the firm to be responsible for the duties relating to quality control.\n\n(16) Strength means:\n\n(i) The concentration of the drug substance (for example, weight/weight, weight/volume, or unit dose/volume basis), and/or\n\n(ii) The potency, that is, the therapeutic activity of the drug product as indicated by appropriate laboratory tests or by adequately developed and controlled clinical data (expressed, for example, in terms of units by reference to a standard).\n\n(17) Theoretical yield means the quantity that would be produced at any appropriate phase of manufacture, processing, or packing of a particular drug product, based upon the quantity of components to be used, in the absence of any loss or error in actual production.\n\n(18) Actual yield means the quantity that is actually produced at any appropriate phase of manufacture, processing, or packing of a particular drug product.\n\n(19) Percentage of theoretical yield means the ratio of the actual yield (at any appropriate phase of manufacture, processing, or packing of a particular drug product) to the theoretical yield (at the same phase), stated as a percentage.\n\n(20) Acceptance criteria means the product specifications and acceptance/rejection criteria, such as acceptable quality level and unacceptable quality level, with an associated sampling plan, that are necessary for making a decision to accept or reject a lot or batch (or any other convenient subgroups of manufactured units).\n\n(21) Representative sample means a sample that consists of a number of units that are drawn based on rational criteria such as random sampling and intended to assure that the sample accurately portrays the material being sampled.\n\n(22) Gang-printed labeling means labeling derived from a sheet of material on which more than one item of labeling is printed.",
+   "notes": [
+    "[43 FR 45076, Sept. 29, 1978, as amended at 51 FR 7389, Mar. 3, 1986; 58 FR 41353, Aug. 3, 1993; 73 FR 51931, Sept. 8, 2008; 74 FR 65431, Dec. 10, 2009]"
+   ],
+   "chars": 5459,
+   "sha": "f9cdd3a11a52b330",
+   "url": "https://www.ecfr.gov/current/title-21/part-210/section-210.3"
+  },
+  {
+   "id": "cfr21/211/211-1",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.1",
+   "slug": "211-1",
+   "code": "21 CFR 211.1",
+   "title": "Scope.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart A—General Provisions"
+   ],
+   "text": "(a) The regulations in this part contain the minimum current good manufacturing practice for preparation of drug products (excluding positron emission tomography drugs and medical gases as defined in § 213.3(b)(12) of this chapter) for administration to humans or animals.\n\n(b) The current good manufacturing practice regulations in this chapter as they pertain to drug products; in parts 600 through 680 of this chapter, as they pertain to drugs that are also biological products for human use; and in part 1271 of this chapter, as they are applicable to drugs that are also human cells, tissues, and cellular and tissue-based products (HCT/Ps) and that are drugs (subject to review under an application submitted under section 505 of the act or under a biological product license application under section 351 of the Public Health Service Act); supplement and do not supersede the regulations in this part unless the regulations explicitly provide otherwise. In the event of a conflict between applicable regulations in this part and in other parts of this chapter, or in parts 600 through 680 of this chapter, or in part 1271 of this chapter, the regulation specifically applicable to the drug product in question shall supersede the more general.\n\n(c) Pending consideration of a proposed exemption, published in the Federal Register of September 29, 1978, the requirements in this part shall not be enforced for OTC drug products if the products and all their ingredients are ordinarily marketed and consumed as human foods, and which products may also fall within the legal definition of drugs by virtue of their intended use. Therefore, until further notice, regulations under parts 110 and 117 of this chapter, and where applicable, parts 113 through 129 of this chapter, shall be applied in determining whether these OTC drug products that are also foods are manufactured, processed, packed, or held under current good manufacturing practice.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 62 FR 66522, Dec. 19, 1997; 69 FR 29828, May 25, 2004; 74 FR 65431, Dec. 10, 2009; 80 FR 56168, Sept. 17, 2015; 89 FR 51769, June 18, 2024]"
+   ],
+   "chars": 1950,
+   "sha": "d7b9eaec6104ede2",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.1"
+  },
+  {
+   "id": "cfr21/211/211-3",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.3",
+   "slug": "211-3",
+   "code": "21 CFR 211.3",
+   "title": "Definitions.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart A—General Provisions"
+   ],
+   "text": "The definitions set forth in § 210.3 of this chapter apply in this part.",
+   "notes": [],
+   "chars": 72,
+   "sha": "d6de0c80472f7f44",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.3"
+  },
+  {
+   "id": "cfr21/211/211-22",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.22",
+   "slug": "211-22",
+   "code": "21 CFR 211.22",
+   "title": "Responsibilities of quality control unit.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart B—Organization and Personnel"
+   ],
+   "text": "(a) There shall be a quality control unit that shall have the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging material, labeling, and drug products, and the authority to review production records to assure that no errors have occurred or, if errors have occurred, that they have been fully investigated. The quality control unit shall be responsible for approving or rejecting drug products manufactured, processed, packed, or held under contract by another company.\n\n(b) Adequate laboratory facilities for the testing and approval (or rejection) of components, drug product containers, closures, packaging materials, in-process materials, and drug products shall be available to the quality control unit.\n\n(c) The quality control unit shall have the responsibility for approving or rejecting all procedures or specifications impacting on the identity, strength, quality, and purity of the drug product.\n\n(d) The responsibilities and procedures applicable to the quality control unit shall be in writing; such written procedures shall be followed.",
+   "notes": [],
+   "chars": 1132,
+   "sha": "da112c668a186bfd",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.22"
+  },
+  {
+   "id": "cfr21/211/211-25",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.25",
+   "slug": "211-25",
+   "code": "21 CFR 211.25",
+   "title": "Personnel qualifications.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart B—Organization and Personnel"
+   ],
+   "text": "(a) Each person engaged in the manufacture, processing, packing, or holding of a drug product shall have education, training, and experience, or any combination thereof, to enable that person to perform the assigned functions. Training shall be in the particular operations that the employee performs and in current good manufacturing practice (including the current good manufacturing practice regulations in this chapter and written procedures required by these regulations) as they relate to the employee's functions. Training in current good manufacturing practice shall be conducted by qualified individuals on a continuing basis and with sufficient frequency to assure that employees remain familiar with CGMP requirements applicable to them.\n\n(b) Each person responsible for supervising the manufacture, processing, packing, or holding of a drug product shall have the education, training, and experience, or any combination thereof, to perform assigned functions in such a manner as to provide assurance that the drug product has the safety, identity, strength, quality, and purity that it purports or is represented to possess.\n\n(c) There shall be an adequate number of qualified personnel to perform and supervise the manufacture, processing, packing, or holding of each drug product.",
+   "notes": [],
+   "chars": 1294,
+   "sha": "63263e9429f37288",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.25"
+  },
+  {
+   "id": "cfr21/211/211-28",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.28",
+   "slug": "211-28",
+   "code": "21 CFR 211.28",
+   "title": "Personnel responsibilities.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart B—Organization and Personnel"
+   ],
+   "text": "(a) Personnel engaged in the manufacture, processing, packing, or holding of a drug product shall wear clean clothing appropriate for the duties they perform. Protective apparel, such as head, face, hand, and arm coverings, shall be worn as necessary to protect drug products from contamination.\n\n(b) Personnel shall practice good sanitation and health habits.\n\n(c) Only personnel authorized by supervisory personnel shall enter those areas of the buildings and facilities designated as limited-access areas.\n\n(d) Any person shown at any time (either by medical examination or supervisory observation) to have an apparent illness or open lesions that may adversely affect the safety or quality of drug products shall be excluded from direct contact with components, drug product containers, closures, in-process materials, and drug products until the condition is corrected or determined by competent medical personnel not to jeopardize the safety or quality of drug products. All personnel shall be instructed to report to supervisory personnel any health conditions that may have an adverse effect on drug products.",
+   "notes": [],
+   "chars": 1117,
+   "sha": "0b9f60c8e7740a80",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.28"
+  },
+  {
+   "id": "cfr21/211/211-34",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.34",
+   "slug": "211-34",
+   "code": "21 CFR 211.34",
+   "title": "Consultants.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart B—Organization and Personnel"
+   ],
+   "text": "Consultants advising on the manufacture, processing, packing, or holding of drug products shall have sufficient education, training, and experience, or any combination thereof, to advise on the subject for which they are retained. Records shall be maintained stating the name, address, and qualifications of any consultants and the type of service they provide.",
+   "notes": [],
+   "chars": 361,
+   "sha": "f10d1ea052420828",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.34"
+  },
+  {
+   "id": "cfr21/211/211-42",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.42",
+   "slug": "211-42",
+   "code": "21 CFR 211.42",
+   "title": "Design and construction features.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart C—Buildings and Facilities"
+   ],
+   "text": "(a) Any building or buildings used in the manufacture, processing, packing, or holding of a drug product shall be of suitable size, construction and location to facilitate cleaning, maintenance, and proper operations.\n\n(b) Any such building shall have adequate space for the orderly placement of equipment and materials to prevent mixups between different components, drug product containers, closures, labeling, in-process materials, or drug products, and to prevent contamination. The flow of components, drug product containers, closures, labeling, in-process materials, and drug products through the building or buildings shall be designed to prevent contamination.\n\n(c) Operations shall be performed within specifically defined areas of adequate size. There shall be separate or defined areas or such other control systems for the firm's operations as are necessary to prevent contamination or mixups during the course of the following procedures:\n\n(1) Receipt, identification, storage, and withholding from use of components, drug product containers, closures, and labeling, pending the appropriate sampling, testing, or examination by the quality control unit before release for manufacturing or packaging;\n\n(2) Holding rejected components, drug product containers, closures, and labeling before disposition;\n\n(3) Storage of released components, drug product containers, closures, and labeling;\n\n(4) Storage of in-process materials;\n\n(5) Manufacturing and processing operations;\n\n(6) Packaging and labeling operations;\n\n(7) Quarantine storage before release of drug products;\n\n(8) Storage of drug products after release;\n\n(9) Control and laboratory operations;\n\n(10) Aseptic processing, which includes as appropriate:\n\n(i) Floors, walls, and ceilings of smooth, hard surfaces that are easily cleanable;\n\n(ii) Temperature and humidity controls;\n\n(iii) An air supply filtered through high-efficiency particulate air filters under positive pressure, regardless of whether flow is laminar or nonlaminar;\n\n(iv) A system for monitoring environmental conditions;\n\n(v) A system for cleaning and disinfecting the room and equipment to produce aseptic conditions;\n\n(vi) A system for maintaining any equipment used to control the aseptic conditions.\n\n(d) Operations relating to the manufacture, processing, and packing of penicillin shall be performed in facilities separate from those used for other drug products for human use.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 60 FR 4091, Jan. 20, 1995]"
+   ],
+   "chars": 2425,
+   "sha": "849ad45603cad983",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.42"
+  },
+  {
+   "id": "cfr21/211/211-44",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.44",
+   "slug": "211-44",
+   "code": "21 CFR 211.44",
+   "title": "Lighting.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart C—Buildings and Facilities"
+   ],
+   "text": "Adequate lighting shall be provided in all areas.",
+   "notes": [],
+   "chars": 49,
+   "sha": "dfc79e5f82175350",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.44"
+  },
+  {
+   "id": "cfr21/211/211-46",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.46",
+   "slug": "211-46",
+   "code": "21 CFR 211.46",
+   "title": "Ventilation, air filtration, air heating and cooling.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart C—Buildings and Facilities"
+   ],
+   "text": "(a) Adequate ventilation shall be provided.\n\n(b) Equipment for adequate control over air pressure, micro-organisms, dust, humidity, and temperature shall be provided when appropriate for the manufacture, processing, packing, or holding of a drug product.\n\n(c) Air filtration systems, including prefilters and particulate matter air filters, shall be used when appropriate on air supplies to production areas. If air is recirculated to production areas, measures shall be taken to control recirculation of dust from production. In areas where air contamination occurs during production, there shall be adequate exhaust systems or other systems adequate to control contaminants.\n\n(d) Air-handling systems for the manufacture, processing, and packing of penicillin shall be completely separate from those for other drug products for human use.",
+   "notes": [],
+   "chars": 840,
+   "sha": "a667bd5030aff06b",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.46"
+  },
+  {
+   "id": "cfr21/211/211-48",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.48",
+   "slug": "211-48",
+   "code": "21 CFR 211.48",
+   "title": "Plumbing.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart C—Buildings and Facilities"
+   ],
+   "text": "(a) Potable water shall be supplied under continuous positive pressure in a plumbing system free of defects that could contribute contamination to any drug product. Potable water shall meet the standards prescribed in the Environmental Protection Agency's Primary Drinking Water Regulations set forth in 40 CFR part 141. Water not meeting such standards shall not be permitted in the potable water system.\n\n(b) Drains shall be of adequate size and, where connected directly to a sewer, shall be provided with an air break or other mechanical device to prevent back-siphonage.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 48 FR 11426, Mar. 18, 1983]"
+   ],
+   "chars": 575,
+   "sha": "596425ba0dbe12cd",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.48"
+  },
+  {
+   "id": "cfr21/211/211-50",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.50",
+   "slug": "211-50",
+   "code": "21 CFR 211.50",
+   "title": "Sewage and refuse.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart C—Buildings and Facilities"
+   ],
+   "text": "Sewage, trash, and other refuse in and from the building and immediate premises shall be disposed of in a safe and sanitary manner.",
+   "notes": [],
+   "chars": 131,
+   "sha": "7431bd16d7e5de78",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.50"
+  },
+  {
+   "id": "cfr21/211/211-52",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.52",
+   "slug": "211-52",
+   "code": "21 CFR 211.52",
+   "title": "Washing and toilet facilities.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart C—Buildings and Facilities"
+   ],
+   "text": "Adequate washing facilities shall be provided, including hot and cold water, soap or detergent, air driers or single-service towels, and clean toilet facilities easily accesible to working areas.",
+   "notes": [],
+   "chars": 195,
+   "sha": "afa328918a4971a8",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.52"
+  },
+  {
+   "id": "cfr21/211/211-56",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.56",
+   "slug": "211-56",
+   "code": "21 CFR 211.56",
+   "title": "Sanitation.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart C—Buildings and Facilities"
+   ],
+   "text": "(a) Any building used in the manufacture, processing, packing, or holding of a drug product shall be maintained in a clean and sanitary condition, Any such building shall be free of infestation by rodents, birds, insects, and other vermin (other than laboratory animals). Trash and organic waste matter shall be held and disposed of in a timely and sanitary manner.\n\n(b) There shall be written procedures assigning responsibility for sanitation and describing in sufficient detail the cleaning schedules, methods, equipment, and materials to be used in cleaning the buildings and facilities; such written procedures shall be followed.\n\n(c) There shall be written procedures for use of suitable rodenticides, insecticides, fungicides, fumigating agents, and cleaning and sanitizing agents. Such written procedures shall be designed to prevent the contamination of equipment, components, drug product containers, closures, packaging, labeling materials, or drug products and shall be followed. Rodenticides, insecticides, and fungicides shall not be used unless registered and used in accordance with the Federal Insecticide, Fungicide, and Rodenticide Act (7 U.S.C. 135).\n\n(d) Sanitation procedures shall apply to work performed by contractors or temporary employees as well as work performed by full-time employees during the ordinary course of operations.",
+   "notes": [],
+   "chars": 1356,
+   "sha": "144e8df5c5fc8025",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.56"
+  },
+  {
+   "id": "cfr21/211/211-58",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.58",
+   "slug": "211-58",
+   "code": "21 CFR 211.58",
+   "title": "Maintenance.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart C—Buildings and Facilities"
+   ],
+   "text": "Any building used in the manufacture, processing, packing, or holding of a drug product shall be maintained in a good state of repair.",
+   "notes": [],
+   "chars": 134,
+   "sha": "debc670097060d75",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.58"
+  },
+  {
+   "id": "cfr21/211/211-63",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.63",
+   "slug": "211-63",
+   "code": "21 CFR 211.63",
+   "title": "Equipment design, size, and location.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart D—Equipment"
+   ],
+   "text": "Equipment used in the manufacture, processing, packing, or holding of a drug product shall be of appropriate design, adequate size, and suitably located to facilitate operations for its intended use and for its cleaning and maintenance.",
+   "notes": [],
+   "chars": 236,
+   "sha": "cee819a652c311eb",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.63"
+  },
+  {
+   "id": "cfr21/211/211-65",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.65",
+   "slug": "211-65",
+   "code": "21 CFR 211.65",
+   "title": "Equipment construction.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart D—Equipment"
+   ],
+   "text": "(a) Equipment shall be constructed so that surfaces that contact components, in-process materials, or drug products shall not be reactive, additive, or absorptive so as to alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements.\n\n(b) Any substances required for operation, such as lubricants or coolants, shall not come into contact with components, drug product containers, closures, in-process materials, or drug products so as to alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements.",
+   "notes": [],
+   "chars": 639,
+   "sha": "5134ff7f894420c9",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.65"
+  },
+  {
+   "id": "cfr21/211/211-67",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.67",
+   "slug": "211-67",
+   "code": "21 CFR 211.67",
+   "title": "Equipment cleaning and maintenance.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart D—Equipment"
+   ],
+   "text": "(a) Equipment and utensils shall be cleaned, maintained, and, as appropriate for the nature of the drug, sanitized and/or sterilized at appropriate intervals to prevent malfunctions or contamination that would alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements.\n\n(b) Written procedures shall be established and followed for cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing, or holding of a drug product. These procedures shall include, but are not necessarily limited to, the following:\n\n(1) Assignment of responsibility for cleaning and maintaining equipment;\n\n(2) Maintenance and cleaning schedules, including, where appropriate, sanitizing schedules;\n\n(3) A description in sufficient detail of the methods, equipment, and materials used in cleaning and maintenance operations, and the methods of disassembling and reassembling equipment as necessary to assure proper cleaning and maintenance;\n\n(4) Removal or obliteration of previous batch identification;\n\n(5) Protection of clean equipment from contamination prior to use;\n\n(6) Inspection of equipment for cleanliness immediately before use.\n\n(c) Records shall be kept of maintenance, cleaning, sanitizing, and inspection as specified in §§ 211.180 and 211.182.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 73 FR 51931, Sept. 8, 2008]"
+   ],
+   "chars": 1350,
+   "sha": "1485cc863e0aa34e",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.67"
+  },
+  {
+   "id": "cfr21/211/211-68",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.68",
+   "slug": "211-68",
+   "code": "21 CFR 211.68",
+   "title": "Automatic, mechanical, and electronic equipment.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart D—Equipment"
+   ],
+   "text": "(a) Automatic, mechanical, or electronic equipment or other types of equipment, including computers, or related systems that will perform a function satisfactorily, may be used in the manufacture, processing, packing, and holding of a drug product. If such equipment is so used, it shall be routinely calibrated, inspected, or checked according to a written program designed to assure proper performance. Written records of those calibration checks and inspections shall be maintained.\n\n(b) Appropriate controls shall be exercised over computer or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel. Input to and output from the computer or related system of formulas or other records or data shall be checked for accuracy. The degree and frequency of input/output verification shall be based on the complexity and reliability of the computer or related system. A backup file of data entered into the computer or related system shall be maintained except where certain data, such as calculations performed in connection with laboratory analysis, are eliminated by computerization or other automated processes. In such instances a written record of the program shall be maintained along with appropriate validation data. Hard copy or alternative systems, such as duplicates, tapes, or microfilm, designed to assure that backup data are exact and complete and that it is secure from alteration, inadvertent erasures, or loss shall be maintained.\n\n(c) Such automated equipment used for performance of operations addressed by §§ 211.101(c) or (d), 211.103, 211.182, or 211.188(b)(11) can satisfy the requirements included in those sections relating to the performance of an operation by one person and checking by another person if such equipment is used in conformity with this section, and one person checks that the equipment properly performed the operation.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 60 FR 4091, Jan. 20, 1995; 73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 1948,
+   "sha": "78fd741e69d9f271",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.68"
+  },
+  {
+   "id": "cfr21/211/211-72",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.72",
+   "slug": "211-72",
+   "code": "21 CFR 211.72",
+   "title": "Filters.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart D—Equipment"
+   ],
+   "text": "Filters for liquid filtration used in the manufacture, processing, or packing of injectable drug products intended for human use shall not release fibers into such products. Fiber-releasing filters may be used when it is not possible to manufacture such products without the use of these filters. If use of a fiber-releasing filter is necessary, an additional nonfiber-releasing filter having a maximum nominal pore size rating of 0.2 micron (0.45 micron if the manufacturing conditions so dictate) shall subsequently be used to reduce the content of particles in the injectable drug product. The use of an asbestos-containing filter is prohibited.",
+   "notes": [
+    "[73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 648,
+   "sha": "b3f8056bccab86eb",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.72"
+  },
+  {
+   "id": "cfr21/211/211-80",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.80",
+   "slug": "211-80",
+   "code": "21 CFR 211.80",
+   "title": "General requirements.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart E—Control of Components and Drug Product Containers and Closures"
+   ],
+   "text": "(a) There shall be written procedures describing in sufficient detail the receipt, identification, storage, handling, sampling, testing, and approval or rejection of components and drug product containers and closures; such written procedures shall be followed.\n\n(b) Components and drug product containers and closures shall at all times be handled and stored in a manner to prevent contamination.\n\n(c) Bagged or boxed components of drug product containers, or closures shall be stored off the floor and suitably spaced to permit cleaning and inspection.\n\n(d) Each container or grouping of containers for components or drug product containers, or closures shall be identified with a distinctive code for each lot in each shipment received. This code shall be used in recording the disposition of each lot. Each lot shall be appropriately identified as to its status (i.e., quarantined, approved, or rejected).",
+   "notes": [],
+   "chars": 909,
+   "sha": "eb6c59cb273c7be8",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.80"
+  },
+  {
+   "id": "cfr21/211/211-82",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.82",
+   "slug": "211-82",
+   "code": "21 CFR 211.82",
+   "title": "Receipt and storage of untested components, drug product containers, and closures.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart E—Control of Components and Drug Product Containers and Closures"
+   ],
+   "text": "(a) Upon receipt and before acceptance, each container or grouping of containers of components, drug product containers, and closures shall be examined visually for appropriate labeling as to contents, container damage or broken seals, and contamination.\n\n(b) Components, drug product containers, and closures shall be stored under quarantine until they have been tested or examined, whichever is appropriate, and released. Storage within the area shall conform to the requirements of § 211.80.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 494,
+   "sha": "c33af3a3592104ee",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.82"
+  },
+  {
+   "id": "cfr21/211/211-84",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.84",
+   "slug": "211-84",
+   "code": "21 CFR 211.84",
+   "title": "Testing and approval or rejection of components, drug product containers, and closures.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart E—Control of Components and Drug Product Containers and Closures"
+   ],
+   "text": "(a) Each lot of components, drug product containers, and closures shall be withheld from use until the lot has been sampled, tested, or examined, as appropriate, and released for use by the quality control unit.\n\n(b) Representative samples of each shipment of each lot shall be collected for testing or examination. The number of containers to be sampled, and the amount of material to be taken from each container, shall be based upon appropriate criteria such as statistical criteria for component variability, confidence levels, and degree of precision desired, the past quality history of the supplier, and the quantity needed for analysis and reserve where required by § 211.170.\n\n(c) Samples shall be collected in accordance with the following procedures:\n\n(1) The containers of components selected shall be cleaned when necessary in a manner to prevent introduction of contaminants into the component.\n\n(2) The containers shall be opened, sampled, and resealed in a manner designed to prevent contamination of their contents and contamination of other components, drug product containers, or closures.\n\n(3) Sterile equipment and aseptic sampling techniques shall be used when necessary.\n\n(4) If it is necessary to sample a component from the top, middle, and bottom of its container, such sample subdivisions shall not be composited for testing.\n\n(5) Sample containers shall be identified so that the following information can be determined: name of the material sampled, the lot number, the container from which the sample was taken, the date on which the sample was taken, and the name of the person who collected the sample.\n\n(6) Containers from which samples have been taken shall be marked to show that samples have been removed from them.\n\n(d) Samples shall be examined and tested as follows:\n\n(1) At least one test shall be conducted to verify the identity of each component of a drug product. Specific identity tests, if they exist, shall be used.\n\n(2) Each component shall be tested for conformity with all appropriate written specifications for purity, strength, and quality. In lieu of such testing by the manufacturer, a report of analysis may be accepted from the supplier of a component, provided that at least one specific identity test is conducted on such component by the manufacturer, and provided that the manufacturer establishes the reliability of the supplier's analyses through appropriate validation of the supplier's test results at appropriate intervals.\n\n(3) Containers and closures shall be tested for conformity with all appropriate written specifications. In lieu of such testing by the manufacturer, a certificate of testing may be accepted from the supplier, provided that at least a visual identification is conducted on such containers/closures by the manufacturer and provided that the manufacturer establishes the reliability of the supplier's test results through appropriate validation of the supplier's test results at appropriate intervals.\n\n(4) When appropriate, components shall be microscopically examined.\n\n(5) Each lot of a component, drug product container, or closure that is liable to contamination with filth, insect infestation, or other extraneous adulterant shall be examined against established specifications for such contamination.\n\n(6) Each lot of a component, drug product container, or closure with potential for microbiological contamination that is objectionable in view of its intended use shall be subjected to microbiological tests before use.\n\n(e) Any lot of components, drug product containers, or closures that meets the appropriate written specifications of identity, strength, quality, and purity and related tests under paragraph (d) of this section may be approved and released for use. Any lot of such material that does not meet such specifications shall be rejected.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 63 FR 14356, Mar. 25, 1998; 73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 3847,
+   "sha": "ee43fb76ec9fcedd",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.84"
+  },
+  {
+   "id": "cfr21/211/211-86",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.86",
+   "slug": "211-86",
+   "code": "21 CFR 211.86",
+   "title": "Use of approved components, drug product containers, and closures.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart E—Control of Components and Drug Product Containers and Closures"
+   ],
+   "text": "Components, drug product containers, and closures approved for use shall be rotated so that the oldest approved stock is used first. Deviation from this requirement is permitted if such deviation is temporary and appropriate.",
+   "notes": [],
+   "chars": 225,
+   "sha": "e095587320d317e0",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.86"
+  },
+  {
+   "id": "cfr21/211/211-87",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.87",
+   "slug": "211-87",
+   "code": "21 CFR 211.87",
+   "title": "Retesting of approved components, drug product containers, and closures.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart E—Control of Components and Drug Product Containers and Closures"
+   ],
+   "text": "Components, drug product containers, and closures shall be retested or reexamined, as appropriate, for identity, strength, quality, and purity and approved or rejected by the quality control unit in accordance with § 211.84 as necessary, e.g., after storage for long periods or after exposure to air, heat or other conditions that might adversely affect the component, drug product container, or closure.",
+   "notes": [],
+   "chars": 404,
+   "sha": "d00f0e0aeceaece4",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.87"
+  },
+  {
+   "id": "cfr21/211/211-89",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.89",
+   "slug": "211-89",
+   "code": "21 CFR 211.89",
+   "title": "Rejected components, drug product containers, and closures.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart E—Control of Components and Drug Product Containers and Closures"
+   ],
+   "text": "Rejected components, drug product containers, and closures shall be identified and controlled under a quarantine system designed to prevent their use in manufacturing or processing operations for which they are unsuitable.",
+   "notes": [],
+   "chars": 222,
+   "sha": "41a0e63bb3e9d8c8",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.89"
+  },
+  {
+   "id": "cfr21/211/211-94",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.94",
+   "slug": "211-94",
+   "code": "21 CFR 211.94",
+   "title": "Drug product containers and closures.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart E—Control of Components and Drug Product Containers and Closures"
+   ],
+   "text": "(a) Drug product containers and closures shall not be reactive, additive, or absorptive so as to alter the safety, identity, strength, quality, or purity of the drug beyond the official or established requirements.\n\n(b) Container closure systems shall provide adequate protection against foreseeable external factors in storage and use that can cause deterioration or contamination of the drug product.\n\n(c) Drug product containers and closures shall be clean and, where indicated by the nature of the drug, sterilized and processed to remove pyrogenic properties to assure that they are suitable for their intended use. Such depyrogenation processes shall be validated.\n\n(d) Standards or specifications, methods of testing, and, where indicated, methods of cleaning, sterilizing, and processing to remove pyrogenic properties shall be written and followed for drug product containers and closures.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 73 FR 51932, Sept. 8, 2008; 81 FR 81697, Nov. 18, 2016; 89 FR 51769, June 18, 2024]"
+   ],
+   "chars": 898,
+   "sha": "9c0713caa4479512",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.94"
+  },
+  {
+   "id": "cfr21/211/211-100",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.100",
+   "slug": "211-100",
+   "code": "21 CFR 211.100",
+   "title": "Written procedures; deviations.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "(a) There shall be written procedures for production and process control designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess. Such procedures shall include all requirements in this subpart. These written procedures, including any changes, shall be drafted, reviewed, and approved by the appropriate organizational units and reviewed and approved by the quality control unit.\n\n(b) Written production and process control procedures shall be followed in the execution of the various production and process control functions and shall be documented at the time of performance. Any deviation from the written procedures shall be recorded and justified.",
+   "notes": [],
+   "chars": 729,
+   "sha": "3a2729e47dbebbb1",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.100"
+  },
+  {
+   "id": "cfr21/211/211-101",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.101",
+   "slug": "211-101",
+   "code": "21 CFR 211.101",
+   "title": "Charge-in of components.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "Written production and control procedures shall include the following, which are designed to assure that the drug products produced have the identity, strength, quality, and purity they purport or are represented to possess:\n\n(a) The batch shall be formulated with the intent to provide not less than 100 percent of the labeled or established amount of active ingredient.\n\n(b) Components for drug product manufacturing shall be weighed, measured, or subdivided as appropriate. If a component is removed from the original container to another, the new container shall be identified with the following information:\n\n(1) Component name or item code;\n\n(2) Receiving or control number;\n\n(3) Weight or measure in new container;\n\n(4) Batch for which component was dispensed, including its product name, strength, and lot number.\n\n(c) Weighing, measuring, or subdividing operations for components shall be adequately supervised. Each container of component dispensed to manufacturing shall be examined by a second person to assure that:\n\n(1) The component was released by the quality control unit;\n\n(2) The weight or measure is correct as stated in the batch production records;\n\n(3) The containers are properly identified. If the weighing, measuring, or subdividing operations are performed by automated equipment under § 211.68, only one person is needed to assure paragraphs (c)(1), (c)(2), and (c)(3) of this section.\n\n(d) Each component shall either be added to the batch by one person and verified by a second person or, if the components are added by automated equipment under § 211.68, only verified by one person.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 1614,
+   "sha": "3afdc8c10aab0708",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.101"
+  },
+  {
+   "id": "cfr21/211/211-103",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.103",
+   "slug": "211-103",
+   "code": "21 CFR 211.103",
+   "title": "Calculation of yield.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "Actual yields and percentages of theoretical yield shall be determined at the conclusion of each appropriate phase of manufacturing, processing, packaging, or holding of the drug product. Such calculations shall either be performed by one person and independently verified by a second person, or, if the yield is calculated by automated equipment under § 211.68, be independently verified by one person.",
+   "notes": [
+    "[73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 403,
+   "sha": "89d3b62316564fe4",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.103"
+  },
+  {
+   "id": "cfr21/211/211-105",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.105",
+   "slug": "211-105",
+   "code": "21 CFR 211.105",
+   "title": "Equipment identification.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "(a) All compounding and storage containers, processing lines, and major equipment used during the production of a batch of a drug product shall be properly identified at all times to indicate their contents and, when necessary, the phase of processing of the batch.\n\n(b) Major equipment shall be identified by a distinctive identification number or code that shall be recorded in the batch production record to show the specific equipment used in the manufacture of each batch of a drug product. In cases where only one of a particular type of equipment exists in a manufacturing facility, the name of the equipment may be used in lieu of a distinctive identification number or code.",
+   "notes": [],
+   "chars": 683,
+   "sha": "81614335f061707f",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.105"
+  },
+  {
+   "id": "cfr21/211/211-110",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.110",
+   "slug": "211-110",
+   "code": "21 CFR 211.110",
+   "title": "Sampling and testing of in-process materials and drug products.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "(a) To assure batch uniformity and integrity of drug products, written procedures shall be established and followed that describe the in-process controls, and tests, or examinations to be conducted on appropriate samples of in-process materials of each batch. Such control procedures shall be established to monitor the output and to validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product. Such control procedures shall include, but are not limited to, the following, where appropriate:\n\n(1) Tablet or capsule weight variation;\n\n(2) Disintegration time;\n\n(3) Adequacy of mixing to assure uniformity and homogeneity;\n\n(4) Dissolution time and rate;\n\n(5) Clarity, completeness, or pH of solutions.\n\n(6) Bioburden testing.\n\n(b) Valid in-process specifications for such characteristics shall be consistent with drug product final specifications and shall be derived from previous acceptable process average and process variability estimates where possible and determined by the application of suitable statistical procedures where appropriate. Examination and testing of samples shall assure that the drug product and in-process material conform to specifications.\n\n(c) In-process materials shall be tested for identity, strength, quality, and purity as appropriate, and approved or rejected by the quality control unit, during the production process, e.g., at commencement or completion of significant phases or after storage for long periods.\n\n(d) Rejected in-process materials shall be identified and controlled under a quarantine system designed to prevent their use in manufacturing or processing operations for which they are unsuitable.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 1757,
+   "sha": "d8c3365c0233492d",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.110"
+  },
+  {
+   "id": "cfr21/211/211-111",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.111",
+   "slug": "211-111",
+   "code": "21 CFR 211.111",
+   "title": "Time limitations on production.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "When appropriate, time limits for the completion of each phase of production shall be established to assure the quality of the drug product. Deviation from established time limits may be acceptable if such deviation does not compromise the quality of the drug product. Such deviation shall be justified and documented.",
+   "notes": [],
+   "chars": 318,
+   "sha": "64d19f8fcf7c36a2",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.111"
+  },
+  {
+   "id": "cfr21/211/211-113",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.113",
+   "slug": "211-113",
+   "code": "21 CFR 211.113",
+   "title": "Control of microbiological contamination.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "(a) Appropriate written procedures, designed to prevent objectionable microorganisms in drug products not required to be sterile, shall be established and followed.\n\n(b) Appropriate written procedures, designed to prevent microbiological contamination of drug products purporting to be sterile, shall be established and followed. Such procedures shall include validation of all aseptic and sterilization processes.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 414,
+   "sha": "bf20719b89de4961",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.113"
+  },
+  {
+   "id": "cfr21/211/211-115",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.115",
+   "slug": "211-115",
+   "code": "21 CFR 211.115",
+   "title": "Reprocessing.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "(a) Written procedures shall be established and followed prescribing a system for reprocessing batches that do not conform to standards or specifications and the steps to be taken to insure that the reprocessed batches will conform with all established standards, specifications, and characteristics.\n\n(b) Reprocessing shall not be performed without the review and approval of the quality control unit.",
+   "notes": [],
+   "chars": 402,
+   "sha": "025015e33c72e660",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.115"
+  },
+  {
+   "id": "cfr21/211/211-122",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.122",
+   "slug": "211-122",
+   "code": "21 CFR 211.122",
+   "title": "Materials examination and usage criteria.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart G—Packaging and Labeling Control"
+   ],
+   "text": "(a) There shall be written procedures describing in sufficient detail the receipt, identification, storage, handling, sampling, examination, and/or testing of labeling and packaging materials; such written procedures shall be followed. Labeling and packaging materials shall be representatively sampled, and examined or tested upon receipt and before use in packaging or labeling of a drug product.\n\n(b) Any labeling or packaging materials meeting appropriate written specifications may be approved and released for use. Any labeling or packaging materials that do not meet such specifications shall be rejected to prevent their use in operations for which they are unsuitable.\n\n(c) Records shall be maintained for each shipment received of each different labeling and packaging material indicating receipt, examination or testing, and whether accepted or rejected.\n\n(d) Labels and other labeling materials for each different drug product, strength, dosage form, or quantity of contents shall be stored separately with suitable identification. Access to the storage area shall be limited to authorized personnel.\n\n(e) Obsolete and outdated labels, labeling, and other packaging materials shall be destroyed.\n\n(f) Use of gang-printed labeling for different drug products, or different strengths or net contents of the same drug product, is prohibited unless the labeling from gang-printed sheets is adequately differentiated by size, shape, or color.\n\n(g) If cut labeling is used for immediate container labels, individual unit cartons, or multiunit cartons containing immediate containers that are not packaged in individual unit cartons, packaging and labeling operations shall include one of the following special control procedures:\n\n(1) Dedication of labeling and packaging lines to each different strength of each different drug product;\n\n(2) Use of appropriate electronic or electromechanical equipment to conduct a 100-percent examination for correct labeling during or after completion of finishing operations; or\n\n(3) Use of visual inspection to conduct a 100-percent examination for correct labeling during or after completion of finishing operations for hand-applied labeling. Such examination shall be performed by one person and independently verified by a second person.\n\n(4) Use of any automated technique, including differentiation by labeling size and shape, that physically prevents incorrect labeling from being processed by labeling and packaging equipment.\n\n(h) Printing devices on, or associated with, manufacturing lines used to imprint labeling upon the drug product unit label or case shall be monitored to assure that all imprinting conforms to the print specified in the batch production record.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 58 FR 41353, Aug. 3, 1993; 77 FR 16163, Mar. 20, 2012]"
+   ],
+   "chars": 2722,
+   "sha": "18bc03f0cfb1bd62",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.122"
+  },
+  {
+   "id": "cfr21/211/211-125",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.125",
+   "slug": "211-125",
+   "code": "21 CFR 211.125",
+   "title": "Labeling issuance.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart G—Packaging and Labeling Control"
+   ],
+   "text": "(a) Strict control shall be exercised over labeling issued for use in drug product labeling operations.\n\n(b) Labeling materials issued for a batch shall be carefully examined for identity and conformity to the labeling specified in the master or batch production records.\n\n(c) Procedures shall be used to reconcile the quantities of labeling issued, used, and returned, and shall require evaluation of discrepancies found between the quantity of drug product finished and the quantity of labeling issued when such discrepancies are outside narrow preset limits based on historical operating data. Such discrepancies shall be investigated in accordance with § 211.192. Labeling reconciliation is waived for cut or roll labeling if a 100-percent examination for correct labeling is performed in accordance with § 211.122(g)(2).\n\n(d) All excess labeling bearing lot or control numbers shall be destroyed.\n\n(e) Returned labeling shall be maintained and stored in a manner to prevent mixups and provide proper identification.\n\n(f) Procedures shall be written describing in sufficient detail the control procedures employed for the issuance of labeling; such written procedures shall be followed.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 58 FR 41354, Aug. 3, 1993; 81 FR 81697, Nov. 18, 2016; 89 FR 51769, June 18, 2024]"
+   ],
+   "chars": 1190,
+   "sha": "1a8cb3d688f17d4f",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.125"
+  },
+  {
+   "id": "cfr21/211/211-130",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.130",
+   "slug": "211-130",
+   "code": "21 CFR 211.130",
+   "title": "Packaging and labeling operations.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart G—Packaging and Labeling Control"
+   ],
+   "text": "There shall be written procedures designed to assure that correct labels, labeling, and packaging materials are used for drug products; such written procedures shall be followed. These procedures shall incorporate the following features:\n\n(a) Prevention of mixups and cross-contamination by physical or spatial separation from operations on other drug products.\n\n(b) Identification and handling of filled drug product containers that are set aside and held in unlabeled condition for future labeling operations to preclude mislabeling of individual containers, lots, or portions of lots. Identification need not be applied to each individual container but shall be sufficient to determine name, strength, quantity of contents, and lot or control number of each container.\n\n(c) Identification of the drug product with a lot or control number that permits determination of the history of the manufacture and control of the batch.\n\n(d) Examination of packaging and labeling materials for suitability and correctness before packaging operations, and documentation of such examination in the batch production record.\n\n(e) Inspection of the packaging and labeling facilities immediately before use to assure that all drug products have been removed from previous operations. Inspection shall also be made to assure that packaging and labeling materials not suitable for subsequent operations have been removed. Results of inspection shall be documented in the batch production records.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 58 FR 41354, Aug. 3, 1993]"
+   ],
+   "chars": 1479,
+   "sha": "2ee2ff7be139c8e5",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.130"
+  },
+  {
+   "id": "cfr21/211/211-132",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.132",
+   "slug": "211-132",
+   "code": "21 CFR 211.132",
+   "title": "Tamper-evident packaging requirements for over-the-counter (OTC) human drug products.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart G—Packaging and Labeling Control"
+   ],
+   "text": "(a) General. The Food and Drug Administration has the authority under the Federal Food, Drug, and Cosmetic Act (the act) to establish a uniform national requirement for tamper-evident packaging of OTC drug products that will improve the security of OTC drug packaging and help assure the safety and effectiveness of OTC drug products. An OTC drug product (except a dermatological, dentifrice, insulin, or lozenge product) for retail sale that is not packaged in a tamper-resistant package or that is not properly labeled under this section is adulterated under section 501 of the act or misbranded under section 502 of the act, or both.\n\n(b) Requirements for tamper-evident package. (1) Each manufacturer and packer who packages an OTC drug product (except a dermatological, dentifrice, insulin, or lozenge product) for retail sale shall package the product in a tamper-evident package, if this product is accessible to the public while held for sale. A tamper-evident package is one having one or more indicators or barriers to entry which, if breached or missing, can reasonably be expected to provide visible evidence to consumers that tampering has occurred. To reduce the likelihood of successful tampering and to increase the likelihood that consumers will discover if a product has been tampered with, the package is required to be distinctive by design or by the use of one or more indicators or barriers to entry that employ an identifying characteristic (e.g., a pattern, name, registered trademark, logo, or picture). For purposes of this section, the term “distinctive by design” means the packaging cannot be duplicated with commonly available materials or through commonly available processes. A tamper-evident package may involve an immediate-container and closure system or secondary-container or carton system or any combination of systems intended to provide a visual indication of package integrity. The tamper-evident feature shall be designed to and shall remain intact when handled in a reasonable manner during manufacture, distribution, and retail display.\n\n(2) In addition to the tamper-evident packaging feature described in paragraph (b)(1) of this section, any two-piece, hard gelatin capsule covered by this section must be sealed using an acceptable tamper-evident technology.\n\n(c) Labeling. (1) In order to alert consumers to the specific tamper-evident feature(s) used, each retail package of an OTC drug product covered by this section (except ammonia inhalant in crushable glass ampules or aerosol products that depend upon the power of a liquefied or compressed gas to expel the contents from the container) is required to bear a statement that:\n\n(i) Identifies all tamper-evident feature(s) and any capsule sealing technologies used to comply with paragraph (b) of this section;\n\n(ii) Is prominently placed on the package; and\n\n(iii) Is so placed that it will be unaffected if the tamper-evident feature of the package is breached or missing.\n\n(2) If the tamper-evident feature chosen to meet the requirements in paragraph (b) of this section uses an identifying characteristic, that characteristic is required to be referred to in the labeling statement. For example, the labeling statement on a bottle with a shrink band could say “For your protection, this bottle has an imprinted seal around the neck.”\n\n(d) Request for exemptions from packaging and labeling requirements. A manufacturer or packer may request an exemption from the packaging and labeling requirements of this section. A request for an exemption is required to be submitted in the form of a citizen petition under § 10.30 of this chapter and should be clearly identified on the envelope as a “Request for Exemption from the Tamper-Evident Packaging Rule.” The petition is required to contain the following:\n\n(1) The name of the drug product or, if the petition seeks an exemption for a drug class, the name of the drug class, and a list of products within that class.\n\n(2) The reasons that the drug product's compliance with the tamper-evident packaging or labeling requirements of this section is unnecessary or cannot be achieved.\n\n(3) A description of alternative steps that are available, or that the petitioner has already taken, to reduce the likelihood that the product or drug class will be the subject of malicious adulteration.\n\n(4) Other information justifying an exemption.\n\n(e) OTC drug products subject to approved new drug applications. Holders of approved new drug applications for OTC drug products are required under § 314.70 of this chapter to provide the agency with notification of changes in packaging and labeling to comply with the requirements of this section. Changes in packaging and labeling required by this regulation may be made before FDA approval, as provided under § 314.70(c) of this chapter. Manufacturing changes by which capsules are to be sealed require prior FDA approval under § 314.70(b) of this chapter.\n\n(f) Poison Prevention Packaging Act of 1970. This section does not affect any requirements for “special packaging” as defined under § 310.3(l) of this chapter and required under the Poison Prevention Packaging Act of 1970.\n\n(Approved by the Office of Management and Budget under OMB control number 0910-0149)",
+   "notes": [
+    "[54 FR 5228, Feb. 2, 1989, as amended at 63 FR 59470, Nov. 4, 1998; 89 FR 51769, June 18, 2024]"
+   ],
+   "chars": 5262,
+   "sha": "557f7a730450db10",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.132"
+  },
+  {
+   "id": "cfr21/211/211-134",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.134",
+   "slug": "211-134",
+   "code": "21 CFR 211.134",
+   "title": "Drug product inspection.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart G—Packaging and Labeling Control"
+   ],
+   "text": "(a) Packaged and labeled products shall be examined during finishing operations to provide assurance that containers and packages in the lot have the correct label.\n\n(b) A representative sample of units shall be collected at the completion of finishing operations and shall be visually examined for correct labeling.\n\n(c) Results of these examinations shall be recorded in the batch production or control records.",
+   "notes": [],
+   "chars": 413,
+   "sha": "81ddc20a34ec6153",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.134"
+  },
+  {
+   "id": "cfr21/211/211-137",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.137",
+   "slug": "211-137",
+   "code": "21 CFR 211.137",
+   "title": "Expiration dating.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart G—Packaging and Labeling Control"
+   ],
+   "text": "(a) To assure that a drug product meets applicable standards of identity, strength, quality, and purity at the time of use, it shall bear an expiration date determined by appropriate stability testing described in § 211.166.\n\n(b) Expiration dates shall be related to any storage conditions stated on the labeling, as determined by stability studies described in § 211.166.\n\n(c) If the drug product is to be reconstituted at the time of dispensing, its labeling shall bear expiration information for both the reconstituted and unreconstituted drug products.\n\n(d) Expiration dates shall appear on labeling in accordance with the requirements of § 201.17 of this chapter.\n\n(e) Homeopathic drug products shall be exempt from the requirements of this section.\n\n(f) Allergenic extracts that are labeled “No U.S. Standard of Potency” are exempt from the requirements of this section.\n\n(g) New drug products for investigational use are exempt from the requirements of this section, provided that they meet appropriate standards or specifications as demonstrated by stability studies during their use in clinical investigations. Where new drug products for investigational use are to be reconstituted at the time of dispensing, their labeling shall bear expiration information for the reconstituted drug product.\n\n(h) Pending consideration of a proposed exemption, published in the Federal Register of September 29, 1978, the requirements in this section shall not be enforced for human OTC drug products if their labeling does not bear dosage limitations and they are stable for at least 3 years as supported by appropriate stability data.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 46 FR 56412, Nov. 17, 1981; 60 FR 4091, Jan. 20, 1995]"
+   ],
+   "chars": 1631,
+   "sha": "2160b7f23b764dea",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.137"
+  },
+  {
+   "id": "cfr21/211/211-142",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.142",
+   "slug": "211-142",
+   "code": "21 CFR 211.142",
+   "title": "Warehousing procedures.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart H—Holding and Distribution"
+   ],
+   "text": "Written procedures describing the warehousing of drug products shall be established and followed. They shall include:\n\n(a) Quarantine of drug products before release by the quality control unit.\n\n(b) Storage of drug products under appropriate conditions of temperature, humidity, and light so that the identity, strength, quality, and purity of the drug products are not affected.",
+   "notes": [],
+   "chars": 380,
+   "sha": "da6594c60e95a770",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.142"
+  },
+  {
+   "id": "cfr21/211/211-150",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.150",
+   "slug": "211-150",
+   "code": "21 CFR 211.150",
+   "title": "Distribution procedures.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart H—Holding and Distribution"
+   ],
+   "text": "Written procedures shall be established, and followed, describing the distribution of drug products. They shall include:\n\n(a) A procedure whereby the oldest approved stock of a drug product is distributed first. Deviation from this requirement is permitted if such deviation is temporary and appropriate.\n\n(b) A system by which the distribution of each lot of drug product can be readily determined to facilitate its recall if necessary.",
+   "notes": [],
+   "chars": 437,
+   "sha": "de60bbd27fcacaa9",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.150"
+  },
+  {
+   "id": "cfr21/211/211-160",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.160",
+   "slug": "211-160",
+   "code": "21 CFR 211.160",
+   "title": "General requirements.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart I—Laboratory Controls"
+   ],
+   "text": "(a) The establishment of any specifications, standards, sampling plans, test procedures, or other laboratory control mechanisms required by this subpart, including any change in such specifications, standards, sampling plans, test procedures, or other laboratory control mechanisms, shall be drafted by the appropriate organizational unit and reviewed and approved by the quality control unit. The requirements in this subpart shall be followed and shall be documented at the time of performance. Any deviation from the written specifications, standards, sampling plans, test procedures, or other laboratory control mechanisms shall be recorded and justified.\n\n(b) Laboratory controls shall include the establishment of scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity. Laboratory controls shall include:\n\n(1) Determination of conformity to applicable written specifications for the acceptance of each lot within each shipment of components, drug product containers, closures, and labeling used in the manufacture, processing, packing, or holding of drug products. The specifications shall include a description of the sampling and testing procedures used. Samples shall be representative and adequately identified. Such procedures shall also require appropriate retesting of any component, drug product container, or closure that is subject to deterioration.\n\n(2) Determination of conformance to written specifications and a description of sampling and testing procedures for in-process materials. Such samples shall be representative and properly identified.\n\n(3) Determination of conformance to written descriptions of sampling procedures and appropriate specifications for drug products. Such samples shall be representative and properly identified.\n\n(4) The calibration of instruments, apparatus, gauges, and recording devices at suitable intervals in accordance with an established written program containing specific directions, schedules, limits for accuracy and precision, and provisions for remedial action in the event accuracy and/or precision limits are not met. Instruments, apparatus, gauges, and recording devices not meeting established specifications shall not be used.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 73 FR 51932, Sept. 8, 2008]"
+   ],
+   "chars": 2435,
+   "sha": "8a58856a5d72512d",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.160"
+  },
+  {
+   "id": "cfr21/211/211-165",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.165",
+   "slug": "211-165",
+   "code": "21 CFR 211.165",
+   "title": "Testing and release for distribution.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart I—Laboratory Controls"
+   ],
+   "text": "(a) For each batch of drug product, there shall be appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release. Where sterility and/or pyrogen testing are conducted on specific batches of shortlived radiopharmaceuticals, such batches may be released prior to completion of sterility and/or pyrogen testing, provided such testing is completed as soon as possible.\n\n(b) There shall be appropriate laboratory testing, as necessary, of each batch of drug product required to be free of objectionable microorganisms.\n\n(c) Any sampling and testing plans shall be described in written procedures that shall include the method of sampling and the number of units per batch to be tested; such written procedure shall be followed.\n\n(d) Acceptance criteria for the sampling and testing conducted by the quality control unit shall be adequate to assure that batches of drug products meet each appropriate specification and appropriate statistical quality control criteria as a condition for their approval and release. The statistical quality control criteria shall include appropriate acceptance levels and/or appropriate rejection levels.\n\n(e) The accuracy, sensitivity, specificity, and reproducibility of test methods employed by the firm shall be established and documented. Such validation and documentation may be accomplished in accordance with § 211.194(a)(2).\n\n(f) Drug products failing to meet established standards or specifications and any other relevant quality control criteria shall be rejected. Reprocessing may be performed. Prior to acceptance and use, reprocessed material must meet appropriate standards, specifications, and any other relevant criteria.",
+   "notes": [],
+   "chars": 1793,
+   "sha": "120f0924a3522e21",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.165"
+  },
+  {
+   "id": "cfr21/211/211-166",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.166",
+   "slug": "211-166",
+   "code": "21 CFR 211.166",
+   "title": "Stability testing.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart I—Laboratory Controls"
+   ],
+   "text": "(a) There shall be a written testing program designed to assess the stability characteristics of drug products. The results of such stability testing shall be used in determining appropriate storage conditions and expiration dates. The written program shall be followed and shall include:\n\n(1) Sample size and test intervals based on statistical criteria for each attribute examined to assure valid estimates of stability;\n\n(2) Storage conditions for samples retained for testing;\n\n(3) Reliable, meaningful, and specific test methods;\n\n(4) Testing of the drug product in the same container-closure system as that in which the drug product is marketed;\n\n(5) Testing of drug products for reconstitution at the time of dispensing (as directed in the labeling) as well as after they are reconstituted.\n\n(b) An adequate number of batches of each drug product shall be tested to determine an appropriate expiration date and a record of such data shall be maintained. Accelerated studies, combined with basic stability information on the components, drug products, and container-closure system, may be used to support tentative expiration dates provided full shelf life studies are not available and are being conducted. Where data from accelerated studies are used to project a tentative expiration date that is beyond a date supported by actual shelf life studies, there must be stability studies conducted, including drug product testing at appropriate intervals, until the tentative expiration date is verified or the appropriate expiration date determined.\n\n(c) For homeopathic drug products, the requirements of this section are as follows:\n\n(1) There shall be a written assessment of stability based at least on testing or examination of the drug product for compatibility of the ingredients, and based on marketing experience with the drug product to indicate that there is no degradation of the product for the normal or expected period of use.\n\n(2) Evaluation of stability shall be based on the same container-closure system in which the drug product is being marketed.\n\n(d) Allergenic extracts that are labeled “No U.S. Standard of Potency” are exempt from the requirements of this section.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 46 FR 56412, Nov. 17, 1981]"
+   ],
+   "chars": 2194,
+   "sha": "e886f4d44c7173c6",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.166"
+  },
+  {
+   "id": "cfr21/211/211-167",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.167",
+   "slug": "211-167",
+   "code": "21 CFR 211.167",
+   "title": "Special testing requirements.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart I—Laboratory Controls"
+   ],
+   "text": "(a) For each batch of drug product purporting to be sterile and/or pyrogen-free, there shall be appropriate laboratory testing to determine conformance to such requirements. The test procedures shall be in writing and shall be followed.\n\n(b) For each batch of ophthalmic ointment, there shall be appropriate testing to determine conformance to specifications regarding the presence of foreign particles and harsh or abrasive substances. The test procedures shall be in writing and shall be followed.\n\n(c) For each batch of controlled-release dosage form, there shall be appropriate laboratory testing to determine conformance to the specifications for the rate of release of each active ingredient. The test procedures shall be in writing and shall be followed.",
+   "notes": [],
+   "chars": 761,
+   "sha": "a2457cc389a0db22",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.167"
+  },
+  {
+   "id": "cfr21/211/211-170",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.170",
+   "slug": "211-170",
+   "code": "21 CFR 211.170",
+   "title": "Reserve samples.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart I—Laboratory Controls"
+   ],
+   "text": "(a) An appropriately identified reserve sample that is representative of each lot in each shipment of each active ingredient shall be retained. The reserve sample consists of at least twice the quantity necessary for all tests required to determine whether the active ingredient meets its established specifications, except for sterility and pyrogen testing. The retention time is as follows:\n\n(1) For an active ingredient in a drug product other than those described in paragraphs (a) (2) and (3) of this section, the reserve sample shall be retained for 1 year after the expiration date of the last lot of the drug product containing the active ingredient.\n\n(2) For an active ingredient in a radioactive drug product, except for nonradioactive reagent kits, the reserve sample shall be retained for:\n\n(i) Three months after the expiration date of the last lot of the drug product containing the active ingredient if the expiration dating period of the drug product is 30 days or less; or\n\n(ii) Six months after the expiration date of the last lot of the drug product containing the active ingredient if the expiration dating period of the drug product is more than 30 days.\n\n(3) For an active ingredient in an OTC drug product that is exempt from bearing an expiration date under § 211.137, the reserve sample shall be retained for 3 years after distribution of the last lot of the drug product containing the active ingredient.\n\n(b) An appropriately identified reserve sample that is representative of each lot or batch of drug product shall be retained and stored under conditions consistent with product labeling. The reserve sample shall be stored in the same immediate container-closure system in which the drug product is marketed or in one that has essentially the same characteristics. The reserve sample consists of at least twice the quantity necessary to perform all the required tests, except those for sterility and pyrogens. Except for those for drug products described in paragraph (b)(2) of this section, reserve samples from representative sample lots or batches selected by acceptable statistical procedures shall be examined visually at least once a year for evidence of deterioration unless visual examination would affect the integrity of the reserve sample. Any evidence of reserve sample deterioration shall be investigated in accordance with § 211.192. The results of the examination shall be recorded and maintained with other stability data on the drug product. The retention time is as follows:\n\n(1) For a drug product other than those described in paragraphs (b) (2) and (3) of this section, the reserve sample shall be retained for 1 year after the expiration date of the drug product.\n\n(2) For a radioactive drug product, except for nonradioactive reagent kits, the reserve sample shall be retained for:\n\n(i) Three months after the expiration date of the drug product if the expiration dating period of the drug product is 30 days or less; or\n\n(ii) Six months after the expiration date of the drug product if the expiration dating period of the drug product is more than 30 days.\n\n(3) For an OTC drug product that is exempt for bearing an expiration date under § 211.137, the reserve sample must be retained for 3 years after the lot or batch of drug product is distributed.",
+   "notes": [
+    "[48 FR 13025, Mar. 29, 1983, as amended at 60 FR 4091, Jan. 20, 1995; 89 FR 51770, June 18, 2024]"
+   ],
+   "chars": 3306,
+   "sha": "07f128c2defc52a7",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.170"
+  },
+  {
+   "id": "cfr21/211/211-173",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.173",
+   "slug": "211-173",
+   "code": "21 CFR 211.173",
+   "title": "Laboratory animals.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart I—Laboratory Controls"
+   ],
+   "text": "Animals used in testing components, in-process materials, or drug products for compliance with established specifications shall be maintained and controlled in a manner that assures their suitability for their intended use. They shall be identified, and adequate records shall be maintained showing the history of their use.",
+   "notes": [],
+   "chars": 324,
+   "sha": "ea7302c28cd51568",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.173"
+  },
+  {
+   "id": "cfr21/211/211-176",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.176",
+   "slug": "211-176",
+   "code": "21 CFR 211.176",
+   "title": "Penicillin contamination.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart I—Laboratory Controls"
+   ],
+   "text": "If a reasonable possibility exists that a non-penicillin drug product has been exposed to cross-contamination with penicillin, the non-penicillin drug product shall be tested for the presence of penicillin. Such drug product shall not be marketed if detectable levels are found when tested according to procedures specified in ‘Procedures for Detecting and Measuring Penicillin Contamination in Drugs,’ which is incorporated by reference. Copies are available from the Division of Research and Testing (HFD-470), Center for Drug Evaluation and Research, Food and Drug Administration, 5001 Campus Dr., College Park, MD 20740, or available for inspection at the National Archives and Records Administration (NARA). For information on the availability of this material at NARA, call 202-741-6030, or go to: http://www.archives.gov/federal_register/code_of_federal_regulations/ibr_locations.html.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 47 FR 9396, Mar. 5, 1982; 50 FR 8996, Mar. 6, 1985; 55 FR 11577, Mar. 29, 1990; 66 FR 56035, Nov. 6, 2001; 69 FR 18803, Apr. 9, 2004; 81 FR 49897, July 29, 2016]"
+   ],
+   "chars": 892,
+   "sha": "dc3c94f1552ac5e0",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.176"
+  },
+  {
+   "id": "cfr21/211/211-180",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.180",
+   "slug": "211-180",
+   "code": "21 CFR 211.180",
+   "title": "General requirements.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "(a) Any production, control, or distribution record that is required to be maintained in compliance with this part and is specifically associated with a batch of a drug product shall be retained for at least 1 year after the expiration date of the batch or, in the case of certain OTC drug products lacking expiration dating because they meet the criteria for exemption under § 211.137, 3 years after distribution of the batch.\n\n(b) Records shall be maintained for all components, drug product containers, closures, and labeling for at least 1 year after the expiration date or, in the case of certain OTC drug products lacking expiration dating because they meet the criteria for exemption under § 211.137, 3 years after distribution of the last lot of drug product incorporating the component or using the container, closure, or labeling.\n\n(c) All records required under this part, or copies of such records, shall be readily available for authorized inspection during the retention period at the establishment where the activities described in such records occurred. These records or copies thereof shall be subject to photocopying or other means of reproduction as part of such inspection. Records that can be immediately retrieved from another location by computer or other electronic means shall be considered as meeting the requirements of this paragraph.\n\n(d) Records required under this part may be retained either as original records or as true copies such as photocopies, microfilm, microfiche, or other accurate reproductions of the original records. Where reduction techniques, such as microfilming, are used, suitable reader and photocopying equipment shall be readily available.\n\n(e) Written records required by this part shall be maintained so that data therein can be used for evaluating, at least annually, the quality standards of each drug product to determine the need for changes in drug product specifications or manufacturing or control procedures. Written procedures shall be established and followed for such evaluations and shall include provisions for:\n\n(1) A review of a representative number of batches, whether approved or rejected, and, where applicable, records associated with the batch.\n\n(2) A review of complaints, recalls, returned or salvaged drug products, and investigations conducted under § 211.192 for each drug product.\n\n(f) Procedures shall be established to assure that the responsible officials of the firm, if they are not personally involved in or immediately aware of such actions, are notified in writing of any investigations conducted under §§ 211.198, 211.204, or 211.208 of these regulations, any recalls, reports of inspectional observations issued by the Food and Drug Administration, or any regulatory actions relating to good manufacturing practices brought by the Food and Drug Administration.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 60 FR 4091, Jan. 20, 1995]"
+   ],
+   "chars": 2853,
+   "sha": "1a78aa130fa84879",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.180"
+  },
+  {
+   "id": "cfr21/211/211-182",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.182",
+   "slug": "211-182",
+   "code": "21 CFR 211.182",
+   "title": "Equipment cleaning and use log.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "A written record of major equipment cleaning, maintenance (except routine maintenance such as lubrication and adjustments), and use shall be included in individual equipment logs that show the date, time, product, and lot number of each batch processed. If equipment is dedicated to manufacture of one product, then individual equipment logs are not required, provided that lots or batches of such product follow in numerical order and are manufactured in numerical sequence. In cases where dedicated equipment is employed, the records of cleaning, maintenance, and use shall be part of the batch record. The persons performing and double-checking the cleaning and maintenance (or, if the cleaning and maintenance is performed using automated equipment under § 211.68, just the person verifying the cleaning and maintenance done by the automated equipment) shall date and sign or initial the log indicating that the work was performed. Entries in the log shall be in chronological order.",
+   "notes": [
+    "[73 FR 51933, Sept. 8, 2008]"
+   ],
+   "chars": 987,
+   "sha": "ac5a5eed56baf5b4",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.182"
+  },
+  {
+   "id": "cfr21/211/211-184",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.184",
+   "slug": "211-184",
+   "code": "21 CFR 211.184",
+   "title": "Component, drug product container, closure, and labeling records.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "These records shall include the following:\n\n(a) The identity and quantity of each shipment of each lot of components, drug product containers, closures, and labeling; the name of the supplier; the supplier's lot number(s) if known; the receiving code as specified in § 211.80; and the date of receipt. The name and location of the prime manufacturer, if different from the supplier, shall be listed if known.\n\n(b) The results of any test or examination performed (including those performed as required by § 211.82(a), § 211.84(d), or § 211.122(a)) and the conclusions derived therefrom.\n\n(c) An individual inventory record of each component, drug product container, and closure and, for each component, a reconciliation of the use of each lot of such component. The inventory record shall contain sufficient information to allow determination of any batch or lot of drug product associated with the use of each component, drug product container, and closure.\n\n(d) Documentation of the examination and review of labels and labeling for conformity with established specifications in accord with §§ 211.122(c) and 211.130(c).\n\n(e) The disposition of rejected components, drug product containers, closure, and labeling.",
+   "notes": [],
+   "chars": 1215,
+   "sha": "f06443c3a41f56f1",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.184"
+  },
+  {
+   "id": "cfr21/211/211-186",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.186",
+   "slug": "211-186",
+   "code": "21 CFR 211.186",
+   "title": "Master production and control records.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "(a) To assure uniformity from batch to batch, master production and control records for each drug product, including each batch size thereof, shall be prepared, dated, and signed (full signature, handwritten) by one person and independently checked, dated, and signed by a second person. The preparation of master production and control records shall be described in a written procedure and such written procedure shall be followed.\n\n(b) Master production and control records shall include:\n\n(1) The name and strength of the product and a description of the dosage form;\n\n(2) The name and weight or measure of each active ingredient per dosage unit or per unit of weight or measure of the drug product, and a statement of the total weight or measure of any dosage unit;\n\n(3) A complete list of components designated by names or codes sufficiently specific to indicate any special quality characteristic;\n\n(4) An accurate statement of the weight or measure of each component, using the same weight system (metric, avoirdupois, or apothecary) for each component. Reasonable variations may be permitted, however, in the amount of components necessary for the preparation in the dosage form, provided they are justified in the master production and control records;\n\n(5) A statement concerning any calculated excess of component;\n\n(6) A statement of theoretical weight or measure at appropriate phases of processing;\n\n(7) A statement of theoretical yield, including the maximum and minimum percentages of theoretical yield beyond which investigation according to § 211.192 is required;\n\n(8) A description of the drug product containers, closures, and packaging materials, including a specimen or copy of each label and all other labeling signed and dated by the person or persons responsible for approval of such labeling;\n\n(9) Complete manufacturing and control instructions, sampling and testing procedures, specifications, special notations, and precautions to be followed.",
+   "notes": [],
+   "chars": 1972,
+   "sha": "6c4ee710b8b21ebc",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.186"
+  },
+  {
+   "id": "cfr21/211/211-188",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.188",
+   "slug": "211-188",
+   "code": "21 CFR 211.188",
+   "title": "Batch production and control records.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "Batch production and control records shall be prepared for each batch of drug product produced and shall include complete information relating to the production and control of each batch. These records shall include:\n\n(a) An accurate reproduction of the appropriate master production or control record, checked for accuracy, dated, and signed;\n\n(b) Documentation that each significant step in the manufacture, processing, packing, or holding of the batch was accomplished, including:\n\n(1) Dates;\n\n(2) Identity of individual major equipment and lines used;\n\n(3) Specific identification of each batch of component or in-process material used;\n\n(4) Weights and measures of components used in the course of processing;\n\n(5) In-process and laboratory control results;\n\n(6) Inspection of the packaging and labeling area before and after use;\n\n(7) A statement of the actual yield and a statement of the percentage of theoretical yield at appropriate phases of processing;\n\n(8) Complete labeling control records, including specimens or copies of all labeling used;\n\n(9) Description of drug product containers and closures;\n\n(10) Any sampling performed;\n\n(11) Identification of the persons performing and directly supervising or checking each significant step in the operation, or if a significant step in the operation is performed by automated equipment under § 211.68, the identification of the person checking the significant step performed by the automated equipment.\n\n(12) Any investigation made according to § 211.192.\n\n(13) Results of examinations made in accordance with § 211.134.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 73 FR 51933, Sept. 8, 2008]"
+   ],
+   "chars": 1581,
+   "sha": "f1ffb8afb206243f",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.188"
+  },
+  {
+   "id": "cfr21/211/211-192",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.192",
+   "slug": "211-192",
+   "code": "21 CFR 211.192",
+   "title": "Production record review.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "All drug product production and control records, including those for packaging and labeling, shall be reviewed and approved by the quality control unit to determine compliance with all established, approved written procedures before a batch is released or distributed. Any unexplained discrepancy (including a percentage of theoretical yield exceeding the maximum or minimum percentages established in master production and control records) or the failure of a batch or any of its components to meet any of its specifications shall be thoroughly investigated, whether or not the batch has already been distributed. The investigation shall extend to other batches of the same drug product and other drug products that may have been associated with the specific failure or discrepancy. A written record of the investigation shall be made and shall include the conclusions and followup.",
+   "notes": [],
+   "chars": 883,
+   "sha": "623102175ff6f74f",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.192"
+  },
+  {
+   "id": "cfr21/211/211-194",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.194",
+   "slug": "211-194",
+   "code": "21 CFR 211.194",
+   "title": "Laboratory records.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "(a) Laboratory records shall include complete data derived from all tests necessary to assure compliance with established specifications and standards, including examinations and assays, as follows:\n\n(1) A description of the sample received for testing with identification of source (that is, location from where sample was obtained), quantity, lot number or other distinctive code, date sample was taken, and date sample was received for testing.\n\n(2) A statement of each method used in the testing of the sample. The statement shall indicate the location of data that establish that the methods used in the testing of the sample meet proper standards of accuracy and reliability as applied to the product tested. (If the method employed is in the current revision of the United States Pharmacopeia, National Formulary, AOAC INTERNATIONAL, Book of Methods,\n1\n or in other recognized standard references, or is detailed in an approved new drug application and the referenced method is not modified, a statement indicating the method and reference will suffice). The suitability of all testing methods used shall be verified under actual conditions of use.\n\n1 Copies may be obtained from: AOAC INTERNATIONAL, 481 North Frederick Ave., suite 500, Gaithersburg, MD 20877.\n\n(3) A statement of the weight or measure of sample used for each test, where appropriate.\n\n(4) A complete record of all data secured in the course of each test, including all graphs, charts, and spectra from laboratory instrumentation, properly identified to show the specific component, drug product container, closure, in-process material, or drug product, and lot tested.\n\n(5) A record of all calculations performed in connection with the test, including units of measure, conversion factors, and equivalency factors.\n\n(6) A statement of the results of tests and how the results compare with established standards of identity, strength, quality, and purity for the component, drug product container, closure, in-process material, or drug product tested.\n\n(7) The initials or signature of the person who performs each test and the date(s) the tests were performed.\n\n(8) The initials or signature of a second person showing that the original records have been reviewed for accuracy, completeness, and compliance with established standards.\n\n(b) Complete records shall be maintained of any modification of an established method employed in testing. Such records shall include the reason for the modification and data to verify that the modification produced results that are at least as accurate and reliable for the material being tested as the established method.\n\n(c) Complete records shall be maintained of any testing and standardization of laboratory reference standards, reagents, and standard solutions.\n\n(d) Complete records shall be maintained of the periodic calibration of laboratory instruments, apparatus, gauges, and recording devices required by § 211.160(b)(4).\n\n(e) Complete records shall be maintained of all stability testing performed in accordance with § 211.166.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 55 FR 11577, Mar. 29, 1990; 65 FR 18889, Apr. 10, 2000; 70 FR 40880, July 15, 2005; 70 FR 67651, Nov. 8, 2005]"
+   ],
+   "chars": 3055,
+   "sha": "4d7e03041addbd4b",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.194"
+  },
+  {
+   "id": "cfr21/211/211-196",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.196",
+   "slug": "211-196",
+   "code": "21 CFR 211.196",
+   "title": "Distribution records.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "Distribution records shall contain the name and strength of the product and description of the dosage form, name and address of the consignee, date and quantity shipped, and lot or control number of the drug product.",
+   "notes": [
+    "[89 FR 51770, June 18, 2024]"
+   ],
+   "chars": 216,
+   "sha": "fae610d204b48fd2",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.196"
+  },
+  {
+   "id": "cfr21/211/211-198",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.198",
+   "slug": "211-198",
+   "code": "21 CFR 211.198",
+   "title": "Complaint files.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart J—Records and Reports"
+   ],
+   "text": "(a) Written procedures describing the handling of all written and oral complaints regarding a drug product shall be established and followed. Such procedures shall include provisions for review by the quality control unit, of any complaint involving the possible failure of a drug product to meet any of its specifications and, for such drug products, a determination as to the need for an investigation in accordance with § 211.192. Such procedures shall include provisions for review to determine whether the complaint represents a serious and unexpected adverse drug experience which is required to be reported to the Food and Drug Administration in accordance with §§ 310.305 and 514.80 of this chapter.\n\n(b) A written record of each complaint shall be maintained in a file designated for drug product complaints. The file regarding such drug product complaints shall be maintained at the establishment where the drug product involved was manufactured, processed, or packed, or such file may be maintained at another facility if the written records in such files are readily available for inspection at that other facility. Written records involving a drug product shall be maintained until at least 1 year after the expiration date of the drug product, or 1 year after the date that the complaint was received, whichever is longer. In the case of certain OTC drug products lacking expiration dating because they meet the criteria for exemption under § 211.137, such written records shall be maintained for 3 years after distribution of the drug product.\n\n(1) The written record shall include the following information, where known: the name and strength of the drug product, lot number, name of complainant, nature of complaint, and reply to complainant.\n\n(2) Where an investigation under § 211.192 is conducted, the written record shall include the findings of the investigation and followup. The record or copy of the record of the investigation shall be maintained at the establishment where the investigation occurred in accordance with § 211.180(c).\n\n(3) Where an investigation under § 211.192 is not conducted, the written record shall include the reason that an investigation was found not to be necessary and the name of the responsible person making such a determination.",
+   "notes": [
+    "[43 FR 45077, Sept. 29, 1978, as amended at 51 FR 24479, July 3, 1986; 68 FR 15364, Mar. 31, 2003]"
+   ],
+   "chars": 2285,
+   "sha": "517bcfb6cb6d4172",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.198"
+  },
+  {
+   "id": "cfr21/211/211-204",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.204",
+   "slug": "211-204",
+   "code": "21 CFR 211.204",
+   "title": "Returned drug products.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart K—Returned and Salvaged Drug Products"
+   ],
+   "text": "Returned drug products shall be identified as such and held. If the conditions under which returned drug products have been held, stored, or shipped before or during their return, or if the condition of the drug product, its container, carton, or labeling, as a result of storage or shipping, casts doubt on the safety, identity, strength, quality or purity of the drug product, the returned drug product shall be destroyed unless examination, testing, or other investigations prove the drug product meets appropriate standards of safety, identity, strength, quality, or purity. A drug product may be reprocessed provided the subsequent drug product meets appropriate standards, specifications, and characteristics. Records of returned drug products shall be maintained and shall include the name and label potency of the drug product dosage form, lot number (or control number or batch number), reason for the return, quantity returned, date of disposition, and ultimate disposition of the returned drug product. If the reason for a drug product being returned implicates associated batches, an appropriate investigation shall be conducted in accordance with the requirements of § 211.192. Procedures for the holding, testing, and reprocessing of returned drug products shall be in writing and shall be followed.",
+   "notes": [],
+   "chars": 1313,
+   "sha": "da330c3988936f20",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.204"
+  },
+  {
+   "id": "cfr21/211/211-208",
+   "source": "cfr21",
+   "doc": "211",
+   "number": "211.208",
+   "slug": "211-208",
+   "code": "21 CFR 211.208",
+   "title": "Drug product salvaging.",
+   "path": [
+    "21 CFR Part 211",
+    "Subpart K—Returned and Salvaged Drug Products"
+   ],
+   "text": "Drug products that have been subjected to improper storage conditions including extremes in temperature, humidity, smoke, fumes, pressure, age, or radiation due to natural disasters, fires, accidents, or equipment failures shall not be salvaged and returned to the marketplace. Whenever there is a question whether drug products have been subjected to such conditions, salvaging operations may be conducted only if there is (a) evidence from laboratory tests and assays (including animal feeding studies where applicable) that the drug products meet all applicable standards of identity, strength, quality, and purity and (b) evidence from inspection of the premises that the drug products and their associated packaging were not subjected to improper storage conditions as a result of the disaster or accident. Organoleptic examinations shall be acceptable only as supplemental evidence that the drug products meet appropriate standards of identity, strength, quality, and purity. Records including name, lot number, and disposition shall be maintained for drug products subject to this section.",
+   "notes": [],
+   "chars": 1096,
+   "sha": "736e28f7de4cf0dd",
+   "url": "https://www.ecfr.gov/current/title-21/part-211/section-211.208"
+  }
+ ]
+}

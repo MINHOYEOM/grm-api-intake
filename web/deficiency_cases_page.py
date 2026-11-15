@@ -300,6 +300,22 @@ def clause_counts_view(snap: "dict[str, Any] | None") -> "dict[str, Any] | None"
         g["kind"] = "annex" if g["label"].startswith("Annex") else "chapter"
         g["title"], g["title_ko"] = eu_title(key)
         out.append(g)
+    # [11-15] EudraLex Vol.4 목차에 없는 번호(예: 'Chapter 10' — Part I 은 9장까지)는 원자료 표기
+    # 오류로 보고 화면에서 '기타·미상' 한 묶음으로 모은다. 행 수는 그대로(합계 불변), 원래 표기는
+    # 문단 칸 앞에 남긴다. 스냅샷·DB 는 손대지 않는다.
+    known = [g for g in out if g["title"]]
+    odd = [g for g in out if not g["title"]]
+    if odd:
+        other = {"key": "EU GMP other", "label": "Other or unreadable", "label_ko": "기타·미상",
+                 "anchor": "other", "kind": "other", "title": "", "title_ko": "",
+                 "critical": 0, "major": 0, "other": 0, "rows": []}
+        for g in odd:
+            for k in ("critical", "major", "other"):
+                other[k] += g[k]
+            for r in g["rows"]:
+                other["rows"].append(dict(r, para=(g["label"] + (" " + r["para"] if r["para"] else ""))))
+        other["total"] = other["critical"] + other["major"] + other["other"]
+        out = known + [other]
     top = max((g["total"] for g in out), default=0) or 1
     for g in out:  # 개요 막대 폭(가장 많이 인용된 조항 = 100). 최소 1 — 0 이 아닌 값이 사라지지 않게.
         g["pct"] = max(1, round(g["total"] * 100 / top)) if g["total"] else 0

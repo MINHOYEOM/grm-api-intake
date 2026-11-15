@@ -16,7 +16,7 @@
     {% include "partials/deficiency_cases_tabs.html" %}
 
     <div class="dc-ov">
-      {%- for kind, head in (('chapter', _('EU GMP 본문(장)')), ('annex', _('EU GMP 부속서'))) %}
+      {%- for kind, head in (('chapter', _('EU GMP 본문(장)')), ('annex', _('EU GMP 부속서')), ('other', _('기타·미상'))) %}
       {%- set gs = cc.groups | selectattr('kind', 'equalto', kind) | list %}
       {%- if gs %}
       <section aria-labelledby="ov-{{ kind }}">

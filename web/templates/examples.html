@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% include "partials/deficiency_cases_style.html" %}
 {#- 지적 사례 — /findings/examples/. 주제(업무 영역) → 대표 사례 → 출처 링크.
     한국어 화면은 참고용 번역(e.ko)을 먼저, 원문(영어)을 바로 아래에 함께 싣는다 — 번역만
     따로 내보내지 않는다(원문 기준). 영어 화면은 원문만. 출처 파일로 바로 갈 수 있게 한다.
@@ -28,8 +29,30 @@
   .ex-next{display:flex;flex-wrap:wrap;gap:10px}
   .ex-next a{font-family:var(--sans);font-size:14px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:10px;padding:11px 16px;background:var(--paper,#FFFFFF)}
   .ex-next a:hover{border-color:var(--coral)}
+  .ex-jump a span{color:var(--muted);margin-left:5px;font-variant-numeric:tabular-nums}
+  .ex-top{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+  .ex-legend{font-family:var(--sans);font-size:13px;color:var(--muted);margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+  .ex-more{margin-top:10px}
+  .ex-more>summary{font-family:var(--sans);font-size:14px;color:var(--coral-2);cursor:pointer;padding:6px 0;list-style:none}
+  .ex-more>summary::-webkit-details-marker{display:none}
+  .ex-more>summary::before{content:"+ "}
+  .ex-more[open]>summary::before{content:"\2212  "}
+  .ex-more>.ex-list{margin-top:8px}
   .ex-note{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:0;word-break:keep-all;max-width:760px}
 </style>
+{%- macro ex_item(e) %}
+  <figure class="ex-item">
+    <p class="ex-top"><span class="dc-ag dc-ag-{{ e.agency | lower }}">{{ e.agency }}</span></p>
+    {%- if lang == 'ko' %}
+    <p class="ex-ko">{{ e.ko }}</p>
+    {%- endif %}
+    <blockquote class="ex-q" lang="en">{{ e.text }}</blockquote>
+    <figcaption class="ex-meta">
+      <span>{{ ('FY' ~ e.year) if e.year_basis == 'jp_fiscal' else e.year }}{% if e.agency_category %} &middot; {{ e.agency_category }}{% endif %}</span>
+      <a href="{{ e.url }}" target="_blank" rel="noopener"{% if e.locator %} title="{{ e.locator }}"{% endif %}>{{ _('원문 파일 열기') }}</a>
+    </figcaption>
+  </figure>
+{%- endmacro %}
 <main>
   <div class="wrap">
     <nav class="ex-crumb" aria-label="{{ _('현재 위치') }}">
@@ -37,13 +60,15 @@
     </nav>
     <p class="kick">PMDA &middot; MHRA</p>
     <h1 class="ex-h1">{{ _('지적 사례') }}</h1>
-    <p class="ex-sum">{{ _('내 업무 영역에서 규제기관이 실제로 어떤 점을 지적했는지 사례로 봅니다. 영역을 고르면 대표 문장과 출처가 나옵니다. 사례는 점검 체크리스트에 옮겨 적을 문장으로 쓰세요.') }}</p>
-    {%- if lang == 'ko' %}
-    <p class="ex-tr">{{ _('한국어는 참고용 번역입니다. 원문 기준은 영어입니다.') }}</p>
-    {%- endif %}
+    <p class="ex-sum">{{ _('일본 PMDA 와 영국 MHRA 가 공개한 GMP 실사 지적을 모았습니다. 업무 영역별 대표 사례를 보거나, 기관별 전체 목록과 조항 집계로 들어가세요.') }}</p>
+    {% set dc_on = 'HUB' %}{% include "partials/deficiency_cases_tabs.html" %}
+
+    <h2 class="dc-sec">{{ _('영역별 대표 사례') }}</h2>
+    <p class="ex-note">{{ _('영역을 고르면 그 영역의 대표 문장과 출처가 나옵니다. 체크리스트에 옮겨 적을 문장으로 쓰세요.') }}{% if lang == 'ko' %} {{ _('한국어는 참고용 번역입니다. 원문 기준은 영어입니다.') }}{% endif %}</p>
+    <p class="ex-legend"><span><span class="dc-ag dc-ag-pmda">PMDA</span> {{ _('일본 의약품의료기기종합기구') }}</span><span><span class="dc-ag dc-ag-mhra">MHRA</span> {{ _('영국 의약품·의료제품규제청') }}</span></p>
     <ul class="ex-jump">
       {%- for t in topics %}
-      <li><a href="#{{ t.code }}">{{ t.label_en if lang == 'en' else t.label_ko }}</a></li>
+      <li><a href="#{{ t.code }}">{{ t.label_en if lang == 'en' else t.label_ko }}<span>{{ t.examples | length }}</span></a></li>
       {%- endfor %}
     </ul>
   </div>
@@ -53,19 +78,16 @@
     <section id="{{ t.code }}">
       <h2 class="ex-h2">{{ t.label_en if lang == 'en' else t.label_ko }}</h2>
       <div class="ex-list">
-        {%- for e in t.examples %}
-        <figure class="ex-item">
-          {%- if lang == 'ko' %}
-          <p class="ex-ko">{{ e.ko }}</p>
-          {%- endif %}
-          <blockquote class="ex-q" lang="en">{{ e.text }}</blockquote>
-          <figcaption class="ex-meta">
-            <span>{{ e.agency }} &middot; {{ ('FY' ~ e.year) if e.year_basis == 'jp_fiscal' else e.year }}{% if e.agency_category %} &middot; {{ e.agency_category }}{% endif %}</span>
-            <a href="{{ e.url }}" target="_blank" rel="noopener"{% if e.locator %} title="{{ e.locator }}"{% endif %}>{{ _('원문 파일 열기') }}</a>
-          </figcaption>
-        </figure>
-        {%- endfor %}
+        {%- for e in t.examples[:3] %}{{ ex_item(e) }}{%- endfor %}
       </div>
+      {%- if t.examples | length > 3 %}
+      <details class="ex-more">
+        <summary>{{ _('{n}건 더 보기', n=(t.examples | length) - 3) }}</summary>
+        <div class="ex-list">
+          {%- for e in t.examples[3:] %}{{ ex_item(e) }}{%- endfor %}
+        </div>
+      </details>
+      {%- endif %}
     </section>
     {%- endfor %}
 

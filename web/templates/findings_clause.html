@@ -108,11 +108,17 @@
 
     {% if intl_cases is defined %}{% with xc = intl_cases('clause', clause.code, lang), xc_sec = 'fx-sec', xc_h = 'fx-sec-h' %}{% include "partials/intl_cases_block.html" %}{% endwith %}{% endif %}
 
-    {% if clause.official_url %}
+    {% if clause.official_url or text_href %}
     <section class="fx-sec">
       <h2 class="fx-sec-h">{{ _('조항 원문') }}</h2>
       <div class="fx-sibs">
+        {%- if text_href %}
+        {#- [기준 조항 원문 2026-11-15] 사이트 안 조항 원문 페이지(무절단 · 공식 링크 포함)가 먼저. -#}
+        <a href="{{ rel_root }}{{ text_href }}">{{ _("{code} 조항 원문 읽기", code=clause.code) }}</a>
+        {%- endif %}
+        {%- if clause.official_url %}
         <a href="{{ clause.official_url }}" target="_blank" rel="noopener">{{ _("eCFR 에서 {code} 원문 보기", code=clause.code) }}</a>
+        {%- endif %}
       </div>
     </section>
     {% endif %}

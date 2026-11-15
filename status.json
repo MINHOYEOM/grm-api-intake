@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-14T22:59:14Z",
+ "generated_at": "2026-11-15T02:37:37Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43649516667,
+    "databaseId": 43668519147,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-15T02:35:39Z",
+    "updatedAt": "2026-11-15T02:35:43Z",
+    "headBranch": "fix/ux-search-fail-notice",
+    "displayTitle": "fix(web): 지적 검색이 실패할 때 알리고 다시 시도하게 — 이전 목록을 검색 결과처럼 보이던 문제",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43668519147"
+   },
+   {
+    "databaseId": 43668514522,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-15T02:35:36Z",
+    "updatedAt": "2026-11-15T02:35:39Z",
+    "headBranch": "fix/ux-search-fail-notice",
+    "displayTitle": "fix: 검색 안내 클래스 이름을 fnd-searchmsg 로(옛 fnd-notice 금지 테스트), 딥링크 catch 첫 …",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43668514522"
+   },
+   {
+    "databaseId": 43667223684,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-14T22:42:46Z",
-    "updatedAt": "2026-11-14T22:50:18Z",
-    "headBranch": "automation/findings-docs-auto-43648838897",
-    "displayTitle": "chore: refresh findings document pages",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43649516667"
+    "createdAt": "2026-11-15T02:19:19Z",
+    "updatedAt": "2026-11-15T02:26:05Z",
+    "headBranch": "fix/ux-search-fail-notice",
+    "displayTitle": "fix(web): 지적 검색이 실패할 때 알리고 다시 시도하게 — 이전 목록을 검색 결과처럼 보이던 문제",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43667223684"
    },
    {
-    "databaseId": 43626847553,
+    "databaseId": 43667219804,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-14T18:29:11Z",
-    "updatedAt": "2026-11-14T18:35:13Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1695 from MINHOYEOM/claude/glossary-fig-daily-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43626847553"
+    "createdAt": "2026-11-15T02:19:17Z",
+    "updatedAt": "2026-11-15T02:26:53Z",
+    "headBranch": "fix/ux-search-fail-notice",
+    "displayTitle": "merge origin/main into fix/ux-search-fail-notice — 골든 재동결",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43667219804"
    },
    {
-    "databaseId": 43619435634,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-14T17:08:11Z",
-    "updatedAt": "2026-11-14T17:13:23Z",
-    "headBranch": "main",
-    "displayTitle": "chore: refresh findings facet pages (#1697)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43619435634"
-   },
-   {
-    "databaseId": 43619204300,
+    "databaseId": 43666943910,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-14T17:05:43Z",
-    "updatedAt": "2026-11-14T17:11:31Z",
-    "headBranch": "claude/firm-alias-159",
-    "displayTitle": "feat(업체 별칭 159): OCR 로 갈라진 업체 키 3쌍 묶기 (DB 적용은 대표 승인 뒤)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43619204300"
-   },
-   {
-    "databaseId": 43619194370,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-14T17:05:36Z",
-    "updatedAt": "2026-11-14T17:11:27Z",
-    "headBranch": "claude/firm-alias-159",
-    "displayTitle": "feat(업체 별칭 159): OCR 로 갈라진 업체 키 3쌍 묶기 — 원문 불변, firm_alias 가산",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43619194370"
+    "createdAt": "2026-11-15T02:15:47Z",
+    "updatedAt": "2026-11-15T02:23:46Z",
+    "headBranch": "fix/ux-color-tokens-aa",
+    "displayTitle": "fix(web): 주황·회색 기준색을 AA 대비로 — 사이트 전역",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43666943910"
    }
   ],
   "grm-scaffold-mirror.yml": [

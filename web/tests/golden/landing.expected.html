@@ -274,16 +274,7 @@ a.home-cell:hover .hc-more{color:var(--coral)}
   .home-tl li:first-child .ht-t{font-size:18.5px}
 }
 </style>
-<section class="ai-disclosure" id="notice" aria-label="AI 자동 생성 고지"><div class="wrap">
-  <span class="kick">AI Disclosure</span>
-  <h2>콘텐츠 생성 방식 및 유의사항</h2>
-  <div class="disc-body">
-    <div class="disc-sec"><p>본 서비스는 FDA, EMA, MHRA, PIC/S, ICH, WHO, Health Canada, ECA, 식약처 등 주요 규제기관 및 공신력 있는 전문기관의 공개 자료를 정기적으로 수집·분석하여 생성형 AI 기반의 한국어 브리핑 카드로 제공합니다.</p></div>
-    <div class="disc-sec"><p>수치·코드·일자·영문 원문 인용·출처 링크 및 기계 추출 표는 원문 정보를 기준으로 제공되며, 생성형 AI 요약과 구분하여 표시합니다.</p></div>
-    <div class="disc-sec"><p>각 정보는 신뢰도(Evidence A·B·C) 및 신호 강도(Tier 1~3) 기준에 따라 분류되며, 정보출처와 공식 원문 링크를 함께 제공하여 사용자가 1차 자료까지 추적·검증할 수 있도록 설계되었습니다.</p></div>
-    <div class="disc-sec"><p>본 서비스는 규제 동향 및 품질 이슈 파악을 지원하기 위한 참고자료입니다. 제공되는 요약, 분석 및 해석은 공식 규제기관의 견해를 대변하지 않으며, 법률·규제·품질·컴플라이언스 자문이나 인증 의견으로 간주되어서는 안 됩니다. 중요한 의사결정은 반드시 공식 원문 및 전문 자문을 통해 검토하시기 바랍니다.</p></div>
-  </div>
-</div></section>
+<section class="ai-line" id="notice" aria-label="AI 자동 생성 고지"><div class="wrap"><p>요약·번역은 생성형 AI가 쓰고, 수치·인용·출처 링크는 원문 그대로 싣습니다. <a href="guide/index.html#sec-8">자료와 AI 활용 안내</a></p></div></section>
 <style>
 .foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}
 .foot .b1 .foot-srclink:hover{color:#fff;border-bottom-color:rgba(255,255,255,.35)}
@@ -367,6 +358,12 @@ main:not(#_) > .wrap:last-child{padding-bottom:0}
 @media(max-width:640px){ main:not(#_){margin-bottom:56px} }
 /* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
 main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -374,7 +371,7 @@ main:not(#_):has(> .toc-fab){margin-bottom:0}
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>국내외 의약품 GMP·품질 규제 동향을 한국어와 영어로 제공하는 무료 정보 서비스입니다.</p>
       <a class="foot-srclink" href="findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
-    <div data-feedback-slot><h5>서비스 안내</h5><a href="about/index.html">서비스 소개</a><a href="guide/index.html">이용안내</a><a href="#notice">AI 활용 안내</a><a href="findings/coverage/index.html">데이터 현황</a><a href="rss.xml">RSS 피드</a></div>
+    <div data-feedback-slot><h5>서비스 안내</h5><a href="about/index.html">서비스 소개</a><a href="guide/index.html">이용안내</a><a href="guide/index.html#sec-8">AI 활용 안내</a><a href="findings/coverage/index.html">데이터 현황</a><a href="rss.xml">RSS 피드</a></div>
     <div><h5>콘텐츠</h5><a href="archive/index.html">주간 브리프</a><a href="news/index.html">최근 규제 소식</a><a href="browse/index.html">찾아보기</a><a href="library/index.html">자료실</a><a href="glossary/index.html">용어사전</a><a href="quiz/index.html">주간 퀴즈</a></div>
     <div class="foot-fnd"><h5>찾아보기</h5><a href="findings/firm/index.html">업체</a><a href="findings/inspector/index.html">실사관</a><a href="findings/clause/index.html">조항</a><a href="findings/trends/index.html">업무 영역별 경향</a><a href="findings/inspections/index.html">FDA 실사 결과</a><a href="findings/docs/index.html">공개 문서</a><a href="findings/index.html">지적 문장 검색</a><a href="findings/checklist/index.html">자가점검표</a><a href="browse/index.html">전체 색인</a></div>
   </div>

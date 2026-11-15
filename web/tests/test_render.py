@@ -1635,7 +1635,6 @@ class WebFindingsRenderTest(unittest.TestCase):
         # (id="ai-notice")으로 이전됐다.
         self.assertNotIn('id="findings-notice"', self.html)
         self.assertIn('id="ai-notice"', self.html)
-        self.assertIn("AI Disclosure", self.html)
 
     def test_cfg_div_env_gated_empty_by_default(self):
         # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
@@ -2001,20 +2000,22 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     # ── FIND-1 M15: AI 고지를 하단 기존 .ai-disclosure 디자인으로 이전 ──────────────────
     def test_notice_moved_to_bottom_ai_disclosure(self):
-        """[M15] 상단 슬림 고지(.fnd-notice/#findings-notice)는 완전히 제거됐고, landing.html
-        과 동일한 .ai-disclosure 구조(kick + h2 + .disc-body > .disc-sec)가 페이지 하단에
-        findings 전용 id(#ai-notice)로 렌더된다."""
+        """[M15 → 고지 정리 2026-11-15] 하단 AI 고지는 제목·네 단락 섹션에서 **한 줄 띠**
+        (.ai-line#ai-notice)로 줄었다(대표 지적 "AI 경고글이 작위적"). 남기는 뜻은 두 가지 —
+        국문이 AI 번역이라는 것, 판단은 원문 기준이라는 것. 나머지 설명은 이용안내 #sec-8."""
         import re as _re
         self.assertNotIn("fnd-notice", self.html)
         self.assertNotIn('id="findings-notice"', self.html)
         m = _re.search(
-            r'<section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지">',
+            r'<section class="ai-line" id="ai-notice" aria-label="AI 자동 생성 고지">',
             self.html)
-        self.assertIsNotNone(m, "하단 ai-disclosure 섹션 마커 미발견")
-        block = self.html[m.start():]
-        self.assertIn('<span class="kick">AI Disclosure</span>', block[:400])
-        self.assertIn("<h2>콘텐츠 생성 방식 및 유의사항</h2>", block[:400])
-        self.assertEqual(block.count('<div class="disc-sec">'), 4)
+        self.assertIsNotNone(m, "하단 AI 고지 한 줄 띠 미발견")
+        block = self.html[m.start():m.start() + 900]
+        self.assertIn("생성형 AI 번역", block)
+        self.assertIn("원문을 기준으로", block)
+        self.assertIn("guide/index.html#sec-8", block)
+        self.assertNotIn("disc-sec", block)
+        self.assertNotIn("콘텐츠 생성 방식 및 유의사항", self.html)
 
     def test_ai_disclosure_appears_after_results_section(self):
         """[M15] AI 고지는 더 이상 첫 화면(page-head 바로 아래)이 아니라 본문(검색 결과)
@@ -6652,7 +6653,7 @@ class WebFirmRenderTest(unittest.TestCase):
     def test_page_generated(self):
         self.assertIn("업체 프로파일", self.html)
         self.assertIn("Firm Profile", self.html)
-        self.assertIn("AI Disclosure", self.html)
+        self.assertIn('class="ai-line" id="ai-notice"', self.html)  # 11-15 AI 고지 한 줄
 
     # ── [존 재편 2026-08-26] 이름으로 조회하는 랜딩 ──────────────────────────
     # 이 폼은 원래 트렌드 페이지 일곱 번째 블록에 있었다(WebTrendsRecentWindowTest 소관).
@@ -6985,7 +6986,7 @@ class WebInspectorRenderTest(unittest.TestCase):
     def test_page_generated(self):
         self.assertIn("실사관 프로파일", self.html)
         self.assertIn("Inspector Profile", self.html)
-        self.assertIn("AI Disclosure", self.html)
+        self.assertIn('class="ai-line" id="ai-notice"', self.html)  # 11-15 AI 고지 한 줄
 
     def test_cfg_div_env_gated_empty_by_default_with_root(self):
         # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
@@ -11315,7 +11316,7 @@ class WebFirmPageTest(unittest.TestCase):
         self.assertIn("행마다 날짜의 종류", html)
         for label in ("공개", "실사"):
             self.assertIn(label, html, f"타임라인 행이 날짜 종류('{label}')를 적지 않는다")
-        self.assertIn("이것은 그 시점의 기록입니다", html)  # 후속 시정 고지
+        self.assertIn("그 시점의 기록입니다", html)  # 후속 시정 고지(11-15 한 줄로)
         self.assertIn(self.data.get("measured_on", ""), html)
 
     def test_doc_page_links_static_when_it_exists_else_lookup(self):
@@ -11880,8 +11881,9 @@ class WebFindingsDocPageTest(unittest.TestCase):
         """
         for doc in self._sample_docs(7):
             html = self._page(doc["slug"])
-            self.assertIn("이 기록에 대하여", html)
+            # [고지 정리 2026-11-15] 제목('이 기록에 대하여')·세 단락 → 한 줄. 뜻은 그대로 잰다.
             self.assertIn("그 시점의 기록", html)
+            self.assertIn("원문을 기준으로", html)
             self.assertIn("시정", html)
             self.assertIn("기계로 처리", html)
 
@@ -14032,6 +14034,27 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertEqual(render.home_source_tag("EUDAMED 등록 의무화")["src_cls"], "")
         self.assertEqual(render.home_source_tag("WHO, 사전적격성평가 개정")["src_cls"], "")
 
+    def test_notices_are_one_line_and_explained_once_in_guide(self):
+        """[고지 정리 2026-11-15 · 대표 지적] 페이지마다 길게 반복되던 고지·경고 단락을 한 줄로 —
+        '~하지 마시고', '이 페이지가 알지 못합니다' 같은 말투와 수록 기준 설명은 화면에서 빼고
+        이용안내 '이용 시 유의사항'(sec-8) 한 곳으로. 푸터 'AI 활용 안내'가 그곳을 가리킨다."""
+        tdir = WEB_DIR / "templates"
+        for name in ("findings_clause.html", "findings_facet.html", "findings_doc_list.html",
+                     "findings_doc.html", "findings_firm_page.html", "findings.html",
+                     "firm.html", "inspector.html", "landing.html"):
+            src = (tdir / name).read_text(encoding="utf-8")
+            for bad in ("읽지 마시고", "이 페이지가 알지 못합니다", "콘텐츠 생성 방식 및 유의사항",
+                        "자문으로 간주되어서는"):
+                self.assertNotIn(bad, src, f"{name}: {bad}")
+        guide = (WEB_DIR / "data" / "guide_content.md").read_text(encoding="utf-8")
+        heads = [l for l in guide.splitlines() if l.startswith("## ")]
+        self.assertEqual(heads[7], "## 이용 시 유의사항", "푸터·고지 링크(#sec-8)가 가리키는 절")
+        for need in ("3건 이상", "공개된 시점의 기록", "정규화", "Evidence A·B·C"):
+            self.assertIn(need, guide)
+        guide_en = (WEB_DIR / "data" / "guide_content_en.md").read_text(encoding="utf-8")
+        self.assertEqual([l for l in guide_en.splitlines() if l.startswith("## ")][7],
+                         "## Before you rely on this")
+
     def test_search_loading_states_are_wired(self):
         """[검색 로딩 2026-11-15] 진행선·자리 표시·0건/오류 칸이 화면과 스크립트 양쪽에 있고,
         움직임 줄이기를 지킨다. 홈 검색 단추도 '검색 중'으로 바뀐다."""
@@ -15283,7 +15306,9 @@ class WebAboutTest(unittest.TestCase):
         self.assertNotIn('class="foot-grp"', foot)
         self.assertIn('href="../../about/index.html">서비스 소개</a>', foot)
         self.assertNotIn("index.html#why", foot)                     # 종전 홈 앵커 소개 없음
-        self.assertEqual(foot.count("index.html#notice"), 1)        # 같은 앵커 링크 둘 → 하나
+        # [고지 정리 2026-11-15] 'AI 활용 안내'는 홈 #notice 대신 이용안내 '이용 시 유의사항'(sec-8).
+        self.assertEqual(foot.count("guide/index.html#sec-8"), 1)
+        self.assertNotIn("index.html#notice", foot)
         self.assertIn("<div data-feedback-slot>", foot)              # 문의 링크가 얹힐 열
         # RSS 피드(#927) — 열을 재구성하며 실제로 한 번 떨어뜨렸다가 i18n 고아 경고로
         # 되찾은 링크다. 피드는 링크가 없으면 발견 자체가 안 되므로 여기 못 박는다.

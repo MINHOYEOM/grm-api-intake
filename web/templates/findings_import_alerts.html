@@ -53,8 +53,8 @@
     <p class="kick">FDA &middot; Import Alert</p>
     <h1 class="ia-h1">{{ _('FDA 수입경보 대상 업체') }}</h1>
     <p class="ia-sum">{{ _('{date} 확인 기준 · 전체 {n}곳 · 현재 등재 {a}곳 · 한국 {k}곳', date=ia.measured_on, n="{:,}".format(ia.total), a="{:,}".format(ia.active), k="{:,}".format(ia.korea)) }}</p>
-    <p class="ia-note">{{ _('FDA 공개 목록에 올라 있다는 사실만 옮겼습니다. 등재 사유의 해석이나 위반 판단은 싣지 않습니다. 주소와 품목은 FDA 원문에서 확인하세요.') }}</p>
-    <p class="ia-note">{{ _("'등재 해제'는 GRM 이 수집을 시작한 뒤 FDA 목록에서 빠진 것을 확인한 경우입니다. 업체 하나가 두 경보에 모두 올라 있으면 두 줄로 나옵니다.") }}</p>
+    <p class="ia-note">{{ _('FDA 공개 목록을 그대로 옮겼습니다. 주소와 품목은 FDA 원문에서 확인하세요.') }}</p>
+    <p class="ia-note">{{ _("'등재 해제'는 GRM 수집 이후 FDA 목록에서 빠진 경우입니다.") }}</p>
     <ul class="ia-src">
       {%- for al in ia.alerts %}
       <li>{{ _('출처: FDA Import Alert {no}', no=al.alert_no) }}{% if al.title %} &middot; <span lang="en">{{ al.title }}</span>{% endif %}{% if al.url %} &middot; <a href="{{ al.url }}" target="_blank" rel="noopener">{{ _('FDA 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}</li>

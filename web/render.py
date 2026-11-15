@@ -3206,6 +3206,10 @@ def _doc_term_pattern(surface: str, ignore_case: bool) -> "re.Pattern[str]":
 #   · 허용하는 공백은 한 칸(스페이스·NBSP)뿐. 줄바꿈·여러 칸은 다른 문장 조각으로 본다.
 #   · 낱말 시작 규칙(앞 글자가 한글이면 건너뜀)·동사형 배제는 **실제 매치 범위**에 그대로 건다.
 _DOC_TERM_SPACE = "[  ]?"
+# 띄어쓰기 무시를 **끄는** 표면형(글자 그대로 일치만 유지). 한 줄에 하나, 사유 주석 필수.
+_DOC_TERM_SPACE_FOLD_DENY = frozenset({
+    "위험 평가",  # 붙은 "위험평가"(risk assessment)는 위험평가·위험성 평가 표제 충돌(준비 보고서 §4-C) — 대표 결정 전까지
+})
 
 
 def _is_hangul_char(c: str) -> bool:
@@ -3215,6 +3219,8 @@ def _is_hangul_char(c: str) -> bool:
 @functools.lru_cache(maxsize=4096)
 def _doc_term_ko_space_pattern(surface: str) -> "re.Pattern[str] | None":
     """띄어쓰기를 무시하는 한글 표면형 패턴. 공백을 접을 자리가 없으면 None(글자 일치 경로)."""
+    if surface in _DOC_TERM_SPACE_FOLD_DENY:
+        return None
     tight = re.sub(r"\s+", "", surface)
     # 각 글자 뒤의 공백 허용 여부: 원래 공백(한글 사이) 또는 양쪽 2음절 이상인 한글 경계
     had_space: set[int] = set()

@@ -21240,6 +21240,12 @@ class BriefTermLinks(unittest.TestCase):
         # 한 칸만 — 줄바꿈·두 칸은 다른 조각으로 본다.
         self.assertEqual(render._doc_term_find("공정\n관리", "공정관리"), -1)
         self.assertEqual(render._doc_term_find("공정  관리", "공정관리"), -1)
+        # 예외 목록: '위험 평가' 는 붙은 "위험평가" 와 잇지 않는다(표제 충돌, 대표 결정 전까지).
+        self.assertIn("위험 평가", render._DOC_TERM_SPACE_FOLD_DENY)
+        self.assertEqual(render._doc_term_find("전체 위험평가를 제출", "위험 평가"), -1)
+        self.assertEqual(span("전체 위험 평가를 제출", "위험 평가"), (3, 8))  # 기존 정확 일치는 그대로
+        # '공정 관리' 연결("생산 및 공정 관리")은 유지.
+        self.assertGreaterEqual(render._doc_term_find("생산 및 공정 관리", "공정관리"), 0)
         # 영어 경로는 불변(한글 표면형 패턴을 타지 않는다).
         self.assertEqual(render._doc_term_find("공정 관리", "공정관리", lang="en"), -1)
 

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [실사 대비 노트 2026-11-15] /inspection-notes/<id>/ — 주제 하나에서 실사가 실제로 지적한 문장 묶음.
+    데이터 = web/data/inspection_notes/<id>.json → inspection_notes_page.note_view. 네트워크 0.
+    ★언어는 뷰가 정해 넘긴다(`note` 는 이미 그 언어의 값만 담는다) — 여기서 *_ko/*_en 을 고르지 않는다.
+    ★인용문은 글자 그대로다. 문서 링크는 그 문서 페이지가 이 언어 트리에 있을 때만(`doc_path`).
+    ★'내 AI 에 물어보기'는 복사뿐이다 — 원격 호출 없음. 복사 글은 뷰가 지어 textarea 에 싣는다. -#}
+{% include "partials/inspection_notes_style.html" %}
+<main>
+  <div class="wrap">
+    <nav class="in-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}inspection-notes/">{{ _('실사 대비 노트') }}</a><i>&rsaquo;</i><span>{{ note.title }}</span>
+    </nav>
+    <div class="in-grid">
+      <article class="in-card">
+        <p class="in-kicker">{{ _('실사 대비 노트') }} &middot; {{ note.area }}</p>
+        <h1 class="in-h1">{{ note.title }}</h1>
+        {%- if note.aliases %}
+        <p class="in-alias">{{ _('같은 말') }}: {{ note.aliases | join(', ') }}</p>
+        {%- endif %}
+        <p class="in-lead">{{ note.lead }}</p>
+
+        <h2 class="in-h2">{{ _('실사에서 지적된 것') }}</h2>
+        {%- for p in note.patterns %}
+        <section class="in-pat">
+          <h3><span>{{ p.n }}</span>{{ p.title }}</h3>
+          {%- for q in p.quotes %}
+          <blockquote class="in-q">{{ q.text }}</blockquote>
+          <p class="in-src">{{ q.source }} &middot; {{ q.firm }} &middot; {{ q.date }}{% if q.doc_path %} &middot; <a href="{{ rel_root }}{{ q.doc_path }}">{{ _('문서 보기') }}</a>{% endif %}</p>
+          {%- endfor %}
+        </section>
+        {%- endfor %}
+
+        <h2 class="in-h2">{{ _('우리 절차서와 대조할 질문') }}</h2>
+        <ol class="in-check">
+          {%- for c in note.checks %}
+          <li>{{ c }}</li>
+          {%- endfor %}
+        </ol>
+
+        <p class="in-foot">{{ notice }}</p>
+      </article>
+
+      <aside class="in-side">
+        {%- if note.clauses %}
+        <div class="in-card">
+          <h2>{{ _('근거 조항') }}</h2>
+          {%- for c in note.clauses %}
+          <div class="in-clause">
+            <b>{{ c.key }}</b>
+            {%- if c.quote %}
+            {{ c.quote }}
+            <p class="in-muted">{{ c.firm }} &middot; {{ c.date }}</p>
+            {%- endif %}
+            {%- if c.note %}
+            <p class="in-muted">{{ c.note }}</p>
+            {%- endif %}
+          </div>
+          {%- endfor %}
+          <p class="in-muted" style="margin-top:10px">{{ _('FDA 483 양식에는 조항이 적혀 있지 않아 경고서한 기준으로 실었습니다.') }}</p>
+        </div>
+        {%- endif %}
+        <div class="in-card">
+          <h2>{{ _('더 읽기') }}</h2>
+          <ul class="in-links">
+            <li><a href="{{ rel_root }}{{ note.search_href }}">{{ _('{q} 관련 지적 전체 보기', q=note.search_q) }}</a></li>
+            {%- for f in note.further %}
+            <li><a href="{{ f.url }}" target="_blank" rel="noopener">{{ f.label }}</a></li>
+            {%- endfor %}
+          </ul>
+        </div>
+        <div class="in-card">
+          <h2>{{ _('내 AI 에 물어보기') }}</h2>
+          <p class="in-muted">{{ _('이 노트의 인용문과 출처를 복사합니다. 쓰시는 AI 에 붙여 넣어 더 물어볼 수 있습니다.') }}</p>
+          <button type="button" class="in-btn" id="in-copy" hidden>{{ _('근거 묶음 복사') }}</button>
+          <p class="in-muted in-copy-msg" id="in-copy-msg" role="status" data-done="{{ _('복사했습니다.') }}" data-fail="{{ _('복사하지 못했습니다. 아래 글을 선택해 복사해 주세요.') }}" hidden></p>
+          <textarea class="in-copy-src" id="in-copy-src" readonly aria-label="{{ _('근거 묶음') }}">{{ note.copy_text }}</textarea>
+        </div>
+        {%- if note.related or note.terms %}
+        <div class="in-card">
+          <h2>{{ _('이어서 보기') }}</h2>
+          {%- if note.related %}
+          <ul class="in-chips">
+            {%- for r in note.related %}
+            <li><a href="{{ rel_root }}{{ r.path }}">{{ r.title }}</a></li>
+            {%- endfor %}
+          </ul>
+          {%- endif %}
+          {%- if note.terms %}
+          <ul class="in-links">
+            {%- for t in note.terms %}
+            <li><a href="{{ rel_root }}{{ t.path }}">{{ _('용어 뜻 보기: {term}', term=t.label) }}</a></li>
+            {%- endfor %}
+          </ul>
+          {%- endif %}
+        </div>
+        {%- endif %}
+      </aside>
+    </div>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}<script>
+(function () {
+  var btn = document.getElementById("in-copy"), src = document.getElementById("in-copy-src"),
+      msg = document.getElementById("in-copy-msg");
+  if (!btn || !src || !msg) return;
+  /* 스크립트가 돌면 단추를 내고 글 상자는 접는다. 스크립트가 없으면 글 상자가 그대로 보여 직접 복사할 수 있다. */
+  btn.hidden = false;
+  src.hidden = true;
+  function say(ok) {
+    msg.textContent = msg.getAttribute(ok ? "data-done" : "data-fail");
+    msg.hidden = false;
+    if (!ok) { src.hidden = false; src.focus(); src.select(); }
+  }
+  btn.addEventListener("click", function () {
+    var text = src.value;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { say(true); }, function () { say(false); });
+    } else {
+      say(false);
+    }
+  });
+})();
+</script>{% endblock %}

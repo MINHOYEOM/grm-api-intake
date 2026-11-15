@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.320` |
-| 최종 수정일 | 2026-11-13 |
+| 문서 버전 | `v1.321` |
+| 최종 수정일 | 2026-11-15 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -670,6 +670,7 @@ grm-api-intake/
 │  ├─ glossary_pdf.py             # [마케팅 2026-09-28] GMP 규제 용어집 PDF — 용어 뷰모델(render)·브랜드·Chrome 렌더러(linkedin_cards) 재사용, QR 은 segno. 구독자 자료(/files/ · 도착 페이지 /welcome/)
 │  ├─ example_page.py             # [지적 사례 2026-11-09] `/findings/examples/`(ko·en) — `data/deficiency_examples.json`(PMDA·MHRA 영문 원문에서 사람이 고른 주제별 대표 사례 100건·출처 행 id 보존, 원문은 영어·한국어는 참고용 한 줄) 로드·검증·주제 뷰(테스트 `web/tests/test_example_page.py`)
 │  ├─ import_alerts_page.py       # [수입경보 2단계 2026-11-10] `/findings/import-alerts/`(ko·en) 전체 목록 뷰 — `data/import_alerts.json`(1단계 스냅샷) → 요약(전체·현재 등재·한국·확인 기준일)·행(업체·국가·도시·경보·등재일·품목 코드 수·등재 중/등재 해제)·국가 필터(ISO2 → 한국어 이름, findings.js 표와 같은 계약·매핑 밖은 FDA 표기 그대로). 등재 사실만(해석·사유 없음). 업체 링크는 1단계 업체 페이지 매칭 결과에서만. 스냅샷 없으면 페이지·진입 링크·sitemap 모두 없음(테스트 `web/tests/test_import_alerts_page.py`)
+│  ├─ inspection_notes_page.py   # [실사 대비 노트 2026-11-15] `/inspection-notes/`(목록)·`/inspection-notes/<id>/`(ko·en) — `data/inspection_notes/<id>.json`(스키마 `grm-inspection-note/v1`: 주제별 패턴 5개 × 인용 2개·근거 조항·점검 질문, 미리 지어 사람이 인용문을 원문과 대조한 뒤 커밋) → 로드·검증·뷰. 빌드는 파일만 읽는다(AI·DB 호출 0). 문서 링크는 그 언어 트리에 문서 페이지가 있을 때만, '내 AI 에 물어보기'는 클립보드 복사뿐. 진입은 찾아보기(상단 내비게이션 없음). 템플릿 `templates/inspection_note(s).html`·`partials/inspection_notes_style.html`
 | 문서 버전 | `v1.309` |
 │  ├─ graph_export.py             # [지식 그래프 2026-11-04] 사이트 빌드 때 `graph/`(manifest·nodes-<유형>·edges-<rel> jsonl) 공개 정적 파일 생성 — 순수 함수·결정론, 개인정보 허용목록·끊긴 엣지/id 중복 가드(테스트 `web/tests/test_graph_export.py`)
 │  ├─ clause_citations_guard.py   # [지적 조항 월간 갱신 가드 2026-11-09] 급감 20%·스냅샷 검증·as_of 만 변경 시 무PR 판정(테스트 `web/tests/test_clause_citations_guard.py`)

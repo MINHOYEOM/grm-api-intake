@@ -19737,6 +19737,9 @@ class WebEnTreeTest(unittest.TestCase):
         # (렌더와 같은 로더·같은 함수 — routes_present 가 실제로 그릴 면만 돌려준다).
         cls.expected |= set(render.deficiency_cases_page.routes_present(
             render.deficiency_cases_page.load_snapshot(render.DEFICIENCY_CASES_FILE)))
+        # [실사 대비 노트 2026-11-15] 노트가 있으면 목록 1 + 노트 N 면이 선다(렌더와 같은 로더·같은 함수).
+        cls.expected |= render.inspection_notes_page.routes_present(
+            render.inspection_notes_page.load_notes())
 
     @classmethod
     def tearDownClass(cls):

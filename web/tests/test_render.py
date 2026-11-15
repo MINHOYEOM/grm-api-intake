@@ -11645,16 +11645,37 @@ class WebFindingsDocPageTest(unittest.TestCase):
         전체 일치라 절단·치환·중복이 전부 잡힌다).
         """
         import html as _html
-        checked = 0
+
+        def _plain(x: str) -> str:
+            return _html.unescape(re.sub(r"<[^>]+>", "", x))
+
+        def _norm(x: str) -> str:
+            return re.sub(r"\s+", " ", x).strip()
+
+        checked = split_checked = 0
         for doc in self._sample_docs(8):
             page = self._page(doc["slug"])
-            bodies = re.findall(r'<p class="fd-text">(.*?)</p>', page, re.S)
-            self.assertEqual(len(bodies), len(doc["findings"]),
-                             f'본문 개수 불일치: {doc["slug"]}')
-            for f, body in zip(doc["findings"], bodies):
-                plain = _html.unescape(re.sub(r"<[^>]+>", "", body))
-                self.assertEqual(plain, f["text_ko"],
-                                 f'본문이 무변형이 아님: {f["finding_id"]}')
+            articles = re.findall(r'<article class="fd-item" id="([^"]+)">(.*?)</article>', page, re.S)
+            self.assertEqual([a[0] for a in articles], [f["finding_id"] for f in doc["findings"]],
+                             f'본문 개수·순서 불일치: {doc["slug"]}')
+            for f, (_, art) in zip(doc["findings"], articles):
+                if 'class="fd-text fd-lead"' in art:
+                    # [WL 해부 2026-10-31] 경고서한 지적은 '요지·지적 내용·회사 회신·FDA 판단·FDA 요구'로
+                    # 나뉘어 여러 문단이 된다(라벨만 우리 것). 11-14 재측정에서 480자 절단이 풀린 서한이
+                    # 나뉘기 시작해 예전 단언(`<p class="fd-text">` 한 개)이 개수부터 어긋났다.
+                    # 계약은 wl_anatomy.rejoin 과 같다 — 라벨을 빼고 문단을 순서대로 이으면 원문과
+                    # 공백 정규화 후 완전히 같아야 한다(절단·치환·중복이 여전히 전부 잡힌다).
+                    art = re.sub(r'<span class="fd-lab">.*?</span>', "", art, flags=re.S)
+                    pieces = [_plain(m.group(2)) for m in
+                              re.finditer(r"<(p|h3|li)\b[^>]*>(.*?)</\1>", art, re.S)]
+                    self.assertEqual(_norm(" ".join(pieces)), _norm(f["text_ko"]),
+                                     f'나눈 본문을 이으면 원문과 달라진다: {f["finding_id"]}')
+                    split_checked += 1
+                else:
+                    bodies = re.findall(r'<p class="fd-text">(.*?)</p>', art, re.S)
+                    self.assertEqual(len(bodies), 1, f'본문 문단이 하나가 아님: {f["finding_id"]}')
+                    self.assertEqual(_plain(bodies[0]), f["text_ko"],
+                                     f'본문이 무변형이 아님: {f["finding_id"]}')
                 checked += 1
         self.assertGreater(checked, 0)
 

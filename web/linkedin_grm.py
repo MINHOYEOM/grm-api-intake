@@ -52,6 +52,15 @@ LIMITS = {"headline_line": 15.5, "row_text": 40, "pair_resp": 24, "pair_why": 74
 _EM_TOPIC = re.compile(r"ISO 5|ISO class 5|Grade A|Class 100|environmental monitor|viable|microbial (?:recover|monitor)|isolates?", re.I)
 
 
+def load_findings(path: Path = FINDINGS) -> dict:
+    """지적사항 DB 사본을 읽는다 — .gz 면 풀어서(테스트의 동결 스냅숏용)."""
+    if path.suffix == ".gz":
+        import gzip
+        with gzip.open(path, "rt", encoding="utf-8") as fh:
+            return json.load(fh)
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def _is_wl(d: dict) -> bool:
     return d.get("source") == "FDA Warning Letter"
 
@@ -730,6 +739,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", help="출력 폴더")
     ap.add_argument("--dist", help="배포 루트 — briefs/<발행일>/ 아래에 낸다(linkedin.* 옆, 사이트맵 비등록)")
     ap.add_argument("--no-pdf", action="store_true")
+    ap.add_argument("--findings", default=str(FINDINGS), help="지적사항 DB 사본(기본 web/data/findings_docs.json · .gz 허용)")
     args = ap.parse_args(argv)
     if not (args.out or args.dist):
         ap.error("--out 또는 --dist 가 필요하다")
@@ -744,7 +754,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"::warning::v3 슬롯 없음({sp.name}) — 만들지 않는다", file=sys.stderr)
         return 0
     slots = json.loads(sp.read_text(encoding="utf-8"))
-    findings = json.loads(FINDINGS.read_text(encoding="utf-8"))
+    findings = load_findings(Path(args.findings))
     url, key = os.environ.get("SUPABASE_URL", "").strip(), os.environ.get("SUPABASE_ANON_KEY", "").strip()
     similar = load_similar(slots, pub, url=url, key=key)
     try:

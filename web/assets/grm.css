@@ -46,6 +46,15 @@ button{font-family:inherit;cursor:pointer}
 /* P2-5 디스플레이 헤딩 — 숫자 라이닝 일관화("11" 올드스타일 튐 방지) + 줄균형(제목 끝 한두 글자 고아 방지).
    text-wrap:balance 는 미지원 브라우저서 무시(graceful)·디자인 동결 폰트/크기 불변. */
 .hero h1,.lead h2,.sec-title,.showcase .copy h2,.callout h2,.page-head h1,.detail-head h1,.hero .stats b,.c-title{font-variant-numeric:lining-nums;text-wrap:balance}
+/* [한국어 고아 줄 — 전역 기본값 2026-11-14] 실측(1440·375, 14쪽): 두세 줄로 접힌 문단의 마지막 줄에
+ * '있습니다.'·'활동입니다.'·'회수' 같은 한 어절만 떨어지는 곳이 용어 정의·지적 문장·카드 제목·면책
+ * 문구 전반에 흩어져 있었다. keep-all 과 같은 이유로 선택자별 손목록이 아니라 기본값으로 둔다.
+ * 본문은 pretty(마지막 줄만 다듬고 나머지 줄 폭은 그대로) — 상속되므로 body 에 한 번(카드 안 span·
+ * 퀴즈 보기처럼 p 가 아닌 글 덩어리도 함께), 제목은 balance(짧은 여러 줄을 고르게).
+ * 둘 다 한 줄에 들어가는 글에는 아무 일도 하지 않는다 — 폭을 줄이지 않고 이미 접히는 곳만 고친다.
+ * white-space:nowrap 을 쓴 칸은 그 선언이 이긴다. 미지원 브라우저는 무시(graceful). */
+body{text-wrap:pretty}
+h1,h2,h3,h4,h5,h6{text-wrap:balance}
 
 /* motion — 진입 페이드업·결과행 등장. reduce 존중. */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -330,6 +339,9 @@ body.js-search .bar{display:flex}
 .bk i.ti-arrow-left::before{content:'\2190';font-family:var(--sans)}  /* P3-4 뒤로 화살표 폰트 비의존(tofu 제거) */
 .detail-head .kick{display:block;margin-bottom:14px}
 .detail-head h1{font-family:var(--serif);font-weight:400;font-size:44px;letter-spacing:-.02em;max-width:24ch;line-height:1.18;color:var(--ink)}
+/* 24ch 는 라틴 숫자 폭 기준 — 한글은 글자가 그 두 배라 11자 남짓에서 꺾였다(브리프 제목이 폭 1,108px 중
+ * 509px 만 쓰고 두 줄). 한국어 화면만 풀고 긴 제목은 위 balance 가 고르게 나눈다. 영어는 24ch 유지. */
+:lang(ko) .detail-head h1{max-width:none}
 .cov{display:flex;gap:14px 28px;flex-wrap:wrap;margin-top:26px;color:var(--muted);font-size:13px}
 .cov b{color:var(--ink);font-weight:600}
 .cov b.mono{font-family:var(--mono);font-weight:500;font-size:13px}  /* P2-4 12.5→13(원문/데이터 라인 가독) */
@@ -561,7 +573,7 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
 .foot-legal{border-top:1px solid var(--band-line);margin-top:46px;padding-top:22px;display:flex;flex-direction:column;gap:11px;font-size:12px;color:var(--band-mut)}
 .foot-copy{display:flex;flex-wrap:wrap;align-items:center;gap:7px 14px}
 .foot-copy .prov{font-size:11.5px;color:var(--band-mut)}
-.foot-disclaimer{font-size:11.5px;color:var(--band-mut);line-height:1.55;max-width:76ch}
+.foot-disclaimer{font-size:11.5px;color:var(--band-mut);line-height:1.55;max-width:none}  /* 76ch→none: ch 폭 제한이 한글을 일찍 꺾었다(모바일은 화면 폭이 곧 한계, 고아 줄은 전역 pretty). 데스크톱 배치는 base.html */
 
 /* P2-1 중간 폭 분기점 — 900px 단일 붕괴 완화(태블릿~좁은 데스크톱 점진 축소).
    900px 블록이 뒤에 와서 ≤900 에선 이 규칙들을 다시 1단으로 덮는다(소스 순서 의존). */

@@ -16,10 +16,11 @@
     o = o || {};
     if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
       var c = new AbortController();
-      setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      var t = setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
       o.signal = c.signal;
     }
-    return fetch(u, o);
+    return fetch(u, o).then(function (r) { clearTimeout(t); return r; },
+                            function (e) { clearTimeout(t); throw e; });
   }
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;

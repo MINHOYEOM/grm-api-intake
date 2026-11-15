@@ -7356,7 +7356,7 @@ class WebInspectorRenderTest(unittest.TestCase):
         import subprocess
 
         fn_src = self._extract_for_node([
-            "fetchInspectorProfileOnce", "RETRY_DELAY_MS", "isRetryableFetchError", "delay",
+            "_fetchT", "fetchInspectorProfileOnce", "RETRY_DELAY_MS", "isRetryableFetchError", "delay",
             "fetchInspectorProfileWithRetry",
         ])
         driver = "\n".join([

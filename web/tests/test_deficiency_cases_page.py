@@ -328,6 +328,20 @@ class ViewTest(unittest.TestCase):
         self.assertEqual((en["No.1"]["text_ko"], en["No.1"]["acat_ko"]), ("", ""))
         self.assertEqual(dcp.cases_view(self.snap, "PMDA", LABELS, "ko")["ko_rows"], 1)
 
+    def test_unknown_chapter_goes_to_other_group(self):
+        """[11-15] EU GMP Part I 은 9장까지 — 'Chapter 10' 같은 표기는 '기타·미상'으로 모은다(합계 불변)."""
+        import copy
+        snap = copy.deepcopy(self.snap)
+        snap["clause_counts"].append({"key": "EU GMP Chapter 10", "para": "", "critical": 0,
+                                      "major": 0, "other": 1, "insp": 1})
+        before = dcp.clause_counts_view(self.snap)["rows_total"]
+        v = dcp.clause_counts_view(snap)
+        self.assertEqual(v["rows_total"], before + 1)
+        self.assertNotIn("EU GMP Chapter 10", [g["key"] for g in v["groups"]])
+        other = v["groups"][-1]
+        self.assertEqual((other["kind"], other["label_ko"], other["total"]), ("other", "기타·미상", 1))
+        self.assertEqual(other["rows"][0]["para"], "Chapter 10")
+
     def test_eu_label_ko(self):
         self.assertEqual(dcp.eu_label_ko("EU GMP Chapter 4"), "제4장")
         self.assertEqual(dcp.eu_label_ko("EU GMP Annex 15"), "부속서 15")

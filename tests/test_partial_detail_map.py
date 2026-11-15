@@ -151,5 +151,27 @@ class FormFooterTrimTest(unittest.TestCase):
         self.assertIn("if (!whole && partial[fid]) {", js)
 
 
+@unittest.skipUnless(shutil.which("node"), "node 없음")
+class RedactionUnifyTest(unittest.TestCase):
+    """[11-15] 국문 화면 가림 표시 통일 — 저장값 불변, 화면에서만."""
+
+    def test_unifies_variants_and_keeps_lists(self):
+        src = (ROOT / "web" / "assets" / "doc-detail.js").read_text(encoding="utf-8")
+        block = src[src.index("// <redaction-unify>"):src.index("// </redaction-unify>")]
+        prog = (block + "\nconst fs=require('fs');const xs=JSON.parse(fs.readFileSync(0,'utf8'));"
+                "process.stdout.write(JSON.stringify(xs.map(unifyRedaction)));")
+        cases = [
+            ("[redacted] [redacted] 로트, 농도 () (4) 및 비중", "[비공개] 로트, 농도 [비공개] 및 비중"),
+            ("Theb) (4) lot 와 (b)(6) (b) (7)(C)", "The[비공개] lot 와 [비공개]"),
+            ("A, [redacted], [redacted] 및 항목 b) 다음", "A, [비공개], [비공개] 및 항목 b) 다음"),
+            ("가림 없음 (4) 단계", "가림 없음 (4) 단계"),
+        ]
+        out = subprocess.run(["node", "-e", prog], input=json.dumps([c for c, _ in cases]).encode("utf-8"),
+                             capture_output=True, check=True)
+        got = json.loads(out.stdout.decode("utf-8"))
+        self.assertEqual(got, [w for _, w in cases])
+        self.assertIn("if (!isEn) text = unifyRedaction(text);", src)
+
+
 if __name__ == "__main__":
     unittest.main()

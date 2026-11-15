@@ -146,6 +146,10 @@ class NavCleanupRenderedTest(unittest.TestCase):
         red = (self.out / "_redirects").read_text(encoding="utf-8")
         self.assertIn("/findings/browse/ /browse/ 301\n", red)
         self.assertIn("/en/findings/browse/ /en/browse/ 301\n", red)
+        # /briefs/ 는 면이 없어 404 였다(2026-11-15) — 지난 호 목록으로.
+        self.assertIn("/briefs/ /archive/ 301\n", red)
+        self.assertIn("/en/briefs/ /en/archive/ 301\n", red)
+        self.assertFalse((self.out / "briefs" / "index.html").exists())
 
     # ── 전역 검색 ─────────────────────────────────────────────────────────
     def test_header_search_form_and_search_page(self):

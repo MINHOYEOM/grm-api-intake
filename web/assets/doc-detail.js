@@ -85,6 +85,18 @@
   }
   // </form-footer-trim>
 
+  // <redaction-unify> (고정값: tests/test_partial_detail_map.py RedactionUnifyTest)
+  // [11-15 대표 신고] 국문 화면의 가림 표시를 하나로 — 저장값은 [redacted]·(b)(4)·b) (4)·() (4) 가 섞여 있다.
+  // 국문에서만 "[비공개]" 로 통일하고, 공백으로만 이어진 반복은 하나로 합친다(쉼표로 나열된 것은 둔다).
+  var REDACT_KO = /\[redacted\]|\(b\)\s*\(\d\)(?:\s*\([A-Z]\))?|(?:\b|(?=b\)))b\)\s*\(\d\)|\(\)\s*\(\d\)/g;
+  // 국문 화면 전용(영문 화면은 이 함수를 부르지 않는다) — 번역 대상 문자열이 아니므로 코드포인트로 만든다.
+  var REDACT_MARK = "[" + String.fromCharCode(0xBE44, 0xACF5, 0xAC1C) + "]";
+  var REDACT_RUN = /\[비공개\](?:\s+\[비공개\])+/g;
+  function unifyRedaction(text) {
+    return String(text || "").replace(REDACT_KO, REDACT_MARK).replace(REDACT_RUN, REDACT_MARK);
+  }
+  // </redaction-unify>
+
   // 지적 id(기본키)로 묻는다 — findings 에는 document_id 색인이 없어 문서 id 로 거르면 공개 키의
   // 3초 제한에 걸린다(실측 57014). 화면에 그려진 지적만 묻는 것이기도 하다.
   var ids = [];
@@ -109,6 +121,7 @@
         var whole = SENT_END.test(orig);
         // [11-12 대표 결정] 끝맺음이 없어도 싣는다. 바닥글 잡음은 화면에서만 걷는다.
         text = trimFormFooter(text).text;
+        if (!isEn) text = unifyRedaction(text);
         if (!text) return;
         var box = document.createElement("details");
         box.className = "fd-detail";

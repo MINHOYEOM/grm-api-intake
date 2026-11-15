@@ -3692,6 +3692,33 @@ def facet_tree_paths(facets_data: "dict[str, Any] | None") -> "set[str]":
     return out
 
 
+def restrict_facets_to_tree(facets_en: "dict[str, Any] | None",
+                            facets_ko: "dict[str, Any] | None") -> "dict[str, Any] | None":
+    """영어 정본에서 **한국어 정본에도 있는 면**만 남긴다(항목·조합 단위).
+
+    [2026-11-15] 두 정본은 언어별 모집단으로 따로 재서 표본 문턱을 넘는 면이 갈린다
+    (실측: 영어에만 training-personnel × HC 조합). 영어 트리 계약은 "모든 영어 페이지에
+    한국어 짝이 있다"(WebEnTreeTest.test_every_en_page_has_a_korean_counterpart)라,
+    짝 없는 영어 면은 그리지 않는다. 건수(totals)·제외 목록은 영어 정본 그대로 둔다."""
+    if not facets_en:
+        return facets_en
+    if not facets_ko:
+        return None
+    ko_axes = {a["axis"]: {it["slug"] for it in a.get("items") or []}
+               for a in facets_ko.get("axes") or []}
+    ko_combos = {(c["category_slug"], c["slug"])
+                 for c in ((facets_ko.get("combos") or {}).get("items") or [])}
+    out = dict(facets_en)
+    out["axes"] = [dict(a, items=[it for it in a.get("items") or []
+                                  if it["slug"] in ko_axes.get(a["axis"], set())])
+                   for a in facets_en.get("axes") or [] if a["axis"] in ko_axes]
+    if facets_en.get("combos") is not None:
+        combos = facets_en["combos"]
+        out["combos"] = dict(combos, items=[c for c in combos.get("items") or []
+                                            if (c["category_slug"], c["slug"]) in ko_combos])
+    return out
+
+
 def facets_root(facets_data: "dict[str, Any] | None") -> "str | None":
     """지적사항 탭 `찾기 › 분류`가 가리킬 모음 첫 화면 — 분류 → 기관 → 국가 중 이 트리에 선 첫 축.
 
@@ -5383,6 +5410,12 @@ RETIRED_PAGE_REDIRECTS: tuple[tuple[str, str], ...] = (
     ("/findings/browse/index.html", "/browse/"),
     ("/en/findings/browse/", "/en/browse/"),
     ("/en/findings/browse/index.html", "/en/browse/"),
+    # [2026-11-15] 브리프 주소는 /briefs/{날짜}/ 인데 /briefs/ 자체는 면이 없어 404 였다(주소창에서
+    # 날짜를 지워 올라가는 방문자). 지난 호 목록 /archive/ 로 잇는다.
+    ("/briefs/", "/archive/"),
+    ("/briefs/index.html", "/archive/"),
+    ("/en/briefs/", "/en/archive/"),
+    ("/en/briefs/index.html", "/en/archive/"),
 )
 
 
@@ -6102,6 +6135,14 @@ def build_site_webmanifest() -> str:
 
 
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
+def _js_single_quoted(value) -> str:
+    """작은따옴표 JS 문자열 리터럴 안에 번역문을 넣을 때의 이스케이프.
+    번역문(It's 등)의 어포스트로피가 문자열을 닫아 스크립트 전체가 죽는 것을 막는다. 한글은 그대로 둔다."""
+    from markupsafe import Markup
+    t = str(value).replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
+    return Markup(t.replace("</", "<\\/"))
+
+
 def _make_env(lang: str = DEFAULT_LANG,
               translator: "Translator | None" = None) -> Environment:
     env = Environment(
@@ -6112,6 +6153,7 @@ def _make_env(lang: str = DEFAULT_LANG,
         keep_trailing_newline=True,
     )
     # [상세 가독성 2026-07-27] 표현층 전용 필터 — 데이터는 verbatim, 렌더만 분해한다.
+    env.filters["js_sq"] = _js_single_quoted
     env.filters["detail_blocks"] = split_detail_blocks
     env.filters["gmp_operations"] = split_gmp_operations
     # [다국어 2단계] 템플릿 전역 `_("…")` — 문구 사전. 한국어는 항등(Markup 으로 그대로),
@@ -6383,7 +6425,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     facets = load_findings_facets()
     # 파일이 없으면 영어 모음 페이지가 0장이 된다 — 그건 의도된 상태다(생기면 저절로
     # 선다). 스키마가 어긋나면 로더가 실패한다 — 빈 페이지 수십 장을 내보내지 않는다.
-    facets_en = load_findings_facets(FINDINGS_FACETS_EN_FILE)
+    facets_en = restrict_facets_to_tree(load_findings_facets(FINDINGS_FACETS_EN_FILE), facets)
     docs_data = load_findings_docs()
     # [조항 페이지] 조항 뷰는 **용어사전보다 먼저** 만든다 — 용어사전의 "관련 조항"이
     # 실제로 만들어진 조항 페이지에만 링크를 걸어야 하기 때문(없는 페이지로 보내는 링크는

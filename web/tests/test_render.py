@@ -8512,6 +8512,27 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn('class="subscribe"', welcome)
         self.assertNotIn('id="grm-cta"', welcome)
 
+    def test_subscribe_links_jump_focus_or_hide(self):
+        """[2026-11-15 대표 신고] '무료 구독'(#subscribe)을 눌러도 아무 일이 없어 보였다 — 밴드가 링크
+        바로 아래라 스크롤이 거의 안 움직이고, 이미 구독한 브라우저는 밴드가 숨어 링크가 빈 곳을 가리켰다.
+        밴드가 있으면 이메일 칸에 커서+강조, 숨었으면 링크를 감춘다(hidden 속성 말고 style)."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            html = self._render_detail(_minimal_brief("2026-06-06"))
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        i = html.index("a[href=\"#subscribe\"]")
+        js = html[i:html.index("</script>", i)]
+        self.assertIn("grm-sub-email", js)
+        self.assertIn(".focus(", js)
+        self.assertIn("sub-flash", js)
+        self.assertIn("style.display='none'", js)
+        self.assertIn("prefers-reduced-motion", js)
+        self.assertIn(".subscribe.sub-flash{", html)
+        # 밴드를 숨기는 구독 완료 스크립트가 먼저 돌아야 sec.hidden 을 읽을 수 있다.
+        self.assertLess(html.index("localStorage.getItem('grm-sub-ok')"), i)
+
     def test_subscribe_band_remembers_completed_subscription(self):
         """[2026-09-23 마케팅 계획 C-06 감사] 배너는 `grm-sub-ok` 를 읽어 다시 뜨지 않는데
         밴드는 안 그랬다 — 이미 구독한 방문자도 다음 페이지에서 빈 폼을 또 만난다(이중
@@ -18631,8 +18652,10 @@ class WebEnFacetTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def _en_paths_from_data(self):
-        """영어 정본이 선언한 면 집합 — 렌더가 쓰는 **그 함수**에서 파생한다."""
-        return render.facet_tree_paths(self.en_data)
+        """영어 정본이 선언한 면 집합 — 렌더가 쓰는 **그 함수**에서 파생한다.
+        (한국어 짝이 없는 면은 렌더가 그리지 않는다 — restrict_facets_to_tree.)"""
+        return render.facet_tree_paths(
+            render.restrict_facets_to_tree(self.en_data, self.ko_data))
 
     def test_english_facet_data_declares_its_population(self):
         """파일 이름이 아니라 **데이터 자신**이 어느 모집단인지 말해야 한다."""
@@ -19530,7 +19553,8 @@ class WebEnTreeTest(unittest.TestCase):
         # 함수를 쓴다(테스트가 따로 세면 두 목록이 갈라지고, 그건 이 가드가 막으려던 것이다).
         cls.en_facets = (render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
                          if render.FINDINGS_FACETS_EN_FILE.exists() else None)
-        cls.expected |= render.facet_tree_paths(cls.en_facets)
+        cls.expected |= render.facet_tree_paths(
+            render.restrict_facets_to_tree(cls.en_facets, render.load_findings_facets()))
         cls.expected |= render.glossary_tree_paths(render.load_glossary())
         cls.expected |= render.clause_tree_paths(render.build_clause_views(
             docs, render.load_cfr_catalog(), render.load_glossary(), lang="en"))

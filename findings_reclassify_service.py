@@ -73,6 +73,23 @@ _SELECT_COLUMNS = "finding_id,source,finding_text,category_code,category_label_k
 # 손대지 않고 세기만 한다. 이 소스들의 taxonomy 갱신은 raw_signals 재추출로 해야 한다.
 _INGEST_OWNED_SOURCES = frozenset({"FDA Warning Letter", "MFDS"})
 
+# ★사람이 원문과 대조해 **지금 분류가 맞다**고 판정한 행(finding_id → 지켜야 할 category_code).
+#   분류기는 키워드 규칙이라 본문에 스치듯 나온 단어('sterile', 'recall')에 끌려 더 나쁜 답을
+#   낼 때가 있다. 그런 행은 표류가 아니다 — 재분류하면 오히려 망가진다(10-12·10-26 정리 교훈).
+#   저장된 분류가 여기 적힌 값과 **같을 때만** 건너뛴다. 값이 달라지면(누가 바꿨으면) 다시 센다.
+#   분류기를 고쳐 같은 답이 나오게 되면 이 항목은 지워도 된다.
+_REVIEWED_KEEP: dict[str, str] = {
+    # 2026-11-15 #1515 — 3행 모두 원문 대조 결과 현행 유지.
+    # EU NCR 162107: 결함 15건 목록, 첫 항목이 일탈 관리 실패. 분류기는 complaint_recall.
+    "finding-31d6b43131bfa546a9e533a2": "deviation_capa",
+    # 483 95605: 장기 보관 원료 재시험·재검사 미실시(QC unit 승인). 'sterile drug products' 는
+    # 사용처 설명일 뿐. 분류기는 aseptic_sterility_assurance.
+    "finding-ae29f126d46391a28ce4bb61": "quality_unit_oversight",
+    # 483 87315: 공급자 성적서(CoA) 검증 안 함 — 공급자 관리. 'sterile and endotoxin free' 는
+    # 성적서 항목. 분류기는 aseptic_sterility_assurance.
+    "finding-e5eefc76a97ad321aeae8a68": "material_supplier_control",
+}
+
 
 def _normalize_base_url(base_url: str) -> str | None:
     return fsb._normalize_base_url(base_url)
@@ -116,6 +133,8 @@ def plan_reclassification(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         text = str(row.get("finding_text") or "")
         old_category = str(row.get("category_code") or "")
         old_taxonomy_version = str(row.get("taxonomy_version") or "")
+        if _REVIEWED_KEEP.get(finding_id) == old_category:
+            continue
         new_category = gf.classify_finding_category(text)
 
         if new_category == old_category and old_taxonomy_version == gf.TAXONOMY_VERSION:
@@ -123,6 +142,7 @@ def plan_reclassification(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         plan.append({
             "finding_id": finding_id,
+            "source": str(row.get("source") or ""),
             "old_category": old_category,
             "new_category": new_category,
             "old_taxonomy_version": old_taxonomy_version,
@@ -225,10 +245,16 @@ def run_reclassify(
         "taxonomy_version": gf.TAXONOMY_VERSION,
         "rows_scanned": 0,
         "ingest_owned_skipped": 0,
+        "reviewed_keep_skipped": 0,
         "changes_planned": 0,
         "category_changes": 0,
         "version_only_stamps": 0,
         "category_migration_matrix": {},
+        # [2026-11-15 #1515] 바뀌는 행 목록. 예전 보고서는 건수·이동 매트릭스만 남겨
+        # apply 뒤 "어느 행이 어디서 왔는지"를 알 수 없었다(되돌릴 수 없었다).
+        # dry-run 에서 대상을 사람이 검토하고, apply 뒤엔 이 목록이 되돌림 원장이다.
+        # version-only 스탬프는 category 가 그대로라 되돌릴 것이 없어 뺀다.
+        "category_change_rows": [],
         "patched": 0,
         "matched_zero": 0,
         "errors": [],
@@ -246,6 +272,9 @@ def run_reclassify(
     report["rows_scanned"] = len(rows)
     report["ingest_owned_skipped"] = sum(
         1 for row in rows if str(row.get("source") or "") in _INGEST_OWNED_SOURCES)
+    report["reviewed_keep_skipped"] = sum(
+        1 for row in rows
+        if _REVIEWED_KEEP.get(str(row.get("finding_id") or "")) == str(row.get("category_code") or ""))
 
     plan = plan_reclassification(rows)
     if limit is not None and limit >= 0:
@@ -255,6 +284,12 @@ def run_reclassify(
     report["category_changes"] = sum(1 for item in plan if item["old_category"] != item["new_category"])
     report["version_only_stamps"] = report["changes_planned"] - report["category_changes"]
     report["category_migration_matrix"] = _category_migration_matrix(plan)
+    report["category_change_rows"] = [
+        {"finding_id": item["finding_id"], "source": item.get("source", ""),
+         "old_category": item["old_category"], "new_category": item["new_category"],
+         "old_taxonomy_version": item["old_taxonomy_version"]}
+        for item in plan if item["old_category"] != item["new_category"]
+    ]
 
     if dry_run:
         return report

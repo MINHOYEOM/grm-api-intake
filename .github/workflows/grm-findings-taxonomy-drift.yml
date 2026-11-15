@@ -101,8 +101,12 @@ jobs:
               '',
               '분류기는 고쳐졌는데 라이브에 닿지 않은 상태입니다 — 사용자가 보는 카테고리는 옛 답입니다.',
               '',
-              '**해소 방법**: Actions → `GRM Findings Reclassify (taxonomy)` → Run workflow →',
-              '`dry_run=false`. (읽기 + category PATCH 만; finding_text 는 건드리지 않습니다.)',
+              // [2026-11-15 #1515] "dry_run=false 로 돌려라"만 안내하던 것을 고친다. 표류 행의
+              // 상당수는 적재 계약상 정상이었고(10-12·10-26 정리), 일괄 apply 가 오히려 망가뜨렸다.
+              // 아래 행 목록을 보고 바뀌는 쪽이 맞는지 사람이 먼저 판단한다.
+              '**해소 방법**: 아래 행을 원문과 대조해 새 분류가 맞는지 먼저 본다(DB 쓰기는 대표 확인 대상).',
+              '맞으면 Actions → `GRM Findings Reclassify (taxonomy)` → `dry_run=false`.',
+              '(category 3칸 PATCH 만. 실행 보고서 `category_change_rows` 가 되돌림 원장이다 — `old_category` 로 다시 PATCH 하면 원복된다.)',
               '',
               '| 이동 | 행 수 |',
               '|---|---|',
@@ -110,6 +114,15 @@ jobs:
             ];
             if (Object.keys(matrix).length > top.length) {
               lines.push(`| … 그 외 ${Object.keys(matrix).length - top.length}종 | |`);
+            }
+            const rows = report.category_change_rows || [];
+            if (rows.length) {
+              const shown = rows.slice(0, 30);
+              lines.push('', '| finding_id | 소스 | 지금 | 분류기 |', '|---|---|---|---|',
+                ...shown.map(r => `| \`${r.finding_id}\` | ${r.source || ''} | \`${r.old_category}\` | \`${r.new_category}\` |`));
+              if (rows.length > shown.length) {
+                lines.push(`| … 그 외 ${rows.length - shown.length}행 — 실행 로그(보고서 JSON)의 \`category_change_rows\` 전체 참조 | | | |`);
+              }
             }
             if ((report.errors || []).length) {
               lines.push('', '**오류**', ...report.errors.map(e => `- ${e}`));

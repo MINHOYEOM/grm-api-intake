@@ -80,6 +80,37 @@
   var hitsH = $("sr-hits-h"), allA = $("sr-all"), advA = $("sr-adv");
   var moreEl = $("sr-more"), pillsEl = $("sr-pills");
   var fAgency = $("sr-f-agency"), fSource = $("sr-f-source"), fPeriod = $("sr-f-period");
+  var goBtn = $("sr-go"), progEl = $("sr-prog");
+
+  // ── [검색 로딩 2026-11-15] 진행 표시 ───────────────────────────────────────
+  // 진행 중: 단추 글자 '검색 중' + 입력창 아래 진행선. 0.4초가 넘으면 결과 자리에 자리 표시
+  // 세 줄(그보다 빨리 오면 자리 표시 없이 바로 결과 — 깜빡임 방지). 단추는 잠그지 않는다
+  // (느릴 때 검색어를 고쳐 다시 보낼 수 있어야 한다). runSeq = 늦게 온 옛 응답을 버리는 표.
+  var SLOW_MS = 400, slowTimer = null, runSeq = 0;
+  function setBusy(on) {
+    if (goBtn) {
+      goBtn.textContent = on ? _t("검색 중") : _t("검색");
+      goBtn.classList.toggle("is-busy", on);
+    }
+    if (progEl) progEl.classList.toggle("on", on);
+    hitsEl.setAttribute("aria-busy", on ? "true" : "false");
+    clearTimeout(slowTimer);
+    if (on) {
+      slowTimer = setTimeout(function () {
+        if (hitsEl.childNodes.length) return;
+        for (var i = 0; i < 3; i++) {
+          var li = el("li", "sr-sk");
+          li.setAttribute("aria-hidden", "true");
+          li.appendChild(el("span")); li.appendChild(el("span")); li.appendChild(el("span"));
+          hitsEl.appendChild(li);
+        }
+      }, SLOW_MS);
+    }
+  }
+  function noteBox(kind) {
+    noteEl.classList.toggle("is-box", !!kind);
+    noteEl.classList.toggle("is-err", kind === "err");
+  }
 
   var params = new URLSearchParams(location.search);
   var Q = (params.get("q") || "").trim().slice(0, 120);
@@ -333,15 +364,19 @@
 
   // textOnly: 본문만(기본) / 업체명·문서 정보까지(업체가 답이거나 본문 일치가 0건일 때).
   function runHits(sq, basisNote, textOnly) {
+    var seq = ++runSeq;
     hitsEl.textContent = "";
     noteEl.hidden = false;
+    noteBox("");
     noteEl.textContent = _t("지적 문장 검색 중");
+    setBusy(true);
     allA.href = explorerHref(sq, textOnly);
     advA.href = explorerHref(sq, textOnly);
     var rerun = function () { runHits(sq, basisNote, textOnly); };
-    if (!URL_ || !KEY) { noteEl.textContent = _t("지적 문장 검색을 사용할 수 없는 환경입니다."); return; }
+    if (!URL_ || !KEY) { setBusy(false); noteEl.textContent = _t("지적 문장 검색을 사용할 수 없는 환경입니다."); return; }
     var tokens = sq.toLowerCase().split(/\s+/).filter(function (t) { return t.length >= 1; });
     Promise.all([rpc(sq, textOnly), _fetchDocPages(ASSET_ROOT)]).then(function (res) {
+      if (seq !== runSeq) return;
       var d = res[0];
       // 옛 함수(153 적용 전)는 월 범위를 한 달 값으로 읽어 0건을 낸다. 월별 분포에는 그 기간
       // 행이 있는데 결과가 0 이면 기간 축을 끄고 다시 부른다(화면이 먼저 배포돼도 안전).
@@ -357,6 +392,8 @@
         runHits(sq, basisNote, false);
         return;
       }
+      setBusy(false);
+      hitsEl.textContent = "";
       hitsH.textContent = _t("지적 문장 {n}건", { n: fmt(d.totals.findings) });
       renderFilters(d, rerun);
       var rows = [];
@@ -376,7 +413,16 @@
         .sort(function (a, b) { return a.k - b.k || a.i - b.i; })
         .map(function (x) { return x.r; }).slice(0, 10);
       if (!rows.length) {
+        // 0건: 무엇이 없는지 적고, 바로 가 볼 곳 두 군데만 둔다.
+        noteBox("zero");
         noteEl.textContent = _t("일치하는 지적 문장이 없습니다. 띄어쓰기나 영문 표기를 바꾸면 결과가 달라질 수 있습니다.");
+        var acts = el("span", "sr-acts");
+        [[_t("업체"), "findings/firm/"], [_t("용어사전"), "glossary/"]].forEach(function (x) {
+          var a = el("a", "", x[0]);
+          a.href = ROOT + x[1];
+          acts.appendChild(a);
+        });
+        noteEl.appendChild(acts);
         return;
       }
       noteEl.hidden = !basisNote;
@@ -398,6 +444,11 @@
         hitsEl.appendChild(li);
       });
     }).catch(function () {
+      if (seq !== runSeq) return;
+      setBusy(false);
+      hitsEl.textContent = "";
+      noteEl.hidden = false;
+      noteBox("err");
       noteEl.textContent = _t("지적 문장을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주십시오.") + " ";
       var b = el("button", "sr-retry", _t("다시 시도"));
       b.type = "button";

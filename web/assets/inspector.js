@@ -43,6 +43,17 @@
  */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o);
+  }
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
@@ -493,7 +504,7 @@
       encodeURIComponent(cols).replace(/%2C/g, ",") +
       "&raw_signal_id=eq." + encodeURIComponent(rawSignalId) +
       "&order=finding_id.asc";
-    return fetch(endpoint, {
+    return _fetchT(endpoint, {
       headers: { apikey: key, Authorization: "Bearer " + key },
     }).then(function (r) {
       if (!r.ok) throw new Error("findings fetch " + r.status);
@@ -773,7 +784,7 @@
   }
 
   function fetchInspectorProfileOnce(inspectorKey) {
-    return fetch(rpcEndpoint("findings_inspector_profile"), {
+    return _fetchT(rpcEndpoint("findings_inspector_profile"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_inspector_key: inspectorKey }),
@@ -827,7 +838,7 @@
 
   function fetchInspectorIndex() {
     if (idxCache) return idxCache;
-    idxCache = fetch(rpcEndpoint("findings_inspector_index"), {
+    idxCache = _fetchT(rpcEndpoint("findings_inspector_index"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -945,7 +956,7 @@
 
   // MFDS는 같은 조회 면·이름순 그룹·문서 멤버십을 사용한다. FDA 호출 계약은 그대로다.
   function mfdsRpc(name, args) {
-    return fetch(rpcEndpoint(name), {
+    return _fetchT(rpcEndpoint(name), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify(args || {}),

@@ -32,6 +32,17 @@
  */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o);
+  }
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
@@ -1169,7 +1180,7 @@
   var SIMILAR_TO_LIMIT = 5;
 
   function fetchSimilarTo(findingId, limit) {
-    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar_to", {
+    return _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar_to", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_finding_id: findingId, p_limit: limit }),
@@ -1535,7 +1546,7 @@
   }
 
   function fetchInspectorCohort() {
-    fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_inspector_index", {
+    _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_inspector_index", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -2022,7 +2033,7 @@
   // 받는다. 비공개/부재는 구분 없이 null 이다(존재 여부 누설 금지 계약을 서버가 RLS 로
   // 강제한다 — 클라이언트가 두 경우를 구분할 수단 자체가 없다).
   function fetchDocument(findingId) {
-    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_document", {
+    return _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_document", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_finding_id: findingId }),
@@ -2259,7 +2270,7 @@
   }
 
   function fetchSimilarItems(q, limit) {
-    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar", {
+    return _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_query: q, p_limit: limit }),
@@ -2539,13 +2550,17 @@
   // 하므로 클라이언트 검증은 불필요 — 신뢰 경계는 서버다).
   // 응답을 LAST 에 대입하지 않고 그대로 반환한다 — 대입 시점은 호출부가 navToken 세대
   // 검사를 통과시킨 뒤여야 한다(늦게 도착한 옛 응답이 최신 결과를 덮어쓰는 것 방지).
-  var SEARCH_ATTEMPT_MS = 9000;
+  var SEARCH_ATTEMPT_MS = 9000, SEARCH_TOTAL_MS = 15000, searchDeadline = 0;
+  function searchAttemptMs() {
+    if (!searchDeadline) searchDeadline = Date.now() + SEARCH_TOTAL_MS;
+    return Math.max(2000, Math.min(SEARCH_ATTEMPT_MS, searchDeadline - Date.now()));
+  }
   function fetchSearch(page) {
     // [11-15 사용성 점검] 검색어가 있는 질의가 서버에서 20초 가까이 걸린 뒤 끊기는 일이 있었다.
     // 시도마다 9초 상한을 두고 넘으면 끊어 재시도로 넘긴다(재시도 규칙은 retrySearchFrom 그대로).
     var ctl = typeof AbortController === "function" ? new AbortController() : null;
-    var timer = ctl ? setTimeout(function () { ctl.abort(); }, SEARCH_ATTEMPT_MS) : null;
-    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_search", {
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, searchAttemptMs()) : null;
+    return _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_search", {
       signal: ctl ? ctl.signal : undefined,
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
@@ -2603,7 +2618,8 @@
 
   function retrySearchFrom(page, err, a) {
     var transient = !(err && err.noRetry) && !(err && err.status && err.status < 500);
-    if (a >= 2 || !transient) return Promise.reject(err);
+    // [11-15] 재시도까지 합쳐 15초(SEARCH_TOTAL_MS) 안에 성공·실패를 정한다 — 넘으면 바로 실패 안내.
+    if (a >= 2 || !transient || Date.now() + 700 * (a + 1) + 2000 > searchDeadline) return Promise.reject(err);
     return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
       .then(function () { return fetchSearch(page); })
       .catch(function (err2) { return retrySearchFrom(page, err2, a + 1); });
@@ -2649,6 +2665,7 @@
     var target = Math.max(1, Math.floor(n) || 1);
     navToken += 1;
     var myToken = navToken;
+    searchDeadline = Date.now() + SEARCH_TOTAL_MS;
     clearTimeout(slowTimer);
     searchNotice(null);
     slowTimer = setTimeout(function () { if (myToken === navToken) searchNotice("slow"); }, 2500);
@@ -2834,7 +2851,7 @@
 
   function fetchCoverageNote() {
     if (!coverageNoteEl || !coverageTextEl) return;
-    fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_stats", {
+    _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_stats", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -2914,6 +2931,7 @@
   // 둘러보기 면으로 옮겨져 검색 툴바가 다시 첫 화면에 있다(보정할 거리 소멸).
   navToken += 1;
   var initToken = navToken;
+  searchDeadline = Date.now() + SEARCH_TOTAL_MS;
   slowTimer = setTimeout(function () { if (initToken === navToken) searchNotice("slow"); }, 2500);
   fetchSearch(currentPage)
     .catch(retrySearch(currentPage))

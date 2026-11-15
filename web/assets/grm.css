@@ -10,9 +10,9 @@
  */
 :root{
   --canvas:#FAF9F5; --soft:#F5F0E8; --card:#EFE9DE; --strong:#E8E0D2;
-  --ink:#141413; --body-s:#252523; --body:#3D3D3A; --muted:#6C6A64; --muted-2:#6A675F;  /* P2-3 --muted-2 #8E8B82→#6A675F: 라이트(canvas≈5.4·card≈4.7) 보조텍스트 ≥4.5:1(AA). 다크밴드 .foot-legal 은 --band-mut 로 분리. */
+  --ink:#141413; --body-s:#252523; --body:#3D3D3A; --muted:#65635D; --muted-2:#6A675F;  /* P2-3 --muted-2 #8E8B82→#6A675F: 라이트(canvas≈5.4·card≈4.7) 보조텍스트 ≥4.5:1(AA). 다크밴드 .foot-legal 은 --band-mut 로 분리. */
   --line:#E6DFD8; --line-2:#DCD3C7;
-  --coral:#C2603F; --coral-2:#A14B30; --coral-tint:#F4E7DF; --on-coral:#FAF9F5;
+  --coral:#AD5434; --coral-2:#A14B30; --coral-tint:#F4E7DF; --on-coral:#FAF9F5;  /* 11-15 AA: --coral #C2603F→#AD5434(바탕 4.9·흰 글자 5.1:1, 예전 4.0·4.2) · --muted #6C6A64→#65635D(카드 바탕 4.5→5.0) */
   --band:#1A1815; --band-2:#262320; --band-soft:#211F1B; --band-ink:#FAF9F5; --band-mut:#A8A299; --band-line:rgba(255,255,255,.11);
   /* 신호 강도 점(render.py SIG_COLOR 가 var(--hi/med/lo) 로 주입 — 반드시 정의) */
   --hi:#BD4B36; --med:#B07D17; --lo:#8E8B82;

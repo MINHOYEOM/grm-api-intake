@@ -7939,11 +7939,11 @@ class WebMePageTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_page_title_and_no_nav_tab_activated(self):
-        """스크랩 전용에서 개인 홈으로 넓어져 제목도 '마이페이지'. nav 6탭 중 어느 것도 이
+        """스크랩 전용에서 개인 홈으로 넓어졌다. [11-15] 제목은 상단 메뉴 이름과 같은 '관심 목록'. nav 6탭 중 어느 것도 이
         페이지를 대표하지 않으므로 아무 탭도 켜지 않는다(이전엔 nav_active='board' 라
         무관한 '모아보기'가 활성으로 보였다)."""
-        self.assertIn("<title>마이페이지 · GRM</title>", self.me)
-        self.assertIn('<h1 class="grm-my-h">마이페이지</h1>', self.me)
+        self.assertIn("<title>관심 목록 · GRM</title>", self.me)
+        self.assertIn('<h1 class="grm-my-h">관심 목록</h1>', self.me)
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.me, _re.S)
         self.assertIsNotNone(nav_m)
@@ -8052,9 +8052,9 @@ class WebMePageTest(unittest.TestCase):
         self.assertEqual(tabs0.count("<a "), 3)                 # 주간 브리프·찾아보기·관심 목록
         self.assertIn("me/index.html", self.reactions_js)        # 계정 메뉴(런타임)
         self.assertNotIn("관심 목록", self.landing_off)          # env-off = 메뉴에도 없다
-        # 헤더 계정 메뉴 항목도 실제 페이지 내용과 이름을 맞췄다(링크·아이콘은 그대로).
+        # 헤더 계정 메뉴 항목도 상단 메뉴·페이지 제목과 같은 이름(11-15 '관심 목록'으로 통일).
         self.assertIn(
-            "'<i class=\"ti ti-bookmark\" aria-hidden=\"true\"></i>' + _t(\"마이페이지\") + '</a>'",
+            "'<i class=\"ti ti-bookmark\" aria-hidden=\"true\"></i>' + _t(\"관심 목록\") + '</a>'",
             self.reactions_js)
 
     def test_no_new_backend_surface(self):

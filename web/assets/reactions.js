@@ -180,7 +180,7 @@
         // 13차: /me 가 스크랩 전용에서 개인 홈(스크랩·구름이·관심 업체)으로 넓어져
         // 메뉴 이름도 실제와 맞췄다 — 링크·아이콘·위치는 그대로(새 표면 0).
         '<a class="grm-acct-item" role="menuitem" href="' + esc(cfgRoot) + 'me/index.html">' +
-        '<i class="ti ti-bookmark" aria-hidden="true"></i>' + _t("마이페이지") + '</a>' +
+        '<i class="ti ti-bookmark" aria-hidden="true"></i>' + _t("관심 목록") + '</a>' +
         '<button type="button" class="grm-acct-item grm-acct-out" role="menuitem">' +
         '<i class="ti ti-logout" aria-hidden="true"></i>' + _t("로그아웃") + '</button></div>';
       el.appendChild(wrap);
@@ -1335,7 +1335,7 @@
         });
         if (mineSubEl) {
           mineSubEl.textContent =
-            _t("마이페이지에서 고른 관심 범위와 관심 업체에 걸린 최근 공개입니다. ") +
+            _t("관심 목록에서 고른 관심 범위와 관심 업체에 걸린 최근 공개입니다. ") +
             // 날짜의 정체는 소스마다 다르다 — 캐나다 실사는 원천이 공개일을 주지 않아
             // 실사일이 이 자리에 들어간다(문서를 열면 둘 다 나온다).
             _t("날짜는 문서가 공개된 날이고, 캐나다 실사만 실사일입니다.");

@@ -17,6 +17,8 @@
     {#- [탭 3묶음 2026-11-11 · 대표 승인] 첫 화면 우선순위 = 제목·한 줄 → 탭 → 검색창 → 결과.
         기관 나열·건수 긴 문장은 검색창 아래 작은 한 줄(.fnd-total)로 내렸다. -#}
     <p class="reveal" style="animation-delay:.14s">{{ _("세계 규제기관이 제약 현장에서 지적한 내용을 원문 그대로 한국어로 찾아봅니다.") }}</p>
+    {#- [구독 유입 2026-11-17] 첫 화면 줄형 구독 칸 — 켜는 언어는 render.py 가 정한다(sub_inline_lists, 영문만). -#}
+    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top' %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-asset-root="{{ asset_root }}" hidden></div>

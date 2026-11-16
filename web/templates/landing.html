@@ -25,6 +25,8 @@
 {% if showcase and showcase.examples %}
     <p class="home-eg"><span>{{ _("예시") }}</span>{% for ex in showcase.examples %}<a href="{{ rel_root }}search/index.html?q={{ ex | urlencode }}">{{ ex }}</a>{% endfor %}</p>
 {% endif %}
+{#- [구독 유입 2026-11-17] 첫 화면 소개·검색 아래 줄형 구독 칸(두 언어) — newsletter 게이트 안(env-off 출력 0). -#}
+{%- with sub_kind='home', sub_slot='top' %}{% include "partials/sub_inline.html" %}{% endwith %}
 {#- [4-A 2026-11-15] 누적 건수 줄(문서·지적·기준일)은 홈에서 뺐다 — 주 1회 스냅샷이라 기준일이
     늘 며칠 낡아 보인다(대표 결정). 같은 수는 찾아보기·지적 검색 화면에 그대로 있다. #}
   </section>
@@ -98,7 +100,9 @@
 {% endfor %}
       </ul>
 {% endif %}
-      <p class="home-links"><a href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">{{ _("주간 브리프 {n}호", n=cover.issue_no) }}</a>{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html">{{ _("지난 호") }}</a>{% endif %}{% if newsletter_form_action %}<a href="#subscribe">{{ _("메일 구독") }}</a>{% endif %}</p>
+      <p class="home-links"><a href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">{{ _("주간 브리프 {n}호", n=cover.issue_no) }}</a>{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html">{{ _("지난 호") }}</a>{% endif %}</p>
+      {#- [구독 유입 2026-11-17] 이번 주 핵심 아래 — 이번 주 소식 메일 받기(자리 키 mid). 반쪽 열이라 한 열로 쌓는다. -#}
+      {%- with sub_kind='home_brief', sub_slot='mid', sub_stack=True %}{% include "partials/sub_inline.html" %}{% endwith +%}
     </div>
 {% endif %}
 {% if showcase and showcase.new_docs %}
@@ -133,10 +137,45 @@
 {% if lang == 'ko' or 'browse/' in en_paths %}      <a class="home-idx-all" href="{{ rel_root }}browse/index.html">{{ _("전체 보기") }}</a>
 {% endif %}
     </p>
-{% if reactions_enabled %}
-    <p class="home-watch" id="watchlist">{{ _("관심 업체 알림 — 업체 화면에서 등록하면 새 지적 기록을 주간 메일로 받습니다.") }} <a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a></p>
-{% endif %}
   </section>
+
+{# [구독 유입 2026-11-17 · 대표 지시] 11-12 홈 4단 개편(#1605)·11-15 4-A 때 함께 빠진 장치(관심 업체 알림·퀴즈·자료실)를
+    지금 홈 결(흰 칸·가는 선·명조 제목·테라코타 링크)로 다시 그린다 — 옛 마크업을 되살리지 않는다.
+    id=watchlist 는 뉴스레터(newsletter.py)가 직링크하는 앵커라 관심 업체 칸에 둔다(파일 간 계약).
+    관심 업체 칸은 반응 계층이 켜진 빌드에서만(등록·로그인 흐름은 기존 업체 화면 그대로). -#}
+{% set hm_quiz = lang == 'ko' or 'quiz/' in en_paths %}
+{% set hm_lib = library and library.catalog_count %}
+{% if reactions_enabled or hm_quiz or hm_lib %}
+  <section class="wrap home-sec">
+    <h2 class="home-h2">{{ _("알림과 학습") }}</h2>
+    <div class="home-more">
+{% if reactions_enabled %}
+      <a class="home-mc" id="watchlist" href="{{ rel_root }}findings/firm/index.html">
+        <span class="hm-k">{{ _("관심 업체 알림") }}</span>
+        <span class="hm-t">{{ _("관심 업체의 새 지적, 메일로 받아 보세요") }}</span>
+        <span class="hm-d">{{ _("업체 화면에서 관심 업체로 등록하면 새 483·경고서한·실사 결과가 나올 때 주간 메일로 알려 드립니다.") }}</span>
+        <span class="hm-go">{{ _("업체 찾기") }}</span>
+      </a>
+{% endif %}
+{% if hm_quiz %}
+      <a class="home-mc" href="{{ rel_root }}quiz/index.html">
+        <span class="hm-k">{{ _("주간 퀴즈") }}</span>
+        <span class="hm-t">{{ _("실사 포인트 점검 문제") }}</span>
+        <span class="hm-d">{{ _("실제 지적 사례로 만든 문제를 풀고 해설과 근거를 함께 확인합니다.") }}</span>
+        <span class="hm-go">{{ _("퀴즈 풀기") }}</span>
+      </a>
+{% endif %}
+{% if hm_lib %}
+      <a class="home-mc" href="{{ rel_root }}library/index.html">
+        <span class="hm-k">{{ _("자료실") }}</span>
+        <span class="hm-t">{{ _("규제기관 가이드라인과 공식 문서") }}</span>
+        <span class="hm-d">{{ _("주요 규제기관의 가이드라인·질의응답·공식 문서를 한곳에서 찾아봅니다.") }}</span>
+        <span class="hm-go">{{ _("자료실 열기") }}</span>
+      </a>
+{% endif %}
+    </div>
+  </section>
+{% endif %}
 </main>
 <style>
 .home{padding:34px 0 56px}
@@ -199,8 +238,8 @@ a.home-cell:hover .hc-more{color:var(--coral)}
 .ht-nb{white-space:nowrap}
 .home-tl li:first-child .ht-t{font-size:21px;line-height:1.42}
 .home-links{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;font-weight:600}
-.home-links a,.home-watch a{color:var(--coral-2);text-decoration:none}
-.home-links a:hover,.home-watch a:hover{color:var(--coral)}
+.home-links a{color:var(--coral-2);text-decoration:none}
+.home-links a:hover{color:var(--coral)}
 .home-rows{list-style:none;margin:0;padding:0}
 .home-rows li{display:grid;grid-template-columns:44px 84px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
 .home-rows li:first-child{padding-top:0}
@@ -213,9 +252,20 @@ a.home-cell:hover .hc-more{color:var(--coral)}
 .home-idx a{padding:8px 14px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:#fff;color:var(--ink);text-decoration:none}
 .home-idx a:hover{border-color:var(--coral);color:var(--coral-2)}
 .home-idx a.home-idx-all{background:none;border-color:transparent;color:var(--coral-2);font-weight:600}
-.home-watch{margin:16px 0 0;font-size:13.5px;color:var(--muted);word-break:keep-all}
+.home-more{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));background:#fff;border:1px solid var(--line-2);border-radius:var(--rad);overflow:hidden}
+.home-mc{display:flex;flex-direction:column;gap:7px;min-width:0;padding:20px 22px;border-left:1px solid var(--line);text-decoration:none;color:var(--body)}
+.home-mc:first-child{border-left:0}
+.home-mc:hover{background:var(--canvas)}
+.hm-k{font-size:12.5px;font-weight:600;color:var(--coral-2)}
+.hm-t{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.4;color:var(--ink);word-break:keep-all}
+.hm-d{font-size:14px;line-height:1.6;color:var(--body);word-break:keep-all}
+.hm-go{margin-top:auto;padding-top:6px;font-size:13.5px;font-weight:600;color:var(--coral-2)}
+.home-mc:hover .hm-go{color:var(--coral)}
 @media(max-width:980px){
   .home-three{grid-template-columns:1fr}
+  .home-more{grid-template-columns:1fr}
+  .home-mc{border-left:0;border-top:1px solid var(--line)}
+  .home-mc:first-child{border-top:0}
   .home-cell{border-left:0;border-top:1px solid var(--line)}
   .home-cell:first-child{border-top:0}
 }

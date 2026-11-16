@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/" />
-<script src="/assets/i18n-en.js?v=735184d9" defer></script>
+<script src="/assets/i18n-en.js?v=c47a2584" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -144,6 +144,24 @@
       <a class="home-idx-all" href="browse/index.html">Show all</a>
     </p>
   </section>
+
+  <section class="wrap home-sec">
+    <h2 class="home-h2">Alerts and learning</h2>
+    <div class="home-more">
+      <a class="home-mc" href="quiz/index.html">
+        <span class="hm-k">Weekly quiz</span>
+        <span class="hm-t">Inspection readiness questions</span>
+        <span class="hm-d">Questions built from real findings, with explanations and sources.</span>
+        <span class="hm-go">Take the quiz</span>
+      </a>
+      <a class="home-mc" href="library/index.html">
+        <span class="hm-k">Library</span>
+        <span class="hm-t">Regulator guidance and official documents</span>
+        <span class="hm-d">Find guidance, Q&As and official documents from major regulators in one place.</span>
+        <span class="hm-go">Open the library</span>
+      </a>
+    </div>
+  </section>
 </main>
 <style>
 .home{padding:34px 0 56px}
@@ -206,8 +224,8 @@ a.home-cell:hover .hc-more{color:var(--coral)}
 .ht-nb{white-space:nowrap}
 .home-tl li:first-child .ht-t{font-size:21px;line-height:1.42}
 .home-links{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;font-weight:600}
-.home-links a,.home-watch a{color:var(--coral-2);text-decoration:none}
-.home-links a:hover,.home-watch a:hover{color:var(--coral)}
+.home-links a{color:var(--coral-2);text-decoration:none}
+.home-links a:hover{color:var(--coral)}
 .home-rows{list-style:none;margin:0;padding:0}
 .home-rows li{display:grid;grid-template-columns:44px 84px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
 .home-rows li:first-child{padding-top:0}
@@ -220,9 +238,20 @@ a.home-cell:hover .hc-more{color:var(--coral)}
 .home-idx a{padding:8px 14px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:#fff;color:var(--ink);text-decoration:none}
 .home-idx a:hover{border-color:var(--coral);color:var(--coral-2)}
 .home-idx a.home-idx-all{background:none;border-color:transparent;color:var(--coral-2);font-weight:600}
-.home-watch{margin:16px 0 0;font-size:13.5px;color:var(--muted);word-break:keep-all}
+.home-more{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));background:#fff;border:1px solid var(--line-2);border-radius:var(--rad);overflow:hidden}
+.home-mc{display:flex;flex-direction:column;gap:7px;min-width:0;padding:20px 22px;border-left:1px solid var(--line);text-decoration:none;color:var(--body)}
+.home-mc:first-child{border-left:0}
+.home-mc:hover{background:var(--canvas)}
+.hm-k{font-size:12.5px;font-weight:600;color:var(--coral-2)}
+.hm-t{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.4;color:var(--ink);word-break:keep-all}
+.hm-d{font-size:14px;line-height:1.6;color:var(--body);word-break:keep-all}
+.hm-go{margin-top:auto;padding-top:6px;font-size:13.5px;font-weight:600;color:var(--coral-2)}
+.home-mc:hover .hm-go{color:var(--coral)}
 @media(max-width:980px){
   .home-three{grid-template-columns:1fr}
+  .home-more{grid-template-columns:1fr}
+  .home-mc{border-left:0;border-top:1px solid var(--line)}
+  .home-mc:first-child{border-top:0}
   .home-cell{border-left:0;border-top:1px solid var(--line)}
   .home-cell:first-child{border-top:0}
 }

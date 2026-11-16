@@ -883,6 +883,39 @@ def lang_is_ko(tr: Translator) -> bool:
     return getattr(tr, "lang", DEFAULT_LANG) == DEFAULT_LANG
 
 
+# ── [브리프 카드 A안 2026-11-16] 카드 머리 한 줄 ────────────────────────────────────
+# 대표 확정: 표지 상자·이모지 없이 제목 위 한 줄 "식약처 · GMP실사 · 합성의약품". 값은 데이터
+# 그대로 두고(이모지는 group_label·modality 데이터에 박혀 있다) 화면에서만 떼어 낸다.
+# '기타'는 정보가 없으므로 표시하지 않는다. 국내(식약처)는 왼쪽 세로선을 주황으로 가른다.
+_LEAD_SYMBOLS_RE = re.compile(r"^[^\w(]+")
+_AGENCY_DISPLAY = {"MFDS": N_("식약처")}
+
+
+def _plain_label(raw: Any, tr: Translator) -> str:
+    """표시용 묶음·제품군 이름 — 앞머리 이모지·기호를 떼고, '기타'면 빈 문자열."""
+    if not raw:
+        return ""
+    if _LEAD_SYMBOLS_RE.sub("", str(raw)).strip() == "기타":
+        return ""
+    return _LEAD_SYMBOLS_RE.sub("", tr(str(raw))).strip()
+
+
+def _kicker_parts(card: dict[str, Any], agency_label: str, tr: Translator) -> list[str]:
+    """카드 머리 한 줄(기관 · 문서 종류 · 제품군). 겹치는 말은 한 번만 쓴다."""
+    agency = card.get("agency") or ""
+    ag = tr(_AGENCY_DISPLAY[agency]) if agency in _AGENCY_DISPLAY and agency_label == agency \
+        else agency_label
+    ct = card.get("card_type") or ""
+    kind = tr("회수") if ct in _RECALL_CARD_TYPES else (tr(ct) if ct else "")
+    for pre in {ag, agency}:                    # 'FDA 483 실사 관찰' → '483 실사 관찰'
+        if pre and kind.startswith(pre + " "):
+            kind = kind[len(pre) + 1:]
+    if kind in (ag, agency):                    # WHO · WHO
+        kind = ""
+    parts = [p for p in (ag, kind, _plain_label(card.get("modality"), tr)) if p]
+    return parts
+
+
 def _clip(text: str, n: int) -> str:
     t = " ".join(str(text or "").split())
     return t if len(t) <= n else t[: n - 1].rstrip() + "…"
@@ -1167,12 +1200,16 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "group": card.get("group"),
         "group_label": tr(card["group_label"]) if card.get("group_label") else
                        card.get("group_label"),
+        "group_label_raw": card.get("group_label"),   # '기타' 판정용 원래 값
         "group_head": None,                            # 섹션 조립 시 결정
         "is_evA": card.get("evidence_level") == "A",
         "card_type": tr(card["card_type"]) if card.get("card_type") else "",
         "agency": card.get("agency", ""),
         # 화면 표기 기관 — EU 비준수는 실제 판정한 회원국 당국(예: "Malta 규제당국").
         "agency_label": (insp["authority"] if insp and insp["authority"] else card.get("agency", "")),
+        "kicker": _kicker_parts(card, (insp["authority"] if insp and insp["authority"]
+                                       else card.get("agency", "")), tr),
+        "is_domestic": card.get("agency") == "MFDS",
         "inspection": insp,
         "headline_target": card.get("headline_target", ""),
         "title_issue": card.get("title_issue", ""),
@@ -1373,7 +1410,9 @@ def _build_sections(card_views: list[dict[str, Any]],
                 # [다국어 5단계] 화면에 보이는 이름만 번역한다. `slug` 는 앵커 id 이자
                 # 딥링크(`#sec-글로벌`)라 **원본 값 그대로** — 번역하면 기존 링크가 죽고
                 # 두 언어판의 앵커가 갈라진다.
-                "name": tr(cv["group"]) if cv.get("group") else cv["group"],
+                # 'Recall' 묶음은 화면에서 '회수'(영어판은 그대로 Recall).
+                "name": (tr("회수") if cv.get("group") == "Recall"
+                         else tr(cv["group"]) if cv.get("group") else cv["group"]),
                 "slug": cv["group"],                   # 앵커 id (HTML5 허용 — 한글 가능)
                 "icon": SECTION_ICON.get(cv["group"], _SECTION_ICON_DEFAULT),
                 "cards": [],
@@ -1383,7 +1422,10 @@ def _build_sections(card_views: list[dict[str, Any]],
         gl = cv.get("group_label")
         if gl and gl != cur_grp:
             cur_grp = gl
-            cv["group_head"] = gl
+            # 소제목은 이모지를 떼고, '기타'는 쓰지 않는다(묶음 판정은 원래 값 그대로).
+            cv["group_head"] = _LEAD_SYMBOLS_RE.sub("", gl).strip()
+            if _plain_label(cv.get("group_label_raw") or gl, _KO) == "":
+                cv["group_head"] = None
         else:
             cv["group_head"] = None
         cur["cards"].append(cv)

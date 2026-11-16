@@ -41,6 +41,24 @@ class EcfrParse(unittest.TestCase):
         self.assertEqual(s["notes"], ["[43 FR 45077, Sept. 29, 1978]"])
         self.assertTrue(secs[1]["reserved"])
 
+    def test_html_table_rows_are_paragraphs_without_blank_ones(self):
+        xml = """<DIV5 N="600" TYPE="PART"><HEAD>PART 600</HEAD>
+<DIV8 N="600.15" TYPE="SECTION"><HEAD>&#xA7; 600.15 Temperatures during shipment.</HEAD>
+<P>(a) Products.</P>
+<DIV><DIV class="gpotbl_div"><TABLE><THEAD>
+<TR>
+<TH>Product</TH>
+<TH>Temperature</TH>
+</TR></THEAD><TBODY>
+<TR>
+<TD>Plasma</TD>
+<TD></TD>
+<TD>-18 C</TD>
+</TR></TBODY></TABLE></DIV></DIV></DIV8></DIV5>"""
+        s = m.parse_ecfr_part(xml, "600")[0]
+        paras = s["text"].split("\n\n")
+        self.assertEqual(paras, ["(a) Products.", "Product\nTemperature", "Plasma\n-18 C"])
+
 
 class SplitClauses(unittest.TestCase):
     def test_eu_chapter_principle_heading_and_list_numbers(self):
@@ -147,6 +165,10 @@ class CommittedData(unittest.TestCase):
             return {c["number"] for c in self.files[key]["clauses"] if c["doc"] == doc}
         self.assertTrue({"211.22", "211.100", "211.192", "211.194"} <= nums("cfr21", "211"))
         self.assertTrue({"210.1", "210.3"} <= nums("cfr21", "210"))
+        self.assertTrue({"600.3", "600.14"} <= nums("cfr21", "600"))
+        self.assertTrue({"601.2", "601.12"} <= nums("cfr21", "601"))
+        self.assertTrue({"606.100", "606.160"} <= nums("cfr21", "606"))
+        self.assertTrue({"610.12", "610.13"} <= nums("cfr21", "610"))
         for ch, last in ((1, 13), (2, 23), (3, 44), (4, 32), (5, 71), (6, 41), (7, 17), (8, 31), (9, 3)):
             got = nums("eu_gmp", f"ch{ch}")
             self.assertTrue({f"{ch}.{i}" for i in range(1, last + 1)} <= got, ch)

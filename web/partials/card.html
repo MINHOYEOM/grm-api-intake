@@ -148,13 +148,15 @@
     <p class="dt-fu"><i class="ti ti-info-circle"></i>{{ _("이 카드는 {n}건을 한 건으로 묶었다. 아래 분석과 원문 인용은 <b>대표 1건</b> 기준이며, 묶인 나머지 건은 위반사실·적용법령·처분 내용이 동일하다.", n=card.merged_count) }}</p>
     {%- endif %}
     {#- [소스확장 2026-07-02] admin-action(행정처분)은 disposition_basis, [483 분석층 2026-07-02]
-        FDA 483 은 inspectional_significance 슬롯 보유 → 한글·기관중립 섹션명. 둘 다 부재인 WL 은
-        기존 영문 섹션명 그대로 = 바이트 불변(da_ko 는 WL 에서 falsy). -#}
+        FDA 483 은 inspectional_significance 슬롯 보유 → 유형별 ②·③ 섹션명.
+        [2026-11-16 브리프 품질 ①②] 경고서한도 한국어 소제목(한국어 페이지에 영어 소제목이 나오던 것).
+        483 판별은 **키가 있는지**로 한다 — 483 은 ②·④ 칸을 비울 수 있어(쓸 원문 사실이 없을 때)
+        값으로 판별하면 빈 483 이 경고서한으로 그려진다. 빈 칸은 숨기고 번호는 보이는 칸만 센다. -#}
     {%- set da_admin = card.deep_analysis.disposition_basis %}
-    {%- set da_fda483 = card.deep_analysis.inspectional_significance %}
-    {%- set da_ko = da_admin or da_fda483 %}
-    {%- if card.deep_analysis.key_violations %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">1</span><span class="deep-t">{% if da_ko %}{{ _("위반 항목 및 리스크") }}{% else %}Key Violations &amp; Risk Analysis{% endif %}</span></div>
+    {%- set da_fda483 = 'inspectional_significance' in card.deep_analysis %}
+    {%- set dn = namespace(n=0) %}
+    {%- if card.deep_analysis.key_violations %}{% set dn.n = dn.n + 1 %}
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">{{ dn.n }}</span><span class="deep-t">{{ _("위반 항목 및 리스크") }}</span></div>
       {%- for v in card.deep_analysis.key_violations %}
       {%- if v is mapping %}
       {#- 위반/관찰 본문은 유형별 키를 흡수: WL·admin=description/summary, FDA 483=observation
@@ -171,12 +173,12 @@
       {%- endfor %}
     </div>
     {%- endif %}
-    {%- if card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation or card.deep_analysis.inspectional_significance %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">2</span><span class="deep-t">{% if da_admin %}{{ _("처분 내용 및 근거") }}{% elif da_fda483 %}{{ _("실사 지적의 의미") }}{% else %}FDA's Evaluation of Response{% endif %}</span></div><p>{{ card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation or card.deep_analysis.inspectional_significance }}</p></div>
+    {%- if card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation or card.deep_analysis.inspectional_significance %}{% set dn.n = dn.n + 1 %}
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">{{ dn.n }}</span><span class="deep-t">{% if da_admin %}{{ _("처분 내용 및 근거") }}{% elif da_fda483 %}{{ _("실사 지적의 의미") }}{% else %}{{ _("회사 회신과 FDA 판단") }}{% endif %}</span></div><p>{{ card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation or card.deep_analysis.inspectional_significance }}</p></div>
     {%- endif %}
-    {%- if card.deep_analysis.required_remediation %}
+    {%- if card.deep_analysis.required_remediation %}{% set dn.n = dn.n + 1 %}
     {%- set rem = card.deep_analysis.required_remediation %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">3</span><span class="deep-t">{% if da_admin %}{{ _("이행·후속 조치") }}{% elif da_fda483 %}{{ _("요구 시정 조치") }}{% else %}Required Remediation{% endif %}</span></div>
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">{{ dn.n }}</span><span class="deep-t">{% if da_admin %}{{ _("이행·후속 조치") }}{% else %}{{ _("요구 시정 조치") }}{% endif %}</span></div>
       {%- if rem is mapping %}
       {#- rem['items'] 는 반드시 대괄호 접근 — Jinja 에서 rem.items 는 dict 의 .items() 메서드로
           해석돼 렌더가 깨진다(키 'items' 와 충돌). deadline 은 충돌 없으나 일관성 위해 대괄호. -#}
@@ -193,8 +195,13 @@
       {%- endif %}
     </div>
     {%- endif %}
-    {%- if card.deep_analysis.administrative_risks %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">4</span><span class="deep-t">{% if da_ko %}{{ _("행정 리스크") }}{% else %}Administrative Risks &amp; Special Notes{% endif %}</span></div><p>{{ card.deep_analysis.administrative_risks }}</p></div>
+    {%- if card.deep_analysis.administrative_risks %}{% set dn.n = dn.n + 1 %}
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">{{ dn.n }}</span><span class="deep-t">{{ _("행정 리스크") }}</span></div><p>{{ card.deep_analysis.administrative_risks }}</p></div>
+    {%- endif %}
+    {%- if da_fda483 %}
+    {#- [2026-11-16 브리프 품질 ①] 483 고정 안내 — 심층 칸마다 지어 쓰던 "483은 최종 판정이 아니며 …"를
+        코드가 칸 아래에 한 번 붙인다(지시문은 이 문장을 더 쓰지 않는다). -#}
+    <p class="dt-fu"><i class="ti ti-info-circle"></i>{{ _("483은 실사가 끝날 때 실사관이 남긴 관찰 목록이다. FDA의 최종 판단이 아니다.") }}</p>
     {%- endif %}
   </details>
   {%- endif %}

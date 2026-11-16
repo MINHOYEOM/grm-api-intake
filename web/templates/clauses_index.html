@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [기준 조항 원문] /clauses/ — 원천별 문서 목록. 데이터 = web/data/clauses/*.json(clause_text_page.build). -#}
+{% include "partials/clauses_style.html" %}
+<main>
+  <div class="wrap">
+    <nav class="ct-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><span>{{ _('기준 조항 원문') }}</span>
+    </nav>
+    <h1 class="ct-h1">{{ _('기준 조항 원문') }}</h1>
+    <p class="ct-lead">{{ _('지적사항이 근거로 드는 기준을 조항 단위로 읽을 수 있게 모았습니다. 규제기관이 공개한 공식 원문을 그대로 실었고, 조항마다 공식 원문 링크를 함께 둡니다.') }}</p>
+    {%- if lang == 'ko' %}
+    <p class="ct-note" style="margin-top:10px">{{ _('해외 기준의 본문은 원문(영어)입니다. 국문 번역은 준비 중입니다.') }}</p>
+    {%- endif %}
+  </div>
+  <div class="wrap ct-body">
+    {%- for s in ct.sources %}
+    <section class="ct-src">
+      <p class="kick">{{ s.kick }}</p>
+      <h2>{{ s.title }}</h2>
+      <ul class="ct-docs">
+        {%- for d in s.docs %}
+        <li><a href="{{ rel_root }}{{ d.path }}">{{ d.code }}{% if d.title %} &middot; {{ d.title }}{% endif %}</a><span>{{ _('조항 {n}개', n=d.n_pages) }}</span></li>
+        {%- endfor %}
+      </ul>
+      <p class="ct-note" style="margin-top:12px">{{ _('출처') }}: <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.publisher }}</a> &middot; {{ s.license }} &middot; {{ _('수집일 {d}', d=s.retrieved) }}</p>
+    </section>
+    {%- endfor %}
+  </div>
+</main>
+{% endblock %}

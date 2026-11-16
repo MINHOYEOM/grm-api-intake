@@ -12,6 +12,7 @@
 5. 이번 주 handoff — 저장소 파일(RUN.md 2항대로 `_handoff/handoff_{run_date_kst}.json` 을 받는다. Notion 은 읽지 않는다) — 자기 샤드 카드의 `prose_input`·`needs_llm_slots`·코드 `facts`·`quotes` 만.
    받은 파일의 지문이 `desk.json` 의 `handoff_ref.sha256` 과 같은지 `python company/editorial/handoff_ref.py <파일>` 로 확인한다. 다르면 쓰지 않고 `status: 보류`(데스크와 다른 handoff 를 본 것이다)
 6. `company/editorial/STYLE.md` §12 — `hook_line` 작성 규칙(그 절만)
+7. 심층 샤드만: 맡은 카드 유형의 정본 심층 지시문(`docs/prompts/GRM_Prompt_Deep{WL,Admin,Fda483}_v1.md`) 전체
 
 ## 맡는 v16 절
 - v16: [역할]
@@ -60,9 +61,10 @@
 6. **델타 샤드를 `완료`로 내기 전에 코드 점검을 돌려 0건으로 만든다**(심층 샤드·`T` 는 해당 없음):
    `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` — 조립 표현 검사와 같은 규칙으로
    금지 표현, v16 [용어·표기] 표 왼쪽 표기, 약어 단독(`CAPA`·`OOS`·`COA` 는 그 카드에서 처음 한 번 `시정 및 예방조치(CAPA)`·`기준일탈(OOS)`·`시험성적서(COA)`),
-   제목 이슈·`hook_line` 길이, **빈 필수 칸과 영문 짝**을 센다 — `title_issue`·`summary`·`key_facts` 는 한국어·영문 모두 반드시 채운다
-   (원문이 얇은 소식 카드도 `key_facts` 를 비우지 않는다. 코드 `facts`·`prose_input` 에 있는 사실로 한 줄 이상 — 비워도 되는 칸은 `implication`·`checks`·`hook_line` 뿐이다.
-   한 장이라도 비면 합치기가 호 전체를 거부한다 — 리허설 1114 에서 소식 카드 4장의 `key_facts` 가 `[]` 여서 그랬다). 걸린 줄이 있으면 그 카드의 그 슬롯만 고치고 다시 돌린다(exit 0 이 될 때까지).
+   제목 이슈·`hook_line` 길이, **빈 필수 칸과 영문 짝**을 센다 — `title_issue`·`summary` 는 한국어·영문 모두 반드시 채운다. `key_facts` 도 채운다.
+   다만 `지침·안내서`·`고시·개정법령`·`규제 소식` 카드에서 원문에 머리말 사실이 없으면 `[]`(v16 — 머리말을 붙여 요약을 다시 쓰지 않는다).
+   비워도 되는 칸은 그 경우의 `key_facts` 와 `implication`·`checks`·`hook_line` 뿐이다(코드가 카드 유형을 handoff 에서 읽어 이 세 유형만 받는다 — 다른 유형의 빈 `key_facts` 는 여전히 합치기가 호 전체를 거부한다).
+   `경고:` 로 시작하는 줄(행정처분 요약 주어·심층 칸 문체)은 exit 코드에 들어가지 않지만 고칠 수 있으면 고친다. 걸린 줄이 있으면 그 카드의 그 슬롯만 고치고 다시 돌린다(exit 0 이 될 때까지).
    코드가 못 세는 표기도 같은 표를 따른다 — 시험 결과·시험실 조사를 말하는 `규격 이탈`·`규격 외`·`규격 부적합`은 `기준일탈(OOS)`.
    **회수 사유의 `○○ 규격 부적합`(원문 `Failed … Specification(s)`)은 그대로 쓴다**(`용출 규격 부적합` — 2026-11-14 대표 결정). 같은 뜻은 한 호 안에서 한 가지 표기로.
 

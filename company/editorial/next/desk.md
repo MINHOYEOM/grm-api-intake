@@ -40,6 +40,9 @@
 1. handoff 의 모든 row(병합 멤버 포함)에 조치를 하나씩 배정한다:
    `render`(카드) · `skip`(Tier 1·Unrelated) · `reflow`(지난주 처리분 재유입) · `error` · `defer`(용량 초과 보류).
    Tier 3 는 전부 `render`. "카드 없이 처리"는 없다(v16 불건 해소 불변식).
+   예외: 행사·교육·전시·후원 모집 공지는 Tier 와 관계없이 `skip`(reason: "행사·광고 공지"). (2026-11-16 대표 승인)
+   매체(ECA·ISPE 등)가 FDA·식약처 문서를 전한 소식은 render 하되, 같은 handoff 에 원본 483·경고서한
+   카드가 있으면 search_findings 에 {fact: "같은 건 원본 카드", related_web_card_id: <원본 id>} 를 적는다.
 2. **샤드 계획**을 `shards` 로 쓴다(RUN.md 6항) — **직접 나누지 않는다.** 입력 JSON `{"delta":[render·merged_into 없는 web_card_id, handoff 순서],
    "deep":[{"id":deep_analysis_ready 또는 ncr_translation_ready 카드,"obs":483 관찰 건수}]}` 를 파일로 쓰고
    `python company/editorial/plan_shards.py <입력.json>` 의 출력을 `desk.json` 의 `shards` 에 그대로 넣는다. 샤드 수는 분량이 정한다(2~8). **카드를 덜어내지 않는다** — 경고가 나도 전부 싣는다.

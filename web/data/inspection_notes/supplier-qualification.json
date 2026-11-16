@@ -1,0 +1,97 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "supplier-qualification", "as_of": "2026-11-16",
+  "area_ko": "공급·제조·포장", "area_en": "Supply, manufacturing and packaging",
+  "title_ko": "공급업체 적격성과 시험성적서", "title_en": "Supplier qualification and certificates of analysis",
+  "glossary_ids": ["supplier-qualification", "certificate-of-analysis"],
+  "aliases_ko": ["공급자 적격성평가", "시험성적서(CoA)", "원료 확인시험"],
+  "aliases_en": ["supplier qualification", "vendor qualification", "certificate of analysis", "COA"],
+  "search_q_ko": "공급업체", "search_q_en": "supplier",
+  "lead_ko": "FDA 는 공급업체 시험성적서를 받아 두었는지보다, 그 성적서를 믿을 근거를 회사가 직접 확인했는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a supplier's certificate of analysis is on file than at whether the firm has confirmed for itself that the certificate can be relied on. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "입고 원료에 확인시험을 하지 않았다", "title_en": "Incoming components were not tested for identity",
+      "quotes": [
+        { "finding_id": "finding-1503cd9706a03ef3c89bff92", "raw_signal_id": "rawsig-a4c2d991374bbfa6da132fe3", "document_id": "9995c30e33c0", "source": "FDA Warning Letter",
+          "firm": "SnugZ USA, Inc.", "date": "2026-10-20",
+          "quote_ko": "귀사는 OTC 의약품 제조에 사용하는 입고 원료에 대해 적절한 확인시험을 수행하지 않았다.",
+          "quote_en": "You failed to perform adequate identity testing of incoming components used in the manufacture of your OTC drug products." },
+        { "finding_id": "finding-2a2e0a58f2f9a7aec3000c89", "raw_signal_id": "rawsig-28bd7cc3322779d11bde888c", "document_id": "fda483-196290", "source": "FDA 483",
+          "firm": "Tripak Pharmaceuticals Pty Ltd.", "date": "2026-11-13",
+          "quote_ko": "공급업체의 시험성적서에 근거하여 적합 판정된 구성 성분에 대해 특정 확인시험(identification test)이 실시되지 않고 있다.",
+          "quote_en": "Specific identification tests are not conducted on components that have been accepted based on the supplier's report of analysis." }
+      ] },
+    { "title_ko": "공급업체 시험성적서의 신뢰성을 검증하는 체계를 갖추지 않았다", "title_en": "There was no sound basis for verifying the reliability of supplier certificates of analysis",
+      "quotes": [
+        { "finding_id": "finding-c2bc91ce5ac0a0cb697589cd", "raw_signal_id": "rawsig-2f2c6e9a635ee522d90e7759", "document_id": "13ca327def9d", "source": "FDA Warning Letter",
+          "firm": "Guangdong Bangze Medicine Co., Ltd.", "date": "2026-11-03",
+          "quote_ko": "또한 귀사는 공급업체 시험 분석의 신뢰성을 적절한 주기로 입증하지 않은 채 (b)(4) 에 대한 공급업체 시험성적서(COA)에 의존했다.",
+          "quote_en": "You also relied on your suppliers' certificates of analysis (COA) for (b)(4) without demonstrating the reliability of your suppliers' test analyses at appropriate intervals." },
+        { "finding_id": "finding-4a419a2bfe0f77a2ada78931", "raw_signal_id": "rawsig-9239684adbdafa6a0ea49e63", "document_id": "fda483-196223", "source": "FDA 483",
+          "firm": "Sumitomo Osaka Cement Co., Ltd", "date": "2026-11-05",
+          "quote_ko": "구매 / 외주업체 관리 절차 매뉴얼의 공급업체 적격성 평가 프로세스에 대한 귀사의 서면 절차 SOP GMP-SOP-S-017, 개정 2는 원료의 공급업체 적격성 평가 중 공급업체 COA의 검증을 위해 시험해야 하는 배치 수를 규정하지 않아 미흡하다.",
+          "quote_en": "Your written procedure for supplier qualification process, SOP GMP-SOP-S-017, revision 2 on Purchasing / subcontractor management procedure manual is deficient and does not specify the number of batches required to be tested for verification of vendor COA during vendor qualification of raw materials." }
+      ] },
+    { "title_ko": "DEG·EG 오염 위험이 높은 원료를 확인시험으로 적절히 시험하지 않았다", "title_en": "Components at high risk of DEG and EG contamination were not adequately tested for identity",
+      "quotes": [
+        { "finding_id": "finding-e386a07596b991399a06a258", "raw_signal_id": "rawsig-2ffc13da2cbdc42cc913cd85", "document_id": "31c2064f1861", "source": "FDA Warning Letter",
+          "firm": "RNA Bio/Pharma, Incorporated", "date": "2025-11-18",
+          "quote_ko": "귀사는 DEG 및 EG 오염 위험이 높은 입고 구성 성분을 의약품 제조에 사용하기 전에 확인시험을 적절히 하지 않았다.",
+          "quote_en": "You failed to adequately test your incoming components at high risk of DEG and EG contamination for identity before using them to manufacture your drug products." },
+        { "finding_id": "finding-46520558eb1bcbf2a5b182c9", "raw_signal_id": "rawsig-f286f65b892b1a152974b67c", "document_id": "102fb7dff220", "source": "FDA Warning Letter",
+          "firm": "Creative Essences, Inc.", "date": "2025-10-07",
+          "quote_ko": "예를 들어 디에틸렌글리콜(DEG) 및 에틸렌글리콜(EG) 오염 위험이 더 높은 원료인 글리세린과 프로필렌글리콜의 각 로트의 각 입고분(shipment)에 대해 확인시험을 적절히 수행하지 않았다.",
+          "quote_en": "For example, you failed to adequately test each shipment of each lot of glycerin and propylene glycol for identity, components at higher risk for diethylene glycol (DEG) and ethylene glycol (EG) contamination." }
+      ] },
+    { "title_ko": "공급업체를 평가해 적격성을 확인하지 않았다", "title_en": "Suppliers were not assessed and qualified",
+      "quotes": [
+        { "finding_id": "finding-a8eb3fe0f3e37c536416c60c", "raw_signal_id": "rawsig-3d66cc8fa23134183ff66a41", "document_id": "0f65bd3c5c70", "source": "FDA Warning Letter",
+          "firm": "Nanjing Hanxin Pharmaceutical Technology Co. Ltd.", "date": "2026-11-10",
+          "quote_ko": "귀사가 제공한 기록과 정보에 따르면, 귀사의 품질부서(QU)는 귀사 시설에서 (b)(4) API를 제조하는 데 쓰이는 핵심 원료의 공급업체를 적절히 적격성평가하지 못했다.",
+          "quote_en": "Based on the records and information you provided, your quality unit (QU) failed to adequately qualify your suppliers of critical raw materials for the manufacturing of (b)(4) API at your facility." },
+        { "finding_id": "finding-16813c185c12c7c9a8501c60", "raw_signal_id": "rawsig-6699c35c190d61a68d35a694", "document_id": "fda483-195346", "source": "FDA 483",
+          "firm": "Conroe Welding Supply, Inc", "date": "2026-10-23",
+          "quote_ko": "귀사는 적절한 평가 및 시험 절차를 통해 공급업체 역량의 신뢰성을 보장하는 프로그램을 수립하고 유지하지 않았다.",
+          "quote_en": "Your firm has not established and maintained a program to ensure the reliability of the supplier's capabilities through appropriate assessment and testing procedures." }
+      ] },
+    { "title_ko": "공급업체가 보낸 용기·마개를 자체 시험으로 확인하지 않았다", "title_en": "Containers and closures from suppliers were not verified by the firm's own testing",
+      "quotes": [
+        { "finding_id": "finding-385733c2a5a4f4461e993ee6", "raw_signal_id": "rawsig-58ae818faa1b8dd9d6f525f9", "document_id": "fda483-195597", "source": "FDA 483",
+          "firm": "FinVector Oy", "date": "2026-10-20",
+          "quote_ko": "구체적으로, 귀사는 Adstiladrin 완제의약품의 일차 용기로 사용하는 [redacted] 바이알에 대해 최소 하나의 특이적 확인 시험을 수행하지 않았으며, 적절한 간격으로 공급업체 시험 결과를 적절히 밸리데이션하여 공급업체 분석의 신뢰성을 확립하지 않았다.",
+          "quote_en": "Specifically, your firm has not conducted at least one specific identity test and has not established the reliability of the suppliers analyses through appropriate validation of the supplier's test result at appropriate intervals for [redacted] vial used as primary container for Adstiladrin drug product." },
+        { "finding_id": "finding-a4d7811c20067b9151743578", "raw_signal_id": "rawsig-f3cf361958ac329f8becc4d5", "document_id": "fda483-195531", "source": "FDA 483",
+          "firm": "Duke University", "date": "2026-10-30",
+          "quote_ko": "외부 공급업체가 멸균한 중요 제품 접촉 장비(즉, 멸균 Starclick 검체 최종 용기 마개 시스템, 조직 절단기)의 무균성을 입고 로트의 주기적 검체 채취로 확인하지 않는다.",
+          "quote_en": "Sterility of critical product-contact equipment sterilized by external vendors (i.e., sterile Starclick specimen final container closure system, tissue slicer, is not being verified through periodic sampling of incoming lots." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.84(d)(1)", "finding_id": "finding-c2bc91ce5ac0a0cb697589cd", "firm": "Guangdong Bangze Medicine Co., Ltd.", "date": "2026-11-03",
+      "quote_ko": "귀사는 각 원료(component)의 시료에 대해 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격에 따른 확인시험 및 적합성 시험을 실시하지 않았다",
+      "quote_en": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality",
+      "note_ko": "원료의 확인시험과 규격 적합성 시험을 하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "The firm was cited under this provision for not testing components for identity and for conformity with specifications." },
+    { "key": "21 CFR 211.84(d)(2)", "finding_id": "finding-e386a07596b991399a06a258", "firm": "RNA Bio/Pharma, Incorporated", "date": "2025-11-18",
+      "quote_ko": "또한 귀사는 구성 성분 공급업체의 시험 분석 결과를 적절한 주기로 밸리데이션하고 그 신뢰성을 확립하지 않았다",
+      "quote_en": "Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals",
+      "note_ko": "공급업체 시험 결과의 신뢰성을 주기적으로 확인하지 않은 채 성적서를 받아들인 점이 이 조항으로 지적됐습니다.",
+      "note_en": "The firm was cited under this provision for accepting supplier results without periodically establishing their reliability." }
+  ],
+  "checks_ko": [
+    "입고되는 원료마다 확인시험을 합니까?",
+    "공급업체 시험성적서에 의존하는 항목은 그 분석의 신뢰성을 적절한 주기로 확인합니까?",
+    "공급업체 시험성적서를 검증할 때 시험할 배치 수가 절차에 정해져 있습니까?",
+    "글리세린, 프로필렌글리콜처럼 DEG·EG 오염 위험이 높은 원료는 입고분마다 확인시험을 합니까?",
+    "핵심 원료 공급업체를 평가하고 적격성을 확인하는 프로그램이 있습니까?",
+    "용기·마개와 외부에서 멸균해 들여오는 물품도 자체 시험이나 주기적 검체 채취로 확인합니까?"
+  ],
+  "checks_en": [
+    "Is every incoming component tested for identity?",
+    "Where you rely on a supplier's certificate of analysis, do you confirm the reliability of the supplier's analyses at appropriate intervals?",
+    "Does your procedure specify how many batches are tested when verifying a supplier's certificate of analysis?",
+    "Is each shipment of components at high risk of DEG and EG contamination, such as glycerin and propylene glycol, tested for identity?",
+    "Is there a program to assess and qualify suppliers of critical raw materials?",
+    "Are containers, closures and items sterilized by outside vendors also verified by your own testing or periodic sampling?"
+  ],
+  "further_reading": [], "related": ["sampling", "quality-unit", "complaint-handling"]
+}

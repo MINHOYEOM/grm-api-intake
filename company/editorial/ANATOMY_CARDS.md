@@ -69,3 +69,8 @@
 - **넘기는 주**: `--candidates` 의 `pick` 이 `null`(해부 가능한 서한 없음)이면 그 주는 쓰지 않는다 — 종전 8장 덱이 나간다. `--check` 를 세 번 고쳐도 못 넘기면 PR 을 열지 않는다.
 - **영문판**(2026-11-16~): 같은 Routine 이 `en` 블록과 `<발행일>.letter_en.txt`(`--save-letter`)를 함께 쓴다. 배포가 `linkedin_grm_en.txt`·`linkedin_grm_en_01~07.png` 를 낸다.
   영문 검증만 실패하면 국문판은 그대로 나가고 영문만 빠진다. 규칙은 `STYLE.md` §13.1.
+- **게시 주기**(2026-11-16 대표 결정): 월=주간 기본판(`linkedin.pdf`·`linkedin_en.pdf`), **수=해부 1위(a1), 금=해부 2위(a2)**, 국·영 모두.
+  슬롯 `<발행일>.a1.v3.json`·`a2.v3.json`(옆 파일 `.a{k}.similar.json`·`.a{k}.letter_en.txt`), 출력 `briefs/<발행일>/linkedin_grm_a{k}*`·`linkedin_grm_a{k}_en*`.
+  옛 단일 슬롯 `<발행일>.v3.json`(11-02·11-16)은 a1 로 읽고, a1 은 옛 이름 `linkedin_grm*` 으로도 복사한다. 슬롯의 `card_id` 는 규칙 순위와 같아야 한다(`rank_problems`).
+- **해부하지 않는 서한**: 실사 없이 704(a)(4) 기록 요청·검토로 나간 서한(`linkedin_anatomy.is_records_review`). 483 회신이 없어 '회신 평가' 칸을 채울 원문이 없다.
+  11-16 호는 2~4위가 모두 이 유형이라 a1 한 편뿐이다(금요일 해부판 없음).

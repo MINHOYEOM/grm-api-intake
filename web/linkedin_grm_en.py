@@ -49,6 +49,14 @@ def load_letter(pub: str, slots_dir: Path | None = None) -> str:
         return ""
 
 
+def load_letter_at(path: Path) -> str:
+    """슬롯 옆 서한 전문(`<pub>.a1.letter_en.txt` · 옛 `<pub>.letter_en.txt`)."""
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+
+
 def letter_from_handoff(handoff: dict, card_id: str) -> str:
     """handoff 의 `deep_analysis_input.body_full`(수집기가 받아 둔 서한 전문)에서 서명 앞까지 — 서명·참조인(개인 이름)과
     FDA 페이지 바닥글은 공개 저장소에 두지 않는다. 사람이 옮겨 적지 않는다(전사 금지)."""

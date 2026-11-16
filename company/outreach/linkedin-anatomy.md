@@ -1,6 +1,7 @@
 # 대외홍보팀 · 링크드인 사건 해부 슬롯 — 모델 Sonnet · 월 13:00·16:00 KST (Routine `trig_01XWTFzLRtFCdFwWefFdDs76`)
 
-이번 주 발행본에서 경고서한 1건을 해부하는 7장 카드(`web/linkedin_grm.py`)의 **슬롯 JSON 을 국문·영문 두 벌로 쓴다**(영문은 `en` 블록, 2026-11-23 호부터).
+이번 주 발행본에서 경고서한을 해부하는 7장 카드(`web/linkedin_grm.py`)의 **슬롯 JSON 을 최대 2편, 편마다 국문·영문 두 벌로 쓴다**(영문은 `en` 블록, 2026-11-23 호부터).
+게시 주기(2026-11-16 대표 결정): 월=주간 기본판(국·영) · **수=해부 1위(a1)** · **금=해부 2위(a2)**. 해부 가능한 서한이 1건뿐이면 a1 만 쓴다 — 억지로 채우지 않는다.
 카드 PNG·본문은 사이트 배포가 슬롯으로 만든다. 슬롯이 없으면 그 주는 밋밋한 종전 8장 덱이 나간다 — 이 일이 그 빈칸을 메운다.
 **링크드인에 로그인·작성·게시하지 않는다.** 머지하지 않는다(코드가 한다). DB 에 쓰지 않는다.
 
@@ -15,15 +16,17 @@
 ## 절차
 1. `PUB` = 이번 주 월요일 KST: `PUB=$(TZ=Asia/Seoul date -d "$(TZ=Asia/Seoul date +%F) -$(( $(TZ=Asia/Seoul date +%u) - 1 )) days" +%F)`.
    `B=claude/linkedin-anatomy-$PUB`, `U=$(echo $PUB | tr - _)`.
-2. **먼저 확인(하나라도 맞으면 `스킵: 이번 주 이미 함`)**: `git fetch origin main` 한 `FETCH_HEAD` 에 `web/data/linkedin_anatomy/$PUB.v3.json` 이 있다 ·
+2. **먼저 확인(하나라도 맞으면 `스킵: 이번 주 이미 함`)**: `git fetch origin main` 한 `FETCH_HEAD` 에 `web/data/linkedin_anatomy/$PUB.a1.v3.json`(또는 옛 `$PUB.v3.json`)이 있다 ·
    원격에 `$B` 가 있다 · 제목이 `linkedin(anatomy): $PUB` 로 시작하는 열린 PR 이 있다.
 3. `git fetch origin main && git checkout -b "$B" FETCH_HEAD` (`origin/main` 이라는 이름은 쓰지 않는다 — 실행 환경의 것은 며칠 전일 수 있다).
    `web/data/briefs/brief_web_$U.json` 이 없으면 **발행 PR 이 아직 머지 전**이다 → `보류: 이번 주 발행 전` 으로 끝낸다(브랜치를 push 하지 않는다 — 다음 회차가 다시 본다).
 4. 대상 서한은 코드가 고른다: `python3.12 web/linkedin_grm.py --brief web/data/briefs/brief_web_$U.json --candidates > /tmp/cand.json`.
-   `pick` 이 `null` 이면 `스킵: 해부 가능한 경고서한 없음 — 종전 덱` 으로 끝낸다(정상). 사람이 고른 것처럼 다른 서한으로 바꾸지 않는다.
-5. 슬롯을 쓴다: `web/data/linkedin_anatomy/$PUB.v3.json`. 형식은 견본 두 개와 같다(`schema` `grm-anatomy-slots/v3`, `pub`, `card_id`=`pick`, `firm_alias`, `status: "weekly"`,
+   `picks` 가 비었으면 `스킵: 해부 가능한 경고서한 없음 — 종전 덱` 으로 끝낸다(정상). `picks` 는 최대 2건(rank 1=a1 수요일, 2=a2 금요일)이고 **편마다 아래 5~8을 한다.**
+   실사 없이 704(a)(4) 기록 요청으로 나간 서한(`records_review_skipped`)은 회신 평가 원문이 없어 코드가 이미 뺐다. 사람이 고른 것처럼 다른 서한으로 바꾸지 않는다.
+   편 하나가 아래 검사를 못 넘기면 그 편만 빼고 나머지 편을 올린다(a2 만 빠지면 금요일은 쉰다).
+5. 슬롯을 쓴다: `picks[i].slot_path`(= `web/data/linkedin_anatomy/$PUB.a{rank}.v3.json`). 형식은 견본 두 개와 같다(`schema` `grm-anatomy-slots/v3`, `pub`, **`rank`**, `card_id`=`picks[i].id`, `firm_alias`, `status: "weekly"`,
    `selection`=`ranked` 상위 3건 점수 한 줄, `cover`, `s02`~`s06`, `caption`).
-   - 문장의 근거(`evidence`·`line_evidence`·`cover.quote`)는 `/tmp/cand.json` 의 `material` 안 문자열을 **글자 그대로** 잘라 쓴다. 옮겨 적다 고치지 않는다.
+   - 문장의 근거(`evidence`·`line_evidence`·`cover.quote`)는 `/tmp/cand.json` 의 그 편 `picks[i].material` 안 문자열을 **글자 그대로** 잘라 쓴다. 옮겨 적다 고치지 않는다.
    - 표지: 서한에 'N건 중 M건' 같은 분모가 있으면 `dots`, 없으면 `quote`(영어 `original` 한두 문장 + 그 국문 `description` 대응 부분). 둘 중 하나만.
    - `s02.rows` 는 정확히 4개(조항별, 한 위반이 길면 사실 단위로 나눈다). 각 행에 `sim_query`(유사 사례 검색어, 한국어 핵심어 3~4개)·`sim_short`·`sim_fact` 또는 `sim_situation`(라벨 정규식)을 단다.
    - `s03.pairs` 3~5개. 반복 위반·생산 중단 같은 한 줄이 서한에 있을 때만 `s03.repeat`(`label`·`text`·`evidence`), 없으면 키를 만들지 않는다.
@@ -33,28 +36,28 @@
      `comment` 는 **숫자 없이** 한 줄.
    - 업체 실명·소재 국가·도시를 어디에도 쓰지 않는다(`firm_name_do_not_write`). 별칭은 "한 ○○ 제조소".
 5-1. **영문 근거 원천**: `git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$PUB.json > /tmp/handoff.json` 후
-   `python3.12 web/linkedin_grm.py --brief web/data/briefs/brief_web_$U.json --save-letter /tmp/handoff.json` → `web/data/linkedin_anatomy/$PUB.letter_en.txt`
+   `python3.12 web/linkedin_grm.py --brief web/data/briefs/brief_web_$U.json --save-letter /tmp/handoff.json` → 편마다 `web/data/linkedin_anatomy/$PUB.a{rank}.letter_en.txt`
    (서한 영문 전문, 서명 앞까지 — 코드가 자른다. 손으로 옮기거나 고치지 않는다). 실패하면 영문은 그 주 건너뛰고 국문만 낸다.
 5-2. **영문 슬롯** `en` 블록(견본: `2026-11-16.v3.json` 의 `en`). 국문 번역이 아니라 **같은 사실을 영어로 다시 쓴다**:
-   - 근거(`evidence`·`line_evidence`·`cover.quote.text`)는 `$PUB.letter_en.txt` 또는 `material.key_violations[].original` 의 영어 문장을 **글자 그대로** 잘라 쓴다(국문 번역 금지).
+   - 근거(`evidence`·`line_evidence`·`cover.quote.text`)는 그 편의 `$PUB.a{rank}.letter_en.txt` 또는 `material.key_violations[].original` 의 영어 문장을 **글자 그대로** 잘라 쓴다(국문 번역 금지).
    - 칸: `cover`(chip·headline 2줄·sub·`quote.text` 또는 `dots`·line·line_evidence) · `s02.rows`(국문과 같은 수, 행마다 `cite`·`text`·`evidence`·`short`) ·
      `s03`(heading·sub·pairs 3~5·있으면 repeat) · `s04.items`(국문과 같은 ref) · `s05`(heading·comment 숫자 없이·`topic_label`=DB 분류의 영어 이름·`cfr_labels`=국문 `cfr_rows` 와 같은 수·`map_header`) ·
      `s06`(not_stated 2~3 + basis · question `?`) · `caption`(lead·claims·contrast·requests·similar·not_stated).
    - **한글 0자**(근거·basis 포함). 업체명·지명 없이 "a sterile injectable manufacturer" 같은 별칭.
    - 후킹(`STYLE.md` §13 영문판): 본문 첫 문장은 약 75자 안, 'FDA …'·'A firm …'으로 시작하지 않고 숫자나 원문 인용(‘…’)을 넣는다. 첫 문장은 마침표가 따옴표 **밖** 소문자 뒤에 오게 끝낸다(‘adequate’. 로 끝내면 문장 끝을 못 찾는다).
    - 문체: 미국 QA 실무자가 동료에게 쓰듯 짧은 평서. underscores·crucial·moreover·notably·landscape 같은 말은 검사가 막는다.
-6. 검사: `python3.12 web/linkedin_grm.py --brief web/data/briefs/brief_web_$U.json --check`(국문·영문 둘 다 본다, 영문 문제는 `en.` 으로 시작). 문제가 나오면 그 칸만 고친다. **세 번 고쳐도 0건이 아니면** 브랜치를 push 하지 않고
+6. 검사: `python3.12 web/linkedin_grm.py --brief web/data/briefs/brief_web_$U.json --check`(편마다 `[a1]`·`[a2]`, 국문·영문·규칙 순위까지 본다, 영문 문제는 `en.` 으로 시작). 한 편만 볼 때는 `--rank 2`. 문제가 나오면 그 칸만 고친다. **세 번 고쳐도 0건이 아니면** 브랜치를 push 하지 않고
    `보류: 슬롯 검증 실패 — <남은 문제 한 줄>` 로 끝낸다(그 주는 종전 덱이 나간다 — 억지로 통과시키지 않는다).
    영문만 세 번 못 넘기면 `en` 블록과 letter_en.txt 를 빼고 국문만 올린다(결과에 `영문 보류: <사유>`).
 7. 유사 사례 저장본: anon 키는 사이트에 공개된 값이다 —
    `export SUPABASE_URL=https://rfwixqqdljpmtjdlblct.supabase.co SUPABASE_ANON_KEY=$(curl -s https://grm-solutions.com/findings/ | grep -oE 'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+' | head -1)` 후
-   `python3.12 web/linkedin_grm.py --brief … --save-similar`. 실패하면 저장본 없이 진행한다(그 카드 한 장만 빠진다).
-8. 렌더 확인: `python3.12 web/linkedin_grm.py --brief … --out /tmp/li_grm` (Chrome 은 `CLOUD.md` 의 headless shell). 국문 `linkedin_grm_NN.png`·영문 `linkedin_grm_en_NN.png` 각 7장(유사 사례 조회 실패 시 6장)을 열어
+   `python3.12 web/linkedin_grm.py --brief … --save-similar`(편마다 `$PUB.a{rank}.similar.json`). 실패하면 저장본 없이 진행한다(그 카드 한 장만 빠진다).
+8. 렌더 확인: `python3.12 web/linkedin_grm.py --brief … --out /tmp/li_grm` (Chrome 은 `CLOUD.md` 의 headless shell). 편마다 국문 `linkedin_grm_a{rank}_NN.png`·영문 `linkedin_grm_a{rank}_en_NN.png` 각 7장(유사 사례 조회 실패 시 6장)을 열어
    글자 넘침·빈 칸이 없는지 본다. 넘치면 그 칸 문장을 줄이고 6번부터 다시.
 9. 표적 테스트: `python3.12 -m unittest tests.test_web_linkedin_grm`.
-10. `git add web/data/linkedin_anatomy/$PUB.v3.json web/data/linkedin_anatomy/$PUB.similar.json web/data/linkedin_anatomy/$PUB.letter_en.txt`(있는 것만) — **이 폴더의 세 파일 말고는 커밋하지 않는다**(워치독은 다른 파일이 섞인 PR 을 머지하지 않는다).
-    커밋·PR 제목 = `linkedin(anatomy): $PUB 사건 해부 슬롯 — <title_issue>`. 본문에 `ranked` 상위 3건과 `--check` 결과 한 줄. PR 은 `gh api` 로 연다. CI 를 기다리지 않는다.
+10. `git add web/data/linkedin_anatomy/$PUB.a1.*` `web/data/linkedin_anatomy/$PUB.a2.*`(있는 것만 — 편마다 v3.json·similar.json·letter_en.txt) — **이 폴더 파일 말고는 커밋하지 않는다**(워치독은 다른 파일이 섞인 PR 을 머지하지 않는다).
+    커밋·PR 제목 = `linkedin(anatomy): $PUB 사건 해부 슬롯 a1·a2 — <a1 title_issue> / <a2 title_issue>`(1편이면 `a1`). 본문에 `ranked` 상위 3건과 `--check` 결과 한 줄. PR 은 `gh api` 로 연다. CI 를 기다리지 않는다.
 
 ## 결과 (최종 메시지, 한 줄에 한 가지)
-`CHARTER.md` 3줄 → PUB · 고른 서한(id·제목 이슈) · 표지 헤드라인 두 줄(국·영) · 본문 첫 문장(국·영) · `--check` 결과 · PR 링크(또는 스킵·보류 사유).
-머지는 `grm-stranded-batch-pr.yml` 이 초록 30분 뒤 한다 → 배포 → `https://grm-solutions.com/briefs/$PUB/linkedin_grm.txt`·`linkedin_grm_en.txt` 가 200 이 된다(월 17:30 초안 확인·PC 18:00 작성창 세팅이 그것을 쓴다).
+`CHARTER.md` 3줄 → PUB · 편마다(a1 수요일·a2 금요일) 고른 서한(id·제목 이슈) · 표지 헤드라인 두 줄(국·영) · 본문 첫 문장(국·영) · `--check` 결과 · PR 링크(또는 스킵·보류 사유).
+머지는 `grm-stranded-batch-pr.yml` 이 초록 30분 뒤 한다 → 배포 → `https://grm-solutions.com/briefs/$PUB/linkedin_grm_a1.txt`·`linkedin_grm_a1_en.txt`(a2 도 같은 꼴)가 200 이 된다. PC `grm-linkedin-weekly`(월·수·금 18:00)가 수요일에 a1, 금요일에 a2 로 작성창을 세팅한다.

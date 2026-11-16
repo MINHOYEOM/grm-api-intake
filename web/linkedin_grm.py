@@ -570,7 +570,7 @@ def fetch_similar(slots: dict, *, url: str, key: str, rpc=_rpc) -> dict | None:
 
 
 def load_similar(slots: dict, pub: str, *, url: str, key: str, fetch=fetch_similar,
-                 slots_dir: Path | None = None) -> dict | None:
+                 slots_dir: Path | None = None, snap: Path | None = None) -> dict | None:
     """유사 사례 묶음을 고른다 — **저장된 <발행일>.similar.json 이 있으면 그것을 쓰고 RPC 를 부르지 않는다.**
 
     ★2026-11-09 실측: 이 스텝은 web/** push·PR 마다(하루 수십 번) 돌며 지적마다 findings_similar 를
@@ -580,7 +580,7 @@ def load_similar(slots: dict, pub: str, *, url: str, key: str, fetch=fetch_simil
       체크리스트 500 과 겹쳤다. 그 주 묶음이 이미 저장소에 있으면(사람이 검수해 커밋한 정본) 다시
       부를 이유가 없다 — 결과도 배포마다 흔들리지 않는다.
     저장본이 없을 때만(새 호, 키가 있을 때) 엔진을 부른다. 키도 없으면 None(그 카드만 빠진다)."""
-    snap = (slots_dir or SLOTS_DIR) / f"{pub}.similar.json"
+    snap = snap or (slots_dir or SLOTS_DIR) / f"{pub}.similar.json"
     try:
         saved = json.loads(snap.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -735,25 +735,74 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
             "card_id": str(card.get("id")), "mode": "grm"}
 
 
-def candidates(doc: dict, slot_path: Path) -> dict[str, Any]:
-    """주간 슬롯 작성자(대외홍보팀 Routine)에게 줄 재료 — 대상 선정은 코드가 한다(ANATOMY_CARDS.md 규칙).
-    고른 서한의 원천 필드(국문 번역·영어 원문·FDA 평가·요구)만 준다 — 슬롯 문장은 이 안에서만 근거를 찾는다."""
-    brief = doc.get("brief") or {}
-    elig = sorted((c for c in doc.get("cards") or [] if la.anatomy_eligible(c)), key=la.anatomy_score, reverse=True)
-    out: dict[str, Any] = {"pub": str(brief.get("publish_date") or ""), "slot_path": str(slot_path),
-                           "slot_exists": slot_path.exists(),
-                           "ranked": [dict(id=c.get("id"), title_issue=c.get("title_issue"), score=list(la.anatomy_score(c)))
-                                      for c in elig]}
-    if not elig:
-        out.update(pick=None, reason="해부 가능한 경고서한 없음(서한 0건 또는 본문·평가·요구 미확보) — 이번 주는 넘긴다")
-        return out
-    c = elig[0]
+MAX_PER_ISSUE = 2  # 한 호에 해부 최대 2편 — 수요일=1위(a1), 금요일=2위(a2). 1건뿐이면 수요일만(2026-11-16 대표 결정)
+
+
+def slot_path_for(pub: str, rank: int, slots_dir: Path | None = None) -> Path:
+    return (slots_dir or SLOTS_DIR) / f"{pub}.a{rank}.v3.json"
+
+
+def slot_paths(pub: str, slots_dir: Path | None = None) -> list[tuple[int, Path]]:
+    """그 호의 슬롯 — `<pub>.a1.v3.json`·`<pub>.a2.v3.json`. 옛 단일 슬롯 `<pub>.v3.json`(11-02·11-16)은 a1 로 본다."""
+    d = slots_dir or SLOTS_DIR
+    out: list[tuple[int, Path]] = []
+    for k in range(1, MAX_PER_ISSUE + 1):
+        sp = slot_path_for(pub, k, d)
+        if not sp.exists() and k == 1 and (d / f"{pub}.v3.json").exists():
+            sp = d / f"{pub}.v3.json"
+        if sp.exists():
+            out.append((k, sp))
+    return out
+
+
+def sidecar(slot_path: Path, kind: str) -> Path:
+    """슬롯 옆 파일 — `<pub>.a1.v3.json` → `<pub>.a1.similar.json`·`<pub>.a1.letter_en.txt`(옛 단일 슬롯은 `<pub>.similar.json`)."""
+    return slot_path.with_name(slot_path.name[: -len(".v3.json")] + "." + kind)
+
+
+def rank_problems(doc: dict, slots: dict, rank: int) -> list[str]:
+    """슬롯의 서한이 규칙 순위 `rank` 번째인지 — 사람·LLM 이 서한을 바꿔 고르지 못하게."""
+    ranked = la.ranked_anatomy_cards(doc)
+    if rank > len(ranked):
+        return [f"a{rank}: 해부 가능한 서한이 {len(ranked)}건뿐이다 — 이 슬롯은 만들지 않는다"]
+    want = str(ranked[rank - 1].get("id"))
+    return [] if str(slots.get("card_id")) == want else [f"a{rank}: card_id 가 규칙 {rank}위({want})가 아니다"]
+
+
+def _material(c: dict) -> dict[str, Any]:
     da = c.get("deep_analysis") or {}
-    out.update(pick=c.get("id"), firm_name_do_not_write=c.get("headline_target"), material=dict(
-        title_issue=c.get("title_issue"), summary=c.get("summary"), key_facts=c.get("key_facts"), facts=c.get("facts"),
-        key_violations=[{k: v.get(k) for k in ("citation", "description", "original")} for v in da.get("key_violations") or []],
-        fda_evaluation=da.get("fda_evaluation"), required_remediation=da.get("required_remediation"),
-        administrative_risks=da.get("administrative_risks"), deadline=la._deadline(c), issue_date=la._issue_date(c)))
+    return dict(title_issue=c.get("title_issue"), summary=c.get("summary"), key_facts=c.get("key_facts"), facts=c.get("facts"),
+                key_violations=[{k: v.get(k) for k in ("citation", "description", "original")} for v in da.get("key_violations") or []],
+                fda_evaluation=da.get("fda_evaluation"), required_remediation=da.get("required_remediation"),
+                administrative_risks=da.get("administrative_risks"), deadline=la._deadline(c), issue_date=la._issue_date(c))
+
+
+def candidates(doc: dict, slot_path: Path | None = None) -> dict[str, Any]:
+    """주간 슬롯 작성자(대외홍보팀 Routine)에게 줄 재료 — 대상 선정은 코드가 한다(ANATOMY_CARDS.md 규칙).
+    `picks` = 규칙 상위 최대 2건(a1=수요일, a2=금요일). 고른 서한의 원천 필드만 준다 — 슬롯 문장은 이 안에서만 근거를 찾는다.
+    (`pick`·`material`·`slot_path` 는 a1 — 옛 호출 호환)"""
+    brief = doc.get("brief") or {}
+    pub = str(brief.get("publish_date") or "")
+    d = slot_path.parent if slot_path else SLOTS_DIR
+    elig = la.ranked_anatomy_cards(doc)
+    skipped = [dict(id=c.get("id"), title_issue=c.get("title_issue")) for c in doc.get("cards") or []
+               if lc.is_warning_letter(c) and la.is_records_review(c)]
+    out: dict[str, Any] = {"pub": pub,
+                           "ranked": [dict(id=c.get("id"), title_issue=c.get("title_issue"), score=list(la.anatomy_score(c)))
+                                      for c in elig],
+                           "records_review_skipped": skipped}
+    picks = []
+    for k, c in enumerate(elig[:MAX_PER_ISSUE], 1):
+        sp = slot_path_for(pub, k, d)
+        exists = sp.exists() or (k == 1 and (d / f"{pub}.v3.json").exists())
+        picks.append(dict(rank=k, day="수요일" if k == 1 else "금요일", id=c.get("id"), slot_path=str(sp), slot_exists=exists,
+                          firm_name_do_not_write=c.get("headline_target"), material=_material(c)))
+    out["picks"] = picks
+    if not picks:
+        out.update(pick=None, reason="해부 가능한 경고서한 없음(서한 0건, 본문·평가·요구 미확보, 또는 기록 요청형뿐) — 이번 주는 넘긴다")
+        return out
+    out.update(pick=picks[0]["id"], slot_path=picks[0]["slot_path"], slot_exists=picks[0]["slot_exists"],
+               firm_name_do_not_write=picks[0]["firm_name_do_not_write"], material=picks[0]["material"])
     return out
 
 
@@ -936,7 +985,9 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="링크드인 사건 해부 GRM 판(시범 v3)")
     ap.add_argument("--brief", help="브리프 JSON(미지정 시 --data 의 최신)")
     ap.add_argument("--data", default=str(WEB_DIR / "data" / "briefs"), help="--brief 가 없을 때 최신 브리프를 찾을 디렉터리")
-    ap.add_argument("--slots", help="v3 슬롯 JSON(기본: web/data/linkedin_anatomy/<발행일>.v3.json)")
+    ap.add_argument("--slots", help="슬롯 JSON 하나만(기본: 그 호의 <발행일>.a1·a2.v3.json, 옛 <발행일>.v3.json 은 a1)")
+    ap.add_argument("--rank", type=int, choices=range(1, MAX_PER_ISSUE + 1),
+                    help="이 순위 슬롯만(--save-letter·--save-similar·--check·렌더). 없으면 그 호의 슬롯 전부")
     ap.add_argument("--out", help="출력 폴더")
     ap.add_argument("--dist", help="배포 루트 — briefs/<발행일>/ 아래에 낸다(linkedin.* 옆, 사이트맵 비등록)")
     ap.add_argument("--no-pdf", action="store_true")
@@ -957,78 +1008,119 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     doc = json.loads(bp.read_text(encoding="utf-8"))
     pub = str((doc.get("brief") or {}).get("publish_date") or "")
-    sp = Path(args.slots) if args.slots else SLOTS_DIR / f"{pub}.v3.json"
     if args.candidates:
-        print(json.dumps(candidates(doc, sp), ensure_ascii=False, indent=1))
+        print(json.dumps(candidates(doc, Path(args.slots) if args.slots else None), ensure_ascii=False, indent=1))
         return 0
     if args.save_letter:
         import linkedin_grm_en as lge
-        pick = candidates(doc, sp).get("pick")
-        text = lge.letter_from_handoff(json.loads(Path(args.save_letter).read_text(encoding="utf-8")), str(pick or ""))
-        if not text:
-            print(f"::warning::handoff 에 서한 전문이 없다(card {pick}) — 영문판은 그 주 만들지 않는다", file=sys.stderr)
-            return 1
-        lp = lge.letter_path(pub, sp.parent)
-        lp.write_text(text + "\n", encoding="utf-8", newline="\n")
-        print(f"저장: {lp.name} · {len(text)}자")
+        picks = candidates(doc).get("picks") or []
+        rc = 0
+        for pk in picks:
+            if args.rank and pk["rank"] != args.rank:
+                continue
+            text = lge.letter_from_handoff(json.loads(Path(args.save_letter).read_text(encoding="utf-8")), str(pk["id"]))
+            if not text:
+                print(f"::warning::handoff 에 서한 전문이 없다(a{pk['rank']} {pk['id']}) — 그 편 영문판은 만들지 않는다", file=sys.stderr)
+                rc = 1
+                continue
+            lp = sidecar(Path(pk["slot_path"]), "letter_en.txt")
+            lp.write_text(text + "\n", encoding="utf-8", newline="\n")
+            print(f"저장: {lp.name} · {len(text)}자")
+        return rc
+    if args.slots:
+        sp0 = Path(args.slots)
+        if not sp0.exists():
+            print(f"::warning::슬롯 없음({sp0.name}) — 만들지 않는다", file=sys.stderr)
+            return 0
+        targets = [(int(json.loads(sp0.read_text(encoding="utf-8")).get("rank") or args.rank or 1), sp0)]
+    else:
+        targets = [(k, p) for k, p in slot_paths(pub) if not args.rank or k == args.rank]
+    if not targets:
+        print(f"::warning::{pub} 해부 슬롯 없음 — 만들지 않는다", file=sys.stderr)
         return 0
-    if not sp.exists():
-        print(f"::warning::v3 슬롯 없음({sp.name}) — 만들지 않는다", file=sys.stderr)
-        return 0
-    slots = json.loads(sp.read_text(encoding="utf-8"))
     findings = load_findings(Path(args.findings))
     url, key = os.environ.get("SUPABASE_URL", "").strip(), os.environ.get("SUPABASE_ANON_KEY", "").strip()
-    if args.check:
-        card = la.pick_anatomy_card(doc, str(slots.get("card_id") or ""))
-        probs = validate_v3(card, slots, findings) if card else ["card_id 에 맞는 해부 가능한 경고서한이 브리프에 없다"]
-        if card and slots.get("en"):
-            import linkedin_grm_en as lge
-            probs += lge.validate_en(card, slots, findings, lge.load_letter(pub, sp.parent))
-        for pr in probs:
-            print(f"  - {pr}")
-        print(f"linkedin_grm --check: {pub} · 문제 {len(probs)}건")
-        return 1 if probs else 0
-    if args.save_similar:
-        snap = sp.parent / f"{pub}.similar.json"
-        if snap.exists():
-            print(f"저장본 있음 — 부르지 않는다: {snap.name}")
-            return 0
-        if not (url and key):
-            print("::warning::SUPABASE_URL·SUPABASE_ANON_KEY 없음 — 저장하지 않는다", file=sys.stderr)
-            return 1
-        sim = fetch_similar(slots, url=url, key=key)
-        if not sim:
-            return 1
-        snap.write_text(json.dumps(sim, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
-        print(f"저장: {snap.name} · 항목 {len(sim['items'])} · 실패 지적 {sim['failed_findings']}")
-        return 0
-    similar = load_similar(slots, pub, url=url, key=key)
+    rc = 0
+    for rank, sp in targets:
+        slots = json.loads(sp.read_text(encoding="utf-8"))
+        tag = f"a{rank}"
+        if args.check:
+            card = la.pick_anatomy_card(doc, str(slots.get("card_id") or ""))
+            probs = validate_v3(card, slots, findings) if card else ["card_id 에 맞는 해부 가능한 경고서한이 브리프에 없다"]
+            probs += rank_problems(doc, slots, rank)
+            if card and slots.get("en"):
+                import linkedin_grm_en as lge
+                probs += lge.validate_en(card, slots, findings, lge.load_letter_at(sidecar(sp, "letter_en.txt")))
+            for pr in probs:
+                print(f"  - [{tag}] {pr}")
+            print(f"linkedin_grm --check: {pub} {tag} · 문제 {len(probs)}건")
+            rc |= 1 if probs else 0
+            continue
+        if args.save_similar:
+            snap = sidecar(sp, "similar.json")
+            if snap.exists():
+                print(f"저장본 있음 — 부르지 않는다: {snap.name}")
+                continue
+            if not (url and key):
+                print("::warning::SUPABASE_URL·SUPABASE_ANON_KEY 없음 — 저장하지 않는다", file=sys.stderr)
+                rc = 1
+                continue
+            sim = fetch_similar(slots, url=url, key=key)
+            if not sim:
+                rc = 1
+                continue
+            snap.write_text(json.dumps(sim, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+            print(f"저장: {snap.name} · 항목 {len(sim['items'])} · 실패 지적 {sim['failed_findings']}")
+            continue
+        rc |= _render_slot(args, doc, pub, rank, sp, slots, findings, url, key)
+    return rc
+
+
+def _render_slot(args, doc: dict, pub: str, rank: int, sp: Path, slots: dict, findings: dict, url: str, key: str) -> int:
+    """한 편(a1/a2)을 낸다 — `linkedin_grm_a{k}*`(국문)·`linkedin_grm_a{k}_en*`(영문). a1 은 옛 이름(`linkedin_grm*`)으로도
+    복사한다(11-16 에 이미 나간 주소·옛 PC 작업 호환)."""
+    import shutil
+    similar = load_similar(slots, pub, url=url, key=key, snap=sidecar(sp, "similar.json"))
+    probs = rank_problems(doc, slots, rank)
     try:
+        if probs:
+            raise la.AnatomyError(probs)
         deck = build_grm_deck(doc, slots, findings, similar=similar)
     except la.AnatomyError as exc:
-        print("::warning::GRM 판 덱 검증 실패 — 만들지 않는다", file=sys.stderr)
+        print(f"::warning::GRM 판 덱 a{rank} 검증 실패 — 이 편은 만들지 않는다", file=sys.stderr)
         for pr in exc.problems:
             print(f"  - {pr}", file=sys.stderr)
         return 1
     out = Path(args.out) if args.out else Path(args.dist) / "briefs" / pub
     out.mkdir(parents=True, exist_ok=True)
+    stem = f"linkedin_grm_a{rank}"
     if similar:
-        (out / "similar.json").write_text(json.dumps(similar, ensure_ascii=False, indent=1), encoding="utf-8")
+        (out / f"similar_a{rank}.json").write_text(json.dumps(similar, ensure_ascii=False, indent=1), encoding="utf-8")
     chrome = None if args.no_pdf else lc.find_chrome()
-    n = _write_deck(deck, out, "linkedin_grm", chrome)
-    print(f"linkedin_grm: {pub} · {len(deck['slides'])}장 · 본문 {len(deck['caption'])}자 · PNG {n} → {out}")
-    # 영문판 — 슬롯에 en 블록이 있는 주만. 실패해도 국문판은 그대로 낸다(그 주 영문만 빠진다).
+    n = _write_deck(deck, out, stem, chrome)
+    written = [(stem, "linkedin_grm", len(deck["slides"]))]
+    print(f"{stem}: {pub} · {len(deck['slides'])}장 · 본문 {len(deck['caption'])}자 · PNG {n} → {out}")
+    # 영문판 — 슬롯에 en 블록이 있는 편만. 실패해도 국문판은 그대로 낸다(그 편 영문만 빠진다).
     if slots.get("en"):
         import linkedin_grm_en as lge
         try:
-            en_deck = lge.build_en_deck(doc, slots, findings, lge.load_letter(pub, sp.parent), similar=similar)
+            en_deck = lge.build_en_deck(doc, slots, findings, lge.load_letter_at(sidecar(sp, "letter_en.txt")), similar=similar)
         except la.AnatomyError as exc:
-            print("::warning::GRM 판 영문 덱 검증 실패 — 영문만 만들지 않는다", file=sys.stderr)
+            print(f"::warning::GRM 판 영문 덱 a{rank} 검증 실패 — 영문만 만들지 않는다", file=sys.stderr)
             for pr in exc.problems:
                 print(f"  - {pr}", file=sys.stderr)
-            return 0
-        n = _write_deck(en_deck, out, "linkedin_grm_en", chrome)
-        print(f"linkedin_grm_en: {pub} · {len(en_deck['slides'])} slides · caption {len(en_deck['caption'])} chars · PNG {n} → {out}")
+            en_deck = None
+        if en_deck:
+            n = _write_deck(en_deck, out, f"{stem}_en", chrome)
+            written.append((f"{stem}_en", "linkedin_grm_en", len(en_deck["slides"])))
+            print(f"{stem}_en: {pub} · {len(en_deck['slides'])} slides · caption {len(en_deck['caption'])} chars · PNG {n} → {out}")
+    if rank == 1:
+        for new, old, k in written:
+            for ext in (".txt", ".html", *[f"_{i:02d}.png" for i in range(1, k + 1)]):
+                if (out / f"{new}{ext}").exists():
+                    shutil.copyfile(out / f"{new}{ext}", out / f"{old}{ext}")
+        if similar:
+            shutil.copyfile(out / f"similar_a{rank}.json", out / "similar.json")
     return 0
 
 

@@ -15,7 +15,7 @@ PC 예약작업 `grm-linkedin-weekly` 의 **파일 확인 부분**을 옮긴 것
    - 장 수(7~9장이 보통) · 빈 장 · 글자 깨짐.
    - **영문 PDF 의 한글 글자 수 = 0** 이어야 한다(`re.findall('[가-힣]', 전체 텍스트)`). 있으면 몇 장인지.
    - 영문이 404 면 국문만 — 그 사실 한 줄.
-3-1. 사건 해부 7장: `https://grm-solutions.com/briefs/$PUB/linkedin_grm.txt` 와 `linkedin_grm_01.png`~`07.png` 가 200 인지 본다.
+3-1. 사건 해부 7장(수·금 게시분): `https://grm-solutions.com/briefs/$PUB/linkedin_grm_a1.txt`·`linkedin_grm_a1_01.png`~`07.png`(a2 도 같은 꼴, 옛 호는 `linkedin_grm.txt`)가 200 인지 본다. 월요일 게시는 기본판(위 2번)이다.
    200 이면 **국문은 이 7장 + linkedin_grm.txt 가 우선**이다(PC `grm-linkedin-weekly` 도 같은 순서). 영문도 `linkedin_grm_en.txt`·`linkedin_grm_en_01~07.png` 가 200 이면 그것이 우선이다(한글 0자인지 본다). 404 면 슬롯 Routine(`outreach/linkedin-anatomy.md`) 결과 —
    열린 PR `linkedin(anatomy): $PUB` 이 있으면 `머지 대기`, 없으면 `해부 없음(종전 덱)` 한 줄.
 4. 본문(`linkedin.txt`)에 AI 고지가 맨 아래에 있는지, 실명(사람 이름)이 없는지 본다(광고엔 실명 금지).

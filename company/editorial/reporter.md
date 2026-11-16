@@ -3,7 +3,7 @@
 ## 읽을 것 (이 순서로, 이것만)
 1. `company/CHARTER.md`
 2. `company/editorial/RUN.md` — 이 파일이 아래 모든 규칙보다 우선
-3. `company/run/{run_date_kst}/desk.json` — 데스크 결과. `status` 가 `완료` 가 아니면 `보류` 로 종료. **`shards` 에서 자기 샤드 목록만** 본다
+3. `company/run/{run_date_kst}/desk.json` — 데스크 결과. `보류`·`실패` 면 바로 종료. 아직 없거나 그 밖의 상태면 **08:35 KST 까지 3분마다 다시 확인**하고(RUN.md 5-2 — handoff 가 늦은 주. 리허설은 시각 무시), 그때도 `완료` 가 아니면 아무것도 쓰지 않고 종료. **`shards` 에서 자기 샤드 목록만** 본다
 4. `docs/prompts/GRM_Prompt_v16.md` §B 중 **아래 절만** (본문을 그대로 따른다 — 요약·재해석 금지)
 5. 이번 주 handoff (Notion, 읽기만) — 자기 샤드 카드의 `prose_input`·`needs_llm_slots`·코드 `facts`·`quotes` 만
 6. `company/editorial/STYLE.md` §12 — `hook_line` 작성 규칙(그 절만)

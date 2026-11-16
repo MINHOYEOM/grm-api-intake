@@ -229,7 +229,9 @@ a.home-cell:hover{background:var(--canvas)}
 .hc-links{list-style:none;margin:6px 0 0;padding:0;border-top:1px solid var(--line)}
 .hc-links a,.hc-row{display:grid;grid-template-columns:52px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline;text-decoration:none}
 .hc-links li:last-child a{border-bottom:0;padding-bottom:0}
-.hc-k{font-size:12.5px;color:var(--muted)}
+.hc-k{font-size:12.5px;color:var(--muted);white-space:nowrap}
+/* [2026-11-17] 영문 라벨(Companies·Inspectors·Categories·Document)이 52px 칸에서 단어 중간에 접혔다 — 영문만 칸을 넓힌다. */
+html[lang="en"] .hc-links a,html[lang="en"] .hc-row{grid-template-columns:6.4em 1fr auto}
 .hc-v{color:var(--ink);font-weight:600;min-width:0;word-break:keep-all}
 .hc-go{font-size:12.5px;color:var(--coral-2);white-space:nowrap}
 .hc-links a:hover .hc-v,.hc-links a:hover .hc-go{color:var(--coral)}
@@ -295,6 +297,7 @@ a.home-cell:hover .hc-more{color:var(--coral)}
   .home-cell{padding:18px}
   .hc-quote{font-size:16.5px}
   .hc-links a,.hc-row{grid-template-columns:48px 1fr}
+  html[lang="en"] .hc-links a,html[lang="en"] .hc-row{grid-template-columns:6.4em 1fr}
   .hc-go{display:none}
   .home-rows li{grid-template-columns:44px 1fr}.hr-a{grid-column:2}.hr-t{grid-column:1 / -1}
   .home-tl li{grid-template-columns:28px minmax(0,1fr)}

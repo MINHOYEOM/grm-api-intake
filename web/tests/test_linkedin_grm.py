@@ -143,8 +143,13 @@ class DeckTest(unittest.TestCase):
         cap = self.deck["caption"]
         heads = [ln[2:] for ln in cap.splitlines() if ln.startswith("■ ")]
         self.assertEqual(heads, ["지적 내용", "회사 회신과 FDA 판단", "FDA 요구", "GRM 지적사항 DB의 비슷한 사례",
-                                 "관련 용어", "서한에 없는 것", "전체 해설"][:len(heads)] if "■ 관련 용어" in cap else
-                         ["지적 내용", "회사 회신과 FDA 판단", "FDA 요구", "GRM 지적사항 DB의 비슷한 사례", "서한에 없는 것", "전체 해설"])
+                                 "관련 용어", "서한에 없는 것", "전체 해설", "GRM 주간 브리프"][:len(heads)] if "■ 관련 용어" in cap else
+                         ["지적 내용", "회사 회신과 FDA 판단", "FDA 요구", "GRM 지적사항 DB의 비슷한 사례", "서한에 없는 것", "전체 해설",
+                          "GRM 주간 브리프"])
+        # [구독 유입 2026-11-17 대책 4] 맨 끝 단락은 구독 — 그 언어 홈의 구독 칸으로, 같은 표식.
+        tail = cap.split("■ GRM 주간 브리프\n", 1)[1].splitlines()
+        self.assertEqual(tail[0], "매주 FDA·EU·식약처 실사 지적 소식을 받아 보세요.")
+        self.assertRegex(tail[1], r"^https://grm-solutions\.com/\?utm_source=linkedin&utm_medium=social&utm_campaign=\S+_weekly#subscribe$")
         self.assertFalse(cap.startswith("■"))
         self.assertTrue(cap.split("■ 지적 내용\n", 1)[1].startswith("지적은"))
         self.assertNotIn("#", cap.split("■ 전체 해설")[0])
@@ -386,7 +391,9 @@ class English1116Test(unittest.TestCase):
         self.assertFalse(cap.startswith("■"))
         heads = [ln[2:] for ln in cap.splitlines() if ln.startswith("■ ")]
         self.assertEqual(heads[0], "What FDA cited")
-        self.assertEqual(heads[-1], "Full analysis")
+        self.assertEqual(heads[-2:], ["Full analysis", "GRM Weekly Brief"])
+        self.assertIn("https://grm-solutions.com/en/?utm_source=linkedin", cap)
+        self.assertIn("#subscribe", cap)
         for ln in cap.splitlines():
             if "grm-solutions.com" in ln:
                 self.assertRegex(ln, r"^https://grm-solutions\.com/en/\S+utm_source=linkedin\S*$")

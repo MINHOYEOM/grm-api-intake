@@ -347,6 +347,9 @@ STR: dict[str, dict[str, Any]] = {
         "month_cap_head": "{m}월 규제 결산, 꼭 볼 변화 {n}가지.",
         "month_count": "이번 달 카드 {c}장 · 브리프 {k}호",
         "month_link_head": "지난 호 전체 보기",
+        # [구독 유입 2026-11-17 대책 4] 본문 끝 구독 한 줄 — 받는 것을 앞세운다(요일·가리키는 말 없음).
+        "sub_head": "GRM 주간 브리프",
+        "sub_line": "매주 FDA·EU·식약처 실사 지적 소식을 받아 보세요.",
     },
     "en": {
         "cover_eyebrow": "Weekly regulatory news · {mon}, week {wk}",
@@ -396,6 +399,8 @@ STR: dict[str, dict[str, Any]] = {
         "month_cap_head": "{mon} recap: {n} change{s} worth your time.",
         "month_count": "{c} card{cs} this month · {k} issue{ks}",
         "month_link_head": "See all past issues",
+        "sub_head": "GRM Weekly Brief",
+        "sub_line": "Get the week's FDA, EU and MFDS inspection findings.",
     },
 }
 
@@ -899,7 +904,21 @@ def hashtags(cards: list[dict], lang: str = "ko") -> str:
     return " ".join(tags)
 
 
-def _caption_one(heads: list[dict], caption_url: str, lang: str, firm_fn) -> str | None:
+def subscribe_url(base_url: str, lang: str, channel: str = "linkedin_weekly", **fmt: str) -> str:
+    """[구독 유입 2026-11-17 대책 4] 게시 본문 끝 구독 링크 — 그 언어 홈의 구독 칸(#subscribe).
+    표식은 같은 게시물의 원문 링크와 같은 채널(`utm.CHANNELS`)이라 구독 제출의 유입 축(087)에
+    링크드인으로 잡힌다. 영어 게시물은 영문 홈 — 영문 리스트(list 4) 폼으로 간다."""
+    home = f"{base_url.rstrip('/')}/{'en/' if lang == 'en' else ''}#subscribe"
+    return channel_url(home, channel, **fmt)
+
+
+def sub_block(t: dict, url: str) -> list[str]:
+    """본문 끝 구독 단락(■ 소제목·한 줄·주소) — 기본판·월간판·해부판이 같은 꼴을 쓴다."""
+    # 기본판은 모바일 폭 26 규칙(한 줄 26칸)을 지킨다 — 설명 한 줄도 같은 감싸기로 접는다.
+    return [f"■ {t['sub_head']}", *wrap_width(t["sub_line"], 26.0), url]
+
+
+def _caption_one(heads: list[dict], caption_url: str, lang: str, firm_fn, sub_url: str = "") -> str | None:
     """'이번 주 한 건' 캡션([마케팅 2026-09-23 계획 L-02, 09-23 개정] 게시 본문 기본형,
     `--caption one`).
 
@@ -957,6 +976,8 @@ def _caption_one(heads: list[dict], caption_url: str, lang: str, firm_fn) -> str
     lines.append(t["one_link_head"])
     lines.append(caption_url)
     lines.append("")
+    if sub_url:
+        lines += [*sub_block(t, sub_url), ""]
     lines.append(hashtags([card], lang))
     return "\n".join(lines) + "\n"
 
@@ -1125,6 +1146,7 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
     # 붙인다(`web/utm.py`). RUM 은 쿼리를 안 읽으므로 이 태그의 소비자는 사이트 first-touch
     # 계측뿐 — 슬라이드 안 표시용 URL 을 더럽히지 않는다.
     caption_url = channel_url(url, "linkedin_weekly", date=pub)
+    sub_url = subscribe_url(base_url, lang, "linkedin_weekly", date=pub)
 
     # ── 본문 A: 요약형(종전 기본, `--caption summary`) — 한 줄에 한 뜻·모바일 폭 안쪽
     lines = [nfmt(t["cap_head"], len(slides)), ""]
@@ -1153,14 +1175,14 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
     if tail:
         lines.append("· " + " · ".join(tail))
     lines += ["", nfmt(t["cap_link"], n_cards), caption_url, "",
-              *t["cap_cta"], "", *t["cap_tags"]]
+              *t["cap_cta"], "", *sub_block(t, sub_url), "", *t["cap_tags"]]
     summary_caption = "\n".join(lines) + "\n"
 
     # ── 본문 B: '이번 주 한 건'(기본, `--caption one`) — 적합한 카드가 없으면 A 로 물러선다.
     if caption_style == "summary":
         caption = summary_caption
     else:
-        caption = _caption_one(heads, caption_url, lang, firm) or summary_caption
+        caption = _caption_one(heads, caption_url, lang, firm, sub_url) or summary_caption
 
     return {"pub": pub, "lang": lang, "slides": slides, "caption": caption,
             "doc_title": t["doc_title"].format(m=m, wk=wk, mon=mon), "url": url,
@@ -1425,6 +1447,7 @@ def build_month_deck(briefs: list[dict], glossary: list[dict], month: str, *, an
     lines.append(t["month_link_head"])
     lines.append(caption_url)
     lines.append("")
+    lines += [*sub_block(t, subscribe_url(base_url, lang, "linkedin_monthly", month=month)), ""]
     lines.append(hashtags([card for card, _pub, _rank in items], lang))
     caption = "\n".join(lines) + "\n"
 

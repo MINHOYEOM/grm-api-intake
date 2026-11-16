@@ -355,7 +355,8 @@ def build_en_deck(brief_doc: dict, slots: dict, findings: dict, letter: str, glo
         while similar_block and similar_block[-1] == "":
             similar_block.pop()
         t = lg.caption_layout(cap["lead"], cap["claims"], cap["contrast"], cap["requests"], similar_block,
-                              [n for n, _ in terms], cap["not_stated"], caption_url, lang="en")
+                              [n for n, _ in terms], cap["not_stated"], caption_url, lang="en",
+                              sub_url=lc.subscribe_url(base_url, "en", "linkedin_weekly", date=pub))
         return utm.tag_bare_site_urls(t, "linkedin_weekly", date=pub)
     text = lg.fit_caption(make, site)
     deck = {"pub": pub, "lang": "en", "slides": slides, "caption": text, "doc_title": f"GRM warning letter analysis · {pub}",

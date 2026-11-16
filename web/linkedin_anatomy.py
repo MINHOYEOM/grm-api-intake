@@ -354,7 +354,9 @@ def build_anatomy_deck(brief_doc: dict, slots: dict, *, glossary: list[dict] | N
     cap = slots["caption"]
     caption_url = lc.with_utm(url, *lc.LINKEDIN_WEEKLY, lc.linkedin_weekly_campaign(pub))
     ko = "\n\n".join(_norm(cap[k]) if k != "facts" else _norm(cap[k]) for k in ("lead", "facts", "contrast", "requests"))
-    parts = [ko, _norm(cap["question"]), f"전체 해설: {caption_url}", cap.get("tags", "")]
+    sub_url = lc.subscribe_url(base_url, "ko", "linkedin_weekly", date=pub)
+    parts = [ko, _norm(cap["question"]), f"전체 해설: {caption_url}",
+             "\n".join(lc.sub_block(lc.STR["ko"], sub_url)), cap.get("tags", "")]
     if cap.get("en"):
         parts.insert(2, cap["en"])
     return {"pub": pub, "lang": "ko", "slides": slides, "caption": "\n\n".join(p for p in parts if p) + "\n",

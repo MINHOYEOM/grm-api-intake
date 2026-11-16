@@ -181,5 +181,162 @@
     "requests": "FDA는 무균조작 독립 평가와 CAPA, 오염 위해 종합 평가와 시정 뒤 동적 조건 스모크 스터디, USP <790>을 반영한 외관검사 프로그램 재평가, 조사 시스템과 품질부서 평가를 요구했습니다. 회신 기한은 서한 수령 후 15영업일입니다.",
     "similar": "우리 지적사항 DB에서 이번 지적과 닮은 과거 사례를 찾아봤습니다.",
     "not_stated": "서한에 없는 것: 스모크 스터디 횟수와 난류 위치 수, 평가 없이 출하된 배치의 제품명과 배치 수(가림 처리)."
+  },
+  "en": {
+    "cover": {
+      "chip": "FDA warning letter · Aseptic processing",
+      "headline": [
+        "Severe turbulence on video,",
+        "airflow called ‘adequate’"
+      ],
+      "sub": "Sterile injectable site · 21 CFR 211.113(b), 211.42(c), 211.160(b)",
+      "quote": {
+        "text": "Significant turbulence was observed in your vial filling line airflow visualization videos. However, your firm concluded that airflow was adequate."
+      },
+      "line": "FDA: such flaws cannot be validated and need redesign",
+      "line_evidence": [
+        "Such inherent flaws cannot be validated and necessitate redesign."
+      ]
+    },
+    "s02": {
+      "heading": "Four findings, by section",
+      "rows": [
+        {
+          "cite": "21 CFR 211.113(b)",
+          "text": "Smoke studies showed no unidirectional airflow across ISO 5",
+          "evidence": [
+            "Your airflow visualization studies (i.e., smoke studies) performed for the ISO 5 vial filling line did not exhibit unidirectional airflow throughout the ISO 5 area.",
+            "airflow was observed to swirl and move upward"
+          ],
+          "short": "Smoke study airflow"
+        },
+        {
+          "cite": "21 CFR 211.113(b)",
+          "text": "Operators reached over sterile equipment and broke first air",
+          "evidence": [
+            "operators breached first air by extending their forearms over sterile equipment"
+          ],
+          "short": "Operators breaking first air"
+        },
+        {
+          "cite": "21 CFR 211.42(c), 211.63",
+          "text": "A conveyor blocked ISO 5 airflow to open sterile bottles",
+          "evidence": [
+            "conveyor system physically blocked continuous ISO 5 unidirectional airflow from reaching open sterile bottles during transport to the filling station"
+          ],
+          "short": "Equipment blocking airflow"
+        },
+        {
+          "cite": "21 CFR 211.160(b)",
+          "text": "Before March 28, 2026, batches shipped without particulate checks",
+          "evidence": [
+            "Prior to March 28, 2026, you also released all batches of (b)(4) without adequate visible particulate assessment.",
+            "You lacked action limits for visible particulates."
+          ],
+          "short": "Visible particulate control"
+        }
+      ]
+    },
+    "s03": {
+      "heading": "Three responses, all found inadequate",
+      "sub": "FDA's review of the May 8, 2026 reply",
+      "pairs": [
+        {
+          "response": "Consultant hired; data show control",
+          "why": "Design flaws cannot be validated and need redesign. Proxy indicators are not enough.",
+          "evidence": [
+            "You add that you engaged an independent consultant to advise on these areas.",
+            "your retrospective risk assessment concluded that the process was in a state of control",
+            "Such inherent flaws cannot be validated and necessitate redesign.",
+            "Your risk assessment relies on proxy indicators such as sterility results, media fill pass rates, and environmental monitoring data"
+          ]
+        },
+        {
+          "response": "Production on the line suspended",
+          "why": "The fixes were minor and narrow, with no plan for the whole aseptic operation.",
+          "evidence": [
+            "you suspended production on the (b)(4) line, pending engineering assessment and remediation",
+            "However, your remediations are minor and narrow in scope.",
+            "it fails to address the need for comprehensive remediation across your aseptic processing operations"
+          ]
+        },
+        {
+          "response": "Will set limits and classify particles",
+          "why": "Batches already distributed were not addressed. Retrospective testing cannot replace control at production.",
+          "evidence": [
+            "In your response, you commit to establish alert and action limits for all products.",
+            "You also commit to implement intrinsic and extrinsic particulate classifications",
+            "It does not address your failure to follow your own procedures on batch disposition criteria for extrinsic particles for products already distributed.",
+            "retrospective destructive testing and assessments of flawed visual inspection data cannot substitute for the required characterization and control you lacked at the time of production."
+          ]
+        }
+      ],
+      "repeat": {
+        "label": "Production stopped",
+        "text": "The firm told FDA it would stop U.S. commercial production on the line. It must tell FDA before resuming.",
+        "evidence": [
+          "You subsequently notified us of your decision to discontinue commercial manufacturing of product from the (b)(4) filling line to the U.S. market.",
+          "notify this office before resuming your drug manufacturing operations"
+        ]
+      }
+    },
+    "s04": {
+      "heading": "What FDA asked for",
+      "items": [
+        {
+          "ref": 0,
+          "title": "Aseptic practice review",
+          "text": "Independent review of aseptic practice and cleanroom behavior, with CAPA and ISO 5 personnel monitoring."
+        },
+        {
+          "ref": 1,
+          "title": "Contamination risk review",
+          "text": "Assessment of all contamination hazards, a timed remediation plan, and smoke studies under dynamic conditions."
+        },
+        {
+          "ref": 2,
+          "title": "Visual inspection plan",
+          "text": "Raw destructive-test data, a USP <790> remediation plan, and a risk review of released batches."
+        },
+        {
+          "ref": 3,
+          "title": "Investigations and QU",
+          "text": "Assessment of the investigation system and of the quality unit's authority, independence and resources."
+        }
+      ]
+    },
+    "s05": {
+      "heading": "Past cases like this one",
+      "comment": "The same sections appear in other sterile-site letters. Cases come from the site's similar-case search.",
+      "topic_label": "Sterility assurance / aseptic processing",
+      "cfr_labels": [
+        "Aseptic process procedures",
+        "Facility areas and equipment design",
+        "Lab controls and visual inspection"
+      ],
+      "map_header": "Sections this letter cites"
+    },
+    "s06": {
+      "heading": "What the letter does not say",
+      "not_stated": [
+        {
+          "text": "The letter does not say how many smoke studies were run or where the turbulence appeared.",
+          "basis": "Violations 1 and 2 (smoke studies, airflow visualization videos) give no count or location"
+        },
+        {
+          "text": "The product and the number of batches released without particulate checks are redacted.",
+          "basis": "Violation 3: ‘released all batches of (b)(4)’ — product redacted, no batch count"
+        }
+      ],
+      "question": "Who judges turbulence in your smoke videos, and by what criteria?"
+    },
+    "caption": {
+      "lead": "The firm called airflow ‘adequate’ though videos showed heavy turbulence. FDA said such inherent flaws cannot be validated and need redesign. The warning letter went to a sterile injectable manufacturer.",
+      "claims": "FDA cited four findings. Under 21 CFR 211.113(b), smoke studies showed no unidirectional airflow across the ISO 5 area. Operators reached over sterile equipment and broke first air. Under 211.42(c) and 211.63, a conveyor blocked ISO 5 airflow to open sterile bottles. Under 211.160(b), there were no action limits for visible particulates. Before March 28, 2026, batches were released without adequate particulate checks.",
+      "contrast": "In its May 8, 2026 reply, the firm said it had hired an independent consultant and that monitoring, sterility and media fill results showed control. FDA said the risk assessment relied on proxy indicators and did not address design flaws. FDA called the line suspension and other fixes minor and narrow in scope. The particulate plan ignored products already distributed. FDA found all three responses inadequate.",
+      "requests": "FDA asked for an independent review of aseptic practice with CAPA, a full contamination risk assessment with smoke studies under dynamic conditions, a USP <790> remediation plan for visual inspection, and an assessment of the investigation system and the quality unit. The reply is due within 15 business days of receipt.",
+      "similar": "We looked for similar past findings in the GRM findings database.",
+      "not_stated": "Not in the letter: The letter does not say how many smoke studies showed turbulence or where. The product and the number of batches released without particulate checks are redacted."
+    }
   }
 }

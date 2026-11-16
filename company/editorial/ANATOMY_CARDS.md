@@ -67,3 +67,5 @@
 - **유사 사례 칸의 맥락은 슬롯이 정한다**: `s05.topic`(지적사항 DB 분류 이름) · `cfr_rows` · `map_header` · `keywords` · `term_ids` · (선택) `method`·`map_note`·`no_match_note`.
   11-02 시범의 PET·환경모니터링 문구는 그 슬롯에만 있다 — 코드 기본값으로 다른 서한에 붙지 않는다.
 - **넘기는 주**: `--candidates` 의 `pick` 이 `null`(해부 가능한 서한 없음)이면 그 주는 쓰지 않는다 — 종전 8장 덱이 나간다. `--check` 를 세 번 고쳐도 못 넘기면 PR 을 열지 않는다.
+- **영문판**(2026-11-16~): 같은 Routine 이 `en` 블록과 `<발행일>.letter_en.txt`(`--save-letter`)를 함께 쓴다. 배포가 `linkedin_grm_en.txt`·`linkedin_grm_en_01~07.png` 를 낸다.
+  영문 검증만 실패하면 국문판은 그대로 나가고 영문만 빠진다. 규칙은 `STYLE.md` §13.1.

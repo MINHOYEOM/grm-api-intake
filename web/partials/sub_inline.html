@@ -15,10 +15,16 @@
 {%- elif sub_kind == 'glossary' %}{% set _t = _("실사 지적 주간 메일") %}{% set _d = _("GMP 용어가 쓰인 새 실사 지적을 매주 받아 보세요.") %}
 {%- elif sub_kind == 'doc' %}{% set _t = _("새 지적 알림 메일") %}{% set _d = _("FDA·EU·식약처의 새 실사 지적을 매주 원문 링크와 함께 받아 보세요.") %}
 {%- elif sub_kind == 'home_brief' %}{% set _t = _("이번 주 소식 메일") %}{% set _d = _("주간 브리프의 핵심과 기관 원문 링크를 메일로 받아 보세요.") %}
+{%- elif sub_kind == 'note' %}{% set _t = _("실사 지적 주간 메일") %}{% set _d = _("실사 대비 노트에 이어 FDA·EU·식약처의 새 실사 지적을 매주 받아 보세요.") %}
+{%- elif sub_kind == 'clause' %}{% set _t = _("조항 인용 지적 메일") %}{% set _d = _("조항이 인용된 새 실사 지적을 원문 링크와 함께 매주 받아 보세요.") %}
+{%- elif sub_kind == 'quiz' %}{% set _t = _("지적 사례 주간 메일") %}{% set _d = _("퀴즈 소재가 되는 실제 지적 사례를 매주 메일로 받아 보세요.") %}
+{%- elif sub_kind == 'library' %}{% set _t = _("규제 자료 주간 메일") %}{% set _d = _("새 가이드라인·공식 문서 소식과 실사 지적을 매주 받아 보세요.") %}
+{%- elif sub_kind == 'notfound' %}{% set _t = _("GRM 주간 브리프") %}{% set _d = _("찾던 페이지 대신, 매주 FDA·EU·식약처 실사 지적 소식을 받아 보세요.") %}
+{%- elif sub_kind == 'firm' %}{% set _t = _("업체 지적 알림 메일") %}{% set _d = _("FDA·EU·식약처의 새 지적 기록을 매주 받아 보세요.") %}
 {%- elif sub_kind == 'findings' %}{% set _t = _("지적사항 주간 메일") %}{% set _d = _("매주 FDA·EU·식약처 실사 지적 소식을 원문 링크와 함께 받아 보세요.") %}
 {%- else %}{% set _t = _("주간 실사 지적 메일") %}{% set _d = _("FDA·EU·식약처의 새 실사 지적을 매주 받아 보세요.") %}
 {%- endif -%}
-<aside class="grm-inl{% if sub_stack %} grm-inl--stack{% endif %}" data-sub-slot="{{ sub_slot or 'top' }}" aria-label="{{ _('메일 구독') }}">
+{% if sub_wrap %}<div class="wrap">{% endif %}<aside class="grm-inl{% if sub_stack %} grm-inl--stack{% endif %}" data-sub-slot="{{ sub_slot or 'top' }}" aria-label="{{ _('메일 구독') }}">
   <div class="grm-inl-in">
     <div class="grm-inl-tx"><b>{{ _t }}</b><span>{{ _d }}</span></div>
     <form class="grm-inl-form" action="{{ newsletter_form_action }}" method="post">
@@ -30,5 +36,5 @@
     </form>
   </div>
   <p class="grm-inl-done" role="status" aria-live="polite" hidden><b>{{ _("확인 메일을 보냈습니다") }}</b> {{ _("메일의 구독 확인 버튼을 누르면 구독이 완료됩니다.") }}</p>
-</aside>
+</aside>{% if sub_wrap %}</div>{% endif %}
 {%- endif -%}

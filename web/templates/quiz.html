@@ -92,6 +92,8 @@
     </section>
     {#- 필터 결과가 0건일 때(예: 전체를 다 푼 뒤 "안 푼 문항만") — 빈 화면 대신 안내. -#}
     <p class="qz-empty" id="grm-qz-empty" hidden>{{ _('조건에 맞는 문항이 없습니다. 다른 필터를 선택하세요.') }}</p>
+    {#- [구독 유입 2026-11-17 · 대표 지시] 본문 끝 줄형 구독 칸 — newsletter 게이트 안(env-off 출력 0). -#}
+    {%- with sub_kind='quiz', sub_slot='end' %}{% include "partials/sub_inline.html" %}{% endwith +%}
   </div>
 </main>
 {% include "backtotop.html" %}

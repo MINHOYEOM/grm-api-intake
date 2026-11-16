@@ -403,13 +403,17 @@ def _deep_preview(da: dict[str, Any] | None, tr: Translator = _KO) -> str:
         return ""
     kv = da.get("key_violations")
     n = len(kv) if isinstance(kv, list) else 0
+    # [2026-11-16 브리프 품질 ①] 483 은 ②·④ 칸을 비울 수 있다 — 빈 칸은 화면에서 숨기므로 힌트에도
+    # 넣지 않는다. 네 칸이 다 찬 카드(WL·admin·종전 483)는 종전 문자열 그대로다.
     if da.get("disposition_basis"):
         mid = tr("처분근거")
-    elif da.get("inspectional_significance"):
-        mid = tr("실사의미")
+    elif "inspectional_significance" in da:
+        mid = tr("실사의미") if str(da.get("inspectional_significance") or "").strip() else ""
     else:
         mid = tr("대응조치")
-    parts = ([tr("위반 {n}건", n=n)] if n else []) + [mid, tr("행정리스크")]
+    risk = tr("행정리스크") if (str(da.get("administrative_risks") or "").strip()
+                              or "inspectional_significance" not in da) else ""
+    parts = ([tr("위반 {n}건", n=n)] if n else []) + [x for x in (mid, risk) if x]
     return " · ".join(parts)
 
 
@@ -543,11 +547,13 @@ def card_english_gaps(card: dict[str, Any]) -> list[str]:
     """
     en = card.get("en")
     en = en if isinstance(en, dict) else {}
+    optional = CARD_NARRATIVE_OPTIONAL + (
+        ("key_facts",) if card.get("card_type") in KEY_FACTS_OPTIONAL_CARD_TYPES else ())
     gaps: list[str] = []
     for field in CARD_NARRATIVE_FIELDS:
         if _narrative_filled(en.get(field)):
             continue
-        if field in CARD_NARRATIVE_OPTIONAL and not _narrative_filled(card.get(field)):
+        if field in optional and not _narrative_filled(card.get(field)):
             continue
         gaps.append(field)
     return gaps
@@ -3847,6 +3853,9 @@ CARD_NARRATIVE_FIELDS: tuple[str, ...] = (
 )
 # 그중 한국어가 비어 있으면 영어도 비어도 되는 둘(쓸 원문 정보가 없는 카드 — 2026-11-10).
 CARD_NARRATIVE_OPTIONAL: tuple[str, ...] = ("implication", "checks")
+# [2026-11-16 브리프 품질 ③] 소식·지침·고시 카드는 원문에 머리말 사실이 없으면 `key_facts` 도 비운다.
+# 이 세 유형에서만 한국어 `key_facts` 가 비면 영어도 비어도 된다(inject_slots·merge_parts 와 같은 목록).
+KEY_FACTS_OPTIONAL_CARD_TYPES: tuple[str, ...] = ("규제 소식", "지침·안내서", "고시·개정법령")
 
 # [다국어 6단계 2026-09-04] 404 의 되돌림 카드 — **그 트리에 실제로 있는 면만** 싣는다.
 # ★영어 트리에는 아카이브(영문 브리프가 있어야 선다)와 용어사전이 없다. 손으로 적은

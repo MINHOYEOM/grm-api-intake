@@ -83,9 +83,20 @@ def _ev_list(ev: Any) -> list[str]:
 
 # ── 대상 카드 선정(제안 규칙 — 근거는 company/editorial/ANATOMY_CARDS.md) ──────────────────────
 
+_RECORDS_REVIEW = re.compile(r"704\(a\)\(4\)")
+
+
+def is_records_review(card: dict) -> bool:
+    """실사 없이 704(a)(4) 기록 요청·검토로 나간 서한 — 483 회신이 없어 '회사 회신 → FDA 판단' 칸을 채울 원문이 없다.
+    (2026-11-16 호 2~4위가 모두 이 유형이었다: 공급업체 관리·기록 제출 거부·기록 접근 거부.) 해부하지 않는다 — 억지로 채우지 않는다."""
+    da = card.get("deep_analysis") or {}
+    blob = " ".join([str(card.get("summary") or ""), *[str(v.get("citation") or "") for v in da.get("key_violations") or []]])
+    return bool(_RECORDS_REVIEW.search(blob))
+
+
 def anatomy_eligible(card: dict) -> bool:
-    """해부할 수 있는 경고서한: 본문이 확보되고, 지적·FDA 평가·요구사항이 모두 있다."""
-    if not lc.is_warning_letter(card) or not card.get("source_body_captured"):
+    """해부할 수 있는 경고서한: 본문이 확보되고, 지적·FDA 평가·요구사항이 모두 있고, 실사 뒤 회신을 평가한 서한."""
+    if not lc.is_warning_letter(card) or not card.get("source_body_captured") or is_records_review(card):
         return False
     da = card.get("deep_analysis") or {}
     return bool(da.get("key_violations") and _norm(da.get("fda_evaluation"))
@@ -107,6 +118,11 @@ def anatomy_score(card: dict) -> tuple:
     n_facts = len(re.findall(r"\d+\s*(?:건|개|회|년|개월|일|%|배치|명|곳)", body))
     return (int(card.get("signal_tier") or 0), n_facts, len(da.get("key_violations") or []),
             -int(card.get("render_order") or 0))
+
+
+def ranked_anatomy_cards(brief_doc: dict) -> list[dict]:
+    """해부 가능한 서한을 규칙 순서대로 — 수요일=1위(a1), 금요일=2위(a2)."""
+    return sorted((c for c in brief_doc.get("cards") or [] if anatomy_eligible(c)), key=anatomy_score, reverse=True)
 
 
 def pick_anatomy_card(brief_doc: dict, card_id: str = "") -> dict | None:

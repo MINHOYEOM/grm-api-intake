@@ -421,6 +421,85 @@ class English1116Test(unittest.TestCase):
         self.assertTrue(any("letter_en.txt" in x for x in p), p)
 
 
+class MultiSlotTest(unittest.TestCase):
+    """[2026-11-16 대표 결정] 수요일=1위(a1)·금요일=2위(a2). 기록 요청형(704(a)(4)) 서한은 회신 평가 원문이 없어 해부하지 않는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.doc = json.loads(BRIEF_1116.read_text(encoding="utf-8"))
+
+    def test_records_review_letters_are_not_anatomized(self):
+        ranked = [c["id"] for c in la.ranked_anatomy_cards(self.doc)]
+        self.assertEqual(ranked, ["bfbb158a522f"])  # 2~4위(공급업체 관리·기록 제출 거부·기록 접근 거부)는 모두 704(a)(4)
+        got = lg.candidates(self.doc)
+        self.assertEqual([p["rank"] for p in got["picks"]], [1])
+        self.assertEqual({s["id"] for s in got["records_review_skipped"]}, {"0f65bd3c5c70", "7e7545ebb190", "00ae76e635bb"})
+
+    def test_legacy_single_slot_is_a1_and_sidecars_follow_slot(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            d = Path(td)
+            (d / "2099-01-05.v3.json").write_text("{}", encoding="utf-8")
+            (d / "2099-01-05.a2.v3.json").write_text("{}", encoding="utf-8")
+            got = lg.slot_paths("2099-01-05", d)
+            self.assertEqual([(k, p.name) for k, p in got], [(1, "2099-01-05.v3.json"), (2, "2099-01-05.a2.v3.json")])
+            self.assertEqual(lg.sidecar(got[0][1], "similar.json").name, "2099-01-05.similar.json")
+            self.assertEqual(lg.sidecar(got[1][1], "letter_en.txt").name, "2099-01-05.a2.letter_en.txt")
+            (d / "2099-01-05.a1.v3.json").write_text("{}", encoding="utf-8")
+            self.assertEqual(lg.slot_paths("2099-01-05", d)[0][1].name, "2099-01-05.a1.v3.json")
+
+    def test_rank_must_match_rule(self):
+        s = json.loads(SLOTS_1116.read_text(encoding="utf-8"))
+        self.assertEqual(lg.rank_problems(self.doc, s, 1), [])
+        self.assertTrue(lg.rank_problems(self.doc, s, 2))
+        s["card_id"] = "0f65bd3c5c70"
+        self.assertTrue(lg.rank_problems(self.doc, s, 1))
+
+    def test_a1_outputs_and_legacy_copies(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            rc = lg.main(["--brief", str(BRIEF_1116), "--out", td, "--no-pdf"])
+            self.assertEqual(rc, 0)
+            names = {p.name for p in Path(td).iterdir()}
+            for n in ("linkedin_grm_a1.txt", "linkedin_grm_a1_en.txt", "linkedin_grm.txt", "linkedin_grm_en.txt"):
+                self.assertIn(n, names)
+            self.assertNotIn("linkedin_grm_a2.txt", names)
+            self.assertEqual((Path(td) / "linkedin_grm_a1_en.txt").read_text(encoding="utf-8"),
+                             (Path(td) / "linkedin_grm_en.txt").read_text(encoding="utf-8"))
+
+
+class CaptionLimitTest(unittest.TestCase):
+    """[2026-11-16] 링크드인 게시물 한도 3,000자 — 영문 3,699자로 게시 버튼이 막혔다. 상한 2,900(주소는 utm 포함 전체)."""
+
+    def test_1116_captions_fit_both_languages(self):
+        import linkedin_grm_en as lge
+        doc = json.loads(BRIEF_1116.read_text(encoding="utf-8"))
+        s = json.loads(SLOTS_1116.read_text(encoding="utf-8"))
+        f = lg.load_findings()
+        ko = lg.build_grm_deck(doc, s, f)["caption"]
+        en = lge.build_en_deck(doc, s, f, lge.load_letter("2026-11-16"))["caption"]
+        self.assertLessEqual(len(ko), lg.CAPTION_MAX)
+        self.assertLessEqual(len(en), lg.CAPTION_MAX)
+        self.assertIn("Firm A", en)  # 사례를 통째로 버리지 않고 뒤에서부터 뺀다
+
+    def test_order_drop_tail_cases_then_shorten_quotes(self):
+        site = [dict(alias=a, fact="x" * 150) for a in "ABCD"]
+        make = lambda rows: "".join(r["alias"] + r["fact"] for r in rows)  # noqa: E731
+        self.assertEqual(lg.fit_caption(make, site, limit=1000), make(site))           # 들어가면 그대로
+        self.assertEqual(lg.fit_caption(make, site, limit=460), make(site[:3]))       # ① 뒤에서부터 뺀다
+        got = lg.fit_caption(make, site, limit=200)                                    # ② 2건 + 인용 80자
+        self.assertTrue(got.startswith("A") and "B" in got and "C" not in got)
+        self.assertLessEqual(len(got), 200)
+        with self.assertRaises(la.AnatomyError):
+            lg.fit_caption(lambda rows: "y" * 300, site, limit=200)                   # 슬롯 문장이 길면 거부
+
+    def test_short_fact_cuts_on_word_boundary(self):
+        src = "Your firm failed to perform adequate smoke studies under dynamic conditions to demonstrate unidirectional airflow"
+        out = lg._short_fact(src)
+        self.assertTrue(out.endswith("…") and len(out) <= lg.SHORT_FACT + 1)
+        self.assertIn(out[:-1].split()[-1], src.split())  # 마지막 낱말이 잘리지 않았다
+
+
 class PickFactTest(unittest.TestCase):
     def test_does_not_split_inside_a_sentence_on_da(self):
         t = "귀사는 멸균 의약품 및 자재를 ISO-5 품질보다 낮은 공기에 노출시켰다. 구체적으로, 작업자의 팔이 막았다."

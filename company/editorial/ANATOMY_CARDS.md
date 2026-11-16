@@ -57,7 +57,7 @@
 4. 용어 풀이: 카드 안 풀이는 슬롯이 쓴다. 용어사전 `easy_ko` 와 같은 뜻이라는 보장은 아직 사람이 본다(자동 대조는 후속).
 
 ## 매주 운영 (2026-11-16~)
-- **누가 쓰나**: 대외홍보팀 클라우드 Routine `company/outreach/linkedin-anatomy.md`(월 13:00·16:00, 화 09:00 따라잡기, Sonnet·구독 경로 — 유료 API 없음).
+- **누가 쓰나**: 대외홍보팀 클라우드 Routine `company/outreach/linkedin-anatomy.md`(월 13:00·16:00, Sonnet·구독 경로 — 유료 API 없음).
   발행 PR 이 main 에 들어간 뒤(`web/data/briefs/brief_web_<발행일>.json`) `python web/linkedin_grm.py --candidates` 로 코드가 고른 서한의 재료를 받아
   `web/data/linkedin_anatomy/<발행일>.v3.json` 을 쓰고, `--check` 통과 + `--save-similar` 저장본까지 커밋해 PR `linkedin(anatomy): <발행일>` 을 연다.
   `grm-stranded-batch-pr.yml` 이 초록 30분 뒤 머지(바뀐 파일이 이 폴더뿐일 때만) → 배포 스텝이 `linkedin_grm.txt`·PNG 7장을 낸다.

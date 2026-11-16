@@ -1,0 +1,39 @@
+{#- [기준 조항 원문] /clauses/ 세 화면 공통 스코프 스타일. grm.css 프리즈 보존을 위해 페이지 안 <style>.
+    클래스 공간 .ct-* · 색·글꼴은 전역 토큰만. §4 한글 안전: letter-spacing/text-transform 금지. -#}
+<style>
+  .ct-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .ct-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .ct-crumb a:hover{color:var(--coral)}
+  .ct-crumb i{font-style:normal;color:var(--line-2)}
+  .ct-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .ct-sub{font-family:var(--sans);font-size:15.5px;line-height:1.5;color:var(--ink);margin:8px 0 0}
+  .ct-path{font-family:var(--sans);font-size:13px;line-height:1.5;color:var(--muted);margin:8px 0 0}
+  .ct-lead{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);margin:14px 0 0;max-width:760px;word-break:keep-all}
+  .ct-body{margin-top:30px;display:flex;flex-direction:column;gap:30px;max-width:820px}
+  .ct-sec-h{font-family:var(--sans);font-size:14px;color:var(--muted);margin:0 0 12px}
+  .ct-text{border:1px solid var(--line-2);border-radius:10px;padding:20px 22px;background:var(--paper,#FFFFFF)}
+  .ct-text p{font-family:var(--sans);font-size:15.5px;line-height:1.78;color:var(--ink);margin:0 0 12px;overflow-wrap:anywhere}
+  .ct-text p:last-child{margin-bottom:0}
+  .ct-notes{margin:0;padding-left:18px;font-family:var(--sans);font-size:13px;line-height:1.6;color:var(--muted)}
+  .ct-links{display:flex;flex-wrap:wrap;gap:8px}
+  .ct-links a{font-family:var(--sans);font-size:13.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:99px;padding:6px 12px}
+  .ct-links a:hover{border-color:var(--coral);color:var(--coral)}
+  .ct-pn{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
+  .ct-pn a{font-family:var(--sans);font-size:14px;color:var(--coral-2);text-decoration:none}
+  .ct-note{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:0;word-break:keep-all;max-width:760px}
+  .ct-src{border-top:1px solid var(--line);padding:22px 0 4px}
+  .ct-src h2{font-family:var(--serif);font-size:22px;color:var(--ink);margin:0 0 4px}
+  .ct-docs{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .ct-docs a{font-family:var(--sans);font-size:15px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .ct-docs a:hover{color:var(--coral);border-color:var(--coral)}
+  .ct-docs span{font-family:var(--sans);font-size:13px;color:var(--muted);margin-left:8px}
+  .ct-toc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+  .ct-toc li{font-family:var(--sans);font-size:14.5px;line-height:1.55;padding:7px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;min-width:0}
+  .ct-toc li.h{color:var(--muted);font-size:13.5px;padding-top:16px}
+  .ct-toc .n{flex:0 0 auto;min-width:64px;color:var(--muted)}
+  .ct-toc a{color:var(--ink);text-decoration:none;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ct-toc a:hover{color:var(--coral)}
+  .ct-toc .d1{padding-left:14px}.ct-toc .d2{padding-left:28px}.ct-toc .d3{padding-left:42px}
+  .ct-front summary{font-family:var(--sans);font-size:14px;color:var(--muted);cursor:pointer}
+  .ct-front p{font-family:var(--sans);font-size:13.5px;line-height:1.65;color:var(--body);margin:10px 0 0;overflow-wrap:anywhere}
+</style>

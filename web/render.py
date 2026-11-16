@@ -152,6 +152,7 @@ from indexnow_submit import INDEXNOW_KEY as _INDEXNOW_KEY  # noqa: E402  [IndexN
 import example_page  # noqa: E402  [지적 사례 화면 2026-11-09]
 import import_alerts_page  # noqa: E402  [수입경보 2단계 2026-11-10] 전체 목록 화면 뷰
 import citation_firms_page  # noqa: E402  [FDA 지적 조항 × 업체 전체 목록 2026-11-10]
+import clause_text_page  # noqa: E402  [기준 조항 원문 2026-11-15] /clauses/ 트리·근거 조항 해석기
 import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
 import news_page  # noqa: E402  [최근 규제 소식 2026-11-10]
 import inspection_notes_page  # noqa: E402  [실사 대비 노트 2026-11-15] 주제별 지적 문장 묶음
@@ -2641,6 +2642,7 @@ def build_glossary_view(
     cases: dict[str, dict[str, Any]] | None = None,
     clause_slugs: "set[str] | None" = None,
     lang: str = DEFAULT_LANG,
+    clause_text_view: "dict[str, Any] | None" = None,
 ) -> dict[str, Any]:
     """용어 리스트 → 초성 그룹 뷰모델(무변형 — 값 재작성 0, 파생만).
 
@@ -2701,6 +2703,10 @@ def build_glossary_view(
         if not is_ko:
             for ref in reg_refs:
                 ref["cases_href"] = ""
+        # [기준 조항 원문 2026-11-15] 근거 조항 → 사이트 안 원문 페이지(확실할 때만 · 두 트리 공통).
+        if clause_text_view:  # 뷰가 없으면 키도 없다(종전 reg_refs 모양 그대로)
+            for ref in reg_refs:
+                ref["text_href"] = clause_text_page.ref_href(clause_text_view, ref["label"])
         term = t["term_ko"] if is_ko else t["term_en"]
         easy = t["easy_ko"] if is_ko else (t.get("easy_en") or "")
         detail = (t.get("detail_ko") or "") if is_ko else (t.get("detail_en") or "")
@@ -5640,6 +5646,7 @@ BROWSE_SECTIONS: tuple[tuple[str, tuple[tuple[str, str, str], ...]], ...] = (
     )),
     (N_("자료·도구"), (
         ("library/", N_("지침·고시"), N_("규제기관 지침과 고시 원문 목록")),
+        ("clauses/", N_("기준 조항 원문"), N_("21 CFR·EU GMP·ICH 조항을 원문 그대로")),
         ("findings/checklist/", N_("자가점검표"), N_("지적 문장 기반 자가점검 항목")),
         ("inspection-notes/", N_("실사 대비 노트"), N_("주제별로 실사에서 실제 지적된 문장과 출처")),
         ("findings/coverage/", N_("데이터 현황"), N_("수집 출처, 연도별 확보량, 수집 범위와 한계")),
@@ -6165,6 +6172,18 @@ EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관�
 NEWS_DESCRIPTION = N_("주간 브리프에 싣지 않은 규제기관·업계 단체의 최근 소식 — 식약처·EMA·FDA 회수·미국 관보·ECA·ISPE 등을 날짜순으로.")
 CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
                            "조항별 인용 실사 수·비율과 회계연도별 추이.")
+CLAUSES_DESCRIPTION = N_("21 CFR Part 210·211, EU GMP Part I·Annex 1, ICH Q7·Q9·Q10 을 조항 단위 원문으로 — "
+                         "규제기관 공식 원문 그대로, 조항마다 공식 링크.")
+CLAUSES_DOC_DESCRIPTION = N_("{code} {title} 조항 목차 — 조항 {n}개의 원문을 조항 단위로 읽습니다.")
+
+
+def clause_text_description(clause: dict[str, Any], doc: dict[str, Any],
+                            tr: Translator = _KO) -> str:
+    """조항 페이지 meta description — 조항 번호·제목 + 원문 첫머리(검색 스니펫에 실제 문장이 보이게).
+    원문 첫머리는 표시용으로만 줄인다(데이터는 무절단)."""
+    head = clause["code"] + (f" {clause['title']}" if clause.get("title") else "")
+    first = clause_text_page._preview(" ".join(clause.get("paras") or []), 120)
+    return tr("{head} 원문: {first}", head=head, first=first)
 DEFICIENCY_CASES_DESCRIPTION = {
     "PMDA": N_("일본 PMDA 가 GMP 실사 연차보고서 별첨으로 공개한 지적 {n}건 전부 — 원문(영문판) 그대로, 영역·연도·낱말로 찾기."),
     "MHRA": N_("영국 MHRA 가 GMP 실사 지적 경향 보고서에 실은 지적 예시 {n}건 전부 — 원문 그대로, 영역·연도·낱말로 찾기."),
@@ -6676,6 +6695,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 넣으면 먼저 그려진 한국어 페이지가 짝을 몰라 hreflang·언어 전환이 한쪽에만 붙는다
     # (모음 페이지에서 같은 실수를 CI 가 잡았다).
     en_paths |= clause_tree_paths(clause_views_en)
+    # [기준 조항 원문 2026-11-15] 커밋 정본(web/data/clauses/*.json)에서만 파생 — 본문이 영어 원문이라
+    # 두 트리가 같은 경로를 낸다. 용어사전·조항 사례 페이지의 "원문" 간선이 이 뷰 하나를 본다.
+    clause_text_view = clause_text_page.build(clause_text_page.load_sources())
+    en_paths |= clause_text_page.tree_paths(clause_text_view)
     if citations_data:
         en_paths.add("findings/citations/")
     # [FDA 지적 조항 × 업체 전체 목록 2026-11-10] 스냅샷(web/data/fda_citation_firms.json)이 있고
@@ -7046,7 +7069,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # [C1] 용어→사례 링크: glossary_cases.json(정본, findings_search RPC 실측치).
         glossary_view = build_glossary_view(
             glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases(),
-            clause_slugs)
+            clause_slugs, clause_text_view=clause_text_view)
         emit("glossary.html", page("glossary/"),
             page_title=tr("규제 용어사전 · GRM"),
             nav_active="glossary",
@@ -7066,7 +7089,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         glossary_en_cases = load_glossary_cases(GLOSSARY_CASES_EN_FILE) or {}
         glossary_en_view = build_glossary_view(
             glossary_terms, _load_reg_ref_catalogs(), glossary_en_cases,
-            clause_slugs, lang="en") if glossary_terms else None
+            clause_slugs, lang="en",
+            clause_text_view=clause_text_view) if glossary_terms else None
         if glossary_en_view:
             en_emit("glossary.html", en_page("glossary/"),
                 page_title=en_tr("규제 용어사전 · GRM"),
@@ -7351,6 +7375,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 clause=clause, siblings=sibs, agency_labels=clause_agency_labels,
                 cit=clause_citations.section_view(citations_data, clause["section"]),
                 firm_cit=(firm_cit_by_section or {}).get(clause["section"]),
+                text_href=clause_text_page.cfr_href(clause_text_view, clause["section"]),
             )
 
     _clause_agency_labels = (docs_data or {}).get("agency_labels") or (
@@ -8028,6 +8053,52 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 cf=_cfv,
             )
         facet_paths.append((citation_firms_page.ROUTE, citation_firms_data["as_of"]))
+
+    # [기준 조항 원문 2026-11-15] /clauses/ 색인·문서 목차·조항 페이지 — ko·en 같은 함수(두 벌 금지).
+    # 본문은 영어 원문 그대로라 두 트리가 같은 경로를 낸다(en_paths 는 위에서 같은 뷰로 선언).
+    # sitemap lastmod 는 비운다 — 조항에는 개정일 필드가 없고, 수집일은 수정일이 아니다(지어낸 날짜 금지).
+    if clause_text_view["sources"]:
+        for _lg, _pg, _em, _tr in trees:
+            _ct_cases = clause_slugs if _lg == DEFAULT_LANG else {c["slug"] for c in clause_views_en}
+            _ct_terms = clause_text_page.terms_by_href(clause_text_view, glossary_terms, _lg)
+            _ip = _pg(clause_text_page.ROUTE)
+            _em("clauses_index.html", _ip,
+                page_title=_tr("기준 조항 원문 · GRM"),
+                nav_active="findings",
+                description=_tr(CLAUSES_DESCRIPTION),
+                json_ld=_ip.breadcrumb_json_ld([
+                    (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"), (_tr("기준 조항 원문"), "")]),
+                ct=clause_text_view,
+            )
+            for _sv in clause_text_view["sources"]:
+                for _d in _sv["docs"]:
+                    _dp = _pg(_d["path"])
+                    _em("clauses_doc.html", _dp,
+                        page_title=_tr("{code} 조항 원문 · GRM", code=_d["code"]),
+                        nav_active="findings",
+                        description=_tr(CLAUSES_DOC_DESCRIPTION, code=_d["code"],
+                                        title=_d["title"], n=f"{_d['n_pages']:,}"),
+                        json_ld=_dp.breadcrumb_json_ld([
+                            (_tr("홈"), "/"), (_tr("기준 조항 원문"), "clauses/"), (_d["code"], "")]),
+                        doc=_d,
+                    )
+            for _d, _c in clause_text_page.pages(clause_text_view):
+                _cp = _pg(_c["href"])
+                _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
+                _em("clause_text.html", _cp,
+                    page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
+                    nav_active="findings",
+                    description=clause_text_description(_c, _d, _tr),
+                    json_ld=_cp.breadcrumb_json_ld([
+                        (_tr("홈"), "/"), (_tr("기준 조항 원문"), "clauses/"),
+                        (_d["code"], _d["path"]), (_c["number"], "")]),
+                    doc=_d, clause=_c,
+                    cases_href=(f"findings/clause/{clause_slug(_sec)}/"
+                                if _sec and clause_slug(_sec) in _ct_cases else ""),
+                    terms=_ct_terms.get(_c["href"]) or [],
+                )
+        for _path in sorted(clause_text_page.tree_paths(clause_text_view)):
+            facet_paths.append((page(_path).site_path, ""))
 
     # [해외 지적 사례 전체 2026-11-10] 기관별 전체 목록(전 행 서버 렌더 — 필터는 인라인 스크립트가 숨길 뿐)
     # + MHRA 조항 집계표. ko·en 같은 함수, 본문은 원문(영어) 그대로.

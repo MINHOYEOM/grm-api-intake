@@ -38,6 +38,10 @@ class ClauseTextView(unittest.TestCase):
         self.assertEqual(h("21 CFR 211.42(c)(10)"), "clauses/cfr21/211/211-42/")
         self.assertEqual(h("21 CFR Part 211"), "clauses/cfr21/211/")
         self.assertEqual(h("21 CFR 211.160–211.194"), "")
+        # 세 자리가 아닌 Part(1271·4)도 같은 규칙으로 잇는다.
+        self.assertEqual(h("21 CFR 1271.150(c)"), "clauses/cfr21/1271/1271-150/")
+        self.assertEqual(h("21 CFR 4.4"), "clauses/cfr21/4/4-4/")
+        self.assertEqual(h("21 CFR Part 212"), "clauses/cfr21/212/")
         self.assertEqual(h("ICH Q10 §2.7"), "clauses/ich/q10/2-7/")
         self.assertEqual(h("ICH Q9(R1) §4.4"), "clauses/ich/q9/4-4/")
         self.assertEqual(h("ICH Q7 §§7–11"), "clauses/ich/q7/#c-7")

@@ -39,6 +39,14 @@ on:
           - validate
           - test
           - send
+  # ★ 2026-11-16 발행 배포 직후 발송 — 11-16 은 예약 3회(14:23·15:23·16:23 KST)가 하나도 뜨지 않았고,
+  #   그 전 주들도 22시대에야 떴다(GitHub 예약 크론 지각). 발행 PR(`publish(web): …`) 머지로 도는
+  #   main 배포가 성공하면 곧바로 같은 send 파이프라인을 탄다. 예약은 백업으로 남긴다.
+  #   멱등 ③(캠페인명)이 중복 발송을 막고, 발행 커밋이 아닌 배포에는 잡이 생기지 않는다(아래 if).
+  workflow_run:
+    workflows: ["GRM Web Deploy"]
+    types: [completed]
+    branches: [main]
   schedule:
     # 매주 월 05:xx UTC = 14:xx KST (월요일 Routine 발행 ~07:30 KST 이후). 스케줄은 **기본
     # 브랜치(main)에서만** 실행된다. 정확한 시각보다 '발행 이후'가 중요하고, 고부하 시 지연돼도
@@ -70,6 +78,7 @@ jobs:
   #   여기서 '보낼 호가 있는지'(should_send)까지 결정한다. 그래야 send 잡은 실제 보낼 새 호가
   #   있을 때만 생성된다(멱등 skip 은 발송 0).
   validate-build:
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_commit.message, 'publish(web)')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -94,7 +103,7 @@ jobs:
           INPUT_DATE: ${{ github.event.inputs.publish_date }}
           INPUT_MODE: ${{ github.event.inputs.mode }}
         run: |
-          if [ "$EVENT_NAME" = "schedule" ]; then
+          if [ "$EVENT_NAME" = "schedule" ] || [ "$EVENT_NAME" = "workflow_run" ]; then
             MODE=send
             PDATE="$(python web/newsletter.py --mode latest-date)"   # 최신 발행일 자동(하드코딩 0)
           else
@@ -187,6 +196,7 @@ jobs:
   #   한 잡 안에서 스냅샷→게이트→미리보기→멱등→발송을 끝낸다(스냅샷을 잡 사이로 옮기지
   #   않는다 — 미리보기와 발송이 같은 파일을 본다).
   newsletter-en:
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_commit.message, 'publish(web)')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -216,7 +226,7 @@ jobs:
           INPUT_DATE: ${{ github.event.inputs.publish_date }}
           INPUT_MODE: ${{ github.event.inputs.mode }}
         run: |
-          if [ "$EVENT_NAME" = "schedule" ]; then
+          if [ "$EVENT_NAME" = "schedule" ] || [ "$EVENT_NAME" = "workflow_run" ]; then
             MODE=send
             PDATE="$(python web/newsletter.py --mode latest-date)"
           else

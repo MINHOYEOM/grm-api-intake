@@ -169,6 +169,9 @@ class CommittedData(unittest.TestCase):
         self.assertTrue({"601.2", "601.12"} <= nums("cfr21", "601"))
         self.assertTrue({"606.100", "606.160"} <= nums("cfr21", "606"))
         self.assertTrue({"610.12", "610.13"} <= nums("cfr21", "610"))
+        self.assertTrue({"212.1", "212.100"} <= nums("cfr21", "212"))
+        self.assertTrue({"1271.3", "1271.150", "1271.290"} <= nums("cfr21", "1271"))
+        self.assertTrue({"4.1", "4.4"} <= nums("cfr21", "4"))
         for ch, last in ((1, 13), (2, 23), (3, 44), (4, 32), (5, 71), (6, 41), (7, 17), (8, 31), (9, 3)):
             got = nums("eu_gmp", f"ch{ch}")
             self.assertTrue({f"{ch}.{i}" for i in range(1, last + 1)} <= got, ch)

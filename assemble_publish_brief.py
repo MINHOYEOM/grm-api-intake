@@ -46,6 +46,8 @@ from grm_taxonomy import is_out_of_scope_483
 # 카드를 통째로 빠뜨린 경우는 제목·요약이 비어 여전히 여기서 걸린다. 빈 칸 수는 경고로 센다.
 _REQUIRED_STR_SLOTS = ("title_issue", "summary")
 _REQUIRED_LIST_SLOTS = ("key_facts",)
+# [2026-11-16 브리프 품질 ③] 소식·지침·고시 카드는 원문에 머리말 사실이 없으면 `key_facts` 를 비운다(v16).
+# 이 유형에서만 빈 `key_facts` 를 막지 않고 경고로 센다(inject_slots.KEY_FACTS_OPTIONAL_CARD_TYPES).
 _OPTIONAL_PROSE_SLOTS = ("implication", "checks")
 
 # [업계 브리핑 노트 2026-07-13, v2 명칭개편 2026-07-13] 해설·교육성 2차 소스(전문 매체) —
@@ -629,6 +631,12 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     report.style = inject_slots.lint_prose_style(delta)
     for line in report.style.lines():
         (report.errors if inject_slots.STYLE_LINT_BLOCKING else report.warnings).append(f"[표현] {line}")
+    # [2026-11-16 ④⑤] 경고만 내는 검사 — 심층 칸 산문·행정처분 요약 주어. 발행을 막지 않는다.
+    for line in report.style.warn_lines():
+        report.warnings.append(f"[표현·경고] {line}")
+    if deep_deltas:
+        for line in inject_slots.lint_deep_prose_style(deep_deltas).warn_lines():
+            report.warnings.append(f"[표현·경고] {line}")
 
     # 채택 필터 + render_order 정렬 보존.
     all_cards = injected.get("cards") or []
@@ -745,13 +753,22 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
         c["render_order"] = i
 
     # 게이트 2: 채택 카드에 빈 필수 슬롯 0.
+    kf_empty_ok: list[str] = []
     for c in adopted_cards:
         for k in _REQUIRED_STR_SLOTS:
             if not c.get(k):
                 report.errors.append(f"채택 카드 {c.get('id')!r}: 빈 슬롯 {k}")
         for k in _REQUIRED_LIST_SLOTS:
             if not c.get(k):
+                if (k == "key_facts"
+                        and c.get("card_type") in inject_slots.KEY_FACTS_OPTIONAL_CARD_TYPES):
+                    kf_empty_ok.append(str(c.get("id")))
+                    continue
                 report.errors.append(f"채택 카드 {c.get('id')!r}: 빈 슬롯 {k}")
+    if kf_empty_ok:
+        report.warnings.append(
+            f"key_facts 비움 {len(kf_empty_ok)}/{len(adopted_cards)}장(소식·지침·고시 — 원문에 머리말 "
+            f"사실 없음, 정상일 수 있음, 예: {', '.join(kf_empty_ok[:3])})")
     for k in _OPTIONAL_PROSE_SLOTS:
         empty = [str(c.get("id")) for c in adopted_cards if not c.get(k)]
         if empty:

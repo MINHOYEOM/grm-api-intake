@@ -159,7 +159,7 @@ def validate_injection(brief: dict[str, Any], delta: dict[str, Any]) -> Injectio
         # ★전부 채우거나 전부 비운다. 하나라도 빠지면 영어 화면에 한국어 한 문단이
         #   섞이므로, 부분 제공은 **경고가 아니라 오류**로 막는다(반쪽 영어 금지).
         if "en" in d:
-            _validate_en_block(report, cid, d["en"], ko=d)
+            _validate_en_block(report, cid, d["en"], ko=d, card_type=card.get("card_type"))
 
     # [다국어 5단계] brief 영문 tldr — 제공되면 한국어와 같은 규약(정확히 3개·평문).
     if "tldr_en" in delta:
@@ -200,6 +200,17 @@ _EN_REQUIRED = ("title_issue", "summary", "implication", "key_facts", "checks")
 _EN_FIELDS = _EN_REQUIRED + ("hook_line",)
 # 한국어 칸이 비었으면 영문도 비어도 되는 둘 — web/render.py CARD_NARRATIVE_OPTIONAL 과 같다.
 _EN_OPTIONAL_IF_KO_EMPTY = ("implication", "checks")
+# [2026-11-16 브리프 품질 ③] 소식·지침·고시 카드는 원문에 머리말 사실이 없으면 `key_facts` 도 비운다
+# (v16). 이 세 유형에서만 한국어가 비운 `key_facts` 는 영문도 비어도 된다 — web/render.py ·
+# company/editorial/merge_parts.py 의 KEY_FACTS_OPTIONAL_CARD_TYPES 와 같다(tests 가 일치를 확인).
+KEY_FACTS_OPTIONAL_CARD_TYPES = ("규제 소식", "지침·안내서", "고시·개정법령")
+
+
+def _en_optional_for(card_type: Any) -> tuple[str, ...]:
+    """한국어가 비었으면 영문도 비어도 되는 칸 — 카드 유형에 따라 `key_facts` 가 더해진다."""
+    if card_type in KEY_FACTS_OPTIONAL_CARD_TYPES:
+        return _EN_OPTIONAL_IF_KO_EMPTY + ("key_facts",)
+    return _EN_OPTIONAL_IF_KO_EMPTY
 
 
 def _slot_filled(value: Any) -> bool:
@@ -225,7 +236,7 @@ def _check_hook_line(report: InjectionReport, cid: str, value: Any, lang: str) -
 
 
 def _validate_en_block(report: InjectionReport, cid: str, en: Any,
-                       ko: dict[str, Any] | None = None) -> None:
+                       ko: dict[str, Any] | None = None, card_type: Any = None) -> None:
     """[다국어 5단계] 카드 영문 갈래 검증 — 한국어 슬롯과 **같은 규약**.
 
     ★부분 제공을 오류로 막는 이유: 다섯 중 넷만 영어면 그 카드가 영어 화면에서 한국어
@@ -244,8 +255,9 @@ def _validate_en_block(report: InjectionReport, cid: str, en: Any,
     filled = [key for key in _EN_REQUIRED if _slot_filled(en.get(key))]
     # [2026-11-10] implication·checks 는 한국어가 비었으면 영어도 비어도 된다(쓸 원문 정보가
     # 없는 카드). 한국어가 채운 칸은 영어도 채워야 한다 — 짝이 어긋나면 반쪽 영어다.
+    optional = _en_optional_for(card_type)
     needed = [key for key in _EN_REQUIRED
-              if key not in _EN_OPTIONAL_IF_KO_EMPTY or _slot_filled(ko.get(key))]
+              if key not in optional or _slot_filled(ko.get(key))]
     if filled and any(k not in filled for k in needed):
         missing = [k for k in needed if k not in filled]
         report.errors.append(
@@ -265,7 +277,7 @@ def _validate_en_block(report: InjectionReport, cid: str, en: Any,
     for key in ("key_facts", "checks"):
         if key in en:
             _check_list_slot(report, f"{cid}.en", key, en[key])
-    if len(en["key_facts"]) > _MAX_KEY_FACTS:
+    if len(en.get("key_facts") or []) > _MAX_KEY_FACTS:
         report.errors.append(
             f"{cid}.en.key_facts: {len(en['key_facts'])}개 — ≤{_MAX_KEY_FACTS} 초과")
     lo, hi = _CHECKS_RANGE
@@ -344,9 +356,10 @@ def inject_llm_slots(brief: dict[str, Any], delta: dict[str, Any], *,
         en = d.get("en")
         if isinstance(en, dict):
             # [2026-11-10] 한국어가 비운 implication·checks 는 영문도 비어도 완결로 친다.
+            optional = _en_optional_for(card.get("card_type"))
             complete = all(
                 _slot_filled(en.get(k))
-                or (k in _EN_OPTIONAL_IF_KO_EMPTY and not _slot_filled(card.get(k)))
+                or (k in optional and not _slot_filled(card.get(k)))
                 for k in _EN_REQUIRED)
             if complete:
                 card["en"] = {k: (list(en.get(k) or []) if k in _LIST_SLOTS
@@ -448,7 +461,16 @@ def inject_deep_analysis(brief: dict[str, Any],
             report.warnings.append(
                 f"deep_analysis[{doc_id!r}]: 원문 병기 절단 {n_repaired}건을 원문에서 "
                 "결정론 복원(생성 0 — source_text verbatim)")
-        gate = vda.run_deep_analysis_gate(da, source_text, wl_statements=wl_statements)
+        # [2026-11-16 브리프 품질 ①] 483 은 ②·④ 칸을 비울 수 있다. 키까지 빠뜨려 유형 자동판별이
+        # WL 로 떨어지지 않게, 결정론 상세가 483 관찰이고 ② 자리 키가 하나도 없을 때만 유형을 알려 준다
+        # (키가 있는 종전 산출물은 자동판별 그대로 — 동작 불변).
+        hint = None
+        if (isinstance(dd, dict) and dd.get("type") == "fda_483_observations"
+                and not any(k in da for k in ("fda_evaluation", "disposition_basis",
+                                              "inspectional_significance"))):
+            hint = "fda-483"
+        gate = vda.run_deep_analysis_gate(da, source_text, card_type=hint,
+                                          wl_statements=wl_statements)
         if not gate.ok:
             report.errors.append(
                 f"deep_analysis[{doc_id!r}]: 게이트 FAIL {gate.fail_count}건(병합 보류) — "
@@ -727,6 +749,90 @@ _ABBR_NEEDS_KO: tuple[tuple[str, str], ...] = (
 _BANNED_RE = tuple((lab, re.compile(p)) for lab, p in _BANNED_PHRASES)
 _TERM_RE = tuple((re.compile(p), fix) for p, fix in _TERM_VARIANTS)
 
+# [2026-11-16 브리프 품질 ④] 심층 칸(상세 분석 보기) 산문 — 카드 금지어에 더해 심층 지시문 '3-1. 문체'의
+# 금지어를 본다. **경고만**(처음 2개 호 실측 뒤 사람이 차단 여부를 정한다 — STYLE_LINT_BLOCKING 과 같은 결의).
+# 원문 인용 칸(`original`)·조항(`citation`)은 보지 않는다.
+_DEEP_EXTRA_BANNED: tuple[tuple[str, str], ...] = (
+    ("귀사", r"귀사"),
+    ("~로 해석될", r"해석될"),
+    ("소지가 있다", r"소지가"),
+    ("승격", r"승격"),
+    ("가능성이 크다·높다", r"가능성이\s?(크|높)"),
+    ("체계적", r"체계적"),
+    ("전반", r"전반"),
+    ("흔들릴 수 있다", r"흔들릴 수 있다"),
+    ("~로 이어질 수 있다", r"이어질 수 있다"),
+)
+_DEEP_BANNED_RE = _BANNED_RE + tuple((lab, re.compile(p)) for lab, p in _DEEP_EXTRA_BANNED)
+_DEEP_TEXT_KEYS = ("inspectional_significance", "fda_evaluation", "disposition_basis",
+                   "administrative_risks")
+_DEEP_VIOLATION_KEYS = ("observation", "description", "summary", "risk")
+_DEEP_REPEAT_CARDS = 3        # 같은 문장이 이만큼의 카드 심층 칸에 나오면 경고(틀 문장)
+_DEEP_REPEAT_MIN_CHARS = 15   # 이보다 짧은 문장은 세지 않는다(짧은 조각)
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.。])\s+|\n+")
+
+# [2026-11-16 브리프 품질 ⑤] 행정처분 요약 첫 문장의 처분 대상을 일반명사로 쓴 꼴 — 경고만.
+# 공고의 업체명을 그대로 쓴다(v16). 예: "식약처가 제약사에" · "식약처가 의약품 수입·판매 업체에".
+_GENERIC_SUBJECT_RE = re.compile(
+    r"^\s*식약처가\s+(?:\S+\s+){0,3}?(제약사|업체|의료기관)에(?![가-힣])")
+
+
+def _deep_prose_texts(entry: Any) -> list[str]:
+    """심층 델타 항목(`{deep_analysis: {...}}` 또는 4섹션 dict) → 검사할 산문 목록(원문 인용 제외)."""
+    if not isinstance(entry, dict):
+        return []
+    da = entry.get("deep_analysis") if isinstance(entry.get("deep_analysis"), dict) else entry
+    out: list[str] = []
+    for v in da.get("key_violations") or []:
+        if isinstance(v, dict):
+            out.extend(v[k] for k in _DEEP_VIOLATION_KEYS
+                       if isinstance(v.get(k), str) and v[k].strip())
+        elif isinstance(v, str) and v.strip():
+            out.append(v)
+    for k in _DEEP_TEXT_KEYS:
+        if isinstance(da.get(k), str) and da[k].strip():
+            out.append(da[k])
+    rem = da.get("required_remediation")
+    if isinstance(rem, dict):
+        out.extend(i for i in rem.get("items") or [] if isinstance(i, str) and i.strip())
+    elif isinstance(rem, str) and rem.strip():
+        out.append(rem)
+    return out
+
+
+def lint_deep_prose_style(deep: Any) -> "StyleReport":
+    """심층 델타 산문의 표현 검사(순수) — 경고 재료만. `deep` = {card_id: 항목} 또는 샤드 `{items: {...}}`.
+
+    결과는 `StyleReport.warns` 에만 싣는다(`lines()` 는 비어 있다 — 막는 검사가 아니다)."""
+    rep = StyleReport()
+    if isinstance(deep, dict) and isinstance(deep.get("items"), dict):
+        deep = deep["items"]
+    if not isinstance(deep, dict):
+        return rep
+    seen: dict[str, set[str]] = {}
+    for cid, entry in deep.items():
+        texts = _deep_prose_texts(entry)
+        if not texts:
+            continue
+        blob = "\n".join(texts)
+        for lab, rx in _DEEP_BANNED_RE:
+            if rx.search(blob):
+                rep.warns.setdefault(f"심층 금지 표현 '{lab}'", []).append(str(cid))
+        for rx, fix in _TERM_RE:
+            m = rx.search(blob)
+            if m:
+                rep.warns.setdefault(f"심층 용어 표기 '{m.group(0)}'→{fix}", []).append(str(cid))
+        for text in texts:
+            for sent in _SENTENCE_SPLIT_RE.split(text):
+                key = " ".join(sent.split())
+                if len(key) >= _DEEP_REPEAT_MIN_CHARS:
+                    seen.setdefault(key, set()).add(str(cid))
+    for sent, ids in seen.items():
+        if len(ids) >= _DEEP_REPEAT_CARDS:
+            short = sent if len(sent) <= 40 else sent[:40] + "…"
+            rep.warns.setdefault(f"심층 같은 문장 반복 '{short}'", []).extend(sorted(ids))
+    return rep
+
 
 @dataclass
 class StyleReport:
@@ -736,6 +842,9 @@ class StyleReport:
     ending_cards: int = 0
     banned: dict[str, list[str]] = field(default_factory=dict)     # 라벨 → 카드 id
     terms: dict[str, list[str]] = field(default_factory=dict)      # "쓴→맞출" → 카드 id
+    # [2026-11-16] 경고만 내는 검사(심층 산문·행정처분 요약 주어) — `lines()` 에 넣지 않는다.
+    # 사전 점검(precheck terms)은 `lines()` 가 있으면 exit 1 이라, 여기 것은 따로 `warn_lines()` 로 낸다.
+    warns: dict[str, list[str]] = field(default_factory=dict)      # 라벨 → 카드 id
 
     @property
     def ending_over(self) -> bool:
@@ -757,6 +866,11 @@ class StyleReport:
         for lab, ids in sorted(self.terms.items(), key=lambda kv: -len(kv[1])):
             out.append(f"용어 표기 {lab} {len(ids)}장 (예: {', '.join(ids[:3])})")
         return out
+
+    def warn_lines(self) -> list[str]:
+        """경고만 내는 검사의 줄 — 발행·사전 점검을 막지 않는다."""
+        return [f"{lab} {len(ids)}장 (예: {', '.join(ids[:3])})"
+                for lab, ids in sorted(self.warns.items(), key=lambda kv: -len(kv[1]))]
 
 
 def _ko_prose_texts(d: dict[str, Any]) -> list[str]:
@@ -793,6 +907,10 @@ def lint_prose_style(delta: dict[str, Any]) -> StyleReport:
             e = _ending(impl)
             if e:
                 endings.append(e)
+        summary = d.get("summary")
+        if isinstance(summary, str) and _GENERIC_SUBJECT_RE.search(summary):
+            rep.warns.setdefault("행정처분 요약 주어 '식약처가 제약사·업체·의료기관에'→공고의 업체명",
+                                 []).append(str(cid))
         texts = _ko_prose_texts(d)
         blob = "\n".join(texts)
         for lab, rx in _BANNED_RE:

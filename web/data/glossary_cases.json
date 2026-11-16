@@ -250,9 +250,9 @@
     },
     {
       "id": "risk-evaluation",
-      "q": "위험 평가",
-      "findings": 284,
-      "documents": 199
+      "q": "Risk Evaluation",
+      "findings": 6,
+      "documents": 5
     },
     {
       "id": "risk-assessment",
@@ -1189,6 +1189,25 @@
       "q": "CFU",
       "findings": 71,
       "documents": 68
+    },
+    {
+      "id": "hvac",
+      "q": "HVAC",
+      "findings": 17,
+      "documents": 16
+    },
+    {
+      "id": "lims",
+      "q": "LIMS",
+      "findings": 12,
+      "documents": 11
+    },
+    {
+      "id": "quality-management-system",
+      "q": "Quality Management System",
+      "findings": 106,
+      "documents": 97,
+      "note": "대부분 의료기기 실사 지적(QMSR·ISO 13485 문구) — 의약품 PQS 지적과 다른 축이라 별도 용어로 둔다(2026-11-16)"
     }
   ],
   "excluded": [
@@ -1456,6 +1475,26 @@
       "id": "recall-classification",
       "term_ko": "회수 등급 (Class I·II·III)",
       "reason": "본문 검색(Class II 5건)에 UK·EU 회수 등급과 마약류 Class III 등 다른 뜻이 섞여 링크가 오해를 부름."
+    },
+    {
+      "id": "manufacturing-execution-system",
+      "term_ko": "제조실행시스템",
+      "reason": "본문 검색 'MES' 512건은 대부분 times 등 다른 낱말 속 글자에 걸린 것이고, 'Manufacturing Execution' 은 1건뿐이라 링크가 오해를 부름(2026-11-16)"
+    },
+    {
+      "id": "fmea",
+      "term_ko": "고장모드 영향분석",
+      "reason": "지적사항 본문 검색 'FMEA' 0건(2026-11-16)"
+    },
+    {
+      "id": "common-technical-document",
+      "term_ko": "국제공통기술문서",
+      "reason": "본문 검색 'CTD' 1건이며 국제공통기술문서를 뜻하는 문장이 아님(2026-11-16)"
+    },
+    {
+      "id": "drug-master-file",
+      "term_ko": "의약품 마스터 파일",
+      "reason": "본문 검색 'DMF' 3건 중 1건은 OCR 잡음이고, 나머지도 DMF 자체에 대한 지적이 아니라 언급에 그침(2026-11-16)"
     }
   ],
   "corpus_note": "건수는 2026-08-04 단일 시점 실측(같은 배치 호출) — 시점이 섞이면 카드끼리 비교가 안 된다."

@@ -36,8 +36,10 @@
   <url><loc>https://grm-solutions.com/glossary/alert-limit/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/management-review/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/oot/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/fmea/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/hepa-filter/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/supplier-qualification/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/hvac/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/process-validation/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/time-limits-on-production/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/in-process-control/</loc></url>
@@ -47,6 +49,7 @@
   <url><loc>https://grm-solutions.com/glossary/training/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/calibration/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/cross-contamination/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/common-technical-document/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/attributable/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/specification/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/oos/</loc></url>
@@ -127,6 +130,7 @@
   <url><loc>https://grm-solutions.com/glossary/corrective-action/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/certificate-of-analysis/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/laboratory-controls/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/lims/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/laboratory-investigation/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/reference-sample/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/severity/</loc></url>
@@ -175,6 +179,7 @@
   <url><loc>https://grm-solutions.com/glossary/shelf-life/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/expiry-date/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/active-ingredient/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/drug-master-file/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/gmp/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/pharmaceutical-quality-system/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/adverse-event/</loc></url>
@@ -207,6 +212,7 @@
   <url><loc>https://grm-solutions.com/glossary/batch/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/batch-number/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/site-master-file/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/manufacturing-execution-system/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/manufacturer/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/product-complaint/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/recall/</loc></url>
@@ -249,6 +255,7 @@
   <url><loc>https://grm-solutions.com/glossary/reference-standard/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/marketing-authorization/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/quality/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/quality-management-system/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/quality-planning/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/quality-control/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/quality-control-unit/</loc></url>
@@ -4788,6 +4795,108 @@
   <url><loc>https://grm-solutions.com/clauses/cfr21/211/211-87/</loc></url>
   <url><loc>https://grm-solutions.com/clauses/cfr21/211/211-89/</loc></url>
   <url><loc>https://grm-solutions.com/clauses/cfr21/211/211-94/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-10/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-11/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-12/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-13/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-14/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-15/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-2/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-20/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-21/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-3/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-80/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-81/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-82/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/600/600-90/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-12/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-14/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-15/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-2/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-20/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-21/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-22/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-27/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-28/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-29/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-3/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-30/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-31/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-32/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-33/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-34/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-35/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-4/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-40/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-41/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-42/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-43/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-44/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-45/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-46/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-5/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-50/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-51/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-6/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-7/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-70/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-8/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-9/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-90/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-91/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-92/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-93/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-94/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/601/601-95/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-100/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-110/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-120/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-121/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-122/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-140/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-145/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-151/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-160/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-165/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-170/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-171/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-20/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-3/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-40/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-60/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/606/606-65/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-1/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-10/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-12/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-13/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-14/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-15/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-16/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-17/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-18/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-2/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-39/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-40/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-41/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-42/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-44/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-46/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-47/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-50/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-53/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-60/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-61/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-62/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-63/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-64/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-65/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-67/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-68/</loc></url>
+  <url><loc>https://grm-solutions.com/clauses/cfr21/610/610-9/</loc></url>
   <url><loc>https://grm-solutions.com/clauses/eu-gmp/annex1/</loc></url>
   <url><loc>https://grm-solutions.com/clauses/eu-gmp/annex1/1/</loc></url>
   <url><loc>https://grm-solutions.com/clauses/eu-gmp/annex1/10-1/</loc></url>
@@ -6297,6 +6406,108 @@
   <url><loc>https://grm-solutions.com/en/clauses/cfr21/211/211-87/</loc></url>
   <url><loc>https://grm-solutions.com/en/clauses/cfr21/211/211-89/</loc></url>
   <url><loc>https://grm-solutions.com/en/clauses/cfr21/211/211-94/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-10/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-11/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-12/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-13/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-14/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-15/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-2/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-20/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-21/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-3/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-80/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-81/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-82/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/600/600-90/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-12/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-14/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-15/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-2/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-20/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-21/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-22/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-27/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-28/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-29/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-3/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-30/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-31/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-32/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-33/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-34/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-35/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-4/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-40/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-41/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-42/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-43/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-44/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-45/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-46/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-5/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-50/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-51/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-6/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-7/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-70/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-8/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-9/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-90/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-91/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-92/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-93/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-94/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/601/601-95/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-100/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-110/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-120/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-121/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-122/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-140/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-145/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-151/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-160/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-165/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-170/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-171/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-20/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-3/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-40/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-60/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/606/606-65/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-1/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-10/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-12/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-13/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-14/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-15/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-16/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-17/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-18/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-2/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-39/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-40/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-41/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-42/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-44/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-46/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-47/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-50/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-53/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-60/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-61/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-62/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-63/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-64/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-65/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-67/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-68/</loc></url>
+  <url><loc>https://grm-solutions.com/en/clauses/cfr21/610/610-9/</loc></url>
   <url><loc>https://grm-solutions.com/en/clauses/eu-gmp/annex1/</loc></url>
   <url><loc>https://grm-solutions.com/en/clauses/eu-gmp/annex1/1/</loc></url>
   <url><loc>https://grm-solutions.com/en/clauses/eu-gmp/annex1/10-1/</loc></url>
@@ -11629,6 +11840,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/cleanroom/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/closed-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/colony-forming-unit/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/common-technical-document/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/complaint-handling/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/computerised-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/container-closure-integrity/</loc></url>
@@ -11660,6 +11872,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/disinfection/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/distribution-record/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/documentation/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/drug-master-file/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/drug-product/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/dynamic-data/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/electronic-record/</loc></url>
@@ -11674,6 +11887,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/filter-integrity-test/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/finished-product/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/first-air/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/fmea/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/form-fill-seal/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/formality/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/gmp/</loc></url>
@@ -11681,6 +11895,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/harm/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/hazard/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/hepa-filter/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/hvac/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/hybrid-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/identification-test/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/impurity-profile/</loc></url>
@@ -11696,12 +11911,14 @@
   <url><loc>https://grm-solutions.com/en/glossary/laboratory-controls/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/laboratory-investigation/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/legible/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/lims/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/line-clearance/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/linearity/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/lyophilization/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/management-review/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/manufacture/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/manufacturer/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/manufacturing-execution-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/marketing-authorization/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/master-production-record/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/master-standard-documents/</loc></url>
@@ -11744,6 +11961,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/quality-assurance/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/quality-control-unit/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/quality-control/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/quality-management-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/quality-manual/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/quality-objectives/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/quality-planning/</loc></url>

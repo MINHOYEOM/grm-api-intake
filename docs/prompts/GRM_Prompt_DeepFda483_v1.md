@@ -8,9 +8,8 @@
 > (`GRM_card_spec_v16.md` §15 정본).
 >
 > ⚠️ **483 은 실사(inspection) 종료 시점에 조사관이 발부하는 문서다.** 회사의 시정 응답 이전 단계라
-> **"당국의 응답 평가"(WL 의 `fda_evaluation`)가 아직 없다.** 그래서 ②번 섹션은 응답 평가가 아니라
-> **이 실사 지적의 규제적 의미**(`inspectional_significance`) — 중대도, systemic/데이터무결성 여부,
-> Warning Letter·Import Alert 승격 가능성 — 다.
+> **"당국의 응답 평가"(WL 의 `fda_evaluation`)가 아직 없다.** ②번 섹션은 응답 평가가 아니라
+> **이 483에서 무게를 더하는 원문 사실**(`inspectional_significance`)이다.
 
 ---
 
@@ -37,7 +36,7 @@
     {"observation": "…", "risk": "…"}
   ],
   "inspectional_significance": "…",
-  "required_remediation": {"deadline": "483 수령 후 15영업일 이내 서면 회신", "items": ["…", "…"]},
+  "required_remediation": {"deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.", "items": []},
   "administrative_risks": "…",
   "observations_ko": [
     {"number": "1", "deficiency_ko": "…관찰 statement 국문…", "detail_ko": "…Specifically 상세 국문…"},
@@ -47,8 +46,10 @@
 ```
 
 - 4개 키(`key_violations`·`inspectional_significance`·`required_remediation`·`administrative_risks`)가
-  **모두** 있어야 한다. 하나라도 비면 게이트 D1 FAIL → 이 카드는 심층분석 없이(결정론 Observation
-  상세만으로) 발행된다.
+  **모두** 있어야 한다(키는 빼지 않는다). `key_violations` 와 `required_remediation.deadline` 은 반드시
+  채운다 — 비면 게이트 D1 FAIL → 이 카드는 심층분석 없이(결정론 Observation 상세만으로) 발행된다.
+  `inspectional_significance`·`administrative_risks` 는 쓸 원문 사실이 없으면 `""`, `required_remediation.items`
+  는 `[]` 로 둔다(2026-11-16 게이트가 483 에서만 허용한다. 빈 칸은 화면에서 숨겨진다).
 - **`observations_ko`(관찰 국문 번역 — 필수·게이트 검증 대상·별도 층)**: 이 483 원문의 **번호가 붙은
   각 Observation(OBSERVATION 1/2/…)** 을 그대로 한국어로 옮긴 목록. 웹의 "Observation 상세" 블록이
   영문 원문 옆에 이 국문을 나란히(원문↔국문) 보여준다 — **483 의 원문↔국문 병기는 이 층이 전담한다**
@@ -91,27 +92,35 @@
   - 게이트 D2 는 483 에서 인용 조항이 원문에 없어도 **WARN(비차단)** 으로만 표시한다(정당한 해석을
     막지 않기 위함 — WL 의 하드 FAIL 과 다르다). 그러나 **틀린 조항을 억지로 붙이지 마라**(발행 전
     수동 확인 대상이 늘 뿐이다). 원문에 조항이 명시돼 있으면 **그 표현 그대로** 옮긴다.
-- **`risk`** — 그 결함이 초래하는 **구체적 리스크**(품질·환자안전·규제 관점) 한 줄.
+- **`risk`**(선택) — 원문에 적힌 결과(출하된 배치, 영향받은 제품, 기간)가 있을 때만 한 줄. 없으면 키를
+  뺀다. 위반마다 '…흔들릴 수 있다'를 붙이지 않는다.
 
-### ② inspectional_significance (평문) — 이 483 실사 지적의 규제적 의미
-이 483 전체가 규제적으로 **얼마나 중대한지**를 원문 관찰에 근거해 서술한다: 중대도, **systemic
-(체계적) vs isolated(단발성)** 여부, **데이터 무결성** 문제 포함 여부, 그리고 이 483 이 **Warning
-Letter · Import Alert(해외 제조소) 로 승격될 가능성**. 추정은 단정하지 말고 **"…가능성이 있다"** 로
-표현한다. 원문 관찰에 없는 근거를 지어내지 마라(483 은 실사 종료 문서라 "당국의 응답 평가"는 없다 —
-그래서 이 섹션은 `fda_evaluation` 이 아니다).
+### ② inspectional_significance (평문) — 이 483에서 무게를 더하는 원문 사실
+원문에 있는 것만 쓴다: 반복 관찰 표시(repeat), 이전 실사·지적 이력, 이미 출하된 배치·영향받은 제품,
+직원 진술. 승격 전망과 '483은 최종 판정이 아니다' 같은 안내는 쓰지 않는다(안내는 코드가 칸 아래에
+한 번 붙인다). 쓸 사실이 없으면 `""`. (483 은 실사 종료 문서라 "당국의 응답 평가"는 없다 — 그래서 이
+섹션은 `fda_evaluation` 이 아니다.)
 
 ### ③ required_remediation (객체 `{deadline, items[]}`)
-- **`deadline`** — 483 응답 의무. 통상 **"483 수령 후 15영업일 이내 FDA 에 서면 회신"** 이다(원문에
-  다른 기한이 명시돼 있으면 그것을 우선). 원문에 기한 언급이 없으면 이 표준 15영업일을 명시한다.
-- **`items`** — 업체가 취해야 할 **구체적 후속·시정 조치** 체크리스트(2~4개, 문장형): 원인 조사,
-  소급 검토, CAPA 수립·문서화, 재밸리데이션 등 원문 관찰에 근거한 실질 조치. ⚠️ 문자열(문단) 금지 —
-  반드시 `{deadline, items[]}` 객체. `items` 비면 D1 FAIL. **사내 절차를 단정(예: "귀사 SOP 12조에
-  따라")하지 마라** — 원문·표준 의무 범위에서만.
+- **`deadline`** — 위 예시 문장("회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를
+  정할 때 검토한다.")을 글자 그대로 쓴다(원문에 다른 기한이 있으면 그 기한을 앞에 적는다).
+- **`items`** — 483은 시정을 요구하는 문서가 아니다. 회사가 실사 중이나 회신에서 약속한 조치가 원문에
+  있을 때만 '회사 약속: …(관찰 N)'으로 쓴다. 없으면 `[]`. 원인 조사·CAPA 수립·재밸리데이션 같은
+  일반 조치를 지어내지 않는다. ⚠️ 문자열(문단) 금지 — 반드시 `{deadline, items[]}` 객체.
 
 ### ④ administrative_risks (평문) — 후속 행정 리스크
-483 미시정·불충분 응답 시 이어질 수 있는 **행정·법적 리스크**: Warning Letter, Import Alert(해외
-제조소), OAI(Official Action Indicated) 분류, 후속 재실사, consent decree 등. 원문 관찰의 성격
-(무균·데이터 무결성 등)에 근거해 개연성 있는 경로만 쓴다.
+원문에 적힌 이력(이전 경고서한·수입경보·회수)만 쓴다. 없으면 `""`. 앞으로 받을 조치를 전망하지 않는다.
+
+## 3-1. 문체 (2026-11 개정 — v16 [용어·표기] 표와 문장 규칙 ①~⑨를 이 칸에도 적용)
+- 쓰지 않는다: "…가능성이 있다/크다", "…로 해석될", "체계적", "전반", "소지가 있다",
+  "흔들릴 수 있다", "…로 이어질 수 있다". 원문에 있는 사실(반복 표시, 이전 실사·서한 이력,
+  출하된 배치, 진술)을 쓴다.
+- 한 문장에 사실 하나. 끝에 근거 번호 "(관찰 N)"·"(위반 N)"을 단다.
+- "귀사"를 쓰지 않는다. 주어는 "회사"로 쓰거나 생략한다.
+- 날짜는 2026-11-09 꼴. "Warning Letter"는 "경고서한"으로 쓴다(원문 인용 칸 original 은 그대로).
+- 카드 앞면(summary·key_facts)과 같은 대상은 같은 이름으로 쓴다(단위·약어·기관명 포함).
+- 조립 검사(`inject_slots.lint_deep_prose_style`)가 이 금지어·8자리 날짜·같은 문장 3장 이상 반복을 세어
+  **경고**한다(처음 2개 호는 경고만).
 
 ## 4. 사실성 규칙(6슬롯 §0 "사실 생성 금지"와 동일 원칙)
 
@@ -125,11 +134,11 @@ Letter · Import Alert(해외 제조소) 로 승격될 가능성**. 추정은 �
 
 ## 5. 셀프체크(출력 직전)
 
-- [ ] 4개 키 모두 채웠는가? (②는 `inspectional_significance`, `required_remediation` 은 `{deadline, items[]}` 객체·items 비어있지 않음)
+- [ ] 4개 키가 모두 있는가? (②는 `inspectional_significance`, `required_remediation` 은 `{deadline, items[]}` 객체 — items 는 회사 약속이 원문에 있을 때만, 없으면 `[]`)
 - [ ] 모든 `observation` 이 원문 `body_full` 의 실제 관찰사항에 근거하는가(창작 0)?
 - [ ] `key_violations` 각 항목에 **`original` 을 넣지 않았는가**(483 은 이 필드 없음 — WL/행정처분과 다름)?
 - [ ] `citation` 을 넣었다면 원문에 있거나 표준적으로 타당한 CFR 인가(억지 조항 금지)?
-- [ ] `inspectional_significance` 가 중대도·systemic·승격 가능성을 원문 근거로 담았는가(추정은 "…가능성")?
+- [ ] ② 칸에 원문에 없는 전망·'가능성'이 0인가(쓸 사실이 없으면 `""`)? '3-1. 문체' 금지어가 0인가?
 - [ ] `observations_ko` 에 원문의 **번호 붙은 Observation 이 하나도 빠짐없이** 있는가 — 각 항목마다
       `deficiency_ko` 가 있고, 그 Observation 에 "Specifically,…" 상세(`detail`)가 있으면 `detail_ko` 도
       있는가(번역만·새 사실 0·번호 정확)? 서명란·페이지 푸터 등 OCR 잡음이 `detail_ko` 에 섞이지
@@ -147,3 +156,4 @@ Letter · Import Alert(해외 제조소) 로 승격될 가능성**. 추정은 �
 | 2026-07-09 | Observation 블록 자체를 병기(CC). **`observations_ko`**(번호별 `deficiency_ko`/`detail_ko` 번역) 추가 — 결정론 "Observation 상세"(영문 verbatim)가 국문 번역을 나란히 갖도록. deep_analysis(분석층)와 deterministic 관찰(수집기 산출)이 서로 다른 분해라 1:1 페어링 불가(2026-07-08 index 오역 교훈)여서, key_violations 에 원문을 붙이는 대신 **관찰 블록을 번호로 직접 번역**한다. `deep_analysis_fanout.assemble` 이 델타로 분리→`inject_slots._merge_observation_translations` 가 번호 매칭 병합(비게이트·additive). 게이트 무관(선택). |
 | 2026-07-13 | **`original` 절단 결함 수정(CC).** "1~2문장 발췌" 지시가 결함 문장만 뽑고 뒤따르는 "Specifically,…" 상세(오염물질명·날짜·건수 등 구체 사실이 담긴 부분)를 잘라내, 국문 `observation` 은 그 구체 사실을 요약해 담는데 병기된 영어 `original` 에는 근거가 안 보여 "국문이 지어냈다"는 오인을 유발한 결함을 수정. `original` 을 **해당 OBSERVATION 블록 전체**(결함 문장+Specifically 상세, 다음 OBSERVATION 표제 또는 서식 푸터 직전까지)로 확장하고, "국문이 언급하는 모든 구체 사실은 original 에 존재해야 한다"는 하드 룰 명시. 서명란·페이지 푸터 OCR 잡음은 계속 제외. 신규 게이트 D5(Specifically 직전 절단=하드 FAIL·국문 구체사실 미근거=WARN)를 `verify_deep_analysis` 에 추가 필요(본 커밋은 프롬프트만; 게이트 구현은 별도 PR). [[GRM_Prompt_DeepWL_v1]]·[[GRM_Prompt_DeepAdmin_v1]] 에도 동일 원칙(국문 구체사실 ⊆ original) 반영. |
 | 2026-07-14 | **분석층 `original` 폐지 + `observations_ko` 필수·게이트 강제화(CC, 시스템 변경 반영).** 웹 렌더러가 483 카드의 "위반 항목 및 리스크"(`key_violations`) 섹션에서 더 이상 `original` 을 표시하지 않도록 변경됨 — 이제 국문 해석(`observation`)+`risk` 만 노출. 이에 맞춰 `key_violations` 에서 `original` 필드 자체를 제거(예시 JSON·①번 섹션·셀프체크에서 전부 삭제; 2026-07-08/07-13 자 `original` 관련 지시는 483 에 한해 무효화). 483 의 영문↔국문 verbatim 병기는 이제 **결정론 "Observation 상세" 섹션 + `observations_ko`** 가 전담(WL/행정처분은 "Observation 상세" 층이 없어 계속 분석층 `original` 유지 — 483 만 다름). 동시에 `render.py` 에 **fail-closed 발행 게이트**가 배포되어 `observations_ko` 가 사실상 필수가 됨: 어느 Observation 이든 `deficiency_ko` 누락, `detail` 있는데 `detail_ko` 누락, 또는 `detail` 에 서명/푸터 OCR 잡음 혼입 시 **빌드 자체가 FAIL**하고 그 주 브리프 전체 발행이 막힌다(과거 "게이트 대상 아님·선택·누락돼도 영문만으로 발행" 서술은 더 이상 사실이 아니므로 삭제). `detail_ko` 를 "선택"에서 "detail 존재 시 필수"로 격상. |
+| 2026-11-16 | **문체·빈 칸 허용(브리프 품질 점검 11-15 · 편집 지시문 수정안 1-1 (나)).** ② `inspectional_significance` 를 '규제적 의미·승격 가능성'에서 '무게를 더하는 원문 사실'(반복 표시·이전 이력·출하 배치·진술)로 바꾸고, 쓸 사실이 없으면 `""`. ③ `deadline` 은 고정 문장("회신은 의무가 아니다. …" — 483 회신은 의무가 아니다), `items` 는 회사 약속이 원문에 있을 때만(없으면 `[]` — 일반 시정 조치 창작 금지). ④ 는 원문에 적힌 이력만(없으면 `""`). `risk` 선택. '3-1. 문체' 절 신설(금지어·'귀사' 금지·날짜 꼴·근거 번호). "483은 최종 판정이 아니다" 안내는 화면이 한 줄 붙인다. 짝 코드: `verify_deep_analysis` D1 이 483 의 ②·④·items 빈 값을 허용(#1774)·`card.html` 빈 칸 숨김. |

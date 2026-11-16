@@ -3262,9 +3262,9 @@ def _doc_term_pattern(surface: str, ignore_case: bool) -> "re.Pattern[str]":
 #   · 낱말 시작 규칙(앞 글자가 한글이면 건너뜀)·동사형 배제는 **실제 매치 범위**에 그대로 건다.
 _DOC_TERM_SPACE = "[  ]?"
 # 띄어쓰기 무시를 **끄는** 표면형(글자 그대로 일치만 유지). 한 줄에 하나, 사유 주석 필수.
-_DOC_TERM_SPACE_FOLD_DENY = frozenset({
-    "위험 평가",  # 붙은 "위험평가"(risk assessment)는 위험평가·위험성 평가 표제 충돌(준비 보고서 §4-C) — 대표 결정 전까지
-})
+# 2026-11-16 #1773: '위험 평가' 표제 충돌이 정리돼(risk-evaluation 표제 → '위험 판정',
+# '위험평가' → risk-assessment 별칭) 예외가 필요 없어졌다. 장치는 남겨 둔다.
+_DOC_TERM_SPACE_FOLD_DENY: frozenset = frozenset()
 
 
 def _is_hangul_char(c: str) -> bool:

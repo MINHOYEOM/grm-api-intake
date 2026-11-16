@@ -136,10 +136,13 @@ class TermEdges(unittest.TestCase):
             self.assertEqual(spaced[tid]["surface"], tight[tid]["surface"])  # 저장 표면형은 사전 표기
             self.assertEqual(spaced[tid]["confidence"], tight[tid]["confidence"])
 
-    def test_spacing_fold_deny_risk_evaluation(self):
-        # '위험 평가' 는 띄어쓰기 무시 예외 — 붙은 "위험평가" 는 새로 잇지 않고, 정확 일치는 유지
-        self.assertNotIn("risk-evaluation", self._edges("전체 위험평가를 제출하지 않았다."))
-        self.assertIn("risk-evaluation", self._edges("전체 위험 평가를 제출하지 않았다."))
+    def test_risk_assessment_spacing_after_1773(self):
+        # #1773: '위험평가' 는 risk-assessment 별칭, risk-evaluation 표제는 '위험 판정'.
+        # 붙여 쓰든 띄어 쓰든 risk-assessment 로 잇고 risk-evaluation 으로는 잇지 않는다.
+        for text in ("전체 위험평가를 제출하지 않았다.", "전체 위험 평가를 제출하지 않았다."):
+            e = self._edges(text)
+            self.assertIn("risk-assessment", e)
+            self.assertNotIn("risk-evaluation", e)
 
     def test_no_edge_below_threshold(self):
         docs = [{"findings": [{"finding_id": "f", "text_ko": "완제품 출하판정 밸리데이션 SOP 품질관리"}]}]

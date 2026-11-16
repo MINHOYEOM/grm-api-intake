@@ -14,7 +14,8 @@
   .cf-note{font-family:var(--sans);font-size:13px;line-height:1.7;color:var(--muted);margin:8px 0 0;max-width:780px;word-break:keep-all}
   .cf-bar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin:22px 0 0}
   .cf-bar[hidden]{display:none}
-  .cf-bar select,.cf-bar input{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:7px 10px;min-width:0;max-width:100%}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .cf-bar select,.cf-bar input{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper,#FFFFFF);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:7px 10px;min-width:0;max-width:100%}
   .cf-bar input{flex:1 1 200px}
   .cf-shown{font-family:var(--sans);font-size:13px;color:var(--muted);margin:12px 0 0}
   .cf-shown b{color:var(--ink);font-weight:600}
@@ -47,8 +48,7 @@
     <p class="kick">FDA &middot; 21 CFR</p>
     <h1 class="cf-h1">{{ _('FDA 실사에서 조항 지적을 받은 제조소') }}</h1>
     <p class="cf-sum">{{ _('{date} 확인 기준 · 제조소 {n}곳 · {c}개국', date=cf.as_of, n="{:,}".format(cf.total), c="{:,}".format(cf.n_countries)) }}</p>
-    <p class="cf-note">{{ _('FDA Data Dashboard 의 실사 지적(Inspections Citations)을 제조소별로 모았습니다. 조항 옆 작은 숫자는 그 조항이 지적된 실사 수입니다. 사실만 옮겼으며 평가나 해석은 싣지 않습니다.') }}</p>
-    <p class="cf-note">{{ _('GRM 업체 페이지와 확실히 같은 곳으로 확인된 제조소만 이름에 링크가 있습니다. 조항 코드의 짧은 제목은 표 아래에서 볼 수 있고, 조항 페이지가 있는 코드는 눌러서 이동할 수 있습니다.') }}</p>
+    <p class="cf-note">{{ _('FDA Data Dashboard 의 실사 지적을 제조소별로 모았습니다. 조항 옆 숫자는 그 조항이 지적된 실사 수입니다.') }}</p>
 
     <form class="cf-bar" id="cf-bar" role="search" hidden>
       <label class="sr-only" for="cf-q">{{ _('업체명') }}</label>

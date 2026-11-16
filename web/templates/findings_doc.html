@@ -275,13 +275,9 @@
     </section>
     {%- endif %}
     <section class="fd-about">
-      <h2 class="fd-sec-h">{{ _('이 기록에 대하여') }}</h2>
-      {#- 캐나다 실사는 published_date 가 실사 시작일이라(수집기가 inspectionStartDate 를
-          거기 넣는다) "공개한"이 거짓이 된다. 두 값이 같을 때만 표현을 바꾼다 —
-          소스 이름이 아니라 값으로 판정한다(위 칩과 같은 규칙). -#}
-      <p>{% if doc.published_date == doc.inspection_date %}{{ _("{agency}가 <b>{date}</b>에 실사한 문서에서 자동으로 추출해 우리말로 옮긴 내용입니다. 원문은 위 링크에서 확인하실 수 있습니다.", agency=agency_labels.get(doc.agency, doc.agency), date=doc.published_date) }}{% else %}{{ _("{agency}가 <b>{date}</b>에 공개한 문서에서 자동으로 추출해 우리말로 옮긴 내용입니다. 원문은 위 링크에서 확인하실 수 있습니다.", agency=agency_labels.get(doc.agency, doc.agency), date=doc.published_date) }}{% endif %}</p>
-      <p>{{ _('<b>이것은 그 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만, 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다. 현재 상태로 읽지 마시고, 최신 현황은 해당 규제기관의 공식 발표를 확인하세요.') }}</p>
-      <p>{{ _('번역과 분류는 기계로 처리한 것이라 원문과 뉘앙스가 다를 수 있습니다.') }}</p>
+      {#- [고지 정리 2026-11-15 · 대표 지적 "경고글이 작위적"] 제목·세 단락 → 한 줄. 지킬 뜻은 그대로:
+          언제 나온 기록인지 · 이후 시정은 원 기관 발표 · 기계 번역. 자세한 설명은 이용안내 한 곳. -#}
+      <p class="fd-note">{% if doc.published_date == doc.inspection_date %}{{ _("{agency} {date} 실사 문서에서 옮긴 그 시점의 기록입니다. 이후 시정 결과는 원 기관 발표를, 판단은 원문을 기준으로 하세요. 번역과 분류는 기계로 처리했습니다.", agency=agency_labels.get(doc.agency, doc.agency), date=doc.published_date) }}{% else %}{{ _("{agency} {date} 공개 문서에서 옮긴 그 시점의 기록입니다. 이후 시정 결과는 원 기관 발표를, 판단은 원문을 기준으로 하세요. 번역과 분류는 기계로 처리했습니다.", agency=agency_labels.get(doc.agency, doc.agency), date=doc.published_date) }}{% endif %}</p>
     </section>
 
     {% if same_firm %}

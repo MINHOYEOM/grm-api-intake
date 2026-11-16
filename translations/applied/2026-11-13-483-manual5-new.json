@@ -1,0 +1,26 @@
+[
+  {
+    "finding_id": "finding-b61be23afc504d82b5ead70e",
+    "finding_text": "The microbiological identification system is used to identify the microbiological contaminants that are recovered via the EM program, USP Sterility Tests, Sampling program and/or other mi- crobiological analyses.",
+    "finding_text_ko": "미생물 동정 시스템은 EM 프로그램, USP 무균시험, 샘플링 프로그램 및/또는 기타 미생물 분석을 통해 회수된 미생물 오염물질을 동정하는 데 사용된다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ccf2f3ae44a1a656ed08b35b",
+    "finding_text": "A Field Alert Report was not submitted within three working days of receipt of information concerning a failure of one or more distributed batches of a drug to meet the specifications established for it in the application.",
+    "finding_text_ko": "허가 신청서에 설정된 규격을 충족하지 못한 유통 배치가 하나 이상 있다는 정보를 접수한 날로부터 영업일 3일 이내에 현장 경보 보고서(Field Alert Report)를 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6d405fabdc032bff5a2e5667",
+    "finding_text": "Clothing of personnel engaged in the processing of drug products is not appropriate for the duties they perform.",
+    "finding_text_ko": "의약품 가공에 종사하는 직원의 복장이 수행 업무에 적절하지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0ab3c5e8cb16771f16043f06",
+    "finding_text": "Each batch of dmg product required to be free of objectionable microorganisms is not tested through appropriate laboratory testing.",
+    "finding_text_ko": "바람직하지 않은 미생물이 없어야 하는 의약품의 각 배치를 적절한 시험실 시험으로 시험하지 않는다.",
+    "translation_method": "llm_assisted"
+  }
+]

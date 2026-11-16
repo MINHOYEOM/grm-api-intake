@@ -104,7 +104,8 @@
 {# P0-4: 'AI 자동 생성 고지' = 홈의 고지 섹션(#notice). 홈에선 순수 프래그먼트(새로고침 0),
    타 페이지에선 홈으로 이동 후 스크롤. [소개 2026-09-06] 종전 '소개'(about_href → 홈 #why
    기능 섹션)는 전용 페이지 /about/ 로 바뀌어 변수가 사라졌다 — 푸터 '서비스' 열 참조. #}
-{% set notice_href = '#notice' if nav_active == 'home' else rel_root ~ 'index.html#notice' %}
+{#- [고지 정리 2026-11-15] 홈 하단 긴 고지를 한 줄로 줄이고 설명은 이용안내 '이용 시 유의사항'(sec-8)으로 모았다. -#}
+{% set notice_href = rel_root ~ 'guide/index.html#sec-8' if (lang == 'ko' or 'guide/' in en_paths) else rel_root ~ 'index.html#notice' %}
 {#- [루트 진입 2026-09-05] 영어 사용자가 `grm-solutions.com` 을 직접 치면 한국어 홈을
     만난다. 헤더에 "English" 칩이 있지만 한국어 화면을 처음 본 사람이 그걸 찾을 이유가
     없다 — 검색 유입은 hreflang 으로 `/en/` 에 바로 착지하지만 직접·공유 링크 진입은 그
@@ -195,6 +196,8 @@
 {# [구독 밴드 실물 링크 2026-09-07] 밴드는 "메일로 보내드립니다"라고 말할 뿐 무엇이 오는지 보여 주지 않는다. 메일 본문은 주간 브리프의 핵심 요약과 바로가기라서 **최신 브리프 페이지가 곧 메일 내용의 실물**이다 — 링크 한 줄이면 구독 판단이 선다. 낱말은 헤더 CTA 와 같은 '이번 주 소식'을 재사용한다(새 낱말 만들지 않는다). 스타일은 grm.css(디자인 동결) 대신 하단 배너와 같은 관례로 이 게이트 안에 두되, **밴드 안**(`<section class="subscribe">` 뒤)에 둔다 — 기존 한글안전 가드가 재는 범위가 거기서 시작하기 때문이다. 게이트가 꺼진 로컬·CI 빌드에서는 이 <style> 도 함께 생략되므로 골든 byte-diff 는 그대로 0. #}
 <style>
 .subscribe .sub-peek{margin:6px auto 14px;font-family:var(--sans);font-size:14px}
+.subscribe.sub-flash{box-shadow:inset 0 0 0 3px var(--coral);transition:box-shadow .3s}
+@media (prefers-reduced-motion:reduce){.subscribe.sub-flash{transition:none}}
 .subscribe .sub-peek a{color:var(--coral-2);text-decoration:none}
 .subscribe .sub-peek a:hover{color:var(--coral)}
 .subscribe .sub-peek .ti{font-size:13px;vertical-align:-1px}
@@ -303,6 +306,30 @@
   });
 })();
 </script>
+{# [구독 바로가기 2026-11-15] '무료 구독'·'메일 구독'(#subscribe) 링크를 눌러도 아무 일이 없어 보였다(대표 신고).
+   두 가지였다: ① 밴드가 링크 바로 아래·페이지 끝이라 스크롤이 거의 안 움직인다 ② 이미 구독한 브라우저는 위
+   스크립트가 밴드를 hidden 으로 감춰 링크가 숨은 곳을 가리킨다. → 밴드가 보이면 그리로 옮기고 이메일 칸에
+   커서를 넣고 잠깐 강조한다. 밴드가 숨어 있으면(구독함) 링크 자체를 감춘다. JS 가 없으면 종전 앵커 이동. #}
+<script>
+(function(){
+  var sec=document.querySelector('.subscribe');
+  var links=document.querySelectorAll('a[href="#subscribe"]');
+  if(!sec||!links.length)return;
+  // hidden 속성은 author display(.grm-next a·.home-links a)에 진다 — style 로 직접 끈다.
+  if(sec.hidden){for(var i=0;i<links.length;i++){var li=links[i].closest&&links[i].closest('li');(li||links[i]).style.display='none';}return;}
+  function go(e){
+    if(sec.hidden)return;
+    e.preventDefault();
+    var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try{sec.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});}catch(_){sec.scrollIntoView();}
+    var em=document.getElementById('grm-sub-email');
+    if(em){try{em.focus({preventScroll:true});}catch(_){em.focus();}}
+    sec.classList.remove('sub-flash');void sec.offsetWidth;sec.classList.add('sub-flash');
+    setTimeout(function(){sec.classList.remove('sub-flash');},1600);
+  }
+  for(var j=0;j<links.length;j++)links[j].addEventListener('click',go);
+})();
+</script>
 {# [구독 언어 선택] 고른 언어의 폼 주소로 action 을 바꾼다(밴드·배너 공통). 스크립트가 돌 때만 선택지를 보인다. #}
 {% if sub_action_ko and sub_action_en %}
 <script>
@@ -335,7 +362,8 @@
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
 .foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
 .foot-copy .foot-ico .ti{font-size:13px;line-height:1}
-@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
+{# [면책 문구 줄바꿈 2026-11-14] 종전 max-width:60ch(=411px)가 한글 문장을 접어 '있습니다.' 한 어절만 오른쪽 아래로 떨어졌다. 폭 제한을 풀어 남는 폭이면 한 줄, 좁은 데스크톱에서 접힐 때만 balance 로 두 줄을 고르게. -#}
+@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:none;text-wrap:balance}}
 </style>
 {# [모바일·태블릿 헤더 2026-09-06] 좁은 폭에서 헤더 한 줄이 넘쳐 로그인(.grm-auth)이 화면
    **밖으로** 나가던 결함 수리. 로컬 빌드 실측(320/375/641/753/885px): 헤더 행이 요구하는
@@ -418,6 +446,21 @@
 .btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
 .grm-skip:focus{left:16px}
+/* [본문 끝 여백 2026-11-15 · 대표 지적 "푸터에 마지막 글이 바짝 붙어 있다"] 페이지마다 아래 여백을
+   main·main>.wrap 의 padding(0~90px)으로 따로 주던 것을 한 규칙으로 — padding 은 걷고 main 의
+   margin 으로만 띄운다. margin 은 안쪽 마지막 요소의 margin 과 겹쳐(collapse) 큰 쪽만 남으므로
+   두 번 더해지지 않는다. :not(#_) 는 템플릿의 main.home·main.sr 같은 개별 규칙보다 앞서려는 것. */
+main:not(#_){padding-bottom:0;margin-bottom:72px}
+main:not(#_) > .wrap:last-child{padding-bottom:0}
+@media(max-width:640px){ main:not(#_){margin-bottom:56px} }
+/* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
+main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -939,7 +982,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       try{ localStorage.setItem(DONE,'1'); }catch(_){}
       var t=el.querySelector('.grm-cta-txt');
       // 2026-09-23 C-06 — 밴드와 같은 문장(발신자 GRM Solutions Brief 명시)으로 맞춘다.
-      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다") }}</b><span>{% if sub_zone == 'glossary' %}{{ _("메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}{% else %}{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}{% endif %}</span>';}
+      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다")|js_sq }}</b><span>{% if sub_zone == 'glossary' %}{{ _("메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.")|js_sq }}{% else %}{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.")|js_sq }}{% endif %}</span>';}
       f.hidden=true;
       setTimeout(function(){dismiss(true);},4000);
     });

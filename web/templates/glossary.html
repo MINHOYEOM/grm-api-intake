@@ -108,7 +108,7 @@
 .page-head p{max-width:none;word-break:keep-all}  /* 공용 62ch 캡 해제 — 표준 wrap 전폭 */
 .gl-tools{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;margin-top:6px}
 .gl-search{position:relative;flex:1;min-width:240px;max-width:460px}
-.gl-search .ti{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:17px;color:var(--lo);pointer-events:none}
+.gl-search .ti{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:17px;color:var(--muted-2);pointer-events:none}
 .gl-search input{width:100%;box-sizing:border-box;font-family:var(--sans);font-size:15px;color:var(--ink);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:11px 14px 11px 38px}
 .gl-search input:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
 .gl-search input::-webkit-search-cancel-button{cursor:pointer}
@@ -131,8 +131,9 @@
 .gl-term-ko{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.3;color:var(--ink);margin:0}
 .gl-term-link{color:inherit;text-decoration:none}
 .gl-term-link:hover{color:var(--coral)}
-.gl-anchor{margin-left:7px;font-family:var(--mono);font-size:13px;font-weight:400;color:var(--line-2);text-decoration:none;opacity:0;transition:opacity .14s var(--ease),color .14s var(--ease)}
-.gl-term:hover .gl-anchor{opacity:1}
+.gl-anchor{margin-left:7px;font-family:var(--mono);font-size:13px;font-weight:400;color:var(--muted-2);text-decoration:none;opacity:0;transition:opacity .14s var(--ease),color .14s var(--ease)}
+/* [11-15] 평소엔 숨기고 마우스를 올리거나 키보드로 닿을 때만 보인다. 보일 때 글자색은 AA(--muted-2). */
+.gl-term:hover .gl-anchor,.gl-term:focus-within .gl-anchor,.gl-anchor:focus-visible{opacity:1}
 .gl-anchor:hover{color:var(--coral)}
 .gl-term-en{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.4}
 .gl-alias{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px;margin:3px 0 0;word-break:keep-all}
@@ -141,9 +142,9 @@
 .gl-def{font-family:var(--sans);font-size:14.5px;line-height:1.66;color:var(--body);margin:2px 0 0;word-break:keep-all}
 .gl-detail{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);margin:8px 0 0;padding:10px 12px;background:var(--soft);border-left:2px solid var(--line-2);border-radius:0 var(--rad-s) var(--rad-s) 0;word-break:keep-all}
 .gl-detail-k{display:block;font-weight:600;font-size:11.5px;color:var(--muted);margin-bottom:3px}
-.gl-src{font-family:var(--sans);font-size:12px;line-height:1.55;color:var(--lo);margin:4px 0 0;word-break:keep-all;overflow-wrap:anywhere}
+.gl-src{font-family:var(--sans);font-size:12px;line-height:1.55;color:var(--muted-2);margin:4px 0 0;word-break:keep-all;overflow-wrap:anywhere}
 .gl-src-k{display:inline-block;font-weight:600;color:var(--muted);margin-right:6px}
-.gl-src-a{color:var(--lo);text-decoration:none;border-bottom:1px dotted var(--line-2);transition:color .14s var(--ease),border-color .14s var(--ease)}
+.gl-src-a{color:var(--muted-2);text-decoration:none;border-bottom:1px dotted var(--line-2);transition:color .14s var(--ease),border-color .14s var(--ease)}
 .gl-src-a:hover{color:var(--coral-2);border-color:var(--coral)}
 .gl-src-a .ti{font-size:11px}
 .gl-rel{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;padding-top:12px;border-top:1px solid var(--line)}

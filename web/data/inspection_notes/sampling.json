@@ -1,0 +1,203 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "sampling",
+  "as_of": "2026-11-15",
+  "area_ko": "시험실",
+  "area_en": "Laboratory",
+  "title_ko": "검체채취와 보관 검체",
+  "title_en": "Sampling and reserve samples",
+  "glossary_ids": [
+    "sampling-plan",
+    "retention-sample"
+  ],
+  "aliases_ko": [
+    "검체 채취",
+    "보관용 검체",
+    "보존품",
+    "샘플링 계획"
+  ],
+  "aliases_en": [
+    "sampling plan",
+    "reserve sample",
+    "retention sample"
+  ],
+  "search_q_ko": "검체 채취",
+  "search_q_en": "sampling plan",
+  "lead_ko": "FDA 는 검체를 채취했는지보다, 그 검체가 로트와 배치를 대표하는지, 보관 검체를 정해진 절차대로 검사하는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether samples were taken than at whether they represent the lot and batch and whether reserve samples are examined under a set procedure. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "보관 검체를 정해진 주기로 육안 검사하지 않았다",
+      "title_en": "Reserve samples were not visually examined at the required interval",
+      "quotes": [
+        {
+          "finding_id": "finding-927d3b11f1027d8b74d72905",
+          "raw_signal_id": "rawsig-555738c086414070a91bf603",
+          "document_id": "fda483-196255",
+          "source": "FDA 483",
+          "firm": "KDC/ONE Socal Laboratories, LLC",
+          "date": "2026-11-12",
+          "quote_ko": "허용 가능한 통계적 절차로 선정된 의약품 대표 로트 또는 배치의 보관용 검체(reserve sample)를 적어도 (b)(4) 열화 징후 여부에 대해 육안으로 검사하지 않는다.",
+          "quote_en": "Reserve samples from representative sample lots or batches of drug products selected by acceptable statistical procedures are not examined visually at least (b)(4) for evidence of deterioration."
+        },
+        {
+          "finding_id": "finding-f8ca49a6cb5258ebe244a973",
+          "raw_signal_id": "rawsig-58ae818faa1b8dd9d6f525f9",
+          "document_id": "fda483-195597",
+          "source": "FDA 483",
+          "firm": "FinVector Oy",
+          "date": "2026-10-20",
+          "quote_ko": "구체적으로, 귀사의 품질관리 부서는 대표 검체 로트의 보관 검체에서 열화 증거를 찾기 위해 최소 연 1회 육안 검사를 수행하는 것을 관리하는 절차를 수립하지 않았다.",
+          "quote_en": "Specifically, your quality control unit has not established a procedure that governs the performance of visual inspection on reserve samples from representative sample lots at least once a year for evidence of deterioration."
+        }
+      ]
+    },
+    {
+      "title_ko": "원료와 공정 검체를 대표성 있게 채취하지 않았다",
+      "title_en": "Component and in-process samples were not representative",
+      "quotes": [
+        {
+          "finding_id": "finding-1503cd9706a03ef3c89bff92",
+          "raw_signal_id": "rawsig-a4c2d991374bbfa6da132fe3",
+          "document_id": "9995c30e33c0",
+          "source": "FDA Warning Letter",
+          "firm": "SnugZ USA, Inc.",
+          "date": "2026-10-20",
+          "quote_ko": "귀사는 OTC 의약품 제조에 사용하는 입고 원료에 대해 적절한 확인시험을 수행하지 않았다. 또한 각 원료 로트에서 대표 검체를 채취하지 않았다.",
+          "quote_en": "You failed to perform adequate identity testing of incoming components used in the manufacture of your OTC drug products. You also failed to collect representative samples from each lot of components."
+        },
+        {
+          "finding_id": "finding-92d2011f88049e4ad9f3940a",
+          "raw_signal_id": "rawsig-6b176a4156cbd1e67eab33f5",
+          "document_id": "fda483-195314",
+          "source": "FDA 483",
+          "firm": "Blossom Pharmaceuticals",
+          "date": "2026-10-22",
+          "quote_ko": "검체 채취는 기록되지 않고 기법도 대표성이 없다. pH 시험에 대해 선임 생산 관리자는 “그냥 주걱으로 맨 위를 떠서 QC로 가져간다”라고 했다.",
+          "quote_en": "Sampling is not documented, and sampling techniques are not representative. For pH testing, your Senior Production Manager stated, “We just take a spatula and skim from the top and take it to QC.”"
+        }
+      ]
+    },
+    {
+      "title_ko": "완제의약품 검체채취가 배치를 대표하도록 하지 않았다",
+      "title_en": "Finished product sampling was not set up to represent the batch",
+      "quotes": [
+        {
+          "finding_id": "finding-45d8a53a55137f53410b0e1a",
+          "raw_signal_id": "rawsig-f286f65b892b1a152974b67c",
+          "document_id": "102fb7dff220",
+          "source": "FDA Warning Letter",
+          "firm": "Creative Essences, Inc.",
+          "date": "2025-10-07",
+          "quote_ko": "귀사는 의약품이 확인, 함량, 품질, 순도의 적절한 기준에 부합함을 보증하기 위한 적절한 샘플링과 시험이 부족했다. 예를 들어 각 배치를 충분히 대표하도록 하는 완제의약품 샘플링의 적절한 절차를 수립하지 않았다.",
+          "quote_en": "You lacked appropriate sampling and testing to ensure your drug products conform to appropriate standards of identity, strength, quality, and purity. For example, you failed to establish adequate procedures for finished drug product sampling to ensure adequate representation of each batch."
+        },
+        {
+          "finding_id": "finding-5ebb2b79333922c7fd18e03b",
+          "raw_signal_id": "rawsig-ec600093dfa7384f4b2d6aa1",
+          "document_id": "8fb90c60bc40",
+          "source": "FDA Warning Letter",
+          "firm": "Dynamic Blending Specialists, Inc.",
+          "date": "2025-07-08",
+          "quote_ko": "귀사의 의약품 출하 전 샘플링 계획은 품질을 보증하기에 충분하지 않다. 구체적으로 SmileSense Fluoride Toothpaste와 KT Tape Pain Relief Gel에 대한 귀사의 샘플링 및 시험 계획은 의약품 배치 전체의 품질 특성을 대표한다는 점이 적절히 입증되지 않았다.",
+          "quote_en": "Your sampling plans prior to the release of your drug products are not sufficient to assure their quality. Specifically, your sampling and testing plan for SmileSense Fluoride Toothpaste and KT Tape Pain Relief Gel is not adequately justified to represent the quality attributes of the entire drug product batch."
+        }
+      ]
+    },
+    {
+      "title_ko": "입고 자재를 사용하기 전에 검체를 채취해 검사하지 않았다",
+      "title_en": "Incoming materials were not sampled and examined before use",
+      "quotes": [
+        {
+          "finding_id": "finding-86e06fa1ee503f076f225672",
+          "raw_signal_id": "rawsig-55a602f063dcbafdf5577156",
+          "document_id": "fda483-189925",
+          "source": "FDA 483",
+          "firm": "Central Admixture Pharmacy Services Inc",
+          "date": "2025-12-03",
+          "quote_ko": "자재는 검체 채취 및 검사 없이 공급업체 시험성적서에 근거해 수락한다.",
+          "quote_en": "Materials are accepted based on the suppliers certificate of analysis, without sampling and examination."
+        },
+        {
+          "finding_id": "finding-3669832ae6e43924a24e539b",
+          "raw_signal_id": "rawsig-c64fcb8f1d04077665fe12a5",
+          "document_id": "fda483-193906",
+          "source": "FDA 483",
+          "firm": "Gascó Industrial Corporation",
+          "date": "2026-07-28",
+          "quote_ko": "구체적으로, 귀사는 각 의약품 성분을 사용하기 전에 검체채취 및 확인시험을 수행하지 않았다.",
+          "quote_en": "Specifically, You firm failed to sample and perform identification testing to the components of each drug product prior to using it."
+        }
+      ]
+    },
+    {
+      "title_ko": "검체채취 계획이나 절차를 문서로 갖추지 않았다",
+      "title_en": "A sampling plan or written sampling procedure was not in place",
+      "quotes": [
+        {
+          "finding_id": "finding-b755057c13da72e490a698ea",
+          "raw_signal_id": "rawsig-7dd3353a3d59a93237f5c0ac",
+          "document_id": "fda483-195580",
+          "source": "FDA 483",
+          "firm": "Bello Bio LLC",
+          "date": "2026-10-27",
+          "quote_ko": "귀사는 제품의 무균 보증을 평가하는 검체채취 계획을 수립하지 않았다.",
+          "quote_en": "You failed to establish a sampling plan that assesses the sterility assurance of your product."
+        },
+        {
+          "finding_id": "finding-fa3f3741422851a93c834ee7",
+          "raw_signal_id": "rawsig-7f11509f750dd625f058c337",
+          "document_id": "fda483-195329",
+          "source": "FDA 483",
+          "firm": "VitaCare Labs Inc.",
+          "date": "2026-10-23",
+          "quote_ko": "보관 검체용 제품 채취의 문서화된 절차도 없다.",
+          "quote_en": "Moreover, there are no written procedures in place for sampling products designated for retained storage."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.160(b)",
+      "finding_id": "finding-45d8a53a55137f53410b0e1a",
+      "firm": "Creative Essences, Inc.",
+      "date": "2025-10-07",
+      "quote_ko": "귀사는 원료, 의약품 용기, 마개, 공정 중 물질, 표시자재 및 의약품이 확인(identity), 함량(strength), 품질(quality), 순도(purity)의 적절한 기준에 부합함을 보증하도록 설계된 과학적으로 타당하고 적절한 규격, 표준, 샘플링 계획 및 시험방법을 포함하는 시험실 관리를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity",
+      "note_ko": "각 배치를 충분히 대표하도록 하는 완제의약품 샘플링 절차를 수립하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Not establishing finished drug product sampling procedures that ensure adequate representation of each batch was cited under this clause."
+    },
+    {
+      "key": "21 CFR 211.84(d)(1), (d)(2)",
+      "finding_id": "finding-1503cd9706a03ef3c89bff92",
+      "firm": "SnugZ USA, Inc.",
+      "date": "2026-10-20",
+      "quote_ko": "귀사는 의약품의 각 원료(component)의 확인(identity)을 검증하기 위한 시험을 최소 1개 이상 수행하지 않았다. 또한 귀사는 원료 공급업체 시험 분석의 신뢰성을 적절한 주기로 밸리데이션하고 확립하지 않았다",
+      "quote_en": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals",
+      "note_ko": "입고 원료의 확인시험을 적절히 하지 않고 각 원료 로트에서 대표 검체를 채취하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Not performing adequate identity testing of incoming components and not collecting representative samples from each component lot was cited under this clause."
+    }
+  ],
+  "checks_ko": [
+    "보관 검체를 정해진 주기로 육안 검사해 열화 여부를 확인합니까",
+    "보관 검체의 육안 검사를 정한 절차가 있습니까",
+    "각 원료 로트에서 대표 검체를 채취합니까",
+    "검체 채취 방법이 정해져 있고 채취할 때마다 기록합니까",
+    "완제의약품 검체채취 계획이 배치 전체의 품질 특성을 대표한다는 점을 입증했습니까",
+    "입고 자재를 공급업체 시험성적서만으로 받지 않고 검체를 채취해 검사합니까"
+  ],
+  "checks_en": [
+    "Are reserve samples visually examined at the set interval for evidence of deterioration?",
+    "Is there a procedure governing the visual examination of reserve samples?",
+    "Are representative samples collected from each lot of components?",
+    "Is the sampling method defined and is each sampling event documented?",
+    "Has the finished product sampling plan been shown to represent the quality attributes of the entire batch?",
+    "Are incoming materials sampled and examined rather than accepted on the supplier's certificate of analysis alone?"
+  ],
+  "further_reading": [],
+  "related": [
+    "stability",
+    "method-validation"
+  ]
+}

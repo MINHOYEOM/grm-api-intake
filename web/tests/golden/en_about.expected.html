@@ -29,12 +29,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="/assets/grm.css?v=bf73464a">
+<link rel="stylesheet" href="/assets/grm.css?v=b70ada39">
 <link rel="stylesheet" href="/assets/pet.css?v=4eb979f5">
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/about/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/about/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/about/" />
-<script src="/assets/i18n-en.js?v=4f4b45cd" defer></script>
+<script src="/assets/i18n-en.js?v=f10223fb" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -148,7 +148,7 @@
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
 .foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
 .foot-copy .foot-ico .ti{font-size:13px;line-height:1}
-@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
+@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:none;text-wrap:balance}}
 </style>
 <style>
 .navmore{display:none}
@@ -212,6 +212,21 @@
 .btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
 .grm-skip:focus{left:16px}
+/* [본문 끝 여백 2026-11-15 · 대표 지적 "푸터에 마지막 글이 바짝 붙어 있다"] 페이지마다 아래 여백을
+   main·main>.wrap 의 padding(0~90px)으로 따로 주던 것을 한 규칙으로 — padding 은 걷고 main 의
+   margin 으로만 띄운다. margin 은 안쪽 마지막 요소의 margin 과 겹쳐(collapse) 큰 쪽만 남으므로
+   두 번 더해지지 않는다. :not(#_) 는 템플릿의 main.home·main.sr 같은 개별 규칙보다 앞서려는 것. */
+main:not(#_){padding-bottom:0;margin-bottom:72px}
+main:not(#_) > .wrap:last-child{padding-bottom:0}
+@media(max-width:640px){ main:not(#_){margin-bottom:56px} }
+/* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
+main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -219,7 +234,7 @@
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>A free information service on GMP and quality regulation for medicinal products, in Korean and English.</p>
       <a class="foot-srclink" href="../findings/coverage/index.html">Where the information comes from <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
-    <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../index.html#notice">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
+    <div data-feedback-slot><h5>About</h5><a href="../about/index.html">About the service</a><a href="../guide/index.html">Guide</a><a href="../guide/index.html#sec-8">How AI is used</a><a href="../findings/coverage/index.html">Data coverage</a></div>
     <div><h5>Content</h5><a href="../news/index.html">Recent regulatory news</a><a href="../browse/index.html">Browse</a><a href="../library/index.html">Library</a><a href="../glossary/index.html">Glossary</a><a href="../quiz/index.html">Weekly quiz</a></div>
     <div class="foot-fnd"><h5>Browse</h5><a href="../findings/firm/index.html">Companies</a><a href="../findings/inspector/index.html">Inspectors</a><a href="../findings/clause/index.html">Section</a><a href="../findings/trends/index.html">Patterns by area</a><a href="../findings/inspections/index.html">FDA inspection outcomes</a><a href="../findings/docs/index.html">Public documents</a><a href="../findings/index.html">Finding search</a><a href="../findings/checklist/index.html">Self-inspection checklist</a><a href="../browse/index.html">Full index</a></div>
   </div>

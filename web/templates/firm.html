@@ -290,14 +290,8 @@ button.fp-cat-row[aria-pressed="true"] .fp-cat-label{color:var(--coral-2);font-w
 </style>
 {% endblock %}
 {% block ai_disclosure %}
-<section class="ai-disclosure" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
-  <span class="kick">AI Disclosure</span>
-  <h2>{{ _('콘텐츠 생성 방식 및 유의사항') }}</h2>
-  <div class="disc-body">
-    <div class="disc-sec"><p>{{ _('이 페이지의 업체별 집계(총 지적·카테고리·연도별 추이)는 FDA 483 Observation·Warning Letter·캐나다 실사보고서(Health Canada)·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서 등 공개 원문에서 자동 추출·정규화된 지적사항을 기반으로 합니다.') }}</p></div>
-    <div class="disc-sec"><p>{{ _('문서 이력에서 펼쳐 보는 개별 지적사항의 국문 해석은 생성형 AI 번역이며 원문(영문)을 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.') }}</p></div>
-    <div class="disc-sec"><p>{{ _('본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.') }}</p></div>
-  </div>
-</div></section>
+{#- [고지 정리 2026-11-15 · 대표 지적 "AI 경고글이 작위적"] 제목·네 단락 → 한 줄. 출처·증거 등급·면책 설명은
+    이용안내 '이용 시 유의사항'(#sec-8) 한 곳으로 모았다. 사이트 공통 면책 한 줄은 푸터에 그대로. -#}
+<section class="ai-line" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap"><p>{{ _('국문 해석은 생성형 AI 번역이며 항목마다 원문을 함께 싣습니다. 판단은 원문을 기준으로 하세요.') }} {% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html#sec-8">{{ _("자료와 AI 활용 안내") }}</a>{% endif %}</p></div></section>
 {% endblock %}
 {% block scripts %}<script src="{{ asset_root }}assets/firm.js?v={{ firmjs_ver }}" defer></script>{% endblock %}

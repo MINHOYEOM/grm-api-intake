@@ -1,0 +1,192 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "disinfection",
+  "as_of": "2026-11-15",
+  "area_ko": "무균·오염 관리",
+  "area_en": "Sterility and contamination control",
+  "title_ko": "소독과 살포자제",
+  "title_en": "Disinfection and sporicidal agents",
+  "glossary_ids": [
+    "disinfection",
+    "sporicidal-agent"
+  ],
+  "aliases_ko": [
+    "소독제",
+    "살포자제",
+    "살균 소독"
+  ],
+  "aliases_en": [
+    "disinfection",
+    "disinfectant",
+    "sporicidal agent"
+  ],
+  "search_q_ko": "소독",
+  "search_q_en": "disinfect",
+  "lead_ko": "FDA 는 소독제를 갖추었는지보다, 그 소독제가 효능이 확인된 조건대로 청정실과 무균 구역의 표면에 쓰였는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether disinfectants are on hand than at whether they were used on cleanroom and aseptic area surfaces under the conditions shown to be effective. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "무균 구역 소독에 살포자제를 제대로 쓰지 않았다",
+      "title_en": "Sporicidal agents were not properly used in disinfecting the aseptic area",
+      "quotes": [
+        {
+          "finding_id": "finding-035bfaf630f05c1f2335b358",
+          "raw_signal_id": "rawsig-1904da2ce853331ac50f13cb",
+          "document_id": "a39124f53704",
+          "source": "FDA Warning Letter",
+          "firm": "Thrive Health and Wellness, LLC dba Thrive Health Solutions",
+          "date": "2026-04-21",
+          "quote_ko": "귀사는 무균공정 구역의 소독 프로그램의 일부로 살포자 사멸제(sporicidal agent)를 사용하지 않았으며, 의약품을 주사기에 충전하는 구역 내에서 비멸균 와이프를 사용하여 청소했다.",
+          "quote_en": "Your firm failed to use a sporicidal agent as part of your disinfection program for the aseptic processing area and used non-sterile wipes to clean within the area where drug products were filled into syringes."
+        },
+        {
+          "finding_id": "finding-c8e5cf6384bf59bfaf1f056d",
+          "raw_signal_id": "rawsig-512cec509914cb912b35d53f",
+          "document_id": "6f0686c32333",
+          "source": "FDA Warning Letter",
+          "firm": "Stokes Healthcare Inc. dba Epicur Pharma",
+          "date": "2024-10-22",
+          "quote_ko": "귀사는 무균공정구역 소독에 사용하는 살포자제(sporicidal agent)에 대해 적절한 접촉시간(contact time)을 보장하지 못하였습니다.",
+          "quote_en": "Your firm failed to ensure an adequate contact time for your sporicidal agent used to disinfect your aseptic processing areas."
+        }
+      ]
+    },
+    {
+      "title_ko": "절차서에 밸리데이션된 접촉 시간을 반영하지 않았다",
+      "title_en": "Procedures did not reflect validated contact times",
+      "quotes": [
+        {
+          "finding_id": "finding-f26a4ac03c4f551e944ee7c2",
+          "raw_signal_id": "rawsig-af99349a1de7a773c1c547fa",
+          "document_id": "2822025e023e",
+          "source": "FDA Warning Letter",
+          "firm": "Bio-Medical Pharmaceutical Manufacturing Corporation",
+          "date": "2026-02-10",
+          "quote_ko": "(b)(4) 은(는) 효과적인 소독제일 수 있으나, 귀사의 절차에는 밸리데이션된 접촉 시간, 농도 확인, 잔류물 제거, 세척 공정이 무균 의약품에 요구되는 무균보증수준을 일관되게 달성함을 입증하는 것과 같은 핵심 요소가 없다.",
+          "quote_en": "While (b)(4) can be an effective disinfectant, your procedure lacks critical elements such as validated contact times, concentration verification, residue removal, and demonstration that the cleaning process consistently achieves the sterility assurance levels required for sterile drug products."
+        },
+        {
+          "finding_id": "finding-fb66c9deff39c590ca7d45bf",
+          "raw_signal_id": "rawsig-252ec09e7921d24ab3380d94",
+          "document_id": "fda483-195349",
+          "source": "FDA 483",
+          "firm": "Kaysersberg Pharmaceuticals SAS",
+          "date": "2026-10-23",
+          "quote_ko": "소독 절차는 “USP <1072> 요구사항에 따른 제조 시설 표면 소독제 효력 적격성평가 보고서”의 접촉 시간을 항상 반영하지 않는다.",
+          "quote_en": "Procedures for sanitization do not always reflect contact times that were determined in your \"Report of Qualification of the Efficacy of Disinfectants on Surfaces of the Manufacturing Facility According to Requirements of USP <1072>.\""
+        }
+      ]
+    },
+    {
+      "title_ko": "쓰고 있는 소독제의 효능 연구를 하지 않았다",
+      "title_en": "No efficacy studies were performed for the disinfectants in use",
+      "quotes": [
+        {
+          "finding_id": "finding-ffcf748bf47e87a1c8d73124",
+          "raw_signal_id": "rawsig-f3cf361958ac329f8becc4d5",
+          "document_id": "fda483-195531",
+          "source": "FDA 483",
+          "firm": "Duke University",
+          "date": "2026-10-30",
+          "quote_ko": "제조 시설에서 일상적으로 사용하는 위생 처리제에 대해 소독제 유효성 연구를 수행하지 않았다.",
+          "quote_en": "Disinfectant effectiveness studies have not been performed for the sanitizing agents routinely utilized in the manufacturing facility."
+        },
+        {
+          "finding_id": "finding-d175955f6e4cd27795cd8001",
+          "raw_signal_id": "rawsig-b52b1a99fb67a9c031d39836",
+          "document_id": "fda483-195316",
+          "source": "FDA 483",
+          "firm": "Apotek Production & Laboratorier AB",
+          "date": "2026-10-22",
+          "quote_ko": "그러나 귀사의 제조 환경에서 관련 미생물에 대한 이들 약제의 효과를 밸리데이션하기 위한 소독제 효능 연구는 수행되지 않았다.",
+          "quote_en": "However, no disinfectant efficacy studies have been performed to validate the effectiveness of these agents against the relevant microorganisms in your manufacturing environment."
+        }
+      ]
+    },
+    {
+      "title_ko": "소독 효능 연구가 실제 재질과 오염원을 다루지 않았다",
+      "title_en": "Disinfection efficacy studies did not cover the actual materials and contaminants",
+      "quotes": [
+        {
+          "finding_id": "finding-1985e67fdf3666aab91db978",
+          "raw_signal_id": "rawsig-f64863f2feaca66a90de6213",
+          "document_id": "9c468c9603b1",
+          "source": "FDA Warning Letter",
+          "firm": "Daewoo Pharmaceutical Co., Ltd.",
+          "date": "2025-07-15",
+          "quote_ko": "또한 (b)(4)에 대한 소독 효능 연구는 충전 라인의 (b)(4)(충전 설비), (b)(4), (b)(4), (b)(4) 호스)를 포함하되 이에 국한되지 않는 모든 재질을 적절히 다루지 않았다.",
+          "quote_en": "Further, the disinfection efficacy studies for (b)(4) did not adequately address all materials of the filling line, including but not limited to, (b)(4) (filling equipment), (b)(4) and (b)(4) , and (b)(4) hose)."
+        },
+        {
+          "finding_id": "finding-7490c67cb1aba857bd0d79c3",
+          "raw_signal_id": "rawsig-0ada76b0fc650cb821fa4ede",
+          "document_id": "fda483-195549",
+          "source": "FDA 483",
+          "firm": "Andelyn Biosciences, Inc.",
+          "date": "2026-10-30",
+          "quote_ko": "소독 유효성 연구는 바이러스 오염원에 대한 효과를 입증하지 않는다.",
+          "quote_en": "The disinfection efficacy study does not demonstrate effectiveness against viral contaminants."
+        }
+      ]
+    },
+    {
+      "title_ko": "소독제를 표면에 접촉 시간만큼 닿게 하지 않았다",
+      "title_en": "Disinfectant was not kept on surfaces for the contact time",
+      "quotes": [
+        {
+          "finding_id": "finding-80ab66e71d87a358ae8c6a50",
+          "raw_signal_id": "rawsig-9cd09fbc6080906fba9028df",
+          "document_id": "3e18b957689e",
+          "source": "FDA Warning Letter",
+          "firm": "Uriel Pharmacy, Inc.",
+          "date": "2025-11-18",
+          "quote_ko": "또한 클린룸에서 비멸균 세척제 및 소독제가 불충분한 접촉 시간으로 사용된 것이 관찰되었다.",
+          "quote_en": "It was also observed that non-sterile cleaning and disinfecting agents were used in your cleanroom with inadequate contact times."
+        },
+        {
+          "finding_id": "finding-9313686ebd246aca11bfb200",
+          "raw_signal_id": "rawsig-ee6ba43ef95f4abf17bd5fc9",
+          "document_id": "fda483-195284",
+          "source": "FDA 483",
+          "firm": "Gland Pharma Limited",
+          "date": "2026-10-20",
+          "quote_ko": "소독제가 필요한 모든 표면에 예상 접촉 시간 동안 닿도록 닦개나 대걸레를 올바르게 사용하지 않고 벽에 들이부었으므로 구역 소독이 미흡했다.",
+          "quote_en": "Disinfection of the area was deficient in that the disinfect was doused on the walls without the proper use of wipes or mops to ensure the disinfectant touches all required surfaces for the expected contact time."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.67(b)",
+      "finding_id": "finding-1985e67fdf3666aab91db978",
+      "firm": "Daewoo Pharmaceutical Co., Ltd.",
+      "date": "2025-07-15",
+      "quote_ko": "귀사는 설비의 세척 및 유지관리에 대한 적절한 문서화된 절차를 수립하고 따르지 않았다",
+      "quote_en": "Your firm failed to establish and follow adequate written procedures for cleaning and maintenance of equipment",
+      "note_ko": "세척 절차가 충분히 상세하지 않고 소독 효능 연구가 충전 라인의 모든 재질을 다루지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Cited for cleaning procedures that lacked detail and for disinfection efficacy studies that did not cover all materials of the filling line."
+    }
+  ],
+  "checks_ko": [
+    "무균 구역의 소독 프로그램에 살포자제가 들어 있습니까",
+    "살포자제의 접촉 시간을 절차서에 정하고 실제 작업에서 채웁니까",
+    "소독 절차서의 접촉 시간이 소독제 효능 보고서의 값과 같습니까",
+    "일상적으로 쓰는 모든 소독제에 대해 효능 연구를 했습니까",
+    "효능 연구가 충전 라인의 재질과 바이러스 오염원까지 다룹니까",
+    "닦개와 대걸레로 소독제가 필요한 모든 표면에 접촉 시간 동안 닿게 합니까"
+  ],
+  "checks_en": [
+    "Does the disinfection program for the aseptic area include a sporicidal agent?",
+    "Is the contact time for the sporicidal agent set in the procedure and achieved in practice?",
+    "Do the contact times in the disinfection procedures match those in the disinfectant efficacy report?",
+    "Have efficacy studies been performed for every disinfectant in routine use?",
+    "Do the efficacy studies cover the materials of the filling line and viral contaminants?",
+    "Are wipes and mops used so that the disinfectant reaches every required surface for the contact time?"
+  ],
+  "further_reading": [],
+  "related": [
+    "environmental-monitoring",
+    "aseptic-technique"
+  ]
+}

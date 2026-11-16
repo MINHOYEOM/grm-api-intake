@@ -27,7 +27,7 @@
   .fx-body{margin-top:34px;display:flex;flex-direction:column;gap:30px}
   .fx-sec-h{font-family:var(--sans);font-size:14px;color:var(--muted);margin:0 0 12px}
   .fx-cases{display:flex;flex-direction:column;gap:14px}
-  .fx-case{border:1px solid var(--line-2);border-radius:10px;padding:16px 18px;background:var(--paper)}
+  .fx-case{border:1px solid var(--line-2);border-radius:10px;padding:16px 18px;background:var(--paper,#FFFFFF)}
   .fx-case-m{display:flex;flex-wrap:wrap;gap:10px;font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-bottom:8px}
   .fx-case-f{color:var(--ink)}
   .fx-case-t{font-family:var(--sans);font-size:14.5px;line-height:1.72;color:var(--ink);margin:0;word-break:keep-all}
@@ -35,7 +35,7 @@
   .fx-sibs{display:flex;flex-wrap:wrap;gap:8px}
   .fx-sibs a{font-family:var(--sans);font-size:13.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:99px;padding:6px 12px}
   .fx-sibs a:hover{border-color:var(--coral);color:var(--coral)}
-  .fx-sibs a.on{border-color:var(--coral);color:var(--coral-2)}
+  .fx-sibs a.on{border-color:var(--coral-2);color:#fff;background:var(--coral-2);font-weight:600}
   .fx-rel3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0}
   .fx-rel3-col{min-width:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px 14px}
   .fx-rel3-col .fx-sec-h{margin:0 0 2px;flex-basis:100%}
@@ -132,7 +132,7 @@
 {#- ★실명 업체가 인쇄되는 페이지에는 시점 고지가 반드시 붙는다(findings_facet 과 동일
           문구·동일 규율). 같은 업체명을 같은 무게로 노출하면서 한쪽만 맥락을 주면 몇 년
           전 지적이 현재 상태로 읽힌다. -#}
-      <p class="fx-note">{{ _('<b>이 지적들은 각 문서가 공개된 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다 &mdash; 현재 상태로 읽지 마시고 최신 현황은 해당 규제기관의 공식 발표를 확인하세요. 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것이고, 조항 인용은 원문에 적힌 것을 그대로 집계했습니다. 각 사례의 &ldquo;공개 원문 보기&rdquo;가 그 원문으로 바로 연결됩니다.') }}</p>
+      <p class="fx-note">{{ _('<b>그 시점의 기록입니다.</b> 이후 시정 결과는 원 기관 발표를 확인하세요.') }}</p>
     </section>
   </div>
 </main>

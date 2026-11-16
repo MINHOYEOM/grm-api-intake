@@ -1,0 +1,113 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "cleanroom", "as_of": "2026-11-15",
+  "area_ko": "무균·오염 관리", "area_en": "Sterility and contamination control",
+  "title_ko": "청정실: 차압·HEPA·기류", "title_en": "Cleanrooms: pressure differentials, HEPA and airflow",
+  "glossary_ids": ["cleanroom", "pressure-differential", "hepa-filter", "airflow-visualization-study"],
+  "aliases_ko": ["클린룸", "차압", "스모크 스터디", "기류 가시화"],
+  "aliases_en": ["cleanroom", "clean room", "pressure differential", "HEPA", "smoke study"],
+  "search_q_ko": "청정실", "search_q_en": "cleanroom",
+  "lead_ko": "FDA 는 청정실 설비를 갖췄는지보다, 차압과 기류가 실제 작업 조건에서 확인되고 유지되는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a cleanroom is installed than at whether its pressure differentials and airflow are confirmed and maintained under actual working conditions. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "연기 시험을 동적 조건에서 제대로 수행하지 않았다",
+      "title_en": "Smoke studies were not adequately performed under dynamic conditions",
+      "quotes": [
+        { "finding_id": "finding-caf8d3bbc086dfaed1a7298e", "raw_signal_id": "rawsig-fb710f49ead0bf3490d13926", "document_id": "8909d4bb39b5", "source": "FDA Warning Letter",
+          "firm": "Northland Nuclear Medicine, LLC", "date": "2026-10-27",
+          "quote_ko": "귀사 시설에서 수행된 스모크 스터디(smoke study)에는 LAFW 또는 (b)(4) 작업에 대한 동적(dynamic) 평가가 포함되지 않았으므로, 무균 제조 중 일방향 기류(unidirectional airflow)가 공기 품질을 효과적으로 관리함을 적절히 입증하지 못한다.",
+          "quote_en": "Smoke studies conducted at your facility did not include a dynamic evaluation of LAFW or (b)(4) operations and therefore do not adequately demonstrate that unidirectional airflow effectively controls air quality during aseptic manufacturing." },
+        { "finding_id": "finding-8dccd6db1fb17fdd179f46fb", "raw_signal_id": "rawsig-9cdf0872624d9d1a3ca50924", "document_id": "fda483-196833", "source": "FDA 483",
+          "firm": "Strive Pharmacy LLC", "date": "2026-11-13",
+          "quote_ko": "연기 시험(smoke study)이 동적 조건(dynamic conditions)에서 충분히 수행되지 않았다.",
+          "quote_en": "Smoke studies were inadequately performed under dynamic conditions." }
+      ]
+    },
+    {
+      "title_ko": "구역 사이의 차압을 적절히 유지하지 않았다",
+      "title_en": "Adequate pressure differentials between areas were not maintained",
+      "quotes": [
+        { "finding_id": "finding-c56eb8c862fcf355989c0436", "raw_signal_id": "rawsig-723dc6a6beb5908c5ace8014", "document_id": "b9398b5811d4", "source": "FDA Warning Letter",
+          "firm": "BRS Analytical Services, LLC", "date": "2025-10-21",
+          "quote_ko": "더 나아가 귀사는 ISO 5 구역과 창고 사이에 적절한 차압을 유지하지 않았고 해당 압력을 지속적으로 모니터링하지도 않았다.",
+          "quote_en": "Furthermore, you failed to maintain an adequate differential pressure between the ISO 5 area and the warehouse, and did not continuously monitor that pressure." },
+        { "finding_id": "finding-3f4ac85cb61d1abdfb256c03", "raw_signal_id": "rawsig-edd3e3edd484cba2387494e5", "document_id": "d1e41608f7ba", "source": "FDA Warning Letter",
+          "firm": "Pharmathen International S.A.", "date": "2026-06-16",
+          "quote_ko": "실사 결과 무균 제조실의 차압이 부적절했다. 예를 들어 무균 충전실의 압력이 인접한 실보다 낮았다.",
+          "quote_en": "Our inspection found the pressure differentials in the aseptic manufacturing rooms were inadequate. For example, the aseptic filling rooms had lower pressure than the adjacent rooms." }
+      ]
+    },
+    {
+      "title_ko": "HEPA 필터 주변의 틈을 제대로 막지 않았다",
+      "title_en": "Gaps around HEPA filters were not properly closed",
+      "quotes": [
+        { "finding_id": "finding-848ef145f717b72943536e4a", "raw_signal_id": "rawsig-941725de81aab429e78b45a7", "document_id": "175d86125c95", "source": "FDA Warning Letter",
+          "firm": "Liebel-Flarsheim Company LLC", "date": "2025-11-04",
+          "quote_ko": "귀사의 청정실(예: ISO 5 충전 라인 및 ISO 7 칭량·제형 구역)은 적절한 세척과 올바른 작업이 용이하도록 설계 및 유지관리되지 않았다. 예를 들어 천장 HEPA 필터, 통풍구 및 (b)(4) 주변의 틈을 보수하기 위해 과도한 코킹과 테이프가 사용되었다.",
+          "quote_en": "Your cleanrooms (e.g., ISO 5 filling line and ISO 7 weigh and formulation rooms) were inadequately designed and maintained to facilitate adequate cleaning and proper operations. For example, excessive caulking and tape were used to repair gaps around ceiling HEPA filters, air vents, and (b)(4) ." },
+        { "finding_id": "finding-f1d1939282f3f06e13cd333e", "raw_signal_id": "rawsig-39cdc990e1a018d2d350a751", "document_id": "fda483-195362", "source": "FDA 483",
+          "firm": "Eugia Steriles Private Limited", "date": "2026-10-26",
+          "quote_ko": "HEPA 필터를 덮는 데 쓰이는 [redacted] 사이에 눈에 보이는 틈이 있다.",
+          "quote_en": "Visible gaps between the [redacted] used to cover HEPA filters." }
+      ]
+    },
+    {
+      "title_ko": "ISO 5 구역과 후드를 정기적으로 인증하지 않았다",
+      "title_en": "ISO 5 areas and hoods were not routinely certified",
+      "quotes": [
+        { "finding_id": "finding-d85a460f333fab81e5c8d015", "raw_signal_id": "rawsig-118c98659862e3866bfbf061", "document_id": "9dd054b471ea", "source": "FDA Warning Letter",
+          "firm": "SCA Pharmaceuticals, LLC", "date": "2026-10-13",
+          "quote_ko": "귀사 시설은 동적 조건에서 수행하는 기류 시각화 연구를 포함하여 ISO 5 구역에 대한 일상적이고 엄격한 인증을 실시하지 않았다.",
+          "quote_en": "Your facility lacked routine and rigorous certification of the ISO 5 areas, including airflow visualization studies performed under dynamic conditions." },
+        { "finding_id": "finding-518788fe58975229db3b2a93", "raw_signal_id": "rawsig-ddb1bb9875a72c4624bd0e5d", "document_id": "fda483-195325", "source": "FDA 483",
+          "firm": "PReye LLC", "date": "2026-10-23",
+          "quote_ko": "또한 재포장에 사용하는 층류 후드는 적격성평가, 인증 또는 정기 유지관리를 받지 않았다.",
+          "quote_en": "Further, the laminar airflow hood used during repackaging has not been qualified, certified, or routinely maintained." }
+      ]
+    },
+    {
+      "title_ko": "충전 구역에서 난류 없는 기류를 보이지 않았다",
+      "title_en": "Airflow in the filling area was not shown to be free of turbulence",
+      "quotes": [
+        { "finding_id": "finding-bb9513c916fd23c7e9be350b", "raw_signal_id": "rawsig-c6cbb48fb3dba52bf32d1d80", "document_id": "bfbb158a522f", "source": "FDA Warning Letter",
+          "firm": "USV Private Limited", "date": "2026-11-10",
+          "quote_ko": "귀사의 바이알 충전 라인 기류 가시화 영상에서 상당한 난류가 관찰되었다. 그러나 귀사는 기류가 적절하다고 결론지었다.",
+          "quote_en": "Significant turbulence was observed in your vial filling line airflow visualization videos. However, your firm concluded that airflow was adequate." },
+        { "finding_id": "finding-17a9f1e39219fa29860f6ace", "raw_signal_id": "rawsig-b52b1a99fb67a9c031d39836", "document_id": "fda483-195316", "source": "FDA 483",
+          "firm": "Apotek Production & Laboratorier AB", "date": "2026-10-22",
+          "quote_ko": "수행된 정적 연구는 충전기 [redacted]의 Grade A 충전 구역에서 천장이 주변 [redacted] 차단벽과 만나는 HEPA 필터 높이에 기류 난류가 있음을 보여준다.",
+          "quote_en": "The static study performed shows air turbulence in the Grade A filling area of filling machine [redacted] at the level of the HEPA filter where the ceiling meets the surrounding [redacted] barrier." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.113(b)", "finding_id": "finding-bb9513c916fd23c7e9be350b", "firm": "USV Private Limited", "date": "2026-11-10",
+      "quote_ko": "귀사는 멸균 표방 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립하고 따르지 않았다",
+      "quote_en": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes",
+      "note_ko": "바이알 충전 라인의 기류 가시화 영상에서 난류가 보였는데도 기류가 적절하다고 결론지은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Concluding that airflow was adequate although turbulence was visible in the vial filling line's airflow visualization videos was cited under this clause." },
+    { "key": "21 CFR 211.42(c)(10)", "finding_id": "finding-3f4ac85cb61d1abdfb256c03", "firm": "Pharmathen International S.A.", "date": "2026-06-16",
+      "quote_ko": "귀사는 무균공정 구역에서 오염 또는 혼동을 방지하는 데 필요한 충분한 크기의 명확히 정해진 구역 내에서 작업을 수행하지 않았고, 별도의 또는 정해진 구역이나 그 밖의 관리 체계를 갖추지 않았다",
+      "quote_en": "Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas",
+      "note_ko": "무균 충전실의 압력이 인접한 실보다 낮았던 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Aseptic filling rooms having lower pressure than the adjacent rooms was cited under this clause." }
+  ],
+  "checks_ko": [
+    "연기 시험에 실제 작업을 반영한 동적 조건 평가가 들어 있습니까",
+    "ISO 5 구역과 인접 구역 사이의 차압을 유지하고 연속으로 감시합니까",
+    "무균 충전실의 압력이 인접한 실보다 높게 유지됩니까",
+    "천장 HEPA 필터와 통풍구 주변에 틈이나 코킹·테이프로 메운 곳이 없습니까",
+    "ISO 5 구역과 층류 후드의 적격성평가와 인증을 정기적으로 실시합니까",
+    "기류 가시화 영상에서 난류가 보이는데도 적절하다고 결론지은 연구가 없습니까"
+  ],
+  "checks_en": [
+    "Do smoke studies include a dynamic evaluation that reflects actual operations?",
+    "Is the pressure differential between the ISO 5 area and adjacent areas maintained and continuously monitored?",
+    "Is the aseptic filling room kept at a higher pressure than the adjacent rooms?",
+    "Are ceiling HEPA filters and air vents free of gaps and of caulk or tape repairs?",
+    "Are ISO 5 areas and laminar airflow hoods qualified and certified routinely?",
+    "Is there any study that judged airflow adequate although turbulence was visible in the airflow visualization videos?"
+  ],
+  "further_reading": [],
+  "related": ["environmental-monitoring", "aseptic-technique"]
+}

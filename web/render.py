@@ -154,6 +154,7 @@ import import_alerts_page  # noqa: E402  [수입경보 2단계 2026-11-10] 전�
 import citation_firms_page  # noqa: E402  [FDA 지적 조항 × 업체 전체 목록 2026-11-10]
 import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
 import news_page  # noqa: E402  [최근 규제 소식 2026-11-10]
+import inspection_notes_page  # noqa: E402  [실사 대비 노트 2026-11-15] 주제별 지적 문장 묶음
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -3692,6 +3693,33 @@ def facet_tree_paths(facets_data: "dict[str, Any] | None") -> "set[str]":
     return out
 
 
+def restrict_facets_to_tree(facets_en: "dict[str, Any] | None",
+                            facets_ko: "dict[str, Any] | None") -> "dict[str, Any] | None":
+    """영어 정본에서 **한국어 정본에도 있는 면**만 남긴다(항목·조합 단위).
+
+    [2026-11-15] 두 정본은 언어별 모집단으로 따로 재서 표본 문턱을 넘는 면이 갈린다
+    (실측: 영어에만 training-personnel × HC 조합). 영어 트리 계약은 "모든 영어 페이지에
+    한국어 짝이 있다"(WebEnTreeTest.test_every_en_page_has_a_korean_counterpart)라,
+    짝 없는 영어 면은 그리지 않는다. 건수(totals)·제외 목록은 영어 정본 그대로 둔다."""
+    if not facets_en:
+        return facets_en
+    if not facets_ko:
+        return None
+    ko_axes = {a["axis"]: {it["slug"] for it in a.get("items") or []}
+               for a in facets_ko.get("axes") or []}
+    ko_combos = {(c["category_slug"], c["slug"])
+                 for c in ((facets_ko.get("combos") or {}).get("items") or [])}
+    out = dict(facets_en)
+    out["axes"] = [dict(a, items=[it for it in a.get("items") or []
+                                  if it["slug"] in ko_axes.get(a["axis"], set())])
+                   for a in facets_en.get("axes") or [] if a["axis"] in ko_axes]
+    if facets_en.get("combos") is not None:
+        combos = facets_en["combos"]
+        out["combos"] = dict(combos, items=[c for c in combos.get("items") or []
+                                            if (c["category_slug"], c["slug"]) in ko_combos])
+    return out
+
+
 def facets_root(facets_data: "dict[str, Any] | None") -> "str | None":
     """지적사항 탭 `찾기 › 분류`가 가리킬 모음 첫 화면 — 분류 → 기관 → 국가 중 이 트리에 선 첫 축.
 
@@ -4825,18 +4853,159 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
         "window": bm.get("window", ""),
         "title": _brief_title(bm, tr, lang),
         "tldr": _brief_tldr(bm, lang),
+        # [홈 2026-11-15] 핵심 줄마다 출처 표지(줄 머리의 기관 이름에서 읽는다).
+        "tldr_items": [{"text": home_nobreak_middot(t), **home_source_tag(t)}
+                       for t in _brief_tldr(bm, lang)],
     }
 
 
-# ── [홈 4단 2026-11-12] '제공 정보' 세 칸 + 신규 공개 문서 ─────────────────────
-# 홈이 기능 설명 대신 **실제 결과 한 건씩**을 보여 준다(대표 확정안 0절 2번). 값은 전부
-# 커밋 스냅샷(findings_docs·findings_facets·glossary·glossary_cases)에서 파생한다 — 손으로
-# 적은 예시는 낡는다. 칸마다 데이터가 없으면 그 칸만 빠진다.
+# ── [홈 출처 색 표지 2026-11-15] ───────────────────────────────────────────────
+# 기관마다 색 하나(landing.html 의 .hs-*). 핵심 줄은 구조화된 기관 필드가 없어 **줄 머리의
+# 기관 이름**으로 읽는다("FDA, …"·"식약처, …"). 표지 글자는 그 줄에 적힌 이름 그대로다
+# (새 말을 만들지 않는다). 목록에 없는 기관(WHO·PIC/S·ECA 등)은 표지 없이 나간다.
+HOME_SOURCE_CLASS = {"FDA": "fda", "MFDS": "mfds", "EMA": "eu", "MHRA": "uk", "HC": "hc"}
+_HOME_TLDR_PREFIXES: tuple[tuple[str, str], ...] = (
+    ("Health Canada", "hc"), ("캐나다 보건부", "hc"), ("캐나다", "hc"),
+    ("미국 FDA", "fda"), ("US FDA", "fda"), ("U.S. FDA", "fda"), ("FDA", "fda"),
+    ("식품의약품안전처", "mfds"), ("식약처", "mfds"), ("MFDS", "mfds"),
+    ("영국 MHRA", "uk"), ("MHRA", "uk"),
+    ("유럽 EMA", "eu"), ("EMA", "eu"), ("EU", "eu"),
+)
+
+
+_HOME_MIDDOT_RE = re.compile(r"(\S)·")
+
+
+def home_nobreak_middot(line: str) -> Markup:
+    """가운뎃점 앞에서 줄이 끊기지 않게 한다 — "위조·DEG" 가 "위조 / ·DEG" 로 갈라지면 다음
+    줄이 점으로 시작한다(375px 실측). 글자는 그대로 두고 앞 글자와 점만 한 덩어리로 묶는다."""
+    return Markup(_HOME_MIDDOT_RE.sub(r'<span class="ht-nb">\1·</span>', str(_escape(line or ""))))
+
+
+def home_source_tag(line: str) -> dict[str, str]:
+    """핵심 한 줄 → {"src_cls", "src_label"}. 줄 머리가 아는 기관 이름이 아니면 둘 다 빈 값."""
+    text = (line or "").lstrip()
+    for prefix, cls in _HOME_TLDR_PREFIXES:
+        if text.startswith(prefix) and not text[len(prefix):len(prefix) + 1].isalnum():
+            return {"src_cls": cls, "src_label": prefix}
+    return {"src_cls": "", "src_label": ""}
+
+
+# ── [홈 4단 2026-11-12 · 내용 먼저 2026-11-14] '제공 정보' 세 칸 + 신규 공개 문서 ──
+# 홈이 기능 설명 대신 **실제 내용**을 보여 준다(대표 확정안 0절 2번 + 11-14 시안 선택
+# "A 바탕 + 지적 한 건 칸"). 첫 칸은 최근 공개된 지적 한 건과 거기서 이어지는 업체·실사관·
+# 영역·용어·문서, 둘째 칸은 용어의 뜻, 셋째 칸은 기관의 지적 영역 막대다. 값은 전부 커밋
+# 스냅샷(findings_docs·findings_facets·glossary·glossary_cases)에서 파생한다 — 손으로 적은
+# 예시는 낡는다. 칸마다 데이터가 없으면 그 칸만 빠진다. 페이지는 원격 호출을 하지 않는다.
 HOME_TERM_PREFERRED = ("cleanroom", "data-integrity", "audit-trail", "cleaning-validation")
 HOME_AGENCY_BY_LANG = {DEFAULT_LANG: "MFDS", "en": "FDA"}
 HOME_CATCHALL_KEY = "other_quality_system"
 HOME_CATCHALL_LABEL = "기타 품질시스템"
 HOME_NEW_DOCS = 5
+HOME_AGENCY_TOP = 3
+# 지적 한 건 — 최근 문서 몇 장 안에서만 찾는다('최근 공개'라는 말이 참이어야 한다). 길이
+# 범위는 한 칸에서 한눈에 읽히는 문장만 고르려는 것이다(고르는 기준이지 자르는 게 아니다).
+HOME_CASE_SCAN_DOCS = 30
+HOME_CASE_LEN = {DEFAULT_LANG: (30, 150), "en": (50, 240)}
+# 홈은 제약 GMP 독자의 얼굴이다 — 의료기기 실사 문서는 지적 한 건 후보에서 뺀다(문서에
+# 제품군 필드가 없어 본문 낱말로 가린다. 문서 자체는 검색·목록에 그대로 있다).
+HOME_CASE_SKIP_WORDS = ("의료기기", "device")
+# 검색 예시의 조항 한 건 — 조항 번호는 낡지 않는다.
+HOME_SEARCH_CLAUSE = "21 CFR 211.192"
+
+
+def _home_case(docs: list[dict[str, Any]], facets: "dict[str, Any] | None",
+               glossary_terms: "list[dict[str, Any]] | None",
+               glossary_cases: "dict[str, dict[str, Any]] | None",
+               tr: Translator, lang: str) -> "dict[str, Any] | None":
+    """홈 첫 칸 '최근 공개된 지적 한 건'.
+
+    최신 문서부터 훑어, **쓸 만한 지적이 있는 첫 문서**에서 한 건을 고른다.
+    · 후보: 분류가 붙어 있고(캐치올 제외) 길이가 알맞은 지적. 한국어판은 원문이 영어인
+      지적을 먼저 찾는다("원문과 함께"라는 소개가 이 칸에서 보여야 한다) — 창 안에 없으면
+      그 조건만 푼다.
+    · 그 문서 안에서는 **가장 드문 용어가 걸리는 지적**을 고른다(문서 화면 용어 링크의
+      희소 우선과 같은 생각 — '생산'·'품질' 같은 흔한 말보다 '변경관리'가 이어 볼 값이 있다).
+      드문 정도는 용어 사례 수로 잰다(사례 0건 용어는 사례 화면이 비어 있어 뺀다).
+    · 용어가 걸리는 지적이 창 안에 없으면 용어 줄 없이 첫 후보를 쓴다.
+    같은 입력이면 같은 결과다(문서 정렬·지적 순서·용어 색인이 모두 결정론).
+    """
+    lo, hi = HOME_CASE_LEN.get(lang, HOME_CASE_LEN["en"])
+    index = build_doc_term_link_index(glossary_terms, lang) if glossary_terms else []
+    by_id = {t["id"]: t for t in (glossary_terms or [])}
+
+    def _rarest(body: str) -> "tuple[int, str] | None":
+        hits: dict[str, int] = {}
+        for surface, tid in index:
+            if tid not in hits and _doc_term_find(body, surface, lang=lang) >= 0:
+                # 사례 정본이 없으면(픽스처·부분 빌드) 걸린 순서(긴 표면형 먼저)를 그대로 쓴다.
+                n = (_glossary_case_count(glossary_cases.get(tid)) if glossary_cases
+                     else len(hits) + 1)
+                if n:
+                    hits[tid] = n
+        return min(((n, tid) for tid, n in hits.items()), default=None)
+
+    def _scan(need_english_orig: bool):
+        fallback = None
+        for d in docs[:HOME_CASE_SCAN_DOCS]:
+            blob = " ".join(f"{f.get('text_ko') or ''} {f.get('text_orig') or ''}"
+                            for f in d.get("findings") or []).lower()
+            if any(w in blob for w in HOME_CASE_SKIP_WORDS):
+                continue
+            best = None
+            for f in d.get("findings") or []:
+                label = f.get("category_label_ko") or ""
+                body = finding_body(f, lang)
+                orig = (f.get("text_orig") or "").strip()
+                if not label or label == HOME_CATCHALL_LABEL or not lo <= len(body) <= hi:
+                    continue
+                if need_english_orig and (not orig or _HANGUL_RE.search(orig)):
+                    continue
+                rare = _rarest(body)
+                if rare and (best is None or rare[0] < best[0]):
+                    best = (rare[0], d, f, body, label, rare[1])
+                fallback = fallback or (d, f, body, label, None)
+            if best:
+                return best[1:]
+        return fallback
+
+    picked = (_scan(True) if lang == DEFAULT_LANG else None) or _scan(False)
+    if not picked:
+        return None
+    d, f, body, label, tid = picked
+    orig = (f.get("text_orig") or "").strip()
+    cat_slug = ""
+    for axis in (facets or {}).get("axes") or []:
+        if axis.get("axis") == "category":
+            cat_slug = next((it.get("slug") or "" for it in axis.get("items") or []
+                             if it.get("label_ko") == label), "")
+    term = None
+    if tid:
+        t = by_id[tid]
+        term = {"id": tid,
+                "name": (t.get("term_ko") if lang == DEFAULT_LANG else t.get("term_en"))
+                        or t.get("term_en") or tid}
+    published = d.get("published_date") or ""
+    inspected = (d.get("inspection_date") or "").strip()
+    return {
+        "body": body,
+        # 한국어판만, 원문이 영어일 때만 함께 싣는다(영어판은 본문이 곧 원문이고, 식약처
+        # 원문은 같은 한국어라 두 번 적는 셈이 된다).
+        "orig": (orig if lang == DEFAULT_LANG and orig and orig != body
+                 and not _HANGUL_RE.search(orig) else ""),
+        "source": doc_source_label(d) or tr((facets or {}).get("agency_labels", {})
+                                            .get(d.get("agency") or "", "")
+                                            or d.get("agency") or ""),
+        "published": published,
+        "inspected": inspected if inspected != published else "",
+        "slug": d["slug"],
+        "firm": d.get("firm_name") or "",
+        "firm_key": d.get("firm_key") or "",
+        "inspector": doc_inspector_line(d, tr),
+        "category": tr(label),
+        "category_slug": cat_slug,
+        "term": term,
+    }
 
 
 def build_home_showcase(docs_data: "dict[str, Any] | None",
@@ -4845,14 +5014,16 @@ def build_home_showcase(docs_data: "dict[str, Any] | None",
                         glossary_cases: "dict[str, dict[str, Any]] | None",
                         tr: Translator = _KO,
                         lang: str = DEFAULT_LANG) -> dict[str, Any]:
-    """홈의 업체·용어·기관 예시 한 건씩과 신규 공개 문서 목록.
+    """홈의 지적 한 건·용어·기관 칸과 신규 공개 문서 목록, 검색 예시.
 
-    · 업체: 가장 최근 공개 문서의 업체 중 문서 2건 이상인 곳(업체 페이지 임계와 같다).
-    · 용어: 선호 목록에서 사례가 있는 첫 용어, 없으면 사례가 가장 많은 용어.
-    · 기관: 그 언어 독자에게 가까운 기관 하나의 분류 상위 둘(캐치올 분류는 순위 밖).
+    · 지적 한 건: `_home_case` — 최근 공개 문서의 지적 하나와 이어지는 다섯 갈래.
+    · 용어: 선호 목록에서 사례가 있는 첫 용어, 없으면 사례가 가장 많은 용어. 뜻을 함께 싣는다.
+    · 기관: 그 언어 독자에게 가까운 기관 하나의 분류 상위 셋(캐치올 분류는 순위 밖).
     · 신규 문서: 공개일 최신순 다섯 건. 영어 트리는 원문이 영어인 문서만.
+    · 검색 예시: 위 칸들에 실린 업체명·용어와 조항 한 건.
     """
-    out: dict[str, Any] = {"firm": None, "term": None, "agency": None, "new_docs": []}
+    out: dict[str, Any] = {"case": None, "term": None, "agency": None, "new_docs": [],
+                           "examples": []}
     docs = list((docs_data or {}).get("documents") or [])
     if lang != DEFAULT_LANG:
         docs = [d for d in docs if doc_is_english(d)]
@@ -4873,27 +5044,10 @@ def build_home_showcase(docs_data: "dict[str, Any] | None",
                                                 or d.get("agency") or ""),
             "firm": d.get("firm_name") or "",
             "cats": " · ".join(_cats(d)),
+            "src_cls": HOME_SOURCE_CLASS.get(d.get("agency") or "", ""),
         })
 
-    by_firm: dict[str, list[dict[str, Any]]] = {}
-    for d in docs:
-        key = _canonical_firm_key(d.get("firm_key") or "")
-        if key:
-            by_firm.setdefault(key, []).append(d)
-    for d in docs:
-        key = _canonical_firm_key(d.get("firm_key") or "")
-        group = by_firm.get(key) or []
-        if len(group) < 2:
-            continue
-        out["firm"] = {
-            "name": d.get("firm_name") or "",
-            "key": d.get("firm_key") or "",
-            "documents": len(group),
-            "findings": sum(len(g.get("findings") or []) for g in group),
-            "latest_source": doc_source_label(d),
-            "latest_cats": " · ".join(_cats(d)),
-        }
-        break
+    out["case"] = _home_case(docs, facets, glossary_terms, glossary_cases, tr, lang)
 
     if glossary_terms and glossary_cases:
         by_id = {t["id"]: t for t in glossary_terms}
@@ -4905,10 +5059,15 @@ def build_home_showcase(docs_data: "dict[str, Any] | None",
             pick = ranked[0] if ranked else None
         if pick:
             t = by_id[pick]
+            ko = lang == DEFAULT_LANG
             out["term"] = {
                 "id": pick,
-                "name": (t.get("term_ko") if lang == DEFAULT_LANG else t.get("term_en"))
+                "name": (t.get("term_ko") if ko else t.get("term_en"))
                         or t.get("term_en") or pick,
+                # 한국어판은 영문 표제어를 곁에 적는다(현장에서 두 말을 함께 쓴다).
+                "alt": (t.get("term_en") or "") if ko else "",
+                "definition": ((t.get("easy_ko") if ko else t.get("easy_en")) or "").strip(),
+                "ref": next((r for r in (t.get("reg_refs") or []) if r), ""),
                 "findings": f"{_glossary_case_count(glossary_cases.get(pick)):,}",
             }
 
@@ -4926,12 +5085,23 @@ def build_home_showcase(docs_data: "dict[str, Any] | None",
                     rows.append((c, it.get("label_ko") or ""))
         rows.sort(key=lambda r: (-r[0], r[1]))
         if len(rows) >= 2:
+            top = rows[:HOME_AGENCY_TOP]
             out["agency"] = {
                 "code": agency,
                 "label": tr((facets.get("agency_labels") or {}).get(agency) or agency),
-                "top": [{"label": tr(lbl), "n": f"{n:,}"} for n, lbl in rows[:2]],
+                # pct = 막대 길이(첫 줄이 100). 값이 작아도 막대가 보이게 바닥을 둔다.
+                "top": [{"label": tr(lbl), "n": f"{n:,}",
+                         "pct": max(4, round(n * 100 / top[0][0]))} for n, lbl in top],
                 "as_of": facets.get("measured_on", ""),
             }
+
+    seen: set[str] = set()
+    for ex in ((out["case"] or {}).get("firm"), HOME_SEARCH_CLAUSE,
+               (out["term"] or {}).get("name"),
+               ((out["case"] or {}).get("term") or {}).get("name")):
+        if ex and ex not in seen:
+            seen.add(ex)
+            out["examples"].append(ex)
     return out
 
 
@@ -5383,6 +5553,12 @@ RETIRED_PAGE_REDIRECTS: tuple[tuple[str, str], ...] = (
     ("/findings/browse/index.html", "/browse/"),
     ("/en/findings/browse/", "/en/browse/"),
     ("/en/findings/browse/index.html", "/en/browse/"),
+    # [2026-11-15] 브리프 주소는 /briefs/{날짜}/ 인데 /briefs/ 자체는 면이 없어 404 였다(주소창에서
+    # 날짜를 지워 올라가는 방문자). 지난 호 목록 /archive/ 로 잇는다.
+    ("/briefs/", "/archive/"),
+    ("/briefs/index.html", "/archive/"),
+    ("/en/briefs/", "/en/archive/"),
+    ("/en/briefs/index.html", "/en/archive/"),
 )
 
 
@@ -5414,6 +5590,7 @@ BROWSE_SECTIONS: tuple[tuple[str, tuple[tuple[str, str, str], ...]], ...] = (
     (N_("자료·도구"), (
         ("library/", N_("지침·고시"), N_("규제기관 지침과 고시 원문 목록")),
         ("findings/checklist/", N_("자가점검표"), N_("지적 문장 기반 자가점검 항목")),
+        ("inspection-notes/", N_("실사 대비 노트"), N_("주제별로 실사에서 실제 지적된 문장과 출처")),
         ("findings/coverage/", N_("데이터 현황"), N_("수집 출처, 연도별 확보량, 수집 범위와 한계")),
         ("guide/", N_("이용안내"), N_("화면별 사용법과 자주 묻는 질문")),
     )),
@@ -5942,6 +6119,10 @@ DEFICIENCY_CASES_DESCRIPTION = {
     "MHRA": N_("영국 MHRA 가 GMP 실사 지적 경향 보고서에 실은 지적 예시 {n}건 전부 — 원문 그대로, 영역·연도·낱말로 찾기."),
     "MHRA_DATA": N_("영국 MHRA 2018·2019 GMP 실사 지적 원자료에서 EU GMP 장·문단별로 센 인용 횟수 {n}회 — Critical·Major·Other 등급별."),
 }
+INSPECTION_NOTES_DESCRIPTION = N_("실사 대비 노트 — 주제마다 FDA 실사에서 실제로 지적된 문장을 묶고 출처와 문서를 함께 적은 자료.")
+INSPECTION_NOTE_DESCRIPTION = N_("{title} 실사 대비 노트 — 실사에서 지적된 문장과 출처, 근거 조항, 절차서와 대조할 질문.")
+# 출처종류(DB 값) → 화면 표기. 한국어 키가 없는 값은 그대로 쓴다('FDA 483').
+INSPECTION_NOTE_SOURCE_LABELS = {"FDA Warning Letter": N_("FDA 경고서한")}
 CITATION_FIRMS_DESCRIPTION = N_("FDA 실사에서 21 CFR 조항 지적을 받은 제조소 {n}곳 전부 — 국가·실사 수·최근 실사일·지적된 조항을 필터로 찾기.")
 IMPORT_ALERTS_DESCRIPTION = N_("FDA 수입경보 66-40·66-41 에 오른 의약품 제조소 {n}곳(한국 {k}곳) — "
                                "국가·경보 번호·등재일·상태와 FDA 원문 링크.")
@@ -6102,6 +6283,14 @@ def build_site_webmanifest() -> str:
 
 
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
+def _js_single_quoted(value) -> str:
+    """작은따옴표 JS 문자열 리터럴 안에 번역문을 넣을 때의 이스케이프.
+    번역문(It's 등)의 어포스트로피가 문자열을 닫아 스크립트 전체가 죽는 것을 막는다. 한글은 그대로 둔다."""
+    from markupsafe import Markup
+    t = str(value).replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
+    return Markup(t.replace("</", "<\\/"))
+
+
 def _make_env(lang: str = DEFAULT_LANG,
               translator: "Translator | None" = None) -> Environment:
     env = Environment(
@@ -6112,6 +6301,7 @@ def _make_env(lang: str = DEFAULT_LANG,
         keep_trailing_newline=True,
     )
     # [상세 가독성 2026-07-27] 표현층 전용 필터 — 데이터는 verbatim, 렌더만 분해한다.
+    env.filters["js_sq"] = _js_single_quoted
     env.filters["detail_blocks"] = split_detail_blocks
     env.filters["gmp_operations"] = split_gmp_operations
     # [다국어 2단계] 템플릿 전역 `_("…")` — 문구 사전. 한국어는 항등(Markup 으로 그대로),
@@ -6383,7 +6573,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     facets = load_findings_facets()
     # 파일이 없으면 영어 모음 페이지가 0장이 된다 — 그건 의도된 상태다(생기면 저절로
     # 선다). 스키마가 어긋나면 로더가 실패한다 — 빈 페이지 수십 장을 내보내지 않는다.
-    facets_en = load_findings_facets(FINDINGS_FACETS_EN_FILE)
+    facets_en = restrict_facets_to_tree(load_findings_facets(FINDINGS_FACETS_EN_FILE), facets)
     docs_data = load_findings_docs()
     # [조항 페이지] 조항 뷰는 **용어사전보다 먼저** 만든다 — 용어사전의 "관련 조항"이
     # 실제로 만들어진 조항 페이지에만 링크를 걸어야 하기 때문(없는 페이지로 보내는 링크는
@@ -6470,6 +6660,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_env.globals["fnd_facets_root"] = facets_root(facets_en)
     env.globals["fnd_facet_axes"] = facets_axes(facets)
     en_env.globals["fnd_facet_axes"] = facets_axes(facets_en)
+    # [실사 대비 노트 2026-11-15] 노트(web/data/inspection_notes/*.json)가 있을 때만 양 트리에 선다
+    # (목록 1 + 노트 N). 미리 지어 커밋한 파일을 그릴 뿐이다 — 빌드는 아무것도 부르지 않는다.
+    inspection_notes = inspection_notes_page.load_notes()
+    en_paths |= inspection_notes_page.routes_present(inspection_notes)
+    # 용어 페이지의 '실사 대비 노트' 링크 블록 재료 — 트리마다 그 언어의 제목·첫 문장으로.
+    env.globals["inspection_note_links"] = inspection_notes_page.glossary_links(
+        inspection_notes, DEFAULT_LANG)
+    en_env.globals["inspection_note_links"] = inspection_notes_page.glossary_links(
+        inspection_notes, "en")
     # [최근 규제 소식 2026-11-10] 정본(web/data/news.json)이 있을 때만 양 트리에 선언한다.
     news_data = news_page.load_news()
     if news_data:
@@ -7684,7 +7883,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
                          json_ld=firm_page.breadcrumb_json_ld([
                              (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
-                             (_tr("문서로 찾기"), "findings/docs/"), (fp["name"], "")]),
+                             (_tr("업체"), "findings/firm/"), (fp["name"], "")]),
                          firm=_fp, agency_labels=agency_labels_by_lang[_lg],
                          thin_page=is_thin_firm_page(fp, _lg),
                          similar_firms=firm_similar_view(
@@ -7818,6 +8017,61 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 if _lg == DEFAULT_LANG:
                     facet_paths.append((_dcp.site_path, _dc_cc["measured_on"]))
 
+    # [실사 대비 노트 2026-11-15] 목록 1장 + 노트마다 1장, ko·en 같은 함수. 언어는 뷰가 정한다.
+    # 문서 링크는 그 트리에 문서 페이지가 실제로 서는 것만(영어판은 원문이 영어인 문서만) —
+    # 없으면 출처를 글자로만 적는다(깨진 링크 금지).
+    if inspection_notes:
+        _in_by_id = {n["id"]: n for n in inspection_notes}
+        _in_docs = {d["document_id"]: d["slug"]
+                    for d in (docs_data or {}).get("documents", []) if d.get("document_id")}
+        _in_terms = {t["id"]: t for t in (glossary_terms or [])}
+        for _lg, _pg, _em, _tr in trees:
+            _in_slugs = (_in_docs if _lg == DEFAULT_LANG
+                         else {k: v for k, v in _in_docs.items() if v in en_doc_slugs})
+            _in_term_labels = {tid: (t.get(f"term_{_lg}") or t.get("term_ko") or tid)
+                               for tid, t in _in_terms.items()
+                               if _lg == DEFAULT_LANG or f"glossary/{tid}/" in en_paths}
+            _in_sources = {s: (_tr(INSPECTION_NOTE_SOURCE_LABELS[s])
+                               if s in INSPECTION_NOTE_SOURCE_LABELS else s)
+                           for s in inspection_notes_page.SOURCES}
+            _inp = _pg(inspection_notes_page.ROUTE)
+            _em("inspection_notes.html", _inp,
+                page_title=_tr("실사 대비 노트 · GRM"),
+                nav_active="browse",
+                description=_tr(INSPECTION_NOTES_DESCRIPTION),
+                json_ld=_inp.breadcrumb_json_ld([
+                    (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"), (_tr("실사 대비 노트"), "")]),
+                groups=inspection_notes_page.index_view(inspection_notes, _lg),
+            )
+            if _lg == DEFAULT_LANG:
+                facet_paths.append((_inp.site_path, max(n["as_of"] for n in inspection_notes)))
+            for _note in inspection_notes:
+                _inq = _note[f"search_q_{_lg}"]
+                _inv = inspection_notes_page.note_view(
+                    _note, _lg, doc_slugs=_in_slugs, notes_by_id=_in_by_id,
+                    glossary_terms=_in_term_labels, source_labels=_in_sources,
+                    # 용어사전 사례 링크와 같은 꼴(본문 전용 검색 `&text=1`).
+                    search_href=f"findings/index.html?q={_url_quote(_inq, safe='')}&text=1",
+                    abs_url=lambda path, _l=_lg: PagePath(path, _l).canonical,
+                    copy_labels={"name": _tr("실사 대비 노트"), "as_of": _tr("기준일")},
+                )
+                _inpp = _pg(_inv["path"])
+                _em("inspection_note.html", _inpp,
+                    page_title=_tr("{title} 실사 대비 노트 · GRM", title=_inv["title"]),
+                    nav_active="browse",
+                    description=_tr(INSPECTION_NOTE_DESCRIPTION, title=_inv["title"]),
+                    json_ld=_inpp.breadcrumb_json_ld([
+                        (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
+                        (_tr("실사 대비 노트"), inspection_notes_page.ROUTE), (_inv["title"], "")]),
+                    note=_inv,
+                    # 한국어판 인용은 번역문, 영어판 인용은 원문이라 고지문이 다르다.
+                    notice=(_tr("AI 가 공개 지적을 묶어 정리하고 사람이 확인했습니다. 인용문은 지적 번역문 "
+                                "그대로이며, (b)(4) 는 원문에서 가려진 부분입니다. 기준일 {as_of}.",
+                                as_of=_inv["as_of"])),
+                )
+                if _lg == DEFAULT_LANG:
+                    facet_paths.append((_inpp.site_path, _note["as_of"]))
+
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전
     # 선택한다(같은 주 = 전 직원 동일 세트). 파일 부재 시 조용히 생략.
@@ -7900,7 +8154,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         interest_vocab = _interest_vocab(tr)
         # 개인화 페이지 — canonical 을 템플릿에 넘기지 않던 종전 계약 그대로(비색인).
         emit("me.html", page("me/"),
-            page_title=tr("마이페이지 · GRM"),
+            page_title=tr("관심 목록 · GRM"),
             nav_active="me",
             show_pet=True,
             canonical="",
@@ -7911,7 +8165,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 그린다. 빠져 있던 건 라우트 하나뿐이었다. Admin 은 운영자 전용 한국어 콘솔이라
         # 짝을 내지 않는다(영어 트리 선언에도 없다).
         en_emit("me.html", en_page("me/"),
-            page_title=en_tr("마이페이지 · GRM"),
+            page_title=en_tr("관심 목록 · GRM"),
             nav_active="me",
             show_pet=True,
             canonical="",

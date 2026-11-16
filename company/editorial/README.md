@@ -28,5 +28,10 @@
 - 발행 브릿지는 월 07:07~13:37 KST 에 30분마다 예치를 확인하므로 백업이 09:30 에 돌아도 그날 발행된다.
 - 어느 쪽이 발행하든 마지막엔 대표가 관리자 사이트에서 미리보기를 보고 승인한다.
 
+## 다음 판 지시문과 리허설
+편집팀이 저장소의 handoff 파일을 읽고 git 으로 반납하는 다음 판 지시문은 `company/editorial/next/` 에 있다(실발행은 아직 이 폴더의 파일을 읽지 않는다).
+실제 발행 없이 그 지시문으로 같은 순서를 돌려 보는 법은 `REHEARSAL.md`, 점검은 `rehearsal_check.py`.
+`precheck.py` 는 교열 전에 코드가 셀 수 있는 것(용어·약어 표기, 길이)을 기자가 먼저 세고, 교열의 심층분석 검사에 handoff 원문을 붙이는 도구다.
+
 ## 매주 남는 기록
 `claude/company-{날짜}` 브랜치의 `company/run/{날짜}/` — `desk.json` · `delta.{A,B}.json` · `deep.{A,B}.json` · (합친) `delta.json` · `copyedit.json`(`published` 로 누가 발행했는지).

@@ -46,7 +46,7 @@ Notion Intake data source = `collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288`.
 - 마커 파일이 안 생기거나 push 가 거절되면 `막힘: Actions — <하려던 일>` 로 남긴다(PC 백업이 한다).
 
 ## 기록
-`git fetch origin claude/company-$D` — 있으면 그 위에, 없으면 `origin/main` 에서 브랜치를 만든다. `company/run/$D/brief-prep.md` 하나만 쓰고 커밋·push.
+`if git fetch origin claude/company-$D; then git checkout -B claude/company-$D FETCH_HEAD; else git fetch origin main && git checkout -b claude/company-$D FETCH_HEAD; fi` — 있으면 그 위에, 없으면 방금 받은 main(`FETCH_HEAD`)에서 브랜치를 만든다. `origin/main` 이라는 이름은 쓰지 않는다(실행 환경의 것은 며칠 전 것일 수 있다 — 2026-11-13 리허설: 11-06 커밋). `company/run/$D/brief-prep.md` 하나만 쓰고 커밋·push.
 첫 3줄은 `CHARTER.md` 형식(`상태:` 로 시작) — PC 백업이 이 첫 줄을 읽고 건너뛸지 정한다. 3줄 바로 아래 4번째 줄에 `편집팀: …` 한 줄을 둔다(5번 판정). 다른 직무의 파일은 건드리지 않는다.
 
 ## 금지

@@ -19,7 +19,11 @@ import linkedin_grm as lg  # noqa: E402
 
 BRIEF = WEB_DIR / "data" / "briefs" / "brief_web_2026_11_02.json"
 SLOTS = WEB_DIR / "data" / "linkedin_anatomy" / "2026-11-02.v3.json"
-FINDINGS = json.loads(lg.FINDINGS.read_text(encoding="utf-8"))
+# 11-02 시범 슬롯의 숫자(예: s05 ‘태그로는 35건’)는 그 주 DB 에서 센 값이다. 라이브 findings_docs.json 을 읽으면
+# 주간 재측정(GRM Findings Doc Pages Refresh)이 새 서한·복원 본문을 들일 때마다 이 테스트가 깨져 자동 PR 이 막힌다
+# (11-07·11-14). 그래서 그 주 말뭉치에서 이 덱이 읽는 조각만 동결한 스냅숏으로 검사한다 — 갱신하지 않는다.
+FINDINGS_SNAPSHOT = pathlib.Path(__file__).resolve().parent / "fixtures" / "linkedin_grm_findings_2026-11-02.json.gz"
+FINDINGS = lg.load_findings(FINDINGS_SNAPSHOT)
 
 
 def _doc() -> dict:
@@ -264,7 +268,7 @@ class DistTest(unittest.TestCase):
     def test_dist_writes_under_briefs_pub(self):
         import tempfile
         with tempfile.TemporaryDirectory() as td:
-            rc = lg.main(["--brief", str(BRIEF), "--dist", td, "--no-pdf"])
+            rc = lg.main(["--brief", str(BRIEF), "--dist", td, "--no-pdf", "--findings", str(FINDINGS_SNAPSHOT)])
             self.assertEqual(rc, 0)
             self.assertTrue((Path(td) / "briefs" / "2026-11-02" / "linkedin_grm.txt").exists())
 

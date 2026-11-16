@@ -10,6 +10,18 @@
  *     지적 문장 검색 화면)로 넘긴다. 값은 전부 textContent 로 넣는다(innerHTML 미사용). */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      var t = setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o).then(function (r) { clearTimeout(t); return r; },
+                            function (e) { clearTimeout(t); throw e; });
+  }
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
@@ -80,6 +92,37 @@
   var hitsH = $("sr-hits-h"), allA = $("sr-all"), advA = $("sr-adv");
   var moreEl = $("sr-more"), pillsEl = $("sr-pills");
   var fAgency = $("sr-f-agency"), fSource = $("sr-f-source"), fPeriod = $("sr-f-period");
+  var goBtn = $("sr-go"), progEl = $("sr-prog");
+
+  // ── [검색 로딩 2026-11-15] 진행 표시 ───────────────────────────────────────
+  // 진행 중: 단추 글자 '검색 중' + 입력창 아래 진행선. 0.4초가 넘으면 결과 자리에 자리 표시
+  // 세 줄(그보다 빨리 오면 자리 표시 없이 바로 결과 — 깜빡임 방지). 단추는 잠그지 않는다
+  // (느릴 때 검색어를 고쳐 다시 보낼 수 있어야 한다). runSeq = 늦게 온 옛 응답을 버리는 표.
+  var SLOW_MS = 400, slowTimer = null, runSeq = 0;
+  function setBusy(on) {
+    if (goBtn) {
+      goBtn.textContent = on ? _t("검색 중") : _t("검색");
+      goBtn.classList.toggle("is-busy", on);
+    }
+    if (progEl) progEl.classList.toggle("on", on);
+    hitsEl.setAttribute("aria-busy", on ? "true" : "false");
+    clearTimeout(slowTimer);
+    if (on) {
+      slowTimer = setTimeout(function () {
+        if (hitsEl.childNodes.length) return;
+        for (var i = 0; i < 3; i++) {
+          var li = el("li", "sr-sk");
+          li.setAttribute("aria-hidden", "true");
+          li.appendChild(el("span")); li.appendChild(el("span")); li.appendChild(el("span"));
+          hitsEl.appendChild(li);
+        }
+      }, SLOW_MS);
+    }
+  }
+  function noteBox(kind) {
+    noteEl.classList.toggle("is-box", !!kind);
+    noteEl.classList.toggle("is-err", kind === "err");
+  }
 
   var params = new URLSearchParams(location.search);
   var Q = (params.get("q") || "").trim().slice(0, 120);
@@ -233,7 +276,10 @@
   }
 
   // ── 지적 문장 ──────────────────────────────────────────────────────────────
+  var rpcDeadline = 0;
   function rpc(q, textOnly, attempt) {
+    // [11-15] 재시도 포함 15초 안에 결과 또는 실패 안내(시도당 최대 9초).
+    if (!attempt) rpcDeadline = Date.now() + 15000;
     var body = {
       // 쪽당 24건 = 서버 캐시(findings_search_cache, 086)의 키와 같은 값 — 용어 사례 검색어는
       // 미리 계산된 답을 받는다(8건이면 키가 달라 매번 새로 계산, 3초 제한에 걸렸다). 화면은 10줄만 쓴다.
@@ -244,7 +290,8 @@
     // 기간을 고르지 않으면 p_month 를 아예 안 보낸다 — 캐시 키(086)가 종전과 같다.
     var period = periodUnsupported ? "" : periodRange(state.period);
     if (period) body.p_month = period;
-    return fetch(URL_ + "/rest/v1/rpc/findings_search", {
+    return _fetchT(URL_ + "/rest/v1/rpc/findings_search", {
+      timeoutMs: Math.max(2000, Math.min(9000, rpcDeadline - Date.now())),
       method: "POST",
       headers: { apikey: KEY, Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -256,7 +303,7 @@
       return d;
     }).catch(function (err) {
       var a = attempt || 0;
-      if (a < 2) {
+      if (a < 2 && Date.now() + 700 * (a + 1) + 2000 <= rpcDeadline) {
         return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
           .then(function () { return rpc(q, textOnly, a + 1); });
       }
@@ -290,25 +337,113 @@
     return ROOT + "findings/index.html?" + u.toString();
   }
 
-  function renderFilters(d, rerun) {
-    var f = (d && d.facets) || {};
-    function group(fs, key, rows, map) {
-      Array.prototype.slice.call(fs.querySelectorAll("label")).forEach(function (n) { n.remove(); });
-      var opts = [{ v: "", c: null }].concat((rows || []).map(function (r) { return { v: r.v, c: r.c }; }));
-      if (state[key] && !opts.some(function (o) { return o.v === state[key]; })) opts.push({ v: state[key], c: 0 });
-      opts.forEach(function (o) {
-        var lab = el("label");
-        var r = document.createElement("input");
-        r.type = "radio"; r.name = "sr-" + key; r.value = o.v; r.checked = state[key] === o.v;
-        r.addEventListener("change", function () { state[key] = o.v; syncUrl(); rerun(); });
-        lab.appendChild(r);
-        lab.appendChild(document.createTextNode(o.v ? label(map, o.v) : _t("전체")));
-        if (o.c != null) lab.appendChild(el("small", "", fmt(o.c)));
-        fs.appendChild(lab);
-      });
+  // ── [필터 위로 2026-11-15 · 대표 선택 'A·B 섞기'] ─────────────────────────────
+  // 기관 = 펼친 탭(한 번 누르면 바뀐다) · 문서 종류·기간 = 칩을 누르면 그 자리에서 목록이 열린다
+  // (휴대폰은 CSS 가 목록을 화면 아래 시트로 바꾼다). 건수는 서버 패싯 그대로 — 기관 패싯은
+  // 자기 조건을 빼고 세므로(153 fac_agency) 탭을 골라도 다른 탭 건수가 사라지지 않는다.
+  var barEl = $("sr-bar"), clearBtn = $("sr-clear"), scrimEl = $("sr-scrim");
+  var openDd = null, lastD = null;
+  function closeMenu(focusChip) {
+    if (!openDd) return;
+    var dd = openDd; openDd = null;
+    var chip = dd.querySelector(".sr-chip"), menu = dd.querySelector(".sr-menu");
+    if (chip) chip.setAttribute("aria-expanded", "false");
+    if (menu) menu.hidden = true;
+    if (scrimEl) scrimEl.hidden = true;
+    if (focusChip && chip) chip.focus();
+  }
+  document.addEventListener("click", function (e) {
+    if (openDd && !openDd.contains(e.target)) closeMenu(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && openDd) closeMenu(true);
+  });
+  if (scrimEl) scrimEl.addEventListener("click", function () { closeMenu(false); });
+  function pick(key, v, rerun) {
+    closeMenu(false);
+    if (state[key] === v) return;
+    state[key] = v; syncUrl();
+    // 응답이 느려도 고른 조건이 바로 보이게 — 직전 건수로 탭·칩을 먼저 다시 그린다.
+    if (lastD) renderFilters(lastD, rerun);
+    rerun();
+  }
+  function renderTabs(fs, rows, rerun) {
+    fs.textContent = "";
+    var opts = (rows || []).filter(function (r) { return r.c > 0 || r.v === state.agency; });
+    if (state.agency && !opts.some(function (o) { return o.v === state.agency; })) opts.push({ v: state.agency, c: 0 });
+    var total = (rows || []).reduce(function (n, r) { return n + (r.c || 0); }, 0);
+    [{ v: "", c: total }].concat(opts).forEach(function (o) {
+      var b = el("button", "sr-tab", o.v ? label(AGENCY_LABEL, o.v) : _t("전체"));
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", state.agency === o.v ? "true" : "false");
+      b.appendChild(el("small", "", fmt(o.c)));
+      b.addEventListener("click", function () { pick("agency", o.v, rerun); });
+      fs.appendChild(b);
+    });
+  }
+  function renderDropdown(dd, key, rows, map, rerun) {
+    if (!dd) return;
+    if (openDd === dd) closeMenu(false);
+    dd.textContent = "";
+    var name = dd.getAttribute("data-name") || "";
+    var opts = [{ v: "", c: null }].concat((rows || []).map(function (r) { return { v: r.v, c: r.c }; }));
+    if (state[key] && !opts.some(function (o) { return o.v === state[key]; })) opts.push({ v: state[key], c: 0 });
+    var on = !!state[key];
+    var chip = el("button", "sr-chip" + (on ? " is-on" : ""));
+    chip.type = "button";
+    chip.setAttribute("aria-haspopup", "listbox");
+    chip.setAttribute("aria-expanded", "false");
+    if (on) {
+      chip.textContent = label(map, state[key]);
+      chip.setAttribute("aria-label", name + ": " + label(map, state[key]));
+    } else {
+      chip.textContent = name + " ";
+      chip.appendChild(el("small", "", _t("전체")));
+      chip.setAttribute("aria-label", name + ": " + _t("전체"));
     }
-    group(fAgency, "agency", f.by_agency, AGENCY_LABEL);
-    group(fSource, "source", f.by_source, SOURCE_LABEL);
+    var menu = el("div", "sr-menu");
+    menu.setAttribute("role", "listbox");
+    menu.setAttribute("aria-label", name);
+    menu.hidden = true;
+    menu.appendChild(el("h3", "", name));
+    opts.forEach(function (o) {
+      var b = el("button", "sr-opt", o.v ? label(map, o.v) : _t("전체"));
+      b.type = "button";
+      b.setAttribute("role", "option");
+      b.setAttribute("aria-selected", state[key] === o.v ? "true" : "false");
+      if (o.c != null) b.appendChild(el("small", "", fmt(o.c)));
+      b.addEventListener("click", function (e) { e.stopPropagation(); pick(key, o.v, rerun); });
+      menu.appendChild(b);
+    });
+    chip.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (openDd === dd) { closeMenu(false); return; }
+      closeMenu(false);
+      openDd = dd;
+      chip.setAttribute("aria-expanded", "true");
+      menu.hidden = false;
+      if (scrimEl) scrimEl.hidden = false;
+      var cur = menu.querySelector('[aria-selected="true"]') || menu.querySelector(".sr-opt");
+      if (cur) cur.focus();
+    });
+    dd.appendChild(chip);
+    if (on) {
+      var x = el("button", "sr-x", "×");
+      x.type = "button";
+      x.setAttribute("aria-label", _t("모두 지우기") + " · " + name);
+      x.addEventListener("click", function (e) { e.stopPropagation(); pick(key, "", rerun); });
+      dd.appendChild(x);
+    }
+    dd.appendChild(menu);
+  }
+  function renderFilters(d, rerun) {
+    lastD = d;
+    var f = (d && d.facets) || {};
+    var any = (f.by_agency || []).some(function (r) { return r.c > 0; });
+    if (barEl) barEl.hidden = !any && !(state.agency || state.source || state.period);
+    renderTabs(fAgency, f.by_agency, rerun);
+    renderDropdown(fSource, "source", f.by_source, SOURCE_LABEL, rerun);
     // 기간 칸: 월별 분포(by_month — 월 조건을 안 거는 패싯)에서 각 기간의 건수를 더한다.
     if (fPeriod) {
       fPeriod.hidden = periodUnsupported;
@@ -316,9 +451,19 @@
       var sumFrom = function (from) {
         return months.reduce(function (n, r) { return n + (!from || r.v >= from ? (r.c || 0) : 0); }, 0);
       };
-      group(fPeriod, "period", ["1y", "3y"].map(function (k) {
+      renderDropdown(fPeriod, "period", ["1y", "3y"].map(function (k) {
         return { v: k, c: sumFrom(periodRange(k).slice(0, 7)) };
-      }), PERIOD_LABEL);
+      }), PERIOD_LABEL, rerun);
+    }
+    if (clearBtn) {
+      clearBtn.hidden = !(state.agency || state.source || state.period);
+      clearBtn.onclick = function () {
+        closeMenu(false);
+        state.agency = ""; state.source = ""; state.period = "";
+        syncUrl();
+        if (lastD) renderFilters(lastD, rerun);
+        rerun();
+      };
     }
   }
 
@@ -333,15 +478,19 @@
 
   // textOnly: 본문만(기본) / 업체명·문서 정보까지(업체가 답이거나 본문 일치가 0건일 때).
   function runHits(sq, basisNote, textOnly) {
+    var seq = ++runSeq;
     hitsEl.textContent = "";
     noteEl.hidden = false;
+    noteBox("");
     noteEl.textContent = _t("지적 문장 검색 중");
+    setBusy(true);
     allA.href = explorerHref(sq, textOnly);
     advA.href = explorerHref(sq, textOnly);
     var rerun = function () { runHits(sq, basisNote, textOnly); };
-    if (!URL_ || !KEY) { noteEl.textContent = _t("지적 문장 검색을 사용할 수 없는 환경입니다."); return; }
+    if (!URL_ || !KEY) { setBusy(false); noteEl.textContent = _t("지적 문장 검색을 사용할 수 없는 환경입니다."); return; }
     var tokens = sq.toLowerCase().split(/\s+/).filter(function (t) { return t.length >= 1; });
     Promise.all([rpc(sq, textOnly), _fetchDocPages(ASSET_ROOT)]).then(function (res) {
+      if (seq !== runSeq) return;
       var d = res[0];
       // 옛 함수(153 적용 전)는 월 범위를 한 달 값으로 읽어 0건을 낸다. 월별 분포에는 그 기간
       // 행이 있는데 결과가 0 이면 기간 축을 끄고 다시 부른다(화면이 먼저 배포돼도 안전).
@@ -357,6 +506,8 @@
         runHits(sq, basisNote, false);
         return;
       }
+      setBusy(false);
+      hitsEl.textContent = "";
       hitsH.textContent = _t("지적 문장 {n}건", { n: fmt(d.totals.findings) });
       renderFilters(d, rerun);
       var rows = [];
@@ -376,7 +527,16 @@
         .sort(function (a, b) { return a.k - b.k || a.i - b.i; })
         .map(function (x) { return x.r; }).slice(0, 10);
       if (!rows.length) {
+        // 0건: 무엇이 없는지 적고, 바로 가 볼 곳 두 군데만 둔다.
+        noteBox("zero");
         noteEl.textContent = _t("일치하는 지적 문장이 없습니다. 띄어쓰기나 영문 표기를 바꾸면 결과가 달라질 수 있습니다.");
+        var acts = el("span", "sr-acts");
+        [[_t("업체"), "findings/firm/"], [_t("용어사전"), "glossary/"]].forEach(function (x) {
+          var a = el("a", "", x[0]);
+          a.href = ROOT + x[1];
+          acts.appendChild(a);
+        });
+        noteEl.appendChild(acts);
         return;
       }
       noteEl.hidden = !basisNote;
@@ -398,6 +558,11 @@
         hitsEl.appendChild(li);
       });
     }).catch(function () {
+      if (seq !== runSeq) return;
+      setBusy(false);
+      hitsEl.textContent = "";
+      noteEl.hidden = false;
+      noteBox("err");
       noteEl.textContent = _t("지적 문장을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주십시오.") + " ";
       var b = el("button", "sr-retry", _t("다시 시도"));
       b.type = "button";

@@ -116,6 +116,11 @@ Newsletter subscription is not offered in the English edition because the email 
 
 ## Before you rely on this
 
+- Findings are extracted automatically from public originals — FDA 483s and warning letters, Health Canada inspection reports, MFDS GMP inspections, and EU and UK GMP non-compliance reports — and split into individual items. The Korean is an AI translation, shown with the original for each item.
+- A finding is a record as of the date the document was published. Later responses and corrective actions are not included; check the agency's own announcements for current status.
+- The public document list includes documents with three or more translated findings. EU and UK GMP non-compliance reports, which carry one finding per document, are the exception; find other documents through findings search.
+- Area classifications map the agency's own categories or the wording of the sentence onto GRM's scheme and may differ from the agency's view. Firms are grouped by a normalised name, not the displayed one ("… Limited" and "… Ltd." are the same firm).
+- Evidence levels (A, B, C) show which source the content was taken from; "needs review" means a person has not yet checked it.
 - AI may be used in GRM's translation, summarisation and implications. Technical terms, negations, conditions, figures, dates and scope of application may be conveyed differently from the original.
 - Legal and regulatory judgements must be based on the official originals published by regulators and on current law and guidance.
 - Check the document's issue date and whether it has since been revised, the products, sites and processes it applies to, and whether any follow-up response, correction, withdrawal or further action exists.

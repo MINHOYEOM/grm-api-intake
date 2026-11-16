@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [실사 대비 노트 2026-11-15] /inspection-notes/ — 노트 목록. 데이터 = inspection_notes_page.index_view.
+    건수 같은 낡는 숫자는 싣지 않는다. 상단 내비게이션에는 없다 — 진입은 찾아보기와 용어 페이지다. -#}
+{% include "partials/inspection_notes_style.html" %}
+<main>
+  <div class="wrap in-index">
+    <nav class="in-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><span>{{ _('실사 대비 노트') }}</span>
+    </nav>
+    <div class="in-head">
+      <h1 class="in-h1">{{ _('실사 대비 노트') }}</h1>
+      <p>{{ _('주제마다 실사에서 실제로 지적된 문장을 묶었습니다. 인용문 아래에 출처와 문서를 함께 적었습니다.') }}</p>
+    </div>
+    {%- for g in groups %}
+    <h2 class="in-area">{{ g.area }}</h2>
+    <div class="in-list">
+      {%- for n in g.notes %}
+      <a href="{{ rel_root }}{{ n.path }}"><b>{{ n.title }}</b><span>{{ n.summary }}</span></a>
+      {%- endfor %}
+    </div>
+    {%- endfor %}
+  </div>
+</main>
+{% endblock %}

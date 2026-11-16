@@ -1,0 +1,44 @@
+[
+  {
+    "finding_id": "finding-01035646e1c22fbe0ecdfad8",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdrug products purporting to be sterile do not include adequate validation ofthe sterilization process.",
+    "finding_text_ko": "무균으로 표시된 의약품의 미생물 오염을 방지하기 위한 절차에 멸균 공정의 적절한 밸리데이션이 포함되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-045b796f89f936418e83fb2e",
+    "finding_text": "Your firm has never performed testing to detennine the preservative (i.e.,) content for any ofthe sterile drug products I reviewed: B.",
+    "finding_text_ko": "귀사는 실사관이 검토한 무균 의약품 모두에 대해 보존제 함량을 확인하는 시험을 한 번도 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-06ac06fe12d481d7898331c3",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdiug products purporting to be sterile are not e:;1ablisbed, written, and followed.",
+    "finding_text_ko": "무균으로 표시된 의약품의 미생물 오염을 방지하기 위한 절차가 확립·문서화·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1111bb0758044f8f362b33a3",
+    "finding_text": "Procedures designed to prevent microbiological contamination ofdiug products purporting to be sterile are not e:;1ablisbed, written, and followed.",
+    "finding_text_ko": "무균으로 표시된 의약품의 미생물 오염을 방지하기 위한 절차가 확립·문서화·준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5e52daf1dadf529b2f34f5c4",
+    "finding_text": "Results of stability testing are not used in determining expiration da tes.",
+    "finding_text_ko": "사용기한 설정에 안정성 시험 결과를 사용하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-86e6a18915c6ea87abb818eb",
+    "finding_text": "Aseptic processing areas are deficie nt regarding the system for monitoring environmental cond itions.",
+    "finding_text_ko": "무균 공정 구역의 환경 조건 모니터링 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a92e6790ffdbfe9664bd9741",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for clea ning and disinfecting the roo m to produce aseptic conditions.",
+    "finding_text_ko": "무균 공정 구역에서 무균 상태를 조성하기 위한 작업실 청소 및 소독 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  }
+]

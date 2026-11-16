@@ -18,12 +18,13 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
 
 0. **이미 했나:** 원격에 `$B` 가 있거나, 제목이 `chore(findings): 일일 번역 배치 $D` 인 PR(열림·닫힘 모두, `pulls?state=all&per_page=30`)이 있으면
    `스킵: 오늘 이미 함` 으로 끝낸다. 어제 이전 배치 PR 이 열려 있으면 번호와 CI 상태만 기록한다(머지는 코드가 한다).
-1. `git checkout -b $B origin/main`.
+1. `git fetch origin main && git checkout -b $B FETCH_HEAD`.
+   (`origin/main` 이라는 이름은 쓰지 않는다 — 실행 환경에 저장된 `origin/main` 은 며칠 전 것일 수 있다(2026-11-13 리허설: 11-06 커밋). 반드시 방금 `git fetch origin main` 한 `FETCH_HEAD` 를 쓴다.)
 2. anon 키·URL 을 `company/CLOUD.md` 방법으로 얻어 `SUPABASE_URL`·`SUPABASE_ANON_KEY` 로 export. 못 얻으면 `보류: 네트워크` 로 끝낸다.
 3. `python3 findings_translate.py --export --source supabase --output /tmp/tr/plan.json --pretty`.
 4. **브릿지 가드:** `plan.json` 의 `queue_source` 가 `"rpc"` 가 아니면 번역하지 말고
    `★브릿지(009 RPC) 미적용 — 번역 파이프라인이 미번역 행을 볼 수 없음` 을 맨 위에 쓰고 끝낸다.
-5. `source_db.untranslated` 가 0 이면 `git push origin origin/main:refs/heads/$B`(표식만) 후 `오늘 번역할 신규 항목 없음` 으로 끝낸다.
+5. `source_db.untranslated` 가 0 이면 `git push origin HEAD:refs/heads/$B`(표식만 — 1 에서 방금 받은 main 위다) 후 `오늘 번역할 신규 항목 없음` 으로 끝낸다.
 6. `items[]` 에서 최신순 최대 100건을 골라 `finding_text_ko` 를 채우고 `translation_method` 를 `"llm_assisted"` 로 둔 완성본을
    **별도 파일** `/tmp/tr/filled.json` 에 쓴다(고른 항목만 담는다). `plan.json` 은 절대 고치지 않는다 — 적용 도구가 원문을 바이트로 대조해,
    한 글자라도 다르면 배치 전체를 거부한다. 번역 지침(반드시 지킨다):
@@ -50,7 +51,7 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
    (`--sql-output` 은 필수다. SQL 은 저장소 밖에 쓴다).
 8. `apply_report.json` 의 `ready` 가 `false` 면 아무것도 커밋하지 말고, 어떤 항목이 왜 실패했는지 요약해 `실패` 로 끝낸다(우회 금지).
 9. **outbox 정리(기아 방지):** `translations/outbox/` 에 오늘 것 말고 다른 `*.json` 이 있으면, 그 파일들을 마지막으로 바꾼 main 커밋
-   (`git log -1 --format=%H origin/main -- translations/outbox`)의 check-runs 중 이름이 `Apply queued translation outbox → Supabase` 인 것의
+   (`git fetch origin main && git log -1 --format=%H FETCH_HEAD -- translations/outbox`)의 check-runs 중 이름이 `Apply queued translation outbox → Supabase` 인 것의
    `conclusion` 이 `success` 일 때만 `git mv` 로 `translations/applied/` 에 옮긴다. 아니면 그대로 두고 `apply 미확인으로 outbox 정리 보류` 를 남긴다.
 10. `git add translations/outbox/$D-batch.json`(9 의 이동분은 이미 스테이징됨). 커밋 `chore(findings): 일일 번역 배치 $D - N건`. `git push -u origin $B`.
 11. PR(`gh api`) — 제목 **`chore(findings): 일일 번역 배치 $D`**, 본문: N건 번역(상한 100·최신 우선, 잔여 M건은 다음 실행), dry-run 검증 통과(ready=true),

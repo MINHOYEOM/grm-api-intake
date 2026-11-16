@@ -1,0 +1,201 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "oos-investigation",
+  "as_of": "2026-11-15",
+  "area_ko": "시험실",
+  "area_en": "Laboratory",
+  "title_ko": "OOS 조사",
+  "title_en": "OOS investigations",
+  "glossary_ids": [
+    "oos",
+    "laboratory-investigation"
+  ],
+  "aliases_ko": [
+    "기준일탈",
+    "규격이탈",
+    "규격 외 결과"
+  ],
+  "aliases_en": [
+    "OOS",
+    "out-of-specification",
+    "out of specification"
+  ],
+  "search_q_ko": "기준일탈",
+  "search_q_en": "out-of-specification",
+  "lead_ko": "FDA 는 OOS 결과가 나왔는지보다, 그 결과를 과학적 근거로 조사해 원인을 밝혔는지와 근거 없이 적합 결과로 바꾸지 않았는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether an OOS result occurred than at whether it was investigated on scientific grounds to find the cause, and whether it was replaced by a passing result without justification. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "조사를 하고도 근본 원인을 밝히지 않았다",
+      "title_en": "The investigation did not determine the root cause",
+      "quotes": [
+        {
+          "finding_id": "finding-71028a6054dedbe2df511bef",
+          "raw_signal_id": "rawsig-b83a7a53aac63e49a683ec69",
+          "document_id": "fda483-195324",
+          "source": "FDA 483",
+          "firm": "Frontage Laboratories, Inc.",
+          "date": "2026-10-23",
+          "quote_ko": "시험실 OOS 조사는 최초 OOS 결과의 잠재적 근본 원인을 확인하지 못했으며, [redacted]의 재시험 중 관찰된 높은(~6%) 시험 변동성에 대한 정당성도 제공되지 않았다.",
+          "quote_en": "The laboratory OOS investigations did not identify potential root causes for the initial OOS result and no justifications were provided for the high (~6%) testing variabilities observed during the retesting by the [redacted]."
+        },
+        {
+          "finding_id": "finding-c618cc42bba7c3530cbe308c",
+          "raw_signal_id": "rawsig-97323446547365df6f2ebce4",
+          "document_id": "bc7adbe92433",
+          "source": "FDA Warning Letter",
+          "firm": "Vegewax Candleworx Ltd.",
+          "date": "2025-03-18",
+          "quote_ko": "귀사는 기준일탈(OOS)의 근본 원인을 규명하지 않았고 적절한 CAPA를 이행하지 않았다.",
+          "quote_en": "You failed to determine the root cause of the out-of-specification (OOS) and implement the appropriate CAPA."
+        }
+      ]
+    },
+    {
+      "title_ko": "과학적 근거 없이 최초 결과를 무효로 했다",
+      "title_en": "The original result was invalidated without scientific justification",
+      "quotes": [
+        {
+          "finding_id": "finding-20444885b3cae13821d6b3d6",
+          "raw_signal_id": "rawsig-cd075575fb61eae910852b8d",
+          "document_id": "8b9b6af44436",
+          "source": "FDA Warning Letter",
+          "firm": "Baxter International Inc.",
+          "date": "2026-10-20",
+          "quote_ko": "귀사는 충분한 과학적 근거 없이 무균시험 결과를 무효화했고, 이 로트를 2025년 7월에 출하했다.",
+          "quote_en": "You invalidated the sterility result without adequate scientific justification and released this lot in July 2025."
+        },
+        {
+          "finding_id": "finding-55f3d85ab8560186aec9c49e",
+          "raw_signal_id": "rawsig-9239684adbdafa6a0ea49e63",
+          "document_id": "fda483-196223",
+          "source": "FDA 483",
+          "firm": "Sumitomo Osaka Cement Co., Ltd",
+          "date": "2026-11-05",
+          "quote_ko": "귀사는 단일한 새 시료와 새 표준품(두 번째)의 적합 결과를 근거로 원래 결과를 무효화했다.",
+          "quote_en": "The firm invalidated the original result based on passing result from the single new sample and new standard (second)."
+        }
+      ]
+    },
+    {
+      "title_ko": "최초 시험이 유효한지 판정하지 않고 재시험 결과로 출하했다",
+      "title_en": "Batches were released on retest results without judging the validity of the original test",
+      "quotes": [
+        {
+          "finding_id": "finding-6082cc3f8d31a2736be85c7a",
+          "raw_signal_id": "rawsig-a4c2d991374bbfa6da132fe3",
+          "document_id": "9995c30e33c0",
+          "source": "FDA Warning Letter",
+          "firm": "SnugZ USA, Inc.",
+          "date": "2026-10-20",
+          "quote_ko": "귀사의 시험법 절차는 OOS 결과 후 검체를 여러 번 재시험하는 것을 허용했으며, 흔히 허용 가능한 결과가 나올 때까지 재시험했다.",
+          "quote_en": "Your test method procedures allowed multiple retesting of samples following an OOS result, often until an acceptable result is obtained."
+        },
+        {
+          "finding_id": "finding-c0c920b6d9483f0fb46d9235",
+          "raw_signal_id": "rawsig-36518798e20ac2869cb99db9",
+          "document_id": "fda483-195558",
+          "source": "FDA 483",
+          "firm": "Merck Teknika LLC",
+          "date": "2026-10-27",
+          "quote_ko": "두 BCG 배치 [redacted]와 [redacted]는 원래 시험의 유효성을 제대로 판정하지 않은 채 재시험 결과를 근거로 출하되었다.",
+          "quote_en": "Both BCG batches, [redacted] and [redacted], were subsequently released based on the retest results without properly determining the validity of the original test."
+        }
+      ]
+    },
+    {
+      "title_ko": "영향을 받았을 수 있는 다른 배치로 조사를 넓히지 않았다",
+      "title_en": "The investigation was not extended to other batches that may have been affected",
+      "quotes": [
+        {
+          "finding_id": "finding-26be950641f00f76e1171eb7",
+          "raw_signal_id": "rawsig-1aa23979f6e18068f52de92e",
+          "document_id": "dcf8f4cdafaf",
+          "source": "FDA Warning Letter",
+          "firm": "Absolutely Natural",
+          "date": "2026-01-06",
+          "quote_ko": "귀사는 해당 배치를 부적합 처리했으나 미생물 오염의 근본 원인을 적절히 평가하지 않았고, 영향을 받았을 수 있는 다른 배치로 조사를 확대하지 않았다.",
+          "quote_en": "Although you rejected the batch, you failed to adequately assess the root cause of the microbiological contamination, and you failed to extend the investigation to additional batches that may also have been affected."
+        },
+        {
+          "finding_id": "finding-b0948465d267de098f2d2428",
+          "raw_signal_id": "rawsig-eb12826e8500b180c12f42db",
+          "document_id": "fda483-194819",
+          "source": "FDA 483",
+          "firm": "PQ Pharmacy LLC",
+          "date": "2026-09-22",
+          "quote_ko": "또한 동일 공정으로 제조한 다른 배치의 잠재적 영향을 고려하도록 조사 범위를 확대하지 않았다.",
+          "quote_en": "Additionally, the investigation scope was not broadened to consider potential impact to other batches manufactured by the same process."
+        }
+      ]
+    },
+    {
+      "title_ko": "조사를 열지 않았거나 늦게 열었다",
+      "title_en": "The investigation was not opened, or was opened late",
+      "quotes": [
+        {
+          "finding_id": "finding-f74f5fbe53a232ede25eb55d",
+          "raw_signal_id": "rawsig-c626c9b07650802c9c8d73f2",
+          "document_id": "68fdf481ca5a",
+          "source": "FDA Warning Letter",
+          "firm": "VeganicSKN Limited",
+          "date": "2026-09-29",
+          "quote_ko": "귀사의 위탁 시험기관이 2024년 8월 28일 (b)(4)에 대한 OOS 결과를 보고했으나, 귀사는 2024년 12월 4일에야 Phase II 조사를 개시했다.",
+          "quote_en": "Your contract testing laboratory reported an OOS result for (b)(4) on August 28, 2024, but you did not initiate the Phase II investigation until December 4, 2024."
+        },
+        {
+          "finding_id": "finding-98f208d7996d82a0b00d7c10",
+          "raw_signal_id": "rawsig-1c905cc2ab36d1b53efb3cac",
+          "document_id": "fda483-193869",
+          "source": "FDA 483",
+          "firm": "Alkem Laboratories Limited",
+          "date": "2026-07-27",
+          "quote_ko": "공정 중 시험 원자료 검토에서 여러 배치의 공정 중 시험 결과가 부적합한 것으로 드러났다. 이러한 부적합에 관한 제조 일탈이나 작성된 배치 기록서의 문서가 없었다.",
+          "quote_en": "A review of raw data from in-process testing revealed that several batches had failed in-process test results. No manufacturing deviations or documentation in the executed batch records were available for these failures."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.192",
+      "finding_id": "finding-f74f5fbe53a232ede25eb55d",
+      "firm": "VeganicSKN Limited",
+      "date": "2026-09-29",
+      "quote_ko": "귀사는 배치의 출하 여부와 관계없이, 설명되지 않은 불일치 또는 배치나 그 구성 원료가 규격을 충족하지 못한 경우를 철저히 조사하지 않았다",
+      "quote_en": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed",
+      "note_ko": "Baxter, Absolutely Natural 사례도 이 조항 아래 적혔습니다.",
+      "note_en": "The Baxter and Absolutely Natural findings were also cited under this section."
+    },
+    {
+      "key": "21 CFR 211.160(b)",
+      "finding_id": "finding-6082cc3f8d31a2736be85c7a",
+      "firm": "SnugZ USA, Inc.",
+      "date": "2026-10-20",
+      "quote_ko": "귀사는 원료, 의약품 용기, 마개, 공정 중 물질, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격, 기준, 검체 채취 계획 및 시험 절차를 포함하는 시험실 관리를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity",
+      "note_ko": "조사 없이 재시험을 허용한 시험 절차가 이 조항으로 지적됐습니다.",
+      "note_en": "Test procedures that allowed retesting without an investigation were cited under this section."
+    }
+  ],
+  "checks_ko": [
+    "OOS 조사 보고서마다 근본 원인과 그 근거가 적혀 있습니까? 원인을 찾지 못한 건은 CAPA 를 어떻게 정했습니까?",
+    "최초 결과를 무효로 한 건마다 과학적 근거가 문서로 있습니까? 새 시료나 새 표준품의 적합 결과만으로 무효로 한 건은 없습니까?",
+    "시험 절차가 조사 없이 재시험을 허용하고 있지 않습니까? 재시험 횟수가 정해져 있습니까?",
+    "재시험 결과로 출하한 배치는 최초 시험의 유효성을 먼저 판정하고 품질 부서의 승인을 받았습니까?",
+    "OOS 가 나오면 같은 공정으로 만든 다른 배치까지 조사 범위를 넓혀 평가합니까?",
+    "OOS 보고일과 조사 개시일 사이에 간격이 벌어진 건은 없습니까? 공정 중 시험의 부적합도 일탈로 기록합니까?"
+  ],
+  "checks_en": [
+    "Does each OOS investigation report state the root cause and the evidence for it? Where no cause was found, how was the CAPA decided?",
+    "Is there documented scientific justification for each invalidated original result? Was any result invalidated only on a passing result from a new sample or a new standard?",
+    "Do test procedures allow retesting without an investigation? Is the number of retests defined?",
+    "For batches released on retest results, was the validity of the original test judged first and approved by the quality unit?",
+    "When an OOS occurs, is the investigation extended to other batches made by the same process?",
+    "Are there cases with a gap between the date the OOS was reported and the date the investigation was opened? Are in-process test failures recorded as deviations too?"
+  ],
+  "further_reading": [],
+  "related": [
+    "capa"
+  ]
+}

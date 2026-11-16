@@ -11,6 +11,18 @@
    provenance: card_id 는 인덱스 앵커 조회 키로만 사용. */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      var t = setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o).then(function (r) { clearTimeout(t); return r; },
+                            function (e) { clearTimeout(t); throw e; });
+  }
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
@@ -35,7 +47,7 @@
   }
 
   Promise.all([
-    fetch(rpcUrl(), {
+    _fetchT(rpcUrl(), {
       headers: { apikey: SUPA_KEY, Authorization: "Bearer " + SUPA_KEY }
     }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
     fetch(idxUrl).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })

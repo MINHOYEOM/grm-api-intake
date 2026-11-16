@@ -1,0 +1,108 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "batch-records", "as_of": "2026-11-15",
+  "area_ko": "데이터와 기록", "area_en": "Data and records",
+  "title_ko": "제조기록서와 동시 기록", "title_en": "Batch records and contemporaneous recording",
+  "glossary_ids": ["batch-record", "master-production-record", "contemporaneous"],
+  "aliases_ko": ["배치 기록", "배치 기록서", "제조기록서", "마스터 생산 기록"],
+  "aliases_en": ["batch record", "batch production record", "master production record"],
+  "search_q_ko": "배치 기록", "search_q_en": "batch record",
+  "lead_ko": "FDA 는 제조기록서를 갖췄는지보다, 각 단계가 수행한 시점에 빠짐없이 기록되고 검토되는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether batch records exist than at whether each step is recorded in full at the time it is performed and then reviewed. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "작업을 수행한 시점에 기록하고 서명하지 않았다",
+      "title_en": "Entries were not recorded and signed at the time the work was performed",
+      "quotes": [
+        { "finding_id": "finding-265350f56df0f545c93c34da", "raw_signal_id": "rawsig-3a745a6d8d217b34df5a1f79", "document_id": "243240bf2fe3", "source": "FDA Warning Letter",
+          "firm": "Shree Jaya Laboratories PVT. LTD.", "date": "2025-03-11",
+          "quote_ko": "작업자가 수행한 생산 업무는 5개 생산실을 동시에 감독하던 생산 감독자가 나중에 기록했다.",
+          "quote_en": "Production tasks performed by operators were recorded later by the production supervisor, who was overseeing five production rooms at the same time." },
+        { "finding_id": "finding-3c574c77f0a803a1103451d9", "raw_signal_id": "rawsig-09106b0c1a8ab81af0e6eb76", "document_id": "fda483-195352", "source": "FDA 483",
+          "firm": "ChemPacific Corporation", "date": "2026-10-23",
+          "quote_ko": "생산을 수행한 화학자는 “자신은 작업자로서 서명하며 확인자는 서로 신뢰하기 때문에 보통 나중에 서명한다”고 진술했다.",
+          "quote_en": "The chemist conducting the production stated that he \"signs as the operator and that the checker will usually sign later because they trust each other.\"" }
+      ]
+    },
+    {
+      "title_ko": "제조기록서에 각 주요 단계의 기록을 담지 않았다",
+      "title_en": "Batch records did not document each significant step",
+      "quotes": [
+        { "finding_id": "finding-2b0f0a46f0ef57b52411f779", "raw_signal_id": "rawsig-91285f4454fd9a567ed650da", "document_id": "8f6e18608801", "source": "FDA Warning Letter",
+          "firm": "Sani-Care Salon Products, Inc.", "date": "2024-06-25",
+          "quote_ko": "예를 들어 귀사의 배치 생산 기록서에는 의약품 제조, 가공, 포장의 각 주요 단계가 포함되어 있지 않았다.",
+          "quote_en": "For example, your firm’s batch production records did not include each significant step in manufacturing, processing, and packaging of your drug products." },
+        { "finding_id": "finding-ed911701b96d160746f9175c", "raw_signal_id": "rawsig-34e557de74adcab0826c7a7a", "document_id": "fda483-181933", "source": "FDA 483",
+          "firm": "Mixlab TX LLC", "date": "2024-09-19",
+          "quote_ko": "구체적으로, 귀사의 배치 기록서에는 의약품 생산의 각 주요 단계에 대한 기록이 없거나 기록이 완전하지 않다.",
+          "quote_en": "Specifically, your firm's batch records do not include documentation and/or complete documentation of each significant step in the production of drug products." }
+      ]
+    },
+    {
+      "title_ko": "기록서에 필요한 공정 정보와 생산 지침을 담지 않았다",
+      "title_en": "Records lacked necessary processing information and production instructions",
+      "quotes": [
+        { "finding_id": "finding-1a8bc52b030cf920b2fd69a3", "raw_signal_id": "rawsig-a68a37c1396fadeaa4a9f2b7", "document_id": "98b0ec48f22e", "source": "FDA Warning Letter",
+          "firm": "Tianjin Kilo Pharmaceutical Sci-tech Co., Ltd.", "date": "2026-08-18",
+          "quote_ko": "(b)(4) 에 대한 귀사의 배치기록서(batch record)에는 일관된 제조와 제품 품질을 보장하는 데 필요한 핵심 공정 정보 일부가 누락되어 있었다. 예를 들어 (b)(4) 와 제조공정에 사용된 주요 설비를 기재하지 않았다.",
+          "quote_en": "Your batch record for (b)(4) lacked some of the critical processing information necessary to ensure consistent manufacturing and product quality. For example, you did not list (b)(4) and major equipment used in the manufacturing process." },
+        { "finding_id": "finding-a601b04d21c31eba67de3387", "raw_signal_id": "rawsig-e2c25dd62749ede1c95cc815", "document_id": "fda483-196275", "source": "FDA 483",
+          "firm": "Qingdao Kangyuan Pharmaceutical Co., LTD", "date": "2026-11-13",
+          "quote_ko": "마스터 배치 생산기록서에 개별 공정 단계 및/또는 전체 공정에서 중간체와 원료의약품(API)의 품질이 충족되도록 하기 위한 시간 제한과 상세한 생산 지침이 설정되어 있지 않다.",
+          "quote_en": "The master batch production record lacks an established time limit and detailed production instructions to ensure the quality of intermediates and APIs are met for individual processing steps and/or total process." }
+      ]
+    },
+    {
+      "title_ko": "갖춰야 할 기록서를 보유하지 않았다",
+      "title_en": "Required records were not kept",
+      "quotes": [
+        { "finding_id": "finding-f4fab641e4e13446a6aad625", "raw_signal_id": "rawsig-bd5da7645d7c03162c197652", "document_id": "16b2a01ff036", "source": "FDA Warning Letter",
+          "firm": "Premier Nutra Pharma Inc.", "date": "2023-05-09",
+          "quote_ko": "귀사는 (b)(4) 비강분무제 배치 (b)(4) 에 대해 배치기록을 포함한 생산기록을 보유하지 않았다고 밝혔습니다.",
+          "quote_en": "Your firm indicated that you did not have production records, including batch records, for (b)(4) Nasal Spray batch (b)(4) ." },
+        { "finding_id": "finding-a5d614b68cccfb49a05053ca", "raw_signal_id": "rawsig-d922583a4e5b777c36d1f51e", "document_id": "fda483-195282", "source": "FDA 483",
+          "firm": "LCC Ltd.", "date": "2026-10-20",
+          "quote_ko": "귀사는 마스터 배치 기록서를 유지하지 않는다.",
+          "quote_en": "Your firm does not maintain a master batch record." }
+      ]
+    },
+    {
+      "title_ko": "품질부서가 제조기록서 검토를 제대로 하지 않았다",
+      "title_en": "The quality unit did not properly review batch records",
+      "quotes": [
+        { "finding_id": "finding-07a9c9cd8b0f13aaf1d99898", "raw_signal_id": "rawsig-c2b5812e41eebcf74d5a09e5", "document_id": "2e8995939a7a", "source": "FDA Warning Letter",
+          "firm": "Cosmobeauti Laboratories & Manufacturing Inc.", "date": "2023-08-29",
+          "quote_ko": "실사 중 귀사의 규제 컨설턴트는 FDA 실사관에게 귀하와 컨설턴트 두 사람이 OTC 의약품의 제조기록 검토 단계를 소급 기재(backdating)했다고 말했다.",
+          "quote_en": "During the inspection, your regulatory consultant told FDA investigators that you both backdated review steps on batch production records for your OTC drug products." },
+        { "finding_id": "finding-2717f2309d0467dcce02af9c", "raw_signal_id": "rawsig-0ada76b0fc650cb821fa4ede", "document_id": "fda483-195549", "source": "FDA 483",
+          "firm": "Andelyn Biosciences, Inc.", "date": "2026-10-30",
+          "quote_ko": "귀사의 품질 부서는 오류가 없도록 생산 기록을 적절히 검토하지 않는다.",
+          "quote_en": "Your quality unit does not review production records adequately to ensure there are no errors that have occurred." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.188", "finding_id": "finding-f4fab641e4e13446a6aad625", "firm": "Premier Nutra Pharma Inc.", "date": "2023-05-09",
+      "quote_ko": "귀사는 생산된 의약품의 각 배치의 생산 및 관리와 관련된 완전한 정보를 포함하는 배치생산관리기록을 작성하지 못하였습니다",
+      "quote_en": "Your firm failed to prepare batch production and control records with complete information relating to the production and control of each batch of drug product produced",
+      "note_ko": "비강분무제 배치에 대해 배치기록을 포함한 생산기록을 보유하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Not having production records, including batch records, for a nasal spray batch was cited under this clause." }
+  ],
+  "checks_ko": [
+    "작업자가 수행한 작업을 다른 사람이 나중에 기록하는 일이 없습니까",
+    "확인자가 확인한 시점에 제조기록서에 서명합니까",
+    "제조기록서에 제조, 가공, 포장의 각 주요 단계가 빠짐없이 기록됩니까",
+    "제조기록서에 핵심 공정 정보와 사용한 주요 설비가 기재되어 있습니까",
+    "마스터 기록서를 갖추고 있으며, 시간 제한과 상세한 생산 지침이 들어 있습니까",
+    "품질부서가 제조기록서를 오류가 없도록 검토하며, 검토 단계를 소급해 기재하지 않습니까"
+  ],
+  "checks_en": [
+    "Is work performed by operators ever recorded later by someone else?",
+    "Does the checker sign the batch record at the time of verification?",
+    "Does the batch record document each significant step in manufacturing, processing and packaging?",
+    "Does the batch record list the critical processing information and the major equipment used?",
+    "Is a master record maintained, and does it include time limits and detailed production instructions?",
+    "Does the quality unit review batch records for errors, without backdating review steps?"
+  ],
+  "further_reading": [],
+  "related": ["data-integrity", "capa"]
+}

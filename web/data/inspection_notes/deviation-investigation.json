@@ -1,0 +1,193 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "deviation-investigation",
+  "as_of": "2026-11-15",
+  "area_ko": "품질시스템",
+  "area_en": "Quality system",
+  "title_ko": "일탈 조사와 근본원인",
+  "title_en": "Deviation investigations and root cause",
+  "glossary_ids": [
+    "deviation",
+    "root-cause-analysis"
+  ],
+  "aliases_ko": [
+    "일탈",
+    "근본 원인",
+    "근본원인분석",
+    "부적합 조사"
+  ],
+  "aliases_en": [
+    "deviation",
+    "root cause",
+    "investigation"
+  ],
+  "search_q_ko": "일탈",
+  "search_q_en": "deviation",
+  "lead_ko": "FDA 는 일탈 절차가 있는지보다, 제조·설비·환경에서 생긴 일탈을 제때 기록하고 근거 있는 원인과 영향 범위까지 조사했는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a deviation procedure exists than at whether deviations in manufacturing, equipment and the environment are recorded on time and investigated through to a supported cause and the full extent of impact. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "한도 초과나 설비 문제를 일탈로 개시하지 않았다",
+      "title_en": "Limit excursions and equipment problems were not opened as deviations",
+      "quotes": [
+        {
+          "finding_id": "finding-dbc7d596b5e697358ea247b2",
+          "raw_signal_id": "rawsig-72084f76fdffdd550dd5f8f4",
+          "document_id": "9a4546da5523",
+          "source": "FDA Warning Letter",
+          "firm": "Jubilant HollisterStier General Partnership",
+          "date": "2026-06-23",
+          "quote_ko": "예를 들어 귀사는 (b)(4) 에 ISO 7 구역에서 작업자의 목 부위를 시료채취하여 곰팡이를 포함한 83 집락형성단위(CFU)를 검출했다. 귀사의 조치 한도는 (b)(4) CFU 이상이었으나 귀사는 일탈 조사를 개시하지 않았다.",
+          "quote_en": "For example, you recovered 83 colony forming units, including mold, from sampling an operator’s neck in the ISO 7 area in (b)(4) . Your action level is (b)(4) or more colony forming units, but you did not initiate a deviation investigation."
+        },
+        {
+          "finding_id": "finding-62580e27232ceca3ee5d7360",
+          "raw_signal_id": "rawsig-135e6ce7d44511afa72a6f81",
+          "document_id": "fda483-195381",
+          "source": "FDA 483",
+          "firm": "Galaxy Medical Products LLC",
+          "date": "2026-10-27",
+          "quote_ko": "교정 기한 경과 온도계가 제품 품질에 미친 영향을 판단하기 위한 문서화, 일탈, 조사 또는 제품 영향 평가가 개시되지 않았다.",
+          "quote_en": "No documentation, deviation, investigation, or product impact assessment was initiated to determine the effect of the out-of-calibration thermometer on product quality."
+        }
+      ]
+    },
+    {
+      "title_ko": "근본 원인을 근거로 뒷받침하지 않았다",
+      "title_en": "Root causes were not supported by evidence",
+      "quotes": [
+        {
+          "finding_id": "finding-d56949738ea16b089159bc84",
+          "raw_signal_id": "rawsig-9357d5b93b162ae928b17fc2",
+          "document_id": "c0f3b8ff757d",
+          "source": "FDA Warning Letter",
+          "firm": "K.C. Pharmaceuticals, Inc.",
+          "date": "2026-08-18",
+          "quote_ko": "귀사에는 적시에 이루어진 적절한 배지충전 조사가 없었다. 예를 들어, 귀사의 근본 원인은 근거가 뒷받침되지 않았고 효과적인 시정 조치가 부족했다.",
+          "quote_en": "Your firm lacked timely and adequate media fill investigations. For instance, your root causes were unsupported and lacked effective corrective actions."
+        },
+        {
+          "finding_id": "finding-be5970e71cca6a952d47ad8c",
+          "raw_signal_id": "rawsig-c2272cc0e51f8c048cb9f3ad",
+          "document_id": "fda483-195620",
+          "source": "FDA 483",
+          "firm": "Biomat USA, Inc.",
+          "date": "2026-10-20",
+          "quote_ko": "이 일탈에는 근본 원인을 기계 오작동으로 뒷받침하기에 충분한 정보가 포함되어 있지 않다.",
+          "quote_en": "The deviation fails to include enough information to support the root cause as a machine malfunction."
+        }
+      ]
+    },
+    {
+      "title_ko": "영향을 받았을 다른 배치로 조사를 넓히지 않았다",
+      "title_en": "Investigations were not extended to other potentially affected batches",
+      "quotes": [
+        {
+          "finding_id": "finding-f3806f54f7554fb0808b73d5",
+          "raw_signal_id": "rawsig-243b6fc9e61ebe22093d9044",
+          "document_id": "e29881ba34c7",
+          "source": "FDA Warning Letter",
+          "firm": "CareFusion 213, LLC",
+          "date": "2026-05-05",
+          "quote_ko": "귀사는 이러한 불만에 대한 조사를 철저히 수행하지 않았고, 근본 원인을 적절히 파악하지 못했으며, 결론에 대한 과학적 근거를 제시하지 않았고, 영향을 받을 수 있는 다른 배치로 조사를 확대하지 않는 일이 반복되었으므로 귀사의 조사는 미흡했다.",
+          "quote_en": "Your investigations into these complaints were inadequate, as you repeatedly failed to conduct thorough investigations, adequately identify root causes, provide scientific rationale for your conclusions, and extend investigations to other potentially affected batches."
+        },
+        {
+          "finding_id": "finding-1afcdf884afaddad1bbcc9d2",
+          "raw_signal_id": "rawsig-e79230d759be3a531bf66ec4",
+          "document_id": "fda483-195570",
+          "source": "FDA 483",
+          "firm": "Instituto Grifols, S.A.",
+          "date": "2026-10-27",
+          "quote_ko": "일탈 조사 300104231 은 다른 Flebogamma 배치, 특히 해당 기간 중 출하 시험된 미국 시판 Flebogamma 배치로 확대되지 않았다.",
+          "quote_en": "Deviation investigation 300104231 failed to be extended into any other batches ofFlebogamma, specifically US marketed batches of Flebogamma tested for release during the period in question."
+        }
+      ]
+    },
+    {
+      "title_ko": "일탈을 제때 기록하고 조사하지 않았다",
+      "title_en": "Deviations were not recorded and investigated in a timely manner",
+      "quotes": [
+        {
+          "finding_id": "finding-104722dc4925c480d085556d",
+          "raw_signal_id": "rawsig-c2b0be8ba3cc0ac21f2ba6da",
+          "document_id": "fda483-195469",
+          "source": "FDA 483",
+          "firm": "Seqirus Inc",
+          "date": "2026-10-26",
+          "quote_ko": "구체적으로, 일탈 관리 절차는 제품 품질 잠재 영향 결정을 위한 품질 사건의 적시 기록·평가를 보장하지 않는다.",
+          "quote_en": "Specifically, your firm’s procedure for deviation management does not ensure timely documentation and assessment of quality events to determine potential impact on product quality."
+        },
+        {
+          "finding_id": "finding-66f7fe6b342bf84afcd82cfa",
+          "raw_signal_id": "rawsig-2b0ebe23df738e116ef1bdf0",
+          "document_id": "fda483-195499",
+          "source": "FDA 483",
+          "firm": "Serum Institute of India Pvt. Ltd.",
+          "date": "2026-10-26",
+          "quote_ko": "일탈 M24/06/21/01의 조사가 적시에 이루어지지 않았다.",
+          "quote_en": "The investigation of Deviation M24/06/21/01 did not take place in a timely manner."
+        }
+      ]
+    },
+    {
+      "title_ko": "반복되는 일탈의 원인을 찾아 조치하지 않았다",
+      "title_en": "Recurring deviations were not traced to their causes and acted on",
+      "quotes": [
+        {
+          "finding_id": "finding-24edf179577feaf6a0c4b269",
+          "raw_signal_id": "rawsig-63a762ea8770ff1226105fe4",
+          "document_id": "cf8b128395ac",
+          "source": "FDA Warning Letter",
+          "firm": "Medline Inc",
+          "date": "2026-06-02",
+          "quote_ko": "귀사는 이러한 반복적 오염 사례의 근본 원인을 규명하고 재발을 방지하기 위한 조사와 시정 및 예방조치(CAPA)를 적절히 이행하지 않았다.",
+          "quote_en": "You failed to adequately investigate and implement corrective actions and preventive actions (CAPA) to determine root causes and prevent recurrence of these repeated contamination incidents."
+        },
+        {
+          "finding_id": "finding-1159368cb96bbd43be350994",
+          "raw_signal_id": "rawsig-e7f4045d59efabd80cce8866",
+          "document_id": "fda483-195507",
+          "source": "FDA 483",
+          "firm": "IDT Biologika GmbH",
+          "date": "2026-10-26",
+          "quote_ko": "귀사는 최근에야 근본 원인별 일탈 추세 분석·분류 및 지속 개선 교육 도입을 시작했으나 중요 제조 단계의 효과적 수행을 보장할 조치는 취하지 않았다.",
+          "quote_en": "The firm has only recently started to trend and categorize deviations based on root cause and has only recently begun to implement a continuous improvement training but has not taken action to ensure that critical manufacturing steps are carried out effectively."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.192",
+      "finding_id": "finding-dbc7d596b5e697358ea247b2",
+      "firm": "Jubilant HollisterStier General Partnership",
+      "date": "2026-06-23",
+      "quote_ko": "귀사는 배치 또는 그 구성 성분이 규격을 충족하지 못했거나 설명되지 않는 불일치가 있는 경우, 해당 배치의 출하 여부와 관계없이 이를 철저히 조사하지 않았다",
+      "quote_en": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed",
+      "note_ko": "작업자 모니터링 결과가 조치 한도를 넘었는데도 일탈 조사를 개시하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Not initiating a deviation investigation although a personnel monitoring result exceeded the action level was cited under this clause."
+    }
+  ],
+  "checks_ko": [
+    "환경·작업자 모니터링 결과가 조치 한도를 넘으면 빠짐없이 일탈 조사를 개시합니까",
+    "교정 기한이 지난 계측기를 사용한 사실이 확인되면 일탈로 기록하고 제품 영향 평가를 합니까",
+    "일탈 기록에 근본 원인을 뒷받침하는 정보가 충분히 들어 있습니까",
+    "일탈 조사를 영향을 받았을 다른 배치까지 넓혀 평가합니까",
+    "품질 사건을 발생 시점에 기록하고 조사를 제때 끝내도록 절차가 보장합니까",
+    "반복되는 일탈과 오염 사례를 근본 원인별로 추세 분석하고 재발 방지 조치로 잇습니까"
+  ],
+  "checks_en": [
+    "Is a deviation investigation opened every time an environmental or personnel monitoring result exceeds the action level?",
+    "When an out-of-calibration instrument is found to have been used, is it recorded as a deviation and a product impact assessment performed?",
+    "Do deviation records contain enough information to support the stated root cause?",
+    "Are deviation investigations extended to other batches that may have been affected?",
+    "Does the procedure ensure that quality events are recorded when they occur and that investigations are completed in a timely manner?",
+    "Are recurring deviations and contamination incidents trended by root cause and followed by action to prevent recurrence?"
+  ],
+  "further_reading": [],
+  "related": [
+    "capa",
+    "oos-investigation"
+  ]
+}

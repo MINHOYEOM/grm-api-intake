@@ -154,6 +154,7 @@ import import_alerts_page  # noqa: E402  [수입경보 2단계 2026-11-10] 전�
 import citation_firms_page  # noqa: E402  [FDA 지적 조항 × 업체 전체 목록 2026-11-10]
 import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
 import news_page  # noqa: E402  [최근 규제 소식 2026-11-10]
+import inspection_notes_page  # noqa: E402  [실사 대비 노트 2026-11-15] 주제별 지적 문장 묶음
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -5675,6 +5676,7 @@ BROWSE_SECTIONS: tuple[tuple[str, tuple[tuple[str, str, str], ...]], ...] = (
     (N_("자료·도구"), (
         ("library/", N_("지침·고시"), N_("규제기관 지침과 고시 원문 목록")),
         ("findings/checklist/", N_("자가점검표"), N_("지적 문장 기반 자가점검 항목")),
+        ("inspection-notes/", N_("실사 대비 노트"), N_("주제별로 실사에서 실제 지적된 문장과 출처")),
         ("findings/coverage/", N_("데이터 현황"), N_("수집 출처, 연도별 확보량, 수집 범위와 한계")),
         ("guide/", N_("이용안내"), N_("화면별 사용법과 자주 묻는 질문")),
     )),
@@ -6203,6 +6205,10 @@ DEFICIENCY_CASES_DESCRIPTION = {
     "MHRA": N_("영국 MHRA 가 GMP 실사 지적 경향 보고서에 실은 지적 예시 {n}건 전부 — 원문 그대로, 영역·연도·낱말로 찾기."),
     "MHRA_DATA": N_("영국 MHRA 2018·2019 GMP 실사 지적 원자료에서 EU GMP 장·문단별로 센 인용 횟수 {n}회 — Critical·Major·Other 등급별."),
 }
+INSPECTION_NOTES_DESCRIPTION = N_("실사 대비 노트 — 주제마다 FDA 실사에서 실제로 지적된 문장을 묶고 출처와 문서를 함께 적은 자료.")
+INSPECTION_NOTE_DESCRIPTION = N_("{title} 실사 대비 노트 — 실사에서 지적된 문장과 출처, 근거 조항, 절차서와 대조할 질문.")
+# 출처종류(DB 값) → 화면 표기. 한국어 키가 없는 값은 그대로 쓴다('FDA 483').
+INSPECTION_NOTE_SOURCE_LABELS = {"FDA Warning Letter": N_("FDA 경고서한")}
 CITATION_FIRMS_DESCRIPTION = N_("FDA 실사에서 21 CFR 조항 지적을 받은 제조소 {n}곳 전부 — 국가·실사 수·최근 실사일·지적된 조항을 필터로 찾기.")
 IMPORT_ALERTS_DESCRIPTION = N_("FDA 수입경보 66-40·66-41 에 오른 의약품 제조소 {n}곳(한국 {k}곳) — "
                                "국가·경보 번호·등재일·상태와 FDA 원문 링크.")
@@ -6740,6 +6746,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_env.globals["fnd_facets_root"] = facets_root(facets_en)
     env.globals["fnd_facet_axes"] = facets_axes(facets)
     en_env.globals["fnd_facet_axes"] = facets_axes(facets_en)
+    # [실사 대비 노트 2026-11-15] 노트(web/data/inspection_notes/*.json)가 있을 때만 양 트리에 선다
+    # (목록 1 + 노트 N). 미리 지어 커밋한 파일을 그릴 뿐이다 — 빌드는 아무것도 부르지 않는다.
+    inspection_notes = inspection_notes_page.load_notes()
+    en_paths |= inspection_notes_page.routes_present(inspection_notes)
+    # 용어 페이지의 '실사 대비 노트' 링크 블록 재료 — 트리마다 그 언어의 제목·첫 문장으로.
+    env.globals["inspection_note_links"] = inspection_notes_page.glossary_links(
+        inspection_notes, DEFAULT_LANG)
+    en_env.globals["inspection_note_links"] = inspection_notes_page.glossary_links(
+        inspection_notes, "en")
     # [최근 규제 소식 2026-11-10] 정본(web/data/news.json)이 있을 때만 양 트리에 선언한다.
     news_data = news_page.load_news()
     if news_data:
@@ -8087,6 +8102,61 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 )
                 if _lg == DEFAULT_LANG:
                     facet_paths.append((_dcp.site_path, _dc_cc["measured_on"]))
+
+    # [실사 대비 노트 2026-11-15] 목록 1장 + 노트마다 1장, ko·en 같은 함수. 언어는 뷰가 정한다.
+    # 문서 링크는 그 트리에 문서 페이지가 실제로 서는 것만(영어판은 원문이 영어인 문서만) —
+    # 없으면 출처를 글자로만 적는다(깨진 링크 금지).
+    if inspection_notes:
+        _in_by_id = {n["id"]: n for n in inspection_notes}
+        _in_docs = {d["document_id"]: d["slug"]
+                    for d in (docs_data or {}).get("documents", []) if d.get("document_id")}
+        _in_terms = {t["id"]: t for t in (glossary_terms or [])}
+        for _lg, _pg, _em, _tr in trees:
+            _in_slugs = (_in_docs if _lg == DEFAULT_LANG
+                         else {k: v for k, v in _in_docs.items() if v in en_doc_slugs})
+            _in_term_labels = {tid: (t.get(f"term_{_lg}") or t.get("term_ko") or tid)
+                               for tid, t in _in_terms.items()
+                               if _lg == DEFAULT_LANG or f"glossary/{tid}/" in en_paths}
+            _in_sources = {s: (_tr(INSPECTION_NOTE_SOURCE_LABELS[s])
+                               if s in INSPECTION_NOTE_SOURCE_LABELS else s)
+                           for s in inspection_notes_page.SOURCES}
+            _inp = _pg(inspection_notes_page.ROUTE)
+            _em("inspection_notes.html", _inp,
+                page_title=_tr("실사 대비 노트 · GRM"),
+                nav_active="browse",
+                description=_tr(INSPECTION_NOTES_DESCRIPTION),
+                json_ld=_inp.breadcrumb_json_ld([
+                    (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"), (_tr("실사 대비 노트"), "")]),
+                groups=inspection_notes_page.index_view(inspection_notes, _lg),
+            )
+            if _lg == DEFAULT_LANG:
+                facet_paths.append((_inp.site_path, max(n["as_of"] for n in inspection_notes)))
+            for _note in inspection_notes:
+                _inq = _note[f"search_q_{_lg}"]
+                _inv = inspection_notes_page.note_view(
+                    _note, _lg, doc_slugs=_in_slugs, notes_by_id=_in_by_id,
+                    glossary_terms=_in_term_labels, source_labels=_in_sources,
+                    # 용어사전 사례 링크와 같은 꼴(본문 전용 검색 `&text=1`).
+                    search_href=f"findings/index.html?q={_url_quote(_inq, safe='')}&text=1",
+                    abs_url=lambda path, _l=_lg: PagePath(path, _l).canonical,
+                    copy_labels={"name": _tr("실사 대비 노트"), "as_of": _tr("기준일")},
+                )
+                _inpp = _pg(_inv["path"])
+                _em("inspection_note.html", _inpp,
+                    page_title=_tr("{title} 실사 대비 노트 · GRM", title=_inv["title"]),
+                    nav_active="browse",
+                    description=_tr(INSPECTION_NOTE_DESCRIPTION, title=_inv["title"]),
+                    json_ld=_inpp.breadcrumb_json_ld([
+                        (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
+                        (_tr("실사 대비 노트"), inspection_notes_page.ROUTE), (_inv["title"], "")]),
+                    note=_inv,
+                    # 한국어판 인용은 번역문, 영어판 인용은 원문이라 고지문이 다르다.
+                    notice=(_tr("AI 가 공개 지적을 묶어 정리하고 사람이 확인했습니다. 인용문은 지적 번역문 "
+                                "그대로이며, (b)(4) 는 원문에서 가려진 부분입니다. 기준일 {as_of}.",
+                                as_of=_inv["as_of"])),
+                )
+                if _lg == DEFAULT_LANG:
+                    facet_paths.append((_inpp.site_path, _note["as_of"]))
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전

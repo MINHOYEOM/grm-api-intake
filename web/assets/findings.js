@@ -345,6 +345,13 @@
   var filtersToggleBtn = document.getElementById("fnd-filters-toggle");
   var filtersBadgeEl = document.getElementById("fnd-filters-badge");
   var activeEl = document.getElementById("fnd-active"); // [M15] 적용 필터 칩 행
+  var advEl = document.getElementById("fnd-adv"); // [상세 필터 2026-11-16] 근거 수준·확인 상태
+  var advToggleBtn = document.getElementById("fnd-adv-toggle");
+  function setAdvOpen(open) {
+    if (!advEl || !advToggleBtn) return;
+    advEl.hidden = !open;
+    advToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
   var langNoteEl = document.getElementById("fnd-langnote"); // [다국어] 원문 언어 공지(영어 트리 전용)
   var textOnlyNoteEl = document.getElementById("fnd-textonlynote"); // [#804] 본문 전용 검색 공지(두 트리 공통)
 
@@ -1912,6 +1919,8 @@
   }
 
   function renderActiveChips() {
+    // 상세 필터 값이 걸려 있으면(URL·칩) 접힌 줄을 펼쳐 둔다 — 걸린 필터를 숨기지 않는다.
+    if (state.evidence_level || state.review_status) setAdvOpen(true);
     if (!activeEl) return;
     activeEl.innerHTML = "";
     var entries = ACTIVE_FILTER_DEFS.filter(function (def) { return !!state[def[0]]; });
@@ -2529,6 +2538,12 @@
       filtersToggleBtn.addEventListener("click", function () {
         var open = filtersEl.classList.toggle("open");
         filtersToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
+    // [상세 필터 2026-11-16] 근거 수준·확인 상태는 접힌 둘째 줄 — 버튼으로 펼친다.
+    if (advToggleBtn && advEl) {
+      advToggleBtn.addEventListener("click", function () {
+        setAdvOpen(advEl.hidden);
       });
     }
     // [FIND-1 M10c → 탭 3묶음 2026-11-11 · 대표 승인] 대시보드 세부지표(3블록 그리드)는 화면 폭과

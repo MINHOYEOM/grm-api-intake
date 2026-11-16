@@ -129,14 +129,14 @@ jobs:
           PYTHONIOENCODING: utf-8
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            # cron 경로는 dispatch 입력이 없다 -- 기본값(embed_input=B, version=1, 전량,
+            # cron 경로는 dispatch 입력이 없다 -- 기본값(embed_input=B, version=1, 신규분만 2,000행 상한,
             # 실제 upsert)으로 실행한다. 여기까지 온다는 것은 이미 위 job-level if 에서
             # ENABLE_FINDINGS_EMBED=true 를 확인했다는 뜻이다.
             DRY_RUN="false"
             EMBED_INPUT="B"
             EMBEDDING_VERSION="1"
-            LIMIT=""
-            NEW_ONLY="false"
+            LIMIT="2000"   # [11-16] 매일 신규분만·회차 상한 — 전량 upsert 는 Nano 를 45분 멈췄다(11-15)
+            NEW_ONLY="true"
           else
             DRY_RUN="${{ inputs.dry_run }}"
             EMBED_INPUT="${{ inputs.embed_input }}"

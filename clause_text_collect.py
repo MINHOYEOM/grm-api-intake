@@ -633,8 +633,8 @@ def write_translation_queue(retrieved: str) -> Path:
         if p.name == "translation_queue.json":
             continue
         obj = json.loads(p.read_text(encoding="utf-8"))
-        if obj.get("schema") != SCHEMA:
-            continue
+        if obj.get("schema") != SCHEMA or obj["source"].get("lang") == "ko":
+            continue  # 국문 원문(식약처)은 국문 번역 대상이 아니다
         for c in obj["clauses"]:
             if c.get("text"):
                 rows.append({"id": c["id"], "code": c["code"], "chars": c["chars"], "sha": c["sha"],
@@ -648,6 +648,184 @@ def write_translation_queue(retrieved: str) -> Path:
     return q
 
 
+# ── 식약처 「의약품 제조 및 품질관리에 관한 규정」(국문 원문) ─────────────────────────
+# 국가법령정보센터 행정규칙 화면에서 키 없이 받는다(Open API 는 OC 키가 있어야 한다 — 키가 생기면 개정 감시로).
+#   · 조문: admRulLsInfoR.do?admRulSeq=… 의 HTML(조문마다 <div class="pgroup">)
+#   · 별표 1~18: 같은 화면의 첨부(flDownload.do) PDF — HWP 에서 만든 PDF 라 글자 사이 공백 문자가 없어
+#     글자 상자 간격으로 띄어쓰기를 되살린다(줄 끝 띄어쓰기는 알 수 없어 한글-한글 줄바꿈은 붙인다).
+
+MFDS_RULE = {
+    "name": "의약품 제조 및 품질관리에 관한 규정",
+    "page": "https://www.law.go.kr/행정규칙/의약품제조및품질관리에관한규정",
+    "body": "https://www.law.go.kr/admRulLsInfoR.do?admRulSeq={seq}",
+}
+
+SOURCES["mfds_gmp"] = {
+    "title": "의약품 제조 및 품질관리에 관한 규정 (식품의약품안전처 고시) — 조문·별표 1~18",
+    "publisher": "식품의약품안전처 · 국가법령정보센터(법제처)",
+    "url": MFDS_RULE["page"],
+    "license": "법령·고시는 저작권법 제7조에 따라 보호받지 않는 저작물입니다. 국가법령정보센터 게시본을 "
+               "그대로 싣습니다(공식 효력은 관보·법령정보센터 원문).",
+    "license_url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=248133#0000",
+    "full_text": True,
+    "lang": "ko",
+}
+
+
+def _html_text(fragment: str) -> str:
+    import html as _h
+    return re.sub(r"\s+", " ", _h.unescape(re.sub(r"<[^>]+>", "", fragment))).strip()
+
+
+def parse_mfds_articles(body_html: str) -> dict[str, Any]:
+    """행정규칙 본문 HTML → {meta, articles}. 조문 = `<div class="pgroup">` 하나, 항(①②)은 <p> 하나씩.
+    부칙(제·개정 이력)은 조문이 아니라 싣지 않는다 — 공식 화면 링크로 갈음."""
+    meta = {}
+    m = re.search(r"\[시행\s*([^\]]+)\]\s*\[([^\]]+)\]", _html_text(body_html[:20000]))
+    if m:
+        meta = {"effective": m.group(1).strip(), "notice": m.group(2).strip()}
+    arts = []
+    for part in body_html.split('<div class="pgroup">')[1:]:
+        lab = re.search(r"<label[^>]*>([^<]*)</label>", part)
+        if not lab:
+            continue
+        label = _ws(lab.group(1))
+        lm = re.match(r"^(제\d+조(?:의\d+)?)\s*(?:\((.*)\))?$", label)
+        if not lm:
+            continue
+        paras = []
+        for p in re.findall(r"<p[^>]*>(.*?)</p>", part, flags=re.S):
+            t = _html_text(p)
+            if t.startswith(label):
+                t = t[len(label):].strip()
+            if t:
+                paras.append(t)
+        arts.append({"number": lm.group(1), "title": lm.group(2) or "", "text": "\n\n".join(paras)})
+    return {"meta": meta, "articles": arts}
+
+
+def kor_pdf_lines(path: Path) -> list[Line]:
+    """HWP 산 PDF → 줄(글자 상자 간격으로 띄어쓰기 복원). 머리말·쪽번호 정리는 finalize_lines 와 같다."""
+    import fitz
+
+    doc = fitz.open(str(path))
+    raw: list[Line] = []
+    for pno, page in enumerate(doc):
+        h = page.rect.height
+        for b in page.get_text("rawdict")["blocks"]:
+            for ln in b.get("lines", []):
+                out, prev, size = "", None, 0.0
+                for s in ln["spans"]:
+                    size = max(size, s["size"])
+                    for c in s["chars"]:
+                        if prev is not None and c["c"] != " " and prev["c"] != " " \
+                                and c["bbox"][0] - prev["bbox"][2] > s["size"] * 0.18:
+                            out += " "
+                        out += c["c"]
+                        prev = c
+                if out.strip():
+                    raw.append(Line(pno, ln["bbox"][1], ln["bbox"][3], ln["bbox"][0], size, out,
+                                    x1=ln["bbox"][2]))
+        raw.append(Line(pno, h, h, 0, 0, "\x00PAGE_END"))
+    return finalize_lines(raw)
+
+
+_KO_NUM = re.compile(r"^(\d{1,2}(?:\.\d{1,2}){0,3})(\.?)\s+(.+)$")
+_KO_ITEM = re.compile(r"^(?:[가-하]\.|\(\d+\)|\d+\)|[①-⑳]|[-•·○◦▪])\s?")
+_HANGUL = re.compile(r"[가-힣]")
+
+
+def _ko_title(rest: str) -> bool:
+    t = rest.strip()
+    return 0 < len(t) <= 40 and not t.endswith(("다.", "다", ".", ",")) and not _KO_ITEM.match(t)
+
+
+def split_kor_byl(lines: list[Line]) -> dict[str, Any]:
+    """별표 줄 → 조항. 번호 제목 줄('2.1 위험관리'·'1. 원칙')이 조항을 연다(단조 증가·제목 꼴일 때만).
+    번호 없는 줄은 이어 붙인다: 한글-한글 줄바꿈은 붙이고(글자 단위 줄바꿈), 그 밖은 공백.
+    '가.'·'(1)'·'①' 같은 항목은 새 문단. 첫 조항 전(별표 번호·제목)은 front_matter."""
+    front: list[str] = []
+    clauses: list[dict[str, Any]] = []
+    last: tuple[int, ...] | None = None
+    cur: dict[str, Any] | None = None
+    top_title = ""
+    for l in lines:
+        t = _ws(l.text)
+        if not t:
+            continue
+        if l.small and cur is not None:
+            cur["notes"].append(t)
+            continue
+        m = _KO_NUM.match(t)
+        if m and _ko_title(m.group(3)):
+            num = _num_tuple(m.group(1))
+            ok = (len(num) == 1 and m.group(2) == "." and (
+                    (last is None and num[0] == 1) or (last is not None and num[0] == last[0] + 1))) \
+                or (len(num) > 1 and last is not None and num > last
+                    and (num[0] == last[0] or (num[0] == last[0] + 1 and num[1] == 1)))
+            if ok:
+                last = num
+                if len(num) == 1:
+                    top_title = m.group(3).strip()
+                cur = {"number": m.group(1), "title": m.group(3).strip(),
+                       "path": [f"{num[0]}. {top_title}"] if len(num) > 1 and top_title else [],
+                       "paras": [], "notes": []}
+                clauses.append(cur)
+                continue
+        target = cur["paras"] if cur is not None else front
+        if not target or _KO_ITEM.match(t) or _KO_NUM.match(t):
+            target.append(t)
+        else:
+            prev = target[-1]
+            glue = "" if _HANGUL.match(prev[-1:]) and _HANGUL.match(t[:1]) else " "
+            target[-1] = prev + glue + t
+    for c in clauses:
+        c["text"] = "\n\n".join(c.pop("paras"))
+    return {"front_matter": "\n\n".join(front), "clauses": clauses}
+
+
+def build_mfds(dl: Path, seq: str) -> dict[str, Any]:
+    name = MFDS_RULE["name"]
+    body_url = MFDS_RULE["body"].format(seq=seq)
+    body = _fetch(body_url, dl / "mfds_body.html").read_text(encoding="utf-8")
+    parsed = parse_mfds_articles(body)
+    meta = parsed["meta"]
+    version = " · ".join(v for v in (meta.get("notice"), f"시행 {meta['effective']}" if meta.get("effective") else "") if v)
+    docs, clauses = [], []
+    docs.append({"key": "rule", "code": f"{name} 조문", "title": "", "url": MFDS_RULE["page"],
+                 "version": version, "front_matter": ""})
+    for a in parsed["articles"]:
+        slug = a["number"].replace("제", "").replace("조의", "-").replace("조", "")
+        clauses.append({"id": f"mfds_gmp/rule/{slug}", "source": "mfds_gmp", "doc": "rule",
+                        "number": a["number"], "slug": slug, "code": f"{name} {a['number']}",
+                        "title": a["title"], "path": [], "text": a["text"], "notes": [],
+                        "chars": len(a["text"]), "sha": _sha(a["text"]), "url": MFDS_RULE["page"]})
+    import html as _h
+    rows = re.findall(r'href="([^"]*flSeq=\d+&amp;flNm=([^"&]*)&amp;bylClsCd=\d+)">\s*<img alt="PDF', body)
+    from urllib.parse import unquote_plus
+    for href, nm in rows:
+        label = unquote_plus(nm)
+        bm = re.match(r"\[별표 (\d+)(?:의(\d+))?\]\s*(.*)$", label)
+        if not bm:
+            continue
+        key = f"byl{bm.group(1)}" + (f"-{bm.group(2)}" if bm.group(2) else "")
+        bno = f"별표 {bm.group(1)}" + (f"의{bm.group(2)}" if bm.group(2) else "")
+        url = "https://www.law.go.kr/LSW/" + _h.unescape(href)
+        pdf = _fetch(url, dl / f"mfds_{key}.pdf")
+        res = split_kor_byl(kor_pdf_lines(pdf))
+        code = f"{name} [{bno}]"
+        docs.append({"key": key, "code": code, "title": bm.group(3).strip(), "url": url,
+                     "version": version, "front_matter": res["front_matter"]})
+        for c in res["clauses"]:
+            slug = c["number"].replace(".", "-")
+            clauses.append({"id": f"mfds_gmp/{key}/{slug}", "source": "mfds_gmp", "doc": key,
+                            "number": c["number"], "slug": slug, "code": f"{code} {c['number']}",
+                            "title": c["title"], "path": c["path"], "text": c["text"],
+                            "notes": c["notes"], "chars": len(c["text"]), "sha": _sha(c["text"]),
+                            "url": url})
+    return {"docs": docs, "clauses": clauses}
+
+
 def main(argv: Iterable[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -656,7 +834,9 @@ def main(argv: Iterable[str] | None = None) -> int:
             pass
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--download-dir", required=True, type=Path)
-    ap.add_argument("--only", default="cfr21,eu_gmp,ich")
+    ap.add_argument("--only", default="cfr21,eu_gmp,ich,mfds_gmp")
+    ap.add_argument("--mfds-seq", default="2100000252026",
+                    help="국가법령정보센터 행정규칙 일련번호(admRulSeq) — 개정되면 바뀐다(2026-11-16 현행: 제2024-87호)")
     ap.add_argument("--retrieved", required=True, help="수집일 YYYY-MM-DD(결정론 — now() 를 쓰지 않는다)")
     a = ap.parse_args(list(argv) if argv is not None else None)
     want = set(a.only.split(","))
@@ -669,6 +849,9 @@ def main(argv: Iterable[str] | None = None) -> int:
     if "ich" in want:
         b = build_pdf_source("ich", ICH_DOCS, a.download_dir)
         print("ich", len(b["clauses"]), "; ".join(b["report"]), write_source("ich", b, a.retrieved))
+    if "mfds_gmp" in want:
+        b = build_mfds(a.download_dir, a.mfds_seq)
+        print("mfds_gmp", len(b["clauses"]), write_source("mfds_gmp", b, a.retrieved))
     print("queue", write_translation_queue(a.retrieved))
     return 0
 

@@ -1,18 +1,18 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-15",
+ "measured_on": "2026-11-16",
  "window_days": 60,
  "totals": {
-  "items": 447
+  "items": 439
  },
  "by_source": [
   {
    "v": "OpenFDA Recall",
-   "c": 141
+   "c": 135
   },
   {
    "v": "Federal Register",
-   "c": 80
+   "c": 79
   },
   {
    "v": "ECA Academy",
@@ -28,7 +28,7 @@
   },
   {
    "v": "Health Canada",
-   "c": 20
+   "c": 19
   },
   {
    "v": "ISPE",
@@ -3120,62 +3120,6 @@
    "published_date": "2026-09-17",
    "title": "Class 4 Medicines Defect Notification: Martindale Pharmaceuticals Ltd, Clobazam Martindale Pharma 5 mg/5 mL and 10 mg/5 mL Oral Suspension 150ml, EL(26)A/38",
    "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-martindale-pharmaceuticals-ltd-clobazam-martindale-pharma-5-mg-slash-5-ml-and-10-mg-slash-5-ml-oral-suspension-150ml-el-26-a-slash-38"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-16",
-   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Biological Products: Reporting of Biological Product Deviations and Human Cells, Tissues, and Cellular and Tissue-Based Product Deviations in Manufacturing",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/16/2026-18946/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-16",
-   "title": "[HC] Platinum Naturals Easymulti Stress (men): Affected lots incorrectly labelled for Vitamin B6 quantity",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/platinum-naturals-easymulti-stress-men-affected-lots-incorrectly-labelled-vitamin-b6"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class I",
-   "published_date": "2026-09-16",
-   "title": "0.9% Sodium Chloride Injection, USP, 100 mL Partial Fill in 150 mL PAB Container, Sterile, Rx only, B. Braun Medical Inc., Bethlehem, PA 18018 USA, NDC 0264-1800-32.",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class I",
-   "published_date": "2026-09-16",
-   "title": "Dextrose Injection, USP, 70 %, 2000 mL bags, Rx Only, Baxter Healthcare Corporation Deerfield, IL, 60016, Made in USA, NDC 00338-0719-06",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class I",
-   "published_date": "2026-09-16",
-   "title": "Epinephrine Injection, USP, 30 mg/30 mL (1mg/mL), 30 mL-Multiple-Dose Vial, Rx Only, For Intravenous Infusion, intramuscular and Subcutaneous Use, AMERICAN REGENT INC., SHIRLEY, NY 11967. NDC 0517-3030-01",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-16",
-   "title": "fentaNYL Citrate, 1,000 mcg/100 mL (10mcg/mL) Injection solution in 100 mL, 0.9% NaCl Bag, OurPharma LLC, 2512 S. City Lake, Fayetteville, AR, NDC 73013-1013-01.",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class III",
-   "published_date": "2026-09-16",
-   "title": "Fluphenazine Hydrochloride Tablets, USP, 1mg, 100-count bottles, Rx Only, Marketed by: Ajanta Pharma USA Inc., Bridgewater, NJ 08807, Made in India, NDC 27241-255-01.",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class III",
-   "published_date": "2026-09-16",
-   "title": "Povidone Iodine 1.25% / Proparacaine HCl 0.5% Ophthalmic Solution, 10 mL per dropper bottle, For Office Use Only, Imprimis NJOF, LLC, 1705 Route 46 West, Unit 6B, Ledgewood, NJ 07852, NDC 71384-732-10",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
   }
  ]
 }

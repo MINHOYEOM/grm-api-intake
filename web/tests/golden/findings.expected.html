@@ -96,11 +96,13 @@
       </button>
       <div class="fnd-filters" id="fnd-filters">
         <div class="fnd-field"><label for="fnd-f-source">소스</label><select id="fnd-f-source" data-key="source"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-evidence">근거 수준</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-status">확인 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category_code"><option value="">전체</option></select></div>
         <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div><div class="fnd-field"><label for="fnd-f-country">국가</label><select id="fnd-f-country" data-key="country"><option value="">전체</option></select></div>
-        <div class="fnd-field fnd-field--sort"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
+        <div class="fnd-field fnd-field--sort"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div><div class="fnd-field fnd-field--adv"><button class="fnd-adv-toggle" id="fnd-adv-toggle" type="button" aria-expanded="false" aria-controls="fnd-adv">상세 필터<i class="ti ti-chevron-down" aria-hidden="true"></i></button></div>
+        <div class="fnd-adv" id="fnd-adv" hidden>
+          <div class="fnd-field"><label for="fnd-f-evidence">근거 수준</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
+          <div class="fnd-field"><label for="fnd-f-status">확인 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
+        </div>
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>      <p class="fnd-textonlynote" id="fnd-textonlynote" hidden></p>
     </section>    <p class="fnd-total">문서 6,805건 · 지적 26,913건 · 2026-11-14 기준</p><section class="fnd-mine" id="fnd-mine" aria-label="내 범위의 최근 공개" hidden>
@@ -274,7 +276,15 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    min-content 는 **가장 긴 option 텍스트**다. 카테고리·소스 옵션은 findings.js 가 런타임에
    채우므로(예: "기타 품질시스템 (4,347)") 정적 폭 계산이 맞아도 데이터가 길어지면 트랙이
    밀려 다시 넘칠 수 있다. .fnd-dash-grid 와 같은 함정·같은 해법이다. */
-.fnd-filters{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(0,.92fr) minmax(0,1fr) minmax(0,1.95fr) minmax(0,.92fr) minmax(0,1.28fr) minmax(0,1.05fr);gap:14px 16px;align-items:flex-start}
+.fnd-filters{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(0,1.95fr) minmax(0,.92fr) minmax(0,1.28fr) minmax(0,1.05fr) minmax(0,.9fr);gap:14px 16px;align-items:flex-start}
+/* [상세 필터 2026-11-16] 줄 끝 버튼(라벨 높이만큼 내려 셀렉트와 같은 줄) + 펼치면 둘째 줄 전체 폭. */
+.fnd-field--adv{align-self:stretch;justify-content:flex-end;align-items:flex-start}
+.fnd-adv-toggle{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:36px;font:inherit;font-size:13px;font-weight:600;color:var(--body);background:transparent;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:0 12px;cursor:pointer;white-space:nowrap}
+.fnd-adv-toggle:hover{border-color:var(--coral);color:var(--coral-2)}
+.fnd-adv-toggle .ti{font-size:14px;transition:transform .15s}
+.fnd-adv-toggle[aria-expanded="true"] .ti{transform:rotate(180deg)}
+.fnd-adv{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,220px));gap:14px 16px;padding-top:12px;border-top:1px dashed var(--line)}
+.fnd-adv[hidden]{display:none}
 .fnd-field{display:flex;flex-direction:column;max-width:100%;min-width:0}
 /* §4 한글 안전(불가침, WebKoreanSafetyTest) — 스펙 원안의 자간 지정은 한글 라벨(소스/증거
    등급/검토 상태/카테고리/발행월/정렬)에 적용돼 사이트 전역 "한글 자간 금지" 계약을 깬다.
@@ -308,7 +318,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    글자를 자른다. 4열/3열 모두 트랙이 균등해 옛 flex-wrap 처럼 마지막 항목만 덩그러니
    남는 모양이 나오지 않는다. 구분선은 1행일 때만 뜻이 있으므로 함께 해제. */
 @media (max-width:1020px){
-  .fnd-filters{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .fnd-filters{grid-template-columns:repeat(3,minmax(0,1fr))}
   .fnd-field--sort{padding-left:0;border-left:0}
 }
 @media (max-width:820px){
@@ -318,6 +328,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .fnd-filters-toggle{display:inline-flex}
   .fnd-filters{display:none}
   .fnd-filters.open{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
+  .fnd-adv{grid-template-columns:repeat(2,minmax(0,1fr))}
   .fnd-field select{max-width:100%}
   .fnd-search{flex-wrap:wrap}
   .fnd-count{flex:1 0 100%;margin-top:6px}
@@ -620,7 +631,7 @@ if(_nt&&_nm){
 </script>
 <script src="/assets/pet.js?v=4433fce6" defer></script>
 <script src="/assets/site-popup.js?v=8b64d29c" defer></script>
-<script src="../assets/findings.js?v=2287d344" defer></script>
+<script src="../assets/findings.js?v=b20349ed" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

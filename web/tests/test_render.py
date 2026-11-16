@@ -2153,8 +2153,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn('id="fnd-f-agency"', self.html)
 
     def test_select_row_order_and_sort_at_end(self):
-        """[M15] 셀렉트 행 순서 = 소스·증거등급·검토상태·카테고리·발행월 + 우측 끝 정렬."""
-        order = ["fnd-f-source", "fnd-f-evidence", "fnd-f-status", "fnd-f-category", "fnd-f-month", "fnd-sort"]
+        """[M15→11-16] 첫 줄 = 소스·카테고리·발행월·국가 + 정렬, 그 뒤 상세 필터(근거 수준·확인 상태)."""
+        order = ["fnd-f-source", "fnd-f-category", "fnd-f-month", "fnd-f-country", "fnd-sort",
+                 "fnd-adv-toggle", "fnd-f-evidence", "fnd-f-status"]
         positions = [self.html.index(f'id="{fid}"') for fid in order]
         self.assertEqual(positions, sorted(positions), "필터 셀렉트 순서가 스펙과 다름")
 
@@ -2174,7 +2175,8 @@ class WebFindingsRenderTest(unittest.TestCase):
         rule = m.group(1)
         self.assertIn("display:grid", rule)
         self.assertNotIn("flex-wrap", rule)
-        self.assertEqual(7, rule.count("minmax(0,"), "7개 트랙 전부 minmax(0,…) 이어야 한다")
+        # 11-16: 근거 수준·확인 상태가 상세 필터 줄로 내려가 첫 줄은 5칸 + 상세 필터 버튼 = 6트랙.
+        self.assertEqual(6, rule.count("minmax(0,"), "6개 트랙 전부 minmax(0,…) 이어야 한다")
         # 필드별 고정 px 폭은 폐기 — 하나라도 남으면 합이 다시 컨테이너를 넘을 수 있다.
         for fid in ("fnd-f-source", "fnd-f-evidence", "fnd-f-status", "fnd-f-category",
                     "fnd-f-month", "fnd-f-country", "fnd-sort"):
@@ -2183,6 +2185,24 @@ class WebFindingsRenderTest(unittest.TestCase):
         sm = _re.search(r"\.fnd-field select\{([^}]*)\}", self.html)
         self.assertIsNotNone(sm)
         self.assertIn("width:100%", sm.group(1))
+
+    def test_rarely_used_filters_sit_in_collapsed_advanced_row(self):
+        """[상세 필터 2026-11-16 · 사용성 점검] 근거 수준·확인 상태는 자주 쓰지 않는다 — 첫 줄에서
+        빼 접힌 '상세 필터' 줄(#fnd-adv, hidden)로. id·data-key 는 그대로(배선·URL·칩 불변),
+        값이 걸려 있으면 findings.js 가 펼친다. 모바일 접기(#fnd-filters) 안에 있어야 한다."""
+        f = self.html.index('id="fnd-filters"')
+        adv = self.html.index('<div class="fnd-adv" id="fnd-adv" hidden>')
+        active = self.html.index('id="fnd-active"')
+        self.assertTrue(f < adv < active)
+        row1 = self.html[f:adv]
+        for fid in ("fnd-f-source", "fnd-f-category", "fnd-f-month", "fnd-f-country", "fnd-sort"):
+            self.assertIn(f'id="{fid}"', row1)
+        for fid in ("fnd-f-evidence", "fnd-f-status"):
+            self.assertNotIn(f'id="{fid}"', row1)
+            self.assertIn(f'id="{fid}"', self.html[adv:active])
+        self.assertIn('id="fnd-adv-toggle" type="button" aria-expanded="false" aria-controls="fnd-adv"', row1)
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("if (state.evidence_level || state.review_status) setAdvOpen(true);", js_src)
 
     def test_sort_field_separated_from_filters(self):
         """[M2c] 정렬은 결과를 좁히지 않고 순서만 바꾼다 — 같은 행에 두되 세로 구분선으로
@@ -2237,7 +2257,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         #fnd-filters 가 </div> 로 닫힌 *직후* 형제로 오는지 마크업 인접성으로 확인한다."""
         self.assertIn('<div class="fnd-active" id="fnd-active" hidden></div>', self.html)
         self.assertIn(
-            '</select></div>\n      </div>\n      <div class="fnd-active" id="fnd-active" hidden></div>',
+            '</select></div>\n        </div>\n      </div>\n      <div class="fnd-active" id="fnd-active" hidden></div>',
             self.html,
             "#fnd-active 가 #fnd-filters 의 형제(밖)로 배치되지 않음",
         )
@@ -19808,6 +19828,9 @@ class WebEnTreeTest(unittest.TestCase):
         # (렌더와 같은 로더·같은 함수 — routes_present 가 실제로 그릴 면만 돌려준다).
         cls.expected |= set(render.deficiency_cases_page.routes_present(
             render.deficiency_cases_page.load_snapshot(render.DEFICIENCY_CASES_FILE)))
+        # [기준 조항 원문 2026-11-15] 정본(web/data/clauses/*.json)에서 파생 — 렌더와 같은 함수.
+        cls.expected |= render.clause_text_page.tree_paths(
+            render.clause_text_page.build(render.clause_text_page.load_sources()))
         # [실사 대비 노트 2026-11-15] 노트가 있으면 목록 1 + 노트 N 면이 선다(렌더와 같은 로더·같은 함수).
         cls.expected |= render.inspection_notes_page.routes_present(
             render.inspection_notes_page.load_notes())

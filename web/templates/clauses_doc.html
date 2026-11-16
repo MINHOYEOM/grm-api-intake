@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [기준 조항 원문] /clauses/{src}/{doc}/ — 문서 1건의 조항 목차. 소제목뿐인 번호는 글자로만, 본문 있는
+    조항은 그 조항 페이지로. 미리보기는 화면에서만 줄인다(CSS 말줄임 · 데이터 무절단). -#}
+{% include "partials/clauses_style.html" %}
+<main>
+  <div class="wrap">
+    <nav class="ct-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}clauses/">{{ _('기준 조항 원문') }}</a><i>&rsaquo;</i><span>{{ doc.code }}</span>
+    </nav>
+    <p class="kick">{{ doc.source.kick }}</p>
+    <h1 class="ct-h1">{{ doc.code }}</h1>
+    {%- if doc.title %}<p class="ct-sub" lang="en">{{ doc.title }}</p>{% endif %}
+    {%- if doc.version %}<p class="ct-path" lang="en">{{ doc.version }}</p>{% endif %}
+    <div class="ct-links" style="margin-top:16px">
+      <a href="{{ doc.url }}" target="_blank" rel="noopener">{{ _('공식 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
+    </div>
+  </div>
+  <div class="wrap ct-body">
+    <section>
+      <h2 class="ct-sec-h">{{ _('조항 목차') }}</h2>
+      <ol class="ct-toc">
+        {%- for c in doc.clauses %}
+        {%- if c.href %}
+        <li id="{{ c.anchor }}" class="d{{ c.depth if c.depth < 4 else 3 }}"><span class="n">{{ c.number }}</span><a href="{{ rel_root }}{{ c.href }}" lang="en">{{ c.title or c.preview }}</a></li>
+        {%- else %}
+        <li id="{{ c.anchor }}" class="h d{{ c.depth if c.depth < 4 else 3 }}"><span class="n">{{ c.number }}</span><span lang="en">{{ c.title }}</span></li>
+        {%- endif %}
+        {%- endfor %}
+      </ol>
+    </section>
+    {%- if doc.front_matter %}
+    <details class="ct-front">
+      <summary>{{ _('표지·목차 원문') }}</summary>
+      <div lang="en">{% for p in doc.front_matter %}<p>{{ p }}</p>{% endfor %}</div>
+    </details>
+    {%- endif %}
+    <p class="ct-note">{{ _('출처') }}: <a href="{{ doc.source.url }}" target="_blank" rel="noopener">{{ doc.source.publisher }}</a> &middot; {{ doc.source.license }} &middot; {{ _('수집일 {d}', d=doc.source.retrieved) }}</p>
+  </div>
+</main>
+{% endblock %}

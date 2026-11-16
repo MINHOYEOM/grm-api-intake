@@ -7,6 +7,8 @@
     python company/editorial/shard_claim.py status <run_folder>
     python company/editorial/shard_claim.py next   <run_folder> <delta|deep>       # 가져갈 샤드 한 줄(없으면 NONE)
     python company/editorial/shard_claim.py claim  <run_folder> <delta|deep> <샤드> <워커id>   # 0=내가 잡음, 1=졌음
+    python company/editorial/shard_claim.py claim  <run_folder> desk desk <데스크id>          # 데스크 잠금(RUN.md 5-2)
+    python company/editorial/shard_claim.py desk   <run_folder>                              # done|held|stale|free
 
 · 샤드 상태 — 완료(`{kind}.{S}.json` 의 status=완료) · 점유(claim 파일, 만든 지 STALE_MIN 분 이내) · 비어 있음.
   점유한 지 STALE_MIN 분이 넘도록 결과가 없으면 죽은 워커로 보고 **가로챌 수 있다**(다른 워커가 덮어쓴다).
@@ -43,12 +45,21 @@ def shard_names(plan, kind):
     return names
 
 
+def _result_path(folder, kind, shard):
+    # 데스크 잠금(RUN.md 5-2): 데스크는 샤드가 없다 — 결과는 `desk.json` 하나, 잠금은 `claims/desk.claim`.
+    if kind == "desk":
+        return os.path.join(folder, "desk.json")
+    return os.path.join(folder, f"{kind}.{shard}.json")
+
+
 def _result_done(folder, kind, shard):
-    part = _load(os.path.join(folder, f"{kind}.{shard}.json"))
+    part = _load(_result_path(folder, kind, shard))
     return bool(part) and part.get("status") == "완료"
 
 
 def _claim_path(folder, kind, shard):
+    if kind == "desk":
+        return os.path.join(folder, "claims", "desk.claim")
     return os.path.join(folder, "claims", f"{kind}.{shard}.claim")
 
 
@@ -159,6 +170,12 @@ def main(argv):
     if cmd == "next":
         s = next_shard(folder, argv[3])
         print(s or "NONE")
+        return 0
+    if cmd == "desk":
+        if _result_done(folder, "desk", "desk"):
+            print("done")
+        else:
+            print(_claim_state(folder, "desk", "desk", time.time())[0])
         return 0
     if cmd == "claim":
         return 0 if claim(folder, argv[3], argv[4], argv[5]) else 1

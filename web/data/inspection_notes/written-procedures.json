@@ -1,0 +1,113 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "written-procedures", "as_of": "2026-11-15",
+  "area_ko": "데이터와 기록", "area_en": "Data and records",
+  "title_ko": "절차서 준수", "title_en": "Following written procedures",
+  "glossary_ids": ["written-procedure", "sop"],
+  "aliases_ko": ["서면 절차", "표준작업절차서", "SOP"],
+  "aliases_en": ["written procedure", "SOP", "standard operating procedure"],
+  "search_q_ko": "서면 절차", "search_q_en": "written procedure",
+  "lead_ko": "FDA 는 절차서를 갖췄는지보다, 현장의 작업이 절차서가 정한 대로 이루어지고 절차서가 그 작업을 다룰 만큼 갖춰져 있는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether written procedures exist than at whether work on the floor is done as they require and whether they actually cover that work. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "절차서가 요구하는 조건대로 작업하지 않았다",
+      "title_en": "Work was not performed under the conditions the written procedure requires",
+      "quotes": [
+        { "finding_id": "finding-968a806630ceb90c81c9b6bc", "raw_signal_id": "rawsig-8bd85b1c90b8769324cd77be", "document_id": "0e8eb5dffc14", "source": "FDA Warning Letter",
+          "firm": "Baxter Healthcare Corporation", "date": "2023-08-01",
+          "quote_ko": "인력이 무균 주사제 단위에 대한 100% 수동 육안검사를 귀사의 문서화된 절차가 요구하는 최소 시간보다 짧게 수행했다.",
+          "quote_en": "Personnel performed 100% manual visual inspection of sterile injectable units for less than the minimum amount of time required by your written procedures." },
+        { "finding_id": "finding-f5032d02fd3e1f3f02f144e6", "raw_signal_id": "rawsig-d6746576f6db98649e0c9173", "document_id": "d5fbf9683272", "source": "FDA Warning Letter",
+          "firm": "EyePoint Pharmaceuticals, Inc.", "date": "2024-08-27",
+          "quote_ko": "비투과성 실리콘 캡과 방출속도 조절 polyvinyl alcohol 캡을 도포하는 데 사용하는 (b)(4) 기계가, 공급업체와 귀사의 서면 절차가 요구하는 (b)(4)보다 낮은 공기 공급 라인 압력 (b)(4)으로 사용되고 있는 것이 확인되었다.",
+          "quote_en": "The (b)(4) machines used to apply nonpermeable silicone cap and the release rate controlling polyvinyl alcohol cap were noted to be used with air supply line pressures (b)(4) that are lower than the (b)(4) required by the vendor and by your written procedure." }
+      ]
+    },
+    {
+      "title_ko": "절차서가 정한 조사를 개시하지 않았다",
+      "title_en": "Investigations called for by the procedure were not opened",
+      "quotes": [
+        { "finding_id": "finding-9432918cbf2aec9ccc7a8e94", "raw_signal_id": "rawsig-f5f374d1f04d9f593c054afd", "document_id": "4db9e979bf04", "source": "FDA Warning Letter",
+          "firm": "UCSF Radiopharmaceutical Facility", "date": "2026-04-21",
+          "quote_ko": "귀사의 품질부서(QU)는 표준작업절차서(SOP) SOP Q043 \"Laminar Flow Hood Environmental Monitoring\"이 요구하는 대로 생산 구역의 불리한 EM 추세를 조사하지 않았다.",
+          "quote_en": "Your quality unit (QU) did not investigate adverse EM trends in your production areas as required by your standard operating procedure (SOP), SOP Q043 “Laminar Flow Hood Environmental Monitoring.”" },
+        { "finding_id": "finding-25fd9100b4c73fb1c434c049", "raw_signal_id": "rawsig-96a80f5b47038543adca06c4", "document_id": "fda483-94794", "source": "FDA 483",
+          "firm": "RXQ Compounding LLC", "date": "2024-01-17",
+          "quote_ko": "구체적으로, 귀사는 의약품 보관용 냉장고가 설정된 한계를 벗어났을 때 귀사의 SOP 008 \"Use, Calibration and Maintenance of the Drug Product Refrigerator and Freezer\" 에 따른 조사를 개시하지 않았다.",
+          "quote_en": "Specifically, you did not open an investigation per your SOP 008 entitled, \"Use, Calibration and Maintenance of the Drug Product Refrigerator and Freezer\" when the refrigerator used to store drug products was out of established limits." }
+      ]
+    },
+    {
+      "title_ko": "절차서가 요구하는 단계를 거치지 않았다",
+      "title_en": "Steps required by the procedure were not carried out",
+      "quotes": [
+        { "finding_id": "finding-dc4537bbc48118fbba8dc32b", "raw_signal_id": "rawsig-4bb1aa91056bcd14e6ca28bb", "document_id": "fda483-195321", "source": "FDA 483",
+          "firm": "Biomylz Private Limited", "date": "2026-10-22",
+          "quote_ko": "구체적으로 귀사는 모든 관리 인쇄본이 품질 보증으로 반환되어 대조되었는지 확인하기 위해 \"Formats/Document Issuance & Retrieval Log\"라는 제목의 기록부(장부 번호: [redacted], 참조 SOP: QAD/004 II)가 요구하는 문서 회수를 수행하지 않았다.",
+          "quote_en": "Specifically, your firm did not perform document retrieval as required by logbook (Book Number: [redacted] titled “Formats/Document Issuance & Retrieval Log”, Reference SOP: QAD/004 II, to ensure that all controlled printed copies were returned to Quality Assurance and reconciled." },
+        { "finding_id": "finding-04ef2d86ea86efce59053af8", "raw_signal_id": "rawsig-16ebd0afdab6ccf0c2001cdd", "document_id": "fda483-190241", "source": "FDA 483",
+          "firm": "UBI Pharma Inc.", "date": "2025-12-18",
+          "quote_ko": "SOP 번호 P818 판 08 제품 불만 처리(시행일 12/13/2024)의 5.1.2항은 “QA 감독자는 조사를 용이하게 하도록 고객으로부터 불만 검체를 확보해야 한다”고 요구한다. 귀사는 불만 검체 확보의 문서화된 증거가 없다.",
+          "quote_en": "Section 5.1.2 of SOP No. P818 Version 08 Handling of Product Complaints (Effective date 12/13/2024) requires, \"QA supervisor should acquire the complaint sample(s) from the customer to facilitate the investigation\". You do not have any documentaiy evidence for acquiring the complaint samples." }
+      ]
+    },
+    {
+      "title_ko": "해당 작업을 다루는 절차서가 없었다",
+      "title_en": "There was no written procedure covering the activity",
+      "quotes": [
+        { "finding_id": "finding-3a1d1827ce0727ecbb00ff6e", "raw_signal_id": "rawsig-33dd51620acc3e30cbf96f87", "document_id": "eb1e680fec98", "source": "FDA Warning Letter",
+          "firm": "Safrel Pharmaceuticals LLC", "date": "2026-08-18",
+          "quote_ko": "귀사에는 완제의약품을 어떻게 입고하고, 출하 전 격리 보관하며, 적절한 조건에서 보관하고, 유통을 승인하는지를 기술한 문서화된 절차가 없다.",
+          "quote_en": "Your firm has no written procedures describing how finished drug products are to be received, quarantined before release, stored under appropriate conditions, and approved for distribution." },
+        { "finding_id": "finding-c80329a180369d64969a6db7", "raw_signal_id": "rawsig-be6c42cf01e74a12bec881de", "document_id": "32bd6b7bc56a", "source": "FDA Warning Letter",
+          "firm": "Tentamus India Private Limited", "date": "2026-03-10",
+          "quote_ko": "또한 시험실 직원은 절차, 분석 관찰 사항, 결과, 시험법 변경, 일탈 설명을 기록하는 데 비공식 개인 일지를 사용했다. 귀사는 이러한 개인 일지의 사용을 관리하고 모든 CGMP 데이터의 적절한 보존을 보장하는 절차를 갖추지 못했다.",
+          "quote_en": "Additionally, laboratory staff used unofficial personal diaries to record procedures, analytical observations, results, method modifications, and deviation descriptions. Your firm lacked procedures to control the use of these personal diaries and to ensure proper retention of all CGMP data." }
+      ]
+    },
+    {
+      "title_ko": "절차서에 필요한 지침이나 요구 사항이 들어 있지 않았다",
+      "title_en": "The procedure did not contain the instructions or requirements it needed",
+      "quotes": [
+        { "finding_id": "finding-be7c8e5c970038186dd78cfc", "raw_signal_id": "rawsig-feaf377ba22a2376f17a4579", "document_id": "fda483-195433", "source": "FDA 483",
+          "firm": "SAFC Pharma Carlsbad", "date": "2026-10-26",
+          "quote_ko": "SOP [redacted] 버전 7.0, 예방 유지보수(PM) 프로그램에는 PM 또는 교정 기한이 지난 장비 평가 지침이 없다.",
+          "quote_en": "SOP, [redacted] Version 7.0, Preventative Maintenance (PM) Program, does not provide instructions for the assessment of equipment that is overdue for PM or calibration." },
+        { "finding_id": "finding-7c06dd976e28f4aebe2b4b00", "raw_signal_id": "rawsig-2403dee9aacb2956f09c7436", "document_id": "fda483-195545", "source": "FDA 483",
+          "firm": "Clongen Laboratories, LLC", "date": "2026-10-30",
+          "quote_ko": "SOP ADMIN006, 표준작업절차서 작성 방법은 기술 또는 QA 절차의 검토와 승인을 요구하지 않는다. 관리 대상 SOP에 대한 QA 검토 증거는 발견되지 않았다.",
+          "quote_en": "SOP ADMIN006, How to Write a Standard Operating Procedure, does not require review and approval of any technical or QA procedures. No evidence was found of any QA review of any controlled SOPs." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.100(a)", "finding_id": "finding-f5032d02fd3e1f3f02f144e6", "firm": "EyePoint Pharmaceuticals, Inc.", "date": "2024-08-27",
+      "quote_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 확인(identity), 함량(strength), 품질(quality), 순도(purity)를 갖도록 보장하기 위한 생산 및 공정 관리의 적절한 서면 절차를 수립하지 않았고, 모든 서면 생산 및 공정 관리 절차를 따르지 않았다",
+      "quote_en": "Your firm failed to establish adequate written procedures for production and process control designed to assure that drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess, and to follow all of your written production and process control procedures",
+      "note_ko": "공급업체와 서면 절차가 요구하는 것보다 낮은 공기 공급 압력으로 캡 도포 기계를 사용한 점이 211.100(a)와 211.100(b)로 함께 지적됐습니다.",
+      "note_en": "Running the cap-applying machines at air supply pressures lower than the vendor and the written procedure require was cited under 211.100(a) and 211.100(b) together." },
+    { "key": "21 CFR 211.100(b)", "finding_id": "finding-968a806630ceb90c81c9b6bc", "firm": "Baxter Healthcare Corporation", "date": "2023-08-01",
+      "quote_ko": "귀사는 제조하는 의약품이 갖추고 있다고 표방하거나 표시된 확인(identity), 함량(strength), 품질, 순도를 보증하도록 설계된 생산 및 공정 관리에 대한 적절한 문서화된 절차를 수립하지 않았으며, 문서화된 모든 생산 및 공정 관리 절차를 따르지 않았다",
+      "quote_en": "Your firm failed to establish adequate written procedures for production and process control designed to assure that drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess, and to follow all of your written production and process control procedures",
+      "note_ko": "절차가 요구하는 최소 시간보다 짧게 수동 육안검사를 수행한 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Performing manual visual inspection for less than the minimum time the procedures require was cited under this clause." }
+  ],
+  "checks_ko": [
+    "수동 육안검사 시간이나 설비의 공기 공급 압력처럼 절차서가 정한 조건을 실제 작업에서 지킵니까",
+    "보관 냉장고 온도가 한계를 벗어나거나 불리한 추세가 나타났을 때 절차서가 정한 조사를 개시합니까",
+    "발행한 관리 문서 인쇄본을 절차서대로 회수해 대조하고, 불만 검체를 절차서대로 확보한 기록이 있습니까",
+    "완제의약품의 입고, 출하 전 격리 보관, 보관 조건, 유통 승인을 기술한 절차서가 있습니까",
+    "시험실 직원이 비공식 개인 일지에 기록하는 일이 없고, 그런 기록의 사용과 보존을 다루는 절차가 있습니까",
+    "예방 유지보수 절차서에 기한이 지난 장비를 평가하는 지침이 있고, 절차서 작성 규정이 QA 의 검토와 승인을 요구합니까"
+  ],
+  "checks_en": [
+    "Are conditions set by the procedure, such as manual visual inspection time or equipment air supply pressure, kept in actual work?",
+    "Is the investigation called for by the procedure opened when a storage refrigerator goes out of limits or an adverse trend appears?",
+    "Are issued controlled copies retrieved and reconciled as the procedure requires, and is there a record that complaint samples were acquired as the procedure requires?",
+    "Is there a written procedure describing how finished drug products are received, quarantined before release, stored, and approved for distribution?",
+    "Are laboratory staff kept from recording in unofficial personal diaries, and is there a procedure covering the use and retention of such records?",
+    "Does the preventive maintenance procedure give instructions for assessing overdue equipment, and does the procedure for writing SOPs require QA review and approval?"
+  ],
+  "further_reading": [],
+  "related": ["batch-records", "capa"]
+}

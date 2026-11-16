@@ -1,0 +1,102 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "cross-contamination-cleaning", "as_of": "2026-11-15",
+  "area_ko": "무균·오염 관리", "area_en": "Sterility and contamination control",
+  "title_ko": "교차오염과 세척 밸리데이션", "title_en": "Cross-contamination and cleaning validation",
+  "glossary_ids": ["cross-contamination", "cleaning-validation"],
+  "aliases_ko": ["교차 오염", "세척 검증", "세척밸리데이션"],
+  "aliases_en": ["cross-contamination", "cleaning validation"],
+  "search_q_ko": "세척 밸리데이션", "search_q_en": "cleaning validation",
+  "lead_ko": "FDA 는 세척 절차가 있는지보다, 그 절차로 설비의 잔류물이 실제로 제거된다는 것을 밝혀 두었는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a cleaning procedure exists than at whether it has been shown to actually remove residue from equipment. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "공용 설비의 세척을 밸리데이션하지 않았다", "title_en": "Cleaning of shared equipment was not validated",
+      "quotes": [
+        { "finding_id": "finding-bf6f4d1180221604d7e2e752", "raw_signal_id": "rawsig-6acae14e0539115d9210e402", "document_id": "03dfb7e91f6b", "source": "FDA Warning Letter",
+          "firm": "Woodbine Products Company Inc.", "date": "2026-08-04",
+          "quote_ko": "귀사는 또한 OTC 의약품 제조에 사용하는 비전용(non-dedicated) 장비의 세척 공정을 밸리데이션하지 않았다.",
+          "quote_en": "Your firm also failed to validate your cleaning processes for non-dedicated equipment used to manufacture your OTC drug products." },
+        { "finding_id": "finding-c24891dfe9e11456dacd1734", "raw_signal_id": "rawsig-16bad582f190444b0d378313", "document_id": "fda483-195384", "source": "FDA 483",
+          "firm": "Paxeuticals LLC", "date": "2026-10-27",
+          "quote_ko": "귀사는 완제의약품 [redacted] 및 [redacted]와 여러 [redacted] 제품의 포장에 사용하는 공용 장비 세척용 SOP #10, 포장실 및 장비 세척 및 소독 절차, 시행일 02/01/2024의 장비 세척을 검증하기 위한 장비 세척 밸리데이션 연구를 완료하지 않았다.",
+          "quote_en": "You have not completed equipment cleaning validation studies to validate equipment cleaning SOP #10, Cleaning and Sanitization Procedure Packaging Room and Equipment, effective date 02/01/2024 which is used for the cleaning of shared equipment used in the packaging of the drug products [redacted] and [redacted] as well as several [redacted] products." }
+      ] },
+    { "title_ko": "설비와 작업 구역에 잔류물이 남아 있었다", "title_en": "Residue was left on equipment and in the work area",
+      "quotes": [
+        { "finding_id": "finding-f6df81d1d3c6478c09369d96", "raw_signal_id": "rawsig-8769bdc2c45fd91332794773", "document_id": "d892dc1bd355", "source": "FDA Warning Letter",
+          "firm": "Lico Industries, LLC., d.b.a. American Towelette Company", "date": "2026-08-11",
+          "quote_ko": "예를 들어 당국 조사관은 충전 라인의 튜브 내부에 (b)(4) 제품 잔류물이 고여 있고, 완제의약품과 직접 접촉하는 틈새와 표면에 잔류물이 축적되어 있는 것을 관찰하였다.",
+          "quote_en": "For example, our investigator observed stagnant (b)(4) product residue inside the tubing on the filling line with residue accumulating in crevices and on surfaces that come into direct contact with the drug product." },
+        { "finding_id": "finding-42ff66fd4370d4c3967a28c4", "raw_signal_id": "rawsig-b2e1d3809901a2207b1a7e6f", "document_id": "fda483-195347", "source": "FDA 483",
+          "firm": "GOJO Industries LLC", "date": "2026-10-23",
+          "quote_ko": "01/06/2026에 칭량 구역의 벽, 바닥 및 칭량되는 제품 위에 위치한 분진 흡입관에서 흰색 분말로 보이는 잔류물이 관찰되었다.",
+          "quote_en": "On 01/06/2026 dispensing bay was observed with remains of apparent white powder residue on the walls, floor, and on the dust snorkel which sits above the product being weighed out." }
+      ] },
+    { "title_ko": "세척 전후 설비 유지시간을 연구로 뒷받침하지 않았다", "title_en": "Dirty and clean hold times for equipment were not supported by studies",
+      "quotes": [
+        { "finding_id": "finding-3a85583c6bdd75226a67de12", "raw_signal_id": "rawsig-ef5e6d7fd0b9b185abb3ac43", "document_id": "fda483-195303", "source": "FDA 483",
+          "firm": "Shilpa Medicare Limited", "date": "2026-10-22",
+          "quote_ko": "그러나 제조소 신제품 도입 시 SOP # UNIT PR/SOP/0017-02 “청결·오염 장비 보관 시간, 시행일 03/08/2026” 요구에 따라 (2022년 최악 조건 분자) 및 (2023-2024년 최악 조건 분자) 후 세척 후 보관 시간(CHT) 및 오염 상태 보관 시간(DHT) 연구를 하지 않았다.",
+          "quote_en": "Yet, you have not performed a Clean Hold Time (CHT) and Dirty Hold Time Study (DHT) after (as worst-case molecule in 2022) and (as worst-case molecule in 2023-2024) as required per SOP # UNIT PR/SOP/0017-02 “Cleaned and Dirty Equipment Hold Time, effective date 03/08/2026” as introduction of new product at the site." },
+        { "finding_id": "finding-76f7fe00895d2a7d0982bc65", "raw_signal_id": "rawsig-6b176a4156cbd1e67eab33f5", "document_id": "fda483-195314", "source": "FDA 483",
+          "firm": "Blossom Pharmaceuticals", "date": "2026-10-22",
+          "quote_ko": "적절한 연구 없이 장비의 세척 후 보관 시간(CHT) [redacted] 및 오염 상태 보관 시간(DHT) o [redacted]를 확립했다.",
+          "quote_en": "You established a clean hold time (CHT) of [redacted] and a dirty hold time (DHT) o [redacted] for equipment without performing adequate studies to support the CHT and DHT." }
+      ] },
+    { "title_ko": "베타락탐 계열 제품을 다른 제품과 분리하지 않았다", "title_en": "Beta-lactam products were not separated from other products",
+      "quotes": [
+        { "finding_id": "finding-004093dc2b71a9dab6cad3f9", "raw_signal_id": "rawsig-cd075575fb61eae910852b8d", "document_id": "8b9b6af44436", "source": "FDA Warning Letter",
+          "firm": "Baxter International Inc.", "date": "2026-10-20",
+          "quote_ko": "귀사는 이 공유 시설에서 세팔로스포린 의약품과 (b)(4) 의약품을 완전하고 포괄적으로 분리하지 못했다.",
+          "quote_en": "You failed to ensure complete and comprehensive separation of cephalosporin and (b)(4) drug products in this shared facility." },
+        { "finding_id": "finding-9676794391aa147930901038", "raw_signal_id": "rawsig-2b177d01775f8f9b5a98a005", "document_id": "fda483-185430", "source": "FDA 483",
+          "firm": "Pine Pharmaceuticals, LLC", "date": "2025-02-12",
+          "quote_ko": "구체적으로, 귀사는 베타락탐이 아닌 의약품과 같은 시설에서 재포장되는 비페니실린 베타락탐 의약품의 교차오염을 방지하기 위한 별도의 전용 시설을 갖추지 못했다.",
+          "quote_en": "Specifically, Your firm failed to have separate dedicated facilities to prevent cross contamination of non-penicillin beta-lactam drug products that are repackaged in the same facility as non-beta-lactam drug products." }
+      ] },
+    { "title_ko": "세척 기록에 수행한 내용과 확인 시점을 그대로 남기지 않았다", "title_en": "Cleaning records did not show what was done or when it was verified",
+      "quotes": [
+        { "finding_id": "finding-9c1193ce25c4089f08ceffb6", "raw_signal_id": "rawsig-96ad67337ef1a395f23ddffa", "document_id": "0af7c14e5949", "source": "FDA Warning Letter",
+          "firm": "Stream2Sea, LLC", "date": "2026-09-29",
+          "quote_ko": "또한 OTC 의약품과 화장품 제조에 공용으로 사용하는 설비에 대해 수행한 세척 유형이나 사용한 특정 세척제를 적절히 기록하지 않았다.",
+          "quote_en": "In addition, you failed to adequately document the type of cleaning performed or the specific cleaning agent used to clean your equipment that is shared to manufacture both your OTC drug products and cosmetics." },
+        { "finding_id": "finding-e52f1239e6f9d6acc84adaf6", "raw_signal_id": "rawsig-845e36e304d8d1d211092a14", "document_id": "fda483-196144", "source": "FDA 483",
+          "firm": "LeeSar Inc", "date": "2026-11-05",
+          "quote_ko": "세척 기록에서 QA 확인자가 세척 작업이 수행된 지 며칠 후에 세척 기록에 이니셜과 날짜를 기재한 사례가 여러 건 관찰되었다.",
+          "quote_en": "Multiple instances were observed on your cleaning records where the QA verifier initialed and dated the cleaning records days after the cleaning operations were performed." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.67(b)", "finding_id": "finding-9c1193ce25c4089f08ceffb6", "firm": "Stream2Sea, LLC", "date": "2026-09-29",
+      "quote_ko": "귀사는 설비의 세척 및 유지관리를 위한 적절한 절차서를 수립하고 준수하지 않았다",
+      "quote_en": "Your firm failed to establish and follow adequate written procedures for cleaning and maintenance of equipment",
+      "note_ko": "공용 설비의 세척 유형과 세척제를 기록하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Failing to record the type of cleaning and the cleaning agent for shared equipment was cited under this clause." },
+    { "key": "21 CFR 211.67(a)", "finding_id": "finding-f6df81d1d3c6478c09369d96", "firm": "Lico Industries, LLC., d.b.a. American Towelette Company", "date": "2026-08-11",
+      "quote_ko": "귀사는 완제의약품의 안전성·확인시험·함량·품질·순도를 공정서 또는 그 밖에 정해진 요건을 벗어나도록 변경시킬 수 있는 오작동이나 오염을 방지하기 위하여, 적절한 주기로 설비와 기구를 세척·유지관리하고 의약품의 특성에 따라 적절히 소독 및/또는 멸균하지 못하였다",
+      "quote_en": "Your firm failed to clean, maintain, and, as appropriate for the nature of the drug, sanitize and/or sterilize equipment and utensils at appropriate intervals to prevent malfunctions or contamination that would alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements",
+      "note_ko": "충전 라인의 제품 접촉 표면에 잔류물이 쌓여 있던 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Residue accumulating on product-contact surfaces of the filling line was cited under this clause." },
+    { "key": "21 CFR 211.42(c)", "finding_id": "finding-004093dc2b71a9dab6cad3f9", "firm": "Baxter International Inc.", "date": "2026-10-20",
+      "quote_ko": "귀사는 오염 또는 혼입을 방지하는 데 필요한, 충분한 크기의 특정하게 정의된 구역 안에서 작업을 수행하지 않았고, 분리되었거나 정의된 구역 또는 그 밖의 관리 체계를 갖추지 않았다",
+      "quote_en": "Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups",
+      "note_ko": "세팔로스포린과 다른 의약품을 한 시설에서 만들면서 분리하지 못한 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Failing to separate cephalosporin products from other drug products in a shared facility was cited under this clause." }
+  ],
+  "checks_ko": [
+    "여러 제품에 쓰는 공용 설비마다 세척 밸리데이션 연구를 완료했습니까",
+    "세척을 마친 설비의 튜브 내부, 틈새, 제품 접촉 표면에 잔류물이 남아 있지 않습니까",
+    "칭량 구역의 벽, 바닥, 분진 흡입관에 분말 잔류물이 남아 있지 않습니까",
+    "세척 후 보관 시간과 오염 상태 보관 시간을 연구로 뒷받침했고, 신제품을 들일 때 그 연구를 다시 했습니까",
+    "베타락탐 계열 제품을 다른 제품과 분리된 전용 시설에서 다룹니까",
+    "세척 기록에 세척 유형과 사용한 세척제가 남고, 확인자가 작업 당시에 서명하고 날짜를 적습니까"
+  ],
+  "checks_en": [
+    "Has a cleaning validation study been completed for each piece of shared equipment used for more than one product?",
+    "Are the inside of tubing, crevices and product-contact surfaces free of residue after equipment has been cleaned?",
+    "Are the walls, floor and dust extraction arm of the dispensing area free of powder residue?",
+    "Are the clean hold time and dirty hold time supported by studies, and were the studies repeated when a new product was introduced?",
+    "Are beta-lactam products handled in dedicated facilities separate from other products?",
+    "Do cleaning records show the type of cleaning and the cleaning agent used, and does the verifier sign and date them at the time of the work?"
+  ],
+  "further_reading": [], "related": ["disinfection", "cleanroom"]
+}

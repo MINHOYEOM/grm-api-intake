@@ -433,9 +433,13 @@ _FIG_ENVS: dict[str, Any] = {}
 
 
 def mini(fig_id: str, lang: str = "ko") -> str:
-    """용어 id → 카드용 그림 SVG(라벨은 lang). 그림이 없는 용어는 일반 문서 아이콘."""
+    """용어 id → 카드용 그림 SVG(라벨은 lang). 그림이 없는 용어는 빈 칸("").
+
+    ★2026-11-16 대표 지적("용어 그림 하나가 빈다"): 그림 없는 용어(예: audit-trail — 검토에서 일부러
+      보류)에 일반 문서 아이콘을 넣었더니 '내용 없는 그림'으로 읽혔다. 억지 그림보다 빈 칸이 낫다
+      (용어 그림 원칙: 학습 가치 없으면 0장이 정상). 그림 있는 용어 우선 선택은 그대로다."""
     if not has_figure(fig_id):
-        return GENERIC_MINI
+        return ""
     if lang not in _FIG_ENVS:
         _FIG_ENVS[lang] = render._make_env(lang)
     out = _FIG_ENVS[lang].get_template(f"partials/glossary_fig/{fig_id}.html").render()
@@ -730,7 +734,14 @@ def pick_glossary_terms(glossary: list[dict], cards: list[dict], n: int = 5,
         if score:
             scored.append((-score, -head_strong, 0 if has_figure(t.get("id")) else 1, idx, t))
     scored.sort(key=lambda x: (x[0], x[1], x[2], x[3]))
-    return [t for _, _, _, _, t in scored[:n]]
+    # ★2026-11-16 대표 지적("용어 그림 하나가 빈다"): 5칸 중 그림 없는 용어가 끼면 그 줄만 비어 보인다.
+    #   상위 2n 후보 안에서 그림 있는 용어를 먼저 채우고, 모자랄 때만 그림 없는 용어로 메운다.
+    #   순서는 원래 점수 순서를 유지한다(그림 때문에 순위를 뒤집지 않는다).
+    pool = scored[:2 * n]
+    keep = [x for x in pool if x[2] == 0][:n]
+    keep += [x for x in pool if x[2] == 1][:n - len(keep)]
+    keep.sort(key=lambda x: (x[0], x[1], x[2], x[3]))
+    return [t for _, _, _, _, t in keep]
 
 
 def pick_checks(groups: list[list[dict]], n: int = 6, max_width: float = 34.0,

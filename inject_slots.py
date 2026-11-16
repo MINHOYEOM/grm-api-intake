@@ -749,6 +749,25 @@ _ABBR_NEEDS_KO: tuple[tuple[str, str], ...] = (
 _BANNED_RE = tuple((lab, re.compile(p)) for lab, p in _BANNED_PHRASES)
 _TERM_RE = tuple((re.compile(p), fix) for p, fix in _TERM_VARIANTS)
 
+# [2026-11-16 재측정] v16 [용어·표기] 에 11-16 에 더한 줄(docs/prompts/GRM_Prompt_v16.md) 중 코드로 셀 수 있는 것.
+# **경고만** — 11-16호(개선 전)에 집락형성단위·15평일·시험 마스터 파일·class I 이 실제로 남아 있었다.
+# 경향이탈은 사전 표제어라 뺐다(v16 변경 이력). 카드 산문·심층 칸 산문 둘 다 본다.
+_WARN_TERM_VARIANTS: tuple[tuple[str, str], ...] = (
+    (r"집락\s?형성\s?단위|(?<![A-Za-z])cfu(?![A-Za-z])", "CFU"),
+    (r"\d\s?평일", "영업일"),
+    (r"스폰서", "의뢰자"),
+    (r"시험 기본 문서철|(?<!임상)시험 마스터 파일", "임상시험 마스터 파일"),
+    (r"귀사", "회사(또는 주어 생략)"),
+    (r"\d\s?(?:MG|ML|MCG)\b|\d(?:mg|mcg|mL)\b", "숫자와 단위 사이 한 칸(20 mcg)·소문자 mg·mL"),
+    (r"(?<![A-Za-z])class (?:I{1,3}|IV)(?![A-Za-z])", "Class II"),
+    (r"시판 전 신고\(premarket notification\)|시판 전 승인", "510(k)·PMA"),
+    (r"적격성 평가", "적격성평가"),
+)
+_WARN_TERM_RE = tuple((re.compile(p), fix) for p, fix in _WARN_TERM_VARIANTS)
+# 483 심층 마감기한 고정 문장의 표지 — 정본: docs/prompts/GRM_Prompt_DeepFda483_v1.md ③ deadline
+_DEEP_483_DEADLINE_MARK = "의무가 아니다"
+_DEEP_483_PROMISE_PREFIX = "회사 약속"
+
 # [2026-11-16 브리프 품질 ④] 심층 칸(상세 분석 보기) 산문 — 카드 금지어에 더해 심층 지시문 '3-1. 문체'의
 # 금지어를 본다. **경고만**(처음 2개 호 실측 뒤 사람이 차단 여부를 정한다 — STYLE_LINT_BLOCKING 과 같은 결의).
 # 원문 인용 칸(`original`)·조항(`citation`)은 보지 않는다.
@@ -800,6 +819,30 @@ def _deep_prose_texts(entry: Any) -> list[str]:
     return out
 
 
+def _lint_deep_483_shape(rep: "StyleReport", cid: Any, entry: Any) -> None:
+    """483 심층의 마감기한·시정 항목이 지시문 꼴인지 본다 — 경고만(코드가 문구를 덮어쓰지는 않는다).
+
+    483 판별은 화면(card.html)과 같다: `inspectional_significance` 키가 있으면 483.
+    마감기한은 고정 문장("회신은 의무가 아니다. …")이어야 하고, items 는 '회사 약속: …'뿐이어야 한다."""
+    if not isinstance(entry, dict):
+        return
+    da = entry.get("deep_analysis") if isinstance(entry.get("deep_analysis"), dict) else entry
+    if "inspectional_significance" not in da:
+        return
+    rem = da.get("required_remediation")
+    if not isinstance(rem, dict):
+        return
+    dl = rem.get("deadline")
+    if isinstance(dl, str) and dl.strip() and _DEEP_483_DEADLINE_MARK not in dl:
+        rep.warns.setdefault("심층 483 마감기한이 고정 문장('회신은 의무가 아니다…')이 아님", []).append(str(cid))
+    items = rem.get("items")
+    if isinstance(items, list) and any(
+            isinstance(i, str) and i.strip() and not i.strip().startswith(_DEEP_483_PROMISE_PREFIX)
+            for i in items):
+        rep.warns.setdefault("심층 483 요구 시정 조치가 '회사 약속:' 아님(483 은 시정 요구 문서가 아니다)",
+                             []).append(str(cid))
+
+
 def lint_deep_prose_style(deep: Any) -> "StyleReport":
     """심층 델타 산문의 표현 검사(순수) — 경고 재료만. `deep` = {card_id: 항목} 또는 샤드 `{items: {...}}`.
 
@@ -811,10 +854,15 @@ def lint_deep_prose_style(deep: Any) -> "StyleReport":
         return rep
     seen: dict[str, set[str]] = {}
     for cid, entry in deep.items():
+        _lint_deep_483_shape(rep, cid, entry)
         texts = _deep_prose_texts(entry)
         if not texts:
             continue
         blob = "\n".join(texts)
+        for rx, fix in _WARN_TERM_RE:
+            m = rx.search(blob)
+            if m:
+                rep.warns.setdefault(f"심층 용어 표기 '{m.group(0)}'→{fix}", []).append(str(cid))
         for lab, rx in _DEEP_BANNED_RE:
             if rx.search(blob):
                 rep.warns.setdefault(f"심층 금지 표현 '{lab}'", []).append(str(cid))
@@ -920,6 +968,10 @@ def lint_prose_style(delta: dict[str, Any]) -> StyleReport:
             m = rx.search(blob)
             if m:
                 rep.terms.setdefault(f"'{m.group(0)}'→{fix}", []).append(str(cid))
+        for rx, fix in _WARN_TERM_RE:
+            m = rx.search(blob)
+            if m:
+                rep.warns.setdefault(f"용어 표기 '{m.group(0)}'→{fix}", []).append(str(cid))
         for abbr, ko in _ABBR_NEEDS_KO:
             if re.search(rf"(?<![A-Za-z]){abbr}(?![A-Za-z])", blob) and ko not in blob:
                 rep.terms.setdefault(f"'{abbr}' 단독→{ko}({abbr})", []).append(str(cid))

@@ -328,5 +328,47 @@ class WarnOnlyLintTest(unittest.TestCase):
         self.assertFalse([x for x in precheck.term_lines(delta, {}) if "식약처가" in x])
 
 
+class RemeasureWarnTermsTest(unittest.TestCase):
+    """11-16 재측정 — v16 [용어·표기] 신규 줄과 483 마감기한·시정 항목 꼴. 경고만."""
+
+    def _warn(self, text):
+        rep = inj.lint_prose_style({"cards": {"a1": {"summary": text}}})
+        self.assertEqual(rep.lines(), [])
+        return "\n".join(rep.warn_lines())
+
+    def test_card_terms_warn(self):
+        for bad, lab in (("집락형성단위 22~451", "CFU"), ("방문 후 15평일 안에", "영업일"),
+                         ("임상시험 스폰서가", "의뢰자"), ("시험 마스터 파일에서", "임상시험 마스터 파일"),
+                         ("귀사는 조사하지 않았다", "회사"), ("20mcg/2mL 흡입액", "단위"),
+                         ("class III 의료기기", "Class II"), ("적격성 평가 근거", "적격성평가")):
+            self.assertIn(lab, self._warn(bad), bad)
+
+    def test_card_terms_ok(self):
+        for ok in ("CFU 22~451", "15영업일 안에", "임상시험 마스터 파일에서", "20 mcg/2 mL",
+                   "Class III 의료기기", "평일 근무", "적격성평가 근거"):
+            self.assertEqual(self._warn(ok), "", ok)
+
+    def test_deep_terms_warn(self):
+        deep = {"c1": {"deep_analysis": {"fda_evaluation": "스폰서가 15평일 안에 승인했다."}}}
+        text = "\n".join(inj.lint_deep_prose_style(deep).warn_lines())
+        self.assertIn("의뢰자", text)
+        self.assertIn("영업일", text)
+
+    def test_483_deadline_and_items_shape(self):
+        fixed = "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다."
+        good = {"c1": {"deep_analysis": {"inspectional_significance": "",
+                "required_remediation": {"deadline": fixed, "items": ["회사 약속: 교육 실시(관찰 1)"]}}}}
+        self.assertEqual(inj.lint_deep_prose_style(good).warn_lines(), [])
+        bad = {"c1": {"deep_analysis": {"inspectional_significance": "",
+               "required_remediation": {"deadline": "483 수령 후 15영업일 이내 서면 회신",
+                                        "items": ["세척 밸리데이션을 다시 한다."]}}}}
+        text = "\n".join(inj.lint_deep_prose_style(bad).warn_lines())
+        self.assertIn("고정 문장", text)
+        self.assertIn("회사 약속", text)
+        wl = {"c1": {"deep_analysis": {"fda_evaluation": "x",
+              "required_remediation": {"deadline": "15영업일", "items": ["a"]}}}}
+        self.assertEqual(inj.lint_deep_prose_style(wl).warn_lines(), [])
+
+
 if __name__ == "__main__":
     unittest.main()

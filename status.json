@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T01:52:21Z",
+ "generated_at": "2026-11-16T01:59:45Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -60,6 +60,17 @@
   ],
   "grm-delta-bridge.yml": [
    {
+    "databaseId": 43788930323,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-16T01:54:04Z",
+    "updatedAt": "2026-11-16T01:54:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788930323"
+   },
+   {
     "databaseId": 43788668824,
     "status": "completed",
     "conclusion": "success",
@@ -102,17 +113,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41396089686"
-   },
-   {
-    "databaseId": 41374647610,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-02T01:51:34Z",
-    "updatedAt": "2026-11-02T01:51:53Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41374647610"
    }
   ],
   "grm-web-publish.yml": [
@@ -175,11 +175,11 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 43788711937,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-16T01:51:44Z",
-    "updatedAt": "2026-11-16T01:51:47Z",
+    "updatedAt": "2026-11-16T01:57:33Z",
     "headBranch": "main",
     "displayTitle": "bridge(web): 2026-11-16 라우틴 델타 커밋 (자동)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788711937"

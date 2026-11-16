@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T12:16:21Z",
+ "generated_at": "2026-11-16T13:42:13Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43864094735,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-16T12:10:05Z",
-    "updatedAt": "2026-11-16T12:10:09Z",
-    "headBranch": "claude/glossary-fig-daily-20261116-2108",
-    "displayTitle": "glossary(fig): 2026-11-16 새 그림 0 · 다시 그림 0 · 보류 8 — 위험성 평가·밸리데이션 결과보고서·실시계획서·QMS·단일방향 기류·HVAC·제약용수 시스템·검체채취계획",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43864094735"
-   },
-   {
-    "databaseId": 43864077391,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-16T12:09:58Z",
-    "updatedAt": "2026-11-16T12:10:02Z",
-    "headBranch": "claude/glossary-fig-daily-20261116-2108",
-    "displayTitle": "glossary(fig): 2026-11-16 새 그림 0 · 다시 그림 0 · 보류 8 — 위험성 평가·밸리데이션 결과보고…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43864077391"
-   },
-   {
-    "databaseId": 43832389080,
+    "databaseId": 43877167943,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-16T08:34:59Z",
-    "updatedAt": "2026-11-16T08:42:53Z",
+    "createdAt": "2026-11-16T13:35:06Z",
+    "updatedAt": "2026-11-16T13:41:47Z",
     "headBranch": "main",
-    "displayTitle": "glossary: 한글 용어 매칭에서 띄어쓰기 무시 (무균공정↔무균 공정 외 138표기) (#1746)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43832389080"
+    "displayTitle": "Merge pull request #1793 from MINHOYEOM/feat/clause-text-cfr1271",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43877167943"
    },
    {
-    "databaseId": 43828838396,
+    "databaseId": 43876579946,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-16T08:08:14Z",
-    "updatedAt": "2026-11-16T08:15:24Z",
-    "headBranch": "tiro/glossary-space-insensitive-1116",
-    "displayTitle": "glossary: 한글 용어 매칭에서 띄어쓰기 무시 (무균공정↔무균 공정 외 138표기)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43828838396"
+    "createdAt": "2026-11-16T13:31:28Z",
+    "updatedAt": "2026-11-16T13:38:29Z",
+    "headBranch": "fix/linkedin-caption-layout",
+    "displayTitle": "fix(linkedin): 해부 본문 배치 — 소제목 단락·한 줄 한 문장·주소는 자기 줄",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43876579946"
    },
    {
-    "databaseId": 43828825867,
+    "databaseId": 43876562360,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-16T08:08:08Z",
-    "updatedAt": "2026-11-16T08:15:27Z",
-    "headBranch": "tiro/glossary-space-insensitive-1116",
-    "displayTitle": "glossary: #1773 위험평가 표제 정리에 맞춰 띄어쓰기 무시 예외 해제",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43828825867"
+    "createdAt": "2026-11-16T13:31:22Z",
+    "updatedAt": "2026-11-16T13:38:15Z",
+    "headBranch": "fix/linkedin-caption-layout",
+    "displayTitle": "fix(linkedin): 해부 본문 배치 — ■ 소제목 단락·한 줄 한 문장·주소는 자기 줄",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43876562360"
+   },
+   {
+    "databaseId": 43873116807,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-16T13:09:37Z",
+    "updatedAt": "2026-11-16T13:15:37Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1791 from MINHOYEOM/feat/linkedin-anatomy-weekly-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43873116807"
+   },
+   {
+    "databaseId": 43872892924,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-16T13:08:11Z",
+    "updatedAt": "2026-11-16T13:15:44Z",
+    "headBranch": "feat/clause-text-cfr1271",
+    "displayTitle": "feat(clauses): 21 CFR Part 212·1271·4 조항 원문 추가",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43872892924"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 43878260732,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-16T13:41:51Z",
+    "updatedAt": "2026-11-16T13:41:57Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43878260732"
+   },
+   {
     "databaseId": 43864830395,
     "status": "completed",
     "conclusion": "success",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42618085057"
-   },
-   {
-    "databaseId": 41454533632,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-02T13:37:05Z",
-    "updatedAt": "2026-11-02T13:38:03Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41454533632"
    }
   ],
   "grm-findings-translate-apply.yml": [

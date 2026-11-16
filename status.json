@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T12:13:07Z",
+ "generated_at": "2026-11-16T12:16:21Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 43864830395,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-16T12:14:54Z",
+    "updatedAt": "2026-11-16T12:16:11Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43864830395"
+   },
+   {
     "databaseId": 43864428978,
     "status": "completed",
     "conclusion": "success",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41454533632"
-   },
-   {
-    "databaseId": 41415013713,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-02T08:42:24Z",
-    "updatedAt": "2026-11-02T08:44:28Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41415013713"
    }
   ],
   "grm-findings-translate-apply.yml": [

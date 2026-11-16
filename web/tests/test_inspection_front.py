@@ -65,7 +65,8 @@ class InspectionFrontViewTest(unittest.TestCase):
         self.assertTrue(card["summary"])
         html = _render_card(v, "ko")
         self.assertIn('class="block insp"', html)
-        self.assertIn("[EU GMP 비준수 · Netherlands 규제당국]", html)
+        # 11-16 A안: 제목 위 [유형 · 기관] 줄 → 머리 한 줄(기관이 먼저, 실제 판정 당국 그대로).
+        self.assertIn('<div class="kline"><span>Netherlands 규제당국</span><span>EU GMP 비준수</span>', html)
         self.assertIn("나머지 3건 보기", html)
         self.assertNotIn('class="summary"', html)
 

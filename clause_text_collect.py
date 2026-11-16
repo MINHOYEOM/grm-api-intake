@@ -9,7 +9,7 @@
 목록(`translation_queue.json`)만 남기고, 번역은 구독 경로(Codex 배치)가 나중에 한다.
 
 첫 묶음(원천 · 공개 원문 · 이용 조건은 web/data/clauses/SOURCES.md):
-  · cfr21   — 21 CFR Part 210·211, eCFR 공개 API(XML). 미국 연방정부 저작물 → 공중 영역.
+  · cfr21   — 21 CFR Part 210·211·600·601·606·610, eCFR 공개 API(XML). 미국 연방정부 저작물 → 공중 영역.
   · eu_gmp  — EudraLex Vol.4 Part I 1~9장 + Annex 1(PDF). EC 재이용 결정 2011/833/EU → 출처 표시 조건 재이용 허용.
   · ich     — ICH Q7·Q9(R1)·Q10(PDF). ICH 법적 고지 → 저작권 표시 조건 복제 허용, 변경·번역은 표시.
 
@@ -44,6 +44,11 @@ ECFR_DATE = "2026-11-12"  # eCFR titles.json 의 title 21 up_to_date_as_of (수�
 CFR_PARTS = {
     "210": "Current Good Manufacturing Practice in Manufacturing, Processing, Packing, or Holding of Drugs; General",
     "211": "Current Good Manufacturing Practice for Finished Pharmaceuticals",
+    # [2026-11-16 Part 600 묶음] 생물의약품 — 총칙·허가·혈액 CGMP·일반 기준.
+    "600": "Biological Products: General",
+    "601": "Licensing",
+    "606": "Current Good Manufacturing Practice for Blood and Blood Components",
+    "610": "General Biological Products Standards",
 }
 
 EU_DOCS = [  # (key, code, chapter_no, title, url) — url 은 자료실 eu_gmp.json 과 같은 공식 PDF
@@ -80,7 +85,7 @@ ICH_DOCS = [  # (key, code, title, url)
 
 SOURCES: dict[str, dict[str, Any]] = {
     "cfr21": {
-        "title": "21 CFR Part 210·211 (Current Good Manufacturing Practice)",
+        "title": "21 CFR Part 210·211 (CGMP) · Part 600·601·606·610 (Biologics)",
         "publisher": "U.S. Office of the Federal Register / GPO — eCFR",
         "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C",
         "api": "https://www.ecfr.gov/api/versioner/v1/full/{date}/title-21.xml?part={part}",
@@ -164,7 +169,10 @@ def parse_ecfr_part(xml_text: str, part: str) -> list[dict[str, Any]]:
                     paras.append(t)
                 continue
             # NOTE·EXTRACT·GPOTABLE·EDNOTE 등: 안쪽 문단 단위로 원문 그대로.
-            inner = [_itertext(p) for p in child.iter() if p.tag in ("P", "FP", "HED", "ROW")]
+            # 표 행(ROW)은 칸을 줄바꿈으로 잇는다 — 빈 칸이 만든 연속 줄바꿈은 하나로(문단 구분 '\n\n' 과
+            # 섞이면 빈 문단이 생긴다). 글자는 바꾸지 않는다.
+            inner = [re.sub(r"\n{2,}", "\n", _itertext(p)).strip()
+                     for p in child.iter() if p.tag in ("P", "FP", "HED", "ROW", "TR")]
             inner = [t for t in inner if t]
             if not inner:
                 t = _itertext(child)

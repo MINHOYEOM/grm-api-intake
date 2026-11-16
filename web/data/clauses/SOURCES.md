@@ -5,7 +5,7 @@
 
 | 파일 | 원천 | 공식 원문 | 이용 조건 | 게재 |
 |---|---|---|---|---|
-| `cfr21.json` | 21 CFR Part 210·211 | eCFR 공개 API `https://www.ecfr.gov/api/versioner/v1/full/{date}/title-21.xml?part=210·211` | 미국 연방정부 저작물 = 공중 영역(17 U.S.C. §105). eCFR 은 편집본이며 공식 법적 판본(연방관보 CFR)이 아니라는 점을 화면에 밝힙니다. | 전문 |
+| `cfr21.json` | 21 CFR Part 210·211(CGMP) + Part 600·601·606·610(생물의약품 총칙·허가·혈액 CGMP·일반 기준, 2026-11-16 추가) | eCFR 공개 API `https://www.ecfr.gov/api/versioner/v1/full/{date}/title-21.xml?part=…`(Part 마다 한 번) | 미국 연방정부 저작물 = 공중 영역(17 U.S.C. §105). eCFR 은 편집본이며 공식 법적 판본(연방관보 CFR)이 아니라는 점을 화면에 밝힙니다. | 전문 |
 | `eu_gmp.json` | EudraLex Vol.4 Part I 1~9장 + Annex 1(2022) | `health.ec.europa.eu` 공식 PDF(자료실 `library/eu_gmp.json` 과 같은 주소) | © European Union. 출처를 밝히면 재이용 허용(Commission Decision 2011/833/EU, 위원회 법적 고지). | 전문 |
 | `ich.json` | ICH Q7·Q9(R1)·Q10 | `database.ich.org` 공식 PDF | © ICH. 각 지침 표지의 법적 고지: ICH 저작권을 표시하면 사용·복제·배포 허용. 번역·수정본은 그 사실을 표시하고 ICH 가 승인한 것처럼 보이게 하면 안 됩니다 → 국문 번역은 "참고 번역" 표시가 필수입니다. | 전문 |
 | `mfds_gmp.json` | 식약처 「의약품 제조 및 품질관리에 관한 규정」(고시 제2024-87호, 2024-12-30 시행) 조문 제1조~제5조 + 별표 1~18(2의2 포함) | 국가법령정보센터 행정규칙 화면 `https://www.law.go.kr/행정규칙/의약품제조및품질관리에관한규정` — 조문은 `admRulLsInfoR.do?admRulSeq=2100000252026` HTML, 별표는 같은 화면의 첨부 PDF(`flDownload.do?flSeq=…`) | 법령·고시는 저작권법 제7조의 비보호 저작물. 공식 효력은 관보·국가법령정보센터 원문. | 전문(국문) |
@@ -14,7 +14,7 @@
 
 - **식약처 개정 감시** — 법제처 Open API 키(OC)가 없어 이번에는 화면·첨부 PDF 를 한 번 받아 실었습니다. 고시가 개정되면 `admRulSeq` 가 바뀝니다. 키가 생기면 개정 감시(일련번호·시행일 비교 → 재수집)를 붙입니다. 그 전까지는 `clause_text_collect.py --mfds-seq <새 번호>` 로 사람이 다시 돌립니다.
 - **식약처 부칙** — 제·개정 이력이라 조문이 아니어서 싣지 않았습니다(공식 화면 링크로 갈음).
-- **21 CFR Part 600 등 나머지** — 다음 묶음입니다.
+- **21 CFR 나머지(Part 1271 세포·조직, Part 212 PET, Part 4 복합제품 등)** — 아직 싣지 않았습니다. `CFR_PARTS` 에 Part 를 더해 다시 돌리면 됩니다.
 
 ## 파서의 한계(PDF)
 

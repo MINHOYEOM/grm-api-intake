@@ -9,10 +9,14 @@
    ```
    select public.growth_daily_v2();
    ```
-2. 결과를 **손대지 말고 그대로** `/tmp/growth.json` 에 저장한다(커넥터 결과 모양 그대로 둬도 렌더러가 푼다).
+   이어서 한 번 더(본문 속 구독 칸 제출 — 위 결과의 '구독 신청'에 들어 있지 않다, 161):
+   ```
+   select public.funnel_inline_report();
+   ```
+2. 두 결과를 **손대지 말고 그대로** `/tmp/growth.json`·`/tmp/inline.json` 에 저장한다(커넥터 결과 모양 그대로 둬도 렌더러가 푼다).
 3. 저장소 루트에서:
    ```
-   python3 web/growth_daily.py daily --json /tmp/growth.json --out /tmp/daily.md
+   python3 web/growth_daily.py daily --json /tmp/growth.json --inline /tmp/inline.json --out /tmp/daily.md
    ```
 4. 최종 메시지 = `CHARTER.md` 3줄 → `/tmp/daily.md` 전문 → 맨 끝 `## 오늘 볼 것` 1~3줄.
 
@@ -24,4 +28,5 @@
 
 ## 실패 처리
 - RPC 가 없다는 오류(`growth_daily_v2` 미존재) → 마이그레이션 135 미적용. `select public.growth_daily_report();` 로 대신 받고 맨 위에 "v2 미적용 — 135 적용 필요" 한 줄, 그 JSON 을 그대로 요약한다.
+- `funnel_inline_report` 가 없다는 오류 → 마이그레이션 161 미적용. `--inline` 을 빼고 렌더한다(본문 구독 칸 줄만 빠진다). 맨 위에 "161 미적용" 한 줄.
 - 렌더러 오류 → 오류 첫 줄만 적고 끝낸다(숫자를 손으로 옮겨 적지 않는다).

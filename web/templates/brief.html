@@ -37,6 +37,8 @@
       {%- endfor %}
     </ul></div>
     {%- endif %}
+    {#- [구독 유입 2026-11-17] 요약 아래 줄형 구독 칸 — newsletter 게이트 안(env-off 빌드 출력 0). -#}
+    {%- with sub_kind='brief', sub_slot='top' %}{% include "partials/sub_inline.html" %}{% endwith %}
     {%- if glance %}
     {#- [브리프 4단 2026-11-12] 주간 현황 — 카드 묶음·종류로 센 건수와 DB 국가·분류 값으로 센 한 줄
         (render.build_brief_glance · 정본 web/data/brief_glance.json). 줄이 없으면 건수 칸만. -#}

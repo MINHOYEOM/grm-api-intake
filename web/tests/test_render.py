@@ -8417,10 +8417,13 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn(f' action="{ko_action}"', ko_home)
         # 기본 action 은 페이지 언어 리스트 — 다른 리스트 주소는 언어 선택지(data-action)에만 있다.
         self.assertNotIn(f' action="{en_action}"', ko_home)
+        # [구독 유입 2026-11-17] 영문 지적사항은 첫 화면 줄형 칸(.grm-inl)이 한 자리 더, 홈은 첫 화면·'이번 주 핵심'
+        # 아래 두 자리 더 — 모두 같은 영문 폼.
         for name, html in (("home", en_home), ("glossary", en_glossary), ("findings", en_findings)):
+            n_forms = 2 + html.count('<aside class="grm-inl')  # 밴드·배너 + 줄형 칸 수(홈 가운데 칸은 이번 주 호가 있을 때만)
             self.assertIn('class="subscribe"', html, f"en {name}: 밴드가 없다")
             self.assertIn('id="grm-cta"', html, f"en {name}: 배너가 없다")
-            self.assertEqual(html.count(f' action="{en_action}"'), 2, f"en {name}: 영문 폼 두 자리")
+            self.assertEqual(html.count(f' action="{en_action}"'), n_forms, f"en {name}: 영문 폼 자리 수")
             self.assertNotIn(f' action="{ko_action}"', html, f"en {name}: 한국어 리스트 폼이 기본값이 됐다")
             # 구독 문안이 "한국어로 보내 드린다"고 말하면 안 된다(푸터의 "in Korean and English"
             # 서비스 소개는 다른 문장이라 이 문구로 좁혀 본다).
@@ -8428,8 +8431,16 @@ class WebRenderHardeningTest(unittest.TestCase):
             self.assertNotIn("findings in Korean", html, f"en {name}: 구독 문안이 '한국어로'라고 말한다")
         # 영어 용어사전 구역은 한국어 리스트 전용 PDF 제안이 아니라 기본 문안으로 접힌다.
         self.assertNotIn("Glossary PDF", en_glossary)
-        self.assertIn("<h2>New GMP inspection findings, every Monday</h2>", en_glossary)
-        self.assertIn("<h2>Get new findings like these every Monday</h2>", en_findings)
+        self.assertIn("<h2>Inspection findings from the FDA, Europe and Korea, every week</h2>", en_glossary)
+        self.assertIn("<h2>Get the week's FDA, EU and MFDS inspection findings</h2>", en_findings)
+        # 홈 첫 화면 줄형 칸은 두 언어 모두, 지적사항 목록 첫 화면 칸은 영문만(render.py sub_inline_lists).
+        self.assertIn('class="grm-inl"', en_home)
+        self.assertIn('class="grm-inl"', ko_home)
+        self.assertIn('class="grm-inl"', en_findings)
+        ko_findings = (out / "findings/index.html").read_text(encoding="utf-8")
+        self.assertNotIn('class="grm-inl"', ko_findings)
+        # 줄형 칸도 각 언어 리스트 폼만 — 한국어 홈의 칸이 영문 리스트로 가면 안 된다.
+        self.assertNotIn(f'class="grm-inl-form" action="{en_action}"', ko_home)
         # 실물 링크 — 영문 메일의 주인공(지적 기록) 면으로.
         self.assertIn("See recent findings first", en_home)
         self.assertNotIn("최근 지적 기록 먼저 보기", ko_home)
@@ -8494,8 +8505,8 @@ class WebRenderHardeningTest(unittest.TestCase):
 
         consent = "사이트에 새로운 기능이 생기면 함께 안내드립니다"
         h2_glossary = "구독하면 GMP 규제 용어집 PDF를 드립니다"   # [마케팅 2026-09-28] 용어집 PDF 제안
-        h2_findings = "이런 지적, 매주 월요일 한국어로 받아보세요"
-        h2_default = "글로벌 GMP 규제 소식, 매주 월요일 한국어로"
+        h2_findings = "FDA·EU·식약처 실사 지적, 매주 받아 보세요"
+        h2_default = "글로벌 GMP 규제 소식, 한국어로 매주 받아 보세요"
         all_h2 = (h2_glossary, h2_findings, h2_default)
 
         # 밴드 — 세 h2 는 각자 구역에서만 나오고, 동의 범위 문장은 세 갈래 모두에 남는다.
@@ -14325,7 +14336,8 @@ class WebPopularCardsTest(unittest.TestCase):
         self.assertNotIn("assets/popular.js", landing_on)
         # 관심 업체 알림 줄은 회원 기능이라 켠 빌드에만 — 뉴스레터(newsletter.py)가 이 앵커로 직링크한다.
         self.assertIn('id="watchlist"', landing_on)
-        self.assertIn('findings/firm/index.html">업체 조회</a>', landing_on)
+        # [구독 유입 2026-11-17] 한 줄 안내가 '알림과 학습' 칸(업체 찾기)으로 바뀌었다 — 앵커·목적지는 그대로.
+        self.assertIn('id="watchlist" href="findings/firm/index.html"', landing_on)
 
 
     def test_watchlist_banner_env_gated(self):

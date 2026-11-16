@@ -156,7 +156,14 @@
    이 형태는 참이면 원래 바이트 그대로, 거짓이면 아무것도 내지 않는다. #}
 {% if alt_other %}  <a class="grm-lang" href="{{ alt_other.rel_href }}" hreflang="{{ alt_other.lang }}" lang="{{ alt_other.lang }}" rel="alternate"><i class="ti ti-language" aria-hidden="true"></i>{{ alt_other.label }}</a>
 {% endif %}
-{% if lang == 'ko' or ('briefs/' ~ latest_slug ~ '/') in en_paths %}  <a class="btn coral" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식") }}</a>
+{#- [구독 유입 2026-11-17] 헤더 상시 '무료 구독' — 밴드와 같은 게이트(밴드가 없는 면에는 갈 곳이 없다).
+    켜지면 '이번 주 소식'은 테두리 버튼으로 물러나고(코랄 버튼 둘이 나란히 서지 않게) 좁은 폭에서는 숨는다.
+    게이트가 꺼진 빌드(로컬·CI)에서는 '이번 주 소식' 줄이 종전 바이트 그대로다. -#}
+{% set hsub_on = newsletter_form_action and nav_active != 'about' and not hide_subscribe %}
+{% if lang == 'ko' or ('briefs/' ~ latest_slug ~ '/') in en_paths %}  <a class="btn {{ 'grm-hweek' if hsub_on else 'coral' }}" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식") }}</a>
+{% endif %}
+{% if hsub_on %}  <a class="grm-hsub" href="#subscribe"><span class="grm-hsub-l">{{ _("무료 구독") }}</span><span class="grm-hsub-s">{{ _("구독") }}</span></a>
+<style>.grm-hsub{display:inline-flex;align-items:center;height:42px;padding:0 18px;border-radius:var(--rad-s);background:var(--coral);color:var(--on-coral,#fff);font-family:var(--sans);font-size:14.5px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background var(--tr)}.grm-hsub:hover{background:var(--coral-2)}.grm-hsub:focus-visible{outline:none;box-shadow:0 0 0 3px var(--coral-tint),0 0 0 4px var(--coral)}.grm-hsub-s{display:none}.grm-hweek{white-space:nowrap}@media (max-width:1180px){.grm-hweek{display:none}}@media (max-width:640px){.grm-hsub{height:38px;padding:0 13px;font-size:13.5px}.grm-hsub-l{display:none}.grm-hsub-s{display:inline}}</style>
 {% endif %}
 </div></header>
 
@@ -223,12 +230,12 @@
         확정하고 도착 페이지(/welcome/)로 보내 GMP 용어집 PDF 를 준다(Brevo 확인 메일·이동 주소
         설정과 짝). 동의 범위 문장은 그대로 남긴다(위 주석 — 공지 메일의 근거). #}
     <h2>{{ _("구독하면 GMP 규제 용어집 PDF를 드립니다") }}</h2>
-    <p>{{ _("구독 확인 메일의 버튼을 누르면 한·영 대조로 정리한 용어집 PDF를 바로 받을 수 있습니다. 매주 월요일에는 그 주의 규제 소식과 지적 사례를 한국어로 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
+    <p>{{ _("구독 확인 메일의 버튼을 누르면 한·영 대조로 정리한 용어집 PDF를 바로 받을 수 있습니다. 매주 규제 소식과 지적 사례도 한국어로 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
     {% elif sub_zone == 'findings' %}
-    <h2>{{ _("이런 지적, 매주 월요일 한국어로 받아보세요") }}</h2>
+    <h2>{{ _("FDA·EU·식약처 실사 지적, 매주 받아 보세요") }}</h2>
     <p>{{ _("FDA·EMA·식약처의 새 지적과 조치를 공식 원문 링크와 함께 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
     {% else %}
-    <h2>{{ _("글로벌 GMP 규제 소식, 매주 월요일 한국어로") }}</h2>
+    <h2>{{ _("글로벌 GMP 규제 소식, 한국어로 매주 받아 보세요") }}</h2>
     <p>{{ _("FDA·EMA·PIC/S·식약처의 주요 변화를 공식 원문 링크와 함께 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
     {% endif %}
     {# 메일 내용의 실물 — 최신 브리프 페이지. 헤더 CTA 와 같은 `latest_slug` 를 쓴다. #}
@@ -237,6 +244,27 @@
     <p class="sub-peek"><a href="{{ rel_root }}findings/index.html">{{ _("최근 지적 기록 먼저 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
     {% else %}
     <p class="sub-peek"><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식 먼저 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
+    {% endif %}
+    {#- [구독 유입 2026-11-17 · 대표 지시] 홈 끝 상자 — GRM 이 가진 것을 타일로 보인다(광고형, 숫자 없음).
+        밴드 안(newsletter 게이트 안)이라 env-off 빌드 출력 0. 홈에서만. -#}
+    {% if nav_active == 'home' %}
+    <ul class="sub-tiles">
+      <li><span class="st-k">FINDINGS</span><b>{{ _("지적사항 DB") }}</b><span>{{ _("FDA·EU·영국·WHO·캐나다·식약처의 지적을 기관 원문과 나란히 대조합니다.") }}</span></li>
+      <li><span class="st-k">FIRMS</span><b>{{ _("업체별 지적 이력") }}</b><span>{{ _("한 업체의 483·경고서한·실사 결과를 시간순으로 봅니다.") }}</span></li>
+      <li><span class="st-k">CLAUSES</span><b>{{ _("조항 원문") }}</b><span>{{ _("지적에 인용된 21 CFR·EU GMP 조항을 원문으로 이어 봅니다.") }}</span></li>
+      <li><span class="st-k">GLOSSARY</span><b>{{ _("용어사전과 그림") }}</b><span>{{ _("한·영 정의와 실제 지적 사례, 개념 그림을 함께 봅니다.") }}</span></li>
+      <li><span class="st-k">NOTES</span><b>{{ _("실사 대비 노트") }}</b><span>{{ _("반복되는 지적 주제를 점검 항목으로 정리합니다.") }}</span></li>
+      <li><span class="st-k">KO · EN</span><b>{{ _("한·영 두 언어") }}</b><span>{{ _("기록과 화면을 한국어와 영어로 봅니다.") }}</span></li>
+    </ul>
+    <style>
+    .subscribe .sub-tiles{list-style:none;margin:22px auto 4px;padding:0;max-width:960px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:left}
+    .subscribe .sub-tiles li{background:#fff;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:14px 16px;display:flex;flex-direction:column;gap:3px}
+    .subscribe .sub-tiles .st-k{font-family:var(--mono);font-size:11px;color:var(--coral-2)}
+    .subscribe .sub-tiles b{font-family:var(--serif);font-weight:600;font-size:16.5px;color:var(--ink)}
+    .subscribe .sub-tiles li>span:last-child{font-family:var(--sans);font-size:13px;line-height:1.55;color:var(--body);word-break:keep-all}
+    @media (max-width:860px){.subscribe .sub-tiles{grid-template-columns:1fr 1fr}}
+    @media (max-width:520px){.subscribe .sub-tiles{grid-template-columns:1fr}}
+    </style>
     {% endif %}
     <form class="sub-form" id="grm-sub-form" action="{{ newsletter_form_action }}" method="post">
       {{ sub_lang_picker('grm-sub-lang') }}
@@ -251,9 +279,9 @@
          에서 정해진다. 한국어 확인 메일이 필요하면 거기서 바꾸고, 그 뒤 이 값을 맞춘다. #}
       <input type="hidden" name="locale" value="en" />
       {% if signup_path_fields %}<input type="hidden" name="SIGNUP_PATH" value="" /><input type="hidden" name="SIGNUP_LANG" value="" />{% endif %}
-      <button class="btn coral" type="submit">{{ _("구독") }}</button>
+      <button class="btn coral" type="submit">{{ _("무료 구독") }}</button>
     </form>
-    <p class="note">{{ _("매주 월요일 발송 · 구독 신청 시 확인 메일이 발송됩니다 · 수신거부는 모든 메일 하단에서 가능합니다.") }}</p>
+    <p class="note">{{ _("확인 메일의 버튼을 누르면 구독이 완료됩니다 · 언제든 해지할 수 있습니다") }}</p>
   </div>
   {# 인라인 성공 상태(방식 A) — 제출 시 intro 를 감추고 이 패널만 표시. 페이지 이동 없음. 아이콘=코랄 원형 + SVG 체크(웹폰트 비의존). #}
   <div id="grm-sub-done" class="sub-done" role="status" aria-live="polite" hidden>
@@ -317,15 +345,24 @@
   if(!sec||!links.length)return;
   // hidden 속성은 author display(.grm-next a·.home-links a)에 진다 — style 로 직접 끈다.
   if(sec.hidden){for(var i=0;i<links.length;i++){var li=links[i].closest&&links[i].closest('li');(li||links[i]).style.display='none';}return;}
+  // [구독 유입 2026-11-17] 본문 속 줄형 칸(.grm-inl)이 있으면 화면에서 가장 가까운 칸으로 간다
+  // (헤더 상시 '무료 구독'이 페이지 맨 끝까지 끌고 내려가지 않게). 밴드는 늘 후보다.
+  function nearest(){
+    var c=[sec],r=document.querySelectorAll('.grm-inl'),mid=window.innerHeight/2,best=sec,bd=Infinity;
+    for(var k=0;k<r.length;k++){if(!r[k].hidden&&r[k].offsetParent!==null)c.push(r[k]);}
+    for(var m=0;m<c.length;m++){var b=c[m].getBoundingClientRect(),d=Math.abs(b.top+b.height/2-mid);if(d<bd){bd=d;best=c[m];}}
+    return best;
+  }
   function go(e){
     if(sec.hidden)return;
     e.preventDefault();
+    var t=nearest();
     var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-    try{sec.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});}catch(_){sec.scrollIntoView();}
-    var em=document.getElementById('grm-sub-email');
+    try{t.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});}catch(_){t.scrollIntoView();}
+    var em=t===sec?document.getElementById('grm-sub-email'):t.querySelector('input[type=email]');
     if(em){try{em.focus({preventScroll:true});}catch(_){em.focus();}}
-    sec.classList.remove('sub-flash');void sec.offsetWidth;sec.classList.add('sub-flash');
-    setTimeout(function(){sec.classList.remove('sub-flash');},1600);
+    t.classList.remove('sub-flash');void t.offsetWidth;t.classList.add('sub-flash');
+    setTimeout(function(){t.classList.remove('sub-flash');},1600);
   }
   for(var j=0;j<links.length;j++)links[j].addEventListener('click',go);
 })();
@@ -814,6 +851,62 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
    · 제출 직전 document 캡처 리스너가 hidden 두 칸을 채운다 — 밴드·배너의 기존 제출 핸들러(FormData 를 읽는 쪽)보다 항상 먼저 돈다. JS 가 꺼져 네이티브 POST 로 폴백해도 값만 빌 뿐 제출은 그대로다.
    · **env 게이트**: `signup_path_fields`(repo var GRM_SIGNUP_PATH_FIELDS=1)일 때만 hidden·이 스크립트가 나간다. Brevo 쪽 속성·폼 필드를 만든 뒤에 켠다(docs/ops_brevo_signup_path_attributes.md). 꺼져 있으면 폼 본문은 종전과 바이트 동일.
    · 구독 경로 익명 카운터(funnel_path_bump, 084)는 별개 경로로 그대로 — 이 스크립트가 건드리지 않는다. #}
+{#- [구독 유입 2026-11-17 · 대표 확정 N1] 본문 속 줄형 구독 칸(partials/sub_inline.html)의 모양과 제출.
+    · 1행 표제 + 이메일 칸·버튼(같은 높이 46px) / 2행 작은 회색 설명. 좁은 폭은 표제→설명→폼 한 열.
+    · 제출은 밴드와 같다: fetch(no-cors)로 sibforms 에 보내고 그 자리에서 '확인 메일을 보냈습니다'로 바꾼다.
+      JS 가 없으면 네이티브 POST 로 폴백. 성공하면 grm-sub-ok 를 세워 밴드·배너·다른 칸이 다시 권하지 않는다.
+    · 이미 구독한 브라우저(grm-sub-ok)에는 칸을 숨긴다. [hidden] 은 author display 에 지므로 짝을 박는다.
+    · §4 한글 안전: 자간·대문자 변형·mono 미사용. newsletter 게이트 안이라 env-off 빌드 출력 0. -#}
+{% if newsletter_form_action and not hide_subscribe %}
+<style>
+.grm-inl{margin:24px 0;padding:16px 0;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);text-align:left}
+.grm-inl[hidden],.grm-inl-in[hidden],.grm-inl-done[hidden]{display:none}
+.grm-inl.sub-flash{box-shadow:0 0 0 3px var(--coral-tint);transition:box-shadow .3s}
+.grm-inl-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:10px 28px;align-items:center}
+.grm-inl-tx b{display:block;font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.35;color:var(--ink);word-break:keep-all}
+.grm-inl-tx span{display:block;margin-top:3px;font-family:var(--sans);font-size:13px;line-height:1.5;color:var(--muted);word-break:keep-all}
+.grm-inl-form{display:flex;gap:8px;margin:0}
+.grm-inl-form input[type=email]{flex:1;min-width:0;height:46px;padding:0 14px;border:1px solid var(--line-2);border-radius:var(--rad-s);background:#fff;font-family:var(--sans);font-size:15px;color:var(--ink);transition:border-color var(--tr),box-shadow var(--tr)}
+.grm-inl-form input[type=email]:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
+.grm-inl-form input[type=email]::placeholder{color:var(--muted)}
+.grm-inl-btn{flex:none;height:46px;padding:0 20px;border:0;border-radius:var(--rad-s);background:var(--coral);color:var(--on-coral,#fff);font-family:var(--sans);font-size:15px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background var(--tr)}
+.grm-inl-btn:hover{background:var(--coral-2)}
+.grm-inl-btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--coral-tint),0 0 0 4px var(--coral)}
+.grm-inl-done{margin:0;font-family:var(--sans);font-size:14.5px;color:var(--ink);word-break:keep-all}
+.grm-inl-done b{color:var(--coral-2);margin-right:6px}
+.grm-inl--stack{margin:18px 0 0}
+.grm-inl--stack .grm-inl-in{grid-template-columns:1fr}
+@media (max-width:720px){.grm-inl-in{grid-template-columns:1fr}.grm-inl-btn{padding:0 16px}}
+@media (prefers-reduced-motion:reduce){.grm-inl.sub-flash{transition:none}}
+</style>
+<script>
+(function(){
+  var rows=document.querySelectorAll('.grm-inl');
+  if(!rows.length)return;
+  try{
+    if(localStorage.getItem('grm-sub-ok')){for(var i=0;i<rows.length;i++)rows[i].hidden=true;return;}
+  }catch(_){}
+  if(!window.fetch)return;
+  for(var j=0;j<rows.length;j++)(function(row){
+    var f=row.querySelector('form');
+    if(!f)return;
+    f.addEventListener('submit',function(e){
+      if(!f.checkValidity())return;
+      e.preventDefault();
+      var body=new URLSearchParams();
+      new FormData(f).forEach(function(v,k){body.append(k,v);});
+      fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
+      try{localStorage.setItem('grm-sub-ok','1');}catch(_){}
+      var inn=row.querySelector('.grm-inl-in'),done=row.querySelector('.grm-inl-done');
+      if(inn)inn.hidden=true;
+      if(done)done.hidden=false;
+      // 같은 페이지의 다른 줄형 칸은 접는다(구독한 사람에게 또 권하지 않는다). 밴드는 다음 방문부터 숨는다.
+      for(var k=0;k<rows.length;k++)if(rows[k]!==row)rows[k].hidden=true;
+    });
+  })(rows[j]);
+})();
+</script>
+{% endif %}
 {% if newsletter_form_action and not hide_subscribe and signup_path_fields %}
 <script>
 (function(){
@@ -828,7 +921,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   }
   document.addEventListener('submit',function(e){
     var f=e.target;
-    if(!f||(f.id!=='grm-sub-form'&&f.id!=='grm-cta-form'))return;
+    if(!f||(f.id!=='grm-sub-form'&&f.id!=='grm-cta-form'&&!(f.classList&&f.classList.contains('grm-inl-form'))))return;
     try{
       var a=f.elements['SIGNUP_PATH'],b=f.elements['SIGNUP_LANG'];
       if(a)a.value=signupPath(location.pathname);
@@ -887,9 +980,9 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       {% if sub_zone == 'glossary' %}
       <b>{{ _("구독하면 GMP 규제 용어집 PDF를 드립니다") }}</b>
       {% elif sub_zone == 'findings' %}
-      <b>{{ _("이런 지적, 매주 월요일 한국어로 받아보세요") }}</b>
+      <b>{{ _("FDA·EU·식약처 실사 지적, 매주 받아 보세요") }}</b>
       {% else %}
-      <b>{{ _("글로벌 GMP 규제 소식, 매주 월요일 한국어로") }}</b>
+      <b>{{ _("글로벌 GMP 규제 소식, 한국어로 매주 받아 보세요") }}</b>
       {% endif %}
       <span>{{ _("공식 원문 링크와 함께 · 언제든 해지 · 무료") }}</span>
     </div>
@@ -899,7 +992,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       <input type="text" name="email_address_check" value="" class="grm-cta-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <input type="hidden" name="locale" value="en" />
       {% if signup_path_fields %}<input type="hidden" name="SIGNUP_PATH" value="" /><input type="hidden" name="SIGNUP_LANG" value="" />{% endif %}
-      <button type="submit">{{ _("구독") }}</button>
+      <button type="submit">{{ _("무료 구독") }}</button>
     </form>
     <div class="grm-cta-side">
       {# [구독 밴드 실물 링크 2026-09-07] 주석 참조 — 밴드는 09-07 부터 최신 브리프로 가는
@@ -1110,7 +1203,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
         body:JSON.stringify({p_key:key})}).catch(function(){});
       // ★제출만 구역을 남긴다 — 노출까지 보내면 요청이 두 배가 되고, 노출 카운터는
       // 어차피 크롤러 오염이라 구역별로 갈라도 못 읽는다(2026-09-01 실측 일 170 vs 21).
-      if(key==='band_submit'||key==='cta_submit'){
+      if(key==='band_submit'||key==='cta_submit'||key==='inline_top_submit'||key==='inline_mid_submit'||key==='inline_end_submit'){
         fetch(u+'/rest/v1/rpc/funnel_zone_bump',{method:'POST',keepalive:true,
           headers:{'Content-Type':'application/json',apikey:k,Authorization:'Bearer '+k},
           body:JSON.stringify({p_key:key,p_zone:zone()})}).catch(function(){});
@@ -1145,6 +1238,20 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   }
   var cf=document.getElementById('grm-cta-form');
   if(cf)cf.addEventListener('submit',function(){bump('cta_submit');});
+  // [160 · 2026-11-17] 본문 속 줄형 칸 — 자리(top|mid|end)마다 노출 1회·제출을 따로 센다. 구역·경로·유입 축은
+  // 위 제출 조건에 두 키를 더해 밴드와 같은 경로로 함께 남는다(가산만, 기존 키·인자 무변경).
+  var inl=document.querySelectorAll('.grm-inl');
+  for(var ii=0;ii<inl.length;ii++)(function(row){
+    var slot=row.getAttribute('data-sub-slot');if(slot!=='mid'&&slot!=='end')slot='top';
+    if(window.IntersectionObserver){
+      var io2=new IntersectionObserver(function(es){
+        es.forEach(function(en){if(en.isIntersecting){bump('inline_'+slot+'_view',true);io2.disconnect();}});
+      },{threshold:0.5});
+      io2.observe(row);
+    }
+    var rf=row.querySelector('form');
+    if(rf)rf.addEventListener('submit',function(){if(rf.checkValidity())bump('inline_'+slot+'_submit');});
+  })(inl[ii]);
   ['grm-cta-today','grm-cta-close'].forEach(function(id){
     var b=document.getElementById(id);
     if(b)b.addEventListener('click',function(){bump('cta_dismiss');});

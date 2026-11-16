@@ -6532,6 +6532,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["sub_lang_default"] = DEFAULT_LANG
     env.globals["lang_endonym"] = LANG_ENDONYM
     env.globals["sub_peek_findings"] = False
+    # [구독 유입 2026-11-17] 영문 홈·지적사항 첫 화면의 줄형 구독 칸 — 영문 방문이 1위인데 첫 화면에
+    # 구독 문이 없었다(대표 확정안). 한국어 홈은 종전대로(헤더 버튼·밴드). 영어 환경에서만 켠다.
+    env.globals["sub_inline_lists"] = False
     # 자산 캐시버스팅 — grm.css/archive.js content-hash 쿼리(재배포 시 stale CSS 방지·결정론).
     def _asset_ver(name: str) -> str:
         p = assets_dir / name
@@ -6681,6 +6684,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION_EN)
     en_env.globals["sub_offer_glossary_pdf"] = False
     en_env.globals["sub_peek_findings"] = True
+    en_env.globals["sub_inline_lists"] = True
     en_env.globals["sub_lang_default"] = "en"
     en_page, _en_render, en_emit = _make_tree("en", en_env)
     # (언어, page 팩토리, emit, 번역기) — 한국어가 **먼저**여야 산출 순서가 종전과 같다.

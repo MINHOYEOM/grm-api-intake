@@ -144,6 +144,8 @@
       <figure class="gt-fig">{% include figure_partial %}<figcaption>{{ _('설명용 그림') }}</figcaption></figure>
       {% endif %}
     </div>
+    {#- [구독 유입 2026-11-17] 정의·출처 바로 아래 줄형 구독 칸 — newsletter 게이트 안(env-off 빌드 출력 0). -#}
+    {%- with sub_kind='glossary', sub_slot='top' %}{% include "partials/sub_inline.html" %}{% endwith %}
 
     {#- [UI 2단 2026-11-12] 관련 조항·용어·기록 한 줄 — 종전엔 아래로 흩어진 세 섹션이었다.
         값·순서는 그대로(related 순서는 사람이 고른 정본). 기록 열 = 이 용어의 지적사례

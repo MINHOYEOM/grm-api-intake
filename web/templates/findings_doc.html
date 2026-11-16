@@ -245,6 +245,8 @@
         {%- endfor %}
       </div>
     </section>
+    {#- [구독 유입 2026-11-17] 지적 본문 끝 줄형 구독 칸 — newsletter 게이트 안(env-off 빌드 출력 0). -#}
+    {%- with sub_kind='doc', sub_slot='end' %}{% include "partials/sub_inline.html" %}{% endwith %}
 
     {#- [SEO 2단계 2026-11-09] GRM 이 더하는 연결 — 원문에 없는 정보. 데이터가 있을 때만
         블록이 선다(빈 제목 금지). 비슷한 지적 = 지식그래프 엣지(같은 문서 유형·점수 0.40 이상)

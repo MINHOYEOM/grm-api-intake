@@ -163,7 +163,7 @@
 {% if lang == 'ko' or ('briefs/' ~ latest_slug ~ '/') in en_paths %}  <a class="btn {{ 'grm-hweek' if hsub_on else 'coral' }}" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식") }}</a>
 {% endif %}
 {% if hsub_on %}  <a class="grm-hsub" href="#subscribe"><span class="grm-hsub-l">{{ _("무료 구독") }}</span><span class="grm-hsub-s">{{ _("구독") }}</span></a>
-<style>.grm-hsub{display:inline-flex;align-items:center;height:42px;padding:0 18px;border-radius:var(--rad-s);background:var(--coral);color:var(--on-coral,#fff);font-family:var(--sans);font-size:14.5px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background var(--tr)}.grm-hsub:hover{background:var(--coral-2)}.grm-hsub:focus-visible{outline:none;box-shadow:0 0 0 3px var(--coral-tint),0 0 0 4px var(--coral)}.grm-hsub-s{display:none}@media (max-width:640px){.grm-hweek{display:none}.grm-hsub{height:38px;padding:0 13px;font-size:13.5px}.grm-hsub-l{display:none}.grm-hsub-s{display:inline}}</style>
+<style>.grm-hsub{display:inline-flex;align-items:center;height:42px;padding:0 18px;border-radius:var(--rad-s);background:var(--coral);color:var(--on-coral,#fff);font-family:var(--sans);font-size:14.5px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background var(--tr)}.grm-hsub:hover{background:var(--coral-2)}.grm-hsub:focus-visible{outline:none;box-shadow:0 0 0 3px var(--coral-tint),0 0 0 4px var(--coral)}.grm-hsub-s{display:none}.grm-hweek{white-space:nowrap}@media (max-width:1180px){.grm-hweek{display:none}}@media (max-width:640px){.grm-hsub{height:38px;padding:0 13px;font-size:13.5px}.grm-hsub-l{display:none}.grm-hsub-s{display:inline}}</style>
 {% endif %}
 </div></header>
 

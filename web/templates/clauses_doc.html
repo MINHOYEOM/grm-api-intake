@@ -10,8 +10,8 @@
     </nav>
     <p class="kick">{{ doc.source.kick }}</p>
     <h1 class="ct-h1">{{ doc.code }}</h1>
-    {%- if doc.title %}<p class="ct-sub" lang="en">{{ doc.title }}</p>{% endif %}
-    {%- if doc.version %}<p class="ct-path" lang="en">{{ doc.version }}</p>{% endif %}
+    {%- if doc.title %}<p class="ct-sub" lang="{{ doc.source.lang }}">{{ doc.title }}</p>{% endif %}
+    {%- if doc.version %}<p class="ct-path" lang="{{ doc.source.lang }}">{{ doc.version }}</p>{% endif %}
     <div class="ct-links" style="margin-top:16px">
       <a href="{{ doc.url }}" target="_blank" rel="noopener">{{ _('공식 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
     </div>
@@ -22,9 +22,9 @@
       <ol class="ct-toc">
         {%- for c in doc.clauses %}
         {%- if c.href %}
-        <li id="{{ c.anchor }}" class="d{{ c.depth if c.depth < 4 else 3 }}"><span class="n">{{ c.number }}</span><a href="{{ rel_root }}{{ c.href }}" lang="en">{{ c.title or c.preview }}</a></li>
+        <li id="{{ c.anchor }}" class="d{{ c.depth if c.depth < 4 else 3 }}"><span class="n">{{ c.number }}</span><a href="{{ rel_root }}{{ c.href }}" lang="{{ doc.source.lang }}">{{ c.title or c.preview }}</a></li>
         {%- else %}
-        <li id="{{ c.anchor }}" class="h d{{ c.depth if c.depth < 4 else 3 }}"><span class="n">{{ c.number }}</span><span lang="en">{{ c.title }}</span></li>
+        <li id="{{ c.anchor }}" class="h d{{ c.depth if c.depth < 4 else 3 }}"><span class="n">{{ c.number }}</span><span lang="{{ doc.source.lang }}">{{ c.title }}</span></li>
         {%- endif %}
         {%- endfor %}
       </ol>
@@ -32,7 +32,7 @@
     {%- if doc.front_matter %}
     <details class="ct-front">
       <summary>{{ _('표지·목차 원문') }}</summary>
-      <div lang="en">{% for p in doc.front_matter %}<p>{{ p }}</p>{% endfor %}</div>
+      <div lang="{{ doc.source.lang }}">{% for p in doc.front_matter %}<p>{{ p }}</p>{% endfor %}</div>
     </details>
     {%- endif %}
     <p class="ct-note">{{ _('출처') }}: <a href="{{ doc.source.url }}" target="_blank" rel="noopener">{{ doc.source.publisher }}</a> &middot; {{ doc.source.license }} &middot; {{ _('수집일 {d}', d=doc.source.retrieved) }}</p>

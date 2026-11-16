@@ -673,17 +673,13 @@
     "id": "pharmaceutical-quality-system",
     "term_ko": "의약품 품질시스템",
     "term_en": "Pharmaceutical Quality System (PQS)",
-    "aliases": [
-      "quality management system",
-      "품질경영시스템",
-      "QMS"
-    ],
     "easy_ko": "제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과 자원을 연결한 관리체계입니다.",
     "definition_source": "ICH Q10, Pharmaceutical Quality System, §§1.2–1.8 and Glossary",
     "related": [
       "quality-assurance",
       "quality-risk-management",
-      "continual-improvement"
+      "continual-improvement",
+      "quality-management-system"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
     "reg_refs": [
@@ -5242,5 +5238,27 @@
       "21 CFR 211.194"
     ],
     "easy_en": "A computerised system that manages laboratory work and data from sample receipt and test assignment to entry, review and approval of results and reporting."
+  },
+  {
+    "id": "quality-management-system",
+    "term_ko": "품질경영시스템",
+    "term_en": "Quality Management System (QMS)",
+    "aliases": [
+      "QMS",
+      "품질 경영 시스템"
+    ],
+    "easy_ko": "품질에 관해 조직을 지휘하고 관리하는 경영시스템입니다. 의료기기에서는 미국 QMSR(21 CFR 820)이 ISO 13485 를 그대로 받아들여 이 이름으로 요구합니다.",
+    "definition_source": "ISO 9000:2015 §3.5.4; 21 CFR Part 820 Quality Management System Regulation (2026-02-02 시행, ISO 13485:2016 인용)",
+    "related": [
+      "pharmaceutical-quality-system",
+      "quality-system",
+      "management-review"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-820",
+    "reg_refs": [
+      "21 CFR 820.10",
+      "ISO 13485:2016 §4.1"
+    ],
+    "easy_en": "The management system that directs and controls an organisation with regard to quality. For medical devices, the US QMSR (21 CFR 820) adopts ISO 13485 and requires it under this name."
   }
 ]

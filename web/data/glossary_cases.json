@@ -1201,6 +1201,13 @@
       "q": "LIMS",
       "findings": 12,
       "documents": 11
+    },
+    {
+      "id": "quality-management-system",
+      "q": "Quality Management System",
+      "findings": 106,
+      "documents": 97,
+      "note": "대부분 의료기기 실사 지적(QMSR·ISO 13485 문구) — 의약품 PQS 지적과 다른 축이라 별도 용어로 둔다(2026-11-16)"
     }
   ],
   "excluded": [

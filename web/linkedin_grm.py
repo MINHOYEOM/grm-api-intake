@@ -593,8 +593,57 @@ def load_similar(slots: dict, pub: str, *, url: str, key: str, fetch=fetch_simil
 
 
 def site_lines(rows: list[dict]) -> list[str]:
-    return [f"{r['alias']}({r['year']}년 {r['agency']}, {r['label']}) ‘{r['target']}’ ← {r['fact']} grm-solutions.com/findings/doc/{r['slug']}/"
+    """유사 사례 한 건 = 세 줄(머리 · 원문 한 조각 · 주소). 주소는 반드시 자기 줄 — 문장 끝·괄호에 붙으면
+    링크드인이 링크를 덜 걸거나 마침표·괄호까지 주소로 먹는다(2026-11-16 대표 지적)."""
+    return [f"{r['alias']} · {r['year']}년 {r['agency']} · {r['label']}\n‘{r['target']}’ — {r['fact']}\ngrm-solutions.com/findings/doc/{r['slug']}/"
             for r in rows if r["slug"]]
+
+
+_SENT_END = re.compile(r"(?<=[다요]\.)\s+")
+_URL_IN_LINE = re.compile(r"\s*[—(]?\s*((?:https://)?grm-solutions\.com/\S*?)\)?(?=\s|$)")
+
+
+def _cap_lines(text: str) -> list[str]:
+    """한 줄에 한 문장 — 모바일에서 문장 중간에 접히지 않게(링크드인 본문 규칙)."""
+    return [x.strip() for x in _SENT_END.split(la._norm(text or "")) if x.strip()]
+
+
+def _url_own_line(text: str) -> str:
+    """줄 안에 섞인 사이트 주소를 다음 줄로 뺀다(앞의 '—'·'(' 와 뒤의 ')' 는 떼어 낸다)."""
+    out = []
+    for line in text.split("\n"):
+        urls = [m.group(1) for m in _URL_IN_LINE.finditer(line)]
+        rest = _URL_IN_LINE.sub("", line).rstrip(" ·:—(")
+        if urls and rest.strip():
+            out.append(rest)
+            out.extend(urls)
+        else:
+            out.append(line)
+    return "\n".join(out)
+
+
+def caption_layout(lead: str, claims: str, contrast: str, requests: str, similar_block: list[str],
+                   term_names: list[str], not_stated: str, caption_url: str) -> str:
+    """링크드인 본문 배치(코드 고정) — 첫 단락은 소제목 없이 사건, 그다음 ■ 소제목 단락.
+    문장은 한 줄에 하나, 주소는 자기 줄, 단락 사이는 빈 줄 하나."""
+    def sec(title: str, lines: list[str]) -> str:
+        body = list(lines)
+        while body and not body[-1]:
+            body.pop()
+        return "\n".join([f"■ {title}", *body]) if any(body) else ""
+    ns = la._norm(not_stated or "")
+    ns = re.sub(r"^서한에 없는 것\s*[:：]\s*", "", ns)
+    parts = [
+        "\n".join(_cap_lines(lead)),
+        sec("지적 내용", _cap_lines(claims)),
+        sec("회사 회신과 FDA 판단", _cap_lines(contrast)),
+        sec("FDA 요구", _cap_lines(requests)),
+        sec("GRM 지적사항 DB의 비슷한 사례", similar_block),
+        sec("관련 용어", [" · ".join(term_names), "grm-solutions.com/glossary/"] if term_names else []),
+        sec("서한에 없는 것", _cap_lines(ns)),
+        sec("전체 해설", [caption_url]),
+    ]
+    return _url_own_line("\n\n".join(x for x in parts if x)) + "\n"
 
 
 def _load_glossary() -> list[dict]:
@@ -657,15 +706,16 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     url = f"{base_url}/briefs/{pub}/"
     cap = slots["caption"]
     caption_url = lc.with_utm(url, *lc.LINKEDIN_WEEKLY, lc.linkedin_weekly_campaign(pub))
-    term_line = ("관련 용어: " + " · ".join(n for n, _ in terms) + " (grm-solutions.com/glossary/)") if terms else ""
-    sim = "\n".join(x for x in [la._norm(cap["similar"]),
-                               *(site_lines(site) if site else case_lines(db, polite=True, no_match_note=ctx["no_match_note"])),
-                               ctx["method"], *db_lines(db, polite=True), ctx["map_note"], term_line] if x)
-    ko = "\n\n".join([la._norm(cap["lead"]), la._norm(cap["claims"]), la._norm(cap["contrast"]),
-                      la._norm(cap["requests"]), sim, la._norm(cap["not_stated"])])
+    cases = site_lines(site) if site else case_lines(db, polite=True, no_match_note=ctx["no_match_note"])
+    similar_block = [la._norm(cap["similar"]), "", *("\n\n".join(cases).split("\n") if cases else []),
+                     "", *[x for x in [ctx["method"], *db_lines(db, polite=True), ctx["map_note"]] if x]]
+    while similar_block and similar_block[-1] == "":
+        similar_block.pop()
+    ko = caption_layout(cap["lead"], cap["claims"], cap["contrast"], cap["requests"], similar_block,
+                        [n for n, _ in terms], cap["not_stated"], caption_url)
     # 캡션 본문 속 글자 주소(`grm-solutions.com/...`)에도 같은 표식 — 링크드인이 링크로 걸어 주지만 표식이 없어 '직접'에 섞였다.
     ko = utm.tag_bare_site_urls(ko, "linkedin_weekly", date=pub)
-    return {"pub": pub, "lang": "ko", "slides": slides, "caption": ko + f"\n\n전체 해설: {caption_url}\n",
+    return {"pub": pub, "lang": "ko", "slides": slides, "caption": ko,
             "doc_title": f"GRM {m}월 {wk}주 경고서한 분석(GRM 판)", "url": url, "caption_url": caption_url,
             "card_id": str(card.get("id")), "mode": "grm"}
 

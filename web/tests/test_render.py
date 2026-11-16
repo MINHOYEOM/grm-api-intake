@@ -14336,7 +14336,8 @@ class WebPopularCardsTest(unittest.TestCase):
         self.assertNotIn("assets/popular.js", landing_on)
         # 관심 업체 알림 줄은 회원 기능이라 켠 빌드에만 — 뉴스레터(newsletter.py)가 이 앵커로 직링크한다.
         self.assertIn('id="watchlist"', landing_on)
-        self.assertIn('findings/firm/index.html">업체 조회</a>', landing_on)
+        # [구독 유입 2026-11-17] 한 줄 안내가 '알림과 학습' 칸(업체 찾기)으로 바뀌었다 — 앵커·목적지는 그대로.
+        self.assertIn('id="watchlist" href="findings/firm/index.html"', landing_on)
 
 
     def test_watchlist_banner_env_gated(self):

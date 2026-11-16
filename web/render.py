@@ -5646,7 +5646,7 @@ BROWSE_SECTIONS: tuple[tuple[str, tuple[tuple[str, str, str], ...]], ...] = (
     )),
     (N_("자료·도구"), (
         ("library/", N_("지침·고시"), N_("규제기관 지침과 고시 원문 목록")),
-        ("clauses/", N_("기준 조항 원문"), N_("21 CFR·EU GMP·ICH 조항을 원문 그대로")),
+        ("clauses/", N_("기준 조항 원문"), N_("식약처 GMP·21 CFR·EU GMP·ICH 조항을 원문 그대로")),
         ("findings/checklist/", N_("자가점검표"), N_("지적 문장 기반 자가점검 항목")),
         ("inspection-notes/", N_("실사 대비 노트"), N_("주제별로 실사에서 실제 지적된 문장과 출처")),
         ("findings/coverage/", N_("데이터 현황"), N_("수집 출처, 연도별 확보량, 수집 범위와 한계")),
@@ -6172,8 +6172,8 @@ EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관�
 NEWS_DESCRIPTION = N_("주간 브리프에 싣지 않은 규제기관·업계 단체의 최근 소식 — 식약처·EMA·FDA 회수·미국 관보·ECA·ISPE 등을 날짜순으로.")
 CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
                            "조항별 인용 실사 수·비율과 회계연도별 추이.")
-CLAUSES_DESCRIPTION = N_("21 CFR Part 210·211, EU GMP Part I·Annex 1, ICH Q7·Q9·Q10 을 조항 단위 원문으로 — "
-                         "규제기관 공식 원문 그대로, 조항마다 공식 링크.")
+CLAUSES_DESCRIPTION = N_("식약처 GMP 규정·별표, 21 CFR Part 210·211, EU GMP Part I·Annex 1, ICH Q7·Q9·Q10 을 "
+                         "조항 단위 원문으로 — 규제기관 공식 원문 그대로, 조항마다 공식 링크.")
 CLAUSES_DOC_DESCRIPTION = N_("{code} {title} 조항 목차 — 조항 {n}개의 원문을 조항 단위로 읽습니다.")
 
 
@@ -6695,10 +6695,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 넣으면 먼저 그려진 한국어 페이지가 짝을 몰라 hreflang·언어 전환이 한쪽에만 붙는다
     # (모음 페이지에서 같은 실수를 CI 가 잡았다).
     en_paths |= clause_tree_paths(clause_views_en)
-    # [기준 조항 원문 2026-11-15] 커밋 정본(web/data/clauses/*.json)에서만 파생 — 본문이 영어 원문이라
-    # 두 트리가 같은 경로를 낸다. 용어사전·조항 사례 페이지의 "원문" 간선이 이 뷰 하나를 본다.
-    clause_text_view = clause_text_page.build(clause_text_page.load_sources())
-    en_paths |= clause_text_page.tree_paths(clause_text_view)
+    # [기준 조항 원문 2026-11-15] 커밋 정본(web/data/clauses/*.json)에서만 파생. 해외 기준(영어 원문)은
+    # 두 트리가 같은 경로를 내고, 식약처 고시(국문 원문)는 국문 트리에만 싣는다 — 영문 뷰는 그 원천을 뺀
+    # 같은 함수의 결과다. en_paths 는 영문 뷰만 본다(국문 전용 페이지는 hreflang 짝이 없다).
+    _ct_sources = clause_text_page.load_sources()
+    clause_text_view = clause_text_page.build(_ct_sources)
+    clause_text_view_en = clause_text_page.build(clause_text_page.for_lang(_ct_sources, "en"))
+    clause_text_views = {DEFAULT_LANG: clause_text_view, "en": clause_text_view_en}
+    en_paths |= clause_text_page.tree_paths(clause_text_view_en)
     if citations_data:
         en_paths.add("findings/citations/")
     # [FDA 지적 조항 × 업체 전체 목록 2026-11-10] 스냅샷(web/data/fda_citation_firms.json)이 있고
@@ -7090,7 +7094,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         glossary_en_view = build_glossary_view(
             glossary_terms, _load_reg_ref_catalogs(), glossary_en_cases,
             clause_slugs, lang="en",
-            clause_text_view=clause_text_view) if glossary_terms else None
+            clause_text_view=clause_text_view_en) if glossary_terms else None
         if glossary_en_view:
             en_emit("glossary.html", en_page("glossary/"),
                 page_title=en_tr("규제 용어사전 · GRM"),
@@ -8059,8 +8063,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # sitemap lastmod 는 비운다 — 조항에는 개정일 필드가 없고, 수집일은 수정일이 아니다(지어낸 날짜 금지).
     if clause_text_view["sources"]:
         for _lg, _pg, _em, _tr in trees:
+            _ctv = clause_text_views.get(_lg, clause_text_view_en)
+            if not _ctv["sources"]:
+                continue
             _ct_cases = clause_slugs if _lg == DEFAULT_LANG else {c["slug"] for c in clause_views_en}
-            _ct_terms = clause_text_page.terms_by_href(clause_text_view, glossary_terms, _lg)
+            _ct_terms = clause_text_page.terms_by_href(_ctv, glossary_terms, _lg)
             _ip = _pg(clause_text_page.ROUTE)
             _em("clauses_index.html", _ip,
                 page_title=_tr("기준 조항 원문 · GRM"),
@@ -8068,9 +8075,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=_tr(CLAUSES_DESCRIPTION),
                 json_ld=_ip.breadcrumb_json_ld([
                     (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"), (_tr("기준 조항 원문"), "")]),
-                ct=clause_text_view,
+                ct=_ctv,
             )
-            for _sv in clause_text_view["sources"]:
+            for _sv in _ctv["sources"]:
                 for _d in _sv["docs"]:
                     _dp = _pg(_d["path"])
                     _em("clauses_doc.html", _dp,
@@ -8082,7 +8089,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                             (_tr("홈"), "/"), (_tr("기준 조항 원문"), "clauses/"), (_d["code"], "")]),
                         doc=_d,
                     )
-            for _d, _c in clause_text_page.pages(clause_text_view):
+            for _d, _c in clause_text_page.pages(_ctv):
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
                 _em("clause_text.html", _cp,

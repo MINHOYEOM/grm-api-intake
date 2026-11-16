@@ -1,11 +1,12 @@
 """[기준 조항 원문 2026-11-15] `/clauses/` 트리 — 로더·뷰·근거 조항 해석기(순수 함수).
 
-정본: `web/data/clauses/{cfr21,eu_gmp,ich}.json`(clause_text_collect.py · 조항 단위 원문, 무절단).
+정본: `web/data/clauses/{mfds_gmp,cfr21,eu_gmp,ich}.json`(clause_text_collect.py · 조항 단위 원문, 무절단).
 화면 세 층:
   · `/clauses/`                         — 원천별 문서 목록(색인)
   · `/clauses/{src}/{doc}/`             — 문서 1건의 조항 목차(소제목 포함)
   · `/clauses/{src}/{doc}/{slug}/`      — 조항 1개의 원문 전체 + 공식 원문 링크 + 이 조항을 인용한 용어
-본문은 원문(영어) 그대로다 — 국문 번역은 아직 없고(번역 대기 목록만 있다) 지어내지 않는다.
+본문은 원문 그대로다(해외 기준은 영어, 식약처 고시는 국문) — 해외 기준의 국문 번역은 아직 없고 지어내지 않는다.
+`source.lang` 이 "ko" 인 원천(식약처 고시)은 국문 트리에만 싣는다 — 영문 트리는 `for_lang(sources, "en")` 으로 뺀다.
 목차의 미리보기만 화면에서 줄인다(데이터는 자르지 않는다).
 
 근거 조항 해석기(`ref_href`)는 용어사전 `reg_refs` 라벨·지적의 `cfr_refs` 를 이 트리의 주소로 잇는다.
@@ -24,11 +25,11 @@ from typing import Any
 SCHEMA = "grm-clause-text/v1"
 DATA_DIR = Path(__file__).resolve().parent / "data" / "clauses"
 ROUTE = "clauses/"
-#: 색인 순서 = 원천 중요도(법령 → EU 기준서 → ICH). 파일이 없으면 그 원천만 빠진다.
-SOURCE_ORDER = ("cfr21", "eu_gmp", "ich")
-SOURCE_SLUG = {"cfr21": "cfr21", "eu_gmp": "eu-gmp", "ich": "ich"}
+#: 색인 순서 = 국내 고시 → 미국 법령 → EU 기준서 → ICH. 파일이 없으면 그 원천만 빠진다.
+SOURCE_ORDER = ("mfds_gmp", "cfr21", "eu_gmp", "ich")
+SOURCE_SLUG = {"mfds_gmp": "mfds-gmp", "cfr21": "cfr21", "eu_gmp": "eu-gmp", "ich": "ich"}
 #: 화면 머리 표지(eyebrow) — 고유명사라 번역하지 않는다.
-SOURCE_KICK = {"cfr21": "US · 21 CFR", "eu_gmp": "EU · EudraLex Vol.4", "ich": "ICH"}
+SOURCE_KICK = {"mfds_gmp": "KR · 식약처 고시", "cfr21": "US · 21 CFR", "eu_gmp": "EU · EudraLex Vol.4", "ich": "ICH"}
 PREVIEW_CHARS = 140
 
 
@@ -48,6 +49,18 @@ def load_sources(data_dir: "Path | None" = None) -> list[dict[str, Any]]:
             continue
         out.append(obj)
     return out
+
+
+def source_lang(obj: dict[str, Any]) -> str:
+    """원천 본문의 언어(없으면 "en")."""
+    return (obj.get("source") or {}).get("lang") or "en"
+
+
+def for_lang(sources: list[dict[str, Any]], lang: str) -> list[dict[str, Any]]:
+    """그 언어 트리에 싣는 원천. 영문 트리는 국문 본문(식약처 고시)을 싣지 않는다."""
+    if lang == "ko":
+        return list(sources)
+    return [o for o in sources if source_lang(o) != "ko"]
 
 
 def _preview(text: str, n: int = PREVIEW_CHARS) -> str:
@@ -99,7 +112,7 @@ def build(sources: list[dict[str, Any]]) -> dict[str, Any]:
             docs.append(dv)
             index[(key, d["key"])] = dv
             total += len(pages)
-        views.append({"key": key, "slug": sslug, "kick": SOURCE_KICK.get(key, ""),
+        views.append({"key": key, "slug": sslug, "lang": source_lang(obj), "kick": SOURCE_KICK.get(key, ""),
                       "title": src.get("title") or "", "publisher": src.get("publisher") or "",
                       "url": src.get("url") or "", "license": src.get("license") or "",
                       "license_url": src.get("license_url") or "",
@@ -174,6 +187,9 @@ _CFR_SEC = re.compile(r"^21 CFR (\d{3}\.\d+)(?:\([A-Za-z0-9]+\))*$")
 _CFR_PART = re.compile(r"^21 CFR Part (\d{3})$")
 _EU_CH = re.compile(r"^EU GMP Part I,? Chapter (\d)\b(.*)$")
 _EU_AN1 = re.compile(r"^EU GMP Annex 1\b(?!\d)(.*)$")
+_MFDS_RULE = "의약품 제조 및 품질관리에 관한 규정"
+_MFDS_BYL = re.compile(r"^" + _MFDS_RULE + r" \[별표 (\d+)(?:의(\d+))?\]")
+_MFDS_ART = re.compile(r"^" + _MFDS_RULE + r" 제(\d+)조(?:의(\d+))?(?![\d의])")
 _ICH = re.compile(r"^ICH (Q7|Q9(?:\(R1\))?|Q10)(?=\s|$)(.*)$")
 
 
@@ -197,6 +213,16 @@ def ref_href(view: dict[str, Any], label: str) -> str:
     m = _EU_AN1.match(label)
     if m:
         return _doc_or_clause(view, "eu_gmp", "annex1", m.group(1))
+    m = _MFDS_BYL.match(label)
+    if m:  # 별표는 문서 목차로(별표 안 번호는 라벨에 거의 없고, 있어도 표기가 제각각이다)
+        doc = f"byl{m.group(1)}" + (f"-{m.group(2)}" if m.group(2) else "")
+        d = view["index"].get(("mfds_gmp", doc))
+        return d["path"] if d else ""
+    m = _MFDS_ART.match(label)
+    if m:
+        num = f"제{m.group(1)}조" + (f"의{m.group(2)}" if m.group(2) else "")
+        c = _find(view, "mfds_gmp", "rule", num)
+        return (c or {}).get("href") or ""
     m = _ICH.match(label)
     if m:
         doc = {"Q7": "q7", "Q9": "q9", "Q9(R1)": "q9", "Q10": "q10"}[m.group(1)]

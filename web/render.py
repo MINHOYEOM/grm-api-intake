@@ -6258,7 +6258,7 @@ EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관�
 NEWS_DESCRIPTION = N_("주간 브리프에 싣지 않은 규제기관·업계 단체의 최근 소식 — 식약처·EMA·FDA 회수·미국 관보·ECA·ISPE 등을 날짜순으로.")
 CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
                            "조항별 인용 실사 수·비율과 회계연도별 추이.")
-CLAUSES_DESCRIPTION = N_("식약처 GMP 규정·별표, 21 CFR Part 210·211·600·601·606·610, EU GMP Part I·Annex 1, ICH Q7·Q9·Q10 을 "
+CLAUSES_DESCRIPTION = N_("식약처 GMP 규정·별표, 21 CFR Part 4·210·211·212·600·601·606·610·1271, EU GMP Part I·Annex 1, ICH Q7·Q9·Q10 을 "
                          "조항 단위 원문으로 — 규제기관 공식 원문 그대로, 조항마다 공식 링크.")
 CLAUSES_DOC_DESCRIPTION = N_("{code} {title} 조항 목차 — 조항 {n}개의 원문을 조항 단위로 읽습니다.")
 

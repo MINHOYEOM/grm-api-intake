@@ -2,7 +2,7 @@
  "schema": "grm-clause-text/v1",
  "source": {
   "key": "cfr21",
-  "title": "21 CFR Part 210·211 (CGMP) · Part 600·601·606·610 (Biologics)",
+  "title": "21 CFR Part 210·211 (CGMP) · Part 600·601·606·610 (Biologics) · Part 212 (PET) · Part 1271 (HCT/Ps) · Part 4 (Combination Products)",
   "publisher": "U.S. Office of the Federal Register / GPO — eCFR",
   "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C",
   "license": "U.S. federal government work — public domain (17 U.S.C. §105). eCFR is an editorial compilation, not an official legal edition of the CFR.",
@@ -58,6 +58,30 @@
    "url": "https://www.ecfr.gov/current/title-21/part-610",
    "version": "eCFR, up to date as of 2026-11-12",
    "front_matter": "Authority:21 U.S.C. 321, 331, 351, 352, 353, 355, 360, 360c, 360d, 360h, 360i, 371, 372, 374, 381; 42 U.S.C. 216, 262, 263, 263a, 264.\n\nSource:38 FR 32056, Nov. 20, 1973, unless otherwise noted."
+  },
+  {
+   "key": "212",
+   "code": "21 CFR Part 212",
+   "title": "Current Good Manufacturing Practice for Positron Emission Tomography Drugs",
+   "url": "https://www.ecfr.gov/current/title-21/part-212",
+   "version": "eCFR, up to date as of 2026-11-12",
+   "front_matter": "Authority:21 U.S.C. 321, 351, 352, 355, 371, 374; Sec. 121, Pub. L. 105-115, 111 Stat. 2296.\n\nSource:74 FR 65431, Dec. 10, 2009, unless otherwise noted."
+  },
+  {
+   "key": "1271",
+   "code": "21 CFR Part 1271",
+   "title": "Human Cells, Tissues, and Cellular and Tissue-Based Products",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271",
+   "version": "eCFR, up to date as of 2026-11-12",
+   "front_matter": "Authority:42 U.S.C. 216, 243, 263a, 264, 271.\n\nSource:66 FR 5466, Jan. 19, 2001, unless otherwise noted."
+  },
+  {
+   "key": "4",
+   "code": "21 CFR Part 4",
+   "title": "Regulation of Combination Products",
+   "url": "https://www.ecfr.gov/current/title-21/part-4",
+   "version": "eCFR, up to date as of 2026-11-12",
+   "front_matter": "Authority:21 U.S.C. 321, 331, 351, 352, 353, 355, 360, 360b-360f, 360h-360j, 360l, 360hh-360ss, 360aaa-360bbb, 360ddd, 360ddd-1, 371(a), 372-374, 379e, 381, 383, 394; 42 U.S.C. 216, 262, 263a, 264, 271.\n\nSource:78 FR 4321, Jan. 22, 2013, unless otherwise noted."
   }
  ],
  "clauses": [
@@ -3218,6 +3242,1400 @@
    "chars": 3419,
    "sha": "0decfbedd635f471",
    "url": "https://www.ecfr.gov/current/title-21/part-610/section-610.68"
+  },
+  {
+   "id": "cfr21/212/212-1",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.1",
+   "slug": "212-1",
+   "code": "21 CFR 212.1",
+   "title": "What are the meanings of the technical terms used in these regulations?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart A—General Provisions"
+   ],
+   "text": "The following definitions apply to words and phrases as they are used in this part. Other definitions of these words may apply when they are used in other parts of this chapter.\n\nAcceptance criteria means numerical limits, ranges, or other criteria for tests that are used for or in making a decision to accept or reject a unit, lot, or batch of a PET drug product.\n\nAct means the Federal Food, Drug, and Cosmetic Act, as amended (21 U.S.C. 321 et seq.).\n\nActive pharmaceutical ingredient means a substance that is intended for incorporation into a finished PET drug product and is intended to furnish pharmacological activity or other direct effect in the diagnosis or monitoring of a disease or a manifestation of a disease in humans, but does not include intermediates used in the synthesis of such substance.\n\nBatch means a specific quantity of PET drug intended to have uniform character and quality, within specified limits, that is produced according to a single production order during the same cycle of production.\n\nBatch production and control record means a unique record that references an accepted master production and control record and documents specific details on production, labeling, and quality control for a single batch of a PET drug.\n\nComponent means any ingredient intended for use in the production of a PET drug, including any ingredients that may not appear in the final PET drug product.\n\nConditional final release means a final release made prior to completion of a required finished-product test because of a malfunction involving analytical equipment.\n\nFinal release means the authoritative decision by a responsible person in a PET production facility to permit the use of a batch of a PET drug in humans.\n\nInactive ingredient means any intended component of the PET drug other than the active pharmaceutical ingredient.\n\nIn-process material means any material fabricated, compounded, blended, or derived by chemical reaction that is produced for, and is used in, the preparation of a PET drug.\n\nLot means a batch, or a specifically identified portion of a batch, having uniform character and quality within specified limits. In the case of a PET drug produced by continuous process, a lot is a specifically identified amount produced in a unit of time or quantity in a manner that ensures its having uniform character and quality within specified limits.\n\nLot number, control number, or batch number means any distinctive combination of letters, numbers, or symbols from which the complete history of the production, processing, packing, holding, and distribution of a batch or lot of a PET drug can be determined.\n\nMaster production and control record means a compilation of instructions containing the procedures and specifications for the production of a PET drug.\n\nMaterial release means the authoritative decision by a responsible person in a PET production facility to permit the use of a component, container and closure, in-process material, packaging material, or labeling in the production of a PET drug.\n\nPET means positron emission tomography.\n\nPET drug means a radioactive drug that exhibits spontaneous disintegration of unstable nuclei by the emission of positrons and is used for providing dual photon positron emission tomographic diagnostic images. The definition includes any nonradioactive reagent, reagent kit, ingredient, nuclide generator, accelerator, target material, electronic synthesizer, or other apparatus or computer program to be used in the preparation of a PET drug. “PET drug” includes a “PET drug product” as defined in this section.\n\nPET drug product means a finished dosage form of a PET drug, whether or not in association with one or more other ingredients.\n\nPET drug production facility means a facility that is engaged in the production of a PET drug.\n\nProduction means the manufacturing, compounding, processing, packaging, labeling, reprocessing, repacking, relabeling, and testing of a PET drug.\n\nQuality assurance means a system for ensuring the quality of active ingredients, PET drugs, intermediates, components that yield an active pharmaceutical ingredient, analytical supplies, and other components, including container-closure systems and in-process materials, through procedures, tests, analytical methods, and acceptance criteria.\n\nReceiving facility means any hospital, institution, nuclear pharmacy, imaging facility, or other entity or part of an entity that accepts a PET drug product that has been given final release, but does not include a common or contract carrier that transports a PET drug product from a PET production facility to a receiving facility.\n\nSpecifications means the tests, analytical procedures, and appropriate acceptance criteria to which a PET drug, PET drug product, component, container-closure system, in-process material, or other material used in PET drug production must conform to be considered acceptable for its intended use. Conformance to specifications means that a PET drug, PET drug product, component, container-closure system, in-process material, or other material used in PET drug production, when tested according to the described analytical procedures, meets the listed acceptance criteria.\n\nStrength means the concentration of the active pharmaceutical ingredient (radioactivity amount per volume or weight at the time of calibration).\n\nSub-batch means a quantity of PET drug having uniform character and quality, within specified limits, that is produced during one succession of multiple irradiations, using a given synthesis and/or purification operation.\n\nVerification means confirmation that an established method, process, or system meets predetermined acceptance criteria.",
+   "notes": [],
+   "chars": 5716,
+   "sha": "b7824a5998997f42",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.1"
+  },
+  {
+   "id": "cfr21/212/212-2",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.2",
+   "slug": "212-2",
+   "code": "21 CFR 212.2",
+   "title": "What is current good manufacturing practice for PET drugs?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart A—General Provisions"
+   ],
+   "text": "Current good manufacturing practice for PET drugs is the minimum requirements for the methods to be used in, and the facilities and controls used for, the production, quality assurance, holding, or distribution of PET drugs intended for human use. Current good manufacturing practice is intended to ensure that each PET drug meets the requirements of the act as to safety and has the identity and strength, and meets the quality and purity characteristics, that it is supposed to have.",
+   "notes": [],
+   "chars": 485,
+   "sha": "2f84f7170ca57db3",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.2"
+  },
+  {
+   "id": "cfr21/212/212-5",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.5",
+   "slug": "212-5",
+   "code": "21 CFR 212.5",
+   "title": "To what drugs do the regulations in this part apply?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart A—General Provisions"
+   ],
+   "text": "(a) Application solely to PET drugs. The regulations in this part apply only to the production, quality assurance, holding, and distribution of PET drugs. Any human drug that does not meet the definition of a PET drug must be manufactured in accordance with the current good manufacturing practice requirements in parts 210 and 211 of this chapter.\n\n(b) Investigational and research PET drugs. For investigational PET drugs for human use produced under an investigational new drug application in accordance with part 312 of this chapter, and PET drugs produced with the approval of a Radioactive Drug Research Committee in accordance with part 361 of this chapter, the requirement under the act to follow current good manufacturing practice is met by complying with the regulations in this part or by producing PET drugs in accordance with Chapter 823, “Radiopharmaceuticals for Positron Emission Tomography—Compounding,” May 1, 2009, pp. 365-369, 32d ed. of the United States Pharmacopeia (USP) National Formulary (NF) (USP 32/NF 27) (2009). The Director of the Federal Register approves this incorporation by reference in accordance with 5 U.S.C. 552(a) and 1 CFR part 51. You may obtain a copy from the United States Pharmacopeial Convention, Inc., 12601 Twinbrook Pkwy., Rockville, MD 20852, Geeta M. Tirumalai, 301-816-8352, e-mail: gt@usp.org, Internet address: http://www.usp.org/USPNF/notices. You may inspect a copy at the Food and Drug Administration Biosciences Library, 10903 New Hampshire Ave., Silver Spring, MD, 20993-0002, 301-796-3504, or at the National Archives and Records Administration (NARA). For information on the availability of this material at NARA, call 202-741-6030, or go to http://www.archives.gov/federal_register/code_of_federal_regulations/ibr_locations.html.",
+   "notes": [],
+   "chars": 1794,
+   "sha": "ddf69ad07b0a0c6a",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.5"
+  },
+  {
+   "id": "cfr21/212/212-10",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.10",
+   "slug": "212-10",
+   "code": "21 CFR 212.10",
+   "title": "What personnel and resources must I have?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart B—Personnel and Resources"
+   ],
+   "text": "You must have a sufficient number of personnel with the necessary education, background, training, and experience to perform their assigned functions. You must have adequate resources, including facilities and equipment, to enable your personnel to perform their functions.",
+   "notes": [],
+   "chars": 273,
+   "sha": "3e5d5afb8e8bef8d",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.10"
+  },
+  {
+   "id": "cfr21/212/212-20",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.20",
+   "slug": "212-20",
+   "code": "21 CFR 212.20",
+   "title": "What activities must I perform to ensure drug quality?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart C—Quality Assurance"
+   ],
+   "text": "(a) Production operations. You must oversee production operations to ensure that each PET drug meets the requirements of the act as to safety and has the identity and strength, and meets the quality and purity characteristics, that it is supposed to have.\n\n(b) Materials. You must examine and approve or reject components, containers, closures, in-process materials, packaging materials, labeling, and finished dosage forms to ensure compliance with procedures and specifications affecting the identity, strength, quality, or purity of a PET drug.\n\n(c) Specifications and processes. You must approve or reject, before implementation, any initial specifications, methods, processes, or procedures, and any proposed changes to existing specifications, methods, processes, or procedures, to ensure that they maintain the identity, strength, quality, and purity of a PET drug. You must demonstrate that any change does not adversely affect the identity, strength, quality, or purity of any PET drug.\n\n(d) Production records. You must review production records to determine whether errors have occurred. If errors have occurred, or a production batch or any component of the batch fails to meet any of its specifications, you must determine the need for an investigation, conduct investigations when necessary, and take appropriate corrective actions.\n\n(e) Quality assurance. You must establish and follow written quality assurance procedures.",
+   "notes": [],
+   "chars": 1438,
+   "sha": "db1e9859819a4457",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.20"
+  },
+  {
+   "id": "cfr21/212/212-30",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.30",
+   "slug": "212-30",
+   "code": "21 CFR 212.30",
+   "title": "What requirements must my facilities and equipment meet?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart D—Facilities and Equipment"
+   ],
+   "text": "(a) Facilities. You must provide adequate facilities to ensure the orderly handling of materials and equipment, the prevention of mix-ups, and the prevention of contamination of equipment or product by substances, personnel, or environmental conditions that could reasonably be expected to have an adverse effect on product quality.\n\n(b) Equipment procedures. You must implement procedures to ensure that all equipment that could reasonably be expected to adversely affect the identity, strength, quality, or purity of a PET drug, or give erroneous or invalid test results when improperly used or maintained, is clean, suitable for its intended purposes, properly installed, maintained, and capable of repeatedly producing valid results. You must document your activities in accordance with these procedures.\n\n(c) Equipment construction and maintenance. Equipment must be constructed and maintained so that surfaces that contact components, in-process materials, or PET drugs are not reactive, additive, or absorptive so as to alter the quality of PET drugs.",
+   "notes": [],
+   "chars": 1058,
+   "sha": "87d59d171544b3d7",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.30"
+  },
+  {
+   "id": "cfr21/212/212-40",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.40",
+   "slug": "212-40",
+   "code": "21 CFR 212.40",
+   "title": "How must I control the components I use to produce PET drugs and the containers and closures I package them in?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart E—Control of Components, Containers, and Closures"
+   ],
+   "text": "(a) Written procedures. You must establish, maintain, and follow written procedures describing the receipt, login, identification, storage, handling, testing, and acceptance and/or rejection of components and drug product containers and closures. The procedures must be adequate to ensure that the components, containers, and closures are suitable for their intended use.\n\n(b) Written specifications. You must establish appropriate written specifications for the identity, quality, and purity of components and for the identity and quality of drug product containers and closures.\n\n(c) Examination and testing. Upon receipt, each lot of components and containers and closures must be uniquely identified and tested or examined to determine whether the lot complies with your specifications. You must not use in PET drug production any lot that does not meet its specifications, including any expiration date if applicable, or that has not yet received its material release. Any incoming lot must be appropriately designated as quarantined, accepted, or rejected. You must use a reliable supplier as a source of each lot of each component, container, and closure.\n\n(1)(i) If you conduct finished-product testing of a PET drug product that includes testing to ensure that the correct components have been used, you must determine that each lot of incoming components used in that PET drug product complies with written specifications by examining a certificate of analysis provided by the supplier. You are not required to perform a specific identity test on any of those components.\n\n(ii) If you do not conduct finished-product testing of a PET drug product that ensures that the correct components have been used, you must conduct identity testing on each lot of a component that yields an active ingredient and each lot of an inactive ingredient used in that PET drug product. This testing must be conducted using tests that are specific to each component that yields an active ingredient and each inactive ingredient. For any other component, such as a solvent or reagent, that is not the subject of finished-product testing, you must determine that each lot complies with written specifications by examining a certificate of analysis provided by the supplier; if you use such a component to prepare an inactive ingredient on site, you must perform an identity test on the components used to make the inactive ingredient before the components are released for use. However, if you use as an inactive ingredient a product that is approved under section 505 of the act (21 U.S.C. 355) and is marketed as a finished drug product intended for intravenous administration, you need not perform a specific identity test on that ingredient.\n\n(2) You must examine a representative sample of each lot of containers and closures for conformity to its written specifications. You must perform at least a visual identification of each lot of containers and closures.\n\n(d) Handling and storage. You must handle and store components, containers, and closures in a manner that prevents contamination, mix-ups, and deterioration and ensures that they are and remain suitable for their intended use.\n\n(e) Records. You must keep a record for each shipment of each lot of components, containers, and closures that you receive. The record must include the identity and quantity of each shipment, the supplier's name and lot number, the date of receipt, the results of any testing performed, the disposition of rejected material, and the expiration date (where applicable).",
+   "notes": [],
+   "chars": 3553,
+   "sha": "cf5969d127f93877",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.40"
+  },
+  {
+   "id": "cfr21/212/212-50",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.50",
+   "slug": "212-50",
+   "code": "21 CFR 212.50",
+   "title": "What production and process controls must I have?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart F—Production and Process Controls"
+   ],
+   "text": "You must have adequate production and process controls to ensure the consistent production of a PET drug that meets the applicable standards of identity, strength, quality, and purity.\n\n(a) Written control procedures. You must have written production and process control procedures to ensure and document that all key process parameters are controlled and that any deviations from the procedures are justified.\n\n(b) Master production and control records. You must have master production and control records that document all steps in the PET drug production process. The master production and control records must include the following information:\n\n(1) The name and strength of the PET drug;\n\n(2) If applicable, the name and radioactivity or other measurement of each active pharmaceutical ingredient and each inactive ingredient per batch or per unit of radioactivity or other measurement of the drug product, and a statement of the total radioactivity or other measurement of any dosage unit;\n\n(3) A complete list of components designated by names and codes sufficiently specific to indicate any special quality characteristic;\n\n(4) Identification of all major pieces of equipment used in production;\n\n(5) An accurate statement of the weight or measurement of each component, using the same weight system (metric, avoirdupois, or apothecary) for each component. Reasonable variations are permitted in the amount of component necessary if they are specified in the master production and control records;\n\n(6) A statement of action limits on radiochemical yield, i.e., the minimum percentage of yield beyond which investigation and corrective action are required;\n\n(7) Complete production and control instructions, sampling and testing procedures, specifications, special notations, and precautions to be followed; and\n\n(8) A description of the PET drug product containers, closures, and packaging materials, including a specimen or copy of each label and all other labeling.\n\n(c) Batch production and control records. Each time a batch of a PET drug is produced, a unique batch production and control record must be created. The batch production record must include the following information:\n\n(1) Name and strength of the PET drug;\n\n(2) Identification number or other unique identifier of the specific batch that was produced;\n\n(3) The name and radioactivity or other measure of each active pharmaceutical ingredient and each inactive ingredient per batch or per unit of radioactivity or other measurement of the drug product;\n\n(4) Each major production step (obtained from the approved appropriate master production and control record);\n\n(5) Weights (or other measure of quantity) and identification codes of components;\n\n(6) Dates of production steps and times of critical production steps;\n\n(7) Identification of major pieces of equipment used in production of the batch;\n\n(8) Testing results;\n\n(9) Labeling;\n\n(10) Initials or signatures of persons performing or checking each significant step in the operation; and\n\n(11) Results of any investigations conducted.\n\n(d) Area and equipment checks. The production area and all equipment in the production area must be checked to ensure cleanliness and suitability immediately before use. A record of these checks must be kept.\n\n(e) In-process materials controls. Process controls must include control of in-process materials to ensure that the materials are controlled until required tests or other verification activities have been completed or necessary approvals are received and documented.\n\n(f) Process verification. (1) For a PET drug for which each entire batch undergoes full finished-product testing to ensure that the product meets all specifications, process verification, as described in paragraph (f)(2) of this section, is not required.\n\n(2) When the results of the production of an entire batch of a PET drug are not fully verified through finished-product testing or when only the initial sub-batch in a series is tested, the PET drug producer must demonstrate that the process for producing the PET drug is reproducible and is capable of producing a drug product that meets the predetermined acceptance criteria. Process verification activities and results must be documented. Documentation must include the date and signature of the individual(s) performing the verification, the monitoring and control methods and data, and the major equipment qualified.",
+   "notes": [],
+   "chars": 4425,
+   "sha": "4c778ed3fcb5cd95",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.50"
+  },
+  {
+   "id": "cfr21/212/212-60",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.60",
+   "slug": "212-60",
+   "code": "21 CFR 212.60",
+   "title": "What requirements apply to the laboratories where I test components, in-process materials, and finished PET drug products?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart G—Laboratory Controls"
+   ],
+   "text": "(a) Testing procedures. Each laboratory used to conduct testing of components, in-process materials, and finished PET drug products must have and follow written procedures for the conduct of each test and for the documentation of the results.\n\n(b) Specifications and standards. Each laboratory must have sampling and testing procedures designed to ensure that components, in-process materials, and PET drug products conform to appropriate standards, including established standards of identity, strength, quality, and purity.\n\n(c) Analytical methods. Laboratory analytical methods must be suitable for their intended use and must be sufficiently sensitive, specific, accurate, and reproducible.\n\n(d) Materials. The identity, purity, and quality of reagents, solutions, and supplies used in testing procedures must be adequately controlled. All solutions that you prepare must be properly labeled to show their identity and expiration date.\n\n(e) Equipment. All equipment used to perform the testing must be suitable for its intended purposes and capable of producing valid results.\n\n(f) Equipment maintenance. Each laboratory must have and follow written procedures to ensure that equipment is routinely calibrated, inspected, checked, and maintained, and that these activities are documented.\n\n(g) Test records. Each laboratory performing tests related to the production of a PET drug must keep complete records of all tests performed to ensure compliance with established specifications and standards, including examinations and assays, as follows:\n\n(1) A suitable identification of the sample received for testing.\n\n(2) A description of each method used in the testing of the sample, a record of all calculations performed in connection with each test, and a statement of the weight or measurement of the sample used for each test.\n\n(3) A complete record of all data obtained in the course of each test, including the date and time the test was conducted, and all graphs, charts, and spectra from laboratory instrumentation, properly identified to show the specific component, in-process material, or drug product for each lot tested.\n\n(4) A statement of the results of tests and how the results compare with established acceptance criteria.\n\n(5) The initials or signature of the person performing the test and the date on which the test was performed.",
+   "notes": [],
+   "chars": 2354,
+   "sha": "18a017462fa69532",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.60"
+  },
+  {
+   "id": "cfr21/212/212-61",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.61",
+   "slug": "212-61",
+   "code": "21 CFR 212.61",
+   "title": "What must I do to ensure the stability of my PET drug products through expiry?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart G—Laboratory Controls"
+   ],
+   "text": "(a) Stability testing program. You must establish, follow, and maintain a written testing program to assess the stability characteristics of your PET drug products. The test methods must be reliable, meaningful, and specific. The samples tested for stability must be representative of the lot or batch from which they were obtained and must be stored under suitable conditions.\n\n(b) Storage conditions and expiration dates. The results of such stability testing must be documented and used in determining appropriate storage conditions and expiration dates and times for each PET drug product you produce.",
+   "notes": [],
+   "chars": 605,
+   "sha": "e95db9544c640daa",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.61"
+  },
+  {
+   "id": "cfr21/212/212-70",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.70",
+   "slug": "212-70",
+   "code": "21 CFR 212.70",
+   "title": "What controls and acceptance criteria must I have for my finished PET drug products?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart H—Finished Drug Product Controls and Acceptance"
+   ],
+   "text": "(a) Specifications. You must establish specifications for each PET drug product, including criteria for determining identity, strength, quality, purity, and, if appropriate, sterility and pyrogens.\n\n(b) Test procedures. Before you implement a new test procedure in a specification, you must establish and document the accuracy, sensitivity, specificity, and reproducibility of the procedure. If you use an established compendial test procedure in a specification, you must first verify and document that the test works under the conditions of actual use.\n\n(c) Conformance to specifications. Before final release, you must conduct an appropriate laboratory determination to ensure that each batch of a PET drug product conforms to specifications, except for sterility. For a PET drug product produced in sub-batches, before final release, you must conduct an appropriate laboratory determination to ensure that each sub-batch conforms to specifications, except for sterility.\n\n(d) Final release procedures. Except as conditional final release is permitted in accordance with paragraph (f) of this section, you must establish and follow procedures to ensure that each batch of a PET drug product is not given final release until the following are done:\n\n(1) An appropriate laboratory determination under paragraph (c) of this section is completed;\n\n(2) Associated laboratory data and documentation are reviewed and they demonstrate that the PET drug product meets specifications, except for sterility; and\n\n(3) A designated qualified individual authorizes final release by dated signature.\n\n(e) Sterility testing. Sterility testing need not be completed before final release but must be started within 30 hours after completion of production. The 30-hour requirement may be exceeded due to a weekend or holiday. If the sample for sterility testing is held longer than 30 hours, you must demonstrate that the longer period does not adversely affect the sample and the test results obtained will be equivalent to test results that would have been obtained if the test had been started within the 30-hour time period. Tested samples must be from individual batches and not pooled. If the product fails to meet a criterion for sterility, you must immediately notify all facilities that received the product of the test results and provide any appropriate recommendations. The notification must be documented. Upon completion of an investigation into the failure to meet a criterion for sterility, you must notify all facilities that received the product of the findings from the investigation.\n\n(f) Conditional final release. (1) If you cannot complete one of the required finished-product tests for a batch of a PET drug product because of a malfunction involving analytical equipment, you may approve the conditional final release of the product if you meet the following conditions:\n\n(i) You have data documenting that preceding consecutive batches, produced using the same methods used for the conditionally released batch, demonstrate that the conditionally released batch will likely meet the established specifications;\n\n(ii) You determine that all other acceptance criteria are met;\n\n(iii) You retain a reserve sample of the conditionally released batch of drug product;\n\n(iv) You promptly correct the malfunction of analytical equipment, complete the omitted test using the reserve sample after the malfunction is corrected, and document that reasonable efforts have been made to prevent recurrence of the malfunction;\n\n(v) If you obtain an out-of-specification result when testing the reserve sample, you immediately notify the receiving facility; and\n\n(vi) You document all actions regarding the conditional final release of the drug product, including the justification for the release, all followup actions, results of completed testing, all notifications, and corrective actions to prevent recurrence of the malfunction involving analytical equipment.\n\n(2) Even if the criteria in paragraph (f)(1) of this section are met, you may not approve the conditional final release of the product if the malfunction involving analytical equipment prevents the performance of a radiochemical identity/purity test or prevents the determination of the product's specific activity.\n\n(3) You may not release another batch of the PET drug product until you have corrected the problem concerning the malfunction of analytical equipment and completed the omitted finished-product test.",
+   "notes": [],
+   "chars": 4476,
+   "sha": "c11054373d85af03",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.70"
+  },
+  {
+   "id": "cfr21/212/212-71",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.71",
+   "slug": "212-71",
+   "code": "21 CFR 212.71",
+   "title": "What actions must I take if a batch of PET drug product does not conform to specifications?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart H—Finished Drug Product Controls and Acceptance"
+   ],
+   "text": "(a) Rejection of nonconforming product. You must reject a batch of a PET drug product that does not conform to specifications. You must have and follow procedures to identify and segregate the product to avoid mix-ups. You must have and follow procedures to investigate the cause(s) of the nonconforming product. The investigation must include, but is not limited to, examination of processes, operations, records, complaints, and any other relevant sources of information concerning the nonconforming product.\n\n(b) Investigation. You must document the investigation of a PET drug product that does not meet specifications, including the results of the investigation and what happened to the rejected PET drug product.\n\n(c) Correction of problems. You must take action to correct any identified problems to prevent recurrence of a nonconforming product or other quality problem.\n\n(d) Reprocessing. If appropriate, you may reprocess a batch of a PET drug product that does not conform to specifications. If material that does not meet acceptance criteria is reprocessed, you must follow procedures stated in the product's approved application and the finished product must conform to specifications, except for sterility, before final release.",
+   "notes": [],
+   "chars": 1242,
+   "sha": "9b51e5cf2983cc4d",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.71"
+  },
+  {
+   "id": "cfr21/212/212-80",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.80",
+   "slug": "212-80",
+   "code": "21 CFR 212.80",
+   "title": "What are the requirements associated with labeling and packaging PET drug products?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart I—Packaging and Labeling"
+   ],
+   "text": "(a) A PET drug product must be suitably labeled and packaged to protect the product from alteration, contamination, and damage during the established conditions of shipping, distribution, handling, and use.\n\n(b) Labels must be legible and applied so as to remain legible and affixed during the established conditions of processing, storage, handling, distribution, and use.\n\n(c) All information stated on each label must also be contained in each batch production record.\n\n(d) Labeling and packaging operations must be controlled to prevent labeling and product mix-ups.",
+   "notes": [],
+   "chars": 570,
+   "sha": "7eb5e47e7f4fdefd",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.80"
+  },
+  {
+   "id": "cfr21/212/212-90",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.90",
+   "slug": "212-90",
+   "code": "21 CFR 212.90",
+   "title": "What actions must I take to control the distribution of PET drug products?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart J—Distribution"
+   ],
+   "text": "(a) Written distribution procedures. You must establish, maintain, and follow written procedures for the control of distribution of PET drug products shipped from the PET drug production facility to ensure that the method of shipping chosen will not adversely affect the identity, purity, or quality of the PET drug product.\n\n(b) Distribution records. You must maintain distribution records for each PET drug product that include or refer to the following:\n\n(1) The name, address, and telephone number of the receiving facility that received each batch of a PET drug product;\n\n(2) The name and quantity of the PET drug product shipped;\n\n(3) The lot number, control number, or batch number for the PET drug product shipped; and\n\n(4) The date and time you shipped the PET drug product.",
+   "notes": [],
+   "chars": 783,
+   "sha": "d22dece56e81d160",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.90"
+  },
+  {
+   "id": "cfr21/212/212-100",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.100",
+   "slug": "212-100",
+   "code": "21 CFR 212.100",
+   "title": "What do I do if I receive a complaint about a PET drug product produced at my facility?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart K—Complaint Handling"
+   ],
+   "text": "(a) Written complaint procedures. You must develop and follow written procedures for the receipt and handling of all complaints concerning the quality or purity of, or possible adverse reactions to, a PET drug product.\n\n(b) Complaint review. The procedures must include review by a designated person of any complaint involving the possible failure of a PET drug product to meet any of its specifications and an investigation to determine the cause of the failure.\n\n(c) Complaint records. A written record of each complaint must be maintained in a file designated for PET drug product complaints. The record must include the name and strength of the PET drug product, the batch number, the name of the complainant, the date the complaint was received, the nature of the complaint, and the response to the complaint. It must also include the findings of any investigation and followup.\n\n(d) Returned products. A PET drug product that is returned because of a complaint or for any other reason may not be reprocessed and must be destroyed in accordance with applicable Federal and State law.",
+   "notes": [],
+   "chars": 1088,
+   "sha": "6be705cfb96b2441",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.100"
+  },
+  {
+   "id": "cfr21/212/212-110",
+   "source": "cfr21",
+   "doc": "212",
+   "number": "212.110",
+   "slug": "212-110",
+   "code": "21 CFR 212.110",
+   "title": "How must I maintain records of my production of PET drugs?",
+   "path": [
+    "21 CFR Part 212",
+    "Subpart L—Records"
+   ],
+   "text": "(a) Record availability. Records must be maintained at the PET drug production facility or another location that is reasonably accessible to responsible officials of the production facility and to employees of FDA designated to perform inspections.\n\n(b) Record quality. All records, including those not stored at the inspected establishment, must be legible, stored to prevent deterioration or loss, and readily available for review and copying by FDA employees.\n\n(c) Record retention period. You must maintain all records and documentation referenced in this part for a period of at least 1 year from the date of final release, including conditional final release, of a PET drug product.",
+   "notes": [],
+   "chars": 688,
+   "sha": "db8981603b517647",
+   "url": "https://www.ecfr.gov/current/title-21/part-212/section-212.110"
+  },
+  {
+   "id": "cfr21/1271/1271-1",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.1",
+   "slug": "1271-1",
+   "code": "21 CFR 1271.1",
+   "title": "What are the purpose and scope of this part?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart A—General Provisions"
+   ],
+   "text": "(a) Purpose. The purpose of this part, in conjunction with §§ 207.9(a)(5), 210.1(c), 210.2, 807.20(d), and 820.1(a) of this chapter, is to create an electronic registration and listing system for establishments that manufacture human cells, tissues, and cellular and tissue-based products (HCT/P's) and to establish donor-eligibility, current good tissue practice, and other procedures to prevent the introduction, transmission, and spread of communicable diseases by HCT/P's.\n\n(b) Scope. (1) If you are an establishment that manufactures HCT/P's that are regulated solely under the authority of section 361 of the Public Health Service Act (the PHS Act), this part requires you to register and list your HCT/P's with the Food and Drug Administration's (FDA's) Center for Biologics Evaluation and Research and to comply with the other requirements contained in this part, whether or not the HCT/P enters into interstate commerce. Those HCT/P's that are regulated solely under the authority of section 361 of the PHS Act are described in § 1271.10.\n\n(2) If you are an establishment that manufactures HCT/P's that are regulated as drugs, devices and/or biological products under section 351 of the PHS Act and/or the Federal Food, Drug, and Cosmetic Act, §§ 207.9(a)(5) and 807.20(d) of this chapter require you to register and list your HCT/P's following the procedures in part 207 (if a drug and/or biological product) of this chapter or part 807 (if a device) of this chapter. Sections 210.1(c), 210.2, 211.1(b), and 820.1(a) of this chapter require you to comply with the donor-eligibility procedures in subpart C of this part and the current good tissue practice procedures in subpart D of this part, in addition to all other applicable regulations.",
+   "notes": [
+    "[66 FR 5466, Jan. 19, 2001, as amended at 69 FR 29829, May 25, 2004; 81 FR 60223, Aug. 31, 2016]"
+   ],
+   "chars": 1752,
+   "sha": "e79b6a06e3972c20",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.1"
+  },
+  {
+   "id": "cfr21/1271/1271-3",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.3",
+   "slug": "1271-3",
+   "code": "21 CFR 1271.3",
+   "title": "How does FDA define important terms in this part?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart A—General Provisions"
+   ],
+   "text": "The following definitions apply only to this part:\n\n(a) Autologous use means the implantation, transplantation, infusion, or transfer of human cells or tissue back into the individual from whom the cells or tissue were recovered.\n\n(b) Establishment means a place of business under one management, at one general physical location, that engages in the manufacture of human cells, tissues, and cellular and tissue-based products. “Establishment” includes:\n\n(1) Any individual, partnership, corporation, association, or other legal entity engaged in the manufacture of human cells, tissues, and cellular and tissue-based products; and\n\n(2) Facilities that engage in contract manufacturing services for a manufacturer of human cells, tissues, and cellular and tissue-based products.\n\n(c) Homologous use means the repair, reconstruction, replacement, or supplementation of a recipient's cells or tissues with an HCT/P that performs the same basic function or functions in the recipient as in the donor.\n\n(d) Human cells, tissues, or cellular or tissue-based products (HCT/Ps) means articles containing or consisting of human cells or tissues that are intended for implantation, transplantation, infusion, or transfer into a human recipient. Examples of HCT/Ps include, but are not limited to, bone, ligament, skin, dura mater, heart valve, cornea, hematopoietic stem/progenitor cells derived from peripheral and cord blood, manipulated autologous chondrocytes, epithelial cells on a synthetic matrix, and semen or other reproductive tissue. The following articles are not considered HCT/Ps:\n\n(1) Vascularized human organs for transplantation;\n\n(2) Whole blood or blood components or blood derivative products subject to listing under parts 607 and 207 of this chapter, respectively;\n\n(3) Secreted or extracted human products, such as milk, collagen, and cell factors; except that semen is considered an HCT/P;\n\n(4) Minimally manipulated bone marrow for homologous use and not combined with another article (except for water, crystalloids, or a sterilizing, preserving, or storage agent, if the addition of the agent does not raise new clinical safety concerns with respect to the bone marrow);\n\n(5) Ancillary products used in the manufacture of HCT/P;\n\n(6) Cells, tissues, and organs derived from animals other than humans; and\n\n(7) In vitro diagnostic products as defined in § 809.3(a) of this chapter.\n\n(8) Blood vessels recovered with an organ, as defined in 42 CFR 121.2, that are intended for use in organ transplantation and labeled “For use in organ transplantation only.”\n\n(e) Manufacture means, but is not limited to, any or all steps in the recovery, processing, storage, labeling, packaging, or distribution of any human cell or tissue, and the screening or testing of the cell or tissue donor.\n\n(f) Minimal manipulation means:\n\n(1) For structural tissue, processing that does not alter the original relevant characteristics of the tissue relating to the tissue's utility for reconstruction, repair, or replacement; and\n\n(2) For cells or nonstructural tissues, processing that does not alter the relevant biological characteristics of cells or tissues.\n\n(g) Transfer means the placement of human reproductive cells or tissues into a human recipient.\n\n(h) Biohazard legend appears on the label as follows and is used to mark HCT/Ps that present a known or suspected relevant communicable disease risk.\n\n(i) Blood component means a product containing a part of human blood separated by physical or mechanical means.\n\n(j) Colloid means:\n\n(1) A protein or polysaccharide solution, such as albumin, dextran, or hetastarch, that can be used to increase or maintain osmotic (oncotic) pressure in the intravascular compartment; or\n\n(2) Blood components such as plasma and platelets.\n\n(k) Crystalloid means an isotonic salt and/or glucose solution used for electrolyte replacement or to increase intravascular volume, such as saline solution, Ringer's lactate solution, or 5 percent dextrose in water.\n\n(l) Directed reproductive donor means a donor of reproductive cells or tissue (including semen, oocytes, and embryos to which the donor contributed the spermatozoa or oocyte) to a specific recipient, and who knows and is known by the recipient before donation. The term directed reproductive donor does not include a sexually intimate partner under § 1271.90.\n\n(m) Donor means a person, living or dead, who is the source of cells or tissue for an HCT/P.\n\n(n) Donor medical history interview means a documented dialog about the donor's medical history and relevant social behavior, including activities, behaviors, and descriptions considered to increase the donor's relevant communicable disease risk:\n\n(1) With the donor, if the donor is living and able to participate in the interview, or\n\n(2) If not, with an individual or individuals able to provide the information sought in the interview (e.g., the donor's next-of-kin, the nearest available relative, a member of the donor's household, an individual with an affinity relationship, and/or the primary treating physician).\n\n(o) Physical assessment of a cadaveric donor means a limited autopsy or recent antemortem or postmortem physical examination of the donor to assess for signs of a relevant communicable disease and for signs suggestive of any risk factor for a relevant communicable disease.\n\n(p) Plasma dilution means a decrease in the concentration of the donor's plasma proteins and circulating antigens or antibodies resulting from the transfusion of blood or blood components and/or infusion of fluids.\n\n(q) Quarantine means the storage or identification of an HCT/P, to prevent improper release, in a physically separate area clearly identified for such use, or through use of other procedures, such as automated designation.\n\n(r) Relevant communicable disease agent or disease means:\n\n(1)(i) For all human cells and tissues, a communicable disease or disease agent listed as follows:\n\n(A) Human immunodeficiency virus, types 1 and 2;\n\n(B) Hepatitis B virus;\n\n(C) Hepatitis C virus;\n\n(D) Human transmissible spongiform encephalopathy, including Creutzfeldt-Jakob disease; and\n\n(E) Treponema pallidum.\n\n(ii) For viable, leukocyte-rich cells and tissues, a cell-associated disease agent or disease listed as follows:\n\n(A) Human T-lymphotropic virus, type I; and\n\n(B) Human T-lymphotropic virus, type II.\n\n(iii) For reproductive cells or tissues, a disease agent or disease of the genitourinary tract listed as follows:\n\n(A) Chlamydia trachomatis; and\n\n(B) Neisseria gonorrhea.\n\n(2) A disease agent or disease not listed in paragraph (r)(1) of this section:\n\n(i) For which there may be a risk of transmission by an HCT/P, either to the recipient of the HCT/P or to those people who may handle or otherwise come in contact with it, such as medical personnel, because the disease agent or disease:\n\n(A) Is potentially transmissible by an HCT/P and\n\n(B) Either of the following applies:\n\n(1) The disease agent or disease has sufficient incidence and/or prevalence to affect the potential donor population, or\n\n(2) The disease agent or disease may have been released accidentally or intentionally in a manner that could place potential donors at risk of infection;\n\n(ii) That could be fatal or life-threatening, could result in permanent impairment of a body function or permanent damage to body structure, or could necessitate medical or surgical intervention to preclude permanent impairment of body function or permanent damage to a body structure; and\n\n(iii) For which appropriate screening measures have been developed and/or an appropriate screening test for donor specimens has been licensed, approved, or cleared for such use by FDA and is available.\n\n(s) Relevant medical records means a collection of documents that includes a current donor medical history interview; a current report of the physical assessment of a cadaveric donor or the physical examination of a living donor; and, if available, the following:\n\n(1) Laboratory test results (other than results of testing for relevant communicable disease agents required under this subpart);\n\n(2) Medical records;\n\n(3) Coroner and autopsy reports; and\n\n(4) Records or other information received from any source pertaining to risk factors for relevant communicable disease (e.g., social behavior, clinical signs and symptoms of relevant communicable disease, and treatments related to medical conditions suggestive of risk for relevant communicable disease).\n\n(t) Responsible person means a person who is authorized to perform designated functions for which he or she is trained and qualified.\n\n(u) Urgent medical need means that no comparable HCT/P is available and the recipient is likely to suffer death or serious morbidity without the HCT/P.\n\n(v) Act means the Federal Food, Drug, and Cosmetic Act.\n\n(w) PHS Act means the Public Health Service Act.\n\n(x) FDA means the Food and Drug Administration.\n\n(y) Adverse reaction means a noxious and unintended response to any HCT/P for which there is a reasonable possibility that the HCT/P caused the response.\n\n(z) Available for distribution means that the HCT/P has been determined to meet all release criteria.\n\n(aa) Complaint means any written, oral, or electronic communication about a distributed HCT/P that alleges:\n\n(1) That an HCT/P has transmitted or may have transmitted a communicable disease to the recipient of the HCT/P; or\n\n(2) Any other problem with an HCT/P relating to the potential for transmission of communicable disease, such as the failure to comply with current good tissue practice.\n\n(bb) Distribution means any conveyance or shipment (including importation and exportation) of an HCT/P that has been determined to meet all release criteria, whether or not such conveyance or shipment is entirely intrastate. If an entity does not take physical possession of an HCT/P, the entity is not considered a distributor.\n\n(cc) Establish and maintain means define, document (in writing or electronically), and implement; then follow, review, and, as needed, revise on an ongoing basis.\n\n(dd) HCT/P deviation means an event:\n\n(1) That represents a deviation from applicable regulations in this part or from applicable standards or established specifications that relate to the prevention of communicable disease transmission or HCT/P contamination; or\n\n(2) That is an unexpected or unforeseeable event that may relate to the transmission or potential transmission of a communicable disease or may lead to HCT/P contamination.\n\n(ee) Importer of record means the person, establishment, or its representative responsible for making entry of imported goods in accordance with all laws affecting such importation.\n\n(ff) Processing means any activity performed on an HCT/P, other than recovery, donor screening, donor testing, storage, labeling, packaging, or distribution, such as testing for microorganisms, preparation, sterilization, steps to inactivate or remove adventitious agents, preservation for storage, and removal from storage.\n\n(gg) Quality audit means a documented, independent inspection and review of an establishment's activities related to core CGTP requirements. The purpose of a quality audit is to verify, by examination and evaluation of objective evidence, the degree of compliance with those aspects of the quality program under review.\n\n(hh) Quality program means an organization's comprehensive system for manufacturing and tracking HCT/Ps in accordance with this part. A quality program is designed to prevent, detect, and correct deficiencies that may lead to circumstances that increase the risk of introduction, transmission, or spread of communicable diseases.\n\n(ii) Recovery means obtaining from a human donor cells or tissues that are intended for use in human implantation, transplantation, infusion, or transfer.\n\n(jj) Storage means holding HCT/Ps for future processing and/or distribution.\n\n(kk) Validation means confirmation by examination and provision of objective evidence that particular requirements can consistently be fulfilled. Validation of a process, or process validation, means establishing by objective evidence that a process consistently produces a result or HCT/P meeting its predetermined specifications.\n\n(ll) Verification means confirmation by examination and provision of objective evidence that specified requirements have been fulfilled.\n\n(mm) Importer means a company or individual in the United States that is the owner, consignee, or recipient, at the time of entry, of the foreign establishment's HCT/P that is imported into the United States.\n\n(nn) United States agent means a person residing or maintaining a place of business in the United States whom a foreign establishment designates as its agent. This definition excludes mailboxes, answering machines or services, or other places where an individual acting as the foreign establishment's agent is not physically present.",
+   "notes": [
+    "[66 FR 5466, Jan. 19, 2001, as amended at 68 FR 3826, Jan. 27, 2004; 69 FR 29829, May 25, 2004; 69 FR 68680, Nov. 24, 2004; 81 FR 60223, Aug. 31, 2016]"
+   ],
+   "chars": 12921,
+   "sha": "ef746da3c3b61bb7",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.3"
+  },
+  {
+   "id": "cfr21/1271/1271-10",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.10",
+   "slug": "1271-10",
+   "code": "21 CFR 1271.10",
+   "title": "Are my HCT/P's regulated solely under section 361 of the PHS Act and the regulations in this part, and if so what must I do?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart A—General Provisions"
+   ],
+   "text": "(a) An HCT/P is regulated solely under section 361 of the PHS Act and the regulations in this part if it meets all of the following criteria:\n\n(1) The HCT/P is minimally manipulated;\n\n(2) The HCT/P is intended for homologous use only, as reflected by the labeling, advertising, or other indications of the manufacturer's objective intent;\n\n(3) The manufacture of the HCT/P does not involve the combination of the cells or tissues with another article, except for water, crystalloids, or a sterilizing, preserving, or storage agent, provided that the addition of water, crystalloids, or the sterilizing, preserving, or storage agent does not raise new clinical safety concerns with respect to the HCT/P; and\n\n(4) Either:\n\n(i) The HCT/P does not have a systemic effect and is not dependent upon the metabolic activity of living cells for its primary function; or\n\n(ii) The HCT/P has a systemic effect or is dependent upon the metabolic activity of living cells for its primary function, and:\n\n(a) Is for autologous use;\n\n(b) Is for allogeneic use in a first-degree or second-degree blood relative; or\n\n(c) Is for reproductive use.\n\n(b) If you are a domestic or foreign establishment that manufactures an HCT/P described in paragraph (a) of this section:\n\n(1) You must register with FDA;\n\n(2) You must submit to FDA a list of each HCT/P manufactured; and\n\n(3) You must comply with the other requirements contained in this part.",
+   "notes": [
+    "[66 FR 5466, Jan. 19, 2001, as amended at 69 FR 68681, Nov. 24, 2004]"
+   ],
+   "chars": 1424,
+   "sha": "0acfb95258b114e6",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.10"
+  },
+  {
+   "id": "cfr21/1271/1271-15",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.15",
+   "slug": "1271-15",
+   "code": "21 CFR 1271.15",
+   "title": "Are there any exceptions from the requirements of this part?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart A—General Provisions"
+   ],
+   "text": "(a) You are not required to comply with the requirements of this part if you are an establishment that uses HCT/P's solely for nonclinical scientific or educational purposes.\n\n(b) You are not required to comply with the requirements of this part if you are an establishment that removes HCT/P's from an individual and implants such HCT/P's into the same individual during the same surgical procedure.\n\n(c) You are not required to comply with the requirements of this part if you are a carrier who accepts, receives, carries, or delivers HCT/P's in the usual course of business as a carrier.\n\n(d) You are not required to comply with the requirements of this part if you are an establishment that does not recover, screen, test, process, label, package, or distribute, but only receives or stores HCT/P's solely for implantation, transplantation, infusion, or transfer within your facility.\n\n(e) You are not required to comply with the requirements of this part if you are an establishment that only recovers reproductive cells or tissue and immediately transfers them into a sexually intimate partner of the cell or tissue donor.\n\n(f) You are not required to register or list your HCT/P's independently, but you must comply with all other applicable requirements in this part, if you are an individual under contract, agreement, or other arrangement with a registered establishment and engaged solely in recovering cells or tissues and sending the recovered cells or tissues to the registered establishment.",
+   "notes": [],
+   "chars": 1506,
+   "sha": "78bb0a96d8fbc9ed",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.15"
+  },
+  {
+   "id": "cfr21/1271/1271-20",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.20",
+   "slug": "1271-20",
+   "code": "21 CFR 1271.20",
+   "title": "If my HCT/P's do not meet the criteria in § 1271.10, and I do not qualify for any of the exceptions in § 1271.15, what regulations apply?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart A—General Provisions"
+   ],
+   "text": "If you are an establishment that manufactures an HCT/P that does not meet the criteria set out in § 1271.10(a), and you do not qualify for any of the exceptions in § 1271.15, your HCT/P will be regulated as a drug, device, and/or biological product under the act and/or section 351 of the PHS Act, and applicable regulations in title 21, chapter I. Applicable regulations include, but are not limited to, §§ 207.9(a)(5), 210.1(c), 210.2, 211.1(b), 807.20(d), and 820.1(a) of this chapter, which require you to follow the procedures in subparts C and D of this part.",
+   "notes": [
+    "[66 FR 5466, Jan. 19, 2001, as amended at 81 FR 60223, Aug. 31, 2016]"
+   ],
+   "chars": 565,
+   "sha": "6ed9f1a31bd190c5",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.20"
+  },
+  {
+   "id": "cfr21/1271/1271-21",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.21",
+   "slug": "1271-21",
+   "code": "21 CFR 1271.21",
+   "title": "When do I register, submit an HCT/P list, and submit updates?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart B—Procedures for Registration and Listing"
+   ],
+   "text": "(a) You must register and submit a list of every HCT/P that your establishment manufactures within 5 days after beginning operations or within 30 days of the effective date of this regulation, whichever is later.\n\n(b) You must update your establishment registration annually in December, except as required by § 1271.26. You may accomplish your annual registration in conjunction with updating your HCT/P list under paragraph (c) of this section.\n\n(c)(i) If no change described in § 1271.25(c) has occurred since you previously submitted an HCT/P list, you are not required to update your listing.\n\n(ii) If a change described in § 1271.25(c) has occurred, you must update your HCT/P listing with the new information:\n\n(a) At the time of the change, or\n\n(b) Each June or December, whichever month occurs first after the change.",
+   "notes": [
+    "[69 FR 68681, Nov. 24, 2004]"
+   ],
+   "chars": 826,
+   "sha": "759287d0d63810d7",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.21"
+  },
+  {
+   "id": "cfr21/1271/1271-22",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.22",
+   "slug": "1271-22",
+   "code": "21 CFR 1271.22",
+   "title": "How do I register and submit an HCT/P list?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart B—Procedures for Registration and Listing"
+   ],
+   "text": "(a) You must use the electronic registration and listing system at http://www.fda.gov/cber/tissue/tisreg.htm in accordance with § 1271.25 for:\n\n(1) Establishment registration,\n\n(2) HCT/P listings, and\n\n(3) Updates of registration and HCT/P listing.\n\n(b) FDA will periodically issue guidance on recommended procedures for providing registration and listing information in electronic format (for example, method of transmission, media, file formats, preparation, and organization of files).\n\n(c) You must provide the information under paragraph (a) of this section in accordance with part 11 of this chapter, except for the requirements in § 11.10(b), (c), and (e) and the corresponding requirements in § 11.30.",
+   "notes": [
+    "[81 FR 60223, Aug. 31, 2016]"
+   ],
+   "chars": 709,
+   "sha": "5fe1ee41a31ce77a",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.22"
+  },
+  {
+   "id": "cfr21/1271/1271-23",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.23",
+   "slug": "1271-23",
+   "code": "21 CFR 1271.23",
+   "title": "How is a waiver from the electronic format requirements requested?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart B—Procedures for Registration and Listing"
+   ],
+   "text": "(a) You may request a waiver from the requirement in § 1271.22 that information must be provided to FDA in electronic format. Submission of a request for waiver does not excuse timely compliance with the registration and listing requirements. FDA will grant a waiver request if FDA determines that the use of electronic means for submission of registration and listing information is not reasonable for the registrant making the waiver request.\n\n(b) Waiver requests under this section must be submitted in writing and must include the specific reasons why electronic submission is not reasonable for the registrant and a U.S. telephone number and mailing address where FDA can contact the registrant. Waiver requests may be sent to the Center for Biologics Evaluation and Research (CBER), Document Control Center (see addresses in § 600.2 of this chapter).\n\n(c) If FDA grants the waiver request, FDA may limit its duration and will specify terms of the waiver and provide information on how to submit establishment registration, listings, other information, and updates, as applicable.",
+   "notes": [
+    "[81 FR 60224, Aug. 31, 2016]"
+   ],
+   "chars": 1085,
+   "sha": "29e45e2b0f1d48bd",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.23"
+  },
+  {
+   "id": "cfr21/1271/1271-25",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.25",
+   "slug": "1271-25",
+   "code": "21 CFR 1271.25",
+   "title": "What information is required for establishment registration and HCT/P listing?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart B—Procedures for Registration and Listing"
+   ],
+   "text": "(a) Your establishment registration must include:\n\n(1) The legal name(s) of the establishment;\n\n(2) Each physical location, including the street address, telephone number, email address, and the postal service ZIP code of the establishment;\n\n(3) The name, address, telephone number, email address, and title of the reporting official;\n\n(4) A dated signature by the reporting official affirming that all information contained in the establishment registration and HCT/P listing form is true and accurate, to the best of his or her knowledge.\n\n(5) Each foreign establishment must also submit the name, address, telephone number, and email address of each importer that is known to the establishment, and the name of each person who imports or offers for import such HCT/P to the United States for purposes of importation; and\n\n(6) Each foreign establishment must also submit the name, address, telephone number, and email address of its United States agent.\n\n(i) The United States agent must reside or maintain a place of business in the United States.\n\n(ii) Upon request from FDA, the United States agent must assist FDA in communications with the foreign establishment, respond to questions concerning the foreign establishment's products that are imported or offered for import into the United States, and assist FDA in scheduling inspections of the foreign establishment. If the Agency is unable to contact the foreign establishment directly or expeditiously, FDA may provide information or documents to the United States agent, and such an action is equivalent to providing the same information or documents to the foreign establishment.\n\n(iii) The foreign establishment or the United States agent must report changes in the United States agent's name, address, telephone number, or email address to FDA within 30 calendar days of the change.\n\n(b) Your HCT/P listing must include all HCT/P's (including the established name and the proprietary name) that you recover, process, store, label, package, distribute, or for which you perform donor screening or testing. You must also state whether each HCT/P meets the criteria set out in § 1271.10.\n\n(c) Your HCT/P listing update must include:\n\n(1) A list of each HCT/P that you have begun recovering, processing, storing, labeling, packaging, distributing, or for which you have begun donor screening or testing, that has not been included in any list previously submitted. You must provide all of the information required by § 1271.25(b) for each new HCT/P.\n\n(2) A list of each HCT/P formerly listed in accordance with § 1271.21(a) for which you have discontinued recovery, processing, storage, labeling, packaging, distribution, or donor screening or testing, including for each HCT/P so listed, the identity by established name and proprietary name, and the date of discontinuance. We request but do not require that you include the reason for discontinuance with this information.\n\n(3) A list of each HCT/P for which a notice of discontinuance was submitted under paragraph (c)(2) of this section and for which you have resumed recovery, processing, storage, labeling, packaging, distribution, or donor screening or testing, including the identity by established name and proprietary name, the date of resumption, and any other information required by § 1271.25(b) not previously submitted.\n\n(4) Any material change in any information previously submitted. Material changes include any change in registration and listing information, submitted, such as whether the HCT/P meets the criteria set out in § 1271.10.\n\n(d) If your HCT/P is described under § 1271.20 and is regulated under a BLA, you must submit the information required under part 207 of this chapter using the procedures under subpart E of part 207.",
+   "notes": [
+    "[66 FR 5466, Jan. 19, 2001, as amended at 81 FR 60224, Aug. 31, 2016]"
+   ],
+   "chars": 3765,
+   "sha": "fb7231b61895afea",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.25"
+  },
+  {
+   "id": "cfr21/1271/1271-26",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.26",
+   "slug": "1271-26",
+   "code": "21 CFR 1271.26",
+   "title": "When must I amend my establishment registration?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart B—Procedures for Registration and Listing"
+   ],
+   "text": "If the ownership or location of your establishment changes, or if there is a change in the United States agent's name, address, telephone number, or email address, you must submit an amendment to registration within 30 calendar days of the change.",
+   "notes": [
+    "[81 FR 60224, Aug. 31, 2017]"
+   ],
+   "chars": 247,
+   "sha": "32103335d830a21a",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.26"
+  },
+  {
+   "id": "cfr21/1271/1271-27",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.27",
+   "slug": "1271-27",
+   "code": "21 CFR 1271.27",
+   "title": "Will FDA assign me a registration number?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart B—Procedures for Registration and Listing"
+   ],
+   "text": "(a) FDA will assign each location a permanent registration number.\n\n(b) FDA acceptance of an establishment registration and HCT/P listing form does not constitute a determination that an establishment is in compliance with applicable rules and regulations or that the HCT/P is licensed or approved by FDA.",
+   "notes": [],
+   "chars": 305,
+   "sha": "74d261d431f64e85",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.27"
+  },
+  {
+   "id": "cfr21/1271/1271-37",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.37",
+   "slug": "1271-37",
+   "code": "21 CFR 1271.37",
+   "title": "Will establishment registrations and HCT/P listings be available for inspection, and how do I request information on registrations and listings?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart B—Procedures for Registration and Listing"
+   ],
+   "text": "(a) Any registration on Form FDA 3356 filed in paper or electronic format by each establishment will be available for public inspection through the Center for Biologics Evaluation and Research Human Cell and Tissue Establishment Registration—Public Query Web site by using the CBER electronic Web-based application or by going in person to the Food and Drug Administration, Dockets Management Staff Public Reading Room (see address in § 20.120(a) of this chapter). The following information submitted under the HCT/P requirements is illustrative of the type of information that will be available for public disclosure when it is compiled:\n\n(1) A list of all HCT/P's;\n\n(2) A list of all HCT/P's manufactured by each establishment;\n\n(3) A list of all HCT/P's discontinued; and\n\n(4) All data or information that has already become a matter of public record.\n\n(b) You should direct your other requests for information regarding HCT/P establishment registrations and HCT/P listings to the Food and Drug Administration, Center for Biologics Evaluation and Research, Office of Communication, Outreach and Development, 10903 New Hampshire Ave., Bldg. 71, Rm. 3103, Silver Spring, MD 20993-0002.",
+   "notes": [
+    "[80 FR 18094, Apr. 3, 2015, as amended at 88 FR 45067, July 14, 2023]"
+   ],
+   "chars": 1186,
+   "sha": "54ad40a3d05c58a4",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.37"
+  },
+  {
+   "id": "cfr21/1271/1271-45",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.45",
+   "slug": "1271-45",
+   "code": "21 CFR 1271.45",
+   "title": "What requirements does this subpart contain?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) General. This subpart sets out requirements for determining donor eligibility, including donor screening and testing. The requirements contained in this subpart are a component of current good tissue practice (CGTP) requirements. Other CGTP requirements are set out in subpart D of this part.\n\n(b) Donor-eligibility determination required. A donor-eligibility determination, based on donor screening and testing for relevant communicable disease agents and diseases, is required for all donors of cells or tissue used in HCT/Ps, except as provided under § 1271.90. In the case of an embryo or of cells derived from an embryo, a donor-eligibility determination is required for both the oocyte donor and the semen donor.\n\n(c) Prohibition on use. An HCT/P must not be implanted, transplanted, infused, or transferred until the donor has been determined to be eligible, except as provided under §§ 1271.60(d), 1271.65(b), and 1271.90 of this subpart.\n\n(d) Applicability of requirements. If you are an establishment that performs any function described in this subpart, you must comply with the requirements contained in this subpart that are applicable to that function.",
+   "notes": [
+    "[69 FR 29830, May 25, 2004, as amended at 69 FR 68681, Nov. 24, 2004]"
+   ],
+   "chars": 1170,
+   "sha": "4766becaaac6a970",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.45"
+  },
+  {
+   "id": "cfr21/1271/1271-47",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.47",
+   "slug": "1271-47",
+   "code": "21 CFR 1271.47",
+   "title": "What procedures must I establish and maintain?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) General. You must establish and maintain procedures for all steps that you perform in testing, screening, determining donor eligibility, and complying with all other requirements of this subpart. Establish and maintain means define, document (in writing or electronically), and implement; then follow, review, and as needed, revise on an ongoing basis. You must design these procedures to ensure compliance with the requirements of this subpart.\n\n(b) Review and approval. Before implementation, a responsible person must review and approve all procedures.\n\n(c) Availability. Procedures must be readily available to the personnel in the area where the operations to which they relate are performed, or in a nearby area if such availability is impractical.\n\n(d) Departures from procedures. You must record and justify any departure from a procedure relevant to preventing risks of communicable disease transmission at the time of its occurrence. You must not make available for distribution any HCT/P from a donor whose eligibility is determined under such a departure unless a responsible person has determined that the departure does not increase the risks of communicable disease transmission through the use of the HCT/P.\n\n(e) Standard procedures. You may adopt current standard procedures, such as those in a technical manual prepared by another organization, provided that you have verified that the procedures are consistent with and at least as stringent as the requirements of this part and appropriate for your operations.",
+   "notes": [],
+   "chars": 1534,
+   "sha": "66aeecc74ab7bd08",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.47"
+  },
+  {
+   "id": "cfr21/1271/1271-50",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.50",
+   "slug": "1271-50",
+   "code": "21 CFR 1271.50",
+   "title": "How do I determine whether a donor is eligible?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) Determination based on screening and testing. If you are the establishment responsible for making the donor-eligibility determination, you must determine whether a donor is eligible based upon the results of donor screening in accordance with § 1271.75 and donor testing in accordance with §§ 1271.80 and 1271.85. A responsible person, as defined in § 1271.3(t), must determine and document the eligibility of a cell or tissue donor.\n\n(b) Eligible donor. A donor is eligible under these provisions only if:\n\n(1) Donor screening in accordance with § 1271.75 indicates that the donor:\n\n(i) Is free from risk factors for, and clinical evidence of, infection due to relevant communicable disease agents and diseases; and\n\n(ii) Is free from communicable disease risks associated with xenotransplantation; and\n\n(2) The results of donor testing for relevant communicable disease agents in accordance with §§ 1271.80 and 1271.85 are negative or nonreactive, except as provided in § 1271.80(d)(1).",
+   "notes": [],
+   "chars": 992,
+   "sha": "77c5ad45f981e070",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.50"
+  },
+  {
+   "id": "cfr21/1271/1271-55",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.55",
+   "slug": "1271-55",
+   "code": "21 CFR 1271.55",
+   "title": "What records must accompany an HCT/P after the donor-eligibility determination is complete; and what records must I retain?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) Accompanying records. Once a donor-eligibility determination has been made, the following must accompany the HCT/P at all times:\n\n(1) A distinct identification code affixed to the HCT/P container, e.g., alphanumeric, that relates the HCT/P to the donor and to all records pertaining to the HCT/P and, except in the case of autologous donations, directed reproductive donations, or donations made by first-degree or second-degree blood relatives, does not include an individual's name, social security number, or medical record number;\n\n(2) A statement whether, based on the results of screening and testing, the donor has been determined to be eligible or ineligible; and\n\n(3) A summary of the records used to make the donor-eligibility determination.\n\n(b) Summary of records. The summary of records required by paragraph (a)(3) of this section must contain the following information:\n\n(1) A statement that the communicable disease testing was performed by a laboratory:\n\n(i) Certified to perform such testing on human specimens under the Clinical Laboratory Improvement Amendments of 1988 (42 U.S.C. 263a) and 42 CFR part 493; or\n\n(ii) That has met equivalent requirements as determined by the Centers for Medicare and Medicaid Services in accordance with those provisions;\n\n(2) A listing and interpretation of the results of all communicable disease tests performed;\n\n(3) The name and address of the establishment that made the donor-eligibility determination; and\n\n(4) In the case of an HCT/P from a donor who is ineligible based on screening and released under paragraph (b) of § 1271.65, a statement noting the reason(s) for the determination of ineligibility.\n\n(c) Deletion of personal information. The accompanying records required by this section must not contain the donor's name or other personal information that might identify the donor.\n\n(d) Record retention requirements. (1) You must maintain documentation of:\n\n(i) Results and interpretation of all testing for relevant communicable disease agents in compliance with §§ 1271.80 and 1271.85, as well as the name and address of the testing laboratory or laboratories;\n\n(ii) Results and interpretation of all donor screening for communicable diseases in compliance with § 1271.75; and\n\n(iii) The donor-eligibility determination, including the name of the responsible person who made the determination and the date of the determination.\n\n(2) All records must be accurate, indelible, and legible. Information on the identity and relevant medical records of the donor, as defined in § 1271.3(s), must be in English or, if in another language, must be retained and translated to English and accompanied by a statement of authenticity by the translator that specifically identifies the translated document.\n\n(3) You must retain required records and make them available for authorized inspection by or upon request from FDA. Records that can be readily retrieved from another location by electronic means are considered “retained.”\n\n(4) You must retain the records pertaining to a particular HCT/P at least 10 years after the date of its administration, or if the date of administration is not known, then at least 10 years after the date of the HCT/P's distribution, disposition, or expiration, whichever is latest.",
+   "notes": [
+    "[69 FR 29830, May 25, 2004, as amended at 70 FR 29952, May 25, 2005]"
+   ],
+   "chars": 3277,
+   "sha": "2fa5f4a7681e1258",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.55"
+  },
+  {
+   "id": "cfr21/1271/1271-60",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.60",
+   "slug": "1271-60",
+   "code": "21 CFR 1271.60",
+   "title": "What quarantine and other requirements apply before the donor-eligibility determination is complete?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) Quarantine. You must keep an HCT/P in quarantine, as defined in § 1271.3(q), until completion of the donor-eligibility determination required by § 1271.50. You must quarantine semen from anonymous donors until the retesting required under § 1271.85(d) is complete.\n\n(b) Identification of HCT/Ps in quarantine. You must clearly identify as quarantined an HCT/P that is in quarantine pending completion of a donor-eligibility determination. The quarantined HCT/P must be easily distinguishable from HCT/Ps that are available for release and distribution.\n\n(c) Shipping of HCT/Ps in quarantine. If you ship an HCT/P before completion of the donor-eligibility determination, you must keep it in quarantine during shipment. The HCT/P must be accompanied by records:\n\n(1) Identifying the donor (e.g., by a distinct identification code affixed to the HCT/P container);\n\n(2) Stating that the donor-eligibility determination has not been completed; and\n\n(3) Stating that the product must not be implanted, transplanted, infused, or transferred until completion of the donor-eligibility determination, except under the terms of paragraph (d) of this section.\n\n(d) Use in cases of urgent medical need. (1) This subpart C does not prohibit the implantation, transplantation, infusion, or transfer of an HCT/P from a donor for whom the donor-eligibility determination is not complete if there is a documented urgent medical need for the HCT/P, as defined in § 1271.3(u).\n\n(2) If you make an HCT/P available for use under the provisions of paragraph (d)(1) of this section, you must prominently label it “NOT EVALUATED FOR INFECTIOUS SUBSTANCES,” and “ WARNING: Advise patient of communicable disease risks.” The following information must accompany the HCT/P:\n\n(i) The results of any donor screening required under § 1271.75 that has been completed;\n\n(ii) The results of any testing required under § 1271.80 or 1271.85 that has been completed; and\n\n(iii) A list of any screening or testing required under § 1271.75, 1271.80 or 1271.85 that has not yet been completed.\n\n(3) If you are the establishment that manufactured an HCT/P used under the provisions of paragraph (d)(1) of this section, you must document that you notified the physician using the HCT/P that the testing and screening were not complete.\n\n(4) In the case of an HCT/P used for an urgent medical need under the provisions of paragraph (d)(1) of this section, you must complete the donor-eligibility determination during or after the use of the HCT/P, and you must inform the physician of the results of the determination.",
+   "notes": [],
+   "chars": 2580,
+   "sha": "682cfbd39d4b2e02",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.60"
+  },
+  {
+   "id": "cfr21/1271/1271-65",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.65",
+   "slug": "1271-65",
+   "code": "21 CFR 1271.65",
+   "title": "How do I store an HCT/P from a donor determined to be ineligible, and what uses of the HCT/P are not prohibited?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) Storage. If you are the establishment that stores the HCT/P, you must store or identify HCT/Ps from donors who have been determined to be ineligible in a physically separate area clearly identified for such use, or follow other procedures, such as automated designation, that are adequate to prevent improper release until destruction or other disposition of the HCT/P in accordance with paragraph (b) or (c) of this section.\n\n(b) Limited uses of HCT/P from ineligible donor. (1) An HCT/P from a donor who has been determined to be ineligible, based on the results of required testing and/or screening, is not prohibited by subpart C of this part from use for implantation, transplantation, infusion, or transfer under the following circumstances:\n\n(i) The HCT/P is for allogeneic use in a first-degree or second-degree blood relative;\n\n(ii) The HCT/P consists of reproductive cells or tissue from a directed reproductive donor, as defined in § 1271.3(l); or\n\n(iii) There is a documented urgent medical need as defined in § 1271.3(u).\n\n(2) You must prominently label an HCT/P made available for use under the provisions of paragraph (b)(1) of this section with the Biohazard legend shown in § 1271.3(h) with the statement “WARNING: Advise patient of communicable disease risks,” and, in the case of reactive test results, “WARNING: Reactive test results for (name of disease agent or disease).” The HCT/P must be accompanied by the records required under § 1271.55.\n\n(3) If you are the establishment that manufactured an HCT/P used under the provisions of paragraph (b)(1) of this section, you must document that you notified the physician using the HCT/P of the results of testing and screening.\n\n(c) Nonclinical use. You may make available for nonclinical purposes an HCT/P from a donor who has been determined to be ineligible, based on the results of required testing and/or screening, provided that it is labeled:\n\n(1) “For Nonclinical Use Only” and\n\n(2) With the Biohazard legend shown in § 1271.3(h).",
+   "notes": [],
+   "chars": 2011,
+   "sha": "6b8f253ac11706a3",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.65"
+  },
+  {
+   "id": "cfr21/1271/1271-75",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.75",
+   "slug": "1271-75",
+   "code": "21 CFR 1271.75",
+   "title": "How do I screen a donor?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) All donors. Except as provided under § 1271.90, if you are the establishment that performs donor screening, you must screen a donor of cells or tissue by reviewing the donor's relevant medical records for:\n\n(1) Risk factors for, and clinical evidence of, relevant communicable disease agents and diseases, including:\n\n(i) Human immunodeficiency virus;\n\n(ii) Hepatitis B virus;\n\n(iii) Hepatitis C virus;\n\n(iv) Human transmissible spongiform encephalopathy, including Creutzfeldt-Jakob disease;\n\n(v) Treponema pallidum; and\n\n(2) Communicable disease risks associated with xenotransplantation.\n\n(b) Donors of viable, leukocyte-rich cells or tissue. In addition to the relevant communicable disease agents and diseases for which screening is required under paragraph (a) of this section, and except as provided under § 1271.90, you must screen the donor of viable, leukocyte-rich cells or tissue by reviewing the donor's relevant medical records for risk factors for and clinical evidence of relevant cell-associated communicable disease agents and diseases, including Human T-lymphotropic virus.\n\n(c) Donors of reproductive cells or tissue. In addition to the relevant communicable disease agents and diseases for which screening is required under paragraphs (a) and (b) of this section, as applicable, and except as provided under § 1271.90, you must screen the donor of reproductive cells or tissue by reviewing the donor's relevant medical records for risk factors for and clinical evidence of infection due to relevant communicable diseases of the genitourinary tract. Such screening must include screening for the communicable disease agents listed in paragraphs (c)(1) and (c)(2) of this section. However, if the reproductive cells or tissues are recovered by a method that ensures freedom from contamination of the cells or tissue by infectious disease organisms that may be present in the genitourinary tract, then screening for the communicable disease agents listed in paragraphs (c)(1) and (c)(2) of this section is not required. Communicable disease agents of the genitourinary tract for which you must screen include:\n\n(1) Chlamydia trachomatis; and\n\n(2) Neisseria gonorrhea.\n\n(d) Ineligible donors. You must determine ineligible a donor who is identified as having either of the following:\n\n(1) A risk factor for or clinical evidence of any of the relevant communicable disease agents or diseases for which screening is required under paragraphs (a)(1), (b), or (c) of this section; or\n\n(2) Any communicable disease risk associated with xenotransplantation.\n\n(e) Abbreviated procedure for repeat donors. If you have performed a complete donor screening procedure on a living donor within the previous 6 months, you may use an abbreviated donor screening procedure on repeat donations. The abbreviated procedure must determine and document any changes in the donor's medical history since the previous donation that would make the donor ineligible, including relevant social behavior.",
+   "notes": [
+    "[66 FR 5466, Jan. 19, 2001, as amended at 71 FR 14798, Mar. 24, 2006]"
+   ],
+   "chars": 2998,
+   "sha": "08c2af9eb87189df",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.75"
+  },
+  {
+   "id": "cfr21/1271/1271-80",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.80",
+   "slug": "1271-80",
+   "code": "21 CFR 1271.80",
+   "title": "What are the general requirements for donor testing?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) Testing for relevant communicable diseases is required. To adequately and appropriately reduce the risk of transmission of relevant communicable diseases, and except as provided under § 1271.90, if you are the establishment that performs donor testing, you must test a donor specimen for evidence of infection due to communicable disease agents in accordance with paragraph (c) of this section. You must test for those communicable disease agents specified in § 1271.85. In the case of a donor 1 month of age or younger, you must test a specimen from the birth mother instead of a specimen from the donor.\n\n(b) Timing of specimen collection. You must collect the donor specimen for testing at the time of recovery of cells or tissue from the donor; or up to 7 days before or after recovery, except:\n\n(1) For donors of peripheral blood stem/progenitor cells, bone marrow (if not excepted under § 1271.3(d)(4)), or oocytes, you may collect the donor specimen for testing up to 30 days before recovery; or\n\n(2) In the case of a repeat semen donor from whom a specimen has already been collected and tested, and for whom retesting is required under § 1271.85(d), you are not required to collect a donor specimen at the time of each donation.\n\n(c) Tests. You must test using appropriate FDA-licensed, approved, or cleared donor screening tests, in accordance with the manufacturer's instructions, to adequately and appropriately reduce the risk of transmission of relevant communicable disease agents or diseases; however, until such time as appropriate FDA-licensed, approved, or cleared donor screening tests for Chlamydia trachomatis and for Neisseria gonorrhea are available, you must use FDA-licensed, approved, or cleared tests labeled for the detection of those organisms in an asymptomatic, low-prevalence population. You must use a test specifically labeled for cadaveric specimens instead of a more generally labeled test when applicable and when available. Required testing under this section must be performed by a laboratory that either is certified to perform such testing on human specimens under the Clinical Laboratory Improvement Amendments of 1988 (42 U.S.C. 263a) and 42 CFR part 493, or has met equivalent requirements as determined by the Centers for Medicare and Medicaid Services.\n\n(d) Ineligible donors. You must determine the following donors to be ineligible:\n\n(1) A donor whose specimen tests reactive on a screening test for a communicable disease agent in accordance with § 1271.85, except for a donor whose specimen tests reactive on a non-treponemal screening test for syphilis and negative on a specific treponemal confirmatory test;\n\n(2)(i) A donor in whom plasma dilution sufficient to affect the results of communicable disease testing is suspected, unless:\n\n(A) You test a specimen taken from the donor before transfusion or infusion and up to 7 days before recovery of cells or tissue; or\n\n(B) You use an appropriate algorithm designed to evaluate volumes administered in the 48 hours before specimen collection, and the algorithm shows that plasma dilution sufficient to affect the results of communicable disease testing has not occurred.\n\n(ii) Clinical situations in which you must suspect plasma dilution sufficient to affect the results of communicable disease testing include but are not limited to the following:\n\n(A) Blood loss is known or suspected in a donor over 12 years of age, and the donor has received a transfusion or infusion of any of the following, alone or in combination:\n\n(1) More than 2,000 milliliters (mL) of blood (e.g., whole blood, red blood cells) or colloids within 48 hours before death or specimen collection, whichever occurred earlier, or\n\n(2) More than 2,000 mL of crystalloids within 1 hour before death or specimen collection, whichever occurred earlier.\n\n(B) Regardless of the presence or absence of blood loss, the donor is 12 years of age or younger and has received a transfusion or infusion of any amount of any of the following, alone or in combination:\n\n(1) Blood (e.g., whole blood, red blood cells) or colloids within 48 hours before death or specimen collection, whichever occurred earlier, or\n\n(2) Crystalloids within 1 hour before death or specimen collection, whichever occurred earlier.",
+   "notes": [
+    "[69 FR 29830, May 25, 2004, as amended at 70 FR 29952, May 25, 2005]"
+   ],
+   "chars": 4275,
+   "sha": "1e1ae63cad1a0d92",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.80"
+  },
+  {
+   "id": "cfr21/1271/1271-85",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.85",
+   "slug": "1271-85",
+   "code": "21 CFR 1271.85",
+   "title": "What donor testing is required for different types of cells and tissues?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) All donors. To adequately and appropriately reduce the risk of transmission of relevant communicable diseases, and except as provided under § 1271.90, you must test a specimen from the donor of cells or tissue, whether viable or nonviable, for evidence of infection due to relevant communicable disease agents, including:\n\n(1) Human immunodeficiency virus, type 1;\n\n(2) Human immunodeficiency virus, type 2;\n\n(3) Hepatitis B virus;\n\n(4) Hepatitis C virus; and\n\n(5) Treponema pallidum.\n\n(b) Donors of viable, leukocyte-rich cells or tissue. In addition to the relevant communicable disease agents for which testing is required under paragraph (a) of this section, and except as provided under § 1271.90,\n\n(1) You must test a specimen from the donor of viable, leukocyte-rich cells or tissue to adequately and appropriately reduce the risk of transmission of relevant cell-associated communicable diseases, including:\n\n(i) Human T-lymphotropic virus, type I; and\n\n(ii) Human T-lymphotropic virus, type II.\n\n(2) You must test a specimen from the donor of viable, leukocyte-rich cells or tissue for evidence of infection due to cytomegalovirus (CMV), to adequately and appropriately reduce the risk of transmission. You must establish and maintain a standard operating procedure governing the release of an HCT/P from a donor whose specimen tests reactive for CMV.\n\n(c) Donors of reproductive cells or tissue. In addition to the communicable disease agents for which testing is required under paragraphs (a) and (b) of this section, as applicable, and except as provided under § 1271.90, you must test a specimen from the donor of reproductive cells or tissue to adequately and appropriately reduce the risk of transmission of relevant communicable disease agents of the genitourinary tract. Such testing must include testing for the communicable disease agents listed in paragraphs (c)(1) and (c)(2) of this section. However, if the reproductive cells or tissues are recovered by a method that ensures freedom from contamination of the cells or tissue by infectious disease organisms that may be present in the genitourinary tract, then testing for the communicable disease agents listed in paragraphs (c)(1) and (c)(2) of this section is not required. Communicable disease agents of the genitourinary tract for which you must test include:\n\n(1) Chlamydia trachomatis; and\n\n(2) Neisseria gonorrhea.\n\n(d) Retesting anonymous semen donors. Except as provided under § 1271.90 and except for directed reproductive donors as defined in § 1271.3(l), at least 6 months after the date of donation of semen from anonymous donors, you must collect a new specimen from the donor and test it for evidence of infection due to the communicable disease agents for which testing is required under paragraphs (a), (b), and (c) of this section.\n\n(e) Dura mater. For donors of dura mater, you must perform an adequate assessment designed to detect evidence of transmissible spongiform encephalopathy.",
+   "notes": [],
+   "chars": 2982,
+   "sha": "0673a88b223ba441",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.85"
+  },
+  {
+   "id": "cfr21/1271/1271-90",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.90",
+   "slug": "1271-90",
+   "code": "21 CFR 1271.90",
+   "title": "Are there other exceptions and what labeling requirements apply?",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart C—Donor Eligibility"
+   ],
+   "text": "(a) Donor-eligibility determination not required. You are not required to make a donor-eligibility determination under § 1271.50 or to perform donor screening or testing under §§ 1271.75, 1271.80 and 1271.85 for:\n\n(1) Cells and tissues for autologous use; or\n\n(2) Reproductive cells or tissue donated by a sexually intimate partner of the recipient for reproductive use; or\n\n(3) Cryopreserved cells or tissue for reproductive use, other than embryos, originally excepted under paragraphs (a)(1) or (a)(2) of this section at the time of donation, that are subsequently intended for directed donation, provided that:\n\n(i) Additional donations are unavailable, for example, due to the infertility or health of a donor of the cryopreserved reproductive cells or tissue; and\n\n(ii) Appropriate measures are taken to screen and test the donor(s) before transfer to the recipient.\n\n(4) A cryopreserved embryo, originally excepted under paragraph (a)(2) of this section at the time of recovery or cryopreservation, that is subsequently intended for directed or anonymous donation. When possible, appropriate measures should be taken to screen and test the semen and oocyte donors before transfer of the embryo to the recipient.\n\n(b) Exceptions for reproductive use. An embryo originally intended for reproductive use for a specific individual or couple that is subsequently intended for directed or anonymous donation for reproductive use is excepted from the prohibition on use under § 1271.45(c) even when the applicable donor eligibility requirements under subpart C of this part are not met. Nothing in this paragraph creates an exception for deficiencies that occurred in making the donor eligibility determination for either the oocyte donor or the semen donor as required under § 1271.45(b), or for deficiencies in performing donor screening or testing, as required under §§ 1271.75, 1271.80, and 1271.85.\n\n(c) Required labeling. As applicable, you must prominently label an HCT/P described in paragraphs (a) and (b) of this section as follows:\n\n(1) “FOR AUTOLOGOUS USE ONLY,” if it is stored for autologous use.\n\n(2) “NOT EVALUATED FOR INFECTIOUS SUBSTANCES,” unless you have performed all otherwise applicable screening and testing under §§ 1271.75, 1271.80, and 1271.85. This paragraph does not apply to reproductive cells or tissue labeled in accordance with paragraph (c)(6) of this section.\n\n(3) Unless the HCT/P is for autologous use only, “WARNING: Advise recipient of communicable disease risks,”\n\n(i) When the donor-eligibility determination under § 1271.50(a) is not performed or is not completed; or\n\n(ii) If the results of any screening or testing performed indicate:\n\n(A) The presence of relevant communicable disease agents and/or\n\n(B) Risk factors for or clinical evidence of relevant communicable disease agents or diseases.\n\n(4) With the Biohazard legend shown in § 1271.3(h), if the results of any screening or testing performed indicate:\n\n(i) The presence of relevant communicable disease agents and/or\n\n(ii) Risk factors for or clinical evidence of relevant communicable disease agents or diseases.\n\n(5) “WARNING: Reactive test results for (name of disease agent or disease),” in the case of reactive test results.\n\n(6) “Advise recipient that screening and testing of the donor(s) were not performed at the time of recovery or cryopreservation of the reproductive cells or tissue, but have been performed subsequently,” for paragraphs (a)(3) or (a)(4) of this section.",
+   "notes": [
+    "[69 FR 29830, May 25, 2004, as amended at 70 FR 29952, May 25, 2005; 81 FR 40517, June 22, 2016]"
+   ],
+   "chars": 3487,
+   "sha": "b14141647299cc4c",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.90"
+  },
+  {
+   "id": "cfr21/1271/1271-145",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.145",
+   "slug": "1271-145",
+   "code": "21 CFR 1271.145",
+   "title": "Prevention of the introduction, transmission, or spread of communicable diseases.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "You must recover, process, store, label, package, and distribute HCT/Ps, and screen and test cell and tissue donors, in a way that prevents the introduction, transmission, or spread of communicable diseases.",
+   "notes": [],
+   "chars": 207,
+   "sha": "b0728ac47389fc3d",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.145"
+  },
+  {
+   "id": "cfr21/1271/1271-150",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.150",
+   "slug": "1271-150",
+   "code": "21 CFR 1271.150",
+   "title": "Current good tissue practice requirements.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. This subpart D and subpart C of this part set forth current good tissue practice (CGTP) requirements. You must follow CGTP requirements to prevent the introduction, transmission, or spread of communicable diseases by HCT/Ps (e.g., by ensuring that the HCT/Ps do not contain communicable disease agents, that they are not contaminated, and that they do not become contaminated during manufacturing). Communicable diseases include, but are not limited to, those transmitted by viruses, bacteria, fungi, parasites, and transmissible spongiform encephalopathy agents. CGTP requirements govern the methods used in, and the facilities and controls used for, the manufacture of HCT/Ps, including but not limited to all steps in recovery, donor screening, donor testing, processing, storage, labeling, packaging, and distribution. The CGTP provisions specifically governing determinations of donor eligibility, including donor screening and testing, are set out separately in subpart C of this part.\n\n(b) Core CGTP requirements. The following are core CGTP requirements:\n\n(1) Requirements relating to facilities in § 1271.190(a) and (b);\n\n(2) Requirements relating to environmental control in § 1271.195(a);\n\n(3) Requirements relating to equipment in § 1271.200(a);\n\n(4) Requirements relating to supplies and reagents in § 1271.210(a) and (b);\n\n(5) Requirements relating to recovery in § 1271.215;\n\n(6) Requirements relating to processing and process controls in § 1271.220;\n\n(7) Requirements relating to labeling controls in § 1271.250(a) and (b);\n\n(8) Requirements relating to storage in § 1271.260 (a) through (d);\n\n(9) Requirements relating to receipt, predistribution shipment, and distribution of an HCT/P in § 1271.265(a) through (d); and\n\n(10) Requirements relating to donor eligibility determinations, donor screening, and donor testing in §§ 1271.50, 1271.75, 1271.80, and 1271.85.\n\n(c) Compliance with applicable requirements—(1) Manufacturing arrangements (i) If you are an establishment that engages in only some operations subject to the regulations in this subpart and subpart C of this part, and not others, then you need only comply with those requirements applicable to the operations that you perform.\n\n(ii) If you engage another establishment (e.g., a laboratory to perform communicable disease testing, or an irradiation facility to perform terminal sterilization), under a contract, agreement, or other arrangement, to perform any step in manufacture for you, that establishment is responsible for complying with requirements applicable to that manufacturing step.\n\n(iii) Before entering into a contract, agreement, or other arrangement with another establishment to perform any step in manufacture for you, you must ensure that the establishment complies with applicable CGTP requirements. If, during the course of this contract, agreement, or other arrangement, you become aware of information suggesting that the establishment may no longer be in compliance with such requirements, you must take reasonable steps to ensure the establishment complies with those requirements. If you determine that the establishment is not in compliance with those requirements, you must terminate your contract, agreement, or other arrangement with the establishment.\n\n(2) If you are the establishment that determines that an HCT/P meets all release criteria and makes the HCT/P available for distribution, whether or not you are the actual distributor, you are responsible for reviewing manufacturing and tracking records to determine that the HCT/P has been manufactured and tracked in compliance with the requirements of this subpart and subpart C of this part and any other applicable requirements.\n\n(3) With the exception of §§ 1271.150(c) and 1271.155 of this subpart, the regulations in this subpart are not being implemented for reproductive HCT/Ps described in § 1271.10 and regulated solely under section 361 of the Public Health Service Act and the regulations in this part, or for the establishments that manufacture them.\n\n(d) Compliance with parts 210, 211, and 820 of this chapter. With respect to HCT/Ps that are drugs (subject to review under an application submitted under section 505 of the Federal Food, Drug, and Cosmetic Act or under a biological product license application under section 351 of the Public Health Service Act) or that are devices (subject to premarket review or notification under the device provisions of the act or under a biological product license application under section 351 of the Public Health Service Act), the procedures contained in this subpart and in subpart C of this part and the current good manufacturing practice regulations in parts 210 and 211 of this chapter and the quality system regulations in part 820 of this chapter supplement, and do not supersede, each other unless the regulations explicitly provide otherwise. In the event that a regulation in part 1271 of this chapter is in conflict with a requirement in parts 210, 211, or 820 of this chapter, the regulations more specifically applicable to the product in question will supersede the more general.\n\n(e) Where appropriate. When a requirement is qualified by “where appropriate,” it is deemed to be “appropriate” unless you can document justification otherwise. A requirement is “appropriate” if nonimplementation of the requirement could reasonably be expected to result in the HCT/P not meeting its specified requirements related to prevention of introduction, transmission, or spread of communicable diseases, or in your inability to carry out any necessary corrective action.",
+   "notes": [],
+   "chars": 5615,
+   "sha": "2b29c798e24835d5",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.150"
+  },
+  {
+   "id": "cfr21/1271/1271-155",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.155",
+   "slug": "1271-155",
+   "code": "21 CFR 1271.155",
+   "title": "Exemptions and alternatives.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. You may request an exemption from or alternative to any requirement in subpart C or D of this part.\n\n(b) Request for exemption or alternative. Submit your request under this section to the Director of the appropriate Center (the Director), e.g., the Center for Biologics Evaluation and Research or the Center for Devices and Radiological Health. The request must be accompanied by supporting documentation, including all relevant valid scientific data, and must contain either:\n\n(1) Information justifying the requested exemption from the requirement, or\n\n(2) A description of a proposed alternative method of meeting the requirement.\n\n(c) Criteria for granting an exemption or alternative. The Director may grant an exemption or alternative if he or she finds that such action is consistent with the goals of protecting the public health and/or preventing the introduction, transmission, or spread of communicable diseases and that:\n\n(1) The information submitted justifies an exemption; or\n\n(2) The proposed alternative satisfies the purpose of the requirement.\n\n(d) Form of request. You must ordinarily make your request for an exemption or alternative in writing (hard copy or electronically). However, if circumstances make it difficult (e.g., there is inadequate time) to submit your request in writing, you may make the request orally, and the Director may orally grant an exemption or alternative. You must follow your oral request with an immediate written request, to which the Director will respond in writing.\n\n(e) Operation under exemption or alternative. You must not begin operating under the terms of a requested exemption or alternative until the exemption or alternative has been granted. You may apply for an extension of an exemption or alternative beyond its expiration date, if any.\n\n(f) Documentation. If you operate under the terms of an exemption or alternative, you must maintain documentation of:\n\n(1) FDA's grant of the exemption or alternative, and\n\n(2) The date on which you began operating under the terms of the exemption or alternative.\n\n(g) Issuance of an exemption or alternative by the Director. In a public health emergency, the Director may issue an exemption from, or alternative to, any requirement in part 1271. The Director may issue an exemption or alternative under this section if the exemption or alternative is necessary to assure that certain HCT/Ps will be available in a specified location to respond to an unanticipated immediate need for those HCT/Ps.",
+   "notes": [],
+   "chars": 2516,
+   "sha": "d394b456de2ecdf9",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.155"
+  },
+  {
+   "id": "cfr21/1271/1271-160",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.160",
+   "slug": "1271-160",
+   "code": "21 CFR 1271.160",
+   "title": "Establishment and maintenance of a quality program.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. If you are an establishment that performs any step in the manufacture of HCT/Ps, you must establish and maintain a quality program intended to prevent the introduction, transmission, or spread of communicable diseases through the manufacture and use of HCT/Ps. The quality program must be appropriate for the specific HCT/Ps manufactured and the manufacturing steps performed. The quality program must address all core CGTP requirements listed in § 1271.150(b).\n\n(b) Functions. Functions of the quality program must include:\n\n(1) Establishing and maintaining appropriate procedures relating to core CGTP requirements, and ensuring compliance with the requirements of § 1271.180 with respect to such procedures, including review, approval, and revision;\n\n(2) Ensuring that procedures exist for receiving, investigating, evaluating, and documenting information relating to core CGTP requirements, including complaints, and for sharing any information pertaining to the possible contamination of the HCT/P or the potential for transmission of a communicable disease by the HCT/P with the following:\n\n(i) Other establishments that are known to have recovered HCT/Ps from the same donor;\n\n(ii) Other establishments that are known to have performed manufacturing steps with respect to the same HCT/P; and\n\n(iii) Relating to consignees, in the case of such information received after the HCT/P is made available for distribution, shipped to the consignee, or administered to the recipient, procedures must include provisions for assessing risk and appropriate followup, and evaluating the effect this information has on the HCT/P and for the notification of all entities to whom the affected HCT/P was distributed, the quarantine and recall of the HCT/P, and/or reporting to FDA, as necessary.\n\n(3) Ensuring that appropriate corrective actions relating to core CGTP requirements, including reaudits of deficiencies, are taken and documented, as necessary. You must verify corrective actions to ensure that such actions are effective and are in compliance with CGTP. Where appropriate, corrective actions must include both short-term action to address the immediate problem and long-term action to prevent the problem's recurrence. Documentation of corrective actions must include, where appropriate:\n\n(i) Identification of the HCT/P affected and a description of its disposition;\n\n(ii) The nature of the problem requiring corrective action;\n\n(iii) A description of the corrective action taken; and\n\n(iv) The date(s) of the corrective action.\n\n(4) Ensuring the proper training and education of personnel involved in activities related to core CGTP requirements;\n\n(5) Establishing and maintaining appropriate monitoring systems as necessary to comply with the requirements of this subpart (e.g., environmental monitoring);\n\n(6) Investigating and documenting HCT/P deviations and trends of HCT/P deviations relating to core CGTP requirements and making reports if required under § 1271.350(b) or other applicable regulations. Each investigation must include a review and evaluation of the HCT/P deviation, the efforts made to determine the cause, and the implementation of corrective action(s) to address the HCT/P deviation and prevent recurrence.\n\n(c) Audits. You must periodically perform for management review a quality audit, as defined in § 1271.3(gg), of activities related to core CGTP requirements.\n\n(d) Computers. You must validate the performance of computer software for the intended use, and the performance of any changes to that software for the intended use, if you rely upon the software to comply with core CGTP requirements and if the software either is custom software or is commercially available software that has been customized or programmed (including software programmed to perform a user defined calculation or table) to perform a function related to core CGTP requirements. You must verify the performance of all other software for the intended use if you rely upon it to comply with core CGTP requirements. You must approve and document these activities and results before implementation.",
+   "notes": [],
+   "chars": 4120,
+   "sha": "2f18de3a41b07e35",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.160"
+  },
+  {
+   "id": "cfr21/1271/1271-170",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.170",
+   "slug": "1271-170",
+   "code": "21 CFR 1271.170",
+   "title": "Personnel.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. You must have personnel sufficient to ensure compliance with the requirements of this part.\n\n(b) Competent performance of functions. You must have personnel with the necessary education, experience, and training to ensure competent performance of their assigned functions. Personnel must perform only those activities for which they are qualified and authorized.\n\n(c) Training. You must train all personnel, and retrain as necessary, to perform their assigned responsibilities adequately.",
+   "notes": [],
+   "chars": 501,
+   "sha": "4f97b4f2942ed057",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.170"
+  },
+  {
+   "id": "cfr21/1271/1271-180",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.180",
+   "slug": "1271-180",
+   "code": "21 CFR 1271.180",
+   "title": "Procedures.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. You must establish and maintain procedures appropriate to meet core CGTP requirements for all steps that you perform in the manufacture of HCT/Ps. You must design these procedures to prevent circumstances that increase the risk of the introduction, transmission, or spread of communicable diseases through the use of HCT/Ps.\n\n(b) Review and approval. Before implementation, a responsible person must review and approve these procedures.\n\n(c) Availability. These procedures must be readily available to the personnel in the area where the operations to which they relate are performed, or in a nearby area if such availability is impractical.\n\n(d) Standard procedures. If you adopt current standard procedures from another organization, you must verify that the procedures meet the requirements of this part and are appropriate for your operations.",
+   "notes": [],
+   "chars": 860,
+   "sha": "632f30fbd0af1309",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.180"
+  },
+  {
+   "id": "cfr21/1271/1271-190",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.190",
+   "slug": "1271-190",
+   "code": "21 CFR 1271.190",
+   "title": "Facilities.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. Any facility used in the manufacture of HCT/Ps must be of suitable size, construction, and location to prevent contamination of HCT/Ps with communicable disease agents and to ensure orderly handling of HCT/Ps without mix-ups. You must maintain the facility in a good state of repair. You must provide lighting, ventilation, plumbing, drainage, and access to sinks and toilets that are adequate to prevent the introduction, transmission, or spread of communicable disease.\n\n(b) Facility cleaning and sanitation. (1) You must maintain any facility used in the manufacture of HCT/Ps in a clean, sanitary, and orderly manner, to prevent the introduction, transmission, or spread of communicable disease.\n\n(2) You must dispose of sewage, trash, and other refuse in a timely, safe, and sanitary manner.\n\n(c) Operations. You must divide a facility used in the manufacture of HCT/Ps into separate or defined areas of adequate size for each operation that takes place in the facility, or you must establish and maintain other control systems to prevent improper labeling, mix-ups, contamination, cross-contamination, and accidental exposure of HCT/Ps to communicable disease agents.\n\n(d) Procedures and records. (1) You must establish and maintain procedures for facility cleaning and sanitation for the purpose of preventing the introduction, transmission, or spread of communicable disease. These procedures must assign responsibility for sanitation and must describe in sufficient detail the cleaning methods to be used and the schedule for cleaning the facility.\n\n(2) You must document, and maintain records of, all cleaning and sanitation activities performed to prevent contamination of HCT/Ps. You must retain such records 3 years after their creation.",
+   "notes": [],
+   "chars": 1763,
+   "sha": "b6b46403b0f9566a",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.190"
+  },
+  {
+   "id": "cfr21/1271/1271-195",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.195",
+   "slug": "1271-195",
+   "code": "21 CFR 1271.195",
+   "title": "Environmental control and monitoring.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) Environmental control. Where environmental conditions could reasonably be expected to cause contamination or cross-contamination of HCT/Ps or equipment, or accidental exposure of HCT/Ps to communicable disease agents, you must adequately control environmental conditions and provide proper conditions for operations. Where appropriate, you must provide for the following control activities or systems:\n\n(1) Temperature and humidity controls;\n\n(2) Ventilation and air filtration;\n\n(3) Cleaning and disinfecting of rooms and equipment to ensure aseptic processing operations; and\n\n(4) Maintenance of equipment used to control conditions necessary for aseptic processing operations.\n\n(b) Inspections. You must inspect each environmental control system periodically to verify that the system, including necessary equipment, is adequate and functioning properly. You must take appropriate corrective action as necessary.\n\n(c) Environmental monitoring. You must monitor environmental conditions where environmental conditions could reasonably be expected to cause contamination or cross-contamination of HCT/Ps or equipment, or accidental exposure of HCT/Ps to communicable disease agents. Where appropriate, you must provide environmental monitoring for microorganisms.\n\n(d) Records. You must document, and maintain records of, environmental control and monitoring activities.",
+   "notes": [],
+   "chars": 1375,
+   "sha": "3c7d12c0d36b94de",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.195"
+  },
+  {
+   "id": "cfr21/1271/1271-200",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.200",
+   "slug": "1271-200",
+   "code": "21 CFR 1271.200",
+   "title": "Equipment.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. To prevent the introduction, transmission, or spread of communicable diseases, equipment used in the manufacture of HCT/Ps must be of appropriate design for its use and must be suitably located and installed to facilitate operations, including cleaning and maintenance. Any automated, mechanical, electronic, or other equipment used for inspection, measuring, or testing in accordance with this part must be capable of producing valid results. You must clean, sanitize, and maintain equipment according to established schedules.\n\n(b) Procedures and schedules. You must establish and maintain procedures for cleaning, sanitizing, and maintaining equipment to prevent malfunctions, contamination or cross-contamination, accidental exposure of HCT/Ps to communicable disease agents, and other events that could reasonably be expected to result in the introduction, transmission, or spread of communicable diseases.\n\n(c) Calibration of equipment. Where appropriate, you must routinely calibrate according to established procedures and schedules all automated, mechanical, electronic, or other equipment used for inspection, measuring, and testing in accordance with this part.\n\n(d) Inspections. You must routinely inspect equipment for cleanliness, sanitation, and calibration, and to ensure adherence to applicable equipment maintenance schedules.\n\n(e) Records. You must document and maintain records of all equipment maintenance, cleaning, sanitizing, calibration, and other activities performed in accordance with this section. You must display records of recent maintenance, cleaning, sanitizing, calibration, and other activities on or near each piece of equipment, or make the records readily available to the individuals responsible for performing these activities and to the personnel using the equipment. You must maintain records of the use of each piece of equipment, including the identification of each HCT/P manufactured with that equipment.",
+   "notes": [],
+   "chars": 1964,
+   "sha": "1076f555c8267196",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.200"
+  },
+  {
+   "id": "cfr21/1271/1271-210",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.210",
+   "slug": "1271-210",
+   "code": "21 CFR 1271.210",
+   "title": "Supplies and reagents.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) Verification. You must not use supplies and reagents until they have been verified to meet specifications designed to prevent circumstances that increase the risk of the introduction, transmission, or spread of communicable diseases. Verification may be accomplished by the establishment that uses the supply or reagent, or by the vendor of the supply or reagent.\n\n(b) Reagents. Reagents used in processing and preservation of HCT/Ps must be sterile, where appropriate.\n\n(c) In-house reagents. You must validate and/or verify the processes used for production of in-house reagents.\n\n(d) Records. You must maintain the following records pertaining to supplies and reagents:\n\n(1) Records of the receipt of each supply or reagent, including the type, quantity, manufacturer, lot number, date of receipt, and expiration date;\n\n(2) Records of the verification of each supply or reagent, including test results or, in the case of vendor verification, a certificate of analysis from the vendor; and\n\n(3) Records of the lot of supply or reagent used in the manufacture of each HCT/P.",
+   "notes": [],
+   "chars": 1079,
+   "sha": "83cc9d151aac3353",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.210"
+  },
+  {
+   "id": "cfr21/1271/1271-215",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.215",
+   "slug": "1271-215",
+   "code": "21 CFR 1271.215",
+   "title": "Recovery.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "If you are an establishment that recovers HCT/Ps, you must recover each HCT/P in a way that does not cause contamination or cross-contamination during recovery, or otherwise increase the risk of the introduction, transmission, or spread of communicable disease through the use of the HCT/P.",
+   "notes": [],
+   "chars": 290,
+   "sha": "ec2f80644744e9d8",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.215"
+  },
+  {
+   "id": "cfr21/1271/1271-220",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.220",
+   "slug": "1271-220",
+   "code": "21 CFR 1271.220",
+   "title": "Processing and process controls.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. If you are an establishment that processes HCT/Ps, you must process each HCT/P in a way that does not cause contamination or cross-contamination during processing, and that prevents the introduction, transmission, or spread of communicable disease through the use of the HCT/P.\n\n(b) Pooling. Human cells or tissue from two or more donors must not be pooled (placed in physical contact or mixed in a single receptacle) during manufacturing.\n\n(c) In-process control and testing. You must ensure that specified requirements, consistent with paragraph (a) of this section, for in-process controls are met, and that each in-process HCT/P is controlled until the required inspection and tests or other verification activities have been completed, or necessary approvals are received and documented. Sampling of in-process HCT/Ps must be representative of the material to be evaluated.\n\n(d) Dura mater. (1) When there is a published validated process that reduces the risk of transmissible spongiform encephalopathy, you must use this process for dura mater (or an equivalent process that you have validated), unless following this process adversely affects the clinical utility of the dura mater.\n\n(2) When you use a published validated process, you must verify such a process in your establishment.",
+   "notes": [],
+   "chars": 1306,
+   "sha": "298af0688a53d170",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.220"
+  },
+  {
+   "id": "cfr21/1271/1271-225",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.225",
+   "slug": "1271-225",
+   "code": "21 CFR 1271.225",
+   "title": "Process changes.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "Any change to a process must be verified or validated in accordance with § 1271.230, to ensure that the change does not create an adverse impact elsewhere in the operation, and must be approved before implementation by a responsible person with appropriate knowledge and background. You must communicate approved changes to the appropriate personnel in a timely manner.",
+   "notes": [],
+   "chars": 369,
+   "sha": "401055e584227063",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.225"
+  },
+  {
+   "id": "cfr21/1271/1271-230",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.230",
+   "slug": "1271-230",
+   "code": "21 CFR 1271.230",
+   "title": "Process validation.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. Where the results of processing described in § 1271.220 cannot be fully verified by subsequent inspection and tests, you must validate and approve the process according to established procedures. The validation activities and results must be documented, including the date and signature of the individual(s) approving the validation.\n\n(b) Written representation. Any written representation that your processing methods reduce the risk of transmission of communicable disease by an HCT/P, including but not limited to, a representation of sterility or pathogen inactivation of an HCT/P, must be based on a fully verified or validated process.\n\n(c) Changes. When changes to a validated process subject to paragraph (a) of this section occur, you must review and evaluate the process and perform revalidation where appropriate. You must document these activities.",
+   "notes": [],
+   "chars": 873,
+   "sha": "1e9e0ce363e64947",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.230"
+  },
+  {
+   "id": "cfr21/1271/1271-250",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.250",
+   "slug": "1271-250",
+   "code": "21 CFR 1271.250",
+   "title": "Labeling controls.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. You must establish and maintain procedures to control the labeling of HCT/Ps. You must design these procedures to ensure proper HCT/P identification and to prevent mix-ups.\n\n(b) Verification. Procedures must include verification of label accuracy, legibility, and integrity.\n\n(c) Labeling requirements. Procedures must ensure that each HCT/P is labeled in accordance with all applicable labeling requirements, including those in §§ 1271.55, 1271.60, 1271.65, 1271.90, 1271.290, and 1271.370, and that each HCT/P made available for distribution is accompanied by documentation of the donor eligibility determination as required under § 1271.55.",
+   "notes": [],
+   "chars": 656,
+   "sha": "bab2efe6fd351b5a",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.250"
+  },
+  {
+   "id": "cfr21/1271/1271-260",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.260",
+   "slug": "1271-260",
+   "code": "21 CFR 1271.260",
+   "title": "Storage.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) Control of storage areas. You must control your storage areas and stock rooms to prevent:\n\n(1) Mix-ups, contamination, and cross-contamination of HCT/Ps, supplies, and reagents, and\n\n(2) An HCT/P from being improperly made available for distribution.\n\n(b) Temperature. You must store HCT/Ps at an appropriate temperature.\n\n(c) Expiration date. Where appropriate, you must assign an expiration date to each HCT/P based on the following factors:\n\n(1) HCT/P type;\n\n(2) Processing, including the method of preservation;\n\n(3) Storage conditions; and\n\n(4) Packaging.\n\n(d) Corrective action. You must take and document corrective action whenever proper storage conditions are not met.\n\n(e) Acceptable temperature limits. You must establish acceptable temperature limits for storage of HCT/Ps at each step of the manufacturing process to inhibit the growth of infectious agents. You must maintain and record storage temperatures for HCT/Ps. You must periodically review recorded temperatures to ensure that temperatures have been within acceptable limits.",
+   "notes": [],
+   "chars": 1051,
+   "sha": "908c3157d288da14",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.260"
+  },
+  {
+   "id": "cfr21/1271/1271-265",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.265",
+   "slug": "1271-265",
+   "code": "21 CFR 1271.265",
+   "title": "Receipt, predistribution shipment, and distribution of an HCT/P.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) Receipt. You must evaluate each incoming HCT/P for the presence and significance of microorganisms and inspect for damage and contamination. You must determine whether to accept, reject, or place in quarantine each incoming HCT/P, based upon pre-established criteria designed to prevent communicable disease transmission.\n\n(b) Predistribution shipment. If you ship an HCT/P within your establishment or between establishments (e.g., procurer to processor) and the HCT/P is not available for distribution as described in paragraph (c) of this section, you must first determine and document whether pre-established criteria designed to prevent communicable disease transmission have been met, and you must ship the HCT/P in quarantine.\n\n(c) Availability for distribution. (1) Before making an HCT/P available for distribution, you must review manufacturing and tracking records pertaining to the HCT/P, and, on the basis of that record review, you must verify and document that the release criteria have been met. A responsible person must document and date the determination that an HCT/P is available for distribution.\n\n(2) You must not make available for distribution an HCT/P that is in quarantine, is contaminated, is recovered from a donor who has been determined to be ineligible or for whom a donor-eligibility determination has not been completed (except as provided under §§ 1271.60, 1271.65, and 1271.90), or that otherwise does not meet release criteria designed to prevent communicable disease transmission.\n\n(3) You must not make available for distribution any HCT/P manufactured under a departure from a procedure relevant to preventing risks of communicable disease transmission, unless a responsible person has determined that the departure does not increase the risk of communicable disease through the use of the HCT/P. You must record and justify any departure from a procedure at the time of its occurrence.\n\n(d) Packaging and shipping. Packaging and shipping containers must be designed and constructed to protect the HCT/P from contamination. For each type of HCT/P, you must establish appropriate shipping conditions to be maintained during transit.\n\n(e) Procedures. You must establish and maintain procedures, including release criteria, for the activities in paragraphs (a) through (d) of this section. You must document these activities. Documentation must include:\n\n(1) Identification of the HCT/P and the establishment that supplied the HCT/P;\n\n(2) Activities performed and the results of each activity;\n\n(3) Date(s) of activity;\n\n(4) Quantity of HCT/P subject to the activity; and\n\n(5) Disposition of the HCT/P (e.g., identity of consignee).\n\n(f) Return to inventory. You must establish and maintain procedures to determine if an HCT/P that is returned to your establishment is suitable to be returned to inventory.",
+   "notes": [],
+   "chars": 2847,
+   "sha": "ea4bf76cb5a9c85f",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.265"
+  },
+  {
+   "id": "cfr21/1271/1271-270",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.270",
+   "slug": "1271-270",
+   "code": "21 CFR 1271.270",
+   "title": "Records.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. You must maintain records concurrently with the performance of each step required in this subpart and subpart C of this part. Any requirement in this part that an action be documented involves the creation of a record, which is subject to the requirements of this section. All records must be accurate, indelible, and legible. The records must identify the person performing the work and the dates of the various entries, and must be as detailed as necessary to provide a complete history of the work performed and to relate the records to the particular HCT/P involved.\n\n(b) Records management system. You must establish and maintain a records management system relating to core CGTP requirements. Under this system, records pertaining to a particular HCT/P must be maintained in such a way as to facilitate review of the HCT/Ps history before making it available for distribution and, if necessary, subsequent to the HCT/Ps release as part of a followup evaluation or investigation. Records pertinent to the manufacture of HCT/Ps (e.g., labeling and packaging procedures, and equipment logs) must also be maintained and organized under the records management system. If records are maintained in more than one location, then the records management system must be designed to ensure prompt identification, location, and retrieval of all records.\n\n(c) Methods of retention. You may maintain records required under this subpart electronically, as original paper records, or as true copies such as photocopies, microfiche, or microfilm. Equipment that is necessary to make the records available and legible, such as computer and reader equipment, must be readily available. Records stored in electronic systems must be backed up.\n\n(d) Length of retention. You must retain all records for 10 years after their creation, unless stated otherwise in this part. However, you must retain the records pertaining to a particular HCT/P at least 10 years after the date of its administration, or if the date of administration is not known, then at least 10 years after the date of the HCT/Ps distribution, disposition, or expiration, whichever is latest. You must retain records for archived specimens of dura mater for 10 years after the appropriate disposition of the specimens.\n\n(e) Contracts and agreements. You must maintain the name and address and a list of the responsibilities of any establishment that performs a manufacturing step for you. This information must be available during an inspection conducted under § 1271.400.",
+   "notes": [],
+   "chars": 2535,
+   "sha": "5b2f8af9c15adbe6",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.270"
+  },
+  {
+   "id": "cfr21/1271/1271-290",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.290",
+   "slug": "1271-290",
+   "code": "21 CFR 1271.290",
+   "title": "Tracking.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) General. If you perform any step in the manufacture of an HCT/P in which you handle the HCT/P, you must track each such HCT/P in accordance with this section, to facilitate the investigation of actual or suspected transmission of communicable disease and take appropriate and timely corrective action.\n\n(b) System of HCT/P tracking. (1) You must establish and maintain a system of HCT/P tracking that enables the tracking of all HCT/Ps from:\n\n(i) The donor to the consignee or final disposition; and\n\n(ii) The consignee or final disposition to the donor.\n\n(2) Alternatively, if you are an establishment that performs some but not all of the steps in the manufacture of an HCT/P in which you handle the HCT/P, you may participate in a system of HCT/P tracking established and maintained by another establishment responsible for other steps in the manufacture of the same HCT/P, provided that the tracking system complies with all the requirements of this section.\n\n(c) Distinct identification code. As part of your tracking system, you must ensure: That each HCT/P that you manufacture is assigned and labeled with a distinct identification code, e.g., alphanumeric, that relates the HCT/P to the donor and to all records pertaining to the HCT/P; and that labeling includes information designed to facilitate effective tracking, using the distinct identification code, from the donor to the recipient and from the recipient to the donor. Except as described in § 1271.55(a)(1), you must create such a code specifically for tracking, and it may not include an individual's name, social security number, or medical record number. You may adopt a distinct identification code assigned by another establishment engaged in the manufacturing process, or you may assign a new code. If you assign a new code to an HCT/P, you must establish and maintain procedures for relating the new code to the old code.\n\n(d) Tracking from consignee to donor. As part of your tracking system, you must establish and maintain a method for recording the distinct identification code and type of each HCT/P distributed to a consignee to enable tracking from the consignee to the donor.\n\n(e) Tracking from donor to consignee or final disposition. As part of your tracking system, you must establish and maintain a method for documenting the disposition of each of your HCT/Ps, to enable tracking from the donor to the consignee or final disposition. The information you maintain must permit the prompt identification of the consignee of the HCT/P, if any.\n\n(f) Consignees. At or before the time of distribution of an HCT/P to a consignee, you must inform the consignee in writing of the requirements in this section and of the tracking system that you have established and are maintaining to comply with these requirements.\n\n(g) Requirements specific to dura mater donors. You must archive appropriate specimens from each donor of dura mater, under appropriate storage conditions, and for the appropriate duration, to enable testing of the archived material for evidence of transmissible spongiform encephalopathy, and to enable appropriate disposition of any affected nonadministered dura mater tissue, if necessary.",
+   "notes": [
+    "[69 FR 68681, Nov. 24, 2004, as amended at 70 FR 29952, May 25, 2005]"
+   ],
+   "chars": 3194,
+   "sha": "06fb67576f4851af",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.290"
+  },
+  {
+   "id": "cfr21/1271/1271-320",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.320",
+   "slug": "1271-320",
+   "code": "21 CFR 1271.320",
+   "title": "Complaint file.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart D—Current Good Tissue Practice"
+   ],
+   "text": "(a) Procedures. You must establish and maintain procedures for the review, evaluation, and documentation of complaints as defined in § 1271.3(aa), relating to core current good tissue practice (CGTP) requirements, and the investigation of complaints as appropriate.\n\n(b) Complaint file. You must maintain a record of complaints that you receive in a file designated for complaints. The complaint file must contain sufficient information about each complaint for proper review and evaluation of the complaint (including the distinct identification code of the HCT/P that is the subject of the complaint) and for determining whether the complaint is an isolated event or represents a trend. You must make the complaint file available for review and copying upon request from FDA.\n\n(c) Review and evaluation of complaints. You must review and evaluate each complaint relating to core CGTP requirements to determine if the complaint is related to an HCT/P deviation or to an adverse reaction, and to determine if a report under § 1271.350 or another applicable regulation is required. As soon as practical, you must review, evaluate, and investigate each complaint that represents an event required to be reported to FDA, as described in § 1271.350. You must review and evaluate a complaint relating to core CGTP requirements that does not represent an event required to be reported to determine whether an investigation is necessary; an investigation may include referring a copy of the complaint to another establishment that performed manufacturing steps pertinent to the complaint. When no investigation is made, you must maintain a record that includes the reason no investigation was made, and the name of the individual(s) responsible for the decision not to investigate.",
+   "notes": [],
+   "chars": 1774,
+   "sha": "c3cae68203060e62",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.320"
+  },
+  {
+   "id": "cfr21/1271/1271-330",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.330",
+   "slug": "1271-330",
+   "code": "21 CFR 1271.330",
+   "title": "Applicability.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart E—Additional Requirements for Establishments Described in § 1271.10"
+   ],
+   "text": "The provisions set forth in this subpart are being implemented for nonreproductive HCT/Ps described in § 1271.10 and regulated solely under section 361 of the Public Health Service Act and the regulations in this part, and for the establishments that manufacture those HCT/Ps. HCT/Ps that are drugs or devices regulated under the act, or are biological products regulated under section 351 of the Public Health Service Act, are not subject to the regulations set forth in this subpart.",
+   "notes": [],
+   "chars": 485,
+   "sha": "b28184a9a7a9fffc",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.330"
+  },
+  {
+   "id": "cfr21/1271/1271-350",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.350",
+   "slug": "1271-350",
+   "code": "21 CFR 1271.350",
+   "title": "Reporting.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart E—Additional Requirements for Establishments Described in § 1271.10"
+   ],
+   "text": "(a) Adverse reaction reports. (1) You must investigate any adverse reaction involving a communicable disease related to an HCT/P that you made available for distribution. You must report to FDA an adverse reaction involving a communicable disease if it:\n\n(i) Is fatal;\n\n(ii) Is life-threatening;\n\n(iii) Results in permanent impairment of a body function or permanent damage to body structure; or\n\n(iv) Necessitates medical or surgical intervention, including hospitalization.\n\n(2) You must submit each report on a Form FDA-3500A to the address in paragraph (a)(5) of this section within 15 calendar days of initial receipt of the information.\n\n(3) You must, as soon as practical, investigate all adverse reactions that are the subject of these 15-day reports and must submit followup reports within 15 calendar days of the receipt of new information or as requested by FDA. If additional information is not obtainable, a followup report may be required that describes briefly the steps taken to seek additional information and the reasons why it could not be obtained.\n\n(4) You may obtain copies of the reporting form (FDA-3500A) from the Center for Biologics Evaluation and Research (see address in paragraph (a)(5) of this section). Electronic Form FDA-3500A may be obtained at http://www.fda.gov/medwatch or at http://www.hhs.gov/forms.\n\n(5) You must submit two copies of each report described in this paragraph to the Food and Drug Administration, Center for Biologics Evaluation and Research, Document Control Center, 10903 New Hampshire Ave., Bldg. 71, Rm. G112, Silver Spring, MD 20993-0002. FDA may waive the requirement for the second copy in appropriate circumstances.\n\n(b) Reports of HCT/P deviations. (1) You must investigate all HCT/P deviations related to a distributed HCT/P for which you performed a manufacturing step.\n\n(2) You must report any such HCT/P deviation relating to the core CGTP requirements, if the HCT/P deviation occurred in your facility or in a facility that performed a manufacturing step for you under contract, agreement, or other arrangement. Each report must contain a description of the HCT/P deviation, information relevant to the event and the manufacture of the HCT/P involved, and information on all follow-up actions that have been or will be taken in response to the HCT/P deviation (e.g., recalls).\n\n(3) You must report each such HCT/P deviation that relates to a core CGTP requirement on Form FDA 3486 within 45 days of the discovery of the event either electronically using the Center for Biologics Evaluation and Research electronic Web-based application or by mail to the Food and Drug Administration, Center for Biologics Evaluation and Research, Document Control Center, 10903 New Hampshire Ave., Bldg. 71, Rm. G112, Silver Spring, MD 20993-0002.",
+   "notes": [
+    "[69 FR 68686, Nov. 24, 2004, as amended at 80 FR 18095, Apr. 3, 2015]"
+   ],
+   "chars": 2799,
+   "sha": "ac22e58fbabbf572",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.350"
+  },
+  {
+   "id": "cfr21/1271/1271-370",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.370",
+   "slug": "1271-370",
+   "code": "21 CFR 1271.370",
+   "title": "Labeling.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart E—Additional Requirements for Establishments Described in § 1271.10"
+   ],
+   "text": "The following requirements apply in addition to §§ 1271.55, 1271.60, 1271.65, and 1271.90:\n\n(a) You must label each HCT/P made available for distribution clearly and accurately.\n\n(b) The following information must appear on the HCT/P label:\n\n(1) Distinct identification code affixed to the HCT/P container, and assigned in accordance with § 1271.290(c);\n\n(2) Description of the type of HCT/P;\n\n(3) Expiration date, if any; and\n\n(4) Warnings required under § 1271.60(d)(2), § 1271.65(b)(2), or § 1271.90(c), if applicable and physically possible. If it is not physically possible to include these warnings on the label, the warnings must, instead, accompany the HCT/P.\n\n(c) The following information must either appear on the HCT/P label or accompany the HCT/P:\n\n(1) Name and address of the establishment that determines that the HCT/P meets release criteria and makes the HCT/P available for distribution;\n\n(2) Storage temperature;\n\n(3) Other warnings, where appropriate; and\n\n(4) Instructions for use when related to the prevention of the introduction, transmission, or spread of communicable diseases.",
+   "notes": [
+    "[69 FR 68686, Nov. 24, 2004, as amended at 70 FR 29952, May 25, 2005; 81 FR 40518, June 22, 2016]"
+   ],
+   "chars": 1103,
+   "sha": "8839d43288ef1771",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.370"
+  },
+  {
+   "id": "cfr21/1271/1271-390",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.390",
+   "slug": "1271-390",
+   "code": "21 CFR 1271.390",
+   "title": "Applicability.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart F—Inspection and Enforcement of Establishments Described in § 1271.10"
+   ],
+   "text": "The provisions set forth in this subpart are applicable only to HCT/Ps described in § 1271.10 and regulated solely under section 361 of the Public Health Service Act and the regulations in this part, and to the establishments that manufacture those HCT/Ps. HCT/Ps that are drugs or devices regulated under the act, or are biological products regulated under section 351 of the Public Health Service Act, are not subject to the regulations set forth in this subpart.",
+   "notes": [],
+   "chars": 465,
+   "sha": "9c74a36f72923ce0",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.390"
+  },
+  {
+   "id": "cfr21/1271/1271-400",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.400",
+   "slug": "1271-400",
+   "code": "21 CFR 1271.400",
+   "title": "Inspections.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart F—Inspection and Enforcement of Establishments Described in § 1271.10"
+   ],
+   "text": "(a) If you are an establishment that manufactures HCT/Ps described in § 1271.10, whether or not under contract, you must permit the Food and Drug Administration (FDA) to inspect any manufacturing location at any reasonable time and in a reasonable manner to determine compliance with applicable provisions of this part. The inspection will be conducted as necessary in the judgment of the FDA and may include your establishment, facilities, equipment, finished and unfinished materials, containers, processes, HCT/Ps, procedures, labeling, records, files, papers, and controls required to be maintained under the part. The inspection may be made with or without prior notification and will ordinarily be made during regular business hours.\n\n(b) The frequency of inspection will be at the agency's discretion.\n\n(c) FDA will call upon the most responsible person available at the time of the inspection of the establishment and may question the personnel of the establishment as necessary to determine compliance with the provisions of this part.\n\n(d) FDA's representatives may take samples, may review and copy any records required to be kept under this part, and may use other appropriate means to record evidence of observations during inspections conducted under this subpart.\n\n(e) The public disclosure of records containing the name or other positive identification of donors or recipients of HCT/Ps will be handled in accordance with FDA's procedures on disclosure of information as set forth in parts 20 and 21 of this chapter.",
+   "notes": [],
+   "chars": 1533,
+   "sha": "df3d8ebef59ef3eb",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.400"
+  },
+  {
+   "id": "cfr21/1271/1271-420",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.420",
+   "slug": "1271-420",
+   "code": "21 CFR 1271.420",
+   "title": "HCT/Ps offered for import.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart F—Inspection and Enforcement of Establishments Described in § 1271.10"
+   ],
+   "text": "(a) Except as provided in paragraphs (c) and (d) of this section, when an HCT/P is offered for import, the importer of record must notify, either before or at the time of importation, the director of the district of the Food and Drug Administration (FDA) having jurisdiction over the port of entry through which the HCT/P is imported or offered for import, or such officer of the district as the director may designate to act in his or her behalf in administering and enforcing this part, and must provide sufficient information, including information submitted in the Automated Commercial Environment (ACE) system or any other electronic data interchange system authorized by the U.S. Customs and Border Protection Agency as required in part 1, subpart D of this chapter, for FDA to make an admissibility decision.\n\n(b) Except as provided in paragraphs (c) and (d) of this section, an HCT/P offered for import must be held intact by the importer or consignee, under conditions necessary to prevent transmission of communicable disease, until an admissibility decision is made by FDA. The HCT/P may be transported under quarantine to the consignee, while the FDA district reviews the documentation accompanying the HCT/P. When FDA makes a decision regarding the admissibility of the HCT/P, FDA will notify the importer of record.\n\n(c) This section does not apply to reproductive HCT/Ps regulated solely under section 361 of the Public Health Service Act and the regulations in this part, and donated by a sexually intimate partner of the recipient for reproductive use.\n\n(d) This section does not apply to peripheral blood stem/progenitor cells regulated solely under section 361 of the Public Health Service Act and the regulations in this part, except that paragraphs (a) and (b) of this section apply when circumstances occur under which such imported peripheral blood stem/progenitor cells may present an unreasonable risk of communicable disease transmission which indicates the need to review the information referenced in paragraph (a) of this section.",
+   "notes": [
+    "[69 FR 68687, Nov. 24, 2004, as amended at 81 FR 85873, Nov. 29, 2016]"
+   ],
+   "chars": 2059,
+   "sha": "ae851c417bc1961a",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.420"
+  },
+  {
+   "id": "cfr21/1271/1271-440",
+   "source": "cfr21",
+   "doc": "1271",
+   "number": "1271.440",
+   "slug": "1271-440",
+   "code": "21 CFR 1271.440",
+   "title": "Orders of retention, recall, destruction, and cessation of manufacturing.",
+   "path": [
+    "21 CFR Part 1271",
+    "Subpart F—Inspection and Enforcement of Establishments Described in § 1271.10"
+   ],
+   "text": "(a) Upon an agency finding that there are reasonable grounds to believe that an HCT/P is a violative HCT/P because it was manufactured in violation of the regulations in this part and, therefore, the conditions of manufacture of the HCT/P do not provide adequate protections against risks of communicable disease transmission; or the HCT/P is infected or contaminated so as to be a source of dangerous infection to humans; or an establishment is in violation of the regulations in this part and, therefore, does not provide adequate protections against the risks of communicable disease transmission, the Food and Drug Administration (FDA) may take one or more of the following actions:\n\n(1) Serve upon the person who distributed the HCT/P a written order that the HCT/P be recalled and/or destroyed, as appropriate, and upon persons in possession of the HCT/P that the HCT/P must be retained until it is recalled by the distributor, destroyed, or disposed of as agreed by FDA, or the safety of the HCT/P is confirmed;\n\n(2) Take possession of and/or destroy the violative HCT/P; or\n\n(3) Serve upon the establishment an order to cease manufacturing until compliance with the regulations of this part has been achieved. When FDA determines there are reasonable grounds to believe there is a danger to health, such order will be effective immediately. In other situations, such order will be effective after one of the following events, whichever is later:\n\n(i) Passage of 5 working days from the establishment's receipt of the order; or\n\n(ii) If the establishment requests a hearing in accordance with paragraph (e) of this section and part 16 of this chapter, a decision in, and in accordance with, those proceedings.\n\n(b) A written order issued under paragraph (a) of this section will state with particularity the facts that justify the order.\n\n(c)(1) A written order issued under paragraph (a)(1) of this section will ordinarily provide that the HCT/P be recalled and/or destroyed within 5 working days from the date of receipt of the order. After receipt of an order issued under paragraph (a)(1) of this section, the establishment in possession of the HCT/P must not distribute or dispose of the HCT/P in any manner except to recall and/or destroy the HCT/P consistent with the provisions of the order, under the supervision of FDA.\n\n(2) In lieu of paragraph (c)(1) of this section, other arrangements for assuring the proper disposition of the HCT/P may be agreed upon by the person receiving the written order and FDA. Such arrangements may include, among others, providing FDA with records or other written information that adequately ensure that the HCT/P has been recovered, processed, stored, and distributed in conformance with this part, and that, except as provided under §§ 1271.60, 1271.65, and 1271.90, the donor of the cells or tissue for the HCT/P has been determined to be eligible.\n\n(d) A written order issued under paragraph (a)(3) of this section will specify the regulations with which you must achieve compliance and will ordinarily specify the particular operations covered by the order. After receipt of an order that is in effect and issued under paragraph (a)(3) of this section, you must not resume operations without prior written authorization of FDA.\n\n(e) The recipient of an order issued under this section may request a hearing in accordance with part 16 of this chapter. To request a hearing, the recipient of the written order or prior possessor of such HCT/P must make the request within 5 working days of receipt of a written order for retention, recall, destruction, and/or cessation (or within 5 working days of the agency's possession of an HCT/P under paragraph (a)(2) of this section), in accordance with part 16 of this chapter. An order of destruction will be held in abeyance pending resolution of the hearing request. Upon request under part 16 of this chapter, FDA will provide an opportunity for an expedited hearing for an order of cessation that is not stayed by the Commissioner of Food and Drugs.\n\n(f) FDA will not issue an order for the destruction of reproductive tissue under paragraph (a)(1) of this section, nor will it carry out such destruction itself under paragraph (a)(2) of this section.",
+   "notes": [],
+   "chars": 4251,
+   "sha": "70033a2fe6b92552",
+   "url": "https://www.ecfr.gov/current/title-21/part-1271/section-1271.440"
+  },
+  {
+   "id": "cfr21/4/4-1",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.1",
+   "slug": "4-1",
+   "code": "21 CFR 4.1",
+   "title": "What is the scope of this subpart?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart A—Current Good Manufacturing Practice Requirements for Combination Products"
+   ],
+   "text": "This subpart applies to combination products. It establishes which current good manufacturing practice requirements apply to these products. This subpart clarifies the application of current good manufacturing practice regulations to combination products, and provides a regulatory framework for designing and implementing the current good manufacturing practice operating system at facilities that manufacture co-packaged or single-entity combination products.",
+   "notes": [],
+   "chars": 461,
+   "sha": "61974c879ccc61c8",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.1"
+  },
+  {
+   "id": "cfr21/4/4-2",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.2",
+   "slug": "4-2",
+   "code": "21 CFR 4.2",
+   "title": "How does FDA define key terms and phrases in this subpart?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart A—Current Good Manufacturing Practice Requirements for Combination Products"
+   ],
+   "text": "The terms listed in this section have the following meanings for purposes of this subpart:\n\nBiological product has the meaning set forth in § 3.2(d) of this chapter. A biological product also meets the definitions of either a drug or device as these terms are defined under this section.\n\nCombination product has the meaning set forth in § 3.2(e) of this chapter.\n\nConstituent part is a drug, device, or biological product that is part of a combination product.\n\nCo-packaged combination product has the meaning set forth in § 3.2(e)(2) of this chapter.\n\nCurrent good manufacturing practice operating system means the operating system within an establishment that is designed and implemented to address and meet the current good manufacturing practice requirements for a combination product.\n\nCurrent good manufacturing practice requirements means the requirements set forth under § 4.3(a) through (e).\n\nDevice has the meaning set forth in § 3.2(f) of this chapter. A device that is a constituent part of a combination product is considered a finished device within the meaning of the Quality Management System Regulation (QMSR).\n\nDrug has the meaning set forth in § 3.2(g) of this chapter and includes medical gas as defined in section 575(2) of the Federal Food, Drug, and Cosmetic Act. Medical gas includes designated medical gases as defined in section 575(1) of the Federal Food, Drug, and Cosmetic Act and medical gases approved under section 505 of the Federal Food, Drug, and Cosmetic Act. A drug other than a medical gas that is a constituent part of a combination product is considered a drug product within the meaning of the drug current good manufacturing practice (CGMP) requirements. A drug that is a medical gas that is a constituent part of a combination product is considered a medical gas within the meaning of the medical gas CGMP requirements.\n\nDrug CGMP requirements refers to the current good manufacturing practice regulations set forth in parts 210 and 211 of this chapter.\n\nHCT/Ps refers to human cell, tissue, and cellular and tissue-based products, as defined in § 1271.3(d) of this chapter. An HCT/P that is not regulated solely under section 361 of the Public Health Service Act may be a constituent part of a combination product. Such an HCT/P is subject to part 1271 of this chapter and is also regulated as a drug, device, and/or biological product.\n\nManufacture includes, but is not limited to, designing, fabricating, assembling, filling, processing, testing, labeling, packaging, repackaging, holding, and storage.\n\nMedical gas CGMP requirements refers to the current good manufacturing practice regulations set forth in part 213 of this chapter.\n\nQMSR refers to the requirements under part 820 of this chapter.\n\nSingle-entity combination product has the meaning set forth in § 3.2(e)(1) of this chapter.\n\nType of constituent part refers to the category of the constituent part, which can be either a biological product, a device, or a drug, as these terms are defined under this section.",
+   "notes": [
+    "[89 FR 57165, June 2, 2024]"
+   ],
+   "chars": 3023,
+   "sha": "977836bd0ae324b3",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.2"
+  },
+  {
+   "id": "cfr21/4/4-3",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.3",
+   "slug": "4-3",
+   "code": "21 CFR 4.3",
+   "title": "What current good manufacturing practice requirements apply to my combination product?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart A—Current Good Manufacturing Practice Requirements for Combination Products"
+   ],
+   "text": "If you manufacture a combination product, the requirements listed in this section apply as follows:\n\n(a) The current good manufacturing practice requirements in parts 210 and 211 of this chapter apply to a combination product that includes a drug constituent part other than a medical gas;\n\n(b) The current good manufacturing practice requirements in part 820 of this chapter apply to a combination product that includes a device constituent part;\n\n(c) The current good manufacturing practice requirements among the requirements (including standards) for biological products in parts 600 through 680 of this chapter apply to a combination product that includes a biological product constituent part to which those requirements would apply if that constituent part were not part of a combination product;\n\n(d) The current good tissue practice requirements including donor eligibility requirements for HCT/Ps in part 1271 of this chapter apply to a combination product that includes an HCT/P; and\n\n(e) The current good manufacturing practice requirements in part 213 of this chapter apply to a combination product that includes a drug constituent part that is a medical gas.",
+   "notes": [
+    "[78 FR 4321, Jan. 22, 2013, as amended at 89 FR 51766, June 18, 2024]"
+   ],
+   "chars": 1172,
+   "sha": "6944ee6efe214920",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.3"
+  },
+  {
+   "id": "cfr21/4/4-4",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.4",
+   "slug": "4-4",
+   "code": "21 CFR 4.4",
+   "title": "How can I comply with these current good manufacturing practice requirements for a co-packaged or single-entity combination product?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart A—Current Good Manufacturing Practice Requirements for Combination Products"
+   ],
+   "text": "(a) Under this subpart, for single entity or co-packaged combination products, compliance with all applicable current good manufacturing practice requirements for the combination product shall be achieved through the design and implementation of a current good manufacturing practice operating system that is demonstrated to comply with:\n\n(1) The specifics of each set of current good manufacturing practice regulations listed under § 4.3 as they apply to each constituent part included in the combination product; or\n\n(2) Paragraph (b) of this section.\n\n(b) If you elect to establish a current good manufacturing practice operating system in accordance with paragraph (b) of this section, the following requirements apply:\n\n(1) If the combination product includes a device constituent part and a drug constituent part, and the current good manufacturing practice operating system has been shown to comply with the drug CGMP requirements or the medical gas CGMP requirements, as applicable, the following clauses of ISO 13485 (together with the definitions in Clause 3 of ISO 9000), which is incorporated by reference into the QMSR under § 820.7 of this chapter, and certain other provisions within the QMSR must also be shown to have been satisfied; upon demonstration that these requirements have been satisfied, no additional showing of compliance with respect to the QMSR need be made:\n\n(i) General requirements and management responsibility. Clause 4.1, Clause 5 and its subclauses, Clause 6.1 of ISO 13485, and § 820.10 of this chapter;\n\n(ii) Design and development. Clause 7.3 and its subclauses of ISO 13485. The organization shall document one or more processes for risk management in product realization. Records of risk management activities shall be maintained;\n\n(iii) Purchasing. Clause 7.4. and its subclauses of ISO 13485;\n\n(iv) Analysis of data, improvement, and complaint handling. Clause 8.2.2 and § 820.35(a) of this chapter, Clause 8.4, and Clause 8.5. and its subclauses of ISO 13485;\n\n(v) Installation activities. Clause 7.5.3 of ISO 13485; and\n\n(vi) Servicing activities. Clause 7.5.4 of ISO 13485 and § 820.35(b) of this chapter.\n\n(2) If the combination product includes a device constituent part and a drug constituent part other than a medical gas, and the current good manufacturing practice operating system has been shown to comply with the QMSR requirements for devices, the following provisions of the drug CGMP requirements must also be shown to have been satisfied; upon demonstration that these requirements have been satisfied, no additional showing of compliance with respect to the drug CGMP requirements need be made:\n\n(i) Section 211.84 of this chapter. Testing and approval or rejection of components, drug product containers, and closures.\n\n(ii) Section 211.103 of this chapter. Calculation of yield.\n\n(iii) Section 211.132 of this chapter. Tamper-evident packaging requirements for over-the-counter (OTC) human drug products.\n\n(iv) Section 211.137 of this chapter. Expiration dating.\n\n(v) Section 211.165 of this chapter. Testing and release for distribution.\n\n(vi) Section 211.166 of this chapter. Stability testing.\n\n(vii) Section 211.167 of this chapter. Special testing requirements.\n\n(viii) Section 211.170 of this chapter. Reserve samples.\n\n(3) If the combination product includes a device constituent part and a drug constituent part that is a medical gas, and the current good manufacturing practice operating system has been shown to comply with the QMSR regulation, the following provisions of the medical gas CGMP requirements must also be shown to have been satisfied; upon demonstration that these requirements have been satisfied, no additional showing of compliance with respect to the medical gas CGMP requirements need be made:\n\n(i) Section 213.84 of this chapter. Testing and approval or rejection of components, containers, and closures.\n\n(ii) Section 213.94 of this chapter. Medical gas containers and closures.\n\n(iii) Section 213.122 of this chapter. Materials examination and usage criteria.\n\n(iv) Section 213.165 of this chapter. Testing and release for distribution.\n\n(v) Section 213.166 of this chapter. Stability testing and expiration dating for medical gases marketed under applications submitted under section 505 or section 512 of the Federal Food, Drug, and Cosmetic Act.\n\n(vi) Section 213.204 of this chapter. Returned medical gases.\n\n(vii) Section 213.208 of this chapter. Salvaging of medical gases.\n\n(4) In addition to being shown to comply with the other applicable manufacturing requirements listed under § 4.3, if the combination product includes a biological product constituent part, the current good manufacturing practice operating system must also be shown to implement and comply with all manufacturing requirements identified under § 4.3(c) that would apply to that biological product if that constituent part were not part of a combination product.\n\n(5) In addition to being shown to comply with the other applicable current good manufacturing practice requirements listed under § 4.3, if the combination product includes an HCT/P, the current good manufacturing practice operating system must also be shown to implement and comply with all current good tissue practice requirements identified under § 4.3(d) that would apply to that HCT/P if it were not part of a combination product.\n\n(c) During any period in which the manufacture of a constituent part to be included in a co-packaged or single entity combination product occurs at a separate facility from the other constituent part(s) to be included in that single-entity or co-packaged combination product, the current good manufacturing practice operating system for that constituent part at that facility must be demonstrated to comply with all current good manufacturing practice requirements applicable to that type of constituent part.\n\n(d) When two or more types of constituent parts to be included in a single-entity or co-packaged combination product have arrived at the same facility, or the manufacture of these constituent parts is proceeding at the same facility, application of a current good manufacturing process operating system that complies with paragraph (b) of this section may begin.\n\n(e) The requirements set forth in this subpart and in parts 210, 211, 213, 820, 600 through 680, and 1271 of this chapter listed in § 4.3, supplement, and do not supersede, each other unless the regulations explicitly provide otherwise. In the event of a conflict between regulations applicable under this subpart to combination products, including their constituent parts, the regulations most specifically applicable to the constituent part in question shall supersede the more general.\n\n(f) The material listed in this paragraph (f) is incorporated by reference into this section with the approval of the Director of the Federal Register under 5 U.S.C. 552(a) and 1 CFR part 51. All approved incorporation by reference (IBR) material is available for inspection at the Food and Drug Administration (FDA) and at the National Archives and Records Administration (NARA). Contact FDA at Dockets Management Staff, 5630 Fishers Lane, Rm. 1061, Rockville, MD 20852; 240-402-7500; https://www.regulations.gov/document/FDA-2013-S-0610-0003. For information on the availability of this material at NARA, visit www.archives.gov/federal-register/cfr/ibr-locations or email fr.inspection@nara.gov. In addition, the terms and definitions given in ISO 9000:2015 are available for viewing, without cost, at https://www.iso.org/obp/ui#iso:std:iso:9000:ed-4:v1:en. This material is available from the International Organization for Standardization (ISO), BIBC II, Chemin de Blandonnet 8, CP 401, 1214 Vernier, Geneva, Switzerland; +41-22-749-01-11; customerservice@iso.org, https://www.iso.org/store.html.\n\n(1) ISO 9000:2015(E), (“ISO 9000”), Quality Management systems—Fundamentals and vocabulary, Clause 3—Terms and definitions, Fourth edition, September 15, 2015.\n\n(2) ISO 13485:2016(E), (“ISO 13485”), Medical devices—Quality management systems—Requirements for regulatory purposes, Third edition, March 1, 2016.",
+   "notes": [
+    "[78 FR 4321, Jan. 22, 2013, as amended at 89 FR 7522, Feb. 2, 2024; 89 FR 51766, June 18, 2024]"
+   ],
+   "chars": 8151,
+   "sha": "ac89071bfe7e0d47",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.4"
+  },
+  {
+   "id": "cfr21/4/4-100",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.100",
+   "slug": "4-100",
+   "code": "21 CFR 4.100",
+   "title": "What is the scope of this subpart?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart B—Postmarketing Safety Reporting for Combination Products"
+   ],
+   "text": "(a) This subpart identifies postmarketing safety reporting requirements for combination product applicants and constituent part applicants.\n\n(b) This subpart does not apply to investigational combination products, combination products that have not received marketing authorization, or to persons other than combination product applicants and constituent part applicants.\n\n(c) This subpart supplements and does not supersede other provisions of this chapter, including the provisions in parts 314, 600, 606, 803, and 806 of this chapter, unless a regulation explicitly provides otherwise.",
+   "notes": [],
+   "chars": 588,
+   "sha": "7c1b95f66f257cf3",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.100"
+  },
+  {
+   "id": "cfr21/4/4-101",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.101",
+   "slug": "4-101",
+   "code": "21 CFR 4.101",
+   "title": "How does the FDA define key terms and phrases in this subpart?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart B—Postmarketing Safety Reporting for Combination Products"
+   ],
+   "text": "Abbreviated new drug application (ANDA) has the same meaning given the term “abbreviated application” in § 314.3(b) of this chapter.\n\nAgency or we means Food and Drug Administration.\n\nApplicant means, for the purposes of this subpart, a person holding an application under which a combination product or constituent part of a combination product has received marketing authorization (such as approval, licensure, or clearance). For the purposes of this subpart, applicant is used interchangeably with the term “you.”\n\nApplication means, for purposes of this subpart, a BLA, an NDA, an ANDA, or a device application, including all amendments and supplements to them.\n\nBiological product has the meaning given the term in section 351 of the Public Health Service Act (42 U.S.C. 262).\n\nBiological product deviation report (BPDR) is a report as described in §§ 600.14 and 606.171 of this chapter.\n\nBiologics license application (BLA) has the meaning given the term in section 351 of the Public Health Service Act (42 U.S.C. 262) and § 601.2 of this chapter.\n\nCombination product has the meaning given the term in § 3.2(e) of this chapter.\n\nCombination product applicant means an applicant that holds the application(s) for a combination product.\n\nConstituent part has the meaning given the term in § 4.2.\n\nConstituent part applicant means the applicant for a constituent part of a combination product the constituent parts of which are marketed under applications held by different applicants.\n\nCorrection or removal report is a report as described in § 806.10 of this chapter.\n\nDe novo classification request is a submission requesting de novo classification under section 513(f)(2) of the Federal Food, Drug, and Cosmetic Act.\n\nDevice has the meaning given the term in section 201(h) of the Federal Food, Drug, and Cosmetic Act.\n\nDevice application means a PMA, PDP, premarket notification submission, de novo classification request, or HDE.\n\nDrug has the meaning given the term in section 201(g)(1) of the Federal Food, Drug, and Cosmetic Act.\n\nField alert report is a report as described in § 314.81 of this chapter.\n\nFifteen-day report is a report required to be submitted within 15 days as described in § 314.80 of this chapter or § 600.80 of this chapter, as well as followup reports to such a report.\n\nFive-day report is a report as described in §§ 803.3 and 803.53 of this chapter, as well as supplemental or followup reports to such a report as described in § 803.56 of this chapter.\n\nHumanitarian device exemption (HDE) has the meaning given the term in § 814.3 of this chapter.\n\nMalfunction report is a report as described in § 803.50 of this chapter as well as supplemental or followup reports to such a report as described in § 803.56 of this chapter.\n\nNew drug application (NDA) has the meaning given the term “application” in § 314.3(b) of this chapter.\n\nPremarket approval application (PMA) has the meaning given the term in § 814.3 of this chapter.\n\nPremarket notification submission is a submission as described in § 807.87 of this chapter.\n\nProduct Development Protocol (PDP) is a submission as set forth in section 515(f) of the Federal Food, Drug, and Cosmetic Act.",
+   "notes": [],
+   "chars": 3183,
+   "sha": "72cfa8f4620ef95d",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.101"
+  },
+  {
+   "id": "cfr21/4/4-102",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.102",
+   "slug": "4-102",
+   "code": "21 CFR 4.102",
+   "title": "What reports must you submit to FDA for your combination product or constituent part?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart B—Postmarketing Safety Reporting for Combination Products"
+   ],
+   "text": "(a) In general. If you are a constituent part applicant, the reporting requirements applicable to you that are identified in this section apply to your constituent part, and if you are a combination product applicant, the reporting requirements applicable to you that are identified in this section apply to your combination product as a whole.\n\n(b) Reporting requirements applicable to both combination product applicants and constituent part applicants. If you are a combination product applicant or constituent part applicant, you must comply with the reporting requirements identified in paragraphs (b)(1), (b)(2), or (b)(3) of this section for your product based on its application type. If you are a combination product applicant, you are required to submit a report as specified in this paragraph unless you have already submitted a report in accordance with paragraph (c) of this section for the same event that: Includes the information required under the applicable regulations identified in this paragraph, is required to be submitted in the same manner under § 4.104, and meets the deadlines under the applicable regulations identified in this paragraph.\n\n(1) If your combination product or device constituent part received marketing authorization under a device application, you must comply with the requirements for postmarketing safety reporting described in parts 803 and 806 of this chapter with respect to your product.\n\n(2) If your combination product or drug constituent part received marketing authorization under an NDA or ANDA, you must comply with the requirements for postmarketing safety reporting described in part 314 of this chapter with respect to your product.\n\n(3) If your combination product or biological product constituent part received marketing authorization under a BLA, you must comply with the requirements for postmarketing safety reporting described in parts 600 and 606 of this chapter with respect to your product.\n\n(c) Reporting requirements applicable only to combination product applicants. If you are a combination product applicant, in addition to compliance with paragraph (a) of this section, you must also comply with the reporting requirements identified under this paragraph as applicable to your product based on its constituent parts. If you are a combination product applicant, you are required to submit a report as specified in this paragraph unless you have already submitted a report in accordance with paragraph (b) of this section for the same event that: Includes the information required under the applicable regulations for the report identified in this paragraph; is required to be submitted in the same manner under § 4.104 of this chapter; and, unless otherwise specified in this paragraph, meets the deadlines under the applicable regulations for the report identified in this paragraph.\n\n(1) If your combination product contains a device constituent part, you must submit:\n\n(i) Five-day reports;\n\n(ii) Malfunction reports; and\n\n(iii) Correction or removal reports, and maintain records as described in § 806.20 of this chapter for corrections and removals not required to be reported.\n\n(2) If your combination product contains a drug constituent part, you must submit:\n\n(i) Field alert reports; and\n\n(ii) Fifteen-day reports as described in § 314.80 of this chapter, which must be submitted within 30 calendar days instead of 15 calendar days if your combination product received marketing authorization under a device application.\n\n(3) If your combination product contains a biological product constituent part, you must submit:\n\n(i) Biological product deviation reports; and\n\n(ii) Fifteen-day reports as described in § 600.80 of this chapter, which must be submitted within 30 calendar days instead of 15 calendar days if your combination product received marketing authorization under a device application.\n\n(d) Other reporting requirements for combination product applicants. (1) If you are the combination product applicant for a combination product that contains a device constituent part and that received marketing authorization under an NDA, ANDA, or BLA, in addition to the information otherwise required in the periodic safety reports you submit under § 314.80 or § 600.80 of this chapter, your periodic safety reports must also include a summary and analysis of the reports identified in paragraphs (c)(1)(i) and (ii) of this section that were submitted during the report interval.\n\n(2) If you are the combination product applicant for a combination product that received marketing authorization under a device application, in addition to the reports required under paragraphs (b) and (c) of this section, you must submit reports regarding postmarketing safety events if notified by the Agency in writing that the Agency requires additional information. We will specify what safety information is needed and will require such information if we determine that protection of the public health requires additional or clarifying safety information for the combination product. In any request under this section, we will state the reason or purpose for the safety information request, specify the due date for submitting the information, and clearly identify the reported event(s) related to our request.",
+   "notes": [],
+   "chars": 5283,
+   "sha": "d6b555852f4cdefe",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.102"
+  },
+  {
+   "id": "cfr21/4/4-103",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.103",
+   "slug": "4-103",
+   "code": "21 CFR 4.103",
+   "title": "What information must you share with other constituent part applicants for the combination product?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart B—Postmarketing Safety Reporting for Combination Products"
+   ],
+   "text": "(a) When you receive information regarding an event that involves a death or serious injury as described in § 803.3 of this chapter, or an adverse experience as described in § 314.80(a) of this chapter or § 600.80(a) of this chapter, associated with the use of the combination product, you must provide the information to the other constituent part applicant(s) for the combination product no later than 5 calendar days of your receipt of the information.\n\n(b) With regard to information you must provide to the other constituent part applicant(s) for the combination product, you must maintain records that include:\n\n(1) A copy of the information you provided,\n\n(2) The date the information was received by you,\n\n(3) The date the information was provided to the other constituent part applicant(s), and\n\n(4) The name and address of the other constituent part applicant(s) to whom you provided the information.",
+   "notes": [],
+   "chars": 910,
+   "sha": "94511cf9b2028ec6",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.103"
+  },
+  {
+   "id": "cfr21/4/4-104",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.104",
+   "slug": "4-104",
+   "code": "21 CFR 4.104",
+   "title": "How and where must you submit postmarketing safety reports for your combination product or constituent part?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart B—Postmarketing Safety Reporting for Combination Products"
+   ],
+   "text": "(a) If you are a constituent part applicant, you must submit postmarketing safety reports in accordance with the regulations identified in § 4.102(b) that are applicable to your product based on its application type.\n\n(b) If you are a combination product applicant, you must submit postmarketing safety reports required under § 4.102 in the manner specified in the regulation applicable to the type of report, with the following exceptions:\n\n(1) You must submit the postmarketing safety reports identified in § 4.102(c)(1)(i) and (ii) in accordance with § 314.80(g) of this chapter if your combination product received marketing authorization under an NDA or ANDA or in accordance with § 600.80(h) of this chapter if your combination product received marketing authorization under a BLA.\n\n(2) You must submit the postmarketing safety reports identified in § 4.102(c)(2)(ii) and (c)(3)(ii) in accordance with § 803.12(a) of this chapter if your combination product received marketing authorization under a device application.",
+   "notes": [],
+   "chars": 1024,
+   "sha": "87fc4c00af90cdeb",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.104"
+  },
+  {
+   "id": "cfr21/4/4-105",
+   "source": "cfr21",
+   "doc": "4",
+   "number": "4.105",
+   "slug": "4-105",
+   "code": "21 CFR 4.105",
+   "title": "What are the postmarketing safety reporting recordkeeping requirements for your combination product or constituent part?",
+   "path": [
+    "21 CFR Part 4",
+    "Subpart B—Postmarketing Safety Reporting for Combination Products"
+   ],
+   "text": "(a) If you are a constituent part applicant:\n\n(1) You must maintain records in accordance with the recordkeeping requirements in the applicable regulation(s) described in § 4.102(b).\n\n(2) You must maintain records required under § 4.103(b) for the longest time period required for records under the postmarketing safety reporting regulations applicable to your product under § 4.102(b).\n\n(b) If you are a combination product applicant, you must maintain records in accordance with the longest time period required for records under the regulations applicable to your product under § 4.102.",
+   "notes": [],
+   "chars": 589,
+   "sha": "38743b48abe25a3d",
+   "url": "https://www.ecfr.gov/current/title-21/part-4/section-4.105"
   }
  ]
 }

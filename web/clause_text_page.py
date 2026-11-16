@@ -183,8 +183,8 @@ def _doc_or_clause(view: dict[str, Any], src: str, doc: str, tail: str) -> str:
     return d["path"]
 
 
-_CFR_SEC = re.compile(r"^21 CFR (\d{3}\.\d+)(?:\([A-Za-z0-9]+\))*$")
-_CFR_PART = re.compile(r"^21 CFR Part (\d{3})$")
+_CFR_SEC = re.compile(r"^21 CFR (\d{1,4}\.\d+)(?:\([A-Za-z0-9]+\))*$")
+_CFR_PART = re.compile(r"^21 CFR Part (\d{1,4})$")
 _EU_CH = re.compile(r"^EU GMP Part I,? Chapter (\d)\b(.*)$")
 _EU_AN1 = re.compile(r"^EU GMP Annex 1\b(?!\d)(.*)$")
 _MFDS_RULE = "의약품 제조 및 품질관리에 관한 규정"

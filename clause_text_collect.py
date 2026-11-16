@@ -49,6 +49,10 @@ CFR_PARTS = {
     "601": "Licensing",
     "606": "Current Good Manufacturing Practice for Blood and Blood Components",
     "610": "General Biological Products Standards",
+    # [2026-11-16 나머지 묶음] PET 의약품 CGMP · 세포·조직 제품 · 복합제품.
+    "212": "Current Good Manufacturing Practice for Positron Emission Tomography Drugs",
+    "1271": "Human Cells, Tissues, and Cellular and Tissue-Based Products",
+    "4": "Regulation of Combination Products",
 }
 
 EU_DOCS = [  # (key, code, chapter_no, title, url) — url 은 자료실 eu_gmp.json 과 같은 공식 PDF
@@ -85,7 +89,7 @@ ICH_DOCS = [  # (key, code, title, url)
 
 SOURCES: dict[str, dict[str, Any]] = {
     "cfr21": {
-        "title": "21 CFR Part 210·211 (CGMP) · Part 600·601·606·610 (Biologics)",
+        "title": "21 CFR Part 210·211 (CGMP) · Part 600·601·606·610 (Biologics) · Part 212 (PET) · Part 1271 (HCT/Ps) · Part 4 (Combination Products)",
         "publisher": "U.S. Office of the Federal Register / GPO — eCFR",
         "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C",
         "api": "https://www.ecfr.gov/api/versioner/v1/full/{date}/title-21.xml?part={part}",

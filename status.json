@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T09:34:54Z",
+ "generated_at": "2026-11-16T12:13:07Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43864094735,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-16T12:10:05Z",
+    "updatedAt": "2026-11-16T12:10:09Z",
+    "headBranch": "claude/glossary-fig-daily-20261116-2108",
+    "displayTitle": "glossary(fig): 2026-11-16 새 그림 0 · 다시 그림 0 · 보류 8 — 위험성 평가·밸리데이션 결과보고서·실시계획서·QMS·단일방향 기류·HVAC·제약용수 시스템·검체채취계획",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43864094735"
+   },
+   {
+    "databaseId": 43864077391,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-16T12:09:58Z",
+    "updatedAt": "2026-11-16T12:10:02Z",
+    "headBranch": "claude/glossary-fig-daily-20261116-2108",
+    "displayTitle": "glossary(fig): 2026-11-16 새 그림 0 · 다시 그림 0 · 보류 8 — 위험성 평가·밸리데이션 결과보고…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43864077391"
+   },
+   {
     "databaseId": 43832389080,
     "status": "completed",
     "conclusion": "success",
@@ -205,28 +227,6 @@
     "headBranch": "tiro/glossary-space-insensitive-1116",
     "displayTitle": "glossary: #1773 위험평가 표제 정리에 맞춰 띄어쓰기 무시 예외 해제",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43828825867"
-   },
-   {
-    "databaseId": 43827627922,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T07:58:44Z",
-    "updatedAt": "2026-11-16T08:05:01Z",
-    "headBranch": "main",
-    "displayTitle": "i18n(en): '근거 조항' 영문을 Reference → Regulatory basis (#1780)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43827627922"
-   },
-   {
-    "databaseId": 43824519422,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-16T07:31:49Z",
-    "updatedAt": "2026-11-16T07:38:23Z",
-    "headBranch": "fix/notes-en-basis-label",
-    "displayTitle": "i18n(en): '근거 조항' 영문을 Reference → Regulatory basis",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43824519422"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 43864428978,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-16T12:12:15Z",
+    "updatedAt": "2026-11-16T12:12:57Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43864428978"
+   },
+   {
     "databaseId": 42630329807,
     "status": "completed",
     "conclusion": "success",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41415013713"
-   },
-   {
-    "databaseId": 40313383130,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-26T11:12:57Z",
-    "updatedAt": "2026-10-26T11:13:51Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40313383130"
    }
   ],
   "grm-findings-translate-apply.yml": [

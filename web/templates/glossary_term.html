@@ -154,7 +154,8 @@
       {% if term.reg_refs %}
       <div class="gt-rel3-col">
         <h2 class="gt-sec-h">{{ _('관련 조항') }}</h2>
-        {%- for r in term.reg_refs %}{% if r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span class="gt-rel3-t">{{ r.label }}</span>{% endif %}{% endfor %}
+        {#- [기준 조항 원문 2026-11-15] 사이트 안 원문이 있으면 라벨은 그 원문 페이지로 — 공식 원문은 옆 아이콘. -#}
+        {%- for r in term.reg_refs %}{% if r.text_href %}<a href="{{ rel_root }}{{ r.text_href }}">{{ r.label }}</a>{% if r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener" aria-label="{{ _('공식 원문 보기') }}"><i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}{% elif r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span class="gt-rel3-t">{{ r.label }}</span>{% endif %}{% endfor %}
       </div>
       {% endif %}
       {% if term.related %}

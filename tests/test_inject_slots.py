@@ -477,9 +477,13 @@ class DeepAnalysisRenderSmokeTest(unittest.TestCase):
         self.assertEqual(report.errors, [])
         html = self._render_brief_html(brief)
         self.assertIn("상세 분석 보기", html)
-        self.assertIn("Key Violations", html)
+        # [2026-11-16 브리프 품질 ②] 경고서한도 한국어 페이지에서 한국어 소제목.
+        self.assertIn("위반 항목 및 리스크", html)
         self.assertIn("21 CFR 211.192", html)
-        self.assertIn("Required Remediation", html)
+        self.assertIn("회사 회신과 FDA 판단", html)
+        self.assertIn("요구 시정 조치", html)
+        self.assertNotIn("Key Violations", html)
+        self.assertNotIn("FDA's Evaluation of Response", html)
         # §2.5 확정: Overview 섹션 제거 + required_remediation 마감기한·체크리스트 렌더.
         self.assertNotIn("Overview", html)
         self.assertIn("15영업일 이내 서면 회신", html)   # deadline 한 줄

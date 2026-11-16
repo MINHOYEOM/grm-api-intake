@@ -8,6 +8,11 @@
         기자는 샤드를 `완료`로 내기 전에 돌려 0 으로 만든다. 길이 상한도 같이 본다(제목 이슈·hook_line).
         **빈 필수 칸과 영문 짝**도 본다 — 합치기(`merge_parts.py`)가 호 전체를 거부하는 것과 같은 규칙이다:
         한국어 `title_issue`·`summary`·`key_facts` 는 반드시 채우고, 영문 `en` 은 그 셋 + 한국어가 채운 `implication`·`checks` 를 채운다.
+        단 `규제 소식`·`지침·안내서`·`고시·개정법령` 카드는 원문에 머리말 사실이 없으면 `key_facts` 를 비워도 된다(2026-11-16).
+        카드 유형은 그 주 handoff(`_handoff/handoff_<날짜>.json`, 날짜 = 델타 폴더 이름)에서 읽는다 — `--handoff` 로 직접 줄 수도 있다.
+        handoff 를 못 찾으면 종전처럼 전부 필수다.
+        `--deep <심층 델타·샤드>` 를 주면 심층 칸 산문도 본다. 심층 칸 검사와 행정처분 요약 주어 검사는 **경고만** 낸다
+        (`경고:` 로 시작하는 줄 — exit 코드에 들어가지 않는다. 처음 2개 호 실측 뒤 차단 여부를 사람이 정한다).
 
     python company/editorial/precheck.py deep-source <handoff 파일> <deep_delta 파일> --out <검사용 파일>
         심층분석 델타의 각 카드에 그 주 handoff 의 `deep_analysis_input.body_full` 을 `source_text` 로 붙인
@@ -41,7 +46,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import inject_slots  # noqa: E402
 import merge_parts  # noqa: E402
 
-KO_REQUIRED = tuple(f for f in merge_parts.EN_FIELDS if f not in merge_parts.EN_OPTIONAL)
+KO_REQUIRED = tuple(f for f in merge_parts.EN_FIELDS if f not in merge_parts.EN_OPTIONAL)   # 유형을 모를 때
 
 
 def _load(path):
@@ -49,8 +54,17 @@ def _load(path):
         return json.load(f)
 
 
-def term_lines(delta):
-    """표현 검사 줄 + 길이 상한 위반 줄(순수)."""
+def warn_lines(delta, deep=None):
+    """경고만 내는 줄(순수) — 행정처분 요약 주어(⑤)와 심층 칸 산문(④). exit 코드에 들어가지 않는다."""
+    out = inject_slots.lint_prose_style(delta).warn_lines()
+    if deep is not None:
+        out += inject_slots.lint_deep_prose_style(deep).warn_lines()
+    return out
+
+
+def term_lines(delta, card_types=None):
+    """표현 검사 줄 + 길이 상한 위반 줄(순수). `card_types` = {카드 id: 카드 유형}(선택)."""
+    card_types = card_types or {}
     out = [line for line in inject_slots.lint_prose_style(delta).lines() if not line.startswith("시사점 맺음 반복")]
     hook = inject_slots._HOOK_LINE_MAX
     title = inject_slots._MAX_TITLE_ISSUE
@@ -59,10 +73,11 @@ def term_lines(delta):
         if not isinstance(card, dict):
             continue
         en = card.get("en") if isinstance(card.get("en"), dict) else {}
-        ko_gaps = [f for f in KO_REQUIRED if not merge_parts._filled(card.get(f))]
+        ctype = card_types.get(cid)
+        ko_gaps = [f for f in merge_parts.ko_required(ctype) if not merge_parts._filled(card.get(f))]
         if ko_gaps:
             out.append(f"빈 필수 칸 {cid}: {', '.join(ko_gaps)}")
-        en_gaps = merge_parts._en_gaps(card)
+        en_gaps = merge_parts._en_gaps(card, ctype)
         if en_gaps:
             out.append(f"영문 슬롯 미완결 {cid}: en.{', en.'.join(en_gaps)}")
         for label, text, limit in (
@@ -204,6 +219,8 @@ def main(argv=None):
     sub = ap.add_subparsers(dest="cmd", required=True)
     t = sub.add_parser("terms")
     t.add_argument("delta")
+    t.add_argument("--handoff", help="카드 유형을 읽을 handoff 파일(없으면 델타 폴더 날짜로 찾는다)")
+    t.add_argument("--deep", help="심층 델타·샤드 — 심층 칸 산문을 경고로 본다")
     d = sub.add_parser("deep-source")
     d.add_argument("handoff")
     d.add_argument("deep")
@@ -221,10 +238,18 @@ def main(argv=None):
             delta = _load(args.delta)
             if not isinstance(delta, dict):
                 raise ValueError("델타가 객체가 아니다")
-            lines = term_lines(delta)
+            if args.handoff:
+                card_types = merge_parts.handoff_card_types(_load(args.handoff))
+            else:
+                card_types = merge_parts.run_card_types(os.path.dirname(os.path.abspath(args.delta)))
+            lines = term_lines(delta, card_types)
             for line in lines:
                 print(line)
-            print(f"사전 점검: {len(lines)}건" + ("" if lines else " — 통과"))
+            warns = warn_lines(delta, _load(args.deep) if args.deep else None)
+            for line in warns:
+                print(f"경고: {line}")
+            print(f"사전 점검: {len(lines)}건" + ("" if lines else " — 통과")
+                  + (f" · 경고 {len(warns)}건(막지 않음)" if warns else ""))
             return 1 if lines else 0
         if args.cmd == "deep":
             handoff, shard = _load(args.handoff), _load(args.shard)
@@ -233,7 +258,11 @@ def main(argv=None):
             lines = deep_lines(shard, fda483_ids(handoff))
             for line in lines:
                 print(line)
-            print(f"심층 사전 점검: {len(lines)}건" + ("" if lines else " — 통과"))
+            warns = inject_slots.lint_deep_prose_style(shard).warn_lines()
+            for line in warns:
+                print(f"경고: {line}")
+            print(f"심층 사전 점검: {len(lines)}건" + ("" if lines else " — 통과")
+                  + (f" · 경고 {len(warns)}건(막지 않음)" if warns else ""))
             return 1 if lines else 0
         if args.cmd == "rework-diff":
             old, new, copyedit = _load(args.old), _load(args.new), _load(args.copyedit)

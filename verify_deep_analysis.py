@@ -18,6 +18,8 @@ JSON 과 그 카드의 `wl_body_full`(fan-out 입력 원문)만 받아, 산출�
 검증 항목:
   D1 구조 완전성 — 4개 섹션 키가 전부 존재하고 공백이 아님. required_remediation 은
       {deadline, items[]} 객체이고 items 가 비어있지 않아야 함(아니면 FAIL).
+      단 FDA 483 은 inspectional_significance·administrative_risks 를 빈 문자열로,
+      required_remediation.items 를 빈 리스트로 둘 수 있다(2026-11-16 — 483 은 시정 요구 문서가 아님).
   D2 인용 근거(citation grounding) — 산출물 안의 조항 번호류 토큰(21 CFR·FD&C Act 섹션·
       bare subsection 등)이 원문(wl_body_full)에 실제로 존재하는지 대조. 없으면 FAIL(날조
       의심) — brief_lint 의 MFDS 미근거 링크 FAIL 과 동형 취급(식별자성 사실은 하드 검증).
@@ -83,6 +85,12 @@ REQUIRED_SECTIONS_FDA483: tuple[str, ...] = (
     "administrative_risks",
 )
 _MIN_SECTION_LEN = 20  # 구조 완전성 최소 길이(문자열 섹션). 리스트 섹션은 비었는지만 본다.
+# [브리프 품질 2026-11-16] FDA 483 은 시정을 요구하는 문서가 아니고, 승격 전망·일반 시정 조치를
+# 지어내지 않으려면 쓸 원문 사실이 없는 칸은 비워야 한다(편집 지시문 수정안 2026-11-15 ①).
+# 483 에서만 이 칸들을 비워도 된다 — 빈 문자열(`""`)·빈 `items`(`[]`). 키 자체를 빼면 종전처럼 FAIL
+# (키가 유형 판별 근거라 빠지면 안 된다). 채웠다면 종전 최소 길이를 본다.
+# 필수는 `key_violations` 하나(+ `required_remediation.deadline`). WL·admin 은 종전 그대로 전부 필수.
+FDA483_OPTIONAL_SECTIONS: tuple[str, ...] = ("inspectional_significance", "administrative_risks")
 
 
 def resolve_required_sections(deep_analysis: "dict[str, Any] | None" = None,
@@ -142,9 +150,12 @@ def _section_text(value: Any) -> str:
     return str(value)
 
 
-def _check_remediation_structure(value: Any) -> list[Finding]:
+def _check_remediation_structure(value: Any, *, items_optional: bool = False) -> list[Finding]:
     """required_remediation 은 {deadline, items[]} 객체(§2.5 확정: 문단→체크리스트 구조
-    변경) — deadline 은 비공백 문자열, items 는 비어있지 않은(≥1 비공백) 리스트여야 한다."""
+    변경) — deadline 은 비공백 문자열, items 는 비어있지 않은(≥1 비공백) 리스트여야 한다.
+
+    `items_optional`(FDA 483 전용 — 2026-11-16): items 가 빈 리스트여도 된다(회사가 약속한
+    조치가 원문에 없으면 `[]`). 리스트여야 한다는 형태 검사는 그대로다."""
     if not isinstance(value, dict):
         return [Finding(SEV_FAIL, "D1-SECTION-INCOMPLETE",
                         "섹션 'required_remediation' 은 {deadline, items[]} 객체여야 함 — "
@@ -155,6 +166,9 @@ def _check_remediation_structure(value: Any) -> list[Finding]:
         findings.append(Finding(SEV_FAIL, "D1-SECTION-INCOMPLETE",
                                 "섹션 'required_remediation.deadline' 누락/공백 — 마감기한 한 줄 필수."))
     items = value.get("items")
+    if items_optional and isinstance(items, list) and not any(
+            isinstance(i, str) and i.strip() for i in items):
+        return findings
     if not isinstance(items, list) or not any(isinstance(i, str) and i.strip() for i in items):
         findings.append(Finding(SEV_FAIL, "D1-SECTION-INCOMPLETE",
                                 "섹션 'required_remediation.items' 가 비어있음 — 체크리스트 항목 ≥1 필수."))
@@ -169,11 +183,16 @@ def check_structure(deep_analysis: dict[str, Any],
     `sections` 로 카드타입별 필수 섹션 집합을 받는다(기본=WL, 후방호환). admin 은 fda_evaluation
     자리에 disposition_basis(문자열 섹션 — 동일 최소길이 검사)."""
     findings: list[Finding] = []
+    is_483 = sections is REQUIRED_SECTIONS_FDA483
     for key in sections:
         if key == "required_remediation":
-            findings.extend(_check_remediation_structure(deep_analysis.get(key)))
+            findings.extend(_check_remediation_structure(deep_analysis.get(key),
+                                                         items_optional=is_483))
             continue
         text = _section_text(deep_analysis.get(key))
+        if (is_483 and key in FDA483_OPTIONAL_SECTIONS and key in deep_analysis
+                and not text.strip()):
+            continue  # 483 의 빈 칸(키는 있고 값이 "") = 쓸 원문 사실이 없음(정상). 화면은 숨긴다.
         if len(text.strip()) < _MIN_SECTION_LEN:
             findings.append(Finding(
                 SEV_FAIL, "D1-SECTION-INCOMPLETE",

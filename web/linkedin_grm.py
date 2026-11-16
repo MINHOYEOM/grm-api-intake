@@ -509,7 +509,7 @@ def site_cases(sim: dict | None, findings: dict) -> list[dict]:
     rows = []
     for n, (q, lv, it) in enumerate(picked):
         slug, full = by_fid.get(it["finding_id"], ("", ""))
-        rows.append(dict(q=q, target=targets[q - 1] if q <= len(targets) else "", alias=f"업체 {'ABCDEFG'[n]}", level=lv, label=SITE_LEVELS[lv],
+        rows.append(dict(q=q, finding_id=it["finding_id"], target=targets[q - 1] if q <= len(targets) else "", alias=f"업체 {'ABCDEFG'[n]}", level=lv, label=SITE_LEVELS[lv],
                          year=str(it["date"])[:4], agency="경고서한" if "Warning" in it["source"] else "483", score=float(it["score"]),
                          text=it["text"], fact=_pick_fact(full or it["text"]), slug=str(slug or ""),
                          history=_firm_history(findings, str(slug or ""))))
@@ -603,9 +603,24 @@ _SENT_END = re.compile(r"(?<=[다요]\.)\s+")
 _URL_IN_LINE = re.compile(r"\s*[—(]?\s*((?:https://)?grm-solutions\.com/\S*?)\)?(?=\s|$)")
 
 
-def _cap_lines(text: str) -> list[str]:
+# 영어 문장 끝: 소문자·숫자·닫는 괄호/따옴표 뒤 마침표·물음표 + 공백 + 대문자/따옴표('211.113(b)' 같은 조항 마침표는 걸리지 않는다)
+_SENT_END_EN = re.compile(r"(?<=[a-z0-9)\]”’\"'][.?!])\s+(?=[A-Z“‘\"0-9])")
+
+
+def _cap_lines(text: str, lang: str = "ko") -> list[str]:
     """한 줄에 한 문장 — 모바일에서 문장 중간에 접히지 않게(링크드인 본문 규칙)."""
-    return [x.strip() for x in _SENT_END.split(la._norm(text or "")) if x.strip()]
+    rx = _SENT_END_EN if lang == "en" else _SENT_END
+    return [x.strip() for x in rx.split(la._norm(text or "")) if x.strip()]
+
+
+CAP_HEADS = {
+    "ko": dict(claims="지적 내용", contrast="회사 회신과 FDA 판단", requests="FDA 요구", similar="GRM 지적사항 DB의 비슷한 사례",
+               terms="관련 용어", not_stated="서한에 없는 것", url="전체 해설", glossary="grm-solutions.com/glossary/",
+               ns_prefix=r"^서한에 없는 것\s*[:：]\s*"),
+    "en": dict(claims="What FDA cited", contrast="The firm's response and FDA's view", requests="What FDA asked for",
+               similar="Similar cases in the GRM findings database", terms="Related terms", not_stated="Not in the letter",
+               url="Full analysis", glossary="grm-solutions.com/en/glossary/", ns_prefix=r"^Not in the letter\s*:\s*"),
+}
 
 
 def _url_own_line(text: str) -> str:
@@ -623,7 +638,7 @@ def _url_own_line(text: str) -> str:
 
 
 def caption_layout(lead: str, claims: str, contrast: str, requests: str, similar_block: list[str],
-                   term_names: list[str], not_stated: str, caption_url: str) -> str:
+                   term_names: list[str], not_stated: str, caption_url: str, lang: str = "ko") -> str:
     """링크드인 본문 배치(코드 고정) — 첫 단락은 소제목 없이 사건, 그다음 ■ 소제목 단락.
     문장은 한 줄에 하나, 주소는 자기 줄, 단락 사이는 빈 줄 하나."""
     def sec(title: str, lines: list[str]) -> str:
@@ -631,17 +646,17 @@ def caption_layout(lead: str, claims: str, contrast: str, requests: str, similar
         while body and not body[-1]:
             body.pop()
         return "\n".join([f"■ {title}", *body]) if any(body) else ""
-    ns = la._norm(not_stated or "")
-    ns = re.sub(r"^서한에 없는 것\s*[:：]\s*", "", ns)
+    H = CAP_HEADS[lang]
+    ns = re.sub(H["ns_prefix"], "", la._norm(not_stated or ""))
     parts = [
-        "\n".join(_cap_lines(lead)),
-        sec("지적 내용", _cap_lines(claims)),
-        sec("회사 회신과 FDA 판단", _cap_lines(contrast)),
-        sec("FDA 요구", _cap_lines(requests)),
-        sec("GRM 지적사항 DB의 비슷한 사례", similar_block),
-        sec("관련 용어", [" · ".join(term_names), "grm-solutions.com/glossary/"] if term_names else []),
-        sec("서한에 없는 것", _cap_lines(ns)),
-        sec("전체 해설", [caption_url]),
+        "\n".join(_cap_lines(lead, lang)),
+        sec(H["claims"], _cap_lines(claims, lang)),
+        sec(H["contrast"], _cap_lines(contrast, lang)),
+        sec(H["requests"], _cap_lines(requests, lang)),
+        sec(H["similar"], similar_block),
+        sec(H["terms"], [" · ".join(term_names), H["glossary"]] if term_names else []),
+        sec(H["not_stated"], _cap_lines(ns, lang)),
+        sec(H["url"], [caption_url]),
     ]
     return _url_own_line("\n\n".join(x for x in parts if x)) + "\n"
 
@@ -809,15 +824,28 @@ def _e(s: Any) -> str:
 
 
 _KEY_SPAN = {"o": "서한 원문", "h": "GRM 해설", "n": "서한에 없음"}
+# 그림 속 고정 문구 — 언어별(영문판은 한글 0자여야 한다). 국문 값은 종전 문자열 그대로.
+LABELS = {
+    "ko": dict(key=_KEY_SPAN, quote="서한 원문", resp="회사 회신", why="FDA: 부적절한 이유", repeat="반복 위반",
+               req="요구 {n}/{m}", due="회신 기한: ", target="이번 서한의 지적: ", map_head="인용 조항",
+               col_wl="경고서한", col_recent="2025년 이후", n_unit="{n}건", basis="근거: ", ask="우리 현장에 던질 질문"),
+    "en": dict(key={"o": "Letter text", "h": "GRM note", "n": "Not in the letter"}, quote="From the letter",
+               resp="Firm's response", why="FDA: why it falls short", repeat="Repeat violation",
+               req="Request {n}/{m}", due="Response due: ", target="This letter: ", map_head="Cited sections",
+               col_wl="Warning letters", col_recent="Since 2025", n_unit="{n}", basis="Basis: ",
+               ask="A question for your site"),
+}
 _KEY_OF = {"g_find": "oh", "g_reply": "oh", "g_req": "oh", "g_site": "h", "g_sim": "h", "g_end": "nh"}  # 그 카드에 실제로 있는 종류만 표시
 
 
-def _key(kind: str) -> str:
-    return '<div class="g-key">' + "".join(f'<span class="{c}">{_KEY_SPAN[c]}</span>' for c in _KEY_OF.get(kind, "oh")) + "</div>"
+def _key(kind: str, lang: str = "ko") -> str:
+    ks = LABELS[lang]["key"]
+    return '<div class="g-key">' + "".join(f'<span class="{c}">{ks[c]}</span>' for c in _KEY_OF.get(kind, "oh")) + "</div>"
 
 
-def _slide_html(s: dict) -> str:
+def _slide_html(s: dict, lang: str = "ko") -> str:
     k = s["kind"]
+    L = LABELS[lang]
     p: list[str] = []
     if k == "g_cover":
         d, q = s.get("dots") or {}, s.get("quote") or {}
@@ -829,10 +857,11 @@ def _slide_html(s: dict) -> str:
             grid = "".join(f'<i class="{"m" if n < d["marked"] else ""}"></i>' for n in range(d["total"]))
             p.append(f'<div class="g-dots"><div class="g-grid">{grid}</div><div class="g-dcap">{_e(d["caption"])}</div>{line}</div>')
         else:  # 분모가 없는 서한 — 서한 원문 한 줄(영어 그대로 + 우리 번역)이 표지 그림이다
-            p.append(f'<div class="g-quote"><small>서한 원문</small><blockquote lang="en">“{_e(q.get("en"))}”</blockquote>'
-                     f'<div class="ko">{_e(q.get("ko"))}</div>{line}</div>')
+            ko_line = f'<div class="ko">{_e(q.get("ko"))}</div>' if q.get("ko") else ""
+            p.append(f'<div class="g-quote"><small>{L["quote"]}</small><blockquote lang="en">“{_e(q.get("en"))}”</blockquote>'
+                     f'{ko_line}{line}</div>')
     else:
-        p.append(_key(k))
+        p.append(_key(k, lang))
         p.append(f'<span class="g-corner">{_e(s["corner"])}</span>')
         p.append(f'<h2 class="g-h">{_e(s["heading"])}</h2>')
         if k == "g_find":
@@ -842,22 +871,22 @@ def _slide_html(s: dict) -> str:
         elif k == "g_reply":
             p.append(f'<div class="g-sub">{_e(s["sub"])}</div>')
             p.append('<div class="g-rp">' + "".join(
-                f'<div class="g-p"><div class="r"><small>회사 회신</small>{_e(x["response"])}</div>'
-                f'<div class="j"><small>FDA: 부적절한 이유</small>{_e(x["why"])}</div></div>' for x in s["pairs"]) + "</div>")
+                f'<div class="g-p"><div class="r"><small>{L["resp"]}</small>{_e(x["response"])}</div>'
+                f'<div class="j"><small>{L["why"]}</small>{_e(x["why"])}</div></div>' for x in s["pairs"]) + "</div>")
             if s.get("repeat"):
-                p.append(f'<div class="g-rep">{_e(s.get("repeat_label") or "반복 위반")} · {_e(s["repeat"])}</div>')
+                p.append(f'<div class="g-rep">{_e(s.get("repeat_label") or L["repeat"])} · {_e(s["repeat"])}</div>')
         elif k == "g_req":
             p.append('<div class="g-req">' + "".join(
-                f'<div class="g-r"><em>요구 {n}/{len(s["items"])}</em><b>{_e(t)}</b><span>{_e(x)}</span></div>'
+                f'<div class="g-r"><em>{L["req"].format(n=n, m=len(s["items"]))}</em><b>{_e(t)}</b><span>{_e(x)}</span></div>'
                 for n, (t, x) in enumerate(s["items"], 1)) + "</div>")
             if s.get("deadline"):
-                p.append(f'<div class="g-dl">회신 기한: {_e(s["deadline"])}</div>')
+                p.append(f'<div class="g-dl">{L["due"]}{_e(s["deadline"])}</div>')
         elif k == "g_site":
             p.append('<div class="g-cs3 g-site">' + "".join(
                 f'<div><b>{_e(r["alias"])}<small>{_e(r["year"])} · FDA {_e(r["agency"])}</small></b>'
-                f'<span><small class="t">이번 서한의 지적: {_e(r["target"])}</small><em class="lv {r["level"]}">{_e(r["label"])}</em>{_e(r["fact"])}'
+                f'<span><small class="t">{L["target"]}{_e(r["target"])}</small><em class="lv {r["level"]}">{_e(r["label"])}</em>{_e(r["fact"])}'
                 f'<small class="h">{_e(r["history"])}</small>'
-                f'<small class="u">grm-solutions.com/findings/doc/{_e(r["slug"])}/</small></span></div>' for r in s["rows"]) + "</div>")
+                f'<small class="u">grm-solutions.com{"/en" if lang == "en" else ""}/findings/doc/{_e(r["slug"])}/</small></span></div>' for r in s["rows"]) + "</div>")
         elif k == "g_sim":
             db = s["db"]
             if not db.get("site"):
@@ -873,14 +902,14 @@ def _slide_html(s: dict) -> str:
                 p.append('<div class="g-chips">' + "".join(f'<i>{_e(k_)}</i>' for k_ in s.get("keywords") or [])
                          + "".join(f'<u>{_e(n)}</u>' for n, _ in s.get("terms") or []) + '</div>')
             if db["cfr_rows"]:
-                p.append(f'<div class="g-map{" big" if big else ""}"><div class="mh"><span>{_e(s.get("map_header") or "인용 조항")}</span><span>경고서한</span><span>2025년 이후</span></div>' + "".join(
-                    f'<div><span>{_e(r["label"])}<small>{_e(r["cfr"])}</small></span><span>{r["n"]}건</span><span>{r["recent"]}건</span></div>'
+                p.append(f'<div class="g-map{" big" if big else ""}"><div class="mh"><span>{_e(s.get("map_header") or L["map_head"])}</span><span>{L["col_wl"]}</span><span>{L["col_recent"]}</span></div>' + "".join(
+                    f'<div><span>{_e(r["label"])}<small>{_e(r["cfr"])}</small></span><span>{L["n_unit"].format(n=r["n"])}</span><span>{L["n_unit"].format(n=r["recent"])}</span></div>'
                     for r in db["cfr_rows"]) + '</div>')
             p.append(f'<div class="g-cm">{_e(s["comment"])}</div>')
         elif k == "g_end":
             for x in s["not_stated"]:
-                p.append(f'<div class="g-ns">{_e(x["text"])}<small>근거: {_e(x["basis"])}</small></div>')
-            p.append(f'<div class="g-qq"><small>우리 현장에 던질 질문</small>{_e(s["question"])}</div>')
+                p.append(f'<div class="g-ns">{_e(x["text"])}<small>{L["basis"]}{_e(x["basis"])}</small></div>')
+            p.append(f'<div class="g-qq"><small>{L["ask"]}</small>{_e(s["question"])}</div>')
     ai = f'<div class="ai">{_e(s["ai"])}</div>' if s.get("ai") else ""
     cls = " g-cover g-page" if k == "g_cover" else " g-page"
     return (f'<section class="slide{cls}"><div class="hd"><div class="brand">{lc.OWL_SVG}<span class="w"><b>GRM</b>'
@@ -892,9 +921,10 @@ def _slide_html(s: dict) -> str:
 def render_html(deck: dict, *, font_links: bool = True) -> str:
     css = (lc.CSS + CSS).replace("HEX_DARK", lc._data_uri(lc._HEX.format(op="0.07"))) \
         .replace("HEX_CREAM", lc._data_uri(lc._HEX.format(op="0.16")))
-    body = "".join(_slide_html(s) for s in deck["slides"])
-    return (f'<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>{_e(deck["doc_title"])}</title>'
-            f'{lc.FONT_LINKS if font_links else ""}<style>{css}</style></head><body class="lang-ko">{body}</body></html>')
+    lang = deck.get("lang") or "ko"
+    body = "".join(_slide_html(s, lang) for s in deck["slides"])
+    return (f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><title>{_e(deck["doc_title"])}</title>'
+            f'{lc.FONT_LINKS if font_links else ""}<style>{css}</style></head><body class="lang-{lang}">{body}</body></html>')
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -916,8 +946,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check", action="store_true", help="슬롯 검증만(근거·숫자·실명·AI 티·후킹). 실패면 exit 1, 파일을 쓰지 않는다")
     ap.add_argument("--save-similar", action="store_true",
                     help="<발행일>.similar.json 저장본이 없으면 유사 사례 엔진을 불러 슬롯 폴더에 저장한다(SUPABASE_URL·SUPABASE_ANON_KEY)")
+    ap.add_argument("--save-letter", metavar="HANDOFF_JSON",
+                    help="영문판 근거 원천 저장: 그 주 handoff 에서 대상 서한 전문을 <발행일>.letter_en.txt 로(서명 앞까지)")
     args = ap.parse_args(argv)
-    if not (args.out or args.dist or args.candidates or args.check or args.save_similar):
+    if not (args.out or args.dist or args.candidates or args.check or args.save_similar or args.save_letter):
         ap.error("--out 또는 --dist 가 필요하다")
     bp = Path(args.brief) if args.brief else lc.latest_brief_path(Path(args.data))
     if bp is None:
@@ -929,6 +961,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.candidates:
         print(json.dumps(candidates(doc, sp), ensure_ascii=False, indent=1))
         return 0
+    if args.save_letter:
+        import linkedin_grm_en as lge
+        pick = candidates(doc, sp).get("pick")
+        text = lge.letter_from_handoff(json.loads(Path(args.save_letter).read_text(encoding="utf-8")), str(pick or ""))
+        if not text:
+            print(f"::warning::handoff 에 서한 전문이 없다(card {pick}) — 영문판은 그 주 만들지 않는다", file=sys.stderr)
+            return 1
+        lp = lge.letter_path(pub, sp.parent)
+        lp.write_text(text + "\n", encoding="utf-8", newline="\n")
+        print(f"저장: {lp.name} · {len(text)}자")
+        return 0
     if not sp.exists():
         print(f"::warning::v3 슬롯 없음({sp.name}) — 만들지 않는다", file=sys.stderr)
         return 0
@@ -938,6 +981,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         card = la.pick_anatomy_card(doc, str(slots.get("card_id") or ""))
         probs = validate_v3(card, slots, findings) if card else ["card_id 에 맞는 해부 가능한 경고서한이 브리프에 없다"]
+        if card and slots.get("en"):
+            import linkedin_grm_en as lge
+            probs += lge.validate_en(card, slots, findings, lge.load_letter(pub, sp.parent))
         for pr in probs:
             print(f"  - {pr}")
         print(f"linkedin_grm --check: {pub} · 문제 {len(probs)}건")
@@ -966,23 +1012,40 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     out = Path(args.out) if args.out else Path(args.dist) / "briefs" / pub
     out.mkdir(parents=True, exist_ok=True)
-    (out / "linkedin_grm.txt").write_text(deck["caption"], encoding="utf-8")
     if similar:
         (out / "similar.json").write_text(json.dumps(similar, ensure_ascii=False, indent=1), encoding="utf-8")
-    (out / "linkedin_grm.html").write_text(render_html(deck), encoding="utf-8")
     chrome = None if args.no_pdf else lc.find_chrome()
+    n = _write_deck(deck, out, "linkedin_grm", chrome)
+    print(f"linkedin_grm: {pub} · {len(deck['slides'])}장 · 본문 {len(deck['caption'])}자 · PNG {n} → {out}")
+    # 영문판 — 슬롯에 en 블록이 있는 주만. 실패해도 국문판은 그대로 낸다(그 주 영문만 빠진다).
+    if slots.get("en"):
+        import linkedin_grm_en as lge
+        try:
+            en_deck = lge.build_en_deck(doc, slots, findings, lge.load_letter(pub, sp.parent), similar=similar)
+        except la.AnatomyError as exc:
+            print("::warning::GRM 판 영문 덱 검증 실패 — 영문만 만들지 않는다", file=sys.stderr)
+            for pr in exc.problems:
+                print(f"  - {pr}", file=sys.stderr)
+            return 0
+        n = _write_deck(en_deck, out, "linkedin_grm_en", chrome)
+        print(f"linkedin_grm_en: {pub} · {len(en_deck['slides'])} slides · caption {len(en_deck['caption'])} chars · PNG {n} → {out}")
+    return 0
+
+
+def _write_deck(deck: dict, out: Path, stem: str, chrome: str | None) -> int:
+    (out / f"{stem}.txt").write_text(deck["caption"], encoding="utf-8")
+    (out / f"{stem}.html").write_text(render_html(deck), encoding="utf-8")
     n = 0
     if chrome:
         for i, slide in enumerate(deck["slides"], 1):
-            tmp = out / f"linkedin_grm_{i:02d}.tmp.html"
+            tmp = out / f"{stem}_{i:02d}.tmp.html"
             tmp.write_text(render_html(dict(deck, slides=[slide])), encoding="utf-8")
             try:
-                lc.render_png(tmp, out / f"linkedin_grm_{i:02d}.png", chrome)
+                lc.render_png(tmp, out / f"{stem}_{i:02d}.png", chrome)
                 n += 1
             finally:
                 tmp.unlink(missing_ok=True)
-    print(f"linkedin_grm: {pub} · {len(deck['slides'])}장 · 본문 {len(deck['caption'])}자 · PNG {n} → {out}")
-    return 0
+    return n
 
 
 if __name__ == "__main__":

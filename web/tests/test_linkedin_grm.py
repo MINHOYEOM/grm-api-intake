@@ -347,6 +347,80 @@ class Weekly1116Test(unittest.TestCase):
         self.assertEqual([r["id"] for r in got["ranked"]][0], got["pick"])
 
 
+class English1116Test(unittest.TestCase):
+    """[2026-11-16] 영문 해부판 — 근거는 FDA 영문 원문 verbatim(위반 original + 서한 전문 letter_en.txt),
+    그림·본문 한글 0자, 본문 배치는 국문과 같고 주소는 /en/ 경로."""
+
+    @classmethod
+    def setUpClass(cls):
+        import linkedin_grm_en as lge
+        cls.lge = lge
+        cls.doc = json.loads(BRIEF_1116.read_text(encoding="utf-8"))
+        cls.findings = lg.load_findings()
+        cls.card = la.pick_anatomy_card(cls.doc)
+        cls.letter = lge.load_letter("2026-11-16")
+
+    def _slots(self) -> dict:
+        return json.loads(SLOTS_1116.read_text(encoding="utf-8"))
+
+    def _p(self, mutate) -> list[str]:
+        s = self._slots()
+        mutate(s)
+        return self.lge.validate_en(self.card, s, self.findings, self.letter)
+
+    def test_slot_passes(self):
+        self.assertEqual(self._p(lambda s: None), [])
+
+    def test_letter_has_no_signature_block(self):
+        self.assertTrue(self.letter)
+        self.assertNotIn("Sincerely", self.letter)  # 서명·참조인 개인 이름은 저장소에 두지 않는다
+
+    def test_deck_has_no_hangul_and_uses_en_paths(self):
+        import re
+        deck = self.lge.build_en_deck(self.doc, self._slots(), self.findings, self.letter)
+        html_ = lg.render_html(deck, font_links=False)
+        self.assertEqual(len(deck["slides"]), 7)
+        self.assertIsNone(re.search(r"[가-힣]", html_ + deck["caption"]))
+        self.assertIn('<html lang="en">', html_)
+        cap = deck["caption"]
+        self.assertFalse(cap.startswith("■"))
+        heads = [ln[2:] for ln in cap.splitlines() if ln.startswith("■ ")]
+        self.assertEqual(heads[0], "What FDA cited")
+        self.assertEqual(heads[-1], "Full analysis")
+        for ln in cap.splitlines():
+            if "grm-solutions.com" in ln:
+                self.assertRegex(ln, r"^https://grm-solutions\.com/en/\S+utm_source=linkedin\S*$")
+        self.assertNotIn("USV", html_ + cap)
+        self.assertNotIn("Private Limited", html_ + cap)
+
+    def test_evidence_must_be_verbatim_english(self):
+        p = self._p(lambda s: s["en"]["s03"]["pairs"][0].update(evidence=["The firm hired a consultant."]))
+        self.assertTrue(any("not verbatim" in x for x in p), p)
+        p = self._p(lambda s: s["en"]["cover"]["quote"].update(text="Airflow was fine."))
+        self.assertTrue(any("en.cover.quote" in x for x in p), p)
+
+    def test_hangul_firm_name_and_ai_tells_blocked(self):
+        p = self._p(lambda s: s["en"]["s05"].update(comment="같은 조항이 인용됐다."))
+        self.assertTrue(any("한글" in x for x in p), p)
+        p = self._p(lambda s: s["en"]["caption"].update(similar="USV Private Limited was cited before."))
+        self.assertTrue(any("firm name" in x for x in p), p)
+        p = self._p(lambda s: s["en"]["caption"].update(similar="This case underscores the importance of airflow."))
+        self.assertTrue(any("AI-sounding" in x for x in p), p)
+
+    def test_hook_rules_en(self):
+        lead = lambda t: (lambda s: s["en"]["caption"].update(lead=t))  # noqa: E731
+        p = self._p(lead("FDA issued a warning letter to a sterile injectable maker. Airflow was poor."))
+        self.assertTrue(any("start with the fact" in x for x in p), p)
+        p = self._p(lead("Airflow videos showed heavy turbulence. The firm disagreed."))
+        self.assertTrue(any("number or a quoted" in x for x in p), p)
+        p = self._p(lambda s: s["en"]["cover"].update(headline=["Aseptic design flaws", "and inspection deficiencies"]))
+        self.assertTrue(any("ends with a label" in x for x in p), p)
+
+    def test_missing_letter_blocks(self):
+        p = self.lge.validate_en(self.card, self._slots(), self.findings, "")
+        self.assertTrue(any("letter_en.txt" in x for x in p), p)
+
+
 class PickFactTest(unittest.TestCase):
     def test_does_not_split_inside_a_sentence_on_da(self):
         t = "귀사는 멸균 의약품 및 자재를 ISO-5 품질보다 낮은 공기에 노출시켰다. 구체적으로, 작업자의 팔이 막았다."

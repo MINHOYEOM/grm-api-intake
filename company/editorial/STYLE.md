@@ -208,3 +208,11 @@
 - 숫자를 키우려고 반올림·합계를 만들지 않는다(§2 그대로). 자극적인 말("충격", "무려", 느낌표)로 멈추게 하지 않는다 — 멈추게 하는 것은 사실의 대비다.
 - `s05.comment` 에는 숫자를 쓰지 않는다. DB 숫자는 코드가 렌더 때 센다 — 주간 재측정으로 DB 가 바뀌어도 슬롯 검증이 깨지지 않게.
 - 지적 칸·회신 칸의 용어는 용어사전 표기(단일방향 기류·스모크 스터디·외관검사·퍼스트 에어)로 쓴다. 근거 인용(`evidence`)만 서한 번역 그대로다.
+
+### 13.1 영문판 (2026-11-16, 11-23 호부터 매주)
+같은 서한·같은 7장·같은 DB 숫자를 영어로 낸다(`web/linkedin_grm_en.py`, 슬롯 `en` 블록). 번역이 아니라 같은 사실을 영어로 다시 쓴다.
+- 근거는 **FDA 영문 원문 그대로**: 위반 `original` 과 서한 전문 `<발행일>.letter_en.txt`(handoff `body_full` 을 `--save-letter` 가 서명 앞까지 저장). 국문 번역을 근거로 쓰지 않는다.
+- 그림·본문에 **한글 0자**(코드가 렌더 결과로 검사). 업체명·지명 없이 "a sterile injectable manufacturer".
+- 후킹 규칙은 §13 과 같다. 첫 문장은 약 75자(`LEAD_FIRST_EN`). 'FDA …'·'A firm …'으로 시작하지 않고, 숫자나 원문 인용(‘…’)을 넣는다. 첫 문장은 따옴표 **밖** 마침표로 끝낸다.
+- AI 티(영문): underscores · highlights the importance · crucial · pivotal · moreover · furthermore · notably · landscape 등(`AI_TELLS_EN`).
+- 본문 배치는 국문과 같다(첫 단락 → ■ What FDA cited / The firm's response and FDA's view / What FDA asked for / Similar cases… / Related terms / Not in the letter / Full analysis). 주소는 `/en/` 경로이고 자기 줄에 둔다.

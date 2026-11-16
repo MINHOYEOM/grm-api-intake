@@ -78,6 +78,8 @@
 {% endif %}
     </aside>
   </div>
+  {#- [구독 유입 2026-11-17 · 대표 지시] 본문 끝 줄형 구독 칸 — newsletter 게이트 안(env-off 출력 0). -#}
+  {%- with sub_kind='library', sub_slot='end', sub_wrap=True %}{% include "partials/sub_inline.html" %}{% endwith +%}
 </main>
 <style>
 /* [자료실] 허브 — grm.css 토큰만 사용(프리즈 보존). 카탈로그 카드 그리드.

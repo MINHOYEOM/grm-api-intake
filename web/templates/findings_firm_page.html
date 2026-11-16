@@ -229,6 +229,8 @@
       <a href="{{ rel_root }}findings/docs/">{{ _('문서로 찾기') }}</a>
       <a href="{{ rel_root }}findings/">{{ _('지적사항 검색으로') }}</a>
     </section>
+    {#- [구독 유입 2026-11-17 · 대표 지시] 본문 끝 줄형 구독 칸 — newsletter 게이트 안(env-off 출력 0). -#}
+    {%- with sub_kind='firm', sub_slot='end' %}{% include "partials/sub_inline.html" %}{% endwith +%}
   </div>
 </main>
 {% endblock %}

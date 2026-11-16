@@ -30,6 +30,17 @@
   ]
  },
  {
+  "finding_id": "finding-8a30044c1d1311c481e9fd40",
+  "finding_text_md5": "7562c36007be77e7ae6f357af3694ea4",
+  "detail_text": "Specifically, your filling has not [redacted] performed and documented GMP training. Of the pharmacists and [redacted] technicians currently working on site, none have participated in GMP training. Examples of office stock products produced by one or more technicians and reviewed by a pharmacist include: 1. Rx [redacted] BLT (Benzocaine/Lidocaineffetracaine 20/8/8% Transdermal Ointment made 6/25/19, BUD 9/7/19, lot 06252019@43. Technician 16and Pharmacist [redacted] performed the documented activities. TO: Allen Jolly, Owner and Pharmacist in Charge FIRMNAMe Infusion Treatment Center Inc dba ITC Compounding CITY, STATE ANO ZIP CODE Castle Rock CO 80109 b\"'TREET ADDRESS 65 l Topeka Way Suite 600 TYPE OF ESTA8LISHMENT INSPECTED Producer of Non-Sterile Drugs i-==-==;:============:::::::;:=======================·===:-- lot 06252019@43. Technician 16 and Pharmacis1(15 (6) I performed the documented activities. 'fl r 2. Rx [redacted] Tetracaine/Lidocaine/Prilocaine/Phenylephrine (Spearmint) 4/10/1 Oi2% Lipoderm Ointment made 7/10/19, BUD J/6/20, lot 07102019@44. Technicians [redacted] and [redacted] and Pharmacist [redacted] performed the documented activities.",
+  "detail_text_ko": "구체적으로, 귀사는 [redacted] GMP 교육을 실시하고 기록하지 않았다. 현재 현장에서 근무하는 약사와 [redacted] 제조 담당자 중 GMP 교육에 참여한 사람은 없었다. 한 명 이상의 제조 담당자가 제조하고 약사가 검토한 진료기관 비치용 제품의 예는 다음과 같다.\n1. Rx [redacted] BLT(Benzocaine/Lidocaine/Tetracaine 20/8/8% 경피용 연고), 제조일 6/25/19, 사용기한(BUD) 9/7/19, 로트 06252019@43. 제조 담당자 16과 약사 [redacted]이 기록된 활동을 수행했다.\n2. Rx [redacted] Tetracaine/Lidocaine/Prilocaine/Phenylephrine(Spearmint) 4/10/10/2% Lipoderm 연고, 제조일 7/10/19, BUD J/6/20, 로트 07102019@44. 제조 담당자 [redacted] 및 [redacted]과 약사 [redacted]이 기록된 활동을 수행했다.",
+  "ocr_dropped": [
+   "16and",
+   "4/10/1 Oi2%",
+   "15"
+  ]
+ },
+ {
   "finding_id": "finding-8da7c559f432f39c8bb9c7b4",
   "finding_text_md5": "84c864f6253b5fb6ef1306b7beeae990",
   "detail_text": "Specifically, Equipment, work surfaces, and utensils are used for the production of hormonal products as well as non-hormonal products. Inadequate cross-contamination precautions are established to protect drug products produced on these shared surfaces at the Good Day Longmont location as well as the Good Day Fort Collins location. You have failed to demonstrate that the use of the dish washer and manual deaning operations (soap and water) are adequate to mitigate cross-contamination of products made on site. Non-dedicated equipment, utensils, and work surfaces include the [redacted] hood, compounding counter adjacent to the hood, glass stirrers, metal spatulas, glass mortar and pestle, mesh sieves, [redacted] capsule machines, unguator and mixing blades, ointment mill, troche mold, stir bars, and beakers. a. On 6/4/2019 you made the following hormone containing prescription products and non-hormone containing prescription products with mixed use equipment, utensils, and workstations: Testosterone 10mg Mini Troche Rx [redacted] troches Progesterone 100mg IR Capsule Rx [redacted] c:apsules BIEST (50:50) 0.lmg/gm [redacted] 01.mg/gm cream Rx [redacted] Progesterone 75mg SR #1 75mg Capsule Rx [redacted] capsules Professional Pharmacy Services Inc dba 1749 Main St Unit D Good Day Pharmacy CITY. STATE. ZIP CODE, COUNTRY TYPE ESTASLlSHt.iEITT INSPECTED Longmont, CO 80501-7441 Non-Sterile Drug Manufacturer Enrof 20mg/Prednisolone Smg/Ursodiol 80mg/ml Oral Suspension Rx [redacted] Prazosin 0.5mg Capsule Rx [redacted] Ranitidine 30mg/mL Glycerin Oral Suspension Rx [redacted] Clonidine O. lmg/mL Oral Suspension Rx [redacted] b. On 6/7/2019 you made the following hormone containing products and non-hormone containing products with mixed use equipment, utensils, and workstations [redacted] hood and compounding counter adjacent to the hood): E stradiol Smg/gm Cream Rx [redacted] Estradiol 15mg/gm Cream Rx [redacted] Biest 80:20) l..45mg/ Pregnenolone 65mg/ Progesterone 200mg/ Testosterone 0.65mg Sugar Free Troche Rx [redacted] roches T estosterone 16% (160mg/gm) Cream Rx [redacted] Gabapentin 50mg #3 Capsule Rx [redacted] capsules Omeprazole 2mg/ml Oral Suspension Rx [redacted]",
@@ -73,6 +84,12 @@
   "ocr_dropped": [
    "503B(a)(l 0)(B)"
   ]
+ },
+ {
+  "finding_id": "finding-3b95225f38556c9c4e3a7e90",
+  "finding_text_md5": "79b0d2170b774cdec5e5c7fdcf817223",
+  "detail_text": "Firs t Royal Care Co. LLC, dba Red 6828 E Brown Rd Ste 101 Mountain Compounding Pharma c y CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABU SHMENT INSPECTED Me s a, AZ 85207- 3761 Produc er of Steril e a nd Non- Steril e Drug Produc t s of the methods of disassembling and reassembling equipment as necessary to assure proper cleaning and maintenance and instmctions for protection of clean equipment from contamination prior to use. Specifically, There were no cleaning SOP's to review which demonstrate actual procedures utilized at the facility. A generic, commercially available template SOP was provided but lacked any supporting information or detail that would reflect actual practices at your firm. Cleaning practices observed on 06/07/2019 prior to sterile drug production are not reflected in SOP #: 3.020 \"Cleaning and Maintenance of The Clean Room Facility\". Multiple cleaning products utilized are not reflected in SOP #: 3.020 or lack procedural information such as frequency, location, dwell time and concentration. There are no procedures to review that reflects how equipment is broken down, cleaned or reassembled to prevent microbial contamination.",
+  "detail_text_ko": "적절한 세척과 유지관리를 보장하기 위해 필요한 설비 분해 및 재조립 방법과, 사용 전 세척된 설비를 오염으로부터 보호하기 위한 지침이 포함된다.\n구체적으로, 시설에서 실제로 사용하는 절차를 보여 주는 세척 SOP가 없어 검토할 수 없었다. 일반적인 시판 SOP 서식은 제공되었으나, 귀사의 실제 작업 방식을 반영하는 근거 정보나 세부사항은 없었다. 06/07/2019 무균 의약품 제조 전에 관찰한 세척 작업 방식은 SOP 번호 3.020 “청정실 시설의 세척 및 유지관리”에 반영되지 않았다. 사용하는 여러 세척 제품이 SOP 번호 3.020에 반영되지 않았거나, 사용 빈도, 위치, 접촉시간 및 농도와 같은 절차 정보가 없었다. 미생물 오염을 방지하기 위한 설비의 분해, 세척 또는 재조립 방법을 나타내는 절차가 없어 검토할 수 없었다."
  },
  {
   "finding_id": "finding-b420f50a8642e0885265a059",
@@ -399,6 +416,12 @@
   ]
  },
  {
+  "finding_id": "finding-36a2a9efdccec47ca6aa6a81",
+  "finding_text_md5": "eb5cb9868293e23374a921190dc155a5",
+  "detail_text": "Specifically, you do not conduct sterility testing beyond the initial production date on finished products where you apply extended beyond use dates up to [redacted] years. In addition, the data you use to support your extended beyond use dates is several years old and do not reflect any changes made in the process or to suppliers of components or bulk drug substances. Producer of Sterile and Non- sterile Drugs use dates is several years old and do not reflect any changes made in the process or to suppliers of components or bulk chug substances.",
+  "detail_text_ko": "구체적으로, 귀사는 최대 [redacted]년까지 연장된 사용기한을 부여한 완제품에 대해 최초 제조일 이후에는 무균시험을 수행하지 않는다. 또한 사용기한 연장의 근거로 사용하는 자료는 수년 전의 것으로, 공정 변경이나 구성성분 또는 원료의약품 공급업체 변경을 반영하지 않는다."
+ },
+ {
   "finding_id": "finding-3c51993c09a12bdf9cc6f609",
   "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
   "detail_text": "Specifically, a) You do not have cleaning records prior to Januaiy 2019 and they do not include documentation of contact times for the cleaning agents you use. This includes documentation to show you conducted triple cleaning after you had growth in the ISO 7 rooms on March 28, 2017, September 13, 2017 and March 26, 2018. b) You use a product called [redacted] that is not labeled as sterile to clean the ISO 5 [redacted] and laminar flow hood. c) You use non-sterile wipes and mop covers to clean the classified area including inside the [redacted] and laminar flow hood. I ( ***This is a repeat observation. Producer of Sterile and Non-sterile Drugs",
@@ -453,6 +476,12 @@
   "detail_text_ko": "구체적으로, 이는 반복 관찰사항이다.\nA. 실사관은 귀사의 청정실 [redacted]에 있는 준비 및 물품 운반차에서 습기가 있는 것으로 보이는 육안상 변색을 관찰했다. 이 운반차는 무균 유리체 내 주사제의 무균 작업을 수행하는 LAFH(ISO 5 등급), 설비 식별번호(EQ ID) [redacted]에서 약 3피트 떨어진 곳에 있었다. 또한 귀사의 품질운영 책임자는 이 운반차가 청정도 등급 구역에서 사용하기에 적합함을 뒷받침하는 문서를 제공하지 못했다."
  },
  {
+  "finding_id": "finding-b098dae2b6026d17be2cc664",
+  "finding_text_md5": "92ba5042c993896102feee2aef14a1cf",
+  "detail_text": "Specifically, A. Syringes used during visual inspection trainings are not representative of the actual syringes used m processmg. For example, but are not limited to: Your firm uses Monoject syringes (not [redacted] syringes) during the visual trnining of your Pharmacist when conducting final visual inspections (i.e. visible particulates, inaccurate dosage, presence of bubbles, discoloration, other). June P Page, Investigato r Br andon C Heitmeier, Investigato r.ll'lePPage S By 2000405709 Philip F Istafanos, Micr obi o l ogist X eSg'le(I 06-20--20l9060523 Susan T Hadman, Micr obi o l ogist",
+  "detail_text_ko": "구체적으로,\nA. 육안검사 교육에 사용하는 주사기는 실제 공정에 사용하는 주사기를 대표하지 않는다. 예는 다음과 같으며, 이에 한정되지 않는다.\n귀사는 약사의 최종 육안검사 교육에서 [redacted] 주사기 대신 Monoject 주사기를 사용한다. 최종 육안검사 항목에는 눈에 보이는 입자, 부정확한 용량, 기포 존재, 변색 및 기타 사항이 포함된다."
+ },
+ {
   "finding_id": "finding-c5bb99e262f602217951947a",
   "finding_text_md5": "788f248fa14f7a1733c4943726ef1f14",
   "detail_text": "Specifically, your outsourcing facility lacked valid analytical and sterility data to support the following: ***THIS IS A REPEAT OBSERVATION*** A. According to your Director of Quality Operations, your firm has not conducted any stability testing to suppori the 30-day beyond use date (BUD) assigned to [redacted] (Bevacizumab/Dexamethasone), used for sterile intrnvitreal injections. B. According to your Stability Study Protocol, conducted by your third party laboratory contractor, A vastin (Bevacizumab) repackaged in [redacted] syringes failed stability testing at [redacted] in the last passing stability testing result [redacted] unit [redacted] is [redacted] days. However, your firm applies a 105-day BUD to A vastin (Bevacizumab) [redacted] syringes. (CDICJIII, eSg'le(I 06-20--20l9060523",
@@ -483,6 +512,27 @@
   "detail_text_ko": "구체적으로, 4/23/2019에 실사관은 ISO 5 층류 작업대(LAFW)의 장비 또는 표면이 다음과 같이 육안으로 보기에 더러운 상태임을 관찰했다.\nA. ISO 5 LAFW [redacted] 내부의 뒷면과 왼쪽 스테인리스강 표면, ISO 5 LAFW [redacted] 내부의 금속 봉에 걸린 [redacted] 굽은 금속 걸쇠의 윗면, ISO 5 LAFW [redacted] 내부 뒷면의 전면판에 박힌 머리 나사 두 개에 정체불명의 황갈색 얼룩이 있었다.\nB. ISO 5 LAFW [redacted] 내부 작업면 위에 위치한 HEPA 여과기 덮개 표면에 황갈색 반점이 있었다.\nC. ISO 5 LAFW [redacted]의 전면 유리 차폐판과 LAFW가 만나는 양쪽 접합부에 정체불명의 흰색 층이 있었으며, 일부가 변색되어 있었다.\nD. 작업자 [redacted]가 4/23/2019에 5% acetylcysteine 점안액, 로트 번호 04232019@3을 제조하고 다른 작업자가 4/24/2019에 Trimix # 1lC 10/1/12 주사제, 로트 번호 04242019@5를 제조하는 동안, 두 작업자 모두 [redacted]로 장갑을 낀 손을 자주 소독했으나 손을 건조하지 않은 채 무균 작업을 수행했다.",
   "ocr_dropped": [
    "T1imix"
+  ]
+ },
+ {
+  "finding_id": "finding-39b7b3244a3e55f6732c1dd3",
+  "finding_text_md5": "fd2c4974c15fb6e8be8549d73dfc4834",
+  "detail_text": "Rancho Park Compounding Pharmacy 10587 W Pico Blvd CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABU SI-NENT INSPECTED Los Angeles, CA 90064 - 2333 Producer of Sterile and Non Sterile Drug Products Specifically, On 4/23/2019, I observed an unsealed light cover and frame in the ISO 7 buffer room as follows: A. The fluorescent light cover above the ISO 5 LAFW [redacted] was cracked near the comer, leaving a gap (about a pencil size) between the light cover and the frame. B. The right-angle frame of the fluorescent light fixture on the ceiling near the ISO 5 LAFW [redacted] was not completely sealed.",
+  "detail_text_ko": "구체적으로, 4/23/2019에 실사관은 ISO 7 완충실에서 다음과 같이 밀봉되지 않은 조명 덮개와 틀을 관찰했다.\nA. ISO 5 LAFW [redacted] 위 형광등 덮개의 모서리 근처에 균열이 있어 조명 덮개와 틀 사이에 연필 굵기 정도의 틈이 생겨 있었다.\nB. ISO 5 LAFW [redacted] 근처 천장의 형광등 기구에 있는 직각 형태의 틀이 완전히 밀봉되지 않았다."
+ },
+ {
+  "finding_id": "finding-5a3e299b97d69712e3a566d4",
+  "finding_text_md5": "885ac49e72bea9077d1f17ff38e2caf1",
+  "detail_text": "Specifically, Rancho Park Compounding Pharmacy 10587 W Pico Blvd CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABUSI-NENT INSPECTED Los Angeles, CA 90064 - 2333 Producer of Sterile and Non Sterile Drug Products The ISO 7 buffer room surrounding the [redacted] ISO LAFWs [redacted] as well as the ISO 7 anteroom contain wall cable raceways that are designed to conceal cables running along walls near the ceiling, which are hard to clean and visualize the top surface. The cable raceways run through every room in the sterile compounding lab and are opened at the comers with cables exposed. Dirty was observed around the cable raceway in the anteroom.",
+  "detail_text_ko": "구체적으로, [redacted] ISO LAFW [redacted]를 둘러싼 ISO 7 완충실과 ISO 7 전실에는 천장 근처 벽을 따라 지나가는 전선을 감추기 위한 벽면 전선 덮개가 설치되어 있었으며, 그 윗면은 세척하거나 육안으로 확인하기 어려웠다. 전선 덮개는 무균 조제실의 모든 방을 통과하며, 모서리 부분이 열려 있어 전선이 노출되어 있었다. 전실의 전선 덮개 주변에서 오염물이 관찰되었다."
+ },
+ {
+  "finding_id": "finding-a14896cb09a73a82e33845d3",
+  "finding_text_md5": "fe40b97f363738b697e1efd1ed57e645",
+  "detail_text": "Specifically, The gowning room inside the ISO 7 anteroom occupies an area of [redacted] if that includes a sink and drain, a trash bin, and an open metal shelf for the storage of sterile materials used for compounding such as [redacted] syringes, [redacted] water, and a small space for gowning. For example, water spills out onto the gowning area while washing hands, and gowning apparels were observed to touch the wet spillage, wall, trash bin or doorframe before technician [redacted] moved into the ISO 7 buffer room on 4/23/2019. Rancho Park Compounding Pharmacy 10587 W Pico Blvd CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABUSI-NENT INSPECTED Los Angeles, CA 90064- 2333 Producer of Sterile and Non Sterile Drug Products 4/23/2019 (Tue), 4/24/2019 (Wed), 4/25/2019 (Thu), 4/26/2019 (Fri), 4/29/2019 (Mon), 5/07/2019 (Tue)",
+  "detail_text_ko": "구체적으로, ISO 7 전실 내부의 무균복 착의실은 면적이 [redacted] (판독 불가)이며, 이 공간에는 세면대와 배수구, 쓰레기통, [redacted] 주사기와 [redacted] 물 등 조제에 사용하는 멸균 물품을 보관하는 개방형 금속 선반, 무균복 착의를 위한 작은 공간이 포함되어 있었다. 예를 들어 손을 씻는 동안 착의 구역으로 물이 튀었으며, 4/23/2019에 작업자 [redacted]가 ISO 7 완충실로 이동하기 전에 착의 중인 무균복이 바닥에 흘린 물, 벽, 쓰레기통 또는 문틀에 닿는 것이 관찰되었다.",
+  "ocr_dropped": [
+   "if"
   ]
  },
  {
@@ -758,6 +808,23 @@
   ]
  },
  {
+  "finding_id": "finding-ef85e67799593ac25d466f08",
+  "finding_text_md5": "64bc027586fc9ee84d1f0d268a07b6c5",
+  "detail_text": "The 6f<'I process for Fill Line~, during routine aseptic filling and the aseptic process simulation, the fbl <4>;J-lcrobial growth media is transfeITed to a sterilizedr>™ I holding vessel in roomf 0 ' l41 (Grade B). A production room operator confirmed there is no written standai·d operating procedure, and/or in the BMR, that specifically describes and establishes that the fb> (•f)l tubing is to be manually transfeITed from the Grade B ai·ea into the Grade D room. Ahmedabad, Gujarat, 382210 I ndia Drug Manufacturer Thomas J AMtl Rna K KaDa&O ~:O:t'e~rnas J. Arista -S x OateSipd: 05-03-2019 10:41:25 omoe 01 lntemaUona1 P'.J'Ograms Et11>1oyee x ~~~~~;,~9 1041 56",
+  "detail_text_ko": "충전라인 [redacted]의 [redacted] 공정에서는 통상적인 무균 충전 및 무균 공정 모의시험 중 [redacted] 미생물 배양배지를 Grade B인 실 번호 [redacted]에 있는 멸균된 [redacted] 보관 용기로 이송했다. 생산실 작업자는 [redacted] 관을 Grade B 구역에서 Grade D실로 수동 이송하도록 구체적으로 설명하고 정한 서면 표준작업절차서 또는 BMR의 지시사항이 없음을 확인했다.",
+  "ocr_dropped": [
+   "0",
+   "05-03-2019",
+   "10:41:25",
+   "01",
+   "1",
+   "382210",
+   "1041",
+   "56",
+   "9"
+  ]
+ },
+ {
   "finding_id": "finding-6539f53d8ed18ec7989ab719",
   "finding_text_md5": "02865eea7ae113c337a43bbd29b51332",
   "detail_text": "Specitically, a. Your firm failed to conduct [redacted] testing only [redacted] used to sterilize Atropine Sulfate 0.01% Sterile Ophthalmic Solution, lot 021219OS1010, manufactured on 02/12/19, with a beyond-use date (BUD) of 180 days. b. Your firm released products purported to be sterile despite the failure of the [redacted] used in their production to meet the manufacturer's [redacted] test specifications. For example: Prednisolone/Ketorolac 1 %/0.5% Ophthalmic Solution, lot 021319OS1001, manufactured on 02/13/19, with a BUD of 180 days, was released with a [redacted] testing result of [redacted] which is below the manufacturer's specification of [redacted] Timolol/Brimonidine/Dozolamide 0.5%/0.2%/2% Ophthalmic Solution, lot 020720190S I006, manufactured on 02/07/19, with a BUD of 180 days, was released with a [redacted] testing result of [redacted] which is below the manufacturer's specification of [redacted] 1120 Kensington Ave Unit E TYPE ESTABUSMMENT INSPECTED Compounding Pharmacy Chr!slopllor R Cza1ca lnvasllg!!tor Signed B. R. Cm kD -S X Oa1DS~~1910:4i:37",
@@ -780,6 +847,17 @@
    "9",
    "l00mL",
    "4040"
+  ]
+ },
+ {
+  "finding_id": "finding-51c52af74358e34dd1cb75c9",
+  "finding_text_md5": "a466963bc20ad93f5ca4c32afc6a3142",
+  "detail_text": "Specifically, during review of Recall# D-0295-2019, Norepinephrine 8 mg (32 mcg/mL) added to 0.9% Sodium Chloride Injection 250 mL Bag, your firm's investigation identified the issue to be a drug component picking issue. Your firm's compounding technician aseptically admixed 250mL 5% Dextrose Injection 250 mL Bag in error. Your firm 's quality unit failed to investigate why your firm 's [redacted] Testing Laboratory failed to report an unusual peak found during potency testing. l requested the lot laboratory test data, which resulted in the firm finding the presence of an unknown peak of the finished sterile drug product sample. Your firm's director ofquality reported the firm will be reopening the CAPA to further investigate this finding made during this inspection. Your firm failed to adequately investigate the unusual laboratory test results. DEPARTMENT OF UEALTH AND HUMAN SERVlCES FOOi) AND DRUG AOMINISTRATION OOTRICTAllllleS AHIJ PttONE NUM8ER 4040 North Central Expressway, Suite 300 Dallas, TX 75204 (214) 253-5200 Fax: (214) 253-5314 NMIE AND t II Lt,_,.. Jr,u,v,uv,,i. TOW.._,,,, l<l:l'U<T lliSUED Ill'., \"l• J OF IH$PECTOI 4/5/2019-4 /23/2019* FEI NUMtltJ< 3012053582 Travis M. McGrady, Senior Dir ector Production Oper ations FIRM NIIME STREET~ QuVa Pharma, Inc. 1075 W Park One Dr Ste 100,.:>TATE. ZP COUNTRY TYPE EST AIIUSHME~,......,,_ ED Sugar Land, TX 77478 - 2576 Outsourcing Faci lity [(oH 4) ITesting Laboratory failed to report an unusual peak found during potency testing. l requested the lot laboratory test data, which resulted in the finn finding the presence ofan unknown peak ofthe finished sterile drug product sample. Your firm's director ofquality reported the firm will be reopening the CAPA to further investigate this finding made during this inspection. Your firm failed to adequately investigate the unusual laboratory test results.",
+  "detail_text_ko": "구체적으로, 회수 번호 D-0295-2019인 0.9% Sodium Chloride 주사액 250 mL 용기에 Norepinephrine 8 mg(32 mcg/mL)을 첨가한 제품을 검토하는 동안, 귀사의 조사에서는 문제를 의약품 구성성분의 선택 오류로 확인했다. 귀사의 조제 작업자는 5% Dextrose 주사액 250 mL 용기의 250mL를 잘못 무균 혼합했다. 귀사의 품질 부서는 [redacted] 시험기관이 역가시험 중 발견한 비정상 봉우리를 보고하지 않은 이유를 조사하지 않았다. 실사관이 해당 로트의 시험실 시험 자료를 요청한 결과, 귀사는 멸균 완제의약품 검체에 미지 봉우리가 있음을 발견했다. 귀사의 품질 책임자는 이번 실사에서 발견한 이 관찰사항을 추가 조사하기 위해 CAPA를 재개할 것이라고 밝혔다. 귀사는 비정상적인 시험실 시험 결과를 적절히 조사하지 않았다.",
+  "ocr_dropped": [
+   "AHIJ",
+   "[(oH",
+   "4)"
   ]
  },
  {
@@ -806,6 +884,19 @@
   "detail_text_ko": "구체적으로, 다음과 같은 기준 일탈(OOS) 역가 결과가 관찰되었다.\nT3 6mcg 서방성 캡슐 S/R, 로트 번호 01082019@9: Liothyronine Sodium(T3) 역가 86.3%.\nT3 20mcg 캡슐 SIR, 로트 번호 01252019@7: Liothyronine Sodium(T3) 역가 116%.\nT3 30mcg, 로트 번호 01252019@14: Liothyronine Sodium(T3) 역가 75.0%.\nEstriol/DHEA/Testosterone/Pregnenolone 100mg/4mg/45mg/mg/mL, 로트 번호 02 1420 19@1: DHEA 역가 81.3%, Estriol 역가 77.2%, Testosterone 역가 84.5%.\nMethylcobalamin (판독 불가) mcg/mL(PF) 주사제, 로트 번호 02212019@1: Methylcobalamin 역가 53.3%.",
   "ocr_dropped": [
    "lO00mcg/mL"
+  ]
+ },
+ {
+  "finding_id": "finding-836821fc855b44047c7252f3",
+  "finding_text_md5": "2987e8f9d00e1d3f42ed209573f65e0d",
+  "detail_text": "Specifically, unidirectional airflow was not verified under dynamic conditions. The most recent smoke pattern tests were perfonned on [redacted] on the fnm's ISO 5 biological safety cabinet and ISO 5 laminai· flow clean bench under static conditions. Producer of Sterile and Non- Sterile Drug Products Ra::haelA.Mol'ta'\" =:----s Oo11:!Sll7!ed D4-(15,.21J19090652 X IONS",
+  "detail_text_ko": "구체적으로, 동적 조건에서 단일 방향 기류를 확인하지 않았다. 가장 최근의 연무 기류 형태 시험은 [redacted]에 귀사의 ISO 5 생물안전작업대와 ISO 5 층류 청정작업대를 대상으로 정적 조건에서 수행했다.",
+  "ocr_dropped": [
+   "1",
+   "15",
+   "2",
+   "9090652",
+   "IONS"
   ]
  },
  {
@@ -1100,10 +1191,39 @@
   ]
  },
  {
+  "finding_id": "finding-c53c7736b32aa07c9996ba08",
+  "finding_text_md5": "031730c95f3be4666bb536a162dea37a",
+  "detail_text": "Specifically, the Summary of Records for CMV positive donors only lists the result as \"PASS\" and does not also list the result as positive. A. For example all vials from the following Lot#s: [redacted], and [redacted] (949)608-2900 Fax: (949)608-4417 NN.tEN-,nnEOF lt40MQJALTOYJl...,.,~,, 1SSUEO Eri n M. Sai rafe, Chief Compliance Officer flRMNAM£ Liveyon CITY. STA.~.,ZIP COOE, c:.ot-.aTRY Yorba Linda, CA 92887- 4601 DATo(S)Of' 1NSl'ECT101< 9/17/2018-9/21/2018 fEINWlleR 3013957857 STREET.,,._.._ 22667 Ol d Canal Rd l\"'t'PE E,SfAUIA1-tMtHT' INSPECltD own l abel stem cell distributor B. The Summary of Records includes Form 001 (Certificate of Analysis) and the Instructions For Use And Product Preparation Guide. 1) Revision 4 of Form 001 removed the test results from the Certificate of Analysis. Revision 4 implemented 6/5/18. From 6/5/18 to present, there were [redacted] lots affected. 2) The Instructions for Use And Product Preparation Guide indicates results as \"PASS\" 7 r for all communicable diseases tested and also states [redacted], which is incorrect for CMV positive donors.",
+  "detail_text_ko": "구체적으로, CMV 양성 기증자의 기록 요약에는 결과를 “적합(PASS)”으로만 기재하고 양성 결과를 함께 기재하지 않는다.\nA. 예를 들어, 로트 번호 [redacted] 및 [redacted]의 모든 바이알이 이에 해당한다.\nB. 기록 요약에는 양식 001 시험성적서(COA)와 사용 및 제품 준비 안내서가 포함된다.\n1) 양식 001의 개정 4에서는 시험성적서에서 시험 결과를 삭제했다. 개정 4는 6/5/18에 시행되었다. 6/5/18부터 현재까지 [redacted]개 로트가 영향을 받았다.\n2) 사용 및 제품 준비 안내서에는 검사한 모든 전염성 질환의 결과가 “적합(PASS)”으로 표시되어 있으며, [redacted]이라고도 명시되어 있다. 이는 CMV 양성 기증자에 대해서는 부정확하다.",
+  "ocr_dropped": [
+   "3013957857",
+   "22667",
+   "PE",
+   "STREET",
+   "7"
+  ]
+ },
+ {
   "finding_id": "finding-eddb8beaffd5fe221c77ee17",
   "finding_text_md5": "41d9dcb260382905dacd4bd016eed1af",
   "detail_text": "Specifically, complaints and adverse events recorded on the AER-Complaint Log lack thorough follow up. For example: A. When a complaint is determined to not require further investigation, this is not documented. I) Complaint 61818-01 for lot # [redacted] which documents a patient experienced an adverse reaction that included in an ERvisit and E. Coli positive specimen culture was not followed up. The reported reason is because this physician had injected 6 other patients with this same lot# with no adverse events experienced [redacted] vials were made of this lot. 0/\\TEISSUED fMPLOY••(SJ-nmE Tania Y Hall, I nvestigator 9/21/2018",
   "detail_text_ko": "구체적으로, AER 불만 기록대장에 기록된 불만과 이상사례에 대한 후속조치가 철저하지 않다. 예를 들면 다음과 같다.\nA. 불만에 대해 추가 조사가 필요하지 않다고 판단했을 때 이를 문서화하지 않는다.\nI) 로트 번호 [redacted]에 대한 불만 61818-01에는 환자가 응급실 방문과 검체 배양검사 E. Coli 양성을 포함하는 이상반응을 경험했다고 기록되어 있으나, 후속조치를 하지 않았다. 보고된 사유는 해당 의사가 동일한 로트 번호의 제품을 다른 환자 6명에게 주사했지만 이상사례가 발생하지 않았다는 것이었다. 이 로트는 [redacted]개 바이알로 제조되었다."
+ },
+ {
+  "finding_id": "finding-f80e2a4a36d8aad5edc3c200",
+  "finding_text_md5": "deb9ba2d06a1769271b6973085d2c54d",
+  "detail_text": "( 949) 608-2900 Fax: (949) 608-4417 3013957857 NMIEAJiD TITLE OF INDWIOUAl. TOWHOl.i REPORT ISSUSD Erin M. Sairafe, Chief Compliance Officer S1 Rei, 1 Liveyon 22667 Old Canal Rd CITY. STATE, ZIP COOE, COUNTRY ~'IPE ESTA8USIU,~ IT INSl'EClED Yorba Linda, CA 92887-4601 own label stem cell distributor Specifically, the packing configuration used is not supported by the shipping validation. The packing configuration validated includes one vial in the small box with dry ice. However, up to 5 vials can be shipped in the small box. Only one of the three validation runs could be found. TAH 9/21/18 SEE REVERS E",
+  "detail_text_ko": "구체적으로, 사용 중인 포장 구성은 운송 밸리데이션으로 뒷받침되지 않는다. 밸리데이션한 포장 구성은 드라이아이스와 함께 작은 상자에 바이알 1개를 넣는 것이다. 그러나 작은 상자에 최대 5개 바이알을 넣어 운송할 수 있다. 3회의 밸리데이션 수행 기록 중 1회분만 찾을 수 있었다.",
+  "ocr_dropped": [
+   "9/21/18",
+   "TAH"
+  ]
+ },
+ {
+  "finding_id": "finding-15283f3ce7efb7eda11f34b3",
+  "finding_text_md5": "f316a6e1bc15da6105b1e7fc730bd874",
+  "detail_text": "Crawford's Professional Drugs, Inc. dba 240 S. 13th Ave Diket's Professional Drugs, Inc. CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABUSI-NENT INSPECTED Laurel, MS 39440-4 226 Producer of Non-Sterile Drugs Specifically, five capsules of the progesterone 150 sustained release (SR) cap s for BCB BCAB [redacted] 8 wer e res ted for potency. On 1/25/2018, the results were reported at 88% which is below the [redacted] % specification fo r this formulation. There is no documentation to support how this information was evaluated and you continued t o distribute th e capsules until 3/28/201 8 which i s afte r thes e test results were reported. I n additio n, y ou do n ot preform a confirmation of weight test on a representative percentage of capsules that you prepare to determi ne that the fill weight for each capsule is the same. Employee(s) Signature: Joanne E. Kind",
+  "detail_text_ko": "구체적으로, BCB BCAB [redacted] 8의 progesterone 150 서방형(SR) 캡슐 5개에 대해 역가를 시험했다. 1/25/2018에 보고된 결과는 88%로, 이 제제의 규격인 [redacted]%보다 낮았다. 이 정보를 어떻게 평가했는지 뒷받침하는 문서가 없으며, 귀사는 시험 결과가 보고된 이후인 3/28/201 8까지 해당 캡슐을 계속 유통했다. 또한, 조제한 캡슐 중 대표성 있는 비율을 대상으로 각 캡슐의 충전 중량이 동일한지 확인하는 중량 확인 시험을 수행하지 않는다."
  },
  {
   "finding_id": "finding-1adc5ff834f3428c48bed8c6",
@@ -1119,6 +1239,17 @@
   "ocr_dropped": [
    "5",
    "4"
+  ]
+ },
+ {
+  "finding_id": "finding-40584029560a255000d441a8",
+  "finding_text_md5": "1b5808a3a0af66d241e7c5c066c03a57",
+  "detail_text": "Specifically, There is no established testing program for any of your sterile drug products to demonstrate products are indeed sterile and pyrogen free prior to being distributed. For example, the following sterile drug products that were distributed as office stocks did not have sterility testing: 1.Rx [redacted] for 5 mL Papaverine-Phentolamine-PGEI 22-0.8 mg-8mcg/mL Injection solution; lot 01102018@9; produced 10/1/18. Rx [redacted] for 5 mL Papaverine-Phentolamine-PGEI 22-0.8 mg-8mcg/mL Injection solution; lot 01102018@9; produced 10/1/18. 2.RX [redacted] for 30 mL Cyclopentolate-Phenylephrine-Tropicamide Ophthalmic Solution; lot 27092018@11; produced 9/27/18. RX [redacted] for 30 mL Cyclopentolate-Phenylephrine-Tropicamide Ophthalmic Solution; lot 27092018@11; produced 9/27/18. · 3.RFX [redacted] 10 mL Hydroxyprogesterone Caproate 250 mg/mL Oil Injectable Solution; lot 19062018@1; produced 6/19/18. RFX [redacted] 10 mL Hydroxyprogesterone Caproate 250 mg/mL Oil Injectable Solution; lot 19062018@1; produced 6/19/18.,, Producer of sterile and non-sterile drug products",
+  "detail_text_ko": "구체적으로, 귀사의 모든 무균 의약품에 대해 유통 전에 제품이 실제로 무균이고 발열성물질이 없음을 입증하기 위한 시험 프로그램이 수립되어 있지 않다. 예를 들어, 의료기관 비축용으로 유통한 다음 무균 의약품에 대해 무균시험을 수행하지 않았다.\n1. Rx [redacted], Papaverine-Phentolamine-PGEI 22-0.8 mg-8mcg/mL 주사액 5 mL, 로트 01102018@9, 제조일 10/1/18.\n2. RX [redacted], Cyclopentolate-Phenylephrine-Tropicamide 점안액 30 mL, 로트 27092018@11, 제조일 9/27/18.\n3. RFX [redacted], Hydroxyprogesterone Caproate 250 mg/mL 유성 주사액 10 mL, 로트 19062018@1, 제조일 6/19/18.",
+  "ocr_dropped": [
+   "[redacted]",
+   "[redacted]",
+   "[redacted]"
   ]
  },
  {
@@ -1139,6 +1270,15 @@
   "ocr_dropped": [
    "4",
    "1"
+  ]
+ },
+ {
+  "finding_id": "finding-6090298c267e0604737eb625",
+  "finding_text_md5": "735f2c5aca8a06c1ce5f7a88159a29a8",
+  "detail_text": "Specifically, your ISO classified zones lack sufficient data to substantiate the current classifications. For example: A.Certification of your A C/HEP A system has never been conducted. You did not provide data to support design of your clean-room was sufficient to perform sterile drug production prior to production. HV t the Certification of your AC/HEP A system has never been conducted. You did not provide data to support design of your clean-room was sufficient to perform sterile drug production prior to production. B. LLighting equipment used in your aseptic processing area was observed to be insufficient. Light fixtures used are not designed to maintain ceiling integrity and prevent infiltration of particulate into the clean room under positive pressure. Lighting equipment used in your aseptic processing area was observed to be insufficient. Light fixtures used are not d esigned to maintain ceiling integrity and prevent infiltration of particulate into the clean room under positive pressure. C. Multiple ceiling tiles were observed to be labeled with \"do not seal\" and confirmed to be unsealed.",
+  "detail_text_ko": "구체적으로, 귀사의 ISO 등급 지정 구역에는 현재 등급을 뒷받침할 충분한 자료가 없다. 예를 들면 다음과 같다.\nA. 귀사의 AC/HEPA 시스템에 대한 인증을 수행한 적이 없다. 귀사는 제조를 시작하기 전에 청정실 설계가 무균 의약품 제조에 충분히 적합했음을 뒷받침하는 자료를 제공하지 않았다.\nB. 무균 공정 구역에서 사용하는 조명 설비가 부적절한 것을 관찰했다. 사용하는 조명 기구는 천장의 완전성을 유지하고 양압 상태의 청정실로 입자가 유입되는 것을 방지하도록 설계되지 않았다.\nC. 여러 천장판에 “밀봉하지 말 것”이라고 표시되어 있었으며, 밀봉되지 않은 것을 확인했다.",
+  "ocr_dropped": [
+   "HV"
   ]
  },
  {
@@ -1257,6 +1397,12 @@
   ]
  },
  {
+  "finding_id": "finding-9e62f85c7b07f6fac0c906c5",
+  "finding_text_md5": "ca95ce478e3aae3f55aabd5254fb7f24",
+  "detail_text": "Specifically, not all your sterile products are released with testing for active ingredient identification and potency. For example, your Tri-mix 30mg/2mg/20mcg/mL (Papaverine, Phentolamine, Prostaglandin) finished chug Maple Rose Enterp ris e s, I nc, db a Pencol 1325 S Colorado Bl vd Ste B-024 Pharma c y CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABU SHMENT INSPECTED De nver, co 80222- 3303 Producer o f Steril e a nd Non- Steril e Dr ugs product is dispensed without determining the identification and potency of each active ingredient of the final product. This is a repeat FDA 483, Inspection Observation, from inspection ending on 8/22/2016.",
+  "detail_text_ko": "구체적으로, 귀사의 모든 무균 제품이 유효성분 확인 및 역가시험을 거쳐 출하되는 것은 아니다. 예를 들어, 귀사의 Tri-mix 30mg/2mg/20mcg/mL(Papaverine, Phentolamine, Prostaglandin) 완제의약품은 최종 제품의 각 유효성분에 대한 확인 및 역가를 판정하지 않고 조제·교부한다. 이는 8/22/2016에 종료된 실사의 FDA 483 관찰사항이 반복된 것이다."
+ },
+ {
   "finding_id": "finding-a228a9926f441108776fd5eb",
   "finding_text_md5": "0ddaa73abf46190ed0308df06d701ecc",
   "detail_text": "Specifically, A)Your firm does not effectively perform a [redacted] testing of [redacted]. B) On 2/11/19, I observed your compounding technician placing her gloved hanf and other objects (needles, needle adapter, barrel, plungers, large volume IV bag) into the path of unidirectional \"first air\" during t he compounding of Bupivacaine HCI Hyaluronidase preservative free solution (0.75 % <Red acted B4> nit injection), Lot No. BH0429. The HEPA filtered airflow above the sterile finished product vials was compromised (hands a nd other objects placed over the pre-sterilized vial septums) during the [redacted] and the <R edacted B4> of final product. Maple Rose Enterp rises, Inc, db a Pencol 1325 S Colorado Blvd Ste B-024 Pharmacy CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABU SHMENT INSPECTED Denver, co 80222- 3303 Producer o f Sterile and Non- Sterile Drugs C) Your firm's in situ air pattern analysis (smoke studies) was not conducted under dynamic conditionst tha t simulate routine production, such as [redacted] sterilization and IV bag manipu lation. Without, there is no as surance cirical processing areas are suitable for aseptic manufacturing of sterile drug products. The [redacted] current smoke study videos (for each of the laminar flow hoods) were filmed 12/22/2017. D) Your firm's media fills/process simulations are not performed under the most stressful or challenging conditions and do not simulate typical volumes and manipulations to closely simulate the same exposure that the product itself will undergo. In addition, protocols and dinal reports are not established to describe and evaluate media fills other than <Re dacted B4>. E) From 2/11/19-2 /26/19 equipment used in the production of sterile injectables including glassware, utensils, a nd stir components was not processed in a way that eliminates pyrogens. The following sterile drugs were manufactured during the inspection using non-depyrogenated glassware utensils: 1. Bupivacaine with Hyaluronidase lot BH0429, Rx [redacted], made [redacted], [redacted] x 5cc vials, made 2/11/19, BUD 2/25/19. 2. Vitamin B Complex PF Formula Combo Solution lot 3VBC0449, Rx [redacted], [redacted] x 20ml vials, made 2/13/19, BUD 3/15/19 1. 4 Bupivacaine with Hyaluronidase lot BH0429, Rx[ [redacted] L made[(I::>) (4)1,r)( Sec vials, made 2/11/19, BUD 2/25/19 (1>)(4 Vitamin B Complex PF Fo1mula Combo Solution lot 3VBC0449, Rx[ [redacted] t [} 20ml vials, made 2/13/19, BUD 3/15/19 2. F) Sterility and baterial endotoxin testing is performed only on products whose batch size is greater than <Reda ct ed B4> units. A pproximately [redacted] % of products have a batch size greate r tha n or equal to [redacted] unit s. In conjunction with this, media used for st erility testing, via [redacted], for produ cts whose batch size is less than [redacted] units, is not tested for growth promotion prior to use. Maple Rose Enterp rises, I nc, dba Pencol 1325 S Colorado Blvd Ste B- 024 Phar macy CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABUSHMENT INSPECTED Denver, co 80222- 3303 Producer of Sterile and Non- Sterile Dr ugs This is a repeat FDA 483, Inspection Observation, from inspection ending on 8/22/2016. Quality System",
@@ -1267,6 +1413,16 @@
    "[redacted]",
    "4",
    "Sec"
+  ]
+ },
+ {
+  "finding_id": "finding-a66bb158ad3b1e90a4c186c3",
+  "finding_text_md5": "0536b299d7c77a5ea8290c074cfe9e2b",
+  "detail_text": "Specifically, A)Procedures impating the identity, strenght, quality, and purity of drug prodcuts have not been established. D uring our inspection, we were provided with a set of comprehensive standard operating procedures (SOPs) for u se by the pharmacy staff. T he SOPs were provided by [redacted] - a contractor who provides SOPs tailored for sterile and non-sterile compounding pharmac ies. The SOPs are generally written for any compounding pharm acy and are intended to be revised and tailored to the current operations at each individual pharma cy. Your firm has not tailored your contractor provided SOPs for your pharmacy staff to carry out operations correcrtly and alwa ys in the same ma nner. Procedures were written by [redacted] and made effective in March 2017. B) B. There is no quality control unit. Site activities that lack quality oversight include but are not limited to th e following: 1. Complaint Management-receipt, documentation, investigation; 2. Equipment Sterilization-review of equipment [redacted] logs and verification of perfomance, verification of [redacted] challenge testing performance and results; 3. Incubators-review equipment logs; 4. 3rd Party Calibrations and Certification - review and approval of vendors and resulting data; 5. Classified Room Monitoring - review of logged temperature, humidity, and pressure results; 6. Media Fills - independent review of competency check (fingertip glove test) results; 7. Contract Testing Laboratories - qualification and approva l 1. Complaint. Management - receipt, documentation, investigation r t i)ment Sterilization - review of equipmentOCl:i) (:.:t)togs and verification of pe1formance, ve1ification of, 0 4 _hallenge testing perfo1mance and results 3. Incubators - review of equipment logs Maple Rose Enterprises, Inc, dba Pencol 1325 S Colorado Blvd Ste B-024 Pharmacy CITY. STATE. ZIP CODE. COUNTRY TYPE ESTABUSHMENT INSPECTED Denver, co 80222- 3303 Producer of Sterile and Non-Sterile Drugs 4. 3rd Party Calibrations and Certification - review and approval of vendors and resulting data 5. Classified Room Monitoring- review oflogged temperature, humidity, and pressure results 6. Media Fills - independent review of competency check (finge1tip glove test) results 7. Contract Testing Laborato1ies - qualification and approval This is a repeat FDA 483, Inspection Observation, from inspection ending on 8/22/2016.",
+  "detail_text_ko": "구체적으로, A) 의약품의 확인, 함량, 품질 및 순도에 영향을 미치는 절차가 수립되어 있지 않다. 실사 중 약국 직원용 종합 표준작업절차서(SOPs) 일체가 제공되었다. 이 SOPs는 무균 및 비무균 조제 약국에 맞춤형 SOPs를 제공하는 계약업체 [redacted]이 제공했다. SOPs는 일반적으로 모든 조제 약국에 적용하도록 작성되었으며, 각 약국의 현재 작업에 맞게 개정하고 조정하도록 되어 있다. 귀사는 약국 직원이 작업을 올바르고 항상 동일한 방식으로 수행할 수 있도록 계약업체가 제공한 SOPs를 조정하지 않았다. 이 절차는 [redacted]이 작성했으며 2017년 3월에 발효되었다.\nB) 품질관리 부서가 없다. 품질 감독이 이루어지지 않는 현장 활동에는 다음 사항이 포함되며 이에 한정되지 않는다.\n1. 불만 관리 — 접수, 문서화 및 조사.\n2. 장비 멸균 — 장비 [redacted] 기록 검토와 수행 확인, [redacted] 부하시험의 수행 및 결과 확인.\n3. 배양기 — 장비 기록 검토.\n4. 외부 교정 및 인증 — 공급업체와 산출 자료의 검토 및 승인.\n5. 등급 지정 작업실 모니터링 — 기록된 온도, 습도 및 압력 결과 검토.\n6. 배지충전 — 역량 확인 시험인 장갑 손끝 시험 결과에 대한 독립적 검토.\n7. 위탁시험실 — 적격성평가 및 승인.\n이는 8/22/2016에 종료된 실사의 FDA 483 관찰사항이 반복된 것이다.",
+  "ocr_dropped": [
+   "0",
+   "4"
   ]
  },
  {

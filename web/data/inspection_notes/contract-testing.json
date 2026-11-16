@@ -1,0 +1,192 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "contract-testing",
+  "as_of": "2026-11-16",
+  "area_ko": "공급·제조·포장",
+  "area_en": "Supply, manufacturing and packaging",
+  "title_ko": "위탁 시험과 품질협약서",
+  "title_en": "Contract testing and quality agreements",
+  "glossary_ids": [
+    "quality-agreement"
+  ],
+  "aliases_ko": [
+    "위탁시험기관",
+    "계약 시험기관",
+    "품질 협약"
+  ],
+  "aliases_en": [
+    "contract testing laboratory",
+    "contract laboratory",
+    "quality agreement"
+  ],
+  "search_q_ko": "위탁",
+  "search_q_en": "quality agreement",
+  "lead_ko": "FDA 는 일을 외부에 맡겼는지보다, 맡긴 일을 누가 책임지고 어떻게 확인하는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether work was contracted out than at who is responsible for that work and how it is checked. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "품질협약서를 맺지 않았다",
+      "title_en": "No quality agreement was in place",
+      "quotes": [
+        {
+          "finding_id": "finding-3e719202b17f1d1f6d6b5969",
+          "raw_signal_id": "rawsig-231c5fa5ffcc7589c48a2332",
+          "document_id": "4ca9202786d6",
+          "source": "FDA Warning Letter",
+          "firm": "TCI Co., Ltd BioCosme PABP BRANCH",
+          "date": "2026-10-06",
+          "quote_ko": "귀사에는 위탁제조기관(CMO)인 귀사와 고객 간 시험 요건 및 설정된 제품 규격에 관한 역할과 책임을 기술한 서면 절차나 품질협약서(quality agreement)가 없다.",
+          "quote_en": "You do not have a written procedure or a quality agreement describing the roles and responsibilities between you, as the contract manufacturing organization, and your customer regarding testing requirements and established product specifications."
+        },
+        {
+          "finding_id": "finding-325a2710043bc0af465cf272",
+          "raw_signal_id": "rawsig-2403dee9aacb2956f09c7436",
+          "document_id": "fda483-195545",
+          "source": "FDA 483",
+          "firm": "Clongen Laboratories, LLC",
+          "date": "2026-10-30",
+          "quote_ko": "구체적으로, mycoplasma 출하 시험에 관하여 [redacted]와 체결한 품질협약이 없다.",
+          "quote_en": "Specifically, there is no quality agreement established with [redacted] regarding mycoplasma release testing."
+        }
+      ]
+    },
+    {
+      "title_ko": "위탁 시험소를 적격성평가하지 않았다",
+      "title_en": "The contract testing laboratory was not qualified",
+      "quotes": [
+        {
+          "finding_id": "finding-ab8f28c73eeabd7702a5a0c1",
+          "raw_signal_id": "rawsig-9861ff9075b3a9916af4ef5d",
+          "document_id": "e060c184a33d",
+          "source": "FDA Warning Letter",
+          "firm": "Outin Futures Corp.",
+          "date": "2024-10-15",
+          "quote_ko": "귀사는 원료의약품(API) 공급업체와 API 시험에 사용한 위탁시험기관을 적격성평가하지 않았다.",
+          "quote_en": "You did not qualify your active pharmaceutical ingredients (API) supplier, and your contract testing laboratory used for API testing."
+        },
+        {
+          "finding_id": "finding-9eb09a3bb24109c01cad2871",
+          "raw_signal_id": "rawsig-b9f7a979eee3acde1d73037b",
+          "document_id": "fd692b9d917f",
+          "source": "FDA Warning Letter",
+          "firm": "Fagron Group B.V.",
+          "date": "2022-06-28",
+          "quote_ko": "또한 실사 중 귀사는 자원 문제로 QU가 제품 출하를 지원하는 데 사용한 위탁시험기관을 적격성 평가하지 않았음을 인정했다.",
+          "quote_en": "In addition, during the inspection you acknowledged that your QU did not qualify the contract laboratories you used to support product release due to resource issues."
+        }
+      ]
+    },
+    {
+      "title_ko": "위탁 시험소가 쓰는 시험법을 검증하지 않았다",
+      "title_en": "The method used by the contract laboratory was not verified",
+      "quotes": [
+        {
+          "finding_id": "finding-95721f2d1c96e303396d8508",
+          "raw_signal_id": "rawsig-91f11d6c2d25f9a0889f2fa5",
+          "document_id": "ed5ec19accbe",
+          "source": "FDA Warning Letter",
+          "firm": "Shimoga Chemicals",
+          "date": "2026-07-21",
+          "quote_ko": "예를 들어 귀사는 위탁 시험기관이 사용하는 잔류용매 시험법을 검증하지 않았다.",
+          "quote_en": "For example, your firm failed to verify the residual solvent method used by your contract testing laboratory."
+        },
+        {
+          "finding_id": "finding-a6b60dc961cbf08283e517cf",
+          "raw_signal_id": "rawsig-09634d3ef39110890a139101",
+          "document_id": "fda483-193572",
+          "source": "FDA 483",
+          "firm": "Enemeez LLC",
+          "date": "2026-07-13",
+          "quote_ko": "귀사에는 계약 시험기관이 수행한 수정 시험법의 USP <61> 및 USP <62> 동등성에 대한 시험법 밸리데이션 또는 시험법 검증 문서가 없었다.",
+          "quote_en": "Your firm did not have documentation of a method validation or method verification performed by the contract laboratory of its modified version equivalency to USP <61> and USP <62>."
+        }
+      ]
+    },
+    {
+      "title_ko": "위탁 시험소의 시험을 감독하지 않았다",
+      "title_en": "Testing at the contract laboratory was not overseen",
+      "quotes": [
+        {
+          "finding_id": "finding-c990b5a614ca37f967fe5d10",
+          "raw_signal_id": "rawsig-fd2d598d84340fa9ec38597b",
+          "document_id": "2837bf070b64",
+          "source": "FDA Warning Letter",
+          "firm": "Advanced Pharmaceutical Technology",
+          "date": "2025-03-18",
+          "quote_ko": "귀사의 품질부서(QU)는 적절한 완제품 시험이 수행되고 있는지 확인하기 위해 위탁 시험소를 감독할 책임을 이행하지 않았다.",
+          "quote_en": "Your quality unit (QU) did not exercise its responsibility to oversee your contract testing laboratory to ensure the appropriate finish product testing was being conducted."
+        },
+        {
+          "finding_id": "finding-cad19f1f140d31b2eafe89f1",
+          "raw_signal_id": "rawsig-66dab6db78a8e50fd952237f",
+          "document_id": "fda483-195495",
+          "source": "FDA 483",
+          "firm": "Burgwedel Biotech GmbH",
+          "date": "2026-10-26",
+          "quote_ko": "구체적으로, ERVEBO 완제 백신 및 관련 물질의 안정성 연구에 쓰는 귀사 위탁 시험실의 설명되지 않는 모든 불일치를 철저히 검토하지 않았다.",
+          "quote_en": "Specifically, There is a failure to thoroughly review any unexplained discrepancy from the firm's contract testing lab used for stability studies of ERVEBO drug product vaccine and related materials."
+        }
+      ]
+    },
+    {
+      "title_ko": "위탁 시험소에서 문제가 생긴 뒤에도 감사하거나 시정조치를 확인하지 않았다",
+      "title_en": "After problems at the contract laboratory, it was not audited and its corrective actions were not checked",
+      "quotes": [
+        {
+          "finding_id": "finding-0c3d603741c0df2e21a7f886",
+          "raw_signal_id": "rawsig-73ede125d6ba96e4996cd749",
+          "document_id": "fda483-194603",
+          "source": "FDA 483",
+          "firm": "Brookfield Medical Surgical Supplies Inc",
+          "date": "2026-09-10",
+          "quote_ko": "QCU는 OOS 결과 13건이 발생한 기간 동안 위탁시험실을 감사하지 않았다.",
+          "quote_en": "The QCU did not audit the contract testing laboratory during the period in which 13 OOS results were generated."
+        },
+        {
+          "finding_id": "finding-13f57883a1419a576920828d",
+          "raw_signal_id": "rawsig-f3cf361958ac329f8becc4d5",
+          "document_id": "fda483-195531",
+          "source": "FDA 483",
+          "firm": "Duke University",
+          "date": "2026-10-30",
+          "quote_ko": "위탁 시험실이 문제 재발을 방지하기 위한 적절한 시정조치를 취했는지 조사하지 않았다.",
+          "quote_en": "No investigation was performed as to whether appropriate corrective actions were taken by the contract lab to prevent the problem from reoccurring."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.22(a)",
+      "finding_id": "finding-c990b5a614ca37f967fe5d10",
+      "firm": "Advanced Pharmaceutical Technology",
+      "date": "2025-03-18",
+      "quote_ko": "귀사는 모든 구성 성분, 의약품 용기, 마개, 공정 중 물질, 포장재, 표시자재, 의약품을 승인하거나 불합격 처리할 책임과 권한을 가진 적절한 품질관리부서를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products",
+      "note_ko": "품질부서가 위탁 시험소를 감독하지 않은 것이 이 조항으로 지적됐습니다.",
+      "note_en": "The quality unit's failure to oversee its contract testing laboratory was cited under this section."
+    }
+  ],
+  "checks_ko": [
+    "위탁 제조소·시험소·고객과 맺은 품질협약서가 있습니까?",
+    "품질협약서에 시험 요건과 제품 규격에 관한 역할과 책임이 적혀 있습니까?",
+    "위탁 시험소를 쓰기 전에 적격성평가를 했습니까?",
+    "위탁 시험소가 쓰는 시험법의 밸리데이션 또는 검증 문서를 갖고 있습니까?",
+    "품질부서가 위탁 시험소의 불일치와 일탈을 검토합니까?",
+    "위탁 시험소에서 OOS 나 오류가 나온 뒤 그 시험소를 감사하고 시정조치를 확인했습니까?"
+  ],
+  "checks_en": [
+    "Is there a quality agreement with each contract manufacturer, contract laboratory and customer?",
+    "Does the quality agreement state the roles and responsibilities for testing requirements and product specifications?",
+    "Was the contract testing laboratory qualified before it was used?",
+    "Do you hold method validation or verification documentation for the methods the contract laboratory uses?",
+    "Does the quality unit review discrepancies and deviations from the contract laboratory?",
+    "After OOS results or errors at the contract laboratory, was the laboratory audited and were its corrective actions checked?"
+  ],
+  "further_reading": [],
+  "related": [
+    "supplier-qualification",
+    "quality-unit",
+    "batch-records"
+  ]
+}

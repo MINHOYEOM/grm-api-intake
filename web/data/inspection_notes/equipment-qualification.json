@@ -1,0 +1,197 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "equipment-qualification",
+  "as_of": "2026-11-16",
+  "area_ko": "공급·제조·포장",
+  "area_en": "Supply, manufacturing and packaging",
+  "title_ko": "설비 적격성평가",
+  "title_en": "Equipment qualification",
+  "glossary_ids": [
+    "equipment-qualification",
+    "qualification",
+    "installation-qualification",
+    "operational-qualification",
+    "performance-qualification"
+  ],
+  "aliases_ko": [
+    "장비 적격성평가",
+    "IQ/OQ/PQ",
+    "재적격성평가"
+  ],
+  "aliases_en": [
+    "equipment qualification",
+    "IQ/OQ/PQ",
+    "requalification"
+  ],
+  "search_q_ko": "적격성평가",
+  "search_q_en": "equipment qualification",
+  "lead_ko": "FDA 는 적격성평가 문서가 있는지보다, 지금 쓰는 설비와 시스템이 적격성평가된 상태인지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether qualification documents exist than at whether the equipment and systems in use today are in a qualified state. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "제조 설비를 적격성평가하지 않았다",
+      "title_en": "Manufacturing equipment was not qualified",
+      "quotes": [
+        {
+          "finding_id": "finding-af3b89b3caf736bdaf7d76e1",
+          "raw_signal_id": "rawsig-6fa3ad833c1df9b5bb05594a",
+          "document_id": "87e5429280ed",
+          "source": "FDA Warning Letter",
+          "firm": "Proquimes S A Productos Quimicos Especializados S.A.",
+          "date": "2021-04-13",
+          "quote_ko": "귀사는 핵심 제조 설비의 적격성평가를 수행하지 않았다.",
+          "quote_en": "You have not conducted qualification of critical manufacturing equipment."
+        },
+        {
+          "finding_id": "finding-6582c692bcf185b421ac7f5b",
+          "raw_signal_id": "rawsig-7b3cba26aa45a0d0520d795f",
+          "document_id": "fda483-196221",
+          "source": "FDA 483",
+          "firm": "MicroBioPharm Japan Co., Ltd",
+          "date": "2026-11-05",
+          "quote_ko": "구체적으로, 귀사는 적격성 평가를 받지 않은 생산 설비를 사용하여 API [redacted](DMF# [redacted])의 제조 공정 밸리데이션을 수행했다.",
+          "quote_en": "Specifically, You have performed a process validation for the manufacturing of the API [redacted] (DMF# [redacted] using production equipment that have not been qualified."
+        }
+      ]
+    },
+    {
+      "title_ko": "설비를 변경하거나 옮긴 뒤 재적격성평가를 하지 않았다",
+      "title_en": "Equipment was not requalified after it was modified or relocated",
+      "quotes": [
+        {
+          "finding_id": "finding-4bae5ad4f518691050148f92",
+          "raw_signal_id": "rawsig-2f852f4c6a42869427586b82",
+          "document_id": "c5e3e49faca2",
+          "source": "FDA Warning Letter",
+          "firm": "Island Kinetics, Inc. d.b.a. CoValence Laboratories",
+          "date": "2026-07-21",
+          "quote_ko": "귀사는 2024년 10월에 (b)(4) 구역에 생산 사용 지점(production point of use)을 추가하고 (b)(4) 탱크를 (b)(4) 탱크로 교체하여 (b)(4) 시스템(번호 (b)(4))을 변경하면서 적절한 재적격성평가를 하지 않았다.",
+          "quote_en": "Your firm modified your (b)(4) system (number (b)(4) ) in October 2024 by adding a production point of use in the (b)(4) area and replacing the (b)(4) tank with a (b)(4) tank without adequate requalification."
+        },
+        {
+          "finding_id": "finding-0571a6567a73965940c77470",
+          "raw_signal_id": "rawsig-fca1b39f3ff422066b47143e",
+          "document_id": "fda483-191003",
+          "source": "FDA 483",
+          "firm": "F.H. Investments Inc dba Asteria Health",
+          "date": "2026-02-10",
+          "quote_ko": "또한 CC25-042에 따라 소형 고형제 압축기 [redacted]을 실 [redacted]에서 실 [redacted]로, 소형 고형제 압축기 [redacted]을 실 [redacted]에서 실 [redacted]로 이동했다. 이전 후 압축기를 재적격성평가하지 않았다.",
+          "quote_en": "Additionally, per CC25-042 you moved pellet press [redacted] from room [redacted] to room [redacted] and moved pellet press [redacted] from room [redacted] to room [redacted]. Your firm did not requalify pellet presses after their relocation."
+        }
+      ]
+    },
+    {
+      "title_ko": "제조와 설비 세척에 쓰는 용수 등을 만드는 시스템을 적절히 적격성평가하지 않았다",
+      "title_en": "The system producing water or similar utilities for manufacturing and equipment cleaning was not adequately qualified",
+      "quotes": [
+        {
+          "finding_id": "finding-c3a29a19024e89fce12f1697",
+          "raw_signal_id": "rawsig-bc5ecffb11b10b20428e790e",
+          "document_id": "413c2af721ec",
+          "source": "FDA Warning Letter",
+          "firm": "Colgate-Palmolive/Tom's of Maine, Inc.",
+          "date": "2024-11-19",
+          "quote_ko": "귀사는 설비 세척과 제품 조제에 사용되는 용수를 생산하는 (b)(4) 용수 시스템의 적격성평가를 적절히 실시하지 않았다.",
+          "quote_en": "You failed to adequately qualify your (b)(4) water system that produced water used for equipment cleaning and in formulating your product."
+        },
+        {
+          "finding_id": "finding-316d481e47a56351e885f1c8",
+          "raw_signal_id": "rawsig-5473557e8ff25f91e1256a52",
+          "document_id": "19df4539ef26",
+          "source": "FDA Warning Letter",
+          "firm": "Integrity Partners Group",
+          "date": "2026-01-20",
+          "quote_ko": "귀사는 OTC 의약품 제조 및 설비 세척에 사용하기 위한 적절한 화학적 및 미생물학적 특성을 충족하는 (b)(4) 를 생산함을 보장하도록 귀사의 (b)(4) 시스템을 적절히 적격성평가하지 않았다.",
+          "quote_en": "Your firm failed to adequately qualify your (b)(4) system to ensure it produces (b)(4) that meets appropriate chemical and microbial attributes for use in your OTC drug products manufacturing and equipment cleaning."
+        }
+      ]
+    },
+    {
+      "title_ko": "재적격성평가에 대한 품질 부서의 검토·승인이 제때 이루어지지 않았다",
+      "title_en": "Quality unit review and approval of the requalification was not completed in time",
+      "quotes": [
+        {
+          "finding_id": "finding-68d6545b98f8b2339310a2c4",
+          "raw_signal_id": "rawsig-f1afe1c26fa8ea565af8d04d",
+          "document_id": "fda483-176195",
+          "source": "FDA 483",
+          "firm": "Wedgewood Connect, LLC",
+          "date": "2024-02-12",
+          "quote_ko": "재적격성평가는 11/11/2022에 이루어졌으나 현재까지 최종 보고서는 품질 부서의 승인을 받지 못했다.",
+          "quote_en": "Although the requalification occurred 11/11/2022, to date, the final report has not been approved by the quality unit."
+        },
+        {
+          "finding_id": "finding-645ac7e135600947fca33966",
+          "raw_signal_id": "rawsig-36518798e20ac2869cb99db9",
+          "document_id": "fda483-195558",
+          "source": "FDA 483",
+          "firm": "Merck Teknika LLC",
+          "date": "2026-10-27",
+          "quote_ko": "품질 검토 절차의 지연으로 적격성평가에 부적합한 상태의 설비가 사용되었다.",
+          "quote_en": "The delay in Quality review process led to utilize the equipment in its failed requalified state"
+        }
+      ]
+    },
+    {
+      "title_ko": "설비가 적격성평가되었음을 보여 주는 문서가 없었다",
+      "title_en": "There was no documentation showing that equipment had been qualified",
+      "quotes": [
+        {
+          "finding_id": "finding-8fdb8bb4730a5240400bc7c8",
+          "raw_signal_id": "rawsig-047f82124647c0f198ce5ca0",
+          "document_id": "7c35aa9e0757",
+          "source": "FDA Warning Letter",
+          "firm": "Diora Kimya Sanayi ve Ticaret Limited Sirketi",
+          "date": "2024-10-22",
+          "quote_ko": "또한 귀사는 의약품 제조에 사용한 설비가 적격성평가(qualification)를 거쳤으며 의도된 용도에 적합하다는 문서가 없었다.",
+          "quote_en": "Additionally, you lacked documentation that the equipment used to manufacture your drug product was qualified and suitable for its intended use."
+        },
+        {
+          "finding_id": "finding-20d1c76d77ee9579ef4db14d",
+          "raw_signal_id": "rawsig-c7f09182b8bcc2477583e770",
+          "document_id": "fda483-195277",
+          "source": "FDA 483",
+          "firm": "Tropical Seas, Inc.",
+          "date": "2026-10-20",
+          "quote_ko": "귀사는 완제의약품 제조, 가공, 포장 또는 보관에 사용하는 장비가 적절히 설계, 적격성평가 및 관리된다는 문서를 제공할 수 없다.",
+          "quote_en": "You cannot provide documentation to indicate that equipment used to manufacture, process, package or hold drug product are appropriately designed, qualified and controlled."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.100(a)",
+      "finding_id": "finding-8fdb8bb4730a5240400bc7c8",
+      "firm": "Diora Kimya Sanayi ve Ticaret Limited Sirketi",
+      "date": "2024-10-22",
+      "quote_ko": "귀사는 의약품이 표방하거나 표시된 확인(identity), 함량(strength), 품질 및 순도를 갖추도록 보장하기 위한 생산 및 공정 관리의 서면 절차를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess",
+      "note_ko": "제조 설비가 적격성평가되었다는 문서가 없다는 점이 이 조항으로 지적됐습니다.",
+      "note_en": "The firm was cited under this section for lacking documentation that its manufacturing equipment was qualified."
+    }
+  ],
+  "checks_ko": [
+    "핵심 제조 설비 가운데 적격성평가를 하지 않은 것이 있습니까?",
+    "공정 밸리데이션에 사용한 생산 설비는 그 전에 적격성평가를 마쳤습니까?",
+    "사용 지점 추가, 탱크 교체, 설비 이전 같은 변경 뒤에 재적격성평가를 했습니까?",
+    "제조와 설비 세척에 쓰는 용수를 만드는 시스템은 적격성평가되어 있습니까?",
+    "재적격성평가의 최종 보고서를 품질 부서가 승인했고, 그 검토가 설비 사용 전에 끝납니까?",
+    "설비가 적격성평가되었고 의도된 용도에 적합하다는 문서를 바로 제시할 수 있습니까?"
+  ],
+  "checks_en": [
+    "Is any critical manufacturing equipment in use without having been qualified?",
+    "Was the production equipment used in process validation qualified beforehand?",
+    "Was requalification performed after changes such as adding a point of use, replacing a tank or relocating equipment?",
+    "Is the system that produces water for manufacturing and equipment cleaning qualified?",
+    "Has the quality unit approved the final requalification report, and is that review completed before the equipment is used?",
+    "Can you readily show documentation that equipment is qualified and suitable for its intended use?"
+  ],
+  "further_reading": [],
+  "related": [
+    "calibration-maintenance",
+    "process-validation",
+    "cleanroom",
+    "sterilization"
+  ]
+}

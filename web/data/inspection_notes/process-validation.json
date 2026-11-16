@@ -1,0 +1,192 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "process-validation",
+  "as_of": "2026-11-16",
+  "area_ko": "공급·제조·포장",
+  "area_en": "Supply, manufacturing and packaging",
+  "title_ko": "공정 밸리데이션",
+  "title_en": "Process validation",
+  "glossary_ids": [
+    "process-validation"
+  ],
+  "aliases_ko": [
+    "공정밸리데이션",
+    "공정 성능 적격성평가(PPQ)",
+    "공정 검증"
+  ],
+  "aliases_en": [
+    "process validation",
+    "process performance qualification",
+    "PPQ"
+  ],
+  "search_q_ko": "공정 밸리데이션",
+  "search_q_en": "process validation",
+  "lead_ko": "FDA 는 공정 밸리데이션 문서가 있는지보다, 지금 제조하는 제품과 공정 조건이 그 밸리데이션으로 뒷받침되는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a process validation document exists than at whether the products and process conditions in use today are supported by that validation. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "제조하는 제품의 공정 밸리데이션을 수행하지 않았다",
+      "title_en": "Process validation was not performed for products being manufactured",
+      "quotes": [
+        {
+          "finding_id": "finding-e25f746c4846712af9fb802a",
+          "raw_signal_id": "rawsig-6a4f10dc7e99e08372213afa",
+          "document_id": "20b61b36580f",
+          "source": "FDA Warning Letter",
+          "firm": "Dabur India Limited",
+          "date": "2026-08-04",
+          "quote_ko": "실사 중 귀사는 Unit (b)(4) 라인에서 제조하는 (b)(4) 의약품 중 (b)(4)에 대해 공정 밸리데이션을 수행하지 않았다고 진술했다.",
+          "quote_en": "During the inspection, you stated that you had not performed process validation for (b)(4) of the (b)(4) drug products you manufacture on Unit (b)(4) lines."
+        },
+        {
+          "finding_id": "finding-7f45ef748a107f94965c521e",
+          "raw_signal_id": "rawsig-942961cb0c0e9221192ac31b",
+          "document_id": "fda483-193545",
+          "source": "FDA 483",
+          "firm": "Eosera, Inc.",
+          "date": "2026-07-10",
+          "quote_ko": "구체적으로, 귀사는 제조 공정이 관리 상태에 있음을 보장하기 위한 신제품의 적절한 공정 밸리데이션을 수행하지 않았다.",
+          "quote_en": "Specifically, your firm failed to perform an adequate process validation for new products to ensure that the manufacturing process is in a state of control."
+        }
+      ]
+    },
+    {
+      "title_ko": "밸리데이션에서 중요 공정 변수를 적절히 정하지 않았다",
+      "title_en": "Critical process parameters were not adequately established in the validation",
+      "quotes": [
+        {
+          "finding_id": "finding-d03592374ac3eede15bf398d",
+          "raw_signal_id": "rawsig-71cb034c1c4bce694af41548",
+          "document_id": "120b754ae81a",
+          "source": "FDA Warning Letter",
+          "firm": "BEO Pharma Inc. dba BEO Pharmaceuticals Inc.",
+          "date": "2025-04-29",
+          "quote_ko": "실사 중 제공된 공정 밸리데이션 보고서에는 사용 설비의 완전한 목록, 적절한 중요 공정 변수의 설정, 적절한 샘플링 지시, 판정 기준 같은 충분한 세부 내용이 없었다.",
+          "quote_en": "The process validation reports provided during the inspection lacked sufficient detail, such as a complete list of the equipment used, the establishment of appropriate critical process parameters, adequate sampling instructions, and acceptance criteria."
+        },
+        {
+          "finding_id": "finding-6ab725a6a4a78d99a212cbe7",
+          "raw_signal_id": "rawsig-7f11509f750dd625f058c337",
+          "document_id": "fda483-195329",
+          "source": "FDA 483",
+          "firm": "VitaCare Labs Inc.",
+          "date": "2026-10-23",
+          "quote_ko": "밸리데이션 프로그램은 중요 공정 매개변수와 중요 품질 특성을 적절히 정의하지 않았다.",
+          "quote_en": "The validation program has not adequately defined critical process parameters and critical quality attributes."
+        }
+      ]
+    },
+    {
+      "title_ko": "공정이나 배치 크기를 바꾼 뒤 다시 밸리데이션하지 않았다",
+      "title_en": "The process was not validated again after a process or batch size change",
+      "quotes": [
+        {
+          "finding_id": "finding-fd609fd03948cb2ecdee0190",
+          "raw_signal_id": "rawsig-74077157d34f0437ceda8abd",
+          "document_id": "87beb6242ff0",
+          "source": "FDA Warning Letter",
+          "firm": "Bentley Laboratories LLC",
+          "date": "2026-09-29",
+          "quote_ko": "귀사는 주요 공정 변경 후 제조공정을 재밸리데이션하지 않았고, 밸리데이션 프로토콜을 모든 배치 완료까지 완전히 실행하지도 않았다.",
+          "quote_en": "You did not revalidate your manufacturing processes after making major process changes, nor did you fully execute validation protocols through the completion of all batches."
+        },
+        {
+          "finding_id": "finding-070638623beb1f9abfb83082",
+          "raw_signal_id": "rawsig-fd2d598d84340fa9ec38597b",
+          "document_id": "2837bf070b64",
+          "source": "FDA Warning Letter",
+          "firm": "Advanced Pharmaceutical Technology",
+          "date": "2025-03-18",
+          "quote_ko": "예를 들어 귀사는 상업 생산 배치 크기를 늘리고도 적절한 밸리데이션 없이 의약품을 출하 승인했다.",
+          "quote_en": "For example, you increased the commercial production batch size and released drug product without appropriate validation."
+        }
+      ]
+    },
+    {
+      "title_ko": "보관 시간이 품질에 영향을 주지 않는다는 것을 입증하지 않았다",
+      "title_en": "Hold times were not shown to have no effect on quality",
+      "quotes": [
+        {
+          "finding_id": "finding-6154c63aeb6fdb2b51cfb348",
+          "raw_signal_id": "rawsig-ddbfb75d1d1ba70fb49aadca",
+          "document_id": "b3ad811b4500",
+          "source": "FDA Warning Letter",
+          "firm": "Laboratoire Druide Inc.",
+          "date": "2025-06-10",
+          "quote_ko": "귀사에는 보관 시간이 벌크 제형의 바이오버든을 포함하여 의약품의 품질에 악영향을 미치지 않는다는 것을 입증하는 데이터가 없었다.",
+          "quote_en": "You had no data to demonstrate that your hold time did not adversely affect the quality of your drugs, including bioburden of the bulk formulation."
+        },
+        {
+          "finding_id": "finding-73fa2e8a3313a12d0a510a5a",
+          "raw_signal_id": "rawsig-eb12826e8500b180c12f42db",
+          "document_id": "fda483-194819",
+          "source": "FDA 483",
+          "firm": "PQ Pharmacy LLC",
+          "date": "2026-09-22",
+          "quote_ko": "귀사는 공정 중 USP 등급 벌크 의약품을 설정된 [redacted]일 기간 동안 효과적으로 보관할 수 있음을 입증하기 위한 보관 시간 공정을 적절히 밸리데이션하지 않았다.",
+          "quote_en": "You have not adequately validated your hold time process to demonstrate you can effectively store in-process USP grade bulk drug products for the established [redacted] day time period."
+        }
+      ]
+    },
+    {
+      "title_ko": "밸리데이션에서 부적합이 나왔는데도 밸리데이션을 다시 하지 않았다",
+      "title_en": "Validation was not repeated after failing results in the validation",
+      "quotes": [
+        {
+          "finding_id": "finding-6a07651d6fbd3a90af507c8b",
+          "raw_signal_id": "rawsig-21900c073a5a4751e5d0ec52",
+          "document_id": "35353a2fe081",
+          "source": "FDA Warning Letter",
+          "firm": "Right Value Drug Stores, LLC dba Carie Boyd Pharmaceuticals",
+          "date": "2025-03-11",
+          "quote_ko": "귀사는 조사 IR-2023-036(2023년 9월 6일자)을 개시했으며 헹굼 시간을 늘리고 공정 밸리데이션을 반복해야 한다고 결론 내렸다. 귀사의 회신과 제출된 문서로 볼 때 공정 밸리데이션은 반복되지 않은 것으로 보인다.",
+          "quote_en": "Your firm launched an investigation, IR-2023-036 (dated 09/06/2023) and it was concluded that the rinsing time needed to be increased and the process validation was to be repeated. It appears from your response and the documents provided, the process validation was never repeated."
+        },
+        {
+          "finding_id": "finding-9df1d17b5b1d8cd1331d36d8",
+          "raw_signal_id": "rawsig-008ea5837ede314e592ad24f",
+          "document_id": "fda483-195298",
+          "source": "FDA 483",
+          "firm": "The Mentholatum Company",
+          "date": "2026-10-22",
+          "quote_ko": "공정이 규격에 맞지 않는 이유 조사, 공정 변경 또는 성공 배치로 밸리데이션 반복 없이 부적합 밸리데이션 배치 수용을 위해 규격을 변경했다.",
+          "quote_en": "Your firm changed specifications to accommodate the failing process validation batch without investigating why the process cannot meet specifications, modifying the process, or repeating validation with successful batches."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.100(a)",
+      "finding_id": "finding-fd609fd03948cb2ecdee0190",
+      "firm": "Bentley Laboratories LLC",
+      "date": "2026-09-29",
+      "quote_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 동일성, 함량, 품질, 순도를 갖도록 보장하기 위해 설계된 생산 및 공정 관리에 대한 적절한 문서화된 절차를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess",
+      "note_ko": "주요 공정 변경 뒤 재밸리데이션하지 않고 밸리데이션 프로토콜을 끝까지 실행하지 않은 것이 이 조항으로 지적됐습니다.",
+      "note_en": "Not revalidating after major process changes and not fully executing validation protocols were cited under this section."
+    }
+  ],
+  "checks_ko": [
+    "제조하는 모든 제품과 라인에 공정 밸리데이션이 있습니까? 신제품은 밸리데이션을 마쳤습니까?",
+    "밸리데이션 보고서에 사용 설비 목록, 중요 공정 변수, 샘플링 지시, 판정 기준이 적혀 있습니까?",
+    "중요 공정 변수와 중요 품질 특성을 밸리데이션 프로그램에서 정해 두었습니까?",
+    "주요 공정 변경이나 배치 크기 변경 뒤 재밸리데이션했습니까? 프로토콜의 모든 배치를 끝까지 실행했습니까?",
+    "벌크와 공정 중 제품의 보관 시간이 품질에 영향을 주지 않는다는 데이터가 있습니까?",
+    "밸리데이션 배치가 부적합이면 원인을 조사하고 밸리데이션을 다시 했습니까? 규격을 바꿔 받아들이지는 않았습니까?"
+  ],
+  "checks_en": [
+    "Is there a process validation for every product and line you manufacture? Has validation been completed for new products?",
+    "Do validation reports state the equipment used, critical process parameters, sampling instructions and acceptance criteria?",
+    "Are critical process parameters and critical quality attributes defined in the validation program?",
+    "Did you revalidate after major process changes or batch size changes? Were all protocol batches fully executed?",
+    "Do you have data showing that hold times for bulk and in-process product do not affect quality?",
+    "When a validation batch failed, did you investigate the cause and repeat validation? Were specifications changed to accept it?"
+  ],
+  "further_reading": [],
+  "related": [
+    "change-control",
+    "batch-records",
+    "cross-contamination-cleaning"
+  ]
+}

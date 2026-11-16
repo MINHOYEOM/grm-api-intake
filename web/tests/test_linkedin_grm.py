@@ -139,13 +139,22 @@ class DeckTest(unittest.TestCase):
                          ["지적 내용", "회신 평가", "시정 요구", "유사 사례", "DB 연관", "서한에 없는 것"])
 
     def test_caption_paragraph_order_and_no_hashtag(self):
-        paras = self.deck["caption"].strip().split("\n\n")
-        self.assertEqual(len(paras), 7)
-        self.assertTrue(paras[1].startswith("지적은"))
-        self.assertTrue(paras[4].startswith("우리 지적사항 DB"))
-        self.assertTrue(paras[5].startswith("서한에 없는 것"))
-        self.assertTrue(paras[6].startswith("전체 해설"))
-        self.assertNotIn("#", "\n".join(paras[:6]))
+        # 2026-11-16 배치 개편: 첫 단락(사건)은 소제목 없이, 이후 ■ 소제목 단락. 한 줄에 한 문장.
+        cap = self.deck["caption"]
+        heads = [ln[2:] for ln in cap.splitlines() if ln.startswith("■ ")]
+        self.assertEqual(heads, ["지적 내용", "회사 회신과 FDA 판단", "FDA 요구", "GRM 지적사항 DB의 비슷한 사례",
+                                 "관련 용어", "서한에 없는 것", "전체 해설"][:len(heads)] if "■ 관련 용어" in cap else
+                         ["지적 내용", "회사 회신과 FDA 판단", "FDA 요구", "GRM 지적사항 DB의 비슷한 사례", "서한에 없는 것", "전체 해설"])
+        self.assertFalse(cap.startswith("■"))
+        self.assertTrue(cap.split("■ 지적 내용\n", 1)[1].startswith("지적은"))
+        self.assertNotIn("#", cap.split("■ 전체 해설")[0])
+
+    def test_caption_urls_on_their_own_lines(self):
+        # 2026-11-16 대표 지적: 링크가 잘 안 걸린다 — 주소는 문장·괄호와 섞지 않고 자기 줄에 둔다.
+        import re
+        for ln in self.deck["caption"].splitlines():
+            if "grm-solutions.com" in ln:
+                self.assertRegex(ln, r"^https://grm-solutions\.com/\S+$")
 
     def test_every_site_url_in_caption_carries_utm(self):
         # 2026-11-04 — 글자만 적힌 주소도 스킴+표식(linkedin/social/{pub}_weekly) 이 붙는다.

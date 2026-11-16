@@ -236,12 +236,30 @@ class InspectionNoteViewTest(unittest.TestCase):
     def test_index_groups_by_area_with_first_sentence(self):
         a = make_note("a-topic", title_ko="나", area_ko="시험실")
         b = make_note("b-topic", title_ko="가", area_ko="시험실")
-        c = make_note("c-topic", area_ko="무균")
+        c = make_note("c-topic", area_ko="무균·오염 관리")
         groups = inp.index_view([a, b, c], "ko")
-        self.assertEqual([g["area"] for g in groups], ["무균", "시험실"])
+        self.assertEqual([g["area"] for g in groups], ["무균·오염 관리", "시험실"])
         self.assertEqual([n["title"] for n in groups[1]["notes"]], ["가", "나"])
         self.assertEqual(groups[0]["notes"][0]["summary"], "FDA 는 절차가 지켜졌는지를 봅니다.")
         self.assertEqual(groups[0]["notes"][0]["path"], "inspection-notes/c-topic/")
+
+    def test_index_area_order_is_fixed_and_same_in_ko_and_en(self):
+        # 분야 순서는 AREA_ORDER 한 곳 — 한·영이 같은 순서로 나온다(글자순 아님).
+        want_ko = ["무균·오염 관리", "시험실", "데이터와 기록", "품질시스템", "공급·제조·포장"]
+        want_en = ["Sterility and contamination control", "Laboratory", "Data and records",
+                   "Quality system", "Supply, manufacturing and packaging"]
+        self.assertEqual([ko for ko, _ in inp.AREA_ORDER], want_ko)
+        self.assertEqual([en for _, en in inp.AREA_ORDER], want_en)
+        notes = inp.load_notes()
+        self.assertEqual([g["area"] for g in inp.index_view(notes, "ko")], want_ko)
+        self.assertEqual([g["area"] for g in inp.index_view(notes, "en")], want_en)
+        # 목록에 없는 분야는 맨 끝에 이름순으로 붙는다(빌드는 깨지지 않는다).
+        extra = [make_note(f"x{i}-topic", area_ko=ko, area_en=en)
+                 for i, (ko, en) in enumerate([("하 새 분야", "Zeta area"), ("가 새 분야", "Alpha area")])]
+        self.assertEqual([g["area"] for g in inp.index_view(notes + extra, "ko")],
+                         want_ko + ["가 새 분야", "하 새 분야"])
+        self.assertEqual([g["area"] for g in inp.index_view(notes + extra, "en")],
+                         want_en + ["Alpha area", "Zeta area"])
 
     def test_glossary_links_by_term(self):
         links = inp.glossary_links([make_note()], "en")

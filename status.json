@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T14:03:32Z",
+ "generated_at": "2026-11-16T14:30:07Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43881797106,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-16T14:03:23Z",
-    "updatedAt": "2026-11-16T14:03:27Z",
-    "headBranch": "feat/linkedin-anatomy-multi",
-    "displayTitle": "feat(linkedin): 해부판 한 호 2편(a1 수요일·a2 금요일) — 기록 요청형 서한 제외",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43881797106"
-   },
-   {
-    "databaseId": 43880587909,
+    "databaseId": 43885068692,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-16T13:56:06Z",
-    "updatedAt": "2026-11-16T14:02:57Z",
-    "headBranch": "feat/linkedin-anatomy-en",
-    "displayTitle": "feat(linkedin): 해부 7장 영문판 — FDA 영문 원문 근거·한글 0자·/en/ 본문, 11-16 호 영문 슬롯",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43880587909"
+    "createdAt": "2026-11-16T14:22:38Z",
+    "updatedAt": "2026-11-16T14:29:51Z",
+    "headBranch": "main",
+    "displayTitle": "fix(linkedin): 이번 주 용어 카드에 빈 문서 아이콘 대신 그림 있는 용어 우선 (#1795)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43885068692"
    },
    {
-    "databaseId": 43880544891,
+    "databaseId": 43882354245,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-16T13:55:51Z",
-    "updatedAt": "2026-11-16T14:02:00Z",
-    "headBranch": "fix/linkedin-terms-no-blank-figure",
-    "displayTitle": "fix(linkedin): 이번 주 용어 카드 — 그림 있는 용어 우선·빈 문서 아이콘 제거",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43880544891"
+    "createdAt": "2026-11-16T14:06:46Z",
+    "updatedAt": "2026-11-16T14:12:46Z",
+    "headBranch": "feat/linkedin-anatomy-multi",
+    "displayTitle": "feat(linkedin): 해부판 한 호 2편(a1 수요일·a2 금요일) — 기록 요청형 서한 제외",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43882354245"
    },
    {
-    "databaseId": 43880524134,
+    "databaseId": 43882343053,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-16T13:55:43Z",
-    "updatedAt": "2026-11-16T14:02:03Z",
-    "headBranch": "fix/linkedin-terms-no-blank-figure",
-    "displayTitle": "fix(linkedin): 이번 주 용어 카드에 빈 문서 아이콘 대신 그림 있는 용어 우선",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43880524134"
+    "createdAt": "2026-11-16T14:06:42Z",
+    "updatedAt": "2026-11-16T14:14:01Z",
+    "headBranch": "feat/linkedin-anatomy-multi",
+    "displayTitle": "Merge branch 'feat/linkedin-anatomy-en' into feat/linkedin-anatomy-multi",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43882343053"
    },
    {
-    "databaseId": 43880432102,
+    "databaseId": 43882208304,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-16T14:05:52Z",
+    "updatedAt": "2026-11-16T14:12:47Z",
+    "headBranch": "feat/linkedin-anatomy-en",
+    "displayTitle": "feat(linkedin): 해부 7장 영문판 — FDA 영문 원문 근거·한글 0자·/en/ 본문 (11-16 영문 포함)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43882208304"
+   },
+   {
+    "databaseId": 43882198197,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-16T13:55:11Z",
-    "updatedAt": "2026-11-16T14:03:17Z",
-    "headBranch": "main",
-    "displayTitle": "fix(linkedin): 해부 본문 배치 — ■ 소제목 단락·한 줄 한 문장·주소는 자기 줄 (#1794)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43880432102"
+    "createdAt": "2026-11-16T14:05:49Z",
+    "updatedAt": "2026-11-16T14:12:46Z",
+    "headBranch": "feat/linkedin-anatomy-en",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into feat/linkedin-anatomy-en",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43882198197"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 43886338950,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-16T14:29:55Z",
+    "updatedAt": "2026-11-16T14:29:57Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43886338950"
+   },
+   {
     "databaseId": 43881790953,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43864830395"
-   },
-   {
-    "databaseId": 43864428978,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-16T12:12:15Z",
-    "updatedAt": "2026-11-16T12:12:57Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43864428978"
    }
   ],
   "grm-findings-translate-apply.yml": [

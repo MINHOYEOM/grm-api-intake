@@ -2,8 +2,8 @@
  "schema": "grm-clause-translation-queue/v1",
  "as_of": "2026-11-16",
  "target_lang": "ko",
- "total": 1155,
- "total_chars": 855959,
+ "total": 1230,
+ "total_chars": 1010078,
  "items": [
   {
    "id": "cfr21/210/210-1",
@@ -1130,6 +1130,531 @@
    "code": "21 CFR 610.68",
    "chars": 3419,
    "sha": "0decfbedd635f471",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-1",
+   "code": "21 CFR 212.1",
+   "chars": 5716,
+   "sha": "b7824a5998997f42",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-2",
+   "code": "21 CFR 212.2",
+   "chars": 485,
+   "sha": "2f84f7170ca57db3",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-5",
+   "code": "21 CFR 212.5",
+   "chars": 1794,
+   "sha": "ddf69ad07b0a0c6a",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-10",
+   "code": "21 CFR 212.10",
+   "chars": 273,
+   "sha": "3e5d5afb8e8bef8d",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-20",
+   "code": "21 CFR 212.20",
+   "chars": 1438,
+   "sha": "db1e9859819a4457",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-30",
+   "code": "21 CFR 212.30",
+   "chars": 1058,
+   "sha": "87d59d171544b3d7",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-40",
+   "code": "21 CFR 212.40",
+   "chars": 3553,
+   "sha": "cf5969d127f93877",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-50",
+   "code": "21 CFR 212.50",
+   "chars": 4425,
+   "sha": "4c778ed3fcb5cd95",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-60",
+   "code": "21 CFR 212.60",
+   "chars": 2354,
+   "sha": "18a017462fa69532",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-61",
+   "code": "21 CFR 212.61",
+   "chars": 605,
+   "sha": "e95db9544c640daa",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-70",
+   "code": "21 CFR 212.70",
+   "chars": 4476,
+   "sha": "c11054373d85af03",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-71",
+   "code": "21 CFR 212.71",
+   "chars": 1242,
+   "sha": "9b51e5cf2983cc4d",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-80",
+   "code": "21 CFR 212.80",
+   "chars": 570,
+   "sha": "7eb5e47e7f4fdefd",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-90",
+   "code": "21 CFR 212.90",
+   "chars": 783,
+   "sha": "d22dece56e81d160",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-100",
+   "code": "21 CFR 212.100",
+   "chars": 1088,
+   "sha": "6be705cfb96b2441",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/212/212-110",
+   "code": "21 CFR 212.110",
+   "chars": 688,
+   "sha": "db8981603b517647",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-1",
+   "code": "21 CFR 1271.1",
+   "chars": 1752,
+   "sha": "e79b6a06e3972c20",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-3",
+   "code": "21 CFR 1271.3",
+   "chars": 12921,
+   "sha": "ef746da3c3b61bb7",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-10",
+   "code": "21 CFR 1271.10",
+   "chars": 1424,
+   "sha": "0acfb95258b114e6",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-15",
+   "code": "21 CFR 1271.15",
+   "chars": 1506,
+   "sha": "78bb0a96d8fbc9ed",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-20",
+   "code": "21 CFR 1271.20",
+   "chars": 565,
+   "sha": "6ed9f1a31bd190c5",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-21",
+   "code": "21 CFR 1271.21",
+   "chars": 826,
+   "sha": "759287d0d63810d7",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-22",
+   "code": "21 CFR 1271.22",
+   "chars": 709,
+   "sha": "5fe1ee41a31ce77a",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-23",
+   "code": "21 CFR 1271.23",
+   "chars": 1085,
+   "sha": "29e45e2b0f1d48bd",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-25",
+   "code": "21 CFR 1271.25",
+   "chars": 3765,
+   "sha": "fb7231b61895afea",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-26",
+   "code": "21 CFR 1271.26",
+   "chars": 247,
+   "sha": "32103335d830a21a",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-27",
+   "code": "21 CFR 1271.27",
+   "chars": 305,
+   "sha": "74d261d431f64e85",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-37",
+   "code": "21 CFR 1271.37",
+   "chars": 1186,
+   "sha": "54ad40a3d05c58a4",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-45",
+   "code": "21 CFR 1271.45",
+   "chars": 1170,
+   "sha": "4766becaaac6a970",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-47",
+   "code": "21 CFR 1271.47",
+   "chars": 1534,
+   "sha": "66aeecc74ab7bd08",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-50",
+   "code": "21 CFR 1271.50",
+   "chars": 992,
+   "sha": "77c5ad45f981e070",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-55",
+   "code": "21 CFR 1271.55",
+   "chars": 3277,
+   "sha": "2fa5f4a7681e1258",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-60",
+   "code": "21 CFR 1271.60",
+   "chars": 2580,
+   "sha": "682cfbd39d4b2e02",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-65",
+   "code": "21 CFR 1271.65",
+   "chars": 2011,
+   "sha": "6b8f253ac11706a3",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-75",
+   "code": "21 CFR 1271.75",
+   "chars": 2998,
+   "sha": "08c2af9eb87189df",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-80",
+   "code": "21 CFR 1271.80",
+   "chars": 4275,
+   "sha": "1e1ae63cad1a0d92",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-85",
+   "code": "21 CFR 1271.85",
+   "chars": 2982,
+   "sha": "0673a88b223ba441",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-90",
+   "code": "21 CFR 1271.90",
+   "chars": 3487,
+   "sha": "b14141647299cc4c",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-145",
+   "code": "21 CFR 1271.145",
+   "chars": 207,
+   "sha": "b0728ac47389fc3d",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-150",
+   "code": "21 CFR 1271.150",
+   "chars": 5615,
+   "sha": "2b29c798e24835d5",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-155",
+   "code": "21 CFR 1271.155",
+   "chars": 2516,
+   "sha": "d394b456de2ecdf9",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-160",
+   "code": "21 CFR 1271.160",
+   "chars": 4120,
+   "sha": "2f18de3a41b07e35",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-170",
+   "code": "21 CFR 1271.170",
+   "chars": 501,
+   "sha": "4f97b4f2942ed057",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-180",
+   "code": "21 CFR 1271.180",
+   "chars": 860,
+   "sha": "632f30fbd0af1309",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-190",
+   "code": "21 CFR 1271.190",
+   "chars": 1763,
+   "sha": "b6b46403b0f9566a",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-195",
+   "code": "21 CFR 1271.195",
+   "chars": 1375,
+   "sha": "3c7d12c0d36b94de",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-200",
+   "code": "21 CFR 1271.200",
+   "chars": 1964,
+   "sha": "1076f555c8267196",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-210",
+   "code": "21 CFR 1271.210",
+   "chars": 1079,
+   "sha": "83cc9d151aac3353",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-215",
+   "code": "21 CFR 1271.215",
+   "chars": 290,
+   "sha": "ec2f80644744e9d8",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-220",
+   "code": "21 CFR 1271.220",
+   "chars": 1306,
+   "sha": "298af0688a53d170",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-225",
+   "code": "21 CFR 1271.225",
+   "chars": 369,
+   "sha": "401055e584227063",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-230",
+   "code": "21 CFR 1271.230",
+   "chars": 873,
+   "sha": "1e9e0ce363e64947",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-250",
+   "code": "21 CFR 1271.250",
+   "chars": 656,
+   "sha": "bab2efe6fd351b5a",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-260",
+   "code": "21 CFR 1271.260",
+   "chars": 1051,
+   "sha": "908c3157d288da14",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-265",
+   "code": "21 CFR 1271.265",
+   "chars": 2847,
+   "sha": "ea4bf76cb5a9c85f",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-270",
+   "code": "21 CFR 1271.270",
+   "chars": 2535,
+   "sha": "5b2f8af9c15adbe6",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-290",
+   "code": "21 CFR 1271.290",
+   "chars": 3194,
+   "sha": "06fb67576f4851af",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-320",
+   "code": "21 CFR 1271.320",
+   "chars": 1774,
+   "sha": "c3cae68203060e62",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-330",
+   "code": "21 CFR 1271.330",
+   "chars": 485,
+   "sha": "b28184a9a7a9fffc",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-350",
+   "code": "21 CFR 1271.350",
+   "chars": 2799,
+   "sha": "ac22e58fbabbf572",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-370",
+   "code": "21 CFR 1271.370",
+   "chars": 1103,
+   "sha": "8839d43288ef1771",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-390",
+   "code": "21 CFR 1271.390",
+   "chars": 465,
+   "sha": "9c74a36f72923ce0",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-400",
+   "code": "21 CFR 1271.400",
+   "chars": 1533,
+   "sha": "df3d8ebef59ef3eb",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-420",
+   "code": "21 CFR 1271.420",
+   "chars": 2059,
+   "sha": "ae851c417bc1961a",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/1271/1271-440",
+   "code": "21 CFR 1271.440",
+   "chars": 4251,
+   "sha": "70033a2fe6b92552",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-1",
+   "code": "21 CFR 4.1",
+   "chars": 461,
+   "sha": "61974c879ccc61c8",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-2",
+   "code": "21 CFR 4.2",
+   "chars": 3023,
+   "sha": "977836bd0ae324b3",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-3",
+   "code": "21 CFR 4.3",
+   "chars": 1172,
+   "sha": "6944ee6efe214920",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-4",
+   "code": "21 CFR 4.4",
+   "chars": 8151,
+   "sha": "ac89071bfe7e0d47",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-100",
+   "code": "21 CFR 4.100",
+   "chars": 588,
+   "sha": "7c1b95f66f257cf3",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-101",
+   "code": "21 CFR 4.101",
+   "chars": 3183,
+   "sha": "72cfa8f4620ef95d",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-102",
+   "code": "21 CFR 4.102",
+   "chars": 5283,
+   "sha": "d6b555852f4cdefe",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-103",
+   "code": "21 CFR 4.103",
+   "chars": 910,
+   "sha": "94511cf9b2028ec6",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-104",
+   "code": "21 CFR 4.104",
+   "chars": 1024,
+   "sha": "87fc4c00af90cdeb",
+   "status": "pending"
+  },
+  {
+   "id": "cfr21/4/4-105",
+   "code": "21 CFR 4.105",
+   "chars": 589,
+   "sha": "38743b48abe25a3d",
    "status": "pending"
   },
   {

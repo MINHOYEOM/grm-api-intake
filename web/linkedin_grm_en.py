@@ -348,14 +348,16 @@ def build_en_deck(brief_doc: dict, slots: dict, findings: dict, letter: str, glo
     url = f"{base_url}/en/briefs/{pub}/"
     caption_url = lc.with_utm(url, *lc.LINKEDIN_WEEKLY, lc.linkedin_weekly_campaign(pub))
     cap = en["caption"]
-    cases = site_lines_en(site)
-    similar_block = [la._norm(cap["similar"]), "", *("\n\n".join(cases).split("\n") if cases else []),
-                     "", *db_lines_en(db, topic, polite=True)]
-    while similar_block and similar_block[-1] == "":
-        similar_block.pop()
-    text = lg.caption_layout(cap["lead"], cap["claims"], cap["contrast"], cap["requests"], similar_block,
-                             [n for n, _ in terms], cap["not_stated"], caption_url, lang="en")
-    text = utm.tag_bare_site_urls(text, "linkedin_weekly", date=pub)
+    def make(rows: list[dict]) -> str:
+        cases = site_lines_en(rows)
+        similar_block = [la._norm(cap["similar"]), "", *("\n\n".join(cases).split("\n") if cases else []),
+                         "", *db_lines_en(db, topic, polite=True)]
+        while similar_block and similar_block[-1] == "":
+            similar_block.pop()
+        t = lg.caption_layout(cap["lead"], cap["claims"], cap["contrast"], cap["requests"], similar_block,
+                              [n for n, _ in terms], cap["not_stated"], caption_url, lang="en")
+        return utm.tag_bare_site_urls(t, "linkedin_weekly", date=pub)
+    text = lg.fit_caption(make, site)
     deck = {"pub": pub, "lang": "en", "slides": slides, "caption": text, "doc_title": f"GRM warning letter analysis · {pub}",
             "url": url, "caption_url": caption_url, "card_id": str(card.get("id")), "mode": "grm"}
     html_ = lg.render_html(deck, font_links=False)

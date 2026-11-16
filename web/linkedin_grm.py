@@ -661,6 +661,35 @@ def caption_layout(lead: str, claims: str, contrast: str, requests: str, similar
     return _url_own_line("\n\n".join(x for x in parts if x)) + "\n"
 
 
+# 링크드인 게시물 글자 한도는 3,000자 — 넘으면 게시 버튼이 막힌다(2026-11-16 영문 3,699자). 주소는 utm 까지 센다. 여유를 두고 2,900.
+CAPTION_MAX = 2900
+SHORT_FACT = 80
+
+
+def _short_fact(text: str, limit: int = SHORT_FACT) -> str:
+    t = la._norm(text).rstrip("…")
+    if len(t) <= limit:
+        return t
+    cut = t[:limit].rsplit(" ", 1)[0]
+    return re.sub(r"\s*\([^)]*$", "", cut).rstrip(" ,;·") + "…"
+
+
+def fit_caption(make, site: list[dict], limit: int = CAPTION_MAX) -> str:
+    """본문을 상한 안에 넣는다 — 정해진 순서로만 줄인다: ① 유사 사례를 뒤에서부터 빼되 2건까지 ② 남은 사례 인용을 80자로
+    ③ 사례를 1건·0건까지. 그래도 넘으면 슬롯 문장이 긴 것이다 — 거부(AnatomyError)하고 슬롯을 고치게 한다."""
+    tries: list[list[dict]] = [site[:n] for n in range(len(site), 1, -1)]
+    short = [dict(r, fact=_short_fact(r.get("fact") or "")) for r in site]
+    tries += [short[:n] for n in range(min(len(site), 2), -1, -1)]
+    if not site:
+        tries = [[]]
+    last = ""
+    for rows in tries:
+        last = make(rows)
+        if len(last) <= limit:
+            return last
+    raise la.AnatomyError([f"본문 {len(last)}자 — 유사 사례를 다 빼도 링크드인 상한 {limit}자를 넘는다. 슬롯 caption 문장을 줄여라"])
+
+
 def _load_glossary() -> list[dict]:
     try:
         return json.loads((WEB_DIR / "data" / "glossary.json").read_text(encoding="utf-8"))
@@ -721,15 +750,17 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     url = f"{base_url}/briefs/{pub}/"
     cap = slots["caption"]
     caption_url = lc.with_utm(url, *lc.LINKEDIN_WEEKLY, lc.linkedin_weekly_campaign(pub))
-    cases = site_lines(site) if site else case_lines(db, polite=True, no_match_note=ctx["no_match_note"])
-    similar_block = [la._norm(cap["similar"]), "", *("\n\n".join(cases).split("\n") if cases else []),
-                     "", *[x for x in [ctx["method"], *db_lines(db, polite=True), ctx["map_note"]] if x]]
-    while similar_block and similar_block[-1] == "":
-        similar_block.pop()
-    ko = caption_layout(cap["lead"], cap["claims"], cap["contrast"], cap["requests"], similar_block,
-                        [n for n, _ in terms], cap["not_stated"], caption_url)
-    # 캡션 본문 속 글자 주소(`grm-solutions.com/...`)에도 같은 표식 — 링크드인이 링크로 걸어 주지만 표식이 없어 '직접'에 섞였다.
-    ko = utm.tag_bare_site_urls(ko, "linkedin_weekly", date=pub)
+    def make(rows: list[dict]) -> str:
+        cases = site_lines(rows) if site else case_lines(db, polite=True, no_match_note=ctx["no_match_note"])
+        similar_block = [la._norm(cap["similar"]), "", *("\n\n".join(cases).split("\n") if cases else []),
+                         "", *[x for x in [ctx["method"], *db_lines(db, polite=True), ctx["map_note"]] if x]]
+        while similar_block and similar_block[-1] == "":
+            similar_block.pop()
+        text = caption_layout(cap["lead"], cap["claims"], cap["contrast"], cap["requests"], similar_block,
+                              [n for n, _ in terms], cap["not_stated"], caption_url)
+        # 캡션 본문 속 글자 주소(`grm-solutions.com/...`)에도 같은 표식 — 링크드인이 링크로 걸어 주지만 표식이 없어 '직접'에 섞였다.
+        return utm.tag_bare_site_urls(text, "linkedin_weekly", date=pub)
+    ko = fit_caption(make, site)
     return {"pub": pub, "lang": "ko", "slides": slides, "caption": ko,
             "doc_title": f"GRM {m}월 {wk}주 경고서한 분석(GRM 판)", "url": url, "caption_url": caption_url,
             "card_id": str(card.get("id")), "mode": "grm"}
@@ -1051,6 +1082,16 @@ def main(argv: list[str] | None = None) -> int:
             if card and slots.get("en"):
                 import linkedin_grm_en as lge
                 probs += lge.validate_en(card, slots, findings, lge.load_letter_at(sidecar(sp, "letter_en.txt")))
+            if not probs:  # 본문 글자 상한(링크드인 3,000자)은 덱을 조립해 봐야 안다 — 줄일 수 있는 만큼 줄인 뒤의 길이를 본다
+                sim = load_similar(slots, pub, url="", key="", snap=sidecar(sp, "similar.json"))
+                try:
+                    lens = [len(build_grm_deck(doc, slots, findings, similar=sim)["caption"])]
+                    if slots.get("en"):
+                        lens.append(len(lge.build_en_deck(doc, slots, findings, lge.load_letter_at(sidecar(sp, "letter_en.txt")),
+                                                          similar=sim)["caption"]))
+                    print(f"  [{tag}] 본문 글자 수(상한 {CAPTION_MAX}): {' · '.join(map(str, lens))}")
+                except la.AnatomyError as exc:
+                    probs += exc.problems
             for pr in probs:
                 print(f"  - [{tag}] {pr}")
             print(f"linkedin_grm --check: {pub} {tag} · 문제 {len(probs)}건")

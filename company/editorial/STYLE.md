@@ -216,3 +216,5 @@
 - 후킹 규칙은 §13 과 같다. 첫 문장은 약 75자(`LEAD_FIRST_EN`). 'FDA …'·'A firm …'으로 시작하지 않고, 숫자나 원문 인용(‘…’)을 넣는다. 첫 문장은 따옴표 **밖** 마침표로 끝낸다.
 - AI 티(영문): underscores · highlights the importance · crucial · pivotal · moreover · furthermore · notably · landscape 등(`AI_TELLS_EN`).
 - 본문 배치는 국문과 같다(첫 단락 → ■ What FDA cited / The firm's response and FDA's view / What FDA asked for / Similar cases… / Related terms / Not in the letter / Full analysis). 주소는 `/en/` 경로이고 자기 줄에 둔다.
+- **본문 글자 상한 2,900자**(링크드인 한도 3,000자, 주소는 utm 포함 전체 길이) — 국·영 공통. 넘으면 코드가 정해진 순서로 줄인다:
+  유사 사례를 뒤에서부터 빼되 2건까지 → 남은 사례 인용을 80자(낱말 경계)로 → 사례 1건·0건. 그래도 넘으면 `--check` 가 거부한다 — 슬롯 caption 문장을 줄인다.

@@ -468,6 +468,38 @@ class MultiSlotTest(unittest.TestCase):
                              (Path(td) / "linkedin_grm_en.txt").read_text(encoding="utf-8"))
 
 
+class CaptionLimitTest(unittest.TestCase):
+    """[2026-11-16] 링크드인 게시물 한도 3,000자 — 영문 3,699자로 게시 버튼이 막혔다. 상한 2,900(주소는 utm 포함 전체)."""
+
+    def test_1116_captions_fit_both_languages(self):
+        import linkedin_grm_en as lge
+        doc = json.loads(BRIEF_1116.read_text(encoding="utf-8"))
+        s = json.loads(SLOTS_1116.read_text(encoding="utf-8"))
+        f = lg.load_findings()
+        ko = lg.build_grm_deck(doc, s, f)["caption"]
+        en = lge.build_en_deck(doc, s, f, lge.load_letter("2026-11-16"))["caption"]
+        self.assertLessEqual(len(ko), lg.CAPTION_MAX)
+        self.assertLessEqual(len(en), lg.CAPTION_MAX)
+        self.assertIn("Firm A", en)  # 사례를 통째로 버리지 않고 뒤에서부터 뺀다
+
+    def test_order_drop_tail_cases_then_shorten_quotes(self):
+        site = [dict(alias=a, fact="x" * 150) for a in "ABCD"]
+        make = lambda rows: "".join(r["alias"] + r["fact"] for r in rows)  # noqa: E731
+        self.assertEqual(lg.fit_caption(make, site, limit=1000), make(site))           # 들어가면 그대로
+        self.assertEqual(lg.fit_caption(make, site, limit=460), make(site[:3]))       # ① 뒤에서부터 뺀다
+        got = lg.fit_caption(make, site, limit=200)                                    # ② 2건 + 인용 80자
+        self.assertTrue(got.startswith("A") and "B" in got and "C" not in got)
+        self.assertLessEqual(len(got), 200)
+        with self.assertRaises(la.AnatomyError):
+            lg.fit_caption(lambda rows: "y" * 300, site, limit=200)                   # 슬롯 문장이 길면 거부
+
+    def test_short_fact_cuts_on_word_boundary(self):
+        src = "Your firm failed to perform adequate smoke studies under dynamic conditions to demonstrate unidirectional airflow"
+        out = lg._short_fact(src)
+        self.assertTrue(out.endswith("…") and len(out) <= lg.SHORT_FACT + 1)
+        self.assertIn(out[:-1].split()[-1], src.split())  # 마지막 낱말이 잘리지 않았다
+
+
 class PickFactTest(unittest.TestCase):
     def test_does_not_split_inside_a_sentence_on_da(self):
         t = "귀사는 멸균 의약품 및 자재를 ISO-5 품질보다 낮은 공기에 노출시켰다. 구체적으로, 작업자의 팔이 막았다."

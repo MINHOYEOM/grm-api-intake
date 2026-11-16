@@ -36,8 +36,10 @@
   <url><loc>https://grm-solutions.com/glossary/alert-limit/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/management-review/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/oot/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/fmea/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/hepa-filter/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/supplier-qualification/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/hvac/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/process-validation/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/time-limits-on-production/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/in-process-control/</loc></url>
@@ -47,6 +49,7 @@
   <url><loc>https://grm-solutions.com/glossary/training/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/calibration/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/cross-contamination/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/common-technical-document/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/attributable/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/specification/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/oos/</loc></url>
@@ -127,6 +130,7 @@
   <url><loc>https://grm-solutions.com/glossary/corrective-action/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/certificate-of-analysis/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/laboratory-controls/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/lims/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/laboratory-investigation/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/reference-sample/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/severity/</loc></url>
@@ -175,6 +179,7 @@
   <url><loc>https://grm-solutions.com/glossary/shelf-life/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/expiry-date/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/active-ingredient/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/drug-master-file/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/gmp/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/pharmaceutical-quality-system/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/adverse-event/</loc></url>
@@ -207,6 +212,7 @@
   <url><loc>https://grm-solutions.com/glossary/batch/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/batch-number/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/site-master-file/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/manufacturing-execution-system/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/manufacturer/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/product-complaint/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/recall/</loc></url>
@@ -9074,6 +9080,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/cleanroom/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/closed-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/colony-forming-unit/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/common-technical-document/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/complaint-handling/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/computerised-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/container-closure-integrity/</loc></url>
@@ -9105,6 +9112,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/disinfection/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/distribution-record/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/documentation/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/drug-master-file/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/drug-product/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/dynamic-data/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/electronic-record/</loc></url>
@@ -9119,6 +9127,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/filter-integrity-test/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/finished-product/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/first-air/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/fmea/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/form-fill-seal/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/formality/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/gmp/</loc></url>
@@ -9126,6 +9135,7 @@
   <url><loc>https://grm-solutions.com/en/glossary/harm/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/hazard/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/hepa-filter/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/hvac/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/hybrid-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/identification-test/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/impurity-profile/</loc></url>
@@ -9141,12 +9151,14 @@
   <url><loc>https://grm-solutions.com/en/glossary/laboratory-controls/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/laboratory-investigation/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/legible/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/lims/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/line-clearance/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/linearity/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/lyophilization/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/management-review/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/manufacture/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/manufacturer/</loc></url>
+  <url><loc>https://grm-solutions.com/en/glossary/manufacturing-execution-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/marketing-authorization/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/master-production-record/</loc></url>
   <url><loc>https://grm-solutions.com/en/glossary/master-standard-documents/</loc></url>

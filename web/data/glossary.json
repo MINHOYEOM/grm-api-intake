@@ -931,7 +931,7 @@
   },
   {
     "id": "risk-evaluation",
-    "term_ko": "위험 평가",
+    "term_ko": "위험 판정",
     "term_en": "Risk Evaluation",
     "easy_ko": "추정된 위험을 정해 둔 위험기준과 비교해 위험의 중요도를 판단하는 것입니다.",
     "definition_source": "ICH Q9(R1), Glossary, Risk Evaluation",
@@ -951,6 +951,9 @@
     "id": "risk-assessment",
     "term_ko": "위험성 평가",
     "term_en": "Risk Assessment",
+    "aliases": [
+      "위험평가"
+    ],
     "easy_ko": "위험을 확인하고 분석한 뒤 평가하는 과정 전체입니다.",
     "definition_source": "ICH Q9(R1), Glossary, Risk Assessment",
     "related": [
@@ -959,7 +962,7 @@
       "risk-evaluation"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위험성 평가는 위험 확인(무엇이 잘못될 수 있나)·위험 분석(발생 가능성과 심각성, 필요하면 검출 가능성)·위험 평가(정해진 기준과 비교)로 이루어진 정보 정리 과정이고, 그 결과를 받아 줄일지·수용할지 결정하고 실행하는 것이 위험 통제입니다 — 평가는 판단의 재료를 만들고 통제는 판단을 실행합니다. ICH Q9(R1) §4.3 은 잘 정의된 문제 기술이나 위험 질문에서 출발해 '무엇이 잘못될 수 있는가, 그 가능성은, 그 결과는' 세 질문에 답하도록 하고, 데이터의 견고성이 산출물의 품질을 정하므로 가정과 불확실성의 원천을 드러내라고 합니다. 실사에서는 위험 질문이 없어 무엇을 평가했는지 알 수 없는 문서, 점수의 근거 데이터가 없는 FMEA, 결론을 먼저 정해 놓고 점수를 맞춘 흔적, 검출 가능성을 과대평가해 위험을 낮춘 경우, 평가 결과가 통제 결정으로 이어지지 않은 경우가 지적됩니다.",
+    "detail_ko": "위험성 평가는 위험 확인(무엇이 잘못될 수 있나)·위험 분석(발생 가능성과 심각성, 필요하면 검출 가능성)·위험 판정(정해진 기준과 비교)로 이루어진 정보 정리 과정이고, 그 결과를 받아 줄일지·수용할지 결정하고 실행하는 것이 위험 통제입니다 — 평가는 판단의 재료를 만들고 통제는 판단을 실행합니다. ICH Q9(R1) §4.3 은 잘 정의된 문제 기술이나 위험 질문에서 출발해 '무엇이 잘못될 수 있는가, 그 가능성은, 그 결과는' 세 질문에 답하도록 하고, 데이터의 견고성이 산출물의 품질을 정하므로 가정과 불확실성의 원천을 드러내라고 합니다. 실사에서는 위험 질문이 없어 무엇을 평가했는지 알 수 없는 문서, 점수의 근거 데이터가 없는 FMEA, 결론을 먼저 정해 놓고 점수를 맞춘 흔적, 검출 가능성을 과대평가해 위험을 낮춘 경우, 평가 결과가 통제 결정으로 이어지지 않은 경우가 지적됩니다.",
     "reg_refs": [
       "ICH Q9(R1) §4.3",
       "EU GMP Part I Chapter 1 §1.12"
@@ -5109,5 +5112,135 @@
       "Class II recall",
       "Class III recall"
     ]
+  },
+  {
+    "id": "manufacturing-execution-system",
+    "term_ko": "제조실행시스템",
+    "term_en": "Manufacturing Execution System (MES)",
+    "aliases": [
+      "MES",
+      "제조관리시스템"
+    ],
+    "easy_ko": "기업 업무 시스템과 설비 제어 시스템 사이에서 생산 지시를 받아 제조 작업의 실행과 실적 기록을 관리하는 전산 시스템입니다.",
+    "definition_source": "ANSI/ISA-95.00.01 (IEC 62264-1), Enterprise-Control System Integration, Part 1: Models and Terminology, Manufacturing operations management",
+    "related": [
+      "computerised-system",
+      "batch-record",
+      "electronic-record"
+    ],
+    "source_url": "https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard",
+    "reg_refs": [
+      "EU GMP Annex 11 §4",
+      "21 CFR 211.68"
+    ],
+    "easy_en": "A computerised system between business systems and equipment control systems that takes production orders and manages and records the execution of manufacturing work."
+  },
+  {
+    "id": "hvac",
+    "term_ko": "공기조화 시스템",
+    "term_en": "Heating, Ventilation and Air-Conditioning (HVAC)",
+    "aliases": [
+      "HVAC",
+      "공조 시스템",
+      "공조설비"
+    ],
+    "easy_ko": "온도·습도·공기 청정도와 실 사이의 차압·기류를 조절해 제품과 작업자, 환경을 보호하는 난방·환기·공기조화 시스템입니다.",
+    "definition_source": "WHO Technical Report Series No. 1010, Annex 8, Guidelines on heating, ventilation and air-conditioning systems for non-sterile pharmaceutical products",
+    "related": [
+      "air-handling",
+      "pressure-differential",
+      "cleanroom"
+    ],
+    "source_url": "https://www.who.int/publications/m/item/Annex-8-trs-1010",
+    "reg_refs": [
+      "WHO TRS 1010 Annex 8",
+      "21 CFR 211.46"
+    ],
+    "easy_en": "The heating, ventilation and air-conditioning system that controls temperature, humidity, air cleanliness, pressure differentials and airflow to protect the product, personnel and the environment."
+  },
+  {
+    "id": "fmea",
+    "term_ko": "고장모드 영향분석",
+    "term_en": "Failure Mode Effects Analysis (FMEA)",
+    "aliases": [
+      "FMEA",
+      "고장 유형 영향 분석",
+      "failure mode and effects analysis"
+    ],
+    "easy_ko": "공정에서 일어날 수 있는 고장 형태와 그것이 결과나 제품 성능에 미칠 영향을 평가해, 고장을 없애거나 줄이는 위험 감소로 이어가는 위험관리 기법입니다.",
+    "definition_source": "ICH Q9(R1), Annex I: Risk Management Methods and Tools, Failure Mode Effects Analysis (FMEA)",
+    "related": [
+      "risk-assessment",
+      "severity",
+      "detectability"
+    ],
+    "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
+    "reg_refs": [
+      "ICH Q9(R1) §4.3"
+    ],
+    "easy_en": "A risk management tool that evaluates potential failure modes of a process and their likely effect on outcomes or product performance, so that the failures can be eliminated, reduced or controlled."
+  },
+  {
+    "id": "common-technical-document",
+    "term_ko": "국제공통기술문서",
+    "term_en": "Common Technical Document (CTD)",
+    "aliases": [
+      "CTD"
+    ],
+    "easy_ko": "의약품 허가 신청 때 품질·비임상·임상 자료를 정해진 모듈 구성으로 정리해 제출하도록 ICH 가 합의한 공통 서식입니다. 모듈 1은 지역별 행정자료이고 모듈 2~5가 공통입니다.",
+    "definition_source": "ICH M4(R4) (2016), Organisation of the Common Technical Document for the Registration of Pharmaceuticals for Human Use",
+    "related": [
+      "marketing-authorization",
+      "drug-master-file",
+      "specification"
+    ],
+    "source_url": "https://database.ich.org/sites/default/files/M4_R4__Guideline.pdf",
+    "reg_refs": [
+      "ICH M4"
+    ],
+    "easy_en": "The common format agreed by ICH for organising the quality, nonclinical and clinical data in a marketing application; Module 1 is regional administrative data and Modules 2 to 5 are common."
+  },
+  {
+    "id": "drug-master-file",
+    "term_ko": "의약품 마스터 파일",
+    "term_en": "Drug Master File (DMF)",
+    "aliases": [
+      "DMF",
+      "drug master file"
+    ],
+    "easy_ko": "제조시설·공정과 원료의약품·첨가제·포장자재 등에 관한 정보를 FDA 에 미리 제출해 두고, 다른 신청자가 그 내용을 공개받지 않고도 허가 신청에서 인용할 수 있게 하는 자료입니다.",
+    "definition_source": "21 CFR 314.420 Drug master files",
+    "related": [
+      "api",
+      "marketing-authorization",
+      "common-technical-document"
+    ],
+    "source_url": "https://www.ecfr.gov/current/title-21/section-314.420",
+    "reg_refs": [
+      "21 CFR 314.420"
+    ],
+    "easy_en": "A submission to FDA of information on facilities, processes, drug substances, excipients or packaging materials that the holder lets other applicants rely on without disclosing it to them."
+  },
+  {
+    "id": "lims",
+    "term_ko": "시험실 정보관리시스템",
+    "term_en": "Laboratory Information Management System (LIMS)",
+    "aliases": [
+      "LIMS",
+      "실험실 정보관리시스템"
+    ],
+    "easy_ko": "검체 접수부터 시험 배정, 결과 입력·검토·승인과 보고까지 시험실 업무와 데이터를 관리하는 컴퓨터화 시스템입니다.",
+    "definition_source": "ISPE GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems (Second Edition, 2022)",
+    "related": [
+      "computerised-system",
+      "laboratory-controls",
+      "audit-trail"
+    ],
+    "source_url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "reg_refs": [
+      "EU GMP Annex 11 §4",
+      "21 CFR 211.194"
+    ],
+    "easy_en": "A computerised system that manages laboratory work and data from sample receipt and test assignment to entry, review and approval of results and reporting."
   }
 ]

@@ -486,6 +486,13 @@ def merge_no_finding_inspections(cards: list[dict[str, Any]]) -> list[dict[str, 
                         f"raised. The sites and inspection dates are listed on this card."),
             "key_facts": [f"Count: {n} inspections with no deficiencies raised",
                           "Source: MFDS published GMP inspection results"],
+            # [11-16] 국문 implication 을 코드가 채우므로 영문도 짝으로 채운다. 대표 카드의
+            #   en.implication 이 비어 있으면(#1460 비움 허용) 영문 갈래가 반쪽이 되어
+            #   영문 슬롯 게이트가 호 전체 발행을 막았다(11-16 호).
+            "implication": ("No findings means the site passed that inspection at that time, "
+                            "nothing more. Whether a site has a published inspection record is "
+                            "itself a screening criterion for overseas contract partners, so use "
+                            "this list to check for sites in your own supply chain."),
             "checks": ["Check the list for your own contract manufacturing sites"],
         }
     drop = {str(cards[i].get("id")) for i in idxs[1:]}

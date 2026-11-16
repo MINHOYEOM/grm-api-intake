@@ -189,7 +189,36 @@ def mail_clicks(w: "dict[str, Any] | None") -> "tuple[Any, str]":
 
 
 # ── 일보 ────────────────────────────────────────────────────────────────────
-def render_daily(p: "dict[str, Any]") -> str:
+SLOT_LABEL = {"top": "앞쪽(첫 화면·요약·정의 아래)", "mid": "중간(홈 '이번 주 핵심' 아래)", "end": "끝(문서·노트·조항 등)"}
+
+
+def inline_section(q: "dict[str, Any] | None") -> "list[str]":
+    """[161] 본문 속 줄형 구독 칸 판독 — `funnel_inline_report()` 결과. 없으면 아무것도 내지 않는다.
+
+    ★'구독 신청(사이트 폼)' 줄(077 band·cta 차분)과 **합치지 않는다** — 원천 함수가 다르고, 합치면
+    077 쪽이 inline 을 세게 되는 날(가산 이전·이후) 이중 계산을 알아챌 수 없다. 따로 한 줄씩 보인다.
+    구역별은 누적이다(076 에 일자 스냅샷이 없다) — '어제'는 마지막 제출 시각으로만 읽는다."""
+    if not q:
+        return []
+    out = ["\n### 본문 구독 칸(줄형)\n"]
+    if not q.get("snapshot_present"):
+        out.append(f"⚠ {q.get('report_date') or '기준일'} 깔때기 스냅샷이 없다 — 일·7일 값을 셀 수 없다(수집 확인).\n")
+    slots = q.get("slots") or {}
+    rows = [[SLOT_LABEL[s], n((slots.get(s) or {}).get("day")), n((slots.get(s) or {}).get("week"))]
+            for s in ("top", "mid", "end")]
+    rows.append(["합계", n(q.get("day")), f"{n(q.get('week'))} (전주 {n(q.get('prev_week'))})"])
+    out.append(table(["자리", "어제", "최근 7일"], rows))
+    zones = [z for z in (q.get("zones") or []) if z.get("total")]
+    if zones:
+        out.append("\n누적(칸을 둔 2026-11-17 이후) · 구역별\n")
+        out.append(table(["구역", "자리", "누적 제출", "마지막 제출(KST)"],
+                         [[str(z.get("zone") or "—"), str(z.get("slot") or "—"), n(z.get("total")),
+                           str(z.get("last_at_kst") or "—")] for z in zones[:10]]))
+    out.append("\n_위 '구독 신청(사이트 폼)' 줄은 하단 밴드·배너만 센다 — 본문 칸은 이 표에 따로 있다._\n")
+    return out
+
+
+def render_daily(p: "dict[str, Any]", inline: "dict[str, Any] | None" = None) -> str:
     g = p.get("growth") or {}
     s = p.get("search") or {}
     mail = p.get("mail") or {}
@@ -255,9 +284,15 @@ def render_daily(p: "dict[str, Any]") -> str:
         ["방문 → 신청 전환", pct(fday.get("submits"), best),
          pct(funnel.get("this_week_submits"), week_visits_clean), "신청 ÷ 방문(7일은 급증일 제외 방문)"],
     ]
+    if inline:
+        # [161] 본문 칸 제출 — 077 차분(밴드·배너)과 원천이 달라 합치지 않고 바로 아래 한 줄로 둔다.
+        at = next(i for i, r in enumerate(rows) if r[0] == "구독 신청(사이트 폼)") + 1
+        rows.insert(at, ["└ 본문 구독 칸(줄형)", n(inline.get("day")), n(inline.get("week")),
+                         "브리프·용어·문서 등 본문 속 칸 제출(161) — 위 줄에 들어 있지 않다"])
     out.append(table(["단계", "어제", "최근 7일", "기준"], rows))
     out.append("\n_구독 증감의 출처(누가 언제)는 Brevo 연락처 History·Transactional Logs 에서 확인한다 — "
                "스냅샷 시각으로 추론하지 않는다._\n")
+    out.extend(inline_section(inline))
 
     # 2. 14일 흐름
     out.append("\n## 2. 방문 14일 흐름\n\n")
@@ -420,6 +455,8 @@ def main(argv: "list[str] | None" = None) -> int:
     ap.add_argument("--date", default=None, help="daily 기준일 YYYY-MM-DD(기본: 어제 KST)")
     ap.add_argument("--days", type=int, default=28, help="search 창 일수(기본 28)")
     ap.add_argument("--out", default=None, help="결과 파일(기본 stdout)")
+    ap.add_argument("--inline", default=None,
+                    help="daily 선택 입력: funnel_inline_report() 결과 JSON(161, 본문 구독 칸). 없으면 그 줄을 생략")
     args = ap.parse_args(argv)
 
     if args.json:
@@ -429,7 +466,16 @@ def main(argv: "list[str] | None" = None) -> int:
     else:
         raw = fetch_live("gsc_search_opportunities", {"p_days": args.days})
     payload = unwrap(raw)
-    text = render_daily(payload) if args.kind == "daily" else render_search(payload)
+    inline = None
+    if args.kind == "daily":
+        if args.inline:
+            inline = unwrap(json.loads(Path(args.inline).read_text(encoding="utf-8-sig")))
+        elif args.live:
+            try:   # 161 미적용이면 그 줄만 빠진다 — 일보 본체를 막지 않는다
+                inline = unwrap(fetch_live("funnel_inline_report", {"p_date": args.date}))
+            except Exception as e:  # noqa: BLE001
+                print(f"funnel_inline_report 생략: {type(e).__name__}", file=sys.stderr)
+    text = render_daily(payload, inline) if args.kind == "daily" else render_search(payload)
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")
         print(f"{args.kind} 리포트 저장: {args.out}")

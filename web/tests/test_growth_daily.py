@@ -311,5 +311,69 @@ class RumAnomalyFilter139(unittest.TestCase):
         self.assertEqual(gd.anomaly_lines({"excluded_days": [], "capped_paths": []}, "2026-11-07"), [])
 
 
+
+def _inline(**over):
+    q = {"version": 1, "report_date": "2026-11-07", "snapshot_present": True,
+         "day": 3, "week": 9, "prev_week": 0,
+         "slots": {"top": {"day": 2, "week": 6}, "mid": {"day": 0, "week": 1}, "end": {"day": 1, "week": 2}},
+         "zones": [{"zone": "glossary", "slot": "top", "total": 5, "last_at_kst": "2026-11-07 10:12"},
+                   {"zone": "clauses", "slot": "end", "total": 0, "last_at_kst": "2026-11-06 09:00"}],
+         "paths": []}
+    q.update(over)
+    return q
+
+
+class InlineSubscribe161Test(unittest.TestCase):
+    """[161] 본문 속 줄형 구독 칸 — 077 band·cta 줄과 합치지 않고 바로 아래 한 줄 + 자리·구역 표."""
+
+    def test_no_inline_input_means_no_inline_row(self):
+        md = gd.render_daily(_payload())
+        self.assertNotIn("본문 구독 칸", md)
+
+    def test_inline_row_sits_right_under_site_form_row_and_is_not_summed(self):
+        md = gd.render_daily(_payload(), _inline())
+        lines = md.splitlines()
+        i = next(k for k, ln in enumerate(lines) if ln.startswith("| 구독 신청(사이트 폼)"))
+        self.assertTrue(lines[i + 1].startswith("| └ 본문 구독 칸(줄형) | 3 | 9 |"), lines[i + 1])
+        self.assertIn("### 본문 구독 칸(줄형)", md)
+        self.assertIn("| 합계 | 3 | 9 (전주 0) |", md)
+        # 누적 0 인 구역은 표에 싣지 않는다
+        self.assertIn("| glossary | top | 5 |", md)
+        self.assertNotIn("| clauses |", md)
+
+    def test_missing_snapshot_is_flagged_not_read_as_zero(self):
+        md = gd.render_daily(_payload(), _inline(snapshot_present=False, day=None, week=None))
+        self.assertIn("깔때기 스냅샷이 없다", md)
+
+    def test_cli_inline_file_is_optional_input(self):
+        with tempfile.TemporaryDirectory() as td:
+            g = pathlib.Path(td) / "g.json"
+            q = pathlib.Path(td) / "q.json"
+            g.write_text(json.dumps([{"r": _payload()}], ensure_ascii=False), encoding="utf-8")
+            q.write_text(json.dumps([{"funnel_inline_report": _inline()}], ensure_ascii=False), encoding="utf-8")
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = gd.main(["daily", "--json", str(g), "--inline", str(q)])
+        self.assertEqual(rc, 0)
+        self.assertIn("└ 본문 구독 칸(줄형)", buf.getvalue())
+
+    def test_migration_161_is_additive_read_only_and_service_role_only(self):
+        sql = (WEB_DIR / "migrations" / "161_funnel_inline_report.sql").read_text(encoding="utf-8")
+        code = "\n".join(ln for ln in sql.splitlines() if not ln.lstrip().startswith("--")).lower()
+        # 077·135 는 139 가 DB 안에서 본문을 바꿔 썼다 — 파일로 재정의하면 봇 거르기가 풀린다.
+        for fn in ("growth_daily_report", "growth_daily_v2", "funnel_bump", "funnel_zone_bump"):
+            self.assertNotRegex(code, rf"create\s+or\s+replace\s+function\s+public\.{fn}\s*\(")
+        self.assertNotRegex(code, r"\b(insert|update|delete|drop|alter|truncate)\b")
+        self.assertIn("stable", code)
+        self.assertIn("revoke all on function public.funnel_inline_report(date) from public, anon, authenticated", code)
+        self.assertIn("grant execute on function public.funnel_inline_report(date) to service_role", code)
+        for key in ("inline_top_submit", "inline_mid_submit", "inline_end_submit"):
+            self.assertIn(key, code)
+
+    def test_daily_instruction_passes_inline_report_to_renderer(self):
+        t = (ROOT / "company" / "growth" / "daily-report.md").read_text(encoding="utf-8")
+        self.assertIn("select public.funnel_inline_report()", t)
+        self.assertIn("--inline /tmp/inline.json", t)
+
 if __name__ == "__main__":
     unittest.main()

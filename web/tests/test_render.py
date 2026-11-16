@@ -21313,6 +21313,47 @@ class BriefTermLinks(unittest.TestCase):
         # 라틴 표면형 동작 불변.
         self.assertGreaterEqual(render._doc_term_find("RAPID test and API lot", "API"), 0)
 
+    # ── 9. 띄어쓰기 무시(2026-11-16) ─────────────────────────────────────
+    def test_hangul_space_insensitive(self):
+        span = render._doc_term_span
+        # 공백 없던 자리에 공백(양쪽 2음절 이상) — 실제 매치 범위를 돌려준다.
+        self.assertEqual(span("생산 및 공정 관리 절차", "공정관리"), (5, 10))
+        self.assertEqual(span("무균 공정 구역", "무균공정"), (0, 5))
+        self.assertEqual(span("안정성 시험 자료", "안정성시험"), (0, 6))
+        # 표면형의 공백은 있어도 없어도.
+        self.assertEqual(span("교육훈련 기록", "교육 훈련"), (0, 4))
+        self.assertEqual(span("컴퓨터화시스템 접근", "컴퓨터화 시스템"), (0, 7))
+        self.assertEqual(span("교육 훈련 기록", "교육 훈련"), (0, 5))
+        # 글자 그대로 일치는 종전과 같다.
+        self.assertEqual(span("무균공정 구역", "무균공정"), (0, 4))
+        # 낱말 시작 규칙은 실제 매치 시작에 그대로 — 앞 글자가 한글이면 건너뛴다.
+        self.assertEqual(render._doc_term_find("세척 밸리데이션 회수율 자료", "수율"), -1)
+        self.assertEqual(render._doc_term_find("품질관리 기록", "관리 기록"), -1)
+        self.assertEqual(render._doc_term_find("미무균 공정", "무균공정"), -1)
+        # 동사형 배제도 실제 매치 끝에서 본다.
+        self.assertEqual(render._doc_term_find("변경 관리하고", "변경관리"), -1)
+        # 1음절 조각 경계(3음절 이하 표면형)는 공백을 허용하지 않는다.
+        self.assertEqual(render._doc_term_find("시험 법 개정", "시험법"), -1)
+        self.assertEqual(render._doc_term_find("안 정성 시험", "안정성시험"), -1)
+        # 한 칸만 — 줄바꿈·두 칸은 다른 조각으로 본다.
+        self.assertEqual(render._doc_term_find("공정\n관리", "공정관리"), -1)
+        self.assertEqual(render._doc_term_find("공정  관리", "공정관리"), -1)
+        # 예외 목록: '위험 평가' 표제 충돌은 #1773 에서 정리돼 예외가 비었다.
+        # 이제 risk-assessment 별칭 "위험평가" 가 띄어 쓴 "위험 평가" 와도 잇는다.
+        self.assertNotIn("위험 평가", render._DOC_TERM_SPACE_FOLD_DENY)
+        self.assertEqual(span("전체 위험 평가를 제출", "위험평가"), (3, 8))
+        # '공정 관리' 연결("생산 및 공정 관리")은 유지.
+        self.assertGreaterEqual(render._doc_term_find("생산 및 공정 관리", "공정관리"), 0)
+        # 영어 경로는 불변(한글 표면형 패턴을 타지 않는다).
+        self.assertEqual(render._doc_term_find("공정 관리", "공정관리", lang="en"), -1)
+
+    def test_link_terms_uses_spaced_match_span(self):
+        """띄어쓰기 무시 매치는 링크 라벨이 원문 그대로("공정 관리")여야 하고 본문은 무변형."""
+        text = "생산 및 공정 관리 절차가 없다"
+        html = str(render.link_terms_in_text(text, [("공정관리", "t-ipc")], "../", set()))
+        self.assertIn('<a class="fd-term" href="../glossary/t-ipc/">공정 관리</a>', html)
+        self.assertEqual(re.sub(r"<[^>]+>", "", html), text)
+
 
 # ── [용어 그림 2026-09-08] 낱개 페이지(/glossary/<id>/)에 정의를 묘사만 하는 미니 SVG.
 # 링크드인 카드뉴스 "이번 주 용어" 장에서 쓴 그림을 그대로 재사용한다(partial 은

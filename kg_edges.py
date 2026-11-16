@@ -342,10 +342,14 @@ def main(argv: list[str] | None = None) -> int:
     if a.dry_run:
         text_by = {f["finding_id"]: f.get("text_ko") or "" for d in docs for f in d.get("findings") or []}
         rnd = random.Random(1103)
+        render = _load_render()
         for e in rnd.sample(edges, min(a.sample, len(edges))):
             tx = text_by[e["finding_id"]]
-            pos = tx.find(e["surface"])
-            ctx = tx[max(0, pos - 25):pos + len(e["surface"]) + 25].replace("\n", " ")
+            # 띄어쓰기 무시 매치(`무균공정`↔"무균 공정")는 str.find 로 못 찾는다 — 엔진과 같은 판정으로.
+            pos, end = render._doc_term_span(tx, e["surface"])
+            if pos < 0:
+                pos, end = max(0, tx.find(e["surface"])), max(0, tx.find(e["surface"])) + len(e["surface"])
+            ctx = tx[max(0, pos - 25):end + 25].replace("\n", " ")
             print(f"| {e['finding_id']} | {e['term_id']} | {e['surface']} | {e['confidence']} | …{ctx}… |")
     if a.emit_sql:
         Path(a.emit_sql).write_text(emit_sql(edges), encoding="utf-8", newline="\n")

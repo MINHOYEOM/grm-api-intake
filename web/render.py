@@ -3250,10 +3250,95 @@ def _doc_term_pattern(surface: str, ignore_case: bool) -> "re.Pattern[str]":
                       re.IGNORECASE if ignore_case else 0)
 
 
+# [띄어쓰기 무시 2026-11-16] 한글 매칭이 글자 그대로라 띄어쓰기만 다른 표기를 못 이었다
+# (번역문 실측: `무균공정`↔"무균 공정" 480건·`공정관리`↔"공정 관리" 315건·`컴퓨터화 시스템`↔
+# "컴퓨터화시스템" 274건 등 138개 표기). 별칭을 표기마다 더하는 대신 매칭에서 공백을 접는다.
+# 오탐을 막는 경계:
+#   · 표면형에 이미 있는 한글 사이 공백은 "있어도 없어도"(`교육 훈련`↔"교육훈련").
+#   · 공백이 없던 자리에 공백을 허용하는 건 **양쪽이 모두 한글 2음절 이상**일 때만
+#     (`무균|공정`·`안정성|시험`). 그래서 3음절 이하 표면형(`수율`·`시험법`)은 종전 그대로
+#     글자 일치만 본다 — 1음절 조각(`안|정성`)이 앞 낱말 꼬리에 붙는 오탐을 원천 차단.
+#   · 허용하는 공백은 한 칸(스페이스·NBSP)뿐. 줄바꿈·여러 칸은 다른 문장 조각으로 본다.
+#   · 낱말 시작 규칙(앞 글자가 한글이면 건너뜀)·동사형 배제는 **실제 매치 범위**에 그대로 건다.
+_DOC_TERM_SPACE = "[  ]?"
+# 띄어쓰기 무시를 **끄는** 표면형(글자 그대로 일치만 유지). 한 줄에 하나, 사유 주석 필수.
+# 2026-11-16 #1773: '위험 평가' 표제 충돌이 정리돼(risk-evaluation 표제 → '위험 판정',
+# '위험평가' → risk-assessment 별칭) 예외가 필요 없어졌다. 장치는 남겨 둔다.
+_DOC_TERM_SPACE_FOLD_DENY: frozenset = frozenset()
+
+
+def _is_hangul_char(c: str) -> bool:
+    return "가" <= c <= "힣"
+
+
+@functools.lru_cache(maxsize=4096)
+def _doc_term_ko_space_pattern(surface: str) -> "re.Pattern[str] | None":
+    """띄어쓰기를 무시하는 한글 표면형 패턴. 공백을 접을 자리가 없으면 None(글자 일치 경로)."""
+    if surface in _DOC_TERM_SPACE_FOLD_DENY:
+        return None
+    tight = re.sub(r"\s+", "", surface)
+    # 각 글자 뒤의 공백 허용 여부: 원래 공백(한글 사이) 또는 양쪽 2음절 이상인 한글 경계
+    had_space: set[int] = set()
+    i = 0
+    for ch in surface:
+        if ch.isspace():
+            had_space.add(i)        # tight[i-1] 과 tight[i] 사이에 원래 공백이 있었다
+        else:
+            i += 1
+    n_hangul = sum(1 for c in tight if _is_hangul_char(c))
+    left = 0
+    parts: list[str] = []
+    flexible = False
+    for k, ch in enumerate(tight):
+        if k > 0:
+            prev = tight[k - 1]
+            if _is_hangul_char(prev) and _is_hangul_char(ch) and (
+                    k in had_space or (left >= 2 and n_hangul - left >= 2)):
+                parts.append(_DOC_TERM_SPACE)
+                flexible = True
+            elif k in had_space:
+                parts.append(" ")   # 한글 사이가 아닌 원래 공백은 종전처럼 글자 그대로
+        parts.append(re.escape(ch))
+        if _is_hangul_char(ch):
+            left += 1
+    if not flexible:
+        return None
+    return re.compile("".join(parts))
+
+
+def _doc_term_span(
+    text: str, surface: str, start: int = 0, lang: str = DEFAULT_LANG,
+) -> tuple[int, int]:
+    """`_doc_term_find` 와 같은 판정으로 (시작, 끝) — 띄어쓰기 무시 매치는 길이가 표면형과
+    다를 수 있어 링크를 끼우는 쪽은 이 끝 위치를 써야 한다. 없으면 (-1, -1)."""
+    if lang == DEFAULT_LANG and not _LATIN_TOKEN.match(surface) and _HANGUL_RE.search(surface):
+        rx = _doc_term_ko_space_pattern(surface)
+        if rx is not None:
+            m = rx.search(text, start)
+            while m and (
+                _doc_term_is_verbish(text, m.start(), m.end())
+                or (m.start() > 0 and _HANGUL_RE.match(text[m.start() - 1]))
+            ):
+                m = rx.search(text, m.start() + 1)
+            return (m.start(), m.end()) if m else (-1, -1)
+    pos = _doc_term_find_literal(text, surface, start, lang)
+    return (pos, pos + len(surface)) if pos >= 0 else (-1, -1)
+
+
 def _doc_term_find(
     text: str, surface: str, start: int = 0, lang: str = DEFAULT_LANG,
 ) -> int:
+    """등장 위치(`_doc_term_span` 의 시작). 판정 규칙은 `_doc_term_find_literal`·위 주석."""
+    return _doc_term_span(text, surface, start, lang)[0]
+
+
+def _doc_term_find_literal(
+    text: str, surface: str, start: int = 0, lang: str = DEFAULT_LANG,
+) -> int:
     """등장 위치. 라틴 표면형은 낱말 경계를 요구한다(`API` 가 `RAPID` 안에 걸리면 안 된다).
+
+    ★[띄어쓰기 무시 2026-11-16] 한국어 경로의 한글 표면형 중 공백을 접을 자리가 있는 것은
+      `_doc_term_span` 이 정규식으로 찾고, 나머지만 이 글자 일치 경로로 온다.
 
     ★[한글 낱말 시작 규칙 2026-09-08] 한글은 낱말 경계가 없어 표면형이 다른 낱말 **중간**
       에도 걸린다(문서 코퍼스 3,310장 매칭의 3.3%·1,138쌍 실측): `회수율`→"수율",
@@ -3339,11 +3424,12 @@ def link_terms_in_text(
     for surface, tid in selected:
         if tid in used:
             continue
-        pos = _doc_term_find(text, surface, lang=lang)
-        while pos >= 0 and any(s < pos + len(surface) and pos < e for s, e, _ in spans):
-            pos = _doc_term_find(text, surface, pos + 1, lang=lang)
+        # 띄어쓰기 무시 매치는 길이가 표면형과 다를 수 있어 (시작, 끝)을 함께 받는다.
+        pos, end = _doc_term_span(text, surface, lang=lang)
+        while pos >= 0 and any(s < end and pos < e for s, e, _ in spans):
+            pos, end = _doc_term_span(text, surface, pos + 1, lang=lang)
         if pos >= 0:
-            spans.append((pos, pos + len(surface), tid))
+            spans.append((pos, end, tid))
             used.add(tid)
     if not spans:
         return Markup(str(_escape(text)))

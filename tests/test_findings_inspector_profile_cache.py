@@ -89,7 +89,7 @@ class InspectorProfileCacheMigrationTest(unittest.TestCase):
         # 070 이 프로파일을 정의한 마지막 파일이어야 한다(그 뒤 재정의가 있으면 이 래퍼 계약을 다시 볼 것).
         later = [p.name for p in sorted(_MIGRATIONS.glob("*.sql"))
                  if p.name > _PREV_DEF.name and p != _PATH
-                 and re.search(r"function\s+public\.findings_inspector_profile\s*\(",
+                 and re.search(r"(?<!alter )function\s+public\.findings_inspector_profile\s*\(",  # 157 의 alter(설정만)는 재정의 아님
                                _strip(p.read_text(encoding="utf-8")))]
         self.assertEqual(later, [])
 

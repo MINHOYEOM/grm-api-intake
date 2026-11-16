@@ -50,8 +50,8 @@
       </button>
       <div class="fnd-filters" id="fnd-filters">
         <div class="fnd-field"><label for="fnd-f-source">{{ _("소스") }}</label><select id="fnd-f-source" data-key="source"><option value="">{{ _("전체") }}</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-evidence">{{ _("증거 등급") }}</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">{{ _("전체") }}</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-status">{{ _("검토 상태") }}</label><select id="fnd-f-status" data-key="review_status"><option value="">{{ _("전체") }}</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-evidence">{{ _("근거 수준") }}</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">{{ _("전체") }}</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-status">{{ _("확인 상태") }}</label><select id="fnd-f-status" data-key="review_status"><option value="">{{ _("전체") }}</option></select></div>
         <div class="fnd-field"><label for="fnd-f-category">{{ _("카테고리") }}</label><select id="fnd-f-category" data-key="category_code"><option value="">{{ _("전체") }}</option></select></div>
         <div class="fnd-field"><label for="fnd-f-month">{{ _("발행월") }}</label><select id="fnd-f-month" data-key="month"><option value="">{{ _("전체") }}</option></select></div>
         {#- [056] 국가 필터 — country_key 축(055/056). 다른 5개와 달리 findings.js 가
@@ -347,6 +347,11 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 }
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .fnd-state-error{color:var(--coral-2)}
+.fnd-searchmsg{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 14px;padding:11px 14px;border:1px solid var(--line-2);border-left:3px solid var(--muted-2);border-radius:var(--rad-s);background:var(--soft);font-size:14px;line-height:1.55;color:var(--body)}
+.fnd-searchmsg[hidden]{display:none}
+.fnd-searchmsg.is-fail{border-left-color:var(--coral-2);color:var(--ink)}
+.fnd-searchmsg-retry{font-size:13.5px;font-weight:600;color:#fff;background:var(--coral-2);border:0;border-radius:999px;padding:6px 14px}
+.fnd-searchmsg-retry:hover,.fnd-searchmsg-retry:focus-visible{background:var(--ink)}
 {#- min-height 예약(CLS): 결과 목록·대시보드는 findings.js 데이터 수신 후에야 채워진다.
     예약 없이는 공개 전 구독밴드·푸터가 첫 화면 하단에 걸쳐 있다가 공개 순간 수천 px 밀려
     RUM CLS Poor(0.452)를 만들었다 — 초기 로드 경로의 두 상태(로딩·로드실패)만 뷰포트 잔여
@@ -500,15 +505,8 @@ main{word-break:keep-all;overflow-wrap:anywhere}
     으로 이전 — 신규 CSS 없음, grm.css 기존 클래스만 사용. id="notice" 는 landing 전용이라
     findings 전용 id="ai-notice" + aria-label 을 쓴다(원문 요청). -#}
 {% block ai_disclosure %}
-<section class="ai-disclosure" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
-  <span class="kick">AI Disclosure</span>
-  <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
-  <div class="disc-body">
-    <div class="disc-sec"><p>{{ _("본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·캐나다 실사보고서(Health Canada)·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서(EudraGMDP·MHRA) 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("국문 해석은 생성형 AI 번역이며 원문(영문)을 항목마다 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("각 항목의 증거 등급(Evidence A·B·C)은 추출 근거의 신뢰도를, '검토 필요' 표시는 사람 검수 전 상태를 뜻합니다. 모든 항목에 공식 원문 링크를 제공해 1차 자료까지 추적·검증할 수 있습니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.") }}</p></div>
-  </div>
-</div></section>
+{#- [고지 정리 2026-11-15 · 대표 지적 "AI 경고글이 작위적"] 제목·네 단락 → 한 줄. 출처·증거 등급·면책 설명은
+    이용안내 '이용 시 유의사항'(#sec-8) 한 곳으로 모았다. 사이트 공통 면책 한 줄은 푸터에 그대로. -#}
+<section class="ai-line" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap"><p>{{ _('국문 해석은 생성형 AI 번역이며 항목마다 원문을 함께 싣습니다. 날짜는 공개일(캐나다 실사는 실사일)이고, 판단은 원문을 기준으로 하세요.') }} {% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html#sec-8">{{ _("자료와 AI 활용 안내") }}</a>{% endif %}</p></div></section>
 {% endblock %}
 {% block scripts %}<script src="{{ asset_root }}assets/findings.js?v={{ findingsjs_ver }}" defer></script>{% endblock %}

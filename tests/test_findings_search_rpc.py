@@ -710,8 +710,13 @@ class ClientFieldsParseTest(unittest.TestCase):
 
     def test_restored_three_are_read_by_client(self) -> None:
         # 028 이 복원한 3종을 렌더러가 실제로 읽어야 그 수리의 근거가 성립한다.
+        # [11-15] confidence(추출 신뢰도 %)는 내부 지표라 카드에서 뺐다 — 클라이언트는 더 읽지
+        # 않는다. 서버 투영에는 그대로 남는다(아래 투영 테스트들이 여전히 3종 보존을 고정).
         fields = _parse_client_fields()
         for col in _RESTORED_BY_028:
+            if col == "confidence":
+                self.assertNotIn(col, fields)
+                continue
             self.assertIn(col, fields)
 
 
@@ -961,19 +966,20 @@ class ReceiverVariableNamingConventionTest(unittest.TestCase):
 
 
 class MutationSelfVerificationTest(unittest.TestCase):
-    """③뮤테이션 자기검증 -- Codex 의 우회 시나리오(`row.confidence` -> `row["confidence"]`)
+    """③뮤테이션 자기검증 -- Codex 의 우회 시나리오(`row.confidence` -> `row["confidence"]`;
+    11-15 카드가 confidence 를 더 읽지 않아 같은 시나리오를 `row.translation_method` 로 재현)
     를 findings.js 를 실제로 바꾸지 않고 **문자열 사본**에서 재현해, 위 ①②가 "말로만"
     방어가 아니라 실제로 발화하는지 실행으로 증명한다."""
 
     def setUp(self) -> None:
         self.original_js = _CLIENT_JS_PATH.read_text(encoding="utf-8")
         self.assertIn(
-            "row.confidence", self.original_js,
-            "전제 조건 불충족: findings.js 가 row.confidence 를 dot-access 로 읽고 있어야 "
+            "row.translation_method", self.original_js,
+            "전제 조건 불충족: findings.js 가 row.translation_method 를 dot-access 로 읽고 있어야 "
             "이 뮤테이션 시나리오가 성립한다(전제가 깨졌으면 findings.js 구조가 바뀐 것).",
         )
         # Codex 실증 그대로: dot-access 를 bracket-access 로 치환한 가상 소스(사본 -- 파일은 불변).
-        self.mutated_js = self.original_js.replace("row.confidence", 'row["confidence"]')
+        self.mutated_js = self.original_js.replace("row.translation_method", 'row["translation_method"]')
         self.assertNotEqual(self.mutated_js, self.original_js, "치환이 실제로 일어나지 않았음")
 
     def test_mutation_makes_confidence_vanish_from_dot_access_parse(self) -> None:
@@ -981,8 +987,8 @@ class MutationSelfVerificationTest(unittest.TestCase):
         파싱 결과에서 조용히 빠진다(투영 가드가 죽은 채로 green 이 될 수 있었던 이유)."""
         original_fields = _parse_fields_from_source(self.original_js)
         mutated_fields = _parse_fields_from_source(self.mutated_js)
-        self.assertIn("confidence", original_fields)
-        self.assertNotIn("confidence", mutated_fields)
+        self.assertIn("translation_method", original_fields)
+        self.assertNotIn("translation_method", mutated_fields)
 
     def test_bracket_access_ban_detects_the_mutation(self) -> None:
         """①bracket-access 금지 계약이 이 사본에서 실제로 실패를 감지해야 한다 --
@@ -990,7 +996,7 @@ class MutationSelfVerificationTest(unittest.TestCase):
         Codex 의 우회 시나리오를 실제로 막는다는 증거)."""
         self.assertEqual(_bracket_access_violations(self.original_js), [])
         violations = _bracket_access_violations(self.mutated_js)
-        self.assertIn("confidence", violations)
+        self.assertIn("translation_method", violations)
 
 
 # ============================================================================

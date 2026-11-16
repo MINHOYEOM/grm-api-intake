@@ -8,11 +8,12 @@
 
 ## 클라우드에서 다른 점
 - `YYYYWW` = `TZ=Asia/Seoul date +%G%V`. 표식 브랜치 = `claude/quiz-weekly-YYYYWW`.
-- **먼저 확인(하나라도 맞으면 `스킵: 이번 주 이미 함`):** `web/data/quiz_bank.json`(origin/main)에 `week: YYYYWW` 문항이 있다 ·
+- **먼저 확인(하나라도 맞으면 `스킵: 이번 주 이미 함`):** `web/data/quiz_bank.json`(방금 `git fetch origin main` 한 `FETCH_HEAD`)에 `week: YYYYWW` 문항이 있다 ·
   원격에 표식 브랜치가 있다 · 제목이 `quiz(weekly): YYYYWW` 로 시작하는 열린 PR 이 있다.
 - 라이브 확인(`https://grm-solutions.com/briefs/{publish_date}/`)이 안 되면 `보류: 네트워크 — grm-solutions.com` 으로 끝낸다.
   라이브가 아니면 정본대로 `SKIP` — 표식 브랜치를 만들지 않는다(다음 회차·PC 백업이 다시 본다).
-- §1 worktree 대신 `git checkout -b claude/quiz-weekly-YYYYWW origin/main`.
+- §1 worktree 대신 `git fetch origin main && git checkout -b claude/quiz-weekly-YYYYWW FETCH_HEAD`.
+  (`origin/main` 이라는 이름은 쓰지 않는다 — 실행 환경에 저장된 `origin/main` 은 며칠 전 것일 수 있다(2026-11-13 리허설: 11-06 커밋). 반드시 방금 `git fetch origin main` 한 `FETCH_HEAD` 를 쓴다.)
 - §4-3 전체 테스트는 돌리지 않는다(CI 가 본다). 대신 `python3 quiz_lint.py` · `python3 -m unittest tests.test_quiz_lint` ·
   `python3 web/tests/test_render.py --freeze` 후 `git diff --numstat -- web/tests/golden` 에서 퀴즈가 실리는 골든만 바뀌었는지 확인.
   다른 골든이 바뀌면 멈추고 `보류` 로 끝낸다.

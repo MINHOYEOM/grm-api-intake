@@ -328,6 +328,20 @@ class ViewTest(unittest.TestCase):
         self.assertEqual((en["No.1"]["text_ko"], en["No.1"]["acat_ko"]), ("", ""))
         self.assertEqual(dcp.cases_view(self.snap, "PMDA", LABELS, "ko")["ko_rows"], 1)
 
+    def test_unknown_chapter_goes_to_other_group(self):
+        """[11-15] EU GMP Part I 은 9장까지 — 'Chapter 10' 같은 표기는 '기타·미상'으로 모은다(합계 불변)."""
+        import copy
+        snap = copy.deepcopy(self.snap)
+        snap["clause_counts"].append({"key": "EU GMP Chapter 10", "para": "", "critical": 0,
+                                      "major": 0, "other": 1, "insp": 1})
+        before = dcp.clause_counts_view(self.snap)["rows_total"]
+        v = dcp.clause_counts_view(snap)
+        self.assertEqual(v["rows_total"], before + 1)
+        self.assertNotIn("EU GMP Chapter 10", [g["key"] for g in v["groups"]])
+        other = v["groups"][-1]
+        self.assertEqual((other["kind"], other["label_ko"], other["total"]), ("other", "기타·미상", 1))
+        self.assertEqual(other["rows"][0]["para"], "Chapter 10")
+
     def test_eu_label_ko(self):
         self.assertEqual(dcp.eu_label_ko("EU GMP Chapter 4"), "제4장")
         self.assertEqual(dcp.eu_label_ko("EU GMP Annex 15"), "부속서 15")
@@ -421,7 +435,40 @@ class RenderedPagesTest(unittest.TestCase):
         self.assertIn("공개한 지적 111건을 원문(영문판) 그대로", body)
         self.assertIn('<option value="documentation_records">문서화/기록관리 (109)</option>', body)
         self.assertIn("원문 파일 FY2025 (일본어)", body)
-        self.assertIn('class="on" aria-current="page">일본 PMDA 사례</a>', body)
+        self.assertIn('class="on" aria-current="page"><b>일본 PMDA 사례</b><span>지적 문장 111건</span></a>', body)
+
+    def test_page_order_tabs_list_then_source(self):
+        """[11-15 대표 지적] 첫 화면 = 제목·한 줄 요약 → 네 화면 탭(건수) → 필터 → 목록.
+        읽는 법·출처는 목록 아래 '출처와 읽는 법' 구획으로 내린다(지우지 않는다)."""
+        for route in ("pmda", "mhra", "mhra-data"):
+            body = self._main(self.page("findings", "examples", route, "index.html"))
+            i_tabs, i_src = body.index('class="dc-tabs"'), body.index('id="about-source"')
+            i_credit = body.index('id="source-credit"')
+            first = body.index('class="dc-i"') if route != "mhra-data" else body.index('class="dc-ov"')
+            self.assertLess(i_tabs, first)
+            self.assertLess(first, i_src)
+            self.assertLess(i_src, i_credit)
+            self.assertEqual(body.count('aria-current="page"'), 1)
+        pm = self._main(self.page("findings", "examples", "pmda", "index.html"))
+        self.assertIn('<span class="dc-ag dc-ag-pmda">PMDA</span>', pm)
+        self.assertIn('id="dc-more" data-label="더 보기 (남은 {n}건)" hidden>', pm)
+
+    def test_mhra_data_overview_groups(self):
+        body = self._main(self.page("findings", "examples", "mhra-data", "index.html"))
+        ov = body.split('class="dc-ov"', 1)[1].split("</div>", 1)[0]
+        self.assertIn("EU GMP 본문(장)", ov)
+        self.assertIn("EU GMP 부속서", ov)
+        self.assertIn('<a href="#annex-11"><span class="t">부속서 11<small>컴퓨터화 시스템</small>', ov)
+        self.assertNotIn('class="dc-jump"', body)
+        en = self._main(self.page("en", "findings", "examples", "mhra-data", "index.html"))
+        self.assertIn('Annex 11<small lang="en">Computerised Systems</small>', en)
+
+    def test_hub_tabs_and_agency_badges(self):
+        ko = self._main(self.page("findings", "examples", "index.html"))
+        self.assertIn('<a href="../../findings/examples/" class="on" aria-current="page"><b>영역별 대표 사례</b>', ko)
+        self.assertLess(ko.index('class="dc-tabs"'), ko.index('class="ex-jump"'))
+        en = self._main(self.page("en", "findings", "examples", "index.html"))
+        self.assertIn("<b>Examples by area</b>", en)
 
     def test_mhra_data_table(self):
         body = self._main(self.page("findings", "examples", "mhra-data", "index.html"))

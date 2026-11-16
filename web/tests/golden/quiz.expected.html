@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="/assets/grm.css?v=bf73464a">
+<link rel="stylesheet" href="/assets/grm.css?v=b70ada39">
 <link rel="stylesheet" href="/assets/pet.css?v=4eb979f5">
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/quiz/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/quiz/" />
@@ -4087,19 +4087,19 @@
 .qz-card[hidden]{display:none}
 .qz-card:target{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
 .qz-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.qz-no{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--lo)}
+.qz-no{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--muted-2)}
 .qz-no-n{font-variant-numeric:tabular-nums}
 .qz-diff{font-family:var(--sans);font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px}
 .qz-diff-easy{color:var(--coral-2);background:var(--coral-tint);border:1px solid rgba(194,96,63,.22)}
 .qz-diff-normal{color:var(--muted);background:var(--soft);border:1px solid var(--line-2)}
-.qz-src-kind{font-family:var(--sans);font-size:11.5px;color:var(--lo);margin-left:auto}
+.qz-src-kind{font-family:var(--sans);font-size:11.5px;color:var(--muted-2);margin-left:auto}
 .qz-q{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.5;color:var(--ink);margin:0 0 16px;word-break:keep-all}
 .qz-choices{display:flex;flex-direction:column;gap:9px}
 .qz-choice{display:flex;align-items:flex-start;gap:11px;width:100%;box-sizing:border-box;text-align:left;font-family:var(--sans);font-size:14.5px;line-height:1.5;color:var(--body);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:12px 15px;cursor:pointer;word-break:keep-all;transition:border-color .14s var(--ease),background .14s var(--ease),color .14s var(--ease)}
 .qz-choice:hover:not(:disabled){border-color:var(--coral);background:var(--soft)}
 .qz-choice:focus-visible{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
 .qz-choice:disabled{cursor:default}
-.qz-mark{flex:none;font-size:15px;color:var(--lo);line-height:1.5}
+.qz-mark{flex:none;font-size:15px;color:var(--muted-2);line-height:1.5}
 /* min-width:0 + anywhere — 공백 없는 긴 한국어 토큰(예: "완전성·풍량·차압·기류방향·미생물·회복시험")이
    375px 뷰포트에서 가로로 삐져나오던 문제. keep-all 은 유지하고 끊을 데가 없을 때만 끊는다. */
 .qz-choice-t{flex:1;min-width:0;overflow-wrap:anywhere}
@@ -4126,7 +4126,7 @@
 .qz-chip{font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--muted);background:var(--canvas);border:1px solid var(--line-2);border-radius:999px;padding:6px 13px;cursor:pointer;transition:color .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease)}
 .qz-chip:hover{color:var(--coral-2);border-color:var(--coral)}
 .qz-chip:focus-visible{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-tint)}
-.qz-chip[aria-pressed="true"]{color:#fff;background:var(--coral);border-color:var(--coral)}
+.qz-chip[aria-pressed="true"]{color:#fff;background:var(--coral-2);border-color:var(--coral-2)}
 /* ── 완주 요약·오답노트(13차) ── */
 .qz-result{padding:22px 24px;background:var(--coral-tint);border:1px solid rgba(194,96,63,.22);border-radius:var(--rad);scroll-margin-top:88px}
 .qz-result[hidden]{display:none}
@@ -4173,7 +4173,7 @@
 @media (prefers-reduced-motion:reduce){ .qzg-bar{transition:none} }
 .qzg-meta{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:8px 0 0;word-break:keep-all}
 .qzg-meta > span:first-child{color:var(--coral-2);font-weight:600}
-.qzg-note{color:var(--lo)}
+.qzg-note{color:var(--muted-2)}
 .qzg-reset{font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline}
 .qzg-reset:hover{color:var(--coral-2)}
 /* 성장 도감 — 현재 캐릭터 원형은 유지하고, 단계 차이는 자세·행동·상징으로 보여준다. */
@@ -4240,7 +4240,7 @@
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
 .foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
 .foot-copy .foot-ico .ti{font-size:13px;line-height:1}
-@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
+@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:none;text-wrap:balance}}
 </style>
 <style>
 .navmore{display:none}
@@ -4304,6 +4304,21 @@
 .btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
 .grm-skip:focus{left:16px}
+/* [본문 끝 여백 2026-11-15 · 대표 지적 "푸터에 마지막 글이 바짝 붙어 있다"] 페이지마다 아래 여백을
+   main·main>.wrap 의 padding(0~90px)으로 따로 주던 것을 한 규칙으로 — padding 은 걷고 main 의
+   margin 으로만 띄운다. margin 은 안쪽 마지막 요소의 margin 과 겹쳐(collapse) 큰 쪽만 남으므로
+   두 번 더해지지 않는다. :not(#_) 는 템플릿의 main.home·main.sr 같은 개별 규칙보다 앞서려는 것. */
+main:not(#_){padding-bottom:0;margin-bottom:72px}
+main:not(#_) > .wrap:last-child{padding-bottom:0}
+@media(max-width:640px){ main:not(#_){margin-bottom:56px} }
+/* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
+main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -4311,7 +4326,7 @@
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>국내외 의약품 GMP·품질 규제 동향을 한국어와 영어로 제공하는 무료 정보 서비스입니다.</p>
       <a class="foot-srclink" href="../findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
-    <div data-feedback-slot><h5>서비스 안내</h5><a href="../about/index.html">서비스 소개</a><a href="../guide/index.html">이용안내</a><a href="../index.html#notice">AI 활용 안내</a><a href="../findings/coverage/index.html">데이터 현황</a><a href="../rss.xml">RSS 피드</a></div>
+    <div data-feedback-slot><h5>서비스 안내</h5><a href="../about/index.html">서비스 소개</a><a href="../guide/index.html">이용안내</a><a href="../guide/index.html#sec-8">AI 활용 안내</a><a href="../findings/coverage/index.html">데이터 현황</a><a href="../rss.xml">RSS 피드</a></div>
     <div><h5>콘텐츠</h5><a href="../archive/index.html">주간 브리프</a><a href="../news/index.html">최근 규제 소식</a><a href="../browse/index.html">찾아보기</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../quiz/index.html">주간 퀴즈</a></div>
     <div class="foot-fnd"><h5>찾아보기</h5><a href="../findings/firm/index.html">업체</a><a href="../findings/inspector/index.html">실사관</a><a href="../findings/clause/index.html">조항</a><a href="../findings/trends/index.html">업무 영역별 경향</a><a href="../findings/inspections/index.html">FDA 실사 결과</a><a href="../findings/docs/index.html">공개 문서</a><a href="../findings/index.html">지적 문장 검색</a><a href="../findings/checklist/index.html">자가점검표</a><a href="../browse/index.html">전체 색인</a></div>
   </div>

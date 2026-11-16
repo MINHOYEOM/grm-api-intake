@@ -15,7 +15,7 @@
   .fx-sum{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);margin:14px 0 0;max-width:760px;word-break:keep-all}
   .fx-body{margin-top:34px;display:flex;flex-direction:column;gap:30px}
   .fx-list{display:flex;flex-direction:column;gap:10px}
-  .fx-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;border:1px solid var(--line-2);border-radius:10px;padding:13px 16px;background:var(--paper);text-decoration:none}
+  .fx-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;border:1px solid var(--line-2);border-radius:10px;padding:13px 16px;background:var(--paper,#FFFFFF);text-decoration:none}
   .fx-row:hover{border-color:var(--coral)}
   .fx-row-c{font-family:var(--sans);font-size:15px;color:var(--ink)}
   .fx-row-t{font-family:var(--sans);font-size:13.5px;color:var(--muted);flex:1 1 260px}
@@ -52,7 +52,7 @@
     {%- endif %}
 
     <section class="fx-sec">
-      <p class="fx-note">{{ _('조항 제목은 미국 연방규정 원문(영문) 그대로입니다. 건수는 공개 문서에서 자동 집계한 값이고, 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것입니다. 각 조항 페이지에서 공개 원문으로 바로 갈 수 있습니다.') }}</p>
+      <p class="fx-note">{{ _('조항 제목은 미국 연방규정 원문(영문) 그대로이고, 건수는 공개 문서에서 자동 집계한 값입니다.') }}</p>
     </section>
   </div>
 </main>

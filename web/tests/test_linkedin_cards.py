@@ -441,7 +441,7 @@ class EnglishDeckTest(unittest.TestCase):
                     self.assertNotEqual(svg, lc.GENERIC_MINI)
                     if lang != "ko":
                         self.assertEqual(HANGUL.findall(svg), [])
-        self.assertEqual(lc.mini("없는-용어", "en"), lc.GENERIC_MINI)
+        self.assertEqual(lc.mini("없는-용어", "en"), "")  # 그림 없는 용어는 빈 칸(일반 문서 아이콘 금지, 2026-11-16)
         self.assertFalse(lc.has_figure("없는-용어"))
         self.assertFalse(lc.has_figure(None))
 

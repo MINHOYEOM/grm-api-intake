@@ -202,7 +202,7 @@ jobs:
           OUT="web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json"
           FLAG=""
           if [ "${{ github.event.inputs.allow_no_en }}" = "true" ]; then FLAG="--warn-only"; fi
-          MSG=$(python check_en_slots.py "$OUT" $FLAG); RC=$?
+          RC=0; MSG=$(python check_en_slots.py "$OUT" $FLAG) || RC=$?  # 러너 셸이 bash -e 라 `; RC=$?` 꼴이면 실패 시 메시지 없이 죽는다(11-16)
           echo "$MSG"
           echo "### 영문 슬롯 게이트: $MSG" >> "$GITHUB_STEP_SUMMARY"
           if [ "$RC" -ne 0 ]; then echo "::error::$MSG"; exit "$RC"; fi

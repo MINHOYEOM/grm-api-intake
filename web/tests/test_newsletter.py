@@ -447,12 +447,20 @@ class NewsletterLibraryBlockTest(unittest.TestCase):
 # ── 면책 캐논 drift 가드(메일 = brief.html 동일 문안) ──────────────────────────
 class NewsletterDisclosureDriftTest(unittest.TestCase):
     def test_canon_matches_brief_template(self):
+        """[고지 정리 2026-11-16] 웹 브리프는 긴 고지를 한 줄(.ai-line)로 줄였다 — 메일 문안은
+        발송물이라 그대로 두고, 두 곳이 같은 약속(생성형 AI 작성 · 수치·인용·링크는 원문 그대로 ·
+        판단은 원문 확인)을 하는지만 지킨다. 한쪽에서 약속 하나가 빠지면 여기서 걸린다."""
         tpl = BRIEF_TEMPLATE.read_text(encoding="utf-8")
         norm = re.sub(r"\s+", " ", tpl)
-        self.assertIn(re.sub(r"\s+", " ", newsletter.DISCLOSURE_KO), norm,
-                      "메일 면책 KO 문안이 brief.html 과 드리프트")
-        self.assertIn(newsletter.DISCLOSURE_EN, norm,
-                      "메일 면책 EN 문안이 brief.html 과 드리프트")
+        line = norm[norm.index('<section class="ai-line" id="ai-notice"'):]
+        line = line[:line.index("</section>")]
+        mail = re.sub(r"\s+", " ", newsletter.DISCLOSURE_KO)
+        for promise in ("생성형 AI", "원문 인용", "링크", "원문"):
+            self.assertIn(promise, mail, f"메일 면책에서 '{promise}' 약속이 빠졌다")
+            self.assertIn(promise, line, f"브리프 고지 한 줄에서 '{promise}' 약속이 빠졌다")
+        self.assertIn("원문 그대로", line)
+        self.assertIn("원문을 그대로", mail)
+        self.assertIn("verify against the original", newsletter.DISCLOSURE_EN)
 
 
 # ── Brevo 어댑터(FakeSession — 네트워크 0, 엔드포인트·페이로드 단언) ────────────

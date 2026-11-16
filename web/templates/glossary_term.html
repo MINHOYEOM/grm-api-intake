@@ -73,6 +73,11 @@
   .gt-case-meta:hover{color:var(--coral)}
   .gt-case{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:15px;color:var(--on-coral);background:var(--coral-2);border-radius:var(--rad-s);padding:11px 20px;text-decoration:none}
   .gt-case:hover{text-decoration:underline}
+  .gt-inote{display:block;max-width:720px;font-family:var(--sans);color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:13px 16px;background:var(--paper,#FFFFFF);transition:border-color var(--tr)}
+  .gt-inote + .gt-inote{margin-top:8px}
+  .gt-inote:hover,.gt-inote:focus-visible{border-color:var(--coral)}
+  .gt-inote b{display:block;font-size:15.5px;font-weight:600;line-height:1.4}
+  .gt-inote span{display:block;font-size:14px;line-height:1.65;color:var(--body);margin-top:3px}
   .gt-case b{font-weight:600}
   /* [마케팅 2026-09-28] 사전 전체 규모 — 검색으로 용어 하나만 보고 나가려는 방문자에게
      사전이 이만큼 크다는 걸 보여 주고, 다음에 모르는 용어가 나오면 여기서 찾게 한다.
@@ -200,6 +205,17 @@
       {% if cases_asof %}<p class="gt-case-asof">{{ _("{asof} 기준으로 센 건수입니다 — 눌러서 보시는 검색 결과는 오늘 값이라 조금 다를 수 있습니다.", asof=cases_asof) }}</p>{% endif %}
     </section>
     {% endif %}
+
+    {#- [실사 대비 노트 2026-11-15] 이 용어를 다루는 노트가 있으면 링크 블록 하나(노트 제목 + lead 첫 문장).
+        재료는 env 전역 `inspection_note_links`({용어 id: [노트]} — 그 언어 트리의 값)다. 없으면 흔적 0. -#}
+    {%- if inspection_note_links is defined and inspection_note_links.get(term.id) %}
+    <section class="gt-sec">
+      <h2 class="gt-sec-h">{{ _('실사 대비 노트') }}</h2>
+      {%- for n in inspection_note_links.get(term.id) %}
+      <a class="gt-inote" href="{{ rel_root }}{{ n.path }}"><b>{{ n.title }}</b><span>{{ n.summary }}</span></a>
+      {%- endfor %}
+    </section>
+    {%- endif %}
 
     {% if intl_cases is defined %}{% with xc = intl_cases('term', term.id, lang), xc_sec = 'gt-sec', xc_h = 'gt-sec-h' %}{% include "partials/intl_cases_block.html" %}{% endwith %}{% endif %}
     <section class="gt-sec gt-src">

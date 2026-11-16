@@ -1,0 +1,151 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "media-fill",
+  "as_of": "2026-11-15",
+  "area_ko": "무균·오염 관리",
+  "area_en": "Sterility and contamination control",
+  "title_ko": "배지충전",
+  "title_en": "Media fill",
+  "glossary_ids": ["aseptic-process-simulation"],
+  "aliases_ko": ["무균공정 모의시험", "공정 모사", "공정 시뮬레이션", "미디어필", "배지 충전"],
+  "aliases_en": ["media fill", "process simulation", "aseptic process simulation"],
+  "search_q_ko": "배지충전",
+  "search_q_en": "media fill",
+  "lead_ko": "FDA 는 배지충전을 했는지보다, 그 배지충전이 실제 생산의 가장 어려운 조건을 그대로 모사했는지를 봅니다. 아래는 경고서한에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a media fill was run than at whether it simulated the hardest conditions of actual production. The findings below are quoted from warning letters.",
+  "patterns": [
+    {
+      "title_ko": "최악 조건과 실제 배치 규모를 모사하지 않았다",
+      "title_en": "Worst-case conditions and actual batch size were not simulated",
+      "quotes": [
+        {
+          "finding_id": "finding-f047422c69076fa8a2a739ad", "raw_signal_id": "rawsig-bc0eed217c75998d98ef1d10", "document_id": "39fcd67d9735",
+          "source": "FDA Warning Letter", "firm": "Turbare Manufacturing", "date": "2025-12-02", "trailing_ellipsis": true,
+          "quote_ko": "공정 모사(즉 배지충전) 시험은 \"최악조건(worst-case)\" 시나리오(예: 최대 배치 크기, 최장 공정 시간, 일상 및 비일상 개입의 모사)에서 수행되어야 하나",
+          "quote_en": "process simulation (i.e., media-fill) studies should be conducted under “worst-case” scenarios (e.g., simulating largest batch size, longest processing time, and routine & non-routine interventions)"
+        },
+        {
+          "finding_id": "finding-4bf9430af2ed91a8238b7716", "raw_signal_id": "rawsig-4834cf8d50d20e0b816dd1b1", "document_id": "6266b6a5dbe5",
+          "source": "FDA Warning Letter", "firm": "Bausch & Lomb Inc.", "date": "2026-09-15",
+          "quote_ko": "자료에 따르면 배지충전의 총 유닛 수가 무균적으로 생산되는 상업용 배치 규모보다 상당히 적었고, 귀사 무균공정 라인에 수반되는 오염 위험을 충분히 대표하지 못했다.",
+          "quote_en": "Data indicated that the total number of units in your media fills were substantially smaller than your aseptically produced commercial batch sizes and did not sufficiently represent the contamination risks associated with your aseptic processing lines."
+        }
+      ]
+    },
+    {
+      "title_ko": "개입 작업의 횟수와 종류가 실제 생산보다 적다",
+      "title_en": "Fewer interventions, and fewer kinds, than in actual production",
+      "quotes": [
+        {
+          "finding_id": "finding-0410c3dccb7ee14795b9b1e3", "raw_signal_id": "rawsig-cd075575fb61eae910852b8d", "document_id": "8b9b6af44436",
+          "source": "FDA Warning Letter", "firm": "Baxter International Inc.", "date": "2026-10-20",
+          "quote_ko": "(b)(4) 의 개입은 배지충전(media fill) 중 약 (b)(4) 회 모의되었으나, 생산기록은 이 개입이 훨씬 더 많이 발생했음을 나타낸다.",
+          "quote_en": "The intervention of (b)(4) was simulated approximately (b)(4) times during a media fill, but production records indicate a significantly higher occurrence of this intervention."
+        },
+        {
+          "finding_id": "finding-f66e3dca4534664a763575d9", "raw_signal_id": "rawsig-f64863f2feaca66a90de6213", "document_id": "9c468c9603b1",
+          "source": "FDA Warning Letter", "firm": "Daewoo Pharmaceutical Co., Ltd.", "date": "2025-07-15",
+          "quote_ko": "일상적인 배치 제조 중에 수행되는 개입이 배지충전에서는 모사되지 않았거나 수가 줄어든 경우가 훨씬 많았다.",
+          "quote_en": "We observed significantly more interventions performed during routine batch manufacturing that were either not simulated or reduced in quantity in media fills, as compared to what was observed during production."
+        }
+      ]
+    },
+    {
+      "title_ko": "오염된 단위가 나왔는데 원인을 조사하지 않았다",
+      "title_en": "Contaminated units were found but the cause was not investigated",
+      "quotes": [
+        {
+          "finding_id": "finding-34b919fe2bd87cf28a9e5b4b", "raw_signal_id": "rawsig-c4f7e79669afcbf25aed5a77", "document_id": "bc1f5b2bf48b",
+          "source": "FDA Warning Letter", "firm": "Annovex Pharma, Inc.", "date": "2025-03-25",
+          "quote_ko": "귀사는 양성 증식을 조사하지 않았으며 미생물 오염 징후를 보인 모든 유닛을 폐기하였습니다.",
+          "quote_en": "Your firm failed to investigate the positive growth and discarded all units that showed signs of microbial contamination."
+        },
+        {
+          "finding_id": "finding-1c1313fa4c60c85e5020b88e", "raw_signal_id": "rawsig-9ffd728b44361acedacbfa2e", "document_id": "671e7acfaf04",
+          "source": "FDA Warning Letter", "firm": "Regenerative Processing Plant, LLC", "date": "2024-09-06",
+          "quote_ko": "어느 배치도 오염의 규명 가능한 원인(assignable cause)에 대해 평가되지 않았고, 이후 성공적인 재밸리데이션도 이루어지지 않았다.",
+          "quote_en": "Neither batch was evaluated for an assignable cause of contamination or followed by successful revalidation."
+        }
+      ]
+    },
+    {
+      "title_ko": "충전한 단위 일부를 빼거나 일부만 배양했다",
+      "title_en": "Filled units were removed, or only some were incubated",
+      "quotes": [
+        {
+          "finding_id": "finding-8ebaacfd8f4a085bd0c148d1", "raw_signal_id": "rawsig-7478cc6f805d81dd8ae69821", "document_id": "cf579c86b52a",
+          "source": "FDA Warning Letter", "firm": "Global Pharma Healthcare Private Limited", "date": "2023-11-14",
+          "quote_ko": "귀사는 적절한 근거 없이 배지충전에서 온전한 유닛(integral units, 즉 용기-마개 시스템이 온전한 유닛)을 제외했고, 모든 온전한 유닛을 (b)(4) 전체 기간 동안 배양하지 않았다.",
+          "quote_en": "You removed integral units (i.e., units with intact container-closure systems) from media fills without adequate justification and failed to incubate all integral units for the full (b)(4) period."
+        },
+        {
+          "finding_id": "finding-1c1313fa4c60c85e5020b88e", "raw_signal_id": "rawsig-9ffd728b44361acedacbfa2e", "document_id": "671e7acfaf04",
+          "source": "FDA Warning Letter", "firm": "Regenerative Processing Plant, LLC", "date": "2024-09-06",
+          "quote_ko": "귀사는 온전한 충전 단위 전체가 아니라 허용품질수준(AQL) 샘플링 계획에 따라 선별한 일부 충전 단위만 배양하고 검사했다.",
+          "quote_en": "your firm incubated and examined a select number of filled units based on an acceptable quality level (AQL) sampling plan, rather than all integral, filled units."
+        }
+      ]
+    },
+    {
+      "title_ko": "작업자가 배지충전으로 적격성평가를 받지 않았다",
+      "title_en": "Operators were not qualified through media fills",
+      "quotes": [
+        {
+          "finding_id": "finding-d6e0d9f46661424f6cc7cee0", "raw_signal_id": "rawsig-3a98b93b5b538127458c958d", "document_id": "87c2a9ec70e4",
+          "source": "FDA Warning Letter", "firm": "3D Imaging Drug Design and Development LLC", "date": "2025-12-16",
+          "quote_ko": "귀사 작업자 중 1명은 2021년 4월 이후 공정 시뮬레이션(배지충전)을 이용한 PET 의약품 제조 재적격성평가를 받지 않았다. 그러나 이 작업자는 2025년 6월까지도 FDG를 제조했다.",
+          "quote_en": "one of your operators had not been requalified to perform PET drug manufacturing using process simulations (media fills) since April 2021."
+        },
+        {
+          "finding_id": "finding-f66e3dca4534664a763575d9", "raw_signal_id": "rawsig-f64863f2feaca66a90de6213", "document_id": "9c468c9603b1",
+          "source": "FDA Warning Letter", "firm": "Daewoo Pharmaceutical Co., Ltd.", "date": "2025-07-15",
+          "quote_ko": "귀사는 또한 작업자가 무균공정 운영에서 작업하기 전에 배지충전에 참여하도록 요구하지 않았다.",
+          "quote_en": "Your firm also did not require operators to participate in a media fill prior to working in the aseptic processing operation."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.113(b)",
+      "finding_id": "finding-f66e3dca4534664a763575d9", "firm": "Daewoo Pharmaceutical Co., Ltd.", "date": "2025-07-15",
+      "quote_ko": "귀사는 무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 및 멸균 공정의 밸리데이션을 포함하는 적절한 서면 절차를 수립하고 따르지 않았다",
+      "quote_en": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes",
+      "note_ko": "Bausch & Lomb, Baxter, Regenerative, Global Pharma 사례도 이 조항 아래 적혔습니다.",
+      "note_en": "The Bausch & Lomb, Baxter, Regenerative and Global Pharma findings were also cited under this section."
+    },
+    {
+      "key": "21 CFR 211.192",
+      "finding_id": "finding-c89d574118c109b12c44571d", "firm": "Somerset Therapeutics Private Limited", "date": "2025-09-16",
+      "quote_ko": "귀사는 배치 또는 그 구성 성분이 규격을 충족하지 못한 모든 원인불명의 불일치나 부적합을, 해당 배치가 이미 유통되었는지 여부와 관계없이 철저히 조사하지 않았다",
+      "quote_en": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed",
+      "note_ko": "배지충전 부적합의 조사 미흡이 이 조항으로 지적됐습니다.",
+      "note_en": "An inadequate investigation of a media fill failure was cited under this section."
+    },
+    {
+      "key": "21 CFR 212.50",
+      "note_ko": "PET 의약품에 적용됩니다(3D Imaging 사례).",
+      "note_en": "Applies to PET drugs (the 3D Imaging finding)."
+    }
+  ],
+  "checks_ko": [
+    "배지충전 계획서가 최대 배치 크기와 최장 충전 시간을 기준으로 잡혀 있습니까?",
+    "배지충전의 충전 수량이 상업 배치 규모와 견줄 만합니까? 차이가 있다면 근거가 문서로 있습니까?",
+    "생산 기록에 남은 개입의 종류와 횟수를 집계해 배지충전에 반영합니까? 계획되지 않은 개입도 기록합니까?",
+    "배지충전에서 오염된 단위가 나오면 원인 조사와 재밸리데이션까지 절차로 이어집니까?",
+    "온전한 단위를 모두 배양합니까? 제외한 단위가 있으면 사유를 기록합니까?",
+    "무균 작업자 전원이 작업 전과 정해진 주기마다 배지충전에 참여합니까? 빠진 사람을 걸러낼 장치가 있습니까?"
+  ],
+  "checks_en": [
+    "Is the media fill protocol based on the largest batch size and the longest filling time?",
+    "Is the number of units filled comparable to a commercial batch? If not, is the justification documented?",
+    "Are the types and counts of interventions in production records tallied and carried into the media fill? Are unplanned interventions recorded too?",
+    "When a media fill yields contaminated units, does the procedure lead to a root cause investigation and revalidation?",
+    "Are all integral units incubated? If any are excluded, is the reason recorded?",
+    "Do all aseptic operators take part in a media fill before working and at the set interval? Is there a control that catches anyone who was missed?"
+  ],
+  "further_reading": [
+    {"label_ko": "FDA 가이던스: Sterile Drug Products Produced by Aseptic Processing", "label_en": "FDA guidance: Sterile Drug Products Produced by Aseptic Processing", "url": "https://www.fda.gov/media/71026/download"}
+  ],
+  "related": ["environmental-monitoring"]
+}

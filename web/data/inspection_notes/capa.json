@@ -1,0 +1,212 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "capa",
+  "as_of": "2026-11-15",
+  "area_ko": "품질시스템",
+  "area_en": "Quality system",
+  "title_ko": "CAPA",
+  "title_en": "CAPA",
+  "glossary_ids": [
+    "capa",
+    "corrective-action",
+    "preventive-action"
+  ],
+  "aliases_ko": [
+    "시정 및 예방조치",
+    "시정조치",
+    "예방조치"
+  ],
+  "aliases_en": [
+    "CAPA",
+    "corrective action",
+    "preventive action"
+  ],
+  "search_q_ko": "CAPA",
+  "search_q_en": "CAPA",
+  "lead_ko": "FDA 는 CAPA 절차가 있는지보다, 확인된 문제마다 CAPA 가 열리고 시행되어 재발을 막았는지를 봅니다. 아래는 483 과 경고서한에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a CAPA procedure exists than at whether a CAPA was opened for each identified problem, carried out, and kept the problem from recurring. The findings below are quoted from Form 483s and warning letters.",
+  "patterns": [
+    {
+      "title_ko": "문제를 확인하고도 CAPA 를 열지 않았다",
+      "title_en": "A problem was identified but no CAPA was opened",
+      "quotes": [
+        {
+          "finding_id": "finding-13f57883a1419a576920828d",
+          "raw_signal_id": "rawsig-f3cf361958ac329f8becc4d5",
+          "document_id": "fda483-195531",
+          "source": "FDA 483",
+          "firm": "Duke University",
+          "date": "2026-10-30",
+          "quote_ko": "취한 시정조치를 기록하기 위한 CAPA를 개시하지 않았으며 추가 시정 및/또는 예방조치가 필요하지 않다고 판단했다.",
+          "quote_en": "No CAPA was initiated to capture the corrective action taken and no additional corrective and/or preventive action was deemed necessary."
+        },
+        {
+          "finding_id": "finding-5714d2d242caf9e567b36f05",
+          "raw_signal_id": "rawsig-be6c42cf01e74a12bec881de",
+          "document_id": "32bd6b7bc56a",
+          "source": "FDA Warning Letter",
+          "firm": "Tentamus India Private Limited",
+          "date": "2026-03-10",
+          "quote_ko": "감사 관찰은 실사 약 6주 전에 이루어졌으나 양식에 CAPA가 기재되어 있지 않았고, 그 지적사항은 QU의 일탈 및 CAPA 추적 프로그램에 포함되지 않았다.",
+          "quote_en": "The audit observations were made approximately six weeks before the inspection, but no CAPAs were listed on the form, and the findings were not included in the QU’s deviation and CAPA tracking program."
+        }
+      ]
+    },
+    {
+      "title_ko": "같은 문제가 되풀이되는데 CAPA 가 재발을 막지 못했다",
+      "title_en": "The same problem kept recurring and the CAPA did not prevent it",
+      "quotes": [
+        {
+          "finding_id": "finding-d5fab7c38c0ec01309873b98",
+          "raw_signal_id": "rawsig-edd3e3edd484cba2387494e5",
+          "document_id": "d1e41608f7ba",
+          "source": "FDA Warning Letter",
+          "firm": "Pharmathen International S.A.",
+          "date": "2026-06-16",
+          "quote_ko": "귀사는 지난 5년간 반복된 무균시험 및 배지충전(media fill) 부적합에 크게 기여한 작업자 오류를 포함하되 이에 국한되지 않는 심각한 오염 위험의 재발을 줄이기 위한 효과적인 CAPA를 시행하지 않았다.",
+          "quote_en": "Your firm did not implement effective CAPA to reduce recurrence of severe contamination hazards including, but not limited to, operator error that had contributed significantly to recurring sterility and media-fill failures over the past five years."
+        },
+        {
+          "finding_id": "finding-2717f2309d0467dcce02af9c",
+          "raw_signal_id": "rawsig-0ada76b0fc650cb821fa4ede",
+          "document_id": "fda483-195549",
+          "source": "FDA 483",
+          "firm": "Andelyn Biosciences, Inc.",
+          "date": "2026-10-30",
+          "quote_ko": "일탈 조사가 부적절하며 재발을 방지하는 효과적인 CAPA가 실행되지 않았다.",
+          "quote_en": "Deviation investigations are inadequate and effective CAPAs were not implemented to prevent recurrence."
+        }
+      ]
+    },
+    {
+      "title_ko": "조사에서 원인을 짚고도 그에 맞는 조치를 시행하지 않았다",
+      "title_en": "The investigation named a cause but matching actions were not implemented",
+      "quotes": [
+        {
+          "finding_id": "finding-e553df0ffa3b889bde4c76f5",
+          "raw_signal_id": "rawsig-cd075575fb61eae910852b8d",
+          "document_id": "8b9b6af44436",
+          "source": "FDA Warning Letter",
+          "firm": "Baxter International Inc.",
+          "date": "2026-10-20",
+          "quote_ko": "귀사의 조사는 육안검사의 부적절성이 기여 원인이라고 결론지었으나, 육안검사 프로그램의 개선을 보장하기 위한 충분한 CAPA를 이행하지 않았다.",
+          "quote_en": "Your investigation concluded that inadequacies of visual inspection were a contributing cause, but you did not implement sufficient CAPA to ensure remediation of your visual inspection program."
+        },
+        {
+          "finding_id": "finding-62b5ef108efec9d5972787f6",
+          "raw_signal_id": "rawsig-845e36e304d8d1d211092a14",
+          "document_id": "fda483-196144",
+          "source": "FDA 483",
+          "firm": "LeeSar Inc",
+          "date": "2026-11-05",
+          "quote_ko": "귀사 품질 부서(QU)는 적절한 감독을 하지 못했고, [redacted] ISO 5 격리 셀 내에서 회수된 미생물 오염에 대응하는 적절한 시정 및 예방 조치를 시행하지 않았다.",
+          "quote_en": "Your firm's Quality Unit (QU) failed to exercise adequate oversight and did not implement appropriate corrective and preventive actions in response to microbial contamination recovered within the [redacted] ISO 5 containment cell."
+        }
+      ]
+    },
+    {
+      "title_ko": "효과성 확인 없이 CAPA 를 종결했다",
+      "title_en": "CAPAs were closed without an effectiveness check",
+      "quotes": [
+        {
+          "finding_id": "finding-caf8d3bbc086dfaed1a7298e",
+          "raw_signal_id": "rawsig-fb710f49ead0bf3490d13926",
+          "document_id": "8909d4bb39b5",
+          "source": "FDA Warning Letter",
+          "firm": "Northland Nuclear Medicine, LLC",
+          "date": "2026-10-27",
+          "quote_ko": "반복되는 낮은 (b)(4) 수율에 대한 여러 CAPA가 귀사가 요구하는 효과성 확인 없이 종결되었다.",
+          "quote_en": "Multiple CAPAs for recurring low (b)(4) yields were closed without your required effectiveness checks."
+        },
+        {
+          "finding_id": "finding-4a6d1f256caadadce2060774",
+          "raw_signal_id": "rawsig-2b1fae81418c07fc8fe03ad5",
+          "document_id": "fda483-195453",
+          "source": "FDA 483",
+          "firm": "Octapharma Dessau GmbH",
+          "date": "2026-10-26",
+          "quote_ko": "시정조치의 효과를 검증하고 일탈의 향후 재발을 방지하기 위한 효과성 점검은 CAPA 안에 지정되지 않았다.",
+          "quote_en": "No effectiveness check was assigned within the CAPA to verify effectiveness of the corrective action and to prevent future reoccurrence of the deviation."
+        }
+      ]
+    },
+    {
+      "title_ko": "CAPA 를 제때 시작하지 않았거나 기한을 넘겨 끝냈다",
+      "title_en": "CAPAs were not started in time, or were closed past their due date",
+      "quotes": [
+        {
+          "finding_id": "finding-f3a9b916a3f186b546f85c47",
+          "raw_signal_id": "rawsig-e44c2c672ed87fc54d1b854a",
+          "document_id": "fda483-195541",
+          "source": "FDA 483",
+          "firm": "GlaxoSmithKline Biologicals",
+          "date": "2026-10-30",
+          "quote_ko": "귀사는 15일 신속 보고서 지연의 재발을 방지하기 위해 적절한 시점에 시정 및 예방 조치(CAPA)를 배정, 시작, 이행하지 않았다.",
+          "quote_en": "Your firm failed to assign, initiated, and implemented corrective and preventative actions (CAPAs) at an appropriate time to prevent future reoccurrence of late 15-Day Alert reports."
+        },
+        {
+          "finding_id": "finding-e8134d068913b0fe1124a8dc",
+          "raw_signal_id": "rawsig-cfcc617a29d2d84ca56e9988",
+          "document_id": "fda483-195454",
+          "source": "FDA 483",
+          "firm": "Premier Laboratory, LLC",
+          "date": "2026-10-26",
+          "quote_ko": "예를 들어, CAPA-23-004에는 연장이 있었으나 2023년 8월 17일 연장 요청은 최초 목표일 2023년 7월 31일 이후였고, CAPA는 연장 기한 2024년 1월 5일 후인 2024년 1월 24일 종료되었다.",
+          "quote_en": "For example, CAPA-23-004 included an extension, but the request for the extension on August 17, 2023 occurred after the initial target date of July 31, 2023, and the CAPA was closed on January 24, 2024, after the extended due date of January 5, 2024."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.192",
+      "finding_id": "finding-d5fab7c38c0ec01309873b98",
+      "firm": "Pharmathen International S.A.",
+      "date": "2026-06-16",
+      "quote_ko": "귀사는 배치 또는 그 구성 성분이 규격을 충족하지 못했거나 설명되지 않는 불일치가 있는 경우, 해당 배치의 출하 여부와 관계없이 이를 철저히 조사하지 않았다",
+      "quote_en": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed",
+      "note_ko": "Tentamus India 사례도 이 조항 아래 적혔습니다.",
+      "note_en": "The Tentamus India finding was also cited under this section."
+    },
+    {
+      "key": "21 CFR 212.20(d)",
+      "finding_id": "finding-caf8d3bbc086dfaed1a7298e",
+      "firm": "Northland Nuclear Medicine, LLC",
+      "date": "2026-10-27",
+      "quote_ko": "귀사는 생산 배치 또는 배치의 구성성분이 규격을 충족하지 못한 경우 적절한 조사를 수행하고 적절한 시정조치를 취하지 않았다",
+      "quote_en": "Your firm failed to conduct adequate investigations and take appropriate corrective action when a failure of a production batch or any component of the batch failed to meet any of its specifications",
+      "note_ko": "PET 의약품에 적용됩니다.",
+      "note_en": "Applies to PET drugs."
+    },
+    {
+      "key": "21 CFR 211.160(b)",
+      "finding_id": "finding-e553df0ffa3b889bde4c76f5",
+      "firm": "Baxter International Inc.",
+      "date": "2026-10-20",
+      "quote_ko": "귀사는 원료, 의약품 용기, 마개, 공정 중 물질, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당하고 적절한 규격, 기준, 검체채취 계획 및 시험 절차를 포함하는 시험 관리(laboratory controls)를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity",
+      "note_ko": "육안검사 프로그램에 대한 CAPA 미흡이 이 조항 아래 적혔습니다.",
+      "note_en": "Insufficient CAPA for the visual inspection program was cited under this section."
+    }
+  ],
+  "checks_ko": [
+    "일탈이나 감사에서 확인된 문제마다 CAPA 가 열려 추적 시스템에 올라 있습니까? 이미 취한 시정조치도 CAPA 로 기록합니까?",
+    "CAPA 가 필요 없다고 판단한 경우 그 근거가 문서로 있습니까?",
+    "같은 유형의 일탈이나 부적합이 되풀이될 때, 앞선 CAPA 가 왜 재발을 막지 못했는지 다시 검토합니까?",
+    "조사에서 짚은 원인과 기여 원인마다 그에 대응하는 조치가 있고 실제로 시행됐습니까?",
+    "CAPA 마다 효과성 확인이 지정되어 있습니까? 효과성 확인 없이 종결된 CAPA 가 있습니까?",
+    "CAPA 는 제때 배정되어 시작됩니까? 기한 연장은 기한이 지나기 전에 요청됩니까? 연장 기한을 넘겨 종결된 건이 있습니까?"
+  ],
+  "checks_en": [
+    "Is a CAPA opened and entered in the tracking system for each problem identified in a deviation or an audit? Are corrective actions already taken also recorded in a CAPA?",
+    "When a CAPA is judged unnecessary, is the justification documented?",
+    "When the same type of deviation or failure recurs, is it reviewed why the earlier CAPA did not prevent it?",
+    "Is there a matching action for each root cause and contributing cause named in the investigation, and was it actually implemented?",
+    "Does each CAPA have an effectiveness check assigned? Have any CAPAs been closed without one?",
+    "Are CAPAs assigned and started on time? Are extensions requested before the due date passes? Have any been closed after the extended due date?"
+  ],
+  "further_reading": [],
+  "related": [
+    "oos-investigation"
+  ]
+}

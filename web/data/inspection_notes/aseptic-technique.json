@@ -1,0 +1,108 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "aseptic-technique", "as_of": "2026-11-15",
+  "area_ko": "무균·오염 관리", "area_en": "Sterility and contamination control",
+  "title_ko": "무균 작업과 개입", "title_en": "Aseptic technique and interventions",
+  "glossary_ids": ["aseptic-processing", "critical-intervention"],
+  "aliases_ko": ["무균 조작", "무균 기법", "무균조작"],
+  "aliases_en": ["aseptic technique", "aseptic practice", "intervention"],
+  "search_q_ko": "무균 조작", "search_q_en": "aseptic technique",
+  "lead_ko": "FDA 는 무균 작업 절차서가 있는지보다, 작업자가 개입하는 동안 실제로 어떻게 움직였는지를 봅니다. 아래는 경고서한과 FDA 483에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether aseptic procedures exist than at how operators actually moved during interventions. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "열린 용기 위로 팔과 상체를 뻗어 퍼스트 에어를 막았다",
+      "title_en": "Operators reached over open containers and blocked first air",
+      "quotes": [
+        { "finding_id": "finding-47587db024c849ff17c63394", "raw_signal_id": "rawsig-7f3dc14efa94922ce45a5583", "document_id": "8a404f9eaaf8", "source": "FDA Warning Letter",
+          "firm": "Hanlim Pharm Co., Ltd.", "date": "2026-10-13",
+          "quote_ko": "작업자가 (b)(4) 개입 중 개방된 무균 튜브, (b)(4), 개방된 (b)(4) 위로 팔·상체·머리를 뻗어 퍼스트 에어(first air)를 반복적으로 차단했다.",
+          "quote_en": "Operators repeatedly broke first air by reaching their arms, torsos, and heads over open sterile tubes, (b)(4) , and open (b)(4) during (b)(4) interventions." },
+        { "finding_id": "finding-5109307ee8a40b0f3841b3fa", "raw_signal_id": "rawsig-2db987aa19d26095a07d9432", "document_id": "fda483-195304", "source": "FDA 483",
+          "firm": "Jiangsu Hansoh Pharmaceutical Group Co Ltd.", "date": "2026-10-22",
+          "quote_ko": "작업자가 마개를 추가하는 동안 제1 공기(first air)를 막는다.",
+          "quote_en": "Operators block first air during the addition of stoppers." }
+      ]
+    },
+    {
+      "title_ko": "상체를 ISO 5 구역이나 RABS 안으로 넣었다",
+      "title_en": "Operators put their upper body into the ISO 5 zone or RABS",
+      "quotes": [
+        { "finding_id": "finding-47e296b6039eb54c68296b8f", "raw_signal_id": "rawsig-72084f76fdffdd550dd5f8f4", "document_id": "9a4546da5523", "source": "FDA Warning Letter",
+          "firm": "Jubilant HollisterStier General Partnership", "date": "2026-06-23",
+          "quote_ko": "이 시험 중 작업자는 큰 (b)(4) 를 (b)(4) 하고 상체를 ISO 5 등급 구역 안에 넣었다.",
+          "quote_en": "During this study an operator (b)(4) the large (b)(4) and placed their upper torso inside the ISO 5 classified area." },
+        { "finding_id": "finding-5109307ee8a40b0f3841b3fa", "raw_signal_id": "rawsig-2db987aa19d26095a07d9432", "document_id": "fda483-195304", "source": "FDA 483",
+          "firm": "Jiangsu Hansoh Pharmaceutical Group Co Ltd.", "date": "2026-10-22",
+          "quote_ko": "작업자가 작업실에서 포셉을 꺼내고 되돌려 놓기 위해 RABS 장치 안쪽으로 상체를 기울여야 하는 것이 관찰되었다.",
+          "quote_en": "An operator was seen having to lean his upper body inside the RABS unit to retrieve and return forceps" }
+      ]
+    },
+    {
+      "title_ko": "청정구역 안이나 바로 옆에서 빠르게 움직였다",
+      "title_en": "Operators moved quickly in or next to the critical area",
+      "quotes": [
+        { "finding_id": "finding-d7b7c94b5ed8308da374c114", "raw_signal_id": "rawsig-118c98659862e3866bfbf061", "document_id": "9dd054b471ea", "source": "FDA Warning Letter",
+          "firm": "SCA Pharmaceuticals, LLC", "date": "2026-10-13",
+          "quote_ko": "청정구역 내 또는 청정구역에 바로 인접한 구역에서 일방향 기류(unidirectional airflow)가 교란될 가능성이 있을 정도로 빠르게 움직였다.",
+          "quote_en": "Moved quickly in a critical area or in an area immediately adjacent to a critical area such that unidirectional airflow is likely to be disrupted." },
+        { "finding_id": "finding-23ff5327c546e09dcc9ce5ba", "raw_signal_id": "rawsig-a159b6cc9777a0ee888e9b2d", "document_id": "fda483-193769", "source": "FDA 483",
+          "firm": "Lt Col Luke Weather Jr Veterans Affairs Medical Center", "date": "2026-07-23",
+          "quote_ko": "구체적으로, 06/02/2026 무균 생산 작업 중 작업자가 무균 조작을 수행하며 ISO 5 LAFH [redacted] 내에서 빠르게 움직이는 것이 관찰되었다.",
+          "quote_en": "Specifically, On 06/02/2026, during aseptic production operations, an operator was observed moving quickly within ISO 5 LAFH [redacted] while performing aseptic manipulations." }
+      ]
+    },
+    {
+      "title_ko": "장갑 낀 손을 소독하지 않거나 멸균 도구 대신 썼다",
+      "title_en": "Operators did not sanitize gloves or used gloved hands instead of sterile tools",
+      "quotes": [
+        { "finding_id": "finding-47e296b6039eb54c68296b8f", "raw_signal_id": "rawsig-72084f76fdffdd550dd5f8f4", "document_id": "9a4546da5523", "source": "FDA Warning Letter",
+          "firm": "Jubilant HollisterStier General Partnership", "date": "2026-06-23",
+          "quote_ko": "작업자는 또한 바이알을 꺼낼 때 멸균 도구 대신 장갑 낀 손을 사용했다.",
+          "quote_en": "The operator also used gloved hands instead of sterile tools to remove vials." },
+        { "finding_id": "finding-040360f54f5994366730d00f", "raw_signal_id": "rawsig-022cd9fbe4e4a944ad88a9f8", "document_id": "fda483-195536", "source": "FDA 483",
+          "firm": "Catalent Maryland, Inc.", "date": "2026-10-30",
+          "quote_ko": "작업자가 장갑(손)을 자주 소독하지 않는 것이 관찰되었다.",
+          "quote_en": "The operator was observed to not perform frequent glove (hand) sanitization." }
+      ]
+    },
+    {
+      "title_ko": "개입을 기록하지 않았다",
+      "title_en": "Interventions were not documented",
+      "quotes": [
+        { "finding_id": "finding-093ba1a4baca3e14af4a3ef8", "raw_signal_id": "rawsig-f549a46831c9c201a545862c", "document_id": "e68818062d22", "source": "FDA Warning Letter",
+          "firm": "Rohto Pharmaceutical Co., Ltd.", "date": "2026-10-20",
+          "quote_ko": "작업자들이 문서화되지 않은 개입 중에 개방된 병과 핵심 표면의 바로 위에서 접촉하는 상태로 (b)(4) 를 반복적으로 사용했으며, 노출된 용기를 폐기하지 않았다.",
+          "quote_en": "Operators repeatedly used (b)(4) directly above and in contact with open bottles and critical surfaces during undocumented interventions without rejecting the exposed containers." },
+        { "finding_id": "finding-b791fac20ea39682f95a7ac7", "raw_signal_id": "rawsig-b52b1a99fb67a9c031d39836", "document_id": "fda483-195316", "source": "FDA 483",
+          "firm": "Apotek Production & Laboratorier AB", "date": "2026-10-22",
+          "quote_ko": "배치 기록서에는 Grade A에서 수행된 모든 개입의 문서화나 각 개입을 수행하는 데 걸린 시간이 포함되어 있지 않다.",
+          "quote_en": "Batch records do not contain documentation of all interventions performed in the Grade Aor the length of time taken to perform each intervention." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.113(b)", "finding_id": "finding-47587db024c849ff17c63394", "firm": "Hanlim Pharm Co., Ltd.", "date": "2026-10-13",
+      "quote_ko": "귀사는 무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균공정(aseptic) 및 멸균 공정의 밸리데이션을 포함하는 적절한 서면 절차를 수립하지 않았고 이를 따르지 않았다",
+      "quote_en": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes",
+      "note_ko": "개방된 용기 위로 팔·상체를 뻗는 등 부적절한 무균 조작 관행이 이 조항으로 지적됐습니다.",
+      "note_en": "Poor aseptic practices such as reaching over open containers were cited under this clause." }
+  ],
+  "checks_ko": [
+    "개입 중 팔·상체·머리가 열린 용기나 제품 접촉 표면 위로 지나가지 않습니까",
+    "충전 구역에서 작업자의 움직임 속도와 범위를 정해 두고 영상 등으로 확인합니까",
+    "RABS 안으로 손이나 상체를 넣어야 하는 개입이 연기 시험에서 평가됐습니까",
+    "장갑 소독 시점과 멸균 도구 사용 기준이 작업 중에 실제로 지켜집니까",
+    "충전 라인에서 일어난 개입이 하나도 빠짐없이 배치 기록에 남습니까",
+    "계획 외 개입이나 열린 용기를 만진 뒤의 조치가 정해져 있고 지켜집니까"
+  ],
+  "checks_en": [
+    "Do operators' arms, upper bodies, and heads stay clear of open containers and product-contact surfaces during interventions?",
+    "Are the speed and reach of operator movements in the filling area defined and checked, for example by video?",
+    "Were interventions that require reaching or leaning into the RABS evaluated in smoke studies?",
+    "Are glove sanitization timing and sterile tool use actually followed during work?",
+    "Is every intervention on the filling line recorded in the batch record?",
+    "Are the actions after an unplanned intervention or contact with open containers defined and followed?"
+  ],
+  "further_reading": [],
+  "related": ["media-fill", "environmental-monitoring"]
+}

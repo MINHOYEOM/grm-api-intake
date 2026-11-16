@@ -29,6 +29,16 @@ SOURCES = ("FDA Warning Letter", "FDA 483")
 # 화면 이름은 '실사 대비 노트'다. 아래 낱말은 노트 어디에도 싣지 않는다(대화형 도구가 아니다).
 FORBIDDEN_WORDS = ("챗봇", "chatbot")
 ELLIPSIS = " …"
+# 목록의 분야 순서 — 한·영이 같은 목록을 쓴다(언어별로 따로 정렬하지 않는다).
+# 여기 없는 분야는 맨 끝에 이름순으로 붙는다(빌드는 깨지지 않는다).
+AREA_ORDER = (
+    ("무균·오염 관리", "Sterility and contamination control"),
+    ("시험실", "Laboratory"),
+    ("데이터와 기록", "Data and records"),
+    ("품질시스템", "Quality system"),
+    ("공급·제조·포장", "Supply, manufacturing and packaging"),
+)
+_AREA_RANK = {name: i for i, pair in enumerate(AREA_ORDER) for name in pair}
 
 _ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -275,7 +285,7 @@ def note_view(note: dict[str, Any], lang: str, *,
 
 
 def index_view(notes: "list[dict[str, Any]]", lang: str) -> "list[dict[str, Any]]":
-    """목록 뷰 — 영역별로 묶는다(영역·노트 모두 데이터에 적힌 순서가 아니라 이름순: 결정론)."""
+    """목록 뷰 — 영역별로 묶는다. 영역은 AREA_ORDER 순(없는 영역은 끝에 이름순), 노트는 이름순."""
     sfx = f"_{lang}"
     groups: dict[str, list[dict[str, Any]]] = {}
     for n in notes:
@@ -284,7 +294,8 @@ def index_view(notes: "list[dict[str, Any]]", lang: str) -> "list[dict[str, Any]
             "summary": first_sentence(n[f"lead{sfx}"]),
         })
     return [{"area": area, "notes": sorted(items, key=lambda x: x["title"].casefold())}
-            for area, items in sorted(groups.items())]
+            for area, items in sorted(
+                groups.items(), key=lambda kv: (_AREA_RANK.get(kv[0], len(AREA_ORDER)), kv[0]))]
 
 
 def glossary_links(notes: "list[dict[str, Any]]", lang: str) -> "dict[str, list[dict[str, str]]]":

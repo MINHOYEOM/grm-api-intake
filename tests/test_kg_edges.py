@@ -170,7 +170,8 @@ class ExtendedSurfaces(unittest.TestCase):
         self.assertEqual(e, {})
 
     def test_korean_alias_and_acronym_paren_base(self):
-        self.assertIn("pharmaceutical-quality-system", self._edges("품질경영시스템의 유효성이 미흡했다."))
+        # 2026-11-16: 품질경영시스템은 PQS 별칭에서 떼어 별도 용어(quality-management-system)가 됐다.
+        self.assertIn("quality-management-system", self._edges("품질경영시스템의 유효성이 미흡했다."))
         self.assertEqual(self._edges("품질관리부서가 업무를 수행하지 않았다.")["quality-control-unit"]["basis"], "ko_alias")
         # 괄호가 한정어(FDA 모델)면 본체를 표면형으로 쓰지 않는다
         self.assertNotIn("quality-system", self._edges("품질시스템 이행이 미흡했다."))

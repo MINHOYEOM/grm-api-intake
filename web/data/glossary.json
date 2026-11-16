@@ -5256,8 +5256,7 @@
     ],
     "source_url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-820",
     "reg_refs": [
-      "21 CFR 820.10",
-      "ISO 13485:2016 §4.1"
+      "21 CFR 820.10"
     ],
     "easy_en": "The management system that directs and controls an organisation with regard to quality. For medical devices, the US QMSR (21 CFR 820) adopts ISO 13485 and requires it under this name."
   }

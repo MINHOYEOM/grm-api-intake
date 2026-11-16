@@ -9150,6 +9150,15 @@ class WebSeoMetaTest(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
+    def test_brief_detail_header_marks_weekly_brief_current(self):
+        """[11-15 사용성 점검] 브리프 호별 화면에서 헤더 '주간 브리프'가 현재 위치로 켜져야 한다
+        (전엔 nav_active='detail' 이라 어느 탭도 켜지지 않았다)."""
+        import re as _re
+        for page in (self.detail, self.detail22):
+            tabs = _re.search(r'<nav id="navmenu">(.*?)</nav>', page, _re.S).group(1)
+            self.assertRegex(tabs, r'archive/index\.html" class="on">주간 브리프</a>')
+            self.assertNotIn('class="on">찾아보기</a>', tabs)
+
     def test_description_present_each_page(self):
         for h in (self.landing, self.archive, self.detail):
             self.assertIn('<meta name="description" content="', h)

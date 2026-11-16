@@ -413,7 +413,8 @@
     "term_ko": "배치 출하승인",
     "term_en": "Batch Release",
     "aliases": [
-      "lot release"
+      "lot release",
+      "배치 출하"
     ],
     "easy_ko": "배치의 제조·시험 기록과 요건 충족 여부를 검토해 판매 가능한 상태로 승인하는 과정입니다.",
     "definition_source": "PIC/S PE 009-17, Annex 16, Authorised Person and Batch Release",
@@ -563,6 +564,10 @@
     "id": "acceptance-criteria",
     "term_ko": "적합기준·허용기준",
     "term_en": "Acceptance Criteria",
+    "aliases": [
+      "판정기준",
+      "합격기준"
+    ],
     "easy_ko": "시험결과의 적합 여부를 판단하는 수치 한도, 범위 또는 그 밖의 적절한 기준입니다.",
     "definition_source": "ICH Q7, §20 Glossary, Acceptance Criteria; 식품의약품안전처, 「알기 쉬운 GMP 용어집」",
     "related": [
@@ -1289,7 +1294,9 @@
     "term_ko": "제품품질평가",
     "term_en": "Product Quality Review (PQR)",
     "aliases": [
-      "annual product review"
+      "annual product review",
+      "제품 품질 검토",
+      "연간 제품 검토"
     ],
     "easy_ko": "공정과 제품의 일관성, 규격의 적절성, 추세와 개선 필요성을 확인하기 위해 정기적으로 수행하는 품질 검토입니다.",
     "definition_source": "PIC/S PE 009-17, Part I, Chapter 1, Product Quality Review",
@@ -1415,7 +1422,8 @@
     "term_en": "Raw Data",
     "aliases": [
       "source data",
-      "원시 데이터"
+      "원시 데이터",
+      "원시자료"
     ],
     "easy_ko": "활동을 완전히 재구성하고 평가하는 데 필요한 최초 관찰과 그 후의 원본 기록·데이터입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Raw Data",
@@ -2354,6 +2362,9 @@
     "id": "bioburden",
     "term_ko": "바이오버든·미생물부하",
     "term_en": "Bioburden",
+    "aliases": [
+      "생물부하"
+    ],
     "easy_ko": "물질, 제품, 작업자, 표면 또는 환경에 존재하는 미생물의 수와 종류입니다.",
     "definition_source": "EU GMP Annex 1 (2022), Glossary, Bioburden; 식품의약품안전처, 「알기 쉬운 GMP 용어집」",
     "related": [
@@ -2509,7 +2520,8 @@
     "term_ko": "조치한계",
     "term_en": "Action Limit",
     "aliases": [
-      "action level"
+      "action level",
+      "조치 수준"
     ],
     "easy_ko": "초과할 경우 원인조사와 적절한 시정조치를 즉시 수행해야 하는 설정 기준입니다.",
     "definition_source": "PIC/S PE 009-17, Glossary, Action limit; 식품의약품안전처, 「알기 쉬운 GMP 용어집」, Action level",
@@ -2530,6 +2542,9 @@
     "id": "hepa-filter",
     "term_ko": "고효율 미립자 공기필터",
     "term_en": "High Efficiency Particulate Air (HEPA) Filter",
+    "aliases": [
+      "HEPA 필터"
+    ],
     "easy_ko": "청정실이나 무균작업구역의 공급공기에서 미립자를 제거하는 고효율 공기필터입니다.",
     "definition_source": "EU GMP Annex 1 (2022), Glossary, HEPA filter",
     "related": [
@@ -2773,6 +2788,10 @@
     "id": "biological-indicator",
     "term_ko": "생물학적 지표",
     "term_en": "Biological Indicator",
+    "aliases": [
+      "생물학적 지시자",
+      "생물학적 지시제"
+    ],
     "easy_ko": "멸균공정에 알려진 저항성을 가진 미생물을 사용해 멸균 사이클의 유효성을 확인하는 시험체입니다.",
     "definition_source": "식품의약품안전처, 「알기 쉬운 GMP 용어집」, Biological Indicator; EU GMP Annex 1",
     "related": [
@@ -2840,7 +2859,8 @@
       "internal audit",
       "quality audit",
       "자체점검",
-      "self inspection"
+      "self inspection",
+      "자기점검"
     ],
     "easy_ko": "제조소가 자체적으로 GMP 준수와 품질시스템의 효과를 정기적으로 평가하는 점검입니다.",
     "definition_source": "PIC/S PE 009-17, Part I, Chapter 9, Self Inspection",
@@ -2903,7 +2923,8 @@
     "term_ko": "보관용 검체·보존품",
     "term_en": "Retention Sample",
     "aliases": [
-      "reserve sample"
+      "reserve sample",
+      "보관 검체"
     ],
     "easy_ko": "완제품 배치의 표시·포장 상태를 확인할 목적으로 보관하는 완전 포장 단위의 검체입니다.",
     "definition_source": "PIC/S PE 009-17, Annex 19, Reference and Retention Samples",
@@ -2947,7 +2968,8 @@
     "term_en": "Critical Zone",
     "aliases": [
       "critical area",
-      "중요구역"
+      "중요구역",
+      "핵심 구역"
     ],
     "easy_ko": "무균공정 중 제품과 중요 표면이 환경에 노출되는 구역입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §11 Glossary: Critical zone",
@@ -2973,7 +2995,8 @@
       "laminar airflow",
       "laminar air flow",
       "층류",
-      "일방향 기류"
+      "일방향 기류",
+      "단방향 기류"
     ],
     "easy_ko": "입자를 임계 작업구역에서 재현성 있게 쓸어내도록 한 방향으로 균일하게 흐르는 공기입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §11 Glossary: Unidirectional airflow",
@@ -3277,7 +3300,9 @@
     "term_en": "Sterilising-grade Filter",
     "aliases": [
       "sterile filter",
-      "sterilizing filter"
+      "sterilizing filter",
+      "멸균필터",
+      "제균필터"
     ],
     "easy_ko": "적절히 검증되어 액체 또는 가스에서 미생물을 제거해 무균 여과 결과를 얻는 통상 최대 공칭공극 0.22 µm 필터입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§6.19, 8.79–8.95",
@@ -3834,6 +3859,10 @@
     "id": "original-data",
     "term_ko": "원본성·원기록",
     "term_en": "Original Data / Original Record",
+    "aliases": [
+      "원본 데이터",
+      "원본 기록"
+    ],
     "easy_ko": "정보가 처음 포착된 기록 또는 내용·의미를 보존한 검증된 진본 사본입니다.",
     "definition_source": "PIC/S PI 041-1 (2021), §§7.4, 13; MHRA GxP Data Integrity Guidance §6.2",
     "related": [
@@ -4195,7 +4224,8 @@
     "term_ko": "제약용수 시스템",
     "term_en": "Water System (Pharmaceutical Water System)",
     "aliases": [
-      "용수 시스템"
+      "용수 시스템",
+      "물 시스템"
     ],
     "easy_ko": "제약용수를 만들어 저장하고 사용처까지 보내는 설비 일체로, 설계와 적격성평가, 상시 감시가 함께 요구됩니다.",
     "definition_source": "WHO Technical Report Series No. 1033, Annex 3, Good manufacturing practices: water for pharmaceutical use, §5 General considerations for water purification systems; §6 Water storage and distribution systems; §7 Good practices for water systems",
@@ -4259,6 +4289,9 @@
     "id": "in-process-control",
     "term_ko": "공정관리",
     "term_en": "In-Process Control (IPC)",
+    "aliases": [
+      "공정 중 관리"
+    ],
     "easy_ko": "제조 중에 공정을 확인하고 필요하면 조정해 중간체나 원료의약품이 규격에 맞도록 하는 활동입니다.",
     "definition_source": "ICH Q7 (2000), §20 Glossary, In-Process Control (or Process Control)",
     "source_url": "https://database.ich.org/sites/default/files/Q7%20Guideline.pdf",
@@ -4280,7 +4313,9 @@
     "term_ko": "품질협약서",
     "term_en": "Quality Agreement",
     "aliases": [
-      "품질계약서"
+      "품질계약서",
+      "품질계약",
+      "품질협약"
     ],
     "easy_ko": "위탁자와 수탁자가 각자 어떤 CGMP 활동을 책임지는지 문서로 나눠 정해 둔 약정입니다.",
     "definition_source": "FDA Guidance for Industry, Contract Manufacturing Arrangements for Drugs: Quality Agreements (2016-11, Docket FDA-2013-D-0558)",
@@ -4668,7 +4703,8 @@
       "ongoing stability",
       "stability program",
       "시판 후 안정성 시험",
-      "안정성 프로그램"
+      "안정성 프로그램",
+      "안정성 시험 프로그램"
     ],
     "easy_ko": "시판 후에도 제품이 유효기간 동안 규격 안에 머무는지 확인하기 위해 매년 배치를 넣어 계속 시험하는 프로그램입니다.",
     "definition_source": "EU GMP Part I Chapter 6 §§6.26–6.36 On-going stability programme",

@@ -10,25 +10,25 @@
     </nav>
     <p class="kick">{{ doc.source.kick }}</p>
     <h1 class="ct-h1">{{ clause.code }}</h1>
-    {%- if clause.title %}<p class="ct-sub" lang="en">{{ clause.title }}</p>{% endif %}
-    {%- if clause.path %}<p class="ct-path" lang="en">{{ clause.path | join(' › ') }}</p>{% endif %}
+    {%- if clause.title %}<p class="ct-sub" lang="{{ doc.source.lang }}">{{ clause.title }}</p>{% endif %}
+    {%- if clause.path %}<p class="ct-path" lang="{{ doc.source.lang }}">{{ clause.path | join(' › ') }}</p>{% endif %}
   </div>
   <div class="wrap ct-body">
     <section>
       <h2 class="ct-sec-h">{{ _('조항 원문') }}</h2>
-      <div class="ct-text" lang="en">
+      <div class="ct-text" lang="{{ doc.source.lang }}">
         {%- for p in clause.paras %}
         <p>{{ p }}</p>
         {%- endfor %}
       </div>
-      {%- if lang == 'ko' %}
+      {%- if lang == 'ko' and doc.source.lang != 'ko' %}
       <p class="ct-note" style="margin-top:10px">{{ _('본문은 원문(영어)입니다. 국문 번역은 준비 중입니다.') }}</p>
       {%- endif %}
     </section>
     {%- if clause.notes %}
     <section>
       <h2 class="ct-sec-h">{{ _('각주·출처 표기') }}</h2>
-      <ul class="ct-notes" lang="en">{% for n in clause.notes %}<li>{{ n }}</li>{% endfor %}</ul>
+      <ul class="ct-notes" lang="{{ doc.source.lang }}">{% for n in clause.notes %}<li>{{ n }}</li>{% endfor %}</ul>
     </section>
     {%- endif %}
     <section>

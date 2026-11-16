@@ -19,8 +19,14 @@
 
 ## 시작할 때 (07:20 · 07:45 두 번 돈다)
 - `company/run/{run_date_kst}/desk.json` 이 이미 `status: 완료` 면 아무것도 하지 않고 종료한다(07:45 재시도가 07:20 결과를 덮어쓰지 않는다).
-- 이번 주 월요일 OPEN handoff 가 아직 없으면(Notion 에 생성 전 — 2026-11-02 시범에서 07:05 에 생겼다) `desk.json` 에
-  `"status": "보류", "reason": "handoff 없음"` 만 쓰고 끝낸다. 07:45 에 같은 확인을 한 번 더 한다. 그때도 없으면 그대로 두고 끝낸다(백업이 한다).
+- **읽을 수 있는 handoff** = 이번 주 월요일 Notion `OPEN GRM Routine Handoff {run_date_kst}`(Status=New)가 있고, 본문 payload JSON 이 끝까지 읽히고,
+  `rows` 개수가 Headline `(N rows)` 와 같다. 아니면 아직 쓰는 중이다(2026-11-02 07:05 · 11-16 08:01 에 생겼다).
+- 이번 주 handoff 를 아직 읽을 수 없으면 **기다린다**(RUN.md 5-2): 5분마다 다시 확인 — 07:20 슬롯은 07:42 까지, 07:45 슬롯은 08:10 까지.
+  07:20 슬롯이 07:42 까지 못 찾으면 아무것도 쓰지 않고 끝낸다(07:45 슬롯이 이어서 기다린다). 07:45 슬롯이 08:10 까지 못 찾으면 `desk.json` 에
+  `"status": "보류", "reason": "handoff 없음(08:10 까지 대기)"` 만 쓰고 끝낸다(백업이 한다). 08:10 이 지나서 처음 찾았으면 시작하지 않는다(같은 `보류`).
+- handoff 를 찾으면 일을 시작하기 **전에**, 3항 브랜치에 올라탄 뒤 데스크 잠금을 잡는다: `python company/editorial/shard_claim.py claim company/run/{run_date_kst} desk desk "데스크 07:20"`
+  (07:45 슬롯은 `"데스크 07:45"`). exit 1 이면 다른 데스크가 하는 중이다 — 일하지 말고 `python company/editorial/shard_claim.py desk company/run/{run_date_kst}` 가
+  `done` 이 될 때까지 5분마다 확인한다(시한 같음). `stale` 이면 다시 claim 해 이어받는다.
 
 ## 하는 일
 1. handoff 의 모든 row(병합 멤버 포함)에 조치를 하나씩 배정한다:

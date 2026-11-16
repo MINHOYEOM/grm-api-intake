@@ -11,17 +11,6 @@
   ]
  },
  {
-  "finding_id": "finding-b530df6890579b5c6e1d4772",
-  "finding_text_md5": "43f1b13919b2d81286c3fcdad1141ff0",
-  "detail_text": "· · q I/IJ f. Specifically, the observations document that the Pharmacists, Pharmacist-In-Charge (PIC) and ~g obs~Jtions the General Manager do not have the training and experience to provide assurance with respect tol~asic r equirements needed in support ofaseptic operations and sterile dtilgs. This would include, for example, the support utilities (HV AC, Water), personnel aseptic p ractices and procedures, Quality Control tests and laboratory equipment that are used in support ofthe aseptic operations. In addition, the \"Supervising Pharmacist Responsibilities/Pharmacist-In-Charge (PIC}\" document SOP ·No. 2.35, dated Jun 19,2013, establishes the responsibilities, that include for example, \"PIC and/or Supervising Pharmacist reports to the General Manager on overall effectiveness ofemployees individually and as a whole. Also keeps the. General Manger infonned of all legal and quality control issues tha:t affect the operations ofthe store.\" The procedure is silent with respect to assessing the support utilities, personnel aseptic practices and procedures,· Quality Control tests and laboratory equipment used in support ofth.e aseptic operations..",
-  "detail_text_ko": "구체적으로, 관찰 사항은 약사, 책임약사(PIC) 및 총괄 관리자가 무균 작업과 무균 의약품을 뒷받침하는 기본 요건에 대해 확신을 제공할 만한 교육과 경험을 갖추지 않았음을 보여준다. 여기에는 공조 설비(HVAC)와 용수 같은 지원 설비, 작업자의 무균 작업 관행과 절차, 품질관리 시험 및 무균 작업을 지원하는 실험실 설비 등이 포함된다. 또한 2013년 6월 19일(원문 표기 Jun 19,2013)자 SOP No. 2.35 “감독 약사의 책임 및 책임약사(PIC)”에는 “PIC 또는 감독 약사는 각 종업원과 전체 종업원의 전반적인 업무 효과를 총괄 관리자에게 보고한다. 또한 약국 운영에 영향을 미치는 모든 법적 문제와 품질관리 문제를 총괄 관리자에게 알린다”는 등의 책임이 규정되어 있다. 그러나 이 절차에는 무균 작업을 지원하는 지원 설비, 작업자의 무균 작업 관행과 절차, 품질관리 시험 및 실험실 설비를 평가하는 내용이 없다.",
-  "ocr_dropped": [
-   "I/IJ",
-   "IJ",
-   "HV AC"
-  ]
- },
- {
   "finding_id": "finding-2aa9479a24e0f4207619af95",
   "finding_text_md5": "173884867624cc5d3d8e96258ca27300",
   "detail_text": "Specifically, individual inventory records are not accurate for excipients and non-controlled substances used as Active Pharmaceutical Ingredients (API) and do not document all shipments and quantities received for each lot. For example, a)The Inventory and Use for Specific Chemical log shows that Lot REDACTED [redacted] of Calcium Gluconate USP Anhydrous Powder (Injectable) was used in REDACTED [redacted] finished product lots. The running inventory record shows there to be -3635.65gm in inventory. When the product was sampled on 8/16/13 there was approximately 2320gm in stock. b) The Inventory and Use for Specific Chemical log shows that lot RE DACTED [redacted] of Edetate Disodium USP Dihydrate has an inventory of 400.053 grams. When the product was sampled on 8/16/13 the firm had approximately 200gm in inventory.",
@@ -170,7 +159,7 @@
   "finding_id": "finding-be540f03841db8f6846a730d",
   "finding_text_md5": "0ce7baeff6a6ed3a0ce7d8768ad6477b",
   "detail_text": "Specifically, A testing program to determine appropriate storage conditions and expiration dating has not been established, rather, beyond use dates (BUD) are assigned to drug products based upon external literatur.e_ andrefe:r.e.J_tC.~.~ll!~r.i<ti,N.g_~~V!'~ Pf9Yid~4Jo Support that any drug products produced by the firm will conform to specifications such as potency, sterility, or endotoxin levels at the end of the labeled shelf life, for example Support that any drug products produced by the firm will conform to specifications such as potency, sterility, or endotoxin levels at the end of the labeled shelf life, for example Ascorbic Acid 500 mg/mL lot 04052013@2 was given a BUD of l0/2/13 (6 months) Cyanocobalamine 1000 mcg/mL lot 03122013@21 w as given a BUD of 9/12/13 (6 months) Testosterone 100 mg pellets lot 04042013@18 was given a BUD of 10/1/13 (6 months) Levothyroxine/Liothyronine 15/14 mcg capsule lot 0418213@17 was given a BUD of 4/18/14 (1 year)",
-  "detail_text_ko": "구체적으로, 적절한 보관 조건과 사용기한을 정하기 위한 시험 계획을 수립하지 않았다. 대신 외부 문헌과 참고자료를 근거로 의약품의 사용기한(BUD)을 정했다. 귀사가 생산한 의약품이 표시된 유효기간 말까지 함량, 무균성 또는 엔도톡신 수준 등의 규격을 충족한다는 근거는 없다. 예를 들어 Ascorbic Acid 500 mg/mL 로트 04052013@2에는 10/2/13(원문 표기 l0/2/13)까지 6개월의 BUD를 부여했다. Cyanocobalamin 1000 mcg/mL 로트 03122013@21에는 9/12/13까지 6개월의 BUD를 부여했다. Testosterone 100 mg 펠릿 로트 04042013@18에는 10/1/13까지 6개월의 BUD를 부여했다. Levothyroxine/Liothyronine 15/14 mcg 캡슐 로트 0418213@17에는 4/18/14까지 1년의 BUD를 부여했다.",
+  "detail_text_ko": "구체적으로, 적절한 보관 조건과 사용기한을 정하기 위한 시험 계획을 수립하지 않았다. 대신 외부 문헌과 참고자료를 근거로 의약품의 사용기한(BUD)을 정했다. 귀사가 생산한 의약품이 표시된 유효기간 말까지 함량, 무균성 또는 엔도톡신 수준 등의 규격을 충족한다는 근거는 없다. 예를 들어 Ascorbic Acid 500 mg/mL 로트 04052013@2에는 10/2/13까지 6개월의 BUD를 부여했다. Cyanocobalamin 1000 mcg/mL 로트 03122013@21에는 9/12/13까지 6개월의 BUD를 부여했다. Testosterone 100 mg 펠릿 로트 04042013@18에는 10/1/13까지 6개월의 BUD를 부여했다. Levothyroxine/Liothyronine 15/14 mcg 캡슐 로트 0418213@17에는 4/18/14까지 1년의 BUD를 부여했다.",
   "ocr_dropped": [
    "l0/2/13"
   ]
@@ -252,20 +241,6 @@
   ]
  },
  {
-  "finding_id": "finding-97d80e0676a28fed2d5f19f6",
-  "finding_text_md5": "5881a83a053886d12092e837e364869d",
-  "detail_text": "Specifically, a) The majority ofemployees (e.g., laboratory and production) have not participated in at least one current Good · · covering Title 21 CFR 210/211 for dmg products. For b) Only ten total employees have taken the recently implemente web based Isotrain \"GMP Orienta6on ALL in ONE: Lesson 4\", effective on 07/25/12. Three of the ten 10 employees lack certification of the training (e. [redacted] (C) c) Training on SOP BMFG1404 for \"General Mimufacturing Log Books\", dated 06/22/12, consists ofself training (i.e., employees reading the SOP) with no assessment ofemployee w1derstanding ofthe SOP. Per SOP section 5.5.2 ofB:MFG1404 \"If ~iscoloration or particulate is observed, contact the area superv.isor or designee immediately. The area operator wi.ll sign and. date the Equipment Cleaning Log Book and indicate in the 'Comments' column tl1at discoloration or particulate in the ISO 7/EU-C or ISO 8/EU-D production area was observed and area supervisor·or designee was contacted.\" There is no documentation in the Equipment Cleaning Log Book that the supervisor or designee was contacted regarding discoloration ofequipment; however, the supervisor signed off as having reviewed the cleaning log book on 08/09112 (for entries on 07/23-25,29-3 1 & 08/01 & 07/12), and on 08/19/12 (for entries on 08/12, 13 & 15112). Sections 5.5.3, 5.5.4, 5.5.4.1, 5.5.4.2, 5.5.5, and 5.5.5.1 of SOP BMFG1404 were not followed. d) AJl employees who petform visual inspection activities eid1er on-line (operators) or off-line (MQ Inspectors), are qualified yearly to perform this activity by reviewing a defect library that contains one example ofeach type ofdefect and then taking a test to identify the defect. The qualification does not entail reviewing and identifying defects under the same conditions that they perform this function during manufacturing operations (e.g. bags moving on conveyors with specific light sources and backgrounds and position o~)- For examples, employees [redacted] (C) e) MicrobioJogisU (hired on Ol/11111 was not trained on 90M-0426 for \"Microbial Limits Testing\" until Zena G. Kaufman, Senior Vice President, Gl obal Quality FlltM NAME •n\"\"ET AOORESS Hospira, I nc. 3900 Howard Lane CITY, U..lE, ZIP 000E. COU'ITRY n•EESTABLISHMENT INSPEC'fED Austin, TX 78 728-6515. Sterile Drug Manufacturer",
-  "detail_text_ko": "구체적으로, a) 실험실 및 생산 부서 등을 포함한 종업원 대부분이 의약품에 대한 Title 21 CFR 210/211을 다루는 최신 GMP 교육에 한 차례 이상 참여하지 않았다. b) 최근 도입하여 07/25/12에 시행된 웹 기반 Isotrain “GMP Orientation ALL in ONE: Lesson 4” 교육을 수료한 종업원은 총 10명뿐이다. 이 10명 중 3명은 교육 인증이 없다. 예: [redacted]. c) 06/22/12자 SOP BMFG1404 “일반 제조 기록서” 교육은 종업원이 SOP를 읽는 자율 학습으로만 구성되며 SOP 이해도를 평가하지 않는다. BMFG1404의 SOP 5.5.2항에는 “변색이나 입자가 관찰되면 구역 감독자 또는 지정자에게 즉시 연락한다. 구역 작업자는 설비 세척 기록서에 서명하고 날짜를 기록하며, ISO 7/EU-C 또는 ISO 8/EU-D 생산 구역에서 변색이나 입자가 관찰되었고 구역 감독자 또는 지정자에게 연락했음을 ‘설명’란에 기록한다”고 규정되어 있다. 설비 변색과 관련해 감독자 또는 지정자에게 연락했다는 문서는 설비 세척 기록서에 없었다. 그러나 감독자는 07/23-25,29-3 1, 08/01 및 07/12의 기록에 대해 08/09112에, 08/12, 13 및 15112의 기록에 대해 08/19/12에 세척 기록서를 검토했다고 서명했다. SOP BMFG1404의 5.5.3, 5.5.4, 5.5.4.1, 5.5.4.2, 5.5.5 및 5.5.5.1항을 따르지 않았다. d) 제조 중 온라인으로 육안 검사를 수행하는 작업자와 오프라인으로 수행하는 MQ 검사자를 포함한 모든 종업원은 결함 유형별 사례 1개가 포함된 결함 자료를 검토한 뒤 결함을 확인하는 시험을 치르는 방식으로 매년 적격성 평가를 받는다. 이 적격성 평가에서는 제조 작업 때와 같은 조건, 예를 들어 특정 광원과 배경 아래 이송 장치 위에서 백이 움직이는 조건과 작업 위치에서 결함을 검토하고 확인하지 않는다. 예: 종업원 [redacted]. e) 01/11/11(원문 표기 Ol/11111)에 채용된 미생물 담당자는 “미생물 한도시험” 절차 90M-0426에 대한 교육을 받지 않았다.",
-  "ocr_dropped": [
-   "Ol/11111",
-   "3900",
-   "AOORESS",
-   "CITY",
-   "ET",
-   "NAME"
-  ]
- },
- {
   "finding_id": "finding-ed83135da7f58fc53870534e",
   "finding_text_md5": "7c1191e19c74df868641d163a608f024",
   "detail_text": "and examinations to be conducted on appropriate samples ofin-process materials ofeach batch.. · · Specifically, Your finn takes in-process samples at a frequency and quantity not consistent with procedure BMQA0075, dated July 5, 2012 \"Responsibility/Flexible Container Sampling Process (Overwrap - Palletizer Area)\" section 1.1 which states \"Samples selected sbould always be representative ofthe Jot. For example, ifan equal number of samples are pulled at set intervals, the sample is representative ofthe lot.\" and section 1.3 which states \"Samples sizes for all pulls should be approximately equal whenever possible.\" The following are examples ofinconsistent sampling with respect to the number ofsamples pulJed per interval: During lot # 19-129-JT of 0.9% Sodium Chloride Injection USP (250mL) manufactured in July 2012, 1/12 at 1605 tq:&~/ 12 at 1300. Samples were pulled at approximately every 1 and there we~total groups ofsamples pulled. The numbers of samples pulled at set intervals range fromllto · ags per interval. During Jot# 20-029-JT ofMetro~aw e Injection, USP 500mg (lOOmL) manufactured in August 2012, from 8/14/12 at 1430 to 8/1 6/12 at 1225. Samples were pulled at approximately every there ' tal groups ofsamples pulled. The numbers ofsamples ' · ~bags per interval. During lot# 20-004-JT of 0.9% Sodium Chloride Injection, USP (SOmL} manufactured in August 2012, Margaret M. Annes, CS0~'1}1. ~\\A'~ Sharon K. Thoma",
@@ -314,21 +289,6 @@
   ],
   "kept_tokens": [
    "H2012l4BQ"
-  ]
- },
- {
-  "finding_id": "finding-5f9b1b0e0047ea6c46147782",
-  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
-  "detail_text": "Specifically, A. In October 2012, Biological Quality Manager identified that \"Gram positive rods~increased to 25% from 0%\". Tit~ trend report for- 2012 states \"Gram positive (spores), Gram negative rods, and molds (ObJ~e organisms) occur more abundantly t118I1 expected for properly functioning clean rooms.\" For example in the. aseptic core the microbial bioburden consisted ofthe following: 48% Gram positive spore fornring rods, 31 % Gram positive cocci. 9% Gram positive non-spore forming rods, 6% mold, 5% Gram negative rods, an.d I% yeast. The small volume parenteral tenninally sterilized classified area had bioburden consisting of27% Gram positive spore­ forming rods, 23% mold, 18% Gram negative rods, 18% Gram~cocci, 8% non-spore fanning rods, and 6% yeasL Review of the- trend reports fro~ 2012 to--.z012 remained similar. The report states that fue \"vast majority ofmicrobial contamination is human borne in adequately functioning clean rooms.\" Subsequently, on October 31,2012 Production Services Manager opened CA-PA PR ID: 105693 in order to create a focus team to review the current Rocky Motint Cleaning and Disinfectant Program to identify gaps, standardize cleaning procedures, and implement continuous improvements around cleaning, sanitization, and disinfection in the ISO classified areas. Although",
-  "detail_text_ko": "구체적으로, A. 2012년 10월 생물 품질 관리자는 “그람 양성 막대균이 0%에서 25%로 증가했다”고 확인했다. 2012년 경향 보고서에는 “정상적으로 기능하는 청정실에서 예상되는 수준보다 그람 양성균 포자, 그람 음성 막대균 및 곰팡이가 더 많이 발생한다”고 기재되어 있다. 예를 들어 무균 핵심 구역의 미생물 바이오버든은 그람 양성 포자 형성 막대균 48%, 그람 양성 구균 31%, 그람 양성 비포자 형성 막대균 9%, 곰팡이 6%, 그람 음성 막대균 5%, 효모 1%(원문 표기 I%)로 구성되었다. 소용량 주사제의 최종 멸균 등급 구역에서는 그람 양성 포자 형성 막대균 27%, 곰팡이 23%, 그람 음성 막대균 18%, 그람 양성 구균 18%, 비포자 형성 막대균 8%, 효모 6%로 구성된 바이오버든이 확인되었다. 2012년 경향 보고서들을 검토한 결과도 비슷했다. 보고서에는 “정상적으로 기능하는 청정실에서 발생한 미생물 오염의 대부분은 사람에게서 유래한다”고 기재되어 있다. 이후 2012년 10월 31일(원문 표기 31,2012) 생산 서비스 관리자는 현재 Rocky Mount 세척 및 소독 프로그램의 격차를 파악하고, 세척 절차를 표준화하며, ISO 등급 구역의 세척·위생 처리·소독을 지속해서 개선할 전담팀을 구성하기 위해 CA-PA PR ID 105693을 개시했다.",
-  "ocr_dropped": [
-   "Tit~",
-   "ObJ~e",
-   "t118I1",
-   "fro~",
-   "to--.z012",
-   "fue",
-   "Motint"
   ]
  },
  {
@@ -623,16 +583,6 @@
   "detail_text_ko": "(2011년 6월 21일 FDA 실사에서 나온 반복 관찰 사항이다.) a) 구체적으로, Carboplatin 제조 공정은 밸리데이션되지 않았으며 Carboplatin 18개 로트가 상업적으로 유통되었다. b) 또한 12/15/2006자 U-QCM-0603 개정 1 ‘Carboplatin pH 분석’ 절차를 수립한 때부터 12/16/2011자 U-QCM-0603 개정 3 ‘Carboplatin pH 분석’까지 완제품 및 안정성 시험에 사용한 Carboplatin pH 시험법이 정확한 결과를 낸다는 보장이 없다. 이 기간에는 상업적으로 유통된 Carboplatin USP for Injection 18개 로트가 모두 포함된다. c) 06/30/2011 발효된 QCO.OJ.002 ‘문제 상향 평가 양식’에 따르면 Carboplatin 로트 [redacted]는 6개월 안정성 pH 시험에 부적합했다. 이 로트는 상업적으로 유통되었다. 상업적으로 유통된 18개 로트에는 [redacted]가 포함된다.",
   "ocr_dropped": [
    "REDACTION"
-  ]
- },
- {
-  "finding_id": "finding-7da86279aded0f29dfd6f656",
-  "finding_text_md5": "e91e35f3f5c55aeb5137cd195550a220",
-  "detail_text": "Specifically, out of specifications (OOS) were observed on stability API samples which are used to support an application drug product currently on the market. For example, laboratory investigations: PR# 66560, confirmed OOS 6 month room temperature (R1) stability sample for Carboplatin, API lot REDACTI ON [redacted] was OOS for pH. Distributed finished product lot #Y061711A Carboplatin USP for injection. PR# 72518, Carboplatin, API 12 month RT stability sample lot REDACTIO N [redacted] was OOS for assay. Issue awareness date March 05, 2012. Investigation completed May 01, 2012. Distributed finished produ ct lot #Y021711A Carboplatin USP for injection. PR# 73478, Pentostatin, API 3 month RT stability sample lot [,6)14)_ 'and 24 month RT stability sample lot;K5)l2J) Iwas OOS for assay. Issue awareness date March 12,2012. Investigation completed April 12, 2012. Distributed fmished product lots #ZO 14870A and XOI4870NZ014870A Pentostatin for Injection 10 mg (Nipent) respectively. Active PhannaceuticaJ Ingredient Manufacturer",
-  "detail_text_ko": "구체적으로, 현재 시판 중인 허가 의약품을 뒷받침하는 안정성 API 검체에서 기준 일탈(OOS)이 관찰되었다. 예를 들어 시험실 조사 PR 66560은 Carboplatin API 로트 [redacted]의 6개월 실온(R1) 안정성 검체가 pH OOS임을 확인했다. 관련 유통 완제품은 Carboplatin USP for Injection, 로트 Y061711A이다. PR 72518에서는 Carboplatin API 로트 [redacted]의 12개월 실온(RT) 안정성 검체가 함량 OOS였다. 문제 인지일은 2012년 3월 05일이고 조사는 2012년 5월 01일 완료되었다. 관련 유통 완제품은 Carboplatin USP for Injection, 로트 Y021711A이다. PR 73478에서는 Pentostatin API의 3개월 실온(RT) 안정성 검체 로트 [redacted] 및 24개월 실온(RT) 안정성 검체 로트 [redacted]가 함량 OOS였다. 문제 인지일은 2012년 3월 12일(원문 표기 12,2012)이고 조사는 2012년 4월 12일(원문 표기 12,2012) 완료되었다. 관련 유통 완제품은 각각 Pentostatin for Injection 10 mg (Nipent), 로트 ZO 14870A 및 XOI4870NZ014870A이다.",
-  "ocr_dropped": [
-   "REDACTI",
-   "REDACTIO"
   ]
  },
  {

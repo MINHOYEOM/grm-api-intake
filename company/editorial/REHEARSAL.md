@@ -40,8 +40,10 @@
 | `1113b`·`1113c` | 11-13(목) 밤 | `2026-11-13` | (1113 을 다시 돌린 회차 — b: 영문 길이 상한 불일치로 보류, c: reject 4 로 미성공) | |
 | `1114` | 11-14(금) | `2026-11-13` | `claude/company-rehearsal-1114` | `company/run/rehearsal-1114/` |
 | `1115` | 11-15(토) | `2026-11-13` | `claude/company-rehearsal-1115` | `company/run/rehearsal-1115/` |
+| `1118` | 11-18(수) | `2026-11-16` | `claude/company-rehearsal-1118` | `company/run/rehearsal-1118/` |
+| `1120` | 11-20(금) | `2026-11-16` | `claude/company-rehearsal-1120` | `company/run/rehearsal-1120/` |
 
-(11-16 전환을 미루면 `1118`·`1120` 회차를 재료 `2026-11-16` 으로 같은 방식으로 돌린다.)
+(11-23 전환 전 `1118`·`1120` 은 재료 `2026-11-16` 이다. 리허설 폴더 이름이 날짜가 아니어도 사전 점검·병합은 `desk.json` 의 `handoff_ref.date` 로 handoff 를 찾는다.)
 
 각 Routine 을 수동 실행할 때 프롬프트 맨 앞에 이 한 줄을 더한다: `company/editorial/REHEARSAL.md 를 먼저 읽고 그 규칙을 우선한다. 회차 {회차}.`
 (워커 Routine 은 원래 있던 `워커: 델타-1` 같은 줄을 그대로 둔다.)

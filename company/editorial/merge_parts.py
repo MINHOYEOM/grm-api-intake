@@ -105,8 +105,21 @@ def handoff_card_types(payload):
 def find_handoff(folder, run_date=None):
     """실행 폴더의 handoff 파일 경로(`_handoff/handoff_<날짜>.json`). 없으면 None.
 
-    날짜는 `run_date` → 폴더 이름 순. 현재 작업 폴더와 저장소 루트를 차례로 본다(RUN.md 2항이 루트에 받는다)."""
+    날짜는 `run_date` → 폴더 이름 → 폴더의 `desk.json`(`handoff_ref.date`·`run_date_kst`) 순.
+    현재 작업 폴더와 저장소 루트를 차례로 본다(RUN.md 2항이 루트에 받는다).
+
+    ★2026-11-17 리허설 폴더(`rehearsal-1118`)는 이름이 날짜가 아니라 기자 사전 점검(precheck terms)이
+      handoff 를 못 찾고 모든 카드를 필수로 보아 거짓 차단했다(리허설 1118 준비 점검). 데스크가 적은
+      handoff_ref 날짜로 찾는다."""
     d = str(run_date or os.path.basename(os.path.normpath(folder)) or "")[:10]
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
+        try:
+            desk = _load(os.path.join(folder, "desk.json"))
+        except (OSError, ValueError):
+            desk = None
+        if isinstance(desk, dict):
+            ref = desk.get("handoff_ref") if isinstance(desk.get("handoff_ref"), dict) else {}
+            d = str(ref.get("date") or desk.get("run_date_kst") or "")[:10]
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
         return None
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

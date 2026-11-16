@@ -110,3 +110,31 @@ class MergePartsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FindHandoffRehearsalFolderTest(unittest.TestCase):
+    """2026-11-17: 리허설 폴더(rehearsal-1118)는 이름이 날짜가 아니다 — desk.json 의 handoff_ref 날짜로 찾는다."""
+
+    def test_rehearsal_folder_uses_desk_handoff_ref_date(self):
+        with tempfile.TemporaryDirectory() as root:
+            run = os.path.join(root, "company", "run", "rehearsal-1118")
+            os.makedirs(run)
+            os.makedirs(os.path.join(root, "_handoff"))
+            hp = os.path.join(root, "_handoff", "handoff_2026-11-16.json")
+            with open(hp, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+            with open(os.path.join(run, "desk.json"), "w", encoding="utf-8") as f:
+                json.dump({"status": "완료", "run_date_kst": "2026-11-16",
+                           "handoff_ref": {"date": "2026-11-16", "sha256": "x", "rows": 1}}, f)
+            cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                self.assertEqual(os.path.normpath(mp.find_handoff(run)), os.path.normpath(os.path.join(root, "_handoff", "handoff_2026-11-16.json")))
+            finally:
+                os.chdir(cwd)
+
+    def test_no_desk_no_date_returns_none(self):
+        with tempfile.TemporaryDirectory() as root:
+            run = os.path.join(root, "rehearsal-1118")
+            os.makedirs(run)
+            self.assertIsNone(mp.find_handoff(run))

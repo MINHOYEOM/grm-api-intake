@@ -1,0 +1,91 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "packaging-labeling", "as_of": "2026-11-16",
+  "area_ko": "공급·제조·포장", "area_en": "Supply, manufacturing and packaging",
+  "title_ko": "포장·표시 혼동 방지와 라인 클리어런스", "title_en": "Packaging and labeling mix-up prevention and line clearance",
+  "glossary_ids": ["line-clearance", "mix-up", "labeling-control"],
+  "aliases_ko": ["혼동", "표시자재 관리", "라인 클리어런스"], "aliases_en": ["mix-up", "labeling control", "line clearance"],
+  "search_q_ko": "혼동", "search_q_en": "mix-up",
+  "lead_ko": "FDA 는 포장·표시 절차를 갖췄는지보다, 라인과 표시자재가 실제로 혼동을 막도록 관리되고 있는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether packaging and labeling procedures exist than at whether lines and labeling materials are actually controlled to prevent mix-ups. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "라인 클리어런스를 적절히 수행하지 않았다", "title_en": "Line clearance was not adequately performed",
+      "quotes": [
+        { "finding_id": "finding-48e7c88bffb70a62a2eeef15", "raw_signal_id": "rawsig-c6620726224affdbc03d5312", "document_id": "0d4c4b7b9c64", "source": "FDA Warning Letter",
+          "firm": "Safecor Health, LLC", "date": "2023-09-12",
+          "quote_ko": "제조기록에는 라인 클리어런스(line clearance)를 실시했다고 되어 있음에도, 블리스터 포장기 위와 주변에서 관찰된 정제는 현재 진행 중인 작업의 것이 아니었다.",
+          "quote_en": "The tablets observed on and around the blister packaging machine did not belong to the current run, despite your batch records indicating that line clearance was performed." },
+        { "finding_id": "finding-6427748a122d9adac295c7cc", "raw_signal_id": "rawsig-3538b6364393468595c82ce1", "document_id": "9fcc608cccb4", "source": "FDA Warning Letter",
+          "firm": "Winder Laboratories, LLC", "date": "2026-01-13",
+          "quote_ko": "또한 병 안에서 (b)(4) mg 정제가 발견되어 귀사가 자발적으로 회수한 (b)(4) mg (b)(4) 정제는 사용 전 설비의 라인 클리어런스(line clearance)가 부적절했던 것과 관련될 수 있다.",
+          "quote_en": "Additionally, your firm's voluntary recall of (b)(4) mg (b)(4) tablets due to (b)(4) mg tablets being found inside the bottle could be associated to inadequate line clearance of equipment prior to use." }
+      ] },
+    { "title_ko": "라벨의 사용 수량을 기록하고 대조하지 않았다", "title_en": "Label usage was not recorded and reconciled",
+      "quotes": [
+        { "finding_id": "finding-6ced231954c199cd65f808f7", "raw_signal_id": "rawsig-4aab8ddd74674893ea70c562", "document_id": "fda483-195326", "source": "FDA 483",
+          "firm": "SURETEC INNOVATIONS LLC", "date": "2026-10-23",
+          "quote_ko": "의약품 라벨은 수불 관리, 문서화 또는 기록 유지 없이 사용 및 반납된다.",
+          "quote_en": "Drug labels are used and returned without any type of accountability, documentation or record keeping." },
+        { "finding_id": "finding-71f9f778e2be979ac6f6a9fd", "raw_signal_id": "rawsig-2a8f236eea5087bb7a8d8453", "document_id": "fda483-112561", "source": "FDA 483",
+          "firm": "Edge Pharmacy Services, LLC", "date": "2024-01-17",
+          "quote_ko": "귀사는 유통 전 제품 재포장에 대한 표시자재 관리나 용기 표시자재 수불 대조를 수행하지 않는다.",
+          "quote_en": "Your firm neither has label controls in place nor performs container label reconciliation for the repackaging of product prior to distribution." }
+      ] },
+    { "title_ko": "표시자재를 관리된 상태로 보관하지 않았다", "title_en": "Labeling materials were not stored under adequate control",
+      "quotes": [
+        { "finding_id": "finding-85bf674fba21caf4c739a90a", "raw_signal_id": "rawsig-6ae67b90398119ce6be727e5", "document_id": "fda483-195366", "source": "FDA 483",
+          "firm": "L' Oreal Usa, Inc.", "date": "2026-10-26",
+          "quote_ko": "라벨 및 기타 표시 자재가 의약품 종류, 함량, 제형 또는 내용량별로 적절히 식별되어 구분 보관되지 않는다.",
+          "quote_en": "Labels and other labeling materials are not stored separately with suitable identification for each different drug product, strength, dosage form or quantity of contents." },
+        { "finding_id": "finding-9f5b00f4f80e7a5d1b00b0dc", "raw_signal_id": "rawsig-7f4039bb7d425b7ad8d47de6", "document_id": "fda483-195348", "source": "FDA 483",
+          "firm": "Lantheus Medical Imaging, Inc.", "date": "2026-10-23",
+          "quote_ko": "운영, 제조, 키트 포장, 공급망, 시설, 엔지니어링, 밸리데이션, 품질관리 및 계측 부서 직원이 이 라벨 잠금 구역에 접근할 수 있다.",
+          "quote_en": "Personnel from your operations, manufacturing, kit packaging, supply chain, facilities, engineering, validation, quality control, and metrology departments have access to this label cage." }
+      ] },
+    { "title_ko": "혼동을 막도록 구분해 보관하지 않았다", "title_en": "Materials were not segregated to prevent mix-ups",
+      "quotes": [
+        { "finding_id": "finding-3a1d1827ce0727ecbb00ff6e", "raw_signal_id": "rawsig-33dd51620acc3e30cbf96f87", "document_id": "eb1e680fec98", "source": "FDA Warning Letter",
+          "firm": "Safrel Pharmaceuticals LLC", "date": "2026-08-18",
+          "quote_ko": "혼동을 방지하기 위한 창고 전반의 의약품 구분·격리가 부적절하다.",
+          "quote_en": "Improper segregation of drug products throughout your warehouse to prevent mix-ups." },
+        { "finding_id": "finding-912bba8e136cca2c6629f6a2", "raw_signal_id": "rawsig-6ae67b90398119ce6be727e5", "document_id": "fda483-195366", "source": "FDA 483",
+          "firm": "L' Oreal Usa, Inc.", "date": "2026-10-26",
+          "quote_ko": "부적합 원료, 의약품 용기, 마개 및 표시 자재를 처리 결정 전까지 보관하는 작업과 관련하여 오염 또는 혼동을 방지하기 위한 별도 구역 또는 지정 구역이 미흡하다.",
+          "quote_en": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to the holding of rejected components, drug product containers, closures and labeling before disposition." }
+      ] },
+    { "title_ko": "라벨이 올바른지 검사하지 않았다", "title_en": "Labels were not examined for correctness",
+      "quotes": [
+        { "finding_id": "finding-9c8b1f66c94b4a3b9a6e03e3", "raw_signal_id": "rawsig-845e36e304d8d1d211092a14", "document_id": "fda483-196144", "source": "FDA 483",
+          "firm": "LeeSar Inc", "date": "2026-11-05",
+          "quote_ko": "귀사의 절차는 검사자가 완제의약품의 라벨 표시가 올바른지에 대해 육안 검사를 수행하도록 요구하지 않는다.",
+          "quote_en": "Your procedure does not require inspectors to perform a visual inspection of finished drug products for the correct labeling." },
+        { "finding_id": "finding-1a342a120af6543798d9036e", "raw_signal_id": "rawsig-7dd3353a3d59a93237f5c0ac", "document_id": "fda483-195580", "source": "FDA 483",
+          "firm": "Bello Bio LLC", "date": "2026-10-27",
+          "quote_ko": "귀사는 [redacted] 주사용 바이알에 라벨을 붙이기 전에 라벨의 각 배치를 검사하지 않는다.",
+          "quote_en": "You do not examine each batch of labels prior to labeling [redacted] vials for injection." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.130(e)", "finding_id": "finding-48e7c88bffb70a62a2eeef15", "firm": "Safecor Health, LLC", "date": "2023-09-12",
+      "quote_ko": "귀사는 이전 작업에서 나온 모든 의약품이 제거되었음을 보증하기 위해 사용 직전에 포장 및 표시 시설을 적절히 점검하지 않는다",
+      "quote_en": "Your firm does not adequately inspect the packaging and labeling facilities immediately before use to assure that all drug products have been removed from the previous operations",
+      "note_ko": "라인 클리어런스를 했다고 기록한 포장기 주변에 다른 작업의 정제가 남아 있던 것이 이 조항으로 지적됐습니다.",
+      "note_en": "Tablets from other runs were found around a packaging machine whose batch record showed line clearance, and this was cited under this clause." }
+  ],
+  "checks_ko": [
+    "라인 클리어런스를 했다고 기록한 포장 라인과 그 주변에 이전 작업의 제품이 남아 있지 않습니까?",
+    "사용 전 설비의 라인 클리어런스가 다른 함량의 제품이 섞이는 것을 막을 만큼 적절합니까?",
+    "라벨의 사용·반납 수량을 기록하고 수불 대조를 수행합니까?",
+    "라벨과 표시자재를 제품, 함량, 제형, 내용량별로 식별해 구분 보관하고, 보관 구역에 접근하는 인원을 제한합니까?",
+    "표시되지 않은 제품과 부적합 표시자재를 혼동이 생기지 않도록 구분된 구역에 보관합니까?",
+    "라벨을 붙이기 전에 라벨 배치를 검사하고, 완제품의 라벨 표시가 올바른지 육안으로 확인합니까?"
+  ],
+  "checks_en": [
+    "Are packaging lines recorded as cleared, and the area around them, free of product from previous operations?",
+    "Is line clearance of equipment before use adequate to keep product of another strength from being mixed in?",
+    "Are the quantities of labels used and returned recorded and reconciled?",
+    "Are labels and labeling materials stored separately with identification by product, strength, dosage form and quantity of contents, and is access to the storage area limited?",
+    "Are unlabeled product and rejected labeling held in segregated areas so that mix-ups cannot occur?",
+    "Is each batch of labels examined before labeling, and is finished product visually examined for correct labeling?"
+  ],
+  "further_reading": [], "related": ["batch-records", "cross-contamination-cleaning", "written-procedures"]
+}

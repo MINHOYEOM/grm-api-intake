@@ -8234,7 +8234,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         _brief_page_title = tr("{date} 규제뉴스 · GRM", date=ctx["title_dateform"])
         emit("brief.html", brief_page,
             page_title=_brief_page_title,
-            nav_active="detail",
+            nav_active="board",   # [11-15 점검] 호별 화면에서도 헤더 '주간 브리프'가 켜진다(현재 위치)
             description=_brief_description(b["brief"], tr),
             brief=ctx,
             sections=sections,
@@ -8275,7 +8275,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             _en_brief_page_title = en_tr("{date} 규제뉴스 · GRM", date=en_ctx["title_dateform"])
             en_emit("brief.html", en_brief_page,
                 page_title=_en_brief_page_title,
-                nav_active="detail",
+                nav_active="board",
                 description=_brief_description(b["brief"], en_tr, "en"),
                 brief=en_ctx,
                 sections=(_en_sections := _build_sections(en_card_views, en_tr)),

@@ -264,6 +264,92 @@ class FetchSimilarTest(unittest.TestCase):
         self.assertNotRegex(deck["caption"], r"(?<!\d)0건")
 
 
+BRIEF_1116 = WEB_DIR / "data" / "briefs" / "brief_web_2026_11_16.json"
+SLOTS_1116 = WEB_DIR / "data" / "linkedin_anatomy" / "2026-11-16.v3.json"
+
+
+class Weekly1116Test(unittest.TestCase):
+    """[2026-11-16] 첫 주간 슬롯 — 분모 없는 서한(원문 한 줄 표지)·반복 위반 없는 서한·다른 주제(무균공정).
+    s05.comment 에 숫자를 쓰지 않아 라이브 지적사항 DB 가 주마다 바뀌어도 검증이 흔들리지 않는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.doc = json.loads(BRIEF_1116.read_text(encoding="utf-8"))
+        cls.findings = lg.load_findings()
+        cls.card = la.pick_anatomy_card(cls.doc)
+
+    def _slots(self) -> dict:
+        return json.loads(SLOTS_1116.read_text(encoding="utf-8"))
+
+    def _p(self, mutate) -> list[str]:
+        s = self._slots()
+        mutate(s)
+        return lg.validate_v3(self.card, s, self.findings)
+
+    def test_rule_picks_the_slot_card_dates_are_not_numbers(self):
+        # 날짜(년·월·일)를 수치로 세던 때는 기록 제출 거부 서한(7e7545ebb190, 지적 2건)이 뽑혔다.
+        self.assertEqual(self.card["id"], self._slots()["card_id"])
+        qiancan = next(c for c in self.doc["cards"] if c["id"] == "7e7545ebb190")
+        self.assertEqual(la.anatomy_score(qiancan)[1], 0)
+
+    def test_slot_passes(self):
+        self.assertEqual(lg.validate_v3(self.card, self._slots(), self.findings), [])
+
+    def test_deck_quote_cover_and_topic(self):
+        deck = lg.build_grm_deck(self.doc, self._slots(), self.findings)
+        self.assertEqual(len(deck["slides"]), 7)
+        cover = deck["slides"][0]
+        self.assertTrue(cover["quote"]["en"] and not cover["dots"])
+        html_ = lg.render_html(deck, font_links=False)
+        self.assertIn('class="g-quote"', html_)
+        self.assertNotIn("212 → 211", html_)          # 11-02 PET 문구가 다른 서한에 붙지 않는다
+        self.assertIn("‘무균보증/무균공정’", deck["caption"])
+        self.assertNotIn("USV", html_ + deck["caption"])
+        self.assertTrue(deck["caption"].startswith(self._slots()["caption"]["lead"].split(".")[0]))
+
+    def test_cover_needs_exactly_one_of_dots_or_quote(self):
+        p = self._p(lambda s: s["cover"].update(dots={"total": 3, "marked": 3, "evidence": ["x"], "caption": ""}))
+        self.assertTrue(any("정확히 하나" in x for x in p), p)
+        p = self._p(lambda s: s["cover"]["quote"].update(en="Airflow was observed to be fine."))
+        self.assertTrue(any("cover.quote.en" in x for x in p), p)
+
+    def test_repeat_is_optional(self):
+        self.assertEqual(self._p(lambda s: s["s03"].pop("repeat")), [])
+
+    def test_topic_required_for_new_weeks(self):
+        p = self._p(lambda s: s["s05"].pop("topic"))
+        self.assertTrue(any("s05.topic" in x for x in p), p)
+
+    def test_hook_rules(self):
+        lead = lambda t: (lambda s: s["caption"].update(lead=t))  # noqa: E731
+        p = self._p(lead("FDA는 한 무균 주사제 제조소에 경고서한을 보냈습니다. 기류에 난류가 있었습니다."))
+        self.assertTrue(any("사실로 시작" in x for x in p), p)
+        p = self._p(lead("기류 시각화 영상에서 심한 난류가 관찰됐는데도 회사가 기류는 적절하다고 결론을 내린 사건이 있었습니다."))
+        self.assertTrue(any("모바일 접힘" in x for x in p), p)
+        p = self._p(lead("기류 영상에 심한 난류가 찍혔는데도 회사는 적절하다고 봤습니다."))
+        self.assertTrue(any("숫자나 원문 인용" in x for x in p), p)
+        p = self._p(lambda s: s["cover"].update(headline=["무균공정 설계 결함·", "육안검사 미흡"]))
+        self.assertTrue(any("라벨로 끝난다" in x for x in p), p)
+
+    def test_candidates_cli_material(self):
+        got = lg.candidates(self.doc, SLOTS_1116)
+        self.assertEqual(got["pick"], self.card["id"])
+        self.assertTrue(got["material"]["key_violations"][0]["original"])
+        self.assertEqual([r["id"] for r in got["ranked"]][0], got["pick"])
+
+
+class PickFactTest(unittest.TestCase):
+    def test_does_not_split_inside_a_sentence_on_da(self):
+        t = "귀사는 멸균 의약품 및 자재를 ISO-5 품질보다 낮은 공기에 노출시켰다. 구체적으로, 작업자의 팔이 막았다."
+        self.assertEqual(lg._pick_fact(t), "멸균 의약품 및 자재를 ISO-5 품질보다 낮은 공기에 노출시켰다.")
+
+    def test_cut_drops_unclosed_parenthesis(self):
+        t = "ISO 5 구역 내 일방향 기류(unidirectional airflow)를 입증하기 위한 동적 조건(dynamic conditions)에서의 적절한 스모크 스터디(smoke study)를 수행하지 않았다."
+        out = lg._pick_fact(t)
+        self.assertTrue(out.endswith("…"), out)
+        self.assertNotIn("(smoke", out)
+
+
 class DistTest(unittest.TestCase):
     def test_dist_writes_under_briefs_pub(self):
         import tempfile

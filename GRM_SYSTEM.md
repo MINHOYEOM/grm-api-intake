@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.322` |
+| 문서 버전 | `v1.323` |
 | 최종 수정일 | 2026-11-16 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -665,7 +665,7 @@ grm-api-intake/
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
 │  ├─ linkedin_anatomy.py        # [콘텐츠 품질 2026-11-03 · 시범·플래그 뒤] 링크드인 '사건 해부형' 6장 — 주간 대표 경고서한 1건(표지 수치 막대→지적 표→근본원인→FDA 요구→회사 회신 vs FDA 판단→현장 체크리스트). 코드가 사실을 쥐고 해설 슬롯(`data/linkedin_anatomy/<발행일>.json`)은 근거 verbatim·숫자·상투어·실명·누락 게이트를 통과해야 한다. 별도 CLI — `linkedin_cards.main`·현행 출력 불변. 설계·대상 선정 제안은 `company/editorial/ANATOMY_CARDS.md`, 문체 기준은 `company/editorial/STYLE.md`
-│  ├─ linkedin_grm.py            # [콘텐츠 품질 2026-11-03 · 시범] 해부 카드 GRM 판(v7) — 고정 포맷 7칸(판정·지적 내용·회신 평가·시정 요구·유사 사례·DB 연관·서한에 없는 것)과 고정 순서 본문. 서한 원문 조항별 해부 + 유사 사례는 사이트 ‘유사 사례’ 엔진(`findings_similar` RPC, SUPABASE_URL·ANON_KEY 있을 때 호출·실패하면 그 카드만 뺌; 웹 배포 워크플로 ‘LinkedIn anatomy cards — GRM 7’ 스텝이 슬롯이 있는 주에 `briefs/<발행일>/linkedin_grm_01~07.png`·`linkedin_grm.txt` 를 낸다, 없으면 종전 linkedin.pdf) + DB 연관은 `findings_docs.json` 에서 코드가 센 값. 슬롯 `data/linkedin_anatomy/<발행일>.v3.json`, 검증 게이트·비용 0 는 v1 과 같다. 현행 출력 불변. 포맷은 `company/editorial/STYLE.md` §11, 시그니처·전후는 `company/editorial/ANATOMY_SIGNATURES.md`
+│  ├─ linkedin_grm.py            # [콘텐츠 품질 2026-11-03 · 시범] 해부 카드 GRM 판(v7) — 고정 포맷 7칸(판정·지적 내용·회신 평가·시정 요구·유사 사례·DB 연관·서한에 없는 것)과 고정 순서 본문. 서한 원문 조항별 해부 + 유사 사례는 사이트 ‘유사 사례’ 엔진(`findings_similar` RPC, SUPABASE_URL·ANON_KEY 있을 때 호출·실패하면 그 카드만 뺌; 웹 배포 워크플로 ‘LinkedIn anatomy cards — GRM 7’ 스텝이 슬롯이 있는 주에 `briefs/<발행일>/linkedin_grm_01~07.png`·`linkedin_grm.txt` 를 낸다, 없으면 종전 linkedin.pdf) + DB 연관은 `findings_docs.json` 에서 코드가 센 값. 슬롯 `data/linkedin_anatomy/<발행일>.v3.json`, 검증 게이트·비용 0 는 v1 과 같다. 현행 출력 불변. 포맷은 `company/editorial/STYLE.md` §11·후킹 §13(본문 첫 문장 44자·사실 먼저·숫자나 원문 인용 / 헤드라인 라벨 금지), 시그니처·전후는 `company/editorial/ANATOMY_SIGNATURES.md`. **매주 슬롯은 대외홍보팀 Routine(`company/outreach/linkedin-anatomy.md`)이 발행 뒤 쓴다** — `--candidates`(코드가 대상 선정·날짜는 수치로 세지 않음)→슬롯→`--check`→`--save-similar`→PR `linkedin(anatomy):`(워치독이 초록 30분 뒤 머지). 표지는 분모가 있으면 점 그림, 없으면 원문 한 줄(`cover.quote`)
 │  ├─ utm.py                     # [성장 2026-09-23] UTM 부착 헬퍼 + 채널 사전 `CHANNELS`(링크드인·주간/영문/서비스 안내 메일 본문·전달·용어집 PDF·구독 확인 메일 — 내보내는 모든 링크의 단일 정본, 2026-11-04). RUM(Cloudflare)은 쿼리를 안 읽으므로 소비자는 base.html 의 first-touch 계측(087 가입 시·104 도착 시 정수 카운트)뿐
 │  ├─ wl_anatomy.py              # [WL 해부 2026-10-31] 경고서한 국문 지적을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈다(FDA 문장 무변형·이으면 원문·확신 없으면 None). 문서 페이지(findings_doc.html)와 브리프 카드 문서 링크 문구가 쓴다
 │  ├─ glossary_pdf.py             # [마케팅 2026-09-28] GMP 규제 용어집 PDF — 용어 뷰모델(render)·브랜드·Chrome 렌더러(linkedin_cards) 재사용, QR 은 segno. 구독자 자료(/files/ · 도착 페이지 /welcome/)
@@ -712,7 +712,7 @@ grm-api-intake/
 │  ├─ education/                   # 용어·교육팀 — 주간 용어 추가(화) · 용어 그림(매일) · 주간 퀴즈(월)
 │  ├─ translation/                 # 글로벌번역팀 — 지적사항 일일 번역(매일 04:00)
 │  ├─ situation-room/              # 종합상황실 — 월 발행 준비 확인 · 월 운영 점검(확인만, 복구는 PC 백업)
-│  ├─ growth/ · outreach/          # 성장분석팀 주간 성장 보고 · 대외홍보팀 링크드인 초안 확인
+│  ├─ growth/ · outreach/          # 성장분석팀 주간 성장 보고 · 대외홍보팀 링크드인 초안 확인·사건 해부 슬롯(`linkedin-anatomy.md`, 월 13:00·16:00)
 │  └─ run/                         # (claude/company-<날짜> 브랜치에만) 직무별 실행 결과
 ├─ docs/  (prompts/·specs/ 포함, 현행 설계·운영 문서만 유지)
 │  ├─ GRM_자동화지도_2026-07.md          # 전 자동화 인벤토리·데이터계약·실패모드·월요일 타임라인

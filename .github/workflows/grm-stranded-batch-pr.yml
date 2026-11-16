@@ -26,6 +26,9 @@ on:
   schedule:
     # 6시간마다, :00/:17 크론 혼잡대를 피해 :41 에 실행.
     - cron: '41 */6 * * *'
+    # 월요일 15:41·17:41·19:41 KST — 링크드인 해부 슬롯 PR(`linkedin(anatomy):`, 월 13:00·16:00 클라우드 작성)을
+    # 그날 저녁 PC 작성창 세팅(18:00) 전후에 머지되게 한다. 다른 배치 PR 은 여전히 3시간 유예.
+    - cron: '41 6,8,10 * * 1'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -83,7 +86,13 @@ jobs:
               'glossary(weekly):',
               'quiz(weekly):',
               'glossary(fig):',
+              'linkedin(anatomy):',
             ];
+            // 링크드인 해부 슬롯 PR — 데이터 2파일(web/data/linkedin_anatomy/)뿐이고 검증은 슬롯 게이트(linkedin_grm --check)·CI 가 한다.
+            // 그날 게시 준비에 맞추려고 유예를 30분으로 줄인다. 이 폴더 밖 파일이 하나라도 있으면 머지하지 않는다.
+            const ANATOMY_PREFIX = 'linkedin(anatomy):';
+            const ANATOMY_GRACE_MS = 30 * 60 * 1000;
+            const ANATOMY_PATH = 'web/data/linkedin_anatomy/';
             const ISSUE_TITLE = '일일 번역 배치 PR 방치 — 검사 실패 또는 충돌';
             const LABEL_FINDINGS = 'grm-findings';
             const LABEL_FAILURE = 'automation-failure';
@@ -149,10 +158,19 @@ jobs:
                 continue;
               }
 
+              const isAnatomy = pr.title.startsWith(ANATOMY_PREFIX);
               const ageMs = Date.now() - new Date(pr.created_at).getTime();
-              if (ageMs <= GRACE_MS) {
-                console.log(`#${pr.number} 초록·머지가능이지만 생성 ${Math.round(ageMs / 60000)}분 전 — 3시간 유예 대기.`);
+              if (ageMs <= (isAnatomy ? ANATOMY_GRACE_MS : GRACE_MS)) {
+                console.log(`#${pr.number} 초록·머지가능이지만 생성 ${Math.round(ageMs / 60000)}분 전 — ${isAnatomy ? '30분' : '3시간'} 유예 대기.`);
                 continue;
+              }
+              if (isAnatomy) {
+                const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: pr.number, per_page: 100 });
+                const outside = files.map((f) => f.filename).filter((f) => !f.startsWith(ANATOMY_PATH));
+                if (outside.length > 0) {
+                  console.log(`#${pr.number} 해부 슬롯 PR 인데 ${ANATOMY_PATH} 밖 파일이 있다(${outside.join(', ')}) — 머지하지 않는다(사람 검토).`);
+                  continue;
+                }
               }
 
               if (dryRun) {

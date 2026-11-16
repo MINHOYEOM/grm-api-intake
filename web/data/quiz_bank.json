@@ -2389,5 +2389,101 @@
       "A program that keeps testing batches placed on stability each year to confirm the marketed product stays within specification through its shelf life"
     ],
     "explanation_en": "The product quality review is a periodic quality review to confirm process and product consistency, suitability of specifications, trends, and need for improvement (EU GMP Part I Chapter 1; ICH Q10 §2.7). The others describe continual improvement, state of control, and the ongoing stability programme."
+  },
+  {
+    "id": "q-202647-01",
+    "question_ko": "FDA가 2026년 11월 10일 중국 난징의 원료의약품 제조업체 Nanjing Hanxin Pharmaceutical Technology Co. Ltd.에 발행한 경고서한에서, 품질부서의 CGMP 책임 미이행(501(a)(2)(B))으로 지적한 내용은?",
+    "choices": [
+      "503A·503B 조제에 쓸 수 없는 원료를 미국으로 수입하려 한 것",
+      "FDA의 전자 기록 요청에 요청한 기록을 끝내 제출하지 않은 것",
+      "무균 의약품·조제용 원료의약품의 핵심 원자재 공급업체를 적절히 적격성 평가하지 않은 것",
+      "무균공정 설계와 육안검사 절차를 제대로 지키지 않은 것"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "경고서한 위반 1은 품질부서가 핵심 원자재 공급업체를 적절히 적격성 평가하지 않은 것(501(a)(2)(B))입니다. 미승인 의약품 수입은 같은 서한의 위반 2이고, 나머지는 같은 주 다른 업체 경고서한의 지적입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-11-16/#0f65bd3c5c70",
+    "difficulty": "normal",
+    "week": "202647",
+    "question_en": "In its November 10, 2026 Warning Letter to Nanjing Hanxin Pharmaceutical Technology Co. Ltd., an API manufacturer in Nanjing, China, what did FDA cite as the quality unit's failure to meet its CGMP responsibility (501(a)(2)(B))?",
+    "choices_en": [
+      "Seeking to import into the U.S. materials that cannot be used in 503A/503B compounding",
+      "Never providing the records FDA requested electronically",
+      "Not adequately qualifying the suppliers of critical raw materials for APIs used in sterile products and compounding",
+      "Not properly following aseptic process design and visual inspection procedures"
+    ],
+    "explanation_en": "Violation 1 in the Warning Letter is the quality unit's failure to adequately qualify suppliers of critical raw materials (501(a)(2)(B)). The unapproved-drug import is violation 2 of the same letter; the others were cited in other firms' Warning Letters that week."
+  },
+  {
+    "id": "q-202647-02",
+    "question_ko": "식약처가 2026년 11월 9일 제이더블유중외제약(주)에 해당 임상시험 업무정지 1개월(1차)을 처분하면서 적용한 위반 사유는?",
+    "choices": [
+      "기준서 미준수와 임상시험용의약품 제조 및 품질관리기준 위반",
+      "임상시험계획 변경 미보고 등",
+      "임상시험 대상자 동의 절차 위반",
+      "마약류 취급내역 보고기한 및 변경 보고기한 미준수"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "식약처는 제이더블유중외제약(주)의 기준서 미준수와 임상시험용의약품 제조 및 품질관리기준 위반을 이유로 해당 임상시험 업무정지 1개월(1차)을 처분했습니다. 나머지는 같은 주 다른 업체 처분의 사유입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-11-16/#admin-2026007935",
+    "difficulty": "easy",
+    "week": "202647",
+    "question_en": "On November 9, 2026, MFDS suspended JW Pharmaceutical's relevant clinical trial for 1 month (first offence). What violation did it cite?",
+    "choices_en": [
+      "Failure to follow standard documents and violation of the GMP for investigational medicinal products",
+      "Failure to report changes to the clinical trial plan, among others",
+      "Violation of the consent procedure for trial subjects",
+      "Failure to meet the reporting deadline and change-reporting deadline for narcotics handling records"
+    ],
+    "explanation_en": "MFDS suspended the relevant clinical trial for 1 month (first offence) over failure to follow standard documents and violation of the manufacturing and quality control standards for investigational medicinal products. The others were reasons for other firms' actions that week."
+  },
+  {
+    "id": "q-202647-03",
+    "question_ko": "의약품 GMP에서 말하는 ‘교차오염(Cross-contamination)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "새 작업 전에 작업구역과 설비에 이전 제품·자재·문서가 남지 않았는지 확인하는 절차",
+      "승인된 세척절차가 설비를 의약품 처리에 적합한 상태로 만든다는 문서화된 증거",
+      "청정실과 청정공기설비의 입자와 미생물 상태를 정한 위치와 주기로 계속 확인하는 활동",
+      "한 물질 또는 제품이 다른 물질이나 제품에 의해 오염되는 것"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "교차오염은 한 물질 또는 제품이 다른 물질이나 제품에 의해 오염되는 것입니다(ICH Q7 §§4.4, 5; EU GMP Part I Chapter 5). 나머지는 각각 라인 클리어런스, 세척 밸리데이션, 환경 모니터링에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "cross-contamination",
+    "difficulty": "easy",
+    "week": "202647",
+    "question_en": "In pharmaceutical GMP, which statement correctly describes cross-contamination?",
+    "choices_en": [
+      "The procedure confirming, before new work starts, that no previous product, material, or document remains in the working area or on the equipment",
+      "Documented evidence that an approved cleaning procedure leaves equipment in a condition suitable for processing medicines",
+      "Continuing checks on the particle and microbial condition of cleanrooms and clean air equipment, at defined locations and frequencies",
+      "Contamination of one material or product by another material or product"
+    ],
+    "explanation_en": "Cross-contamination is the contamination of one material or product by another material or product (ICH Q7 §§4.4, 5; EU GMP Part I Chapter 5). The others describe line clearance, cleaning validation, and environmental monitoring."
+  },
+  {
+    "id": "q-202647-04",
+    "question_ko": "의약품 GMP에서 말하는 ‘무균시험(Sterility Test)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "물질, 제품, 작업자, 표면 또는 환경에 존재하는 미생물의 수와 종류",
+      "약전에 정한 방법으로 검체에 살아 있는 미생물이 검출되는지 확인하는 시험",
+      "실제 제품 대신 배지나 대체물질을 사용해 일상 무균제조공정 전체를 모의하는 시험",
+      "청정실과 청정공기설비의 입자와 미생물 상태를 정한 위치와 주기로 계속 확인하는 활동"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "무균시험은 약전에 정한 방법으로 검체에 살아 있는 미생물이 검출되는지 확인하는 시험입니다(EU GMP Annex 1 §§10.4–10.7; 21 CFR 211.167(a)). 나머지는 각각 바이오버든, 무균공정 모의시험(배지충전), 환경 모니터링에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "sterility-test",
+    "difficulty": "normal",
+    "week": "202647",
+    "question_en": "In pharmaceutical GMP, which statement correctly describes the sterility test?",
+    "choices_en": [
+      "The number and type of microorganisms present on a material, product, person, surface, or in the environment",
+      "A test that checks by the pharmacopoeial method whether viable microorganisms are detected in a sample",
+      "A test that simulates the entire routine aseptic manufacturing process using a growth medium or a substitute in place of the actual product",
+      "Continuing checks on the particle and microbial condition of cleanrooms and clean air equipment, at defined locations and frequencies"
+    ],
+    "explanation_en": "The sterility test checks by the pharmacopoeial method whether viable microorganisms are detected in a sample (EU GMP Annex 1 §§10.4–10.7; 21 CFR 211.167(a)). The others describe bioburden, the aseptic process simulation (media fill), and environmental monitoring."
   }
 ]

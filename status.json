@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T01:59:45Z",
+ "generated_at": "2026-11-16T02:42:03Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 43793464419,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-16T02:39:08Z",
+    "updatedAt": "2026-11-16T02:41:50Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Web Publish (assemble)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43793464419"
+   },
+   {
     "databaseId": 43788711900,
     "status": "completed",
     "conclusion": "failure",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "fix(brief): 새 실사 카드 틀은 11-09 이후 호에만 — 옛 호 재조립 소급 방지 (#1412)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568356278"
-   },
-   {
-    "databaseId": 42566688275,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-09T05:20:01Z",
-    "updatedAt": "2026-11-09T05:20:59Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Web Publish (assemble)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566688275"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43788711937,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T01:51:44Z",
-    "updatedAt": "2026-11-16T01:57:33Z",
-    "headBranch": "main",
-    "displayTitle": "bridge(web): 2026-11-16 라우틴 델타 커밋 (자동)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788711937"
+    "databaseId": 43793725178,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-16T02:41:50Z",
+    "updatedAt": "2026-11-16T02:41:54Z",
+    "headBranch": "publish/brief-2026-11-16",
+    "displayTitle": "publish(web): 2026-11-16 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43793725178"
    },
    {
-    "databaseId": 43741324770,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 43793720061,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-15T17:28:49Z",
-    "updatedAt": "2026-11-15T17:34:36Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1751 from MINHOYEOM/feat/inspection-notes-glossar…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43741324770"
+    "createdAt": "2026-11-16T02:41:47Z",
+    "updatedAt": "2026-11-16T02:41:50Z",
+    "headBranch": "publish/brief-2026-11-16",
+    "displayTitle": "publish(web): 2026-11-16 주간 브리프 (자동 조립)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43793720061"
    },
    {
-    "databaseId": 43740744500,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-15T17:22:27Z",
-    "updatedAt": "2026-11-15T17:28:07Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1750 from MINHOYEOM/data/inspection-notes-batch2",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43740744500"
-   },
-   {
-    "databaseId": 43738937790,
+    "databaseId": 43791830297,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-15T17:03:33Z",
-    "updatedAt": "2026-11-15T17:11:38Z",
-    "headBranch": "feat/inspection-notes-glossary-block",
-    "displayTitle": "feat(web): 용어 페이지에 '실사 대비 노트' 링크 블록 (ko·en)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738937790"
+    "createdAt": "2026-11-16T02:23:05Z",
+    "updatedAt": "2026-11-16T02:28:48Z",
+    "headBranch": "data/inspection-notes-batch5",
+    "displayTitle": "data(web): 실사 대비 노트 6건 추가 (합계 25건)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43791830297"
    },
    {
-    "databaseId": 43738925997,
+    "databaseId": 43791803305,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-15T17:03:26Z",
-    "updatedAt": "2026-11-15T17:09:32Z",
-    "headBranch": "feat/inspection-notes-glossary-block",
-    "displayTitle": "feat(web): 용어 페이지에 '실사 대비 노트' 링크 블록 (ko·en)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738925997"
+    "createdAt": "2026-11-16T02:22:48Z",
+    "updatedAt": "2026-11-16T02:28:20Z",
+    "headBranch": "data/inspection-notes-batch5",
+    "displayTitle": "data(web): 실사 대비 노트 6건 추가 (합계 25건)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43791803305"
+   },
+   {
+    "databaseId": 43791590804,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-16T02:20:41Z",
+    "updatedAt": "2026-11-16T02:26:08Z",
+    "headBranch": "fix/brief-card-a-1116",
+    "displayTitle": "fix(web): 브리프 카드 머리 A안 · AI 고지 한 줄 · 휴대폰 하단 여백",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43791590804"
    }
   ],
   "grm-scaffold-mirror.yml": [

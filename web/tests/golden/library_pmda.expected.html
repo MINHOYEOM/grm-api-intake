@@ -374,8 +374,8 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
 main:not(#_){padding-bottom:0;margin-bottom:72px}
 main:not(#_) > .wrap:last-child{padding-bottom:0}
 @media(max-width:640px){ main:not(#_){margin-bottom:56px} }
-/* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
-main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* 주간 브리프 본문: 마지막 칸이 .wrap.layout 뒤의 목차 단추라 :last-child 가 안 걸린다 — 직접 걷는다. */
+main:not(#_) > .wrap.layout{padding-bottom:0}
 /* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
 .ai-line{background:var(--canvas);border-top:1px solid var(--line)}
 .ai-line .wrap{padding-top:16px;padding-bottom:16px}

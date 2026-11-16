@@ -9,7 +9,9 @@
       <span>{{ _('검색 기간 <b class="mono">{window}</b>', window=brief.window) }}</span>
       <span>{{ _('발행일 <b class="mono">{date}</b>', date=brief.publish_date) }}</span>
       <span>{{ _("수집 <b>{n}</b>건 · 카드 <b>{c}</b>장", n=brief.coverage.intake_total, c=brief.coverage.rendered) }}</span>
-      <span>Evidence <b class="mono">A {{ brief.coverage.evidence.A }} · B {{ brief.coverage.evidence.B }} · C {{ brief.coverage.evidence.C }}</b></span>
+      {%- if brief.ai_disclosure %}
+      <span><a href="#ai-notice">{{ _("요약·번역은 생성형 AI") }}</a></span>
+      {%- endif %}
     </div>
 {%- if ko_only_names %}
     {#- 한국 규제기관 문서의 업체·기관 실명은 원문 그대로 둔다(옮기면 존재하지 않는
@@ -50,9 +52,6 @@
       <p class="glance-src">{{ _("국가·분류: 지적사항 DB 기준") }}</p>
       {%- endif %}
     </section>
-    {%- endif %}
-    {%- if brief.ai_disclosure %}
-    <div class="ai-badge"><i class="ti ti-robot" aria-hidden="true"></i><div class="ai-badge-b"><b>{{ _("AI 자동 생성 안내") }}</b><p>{{ _("요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, 수치·원문 인용·링크·기계 추출 표는 원문을 그대로 제공합니다. 본 내용은 참고자료이며, 의사결정 전 공식 원문을 확인하십시오.") }}</p><a href="#ai-notice">{{ _("전문 보기 ↓") }}</a></div></div>
     {%- endif %}
   </div>
   <div class="wrap layout">
@@ -230,7 +229,7 @@
 .arc-lib-l{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--line);font-size:0}
 .arc-lib-l a{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);text-decoration:none;word-break:keep-all;overflow-wrap:anywhere}
 .arc-lib-l a:hover{color:var(--coral-2);text-decoration:underline}
-.arc-lib-l a + a::before{content:"·";color:var(--lo);margin:0 8px;text-decoration:none;display:inline-block}
+.arc-lib-l a + a::before{content:"·";color:var(--muted-2);margin:0 8px;text-decoration:none;display:inline-block}
 .arc-lib-tag{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--strong);border-radius:4px;padding:2px 6px;margin-right:6px;white-space:nowrap}
 .arc-lib-more{color:var(--muted)!important;font-weight:500}
 @media (max-width:640px){ .arc-lib{padding:12px 14px 11px} .arc-lib-sum{flex-basis:100%} }
@@ -298,25 +297,23 @@ body.brief-summary #cards .rowc[open]>article.card{display:block}
 .glance-pt{font-size:12.5px;line-height:1.55;color:var(--muted);word-break:keep-all}
 .glance-line{margin:14px 0 0;font-size:14.5px;color:var(--ink);word-break:keep-all}
 .glance-src{margin:4px 0 0;font-size:12px;color:var(--muted)}
+/* [브리프 카드 A안 2026-11-16] 제목 위 글자 한 줄(기관 · 문서 · 제품군) + 왼쪽 세로선(국내 주황 · 해외 검정). */
+#cards article.card{border-left:3px solid var(--ink)}
+#cards article.card.evA{border-top:1px solid var(--line)}  /* 근거 등급 A 강조선(내부 표지)은 세로선과 겹쳐 뺀다 */
+#cards article.card.dom{border-left-color:var(--coral)}
+.rowc>article.card,.rowc>article.card.dom{border-left:0}
+.kline{display:flex;flex-wrap:wrap;align-items:center;font-family:var(--sans);font-size:13px;line-height:1.5;color:var(--muted);margin:0 0 8px;word-break:keep-all}
+.kline span+span::before{content:"·";margin:0 7px;color:var(--muted)}
+.kline span:first-child{color:var(--ink);font-weight:700}
+.kline span:nth-child(2){color:var(--ink)}
+.kline span:nth-child(3){color:var(--coral-2);font-weight:600}
+.cresult .kline{margin:0 0 6px}
 </style>
 {% endblock %}
 {% block ai_disclosure %}
 {%- if brief.ai_disclosure %}
-<section class="ai-disclosure" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
-  <span class="kick">AI Disclosure</span>
-  <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
-  <div class="disc-body">
-    <div class="disc-sec"><h4>{{ _("1. AI가 생성한 정보") }}</h4><p>{{ _("카드 제목, 요약, 한국어 번역, 시사점, 점검 항목 및 상세 분석은 생성형 AI가 공개된 1차 공식 자료를 기반으로 자동 생성한 콘텐츠입니다.") }}</p></div>
-    <div class="disc-sec"><h4>{{ _("2. 원문 그대로 제공되는 정보") }}</h4><p>{{ _("사실표에 포함된 수치·코드·일자·기관명·업체명, 영문 원문 인용, 정보출처·공식원본 링크 및 지적사항 표(FDA Form 483 Observation, 식약처 정기실태조사 지적사항 등)는 원문에서 기계적으로 추출한 정보이며, 의미를 변경하거나 재작성하지 않습니다.") }}</p></div>
-    <div class="disc-sec"><h4>{{ _("3. 검증·한계 및 이용자 유의사항") }}</h4><ul>
-      <li>{{ _("GRM은 정보의 정확성을 높이기 위해 신뢰도(Evidence A·B·C)와 신호 강도(Tier 1~3)를 제공합니다. Evidence A는 1차 공식 문서를 직접 확인할 수 있는 정보를 의미합니다.") }}</li>
-      <li>{{ _("생성형 AI가 생성한 요약·번역·시사점·점검 항목 및 상세 분석에는 오역, 누락, 맥락 해석 오류 또는 최신 정보 미반영 가능성이 존재합니다.") }}</li>
-      <li>{{ _("본 서비스는 규제 및 품질 관련 정보 제공을 목적으로 하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문 또는 공식 해석을 제공하지 않습니다.") }}</li>
-      <li>{{ _("이용자는 의사결정, 품질시스템 운영, 규제 대응 또는 감사 준비에 활용하기 전에 반드시 공식 원문 및 관련 기관의 최신 자료를 직접 확인해야 합니다.") }}</li>
-    </ul></div>
-    <p class="en">This digest is AI-generated from primary sources; interpretations are not official or legal advice — verify against the original before acting.</p>
-  </div>
-</div></section>
+{#- [고지 정리 2026-11-16] 제목·세 단락 → 한 줄(다른 페이지와 같은 .ai-line). 설명은 이용안내 #sec-8. -#}
+<section class="ai-line" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap"><p>{{ _("요약·번역·시사점은 생성형 AI가 쓰고, 수치·원문 인용·출처 링크는 원문 그대로 싣습니다. 판단은 원문을 기준으로 하세요.") }} {% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html#sec-8">{{ _("자료와 AI 활용 안내") }}</a>{% endif %}</p></div></section>
 {%- endif %}
 {% endblock %}
 {% block scripts %}<script>
@@ -408,14 +405,12 @@ body.brief-summary #cards .rowc[open]>article.card{display:block}
     if(card.closest && card.closest('.rowtbl')) return;   /* 표 한 줄은 표 자체가 요약이다 */
     var a=document.createElement('a');
     a.className='cresult card-summary'; a.href='#'+card.id;
-    var badges=card.querySelector('.badges');
-    var bhtml=badges?badges.outerHTML:'';
+    var kl=card.querySelector('.kline');
+    var bhtml=kl?kl.outerHTML:'';
     var title=card.querySelector('.c-title'), tclone=title?title.cloneNode(true):null;
     if(tclone){ var pre=tclone.querySelector('.pre'); if(pre)pre.parentNode.removeChild(pre); }
     var thtml=tclone?tclone.innerHTML.trim():'';
-    var ct=card.getAttribute('data-card-type')||'';
-    var tier=card.getAttribute('data-signal-tier')||'', ev=card.getAttribute('data-evidence')||'';
-    var meta='<span class="mono">Vol.'+issueNo+' · '+date+'</span> · '+ct+' · Signal T'+tier+' · Evidence '+ev;
+    var meta='<span class="mono">Vol.'+issueNo+' · '+date+'</span>';
     a.innerHTML='<div>'+bhtml+'<h4>'+thtml+'</h4><div class="meta">'+meta+'</div></div><i class="ti ti-arrow-right go" aria-hidden="true"></i>';
     /* [카드 무게 2026-11-10] 새 짜임 호는 꼬리표가 그 건의 사실 하나(사유·등급·지적 건수)다.
        값은 속성에서 읽어 textContent 로만 넣는다(HTML 삽입 금지). */

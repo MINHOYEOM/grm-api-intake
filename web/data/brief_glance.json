@@ -56,6 +56,12 @@
     "quality_unit_oversight"
    ]
   },
+  "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chongqing-qiancan-technology-co-ltd-736416-10292026": {
+   "c": "",
+   "k": [
+    "data_integrity"
+   ]
+  },
   "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/conroe-welding-supply-inc-731507-10292026": {
    "c": "",
    "k": [
@@ -255,6 +261,12 @@
     "data_integrity"
    ]
   },
+  "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/nanjing-hanxin-pharmaceutical-technology-co-ltd-734913-11032026": {
+   "c": "",
+   "k": [
+    "aseptic_sterility_assurance"
+   ]
+  },
   "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/nexcell-scientific-inc-730612-09112026": {
    "c": "",
    "k": [
@@ -444,6 +456,12 @@
     "validation_qualification"
    ]
   },
+  "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/tianjin-healthcare-medical-technology-co-ltd-736415-10292026": {
+   "c": "",
+   "k": [
+    "data_integrity"
+   ]
+  },
   "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/tianjin-kilo-pharmaceutical-sci-tech-co-ltd-731761-08062026": {
    "c": "",
    "k": [
@@ -459,6 +477,13 @@
     "material_supplier_control",
     "qc_lab_controls",
     "quality_unit_oversight"
+   ]
+  },
+  "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/usv-private-limited-735938-11022026": {
+   "c": "",
+   "k": [
+    "aseptic_sterility_assurance",
+    "qc_lab_controls"
    ]
   },
   "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/veganicskn-limited-719883-02092026": {
@@ -2173,6 +2198,13 @@
     "computer_system_validation"
    ]
   },
+  "https://www.fda.gov/media/195366/download": {
+   "c": "US",
+   "k": [
+    "material_supplier_control",
+    "quality_unit_oversight"
+   ]
+  },
   "https://www.fda.gov/media/195367/download": {
    "c": "US",
    "k": [
@@ -2207,6 +2239,13 @@
   },
   "https://www.fda.gov/media/195376/download": {
    "c": "BE",
+   "k": [
+    "other_quality_system",
+    "process_validation"
+   ]
+  },
+  "https://www.fda.gov/media/195377/download": {
+   "c": "MT",
    "k": [
     "other_quality_system",
     "process_validation"
@@ -3171,6 +3210,12 @@
     "quality_unit_oversight"
    ]
   },
+  "https://www.fda.gov/media/196245/download": {
+   "c": "US",
+   "k": [
+    "other_quality_system"
+   ]
+  },
   "https://www.fda.gov/media/196246/download": {
    "c": "US",
    "k": [
@@ -3195,8 +3240,299 @@
    "k": [
     "validation_qualification"
    ]
+  },
+  "https://www.fda.gov/media/196251/download": {
+   "c": "US",
+   "k": [
+    "other_quality_system"
+   ]
+  },
+  "https://www.fda.gov/media/196252/download": {
+   "c": "CN",
+   "k": [
+    "equipment_facility",
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196253/download": {
+   "c": "",
+   "k": [
+    "computer_system_validation",
+    "documentation_records",
+    "other_quality_system",
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196255/download": {
+   "c": "US",
+   "k": [
+    "equipment_facility",
+    "qc_lab_controls",
+    "quality_unit_oversight",
+    "stability_storage"
+   ]
+  },
+  "https://www.fda.gov/media/196257/download": {
+   "c": "CH",
+   "k": [
+    "equipment_facility",
+    "process_validation",
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196258/download": {
+   "c": "IN",
+   "k": [
+    "quality_unit_oversight",
+    "training_personnel"
+   ]
+  },
+  "https://www.fda.gov/media/196259/download": {
+   "c": "TW",
+   "k": [
+    "quality_unit_oversight"
+   ]
+  },
+  "https://www.fda.gov/media/196261/download": {
+   "c": "IE",
+   "k": [
+    "aseptic_sterility_assurance",
+    "equipment_facility",
+    "other_quality_system"
+   ]
+  },
+  "https://www.fda.gov/media/196262/download": {
+   "c": "KR",
+   "k": [
+    "aseptic_sterility_assurance",
+    "deviation_capa",
+    "documentation_records",
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196264/download": {
+   "c": "CN",
+   "k": [
+    "other_quality_system"
+   ]
+  },
+  "https://www.fda.gov/media/196270/download": {
+   "c": "US",
+   "k": [
+    "equipment_facility",
+    "other_quality_system",
+    "process_validation",
+    "validation_qualification"
+   ]
+  },
+  "https://www.fda.gov/media/196272/download": {
+   "c": "IN",
+   "k": [
+    "aseptic_sterility_assurance",
+    "contamination_control"
+   ]
+  },
+  "https://www.fda.gov/media/196273/download": {
+   "c": "CN",
+   "k": [
+    "equipment_facility",
+    "other_quality_system",
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196274/download": {
+   "c": "CN",
+   "k": [
+    "contamination_control",
+    "equipment_facility",
+    "material_supplier_control",
+    "other_quality_system"
+   ]
+  },
+  "https://www.fda.gov/media/196275/download": {
+   "c": "CN",
+   "k": [
+    "documentation_records",
+    "other_quality_system",
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196279/download": {
+   "c": "TW",
+   "k": [
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196280/download": {
+   "c": "CA",
+   "k": [
+    "equipment_facility",
+    "material_supplier_control",
+    "other_quality_system",
+    "qc_lab_controls",
+    "quality_unit_oversight"
+   ]
+  },
+  "https://www.fda.gov/media/196282/download": {
+   "c": "IN",
+   "k": [
+    "equipment_facility"
+   ]
+  },
+  "https://www.fda.gov/media/196283/download": {
+   "c": "DE",
+   "k": [
+    "other_quality_system"
+   ]
+  },
+  "https://www.fda.gov/media/196284/download": {
+   "c": "CN",
+   "k": [
+    "equipment_facility",
+    "labeling_packaging",
+    "process_validation",
+    "qc_lab_controls",
+    "stability_storage"
+   ]
+  },
+  "https://www.fda.gov/media/196285/download": {
+   "c": "IN",
+   "k": [
+    "deviation_capa",
+    "equipment_facility",
+    "other_quality_system"
+   ]
+  },
+  "https://www.fda.gov/media/196286/download": {
+   "c": "US",
+   "k": [
+    "equipment_facility",
+    "material_supplier_control",
+    "other_quality_system",
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196287/download": {
+   "c": "US",
+   "k": [
+    "deviation_capa"
+   ]
+  },
+  "https://www.fda.gov/media/196289/download": {
+   "c": "CN",
+   "k": [
+    "equipment_facility",
+    "qc_lab_controls",
+    "stability_storage"
+   ]
+  },
+  "https://www.fda.gov/media/196290/download": {
+   "c": "AU",
+   "k": [
+    "material_supplier_control",
+    "process_validation",
+    "qc_lab_controls",
+    "quality_unit_oversight",
+    "stability_storage"
+   ]
+  },
+  "https://www.fda.gov/media/196291/download": {
+   "c": "CN",
+   "k": [
+    "equipment_facility",
+    "material_supplier_control",
+    "quality_unit_oversight"
+   ]
+  },
+  "https://www.fda.gov/media/196292/download": {
+   "c": "CN",
+   "k": [
+    "computer_system_validation",
+    "equipment_facility",
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196297/download": {
+   "c": "US",
+   "k": [
+    "aseptic_sterility_assurance",
+    "deviation_capa",
+    "equipment_facility",
+    "process_validation",
+    "qc_lab_controls",
+    "quality_unit_oversight",
+    "stability_storage",
+    "training_personnel"
+   ]
+  },
+  "https://www.fda.gov/media/196299/download": {
+   "c": "CN",
+   "k": [
+    "quality_unit_oversight"
+   ]
+  },
+  "https://www.fda.gov/media/196301/download": {
+   "c": "CN",
+   "k": [
+    "qc_lab_controls"
+   ]
+  },
+  "https://www.fda.gov/media/196303/download": {
+   "c": "US",
+   "k": [
+    "aseptic_sterility_assurance",
+    "equipment_facility",
+    "process_validation"
+   ]
+  },
+  "https://www.fda.gov/media/196711/download": {
+   "c": "DE",
+   "k": [
+    "aseptic_sterility_assurance",
+    "other_quality_system"
+   ]
+  },
+  "https://www.fda.gov/media/196713/download": {
+   "c": "IT",
+   "k": [
+    "equipment_facility",
+    "other_quality_system"
+   ]
+  },
+  "https://www.fda.gov/media/196714/download": {
+   "c": "IT",
+   "k": [
+    "equipment_facility",
+    "other_quality_system",
+    "process_validation"
+   ]
+  },
+  "https://www.fda.gov/media/196833/download": {
+   "c": "US",
+   "k": [
+    "aseptic_sterility_assurance",
+    "contamination_control",
+    "training_personnel"
+   ]
+  },
+  "https://www.fda.gov/media/196834/download": {
+   "c": "US",
+   "k": [
+    "aseptic_sterility_assurance"
+   ]
+  },
+  "https://www.fda.gov/media/196842/download": {
+   "c": "US",
+   "k": [
+    "aseptic_sterility_assurance",
+    "equipment_facility",
+    "process_validation",
+    "qc_lab_controls",
+    "regulatory_reporting",
+    "training_personnel"
+   ]
   }
  },
- "measured_on": "2026-11-15",
+ "measured_on": "2026-11-16",
  "schema": "grm-brief-glance/v1"
 }

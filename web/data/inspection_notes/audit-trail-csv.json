@@ -1,0 +1,108 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "audit-trail-csv", "as_of": "2026-11-15",
+  "area_ko": "데이터와 기록", "area_en": "Data and records",
+  "title_ko": "감사 추적과 컴퓨터화 시스템", "title_en": "Audit trails and computerized systems",
+  "glossary_ids": ["audit-trail", "computerised-system"],
+  "aliases_ko": ["감사추적", "감사 추적 기록", "컴퓨터화 시스템", "컴퓨터 시스템"],
+  "aliases_en": ["audit trail", "computerized system"],
+  "search_q_ko": "감사 추적", "search_q_en": "audit trail",
+  "lead_ko": "FDA 는 감사 추적 기능을 갖췄는지보다, 그 기록을 실제로 검토하고 시스템의 권한·밸리데이션·백업을 관리하는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether an audit trail function exists than at whether its records are actually reviewed and the system's privileges, validation and backups are controlled. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "감사 추적을 검토하지 않았다",
+      "title_en": "Audit trails were not reviewed",
+      "quotes": [
+        { "finding_id": "finding-509cc5f997b05feea604f7bf", "raw_signal_id": "rawsig-8fd02d318f3324213a68936e", "document_id": "76ed6c327d1e", "source": "FDA Warning Letter",
+          "firm": "Wisconsin Pharmacal Company, LLC", "date": "2025-09-02",
+          "quote_ko": "OTC 완제의약품의 최종 출하 시험에 대한 분석 시스템 감사추적(audit trail)을 검토하는 과정에서, 귀사가 이들 분석 장비가 수집한 감사추적과 원시 분석 데이터를 검토하지 않는다는 것이 실사에서 확인되었다.",
+          "quote_en": "During the review of analytical system audit trails for final release testing of finished OTC drug products, our inspection found that your firm does not review audit trails and raw analytical data captured by these analytical instruments." },
+        { "finding_id": "finding-68ab87d6d435d4db36132878", "raw_signal_id": "rawsig-eb12826e8500b180c12f42db", "document_id": "fda483-194819", "source": "FDA 483",
+          "firm": "PQ Pharmacy LLC", "date": "2026-09-22",
+          "quote_ko": "품질보증 부서는 [redacted] 기기에 저장된 감사 추적이나 시험 결과를 정기적으로 검토하지 않는다.",
+          "quote_en": "Quality Assurance does not periodically review audit trails or test results stored in the [redacted] instrument." }
+      ]
+    },
+    {
+      "title_ko": "분석자의 관리자 권한을 제한하지 않았다",
+      "title_en": "Analysts' administrative privileges were not restricted",
+      "quotes": [
+        { "finding_id": "finding-bfb1b85e1e0a967b149b8925", "raw_signal_id": "rawsig-9e940d4b885cb784c01953c5", "document_id": "63bd64484361", "source": "FDA Warning Letter",
+          "firm": "Unipack LLC", "date": "2025-12-30",
+          "quote_ko": "예를 들어 귀사 분석원은 크로마토그래피 시스템에서 함량 계산에 사용하는 스프레드시트를 포함한 데이터, 파일 및 폴더를 변경하고 삭제할 수 있는 관리자 권한을 가지고 있었다.",
+          "quote_en": "For example, your analysts had administrative rights on your chromatographic systems that allowed them to alter and delete data, files, and folders, including your spreadsheet used for assay calculations." },
+        { "finding_id": "finding-117074761840e61d179b928e", "raw_signal_id": "rawsig-17d99938e58c61397f70f883", "document_id": "fda483-192261", "source": "FDA 483",
+          "firm": "Staska Pharmaceuticals, Inc", "date": "2026-05-08",
+          "quote_ko": "HPLC 분석 권한이 있는 직원 [redacted]명은 [redacted] 크로마토그래피 자료 장치의 관리자 역할을 가진다.",
+          "quote_en": "[redacted] employees authorized to perform HPLC analyses have administrative user roles in the [redacted] chromatography data system." }
+      ]
+    },
+    {
+      "title_ko": "소프트웨어를 밸리데이션하지 않았다",
+      "title_en": "Software was not validated",
+      "quotes": [
+        { "finding_id": "finding-64c46e64eccc8fed41a6170b", "raw_signal_id": "rawsig-25241b6e44532f3a0a1e23ef", "document_id": "13bcdb717a8b", "source": "FDA Warning Letter",
+          "firm": "Laboratorios Jaloma S.A. de C.V.", "date": "2026-06-02",
+          "quote_ko": "귀사의 GC 시험실 기기는 제어 소프트웨어를 밸리데이션하지 않았고 감사추적(audit trail)을 활성화하지 않았으며 GC 데이터 파일의 생성 및 수정 일자도 정확하지 않았으므로 적절히 적격성평가되지 않았다.",
+          "quote_en": "Your GC laboratory instrument was not adequately qualified because you failed to validate the control software or enable audit trails, and the GC data file creation and modification dates were not accurate." },
+        { "finding_id": "finding-0bb6eb5e506d0597ba13b913", "raw_signal_id": "rawsig-6fd081803a8837efe6159904", "document_id": "fda483-187221", "source": "FDA 483",
+          "firm": "Apollo Care LLC", "date": "2025-07-31",
+          "quote_ko": "[redacted] 세척/제염 세부 정보를 생성하고 저장하는 응용 소프트웨어가 전자기록에 대한 Part 11 요건을 충족함을 보여 주는 문서화된 밸리데이션이 없다.",
+          "quote_en": "You lack documented validation showing that the application software that generates and stores details of [redacted] cleaning/decontamination meet Part 11 requirements for electronic records." }
+      ]
+    },
+    {
+      "title_ko": "전자 데이터를 백업하지 않았다",
+      "title_en": "Electronic data were not backed up",
+      "quotes": [
+        { "finding_id": "finding-4b4a0311cfc9a4964370aea8", "raw_signal_id": "rawsig-8aa120ff8e27ca380d9b609c", "document_id": "52b9121a22d6", "source": "FDA Warning Letter",
+          "firm": "NWL Netherlands Services B.V.", "date": "2025-05-20",
+          "quote_ko": "더욱이 귀사는 시험 장비에서 생성된 데이터의 백업을 적절히 유지하지 않았다.",
+          "quote_en": "Furthermore, your firm did not adequately maintain backups of data generated by your laboratory equipment." },
+        { "finding_id": "finding-68ab87d6d435d4db36132878", "raw_signal_id": "rawsig-eb12826e8500b180c12f42db", "document_id": "fda483-194819", "source": "FDA 483",
+          "firm": "PQ Pharmacy LLC", "date": "2026-09-22",
+          "quote_ko": "절차 S403400의 7.9.23항은 [redacted] 데이터를 외부 저장장치에 백업할 수 있다고 명시한다. 그러나 귀사의 CEO는 데이터 손실을 방지하기 위한 백업이 수행되지 않음을 확인했다.",
+          "quote_en": "Procedure S403400, Section 7.9.23 indicate [redacted] data can be backed up to external storage. However, your CEO confirmed that no backup is performed to prevent data loss." }
+      ]
+    },
+    {
+      "title_ko": "사용자 계정을 개인별로 나누지 않았다",
+      "title_en": "User accounts were shared instead of individual",
+      "quotes": [
+        { "finding_id": "finding-2a44aab5878c991bbe8b9476", "raw_signal_id": "rawsig-2bda5cef3046377ade742c78", "document_id": "539e6f3e8d21", "source": "FDA Warning Letter",
+          "firm": "Taizhou Kangping Medical Science and Technology Co., Ltd.", "date": "2025-11-11",
+          "quote_ko": "구체적으로 크로마토그램 계산에 사용한 Excel 워크시트가 보관되지 않았고, GC 및 HPLC 워크스테이션의 접속 계정이 직위별로 공유되어 개별 분석자에게 귀속되지 않았다.",
+          "quote_en": "Specifically, Excel worksheets used to perform chromatogram calculations were not retained, and access accounts to the GC and HPLC workstations were shared by job title and were not attributable to the individual analyst." },
+        { "finding_id": "finding-f9b48ac0c14b28538db3a9e4", "raw_signal_id": "rawsig-fbc374a4d99e611551fbf52a", "document_id": "fda483-195243", "source": "FDA 483",
+          "firm": "Zen Chemicals Pvt. Ltd", "date": "2026-10-19",
+          "quote_ko": "Chrome 2004 crt 소프트웨어를 사용하는 GC(장비 # QC/INST/08)는 직원 네(4) 명이 공유하는 공통 사용자 이름 및 비밀번호가 있다.",
+          "quote_en": "GC which uses Chrome 2004 crt software (equipment # QC/INST/08) has a common user name and password shared by four (4) employees." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.68(b)", "finding_id": "finding-64c46e64eccc8fed41a6170b", "firm": "Laboratorios Jaloma S.A. de C.V.", "date": "2026-06-02",
+      "quote_ko": "귀사는 승인된 담당자만 마스터 생산 및 관리 기록이나 기타 기록을 변경하도록 보장하기 위해 컴퓨터 또는 관련 시스템에 대한 적절한 관리를 하지 않았다",
+      "quote_en": "Your firm failed to exercise appropriate controls over computer or related systems to assure that only authorized personnel institute changes in master production and control records, or other records",
+      "note_ko": "GC 기기의 제어 소프트웨어를 밸리데이션하지 않고 감사추적을 활성화하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Failing to validate the GC instrument's control software and to enable audit trails was cited under this clause." }
+  ],
+  "checks_ko": [
+    "최종 출하 시험에 쓰는 분석 장비의 감사 추적과 원시 분석 데이터를 검토합니까",
+    "분석을 수행하는 직원이 데이터·파일·폴더를 변경하거나 삭제할 수 있는 관리자 권한을 갖고 있지 않습니까",
+    "시험 장비 워크스테이션의 사용자 이름과 비밀번호를 여러 직원이 함께 쓰지 않고, 접속 계정이 개별 분석자에게 귀속됩니까",
+    "시험 기기의 제어 소프트웨어를 밸리데이션했고 감사 추적이 활성화되어 있습니까",
+    "전자 기록을 만들고 저장하는 응용 소프트웨어가 Part 11 요건을 충족함을 보여 주는 밸리데이션 문서가 있습니까",
+    "시험 장비에서 생성된 데이터를 절차에 적힌 대로 백업합니까"
+  ],
+  "checks_en": [
+    "Are audit trails and raw analytical data from instruments used for final release testing reviewed?",
+    "Are the staff who perform analyses without administrative rights that let them alter or delete data, files and folders?",
+    "Are user names and passwords on instrument workstations individual and not shared among staff, so that access accounts are attributable to the individual analyst?",
+    "Is the control software of laboratory instruments validated, and are audit trails enabled?",
+    "Is there documented validation showing that application software that generates and stores electronic records meets Part 11 requirements?",
+    "Is data generated by laboratory equipment backed up as the procedure states?"
+  ],
+  "further_reading": [],
+  "related": ["data-integrity"]
+}

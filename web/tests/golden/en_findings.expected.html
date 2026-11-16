@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=f10223fb" defer></script>
+<script src="/assets/i18n-en.js?v=bece3213" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -535,8 +535,8 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 main:not(#_){padding-bottom:0;margin-bottom:72px}
 main:not(#_) > .wrap:last-child{padding-bottom:0}
 @media(max-width:640px){ main:not(#_){margin-bottom:56px} }
-/* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
-main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* 주간 브리프 본문: 마지막 칸이 .wrap.layout 뒤의 목차 단추라 :last-child 가 안 걸린다 — 직접 걷는다. */
+main:not(#_) > .wrap.layout{padding-bottom:0}
 /* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
 .ai-line{background:var(--canvas);border-top:1px solid var(--line)}
 .ai-line .wrap{padding-top:16px;padding-bottom:16px}

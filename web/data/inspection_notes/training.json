@@ -1,0 +1,94 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "training", "as_of": "2026-11-16",
+  "area_ko": "품질시스템", "area_en": "Quality system", "title_ko": "교육훈련과 직무", "title_en": "Training and job responsibilities",
+  "glossary_ids": ["training"], "aliases_ko": ["교육 훈련", "직무기술서", "적격성"], "aliases_en": ["training", "job description", "personnel qualification"],
+  "search_q_ko": "교육훈련", "search_q_en": "training",
+  "lead_ko": "FDA 는 교육 절차가 있는지보다, 그 일을 맡은 사람이 필요한 교육을 실제로 받았고 그 사실을 기록으로 보여 줄 수 있는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a training procedure exists than at whether the person doing the job actually received the training it requires and whether records can show it. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "시험자와 검사자가 맡은 일에 필요한 교육을 받지 않았다", "title_en": "Analysts and inspectors were not trained for the work they performed",
+      "quotes": [
+        { "finding_id": "finding-4dc5afbf2fe17364c8901f9e", "raw_signal_id": "rawsig-78d4bb048a6bf5cbf5e97166", "document_id": "fda483-195554", "source": "FDA 483",
+          "firm": "Baxter Healthcare Corporation", "date": "2026-10-30",
+          "quote_ko": "[redacted] 시험을 수행하는 QC 분석자는 업체의 교육 절차(문서 번호 RD-03-01-019, 개정 W)에 따른 의무 교육 요건을 완료하지 않았다.",
+          "quote_en": "QC analysts performing [redacted] testing have not completed mandatory training requirements per the firm's training procedure (Document No. RD-03-01-019, Revision W)." },
+        { "finding_id": "finding-071ecf5404dbf5655d65dcc5", "raw_signal_id": "rawsig-47551600ecf54b8756f76af9", "document_id": "fda483-180618", "source": "FDA 483",
+          "firm": "Imprimis NJOF, LLC", "date": "2024-08-06",
+          "quote_ko": "그러나 육안검사자는 육안검사 적격성평가 과정에서 API 잔류물 식별에 관한 교육을 받지 않는다.",
+          "quote_en": "However, visual inspectors are not trained on identification of API residue during visual inspection qualification." }
+      ] },
+    { "title_ko": "CGMP 교육을 정기적으로 하지 않았다", "title_en": "CGMP training was not given on a regular basis",
+      "quotes": [
+        { "finding_id": "finding-fe431f9d0bfebf31d0d8e9a6", "raw_signal_id": "rawsig-8b7c5596e04f99ea6da9fdb7", "document_id": "b62e450ac916", "source": "FDA Warning Letter",
+          "firm": "Microbiological Testing & Consulting, LLC", "date": "2026-03-31",
+          "quote_ko": "CGMP 교육은 귀사가 확립한 절차에서 요구하는 대로 정기적으로 수행되지 않는다.",
+          "quote_en": "CGMP training is not regularly performed at your firm as required by your established procedure." },
+        { "finding_id": "finding-bb1b8f177f171a5d0e7c9cfa", "raw_signal_id": "rawsig-3b117875877bf292e05c03fa", "document_id": "fda483-195189", "source": "FDA 483",
+          "firm": "RC Outsourcing LLC", "date": "2026-10-06",
+          "quote_ko": "귀사는 직원에게 정기적인 CGMP 교육을 실시하지 않는다.",
+          "quote_en": "Your firm does not conduct periodic CGMP training for employees." }
+      ] },
+    { "title_ko": "교육을 받았다는 기록을 제대로 남기지 않았다", "title_en": "Training was not properly documented",
+      "quotes": [
+        { "finding_id": "finding-1b7a071a08b8697b8297871f", "raw_signal_id": "rawsig-91f11d6c2d25f9a0889f2fa5", "document_id": "ed5ec19accbe", "source": "FDA Warning Letter",
+          "firm": "Shimoga Chemicals", "date": "2026-07-21",
+          "quote_ko": "예를 들어, 보고되지 않은 시료 주입(injection)을 수행한 분석자는 문서화된 시험실 교육훈련과 CGMP 교육훈련을 받은 기록이 없었다.",
+          "quote_en": "For example, an analyst who performed unreported injections lacked documented laboratory training and CGMP training." },
+        { "finding_id": "finding-b55b38a80f3ce3a8a85c4680", "raw_signal_id": "rawsig-e4e1295d2e5e46dc6f9be6c6", "document_id": "fda483-195285", "source": "FDA 483",
+          "firm": "Emcure Pharmaceuticals Limited", "date": "2026-10-20",
+          "quote_ko": "구체적으로, 귀사는 제조, 설비, cGMP 교육에 관여하는 인원의 교육 기록을 적절히 문서화하고 확인하지 않았다.",
+          "quote_en": "Specifically, your firm failed to adequately document and verify training records for personnel involved in manufacturing, equipment, and cGMP training." }
+      ] },
+    { "title_ko": "재교육이 필요한 직원을 재교육하지 않았다", "title_en": "Employees who needed retraining were not retrained",
+      "quotes": [
+        { "finding_id": "finding-90d3064784fa8b231c7c221f", "raw_signal_id": "rawsig-30726768da73a34daf1f8476", "document_id": "fda483-190469", "source": "FDA 483",
+          "firm": "Alembic Pharmaceuticals Limited", "date": "2026-01-07",
+          "quote_ko": "예를 들어 실사관은 #SD/PD/SOP028 Rev. 06(\"Cleaning and Disinfection of Floor Drain\", 04/26/2021 발효)에 대한 교육에서 불합격한 직원이 재교육을 받지 않은 것을 확인했다.",
+          "quote_en": "For example, we observed your failed training for #SD/PD/SOP028 Rev. 06 (Cleaning and Disinfection of Floor Drain, 04/26/2021 effective date) which was never repeated." },
+        { "finding_id": "finding-d102c6e59a7851653d480cd0", "raw_signal_id": "rawsig-8a11e9836f8c50b2173dfba5", "document_id": "fda483-69976", "source": "FDA 483",
+          "firm": "Caraco Pharmaceutical Laboratories, Ltd.", "date": "2025-06-30",
+          "quote_ko": "품질 부서는 SLS를 포함하는 용출 시험의 희석 절차에 대해 분석자를 재교육한 시정조치가 완전했음을 보증하지 않았다. Carbamezapine Tablets 로트의 최초 용출 부적합에 관여한 인원이 이번 실사 때까지 재교육을 받지 않았기 때문이다.",
+          "quote_en": "The Quality Unit has not assured that corrective action taken to retrain analysts in the dilution procedure for dissolution tests involving SLS was complete in that; for persons involved in the initial dissolution failure of Carbamezapine Tablets lots were not retrained until this inspection." }
+      ] },
+    { "title_ko": "작업을 맡은 사람이 적절한 교육을 받았다는 근거가 없다", "title_en": "There was no evidence that the people doing the work were adequately trained",
+      "quotes": [
+        { "finding_id": "finding-1dc471a6af9dd12318435e22", "raw_signal_id": "rawsig-f390b45073077bbe631badf6", "document_id": "1e5180262ee0", "source": "FDA Warning Letter",
+          "firm": "Premier Trends LLC", "date": "2022-03-22",
+          "quote_ko": "예를 들어 귀사의 공동 소유주는 자신이 Magic Heal 처방의 유일한 소유자이며 공정을 완전히 알고 있고 모든 제조 작업을 수행했다고 진술했다. 그러나 귀사에는 공동 소유주가 이러한 업무를 수행할 충분한 경험이 있다거나 적절한 CGMP 교육을 받았다는 증거가 없다.",
+          "quote_en": "For example, your co-owner stated that he is the sole proprietor of the Magic Heal formulation, had full knowledge of the process, and performed all manufacturing operations. However, you lack evidence that your co-owner has the adequate experience to perform these functions nor has received the appropriate CGMP training." },
+        { "finding_id": "finding-0d93c960a967ce7ef80a4341", "raw_signal_id": "rawsig-a8e85f745e2783bd62ccf6da", "document_id": "fda483-86709", "source": "FDA 483",
+          "firm": "Pharmagen Laboratories, Inc", "date": "2024-01-17",
+          "quote_ko": "무균 주사 제품의 육안 검사를 수행하는 직원(모든 약사와 기술자 포함)이 적절히 교육받았음을 뒷받침하는 문서가 없다.",
+          "quote_en": "There is no documentation to support that staff performing visual inspection of sterile injectable product, which comprises all pharmacists and technicians, have adequate training." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.25(a)", "finding_id": "finding-1dc471a6af9dd12318435e22", "firm": "Premier Trends LLC", "date": "2022-03-22",
+      "quote_ko": "귀사는 의약품의 제조, 가공, 포장 또는 보관에 종사하는 각 사람이 배정된 업무를 수행할 수 있는 교육, 훈련 및 경험 또는 이들의 조합을 갖추도록 보장하지 않았다",
+      "quote_en": "Your firm failed to ensure that each person engaged in the manufacture, processing, packing, or holding of a drug product has the education, training, and experience, or any combination thereof, to enable that person to perform his or her assigned functions",
+      "note_ko": "모든 제조 작업을 수행한 사람이 그 일을 할 경험과 CGMP 교육을 갖췄다는 증거가 없는 점이 이 조항으로 지적됐습니다.",
+      "note_en": "The firm was cited under this section because it had no evidence that the person who performed all manufacturing operations had the experience and CGMP training to do so." },
+    { "key": "21 CFR 211.22", "finding_id": "finding-fe431f9d0bfebf31d0d8e9a6", "firm": "Microbiological Testing & Consulting, LLC", "date": "2026-03-31",
+      "quote_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 동일성, 함량, 품질 및 순도에 대해 확립된 규격을 충족함을 보증할 책임을 이행하지 않았다",
+      "quote_en": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP and meet established specifications for identity, strength, quality, and purity",
+      "note_ko": "CGMP 교육을 절차대로 정기적으로 하지 않고 교육 기록을 제시하지 못한 점이 품질관리부서의 책임 불이행 안에서 지적됐습니다.",
+      "note_en": "The failure to perform CGMP training regularly as the procedure required, and to provide training records, was cited as part of the quality control unit's failure to carry out its responsibility." }
+  ],
+  "checks_ko": [
+    "시험이나 검사를 맡은 사람이 절차에서 정한 필수 교육을 모두 마쳤습니까?",
+    "육안검사자의 적격성평가 교육이 실제로 판정해야 하는 결함을 다룹니까?",
+    "CGMP 교육을 절차에서 정한 주기대로 하고 있습니까?",
+    "실사 중에 요청받으면 직원별 교육 기록을 바로 제시할 수 있습니까?",
+    "교육 기록을 교육받은 본인이 확인하도록 되어 있습니까?",
+    "교육에서 불합격했거나 부적합에 관여한 직원을 재교육한 뒤에 작업을 맡깁니까?"
+  ],
+  "checks_en": [
+    "Has everyone who performs a test or inspection completed all the training the procedure makes mandatory?",
+    "Does the qualification training for visual inspectors cover the defects they actually have to judge?",
+    "Is CGMP training given at the interval the procedure sets?",
+    "Can each employee's training records be produced right away when asked for during an inspection?",
+    "Are training records verified by the trainee who received the training?",
+    "Are employees who failed a training or were involved in a failure retrained before they are assigned the work again?"
+  ],
+  "further_reading": [], "related": ["aseptic-technique", "written-procedures", "quality-unit"]
+}

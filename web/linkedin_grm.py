@@ -46,7 +46,13 @@ CFR_MAP = [("212.20(d) 부적합 조사·시정", "21 CFR 211.192"),
            ("ISO 5·EM 무균 관리", "21 CFR 211.113(b)")]
 
 LIMITS = {"headline_line": 15.5, "row_text": 40, "pair_resp": 24, "pair_why": 74, "item_title": 14, "item_text": 62,
-          "db_comment": 70, "ns": 74, "question": 40}
+          "db_comment": 70, "ns": 74, "question": 40, "quote_ko": 70, "quote_en": 170,
+          # 본문 첫 문장 — 링크드인 모바일 피드는 약 22자 두 줄에서 '…더 보기'로 접는다. 그 안에 핵심이 끝나야 한다.
+          "lead_first": 44}
+
+# 후킹 규칙(STYLE.md §13) — 피드에서 멈추게 하는 두 자리: 표지 헤드라인과 본문 첫 문장.
+_LABEL_END = re.compile(r"(?:미흡|부족|결함|위반|실패|거부|문제|미비|부재|소홀|논란|우려)[.!]?$")
+_WEAK_START = re.compile(r"^(?:FDA|MHRA|EMA|식약처|한\s|이번\s|지난\s|최근\s)")
 
 
 _EM_TOPIC = re.compile(r"ISO 5|ISO class 5|Grade A|Class 100|environmental monitor|viable|microbial (?:recover|monitor)|isolates?", re.I)
@@ -72,15 +78,18 @@ def _firm_tokens(name: str) -> list[str]:
             if len(t) >= 4 and t.lower() not in ("inc", "llc", "ltd", "corp", "company", "co", "pharma", "pharmaceutical")]
 
 
-def db_similar(findings: dict, card: dict, *, n_cases: int = 3) -> dict[str, Any]:
-    """같은 주제(환경모니터링)·대응 조항으로 지적된 과거 사례. 전부 센 값 — 문장을 만들지 않는다."""
+def db_similar(findings: dict, card: dict, *, n_cases: int = 3, topic: str = "환경모니터링",
+               cfr_map: list | None = None) -> dict[str, Any]:
+    """같은 주제(지적사항 DB 분류 `topic`)·대응 조항으로 지적된 과거 사례. 전부 센 값 — 문장을 만들지 않는다.
+    주제·조항 표는 서한마다 다르므로 슬롯 `s05.topic`·`s05.cfr_rows` 가 정한다(기본값은 11-02 시범 서한의 것)."""
+    cfr_map = CFR_MAP if cfr_map is None else [tuple(x) for x in cfr_map]
     docs = findings.get("documents") or []
     tgt = (lc.firm_name(card) or "").lower()
     by_firm: dict[str, list[dict]] = defaultdict(list)
     for d in docs:
         by_firm[d.get("firm_key")].append(d)
     wls = [d for d in docs if _is_wl(d)]
-    em = [d for d in wls if "환경모니터링" in (d.get("categories") or []) and not (tgt and tgt in str(d.get("firm_name")).lower())]
+    em = [d for d in wls if topic in (d.get("categories") or []) and not (tgt and tgt in str(d.get("firm_name")).lower())]
     years = Counter(str(d["published_date"])[:4] for d in em)
     firms = {d["firm_key"] for d in em}
     b483_before = 0
@@ -90,13 +99,14 @@ def db_similar(findings: dict, card: dict, *, n_cases: int = 3) -> dict[str, Any
             b483_before += 1
     repeat = sum(1 for k in firms if sum(1 for x in by_firm[k] if _is_wl(x)) > 1)
     cfr_rows = []
-    for label, prefix in CFR_MAP:
+    for label, prefix in cfr_map:
         hit = [d for d in wls if any(r.startswith(prefix) for f in d.get("findings") or [] for r in f.get("cfr_refs") or [])]
         cfr_rows.append(dict(label=label, cfr=prefix, n=len(hit), recent=sum(1 for d in hit if str(d["published_date"]) >= "2025-01-01")))
     pet = [d for d in wls if any("21 CFR 212" in r for f in d.get("findings") or [] for r in f.get("cfr_refs") or [])
            and not (tgt and tgt in str(d.get("firm_name")).lower())]
-    cases, tiers, id_n = similar_cases(wls, tgt, n_cases)
-    return dict(measured_on=findings.get("measured_on") or "", wl_total=len(wls), em_n=len(em), em_years=dict(sorted(years.items())),
+    # 문장 패턴(FACETS)은 11-02 환경모니터링 서한용이다 — 다른 주제에 돌리면 엉뚱한 '닮은 사례'가 나온다.
+    cases, tiers, id_n = similar_cases(wls, tgt, n_cases) if topic == "환경모니터링" else ([], dict(both=0, pattern=0, clause=0), 0)
+    return dict(topic=topic, measured_on=findings.get("measured_on") or "", wl_total=len(wls), em_n=len(em), em_years=dict(sorted(years.items())),
                 em_firms=len(firms), em_483_before=b483_before, em_repeat=repeat, cfr_rows=cfr_rows, pet_other=len(pet),
                 cases=cases, tiers=tiers, pool=tiers["both"] + tiers["pattern"], id_n=id_n)
 
@@ -198,6 +208,21 @@ def similar_cases(wls: list[dict], tgt: str, n_cases: int = 3) -> tuple[list[dic
     return cases, {k: len(v) for k, v in found.items()}, id_n
 
 
+def s05_ctx(slots: dict) -> dict[str, Any]:
+    """유사 사례 칸의 서한별 맥락 — 주제 분류·조항 표·키워드·용어·설명 문장. 슬롯 `s05` 가 정한다.
+    없는 항목은 그 요소를 그리지 않는다(11-02 시범 서한의 PET·환경모니터링 문구를 다른 서한에 붙이지 않는다)."""
+    s5 = slots.get("s05") or {}
+    return dict(topic=str(s5.get("topic") or ""), cfr_rows=[tuple(x) for x in s5.get("cfr_rows") or []],
+                map_header=str(s5.get("map_header") or "인용 조항"), map_note=str(s5.get("map_note") or ""),
+                keywords=[str(x) for x in s5.get("keywords") or []], term_ids=[str(x) for x in s5.get("term_ids") or []],
+                method=str(s5.get("method") or ""), no_match_note=str(s5.get("no_match_note") or ""))
+
+
+def db_for(findings: dict, card: dict, slots: dict) -> dict[str, Any]:
+    ctx = s05_ctx(slots)
+    return db_similar(findings, card, topic=ctx["topic"] or "환경모니터링", cfr_map=ctx["cfr_rows"])
+
+
 def db_numbers(db: dict) -> set[str]:
     blob = " ".join(str(v) for v in (db["measured_on"], db["wl_total"], db["em_n"], db["em_firms"], db["em_483_before"],
                                      db["em_repeat"], db["pet_other"], db["pool"], db["id_n"], *db["tiers"].values(),
@@ -212,7 +237,7 @@ def db_numbers(db: dict) -> set[str]:
 def validate_v3(card: dict, slots: dict, findings: dict) -> list[str]:
     probs: list[str] = []
     src = la.source_text(card)
-    db = db_similar(findings, card)
+    db = db_for(findings, card, slots)
     allowed = la._nums(src) | db_numbers(db)
     if slots.get("schema") != SCHEMA:
         probs.append(f"schema 가 {SCHEMA} 가 아니다")
@@ -224,7 +249,7 @@ def validate_v3(card: dict, slots: dict, findings: dict) -> list[str]:
     texts: list[tuple[str, str]] = []
     texts += [(f"cover.headline[{i}]", x) for i, x in enumerate(cv.get("headline") or [])]
     texts += [("cover.sub", cv.get("sub") or ""), ("cover.dots.caption", (cv.get("dots") or {}).get("caption") or ""),
-              ("cover.line", cv.get("line") or "")]
+              ("cover.line", cv.get("line") or ""), ("s03.repeat.label", (s3.get("repeat") or {}).get("label") or "")]
     texts += [(f"s02.rows[{i}]", r.get("text") or "") for i, r in enumerate(s2.get("rows") or [])]
     texts += [("s03.sub", s3.get("sub") or ""), ("s03.repeat", (s3.get("repeat") or {}).get("text") or "")]
     for i, p in enumerate(s3.get("pairs") or []):
@@ -255,12 +280,28 @@ def validate_v3(card: dict, slots: dict, findings: dict) -> list[str]:
         if text and la._nums(text) - la._nums(" ".join(evs)):
             probs.append(f"{path}: 근거에 없는 숫자 {sorted(la._nums(text) - la._nums(' '.join(evs)))}")
 
-    dots = cv.get("dots") or {}
-    _ev_ok("cover.dots", dots.get("evidence"))
-    if not {str(dots.get("total")), str(dots.get("marked"))} <= la._nums(" ".join(la._ev_list(dots.get("evidence")))):
-        probs.append("cover.dots: total·marked 가 근거 안의 숫자여야 한다")
-    if not (isinstance(dots.get("total"), int) and 1 <= dots["total"] <= 100 and 0 <= dots.get("marked", -1) <= dots["total"]):
-        probs.append("cover.dots: total 1~100, marked ≤ total")
+    # 표지 그림은 둘 중 하나: 점 그림(서한에 'N건 중 M건' 같은 분모가 있을 때) 또는 원문 한 줄(분모가 없을 때).
+    # 분모 없는 서한에 점 그림을 억지로 만들지 않는다(2026-11-16 — 3건 중 3건 같은 그림은 아무것도 보여 주지 않는다).
+    dots, quote = cv.get("dots"), cv.get("quote")
+    if bool(dots) == bool(quote):
+        probs.append("cover: dots(분모가 있는 숫자) 또는 quote(서한 원문 한 줄) 중 정확히 하나")
+    if dots:
+        _ev_ok("cover.dots", dots.get("evidence"))
+        if not {str(dots.get("total")), str(dots.get("marked"))} <= la._nums(" ".join(la._ev_list(dots.get("evidence")))):
+            probs.append("cover.dots: total·marked 가 근거 안의 숫자여야 한다")
+        if not (isinstance(dots.get("total"), int) and 1 <= dots["total"] <= 100 and 0 <= dots.get("marked", -1) <= dots["total"]):
+            probs.append("cover.dots: total 1~100, marked ≤ total")
+    if quote:
+        for k in ("en", "ko"):
+            q = la._norm(quote.get(k))
+            if not q:
+                probs.append(f"cover.quote.{k} 비어 있음")
+            elif q not in src:
+                probs.append(f"cover.quote.{k}: 서한 원문에 그대로 없다 — {q[:40]}…")
+        if lc.text_width(la._norm(quote.get("ko"))) > LIMITS["quote_ko"]:
+            probs.append(f"cover.quote.ko: 너무 길다(> {LIMITS['quote_ko']:g})")
+        if len(la._norm(quote.get("en"))) > LIMITS["quote_en"]:
+            probs.append(f"cover.quote.en: 너무 길다(> {LIMITS['quote_en']}자)")
     for e in la._ev_list(cv.get("line_evidence")):
         if e not in src:
             probs.append(f"cover.line_evidence: 근거가 원천에 없다 — {e[:40]}…")
@@ -278,19 +319,27 @@ def validate_v3(card: dict, slots: dict, findings: dict) -> list[str]:
         probs.append("s03.pairs 는 3~5개")
     for i, p in enumerate(pairs):
         _ev_ok(f"s03.pairs[{i}]", p.get("evidence"), (p.get("response") or "") + " " + (p.get("why") or ""))
-    _ev_ok("s03.repeat", (s3.get("repeat") or {}).get("evidence"), (s3.get("repeat") or {}).get("text") or "")
+    if s3.get("repeat"):  # 반복 위반·후속 조치 한 줄 — 서한에 없으면 칸을 만들지 않는다
+        _ev_ok("s03.repeat", s3["repeat"].get("evidence"), s3["repeat"].get("text") or "")
 
     refs = sorted(it.get("ref") for it in s4.get("items") or [] if isinstance(it.get("ref"), int))
     if refs != list(range(min(len(items), 4))):
         probs.append(f"s04.items 가 서한의 FDA 요구 {min(len(items), 4)}개를 모두 다뤄야 한다(ref {refs})")
+    if str(slots.get("pub") or "") > "2026-11-02" and not _ns(s5.get("topic")):
+        probs.append("s05.topic: 지적사항 DB 분류 이름이 필요하다(예: 무균보증/무균공정)")
     if not db["em_n"]:
-        probs.append("s05: DB 에서 같은 주제 사례를 찾지 못했다")
+        probs.append(f"s05: DB 에서 같은 주제('{db['topic']}') 사례를 찾지 못했다")
+    for t in s05_ctx(slots)["term_ids"]:
+        if t not in {g.get("id") for g in _load_glossary()}:
+            probs.append(f"s05.term_ids: 용어사전에 없는 id '{t}'")
 
     ns = s6.get("not_stated") or []
     if len(ns) not in (2, 3) or any(not x.get("basis") for x in ns):
         probs.append("s06.not_stated 는 2~3개이고 각각 basis(무엇을 보고 없다고 했는지)가 있어야 한다")
     if not la._norm(s6.get("question")).endswith("?"):
         probs.append("s06.question 은 질문형(?)이어야 한다")
+
+    probs += hook_problems(card, slots)
 
     firm_tokens = [t for t in _firm_tokens(card.get("headline_target"))]
     blob = json.dumps(slots, ensure_ascii=False).lower()
@@ -320,15 +369,46 @@ def _ns(x: Any) -> str:
     return la._norm(x)
 
 
+def first_sentence(text: Any) -> str:
+    t = la._norm(text)
+    m = re.search(r"(?<=[다요죠])\.(?:\s|$)|[?!](?:\s|$)", t)
+    return t[: m.end()].strip() if m else t
+
+
+def hook_problems(card: dict, slots: dict) -> list[str]:
+    """피드에서 멈추게 하는지 — 코드가 볼 수 있는 것만 본다(STYLE.md §13).
+    ① 본문 첫 문장은 모바일 접힘(약 22자×2줄) 안에 끝난다 ② 첫 문장은 사실로 시작한다 — 'FDA는 한 제조소가…' 같은
+    주어·기관 머리는 접힘 위의 자리를 다 쓴다 ③ 첫 문장에 숫자나 원문 인용(‘…’) 한 조각이 있다 ④ 표지 헤드라인은 두 줄이고
+    제목(라벨)을 되풀이하지 않으며 '…미흡'·'…위반' 같은 라벨로 끝나지 않는다."""
+    out: list[str] = []
+    lead1 = first_sentence((slots.get("caption") or {}).get("lead"))
+    alias = _ns(slots.get("firm_alias"))
+    if lc.text_width(lead1) > LIMITS["lead_first"]:
+        out.append(f"caption.lead 첫 문장이 모바일 접힘(약 22자×2줄)을 넘는다({lc.text_width(lead1):.0f} > {LIMITS['lead_first']}): {lead1[:30]}…")
+    if _WEAK_START.search(lead1) or (alias and alias in lead1):
+        out.append("caption.lead 첫 문장은 사실로 시작한다 — 기관·업체 소개('FDA는 …', '한 제조소가 …')는 둘째 문장으로")
+    if not (re.search(r"\d", lead1) or re.search(r"[‘“'\"][^’”'\"]{2,}[’”'\"]", lead1)):
+        out.append("caption.lead 첫 문장에 숫자나 원문 인용(‘…’) 한 조각이 있어야 한다")
+    h = [_ns(x) for x in (slots.get("cover") or {}).get("headline") or []]
+    if len(h) != 2:
+        out.append("cover.headline 은 두 줄")
+    elif _LABEL_END.search(h[-1]):
+        out.append(f"cover.headline 이 라벨로 끝난다('{h[-1]}') — 무엇이 어떻게 됐는지를 쓴다")
+    if h and re.sub(r"[\s·,]", "", "".join(h)) == re.sub(r"[\s·,]", "", _ns(card.get("title_issue"))):
+        out.append("cover.headline 이 카드 제목을 되풀이한다")
+    return out
+
+
 # ── 덱 ───────────────────────────────────────────────────────────────────────────────────────
 
 def db_lines(db: dict, polite: bool = False) -> list[str]:
     """DB 값으로만 만드는 문장(템플릿) — LLM 이 쓰지 않는다. polite=True 는 본문(합쇼체), 아니면 카드(짧은 평서)."""
     yrs = sorted(db["em_years"])
+    tp = db.get("topic") or "환경모니터링"
     if polite:
-        return [f"참고로 ‘환경모니터링’ 태그로 묶인 경고서한은 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체입니다.",
+        return [f"참고로 ‘{tp}’ 태그로 묶인 경고서한은 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체입니다.",
                 f"이 중 {db['em_483_before']}곳은 서한 전에 483이 먼저 게시됐고, {db['em_repeat']}곳은 서한을 두 번 이상 받았습니다(업체명 일치 기준이라 최소값입니다)."]
-    return [f"태그 기준 집계: ‘환경모니터링’ 경고서한 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체.",
+    return [f"태그 기준 집계: ‘{tp}’ 경고서한 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체.",
             f"이 중 {db['em_483_before']}곳은 서한 전에 483이 먼저 게시됐고, {db['em_repeat']}곳은 서한 2건 이상. 업체명 일치 기준이라 최소값."]
 
 
@@ -347,14 +427,14 @@ def _case_facets(c: dict) -> str:
     return ", ".join(c["facets"]) if c["facets"] else "환경모니터링 지적에 같은 조항이 인용됨(세부 사실은 다름)"
 
 
-def case_lines(db: dict, polite: bool = False) -> list[str]:
+def case_lines(db: dict, polite: bool = False, no_match_note: str = _NO_ID) -> list[str]:
     """개별 유사 사례 문장(템플릿) — 코드가 센 값·판정만 쓴다. 정확히 일치가 모자라면 단계적으로 넓히고 정도 라벨을 붙인다."""
     out = []
     if polite:
         for c in db["cases"]:
             out.append(f"{c['alias']}({c['year']}년, {c['cfr']}, {c['label']}): {_case_facets(c)} — grm-solutions.com/findings/doc/{c['slug']}/")
-    if db["id_n"] == 0:
-        out.append(_NO_ID.replace("찾지 못했다. 그래서", "찾지 못했습니다. 그래서").replace("표시한다.", "표시했습니다.") if polite else _NO_ID)
+    if db["id_n"] == 0 and db["cases"] and no_match_note:
+        out.append(no_match_note.replace("찾지 못했다. 그래서", "찾지 못했습니다. 그래서").replace("표시한다.", "표시했습니다.") if polite else _NO_ID)
     return out
 
 
@@ -367,12 +447,16 @@ _SITE_RULES = {1: ("situation", re.compile(r"ISO ?5.*(?:오염|검출)|동정"))
 
 def _pick_fact(text: str) -> str:
     """원문 지적에서 수치·기간이 든 문장을 먼저, 없으면 첫 문장을 그대로 쓴다(직접 쓰지 않는다). 너무 길면 자른다."""
-    sents = [x for x in re.split(r"(?<=[.!?다])\s+(?=[가-힣A-Z0-9(])", re.sub(r"\s+", " ", text or "").strip()) if x]
+    # 문장 끝은 마침표·물음표로만 본다 — '다' 뒤 공백으로 자르면 '…ISO-5 품질보다 낮은 공기'가 '품질보다'에서 잘렸다(2026-11-16).
+    sents = [x for x in re.split(r"(?<=[.!?])\s+(?=[가-힣A-Z0-9(])", re.sub(r"\s+", " ", text or "").strip()) if x]
     sents = [re.sub(r"\s*\[[^\]]*CFR[^\]]*\]", "", x) for x in sents]
     pick = next((x for x in sents if re.search(r"\d+\s*건|\d{4}년|\d+\s*%|\d+개월", x)), sents[0] if sents else "")
     pick = re.sub(r"^구체적으로,\s*", "", pick)
     pick = re.sub(r"^귀사는\s*", "", pick)
-    return pick if len(pick) <= 104 else pick[:100].rstrip() + "…"
+    if len(pick) <= 104:
+        return pick
+    cut = pick[:100].rsplit(" ", 1)[0]  # 낱말 중간에서 자르지 않는다
+    return re.sub(r"\s*\([^)]*$", "", cut).rstrip(" ,") + "…"  # 닫히지 않은 괄호(영문 병기 등)는 통째로 뺀다
 
 
 def _firm_history(findings: dict, slug: str) -> str:
@@ -520,9 +604,9 @@ def _load_glossary() -> list[dict]:
         return []
 
 
-def glossary_terms(glossary: list[dict] | None) -> list[tuple[str, str]]:
+def glossary_terms(glossary: list[dict] | None, ids: list[str] | None = None) -> list[tuple[str, str]]:
     by = {g.get("id"): g.get("term_ko") for g in glossary or []}
-    return [(by[i], i) for i in TERM_IDS if by.get(i)]
+    return [(by[i], i) for i in (TERM_IDS if ids is None else ids) if by.get(i)]
 
 
 def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[dict] | None = None,
@@ -533,7 +617,8 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     probs = validate_v3(card, slots, findings)
     if probs:
         raise la.AnatomyError(probs)
-    db = db_similar(findings, card)
+    db = db_for(findings, card, slots)
+    ctx = s05_ctx(slots)
     brief = brief_doc.get("brief") or {}
     pub = str(brief.get("publish_date") or slots.get("pub") or "")
     y, m, wk = lc.title_dateform(pub)
@@ -549,18 +634,20 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     items = (card["deep_analysis"].get("required_remediation") or {}).get("items") or []
     src_note = f"원문: FDA 경고서한{f' ({issued})' if issued else ''} · 업체명 비공개"
     ai = lc.AI_NOTE
-    terms = glossary_terms(glossary if glossary is not None else _load_glossary())
+    terms = glossary_terms(glossary if glossary is not None else _load_glossary(), ctx["term_ids"])
     slides = [
-        dict(kind="g_cover", chip=cv["chip"], h1=list(cv["headline"]), sub=cv["sub"], dots=dict(cv["dots"]),
-             line=cv.get("line") or "", ft_right=src_note, ai=ai),
+        dict(kind="g_cover", chip=cv["chip"], h1=list(cv["headline"]), sub=cv["sub"], dots=dict(cv.get("dots") or {}),
+             quote=dict(cv.get("quote") or {}), line=cv.get("line") or "", ft_right=src_note, ai=ai),
         dict(kind="g_find", corner="지적 내용", heading=s2["heading"], rows=s2["rows"], ft_right=src_note, ai=ai),
         dict(kind="g_reply", corner="회신 평가", heading=s3["heading"], sub=s3["sub"], pairs=s3["pairs"],
-             repeat=s3["repeat"]["text"], ft_right=src_note, ai=ai),
+             repeat=(s3.get("repeat") or {}).get("text") or "", repeat_label=(s3.get("repeat") or {}).get("label") or "반복 위반",
+             ft_right=src_note, ai=ai),
         dict(kind="g_req", corner="시정 요구", heading=s4["heading"], sub=f"서한이 요구한 항목 {len(items)}건",
              items=[(it["title"], it["text"]) for it in s4["items"]], deadline=la._deadline(card), ft_right=src_note, ai=ai),
         *([dict(kind="g_site", corner="유사 사례", heading=s5["heading"], rows=site, ft_right="사이트 유사 사례 검색 결과 · 정도 라벨은 코드 규칙", ai=ai)] if site else []),
         dict(kind="g_sim", corner="DB 연관" if site else "유사 사례", heading="DB로 본 반복과 선행" if site else s5["heading"], db=db,
-             lines=(db_lines(db) if site else case_lines(db) + db_lines(db)), comment=s5["comment"], terms=terms,
+             lines=(db_lines(db) if site else case_lines(db, no_match_note=ctx["no_match_note"]) + db_lines(db)), comment=s5["comment"], terms=terms,
+             keywords=ctx["keywords"], cfr_rows=db["cfr_rows"], map_header=ctx["map_header"],
              ft_right=f"지적사항 DB {db['measured_on']} 기준 · 직접 센 숫자", ai=ai),
         dict(kind="g_end", corner="서한에 없는 것", heading=s6["heading"], not_stated=s6["not_stated"],
              question=s6["question"], ft_right="원문 링크는 브리프 페이지에서 확인", ai=ai),
@@ -571,8 +658,9 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     cap = slots["caption"]
     caption_url = lc.with_utm(url, *lc.LINKEDIN_WEEKLY, lc.linkedin_weekly_campaign(pub))
     term_line = ("관련 용어: " + " · ".join(n for n, _ in terms) + " (grm-solutions.com/glossary/)") if terms else ""
-    sim = "\n".join(x for x in [la._norm(cap["similar"]), *(site_lines(site) if site else case_lines(db, polite=True)), METHOD, *db_lines(db, polite=True),
-                               MAP_NOTE, term_line] if x)
+    sim = "\n".join(x for x in [la._norm(cap["similar"]),
+                               *(site_lines(site) if site else case_lines(db, polite=True, no_match_note=ctx["no_match_note"])),
+                               ctx["method"], *db_lines(db, polite=True), ctx["map_note"], term_line] if x)
     ko = "\n\n".join([la._norm(cap["lead"]), la._norm(cap["claims"]), la._norm(cap["contrast"]),
                       la._norm(cap["requests"]), sim, la._norm(cap["not_stated"])])
     # 캡션 본문 속 글자 주소(`grm-solutions.com/...`)에도 같은 표식 — 링크드인이 링크로 걸어 주지만 표식이 없어 '직접'에 섞였다.
@@ -580,6 +668,28 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     return {"pub": pub, "lang": "ko", "slides": slides, "caption": ko + f"\n\n전체 해설: {caption_url}\n",
             "doc_title": f"GRM {m}월 {wk}주 경고서한 분석(GRM 판)", "url": url, "caption_url": caption_url,
             "card_id": str(card.get("id")), "mode": "grm"}
+
+
+def candidates(doc: dict, slot_path: Path) -> dict[str, Any]:
+    """주간 슬롯 작성자(대외홍보팀 Routine)에게 줄 재료 — 대상 선정은 코드가 한다(ANATOMY_CARDS.md 규칙).
+    고른 서한의 원천 필드(국문 번역·영어 원문·FDA 평가·요구)만 준다 — 슬롯 문장은 이 안에서만 근거를 찾는다."""
+    brief = doc.get("brief") or {}
+    elig = sorted((c for c in doc.get("cards") or [] if la.anatomy_eligible(c)), key=la.anatomy_score, reverse=True)
+    out: dict[str, Any] = {"pub": str(brief.get("publish_date") or ""), "slot_path": str(slot_path),
+                           "slot_exists": slot_path.exists(),
+                           "ranked": [dict(id=c.get("id"), title_issue=c.get("title_issue"), score=list(la.anatomy_score(c)))
+                                      for c in elig]}
+    if not elig:
+        out.update(pick=None, reason="해부 가능한 경고서한 없음(서한 0건 또는 본문·평가·요구 미확보) — 이번 주는 넘긴다")
+        return out
+    c = elig[0]
+    da = c.get("deep_analysis") or {}
+    out.update(pick=c.get("id"), firm_name_do_not_write=c.get("headline_target"), material=dict(
+        title_issue=c.get("title_issue"), summary=c.get("summary"), key_facts=c.get("key_facts"), facts=c.get("facts"),
+        key_violations=[{k: v.get(k) for k in ("citation", "description", "original")} for v in da.get("key_violations") or []],
+        fda_evaluation=da.get("fda_evaluation"), required_remediation=da.get("required_remediation"),
+        administrative_risks=da.get("administrative_risks"), deadline=la._deadline(c), issue_date=la._issue_date(c)))
+    return out
 
 
 # ── 렌더 ─────────────────────────────────────────────────────────────────────────────────────
@@ -599,6 +709,10 @@ CSS = """
 .g-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:14px;max-width:940px}
 .g-grid i{display:block;aspect-ratio:1;border-radius:50%;border:3px solid #B8AFA0}
 .g-grid i.m{background:#C2603F;border-color:#C2603F;box-shadow:0 0 0 7px rgba(194,96,63,.22)}
+.g-quote{margin-top:46px;border-left:10px solid #1A1815;padding:6px 0 6px 30px}
+.g-quote small{display:block;font-size:20px;font-weight:800;color:#6C6A64;margin-bottom:10px}
+.g-quote blockquote{margin:0;font-size:33px;line-height:1.42;font-style:italic;font-weight:600;color:#141413}
+.g-quote .ko{margin-top:18px;font-size:30px;line-height:1.45;font-weight:700;color:#3D3D3A;word-break:keep-all}
 .g-dcap{margin-top:30px;font-size:31px;font-weight:700;line-height:1.4;word-break:keep-all}
 .g-line{margin-top:16px;font-size:25px;color:#6C6A64;word-break:keep-all}
 .g-fr{border-top:3px solid #141413}
@@ -656,13 +770,17 @@ def _slide_html(s: dict) -> str:
     k = s["kind"]
     p: list[str] = []
     if k == "g_cover":
-        d = s["dots"]
-        grid = "".join(f'<i class="{"m" if n < d["marked"] else ""}"></i>' for n in range(d["total"]))
+        d, q = s.get("dots") or {}, s.get("quote") or {}
         p.append(f'<div class="g-chip">{_e(s["chip"])}</div>')
         p.append(lc._h1(s["h1"], 92))
         p.append(f'<p class="g-cs">{_e(s["sub"])}</p>')
-        p.append(f'<div class="g-dots"><div class="g-grid">{grid}</div><div class="g-dcap">{_e(d["caption"])}</div>'
-                 + (f'<div class="g-line">{_e(s["line"])}</div>' if s.get("line") else "") + '</div>')
+        line = f'<div class="g-line">{_e(s["line"])}</div>' if s.get("line") else ""
+        if d:
+            grid = "".join(f'<i class="{"m" if n < d["marked"] else ""}"></i>' for n in range(d["total"]))
+            p.append(f'<div class="g-dots"><div class="g-grid">{grid}</div><div class="g-dcap">{_e(d["caption"])}</div>{line}</div>')
+        else:  # 분모가 없는 서한 — 서한 원문 한 줄(영어 그대로 + 우리 번역)이 표지 그림이다
+            p.append(f'<div class="g-quote"><small>서한 원문</small><blockquote lang="en">“{_e(q.get("en"))}”</blockquote>'
+                     f'<div class="ko">{_e(q.get("ko"))}</div>{line}</div>')
     else:
         p.append(_key(k))
         p.append(f'<span class="g-corner">{_e(s["corner"])}</span>')
@@ -676,7 +794,8 @@ def _slide_html(s: dict) -> str:
             p.append('<div class="g-rp">' + "".join(
                 f'<div class="g-p"><div class="r"><small>회사 회신</small>{_e(x["response"])}</div>'
                 f'<div class="j"><small>FDA: 부적절한 이유</small>{_e(x["why"])}</div></div>' for x in s["pairs"]) + "</div>")
-            p.append(f'<div class="g-rep">반복 위반 · {_e(s["repeat"])}</div>')
+            if s.get("repeat"):
+                p.append(f'<div class="g-rep">{_e(s.get("repeat_label") or "반복 위반")} · {_e(s["repeat"])}</div>')
         elif k == "g_req":
             p.append('<div class="g-req">' + "".join(
                 f'<div class="g-r"><em>요구 {n}/{len(s["items"])}</em><b>{_e(t)}</b><span>{_e(x)}</span></div>'
@@ -700,11 +819,13 @@ def _slide_html(s: dict) -> str:
             big = bool(db.get("site"))  # DB 연관 카드는 내용이 적어 글을 키운다(억지로 채우지 않고 읽기 편하게)
             ln_style = ' style="font-size:29px;margin:14px 0"' if big else ""
             p.extend(f'<div class="g-ln"{ln_style}>{_e(x)}</div>' for x in s["lines"])
-            p.append('<div class="g-chips">' + "".join(f'<i>{_e(k_)}</i>' for k_ in KEYWORDS)
-                     + "".join(f'<u>{_e(n)}</u>' for n, _ in s.get("terms") or []) + '</div>')
-            p.append(f'<div class="g-map{" big" if big else ""}"><div class="mh"><span>대응 조항 기준 (212 → 211)</span><span>경고서한</span><span>2025년 이후</span></div>' + "".join(
-                f'<div><span>{_e(r["label"])}<small>{_e(r["cfr"])}</small></span><span>{r["n"]}건</span><span>{r["recent"]}건</span></div>'
-                for r in db["cfr_rows"]) + '</div>')
+            if s.get("keywords") or s.get("terms"):
+                p.append('<div class="g-chips">' + "".join(f'<i>{_e(k_)}</i>' for k_ in s.get("keywords") or [])
+                         + "".join(f'<u>{_e(n)}</u>' for n, _ in s.get("terms") or []) + '</div>')
+            if db["cfr_rows"]:
+                p.append(f'<div class="g-map{" big" if big else ""}"><div class="mh"><span>{_e(s.get("map_header") or "인용 조항")}</span><span>경고서한</span><span>2025년 이후</span></div>' + "".join(
+                    f'<div><span>{_e(r["label"])}<small>{_e(r["cfr"])}</small></span><span>{r["n"]}건</span><span>{r["recent"]}건</span></div>'
+                    for r in db["cfr_rows"]) + '</div>')
             p.append(f'<div class="g-cm">{_e(s["comment"])}</div>')
         elif k == "g_end":
             for x in s["not_stated"]:
@@ -740,8 +861,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--dist", help="배포 루트 — briefs/<발행일>/ 아래에 낸다(linkedin.* 옆, 사이트맵 비등록)")
     ap.add_argument("--no-pdf", action="store_true")
     ap.add_argument("--findings", default=str(FINDINGS), help="지적사항 DB 사본(기본 web/data/findings_docs.json · .gz 허용)")
+    ap.add_argument("--candidates", action="store_true",
+                    help="주간 슬롯 작성용: 규칙으로 고른 서한과 후보 순위·원천 재료를 JSON 으로 출력(파일을 쓰지 않는다)")
+    ap.add_argument("--check", action="store_true", help="슬롯 검증만(근거·숫자·실명·AI 티·후킹). 실패면 exit 1, 파일을 쓰지 않는다")
+    ap.add_argument("--save-similar", action="store_true",
+                    help="<발행일>.similar.json 저장본이 없으면 유사 사례 엔진을 불러 슬롯 폴더에 저장한다(SUPABASE_URL·SUPABASE_ANON_KEY)")
     args = ap.parse_args(argv)
-    if not (args.out or args.dist):
+    if not (args.out or args.dist or args.candidates or args.check or args.save_similar):
         ap.error("--out 또는 --dist 가 필요하다")
     bp = Path(args.brief) if args.brief else lc.latest_brief_path(Path(args.data))
     if bp is None:
@@ -750,12 +876,36 @@ def main(argv: list[str] | None = None) -> int:
     doc = json.loads(bp.read_text(encoding="utf-8"))
     pub = str((doc.get("brief") or {}).get("publish_date") or "")
     sp = Path(args.slots) if args.slots else SLOTS_DIR / f"{pub}.v3.json"
+    if args.candidates:
+        print(json.dumps(candidates(doc, sp), ensure_ascii=False, indent=1))
+        return 0
     if not sp.exists():
         print(f"::warning::v3 슬롯 없음({sp.name}) — 만들지 않는다", file=sys.stderr)
         return 0
     slots = json.loads(sp.read_text(encoding="utf-8"))
     findings = load_findings(Path(args.findings))
     url, key = os.environ.get("SUPABASE_URL", "").strip(), os.environ.get("SUPABASE_ANON_KEY", "").strip()
+    if args.check:
+        card = la.pick_anatomy_card(doc, str(slots.get("card_id") or ""))
+        probs = validate_v3(card, slots, findings) if card else ["card_id 에 맞는 해부 가능한 경고서한이 브리프에 없다"]
+        for pr in probs:
+            print(f"  - {pr}")
+        print(f"linkedin_grm --check: {pub} · 문제 {len(probs)}건")
+        return 1 if probs else 0
+    if args.save_similar:
+        snap = sp.parent / f"{pub}.similar.json"
+        if snap.exists():
+            print(f"저장본 있음 — 부르지 않는다: {snap.name}")
+            return 0
+        if not (url and key):
+            print("::warning::SUPABASE_URL·SUPABASE_ANON_KEY 없음 — 저장하지 않는다", file=sys.stderr)
+            return 1
+        sim = fetch_similar(slots, url=url, key=key)
+        if not sim:
+            return 1
+        snap.write_text(json.dumps(sim, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+        print(f"저장: {snap.name} · 항목 {len(sim['items'])} · 실패 지적 {sim['failed_findings']}")
+        return 0
     similar = load_similar(slots, pub, url=url, key=key)
     try:
         deck = build_grm_deck(doc, slots, findings, similar=similar)

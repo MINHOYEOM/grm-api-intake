@@ -143,7 +143,37 @@
   },
   "s05": {
     "heading": "이번 지적과 닮은 과거 지적",
-    "comment": "태그로는 35건이다. 닮은 서한은 앞 장처럼 지적마다 따로 찾는다."
+    "comment": "태그로는 35건이다. 닮은 서한은 앞 장처럼 지적마다 따로 찾는다.",
+    "topic": "환경모니터링",
+    "cfr_rows": [
+      [
+        "212.20(d) 부적합 조사·시정",
+        "21 CFR 211.192"
+      ],
+      [
+        "212.30(b) 설비 적합성",
+        "21 CFR 211.67"
+      ],
+      [
+        "ISO 5·EM 무균 관리",
+        "21 CFR 211.113(b)"
+      ]
+    ],
+    "map_header": "대응 조항 기준 (212 → 211)",
+    "map_note": "대응 조항 기준: PET 의약품 규정(21 CFR 212)을 같은 취지의 일반 cGMP(21 CFR 211) 조항으로 바꿔 센 값입니다.",
+    "keywords": [
+      "ISO 5 · Grade A",
+      "smoke study · dynamic",
+      "CAPA effectiveness"
+    ],
+    "term_ids": [
+      "cleanroom-classification",
+      "viable-environmental-monitoring",
+      "airflow-visualization-study",
+      "capa"
+    ],
+    "method": "찾은 방법: 경고서한 영문 문장을 코드로 검색(ISO 5·Grade A 검출 + 조사·평가 부족 / smoke study + dynamic / CAPA + effectiveness 부재)하고, 대응 조항 인용 여부로 닮은 정도를 나눴습니다.",
+    "no_match_note": "‘검출균 동정 미흡’ 그대로 지적한 서한은 DB에서 아직 찾지 못했다. 그래서 상황·조항이 겹치는 서한까지 넓혀 닮은 정도를 표시한다."
   },
   "s06": {
     "heading": "서한에 적히지 않은 내용",

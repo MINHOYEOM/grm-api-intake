@@ -92,12 +92,18 @@ def anatomy_eligible(card: dict) -> bool:
                 and (da.get("required_remediation") or {}).get("items"))
 
 
+_DATE_RE = re.compile(r"\d{4}\s*년(?:\s*\d{1,2}\s*월)?(?:\s*\d{1,2}\s*일)?|\d{1,2}\s*월\s*\d{1,2}\s*일|\d{4}-\d{2}-\d{2}")
+
+
 def anatomy_score(card: dict) -> tuple:
     """클수록 먼저. ① 신호 등급 ② 서한에 적힌 구체 수치 수(지적 본문의 숫자 토큰, 조항·날짜 제외 근사)
     ③ 지적 건수 ④ 앞선 렌더 순서. 결정론 — 같은 입력이면 같은 카드."""
     da = card.get("deep_analysis") or {}
     body = " ".join(_norm(v.get("description")) for v in da.get("key_violations") or [])
     body = re.sub(r"\(\s*21\s*CFR[^)]*\)", " ", body)
+    # 날짜는 '구체 수치'가 아니다 — 2026-11-16 호에서 날짜(년·월·일) 6개가 수치로 잡혀 지적 2건짜리 기록 제출 거부 서한이
+    # 지적 3건·회신 평가 3건인 무균공정 서한을 이겼다. 연월일·ISO 날짜를 지우고 센다(기간 'N개월'·건수는 그대로 센다).
+    body = _DATE_RE.sub(" ", body)
     n_facts = len(re.findall(r"\d+\s*(?:건|개|회|년|개월|일|%|배치|명|곳)", body))
     return (int(card.get("signal_tier") or 0), n_facts, len(da.get("key_violations") or []),
             -int(card.get("render_order") or 0))

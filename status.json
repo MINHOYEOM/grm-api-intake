@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T19:27:49Z",
+ "generated_at": "2026-11-16T22:36:49Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43970682275,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-16T22:30:18Z",
+    "updatedAt": "2026-11-16T22:36:28Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1788 from MINHOYEOM/claude/glossary-fig-daily-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43970682275"
+   },
+   {
     "databaseId": 43938262266,
     "status": "completed",
     "conclusion": "success",
@@ -216,17 +227,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1801 from MINHOYEOM/feat/subscribe-more-surfaces",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43931422360"
-   },
-   {
-    "databaseId": 43925021872,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-16T18:04:44Z",
-    "updatedAt": "2026-11-16T18:12:05Z",
-    "headBranch": "feat/subscribe-more-surfaces",
-    "displayTitle": "feat(subscribe): 다른 화면 상시 구독 칸(노트·조항·퀴즈·자료실·404·업체) + 영문 홈 라벨 접힘 수정",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43925021872"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 43971685415,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-16T22:36:30Z",
+    "updatedAt": "2026-11-16T22:36:37Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43971685415"
+   },
+   {
     "databaseId": 43939541810,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43909710806"
-   },
-   {
-    "databaseId": 43897940018,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-16T15:35:14Z",
-    "updatedAt": "2026-11-16T15:35:15Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43897940018"
    }
   ],
   "grm-findings-translate-apply.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 43967973899,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-16T22:13:41Z",
+    "updatedAt": "2026-11-16T22:13:44Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43967973899"
+   },
+   {
     "databaseId": 43818519824,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43625314453"
-   },
-   {
-    "databaseId": 43567128402,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-14T06:35:58Z",
-    "updatedAt": "2026-11-14T08:30:02Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43567128402"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 43970614948,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-16T22:29:54Z",
+    "updatedAt": "2026-11-16T22:30:28Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43970614948"
+   },
+   {
     "databaseId": 43822582002,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43649638743"
-   },
-   {
-    "databaseId": 43626819966,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-14T18:28:52Z",
-    "updatedAt": "2026-11-14T18:29:14Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43626819966"
    }
   ],
   "grm-cloud-request.yml": [

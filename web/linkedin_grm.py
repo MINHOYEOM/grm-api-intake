@@ -616,10 +616,12 @@ def _cap_lines(text: str, lang: str = "ko") -> list[str]:
 CAP_HEADS = {
     "ko": dict(claims="지적 내용", contrast="회사 회신과 FDA 판단", requests="FDA 요구", similar="GRM 지적사항 DB의 비슷한 사례",
                terms="관련 용어", not_stated="서한에 없는 것", url="전체 해설", glossary="grm-solutions.com/glossary/",
+               sub="GRM 주간 브리프", sub_line="매주 FDA·EU·식약처 실사 지적 소식을 받아 보세요.",
                ns_prefix=r"^서한에 없는 것\s*[:：]\s*"),
     "en": dict(claims="What FDA cited", contrast="The firm's response and FDA's view", requests="What FDA asked for",
                similar="Similar cases in the GRM findings database", terms="Related terms", not_stated="Not in the letter",
-               url="Full analysis", glossary="grm-solutions.com/en/glossary/", ns_prefix=r"^Not in the letter\s*:\s*"),
+               url="Full analysis", glossary="grm-solutions.com/en/glossary/",
+               sub="GRM Weekly Brief", sub_line="Get the week's FDA, EU and MFDS inspection findings.", ns_prefix=r"^Not in the letter\s*:\s*"),
 }
 
 
@@ -638,7 +640,8 @@ def _url_own_line(text: str) -> str:
 
 
 def caption_layout(lead: str, claims: str, contrast: str, requests: str, similar_block: list[str],
-                   term_names: list[str], not_stated: str, caption_url: str, lang: str = "ko") -> str:
+                   term_names: list[str], not_stated: str, caption_url: str, lang: str = "ko",
+                   sub_url: str = "") -> str:
     """링크드인 본문 배치(코드 고정) — 첫 단락은 소제목 없이 사건, 그다음 ■ 소제목 단락.
     문장은 한 줄에 하나, 주소는 자기 줄, 단락 사이는 빈 줄 하나."""
     def sec(title: str, lines: list[str]) -> str:
@@ -657,6 +660,8 @@ def caption_layout(lead: str, claims: str, contrast: str, requests: str, similar
         sec(H["terms"], [" · ".join(term_names), H["glossary"]] if term_names else []),
         sec(H["not_stated"], _cap_lines(ns, lang)),
         sec(H["url"], [caption_url]),
+        # [구독 유입 2026-11-17 대책 4] 맨 끝 구독 단락 — fit_caption 이 이것까지 세어 2,900자 상한을 지킨다.
+        sec(H["sub"], [H["sub_line"], sub_url]) if sub_url else "",
     ]
     return _url_own_line("\n\n".join(x for x in parts if x)) + "\n"
 
@@ -757,7 +762,8 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
         while similar_block and similar_block[-1] == "":
             similar_block.pop()
         text = caption_layout(cap["lead"], cap["claims"], cap["contrast"], cap["requests"], similar_block,
-                              [n for n, _ in terms], cap["not_stated"], caption_url)
+                              [n for n, _ in terms], cap["not_stated"], caption_url,
+                              sub_url=lc.subscribe_url(base_url, "ko", "linkedin_weekly", date=pub))
         # 캡션 본문 속 글자 주소(`grm-solutions.com/...`)에도 같은 표식 — 링크드인이 링크로 걸어 주지만 표식이 없어 '직접'에 섞였다.
         return utm.tag_bare_site_urls(text, "linkedin_weekly", date=pub)
     ko = fit_caption(make, site)

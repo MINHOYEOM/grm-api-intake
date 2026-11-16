@@ -18,7 +18,7 @@
     를 quiz.html 과 이 파일이 함께 include 한다(그 파일은 quiz.html 에서 잘라낸 원본
     그대로 — 한 글자도 더하지 않아야 quiz 골든 byte 가 보존된다). -#}
 <main class="wrap" id="grm-me">
-  <h1 class="grm-my-h">{{ _('마이페이지') }}</h1>
+  <h1 class="grm-my-h">{{ _('관심 목록') }}</h1>
   <p class="grm-my-sub">{{ _('저장한 용어와 스크랩한 카드, 구름이, 관심 업체를 한 화면에 모았습니다.') }}</p>
   <div id="grm-me-head" class="grm-me-head"></div>
 
@@ -94,7 +94,7 @@
 .grm-int-chips{display:flex;flex-wrap:wrap;gap:7px}
 .grm-int-chip{font:inherit;font-size:12.5px;line-height:1;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill,999px);padding:7px 13px;cursor:pointer}
 .grm-int-chip:hover{border-color:var(--coral)}
-.grm-int-chip[aria-pressed="true"]{color:var(--on-coral,#fff);background:var(--coral);border-color:var(--coral);font-weight:600}
+.grm-int-chip[aria-pressed="true"]{color:#fff;background:var(--coral-2);border-color:var(--coral-2);font-weight:600}
 .grm-int-chip:disabled{opacity:.55;cursor:default}
 /* 게스트 계정 카드 — 로그인 카드(.grm-me-card)와 같은 골격에 안내문 + CTA 2개. */
 .grm-me-guest-s{font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);margin:6px 0 0}

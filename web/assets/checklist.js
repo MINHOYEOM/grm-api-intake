@@ -22,6 +22,18 @@
  */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      var t = setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o).then(function (r) { clearTimeout(t); return r; },
+                            function (e) { clearTimeout(t); throw e; });
+  }
 
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
@@ -168,14 +180,28 @@
     return url.replace(/\/$/, "") + "/rest/v1/rpc/" + name;
   }
 
-  function rpc(name, body) {
-    return fetch(rpcEndpoint(name), {
+  // [157 · 2026-11-13 식은 첫 호출 재시도] 오래 쉰 뒤 첫 호출은 서버 시간 제한(57014 → HTTP 500)에
+  // 걸리는 일이 있다. 다시 보내면 첫 시도가 데운 페이지를 읽어 대개 성공한다. search.js 와 같은
+  // 규칙: 5xx·네트워크 오류만 간격을 두고 두 번 더 시도, 4xx(미적용 404 등)는 즉시 실패.
+  function rpc(name, body, attempt) {
+    return _fetchT(rpcEndpoint(name), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     }).then(function (r) {
-      if (!r.ok) throw new Error(name + " " + r.status);
+      if (!r.ok) {
+        var e = new Error(name + " " + r.status);
+        e.status = r.status;
+        throw e;
+      }
       return r.json();
+    }).catch(function (err) {
+      var a = attempt || 0;
+      if (a < 2 && !(err && err.status && err.status < 500)) {
+        return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
+          .then(function () { return rpc(name, body, a + 1); });
+      }
+      throw err;
     });
   }
 

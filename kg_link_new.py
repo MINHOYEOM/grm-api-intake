@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -28,6 +29,7 @@ from typing import Any
 import requests
 
 import kg_edges
+import kg_hc_clause
 import kg_product
 from grm_cli import normalize_supabase_url, resolve_supabase_service_credentials
 
@@ -215,6 +217,13 @@ def main(argv: list[str] | None = None) -> int:
                                     ensure_ascii=False) if g is not None else "SKIP(142 미적용)"))
             except RuntimeError as exc:  # 부가 단계 — 지적 연결을 실패시키지 않는다
                 print(f"[kg-link] GMP 적합판정 연결 건너뜀: {exc}", file=sys.stderr)
+        if os.environ.get("GRM_KG_HC_CLAUSE") == "1":  # 기본 꺼짐 — 캐나다 C.02.xxx 조항 연결(원문 regulation 필드)
+            try:
+                st, n_hc = kg_hc_clause.link_recent(base, key, since)
+                print(f"[kg-link] 캐나다 조항: {json.dumps(st, ensure_ascii=False)} · "
+                      + (f"전송 {n_hc:,}" if n_hc is not None else "SKIP(finding_clause 없음)"))
+            except RuntimeError as exc:  # 부가 단계 — 지적 연결을 실패시키지 않는다
+                print(f"[kg-link] 캐나다 조항 건너뜀: {exc}", file=sys.stderr)
         terms = json.loads(Path(a.glossary).read_text(encoding="utf-8"))
         rows = fetch_recent_texts(base, key, since)
         edges, _stats = compute_edges(rows, terms)

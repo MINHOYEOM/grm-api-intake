@@ -143,6 +143,55 @@ class ClaimRaceTest(unittest.TestCase):
         finally:
             shutil.rmtree(base, ignore_errors=True)
 
+    def test_desk_lock_07_20_and_07_45(self):
+        """데스크 두 슬롯이 같은 handoff 를 동시에 보면 한 쪽만 일한다(RUN.md 5-2)."""
+        base = tempfile.mkdtemp()
+        try:
+            bare = os.path.join(base, "r.git")
+            subprocess.run(["git", "init", "-q", "--bare", "-b", "main", bare], check=True)
+            seed = os.path.join(base, "seed")
+            subprocess.run(["git", "clone", "-q", bare, seed], check=True, capture_output=True)
+            _git(seed, "checkout", "-q", "-b", "main")
+            _git(seed, "config", "user.email", "t@t")
+            _git(seed, "config", "user.name", "t")
+            _w(os.path.join(seed, "company", "run", "D", "README.txt"), {})
+            _git(seed, "add", "-A")
+            _git(seed, "commit", "-q", "-m", "seed")
+            _git(seed, "push", "-q", "origin", "HEAD:main")
+            wk = []
+            for n in ("d1", "d2"):
+                p = os.path.join(base, n)
+                subprocess.run(["git", "clone", "-q", "-b", "main", bare, p], check=True, capture_output=True)
+                _git(p, "config", "user.email", "t@t")
+                _git(p, "config", "user.name", n)
+                wk.append(p)
+            f1 = os.path.join(wk[0], "company", "run", "D")
+            f2 = os.path.join(wk[1], "company", "run", "D")
+            self.assertTrue(sc.claim(f1, "desk", "desk", "데스크 07:20", now=1000))
+            self.assertTrue(os.path.exists(os.path.join(f1, "claims", "desk.claim")))
+            self.assertFalse(sc.claim(f2, "desk", "desk", "데스크 07:45", now=1000 + 60))
+            # 앞 데스크가 죽었으면(25분 넘게 desk.json 없음) 뒤 데스크가 이어받는다
+            self.assertTrue(sc.claim(f2, "desk", "desk", "데스크 07:45", now=1000 + sc.STALE_MIN * 60 + 5))
+            # desk.json 이 완료면 아무도 다시 잡지 않는다
+            _w(os.path.join(f2, "desk.json"), {"status": "완료", "shards": PLAN})
+            self.assertFalse(sc.claim(f2, "desk", "desk", "데스크 07:45", now=1000 + 9999))
+        finally:
+            shutil.rmtree(base, ignore_errors=True)
+
+    def test_desk_state_command(self):
+        d = tempfile.mkdtemp()
+        try:
+            self.assertEqual(sc._claim_state(d, "desk", "desk", 1)[0], "free")
+            _w(os.path.join(d, "claims", "desk.claim"), {"worker": "x", "at": 0})
+            self.assertEqual(sc._claim_state(d, "desk", "desk", 60)[0], "held")
+            self.assertFalse(sc._result_done(d, "desk", "desk"))
+            _w(os.path.join(d, "desk.json"), {"status": "보류"})
+            self.assertFalse(sc._result_done(d, "desk", "desk"))
+            _w(os.path.join(d, "desk.json"), {"status": "완료"})
+            self.assertTrue(sc._result_done(d, "desk", "desk"))
+        finally:
+            shutil.rmtree(d, ignore_errors=True)
+
 
 class MergeNTest(unittest.TestCase):
     def _folder(self, plan, files):

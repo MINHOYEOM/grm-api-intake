@@ -99,7 +99,7 @@
 <main>
   <div class="wrap">
     <nav class="ff-crumb" aria-label="{{ _('현재 위치') }}">
-      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/docs/">{{ _('문서로 찾기') }}</a><i>&rsaquo;</i><span>{{ firm.name }}</span>
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}browse/">{{ _('찾아보기') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/firm/">{{ _('업체') }}</a><i>&rsaquo;</i><span>{{ firm.name }}</span>
     </nav>
     {#- [수입경보 1단계 2026-11-10] FDA 수입경보(66-40·66-41) 현재 등재 제조소 — 뷰가 매칭해 넘긴
         행이 있을 때만 선다(render.firm_import_alerts: 표기명·법인격까지 일치, 두 나라 이상 이름 제외).
@@ -117,7 +117,7 @@
     </section>
     {%- endif %}
     <p class="kick">Firm Record</p>
-    <h1 class="ff-h1">{{ _("{name} 지적사항 이력", name=firm.name) }}</h1>
+    <h1 class="ff-h1">{{ firm.name }}</h1>
     {#- [2026-08-28] 종전 문구는 "아래 날짜는 실사한 날이 아니라 문서가 공개된 날"이었다.
         이 페이지의 타임라인은 행마다 '공개'/'실사 종료'를 적고 있어서 **자기 화면과
         모순**이었고, 캐나다 실사는 그 '공개' 자리에 실사일이 들어간다. 한 문장으로
@@ -213,12 +213,10 @@
     {%- endif %}
 
     <section class="ff-about">
-      <h2 class="ff-sec-h">{{ _('이 페이지에 대하여') }}</h2>
-      <p>{{ _('<b>이것은 그 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만, 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다. 현재 상태로 읽지 마시고, 최신 현황은 해당 규제기관의 공식 발표를 확인하세요.') }}</p>
-      {#- ★범위 고지(부재 어휘) — 이 페이지는 정본 스냅샷 중 **상세 페이지가 있는 문서**만
-          담는다. 전량은 조회 화면이 정본이므로 그 사실과 경로를 함께 적는다. -#}
-      <p><b>{{ _('담긴 범위.') }}</b> {% if min_findings %}{{ _("{date} 수집 기준으로, 상세 페이지가 있는 문서(지적 {n}건 이상)만 실었습니다. 같은 업체의 문서가 더 있을 수 있으며, 전체는 아래 업체 조회에서 확인하실 수 있습니다.", date=measured_on, n=min_findings) }}{% else %}{{ _("{date} 수집 기준으로, 상세 페이지가 있는 문서만 실었습니다. 같은 업체의 문서가 더 있을 수 있으며, 전체는 아래 업체 조회에서 확인하실 수 있습니다.", date=measured_on) }}{% endif %}</p>
-      <p>{{ _('업체를 묶는 기준은 표시명이 아니라 정규화 키입니다 &mdash; &ldquo;… Limited&rdquo;와 &ldquo;… Ltd.&rdquo;처럼 표기가 달라도 같은 업체로 봅니다. 번역과 분류는 기계로 처리한 것이라 원문과 뉘앙스가 다를 수 있고, 판단의 근거는 언제나 각 문서의 규제기관 공개 원문입니다.') }}</p>
+      {#- [고지 정리 2026-11-15] 제목·세 단락 → 짧은 두 줄. 시점 고지와 담긴 범위(부재 어휘)는 남기고,
+          업체 묶는 기준(정규화 키) 설명은 이용안내로 옮겼다. -#}
+      <p class="ff-note">{{ _('<b>그 시점의 기록입니다.</b> 이후 시정 결과는 원 기관 발표를 확인하세요.') }}</p>
+      <p class="ff-note"><b>{{ _('담긴 범위.') }}</b> {% if min_findings %}{{ _("{date} 수집 기준, 상세 페이지가 있는 문서(지적 {n}건 이상)만 실었습니다. 전체는 업체 조회에서 봅니다.", date=measured_on, n=min_findings) }}{% else %}{{ _("{date} 수집 기준, 상세 페이지가 있는 문서만 실었습니다. 전체는 업체 조회에서 봅니다.", date=measured_on) }}{% endif %}</p>
     </section>
 
     <section class="ff-rel">

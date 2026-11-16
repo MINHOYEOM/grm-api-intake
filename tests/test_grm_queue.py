@@ -1050,6 +1050,184 @@ class KeepShadowHealthTest(unittest.TestCase):
             self.assertFalse(fnmatch.fnmatch("store_health_2026-11-14.json", glob))
 
 
+class EditorialGitHandoffTest(unittest.TestCase):
+    """다음 판 편집팀 지시문(`company/editorial/next/`)이 가리키는 이름이 코드·워크플로의 이름과 같은지(3단계).
+
+    실발행 지시문(`company/editorial/*.md`)은 전환 때까지 바뀌지 않는다 — 리허설만 `next/` 를 읽는다.
+    """
+
+    ED = ROOT / "company" / "editorial"
+    NEXT = ("company", "editorial", "next")
+
+    def _read(self, *parts):
+        return ROOT.joinpath(*parts).read_text(encoding="utf-8")
+
+    def _script(self, name):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(name, self.ED / f"{name}.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def test_standalone_handoff_ref_equals_the_collector_fingerprint(self):
+        payload = {"run_date_kst": "2026-11-23", "generated_at_kst": "t", "row_count": 2,
+                   "rows": [{"source": "FR", "document_id": "가", "x": [1, {"b": 2}]},
+                            {"source": "MFDS", "document_id": "b"}], "coverage_collected_md": "한글"}
+        hr = self._script("handoff_ref")
+        self.assertEqual(hr.handoff_ref(payload), gq.handoff_ref(payload))
+        self.assertEqual(hr.handoff_ref(payload)["sha256"], gq.payload_sha256(payload))
+        src = (self.ED / "handoff_ref.py").read_text(encoding="utf-8")
+        for dep in ("import requests", "import grm_", "from grm_"):
+            self.assertNotIn(dep, src)                     # 클라우드 직무가 설치 없이 돌린다
+
+    def test_instructions_point_at_the_mirror_branch_and_file_names(self):
+        wf = self._read(".github", "workflows", "grm-queue-handoff-mirror.yml")
+        self.assertIn("MIRROR_BRANCH: claude/queue-handoff", wf)
+        self.assertIn('cp "$f" "handoff_${d}.json"', wf)
+        run = self._read(*self.NEXT, "RUN.md")
+        self.assertIn("git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json", run)
+        copyedit = self._read(*self.NEXT, "copyedit.md")
+        self.assertIn("git fetch origin claude/queue-handoff && git show FETCH_HEAD:brief_web_$U.json", copyedit)
+        for name in ("desk.md", "reporter.md", "copyedit.md"):
+            self.assertIn("company/editorial/handoff_ref.py", self._read(*self.NEXT, name), name)
+
+    def test_copyedit_hands_back_what_the_bridge_reads(self):
+        import delta_bridge
+        copyedit = self._read(*self.NEXT, "copyedit.md")
+        self.assertIn(f"company/run/{{run_date_kst}}/{delta_bridge.SCAFFOLD_RUN_NAME}", copyedit)
+        self.assertIn("grm_queue.py notion-sync", copyedit)
+        self.assertIn("행 Status 는 찍지 않는다", copyedit)
+        desk = self._read(*self.NEXT, "desk.md")
+        self.assertIn('"handoff_ref": {"date"', desk)       # merge_parts 가 읽는 키
+
+    def test_run_md_names_the_real_switches(self):
+        run = self._read(*self.NEXT, "RUN.md")
+        intake = self._read(".github", "workflows", "grm-intake.yml")
+        bridge = self._read(".github", "workflows", "grm-delta-bridge.yml")
+        self.assertIn("GRM_QUEUE_HANDOFF_REFRESH", run)
+        self.assertIn("vars.GRM_QUEUE_HANDOFF_REFRESH", intake)
+        self.assertIn("GRM_DELTA_SOURCE", run)
+        self.assertIn("vars.GRM_DELTA_SOURCE", bridge)
+
+    def test_run_branch_is_cut_from_a_fresh_fetch_not_the_stale_tracking_ref(self):
+        # 2026-11-13 리허설: 실행 환경의 origin/main 이 11-06 이라, 거기서 만든 브랜치에 next/ 와 handoff_ref.py 가 없었다.
+        run = self._read(*self.NEXT, "RUN.md")
+        self.assertIn('git fetch origin main && git checkout -b "$B" FETCH_HEAD', run)
+        self.assertIn('git fetch origin "$B"; then git checkout -B "$B" FETCH_HEAD', run)
+        self.assertNotIn("`origin/main` 에서 만든다", run)
+        self.assertIn("test -f company/editorial/handoff_ref.py", run)
+        reh = self._read("company", "editorial", "REHEARSAL.md")
+        self.assertIn("test -f company/editorial/next/RUN.md", reh)
+        self.assertNotIn("checkout -b claude/company-rehearsal", reh)
+
+    def test_other_cloud_jobs_also_cut_branches_from_a_fresh_fetch(self):
+        # 같은 낡은 origin/main 이 편집팀 밖 클라우드 직무(교육·번역·검증·브리프 준비)에도 남아 있었다(2026-11-15).
+        import re
+        jobs = [
+            ("company", "education", "glossary-fig-daily.md"),
+            ("company", "education", "glossary-weekly.md"),
+            ("company", "education", "quiz-weekly.md"),
+            ("company", "situation-room", "brief-prep.md"),
+            ("company", "translation", "findings-daily.md"),
+            ("company", "verification", "monthly.md"),
+        ]
+        stale = re.compile(r"(checkout -b \S+ origin/main|push origin origin/main:|--format=%H origin/main|에서 만든다\.\)|`origin/main` 에서 브랜치)")
+        for parts in jobs:
+            text = self._read(*parts)
+            self.assertIsNone(stale.search(text), "/".join(parts))
+            self.assertIn("FETCH_HEAD", text, "/".join(parts))
+
+    def test_instructions_state_the_same_length_limits_the_code_enforces(self):
+        # 2026-11-13 리허설 1113b: 교열이 영문 hook_line 에 한국어 상한(40자)을 적용해 49장을 반려했고,
+        # 기자는 en.title_issue 상한(50자)을 몰라 한 장이 조립을 막았다. 지시문의 숫자 = 코드의 숫자.
+        import inject_slots
+        ko, en = inject_slots._HOOK_LINE_MAX["ko"], inject_slots._HOOK_LINE_MAX["en"]
+        en_title = inject_slots._MAX_TITLE_ISSUE * 2
+        style = self._read("company", "editorial", "STYLE.md")
+        self.assertIn(f"한국어 공백 포함 {ko}자 이내", style)
+        self.assertIn(f"영문 `en.hook_line` 공백 포함 {en}자 이내", style)
+        for folder in (("company", "editorial"), self.NEXT):
+            copyedit = self._read(*folder, "copyedit.md")
+            self.assertIn(f"한국어 {ko}자 이내 · 영문 {en}자 이내", copyedit, folder)
+            self.assertNotIn(f"② 공백 포함 {ko}자 이내 ③", copyedit, folder)
+            reporter = self._read(*folder, "reporter.md")
+            self.assertIn(f"한국어 {ko}자 이내 · 영문 {en}자 이내", reporter, folder)
+            self.assertIn(f"`title_issue` {inject_slots._MAX_TITLE_ISSUE}자 이내, `en.title_issue` {en_title}자 이내",
+                          reporter, folder)
+        self.assertIn(f"영문 `en.title_issue` ≤{en_title}자", self._read("docs", "prompts", "GRM_Prompt_v16.md"))
+
+    def test_live_instructions_are_untouched_and_rehearsal_reads_next(self):
+        # 이 PR 은 실발행 지시문을 바꾸지 않는다 — 월요일 발행은 여전히 노션 handoff 를 읽는다.
+        for name in ("RUN.md", "desk.md", "reporter.md", "copyedit.md"):
+            live = self._read("company", "editorial", name)
+            self.assertNotIn("claude/queue-handoff", live, name)
+            self.assertNotIn("handoff_ref", live, name)
+            nxt = self._read(*self.NEXT, name)
+            self.assertIn("다음 판(시범) 지시문", nxt, name)
+            self.assertNotIn("`company/editorial/RUN.md`", nxt.split("\n", 6)[-1], name)   # 실행 규칙 포인터는 next/ 판
+        reh = self._read("company", "editorial", "REHEARSAL.md")
+        for name in ("RUN.md", "desk.md", "reporter.md", "copyedit.md"):
+            self.assertIn(f"company/editorial/next/{name}", reh)
+
+    def test_next_role_files_keep_every_v16_pointer(self):
+        # 전환 때 next/ 판이 실발행 파일을 대신한다 — v16 절 배정이 하나도 빠지면 안 된다.
+        import re
+        pointer = re.compile(r"^- v16: (\[.+\])\s*$", re.M)
+        for name in ("desk.md", "reporter.md", "copyedit.md"):
+            live = pointer.findall(self._read("company", "editorial", name))
+            nxt = pointer.findall(self._read(*self.NEXT, name))
+            self.assertTrue(live, name)
+            self.assertEqual(nxt, live, name)
+
+    def test_rehearsal_never_touches_the_publish_path(self):
+        import delta_bridge
+        reh = self._read("company", "editorial", "REHEARSAL.md")
+        self.assertIn("claude/company-rehearsal-", reh)
+        self.assertIn("company/run/rehearsal-", reh)
+        # 브릿지가 읽는 브랜치·폴더 이름은 날짜로만 만들어진다 — 리허설 이름과 겹칠 수 없다.
+        self.assertEqual(delta_bridge.GIT_BRANCH_TPL, "claude/company-{date}")
+        self.assertEqual(delta_bridge.GIT_RUN_DIR_TPL, "company/run/{date}")
+        self.assertRegex("2026-11-16", delta_bridge._DATE_RE)
+        for name in ("rehearsal-1114", "rehearsal-1115", "rehearsal-1118"):
+            self.assertIsNone(delta_bridge._DATE_RE.match(name))
+
+    def test_rehearsal_check_passes_a_complete_run_and_fails_an_incomplete_one(self):
+        rc = self._script("rehearsal_check")
+        handoff = {"run_date_kst": "2026-11-16", "generated_at_kst": "t", "row_count": 2,
+                   "rows": [{"source": "FR", "document_id": "a", "web_card_id": "a"},
+                            {"source": "FR", "document_id": "b", "web_card_id": "b"}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            hp = os.path.join(tmp, "handoff.json")
+            folder = os.path.join(tmp, "run")
+            os.makedirs(folder)
+
+            def put(name, obj):
+                with open(os.path.join(folder, name) if name != "handoff.json" else hp, "w",
+                          encoding="utf-8") as f:
+                    json.dump(obj, f, ensure_ascii=False)
+            put("handoff.json", handoff)
+            ref = gq.handoff_ref(handoff)
+            put("desk.json", {"status": "완료", "handoff_ref": ref,
+                              "shards": {"delta": {"A": ["a"]}, "deep": {"A": []}}})
+            put("delta.A.json", {"status": "완료", "cards": {"a": {}}})
+            put("delta.json", {"cards": {"a": {}}, "tldr": [], "handoff_ref": ref, "deferred": []})
+            put("copyedit.json", {"status": "완료", "code_gate": {"ran": True, "exit": 0},
+                                  "cards": [{"web_card_id": "a", "verdict": "pass"}],
+                                  "counts": {"reject": 0}})
+            put("scaffold.json", {"brief": {"run_date_kst": "2026-11-16"}, "cards": [{"id": "a"}]})
+            results = rc.check(folder, hp)
+            self.assertEqual([ok for _, _, ok, _ in results], [True] * 5, results)
+            # 스캐폴드가 다른 날짜면 5번, 교열 reject 가 있으면 4번, 지문이 다르면 1번이 실패한다.
+            put("scaffold.json", {"brief": {"run_date_kst": "2026-11-09"}, "cards": [{"id": "a"}]})
+            put("copyedit.json", {"status": "완료", "code_gate": {"ran": True, "exit": 0},
+                                  "cards": [{"web_card_id": "a", "verdict": "reject"}],
+                                  "counts": {"reject": 1}})
+            put("desk.json", {"status": "완료", "handoff_ref": dict(ref, sha256="0" * 64),
+                              "shards": {"delta": {"A": ["a"]}, "deep": {}}})
+            self.assertEqual([ok for _, _, ok, _ in rc.check(folder, hp)],
+                             [False, True, True, False, False])
+
+
 class CompareTest(unittest.TestCase):
     def test_classifies_who_is_richer(self):
         n = {"rows": [{"source": "FR", "document_id": "1", "body": "abc…", "modality": "Bio",

@@ -5195,6 +5195,7 @@ def main() -> int:
     # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
     handoff_window_days = cfg.handoff_window_days
     handoff_payloads: list[dict[str, Any]] = []   # 대기열 그림자 비교용(노션으로 만든 payload)
+    handoff_frozen: list[str] = []   # 발행일 동결로 handoff 를 건너뛰었으면 그 페이지 상태
     if args.emit_routine_handoff:
         if args.dry_run:
             log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
@@ -5245,8 +5246,20 @@ def main() -> int:
                     # 무음 소스는 coverage 줄에 `0(점검필요)` 로 찍힌다(§3 2026-09-14).
                     silent_sources=coverage_silent_sources,
                     sealed_dates=handoff_sealed_dates,
-                    payload_out=handoff_payloads)
+                    payload_out=handoff_payloads,
+                    frozen_out=handoff_frozen)
                 handoff_emitted = True
+                if handoff_frozen:
+                    # 발행일 동결(grm_handoff.publish_day_handoff_frozen) — 이번 실행은 handoff 를 쓰지 않았다.
+                    _sum_path = os.environ.get("GITHUB_STEP_SUMMARY")
+                    if _sum_path:
+                        try:
+                            with open(_sum_path, "a", encoding="utf-8") as f:
+                                f.write(f"> 🧊 발행일 handoff 동결 — {run_date} handoff 가 이미 있어"
+                                        f"(Status={handoff_frozen[0]}) 다시 쓰지 않았다. 07:00 KST 이후 재실행은"
+                                        f" 무해 종료한다(새 행은 다음 handoff 로). 아래 handoff 행 수는 기존 페이지 값이다.\n\n")
+                        except OSError:
+                            pass
             except NotionHandoffError as e:
                 handoff_failed = True
                 handoff_error_msg = str(e)

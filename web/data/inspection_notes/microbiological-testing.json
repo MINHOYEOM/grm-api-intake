@@ -1,0 +1,118 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "microbiological-testing", "as_of": "2026-11-15",
+  "area_ko": "시험실", "area_en": "Laboratory",
+  "title_ko": "미생물 시험", "title_en": "Microbiological testing",
+  "glossary_ids": ["sterility-test", "microbial-limits", "bioburden"],
+  "aliases_ko": ["무균시험", "미생물한도시험", "바이오버든", "엔도톡신 시험"],
+  "aliases_en": ["sterility test", "microbial limits", "bioburden", "endotoxin"],
+  "search_q_ko": "무균시험", "search_q_en": "sterility test",
+  "lead_ko": "FDA 는 미생물 시험을 했는지보다, 그 시험법이 밸리데이션됐고 부적합 결과를 근거를 갖춰 조사했는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether microbiological tests were run than at whether the methods were validated and failing results were investigated on a sound basis. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    {
+      "title_ko": "대체 시험법이 공정서 시험법과 동등함을 입증하지 않았다",
+      "title_en": "An alternative method was not shown to be equivalent to the compendial method",
+      "quotes": [
+        { "finding_id": "finding-407ca4a0a1932fd52a009f44", "raw_signal_id": "rawsig-b371a2de986695d447f927ff", "document_id": "ac5861265ee7", "source": "FDA Warning Letter",
+          "firm": "Spa De Soleil, Inc.", "date": "2026-07-14",
+          "quote_ko": "귀사는 (b)(4) , 원료물질, 완제의약품의 (b)(4) 미생물 시험(예: 총균수, 부적합 미생물)에 (b)(4) 시스템을 사용했다. 그러나 이 시스템이 USP 공정서 시험법과 동등하거나 그보다 우수하며 의도된 용도에 적합함을 입증하지 못했다.",
+          "quote_en": "Your firm used the (b)(4) system for (b)(4) microbiological testing of your (b)(4) , raw materials, and finished drug products (e.g., total counts, objectionable microorganisms). However, you failed to demonstrate that this system was equivalent to or better than USP compendial methods and suitable for its intended use." },
+        { "finding_id": "finding-5d99e59c6188d83c75b6de16", "raw_signal_id": "rawsig-845e36e304d8d1d211092a14", "document_id": "fda483-196144", "source": "FDA 483",
+          "firm": "LeeSar Inc", "date": "2026-11-05",
+          "quote_ko": "귀사는 완제의약품 무균시험을 ATP 생물발광법을 수행하는 제3자 시험기관에 위탁한다. 2025년 8월 이후 확립된 시험법 USP <73>이 시행되었으나, 귀사에는 해당 시험기관의 ATP 생물발광법이 단수명 제품의 오염 검출을 위한 USP <73> ATP 생물발광 기반 미생물학적 시험법과 동등함을 입증하는 증거가 없다.",
+          "quote_en": "Your firm outsources your finished drug product sterility testing to a third-party laboratory who performs an ATP-bioluminescent method. Since August 2025, an established method USP <73> has been implemented but you do not have evidence to demonstrate that the laboratory's ATP-bioluminescent method is equivalent to USP <73> ATP bioluminescence-based microbiological methods for the detection of contamination in short-life products." }
+      ]
+    },
+    {
+      "title_ko": "미생물 시험법을 적절히 밸리데이션하지 않았다",
+      "title_en": "Microbiological test methods were not adequately validated",
+      "quotes": [
+        { "finding_id": "finding-6d4457face71b3cf96bef9c3", "raw_signal_id": "rawsig-21051f05529a46fad620b036", "document_id": "530821d5b169", "source": "FDA Warning Letter",
+          "firm": "Suretec Innovations, LLC", "date": "2026-08-18",
+          "quote_ko": "완제 OTC 의약품의 미생물학적 특성(예: 총균수, 유해미생물)을 판정하기 위해 사용한 비공정서(non-compendial) 시험법이 부적절했다. 구체적으로 적절한 배양시간이 설정되어 있지 않았고, 적절한 시험법 적합성(method suitability)이 확인되지 않았으며, 양성 및 음성 대조가 없었다. 또한 이 비공정서 시험법을 밸리데이션하지 않았다.",
+          "quote_en": "Your non-compendial test method used to determine microbiological attributes (e.g., total count, objectionable microorganisms) for your finished OTC drug product was inadequate. Specifically, you lacked appropriate incubation times, lacked appropriate method suitability, and lacked positive and negative controls. In addition, you did not validate this non-compendial method." },
+        { "finding_id": "finding-a25bd87e384b3a77426c240f", "raw_signal_id": "rawsig-603aef51079cc7d1f6cd8860", "document_id": "b4df667af731", "source": "FDA Warning Letter",
+          "firm": "Active Cosmetics Manufacturing Inc.", "date": "2026-05-05",
+          "quote_ko": "귀사는 대체 신속 미생물 시험법을 적절히 밸리데이션하지 않았다.",
+          "quote_en": "You failed to adequately validate your alternative rapid microbiological test methods." }
+      ]
+    },
+    {
+      "title_ko": "무균시험 부적합을 제대로 조사하지 않았다",
+      "title_en": "Sterility test failures were not adequately investigated",
+      "quotes": [
+        { "finding_id": "finding-b9a60f9a3690a1bb204eb016", "raw_signal_id": "rawsig-e3a20b1c68ed54dc09725638", "document_id": "fda468f6708d", "source": "FDA Warning Letter",
+          "firm": "Jabil Inc.", "date": "2026-09-01",
+          "quote_ko": "귀사는 무균 충전된 (b)(4) mg/ (b)(4) ml 제품의 무균시험 부적합 결과를 적절히 조사하지 않았다. 귀사는 (b)(4) 배지에서 진균인 Ustilago spermophora 를 확인했다.",
+          "quote_en": "You did not adequately investigate a failed sterility test result for your aseptically filled (b)(4) mg/ (b)(4) ml. Your firm identified Ustilago spermophora , a fungi, in (b)(4) medium." },
+        { "finding_id": "finding-05edce3edfaa6c9cacb647be", "raw_signal_id": "rawsig-7dd3353a3d59a93237f5c0ac", "document_id": "fda483-195580", "source": "FDA 483",
+          "firm": "Bello Bio LLC", "date": "2026-10-27",
+          "quote_ko": "구체적으로, 귀사는 사람 탯줄 조직으로 제조한 생물학적 제제의 무균시험 부적합을 조사하지 않았다.",
+          "quote_en": "Specifically, your firm did not investigate sterility failures in biological products manufactured from human umbilical cord tissue." }
+      ]
+    },
+    {
+      "title_ko": "부적합 결과를 무효화하면서 과학적 근거를 갖추지 않았다",
+      "title_en": "Failing results were invalidated without scientific justification",
+      "quotes": [
+        { "finding_id": "finding-20444885b3cae13821d6b3d6", "raw_signal_id": "rawsig-cd075575fb61eae910852b8d", "document_id": "8b9b6af44436", "source": "FDA Warning Letter",
+          "firm": "Baxter International Inc.", "date": "2026-10-20",
+          "quote_ko": "귀사는 Phase II 조사를 수행하지 않고 제조 공정이나 완제품에 위험이 없다고 결론 내렸다. 귀사는 충분한 과학적 근거 없이 무균시험 결과를 무효화했고, 이 로트를 2025년 7월에 출하했다.",
+          "quote_en": "Without conducting a Phase II investigation, you concluded there was no risk to the manufacturing process or finished product. You invalidated the sterility result without adequate scientific justification and released this lot in July 2025." },
+        { "finding_id": "finding-6082cc3f8d31a2736be85c7a", "raw_signal_id": "rawsig-a4c2d991374bbfa6da132fe3", "document_id": "9995c30e33c0", "source": "FDA Warning Letter",
+          "firm": "SnugZ USA, Inc.", "date": "2026-10-20",
+          "quote_ko": "아울러 귀사의 (b)(4) 미생물 시험 SOP는 최초 부적합 후 재시험을 허용한다. 또한 이 SOP는 재시험이 부적합하면 분석자가 두 번째 미생물 시험 기기인 (b)(4) 를 사용하도록 규정한다. 귀사는 (b)(4) 시스템의 부적합한 배치 출하 시험 결과를 일상적으로 무효화하고, 과학적 근거 없이 적합한 (b)(4) 결과를 사용해 제품을 시장에 출하했다.",
+          "quote_en": "Additionally, your (b)(4) Microbial Testing SOP allows retesting following an initial failure. Also, your SOP says that if the retest fails, your analysts are to use the (b)(4) , a second microbiological testing instrument. You routinely invalidated failing batch release results from the (b)(4) system and used the passing (b)(4) results to release product to the market without scientific justification." }
+      ]
+    },
+    {
+      "title_ko": "용수의 유해 미생물 시험을 갖추지 않았다",
+      "title_en": "Testing of water for objectionable microorganisms was not in place",
+      "quotes": [
+        { "finding_id": "finding-6f7bec118af034d984cef324", "raw_signal_id": "rawsig-d8842c87e311d2e7d91404e9", "document_id": "ab43d386b7bc", "source": "FDA Warning Letter",
+          "firm": "World Perfumes Inc.", "date": "2025-11-18",
+          "quote_ko": "구체적으로, 귀사는 (b)(4) 물에서 부적합 미생물(예: Burkholderia cepacia complex(BCC))에 대한 적절한 시험을 수행하지 않았고 제조 사용지점에서 시료를 채취하지도 않았다.",
+          "quote_en": "Specifically, you did not perform adequate testing for objectionable microorganisms in your (b)(4) water (e.g., Burkholderia cepacia complex (BCC)) or sample your manufacturing points-of-use." },
+        { "finding_id": "finding-4353df773b1e4175f04f74f0", "raw_signal_id": "rawsig-c904adf220385fc652cbf8f6", "document_id": "fda483-196222", "source": "FDA 483",
+          "firm": "Yuki Gosei Kogyo, Co., Ltd", "date": "2026-11-05",
+          "quote_ko": "구체적으로, 귀사는 [redacted] 의약품 제조에 쓰이는 APIs의 생산 공정에 사용하는 [redacted] 용수의 유해 미생물 시험에 대한 서면 절차를 수립하지 않았다.",
+          "quote_en": "Specifically, You have not established a written procedure for testing of objectionable organisms in [redacted] water that is used in the production process of APIs that are used for the manufacturing of [redacted] drug products." }
+      ]
+    }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.165(b)", "finding_id": "finding-6d4457face71b3cf96bef9c3", "firm": "Suretec Innovations, LLC", "date": "2026-08-18",
+      "quote_ko": "귀사는 유해미생물(objectionable microorganisms)이 없어야 하는 완제의약품의 각 배치에 대하여 필요한 적절한 실험실 시험을 수행하지 않았다",
+      "quote_en": "Your firm failed to conduct appropriate laboratory testing, as necessary, for each batch of drug product required to be free of objectionable microorganisms",
+      "note_ko": "배양시간, 시험법 적합성, 양성·음성 대조를 갖추지 않은 비공정서 시험법으로 완제의약품을 시험한 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Testing finished drug product with a non-compendial method that lacked incubation times, method suitability, and positive and negative controls was cited under this clause." },
+    { "key": "21 CFR 211.165(e)", "finding_id": "finding-a25bd87e384b3a77426c240f", "firm": "Active Cosmetics Manufacturing Inc.", "date": "2026-05-05",
+      "quote_ko": "귀사는 시험법의 정확성(accuracy), 감도(sensitivity), 특이성(specificity), 재현성(reproducibility)을 수립하고 문서화하지 않았다",
+      "quote_en": "Your firm failed to establish and document the accuracy, sensitivity, specificity, and reproducibility of its test methods",
+      "note_ko": "대체 신속 미생물 시험법을 적절히 밸리데이션하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Not adequately validating alternative rapid microbiological test methods was cited under this clause." },
+    { "key": "21 CFR 211.192", "finding_id": "finding-b9a60f9a3690a1bb204eb016", "firm": "Jabil Inc.", "date": "2026-09-01",
+      "quote_ko": "귀사는 배치 또는 그 구성 성분이 어떤 규격이든 충족하지 못한 설명되지 않는 불일치나 실패에 대해, 해당 배치가 이미 유통되었는지 여부와 관계없이 철저히 조사하지 않았다",
+      "quote_en": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed",
+      "note_ko": "무균 충전 제품의 무균시험 부적합을 적절히 조사하지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Not adequately investigating a failed sterility test result for an aseptically filled product was cited under this clause." }
+  ],
+  "checks_ko": [
+    "대체 미생물 시험법이 공정서 시험법과 동등하거나 그보다 우수하다는 자료가 있습니까",
+    "위탁 시험기관이 쓰는 무균시험법이 공정서 시험법과 동등하다는 증거를 갖고 있습니까",
+    "비공정서 시험법에 배양시간, 시험법 적합성, 양성·음성 대조가 정해져 있습니까",
+    "무균시험 부적합이 나오면 빠짐없이 조사합니까",
+    "미생물 시험 결과를 무효화할 때 과학적 근거를 기록합니까",
+    "용수의 유해 미생물 시험 절차가 있고 제조 사용지점에서 시료를 채취합니까"
+  ],
+  "checks_en": [
+    "Is there data showing that an alternative microbiological method is equivalent to or better than the compendial method?",
+    "Do you hold evidence that the sterility method used by the contract laboratory is equivalent to the compendial method?",
+    "Does a non-compendial method define incubation times, method suitability, and positive and negative controls?",
+    "Is every sterility test failure investigated?",
+    "Is the scientific justification recorded when a microbiological test result is invalidated?",
+    "Is there a procedure for testing water for objectionable microorganisms, and are manufacturing points-of-use sampled?"
+  ],
+  "further_reading": [],
+  "related": ["environmental-monitoring", "oos-investigation"]
+}

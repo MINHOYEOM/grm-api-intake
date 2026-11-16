@@ -1,0 +1,154 @@
+{
+  "schema": "grm-inspection-note/v1",
+  "id": "environmental-monitoring",
+  "as_of": "2026-11-15",
+  "area_ko": "무균·오염 관리",
+  "area_en": "Sterility and contamination control",
+  "title_ko": "환경모니터링",
+  "title_en": "Environmental monitoring",
+  "glossary_ids": ["environmental-monitoring"],
+  "aliases_ko": ["환경 모니터링", "환경모니터링"],
+  "aliases_en": ["environmental monitoring"],
+  "search_q_ko": "환경 모니터링",
+  "search_q_en": "environmental monitoring",
+  "lead_ko": "FDA 는 환경모니터링 기록이 있는지보다, 그 모니터링이 실제 생산 조건을 대표하는지와 검출 결과를 끝까지 조사했는지를 봅니다. 아래는 경고서한과 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether environmental monitoring records exist than at whether the monitoring represents actual production conditions and whether recoveries were investigated through to the end. The findings below are quoted from warning letters and Form 483s.",
+  "patterns": [
+    {
+      "title_ko": "실제 생산 조건을 대표하는 모니터링을 하지 않았다",
+      "title_en": "Monitoring did not represent actual production conditions",
+      "quotes": [
+        {
+          "finding_id": "finding-e49a7a07c6cdd7bfb264b988", "raw_signal_id": "rawsig-63d22d4e8286ceaab5e0f0b9", "document_id": "511a2f6e48e7",
+          "source": "FDA Warning Letter", "firm": "Pine Pharmaceuticals, LLC", "date": "2026-10-06",
+          "quote_ko": "귀사의 환경모니터링 프로그램에는 무균 생산 조건을 대표하는 데이터를 확보하는 적절한 일상 환경모니터링이 부족하다.",
+          "quote_en": "Your environmental monitoring program lacks adequate routine environmental monitoring that captures data representative of aseptic production conditions."
+        },
+        {
+          "finding_id": "finding-0fb54b9598fa39a7722eaf31", "raw_signal_id": "rawsig-5bdd4b13c50705f880425776", "document_id": "fda483-191428",
+          "source": "FDA 483", "firm": "Maiva Pharma Private Limited", "date": "2026-03-06",
+          "quote_ko": "구체적으로 작업자 모니터링, 낙하균, 능동 공기 채취, 비생균 입자 측정을 하지 않는다.",
+          "quote_en": "Specifically, personnel monitoring, settle plates, active air sampling, or non-viable particles is not performed."
+        }
+      ]
+    },
+    {
+      "title_ko": "작업자 모니터링을 하지 않았다",
+      "title_en": "Personnel monitoring was not performed",
+      "quotes": [
+        {
+          "finding_id": "finding-2f42b3a63c15b5e5acd9047a", "raw_signal_id": "rawsig-f549a46831c9c201a545862c", "document_id": "e68818062d22",
+          "source": "FDA Warning Letter", "firm": "Rohto Pharmaceutical Co., Ltd.", "date": "2026-10-20",
+          "quote_ko": "마찬가지로 무균공정실에서 작업한 생산 및 엔지니어링 인원에 대해서는 인원 모니터링 시료가 채취되지 않았다.",
+          "quote_en": "Similarly, personnel monitoring samples were not collected for production and engineering personnel who worked in the aseptic processing room."
+        },
+        {
+          "finding_id": "finding-b0030ebecaeb1fa6cc123c4b", "raw_signal_id": "rawsig-feaf377ba22a2376f17a4579", "document_id": "fda483-195433",
+          "source": "FDA 483", "firm": "SAFC Pharma Carlsbad", "date": "2026-10-26",
+          "quote_ko": "귀사는 BSCs 세척에 계약업체를 고용한다; [redacted] 환경 모니터링 추세 보고서에서 이들로부터 상당한 미생물 검출이 확인되었음에도, 이들이 BSCs에서 나갈 때 더 이상 작업자 모니터링을 수행하지 않는다.",
+          "quote_en": "You employ contractors to clean your BSCs; you no longer perform personnel monitoring of these contractors upon exiting the BSCs despite significant recoveries from these personnel uncovered during your [redacted] environmental monitoring trend report."
+        }
+      ]
+    },
+    {
+      "title_ko": "채취 위치와 빈도의 근거를 대지 못했다",
+      "title_en": "Sampling locations and frequencies were not justified",
+      "quotes": [
+        {
+          "finding_id": "finding-bc114ba5be3e670fe4c107a5", "raw_signal_id": "rawsig-7f3dc14efa94922ce45a5583", "document_id": "8a404f9eaaf8",
+          "source": "FDA Warning Letter", "firm": "Hanlim Pharm Co., Ltd.", "date": "2026-10-13",
+          "quote_ko": "귀사는 부유균 시료 채취, 표면 모니터링, 비생균 입자 시료 채취의 위치와 빈도가 오염 위험을 신속하게 검출하기에 적절히 정당화되고 충분함을 입증하지 못했다.",
+          "quote_en": "You failed to demonstrate that the locations and frequencies established for viable air sampling, surface monitoring, and non-viable particulate sampling were adequately justified and sufficient to promptly detect contamination risks."
+        },
+        {
+          "finding_id": "finding-51009ba8355729361733762c", "raw_signal_id": "rawsig-845e36e304d8d1d211092a14", "document_id": "fda483-196144",
+          "source": "FDA 483", "firm": "LeeSar Inc", "date": "2026-11-05",
+          "quote_ko": "귀사는 환경 모니터링의 시료 채취 위치를 정당화하기 위한 시설 위험성 평가를 수행하지 않았고, 불쾌 미생물로 간주될 수 있는 미생물도 규정하지 않았다.",
+          "quote_en": "Your firm has not conducted a risk assessment of your facility to justify the sampling locations of your environmental monitoring nor have you identified microorganisms that may be considered objectionable."
+        }
+      ]
+    },
+    {
+      "title_ko": "기준을 넘은 결과를 조사하지 않았다",
+      "title_en": "Results above the limits were not investigated",
+      "quotes": [
+        {
+          "finding_id": "finding-dbc7d596b5e697358ea247b2", "raw_signal_id": "rawsig-72084f76fdffdd550dd5f8f4", "document_id": "9a4546da5523",
+          "source": "FDA Warning Letter", "firm": "Jubilant HollisterStier General Partnership", "date": "2026-06-23",
+          "quote_ko": "귀사는 2025년 1월부터 6월 사이 ISO 5 및 7 구역에서 발생한 여러 조치 한도 수준의 환경 모니터링 일탈을 조사하지 않았다.",
+          "quote_en": "Your firm failed to investigate multiple action-level environmental monitoring excursions that occurred between January and June 2025 in the ISO 5 and 7 areas."
+        },
+        {
+          "finding_id": "finding-51009ba8355729361733762c", "raw_signal_id": "rawsig-845e36e304d8d1d211092a14", "document_id": "fda483-196144",
+          "source": "FDA 483", "firm": "LeeSar Inc", "date": "2026-11-05",
+          "quote_ko": "귀사는 ISO 5, 7, 8 등급 구역의 환경 및 작업자 모니터링 중 내생포자 형성 미생물인 Bacillus spp.가 반복해서 회수된 것을 적절히 동정하고 조사하지 못했다.",
+          "quote_en": "Your firm has failed to adequately identify and investigate the recurring recovery of the endospore-forming microorganism Bacillus spp. during environmental and personnel monitoring activities in ISO 5, 7, and 8 classified areas."
+        }
+      ]
+    },
+    {
+      "title_ko": "검출균을 동정하지 않았고 추세를 따져 보지 않았다",
+      "title_en": "Recoveries were not identified and trends were not assessed",
+      "quotes": [
+        {
+          "finding_id": "finding-caf8d3bbc086dfaed1a7298e", "raw_signal_id": "rawsig-fb710f49ead0bf3490d13926", "document_id": "8909d4bb39b5",
+          "source": "FDA Warning Letter", "firm": "Northland Nuclear Medicine, LLC", "date": "2026-10-27",
+          "quote_ko": "이러한 검출균은 공식적으로 동정되지 않았고, 이로 인해 귀사는 적절한 조사를 수행할 수 없었다.",
+          "quote_en": "These recoveries were not formally identified, preventing your firm from conducting adequate investigations."
+        },
+        {
+          "finding_id": "finding-b0030ebecaeb1fa6cc123c4b", "raw_signal_id": "rawsig-feaf377ba22a2376f17a4579", "document_id": "fda483-195433",
+          "source": "FDA 483", "firm": "SAFC Pharma Carlsbad", "date": "2026-10-26",
+          "quote_ko": "환경 모니터링 추세 프로그램의 일환으로, 귀사는 [redacted] 추세 보고서에서 포자 형성 미생물과 비포자 형성 미생물 검출의 의미를 고려하지 않는다.",
+          "quote_en": "As part your Environmental Monitoring Trending Program, you do not consider the implications of recoveries of spore forming vs. non-spore forming microorganisms in your [redacted] trend reports."
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "key": "21 CFR 211.192",
+      "finding_id": "finding-dbc7d596b5e697358ea247b2", "firm": "Jubilant HollisterStier General Partnership", "date": "2026-06-23",
+      "quote_ko": "귀사는 배치 또는 그 구성 성분이 규격을 충족하지 못했거나 설명되지 않는 불일치가 있는 경우, 해당 배치의 출하 여부와 관계없이 이를 철저히 조사하지 않았다",
+      "quote_en": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed",
+      "note_ko": "조치 기준을 넘은 환경모니터링 결과를 조사하지 않은 것이 이 조항으로 지적됐습니다.",
+      "note_en": "The failure to investigate environmental monitoring results above the action level was cited under this section."
+    },
+    {
+      "key": "21 CFR 211.42(c)",
+      "finding_id": "finding-bc114ba5be3e670fe4c107a5", "firm": "Hanlim Pharm Co., Ltd.", "date": "2026-10-13", "trailing_ellipsis": true,
+      "quote_ko": "귀사는 오염 또는 혼입을 방지하는 데 필요한 분리되었거나 정의된 구역 또는 그 밖의 관리 체계를 갖추지 않았고",
+      "quote_en": "Your firm failed to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups",
+      "note_ko": "채취 위치와 빈도의 근거 부족이 이 조항 아래 적혔습니다.",
+      "note_en": "The lack of justification for sampling locations and frequencies was cited under this section."
+    },
+    {
+      "key": "21 CFR 212.20(d)",
+      "finding_id": "finding-caf8d3bbc086dfaed1a7298e", "firm": "Northland Nuclear Medicine, LLC", "date": "2026-10-27",
+      "quote_ko": "귀사는 생산 배치 또는 배치의 구성성분이 규격을 충족하지 못한 경우 적절한 조사를 수행하고 적절한 시정조치를 취하지 않았다",
+      "quote_en": "Your firm failed to conduct adequate investigations and take appropriate corrective action when a failure of a production batch or any component of the batch failed to meet any of its specifications",
+      "note_ko": "PET 의약품에 적용됩니다. 검출균을 동정하지 않아 조사가 미흡했던 사례가 이 조항으로 지적됐습니다.",
+      "note_en": "Applies to PET drugs. An investigation left inadequate because recoveries were not identified was cited under this section."
+    }
+  ],
+  "checks_ko": [
+    "일상 환경모니터링이 실제 무균 생산 조건을 대표하는 데이터를 확보합니까?",
+    "이송, 사전 조립 같은 작업 중에도 작업자 모니터링, 낙하균, 능동 공기 채취, 비생균 입자 측정을 합니까?",
+    "무균공정실에서 작업한 생산·엔지니어링 인원과 세척 계약업체까지 작업자 모니터링 시료를 채취합니까?",
+    "부유균, 표면, 비생균 입자 채취의 위치와 빈도를 정한 근거가 위험성 평가 문서로 있습니까?",
+    "조치 기준을 넘은 결과마다 조사를 개시합니까? 같은 균이 반복해서 회수되면 동정과 조사로 이어집니까?",
+    "검출균을 공식적으로 동정합니까? 추세 보고서에서 포자 형성 미생물 검출의 의미를 따져 봅니까?"
+  ],
+  "checks_en": [
+    "Does routine environmental monitoring capture data representative of actual aseptic production conditions?",
+    "Are personnel monitoring, settle plates, active air sampling and non-viable particle counts also performed during activities such as transfer and pre-assembly?",
+    "Are personnel monitoring samples collected from production and engineering personnel who worked in the aseptic processing room, and from cleaning contractors?",
+    "Is there a documented risk assessment justifying the locations and frequencies for viable air, surface and non-viable particulate sampling?",
+    "Is an investigation opened for every result above the action level? Does a recurring recovery of the same organism lead to identification and investigation?",
+    "Are recoveries formally identified? Do trend reports consider the implications of recoveries of spore-forming microorganisms?"
+  ],
+  "further_reading": [
+    {"label_ko": "FDA 가이던스: Sterile Drug Products Produced by Aseptic Processing", "label_en": "FDA guidance: Sterile Drug Products Produced by Aseptic Processing", "url": "https://www.fda.gov/media/71026/download"}
+  ],
+  "related": ["media-fill"]
+}

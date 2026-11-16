@@ -48,9 +48,17 @@ on:
         required: true
         default: "1"
       limit:
-        description: "이번 실행에서 고려할 최대 findings 건수(비우면 전량)"
+        description: "이번 실행에서 새로(다시) 임베딩할 최대 건수 -- skip 판정 뒤에 적용(비우면 전량)"
         required: false
         default: ""
+      new_only:
+        description: "true=이미 같은 model 로 있는 id 는 본문을 다시 읽지 않고 건너뜀(가벼운 회차, 드리프트 감지 없음)"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 permissions:
   contents: read
@@ -128,11 +136,13 @@ jobs:
             EMBED_INPUT="B"
             EMBEDDING_VERSION="1"
             LIMIT=""
+            NEW_ONLY="false"
           else
             DRY_RUN="${{ inputs.dry_run }}"
             EMBED_INPUT="${{ inputs.embed_input }}"
             EMBEDDING_VERSION="${{ inputs.embedding_version }}"
             LIMIT="${{ inputs.limit }}"
+            NEW_ONLY="${{ inputs.new_only }}"
           fi
 
           ARGS=(--embedding-version "$EMBEDDING_VERSION" --embed-input "$EMBED_INPUT" --output embed_report.json)
@@ -141,6 +151,9 @@ jobs:
           fi
           if [ -n "$LIMIT" ]; then
             ARGS+=(--limit "$LIMIT")
+          fi
+          if [ "$NEW_ONLY" = "true" ]; then
+            ARGS+=(--new-only)
           fi
           python findings_embed_service.py "${ARGS[@]}"
 
@@ -153,7 +166,7 @@ jobs:
             echo "event: \`${{ github.event_name }}\`"
             if [ "${{ github.event_name }}" != "schedule" ]; then
               echo ""
-              echo "dry_run=${{ inputs.dry_run }} embed_input=${{ inputs.embed_input }} embedding_version=${{ inputs.embedding_version }} limit=${{ inputs.limit }}"
+              echo "dry_run=${{ inputs.dry_run }} embed_input=${{ inputs.embed_input }} embedding_version=${{ inputs.embedding_version }} limit=${{ inputs.limit }} new_only=${{ inputs.new_only }}"
             fi
             echo ""
             if [ -f embed_report.json ]; then

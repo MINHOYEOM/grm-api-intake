@@ -1137,6 +1137,7 @@ _REPORT_KEY_ALLOWLIST = frozenset({
     "candidates_total",
     "already_current",
     "to_embed",
+    "limit_deferred",
     "revision_changed",
     "embedded",
     "upserted",
@@ -1392,6 +1393,84 @@ class ReportErrorsSanitizeExceptionMessagesTest(unittest.TestCase):
         self.assertNotIn("u:p@", stdout_text)
         self.assertNotIn("secret=https://u:p@proxy.invalid/token", stdout_text)
         self.assertIn("***", stdout_text)
+
+
+class LimitAppliesAfterSkipTest(_RunEmbedFixture):
+    """11-15: limit 은 skip 판정 뒤에 건다 -- 앞 구간이 이미 차 있어도 limit 회차가 새 행을 넣는다."""
+
+    def _findings(self) -> list[dict[str, Any]]:
+        rows = []
+        for i in range(1, 6):
+            rows.append({
+                "finding_id": f"finding-{i}",
+                "finding_text": f"text {i}",
+                "source": "FDA Warning Letter",
+                "raw_signal_id": f"rawsig-{i}",
+            })
+        return rows
+
+    def _wire(self, existing_ids: list[str]) -> tuple[list[list[str]], list[list[dict]]]:
+        embed_calls: list[list[str]] = []
+        upserts: list[list[dict]] = []
+        tag = svc.build_model_tag(svc.MODEL_NAME, "rev")
+        svc.fetch_target_findings = lambda base, key: self._findings()
+        svc.resolve_model_revision = lambda name: "rev"
+        svc.load_model = lambda name, revision: object()
+        svc.fetch_existing_embeddings = lambda base, key, version: {
+            fid: (hashlib.sha256(("text " + fid.split("-")[1]).encode()).hexdigest(), tag)
+            for fid in existing_ids
+        }
+
+        def _fake_embed_texts(model, texts, *, batch_size):
+            embed_calls.append(list(texts))
+            return [[0.1] * svc.EMBED_DIM for _ in texts]
+
+        def _fake_upsert(_base, _key, batch, *args, **kwargs):
+            upserts.append(list(batch))
+            return 200, [], ""
+
+        svc.embed_texts = _fake_embed_texts
+        svc._upsert_embeddings_batch = _fake_upsert
+        return embed_calls, upserts
+
+    def test_limit_counts_only_rows_needing_embedding(self) -> None:
+        embed_calls, upserts = self._wire(["finding-1", "finding-2", "finding-3"])
+
+        report = self._run(limit=1)
+
+        self.assertEqual(report["candidates_total"], 5)
+        self.assertEqual(report["already_current"], 3)
+        self.assertEqual(report["to_embed"], 1)
+        self.assertEqual(report["limit_deferred"], 1)
+        self.assertEqual([row["finding_id"] for row in upserts[0]], ["finding-4"])
+        self.assertEqual(report["errors"], [])
+
+    def test_new_only_skips_existing_ids_without_reading_their_raw_signals(self) -> None:
+        embed_calls, upserts = self._wire(["finding-1", "finding-2"])
+        raw_requests: list[list[str]] = []
+
+        def _fake_raw(base, key, ids):
+            raw_requests.append(sorted(ids))
+            return {}
+
+        svc.fetch_raw_signals_by_ids = _fake_raw
+        findings = self._findings()
+        for row in findings:
+            row["source"] = svc.FDA_483_SOURCE
+        svc.fetch_target_findings = lambda base, key: findings
+
+        report = svc.run_embed(
+            "https://example.supabase.co", "fake-key",
+            embedding_version=1, embed_input="B", dry_run=False,
+            limit=2, new_only=True,
+        )
+
+        self.assertEqual(raw_requests, [["rawsig-3", "rawsig-4"]])
+        self.assertEqual(report["already_current"], 2)
+        self.assertEqual(report["limit_deferred"], 1)
+        self.assertEqual(report["to_embed"], 2)
+        self.assertEqual(report["upserted"], 2)
+        self.assertEqual(report["errors"], [])
 
 
 if __name__ == "__main__":  # pragma: no cover

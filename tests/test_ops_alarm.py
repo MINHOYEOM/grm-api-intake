@@ -252,7 +252,8 @@ class WorkflowTest(unittest.TestCase):
 
     def test_triggers(self):
         self.assertIn("issues:\n    types: [opened, reopened, closed, labeled, unlabeled]", self.code)
-        self.assertRegex(self.code, r"schedule:\n\s+- cron: '41 22 \* \* \*'")
+        # 매시간: GITHUB_TOKEN 으로 닫힌 경보는 이벤트가 없어 동기화만이 업무를 닫는다(11-15)
+        self.assertRegex(self.code, r"schedule:\n\s+- cron: '41 \* \* \* \*'")
         self.assertIn("workflow_dispatch:", self.code)
         self.assertNotIn("pull_request", self.code)
 

@@ -1,5 +1,8 @@
-{#- [해외 지적 사례 전체] 기관 축 = 페이지 축. 이 빌드에 실제로 선 화면만(tabs = 경로 목록). -#}
+{#- [해외 지적 사례 화면 전환 2026-11-15] 네 화면(영역별 대표 · PMDA 전체 · MHRA 전체 · MHRA 조항 집계)을
+    한 줄 탭으로 잇는다. 이 빌드에 실제로 선 화면만(hub 카드 = 경로 목록). 탭마다 건수를 달아
+    첫 화면에서 무엇이 얼마나 있는지 보이게 한다. dc_on = 'HUB' | 'PMDA' | 'MHRA' | 'MHRA_DATA'. -#}
+{%- set _hub = intl_cases('hub', '', lang) if intl_cases is defined else none %}
 <nav class="dc-tabs" aria-label="{{ _('지적 사례 화면') }}">
-  {%- if 'findings/examples/' in en_paths %}<a href="{{ rel_root }}findings/examples/">{{ _('대표 사례') }}</a>{% endif %}
-  {%- for t in dc_tabs %}<a href="{{ rel_root }}{{ t.route }}"{% if t.key == dc_on %} class="on" aria-current="page"{% endif %}>{% if t.key == 'PMDA' %}{{ _('일본 PMDA 사례') }}{% elif t.key == 'MHRA' %}{{ _('영국 MHRA 사례') }}{% else %}{{ _('MHRA 조항별 집계') }}{% endif %}</a>{% endfor %}
+  {%- if 'findings/examples/' in en_paths %}<a href="{{ rel_root }}findings/examples/"{% if dc_on == 'HUB' %} class="on" aria-current="page"{% endif %}><b>{{ _('영역별 대표 사례') }}</b><span>{{ _('업무 영역별로 고른 문장') }}</span></a>{% endif %}
+  {%- for t in (_hub.cards if _hub else []) %}<a href="{{ rel_root }}{{ t.route }}"{% if t.key == dc_on %} class="on" aria-current="page"{% endif %}><b>{% if t.key == 'PMDA' %}{{ _('일본 PMDA 사례') }}{% elif t.key == 'MHRA' %}{{ _('영국 MHRA 사례') }}{% else %}{{ _('MHRA 조항별 집계') }}{% endif %}</b><span>{% if t.key == 'MHRA_DATA' %}{{ _('EU GMP 조항 인용 {n}회', n="{:,}".format(t.n)) }}{% else %}{{ _('지적 문장 {n}건', n="{:,}".format(t.n)) }}{% endif %}</span></a>{% endfor %}
 </nav>

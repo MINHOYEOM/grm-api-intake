@@ -588,6 +588,7 @@ def run_embed(
     limit: int | None = None,
     batch_size: int = 64,
     dry_run: bool = False,
+    new_only: bool = False,
 ) -> dict[str, Any]:
     """Fetch public findings, decide which need (re)embedding at
     embedding_version, compute embeddings (always -- even in dry_run, so the
@@ -603,6 +604,7 @@ def run_embed(
         "candidates_total": 0,
         "already_current": 0,
         "to_embed": 0,
+        "limit_deferred": 0,
         "revision_changed": 0,
         "embedded": 0,
         "upserted": 0,
@@ -626,21 +628,7 @@ def run_embed(
         report["errors"].append(_sanitize_error(str(exc)))
         return report
 
-    if limit is not None and limit >= 0:
-        findings = findings[:limit]
     report["candidates_total"] = len(findings)
-
-    raw_signals_by_id: dict[str, dict[str, Any]] = {}
-    if embed_input == "B":
-        needed_ids = [
-            str(f.get("raw_signal_id") or "") for f in findings
-            if str(f.get("source") or "") == FDA_483_SOURCE
-        ]
-        try:
-            raw_signals_by_id = fetch_raw_signals_by_ids(base, service_key, needed_ids)
-        except (RuntimeError, ValueError) as exc:
-            report["errors"].append(_sanitize_error(str(exc)))
-            return report
 
     try:
         existing = fetch_existing_embeddings(base, service_key, embedding_version)
@@ -666,6 +654,36 @@ def run_embed(
     model_tag = build_model_tag(MODEL_NAME, revision)
     report["model"] = model_tag
 
+    # ★new_only(가벼운 회차): 이 버전에 같은 model 로 이미 행이 있는 finding 은 본문
+    #   sha 비교 없이 already_current 로 센다 -- 그 행들의 483 raw_json 을 읽지 않아도
+    #   된다(B 입력의 가장 무거운 조회). 본문이 바뀐 행의 재임베딩(드리프트 감지)은
+    #   new_only 를 끈 회차(cron 기본값)가 맡는다.
+    if new_only:
+        remaining: list[dict[str, Any]] = []
+        for finding in findings:
+            finding_id = str(finding.get("finding_id") or "")
+            if existing.get(finding_id, ("", ""))[1] == model_tag:
+                report["already_current"] += 1
+                continue
+            remaining.append(finding)
+        if limit is not None and limit >= 0:
+            report["limit_deferred"] = max(0, len(remaining) - limit)
+            remaining = remaining[:limit]
+        findings = remaining
+
+    raw_signals_by_id: dict[str, dict[str, Any]] = {}
+    if embed_input == "B":
+        needed_ids = [
+            str(f.get("raw_signal_id") or "") for f in findings
+            if str(f.get("source") or "") == FDA_483_SOURCE
+        ]
+        try:
+            raw_signals_by_id = fetch_raw_signals_by_ids(base, service_key, needed_ids)
+        except (RuntimeError, ValueError) as exc:
+            report["errors"].append(_sanitize_error(str(exc)))
+            report["elapsed_seconds"] = round(time.monotonic() - t0, 3)
+            return report
+
     to_process: list[tuple[str, str, str, str]] = []  # (finding_id, text, actual_mode, sha256)
     text_lengths: list[int] = []
     for finding in findings:
@@ -687,6 +705,13 @@ def run_embed(
             # would have called this "current"; it must be re-embedded.
             report["revision_changed"] += 1
         to_process.append((finding_id, text, actual_mode, sha256))
+
+    # ★limit 은 skip 판정 **뒤**에 건다: "새로(또는 다시) 임베딩할 것 중 앞 N건".
+    #   종전에는 findings[:limit] 를 먼저 잘라, 앞 구간이 이미 차 있으면 limit 회차가
+    #   새 행 0건으로 끝났다(11-15 run 43664744210).
+    if not new_only and limit is not None and limit >= 0:
+        report["limit_deferred"] = max(0, len(to_process) - limit)
+        to_process = to_process[:limit]
 
     report["to_embed"] = len(to_process)
     if text_lengths:
@@ -808,7 +833,15 @@ def main(argv: list[str] | None = None) -> int:
         "--limit",
         type=int,
         default=None,
-        help="Only consider the first N public findings this run (default: all)",
+        help="Embed at most N of the rows that need (re)embedding this run, "
+        "applied after the already-current skip (default: all)",
+    )
+    parser.add_argument(
+        "--new-only",
+        action="store_true",
+        default=False,
+        help="Light run: rows already stored at this version with the current model "
+        "are skipped by id without re-reading their source text (no drift check)",
     )
     parser.add_argument(
         "--batch-size",
@@ -843,6 +876,7 @@ def main(argv: list[str] | None = None) -> int:
         limit=args.limit,
         batch_size=args.batch_size,
         dry_run=args.dry_run,
+        new_only=args.new_only,
     )
     _write_report(args.output, report)
 

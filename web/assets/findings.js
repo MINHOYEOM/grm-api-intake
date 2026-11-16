@@ -32,6 +32,18 @@
  */
 (function () {
   "use strict";
+  // [11-15 DB 무응답] DB 가 응답하지 않으면 fetch 가 20초 넘게(때로 끝없이) 걸려 화면이 '불러오는 중'에
+  // 멈췄다. 공개 RPC 호출은 15초에 끊어 각 화면의 기존 실패 처리(오류 안내·다시 시도)로 넘긴다.
+  function _fetchT(u, o, ms) {
+    o = o || {};
+    if (typeof AbortController === "function" && !o.signal) {   // 자기 상한을 가진 호출(o.signal)은 그대로
+      var c = new AbortController();
+      var t = setTimeout(function () { c.abort(); }, ms || o.timeoutMs || 15000);
+      o.signal = c.signal;
+    }
+    return fetch(u, o).then(function (r) { clearTimeout(t); return r; },
+                            function (e) { clearTimeout(t); throw e; });
+  }
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
@@ -242,8 +254,8 @@
     ["q", _t("검색"), function (v) { return v; }],
     ["agency", _t("기관"), function (v) { return v; }],
     ["source", _t("소스"), function (v) { return v; }],
-    ["evidence_level", _t("증거 등급"), function (v) { return EVIDENCE_LABEL[v] || v; }],
-    ["review_status", _t("검토 상태"), function (v) { return STATUS_LABEL[v] || v; }],
+    ["evidence_level", _t("근거 수준"), function (v) { return EVIDENCE_LABEL[v] || v; }],
+    ["review_status", _t("확인 상태"), function (v) { return STATUS_LABEL[v] || v; }],
     ["category_code", _t("카테고리"), function (v) { var c = CATEGORY_LABELS[v]; return c ? c.ko : v; }],
     ["month", _t("발행월"), function (v) { return v; }],
     ["country", _t("국가"), function (v) { return countryLabelKo(v); }],
@@ -1089,6 +1101,7 @@
       details.appendChild(el("span", "fnd-tr-note", _t("AI 번역 — 원문 대조 권장")));
     }
     var p = elHL("p", null, altText, query);
+    p.lang = _HANGUL.test(altText) ? "ko" : "en";   // 화면 낭독기가 접기 안의 언어를 맞게 읽게
     details.appendChild(p);
     extra.appendChild(details);
   }
@@ -1108,8 +1121,8 @@
     extra.appendChild(refsWrap);
   }
 
-  // [M10b P0] 메타 줄 — 문서번호(ASCII, mono 허용) · 신뢰도. 문서번호 표시 위치이므로
-  // 매칭어 하이라이트 대상(P1)이기도 하다.
+  // [M10b P0] 메타 줄 — 문서번호(ASCII, mono 허용). 문서번호 표시 위치이므로
+  // 매칭어 하이라이트 대상(P1)이기도 하다. [11-15] 추출 신뢰도(%)는 내부 지표라 독자 화면에서 뺐다.
   function appendMetaLine(extra, row, query) {
     var docId = row.document_id || "";
     var meta = document.createElement("p");
@@ -1117,10 +1130,6 @@
     meta.appendChild(document.createTextNode(_t("문서번호 ")));
     var docSpan = elHL("span", "fnd-meta-doc", docId, query);
     meta.appendChild(docSpan);
-    if (row.confidence !== undefined && row.confidence !== null && row.confidence !== "") {
-      var pct = Math.round(Number(row.confidence) * 100);
-      if (!isNaN(pct)) meta.appendChild(document.createTextNode(_t(" · 신뢰도 {pct}%", { pct: pct })));
-    }
     extra.appendChild(meta);
   }
 
@@ -1168,7 +1177,7 @@
   var SIMILAR_TO_LIMIT = 5;
 
   function fetchSimilarTo(findingId, limit) {
-    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar_to", {
+    return _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar_to", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_finding_id: findingId, p_limit: limit }),
@@ -1534,7 +1543,7 @@
   }
 
   function fetchInspectorCohort() {
-    fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_inspector_index", {
+    _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_inspector_index", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -2021,7 +2030,7 @@
   // 받는다. 비공개/부재는 구분 없이 null 이다(존재 여부 누설 금지 계약을 서버가 RLS 로
   // 강제한다 — 클라이언트가 두 경우를 구분할 수단 자체가 없다).
   function fetchDocument(findingId) {
-    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_document", {
+    return _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_document", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_finding_id: findingId }),
@@ -2258,7 +2267,7 @@
   }
 
   function fetchSimilarItems(q, limit) {
-    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar", {
+    return _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_similar", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_query: q, p_limit: limit }),
@@ -2538,8 +2547,18 @@
   // 하므로 클라이언트 검증은 불필요 — 신뢰 경계는 서버다).
   // 응답을 LAST 에 대입하지 않고 그대로 반환한다 — 대입 시점은 호출부가 navToken 세대
   // 검사를 통과시킨 뒤여야 한다(늦게 도착한 옛 응답이 최신 결과를 덮어쓰는 것 방지).
+  var SEARCH_ATTEMPT_MS = 9000, SEARCH_TOTAL_MS = 15000, searchDeadline = 0;
+  function searchAttemptMs() {
+    if (!searchDeadline) searchDeadline = Date.now() + SEARCH_TOTAL_MS;
+    return Math.max(2000, Math.min(SEARCH_ATTEMPT_MS, searchDeadline - Date.now()));
+  }
   function fetchSearch(page) {
-    return fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_search", {
+    // [11-15 사용성 점검] 검색어가 있는 질의가 서버에서 20초 가까이 걸린 뒤 끊기는 일이 있었다.
+    // 시도마다 9초 상한을 두고 넘으면 끊어 재시도로 넘긴다(재시도 규칙은 retrySearchFrom 그대로).
+    var ctl = typeof AbortController === "function" ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, searchAttemptMs()) : null;
+    return _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_search", {
+      signal: ctl ? ctl.signal : undefined,
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2567,33 +2586,95 @@
       }),
     })
       .then(function (r) {
-        if (!r.ok) throw new Error("findings_search " + r.status);
+        if (timer) clearTimeout(timer);
+        if (!r.ok) {
+          var httpErr = new Error("findings_search " + r.status);
+          httpErr.status = r.status;
+          throw httpErr;
+        }
         return r.json();
       })
       .then(function (data) {
         // 봉투 계약 검증 — 형태가 어긋나면 부분 렌더로 화면을 망가뜨리지 말고 실패로 다룬다.
         if (!data || !Array.isArray(data.documents) || !data.totals) {
-          throw new Error("findings_search shape");
+          var shapeErr = new Error("findings_search shape");
+          shapeErr.noRetry = true;
+          throw shapeErr;
         }
         return data;
       });
   }
+  // [157 · 2026-11-13 식은 첫 호출 재시도] 오래 쉰 뒤 첫 검색은 DB 페이지가 식어 서버 시간
+  // 제한(57014 → HTTP 500)에 걸리는 일이 있다. 같은 질의를 다시 보내면 첫 시도가 데운 페이지를
+  // 읽어 대개 1~3초 안에 성공한다(11-12~13 edge 로그: 500 뒤 4초 안팎 재요청 성공). search.js 와
+  // 같은 규칙으로 5xx·네트워크 오류만 간격을 두고 두 번 더 시도한다. 4xx·봉투 모양 오류는 즉시 실패.
+  // 호출부는 `fetchSearch(page).catch(retrySearch(page))` 로 쓴다(fetchSearch 본문은 1회 호출 그대로).
+  function retrySearch(page) {
+    return function (err) { return retrySearchFrom(page, err, 0); };
+  }
+
+  function retrySearchFrom(page, err, a) {
+    var transient = !(err && err.noRetry) && !(err && err.status && err.status < 500);
+    // [11-15] 재시도까지 합쳐 15초(SEARCH_TOTAL_MS) 안에 성공·실패를 정한다 — 넘으면 바로 실패 안내.
+    if (a >= 2 || !transient || Date.now() + 700 * (a + 1) + 2000 > searchDeadline) return Promise.reject(err);
+    return new Promise(function (res) { setTimeout(res, 700 * (a + 1)); })
+      .then(function () { return fetchSearch(page); })
+      .catch(function (err2) { return retrySearchFrom(page, err2, a + 1); });
+  }
+
 
   // [페이지 이동] navToken 세대 카운터로 연타(빠른 재클릭)를 방어한다 — 오래된 요청의
   // 응답은 LAST/currentPage/render() 를 건드리지 않고 조용히 버려지므로, 항상 "가장
   // 최근 조작"만 화면에 반영된다.
   // ★진행 중에 이전 결과를 지우지 않는다 — setPagerLoading(true) 로 진행만 알리고, 교체는
   // 응답이 도착한 뒤 render() 가 한 번에 한다(입력할 때마다 목록이 사라졌다 나타나는 깜빡임 방지).
+  // [11-15 사용성 점검] 검색이 실패하면 예전엔 이전 목록을 말없이 다시 그렸다 — 검색어를 넣은
+  // 사람은 그 목록을 자기 검색 결과로 읽는다. 지금은 결과 위에 한 줄로 알리고 다시 시도하게 한다.
+  // 오래 걸릴 때(2.5초~)도 같은 자리에서 진행 중임을 알린다.
+  var noticeEl = null, slowTimer = null;
+  function searchNotice(kind, retryPage) {
+    if (!noticeEl) {
+      noticeEl = document.createElement("div");
+      noticeEl.id = "fnd-searchmsg";
+      noticeEl.className = "fnd-searchmsg";
+      noticeEl.setAttribute("role", "status");
+      resultsEl.parentNode.insertBefore(noticeEl, resultsEl);
+    }
+    while (noticeEl.firstChild) noticeEl.removeChild(noticeEl.firstChild);
+    noticeEl.hidden = !kind;
+    noticeEl.className = "fnd-searchmsg" + (kind === "fail" ? " is-fail" : "");
+    if (kind === "slow") {
+      noticeEl.appendChild(document.createTextNode(_t("검색 중입니다. 검색어가 있으면 시간이 조금 걸릴 수 있습니다.")));
+    } else if (kind === "fail") {
+      noticeEl.appendChild(document.createTextNode(LAST
+        ? _t("검색 결과를 가져오지 못했습니다. 아래 목록은 검색어가 반영되지 않은 이전 결과입니다.")
+        : _t("검색 결과를 가져오지 못했습니다.")));
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "fnd-searchmsg-retry";
+      btn.textContent = _t("다시 시도");
+      btn.addEventListener("click", function () { goToPage(retryPage); });
+      noticeEl.appendChild(btn);
+    }
+  }
+
   function goToPage(n) {
     var target = Math.max(1, Math.floor(n) || 1);
     navToken += 1;
     var myToken = navToken;
+    searchDeadline = Date.now() + SEARCH_TOTAL_MS;
+    clearTimeout(slowTimer);
+    searchNotice(null);
+    slowTimer = setTimeout(function () { if (myToken === navToken) searchNotice("slow"); }, 2500);
     var doScroll = pendingScrollAfterNav;
     pendingScrollAfterNav = false;
     setPagerLoading(true);
     fetchSearch(target)
+      .catch(retrySearch(target))
       .then(function (data) {
         if (myToken !== navToken) return; // 더 최근 조작에 의해 취소됨
+        clearTimeout(slowTimer);
+        searchNotice(null);
         // 범위 밖 페이지(옛 북마크·손으로 고친 ?page= 등): 서버는 빈 documents 를 준다.
         // 그대로 그리면 "결과 없음"에 페이저까지 숨겨져 되돌아갈 길이 사라진다 — 결과가
         // 존재하는데 페이지만 넘친 경우에 한해 마지막 페이지로 1회 되돌린다(재귀 아님:
@@ -2625,8 +2706,10 @@
         // 이전 결과가 있으면 그대로 두고 조용히 실패한다 — 일시적 네트워크 오류로 사용자가
         // 보던 목록을 통째로 날리지 않는다. render() 재호출은 로딩 표시(setPagerLoading)를
         // 되돌리기 위한 것이다. 그릴 것이 아예 없을 때만 오류 상태로 간다.
-        if (!LAST) { showState("error"); return; }
+        clearTimeout(slowTimer);
+        if (!LAST) { showState("none"); searchNotice("fail", target); return; }
         render();
+        searchNotice("fail", target);
       });
   }
 
@@ -2765,7 +2848,7 @@
 
   function fetchCoverageNote() {
     if (!coverageNoteEl || !coverageTextEl) return;
-    fetch(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_stats", {
+    _fetchT(url.replace(/\/$/, "") + "/rest/v1/rpc/findings_stats", {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: "{}",
@@ -2845,9 +2928,14 @@
   // 둘러보기 면으로 옮겨져 검색 툴바가 다시 첫 화면에 있다(보정할 거리 소멸).
   navToken += 1;
   var initToken = navToken;
+  searchDeadline = Date.now() + SEARCH_TOTAL_MS;
+  slowTimer = setTimeout(function () { if (initToken === navToken) searchNotice("slow"); }, 2500);
   fetchSearch(currentPage)
+    .catch(retrySearch(currentPage))
     .then(function (data) {
       if (initToken !== navToken) return; // 첫 응답 도착 전에 이미 다른 조작이 앞질렀다
+      clearTimeout(slowTimer);
+      searchNotice(null);
       LAST = data;
       buildFacetSkeleton();
       buildCountrySelect(); // [056] 국가 옵션 골격 — syncControlsFromState() 보다 먼저(값 대입 전 옵션 존재 필요)
@@ -2860,6 +2948,8 @@
     })
     .catch(function () {
       // [PR-0 딥링크] 목록 fetch 가 실패해도 이미 확정된 딥링크 단건 렌더는 덮어쓰지 않는다.
+      clearTimeout(slowTimer);
+      if (initToken === navToken) searchNotice(null);
       if (deepLinkStatus !== "found") showState("error");
       // ★[첫 응답 실패] syncControlsFromState()·wire() 는 성공 분기에만 있다. 그래서 첫
       //   응답이 실패하면 **URL 의 검색어가 입력창에 들어가지 못한 채** 빈 안내 문구만

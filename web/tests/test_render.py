@@ -1033,6 +1033,21 @@ class WebRenderGoldenTest(unittest.TestCase):
         self.assertIn("overflow-wrap:break-word", rule)
         self.assertNotIn("overflow-wrap:anywhere", rule)
 
+    def test_korean_orphan_line_defaults_and_footer_disclaimer_uncapped(self):
+        """★[한국어 고아 줄 2026-11-14] 실측(1440·375, 14쪽): 마지막 줄에 '있습니다.'·'활동입니다.'
+        한 어절만 떨어지는 곳이 데스크톱 69 · 모바일 113곳. 문단 pretty·제목 balance 를 전역 기본값으로
+        둔다. 푸터 면책 문구는 60ch(=411px) 상한이 남는 폭에서도 문장을 접어 '있습니다.' 만 오른쪽
+        아래로 떨어뜨렸다 — ch 상한이 되살아나면 실패한다."""
+        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
+        self.assertRegex(css, r"\nbody\{text-wrap:pretty\}", "전역 문단 pretty 기본값이 사라졌다")
+        self.assertRegex(css, r"\nh1,h2,h3,h4,h5,h6\{text-wrap:balance\}", "제목 balance 기본값이 사라졌다")
+        m = re.search(r"\n\.foot-disclaimer\{([^}]*)\}", css)
+        self.assertIsNotNone(m, "grm.css .foot-disclaimer 규칙 미발견")
+        self.assertNotRegex(m.group(1), r"max-width:\s*\d+ch")
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        for rule in re.findall(r"\.foot-disclaimer\{([^}]*)\}", base):
+            self.assertNotRegex(rule, r"max-width:\s*\d+ch", "base.html 면책 문구에 ch 폭 상한이 되살아났다")
+
     def test_page_head_paragraph_has_no_ch_cap(self):
         """★[62ch 캡 폐기 2026-08-12] `ch` 는 숫자 `0` 의 폭이라 한글에는 62ch ≈ 31자다 —
         컨테이너 1,180px 인데 609px 에서 접혔다. 그래서 **12개 템플릿 중 10개가 이미
@@ -1620,7 +1635,6 @@ class WebFindingsRenderTest(unittest.TestCase):
         # (id="ai-notice")으로 이전됐다.
         self.assertNotIn('id="findings-notice"', self.html)
         self.assertIn('id="ai-notice"', self.html)
-        self.assertIn("AI Disclosure", self.html)
 
     def test_cfg_div_env_gated_empty_by_default(self):
         # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
@@ -1986,20 +2000,22 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     # ── FIND-1 M15: AI 고지를 하단 기존 .ai-disclosure 디자인으로 이전 ──────────────────
     def test_notice_moved_to_bottom_ai_disclosure(self):
-        """[M15] 상단 슬림 고지(.fnd-notice/#findings-notice)는 완전히 제거됐고, landing.html
-        과 동일한 .ai-disclosure 구조(kick + h2 + .disc-body > .disc-sec)가 페이지 하단에
-        findings 전용 id(#ai-notice)로 렌더된다."""
+        """[M15 → 고지 정리 2026-11-15] 하단 AI 고지는 제목·네 단락 섹션에서 **한 줄 띠**
+        (.ai-line#ai-notice)로 줄었다(대표 지적 "AI 경고글이 작위적"). 남기는 뜻은 두 가지 —
+        국문이 AI 번역이라는 것, 판단은 원문 기준이라는 것. 나머지 설명은 이용안내 #sec-8."""
         import re as _re
         self.assertNotIn("fnd-notice", self.html)
         self.assertNotIn('id="findings-notice"', self.html)
         m = _re.search(
-            r'<section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지">',
+            r'<section class="ai-line" id="ai-notice" aria-label="AI 자동 생성 고지">',
             self.html)
-        self.assertIsNotNone(m, "하단 ai-disclosure 섹션 마커 미발견")
-        block = self.html[m.start():]
-        self.assertIn('<span class="kick">AI Disclosure</span>', block[:400])
-        self.assertIn("<h2>콘텐츠 생성 방식 및 유의사항</h2>", block[:400])
-        self.assertEqual(block.count('<div class="disc-sec">'), 4)
+        self.assertIsNotNone(m, "하단 AI 고지 한 줄 띠 미발견")
+        block = self.html[m.start():m.start() + 900]
+        self.assertIn("생성형 AI 번역", block)
+        self.assertIn("원문을 기준으로", block)
+        self.assertIn("guide/index.html#sec-8", block)
+        self.assertNotIn("disc-sec", block)
+        self.assertNotIn("콘텐츠 생성 방식 및 유의사항", self.html)
 
     def test_ai_disclosure_appears_after_results_section(self):
         """[M15] AI 고지는 더 이상 첫 화면(page-head 바로 아래)이 아니라 본문(검색 결과)
@@ -2037,12 +2053,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("coral-tint", rule)
         self.assertNotIn("background", rule)
 
-    def test_review_note_confidence_percent_marker(self):
-        """신뢰도 표시는 Math.round(confidence*100) 로 산출되고, confidence 없으면
-        생략되는 분기가 있어야 한다(소스 마커)."""
+    def test_review_note_confidence_percent_not_shown(self):
+        """[11-15] 추출 신뢰도(%)는 내부 지표 — 독자 카드에 내지 않는다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("Math.round(Number(row.confidence) * 100)", js_src)
-        self.assertIn("신뢰도 ", js_src)
+        self.assertNotIn("Math.round(Number(row.confidence) * 100)", js_src)
+        self.assertNotIn('" · 신뢰도 {pct}%"', js_src)
 
     def test_card_default_collapsed_and_more_toggle(self):
         """카드는 기본 접힘(.fnd-collapsed)이고, "자세히 보기"/"접기" 토글 버튼이
@@ -2081,7 +2096,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertNotIn("var(--mono)", m.group(1), "한글 칩에 mono 적용(§4 위반 위험)")
 
     def test_meta_line_document_id_and_confidence_marker(self):
-        """펼침 영역 하단 메타 줄 = 문서번호(mono, ASCII) · 신뢰도(퍼센트)."""
+        """펼침 영역 하단 메타 줄 = 문서번호(mono, ASCII)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function appendMetaLine(extra, row, query)", js_src)
         self.assertIn('meta.appendChild(document.createTextNode(_t("문서번호 ")))', js_src)
@@ -2167,7 +2182,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         두 노출 지점(부제·AI 고지)에 실제로 실렸는지 확인한다. 전 페이지 범위의 정합은
         WebSourceCopyConsistencyTest 가 추출기 배선에서 파생해 검증한다."""
         self.assertIn("캐나다 실사", self.html)                        # 페이지 부제
-        self.assertIn("캐나다 실사보고서(Health Canada)", self.html)   # AI 고지
+        # [고지 정리 2026-11-15] AI 고지가 한 줄로 줄며 출처 나열은 이용안내로 옮겼다 —
+        # 이 면의 하단 한 줄은 대신 날짜 예외(캐나다=실사일)를 이름으로 말한다.
+        self.assertIn("캐나다 실사는 실사일", self.html)
 
     def test_uniform_select_style(self):
         """[M15] 전 셀렉트 동일 컴포넌트 — height 36px, font-size 13px."""
@@ -6638,7 +6655,7 @@ class WebFirmRenderTest(unittest.TestCase):
     def test_page_generated(self):
         self.assertIn("업체 프로파일", self.html)
         self.assertIn("Firm Profile", self.html)
-        self.assertIn("AI Disclosure", self.html)
+        self.assertIn('class="ai-line" id="ai-notice"', self.html)  # 11-15 AI 고지 한 줄
 
     # ── [존 재편 2026-08-26] 이름으로 조회하는 랜딩 ──────────────────────────
     # 이 폼은 원래 트렌드 페이지 일곱 번째 블록에 있었다(WebTrendsRecentWindowTest 소관).
@@ -6971,7 +6988,7 @@ class WebInspectorRenderTest(unittest.TestCase):
     def test_page_generated(self):
         self.assertIn("실사관 프로파일", self.html)
         self.assertIn("Inspector Profile", self.html)
-        self.assertIn("AI Disclosure", self.html)
+        self.assertIn('class="ai-line" id="ai-notice"', self.html)  # 11-15 AI 고지 한 줄
 
     def test_cfg_div_env_gated_empty_by_default_with_root(self):
         # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
@@ -7341,7 +7358,7 @@ class WebInspectorRenderTest(unittest.TestCase):
         import subprocess
 
         fn_src = self._extract_for_node([
-            "fetchInspectorProfileOnce", "RETRY_DELAY_MS", "isRetryableFetchError", "delay",
+            "_fetchT", "fetchInspectorProfileOnce", "RETRY_DELAY_MS", "isRetryableFetchError", "delay",
             "fetchInspectorProfileWithRetry",
         ])
         driver = "\n".join([
@@ -7857,7 +7874,7 @@ class WebFirmWatchlistTest(unittest.TestCase):
         self.assertIn('from("firm_watchlist").select("firm_key,firm_display,created_at")', self.reactions_js)
         # 015 미적용/비로그인 방어 — 오류처럼 보이지 않는 노트 폴백.
         self.assertIn("관심 업체 목록 준비 중입니다.", self.reactions_js)
-        self.assertIn("로그인하면 관심 업체를 모아볼 수 있어요.", self.reactions_js)
+        self.assertIn("로그인하면 관심 업체를 모아볼 수 있습니다.", self.reactions_js)
         # 빈 목록 안내 + 프로파일 링크 + 해제 버튼.
         self.assertIn("아직 등록한 업체가 없습니다", self.reactions_js)
         self.assertIn("업체 프로파일에서 관심 업체로 등록하세요.", self.reactions_js)
@@ -7924,11 +7941,11 @@ class WebMePageTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_page_title_and_no_nav_tab_activated(self):
-        """스크랩 전용에서 개인 홈으로 넓어져 제목도 '마이페이지'. nav 6탭 중 어느 것도 이
+        """스크랩 전용에서 개인 홈으로 넓어졌다. [11-15] 제목은 상단 메뉴 이름과 같은 '관심 목록'. nav 6탭 중 어느 것도 이
         페이지를 대표하지 않으므로 아무 탭도 켜지 않는다(이전엔 nav_active='board' 라
         무관한 '모아보기'가 활성으로 보였다)."""
-        self.assertIn("<title>마이페이지 · GRM</title>", self.me)
-        self.assertIn('<h1 class="grm-my-h">마이페이지</h1>', self.me)
+        self.assertIn("<title>관심 목록 · GRM</title>", self.me)
+        self.assertIn('<h1 class="grm-my-h">관심 목록</h1>', self.me)
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.me, _re.S)
         self.assertIsNotNone(nav_m)
@@ -7994,7 +8011,7 @@ class WebMePageTest(unittest.TestCase):
         fn = self.reactions_js[self.reactions_js.index("function renderMeGuestHead(head)"):]
         fn = fn[:fn.index("\n  }")]
         self.assertIn("가입하고 시작하기", fn)
-        self.assertIn("이미 계정이 있어요 · 로그인", fn)
+        self.assertIn("계정이 있으면 로그인", fn)
         self.assertIn('openLogin({ mode: "signup" })', fn)
         # 비로그인 분기가 빈 카드로 남지 않는다(13차 이전 동작 회귀 방지).
         head_fn = self.reactions_js[self.reactions_js.index("function renderMeHead(count)"):]
@@ -8006,8 +8023,8 @@ class WebMePageTest(unittest.TestCase):
         """같은 화면에 로그인 버튼이 여러 개 뜨지 않게, 스크랩 섹션의 비로그인 버튼은
         제거하고 상단 게스트 카드 하나로 모았다(문구 안내는 유지)."""
         self.assertNotIn('className = "grm-my-login"', self.reactions_js)
-        self.assertIn("로그인하면 스크랩한 카드를 이곳에 모아볼 수 있어요.", self.reactions_js)
-        self.assertIn("로그인하면 관심 업체를 모아볼 수 있어요.", self.reactions_js)
+        self.assertIn("로그인하면 스크랩한 카드를 이곳에 모아볼 수 있습니다.", self.reactions_js)
+        self.assertIn("로그인하면 관심 업체를 모아볼 수 있습니다.", self.reactions_js)
 
     def test_growth_fallback_note_hidden_by_css_when_panel_renders(self):
         """growth.js 미로드·localStorage 차단 시 제목만 덩그러니 남지 않도록 정적 폴백
@@ -8037,9 +8054,9 @@ class WebMePageTest(unittest.TestCase):
         self.assertEqual(tabs0.count("<a "), 3)                 # 주간 브리프·찾아보기·관심 목록
         self.assertIn("me/index.html", self.reactions_js)        # 계정 메뉴(런타임)
         self.assertNotIn("관심 목록", self.landing_off)          # env-off = 메뉴에도 없다
-        # 헤더 계정 메뉴 항목도 실제 페이지 내용과 이름을 맞췄다(링크·아이콘은 그대로).
+        # 헤더 계정 메뉴 항목도 상단 메뉴·페이지 제목과 같은 이름(11-15 '관심 목록'으로 통일).
         self.assertIn(
-            "'<i class=\"ti ti-bookmark\" aria-hidden=\"true\"></i>' + _t(\"마이페이지\") + '</a>'",
+            "'<i class=\"ti ti-bookmark\" aria-hidden=\"true\"></i>' + _t(\"관심 목록\") + '</a>'",
             self.reactions_js)
 
     def test_no_new_backend_surface(self):
@@ -8496,6 +8513,27 @@ class WebRenderHardeningTest(unittest.TestCase):
         # 도착 페이지 — 방금 구독을 마친 사람에게 다시 권하지 않는다
         self.assertNotIn('class="subscribe"', welcome)
         self.assertNotIn('id="grm-cta"', welcome)
+
+    def test_subscribe_links_jump_focus_or_hide(self):
+        """[2026-11-15 대표 신고] '무료 구독'(#subscribe)을 눌러도 아무 일이 없어 보였다 — 밴드가 링크
+        바로 아래라 스크롤이 거의 안 움직이고, 이미 구독한 브라우저는 밴드가 숨어 링크가 빈 곳을 가리켰다.
+        밴드가 있으면 이메일 칸에 커서+강조, 숨었으면 링크를 감춘다(hidden 속성 말고 style)."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            html = self._render_detail(_minimal_brief("2026-06-06"))
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        i = html.index("a[href=\"#subscribe\"]")
+        js = html[i:html.index("</script>", i)]
+        self.assertIn("grm-sub-email", js)
+        self.assertIn(".focus(", js)
+        self.assertIn("sub-flash", js)
+        self.assertIn("style.display='none'", js)
+        self.assertIn("prefers-reduced-motion", js)
+        self.assertIn(".subscribe.sub-flash{", html)
+        # 밴드를 숨기는 구독 완료 스크립트가 먼저 돌아야 sec.hidden 을 읽을 수 있다.
+        self.assertLess(html.index("localStorage.getItem('grm-sub-ok')"), i)
 
     def test_subscribe_band_remembers_completed_subscription(self):
         """[2026-09-23 마케팅 계획 C-06 감사] 배너는 `grm-sub-ok` 를 읽어 다시 뜨지 않는데
@@ -11280,7 +11318,7 @@ class WebFirmPageTest(unittest.TestCase):
         self.assertIn("행마다 날짜의 종류", html)
         for label in ("공개", "실사"):
             self.assertIn(label, html, f"타임라인 행이 날짜 종류('{label}')를 적지 않는다")
-        self.assertIn("이것은 그 시점의 기록입니다", html)  # 후속 시정 고지
+        self.assertIn("그 시점의 기록입니다", html)  # 후속 시정 고지(11-15 한 줄로)
         self.assertIn(self.data.get("measured_on", ""), html)
 
     def test_doc_page_links_static_when_it_exists_else_lookup(self):
@@ -11476,8 +11514,9 @@ class WebInspectionDateTest(unittest.TestCase):
                       "같은 날짜가 '실사'와 '공개'로 두 번 나간다")
         # 본문의 출처 문장도 같은 규칙을 따라야 한다(갈래마다 문장 전체가 하나의 키다).
         self.assertIn("{% if doc.published_date == doc.inspection_date %}", tpl)
-        self.assertIn('_("{agency}가 <b>{date}</b>에 실사한 문서에서', tpl)
-        self.assertIn('_("{agency}가 <b>{date}</b>에 공개한 문서에서', tpl)
+        # [고지 정리 2026-11-15] 문서 페이지 하단 고지가 한 줄로 줄었다 — 날짜 종류 구분은 그대로.
+        self.assertIn('_("{agency} {date} 실사 문서에서 옮긴', tpl)
+        self.assertIn('_("{agency} {date} 공개 문서에서 옮긴', tpl)
 
 
 class WebFindingsDocPageTest(unittest.TestCase):
@@ -11624,16 +11663,37 @@ class WebFindingsDocPageTest(unittest.TestCase):
         전체 일치라 절단·치환·중복이 전부 잡힌다).
         """
         import html as _html
-        checked = 0
+
+        def _plain(x: str) -> str:
+            return _html.unescape(re.sub(r"<[^>]+>", "", x))
+
+        def _norm(x: str) -> str:
+            return re.sub(r"\s+", " ", x).strip()
+
+        checked = split_checked = 0
         for doc in self._sample_docs(8):
             page = self._page(doc["slug"])
-            bodies = re.findall(r'<p class="fd-text">(.*?)</p>', page, re.S)
-            self.assertEqual(len(bodies), len(doc["findings"]),
-                             f'본문 개수 불일치: {doc["slug"]}')
-            for f, body in zip(doc["findings"], bodies):
-                plain = _html.unescape(re.sub(r"<[^>]+>", "", body))
-                self.assertEqual(plain, f["text_ko"],
-                                 f'본문이 무변형이 아님: {f["finding_id"]}')
+            articles = re.findall(r'<article class="fd-item" id="([^"]+)">(.*?)</article>', page, re.S)
+            self.assertEqual([a[0] for a in articles], [f["finding_id"] for f in doc["findings"]],
+                             f'본문 개수·순서 불일치: {doc["slug"]}')
+            for f, (_, art) in zip(doc["findings"], articles):
+                if 'class="fd-text fd-lead"' in art:
+                    # [WL 해부 2026-10-31] 경고서한 지적은 '요지·지적 내용·회사 회신·FDA 판단·FDA 요구'로
+                    # 나뉘어 여러 문단이 된다(라벨만 우리 것). 11-14 재측정에서 480자 절단이 풀린 서한이
+                    # 나뉘기 시작해 예전 단언(`<p class="fd-text">` 한 개)이 개수부터 어긋났다.
+                    # 계약은 wl_anatomy.rejoin 과 같다 — 라벨을 빼고 문단을 순서대로 이으면 원문과
+                    # 공백 정규화 후 완전히 같아야 한다(절단·치환·중복이 여전히 전부 잡힌다).
+                    art = re.sub(r'<span class="fd-lab">.*?</span>', "", art, flags=re.S)
+                    pieces = [_plain(m.group(2)) for m in
+                              re.finditer(r"<(p|h3|li)\b[^>]*>(.*?)</\1>", art, re.S)]
+                    self.assertEqual(_norm(" ".join(pieces)), _norm(f["text_ko"]),
+                                     f'나눈 본문을 이으면 원문과 달라진다: {f["finding_id"]}')
+                    split_checked += 1
+                else:
+                    bodies = re.findall(r'<p class="fd-text">(.*?)</p>', art, re.S)
+                    self.assertEqual(len(bodies), 1, f'본문 문단이 하나가 아님: {f["finding_id"]}')
+                    self.assertEqual(_plain(bodies[0]), f["text_ko"],
+                                     f'본문이 무변형이 아님: {f["finding_id"]}')
                 checked += 1
         self.assertGreater(checked, 0)
 
@@ -11824,8 +11884,9 @@ class WebFindingsDocPageTest(unittest.TestCase):
         """
         for doc in self._sample_docs(7):
             html = self._page(doc["slug"])
-            self.assertIn("이 기록에 대하여", html)
+            # [고지 정리 2026-11-15] 제목('이 기록에 대하여')·세 단락 → 한 줄. 뜻은 그대로 잰다.
             self.assertIn("그 시점의 기록", html)
+            self.assertIn("원문을 기준으로", html)
             self.assertIn("시정", html)
             self.assertIn("기계로 처리", html)
 
@@ -13934,10 +13995,150 @@ class WebGurumiPetTest(unittest.TestCase):
 
 
     def test_landing_features_are_exactly_three(self):
-        """[홈 4단] '제공 정보'는 업체·용어·기관 세 칸이고 칸마다 실제 결과 한 건을 싣는다."""
-        self.assertEqual(self.landing.count('class="home-demo"'), 3)
-        for label in ("업체별 지적 이력", "용어 해설과 지적 사례", "기관별 지적 경향"):
+        """[홈 4단 · 내용 먼저 2026-11-14] '제공 정보'는 지적 한 건·용어·기관 세 칸이고 칸마다
+        건수 요약이 아니라 실제 내용(지적 문장·용어 뜻·영역 막대)을 싣는다."""
+        self.assertEqual(self.landing.count('class="home-cell'), 3)
+        for label in ("최근 공개된 지적 한 건", "용어 해설과 지적 사례", "기관별 지적 경향"):
             self.assertIn(label, self.landing)
+        for cls in ('class="hc-quote"', 'class="hc-def"', 'class="hc-bar"'):
+            self.assertIn(cls, self.landing, cls)
+
+    def test_landing_case_links_lead_to_real_pages(self):
+        """지적 한 건 칸의 줄은 전부 그 빌드에 실제로 있는 화면으로 간다(없는 페이지 링크 금지)."""
+        cell = self.landing.split('class="home-cell home-case"', 1)[1].split("</ul>", 1)[0]
+        hrefs = re.findall(r'href="([^"]+)"', cell)
+        self.assertGreaterEqual(len(hrefs), 3, hrefs)
+        for href in hrefs:
+            # 문서 페이지는 픽스처 빌드가 내지 않는다(신규 공개 문서 줄과 같은 사정) — 주소 꼴만 본다.
+            if href.startswith("findings/doc/"):
+                self.assertRegex(href, r"^findings/doc/[^/]+/index\.html$")
+                continue
+            target = self.single / href.split("?", 1)[0]
+            self.assertTrue(target.is_file(), href)
+
+    def test_landing_has_no_stale_totals_line(self):
+        """[4-A 2026-11-15] 누적 건수·기준일 줄은 홈에 없다(주 1회 스냅샷이라 늘 낡아 보인다)."""
+        self.assertNotIn('class="home-count"', self.landing)
+        top = self.landing.split('class="wrap home-top"', 1)[1].split("</section>", 1)[0]
+        self.assertIsNone(re.search(r"\d{4}-\d{2}-\d{2} 기준", top))
+        self.assertNotIn("일본", top)
+
+    def test_landing_headlines_are_numbered_with_source_tags(self):
+        """이번 주 핵심은 줄마다 명조 제목이고, 줄 머리 기관을 아는 줄에는 출처 표지가 붙는다."""
+        block = self.landing.split(">이번 주 핵심</h2>", 1)[1].split("</ul>", 1)[0]
+        self.assertGreaterEqual(block.count('class="ht-t"'), 1)
+        self.assertEqual(render.home_source_tag("FDA, 주사제 Class I 회수"),
+                         {"src_cls": "fda", "src_label": "FDA"})
+        self.assertEqual(str(render.home_nobreak_middot("위조·DEG <b>")),
+                         '위<span class="ht-nb">조·</span>DEG &lt;b&gt;')
+        self.assertEqual(render.home_source_tag("식약처, 제조업무정지 3개월")["src_cls"], "mfds")
+        self.assertEqual(render.home_source_tag("Health Canada recalls a product")["src_cls"], "hc")
+        # 기관 이름이 낱말의 앞부분일 뿐이면(EUDAMED·FDA483) 표지를 달지 않는다.
+        self.assertEqual(render.home_source_tag("EUDAMED 등록 의무화")["src_cls"], "")
+        self.assertEqual(render.home_source_tag("WHO, 사전적격성평가 개정")["src_cls"], "")
+
+    def test_notices_are_one_line_and_explained_once_in_guide(self):
+        """[고지 정리 2026-11-15 · 대표 지적] 페이지마다 길게 반복되던 고지·경고 단락을 한 줄로 —
+        '~하지 마시고', '이 페이지가 알지 못합니다' 같은 말투와 수록 기준 설명은 화면에서 빼고
+        이용안내 '이용 시 유의사항'(sec-8) 한 곳으로. 푸터 'AI 활용 안내'가 그곳을 가리킨다."""
+        tdir = WEB_DIR / "templates"
+        for name in ("findings_clause.html", "findings_facet.html", "findings_doc_list.html",
+                     "findings_doc.html", "findings_firm_page.html", "findings.html",
+                     "firm.html", "inspector.html", "landing.html"):
+            src = (tdir / name).read_text(encoding="utf-8")
+            for bad in ("읽지 마시고", "이 페이지가 알지 못합니다", "콘텐츠 생성 방식 및 유의사항",
+                        "자문으로 간주되어서는"):
+                self.assertNotIn(bad, src, f"{name}: {bad}")
+        guide = (WEB_DIR / "data" / "guide_content.md").read_text(encoding="utf-8")
+        heads = [l for l in guide.splitlines() if l.startswith("## ")]
+        self.assertEqual(heads[7], "## 이용 시 유의사항", "푸터·고지 링크(#sec-8)가 가리키는 절")
+        for need in ("3건 이상", "공개된 시점의 기록", "정규화", "Evidence A·B·C"):
+            self.assertIn(need, guide)
+        guide_en = (WEB_DIR / "data" / "guide_content_en.md").read_text(encoding="utf-8")
+        self.assertEqual([l for l in guide_en.splitlines() if l.startswith("## ")][7],
+                         "## Before you rely on this")
+
+    def test_search_loading_states_are_wired(self):
+        """[검색 로딩 2026-11-15] 진행선·자리 표시·0건/오류 칸이 화면과 스크립트 양쪽에 있고,
+        움직임 줄이기를 지킨다. 홈 검색 단추도 '검색 중'으로 바뀐다."""
+        page = (self.single / "search" / "index.html").read_text(encoding="utf-8")
+        js = (WEB_DIR / "assets" / "search.js").read_text(encoding="utf-8")
+        for needle in ('id="sr-prog"', 'id="sr-go"', ".sr-sk", ".sr-note.is-err",
+                       "prefers-reduced-motion:reduce"):
+            self.assertIn(needle, page, needle)
+        for needle in ('_t("검색 중")', 'noteBox("zero")', 'noteBox("err")', "SLOW_MS = 400",
+                       "seq !== runSeq"):
+            self.assertIn(needle, js, needle)
+        self.assertNotIn("goBtn.disabled", js)   # 느릴 때 다시 보낼 수 있어야 한다
+        self.assertIn('data-busy="검색 중"', self.landing)
+        self.assertIn("prefers-reduced-motion:reduce", self.landing)
+
+    def test_main_bottom_gap_is_one_global_rule(self):
+        """[본문 끝 여백 2026-11-15 · 대표 지적] 본문 마지막 글이 구독 띠·푸터에 3~4px 로 붙던
+        페이지(지적 경향·공개 문서·조항·지적 사례 등 11종)를 base.html 한 규칙으로 띄운다 —
+        padding 은 걷고 main 의 margin(겹침으로 큰 쪽만)으로만. 브리프 본문은 11-16 발행 뒤."""
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        self.assertIn("main:not(#_){padding-bottom:0;margin-bottom:72px}", base)
+        self.assertIn("main:not(#_) > .wrap:last-child{padding-bottom:0}", base)
+        self.assertIn("main:not(#_){margin-bottom:56px}", base)
+        self.assertIn("main:not(#_):has(> .toc-fab){margin-bottom:0}", base)
+        page = (self.single / "findings" / "examples" / "mhra" / "index.html")
+        if page.exists():
+            self.assertIn("margin-bottom:72px", page.read_text(encoding="utf-8"))
+
+    def test_search_filters_sit_above_results(self):
+        """[필터 위로 2026-11-15 · 대표 선택] 오른쪽 세로 필터(sr-side)를 없애고 결과 위 한 줄로 —
+        기관은 펼친 탭, 문서 종류·기간은 칩을 누르면 열리는 목록. 결과 문장은 화면에서만 3줄."""
+        page = (self.single / "search" / "index.html").read_text(encoding="utf-8")
+        js = (WEB_DIR / "assets" / "search.js").read_text(encoding="utf-8")
+        self.assertNotIn("sr-side", page)
+        self.assertNotIn('type = "radio"', js)
+        bar, hits = page.index('id="sr-bar"'), page.index('id="sr-hits"')
+        self.assertLess(bar, hits, "필터 줄이 결과보다 위에 있어야 한다")
+        for needle in ('role="tablist"', 'id="sr-f-source"', 'id="sr-f-period"', 'id="sr-adv"',
+                       'id="sr-clear"', "-webkit-line-clamp:3"):
+            self.assertIn(needle, page, needle)
+        for needle in ('"role", "tab"', '"aria-haspopup", "listbox"', '"role", "option"',
+                       'e.key === "Escape"'):
+            self.assertIn(needle, js, needle)
+        # 영어판은 새 문구 없이 기존 사전 키만 쓴다(골든 재동결 없이 같은 구조).
+        en = (self.single / "en" / "search" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Clear all", en)
+        self.assertNotIn("모두 지우기", en)
+
+    def test_home_case_selection_rule(self):
+        """최신 문서부터, 분류가 있고(캐치올 제외) 길이가 맞는 지적 — 용어가 걸리는 것을 먼저."""
+        terms = [{"id": "change-control", "term_ko": "변경관리", "term_en": "Change control"}]
+        long_ko = "가" * 200
+
+        def doc(slug, date, findings):
+            return {"slug": slug, "document_id": slug, "agency": "FDA", "source": "FDA 483",
+                    "firm_name": slug.upper(), "firm_key": slug, "published_date": date,
+                    "findings": findings}
+
+        docs = {"documents": [
+            doc("old", "2026-01-01", [{"text_ko": "오래된 문서의 변경관리 절차가 문서화되어 있지 않다는 지적이다.",
+                                       "category_label_ko": "규제보고/변경관리"}]),
+            doc("new", "2026-02-01", [
+                {"text_ko": "캐치올 분류의 지적은 고르지 않는다. 길이는 충분히 길게 적는다.",
+                 "category_label_ko": render.HOME_CATCHALL_LABEL},
+                {"text_ko": long_ko, "category_label_ko": "시험실/품질관리"},
+                {"text_ko": "용어가 걸리지 않는 평범한 지적 문장이며 길이는 범위 안에 든다.",
+                 "category_label_ko": "시험실/품질관리", "text_orig": "A plain observation."},
+                {"text_ko": "변경이 공식 변경관리 시스템으로 처리되지 않은 사례가 확인되었다는 지적.",
+                 "category_label_ko": "규제보고/변경관리", "text_orig": "Changes are not handled."},
+            ]),
+        ]}
+        case = render.build_home_showcase(docs, None, terms, None)["case"]
+        self.assertEqual(case["slug"], "new")
+        self.assertEqual(case["term"], {"id": "change-control", "name": "변경관리"})
+        self.assertEqual(case["orig"], "Changes are not handled.")
+        self.assertIn("변경관리 시스템", case["body"])
+        # 용어 정본이 없으면 용어 줄 없이 첫 후보를 쓴다.
+        plain = render.build_home_showcase(docs, None, None, None)["case"]
+        self.assertEqual((plain["slug"], plain["term"]), ("new", None))
+        self.assertTrue(plain["body"].startswith("용어가 걸리지 않는"))
+        self.assertIsNone(render.build_home_showcase({"documents": []}, None, None, None)["case"])
 
 
     def test_engage_zone_popular_then_quiz(self):
@@ -14396,8 +14597,8 @@ class WebGurumiGrowthSyncTest(unittest.TestCase):
     def test_pet_panel_cta_copy_no_pressure(self):
         # 펫 패널 CTA — 확정 카피(보관 프레이밍). 강요 톤·게스트 경험 폄하 문구 금지.
         self.assertIn("구름이 안전하게 보관하기", self.sync_js)
-        self.assertIn("로그인하면 어느 기기에서든 이어서 키울 수 있어요", self.sync_js)
-        self.assertIn("구름이가 계정에 안전하게 보관되고 있어요", self.sync_js)
+        self.assertIn("로그인하면 어느 기기에서든 이어서 키울 수 있습니다", self.sync_js)
+        self.assertIn("구름이는 계정에 보관됩니다", self.sync_js)
         for banned in ("로그인해야", "사라져요", "잃어버", "지워져요"):
             self.assertNotIn(banned, self.sync_js, f"강요 톤 금지 위반: {banned}")
         # 기존 로그인 플로우 재사용(firm.js 관례 — 헤더 로그인 버튼 클릭 위임).
@@ -14809,7 +15010,7 @@ class WebQuizLearningLoopTest(unittest.TestCase):
 class WebLoginFrictionTest(unittest.TestCase):
     """가입 마찰 3종 개선의 정적 계약을 가드한다.
     ① openLogin({mode:"signup"}) 가입 직행(펫 CTA) — 로그인 화면 경유 1클릭 제거,
-       단 "이미 계정이 있어요" 전환은 가입 화면에 상시.
+       단 "계정이 있으면 로그인" 전환은 가입 화면에 상시.
     ② 가입 진행 상태 sessionStorage 보존 → 팝업을 닫았다 열어도 코드 입력 단계로 복원
        (재전송 쿨다운 30초 유지·세션 정본 grm-public-auth-v1 불침범·비밀번호/토큰 미저장).
     ③ 미확인 계정 로그인 실패 분기 — Supabase 공식 코드 email_not_confirmed 기반
@@ -14825,7 +15026,7 @@ class WebLoginFrictionTest(unittest.TestCase):
         self.assertIn("window.GRM_AUTH.open = openLogin;", self.js)
         self.assertIn('setMode(o.mode === "signup" ? "signup" : "login");', self.js)
         # 가입 화면엔 로그인 전환이 항상 있다(막다른 길 0).
-        self.assertIn('addLink(_t("이미 계정이 있어요 · 로그인"), "login")', self.js)
+        self.assertIn('addLink(_t("계정이 있으면 로그인"), "login")', self.js)
         # 펫 CTA(가입 의도 분명) → 가입 직행 + reactions.js 미로드 시 기존 헤더 위임 폴백.
         self.assertIn('window.GRM_AUTH.open({ mode: "signup" })', self.sync_js)
         self.assertIn('querySelector(".grm-auth .grm-acct-login")', self.sync_js)
@@ -14865,8 +15066,8 @@ class WebLoginFrictionTest(unittest.TestCase):
         body = "\n".join(ln.split("//")[0] for ln in body.splitlines())
         for bad in ["오류 코드", "인증 토큰", "OTP", "실패했습니다. 관리자", "차단"]:
             self.assertNotIn(bad, body, f"대중성 톤 위반 후보: {bad}")
-        self.assertIn("가입 확인이 아직이에요", self.js)
-        self.assertIn("코드가 맞지 않거나 시간이 지났어요", self.js)
+        self.assertIn("가입 확인이 끝나지 않았습니다", self.js)
+        self.assertIn("코드가 맞지 않거나 유효 시간이 지났습니다", self.js)
 
     @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — 분류 경로 고정은 CI에서 수행")
     def test_classify_auth_error_paths_pinned_via_node(self):
@@ -15108,7 +15309,9 @@ class WebAboutTest(unittest.TestCase):
         self.assertNotIn('class="foot-grp"', foot)
         self.assertIn('href="../../about/index.html">서비스 소개</a>', foot)
         self.assertNotIn("index.html#why", foot)                     # 종전 홈 앵커 소개 없음
-        self.assertEqual(foot.count("index.html#notice"), 1)        # 같은 앵커 링크 둘 → 하나
+        # [고지 정리 2026-11-15] 'AI 활용 안내'는 홈 #notice 대신 이용안내 '이용 시 유의사항'(sec-8).
+        self.assertEqual(foot.count("guide/index.html#sec-8"), 1)
+        self.assertNotIn("index.html#notice", foot)
         self.assertIn("<div data-feedback-slot>", foot)              # 문의 링크가 얹힐 열
         # RSS 피드(#927) — 열을 재구성하며 실제로 한 번 떨어뜨렸다가 i18n 고아 경고로
         # 되찾은 링크다. 피드는 링크가 없으면 발견 자체가 안 되므로 여기 못 박는다.
@@ -15251,10 +15454,11 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
         소스 추가 시 수집기·DB 만 고치고 설명을 빠뜨리던 재발 방지."""
         REQUIRED = sorted(set(self.EXTRACTOR_COPY_KEYWORDS.values()))
         # ① 템플릿(인트로·고지) — 파일 전체 텍스트에 전부 존재해야 한다.
-        for label, rel in (("findings 템플릿", "findings.html"),
-                           ("firm 템플릿", "firm.html"),
-                           ("trends 템플릿", "trends.html")):
-            text = (WEB_DIR / "templates" / rel).read_text(encoding="utf-8")
+        # [고지 정리 2026-11-15] findings·firm 하단 AI 고지가 한 줄로 줄며 출처 나열은 이용안내
+        # '이용 시 유의사항' 한 곳으로 옮겼다 — 그 정본(guide_content.md)을 대신 잰다.
+        for label, path in (("이용안내 정본", WEB_DIR / "data" / "guide_content.md"),
+                            ("trends 템플릿", WEB_DIR / "templates" / "trends.html")):
+            text = path.read_text(encoding="utf-8")
             for kw in REQUIRED:
                 self.assertIn(kw, text, f"{label} 에 소스 키워드 '{kw}' 누락 — 신규 소스 카피 갱신 필요")
         # ② render.py 메타 설명 3종 — 상수 본문을 개별 검증(하나만 고치고 나머지 빠뜨리는 것 방지).
@@ -18616,8 +18820,10 @@ class WebEnFacetTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def _en_paths_from_data(self):
-        """영어 정본이 선언한 면 집합 — 렌더가 쓰는 **그 함수**에서 파생한다."""
-        return render.facet_tree_paths(self.en_data)
+        """영어 정본이 선언한 면 집합 — 렌더가 쓰는 **그 함수**에서 파생한다.
+        (한국어 짝이 없는 면은 렌더가 그리지 않는다 — restrict_facets_to_tree.)"""
+        return render.facet_tree_paths(
+            render.restrict_facets_to_tree(self.en_data, self.ko_data))
 
     def test_english_facet_data_declares_its_population(self):
         """파일 이름이 아니라 **데이터 자신**이 어느 모집단인지 말해야 한다."""
@@ -19249,6 +19455,18 @@ def class_signature(html: str) -> "collections.Counter":
 INTENTIONAL_CLASS_DIFFS: dict[str, str] = {
     # 한국어 화면에서만 뜨는 "영어판이 있다" 안내(영어 화면에 권할 이유가 없다).
     "grm-langhint": "한국어 전용 진입 안내",
+    # [홈 2026-11-15] 홈의 '지적 한 건'·출처 표지는 **그 언어 트리의 데이터**에서 고른다 —
+    # 한국어판과 영어판이 서로 다른 지적·문서를 실을 수 있어 줄 수와 표지 수가 달라진다
+    # (실사관·용어 줄은 있을 때만, 영어판에는 원문 줄·영문 표제어 병기가 없다).
+    # 칸 자체(home-cell·home-case·hc-quote)는 예외가 아니다 — 구조는 계속 대조된다.
+    "hc-orig": "한국어판만 원문을 함께 싣는다(영어판은 본문이 원문)",
+    "hc-alt": "한국어판만 영문 표제어를 곁에 적는다",
+    "hc-k": "지적 한 건의 연결 줄 수는 고른 지적에 따라 다르다",
+    "hc-v": "위와 같음", "hc-go": "위와 같음", "hc-row": "분류 모음 화면이 없는 트리에서는 링크 없는 줄",
+    "hs-fda": "출처 표지 수는 그 트리의 문서·핵심 줄에 따라 다르다",
+    "hs-mfds": "위와 같음", "hs-eu": "위와 같음", "hs-uk": "위와 같음", "hs-hc": "위와 같음",
+    "hs": "위와 같음",
+    "ht-nb": "가운뎃점 묶음 수는 핵심 줄 글자에 따라 다르다",
 }
 
 
@@ -19272,6 +19490,15 @@ def page_family(path: str) -> str:
 INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
     "*": {
         "grm-langhint": "한국어 전용 진입 안내(영어 화면에 권할 이유가 없다)",
+    },
+    # [홈 2026-11-15] 홈의 지적 한 건·출처 표지는 그 언어 트리의 데이터에서 고른다
+    # (INTENTIONAL_CLASS_DIFFS 의 같은 항목 참조).
+    "(home)": {
+        "hc-orig": "한국어판만 원문을 함께 싣는다(영어판은 본문이 원문)",
+        "hc-alt": "한국어판만 영문 표제어를 곁에 적는다",
+        "hc-row": "분류 모음 화면이 없는 트리에서는 링크 없는 줄",
+        "hs-*": "출처 표지는 그 트리에 실린 문서·핵심 줄의 기관에 따라 달라진다",
+        "ht-nb": "가운뎃점 묶음은 핵심 줄 글자에 따라 달라진다",
     },
     "glossary/*": {
         "gt-en": "영문 병기 — 영어판은 표제어 자체가 영문이라 덧붙일 것이 없다",
@@ -19515,7 +19742,8 @@ class WebEnTreeTest(unittest.TestCase):
         # 함수를 쓴다(테스트가 따로 세면 두 목록이 갈라지고, 그건 이 가드가 막으려던 것이다).
         cls.en_facets = (render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
                          if render.FINDINGS_FACETS_EN_FILE.exists() else None)
-        cls.expected |= render.facet_tree_paths(cls.en_facets)
+        cls.expected |= render.facet_tree_paths(
+            render.restrict_facets_to_tree(cls.en_facets, render.load_findings_facets()))
         cls.expected |= render.glossary_tree_paths(render.load_glossary())
         cls.expected |= render.clause_tree_paths(render.build_clause_views(
             docs, render.load_cfr_catalog(), render.load_glossary(), lang="en"))
@@ -19538,6 +19766,9 @@ class WebEnTreeTest(unittest.TestCase):
         # (렌더와 같은 로더·같은 함수 — routes_present 가 실제로 그릴 면만 돌려준다).
         cls.expected |= set(render.deficiency_cases_page.routes_present(
             render.deficiency_cases_page.load_snapshot(render.DEFICIENCY_CASES_FILE)))
+        # [실사 대비 노트 2026-11-15] 노트가 있으면 목록 1 + 노트 N 면이 선다(렌더와 같은 로더·같은 함수).
+        cls.expected |= render.inspection_notes_page.routes_present(
+            render.inspection_notes_page.load_notes())
 
     @classmethod
     def tearDownClass(cls):
@@ -20012,7 +20243,10 @@ class WebEnTreeTest(unittest.TestCase):
             html = self.pages.get(rel)
             if html is None:
                 continue
-            self.assertIn(en_n, html, f"{rel}: 영어 모집단 수가 없다")
+            # [4-A 2026-11-15] 홈은 누적 건수 줄을 뺐다 — 영어 수가 '있어야 한다'는 요구는
+            # 검색 화면에만 남고, 한국어 수가 새어 들면 안 된다는 요구는 홈에도 그대로다.
+            if rel != "en/index.html":
+                self.assertIn(en_n, html, f"{rel}: 영어 모집단 수가 없다")
             self.assertNotIn(ko_n, html, f"{rel}: 한국어 모집단 수가 영어 페이지에 있다")
 
     def test_snapshot_counts_disclose_their_as_of_date(self):
@@ -21634,6 +21868,76 @@ class WebBriefGlanceTest(unittest.TestCase):
         for v in snap["items"].values():
             self.assertEqual(set(v), {"c", "k"})
 
+
+
+class CssCustomPropertyDefinedTest(unittest.TestCase):
+    """[11-15 선택 칩 대비] `var(--paper)` 가 어디에도 정의되지 않아, 지적 사례의 선택된 칩
+    ('MHRA 조항별 집계')이 검은 바탕에 검은 글자로 나왔다 — 정의 안 된 변수는 조용히 상속값이 된다.
+    대체값 없는 `var(--x)` 는 반드시 어딘가(:root 또는 지역 스타일)에서 `--x:` 로 정의돼야 한다."""
+
+    def test_every_var_without_fallback_is_defined(self):
+        files = [*(WEB_DIR / "templates").glob("*.html"), *(WEB_DIR / "partials").glob("*.html"),
+                 *(WEB_DIR / "assets").glob("*.css")]
+        used, defined = {}, set()
+        for f in files:
+            src = f.read_text(encoding="utf-8")
+            defined.update(re.findall(r"(?<![\w-])(--[a-z0-9-]+)\s*:", src))
+            for name in re.findall(r"var\(\s*(--[a-z0-9-]+)\s*\)", src):
+                used.setdefault(name, f.name)
+        for js in (WEB_DIR / "assets").glob("*.js"):  # style.setProperty('--x', ...) 로 JS 가 채우는 변수
+            defined.update(re.findall(r"['\"](--[a-z0-9-]+)['\"]", js.read_text(encoding="utf-8")))
+        missing = {k: v for k, v in used.items() if k not in defined}
+        self.assertEqual(missing, {}, "정의 없는 CSS 변수(대체값도 없음) — 색·배경이 조용히 사라진다")
+
+    def test_selected_chip_contrast_meets_aa(self):
+        """선택 상태(.on·aria-pressed)를 칠하는 지역 규칙은 흰 글자 + --coral-2(5.9:1)로 통일했다.
+        --coral(4.2:1) 바탕에 흰 글자, --coral-tint 위 --coral 글자(3.4:1)는 AA 미달."""
+        bad = []
+        for f in [*(WEB_DIR / "templates").glob("*.html"), *(WEB_DIR / "partials").glob("*.html")]:
+            for rule in re.findall(r"[^{}\n]*(?:\.on|aria-pressed=\"true\"\])[^{}\n]*\{[^}]*\}", f.read_text(encoding="utf-8")):
+                body = rule.split("{", 1)[1]
+                if re.search(r"background:var\(--coral[,)]", body) and re.search(r"color:(#fff|var\(--on-coral)", body):
+                    bad.append((f.name, rule.strip()[:90]))
+                if re.search(r"background:var\(--coral-tint\)", body) and re.search(r"(?<!-)color:var\(--coral[,)]", body):
+                    bad.append((f.name, rule.strip()[:90]))
+        self.assertEqual(bad, [], "선택 칩 대비 AA 미달 — --coral-2 를 써라")
+
+    def test_sr_only_rule_present_where_used(self):
+        """[11-15] `.sr-only` 는 grm.css 에 없고 lookup_style 에만 있었다 — 지적 사례·인용 업체·
+        수입경보 화면의 숨김 라벨('낱말·영역·연도')이 입력칸 옆에 그대로 보였다.
+        class="sr-only" 를 쓰는 페이지 템플릿은 자신 또는 include 한 조각에서 규칙을 가져야 한다."""
+        tdir, pdir = WEB_DIR / "templates", WEB_DIR / "partials"
+        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
+        base = (tdir / "base.html").read_text(encoding="utf-8")
+        if ".sr-only{" in css.replace(" ", "") or ".sr-only{" in base:
+            return
+        def text_with_includes(path, seen=()):
+            src = path.read_text(encoding="utf-8")
+            out = [src]
+            for inc in re.findall(r'include "partials/([^"]+)"', src):
+                q = pdir / inc
+                if q.is_file() and q not in seen:
+                    out.append(text_with_includes(q, (*seen, q)))
+            return "\n".join(out)
+        missing = []
+        for f in sorted(tdir.glob("*.html")):
+            full = text_with_includes(f)
+            if 'class="sr-only"' in full and ".sr-only{" not in full:
+                missing.append(f.name)
+        self.assertEqual(missing, [], "sr-only 라벨이 화면에 그대로 보인다 — 규칙 없음")
+
+    def test_signal_dot_color_not_used_for_text(self):
+        """[11-15] --lo(#8E8B82)는 신호 강도 점 색이다. 글자색으로 쓰이면 바탕에 따라 3.0~3.2:1
+        (자료실 안내문·퀴즈 번호·'기록은 이 브라우저에만 저장돼요' 등). 보조 글자는 --muted-2."""
+        bad = []
+        for f in [*(WEB_DIR / "templates").glob("*.html"), *(WEB_DIR / "partials").glob("*.html")]:
+            src = f.read_text(encoding="utf-8")
+            for m in re.finditer(r"(?<![-\w])color:\s*var\(--lo\)", src):
+                sel = src[src.rfind("}", 0, m.start()) + 1:m.start()]
+                if "::before" in sel or "::after" in sel:   # 구분점 같은 장식 글리프는 글자가 아니다
+                    continue
+                bad.append(f.name)
+        self.assertEqual(bad, [], "--lo 를 글자색으로 쓰지 마라 — var(--muted-2)")
 
 if __name__ == "__main__":
     if "--freeze" in sys.argv:

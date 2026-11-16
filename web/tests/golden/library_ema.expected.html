@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Serif+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="/assets/grm.css?v=bf73464a">
+<link rel="stylesheet" href="/assets/grm.css?v=b70ada39">
 <link rel="stylesheet" href="/assets/pet.css?v=4eb979f5">
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/library/ema/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/library/ema/" />
@@ -378,7 +378,7 @@
 .lib-body{padding-bottom:64px}
 .lib-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:22px}
 .lib-meta-i{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted)}
-.lib-meta-i .ti{font-size:15px;color:var(--lo)}
+.lib-meta-i .ti{font-size:15px;color:var(--muted-2)}
 .lib-meta-link{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
 .lib-meta-link:hover{text-decoration:underline}
 .lib-meta-link .ti{font-size:14px}
@@ -388,7 +388,7 @@
 .lib-series-badge{flex:none;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;font-size:20px;color:#fff;background:var(--coral);border-radius:var(--rad-s)}
 .lib-series-t{flex:1;min-width:0}
 .lib-series-t h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.2;color:var(--ink);margin:0;word-break:keep-all}
-.lib-series-t h2 span{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--lo);margin-left:6px}
+.lib-series-t h2 span{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted-2);margin-left:6px}
 .lib-series-t p{font-size:14px;color:var(--muted);margin:5px 0 0;line-height:1.55;word-break:keep-all}
 .lib-series-link{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none;white-space:nowrap;margin-top:4px}
 .lib-series-link:hover{text-decoration:underline}
@@ -401,13 +401,13 @@
 a.lib-item-a:hover{color:var(--coral-2)}
 .lib-code{flex:none;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--ink);background:var(--strong);border-radius:5px;padding:2px 8px;white-space:nowrap;align-self:center}
 .lib-item-title{font-family:var(--sans);font-size:15.5px;line-height:1.5;font-weight:500;word-break:keep-all;overflow-wrap:anywhere}
-.lib-item-ext{flex:none;font-size:13px;color:var(--lo);align-self:center;opacity:0;transition:opacity .14s var(--ease)}
+.lib-item-ext{flex:none;font-size:13px;color:var(--muted-2);align-self:center;opacity:0;transition:opacity .14s var(--ease)}
 a.lib-item-a:hover .lib-item-ext{opacity:1}
 .lib-item-sub{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.5;margin:0;word-break:keep-all;overflow-wrap:anywhere}
 .lib-item-meta{display:flex;flex-wrap:wrap;align-items:center;gap:7px 14px}
 .lib-type{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--med);background:rgba(176,125,23,.11);border:1px solid rgba(176,125,23,.24);padding:3px 9px;border-radius:999px;white-space:nowrap}
 .lib-date{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12.5px;color:var(--muted)}
-.lib-date .ti{font-size:13px;color:var(--lo)}
+.lib-date .ti{font-size:13px;color:var(--muted-2)}
 .lib-extra{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--coral-2);text-decoration:none;border:1px solid rgba(194,96,63,.22);background:var(--coral-tint);padding:3px 10px;border-radius:999px;white-space:nowrap;transition:border-color .14s var(--ease)}
 .lib-extra:hover{border-color:var(--coral)}
 .lib-extra .ti{font-size:13px}
@@ -425,7 +425,7 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
 .foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
 .foot-copy .foot-ico .ti{font-size:13px;line-height:1}
-@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
+@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:none;text-wrap:balance}}
 </style>
 <style>
 .navmore{display:none}
@@ -489,6 +489,21 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
 .btn.coral:hover{background:var(--coral-2);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .grm-skip{position:absolute;left:-9999px;top:8px;z-index:200;padding:10px 16px;border-radius:var(--rad-s);background:var(--ink);color:var(--canvas);font-family:var(--sans);font-size:14px;text-decoration:none}
 .grm-skip:focus{left:16px}
+/* [본문 끝 여백 2026-11-15 · 대표 지적 "푸터에 마지막 글이 바짝 붙어 있다"] 페이지마다 아래 여백을
+   main·main>.wrap 의 padding(0~90px)으로 따로 주던 것을 한 규칙으로 — padding 은 걷고 main 의
+   margin 으로만 띄운다. margin 은 안쪽 마지막 요소의 margin 과 겹쳐(collapse) 큰 쪽만 남으므로
+   두 번 더해지지 않는다. :not(#_) 는 템플릿의 main.home·main.sr 같은 개별 규칙보다 앞서려는 것. */
+main:not(#_){padding-bottom:0;margin-bottom:72px}
+main:not(#_) > .wrap:last-child{padding-bottom:0}
+@media(max-width:640px){ main:not(#_){margin-bottom:56px} }
+/* 주간 브리프 본문(목차 단추 .toc-fab 가 있는 main)은 11-16 발행 뒤 따로 맞춘다 — 지금 모양 그대로. */
+main:not(#_):has(> .toc-fab){margin-bottom:0}
+/* [고지 정리 2026-11-15] AI 고지 한 줄 띠 — 구독 띠와 푸터 사이 작은 글자 한 줄. */
+.ai-line{background:var(--canvas);border-top:1px solid var(--line)}
+.ai-line .wrap{padding-top:16px;padding-bottom:16px}
+.ai-line p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.ai-line a{color:var(--body);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.fd-note,.ff-note{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 4px;word-break:keep-all}
 #grm-main:focus{outline:none}
 </style>
 <footer class="site"><div class="wrap">
@@ -496,7 +511,7 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>국내외 의약품 GMP·품질 규제 동향을 한국어와 영어로 제공하는 무료 정보 서비스입니다.</p>
       <a class="foot-srclink" href="../../findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
-    <div data-feedback-slot><h5>서비스 안내</h5><a href="../../about/index.html">서비스 소개</a><a href="../../guide/index.html">이용안내</a><a href="../../index.html#notice">AI 활용 안내</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../rss.xml">RSS 피드</a></div>
+    <div data-feedback-slot><h5>서비스 안내</h5><a href="../../about/index.html">서비스 소개</a><a href="../../guide/index.html">이용안내</a><a href="../../guide/index.html#sec-8">AI 활용 안내</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../rss.xml">RSS 피드</a></div>
     <div><h5>콘텐츠</h5><a href="../../archive/index.html">주간 브리프</a><a href="../../news/index.html">최근 규제 소식</a><a href="../../browse/index.html">찾아보기</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
     <div class="foot-fnd"><h5>찾아보기</h5><a href="../../findings/firm/index.html">업체</a><a href="../../findings/inspector/index.html">실사관</a><a href="../../findings/clause/index.html">조항</a><a href="../../findings/trends/index.html">업무 영역별 경향</a><a href="../../findings/inspections/index.html">FDA 실사 결과</a><a href="../../findings/docs/index.html">공개 문서</a><a href="../../findings/index.html">지적 문장 검색</a><a href="../../findings/checklist/index.html">자가점검표</a><a href="../../browse/index.html">전체 색인</a></div>
   </div>

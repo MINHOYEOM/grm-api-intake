@@ -18,7 +18,8 @@
 ## 클라우드에서 다른 점
 - PC 백업 없음(PC 작업은 꺼져 있다). 이중 실행 걱정은 열린 배치 PR 가드로만 막는다.
 - `D` = `TZ=Asia/Seoul date +%Y%m%d-%H%M`. 브랜치 = `claude/glossary-fig-daily-$D`.
-- §0.1 worktree 대신 받아진 저장소에서 `git checkout -b claude/glossary-fig-daily-$D origin/main`.
+- §0.1 worktree 대신 받아진 저장소에서 `git fetch origin main && git checkout -b claude/glossary-fig-daily-$D FETCH_HEAD`.
+  (`origin/main` 이라는 이름은 쓰지 않는다 — 실행 환경에 저장된 `origin/main` 은 며칠 전 것일 수 있다(2026-11-13 리허설: 11-06 커밋). 반드시 방금 `git fetch origin main` 한 `FETCH_HEAD` 를 쓴다.)
 - §0.3 열린 배치 PR(head 가 `claude/glossary-fig-daily-` 또는 `glossary-fig/daily-` 로 시작)이 있으면
   **머지하지 말고 `스킵: 앞 배치 PR #n 대기`** 로 끝낸다 — 머지는 워치독이 한다.
 - §0.4 en.json 가드는 `gh api "$R/pulls/<n>/files"` 로 PR 마다 확인한다.

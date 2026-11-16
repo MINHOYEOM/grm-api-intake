@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T16:38:41Z",
+ "generated_at": "2026-11-16T18:11:01Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 43909255215,
+    "databaseId": 43925021872,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-16T16:35:53Z",
-    "updatedAt": "2026-11-16T16:35:58Z",
+    "createdAt": "2026-11-16T18:04:44Z",
+    "updatedAt": "2026-11-16T18:04:48Z",
+    "headBranch": "feat/subscribe-more-surfaces",
+    "displayTitle": "feat(subscribe): 다른 화면 상시 구독 칸(노트·조항·퀴즈·자료실·404·업체) + 영문 홈 라벨 접힘 수정",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43925021872"
+   },
+   {
+    "databaseId": 43924999360,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-16T18:04:36Z",
+    "updatedAt": "2026-11-16T18:04:41Z",
+    "headBranch": "feat/subscribe-more-surfaces",
+    "displayTitle": "fix(home): 영문 홈 '최근 공개된 지적' 라벨이 단어 중간에서 접히던 결함 — 라벨 줄바꿈 금지, 영문만 칸 폭 6…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43924999360"
+   },
+   {
+    "databaseId": 43924915777,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-16T18:04:07Z",
+    "updatedAt": "2026-11-16T18:10:37Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1800 from MINHOYEOM/feat/subscribe-inline-cta",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43924915777"
+   },
+   {
+    "databaseId": 43920446161,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-16T17:38:11Z",
+    "updatedAt": "2026-11-16T17:44:40Z",
     "headBranch": "feat/subscribe-inline-cta",
     "displayTitle": "feat(subscribe): 본문 속 구독 칸·헤더 '무료 구독'·홈 구독 장치 복원 + migration 160",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43909255215"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43920446161"
    },
    {
-    "databaseId": 43909223467,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 43920434917,
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-16T16:35:43Z",
-    "updatedAt": "2026-11-16T16:35:47Z",
+    "createdAt": "2026-11-16T17:38:07Z",
+    "updatedAt": "2026-11-16T17:45:32Z",
     "headBranch": "feat/subscribe-inline-cta",
-    "displayTitle": "feat(subscribe): 본문 속 구독 칸·헤더 상시 '무료 구독'·홈 구독 장치 복원 + migration 160",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43909223467"
-   },
-   {
-    "databaseId": 43908515986,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T16:31:54Z",
-    "updatedAt": "2026-11-16T16:38:17Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1798 from MINHOYEOM/feat/linkedin-subscribe-link",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43908515986"
-   },
-   {
-    "databaseId": 43902637705,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-16T16:00:22Z",
-    "updatedAt": "2026-11-16T16:07:50Z",
-    "headBranch": "feat/linkedin-subscribe-link",
-    "displayTitle": "feat(linkedin): 게시 본문 끝 구독 단락 (utm=linkedin)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43902637705"
-   },
-   {
-    "databaseId": 43902608830,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T16:00:13Z",
-    "updatedAt": "2026-11-16T16:07:44Z",
-    "headBranch": "feat/linkedin-subscribe-link",
-    "displayTitle": "feat(linkedin): 게시 본문 끝 구독 단락 — 그 언어 홈 구독 칸으로(utm=linkedin)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43902608830"
+    "displayTitle": "fix(subscribe): i18n 린트 — 부품을 스캔 대상 web/partials/ 로 옮기고 홈에서 뺀 옛 키 정리",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43920434917"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 43926068983,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-16T18:10:41Z",
+    "updatedAt": "2026-11-16T18:10:48Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43926068983"
+   },
+   {
     "databaseId": 43909710806,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43886338950"
-   },
-   {
-    "databaseId": 43881790953,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-16T14:03:20Z",
-    "updatedAt": "2026-11-16T14:03:21Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43881790953"
    }
   ],
   "grm-findings-translate-apply.yml": [

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-15T23:01:54Z",
+ "generated_at": "2026-11-16T01:52:21Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -60,6 +60,17 @@
   ],
   "grm-delta-bridge.yml": [
    {
+    "databaseId": 43788668824,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-16T01:51:16Z",
+    "updatedAt": "2026-11-16T01:51:47Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788668824"
+   },
+   {
     "databaseId": 42570416355,
     "status": "completed",
     "conclusion": "success",
@@ -102,20 +113,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41374647610"
-   },
-   {
-    "databaseId": 41373833201,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-02T01:41:57Z",
-    "updatedAt": "2026-11-02T01:42:18Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41373833201"
    }
   ],
   "grm-web-publish.yml": [
+   {
+    "databaseId": 43788711900,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "push",
+    "createdAt": "2026-11-16T01:51:44Z",
+    "updatedAt": "2026-11-16T01:52:13Z",
+    "headBranch": "main",
+    "displayTitle": "bridge(web): 2026-11-16 라우틴 델타 커밋 (자동)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788711900"
+   },
    {
     "databaseId": 42568688495,
     "status": "completed",
@@ -159,20 +170,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Web Publish (assemble)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566688275"
-   },
-   {
-    "databaseId": 42563902178,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-09T04:49:35Z",
-    "updatedAt": "2026-11-09T04:50:33Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Web Publish (assemble)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563902178"
    }
   ],
   "grm-web-deploy.yml": [
+   {
+    "databaseId": 43788711937,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-16T01:51:44Z",
+    "updatedAt": "2026-11-16T01:51:47Z",
+    "headBranch": "main",
+    "displayTitle": "bridge(web): 2026-11-16 라우틴 델타 커밋 (자동)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788711937"
+   },
    {
     "databaseId": 43741324770,
     "status": "completed",
@@ -216,17 +227,6 @@
     "headBranch": "feat/inspection-notes-glossary-block",
     "displayTitle": "feat(web): 용어 페이지에 '실사 대비 노트' 링크 블록 (ko·en)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738925997"
-   },
-   {
-    "databaseId": 43738925461,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-15T17:03:25Z",
-    "updatedAt": "2026-11-15T17:09:27Z",
-    "headBranch": "feat/clause-text-pages",
-    "displayTitle": "fix(clauses): 영문 복수 표지 {s} · 뷰가 없으면 reg_refs 에 text_href 키를 넣지 않음 + 영…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43738925461"
    }
   ],
   "grm-scaffold-mirror.yml": [

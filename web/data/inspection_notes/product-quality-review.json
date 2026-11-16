@@ -1,0 +1,92 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "product-quality-review", "as_of": "2026-11-16",
+  "area_ko": "품질시스템", "area_en": "Quality system", "title_ko": "제품품질평가(연간 검토)", "title_en": "Product quality review (annual review)",
+  "glossary_ids": ["product-quality-review"], "aliases_ko": ["연간 제품 검토", "연간 제품 품질 검토", "PQR", "APR"], "aliases_en": ["product quality review", "annual product review", "PQR", "APR"],
+  "search_q_ko": "제품품질평가", "search_q_en": "annual product review",
+  "lead_ko": "FDA 는 연간 검토 보고서가 있는지보다, 검토가 모든 제품에 대해 제때 이루어지고 거기서 확인된 문제가 조치로 이어지는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether an annual review report exists than at whether the review is done on time for every product and whether the problems it identifies lead to action. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "제조한 의약품에 대해 연간 검토를 수행하지 않았다", "title_en": "Annual product reviews were not performed for the drug products made",
+      "quotes": [
+        { "finding_id": "finding-e1f2cb0eb32ee9be3c0a4a46", "raw_signal_id": "rawsig-77ce2b07f675c5f802083b93", "document_id": "d08b1fb8673c", "source": "FDA Warning Letter",
+          "firm": "Sklar Personal Care Inc.", "date": "2025-12-16",
+          "quote_ko": "귀사는 2022년 이후 제조한 OTC 의약품에 대해 연간 제품 품질 검토(APR)를 수행하지 않았다.",
+          "quote_en": "You have not performed an annual product review (APR) of your OTC drug products manufactured since 2022." },
+        { "finding_id": "finding-62b5ef108efec9d5972787f6", "raw_signal_id": "rawsig-845e36e304d8d1d211092a14", "document_id": "fda483-196144", "source": "FDA 483",
+          "firm": "LeeSar Inc", "date": "2026-11-05",
+          "quote_ko": "귀사는 05/30/2025 SOP 6.34 rev 00 \"Annual Product Review Procedure\"를 발행했으나, 2025년 역년 동안 귀사 시설에서 조제된 [redacted]개 의약품 중 16개에 대해 연간 제품 검토를 수행하지 않았다.",
+          "quote_en": "Your firm issued SOP 6.34 rev 00 Annual Product Review Procedure on 05/30/2025 but has not conducted annual product reviews for 16 of the [redacted] drug products compounded at your facility for calendar year 2025." }
+      ] },
+    { "title_ko": "연간 검토를 기한 안에 승인하지 않았다", "title_en": "Annual product reviews were not approved on time",
+      "quotes": [
+        { "finding_id": "finding-b47a515f1e5f6c441d3c2cd9", "raw_signal_id": "rawsig-6ff0a0eb58bfe327e96b1fa7", "document_id": "fda483-195071", "source": "FDA 483",
+          "firm": "Right Value Drug Stores LLC", "date": "2026-09-30",
+          "quote_ko": "2025년에 기한이 도래한 모든 APR 보고서가 절차서가 요구하는 날짜 이후에 승인되었다.",
+          "quote_en": "All APR reports due in 2025 were approved after the dates required by the procedure." },
+        { "finding_id": "finding-71a0af0840b9fb24ef211de1", "raw_signal_id": "rawsig-e88e78d181797e6cf9c20c60", "document_id": "fda483-195522", "source": "FDA 483",
+          "firm": "Fenwal International, Inc.", "date": "2026-10-30",
+          "quote_ko": "2023년 역년의 BPU, Alyx, Amicus 및 Intersol 제품에 대한 연간 제품 검토는 2024년 9월 12일(12 SEP 2024)에 서명 및 승인될 때까지 크게 지연되었다.",
+          "quote_en": "Annual product reviews for BPU, Alyx, Amicus, and Intersol products for the calendar year 2023 were significantly delayed until being signed and approved on 12 SEP 2024." }
+      ] },
+    { "title_ko": "연간 검토 절차를 수립하지 않았다", "title_en": "No procedure for annual product review was established",
+      "quotes": [
+        { "finding_id": "finding-00c738e3f9423993cb08dc6a", "raw_signal_id": "rawsig-5197563d3bdafa702e48506b", "document_id": "73051343c4a0", "source": "FDA Warning Letter",
+          "firm": "GC America, Inc.", "date": "2026-05-26",
+          "quote_ko": "또한 QU는 2018년 이전 실사 이후 의약품에 대한 연간 제품 품질 검토를 수행하지 않았다. 더욱이 이 요건에 대한 서면 절차도 없었다(21 CFR 211.180(e)).",
+          "quote_en": "Your QU also failed to perform annual product reviews of your drug products since our previous inspection in 2018. Furthermore, no written procedures for this requirement were available (21 CFR 211.180(e))." },
+        { "finding_id": "finding-2f463871cb95cee0832e8e5e", "raw_signal_id": "rawsig-6699c35c190d61a68d35a694", "document_id": "fda483-195346", "source": "FDA 483",
+          "firm": "Conroe Welding Supply, Inc", "date": "2026-10-23",
+          "quote_ko": "귀사는 자사 시설에서 충전하고 유통하는 의료용 가스에 대한 연간 제품 검토를 수행하지 못했고 연간 제품 검토 관리를 위한 SOP를 수립하지 못했다.",
+          "quote_en": "Your firm failed to conduct annual product reviews of medical gas being filled and distributed at your facility and failed to establish an SOP for annual product review management." }
+      ] },
+    { "title_ko": "연간 검토에 불만·조사·구성품 자료를 포함하지 않았다", "title_en": "The annual review did not include complaints, investigations or component data",
+      "quotes": [
+        { "finding_id": "finding-2d74b34bfc9db6f5f383c9f3", "raw_signal_id": "rawsig-72fa6693765358bd7c208d46", "document_id": "fda483-88793", "source": "FDA 483",
+          "firm": "Jacobus Pharmaceutical Company, Inc.", "date": "2024-01-17",
+          "quote_ko": "귀사의 품질 부서는 연간 제품 평가를 수행할 때 완제 의약품과 관련된 모든 불만과 조사를 검토하지 않았다.",
+          "quote_en": "Your quality unit failed to review all complaints and investigations related to finished drug products when conducting annual reviews." },
+        { "finding_id": "finding-71a0af0840b9fb24ef211de1", "raw_signal_id": "rawsig-e88e78d181797e6cf9c20c60", "document_id": "fda483-195522", "source": "FDA 483",
+          "firm": "Fenwal International, Inc.", "date": "2026-10-30",
+          "quote_ko": "예를 들어 APRs에는 결함률, 시험 요약 또는 공급업체 적격성평가 상태가 포함되지 않는다.",
+          "quote_en": "For example APRs do not include defect rates, testing summaries, or supplier qualification status." }
+      ] },
+    { "title_ko": "연간 검토에서 확인한 추세에 시정 및 예방조치를 개시하지 않았다", "title_en": "No corrective and preventive action was initiated for trends identified in the annual review",
+      "quotes": [
+        { "finding_id": "finding-ebe3aeb2774fafd23c51da8e", "raw_signal_id": "rawsig-c67dc79dbfe73d806d9227fb", "document_id": "fda483-195441", "source": "FDA 483",
+          "firm": "Protein Sciences Corporation", "date": "2026-10-26",
+          "quote_ko": "구체적으로, 귀사 자체 2024년 및 2025년 제품품질평가(PQRs)는 각 검토 기간의 중대/주요/유의한 일탈 중 “방법” 근본 원인 범주가 각각 약 41% 및 40%를 차지한다고 확인했다. 이 반복 추세가 두 [redacted] 검토에 공식 기록되었음에도 품질 부서는 이 문제를 체계적으로 해결할 시정 및 예방조치(CAPA)를 개시하지 않았다.",
+          "quote_en": "Specifically, Your firm’s own Product Quality Reviews (PQRs) for 2024 and 2025 identified that the root cause category of “Methods” accounted for approximately 41% and 40%, respectively, of critical/major/significant deviations in each review period. Despite this recurring trend being formally documented in two [redacted] reviews, the Quality Unit has not initiated a Corrective and Preventive Action (CAPA) to systemically address this issue." },
+        { "finding_id": "finding-3c8d756476e547e12445334c", "raw_signal_id": "rawsig-d4d951b2c39bd7ceb8f90ced", "document_id": "fda483-111163", "source": "FDA 483",
+          "firm": "Hospira Inc. A Pfizer Company", "date": "2021-04-21",
+          "quote_ko": "구체적으로, 다음 제품의 연간 제품 품질 평가에서 귀사는 경향을 확인했으나 이러한 실패를 해결하고 시정하기 위한 적절한 시정 및 예방 조치를 개시하지 않았다.",
+          "quote_en": "Specifically, In your Annual Product Reviews for the following products you identify trends but fail to initiate appropriate corrective and preventive actions to address and correct these failures." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.180(e)", "finding_id": "finding-00c738e3f9423993cb08dc6a", "firm": "GC America, Inc.", "date": "2026-05-26",
+      "quote_ko": "또한 QU는 2018년 이전 실사 이후 의약품에 대한 연간 제품 품질 검토를 수행하지 않았다. 더욱이 이 요건에 대한 서면 절차도 없었다",
+      "quote_en": "Your QU also failed to perform annual product reviews of your drug products since our previous inspection in 2018. Furthermore, no written procedures for this requirement were available",
+      "note_ko": "연간 검토를 수행하지 않았고 그 서면 절차도 없었던 점이 이 조항으로 지적됐습니다.", "note_en": "The firm was cited under this section for not performing annual product reviews and having no written procedure for them." },
+    { "key": "21 CFR 211.22 (d)", "finding_id": "finding-e1f2cb0eb32ee9be3c0a4a46", "firm": "Sklar Personal Care Inc.", "date": "2025-12-16",
+      "quote_ko": "귀사는 품질관리부서에 적용되는 적절한 문서화된 책임과 절차를 수립하지 않았고 그러한 문서화된 절차를 따르지 않았다",
+      "quote_en": "Your firm failed to establish adequate written responsibilities and procedures applicable to the quality control unit and to follow such written procedures",
+      "note_ko": "연간 검토를 수행하지 않은 점이 품질부서 감독 미흡의 예로 이 조항 아래 적혔습니다.", "note_en": "Not performing annual product reviews was listed under this section as an example of inadequate quality unit oversight." }
+  ],
+  "checks_ko": [
+    "제조하는 모든 의약품에 대해 해마다 연간 검토를 수행합니까?",
+    "연간 검토를 다루는 서면 절차가 있습니까?",
+    "연간 검토 보고서를 절차가 정한 기한 안에 승인합니까?",
+    "연간 검토에서 그 제품과 관련된 불만과 조사를 모두 검토합니까?",
+    "구성품의 결함률, 시험 요약, 공급업체 적격성평가 상태를 연간 검토에 포함합니까?",
+    "연간 검토에서 확인한 추세에 대해 시정 및 예방조치를 개시합니까?"
+  ],
+  "checks_en": [
+    "Do you perform an annual review every year for every drug product you make?",
+    "Is there a written procedure for the annual review?",
+    "Are annual review reports approved by the due dates set in your procedure?",
+    "Does the annual review cover all complaints and investigations related to the product?",
+    "Does the annual review include component defect rates, testing summaries and supplier qualification status?",
+    "Do you initiate corrective and preventive action for trends identified in the annual review?"
+  ],
+  "further_reading": [], "related": ["stability", "deviation-investigation", "capa", "quality-unit"]
+}

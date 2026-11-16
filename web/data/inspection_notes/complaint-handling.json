@@ -1,0 +1,95 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "complaint-handling", "as_of": "2026-11-16",
+  "area_ko": "품질시스템", "area_en": "Quality system", "title_ko": "불만 처리", "title_en": "Complaint handling",
+  "glossary_ids": ["complaint-handling", "product-complaint"],
+  "aliases_ko": ["제품 품질불만", "고객 불만"], "aliases_en": ["product complaint", "customer complaint"],
+  "search_q_ko": "불만", "search_q_en": "complaint",
+  "lead_ko": "FDA 는 불만을 접수했는지보다, 불만마다 원인과 영향 범위를 조사하고 그 내용을 기록으로 남겼는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether complaints were received than at whether each one was investigated for cause and scope and the work was recorded. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "불만 조사가 철저하지 않았다", "title_en": "Complaint investigations were not thorough",
+      "quotes": [
+        { "finding_id": "finding-30369ac5f9e094393bce210d", "raw_signal_id": "rawsig-f16e9e070b1dc4732af8fce7", "document_id": "a9cbe135c72a", "source": "FDA Warning Letter",
+          "firm": "Fresenius Medical Care AG & Co. KGaA", "date": "2026-09-01",
+          "quote_ko": "귀사는 제조하는 대용량 주사제(LVP) 백 의약품에 대한 고객 불만을 적절히 조사하지 않았다. 귀사의 조사는 철저하지 않았고 제품 품질에 대한 위험을 적절히 평가하지 않았다.",
+          "quote_en": "You failed to adequately investigate customer complaints for the large volume parenteral (LVP) bag drug products you manufacture. Your investigations were not thorough and did not appropriately evaluate the risk to product quality." },
+        { "finding_id": "finding-a3714fb71dbc5445fbbc704d", "raw_signal_id": "rawsig-2db987aa19d26095a07d9432", "document_id": "fda483-195304", "source": "FDA 483",
+          "firm": "Jiangsu Hansoh Pharmaceutical Group Co Ltd.", "date": "2026-10-22",
+          "quote_ko": "조사에 불만이나 결함에 기여했을 수 있는 제조 공정의 모든 가능 요인에 대한 철저한 평가가 포함되지 않는다.",
+          "quote_en": "Investigations do not include a thorough evaluation of all possible factors in the manufacturing process that could have contributed to the complaint or defect." }
+      ] },
+    { "title_ko": "조사를 다른 배치나 로트로 넓히지 않았다", "title_en": "The investigation was not extended to other batches or lots",
+      "quotes": [
+        { "finding_id": "finding-f3806f54f7554fb0808b73d5", "raw_signal_id": "rawsig-243b6fc9e61ebe22093d9044", "document_id": "e29881ba34c7", "source": "FDA Warning Letter",
+          "firm": "CareFusion 213, LLC", "date": "2026-05-05",
+          "quote_ko": "귀사는 (b)(4) 조각과 (b)(4) 누락의 가능성 높은 근본 원인이 제조 중 설비 진동이라고 밝혔으나, 동일한 설비에서 처리된 다른 배치로 조사를 확대하지 않았다.",
+          "quote_en": "You indicated that the probable root cause of (b)(4) pieces and missing (b)(4) was equipment vibrations during manufacturing, but you did not extend the investigation to other batches processed on the same equipment." },
+        { "finding_id": "finding-98ff9f02744d59df5c58902d", "raw_signal_id": "rawsig-e60fc6870d7b637aa566013b", "document_id": "5e8b57537626", "source": "FDA Warning Letter",
+          "firm": "Darmerica, LLC", "date": "2025-12-23",
+          "quote_ko": "구체적으로 귀사 품질부서(QU)는 제품 품질 불만 조사를 근본원인, 실패 또는 일탈과 관련되었을 가능성이 있는 다른 API 로트로 확대하지 않았다.",
+          "quote_en": "Specifically, your QU failed to extend product quality complaint investigations to other lots of APIs potentially associated with the root cause, failure, or deviation." }
+      ] },
+    { "title_ko": "불만 처리 절차가 적절하지 않았다", "title_en": "The complaint procedure was inadequate",
+      "quotes": [
+        { "finding_id": "finding-f11699934d247f5fab6484d9", "raw_signal_id": "rawsig-bc5ecffb11b10b20428e790e", "document_id": "413c2af721ec", "source": "FDA Warning Letter",
+          "firm": "Colgate-Palmolive/Tom's of Maine, Inc.", "date": "2024-11-19",
+          "quote_ko": "귀사의 불만 처리 절차는 모든 품질 관련 문제를 조사하지 않으므로 미흡하다. 귀사는 이상 반응(adverse event), 이물, 잘못된 제품과 관련된 불만만 조사한다.",
+          "quote_en": "Your complaint procedure is inadequate because not all quality related issues are investigated. You only investigate complaints related to adverse event, foreign matter, and incorrect product." },
+        { "finding_id": "finding-0880b9f515ed4c6594284337", "raw_signal_id": "rawsig-9357d5b93b162ae928b17fc2", "document_id": "c0f3b8ff757d", "source": "FDA Warning Letter",
+          "firm": "K.C. Pharmaceuticals, Inc.", "date": "2026-08-18",
+          "quote_ko": "예를 들어, 고객 불만 및 문의에 관한 귀사의 절차는 부적절하다. 중대성과 이상반응을 판단하는 귀사의 방식은 조사의 지연과 불완전으로 이어졌다.",
+          "quote_en": "For example, your procedure for customer complaints and inquiries is inadequate. Your approach to determining severity and adverse events resulted in delayed and incomplete investigations." }
+      ] },
+    { "title_ko": "불만 기록에 조사 내용을 남기지 않았다", "title_en": "Complaint records did not document the investigation",
+      "quotes": [
+        { "finding_id": "finding-db2c45d26742d6940db80c01", "raw_signal_id": "rawsig-c64fcb8f1d04077665fe12a5", "document_id": "fda483-193906", "source": "FDA 483",
+          "firm": "Gascó Industrial Corporation", "date": "2026-07-28",
+          "quote_ko": "실사관의 불만 검토에서 귀사는 제품명, 로트 번호, 근본 원인 분석, 결론 및 다른 로트 영향평가를 포함한 중요 정보가 부족한 불만 목록을 유지하는 것으로 확인되었다.",
+          "quote_en": "My review of the complaints found that your firm kept a list of the complaints that lacked critical information including product name, lot number, root cause analysis, conclusions, and assessment of impact to other lots." },
+        { "finding_id": "finding-2029e3f97b7766d1d340a07c", "raw_signal_id": "rawsig-5bdd4b13c50705f880425776", "document_id": "fda483-191428", "source": "FDA 483",
+          "firm": "Maiva Pharma Private Limited", "date": "2026-03-06",
+          "quote_ko": "조사 보고서 MC/006/25/006에는 입자 불만 관련 배치의 배치 생산 기록, 포장 기록, 환경 모니터링 자료 또는 육안검사 기록을 검토한 내용이 전혀 문서화되어 있지 않다.",
+          "quote_en": "The investigation report MC/006/25/006 does not document any review of the batch production records, packing records, environmental monitoring data, or visual inspection records for the batch related to the particle complaint." }
+      ] },
+    { "title_ko": "불만 경향을 평가한 기록이 없었다", "title_en": "There was no documented evaluation of complaint trends",
+      "quotes": [
+        { "finding_id": "finding-f11699934d247f5fab6484d9", "raw_signal_id": "rawsig-bc5ecffb11b10b20428e790e", "document_id": "413c2af721ec", "source": "FDA Warning Letter",
+          "firm": "Colgate-Palmolive/Tom's of Maine, Inc.", "date": "2024-11-19",
+          "quote_ko": "귀사는 경향이 확인되지 않았기 때문에 불만 조사가 필요하지 않았다고 밝혔으나, 각 불만에 특정된 품질 문제에 대해 경향이 없다고 판단한 문서화된 평가를 제공하지 않았다.",
+          "quote_en": "Although you state complaint investigations were not required because there was no trend identified, you did not provide a documented evaluation determining the lack of trend for the quality issue specific to each complaint." },
+        { "finding_id": "finding-307cc0f6e42ad3efded1beab", "raw_signal_id": "rawsig-f23b056480ffdb8146754e69", "document_id": "fda483-195269", "source": "FDA 483",
+          "firm": "CSL Behring GmbH", "date": "2026-10-20",
+          "quote_ko": "또한 2023년 12월, 2024년 1월 및 2024년 2월의 불만 자료 추세 분석 기록에는 이 검토에서 확인된 경보 한계 일탈을 다루는 평가가 기재되어 있지 않다.",
+          "quote_en": "Further, your records of trend analysis for complaint data in December 2023, January 2024, and February 2024 do not list an evaluation covering Alert Limit deviations which were identified during these reviews." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.198(a)", "finding_id": "finding-f11699934d247f5fab6484d9", "firm": "Colgate-Palmolive/Tom's of Maine, Inc.", "date": "2024-11-19",
+      "quote_ko": "귀사는 의약품에 관한 모든 서면 및 구두 불만의 처리를 기술하는 적절한 문서화된 절차를 수립하고 준수하지 않았다.",
+      "quote_en": "Your firm failed to establish and follow adequate written procedures describing the handling of all written and oral complaints regarding a drug product",
+      "note_ko": "절차가 일부 유형의 불만만 조사하도록 되어 있던 것이 이 조항으로 지적됐습니다.",
+      "note_en": "A procedure under which only some types of complaints were investigated was cited under this section." },
+    { "key": "21 CFR 211.192", "finding_id": "finding-30369ac5f9e094393bce210d", "firm": "Fresenius Medical Care AG & Co. KGaA", "date": "2026-09-01",
+      "quote_ko": "귀사는 배치 또는 그 구성 성분이 어떤 규격이든 충족하지 못한 설명되지 않는 불일치나 실패에 대해, 해당 배치가 이미 유통되었는지 여부와 관계없이 철저히 조사하지 않았다",
+      "quote_en": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed",
+      "note_ko": "고객 불만 조사가 철저하지 않았던 것이 이 조항으로 지적됐습니다.",
+      "note_en": "Customer complaint investigations that were not thorough were cited under this section." }
+  ],
+  "checks_ko": [
+    "불만 조사에서 불만에 기여했을 수 있는 제조 공정의 요인을 모두 평가하고, 제품 품질에 대한 위험을 평가합니까?",
+    "원인이 설비나 공정에 있다고 본 경우, 같은 설비에서 처리한 다른 배치나 관련될 수 있는 다른 로트로 조사를 넓힙니까?",
+    "불만 처리 절차가 일부 유형의 불만만 조사하도록 되어 있지 않습니까?",
+    "불만의 중대성을 판단하는 방식 때문에 조사가 늦어지거나 불완전해지지 않습니까?",
+    "불만 기록에 제품명, 로트 번호, 근본 원인 분석, 결론, 다른 로트 영향평가가 적혀 있고, 조사 보고서에 배치 기록을 검토한 내용이 남아 있습니까?",
+    "경향이 없다고 판단한 근거와 경보 한계를 벗어난 경우의 평가를 문서로 남깁니까?"
+  ],
+  "checks_en": [
+    "Do complaint investigations evaluate all manufacturing factors that could have contributed to the complaint, and the risk to product quality?",
+    "When the cause is attributed to equipment or process, is the investigation extended to other batches run on the same equipment and to other lots that may be associated?",
+    "Does the complaint procedure avoid limiting investigations to only some types of complaints?",
+    "Does the way complaint severity is determined avoid delayed or incomplete investigations?",
+    "Do complaint records include product name, lot number, root cause analysis, conclusions and impact on other lots, and does the investigation report document the review of batch records?",
+    "Are the basis for concluding there is no trend, and the evaluation of alert limit excursions, documented?"
+  ],
+  "further_reading": [], "related": ["deviation-investigation", "capa", "quality-unit", "product-quality-review"]
+}

@@ -1,0 +1,94 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "change-control", "as_of": "2026-11-15",
+  "area_ko": "품질시스템", "area_en": "Quality system", "title_ko": "변경관리", "title_en": "Change control",
+  "glossary_ids": ["change-control", "change-management"], "aliases_ko": ["변경 관리", "변경관리 프로세스"], "aliases_en": ["change control", "change management"],
+  "search_q_ko": "변경관리", "search_q_en": "change control",
+  "lead_ko": "FDA 는 변경관리 절차가 있는지보다, 실제 변경이 그 절차를 거쳐 평가되고 검토되고 기한 안에 끝났는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a change control procedure exists than at whether actual changes went through it and were assessed, reviewed and closed on time. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "변경관리를 개시하지 않았고 위험 평가도 하지 않았다", "title_en": "No change control was opened and no risk assessment was done",
+      "quotes": [
+        { "finding_id": "finding-bb01e183bf92bd6cb73063cd", "raw_signal_id": "rawsig-00d3796e6810b3d8ecac5775", "document_id": "2dfa0a931c9c", "source": "FDA Warning Letter",
+          "firm": "Kilitch Healthcare India Limited", "date": "2024-04-09",
+          "quote_ko": "고객이 의약품 등급 (b)(4)로의 전환을 요청하자, 귀사는 SOP KHIL/RB/QA/016/-R07 \"Change Control\"에 따른 변경관리를 개시하지 않고 공정 밸리데이션을 반복 진행했다. 또한 의약품 등급이 아닌 (b)(4)가 사용된 채 미국 시장에 나가 있던 제품에 대한 위험 평가도 수행하지 않았다.",
+          "quote_en": "When your customer requested a switch to pharmaceutical grade (b)(4) , you proceeded to repeat process validation without opening a change control per SOP KHIL/RB/QA/016/-R07, “Change Control.” You also failed to conduct a risk assessment of product that was in the U.S. market with non-pharmaceutical grade (b)(4) ." },
+        { "finding_id": "finding-c2ab8d6da0774ad4d8ec61cd", "raw_signal_id": "rawsig-3a8324bb3c5630921ad274c7", "document_id": "fda483-195320", "source": "FDA 483",
+          "firm": "Steriscience Specialties Private Limited", "date": "2026-10-22",
+          "quote_ko": "귀사는 승인된 작업자에게 개별 사용자 ID와 비밀번호를 부여할 때 변경 관리를 개시하지 않았고 기존 데이터에 대한 관련 위험 평가도 수행하지 않았다.",
+          "quote_en": "Your firm failed to open a Change Control and conduct any associated risk assessments to existing data when individual user IDs and passwords were assigned to approved operators." }
+      ] },
+    { "title_ko": "변경관리 없이 제조공정을 바꾸고 다시 밸리데이션하지 않았다", "title_en": "The manufacturing process was changed without change control and not revalidated",
+      "quotes": [
+        { "finding_id": "finding-fd609fd03948cb2ecdee0190", "raw_signal_id": "rawsig-74077157d34f0437ceda8abd", "document_id": "87beb6242ff0", "source": "FDA Warning Letter",
+          "firm": "Bentley Laboratories LLC", "date": "2026-09-29",
+          "quote_ko": "예를 들어 귀사는 (b)(4)의 처방을 rephase하기 위해 제조공정을 변경하면서 재밸리데이션을 하지 않았고 변경관리 시스템도 거치지 않았다.",
+          "quote_en": "For example, you changed the manufacturing process for (b)(4) to rephase the formulation without revalidation and outside of your change management system." },
+        { "finding_id": "finding-2d93361a3e33fce3b10f38b4", "raw_signal_id": "rawsig-14b4bf6270770688f8918bfa", "document_id": "f33dd20d4788", "source": "FDA Warning Letter",
+          "firm": "Aruba Aloe Balm N.V.", "date": "2024-05-28",
+          "quote_ko": "또한 (b)(4) 제형의 점도에 대한 민원에 대응하여, 귀사는 적절한 변경관리나 정당화 없이 두 가지 성분의 농도를 변경했으며, 변경된 공정을 밸리데이션하지 않은 것에 대한 근거도 없다.",
+          "quote_en": "In addition, in response to complaints regarding the viscosity of your (b)(4) formula, you changed the concentration of two ingredients without an adequate change control or justification for failing to validate this revised process." }
+      ] },
+    { "title_ko": "변경이 미칠 영향을 충분히 평가하지 않았다", "title_en": "The impact of the change was not sufficiently assessed",
+      "quotes": [
+        { "finding_id": "finding-74f52279341aaaf48d1dc86c", "raw_signal_id": "rawsig-7478cc6f805d81dd8ae69821", "document_id": "cf579c86b52a", "source": "FDA Warning Letter",
+          "firm": "Global Pharma Healthcare Private Limited", "date": "2023-11-14",
+          "quote_ko": "Artificial Tears 용기마개 시스템의 일부로 사용되는 내부 캡(plug)의 규격을 \"with prehole\" plug로 변경한 것의 영향이 평가되지 않았다.",
+          "quote_en": "The impact of the change to the specification for the inner cap (plug) used as part of your Artificial Tears container-closure system to a plug “with prehole” was not evaluated." },
+        { "finding_id": "finding-d920526522dd86dabd1afb42", "raw_signal_id": "rawsig-37fea3a72ea22a41cfedc269", "document_id": "fda483-195568", "source": "FDA 483",
+          "firm": "Baxalta Belgium Manufacturing S.A.", "date": "2026-10-27",
+          "quote_ko": "6-Dec-2017에 개시하여 21-Sep-2018에 종결한 변경관리 PR1257198.에는 Gammagard Liquid (GGL) 및 Hy Qvia 제조에 사용하는 중요 자재에 대한 평가가 충분히 포함되어 있지 않았다.",
+          "quote_en": "Change Control PR1257198. opened on 6-Dec-2017 and closed on 21-Sep-2018, did not include a sufficient assessment on a critical material, used for manufacturing of Gammagard Liquid (GGL) and Hy Qvia." }
+      ] },
+    { "title_ko": "품질부서가 변경관리를 감독하지 않았다", "title_en": "The quality unit did not oversee change control",
+      "quotes": [
+        { "finding_id": "finding-5e539073f0d1a22b879e7cd7", "raw_signal_id": "rawsig-618b92251205fc945623441a", "document_id": "7cd7e4d462fc", "source": "FDA Warning Letter",
+          "firm": "Sircle Laboratories, LLC", "date": "2021-10-19",
+          "quote_ko": "귀사의 QU는 귀사가 변경관리 절차를 따르도록 보장하지 않았다. 예를 들어, 2019년 3월의 직전 FDA 실사 이후 귀사는 변경관리 절차를 따르지 않고 소비자 불만 및 의약품 회수 절차를 변경했다.",
+          "quote_en": "Your QU failed to ensure your firm follows your change control procedure. For example, since the last FDA inspection in March 2019, your firm implemented changes to your consumer complaints and drug product recalls procedures without following your change control procedure." },
+        { "finding_id": "finding-1036e59ed898b312be1ff7c5", "raw_signal_id": "rawsig-b8a9f9db9294dd9c515cb860", "document_id": "fda483-193551", "source": "FDA 483",
+          "firm": "Hospira, Inc.", "date": "2026-07-10",
+          "quote_ko": "귀사에는 품질 위험 관리 보고서와 변경관리를 승인 전에 철저하게 수행하고 검토하도록 보장하는 적절한 품질 감독이 없다.",
+          "quote_en": "Your firm lacks adequate quality oversight to ensure Quality Risk Management Reports and change controls are thoroughly conducted and reviewed before approval." }
+      ] },
+    { "title_ko": "변경관리를 기한 안에 끝내지 않았다", "title_en": "Change controls were not completed on time",
+      "quotes": [
+        { "finding_id": "finding-4b0d7e01559bfe4e96a03a9e", "raw_signal_id": "rawsig-e9fced440a4e5add24e1f148", "document_id": "fda483-195317", "source": "FDA 483",
+          "firm": "Q-Med AB", "date": "2026-10-22",
+          "quote_ko": "변경 관리 시스템이 부적절하고 절차도 미준수하여 기한 경과 변경 및 부정확한 기록을 초래한다.",
+          "quote_en": "Your change control management system is not adequate and written procedures for change control are not followed, resulting in overdue changes and inaccurate records." },
+        { "finding_id": "finding-eb1252c62249eed3bff161de", "raw_signal_id": "rawsig-a8f104b3000497718b9bb73b", "document_id": "fda483-177580", "source": "FDA 483",
+          "firm": "Alkem Laboratories Limited", "date": "2024-04-09",
+          "quote_ko": "실사관은 아래 사례를 포함한 여러 변경관리가 목표 완료일을 넘겨 종결됐으며 연장 신청도 없었던 것을 관찰했다. 이는 SOP #CQA/0170 ‘TrackWise를 통한 변경관리 처리’에 위배된다.",
+          "quote_en": "We observed several change controls (including those listed below, not all-inclusive) being closed beyond their target completion dates and no extensions had been requested, which is contrary to SOP # CQA/0170 (Handling of Change Control Through TrackWise)." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.22", "finding_id": "finding-bb01e183bf92bd6cb73063cd", "firm": "Kilitch Healthcare India Limited", "date": "2024-04-09",
+      "quote_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인(identity), 함량(strength), 품질, 순도에 대해 정해진 규격을 충족하도록 보장할 책임을 이행하지 않았다",
+      "quote_en": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity",
+      "note_ko": "변경관리를 개시하지 않고 공정 밸리데이션을 반복한 일이 품질관리부서의 책임 불이행으로 지적됐습니다.",
+      "note_en": "Repeating process validation without opening a change control was cited as a failure of the quality control unit's responsibility." },
+    { "key": "21 CFR 211.100(a)", "finding_id": "finding-fd609fd03948cb2ecdee0190", "firm": "Bentley Laboratories LLC", "date": "2026-09-29",
+      "quote_ko": "귀사는 제조하는 의약품이 표방하거나 표시된 동일성, 함량, 품질, 순도를 갖도록 보장하기 위해 설계된 생산 및 공정 관리에 대한 적절한 문서화된 절차를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess",
+      "note_ko": "변경관리 시스템을 거치지 않고 제조공정을 바꾼 뒤 재밸리데이션하지 않은 일이 이 조항으로 지적됐습니다.",
+      "note_en": "Changing the manufacturing process outside the change management system and without revalidation was cited under this section." }
+  ],
+  "checks_ko": [
+    "원료 등급 전환이나 사용자 계정 부여 같은 변경에 변경관리를 개시하고 위험 평가를 합니까?",
+    "처방, 성분 농도, 제조공정을 바꿀 때 변경관리를 거치고 재밸리데이션을 합니까?",
+    "용기마개 규격이나 중요 자재를 바꿀 때 그 영향을 평가해 변경관리 기록에 남깁니까?",
+    "품질부서가 절차서 변경까지 변경관리 절차를 따르는지 확인합니까?",
+    "변경관리를 승인하기 전에 철저히 수행하고 검토하도록 품질부서가 감독합니까?",
+    "목표 완료일을 넘긴 변경관리를 절차대로 연장 신청하거나 종결합니까?"
+  ],
+  "checks_en": [
+    "Is a change control opened, with a risk assessment, for changes such as switching a material grade or assigning user accounts?",
+    "When a formulation, ingredient concentration or manufacturing process is changed, does it go through change control and revalidation?",
+    "When a container-closure specification or a critical material is changed, is the impact assessed and recorded in the change control?",
+    "Does the quality unit confirm that changes to procedures also follow the change control procedure?",
+    "Does the quality unit oversee that change controls are thoroughly conducted and reviewed before approval?",
+    "Are change controls past their target completion date formally extended or closed as the procedure requires?"
+  ],
+  "further_reading": [], "related": ["deviation-investigation", "capa", "written-procedures"]
+}

@@ -9,9 +9,22 @@ name: GRM API Intake (Daily)
 # cron 표기:
 # minute hour day(month) month day(week)
 #  17     18    *           *      *       → 매일 18:17 UTC
+#
+# [월요일 추가 크론 2026-11-16] 이 저장소의 예약 실행은 3~6.5시간 늦게 뜬다(10-31~11-15 실측: 18:17 UTC
+# 슬롯이 21:39~00:46 UTC 에 시작). 11-16 월요일 수집이 07:52 KST 에야 떠 편집팀이 handoff 를 못 찾았다.
+# 그래서 월요일(KST)만 자정 직후 슬롯을 더 건다 — 일요일 15~16시 UTC = 월요일 00~01시 KST.
+# 실측: 15:47 UTC 주간 슬롯(grm-fda-inspections-backfill)은 19:14~20:50 UTC(=04~06시 KST)에 떴다.
+#   · 15:00 UTC 전으로는 당기지 않는다 — 일요일(KST) 실행이 되어 월요일 handoff 가 아니다.
+#   · 여러 번 돌아도 안전하다: 07:00 KST 전 재실행은 handoff 를 갱신하고(편집팀은 07:20 부터 읽는다),
+#     07:00 뒤에는 그날 handoff 가 이미 있으면 다시 쓰지 않는다(grm_handoff.publish_day_handoff_frozen —
+#     DB handoff 동결과 같은 규칙). 실행끼리는 아래 concurrency 로 줄을 선다.
+#   · 평소 매일 슬롯(18:17)이 월요일에 늦게 와도 같은 규칙을 따른다.
 on:
   schedule:
     - cron: '17 18 * * *'
+    - cron: '7 15 * * 0'
+    - cron: '43 15 * * 0'
+    - cron: '19 16 * * 0'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -331,6 +344,11 @@ jobs:
           #   그림자: 판정은 노션 기준 그대로 두고 DB 기준이었다면 어땠을지(새 문서·보충·건너뜀, 소스별 보충 표본)를
           #   health JSON `store.dedup_shadow` 에 남긴다. 읽기만 한다.
           ENABLE_INTAKE_DEDUP_SHADOW: ${{ vars.ENABLE_INTAKE_DEDUP_SHADOW || 'false' }}
+          # [노션 끄기 준비] 그날 handoff·발행 스캐폴드의 정본. notion(기본) | db.
+          #   db 면 DB(intake_queue + raw_signals)로 만든 handoff 가 정본이다: 스캐폴드(brief_web_*.json)를
+          #   GRM_WEB_BRIEF_DIR 에 내고(→ grm-web-brief 아티팩트), health 의 handoff 성패도 그 결과로 정한다.
+          #   노션 handoff 페이지는 거울로 계속 만든다. Supabase 설정이 없으면 노션 길로 되돌아간다.
+          GRM_HANDOFF_SOURCE: ${{ vars.GRM_HANDOFF_SOURCE || 'notion' }}
           # §1-B(ENABLE_WEB_BRIEF_EMIT·GRM_WEB_BRIEF_DIR)는 job-level env 에 정의(upload 스텝과 공유).
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음

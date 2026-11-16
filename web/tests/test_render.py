@@ -1115,14 +1115,38 @@ class WebRenderStructureTest(unittest.TestCase):
             self.assertIn(f'id="{c["id"]}"', self.detail)
 
     def test_section_counts_derived(self):
-        # 글로벌 34 · 국내 1 · Recall 1 (입력에서 파생).
+        # 글로벌 34 · 국내 1 · 회수 1 (입력에서 파생). 'Recall' 묶음은 화면에서 '회수'(11-16 A안).
         self.assertIn('글로벌 <span class="n">34장</span>', self.detail)
         self.assertIn('국내 <span class="n">1장</span>', self.detail)
-        self.assertIn('Recall <span class="n">1장</span>', self.detail)
+        self.assertIn('회수 <span class="n">1장</span>', self.detail)
+        self.assertIn('id="sec-Recall"', self.detail)   # 앵커(딥링크)는 원래 값 그대로
 
     def test_group_label_subheaders(self):
-        self.assertIn('<div class="grp-h">💊 합성의약품</div>', self.detail)
-        self.assertIn('<div class="grp-h">▫️ 기타</div>', self.detail)
+        # [브리프 카드 A안 2026-11-16] 이모지는 떼고, 정보가 없는 '기타' 소제목은 쓰지 않는다.
+        self.assertIn('<div class="grp-h">합성의약품</div>', self.detail)
+        self.assertNotIn('<div class="grp-h">▫️ 기타</div>', self.detail)
+        self.assertNotIn('<div class="grp-h">기타</div>', self.detail)
+        for emoji in ("💊", "🧬", "▫️"):
+            self.assertNotIn(emoji, self.detail)
+
+    def test_card_head_is_one_text_line(self):
+        """[브리프 카드 A안 2026-11-16 · 대표 확정] 제목 위 글자 한 줄(기관 · 문서 · 제품군).
+        [유형 · 기관] 머리말·표지 상자·내부 표지(Signal·Evidence)는 독자에게 보이지 않는다."""
+        self.assertIn('<div class="kline"><span>', self.detail)
+        for gone in ('<span class="pre">', '<div class="badges">', 'Signal High', 'Signal Med',
+                     'Evidence A</span>', 'Evidence B</span>'):
+            self.assertNotIn(gone, self.detail)
+        self.assertNotIn("<span>기타</span>", self.detail)
+        cv = render._card_view({"agency": "FDA", "card_type": "FDA 483 실사 관찰",
+                                "modality": "▫️ 기타", "headline_target": "x"})
+        self.assertEqual(cv["kicker"], ["FDA", "483 실사 관찰"])
+        cv = render._card_view({"agency": "MFDS", "card_type": "GMP실사",
+                                "modality": "💊 합성의약품", "headline_target": "x"})
+        self.assertEqual(cv["kicker"], ["식약처", "GMP실사", "합성의약품"])
+        self.assertTrue(cv["is_domestic"])
+        cv = render._card_view({"agency": "Health Canada", "card_type": "Recall(HC)",
+                                "headline_target": "x"})
+        self.assertEqual(cv["kicker"], ["Health Canada", "회수"])
 
     def test_empty_prose_slots_omitted_for_real_fixture(self):
         # 6/22 는 모든 산문 슬롯이 빈 placeholder → 해당 블록/줄 미출력.
@@ -1180,8 +1204,13 @@ class WebRenderStructureTest(unittest.TestCase):
         self.assertIn('<span class="t">공식원본</span>', self.detail)
 
     def test_disclaimer_present(self):
-        self.assertIn('AI 자동 생성 안내', self.detail)
-        self.assertIn('verify against the original before acting', self.detail)
+        # [고지 정리 2026-11-16] 상단 배지·하단 세 단락 → 머리 한 칸 + 하단 한 줄(.ai-line).
+        self.assertIn('<span><a href="#ai-notice">요약·번역은 생성형 AI</a></span>', self.detail)
+        self.assertIn('<section class="ai-line" id="ai-notice"', self.detail)
+        self.assertIn('판단은 원문을 기준으로 하세요.', self.detail)
+        for gone in ('AI 자동 생성 안내', 'class="ai-badge"', '콘텐츠 생성 방식 및 유의사항',
+                     'Evidence <b class="mono">'):
+            self.assertNotIn(gone, self.detail)
 
     def test_merged_toggle_in_synthetic(self):
         h = (self.multi / "briefs/2026-06-15/index.html").read_text(encoding="utf-8")
@@ -8184,10 +8213,10 @@ class WebRenderHardeningTest(unittest.TestCase):
     def test_disclaimer_omitted_when_false(self):
         b = _minimal_brief("2026-06-01", ai_disclosure=False)
         h = self._render_detail(b)
-        self.assertNotIn("AI 자동 생성 안내", h)
+        self.assertNotIn('id="ai-notice"', h)
         # 대조: true 면 출력.
         h2 = self._render_detail(_minimal_brief("2026-06-02", ai_disclosure=True))
-        self.assertIn("AI 자동 생성 안내", h2)
+        self.assertIn('id="ai-notice"', h2)
 
     def test_evidence_basis_intake_raw_never_shown_to_visitors(self):
         # [D2 2026-09-11] card_scaffold 는 Evidence A 카드에 계약 토큰 "Intake raw" 를
@@ -9120,6 +9149,15 @@ class WebSeoMetaTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_brief_detail_header_marks_weekly_brief_current(self):
+        """[11-15 사용성 점검] 브리프 호별 화면에서 헤더 '주간 브리프'가 현재 위치로 켜져야 한다
+        (전엔 nav_active='detail' 이라 어느 탭도 켜지지 않았다)."""
+        import re as _re
+        for page in (self.detail, self.detail22):
+            tabs = _re.search(r'<nav id="navmenu">(.*?)</nav>', page, _re.S).group(1)
+            self.assertRegex(tabs, r'archive/index\.html" class="on">주간 브리프</a>')
+            self.assertNotIn('class="on">찾아보기</a>', tabs)
 
     def test_description_present_each_page(self):
         for h in (self.landing, self.archive, self.detail):
@@ -14081,7 +14119,9 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn("main:not(#_){padding-bottom:0;margin-bottom:72px}", base)
         self.assertIn("main:not(#_) > .wrap:last-child{padding-bottom:0}", base)
         self.assertIn("main:not(#_){margin-bottom:56px}", base)
-        self.assertIn("main:not(#_):has(> .toc-fab){margin-bottom:0}", base)
+        # 11-16: 브리프 예외를 걷고, 목차 단추 뒤에 놓인 .wrap.layout 의 아래 padding 만 직접 걷는다.
+        self.assertNotIn(":has(> .toc-fab){margin-bottom:0}", base)
+        self.assertIn("main:not(#_) > .wrap.layout{padding-bottom:0}", base)
         page = (self.single / "findings" / "examples" / "mhra" / "index.html")
         if page.exists():
             self.assertIn("margin-bottom:72px", page.read_text(encoding="utf-8"))
@@ -17895,7 +17935,8 @@ class WebEnBriefTest(unittest.TestCase):
             self.assertIn("Critical cleaning validation deficiency", html)
             self.assertIn("1 critical and 8 major deficiencies", html)
             self.assertIn("GMP non-compliance", html, "카드 종류 라벨이 한국어다")
-            self.assertIn("💊 Small molecule", html, "제형 라벨이 한국어다")
+            self.assertIn("<span>Small molecule</span>", html, "제형 라벨이 한국어다")
+            self.assertNotIn("💊", html)
             self.assertIn("Published", html, "표 라벨이 한국어다")
             for gone in ("세척 밸리데이션 중대결함", "중대결함 1건과", "GMP 비준수"):
                 self.assertNotIn(gone, html, f"영문 브리프에 한국어 잔존: {gone}")

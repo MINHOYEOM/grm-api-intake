@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.321` |
-| 최종 수정일 | 2026-11-15 |
+| 문서 버전 | `v1.322` |
+| 최종 수정일 | 2026-11-16 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -124,7 +124,7 @@ GRM은 **기술적으로는 프로덕션 운영 단계**, 조직·제품 측면�
 
 **① 수집 — Python 수집기.** 가벼운 순수 Python. 외부 의존성은 HTTP 클라이언트(`requests`)와 PDF 파서(`PyMuPDF`, 식약처 실태조사 PDF용)뿐. 공통 HTTP 로직(재시도·429 백오프·파싱)은 `grm_common.py`가 공유합니다.
 
-**② 실행·스케줄 — GitHub Actions.** `grm-intake.yml`(이름 `GRM API Intake (Daily)`)이 **매일 18:17 UTC(= 03:17 KST)** 자동 실행. 실행 말미에 health check를 판정해 실패는 GitHub Issue로, 경고는 누적 comment로 남깁니다. 비밀값은 GitHub Secrets에만 보관합니다.
+**② 실행·스케줄 — GitHub Actions.** `grm-intake.yml`(이름 `GRM API Intake (Daily)`)이 **매일 18:17 UTC(= 03:17 KST)** 자동 실행, 월요일(KST)만 자정 직후 슬롯 3개(일 15:07·15:43·16:19 UTC)를 더 건다(예약 실행이 3~6시간 늦게 떠서 — 월요일 handoff 를 07:00 KST 전에 만들기 위함). 월요일 07:00 KST 이후의 재실행은 그날 handoff 가 이미 있으면 다시 쓰지 않는다(`grm_handoff.publish_day_handoff_frozen`, DB handoff 와 같은 동결·같은 스위치 `GRM_QUEUE_HANDOFF_REFRESH`). 실행 말미에 health check를 판정해 실패는 GitHub Issue로, 경고는 누적 comment로 남깁니다. 비밀값은 GitHub Secrets에만 보관합니다.
 
 **③ 저장 — Notion `GRM API Intake` (staging).** 수집한 모든 항목이 1차로 쌓이는 임시 DB. 각 행에 분류 태그가 붙고, 본문에 원본 API 응답 JSON 전체를 보존합니다(재검증용). 트랙 B(Findings)는 여기에 더해 **Supabase**에도 적재됩니다(§4).
 
@@ -187,7 +187,7 @@ flowchart TD
 
 | # | 단계 | 실행 장치 | 트리거 | 사람 |
 |---|---|---|---|---|
-| ① | 매일 수집 + handoff v2 + 빈슬롯 스캐폴드 artifact | `grm-intake.yml` | cron 매일 03:17 KST | 없음 |
+| ① | 매일 수집 + handoff v2 + 빈슬롯 스캐폴드 artifact | `grm-intake.yml` | cron 매일 03:17 KST + 월 00:07·00:43·01:19 KST | 없음 |
 | ② | 월요일 카드 분석 → 슬롯 델타 + **심층분석 생성** → Notion 예치(자기검증) | 클라우드 브리프편집팀(company/editorial) · 백업 v16 Routine | 월 07:20·08:00·08:40·09:05 · 백업 09:30 KST | 없음 |
 | ③ | 델타를 git 이관(deep는 `verify_deep_analysis` 게이트 통과분만). 정본 길은 저장소 변수 `GRM_DELTA_SOURCE` — 기본 `notion`(노션 예치를 읽고, 편집팀 브랜치 `claude/company-{date}` 의 `delta.json` 은 비교만 해 차이표를 Actions 요약·아티팩트 `delta-compare` 로 남김) / `git`(교열 `copyedit.json` 완료·코드 검사 0·reject 0 인 브랜치 반납을 먼저 쓰고, 없으면 노션 예비). 같은 날 두 길이 다르면 먼저 기록된 쪽이 이긴다 | `grm-delta-bridge.yml` | cron 월 07:07~13:37 KST **30분 간격 14회**(PAT push) | 없음 |
 | ④ | 스캐폴드+델타 → 발행본 조립 → 캐노니컬 브랜치 `publish/brief-{date}` PR | `grm-web-publish.yml` | ③ 델타 커밋(PAT라 자동 트리거) | 없음 |
@@ -536,7 +536,7 @@ grm-api-intake/
 ├─ indexnow_submit.py              # [검색 노출 2026-11-10] IndexNow 제출 — 배포 직후 새/변경 URL 을 네이버·빙에 통지(키 상수=공개값, render 가 /{키}.txt 방출). 수동 전수는 grm-indexnow-full.yml. tests/test_indexnow_submit.py
 ├─ collect_mfds*.py                # 식약처 수집기(recall/admin/gmp_inspection/law/gmp_cert/safety_letter)
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
-├─ clause_text_collect.py         # [기준 원문 2026-11-15] 21 CFR 210·211(eCFR XML)·EU GMP Part I 1~9장+Annex 1·ICH Q7/Q9(R1)/Q10(PDF) 원문 → 조항 단위 `web/data/clauses/{cfr21,eu_gmp,ich}.json`(무절단·DB 아님) + `translation_queue.json`(국문 번역 대기). 수동 CLI·이용 조건은 `web/data/clauses/SOURCES.md`. ★`library_collect_*` 이름 금지(자료실 플러그인 자동 발견에 걸린다)
+├─ clause_text_collect.py         # [기준 원문 2026-11-15] 21 CFR 210·211(eCFR XML)·EU GMP Part I 1~9장+Annex 1·ICH Q7/Q9(R1)/Q10(PDF)·식약처 「의약품 제조 및 품질관리에 관한 규정」 조문+별표 1~18(국가법령정보센터 화면·첨부 PDF, 키 없이) 원문 → 조항 단위 `web/data/clauses/{cfr21,eu_gmp,ich,mfds_gmp}.json`(무절단·DB 아님) + `translation_queue.json`(국문 번역 대기). 수동 CLI·이용 조건은 `web/data/clauses/SOURCES.md`. ★`library_collect_*` 이름 금지(자료실 플러그인 자동 발견에 걸린다)
 ├─ collect_eu_gmp_ncr.py           # EU GMP NCR(EudraGMDP) 수집기 — News+Findings 이중편입
 ├─ eudragmdp_client.py             # EudraGMDP GMP 비준수 requests 클라이언트(세션·페이징·상세·PDF)
 ├─ collect_mhra_gmp_ncr.py         # MHRA GMP NCR 수집기 — EU NCR 영국판(News+Findings·아카이브 없음)

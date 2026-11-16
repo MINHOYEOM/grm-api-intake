@@ -88,19 +88,43 @@ class SplitClauses(unittest.TestCase):
         self.assertEqual(m.find_body_start(paras, "INTRODUCTION"), 3)
 
 
+class MfdsParse(unittest.TestCase):
+    def test_articles_strip_label_and_keep_paragraphs(self):
+        html = ('<p>[시행 2024. 12. 30.] [식품의약품안전처고시 제2024-87호, 2024. 12. 30., 일부개정]</p>'
+                '<div class="pgroup"><p class="x"><label for="a">제3조(유효기간 등)</label> ① 첫째 항.</p>'
+                '<p>② 둘째 &amp; 항.</p></div>')
+        r = m.parse_mfds_articles(html)
+        self.assertEqual(r["meta"]["effective"], "2024. 12. 30.")
+        a = r["articles"][0]
+        self.assertEqual((a["number"], a["title"]), ("제3조", "유효기간 등"))
+        self.assertEqual(a["text"], "① 첫째 항.\n\n② 둘째 & 항.")
+
+    def test_byl_numbering_items_and_hangul_wrap(self):
+        L = lambda t: m.Line(0, 0, 0, 0, 11, t)  # noqa: E731
+        lines = [L("[별표 9]"), L("컴퓨터화 시스템"), L("1. 원칙"), L("가. 이 별표는 모든 시스"),
+                 L("템을 대상으로 한다."), L("2. 일반사항"), L("2.1 위험관리"), L("위험관리는 적용되어야 한다."),
+                 L("1. 이것은 목록이다"), L("3.2 건너뛴 번호는 받지 않는다")]
+        r = m.split_kor_byl(lines)
+        self.assertEqual([c["number"] for c in r["clauses"]], ["1", "2", "2.1"])
+        self.assertEqual(r["clauses"][0]["text"], "가. 이 별표는 모든 시스템을 대상으로 한다.")
+        self.assertEqual(r["clauses"][2]["path"], ["2. 일반사항"])
+        self.assertIn("1. 이것은 목록이다", r["clauses"][2]["text"])
+        self.assertEqual(r["front_matter"], "[별표 9] 컴퓨터화 시스템")
+
+
 class CommittedData(unittest.TestCase):
     """커밋된 web/data/clauses/*.json 불변식 — 화면이 기대는 계약."""
 
     @classmethod
     def setUpClass(cls):
         cls.files = {}
-        for key in ("cfr21", "eu_gmp", "ich"):
+        for key in ("cfr21", "eu_gmp", "ich", "mfds_gmp"):
             p = DATA / f"{key}.json"
             if p.is_file():
                 cls.files[key] = json.loads(p.read_text(encoding="utf-8"))
 
     def test_schema_ids_and_hash(self):
-        self.assertEqual(set(self.files), {"cfr21", "eu_gmp", "ich"})
+        self.assertEqual(set(self.files), {"cfr21", "eu_gmp", "ich", "mfds_gmp"})
         seen = set()
         for key, obj in self.files.items():
             self.assertEqual(obj["schema"], m.SCHEMA)
@@ -131,10 +155,18 @@ class CommittedData(unittest.TestCase):
         self.assertTrue({"2.10", "2.3", "12.30", "20"} <= nums("ich", "q7"))
         self.assertTrue({"4.1", "4.6", "Annex I"} <= nums("ich", "q9"))
         self.assertTrue({"1.5.1", "3.2.2", "Annex 1"} <= nums("ich", "q10"))
+        # 식약처 규정: 조문 제1조~제5조 + 별표 1~18(2의2 포함) 전부.
+        self.assertTrue({"제1조", "제2조의2", "제4조", "제5조"} <= nums("mfds_gmp", "rule"))
+        docs = {d["key"] for d in self.files["mfds_gmp"]["docs"]}
+        self.assertEqual(docs, {"rule", "byl2-2"} | {f"byl{i}" for i in range(1, 19)})
+        self.assertTrue({"2.1", "2.3", "4.13"} <= nums("mfds_gmp", "byl9"))
+        self.assertTrue({"1.1", "5.8"} <= nums("mfds_gmp", "byl17"))
 
     def test_translation_queue_matches_text(self):
         q = json.loads((DATA / "translation_queue.json").read_text(encoding="utf-8"))
-        texts = {c["id"]: c for obj in self.files.values() for c in obj["clauses"] if c["text"]}
+        # 국문 원문(식약처)은 번역 대기열에 넣지 않는다.
+        texts = {c["id"]: c for obj in self.files.values() if obj["source"].get("lang") != "ko"
+                 for c in obj["clauses"] if c["text"]}
         self.assertEqual({r["id"] for r in q["items"]}, set(texts))
         for r in q["items"]:
             self.assertEqual(r["sha"], texts[r["id"]]["sha"])

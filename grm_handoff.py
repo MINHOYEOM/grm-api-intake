@@ -12,7 +12,7 @@ import json
 import os
 import time
 import urllib.parse
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Any, Iterable
 
 import requests
@@ -1228,6 +1228,49 @@ def notion_upsert_routine_handoff(token: str, db_id: str,
     return page_id, page_url
 
 
+# ── 발행일(월) handoff 동결 (2026-11-16) ─────────────────────────────────────────
+# 11-16 수집이 07:52 KST 에야 떠 편집팀이 handoff 를 못 찾았다. 그래서 월요일 수집을 여러 번(자정 직후
+# 추가 크론·PC dispatch) 돌리게 했는데, 그러면 **같은 날 재실행이 handoff 를 다시 쓰는 일**이 잦아진다.
+# 편집팀은 07:20 부터 handoff 를 읽고(데스크는 지문 `handoff_ref` 를 적는다) 09:30 까지 그 내용으로 일한다 —
+# 그 사이 페이지가 다시 쓰이면 기자·교열이 데스크와 다른 handoff 를 보고 보류된다.
+# 규칙: 발행일 07:00 KST 이후, 그날 handoff 페이지가 **이미 있으면**(OPEN·CONSUMED·STALE 무엇이든)
+# 다시 쓰지 않는다 — 앞선 STALE 봉인·reconcile·행 조회도 하지 않고 바로 끝낸다(이번 실행의 새 행은
+# ref 없는 New 로 남아 화요일 handoff 에 들어간다). 페이지가 아직 없으면 평소대로 만든다(늦게 온 첫 수집).
+# 07:00 전의 재실행은 종전대로 갱신한다(483 회수 뒤 재생성 `grm-fda-coverage-gate.yml` 이 이 길이다).
+# DB handoff 의 동결(`grm_queue.record_handoff`)과 같은 시각·같은 스위치다:
+# 07:00 뒤에 일부러 다시 만들 때만 저장소 변수 GRM_QUEUE_HANDOFF_REFRESH=true → 수집 재실행 → 변수 끄기.
+PUBLISH_DAY_FREEZE_HOUR_KST = 7
+HANDOFF_REFRESH_ENV = "GRM_QUEUE_HANDOFF_REFRESH"
+_KST = timezone(timedelta(hours=9))
+
+
+def publish_day_handoff_frozen(run_date: date, now: datetime | None = None) -> bool:
+    """이 실행이 발행일(월) handoff 동결 시각(07:00 KST)을 지났나 — 지났으면 기존 페이지를 다시 쓰지 않는다.
+
+    `now` 는 **쓰기 직전의 실제 시각**이다(실행 시작 시각이 아니다 — 06:50 에 시작해 07:10 에 쓰는 실행도 동결).
+    naive datetime 은 KST 로 본다. 스위치 GRM_QUEUE_HANDOFF_REFRESH=true 면 동결하지 않는다.
+    """
+    if run_date.weekday() != PUBLISH_WEEKDAY:
+        return False
+    if env_flag(HANDOFF_REFRESH_ENV):
+        return False
+    now = now or datetime.now(_KST)
+    now_k = now.replace(tzinfo=_KST) if now.tzinfo is None else now.astimezone(_KST)
+    days = (now_k.date() - run_date).days
+    if days == 1:
+        # 월요일 밤 늦게 시작해 자정을 넘겨 쓰는 실행 — 이미 발행이 끝난 호다.
+        return True
+    return days == 0 and now_k.hour >= PUBLISH_DAY_FREEZE_HOUR_KST
+
+
+def _handoff_rows_from_page(page: dict[str, Any]) -> int:
+    """handoff 페이지 Headline `Routine New-only handoff (N rows)` 의 N. 못 읽으면 0."""
+    import re as _re
+    headline = _plain_text(page.get("properties", {}).get(PROP_HEADLINE, {}).get("rich_text", []))
+    m = _re.search(r"\((\d+) rows\)", headline)
+    return int(m.group(1)) if m else 0
+
+
 def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          window_days: int,
                          generated_at: datetime,
@@ -1239,7 +1282,21 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          silent_sources: Iterable[str] = (),
                          sealed_dates: list[str] | None = None,
                          payload_out: list[dict[str, Any]] | None = None,
+                         freeze_now: datetime | None = None,
+                         frozen_out: list[str] | None = None,
                          ) -> tuple[int, str]:
+    # 발행일 동결(위 주석): 07:00 KST 이후 그날 handoff 페이지가 이미 있으면 아무것도 쓰지 않고 끝낸다.
+    # freeze_now 는 시험용(기본 = 지금 시각). frozen_out 에는 동결로 건너뛰었을 때 그 페이지 상태를 넣는다.
+    if publish_day_handoff_frozen(run_date, freeze_now):
+        frozen_page = notion_find_handoff_page(token, db_id, handoff_id_for(run_date))
+        if frozen_page:
+            frozen_status = _intake_page_snapshot(frozen_page)["status"] or "?"
+            log("INFO", f"발행일 handoff 동결 — {run_date} handoff 가 이미 있다(Status={frozen_status}). "
+                        f"07:00 KST 이후라 다시 쓰지 않고 끝낸다(새 행은 다음 handoff 로). "
+                        f"일부러 다시 만들려면 {HANDOFF_REFRESH_ENV}=true")
+            if frozen_out is not None:
+                frozen_out.append(frozen_status)
+            return _handoff_rows_from_page(frozen_page), frozen_page.get("url", "")
     # payload_out(선택): 만든 payload 를 여기에 append 한다 — 대기열 그림자(grm_queue)가 DB 로 만든
     # handoff 와 비교할 때 쓴다. 반환값·노션 쓰기는 그대로다(미지정이면 종전과 완전히 같다).
     # B1 조회/표시 분리: window_days(조회 lookback, 기본 30 — 미소비 New 누락 방지

@@ -1,0 +1,102 @@
+{
+  "schema": "grm-inspection-note/v1", "id": "quality-unit", "as_of": "2026-11-16",
+  "area_ko": "품질시스템", "area_en": "Quality system", "title_ko": "품질부서의 책임과 권한", "title_en": "Quality unit responsibilities and authority",
+  "glossary_ids": ["quality-unit", "quality-control-unit", "quality-assurance"],
+  "aliases_ko": ["품질관리부서", "품질 부서", "QU", "QCU"], "aliases_en": ["quality unit", "quality control unit", "QU", "QCU"],
+  "search_q_ko": "품질부서", "search_q_en": "quality unit",
+  "lead_ko": "FDA 는 품질부서가 조직도에 있는지보다, 품질부서가 기록 검토와 조사, 출하 판정, 위탁 업체 감독을 실제로 독립적으로 했는지를 봅니다. 아래는 경고서한과 FDA 483 에 적힌 지적입니다.",
+  "lead_en": "FDA looks less at whether a quality unit exists on the organization chart than at whether it actually and independently reviewed records, handled investigations, made release decisions and oversaw contractors. The findings below are quoted from warning letters and FDA 483s.",
+  "patterns": [
+    { "title_ko": "품질부서의 책임과 절차를 문서로 정하지 않았다", "title_en": "The quality unit's responsibilities and procedures were not established in writing",
+      "quotes": [
+        { "finding_id": "finding-735cc7df49996583f6662bb5", "raw_signal_id": "rawsig-8fdbd06ea79c246624082800", "document_id": "702264c05c8b", "source": "FDA Warning Letter",
+          "firm": "R3 Medical Companies", "date": "2026-08-25",
+          "quote_ko": "예를 들어, 실사 당시 품질부서의 책임을 기술하는 문서화된 절차가 수립되어 있지 않았으며",
+          "quote_en": "For example, at the time of the inspection, written procedures describing the responsibilities of the quality unit had not been established",
+          "trailing_ellipsis": true },
+        { "finding_id": "finding-2f463871cb95cee0832e8e5e", "raw_signal_id": "rawsig-6699c35c190d61a68d35a694", "document_id": "fda483-195346", "source": "FDA 483",
+          "firm": "Conroe Welding Supply, Inc", "date": "2026-10-23",
+          "quote_ko": "귀사는 품질 부서 인력의 역할, 책임, 절차를 정의하는 서면 절차를 수립하지 못했다.",
+          "quote_en": "Your firm failed to establish written procedures that define the roles, responsibilities, and procedures of quality unit personnel." }
+      ] },
+    { "title_ko": "시험과 출하 승인을 같은 사람이 맡아 독립적인 확인을 하지 않았다", "title_en": "Testing and release approval were done by the same person, with no independent check",
+      "quotes": [
+        { "finding_id": "finding-6ced231954c199cd65f808f7", "raw_signal_id": "rawsig-4aab8ddd74674893ea70c562", "document_id": "fda483-195326", "source": "FDA 483",
+          "firm": "SURETEC INNOVATIONS LLC", "date": "2026-10-23",
+          "quote_ko": "품질관리 관리자는 독립적 검토 없이 모든 시험실 시험을 수행하고 승인한다. 시험 및 배치 출하 승인을 동일인이 수행하며, 이는 품질관리 공정에서 업무 분리가 없음을 나타낸다.",
+          "quote_en": "The Quality Control Manager performs and approves all laboratory tests without independent review. The testing and batch release approval executed by the same individual, which represents a lack of segregation of duties in the quality control process." },
+        { "finding_id": "finding-2f463871cb95cee0832e8e5e", "raw_signal_id": "rawsig-6699c35c190d61a68d35a694", "document_id": "fda483-195346", "source": "FDA 483",
+          "firm": "Conroe Welding Supply, Inc", "date": "2026-10-23",
+          "quote_ko": "배치 기록서에서 충전자, 시험자, 제품 출하 승인자가 동일인인 것이 관찰되었으며, 이는 독립적 확인과 업무 분리의 부재를 보여준다.",
+          "quote_en": "It was observed on batch records that the filler, tester, and product release approver were the same person, demonstrating a lack of independent verification and segregation of duties",
+          "trailing_ellipsis": true }
+      ] },
+    { "title_ko": "품질부서가 생산 기록이 완전하고 오류가 없는지 확인하지 않았다", "title_en": "The quality unit did not make sure production records were complete and free of errors",
+      "quotes": [
+        { "finding_id": "finding-ce843a047cb3e23de87b0540", "raw_signal_id": "rawsig-df5bf47da2e63830425173a6", "document_id": "2bfc7f4cc17f", "source": "FDA Warning Letter",
+          "firm": "Zhejiang Gaorong Cosmetic Co., Ltd.", "date": "2026-10-20",
+          "quote_ko": "예를 들어, QU는 완전한 세부 내용을 갖춘 적절한 제조기록(batch-production records)을 보장하지 않았다.",
+          "quote_en": "For example, your QU failed to ensure appropriate batch-production records with complete details." },
+        { "finding_id": "finding-2717f2309d0467dcce02af9c", "raw_signal_id": "rawsig-0ada76b0fc650cb821fa4ede", "document_id": "fda483-195549", "source": "FDA 483",
+          "firm": "Andelyn Biosciences, Inc.", "date": "2026-10-30",
+          "quote_ko": "귀사의 품질 부서는 오류가 없도록 생산 기록을 적절히 검토하지 않는다.",
+          "quote_en": "Your quality unit does not review production records adequately to ensure there are no errors that have occurred." }
+      ] },
+    { "title_ko": "품질부서가 규격 외 결과를 철저히 조사하지 않았다", "title_en": "The quality unit did not thoroughly investigate out-of-specification results",
+      "quotes": [
+        { "finding_id": "finding-f74f5fbe53a232ede25eb55d", "raw_signal_id": "rawsig-c626c9b07650802c9c8d73f2", "document_id": "68fdf481ca5a", "source": "FDA Warning Letter",
+          "firm": "VeganicSKN Limited", "date": "2026-09-29",
+          "quote_ko": "조사가 진행 중이었음에도 귀사 품질부서(QU)는 검체를 재시험하여 적합 결과를 얻은 후 (b)(4)에 해당 배치를 출하했고, 이후 (b)(4)에 미국 시장으로 배치를 선적했다.",
+          "quote_en": "Despite the ongoing investigation, your quality unit (QU) released the batch on (b)(4) , and subsequently shipped the batch for the U.S. market on (b)(4) , after your firm retested the sample and obtained passing results." },
+        { "finding_id": "finding-a29495d7f2badc8465aae455", "raw_signal_id": "rawsig-7f11509f750dd625f058c337", "document_id": "fda483-195329", "source": "FDA 483",
+          "firm": "VitaCare Labs Inc.", "date": "2026-10-23",
+          "quote_ko": "조사를 상세히 검토한 결과 품질 부서가 이러한 높은 미생물 수의 잠재적 근본 원인을 철저히 평가하지 않은 것이 드러났다. 1단계에서 품질 부서는 “(위탁) 시험실의 모든 것이 올바르다”라며 시험실 오류를 배제했다.",
+          "quote_en": "A d tailed review of the investigation revealed that the Quality Unit did not thoroughly assess the potential root causes of these high microbial counts. In Phase 1, your quality unit ruled out laboratory errors, stating that “everything was correct from the (contract) lab”." }
+      ] },
+    { "title_ko": "위탁 업체에 대한 품질 감독을 하지 않거나 문서로 정하지 않았다", "title_en": "Quality oversight of contractors was not performed or not defined in writing",
+      "quotes": [
+        { "finding_id": "finding-3a1d1827ce0727ecbb00ff6e", "raw_signal_id": "rawsig-33dd51620acc3e30cbf96f87", "document_id": "eb1e680fec98", "source": "FDA Warning Letter",
+          "firm": "Safrel Pharmaceuticals LLC", "date": "2026-08-18",
+          "quote_ko": "실사 중 귀사는 포장업체를 포함한 공급업체와 위탁제조업체에 대해 QU 감독을 수행하지 않는다고 진술했다.",
+          "quote_en": "During the inspection, you stated that no QU oversight is performed for your suppliers and contract manufacturers, including packagers." },
+        { "finding_id": "finding-28042f2a0891d0ccfe0f360c", "raw_signal_id": "rawsig-4bb1aa91056bcd14e6ca28bb", "document_id": "fda483-195321", "source": "FDA 483",
+          "firm": "Biomylz Private Limited", "date": "2026-10-22",
+          "quote_ko": "또한 시험, 자료 완전성 및 cGMP 준수 관련 역할·책임·감독을 정하는 품질 협약이 없다.",
+          "quote_en": "In addition, no Quality Agreements have been established between your firm and the contracted laboratories to define roles, responsibilities, and oversight related to testing, data integrity, and compliance with cGMP requirements." }
+      ] }
+  ],
+  "clauses": [
+    { "key": "21 CFR 211.22(a)", "finding_id": "finding-ce843a047cb3e23de87b0540", "firm": "Zhejiang Gaorong Cosmetic Co., Ltd.", "date": "2026-10-20",
+      "quote_ko": "귀사는 모든 원료, 의약품 용기, 마개, 공정 중 물질, 포장자재, 표시자재 및 의약품을 승인 또는 거부할 책임과 권한을 갖춘 적절한 품질관리부서(quality control unit)를 수립하지 않았다",
+      "quote_en": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products",
+      "note_ko": "승인·거부의 책임과 권한을 갖춘 품질관리부서를 두지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Cited for not having a quality control unit with the responsibility and authority to approve or reject." },
+    { "key": "21 CFR 211.22(d)", "finding_id": "finding-3a1d1827ce0727ecbb00ff6e", "firm": "Safrel Pharmaceuticals LLC", "date": "2026-08-18",
+      "quote_ko": "귀사는 적절한 품질부서를 확립하지 않았고, 품질부서에 적용되는 책임과 절차가 문서화되어 있지 않으며 완전히 준수되지도 않았다",
+      "quote_en": "Your firm failed to establish an adequate quality unit and the responsibilities and procedures applicable to the quality unit are not in writing and fully followed",
+      "note_ko": "품질부서의 책임과 절차가 문서로 없고 지켜지지 않은 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Cited because the quality unit's responsibilities and procedures were not in writing and not followed." },
+    { "key": "21 CFR 211.192", "finding_id": "finding-f74f5fbe53a232ede25eb55d", "firm": "VeganicSKN Limited", "date": "2026-09-29",
+      "quote_ko": "귀사는 배치의 출하 여부와 관계없이, 설명되지 않은 불일치 또는 배치나 그 구성 원료가 규격을 충족하지 못한 경우를 철저히 조사하지 않았다",
+      "quote_en": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed",
+      "note_ko": "규격 외 결과의 조사가 끝나기 전에 품질부서가 배치를 출하한 점이 이 조항으로 지적됐습니다.",
+      "note_en": "Cited because the quality unit released a batch before the out-of-specification investigation was finished." }
+  ],
+  "checks_ko": [
+    "품질부서의 책임과 품질부서 인력의 역할을 정한 서면 절차가 있습니까?",
+    "시험한 사람과 배치 출하를 승인한 사람이 서로 다릅니까?",
+    "품질부서가 승인한 생산 기록에서 나중에 오류나 빠진 내용이 발견된 적이 있습니까?",
+    "규격 외 결과의 조사가 끝나기 전에 재시험 결과만으로 배치를 출하한 적이 있습니까?",
+    "시험실 오류를 배제할 때 위탁 시험실의 조사 보고서 같은 근거 문서를 확보합니까?",
+    "공급업체, 위탁 제조업체, 위탁 시험실에 대한 품질부서의 감독과 역할 분담을 품질 협약으로 정해 두었습니까?"
+  ],
+  "checks_en": [
+    "Are there written procedures that define the quality unit's responsibilities and the roles of its personnel?",
+    "Is the person who tests a batch different from the person who approves its release?",
+    "Have errors or missing details been found later in production records the quality unit had already approved?",
+    "Has a batch been released on a retest result before the out-of-specification investigation was finished?",
+    "When laboratory error is ruled out, do you obtain supporting documents such as the contract laboratory's investigation report?",
+    "Do quality agreements define the quality unit's oversight and the split of roles for suppliers, contract manufacturers and contract laboratories?"
+  ],
+  "further_reading": [], "related": ["batch-records", "deviation-investigation", "written-procedures", "capa"]
+}

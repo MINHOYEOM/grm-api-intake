@@ -4725,12 +4725,15 @@
   <url><loc>https://grm-solutions.com/findings/examples/pmda/</loc><lastmod>2026-11-10</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/examples/mhra/</loc><lastmod>2026-11-10</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/examples/mhra-data/</loc><lastmod>2026-11-10</lastmod></url>
-  <url><loc>https://grm-solutions.com/inspection-notes/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://grm-solutions.com/inspection-notes/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/aseptic-technique/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://grm-solutions.com/inspection-notes/audit-trail-csv/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/batch-records/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/calibration-maintenance/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/capa/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://grm-solutions.com/inspection-notes/change-control/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/cleanroom/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://grm-solutions.com/inspection-notes/complaint-handling/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/cross-contamination-cleaning/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/data-integrity/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/deviation-investigation/</loc><lastmod>2026-11-15</lastmod></url>
@@ -4740,9 +4743,12 @@
   <url><loc>https://grm-solutions.com/inspection-notes/method-validation/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/microbiological-testing/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/oos-investigation/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://grm-solutions.com/inspection-notes/product-quality-review/</loc><lastmod>2026-11-16</lastmod></url>
+  <url><loc>https://grm-solutions.com/inspection-notes/quality-unit/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/sampling/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/stability/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/sterilization/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://grm-solutions.com/inspection-notes/training/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/water-system/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/inspection-notes/written-procedures/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://grm-solutions.com/quiz/</loc></url>
@@ -9276,10 +9282,13 @@
   <url><loc>https://grm-solutions.com/en/guide/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/aseptic-technique/</loc></url>
+  <url><loc>https://grm-solutions.com/en/inspection-notes/audit-trail-csv/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/batch-records/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/calibration-maintenance/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/capa/</loc></url>
+  <url><loc>https://grm-solutions.com/en/inspection-notes/change-control/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/cleanroom/</loc></url>
+  <url><loc>https://grm-solutions.com/en/inspection-notes/complaint-handling/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/cross-contamination-cleaning/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/data-integrity/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/deviation-investigation/</loc></url>
@@ -9289,9 +9298,12 @@
   <url><loc>https://grm-solutions.com/en/inspection-notes/method-validation/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/microbiological-testing/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/oos-investigation/</loc></url>
+  <url><loc>https://grm-solutions.com/en/inspection-notes/product-quality-review/</loc></url>
+  <url><loc>https://grm-solutions.com/en/inspection-notes/quality-unit/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/sampling/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/stability/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/sterilization/</loc></url>
+  <url><loc>https://grm-solutions.com/en/inspection-notes/training/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/water-system/</loc></url>
   <url><loc>https://grm-solutions.com/en/inspection-notes/written-procedures/</loc></url>
   <url><loc>https://grm-solutions.com/en/library/</loc></url>

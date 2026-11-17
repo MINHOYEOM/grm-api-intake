@@ -104,5 +104,18 @@ class LedgerTest(unittest.TestCase):
                 bml.record_for(p)
 
 
+class DefaultPathTest(unittest.TestCase):
+    def test_default_path_and_dir_creation_idempotent(self):
+        self.assertEqual(bml.DEFAULT_LEDGER.parts[-3:], ("company", "metrics", "brief_ledger.jsonl"))
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            src = d / "b.json"
+            src.write_text(json.dumps(brief([card()])), encoding="utf-8")
+            led = d / "company" / "metrics" / "brief_ledger.jsonl"  # 없는 디렉터리
+            for _ in range(2):
+                bml.main([str(src), "--ledger", str(led)])
+            self.assertEqual(len(led.read_text(encoding="utf-8").splitlines()), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -4,9 +4,9 @@
 호마다 한 줄(JSONL)로 누적한다. 호 간 비교용 `--csv` 도 만든다. 지표 정의의 출처는
 2026-11-16 재측정 스크립트(brief_quality_remeasure_1116.py)이며 아래 정의를 그대로 옮겼다.
 
-사용:
+사용(발행 뒤 비서실이 손으로 한 번 실행, 자동 실행 없음):
   python brief_metrics_ledger.py web/data/briefs/brief_web_2026_11_16.json [...더 많은 호]
-      --ledger brief_metrics_ledger.jsonl [--csv brief_metrics_ledger.csv] [--print]
+      --ledger company/metrics/brief_ledger.jsonl(기본값) [--csv brief_metrics_ledger.csv] [--print]
 
 같은 run_date_kst 가 이미 있으면 그 줄을 덮어쓴다(멱등). 발행본·지시문은 읽기만 한다.
 카드 수에 비해 모집단이 작은 지표(소식·지침 카드 등)는 분모를 같이 남긴다.
@@ -21,6 +21,7 @@ import re
 import sys
 from pathlib import Path
 
+DEFAULT_LEDGER = Path(__file__).resolve().parent / "company" / "metrics" / "brief_ledger.jsonl"
 CARD_FIELDS = ["title_issue", "hook_line", "summary", "key_facts", "implication", "checks"]
 INFO_TYPES = ("규제 소식", "지침·안내서", "고시·개정법령")
 DATE8 = r"(?<!\d)(?:19|20)\d{6}(?!\d)"
@@ -230,7 +231,7 @@ def write_csv(path: Path, rows):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("briefs", nargs="+", type=Path, help="brief_web_*.json 발행본")
-    ap.add_argument("--ledger", type=Path, default=Path("brief_metrics_ledger.jsonl"))
+    ap.add_argument("--ledger", type=Path, default=DEFAULT_LEDGER)
     ap.add_argument("--csv", type=Path, default=None)
     ap.add_argument("--print", action="store_true", dest="show", help="기록 대신(또는 함께) 표로 출력")
     ap.add_argument("--no-write", action="store_true", help="파일에 쓰지 않는다")
@@ -240,8 +241,10 @@ def main(argv=None):
         rows = read_ledger(a.ledger)
         for r in recs:
             rows = upsert(rows, r)
+        a.ledger.parent.mkdir(parents=True, exist_ok=True)
         write_ledger(a.ledger, rows)
         if a.csv:
+            a.csv.parent.mkdir(parents=True, exist_ok=True)
             write_csv(a.csv, rows)
     if a.show or a.no_write:
         sys.stdout.reconfigure(encoding="utf-8")

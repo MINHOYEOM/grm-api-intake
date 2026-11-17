@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-16T22:36:49Z",
+ "generated_at": "2026-11-17T00:25:10Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 43985834340,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-17T00:13:10Z",
+    "updatedAt": "2026-11-17T00:24:58Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43985834340"
+   },
    {
     "databaseId": 43771691509,
     "status": "completed",
@@ -45,17 +56,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43330822634"
-   },
-   {
-    "databaseId": 43129764971,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-12T00:46:38Z",
-    "updatedAt": "2026-11-12T00:55:52Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43129764971"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -174,6 +174,50 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 43981935410,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-16T23:44:59Z",
+    "updatedAt": "2026-11-16T23:52:29Z",
+    "headBranch": "claude/glossary-weekly-202647",
+    "displayTitle": "glossary(weekly): 202647 용어 1개 — 수입경보",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43981935410"
+   },
+   {
+    "databaseId": 43981929177,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-16T23:44:56Z",
+    "updatedAt": "2026-11-16T23:52:23Z",
+    "headBranch": "claude/glossary-weekly-202647",
+    "displayTitle": "glossary(weekly): 202647 수입경보 영문 정의 단축 (카드 5줄 예산)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43981929177"
+   },
+   {
+    "databaseId": 43979590176,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-16T23:28:33Z",
+    "updatedAt": "2026-11-16T23:35:59Z",
+    "headBranch": "claude/glossary-weekly-202647",
+    "displayTitle": "glossary(weekly): 202647 용어 1개 — 수입경보",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43979590176"
+   },
+   {
+    "databaseId": 43979585288,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-16T23:28:31Z",
+    "updatedAt": "2026-11-16T23:35:14Z",
+    "headBranch": "claude/glossary-weekly-202647",
+    "displayTitle": "glossary(weekly): 202647 용어 1개 — 수입경보",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43979585288"
+   },
+   {
     "databaseId": 43970682275,
     "status": "completed",
     "conclusion": "success",
@@ -183,53 +227,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1788 from MINHOYEOM/claude/glossary-fig-daily-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43970682275"
-   },
-   {
-    "databaseId": 43938262266,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T19:20:12Z",
-    "updatedAt": "2026-11-16T19:27:32Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1802 from MINHOYEOM/feat/growth-inline-report",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43938262266"
-   },
-   {
-    "databaseId": 43933752368,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-16T18:54:34Z",
-    "updatedAt": "2026-11-16T19:01:35Z",
-    "headBranch": "feat/growth-inline-report",
-    "displayTitle": "feat(growth): 성장 일보에 본문 구독 칸 제출 — migration 161 funnel_inline_report",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43933752368"
-   },
-   {
-    "databaseId": 43933666562,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T18:54:04Z",
-    "updatedAt": "2026-11-16T19:00:43Z",
-    "headBranch": "feat/growth-inline-report",
-    "displayTitle": "feat(growth): 성장 일보에 본문 구독 칸(inline_*) 제출 — migration 161 funnel_inli…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43933666562"
-   },
-   {
-    "databaseId": 43931422360,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T18:41:11Z",
-    "updatedAt": "2026-11-16T18:48:29Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1801 from MINHOYEOM/feat/subscribe-more-surfaces",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43931422360"
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 43987438903,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-17T00:25:02Z",
+    "updatedAt": "2026-11-17T00:25:03Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43987438903"
+   },
    {
     "databaseId": 43772527700,
     "status": "completed",
@@ -273,17 +284,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43333329287"
-   },
-   {
-    "databaseId": 43130896237,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-12T00:55:55Z",
-    "updatedAt": "2026-11-12T00:56:05Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43130896237"
    }
   ],
   "grm-watchlist-notify.yml": [
@@ -460,11 +460,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 43967973899,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-16T22:13:41Z",
-    "updatedAt": "2026-11-16T22:13:44Z",
+    "updatedAt": "2026-11-17T00:09:20Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43967973899"
@@ -672,11 +672,6 @@
   {
    "run_id": 43330822634,
    "created_at": "2026-11-12T23:40:26Z",
-   "has_web_brief": true
-  },
-  {
-   "run_id": 43129764971,
-   "created_at": "2026-11-12T00:46:38Z",
    "has_web_brief": true
   }
  ]

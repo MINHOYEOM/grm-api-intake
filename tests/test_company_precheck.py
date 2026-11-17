@@ -72,6 +72,24 @@ class TermsTest(unittest.TestCase):
         self.assertTrue(expected)
         self.assertEqual(precheck.gate_lines(bad), [f"조립 검사 {e}" for e in expected])
 
+    def test_assembly_gates_after_injection_are_caught(self):
+        # 리허설 1120: 주입 검증은 통과했는데 발행본 관문(원문 확보 카드의 부재 단정)이 호 전체를 막았다.
+        import assemble_publish_brief as apb
+        body_type = sorted(apb._BODY_DETAIL_TYPES)[0]
+        claim = "관찰은 기록이 없어 실제로 했는지 확인되지 않았다."
+        self.assertTrue(apb._FALSE_ABSENCE_RE.search(claim))      # 전제: 조립 정규식이 이 문장을 잡는다
+        scaffold = {"brief": {"run_date_kst": "2026-11-16"},
+                    "cards": [{"id": "a", "card_type": "FDA 483 실사 관찰",
+                               "deterministic_detail": {"type": body_type}}]}
+        bad = {"cards": {"a": _card(implication=claim,
+                                    en=dict(_card()["en"], implication="Not verified."))}}
+        lines = precheck.assembly_lines(bad, scaffold)
+        self.assertTrue(any("'a'" in x and "부재를 주장" in x for x in lines), lines)
+        ok = {"cards": {"a": _card(implication="수행 기록이 남아 있지 않았다.",
+                                   en=dict(_card()["en"], implication="No record was kept."))}}
+        self.assertFalse([x for x in precheck.assembly_lines(ok, scaffold) if "부재를 주장" in x])
+        self.assertEqual(precheck.assembly_lines(bad, None), [])     # 스캐폴드 없으면 이 검사는 건너뛴다
+
     def test_gate_without_scaffold_skips_only_quote_alignment(self):
         card = _card(quotes_translation=["번역"])
         lines = precheck.gate_lines({"cards": {"a": card}})

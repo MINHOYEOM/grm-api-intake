@@ -41,7 +41,8 @@
 | `1114` | 11-14(금) | `2026-11-13` | `claude/company-rehearsal-1114` | `company/run/rehearsal-1114/` |
 | `1115` | 11-15(토) | `2026-11-13` | `claude/company-rehearsal-1115` | `company/run/rehearsal-1115/` |
 | `1118` | 11-17(화, 앞당김) | `2026-11-16` | `claude/company-rehearsal-1118` | `company/run/rehearsal-1118/` — 교열 보류: 코드 검사 exit 2(`key_facts` 5개 카드 6장). 기자 사전 점검에 개수 상한 추가 후 다음 회차 |
-| `1120` | 11-17(화, 앞당김) | `2026-11-16` | `claude/company-rehearsal-1120` | `company/run/rehearsal-1120/` |
+| `1120` | 11-17(화, 앞당김) | `2026-11-16` | `claude/company-rehearsal-1120` | `company/run/rehearsal-1120/` — 교열 보류: 발행본 관문(원문 확보 카드의 부재 단정 1장). 사전 점검이 조립 함수 전체를 돌리게 고친 뒤 다음 회차 |
+| `1120b`·`1120c` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120b`·`-1120c` | `company/run/rehearsal-1120b/`·`-1120c/` |
 
 (11-23 전환 전 `1118`·`1120` 은 재료 `2026-11-16` 이다. 리허설 폴더 이름이 날짜가 아니어도 사전 점검·병합은 `desk.json` 의 `handoff_ref.date` 로 handoff 를 찾는다.)
 

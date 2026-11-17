@@ -65,7 +65,7 @@
    mkdir -p _handoff _scaffold && git fetch origin claude/queue-handoff
    git show FETCH_HEAD:handoff_$D.json > _handoff/handoff_$D.json; git show FETCH_HEAD:brief_web_$U.json > _scaffold/brief_web_$U.json
    ```
-   `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` — **`조립 검사 …` 줄은 교열 코드 검사(`assemble_publish_brief`)가 호 전체를 막는 바로 그 오류다**(같은 함수 — `key_facts` 4개 이내·`checks` 2~3개·길이·마크업·영문 짝 등 조립 가드 전부. 리허설 1118 에서 `key_facts` 5개 카드 6장이 호 전체를 막았다). 조립 표현 검사와 같은 규칙으로
+   `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` — **`조립 검사 …` 줄은 교열 코드 검사(`assemble_publish_brief`)가 호 전체를 막는 바로 그 오류다**(같은 함수 — 슬롯 주입 검증과 그 뒤 발행본 관문까지: 원문을 확보한 카드에 "기록·원문이 없어 확인되지 않았다" 같은 부재 단정(리허설 1120)·가림 표기 `(b)(4)`·빈 슬롯, `key_facts` 4개 이내·`checks` 2~3개·길이·마크업·영문 짝 등 조립 가드 전부. 리허설 1118 에서 `key_facts` 5개 카드 6장이 호 전체를 막았다). 조립 표현 검사와 같은 규칙으로
    금지 표현, v16 [용어·표기] 표 왼쪽 표기, 약어 단독(`CAPA`·`OOS`·`COA` 는 그 카드에서 처음 한 번 `시정 및 예방조치(CAPA)`·`기준일탈(OOS)`·`시험성적서(COA)`),
    제목 이슈·`hook_line` 길이, **빈 필수 칸과 영문 짝**을 센다 — `title_issue`·`summary` 는 한국어·영문 모두 반드시 채운다. `key_facts` 도 채운다.
    다만 `지침·안내서`·`고시·개정법령`·`규제 소식` 카드에서 원문에 머리말 사실이 없으면 `[]`(v16 — 머리말을 붙여 요약을 다시 쓰지 않는다).

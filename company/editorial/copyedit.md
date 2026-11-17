@@ -22,7 +22,12 @@
 - v16: [Status 갱신 — 발행 후, 0단계 page_id 표 기준]
 
 ## 하는 일
-0. **샤드 합치기.** `python company/editorial/merge_parts.py company/run/{run_date_kst}` — `delta.A/B.json`·`deep.A/B.json` 을
+0. **샤드 합치기.** 합치기 **전에** 데스크가 읽은 handoff 를 받아 둔다 — 없으면 합치기가 카드 유형을 몰라 소식·지침·고시 카드의 빈 `key_facts` 를 영문 미완결로 잘못 센다(리허설 1118: 첫 합치기 exit 1, handoff 를 받은 뒤 exit 0):
+   ```
+   D=$(python -c "import json;print(json.load(open('company/run/{run_date_kst}/desk.json'))['handoff_ref']['date'])")
+   mkdir -p _handoff && git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _handoff/handoff_$D.json
+   ```
+   그다음 `python company/editorial/merge_parts.py company/run/{run_date_kst}` — `delta.A/B.json`·`deep.A/B.json` 을
    `delta.json`·`deep_delta.json` 으로 합친다(LLM 이 옮겨 적지 않는다). exit≠0 이면 그 메시지를 `copyedit.json` 에 적고 `보류`(**영문 슬롯 미완결도 여기서 걸린다** — 카드마다 `en` 의 제목 이슈·요약·핵심 사실과 `tldr_en` 이 있어야 하고, 한국어가 채운 시사점·점검은 `en` 도 채워야 합격 — 한국어가 비운 칸은 `en` 도 비어 있는 것이 맞다. 빠졌으면 기자에게 되돌리고, 09:20 까지 못 메우면 `보류`) — Notion 에 아무것도 쓰지 않는다.
    기자 샤드(가변 N개 + `T`)가 08:40 보강 워커분까지 끝났어야 한다. 미완 샤드가 있으면(`python company/editorial/shard_claim.py status company/run/{run_date_kst}` 로 확인)
    **09:20 까지 3분마다 다시 확인**하고, 그래도 아니면 `보류` — 09:30 백업이 마지막 안전망이다.

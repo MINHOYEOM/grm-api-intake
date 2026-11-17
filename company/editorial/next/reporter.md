@@ -93,9 +93,11 @@
 워커 이름이 `재작업` 으로 시작하면 이 절만 한다 — `copyedit.json` 이 아직 없으면 09:12 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 `재작업` 이 아니면 아무것도 쓰지 않고 종료한다.
 1. `rework.json` 이 이미 있으면(`진행`·`완료` 무엇이든) 종료한다 — 다른 워커가 맡았다. 없으면 `{"status":"진행","round":1,"worker":"<이름>"}` 을 먼저 커밋·push 해 맡는다(push 가 거절되고 남의 파일이 생겼으면 종료).
 2. `copyedit.json` 의 `rework.cards`(반려 카드 id)와 각 카드의 `fails` 만 본다. **적힌 슬롯만** 근거(`evidence`)대로 고친다 — 그 카드가 든 샤드 파일 `delta.{S}.json` 에서
-   (`desk.json` 의 `shards.delta` 로 찾는다). 반려되지 않은 카드·`delta.T.json`·심층 파일·다른 슬롯은 건드리지 않는다(코드가 대조한다 — 바뀌면 그 호는 `보류`).
+   (`desk.json` 의 `shards.delta` 로 찾는다). **`slot` 이 `deep.` 으로 시작하면** 그 카드가 든 심층 샤드 `deep.{S}.json`(`desk.json` 의 `shards.deep`)의
+   `items.<id>.deep_analysis` 그 칸만 고친다(리허설 1120d — 심층 반려도 재작업으로 되돌린다). 반려되지 않은 카드·`delta.T.json`·다른 슬롯은 건드리지 않는다(코드가 대조한다 — 바뀌면 그 호는 `보류`).
    한국어 슬롯의 뜻이 바뀌면 같은 카드 `en` 의 같은 슬롯도 맞춘다. 규칙을 지키는 문장이 안 나오는 `hook_line` 은 필드를 지운다. 지적에 동의하지 않아도 고친다(이의는 `rework.json` 의 `이의`).
-3. 고친 샤드마다 `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` 이 exit 0 인지 본다.
+3. 고친 샤드마다 `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` 이 exit 0 인지 본다
+   (심층 샤드는 `python company/editorial/precheck.py deep _handoff/handoff_$D.json company/run/{run_date_kst}/deep.{S}.json`).
 4. `rework.json` 을 `{"status":"완료","round":1,"worker":"…","fixed":[{"id":"<web_card_id>","shard":"B","changed":["summary","key_facts"]}],"unfixed":["<못 고친 카드 id>"]}` 로 고쳐
    고친 샤드 파일과 함께 커밋·push 한다. **재작업은 한 번뿐이다** — 다시 반려되면 그 호는 백업이 발행한다.
 

@@ -548,5 +548,51 @@ class DeepGate1120dTest(unittest.TestCase):
         self.assertIn("deep_gate_lines(shard, handoff)", inspect.getsource(precheck.main))
 
 
+class ReworkDeep1120dTest(unittest.TestCase):
+    """리허설 1120d: 반려 1장이 심층 칸 — 재작업이 심층도 고치고, 대조는 델타와 같은 함수로 심층을 본다."""
+
+    OLD = {"admin-1": {"deep_analysis": {"key_violations": [{"citation": "제30조제1항제9호"}]}},
+           "admin-2": {"deep_analysis": {"key_violations": [{"citation": "제5조"}]}}}
+
+    def _new(self, **change):
+        new = json.loads(json.dumps(self.OLD))
+        for cid, cit in change.items():
+            new[cid.replace("_", "-")]["deep_analysis"]["key_violations"][0]["citation"] = cit
+        return new
+
+    def test_rejected_deep_card_may_change(self):
+        problems, notes = precheck.rework_diff_deep(self.OLD, self._new(admin_1="제24조제5항제1호 및 제2호, 제30조제1항제9호"), {"admin-1"})
+        self.assertEqual(problems, [])
+        self.assertEqual(notes, ["심층: 고침 admin-1: deep_analysis"])
+
+    def test_other_deep_card_must_not_change(self):
+        problems, _ = precheck.rework_diff_deep(self.OLD, self._new(admin_2="제6조"), {"admin-1"})
+        self.assertEqual(problems, ["심층: 반려되지 않은 카드가 바뀌었다: admin-2 (deep_analysis)"])
+
+    def test_delta_only_rejection_is_fine(self):
+        # 반려 카드가 심층에 없어도(델타 칸 반려) 심층 대조는 문제 삼지 않는다.
+        self.assertEqual(precheck.rework_diff_deep(self.OLD, self._new(), {"fda483-9"}), ([], []))
+
+    def test_cli_with_deep(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            def w(name, obj):
+                p = Path(tmp, name); p.write_text(json.dumps(obj, ensure_ascii=False), encoding="utf-8"); return str(p)
+            delta = {"cards": {"admin-1": _card(), "admin-2": _card()}}
+            ce = {"rework": {"cards": ["admin-1"]}, "cards": [{"web_card_id": "admin-1", "verdict": "reject"}]}
+            args = ["rework-diff", w("d1.json", delta), w("d2.json", delta), w("ce.json", ce),
+                    "--deep-old", w("x1.json", self.OLD)]
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(precheck.main(args + ["--deep-new", w("x2.json", self._new(admin_1="새 인용"))]), 0)
+                self.assertEqual(precheck.main(args + ["--deep-new", w("x3.json", self._new(admin_2="바뀜"))]), 1)
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(precheck.main(args), 2)       # 짝 없이 하나만 주면 못 한다
+
+    def test_instructions_cover_deep_rework(self):
+        rep = (ROOT / "company" / "editorial" / "next" / "reporter.md").read_text(encoding="utf-8")
+        ce = (ROOT / "company" / "editorial" / "next" / "copyedit.md").read_text(encoding="utf-8")
+        self.assertIn("`slot` 이 `deep.` 으로 시작하면", rep)
+        self.assertIn("--deep-old _scaffold/deep_delta.r1.json", ce)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -53,15 +53,9 @@
 4. **`hook_line`(선택).** 483·경고서한·식약처·회수 카드의 카드 맨 위 한 줄을 `STYLE.md` §12 규칙(R1~R11, 공백 포함 한국어 40자 이내 · 영문 90자 이내)대로 쓴다. 한국어는 `cards.{id}.hook_line`, 영문은 `cards.{id}.en.hook_line`. **쓸 사실이 없거나 규칙을 지키는 문장이 안 나오면 필드를 만들지 않는다** — 비우면 박스가 숨겨지고 카드는 종전 모양 그대로다(억지로 채우지 않는다). 근거는 코드 `facts`·`quotes`·483 `observations`·WL `violations` 본문이다(`key_facts` 만으로 쓰지 않는다). 숫자는 근거 필드에 글자 그대로 있는 것만.
 5. 발행 전 자가 점검은 하지 않는다 — 교열이 따로 한다. 대신 v16 규칙을 쓰는 순간에 지킨다.
 6. **델타 샤드를 `완료`로 내기 전에 코드 점검을 돌려 0건으로 만든다**(심층 샤드·`T` 는 해당 없음):
-   먼저 그 주 handoff·스캐폴드 사본을 받아 둔다(한 번만 — 있으면 건너뛴다. 사전 점검이 **조립 코드 검사와 같은 함수**를 돌리는 데 쓴다):
-   ```
-   D=$(python -c "import json;print(json.load(open('company/run/{run_date_kst}/desk.json'))['handoff_ref']['date'])"); U=$(echo $D | tr - _)
-   mkdir -p _handoff _scaffold && git fetch origin claude/queue-handoff claude/scaffold-brief-web
-   git show origin/claude/queue-handoff:handoff_$D.json > _handoff/handoff_$D.json; git show origin/claude/scaffold-brief-web:brief_web_$U.json > _scaffold/brief_web_$U.json
-   ```
-   `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` — **`조립 검사 …` 줄은 교열 코드 검사(`assemble_publish_brief`)가 호 전체를 막는 바로 그 오류다**(같은 함수). 조립 표현 검사와 같은 규칙으로
+   `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` — 조립 표현 검사와 같은 규칙으로
    금지 표현, v16 [용어·표기] 표 왼쪽 표기, 약어 단독(`CAPA`·`OOS`·`COA` 는 그 카드에서 처음 한 번 `시정 및 예방조치(CAPA)`·`기준일탈(OOS)`·`시험성적서(COA)`),
-   제목 이슈·`hook_line` 길이, **`key_facts` 4개 이내·`checks` 2~3개(채울 때)** 등 조립 코드 가드 전부 — 한국어·영문 모두(리허설 1118 에서 `key_facts` 5개 카드 6장이 호 전체를 막았다), **빈 필수 칸과 영문 짝**을 센다 — `title_issue`·`summary`·`key_facts` 는 한국어·영문 모두 반드시 채운다
+   제목 이슈·`hook_line` 길이, **빈 필수 칸과 영문 짝**을 센다 — `title_issue`·`summary`·`key_facts` 는 한국어·영문 모두 반드시 채운다
    (원문이 얇은 소식 카드도 `key_facts` 를 비우지 않는다. 코드 `facts`·`prose_input` 에 있는 사실로 한 줄 이상 — 비워도 되는 칸은 `implication`·`checks`·`hook_line` 뿐이다.
    한 장이라도 비면 합치기가 호 전체를 거부한다 — 리허설 1114 에서 소식 카드 4장의 `key_facts` 가 `[]` 여서 그랬다). 걸린 줄이 있으면 그 카드의 그 슬롯만 고치고 다시 돌린다(exit 0 이 될 때까지).
    코드가 못 세는 표기도 같은 표를 따른다 — 시험 결과·시험실 조사를 말하는 `규격 이탈`·`규격 외`·`규격 부적합`은 `기준일탈(OOS)`.

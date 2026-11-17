@@ -22,12 +22,7 @@
 - v16: [Status 갱신 — 발행 후, 0단계 page_id 표 기준]
 
 ## 하는 일
-0. **샤드 합치기.** 합치기 **전에** 데스크가 읽은 handoff 를 받아 둔다 — 없으면 합치기가 카드 유형을 몰라 소식·지침·고시 카드의 빈 `key_facts` 를 영문 미완결로 잘못 센다(리허설 1118: 첫 합치기 exit 1, handoff 를 받은 뒤 exit 0):
-   ```
-   D=$(python -c "import json;print(json.load(open('company/run/{run_date_kst}/desk.json'))['handoff_ref']['date'])")
-   mkdir -p _handoff && git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _handoff/handoff_$D.json
-   ```
-   그다음 `python company/editorial/merge_parts.py company/run/{run_date_kst}` — `delta.A/B.json`·`deep.A/B.json` 을
+0. **샤드 합치기.** `python company/editorial/merge_parts.py company/run/{run_date_kst}` — `delta.A/B.json`·`deep.A/B.json` 을
    `delta.json`·`deep_delta.json` 으로 합친다(LLM 이 옮겨 적지 않는다). exit≠0 이면 그 메시지를 `copyedit.json` 에 적고 `보류`(**영문 슬롯 미완결도 여기서 걸린다** — 카드마다 `en` 의 제목 이슈·요약·핵심 사실과 `tldr_en` 이 있어야 하고, 한국어가 채운 시사점·점검은 `en` 도 채워야 합격 — 한국어가 비운 칸은 `en` 도 비어 있는 것이 맞다. 빠졌으면 기자에게 되돌리고, 09:20 까지 못 메우면 `보류`) — Notion 에 아무것도 쓰지 않는다.
    기자 샤드(가변 N개 + `T`)가 08:40 보강 워커분까지 끝났어야 한다. 미완 샤드가 있으면(`python company/editorial/shard_claim.py status company/run/{run_date_kst}` 로 확인)
    **09:20 까지 3분마다 다시 확인**하고, 그래도 아니면 `보류` — 09:30 백업이 마지막 안전망이다.
@@ -49,9 +44,6 @@
 2-1. **`hook_line` 점검(있는 카드만).** 한국어 `hook_line` 과 `en.hook_line` 각각 `STYLE.md` §12 로 O/X: ① 금칙어 없음(신호, 볼 만, 필요가, 가능성, 시사, 우려, 느낌표·물음표·이모지) ② 공백 포함 **한국어 40자 이내 · 영문 90자 이내**(영문에 40자를 적용하지 않는다) ③ **숫자 원문 대조** — 문장의 모든 숫자가 같은 카드의 코드 `facts`·483 `observations`·WL `violations` 본문에 글자 그대로 있어야 한다(세어서 만든 숫자·반올림 X) ④ 근거 없는 사실·원문보다 강한 단정 없음(진술은 "진술" 표기) ⑤ 사전 용어는 사전 표기, 영문 약어 없음 ⑥ 업체명·제목 반복 없음. 근거를 못 찾으면 X 로 적고(`item: "hook_line"`) 기자가 필드를 비우도록 되돌린다. `hook_line` 이 없는 카드는 점검 대상이 아니다(없는 것이 정상).
 3. **직접 고치지 않는다.** 판정만 한다. 기준표에 없는 취향 지적을 하지 않는다.
 3-1. **반려가 있으면 기자에게 한 번 되돌린다(재작업 1회 — 2026-11-14 대표 결정).** 조건: 코드 검사 exit 0 · reject 1~10장 · 이 호의 첫 판정(`copyedit.json` 이 아직 없었다).
-   **코드 검사가 카드 몇 장 때문에 실패한 때도 같다(리허설 1118 — 2026-11-17).** 실패 메시지(`LLM 슬롯 주입 검증 실패`)의 줄이 전부 `<카드 id>.<슬롯>` 꼴이고 그 카드가 1~10장이면
-   의미 점검을 하지 않고 그 카드들을 `rework.cards` 로, 줄마다 `fails` 에 `{"item": "코드 검사", "slot": "<슬롯>", "evidence": "<그 줄>"}` 로 적어 `재작업` 으로 되돌린다
-   (`cards` 에 그 카드들을 `verdict: "reject"` 로 싣는다). 2차(3-2)는 코드 검사를 다시 돌린 뒤 의미 점검을 **전 카드**에 한다(1차에 못 했으므로). 카드 id 가 없는 줄(`delta.tldr` 등)이 하나라도 있거나 10장을 넘으면 종전대로 `보류`.
    그러면 마감하지 않고 `copyedit.json` 을 `"status": "재작업"`, `"round": 1`, `"published": false`, `"rework": {"cards": ["<반려 카드 id>", …]}` 로 써서
    `delta.json`(판정한 그대로)과 함께 커밋·push 하고 끝낸다. Notion 에는 아무것도 쓰지 않는다. reject 가 10장을 넘거나 코드 검사가 실패면 되돌리지 않고 종전대로 `보류`.
 3-2. **다시 판정(2차).** 시작할 때 `copyedit.json` 이 이미 `재작업` 이면 이 실행은 2차다(`완료`·`보류`·`실패` 면 곧바로 종료).

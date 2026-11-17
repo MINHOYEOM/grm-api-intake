@@ -1,0 +1,476 @@
+{
+ "status": "재작업",
+ "round": 1,
+ "published": false,
+ "rehearsal": true,
+ "code_gate": {
+  "ran": true,
+  "exit": 0,
+  "message": "assemble_publish_brief.py exit 0 · 채택 86카드 · 심층 병합 59카드 · 심층 게이트 FAIL 1건(admin-2026007955, 병합 보류)"
+ },
+ "rework": {
+  "cards": [
+   "admin-2026007955"
+  ]
+ },
+ "cards": [
+  {
+   "web_card_id": "fda483-195377",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196245",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196251",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196252",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196253",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196254",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196255",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196257",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196258",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196259",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196260",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196261",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196262",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196264",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196270",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196272",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196273",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196274",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196275",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196279",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196280",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196282",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196283",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196284",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196285",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196286",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196289",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196290",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196291",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196292",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196297",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196299",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196300",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196301",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196302",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196303",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196711",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196712",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196713",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196714",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196715",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196833",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196834",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196842",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0f65bd3c5c70",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "7e7545ebb190",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "bfbb158a522f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007929",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007930",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007935",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007955",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "코드 검사",
+     "slot": "deep.key_violations",
+     "evidence": "key_violations[2].citation '｢의약품 등의 안전에 관한 규칙｣ 제30조제1항제9호' 가 원문(wl_body_full)에 그 글자 그대로 없음 — 원문은 '｢의약품 등의 안전에 관한 규칙｣ 제24조제5항제1호 및 제2호, 제30조제1항제9호' (D2-CITATION-UNGROUNDED, 심층 병합 보류). 원문 표기대로 인용"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007975",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008096",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008176",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008197",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrIf",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-5f3494bdb71f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-a458a7fc84b1",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-e1c88c0c401f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "949016d08856",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "dba4d011e02b",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "769b37244dce",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196287",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "00ae76e635bb",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "2026-23005",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82928",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82939",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "758874567fae",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008055",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008195",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008196",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyqbl",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrFI",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrUH",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73uE9xd4-",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "c3b4f61a28c7",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0073-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0074-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0075-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0077-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0080-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0085-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0104-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0105-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0107-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0108-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0110-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0113-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "b0fc253f04b7",
+   "verdict": "pass",
+   "fails": []
+  }
+ ],
+ "counts": {
+  "cards": 89,
+  "pass": 88,
+  "reject": 1,
+  "fails_total": 1
+ },
+ "method": "precheck terms/deep 0건 · 자체 점검(부재 단정·마크업·hook_line 길이·금칙어·숫자 원문 대조·implication 금칙·관찰N 머리말·짝·checks 개수·맺음 반복 최다 6자 9/49) 위반 0(가임 가능성·여러 차례는 오탐) · 심층 8자리 날짜 경고 2건은 조사번호 PC-20250201·20240601 로 날짜 아님 · 카드 전문 정독은 하지 않고 기계 점검+표본"
+}

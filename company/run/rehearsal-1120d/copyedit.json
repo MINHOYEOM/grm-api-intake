@@ -1,17 +1,12 @@
 {
- "status": "재작업",
- "round": 1,
+ "status": "완료",
+ "round": 2,
  "published": false,
  "rehearsal": true,
  "code_gate": {
   "ran": true,
   "exit": 0,
-  "message": "assemble_publish_brief.py exit 0 · 채택 86카드 · 심층 병합 59카드 · 심층 게이트 FAIL 1건(admin-2026007955, 병합 보류)"
- },
- "rework": {
-  "cards": [
-   "admin-2026007955"
-  ]
+  "message": "assemble_publish_brief.py exit 0 · 채택 86카드 · 심층 병합 60카드(게이트 보류 0) · rework-diff 통과(반려 카드만 변경) · merge_parts exit 0 · deep-source 60/60"
  },
  "cards": [
   {
@@ -266,14 +261,8 @@
   },
   {
    "web_card_id": "admin-2026007955",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "코드 검사",
-     "slot": "deep.key_violations",
-     "evidence": "key_violations[2].citation '｢의약품 등의 안전에 관한 규칙｣ 제30조제1항제9호' 가 원문(wl_body_full)에 그 글자 그대로 없음 — 원문은 '｢의약품 등의 안전에 관한 규칙｣ 제24조제5항제1호 및 제2호, 제30조제1항제9호' (D2-CITATION-UNGROUNDED, 심층 병합 보류). 원문 표기대로 인용"
-    }
-   ]
+   "verdict": "pass",
+   "fails": []
   },
   {
    "web_card_id": "admin-2026007975",
@@ -468,9 +457,10 @@
  ],
  "counts": {
   "cards": 89,
-  "pass": 88,
-  "reject": 1,
-  "fails_total": 1
+  "pass": 89,
+  "reject": 0,
+  "fails_total": 0
  },
- "method": "precheck terms/deep 0건 · 자체 점검(부재 단정·마크업·hook_line 길이·금칙어·숫자 원문 대조·implication 금칙·관찰N 머리말·짝·checks 개수·맺음 반복 최다 6자 9/49) 위반 0(가임 가능성·여러 차례는 오탐) · 심층 8자리 날짜 경고 2건은 조사번호 PC-20250201·20240601 로 날짜 아님 · 카드 전문 정독은 하지 않고 기계 점검+표본"
+ "method": "precheck terms/deep 0건 · 자체 점검(부재 단정·마크업·hook_line 길이·금칙어·숫자 원문 대조·implication 금칙·관찰N 머리말·짝·checks 개수·맺음 반복 최다 6자 9/49) 위반 0(가임 가능성·여러 차례는 오탐) · 심층 8자리 날짜 경고 2건은 조사번호 PC-20250201·20240601 로 날짜 아님 · 카드 전문 정독은 하지 않고 기계 점검+표본",
+ "rework_review": "admin-2026007955 deep.key_violations[2].citation 이 handoff body 의 위반 근거 문구와 글자 그대로 같음 · 부재 단정·용어 위반 없음 → pass. 나머지 88장은 1차 pass 승계."
 }

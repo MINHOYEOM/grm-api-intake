@@ -1,0 +1,1775 @@
+{
+ "schema_version": "grm-web-card/v1",
+ "brief": {
+  "run_date_kst": "2026-11-17",
+  "window": "2026-11-10 ~ 2026-11-17",
+  "publish_date": "2026-11-17",
+  "agencies": [
+   "FDA",
+   "ECA",
+   "MHRA",
+   "EMA",
+   "MFDS"
+  ],
+  "categories": [
+   "Other",
+   "Guidance"
+  ],
+  "tldr": [],
+  "coverage": {
+   "intake_total": 25,
+   "rendered": 24,
+   "evidence": {
+    "A": 3,
+    "B": 21,
+    "C": 0
+   }
+  },
+  "ai_disclosure": true
+ },
+ "cards": [
+  {
+   "id": "fda483-196305",
+   "render_order": 0,
+   "group": "글로벌",
+   "group_label": "🧬 바이오의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Genzyme Corporation",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196305"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Genzyme Corporation · FEI 1220423"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Biological Drug Substance/Product Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/09/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 6,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Release of drug substance with documented particle contamination.",
+      "detail": "Specifically, Your firm has released [redacted] and [redacted] _—drug substance lots with documented [redacted] particle contamination as detected in appearance testing. For example, your firm opened laboratory investigations QE-109224 and QE-106364 in November and December 2024 for OOS appearance results for [redacted] and [redacted] drug substance lots [redacted], and [redacted], during release and retain sample appearance testing. The particles were identified as|_ [redacted] _—‘ The [redacted] release specification for appearance is [redacted] Despite the OOS appearance results, your firm concluded that the [redacted] particulate/particles were ofno impact to the process or product as they are intrinsic to the manufacturing process and that subsequent manufacturing steps would remove the contamination. Your firm released the impacted lots despite confirming a manufacturing root cause of improperly set up [redacted] that shed the! [redacted] particles into the manufacturing process. Release of [redacted] —_ and [redacted] drug substance lots with appearance test results documenting [redacted] particle contamination was noted during the 2024 FDA inspection (6/12/2024-7/9/2024)."
+     },
+     {
+      "number": "2",
+      "deficiency": "Failure to adequately investigate significant deviations regarding bulk drug substance manufacture.",
+      "detail": "Specifically, The following inadequate investigations were noted during the inspection: Your firm does not always follow your firm’s [redacted] and deviation process (QU-GOP-0000518 “Deviation Process Management”) and ““QU-SOP-0074684-Good Documentation Practices”, when unexpected manufacturing events occur nor adequately investigate and remediate the issue(s) to prevent reoccurrence. For example, on 1March2026, during the) [redacted] SSS séprrocess in preparation for [redacted] _lot [redacted] bioreactor operations, manufacturing operators were unable to complete the! [redacted] step because the media would not [redacted] ass requiredper step QU-SOP-0080430 “ [redacted] Operation at [redacted] ”, step 6.4.52. The |()(4) devices require {)))) [redacted] WY) before they can be utilized for // [redacted] \") bioreactor operations for the [redacted] _drug substance. Instead ofinitiating a! [redacted] and deviation per QU- GOP-00005 18, the firm left the vernight and the next dayshift resumed operations the following day. Your firm did not investigate why thi \" [redacted] step could not be completed on 1March2026, Additionally, the operators who performed the/ [redacted] operations on 1March2026, did not contemporaneously sign for the [redacted] steps they had completed in the batch record, and instead the dayshift on 2 March2026 signed that they had completed the) [redacted] step for the (64). On 3/18/2026, I observed operators attempt to [redacted] / an/ [redacted] unit in preparation for the manufacture of [redacted] drug substance batch! [redacted] I observed that the operators were unable to complete the!” [redacted] step because the mediawould not [redacted] as required per step QU-SOP-0080430. A! [redacted] was called and deviation initiated. The root cause ofthe inability to [redacted] the [redacted] was due to the incorrect sequencing of! [redacted] removal from the! [redacted] unit (as described in QU-SOP-0080430) during |()(4) operations, a process that your firm updated per change control CC-013836 in 2026. Your firm does not adequately investigate when your cleaning verification program is not followed. For example, in January 2024, your firm documented failed cleaning verification testing for the [redacted] column C3112060 for bioburden (result >200 CFU/10 mL, P. glucanolyticus, action specification’ [redacted] mL). Per MABC-QU-SOP-0065841 “Cleaning Verification Procedure for Framingham Biologics and Biosurgery”, the column was to be [redacted] ‘ Instead, a [redacted] run of the column was conducted and P. glucanolyticus was again recovered at 2 CFU/10 mL (below action specification’ [redacted] mL). No additional remediation was performed and the column stored until use in March 2024, where) [redacted] lots were processed over the column. In September 2024, and October 2024, bioburden contamination ofthe associated [redacted] and [redacted] —_ [redacted] for lots [redacted] and [redacted] (P. glucanolyticus and other microorganisms) occurred as documented in QE-072568. While your firm rejected the directly impacted lots and conducted remediation activities for the [redacted] and column, your firm failed to adequately investigate and holistically assess prior cleaning verification activities to ensure they were completed per your cleaning verification program. e Since February 2024, your firm has opened 14 quality events (deviations and trend investigations) related to in- process control failures for the [redacted] manufacturing process for cell viability (specification [redacted] to include investigations opened in December 2025 and February 2026 (QE-1676923, QE-1686568, QE-1687770). Your firm has linked bioreactor performance to [redacted] drug substance quality per QU-OPE-23832498 “Evaluation of process attributes with™ for [redacted] ” (impact on [redacted], and [redacted]). Your firm has attributed the cell viability in-process failures to the age ofthe [redacted] bioreactor [redacted] and the age of the film [redacted]) utilized to manufacture the bioreactor! _(b [redacted] contain the antioxidant! [redacted], which can degrade after ()(4) irradiation and over time leading to [redacted] ofa cytotoxic degradant [redacted] into the process stream. Your firm halted [redacted] manufacture in [redacted] and conducted investigation QE-1676923 due to low cell viability oflot [redacted] Your firm resumed [redacted] manufacture in March 2026 with the interim control of controlling the age ofthe [redacted] bioreactor [redacted] and (6)4) utilized in [redacted] manufacture. Your interim control is inadequate in that it did not account for/evaluate other’ [redacted] items (e.g., cell culture media| [redacted] _—that also contain! [redacted] _which can potentially [redacted] into the [redacted] bioreactor posinga risk to the process."
+     },
+     {
+      "number": "3",
+      "deficiency": "Failure to adequately re-qualify critical drug substance manufacturing equipment after movement and re- installation.",
+      "detail": "Specifically, Your firm lacks adequate space to store the [redacted] and [redacted] (undergoing PPQ)| [redacted] purification equipment simultaneously in the Grade D suite2 [redacted] purification area. For example, due to the space limitation, the [redacted] drug substance [redacted] utilized for the [redacted] chromatography [redacted]) step is uninstalled and moved to an unclassified storage area when your firm manufactures Nexviazyme drug substance. Your firm moves the [redacted] the Grade D suite [redacted] area when [redacted] drug substance production is| [redacted] Your firm is to conduct a clean in place (CIP) and cleaning verification (considered cleaning performance qualification) ofthe [redacted] post installation. Your firm’s program for movement and relocation of critical CGMP equipment is inadequate for the following reasons: In August 2024, your firm moved the [redacted] into the suite \"“ [redacted] area and conducted a CIP ofthe system, however, failed to perform cleaning verification. The subsequent two [redacted] lots ( [redacted] and [redacted]) produced with [redacted] and the associated [redacted] column had action level bioburden excursions and had to be rejected (Paenibacillus glucanolyticus and other microorganisms). ¢ MABC-QU-SOP-0016987 “Product Changeover at [redacted] ” and the associated work order tracking process for movement ofthe [redacted] gives conflicting instructions on whether a post equipment move cleaning verification activity is required for GMP equipment. Additionally, as of4/3/2026, your firm has ™pieces of manufacturing equipment for the [redacted] drug substance and pieces of manufacturing equipment for the [redacted] drug substance (undergoing PPQ) that can be moved per MABC-QU-SOP-0016987, and it remains to be determined ifprior equipment movement activities omitted required re-qualification actions. Biologic drug substance manufacturer"
+     },
+     {
+      "number": "4",
+      "deficiency": "Failure to establish and follow adequate production control procedures.",
+      "detail": "Specifically, A. Manufacturing operators do not follow procedure MABC-QU-SOP-0084522 “ [redacted] ig during [redacted] operations. For example, on 3/20/2026, I observed operators [redacted] onto the [redacted] using a [redacted] in preparation of bioreactor operations for [redacted] lot [redacted] 3 [redacted] must be ()(4) onto the [redacted] and’ [redacted] units aseptically and correctly to ensure that the bioreactor system remains sterile and contamination free. Prior to each [redacted] event, operators are to clean the interior / [redacted]) and bracket components ofthe [redacted] with [redacted] and [redacted]. l observed that the manufacturing operators failed to clean the! [redacted] brackets prior to the [redacted] activities performed. B. QU-SOP-0084643 “Gowning procedure for entry into aseptic processing area at! [redacted] ”, is not followed by all employees. For example, on 27March2026, I observed the pre-use inspection of [redacted] shipping bags for the filling of [redacted] lot [redacted] Secondary sterile gowning is required for the [redacted] inspection and requires sterile sleeves and sterile gloves. Per QU-SOP-0084643, operators are to put on the sterile sleeves halfway, don sterile gloves, and then pull the sleeves all the way from the inside so as not to compromise the sterile gowning. The QA floor employee in the room, who was assisting thet) 4) inspection, was observed to not follow the required sequence and fully don the sterile sleeves using non-sterile gloves. C. MABC-QU-SOP-0065840 “Process Monitoring Procedure for Biologics Operations” is deficient as it does not outline timeframes for review and approval ofstatistical process data (continued process verification/CPV) conducted per MABC-QU-SOP-0065840. Additionally, statistical process review data for the [redacted] — and [redacted] drug substance manufacturing processes are not reviewed and approved in a timely manner. For example, the last [redacted] statistical process data review period was for [redacted] manufacturing operations that occurred from 9July2024- 30January2025. The associated report (QU-OPE-27863 14) evaluating the data from 9July2024- 30January2025, was not reviewed and approved until approximately five months later (27June2025). CAPA-691676 is open and pending regarding revision ofyour CPV program."
+     },
+     {
+      "number": "5",
+      "deficiency": "Drug substance manufacturing equipment is not cleaned and maintained appropriately.",
+      "detail": "Specifically, On 30March2026, I inspected your firm’s column packing area and noted the following deficiencies: ¢ Unknown white residue on the piping below the [redacted] _— [redacted] _— for the chromatography qualification [redacted] (equipment ID [redacted]). Your firm cleaned the residue on 30March2026 and observed the residue again on 31March2026, indicating a leak. ¢ Unknown brown residues/discoloration within [redacted] chromatography hoses SP06-3200001 and PO6-3200003 (column inlet and drain hoses). The hoses were in clean status and in clean storage."
+     },
+     {
+      "number": "6",
+      "deficiency": "Specifically, Failure to establish and follow adequate laboratory control mechanisms.",
+      "detail": "A. Your firm’s inventory tracking of critical laboratory materials is inadequate. On 25March2026, I reviewed the critical materials inventory log sheet for the [redacted] primary reference standard |()(4) which documented that the [redacted] vials were in freezer equipment ID# 70-QC-1046. ()(4) is the [redacted] primary reference standard utilized to qualify working reference standards utilized for drug substance release testing. The [redacted] vials were not located within freezer equipment ID# 70-QC-1046 and instead located in freezer equipment ID# 70-QC-1046FB-5376. The inventory log sheet for ()(4) was not updated when the material was moved and the associated log sheet procedure (QU-SOP-0067941 “QC Assay Controls, Standards and Critical Materials Inventory Management) is deficient in that it does not require material movements from different storage locations to be tracked and documented. Biologic drug substance manufacturer B. Your firm’s non-routine sample request procedure, QU-SOP-0033695 “Non-Routine Sample Request Procedure for Framingham Biologics”, is inadequate in that the procedure does not include established timeframe requirements for completion ofthe various elements of the NRSR process (i.e., NRSR label reconciliation, NRSR batch record exception documentation, NRSR closure, and NRSR filing). The NRSR process is to obtain samples from GMP manufacturing processes which fall outside ofpre-established sampling plans outlined in your firm’s LIMS system. Additionally, your firm’s review ofyour NRSR system during the inspection revealed instances of a batch record exception not being documented for taking an NRSR sample (NRSR# 25SR8015) and manufacturing not documenting how many NRSR sample labels were used and returned (NRSR # 25SR8119 and 25SR8120). Batch record exceptions and NRSR label sample reconciliation are required per QU-SOP-0033695."
+     }
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196305/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196880",
+   "render_order": 1,
+   "group": "글로벌",
+   "group_label": "🧬 바이오의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Baxalta US Inc.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196880"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Baxalta US Inc. · FEI 1000519965"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Plasma Derivative Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "09/18/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 2,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "An MDR report was not submitted within 30 days ofreceiving or otherwise becoming aware of information that reasonably suggests that a marketed device has malfunctioned and would be likely to cause or contribute to a death or serious injury if the malfunction were to recur.",
+      "detail": "Specifically, your firm has not reported apparent malfunctions for the device constituent part of your firm's combination drug and medical device product (Vonvendi). The combination product's primary mode of action relates to the biologic drug product (recombinant von Willebrand factor). The medical device constituent part (Mix2Vial) is used for reconstituting the lyophilized drug product. Medical Device Reports (MD Rs) were not submitted for the following complaints regarding \"Incomnlete Diluent Transfer:' (i.e., incomplete transfer of diluent via the device): product code (product code (product code; (product code (product code and (product code In addition, an MDR was not submitted for the following complaint regarding a \"Defective Device\": product code."
+     },
+     {
+      "number": "2",
+      "deficiency": "The batch production and control records are deficient in that they do not include the identity of major equipment and lines used.",
+      "detail": "Specifically, there was no identification of critical equipment throughout batch production records. For example, the batch production records for ADV AT [redacted], Drug Product Batch and its corresponding BAXJECT II [redacted], Finished Drug Product (FDP) Batch failed to include identification of: A. B. C. [redacted]"
+     }
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196880/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196306",
+   "render_order": 2,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Baxter Healthcare Corporation",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196306"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Baxter Healthcare Corporation · FEI 1416980"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Sterile Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/02/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 9,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+      "detail": "Specifically, A. Your firm has documented recurring leaking unit defects in finished sterile drug products since at least 2023. Since January 2023, approximately 72 In-Process Retention investigations have been opened due to leaking bags or burst bags due to scrap alert being reached or AQL testing failures. In addition, your firm initiates a scrap alert for leaking units only once™leaking units have been found during a production period, which is [redacted] of production. The limit of™units is based on historic process capabilities and was not determined based on criticality of the defect. In addition, you have received approximately 147 complaints related to leaking units since May 2023. B.Your firm has repeatedly failed to take corrective actions to improve detectability of defects from the visual inspection process, leading to defects being found post inspection and in the market. a. Your firm has had leaking media fill units recovered in approximately 21 out of [redacted] media fill runs performed since 2/7/2023. These units were initially deemed integral by your firm’s 100% inspection process and were often identified as leaking post incubation and exhibiting turbidity. Your firm did not evaluate the effectiveness of the visual inspection process asa part of the investigations into these media fill leaking units. b. Your firm received a verified complaint of cardboard particulate matter, which is extrinsic to your processes, in [redacted] lot [redacted] and determined that there was no impact to the batch and continued distribution. This particle was determined to be approximately 3.7mm at the longest dimension. c.Your firm analyzed retention samples as a part of a complaint investigation for particulate matter in [redacted] Lot! [redacted] _. The retain examination resulted in particulate matter being found and analyzed to be made of [redacted] exhibiting oxidative degradation. This particle was determined to be approximately 2.6mm at the longest dimension. C.Sterility testing failure investigations did not include thorough root cause analysis nor appropriate corrective and preventative actions to prevent recurrence. In November 2023, your firm recovered growth in product [redacted] lot [redacted] in an [redacted] jar and investigated under PR2790565. Your firm determined the root cause to be due to the jar being non-integral prior to incubation with only a [redacted] investigation performed and corrective actions were awareness training for the microbiologists and cleaning of the sterility incubator. No [redacted] investigation was performed to include an evaluation of aseptic control during manufacturing. Your firm rejected this lot of [redacted] Your firm recovered another sterility positive, investigated under PR3254160, in’ [redacted] log [redacted] on 7/24/2025. Your firm determined this root cause was the same as the 2023 sterility positive investigation, however, your firm determined that this should be classified as a “no test” and proceed with resampling and retesting. Your firm retested this product and reported a passing result for the sterility test and dispositioned the batch for release. The second investigation also contained only a [redacted] investigation. No additional confirmation environmental monitoring testing was performed for the second sterility failure to determine a probable source of the contamination. Corrective actions for this sterility failure include requiring a [redacted] verification ofjar integrity prior to incubation. D.Your firm implemented no corrective actions and identified no probable root causes for recovery of 1 CFU of Aspergillus fumigatus in an active viable air sample in the grade A space for [redacted] lot! [redacted] Additional environmental sampling and organism identification was not performed to determine a possible source of the organism. This batch was accepted for distribution based on this being an isolated event and all other results passing specification. E.Bacterial endotoxin testing failure investigations did not include thorough root cause analysis and critical evidence was not retained. In July 2025, your firm recovered an endotoxin failure in [redacted] batch [redacted] — with a mean endotoxin value of 5.5450 EU/mL, exceeding the limit of [redacted], investigated under PR3250036. [redacted] retest confirmed the failure with a mean result of 5.9349 EU/mL. However, the original sample unit/container was inadvertently discarded before investigational testing could be performed. The investigation states, \"laboratory error could not be definitively concluded in the [redacted] laboratory investigation in part because the original sample unit/container was not retained\" and \"the overall root cause investigation is inconclusive.\" Despite the inconclusive investigation, your firm classified this as \"No, Laboratory Analysis/System\" and released Sublot “of the same batch [redacted] for distribution while discarding Sublot [redacted] °\"out of an abundance of caution.\" Corrective action was limited to \"awareness training\" for the analyst. The investigation also noted out-of-alert solution bioburden results and a \"potential adverse trend detected for microbiological samples in the month of July,\" yet concluded manufacturing was \"in a state of control” without through investigation. F.Your firm failed to identify the root cause of| [redacted] contamination detected at sample site ™, entrance floor to the mixing tank room, inthe non- [redacted] facility on December 3, 2025 (NCR/SNCR_ PR#3360939). Although your firm separated the [redacted] and non- [redacted] manufacturing facilities in August 2024 to prevent cross-contamination, [redacted] monitoring of site\" in the non- [redacted] _— facility showed! [redacted] contamination while other monitoring locations tested negative. Your [redacted] laboratory investigation validated the initial OOS results and continued the nonconformance investigation. Your firm’s investigation did not identify a root cause; however, your firm implemented the use of dedicated [redacted] in the [redacted] building and is updating the laboratory investigation procedure despite the CAPA remaining open. G.Your firm failed to thoroughly investigate and identify the root cause for [redacted] contamination innon/ [redacted] facility. Sample sit [redacted] (hallway) in the non- facility tested positive during the week of August 17-24, 2025 (NCR/SNCR PR#3276947); however, the entrance door handle and the [redacted] lobby floor were negative for| _()(4) during that period. Your firm identified the root cause as construction workers [redacted] in for the morning shift, yet these workers neither entered the’ [redacted] buildings prior to [redacted] nor entered the hallway. Your firm’s corrective actions included registering construction workers only in [redacted] buildings and cleaning the exterior. Additionally, your firm’s personnel monitoring for the non- [redacted] building included only face shields and goggles of operators working inside production areas. H.Your firm failed to implement corrective and preventative actions (CAPA, PR#3257234) for not collecting [redacted] monitoring samples in non- _()(4) facility locations. Your firm initiated three nonconformance investigations (NCR/SNCR PR#s 3313070, 3357344, and 3369775) in July 2025, October 2025, and January 2026, and CAPAs opened in July 2025 having July/August 2026 expiration date. Your firm did not implement corrective and preventative actions; however, manufacturing continued those days, and [redacted] per batch/lot was tested before release. L.Your firm's laboratory investigations into out-of-specification results are inadequate. Examples include but are not limited to: a. PR 3389404 (Environmental Monitoring, Site All, 12/10/2025): An environmental sample exceeded () (4)of the limit when tested on 12/10/2025 per method 11-25-80-1686 (effective 5/16/2025). Your firm did not open the investigation until 1/30/2026 (51 days later) and canceled it on 2/10/2026, justifying cancellation by retroactively applying a method revision effective 1/26/2026 that changed the limit from [redacted] The sample was out of limit under the method in effect at the time of testing. b.PR 3009934 ( [redacted] RM lot [redacted] ~—,_: 5/13/2024): Raw material tested on [redacted] showed [redacted] ppm| [redacted] (limit! NUT [redacted] ppm). Investigation was not opened until 9/11/2024 (four months later) and closed 9/13/2024 (two days later). Electronic chromatography data from the original testing on 5/13/2024 was not reviewed until 3/24/2025 and 3/26/2025, more than six months after the investigation was closed. c.PR3291814 (Nicardipine batch [redacted] UV ID failure, 9/17/2025): Final sample UV ID result was OOL with a [redacted] difference for [redacted] between sample and standard. The investigation concluded \"no definitive cause could be determined during the investigation, but the most likely cause is instrument noise causing a false negative result.\" The investigation documented \"the instrument has shown, historically, to have noise that can occur at this [redacted] which causes false negative readings.\" Despite identifying a known instrument malfunction, your firm implemented no corrective action to repair or replace the instrument and it remains in use. The investigation concluded the batch would be released using™resample results to disposition."
+     },
+     {
+      "number": "2",
+      "deficiency": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization process.",
+      "detail": "Specifically, A)Your firm routinely recovers biological indicators (BI) with positive growth during [redacted] qualification. Your firm is performing spore log reduction (SLR) calculations on biological indicators that mask potential [redacted] issues. For example: a, [redacted] requalification QNC 24-42 on filling line [redacted] performed on 9/25/2024 was issued as a “no test” due to insufficient BI population recovery of ()(4), where the procedure requires at least [redacted] population. The qualification shows multiple BI locations with positive growth of all™replicates and many with™. replicates exhibiting growth. Even though this qualification resulted in a “no test”, the qualification would be easier to achieve due to the low BI population, however this was not evaluated by the firm and a requalification was performed using new BIs. b! [redacted] requalification QNC 24-55 on filling line [redacted] performed on 10/15/2024 as a follow up to the “no test” resulted in positive BI growth in 20 out of™locations with three locations exhibiting growth in 4 out of” replicate BI’s. Your firm performed SLR calculations on these locations and determined that 6-log reduction was achieved and passed this qualification with no issues noted. c [redacted] requalification QRD 24-23 on filling line [redacted] performed on 6/18/2024 resulted in positive BI growth in 18 out of™locations with multiple locations exhibiting growth in 3 out of” replicate BI’s. Your firm passed this qualification with no issues noted. d [redacted] requalification QRN24-42 on filling line [redacted] performed on 9/10/2024 resulted in positive BI growth in 11 out of™locations with one location exhibiting growth in 4 out of™replicate BI’s. Your firm passed this qualification with no issues noted. B)Your firm’s [redacted] validation BI locations are not based on data but only a theoretical risk associated with the location. Your firm did not utilize tools such as temperature mapping, humidity mapping, airflow pattern studies, or chemical sensors to determine worst-case locations for BI placement. In addition, these ‘| ()(4) like filling machines were designed in 1989 and include many hard to reach locations which likely present as occluded surfaces. C)Your firm does not trend critical interventions for routinely performed aseptic manipulations during production for use in media fill process simulations. For example, Your firm routinely opens [redacted] during media fills but during production up to [redacted] can be opened depending on the batch size. Clearing)()jams is routinely performed [redacted] during media fills, however, this practice is performed up to times during routine production. Fixing film tears occurs [redacted] during media fills but has occurred at least [redacted] during! [redacted] in actual production since the last inspection. D)Clearing o [redacted] jams is not always performed with a tool and [redacted] jams are routinely cleared by using the [redacted] gloves directly. Removal of [redacted] jams directly with [redacted] is likely to cause contact with secondary product contact surfaces as well as the port track that carries ports from the port ()(4) to the’ [redacted] E)Environmental monitoring of the grade A space in the [redacted] filling machines only includes [redacted], continuous non-viable particle probes and one continuous viable probe during production. Your firm does not sample any grade A surfaces, such as the [redacted], or the filling nozzle during batch sampling. F)Your firm has performed air flow studies on only one [redacted] fill machine in the last 10 years. Multiple turbulent zones over critical surfaces were reported in your firm’s evaluation of the airflow study report including the [redacted] area and around) forming and filling. Your firm has total! [redacted] filling machines in use."
+     },
+     {
+      "number": "3",
+      "deficiency": "The statistical quality control criteria fail to include appropriate acceptance levels and rejection levels.",
+      "detail": "Specifically, Multiple visual inspection methods have been implemented without adequately qualifying inspection sensitivity, defect detectability, or comparability between methods. For example, a) Your firm’s 100% visual inspection process only requires [redacted] of defects to be found during inspector qualification without adequate justification, this includes defects that could result in leaking units. In addition, several defects that can result in leaking units such as [redacted] and various port/closure defects, are not included in the challeng [redacted] ™.. Partially [redacted] and damaged [redacted] are also not represented defects during qualification. b) Particle defects included in the qualification ™are between)4)- per [redacted] chart (approximately [redacted] microns) for colored, white, or metallic particles. Fiber defects are approximately [redacted] long in the qualification Clear particles are approximately [redacted] per [redacted] chart (approximately [redacted] microns). These sizes are not based on inspection threshold studies and are gross particle defects which are readily discernable without additional lighting or inspection techniques. c) Your firm has only performed threshold studies to generate probability of detection curves and reject zones across the visual range of defects for your AQL visual inspection process which employes a [redacted] inspection [redacted] against a [redacted] background. Your firm’s 100% visual inspection process is a [redacted] inspection [redacted] against the same background. No equivalency or threshold study was performed for the 100% visual inspection process. d) Your firm’s 100% visual inspection process speed of [redacted] is based on machine fill speed requirements and not inspection capabilities at that speed. In addition, during qualifications your firm requires a false reject rate o [redacted] ” however, during routine production false reject rates of greater than [redacted] are routinely observed. These false rejects are then placed back onto the line with the good population after evaluation by a Supply Handler eam ee (Manufacturing personnel). e) Your firm’s qualification is comprised of [redacted] bag size and does not include’ [redacted] for the larger, [redacted] bags. Your firm’s risk assessment for developing a qualification determined that even though there is more solution in a [redacted] bag, the [redacted] bag is more difficult to inspect due to label obscuring area."
+     },
+     {
+      "number": "4",
+      "deficiency": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use.",
+      "detail": "Specifically, Your firm supplies HEPA air to the [redacted] filling equipment at the) [redacted] of the [redacted] through production completion. In an idle, non-production, state your firm does not protect or maintain the Grade A space from ingress of less than Grade A air quality. In addition, pressure differentials are monitored only during production and decontamination cycles."
+     },
+     {
+      "number": "5",
+      "deficiency": "Deviations from written production and process control procedures are not recorded.",
+      "detail": "Specifically, Your firm failed to initiate a deviation investigation when the manufacturing team lead found that a stock label was not placed inside a pouch prior to entering the fill room (Class C), as required by SOP “Preparation for filling, Document No. FILL-016.” During a customer complaint investigation (Complaint number: 5351394; NCR/SNCR PR#3069496) for particulate matter (PM) in [redacted] solution the team lead stated that labels may not be consistently brought into the fill rooms with a pouch. Cardboard from the film stock label was identified as the probable root cause of the PM."
+     },
+     {
+      "number": "6",
+      "deficiency": "Employees are not given training in the particular operations they perform as part of their function.",
+      "detail": "Specifically, Your firm failed to adequately train and qualify laboratory personnel adequately for monitoring absence of [redacted] in non- [redacted] manufacturing facilities. During qualification, the analysts were trained to [redacted], while the limit for [redacted] _. detection is*°ppb. Analysts were qualified if sample preparations exceeded () [redacted] ppb. Qualifying analysts at higher [redacted] concentrations does not ensure they can efficiently [redacted] the much lower concentrations required for environmental monitoring to prevent cross-contamination. Your firm did not conduct a study to determine the lowest concentration analysts can efficiently ()(4) for [redacted] Additionally, analysts were qualified for. [redacted] sampling using [redacted] and [redacted] surfaces."
+     },
+     {
+      "number": "7",
+      "deficiency": "Established specifications, standards, sampling plans, test procedures and laboratory control mechanisms are not followed and documented at the time of performance.",
+      "detail": "Specifically, a. Your laboratory analysts failed to follow the written procedures for microbiological testing of [redacted] samples. Per SOP “Microbiological /Pyrogen testing of the plant water system, Document No: RD-02-02-005”, the [redacted] must be placed on [redacted] 4) media plate by a! _— [redacted] to prevent [redacted] trapped between the [redacted] and [redacted] However, on March 25, 2026, many [redacted] sample [redacted] had [redacted] trapped, cut edges, and folded edges that did not contact the plates for the accurate enumeration of microbes. b. Your microbiology laboratory analyst failed to contemporaneously sign the endotoxin test record for [redacted] samples when the test was completed on March 31, 2026."
+     },
+     {
+      "number": "8",
+      "deficiency": "Written procedures are not established and followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+      "detail": "Specifically, Your firm failed to validate disinfection studies to clean and remove [redacted] drug residue ( [redacted] and [redacted]) from various surfaces in the non- __()(4) manufacturing facility. Your firm lacked a rationale for selecting only [redacted] surfaces for cleaning validation studies and did not evaluate hard-to-clean surfaces."
+     },
+     {
+      "number": "9",
+      "deficiency": "The control systems necessary to prevent contamination or mix-ups are deficient.",
+      "detail": "Specifically, Your firm routinely tests environmental monitoring samples beyond validated stability timeframes, potentially resulting in degraded samples, false negative results, and undetected cross-contamination. Your firm established sample stability per validation protocol PRO RD 02-02 (Evaluation of the Samples and Standards Beyond [redacted], approved 3/14/2003), which demonstrated environmental swab samples are stable for| [redacted] at room temperature and [redacted] when refrigerated or frozen. Your firm's procedure RD-02-01-020 (Swab Procedure for Absence of [redacted] Environmental Samples, Effective Date: 24-Jan-2026) states in Section 7.2.2.G: \"Samples are good fot [redacted] at room temperature [redacted] refrigerated or frozen.\" Despite this validated stability limit and procedural requirement, your firm tests samples weeks after collection. Examples include but are not limited to: a) Electronic Laboratory Notebook (ELN) experiment 20260317-133 documents Baxter environmental samples collected from 2/27/2026 through 3/17/2026 were stored at [redacted] and analyzed beginning 3/17/2026. The earliest samples (collected 2/27/2026) were tested| [redacted] hours) after collection, exceeding validated frozen stability by [redacted] _— days). b) ELN experiment 20260218-103 documents Baxter environmental samples collected from 2/11/2026 through 2/17/2026 were stored at [redacted] and analyzed beginning 2/18/2026. The earliest samples (collected 2/11/2026) were tested [redacted] hours) after collection, exceeding validated frozen stability by’ [redacted] days). c) ELN experiment 20260212-102 documents Baxter environmental samples collected from 2/4/2026 through 2/11/2026 were stored at [redacted] and analyzed beginning 2/12/2026. The earliest samples (collected 2/4/2026) were tested [redacted] hours) after collection, exceeding validated frozen stability by [redacted] days). Paranthaman SenthamaraiKannan Logan T Williams Pason Parantnaman Serthamarai Karrvan - Loa e A ot n02956056 xX Date Signed! 04.02.2028 16:06:86 xX Date Signed: 04-02-2026 16:10:47"
+     }
+    ],
+    "inspectors": [
+     "Robert J Ham",
+     "Supreet K Sran",
+     "Logan T Williams"
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196306/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196307",
+   "render_order": 3,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Spectrum Laboratory Products Inc.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196307"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Spectrum Laboratory Products Inc. · FEI 2020632"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "API Repacker and Relabeler · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "03/20/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 3,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Your quality unit failed to record, review, and approve all appropriate quality-related documents at the time activities are performed.",
+      "detail": "Specifically, During my inspection, I reviewed your Laboratory Cleaning Records (QAF877) for all available months in 2025 and 2026. These records are used to document laboratory cleaning activities as required by your SOP QC-W-8.22, Section 5.9, which states: \" [redacted] cleaning activities shall be documented in QAF877, Laboratory Cleaning Record and reviewed [redacted] by QC Leadership.\" I observed the following deficiencies: a) Missing Records: Laboratory Cleaning Records for January 2025 and February 2025 were not available for review. Your management stated they suspect these records were not completed. b) Incomplete Documentation: From March 2025 through March 2026, there were numerous instances where cells were marked \"N/A [initials] [date]\" without adequate explanation. Your management identified these entries as indicating a lack of evidence that cleaning activities occurred."
+     },
+     {
+      "number": "2",
+      "deficiency": "Your firm failed to properly maintain buildings, facilities, and equipment used in the manufacture of intermediates and APIs in a clean condition, and failed to establish adequate written procedures for cleaning equipment.",
+      "detail": "Specifically: a) Laboratory Hood Cleanliness: During my walk through on 3/17/2026 of your laboratory facilities, I observed analytical hoods where testing is performed to be in an unclean condition. The hoods exhibited corrosion, permanent staining, flaking paint, and accumulation of residue and dust. These hoods are used for reagent preparation and analytical testing of APIs and raw materials. The condition of these hoods presents a potential risk of contamination to materials and test results. b) Inadequate Cleaning Procedures: Your SOP QC-W-8.22, \"Analytical Laboratory Cleaning,\" does not specify approved cleaning agents or sanitizing agents for use in the laboratory. The selection of appropriate cleaning agents is left to individual chemist discretion. Your quality management stated that!{ [redacted] \" an [redacted] are primarily used to clean all chemicals, but this is not documented in your written procedures."
+     },
+     {
+      "number": "3",
+      "deficiency": "Your firm failed to adequately validate written procedures for cleaning and maintenance of equipment, and failed to monitor cleaning procedures at appropriate intervals after validation.",
+      "detail": "Specifically: a) Outdated Cleaning Validation: Your last cleaning validation for production areas was performed in 2001, representing a 25-year gap between validations. This validation may not be representative of the current operations, products, equipment, and cleaning procedures in your facility. b) Incomplete Current Validation: Your firm provided Document Control Number PJ24-005, titled \"Packing and Sampling Rooms Cleaning Validation Protocol,\" with an Effective Date of 10/14/2024. However, your firm was unable to provide the final validation report demonstrating the efficacy of the cleaning procedures, as the validation has not been completed. Analytical data has been collected, but the final report is still being drafted. c) Lack of Periodic Monitoring: There is no documented evidence that cleaning procedures have been monitored at appropriate intervals following the 2001 validation to ensure these procedures remain effective during routine production operations."
+     }
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196307/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196308",
+   "render_order": 4,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Nortec Quimica S.A.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196308"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Nortec Quimica S.A. · FEI 3007616930"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Active Pharmaceutical Ingredient Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "08/04/2023"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 1,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Your firm’s cleaning validation is not representative of current equipment usage.",
+      "detail": "Specifically, cleaning validation report NQPV432, approved 08/09/2019, updated cleanin ated 06/03/2022. for the group of equipment covered unde which includes: and was validated using as the worst case scenario active pharmaceutical ingredient (API). However, your firm failed to conduct another cleaning validation for the equipment that is grouped in fter The active pharmaceutical ingredient (API), O98 which is marketed for U.S.. is manufactured using cacipmentpocifed iil as bu nd; and The following lots ofthe active pharmaceutical in edient (APT), OI were manufactured after the worst case scenario API, O99) was discounted fo Prod 0 Manufacturing Date Expiration Date TITLE (Print or T;"
+     }
+    ],
+    "inspectors": [
+     "John A. Gonzalez",
+     "Demario L. Walls"
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196308/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196309",
+   "render_order": 5,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Antaria Pty Ltd.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196309"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Antaria Pty Ltd. · FEI 3025978151"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "API and Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "11/17/2023"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 9,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+      "detail": "Specifically, your Quality Unit (QU) failed to fulfill its duties and responsibilities. Examples include the following. a) There is a failure to conduct an appropriate investigation into out of specification (OOS) test results. There is a failure to assess and address all possible root causes for these failures and to identify and implement appropriate corrective actions to prevent their reoccurrence. b) There is a failure of the Quality Unit to review and approve all written procedures. For example, your firm uses some documents, including checklists, to supplement approved procedures that do not show review and approval (signature and date) by QA. Examples include POS206.142_R0 Lab Checklist— Data Processing for HPIC Issue Date: 27FEB2023 POS201.27_RO Issue Checklist for CoA Generation/ Checklist for CoA Review Issue Date: 14JAN2022 c) Annual product quality reviews are not being performed in a timely manner. As of the date of this inspection, your firm has not completed an annual product quality review for products manufactured in 2022. d) The annual product quality review for products manufactured in 2021 states: ’no records were found for products being tested for stability in 2021 for the Brisbane site”. The annual product quality review for products manufactured in 2020 states: “no records were found for products being tested for stability in 2020 for the Brisbane site”. These reports were approved by QA however, the lack of stability studies and stability data for 2020 and 2021 did not trigger an investigation. e) Your firm is not following SOP 206.113 Brisbane Stability Oven Operation, Rev 0 issued 088AUG2022 regarding owntoading and review of the temperature and humidity readings from the data loggers for the stability chambers. The data loggers reached their maximum storage capacity on October 6, 2022 and has not recorded temperature or humidity in the stability chambers since that date."
+     },
+     {
+      "number": "2",
+      "deficiency": "There is a failure to thoroughly review any unexplained discrepancy or the failure of a batch or any of its components to meet any of its specifications, whether or not the batch has been already distributed.",
+      "detail": "Specifically, your firm’s Quality Unit failed to adequately investigate Out of Specification (OOS) test results, determine root cause, and implement corrective actions. Approximately 146 OOS results were obtained in 2023 for I for all countries, including for assay and Loss on Ignition (LOI)..At the time of testing all lots of I have the potential to be shipped to US and all are labeled as USP grade. There is no documentation of root cause or any specific information regarding investigations to justify attributing the failure to such items as not following SOP, issue with sample amount or sample unity, and/or technician error. Many OOS investigations are simply a re-testing of the product by a different analyst. There is limited to no documentation of the preparation of the initial samples and standards or of the re-tested sample nor is there documented justification for invalidating the initial result except to state the product passed when tested by a different analyst. Sometimes the re-testing is. performed by a third analyst as the initial and re-test results are both OOS. Examples of OOS investigations in 2023 that were not adequately investigated for product shipped to the US include the following: + Lot (BAY 00s 125B) — failed MM ssay atl NAY, (specification iY, (OAY,). The product was re- tested by a second analyst and passed. OOS was attributed to an issue with the SOP not being followed but contains no documentation of what aspect of the SOP was not followed. The product was released by QA on July 13, 2023. - Lot KAY 00s 856) — failed MMM ssay a. The product was re-tested twice by two different analysts as the first re-test was also OOS. The third re-test has passing results and the OOS was attributed to an issue with “sample amount or sample unity”, There. is no documentation to show issue with sample. The product was released by OA on March 13, 2023. Lot ABIGIEO0s 18B) — failed Loss on Ignition (LOT) at OY, (specification is.. The product was re-tested twice. The first re-test was performed by a different analyst and was also OOS. The third re-test was. performed by the original analyst and has passing results. The OOS was attributed to an issue with the SOP not being followed but contains no documentation of what aspect of the SOP was not followed. The product was releas June 8, 2023. Lot Osos 102B) - failed Loss on Ignition (LOI) at [redacted]. The product was re-tested by a second analyst and passed. OOS was attributed to an issue with the SOP not being followed but contains no documentation of what aspect of the SOP was not followed. The product was released by QA on May 26, 2023. Lot ‘Too: {05B) - failed Loss on Ignition (LOD at (BAY, (one of two values was OOS), The product was re-tested by a second analyst and passed, OOS was attributed to an issue with the SOP not being followed but contains no documentation of what aspect of the SOP was not followed. The product was released by QA on June 14, 2023. LABORATORY SYSTEM"
+     },
+     {
+      "number": "3",
+      "deficiency": "Laboratory records are deficient in that they do not include a complete record of all data obtained during testing and do not always include documentation of pertinent information related to the preparation and testing of a sample, For example, a) There is no documentation of the preparation of standard stock solutions, working standards, reference standard solutions, sample solutions, diluents, mobile phases, reagents, and other preparations used for performing testing of drug samples including for assay, elemental impurities, and other required USP tests for testing of drug products to include (MAP.",
+      "detail": "b) The “calibration standard” listed in the template for the assay of (OW isl romatogcaphy shows.a date of preparation as 14FEB23. The bottle of working standard currently being used is dated 12SEP23. Per your technician, the date of [2SEP23 is also incorrect. ‘The technician stated they had prepared the working standard several days earlier but did not change the date on the bottle. c) There is no documentation of th A: the sample as required by your test methods. d) Your firm does not document the lot numbers and/or quantity used of reference standards, dil ts and other laboratory consumables used in the preparation and testing of drug products to includ SP (API). This includes items used. for assay, clemental impurities, and other required USP tests.) Your firm does not document the instruments and equipment used when performing testing. For example, your firm hat A) itterent kilns, at least (PA citterent balances, and various pipettors that can be used during testing."
+     },
+     {
+      "number": "4",
+      "deficiency": "Your firm does not assign an expiration date for prepared working standards, mobile phases, diluents and other preparations used for performing testing of drug products, including (YMA rr.",
+      "detail": "Test methods include testing for assay, elemental impurities, and other required USP tests. For example, the bottle of working standard PG o/ tandard solution) that is currently being used for assay oof chronstograry is marked with a prepared date of 12SEP23 but does not have an expiration date listed. SOP 200.02 Shelf Life of Laboratory Reagents and Samples, rev 03 issued 07JUL2021 defines recommended expiration dates for laboratory prepared reagents and calibration standards however, your fitm has no documentation of any validation work to justify these recommended expiration dates."
+     },
+     {
+      "number": "5",
+      "deficiency": "There is no written testing program designed to assess the stability characteristics of drug products.",
+      "detail": "Specifically, your firm has not placed at least one lot of on stability annually. For example, you currently have wii. on long term stability; ot placed on stability in 2022 and in 2023. No lots have been placed.on stability for product manufactured at the Brisbane site in 2019, 2020, or 2021. In addition, your firm uses starting material) from MOA ifrereni suppliers however, your firm has not evaluated the need to place lots made from each supplier on stability. The stability study conducted oO) 01s off A arr manufactured at your Perth facility in 2015 does not have an approved written protocol. Your firm did not define the tests to be performed at each time point. The spreadsheet indicates all release tests however, your firm only tested for Loss on Ignition (LOI) and BET (surface area) at each time point after time point 0. The test results are not signed/approved. In addition, there was an OOS at the 60 month time point for LOI for oe) Your firm did not perform an adequate investigation and provided no documented justification for invali ating the original result. Your firm simply had a second analyst re-test the product and then passed it. Your firm is using this study to justofy placing MOINE:xpiration date on heise (API)."
+     },
+     {
+      "number": "6",
+      "deficiency": "Calibration of balances used in the QC Laboratory are not calibrated appropriately.",
+      "detail": "For example, the balances are not calibrated over the operating range and there is a failure to demonstrate that the balance meets the requirements defined for repeatability, accuracy, and linearity,"
+     },
+     {
+      "number": "7",
+      "deficiency": "Your firm is not always following the approved test method.",
+      "detail": "For example, a) SOP206.15 USPIBIMonogra h Test Methods, rev 8 isstied 09AUG2023, requires the use of a [redacted] or the performance of the test for nd colour of solution. This is consistent with the USP test method. Your firm is using a b) SOP206.15 US onograph Test Methods, rev 8 issued 09AUG2023, requires drying of the nd sample a C fora minimum of (AM: Loss on Ignition. Your drying oven has a knob (no digital display) and does not have a mark forl [redacted] c. On November 15, 2023. I observed the technician performing the test setting the drying oven to over Oc as that is the closest mark toll c."
+     },
+     {
+      "number": "8",
+      "deficiency": "Your firm has no documentation to show the test methods used for stability testing of OAM usp (API) and other drug products are stability indicating.",
+      "detail": "FACILITY AND EQUIPMENT SYSTEM"
+     },
+     {
+      "number": "9",
+      "deficiency": "Your firm has not fully qualified the stability chambers used for long term (30°C/65%RH — Oven ID 0-0007) and accelerated stability studies.",
+      "detail": "The chambers were installed in April 2022. The Operational Qualification (OQ) report approved on August 15, 2022 by QA contains no information about the actual operation of the chambers including no temperature and humidity readings, no verification documentation that the digital read out of the temperature and humidity is correct, no documentation of the placement of the temperature and humidity probes that feed the digital read out, no temperature mapping of the chambers, and no documentation of any alarms for the chambers. The Performance Qualification (PQ) for the chambers has not been completed. There is no approved protocol and the draft protocol provided does not call for verification or qualification of the chambers when full (or at any specific capacity); only(OAP monitoring of temperature and humidity of the empty chamber. Your firm brought storage of stability samples in house when these chambers were installed, and you currently have) tabitity b) (4) for the SP) stored in the long term chamber as well as other samples related t i being contract tested. Your firm has no temperature or humidity data from October 6, 2022 to present except for ote ina logbook. There are several recent entries noting the temperature and/or humidity was out of specification however, no investigation was initiated. ee AVY\\cergonret YY Penner. Margaret M. Annes, CSO 11/17/2023"
+     }
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196309/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196312",
+   "render_order": 6,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Glenmark Pharmaceuticals Limited",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196312"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Glenmark Pharmaceuticals Limited · FEI 3004672766"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "06/30/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 6,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Equipment and utensils are not cleaned or sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+      "detail": "Specifically, A. Inadequate Cleaning Procedures - Insufficient Time Allocation Your firm's written cleaning procedure, SOP CM/PD002 \"Cleaning and Sanitization of Production Areas, Other than Production Areas, Wash Areas and Drain Points\", establishes requirements for Type A cleaning and Type B cleaning of [redacted] manufacturing rooms. Type A cleaning is performed during continued production of the same product, while Type B cleaning is performed during product changeover to prevent cross- contamination between different drug products Review of cleaning records for [redacted] rooms revealed documented cleaning times that are physically insufficient to complete all required procedural steps. 1. Type A Cleaning — Examples of Inadequate Times ie; oO Type A cleaning requires sequential steps fo1 oe operations igitally signed by. JARED P. sing ee Date: 2026.06.30 16:06:46 STEVENS -S sonia Lisa L. Flores -S2 SEE Lisa L. Flores, Investigator Date: 2026.06.30 16:10:35 +0530 9 6/30/2026 REVERSE OF demonstrate that documented cleaning times do not allow completion of all required steps: e March 17, 2026: [redacted] Room [redacted] (1 minute) — documented as completing [redacted] e August 18, 2025: [redacted] Room [redacted] (5 minutes) — documented as completing [redacted] e March 18, 2026 [redacted] Room [redacted] (5 minutes) — documented as completing [redacted] 2. Type B Cleaning — Examples of Inadequate Times Type B cleaning is performed during product changeover and requires more extensive cleaning than Type A, including wet cleaning (using oe 0) and visual inspection of cleaned areas to confirm effectiveness. Review of Type B cleaning records revealed that documented times are insufficient to complete all required steps: e April 22, 2026: me (Unite [redacted], Room [redacted] (14 minutes) — documented as completing wet cleaning of [redacted] wo operations, and visual inspection of floor corners, edges, and under-equipment areas e January 16, 2025: [redacted] Facility (Unit [redacted] Room [redacted] 0) (8 minutes) — documented as completing wet cleaning of mw we SEE Ganpat Sonyabapu Pote, Vice President Operation & Site Head Glenmark Pharmaceuticals Limited Plot No. S-7, Colvale Industrial Estate, Colvale, Bardez, Goa 403 513, India Drug Manufacturer OC) e operations, and required visual inspection. e February 13, 2025: [redacted] Facility (Unit [redacted] Roome« [redacted] (5 minutes) — documented as completing wet cleaning of and required visual inspection. e February 21, 2025 [redacted] (Unit me Room we [redacted] (11 minutes) — documented as completing wet cleaning of [redacted] operations, and required visual inspection. Your firm has not established a minimum or validated cleaning time for Type A and Type B cubicle cleaning. Without scientifically justified time requirements, there is no basis to determine whether documented cleaning times are adequate to complete all required procedural steps. B. Lack of Validated Contact Time for Disinfectants 1. Protocol MSP/QC/2023/005/00/CMPD002 (effective 13/02/2023) and Summary Report MSR/QC/2023/005/00/CMPD002 (dated 01/06/2024) were conducted to demonstrate the effectiveness of the disinfectants used in the sanitization procedure. However, the study design cannot demonstrate disinfectant efficacy because it lacks the following critical elements: e Positive controls e Pre-cleaning microbial counts LL SEE Lisa L. Flores Deliberate microbial challenge e Untreated control surfaces e Inadequate Acceptance Criteria 2. The study's acceptance criteria of \"Total aerobic Microbial count: NU [redacted] cfu/plate\" fails to demonstrate disinfectant efficacy for two reasons: e The acceptance criteria is identical to routine environmental monitoring limits for Grade D areas and therefore does not demonstrate disinfectant efficacy. The acceptance criteria measures surface cleanliness, meaning there is no scientific basis to distinguish between effective disinfection and low baseline contamination. e There is no scientific justification for the absence of a log reduction calculation requirement. Your firm's own 2016 validation (Protocol VP/MM/QC/206) established acceptance criteria of>» [redacted] %) reduction for vegetative organisms and [redacted] 0) reduction for spores, yet these standards were not applied in Protocol MSP/QC/2023/005/00/CMPD002 (effective 13/02/2023) and Summary Report MSR/QC/2023/005/00/CMPD002 (dated 01/06/2024). C. Absence of Validated Contact Time Your firm has not established or validated a minimum contact time for any ofthe [redacted] disinfectants used oe The absence of specified contact times, combined with the inadequate total cleaning times documented above, could indicate that effective sanitization is not being achieved. In the documented cleaning records, if all procedural steps are completed within the allocated time, there is no remaining time for disinfectant to remain in contact with floor surfaces before the room is returned to use. SEE"
+     },
+     {
+      "number": "2",
+      "deficiency": "Appropriate controls were not exercised over computer or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+      "detail": "Specifically,; we A. [redacted] machines—the [redacted] 4) are all documented as having no electronic data storage or audit trail capability. These machines are used to manufacture multiple tablet products for distribution in the United States, including oe oe Asa result: 1. Thewe machines lack electronic data storage and audit trail functionality. While printed reports are generated and subsequently scanned for archival, the original electronic data on the machines themselves cannot be retrieved, trended, or audited. This prevents verification of: a. Authorization status of changes at the time they were made b. Detection of unauthorized modifications to data other than process parameters c. Systematic trending of parameter drift or equipment performance degradation 2. There is no documented procedure establishing acceptable limits on the number or magnitude of parameter adjustments an operator may make during a single batch run within the validated range. An operator may make unlimited corrections tc [redacted] or other parameters without documented justification, and there is no mechanism to detect whether such frequent adjustments indicate process instability or equipment drift. 3. While non-critical alarms are logged in batch records and a Work Request Memo (WRM) system exists to document equipment issues requiring engineering intervention, there is no documented procedure establishing threshold criteria (frequency or severity triggers) that SEE Lisa L. Flores define when non-critical alarms require investigation and escalation beyond routine maintenance. B. [redacted] machines—the [redacted] —are used to manufacture multipletablet products for distribution in the United States, including Although these machines are equipped with electronic data storage and backup capability, appropriate controls are not exercised to assure that changes to process parameters are instituted only by authorized personnel, and procedures do not establish monitoring and investigation requirements for equipment \"Non-Critical\" alarms and parameter deviations. Specifically: 1. While the electronic audit trail captures date, time, personnel identity, old value, and new value of parameter changes, your procedures do not establish requirements to review the audit trail for: the sequence and frequency ofparameter changes during a batch, whether changes were made for documented reasons, whether the pattern of changes indicates process instability or equipment drift, or whether changes were appropriate given the product and process stage. The audit trail is reviewed only for compliance with specification limits, not for assessment of the adequacy or appropriateness of the changes themselves. 2. Your procedures do not establish requirements to monitor the frequency or pattern of non- critical alarms, define investigation criteria or trigger points for repeated non-critical alarms that may indicate emerging equipment problems, or require documentation of non-critical alarm occurrences for trend analysis. 3. While your SOPs establish acceptance limits for process parameters and define alarm thresholds, the procedures do not establish predefined investigation criteria for parameter deviations that do not generate alarms. The SOPs do not establish predefined trigger points SEE Lisa L. Flores for investigation of parameter drift within acceptable limits or trend monitoring of parameters that remain within specification but show directional drift."
+     },
+     {
+      "number": "3",
+      "deficiency": "Each component is not tested for conformity with all written specifications for purity, strength, and quality.",
+      "detail": "Specifically, Your firm failed to perform individual container testing, including identity testing with limits for [redacted] (NM [redacted] %), on each individual container of each shipment of each lot of high-risk drug components prior to their use in manufacturing of drug products distributed to the United States market. Your procedure for sample testing, Sampling, Testing and Release of Raw Materials, SOP 19/QC006, allows analysis of [redacted] samples. The high-risk raw materials tested using [redacted] samples include: Raw Material ow Most recent Glenmark material batch # LLF SEE Lisa L. Flores These raw materials have been used to manufacture commercial product intended for the US market including oe"
+     },
+     {
+      "number": "4",
+      "deficiency": "Control systems for the firm's operations are not adequate to prevent contamination or mix-ups.",
+      "detail": "Specifically, A. Differential pressure in the manufacturing areas of the [redacted] facility (Unite, is not adequately monitored and recorded, and no alarm system is in place to detect differential pressure excursions. A review of the Batch Production Record (BPR) for Batch oe [redacted] USP meg), confirmed that the differential pressure is recorded only during active batch production, approximately [redacted] with no continuous monitoring or alarm system to ensure pressure differentials are maintained. Your firm manufactures [redacted] drug products approved for the U.S. market in Unit [redacted] Approximately [redacted] distinct batches—including [redacted] SEE Lisa L. Flores shipped to the U.S. between January 2023 and June 2026. Your firm also manufactures [redacted] tablets in the same facility as [redacted] products and these [redacted] tablets are [redacted] packaged with [redacted] tablets for at least [redacted] commercial products marketed in the U.S. All these approximately [redacted] batches remain within their approved expiry dates as of the date of this inspection (June 30, 2026). B. Although a risk assessment with containment study was done in 2023 and 2025, your firm has not conducted a comprehensive risk assessment prior to this inspection on June 22, 2026, to evaluate the potential for cross-contamination between the» [redacted] manufacturing facility (Unity and the [redacted] facility (Unit [redacted] The Units are located approximately [redacted] away from each other. For example, your firm has not performeda scientific evaluation of potential [redacted] cross-contamination between the two facilities, including an assessment of the location and w [redacted] points of the me facility's [redacted] systems in relation to the [redacted] vents of the [redacted] facility; the adequacy and a program for periodic environmental monitoring between the facilities."
+     },
+     {
+      "number": "5",
+      "deficiency": "Written procedures for annual product reviews are not followed, and the reviews are deficient in that they do not address a review of complaint records for each drug product.",
+      "detail": "Specifically, SEE Lisa L. Flores Ganpat Sonyabapu Pote, Vice President Operation & Site Head Glenmark Pharmaceuticals Limited Plot No. S-7, Colvale Industrial Estate, Colvale, Bardez, Goa 403 513, India Drug Manufacturer Your firm failed to include a review of all complaints in the Annual Product Quality Review (APQR). Your procedure, \"SOP CM/QA005, Revision 17: Periodic Review of Product Quality of Drug Products,\" requires the compilation of market complaints for the APQR. However, complaints were not included in the APQR for the following products A. Product: [redacted] Tablets The APQR for the review period of March 25, 2024, to March 24, 2025 (APQR/25/US/007) reported zero (0) market complaints. However, a review of your firm's complaint records identified eleven (11) complaints associated with this product within the review period that were not included in the APQR including complaints for lack of efficacy and missing blisters. B. Product: oe Tablets The APQR for the review period of January 19, 2024, to January 18, 2025 (APQR/25/US/001) reported one (1) market complaint. However, a review of your firm's complaint records identified a total of two (2) complaints associated with this product within the review period. Complaint number MC/1102/2024/0065 for missing blister was not included in the APQR."
+     },
+     {
+      "number": "6",
+      "deficiency": "Laboratory records do not include complete data derived from all tests, examinations, and assays necessary to assure compliance with established specifications and standards.",
+      "detail": "Specifically, LLF SEE Lisa L. Flores Your analysts have been granted user privileges within the Empower software that allow them to view numerical results in the review window—uincluding area counts of peaks—while changing processing methods, without requiring the chromatograms to be saved. This configuration allows for the potential previewing of data. While these series of controls were in place, your firm has tested over [redacted] batches of finished drug products for assay and/or impurities by HPLC since January 2023. These products include, but are not limited to, OG) Furthermore, prior to this inspection, your firm did not conduct a comprehensive risk assessment to identify and control the data integrity risks introduced by these user privilege configurations. JARED p"
+     }
+    ],
+    "inspectors": [
+     "Lisa L. Flores"
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196312/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196313",
+   "render_order": 7,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Samchundang Pharma Co., Ltd.",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196313"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Samchundang Pharma Co., Ltd. · FEI 3008425092"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Sterile Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "05/19/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 8,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process.",
+      "detail": "Specifically, Your facility utilizes Filing Lin [redacted] or commercial manufacturing of [redacted] products, including the following. wa) U.S. products: A. Your airflow visualization (smoke) study for Filling Lin [redacted] (PQR-08-061, Revision 001), performed after the installation ofg) [redacted] is inadequate. The study did not evaluate line setup or all interventions representative of actual manufacturing operations. Interventions not evaluated included: trouble at the [redacted] station, trouble at the bottle aq filling station, and aseptic connections. Notably, during aseptic filling of [redacted] batc [redacted] on Filling Lineg) on May 12, 2026, the intervention \"Trouble at the [redacted] station\" occurred 35 times. a Additionally, review of smoke study videos that support PQR-08-061, Revision 001, revealed turbulent and non-unidirectional airflow in the Grade A areas, including above the gm The video angles also did not allow for adequate airflow visualization in the work area or at the HEPA filter face. B. Your airflow visualization (smoke) study for Filling Line [redacted] PQR-08-061, Revision 000), performed prior to the installation of [redacted], during which [redacted] interventions were performed, is inadequate. The study did not evaluate line setup or all interventions representative of actual manufacturing operations. Interventions not evaluated included: trouble at the [redacted] station, trouble at the bottle [redacted] filling station, and aseptic connections. Additionally, review of smoke study videos that support PQR-08-061, Revision 000, revealed turbulent airflow in the Grade A areas, including above the [redacted] The video angles also did not allow for adequate airflow visualization in the work area or at the HEPA filter face. In smoke study video 60-2012-0025, your firm attributed turbulence to a 45 mm gap in the HEPA filter cover; however, this gap and six other HEPA filter gaps (up to 140 mm) in the Grade A areas were not evaluated during smoke studies. Smoke study PQR-08-061, Revision 001, performed after [redacted] installation, showed turbulent air in the same areas. C. The aseptic process simulations performed on Filling Line [redacted] are deficient in that: 1. The complexity and duration of interventions that occur with each run (routine and non-routine, events including line stoppages, and equipment adjustments are not sufficiently representative of your commercial aseptic manufacturing. On May 12, 2026, we observed commercial filling activities on VOUT [redacted] (4) Filling Line [redacted] and witnessed multiple stoppages with interventions that lasted from [redacted] upwards to over [redacted] However, the interventions performed during the simulations are performed significantly unde [redacted] 2. The number of units filled during the process simulatio [redacted] units) is not proportionate to the number of units filled during commercial manufacturing in which the largest quantity was [redacted] units for [redacted] (Batch #e) [redacted] that was shipped to the US. The filling duration of the process simulation is not representative ofnormal commercial manufacturing. Your firm fills approximately [redacted] _—sunits withi [redacted] during commercial manufacturing, while your simulation fillsa [redacted] units withi [redacted] wit [redacted] only filling approximately [redacted] units. Additionally, during the simulation, the filling is not performed continuously as in commercial manufacturing. There are pauses after the specified interventions are completed to prepare for the next set of interventions."
+     },
+     {
+      "number": "2",
+      "deficiency": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+      "detail": "Specifically, A. Your firm has no written procedure detailing how operators are to perfor [redacted] interventions on Filling Lines [redacted] During aseptic filling ofa batc [redacted] on May 12, 2026, different operators were observed pe ming the same intervention, \"Trouble at th [redacted] station,\" in different manners over the sterile [redacted] bowl. Some operators were observed blocking first air to the sterile [redacted] while performing the intervention. B. Your firm has no written procedure detailing how operators are to perform [redacted] interventions on Filling Lin [redacted] C. Poor aseptic practices were observed in smoke study videos supporting study PQR-08-061, Revision 000, which captured operations on Filling Linew prior to the installation of [redacted] during which [redacted] interventions were performed. Your f\" m does not video record aseptic filling operations; therefore, smoke study videos were used to assess aseptic behavior during commercial production using [redacted] interventions. Only qualified operators in proper aseptic behavior participate in smoke studies. The following was observed: An operator was observed bringing forceps out of the Grade A barrier system into the Grade B area and then back into the Grade A area to perform the intervention over sterile open bottles. 2. An operator unnecessarilya of the barrieigy [redacted] to insert and removea settle plate through the [redacted] of the barrieig [redacted]. introducing unnecessary airflow disruption to the Grade A area above th [redacted] Your confirmed this was normal practice during commercial production using g [redacted] interventions. D. Your firm has no written procedure defining what action is required whetigya pass over sterile (4) container and closure components. E. Your procedure for assembly of Filling Lin [redacted] SOP MS-203) is inadequate. The procedure does not specify the work area in which assembly is t\" be performed. During setup fora batc [redacted] on May 13, 2026, operators were observed working above the [redacted], an area where smoke study videos revealed turbulent and non-unidirectional airflow. Additionally, connection tubing was observed hanging beneath the barrierg [redacted] during assembly and contacting a knee-height table located in the Grade A ma LAF. The connection tubing connects the g [redacted] tank to the [redacted] Your firm confirmed that the hanging tubing is normal practice and that the knee-height table is not sterilized. The sterilization wrap on some tubing ends was observed to have detached, leaving the tubing end exposed. Notably, a particle count excursion at Filling Statio [redacted] was documented during equipment setup fo [redacted] Batch [redacted] -—«doon June 17, 2025 (DOS202506006), where the particle count reached [redacted] ea/m?, exceeding the limit ofg) [redacted] _—-ea/m°. The root cause was attributed to the operator inadvertently generating particles during assembly and setup of filling components."
+     },
+     {
+      "number": "3",
+      "deficiency": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to aseptic processing of drug products.",
+      "detail": "Specifically, the design of Filling Line [redacted] is inadequate to maintain first air contact with sterile containers during filling operations. For example: A.The [redacted] is equipped with a cover that blocks first air from contacting sterile open bottles inside the [redacted] Review of smoke study Video 60-2013-0076 confirmed that the [redacted] cover blocks first air to sterile open bottles. B.The mw loading port is a [redacted] chute that blocks first air from contacting sterile bottles as the bottles are dispensed into th [redacted] During aseptic filling of batch [redacted] on May 12, 2026, sterile bottles were observed backing up and piling on top of each other in the loading port, requiring operators to open and close the loading port valve to facilitate bottle movement. Additionally, there is no smoke study evaluating airflow when bottles are backed up into the loading port. C.Theww which [redacted] onto the conveyor track leading to the (4) is angled in a manner that blocks first air as sterile bottles exit the [redacted]"
+     },
+     {
+      "number": "4",
+      "deficiency": "Procedures describing the handling of written and oral complaints related to drug products are deficiently written or followed.",
+      "detail": "Specifically, your complaint investigation process is inadequate. Retain samples are not tested for sterility when microbial contamination is identified in complaint samples. Instead, retain samples are only visually inspected, and sterility testing is not performed unless foreign matter is visually observed. For example, you received six complaints for foreign substances, each confirmed by external laboratory analysis to contain microorganisms, across multiple [redacted] drug product batches. In each case, sterility testing of the retain sample was not PR 28677: Cladosporium sp. identified in [redacted] Batc [redacted] e PR 102663: Penicillium sp. identified in gw [redacted] Batch [redacted] e PR 264883: Penicillium sp. identified in [redacted] Batch [redacted] e PR 206711: Cladosporium sp. identified in gy [redacted] Batc [redacted] e PR 342363: Cyphellophora sp. identified in [redacted] Batc [redacted] e PR350141: Alternaria sp. identified ingw Batchmw Additionally, environmental monitoring reviews conducted as part of these investigations were limited to EM data captured in the complaint batch's manufacturing record. No broader facility-wide EM review was performed to determine whether the identified isolates were present elsewhere in the facility."
+     },
+     {
+      "number": "5",
+      "deficiency": "Equipment and utensils are not sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+      "detail": "Specifically, A.You do not sterilize the [redacted] on Filling Line § between batches. The mw 0) on Filling Lineg make direct contact with sterile bottles. The sterile bottles pass through this equipment before progressi™to the [redacted] B.You do not sterilize [redacted] on Filling Linew detween batches. During aseptic filling of [redacted] batc [redacted] on May 12, 2026, operators were 0 erved blocking first air while performing interventions with [redacted] over the bowl containing sterile [redacted]"
+     },
+     {
+      "number": "6",
+      "deficiency": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+      "detail": "Specifically, your visual inspector qualification program (PQP-12-157), is inadequate. The qualification uses challenge particles consisting of [redacted] foreign matter; however, the size of these particles is not characterized or measured. There is no supporting document justifying the size of the particles currently used in the qualification. Additionally, the challenge particles are prepared at the time of each qualification and requalification. Since the size of the generated challenge particles is not measured, there is no assurance that all operators are evaluated equally or that operators are qualified to detect particles down to a specific size."
+     },
+     {
+      "number": "7",
+      "deficiency": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+      "detail": "Specifically, your environmental monitoring program for Filling Lin [redacted] lacks adequate justification for sampling location selection. For example: bad A.The [redacted] bowl compartment of Filling Lin [redacted] is not monitored for non-viable particles, active air, or settle plates. There were frequent intervention observed in this compartment during aseptic filling of (4) Batch [redacted] on May 12, 2026, with a cumulative intervention duration of approximately [redacted] The total filling time for this batch was approximatel [redacted] Your EM Justification document (QS-801-A1) does not provide rationale for the exclusion of these sampling points in the [redacted] bowl compartment. B.The conveyor track compartment located immediately upstream of the [redacted] on Filling Lin [redacted] is not monitored for non-viable particles. Your airflow visualization (smoke) study (PQR-08-061, Re” sion 001) videos showed turbulent and non-unidirectional airflow within this compartment. Your EM justification document (QS-801-A1) does not provide rationale for the exclusion of this sampling point in the conveyor track compartment."
+     },
+     {
+      "number": "8",
+      "deficiency": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+      "detail": "Specifically, your investigation for deviation DOS202506006 is inadequate. During equinment setup for [redacted]) (4) Batch [redacted] _—on June 17, 2025, a particle count excursion at Filling Station [redacted] reached [redacted] ¢a/m?, exceeding the limit ol [redacted] --ea/m*. The investigation identified the root cause as the perator inadvertently generating particles durmg assembly and setup of filling components. However, the investigation does not identify the specific operator behavior or action that caused the excursion. The investigation also did not include any CAPA addressing the aseptic behavior that caused the excursion, nor did it include reevaluation or retraining of the operator responsible for the excursion."
+     }
+    ],
+    "inspectors": [
+     "Khoa Nathan V Tran",
+     "Damaris Y Hernandez"
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196313/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196637",
+   "render_order": 8,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "SRI Healthcare, LLC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196637"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "SRI Healthcare, LLC · FEI 1527607"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/16/0226"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 2,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Requirements for infrastructure maintenance activities that can affect product quality, including the interval of performing the maintenance activities, have not been documented.",
+      "detail": "Specifically, your firm's procedure (document number 712, (by (4) Sterilizer Checks and Maintenance, Rev 06, effective 6/13/2024) lists several action items that must be completed and documented [redacted] However, these requirements were not fulfilled. For example: 1. Section 1.1 ofyour firm’s procedure [redacted] sterilizer Checks and Maintenance, Revision 06, states, “Before starting the sterilizer, perform the required preventive maintenance (PM) task [redacted] and cleaning tasks, and document on Form 7121, [redacted] sterilizer Checks and Maintenance.” The following sterilizer checks on Sterilizer [redacted] were performed without documenting the results during the following dates: 2. Section 1.20 ofyour firm’s procedure, [redacted] sterilizer Checks and Maintenance Revision 6, states that results of Leak tests are documented in the Sterilizer Logbook, Form 7080. The results of the Leak tests were not documented on the following dates in the 2025 Sterilizer [redacted] logbook"
+     },
+     {
+      "number": "2",
+      "deficiency": "Top management did not review the quality management system at documented planned intervals to ensure its continued suitability, adequacy, and effectiveness.",
+      "detail": "Your firm's procedure—document 1, Quality Manual, Rev 02, effective 9/11/2018, Section 2.0, Management Review—requires that \"The management review is held at least [redacted] at the corporate level and at least [redacted] at the facility level to conduct systematic reviews of the QSEs.\" However, in 2024, your firm failed to conduct the required [redacted] management review meetings at the facility level as specified."
+     }
+    ],
+    "inspectors": [
+     "Amber M Capello-Jones"
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196637/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196254",
+   "render_order": 9,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Neva Analytics, LLC",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-12"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196254"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Neva Analytics, LLC · FEI 3014032983"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Contract Testing Laboratory · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/01/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 8,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+      "detail": "Specifically, 1.SOP-1005, Handling Deviations and CAPAs, v2.0 states in section 7.4.1, “CAPAs may be generated in response to a deviation, OOS, Regulatory Inspection, internal audit, client audit, or at the discretion of QM”. Your firm submitted corrective actions to the Agency as responses to the four observations listed on the FDA Form 483"
+     },
+     {
+      "number": "1",
+      "deficiency": "A written record of the program along with appropriate validation data has not been maintained in situations where backup data is eliminated by computerization or other automated processes.",
+      "detail": "a. The Software [redacted] \"used to execute stability analysis for HPLC assays for [redacted] and [redacted] and [redacted] was not validated. CAPA 006 was initiated on 13 May 2019, but it was inadequate. b. The Environmental/Stability Chamber Model [redacted] __, Equipment ID: 3046-1, Temperature [redacted] was not validated and mapped. No CAPA/Deviation was initiated."
+     },
+     {
+      "number": "2",
+      "deficiency": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+      "detail": "a. Your firm did not have a formal established procedure for investigating Out of Specification [OOS] results. No CAPA/Deviation was initiated."
+     },
+     {
+      "number": "3",
+      "deficiency": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+      "detail": "Specifically, b.Analysts were capable of deleting executed sequences and results from the [redacted] where the software path saves the executed analyses for HPLC. CAPA 006 was initiated on 13 May 2019, but it was inadequate."
+     },
+     {
+      "number": "4",
+      "deficiency": "Procedures describing the handling of written and oral complaints related to drug products are not written or followed.",
+      "detail": "a. Your firm did not have a formal complaint handling procedure reviewed and approved by the Quality Unit. No CAPA was initiated. Verbal"
+     },
+     {
+      "number": "1",
+      "deficiency": "Refrigerator _ ()(4) stored USP References used to execute HPLC assays.",
+      "detail": "This Refrigerator was not qualified and mapped. No CAPA/Deviation was opened."
+     },
+     {
+      "number": "2",
+      "deficiency": "Standard Operating Procedure, SOP-1005.00, “Handling Deviations & CAPA” needed clarity on how System Suitability failures occurring in the HPLC are to be resolved.",
+      "detail": "No CAPA/Deviation was opened. 2.SOP-1008, Supplier Approval Program, v2.0 states in part that the purpose of the SOP is to “describe the general practices required for assessing, reviewing, and approving suppliers of GMP materials and/or services. a. Your firm failed to qualify the suppliers of the following HPLC Columns used in your analytical testing of GMP drug product: i. HPLC column [redacted] used in [redacted], Assay and Related Substances for [redacted] by HPLC, Protocol [redacted]. Your firm used this method to determine [redacted] HCI assay and related substances in [redacted] stability timepoint. ii, HPLC Column [redacted], Column # 008MA-04723M used in Method [redacted] -HPLC [redacted] Aggregate Quantification [redacted]. Your firm used this method to quantify the percentage of higher and lower molecular weight species in| [redacted] Drug Substance (DS) and Drug Product (DP). iii, HPLC Column [redacted], Column # 008MA-10557K used in Protocol, [redacted] BRD Stability Testing [redacted] Active Drug Product-| [redacted]. Your firm used this method to perform GMP lot release (time [redacted] testing of| [redacted] active drug product (DP) pre-filled syringes and place into stability chambers at specified conditions for testing at™,and| [redacted]. per proposal # 2423., Your firm used this method to [redacted] drug substance (OS) and drug product (DP) for expiration extension. b. Your firm also failed to qualify suppliers of [redacted] used for long or short term storage of your HPLC Columns referenced in Observation la. c. Your firm’s SOP-1008, Supplier Approval Program, v2.0 fails to define supplier audit frequency relative to supplier risk level. 3. Your SOP-1006, Out of Specification, v2.0. fails to govern retesting performed during out of specification (OOS) Phase 2 investigations. Method [redacted] _—-Assay and Related Substances for [redacted] by HPLC, Protocol [redacted] failed system suitability and was retested four times."
+     },
+     {
+      "number": "2",
+      "deficiency": "Laboratory records do not include the initials or signature of a second person showing that the original records have been reviewed for accuracy, completeness and compliance with established standards.",
+      "detail": "Specifically, 1.Your firm failed to include a second verifier in the raw data reporting sections of the following executed methods for analytical testing of GMP drug product: a. [redacted] Assay and Related Substances for [redacted] by HPLC, Protocol [redacted]. Method Transfer Protocol for [redacted] _by [redacted]. Spectrophotometry. c.Method [redacted] HPLC for [redacted] d.Method [redacted] -HPLC [redacted] Aggregate Quantification [redacted]"
+     }
+    ],
+    "inspectors": [
+     "Inga M Warr"
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196254/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-196260",
+   "render_order": 10,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Orean Personal Care Ltd",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-12"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-196260"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Orean Personal Care Ltd · FEI 3010999645"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "OTC Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "02/20/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 8,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+      "detail": "Specifically, you manufacture Over the Counter (OTC) drug products for the US market on non- dedicated manufacturing equipment. You designed a cleaning matrix that identified most difficult product to clean, sit FDA product Code No. also called 4), |You did not validate the respective cleaning procedures such that, A. You clean your manufacturing vessels 4«4 according to the cleaning procedure/check list, WIM020 OTC Cleaning and Sanitizing Vessel Check Sheet. You recorded the data for cleaning validation in, Cleaning Validation Report for Cleaning Process WIM020 On Manufacturing Vessel Issued on 9/11/2025. The report contains cleaning data after manufacturing a single batch of ingw Your Quality Hea [redacted] stated that the batch number for drug product, 4), was not available. B. Youclean your tube filling line (Lin [redacted] according to a cleaning procedure/check list, WIPROD008 OTC Cleaning and Sanitising Tuber Check Sheet. You recorded the data for cleaning validation in, Cleaning Validation Report for Cleaning Process WIPROD008 on Tube Fillers Issued on 9/9/2025. The report contains cleaning data after manufacturing a single batch offs in Line [redacted] Your Quality Hea [redacted] stated that the batch number for drug product.) was not available. C. Youclean yours, filling line (Lin [redacted] according to a cleaning procedure/check list, WIPROD007 OTC Cleaning and Sanitising Line Check Sheet. You recorded the data for cleaning validation in, Cleaning Validation Report for Cleaning Process WIPROD007 on 4 Filling Line, Issued on 9/11/2025. The report contains cleaning data after manufacturing a single batch of% in Line [redacted] Your Quality Hea [redacted] stated that the batch number for drug product, 4,4) Was not available. None ofyour cleaning validation protocols and/or reports have the equipment design to identity the swabbing locations. You Quality Heaa [redacted] confirmed that the transfer pipes and hoses used in the manufacturing were not product dedicated and were not part of the cleaning validation. On 2/17/2026, during walkthrough of your manufacturing area, I saw pipes and hoses hanging on the walls without any (clean/to-be-cleaned/dirty) status. Your Quality Hea [redacted] stated that the hoses and pipes were in clean status. I checked inside of one of the hoses with a paper towel. The surface of the paper towel that rubbed the inside of the hose became soiled with 4 material. Your Quality Hea [redacted] stated that these pipes will be cleaned one more time when they are picked up for the manufacturing and all the manufacturing equipment are verified for sanitization through a Sanitization Equipment Check List FDA F023. You currently manufacture [redacted] drug products for the US market and sid for the UK. You did not have any scientific justification why re US product.4,,. is the most difficult material to clean in comparison to many ofyour [redacted] Tn addition, the non-dedicated hose and pipes also present opportunity for cross contamination of the US products with that ofthe actives present in many of the [redacted] You use aes different across your multiple products that are manufactured in your facility. You have no data to confirm how easy or difficult to clean these 4) 4)"
+     },
+     {
+      "number": "2",
+      "deficiency": "The responsibilities and procedures applicable to the quality contro] unit are not in writing and/or fully followed.",
+      "detail": "Specifically, A. You released the batches of finished products before completing all the test to ensure the OTC drug products meet all the specification. Your procedure, WIPROD027 OTC Products Sampling and Processes Version 12 (Issued on 1 1/28/2024) require a review of all the test to ensure the product meets specification for the prior to releasing the batch. Your Quality Hea [redacted] stated that the firm released the batches under quarantine as per the quality agreement with the customer. You shared a generic quality agreement with the respective customer that was created on September 2024 and signed but not dated. The QA is also open ended without an expiry/re- certification timeline. B. You did not initiate deviations for delayed stability studies. Specifically, you initiated Long Term stability studies for the process validation batches after >3 months from the date of manufacturing. Your Quality Hea [redacted] stated that the firm did not have a deviation procedure and shared a form, OTC Deviation Form FDAFO12 Version that the firm uses to record deviations. C. You did not follow your FDA Change Control Procedure, FDASOP001 Version 1 such that you did not initiate change control prior to revising the batch manufacturing records. Specifically, during the process validation, you made several modifications into the first process validation batches to bring the batch in specification. You then updated the manufacturing instructions for the g), Subsequent batches and completed the process validation. You did not initiate change controls to evaluate the impact of changes on the overall drug product quality. As of 2/20/2026, you have not initiated any change control for your manufacturing site. D. You did not conduct accelerated stability study for the OTC drug products that you manufacture for the US market. You shared data for accelerated study that did not have batch numbers. Your Quality Hea [redacted] stated that these data were generated from the lab batches and not from the commercial batch. E. Your procedure, Annual Product Quality Review for OTC Product WIT021 Version 5.0 (Issued on 9/10/2024) does not have provision for trending key quality attributes as a way to monitor the manufacturing process. In 2024, you manufactured» [redacted] >atches of«» You did not include/trend the manufacturing data and test results in respective Annual Product Quality Review for OTC Form QAF003 Version 1.0 (Effective date 4/1/2025). You also did not conduct annual quality review for your [redacted] that is used as raw material for OTC drug products. F. You do not have quality agreements with the suppliers ofAPI)« The release test and stability study ofyour drug products is carried out at a third-party lab, You do not have quality agreement with this q)4 lab. G. There are not written procedures that guide the production of ‘or the cleaning/maintenance ofthe4 system used for the production of OTC drug products and the cleaning of equipment used to produce OTC drug products. H. You did not follow your procedure, Control of Quality Documents Version 1 dated 11/27/2024 to ensure all the documents and data related to the US OTC drug products are secured and the most current version are in use. During walkthroughs and document review, several deficiencies were observed, e.g. a. In your production lab, loose sheets of the pH calibration test data (for 2024 and 2025, 2026) were stored. The data were not reviewed by the quality assurance. Your Quality Hea [redacted] was not sure why old data were not bounded and archived. The Cleaning Validation Protocols and Reports were not reviewed and signed by quality assurance. c. The Process Validation Protocol and Reports were not reviewed and signed by quality assurance."
+     },
+     {
+      "number": "3",
+      "deficiency": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, standards, sampling plans, test procedures designed to assure that components of drug product, in-process materials, and drug products conform to appropriate standards of identity, strength, quality and purity.",
+      "detail": "Specifically, A. Your firm failed to monitor the g4 system to ensure that it consistently produces Be that, at a minimum, meets the USP monograph for 4)«) at the point of use. Furthermore, your firm uses the4 for equipment cleaning and as a raw material in OTC drug products exported to the US, including but not limited to the bulk batches manufactured (and tested in the production lab) for the US market between 1/28/2026 and 2/16/2026, which are summarized below in Table 1. On multiple occasions during 2025, your qq exceeded your upper limit of) yet no investigation or deviation was implemented to determine the cause ofthe out of specification [redacted] In addition, the was consistently outside the parameters ofyour pre-. determined range over the course of 2025. In 2025, a risk assessment was conducted to raise the we range tO g _—~With no scientific rational as to why the upper limit was raised to w The test methods for microbial and chemical testing are not validated. Some of the batches manufactured for the US market include but are not limited to:,,45 wa) B. The gg system was not qualified when installed in 2022 and complete preventative maintenance records are not kept of the gw maintenance done on the g system, including the cleaning and sanitization ofthe system. You do not have a written procedure that guides the sampling, sanitizing, cleaning and maintenance ofthey system. C. On 2/16/2026, an expired standard ofpH 7.0 buffer (Lot # q was found in your production lab. The label on the bottle read, the Recommended use by date 1/28/2026. You calibrate your pH meter in the production lab with pH 4.0 and pH 7.0 standards. There was no other pH 7.0 standard in the lab. On 2/19/2026, your Quality Hea [redacted] stated that on 2/16/2026, the firm placed a new pH 7.0 standard (Lot # g Recommended use by date 9/17/2027) in the production lab. The bulk batches manufactured (and tested in the production lab) for the US market between 1/28/2026 and 2/16/2026 are summarized in Table 1. Cleckheaton, West Yorkshire, BD19 4TT, United Kington OTC Drug Product Manufacturer Table 1. Bulk batches manufactured for the US market between 1/28/2026 - 2/16/2026 Date |Product Name |Product Code |Batch No. IRatch Size OC) [redacted]"
+     },
+     {
+      "number": "4",
+      "deficiency": "There are no written procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess.",
+      "detail": "Specifically, you currently manufacture [redacted] OTC drug products for the US market. You have not validated the respective manufacturing processes such that, A. You designed the process validation protocol, PVal014 for on love from q~ batches at oe batch size. According to your Process Validation Report, the first batch failed. You added ag batch at g to complete the process validation. You have manufactured commercial batches that range in Your Production Hea [redacted] stated that the process validation batch sizes were designed to utilize the minimum and maximum working volume of the wes capacity). Mr. [redacted] also stated that the commercial batches sizes are executed as per the customer order. B. You designed the process validation protocol, PVal017 for Ow hoes frome), batches at [redacted] a batch size. You have manufactured [redacted] commercial batch at batch size. Your Production Hea [redacted] stated that the process validation batch sizes were designed to utilize the minimum and maximum working volume of the ii capacity). Mr. [redacted] also stated that the commercial batches sizes are executed as per the customer order. C. You designed the process validation protocol, PVal015 for OF oe from g~ [redacted] batches at [redacted] batch size. According to you Process Validation Report, the first batch failed. You added ag). _batch at a) to complete the process validation. You have manufactured commercial batches that ranges in batch size, a Your Production Hea [redacted] stated that the process validation batch sizes were designed to utilize the minimum and maximum working volume of the g« hee capacity). Mr. also stated that the commercial batch sizes are executed as per the customer order. The finished product, me ml Batch No’s [redacted] OC) em manufactured from the g bulk batches pale failed at time t 0 for the long- term (25 + 5 °C/60 + 5% RH) stability study that is carried out at a third party. The qq) batches failed for pHi against Specification ews In addition, Batch No. ww also failed for viscosity g)4 cps against Specification 9 cps). You have shippeda total of)«4 units from these implicated batches to the US market. You did not investigate the OOS results as"
+     },
+     {
+      "number": "5",
+      "deficiency": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+      "detail": "Specifically, A. On 12/26/2025, your vendor q) who carries out stability study has recorded OOS result for ee mL. The OOS result was recorded for Batch No. [redacted] (Mfg. date 7/7/2025 Expiry date &« for pH [redacted] against the Specification 9« the initiation (t 0) of long-term (25 + 5 °C/60 + 5% RH) stability study. The OOS result was confirmed via Re-Measurement Testing. No Laboratory Assignable Root Cause was found. Your vendoty4, communicated to you to initiate Phase II full scale manufacturing investigation. As of 2/20/2026, you did not take any action and did not share any investigation report. You have shipped g),. units of the above implicated batch to the US market. B. On 12/26/2025, your vendor «4 who carries out stability study recorded OOS result for =e mL. The OOS result was recorded for Batch No. we (Mfg. date 8/15/2025 Expiry date § for pH. againstthe Specification at the initiation (t 0) of long-term (25 + 5 °C/60 + 5% RH) stability study. The OOS result was confirmed via Re-Measurement Testing. No Laboratory Assignable Root Cause for found. Your vendotg)4, communicated to you to initiate Phase II full scale manufacturing investigation. As of 2/20/2026, you did not take any action and did not share any investigation report. You have shipped,,,. units of the above implicated batch to the US market. C. On 1/12/2026, your vendor g4, who carries out stability study recorded OOS result for sini mL. The OOS result was recorded for Batch No. (Mfg. date 8/22/2025 Expiry date ow for pH gq against the Specification 9«4 and Viscosity g cps against Specification 4 cps) at the initiation (t 0) of long-term (25 + 5 °C/60 + 5% RH) stability study. The OOS result was confirmed via Re-Measurement Testing. No Laboratory Assignable Root Cause for found. Your vendor g, communicated to you to initiate Phase II full scale manufacturing investigation. As of 2/20/2026, you did not take any action and did not share any investigation report. You have shipped 4). units of the above implicated batch to the US market. Your Regulatory Hea [redacted] and Quality Hea [redacted] stated that there were minor differences in the pH and Viscosity. These non-conformances are not likely to cause harm to the patients/users. Your procedure, FDA Out of Specification FDASOP002 Version 1 (Issued date 6/10/2025) requires investigation to close within 4« or an extension is approved by QA. On 2/20/2026, your Quality Hea [redacted] confirmed there was no report or extension available to share/review."
+     },
+     {
+      "number": "5",
+      "deficiency": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+      "detail": "Specifically, on 2/16/2025, a notebook was found in your production lab where you test the bulk batches for pH, viscosity, and specific gravity. I saw handwritten data in some of the notebook pages. One of the pages contained data for pH, viscosity, and specific gravity for the q (sample). Your production persona [redacted] owner of the notebook) stated he did not write the data. Your Quality Hea [redacted] stated that the firm manufactures numerous products, and it was not possible to attribute the data to a specific batch. Through a review of the submitted data for the bulk batches, it was determined that the data belonged to a US product, [redacted] Product Code ww Batch No. that was manufactured on 2/13/2026."
+     },
+     {
+      "number": "6",
+      "deficiency": "Written procedures are lacking which describe in sufficient detail the receipt, sampling and testing of components of drug products.",
+      "detail": "Specifically, your procedure, OTC Products Sampling and Process WIPROD027 Version 12 (Issued on 11/28/2024) does not contain information about collecting a representative sample. You are in the process of vendor qualification for 4 As of now you have completed the testing of 4 batches of) Batch No’s w Each batch was received as a g [redacted] lot size in [redacted] bags of each. Your Quality Head” stated that one sample from one of the bags from each batch was sent to the testing laboratory for full scale testing. Mr.° [redacted] also stated that [redacted] sample was collected for each lot for the testing and this sampling was not recorded in the ERP system. Mr. [redacted] also confirmed that there was no attributing document to verify that a sample of ww was collected at the site and shipped to the outside lab."
+     },
+     {
+      "number": "7",
+      "deficiency": "There wasa failure to handle and store components of drug product at all times in a manner to prevent contamination.",
+      "detail": "Cleckheaton, West Yorkshire, BD19 4TT, United Kington OTC Drug Product Manufacturer Specifically, on 2/16/2026 during the walkthrough ofyour warehouse, I saw a bag of Lot No. i Mfg. date May 2025 Expiry date ow I saw the bag left open and was not sealed/secured. I also SAW of material in ay bag on top ofa carton ofa wa Your Quality Head stated that the 44, looking gq WETe ww that belonged to one of the cartons with the Lot No. [redacted] The Baw Lot No. [redacted] was used to manufacture OTC drus products for the US market. e.9. [redacted]"
+     }
+    ]
+   },
+   "deep_analysis": null,
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/196260/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "0a7b0d339de9",
+   "render_order": 11,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "ECA&#39;s Analytical Quality Control Group Publishes Version…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "0a7b0d339de9"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "ECA&#39;s Analytical Quality Control Group Publishes Version 3.0 of the Out of S…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/ecas-analytical-quality-control-group-publishes-version-3-0-of-the-out-of-specification-oos-guidance",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "9730858b8989",
+   "render_order": 12,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "Supplier Qualification and Oversight in an FDA Warning Lette…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "9730858b8989"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Supplier Qualification and Oversight in an FDA Warning Letter"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/supplier-qualification-and-oversight-in-an-fda-warning-letter",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "a74d4fbdccdd",
+   "render_order": 13,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "Warning Letter - Endotoxins, Microbiological Weaknesses and…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "a74d4fbdccdd"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Warning Letter - Endotoxins, Microbiological Weaknesses and Further Contaminatio…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/warning-letter-endotoxins-microbiological-weaknesses-and-further-contamination",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "ad04c5ea4a99",
+   "render_order": 14,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "FDA Warning Letter Highlights Component Testing, Batch Relea…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "ad04c5ea4a99"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "FDA Warning Letter Highlights Component Testing, Batch Release and Quality Overs…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-highlights-component-testing-batch-release-and-quality-oversight-gaps",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "ef50339bb834",
+   "render_order": 15,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "MHRA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP News",
+   "headline_target": "Understanding Annex 1: A Harmonised Approach to Interpretati…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "ef50339bb834"
+    },
+    {
+     "label": "발행기관",
+     "value": "MHRA"
+    },
+    {
+     "label": "주제",
+     "value": "Understanding Annex 1: A Harmonised Approach to Interpretation"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://mhrainspectorate.blog.gov.uk/feed/",
+    "official_url": "https://mhrainspectorate.blog.gov.uk/2026/11/16/understanding-annex-1-a-harmonised-approach-to-interpretation/",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "1d9759b41ff0",
+   "render_order": 16,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "VDI 2083 Sheet 4.1 Final Version Published: Guideline on Pla…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "1d9759b41ff0"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "VDI 2083 Sheet 4.1 Final Version Published: Guideline on Planning, Construction…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/vdi-2083-sheet-4-1-final-version-published-guideline-on-planning-construction-and-start-up-of-cleanrooms",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "74030b79bdf2",
+   "render_order": 17,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "FDA Opens the Door to eCTD 4.0",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "74030b79bdf2"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "FDA Opens the Door to eCTD 4.0"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/fda-opens-the-door-to-ectd-4-0",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "b3753e6d62c7",
+   "render_order": 18,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "ECA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "GMP News",
+   "headline_target": "Potency of Cell and Gene Therapies - Draft FDA Guideline",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "b3753e6d62c7"
+    },
+    {
+     "label": "발행기관",
+     "value": "ECA"
+    },
+    {
+     "label": "주제",
+     "value": "Potency of Cell and Gene Therapies - Draft FDA Guideline"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://app.gxp-services.net/eca_newsfeed.xml",
+    "official_url": "https://www.gmp-compliance.org/gmp-news/potency-of-cell-and-gene-therapies-draft-fda-guideline",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "8b95096fb867",
+   "render_order": 19,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "EMA",
+   "card_type": "규제 소식",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "규제 소식",
+   "headline_target": "Reflection paper on the use of heat treatment to inactivate…",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-13"
+    },
+    {
+     "label": "문서번호",
+     "value": "8b95096fb867"
+    },
+    {
+     "label": "발행기관",
+     "value": "EMA"
+    },
+    {
+     "label": "주제",
+     "value": "Reflection paper on the use of heat treatment to inactivate endogenous retroviru…"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.ema.europa.eu/en/scientific-guidelines.xml",
+    "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/reflection-paper-use-heat-treatment-inactivate-endogenous-retroviruses-live-immunological-veterinary-medicinal-products-revision-1_en.pdf",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "data0008-15206",
+   "render_order": 20,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "고시·개정법령",
+   "category": "Guidance",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "규정",
+   "headline_target": "의약외품 범위 지정 검토위원회 구성 및 운영에 관한 규정(예규)",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "data0008-15206"
+    },
+    {
+     "label": "발행기관",
+     "value": "MFDS"
+    },
+    {
+     "label": "주제",
+     "value": "의약외품 범위 지정 검토위원회 구성 및 운영에 관한 규정(예규)"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.mfds.go.kr/www/rss/brd.do?brdId=data0008",
+    "official_url": "https://www.mfds.go.kr/brd/m_207/view.do?seq=15206",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q7XhpAwI0q",
+   "render_order": 21,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "(주)유영제약",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q7XhpAwI0q"
+    },
+    {
+     "label": "제조소",
+     "value": "(주)유영제약"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-07-13~2026-07-16"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) 지적사항은 PIC/S 정의에 따라 중대, 중요, 기타로 구분됨 - 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 - 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 - ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획의 타당성…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 2,
+    "severity_summary": {
+     "기타": 2
+    },
+    "rows": [
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제2.1호 아목",
+      "summary": "중요 제조설비는 실제 운전조건 반영하여 적격성평가를 실시할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제6.4호",
+      "summary": "제품과 접촉하는 모든 기구는 세척밸데이션을 실시할 것",
+      "followup": "이행계획서 타당성 인정"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q7XhpAwI0q",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q7XhpAwhFA",
+   "render_order": 22,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "(주)셀트리온제약",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q7XhpAwhFA"
+    },
+    {
+     "label": "제조소",
+     "value": "(주)셀트리온제약"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-08-31~2026-09-02"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 3) 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획 확인 후 타당성이 인…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q7XhpAwhFA",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-74000539e83e",
+   "render_order": 24,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)이풀잎제약",
+   "title_issue": "",
+   "summary": "",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-11-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-74000539e83e"
+    },
+    {
+     "label": "업체",
+     "value": "(주)이풀잎제약"
+    },
+    {
+     "label": "제품",
+     "value": "이풀잎강황"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합)",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "201004881",
+    "std_cd": "8800660000400,8800660000417,8800660000424,8800660000431,8800660000448",
+    "bizrno": "1328195026"
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  }
+ ]
+}

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-17T02:08:09Z",
+ "generated_at": "2026-11-17T05:49:32Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 44025961516,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-17T05:42:21Z",
+    "updatedAt": "2026-11-17T05:49:15Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh recent regulatory news (#1808)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44025961516"
+   },
+   {
+    "databaseId": 44022882972,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-17T05:15:58Z",
+    "updatedAt": "2026-11-17T05:23:28Z",
+    "headBranch": "automation/news-auto-44022795338",
+    "displayTitle": "chore: refresh recent regulatory news",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44022882972"
+   },
+   {
     "databaseId": 43981935410,
     "status": "completed",
     "conclusion": "success",
@@ -205,28 +227,6 @@
     "headBranch": "claude/glossary-weekly-202647",
     "displayTitle": "glossary(weekly): 202647 용어 1개 — 수입경보",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43979590176"
-   },
-   {
-    "databaseId": 43979585288,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T23:28:31Z",
-    "updatedAt": "2026-11-16T23:35:14Z",
-    "headBranch": "claude/glossary-weekly-202647",
-    "displayTitle": "glossary(weekly): 202647 용어 1개 — 수입경보",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43979585288"
-   },
-   {
-    "databaseId": 43970682275,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T22:30:18Z",
-    "updatedAt": "2026-11-16T22:36:28Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1788 from MINHOYEOM/claude/glossary-fig-daily-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43970682275"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 44026752209,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-17T05:49:17Z",
+    "updatedAt": "2026-11-17T05:49:18Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44026752209"
+   },
+   {
     "databaseId": 43971685415,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43926068983"
-   },
-   {
-    "databaseId": 43909710806,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-16T16:38:22Z",
-    "updatedAt": "2026-11-16T16:38:23Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43909710806"
    }
   ],
   "grm-findings-translate-apply.yml": [

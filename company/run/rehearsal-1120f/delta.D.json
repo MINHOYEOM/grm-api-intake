@@ -1,0 +1,446 @@
+{
+  "status": "완료",
+  "run_date_kst": "2026-11-16",
+  "shard": "D",
+  "cards": {
+    "admin-2026008197": {
+      "title_issue": "마약류 취급내역 보고기한 위반",
+      "hook_line": "마약류 양수·제조·판매 내역을 기한 내 보고 못해 업무정지 3일",
+      "summary": "식약처가 (주)휴온스에 마약류제조업자 업무정지 3일을 처분했다. 마약류 취급내역을 보고기한과 변경 보고기한 안에 보고하지 못했다.",
+      "key_facts": [
+        "위반: 마약류를 양수·제조·판매하면서 취급내역을 보고기한과 변경 보고기한 안에 보고하지 못함",
+        "처분: 마약류제조업자 업무정지 3일(2026-11-23~25)",
+        "근거: 마약류 관리에 관한 법률 제11조, 같은 법 시행규칙 제21조"
+      ],
+      "implication": "보고하지 못한 품목에는 케타민염산염 주사제와 펜터민염산염 원료, Eszopiclone 시험연구용 원료가 들어 있다.",
+      "checks": [
+        "마약류 양수·제조·판매 내역이 보고기한 안에 마약류통합관리시스템에 보고됐는지 정기적으로 대조하는가?",
+        "보고한 취급내역을 고치면 변경 보고기한 안에 변경 보고하는가?"
+      ],
+      "en": {
+        "title_issue": "Narcotics handling reports filed late",
+        "hook_line": "Narcotics transfer, manufacture and sale records not reported on time, 3-day suspension",
+        "summary": "MFDS suspended a manufacturer's narcotics manufacturing operations for 3 days for failing to report narcotics handling records within the reporting and amendment deadlines.",
+        "key_facts": [
+          "Violation: narcotics handling records for transfer, manufacture and sale not reported within the reporting and amendment deadlines",
+          "Sanction: 3-day suspension of narcotics manufacturing operations (2026-11-23 to 25)",
+          "Basis: Narcotics Control Act Article 11 and Enforcement Rule Article 21"
+        ],
+        "implication": "Unreported items included a ketamine hydrochloride injection, phentermine hydrochloride raw material and eszopiclone raw material for research.",
+        "checks": [
+          "Do you regularly reconcile whether narcotics transfer, manufacture and sale records were reported to the national narcotics system on time?",
+          "When you amend a reported record, do you file the amendment within the deadline?"
+        ]
+      }
+    },
+    "gmpinspect-1Q73JiEyrIf": {
+      "title_issue": "배지 관리 기록 등 기타 지적 3건",
+      "hook_line": "시험실·시설장비 분야에서 기타 등급 지적 3건",
+      "summary": "식약처가 이탈리아 ABIOGEN PHARMA S.p.A 완제의약품 제조소를 현지실사해 지적(보완)사항 3건을 확인했다.",
+      "key_facts": [
+        "지적 1: 배지에 대한 관리상황을 적절히 기록할 것(시험실, 기타)",
+        "지적 2: 시험 판정에 대한 데이터 완전성 보완 대책 등을 마련할 것(시험실, 기타)",
+        "지적 3: 제조설비의 운전 적격성평가를 적절히 수행할 것(시설장비, 기타)",
+        "평가 결과: 지적(보완)사항 있음"
+      ],
+      "implication": "실사 대상은 비무균 일반제제 내용액제 완제의약품이다. 수입 의약품 해외제조소의 GMP 준수 여부를 확인하는 사후 현지실사였다.",
+      "checks": [
+        "배지의 입고·조제·사용 상황을 기록으로 관리하는가? (지적 1)",
+        "시험 판정 자료의 데이터 완전성을 보증하는 대책이 문서로 있는가? (지적 2)",
+        "제조설비마다 운전 적격성평가 기록이 있는가? (지적 3)"
+      ],
+      "en": {
+        "title_issue": "Three minor (other) findings incl. media records",
+        "hook_line": "Three findings rated other in the laboratory and facilities and equipment areas",
+        "summary": "MFDS conducted an on-site inspection of ABIOGEN PHARMA S.p.A, a finished product manufacturing site in Italy, and identified 3 deficiencies.",
+        "key_facts": [
+          "Finding 1: record the management status of culture media properly (laboratory, other)",
+          "Finding 2: put in place measures to strengthen data integrity of test decisions (laboratory, other)",
+          "Finding 3: perform operational qualification of manufacturing equipment properly (facilities and equipment, other)",
+          "Outcome: deficiencies found"
+        ],
+        "implication": "The inspection covered non-sterile oral liquid finished products. It was a post-approval on-site inspection to verify GMP compliance of an overseas site supplying imported medicines.",
+        "checks": [
+          "Do you keep records of the receipt, preparation and use of culture media? (Finding 1)",
+          "Do you have documented measures that assure data integrity of test decisions? (Finding 2)",
+          "Is there an operational qualification record for each piece of manufacturing equipment? (Finding 3)"
+        ]
+      }
+    },
+    "recall-5f3494bdb71f": {
+      "title_issue": "안정성 시험 함량 기준일탈 회수",
+      "hook_line": "토스롱에스액, 안정성 시험 함량 기준일탈로 영업자 회수",
+      "summary": "토스롱에스액이 안정성 시험 일부 항목(스코폴라민브롬화수소산염수화물 함량) 기준일탈로 영업자 회수됐다.",
+      "key_facts": [
+        "사유: 안정성 시험 일부 항목(스코폴라민브롬화수소산염수화물 함량) 기준일탈",
+        "제품·범위: 토스롱에스액 1품목",
+        "구분: 영업자 회수"
+      ],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Recall for stability assay failure",
+        "hook_line": "Oral liquid recalled by the company after a stability assay was out of specification",
+        "summary": "An oral liquid product was recalled by the company after part of its stability testing (scopolamine hydrobromide hydrate assay) was out of specification.",
+        "key_facts": [
+          "Reason: stability test item (scopolamine hydrobromide hydrate assay) out of specification",
+          "Product and scope: one product",
+          "Type: voluntary recall by the company"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "recall-a458a7fc84b1": {
+      "title_issue": "안정성 시험 pH 기준일탈 회수",
+      "hook_line": "이지롱내복액, 안정성시험 pH 기준일탈로 영업자 회수",
+      "summary": "이지롱내복액이 안정성시험 일부 항목(pH) 기준일탈로 영업자 회수됐다.",
+      "key_facts": [
+        "사유: 안정성시험 일부 항목(pH) 기준일탈",
+        "제품·범위: 이지롱내복액 1품목",
+        "구분: 영업자 회수"
+      ],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Recall for stability pH failure",
+        "hook_line": "Oral solution recalled by the company after a stability pH test was out of specification",
+        "summary": "An oral solution product was recalled by the company after part of its stability testing (pH) was out of specification.",
+        "key_facts": [
+          "Reason: stability test item (pH) out of specification",
+          "Product and scope: one product",
+          "Type: voluntary recall by the company"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "recall-e1c88c0c401f": {
+      "title_issue": "이물 혼입 회수",
+      "hook_line": "레바미피드 정제 1품목, 이물 혼입으로 영업자 회수",
+      "summary": "파마레바미피드정이 이물 혼입 우려로 영업자 회수됐다.",
+      "key_facts": [
+        "사유: 이물 혼입 우려",
+        "제품·범위: 파마레바미피드정 1품목",
+        "구분: 영업자 회수"
+      ],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Recall for foreign matter",
+        "hook_line": "One rebamipide tablet product recalled by the company over foreign matter",
+        "summary": "A rebamipide tablet product was recalled by the company over foreign matter contamination.",
+        "key_facts": [
+          "Reason: foreign matter contamination",
+          "Product and scope: one rebamipide tablet product",
+          "Type: voluntary recall by the company"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "949016d08856": {
+      "title_issue": "무균 제조 결함으로 경고서한",
+      "summary": "FDA가 미국 무균 제조소를 둔 Baxter International Inc.에 무균 제조 결함으로 경고서한을 발행했다(ECA 보도).",
+      "key_facts": [],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Warning letter over sterile manufacturing failures",
+        "summary": "FDA issued a warning letter to Baxter International Inc., a US based manufacturer, over sterile manufacturing failures (reported by ECA).",
+        "key_facts": [],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "dba4d011e02b": {
+      "title_issue": "한국 무균 제조소 기류·육안검사 지적",
+      "summary": "FDA가 2026년 4월 한국의 무균 제조소를 실사하고 기류, 무균 조건, 육안검사를 지적했다(ECA 보도).",
+      "key_facts": [],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Airflow, aseptic and visual inspection cited",
+        "summary": "FDA inspected a sterile manufacturer in South Korea in April 2026 and cited airflow, aseptic conditions and visual inspection (reported by ECA).",
+        "key_facts": [],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "769b37244dce": {
+      "title_issue": "11월 CHMP 신약 7개 허가 권고",
+      "summary": "EMA 인체용 의약품위원회(CHMP)가 2026년 11월 회의에서 신약 7개의 허가를 권고했다. 권고에는 비소세포폐암 치료제 Aumseqa(aumolertinib)의 판매 허가가 들어 있다.",
+      "key_facts": [],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "CHMP recommends seven medicines in November",
+        "summary": "EMA's human medicines committee (CHMP) recommended seven medicines for approval at its November 2026 meeting, including a marketing authorisation for Aumseqa (aumolertinib) for non-small cell lung cancer.",
+        "key_facts": [],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "fda483-196287": {
+      "title_issue": "안정성 기준일탈 조사 장기 미종결",
+      "hook_line": "안정성 기준일탈 조사가 340일째 열려 있음",
+      "summary": "FDA가 미국 자사 상표 유통·재포장 업체 Water-Jel Technologies, LLC에 Form 483(관찰사항 2건)을 발행했다. 기준일탈(OOS)·부적합 조사 지연과 안정성 시험 계획서 미수립을 지적했다.",
+      "key_facts": [
+        "관찰 1: 일반의약품 안정성 기준일탈과 부적합 조사를 정당한 사유 없이 제때 끝내지 않아 340일째 열린 조사가 있음",
+        "관찰 2: 안정성 설계 절차서 5.9항과 달리 제품마다 보관 조건·기간·시험 간격·검체 수를 정한 계획서를 두지 않음"
+      ],
+      "implication": "회사가 연 부적합 건의 50% 이상이 156~681일째 열려 있었다(관찰 1). 1년 넘게 열린 부적합에는 포장 오류, 수량 부족, 다른 겔 제품 격리, 크림 누출이 있다(관찰 1).",
+      "checks": [
+        "안정성 기준일탈 조사에 종결 기한과 기한 연장 승인 절차가 있는가? (관찰 1)",
+        "제품마다 보관 조건·시험 간격·검체 수를 정한 안정성 시험 계획서가 있는가? (관찰 2)"
+      ],
+      "en": {
+        "title_issue": "Stability OOS investigations left open",
+        "hook_line": "A stability OOS investigation had been open for 340 days",
+        "summary": "FDA issued a Form 483 with 2 observations to Water-Jel Technologies, LLC, an own label distributor and repackager in the US, citing delayed OOS and non-conformance investigations and missing stability protocols.",
+        "key_facts": [
+          "Observation 1: stability OOS and non-conformance investigations for OTC products not completed in a timely manner without justification, with one open for 340 days",
+          "Observation 2: contrary to section 5.9 of the stability design SOP, no protocol per product stating storage conditions, study length, testing intervals and number of samples"
+        ],
+        "implication": "More than 50% of non-conformances the firm initiated had been open for 156-681 days (Observation 1). Those open for a year or more included a packaging error, short counts, a wrong gel quarantine and leaking cream (Observation 1).",
+        "checks": [
+          "Do stability OOS investigations have a closure deadline and an approval step for extensions? (Observation 1)",
+          "Does each product have a stability protocol stating storage conditions, intervals and sample numbers? (Observation 2)"
+        ]
+      }
+    },
+    "00ae76e635bb": {
+      "title_issue": "기록 제출 거부, 수입경보 등재",
+      "hook_line": "미국용 생산을 중단하겠다며 기록 제출을 거부, 수입경보 등재",
+      "summary": "FDA가 중국 원료의약품 제조소 Tianjin Healthcare Medical Technology Co., Ltd.에 경고서한을 발행했다. 기록 제출 요청을 거부한 것을 위반으로 지적했다.",
+      "key_facts": [
+        "위반 1: FD&C Act 704(a)(4)에 따른 기록 요청을 거부함(FD&C Act 301(e))",
+        "회신과 FDA 판단: 회사는 미국 시장용 생산을 중단하겠다며 기록을 내지 않았고, FDA는 유통 중단이나 생산 중단 의사가 규제 의무를 소급해 없애지 않는다고 판단함",
+        "당국 조치: 2026-08-25 수입경보 66-79 등재, 15 영업일 안에 서면 회신"
+      ],
+      "implication": "수입 기록에는 약국 조제용 원료의약품 여러 건이 이 회사를 제조원으로 신고돼 있었다. FDA는 2026-06-17 등록 연락처 이메일로 기록을 요청했다. 회사는 2026-06-24 제출을 거부했다. FDA는 2026-06-25 수입된 원료의약품이 아직 유효기간 안에 있다며 다시 요청했으나 회사는 거부했다. FDA는 미국용 제조를 그만두려면 운영 중단 뒤 30일 안에 등록과 품목 목록을 고쳐야 한다고 밝혔다. FDA는 CGMP 준수를 확인할 때까지 이 회사를 제조원으로 적은 신규 신청을 승인하지 않을 수 있다고 밝혔다.",
+      "checks": [
+        "FDA의 704(a)(4) 기록 요청이 오는 등록 연락처 이메일을 누가 확인하는지 정해져 있는가? (위반 1)",
+        "미국 출하를 멈춘 품목도 유효기간 안의 제품에 대한 기록을 바로 낼 수 있게 보관하는가? (위반 1)"
+      ],
+      "en": {
+        "title_issue": "Records refused; placed on import alert",
+        "hook_line": "Refused to provide records, saying it would stop US production; placed on import alert",
+        "summary": "FDA issued a warning letter to Tianjin Healthcare Medical Technology Co., Ltd., an API manufacturer in China, for refusing to provide requested records.",
+        "key_facts": [
+          "Violation 1: refused records requested under FD&C Act 704(a)(4) (FD&C Act 301(e))",
+          "Response and FDA's assessment: the firm said it would discontinue production for the US market and withheld records; FDA said ceasing distribution or intending to stop production does not retroactively relieve its obligations",
+          "Agency action: placed on Import Alert 66-79 on 2026-08-25; written response due within 15 business days"
+        ],
+        "implication": "Import records showed multiple shipments of APIs for pharmacy compounding that declared the firm as manufacturer. FDA sent a records request to the registered contact email on 2026-06-17. The firm refused on 2026-06-24. FDA sent a follow-up on 2026-06-25, noting the imported APIs were still within expiry, and the firm again refused. FDA said that a firm leaving the US market must update its registration and listings within 30 days of ceasing operations. FDA said it may withhold approval of new applications listing the firm as a manufacturer until compliance with CGMP is confirmed.",
+        "checks": [
+          "Is someone assigned to monitor the registered contact email for FDA 704(a)(4) records requests? (Violation 1)",
+          "For products no longer shipped to the US, are records for in-date product kept ready to provide? (Violation 1)"
+        ]
+      }
+    },
+    "2026-23005": {
+      "title_issue": "항암제 동반 면역조직화학 재분류안",
+      "summary": "FDA가 승인된 항암 치료제와 함께 쓰는 면역조직화학 시험 시스템을 Class III에서 Class II로 재분류하는 안을 제안했다.",
+      "key_facts": [
+        "바뀌는 것: Class III(PMA) 기기를 특별 관리 대상 Class II로 재분류하고 510(k) 대상으로 바꿈",
+        "적용 대상: 승인된 항암 치료제와 함께 쓰는 면역조직화학 시험 시스템(제품 코드 MVC, NKF, QQT, NQF, PLS, PKW, QUL, QNH, QZJ, SBL, SER, SHF)"
+      ],
+      "implication": "FDA는 기존 분류 규정을 일부 고치고 새 기기 분류 규정과 그에 필요한 특별 관리 기준을 함께 제안했다.",
+      "checks": [],
+      "quotes_translation": [
+        "FDA는 승인된 항암 치료제와 함께 쓰도록 표시된 면역조직화학 시험 시스템(제품 코드 MVC, NKF, QQT, NQF, PLS, PKW, QUL, QNH, QZJ, SBL, SE…)의 재분류를 제안한다."
+      ],
+      "en": {
+        "title_issue": "Companion IHC tests proposed for Class II",
+        "summary": "FDA proposed reclassifying immunohistochemistry test systems for use with a corresponding approved oncology therapeutic product from Class III to Class II.",
+        "key_facts": [
+          "What changes: Class III (PMA) devices reclassified into Class II with special controls, subject to 510(k)",
+          "Applies to: immunohistochemistry test systems for use with an approved oncology therapeutic product (product codes MVC, NKF, QQT, NQF, PLS, PKW, QUL, QNH, QZJ, SBL, SER, SHF)"
+        ],
+        "implication": "FDA also proposed minor revisions to an existing classification regulation and a new device classification regulation with the special controls it considers necessary.",
+        "checks": []
+      }
+    },
+    "hc-82928": {
+      "title_issue": "불순물 기준일탈 회수",
+      "hook_line": "디펜히드라민 캡슐, 불순물 기준일탈로 Type II 회수",
+      "summary": "PDP-DIPHENHYDRAMINE 25 mg·50 mg 캡슐이 불순물 기준일탈(OOS)로 회수됐다(Type II).",
+      "key_facts": [
+        "사유: 제품 품질 — 불순물 기준일탈",
+        "제품·범위: PDP-DIPHENHYDRAMINE 25 mg·50 mg 캡슐",
+        "등급: Type II"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "제품 품질"
+      ],
+      "en": {
+        "title_issue": "Recall for out-of-specification impurity",
+        "hook_line": "Diphenhydramine capsules recalled for an out-of-specification impurity, Type II",
+        "summary": "PDP-DIPHENHYDRAMINE 25 mg and 50 mg capsules were recalled for an out-of-specification impurity result (Type II).",
+        "key_facts": [
+          "Reason: product quality — out-of-specification impurity",
+          "Product and scope: PDP-DIPHENHYDRAMINE 25 mg and 50 mg capsules",
+          "Class: Type II"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "hc-82939": {
+      "title_issue": "이물 혼입 로트 회수",
+      "hook_line": "비강용 겔 영향 로트, 오염 사유로 Type II 회수",
+      "summary": "SECARIS NASAL GEL이 영향 로트에 이물이 들어 있을 수 있어 회수됐다(Type II).",
+      "key_facts": [
+        "사유: 오염 — 영향 로트에 이물이 들어 있을 수 있음",
+        "제품·범위: SECARIS NASAL GEL 영향 로트",
+        "등급: Type II"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "오염"
+      ],
+      "en": {
+        "title_issue": "Recall for foreign matter in a lot",
+        "hook_line": "Affected nasal gel lot recalled for contamination, Type II",
+        "summary": "SECARIS NASAL GEL was recalled because the affected lot may contain foreign matter (Type II).",
+        "key_facts": [
+          "Reason: contamination — affected lot may contain foreign matter",
+          "Product and scope: SECARIS NASAL GEL, affected lot",
+          "Class: Type II"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "758874567fae": {
+      "title_issue": "인공지능 활용 품질 체계 확장 1부",
+      "summary": "ISPE가 인공지능에서 얻은 정보를 화학·제조·품질관리, 공정 밸리데이션, 품질 시스템에 활용하는 방안을 다룬 연재 1부를 게재했다.",
+      "key_facts": [],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Using AI-derived insights in quality: Part 1",
+        "summary": "ISPE published Part 1 of a series on leveraging AI-derived insights across CMC, process validation and quality systems.",
+        "key_facts": [],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "admin-2026008055": {
+      "title_issue": "공급내역 보고 지연 판매업무정지",
+      "hook_line": "주사제 공급내역을 기한 내 보고하지 않아 판매업무정지 10일",
+      "summary": "식약처가 비오신코리아(주)에 셀레나제티프로주사 판매업무정지 10일을 처분했다. 2026년 1분기 이 품목의 공급내역을 기한 안에 보고하지 않았다.",
+      "key_facts": [
+        "위반: 완제의약품 공급내역을 출하할 때 의약품관리종합정보센터에 기한 안에 보고하지 않음",
+        "경위: 출하일자 2026-02-11, 보고일자 2026-02-13",
+        "처분: 셀레나제티프로주사 판매업무정지 10일(2026-11-24~2026-12-03)",
+        "근거: 약사법 제47조의3제2항, 같은 법 시행규칙 제45조"
+      ],
+      "implication": "보고기한이 지난 날부터 1개월 안에 공급내역을 보고해 처분이 감경됐다.",
+      "checks": [
+        "완제의약품을 출하한 날 공급내역 보고가 함께 처리되는가?",
+        "출하일자와 공급내역 보고일자를 대조해 늦은 보고를 찾아내는가?"
+      ],
+      "en": {
+        "title_issue": "Late supply report; sales suspension",
+        "hook_line": "Injection supply records not reported on time, 10-day sales suspension for the product",
+        "summary": "MFDS suspended an injection product's sales for 10 days because the company did not report its supply records for the first quarter of 2026 on time.",
+        "key_facts": [
+          "Violation: supply records for a finished drug not reported to the drug information center by the deadline at shipment",
+          "Timeline: shipped 2026-02-11, reported 2026-02-13",
+          "Sanction: 10-day sales suspension for the product (2026-11-24 to 2026-12-03)",
+          "Basis: Pharmaceutical Affairs Act Article 47-3(2) and Enforcement Rule Article 45"
+        ],
+        "implication": "The sanction was reduced because the supply records were reported within 1 month after the deadline.",
+        "checks": [
+          "Is the supply report processed on the same day a finished product ships?",
+          "Do you compare shipment dates with supply report dates to catch late reports?"
+        ]
+      }
+    },
+    "admin-2026008195": {
+      "title_issue": "마약류 취급내역 116건 보고 지연",
+      "hook_line": "프로포폴 표준품 등 마약류 취급내역을 기한 내 보고하지 않아 경고",
+      "summary": "식약처가 대한약품공업(주)에 마약류제조업자 경고를 처분했다. 향정신성의약품 취급내역 116건을 보고기한 안에 보고하지 않았다.",
+      "key_facts": [
+        "위반: 향정신성의약품 표준품 프로포폴(100 mg) 등 116건의 취급내역을 보고기한 안에 보고하지 않음",
+        "처분: 마약류제조업자 경고",
+        "근거: 마약류 관리에 관한 법률 제11조, 같은 법 시행규칙 제21조"
+      ],
+      "implication": "",
+      "checks": [
+        "시험용 마약류 표준품의 사용·폐기 내역도 보고 대상으로 관리하는가?",
+        "마약류 취급내역의 보고기한 경과 건수를 월마다 확인하는가?"
+      ],
+      "en": {
+        "title_issue": "116 narcotics handling records reported late",
+        "hook_line": "Narcotics handling records, including a propofol reference standard, reported late",
+        "summary": "MFDS issued a warning to a narcotics manufacturer that did not report 116 psychotropic drug handling records within the reporting deadline.",
+        "key_facts": [
+          "Violation: 116 handling records, including a propofol (100 mg) reference standard, not reported by the deadline",
+          "Sanction: warning (narcotics manufacturer)",
+          "Basis: Narcotics Control Act Article 11 and Enforcement Rule Article 21"
+        ],
+        "implication": "",
+        "checks": [
+          "Are use and disposal of narcotic reference standards for testing tracked as reportable handling?",
+          "Do you check the number of overdue narcotics handling reports every month?"
+        ]
+      }
+    },
+    "admin-2026008196": {
+      "title_issue": "세 업종 마약류 취급내역 보고 지연",
+      "hook_line": "원료사용·제조·수출입 세 업종 모두 마약류 내역 기한 내 미보고, 경고",
+      "summary": "식약처가 (주)종근당에 마약류원료사용자·마약류제조업자·마약류수출입업자 경고를 처분했다. 세 업종 모두에서 마약류 취급내역을 보고기한과 변경 보고기한 안에 보고하지 못했다.",
+      "key_facts": [
+        "위반: 디히드로코데인타르타르산염·덱스트로메토르판 원료 사용, 에티졸람 구입·제조, 클로나제팜 정제 양수·판매 내역 등을 보고기한과 변경 보고기한 안에 보고하지 못함",
+        "처분: 마약류원료사용자·마약류제조업자·마약류수출입업자 경고",
+        "근거: 마약류 관리에 관한 법률 제11조, 같은 법 시행규칙 제21조"
+      ],
+      "implication": "",
+      "checks": [
+        "마약류 원료 사용 내역과 완제품 제조 내역을 업종별로 따로 보고하는가?",
+        "수입한 마약류 표준품의 양수·사용 내역도 보고기한 안에 보고되는가?"
+      ],
+      "en": {
+        "title_issue": "Late narcotics reports in three licence roles",
+        "hook_line": "Late narcotics handling reports as raw material user, manufacturer and importer-exporter",
+        "summary": "MFDS issued a warning to a company licensed as a narcotics raw material user, manufacturer and importer-exporter for failing to report handling records within the reporting and amendment deadlines in all three roles.",
+        "key_facts": [
+          "Violation: records of dihydrocodeine tartrate and dextromethorphan raw material use, etizolam purchase and manufacture, and clonazepam tablet transfer and sale not reported within the reporting and amendment deadlines",
+          "Sanction: warning (narcotics raw material user, manufacturer, importer-exporter)",
+          "Basis: Narcotics Control Act Article 11 and Enforcement Rule Article 21"
+        ],
+        "implication": "",
+        "checks": [
+          "Do you report raw material use and finished product manufacture separately for each licence role?",
+          "Are transfer and use of imported narcotic reference standards reported within the deadline?"
+        ]
+      }
+    },
+    "gmpinspect-1Q73JiEyqbl": {
+      "title_issue": "합성 원료 제조소 지적사항 없음",
+      "hook_line": "합성 원료의약품 제조소 현지실사에서 지적사항 없음",
+      "summary": "식약처가 이탈리아 Cosma S.P.A 원료의약품 제조소를 현지실사했고 지적(보완)사항은 없었다.",
+      "key_facts": [
+        "평가 결과: 지적(보완)사항 없음"
+      ],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "No deficiencies at synthetic API site",
+        "hook_line": "No deficiencies found in an on-site inspection of a synthetic API site",
+        "summary": "MFDS conducted an on-site inspection of Cosma S.P.A, an API manufacturing site in Italy, and found no deficiencies.",
+        "key_facts": [
+          "Outcome: no deficiencies"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    }
+  }
+}

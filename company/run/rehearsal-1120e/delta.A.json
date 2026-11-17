@@ -403,9 +403,9 @@
     "관찰 1: 엔도톡신 기준일탈(OOS) 결과를 기록하지 않고 다른 시료의 적합 결과로 바꿔 시험성적서(COA)에 보고함",
     "관찰 1: 경고한계 CFU가 나온 바이오버든 배지를 폐기했고, 실사관이 묻자 촬영 시각을 바꾸고 작업표를 소급 작성하게 함",
     "관찰 2: 2023년 1월 이후 미국 시장에서 효과 없음 불만 39건을 받았으나 근본원인을 정하지 않음",
-    "관찰 4: 앰플·바이알 충전 라인 기류 시각화 시험에서 난류와 작업자 머리·상체가 등급 A 구역에 들어간 중재가 확인됨"
+    "당국 조치: 같은 호 회수 — 카르복시메틸셀룰로오스나트륨 0.5% 인공눈물(Class II)"
    ],
-   "implication": "2025-10-31 기록부에서 일탈 시료를 적은 페이지를 뜯어내고 빈 양식으로 바꿔 다시 기록하게 했다(관찰 1). 기준일탈 조사 OS-LC23-006·OS-LC23-010은 과학적 근거 없이 오염된 유리기구·시간 부족을 원인으로 정했고 재시험 적합 뒤 배치를 미국에 출하했다(관찰 3). 감사추적기록 검토 절차가 주입 중단 같은 사건 확인을 요구하지 않았다(관찰 5). 장갑 세척 절차가 없었고 장갑 손가락을 모니터링하지 않았다(관찰 6).",
+   "implication": "2025-10-31 기록부에서 일탈 시료를 적은 페이지를 뜯어내고 빈 양식으로 바꿔 다시 기록하게 했다(관찰 1). 기준일탈 조사 OS-LC23-006·OS-LC23-010은 과학적 근거 없이 오염된 유리기구·시간 부족을 원인으로 정했고 재시험 적합 뒤 배치를 미국에 출하했다(관찰 3). 앰플·바이알 충전 라인 기류 시각화 시험에서 난류와 작업자 머리·상체가 등급 A 구역에 들어간 중재가 확인됐다(관찰 4). 감사추적기록 검토 절차가 주입 중단 같은 사건 확인을 요구하지 않았다(관찰 5). 장갑 세척 절차가 없었고 장갑 손가락을 모니터링하지 않았다(관찰 6).",
    "checks": [
     "기준일탈 결과가 나온 원래 시료의 기록을 시험성적서 작성 전에 모두 남기는가? (관찰 1)",
     "재시험으로 출하하기 전에 실험실 원인을 과학적 근거로 확인하는가? (관찰 3)",
@@ -419,9 +419,9 @@
      "Observation 1: endotoxin OOS results were not recorded and were replaced with passing results from different samples, which were reported on the COA",
      "Observation 1: bioburden plates with alert-level CFU were discarded; when the investigator asked, camera time was changed and worksheets were backdated",
      "Observation 2: since January 2023, 39 complaints of ineffectiveness were received from the US market with no root cause assigned",
-     "Observation 4: smoke studies of the ampoule and vial filling lines showed turbulent airflow and an intervention with an operator's head and upper body inside the Grade A area"
+     "Agency action: recall in the same issue — carboxymethylcellulose sodium 0.5% lubricant eye drops (Class II)"
     ],
-    "implication": "On 2025-10-31 logbook pages recording deviation samples were torn out, replaced with blank forms and backfilled (Observation 1). OOS investigations OS-LC23-006 and OS-LC23-010 assigned dirty glassware and insufficient time as root causes without scientific evidence, and batches were shipped to the US after passing retests (Observation 3). The audit trail review procedure did not require tracking of events such as aborted injections (Observation 5). There was no glove cleaning procedure and glove fingers were not monitored (Observation 6).",
+    "implication": "On 2025-10-31 logbook pages recording deviation samples were torn out, replaced with blank forms and backfilled (Observation 1). OOS investigations OS-LC23-006 and OS-LC23-010 assigned dirty glassware and insufficient time as root causes without scientific evidence, and batches were shipped to the US after passing retests (Observation 3). Smoke studies of the ampoule and vial filling lines showed turbulent airflow and an intervention with an operator's head and upper body inside the Grade A area (Observation 4). The audit trail review procedure did not require tracking of events such as aborted injections (Observation 5). There was no glove cleaning procedure and glove fingers were not monitored (Observation 6).",
     "checks": [
      "Are all records of the original OOS sample kept before the COA is issued? (Observation 1)",
      "Is a laboratory root cause confirmed with scientific evidence before a batch is released on retest? (Observation 3)",

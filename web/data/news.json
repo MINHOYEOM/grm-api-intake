@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-16",
+ "measured_on": "2026-11-17",
  "window_days": 60,
  "totals": {
-  "items": 439
+  "items": 446
  },
  "by_source": [
   {
@@ -11,12 +11,12 @@
    "c": 135
   },
   {
-   "v": "Federal Register",
-   "c": 79
+   "v": "ECA Academy",
+   "c": 84
   },
   {
-   "v": "ECA Academy",
-   "c": 77
+   "v": "Federal Register",
+   "c": 78
   },
   {
    "v": "EMA",
@@ -24,7 +24,7 @@
   },
   {
    "v": "MFDS",
-   "c": 45
+   "c": 46
   },
   {
    "v": "Health Canada",
@@ -48,6 +48,76 @@
   }
  ],
  "items": [
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-16",
+   "title": "ECA&#39;s Analytical Quality Control Group Publishes Version 3.0 of the Out of Specification (OOS) Guidance",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ecas-analytical-quality-control-group-publishes-version-3-0-of-the-out-of-specification-oos-guidance"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-16",
+   "title": "FDA Opens the Door to eCTD 4.0",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-opens-the-door-to-ectd-4-0"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-16",
+   "title": "FDA Warning Letter Highlights Component Testing, Batch Release and Quality Oversight Gaps",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-highlights-component-testing-batch-release-and-quality-oversight-gaps"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-16",
+   "title": "Potency of Cell and Gene Therapies - Draft FDA Guideline",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/potency-of-cell-and-gene-therapies-draft-fda-guideline"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-16",
+   "title": "Supplier Qualification and Oversight in an FDA Warning Letter",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/supplier-qualification-and-oversight-in-an-fda-warning-letter"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-16",
+   "title": "VDI 2083 Sheet 4.1 Final Version Published: Guideline on Planning, Construction and Start-Up of Cleanrooms",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/vdi-2083-sheet-4-1-final-version-published-guideline-on-planning-construction-and-start-up-of-cleanrooms"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-16",
+   "title": "Warning Letter - Endotoxins, Microbiological Weaknesses and Further Contamination",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/warning-letter-endotoxins-microbiological-weaknesses-and-further-contamination"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-11-16",
+   "title": "「의약품 병용금기 성분 등의 지정에 관한 규정」 일부개정고시안 행정예고(식품의약품안전처 공고 제2026-554호)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44322"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "regulation-final",
+   "published_date": "2026-11-16",
+   "title": "의약외품 범위 지정 검토위원회 구성 및 운영에 관한 규정(예규)",
+   "official_url": "https://www.mfds.go.kr/brd/m_207/view.do?seq=15206"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Compliance matters",
+   "published_date": "2026-11-16",
+   "title": "Understanding Annex 1: A Harmonised Approach to Interpretation",
+   "official_url": "https://mhrainspectorate.blog.gov.uk/2026/11/16/understanding-annex-1-a-harmonised-approach-to-interpretation/"
+  },
   {
    "source": "EMA",
    "source_kind": "news",
@@ -3099,27 +3169,6 @@
    "published_date": "2026-09-18",
    "title": "Target Animal Safety Evaluation for Veterinary Monoclonal Antibody Products; Draft Guidance for Industry; Availability",
    "official_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19141/target-animal-safety-evaluation-for-veterinary-monoclonal-antibody-products-draft-guidance-for"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-17",
-   "title": "Recommendations for the Development of Blood Collection, Processing, and Storage Systems for the Manufacture of Blood Components Using the Buffy Coat Method; Guidance for Industry; Availability",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/17/2026-19080/recommendations-for-the-development-of-blood-collection-processing-and-storage-systems-for-the"
-  },
-  {
-   "source": "MFDS",
-   "source_kind": "guidance-industry",
-   "published_date": "2026-09-17",
-   "title": "의약품 임상시험 계획(변경) 승인 보완사례집",
-   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15953"
-  },
-  {
-   "source": "MHRA Inspectorate",
-   "source_kind": "Class 4 Medicines Defect Notification",
-   "published_date": "2026-09-17",
-   "title": "Class 4 Medicines Defect Notification: Martindale Pharmaceuticals Ltd, Clobazam Martindale Pharma 5 mg/5 mL and 10 mg/5 mL Oral Suspension 150ml, EL(26)A/38",
-   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-martindale-pharmaceuticals-ltd-clobazam-martindale-pharma-5-mg-slash-5-ml-and-10-mg-slash-5-ml-oral-suspension-150ml-el-26-a-slash-38"
   }
  ]
 }

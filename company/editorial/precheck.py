@@ -34,6 +34,9 @@
         **원문 부재 단정**(`심층 부재 …` — 게이트 3 과 같은 판정 함수 `assemble_publish_brief.false_absence_match`,
         "처분문에 가중·감경 사유는 없다" 꼴 포함)과 **483 관찰 끝 근거 번호**(`심층 근거 번호 …` —
         `inject_slots.deep_483_basis_hits`)도 막는다(리허설 1120c 교열 반려 11장).
+        **심층분석 근거 게이트**(`verify_deep_analysis.run_deep_analysis_gate` — 발행 브릿지가 조립 직전에 카드마다 부르는 그 함수,
+        원문 = handoff `body_full`)의 FAIL 도 막는다(`심층 게이트 <id>: [FAIL] D2-…` — 리허설 1120d: 조항 인용이 원문 글자와 달라
+        조립은 그 카드 심층을 조용히 빼고 교열은 반려했다).
 
     python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json>
         재작업(반려 카드만 한 번 고치기) 뒤에 다시 합친 델타가 **반려 카드만** 바뀌었는지 본다.
@@ -231,6 +234,27 @@ def deep_term_lines(shard):
     return [f"심층 용어 {cid}.{slot}: {lab}" for cid, slot, lab in inject_slots.deep_term_hits(shard)]
 
 
+def deep_gate_lines(shard, handoff):
+    """심층분석 근거 게이트 FAIL 줄(순수) — 발행 브릿지(`delta_bridge._gate_deep_analysis`)와 같은 함수·같은 원문.
+
+    브릿지는 FAIL 카드의 심층을 조용히 빼고 발행하지만(graceful degrade) 교열은 그 카드를 반려한다 — 기자 단계에서 0 으로 만든다."""
+    import verify_deep_analysis as vda
+    items = shard.get("items") if isinstance(shard.get("items"), dict) else shard
+    sourced, _ = with_source_text(items or {}, handoff_bodies(handoff))
+    out = []
+    for cid, entry in sourced.items():
+        if not (isinstance(entry, dict) and isinstance(entry.get("deep_analysis"), dict)):
+            continue
+        try:
+            gate = vda.run_deep_analysis_gate(entry["deep_analysis"], entry.get("source_text", ""), card_type=None)
+        except Exception as e:  # noqa: BLE001 — 브릿지도 이 경우 카드 심층을 뺀다
+            out.append(f"심층 게이트 {cid}: 게이트 실행 오류 — {type(e).__name__}: {e}")
+            continue
+        if not gate.ok:
+            out.extend(f"심층 게이트 {cid}: {f}" for f in gate.findings if f.severity == vda.SEV_FAIL)
+    return out
+
+
 def deep_absence_lines(shard):
     """심층 칸 산문의 원문 부재 단정 줄(순수) — 게이트 3 과 같은 판정 함수. 심층이 있는 카드는 원문 확보 카드다."""
     import assemble_publish_brief as apb
@@ -405,7 +429,7 @@ def main(argv=None):
             if not isinstance(handoff, dict) or not isinstance(shard, dict):
                 raise ValueError("handoff·심층 샤드가 객체가 아니다")
             lines = (deep_lines(shard, fda483_ids(handoff)) + deep_term_lines(shard)
-                     + deep_absence_lines(shard) + deep_basis_lines(shard))
+                     + deep_absence_lines(shard) + deep_basis_lines(shard) + deep_gate_lines(shard, handoff))
             for line in lines:
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()

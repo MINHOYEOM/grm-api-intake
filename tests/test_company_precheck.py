@@ -242,6 +242,12 @@ class NestedTranslationTest(unittest.TestCase):
         self.assertEqual(precheck.deep_lines(gone, ids), ["483 관찰 국문 없음 fda483-1: observations_ko(★필수)"])
 
     def test_cli_and_instructions(self):
+        # 심층 근거 게이트(1120d)는 DeepGate1120dTest 가 본다 — 원문 없는 최소 픽스처라 여기서는 통과로 고정.
+        import verify_deep_analysis as vda
+        patcher = mock.patch.object(vda, "run_deep_analysis_gate",
+                                    return_value=vda.GateResult(ok=True, findings=[], report=""))
+        patcher.start()
+        self.addCleanup(patcher.stop)
         with tempfile.TemporaryDirectory() as tmp:
             h, good, bad = (os.path.join(tmp, n) for n in ("h.json", "g.json", "b.json"))
             Path(h).write_text(json.dumps({"rows": [{"web_card_id": "fda483-1", "kind": "fda-483"}]}), encoding="utf-8")
@@ -430,6 +436,12 @@ class DeepTermsBlockTest(unittest.TestCase):
         self.assertEqual(precheck.deep_term_lines(shard), [])
 
     def test_cli_deep_exits_1_on_terms(self):
+        # 심층 근거 게이트(1120d)는 DeepGate1120dTest 가 본다 — 원문 없는 최소 픽스처라 여기서는 통과로 고정.
+        import verify_deep_analysis as vda
+        patcher = mock.patch.object(vda, "run_deep_analysis_gate",
+                                    return_value=vda.GateResult(ok=True, findings=[], report=""))
+        patcher.start()
+        self.addCleanup(patcher.stop)
         with tempfile.TemporaryDirectory() as tmp:
             ho, sh = Path(tmp, "h.json"), Path(tmp, "deep.A.json")
             ho.write_text(json.dumps({"rows": []}), encoding="utf-8")
@@ -504,6 +516,36 @@ class Rehearsal1120cTest(unittest.TestCase):
         self.assertTrue(all(x.startswith("hook_line 금칙어 recall-1.") for x in block))
         # 화면도 같은 함수로 숨긴다.
         self.assertEqual(render._valid_hook_line({"hook_line": "이물 혼입 우려로 회수"}, "ko"), "")
+
+
+class DeepGate1120dTest(unittest.TestCase):
+    """리허설 1120d: 심층 근거 게이트 FAIL(조항 인용이 원문 글자와 다름) — 조립은 그 카드 심층을 빼고 교열은 반려했다."""
+
+    def test_uses_bridge_gate_with_handoff_body(self):
+        import verify_deep_analysis as vda
+        seen = {}
+
+        def fake(da, source, card_type=None):
+            seen["source"] = source
+            return vda.GateResult(ok=False, findings=[vda.Finding(vda.SEV_FAIL, "D2-CITATION-UNGROUNDED", "조항 없음"),
+                                                      vda.Finding(vda.SEV_WARN, "D3-X", "경고")], report="")
+        shard = {"items": {"admin-1": {"deep_analysis": {"key_violations": []}}, "admin-2": {"observations_ko": []}}}
+        handoff = {"rows": [{"web_card_id": "admin-1", "deep_analysis_input": {"body_full": "처분문 원문"}}]}
+        with mock.patch.object(vda, "run_deep_analysis_gate", side_effect=fake):
+            lines = precheck.deep_gate_lines(shard, handoff)
+        self.assertEqual(lines, ["심층 게이트 admin-1: [FAIL] D2-CITATION-UNGROUNDED — 조항 없음"])   # WARN 은 막지 않는다
+        self.assertEqual(seen["source"], precheck.handoff_bodies(handoff).get("admin-1", ""))
+
+    def test_pass_gives_no_lines(self):
+        import verify_deep_analysis as vda
+        with mock.patch.object(vda, "run_deep_analysis_gate",
+                               return_value=vda.GateResult(ok=True, findings=[], report="")):
+            self.assertEqual(precheck.deep_gate_lines({"items": {"a": {"deep_analysis": {}}}}, {"rows": []}), [])
+
+    def test_bridge_calls_the_same_gate(self):
+        import inspect
+        self.assertIn("_vda.run_deep_analysis_gate(", inspect.getsource(delta_bridge._gate_deep_analysis))
+        self.assertIn("deep_gate_lines(shard, handoff)", inspect.getsource(precheck.main))
 
 
 if __name__ == "__main__":

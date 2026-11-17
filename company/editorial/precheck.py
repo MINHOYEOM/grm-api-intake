@@ -13,8 +13,8 @@
         handoff 를 못 찾으면 종전처럼 전부 필수다.
         **조립 코드 검사도 같은 함수로 돌린다**(`inject_slots.validate_injection` — 개수·길이·마크업·영문 짝·타입 등
         조립이 막는 것 전부. 리허설 1118). 스캐폴드 사본(`_scaffold/brief_web_<날짜>.json`, `--scaffold`)이 있으면 인용 번역 대조까지 본다.
-        `--deep <심층 델타·샤드>` 를 주면 심층 칸 산문도 본다. 심층 칸 검사와 행정처분 요약 주어 검사는 **경고만** 낸다
-        (`경고:` 로 시작하는 줄 — exit 코드에 들어가지 않는다. 처음 2개 호 실측 뒤 차단 여부를 사람이 정한다).
+        `--deep <심층 델타·샤드>` 를 주면 심층 칸 산문의 경고(금지 표현·반복 문장)도 낸다. 행정처분 요약 주어 검사도 **경고만**
+        (`경고:` 로 시작하는 줄 — exit 코드에 들어가지 않는다). 심층 [용어·표기] 차단은 `deep` 명령이 한다.
 
     python company/editorial/precheck.py deep-source <handoff 파일> <deep_delta 파일> --out <검사용 파일>
         심층분석 델타의 각 카드에 그 주 handoff 의 `deep_analysis_input.body_full` 을 `source_text` 로 붙인
@@ -28,6 +28,9 @@
         심층 기자가 샤드를 `완료`로 내기 전에 돌린다. FDA 483 카드마다 `observations_ko` 가 **카드 층**
         (`items.<id>.observations_ko` — `deep_analysis` 안이 아니다)에 있고 항목마다 `number`·`deficiency_ko` 가 있는지,
         국문 병기가 `deep_analysis` 안에 잘못 들어가 있지 않은지 본다. 걸리면 한 줄씩 내고 exit 1.
+        **심층 칸 산문의 [용어·표기]도 막는다**(`inject_slots.deep_term_hits` — 델타 `terms` 와 **같은 함수**
+        `inject_slots.term_hits` 를 슬롯마다 부른다. 리허설 1120b: 경고만이라 교열이 심층 용어로 19장 반려).
+        걸린 줄은 `심층 용어 <id>.<슬롯>: <라벨>` 꼴이다. 금지 표현·반복 문장·483 꼴은 여전히 경고만.
 
     python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json>
         재작업(반려 카드만 한 번 고치기) 뒤에 다시 합친 델타가 **반려 카드만** 바뀌었는지 본다.
@@ -220,6 +223,11 @@ def fda483_ids(payload):
             and row.get("kind") == "fda-483"}
 
 
+def deep_term_lines(shard):
+    """심층 칸 산문의 [용어·표기] 위반 줄(순수) — 델타와 같은 함수(`inject_slots.term_hits`)를 슬롯마다."""
+    return [f"심층 용어 {cid}.{slot}: {lab}" for cid, slot, lab in inject_slots.deep_term_hits(shard)]
+
+
 def deep_lines(shard, ids_483):
     """심층 샤드의 국문 병기 자리·결손 줄(순수)."""
     out = []
@@ -340,7 +348,7 @@ def main(argv=None):
             handoff, shard = _load(args.handoff), _load(args.shard)
             if not isinstance(handoff, dict) or not isinstance(shard, dict):
                 raise ValueError("handoff·심층 샤드가 객체가 아니다")
-            lines = deep_lines(shard, fda483_ids(handoff))
+            lines = deep_lines(shard, fda483_ids(handoff)) + deep_term_lines(shard)
             for line in lines:
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()

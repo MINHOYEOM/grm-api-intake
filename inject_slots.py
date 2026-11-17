@@ -732,9 +732,10 @@ _TERM_VARIANTS: tuple[tuple[str, str], ...] = (
     (r"세균 내독소", "엔도톡신"),
     (r"환경모니터링", "환경 모니터링"),
     (r"클린룸", "청정실"),
-    (r"Quality Unit|(?<![A-Za-z])QU(?![A-Za-z])", "품질부서"),
+    (r"Quality Unit|(?<![A-Za-z0-9_-])QU(?![A-Za-z0-9_-])", "품질부서"),   # QU-SOP-… 같은 문서 번호는 아니다
     (r"공급처", "공급업체"),
     (r"세척 검증|공정 검증|(?<!재)재검증", "밸리데이션"),
+    (r"배치\s?기록|제조기록(?!서)", "제조기록서"),   # [리허설 1120b] v16 표 줄 — 식약처 '제조지시 및 기록서'는 안 걸린다
     (r"Audit trail|Alert Limit", "감사추적기록·경고한계"),
     (r"Warning Letter|경고장", "경고서한"),
     (r"조사관", "실사관"),
@@ -745,9 +746,50 @@ _TERM_VARIANTS: tuple[tuple[str, str], ...] = (
 _ABBR_NEEDS_KO: tuple[tuple[str, str], ...] = (
     ("OOS", "기준일탈"), ("CAPA", "시정 및 예방조치"), ("COA", "시험성적서"),
 )
+# [리허설 1120b] v16 '목록에 없는 약어는 한글로 푼다'(QU·RCA·OOT·CMO·CCIT 등). 교열이 실제로 반려한 약어
+# (QA·QC·HPLC·EM·AQL·OOT)와 같은 부류의 시험·조직 약어. 한글 풀이가 옆에 있어도(경향이탈(OOT)) 약어 자체를 쓰지 않는다.
+# 문서·시료 번호의 일부(QC-001·OOT/22)는 약어가 아니다 — 앞뒤에 영숫자·하이픈·슬래시가 붙으면 세지 않는다.
+_ABBR_OFF_LIST: tuple[tuple[str, str], ...] = (
+    ("QA", "품질보증"), ("QC", "품질관리"), ("HPLC", "고성능 액체크로마토그래피"),
+    ("UPLC", "초고성능 액체크로마토그래피"), ("GC", "가스크로마토그래피"), ("EM", "환경 모니터링"),
+    ("AQL", "합격 품질 수준"), ("OOT", "경향이탈 결과"), ("RCA", "근본원인 조사"), ("CMO", "위탁제조업체"),
+)
+# v16 표 줄 '기준일탈(OOS) — 처음 한 번, **이후 기준일탈**'(CAPA 는 '이후 CAPA' 라 다르다). 괄호 안이 아닌 맨 'OOS' 는
+# 같은 덩어리에 기준일탈(OOS)이 있어도 막는다(1120b 교열 반려 '회사의 모든 OOS 조사'). 조사 번호(OOS-24006·OOS/22/002)는 원문 그대로.
+_ABBR_KO_AFTER: tuple[tuple[str, str], ...] = (("OOS", "기준일탈"),)
+_ABBR_KO_AFTER_RE = tuple((re.compile(rf"(?<![A-Za-z])(?<!{ko}\(){a}(?![A-Za-z0-9_/-])"), a, ko)
+                          for a, ko in _ABBR_KO_AFTER)
+_ABBR_OFF_RE = tuple((re.compile(rf"(?<![A-Za-z0-9_/-]){a}(?![A-Za-z0-9_/-])"), a, ko) for a, ko in _ABBR_OFF_LIST)
 
 _BANNED_RE = tuple((lab, re.compile(p)) for lab, p in _BANNED_PHRASES)
 _TERM_RE = tuple((re.compile(p), fix) for p, fix in _TERM_VARIANTS)
+
+
+def term_hits(blob: str, context: str | None = None) -> list[str]:
+    """[용어·표기] 막는 검사의 **단일 원천**(순수) — 걸린 라벨 목록. 델타 카드 산문과 심층 칸 산문이 이 함수를 같이 부른다.
+
+    ★리허설 1120b: 델타는 이 규칙으로 막고 심층은 경고만 해서, 교열이 심층 산문 용어로 19장을 반려했다.
+    규칙을 두 벌 두지 않는다 — 표에 줄을 더하면 델타·심층 사전 점검이 같이 는다.
+    ① 표 왼쪽 표기 ② 허용 약어 단독(`context`(없으면 `blob`)에 한글 표기 없음 — '처음 한 번'은 카드 단위)
+    ③ OOS 는 처음 한 번 뒤에도 맨 약어 금지 ④ 목록 밖 약어."""
+    context = blob if context is None else context
+    out: list[str] = []
+    for rx, fix in _TERM_RE:
+        m = rx.search(blob)
+        if m:
+            out.append(f"'{m.group(0)}'→{fix}")
+    alone = set()
+    for abbr, ko in _ABBR_NEEDS_KO:
+        if re.search(rf"(?<![A-Za-z]){abbr}(?![A-Za-z])", blob) and ko not in context:
+            out.append(f"'{abbr}' 단독→{ko}({abbr})")
+            alone.add(abbr)
+    for rx, abbr, ko in _ABBR_KO_AFTER_RE:
+        if abbr not in alone and rx.search(blob):
+            out.append(f"'{abbr}' 단독→처음 한 번 {ko}({abbr}), 이후 {ko}")
+    for rx, abbr, ko in _ABBR_OFF_RE:
+        if rx.search(blob):
+            out.append(f"목록 밖 약어 '{abbr}'→{ko}")
+    return out
 
 # [2026-11-16 재측정] v16 [용어·표기] 에 11-16 에 더한 줄(docs/prompts/GRM_Prompt_v16.md) 중 코드로 셀 수 있는 것.
 # **경고만** — 11-16호(개선 전)에 집락형성단위·15평일·시험 마스터 파일·class I 이 실제로 남아 있었다.
@@ -796,26 +838,50 @@ _GENERIC_SUBJECT_RE = re.compile(
     r"^\s*식약처가\s+(?:\S+\s+){0,3}?(제약사|업체|의료기관)에(?![가-힣])")
 
 
-def _deep_prose_texts(entry: Any) -> list[str]:
-    """심층 델타 항목(`{deep_analysis: {...}}` 또는 4섹션 dict) → 검사할 산문 목록(원문 인용 제외)."""
+def _deep_prose_slots(entry: Any) -> list[tuple[str, str]]:
+    """심층 델타 항목 → (슬롯 경로, 산문) 목록(원문 인용 `original`·조항 `citation` 제외)."""
     if not isinstance(entry, dict):
         return []
     da = entry.get("deep_analysis") if isinstance(entry.get("deep_analysis"), dict) else entry
-    out: list[str] = []
-    for v in da.get("key_violations") or []:
+    out: list[tuple[str, str]] = []
+    for i, v in enumerate(da.get("key_violations") or []):
         if isinstance(v, dict):
-            out.extend(v[k] for k in _DEEP_VIOLATION_KEYS
+            out.extend((f"key_violations[{i}].{k}", v[k]) for k in _DEEP_VIOLATION_KEYS
                        if isinstance(v.get(k), str) and v[k].strip())
         elif isinstance(v, str) and v.strip():
-            out.append(v)
+            out.append((f"key_violations[{i}]", v))
     for k in _DEEP_TEXT_KEYS:
         if isinstance(da.get(k), str) and da[k].strip():
-            out.append(da[k])
+            out.append((k, da[k]))
     rem = da.get("required_remediation")
     if isinstance(rem, dict):
-        out.extend(i for i in rem.get("items") or [] if isinstance(i, str) and i.strip())
+        out.extend((f"required_remediation.items[{i}]", t) for i, t in enumerate(rem.get("items") or [])
+                   if isinstance(t, str) and t.strip())
     elif isinstance(rem, str) and rem.strip():
-        out.append(rem)
+        out.append(("required_remediation", rem))
+    return out
+
+
+def _deep_prose_texts(entry: Any) -> list[str]:
+    """심층 델타 항목(`{deep_analysis: {...}}` 또는 4섹션 dict) → 검사할 산문 목록(원문 인용 제외)."""
+    return [t for _, t in _deep_prose_slots(entry)]
+
+
+def deep_term_hits(deep: Any) -> list[tuple[str, str, str]]:
+    """심층 칸 산문의 [용어·표기] 위반 (카드 id, 슬롯, 라벨) 목록(순수) — `term_hits` 를 **슬롯마다** 부른다.
+
+    슬롯 단위인 까닭: 화면은 위반 항목을 따로따로 보여 주고, 교열도 슬롯마다 '처음 한 번은 한글 뒤 괄호'를 본다
+    (1120b 반려 — 앞 항목에 기준일탈(OOS)이 있어도 다음 항목의 'OOS 결과' 를 반려했다).
+    단 '처음 한 번은 한글 뒤 괄호'(CAPA·COA)는 카드 단위다 — 같은 카드 다른 칸에 한글 표기가 있으면 통과(v16 '이후 CAPA')."""
+    if isinstance(deep, dict) and isinstance(deep.get("items"), dict):
+        deep = deep["items"]
+    if not isinstance(deep, dict):
+        return []
+    out: list[tuple[str, str, str]] = []
+    for cid, entry in deep.items():
+        slots = _deep_prose_slots(entry)
+        card = "\n".join(t for _, t in slots)
+        out.extend((str(cid), slot, lab) for slot, text in slots for lab in term_hits(text, card))
     return out
 
 
@@ -844,9 +910,11 @@ def _lint_deep_483_shape(rep: "StyleReport", cid: Any, entry: Any) -> None:
 
 
 def lint_deep_prose_style(deep: Any) -> "StyleReport":
-    """심층 델타 산문의 표현 검사(순수) — 경고 재료만. `deep` = {card_id: 항목} 또는 샤드 `{items: {...}}`.
+    """심층 델타 산문의 표현 검사(순수). `deep` = {card_id: 항목} 또는 샤드 `{items: {...}}`.
 
-    결과는 `StyleReport.warns` 에만 싣는다(`lines()` 는 비어 있다 — 막는 검사가 아니다)."""
+    [용어·표기] 막는 검사(`term_hits`, 델타와 같은 함수)는 `StyleReport.terms` 에 싣는다 → `lines()`.
+    (★리허설 1120b — 전에는 경고만이라 심층 기자가 고치지 않고 넘겼고 교열이 19장을 반려했다.)
+    금지 표현·11-16 신규 표기·483 꼴·반복 문장은 여전히 `warns`(경고만)."""
     rep = StyleReport()
     if isinstance(deep, dict) and isinstance(deep.get("items"), dict):
         deep = deep["items"]
@@ -866,15 +934,15 @@ def lint_deep_prose_style(deep: Any) -> "StyleReport":
         for lab, rx in _DEEP_BANNED_RE:
             if rx.search(blob):
                 rep.warns.setdefault(f"심층 금지 표현 '{lab}'", []).append(str(cid))
-        for rx, fix in _TERM_RE:
-            m = rx.search(blob)
-            if m:
-                rep.warns.setdefault(f"심층 용어 표기 '{m.group(0)}'→{fix}", []).append(str(cid))
         for text in texts:
             for sent in _SENTENCE_SPLIT_RE.split(text):
                 key = " ".join(sent.split())
                 if len(key) >= _DEEP_REPEAT_MIN_CHARS:
                     seen.setdefault(key, set()).add(str(cid))
+    for cid, _slot, lab in deep_term_hits(deep):
+        ids = rep.terms.setdefault(f"(심층) {lab}", [])
+        if cid not in ids:
+            ids.append(cid)
     for sent, ids in seen.items():
         if len(ids) >= _DEEP_REPEAT_CARDS:
             short = sent if len(sent) <= 40 else sent[:40] + "…"
@@ -964,17 +1032,12 @@ def lint_prose_style(delta: dict[str, Any]) -> StyleReport:
         for lab, rx in _BANNED_RE:
             if rx.search(blob):
                 rep.banned.setdefault(lab, []).append(str(cid))
-        for rx, fix in _TERM_RE:
-            m = rx.search(blob)
-            if m:
-                rep.terms.setdefault(f"'{m.group(0)}'→{fix}", []).append(str(cid))
+        for lab in term_hits(blob):
+            rep.terms.setdefault(lab, []).append(str(cid))
         for rx, fix in _WARN_TERM_RE:
             m = rx.search(blob)
             if m:
                 rep.warns.setdefault(f"용어 표기 '{m.group(0)}'→{fix}", []).append(str(cid))
-        for abbr, ko in _ABBR_NEEDS_KO:
-            if re.search(rf"(?<![A-Za-z]){abbr}(?![A-Za-z])", blob) and ko not in blob:
-                rep.terms.setdefault(f"'{abbr}' 단독→{ko}({abbr})", []).append(str(cid))
     tldr = delta.get("tldr")
     if isinstance(tldr, list):
         blob = "\n".join(t for t in tldr if isinstance(t, str))

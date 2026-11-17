@@ -635,7 +635,11 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     for line in report.style.warn_lines():
         report.warnings.append(f"[표현·경고] {line}")
     if deep_deltas:
-        for line in inject_slots.lint_deep_prose_style(deep_deltas).warn_lines():
+        deep_style = inject_slots.lint_deep_prose_style(deep_deltas)
+        # 심층 [용어·표기] 는 사전 점검(precheck deep)이 막는다 — 조립에서는 카드 표현 검사와 같은 수위.
+        for line in deep_style.lines():
+            (report.errors if inject_slots.STYLE_LINT_BLOCKING else report.warnings).append(f"[표현] {line}")
+        for line in deep_style.warn_lines():
             report.warnings.append(f"[표현·경고] {line}")
 
     # 채택 필터 + render_order 정렬 보존.

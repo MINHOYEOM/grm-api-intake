@@ -23,6 +23,8 @@
 - 심층 지시문 3개의 '3-1. 문체' 절 — deep_delta.json 의 산문(observation·description·risk·
   inspectional_significance·fda_evaluation·disposition_basis·administrative_risks·items)을
   카드 슬롯과 같은 기준으로 O/X 판정한다. fails 의 slot 은 "deep.<키>"로 적는다.
+  심층 [용어·표기] 중 코드가 세는 것(표 왼쪽 표기·OOS·목록 밖 약어)은 기자가 `precheck.py deep` 0건으로 넘긴다(같은 함수 `inject_slots.term_hits`, 리허설 1120b).
+  원문의 조사·문서·시료 번호(`OOS-24006`·`OOS/22/002`·`QU-SOP-0056623`)는 약어가 아니다 — 원문 글자 그대로이므로 반려하지 않는다.
 
 ## 맡는 v16 절 (= 마감, 전부 통과일 때만)
 - v16: [K4 경계 — 임시 책임 고지]

@@ -909,6 +909,32 @@ def _lint_deep_483_shape(rep: "StyleReport", cid: Any, entry: Any) -> None:
                              []).append(str(cid))
 
 
+_DEEP_483_BASIS_END_RE = re.compile(r"\((?:관찰|위반)\s?\d[^)]*\)\s*[.。]?\s*$")
+
+
+def deep_483_basis_hits(deep: Any) -> list[tuple[str, str]]:
+    """483 심층 `key_violations[i].observation` 끝에 근거 번호 '(관찰 N)' 이 없는 (카드 id, 슬롯) 목록(순수).
+
+    정본 `GRM_Prompt_DeepFda483_v1.md` 3-1 '끝에 근거 번호 (관찰 N)을 단다'. 리허설 1120c 교열 반려 1장 —
+    4개 회차 실측에서 코드 판정과 교열 판정이 같다(1118·1120·1120b 0/594, 1120c 1/175). 483 판별은 화면과 같다."""
+    if isinstance(deep, dict) and isinstance(deep.get("items"), dict):
+        deep = deep["items"]
+    if not isinstance(deep, dict):
+        return []
+    out: list[tuple[str, str]] = []
+    for cid, entry in deep.items():
+        if not isinstance(entry, dict):
+            continue
+        da = entry.get("deep_analysis") if isinstance(entry.get("deep_analysis"), dict) else entry
+        if "inspectional_significance" not in da:
+            continue
+        for i, v in enumerate(da.get("key_violations") or []):
+            t = v.get("observation") if isinstance(v, dict) else None
+            if isinstance(t, str) and t.strip() and not _DEEP_483_BASIS_END_RE.search(t):
+                out.append((str(cid), f"key_violations[{i}].observation"))
+    return out
+
+
 def lint_deep_prose_style(deep: Any) -> "StyleReport":
     """심층 델타 산문의 표현 검사(순수). `deep` = {card_id: 항목} 또는 샤드 `{items: {...}}`.
 

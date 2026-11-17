@@ -31,6 +31,9 @@
         **심층 칸 산문의 [용어·표기]도 막는다**(`inject_slots.deep_term_hits` — 델타 `terms` 와 **같은 함수**
         `inject_slots.term_hits` 를 슬롯마다 부른다. 리허설 1120b: 경고만이라 교열이 심층 용어로 19장 반려).
         걸린 줄은 `심층 용어 <id>.<슬롯>: <라벨>` 꼴이다. 금지 표현·반복 문장·483 꼴은 여전히 경고만.
+        **원문 부재 단정**(`심층 부재 …` — 게이트 3 과 같은 판정 함수 `assemble_publish_brief.false_absence_match`,
+        "처분문에 가중·감경 사유는 없다" 꼴 포함)과 **483 관찰 끝 근거 번호**(`심층 근거 번호 …` —
+        `inject_slots.deep_483_basis_hits`)도 막는다(리허설 1120c 교열 반려 11장).
 
     python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json>
         재작업(반려 카드만 한 번 고치기) 뒤에 다시 합친 델타가 **반려 카드만** 바뀌었는지 본다.
@@ -228,6 +231,58 @@ def deep_term_lines(shard):
     return [f"심층 용어 {cid}.{slot}: {lab}" for cid, slot, lab in inject_slots.deep_term_hits(shard)]
 
 
+def deep_absence_lines(shard):
+    """심층 칸 산문의 원문 부재 단정 줄(순수) — 게이트 3 과 같은 판정 함수. 심층이 있는 카드는 원문 확보 카드다."""
+    import assemble_publish_brief as apb
+    items = shard.get("items") if isinstance(shard.get("items"), dict) else shard
+    out = []
+    for cid, entry in (items or {}).items():
+        for slot, text in inject_slots._deep_prose_slots(entry):
+            m = apb.false_absence_match(text)
+            if m:
+                out.append(f"심층 부재 {cid}.{slot}: 원문 확보 카드가 부재를 단정 — {m.group(0)!r} (그 문장을 지운다)")
+    return out
+
+
+def deep_basis_lines(shard):
+    """483 심층 관찰 끝 근거 번호 '(관찰 N)' 이 없는 줄(순수)."""
+    return [f"심층 근거 번호 {cid}.{slot}: 문장 끝에 '(관찰 N)' 이 없다"
+            for cid, slot in inject_slots.deep_483_basis_hits(shard)]
+
+
+def hook_lines(delta, scaffold=None):
+    """(막는 줄, 경고 줄) — `hook_line` 을 화면과 같은 함수로 본다(순수).
+
+    막는 줄 = 금칙어(`render.hook_line_banned`, STYLE §12 ① — 교열이 반려한다, 리허설 1120c 2장).
+    경고 줄 = 스캐폴드 카드와 합쳐 `render._valid_hook_line` 이 숨기는 경우(숫자 대조 등 — 교열 판정과 갈려 막지 않는다)."""
+    web = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "web")
+    if web not in sys.path:
+        sys.path.insert(0, web)
+    import render
+    block, warn = [], []
+    cards = delta.get("cards") if isinstance(delta.get("cards"), dict) else {}
+    sc = {}
+    if isinstance(scaffold, dict) and isinstance(scaffold.get("cards"), list):
+        sc = {c.get("id"): c for c in scaffold["cards"] if isinstance(c, dict)}
+    for cid, d in cards.items():
+        if not isinstance(d, dict):
+            continue
+        en = d.get("en") if isinstance(d.get("en"), dict) else {}
+        for lang, label, raw in (("ko", "hook_line", d.get("hook_line")), ("en", "en.hook_line", en.get("hook_line"))):
+            if not (isinstance(raw, str) and raw.strip()):
+                continue
+            bad = render.hook_line_banned(raw, lang)
+            if bad:
+                block.append(f"hook_line 금칙어 {cid}.{label}: {', '.join(bad)} — 다른 말로 쓰거나 필드를 지운다(STYLE §12 ①)")
+            elif cid in sc:
+                base = sc[cid]
+                card = dict(base, hook_line=d.get("hook_line"),
+                            en=dict(base.get("en") or {}, hook_line=en.get("hook_line")))
+                if not render._valid_hook_line(card, "ko" if lang == "ko" else "en"):
+                    warn.append(f"hook_line 화면에서 숨김 {cid}.{label} — 숫자가 코드 facts·상세에 글자 그대로 있는지 본다")
+    return block, warn
+
+
 def deep_lines(shard, ids_483):
     """심층 샤드의 국문 병기 자리·결손 줄(순수)."""
     out = []
@@ -332,11 +387,12 @@ def main(argv=None):
                 card_types = merge_parts.run_card_types(os.path.dirname(os.path.abspath(args.delta)))
             sc_path = find_scaffold(args.delta, args.scaffold)
             scaffold = _load(sc_path) if sc_path else None
-            lines = term_lines(delta, card_types) + gate_lines(delta, card_types, scaffold)
+            hook_block, hook_warn = hook_lines(delta, scaffold)
+            lines = term_lines(delta, card_types) + gate_lines(delta, card_types, scaffold) + hook_block
             lines += [x for x in assembly_lines(delta, scaffold) if x not in lines]
             for line in lines:
                 print(line)
-            warns = warn_lines(delta, _load(args.deep) if args.deep else None)
+            warns = warn_lines(delta, _load(args.deep) if args.deep else None) + hook_warn
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 인용 번역 대조는 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:
@@ -348,7 +404,8 @@ def main(argv=None):
             handoff, shard = _load(args.handoff), _load(args.shard)
             if not isinstance(handoff, dict) or not isinstance(shard, dict):
                 raise ValueError("handoff·심층 샤드가 객체가 아니다")
-            lines = deep_lines(shard, fda483_ids(handoff)) + deep_term_lines(shard)
+            lines = (deep_lines(shard, fda483_ids(handoff)) + deep_term_lines(shard)
+                     + deep_absence_lines(shard) + deep_basis_lines(shard))
             for line in lines:
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()

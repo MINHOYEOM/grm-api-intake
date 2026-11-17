@@ -642,6 +642,14 @@ def _hook_haystack(card: dict[str, Any]) -> str:
     return "\n".join(out)
 
 
+def hook_line_banned(text: str, lang: str) -> list[str]:
+    """`hook_line` 금칙어·느낌표·물음표 중 걸린 것(순수, STYLE §12 ①). 화면(`_valid_hook_line`)과
+    편집팀 사전 점검(`precheck.py terms`)이 이 함수를 같이 부른다 — 리허설 1120c: 화면은 '우려' 를 조용히 숨기고
+    교열은 반려했는데 기자 점검에는 없었다."""
+    low = (text or "").lower()
+    return [b for b in _HOOK_BANNED["ko" if lang == DEFAULT_LANG or lang == "ko" else "en"] if b in low]
+
+
 def _valid_hook_line(card: dict[str, Any], lang: str) -> str:
     """검사를 통과한 헤드라인, 아니면 "" (박스 숨김).
 
@@ -657,8 +665,7 @@ def _valid_hook_line(card: dict[str, Any], lang: str) -> str:
     key = "ko" if is_ko else "en"
     if not text or len(text) > HOOK_LINE_MAX_CHARS[key]:
         return ""
-    low = text.lower()
-    if any(b in low for b in _HOOK_BANNED[key]):
+    if hook_line_banned(text, key):
         return ""
     if not is_ko and _HANGUL_RE.search(text):
         return ""

@@ -451,5 +451,60 @@ class DeepTermsBlockTest(unittest.TestCase):
         self.assertIn("심층 용어", text)
 
 
+class Rehearsal1120cTest(unittest.TestCase):
+    """리허설 1120c: 코드 검사 통과·심층 용어 0 — 교열 반려 13장은 부재 단정 10·hook 금칙어 2·관찰 번호 1."""
+
+    def _admin(self, **da):
+        return {"items": {"admin-1": {"deep_analysis": da}}}
+
+    def test_source_doc_absence_blocks(self):
+        for bad in ("처분 근거는 약사법 제38조다. 처분문에 가중·감경 사유는 없다.",
+                    "처분문에 가중처분이나 형사고발에 관한 서술은 없다.",
+                    "처분문에 차수와 가중·감경 사유는 적혀 있지 않다."):
+            lines = precheck.deep_absence_lines(self._admin(administrative_risks=bad))
+            self.assertTrue(lines and lines[0].startswith("심층 부재 admin-1.administrative_risks"), (bad, lines))
+
+    def test_inspector_findings_are_not_absence(self):
+        # 483 관찰의 "SOP 에 규정이 없다"·"정보가 없다"는 실사관이 찾은 사실이다 — 원문 부재가 아니다.
+        for ok in ("양손 장갑을 한쪽 면만 모니터링했고 SOP에 양면 모니터링 규정이 없다(관찰 1).",
+                   "USP <467> 시험법과 동등한지 판단할 정보가 없다(관찰 5).",
+                   "안정성 기준일탈 조사를 정당한 사유 없이 제때 끝내지 않았다(관찰 1).",
+                   "근거법령은 위반 시 업무정지 3개월을 정한다."):
+            shard = {"items": {"fda483-1": {"deep_analysis": {"inspectional_significance": "",
+                                                               "key_violations": [{"observation": ok}]}}}}
+            self.assertEqual(precheck.deep_absence_lines(shard), [], ok)
+
+    def test_same_function_as_publish_gate(self):
+        import assemble_publish_brief as apb
+        text = "처분문에 가중·감경 사유는 없다."
+        card = {"id": "admin-1", "summary": text, "deep_analysis": {"x": 1}}
+        self.assertTrue(apb.lint_false_absence_claims([card]))
+        self.assertTrue(apb.false_absence_match(text))
+
+    def test_483_basis_number_at_end(self):
+        def shard(obs):
+            return {"items": {"fda483-1": {"deep_analysis": {"inspectional_significance": "",
+                                                              "key_violations": [{"observation": obs}]}}}}
+        self.assertEqual(precheck.deep_basis_lines(shard("시험하지 않았다(관찰 2).")), [])
+        self.assertEqual(precheck.deep_basis_lines(shard("시험하지 않았다(관찰 1 A)")), [])
+        self.assertTrue(precheck.deep_basis_lines(shard("완제 API를 안정성시험에 넣는 단계를 포함하지 않았다.")))
+        admin = {"items": {"admin-1": {"deep_analysis": {"key_violations": [{"observation": "번호 없음."}]}}}}
+        self.assertEqual(precheck.deep_basis_lines(admin), [])        # 483 만 본다
+
+    def test_hook_banned_uses_render_function(self):
+        import sys as _sys
+        _sys.path.insert(0, str(ROOT / "web"))
+        import render
+        self.assertEqual(render.hook_line_banned("이물 혼입 우려로 영업자 회수", "ko"), ["우려"])
+        delta = {"cards": {"recall-1": {"hook_line": "파마레바미피드정, 이물 혼입 우려로 영업자 회수",
+                                        "en": {"hook_line": "Recalled over concern of foreign matter"}},
+                           "recall-2": {"hook_line": "이물 혼입으로 영업자 회수"}}}
+        block, _warn = precheck.hook_lines(delta)
+        self.assertEqual(len(block), 2, block)
+        self.assertTrue(all(x.startswith("hook_line 금칙어 recall-1.") for x in block))
+        # 화면도 같은 함수로 숨긴다.
+        self.assertEqual(render._valid_hook_line({"hook_line": "이물 혼입 우려로 회수"}, "ko"), "")
+
+
 if __name__ == "__main__":
     unittest.main()

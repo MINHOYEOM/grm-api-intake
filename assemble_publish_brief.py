@@ -93,6 +93,22 @@ _FALSE_ABSENCE_RE = re.compile(
     r"(?:확보|확인|수집|추출)[^.\n]{0,6}?(?:못했|못한|못해|못하|않았|않은|불가|실패)"
     r"|미확보|미확인"
     r")")
+# [리허설 1120c] 원문 문서를 주어로 한 부재 단정 — "처분문에 가중·감경 사유는 없다"·"처분문에 형사고발에 관한
+# 서술은 없다". 위 꼴은 원문·본문·공개 뒤의 부재만 봐서 빠져나갔다(교열 2-1 반려 10장). 주어를 '원문 문서'로
+# 좁힌다 — 483 관찰의 "SOP 에 규정이 없다"(실사관이 찾은 사실)는 원문 부재가 아니므로 걸리면 안 된다(실측 0).
+_SOURCE_DOC_ABSENCE_RE = re.compile(
+    r"(?:처분문|공고문|공고|서한|보고서|원문|본문)(?:에는|에도|에|상)\s?[^.\n]{0,40}?"
+    r"(?:서술|언급|기재|내용|사유|규정|정보|설명)(?:은|는|이|가|도)?\s*(?:따로\s*)?"
+    r"(?:없|나와 있지 않|적혀 있지 않)")
+
+
+def false_absence_match(text: str) -> "re.Match[str] | None":
+    """원문 부재 단정 판정의 단일 원천(순수) — 게이트 3(카드 슬롯)과 편집팀 심층 사전 점검이 같이 부른다."""
+    if not isinstance(text, str):
+        return None
+    return _FALSE_ABSENCE_RE.search(text) or _SOURCE_DOC_ABSENCE_RE.search(text)
+
+
 # 검사 대상 산문 슬롯(코드 verbatim 필드인 facts 는 제외 — 거기서의 "원문 미기재"는
 # 그 칸의 값이 실제로 원문에 없다는 정직한 표기다).
 _FALSE_ABSENCE_SLOTS = ("summary", "implication", "title_issue")
@@ -1000,16 +1016,15 @@ def lint_false_absence_claims(cards: list[dict[str, Any]]) -> list[str]:
         if not _card_has_source_body(c):
             continue
         for slot in _FALSE_ABSENCE_SLOTS:
-            v = c.get(slot)
-            if isinstance(v, str) and _FALSE_ABSENCE_RE.search(v):
+            m = false_absence_match(c.get(slot))
+            if m:
                 errs.append(
-                    f"카드 {c.get('id')!r}: 원문을 확보했는데 {slot} 가 부재를 주장 — "
-                    f"{_FALSE_ABSENCE_RE.search(v).group(0)!r}")
+                    f"카드 {c.get('id')!r}: 원문을 확보했는데 {slot} 가 부재를 주장 — {m.group(0)!r}")
         for i, v in enumerate(c.get("key_facts") or []):
-            if isinstance(v, str) and _FALSE_ABSENCE_RE.search(v):
+            m = false_absence_match(v)
+            if m:
                 errs.append(
-                    f"카드 {c.get('id')!r}: 원문을 확보했는데 key_facts[{i}] 가 부재를 주장 — "
-                    f"{_FALSE_ABSENCE_RE.search(v).group(0)!r}")
+                    f"카드 {c.get('id')!r}: 원문을 확보했는데 key_facts[{i}] 가 부재를 주장 — {m.group(0)!r}")
     return errs
 
 

@@ -5,7 +5,7 @@
 ② 경고서한 심층 소제목이 한국어 페이지에서 한국어다.
 ③ 소식·지침·고시 카드는 `key_facts` 가 비어도 합치기·사전 점검·주입·조립·영문 판정을 통과한다
   (다른 유형은 종전처럼 막힌다 — 유형은 handoff 의 `card_scaffold` 첫 줄에서 읽는다).
-④ 심층 칸 산문 표현 검사 — 경고만.
+④ 심층 칸 산문 표현 검사 — 금지 표현·반복은 경고만, [용어·표기]는 막는 줄(리허설 1120b, test_company_precheck).
 ⑤ 행정처분 요약 "식약처가 제약사·업체·의료기관에" — 경고만.
 """
 from __future__ import annotations
@@ -289,11 +289,15 @@ class WarnOnlyLintTest(unittest.TestCase):
             "required_remediation": {"deadline": "x", "items": ["CAPA 를 수립한다."]},
             "administrative_risks": "체계적 문제로 해석될 소지가 있다."}}}
         rep = inj.lint_deep_prose_style(deep)
-        self.assertEqual(rep.lines(), [])
         text = "\n".join(rep.warn_lines())
         for lab in ("귀사", "흔들릴 수 있다", "승격", "가능성이 크다", "8자리 날짜", "체계적", "해석될",
-                    "소지가", "경고서한"):
+                    "소지가"):
             self.assertIn(lab, text)
+        # [용어·표기]는 리허설 1120b 부터 막는 줄(lines) — 델타와 같은 함수(term_hits).
+        blocking = "\n".join(rep.lines())
+        for lab in ("경고서한", "CAPA"):
+            self.assertIn(lab, blocking)
+            self.assertNotIn(lab, text)
 
     def test_original_not_checked(self):
         deep = {"c1": {"deep_analysis": {"key_violations": [

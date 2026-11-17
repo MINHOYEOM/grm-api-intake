@@ -378,5 +378,78 @@ class InstructionsPointAtTheToolTest(unittest.TestCase):
         self.assertIn("n_reject == 0", self._read("company", "editorial", "rehearsal_check.py"))
 
 
+class DeepTermsBlockTest(unittest.TestCase):
+    """리허설 1120b: 심층 산문 [용어·표기]가 경고만이라 교열이 19장을 반려했다 → 델타와 같은 함수로 막는다."""
+
+    def _shard(self, **da):
+        return {"status": "완료", "items": {"fda483-1": {"deep_analysis": da}}}
+
+    def test_same_function_as_delta(self):
+        # 같은 문장이 델타 카드에서 걸리는 라벨과 심층 칸에서 걸리는 라벨이 같다(규칙 한 벌).
+        text = "배치 기록에 QC 검토가 없고 OOS 조사를 하지 않았다."
+        delta_labels = set(inject_slots.lint_prose_style({"cards": {"a": {"summary": text}}}).terms)
+        deep_labels = {lab for _, _, lab in inject_slots.deep_term_hits(
+            self._shard(key_violations=[{"observation": text}]))}
+        self.assertEqual(delta_labels, deep_labels)
+        self.assertEqual(deep_labels, set(inject_slots.term_hits(text)))
+
+    def test_1120b_rejections_are_caught(self):
+        for bad, lab in (("이미 출하 승인된 배치 기록의 설비 모델번호", "제조기록서"),
+                         ("배지충전 배치기록의 인쇄본", "제조기록서"),
+                         ("QC 검토 보고서의 부서 회신", "'QC'"),
+                         ("HPLC 컬럼 공급업체 4건", "'HPLC'"),
+                         ("QA 관리자는 이 시료를 입고할", "'QA'"),
+                         ("환경 모니터링(EM) 능동 공기 시료", "'EM'"),
+                         ("AQL 표본 검사를 하지 않으며", "'AQL'"),
+                         ("경향이탈(OOT) 내용을 로그북에", "'OOT'"),
+                         ("회사의 OOS 절차 FDASOP002는", "OOS"),
+                         ("기준일탈(OOS) 조사 4건 뒤에 회사의 모든 OOS 조사가", "이후 기준일탈")):
+            lines = precheck.deep_term_lines(self._shard(key_violations=[{"observation": bad}]))
+            self.assertTrue(any(lab in x for x in lines), (bad, lines))
+            self.assertTrue(all(x.startswith("심층 용어 fda483-1.key_violations[0].observation: ") for x in lines))
+
+    def test_clean_prose_and_identifiers_pass(self):
+        for ok in ("기준일탈(OOS) 조사 OOS-24006 과 OOS/22/002 를 종결하지 않았다.",
+                   "제조기록서와 '제조지시 및 기록서'를 대조하지 않았다.",
+                   "SOP QU-SOP-0056623 은 경향이탈 결과를 로그북에 적으라고 한다.",
+                   "품질관리 시험실의 고성능 액체크로마토그래피 원시 데이터를 검토하지 않았다.",
+                   "FDA가 GMP·21 CFR 211.192 위반을 적었다. 표준작업절차서(SOP)·원료의약품(API)."):
+            self.assertEqual(precheck.deep_term_lines(self._shard(key_violations=[{"observation": ok}])), [], ok)
+
+    def test_first_mention_is_card_level_for_capa(self):
+        # v16 '시정 및 예방조치(CAPA) — 처음 한 번, 이후 CAPA': 다른 칸에 한글이 있으면 통과.
+        shard = self._shard(key_violations=[{"observation": "시정 및 예방조치(CAPA)를 세우지 않았다."},
+                                            {"observation": "CAPA 효과성을 평가하지 않았다."}])
+        self.assertEqual(precheck.deep_term_lines(shard), [])
+        lone = self._shard(key_violations=[{"observation": "CAPA 효과성을 평가하지 않았다."}])
+        self.assertTrue(precheck.deep_term_lines(lone))
+
+    def test_original_quote_not_checked(self):
+        shard = self._shard(key_violations=[{"observation": "품질관리 부서가 검토하지 않았다.",
+                                             "original": "The QC unit did not review the batch record."}])
+        self.assertEqual(precheck.deep_term_lines(shard), [])
+
+    def test_cli_deep_exits_1_on_terms(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ho, sh = Path(tmp, "h.json"), Path(tmp, "deep.A.json")
+            ho.write_text(json.dumps({"rows": []}), encoding="utf-8")
+            sh.write_text(json.dumps(self._shard(fda_evaluation="QA 승인 없이 출하했다."),
+                                     ensure_ascii=False), encoding="utf-8")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = precheck.main(["deep", str(ho), str(sh)])
+            self.assertEqual(code, 1, out.getvalue())
+            self.assertIn("심층 용어 fda483-1.fda_evaluation", out.getvalue())
+            sh.write_text(json.dumps(self._shard(fda_evaluation="품질보증 승인 없이 출하했다."),
+                                     ensure_ascii=False), encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(precheck.main(["deep", str(ho), str(sh)]), 0)
+
+    def test_reporter_instructions_require_deep_precheck_zero(self):
+        text = (ROOT / "company" / "editorial" / "next" / "reporter.md").read_text(encoding="utf-8")
+        self.assertIn("precheck.py deep", text)
+        self.assertIn("심층 용어", text)
+
+
 if __name__ == "__main__":
     unittest.main()

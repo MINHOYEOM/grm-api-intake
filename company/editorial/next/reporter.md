@@ -55,7 +55,13 @@
 2. v16 [출력] envelope 그대로 한국어·영문(`en`·`tldr_en`) 슬롯을 채운다. **제목 이슈 길이는 조립 검사가 센다: `title_issue` 25자 이내, `en.title_issue` 50자 이내(공백 포함).** 한 장이라도 넘으면 호 전체 조립이 거부된다 — 쓰고 나서 글자 수를 세고, 넘으면 수식어를 빼 줄인다.
 3. 심층분석 대상이 있으면 v16 [2단계 (선택·additive)] 대로 만든다. **국문 병기(`observations_ko`·`violations_ko`·`ncr_ko`)는 카드 층에 둔다** — `items.<web_card_id>.observations_ko` 이고 `deep_analysis` 안이 아니다
    (v16 스키마 줄이 4섹션과 나란히 적어 두어 안에 넣기 쉽다. 안에 넣으면 분석 게이트가 FAIL 할 때 번역까지 사라져 483 관찰 국문 없음으로 호 전체 조립이 거부된다 — 리허설 1114b).
-   FDA 483 카드는 `observations_ko` 가 ★필수다. 심층 샤드를 `완료`로 내기 전에 `python company/editorial/precheck.py deep _handoff/handoff_{run_date_kst}.json company/run/{run_date_kst}/deep.{S}.json` 이 exit 0 인지 본다.
+   FDA 483 카드는 `observations_ko` 가 ★필수다. 심층 샤드를 `완료`로 내기 전에 `python company/editorial/precheck.py deep _handoff/handoff_{run_date_kst}.json company/run/{run_date_kst}/deep.{S}.json` 이 **exit 0(0건)** 인지 본다
+   (handoff 사본은 아래 6번의 받기 명령으로 먼저 받는다). **심층 칸 산문(observation·description·risk·inspectional_significance·fda_evaluation·disposition_basis·administrative_risks·items)도 v16 [용어·표기]를 그대로 따른다** —
+   `심층 용어 <id>.<슬롯>: …` 줄은 델타 사전 점검과 **같은 함수**(`inject_slots.term_hits`)가 낸 것이고 교열이 반려하는 바로 그 표기다(리허설 1120b: 경고만이라 넘겼다가 19장 반려).
+   걸린 슬롯만 고쳐 다시 돌린다: `배치 기록`·`배치기록`·`제조기록` → `제조기록서`, 시험 결과 `OOS` → 처음 한 번 `기준일탈(OOS)` 이후 `기준일탈`(**슬롯마다** — 항목이 따로 보인다),
+   목록 밖 약어 `QA`·`QC`·`HPLC`·`UPLC`·`GC`·`EM`·`AQL`·`OOT`·`RCA`·`CMO`·`QU` → `품질보증`·`품질관리`·`고성능 액체크로마토그래피`·`초고성능 액체크로마토그래피`·`가스크로마토그래피`·`환경 모니터링`·`합격 품질 수준`·`경향이탈 결과`·`근본원인 조사`·`위탁제조업체`·`품질부서`
+   (괄호 병기 `경향이탈(OOT)` 도 안 된다 — 한글만). `CAPA`·`COA` 는 그 카드 안에서 처음 한 번 `시정 및 예방조치(CAPA)`·`시험성적서(COA)`.
+   원문의 조사·문서·시료 번호(`OOS-24006`·`OOS/22/002`·`QU-SOP-0056623`)와 원문 인용(`original`)은 그대로 둔다. `경고:` 줄(금지 표현·반복 문장·483 꼴)은 막지 않지만 고칠 수 있으면 고친다.
 4. **`hook_line`(선택).** 483·경고서한·식약처·회수 카드의 카드 맨 위 한 줄을 `STYLE.md` §12 규칙(R1~R11, 공백 포함 한국어 40자 이내 · 영문 90자 이내)대로 쓴다. 한국어는 `cards.{id}.hook_line`, 영문은 `cards.{id}.en.hook_line`. **쓸 사실이 없거나 규칙을 지키는 문장이 안 나오면 필드를 만들지 않는다** — 비우면 박스가 숨겨지고 카드는 종전 모양 그대로다(억지로 채우지 않는다). 근거는 코드 `facts`·`quotes`·483 `observations`·WL `violations` 본문이다(`key_facts` 만으로 쓰지 않는다). 숫자는 근거 필드에 글자 그대로 있는 것만.
 5. 발행 전 자가 점검은 하지 않는다 — 교열이 따로 한다. 대신 v16 규칙을 쓰는 순간에 지킨다.
 6. **델타 샤드를 `완료`로 내기 전에 코드 점검을 돌려 0건으로 만든다**(심층 샤드·`T` 는 해당 없음):

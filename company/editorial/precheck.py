@@ -117,6 +117,32 @@ def gate_lines(delta, card_types=None, scaffold=None):
             if not (skip_quotes and "quotes_translation" in e)]
 
 
+def assembly_lines(delta, scaffold):
+    """**조립 함수 전체**(`assemble_publish_brief.assemble_publish_brief`, strict=False)를 이 델타의 카드만으로 돌린
+    차단 오류 줄(순수). 슬롯 주입 검증 뒤의 발행본 관문 — 원문 부재 단정(게이트 3)·가림 표기(게이트 8)·
+    빈 슬롯·미확인 부재 라벨 등 — 까지 조립과 같은 코드로 본다.
+
+    ★리허설 1120: 슬롯 주입 검증(gate_lines)은 통과했는데 발행본 관문 '원문을 확보했는데 implication 가 부재를 주장'
+      이 호 전체를 막았다. 관문을 하나씩 따라가지 않고 조립 함수 자체를 부른다 — 관문이 늘면 저절로 따라온다.
+    빼는 것은 **심층 샤드 몫**인 국문 병기 관문(483 관찰·WL 위반·WHOPIR)뿐이다 — 델타 샤드에는 그 재료가 없다.
+    스캐폴드가 없으면 빈 목록(이 검사는 실제 카드가 있어야 맞게 센다)."""
+    if not (isinstance(scaffold, dict) and isinstance(scaffold.get("cards"), list)):
+        return []
+    import copy
+    import assemble_publish_brief as apb
+    cards = delta.get("cards") if isinstance(delta.get("cards"), dict) else {}
+    sub = copy.deepcopy(scaffold)
+    sub["cards"] = [c for c in sub["cards"] if isinstance(c, dict) and c.get("id") in cards]
+    try:
+        out, report = apb.assemble_publish_brief(sub, {"cards": cards}, strict=False)
+    except (apb.AssembleError, inject_slots.SlotInjectionError, ValueError, TypeError, KeyError) as e:
+        return [f"조립 검사 조립 자체가 멈춤 — {type(e).__name__}: {e}"]
+    out_cards = out.get("cards") or []
+    deep_only = set(apb._lint_483_observation_ko(out_cards, report.refreshed_483_ids))
+    deep_only |= set(apb._lint_wl_violation_ko(out_cards)) | set(apb._lint_whopir_ko(out_cards))
+    return [f"조립 검사 {e}" for e in report.errors if e not in deep_only]
+
+
 def find_scaffold(delta_path, explicit=None):
     """그 주 스캐폴드 사본 경로(`_scaffold/brief_web_<YYYY_MM_DD>.json`). 없으면 None.
     날짜는 델타 폴더의 `desk.json` handoff_ref.date → run_date_kst → 폴더 이름(merge_parts.find_handoff 와 같은 순서)."""
@@ -297,8 +323,9 @@ def main(argv=None):
             else:
                 card_types = merge_parts.run_card_types(os.path.dirname(os.path.abspath(args.delta)))
             sc_path = find_scaffold(args.delta, args.scaffold)
-            lines = term_lines(delta, card_types) + gate_lines(delta, card_types,
-                                                               _load(sc_path) if sc_path else None)
+            scaffold = _load(sc_path) if sc_path else None
+            lines = term_lines(delta, card_types) + gate_lines(delta, card_types, scaffold)
+            lines += [x for x in assembly_lines(delta, scaffold) if x not in lines]
             for line in lines:
                 print(line)
             warns = warn_lines(delta, _load(args.deep) if args.deep else None)

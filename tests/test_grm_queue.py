@@ -1156,13 +1156,25 @@ class EditorialGitHandoffTest(unittest.TestCase):
                           reporter, folder)
         self.assertIn(f"영문 `en.title_issue` ≤{en_title}자", self._read("docs", "prompts", "GRM_Prompt_v16.md"))
 
-    def test_live_instructions_are_untouched_and_rehearsal_reads_next(self):
-        # 이 PR 은 실발행 지시문을 바꾸지 않는다 — 월요일 발행은 여전히 노션 handoff 를 읽는다.
+    def test_live_instructions_are_the_switched_next_and_rehearsal_reads_next(self):
+        # 2026-11-17 전환(SWITCH_2026-11-23 1절 (가), 리허설 1120e·1120f 연속 성공 뒤 대표 승인):
+        # 실발행 지시문 = next/ 판에서 안내 블록을 지우고 next/ 경로를 실발행 경로로 바꾼 것. 한 글자라도 갈라지면 실패.
         for name in ("RUN.md", "desk.md", "reporter.md", "copyedit.md"):
             live = self._read("company", "editorial", name)
-            self.assertNotIn("claude/queue-handoff", live, name)
-            self.assertNotIn("handoff_ref", live, name)
+            self.assertIn("handoff_ref", live, name)
+            self.assertNotIn("다음 판(시범) 지시문", live, name)
+            self.assertNotIn("company/editorial/next/", live, name)
             nxt = self._read(*self.NEXT, name)
+            nl = "\r\n" if "\r\n" in nxt else "\n"
+            body = [ln for ln in nxt.split(nl)]
+            i = next(k for k, ln in enumerate(body) if ln.startswith("> **이 파일은 다음 판(시범) 지시문이다"))
+            j = i
+            while j < len(body) and body[j].startswith(">"):
+                j += 1
+            if j < len(body) and body[j].strip() == "":
+                j += 1
+            expect = nl.join(body[:i] + body[j:]).replace("company/editorial/next/", "company/editorial/")
+            self.assertEqual(live, expect, f"{name}: 실발행 판이 next/ 판과 다르다 — next/ 를 고친 뒤 옮기기를 다시 한다")
             self.assertIn("다음 판(시범) 지시문", nxt, name)
             self.assertNotIn("`company/editorial/RUN.md`", nxt.split("\n", 6)[-1], name)   # 실행 규칙 포인터는 next/ 판
         reh = self._read("company", "editorial", "REHEARSAL.md")

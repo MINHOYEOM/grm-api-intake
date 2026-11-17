@@ -5,8 +5,10 @@
 2. `company/editorial/RUN.md` — 이 파일이 아래 모든 규칙보다 우선
 3. `company/run/{run_date_kst}/desk.json` — 데스크 결과. `보류`·`실패` 면 바로 종료. 아직 없거나 그 밖의 상태면 **08:35 KST 까지 3분마다 다시 확인**하고(RUN.md 5-2 — handoff 가 늦은 주. 리허설은 시각 무시), 그때도 `완료` 가 아니면 아무것도 쓰지 않고 종료. **`shards` 에서 자기 샤드 목록만** 본다
 4. `docs/prompts/GRM_Prompt_v16.md` §B 중 **아래 절만** (본문을 그대로 따른다 — 요약·재해석 금지)
-5. 이번 주 handoff (Notion, 읽기만) — 자기 샤드 카드의 `prose_input`·`needs_llm_slots`·코드 `facts`·`quotes` 만
+5. 이번 주 handoff — 저장소 파일(RUN.md 2항대로 `_handoff/handoff_{run_date_kst}.json` 을 받는다. Notion 은 읽지 않는다) — 자기 샤드 카드의 `prose_input`·`needs_llm_slots`·코드 `facts`·`quotes` 만.
+   받은 파일의 지문이 `desk.json` 의 `handoff_ref.sha256` 과 같은지 `python company/editorial/handoff_ref.py <파일>` 로 확인한다. 다르면 쓰지 않고 `status: 보류`(데스크와 다른 handoff 를 본 것이다)
 6. `company/editorial/STYLE.md` §12 — `hook_line` 작성 규칙(그 절만)
+7. 심층 샤드만: 맡은 카드 유형의 정본 심층 지시문(`docs/prompts/GRM_Prompt_Deep{WL,Admin,Fda483}_v1.md`) 전체
 
 ## 맡는 v16 절
 - v16: [역할]
@@ -49,15 +51,36 @@
 2. v16 [출력] envelope 그대로 한국어·영문(`en`·`tldr_en`) 슬롯을 채운다. **제목 이슈 길이는 조립 검사가 센다: `title_issue` 25자 이내, `en.title_issue` 50자 이내(공백 포함).** 한 장이라도 넘으면 호 전체 조립이 거부된다 — 쓰고 나서 글자 수를 세고, 넘으면 수식어를 빼 줄인다.
 3. 심층분석 대상이 있으면 v16 [2단계 (선택·additive)] 대로 만든다. **국문 병기(`observations_ko`·`violations_ko`·`ncr_ko`)는 카드 층에 둔다** — `items.<web_card_id>.observations_ko` 이고 `deep_analysis` 안이 아니다
    (v16 스키마 줄이 4섹션과 나란히 적어 두어 안에 넣기 쉽다. 안에 넣으면 분석 게이트가 FAIL 할 때 번역까지 사라져 483 관찰 국문 없음으로 호 전체 조립이 거부된다 — 리허설 1114b).
-   FDA 483 카드는 `observations_ko` 가 ★필수다.
-4. **`hook_line`(선택).** 483·경고서한·식약처·회수 카드의 카드 맨 위 한 줄을 `STYLE.md` §12 규칙(R1~R11, 공백 포함 한국어 40자 이내 · 영문 90자 이내)대로 쓴다. 한국어는 `cards.{id}.hook_line`, 영문은 `cards.{id}.en.hook_line`. **쓸 사실이 없거나 규칙을 지키는 문장이 안 나오면 필드를 만들지 않는다** — 비우면 박스가 숨겨지고 카드는 종전 모양 그대로다(억지로 채우지 않는다). 근거는 코드 `facts`·`quotes`·483 `observations`·WL `violations` 본문이다(`key_facts` 만으로 쓰지 않는다). 숫자는 근거 필드에 글자 그대로 있는 것만.
+   FDA 483 카드는 `observations_ko` 가 ★필수다. 심층 샤드를 `완료`로 내기 전에 `python company/editorial/precheck.py deep _handoff/handoff_{run_date_kst}.json company/run/{run_date_kst}/deep.{S}.json` 이 **exit 0(0건)** 인지 본다
+   (handoff 사본은 아래 6번의 받기 명령으로 먼저 받는다). **심층 칸 산문(observation·description·risk·inspectional_significance·fda_evaluation·disposition_basis·administrative_risks·items)도 v16 [용어·표기]를 그대로 따른다** —
+   `심층 용어 <id>.<슬롯>: …` 줄은 델타 사전 점검과 **같은 함수**(`inject_slots.term_hits`)가 낸 것이고 교열이 반려하는 바로 그 표기다(리허설 1120b: 경고만이라 넘겼다가 19장 반려).
+   걸린 슬롯만 고쳐 다시 돌린다: `배치 기록`·`배치기록`·`제조기록` → `제조기록서`, 시험 결과 `OOS` → 처음 한 번 `기준일탈(OOS)` 이후 `기준일탈`(**슬롯마다** — 항목이 따로 보인다),
+   목록 밖 약어 `QA`·`QC`·`HPLC`·`UPLC`·`GC`·`EM`·`AQL`·`OOT`·`RCA`·`CMO`·`QU` → `품질보증`·`품질관리`·`고성능 액체크로마토그래피`·`초고성능 액체크로마토그래피`·`가스크로마토그래피`·`환경 모니터링`·`합격 품질 수준`·`경향이탈 결과`·`근본원인 조사`·`위탁제조업체`·`품질부서`
+   (괄호 병기 `경향이탈(OOT)` 도 안 된다 — 한글만). `CAPA`·`COA` 는 그 카드 안에서 처음 한 번 `시정 및 예방조치(CAPA)`·`시험성적서(COA)`.
+   원문의 조사·문서·시료 번호(`OOS-24006`·`OOS/22/002`·`QU-SOP-0056623`)와 원문 인용(`original`)은 그대로 둔다. `경고:` 줄(금지 표현·반복 문장·483 꼴)은 막지 않지만 고칠 수 있으면 고친다.
+   **원문에 없는 것을 "없다"고 쓰지 않는다(v16 규칙 2-1 — 심층 칸도 같다).** 행정처분 `disposition_basis`·`administrative_risks` 에
+   "처분문에 가중·감경 사유는 없다(적혀 있지 않다)"·"처분문에 형사고발에 관한 서술은 없다" 같은 문장을 넣지 않는다 — **처분문에 없으면 그 문장 자체를 쓰지 않는다**
+   (`administrative_risks` 는 근거법령이 정한 조치만 쓴다. 리허설 1120c 교열 반려 10장). `심층 부재 …` 줄이 이것이다(조립 게이트 3 과 같은 판정 함수).
+   483 `key_violations[].observation` 은 문장 끝에 근거 번호 `(관찰 N)` 을 단다(`심층 근거 번호 …` 줄).
+   `심층 게이트 <id>: [FAIL] …` 줄은 발행 브릿지의 근거 게이트가 그 카드 심층을 빼 버리는 바로 그 판정이다(리허설 1120d) —
+   `citation` 은 원문(handoff `body_full`)에 **글자 그대로** 있는 조항만 쓴다(여러 조항을 묶은 원문에서 하나만 떼어 쓰지 않는다. 원문 꼴 그대로 옮긴다).
+4. **`hook_line`(선택).** 금칙어(`신호`·`볼 만`·`필요가`·`가능성`·`시사`·`우려`·느낌표·물음표, 영문 `signal`·`worth`·`may indicate`·`suggests`·`possib`·`concern`)는
+   화면이 그 줄을 숨기고 교열이 반려한다 — 회수 사유의 "이물 혼입 **우려**"도 그대로 옮기지 않는다("이물 혼입으로 영업자 회수"). 사전 점검 `hook_line 금칙어 …` 줄(화면과 같은 함수 `render.hook_line_banned`, 리허설 1120c).
+    483·경고서한·식약처·회수 카드의 카드 맨 위 한 줄을 `STYLE.md` §12 규칙(R1~R11, 공백 포함 한국어 40자 이내 · 영문 90자 이내)대로 쓴다. 한국어는 `cards.{id}.hook_line`, 영문은 `cards.{id}.en.hook_line`. **쓸 사실이 없거나 규칙을 지키는 문장이 안 나오면 필드를 만들지 않는다** — 비우면 박스가 숨겨지고 카드는 종전 모양 그대로다(억지로 채우지 않는다). 근거는 코드 `facts`·`quotes`·483 `observations`·WL `violations` 본문이다(`key_facts` 만으로 쓰지 않는다). 숫자는 근거 필드에 글자 그대로 있는 것만.
 5. 발행 전 자가 점검은 하지 않는다 — 교열이 따로 한다. 대신 v16 규칙을 쓰는 순간에 지킨다.
 6. **델타 샤드를 `완료`로 내기 전에 코드 점검을 돌려 0건으로 만든다**(심층 샤드·`T` 는 해당 없음):
-   `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` — 조립 표현 검사와 같은 규칙으로
+   먼저 그 주 handoff·스캐폴드 사본을 받아 둔다(한 번만 — 있으면 건너뛴다. 사전 점검이 **조립 코드 검사와 같은 함수**를 돌리는 데 쓴다):
+   ```
+   D=$(python -c "import json;print(json.load(open('company/run/{run_date_kst}/desk.json'))['handoff_ref']['date'])"); U=$(echo $D | tr - _)
+   mkdir -p _handoff _scaffold && git fetch origin claude/queue-handoff
+   git show FETCH_HEAD:handoff_$D.json > _handoff/handoff_$D.json; git show FETCH_HEAD:brief_web_$U.json > _scaffold/brief_web_$U.json
+   ```
+   `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` — **`조립 검사 …` 줄은 교열 코드 검사(`assemble_publish_brief`)가 호 전체를 막는 바로 그 오류다**(같은 함수 — 슬롯 주입 검증과 그 뒤 발행본 관문까지: 원문을 확보한 카드에 "기록·원문이 없어 확인되지 않았다" 같은 부재 단정(리허설 1120)·가림 표기 `(b)(4)`·빈 슬롯, `key_facts` 4개 이내·`checks` 2~3개·길이·마크업·영문 짝 등 조립 가드 전부. 리허설 1118 에서 `key_facts` 5개 카드 6장이 호 전체를 막았다). 조립 표현 검사와 같은 규칙으로
    금지 표현, v16 [용어·표기] 표 왼쪽 표기, 약어 단독(`CAPA`·`OOS`·`COA` 는 그 카드에서 처음 한 번 `시정 및 예방조치(CAPA)`·`기준일탈(OOS)`·`시험성적서(COA)`),
-   제목 이슈·`hook_line` 길이, **빈 필수 칸과 영문 짝**을 센다 — `title_issue`·`summary`·`key_facts` 는 한국어·영문 모두 반드시 채운다
-   (원문이 얇은 소식 카드도 `key_facts` 를 비우지 않는다. 코드 `facts`·`prose_input` 에 있는 사실로 한 줄 이상 — 비워도 되는 칸은 `implication`·`checks`·`hook_line` 뿐이다.
-   한 장이라도 비면 합치기가 호 전체를 거부한다 — 리허설 1114 에서 소식 카드 4장의 `key_facts` 가 `[]` 여서 그랬다). 걸린 줄이 있으면 그 카드의 그 슬롯만 고치고 다시 돌린다(exit 0 이 될 때까지).
+   제목 이슈·`hook_line` 길이, **빈 필수 칸과 영문 짝**을 센다 — `title_issue`·`summary` 는 한국어·영문 모두 반드시 채운다. `key_facts` 도 채운다.
+   다만 `지침·안내서`·`고시·개정법령`·`규제 소식` 카드에서 원문에 머리말 사실이 없으면 `[]`(v16 — 머리말을 붙여 요약을 다시 쓰지 않는다).
+   비워도 되는 칸은 그 경우의 `key_facts` 와 `implication`·`checks`·`hook_line` 뿐이다(코드가 카드 유형을 handoff 에서 읽어 이 세 유형만 받는다 — 다른 유형의 빈 `key_facts` 는 여전히 합치기가 호 전체를 거부한다).
+   `경고:` 로 시작하는 줄(행정처분 요약 주어·심층 칸 문체)은 exit 코드에 들어가지 않지만 고칠 수 있으면 고친다. 걸린 줄이 있으면 그 카드의 그 슬롯만 고치고 다시 돌린다(exit 0 이 될 때까지).
    코드가 못 세는 표기도 같은 표를 따른다 — 시험 결과·시험실 조사를 말하는 `규격 이탈`·`규격 외`·`규격 부적합`은 `기준일탈(OOS)`.
    **회수 사유의 `○○ 규격 부적합`(원문 `Failed … Specification(s)`)은 그대로 쓴다**(`용출 규격 부적합` — 2026-11-14 대표 결정). 같은 뜻은 한 호 안에서 한 가지 표기로.
 
@@ -66,9 +89,11 @@
 워커 이름이 `재작업` 으로 시작하면 이 절만 한다 — `copyedit.json` 이 아직 없으면 09:12 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 `재작업` 이 아니면 아무것도 쓰지 않고 종료한다.
 1. `rework.json` 이 이미 있으면(`진행`·`완료` 무엇이든) 종료한다 — 다른 워커가 맡았다. 없으면 `{"status":"진행","round":1,"worker":"<이름>"}` 을 먼저 커밋·push 해 맡는다(push 가 거절되고 남의 파일이 생겼으면 종료).
 2. `copyedit.json` 의 `rework.cards`(반려 카드 id)와 각 카드의 `fails` 만 본다. **적힌 슬롯만** 근거(`evidence`)대로 고친다 — 그 카드가 든 샤드 파일 `delta.{S}.json` 에서
-   (`desk.json` 의 `shards.delta` 로 찾는다). 반려되지 않은 카드·`delta.T.json`·심층 파일·다른 슬롯은 건드리지 않는다(코드가 대조한다 — 바뀌면 그 호는 `보류`).
+   (`desk.json` 의 `shards.delta` 로 찾는다). **`slot` 이 `deep.` 으로 시작하면** 그 카드가 든 심층 샤드 `deep.{S}.json`(`desk.json` 의 `shards.deep`)의
+   `items.<id>.deep_analysis` 그 칸만 고친다(리허설 1120d — 심층 반려도 재작업으로 되돌린다). 반려되지 않은 카드·`delta.T.json`·다른 슬롯은 건드리지 않는다(코드가 대조한다 — 바뀌면 그 호는 `보류`).
    한국어 슬롯의 뜻이 바뀌면 같은 카드 `en` 의 같은 슬롯도 맞춘다. 규칙을 지키는 문장이 안 나오는 `hook_line` 은 필드를 지운다. 지적에 동의하지 않아도 고친다(이의는 `rework.json` 의 `이의`).
-3. 고친 샤드마다 `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` 이 exit 0 인지 본다.
+3. 고친 샤드마다 `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` 이 exit 0 인지 본다
+   (심층 샤드는 `python company/editorial/precheck.py deep _handoff/handoff_$D.json company/run/{run_date_kst}/deep.{S}.json`).
 4. `rework.json` 을 `{"status":"완료","round":1,"worker":"…","fixed":[{"id":"<web_card_id>","shard":"B","changed":["summary","key_facts"]}],"unfixed":["<못 고친 카드 id>"]}` 로 고쳐
    고친 샤드 파일과 함께 커밋·push 한다. **재작업은 한 번뿐이다** — 다시 반려되면 그 호는 백업이 발행한다.
 

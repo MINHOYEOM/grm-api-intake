@@ -1,0 +1,447 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-16",
+ "shard": "E",
+ "cards": {
+  "gmpinspect-1Q73JiEyrFI": {
+   "title_issue": "항암 원료 실사 지적 없음",
+   "hook_line": "세포독성 항암 합성 원료 제조소 사후 실사, 지적 없음",
+   "summary": "식약처가 인도 세포독성 항암 원료의약품 제조소 Shilpa Pharma Lifesciences Limited Unit-2를 사후 실사했고 지적(보완)사항은 없었다.",
+   "key_facts": [
+    "평가 결과: 지적(보완)사항 없음"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "No deficiencies at oncology API site",
+    "hook_line": "Post-approval inspection of a cytotoxic oncology API site found no deficiencies",
+    "summary": "MFDS completed a post-approval inspection of Shilpa Pharma Lifesciences Limited Unit-2, a cytotoxic oncology API manufacturer in India and found no deficiencies.",
+    "key_facts": [
+     "Outcome: no deficiencies"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "gmpinspect-1Q73JiEyrUH": {
+   "title_issue": "항암 주사제 실사 지적 없음",
+   "hook_line": "무균 세포독성 항암 주사제 제조소 사후 실사, 지적 없음",
+   "summary": "식약처가 인도 무균 세포독성 항암 주사제 제조소 Intas Pharmaceuticals Ltd.를 사후 실사했고 지적(보완)사항은 없었다.",
+   "key_facts": [
+    "평가 결과: 지적(보완)사항 없음"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "No deficiencies at oncology injectable site",
+    "hook_line": "Post-approval inspection of a sterile cytotoxic injectable site found no deficiencies",
+    "summary": "MFDS completed a post-approval inspection of Intas Pharmaceuticals Ltd., a sterile cytotoxic oncology injectable manufacturer in India and found no deficiencies.",
+    "key_facts": [
+     "Outcome: no deficiencies"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "gmpinspect-1Q73uE9xd4-": {
+   "title_issue": "무균 주사제 실사 지적 없음",
+   "hook_line": "무균 일반 주사제 제조소 사후 실사, 지적 없음",
+   "summary": "식약처가 이탈리아 무균 주사제 제조소 A. Menarini Manufacturing Logistics and Services s.r.l.를 사후 실사했고 지적(보완)사항은 없었다.",
+   "key_facts": [
+    "평가 결과: 지적(보완)사항 없음"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "No deficiencies at sterile injectable site",
+    "hook_line": "Post-approval inspection of a sterile injectable site found no deficiencies",
+    "summary": "MFDS completed a post-approval inspection of A. Menarini Manufacturing Logistics and Services s.r.l., a sterile injectable manufacturer in Italy and found no deficiencies.",
+    "key_facts": [
+     "Outcome: no deficiencies"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "c3b4f61a28c7": {
+   "title_issue": "외부 상자 함량 오기 Class 4",
+   "hook_line": "외부 상자 앞면에 12.5 mg 대신 12. mg으로 인쇄됨",
+   "summary": "Enalapril maleate/Hydrochlorothiazide 20 mg/12.5 mg 정제가 외부 상자 앞면 함량 표기 오류로 Class 4 의약품 결함 통지 대상이 됐다(MHRA).",
+   "key_facts": [
+    "사유: 외부 상자 앞면의 hydrochlorothiazide 함량이 12.5 mg 대신 12. mg으로 잘못 인쇄됨",
+    "제품·범위: Enalapril maleate/Hydrochlorothiazide 20 mg/12.5 mg 정제, 영국 유통 1740팩",
+    "등급: Class 4",
+    "조치: 의료인은 이 제품을 계속 조제하도록 안내됨"
+   ],
+   "implication": "함량은 외부 상자의 다른 면, 첨부문서, 블리스터 호일에는 바르게 표기돼 있다. MHRA는 이 표시 결함이 정제 품질에 영향을 주지 않는다고 밝혔다. hydrochlorothiazide 12 mg 함량의 같은 복합제가 없어 위험은 낮다고 판단했다.",
+   "checks": [],
+   "quotes_translation": [
+    "Star Pharmaceuticals Limited가 외부 상자 앞면에 인쇄된 hydrochlorothiazide 함량이 “12.5 mg” 대신 “12.",
+    "mg”으로 잘못 표기된 인쇄 오류를 MHRA에 알렸다."
+   ],
+   "en": {
+    "title_issue": "Carton strength typo, Class 4",
+    "hook_line": "Carton front face printed 12. mg instead of 12.5 mg",
+    "summary": "MHRA issued a Class 4 medicines defect notification for Enalapril maleate/Hydrochlorothiazide 20 mg/12.5 mg tablets over a strength typo on the front face of the carton.",
+    "key_facts": [
+     "Reason: hydrochlorothiazide strength on the carton front face incorrectly states 12. mg instead of 12.5 mg",
+     "Product and scope: Enalapril maleate/Hydrochlorothiazide 20 mg/12.5 mg tablets, 1740 packs distributed in the UK",
+     "Class: Class 4",
+     "Agency action: healthcare professionals should continue to dispense the product"
+    ],
+    "implication": "The strength is correct on all other carton faces, the leaflet and the blister foil. MHRA stated the quality of the tablets is not impacted by this labelling defect. The risk was considered low because no combination with a 12 mg hydrochlorothiazide strength exists.",
+    "checks": []
+   }
+  },
+  "D-0073-2027": {
+   "title_issue": "불순물·분해물 규격 부적합 회수",
+   "hook_line": "포르모테롤 흡입액 3210상자, 불순물 규격 부적합 Class II",
+   "summary": "Formoterol Fumarate 흡입액 20 mcg/2 mL가 불순물·분해물 규격 부적합으로 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: 불순물·분해물 규격 부적합",
+    "제품·범위: Formoterol Fumarate 흡입액 20 mcg/2 mL, 로트 25BL0, 3210상자",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "불순물·분해물 규격 부적합"
+   ],
+   "en": {
+    "title_issue": "Failed impurities/degradation specification",
+    "hook_line": "Formoterol inhalation solution lot of 3210 cartons, failed impurity spec, Class II",
+    "summary": "Formoterol Fumarate Inhalation Solution 20 mcg/2 mL was recalled for failed impurities/degradation specification (Class II, voluntary).",
+    "key_facts": [
+     "Reason: Failed Impurities/Degradation Specification",
+     "Product and scope: Formoterol Fumarate Inhalation Solution 20 mcg/2 mL, lot 25BL0, 3210 cartons",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0074-2027": {
+   "title_issue": "표시 오류 회수",
+   "hook_line": "아비라테론 500 mg 정제 1296병, 표시 문제 Class II",
+   "summary": "Abiraterone Acetate 500 mg 정제가 표시 문제(달리 분류되지 않음)로 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: 표시 — 달리 분류되지 않음",
+    "제품·범위: Abiraterone Acetate 500 mg 정제 60정 병, 로트 13250135, 1296병",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "표시: 달리 분류되지 않음"
+   ],
+   "en": {
+    "title_issue": "Labeling recall",
+    "hook_line": "Abiraterone 500 mg tablets, 1296 bottles recalled for labeling, Class II",
+    "summary": "Abiraterone Acetate Tablets 500 mg were recalled for a labeling issue not elsewhere classified (Class II, voluntary).",
+    "key_facts": [
+     "Reason: Labeling: Not Elsewhere Classified",
+     "Product and scope: Abiraterone Acetate Tablets 500 mg, 60-count bottles, lot 13250135, 1296 bottles",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0075-2027": {
+   "title_issue": "다른 정제 혼입 회수",
+   "hook_line": "메토클로프라미드 5 mg 정제, 다른 정제 혼입 Class II",
+   "summary": "Metoclopramide 5 mg 정제가 다른 정제 혼입으로 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: 다른 정제 혼입(co-mingled tablet)",
+    "제품·범위: Metoclopramide 5 mg 정제 100정 병, 로트 3116509",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "제조사가 정제 혼입으로 해당 배치를 회수하고 있다."
+   ],
+   "en": {
+    "title_issue": "Recall for co-mingled tablet",
+    "hook_line": "Metoclopramide 5 mg tablets, one lot recalled for co-mingled tablet, Class II",
+    "summary": "Metoclopramide Tablets 5 mg were recalled because of a co-mingled tablet (Class II, voluntary).",
+    "key_facts": [
+     "Reason: co-mingled tablet",
+     "Product and scope: Metoclopramide Tablets 5 mg, 100-tablet bottles, lot 3116509",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0077-2027": {
+   "title_issue": "용출 규격 부적합 회수",
+   "hook_line": "복합 정제 3528병·216병, 용출 규격 부적합 Class II",
+   "summary": "Olmesartan Medoxomil·Amlodipine·Hydrochlorothiazide 40 mg/10 mg/12.5 mg 정제가 용출 규격 부적합으로 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: 용출 규격 부적합",
+    "제품·범위: 30정 병 3528개·90정 병 216개, 로트 12251163A·12251163B",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "용출 규격 부적합."
+   ],
+   "en": {
+    "title_issue": "Failed dissolution specifications",
+    "hook_line": "Combination tablets, 3528 and 216 bottles, failed dissolution specifications, Class II",
+    "summary": "Olmesartan Medoxomil, Amlodipine and Hydrochlorothiazide Tablets 40 mg/10 mg/12.5 mg were recalled for failed dissolution specifications (Class II, voluntary).",
+    "key_facts": [
+     "Reason: Failed Dissolution Specifications",
+     "Product and scope: 3528 30-count and 216 90-count bottles, lots 12251163A and 12251163B",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0080-2027": {
+   "title_issue": "폴리에틸렌 올리고머 검출 회수",
+   "hook_line": "점안액 6,633,570튜브, 폴리에틸렌 관련 올리고머 검출",
+   "summary": "Carboxymethylcellulose Sodium 0.5% 무균 점안액이 불순물·분해물 규격 부적합으로 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: 불순물·분해물 규격 부적합 — 폴리에틸렌 관련 올리고머 검출",
+    "제품·범위: Carboxymethylcellulose Sodium 0.5% 일회용 점안액, 로트 2EQH501 등, 6,633,570튜브",
+    "등급: Class II"
+   ],
+   "implication": "제품은 한국에서 제조돼 미국 업체가 판매했다.",
+   "checks": [],
+   "quotes_translation": [
+    "불순물·분해물 규격 부적합; 폴리에틸렌(PE) 관련 올리고머 검출"
+   ],
+   "en": {
+    "title_issue": "PE oligomers found, impurity spec failure",
+    "hook_line": "6,633,570 eye drop tubes recalled after polyethylene-related oligomers detected, Class II",
+    "summary": "Carboxymethylcellulose Sodium 0.5% sterile lubricant eye drops were recalled for failed impurities/degradation specification (Class II, voluntary).",
+    "key_facts": [
+     "Reason: Failed Impurities/Degradation Specification; detection of polyethylene (PE)-related oligomers",
+     "Product and scope: Carboxymethylcellulose Sodium 0.5% single-use eye drops, lots including 2EQH501, 6,633,570 tubes",
+     "Class: Class II"
+    ],
+    "implication": "The product was manufactured in South Korea and marketed by a U.S. company.",
+    "checks": []
+   }
+  },
+  "D-0085-2027": {
+   "title_issue": "CGMP 일탈로 19품목 회수",
+   "hook_line": "손 세정제 등 19품목 9220병, CGMP 일탈로 Class II 회수",
+   "summary": "Palm Antiseptic Hand Soap 등 소독용 세정제 19품목이 같은 사유인 CGMP 일탈로 일괄 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: CGMP 일탈",
+    "제품·범위: 소독용 손·몸 세정제 등 19품목, 9220병",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "CGMP 일탈"
+   ],
+   "en": {
+    "title_issue": "19 products recalled for CGMP deviations",
+    "hook_line": "Hand soap and 18 other products, 9220 bottles, recalled for CGMP deviations, Class II",
+    "summary": "Palm Antiseptic Hand Soap and 18 other antiseptic wash products were recalled together for CGMP deviations (Class II, voluntary).",
+    "key_facts": [
+     "Reason: CGMP Deviations",
+     "Product and scope: 19 antiseptic hand and body wash products, 9220 bottles",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0104-2027": {
+   "title_issue": "CGMP 일탈 외용 연고 회수",
+   "hook_line": "멘톨·살리실산메틸 연고 171,120개, CGMP 일탈로 Class II",
+   "summary": "멘톨 16%·살리실산메틸 32% 함유 외용 연고(ULTRA STRENTGH, ELECTRIC MIDICATED BALM)가 CGMP 일탈로 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: CGMP 일탈",
+    "제품·범위: 70 g·10 g 포장, 로트 23FEBU7001-019 등, 171,120개",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "CGMP 일탈"
+   ],
+   "en": {
+    "title_issue": "Balm recalled for CGMP deviations",
+    "hook_line": "Menthol and methyl salicylate balm, 171,120 units recalled for CGMP deviations, Class II",
+    "summary": "A topical balm containing menthol 16% and methyl salicylate 32% (ULTRA STRENTGH, ELECTRIC MIDICATED BALM) was recalled for CGMP deviations (Class II, voluntary).",
+    "key_facts": [
+     "Reason: CGMP Deviations",
+     "Product and scope: 70 g and 10 g packages, lots including 23FEBU7001-019, 171,120 units",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0105-2027": {
+   "title_issue": "무균 보증 부족 2품목 회수",
+   "hook_line": "페닐레프린·옥시토신 수액 2품목, 무균 보증 부족으로 Class II",
+   "summary": "Phenylephrine HCl 수액 등 2품목이 같은 사유인 무균 보증 부족으로 일괄 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: 무균 보증 부족",
+    "제품·범위: Phenylephrine HCl 100 mg/250 mL 수액, Oxytocin 30 USP 단위 500 mL 수액 등 2품목",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "무균 보증 부족"
+   ],
+   "en": {
+    "title_issue": "Recall for lack of sterility assurance",
+    "hook_line": "Phenylephrine and oxytocin infusions recalled for lack of sterility assurance, Class II",
+    "summary": "Phenylephrine HCl infusion and one other product were recalled together for lack of assurance of sterility (Class II, voluntary).",
+    "key_facts": [
+     "Reason: Lack of Assurance of Sterility",
+     "Product and scope: 2 products including Phenylephrine HCl 100 mg per 250 mL infusion and Oxytocin 30 USP units in 500 mL",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0107-2027": {
+   "title_issue": "함량 미달 회수",
+   "hook_line": "리도카인 5.0% 연고 493병, 함량 미달로 Class II 회수",
+   "summary": "Lidocaine 5.0% 연고가 함량 미달로 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: 함량 미달",
+    "제품·범위: Lidocaine 5.0% 연고 50 g 병, 로트 03AP2511 등, 493병",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "함량 미달 의약품"
+   ],
+   "en": {
+    "title_issue": "Recall for subpotency",
+    "hook_line": "Lidocaine 5.0% ointment, 493 jars recalled as subpotent, Class II",
+    "summary": "Lidocaine Ointment 5.0% was recalled as a subpotent drug (Class II, voluntary).",
+    "key_facts": [
+     "Reason: Subpotent Drug",
+     "Product and scope: Lidocaine Ointment 5.0% 50 g jars, lots including 03AP2511, 493 jars",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0108-2027": {
+   "title_issue": "경고 문구 누락 표시 회수",
+   "hook_line": "베쿠로늄 주사 121,800바이알, 경고 문구 누락 Class III",
+   "summary": "Vecuronium Bromide 주사 10 mg·20 mg 2품목이 같은 사유인 표시의 경고 문구·전문의약품 표시 누락으로 일괄 회수됐다(Class III, 자진회수).",
+   "key_facts": [
+    "사유: 표시 — 경고 문구 또는 전문의약품 표시 누락",
+    "제품·범위: Vecuronium Bromide 주사 10 mg·20 mg 2품목, 121,800바이알",
+    "등급: Class III"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "표시: 경고 문구 또는 전문의약품 표시 누락"
+   ],
+   "en": {
+    "title_issue": "Label lacks warning or Rx legend",
+    "hook_line": "Vecuronium 10 mg and 20 mg vials recalled as label lacks warning, Class III",
+    "summary": "Two Vecuronium Bromide for Injection products, 10 mg and 20 mg, were recalled together because the label lacks a warning or Rx legend (Class III, voluntary).",
+    "key_facts": [
+     "Reason: Labeling: Label Lacks Warning or Rx Legend",
+     "Product and scope: Vecuronium Bromide for Injection 10 mg and 20 mg, 2 products, 121,800 vials",
+     "Class: Class III"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0110-2027": {
+   "title_issue": "안정성 시험 중단 CGMP 일탈",
+   "hook_line": "테오필린 서방정, 외부 시험기관 안정성 시험 중단",
+   "summary": "Theophylline 서방정 100 mg·200 mg 2품목이 같은 사유인 CGMP 일탈(외부 시험기관의 안정성 시험 중단)로 일괄 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: CGMP 일탈 — 외부 시험기관에서 진행하던 안정성 시험 프로그램 중단",
+    "제품·범위: Theophylline 서방정 100 mg·200 mg 2품목",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [
+    "외부 시험기관에 맡긴 진행 중 안정성 시험이 중단되면 즉시 통보받는 계약 조항이 있는가?",
+    "외부 시험기관의 안정성 시험 일정 이행을 정기적으로 확인하는가?"
+   ],
+   "quotes_translation": [
+    "CGMP 일탈: 외부 시험기관에서 진행 중이던 안정성 시험 프로그램 중단"
+   ],
+   "en": {
+    "title_issue": "Stability program interruption, CGMP",
+    "hook_line": "Theophylline ER tablets recalled after third-party stability testing interruption",
+    "summary": "Two Theophylline Extended-Release Tablets products, 100 mg and 200 mg, were recalled together for CGMP deviations due to an interruption in ongoing stability testing at a third-party laboratory (Class II, voluntary).",
+    "key_facts": [
+     "Reason: CGMP Deviations: interruption in the ongoing stability testing program conducted at a third-party laboratory",
+     "Product and scope: Theophylline Extended-Release Tablets 100 mg and 200 mg, 2 products",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": [
+     "Does your contract require immediate notice if a third-party lab interrupts ongoing stability testing?",
+     "Do you regularly verify that third-party labs keep to the stability testing schedule?"
+    ]
+   }
+  },
+  "D-0113-2027": {
+   "title_issue": "다른 정제 혼입 회수",
+   "hook_line": "아토르바스타틴 40 mg 13,296병, 다른 정제 혼입 Class II",
+   "summary": "Atorvastatin Calcium 40 mg 정제가 다른 정제·캡슐 혼입으로 회수됐다(Class II, 자진회수).",
+   "key_facts": [
+    "사유: 다른 정제·캡슐 혼입",
+    "제품·범위: Atorvastatin Calcium 40 mg 정제 1,000정 병, 로트 DRF09618A·DRG02110A, 13,296병",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "다른 정제·캡슐 혼입"
+   ],
+   "en": {
+    "title_issue": "Foreign tablets found",
+    "hook_line": "Atorvastatin 40 mg, 13,296 1,000-count bottles recalled for foreign tablets, Class II",
+    "summary": "Atorvastatin Calcium Tablets 40 mg were recalled for the presence of foreign tablets or capsules (Class II, voluntary).",
+    "key_facts": [
+     "Reason: Presence of Foreign Tablets/Capsules",
+     "Product and scope: Atorvastatin Calcium Tablets 40 mg, 1,000-count bottles, lots DRF09618A and DRG02110A, 13,296 bottles",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "b0fc253f04b7": {
+   "title_issue": "PIC Scheme 7차 개정 채택",
+   "summary": "PIC/S 위원회가 2026-11-02 튀르키예 이스탄불 회의에서 개정 PIC Scheme(PIC/S 1/95 (Rev. 7))을 채택했다.",
+   "key_facts": [
+    "바뀌는 것: 개정 PIC Scheme(PIC/S 1/95 (Rev. 7)) 채택",
+    "시행일: 2026-11-02(채택 당일)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "PIC Scheme Rev. 7 adopted",
+    "summary": "The PIC/S Committee adopted the revised PIC Scheme (PIC/S 1/95 (Rev. 7)) at its meeting on 2026-11-02 in Istanbul, Türkiye.",
+    "key_facts": [
+     "What changes: revised PIC Scheme (PIC/S 1/95 (Rev. 7)) adopted",
+     "Effective date: 2026-11-02 (same date as adoption)"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  }
+ }
+}

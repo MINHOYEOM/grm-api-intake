@@ -10060,7 +10060,8 @@ class WebGlossaryRenderTest(unittest.TestCase):
         # 247 → 248: 2026-11-10 주간 용어 추가 202646(recall-classification).
         # 248 → 254: 2026-11-16 네이버 검색 수요 용어 6개(MES·HVAC·FMEA·CTD·DMF·LIMS).
         # 254 → 255: 2026-11-16 QMS 를 PQS 별칭에서 떼어 별도 용어(quality-management-system)로.
-        self.assertEqual(len(self.terms), 255)
+        # 255 → 256: 2026-11-17 import-alert(수입경보) 추가.
+        self.assertEqual(len(self.terms), 256)
 
     def test_source_url_renders_source_as_link(self):
         # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).

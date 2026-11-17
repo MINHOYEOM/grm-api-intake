@@ -1208,6 +1208,13 @@
       "findings": 106,
       "documents": 97,
       "note": "대부분 의료기기 실사 지적(QMSR·ISO 13485 문구) — 의약품 PQS 지적과 다른 축이라 별도 용어로 둔다(2026-11-16)"
+    },
+    {
+      "id": "import-alert",
+      "q": "Import Alert",
+      "findings": 34,
+      "documents": 32,
+      "note": "경고서한 본문에서 FDA가 업체 제품을 수입경보(Import Alert 번호)에 올렸다는 문장 — 같은 뜻(2026-11-17, 3건 확인)"
     }
   ],
   "excluded": [

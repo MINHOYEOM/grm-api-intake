@@ -1,0 +1,19 @@
+{
+  "status": "보류",
+  "round": 1,
+  "published": false,
+  "rehearsal": true,
+  "reason": "코드 검사 실패(assemble_publish_brief exit 2) — 의미 점검·마감 안 함",
+  "code_gate": {
+    "ran": true,
+    "exit": 2,
+    "message": "조립 거부: LLM 슬롯 주입 검증 실패 — key_facts 5개(≤4 초과) 6장(fda483-196272·196253·196255·196259·196262·196270), 한국어·en 모두. 참고: merge_parts 첫 실행은 '영문 슬롯 미완결 4/89장'으로 exit 1, 재실행은 exit 0(원인 미확인)."
+  },
+  "cards": [],
+  "counts": {
+    "cards": 89,
+    "pass": 0,
+    "reject": 0,
+    "fails_total": 0
+  }
+}

@@ -1,0 +1,531 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-16",
+ "shard": "C",
+ "cards": {
+  "fda483-196711": {
+   "title_issue": "무균 의약품 오염 방지 절차 미흡",
+   "hook_line": "100% 육안검사를 두 번 더 반복해도 중요 결함 기준을 넘음",
+   "summary": "FDA가 독일의 무균의약품 제조소 Vetter Pharma-Fertigung GmbH & Co. KG에 Form 483(관찰사항 3건)을 발행했다. 무균 의약품 미생물 오염 방지 절차, 육안검사 프로그램, Grade A 충전 뒤 환경 모니터링을 지적했다.",
+   "key_facts": [
+    "관찰 1: 멸균 부품을 무균 충전 전에 멸균하지 않은 선반에 임시 보관해 무균 유지를 보증하지 못함",
+    "관찰 1: 2020년 12월~2024년 청정실 계수기 재교정 전 결과가 제조사 사양에 맞지 않은 일탈이 여러 건(757638, 828507, 905985)",
+    "관찰 2: 임상 배치가 100% 육안검사와 합격 품질 수준 검사에 불합격했고 두 번 더 반복한 육안검사도 중요(major) 결함 기준을 넘음",
+    "관찰 3: 표면 환경 모니터링 프로그램에 작업자가 여닫는 문 손잡이가 들어 있지 않음"
+   ],
+   "implication": "일탈 757638과 828507은 재교정 때 계수 효율을 확인하지 못해 제품 영향이 없다는 보증이 없었다(관찰 1). 기준에 맞지 않은 계수기 중 일부는 의약품을 무균 충전하는 청정실 것이었다(관찰 1).",
+   "checks": [
+    "멸균 부품을 충전 전까지 멸균 상태로 보관하는가? (관찰 1)",
+    "육안검사가 반복 불합격하면 결함 원인을 조사하는가? (관찰 2)",
+    "작업자가 만지는 문 손잡이를 표면 모니터링에 넣었는가? (관찰 3)"
+   ],
+   "en": {
+    "title_issue": "Sterile contamination controls not established",
+    "hook_line": "100% visual inspection repeated two more times still exceeded the major defect criterion",
+    "summary": "FDA issued a Form 483 with 3 observations to Vetter Pharma-Fertigung GmbH & Co. KG, a sterile drug manufacturer in Germany, citing sterile contamination controls, the visual inspection program and environmental monitoring after Grade A filling.",
+    "key_facts": [
+     "Observation 1: sterilized components were temporarily stored on a non-sterilized rack before aseptic filling, with no assurance of sterility",
+     "Observation 1: multiple deviations from December 2020 to 2024 where counters did not conform to manufacturer specifications before recalibration (757638, 828507, 905985)",
+     "Observation 2: a clinical batch failed 100% visual inspection and AQL, and two additional 100% inspections still exceeded the major defect criterion",
+     "Observation 3: the surface monitoring program does not include door handles operators use to open and close"
+    ],
+    "implication": "There was no assurance that deviations 757638 and 828507 had no product impact because count rate efficiency could not be determined at recalibration (Observation 1). Some of the nonconforming counters belong to the cleanroom where drug product is aseptically filled (Observation 1).",
+    "checks": [
+     "Are sterilized components kept sterile until filling? (Observation 1)",
+     "When visual inspection fails repeatedly, is the defect cause investigated? (Observation 2)",
+     "Are door handles touched by operators included in surface monitoring? (Observation 3)"
+    ]
+   }
+  },
+  "fda483-196712": {
+   "title_issue": "갱의 오류 뒤 재교육 미실시",
+   "hook_line": "갱의 절차 미준수를 원인으로 결론 냈으나 재교육을 하지 않음",
+   "summary": "FDA가 의약품 제조소 BSP Pharmaceuticals S.p.A.에 Form 483을 발행했다. 관찰 4는 실사 중 논의 뒤 삭제됐고, 관찰 5에서 작업자 교육 미흡을 지적했다.",
+   "key_facts": [
+    "관찰 4: 원래 Form 483에 적힌 사건 관련 관찰은 논의 뒤 삭제",
+    "관찰 5: 2016-10-20 Grade C 구역 표면 검체가 조치 한계를 넘음",
+    "관찰 5: 갱의 절차 미준수 인적 오류를 근본원인으로 정했으나 재교육이나 다른 재발 방지 조치를 하지 않음"
+   ],
+   "implication": "",
+   "checks": [
+    "갱의 오류로 결론 낸 환경 모니터링 초과에 재교육을 하는가? (관찰 5)",
+    "인적 오류로 종결한 일탈에 재발 방지 조치가 있는가? (관찰 5)"
+   ],
+   "en": {
+    "title_issue": "No retraining after gowning error",
+    "hook_line": "Root cause was not following gowning procedure, yet no retraining was done",
+    "summary": "FDA issued a Form 483 to BSP Pharmaceuticals S.p.A., a drug manufacturer. Observation 4 was removed after discussion during the inspection, and Observation 5 cited inadequate employee training.",
+    "key_facts": [
+     "Observation 4: removed following a discussion of the incident described in the original FDA-483",
+     "Observation 5: on 2016-10-20 an environmental surface sample in a Grade C area exceeded the action limit",
+     "Observation 5: root cause was human error in following the gowning procedure, but no retraining or other action was taken"
+    ],
+    "implication": "",
+    "checks": [
+     "Is retraining done when an EM excursion is attributed to a gowning error? (Observation 5)",
+     "Do deviations closed as human error include actions to prevent recurrence? (Observation 5)"
+    ]
+   }
+  },
+  "fda483-196713": {
+   "title_issue": "허가 문서와 현장 운영 불일치",
+   "hook_line": "사용 후 완전성 시험 실패 때 배치 폐기 여부를 절차서가 정하지 않음",
+   "summary": "FDA가 BSP Pharmaceuticals S.p.A.에 Form 483(관찰사항 3건)을 발행했다. 허가 문서 기재 내용과 위탁제조 현장 운영의 불일치, 공정 압력 모니터링, 기준일탈(OOS) 관리 절차를 지적했다.",
+   "key_facts": [
+    "관찰 1: 허가 문서(3.2.P.3.3)는 사용 후 완전성 시험 실패 시 배치를 폐기한다고 했으나 현장 절차서는 폐기 여부를 정하지 않음",
+    "관찰 1: 허가 문서(3.2.P.3.5)의 마개 밀봉 근거가 다른 제품의 밸리데이션 연구였음",
+    "관찰 2: 일상 공정에서 모니터링하는 압력이 미생물 보유 시험에서 밸리데이션한 압력을 대표하지 않음",
+    "관찰 3: 기준일탈 관리 절차서가 출하 기준일탈이 확정된 배치의 처리를 정하지 않음"
+   ],
+   "implication": "압력은 보관 탱크에서 측정했고 연속 모니터링하지 않았다(관찰 2).",
+   "checks": [
+    "허가 문서의 약속과 현장 절차서를 정기적으로 대조하는가? (관찰 1)",
+    "공정 압력을 밸리데이션한 조건과 같은 지점에서 모니터링하는가? (관찰 2)",
+    "출하 기준일탈이 확정된 배치의 처리를 절차서에 정했는가? (관찰 3)"
+   ],
+   "en": {
+    "title_issue": "Application does not match site operations",
+    "hook_line": "Procedures do not say whether a confirmed post-use integrity failure rejects the batch",
+    "summary": "FDA issued a Form 483 with 3 observations to BSP Pharmaceuticals S.p.A., citing discrepancies between the application and contract site operations, process pressure monitoring and the OOS procedure.",
+    "key_facts": [
+     "Observation 1: section 3.2.P.3.3 states a batch will be rejected on post-use integrity failure, but site procedures do not say so",
+     "Observation 1: data in section 3.2.P.3.5 supporting the stopper came from validation of a different product",
+     "Observation 2: pressure monitored in routine processing is not representative of the pressure validated in microbial retention studies",
+     "Observation 3: the OOS procedure does not specify disposition of a batch with a confirmed release OOS"
+    ],
+    "implication": "Pressure is monitored in the holding tank and is not continuously monitored (Observation 2).",
+    "checks": [
+     "Do you periodically reconcile application commitments with site procedures? (Observation 1)",
+     "Is process pressure monitored at the point validated in retention studies? (Observation 2)",
+     "Does your procedure define disposition of batches with a confirmed release OOS? (Observation 3)"
+    ]
+   }
+  },
+  "fda483-196714": {
+   "title_issue": "배지충전 수율 기준 미설정",
+   "hook_line": "충전량 미달로 불합격한 바이알을 수량 대조 양식에서 제외함",
+   "summary": "FDA가 완제의약품 제조소 BSP Pharmaceuticals S.p.A.에 Form 483(관찰사항 4건)을 발행했다. 배지충전(무균공정 모의시험) 프로그램, 불만 조사, 설비 적격성평가, 전자 데이터 관리를 지적했다.",
+   "key_facts": [
+    "관찰 1: 배지충전 수율과 불합격 바이알 수에 대한 합격 기준을 정하지 않음",
+    "관찰 1: 충전량 미달로 불합격한 바이알을 수량 대조 양식에서 제외",
+    "관찰 3: 무균 생산 구역 완전성 시험기를 운영하는 소프트웨어를 밸리데이션하지 않음",
+    "관찰 4: 고성능 액체크로마토그래피 등 단독 시스템에서 데이터 변경 방지, 전자 원자료 검토, 감사추적기록 검토를 하지 않음"
+   ],
+   "implication": "이물 불만(M-RR-21-055) 조사에서 보관 검체 바이알을 다시 육안검사했으나 검사 전 처리 단계를 빠뜨렸다(관찰 2).",
+   "checks": [
+    "배지충전 불합격 바이알 수에 합격 기준이 있는가? (관찰 1)",
+    "배지충전 수량 대조에서 바이알을 빼는 근거를 정해 두었는가? (관찰 1)",
+    "단독 시험 장비의 감사추적기록을 검토하는가? (관찰 4)"
+   ],
+   "en": {
+    "title_issue": "No yield criterion for media fills",
+    "hook_line": "Vials rejected for low fill volume were excluded from the reconciliation form",
+    "summary": "FDA issued a Form 483 with 4 observations to BSP Pharmaceuticals S.p.A., a drug product manufacturer, citing the media fill program, complaint investigation, equipment qualification and control of electronic data.",
+    "key_facts": [
+     "Observation 1: no acceptance criterion for media fill yield or the number of rejected vials",
+     "Observation 1: vials rejected for low fill volume were excluded from the batch record reconciliation form",
+     "Observation 3: software operating an integrity tester in the sterile production area was not validated",
+     "Observation 4: no controls to prevent data changes, no review of electronic raw data and no audit trail review for standalone systems such as HPLC"
+    ],
+    "implication": "In a foreign particle complaint (M-RR-21-055), retain sample vials were re-inspected visually without a required preparatory step (Observation 2).",
+    "checks": [
+     "Is there an acceptance criterion for rejected vials in media fills? (Observation 1)",
+     "Is there a defined justification for excluding vials from media fill reconciliation? (Observation 1)",
+     "Are audit trails of standalone lab instruments reviewed? (Observation 4)"
+    ]
+   }
+  },
+  "fda483-196715": {
+   "title_issue": "간접 제품 접촉면 멸균 미보증",
+   "hook_line": "멸균 마개를 멸균 백에 담을 때 소독만 한 이송 슈트를 씀",
+   "summary": "FDA가 BSP Pharmaceuticals S.p.A.에 Form 483을 발행했다. 관찰 2에서 무균 충전 작업의 간접 제품 접촉면이 항상 멸균 상태는 아니라고 지적했다.",
+   "key_facts": [
+    "관찰 2: 무균 충전 작업의 간접 제품 접촉면이 항상 멸균 상태는 아님",
+    "관찰 2: 멸균 마개를 멸균 백에 담을 때 Grade A 이송 구역의 소독한 이송 슈트를 사용"
+   ],
+   "implication": "",
+   "checks": [
+    "멸균 부품이 닿는 이송 슈트를 멸균해 쓰는가? (관찰 2)",
+    "간접 제품 접촉면마다 멸균과 소독 중 무엇을 적용할지 정해 두었는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "Indirect product contact surfaces not sterile",
+    "hook_line": "Sterile stoppers are loaded into sterile bags through a sanitized transfer chute",
+    "summary": "FDA issued a Form 483 to BSP Pharmaceuticals S.p.A. Observation 2 cited indirect product contact surfaces in aseptic filling that are not always sterile.",
+    "key_facts": [
+     "Observation 2: indirect product contact surfaces used in aseptic filling operations are not always sterile",
+     "Observation 2: loading sterile stoppers into sterile bags uses a sanitized transfer chute in a Grade A transfer area"
+    ],
+    "implication": "",
+    "checks": [
+     "Is the transfer chute contacting sterile components itself sterilized? (Observation 2)",
+     "Have you defined sterilization versus sanitization for each indirect product contact surface? (Observation 2)"
+    ]
+   }
+  },
+  "fda483-196833": {
+   "title_issue": "ISO 5 구역 미생물 오염 미조사",
+   "hook_line": "ISO 5 공기 검체가 15 CFU로 조치 수준인데 추가 조사 없음",
+   "summary": "FDA가 무균·비무균 의약품 생산 시설 Strive Pharmacy LLC에 Form 483(관찰사항 10건)을 발행했다. ISO 5 구역 미생물 오염, 작업자 동작과 갱의, 비무균 소독제 사용, 위해 의약품 교차오염 관리, 기류 시각화 시험, 배지충전, 환경 모니터링을 지적했다.",
+   "key_facts": [
+    "관찰 1: 2025-11-26 ISO 5 층류 후드 공기 검체가 15 CFU로 조치 수준이었으나 추가 조사와 시정조치를 하지 않음",
+    "관찰 4: 위해 의약품에 닿는 믹싱 날·주걱·비커를 비활성화·제염하지 않고 수돗물로 헹굼",
+    "관찰 5: 기류 시각화 시험에서 ISO 5 층류 후드 전체에 연기를 넣지 않았고 ISO 7 작업자는 정지 상태",
+    "관찰 8: 작업자 근무 종료 시점 같은 최악 조건에서 배지충전을 하도록 요구하지 않음"
+   ],
+   "implication": "조치 수준 검체가 나온 날 그 후드에서 세마글루타이드 2.5 mg/mL 주사제 배치를 생산해 조제했다(관찰 1). 무균 작업자가 ISO 8 전실의 유리기구 세척 싱크 가까이에서 갱의했다(관찰 7). 약사 평가용 평판이 깨졌는데 품질보증 기술자가 평가를 무효로 하지 않고 배양했다(관찰 10).",
+   "checks": [
+    "조치 수준을 넘은 환경 모니터링 결과마다 조사와 시정조치를 하는가? (관찰 1)",
+    "위해 의약품 접촉 기구를 비활성화·제염한 뒤 세척하는가? (관찰 4)",
+    "배지충전을 근무 종료 시점 같은 최악 조건에서 하는가? (관찰 8)"
+   ],
+   "en": {
+    "title_issue": "ISO 5 contamination not investigated",
+    "hook_line": "ISO 5 air sample at action level with 15 cfu and no further investigation",
+    "summary": "FDA issued a Form 483 with 10 observations to Strive Pharmacy LLC, a producer of sterile and non-sterile drugs, citing ISO 5 contamination, personnel movement and gowning, non-sterile disinfectants, hazardous drug cross-contamination, smoke studies, media fills and environmental monitoring.",
+    "key_facts": [
+     "Observation 1: an ISO 5 hood air sample on 2025-11-26 was 15 cfu at action level with no further investigation or corrective action",
+     "Observation 4: mixing blades, spatulas and beakers contacting hazardous drugs were not deactivated or decontaminated before tap water rinsing",
+     "Observation 5: smoke was not introduced into the entire ISO 5 hood and ISO 7 technicians were stationary",
+     "Observation 8: no requirement to run media fills at the end of a technician's shift as a worst case"
+    ],
+    "implication": "On the day of the action-level sample, Semaglutide 2.5 mg/mL batches were produced and dispensed from that hood (Observation 1). A sterile technician donned garb near the glassware washing sink in the ISO 8 anteroom (Observation 7). A pharmacist's assessment plates were cracked, yet the QA technician did not invalidate the assessment and incubated them (Observation 10).",
+    "checks": [
+     "Is every action-level EM result investigated with corrective action? (Observation 1)",
+     "Are utensils contacting hazardous drugs deactivated and decontaminated before washing? (Observation 4)",
+     "Are media fills run under worst-case conditions such as end of shift? (Observation 8)"
+    ]
+   }
+  },
+  "fda483-196834": {
+   "title_issue": "ISO 7 상부 누수·무균 작업 미흡",
+   "hook_line": "ISO 7 생산실 바로 위 메자닌 바닥에 물이 고여 있음",
+   "summary": "FDA가 무균 의약품 생산 시설 STAQ Pharma Inc에 Form 483(관찰사항 3건)을 발행했다. 건물 유지 관리, 무균 의약품 미생물 오염 방지 절차, 설비 세척과 유지를 지적했다.",
+   "key_facts": [
+    "관찰 1: 2026-08-27 ISO 7 생산실 바로 위 메자닌에 물이 고였고 청정실 타일 5장 뒷면에 얼룩",
+    "관찰 1: 이 상태에서 펜타닐 염산염 160 mcg/mL 50 mL 주사기 로트를 생산",
+    "관찰 2: 2026-09-01 작업자가 공기 검체 평판을 바꾸며 팔을 어깨까지 ISO 5 후드 안에 넣음",
+    "관찰 3: 생산실 설비에 갈색~검은색 변색이 있었으나 청정실과 제품 위험을 평가하지 않음"
+   ],
+   "implication": "",
+   "checks": [
+    "청정실 상부 공간의 누수를 정기 점검하는가? (관찰 1)",
+    "환경 모니터링 평판 교체 때 작업자가 후드 안으로 몸을 넣지 않게 배치했는가? (관찰 2)",
+    "설비 표면 변색을 발견하면 위험평가를 하는가? (관찰 3)"
+   ],
+   "en": {
+    "title_issue": "Water above ISO 7 room and aseptic lapses",
+    "hook_line": "Standing water found in the mezzanine directly above an ISO-7 production room",
+    "summary": "FDA issued a Form 483 with 3 observations to STAQ Pharma Inc, a producer of sterile drug products, citing building maintenance, sterile contamination controls and equipment cleaning and maintenance.",
+    "key_facts": [
+     "Observation 1: on 2026-08-27 standing water was in the mezzanine above an ISO-7 production room, with staining on five cleanroom tiles",
+     "Observation 1: Fentanyl Hydrochloride 160 mcg/mL 50 mL syringes were produced under this condition",
+     "Observation 2: on 2026-09-01 a technician extended arms up to the shoulders into the ISO-5 hood while exchanging an air sample plate",
+     "Observation 3: brown to blackish discoloration on equipment in a production room was not assessed for risk"
+    ],
+    "implication": "",
+    "checks": [
+     "Do you routinely inspect spaces above cleanrooms for water intrusion? (Observation 1)",
+     "Are EM plates placed so operators need not reach into the hood? (Observation 2)",
+     "Is discoloration on equipment assessed for risk when found? (Observation 3)"
+    ]
+   }
+  },
+  "fda483-196842": {
+   "title_issue": "품질 감독 부재·반복 지적",
+   "hook_line": "옥살산 한도 출하시험 없이 아스코르브산 주사제를 출하함",
+   "summary": "FDA가 아웃소싱 시설(503B) Hybrid Pharma LLC에 Form 483(관찰사항 17건)을 발행했다. 무균공정 구역 관리, 용기 재사용, 배지충전, 차압, 시험실 관리, 품질관리부서 부재, 503B 원료 사용 제한 위반을 지적했다.",
+   "key_facts": [
+    "관찰 2: 외부 공급업체의 멸균 바이알을 재사용하고 세척 뒤 비관리 환경에 보관",
+    "관찰 3: 배지충전을 구성별로 한 번씩만 했고 최악 조건도 한 번뿐(2016·2019·2023 실사 반복 지적)",
+    "관찰 6: 2024년 1월~2026년 5월 아스코르브산 주사제 500 mg/mL를 옥살산 한도 출하시험 없이 출하",
+    "관찰 16: 503B에서 쓸 수 없는 세마글루타이드·티르제파타이드 원료로 의약품을 조제"
+   ],
+   "implication": "ISO 7 전실의 압력이 ISO 7 버퍼룸보다 높아 낮은 등급 공기가 주 무균 조제 구역으로 들어갈 경로가 생겼다(관찰 4). 아스코르브산 고성능 액체크로마토그래피 분석에서 큰 미확인 피크가 나왔으나 조사 없이 적합 판정했다(관찰 5). 품질부서가 제조기록서를 발행하지 않아 누구나 출력할 수 있었다(관찰 8).",
+   "checks": [
+    "재사용 용기의 세척과 발열성 물질 제거를 밸리데이션했는가? (관찰 2)",
+    "약전 불순물 시험을 출하시험에서 빼는 과학적 근거가 있는가? (관찰 6)",
+    "조제에 쓰는 원료가 503B 사용 가능 목록에 있는지 확인하는가? (관찰 16)"
+   ],
+   "en": {
+    "title_issue": "No quality oversight and repeat observations",
+    "hook_line": "Ascorbic acid injection released without routine oxalate limit testing",
+    "summary": "FDA issued a Form 483 with 17 observations to Hybrid Pharma LLC, a 503B outsourcing facility, citing aseptic area controls, vial reuse, media fills, pressure cascade, laboratory controls, no quality control unit and use of bulk substances not permitted under 503B.",
+    "key_facts": [
+     "Observation 2: sterile vials from an external vendor are reused and stored in an uncontrolled environment after cleaning",
+     "Observation 3: one media fill per configuration and only one worst-case run (repeat observation from 2016, 2019 and 2023 inspections)",
+     "Observation 6: from January 2024 to May 2026, Ascorbic Acid for Injection 500 mg/mL was released without routine oxalate testing",
+     "Observation 16: human drugs were compounded using semaglutide and tirzepatide bulk drug substances not permitted under 503B"
+    ],
+    "implication": "The ISO 7 anteroom was at higher pressure than the ISO 7 buffer room, creating a pathway for lower-quality air into the primary sterile compounding area (Observation 4). A significant unidentified peak in an ascorbic acid HPLC assay was not investigated before a passing result was assigned (Observation 5). Quality does not issue batch records, which any personnel can print (Observation 8).",
+    "checks": [
+     "Is cleaning and depyrogenation of reused containers validated? (Observation 2)",
+     "Is there a scientific basis for omitting a compendial impurity test from release? (Observation 6)",
+     "Do you confirm each bulk substance is permitted for 503B compounding? (Observation 16)"
+    ]
+   }
+  },
+  "0f65bd3c5c70": {
+   "title_issue": "제출 기록 검토 CGMP 중대 일탈",
+   "summary": "FDA가 원료의약품(API) 업체 Nanjing Hanxin Pharmaceutical Technology Co. Ltd.에 경고서한을 발행했다. 회사가 제출한 기록을 FDA가 검토해 CGMP 중대 일탈을 확인했다.",
+   "key_facts": [
+    "당국 조치: 기록 요청에 따른 제출 기록 검토 뒤 경고서한 발행, 원료의약품 불량(adulterated) 판정"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Significant CGMP deviations in records review",
+    "summary": "FDA issued a warning letter to Nanjing Hanxin Pharmaceutical Technology Co. Ltd., an API firm, citing significant CGMP deviations identified in an FDA review of records submitted from its facility.",
+    "key_facts": [
+     "Agency action: warning letter after a review of records submitted on request, with the API deemed adulterated"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "7e7545ebb190": {
+   "title_issue": "기록 검토 CGMP 중대 위반",
+   "summary": "FDA가 원료의약품(API) 업체 Chongqing Qiancan Technology Co., Ltd.에 경고서한을 발행했다. FDA가 회사 기록을 검토해 CGMP 중대 위반을 확인했다.",
+   "key_facts": [
+    "당국 조치: 기록 검토 뒤 경고서한 발행, 원료의약품 불량(adulterated) 판정"
+   ],
+   "implication": "FDA는 서한에 적은 위반이 전부가 아니라고 밝혔다.",
+   "checks": [],
+   "en": {
+    "title_issue": "Significant CGMP violation found in records review",
+    "summary": "FDA issued a warning letter to Chongqing Qiancan Technology Co., Ltd., an API firm, citing a significant CGMP violation identified in an FDA review of records from its facility.",
+    "key_facts": [
+     "Agency action: warning letter after a records review, with the API deemed adulterated"
+    ],
+    "implication": "FDA stated that the letter is not intended to be an all-inclusive list of violations.",
+    "checks": []
+   }
+  },
+  "bfbb158a522f": {
+   "title_issue": "무균 공정 밸리데이션 미흡",
+   "summary": "FDA가 의약품 제조소 USV Private Limited에 실사 결과로 경고서한을 발행했다. 무균 오염 방지와 공정 밸리데이션, 오염·혼동 방지 구역과 설비, 시험실 관리 등 위반 3건을 지적했다.",
+   "key_facts": [
+    "위반 1: 무균 의약품 미생물 오염 방지 절차와 무균·멸균 공정 밸리데이션을 갖추지 않음(21 CFR 211.113(b))",
+    "위반 2: 오염·혼동 방지 구역이나 관리 체계, 적절한 설계·크기·위치의 설비를 갖추지 않음(21 CFR 211.42(c), 21 CFR 211.63)",
+    "위반 3: 과학적으로 타당한 규격·표준·검체 채취 계획·시험 절차를 갖춘 시험실 관리를 수립하지 않음(21 CFR 211.160(b))"
+   ],
+   "implication": "",
+   "checks": [
+    "무균·멸균 공정을 모두 밸리데이션했는가? (위반 1)",
+    "오염과 혼동을 막는 구역 구분이 설비 배치에 반영됐는가? (위반 2)",
+    "시험 규격과 검체 채취 계획에 과학적 근거가 있는가? (위반 3)"
+   ],
+   "en": {
+    "title_issue": "Aseptic and sterilization validation lacking",
+    "summary": "FDA issued a warning letter to USV Private Limited, a drug manufacturing facility, after an inspection, citing 3 violations on sterile contamination controls and process validation, areas and equipment to prevent contamination or mix-ups, and laboratory controls.",
+    "key_facts": [
+     "Violation 1: no adequate procedures to prevent microbiological contamination of sterile drugs, including validation of aseptic and sterilization processes (21 CFR 211.113(b))",
+     "Violation 2: no separate or defined areas or control systems to prevent contamination or mix-ups, and equipment not of appropriate design, size and location (21 CFR 211.42(c), 21 CFR 211.63)",
+     "Violation 3: laboratory controls lacked scientifically sound specifications, standards, sampling plans and test procedures (21 CFR 211.160(b))"
+    ],
+    "implication": "",
+    "checks": [
+     "Are all aseptic and sterilization processes validated? (Violation 1)",
+     "Does equipment layout reflect defined areas that prevent contamination and mix-ups? (Violation 2)",
+     "Are specifications and sampling plans scientifically justified? (Violation 3)"
+    ]
+   }
+  },
+  "admin-2026007929": {
+   "title_issue": "한약재 시험 결과 기준 부적합",
+   "hook_line": "한약재 시험 결과 기준 부적합으로 해당 품목 제조업무 정지 3개월",
+   "summary": "식약처가 풍산주식회사에 해당 품목 제조업무 정지 3개월을 처분했다. 한약재 풍산골쇄보의 시험 결과가 기준에 맞지 않았다.",
+   "key_facts": [
+    "위반: 한약재 시험 결과 기준 부적합(풍산골쇄보)",
+    "처분: 해당 품목 제조업무 정지 3개월(2026-11-18~2027-02-17)",
+    "근거: 약사법 제62조(위반), 약사법 제76조(처분)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Herbal medicine failed test standard",
+    "hook_line": "Herbal medicine failed its test standard, manufacturing of the product suspended 3 months",
+    "summary": "MFDS suspended a manufacturer's manufacturing of one herbal medicine product for 3 months after the product's test results failed the standard.",
+    "key_facts": [
+     "Violation: test results of a herbal medicine product failed the standard",
+     "Sanction: 3-month suspension of manufacturing for the product (2026-11-18 to 2027-02-17)",
+     "Basis: Pharmaceutical Affairs Act Article 62 (violation) and Article 76 (sanction)"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026007930": {
+   "title_issue": "한약재 카드뮴 부적합",
+   "hook_line": "수거검사 카드뮴 부적합으로 한약재 제조업무 정지 3개월",
+   "summary": "식약처가 주식회사퓨어마인드농업회사법인에 해당 품목 제조업무 정지 3개월을 처분했다. 수거검사에서 한약재 3품목의 카드뮴이 기준에 맞지 않았다.",
+   "key_facts": [
+    "위반: 수거검사 카드뮴 부적합(시험·검사 기준 0.3 ppm 이하)",
+    "경위: 퓨어마인드곡기생 0.5 ppm, 퓨어마인드절패모 0.7 ppm, 퓨어마인드해방풍 0.6 ppm",
+    "처분: 해당 3품목 제조업무 정지 3개월(2026-11-18~2027-02-17)",
+    "근거: 약사법 제62조"
+   ],
+   "implication": "",
+   "checks": [
+    "한약재 출하 전에 카드뮴을 제조번호마다 시험하는가?",
+    "자가 시험의 카드뮴 판정 기준이 수거검사 기준(0.3 ppm 이하)과 같은가?"
+   ],
+   "en": {
+    "title_issue": "Herbal medicines failed cadmium limit",
+    "hook_line": "Cadmium failed in sampled herbal medicines, manufacturing suspended 3 months",
+    "summary": "MFDS suspended a manufacturer's manufacturing of three herbal medicine products for 3 months after post-market sampling found cadmium above the standard.",
+    "key_facts": [
+     "Violation: cadmium failed in post-market sampling (standard 0.3 ppm or less)",
+     "Timeline: results of 0.5 ppm, 0.7 ppm and 0.6 ppm for the three products",
+     "Sanction: 3-month suspension of manufacturing for the three products (2026-11-18 to 2027-02-17)",
+     "Basis: Pharmaceutical Affairs Act Article 62"
+    ],
+    "implication": "",
+    "checks": [
+     "Do you test cadmium for every batch of herbal medicine before release?",
+     "Does your in-house cadmium criterion match the sampling standard (0.3 ppm or less)?"
+    ]
+   }
+  },
+  "admin-2026007935": {
+   "title_issue": "임상시험용의약품 제조·품질관리기준 위반",
+   "hook_line": "기준서 미준수 등으로 해당 임상시험 업무정지 1개월(1차)",
+   "summary": "식약처가 제이더블유중외제약(주)에 해당 임상시험 업무정지 1개월(1차)을 처분했다. 기준서를 지키지 않았고 임상시험용의약품 제조 및 품질관리기준을 위반했다.",
+   "key_facts": [
+    "위반: 기준서 미준수, 임상시험용의약품 제조 및 품질관리기준 위반",
+    "처분: 해당 임상시험 업무정지 1개월(2026-11-09~2026-12-08), 1차",
+    "근거: 약사법 제34조제3항제2호, 의약품 등의 안전에 관한 규칙 제30조제1항제9호"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Investigational drug GMP violation",
+    "hook_line": "Clinical trial suspended 1 month (first offense) for SOP and other violations",
+    "summary": "MFDS suspended a pharmaceutical company's clinical trial for 1 month (first offense) for not following its SOPs and violating manufacturing and quality control standards for investigational drugs.",
+    "key_facts": [
+     "Violation: SOPs not followed, and investigational drug manufacturing and quality control standards violated",
+     "Sanction: 1-month suspension of the clinical trial (2026-11-09 to 2026-12-08), first offense",
+     "Basis: Pharmaceutical Affairs Act Article 34(3)2 and Enforcement Rule on Safety of Drugs Article 30(1)9"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026007955": {
+   "title_issue": "임상시험계획 변경 미보고·표시 위반",
+   "hook_line": "임상시험계획 변경 미보고 등으로 해당 임상시험 업무정지 1개월",
+   "summary": "식약처가 (주)안트로젠에 해당 임상시험 업무정지 1개월(1차)을 처분했다. 임상시험계획 변경을 보고하지 않거나 늦게 보고했고, 임상시험용 의약품 표시기재와 임상시험 품질보증·자료 품질관리를 위반했다.",
+   "key_facts": [
+    "위반: 임상시험계획 변경 미보고 및 지연 보고, 임상시험용 의약품 표시기재 위반, 임상시험 품질보증 및 임상시험자료 품질관리 위반",
+    "처분: 해당 임상시험 업무정지 1개월(2026-11-09~2026-12-08), 1차",
+    "근거: 약사법 제34조제1항 및 제3항제2호, 의약품 등의 안전에 관한 규칙 제24조제5항제1호·제2호, 제30조제1항제9호"
+   ],
+   "implication": "",
+   "checks": [
+    "임상시험계획 변경 사항을 보고 기한 안에 보고하는지 추적하는가?",
+    "임상시험용 의약품 표시기재를 규정 항목과 대조하는가?"
+   ],
+   "en": {
+    "title_issue": "Protocol changes unreported, labeling violated",
+    "hook_line": "Clinical trial suspended 1 month for unreported protocol changes and other violations",
+    "summary": "MFDS suspended a company's clinical trial for 1 month (first offense) for unreported or late-reported protocol changes, investigational drug labeling violations, and clinical trial quality assurance and data quality control violations.",
+    "key_facts": [
+     "Violation: protocol changes not reported or reported late, investigational drug labeling violated, and clinical trial QA and data quality control violated",
+     "Sanction: 1-month suspension of the clinical trial (2026-11-09 to 2026-12-08), first offense",
+     "Basis: Pharmaceutical Affairs Act Article 34(1) and (3)2, Enforcement Rule on Safety of Drugs Article 24(5)1-2 and Article 30(1)9"
+    ],
+    "implication": "",
+    "checks": [
+     "Do you track that protocol changes are reported within the deadline?",
+     "Do you check investigational drug labels against the required items?"
+    ]
+   }
+  },
+  "admin-2026007975": {
+   "title_issue": "임상시험 대상자 동의 절차 위반",
+   "hook_line": "대상자 동의 절차 위반으로 임상시험 업무정지 3개월·책임자 변경",
+   "summary": "식약처가 재단법인아산사회복지재단서울아산병원에 해당 품목 임상시험 업무정지 3개월과 임상시험 책임자 변경(1차)을 처분했다. 임상시험 대상자의 동의 절차를 위반했다.",
+   "key_facts": [
+    "위반: 임상시험 대상자의 동의 절차 위반",
+    "처분: 해당 품목 임상시험 업무정지 3개월(2026-11-09~2027-02-08)과 임상시험 책임자 변경, 1차",
+    "근거: 약사법 제34조의2제3항제3호, 의약품 등의 안전에 관한 규칙 제30조제1항제4호"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Subject consent procedure violated",
+    "hook_line": "Consent procedure violated, clinical trial suspended 3 months and investigator replaced",
+    "summary": "MFDS suspended a hospital's clinical trial for the product for 3 months and ordered a change of principal investigator (first offense) for violating the subject consent procedure.",
+    "key_facts": [
+     "Violation: clinical trial subject consent procedure violated",
+     "Sanction: 3-month suspension of the clinical trial for the product (2026-11-09 to 2027-02-08) and change of principal investigator, first offense",
+     "Basis: Pharmaceutical Affairs Act Article 34-2(3)3 and Enforcement Rule on Safety of Drugs Article 30(1)4"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026008096": {
+   "title_issue": "자율점검 미실시 기준서 미준수",
+   "hook_line": "연 1회 자율점검 규정에도 정기감시일까지 실시 이력 없음",
+   "summary": "식약처가 (주)녹원유통사업단에 전(全) 제조업무정지 1개월을 처분했다. 정기 점검을 연 1회 하도록 정한 자사 기준서와 달리 GMP 정기감시일까지 자율점검을 실시한 이력이 없었다.",
+   "key_facts": [
+    "위반: 자사 기준서(자율점검 관리규정) 미준수",
+    "경위: 정기 점검을 원칙적으로 연 1회 하도록 정했으나 GMP 정기감시일까지 자율점검 실시 이력 없음",
+    "처분: 전(全) 제조업무정지 1개월(2026-11-11~2026-12-10)",
+    "근거: 약사법 제38조제1항, 의약품 등의 안전에 관한 규칙 제48조제9호바목"
+   ],
+   "implication": "",
+   "checks": [
+    "자율점검을 기준서에 정한 연 1회 주기대로 실시하고 기록하는가?",
+    "자율점검 예정일이 지나면 품질부서가 알 수 있는가?"
+   ],
+   "en": {
+    "title_issue": "Self-inspection not performed per SOP",
+    "hook_line": "SOP required yearly self-inspection, but none was performed before the GMP inspection",
+    "summary": "MFDS suspended all manufacturing operations of a company for 1 month because no self-inspection had been performed by the GMP inspection date, contrary to its SOP requiring one per year.",
+    "key_facts": [
+     "Violation: in-house SOP (self-inspection rules) not followed",
+     "Timeline: periodic inspection required once a year in principle, but no self-inspection record by the GMP inspection date",
+     "Sanction: 1-month suspension of all manufacturing operations (2026-11-11 to 2026-12-10)",
+     "Basis: Pharmaceutical Affairs Act Article 38(1) and Enforcement Rule on Safety of Drugs Article 48(9)(f)"
+    ],
+    "implication": "",
+    "checks": [
+     "Is self-inspection performed and recorded yearly as your SOP requires?",
+     "Is the quality unit alerted when a self-inspection is overdue?"
+    ]
+   }
+  },
+  "admin-2026008176": {
+   "title_issue": "신고와 다른 포장용기로 제조·출하",
+   "hook_line": "신고와 다른 직접 포장용기로 제조해 출하, 제조업무정지 1개월",
+   "summary": "식약처가 (주)한수산에 해당 품목 제조업무정지 1개월을 처분했다. 제조 한약재 한수산웅담을 신고사항과 다른 제조방법(직접 포장용기)으로 제조해 출하했다.",
+   "key_facts": [
+    "위반: 신고사항과 다른 제조방법(직접 포장용기)으로 제조한 제품 출하",
+    "처분: 해당 품목(한수산웅담) 제조업무정지 1개월(2026-11-17~2026-12-16)",
+    "근거: 약사법 제31조제9항, 의약품 등의 안전에 관한 규칙 제8조제1항"
+   ],
+   "implication": "",
+   "checks": [
+    "직접 포장용기를 바꾸기 전에 신고사항 변경을 거치는가?",
+    "출하 전에 포장용기가 신고사항과 같은지 확인하는가?"
+   ],
+   "en": {
+    "title_issue": "Packaging differed from notified method",
+    "hook_line": "Shipped in immediate containers differing from the notification, suspended 1 month",
+    "summary": "MFDS suspended a manufacturer's manufacturing of one herbal medicine product for 1 month for shipping product made by a method (immediate container) different from its notification.",
+    "key_facts": [
+     "Violation: shipped product made by a manufacturing method (immediate container) different from the notification",
+     "Sanction: 1-month suspension of manufacturing for the product (2026-11-17 to 2026-12-16)",
+     "Basis: Pharmaceutical Affairs Act Article 31(9) and Enforcement Rule on Safety of Drugs Article 8(1)"
+    ],
+    "implication": "",
+    "checks": [
+     "Is a notification change completed before changing immediate containers?",
+     "Do you confirm before release that packaging matches the notification?"
+    ]
+   }
+  }
+ }
+}

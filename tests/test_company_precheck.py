@@ -242,6 +242,12 @@ class NestedTranslationTest(unittest.TestCase):
         self.assertEqual(precheck.deep_lines(gone, ids), ["483 관찰 국문 없음 fda483-1: observations_ko(★필수)"])
 
     def test_cli_and_instructions(self):
+        # 심층 근거 게이트(1120d)는 DeepGate1120dTest 가 본다 — 원문 없는 최소 픽스처라 여기서는 통과로 고정.
+        import verify_deep_analysis as vda
+        patcher = mock.patch.object(vda, "run_deep_analysis_gate",
+                                    return_value=vda.GateResult(ok=True, findings=[], report=""))
+        patcher.start()
+        self.addCleanup(patcher.stop)
         with tempfile.TemporaryDirectory() as tmp:
             h, good, bad = (os.path.join(tmp, n) for n in ("h.json", "g.json", "b.json"))
             Path(h).write_text(json.dumps({"rows": [{"web_card_id": "fda483-1", "kind": "fda-483"}]}), encoding="utf-8")
@@ -430,6 +436,12 @@ class DeepTermsBlockTest(unittest.TestCase):
         self.assertEqual(precheck.deep_term_lines(shard), [])
 
     def test_cli_deep_exits_1_on_terms(self):
+        # 심층 근거 게이트(1120d)는 DeepGate1120dTest 가 본다 — 원문 없는 최소 픽스처라 여기서는 통과로 고정.
+        import verify_deep_analysis as vda
+        patcher = mock.patch.object(vda, "run_deep_analysis_gate",
+                                    return_value=vda.GateResult(ok=True, findings=[], report=""))
+        patcher.start()
+        self.addCleanup(patcher.stop)
         with tempfile.TemporaryDirectory() as tmp:
             ho, sh = Path(tmp, "h.json"), Path(tmp, "deep.A.json")
             ho.write_text(json.dumps({"rows": []}), encoding="utf-8")
@@ -504,6 +516,82 @@ class Rehearsal1120cTest(unittest.TestCase):
         self.assertTrue(all(x.startswith("hook_line 금칙어 recall-1.") for x in block))
         # 화면도 같은 함수로 숨긴다.
         self.assertEqual(render._valid_hook_line({"hook_line": "이물 혼입 우려로 회수"}, "ko"), "")
+
+
+class DeepGate1120dTest(unittest.TestCase):
+    """리허설 1120d: 심층 근거 게이트 FAIL(조항 인용이 원문 글자와 다름) — 조립은 그 카드 심층을 빼고 교열은 반려했다."""
+
+    def test_uses_bridge_gate_with_handoff_body(self):
+        import verify_deep_analysis as vda
+        seen = {}
+
+        def fake(da, source, card_type=None):
+            seen["source"] = source
+            return vda.GateResult(ok=False, findings=[vda.Finding(vda.SEV_FAIL, "D2-CITATION-UNGROUNDED", "조항 없음"),
+                                                      vda.Finding(vda.SEV_WARN, "D3-X", "경고")], report="")
+        shard = {"items": {"admin-1": {"deep_analysis": {"key_violations": []}}, "admin-2": {"observations_ko": []}}}
+        handoff = {"rows": [{"web_card_id": "admin-1", "deep_analysis_input": {"body_full": "처분문 원문"}}]}
+        with mock.patch.object(vda, "run_deep_analysis_gate", side_effect=fake):
+            lines = precheck.deep_gate_lines(shard, handoff)
+        self.assertEqual(lines, ["심층 게이트 admin-1: [FAIL] D2-CITATION-UNGROUNDED — 조항 없음"])   # WARN 은 막지 않는다
+        self.assertEqual(seen["source"], precheck.handoff_bodies(handoff).get("admin-1", ""))
+
+    def test_pass_gives_no_lines(self):
+        import verify_deep_analysis as vda
+        with mock.patch.object(vda, "run_deep_analysis_gate",
+                               return_value=vda.GateResult(ok=True, findings=[], report="")):
+            self.assertEqual(precheck.deep_gate_lines({"items": {"a": {"deep_analysis": {}}}}, {"rows": []}), [])
+
+    def test_bridge_calls_the_same_gate(self):
+        import inspect
+        self.assertIn("_vda.run_deep_analysis_gate(", inspect.getsource(delta_bridge._gate_deep_analysis))
+        self.assertIn("deep_gate_lines(shard, handoff)", inspect.getsource(precheck.main))
+
+
+class ReworkDeep1120dTest(unittest.TestCase):
+    """리허설 1120d: 반려 1장이 심층 칸 — 재작업이 심층도 고치고, 대조는 델타와 같은 함수로 심층을 본다."""
+
+    OLD = {"admin-1": {"deep_analysis": {"key_violations": [{"citation": "제30조제1항제9호"}]}},
+           "admin-2": {"deep_analysis": {"key_violations": [{"citation": "제5조"}]}}}
+
+    def _new(self, **change):
+        new = json.loads(json.dumps(self.OLD))
+        for cid, cit in change.items():
+            new[cid.replace("_", "-")]["deep_analysis"]["key_violations"][0]["citation"] = cit
+        return new
+
+    def test_rejected_deep_card_may_change(self):
+        problems, notes = precheck.rework_diff_deep(self.OLD, self._new(admin_1="제24조제5항제1호 및 제2호, 제30조제1항제9호"), {"admin-1"})
+        self.assertEqual(problems, [])
+        self.assertEqual(notes, ["심층: 고침 admin-1: deep_analysis"])
+
+    def test_other_deep_card_must_not_change(self):
+        problems, _ = precheck.rework_diff_deep(self.OLD, self._new(admin_2="제6조"), {"admin-1"})
+        self.assertEqual(problems, ["심층: 반려되지 않은 카드가 바뀌었다: admin-2 (deep_analysis)"])
+
+    def test_delta_only_rejection_is_fine(self):
+        # 반려 카드가 심층에 없어도(델타 칸 반려) 심층 대조는 문제 삼지 않는다.
+        self.assertEqual(precheck.rework_diff_deep(self.OLD, self._new(), {"fda483-9"}), ([], []))
+
+    def test_cli_with_deep(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            def w(name, obj):
+                p = Path(tmp, name); p.write_text(json.dumps(obj, ensure_ascii=False), encoding="utf-8"); return str(p)
+            delta = {"cards": {"admin-1": _card(), "admin-2": _card()}}
+            ce = {"rework": {"cards": ["admin-1"]}, "cards": [{"web_card_id": "admin-1", "verdict": "reject"}]}
+            args = ["rework-diff", w("d1.json", delta), w("d2.json", delta), w("ce.json", ce),
+                    "--deep-old", w("x1.json", self.OLD)]
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(precheck.main(args + ["--deep-new", w("x2.json", self._new(admin_1="새 인용"))]), 0)
+                self.assertEqual(precheck.main(args + ["--deep-new", w("x3.json", self._new(admin_2="바뀜"))]), 1)
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(precheck.main(args), 2)       # 짝 없이 하나만 주면 못 한다
+
+    def test_instructions_cover_deep_rework(self):
+        rep = (ROOT / "company" / "editorial" / "next" / "reporter.md").read_text(encoding="utf-8")
+        ce = (ROOT / "company" / "editorial" / "next" / "copyedit.md").read_text(encoding="utf-8")
+        self.assertIn("`slot` 이 `deep.` 으로 시작하면", rep)
+        self.assertIn("--deep-old _scaffold/deep_delta.r1.json", ce)
 
 
 if __name__ == "__main__":

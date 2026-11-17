@@ -34,8 +34,13 @@
         **원문 부재 단정**(`심층 부재 …` — 게이트 3 과 같은 판정 함수 `assemble_publish_brief.false_absence_match`,
         "처분문에 가중·감경 사유는 없다" 꼴 포함)과 **483 관찰 끝 근거 번호**(`심층 근거 번호 …` —
         `inject_slots.deep_483_basis_hits`)도 막는다(리허설 1120c 교열 반려 11장).
+        **심층분석 근거 게이트**(`verify_deep_analysis.run_deep_analysis_gate` — 발행 브릿지가 조립 직전에 카드마다 부르는 그 함수,
+        원문 = handoff `body_full`)의 FAIL 도 막는다(`심층 게이트 <id>: [FAIL] D2-…` — 리허설 1120d: 조항 인용이 원문 글자와 달라
+        조립은 그 카드 심층을 조용히 빼고 교열은 반려했다).
 
-    python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json>
+    python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json> [--deep-old <1차 deep_delta.json> --deep-new <2차 deep_delta.json>]
+        `--deep-old`·`--deep-new` 를 주면 심층(`deep_delta.json`)도 **같은 대조 함수**로 본다 — 반려 카드의 심층만 바뀌어야 한다
+        (리허설 1120d: 반려 1장이 심층 칸이었는데 재작업이 델타만 고칠 수 있어 되돌릴 길이 없었다).
         재작업(반려 카드만 한 번 고치기) 뒤에 다시 합친 델타가 **반려 카드만** 바뀌었는지 본다.
         카드가 늘거나 줄었거나, 반려되지 않은 카드·`tldr` 가 한 글자라도 바뀌었으면 exit 1 — 교열은 판정하지 않고 보류한다.
         통과면 반려 카드마다 바뀐 슬롯을 한 줄씩 낸다(안 바뀐 반려 카드도 적는다 — 다시 반려될 카드다).
@@ -231,6 +236,27 @@ def deep_term_lines(shard):
     return [f"심층 용어 {cid}.{slot}: {lab}" for cid, slot, lab in inject_slots.deep_term_hits(shard)]
 
 
+def deep_gate_lines(shard, handoff):
+    """심층분석 근거 게이트 FAIL 줄(순수) — 발행 브릿지(`delta_bridge._gate_deep_analysis`)와 같은 함수·같은 원문.
+
+    브릿지는 FAIL 카드의 심층을 조용히 빼고 발행하지만(graceful degrade) 교열은 그 카드를 반려한다 — 기자 단계에서 0 으로 만든다."""
+    import verify_deep_analysis as vda
+    items = shard.get("items") if isinstance(shard.get("items"), dict) else shard
+    sourced, _ = with_source_text(items or {}, handoff_bodies(handoff))
+    out = []
+    for cid, entry in sourced.items():
+        if not (isinstance(entry, dict) and isinstance(entry.get("deep_analysis"), dict)):
+            continue
+        try:
+            gate = vda.run_deep_analysis_gate(entry["deep_analysis"], entry.get("source_text", ""), card_type=None)
+        except Exception as e:  # noqa: BLE001 — 브릿지도 이 경우 카드 심층을 뺀다
+            out.append(f"심층 게이트 {cid}: 게이트 실행 오류 — {type(e).__name__}: {e}")
+            continue
+        if not gate.ok:
+            out.extend(f"심층 게이트 {cid}: {f}" for f in gate.findings if f.severity == vda.SEV_FAIL)
+    return out
+
+
 def deep_absence_lines(shard):
     """심층 칸 산문의 원문 부재 단정 줄(순수) — 게이트 3 과 같은 판정 함수. 심층이 있는 카드는 원문 확보 카드다."""
     import assemble_publish_brief as apb
@@ -320,6 +346,16 @@ def rejected_ids(copyedit):
     return ids
 
 
+def rework_diff_deep(old_deep, new_deep, rejected):
+    """심층(`deep_delta.json` = {카드 id: 항목}) 재작업 대조 — 델타와 **같은 함수**(`rework_diff`)를 카드 층에 씌워 부른다.
+    반려 카드가 심층에 없을 수 있으므로(델타 칸만 반려) '반려 카드가 1차에 없다' 줄은 빼고, 그 밖의 문제는 그대로 막는다."""
+    problems, notes = rework_diff({"cards": old_deep or {}}, {"cards": new_deep or {}}, rejected)
+    problems = [p for p in problems if not p.startswith("반려 카드가 1차 델타에 없다")
+                and not p.startswith("1차 교열 기록에 반려 카드가 없다")]
+    return ([f"심층: {p}" for p in problems],
+            [f"심층: {n}" for n in notes if not n.startswith("안 바뀜")])
+
+
 def rework_diff(old, new, rejected):
     """(문제 줄, 알림 줄) — 문제 줄이 하나라도 있으면 재작업이 범위를 넘은 것이다(순수)."""
     problems, notes = [], []
@@ -375,6 +411,8 @@ def main(argv=None):
     r.add_argument("old")
     r.add_argument("new")
     r.add_argument("copyedit")
+    r.add_argument("--deep-old", help="1차 deep_delta.json — 주면 심층도 같은 대조")
+    r.add_argument("--deep-new", help="2차 deep_delta.json")
     args = ap.parse_args(argv)
     try:
         if args.cmd == "terms":
@@ -405,7 +443,7 @@ def main(argv=None):
             if not isinstance(handoff, dict) or not isinstance(shard, dict):
                 raise ValueError("handoff·심층 샤드가 객체가 아니다")
             lines = (deep_lines(shard, fda483_ids(handoff)) + deep_term_lines(shard)
-                     + deep_absence_lines(shard) + deep_basis_lines(shard))
+                     + deep_absence_lines(shard) + deep_basis_lines(shard) + deep_gate_lines(shard, handoff))
             for line in lines:
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()
@@ -418,7 +456,13 @@ def main(argv=None):
             old, new, copyedit = _load(args.old), _load(args.new), _load(args.copyedit)
             if not all(isinstance(x, dict) for x in (old, new, copyedit)):
                 raise ValueError("델타·교열 기록이 객체가 아니다")
-            problems, notes = rework_diff(old, new, rejected_ids(copyedit))
+            rejected = rejected_ids(copyedit)
+            problems, notes = rework_diff(old, new, rejected)
+            if args.deep_old or args.deep_new:
+                if not (args.deep_old and args.deep_new):
+                    raise ValueError("--deep-old 와 --deep-new 는 같이 준다")
+                dp, dn = rework_diff_deep(_load(args.deep_old), _load(args.deep_new), rejected)
+                problems, notes = problems + dp, notes + dn
             for line in problems + notes:
                 print(line)
             print("재작업 대조: " + (f"범위를 넘음 {len(problems)}건" if problems else "통과 — 반려 카드만 바뀌었다"))

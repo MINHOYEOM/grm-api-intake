@@ -70,8 +70,10 @@
    `rework.json` 이 `완료` 가 될 때까지 09:20 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 아니면 `copyedit.json` 을 `보류` 로 고쳐 push 하고 끝낸다. `완료` 면:
    ```
    mkdir -p _scaffold && cp company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.r1.json && cp company/run/{run_date_kst}/delta.json _scaffold/delta.r1.json
+   cp company/run/{run_date_kst}/deep_delta.json _scaffold/deep_delta.r1.json
    python company/editorial/merge_parts.py company/run/{run_date_kst}
-   python company/editorial/precheck.py rework-diff _scaffold/delta.r1.json company/run/{run_date_kst}/delta.json _scaffold/copyedit.r1.json
+   python company/editorial/precheck.py rework-diff _scaffold/delta.r1.json company/run/{run_date_kst}/delta.json _scaffold/copyedit.r1.json \
+     --deep-old _scaffold/deep_delta.r1.json --deep-new company/run/{run_date_kst}/deep_delta.json
    ```
    `rework-diff` 가 exit≠0 이면(반려되지 않은 카드가 바뀌었거나 카드가 늘고 줄었다) 판정하지 않고 `보류`. exit 0 이면 1번(코드 검사)을 다시 돌리고,
    **반려됐던 카드만** 2·2-1번 전 항목으로 다시 판정한다(나머지 카드는 글자가 그대로이므로 1차 판정 `pass` 를 그대로 옮긴다).

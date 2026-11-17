@@ -66,6 +66,8 @@
    "처분문에 가중·감경 사유는 없다(적혀 있지 않다)"·"처분문에 형사고발에 관한 서술은 없다" 같은 문장을 넣지 않는다 — **처분문에 없으면 그 문장 자체를 쓰지 않는다**
    (`administrative_risks` 는 근거법령이 정한 조치만 쓴다. 리허설 1120c 교열 반려 10장). `심층 부재 …` 줄이 이것이다(조립 게이트 3 과 같은 판정 함수).
    483 `key_violations[].observation` 은 문장 끝에 근거 번호 `(관찰 N)` 을 단다(`심층 근거 번호 …` 줄).
+   `심층 게이트 <id>: [FAIL] …` 줄은 발행 브릿지의 근거 게이트가 그 카드 심층을 빼 버리는 바로 그 판정이다(리허설 1120d) —
+   `citation` 은 원문(handoff `body_full`)에 **글자 그대로** 있는 조항만 쓴다(여러 조항을 묶은 원문에서 하나만 떼어 쓰지 않는다. 원문 꼴 그대로 옮긴다).
 4. **`hook_line`(선택).** 금칙어(`신호`·`볼 만`·`필요가`·`가능성`·`시사`·`우려`·느낌표·물음표, 영문 `signal`·`worth`·`may indicate`·`suggests`·`possib`·`concern`)는
    화면이 그 줄을 숨기고 교열이 반려한다 — 회수 사유의 "이물 혼입 **우려**"도 그대로 옮기지 않는다("이물 혼입으로 영업자 회수"). 사전 점검 `hook_line 금칙어 …` 줄(화면과 같은 함수 `render.hook_line_banned`, 리허설 1120c).
     483·경고서한·식약처·회수 카드의 카드 맨 위 한 줄을 `STYLE.md` §12 규칙(R1~R11, 공백 포함 한국어 40자 이내 · 영문 90자 이내)대로 쓴다. 한국어는 `cards.{id}.hook_line`, 영문은 `cards.{id}.en.hook_line`. **쓸 사실이 없거나 규칙을 지키는 문장이 안 나오면 필드를 만들지 않는다** — 비우면 박스가 숨겨지고 카드는 종전 모양 그대로다(억지로 채우지 않는다). 근거는 코드 `facts`·`quotes`·483 `observations`·WL `violations` 본문이다(`key_facts` 만으로 쓰지 않는다). 숫자는 근거 필드에 글자 그대로 있는 것만.
@@ -91,9 +93,11 @@
 워커 이름이 `재작업` 으로 시작하면 이 절만 한다 — `copyedit.json` 이 아직 없으면 09:12 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 `재작업` 이 아니면 아무것도 쓰지 않고 종료한다.
 1. `rework.json` 이 이미 있으면(`진행`·`완료` 무엇이든) 종료한다 — 다른 워커가 맡았다. 없으면 `{"status":"진행","round":1,"worker":"<이름>"}` 을 먼저 커밋·push 해 맡는다(push 가 거절되고 남의 파일이 생겼으면 종료).
 2. `copyedit.json` 의 `rework.cards`(반려 카드 id)와 각 카드의 `fails` 만 본다. **적힌 슬롯만** 근거(`evidence`)대로 고친다 — 그 카드가 든 샤드 파일 `delta.{S}.json` 에서
-   (`desk.json` 의 `shards.delta` 로 찾는다). 반려되지 않은 카드·`delta.T.json`·심층 파일·다른 슬롯은 건드리지 않는다(코드가 대조한다 — 바뀌면 그 호는 `보류`).
+   (`desk.json` 의 `shards.delta` 로 찾는다). **`slot` 이 `deep.` 으로 시작하면** 그 카드가 든 심층 샤드 `deep.{S}.json`(`desk.json` 의 `shards.deep`)의
+   `items.<id>.deep_analysis` 그 칸만 고친다(리허설 1120d — 심층 반려도 재작업으로 되돌린다). 반려되지 않은 카드·`delta.T.json`·다른 슬롯은 건드리지 않는다(코드가 대조한다 — 바뀌면 그 호는 `보류`).
    한국어 슬롯의 뜻이 바뀌면 같은 카드 `en` 의 같은 슬롯도 맞춘다. 규칙을 지키는 문장이 안 나오는 `hook_line` 은 필드를 지운다. 지적에 동의하지 않아도 고친다(이의는 `rework.json` 의 `이의`).
-3. 고친 샤드마다 `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` 이 exit 0 인지 본다.
+3. 고친 샤드마다 `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` 이 exit 0 인지 본다
+   (심층 샤드는 `python company/editorial/precheck.py deep _handoff/handoff_$D.json company/run/{run_date_kst}/deep.{S}.json`).
 4. `rework.json` 을 `{"status":"완료","round":1,"worker":"…","fixed":[{"id":"<web_card_id>","shard":"B","changed":["summary","key_facts"]}],"unfixed":["<못 고친 카드 id>"]}` 로 고쳐
    고친 샤드 파일과 함께 커밋·push 한다. **재작업은 한 번뿐이다** — 다시 반려되면 그 호는 백업이 발행한다.
 

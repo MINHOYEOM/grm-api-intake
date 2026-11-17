@@ -411,9 +411,9 @@
     "관찰 1: 엔도톡신 기준일탈 결과를 기록하지 않고 다른 검체의 적합 결과로 바꿔 시험성적서(COA)에 보고",
     "관찰 1: 경고 수준 CFU가 자란 생물부하 평판을 폐기했고, FDA 질의 뒤 카메라 날짜를 바꿔 촬영하고 작업지를 소급 작성하게 함",
     "관찰 2: 2023년 1월 이후 미국 시장에서 효능 없음 불만 39건을 받았으나 근본원인을 정하지 않음",
-    "관찰 4: 앰플·바이알 충전 라인 기류 시각화 시험 영상에서 작업자 머리와 상체가 Grade A 구역에 들어감"
+    "당국 조치: 같은 호 회수 — 카복시메틸셀룰로오스나트륨 0.5% 인공눈물 점안액(Class II)"
    ],
-   "implication": "일탈 조사용 생물부하 검체 기록이 든 배양기 사용 로그북 쪽을 품질관리 미생물 팀장이 뜯어내고 빈 양식으로 바꿨다(관찰 1). 불순물 기준일탈 2건은 과학적 근거 없이 유리기구 오염과 시간 부족을 원인으로 정하고 재시험 적합 결과로 미국에 출하했다(관찰 3). 앰플 라인 배지충전(무균공정 모의시험)은 상업 생산 개입의 종류·빈도·시간을 반영하지 않았다(관찰 4). 감사추적기록 검토 점검표는 주입 중단 같은 이벤트 확인을 요구하지 않았다(관찰 5). 장갑 세척 절차서와 세척 효과 연구가 없었고 장갑 손가락은 모니터링하지 않았다(관찰 6).",
+   "implication": "앰플·바이알 충전 라인 기류 시각화 시험 영상에서 작업자 머리와 상체가 Grade A 구역에 들어갔다(관찰 4). 일탈 조사용 생물부하 검체 기록이 든 배양기 사용 로그북 쪽을 품질관리 미생물 팀장이 뜯어내고 빈 양식으로 바꿨다(관찰 1). 불순물 기준일탈 2건은 과학적 근거 없이 유리기구 오염과 시간 부족을 원인으로 정하고 재시험 적합 결과로 미국에 출하했다(관찰 3). 앰플 라인 배지충전(무균공정 모의시험)은 상업 생산 개입의 종류·빈도·시간을 반영하지 않았다(관찰 4). 감사추적기록 검토 점검표는 주입 중단 같은 이벤트 확인을 요구하지 않았다(관찰 5). 장갑 세척 절차서와 세척 효과 연구가 없었고 장갑 손가락은 모니터링하지 않았다(관찰 6).",
    "checks": [
     "기준일탈 결과를 다른 검체 결과로 바꿀 수 없게 원자료를 통제하는가? (관찰 1)",
     "빈 GMP 양식을 발행·회수 대장으로 관리하는가? (관찰 1)",
@@ -427,9 +427,9 @@
      "Observation 1: out-of-specification endotoxin results were not recorded and were replaced with passing results from different samples reported on the COA",
      "Observation 1: bioburden plates with alert level CFU were discarded, and after FDA inquiry camera date settings were changed and worksheets backdated",
      "Observation 2: 39 U.S. complaints of drug ineffectiveness since 01/2023 with no root cause assigned",
-     "Observation 4: smoke study videos of the ampoule and vial lines showed operators' heads and upper bodies inside the Grade A area"
+     "Agency action: recall in the same issue, carboxymethylcellulose sodium 0.5% lubricant eye drops (Class II)"
     ],
-    "implication": "The QC Microbiology Team Lead removed incubator logbook pages holding deviation bioburden samples and replaced them with blank forms (Observation 1). Two impurity OOS results were attributed to dirty glassware and insufficient time without scientific evidence, and the batches were released to the U.S. on retest (Observation 3). The ampoule line media fill did not track commercial intervention types, frequency and duration (Observation 4). The audit trail review checklist did not require tracking events such as aborted injections (Observation 5). There was no written glove cleaning procedure or cleaning effectiveness study, and glove fingers were not monitored (Observation 6).",
+    "implication": "Smoke study videos of the ampoule and vial lines showed operators' heads and upper bodies inside the Grade A area (Observation 4). The QC Microbiology Team Lead removed incubator logbook pages holding deviation bioburden samples and replaced them with blank forms (Observation 1). Two impurity OOS results were attributed to dirty glassware and insufficient time without scientific evidence, and the batches were released to the U.S. on retest (Observation 3). The ampoule line media fill did not track commercial intervention types, frequency and duration (Observation 4). The audit trail review checklist did not require tracking events such as aborted injections (Observation 5). There was no written glove cleaning procedure or cleaning effectiveness study, and glove fingers were not monitored (Observation 6).",
     "checks": [
      "Are raw data controlled so that OOS results cannot be replaced by other samples? (Observation 1)",
      "Are blank GMP forms issued and reconciled through a controlled log? (Observation 1)",

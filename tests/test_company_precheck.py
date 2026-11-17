@@ -594,5 +594,15 @@ class ReworkDeep1120dTest(unittest.TestCase):
         self.assertIn("--deep-old _scaffold/deep_delta.r1.json", ce)
 
 
+class Round2CloseTest(unittest.TestCase):
+    """리허설 1120d: 2차 판정이 reject 0 인데 마감 1번(scaffold.json 반납)을 하지 않았다."""
+
+    def test_round2_pass_goes_to_close(self):
+        text = (ROOT / "company" / "editorial" / "next" / "copyedit.md").read_text(encoding="utf-8")
+        i = text.index("3-2.")
+        j = text.index("4. **마감")
+        self.assertIn("곧바로 아래 4번 마감을 1번(`scaffold.json` 복사", text[i:j])
+
+
 if __name__ == "__main__":
     unittest.main()

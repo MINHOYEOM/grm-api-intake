@@ -44,7 +44,8 @@
 | `1120` | 11-17(화, 앞당김) | `2026-11-16` | `claude/company-rehearsal-1120` | `company/run/rehearsal-1120/` — 교열 보류: 발행본 관문(원문 확보 카드의 부재 단정 1장). 사전 점검이 조립 함수 전체를 돌리게 고친 뒤 다음 회차 |
 | `1120b` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120b` | `company/run/rehearsal-1120b/` — 코드 검사 통과(exit 0) · 교열 반려 19장(심층 산문 [용어·표기]). 심층 사전 점검이 델타와 같은 용어 함수로 막게 고친 뒤 다음 회차 |
 | `1120c` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120c` | `company/run/rehearsal-1120c/` — 코드 검사 통과·심층 용어 0 · 교열 반려 13장(심층 원문 부재 단정 10·hook_line 금칙어 2·483 관찰 번호 1). 심층 부재·관찰 번호·hook 금칙어를 사전 점검이 막게 고친 뒤 다음 회차 |
-| `1120d`·`1120e` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120d`·`-1120e` | `company/run/rehearsal-1120d/`·`-1120e/` |
+| `1120d` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120d` | `company/run/rehearsal-1120d/` — 1차 반려 1장(심층 조항 인용) → 재작업(심층) → 2차 reject 0 · 점검 1~4 통과 · **5 실패(2차 뒤 마감 1번 누락 — `scaffold.json` 없음)**. 3-2 에 2차 통과 → 4번 마감 명시 |
+| `1120e`·`1120f` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120e`·`-1120f` | `company/run/rehearsal-1120e/`·`-1120f/` |
 
 (11-23 전환 전 `1118`·`1120` 은 재료 `2026-11-16` 이다. 리허설 폴더 이름이 날짜가 아니어도 사전 점검·병합은 `desk.json` 의 `handoff_ref.date` 로 handoff 를 찾는다.)
 

@@ -1,0 +1,465 @@
+{
+ "status": "완료",
+ "round": 1,
+ "published": false,
+ "rehearsal": true,
+ "code_gate": {
+  "ran": true,
+  "exit": 0,
+  "message": "assemble_publish_brief.py exit 0 — 채택 86카드, deep 60카드 병합(게이트 WARN 10건은 병합 진행, 심층 '8자리 날짜' 1건은 원문 조사번호 20240601)"
+ },
+ "cards": [
+  {
+   "web_card_id": "fda483-195377",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196245",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196251",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196252",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196253",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196254",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196255",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196257",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196258",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196259",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196260",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196261",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196262",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196264",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196270",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196272",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196273",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196274",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196275",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196279",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196280",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196282",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196283",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196284",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196285",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196286",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196289",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196290",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196291",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196292",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196297",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196299",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196300",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196301",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196302",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196303",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196711",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196712",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196713",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196714",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196715",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196833",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196834",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196842",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0f65bd3c5c70",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "7e7545ebb190",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "bfbb158a522f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007929",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007930",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007935",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007955",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007975",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008096",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008176",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008197",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrIf",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-5f3494bdb71f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-a458a7fc84b1",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-e1c88c0c401f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "949016d08856",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "dba4d011e02b",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "769b37244dce",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196287",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "00ae76e635bb",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "2026-23005",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82928",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82939",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "758874567fae",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008055",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008195",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008196",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyqbl",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrFI",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrUH",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73uE9xd4-",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "c3b4f61a28c7",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0073-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0074-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0075-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0077-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0080-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0085-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0104-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0105-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0107-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0108-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0110-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0113-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "b0fc253f04b7",
+   "verdict": "pass",
+   "fails": []
+  }
+ ],
+ "counts": {
+  "cards": 89,
+  "pass": 89,
+  "reject": 0,
+  "fails_total": 0
+ },
+ "notes": "handoff sha256 일치. 기계 점검(맺음·금칙어·hook 길이/숫자 원문대조·ko/en 짝·checks 개수·용어)과 implication 44장·tldr 3건 원문 대조 통과. 심층 산문 부재 단정·금칙어 0(observations_ko 는 원문 번역이라 제외)."
+}

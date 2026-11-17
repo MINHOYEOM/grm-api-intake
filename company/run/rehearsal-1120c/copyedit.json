@@ -1,0 +1,546 @@
+{
+ "status": "보류",
+ "rehearsal": true,
+ "round": 1,
+ "published": false,
+ "reason": "반려 13장(>10) — 재작업 대상 아님(copyedit.md 3-1), 백업이 발행하는 경우에 해당",
+ "code_gate": {
+  "ran": true,
+  "exit": 0,
+  "message": "assemble_publish_brief.py exit 0 (--deep 원문 붙인 사본 60/60). 표현 경고만: 심층 같은 문장 반복 2종(10장), 심층 '8자리 날짜' 1장(fda483-196291 — 기준일탈 조사 번호 20240601이라 날짜 아님)"
+ },
+ "cards": [
+  {
+   "web_card_id": "fda483-195377",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196245",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196251",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196252",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196253",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196254",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196255",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196257",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196258",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196259",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196260",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196261",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196262",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196264",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196270",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196272",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196273",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196274",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196275",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196279",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196280",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196282",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196283",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196284",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196285",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196286",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196289",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196290",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196291",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196292",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196297",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196299",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[0].observation",
+     "evidence": "문장 끝에 근거 번호 '(관찰 N)' 없음"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196300",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196301",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196302",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196303",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196711",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196712",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196713",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196714",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196715",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196833",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196834",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196842",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0f65bd3c5c70",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "7e7545ebb190",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "bfbb158a522f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026007929",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중처분이나 형사고발에 관한 서술은 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007930",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중처분이나 형사고발에 관한 서술은 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007935",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중·감경 사유는 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007955",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중처분이나 형사고발에 관한 서술은 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026007975",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중·감경 사유는 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008096",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중처분이나 형사고발에 관한 서술은 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008176",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중·감경 사유는 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008197",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중처분이나 형사고발에 관한 서술은 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrIf",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-5f3494bdb71f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-a458a7fc84b1",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-e1c88c0c401f",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "hook_line",
+     "evidence": "STYLE §12 ① 금칙어 '우려' 포함(회수 사유 문구를 옮긴 것이나 점검표는 글자 그대로 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008055",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008195",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중처분이나 형사고발에 관한 서술은 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008196",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 2-1",
+     "slot": "deep.administrative_risks",
+     "evidence": "원문 확보 카드(source_body_captured=true)의 슬롯이 '처분문에 가중·감경 사유는 없다.'로 원문의 부재를 단정(handoff 원문에는 해당 내용이 실제로 없으나 2-1은 부재 서술 자체를 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyqbl",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "949016d08856",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "dba4d011e02b",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "769b37244dce",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "758874567fae",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196287",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "00ae76e635bb",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "2026-23005",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82928",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82939",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line",
+     "slot": "hook_line",
+     "evidence": "STYLE §12 ① 금칙어 '우려' 포함(회수 사유 문구를 옮긴 것이나 점검표는 글자 그대로 금지)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrFI",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73JiEyrUH",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q73uE9xd4-",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "c3b4f61a28c7",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0073-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0074-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0075-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0077-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0080-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0085-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0104-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0105-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0107-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0108-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0110-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0113-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "b0fc253f04b7",
+   "verdict": "pass",
+   "fails": []
+  }
+ ],
+ "counts": {
+  "cards": 89,
+  "pass": 76,
+  "reject": 13,
+  "fails_total": 13
+ },
+ "merge": "merge_parts.py exit 0 (delta 89장·deep 60건), handoff sha256 desk.json 과 일치",
+ "coverage": "delta 89장 한국어 슬롯 전량 읽음+기계 점검(금칙어·용어표·hook 길이·숫자 원문 대조·짝·마크업). 영문 슬롯은 기계 점검만(hook 90자·짝). 심층 60건은 기계 점검(금지어·용어·날짜·부재 서술·근거 번호)과 샘플 읽기",
+ "이의": "1) 8자리 날짜 경고는 조사 번호 오탐 — 코드 쪽 예외 필요. 2) 행정처분 심층 administrative_risks 의 '서술은 없다' 문형이 2-1 과 충돌 — 기자 지시문(DeepAdmin ④)에서 빈 문자열로 두게 하거나 2-1 에 예외를 명문화할 것. 3) hook_line '우려' — 회수 사유 원문이 '…우려'인 경우의 취급 기준 필요."
+}

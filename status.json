@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-17T05:49:32Z",
+ "generated_at": "2026-11-17T06:32:32Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,39 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 44031118110,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-17T06:25:35Z",
+    "updatedAt": "2026-11-17T06:32:19Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1809 from MINHOYEOM/fix/precheck-deep-absence-hook",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44031118110"
+   },
+   {
+    "databaseId": 44028011371,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-17T06:00:19Z",
+    "updatedAt": "2026-11-17T06:06:53Z",
+    "headBranch": "fix/precheck-deep-absence-hook",
+    "displayTitle": "fix(editorial): 심층 부재 단정·483 관찰 번호·hook 금칙어를 사전 점검이 막는다 (리허설 1120c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44028011371"
+   },
+   {
+    "databaseId": 44028001303,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-17T06:00:14Z",
+    "updatedAt": "2026-11-17T06:07:34Z",
+    "headBranch": "fix/precheck-deep-absence-hook",
+    "displayTitle": "fix(editorial): 심층 부재 단정·483 관찰 번호·hook 금칙어를 사전 점검이 막는다 (리허설 1120c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44028001303"
+   },
+   {
     "databaseId": 44025961516,
     "status": "completed",
     "conclusion": "success",
@@ -194,39 +227,6 @@
     "headBranch": "automation/news-auto-44022795338",
     "displayTitle": "chore: refresh recent regulatory news",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44022882972"
-   },
-   {
-    "databaseId": 43981935410,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-16T23:44:59Z",
-    "updatedAt": "2026-11-16T23:52:29Z",
-    "headBranch": "claude/glossary-weekly-202647",
-    "displayTitle": "glossary(weekly): 202647 용어 1개 — 수입경보",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43981935410"
-   },
-   {
-    "databaseId": 43981929177,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-16T23:44:56Z",
-    "updatedAt": "2026-11-16T23:52:23Z",
-    "headBranch": "claude/glossary-weekly-202647",
-    "displayTitle": "glossary(weekly): 202647 수입경보 영문 정의 단축 (카드 5줄 예산)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43981929177"
-   },
-   {
-    "databaseId": 43979590176,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-16T23:28:33Z",
-    "updatedAt": "2026-11-16T23:35:59Z",
-    "headBranch": "claude/glossary-weekly-202647",
-    "displayTitle": "glossary(weekly): 202647 용어 1개 — 수입경보",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43979590176"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 44031950944,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-17T06:32:21Z",
+    "updatedAt": "2026-11-17T06:32:22Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44031950944"
+   },
+   {
     "databaseId": 44026752209,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43932715047"
-   },
-   {
-    "databaseId": 43926068983,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-16T18:10:41Z",
-    "updatedAt": "2026-11-16T18:10:48Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43926068983"
    }
   ],
   "grm-findings-translate-apply.yml": [

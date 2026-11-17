@@ -11,6 +11,8 @@
         단 `규제 소식`·`지침·안내서`·`고시·개정법령` 카드는 원문에 머리말 사실이 없으면 `key_facts` 를 비워도 된다(2026-11-16).
         카드 유형은 그 주 handoff(`_handoff/handoff_<날짜>.json`, 날짜 = 델타 폴더 이름)에서 읽는다 — `--handoff` 로 직접 줄 수도 있다.
         handoff 를 못 찾으면 종전처럼 전부 필수다.
+        **조립 코드 검사도 같은 함수로 돌린다**(`inject_slots.validate_injection` — 개수·길이·마크업·영문 짝·타입 등
+        조립이 막는 것 전부. 리허설 1118). 스캐폴드 사본(`_scaffold/brief_web_<날짜>.json`, `--scaffold`)이 있으면 인용 번역 대조까지 본다.
         `--deep <심층 델타·샤드>` 를 주면 심층 칸 산문도 본다. 심층 칸 검사와 행정처분 요약 주어 검사는 **경고만** 낸다
         (`경고:` 로 시작하는 줄 — exit 코드에 들어가지 않는다. 처음 2개 호 실측 뒤 차단 여부를 사람이 정한다).
 
@@ -37,6 +39,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -88,6 +91,56 @@ def term_lines(delta, card_types=None):
             if isinstance(text, str) and len(text) > limit:
                 out.append(f"길이 {cid}.{label}: {len(text)}자 — {limit}자 이내")
     return out
+
+
+def gate_lines(delta, card_types=None, scaffold=None):
+    """조립 코드 검사(`inject_slots.validate_injection`)를 **그 함수 그대로** 샤드에 돌린 오류 줄(순수).
+
+    ★리허설 1118: 조립 검사는 key_facts ≤4 를 막는데 사전 점검은 그 규칙을 따로 베껴 두지 않아,
+      5개짜리 카드 6장이 기자 단계를 통과하고 교열에서 호 전체를 막았다. 규칙을 베끼면 다음 규칙에서 또 어긋나므로
+      조립과 **같은 함수**를 부른다 — 조립에 가드가 늘면 사전 점검도 저절로 는다.
+    `scaffold`(그 주 스캐폴드)가 있으면 실제 카드(인용·유형)로 본다. 없으면 델타 카드 id·유형으로 최소 카드를 만들어 보고,
+    스캐폴드가 있어야만 맞게 셀 수 있는 인용 번역 대조(quotes_translation)는 건너뛴다(거짓 차단 방지)."""
+    card_types = card_types or {}
+    cards = delta.get("cards") if isinstance(delta.get("cards"), dict) else {}
+    ids = set(cards)
+    if isinstance(scaffold, dict) and isinstance(scaffold.get("cards"), list):
+        brief_cards = [c for c in scaffold["cards"] if isinstance(c, dict) and c.get("id") in ids]
+        known = {c.get("id") for c in brief_cards}
+        brief_cards += [{"id": cid, "card_type": card_types.get(cid)} for cid in sorted(ids - known)]
+        skip_quotes = bool(ids - known)
+    else:
+        brief_cards = [{"id": cid, "card_type": card_types.get(cid)} for cid in sorted(ids)]
+        skip_quotes = True
+    report = inject_slots.validate_injection({"cards": brief_cards}, delta)
+    return [f"조립 검사 {e}" for e in report.errors
+            if not (skip_quotes and "quotes_translation" in e)]
+
+
+def find_scaffold(delta_path, explicit=None):
+    """그 주 스캐폴드 사본 경로(`_scaffold/brief_web_<YYYY_MM_DD>.json`). 없으면 None.
+    날짜는 델타 폴더의 `desk.json` handoff_ref.date → run_date_kst → 폴더 이름(merge_parts.find_handoff 와 같은 순서)."""
+    if explicit:
+        return explicit
+    folder = os.path.dirname(os.path.abspath(delta_path))
+    d = ""
+    try:
+        desk = _load(os.path.join(folder, "desk.json"))
+        if isinstance(desk, dict):
+            ref = desk.get("handoff_ref") if isinstance(desk.get("handoff_ref"), dict) else {}
+            d = str(ref.get("date") or desk.get("run_date_kst") or "")[:10]
+    except (OSError, ValueError):
+        pass
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
+        d = os.path.basename(os.path.normpath(folder))[:10]
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
+        return None
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    for base in (os.getcwd(), root):
+        path = os.path.join(base, "_scaffold", f"brief_web_{d.replace('-', '_')}.json")
+        if os.path.exists(path):
+            return path
+    return None
 
 
 def handoff_bodies(payload):
@@ -221,6 +274,7 @@ def main(argv=None):
     t.add_argument("delta")
     t.add_argument("--handoff", help="카드 유형을 읽을 handoff 파일(없으면 델타 폴더 날짜로 찾는다)")
     t.add_argument("--deep", help="심층 델타·샤드 — 심층 칸 산문을 경고로 본다")
+    t.add_argument("--scaffold", help="그 주 스캐폴드 사본(없으면 _scaffold/brief_web_<날짜>.json 을 찾는다)")
     d = sub.add_parser("deep-source")
     d.add_argument("handoff")
     d.add_argument("deep")
@@ -242,10 +296,14 @@ def main(argv=None):
                 card_types = merge_parts.handoff_card_types(_load(args.handoff))
             else:
                 card_types = merge_parts.run_card_types(os.path.dirname(os.path.abspath(args.delta)))
-            lines = term_lines(delta, card_types)
+            sc_path = find_scaffold(args.delta, args.scaffold)
+            lines = term_lines(delta, card_types) + gate_lines(delta, card_types,
+                                                               _load(sc_path) if sc_path else None)
             for line in lines:
                 print(line)
             warns = warn_lines(delta, _load(args.deep) if args.deep else None)
+            if not sc_path:
+                warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 인용 번역 대조는 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:
                 print(f"경고: {line}")
             print(f"사전 점검: {len(lines)}건" + ("" if lines else " — 통과")

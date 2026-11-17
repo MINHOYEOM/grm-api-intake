@@ -46,6 +46,41 @@ class TermsTest(unittest.TestCase):
         delta = {"cards": {"a": _card(summary="데이터 무결성 문제가 있었다.")}}
         self.assertEqual(precheck.term_lines(delta), inject_slots.lint_prose_style(delta).lines())
 
+    def test_gate_catches_the_1118_key_facts_block(self):
+        # 리허설 1118: key_facts 5개 카드 6장이 사전 점검을 통과하고 조립(exit 2)에서 호 전체를 막았다.
+        n, (lo, hi) = inject_slots._MAX_KEY_FACTS, inject_slots._CHECKS_RANGE
+        ok = _card(key_facts=["사실"] * n, checks=["점검"] * hi,
+                   en=dict(_card()["en"], key_facts=["fact"] * n, checks=["check"] * hi))
+        self.assertEqual(precheck.gate_lines({"cards": {"a": ok}}), [])
+        over = _card(key_facts=["사실"] * (n + 1), checks=["점검"] * (hi + 1),
+                     en=dict(_card()["en"], key_facts=["fact"] * (n + 1), checks=["check"] * (hi + 1)))
+        lines = precheck.gate_lines({"cards": {"a": over}})
+        self.assertTrue(any(f"a.key_facts: {n + 1}개" in x for x in lines))
+        self.assertTrue(any(f"a.en.key_facts: {n + 1}개" in x for x in lines))
+        self.assertTrue(any("a.checks" in x for x in lines))
+
+    def test_gate_is_the_assembly_validator_itself(self):
+        # 규칙을 베끼지 않는다 — 조립 검증 함수가 내는 오류 = 사전 점검 오류(접두만 다름). 조립에 가드가 늘면 저절로 따라온다.
+        bad = {"cards": {
+            "a": _card(key_facts=["x"] * 9),
+            "b": _card(summary="**굵게** 요약", title_issue="가" * 40),
+            "c": _card(en={"title_issue": "only title"}),
+            "d": _card(checks=["하나"]),
+        }}
+        brief = {"cards": [{"id": cid} for cid in sorted(bad["cards"])]}
+        expected = inject_slots.validate_injection(brief, bad).errors
+        self.assertTrue(expected)
+        self.assertEqual(precheck.gate_lines(bad), [f"조립 검사 {e}" for e in expected])
+
+    def test_gate_without_scaffold_skips_only_quote_alignment(self):
+        card = _card(quotes_translation=["번역"])
+        lines = precheck.gate_lines({"cards": {"a": card}})
+        self.assertFalse([x for x in lines if "quotes_translation" in x])
+        scaffold = {"cards": [{"id": "a", "quotes": [{"text": "q1"}, {"text": "q2"}]}]}
+        with_sc = precheck.gate_lines({"cards": {"a": card}}, scaffold=scaffold)
+        self.assertEqual(with_sc, [f"조립 검사 {e}" for e in
+                                   inject_slots.validate_injection(scaffold, {"cards": {"a": card}}).errors])
+
     def test_length_limits_are_the_code_limits(self):
         ko, en = inject_slots._HOOK_LINE_MAX["ko"], inject_slots._HOOK_LINE_MAX["en"]
         t = inject_slots._MAX_TITLE_ISSUE

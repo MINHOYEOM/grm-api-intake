@@ -78,6 +78,8 @@
    `rework-diff` 가 exit≠0 이면(반려되지 않은 카드가 바뀌었거나 카드가 늘고 줄었다) 판정하지 않고 `보류`. exit 0 이면 1번(코드 검사)을 다시 돌리고,
    **반려됐던 카드만** 2·2-1번 전 항목으로 다시 판정한다(나머지 카드는 글자가 그대로이므로 1차 판정 `pass` 를 그대로 옮긴다).
    결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남으면 `보류`** — 더 되돌리지 않는다(백업이 발행한다).
+   **2차가 코드 검사 exit 0 · reject 0 이면 곧바로 아래 4번 마감을 1번(`scaffold.json` 복사 → `delta.json`·`deep_delta.json`·`scaffold.json`·`copyedit.json` push)부터 한다.**
+   `copyedit.json` 에 `완료` 만 적고 끝내면 브릿지가 가져갈 반납이 없어 백업이 발행한다(리허설 1120d — 2차 통과 뒤 `scaffold.json` 이 없었다).
 4. **마감 — 코드 검사 exit 0 이고 reject 0 일 때만.** 하나라도 아니면 Notion 에 아무것도 쓰지 않고 끝낸다
    (Notion handoff 가 OPEN 으로 남아 09:30 백업 Routine 이 발행한다). 통과면 이 순서로 (`RUN.md` 0항 `반납 길: git` 인 호):
    1. **반납 = 실행 폴더 push.** 코드 검사에 쓴 스캐폴드를 **그 파일 그대로** 실행 폴더에 복사한다(다시 저장·정렬하지 않는다):

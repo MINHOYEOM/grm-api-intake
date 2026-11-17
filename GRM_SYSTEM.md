@@ -592,6 +592,7 @@ grm-api-intake/
 ├─ keep_shadow_health.py          # 수집 health JSON 의 store(중복 판정·무음 감시 그림자 기록)를 grm-queue-shadow 아티팩트에 남기고 실행 요약에 적는다 — health JSON 은 아티팩트로 안 올라가 실행 뒤 읽을 곳이 없었다(11-13)
 ├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, inspection_card.py(실사 결과 카드 앞면 블록 — 등급·지적 목록·당국 조치 결정론, 11-08), card_weight.py(카드 무게 — 깊이·표준·표 한 줄을 유형·등급·지적 건수·사유 길이로 판정, 11-16호부터, 11-10), check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
+├─ brief_metrics_ledger.py          # 호별 품질 지표(말투·심층 상투어·483 마감기한 등)를 발행본에서 읽어 JSONL/CSV 한 줄로 누적 — 읽기 전용·발행 직후 수동 실행
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
 ├─ fda_body_coverage.py             # 발행 전 FDA 카드 본문 결손 점검(483·WL·회수 건수·비율·임계 → ok/recover/alert) + handoff 상태 조회 — 판정 순수 함수
 ├─ verify_published_sources.py     # 발행 카드 ↔ 원문 대조(네트워크 검증층 — 수집 실패로 인한 누락 탐지; 범위 밖으로 뺀 483 은 발행 격차로 세지 않음, 11-09)

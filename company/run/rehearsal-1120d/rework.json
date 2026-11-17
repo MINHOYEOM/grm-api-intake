@@ -1,1 +1,1 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{"status":"완료","round":1,"worker":"델타-2","fixed":[{"id":"admin-2026007955","shard":"C","kind":"deep","changed":["deep.key_violations[2].citation"]}],"unfixed":[],"note":"citation 을 원문 표기 그대로 '｢의약품 등의 안전에 관한 규칙｣ 제24조제5항제1호 및 제2호, 제30조제1항제9호' 로 고침 · precheck.py deep(main 판, 심층 게이트 포함) exit 0 · 지시문은 main 의 next/reporter.md 재작업 절(심층 반려 처리)을 따름 — 리허설 브랜치는 그 수정 이전 main 에서 만들어졌다"}

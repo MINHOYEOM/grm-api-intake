@@ -87,6 +87,15 @@ def term_lines(delta, card_types=None):
                 ("en.hook_line", en.get("hook_line"), hook["en"])):
             if isinstance(text, str) and len(text) > limit:
                 out.append(f"길이 {cid}.{label}: {len(text)}자 — {limit}자 이내")
+        # 개수 상한 — 조립(inject_slots)과 같은 값. 리허설 1118 에서 key_facts 5개 카드 6장이 여기서 안 걸려
+        # 교열 코드 검사(assemble exit 2)에서야 호 전체가 막혔다.
+        lo, hi = inject_slots._CHECKS_RANGE
+        for label, items in (("key_facts", card.get("key_facts")), ("en.key_facts", en.get("key_facts"))):
+            if isinstance(items, list) and len(items) > inject_slots._MAX_KEY_FACTS:
+                out.append(f"개수 {cid}.{label}: {len(items)}개 — {inject_slots._MAX_KEY_FACTS}개 이내")
+        for label, items in (("checks", card.get("checks")), ("en.checks", en.get("checks"))):
+            if isinstance(items, list) and items and not (lo <= len(items) <= hi):
+                out.append(f"개수 {cid}.{label}: {len(items)}개 — {lo}~{hi}개")
     return out
 
 

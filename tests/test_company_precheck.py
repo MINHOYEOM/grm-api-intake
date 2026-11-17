@@ -46,6 +46,19 @@ class TermsTest(unittest.TestCase):
         delta = {"cards": {"a": _card(summary="데이터 무결성 문제가 있었다.")}}
         self.assertEqual(precheck.term_lines(delta), inject_slots.lint_prose_style(delta).lines())
 
+    def test_list_count_limits_are_the_code_limits(self):
+        # 리허설 1118: key_facts 5개 카드 6장이 사전 점검을 통과하고 조립(exit 2)에서 호 전체를 막았다.
+        n, (lo, hi) = inject_slots._MAX_KEY_FACTS, inject_slots._CHECKS_RANGE
+        ok = _card(key_facts=["사실"] * n, checks=["점검"] * hi,
+                   en=dict(_card()["en"], key_facts=["fact"] * n, checks=["check"] * lo))
+        self.assertEqual(precheck.term_lines({"cards": {"a": ok}}), [])
+        over = _card(key_facts=["사실"] * (n + 1), checks=["점검"] * (hi + 1),
+                     en=dict(_card()["en"], key_facts=["fact"] * (n + 1), checks=["check"]))
+        lines = [x for x in precheck.term_lines({"cards": {"a": over}}) if x.startswith("개수")]
+        self.assertEqual(len(lines), 4)
+        self.assertTrue(any(f"a.key_facts: {n + 1}개" in x for x in lines))
+        self.assertTrue(any("a.en.checks: 1개" in x for x in lines))
+
     def test_length_limits_are_the_code_limits(self):
         ko, en = inject_slots._HOOK_LINE_MAX["ko"], inject_slots._HOOK_LINE_MAX["en"]
         t = inject_slots._MAX_TITLE_ISSUE

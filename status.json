@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-18T05:18:34Z",
+ "generated_at": "2026-11-18T11:34:09Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -402,6 +402,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 44262724967,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-18T07:55:56Z",
+    "updatedAt": "2026-11-18T08:01:09Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1814 from MINHOYEOM/claude/findings-translate-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44262724967"
+   },
+   {
     "databaseId": 43822614344,
     "status": "completed",
     "conclusion": "success",
@@ -444,20 +455,20 @@
     "headBranch": "main",
     "displayTitle": "data(483 번역): 숨김 재추출 새 관찰 7 — 표제 7·상세 6 (#1682)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43391130814"
-   },
-   {
-    "databaseId": 43377592103,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-13T06:16:47Z",
-    "updatedAt": "2026-11-13T06:18:01Z",
-    "headBranch": "main",
-    "displayTitle": "data(483 번역): 수동 분리 후속 — 새 관찰 4·재번역 4 (#1679)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43377592103"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 44260420127,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-18T07:38:07Z",
+    "updatedAt": "2026-11-18T09:36:00Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44260420127"
+   },
    {
     "databaseId": 44175202555,
     "status": "completed",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43818519824"
-   },
-   {
-    "databaseId": 43749463109,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-15T18:55:22Z",
-    "updatedAt": "2026-11-15T20:49:55Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43749463109"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 44262692624,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-18T07:55:40Z",
+    "updatedAt": "2026-11-18T07:56:03Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44262692624"
+   },
+   {
     "databaseId": 44178586249,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43822582002"
-   },
-   {
-    "databaseId": 43750479756,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-15T19:05:54Z",
-    "updatedAt": "2026-11-15T19:06:04Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43750479756"
    }
   ],
   "grm-cloud-request.yml": [

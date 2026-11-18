@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-18T01:21:32Z",
+ "generated_at": "2026-11-18T01:35:36Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 44216000419,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-18T01:27:50Z",
+    "updatedAt": "2026-11-18T01:35:17Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh findings facet pages (#1815)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44216000419"
+   },
+   {
     "databaseId": 44212731913,
     "status": "completed",
     "conclusion": "success",
@@ -216,27 +227,16 @@
     "headBranch": "claude/glossary-fig-daily-20261117-2107",
     "displayTitle": "glossary(fig): 2026-11-17 새 그림 0 · 다시 그림 0 · 보류 1 — 수불 대조",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44080615778"
-   },
-   {
-    "databaseId": 44047068967,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-17T08:28:47Z",
-    "updatedAt": "2026-11-17T08:36:06Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1803 from MINHOYEOM/claude/glossary-weekly-202647",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44047068967"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 44215173595,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-18T01:21:25Z",
-    "updatedAt": "2026-11-18T01:21:29Z",
+    "updatedAt": "2026-11-18T01:21:37Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44215173595"
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 44216948241,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-18T01:35:19Z",
+    "updatedAt": "2026-11-18T01:35:27Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44216948241"
+   },
+   {
     "databaseId": 44180002388,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44026752209"
-   },
-   {
-    "databaseId": 43971685415,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-16T22:36:30Z",
-    "updatedAt": "2026-11-16T22:36:37Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43971685415"
    }
   ],
   "grm-findings-translate-apply.yml": [

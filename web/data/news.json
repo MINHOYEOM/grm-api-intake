@@ -1,14 +1,14 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-17",
+ "measured_on": "2026-11-18",
  "window_days": 60,
  "totals": {
-  "items": 446
+  "items": 497
  },
  "by_source": [
   {
    "v": "OpenFDA Recall",
-   "c": 135
+   "c": 192
   },
   {
    "v": "ECA Academy",
@@ -16,15 +16,15 @@
   },
   {
    "v": "Federal Register",
-   "c": 78
-  },
-  {
-   "v": "EMA",
-   "c": 50
+   "c": 77
   },
   {
    "v": "MFDS",
    "c": 46
+  },
+  {
+   "v": "EMA",
+   "c": 44
   },
   {
    "v": "Health Canada",
@@ -44,10 +44,38 @@
   },
   {
    "v": "WHO",
-   "c": 1
+   "c": 2
   }
  ],
  "items": [
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-11-17",
+   "title": "EU recommendations for 2026/2027 seasonal flu vaccine composition",
+   "official_url": "https://www.ema.europa.eu/en/news/eu-recommendations-2026-2027-seasonal-flu-vaccine-composition"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-11-17",
+   "title": "Amended Biologics Working Party Vaccines Quality Operational Expert Group (BV-OEG) Influenza Meeting: EU recommendations for the seasonal influenza vaccine composition for the season 2026/2027",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/amended-biologics-working-party-vaccines-quality-operational-expert-group-bv-oeg-influenza-meeting-eu-recommendations-seasonal-influenza-vaccine-composition-season-2026-2027_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-17",
+   "title": "Determination That M.V.I. ADULT (Multiple Vitamins for Injection) Was Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/17/2026-23366/determination-that-mvi-adult-multiple-vitamins-for-injection-was-not-withdrawn-from-sale-for-reasons"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-17",
+   "title": "Determination That M.V.I. PEDIATRIC (Multiple Vitamins for Injection) Was Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/17/2026-23367/determination-that-mvi-pediatric-multiple-vitamins-for-injection-was-not-withdrawn-from-sale-for"
+  },
   {
    "source": "ECA Academy",
    "source_kind": "GMP News",
@@ -243,6 +271,405 @@
    "published_date": "2026-11-12",
    "title": "Revision of the PIC Scheme (PIC/S 1/95 (Rev. 7))",
    "official_url": "http://www.picscheme.org/en/news/152/revision-of-the-pic-scheme-pics-195-rev-7"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "ALPHA LIPOIC ACID (MDV) 25MG/ML **30ML**, VMC, Victory Medical Center Pharmacy, Austin Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "ASCORBIC ACID (MDV) 500MG/ML **50ML**, VMC, Victory Medical Center Pharmacy, Austin Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "ASCORBIC ACID (PRESERVATIVE FREE) 500MG/ML **50ML**, VMC, Victory Medical Center Pharmacy, Austin Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Artificial Tears Lubricant Eye Drops, Visine, Pkg Size: 15, Mfg: Geri-Care: Brooklyn, NY. NDC: 68788-7266-0",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "B COMPLEX (MDV) **30ML**, VMC, Victory Medical Center Pharmacy, Austin Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "BIOTIN 10MG/ML (MDV) **30ML**, VMC, Victory Medical Center Pharmacy, Austin Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "BPC-157 (MDV) 5MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "BPC-157/KPV 5/5MG/ML (MDV) **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "BPC-157/THYMOSIN BETA-4 (MDV) 5/5MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "CAGRILINTIDE/GLYCINE/B12 (MDV) 3.75/5/1MG/ML **1ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "CJC-1295 (MDV) 2MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "CJC-1295/IPAMORELIN (MDV) 2/2MG/ML **2ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "CJC-1295/IPAMORELIN (MDV) 2/2MG/ML **5ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Ciprofloxacin Tablets, USP, 500 mg, 100-count bottle, Rx Only, Manufactured by: Hikma Pharmaceuticals, P.O. Box 182400, Amman, 11118-Jordan, Distributed by: Hikma Pharmaceuticals USA Inc. Berkely Heights, NJ 07922, NDC 0143-9928-01",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Ciprofloxacin Tablets, USP, 750 mg, 50-count bottle, Rx Only, Manufactured by: Hikma Pharmaceuticals, P.O. Box 182400, Amman, 11118-Jordan, Distributed by: Hikma Pharmaceuticals USA Inc. Berkely Heights, NJ 07922, NDC 0143-9929-50",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Cyanocobalamin Injection, USP, 1,000 mcg/mL, Rx Only, 25 x 1mL -Multiple-Dose Vials per carton, Mfg. by: American Regent, Inc., For Bluepoint Laboratories. Carton NDC 68001-542-60; Vial NDC 68001-542-59",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "DELFLEX Peritoneal Dialysis Solution with 1.5% Dextrose, Low Magnesium/ Low Calcium and Attached stay safe Exchange Set, 2,000 mL - Single Dose Bag, Sterile and Non-Pyrogenic, Rx only, CAT.NO. 054-20221. Fresenius Medical Care, Renal Therapies Group, LLC, Lawrence, MA 01843. NDC 46163-206-92",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "DELFLEX Peritoneal Dialysis Solution with 1.5% Dextrose, Low Magnesium/ Low Calcium and Attached stay safe Exchange Set, 2,500 mL Single dose bag, Sterile and Non-Pyrogenic, Rx only, CAT. NO. 054-25321. Fresenius Medical Care, Renal Therapies Group, LLC, Lawrence, MA 01843. NDC 46163-206-94",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "DELFLEX Peritoneal Dialysis Solution with 2.5% Dextrose, Low Magnesium/ Low Calcium and Attached stay safe Exchange Set, 2,000 mL Single dose bag, Sterile and Non-Pyrogenic, Rx only, CAT. No. 054-20222. Fresenius Medical Care, Renal Therapies Group, LLC, Lawrence, MA 01843. NDC 46163-209-92",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "DELFLEX Peritoneal Dialysis Solution with 2.5% Dextrose, Low Magnesium/ Low Calcium and Attached stay\"safe Exchange Set, 2,500 mL Single dose bag, Sterile and Non-Pyrogenic, Rx only, CAT. NO. 054-25322. Fresenius Medical Care, Renal Therapies Group, LLC, Lawrence, MA 01843. NDC 46163-209-94",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "DELFLEX Peritoneal Dialysis Solution with 4.25% Dextrose, Low Magnesium/ Low Calcium and Attached stay safe Exchange Set, 2,500 mL Single dose bag, Sterile and Non-Pyrogenic, Rx only, CAT.NO. 054-25324. Fresenius Medical Care, Renal Therapies Group, LLC, Lawrence, MA 01843. NDC 46163-212-94",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "DEXAMETHASONE PHOSPHATE (MDV) 24MG/ML **1ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "DEXPANTHENOL (MDV) 250MG/ML **30ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "ELECTRO B COMPLEX (MDV) **49ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Fludrocortisone Acetate Tablets, USP 0.1mg, Rx Only, 50 Tablets (5 x 10) Unit Dose AVPAK, Manufactured for: AvKARE, Pulaski, TN 38748, NDC 50268-330-15",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "GHK- CU (MDV) 10MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "HYDROXOCOBALAMIN **MDV** 1MG/ML (30ML), VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "L-CARNITINE 500MG/ML (MDV) **30ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "METHYL MIX (MDV) 6.25/6.25/5/6.25MG/ML **5ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "METHYLCOBALAMIN (MDV) 1MG/ML **1ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "METHYLCOBALAMIN 12.5MG/ML (MDV) **30ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "METHYLCOBALAMIN 1MG/ML (MDV) **30ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "METHYLCOBALAMIN 5MG/ML (MDV) **30ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "MPT-141/NIACINAMIDE 50/2MG/ML (MDV) **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Metoprolol Tartrate Tablets, USP, 50 mg, 1,000 Tablets per bottle, Rx Only, Distributed by: Advagen Pharma Ltd., East Windsor, NJ 08520, USA. NDC: 72888-210-00.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "NAD+ 400MG/ML (MDV) **5ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "SEMAGLUTIDE/L-CARNITINE 2.5/25MG/ML **1ML** MDV, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "SEMAGLUTIDE/L-CARNITINE 5/50MG/ML (1ML MDV), VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "SEMAGLUTIDE/L-CARNITINE 5/50MG/ML (3ML MDV), VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TAURINE (MDV) 50MG/ML **30ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TESAMORELIN (MDV) 10MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TESAMORELIN/IPAMORELIN (MDV) 5MG/2MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "THYMOSIN ALPHA-1 (MDV) 3MG/ML **5ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "THYMOSIN BETA-500 (MDV) 10MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TIRZEPATIDE/B6 (MDV) 25MG/10MG/ML **1ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TIRZEPATIDE/B6 (MDV) 25MG/10MG/ML **8ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TIRZEPATIDE/L-CARNITINE (MDV) 25/50MG/ML **1ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TIRZEPATIDE/L-CARNITINE (MDV) 25/50MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TIRZEPATIDE/L-CARNITINE (MDV) 25/50MG/ML **8ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TIRZEPATIDE/L-CARNITINE **10/50MG/ML** (MDV) **1ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TIRZEPATIDE/L-CARNITINE 30/100MG/ML (MDV) **2ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "TIRZEPATIDE/NIACINAMIDE (MDV) 20/2MG/ML **3ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Tychasis Coats Aloe Creme (Allantoin 0.5%), packaged in a) 4oz (NDC 70211-703-04), and b)16 oz (NDC 70211-703-16) jars, Manufactured for: Tychasis Corporation, Dallas, TX 75227.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Tychasis Coats Aloe Liniment (Methyl salicylate 10%), packaged a) 0.5 oz, b) 8 oz (NDC 70211-704-08) c) 33oz (NDC 70211-704-33) bottles, Manufactured for: Tychasis Corporation, Dallas, TX 75227. There is no NDC for the 0.5 oz given that it is a sample size used as a professional sample.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Tychasis Coats Aloe Lotion (Allantoin 0.5%) packaged in a)0.5 oz, b)8 oz (NDC 70211-704-08), and c)33 oz (NDC 70211-704-33) bottles, Manufactured for: Tychasis Corporation, Dallas, TX 75227. There is no NDC for the 0.5 oz given that it is a sample size used as a professional sample.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "ZINC SULFATE (MDV) 10MG/ML **30ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Not Yet Classified",
+   "published_date": "2026-11-11",
+   "title": "Glutathione 200mg/mL (pf) Injection Solution, Rx Only, This is a compounded product by: Premium Health Care Pharmacy 2400 SW 69th Ave Miami",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
   },
   {
    "source": "Federal Register",
@@ -2961,6 +3388,13 @@
    "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/scope-3-sustainability-pharmaceutical-industry-reality-or"
   },
   {
+   "source": "WHO",
+   "source_kind": "who-inspection",
+   "published_date": "2026-09-22",
+   "title": "[WHOPIR] Lupin (Ankleshwar)",
+   "official_url": "https://extranet.who.int/prequal/sites/default/files/whopir_files/I-03994_WHOPIR_Lupin_Ankleshwar.pdf"
+  },
+  {
    "source": "ECA Academy",
    "source_kind": "GMP News",
    "published_date": "2026-09-21",
@@ -3092,83 +3526,6 @@
    "published_date": "2026-09-21",
    "title": "Automated Cross-Grade Material Transfer – A Perspective – Part II",
    "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/automated-cross-grade-material-transfer-perspective-part-ii"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-09-18",
-   "title": "Meeting highlights from the Committee for Medicinal Products for Human Use (CHMP) 14-17 September 2026",
-   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-14-17-september-2026"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-09-18",
-   "title": "Draft guideline on veterinary good pharmacovigilance practices (VGVP) Module: Signal Management - Revision 1",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/draft-guideline-veterinary-good-pharmacovigilance-practices-vgvp-module-signal-management-revision-1_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-09-18",
-   "title": "Pharmacovigilance-related regulatory recommendations for centrally authorised veterinary medicinal products during 2026",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/pharmacovigilance-related-regulatory-recommendations-centrally-authorised-veterinary-medicinal-products-during-2026_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-18",
-   "title": "Concept paper on the revision of the CVMP guideline on the summary of product characteristics (SPC) for veterinary medicinal products containing antimicrobial substances (EMA/CVMP/383441/2005-Rev.1 Corr.1)",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/concept-paper-revision-cvmp-guideline-summary-product-characteristics-spc-veterinary-medicinal-products-containing-antimicrobial-substances-ema-cvmp-383441-2005-rev1-corr1_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-18",
-   "title": "Draft guideline on user safety for pharmaceutical veterinary medicinal products - Revision 2",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-user-safety-pharmaceutical-veterinary-medicinal-products-revision-2_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-18",
-   "title": "Draft guideline on user safety of topically administered veterinary medicinal products - Revision 1",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-user-safety-topically-administered-veterinary-medicinal-products-revision-1_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-18",
-   "title": "Draft reflection paper on the clinical investigation of medicinal products for the treatment of systemic sclerosis",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-reflection-paper-clinical-investigation-medicinal-products-treatment-systemic-sclerosis_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-18",
-   "title": "Questions and answers on post approval change management protocols for veterinary medicinal products",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/questions-answers-post-approval-change-management-protocols-veterinary-medicinal-products_en.pdf"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-18",
-   "title": "Biosimilar User Fee Act III Future Needs in the Development of Interchangeable Products Post-Workshop; Draft Strategy Document",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19166/biosimilar-user-fee-act-iii-future-needs-in-the-development-of-interchangeable-products"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-18",
-   "title": "Electronic Submission Template for Medical Device Premarket Approval Applications (PMAs); Draft Guidance for Industry and Food and Drug Administration Staff; Availability",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19181/electronic-submission-template-for-medical-device-premarket-approval-applications-pmas-draft"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-18",
-   "title": "Target Animal Safety Evaluation for Veterinary Monoclonal Antibody Products; Draft Guidance for Industry; Availability",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19141/target-animal-safety-evaluation-for-veterinary-monoclonal-antibody-products-draft-guidance-for"
   }
  ]
 }

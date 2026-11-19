@@ -45,7 +45,7 @@
    카드가 있으면 search_findings 에 {fact: "같은 건 원본 카드", related_web_card_id: <원본 id>} 를 적는다.
 2. **샤드 계획**을 `shards` 로 쓴다(RUN.md 6항) — **직접 나누지 않는다.** 입력 JSON `{"delta":[render·merged_into 없는 web_card_id, handoff 순서],
    "deep":[{"id":deep_analysis_ready 또는 ncr_translation_ready 카드,"obs":483 관찰 건수}]}` 를 파일로 쓰고
-   `python company/editorial/plan_shards.py <입력.json>` 의 출력을 `desk.json` 의 `shards` 에 그대로 넣는다. 샤드 수는 분량이 정한다(2~8). **카드를 덜어내지 않는다** — 경고가 나도 전부 싣는다.
+   `python company/editorial/plan_shards.py <입력.json> --handoff _handoff/handoff_{run_date_kst}.json` 의 출력을 `desk.json` 의 `shards` 에 그대로 넣는다(`--handoff` 가 심층 카드 원문 글자 수를 센다 — 심층 샤드당 6만 자). 샤드 수는 분량이 정한다(델타 2~8 · 심층 2~16). **카드를 덜어내지 않는다** — 경고가 나도 전부 싣는다.
 3. v16 [1단계] 대로 검색 보강을 한다(WebSearch 9 · WebFetch 5 한도). 찾은 사실은 출처 URL 과 함께 적는다.
 
 ## 결과 — `company/run/{run_date_kst}/desk.json`

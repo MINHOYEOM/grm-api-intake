@@ -1110,6 +1110,22 @@
       "doc_type": "guidance-industry",
       "published_date": "2026-11-13",
       "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15995"
+    },
+    {
+      "id": "data0011-15997",
+      "title_en": "의료기기 GMP 기준 중 사용적합성 적용 가이드라인(의료용 경)",
+      "title_ko": "의료기기 GMP 기준 중 사용적합성 적용 가이드라인(의료용 경)",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-11-18",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15997"
+    },
+    {
+      "id": "data0011-15996",
+      "title_en": "의료기기 GMP 기준 중 사용적합성 적용 가이드라인(심혈관용 기계 기구)",
+      "title_ko": "의료기기 GMP 기준 중 사용적합성 적용 가이드라인(심혈관용 기계 기구)",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-11-18",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15996"
     }
   ]
 }

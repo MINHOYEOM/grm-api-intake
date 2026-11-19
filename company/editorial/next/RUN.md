@@ -58,7 +58,7 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 | 07:45 | 데스크 재시도 | Sonnet | 07:20 에 `desk.json` 이 `완료`면 곧바로 종료. 아니면(handoff 없음·실패) 다시 한다. handoff 가 없으면 **08:10 까지** 5분마다 기다린다(5-2) |
 | 08:00 | 델타 워커 ×4 (`델타-1`~`델타-4`) | Opus | 7항 루프 — 빈 샤드를 가져와 `delta.{S}.json`, 델타가 다 끝나면 `T`(tldr). `desk.json` 이 아직이면 08:35 까지 기다린다(5-2) |
 | 08:00 | 심층 워커 ×3 (`심층-1`~`심층-3`) | Sonnet | 7항 루프 — 빈 샤드를 가져와 `deep.{S}.json`. `desk.json` 이 아직이면 08:35 까지 기다린다(5-2) |
-| 08:40 | 보강 워커 (델타 ×2·심층 ×2, 같은 이름 뒤에 `+`) | 위와 같음 | 같은 루프. 할 일이 없으면 바로 종료(비용 거의 0). 죽은 워커의 점유를 이어받는다 |
+| 08:40 | 보강 워커 (델타 ×2·심층 ×2, 같은 이름 뒤에 `+`) | 위와 같음 | 같은 루프. 모두 완료면 바로 종료(비용 0). 남이 점유 중인 샤드가 남았으면 그 점유가 25분을 넘겨 죽은 것으로 판정될 때까지(**최대 08:55**) 다시 확인해 이어받는다(7항 `check`) |
 | 08:45 | 교열 | Sonnet | 샤드 합치기 → 코드 검사 → 의미 점검 → 전부 통과면 반납·마감. **미완 샤드가 있으면 09:20 까지 3분마다 다시 확인** |
 | 09:30 | 백업 (v16 Routine) | Opus | Notion handoff 가 아직 OPEN 이면 예전 방식 그대로 — 마지막 안전망(변경 없음) |
 
@@ -105,10 +105,10 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 
 ## 6. 기자 일의 분할 — 샤드 수는 분량이 정한다 (가변, 카드는 줄이지 않는다)
 - 데스크는 입력 JSON `{"delta":[web_card_id…(handoff 순서)],"deep":[{"id":…,"obs":483 관찰 건수}…]}` 를 만들어
-  `python company/editorial/plan_shards.py <입력.json>` 을 돌리고, 출력 `shards` 를 `desk.json` 에 **그대로** 넣는다(LLM 이 나누지 않는다).
-  형태: `{"delta":{"A":[…],"B":[…],…},"deep":{"A":[…],…},"tldr":"T"}` — 샤드는 A, B, C… 로 늘어난다(종류별 상한 8, 최소 2).
+  `python company/editorial/plan_shards.py <입력.json> --handoff _handoff/handoff_{D}.json` 을 돌리고, 출력 `shards` 를 `desk.json` 에 **그대로** 넣는다(LLM 이 나누지 않는다).
+  형태: `{"delta":{"A":[…],"B":[…],…},"deep":{"A":[…],…},"tldr":"T"}` — 샤드는 A, B, C… 로 늘어난다(델타 상한 8 · 심층 상한 16, 최소 2).
   delta 는 `action=render`·`merged_into` 없음 카드를 handoff 순서의 **연속 구간**으로 균등 분할(샤드당 약 18장 이하),
-  deep 은 `deep_analysis_ready`·`ncr_translation_ready` 카드를 샤드당 12장·483 관찰 30건 이하로 균형 분할한다.
+  deep 은 `deep_analysis_ready`·`ncr_translation_ready` 카드를 샤드당 12장·483 관찰 30건·원문 6만 자 이하로 균형 분할한다(원문 글자 수는 `--handoff` 로 센다 — 실측 12.5만 자 샤드 약 8분, 25분 점유 안에 끝나는 크기).
   **FDA 게시 기준 카드는 전부 싣는다** — 모자라면 샤드가 늘 뿐 카드를 덜어내지 않는다(`plan_shards.py` 가 상한 초과 시 경고만 낸다).
 - 샤드 하나는 자기 목록의 카드**만** 쓴다. 결과는 `delta.{S}.json` · `deep.{S}.json` 과 가상 샤드 `delta.T.json`(브리프 `tldr`·`tldr_en`) — 형태는 `reporter.md`.
 - `T` 는 **모든 델타 샤드가 `완료`가 된 뒤** 한 워커가 한 번 쓴다(각 샤드의 `title_issue` 를 읽는다). 델타 샤드 사이는 서로 기다리지 않는다.
@@ -120,14 +120,19 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 워커 한 개가 한 샤드로 끝나지 않는다. 자기 일을 끝내고 시간이 남으면 다음 빈 샤드를 가져온다.
 ```
 반복:
-  S=$(python company/editorial/shard_claim.py next company/run/{D} <delta|deep>)      # 가장 번호 낮은 빈·죽은 샤드, 없으면 NONE
-  NONE 이거나 08:55 KST 를 넘었으면 종료
+  python company/editorial/shard_claim.py check company/run/{D} <delta|deep> <워커이름> --until 08:55   # 끝내도 되는지 코드가 정한다
+  exit 0(DONE · DEADLINE · NO_TAKEOVER)이면 종료. exit 1 이면 끝내지 않는다:
+    WAIT <S> <초> → 그 초만큼(5분 이하) 기다렸다가 위로 — 남이 잡은 샤드가 죽은 것으로 판정되면 이어받는다
+    CLAIM <S>     → 아래로
   python company/editorial/shard_claim.py claim company/run/{D} <종류> $S <워커이름>   # 0=내가 잡음, 1=졌음 → 위로 돌아가 다음 샤드
   샤드 S 를 처리하고 결과 파일을 커밋·push (RUN.md 3항 방식) — 이것이 곧 '완료' 표시다
 ```
 - **잠금** = `company/run/{D}/claims/{종류}.{S}.claim` 파일을 커밋해 push. push 가 거절되면 `pull --rebase` 후, 같은 파일이 남의 것이면 진 것이다(3번 재시도).
 - 점유한 지 25분이 지나도록 결과 파일이 없으면 **죽은 워커**로 보고 다른 워커가 가로챈다. 한 샤드가 25분 안에 끝나지 않는 크기이면 안 되므로 샤드 한도(6항)를 그에 맞춰 둔다.
 - 자기 결과를 쓰기 직전에 `desk.json` 의 목록과 자기 카드가 같은지 확인한다. 못 끝낸 샤드는 부분 결과를 `완료`로 쓰지 말고 `claim` 만 남겨 둔다 — 25분 뒤 보강 워커가 이어받는다.
+- **끝내는 조건은 `check` 의 exit 0 하나뿐이다.** 분량(원문 글자 수)·문맥 크기·'한 워커가 많이 못 가져간다'는 판단은 끝낼 이유가 아니다 —
+  빈 샤드를 남기고 끝내면 그 샤드는 아무도 하지 않고 백업이 발행한다(리허설 1120g: 심층 워커가 7개 중 2개만 하고 끝냈다). 끝낼 때 마지막 `check` 출력 한 줄을 보고에 적는다.
+  끝낸 샤드의 원문은 다시 읽지 않는다 — 다음 샤드는 그 샤드 카드만 읽는다.
 - 델타 워커는 Opus, 심층 워커는 Sonnet — **종류가 다른 샤드는 가져오지 않는다**(모델 배정을 지킨다).
 - 서브에이전트·병렬 세션은 쓰지 않는다(`CHARTER.md`). 분량이 늘어도 해법은 '샤드를 늘리고 워커 슬롯에 중복 배치'이지 세션 안에서 병렬화가 아니다.
 - 예약작업이 다른 예약작업을 깨우거나 세션을 새로 여는 길은 **이 저장소에서 실측하지 못했다**. 확인되면 이 항을 고친다 — 그 전까지는 고정 슬롯(5항)만 쓴다.

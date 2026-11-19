@@ -7,7 +7,7 @@ v16 백업 Routine(Notion handoff → Notion 예치)을 대신한다. **Notion �
 ## 값
 - `D` = 이번 주 월요일(KST, `YYYY-MM-DD`) — 오늘 날짜. `U` = `D` 의 `-` 를 `_` 로. `B` = `claude/company-$D`.
 - 편집팀 폴더 `E` = `company/run/$D/` · **백업 폴더 `F` = `company/run/$D/backup/`** — 백업이 쓰는 곳은 `F` 하나뿐이다. `E` 의 파일은 읽기만 한다.
-- 리허설이면 맨 앞 줄이 `리허설 <회차> 재료 <D>` 다 — 아래 "리허설" 절을 먼저 본다.
+- 리허설이면 맨 앞 줄이 `리허설 <회차> 재료 <D>`(뒤에 `판 <브랜치>` 가 붙을 수 있다) 다 — 아래 "리허설" 절을 먼저 본다.
 
 ## 읽을 것 (이 순서로, 이것만)
 1. `company/CHARTER.md` — 단, 이 실행은 데스크·기자·교열을 **한 세션이 차례로** 한다(직무 1개 = "백업"). 서브에이전트·병렬 작업 금지는 그대로.
@@ -81,6 +81,7 @@ RUN.md 2항대로 `_handoff/handoff_$D.json`, 교열 1번대로 `_scaffold/brief
 맨 앞 줄 `리허설 <회차> 재료 <D>` 이면 바뀌는 것만:
 - `B` = `claude/company-rehearsal-<회차>` · `E` = `company/run/rehearsal-<회차>/` · `F` = `company/run/rehearsal-<회차>/backup/`. 날짜 브랜치(`claude/company-YYYY-MM-DD`)·main 에 쓰지 않는다.
 - 판정은 `python company/editorial/backup_gate.py <D> --rehearsal <회차>` (시각·main 델타를 보지 않는다). `--final` 도 같이 `--rehearsal <회차>` 를 붙인다.
+- `판 <브랜치>` 가 있으면(머지 전 시험) 1항에서 main 대신 `git fetch origin <브랜치>` 한 `FETCH_HEAD` 로 `B` 를 만들고, 0항 판정도 그 판을 받은 뒤 돌린다.
 - 시각 시한(12:00·12:45·13:15)은 무시한다. `copyedit.json` 은 `"published": false, "rehearsal": true`.
 - 편집팀 리허설 폴더가 있으면 4·5번 재사용 규칙이 그대로 시험된다. 없는 회차(`E` 가 빈 회차)는 처음부터 다 쓰는 경우를 시험한다.
 

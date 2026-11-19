@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-18",
+ "measured_on": "2026-11-19",
  "window_days": 60,
  "totals": {
-  "items": 497
+  "items": 505
  },
  "by_source": [
   {
@@ -16,23 +16,23 @@
   },
   {
    "v": "Federal Register",
-   "c": 77
+   "c": 79
   },
   {
    "v": "MFDS",
-   "c": 46
+   "c": 48
   },
   {
    "v": "EMA",
-   "c": 44
+   "c": 45
   },
   {
    "v": "Health Canada",
-   "c": 19
+   "c": 21
   },
   {
    "v": "ISPE",
-   "c": 18
+   "c": 19
   },
   {
    "v": "MHRA Inspectorate",
@@ -48,6 +48,48 @@
   }
  ],
  "items": [
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-11-18",
+   "title": "EudraGMDP database",
+   "official_url": "https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-manufacturing-practice/eudragmdp-database"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-18",
+   "title": "Determination That BROMFED-DM (Brompheniramine Maleate; Dextromethorphan Hydrobromide; Pseudoephedrine Hydrochloride) Syrup, 2 Milligrams/5 Milliliters; 10 Milligrams/5 Milliliters; 30 Milligrams/5 Milliliters, Was Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/18/2026-23414/determination-that-bromfed-dm-brompheniramine-maleate-dextromethorphan-hydrobromide-pseudoephedrine"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-18",
+   "title": "Salerno Pharmaceuticals; Proposal To Withdraw Approval of a New Drug Application for Flolipid Suspension, 20 Milligrams/5 Milliliters and 40 Milligrams/5 Milliliters; Opportunity for a Hearing",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/18/2026-23413/salerno-pharmaceuticals-proposal-to-withdraw-approval-of-a-new-drug-application-for-flolipid"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-18",
+   "title": "Life Sciences AI Reality Check: Turning AI Conversations into Action: An ISPE Australasia Affiliate Virtual Event",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/life-sciences-ai-reality-check-turning-ai-conversations-action"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-18",
+   "title": "의료기기 GMP 기준 중 사용적합성 적용 가이드라인(심혈관용 기계 기구)",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15996"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-18",
+   "title": "의료기기 GMP 기준 중 사용적합성 적용 가이드라인(의료용 경)",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15997"
+  },
   {
    "source": "EMA",
    "source_kind": "news",
@@ -75,6 +117,20 @@
    "published_date": "2026-11-17",
    "title": "Determination That M.V.I. PEDIATRIC (Multiple Vitamins for Injection) Was Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
    "official_url": "https://www.federalregister.gov/documents/2026/11/17/2026-23367/determination-that-mvi-pediatric-multiple-vitamins-for-injection-was-not-withdrawn-from-sale-for"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-17",
+   "title": "[HC] PegLyte Powder: Affected lots may contain foreign matter",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/peglyte-powder-affected-lots-may-contain-foreign-matter"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-17",
+   "title": "[HC] TARO-CANDESARTAN: affected lots may contain Esomeprazole 20mg capsules",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/taro-candesartan-affected-lots-may-contain-esomeprazole-20mg-capsules"
   },
   {
    "source": "ECA Academy",

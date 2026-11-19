@@ -229,7 +229,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "handoff-status":
         import os
+        import grm_queue
         source = (os.environ.get(HANDOFF_STATUS_SOURCE_ENV, "") or "notion").strip().lower()
+        if grm_queue.notion_intake_off():
+            # [노션 은퇴] GRM_INTAKE_NOTION=off 면 노션 handoff 페이지가 만들어지지 않는다 — 노션에 물으면
+            # 언제나 `missing` 이라 FDA 본문 회수 뒤의 handoff 재생성이 조용히 꺼진다. DB 기록으로 답한다.
+            source = "db"
         try:
             if source == "db":
                 status = handoff_status_db(args.date, base_url=os.environ["SUPABASE_URL"],

@@ -4,7 +4,7 @@
 1. `company/CHARTER.md`
 2. `company/editorial/RUN.md` — 이 파일이 아래 모든 규칙보다 우선
 3. `docs/prompts/GRM_Prompt_v16.md` §B 중 **아래 절만** (본문을 그대로 따른다 — 요약·재해석 금지)
-4. 이번 주 handoff — 저장소 파일 `_handoff/handoff_{run_date_kst}.json` (RUN.md 2항대로 받는다. Notion 은 handoff 페이지가 OPEN 인지 확인할 때만 읽는다)
+4. 이번 주 handoff — 저장소 파일 `_handoff/handoff_{run_date_kst}.json` (RUN.md 2항대로 받는다. Notion 은 읽지 않는다)
 
 ## 맡는 v16 절
 - v16: [역할]
@@ -19,12 +19,12 @@
 
 ## 시작할 때 (07:20 · 07:45 두 번 돈다)
 - `company/run/{run_date_kst}/desk.json` 이 이미 `status: 완료` 면 아무것도 하지 않고 종료한다(07:45 재시도가 07:20 결과를 덮어쓰지 않는다).
-- **읽을 수 있는 handoff** = 이번 주 월요일 handoff 파일(RUN.md 2항)이 있고 `handoff_ref.py` 가 exit 0 이며, Notion `OPEN GRM Routine Handoff {run_date_kst}` 가
-  OPEN(Status=New)이다. 파일이 없으면 아직 수집·사본이 안 끝난 것이다(2026-11-02 07:05 · 11-16 08:01 에 생겼다).
-- Notion handoff 페이지가 이미 `CONSUMED`·`STALE` 이면 기다리지 않는다 — `"status": "보류", "reason": "Notion handoff 가 OPEN 아님"` 을 쓰고 끝낸다.
+- **읽을 수 있는 handoff** = 이번 주 월요일 handoff 파일(RUN.md 2항)이 있고 `handoff_ref.py` 가 exit 0 이다.
+  파일이 없으면 아직 수집·사본이 안 끝난 것이다(2026-11-02 07:05 · 11-16 08:01 에 생겼다).
+- 이번 호 델타가 이미 main 에 있으면(RUN.md 2항 — `web/data/deltas/delta_{UNDER}.json`) 기다리지 않는다 — `"status": "보류", "reason": "이미 발행 길에 들어간 호"` 를 쓰고 끝낸다.
 - 이번 주 handoff 를 아직 읽을 수 없으면 **기다린다**(RUN.md 5-2): 5분마다 다시 확인 — 07:20 슬롯은 07:42 까지, 07:45 슬롯은 08:10 까지.
   07:20 슬롯이 07:42 까지 못 찾으면 아무것도 쓰지 않고 끝낸다(07:45 슬롯이 이어서 기다린다). 07:45 슬롯이 08:10 까지 못 찾으면 `desk.json` 에
-  `"status": "보류", "reason": "handoff 없음(08:10 까지 대기)"` 만 쓰고 끝낸다(백업이 한다). 08:10 이 지나서 처음 찾았으면 시작하지 않는다(같은 `보류`).
+  `"status": "보류", "reason": "handoff 없음(08:10 까지 대기)"` 만 쓰고 끝낸다(자동 백업은 없다 — 종합상황실이 잡고 대표가 정한다). 08:10 이 지나서 처음 찾았으면 시작하지 않는다(같은 `보류`).
 - handoff 를 찾으면 일을 시작하기 **전에**, 3항 브랜치에 올라탄 뒤 데스크 잠금을 잡는다: `python company/editorial/shard_claim.py claim company/run/{run_date_kst} desk desk "데스크 07:20"`
   (07:45 슬롯은 `"데스크 07:45"`). exit 1 이면 다른 데스크가 하는 중이다 — 일하지 말고 `python company/editorial/shard_claim.py desk company/run/{run_date_kst}` 가
   `done` 이 될 때까지 5분마다 확인한다(시한 같음). `stale` 이면 다시 claim 해 이어받는다.

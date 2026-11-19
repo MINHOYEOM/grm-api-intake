@@ -9,15 +9,18 @@ PC 예약작업 `grm-monday-brief-publish` 의 **확인 부분**을 옮긴 것�
 
 ## 값
 `D` = 이번 주 발행일 = 오늘(KST) 날짜. `UNDER` = `D` 의 `-` 를 `_` 로. 결과 파일 = 브랜치 `claude/company-$D` 의 `company/run/$D/brief-prep.md`.
-Notion 은 보지 않는다 — 발행 길에서 빠졌다(편집팀 `company/editorial/RUN.md` 0항). 자동 백업(v16 Routine)도 꺼졌다.
+Notion 은 보지 않는다 — 발행 길에서 빠졌다(편집팀 `company/editorial/RUN.md` 0항). v16 백업은 꺼졌고, 백업 v17(`company/editorial/backup.md`, 월 09:30)이
+편집팀이 못 넘긴 호를 같은 브랜치의 `company/run/$D/backup/` 에 따로 반납한다(편집팀과 같은 파일·형식).
 
 ## 확인 (순서대로, 고치지 않는다)
 1. **델타 반납** — `git fetch origin claude/company-$D` 후 `company/run/$D/delta.json` 이 있고 `copyedit.json` 의 `status` 가 `완료`면 정상(`git 반납 있음`).
-   이미 main 에 `web/data/deltas/delta_$UNDER.json` 이 있어도 정상이다(브릿지가 가져갔다). 둘 다 없으면 `★델타 없음`.
+   편집팀 것이 아니면 `company/run/$D/backup/` 의 같은 두 파일을 본다 — `copyedit.json` 이 `완료`면 정상(`git 반납 있음(백업)`).
+   백업 폴더에 `claims/backup.run.claim` 은 있는데 `copyedit.json` 이 없으면 `대기: 백업 진행 중`(백업은 13:15 KST 까지 반납한다 — 정상 진행).
+   이미 main 에 `web/data/deltas/delta_$UNDER.json` 이 있어도 정상이다(브릿지가 가져갔다). 셋 다 없으면 `★델타 없음`.
 2. **main 반영** — `git fetch origin main` 후 `web/data/deltas/delta_$UNDER.json`·`deep_$UNDER.json` 이 있는지.
    git 반납이 있는데 파일이 없으면 브릿지가 아직 안 돈 것이다(크론이 13:37 까지 30분마다 돈다) → `대기: 브릿지`.
    **스캐폴드 동결**도 본다 — main 의 `delta_$UNDER.json` 에 `handoff_ref` 키가 있으면(편집팀이 git handoff 로 만든 호) `web/data/scaffolds/brief_web_$UNDER.json` 도 main 에 있어야 한다.
-   없으면 `★스캐폴드 동결 없음`(발행 조립이 다른 스캐폴드를 쓰게 된다 — `상태: 보류`). `handoff_ref` 가 없는 호(백업이 발행한 호)는 이 파일이 없는 것이 정상이다.
+   없으면 `★스캐폴드 동결 없음`(발행 조립이 다른 스캐폴드를 쓰게 된다 — `상태: 보류`). 백업 v17 이 반납한 호도 `handoff_ref` 가 있으므로 같은 규칙이다.
 3. **발행 PR** — 열린 PR 중 head 가 `publish/brief-$D` 인 것. head sha 의 check-runs 가 전부 `success` 인지.
 4. **심층분석** — PR 브랜치의 `web/data/briefs/brief_web_$UNDER.json` 을 `git show` 로 읽어, `"deep_analysis" in card` 인 카드마다
    ① `deep_analysis` 가 비어 있지 않은가 ② `fda-483` 카드는 `observations_ko` 의 `number` 가 `deterministic_detail.observations[].number` 와 1:1 이고
@@ -30,12 +33,15 @@ Notion 은 보지 않는다 — 발행 길에서 빠졌다(편집팀 `company/ed
 ## 판정
 - 1~4(+4-1) 가 전부 정상 → `상태: 완료` · `대표가 볼 것: 관리자 사이트에서 발행 승인`.
 - 하나라도 아니면 → `상태: 보류` · 무엇이 빠졌는지(★영문 슬롯 미완결(n/N장) · ★델타 없음/오예치 · 대기: 브릿지 · 발행 PR 없음·CI 실패 · deep 누락 카드 id·층) 한 줄씩.
-  `★델타 없음` 이면 `대표가 볼 것: 편집팀이 이번 호를 반납하지 못함 — 자동 백업 없음, 이번 호 처리 결정` 을 쓴다.
+  `★델타 없음` 이면 `대표가 볼 것: 편집팀·백업 모두 이번 호를 반납하지 못함 — company/run/$D/backup/backup.md 첫 줄 참고, 이번 호 처리 결정` 을 쓴다.
+  `대기: 백업 진행 중` 은 `상태: 보류` 이되 `대표가 볼 것: 없음(백업 진행 중 — 13:40 이후 다시 확인)` 이다.
 - 편집팀 판정 (5번) — 셋 중 하나만 쓴다. 미작동이 아닌 경우도 원인 한 줄을 붙인다.
   - `작동`: desk·reporter·copyedit 전부 `완료` 이고 `copyedit.json` 의 `published: true`.
   - `부분 작동(멈춘 단계: 데스크|기자|교열|마감)`: 파일 중 하나 이상은 있으나 위 조건이 아니다. 교열이 `완료` 인데 `published` 가 `false` 면 멈춘 단계는 `마감`.
-  - `미작동`: 세 파일이 전부 없거나 데스크가 `완료` 가 아니다. 자동 백업이 없으므로 이번 호는 발행 길에 들어가지 않았다(대표 확인).
+  - `미작동`: 세 파일이 전부 없거나 데스크가 `완료` 가 아니다. 이번 호를 이어받았는지는 아래 백업 줄로 본다.
   - 형식: `편집팀: <판정> — <원인 한 줄>` (원인은 멈춘 단계의 보류 사유, 파일 없음이면 `브랜치·파일 없음`).
+- 백업 판정(5-1) — `company/run/$D/backup/` 을 읽기만 한다. 하나만 쓴다: `백업: 반납`(`copyedit.json` `완료`) · `백업: 진행 중`(claim 만 있음) ·
+  `백업: 못 함 — <backup.md 첫 줄>` · `백업: 안 함`(폴더 없음 — 편집팀이 넘겼거나 백업이 `SKIP`). `상태:` 판정에는 넣지 않는다(1번이 이미 본다).
 
 ## 복구 — 워크플로 재실행 요청 (확인 2·3번에서 막혔을 때만, 한 번씩)
 `git fetch origin claude/ops-status` 후 `git show FETCH_HEAD:status.json` 으로 최근 실행을 먼저 본다(이미 돌고 있으면 요청하지 않는다).
@@ -47,7 +53,7 @@ Notion 은 보지 않는다 — 발행 길에서 빠졌다(편집팀 `company/ed
 
 ## 기록
 `if git fetch origin claude/company-$D; then git checkout -B claude/company-$D FETCH_HEAD; else git fetch origin main && git checkout -b claude/company-$D FETCH_HEAD; fi` — 있으면 그 위에, 없으면 방금 받은 main(`FETCH_HEAD`)에서 브랜치를 만든다. `origin/main` 이라는 이름은 쓰지 않는다(실행 환경의 것은 며칠 전 것일 수 있다 — 2026-11-13 리허설: 11-06 커밋). `company/run/$D/brief-prep.md` 하나만 쓰고 커밋·push.
-첫 3줄은 `CHARTER.md` 형식(`상태:` 로 시작) — PC 백업이 이 첫 줄을 읽고 건너뛸지 정한다. 3줄 바로 아래 4번째 줄에 `편집팀: …` 한 줄을 둔다(5번 판정). 다른 직무의 파일은 건드리지 않는다.
+첫 3줄은 `CHARTER.md` 형식(`상태:` 로 시작) — PC 백업이 이 첫 줄을 읽고 건너뛸지 정한다. 3줄 바로 아래 4번째 줄에 `편집팀: …` 한 줄(5번 판정), 5번째 줄에 `백업: …` 한 줄(5-1)을 둔다. 다른 직무의 파일은 건드리지 않는다.
 
 ## 금지
 발행 PR 머지 · Notion 읽기·쓰기 · 심층분석 생성 · Supabase 쓰기 · 허용 동작 밖의 워크플로 요청.

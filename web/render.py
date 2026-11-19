@@ -4070,6 +4070,44 @@ def is_thin_firm_page(firm: dict[str, Any], lang: str = DEFAULT_LANG) -> bool:
     return len(docs) <= THIN_FIRM_MAX_DOCS and excerpt <= THIN_FIRM_MAX_EXCERPT_BYTES
 
 
+# [구글 품질 1단계 2026-11-19] 중복 문서(규칙 B)도 구글에서만 뺀다.
+# 왜: HC 보고서는 표준 문구를 써서 영문 지적의 92%가 다른 문서와 글자까지 같다. 얇지 않아도
+# "다른 문서의 사본"이라 사이트 단위 품질 판정을 끌어내린다(범위안 2026-11-19, 대표 결정 1).
+# 판정 단위는 **지적 하나의 본문**(그 언어로 페이지에 실리는 것 — finding_body)이고, 공백·대소문자만
+# 정규화해 **다른 문서**에 글자 그대로 있으면 중복이다. 비교 모집단은 같은 언어 본문의 전 문서다.
+# 렌더 입력만으로 결정론이라, 2단계 보강으로 본문이 달라지면 다음 빌드에서 자동으로 돌아온다.
+DUP_DOC_MIN_RATIO = 0.8
+
+
+def _dup_key(text: str) -> str:
+    return re.sub(r"\s+", " ", text or "").strip().lower()
+
+
+def doc_duplicate_ratios(documents: list[dict[str, Any]],
+                         lang: str = DEFAULT_LANG) -> dict[str, float]:
+    """document_id → 지적 가운데 다른 문서에도 글자 그대로 있는 비율(0~1). 지적이 없으면 0."""
+    owners: dict[str, set[str]] = {}
+    keys_by_doc: dict[str, list[str]] = {}
+    for d in documents:
+        keys = [k for k in (_dup_key(finding_body(f, lang)) for f in d.get("findings") or []) if k]
+        keys_by_doc[d["document_id"]] = keys
+        for k in keys:
+            owners.setdefault(k, set()).add(d["document_id"])
+    return {i: (sum(1 for k in keys if len(owners[k]) > 1) / len(keys) if keys else 0.0)
+            for i, keys in keys_by_doc.items()}
+
+
+def is_duplicate_doc_page(doc: dict[str, Any], ratios: dict[str, float]) -> bool:
+    """규칙 B — 지적의 80% 이상이 다른 문서에 글자 그대로 있다(ratios 는 그 언어로 잰 값)."""
+    return ratios.get(doc.get("document_id", ""), 0.0) >= DUP_DOC_MIN_RATIO
+
+
+def google_noindex_doc_page(doc: dict[str, Any], lang: str,
+                            ratios: dict[str, float]) -> bool:
+    """문서 페이지를 구글에서 뺄까(A 얇음 또는 B 중복). 템플릿 메타와 sitemap 이 **이 함수 하나**를 본다."""
+    return is_thin_doc_page(doc, lang) or is_duplicate_doc_page(doc, ratios)
+
+
 # ── [SEO 2단계 2026-11-09] 문서·업체 페이지의 GRM 고유 맥락 ─────────────────────────
 # 1단계(googlebot noindex)는 얇은 페이지를 빼는 것이었고, 이 단계는 **원문에 없는 정보**를
 # 더한다. 문서 페이지는 공개 문서를 옮긴 것이라 그대로는 사본이다. 우리만 가진 연결 두 가지를
@@ -5645,6 +5683,10 @@ SITE_BASE_URL = os.environ.get(
     "GRM_SITE_BASE_URL", "https://grm-solutions.com").rstrip("/")
 
 
+#: [구글 품질 1단계 2026-11-19] IndexNow 용 전체 sitemap 파일명(구글용 sitemap.xml 과 별개).
+SITEMAP_FULL_NAME = "sitemap-full.xml"
+
+
 def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = False) -> str:
     """robots.txt — 공개 페이지 허용 + sitemap 포인터. Admin 은 비색인, /cdn-cgi/ 는 크롤 차단."""
     lines = [
@@ -5983,12 +6025,16 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
                       base_url: str = SITE_BASE_URL,
                       glossary_term_ids: "list[str] | None" = None,
                       facet_paths: "list[tuple[str, str]] | None" = None,
-                      en_paths: "set[str] | None" = None) -> str:
+                      en_paths: "set[str] | None" = None,
+                      exclude_paths: "set[str] | frozenset[str]" = frozenset()) -> str:
     """sitemap.xml — 랜딩 + 아카이브 + 각 호. canonical = 트레일링 슬래시 디렉터리형
     (`/`·`/archive/`·`/briefs/{pub}/`). lastmod = publish_date(YYYY-MM-DD)만 — 랜딩·
     아카이브는 최신 publish_date. 정렬 = publish_date desc. 생성시각/난수 0(byte 고정).
 
     URL·날짜는 전부 ASCII(http(s)·YYYY-MM-DD)라 XML 메타문자 부재 — 무변형 결합.
+
+    exclude_paths: [구글 품질 1단계 2026-11-19] 뺄 사이트 경로(접두 포함, 예 `en/findings/doc/x/`).
+    구글용 sitemap.xml 은 googlebot noindex 페이지를 빼고, IndexNow 용 sitemap-full.xml 은 비워 전부 싣는다.
     """
     pubs = sorted((b["brief"].get("publish_date", "") for b in briefs),
                   reverse=True)
@@ -6040,14 +6086,15 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         *(f"  <url><loc>{base_url}/{path}</loc>"
           + (f"<lastmod>{mod}</lastmod>" if mod else "")
           + "</url>"
-          for path, mod in (facet_paths or [])),
+          for path, mod in (facet_paths or []) if path not in exclude_paths),
         # [주간 퀴즈] 트랙 C — 상설 학습 콘텐츠라 brief publish_date 와 분리(lastmod 생략).
         f"  <url><loc>{base_url}/quiz/</loc></url>",
         # [다국어 3단계] 영어 트리 — 본문이 영어로 성립하는 면만 등록한다(EN_TREE_STATIC).
         # 경로는 렌더가 실제로 쓴 집합 그대로라(손으로 다시 적지 않는다) 페이지와 sitemap 이
         # 갈라질 수 없다. lastmod 는 비운다 — 한국어 짝과 같은 데이터라 별도 날짜가 없다.
         *(f"  <url><loc>{base_url}/{LANG_PREFIXES['en']}{p}</loc></url>"
-          for p in sorted((en_paths or set()) - EN_SITEMAP_EXCLUDED)),
+          for p in sorted((en_paths or set()) - EN_SITEMAP_EXCLUDED)
+          if f"{LANG_PREFIXES['en']}{p}" not in exclude_paths),
     ]
     for pub in pubs:
         lines.append(
@@ -7275,6 +7322,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   사후 필터(표본에서 한글만 제거)로는 표본만 고쳐지고 머리 숫자가 거짓으로 남는다.
     # 사례 → 문서 링크는 **그 트리에 있는 문서**로만 잇는다(link_doc_slugs).
     facet_paths: list[tuple[str, str]] = []
+    # [구글 품질 1단계 2026-11-19] 구글에서만 뺄 페이지의 사이트 경로(접두 포함 — sitemap 줄과 같은 꼴).
+    # 페이지의 googlebot noindex 와 **같은 판정 함수**에서 채운다 — 둘이 갈라지면 구글에 "색인하지 말라"와
+    # "색인해 달라"를 동시에 보낸다(11-09 #1429 가 그랬다). 데이터에서 파생하므로 렌더 스위치와 무관하다.
+    # sitemap.xml(구글이 읽는 것)은 이 집합을 빼고, sitemap-full.xml(IndexNow 용)은 전부 싣는다.
+    google_noindex_paths: set[str] = set()
+    google_noindex_counts: dict[str, int] = {}
+
+    def _mark_google_noindex(lang: str, path: str, kind: str) -> None:
+        google_noindex_paths.add(f"{LANG_PREFIXES[lang]}{path}")
+        ck = f"{kind}:{lang}"
+        google_noindex_counts[ck] = google_noindex_counts.get(ck, 0) + 1
 
     def emit_facet_tree(facets_data, mkpage, emit_page, tr, lang_key, link_doc_slugs):
         if not facets_data:
@@ -7884,6 +7942,21 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             "en": {c["section"]: c for c in clause_views_en},
         }
         _doc_slugs_by_lang = {DEFAULT_LANG: {d["slug"] for d in documents}, "en": en_doc_slugs}
+        # [구글 품질 1단계] 중복률은 언어마다 그 언어 본문으로 잰다(전 문서 모집단).
+        dup_ratios_by_lang = {_lg: doc_duplicate_ratios(documents, _lg)
+                              for _lg in (DEFAULT_LANG, "en")}
+        google_noindex_doc = {
+            _lg: {d["slug"] for d in documents
+                  if (_lg == DEFAULT_LANG or d["slug"] in en_doc_slugs)
+                  and google_noindex_doc_page(d, _lg, dup_ratios_by_lang[_lg])}
+            for _lg in (DEFAULT_LANG, "en")}
+        for _lg, _slugs in google_noindex_doc.items():
+            for d in documents:
+                if d["slug"] not in _slugs:
+                    continue
+                _mark_google_noindex(
+                    _lg, f"findings/doc/{d['slug']}/",
+                    "doc_thin" if is_thin_doc_page(d, _lg) else "doc_dup")
 
         for doc in documents:
             # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
@@ -7963,7 +8036,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          (_tr("문서로 찾기"), "findings/docs/")),
                         (doc["firm_name"], "")]),
                     doc=_doc, agency_labels=_labels,
-                    thin_page=is_thin_doc_page(doc, _lg),
+                    google_noindex=doc["slug"] in google_noindex_doc[_lg],
                     source_label=doc_source_label(doc),
                     # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                     # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
@@ -8007,6 +8080,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for fp in firm_pages:
             facet_paths.append((page(f"findings/firm/{fp['slug']}/").site_path,
                                 fp["last_seen"]))
+        # [구글 품질 1단계] 얇은 업체(규칙 C) — 페이지 메타와 같은 술어(is_thin_firm_page).
+        for _lg, _fps in ((DEFAULT_LANG, firm_pages), ("en", en_firm_pages)):
+            for fp in _fps:
+                if is_thin_firm_page(fp, _lg):
+                    _mark_google_noindex(_lg, f"findings/firm/{fp['slug']}/", "firm_thin")
         # [수입경보 1단계 2026-11-10] 업체 페이지 상단 표시. 매칭은 **업체 정본 키의 전체 문서
         # 표기명**으로 한 번만 한다(영어판도 같은 결과 — 언어 트리가 매칭을 바꾸면 안 된다).
         # 스냅샷이 없으면 빈 dict → 표시 없음(빌드 계속).
@@ -8062,7 +8140,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                              (_tr("업체"), "findings/firm/"), (fp["name"], "")]),
                          firm=_fp, agency_labels=agency_labels_by_lang[_lg],
-                         thin_page=is_thin_firm_page(fp, _lg),
+                         google_noindex=is_thin_firm_page(fp, _lg),
                          similar_firms=firm_similar_view(
                              fp["documents"], similar_by_doc, docs_by_id, _lg,
                              _doc_slugs_by_lang.get(_lg), _canonical_firm_key,
@@ -8189,6 +8267,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for _d, _c in clause_text_page.pages(_ctv):
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
+                _ct_gni = clause_text_page.google_noindex_reason(_d, _c, _lg)
                 _em("clause_text.html", _cp,
                     page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
                     nav_active="findings",
@@ -8200,9 +8279,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     cases_href=(f"findings/clause/{clause_slug(_sec)}/"
                                 if _sec and clause_slug(_sec) in _ct_cases else ""),
                     terms=_ct_terms.get(_c["href"]) or [],
+                    google_noindex=bool(_ct_gni),
                 )
         for _path in sorted(clause_text_page.tree_paths(clause_text_view)):
             facet_paths.append((page(_path).site_path, ""))
+    # [구글 품질 1단계] 조항 D·E — sitemap 제외 집합은 렌더 루프 밖에서 같은 술어로 채운다
+    # (영문 트리 경로는 en_paths 로 sitemap 에 들어가므로 언어마다 따로 센다).
+    for _lg in (DEFAULT_LANG, "en"):
+        for _d, _c in clause_text_page.pages(clause_text_views[_lg]):
+            _why = clause_text_page.google_noindex_reason(_d, _c, _lg)
+            if _why:
+                _mark_google_noindex(_lg, _c["href"], f"clause_{_why}")
 
     # [해외 지적 사례 전체 2026-11-10] 기관별 전체 목록(전 행 서버 렌더 — 필터는 인라인 스크립트가 숨길 뿐)
     # + MHRA 조항 집계표. ko·en 같은 함수, 본문은 원문(영어) 그대로.
@@ -8758,13 +8845,25 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
            build_llms_txt(briefs, glossary_term_ids=glossary_term_ids, en_paths=en_paths,
                           facet_paths=facet_paths))
     written.append("llms.txt")
+    # [구글 품질 1단계 2026-11-19] sitemap 두 벌.
+    #   · sitemap.xml      — 구글용(GSC·robots.txt 가 가리키는 것). googlebot noindex 페이지를 뺀다 —
+    #     noindex 와 "색인해 달라"를 동시에 보내지 않는다.
+    #   · sitemap-full.xml — 전체 목록. IndexNow(네이버·빙) 증분 제출이 이것끼리 비교한다. robots.txt 에는
+    #     싣지 않는다 — Sitemap 줄은 모든 크롤러가 읽어 구글에도 다시 noindex 페이지를 내밀게 된다.
+    #     네이버·빙 계정에 추가 등록할지는 사람이 정한다(외부 계정 변경).
     _write(out_dir / "sitemap.xml",
            build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids,
-                             facet_paths=facet_paths, en_paths=en_paths))
+                             facet_paths=facet_paths, en_paths=en_paths,
+                             exclude_paths=google_noindex_paths))
     written.append("sitemap.xml")
+    _write(out_dir / SITEMAP_FULL_NAME,
+           build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids,
+                             facet_paths=facet_paths, en_paths=en_paths))
+    written.append(SITEMAP_FULL_NAME)
 
     return {"out_dir": str(out_dir), "written": written,
-            "briefs": len(briefs), "latest": latest_slug}
+            "briefs": len(briefs), "latest": latest_slug,
+            "google_noindex": dict(sorted(google_noindex_counts.items()))}
 
 
 class Fda483ObservationValidationError(ValueError):

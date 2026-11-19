@@ -53,6 +53,45 @@ class ThinPredicateTest(unittest.TestCase):
         self.assertFalse(render.is_thin_firm_page(big))
 
 
+class DuplicateAndClausePredicateTest(unittest.TestCase):
+    """[구글 품질 1단계 2026-11-19] 중복 B·조항 D/E 술어 — 기준을 넘으면 자동으로 돌아온다."""
+
+    def test_duplicate_ratio(self):
+        def d(i, *texts):
+            return {"document_id": i, "findings": [{"text_ko": t, "text_orig": t} for t in texts]}
+        docs = [d("a", "Same  Text", "x1", "x2", "x3", "x4"),
+                d("b", "same text", "x1", "x2", "x3", "u1", "u2"),
+                d("c", "x4", "x1", "x2", "x3", "own"),
+                d("e", "solo")]
+        r = render.doc_duplicate_ratios(docs)
+        self.assertEqual(r["a"], 1.0)        # 공백·대소문자 정규화 후 5/5
+        self.assertEqual(r["c"], 0.8)        # 4/5 = 경계(이상이면 중복)
+        self.assertAlmostEqual(r["b"], 4 / 6)
+        self.assertEqual(r["e"], 0.0)
+        self.assertTrue(render.is_duplicate_doc_page(docs[2], r))
+        self.assertFalse(render.is_duplicate_doc_page(docs[1], r))
+        self.assertFalse(render.is_duplicate_doc_page(docs[3], r))
+        # 보강으로 고유 지적이 늘면 비율이 내려가 자동 복귀
+        docs[2]["findings"].append({"text_ko": "new", "text_orig": "new"})
+        self.assertFalse(render.is_duplicate_doc_page(
+            docs[2], render.doc_duplicate_ratios(docs)))
+
+    def test_clause_reason(self):
+        import clause_text_page as ct
+        en_doc, ko_doc = {"source": {"lang": "en"}}, {"source": {"lang": "ko"}}
+        long_c = {"chars": 500, "text_ko": ""}
+        self.assertEqual(ct.google_noindex_reason(en_doc, long_c, "ko"), "untranslated")
+        self.assertEqual(ct.google_noindex_reason(en_doc, long_c, "en"), "")
+        self.assertEqual(ct.google_noindex_reason(en_doc, {"chars": 299}, "en"), "short")
+        self.assertEqual(ct.google_noindex_reason(ko_doc, {"chars": 299}, "ko"), "short")
+        self.assertEqual(ct.google_noindex_reason(ko_doc, long_c, "ko"), "")
+        # 2단계에서 국문 번역이 생기면 국문 페이지가 돌아온다(번역 길이로 E 를 다시 잰다)
+        self.assertEqual(ct.google_noindex_reason(
+            en_doc, {"chars": 500, "text_ko": "가" * 300}, "ko"), "")
+        self.assertEqual(ct.google_noindex_reason(
+            en_doc, {"chars": 500, "text_ko": "가" * 10}, "ko"), "short")
+
+
 class ThinPageMetaTest(unittest.TestCase):
     """실제 findings_docs.json 으로 짓고, 페이지별 메타가 술어와 일치하는지 전수 대조."""
 
@@ -70,19 +109,25 @@ class ThinPageMetaTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def _check_docs(self, root: pathlib.Path, lang: str, docs):
-        thin = non_thin = 0
+        thin = dup = kept = 0
+        ratios = render.doc_duplicate_ratios(self.data["documents"], lang)
         for d in docs:
             p = root / "findings" / "doc" / d["slug"] / "index.html"
             if not p.is_file():
                 continue
             html = p.read_text(encoding="utf-8")
-            want = render.is_thin_doc_page(d, lang)
+            want = render.google_noindex_doc_page(d, lang, ratios)
             self.assertEqual(GOOGLEBOT in html, want, f"{lang} {d['slug']}")
             self.assertIsNone(ROBOTS_NOINDEX.search(html), d["slug"])
-            thin += want
-            non_thin += not want
+            if render.is_thin_doc_page(d, lang):
+                thin += 1
+            elif want:
+                dup += 1
+            else:
+                kept += 1
         self.assertGreater(thin, 0)
-        self.assertGreater(non_thin, 0)
+        self.assertGreater(dup, 0)
+        self.assertGreater(kept, 0)
 
     def test_ko_doc_pages(self):
         self._check_docs(self.out, "ko", self.data["documents"])
@@ -103,6 +148,42 @@ class ThinPageMetaTest(unittest.TestCase):
                     seen_full += 1
         self.assertGreater(seen_thin, 0)
         self.assertGreater(seen_full, 0)
+
+    def test_sitemap_agrees_with_page_meta(self):
+        """[구글 품질 1단계 2026-11-19] 구글용 sitemap.xml 에 googlebot noindex 페이지가 하나도 없고,
+        noindex 가 아닌 페이지는 하나도 빠지지 않는다. sitemap-full.xml 은 전부 싣는다(IndexNow 용)."""
+        loc = re.compile(r"<loc>https?://[^/]+/([^<]*)</loc>")
+        google = loc.findall((self.out / "sitemap.xml").read_text(encoding="utf-8"))
+        full = loc.findall((self.out / "sitemap-full.xml").read_text(encoding="utf-8"))
+        self.assertTrue(set(google) < set(full))
+        self.assertEqual(len(google), len(set(google)))
+        gset = set(google)
+        noindexed = kept = 0
+        for path in full:
+            p = self.out / path / "index.html"
+            if not p.is_file():
+                continue
+            has = GOOGLEBOT in p.read_text(encoding="utf-8")
+            self.assertNotEqual(has, path in gset, path)
+            noindexed += has
+            kept += not has
+        self.assertGreater(noindexed, 0)
+        self.assertGreater(kept, 0)
+
+    def test_clause_pages(self):
+        """국문 트리의 외국어 원문 조항(D)과 300자 미만 조항(E)만 구글에서 뺀다."""
+        import clause_text_page as ct
+        seen = {"untranslated": 0, "short": 0, "": 0}
+        for lang, root in (("ko", self.out), ("en", self.out / "en")):
+            view = ct.build(ct.for_lang(ct.load_sources(), lang))
+            for d, c in ct.pages(view):
+                p = root / c["href"] / "index.html"
+                html = p.read_text(encoding="utf-8")
+                why = ct.google_noindex_reason(d, c, lang)
+                self.assertEqual(GOOGLEBOT in html, bool(why), f"{lang} {c['href']}")
+                self.assertIsNone(ROBOTS_NOINDEX.search(html), c["href"])
+                seen[why] += 1
+        self.assertTrue(all(seen.values()), seen)
 
     def test_other_pages_untouched(self):
         for rel in ("index.html", "findings/index.html", "sitemap.xml"):

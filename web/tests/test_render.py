@@ -316,6 +316,8 @@ SINGLE_GOLDENS = [
     ("_headers", "headers.expected.txt"),
     ("briefs/2026-06-26/share.txt", "brief_share.expected.txt"),
     ("sitemap.xml", "sitemap.expected.xml"),
+    # [구글 품질 1단계 2026-11-19] IndexNow 용 전체 목록 — 구글용 sitemap.xml 과 별개.
+    ("sitemap-full.xml", "sitemap_full.expected.xml"),
     ("site.webmanifest", "site.expected.webmanifest"),
 ]
 MULTI_GOLDENS = [
@@ -11329,7 +11331,7 @@ class WebFirmPageTest(unittest.TestCase):
         cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_firmpg_"))
         cls.out = cls._tmp / "single"
         _build_single(cls.out, doc_pages=True)
-        cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
+        cls.sitemap = (cls.out / "sitemap-full.xml").read_text(encoding="utf-8")  # [구글 품질 1단계] 전체 목록(sitemap.xml 은 구글용 축소본)
         cls.root = cls.out / "findings" / "firm"
         cls.by_firm = {}
         for d in cls.data["documents"]:
@@ -11610,7 +11612,7 @@ class WebFindingsDocPageTest(unittest.TestCase):
         cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_docs_"))
         cls.out = cls._tmp / "single"
         _build_single(cls.out, doc_pages=True)
-        cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
+        cls.sitemap = (cls.out / "sitemap-full.xml").read_text(encoding="utf-8")  # [구글 품질 1단계] 전체 목록(sitemap.xml 은 구글용 축소본)
         cls.root = cls.out / "findings" / "doc"
 
     @classmethod
@@ -13032,7 +13034,7 @@ class WebLlmsTxtTest(unittest.TestCase):
         _build_single(out)
         cls.out = out
         cls.txt = (out / "llms.txt").read_text(encoding="utf-8")
-        cls.sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+        cls.sitemap = (out / "sitemap-full.xml").read_text(encoding="utf-8")  # [구글 품질 1단계] 전체 목록(sitemap.xml 은 구글용 축소본)
 
     @classmethod
     def tearDownClass(cls):
@@ -18839,7 +18841,7 @@ class WebEnFirmPageTest(unittest.TestCase):
                               f"{p.parent.name}: 영어판에 없는 업체 페이지로 보낸다")
 
     def test_every_english_firm_page_is_in_the_sitemap_and_paired(self):
-        sitemap = (self.out / "sitemap.xml").read_text(encoding="utf-8")
+        sitemap = (self.out / "sitemap-full.xml").read_text(encoding="utf-8")  # [구글 품질 1단계] 전체 목록(sitemap.xml 은 구글용 축소본)
         for slug in sorted(self.en_slugs):
             self.assertIn(f"{render.SITE_BASE_URL}/en/findings/firm/{slug}/</loc>", sitemap,
                           f"{slug}: sitemap 누락")
@@ -19795,7 +19797,7 @@ class WebEnTreeTest(unittest.TestCase):
             for p in cls.out.rglob("*.html")
         }
         cls.en = {k: v for k, v in cls.pages.items() if k.startswith("en/")}
-        cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
+        cls.sitemap = (cls.out / "sitemap-full.xml").read_text(encoding="utf-8")  # [구글 품질 1단계] 전체 목록(sitemap.xml 은 구글용 축소본)
         # [다국어 4단계] 선언 집합 = 셸/자료실 + **원문이 영어인 실사 문서 표면**.
         # 문서 페이지는 렌더 스위치(_DOC_PAGES_IN_TESTS)로 꺼지므로 파일 비교에서는
         # 빼고 본다 — 한국어 쪽과 같은 규율이다(sitemap 은 데이터에서, 파일은 스위치대로).

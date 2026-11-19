@@ -101,5 +101,43 @@ class MainTest(unittest.TestCase):
         self.assertEqual(rc, 0)
 
 
+class IncrementalCapTest(unittest.TestCase):
+    """[구글 품질 1단계 2026-11-19] 구글용(축소)·전체 sitemap 을 섞어 비교하면 수천 건이 '새 URL'이 된다 —
+    증분 상한을 넘으면 아무것도 보내지 않는다(빙 대량 제출 자제 권고)."""
+
+    def _run(self, n_prev, n_cur, *extra):
+        d = tempfile.mkdtemp()
+        cur, prev = os.path.join(d, "cur.xml"), os.path.join(d, "prev.xml")
+        with open(cur, "w", encoding="utf-8") as f:
+            f.write(sm(*((f"https://grm-solutions.com/{i}", "") for i in range(n_cur))))
+        with open(prev, "w", encoding="utf-8") as f:
+            f.write(sm(*((f"https://grm-solutions.com/{i}", "") for i in range(n_prev))))
+        sess = FakeSession(200)
+        real = ix.post_batch
+        ix.post_batch = lambda ep, payload, session=None: real(ep, payload, session=sess)
+        try:
+            return ix.main(["--sitemap", cur, "--previous", prev, *extra]), sess
+        finally:
+            ix.post_batch = real
+
+    def test_over_cap_sends_nothing(self):
+        rc, sess = self._run(10, 30, "--max-urls", "15")
+        self.assertEqual(rc, 0)
+        self.assertEqual(sess.calls, [])
+        rc, _ = self._run(10, 30, "--max-urls", "15", "--strict")
+        self.assertEqual(rc, 1)
+
+    def test_under_cap_sends_diff(self):
+        rc, sess = self._run(10, 20, "--max-urls", "15")
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(sess.calls), len(ix.ENDPOINTS))
+        self.assertEqual(len(sess.calls[0][1]["urlList"]), 10)
+
+    def test_default_cap_blocks_google_vs_full_mixup(self):
+        # 구글용(약 6천 장 축소)을 이전 값으로 잘못 쓰면 빠진 몫 전부가 새 URL 이 된다.
+        self.assertLess(ix.MAX_INCREMENTAL, 6000)
+        self.assertGreater(ix.MAX_INCREMENTAL, 2900)  # 11-16 조항 신설 같은 정상 대량 증분은 통과
+
+
 if __name__ == "__main__":
     unittest.main()

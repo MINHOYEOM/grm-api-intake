@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{#- [구글 품질 1단계 2026-11-19] 구글에서만 뺄 조항(국문 미번역 D·짧은 원문 E)은 구글봇만 noindex — 판정은 clause_text_page.google_noindex_reason, sitemap.xml 도 같은 판정으로 뺀다. -#}
+{% block meta_robots %}{% if google_noindex %}<meta name="googlebot" content="noindex, follow" />
+{% endif %}{% endblock %}
 {% block content %}
 {#- [기준 조항 원문] /clauses/{src}/{doc}/{slug}/ — 조항 1개의 원문 전체(무절단) + 공식 원문 + 이 조항의
     지적사례(21 CFR 조항 페이지가 있을 때) + 이 조항을 근거로 든 용어. 국문 번역은 지어내지 않는다. -#}

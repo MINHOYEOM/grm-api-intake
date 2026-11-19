@@ -90,6 +90,8 @@ _TRANSIENT_ERROR_MARKERS = [
     "429 client error", "too many requests",
     "http 502", "http 503", "http 504", "bad gateway",
     "service unavailable", "gateway timeout",
+    # Akamai 봇차단(호스트 전체 apology 404, 2026-11-19 FDA WL·483 동시) — IP 차단성 일시 장애.
+    "abuse-detection-apology",
 ]
 _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES = {"mfds-rss", "mfds-gmp-inspection"}
 _MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {

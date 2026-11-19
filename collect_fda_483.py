@@ -367,6 +367,7 @@ BACKBONE_DATATABLES = "datatables"
 BACKBONE_LEGACY_JSON = "legacy-json"
 BACKBONE_STATIC_HTML = "static-html"
 _LAST_BACKBONE = BACKBONE_DATATABLES
+_LAST_BOT_BLOCKED = False  # 리딩룸 HTML 이 abuse-detection apology 로 막혔는지(직전 호출)
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _MEDIA_RE = re.compile(r"/media/(\d+)/download")
@@ -985,7 +986,8 @@ def _fetch_html_rows(start_date: date | None = None) -> tuple[list[dict[str, str
     (한번 사망했던 레거시 엔드포인트라 "살아있되 갱신 정지"가 현실 위험 — 침묵 누락 금지).
     사용 백본은 module 전역 `_LAST_BACKBONE` 에 기록(관측용).
     """
-    global _LAST_BACKBONE
+    global _LAST_BACKBONE, _LAST_BOT_BLOCKED
+    _LAST_BOT_BLOCKED = False
     static_rows: list[dict[str, str]] = []
     static_count = 0
     config = None
@@ -993,6 +995,9 @@ def _fetch_html_rows(start_date: date | None = None) -> tuple[list[dict[str, str
         html_text = http_get_html(OII_READING_ROOM_URL, timeout=FDA_483_HTML_TIMEOUT,
                                   retries=HTTP_RETRIES, label="FDA 483 HTML")
     except Exception as e:  # noqa: BLE001
+        # [2026-11-19] Akamai 호스트 전체 봇차단(apology 404) 표식 — 실패 문구에 실어 health 가
+        # 일시 차단(경고)으로 분류하게 한다. 구조 변경(표식 없음)은 그대로 failure.
+        _LAST_BOT_BLOCKED = "abuse-detection-apology" in str(e)
         log("WARN", f"FDA 483 HTML fetch 실패: {str(e)[:120]} — 전수 JSON 백본 시도")
     else:
         static_rows, static_count = _html_norm_rows(html_text)
@@ -3191,8 +3196,9 @@ def collect_fda_483(
     - 윈도우 내 0건 → 정상(빈 리스트·error 없음).
     - PDF excerpt/Observation 실패는 graceful(키 미기록·메타 카드 유지·LAST_HEALTH 경고).
     """
-    global LAST_HEALTH, _LAST_BACKBONE
+    global LAST_HEALTH, _LAST_BACKBONE, _LAST_BOT_BLOCKED
     _LAST_BACKBONE = BACKBONE_DATATABLES     # 실행별 리셋(테스트 스텁 시 이전 값 누출 방지)
+    _LAST_BOT_BLOCKED = False
     # [발행일 추가 예산] 진입 시점에 마감 전이면 넓힌 예산으로 시작하고, 루프에서 마감이
     # 지나는 순간 기본 예산으로 되돌린다(이미 쓴 만큼은 기본 예산에서 차감).
     burst_granted = _burst_active()
@@ -3251,7 +3257,9 @@ def collect_fda_483(
             "backbone": _LAST_BACKBONE,
         }
         return [], ("FDA 483 수집 실패: 백본 3단(DataTables/전수JSON/정적HTML) 모두 483 행 0 — "
-                    "소스 구조 변경 또는 일시 장애(수동 확인 필요)")
+                    "소스 구조 변경 또는 일시 장애(수동 확인 필요)"
+                    + (" [일시 차단: abuse-detection-apology — 호스트 전체 봇차단]"
+                       if _LAST_BOT_BLOCKED else ""))
 
     # Publish Date 윈도우 필터(전수 평가·정렬 비의존). 최신 N건 excerpt cap 위해 publish desc 정렬.
     in_window = [r for r in keep_rows

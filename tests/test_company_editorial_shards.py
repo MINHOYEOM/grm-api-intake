@@ -108,6 +108,145 @@ class NextShardTest(unittest.TestCase):
         self.assertEqual(sc.next_shard(self.d, "delta", now=1), "A")
 
 
+class DeepCharsPlanTest(unittest.TestCase):
+    """2026-11-19 리허설 1120g: 카드·관찰 한도 안인데 원문이 샤드당 5~13만 자 — 원문 글자 수로도 나눈다."""
+
+    def test_chars_cap_splits_heavy_shards(self):
+        items = [{"id": f"d{i}", "obs": 3, "chars": 20000} for i in range(20)]   # 40만 자 · 관찰 60 · 20장
+        shards, warn = ps.plan({"delta": [], "deep": items}, deep_chars=60000)
+        self.assertEqual(len(shards["deep"]), 7)                                  # ceil(400000/60000)
+        per = {k: 20000 * len(v) for k, v in shards["deep"].items()}
+        self.assertLessEqual(max(per.values()), 60000)
+        self.assertEqual(sorted(c for v in shards["deep"].values() for c in v), sorted(x["id"] for x in items))
+        self.assertEqual(warn, [])
+
+    def test_oversize_single_card_gets_its_own_shard_and_a_warning(self):
+        items = [{"id": "big", "obs": 17, "chars": 75000}] + [{"id": f"d{i}", "obs": 1, "chars": 5000} for i in range(10)]
+        shards, warn = ps.plan({"delta": [], "deep": items}, deep_chars=60000)
+        self.assertIn(["big"], list(shards["deep"].values()))
+        self.assertTrue(any("big" in w for w in warn))
+
+    def test_handoff_fills_chars_from_deep_analysis_input(self):
+        handoff = {"rows": [{"web_card_id": "a", "deep_analysis_input": {"body_full": "x" * 50000}},
+                            {"web_card_id": "b", "deep_analysis_input": {"body_full": "y" * 50000}},
+                            {"web_card_id": "c", "deep_analysis_input": {"body_full": "z" * 50000}},
+                            {"card_id": "no-web-id"}]}
+        self.assertEqual(ps.handoff_chars(handoff), {"a": 50000, "b": 50000, "c": 50000})
+        items = [{"id": k, "obs": 0} for k in "abc"]
+        self.assertEqual(len(ps.plan({"delta": [], "deep": items})[0]["deep"]), 2)        # 글자 수 모르면 종전
+        self.assertEqual(len(ps.plan({"delta": [], "deep": items}, handoff=handoff)[0]["deep"]), 3)
+
+    def test_small_text_cards_do_not_pile_past_the_card_cap(self):
+        items = [{"id": "big", "chars": 59000}] + [{"id": f"s{i}", "chars": 10} for i in range(23)]
+        shards, _ = ps.plan({"delta": [], "deep": items}, deep_chars=60000, deep_cards=12)
+        self.assertLessEqual(max(len(v) for v in shards["deep"].values()), 12)
+
+    def test_deep_max_is_separate_from_delta_max(self):
+        items = [{"id": f"d{i}", "chars": 60000} for i in range(11)]
+        shards, warn = ps.plan({"delta": [f"c{i}" for i in range(90)], "deep": items})
+        self.assertEqual(len(shards["deep"]), 11)
+        self.assertEqual(len(shards["delta"]), 5)
+        self.assertEqual(warn, [])
+
+
+class ExitCheckTest(unittest.TestCase):
+    """워커는 check 가 exit 0 일 때만 끝낸다(RUN.md 7항)."""
+
+    def setUp(self):
+        self.d = tempfile.mkdtemp()
+        plan = {"delta": {"A": ["c1"], "B": ["c2"]},
+                "deep": {s: [f"d{s}"] for s in "ABCDEFG"}, "tldr": "T"}
+        _w(os.path.join(self.d, "desk.json"), {"status": "완료", "shards": plan})
+        self.until = sc.until_ts("08:55", 1_763_500_000)
+
+    def tearDown(self):
+        shutil.rmtree(self.d, ignore_errors=True)
+
+    def _done(self, kind, *names):
+        for s in names:
+            _w(os.path.join(self.d, f"{kind}.{s}.json"), {"status": "완료"})
+
+    def test_1120g_deep_worker_may_not_quit_with_empty_shards(self):
+        self._done("deep", "A", "B")
+        ok, line = sc.exit_check(self.d, "deep", "심층-1+", now=1000)
+        self.assertFalse(ok)
+        self.assertEqual(line, "CLAIM C")
+
+    def test_all_done_exits_at_once(self):
+        self._done("deep", *"ABCDEFG")
+        self.assertEqual(sc.exit_check(self.d, "deep", "w", until=self.until, now=self.until - 3600), (True, "DONE"))
+
+    def test_boost_waits_for_a_held_shard_to_go_stale(self):
+        self._done("deep", *"ABCDEF")
+        now = self.until - 15 * 60                      # 08:40
+        at = now - 10 * 60                              # 08:30 점유
+        _w(sc._claim_path(self.d, "deep", "G"), {"worker": "심층-2", "at": at})
+        ok, line = sc.exit_check(self.d, "deep", "심층-1+", until=self.until, now=now)
+        self.assertFalse(ok)
+        self.assertTrue(line.startswith("WAIT G "), line)
+        self.assertLessEqual(int(line.split()[2]), sc.WAIT_MAX_SEC)
+        # 08:55 에 점유 25분이 지나 죽은 것으로 판정 → 이어받는다
+        self.assertEqual(sc.exit_check(self.d, "deep", "심층-1+", until=None, now=at + sc.STALE_MIN * 60 + 1),
+                         (False, "CLAIM G"))
+
+    def test_no_takeover_possible_before_deadline_exits(self):
+        self._done("deep", *"ABCDEF")
+        now = self.until - 15 * 60
+        _w(sc._claim_path(self.d, "deep", "G"), {"worker": "심층-2", "at": now - 5 * 60})    # 08:35 점유 → 09:00 에야 죽음 판정
+        self.assertEqual(sc.exit_check(self.d, "deep", "심층-1+", until=self.until, now=now), (True, "NO_TAKEOVER G"))
+        # 리허설(시한 없음)은 끝내지 않고 기다린다
+        self.assertFalse(sc.exit_check(self.d, "deep", "심층-1+", until=None, now=now)[0])
+
+    def test_deadline_passed_exits(self):
+        self.assertEqual(sc.exit_check(self.d, "deep", "w", until=self.until, now=self.until + 1), (True, "DEADLINE"))
+
+    def test_my_own_unfinished_claim_is_still_mine(self):
+        self._done("deep", *"ABCDEF")
+        _w(sc._claim_path(self.d, "deep", "G"), {"worker": "심층-1", "at": 1000})
+        self.assertEqual(sc.exit_check(self.d, "deep", "심층-1", now=1060), (False, "CLAIM G"))
+
+    def test_delta_waits_while_body_held_then_takes_T(self):
+        self._done("delta", "A")
+        _w(sc._claim_path(self.d, "delta", "B"), {"worker": "델타-2", "at": 1000})
+        ok, line = sc.exit_check(self.d, "delta", "델타-1", now=1060)
+        self.assertFalse(ok)
+        self.assertTrue(line.startswith("WAIT B "), line)
+        self._done("delta", "B")
+        self.assertEqual(sc.exit_check(self.d, "delta", "델타-1", now=1120), (False, "CLAIM T"))
+
+    def test_until_is_kst_wall_clock(self):
+        import datetime
+        t = sc.until_ts("08:55", 1_763_500_000)
+        k = datetime.datetime.fromtimestamp(t, sc.KST)
+        self.assertEqual((k.hour, k.minute), (8, 55))
+
+    def test_cli_exit_code(self):
+        self._done("deep", *"ABCDEFG")
+        self.assertEqual(sc.main(["x", "check", self.d, "deep", "w", "--until", "08:55"]), 0)
+        os.remove(os.path.join(self.d, "deep.C.json"))
+        self.assertEqual(sc.main(["x", "check", self.d, "deep", "w"]), 1)
+
+
+class WorkerLoopInstructionTest(unittest.TestCase):
+    """실발행(company/editorial)·다음 판(next/) 지시문이 같은 종료 규칙을 쓴다."""
+
+    def _read(self, *parts):
+        with open(os.path.join(ROOT, "company", "editorial", *parts), encoding="utf-8") as f:
+            return f.read()
+
+    def test_loop_ends_only_on_check_exit_0(self):
+        for folder in ((), ("next",)):
+            run = self._read(*folder, "RUN.md")
+            self.assertIn("shard_claim.py check company/run/{D} <delta|deep> <워커이름> --until 08:55", run, folder)
+            self.assertIn("끝내는 조건은 `check` 의 exit 0 하나뿐이다", run, folder)
+            self.assertNotIn("NONE 이거나 08:55 KST 를 넘었으면 종료", run, folder)
+            self.assertNotIn("할 일이 없으면 바로 종료", run, folder)
+            self.assertIn("--handoff _handoff/handoff_{D}.json", run, folder)
+            self.assertIn("shard_claim.py check` 가 exit 0 을 내기 전에는 끝내지 않는다", self._read(*folder, "reporter.md"), folder)
+            self.assertIn("plan_shards.py <입력.json> --handoff", self._read(*folder, "desk.md"), folder)
+        self.assertIn("`--until 08:55` 를 빼고", self._read("REHEARSAL.md"))
+
+
 def _git(cwd, *a):
     subprocess.run(["git", "-C", cwd, *a], check=True, capture_output=True, text=True, encoding="utf-8")
 

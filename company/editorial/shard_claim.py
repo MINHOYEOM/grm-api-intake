@@ -9,6 +9,8 @@
     python company/editorial/shard_claim.py claim  <run_folder> <delta|deep> <샤드> <워커id>   # 0=내가 잡음, 1=졌음
     python company/editorial/shard_claim.py claim  <run_folder> desk desk <데스크id>          # 데스크 잠금(RUN.md 5-2)
     python company/editorial/shard_claim.py desk   <run_folder>                              # done|held|stale|free
+    python company/editorial/shard_claim.py check  <run_folder> <delta|deep> <워커id> [--until 08:55]
+        # 워커가 끝내도 되는가 — exit 0 = 끝내도 됨(DONE·DEADLINE·NO_TAKEOVER), exit 1 = 끝내면 안 됨(CLAIM <S> · WAIT <S> <초>)
 
 · 샤드 상태 — 완료(`{kind}.{S}.json` 의 status=완료) · 점유(claim 파일, 만든 지 STALE_MIN 분 이내) · 비어 있음.
   점유한 지 STALE_MIN 분이 넘도록 결과가 없으면 죽은 워커로 보고 **가로챌 수 있다**(다른 워커가 덮어쓴다).
@@ -16,12 +18,20 @@
 · claim 의 원자성: claim 파일을 커밋해 push 한다. 거절되면 pull --rebase 를 하고, 같은 파일이 이미 남의 것이면
   (add/add 충돌 또는 새 점유) **졌다**. 3번까지 재시도.
 · 결과 파일(`delta.A.json` 등)은 이 스크립트가 쓰지 않는다 — 기자가 쓴다.
+· check — 워커의 종료 판단은 코드가 한다(2026-11-19 리허설 1120g: 심층 워커가 빈 샤드 5개를 두고 '분량이 크다'며 스스로 끝냈다.
+  사전 점검 3번: 08:40 보강은 점유 25분이 안 된 샤드를 '없음'으로 보고 바로 끝나, 08:15 뒤 잡힌 샤드가 죽으면 이어받을 워커가 없었다).
+  남은 샤드가 남의 점유 중이면 그 점유가 죽은 것으로 판정되는 시각(점유+25분)까지 기다리라고 답한다 — 단 그 시각이 시한(--until)을 넘으면
+  이어받을 수 없으므로 끝내도 된다. 자기 종류가 모두 완료면 곧바로 끝내도 된다(비용 0).
 """
+import datetime
 import json
 import os
 import subprocess
 import sys
 import time
+
+KST = datetime.timezone(datetime.timedelta(hours=9))
+WAIT_MAX_SEC = 300  # 대기는 한 번에 5분 이하(RUN.md 5-2)
 
 STALE_MIN = 25
 RETRIES = 3
@@ -113,6 +123,52 @@ def next_shard(folder, kind, now=None):
     return None
 
 
+def until_ts(hhmm, now):
+    """'08:55' → now 와 같은 KST 날짜의 그 시각(epoch 초). 없으면 None(리허설 — 시한 없음)."""
+    if not hhmm:
+        return None
+    h, m = (int(x) for x in hhmm.split(":"))
+    day = datetime.datetime.fromtimestamp(now, KST)
+    return day.replace(hour=h, minute=m, second=0, microsecond=0).timestamp()
+
+
+def exit_check(folder, kind, worker=None, until=None, now=None):
+    """워커가 끝내도 되는가 → (끝내도 됨?, 판정 한 줄).
+
+    DONE            자기 종류 샤드(+T)가 모두 완료
+    DEADLINE        시한(until, epoch 초)을 넘었다 — 새 샤드를 잡지 않는다
+    CLAIM <S>       빈 샤드·죽은 점유·내 점유가 있다 → 끝내지 말고 가져간다
+    WAIT <S> <초>   남이 점유 중 — 그 점유가 죽은 것으로 판정될 수 있는 시각까지(한 번에 5분 이하) 기다렸다 다시 확인
+    NO_TAKEOVER     남은 점유가 죽은 것으로 판정되는 시각이 시한 뒤라 이어받을 수 없다
+    """
+    now = time.time() if now is None else now
+    mine = [r for r in status(folder, now) if r[0] == kind]
+    if all(r[2] == "done" for r in mine):
+        return True, "DONE"
+    if until is not None and now >= until:
+        return True, "DEADLINE"
+    if worker:
+        for _, s, st, c in mine:
+            # 내가 잡고 결과를 아직 안 낸 샤드 — 내 일이다(결과를 `보류` 로 냈으면 남의 점유처럼 25분 뒤에 다시 본다)
+            if st == "held" and (c or {}).get("worker") == worker and _load(_result_path(folder, kind, s)) is None:
+                return False, f"CLAIM {s}"
+    s = next_shard(folder, kind, now)
+    if s:
+        return False, f"CLAIM {s}"
+    held = [(float((c or {}).get("at", 0)) + STALE_MIN * 60, s) for _, s, st, c in mine if st == "held"]
+    if not held:
+        # 남은 것이 T 뿐이고 아직 델타 본 샤드가 덜 끝난 경우 등 — 점유가 없으면 곧 next 가 답한다
+        return False, f"WAIT - {WAIT_MAX_SEC}"
+    stale_at, s = min(held)
+    if until is not None and stale_at > until:
+        return True, f"NO_TAKEOVER {s}"
+    wait = min(WAIT_MAX_SEC, int(stale_at - now) + 1)
+    if until is not None:
+        wait = min(wait, int(until - now) + 1)
+    wait = max(1, wait)
+    return False, f"WAIT {s} {wait}"
+
+
 def _git(root, *args, check=True):
     return subprocess.run(["git", "-C", root, *args], capture_output=True, text=True, encoding="utf-8",
                           errors="replace", check=check)
@@ -179,6 +235,24 @@ def main(argv):
         return 0
     if cmd == "claim":
         return 0 if claim(folder, argv[3], argv[4], argv[5]) else 1
+    if cmd == "check":
+        rest = argv[3:]
+        hhmm = None
+        if "--until" in rest:
+            k = rest.index("--until")
+            hhmm = rest[k + 1]
+            rest = rest[:k] + rest[k + 2:]
+        kind, worker = rest[0], (rest[1] if len(rest) > 1 else None)
+        try:  # 남의 결과·점유를 새로 받는다(실패해도 로컬 상태로 판단)
+            root = _repo_root(folder)
+            branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+            _git(root, "pull", "--rebase", "origin", branch, check=False)
+        except (OSError, subprocess.CalledProcessError):
+            pass
+        now = time.time()
+        ok, line = exit_check(folder, kind, worker, until_ts(hhmm, now), now)
+        print(line)
+        return 0 if ok else 1
     print("모르는 명령:", cmd)
     return 2
 

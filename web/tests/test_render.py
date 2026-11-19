@@ -6798,9 +6798,13 @@ class WebFirmRenderTest(unittest.TestCase):
 
         개수는 매직 넘버로 박지 않고 **정본에서 파생**한다 — 데이터가 늘면 함께 는다."""
         self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/firm/</loc>", self.sitemap)
+        # [구글 품질 1단계 2026-11-19] sitemap 은 두 벌이다 — 구글용(sitemap.xml)은 얇은 업체(C)를 빼고,
+        # 전체 목록(sitemap-full.xml, IndexNow 용)은 전부 싣는다. 쿼리 URL 불변은 **둘 다**에 건다.
+        full = (self.single / "sitemap-full.xml").read_text(encoding="utf-8")
         # ★불변: 쿼리스트링 URL 은 어떤 형태로도 sitemap 에 없다.
-        self.assertNotIn("/findings/firm/?", self.sitemap)
-        self.assertNotIn("?key=", self.sitemap)
+        for sm in (self.sitemap, full):
+            self.assertNotIn("/findings/firm/?", sm)
+            self.assertNotIn("?key=", sm)
         docs = render.load_findings_docs()
         if not docs:
             self.skipTest("findings_docs.json 미존재")
@@ -6810,11 +6814,15 @@ class WebFirmRenderTest(unittest.TestCase):
             if k:
                 by_firm[k] = by_firm.get(k, 0) + 1
         expected = sum(1 for n in by_firm.values() if n >= 2)
-        listed = len(re.findall(
-            rf"<loc>{re.escape(render.SITE_BASE_URL)}/findings/firm/[^/<]+/</loc>",
-            self.sitemap))
-        self.assertEqual(listed, expected,
-                         "정적 업체 페이지 수와 sitemap 등록 수가 다르다")
+        pat = rf"<loc>{re.escape(render.SITE_BASE_URL)}/findings/firm/[^/<]+/</loc>"
+        listed_full = set(re.findall(pat, full))
+        listed_google = set(re.findall(pat, self.sitemap))
+        self.assertEqual(len(listed_full), expected,
+                         "정적 업체 페이지 수와 전체 sitemap 등록 수가 다르다")
+        # 구글용은 전체의 부분집합이고, 얇은 업체가 실제로 빠졌다(판정과 메타 일치는
+        # test_thin_page_googlebot.ThinPageMetaTest.test_sitemap_agrees_with_page_meta 가 전수 대조).
+        self.assertLess(listed_google, listed_full)
+        self.assertTrue(listed_google, "구글용 sitemap 에 업체 페이지가 하나도 없다")
 
     def test_nav_not_added_entry_only_via_link(self):
         # 요구사항: base.html nav 에 신규 탭을 추가하지 않는다(진입은 findings.js 의 문서

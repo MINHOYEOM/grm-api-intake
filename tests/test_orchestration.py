@@ -283,6 +283,22 @@ class EvaluateHealthFailureBranchTest(unittest.TestCase):
                                  _codes(health.failures))
                 self.assertEqual(health.exit_code, 0)
 
+    def test_fda483_akamai_apology_block_is_warning_not_red(self) -> None:
+        # 2026-11-19 실측: FDA 호스트 전체가 abuse-detection-apology 404 → 483 3단 백본 전멸.
+        # IP 차단성 일시 장애라 warning(exit 0). 표식 없는 구조 변경은 failure 유지.
+        stats = ci.CollectionStats()
+        stats.fda483_error = True
+        stats.fda483_error_msg = ("FDA 483 수집 실패: 백본 3단 모두 483 행 0 — 소스 구조 변경 또는 "
+                                  "일시 장애(수동 확인 필요) [일시 차단: abuse-detection-apology]")
+        health = ci._evaluate_health(**_health_kwargs(
+            stats=stats, active={"fr", "recall"}, enable_fda483=True))
+        self.assertIn("transient-source-error:fda483", _codes(health.warnings))
+        self.assertEqual(health.exit_code, 0)
+        stats.fda483_error_msg = "FDA 483 수집 실패: 백본 3단 모두 483 행 0 — 소스 구조 변경"
+        health = ci._evaluate_health(**_health_kwargs(
+            stats=stats, active={"fr", "recall"}, enable_fda483=True))
+        self.assertIn("enabled-source-error:fda483", _codes(health.failures))
+
     def test_t1_active_global_source_structural_error_stays_failure(self) -> None:
         # T1 경계: 같은 ICH 라도 구조 오류(마커 없음)는 failure(exit 1) 유지.
         stats = ci.CollectionStats()

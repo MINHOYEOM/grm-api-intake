@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-19T14:49:17Z",
+ "generated_at": "2026-11-19T21:05:57Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 44614024921,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-19T20:58:19Z",
+    "updatedAt": "2026-11-19T21:05:25Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1829 from MINHOYEOM/claude/glossary-fig-daily-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44614024921"
+   },
+   {
     "databaseId": 44546535385,
     "status": "completed",
     "conclusion": "success",
@@ -216,17 +227,6 @@
     "headBranch": "feat/google-quality-stage1",
     "displayTitle": "feat(seo): 구글 품질 정리 1단계 — 구글 전용 noindex·구글용 sitemap 일치, IndexNow 전체 목록",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44537192830"
-   },
-   {
-    "databaseId": 44537177867,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-19T13:48:46Z",
-    "updatedAt": "2026-11-19T13:56:36Z",
-    "headBranch": "feat/google-quality-stage1",
-    "displayTitle": "feat(seo): 구글 품질 정리 1단계 — 구글 전용 noindex 와 구글용 sitemap 일치, IndexNow 는 …",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44537177867"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 44615239738,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-19T21:05:30Z",
+    "updatedAt": "2026-11-19T21:05:37Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44615239738"
+   },
+   {
     "databaseId": 44547862552,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44397216468"
-   },
-   {
-    "databaseId": 44243311557,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-18T05:18:17Z",
-    "updatedAt": "2026-11-18T05:18:18Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44243311557"
    }
   ],
   "grm-findings-translate-apply.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 44611611989,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "schedule",
+    "createdAt": "2026-11-19T20:43:44Z",
+    "updatedAt": "2026-11-19T20:52:01Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44611611989"
+   },
+   {
     "databaseId": 44480501974,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44175202555"
-   },
-   {
-    "databaseId": 44043227004,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-17T08:01:26Z",
-    "updatedAt": "2026-11-17T09:58:45Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44043227004"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 44613981563,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-19T20:58:03Z",
+    "updatedAt": "2026-11-19T20:58:29Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44613981563"
+   },
+   {
     "databaseId": 44483372403,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44178586249"
-   },
-   {
-    "databaseId": 44047031625,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-17T08:28:32Z",
-    "updatedAt": "2026-11-17T08:28:54Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44047031625"
    }
   ],
   "grm-cloud-request.yml": [

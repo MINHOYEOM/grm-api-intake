@@ -153,7 +153,8 @@ class ComputeStatesTest(unittest.TestCase):
         self.assertEqual(got["FR::dropped"]["state"], "skipped")
         self.assertEqual(got["FR::t1"]["reason"], "tier1")
         self.assertEqual(got["MFDS::watch"]["reason"], "watch")
-        self.assertEqual(got["FR::plain"]["reason"], "not_carded")
+        self.assertEqual(got["FR::plain"], {"state": "new", "reason": "not_carded",   # 닫지 않는다
+                                            "brief_publish_date": ""})
         self.assertEqual(got["FR::held"]["state"], "deferred")
         self.assertEqual(got["Recall::member"]["state"], "processed")       # 대표를 따른다
         self.assertEqual(got["Recall::member"]["reason"], "merged:published")
@@ -225,7 +226,8 @@ class ReconcileTest(unittest.TestCase):
         gq.reconcile(self.store, self.root, RUN)
         self.assertEqual(self.store.queue["FR::a"]["state"], "processed")
         self.assertEqual(self.store.queue["FR::a"]["brief_publish_date"], "2026-11-09")
-        self.assertEqual(self.store.queue["FR::b"]["state"], "skipped")
+        self.assertEqual(self.store.queue["FR::b"]["state"], "new")           # 카드 안 됨 — 다음 주 후보
+        self.assertEqual(self.store.queue["FR::b"]["state_reason"], "not_carded")
         self.assertEqual(self.store.queue["FR::c"]["state"], "deferred")
         self.assertEqual(self.store.handoffs["2026-11-09"]["status"], gq.HANDOFF_CONSUMED)
         self.assertEqual(self.store.handoffs["2026-11-09"]["consumed_evidence"],
@@ -240,7 +242,7 @@ class ReconcileTest(unittest.TestCase):
         self._publish("2026-11-09", ["a"], brief_ids=["a"], deferred=["FR::c"])
         gq.reconcile(self.store, self.root, RUN)
         rows, _, _ = gq.load_candidates(self.store, RUN, 30, gh._HANDOFF_V2_ROW_KEEP)
-        self.assertEqual([r["document_id"] for r in rows], ["c"])            # 보류분만 다시 후보
+        self.assertEqual([r["document_id"] for r in rows], ["b", "c"])       # 카드 안 된 행·보류분이 다시 후보
         self._handoff("2026-11-16", "c")
         self._publish("2026-11-16", ["c"], brief_ids=["c"])
         gq.reconcile(self.store, self.root, RUN)
@@ -251,6 +253,50 @@ class ReconcileTest(unittest.TestCase):
         self.assertEqual(self.store.queue["FR::c"]["state"], "processed")
         # 옛 호의 '보류'로 잠깐 되돌렸다가 다시 쓰지 않는다(중간에 끊기면 틀린 상태가 남는다).
         self.assertEqual(self.store.writes, before)
+
+    def test_uncarded_483_rows_of_1116_reenter_1118_handoff(self):
+        """11-19 검토 5절 8번(대표 결정 A) 재현: 11-16 호 handoff 에 올랐지만 카드가 되지 않은 483 2건
+        (196254·196260)은 노션에서 `New` 로 남아 11-18 handoff 에 다시 올랐다. DB 도 같아야 한다 —
+        예전에는 `skipped(not_carded)` 로 닫혀 11-18 후보에서 빠졌다."""
+        src = "FDA 483"
+        docs = ("196254", "196260")
+        for d in docs:
+            self.store.add_raw(_record(src, d))
+        self.store.enqueue([{"source": src, "document_id": d, "first_seen_run_date": "2026-11-12",
+                             "first_seen_at": "2026-11-12T03:30:00+09:00"} for d in docs])
+        manifest = _manifest({"source": "FR", "document_id": "a"},
+                             *[{"source": src, "document_id": d, "section": "483"} for d in docs])
+        self.store.upsert_handoff({"handoff_date": "2026-11-16", "status": gq.HANDOFF_OPEN,
+                                   "consumed_evidence": "", "manifest": manifest})
+        self._publish("2026-11-16", ["a"], brief_ids=["a"])        # 그 주에 카드가 된 것은 a 뿐
+        run = date(2026, 11, 18)
+        gq.reconcile(self.store, self.root, run)
+        for d in docs:
+            row = self.store.queue[gq.row_key(src, d)]
+            self.assertEqual((row["state"], row["state_reason"]), ("new", "not_carded"), d)
+            self.assertEqual(row["handoff_date"], "2026-11-16")
+            self.assertIsNone(row["brief_publish_date"])
+        rows, _, _ = gq.load_candidates(self.store, run, 30, gh._HANDOFF_V2_ROW_KEEP)
+        got = {(r["source"], r["document_id"]) for r in rows}
+        self.assertTrue({(src, d) for d in docs} <= got, got)      # 11-18 handoff 후보에 다시 오른다
+        self.assertNotIn(("FR", "a"), got)                          # 실린 행은 닫힌 그대로
+        # 노션 Status 와 비교해도 일치(노션 New = 코드 new).
+        states = gq.compute_states(manifest, {"cards": {"a": {}}}, {"cards": [{"id": "a"}]}, "2026-11-16")
+        cmp_ = gq.compare_states(states, {"FR::a": "Processed",
+                                          **{gq.row_key(src, d): "New" for d in docs}})
+        self.assertEqual(cmp_["mismatch"], 0)
+        # 노션 Status 기록 계획도 New 행을 건드리지 않는다.
+        todo, _ = gq.plan_notion_sync(states, [], {gq.row_key(src, d): {"page_id": f"p{d}", "status": "New"}
+                                                   for d in docs})
+        self.assertEqual(todo, [])
+
+    def test_uncarded_row_leaves_candidates_after_window(self):
+        self._handoff("2026-11-09", "ab")
+        self._publish("2026-11-09", ["a"], brief_ids=["a"])
+        gq.reconcile(self.store, self.root, RUN)
+        far = date(2026, 12, 20)                                    # 첫 수집 11-05 + 30일 창 밖
+        rows, _, _ = gq.load_candidates(self.store, far, 30, gh._HANDOFF_V2_ROW_KEEP)
+        self.assertEqual(rows, [])
 
     def test_late_brief_corrects_provisional_state(self):
         self._handoff("2026-11-09", "ab")
@@ -267,7 +313,7 @@ class ReconcileTest(unittest.TestCase):
         self._publish("2026-11-09", ["a"], brief_ids=["a"])
         out = gq.reconcile(self.store, self.root, RUN, apply=False)
         self.assertEqual(self.store.writes, 0)
-        self.assertEqual(out["states"], {"processed": 1, "skipped": 2})
+        self.assertEqual(out["states"], {"processed": 1, "new": 2})   # 카드 안 된 b·c 는 열린 채
 
 
 class CandidatesTest(unittest.TestCase):
@@ -794,19 +840,20 @@ class NotionSyncTest(unittest.TestCase):
         self._delta()
         out = self._sync()
         self.assertEqual(self.patched, [])
-        self.assertEqual(out["stats"]["to_set"], 3)
-        self.assertEqual((out["stats"]["Processed"], out["stats"]["Skipped"]), (1, 2))
+        self.assertEqual(out["stats"]["to_set"], 2)
+        self.assertEqual((out["stats"]["Processed"], out["stats"]["Skipped"]), (1, 1))
 
     def test_apply_stamps_only_rows_that_are_new_in_notion(self):
         self._delta()
         out = self._sync(apply=True)
-        self.assertEqual(sorted(self.patched), [("p-oos", "Skipped"), ("p-pub", "Processed"),
-                                                ("p-skip", "Skipped")])
-        self.assertEqual((out["patched"], out["failed"]), (3, 0))
+        self.assertEqual(sorted(self.patched), [("p-oos", "Skipped"), ("p-pub", "Processed")])
+        self.assertEqual((out["patched"], out["failed"]), (2, 0))
+        # 카드가 안 된 행(skip)은 New 그대로 — 다음 주 후보로 다시 오른다(11-19 대표 결정 A).
+        self.assertNotIn("p-skip", [p for p, _ in self.patched])
         stats = out["stats"]
         self.assertEqual(stats["deferred"], 1)            # 보류 행은 건드리지 않는다(다음 주 재유입)
         self.assertEqual(stats["already_set"], 1)         # 이미 찍힌 행은 그대로
-        self.assertEqual(stats["not_in_notion"], 1)       # 노션에 없는 행은 만들지 않는다
+        self.assertEqual(stats["not_in_notion"], 0)       # 노션에 없는 행(gone)도 카드가 안 돼 열린 채 — 찍을 것 없음
         self.assertNotIn(("p-hold", "Skipped"), self.patched)
         self.assertNotIn("p-x", [p for p, _ in self.patched])   # handoff 밖 행은 손대지 않는다
 
@@ -837,7 +884,7 @@ class NotionSyncTest(unittest.TestCase):
         with patch.object(gq, "log"):
             out = gq.notion_sync(self.store, "tok", "db", "2026-11-16", self.root, apply=True,
                                  rows_reader=lambda *a: self.notion, patch_status=patch_status)
-        self.assertEqual((out["patched"], out["failed"]), (2, 1))
+        self.assertEqual((out["patched"], out["failed"]), (1, 1))
 
     def test_plan_never_moves_a_row_back_to_new(self):
         todo, _ = gq.plan_notion_sync({"FR::a": {"state": "new"}, "FR::b": {"state": "deferred"}},

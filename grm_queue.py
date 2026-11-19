@@ -21,7 +21,10 @@
     error      status_hint=Error (카드가 실렸어도 Error 가 우선)
     processed  발행본에 카드로 실림(병합 멤버는 대표를 따른다)
     deferred   델타의 `deferred` 목록에 있음 → 다음 handoff 에 다시 들어간다
-    skipped    그 밖 — 사유: out_of_scope_483 · tier1 · watch · carded_not_published · not_carded
+    new        사유 not_carded — handoff 에 올랐지만 카드가 되지 않았고 따로 닫을 사유도 없음.
+               열린 채 두어 다음 주 handoff 후보로 다시 올린다(수집일 창 N일 안에서만). 노션에서 Status 를
+               바꾸지 않아 `New` 로 남던 것과 같은 동작(2026-11-19 대표 결정 — 11-16 호 483 2건)
+    skipped    그 밖 — 사유: out_of_scope_483 · tier1 · watch · carded_not_published
 """
 from __future__ import annotations
 
@@ -405,7 +408,9 @@ def compute_states(manifest: list[dict[str, Any]], delta: dict[str, Any],
             return STATE_SKIPPED, "tier1"
         if row.get("section") == "watch":
             return STATE_SKIPPED, "watch"
-        return STATE_SKIPPED, "not_carded"
+        # 카드가 안 된 행은 닫지 않는다 — 다음 주 후보로 다시 올린다(노션의 'Status 미변경 = New' 와 같다).
+        # 창(window_days) 밖으로 나가면 후보에서 저절로 빠진다.
+        return STATE_NEW, "not_carded"
 
     by_key = {row_key(r.get("source", ""), r.get("document_id", "")): r for r in manifest}
     out: dict[str, dict[str, str]] = {}

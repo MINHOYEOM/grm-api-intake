@@ -23,7 +23,12 @@ python company/editorial/backup_gate.py $D
 ```
 첫 줄이 `RUN` 이면 1번으로. `WAIT` 면 5분 뒤 다시(`sleep` 은 한 번에 5분 이하, 기다리는 동안 다른 일 금지). `SKIP` 이면 정상 — 아무것도 쓰지 않고 끝낸다.
 `STOP` 이면 2번 기록만 남기고 끝낸다(대표가 정한다). 판정 근거는 둘째 줄 JSON 이다 — 다르게 해석하지 않는다.
-- `RUN` 의 뜻: main 에 이번 호 델타가 없고, 브릿지가 편집팀 반납을 쓸 수 없고(`delta_bridge.load_git_run`·`load_run_scaffold` — 브릿지와 같은 함수),
+- **판정을 읽지 못했을 때(exit 2 — 첫 줄 없이 stderr 에 `읽기 실패: …`)**: 원격(main·`claude/queue-handoff`·`B`)을 받지 못한 것이다. 시작하지 않는다.
+  5분 뒤 같은 명령을 다시 — **세 번까지**(처음 포함). 그 사이 `RUN`·`WAIT`·`SKIP`·`STOP` 이 나오면 위 규칙대로. 세 번 다 exit 2 면
+  2번 기록을 남기고 끝낸다: `상태: 실패` · `한 일: 판정 읽기 실패 3회 — 백업 안 함` · `대표가 볼 것: 편집팀 반납·main 델타를 사람이 확인` ·
+  `판정: 읽기 실패 — <stderr 첫 줄>`. 그 push 도 안 되면 이 실행의 마지막 출력에 같은 네 줄을 남긴다(Routine 실행 기록이 유일한 기록이 된다).
+  11:00 KST 가 지나면 다시 하지 않고 바로 이 기록으로 끝낸다.
+- `RUN` 의 뜻: main 에 이번 호 델타가 없고, 브릿지가 편집팀 반납을 쓸 수 없고(`delta_bridge.load_git_run` → `_prepare_adoptable` — 채택 조건·봉투·호 날짜·스캐폴드, 브릿지와 같은 검증),
   편집팀이 스스로 끝냈거나(교열 `보류`·`실패`, 교열 없이 데스크 `보류`·`실패`) 09:40 KST 가 지났다(교열 마감 09:25).
 - 11:00 KST 가 지나도록 `RUN` 이 안 나오면 `STOP` 이 나온다. 그 뒤에 시작하지 않는다.
 
@@ -73,8 +78,9 @@ RUN.md 2항대로 `_handoff/handoff_$D.json`, 교열 1번대로 `_scaffold/brief
    python company/editorial/backup_gate.py $D --final                                            # 첫 줄 RUN
    ```
    `--final` 이 `SKIP` 이면(그 사이 편집팀 반납이 쓸 수 있게 됐거나 main 에 델타가 생겼다) `copyedit.json` 의 `status` 를 `보류`, `published` 를 `false` 로 고쳐 쓴다 — 발행 길에 두 번째 반납을 올리지 않는다.
+   `--final` 이 exit 2(읽기 실패)면 0항과 같이 5분 간격 세 번까지 다시 본다. 세 번 다 exit 2 면 `완료` 로 반납하지 않는다 — `copyedit.json` 을 `보류`(`published: false`, 사유 `--final 판정 읽기 실패`)로 써서 push 한다.
 6. `F` 의 `desk.json`·샤드 파일·`delta.json`·(있으면) `deep_delta.json`·`scaffold.json`·`copyedit.json`·`brief_check.json`·`backup.md` 를 `git add` 로 하나씩 올려 커밋·push(2번 방식).
-   13:15 KST 까지 push 하지 못하면 `copyedit.json` 을 `실패` 로 고쳐 push 하고 끝낸다(브릿지 마지막 회차 13:37).
+   13:15 KST 까지 push 하지 못하면 `copyedit.json` 을 `실패` 로 고쳐 push 하고 끝낸다(그 뒤 브릿지 회차 13:37·14:07·14:37 — 한 회차가 늦거나 빠져도 남은 회차가 가져간다).
    브릿지가 가져가 main 에 넣으면 발행 PR·승인은 편집팀 호와 같다 — 백업은 그 뒤를 기다리지 않는다.
 
 ## 리허설 (실발행 없이 백업만 돌려 보기)

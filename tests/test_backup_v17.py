@@ -93,8 +93,21 @@ class GateDecideTest(unittest.TestCase):
         self.assertLess("09:25", bg.EDITORIAL_GRACE)
         self.assertLess(bg.EDITORIAL_GRACE, bg.START_DEADLINE)
         wf = (ROOT / ".github" / "workflows" / "grm-delta-bridge.yml").read_text(encoding="utf-8")
-        self.assertIn("'7,37 0-4 * * 1'", wf)  # 월 09:07~13:37 KST — 백업 반납 시한 13:15 뒤에 한 회차 남는다
-        self.assertLess(bg.FINISH_DEADLINE, "13:37")
+        # 월 09:07~14:37 KST — 백업 반납 시한 13:15 뒤에 브릿지 회차가 셋(13:37·14:07·14:37) 남는다.
+        # 한 회차가 지각·누락돼도 반납이 남은 채 끝나지 않게(11-19 검토 6번).
+        self.assertIn("'7,37 0-5 * * 1'", wf)
+        self.assertEqual(bg.BRIDGE_LAST, "14:37")
+        after = [hm for hm in ("13:07", "13:37", "14:07", "14:37") if bg.FINISH_DEADLINE < hm <= bg.BRIDGE_LAST]
+        self.assertGreaterEqual(len(after), 3, after)
+
+    def test_bridge_commit_message_names_who_wrote_it(self) -> None:
+        # 11-19 검토 5번: 백업 글도 "편집팀 git 반납" 으로 적히던 것을 by 로 가른다(커밋 메시지 + run 요약).
+        wf = (ROOT / ".github" / "workflows" / "grm-delta-bridge.yml").read_text(encoding="utf-8")
+        self.assertIn('BY="${{ steps.bridge.outputs.by }}"', wf)
+        self.assertIn('MSG="백업 v17 git 반납 (by=backup)"', wf)
+        self.assertIn('MSG="편집팀 git 반납 (by=editorial)"', wf)
+        self.assertIn("by=${BY:-notion}", wf)
+        self.assertIn('"$GITHUB_STEP_SUMMARY"', wf.split('MSG="편집팀 git 반납 (by=editorial)"', 1)[1].split("- name:", 1)[0])
 
 
 class GateUsableTest(unittest.TestCase):
@@ -116,6 +129,60 @@ class GateUsableTest(unittest.TestCase):
         ok, why = bg.usable(db, DATE, self._read({"delta.json": d, "copyedit.json": _COPYEDIT_OK}), "")
         self.assertFalse(ok)
         self.assertIn("scaffold.json", why)
+
+    def test_return_rejected_by_bridge_validation_is_not_usable(self) -> None:
+        # 11-19 검토 1번 재현: 채택 조건(교열 `완료`·코드 검사 0·reject 0)은 채웠지만 브릿지의 뒤 검증
+        # (`prepare_git_run` — 호 날짜)이 떨어뜨리는 반납. 예전 판정은 `usable=True` → SKIP 이었고 브릿지는
+        # 거절해 아무도 발행하지 않았다. 이제 판정도 "쓸 수 없다" → 09:40 부터 RUN.
+        wrong_date = _git_delta()
+        wrong_date["publish_date"] = "2026-07-20"  # 브랜치 날짜 2026-07-13 과 다름
+        files = {"delta.json": wrong_date, "copyedit.json": _COPYEDIT_OK}
+        self.assertTrue(db.load_git_run(DATE, read=self._read(files))["adoptable"])  # 채택 조건은 채움
+        with mock.patch.object(db, "git_read_handoff", return_value=None):
+            ok, why = bg.usable(db, DATE, self._read(files), "")
+            with self.assertRaises(db.DeltaBridgeError):  # 브릿지는 거절한다
+                db._prepare_adoptable("", "", db.load_git_run(DATE, read=self._read(files)), self._read(files))
+        self.assertFalse(ok)
+        self.assertIn("브릿지 검증", why)
+        st = _state(editorial_usable=ok, editorial_reason=why, desk={"status": "완료"},
+                    copyedit={"status": "완료"})
+        self.assertEqual(bg.decide(st, "09:45")[0], "RUN")
+        self.assertEqual(bg.decide(st, "12:50", final=True)[0], "RUN")
+
+    def test_gate_and_bridge_agree(self) -> None:
+        """판정의 '쓸 수 있다'와 브릿지의 채택이 같은 답을 내는가 — 반납 꼴 여럿으로."""
+        bad_env = _git_delta()
+        bad_env["cards"] = []  # 봉투 형식 위반
+        wrong_date = _git_delta()
+        wrong_date["publish_date"] = "2026-07-20"
+        no_scaffold = _git_delta()
+        no_scaffold["handoff_ref"] = REF
+        cases = {"정상": {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_OK},
+                 "교열 보류": {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_HELD},
+                 "봉투 위반": {"delta.json": bad_env, "copyedit.json": _COPYEDIT_OK},
+                 "호 날짜 다름": {"delta.json": wrong_date, "copyedit.json": _COPYEDIT_OK},
+                 "스캐폴드 없음": {"delta.json": no_scaffold, "copyedit.json": _COPYEDIT_OK}}
+        env = {"GRM_INTAKE_NOTION": "off"}
+        for name, files in cases.items():
+            with self.subTest(name), mock.patch.dict(os.environ, env), \
+                    mock.patch.object(db, "git_read_handoff", return_value=None), \
+                    mock.patch.object(db, "notion_api_request", side_effect=AssertionError("노션 호출 금지")):
+                gate_ok, _ = bg.usable(db, DATE, self._read(files), "")
+                run = db.load_git_run(DATE, read=self._read(files))
+                try:
+                    bridge_ok = run["adoptable"] and db._prepare_adoptable("", "", run, self._read(files)) is not None
+                except db.DeltaBridgeError:
+                    bridge_ok = False
+                self.assertEqual(gate_ok, bridge_ok, name)
+                self.assertEqual(gate_ok, name == "정상", name)
+
+    def test_usable_restores_notion_env(self) -> None:
+        files = {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_OK}
+        with mock.patch.dict(os.environ, {}, clear=False), \
+                mock.patch.object(db, "git_read_handoff", return_value=None):
+            os.environ.pop("GRM_INTAKE_NOTION", None)
+            bg.usable(db, DATE, self._read(files), "")
+            self.assertNotIn("GRM_INTAKE_NOTION", os.environ)
 
     def test_backup_subfolder_is_read(self) -> None:
         files = {"backup/delta.json": _git_delta(), "backup/copyedit.json": _COPYEDIT_OK}
@@ -224,6 +291,15 @@ class BackupInstructionsTest(unittest.TestCase):
                      "merge_parts.py company/run/$D/backup", "assemble_publish_brief.py", "precheck.py terms",
                      "precheck.py deep", "claude/queue-handoff", '"by":"backup"', "git add -A` 금지"):
             self.assertIn(must, text, must)
+
+    def test_gate_read_failure_has_a_rule(self) -> None:
+        # 11-19 검토 4번: 판정 exit 2(원격 읽기 실패) 때 기록 없이 끝나지 않게.
+        text = self._read("company", "editorial", "backup.md")
+        zero = text.split("## 0.", 1)[1].split("## 1.", 1)[0]
+        self.assertIn("exit 2", zero)
+        self.assertIn("세 번까지", zero)
+        self.assertIn("판정: 읽기 실패", zero)
+        self.assertIn("`--final` 이 exit 2", text)
 
     def test_backup_writes_only_its_subfolder(self) -> None:
         self.assertEqual(db.BACKUP_SUBDIR, "backup")

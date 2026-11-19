@@ -18,7 +18,7 @@ Notion 은 보지 않는다 — 발행 길에서 빠졌다(편집팀 `company/ed
    백업 폴더에 `claims/backup.run.claim` 은 있는데 `copyedit.json` 이 없으면 `대기: 백업 진행 중`(백업은 13:15 KST 까지 반납한다 — 정상 진행).
    이미 main 에 `web/data/deltas/delta_$UNDER.json` 이 있어도 정상이다(브릿지가 가져갔다). 셋 다 없으면 `★델타 없음`.
 2. **main 반영** — `git fetch origin main` 후 `web/data/deltas/delta_$UNDER.json`·`deep_$UNDER.json` 이 있는지.
-   git 반납이 있는데 파일이 없으면 브릿지가 아직 안 돈 것이다(크론이 13:37 까지 30분마다 돈다) → `대기: 브릿지`.
+   git 반납이 있는데 파일이 없으면 브릿지가 아직 안 돈 것이다(크론이 월 14:37 KST 까지 30분마다 돈다) → `대기: 브릿지`.
    **스캐폴드 동결**도 본다 — main 의 `delta_$UNDER.json` 에 `handoff_ref` 키가 있으면(편집팀이 git handoff 로 만든 호) `web/data/scaffolds/brief_web_$UNDER.json` 도 main 에 있어야 한다.
    없으면 `★스캐폴드 동결 없음`(발행 조립이 다른 스캐폴드를 쓰게 된다 — `상태: 보류`). 백업 v17 이 반납한 호도 `handoff_ref` 가 있으므로 같은 규칙이다.
 3. **발행 PR** — 열린 PR 중 head 가 `publish/brief-$D` 인 것. head sha 의 check-runs 가 전부 `success` 인지.

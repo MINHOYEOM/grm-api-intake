@@ -8,11 +8,13 @@
 첫 줄은 한 단어 — `RUN`(시작·반납해도 된다) · `WAIT`(5분 뒤 다시) · `SKIP`(할 일 없음, 정상) · `STOP`(못 한다, 대표 결정).
 둘째 줄은 근거 JSON. exit 0=RUN · 3=WAIT · 4=SKIP/STOP · 2=읽기 실패.
 
-판정의 기준은 **발행 브릿지와 같은 함수**다(`delta_bridge.load_git_run`·`load_run_scaffold`). 브릿지가 편집팀 반납을
-가져갈 수 있으면 백업은 하지 않는다 — 그래서 한 호에 두 반납이 발행 길에 오르지 않는다. 그래도 둘이 겹치면 브릿지가
+판정의 기준은 **발행 브릿지와 같은 함수**다(`delta_bridge.load_git_run` → `_prepare_adoptable` — 채택 조건 · 호 날짜·봉투
+검증(`prepare_git_run`) · 스캐폴드). 채택 조건만 보고 뒤 검증을 건너뛰면 "판정은 SKIP, 브릿지는 검증 실패"로 아무도 발행하지
+않는 틈이 생긴다(11-19 검토 1번). 브릿지가 편집팀 반납을 가져갈 수 있으면 백업은 하지 않는다 — 그래서 한 호에 두 반납이 발행 길에 오르지 않는다. 그래도 둘이 겹치면 브릿지가
 편집팀 쪽을 먼저 보고, main 에는 먼저 기록된 하나만 남는다(`delta_bridge._existing_conflicts`).
 
-시각(KST, 월요일 실행) — 근거는 `RUN.md` 5항(교열 마감 09:25)과 발행 브릿지 크론(월 13:37 KST 가 마지막 회차):
+시각(KST, 월요일 실행) — 근거는 `RUN.md` 5항(교열 마감 09:25)과 발행 브릿지 크론(월 14:37 KST 가 마지막 회차 —
+13:15 반납 뒤 13:37·14:07·14:37 세 회차가 본다):
   · 09:40 전: 편집팀이 끝났다는 표시(교열 `보류`·`실패`, 또는 교열 없이 데스크 `보류`·`실패`)가 없으면 WAIT.
   · 09:40 부터: 편집팀 반납을 브릿지가 쓸 수 없으면 RUN(교열 `재작업`·미착수도 포함 — 09:25 시한이 지났다).
   · 11:00 까지 시작하지 못하면 STOP(백업이 끝나기 전에 브릿지 마지막 회차가 지난다).
@@ -29,8 +31,10 @@ sys.path.insert(0, ROOT)
 
 EDITORIAL_GRACE = "09:40"   # 교열 마감(09:25) + 여유. 이 전에는 편집팀이 끝났다는 표시가 있어야 시작한다
 START_DEADLINE = "11:00"    # 이 뒤에는 시작하지 않는다
-FINISH_DEADLINE = "13:15"   # 백업이 이때까지 반납하지 못하면 `실패` 로 끝낸다(브릿지 마지막 회차 13:37)
+FINISH_DEADLINE = "13:15"   # 백업이 이때까지 반납하지 못하면 `실패` 로 끝낸다(뒤에 브릿지 13:37·14:07·14:37)
+BRIDGE_LAST = "14:37"       # 발행 브릿지 월요일 마지막 회차(grm-delta-bridge.yml '7,37 0-5 * * 1')
 TERMINAL = ("보류", "실패")
+NOTION_ENV = "GRM_INTAKE_NOTION"
 
 
 def _status(obj):
@@ -63,7 +67,7 @@ def decide(state, now_hm, final=False, rehearsal=False):
             return "STOP", "이번 주 handoff 파일이 없다(claude/queue-handoff)"
         return "WAIT", "handoff 파일을 아직 읽을 수 없다"
     if late:
-        return "STOP", f"시작 시한 {START_DEADLINE} KST 를 넘겼다 — 백업이 브릿지 마지막 회차(13:37) 전에 끝나지 못한다"
+        return "STOP", f"시작 시한 {START_DEADLINE} KST 를 넘겼다 — 백업이 반납 시한({FINISH_DEADLINE}) 전에 끝나지 못한다"
     reason = state.get("editorial_reason") or ""
     if editorial_finished(state.get("desk"), state.get("copyedit")):
         return "RUN", f"편집팀이 마감하지 못하고 끝냈다 — {reason}"
@@ -124,14 +128,28 @@ def collect(date, branch, folder, rehearsal=False):
 
 
 def usable(delta_bridge, date, read, sub):
-    """브릿지가 이 반납을 가져갈 수 있는가 — 채택 조건 + 스캐폴드(브릿지와 같은 함수). (bool, 사유)."""
+    """브릿지가 이 반납을 가져갈 수 있는가 — 브릿지와 **같은 길**(`load_git_run` → `_prepare_adoptable`). (bool, 사유).
+
+    채택 조건(`load_git_run`)만이 아니라 브릿지가 기록 직전에 도는 검증 전부 — 봉투·슬롯 계약·호 날짜
+    (`prepare_git_run`)와 스캐폴드(`load_run_scaffold`) — 를 똑같이 돈다. 하나라도 떨어지면 "쓸 수 없다".
+    노션은 보지 않는다(`GRM_INTAKE_NOTION=off` 로 돈다 — 백업이 도는 것은 노션 off 뒤다). 검증 중 어떤
+    예외도 "쓸 수 없다"로 읽는다 — 그쪽이 안전하다(브릿지는 편집팀 → 백업 순으로 보고 main 엔 먼저 기록된
+    하나만 남으므로, 판정이 지나치게 RUN 이어도 두 번 나가지 않는다).
+    """
     run = delta_bridge.load_git_run(date, read=read, sub=sub)
     if not run["adoptable"]:
         return False, run["reason"]
+    prev = os.environ.get(NOTION_ENV)
+    os.environ[NOTION_ENV] = "off"
     try:
-        delta_bridge.load_run_scaffold(run, run["delta"] or {}, read=read)
-    except delta_bridge.DeltaBridgeError as e:
-        return False, f"채택 조건은 채웠으나 스캐폴드를 쓸 수 없다: {e}"
+        delta_bridge._prepare_adoptable(os.environ.get("NOTION_TOKEN", ""), "", run, read)
+    except Exception as e:  # noqa: BLE001 — 브릿지가 거절할 반납은 판정도 거절한다
+        return False, f"채택 조건은 채웠으나 브릿지 검증에서 떨어진다: {e}"
+    finally:
+        if prev is None:
+            os.environ.pop(NOTION_ENV, None)
+        else:
+            os.environ[NOTION_ENV] = prev
     return True, run["reason"]
 
 

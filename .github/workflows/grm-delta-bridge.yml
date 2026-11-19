@@ -32,8 +32,8 @@ on:
     #   이관됐으면 wrote=false 로 1분 내 무해 종료(delta_bridge.main: return 0)라 비용이 낮다.
     #   일 22:07~23:37 UTC = 월 07:07~08:37 KST (Routine 예치 07:30 KST 전후를 감싼다)
     - cron: '7,37 22-23 * * 0'
-    #   월 00:07~04:37 UTC = 월 09:07~13:37 KST (예치 지연·크론 지각을 흡수)
-    - cron: '7,37 0-4 * * 1'
+    #   월 00:07~05:37 UTC = 월 09:07~14:37 KST (예치 지연·크론 지각 흡수 + 백업 v17 반납 시한 13:15 뒤 세 회차)
+    - cron: '7,37 0-5 * * 1'
   workflow_dispatch:
     inputs:
       publish_date:
@@ -142,9 +142,14 @@ jobs:
             git add "web/data/scaffolds/brief_web_${U}.json"
           fi
           SRC="${{ steps.bridge.outputs.source }}"
-          if [ "$SRC" = "git" ]; then MSG="편집팀 git 반납"; else MSG="라우틴 델타"; fi
+          # [백업 v17] 누가 쓴 반납인가 — by=editorial(편집팀) | backup(백업 v17). delta_bridge.bridge_from_git 출력.
+          BY="${{ steps.bridge.outputs.by }}"
+          if [ "$SRC" != "git" ]; then MSG="라우틴 델타"
+          elif [ "$BY" = "backup" ]; then MSG="백업 v17 git 반납 (by=backup)"
+          else MSG="편집팀 git 반납 (by=editorial)"; fi
           git commit -m "bridge(web): ${{ steps.bridge.outputs.date }} ${MSG} 커밋 (자동)"
           git push
+          echo "### 브릿지 기록: ${{ steps.bridge.outputs.date }} · source=${SRC} · by=${BY:-notion} — ${MSG}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Notion 마감(CONSUMED) — 커밋+push 성공 후에만
         # git 반납으로 기록한 run 은 노션 페이지를 닫지 않는다 — 닫을 대상은 노션에서 읽은 페이지뿐이다.

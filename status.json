@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-19T00:39:17Z",
+ "generated_at": "2026-11-19T01:09:18Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,12 +174,23 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 44433770781,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-19T01:02:15Z",
+    "updatedAt": "2026-11-19T01:09:03Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh live regulatory library (#1820)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44433770781"
+   },
+   {
     "databaseId": 44430503564,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-19T00:37:34Z",
-    "updatedAt": "2026-11-19T00:37:38Z",
+    "updatedAt": "2026-11-19T00:44:39Z",
     "headBranch": "automation/library-auto-44429797002",
     "displayTitle": "chore: refresh live regulatory library",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44430503564"
@@ -216,17 +227,6 @@
     "headBranch": "claude/glossary-fig-daily-20261118-2107",
     "displayTitle": "glossary(fig): 2026-11-18 새 그림 0 · 다시 그림 0 · 보류 5 — 수입경보·품질협약서·LIMS·보…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44300978865"
-   },
-   {
-    "databaseId": 44242422503,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-18T05:10:57Z",
-    "updatedAt": "2026-11-18T05:18:14Z",
-    "headBranch": "main",
-    "displayTitle": "chore: refresh recent regulatory news (#1817)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44242422503"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 44434676807,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-19T01:09:05Z",
+    "updatedAt": "2026-11-19T01:09:06Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44434676807"
+   },
+   {
     "databaseId": 44397216468,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44180002388"
-   },
-   {
-    "databaseId": 44048143905,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-17T08:36:10Z",
-    "updatedAt": "2026-11-17T08:36:18Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44048143905"
    }
   ],
   "grm-findings-translate-apply.yml": [

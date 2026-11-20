@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-19T21:05:57Z",
+ "generated_at": "2026-11-20T00:56:10Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 44647534191,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-20T00:38:58Z",
+    "updatedAt": "2026-11-20T00:39:02Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44647534191"
+   },
    {
     "databaseId": 44428913807,
     "status": "completed",
@@ -45,17 +56,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44096711025"
-   },
-   {
-    "databaseId": 43998791555,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-17T01:52:11Z",
-    "updatedAt": "2026-11-17T02:07:51Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43998791555"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 44648055464,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-20T00:43:01Z",
+    "updatedAt": "2026-11-20T00:50:07Z",
+    "headBranch": "automation/glossary-cases-auto-44646959356",
+    "displayTitle": "chore: refresh glossary case counts",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44648055464"
+   },
+   {
     "databaseId": 44614024921,
     "status": "completed",
     "conclusion": "success",
@@ -216,17 +227,6 @@
     "headBranch": "feat/google-quality-stage1",
     "displayTitle": "test(seo): 업체 sitemap 시험을 두 벌 sitemap 기준으로 — 전체 목록은 정본 수, 구글용은 부분집합",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44541976384"
-   },
-   {
-    "databaseId": 44537192830,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-19T13:48:52Z",
-    "updatedAt": "2026-11-19T13:56:02Z",
-    "headBranch": "feat/google-quality-stage1",
-    "displayTitle": "feat(seo): 구글 품질 정리 1단계 — 구글 전용 noindex·구글용 sitemap 일치, IndexNow 전체 목록",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44537192830"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -663,11 +663,6 @@
    "run_id": 44102656781,
    "created_at": "2026-11-17T14:23:54Z",
    "has_web_brief": false
-  },
-  {
-   "run_id": 43998791555,
-   "created_at": "2026-11-17T01:52:11Z",
-   "has_web_brief": true
   }
  ]
 }

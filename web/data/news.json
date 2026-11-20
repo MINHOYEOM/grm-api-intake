@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-19",
+ "measured_on": "2026-11-20",
  "window_days": 60,
  "totals": {
-  "items": 505
+  "items": 507
  },
  "by_source": [
   {
@@ -16,7 +16,7 @@
   },
   {
    "v": "Federal Register",
-   "c": 79
+   "c": 81
   },
   {
    "v": "MFDS",
@@ -48,6 +48,20 @@
   }
  ],
  "items": [
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-19",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Good Laboratory Practice Requirements for Nonclinical Laboratory Studies",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/19/2026-23541/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-19",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; National Youth Tobacco Survey",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/19/2026-23542/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
   {
    "source": "EMA",
    "source_kind": "inspections",

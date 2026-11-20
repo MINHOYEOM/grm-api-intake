@@ -67,6 +67,106 @@ class ValidateTest(unittest.TestCase):
             self.assertFalse([w for w in wfs if banned in w], banned)
 
 
+class IntakeTest(unittest.TestCase):
+    """intake 동작 — 일일 수집을 입력 없이 깨우고, 소유자 PAT 로, 오늘 handoff 가 있으면 건너뛴다."""
+    RID = "20261123-0500-intake"
+    # 2026-11-23 05:00 KST = 11-22 20:00 UTC
+    NOW = datetime.datetime(2026, 11, 22, 20, 0, 0, tzinfo=datetime.timezone.utc)
+
+    def test_validate_no_args(self):
+        raw = json.dumps({"id": self.RID, "action": "intake", "args": {}})
+        self.assertEqual(cr.validate(raw, self.RID, datetime.date(2026, 11, 23)),
+                         ("grm-intake.yml", "intake", {}))
+        raw = json.dumps({"id": self.RID, "action": "intake"})              # args 생략도 된다
+        self.assertEqual(cr.validate(raw, self.RID, datetime.date(2026, 11, 23))[0], "grm-intake.yml")
+        for args in ({"window_days": "30"}, {"sources": "fr"}, {"dry_run": "true"}):
+            with self.assertRaises(cr.Rejected, msg=args):
+                cr.validate(json.dumps({"id": self.RID, "action": "intake", "args": args}),
+                            self.RID, datetime.date(2026, 11, 23))
+
+    def test_pat_only_for_intake(self):
+        self.assertEqual(cr.PAT_ACTIONS, {"intake"})
+        self.assertEqual(cr.ACTIONS["queue-handoff-mirror"][0], "grm-queue-handoff-mirror.yml")
+
+    def test_workflow_files_exist_and_inputs_match(self):
+        """깨우는 워크플로가 실제로 있고 workflow_dispatch 를 받는지, 넘기는 인자가 그 워크플로의 입력인지."""
+        import re
+        for action, (wf, spec) in cr.ACTIONS.items():
+            if not wf:
+                continue
+            with open(os.path.join(ROOT, ".github", "workflows", wf), encoding="utf-8") as f:
+                text = f.read()
+            self.assertIn("workflow_dispatch:", text, wf)
+            for name in spec:
+                self.assertTrue(re.search(r"^\s{6}%s:\s*$" % re.escape(name), text, re.M), (wf, name))
+        # 사본은 수집 완료(workflow_run)로 돈다 — 이름이 바뀌면 intake 를 깨워도 사본이 안 붙는다
+        with open(os.path.join(ROOT, ".github", "workflows", "grm-intake.yml"), encoding="utf-8") as f:
+            self.assertTrue(f.readline().startswith("name: GRM API Intake (Daily)"))
+        with open(os.path.join(ROOT, ".github", "workflows", "grm-queue-handoff-mirror.yml"), encoding="utf-8") as f:
+            self.assertIn('workflows: ["GRM API Intake (Daily)"]', f.read())
+
+    def test_request_workflow_uses_pat_and_skip(self):
+        with open(os.path.join(ROOT, ".github", "workflows", "grm-cloud-request.yml"), encoding="utf-8") as f:
+            text = f.read()
+        self.assertIn("ADMIN_TOKEN: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}", text)
+        self.assertIn('GH_TOKEN="$DISPATCH_TOKEN" gh workflow run', text)
+        self.assertIn('python3 "$CR" intake-skip _runs.json _handoffs.txt', text)
+        self.assertIn("claude/queue-handoff", text)
+
+    def run_(self, rid, status, conclusion, created):
+        return {"id": rid, "status": status, "conclusion": conclusion, "created_at": created}
+
+    def test_skip_when_handoff_exists(self):
+        self.assertIn("handoff_2026-11-23.json",
+                      cr.intake_skip_reason([], {"handoff_2026-11-23.json", "README.txt"}, self.NOW))
+        # 어제 handoff 만 있으면 깨운다
+        self.assertIsNone(cr.intake_skip_reason([], {"handoff_2026-11-22.json"}, self.NOW))
+
+    def test_skip_when_today_run_live_or_success(self):
+        today_early = "2026-11-22T15:10:00Z"  # 월 00:10 KST
+        for status, concl in (("in_progress", None), ("queued", None), ("waiting", None),
+                              ("completed", "success")):
+            with self.subTest(status=status):
+                self.assertIsNotNone(cr.intake_skip_reason(
+                    [self.run_(1, status, concl, today_early)], set(), self.NOW))
+
+    def test_dispatch_when_only_failures_or_old_runs(self):
+        runs = [
+            self.run_(1, "completed", "failure", "2026-11-22T15:10:00Z"),   # 오늘 실패 — handoff 없음
+            self.run_(2, "completed", "cancelled", "2026-11-22T15:45:00Z"),
+            self.run_(3, "completed", "success", "2026-11-22T00:38:00Z"),   # 일 09:38 KST — 어제
+            self.run_(4, "in_progress", None, "2026-11-22T14:50:00Z"),      # 일 23:50 KST — 어제
+            {"id": 5},                                                      # 형식 깨짐은 무시
+        ]
+        self.assertIsNone(cr.intake_skip_reason(runs, set(), self.NOW))
+
+    def test_cli_fails_open(self):
+        d = tempfile.mkdtemp()
+        bad = os.path.join(d, "runs.json")
+        with open(bad, "w", encoding="utf-8") as f:
+            f.write("not json")
+        import contextlib
+        import io
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = cr.main(["x", "intake-skip", bad, os.path.join(d, "missing.txt")])
+        self.assertEqual((rc, buf.getvalue().strip()), (0, ""))
+
+    def test_check_verdict_carries_pat(self):
+        d = tempfile.mkdtemp()
+        rid = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M") + "-intake"
+        p = os.path.join(d, "req.json")
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump({"id": rid, "action": "intake", "args": {}}, f)
+        import contextlib
+        import io
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = cr.main(["x", "check", p, rid, os.path.join(d, "res")])
+        v = json.loads(buf.getvalue())
+        self.assertEqual((rc, v["workflow"], v["pat"]), (0, "grm-intake.yml", True))
+
+
 class ReplayTest(unittest.TestCase):
     NOW = datetime.datetime(2026, 11, 9, 1, 0, 0, tzinfo=datetime.timezone.utc)
 

@@ -50,6 +50,9 @@
      --out company/run/{run_date_kst}/brief_check.json [--deep company/run/{run_date_kst}/deep_delta.json]
    ```
    를 돌린다. 실패(exit≠0)면 그 메시지를 그대로 적는다 — 발행 경로에 넘겼다면 **발행이 멈췄을 것**이다.
+   이어서 **영문 게이트** `python check_en_slots.py company/run/{run_date_kst}/brief_check.json` 를 돌린다 — 발행 워크플로(`grm-web-publish.yml` 영문 슬롯 게이트)와 같은 판정이다.
+   exit≠0 이면 코드 검사 실패와 같다(여기서 안 보면 `CONSUMED` 뒤에 발행이 멈춘다): 메시지의 빠진 카드가 1~5장이면(예시에 전부 나온다) 그 카드들을 3-1 대로 `재작업`
+   (`fails` `{"item": "영문 게이트", "slot": "en", "evidence": "<메시지>"}`), 그보다 많거나 `brief.en.tldr 없음` 이 있으면 `보류`.
    **`--deep` 에는 원문을 붙인 검사용 사본을 넘긴다**(`deep_delta.json` 이 있을 때):
    `python company/editorial/precheck.py deep-source _handoff/handoff_$D.json company/run/{run_date_kst}/deep_delta.json --out _scaffold/deep_check.json`
    → `--deep _scaffold/deep_check.json`. 심층분석의 근거 대조는 그 주 handoff 의 원문(`deep_analysis_input.body_full`)이 기준선인데,
@@ -67,6 +70,9 @@
    그러면 마감하지 않고 `copyedit.json` 을 `"status": "재작업"`, `"round": 1`, `"published": false`, `"rework": {"cards": ["<반려 카드 id>", …]}` 로 써서
    `delta.json`(판정한 그대로)과 함께 커밋·push 하고 끝낸다. Notion 에는 아무것도 쓰지 않는다. reject 가 10장을 넘거나 코드 검사가 실패면 되돌리지 않고 종전대로 `보류`.
 3-2. **다시 판정(2차).** 시작할 때 `copyedit.json` 이 이미 `재작업` 이면 이 실행은 2차다(`완료`·`보류`·`실패` 면 곧바로 종료).
+   **예약작업 프롬프트에 `역할: 교열(2차)` 가 있는 실행(09:12 슬롯)은 2차만 한다** — `copyedit.json` 이 아직 없으면 1차 교열(08:45)이 아직 샤드를 기다리는 중이다:
+   아무것도 쓰지 않고 종료한다(1차 판정을 대신하지 않는다 — 두 교열이 따로 판정하거나 1차가 `CONSUMED` 를 찍은 뒤 `copyedit.json` 을 덮어쓰면 아무도 발행하지 않는다).
+   `재작업` 이 아니면(`완료`·`보류`·`실패`) 역시 아무것도 쓰지 않고 종료한다.
    `rework.json` 이 `완료` 가 될 때까지 09:20 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 아니면 `copyedit.json` 을 `보류` 로 고쳐 push 하고 끝낸다. `완료` 면:
    ```
    mkdir -p _scaffold && cp company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.r1.json && cp company/run/{run_date_kst}/delta.json _scaffold/delta.r1.json

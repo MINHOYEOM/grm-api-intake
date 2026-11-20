@@ -12,7 +12,8 @@
         카드 유형은 그 주 handoff(`_handoff/handoff_<날짜>.json`, 날짜 = 델타 폴더 이름)에서 읽는다 — `--handoff` 로 직접 줄 수도 있다.
         handoff 를 못 찾으면 종전처럼 전부 필수다.
         **조립 코드 검사도 같은 함수로 돌린다**(`inject_slots.validate_injection` — 개수·길이·마크업·영문 짝·타입 등
-        조립이 막는 것 전부. 리허설 1118). 스캐폴드 사본(`_scaffold/brief_web_<날짜>.json`, `--scaffold`)이 있으면 인용 번역 대조까지 본다.
+        조립이 막는 것 전부. 리허설 1118). 조립 **뒤** 카드에 영문 게이트(`check_en_slots.card_problem`)도 돌린다 —
+        조립이 한국어 서사를 갈아 써서 생긴 반쪽 영어(`조립 검사 영문 게이트 …`, 리허설 1120j). 스캐폴드 사본(`_scaffold/brief_web_<날짜>.json`, `--scaffold`)이 있으면 인용 번역 대조까지 본다.
         `--deep <심층 델타·샤드>` 를 주면 심층 칸 산문의 경고(금지 표현·반복 문장)도 낸다. 행정처분 요약 주어 검사도 **경고만**
         (`경고:` 로 시작하는 줄 — exit 코드에 들어가지 않는다). 심층 [용어·표기] 차단은 `deep` 명령이 한다.
 
@@ -153,7 +154,29 @@ def assembly_lines(delta, scaffold):
     except (apb.AssembleError, inject_slots.SlotInjectionError, ValueError, TypeError, KeyError) as e:
         return [f"조립 검사 조립 자체가 멈춤 — {type(e).__name__}: {e}"]
     deep_only = deep_ko_errors(out, report)
-    return [f"조립 검사 {e}" for e in report.errors if e not in deep_only]
+    return [f"조립 검사 {e}" for e in report.errors if e not in deep_only] + assembled_en_lines(cards, out)
+
+
+def assembled_en_lines(cards, out):
+    """조립 **뒤** 카드에 영문 게이트(`check_en_slots.card_problem` — 교열·발행 워크플로가 부르는 그 판정)를 돌린 줄(순수).
+
+    ★리허설 1120j: 샤드 카드는 한국어·영문 시사점·점검을 둘 다 비워 짝이 맞았는데, 조립이 한국어 서사를 갈아 쓰자
+      (483 디제스트 대표) 영문만 비어 교열 영문 게이트가 exit 1 로 재작업을 냈다. 샤드 단계의 짝 검사(`term_lines`)는
+      조립 전 카드만 보므로 이런 결손을 못 본다 — 조립 결과에 같은 판정을 돌리고, **조립 전엔 완결이던** 카드만 낸다
+      (조립 전부터 빠진 카드는 `영문 슬롯 미완결` 줄로 이미 나간다)."""
+    import check_en_slots
+    lines = []
+    for c in out.get("cards") or []:
+        cid = c.get("id") if isinstance(c, dict) else None
+        if cid not in cards:
+            continue
+        prob = check_en_slots.card_problem(c)
+        if prob is None:
+            continue
+        before = dict(cards[cid], id=cid, card_type=c.get("card_type"))
+        if check_en_slots.card_problem(before) is None:
+            lines.append(f"조립 검사 영문 게이트 {prob[1]} — 조립 뒤 영문 미완결(조립 전엔 완결)")
+    return lines
 
 
 def deep_ko_errors(out, report):

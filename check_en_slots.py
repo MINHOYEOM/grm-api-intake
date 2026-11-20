@@ -27,6 +27,19 @@ def _filled(value) -> bool:
     return bool(str(value or "").strip())
 
 
+def card_problem(card: dict) -> "tuple[str, str] | None":
+    """카드 한 장의 영문 판정 — 완결이면 None, 아니면 ("missing", id) 또는 ("partial", "id(빠짐: …)").
+
+    `find_problems` 와 편집팀 사전 점검(`company/editorial/precheck.py terms`)이 **같이** 부른다(두 벌 금지)."""
+    if render.card_has_english(card):
+        return None
+    en = card.get("en")
+    cid = str(card.get("id") or "?")
+    if not isinstance(en, dict) or not any(_filled(en.get(f)) for f in render.CARD_NARRATIVE_FIELDS):
+        return ("missing", cid)
+    return ("partial", f"{cid}(빠짐: {','.join(render.card_english_gaps(card))})")
+
+
 def find_problems(doc: dict) -> list[str]:
     """빠진 것 목록. 비어 있으면 완결."""
     cards = doc.get("cards") or []
@@ -36,15 +49,10 @@ def find_problems(doc: dict) -> list[str]:
     missing_all: list[str] = []
     partial: list[str] = []
     for c in cards:
-        if render.card_has_english(c):
+        prob = card_problem(c)
+        if prob is None:
             continue
-        en = c.get("en")
-        cid = str(c.get("id") or "?")
-        if not isinstance(en, dict) or not any(_filled(en.get(f)) for f in render.CARD_NARRATIVE_FIELDS):
-            missing_all.append(cid)
-        else:
-            gaps = render.card_english_gaps(c)
-            partial.append(f"{cid}(빠짐: {','.join(gaps)})")
+        (missing_all if prob[0] == "missing" else partial).append(prob[1])
     if missing_all:
         out.append(f"en 없음 {len(missing_all)}/{len(cards)}장 (예: {', '.join(missing_all[:5])})")
     if partial:

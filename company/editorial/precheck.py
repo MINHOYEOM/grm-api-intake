@@ -37,6 +37,9 @@
         **심층분석 근거 게이트**(`verify_deep_analysis.run_deep_analysis_gate` — 발행 브릿지가 조립 직전에 카드마다 부르는 그 함수,
         원문 = handoff `body_full`)의 FAIL 도 막는다(`심층 게이트 <id>: [FAIL] D2-…` — 리허설 1120d: 조항 인용이 원문 글자와 달라
         조립은 그 카드 심층을 조용히 빼고 교열은 반려했다).
+        **국문 병기 관문**(483 관찰·WL 위반항목·WHOPIR — 조립 게이트 4·6·7)도 조립 함수 그대로 막는다(`심층 조립 검사 …` —
+        리허설 1120h: 경고서한 `violations_ko` 결손이 통과해 교열 조립이 exit 2). 스캐폴드 사본(`--scaffold`, 없으면
+        `_scaffold/brief_web_<날짜>.json`)이 있어야 본다 — 없으면 경고 한 줄을 내고 건너뛴다.
 
     python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json> [--deep-old <1차 deep_delta.json> --deep-new <2차 deep_delta.json>]
         `--deep-old`·`--deep-new` 를 주면 심층(`deep_delta.json`)도 **같은 대조 함수**로 본다 — 반려 카드의 심층만 바뀌어야 한다
@@ -148,10 +151,43 @@ def assembly_lines(delta, scaffold):
         out, report = apb.assemble_publish_brief(sub, {"cards": cards}, strict=False)
     except (apb.AssembleError, inject_slots.SlotInjectionError, ValueError, TypeError, KeyError) as e:
         return [f"조립 검사 조립 자체가 멈춤 — {type(e).__name__}: {e}"]
-    out_cards = out.get("cards") or []
-    deep_only = set(apb._lint_483_observation_ko(out_cards, report.refreshed_483_ids))
-    deep_only |= set(apb._lint_wl_violation_ko(out_cards)) | set(apb._lint_whopir_ko(out_cards))
+    deep_only = deep_ko_errors(out, report)
     return [f"조립 검사 {e}" for e in report.errors if e not in deep_only]
+
+
+def deep_ko_errors(out, report):
+    """조립 결과에서 **심층 샤드 몫** 국문 병기 관문(게이트 4·6·7 — 483 관찰·WL 위반·WHOPIR)의 오류 집합.
+    조립이 부르는 그 함수들을 그대로 부른다 — 델타 검사(`assembly_lines`)는 이 집합을 빼고, 심층 검사(`deep_assembly_lines`)는 이 집합만 낸다."""
+    import assemble_publish_brief as apb
+    out_cards = out.get("cards") or []
+    errs = set(apb._lint_483_observation_ko(out_cards, report.refreshed_483_ids))
+    return errs | set(apb._lint_wl_violation_ko(out_cards)) | set(apb._lint_whopir_ko(out_cards))
+
+
+def deep_assembly_lines(shard, handoff, scaffold):
+    """심층 샤드를 **조립 함수 그대로**(`assemble_publish_brief.assemble_publish_brief`, strict=False, deep_deltas=샤드+원문)
+    돌려 국문 병기 관문(게이트 4·6·7)의 차단 오류만 낸 줄(순수). `assembly_lines` 가 델타 쪽에서 빼 둔 바로 그 몫이다.
+
+    ★리허설 1120h: `deep` 은 483 `observations_ko` 자리만 따로 세고 있어, 경고서한 카드가 `violations_ko` 없이 '0건 — 통과'로
+      나갔고 교열 코드 검사(조립)가 "위반 #1~#3 statement_ko 없음"으로 호 전체를 막았다. 위반항목 블록은 조립이 원문에서
+      만들므로(`_refresh_wl_violations`) 규칙을 베끼지 않고 조립 함수를 부른다 — 관문이 늘면 저절로 따라온다.
+    스캐폴드가 없으면 빈 목록(실제 카드 유형·결정론 블록이 있어야 맞게 센다)."""
+    if not (isinstance(scaffold, dict) and isinstance(scaffold.get("cards"), list)):
+        return []
+    import copy
+    import assemble_publish_brief as apb
+    items = shard.get("items") if isinstance(shard.get("items"), dict) else {}
+    sourced, _ = with_source_text(items, handoff_bodies(handoff))
+    sourced = {cid: e for cid, e in sourced.items() if isinstance(e, dict)}
+    sub = copy.deepcopy(scaffold)
+    sub["cards"] = [c for c in sub["cards"] if isinstance(c, dict) and c.get("id") in sourced]
+    try:
+        out, report = apb.assemble_publish_brief(sub, {"cards": {cid: {} for cid in sourced}},
+                                                 strict=False, deep_deltas=sourced)
+    except (apb.AssembleError, inject_slots.SlotInjectionError, ValueError, TypeError, KeyError) as e:
+        return [f"심층 조립 검사 조립 자체가 멈춤 — {type(e).__name__}: {e}"]
+    deep_only = deep_ko_errors(out, report)
+    return [f"심층 조립 검사 {e}" for e in report.errors if e in deep_only]
 
 
 def find_scaffold(delta_path, explicit=None):
@@ -407,6 +443,7 @@ def main(argv=None):
     p = sub.add_parser("deep")
     p.add_argument("handoff")
     p.add_argument("shard")
+    p.add_argument("--scaffold", help="그 주 스캐폴드 사본(없으면 _scaffold/brief_web_<날짜>.json 을 찾는다)")
     r = sub.add_parser("rework-diff")
     r.add_argument("old")
     r.add_argument("new")
@@ -444,9 +481,13 @@ def main(argv=None):
                 raise ValueError("handoff·심층 샤드가 객체가 아니다")
             lines = (deep_lines(shard, fda483_ids(handoff)) + deep_term_lines(shard)
                      + deep_absence_lines(shard) + deep_basis_lines(shard) + deep_gate_lines(shard, handoff))
+            sc_path = find_scaffold(args.shard, args.scaffold)
+            lines += deep_assembly_lines(shard, handoff, _load(sc_path) if sc_path else None)
             for line in lines:
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()
+            if not sc_path:
+                warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 국문 병기 관문(483·WL·WHOPIR)은 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:
                 print(f"경고: {line}")
             print(f"심층 사전 점검: {len(lines)}건" + ("" if lines else " — 통과")

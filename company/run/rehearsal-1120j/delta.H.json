@@ -1,0 +1,426 @@
+{
+  "status": "완료",
+  "run_date_kst": "2026-11-20",
+  "shard": "H",
+  "cards": {
+    "data0008-15206": {
+      "title_issue": "의약외품 범위 검토위원회 규정",
+      "summary": "식약처가 「의약외품 범위 지정 검토위원회 구성 및 운영에 관한 규정」(예규)을 게시했다.",
+      "key_facts": [],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Rules on quasi-drug scope review committee",
+        "summary": "MFDS posted an administrative rule on the composition and operation of the committee that reviews the designation of quasi-drug scope.",
+        "key_facts": [],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "data0011-15996": {
+      "title_issue": "심혈관용 기구 사용적합성 가이드라인",
+      "summary": "식약처가 「의료기기 GMP 기준 중 사용적합성 적용 가이드라인(심혈관용 기계 기구)」을 게시했다.",
+      "key_facts": [],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Usability guideline for cardiovascular devices",
+        "summary": "MFDS posted a guideline on applying usability requirements under the medical device GMP standards for cardiovascular instruments.",
+        "key_facts": [],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "data0011-15997": {
+      "title_issue": "의료용 경 사용적합성 가이드라인",
+      "summary": "식약처가 「의료기기 GMP 기준 중 사용적합성 적용 가이드라인(의료용 경)」을 게시했다.",
+      "key_facts": [],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Usability guideline for medical scopes",
+        "summary": "MFDS posted a guideline on applying usability requirements under the medical device GMP standards for medical scopes.",
+        "key_facts": [],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "gmpinspect-1Q7XhpAwI0q": {
+      "title_issue": "설비 적격성평가·세척 밸리데이션 지적",
+      "hook_line": "시설장비·제조 분야 기타 지적 2건, 이행계획서 타당성 인정",
+      "summary": "식약처가 (주)유영제약 제조소(완제·원료 겸업)의 GMP 사후 실사에서 기타 지적 2건을 냈다.",
+      "key_facts": [
+        "지적 1: 중요 제조설비는 실제 운전조건을 반영해 적격성평가를 실시할 것(시설장비, 기타)",
+        "지적 2: 제품과 접촉하는 모든 기구는 세척 밸리데이션을 실시할 것(제조, 기타)",
+        "평가 결과: 지적 2건 모두 기타",
+        "후속: 2건 모두 이행계획서 타당성 인정"
+      ],
+      "implication": "",
+      "checks": [
+        "중요 제조설비의 적격성평가가 실제 운전조건을 반영하는가? (지적 1)",
+        "제품과 접촉하는 기구마다 세척 밸리데이션 결과가 있는가? (지적 2)"
+      ],
+      "en": {
+        "title_issue": "Equipment qualification, cleaning validation",
+        "hook_line": "Two other-level findings in facilities and manufacturing, implementation plans accepted",
+        "summary": "MFDS issued two other-level findings in a post-approval GMP inspection of a finished product and API manufacturing site.",
+        "key_facts": [
+          "Finding 1: qualify critical manufacturing equipment under actual operating conditions (facilities and equipment, other)",
+          "Finding 2: perform cleaning validation for all product-contact utensils (manufacturing, other)",
+          "Outcome: both findings rated other",
+          "Follow-up: implementation plans for both findings accepted as adequate"
+        ],
+        "implication": "",
+        "checks": [
+          "Does qualification of critical manufacturing equipment reflect actual operating conditions? (Finding 1)",
+          "Is there cleaning validation for every product-contact utensil? (Finding 2)"
+        ]
+      }
+    },
+    "gmpinspect-1Q7XhpAwhFA": {
+      "title_issue": "사후 실사 지적(보완)사항 없음",
+      "hook_line": "완제의약품 사후 실사에서 지적(보완)사항 없음",
+      "summary": "식약처가 (주)셀트리온제약 제조소(완제 단일)의 GMP 사후 실사 결과를 공개했다. 평가 결과는 지적(보완)사항 없음이다.",
+      "key_facts": [
+        "평가 결과: 지적(보완)사항 없음(GMP 감시 6개 분야)"
+      ],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "No deficiencies in post-approval inspection",
+        "hook_line": "No deficiencies in a post-approval inspection of a finished product site",
+        "summary": "MFDS published the result of a post-approval GMP inspection of a finished product manufacturing site, with no deficiencies cited.",
+        "key_facts": [
+          "Outcome: no deficiencies across the 6 GMP inspection areas"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "ef50339bb834": {
+      "title_issue": "Annex 1 공동 해석 발표",
+      "summary": "PIC/S·EMA·WHO가 무균의약품 제조에 관한 Annex 1(2022)의 주요 변경 사항에 대한 공동 해석을 발표했다(MHRA 블로그).",
+      "key_facts": [],
+      "implication": "",
+      "checks": [],
+      "en": {
+        "title_issue": "Harmonised interpretation of Annex 1",
+        "summary": "PIC/S, EMA and WHO published a harmonised interpretation of the most important changes in Annex 1 (2022) on the manufacture of sterile products (MHRA blog).",
+        "key_facts": [],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "D-0114-2027": {
+      "title_issue": "공정 관리 부족 회수",
+      "hook_line": "다회용 바이알 제품을 공정 관리 부족으로 일괄 회수, Class II",
+      "summary": "Victory Medical Center Pharmacy의 ALPHA LIPOIC ACID 다회용 바이알 등 42품목이 공정 관리 부족으로 회수됐다(Class II). 동일 사유 42품목 일괄 회수다.",
+      "key_facts": [
+        "사유: 공정 관리 부족",
+        "제품·범위: ALPHA LIPOIC ACID 다회용 바이알 외 41품목, 동일 사유 일괄 회수",
+        "등급: Class II",
+        "조치: 업체 자진회수, 서한 통지"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "공정 관리 부족"
+      ],
+      "en": {
+        "title_issue": "Recall for lack of processing controls",
+        "hook_line": "Multiple-dose vial products recalled together for lack of processing controls, Class II",
+        "summary": "42 products from Victory Medical Center Pharmacy, including Alpha Lipoic Acid multiple-dose vials, were recalled for lack of processing controls (Class II), all for the same reason.",
+        "key_facts": [
+          "Reason: lack of processing controls",
+          "Product and scope: Alpha Lipoic Acid multiple-dose vial and 41 other products, recalled together for the same reason",
+          "Class: Class II",
+          "Agency action: voluntary firm-initiated recall, notified by letter"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "D-0157-2027": {
+      "title_issue": "불순물·분해물 규격 부적합 회수",
+      "hook_line": "플루드로코르티손 정제, 불순물·분해물 규격 부적합 Class II",
+      "summary": "AvKARE의 플루드로코르티손 아세테이트 정제 0.1 mg이 불순물·분해물 규격 부적합으로 회수됐다(Class II).",
+      "key_facts": [
+        "사유: 불순물·분해물 규격 부적합",
+        "제품·범위: 플루드로코르티손 아세테이트 정제 0.1 mg, Lot 48353, 8866 cartons",
+        "등급: Class II"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "불순물·분해물 규격 부적합"
+      ],
+      "en": {
+        "title_issue": "Recall for failed impurity specifications",
+        "hook_line": "Fludrocortisone tablets recalled for failed impurities/degradation specs, Class II",
+        "summary": "AvKARE's fludrocortisone acetate tablets 0.1 mg were recalled for failed impurities/degradation specifications (Class II).",
+        "key_facts": [
+          "Reason: failed impurities/degradation specifications",
+          "Product and scope: fludrocortisone acetate tablets 0.1 mg, Lot 48353, 8866 cartons",
+          "Class: Class II"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "D-0158-2027": {
+      "title_issue": "무균성 보증 부족 회수",
+      "hook_line": "인공눈물 점안제, 무균성 보증 부족으로 Class II 회수",
+      "summary": "Preferred Pharmaceuticals, Inc.의 인공눈물 점안제(Artificial Tears, Visine)가 무균성 보증 부족으로 회수됐다(Class II).",
+      "key_facts": [
+        "사유: 무균성 보증 부족",
+        "제품·범위: 인공눈물 점안제(Geri-Care 제조), 480 bottles",
+        "등급: Class II"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "무균성 보증 부족"
+      ],
+      "en": {
+        "title_issue": "Recall for lack of sterility assurance",
+        "hook_line": "Artificial tears eye drops recalled for lack of assurance of sterility, Class II",
+        "summary": "Artificial Tears lubricant eye drops from Preferred Pharmaceuticals, Inc. were recalled for lack of assurance of sterility (Class II).",
+        "key_facts": [
+          "Reason: lack of assurance of sterility",
+          "Product and scope: artificial tears lubricant eye drops made by Geri-Care, 480 bottles",
+          "Class: Class II"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "D-0159-2027": {
+      "title_issue": "안정성 규격 부적합 회수",
+      "hook_line": "알로에 로션 등, 점도·외관 안정성 결과 부적합으로 Class II 회수",
+      "summary": "BioMed Laboratories, LLC.의 Tychasis Coats Aloe 로션 등 3품목이 안정성 규격 부적합으로 회수됐다(Class II). 동일 사유 3품목 일괄 회수다.",
+      "key_facts": [
+        "사유: 안정성 규격 부적합 — 점도와 외관의 안정성 시험 결과가 기준일탈(OOS)",
+        "제품·범위: Tychasis Coats Aloe 로션 외 2품목, 동일 사유 일괄 회수",
+        "등급: Class II"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "안정성 규격 부적합: 점도와 외관의 안정성 기준일탈 결과가 설정된 규격에 맞지 않았다."
+      ],
+      "en": {
+        "title_issue": "Recall for failed stability specifications",
+        "hook_line": "Aloe lotion and related products recalled for viscosity and appearance stability failures",
+        "summary": "Three products from BioMed Laboratories, LLC., including Tychasis Coats Aloe Lotion, were recalled for failed stability specifications (Class II), all for the same reason.",
+        "key_facts": [
+          "Reason: failed stability specifications, with OOS viscosity and appearance stability results",
+          "Product and scope: Tychasis Coats Aloe Lotion and 2 other products, recalled together for the same reason",
+          "Class: Class II"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "D-0167-2027": {
+      "title_issue": "백 인쇄부 천공 누출 의심 회수",
+      "hook_line": "복막투석액 백 인쇄 부위 작은 천공 누출 불만으로 Class II 회수",
+      "summary": "Fresenius Medical Care Renal Therapies Group, LLC의 DELFLEX 복막투석액 5품목이 무균성 보증 부족으로 회수됐다(Class II). 해당 로트 1차 백의 인쇄 부위에 생긴 작은 천공으로 누출이 의심된다는 불만이 접수됐다.",
+      "key_facts": [
+        "사유: 무균성 보증 부족 — 1차 백 인쇄 부위의 작은 천공으로 인한 누출 의심 불만",
+        "제품·범위: DELFLEX 복막투석액 2,000 mL 외 4품목, 동일 사유 일괄 회수",
+        "등급: Class II"
+      ],
+      "implication": "",
+      "checks": [
+        "1차 백의 인쇄 부위가 누출 검사 범위에 들어 있는가?",
+        "누출 의심 불만이 접수되면 같은 로트의 보관 검체를 확인하는가?"
+      ],
+      "quotes_translation": [
+        "무균성 보증 부족: 해당 로트 1차 백의 인쇄 부위에 생긴 작은 천공으로 누출이 의심된다는 불만이 접수됐다."
+      ],
+      "en": {
+        "title_issue": "Bag perforations in print area",
+        "hook_line": "Dialysis solution recalled after leak complaints from tiny perforations in bag print area",
+        "summary": "Five DELFLEX peritoneal dialysis solution products from Fresenius Medical Care Renal Therapies Group, LLC were recalled for lack of assurance of sterility (Class II) after complaints of potential leaks from small perforations in the print area of the primary bag.",
+        "key_facts": [
+          "Reason: lack of assurance of sterility, after complaints of potential leaks from small perforations in the primary bag print area",
+          "Product and scope: DELFLEX peritoneal dialysis solution 2,000 mL and 4 other products, recalled together for the same reason",
+          "Class: Class II"
+        ],
+        "implication": "",
+        "checks": [
+          "Is the primary bag print area included in leak testing?",
+          "Are retain samples from the same lot checked when a leak complaint is received?"
+        ]
+      }
+    },
+    "D-0173-2027": {
+      "title_issue": "유리 파편 혼입 의심 회수",
+      "hook_line": "시아노코발라민 주사제, 유리 파편 혼입 의심으로 Class II 회수",
+      "summary": "American Health Packaging의 시아노코발라민 주사제 1,000 mcg/mL가 미립자 혼입으로 회수됐다(Class II). 제조사 American Regent, Inc.가 해당 배치에서 유리 입자 오염이 의심된다고 알렸다.",
+      "key_facts": [
+        "사유: 미립자 혼입 — 제조사가 해당 배치의 유리 파편 혼입 의심을 통보",
+        "제품·범위: 시아노코발라민 주사제 1,000 mcg/mL 다회용 바이알, Lot 24394A",
+        "등급: Class II"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "미립자 혼입: American Regent, Inc.가",
+        "해당 제품 배치에서 확인된 유리 입자 오염 의심(유리 파편)을 BluePoint Pharmaceuticals Laboratories에 통보했다."
+      ],
+      "en": {
+        "title_issue": "Recall for suspected glass fragments",
+        "hook_line": "Cyanocobalamin injection recalled for potential glass particle contamination, Class II",
+        "summary": "Cyanocobalamin injection 1,000 mcg/mL from American Health Packaging was recalled for the presence of particulate matter (Class II) after the manufacturer, American Regent, Inc., reported potential glass particle contamination in the batch.",
+        "key_facts": [
+          "Reason: presence of particulate matter, with potential glass fragment contamination reported by the manufacturer",
+          "Product and scope: cyanocobalamin injection 1,000 mcg/mL multiple-dose vials, Lot 24394A",
+          "Class: Class II"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "D-0182-2027": {
+      "title_issue": "다른 정제·캡슐 혼입 회수",
+      "hook_line": "메토프롤롤 정제 병에 다른 정제·캡슐 혼입으로 Class II 회수",
+      "summary": "Advagen Pharma Limited의 메토프롤롤 타르타르산염 정제 50 mg이 다른 정제·캡슐 혼입으로 회수됐다(Class II).",
+      "key_facts": [
+        "사유: 다른 정제·캡슐 혼입",
+        "제품·범위: 메토프롤롤 타르타르산염 정제 50 mg 1,000정 병, Batch 2611C065A1",
+        "등급: Class II"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "다른 정제·캡슐 혼입"
+      ],
+      "en": {
+        "title_issue": "Recall for foreign tablets or capsules",
+        "hook_line": "Metoprolol tablets recalled for the presence of foreign tablets or capsules, Class II",
+        "summary": "Metoprolol tartrate tablets 50 mg from Advagen Pharma Limited were recalled for the presence of foreign tablets/capsules (Class II).",
+        "key_facts": [
+          "Reason: presence of foreign tablets/capsules",
+          "Product and scope: metoprolol tartrate tablets 50 mg, 1,000-tablet bottles, Batch 2611C065A1",
+          "Class: Class II"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "recall-fb-24e87667c9a6a108": {
+      "title_issue": "엔도톡신 기준일탈 회수",
+      "hook_line": "조제 글루타치온 주사제, 엔도톡신 기준일탈로 회수",
+      "summary": "Premium Health Care LLC의 조제 글루타치온 주사제 200 mg/mL가 무균제품의 미생물 오염으로 회수됐다. 엔도톡신 시험에서 기준일탈(OOS) 결과가 나왔다.",
+      "key_facts": [
+        "사유: 무균제품 미생물 오염 — 엔도톡신 기준일탈",
+        "제품·범위: 조제 글루타치온 주사제 200 mg/mL, Lot 1732207·1737548, 209 units",
+        "등급: Not Yet Classified"
+      ],
+      "implication": "",
+      "checks": [],
+      "quotes_translation": [
+        "무균제품의 미생물 오염: 엔도톡신 기준일탈 결과가 나왔다."
+      ],
+      "en": {
+        "title_issue": "Recall for endotoxin OOS results",
+        "hook_line": "Compounded glutathione injection recalled for out of specification endotoxin results",
+        "summary": "Compounded glutathione injection 200 mg/mL from Premium Health Care LLC was recalled for microbial contamination of sterile products after out of specification results for bacterial endotoxin.",
+        "key_facts": [
+          "Reason: microbial contamination of sterile products, with OOS bacterial endotoxin results",
+          "Product and scope: compounded glutathione injection 200 mg/mL, Lots 1732207 and 1737548, 209 units",
+          "Class: Not Yet Classified"
+        ],
+        "implication": "",
+        "checks": []
+      }
+    },
+    "who-whopir-492199ae88d3": {
+      "title_issue": "실사 후 WHO GMP 수용 판정",
+      "hook_line": "데이터 완전성 교육 전에 현장 업무를 시작한 직원 지적, 보완 완료",
+      "summary": "WHO가 인도의 Cipla Limited Kurkumbh 제조소를 실사해 WHO GMP 수용 가능 수준으로 판정했다.",
+      "key_facts": [
+        "결론: WHO GMP 수용 가능 수준, 지적 사항은 WHOPIR 공개 전 보완 완료, 3년간 유효",
+        "지적 분야: 교육 — 데이터 완전성 교육을 받기 전에 현장 업무를 시작한 직원이 있었음"
+      ],
+      "implication": "실사는 WHO 사전적격성평가 제품(Artesunate 좌제 100 mg)을 만드는 Unit-I를 대상으로 했다.",
+      "checks": [
+        "신규 직원이 데이터 완전성 교육을 마친 뒤에 현장 업무를 시작하는가?",
+        "교육 관리 시스템이 교육 완료 전의 업무 배정을 막는가?"
+      ],
+      "en": {
+        "title_issue": "Acceptable WHO GMP after inspection",
+        "hook_line": "Staff started on-site work before data integrity training, deficiency addressed",
+        "summary": "WHO inspected the Cipla Limited site at Kurkumbh, India, and found it operating at an acceptable level of compliance with WHO GMP guidelines.",
+        "key_facts": [
+          "Conclusion: acceptable level of compliance with WHO GMP, non-compliances addressed before WHOPIR publication, valid for 3 years",
+          "Areas cited: training, as personnel did not receive data integrity training before starting on-site work"
+        ],
+        "implication": "The inspection covered Unit-I, which makes the WHO prequalified product, Artesunate suppositories 100 mg.",
+        "checks": [
+          "Do new staff complete data integrity training before starting on-site work?",
+          "Does the learning management system block work assignment before training is complete?"
+        ]
+      }
+    },
+    "who-whopir-98cfb8b39789": {
+      "title_issue": "서류 평가로 WHO GMP 수용 판정",
+      "hook_line": "현장 실사 대신 서류 평가로 에탐부톨 원료의약품 공장 수용 판정",
+      "summary": "WHO가 인도의 Lupin Limited 앙클레슈와르 제조소 에탐부톨 공장을 서류 평가해 원료의약품 WHO GMP 수용 가능 수준으로 판정했다.",
+      "key_facts": [
+        "결론: 서류 평가로 원료의약품 WHO GMP 수용 가능 수준, 3년간 유효"
+      ],
+      "implication": "WHO는 이전 WHO 실사와 USA FDA(2026-03-02~07, 2022-08-16~19)·TGA(2024-10-03~04) 실사 근거를 검토해 현장 실사를 서류 평가로 대신했다.",
+      "checks": [],
+      "en": {
+        "title_issue": "Desk assessment finds WHO GMP acceptable",
+        "hook_line": "Ethambutol API plant accepted by desk assessment in lieu of an onsite inspection",
+        "summary": "WHO found the Ethambutol plant of Lupin Limited at Ankleshwar, India, operating at an acceptable level of compliance with WHO GMP guidelines for APIs, based on a desk assessment.",
+        "key_facts": [
+          "Conclusion: acceptable level of compliance with WHO GMP for APIs by desk assessment, valid for 3 years"
+        ],
+        "implication": "WHO accepted a desk assessment in lieu of an onsite inspection based on previous WHO inspections and evidence from USA FDA (2026-03-02 to 07 and 2022-08-16 to 19) and TGA (2024-10-03 to 04) inspections.",
+        "checks": []
+      }
+    },
+    "who-whopir-af14a079113a": {
+      "title_issue": "서류 평가로 원료의약품 GMP 수용",
+      "hook_line": "현장 실사 대신 서류 평가로 원료의약품 제조소 수용 판정",
+      "summary": "WHO가 인도의 Neuland Laboratories Limited Unit-I를 서류 평가해 원료의약품 WHO GMP 수용 가능 수준으로 판정했다.",
+      "key_facts": [
+        "결론: 서류 평가로 원료의약품 WHO GMP 수용 가능 수준, 3년간 유효"
+      ],
+      "implication": "서류 평가는 USFDA(2024-03-18~22)와 EDQM/ANSM(2023-06-07~09) 실사 근거를 바탕으로 했다.",
+      "checks": [],
+      "en": {
+        "title_issue": "Desk assessment finds API site acceptable",
+        "hook_line": "API site accepted by desk assessment in lieu of a WHO onsite inspection",
+        "summary": "WHO found Unit-I of Neuland Laboratories Limited in India operating at an acceptable level of compliance with WHO GMP guidelines for APIs, based on a desk assessment.",
+        "key_facts": [
+          "Conclusion: acceptable level of compliance with WHO GMP for APIs by desk assessment, valid for 3 years"
+        ],
+        "implication": "The desk assessment relied on evidence from USFDA (2024-03-18 to 22) and EDQM/ANSM (2023-06-07 to 09) inspections.",
+        "checks": []
+      }
+    },
+    "who-whopir-d6ea75f7687f": {
+      "title_issue": "위탁 제조소 WHO GMP 수용 판정",
+      "summary": "WHO가 인도의 Oxalis Labs 제조소를 실사해 WHO GMP 수용 가능 수준으로 판정했다.",
+      "key_facts": [
+        "결론: WHO GMP 수용 가능 수준, 지적 사항은 WHOPIR 공개 전 보완 완료, 3년간 유효"
+      ],
+      "implication": "Oxalis Labs는 Macleods Pharmaceuticals Limited의 위탁 제조소다. 2026년 PAHO의 불만에 따라 자진회수가 시작됐다.",
+      "checks": [],
+      "en": {
+        "title_issue": "Contract manufacturer acceptable to WHO",
+        "summary": "WHO inspected Oxalis Labs in India and found it operating at an acceptable level of compliance with WHO GMP guidelines.",
+        "key_facts": [
+          "Conclusion: acceptable level of compliance with WHO GMP, non-compliances addressed before WHOPIR publication, valid for 3 years"
+        ],
+        "implication": "Oxalis Labs is a contract manufacturer for Macleods Pharmaceuticals Limited. In 2026 a voluntary recall was initiated following a complaint from PAHO.",
+        "checks": []
+      }
+    }
+  }
+}

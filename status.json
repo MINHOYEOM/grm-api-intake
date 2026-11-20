@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-20T04:06:00Z",
+ "generated_at": "2026-11-20T04:48:38Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,50 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 44676038203,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-20T04:41:01Z",
+    "updatedAt": "2026-11-20T04:48:14Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh recent regulatory news (#1842)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44676038203"
+   },
+   {
+    "databaseId": 44673799332,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-20T04:20:58Z",
+    "updatedAt": "2026-11-20T04:27:11Z",
+    "headBranch": "automation/news-auto-44673702387",
+    "displayTitle": "chore: refresh recent regulatory news",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44673799332"
+   },
+   {
+    "databaseId": 44673771537,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-20T04:20:43Z",
+    "updatedAt": "2026-11-20T04:28:13Z",
+    "headBranch": "claude/google-quality-stage2-translate-gist",
+    "displayTitle": "[머지 보류·대표 검토] 구글 품질 2단계 — 국문 조항 참고 번역·짧은 문서 GRM 요지 큐 + 시범 20건씩",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44673771537"
+   },
+   {
+    "databaseId": 44673767407,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-20T04:20:41Z",
+    "updatedAt": "2026-11-20T04:27:16Z",
+    "headBranch": "claude/google-quality-stage2-translate-gist",
+    "displayTitle": "fix(i18n): 국문 참고 번역 제목을 뷰가 넘긴다 — 템플릿 감싸지 않은 한글 lint",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44673767407"
+   },
+   {
     "databaseId": 44671324685,
     "status": "completed",
     "conclusion": "success",
@@ -183,50 +227,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1838 from MINHOYEOM/feat/db-growth-stage3-1120",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44671324685"
-   },
-   {
-    "databaseId": 44670599225,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-20T03:52:13Z",
-    "updatedAt": "2026-11-20T03:59:28Z",
-    "headBranch": "claude/google-quality-stage2-translate-gist",
-    "displayTitle": "[머지 보류·대표 검토] 구글 품질 2단계 — 국문 조항 참고 번역·짧은 문서 GRM 요지 큐 + 시범 20건씩",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44670599225"
-   },
-   {
-    "databaseId": 44670577933,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-20T03:52:01Z",
-    "updatedAt": "2026-11-20T03:59:16Z",
-    "headBranch": "claude/google-quality-stage2-translate-gist",
-    "displayTitle": "feat(seo): 구글 품질 2단계 — 국문 조항 참고 번역·짧은 문서 GRM 요지 큐 + 시범 20건씩",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44670577933"
-   },
-   {
-    "databaseId": 44669720633,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-20T03:44:12Z",
-    "updatedAt": "2026-11-20T03:50:45Z",
-    "headBranch": "claude/doc-standard-refs-1120",
-    "displayTitle": "[구글 품질 2단계 ①] GRM 연결 빈 문서 — 본문이 적은 기준의 원문 링크 (DB 0)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44669720633"
-   },
-   {
-    "databaseId": 44669668841,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-20T03:43:44Z",
-    "updatedAt": "2026-11-20T03:50:50Z",
-    "headBranch": "claude/doc-standard-refs-1120",
-    "displayTitle": "feat(seo): GRM 연결이 빈 문서 페이지에 본문이 적은 기준의 원문 링크 (DB 행 0)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44669668841"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 44676827733,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-20T04:48:19Z",
+    "updatedAt": "2026-11-20T04:48:29Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44676827733"
+   },
+   {
     "databaseId": 44672083788,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44461863059"
-   },
-   {
-    "databaseId": 44434676807,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-19T01:09:05Z",
-    "updatedAt": "2026-11-19T01:09:06Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44434676807"
    }
   ],
   "grm-findings-translate-apply.yml": [

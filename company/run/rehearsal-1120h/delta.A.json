@@ -387,9 +387,9 @@
     "관찰 1: 엔도톡신 기준일탈 결과를 기록·보고하지 않고 다른 시료의 적합 결과로 바꿔 시험성적서(COA)에 보고, 경고 수준 CFU가 나온 평판을 기록 없이 폐기",
     "관찰 2: 2023년 1월 이후 미국 시장에서 효과 없음 불만 39건을 받았으나 근본원인을 정하지 않음",
     "관찰 3: 기준일탈 조사에서 과학적 근거 없이 오염된 초자 등을 원인으로 정하고 재시험 적합 배치를 미국에 출하",
-    "관찰 4: 앰플·바이알 충전 라인 기류 시각화 영상에서 작업자 머리와 상체가 A등급 구역 안에 들어간 개입이 확인됨"
+    "당국 조치: 같은 호 회수 — 카복시메틸셀룰로오스나트륨 0.5% 점안제(Class II)"
    ],
-   "implication": "FDA 실사관이 묻자 2025-11-12 미생물 팀장이 카메라 날짜와 시간을 바꿔 균이 자란 평판을 촬영했고 팀원에게 시험 정보를 소급 기재한 작업지를 만들게 했다(관찰 1). 2025-10-31 미생물 팀장이 일탈 시료 정보가 담긴 기록부 60~62쪽을 떼어 내고 빈 양식으로 바꾼 뒤 팀원에게 일탈 시료를 뺀 정보를 다시 쓰게 했다(관찰 1). 미생물 시험실에서 관리되지 않는 CGMP 빈 양식이 30종 넘게 발견됐다(관찰 1). 감사추적기록 검토 점검표는 주입 중단 같은 이벤트의 확인을 요구하지 않았다(관찰 5). 장갑 세척 절차서가 없었고 생산 뒤 장갑 손가락 부위는 시료를 채취하지 않았다(관찰 6).",
+   "implication": "FDA 실사관이 묻자 2025-11-12 미생물 팀장이 카메라 날짜와 시간을 바꿔 균이 자란 평판을 촬영했고 팀원에게 시험 정보를 소급 기재한 작업지를 만들게 했다(관찰 1). 2025-10-31 미생물 팀장이 일탈 시료 정보가 담긴 기록부 60~62쪽을 떼어 내고 빈 양식으로 바꾼 뒤 팀원에게 일탈 시료를 뺀 정보를 다시 쓰게 했다(관찰 1). 미생물 시험실에서 관리되지 않는 CGMP 빈 양식이 30종 넘게 발견됐다(관찰 1). 앰플·바이알 충전 라인 기류 시각화 영상에서 작업자 머리와 상체가 A등급 구역 안에 들어간 개입이 확인됐다(관찰 4). 감사추적기록 검토 점검표는 주입 중단 같은 이벤트의 확인을 요구하지 않았다(관찰 5). 장갑 세척 절차서가 없었고 생산 뒤 장갑 손가락 부위는 시료를 채취하지 않았다(관찰 6).",
    "checks": [
     "기준일탈 결과가 다른 시료 결과로 대체되지 않도록 원시 결과를 바로 기록하는가? (관찰 1)",
     "시험실 빈 양식을 발행 번호로 관리하는가? (관찰 1)",
@@ -403,9 +403,9 @@
      "Observation 1: endotoxin OOS results were not recorded or reported and were replaced with passing results from different samples on the final COA, and plates with alert level CFU were discarded without records",
      "Observation 2: 39 complaints of drug ineffectiveness were received from the U.S. market since January 2023 with no root cause assigned",
      "Observation 3: OOS investigations assigned causes such as dirty glassware without scientific evidence, and batches passing on retest were released to the U.S.",
-     "Observation 4: smoke study videos of the ampoule and vial filling lines showed operators' heads and upper bodies inside the Grade A area during interventions"
+     "Agency action: recall in the same issue — carboxymethylcellulose sodium 0.5% eye drops (Class II)"
     ],
-    "implication": "When asked by the FDA investigator on 2025-11-12, the QC Microbiology Team Lead changed the camera time and date to photograph plates with growth and had a team member create backdated worksheets (Observation 1). On 2025-10-31 the QC Microbiology Team Lead removed logbook pages 60 to 62 holding deviation sample information, replaced them with blank forms and had a team member backfill entries without the deviation samples (Observation 1). Over thirty uncontrolled CGMP blank form types were found in the microbiology laboratory (Observation 1). The audit trail review checklist did not require identifying events such as aborted injections (Observation 5). There was no written procedure for cleaning gloves, and glove fingers were not sampled after production (Observation 6).",
+    "implication": "When asked by the FDA investigator on 2025-11-12, the QC Microbiology Team Lead changed the camera time and date to photograph plates with growth and had a team member create backdated worksheets (Observation 1). On 2025-10-31 the QC Microbiology Team Lead removed logbook pages 60 to 62 holding deviation sample information, replaced them with blank forms and had a team member backfill entries without the deviation samples (Observation 1). Over thirty uncontrolled CGMP blank form types were found in the microbiology laboratory (Observation 1). Smoke study videos of the ampoule and vial filling lines showed operators' heads and upper bodies inside the Grade A area during interventions (Observation 4). The audit trail review checklist did not require identifying events such as aborted injections (Observation 5). There was no written procedure for cleaning gloves, and glove fingers were not sampled after production (Observation 6).",
     "checks": [
      "Are raw results recorded immediately so that OOS results cannot be replaced by other samples' results? (Observation 1)",
      "Are blank laboratory forms issued and tracked by number? (Observation 1)",

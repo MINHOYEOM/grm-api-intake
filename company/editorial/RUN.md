@@ -93,7 +93,9 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
   07:20 데스크가 07:42 직전에 handoff 를 찾아 일하는 중에 07:45 데스크가 와도 둘이 같은 일을 하지 않는다.
 - 데스크는 08:10 이 지나서 처음 handoff 를 찾았으면 시작하지 않는다(기자·교열 시간이 모자란다) — 위 `보류`.
 - 워커는 `desk.json` 이 `보류`·`실패` 면 기다리지 않고 바로 종료한다. 파일이 없거나 그 밖의 상태면 기다린다.
-- 대기는 `sleep` 을 한 번에 5분 이하로 나눠서 하고, 기다리는 동안 다른 일(검색·작성)은 하지 않는다. 확인할 때마다 `git fetch` 로 새로 받는다.
+- 대기는 `sleep` 을 **한 번에 90초 이하**로 나눠서 한다(Bash 도구 기본 시한 120초 — 그보다 긴 명령은 잘리고, Routine 세션은 긴 `sleep` 을 막기도 한다).
+  '5분마다'·'3분마다'는 확인 간격이지 `sleep` 한 번의 길이가 아니다(예: 5분 = `sleep 90` 을 네 번 남짓). 기다리는 동안 다른 일(검색·작성)은 하지 않는다. 확인할 때마다 `git fetch` 로 새로 받는다.
+  워커 루프(7항)는 `check --wait` 이 파이썬 안에서 기다리므로 `sleep` 을 따로 하지 않는다.
 - 기다리는 동안 handoff 가 바뀌지 않는다: 07:00 KST 이후 수집을 다시 돌려도 그날 handoff 가 이미 있으면 다시 쓰지 않는다
   (`grm_handoff.publish_day_handoff_frozen` · DB 사본도 같은 규칙). 그래서 데스크가 읽은 handoff 를 기자·교열도 그대로 본다.
 - 어림(분량은 그 주마다 다르다): handoff 08:10 → 데스크 약 15분 → 워커 08:25 시작 → 첫 샤드 08:50 전후 → 7항의 08:55 이후엔 새 샤드를 잡지 않으므로
@@ -116,9 +118,10 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 워커 한 개가 한 샤드로 끝나지 않는다. 자기 일을 끝내고 시간이 남으면 다음 빈 샤드를 가져온다.
 ```
 반복:
-  python company/editorial/shard_claim.py check company/run/{D} <delta|deep> <워커이름> --until 08:55   # 끝내도 되는지 코드가 정한다
+  python company/editorial/shard_claim.py check company/run/{D} <delta|deep> <워커이름> --until 08:55 --wait   # 끝내도 되는지 코드가 정한다
   exit 0(DONE · DEADLINE · NO_TAKEOVER)이면 종료. exit 1 이면 끝내지 않는다:
-    WAIT <S> <초> → 그 초만큼(5분 이하) 기다렸다가 위로 — 남이 잡은 샤드가 죽은 것으로 판정되면 이어받는다
+    WAIT <S> <초> → 셸 `sleep` 없이 **같은 명령을 곧바로 다시** 실행 — `--wait` 이 파이썬 안에서 이미 최대 90초 기다렸다(한 번 실행이 120초 시한 안에 끝난다).
+                    남이 잡은 샤드가 죽은 것으로 판정되면 이어받는다
     CLAIM <S>     → 아래로
   python company/editorial/shard_claim.py claim company/run/{D} <종류> $S <워커이름>   # 0=내가 잡음, 1=졌음 → 위로 돌아가 다음 샤드
   샤드 S 를 처리하고 결과 파일을 커밋·push (RUN.md 3항 방식) — 이것이 곧 '완료' 표시다
@@ -129,6 +132,7 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 - **끝내는 조건은 `check` 의 exit 0 하나뿐이다.** 분량(원문 글자 수)·문맥 크기·'한 워커가 많이 못 가져간다'는 판단은 끝낼 이유가 아니다 —
   빈 샤드를 남기고 끝내면 그 샤드는 아무도 하지 않고 백업이 발행한다(리허설 1120g: 심층 워커가 7개 중 2개만 하고 끝냈다). 끝낼 때 마지막 `check` 출력 한 줄을 보고에 적는다.
   끝낸 샤드의 원문은 다시 읽지 않는다 — 다음 샤드는 그 샤드 카드만 읽는다.
+- `T` 는 08:55 시한에서 빠진다 — 델타 본 샤드가 모두 `완료`이고 `T` 만 비어 있으면 08:55 뒤에도 `check` 가 `CLAIM T` 를 낸다(T 가 비면 합치기가 멈춰 백업이 발행한다).
 - 델타 워커는 Opus, 심층 워커는 Sonnet — **종류가 다른 샤드는 가져오지 않는다**(모델 배정을 지킨다).
 - 서브에이전트·병렬 세션은 쓰지 않는다(`CHARTER.md`). 분량이 늘어도 해법은 '샤드를 늘리고 워커 슬롯에 중복 배치'이지 세션 안에서 병렬화가 아니다.
 - 예약작업이 다른 예약작업을 깨우거나 세션을 새로 여는 길은 **이 저장소에서 실측하지 못했다**. 확인되면 이 항을 고친다 — 그 전까지는 고정 슬롯(5항)만 쓴다.

@@ -522,6 +522,38 @@ class FreezeTest(unittest.TestCase):
         self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 2)
         self.assertTrue(gq.past_publish_freeze(None))               # 시각을 못 읽으면 동결 쪽
 
+    def test_freeze_is_decided_by_write_time_not_run_start(self):
+        # 2026-11-20 감사: 06:45 에 시작해 07:05 에 쓰는 실행이 시작 시각만 보고 handoff 를 다시 썼다
+        # → 데스크(07:20)가 읽은 사본 지문이 바뀌어 보류 → 백업 발행. 노션 길처럼 쓰기 시각으로 동결한다.
+        self._shadow()
+        first = dict(self.store.handoffs["2026-11-16"])
+        self.store.add_raw(_record("Federal Register", "2026-3"))
+        os.environ.pop("GRM_QUEUE_HANDOFF_REFRESH", None)
+        start = datetime(2026, 11, 16, 6, 45, tzinfo=gq.KST)
+        report = self._shadow(at=start, freeze_now=datetime(2026, 11, 16, 7, 5, tzinfo=gq.KST),
+                              new_items=[_Item("Federal Register", "2026-3")])
+        self.assertEqual(report["handoff_frozen"], gq.FROZEN_PUBLISH_DAY)
+        after = self.store.handoffs["2026-11-16"]
+        self.assertEqual((after["manifest"], after["payload_sha256"]),
+                         (first["manifest"], first["payload_sha256"]))
+        self.assertTrue(os.path.exists(os.path.join(self.root, "handoff_db_2026-11-16.rerun.json")))
+        # 같은 실행이 06:55 에 쓰면 동결 전 — 갱신한다(coverage gate 재생성 길).
+        report = self._shadow(at=start, freeze_now=datetime(2026, 11, 16, 6, 55, tzinfo=gq.KST),
+                              new_items=[_Item("Federal Register", "2026-3")])
+        self.assertEqual(report["handoff_frozen"], "")
+        self.assertEqual(len(self.store.handoffs["2026-11-16"]["manifest"]), 3)
+
+    def test_write_time_freeze_matches_the_notion_rule(self):
+        at = lambda d, h, m=0: datetime(2026, 11, d, h, m, tzinfo=gq.KST)  # noqa: E731
+        self.assertFalse(gq.past_publish_freeze_at_write("2026-11-16", at(16, 6, 59)))
+        self.assertTrue(gq.past_publish_freeze_at_write("2026-11-16", at(16, 7, 0)))
+        self.assertTrue(gq.past_publish_freeze_at_write("2026-11-16", at(17, 0, 30)))   # 자정을 넘긴 실행
+        self.assertFalse(gq.past_publish_freeze_at_write("2026-11-16", at(18, 9)))      # 노션 길과 같다
+        self.assertTrue(gq.past_publish_freeze_at_write("2026-11-16", datetime(2026, 11, 16, 7, 1)))  # naive=KST
+        for d, h in ((16, 6), (16, 7), (17, 0), (18, 9)):
+            self.assertEqual(gq.past_publish_freeze_at_write("2026-11-16", at(d, h)),
+                             gh.publish_day_handoff_frozen(RUN, at(d, h)))
+
     def test_refresh_switch_rebuilds_an_open_publish_day_record_only(self):
         self._shadow()
         self.store.add_raw(_record("Federal Register", "2026-3"))

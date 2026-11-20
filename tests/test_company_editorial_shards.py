@@ -214,6 +214,53 @@ class ExitCheckTest(unittest.TestCase):
         self._done("delta", "B")
         self.assertEqual(sc.exit_check(self.d, "delta", "델타-1", now=1120), (False, "CLAIM T"))
 
+    def test_T_is_exempt_from_the_deadline_once_body_shards_are_done(self):
+        # 2026-11-20 감사: 본 샤드가 다 끝났는데 T 가 비어 있으면 08:56 에 DEADLINE → T 고아 → merge_parts 'tldr 없음' → 백업.
+        self._done("delta", "A", "B")
+        self.assertEqual(sc.exit_check(self.d, "delta", "델타-1+", until=self.until, now=self.until - 60),
+                         (False, "CLAIM T"))
+        self.assertEqual(sc.exit_check(self.d, "delta", "델타-1+", until=self.until, now=self.until + 60),
+                         (False, "CLAIM T"))
+        # 남이 T 를 잡고 살아 있으면 이어받을 수 없으니 끝내도 된다(그 워커가 쓴다).
+        _w(sc._claim_path(self.d, "delta", "T"), {"worker": "델타-2", "at": self.until})
+        self.assertEqual(sc.exit_check(self.d, "delta", "델타-1+", until=self.until, now=self.until + 60),
+                         (True, "NO_TAKEOVER T"))
+        self._done("delta", "T")
+        self.assertEqual(sc.exit_check(self.d, "delta", "델타-1+", until=self.until, now=self.until + 60),
+                         (True, "DONE"))
+
+    def test_deadline_still_applies_while_body_shards_remain(self):
+        self._done("delta", "A")
+        self.assertEqual(sc.exit_check(self.d, "delta", "델타-1+", until=self.until, now=self.until + 60),
+                         (True, "DEADLINE"))
+
+    def test_wait_is_capped_under_the_bash_tool_timeout(self):
+        self.assertLessEqual(sc.WAIT_MAX_SEC, 100)
+        self._done("deep", *"ABCDEF")
+        _w(sc._claim_path(self.d, "deep", "G"), {"worker": "심층-2", "at": 1000})
+        ok, line = sc.exit_check(self.d, "deep", "심층-1+", now=1060)       # 죽음 판정까지 24분 남음
+        self.assertEqual((ok, line), (False, f"WAIT G {sc.WAIT_MAX_SEC}"))
+
+    def test_check_wait_sleeps_in_python_and_rechecks(self):
+        from unittest import mock
+        self._done("deep", *"ABCDEF")
+        _w(sc._claim_path(self.d, "deep", "G"), {"worker": "심층-2", "at": 1e12})   # 먼 미래까지 살아 있는 점유
+        slept = []
+
+        def fake_sleep(sec):
+            slept.append(sec)
+            self._done("deep", "G")                       # 기다리는 사이 남이 끝냈다
+
+        with mock.patch.object(sc, "_sleep", side_effect=fake_sleep):
+            self.assertEqual(sc.main(["x", "check", self.d, "deep", "w", "--wait"]), 0)
+        self.assertEqual(len(slept), 1)
+        self.assertLessEqual(slept[0], sc.WAIT_MAX_SEC)
+        # WAIT 가 아니면 기다리지 않는다
+        os.remove(os.path.join(self.d, "deep.C.json"))
+        with mock.patch.object(sc, "_sleep") as never:
+            self.assertEqual(sc.main(["x", "check", self.d, "deep", "w", "--wait"]), 1)   # CLAIM C
+            never.assert_not_called()
+
     def test_until_is_kst_wall_clock(self):
         import datetime
         t = sc.until_ts("08:55", 1_763_500_000)
@@ -245,6 +292,23 @@ class WorkerLoopInstructionTest(unittest.TestCase):
             self.assertIn("shard_claim.py check` 가 exit 0 을 내기 전에는 끝내지 않는다", self._read(*folder, "reporter.md"), folder)
             self.assertIn("plan_shards.py <입력.json> --handoff", self._read(*folder, "desk.md"), folder)
         self.assertIn("`--until 08:55` 를 빼고", self._read("REHEARSAL.md"))
+
+    def test_2026_11_20_audit_wording(self):
+        for folder in ((), ("next",)):
+            run = self._read(*folder, "RUN.md")
+            self.assertIn("--until 08:55 --wait", run, folder)                   # 셸 sleep 없는 루프
+            self.assertNotIn("그 초만큼(5분 이하) 기다렸다가", run, folder)
+            self.assertNotIn("한 번에 5분 이하로", run, folder)
+            rep = self._read(*folder, "reporter.md")
+            self.assertNotIn("`shard_claim.py next` → `claim`", rep, folder)
+            self.assertIn("--wait", rep, folder)
+            ce = self._read(*folder, "copyedit.md")
+            self.assertIn("python check_en_slots.py company/run/{run_date_kst}/brief_check.json", ce, folder)
+            self.assertIn("`역할: 교열(2차)`", ce, folder)
+            self.assertIn("1차 판정을 대신하지 않는다", ce, folder)
+        switch = self._read("SWITCH_2026-11-23.md")
+        self.assertNotIn("| 09:05 |", switch)
+        self.assertIn("08:45 · 09:12", switch)
 
 
 def _git(cwd, *a):

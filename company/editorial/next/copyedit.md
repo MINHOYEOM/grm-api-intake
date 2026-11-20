@@ -36,7 +36,7 @@
    그다음 `python company/editorial/merge_parts.py company/run/{run_date_kst}` — `delta.A/B.json`·`deep.A/B.json` 을
    `delta.json`·`deep_delta.json` 으로 합친다(LLM 이 옮겨 적지 않는다). exit≠0 이면 그 메시지를 `copyedit.json` 에 적고 `보류`(**영문 슬롯 미완결도 여기서 걸린다** — 카드마다 `en` 의 제목 이슈·요약·핵심 사실과 `tldr_en` 이 있어야 하고, 한국어가 채운 시사점·점검은 `en` 도 채워야 합격 — 한국어가 비운 칸은 `en` 도 비어 있는 것이 맞다. 빠졌으면 기자에게 되돌리고, 09:20 까지 못 메우면 `보류`) — Notion 에 아무것도 쓰지 않는다.
    기자 샤드(가변 N개 + `T`)가 08:40 보강 워커분까지 끝났어야 한다. 미완 샤드가 있으면(`python company/editorial/shard_claim.py status company/run/{run_date_kst}` 로 확인)
-   **09:20 까지 3분마다 다시 확인**하고, 그래도 아니면 `보류` — 09:30 백업이 마지막 안전망이다.
+   **09:20 까지 3분마다 다시 확인**하고, 그래도 아니면 `보류` — 자동 백업은 없다 — 종합상황실이 잡고 대표가 정한다(RUN.md 0항).
 1. **코드 검사 먼저.** 이번 주 스캐폴드를 받는다 — **handoff 와 같은 브랜치**(`claude/queue-handoff`)의 것이다. 기자는 이 스캐폴드와 같은 재료(DB handoff)의 사실 칸을 보고 썼다.
    (`RUN.md` 0항이 `handoff 길: notion` 인 호만 종전 사본 `claude/scaffold-brief-web` 을 쓴다.)
    ```
@@ -77,22 +77,20 @@
    ```
    `rework-diff` 가 exit≠0 이면(반려되지 않은 카드가 바뀌었거나 카드가 늘고 줄었다) 판정하지 않고 `보류`. exit 0 이면 1번(코드 검사)을 다시 돌리고,
    **반려됐던 카드만** 2·2-1번 전 항목으로 다시 판정한다(나머지 카드는 글자가 그대로이므로 1차 판정 `pass` 를 그대로 옮긴다).
-   결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남으면 `보류`** — 더 되돌리지 않는다(백업이 발행한다).
+   결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남으면 `보류`** — 더 되돌리지 않는다(자동 백업 없음 — `RUN.md` 0항).
    **2차가 코드 검사 exit 0 · reject 0 이면 곧바로 아래 4번 마감을 1번(`scaffold.json` 복사 → `delta.json`·`deep_delta.json`·`scaffold.json`·`copyedit.json` push)부터 한다.**
-   `copyedit.json` 에 `완료` 만 적고 끝내면 브릿지가 가져갈 반납이 없어 백업이 발행한다(리허설 1120d — 2차 통과 뒤 `scaffold.json` 이 없었다).
-4. **마감 — 코드 검사 exit 0 이고 reject 0 일 때만.** 하나라도 아니면 Notion 에 아무것도 쓰지 않고 끝낸다
-   (Notion handoff 가 OPEN 으로 남아 09:30 백업 Routine 이 발행한다). 통과면 이 순서로 (`RUN.md` 0항 `반납 길: git` 인 호):
+   `copyedit.json` 에 `완료` 만 적고 끝내면 브릿지가 가져갈 반납이 없어 그 호가 발행되지 않는다(리허설 1120d — 2차 통과 뒤 `scaffold.json` 이 없었다).
+4. **마감 — 코드 검사 exit 0 이고 reject 0 일 때만.** 하나라도 아니면 반납하지 않고 끝낸다
+   (자동 백업은 없다 — 종합상황실이 잡고 대표가 정한다 — `RUN.md` 0항). 통과면 이 순서로:
    1. **반납 = 실행 폴더 push.** 코드 검사에 쓴 스캐폴드를 **그 파일 그대로** 실행 폴더에 복사한다(다시 저장·정렬하지 않는다):
       `cp _scaffold/brief_web_$U.json company/run/{run_date_kst}/scaffold.json`.
       `delta.json`·(있으면) `deep_delta.json`·`scaffold.json`·`copyedit.json`(`status: 완료`, `published: true`)을 커밋·push 한다(RUN.md 3항 방식).
       발행 브릿지가 이 브랜치에서 가져가 main 에 넣는다 — Notion 에 델타를 예치하지 않는다(v16 [산출물 — 델타 Notion 예치] 의 예치·글자 대조는 하지 않는다).
-      push 가 3번 거절되면 Notion 에 아무것도 쓰지 않고 `실패` 로 끝낸다.
-   2. push 가 끝나면 **곧바로** Notion handoff 페이지(제목 `OPEN GRM Routine Handoff {run_date_kst}`)를 v16 [0단계] PL-10 마감대로 `CONSUMED` 로 바꾼다
-      (`desk.json` 의 `defer` row 가 있으면 `DEFERRED` 블록 포함). 이때부터 백업 Routine 은 돌지 않는다.
-      09:25 까지 못 바꿨으면 `copyedit.json` 을 `status: 실패`·`published: false` 로 고쳐 다시 push 하고 끝낸다(RUN.md 5항).
+      push 가 3번 거절되면 `실패` 로 끝낸다.
+   2. **Notion 마감은 없다.** handoff 를 닫는 일(종전 `CONSUMED`)·행 Status 찍기는 하지 않는다 — 기다릴 백업 Routine 도 없다(`RUN.md` 0항).
+      v16 [산출물 — 델타 Notion 예치]·[Status 갱신] 은 이 호에 해당하지 않는다(가리킴은 v16 절 배정표 때문에 남겨 둔다).
    3. **행 Status 는 찍지 않는다.** v16 [Status 갱신] 의 규칙(`render`·병합 멤버·`reflow`→Processed · `skip`→Skipped · `error`→Error · `defer`→미변경)은
-      코드가 적용한다 — 브릿지가 델타를 가져간 직후 `grm_queue.py notion-sync` 가 발행 결과로 계산해 Notion 행에 찍는다. handoff 행에는 `page_id` 가 없다.
-   (`반납 길: notion` 인 호는 종전 순서다: v16 [산출물 — 델타 Notion 예치] 로 예치·자기검증(실패 시 `VOID GRM Web Delta {날짜}`·Skipped) → handoff `CONSUMED` → v16 [Status 갱신] 대로 행 Status 를 `desk.json` 의 `action` 에 맞춰 바꾼다.)
+      코드가 적용한다 — 브릿지가 델타를 main 에 넣으면 DB 대기열이 발행 결과로 상태를 다시 계산한다. 노션 행 기록(`grm_queue.py notion-sync`)은 Notion 을 끈 뒤로 돌지 않는다.
 
 ## 결과 — `company/run/{run_date_kst}/copyedit.json`
 ```

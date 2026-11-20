@@ -156,6 +156,7 @@ import clause_text_page  # noqa: E402  [기준 조항 원문 2026-11-15] /clause
 import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
 import news_page  # noqa: E402  [최근 규제 소식 2026-11-10]
 import inspection_notes_page  # noqa: E402  [실사 대비 노트 2026-11-15] 주제별 지적 문장 묶음
+import doc_gist  # noqa: E402  [구글 품질 2단계 2026-11-20] 국문 짧은 문서 첫머리 'GRM 요지'
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -7936,6 +7937,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # [SEO 2단계 2026-11-09] GRM 고유 맥락 입력 — 비슷한 지적(정본 파일)·조항(뷰 재사용).
         similar_by_doc = load_findings_similar() if render_doc_pages else {}
         partial_detail_ids = load_partial_detail_ids() if render_doc_pages else frozenset()
+        # [구글 품질 2단계 2026-11-20] GRM 요지(translations/doc_gist_outbox) — 지적 본문 해시가 같고 검사를 통과한 것만.
+        doc_gists = doc_gist.load_outbox() if render_doc_pages else {}
         docs_by_id = {d["document_id"]: d for d in documents}
         clause_by_section_by_lang = {
             DEFAULT_LANG: {c["section"]: c for c in clause_views},
@@ -8056,6 +8059,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
                     # [다국어] 그 언어 트리에 있는 것만 잇는다(_firm_slug_for).
                     firm_page_slug=_firm_slug_for(doc, _lg),
+                    doc_gist=(doc_gist.view(doc, doc_gists) if _lg == DEFAULT_LANG else None),
                     similar_cases=doc_similar_view(
                         doc, similar_by_doc.get(doc["document_id"]), docs_by_id, _lg,
                         _doc_slugs_by_lang.get(_lg), _canonical_firm_key),

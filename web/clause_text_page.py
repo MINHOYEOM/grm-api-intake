@@ -31,10 +31,22 @@ SOURCE_SLUG = {"mfds_gmp": "mfds-gmp", "cfr21": "cfr21", "eu_gmp": "eu-gmp", "ic
 #: 화면 머리 표지(eyebrow) — 고유명사라 번역하지 않는다.
 SOURCE_KICK = {"mfds_gmp": "KR · 식약처 고시", "cfr21": "US · 21 CFR", "eu_gmp": "EU · EudraLex Vol.4", "ich": "ICH"}
 PREVIEW_CHARS = 140
+#: [구글 품질 2단계 2026-11-20] 국문 참고 번역 머리 안내(국문 트리 전용 — 영문 트리에는 번역 블록이 없다).
+#  ICH 법적 고지: 번역본은 그 사실을 밝히고 ICH 가 승인한 것처럼 보이면 안 된다(SOURCES.md). EC 재이용 결정도 같은 취지.
+KO_NOTE = {
+    "ich": "GRM 이 옮긴 참고 번역입니다. ICH 가 승인한 번역이 아니며, 기준은 아래 영어 원문입니다.",
+    "eu_gmp": "GRM 이 옮긴 참고 번역입니다. 유럽연합(EC)의 공식 번역이 아니며, 기준은 아래 영어 원문입니다.",
+    "_": "GRM 이 옮긴 참고 번역입니다. 법적 효력은 아래 영어 원문에 있습니다.",
+}
 
 
-def load_sources(data_dir: "Path | None" = None) -> list[dict[str, Any]]:
-    """원천 파일들. 없거나 깨졌거나 스키마가 다르면 그 원천만 빠진다(빌드 계속)."""
+def load_sources(data_dir: "Path | None" = None,
+                 translations_dir: "Path | None" = None) -> list[dict[str, Any]]:
+    """원천 파일들. 없거나 깨졌거나 스키마가 다르면 그 원천만 빠진다(빌드 계속).
+
+    [구글 품질 2단계 2026-11-20] 정본 폴더(data_dir 생략)를 읽을 때는 국문 참고 번역
+    (`translations/clause_outbox/*.json`)을 원문 해시가 같은 조항에만 덧씌운다(clause_translation.apply).
+    다른 폴더를 읽을 때는 translations_dir 을 줄 때만 덧씌운다."""
     d = DATA_DIR if data_dir is None else data_dir
     out = []
     for key in SOURCE_ORDER:
@@ -48,6 +60,9 @@ def load_sources(data_dir: "Path | None" = None) -> list[dict[str, Any]]:
         if obj.get("schema") != SCHEMA or not obj.get("clauses"):
             continue
         out.append(obj)
+    if data_dir is None or translations_dir is not None:
+        import clause_translation
+        clause_translation.apply(out, clause_translation.load_outbox(translations_dir))
     return out
 
 
@@ -101,6 +116,9 @@ def build(sources: list[dict[str, Any]]) -> dict[str, Any]:
                     "chars": c.get("chars") or 0,
                     # [구글 품질 1단계 2026-11-19] 국문 번역(2단계가 채운다). 있으면 국문 페이지가 구글에 돌아온다.
                     "text_ko": c.get("text_ko") or "",
+                    # [구글 품질 2단계 2026-11-20] 국문 참고 번역의 화면 몫 — 국문 트리 템플릿만 쓴다.
+                    "title_ko": c.get("title_ko") or "",
+                    "ko_paras": [p for p in (c.get("text_ko") or "").split("\n\n") if p.strip()],
                 })
             pages = [c for c in clauses if c["href"]]
             for i, c in enumerate(pages):
@@ -118,7 +136,8 @@ def build(sources: list[dict[str, Any]]) -> dict[str, Any]:
                       "title": src.get("title") or "", "publisher": src.get("publisher") or "",
                       "url": src.get("url") or "", "license": src.get("license") or "",
                       "license_url": src.get("license_url") or "",
-                      "retrieved": src.get("retrieved") or "", "docs": docs})
+                      "retrieved": src.get("retrieved") or "", "docs": docs,
+                      "ko_note": KO_NOTE.get(key, KO_NOTE["_"])})
     for sv in views:
         for d in sv["docs"]:
             d["source"] = sv

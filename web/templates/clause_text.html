@@ -21,7 +21,7 @@
         국문 트리에서 번역이 있을 때만 원문 위에 둔다. 안내 문구는 원천별로 뷰가 정한다(ICH·EC 는 '승인 번역 아님'). -#}
     {%- if lang == 'ko' and clause.ko_paras %}
     <section>
-      <h2 class="ct-sec-h">국문 참고 번역</h2>
+      <h2 class="ct-sec-h">{{ doc.source.ko_label }}</h2>
       {%- if clause.title_ko %}<p class="ct-sub">{{ clause.title_ko }}</p>{% endif %}
       <div class="ct-text" lang="ko">
         {%- for p in clause.ko_paras %}

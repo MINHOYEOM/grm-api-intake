@@ -33,6 +33,8 @@ SOURCE_KICK = {"mfds_gmp": "KR · 식약처 고시", "cfr21": "US · 21 CFR", "e
 PREVIEW_CHARS = 140
 #: [구글 품질 2단계 2026-11-20] 국문 참고 번역 머리 안내(국문 트리 전용 — 영문 트리에는 번역 블록이 없다).
 #  ICH 법적 고지: 번역본은 그 사실을 밝히고 ICH 가 승인한 것처럼 보이면 안 된다(SOURCES.md). EC 재이용 결정도 같은 취지.
+#  문구는 뷰가 넘긴다 — 국문 전용 블록이라 en.json 키를 만들지 않는다(i18n lint: 템플릿에 감싸지 않은 한글 금지).
+KO_LABEL = "국문 참고 번역"
 KO_NOTE = {
     "ich": "GRM 이 옮긴 참고 번역입니다. ICH 가 승인한 번역이 아니며, 기준은 아래 영어 원문입니다.",
     "eu_gmp": "GRM 이 옮긴 참고 번역입니다. 유럽연합(EC)의 공식 번역이 아니며, 기준은 아래 영어 원문입니다.",
@@ -137,7 +139,7 @@ def build(sources: list[dict[str, Any]]) -> dict[str, Any]:
                       "url": src.get("url") or "", "license": src.get("license") or "",
                       "license_url": src.get("license_url") or "",
                       "retrieved": src.get("retrieved") or "", "docs": docs,
-                      "ko_note": KO_NOTE.get(key, KO_NOTE["_"])})
+                      "ko_label": KO_LABEL, "ko_note": KO_NOTE.get(key, KO_NOTE["_"])})
     for sv in views:
         for d in sv["docs"]:
             d["source"] = sv

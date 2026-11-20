@@ -1,1 +1,8 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{
+  "status": "완료",
+  "round": 1,
+  "worker": "델타-2",
+  "fixed": [],
+  "unfixed": ["fda483-196399"],
+  "이의": "fda483-196399 — 슬롯 문제가 아니라 번호 충돌이다. 원문(handoff body_full)에 'OBSERVATION 5' 가 두 번 있고(보관용 시료·기기 교정 — 앞의 것은 OCR 상 4로 보인다) 스캐폴드 deterministic_detail.observations 의 number 도 1,2,3,5,5,6,7,8 이다. inject_slots._merge_observation_translations 는 번호→관찰 dict(by_num)로 병합해 같은 번호 중 마지막 관찰에만 국문이 붙으므로, deep.B.json observations_ko 에 '5' 두 항목(이미 둘 다 있음)을 어떻게 적어도 첫 번째 #5 는 deficiency_ko·detail_ko 가 비고 조립 게이트 4 가 막는다. 기자 재작업으로 풀 수 없고 코드(중복 번호 순서 매칭 또는 수집기 번호 보정) 수정이 필요하다. deep.B.json 은 바꾸지 않았다. 사전 점검 deep: 같은 2건(exit 1)."
+}

@@ -254,6 +254,32 @@ def merge_fda483_disclosures(cards: list[dict[str, Any]]) -> list[dict[str, Any]
         "목록에 자사 공급망·수급처 시설이 있는지 확인",
         "해당 시 FDA FOIA 원문(PDF) 직접 열람",
     ]
+    # [영문 디제스트 2026-11-20] 한국어 서사를 위에서 통째로 갈아 쓰므로 영문 갈래도 같은 디제스트로 쓴다.
+    # ★리허설 1120j: 대표(fda483-196348)는 기자가 **낱장 카드**로 쓴 en(시사점·점검 없음 — 관찰 원문이 없어
+    #   한국어도 비웠다)을 그대로 들고 나가, 한국어만 디제스트 시사점·점검으로 채워진 반쪽 영어가 됐다 →
+    #   영문 게이트(check_en_slots) exit 1. 접힘은 호 전체를 봐야 정해지므로(샤드마다 1장씩이면 기자는 모른다)
+    #   기자가 막을 수 없다 — 한국어를 쓰는 이 자리에서 영어도 쓴다. 11-02 호 영문 디제스트는 손으로 써서
+    #   건수가 한국어(4건)와 달랐다(11건) — 결정론으로 같은 n 을 쓴다.
+    rep["en"] = {
+        "title_issue": "Multiple 483 inspection records released",
+        "summary": (
+            f"FDA OII FOIA Electronic Reading Room released {n} Form 483 inspection records. "
+            "The original PDFs are public, but the individual observation text could not be obtained "
+            "automatically, so only the list of facilities and inspection dates is summarized."),
+        "key_facts": [
+            f"Records released: {n} (observation text not obtained automatically; original PDFs are public)",
+            f"Representative facility: {rep_fac.replace(' · ', ', ')}, plus {n - 1} others",
+            "Source: FDA OII FOIA Electronic Reading Room",
+        ],
+        "implication": (
+            "Release of inspection records without the observation text is not in itself a signal for "
+            "action. Domestic firms should check whether any facility in their supply chain appears on "
+            "the list and, if so, read the original PDF directly."),
+        "checks": [
+            "Whether any facility in your supply chain or sourcing appears on the list",
+            "If so, read the original FDA FOIA PDF directly",
+        ],
+    }
     rep["merged_count"] = n
     rep["merged_items"] = facilities
     rep["merged_noun"] = "건"

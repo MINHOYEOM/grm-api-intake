@@ -659,5 +659,53 @@ class WlViolationKo1120hTest(unittest.TestCase):
                 self.assertEqual(precheck.main(["deep", str(ho), str(sh), "--scaffold", str(sc)]), 0)
 
 
+class AssembledEnGate1120jTest(unittest.TestCase):
+    """리허설 1120j: 샤드 카드는 시사점·점검을 한·영 모두 비워 짝이 맞았는데, 조립(483 디제스트 대표)이 한국어만
+    갈아 써서 교열 영문 게이트(`check_en_slots`)가 exit 1. 사전 점검은 조립 **뒤** 카드에 그 판정을 그대로 돌린다."""
+
+    @staticmethod
+    def _scaffold(*ids):
+        return {"brief": {"run_date_kst": "2026-11-20"},
+                "cards": [{"id": cid, "card_type": "FDA 483 실사 관찰", "type_tag": "483",
+                           "facts": [{"label": "제조소/업체", "value": f"Firm {cid}"},
+                                     {"label": "실사일", "value": "03/20/2026"}]} for cid in ids]}
+
+    def test_lines_use_check_en_slots_verdict_on_assembled_cards(self):
+        import check_en_slots
+        cards = {"fda483-1": _card()}
+        out = {"cards": [dict(_card(implication="조립이 채운 시사점", checks=["점검"]), id="fda483-1",
+                              card_type="FDA 483 실사 관찰")]}
+        prob = check_en_slots.card_problem(out["cards"][0])
+        self.assertEqual(prob, ("partial", "fda483-1(빠짐: implication,checks)"))
+        self.assertEqual(precheck.assembled_en_lines(cards, out),
+                         [f"조립 검사 영문 게이트 {prob[1]} — 조립 뒤 영문 미완결(조립 전엔 완결)"])
+        # 조립 전부터 빠진 카드는 `영문 슬롯 미완결` 줄로 이미 나간다 — 두 번 내지 않는다.
+        before_bad = {"fda483-1": _card(implication="한국어만 있음")}
+        self.assertEqual(precheck.assembled_en_lines(before_bad, out), [])
+        # 이 샤드 카드가 아니면 보지 않는다.
+        self.assertEqual(precheck.assembled_en_lines({}, out), [])
+
+    def test_digest_representative_passes_after_assembly(self):
+        # 관찰 원문 없는 483 두 장이 한 샤드에 오면 조립이 디제스트로 접는다 — 대표의 영문도 디제스트로 써야 통과.
+        delta = {"cards": {"fda483-1": _card(), "fda483-2": _card()}}
+        lines = precheck.assembly_lines(delta, self._scaffold("fda483-1", "fda483-2"))
+        self.assertFalse([x for x in lines if "영문 게이트" in x], lines)
+
+    def test_digest_without_english_rewrite_is_caught(self):
+        # 수리 전 조립(대표가 기자의 낱장 en 을 그대로 듦)을 재현하면 사전 점검이 잡는다 — 이 검사가 살아 있다는 증거.
+        import assemble_publish_brief as apb
+        real = apb.merge_fda483_disclosures
+
+        def stale(cards):
+            before = {c.get("id"): c.get("en") for c in cards}
+            return [dict(c, en=before[c["id"]]) if (c.get("merged_count") or 1) > 1 else c for c in real(cards)]
+
+        delta = {"cards": {"fda483-1": _card(), "fda483-2": _card()}}
+        with mock.patch.object(apb, "merge_fda483_disclosures", stale):
+            lines = precheck.assembly_lines(delta, self._scaffold("fda483-1", "fda483-2"))
+        self.assertIn("조립 검사 영문 게이트 fda483-1(빠짐: implication,checks) — 조립 뒤 영문 미완결(조립 전엔 완결)",
+                      lines)
+
+
 if __name__ == "__main__":
     unittest.main()

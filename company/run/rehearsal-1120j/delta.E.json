@@ -1,0 +1,549 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-20",
+ "shard": "E",
+ "cards": {
+  "fda483-196432": {
+   "title_issue": "기록 분실 반복·전자기록 변경 검증",
+   "hook_line": "2016~2019년 발행 일지 다수 분실 뒤에도 품질관리 일지 분실 반복",
+   "summary": "FDA가 미국의 제조소 Kite Pharma, Inc.에 Form 483(관찰사항 4건)을 발행했다. 품질관리 일지 분실에 대한 시정조치, 전자 제조기록서 변경 검증, 변경관리 절차 준수, 소독 기록을 지적했다.",
+   "key_facts": [
+    "관찰 1: 2022-06-07 일탈에서 2016~2019년 발행 일지 분실을 확인한 뒤에도 품질관리 일지 분실 일탈이 2024-05-29까지 이어짐",
+    "관찰 2: Tecartus 전자 제조기록서 버전 27 운전 적격성평가가 시스템 기능을 규격대로 검증하지 않음",
+    "관찰 3: 2022-06-29 제출한 YESCARTA 공정 변경의 변경관리 기록을 2023-06-07에야 시작",
+    "관찰 4: 청정실 청소 기록에 소독제 표면 접촉 시간을 적게 하지 않아 접촉 시간을 확인할 수 없음"
+   ],
+   "implication": "분실 일지는 품질관리 분석·미생물, 품질보증, 제조, 시설·엔지니어링 등 여러 부서에서 나왔다(관찰 1). 기록 취급·보관·보존에 관한 종합 교육은 하지 않았다(관찰 1). 전자 제조기록서 버전 27 운전 적격성평가는 2025-06-25에 수행됐다(관찰 2).",
+   "checks": [
+    "GMP 일지 분실 일탈의 시정조치 유효성을 확인하는가? (관찰 1)",
+    "전자 제조기록서 변경 때 현재 버전의 동작이 바뀌지 않는지 검증하는가? (관찰 2)",
+    "청소 기록에 소독제 접촉 시간을 적게 하는가? (관찰 4)"
+   ],
+   "en": {
+    "title_issue": "Repeated record loss, EBR change verification",
+    "hook_line": "Quality control logbooks kept going missing after many 2016-2019 logbooks were lost",
+    "summary": "FDA issued a Form 483 with 4 observations to Kite Pharma, Inc., a manufacturer in the USA, citing ineffective corrective actions for lost QC logbooks, verification of electronic batch record changes, change control and disinfection records.",
+    "key_facts": [
+     "Observation 1: after a 2022-06-07 deviation found logbooks issued in 2016-2019 lost, deviations for missing QC logbooks continued through 2024-05-29",
+     "Observation 2: the operational qualification of Tecartus EBR version 27 failed to verify that the system functions according to its specifications",
+     "Observation 3: a change record for a YESCARTA process change submitted on 2022-06-29 was not initiated until 2023-06-07",
+     "Observation 4: the clean room cleaning log does not require recording disinfectant contact time, so contact time cannot be verified"
+    ],
+    "implication": "Missing logbooks came from multiple departments, including QC Analytical, QC Microbiology, Quality Assurance, Manufacturing, and Facilities and Engineering (Observation 1). No comprehensive training was provided on handling, storage and archiving of written records (Observation 1). The operational qualification for EBR version 27 was conducted on 2025-06-25 (Observation 2).",
+    "checks": [
+     "Do you check the effectiveness of corrective actions for lost GMP logbooks? (Observation 1)",
+     "When changing the EBR, do you verify that released versions are not altered? (Observation 2)",
+     "Do cleaning logs record disinfectant contact time? (Observation 4)"
+    ]
+   }
+  },
+  "fda483-196433": {
+   "title_issue": "무균 작업 반복 지적·안정성 미흡",
+   "hook_line": "2018년 경고서한 때와 같은 무균 작업 미흡이 다시 지적됨",
+   "summary": "FDA가 한국의 일반의약품 무균 제조소 Hanlim Pharm Co., Ltd.에 Form 483(관찰사항 11건)을 발행했다. 무균 작업 관행, 무균 공정 밸리데이션, 환경 모니터링, 소독, 안정성 시험, 데이터 검토를 지적했다.",
+   "key_facts": [
+    "관찰 1: 2026-04-16 충전 중 작업자가 팔·몸통·머리를 열린 튜브 위로 반복해 뻗음, 2018년 10월 경고서한의 반복 지적",
+    "관찰 2: 멸균 부품에 닿는 장비 표면을 멸균하지 않고 배치 사이에 소독만 함",
+    "관찰 6: 공정 밸리데이션 3개 배치가 가속 조건 3개월 시점에 규격을 벗어났으나 안정성 데이터 전에 미국에 출하",
+    "관찰 8: 전자 데이터·감사추적기록 검토가 지정 폴더 하나만 보고, 감사추적기록이 꺼진 프로젝트 폴더 3개에 접근 가능"
+   ],
+   "implication": "환경 모니터링 위치 선정도 2018년 경고서한의 반복 지적이다(관찰 3). 2026-03-23 작업 요청에서 확인한 B등급 천장 패널 기포에 시정조치를 하지 않았다(관찰 5). 환경·작업자 모니터링 기록은 시료를 배양실로 가져온 뒤에 작성됐다(관찰 9). 유기 용출물 시험법을 연구소에서 품질부서로 이전·밸리데이션하지 않았다(관찰 11).",
+   "checks": [
+    "무균 충전 중 작업자의 손과 몸이 열린 용기 위로 지나가지 않는가? (관찰 1)",
+    "멸균 부품에 닿는 장비 표면을 멸균하는가? (관찰 2)",
+    "공정 변경 뒤 안정성 데이터를 확인하고 출하하는가? (관찰 6)"
+   ],
+   "en": {
+    "title_issue": "Repeat aseptic findings, stability gaps",
+    "hook_line": "Poor aseptic practices cited again, repeating the 2018 warning letter finding",
+    "summary": "FDA issued a Form 483 with 11 observations to Hanlim Pharm Co., Ltd., an OTC sterile drug manufacturer in South Korea, citing aseptic practices, aseptic process validation, environmental monitoring, disinfection, stability testing and data review.",
+    "key_facts": [
+     "Observation 1: during filling on 2026-04-16 operators repeatedly reached over open tubes with arms, torso and head, a repeat of the October 2018 FDA Warning Letter",
+     "Observation 2: equipment surfaces that contact sterile components are not sterilized, only disinfected between batches",
+     "Observation 6: all three process validation batches failed specification at the three-month accelerated time point, after shipment to the US before stability data",
+     "Observation 8: data and audit trail review covered only one folder, and analysts had access to three project folders with no audit trail enabled"
+    ],
+    "implication": "Environmental monitoring site selection was also a repeat of the 2018 FDA Warning Letter (Observation 3). Bubbling Grade B ceiling panels identified in a 2026-03-23 work request had no corrective action (Observation 5). Environmental and personnel monitoring records were made after samples were returned to the incubation room (Observation 9). Organic leachables methods were not transferred from R&D to the quality unit for validation (Observation 11).",
+    "checks": [
+     "Do operators keep hands and body out of the space above open containers during aseptic filling? (Observation 1)",
+     "Are equipment surfaces that contact sterile components sterilized? (Observation 2)",
+     "Do you review stability data before shipping batches made after process changes? (Observation 6)"
+    ]
+   }
+  },
+  "fda483-196435": {
+   "title_issue": "시정 및 예방조치 절차 미흡",
+   "hook_line": "위험도와 상관없이 모든 시정 및 예방조치에 180일 완료 목표",
+   "summary": "FDA가 독일의 제조소 Freudenberg Medical Europe GmbH에 Form 483(관찰사항 2건)을 발행했다. 시정 및 예방조치(CAPA) 절차와 청정실 환경 관리 절차를 지적했다.",
+   "key_facts": [
+    "관찰 1: 점검에 필요한 세부가 SAP 데이터베이스에만 있고 CAPA 보고서에는 빠짐",
+    "관찰 1: CAPA 절차에 과제 책임자 정의와 완결된 기록의 범위가 없고 위험도와 무관하게 180일 완료 목표를 둠",
+    "관찰 2: 청정실 모니터링 절차가 비생균 입자 경고·조치 수준 설정을 다루지 않음"
+   ],
+   "implication": "CAPA 절차는 모든 출처의 품질 데이터를 분석해 반복 문제를 찾는 방법을 정하지 않았다(관찰 1). 과제를 누가 승인하는지도 분명하지 않았다(관찰 1).",
+   "checks": [
+    "CAPA 기록에 점검에 필요한 세부가 모두 들어가는가? (관찰 1)",
+    "CAPA 완료 기한을 위험도에 따라 정하는가? (관찰 1)",
+    "비생균 입자 경고·조치 수준의 설정 근거가 절차에 있는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "CAPA procedure gaps",
+    "hook_line": "A blanket 180-day completion target for every CAPA regardless of risk",
+    "summary": "FDA issued a Form 483 with 2 observations to Freudenberg Medical Europe GmbH, a manufacturer in Germany, citing its CAPA procedures and cleanroom environmental control procedures.",
+    "key_facts": [
+     "Observation 1: details needed for inspection were held in the SAP database but omitted from the CAPA report",
+     "Observation 1: the CAPA procedure lacked a definition of task owner and of a complete CAPA record, and set a 180-day completion target regardless of risk",
+     "Observation 2: cleanroom monitoring procedures did not address how non-viable particle alert and action levels are set"
+    ],
+    "implication": "The CAPA procedure did not direct a systematic method for analyzing quality data from all sources to detect recurring issues (Observation 1). It also lacked clear direction on who may sign off on tasks (Observation 1).",
+    "checks": [
+     "Does the CAPA record contain all details needed for inspection? (Observation 1)",
+     "Are CAPA completion targets set by risk level? (Observation 1)",
+     "Do procedures explain how non-viable particle alert and action levels are set? (Observation 2)"
+    ]
+   }
+  },
+  "fda483-196437": {
+   "title_issue": "품질시스템 절차 부재",
+   "hook_line": "미국 전용 정형외과 핀을 품질시스템 절차서 없이 위탁 제조",
+   "summary": "FDA가 폴란드의 위탁제조 시설 Clavmed에 Form 483(관찰사항 1건)을 발행했다. 품질시스템 절차·지시·기록을 수립하지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 품질 감사·변경관리·부적합품·공정 밸리데이션·교정·불만 처리 등 품질시스템 절차서가 없음",
+    "관찰 1: 회사는 K-Wire와 Steinmann Pin의 전속 위탁제조업체",
+    "관찰 1: 이 의료기기는 미국에서만 판매·유통"
+   ],
+   "implication": "이 의료기기는 골절 고정, 뼈 정렬, 다른 정형외과 이식물의 견인·유도에 쓰인다(관찰 1).",
+   "checks": [
+    "위탁 제조 품목의 변경관리와 부적합품 처리 절차서가 있는가? (관찰 1)",
+    "공정 밸리데이션과 교정 기록을 유지하는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "No quality system procedures",
+    "hook_line": "Orthopedic pins for the US market made under contract with no quality system procedures",
+    "summary": "FDA issued a Form 483 with 1 observation to Clavmed, a contract manufacturer in Poland, finding that quality system procedures, instructions and records had not been established.",
+    "key_facts": [
+     "Observation 1: no written procedures for quality audits, change control, nonconforming product, process validation, calibration, complaint handling and other quality system elements",
+     "Observation 1: the firm is the exclusive contract manufacturer of K-Wires and Steinmann Pins",
+     "Observation 1: the devices are marketed and distributed only in the United States"
+    ],
+    "implication": "The devices are intended to fix fractures, aid bone realignment and provide traction and guidance for other orthopedic implants (Observation 1).",
+    "checks": [
+     "Do you have written change control and nonconforming product procedures for contract-manufactured products? (Observation 1)",
+     "Do you maintain process validation and calibration records? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196441": {
+   "title_issue": "선량계 대기 시간 위험 미평가",
+   "hook_line": "선량계 조사 후 대기 시간을 위험 분석에서 평가하지 않음",
+   "summary": "FDA가 이탈리아의 위탁 멸균 시설 Steris S.p.A.에 Form 483(관찰사항 1건)을 발행했다. 품질경영시스템 공정 관리에 위험 기반 접근을 적용하지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 2025-11-14 공정 고장모드 영향분석이 선량계 조사와 후처리 사이 대기 시간의 위험을 평가하지 않음",
+    "관찰 1: 2025-07-14 교정 검증 보고서에 대기 시간을 기록하지 않음",
+    "관찰 1: 선량계 제조 결함과 입고 검사의 유효성을 위험 분석에서 평가하지 않음"
+   ],
+   "implication": "작업지시서는 조사 종료부터 배양 시작까지 시간을 교정 때와 비슷하게 하라고 정하고 있다(관찰 1). 작업지시서는 30분 이상 720분 미만 대기가 선량계 반응을 개선한다고 적고 있다(관찰 1). 선량계 공급업체의 2026-02-23 기술 보고서는 전자선 시설의 최적 대기 시간을 조사 후 최소 1시간으로 적었다(관찰 1).",
+   "checks": [
+    "선량계 조사 후 대기 시간을 교정과 일상 사용에서 기록하는가? (관찰 1)",
+    "공정 위험 분석에 선량계 입고 검사의 유효성이 들어가는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Dosimeter wait-time risk not assessed",
+    "hook_line": "Wait time between dosimeter irradiation and conditioning not assessed in the risk analysis",
+    "summary": "FDA issued a Form 483 with 1 observation to Steris S.p.A., a contract sterilizer in Italy, finding that a risk-based approach was not adequately applied to quality management system processes.",
+    "key_facts": [
+     "Observation 1: the pFMEA dated 2025-11-14 did not evaluate risks of the wait time between dosimeter irradiation and post-irradiation conditioning",
+     "Observation 1: the calibration verification report dated 2025-07-14 did not record the wait time",
+     "Observation 1: the pFMEA did not assess dosimeter manufacturing defects or the effectiveness of receiving inspection"
+    ],
+    "implication": "The work instruction states that the time from end of irradiation to start of incubation should be similar to that during calibration (Observation 1). It states that waiting 30min and less than 720min improves dosimeter response (Observation 1). A supplier technical report dated 2026-02-23 states that the optimal wait time for electron beam facilities is at least one-hour post-irradiation (Observation 1).",
+    "checks": [
+     "Do you record dosimeter post-irradiation wait time in calibration and routine use? (Observation 1)",
+     "Does your process risk analysis cover the effectiveness of dosimeter receiving inspection? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196443": {
+   "title_issue": "Form 483 발행",
+   "summary": "FDA가 미국의 임상시험 의뢰자 Synergy Spine Solutions, Inc.에 Form 483을 발행했다.",
+   "key_facts": [
+    "당국 조치: Form 483 발행"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Form 483 issued",
+    "summary": "FDA issued a Form 483 to Synergy Spine Solutions, Inc., a sponsor in the USA.",
+    "key_facts": [
+     "Agency action: Form 483 issued"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "fda483-196444": {
+   "title_issue": "장비 부식·이물 일탈 조사 미흡",
+   "hook_line": "미국 출하 품목 충전 용기의 제품 접촉면에서 진행 중인 부식 확인",
+   "summary": "FDA가 아일랜드의 완제의약품 제조소 Genzyme Ireland Limited에 Form 483(관찰사항 6건)을 발행했다. 시험 기록 완전성, 변경관리 절차, 시설·장비 유지, 일탈 조사, 공정 조건 이탈을 지적했다.",
+   "key_facts": [
+    "관찰 1: 입자 계수기 기록에 남은 조치·경고 수준 초과 결과를 공식 기록에 보고하지 않고 제품 영향도 조사하지 않음",
+    "관찰 2: 누수 사건을 일탈 없이 작업지시서로만 처리했고 품질 감독과 경향 분석이 없음",
+    "관찰 4: 2026-01-12 Myozyme·Thymoglobulin 제조에 쓴 충전 용기 제품 접촉면에서 회사가 진행 중인 부식으로 확인",
+    "관찰 6: 2026-01-13 Thymoglobulin 배치를 적격성평가 조건에서 벗어난 상태로 충전하고 일탈을 열지 않음"
+   ],
+   "implication": "Thymoglobulin 이물 불만 조사는 제조 공정을 가장 가능한 원인으로 들고도 그 일탈을 보고 대상이 아니라고 판단했다(관찰 5). 해당 배치는 미국 시장에 출하됐다(관찰 5). 공정 성능 적격성평가 배치의 기준일탈(OOS)은 근거가 부족한 시료 오염 가설로 결론 났다(관찰 5). 2026-01-13 충전 중 충전 라인 상류 바닥에서 마개가 발견됐다(관찰 4).",
+   "checks": [
+    "입자 계수기에 남은 초과 결과가 모두 공식 기록에 옮겨지는가? (관찰 1)",
+    "누수 같은 시설 사건을 일탈로 평가하는 기준이 있는가? (관찰 2)",
+    "제품 접촉 용기의 내부 표면을 정기적으로 점검하는가? (관찰 4)"
+   ],
+   "en": {
+    "title_issue": "Equipment corrosion and deviation investigations",
+    "hook_line": "Active corrosion found on product contact surfaces of filling vessels used for US products",
+    "summary": "FDA issued a Form 483 with 6 observations to Genzyme Ireland Limited, a drug product manufacturer in Ireland, citing complete laboratory records, change control, facility and equipment maintenance, investigations and deviations from process conditions.",
+    "key_facts": [
+     "Observation 1: action and alert level excursions in particle counter history were not reported in official records or investigated for product impact",
+     "Observation 2: leakage events were documented as work orders without deviations, quality oversight or trending",
+     "Observation 4: on 2026-01-12 the firm confirmed active corrosion on product contact surfaces of filling vessels used for Myozyme and Thymoglobulin",
+     "Observation 6: a Thymoglobulin batch was filled on 2026-01-13 under conditions outside qualified operating conditions without a deviation"
+    ],
+    "implication": "The investigation of a Thymoglobulin foreign matter complaint named the manufacturing process as the most probable root cause yet deemed the deviation non-reportable (Observation 5). The batch was released to the U.S. market (Observation 5). An OOS result in a PPQ batch was attributed to sample contamination on a hypothesis that lacked sufficient evidence (Observation 5). During filling on 2026-01-13 a stopper was found on the floor upstream of the filling line (Observation 4).",
+    "checks": [
+     "Are all excursions stored in particle counters transferred to official records? (Observation 1)",
+     "Is there a criterion for raising facility events such as leaks as deviations? (Observation 2)",
+     "Do you periodically inspect interior surfaces of product contact vessels? (Observation 4)"
+    ]
+   }
+  },
+  "fda483-196445": {
+   "title_issue": "기준일탈 조사 없이 재시험",
+   "hook_line": "역가 기준일탈을 조사 없이 고객 지시로 재시험해 합격",
+   "summary": "FDA가 미국의 위탁시험기관 Haematologic Technologies, LLC에 Form 483(관찰사항 1건)을 발행했다. 기준일탈(OOS) 결과를 철저히 검토하지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 2024-12-12 일탈에서 역가 결과가 고객 규격 450-575 IU/vial보다 낮았음",
+    "관찰 1: 품질보증 부서가 이를 계획된 일탈로 처리하고 시험을 중단",
+    "관찰 1: 고객 지시로 한 재시험이 규격에 맞았으나 재시험 전 근본원인 조사 기록이 없음"
+   ],
+   "implication": "반복 분석 절차서는 재시험 전에 처음 기준일탈의 조사를 요구한다(관찰 1). 미리 정한 시험실 재시험 절차를 따랐다는 증거도 없었다(관찰 1).",
+   "checks": [
+    "기준일탈 결과에서 재시험 전에 조사를 시작하는가? (관찰 1)",
+    "고객이 재시험을 지시해도 자체 재시험 절차를 따르는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Retest without OOS investigation",
+    "hook_line": "Potency OOS retested on client instruction and passed with no investigation",
+    "summary": "FDA issued a Form 483 with 1 observation to Haematologic Technologies, LLC, a contract testing laboratory in the USA, finding that an OOS result was not thoroughly reviewed.",
+    "key_facts": [
+     "Observation 1: in a deviation initiated on 2024-12-12, potency results fell below the client specification of 450-575 IU/vial",
+     "Observation 1: Quality Assurance made it a planned deviation and discontinued testing",
+     "Observation 1: a retest on the client's instruction met specification, with no documented root cause investigation before retesting"
+    ],
+    "implication": "The repeat analysis SOP requires an investigation of an initial OOS before retesting (Observation 1). There was no evidence that predefined laboratory retesting procedures were followed (Observation 1).",
+    "checks": [
+     "Do you start an investigation before retesting an OOS result? (Observation 1)",
+     "Do you follow your own retest procedure when a client instructs a retest? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196447": {
+   "title_issue": "장갑 소독 절차 미준수",
+   "hook_line": "주요 제조 작업자가 절차대로 장갑을 정기 소독하지 않음",
+   "summary": "FDA가 대만의 제조소 Adimmune Corporation에 승인 전 실사 후 Form 483(관찰사항 1건)을 발행했다. 작업자가 절차대로 장갑을 정기적으로 소독하지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 주요 제조 작업자가 절차대로 장갑을 정기적으로 소독하지 않음"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Glove sanitization not followed",
+    "hook_line": "Manufacturing staff did not regularly sanitize gloves as the procedure requires",
+    "summary": "FDA issued a Form 483 with 1 observation to Adimmune Corporation in Taiwan after a pre-approval inspection, finding that staff did not regularly sanitize their gloves as per procedure.",
+    "key_facts": [
+     "Observation 1: main manufacturing staff did not regularly sanitize their gloves as per procedure"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "fda483-196449": {
+   "title_issue": "기준일탈 조사의 영향 평가 미흡",
+   "hook_line": "기준일탈 기간에 만든 미국 출하 배치를 영향 평가에서 제외",
+   "summary": "FDA가 스위스의 생물의약품 원료 제조소 Janssen Vaccines, Zweigniederlassung der Cilag GmbH International에 Form 483(관찰사항 1건)을 발행했다. 기준일탈(OOS) 조사가 제품 영향 평가로 확대되지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 2025년 1월~10월 확인된 기준일탈의 조사가 그 기간 제조한 모든 배치의 영향을 평가하지 않음",
+    "관찰 1: 미국 시장에 출하된 배치와 판정 대기 배치를 영향 평가에서 제외",
+    "관찰 1: 기준일탈의 근본원인을 밝히지 못함"
+   ],
+   "implication": "2026-05-13 시행 중간 조사 보고서는 전 배치에 걸친 통계적으로 유의한 차이를 기록했다(관찰 1). 안정성 배치 2개가 2026-04-28 기준일탈로 보고돼 조사 중이다(관찰 1). 한 안정성 배치는 조사가 다룬 기준일탈 기간 안에 제조·출하됐다(관찰 1).",
+   "checks": [
+    "기준일탈 조사에서 같은 기간 출하된 배치의 영향을 평가하는가? (관찰 1)",
+    "근본원인이 밝혀지기 전 출하 결정의 근거를 기록하는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "OOS investigation impact assessment",
+    "hook_line": "Batches released to the US during the OOS period were left out of the impact assessment",
+    "summary": "FDA issued a Form 483 with 1 observation to Janssen Vaccines, Zweigniederlassung der Cilag GmbH International, a biological drug substance manufacturer in Switzerland, finding that OOS investigations were not expanded to assess product impact.",
+    "key_facts": [
+     "Observation 1: the investigation of OOS results confirmed from January to October 2025 did not assess all batches made in that period",
+     "Observation 1: batches released to the U.S. market and batches awaiting disposition were not assessed for impact",
+     "Observation 1: no root cause for the OOS results has been determined"
+    ],
+    "implication": "An interim investigation report effective 13 May 2026 documented a statistically significant difference across all batches (Observation 1). Two stability batches were reported OOS on April 28 2026 and are under investigation (Observation 1). One stability batch was manufactured and released within the OOS timeline assessed by the investigation (Observation 1).",
+    "checks": [
+     "Do OOS investigations assess batches released in the same period? (Observation 1)",
+     "Do you document the basis for release decisions before a root cause is found? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196451": {
+   "title_issue": "생물부하 이탈 위험 평가 누락",
+   "hook_line": "렌티바이러스 벡터 생물부하 기준일탈을 오염 위험 평가에서 빠뜨림",
+   "summary": "FDA가 미국의 원료 중간체 제조소 Lentigen Technology Inc.에 Form 483(관찰사항 1건)을 발행했다. 생물부하 이탈이 충분히 평가되지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 2025-05-16 승인된 미생물 오염 위험 평가가 상업용 렌티바이러스 제품 제조 중 오염 사건의 근본원인과 조치를 평가하지 않음",
+    "관찰 1: 2025-04-25 시작한 MAGE-A4-c1032 렌티바이러스 벡터 생물부하 기준일탈을 위험 평가에 넣지 않음",
+    "관찰 1: 이 기준일탈 시료의 균이 다른 정제 단계 시료에서도 동정됨"
+   ],
+   "implication": "MAGE-A4-c1032 렌티바이러스 벡터는 afamitresgene autoleucel 완제의약품 제조에 쓰인다(관찰 1).",
+   "checks": [
+    "미생물 오염 위험 평가에 실제 생물부하 기준일탈 사례가 들어가는가? (관찰 1)",
+    "같은 균이 여러 공정 단계에서 나오면 오염원 조사를 넓히는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Bioburden excursion left out of risk assessment",
+    "hook_line": "Lentiviral vector bioburden OOS left out of the contamination risk assessment",
+    "summary": "FDA issued a Form 483 with 1 observation to Lentigen Technology Inc., a drug substance intermediate manufacturer in the USA, finding that bioburden excursions were not always fully evaluated.",
+    "key_facts": [
+     "Observation 1: the microbial contamination risk assessment approved on 16 May 2025 did not evaluate root causes and actions for contamination events in commercial lentiviral manufacturing",
+     "Observation 1: it did not include the bioburden OOS for a MAGE-A4-c1032 lentiviral vector batch initiated on 25 Apr 2025",
+     "Observation 1: the organism in the OOS sample was also identified in samples from other purification steps"
+    ],
+    "implication": "The MAGE-A4-c1032 lentiviral vector is used to manufacture afamitresgene autoleucel drug product (Observation 1).",
+    "checks": [
+     "Does your contamination risk assessment include actual bioburden OOS events? (Observation 1)",
+     "When the same organism appears at several process steps, do you widen the source investigation? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196452": {
+   "title_issue": "원료 시험·적격성평가 미흡",
+   "hook_line": "시험성적서 확인 시험을 절차서대로 수행하지 않음",
+   "summary": "FDA가 미국의 제조소 Lentigen Technology, Inc.에 Form 483(관찰사항 1건)을 발행했다. MAGE-A4-c1032 렌티바이러스 벡터 제조에 쓰는 원료의 시험과 적격성평가를 지적했다.",
+   "key_facts": [
+    "관찰 1: 일부 원료에 정해진 시험이 없어 적격성평가·출하 때 시험하지 않음",
+    "관찰 1: 절차서와 달리 연속 3로트에 대한 시험성적서(COA) 확인 시험을 수행하지 않음",
+    "관찰 1: 소모품에 적절한 육안검사 시험이 없음"
+   ],
+   "implication": "한 원료의 COA 확인 시험에는 제품 관련 시험이 빠져 있었다(관찰 1).",
+   "checks": [
+    "원료마다 적격성평가와 출하 시험 항목이 정해져 있는가? (관찰 1)",
+    "COA 확인 시험을 절차서가 정한 로트 수만큼 수행하는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Raw material testing and qualification gaps",
+    "hook_line": "Confirmatory certificate of analysis testing not performed as the procedure requires",
+    "summary": "FDA issued a Form 483 with 1 observation to Lentigen Technology, Inc., a manufacturer in the USA, citing testing and qualification of raw materials used to make the MAGE-A4-c1032 lentiviral vector.",
+    "key_facts": [
+     "Observation 1: some raw materials had no defined test and were not tested for qualification and release",
+     "Observation 1: confirmatory CoA testing was not performed for three consecutive lots as the SOP requires",
+     "Observation 1: consumables did not have an adequate visual inspection test"
+    ],
+    "implication": "Confirmatory CoA testing of one material did not include product-related tests (Observation 1).",
+    "checks": [
+     "Are qualification and release tests defined for every raw material? (Observation 1)",
+     "Do you perform confirmatory CoA testing on the number of lots the SOP requires? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196455": {
+   "title_issue": "보관 시간·소독제 효력 근거 부족",
+   "hook_line": "생산 규모에서 중간체 최대 보관 시간을 밸리데이션하지 않음",
+   "summary": "FDA가 체코의 제조소 Novavax CZ에 Form 483을 발행했다. 표준품·배치 판정 근거 데이터, 중간체 보관 시간 밸리데이션, 소독제 효력 시험을 지적했다.",
+   "key_facts": [
+    "관찰 2: 표준품 사용과 배치 판정을 뒷받침할 데이터가 부족",
+    "관찰 3: 제안한 중간체 최대 보관 시간을 생산 규모에서 밸리데이션하지 않음",
+    "관찰 4: 공급업체가 수행한 소독제 효력 시험에 시설 분리균이 들어가지 않음"
+   ],
+   "implication": "회사는 시설 분리균을 넣은 소독제 효력 시험 계획서를 제출했다(관찰 4).",
+   "checks": [
+    "중간체 보관 시간을 생산 규모 데이터로 밸리데이션했는가? (관찰 3)",
+    "소독제 효력 시험에 우리 시설 분리균이 들어가는가? (관찰 4)"
+   ],
+   "en": {
+    "title_issue": "Hold times and disinfectant efficacy data",
+    "hook_line": "Maximum hold times for intermediates not validated at production scale",
+    "summary": "FDA issued a Form 483 to Novavax CZ, a manufacturer in the Czech Republic, citing data supporting reference standard use and batch determination, intermediate hold time validation and disinfectant efficacy studies.",
+    "key_facts": [
+     "Observation 2: lack of data to support the use of the reference and the determination of batches",
+     "Observation 3: proposed maximum holding times for intermediates have not been validated at production scale",
+     "Observation 4: vendor-performed disinfectant efficacy studies did not include facility isolates"
+    ],
+    "implication": "The firm provided a disinfectant efficacy study protocol that will include facility isolates (Observation 4).",
+    "checks": [
+     "Are intermediate hold times validated with production-scale data? (Observation 3)",
+     "Do disinfectant efficacy studies include your own facility isolates? (Observation 4)"
+    ]
+   }
+  },
+  "fda483-196456": {
+   "title_issue": "재적격성평가 실패·약속 미이행",
+   "hook_line": "이전 실사 때 완료를 약속한 밸리데이션 연구가 아직 미완료",
+   "summary": "FDA가 인도의 백신 제조소 Serum Institute of India Pvt. Limited Manjari Site에 Form 483(관찰사항 5건)을 발행했다. 충전 라인 재적격성평가, 세척 판정 기준, 밸리데이션 데이터, 표준품 적격성평가, 중대 결함 조사를 지적했다.",
+   "key_facts": [
+    "관찰 1: COVID 백신 시린지 충전 라인 재적격성평가 최대 적재 시험이 2023년 판정 기준을 통과하지 못했고 근본원인을 조사하지 않음",
+    "관찰 2: 현재 판정 기준으로는 다른 백신 제품 사이 세척을 보증할 데이터가 부족",
+    "관찰 3: 밸리데이션 연구의 동등 성능 데이터가 부족하고 2022-12-31 완료를 약속한 보고서가 아직 미완료",
+    "관찰 5: 2024-01-29 일탈의 중대 결함을 충분히 조사하지 않았고 효과적인 시정 및 예방조치(CAPA)를 하지 않음"
+   ],
+   "implication": "바이알 충전 라인 재적격성평가에서도 2023년과 2024년에 같은 주변 위치에서 양성이 나왔다(관찰 1). 관찰 3의 결함은 2022년 4월 실사에서도 지적됐다(관찰 3). 작업 표준품 적격성평가 보고서에는 유효한 시험 결과를 내지 못한 실패에 대한 조사가 없었다(관찰 4).",
+   "checks": [
+    "재적격성평가 판정 기준 실패에 근본원인 조사를 하는가? (관찰 1)",
+    "이전 실사에서 약속한 연구의 완료 기한을 추적하는가? (관찰 3)",
+    "합격 품질 수준 검사에서 나온 중대 결함에 시정 및 예방조치를 하는가? (관찰 5)"
+   ],
+   "en": {
+    "title_issue": "Failed requalification, unmet commitment",
+    "hook_line": "A validation study promised at the previous inspection is still not completed",
+    "summary": "FDA issued a Form 483 with 5 observations to Serum Institute of India Pvt. Limited Manjari Site, a vaccine manufacturer in India, citing filling line requalification, cleaning acceptance criteria, validation data, reference standard qualification and a critical defect investigation.",
+    "key_facts": [
+     "Observation 1: maximum load runs in the 2023 requalification for the line filling COVID vaccine into syringes failed acceptance criteria and no root cause was investigated",
+     "Observation 2: insufficient data that cleaning prevents carryover between vaccine products under the current acceptance criteria",
+     "Observation 3: insufficient validation data on comparable performance, and the report committed for December 31, 2022 was still not completed",
+     "Observation 5: a critical defect found on January 29, 2024 was not fully investigated and no effective CAPA was implemented"
+    ],
+    "implication": "Positives were also found in the same nearby locations during requalification of the vial filling line in 2023 and 2024 (Observation 1). The Observation 3 deficiency was previously identified during the last inspection in April 2022 (Observation 3). The working reference standard qualification report included no investigation of the failure to produce valid test results (Observation 4).",
+    "checks": [
+     "Do you investigate root causes when requalification fails acceptance criteria? (Observation 1)",
+     "Do you track completion of studies committed at previous inspections? (Observation 3)",
+     "Do critical defects found in AQL inspection lead to CAPA? (Observation 5)"
+    ]
+   }
+  },
+  "fda483-196457": {
+   "title_issue": "환경 모니터링·일탈 종결 지연",
+   "hook_line": "최근 12개월 일탈 81건 중 절반 넘게 기한 안에 종결하지 못함",
+   "summary": "FDA가 미국의 제조소 MassBiologics South Coast에 Form 483(관찰사항 6건)을 발행했다. 환경 모니터링, 일탈 종결 지연, 시설 유지, 절차서 세부, 절차 미준수, 문서 관리를 지적했다.",
+   "key_facts": [
+    "관찰 1: Eladocagene exuparvovec 완제의약품 작업 안전작업대의 가동 중 환경 모니터링 위치가 절차서에 없음",
+    "관찰 2: 최근 12개월 일탈 81건 중 50% 넘게 정해진 기한 안에 종결되지 않음",
+    "관찰 3: 최종 여과를 하는 구역의 장비 뒤에서 먼지 뭉치와 병뚜껑·플라스틱 조각 발견",
+    "관찰 5: 2023년 4분기·2024년 1분기 환경 모니터링 조치 수준 도달 건을 절차서대로 조사하지 않음"
+   ],
+   "implication": "일탈 기한 연장을 관리하는 절차가 없었다(관찰 2). 2021년과 2022년의 시설 작업지시서가 아직 열려 있었다(관찰 3). 실행된 제조기록서가 한동안 없어졌다가 위치를 모른 채 돌아왔고, 이 사건은 작업자 실수로 종결됐다(관찰 6).",
+   "checks": [
+    "안전작업대 가동 중 환경 모니터링 위치가 절차서에 있는가? (관찰 1)",
+    "일탈 종결 기한 연장을 승인·추적하는 절차가 있는가? (관찰 2)",
+    "환경 모니터링 조치 수준 도달 때마다 일탈을 여는가? (관찰 5)"
+   ],
+   "en": {
+    "title_issue": "EM gaps and late deviation closure",
+    "hook_line": "More than half of 81 deviations in the last 12 months were not closed on time",
+    "summary": "FDA issued a Form 483 with 6 observations to MassBiologics South Coast, a manufacturer in the USA, citing environmental monitoring, late deviation closure, facility repair, SOP detail, failure to follow procedures and document control.",
+    "key_facts": [
+     "Observation 1: in-operation sampling locations did not include the biosafety cabinets used for Eladocagene exuparvovec drug product",
+     "Observation 2: of 81 deviations opened over the last 12 months, more than 50% were not closed within the specified timeframe",
+     "Observation 3: dust balls and debris including bottle caps and plastic bits were found behind equipment where final filtration is conducted",
+     "Observation 5: several EM action level incidents in the Q4 2023 and Q1 2024 trend reports were not investigated as the SOP requires"
+    ],
+    "implication": "There were no procedures for managing deviation and investigation extensions (Observation 2). Facility work orders from 2021 and 2022 were still open (Observation 3). Executed batch records went missing for a period, were returned with their location unknown, and the incident was closed as operator error (Observation 6).",
+    "checks": [
+     "Are in-operation EM locations for biosafety cabinets in the SOP? (Observation 1)",
+     "Is there a procedure to approve and track deviation closure extensions? (Observation 2)",
+     "Do you open a deviation every time an EM action level is reached? (Observation 5)"
+    ]
+   }
+  },
+  "fda483-196458": {
+   "title_issue": "충전 중 부유균 채취 미실시",
+   "hook_line": "상업 생산 시작부터 충전 단계 부유균 채취를 하지 않음",
+   "summary": "FDA가 스위스의 생물의약품 제조소 Novartis Pharma Stein AG에 Form 483(관찰사항 2건)을 발행했다. KYMRIAH 충전 단계의 능동 부유균 채취 미실시와 환경 모니터링 시료 누락의 반복을 지적했다.",
+   "key_facts": [
+    "관찰 1: KYMRIAH 충전 단계에서 능동 부유균 채취를 하지 않았고 위험 평가에 제외 근거가 없음",
+    "관찰 1: 이 관행은 2020년 5월 상업 생산 시작부터 이어짐",
+    "관찰 2: 2025년부터 환경 모니터링 시료를 분석하지 않은 일탈이 약 19건 반복",
+    "관찰 2: 시료 누락 일탈이 열리기 전에 배치를 출하한 사례가 있음"
+   ],
+   "implication": "같은 수준이거나 더 낮은 다른 단계는 채취하고 있었다(관찰 1). 시료 누락 일탈 19건은 모두 처음에 중요(major)로 분류됐다(관찰 2). 한 조사는 배치 영향이 없다고 결론 내고 배치를 출하했다(관찰 2).",
+   "checks": [
+    "가장 중요한 충전 단계에서 능동 부유균 채취를 하는가? (관찰 1)",
+    "환경 모니터링 시료가 모두 분석됐는지 출하 전에 확인하는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "No active air sampling during filling",
+    "hook_line": "No active viable air sampling during filling since commercial production began in May 2020",
+    "summary": "FDA issued a Form 483 with 2 observations to Novartis Pharma Stein AG, a licensed biological drug manufacturer in Switzerland, citing no active viable air sampling during KYMRIAH filling and a recurring failure to analyze environmental monitoring samples.",
+    "key_facts": [
+     "Observation 1: active viable air sampling is not performed during KYMRIAH filling steps and the risk assessment gives no rationale",
+     "Observation 1: this practice has been in place since commercial KYMRIAH manufacturing began in May 2020",
+     "Observation 2: since 2025 there have been approximately 19 deviations for EM samples that were not analyzed",
+     "Observation 2: a batch was released before the deviation for a missed sample was opened"
+    ],
+    "implication": "Other steps with equivalent or lower exposure are sampled (Observation 1). All 19 deviations were initially classified as Major (Observation 2). One investigation concluded no batch impact and the batch was released (Observation 2).",
+    "checks": [
+     "Do you perform active viable air sampling during the most critical filling step? (Observation 1)",
+     "Do you confirm that all EM samples were analyzed before batch release? (Observation 2)"
+    ]
+   }
+  },
+  "fda483-196463": {
+   "title_issue": "안정성 시험 기한 반복 초과",
+   "hook_line": "2019~2025년 안정성 시험 기한을 놓친 일탈 58건",
+   "summary": "FDA가 아일랜드의 위탁시험기관 PPD Development Ireland Ltd.에 Form 483(관찰사항 1건)을 발행했다. 고객 안정성 계획서의 시험 기한을 지키지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 2019~2025년 안정성 시험 기한을 놓친 일탈이 58건",
+    "관찰 1: 2022-02-03 일탈은 방법 세부 부족과 작업자 실수로 9개 안정성 시료의 시험이 늦어짐",
+    "관찰 1: 2025년 일탈들은 감독자 일정 오류와 우선순위 판단 오류를 원인으로 적음"
+   ],
+   "implication": "2022-10-13 일탈은 절차서 미준수와 교육 차이로 인한 장비 정비 부적절을 원인으로 적었다(관찰 1). 2025-03-03 일탈은 장비 고장도 원인으로 들었다(관찰 1).",
+   "checks": [
+    "안정성 시험 예정일과 실제 시험일을 대조해 지연을 추적하는가? (관찰 1)",
+    "반복되는 일정 오류에 예방조치를 하는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Repeated missed stability testing windows",
+    "hook_line": "58 deviations for missed stability testing windows from 2019 to 2025",
+    "summary": "FDA issued a Form 483 with 1 observation to PPD Development Ireland Ltd., a contract testing laboratory in Ireland, finding that it did not follow the testing windows in clients' stability protocols.",
+    "key_facts": [
+     "Observation 1: 58 deviations were initiated for missed stability testing windows from 2019 through 2025",
+     "Observation 1: a deviation initiated on February 3, 2022 cited insufficient method detail and operator oversight, delaying 9 stability samples",
+     "Observation 1: deviations in 2025 cited supervisor scheduling error and incorrect prioritization"
+    ],
+    "implication": "A deviation initiated on October 13, 2022 cited improper equipment maintenance due to failure to follow SOP and training gaps (Observation 1). A deviation initiated on March 3, 2025 also cited equipment failure (Observation 1).",
+    "checks": [
+     "Do you track delays by comparing scheduled and actual stability test dates? (Observation 1)",
+     "Do recurring scheduling errors lead to preventive action? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196464": {
+   "title_issue": "임상시험약 모니터링 미흡",
+   "hook_line": "임상시험약 인수인계 양식에 유효기한·시간이 빠졌으나 보고서에 없음",
+   "summary": "FDA가 미국의 기업 본사 Avotres Inc.에 Form 483(관찰사항 1건)을 발행했다. 임상시험 모니터링을 제대로 하지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 품질 협약에 따라 위임한 임상시험약 제조사의 활동을 시험 기간 내내 감독하지 않음",
+    "관찰 1: 모니터 요원이 임상시험약 인수인계 양식의 필수 항목을 확인하지 않음",
+    "관찰 1: 피험자 2명의 인수인계 양식에 임상시험약 유효기한·시간이 없음"
+   ],
+   "implication": "모니터링 방문 보고서는 이 결함을 기록하지 않았다(관찰 1). 감독 부재는 인수인계 양식의 누락 항목으로 이어졌다(관찰 1).",
+   "checks": [
+    "위임한 임상시험약 제조사의 활동을 감독한 기록이 있는가? (관찰 1)",
+    "모니터링 때 인수인계 양식의 필수 항목을 확인하는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Investigational product monitoring gaps",
+    "hook_line": "Chain of custody forms lacked IP expiration date or time, and visit reports missed it",
+    "summary": "FDA issued a Form 483 with 1 observation to Avotres Inc., a corporate headquarters in the USA, finding a failure to ensure proper monitoring of the study.",
+    "key_facts": [
+     "Observation 1: the firm did not oversee activities delegated to its investigational product manufacturer throughout the study, as the quality agreement required",
+     "Observation 1: study monitors did not ensure the Chain of Custody forms contained the required elements",
+     "Observation 1: two subjects' Chain of Custody forms did not include an expiration date or time for the investigational product"
+    ],
+    "implication": "The monitoring visit reports did not document these deficiencies (Observation 1). The lack of oversight contributed to missing elements in the Chain of Custody forms (Observation 1).",
+    "checks": [
+     "Do you have records of overseeing activities delegated to your investigational product manufacturer? (Observation 1)",
+     "Do monitors check required elements of chain of custody forms? (Observation 1)"
+    ]
+   }
+  }
+ }
+}

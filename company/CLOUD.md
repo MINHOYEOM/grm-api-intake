@@ -16,7 +16,7 @@
 - **깨우기**: 브랜치 `claude/request-<날짜>-<이름>` 에 `company/requests/<id>.json` 한 파일을 커밋·push.
   `id` = `YYYYMMDD-HHMM-<소문자·숫자·->` (파일명과 같아야 함). 형식 `{"id": "…", "action": "…", "args": {…}}`.
   허용 동작은 `ping` · `ops-status-refresh` · `delta-bridge`(publish_date) · `web-publish`(publish_date, intake_run_id?) · `scaffold-mirror`(intake_run_id) · `wl-restore-plan` · `intake` · `queue-handoff-mirror`(intake_run_id). 그 밖은 거부된다.
-  `intake`(인자 없음) = 일일 수집 실행 — 오늘(KST) `handoff_<오늘>.json` 이 `claude/queue-handoff` 에 있거나 오늘 수집이 돌고 있거나 성공했으면 `skipped`(이유는 `reason`). 깨우면 사본이 따라 돈다(약 30분 뒤 `claude/queue-handoff`). 예: 브랜치 `claude/request-2026-11-23-intake` · 파일 `company/requests/20261123-0500-intake.json` · 내용 `{"id": "20261123-0500-intake", "action": "intake", "args": {}}`.
+  `intake`(인자 없음) = 일일 수집 실행 — 오늘(KST) `handoff_<오늘>.json` 이 `claude/queue-handoff` 에 있거나 오늘 수집이 돌고 있거나 성공했으면 `skipped`(이유는 `reason`). 깨우면 사본이 따라 돈다(약 30분 뒤 `claude/queue-handoff`). 예: 브랜치 `claude/request-2026-11-23-intake` · 파일 `company/requests/<id>.json`(id `20261123-0500-intake`) · 내용 `{"id": "20261123-0500-intake", "action": "intake", "args": {}}`.
   결과: `claude/ops-status` 의 `requests/<id>.json` (`outcome`: dispatched · skipped · rejected · pinged · dispatch-failed · dispatched-no-pat(사본이 안 붙을 수 있음 — `queue-handoff-mirror` 로 다시)). 몇 분 뒤 status.json 에서 실제 실행 결과를 본다. 같은 id 는 한 번만, 시간당 10건.
   깨운 것이 발행이어도 PR 머지·라이브 발행은 대표의 관리자 승인이다.
 

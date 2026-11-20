@@ -491,21 +491,46 @@ def _merge_observation_translations(card: dict[str, Any], obs_ko: Any,
 
     결정론 English 관찰(수집기 산출)은 그대로 두고 국문만 additive 로 얹는다 → 웹 렌더가
     원문(영문)+국문 병기. 번호가 안 맞거나 관찰 블록이 없으면 조용히 건너뛴다(비차단). 값은
-    문자열 강제·평문(렌더러가 이스케이프). deep_analysis 와 독립이라 실패해도 카드는 발행된다."""
+    문자열 강제·평문(렌더러가 이스케이프). deep_analysis 와 독립이라 실패해도 카드는 발행된다.
+
+    [번호 중복 2026-11-20 리허설 1120i] 원문(OCR)이 같은 번호를 두 번 쓰는 483 이 있다 —
+    fda483-196399 `1,2,3,5,5,6,7,8`(4 가 5 로 읽힘), fda483-196254 `1,1,2,3,4,1,2,2`(이전 실사 관찰 인용).
+    번호 하나에 관찰 하나만 남기던 매칭은 앞선 같은 번호 관찰에 국문을 못 붙여, 기자가 번역을 다 넣어도
+    배포 게이트(`render.validate_483_observations`)가 호 전체를 막았다. 그래서 **같은 번호 안에서는
+    나온 순서로** 짝짓는다(번호 N 의 k 번째 번역 → 번호 N 의 k 번째 관찰). 같은 번호의 관찰 수와 번역 수가
+    다르면 순서를 믿을 수 없으므로 종전대로(그 번호의 마지막 관찰에 마지막 번역) 붙인다 — 번호가 유일한
+    정상 카드는 결과가 종전과 같다."""
     if not isinstance(obs_ko, list) or not obs_ko:
         return
     dd = card.get("deterministic_detail")
     if not (isinstance(dd, dict) and dd.get("type") == "fda_483_observations"):
         return
-    by_num = {str(o.get("number")): o for o in dd.get("observations", [])
-              if isinstance(o, dict)}
-    merged = 0
+    obs_by_num: dict[str, list[dict[str, Any]]] = {}
+    for o in dd.get("observations", []):
+        if isinstance(o, dict):
+            obs_by_num.setdefault(str(o.get("number")), []).append(o)
+    ko_by_num: dict[str, list[dict[str, Any]]] = {}
+    for t in obs_ko:
+        if isinstance(t, dict):
+            ko_by_num.setdefault(str(t.get("number")), []).append(t)
+    pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    seen: dict[str, int] = {}
     for t in obs_ko:
         if not isinstance(t, dict):
             continue
-        obs = by_num.get(str(t.get("number")))
-        if obs is None:
+        num = str(t.get("number"))
+        k = seen.get(num, 0)
+        seen[num] = k + 1
+        group = obs_by_num.get(num)
+        if not group:
             continue
+        if len(group) > 1 and len(group) == len(ko_by_num[num]):
+            # 같은 번호 여럿 — 나온 순서로 1:1.
+            pairs.append((group[k], t))
+        else:
+            pairs.append((group[-1], t))
+    merged = 0
+    for obs, t in pairs:
         if t.get("deficiency_ko"):
             obs["deficiency_ko"] = str(t["deficiency_ko"])
             merged += 1

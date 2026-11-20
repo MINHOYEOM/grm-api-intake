@@ -53,6 +53,7 @@
 2. v16 [출력] envelope 그대로 한국어·영문(`en`·`tldr_en`) 슬롯을 채운다. **제목 이슈 길이는 조립 검사가 센다: `title_issue` 25자 이내, `en.title_issue` 50자 이내(공백 포함).** 한 장이라도 넘으면 호 전체 조립이 거부된다 — 쓰고 나서 글자 수를 세고, 넘으면 수식어를 빼 줄인다.
 3. 심층분석 대상이 있으면 v16 [2단계 (선택·additive)] 대로 만든다. **국문 병기(`observations_ko`·`violations_ko`·`ncr_ko`)는 카드 층에 둔다** — `items.<web_card_id>.observations_ko` 이고 `deep_analysis` 안이 아니다
    (v16 스키마 줄이 4섹션과 나란히 적어 두어 안에 넣기 쉽다. 안에 넣으면 분석 게이트가 FAIL 할 때 번역까지 사라져 483 관찰 국문 없음으로 호 전체 조립이 거부된다 — 리허설 1114b).
+   관찰 번호가 겹치는 483(원문 OCR 이 `5` 를 두 번 쓰거나 이전 실사 관찰을 `Observation 1:` 꼴로 인용)도 관찰마다 하나씩, **스캐폴드 관찰 순서 그대로 같은 번호**로 넣는다 — 조립이 같은 번호 안에서는 나온 순서로 짝짓는다(리허설 1120i).
    FDA 483 카드는 `observations_ko` 가 ★필수다. 심층 샤드를 `완료`로 내기 전에 `python company/editorial/precheck.py deep _handoff/handoff_{run_date_kst}.json company/run/{run_date_kst}/deep.{S}.json` 이 **exit 0(0건)** 인지 본다
    (handoff 사본은 아래 6번의 받기 명령으로 먼저 받는다). **심층 칸 산문(observation·description·risk·inspectional_significance·fda_evaluation·disposition_basis·administrative_risks·items)도 v16 [용어·표기]를 그대로 따른다** —
    `심층 용어 <id>.<슬롯>: …` 줄은 델타 사전 점검과 **같은 함수**(`inject_slots.term_hits`)가 낸 것이고 교열이 반려하는 바로 그 표기다(리허설 1120b: 경고만이라 넘겼다가 19장 반려).

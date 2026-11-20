@@ -1,40 +1,42 @@
 {
- "status": "재작업",
- "round": 1,
- "published": false,
- "rehearsal": true,
- "code_gate": {
-  "ran": true,
-  "exit": 2,
-  "message": "발행본 조립 검증 실패: 카드 'fda483-196399' 관찰 #5: deficiency_ko 없음 / 카드 'fda483-196399' 관찰 #5: detail 이 있는데 detail_ko 없음"
- },
- "cards": [
-  {
-   "web_card_id": "fda483-196399",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "코드 검사",
-     "slot": "deep.observations",
-     "evidence": "카드 'fda483-196399' 관찰 #5: deficiency_ko 없음"
-    },
-    {
-     "item": "코드 검사",
-     "slot": "deep.observations",
-     "evidence": "카드 'fda483-196399' 관찰 #5: detail 이 있는데 detail_ko 없음"
-    }
-   ]
-  }
- ],
- "counts": {
-  "cards": 1,
-  "pass": 0,
-  "reject": 1,
-  "fails_total": 2
- },
- "rework": {
+  "status": "보류",
+  "round": 2,
+  "published": false,
+  "rehearsal": true,
+  "reason": "2차에도 코드 검사 실패(exit 2) — fda483-196399 관찰 번호 5 중복(원문·스캐폴드 number 1,2,3,5,5,6,7,8), inject_slots._merge_observation_translations 가 번호로 병합해 첫 #5 에 국문이 붙지 않음. 기자 재작업으로 못 푼다(rework.json 이의) — 코드 수정 필요.",
+  "code_gate": {
+    "ran": true,
+    "exit": 2,
+    "message": "발행본 조립 검증 실패: 카드 'fda483-196399' 관찰 #5: deficiency_ko 없음 / 카드 'fda483-196399' 관찰 #5: detail 이 있는데 detail_ko 없음"
+  },
   "cards": [
-   "fda483-196399"
-  ]
- }
+    {
+      "web_card_id": "fda483-196399",
+      "verdict": "reject",
+      "fails": [
+        {
+          "item": "코드 검사",
+          "slot": "deep.observations",
+          "evidence": "카드 'fda483-196399' 관찰 #5: deficiency_ko 없음"
+        },
+        {
+          "item": "코드 검사",
+          "slot": "deep.observations",
+          "evidence": "카드 'fda483-196399' 관찰 #5: detail 이 있는데 detail_ko 없음"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "cards": 1,
+    "pass": 0,
+    "reject": 1,
+    "fails_total": 2
+  },
+  "precheck": {
+    "merge_parts": 0,
+    "rework_diff": 0,
+    "deep_source": "원문 붙임 60/64장"
+  },
+  "note": "의미 점검은 코드 검사 실패로 하지 않았다. 리허설 — Notion 쓰기 없음, 반납 없음."
 }

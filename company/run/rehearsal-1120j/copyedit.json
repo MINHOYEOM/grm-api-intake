@@ -1,17 +1,12 @@
 {
-  "status": "재작업",
-  "round": 1,
+  "status": "완료",
+  "round": 2,
   "published": false,
   "rehearsal": true,
   "code_gate": {
     "ran": true,
-    "exit": 1,
-    "message": "assemble_publish_brief exit 0 · check_en_slots exit 1: 영문 슬롯 미완결 — en 부분 제공 1장 (fda483-196348(빠짐: implication,checks))"
-  },
-  "rework": {
-    "cards": [
-      "fda483-196348"
-    ]
+    "exit": 0,
+    "message": "merge_parts exit 0 · rework-diff exit 0(반려 카드 fda483-196348 만 변경) · assemble_publish_brief exit 0(140카드, 심층 60 병합) · check_en_slots exit 0"
   },
   "cards": [
     {
@@ -106,14 +101,8 @@
     },
     {
       "web_card_id": "fda483-196348",
-      "verdict": "reject",
-      "fails": [
-        {
-          "item": "영문 게이트",
-          "slot": "en",
-          "evidence": "영문 슬롯 미완결 — en 부분 제공 1장 (fda483-196348(빠짐: implication,checks))"
-        }
-      ]
+      "verdict": "pass",
+      "fails": []
     },
     {
       "web_card_id": "fda483-196351",
@@ -753,9 +742,9 @@
   ],
   "counts": {
     "cards": 146,
-    "pass": 145,
-    "reject": 1,
-    "fails_total": 1
+    "pass": 146,
+    "reject": 0,
+    "fails_total": 0
   },
   "note": "3-1: 코드 검사(영문 게이트) 1장 → 의미 점검 생략, 재작업. 2차에서 전 카드 의미 점검."
 }

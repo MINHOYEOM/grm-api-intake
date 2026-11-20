@@ -40,6 +40,7 @@
         **국문 병기 관문**(483 관찰·WL 위반항목·WHOPIR — 조립 게이트 4·6·7)도 조립 함수 그대로 막는다(`심층 조립 검사 …` —
         리허설 1120h: 경고서한 `violations_ko` 결손이 통과해 교열 조립이 exit 2). 스캐폴드 사본(`--scaffold`, 없으면
         `_scaffold/brief_web_<날짜>.json`)이 있어야 본다 — 없으면 경고 한 줄을 내고 건너뛴다.
+        483 관찰 국문은 배포 게이트(`render.validate_483_observations`)처럼 샤드의 **모든** 483 카드를 본다(리허설 1120i).
 
     python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json> [--deep-old <1차 deep_delta.json> --deep-new <2차 deep_delta.json>]
         `--deep-old`·`--deep-new` 를 주면 심층(`deep_delta.json`)도 **같은 대조 함수**로 본다 — 반려 카드의 심층만 바뀌어야 한다
@@ -187,7 +188,17 @@ def deep_assembly_lines(shard, handoff, scaffold):
     except (apb.AssembleError, inject_slots.SlotInjectionError, ValueError, TypeError, KeyError) as e:
         return [f"심층 조립 검사 조립 자체가 멈춤 — {type(e).__name__}: {e}"]
     deep_only = deep_ko_errors(out, report)
-    return [f"심층 조립 검사 {e}" for e in report.errors if e in deep_only]
+    lines = [f"심층 조립 검사 {e}" for e in report.errors if e in deep_only]
+    # ★리허설 1120i: 조립의 483 관문(게이트 4)은 이번 조립에서 관찰을 새로 만든 카드만 보지만, 배포 게이트
+    #   (`render.validate_483_observations`)는 **모든** 483 카드의 관찰을 본다. 관찰 번호가 겹친 카드
+    #   (fda483-196254·196260)는 조립 검사 0건으로 지나가고 사이트 빌드에서 막힐 뻔했다. 이 샤드의 카드만
+    #   배포 게이트와 같은 범위(전체)로 한 번 더 센다 — 과거 호는 여기 들어오지 않는다.
+    seen = set(report.errors)
+    for e in apb._lint_483_observation_ko(out.get("cards") or []):
+        if e not in seen:
+            seen.add(e)
+            lines.append(f"심층 조립 검사 {e}")
+    return lines
 
 
 def find_scaffold(delta_path, explicit=None):

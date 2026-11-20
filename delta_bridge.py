@@ -1304,27 +1304,49 @@ def write_scaffold(text: str, date_str: str) -> bool:
     return True
 
 
-def bridge_from_git(token: str, db_id: str, date_str: str, read=None) -> "int | None":
+def _copyedit_done(date_str: str, read=None) -> bool:
+    """그 날짜 브랜치의 `copyedit.json` 이 `status=="완료"`·`published: true`(교열이 발행 반납을 마쳤다)인가.
+    못 읽으면 False."""
+    try:
+        text = (read or git_read_run_file)(date_str, "copyedit.json")
+    except Exception:  # noqa: BLE001 — 판정 보조, 실패는 '모름'
+        return False
+    obj = _try_json_dict(text) if text is not None else None
+    return bool(obj) and obj.get("status") == "완료" and obj.get("published") is True
+
+
+def bridge_from_git(token: str, db_id: str, date_str: str, read=None,
+                    held: "list[str] | None" = None) -> "int | None":
     """git 모드: 채택 가능한 git 반납이 있으면 기록하고 종료코드를, 아니면 None(노션으로 넘김).
 
     git 쪽 검증이 실패해도 None 을 돌려 노션 예비 길로 넘어간다 — 노션은 예비이자 검증된 길이다.
+    `held` 를 주면, 교열이 반납을 **완료**로 마쳤는데 git 으로 기록하지 못한 사유를 거기에 적는다
+    (main 이 노션에서도 쓰지 못했을 때 run 을 실패로 끝내는 근거 — 11-23 사전 점검 B).
     """
+    def _hold(reason: str) -> None:
+        if held is not None and _copyedit_done(date_str, read=read):
+            held.append(reason)
+
     run = load_git_run(date_str, read=read)
     if not run["adoptable"]:
         log("INFO", f"git 반납 채택 안 함({run['branch']}): {run['reason']} — 노션 예치로 넘어감")
+        _hold(f"git 반납 채택 안 함({run['branch']}): {run['reason']}")
         return None
     try:
         delta, deep, date_str = prepare_git_run(token, db_id, run)
     except DeltaBridgeError as e:
         log("WARN", f"git 반납 검증 실패 — 노션 예치로 넘어감: {e}")
+        _hold(f"git 반납 검증 실패: {e}")
         return None
     except NotionHandoffError as e:
         log("WARN", f"git 반납 처리 중 노션 조회 실패 — 노션 예치로 넘어감: {e}")
+        _hold(f"git 반납 처리 중 노션 조회 실패: {e}")
         return None
     try:
         scaffold_text = load_run_scaffold(run, delta, read=read)
     except DeltaBridgeError as e:
         log("WARN", f"git 반납의 스캐폴드를 쓸 수 없음 — 노션 예치로 넘어감: {e}")
+        _hold(f"git 반납의 스캐폴드를 쓸 수 없음: {e}")
         return None
 
     conflicts = _existing_conflicts(delta, deep, date_str)
@@ -1526,10 +1548,12 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         return compare_only(token, args.db, args.publish_date)
 
+    git_held: list[str] = []
+    git_date = ""
     if source == SOURCE_GIT and not args.consume:
         git_date = args.publish_date or _kst_today()
         try:
-            rc = bridge_from_git(token, args.db, git_date)
+            rc = bridge_from_git(token, args.db, git_date, held=git_held)
         except DeltaBridgeError as e:
             print(f"ERROR: {e}", file=sys.stderr)
             return 1
@@ -1557,8 +1581,26 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             if rc is not None:
                 return rc
-        log("INFO", "no OPEN web-delta — nothing to bridge")
         _github_output("wrote", "false")
+        if git_held and not os.path.exists(_delta_path(git_date)):
+            # [11-23 사전 점검 B] 교열은 반납을 완료로 마쳤는데 git 으로 기록하지 못했고, 노션에도 쓸 OPEN
+            # 델타가 없다(교열이 CONSUMED 를 찍었거나 예치가 없다) — 초록 '클린 skip' 이면 그 주가 조용히
+            # 발행되지 않는다. 실패로 끝내 사람이 보게 한다. 이미 main 에 그 주 델타가 있으면 해당 없음.
+            reason = " · ".join(git_held)
+            msg = (f"{git_date} 교열 반납(copyedit.json status=완료)을 기록하지 못했다 — {reason}. "
+                   "노션에도 OPEN 델타가 없어 이번 run 은 아무것도 쓰지 않았다.")
+            print(f"ERROR: {msg}", file=sys.stderr)
+            print(f"::error title=교열 반납 미기록::{msg}")
+            summary = os.environ.get("GITHUB_STEP_SUMMARY")
+            if summary:
+                try:
+                    with open(summary, "a", encoding="utf-8") as f:
+                        f.write(f"### 교열 반납 미기록 ({git_date})\n\n- {msg}\n"
+                                "- 고친 뒤 브릿지를 `publish_date` 로 다시 돌린다.\n\n")
+                except OSError:
+                    pass
+            return 1
+        log("INFO", "no OPEN web-delta — nothing to bridge")
         return 0
 
     if args.consume:

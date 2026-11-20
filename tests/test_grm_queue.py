@@ -729,6 +729,26 @@ class HandoffMirrorWorkflowTest(unittest.TestCase):
         self.assertIn('workflows: ["GRM API Intake (Daily)"]', self.wf)
         self.assertRegex(intake, r"(?m)^name: GRM API Intake \(Daily\)")
 
+    def test_mirror_runs_after_a_failed_intake_and_fails_loudly_without_a_file(self):
+        # 11-19: 수집이 handoff 를 다 만든 뒤 실패로 끝나 사본이 skipped — 그날 handoff 가 브랜치에 없었다.
+        self.assertIn("github.event.workflow_run.conclusion == 'failure'", self.wf)
+        self.assertIn("github.event.workflow_run.head_branch == 'main'", self.wf)
+        self.assertIn("WR_CONCLUSION: ${{ github.event.workflow_run.conclusion }}", self.wf)
+        fn = self.wf[self.wf.index("no_handoff() {"):]
+        fn = fn[:fn.index("\n          }\n")]
+        self.assertIn('if [ "${WR_CONCLUSION:-}" = "failure" ]; then', fn)
+        self.assertLess(fn.index("::error::"), fn.index("exit 1"))
+        self.assertIn('no_handoff "grm-queue-shadow 아티팩트 없음"', self.wf)
+        self.assertIn('no_handoff "handoff_db_*.json 없음"', self.wf)
+        # 반쪽 payload 는 올리지 않는다 — 행 수 검사
+        self.assertIn('int(p.get("row_count",len(p["rows"])))==len(p["rows"])', self.wf)
+
+    def test_handoff_file_is_written_only_after_the_whole_collection(self):
+        # 실패 run 의 파일도 온전하다는 근거: run_shadow 는 수집기 끝(노션 handoff 뒤)에서 한 번만 돈다.
+        src = (ROOT / "collect_intake.py").read_text(encoding="utf-8")
+        self.assertLess(src.index("emit_routine_handoff("), src.index("grm_queue.run_shadow("))
+        self.assertLess(src.index("grm_queue.run_shadow("), src.rindex("return health.exit_code"))
+
     def test_branch_is_rewritten_as_a_single_parentless_commit(self):
         self.assertIn("git checkout -q --orphan mirror", self.wf)
         self.assertIn("git checkout -q FETCH_HEAD -- .", self.wf)

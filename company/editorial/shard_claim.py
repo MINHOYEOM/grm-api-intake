@@ -18,7 +18,8 @@
   점유한 지 STALE_MIN 분이 넘도록 결과가 없으면 죽은 워커로 보고 **가로챌 수 있다**(다른 워커가 덮어쓴다).
 · delta 에는 가상 샤드 `T`(브리프 tldr·tldr_en)가 있다 — 모든 델타 샤드가 완료된 뒤에만 `next` 가 내놓는다.
 · claim 의 원자성: claim 파일을 커밋해 push 한다. 거절되면 pull --rebase 를 하고, 같은 파일이 이미 남의 것이면
-  (add/add 충돌 또는 새 점유) **졌다**. 3번까지 재시도.
+  (add/add 충돌 또는 새 점유) **졌다**. 3번까지 재시도. push 가 성공해도 원격의 claim 파일을 다시 읽어 내 이름이
+  아니면 졌다(2026-11-20 리허설 1120i deep.B 이중 점유). 판정과 쓰기 사이에 작업 폴더의 HEAD 가 움직였으면 다시 판정한다.
 · 결과 파일(`delta.A.json` 등)은 이 스크립트가 쓰지 않는다 — 기자가 쓴다.
 · check — 워커의 종료 판단은 코드가 한다(2026-11-19 리허설 1120g: 심층 워커가 빈 샤드 5개를 두고 '분량이 크다'며 스스로 끝냈다.
   사전 점검 3번: 08:40 보강은 점유 25분이 안 된 샤드를 '없음'으로 보고 바로 끝나, 08:15 뒤 잡힌 샤드가 죽으면 이어받을 워커가 없었다).
@@ -188,6 +189,26 @@ def _repo_root(folder):
     return out.stdout.strip()
 
 
+def _remote_claim_is_mine(root, remote, branch, rel, worker, at):
+    """push 성공 뒤 원격 브랜치의 claim 파일을 다시 읽는다 — 내 이름·내 시각이면 True.
+
+    2026-11-20 리허설 1120i: deep.B 를 심층-2 가 잡은 1.8초 뒤 심층-1+ 가 같은 파일을 덮어써 push 했다(수정 커밋).
+    push 성공만 믿으면 두 워커가 모두 '내가 잡음'으로 일한다. 원격을 못 읽으면(네트워크) push 성공을 믿는다.
+    """
+    if _git(root, "fetch", "-q", remote, branch, check=False).returncode != 0:
+        return True
+    shown = _git(root, "show", f"FETCH_HEAD:{rel}", check=False)
+    try:
+        c = json.loads(shown.stdout) if shown.returncode == 0 else None
+    except ValueError:
+        c = None
+    if not isinstance(c, dict) or c.get("worker") != worker or c.get("at") != at:
+        print(f"claim 확인 실패: 원격 {rel} 이 {c.get('worker') if isinstance(c, dict) else '없음'} 의 것 — 졌음",
+              file=sys.stderr)
+        return False
+    return True
+
+
 def claim(folder, kind, shard, worker, now=None, remote="origin"):
     """claim 파일을 커밋·push 한다. True = 내가 잡음, False = 졌음(남이 잡았거나 이미 완료)."""
     root = _repo_root(folder)
@@ -195,6 +216,7 @@ def claim(folder, kind, shard, worker, now=None, remote="origin"):
     branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
     for _ in range(RETRIES):
         _git(root, "pull", "--rebase", remote, branch, check=False)
+        head0 = _git(root, "rev-parse", "HEAD", check=False).stdout.strip()
         now_t = time.time() if now is None else now
         if _result_done(folder, kind, shard):
             return False
@@ -206,11 +228,17 @@ def claim(folder, kind, shard, worker, now=None, remote="origin"):
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump({"worker": worker, "at": now_t, "kind": kind, "shard": shard}, f)
             f.write("\n")
+        if _git(root, "rev-parse", "HEAD", check=False).stdout.strip() != head0:
+            # 판정과 쓰기 사이에 이 작업 폴더의 HEAD 가 움직였다 = 같은 폴더를 다른 워커가 함께 쓴다
+            # (리허설 1120i deep.B). 방금 쓴 파일을 HEAD 판으로 되돌리고 처음부터 다시 판정한다.
+            if _git(root, "checkout", "HEAD", "--", rel, check=False).returncode != 0:
+                os.remove(path)
+            continue
         _git(root, "add", rel)
         _git(root, "commit", "-m", f"claim {kind}.{shard} by {worker}", "--only", rel, check=False)
         pushed = _git(root, "push", remote, f"HEAD:{branch}", check=False)
         if pushed.returncode == 0:
-            return True
+            return _remote_claim_is_mine(root, remote, branch, rel, worker, now_t)
         rb = _git(root, "pull", "--rebase", remote, branch, check=False)
         if rb.returncode != 0:  # add/add 충돌 = 남이 같은 파일을 먼저 올렸다
             _git(root, "rebase", "--abort", check=False)

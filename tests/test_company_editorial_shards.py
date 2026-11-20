@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """편집팀 가변 샤드 — 계획(plan_shards)·자가 완수 잠금(shard_claim)·N 샤드 합치기(merge_parts)."""
 import importlib.util
+import io
 import json
 import os
 import shutil
 import subprocess
 import tempfile
 import unittest
+from contextlib import redirect_stderr
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -310,6 +313,39 @@ class WorkerLoopInstructionTest(unittest.TestCase):
         self.assertNotIn("| 09:05 |", switch)
         self.assertIn("08:45 · 09:12", switch)
 
+    def test_2026_11_23_precheck_wording(self):
+        """사전 점검 C(교열 마감 뒤 브릿지 요청)·D(claim 실패 뒤 git 금지) — 두 판이 같은 문장."""
+        import importlib.util as iu
+        spec = iu.spec_from_file_location("cloud_request", os.path.join(ROOT, "company", "ops", "cloud_request.py"))
+        cr = iu.module_from_spec(spec)
+        spec.loader.exec_module(cr)
+        self.assertEqual(cr.ACTIONS["delta-bridge"][0], "grm-delta-bridge.yml")   # 허용 목록에 있다
+        req = '`{"id": "<id>", "action": "delta-bridge", "args": {"publish_date": "{run_date_kst}"}}`'
+        line = ("`claim` 이 실패(exit 1)하면 그 샤드는 남의 것이다 — git 을 손대지 말고"
+                "(claim 파일 수정·commit·push·rebase·reset 모두 하지 않는다) 곧바로 `check` 로 돌아간다.")
+        for folder in ((), ("next",)):
+            ce = self._read(*folder, "copyedit.md")
+            self.assertIn("3. **브릿지 요청 — 2번까지 끝나면 곧바로 한 번.**", ce, folder)
+            self.assertIn(req, ce, folder)
+            self.assertIn("claude/request-{run_date_kst}-delta-bridge", ce, folder)
+            self.assertIn("리허설은 이 단계를 하지 않는다(`REHEARSAL.md` 금지)", ce, folder)
+            self.assertLess(ce.index("2. push 가 끝나면 **곧바로**"), ce.index("3. **브릿지 요청"))
+            self.assertIn(line, self._read(*folder, "reporter.md"), folder)
+        reh = self._read("REHEARSAL.md")
+        self.assertIn("워크플로 실행 요청(`claude/request-*` 마커)", reh)          # 리허설 금지가 덮는다
+        self.assertIn("**1번(실행 폴더 push)까지만.**", reh)
+        # 요청 마커 형식이 실제 검증을 통과한다
+        import datetime as dt
+        today = dt.date(2026, 11, 23)
+        obj = json.loads(req.strip("`").replace("<id>", "20261123-0905-bridge")
+                         .replace("{run_date_kst}", "2026-11-23"))
+        self.assertEqual(cr.validate(json.dumps(obj), "20261123-0905-bridge", today),
+                         ("grm-delta-bridge.yml", "delta-bridge", {"publish_date": "2026-11-23"}))
+
+    def test_switch_wording_kept(self):
+        switch = self._read("SWITCH_2026-11-23.md")
+        self.assertIn("08:45 · 09:12", switch)
+
 
 def _git(cwd, *a):
     subprocess.run(["git", "-C", cwd, *a], check=True, capture_output=True, text=True, encoding="utf-8")
@@ -343,6 +379,90 @@ class ClaimRaceTest(unittest.TestCase):
             self.assertFalse(sc.claim(f2, "delta", "A", "w2", now=1000 + 30))
             self.assertTrue(sc.claim(f2, "delta", "B", "w2", now=1000 + 30))
             self.assertTrue(sc.claim(f2, "delta", "A", "w2", now=1000 + sc.STALE_MIN * 60 + 5))
+        finally:
+            shutil.rmtree(base, ignore_errors=True)
+
+    def _repo(self, base, names):
+        bare = os.path.join(base, "r.git")
+        subprocess.run(["git", "init", "-q", "--bare", "-b", "main", bare], check=True)
+        seed = os.path.join(base, "seed")
+        subprocess.run(["git", "clone", "-q", bare, seed], check=True, capture_output=True)
+        _git(seed, "checkout", "-q", "-b", "main")
+        _git(seed, "config", "user.email", "t@t")
+        _git(seed, "config", "user.name", "t")
+        _w(os.path.join(seed, "company", "run", "D", "desk.json"), {"status": "완료", "shards": PLAN})
+        _git(seed, "add", "-A")
+        _git(seed, "commit", "-q", "-m", "seed")
+        _git(seed, "push", "-q", "origin", "HEAD:main")
+        out = []
+        for n in names:
+            p = os.path.join(base, n)
+            subprocess.run(["git", "clone", "-q", "-b", "main", bare, p], check=True, capture_output=True)
+            _git(p, "config", "user.email", "t@t")
+            _git(p, "config", "user.name", n)
+            out.append(p)
+        return out
+
+    @staticmethod
+    def _overwrite_and_push(clone, worker, at):
+        """다른 워커가 같은 claim 파일을 덮어써 push 한다(리허설 1120i deep.B 의 수정 커밋)."""
+        _git(clone, "pull", "-q", "--rebase", "origin", "main")
+        p = os.path.join(clone, "company", "run", "D", "claims", "deep.B.claim")
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        with open(p, "w", encoding="utf-8", newline="\n") as f:
+            json.dump({"worker": worker, "at": at, "kind": "deep", "shard": "B"}, f)
+            f.write("\n")
+        _git(clone, "add", "company/run/D/claims/deep.B.claim")
+        _git(clone, "commit", "-q", "-m", f"claim deep.B by {worker}")
+        _git(clone, "push", "-q", "origin", "HEAD:main")
+
+    def test_push_success_is_rechecked_against_the_remote_file(self):
+        base = tempfile.mkdtemp()
+        try:
+            w1, w2 = self._repo(base, ("w1", "w2"))
+            real = sc._git
+            fired = []
+
+            def racing_git(root, *args, check=True):
+                # w1 의 push 가 성공한 직후(원격 재확인 fetch 직전) w2 가 덮어쓴다
+                if args[:1] == ("fetch",) and os.path.samefile(root, w1) and not fired:
+                    fired.append(1)
+                    self._overwrite_and_push(w2, "w2", 1001.5)
+                return real(root, *args, check=check)
+
+            with mock.patch.object(sc, "_git", side_effect=racing_git), \
+                    redirect_stderr(io.StringIO()) as err:
+                self.assertFalse(sc.claim(os.path.join(w1, "company", "run", "D"), "deep", "B", "w1", now=1000))
+            self.assertTrue(fired)
+            self.assertIn("claim 확인 실패", err.getvalue())
+            # 덮어쓰기가 없으면 종전대로 이긴다
+            self.assertTrue(sc.claim(os.path.join(w1, "company", "run", "D"), "deep", "C", "w1", now=1000))
+        finally:
+            shutil.rmtree(base, ignore_errors=True)
+
+    def test_shared_folder_head_move_between_check_and_write_loses(self):
+        """두 워커가 한 작업 폴더를 같이 쓰면 판정 뒤 남의 커밋이 HEAD 를 옮긴다 — 덮어쓰지 않고 진다."""
+        base = tempfile.mkdtemp()
+        try:
+            (w1,) = self._repo(base, ("w1",))
+            folder = os.path.join(w1, "company", "run", "D")
+            real_state = sc._claim_state
+            fired = []
+
+            def state_then_other_commits(*a, **k):
+                r = real_state(*a, **k)
+                if not fired:
+                    fired.append(1)
+                    self._overwrite_and_push(w1, "심층-2", 999.0)   # 같은 폴더에서 남이 먼저 커밋·push
+                return r
+
+            with mock.patch.object(sc, "_claim_state", side_effect=state_then_other_commits):
+                self.assertFalse(sc.claim(folder, "deep", "B", "심층-1+", now=1000))
+            with open(os.path.join(folder, "claims", "deep.B.claim"), encoding="utf-8") as f:
+                self.assertEqual(json.load(f)["worker"], "심층-2")
+            shown = subprocess.run(["git", "-C", w1, "show", "origin/main:company/run/D/claims/deep.B.claim"],
+                                   capture_output=True, text=True, encoding="utf-8", check=True).stdout
+            self.assertEqual(json.loads(shown)["worker"], "심층-2")
         finally:
             shutil.rmtree(base, ignore_errors=True)
 

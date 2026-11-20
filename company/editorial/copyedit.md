@@ -92,7 +92,13 @@
    2. push 가 끝나면 **곧바로** Notion handoff 페이지(제목 `OPEN GRM Routine Handoff {run_date_kst}`)를 v16 [0단계] PL-10 마감대로 `CONSUMED` 로 바꾼다
       (`desk.json` 의 `defer` row 가 있으면 `DEFERRED` 블록 포함). 이때부터 백업 Routine 은 돌지 않는다.
       09:25 까지 못 바꿨으면 `copyedit.json` 을 `status: 실패`·`published: false` 로 고쳐 다시 push 하고 끝낸다(RUN.md 5항).
-   3. **행 Status 는 찍지 않는다.** v16 [Status 갱신] 의 규칙(`render`·병합 멤버·`reflow`→Processed · `skip`→Skipped · `error`→Error · `defer`→미변경)은
+   3. **브릿지 요청 — 2번까지 끝나면 곧바로 한 번.** 브릿지 크론만 기다리면 월요일 반영이 몇 시간 늦는다(실측 첫 발화 09:10~10:54 KST).
+      `company/CLOUD.md` "Actions 다리" 형식 그대로 요청 마커 한 파일을 올린다 — `id` 는 지금 KST 시각으로 `YYYYMMDD-HHMM-bridge`:
+      `git fetch origin main && git checkout -b claude/request-{run_date_kst}-delta-bridge FETCH_HEAD` →
+      `company/requests/<id>.json` 에 `{"id": "<id>", "action": "delta-bridge", "args": {"publish_date": "{run_date_kst}"}}` →
+      그 파일만 `git add` · 커밋 · `git push origin claude/request-{run_date_kst}-delta-bridge` → `git checkout claude/company-{run_date_kst}` 로 돌아온다.
+      결과는 기다리지 않는다(크론이 예비다). push 가 거절되면 `copyedit.md` 에 `막힘: Actions — 브릿지 요청` 한 줄만 남긴다. 리허설은 이 단계를 하지 않는다(`REHEARSAL.md` 금지).
+   4. **행 Status 는 찍지 않는다.** v16 [Status 갱신] 의 규칙(`render`·병합 멤버·`reflow`→Processed · `skip`→Skipped · `error`→Error · `defer`→미변경)은
       코드가 적용한다 — 브릿지가 델타를 가져간 직후 `grm_queue.py notion-sync` 가 발행 결과로 계산해 Notion 행에 찍는다. handoff 행에는 `page_id` 가 없다.
    (`반납 길: notion` 인 호는 종전 순서다: v16 [산출물 — 델타 Notion 예치] 로 예치·자기검증(실패 시 `VOID GRM Web Delta {날짜}`·Skipped) → handoff `CONSUMED` → v16 [Status 갱신] 대로 행 Status 를 `desk.json` 의 `action` 에 맞춰 바꾼다.)
 

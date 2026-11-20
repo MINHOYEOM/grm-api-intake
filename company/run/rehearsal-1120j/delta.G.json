@@ -1,0 +1,452 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-20",
+ "shard": "G",
+ "cards": {
+  "recall-53d37db1b711": {
+   "title_issue": "이산화황 회수",
+   "hook_line": "현진천마, 이산화황으로 회수명령(강제)",
+   "summary": "현진천마가 이산화황으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 이산화황",
+    "제품·범위: 현진천마 1품목",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for sulfur dioxide",
+    "hook_line": "One product recalled for sulfur dioxide (mandatory recall order)",
+    "summary": "One product was recalled for sulfur dioxide (mandatory recall order).",
+    "key_facts": [
+     "Reason: sulfur dioxide",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-6ffa973e2763": {
+   "title_issue": "이산화황 회수",
+   "hook_line": "목단피 제품, 이산화황으로 회수명령(강제)",
+   "summary": "자연세상목단피가 이산화황으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 이산화황",
+    "제품·범위: 자연세상목단피 1품목",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for sulfur dioxide",
+    "hook_line": "One product recalled for sulfur dioxide (mandatory recall order)",
+    "summary": "One product was recalled for sulfur dioxide (mandatory recall order).",
+    "key_facts": [
+     "Reason: sulfur dioxide",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-74000539e83e": {
+   "title_issue": "쿠르쿠민류 정량법 부적합 회수",
+   "hook_line": "강황 제품, 쿠르쿠민류 정량법으로 회수명령(강제)",
+   "summary": "이풀잎강황이 정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합)으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합)",
+    "제품·범위: 이풀잎강황 1품목",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall over curcuminoid assay",
+    "hook_line": "One product recalled over the curcuminoid assay (mandatory recall order)",
+    "summary": "One product was recalled over the assay for the sum of curcumin, demethoxycurcumin and bisdemethoxycurcumin (mandatory recall order).",
+    "key_facts": [
+     "Reason: assay (sum of curcumin, demethoxycurcumin and bisdemethoxycurcumin)",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-9cf757ea745d": {
+   "title_issue": "이산화황 부적합 회수",
+   "hook_line": "산약 제품, 이산화황 부적합으로 회수명령(강제)",
+   "summary": "영천약초도매시장산약이 이산화황 부적합으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 이산화황 부적합",
+    "제품·범위: 영천약초도매시장산약 1품목",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for sulfur dioxide failure",
+    "hook_line": "One product recalled for failing the sulfur dioxide test (mandatory recall order)",
+    "summary": "One product was recalled for failing the sulfur dioxide test (mandatory recall order).",
+    "key_facts": [
+     "Reason: sulfur dioxide failure",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-bc51804c85aa": {
+   "title_issue": "중금속(카드뮴) 회수",
+   "hook_line": "절패모 제품, 중금속(카드뮴)으로 회수명령(강제)",
+   "summary": "허브팜절패모가 중금속(카드뮴)으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 중금속(카드뮴)",
+    "제품·범위: 허브팜절패모 1품목",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for heavy metal (cadmium)",
+    "hook_line": "One product recalled for heavy metal (cadmium) (mandatory recall order)",
+    "summary": "One product was recalled for heavy metal (cadmium) (mandatory recall order).",
+    "key_facts": [
+     "Reason: heavy metal (cadmium)",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-c5d40bc8b3d1": {
+   "title_issue": "분진포집효율 부적합 회수",
+   "hook_line": "보건용 마스크, 분진포집효율 부적합으로 회수명령(강제)",
+   "summary": "보건용 마스크(KF80) 1품목이 품질부적합(분진포집효율)으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 품질부적합(분진포집효율)",
+    "제품·범위: 보건용 마스크(KF80) 1품목",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for particle filtration failure",
+    "hook_line": "A health mask recalled for failing particle filtration efficiency (mandatory)",
+    "summary": "A KF80 health mask product was recalled for failing particle filtration efficiency (mandatory recall order).",
+    "key_facts": [
+     "Reason: quality failure (particle filtration efficiency)",
+     "Product and scope: one KF80 health mask product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0165-2027": {
+   "title_issue": "니트로사민 불순물 한도 초과 회수",
+   "hook_line": "니트로소 불순물이 잠정 관리 한도를 넘어 정제 Class II 회수",
+   "summary": "시프로플록사신 정제 500 mg 등 2품목이 FDA 권고 잠정 관리 한도를 넘은 N-nitroso-ciprofloxacin 결과로 회수됐다(Class II).",
+   "key_facts": [
+    "사유: CGMP 일탈 — N-nitroso-ciprofloxacin 결과가 FDA 권고 잠정 관리 한도 초과",
+    "제품·범위: 동일 사유 2품목 일괄 회수, 대표 품목 로트 CB496A·CB497A·CB498A",
+    "등급: Class II",
+    "조치: 업체 자진회수, 서한 통지, 미국 전역 유통분"
+   ],
+   "implication": "대표 품목의 회수 수량은 29,085 bottles다. 회수는 2026-10-20에 시작됐고 FDA는 2026-11-03에 등급을 확정했다.",
+   "checks": [
+    "시프로플록사신 함유 품목의 N-nitroso-ciprofloxacin 시험 결과를 FDA 권고 잠정 관리 한도와 대조하는가?",
+    "니트로사민 불순물이 한도를 넘으면 유통 중 로트까지 영향 평가를 넓히는가?"
+   ],
+   "en": {
+    "title_issue": "Nitrosamine impurity above limit",
+    "hook_line": "Ciprofloxacin tablets recalled, Class II, over N-nitroso-ciprofloxacin above interim limit",
+    "summary": "Ciprofloxacin Tablets, USP, 500 mg and one other product were recalled because N-nitroso-ciprofloxacin results exceeded the FDA recommended interim control limit (Class II).",
+    "key_facts": [
+     "Reason: CGMP deviations — N-nitroso-ciprofloxacin results above the FDA recommended interim control limit",
+     "Product and scope: two products recalled together for the same reason; lead product lots CB496A, CB497A and CB498A",
+     "Class: Class II",
+     "Agency action: voluntary firm-initiated recall, notified by letter, US nationwide distribution"
+    ],
+    "implication": "The recall quantity for the lead product is 29,085 bottles. The recall was initiated on 2026-10-20 and FDA classified it on 2026-11-03.",
+    "checks": [
+     "Do you compare N-nitroso-ciprofloxacin results for ciprofloxacin products with the FDA recommended interim control limit?",
+     "When a nitrosamine impurity exceeds the limit, do you extend the impact assessment to lots in distribution?"
+    ]
+   },
+   "quotes_translation": [
+    "CGMP 일탈: N-nitroso-ciprofloxacin 결과가 FDA 권고 잠정 관리 한도를 넘었다."
+   ]
+  },
+  "0a7b0d339de9": {
+   "title_issue": "기준일탈 결과 지침 3.0판",
+   "summary": "ECA 분석 품질관리 그룹이 2026년 11월 실험실 데이터 관리 지침 '기준일탈(OOS) 결과' 3.0판을 발행했다(ECA 보도).",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "OOS guidance version 3.0",
+    "summary": "In November 2026 the ECA Analytical Quality Control Group published Version 3.0 of its Laboratory Data Management Guidance on Out of Specification (OOS) results (ECA report).",
+    "key_facts": [],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "9730858b8989": {
+   "title_issue": "공급업체 적격성평가 경고서한",
+   "summary": "FDA 의약품평가연구센터가 Nanjing Hanxin Pharmaceutical Technology Co. Ltd에 경고서한을 발행했다(ECA 보도). ECA는 이 서한의 공급업체 적격성평가와 감독 문제를 다뤘다.",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Supplier qualification warning letter",
+    "summary": "FDA's Center for Drug Evaluation and Research issued a Warning Letter to Nanjing Hanxin Pharmaceutical Technology Co. Ltd (ECA report), covering supplier qualification and oversight.",
+    "key_facts": [],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "a74d4fbdccdd": {
+   "title_issue": "엔도톡신·미생물 관리 경고서한",
+   "summary": "FDA가 Fresenius Kabi USA LLC 실사에서 무균의약품 GMP 요건의 중대한 위반을 확인했다(ECA 보도). ECA는 엔도톡신과 미생물 관리 미흡, 추가 오염 문제를 다뤘다.",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Endotoxin and microbiological warning letter",
+    "summary": "FDA found significant violations of GMP requirements for sterile medicinal products during an inspection of Fresenius Kabi USA LLC (ECA report), covering endotoxins, microbiological weaknesses and further contamination.",
+    "key_facts": [],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "ad04c5ea4a99": {
+   "title_issue": "원료 시험·출하·품질 감독 경고서한",
+   "summary": "FDA 경고서한이 원료 시험, 배치 출하, 품질 감독의 미흡을 지적했다(ECA 보도).",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Component testing and release warning letter",
+    "summary": "An FDA Warning Letter highlighted gaps in component testing, batch release and quality oversight (ECA report).",
+    "key_facts": [],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "fda483-196381": {
+   "title_issue": "공여자 적격성·품질 절차 반복 지적",
+   "hook_line": "거대세포바이러스 양성 태반·제대 조직에 경고 문구 없이 보관",
+   "summary": "FDA가 미국의 줄기세포 자체 상표 유통업체 CellSure, L3C에 Form 483(관찰사항 6건)을 발행했다. 공여자 적격성 표시, 공여자 선별, 품질부서 기준, 보관·유통 절차, 안정성 시험 프로그램을 지적했다.",
+   "key_facts": [
+    "관찰 1: 거대세포바이러스 양성 태반·제대 조직에 감염병 위험 경고 문구를 표시하지 않음",
+    "관찰 2: 2021년 9월~2023년 8월 공여자를 의료기록 검토로 선별하지 않았고 선별 질문에 크로이츠펠트-야콥병·지카 바이러스 항목이 빠짐",
+    "관찰 3: 위탁 제조업체의 태반·제대 조직 가공에 대한 기준·절차를 정하지 않음",
+    "관찰 6: 2021년 8월부터 보관한 태반 줄기세포의 안정성 프로그램이 없고 사용기한이 없음"
+   ],
+   "implication": "관찰 2·3·4·6은 이전 실사의 반복 지적이다(관찰 2). 회사는 제3자 보관 탱크에 둔 태반 줄기세포 재고의 위치와 품질 상태를 관리하는 절차를 두지 않았다(관찰 4). 회사는 현재 고객 4명의 태반·제대 조직을 보관하고 있다(관찰 2).",
+   "checks": [
+    "공여자 적격성 요건을 충족하지 못한 조직에 경고 문구를 표시하는가? (관찰 1)",
+    "공여자 선별 질문지가 크로이츠펠트-야콥병·지카 바이러스 위험 요인을 묻는가? (관찰 2)",
+    "보관 중인 세포 제품의 안정성 프로그램과 사용기한이 있는가? (관찰 6)"
+   ],
+   "en": {
+    "title_issue": "Donor eligibility and repeat quality findings",
+    "hook_line": "CMV-positive placenta and cord tissue stored without the required warning label",
+    "summary": "FDA issued a Form 483 with 6 observations to CellSure, L3C, a stem cell own-label distributor in the USA, citing donor eligibility labeling, donor screening, quality unit criteria, warehousing and distribution procedures and stability testing.",
+    "key_facts": [
+     "Observation 1: placenta and umbilical cord tissue positive for CMV was not labeled with the communicable disease risk warning",
+     "Observation 2: from September 2021 to August 2023 donors were not screened by medical record review, and questions on CJD and ZIKA virus risk were missing",
+     "Observation 3: no criteria or procedures for processing of placenta and umbilical cord tissue by a contract manufacturer",
+     "Observation 6: no stability program for placental stem cells stored since August of 2021, and the products have no expiration date"
+    ],
+    "implication": "Observations 2, 3, 4 and 6 are repeat observations (Observation 2). The firm had no procedures for the location and quality status of placental stem cell inventory held by third parties (Observation 4). The firm is currently storing placenta and umbilical cord tissue for 4 clients (Observation 2).",
+    "checks": [
+     "Do tissues that fail donor eligibility carry the required warning statement? (Observation 1)",
+     "Does the donor questionnaire ask about CJD and ZIKA virus risk factors? (Observation 2)",
+     "Do stored cell products have a stability program and expiration date? (Observation 6)"
+    ]
+   }
+  },
+  "fda483-196386": {
+   "title_issue": "라벨 검증·조사 확대 미흡",
+   "hook_line": "블리스터 밀봉 불만 20건 넘게 받고도 조사를 한 로트에만 한정",
+   "summary": "FDA가 미국의 재포장·자체 상표 유통업체 The Harvard Drug Group LLC dba Major Pharmaceuticals and Rugby Laboratories에 Form 483(관찰사항 3건)을 발행했다. 라벨 가변 정보 검증, 조사 범위 확대, 의약품 공급망 보안법 검증 체계를 지적했다.",
+   "key_facts": [
+    "관찰 1: 출하 승인 절차서가 품질부서의 라벨 로트 번호·유효기한 검증을 요구하지 않음",
+    "관찰 2: 2025-12-12~2026-03-03 블리스터 밀봉 강도 불만 20건 넘게 받았으나 조사를 한 로트에만 한정",
+    "관찰 2: 같은 밀봉 공정·자재를 쓴 다른 로트와 제품을 품질부서가 출하 승인",
+    "관찰 3: 의심 제품 식별·조사와 불법 제품 통지 대응 절차가 공급망 보안법 검증 요건에 맞지 않음"
+   ],
+   "implication": "조사 SCAR-000303은 결함 있는 밀봉 공정과 자재를 근본원인으로 확인했다(관찰 2). 이 조사는 결국 회수로 이어졌다(관찰 2).",
+   "checks": [
+    "출하 전 라벨의 로트 번호·유효기한을 적합성 증명서와 대조하는가? (관찰 1)",
+    "근본원인이 공통 공정이면 같은 공정을 쓴 다른 로트로 조사를 넓히는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "Label verification and investigation scope",
+    "hook_line": "Over 20 blister seal complaints yet the investigation covered only one lot",
+    "summary": "FDA issued a Form 483 with 3 observations to The Harvard Drug Group LLC dba Major Pharmaceuticals and Rugby Laboratories, a repackager and own-label distributor in the USA, citing label variable data verification, investigation scope and DSCSA verification systems.",
+    "key_facts": [
+     "Observation 1: the authorization-to-ship SOP did not require the quality unit to verify lot number and expiration date on labels",
+     "Observation 2: more than 20 complaints of inadequate blister seal strength from 2025-12-12 to 2026-03-03, but the investigation covered one lot",
+     "Observation 2: other lots and products made with the same sealing process and materials were released by the quality unit",
+     "Observation 3: procedures did not establish systems for identifying suspect product and responding to illegitimate product notifications under the DSCSA"
+    ],
+    "implication": "Investigation SCAR-000303 identified a defective sealing process and material as the root cause (Observation 2). The investigation ultimately led to a recall (Observation 2).",
+    "checks": [
+     "Do you verify label lot numbers and expiration dates against the certificate of compliance before release? (Observation 1)",
+     "When the root cause is a shared process, do you extend the investigation to other lots? (Observation 2)"
+    ]
+   }
+  },
+  "fda483-196426": {
+   "title_issue": "위탁 제조소 감독 미흡",
+   "hook_line": "10년 넘게 창고 업무를 한 직원의 교육 기록을 제시하지 못함",
+   "summary": "FDA가 미국의 도매 유통업체 Talbot's Pharmaceuticals Family Products, LLC에 Form 483(관찰사항 1건)을 발행했다. 위탁 제조·시험·포장 시설에 대한 품질부서의 감독 미흡을 지적했다.",
+   "key_facts": [
+    "관찰 1: 위탁 계약서가 안정성 시험 책임·조건·판정 기준을 정하지 않음",
+    "관찰 1: 계약서가 위탁업체의 공정·설비·시설 변경 통지를 요구하지 않음",
+    "관찰 1: 계약서에 정기 감사 권한 조항이 없음",
+    "관찰 1: 10년 넘게 입고·보관·유통을 한 창고 직원의 교육 기록을 제시하지 못함"
+   ],
+   "implication": "위탁업체들은 일반의약품 액제 원료와 액제·연고의 제조·시험·포장을 맡고 있다(관찰 1). 직원 교육 절차서는 2014-03-11 이후 개정되지 않았다(관찰 1).",
+   "checks": [
+    "위탁 계약서에 변경 통지 의무와 감사 권한이 있는가? (관찰 1)",
+    "위탁 품목의 안정성 시험 책임자가 계약서에 정해져 있는가? (관찰 1)",
+    "창고 직원의 GMP 교육 기록이 있는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Contract facility oversight gaps",
+    "hook_line": "No training records for warehouse staff who had handled products for over 10 years",
+    "summary": "FDA issued a Form 483 with 1 observation to Talbot's Pharmaceuticals Family Products, LLC, a wholesale distributor in the USA, finding inadequate quality unit oversight of contract manufacturing, testing and packaging facilities.",
+    "key_facts": [
+     "Observation 1: contract agreements did not specify responsibility, conditions or acceptance criteria for stability studies",
+     "Observation 1: agreements did not require contractors to notify the firm of process, equipment or facility changes",
+     "Observation 1: agreements had no right-to-audit provision",
+     "Observation 1: no training records were provided for warehouse staff who had handled OTC products for more than 10 years"
+    ],
+    "implication": "The contractors manufacture bulk OTC liquids and manufacture, test and package OTC liquids and ointment (Observation 1). The employee training procedure was last revised on March 11, 2014 (Observation 1).",
+    "checks": [
+     "Do contract agreements require change notification and grant audit rights? (Observation 1)",
+     "Do agreements assign responsibility for stability studies of contracted products? (Observation 1)",
+     "Do warehouse staff have GMP training records? (Observation 1)"
+    ]
+   }
+  },
+  "hc-82964": {
+   "title_issue": "오염 회수",
+   "hook_line": "PegLyte Powder, 오염 사유로 Type III 회수",
+   "summary": "PegLyte Powder(용액용 산제)가 오염으로 회수됐다(Type III).",
+   "key_facts": [
+    "사유: 오염 — 해당 로트에 이물이 들어 있을 수 있음",
+    "제품·범위: PegLyte Powder(용액용 산제)",
+    "등급: Type III"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for contamination",
+    "hook_line": "PegLyte Powder for solution recalled for contamination, Type III",
+    "summary": "PegLyte Powder (powder for solution) was recalled for contamination (Type III).",
+    "key_facts": [
+     "Reason: contamination — affected lots may contain foreign matter",
+     "Product and scope: PegLyte Powder (powder for solution)",
+     "Class: Type III"
+    ],
+    "implication": "",
+    "checks": []
+   },
+   "quotes_translation": [
+    "오염"
+   ]
+  },
+  "hc-82965": {
+   "title_issue": "타 품목 캡슐 혼입 회수",
+   "hook_line": "칸데사르탄 정제 로트에 에소메프라졸 캡슐이 섞였을 수 있어 회수",
+   "summary": "Taro-Candesartan 정제 8 mg이 제품 품질 사유로 회수됐다(Type II). 해당 로트에 에소메프라졸 20 mg 캡슐이 섞여 있을 수 있다.",
+   "key_facts": [
+    "사유: 제품 품질 — 해당 로트에 에소메프라졸 20 mg 캡슐이 섞여 있을 수 있음",
+    "제품·범위: Taro-Candesartan 정제 8 mg",
+    "등급: Type II"
+   ],
+   "implication": "",
+   "checks": [
+    "포장 전 라인 정리에서 다른 품목의 잔류를 확인하는가?",
+    "정제 포장품에 다른 품목 캡슐이 섞이면 검출하는 검사가 있는가?"
+   ],
+   "en": {
+    "title_issue": "Recall for mixed-in capsules",
+    "hook_line": "Candesartan tablet lots may contain esomeprazole capsules",
+    "summary": "Taro-Candesartan 8 mg tablets were recalled for product quality (Type II); affected lots may contain esomeprazole 20mg capsules.",
+    "key_facts": [
+     "Reason: product quality — affected lots may contain esomeprazole 20mg capsules",
+     "Product and scope: Taro-Candesartan tablets, 8 mg",
+     "Class: Type II"
+    ],
+    "implication": "",
+    "checks": [
+     "Does line clearance before packaging check for residues of other products?",
+     "Is there an inspection that would detect capsules of another product in tablet packs?"
+    ]
+   },
+   "quotes_translation": [
+    "제품 품질"
+   ]
+  },
+  "admin-2026008238": {
+   "title_issue": "안전성 보고 지연, 판매업무정지 1개월",
+   "hook_line": "위해성 관리 결과를 보고기간 뒤 제출해 판매업무정지 1개월",
+   "summary": "식약처가 진양제약(주)에 경고와 해당 3품목 판매업무정지 1개월을 처분했다. 로수브젯정 3품목의 위해성 관리 실시 결과와 정기적인 최신 안전성정보를 보고기간 이후에 제출했다.",
+   "key_facts": [
+    "위반: 위해성 관리 계획에 따른 위해성 관리 실시 결과와 정기적인 최신 안전성정보를 보고기간 이후 제출",
+    "처분: 경고(2026-11-23자) 및 해당 품목 판매업무정지 1개월(2026-11-23~12-22)",
+    "근거: 약사법 제32조의2·제37조의3·제76조, 의약품 등의 안전에 관한 규칙 제95조 [별표 8]"
+   ],
+   "implication": "",
+   "checks": [
+    "위해성 관리 실시 결과의 보고 기한을 품목별로 추적하는가?",
+    "정기적인 최신 안전성정보 제출 기한을 품목별 일정표로 관리하는가?"
+   ],
+   "en": {
+    "title_issue": "Late safety reports, 1-month sales suspension",
+    "hook_line": "Risk management results filed after the reporting period, one-month sales suspension",
+    "summary": "MFDS issued a warning and a one-month sales suspension for three tablet products to a manufacturer that submitted risk management results and periodic safety update reports after the reporting period.",
+    "key_facts": [
+     "Violation: risk management results under the risk management plan and periodic safety update reports submitted after the reporting period",
+     "Sanction: warning (as of 2026-11-23) and one-month sales suspension for the products (2026-11-23 to 12-22)",
+     "Basis: Pharmaceutical Affairs Act Articles 32-2, 37-3 and 76; Rules on the Safety of Medicinal Products Article 95 [Annex 8]"
+    ],
+    "implication": "",
+    "checks": [
+     "Do you track risk management result reporting deadlines by product?",
+     "Do you manage periodic safety update report deadlines on a per-product schedule?"
+    ]
+   }
+  },
+  "admrul-2100000288220": {
+   "title_issue": "의약외품 범위 검토위원회 규정 제정",
+   "hook_line": "의약외품 범위 지정 검토위원회 규정을 예규로 제정, 발령일 시행",
+   "summary": "식약처가 의약외품 범위 지정 검토위원회 구성 및 운영에 관한 규정(예규 제227호)을 제정했다.",
+   "key_facts": [
+    "시행일: 2026-11-16"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Quasi-drug scope review committee rules",
+    "hook_line": "New rules on the quasi-drug scope review committee take effect on issue",
+    "summary": "MFDS established rules on the composition and operation of a committee that reviews the scope of quasi-drugs (Directive No. 227).",
+    "key_facts": [
+     "Effective date: 2026-11-16"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  }
+ }
+}

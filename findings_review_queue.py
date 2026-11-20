@@ -44,6 +44,12 @@ from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 
 
 DEFAULT_MAX_AGE_DAYS = 3
+# 범위 밖(scope_status != 'ok': non_pharma 등) 행의 기한. 이 행은 검색 화면에 원래 안 보이고
+# 자동승격도 scope ok 만 본다 — 하루 한 번 도는 규칙으로는 영영 안 풀리는 게 정상이라 3일
+# 기한이면 FDA WL 이 식품 업체(제과점 등) 서한을 들여올 때마다 같은 경보가 난다(#1759: 26건).
+# 사람이 일괄 정리할 시간을 주되(2주), 범위 오분류(11-08 Baylab 마스크 WL 은 non_pharma 였지만
+# 실제 지적)를 영원히 가리지 않도록 기한 자체는 둔다.
+DEFAULT_OUT_OF_SCOPE_MAX_AGE_DAYS = 14
 _PAGE_SIZE = 1000
 _MAX_LISTED = 30          # 이슈 본문에 싣는 초과 행 상한(잘랐다는 사실은 report 에 남긴다)
 _TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
@@ -68,8 +74,14 @@ def summarize(
     *,
     now: datetime,
     max_age_days: int,
+    out_of_scope_max_age_days: int = DEFAULT_OUT_OF_SCOPE_MAX_AGE_DAYS,
 ) -> dict[str, Any]:
-    """순수 함수 — needs_review 행 목록 → report. 나이는 소수 첫째 자리 일 단위."""
+    """순수 함수 — needs_review 행 목록 → report. 나이는 소수 첫째 자리 일 단위.
+
+    scope ok 행은 max_age_days, 범위 밖 행은 max(out_of_scope_max_age_days, max_age_days) 가
+    기한이다. 기한 안의 범위 밖 행은 경보 없이 out_of_scope_waiting 으로만 센다."""
+    out_limit = max(out_of_scope_max_age_days, max_age_days)
+    out_waiting = 0
     by_source: dict[str, int] = {}
     by_scope: dict[str, int] = {}
     aged: list[dict[str, Any]] = []
@@ -88,7 +100,10 @@ def summarize(
         else:
             age = round((now - ts).total_seconds() / 86400, 1)
             oldest = age if oldest is None else max(oldest, age)
-        if age is None or age > max_age_days:
+        limit = max_age_days if scope == "ok" else out_limit
+        if age is not None and scope != "ok" and age <= out_limit:
+            out_waiting += 1
+        if age is None or age > limit:
             aged.append({
                 "finding_id": str(row.get("finding_id") or ""),
                 "source": src,
@@ -101,6 +116,8 @@ def summarize(
     return {
         "checked_at_utc": now.astimezone(timezone.utc).isoformat(timespec="seconds"),
         "max_age_days": max_age_days,
+        "out_of_scope_max_age_days": out_limit,
+        "out_of_scope_waiting": out_waiting,
         "needs_review": len(rows),
         "needs_review_visible": by_scope.get("ok", 0),
         "by_source": dict(sorted(by_source.items())),
@@ -131,17 +148,20 @@ def run_measure(
     service_key: str,
     *,
     max_age_days: int,
+    out_of_scope_max_age_days: int = DEFAULT_OUT_OF_SCOPE_MAX_AGE_DAYS,
     now: datetime | None = None,
 ) -> dict[str, Any]:
     now = now or datetime.now(timezone.utc)
     try:
         rows = fetch_needs_review_all(base_url, service_key)
     except (RuntimeError, ValueError) as exc:
-        report = summarize([], now=now, max_age_days=max_age_days)
+        report = summarize([], now=now, max_age_days=max_age_days,
+                           out_of_scope_max_age_days=out_of_scope_max_age_days)
         report["status"] = "error"
         report["errors"].append(str(exc))
         return report
-    return summarize(rows, now=now, max_age_days=max_age_days)
+    return summarize(rows, now=now, max_age_days=max_age_days,
+                     out_of_scope_max_age_days=out_of_scope_max_age_days)
 
 
 # ---------------------------------------------------------------------------
@@ -268,6 +288,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("command", nargs="?", default="measure", choices=("measure", "decide"))
     parser.add_argument("--max-age-days", type=int, default=DEFAULT_MAX_AGE_DAYS,
                         help=f"이 일수를 넘긴 행이 있으면 경보(기본 {DEFAULT_MAX_AGE_DAYS})")
+    parser.add_argument("--out-of-scope-max-age-days", type=int, default=DEFAULT_OUT_OF_SCOPE_MAX_AGE_DAYS,
+                        help=f"범위 밖(scope_status != ok) 행의 기한(기본 {DEFAULT_OUT_OF_SCOPE_MAX_AGE_DAYS})")
     parser.add_argument("--decisions", help="decide: 판정 JSON 파일 경로")
     parser.add_argument("--apply", action="store_true", default=False,
                         help="decide: 실제 PATCH(없으면 dry-run)")
@@ -298,7 +320,8 @@ def main(argv: list[str] | None = None) -> int:
         _emit(args.output, report)
         return 1 if report["errors"] else 0
 
-    report = run_measure(base_url, service_key, max_age_days=args.max_age_days)
+    report = run_measure(base_url, service_key, max_age_days=args.max_age_days,
+                         out_of_scope_max_age_days=args.out_of_scope_max_age_days)
     _emit(args.output, report)
     return 0 if report["status"] == "ok" else 1
 

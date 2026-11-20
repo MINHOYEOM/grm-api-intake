@@ -604,5 +604,60 @@ class Round2CloseTest(unittest.TestCase):
         self.assertIn("곧바로 아래 4번 마감을 1번(`scaffold.json` 복사", text[i:j])
 
 
+class WlViolationKo1120hTest(unittest.TestCase):
+    """리허설 1120h: 경고서한 카드가 `violations_ko` 없이 `precheck deep` 0건 통과 → 교열 조립 exit 2
+    ("위반 #1~#3 statement_ko 없음"). 심층 사전 점검이 조립 게이트 6(과 4·7)을 **같은 함수**로 돌린다."""
+
+    VIOL = [{"number": str(n), "statement": f"Failure {n} [21 CFR 211.{n}0].", "citation": f"21 CFR 211.{n}0"}
+            for n in (1, 2, 3)]
+    KO = [{"number": str(n), "statement_ko": f"위반 {n} 국문"} for n in (1, 2, 3)]
+
+    def _scaffold(self):
+        return {"brief": {"run_date_kst": "2026-11-16"},
+                "cards": [{"id": "wl-1", "card_type": "Warning Letter",
+                           "deterministic_detail": {"type": "wl_violations", "count": 3,
+                                                    "violations": json.loads(json.dumps(self.VIOL))}},
+                          {"id": "other", "card_type": "Warning Letter",
+                           "deterministic_detail": {"type": "wl_violations", "count": 1,
+                                                    "violations": json.loads(json.dumps(self.VIOL[:1]))}}]}
+
+    def _shard(self, **entry):
+        return {"items": {"wl-1": dict({"deep_analysis": {"key_violations": "x"}}, **entry)}}
+
+    def test_missing_violations_ko_blocks_like_assembly(self):
+        import assemble_publish_brief as apb
+        lines = precheck.deep_assembly_lines(self._shard(), {"rows": []}, self._scaffold())
+        expected = apb._lint_wl_violation_ko([self._scaffold()["cards"][0]])   # 조립 게이트 6 그 함수
+        self.assertEqual(len(expected), 3)
+        self.assertEqual(lines, [f"심층 조립 검사 {e}" for e in expected])
+        # 샤드 밖 카드(other)는 이 샤드 몫이 아니다 — 검사하지 않는다.
+        self.assertFalse([x for x in lines if "'other'" in x])
+
+    def test_filled_violations_ko_passes_and_no_scaffold_skips(self):
+        self.assertEqual(precheck.deep_assembly_lines(self._shard(violations_ko=self.KO), {"rows": []},
+                                                      self._scaffold()), [])
+        self.assertEqual(precheck.deep_assembly_lines(self._shard(), {"rows": []}, None), [])
+
+    def test_cli_deep_blocks_then_passes(self):
+        import verify_deep_analysis as vda
+        patcher = mock.patch.object(vda, "run_deep_analysis_gate",
+                                    return_value=vda.GateResult(ok=True, findings=[], report=""))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        with tempfile.TemporaryDirectory() as tmp:
+            ho, sh, sc = Path(tmp, "h.json"), Path(tmp, "deep.F.json"), Path(tmp, "sc.json")
+            ho.write_text(json.dumps({"rows": []}), encoding="utf-8")
+            sc.write_text(json.dumps(self._scaffold(), ensure_ascii=False), encoding="utf-8")
+            sh.write_text(json.dumps(self._shard(), ensure_ascii=False), encoding="utf-8")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = precheck.main(["deep", str(ho), str(sh), "--scaffold", str(sc)])
+            self.assertEqual(code, 1, out.getvalue())
+            self.assertIn("심층 조립 검사 카드 'wl-1' 위반 #1: statement_ko 없음", out.getvalue())
+            sh.write_text(json.dumps(self._shard(violations_ko=self.KO), ensure_ascii=False), encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(precheck.main(["deep", str(ho), str(sh), "--scaffold", str(sc)]), 0)
+
+
 if __name__ == "__main__":
     unittest.main()

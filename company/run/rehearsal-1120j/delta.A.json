@@ -575,8 +575,11 @@
         "key_facts": [
           "Agency action: Form 483 issued after the 2026-03-20 inspection"
         ],
-        "implication": "",
-        "checks": []
+        "implication": "An inspection record published without the observation text does not by itself call for action. Domestic firms should check whether any facility in their supply chain appears on the list and, if so, read the original record (PDF) directly.",
+        "checks": [
+          "Check whether any of your supply-chain or sourcing facilities appear on the list",
+          "If one does, read the original FDA FOIA record (PDF) directly"
+        ]
       }
     }
   }

@@ -1,1 +1,16 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{
+  "status": "완료",
+  "round": 1,
+  "worker": "델타-2",
+  "fixed": [
+    {"id": "fda483-196348", "shard": "A", "changed": ["en.implication", "en.checks"]}
+  ],
+  "unfixed": [],
+  "checks": {
+    "precheck_terms_delta.A": "exit 0 (0건)",
+    "rework_diff_scratch_merge": "exit 0 — 반려 카드만 바뀜(fda483-196348: en)",
+    "assemble_publish_brief_scratch": "exit 0",
+    "check_en_slots_scratch": "exit 0 (영문 슬롯 완결)"
+  },
+  "이의": "fda483-196348 — 원인은 사전 점검이 못 잡는 틈: 델타 한국어 implication·checks 를 비워 두면 스캐폴드 기본값(원문 미확보 483 안내문)이 조립 카드에 남는데, inject_slots 의 en 짝 검사는 델타 한국어(빈 값)만 보고 통과시키고 render.card_english_gaps 는 조립된 카드의 한국어(채워짐)를 본다. precheck terms 가 스캐폴드 값까지 합쳐 en 짝을 보게 고치면 1차에서 막힌다."
+}

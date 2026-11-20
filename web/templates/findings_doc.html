@@ -276,6 +276,17 @@
       </ul>
     </section>
     {%- endif %}
+    {%- if standard_refs %}
+    <section class="fd-ctx" id="standards">
+      <h2 class="fd-sec-h">{{ _('이 문서가 본문에 적은 기준') }}</h2>
+      <p class="fd-ctx-note">{{ _('지적 본문에 적힌 기준의 원문(공식 게시본)으로 바로 갑니다.') }}</p>
+      <ul class="fd-cl">
+        {%- for s in standard_refs %}
+        <li><a href="{{ rel_root }}{{ s.href }}"><b>{{ s.code }}</b>{% if s.title %} <span>{{ s.title }}</span>{% endif %}</a></li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
     <section class="fd-about">
       {#- [고지 정리 2026-11-15 · 대표 지적 "경고글이 작위적"] 제목·세 단락 → 한 줄. 지킬 뜻은 그대로:
           언제 나온 기록인지 · 이후 시정은 원 기관 발표 · 기계 번역. 자세한 설명은 이용안내 한 곳. -#}

@@ -259,6 +259,52 @@ def cfr_href(view: dict[str, Any], section: str) -> str:
     return ref_href(view, f"21 CFR {section}")
 
 
+def href_labels(view: dict[str, Any]) -> dict[str, tuple[str, str]]:
+    """주소 → (코드, 제목). 문서 목차 주소와 조항 페이지 주소 모두(문서 페이지 '인용한 기준 원문' 표시용)."""
+    out: dict[str, tuple[str, str]] = {}
+    for d in (view.get("index") or {}).values():
+        out.setdefault(d["path"], (d["code"], d["title"]))
+        for c in d["clauses"]:
+            if c["href"]:
+                out[c["href"]] = (c["code"], c["title"])
+    return out
+
+
+_ANNEX1_RE = re.compile(r"\bAnnex\s+1(?!\d)")
+_GMP_RE = re.compile(r"\b(?:EU\s+)?GMP\b|EudraLex", re.I)
+_ICH_TEXT_RE = re.compile(r"\bICH\s+(Q7|Q9|Q10)\b(?!\s*\(R1\)\s*§)")
+_CFR_TEXT_RE = re.compile(r"\b21\s*CFR\s*(?:§\s*)?(\d{1,4}\.\d+)")
+_CFR_LABEL_RE =re.compile(r"^(21 CFR \d{1,4}\.\d+)(?:\([A-Za-z0-9]+\))*$")
+
+
+def cited_standard_labels(doc: dict[str, Any]) -> list[str]:
+    """문서의 지적 본문이 **글자 그대로 적은** 기준 라벨(정규화). 추측하지 않는다.
+    · 21 CFR 섹션: 지적의 cfr_refs
+    · ICH Q7/Q9/Q10, EU GMP Annex 1: 영문 원문에 이름이 적힌 것(Annex 1 은 같은 지적에 GMP 가 함께 있을 때만)
+    식약처 '[별표 N] 제X호' 는 일부러 뺀다 — 점검 평가표의 번호이지 고시 별표 번호가 아니다."""
+    out: list[str] = []
+    seen: set[str] = set()
+
+    def add(label: str) -> None:
+        if label not in seen:
+            seen.add(label)
+            out.append(label)
+
+    for f in doc.get("findings") or []:
+        for r in f.get("cfr_refs") or []:
+            m = _CFR_LABEL_RE.match((r or "").strip())
+            if m:
+                add(m.group(1))
+        text = f.get("text_orig") or ""
+        for m in _CFR_TEXT_RE.finditer(text):
+            add(f"21 CFR {m.group(1)}")
+        for m in _ICH_TEXT_RE.finditer(text):
+            add(f"ICH {m.group(1)}")
+        if _ANNEX1_RE.search(text) and _GMP_RE.search(text):
+            add("EU GMP Annex 1")
+    return out
+
+
 def terms_by_href(view: dict[str, Any], glossary_terms: "list[dict[str, Any]] | None",
                   lang: str) -> dict[str, list[dict[str, str]]]:
     """조항 페이지 주소 → 그 조항을 근거로 든 용어(상호 진입 간선). 문서 목차·앵커로 가는 라벨은 세지 않는다

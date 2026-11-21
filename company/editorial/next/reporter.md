@@ -14,6 +14,16 @@
 6. `company/editorial/STYLE.md` §12 — `hook_line` 작성 규칙(그 절만)
 7. 심층 샤드만: 맡은 카드 유형의 정본 심층 지시문(`docs/prompts/GRM_Prompt_Deep{WL,Admin,Fda483}_v1.md`) 전체
 
+## ★ 최우선 규칙 — 가려진·깨진 값은 채우지 않는다 (리허설 1121b: 전수 교열 반려 21장 중 약 2/3)
+델타 슬롯·심층 칸(`observations_ko`·`key_violations`·`fda_evaluation` 등)·영문 칸 모두에 적용한다. 아래 모든 규칙보다 먼저 지킨다.
+- 원문이 `[redacted]`·`(b)(4)`·OCR 로 깨진 글자인 자리에 **구체 명사·숫자·분류를 넣지 않는다** — 그 자리는 `[가림]`(영문 `[redacted]`)으로 두거나 그 구절을 뺀다.
+  앞뒤 문맥·다른 관찰·업계 상식으로 짐작한 값도 채움이다(1121b 반려 예: `[redacted] meter`→'산도계', `Line [redacted] Tester`→'누설시험',
+  `[redacted] vials per minute`→'분당 수십 개', `[redacted] system`→'정제수 시스템', `specifications for [redacted]`→'불순물 규격', `worksheets`→'엑셀', `the [redacted] was present`→'배지').
+- **원문보다 세게 쓰지 않는다.** `probable`·`potential`·`suspected` 는 '추정'·'가능성'·'의심'으로(‘확인’ 아님), `inadequate`·`not thorough` 는 '미흡'·'철저하지 않음'으로(‘없이’·‘미조사’ 아님).
+- **예시 목록의 개수는 총수가 아니다** — `For example:` 아래 4건은 '4곳'이 아니라 '예를 들어'. 원문이 세지 않은 수는 쓰지 않는다.
+- 사전 점검이 `가림 값 채움 <id>.<슬롯>` 줄로 막는다(원문 어디에도 없는 낱말 — 정제수·용수·물·산도·누설·불순물·엑셀·배지·소독제·내시경·수십·박층).
+  사전에 없는 추정('일부'·'훨씬 뒤'·'설비')은 코드가 못 센다 — 쓰는 순간 원문 글자와 대조한다. `경고: 가림 값 채움 의심` 줄은 원문과 대조해 채운 값이면 고친다.
+
 ## 맡는 v16 절
 - v16: [역할]
 - v16: [핵심 원칙]

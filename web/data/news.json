@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-20",
+ "measured_on": "2026-11-21",
  "window_days": 60,
  "totals": {
-  "items": 507
+  "items": 493
  },
  "by_source": [
   {
@@ -11,12 +11,12 @@
    "c": 192
   },
   {
-   "v": "ECA Academy",
-   "c": 84
+   "v": "Federal Register",
+   "c": 78
   },
   {
-   "v": "Federal Register",
-   "c": 81
+   "v": "ECA Academy",
+   "c": 74
   },
   {
    "v": "MFDS",
@@ -24,7 +24,7 @@
   },
   {
    "v": "EMA",
-   "c": 45
+   "c": 43
   },
   {
    "v": "Health Canada",
@@ -32,7 +32,7 @@
   },
   {
    "v": "ISPE",
-   "c": 19
+   "c": 20
   },
   {
    "v": "MHRA Inspectorate",
@@ -51,6 +51,34 @@
   {
    "source": "Federal Register",
    "source_kind": "Notice",
+   "published_date": "2026-11-20",
+   "title": "Product-Specific Guidances; Draft and Revised Draft Guidances for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/20/2026-23692/product-specific-guidances-draft-and-revised-draft-guidances-for-industry-availability"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-20",
+   "title": "Transfer of a Premarket Notification (510(k)) Clearance-Questions and Answers; Guidance for Industry and Food and Drug Administration Staff; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/20/2026-23668/transfer-of-a-premarket-notification-510k-clearance-questions-and-answers-guidance-for-industry-and"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-20",
+   "title": "Expanding the Pharmaceutical Quality Framework, Part 2: Leveraging AI-Derived Insights Across CMC, Process Validation, and Quality Systems",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/expanding-pharmaceutical-quality-framework-part-2-leveraging-ai"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-20",
+   "title": "From Arbitrary Thresholds to Data-Driven Kaizen: Cleaning Validation as a Lean Enabler",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/arbitrary-thresholds-data-driven-kaizen-cleaning-validation-lean"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
    "published_date": "2026-11-19",
    "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Good Laboratory Practice Requirements for Nonclinical Laboratory Studies",
    "official_url": "https://www.federalregister.gov/documents/2026/11/19/2026-23541/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
@@ -61,6 +89,13 @@
    "published_date": "2026-11-19",
    "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; National Youth Tobacco Survey",
    "official_url": "https://www.federalregister.gov/documents/2026/11/19/2026-23542/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-19",
+   "title": "[HC] Importation of Italian-Authorized BUPISEN iperbarica 7,5 mg/ml soluzione iniettabile (Bupivacaine Hydrochloride in Dextrose Injection) due to the Current Shortage of Canadian-Authorized Bupivacaine Hydrochloride in Dextrose Injection USP",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/importation-italian-authorized-bupisen-iperbarica-75-mgml-soluzione-iniettabile"
   },
   {
    "source": "EMA",
@@ -3463,139 +3498,6 @@
    "published_date": "2026-09-22",
    "title": "[WHOPIR] Lupin (Ankleshwar)",
    "official_url": "https://extranet.who.int/prequal/sites/default/files/whopir_files/I-03994_WHOPIR_Lupin_Ankleshwar.pdf"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "FDA Inspection as GMP Evidence? Swissmedic Opens Up a New Option",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-inspection-as-gmp-evidence-swissmedic-opens-up-a-new-option"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "FDA Publishes Draft Guidance on Potency Testing of Active Immunotherapy Products",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-publishes-draft-guidance-on-potency-testing-of-active-immunotherapy-products"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "FDA Warning Letter: Deficiencies in Stability Testing, Supplier Qualification, Validation and CGMP Oversight",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-deficiencies-in-stability-testing-supplier-qualification-validation-and-cgmp-oversight"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "FDA Warning Letter: serious GMP Deficiencies at a Chinese API Manufacturer",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-serious-gmp-deficiencies-at-a-chinese-api-manufacturer"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "FDA criticises Visual Inspection",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-criticises-visual-inspection"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "How is GMP-compliant Calibration of Equipment and Devices carried out in the pharmaceutical Industry?",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/how-is-gmp-compliant-calibration-of-equipment-and-devices-carried-out-in-the-pharmaceutical-industry"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "IRIS Portal: EMA expands digital Procedure Management",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/iris-portal-ema-expands-digital-procedure-management"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "New Version of PDA Technical Report No. 60 on Process Validation Published",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/new-version-of-pda-technical-report-no-60-on-process-validation-published"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "New: Coordination of GMP Inspections for Centrally Authorised Products",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/new-coordination-of-gmp-inspections-for-centrally-authorised-products"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "USP Draft Chapter on Leachables in Oral Drug Products",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/usp-draft-chapter-on-leachables-in-oral-drug-products"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "inspections",
-   "published_date": "2026-09-21",
-   "title": "Report on the International Active Pharmaceutical Ingredient Inspection Programme 2017 – 2024",
-   "official_url": "https://www.ema.europa.eu/system/files/documents/report/report-international-active-pharmaceutical-ingredient-inspection-programme-2017-2024_en_0.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-21",
-   "title": "ICH M13B guideline on bioequivalence for immediate-release solid oral dosage forms - additional strengths biowaiver - Step 5",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/ich-m13b-guideline-bioequivalence-immediate-release-solid-oral-dosage-forms-additional-strengths-biowaiver-step-5_en.pdf"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-21",
-   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Prior Notice of Imported Food Under the Public Health Security and Bioterrorism Preparedness and Response Act of 2002",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19281/agency-information-collection-activities-proposed-collection-comment-request-prior-notice-of"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-21",
-   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; State Petitions for Exemption From Preemption",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19282/agency-information-collection-activities-proposed-collection-comment-request-state-petitions-for"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-21",
-   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Temporary Marketing Permit Applications",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19283/agency-information-collection-activities-proposed-collection-comment-request-temporary-marketing"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-21",
-   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Orphan Drugs",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19284/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-21",
-   "title": "Chemistry, Manufacturing, and Controls Development and Readiness Pilot Program; Program Announcement",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19277/chemistry-manufacturing-and-controls-development-and-readiness-pilot-program-program-announcement"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-21",
-   "title": "[HC] IMAAVY: Affected lots may contain glass particles",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/imaavy-affected-lots-may-contain-glass-particles"
-  },
-  {
-   "source": "ISPE",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-21",
-   "title": "Automated Cross-Grade Material Transfer – A Perspective – Part II",
-   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/automated-cross-grade-material-transfer-perspective-part-ii"
   }
  ]
 }

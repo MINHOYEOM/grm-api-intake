@@ -185,6 +185,49 @@ class ThinPageMetaTest(unittest.TestCase):
                 seen[why] += 1
         self.assertTrue(all(seen.values()), seen)
 
+    def test_stage2_translation_and_gist_blocks(self):
+        """[구글 품질 2단계 2026-11-20] 국문 참고 번역·GRM 요지가 실빌드에 실리는가(국문 트리만).
+        번역된 조항은 국문 블록이 있고 '준비 중' 문구가 없다. 300자 이상이면 sitemap.xml 로 돌아온다.
+        요지는 doc_gist.view 가 넘긴 문서에만, 영문 트리에는 없다."""
+        import clause_text_page as ct
+        import doc_gist
+        gset = set(re.findall(r"<loc>https?://[^/]+/([^<]*)</loc>",
+                              (self.out / "sitemap.xml").read_text(encoding="utf-8")))
+        n_ko = n_back = 0
+        for d, c in ct.pages(ct.build(ct.load_sources())):
+            if d["source"]["lang"] == "ko":
+                continue
+            ko = (self.out / c["href"] / "index.html").read_text(encoding="utf-8")
+            en = (self.out / "en" / c["href"] / "index.html").read_text(encoding="utf-8")
+            self.assertNotIn("국문 참고 번역", en, c["href"])
+            if c["ko_paras"]:
+                n_ko += 1
+                self.assertIn("국문 참고 번역", ko, c["href"])
+                import html as _h
+                self.assertIn(c["ko_paras"][0], _h.unescape(ko), c["href"])
+                self.assertNotIn("국문 번역은 준비 중", ko, c["href"])
+                if len(c["text_ko"]) >= ct.GOOGLE_MIN_CHARS:
+                    n_back += 1
+                    self.assertIn(c["href"], gset, c["href"])
+            else:
+                self.assertNotIn("국문 참고 번역", ko, c["href"])
+        self.assertGreater(n_ko, 0)
+        self.assertGreater(n_back, 0)
+        gists = doc_gist.load_outbox()
+        n_gist = 0
+        for d in self.data["documents"]:
+            p = self.out / "findings" / "doc" / d["slug"] / "index.html"
+            if not p.is_file():
+                continue
+            v = doc_gist.view(d, gists)
+            html = p.read_text(encoding="utf-8")
+            self.assertEqual('class="fd-gist"' in html, v is not None, d["slug"])
+            n_gist += v is not None
+            pe = self.out / "en" / "findings" / "doc" / d["slug"] / "index.html"
+            if pe.is_file():
+                self.assertNotIn('class="fd-gist"', pe.read_text(encoding="utf-8"), d["slug"])
+        self.assertGreater(n_gist, 0)
+
     def test_other_pages_untouched(self):
         for rel in ("index.html", "findings/index.html", "sitemap.xml"):
             p = self.out / rel

@@ -536,11 +536,11 @@
    }
   },
   "fda483-196382": {
-   "title_issue": "임상시험 모니터링 계획 미수립",
+   "title_issue": "임상시험 모니터링 계획 이행 미흡",
    "hook_line": "용혈 혈액 시료로 안전성 검사 결과가 빠진 일탈 8건",
    "summary": "FDA가 임상시험 의뢰자 Rapa Therapeutics LLC에 Form 483(관찰사항 1건)을 발행했다. 시험 모니터링과 시험계획서 준수 보증이 부족하다고 지적했다.",
    "key_facts": [
-    "관찰 1: 임상시험 모니터링 계획과 표준작업절차서(SOP) 없이 모니터링을 수행하는 등 시험계획서 준수 보증 미흡"
+    "관찰 1: 모니터링 절차와 위험 기반 모니터링 방식을 충분히 기술한 임상시험 모니터링 계획과 표준작업절차서(SOP)를 모니터링 시작 전에 이행하지 않음"
    ],
    "implication": "기관 01 시험대상자 2명의 이상사례 전자 증례기록서 원자료 검증을 하지 않았다(관찰 1). 기관 01·02 전체 시험대상자의 병용약물 원자료 검증을 하지 않았다(관찰 1). 2021-05-28부터 2021-10-13까지 기관 01에서 용혈 혈액 시료로 시험계획서 일탈 8건이 있었다(관찰 1). 자료안전성모니터링위원회 보고서 5건을 기관 02에 제공하지 않았다(관찰 1).",
    "checks": [
@@ -549,11 +549,11 @@
     "자료안전성모니터링위원회 보고서를 모든 기관에 전달하는가? (관찰 1)"
    ],
    "en": {
-    "title_issue": "No clinical monitoring plan in place",
+    "title_issue": "Clinical monitoring plan not implemented",
     "hook_line": "Eight protocol deviations from hemolyzed blood samples left safety lab results missing",
     "summary": "FDA issued a Form 483 with 1 observation to Rapa Therapeutics LLC, a clinical trial sponsor, citing failure to ensure proper monitoring and protocol compliance.",
     "key_facts": [
-     "Observation 1: monitoring performed without a clinical monitoring plan and SOPs, and the study not ensured to follow the protocol"
+     "Observation 1: a clinical monitoring plan and SOPs adequately describing the monitoring procedures and risk-based approach were not implemented before monitoring began"
     ],
     "implication": "Source data verification of the adverse event eCRF was not performed for two subjects at Site 01 (Observation 1). Source data verification of concomitant medications was not performed for all subjects at Sites 01 and 02 (Observation 1). Eight protocol deviations involving hemolyzed blood samples occurred at Site 01 between May 28, 2021, and October 13, 2021 (Observation 1). DSMB reports dated 2/16/2021, 8/3/2021, 5/3/2022, 2/21/2023 and 11/15/2023 were not provided to Site 02 (Observation 1).",
     "checks": [

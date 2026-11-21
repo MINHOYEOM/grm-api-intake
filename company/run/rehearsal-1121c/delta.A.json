@@ -462,7 +462,7 @@
   "fda483-196329": {
    "title_issue": "식용 조직 암피실린 잔류 초과",
    "hook_line": "소 신장에서 암피실린 0.0799 ppm 검출, 허용치는 0.01 ppm",
-   "summary": "FDA가 미국의 축산 농가 Kenneth F Tesch에 Form 483(관찰사항 1건)을 발행했다. 식용 조직의 약물 잔류가 허용 기준을 넘은 동물을 주 간 거래에 내놓은 것을 지적했다.",
+   "summary": "FDA가 미국의 개인 축산 농가에 Form 483(관찰사항 1건)을 발행했다. 식용 조직의 약물 잔류가 허용 기준을 넘은 동물을 주 간 거래에 내놓은 것을 지적했다.",
    "key_facts": [
     "관찰 1: 판매에 내놓은 소의 신장에서 항생제 암피실린이 0.0799 ppm 검출됨(허용치 0.01 ppm)",
     "관찰 1: 이 소는 농장에서 2025-08-16과 2025-08-19에 암피실린을 투여받음"
@@ -475,7 +475,7 @@
    "en": {
     "title_issue": "Ampicillin residue above tolerance",
     "hook_line": "Ampicillin at 0.0799 ppm in kidney against a tolerance of 0.01 ppm",
-    "summary": "FDA issued a Form 483 with 1 observation to Kenneth F Tesch, a grower in the USA, citing a food-producing animal offered for interstate commerce with a drug residue in edible tissue above tolerance.",
+    "summary": "FDA issued a Form 483 with 1 observation to an individual grower in the USA, citing a food-producing animal offered for interstate commerce with a drug residue in edible tissue above tolerance.",
     "key_facts": [
      "Observation 1: an animal offered for sale had an ampicillin residue in the kidney at 0.0799 ppm (tolerance 0.01 ppm)",
      "Observation 1: the cow was treated with ampicillin on the farm on 8/16/25 and 8/19/25"
@@ -558,7 +558,7 @@
   "fda483-196343": {
    "title_issue": "도축 소 멜록시캄 잔류",
    "hook_line": "도축 소 신장에서 허용치가 없는 멜록시캄이 검출됨",
-   "summary": "FDA가 미국의 육우 목장 Matthew A. Leo에 Form 483(관찰사항 2건)을 발행했다. 식용 조직에 약물이 잔류한 소를 도축용으로 출하한 것과 투약 기록이 불완전한 것을 지적했다.",
+   "summary": "FDA가 미국의 개인 육우 목장에 Form 483(관찰사항 2건)을 발행했다. 식용 조직에 약물이 잔류한 소를 도축용으로 출하한 것과 투약 기록이 불완전한 것을 지적했다.",
    "key_facts": [
     "관찰 1: 식용 도축용으로 출하한 거세우의 신장에서 USDA 검사로 멜록시캄이 검출됐고, 소 식용 조직의 멜록시캄 허용치는 없음",
     "관찰 2: 이 소의 투약 기록에 멜록시캄 투여가 없었고, 투여 경로와 도축 휴약 기간도 기록하지 않음"
@@ -571,7 +571,7 @@
    "en": {
     "title_issue": "Meloxicam residue in slaughtered steer",
     "hook_line": "Meloxicam, which has no tolerance in cattle, found in a slaughtered steer's kidney",
-    "summary": "FDA issued a Form 483 with 2 observations to Matthew A. Leo, a beef ranch in the USA, citing a steer delivered for slaughter with a drug residue in edible tissue and incomplete treatment records.",
+    "summary": "FDA issued a Form 483 with 2 observations to an individual beef ranch in the USA, citing a steer delivered for slaughter with a drug residue in edible tissue and incomplete treatment records.",
     "key_facts": [
      "Observation 1: USDA tests found meloxicam in the kidney of a steer delivered for slaughter for human food, and there is no tolerance for meloxicam in edible tissues of cattle",
      "Observation 2: treatment records for the steer did not show a meloxicam treatment and did not include route of administration or withdrawal times for slaughter"

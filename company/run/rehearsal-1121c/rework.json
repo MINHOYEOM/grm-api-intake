@@ -1,1 +1,18 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{
+ "status": "완료",
+ "round": 1,
+ "worker": "델타-2",
+ "fixed": [
+  {"id": "fda483-196329", "shard": "A", "changed": ["summary", "en.summary"]},
+  {"id": "fda483-196343", "shard": "A", "changed": ["summary", "en.summary"]},
+  {"id": "fda483-196382", "shard": "B", "changed": ["title_issue", "key_facts", "en.title_issue", "en.key_facts"]},
+  {"id": "fda483-196445", "shard": "E", "changed": ["title_issue", "hook_line", "key_facts", "en.title_issue", "en.hook_line", "en.key_facts"]},
+  {"id": "D-0173-2027", "shard": "H", "changed": ["quotes_translation"]}
+ ],
+ "unfixed": [],
+ "notes": [
+  "fda483-196329·196343: 요약에서 개인 실명 삭제(카드 제목의 업체명은 코드 headline_target — 기자 슬롯 아님)",
+  "fda483-196445: 교열 notes(칸 삭제) 의 hook_line·key_facts[0] 도 같은 부재 단정이라 함께 고침",
+  "fda483-196382: implication·심층의 위원회·기관 이름 불일치(notes, 반려 아님)는 손대지 않음"
+ ]
+}

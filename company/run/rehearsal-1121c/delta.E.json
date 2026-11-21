@@ -110,11 +110,11 @@
    }
   },
   "fda483-196445": {
-   "title_issue": "기준일탈 조사 없이 재시험",
-   "hook_line": "역가 기준일탈 결과를 조사 없이 고객 지시로 재시험해 합격",
+   "title_issue": "기준일탈 조사 문서 없이 재시험",
+   "hook_line": "역가 기준일탈 결과를 고객 지시로 재시험해 합격",
    "summary": "FDA가 미국의 위탁시험기관 Haematologic Technologies, LLC에 Form 483(관찰사항 1건)을 발행했다. 기준일탈(OOS) 결과를 철저히 검토하지 않았다고 지적했다.",
    "key_facts": [
-    "관찰 1: 최초 기준일탈 결과의 근본원인을 조사하지 않고 재시험했으며 정해진 재시험 절차를 따르지 않음"
+    "관찰 1: 재시험 전에 최초 기준일탈 결과의 근본원인을 철저히 조사했다는 문서가 없고, 정해진 재시험 절차를 따랐다는 증거도 없음"
    ],
    "implication": "2024-12-12 연 일탈 2025-005에서 역가 분석 결과가 고객 규격 450-575 IU/vial보다 낮았다(관찰 1). 품질보증은 이를 계획된 일탈로 처리하고 시험을 중단했으며, 고객 지시로 한 재시험은 역가 규격에 맞았다(관찰 1). 절차서 SOP 10044는 재시험 전에 최초 기준일탈 조사를 요구한다(관찰 1).",
    "checks": [
@@ -122,11 +122,11 @@
     "고객이 재시험을 지시해도 자체 기준일탈 조사 절차를 따르는가? (관찰 1)"
    ],
    "en": {
-    "title_issue": "Retest without OOS investigation",
-    "hook_line": "Failing potency results retested on client instruction without investigation, then passed",
+    "title_issue": "Retest without documented OOS investigation",
+    "hook_line": "Failing potency results retested on client instruction, then passed",
     "summary": "FDA issued a Form 483 with 1 observation to contract testing laboratory Haematologic Technologies, LLC in the USA, citing failure to thoroughly review OOS results.",
     "key_facts": [
-     "Observation 1: retesting done without investigating the root cause of initial OOS results and without following predefined retest procedures"
+     "Observation 1: no documentation that a thorough investigation of the root cause of the initial OOS results was done before retesting, and no evidence that predefined retest procedures were followed"
     ],
     "implication": "Under deviation 2025-005 opened on 2024-12-12, potency runs gave results below the client's specification of 450-575 IU/vial (Observation 1). QA made it a planned deviation and stopped testing, and a retest on the client's instruction met the potency specification (Observation 1). SOP 10044 requires an investigation of an initial OOS before retesting (Observation 1).",
     "checks": [

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""리허설 결과 점검 — `REHEARSAL.md` 의 성공 판정 1~5(+4-1 교열 전수 대조)를 코드로 본다. 읽기만 한다.
+"""리허설 결과 점검 — `REHEARSAL.md` 의 성공 판정 1~5(+4-1 교열 전수 대조 · 4-2 심층 삭제)를 코드로 본다. 읽기만 한다.
 
     python company/editorial/rehearsal_check.py <실행 폴더> <handoff 파일>
 
@@ -17,6 +17,7 @@ import delta_bridge  # noqa: E402
 import grm_queue  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import blank_slots  # noqa: E402
 import copyedit_evidence  # noqa: E402
 
 
@@ -80,6 +81,21 @@ def check(folder, handoff_path):
     else:
         out.append(("4-1", "교열 전수 대조 근거(카드마다 원문 조각)", False,
                     f"status={copyedit.get('status')!r} — 완료가 아니면 보지 않는다"))
+
+    # 4-2. 심층에서만 걸린 반려는 코드가 심층을 빼고 통과시킨다(blank_slots.py deep-auto · 2026-11-21 대표 결정).
+    #      그런 카드가 반려로 남았으면 deep-auto 를 안 돌린 것이고, 심층 삭제를 반영했으면 기록(slot_removals.json)이 있어야 한다.
+    deep_only = [str(c.get("web_card_id")) for c in rejects
+                 if c.get("fails") and all(str((f or {}).get("slot", "")).strip().startswith("deep.")
+                                           for f in c.get("fails") if isinstance(f, dict))]
+    n_deep_notes = sum(1 for c in copyedit.get("cards") or [] if isinstance(c, dict)
+                       for n in c.get("notes") or [] if isinstance(n, dict) and n.get("item") == blank_slots.DEEP_ITEM)
+    log = _load(os.path.join(folder, "slot_removals.json"))
+    logged = len((log or {}).get("removed") or []) if isinstance(log, dict) else 0
+    need_log = copyedit.get("status") == "완료" and n_deep_notes > 0
+    ok = not deep_only and (not need_log or logged > 0)
+    out.append(("4-2", "심층만 반려된 카드 0 · 심층 삭제 기록", ok,
+                f"심층만 반려 {len(deep_only)}장{(' ' + str(deep_only[:5])) if deep_only else ''} · 심층 삭제 주의 {n_deep_notes}건"
+                f" · slot_removals.json {logged}줄" + (" — 반영 기록이 없다" if need_log and not logged else "")))
 
     detail, ok = "", False
     if isinstance(delta, dict) and isinstance(handoff, dict):

@@ -58,6 +58,16 @@ def _bad(copyedit):
 
 
 class CopyeditEvidenceTest(unittest.TestCase):
+    def test_evidence_on_removed_deep_slot_is_not_a_failure_after_deep_removal(self):
+        # 심층 삭제(blank_slots.py)로 심층분석이 통째로 빠진 뒤: 그 칸을 가리키던 근거는 카드에 없지만 실패가 아니다.
+        ce_ = _full()
+        ce_["cards"][0]["notes"] = [{"item": "심층 삭제", "slot": "deep.key_violations[0].observation", "evidence": "추정"}]
+        lines, _ = ce.check(_delta(), ce_, {"a": {"observations_ko": []}}, _handoff(), None)
+        self.assertEqual(lines, [])
+        # 주의 없이 빠졌으면 종전대로 걸린다.
+        lines, _ = ce.check(_delta(), _full(), {"a": {"observations_ko": []}}, _handoff(), None)
+        self.assertTrue(any("claim 이 카드 문장에 없다" in l for l in lines), lines)
+
     def test_full_evidence_passes(self):
         lines, stats = ce.check(_delta(), _full(), _deep(), _handoff(), None)
         self.assertEqual(lines, [])

@@ -29,6 +29,8 @@
     `칸 삭제` 주의(`notes`)가 있어야 한다(없으면 원문에 없는 말을 통과시킨 것이다 — `reject` 로 바꾼다).
   - 카드마다: 서로 다른 원문 조각으로 맞춘 근거 2개 이상 · 앞면 칸(`title_issue`·`summary`·`key_facts`·`implication`·`checks`) 1개 이상 ·
     한국어 `hook_line` 이 있으면 `hook_line` 1개 · 심층(`deep_delta.json`)이 있는 카드는 `deep.<키>` 1개. `en.` 접두·`[i]` 는 같은 칸으로 본다.
+  - `칸 삭제`·`심층 삭제` 주의가 가리키는 칸의 근거는 그 칸이 빠진 뒤(`blank_slots.py apply`) 카드에 없어도 실패로 보지 않는다.
+    심층 삭제 카드는 `deep.<키>` 근거 요구도 없다(심층이 통째로 빠질 수 있다).
   - 원문이 정말 없는 카드(handoff·스캐폴드 어디에도 본문이 없다)는 `checked` 대신 `"source_absent": "<사유>"` — 코드가 원문이 있다고 보면 실패다.
   - `reject` 카드는 `fails` 가 비어 있으면 안 된다.
 
@@ -153,11 +155,22 @@ def slot_base(slot):
 
 
 def _blanked_slots(entry):
+    """칸 삭제·심층 삭제 주의가 가리키는 칸(`blank_slots.py` 가 빼는 칸)."""
     out = set()
     for n in entry.get("notes") or []:
-        if isinstance(n, dict) and "칸 삭제" in str(n.get("item") or ""):
+        item = str(n.get("item") or "") if isinstance(n, dict) else ""
+        if "칸 삭제" in item or "심층 삭제" in item:
             out.add(str(n.get("slot") or "").strip())
     return out
+
+
+def _deep_removed(entry):
+    """심층 삭제 주의가 있는 카드 — 심층분석이 통째로 빠질 수 있다(`blank_slots.py`)."""
+    return any(isinstance(n, dict) and "심층 삭제" in str(n.get("item") or "") for n in entry.get("notes") or [])
+
+
+def _covered(slot, blanked):
+    return any(b and (b == slot or slot.startswith(b) or b.startswith(slot)) for b in blanked)
 
 
 def card_problems(cid, entry, card, deep_entry, row, sc_card):
@@ -182,6 +195,7 @@ def card_problems(cid, entry, card, deep_entry, row, sc_card):
     ctext = card_text(card, deep_entry)
     stext = norm(" ".join(_strings([v for _, v in source_parts(row, sc_card)])))
     blanked = _blanked_slots(entry)
+    deep_removed = _deep_removed(entry)
     seen_sources, bases = set(), set()
     for i, c in enumerate(checked):
         tag = f"checked[{i}]"
@@ -197,10 +211,13 @@ def card_problems(cid, entry, card, deep_entry, row, sc_card):
             probs.append(f"{tag} {slot}: claim 길이(공백 빼고 2자 이상 · {MAX_CLAIM}자 이하)")
             continue
         if nclaim not in ctext:
+            # 칸 삭제·심층 삭제가 이미 반영된 뒤면 그 칸의 문장은 카드에 없다 — 뺀 칸을 가리키는 근거는 세지도 막지도 않는다.
+            if _covered(slot, blanked) or (deep_removed and slot.startswith("deep.")):
+                continue
             probs.append(f"{tag} {slot}: claim 이 카드 문장에 없다 — {claim[:40]!r}")
             continue
         if c.get("absent") is True:
-            if verdict == "pass" and not any(b == slot or slot.startswith(b) or b.startswith(slot) for b in blanked if b):
+            if verdict == "pass" and not _covered(slot, blanked):
                 probs.append(f"{tag} {slot}: 원문에 없는 사실인데 pass — reject 로 바꾸거나(필수 칸) `칸 삭제` 주의를 적는다(선택 칸)")
             continue
         src = str(c.get("source") or "")
@@ -221,7 +238,8 @@ def card_problems(cid, entry, card, deep_entry, row, sc_card):
         probs.append("앞면 칸(title_issue·summary·key_facts·implication·checks) 근거 없음")
     if str((card or {}).get("hook_line") or "").strip() and "hook_line" not in bases:
         probs.append("hook_line 이 있는데 hook_line 근거 없음(숫자·사실 원문 대조 — 2-1 ③)")
-    if deep_entry and "deep" not in bases:
+    if deep_entry and "deep" not in bases and not deep_removed:
+        # 심층 삭제 카드는 교열이 심층을 읽고 반려 근거를 냈다(그 칸이 빠졌다) — 남은 심층 근거를 따로 요구하지 않는다.
         probs.append("심층이 있는데 deep.<키> 근거 없음")
     return probs
 

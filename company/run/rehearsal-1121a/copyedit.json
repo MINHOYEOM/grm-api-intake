@@ -1,0 +1,1300 @@
+{
+ "status": "보류",
+ "round": 1,
+ "published": false,
+ "rehearsal": true,
+ "reason": "반려 59장 > 10장 — 재작업 한도 초과(copyedit.md 3-1). 코드 검사 exit 0·영문 게이트 통과. Notion 쓰기 없음.",
+ "code_gate": {
+  "ran": true,
+  "exit": 0,
+  "message": "assemble_publish_brief exit 0(145카드 채택·스킵 18), check_en_slots exit 0"
+ },
+ "tldr": "pass",
+ "cards": [
+  {
+   "web_card_id": "fda483-196254",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196307",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196313",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[0].observation",
+     "evidence": "앞면 '기류 시각화(연기) 시험'을 '기류 가시화(연기) 시험'으로 다르게 부름, 한 문장에 사실 3개(시험 범위·난류·HEPA 틈 미평가)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196321",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "'2011년 3월 설치 이후 세척한 적 없는' 은 관찰 8 의 생산 부책임자 진술('According to the Associate VP-Production, the firm has not cleaned…')인데 hook 에 진술 표기가 없다(STYLE R3). en.hook_line 도 동일"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196340",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196352",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "hook_line",
+     "evidence": "'경고 기준 미만' — 사전 표기는 경고한계(STYLE R7·v16 표 Alert Limit→경고한계)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196356",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196371",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196375",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 14",
+     "slot": "key_facts[0]",
+     "evidence": "'손글씨 메모지가 다수 있었고' — v16 [용어·표기] 군말 '다수'→원문 숫자(없으면 '반복'까지)"
+    },
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[0].observation",
+     "evidence": "앞면 '메모지'를 '포스트잇'으로 다르게 부름(앞면과 같은 이름), '다수' 군말, 한 문장에 사실 3개"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196379",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[2].observation",
+     "evidence": "앞면 '시험법 이전 계획서'를 '프로토콜'로 다르게 부름; kv[0] '분석 출고 시험' — 앞면은 '출하'(v16 용어)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196385",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "'백업 없이 일정 기간 뒤 지워짐' 의 삭제 사실은 관찰 2 의 'management reported alarm history raw data is saved … prior to being erased' 즉 경영진 보고인데 hook 에 진술 표기가 없다(R3). en.hook_line 도 동일"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196391",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[0].observation",
+     "evidence": "한 문장에 사실 4개(DEV26001 결론·인적 오류에서 정지·CAPA26007 방법 개선·DEV26020 결론)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196395",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.inspectional_significance",
+     "evidence": "첫 문장에 사실 4개(설정 변경·제조기록서 미기재·품질부서 미통보·편차 미개시)"
+    },
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[2].observation",
+     "evidence": "목록 밖 약어 'IPC'(한글로 풀 것)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196400",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 14",
+     "slot": "key_facts[1]",
+     "evidence": "'최종 제품 외관 검사 절차' — v16 표 외관검사→육안검사(원문 visual inspection, 같은 카드 summary 는 육안검사)"
+    },
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[3].observation",
+     "evidence": "'침강 플레이트 덮개' — 앞면 implication 은 '침강 평판'(앞면과 같은 이름)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196404",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 약어 'API' 사용(\"…in API intermediates\") — STYLE R7·2-1 ⑤ 영문 약어 없음, en 도 같은 규칙"
+    },
+    {
+     "item": "3-1 문체",
+     "slot": "deep.inspectional_significance",
+     "evidence": "목록 밖 약어 'PQR 보고서'(한글로 풀 것), 앞면 implication '사이트 책임자'를 '사업장 책임자'로 다르게 부름"
+    },
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[3].observation",
+     "evidence": "'연간 제품 품질 검토 보고서' — 앞면 key_facts 는 '연간 제품 품질 평가 보고서'(앞면과 같은 이름)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196409",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[2].risk",
+     "evidence": "목록 밖 약어 '적격 책임자(QP)'; kv[2] 의 '출고 승인'도 앞면·v16 은 '출하'"
+    },
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[3].observation",
+     "evidence": "'이상반응 보고 28건' — 앞면 key_facts 는 '이상사례 보고 28건'(앞면과 같은 이름)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196413",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[4].observation",
+     "evidence": "'시각검사' — 앞면 implication·v16 표는 '육안검사'"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196418",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196430",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196435",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 약어 'CAPA' 사용(\"omitted from CAPA reports\") — 2-1 ⑤ 영문 약어 없음"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196444",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196451",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 약어 'OOS' 사용(\"Bioburden OOS in a lentiviral…\") — 2-1 ⑤"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196457",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196502",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196640",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[0].risk",
+     "evidence": "'출고 시험 배치' — 앞면 key_facts 는 '출하 시험'(앞면과 같은 이름)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "0f3a6eeb815d",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 약어 'OTC' 사용(\"OTC drugs labeled sterile…\") — 2-1 ⑤"
+    },
+    {
+     "item": "3-1 문체",
+     "slot": "deep.administrative_risks",
+     "evidence": "'Import Alert 66-40' — 앞면 key_facts 는 '수입경보 66-40'(앞면과 같은 이름)"
+    },
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[0].description",
+     "evidence": "목록 밖 약어 'OTC'(일반의약품(OTC), 이후 'OTC 의약품' — kv[2] 도 동일)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008242",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008296",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[0].description",
+     "evidence": "목록 밖 약어 '(KP)' — 앞면에는 없음, 한글로 풀거나 뺄 것"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-53d37db1b711",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-9cf757ea745d",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "'한약재 산약' — handoff·facts 에는 제품명 '영천약초도매시장산약'·사유 '이산화황 부적합'뿐, '한약재'·'산약'(제품명 일부 추출)은 근거 없음. en.hook_line 의 '(dioscorea)' 와 en summary·key_facts 'herbal medicine (dioscorea rhizome)' 도 동일"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0165-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "ad04c5ea4a99",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82964",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008238",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체",
+     "slot": "deep.key_violations[1].description",
+     "evidence": "목록 밖 약어 '(PSUR)' — 앞면 key_facts 에는 없음, 한글만 쓸 것"
+    }
+   ]
+  },
+  {
+   "web_card_id": "data0011-15997",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "ef50339bb834",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0159-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 약어 'OOS' 사용(\"viscosity and appearance OOS on stability\") — 2-1 ⑤"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-fb-24e87667c9a6a108",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 약어 'OOS' 사용(\"endotoxin OOS results\") — 2-1 ⑤"
+    }
+   ]
+  },
+  {
+   "web_card_id": "who-whopir-d6ea75f7687f",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196260",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑥",
+     "slot": "hook_line",
+     "evidence": "hook '모든 시험을 마치기 전에 완제품 배치를 출하함' 은 제목 '시험 완료 전 출하·밸리데이션 미흡'의 앞 절을 그대로 반복 — 숫자·기간·진술 등 새 사실 없음(STYLE §12 R8, 483 틀 2요소 미충족)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196308",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196317",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196327",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196343",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196353",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196362",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196372",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196376",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196380",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196387",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196392",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196397",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196401",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196405",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "hook '전수 재검사 없이 미국으로 출하' — 원문은 미국 출하 전 육안 재검사(visually re-inspected)를 했고, 추가 입자 발견 뒤 AQL 시험만 하고 나머지 100% 재검사는 하지 않았다고 따로 서술. 출하분이 전수 재검사 없는 배치라는 결합은 원문에 없음"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196410",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "hook '미생물 책임자가 … 시인' — 원문은 microbiology manager 가 추가 질의에서 확인(confirmed)한 진술; R3 업체 직원의 말은 '진술'로 표기해야 하는데 '시인'으로 강하게 씀(deep 은 '진술했다')"
+    },
+    {
+     "item": "3-1 문체(같은 대상 같은 이름)",
+     "slot": "deep.key_violations",
+     "evidence": "앞면은 '미생물 책임자', deep 은 '미생물학 관리자'로 같은 인물을 달리 부름"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196414",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑥",
+     "slot": "hook_line",
+     "evidence": "hook '공정 성능 적격성평가 배치의 육안 불량률이 갈수록 높아짐' 은 제목 '공정 성능 적격성평가 이물 불량 증가'와 같은 내용 반복, 새 사실(숫자·기간) 없음(R8)"
+    },
+    {
+     "item": "3-1 문체(같은 대상 같은 이름)",
+     "slot": "deep.key_violations",
+     "evidence": "카드 앞면 key_facts·hook 은 '불량률', deep 은 '배제율'(원문 rejection rate)로 달리 씀"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196425",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196431",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196437",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196445",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196452",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196458",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196588",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196641",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "55c08c82779b",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 10 / 핵심 원칙 2",
+     "slot": "key_facts",
+     "evidence": "위반 1 '기준일탈 300건 넘게 조사가 미흡했고 200건 넘게 재분석 합격만으로 무효화' — 원문은 '200건 넘게 무효화'(invalidated)와 '조사 기록 30건 검토에서 확인한 양상: 재분석 합격만을 근거로 무효화'를 따로 서술; 200건 전부가 재분석 합격만으로 무효화됐다는 결합은 원문에 없음(implication 도 30건 양상을 '시험실 오류가 없어도'로 강화: 원문은 'no conclusive laboratory error')"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008244",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체(날짜 2026-11-09 꼴)",
+     "slot": "deep.items",
+     "evidence": "required_remediation.items·deadline 이 '2026. 12. 2. ~ 2027. 3. 1.' 원문 표기 그대로 — 산문 칸은 2026-12-02~2027-03-01 꼴이어야 함(같은 deep 의 disposition_basis 는 ISO 꼴이라 불일치)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q7txc0kHQ0",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-6ffa973e2763",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-bb9291755916",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0a7b0d339de9",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196381",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82965",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admrul-2100000288220",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q7XhpAwI0q",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0114-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0167-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "hook '누출 불만 접수'(제목도 '누출') — 원문은 'complaints … related to potential leaks'(잠재적 누출); 'potential' 이 빠져 원문보다 강함(R3). quotes_translation 은 '누출 의심'으로 옮겨 슬롯 간 강도 불일치"
+    }
+   ]
+  },
+  {
+   "web_card_id": "who-whopir-492199ae88d3",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196305",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 hook 에 약어 OOS(\"despite OOS appearance results\") — STYLE R7 영문 약어 금지"
+    },
+    {
+     "item": "용어·표기(3-1)",
+     "slot": "deep.key_violations.observation",
+     "evidence": "\"CIP는 수행했으나\" — 목록 밖 약어 CIP, 한글로 풀어야 함(세척 후 설치 확인 등)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196309",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 hook 에 약어 OOS(\"About 146 OOS results\") — R7"
+    },
+    {
+     "item": "용어·표기(3-1)",
+     "slot": "deep.key_violations.observation",
+     "evidence": "\"성능 적격성평가(PQ)\" — 목록 밖 약어 PQ"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196318",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196329",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196348",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196354",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196363",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196373",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 같은 이름",
+     "slot": "deep.key_violations.observation",
+     "evidence": "앞면은 \"제한출입 차단 시스템·차단 시스템·능동 생균\", 심층은 \"제한접근장벽시스템(RABS)·RABS·부유균\" — 같은 대상 이름 불일치 + 목록 밖 약어 RABS"
+    },
+    {
+     "item": "자가점검 10",
+     "slot": "deep.key_violations.observation",
+     "evidence": "\"천이 ... 입자를 방출\" — 원문은 \"shed [판독불가]\" 로 방출 물질이 훼손·비공개, 입자로 확정 불가"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196377",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 10",
+     "slot": "implication",
+     "evidence": "\"최종 용기의 부피를 기록하지 않고\" — 원문은 \"the [redacted] to the final ml syringe was not recorded\"(기록 안 된 대상 비공개), 부피로 추정해 채움"
+    },
+    {
+     "item": "문장 규칙 ④ 세기",
+     "slot": "key_facts",
+     "evidence": "\"조명 배치가 ... 최초 공기를 방해함\" — 원문은 \"appeared to be placed in a way that would disrupt first air\"(추정 표현), 단정으로 강화"
+    },
+    {
+     "item": "3-1 같은 이름",
+     "slot": "deep.key_violations.observation",
+     "evidence": "앞면 \"공기 압력계·층류 후드·원료·검체·마개\" vs 심층 \"마그네헬릭 게이지·ISO-5 후드·구성 성분·시료·캡\" — 같은 대상 이름 불일치"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196382",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 같은 이름",
+     "slot": "deep.key_violations.observation",
+     "evidence": "앞면 \"Site 01·이상사례·원자료·계획서 이탈·전자 자료 수집 시스템·시험대상자\" vs 심층 \"시험기관 01·이상반응·원시 자료·프로토콜 일탈·전자 데이터 수집 시스템·대상자\" — 이름 불일치"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196388",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑥",
+     "slot": "hook_line",
+     "evidence": "hook \"엔도톡신 기준일탈·경향이탈 결과 14건 반복, 원인 규명 못 함\" 이 제목 \"엔도톡신 기준일탈 14건 원인 미규명\" 과 같은 내용 반복(R8)"
+    },
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 hook 에 약어 OOS·OOT(\"Fourteen recurring endotoxin OOS and OOT results\") — OOT 는 목록 밖 약어"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196393",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196398",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 같은 이름",
+     "slot": "deep.key_violations.observation",
+     "evidence": "앞면 key_facts \"UV 기기·시험 보고서\" vs 심층 \"자외선 분광 장비·시험성적서\" 이름 불일치(원문은 laboratory test report)"
+    },
+    {
+     "item": "용어·표기(3-1)",
+     "slot": "deep.key_violations.observation",
+     "evidence": "\"설비 적격성평가(IQ·OQ·PQ)\" — 목록 밖 약어 IQ·OQ·PQ(앞면은 \"설치·운전·성능 적격성평가\"), key_facts 의 UV 도 목록 밖 약어"
+    },
+    {
+     "item": "용어·표기(군말)",
+     "slot": "implication",
+     "evidence": "\"장기간 보관됐다\" — 군말 표 \"장기간→원문 숫자(없으면 삭제)\"; 원문은 \"about [redacted] years\""
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196402",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 같은 이름",
+     "slot": "deep.key_violations.observation",
+     "evidence": "앞면 \"조작 화면·총진균수·설치·운전·성능 적격성평가·일반의약품\" vs 심층 \"HMI·TYMC·IQ·OQ·PQ·OTC 의약품\" — 이름 불일치 + 목록 밖 약어(HMI·TYMC·IQ·OQ·PQ·OTC)"
+    },
+    {
+     "item": "3-1 근거 번호",
+     "slot": "deep.key_violations.risk",
+     "evidence": "risk 4건 모두 문장 끝 \"(관찰 N)\" 없음"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196407",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑥",
+     "slot": "hook_line",
+     "evidence": "hook \"연간 제품 평가가 육안 이물 감소를 위한 경향 분석에 불충분\" 이 제목 \"연간 품질 평가의 이물 경향 분석 미흡\" 과 같은 내용 반복(R8)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196411",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 같은 이름",
+     "slot": "deep.key_violations.observation",
+     "evidence": "앞면 \"세척 절차서·설비\" vs 심층 \"청소·기계\" — 같은 대상 이름 불일치(표: 세척)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196416",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 10",
+     "slot": "checks",
+     "evidence": "\"Burkholderia cepacia complex를 넣었는가?\" — 원문은 \"Burkholderia Cepacia (B. Cepacia)\", complex 는 원문에 없음"
+    },
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 hook 에 약어 OOS(\"An OOS result of 1.1462\") — R7"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196427",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196432",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "\"일지 다수가 분실\" — 다수는 군말 표 항목이고 원문 개수는 판독불가(\"more thana logbooks\")라 근거 없는 수량 단정"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196441",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196447",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196455",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196463",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196637",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 같은 이름",
+     "slot": "deep.key_violations.observation",
+     "evidence": "앞면 \"누설 시험·기록부\" vs 심층 \"누출 시험·일지\" — 같은 대상 이름 불일치"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196650",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "\"공정 변수 측정 기기를 ... 재교정하지 않음\" — 원문은 \"The [redacted] related to at least [redacted]\"(대상 비공개·OCR 훼손), 측정 기기·공정 변수로 단정 불가(R10). checks 의 \"제조기록서에 기록하는\" 도 원문 근거 없음"
+    },
+    {
+     "item": "3-1 같은 이름",
+     "slot": "deep.key_violations.observation",
+     "evidence": "앞면 \"균일성·입자 크기 분포·공정 성능 적격성평가\" vs 심층 \"균질성·입도 분포·PPQ\" — 이름 불일치 + 목록 밖 약어 PPQ"
+    }
+   ]
+  },
+  {
+   "web_card_id": "d60bdc71408a",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 10",
+     "slot": "key_facts",
+     "evidence": "\"유효성분 규격에 못 미쳤는데도\" — 원문은 \"failed to meet ... specification\"(방향 미표기, 상승 경향 서술도 있음), 못 미침으로 단정"
+    },
+    {
+     "item": "용어·표기(3-1)",
+     "slot": "deep.key_violations.risk",
+     "evidence": "\"PPQ 중 불합격 결과\" — 목록 밖 약어 PPQ(앞면은 공정 성능 적격성평가)"
+    },
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "영문 hook 에 약어 OOS(\"a confirmed OOS\") — R7"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008255",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 10",
+     "slot": "key_facts",
+     "evidence": "\"처분: 라셀턴토탈솔루션플러스 ... 품목 허가 취소\" — 처분명 원문은 \"해당 품목 허가 취소\"뿐, 특정 제품명 지정 근거 없음(위반 대상은 라셀턴·보이델라 패키지제품 제466호)"
+    },
+    {
+     "item": "3-1 조항 번호 나열",
+     "slot": "deep.disposition_basis",
+     "evidence": "\"제95조 관련 [별표8] ... 제10호에 따른다\" — 기준 조항 번호만 적은 문장(처분 지침 ② 금지), 최종처분일자 문장도 발행일과 중복"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-30a2ef396db1",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-74000539e83e",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 10",
+     "slot": "title_issue",
+     "evidence": "\"정량법 부적합 회수\" — 원문 사유는 \"정량법(...합)\"뿐, 부적합 추가(같은 카드 hook·summary 는 \"사유\"로 표기해 슬롯 간 불일치)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-bc51804c85aa",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④",
+     "slot": "hook_line",
+     "evidence": "\"한약재 절패모\" — 원문(품목명·사유)에 한약재 분류 없음(en 도 fritillaria bulb 추가); \"부적합\"도 원문에 없음(사유는 \"중금속(카드뮴)\"만)"
+    },
+    {
+     "item": "자가점검 10",
+     "slot": "summary",
+     "evidence": "\"중금속(카드뮴) 부적합으로 회수\" — 원문 사유 \"중금속(카드뮴)\" 에 부적합 없음(title_issue \"카드뮴 부적합 회수\" 도 같음)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "9730858b8989",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196386",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0888f05a0fd6",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "data0008-15206",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q7XhpAwhFA",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0157-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0173-2027",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 6/10",
+     "slot": "title_issue",
+     "evidence": "\"유리 입자 혼입 회수\" — 원문은 \"Presence of particulate matter ... potential glass particle contamination\"(가능성), 혼입 단정(key_facts 는 가능성으로 정확)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "who-whopir-98cfb8b39789",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196306",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196312",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196320",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196335",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "핵심 원칙 1·2(시설유형 추론 단정)",
+     "slot": "summary",
+     "evidence": "'미국의 의료기기 제조소' — facts 시설·유형은 'Manufacturer', 원문 어디에도 device/medical 표기 없음(제품명에서 추론)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196351",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196355",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196370",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④(R10)",
+     "slot": "hook_line",
+     "evidence": "'추가 육안검사 뒤 출하' — 원문은 'a t round of visual inspection'(OCR 깨짐), 코드 detail_ko·심층 observation 은 '1차 육안검사'. '추가'는 근거 없음"
+    },
+    {
+     "item": "자가점검 10 / 핵심 원칙 2",
+     "slot": "key_facts",
+     "evidence": "관찰 1 '추가 육안검사와 합격 품질 수준 합격으로 출하' — 같은 근거 문제('1차'와 어긋남); en.hook_line 'another visual inspection' 도 동일"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196374",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196378",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체(한 문장 사실 하나·근거 번호·표 중복)",
+     "slot": "deep.inspectional_significance",
+     "evidence": "'실사는 2026-03-16~2026-03-27에 이뤄졌고 Form 483은 2026-03-27에 발행됐다.' 사실 둘·근거 번호 없음"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196384",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196390",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "자가점검 10 / 핵심 원칙 2",
+     "slot": "implication",
+     "evidence": "'같은 두 균이 2025-07에도 다른 건물 계통에서 검출' — 원문은 'from the [redacted] system in Building in July 2025'(건물 가림). '다른 건물' 단정 근거 없음(관찰 4)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196394",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196399",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체(세어서 만든 숫자)",
+     "slot": "deep.key_violations",
+     "evidence": "'누락된 시험 시점이 편차 보고서 8건' — 원문은 목록 8줄이나 DEV-009577 중복으로 서로 다른 보고서 7건, '8건' 수치는 원문에 없음(관찰 2)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196403",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④(R10)",
+     "slot": "hook_line",
+     "evidence": "'계통 부품 유효기간이 49일 지난' — 원문 'expired [redacted] for 49 days'(가림). '부품'은 가려진 값을 추정해 채움; 코드 번역도 '[비공개]'"
+    },
+    {
+     "item": "자가점검 10 / 핵심 원칙 2",
+     "slot": "key_facts",
+     "evidence": "관찰 4 '유효기간 지난 부품으로 49일간 운전' — 같은 가림 값 추정('부품')"
+    },
+    {
+     "item": "3-1 문체(근거 번호·용어)",
+     "slot": "deep.inspectional_significance",
+     "evidence": "'실사는 2026-04-22~2026-05-07에 이뤄졌다.' 근거 번호 없음; '국소 OTC 의약품' — OTC 는 허용 약어 목록 밖(일반의약품); kv 에 'Lot를'/'로트' 혼용"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196408",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체·사실 근거",
+     "slot": "deep.inspectional_significance",
+     "evidence": "'품질 담당 책임자는 시료 채취 교육을 받지 못한 무균 작업자에 대해 확인하지 않았다(관찰 1)' — body_full 에 training·품질 책임자 서술이 전혀 없음(지어낸 사실)"
+    },
+    {
+     "item": "3-1 문체(용어·약어)",
+     "slot": "deep.key_violations",
+     "evidence": "'RABS의 Grade A 구역' — RABS 는 허용 약어 목록 밖, Grade A 는 원문 영어 그대로(A등급/청정 등급 A)"
+    },
+    {
+     "item": "자가점검 14(군말 '다수')",
+     "slot": "hook_line",
+     "evidence": "'결함 바이알 다수 발견' — [용어·표기] 군말 '다수'→원문 숫자(없으면 '반복'까지); key_facts 관찰 2 '다수 발견됨'도 동일"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196412",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체(한 문장 사실 하나·근거 번호)",
+     "slot": "deep.inspectional_significance",
+     "evidence": "'실사는 2026-07-13~2026-07-17에 이뤄졌다.' 근거 번호 없음; 다음 문장은 '세 번 바뀌었고 … 증기가 나왔으며 용제가 들어 있었다(관찰 2)' 한 문장에 사실 셋"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196417",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ④(R10)",
+     "slot": "hook_line",
+     "evidence": "'공통 시약 확인 없이' — 원문 'a common material … [redacted] (Lot #, Bottle #)' 가려진 값을 '시약'으로 채움"
+    },
+    {
+     "item": "자가점검 10 / 핵심 원칙 2",
+     "slot": "implication",
+     "evidence": "'세 건에 공통으로 쓴 시약 로트' — 같은 추정(관찰 3)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196429",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196433",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196443",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196449",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "'US-distributed batches from the OOS period…' — 한 줄 안에 약어 OOS 사용(out-of-specification 으로 풀어야)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196456",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196464",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196639",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196880",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "3-1 문체(용어·약어)",
+     "slot": "deep.key_violations",
+     "evidence": "'의료기기 보고(MDR)' — MDR 는 허용 약어 목록 밖(한글로 풂); 카드 앞면 '결합제품' ↔ 심층 '복합제품' 불일치"
+    }
+   ]
+  },
+  {
+   "web_card_id": "ed75ff499f75",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "hook_line ⑤",
+     "slot": "en.hook_line",
+     "evidence": "'Lot with a retest-confirmed OOS mostly released…' — 약어 OOS"
+    },
+    {
+     "item": "3-1 문체(근거 번호)",
+     "slot": "deep.key_violations.risk / deep.required_remediation.items",
+     "evidence": "risk '서한은 로트 일부만 불합격시키는 관행이…적었다.' (위반 1) 없음; items 10·13 일부 문장 (위반 N) 없음; fda_evaluation 첫 문장도 근거 번호 없음"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008256",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-327eae52c8bb",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-8a5c7d80ccf0",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-c5d40bc8b3d1",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "a74d4fbdccdd",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196426",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "ac07673512db",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "data0011-15996",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q7txc0kUrl",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0158-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0182-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "who-whopir-af14a079113a",
+   "verdict": "pass",
+   "fails": []
+  }
+ ],
+ "counts": {
+  "cards": 153,
+  "pass": 94,
+  "reject": 59,
+  "fails_total": 91
+ }
+}

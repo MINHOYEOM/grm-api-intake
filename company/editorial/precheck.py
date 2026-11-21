@@ -20,6 +20,10 @@
         표 줄 `외관검사` 가 손 베낌 표에 빠져 있었고 군말 줄은 코드에 0줄이었다). 이 규칙은 **사전 점검 전용**이다 — 발행 조립은 종전 규칙(백업 Routine 보호). `hook_line` 한국어의 목록 약어도 막는다(`hook_line 약어 …`).
         경고만: 영문 `hook_line` 약어(교열 판정이 갈린다)·약어 후보·진술 표기(R3)·정확성 대조(`accuracy_warn_lines` —
         가림 값 채움 의심·가능성 표현 누락·원문에 없는 수·회수 사유 덧붙임).
+        **가림·깨진 값 채움**(`guess_check` — 리허설 1121b 전수 교열 반려 21장 중 2/3): 자주 채워 넣는 낱말
+        (정제수·용수·물·산도·누설·불순물·엑셀·배지·소독제·내시경·수십·박층)이 사실 칸에 있는데 그 카드 원문 전체
+        (handoff 행 + 스캐폴드 결정론 필드)에 대응하는 말이 영어로도 한국어로도 없으면 **막는다**(`가림 값 채움 …`).
+        권고 칸(implication·checks)·handoff 행이 없는 카드·관찰 단위 대조·'원료'는 경고만(`가림 값 채움 의심 …`).
 
     python company/editorial/precheck.py deep-source <handoff 파일> <deep_delta 파일> --out <검사용 파일>
         심층분석 델타의 각 카드에 그 주 handoff 의 `deep_analysis_input.body_full` 을 `source_text` 로 붙인
@@ -46,6 +50,8 @@
         리허설 1120h: 경고서한 `violations_ko` 결손이 통과해 교열 조립이 exit 2). 스캐폴드 사본(`--scaffold`, 없으면
         `_scaffold/brief_web_<날짜>.json`)이 있어야 본다 — 없으면 경고 한 줄을 내고 건너뛴다.
         483 관찰 국문은 배포 게이트(`render.validate_483_observations`)처럼 샤드의 **모든** 483 카드를 본다(리허설 1120i).
+        **가림·깨진 값 채움**도 `terms` 와 같은 함수(`guess_check`)로 막는다 — 관찰 국문·위반 서술·FDA 평가 등 사실 칸
+        (`가림 값 채움 <id>.deep.<슬롯>`), 원문 = handoff 행(body_full 포함). risk·administrative_risks·required_remediation 은 경고.
 
     python company/editorial/precheck.py rework-diff <1차 delta.json> <2차 delta.json> <1차 copyedit.json> [--deep-old <1차 deep_delta.json> --deep-new <2차 deep_delta.json>]
         `--deep-old`·`--deep-new` 를 주면 심층(`deep_delta.json`)도 **같은 대조 함수**로 본다 — 반려 카드의 심층만 바뀌어야 한다
@@ -66,6 +72,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import guess_check  # noqa: E402
 import inject_slots  # noqa: E402
 import merge_parts  # noqa: E402
 
@@ -75,6 +82,18 @@ KO_REQUIRED = tuple(f for f in merge_parts.EN_FIELDS if f not in merge_parts.EN_
 def _load(path):
     with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+def _load_handoff_quiet(folder):
+    """실행 폴더 → 그 주 handoff payload. 못 찾거나 못 읽으면 None(카드 유형은 종전처럼 전부 필수, 가림 채움은 차단 없이)."""
+    path = merge_parts.find_handoff(folder)
+    if not path:
+        return None
+    try:
+        payload = _load(path)
+    except (OSError, ValueError):
+        return None
+    return payload if isinstance(payload, dict) else None
 
 
 def warn_lines(delta, deep=None):
@@ -655,18 +674,21 @@ def main(argv=None):
             if not isinstance(delta, dict):
                 raise ValueError("델타가 객체가 아니다")
             if args.handoff:
-                card_types = merge_parts.handoff_card_types(_load(args.handoff))
+                handoff = _load(args.handoff)
             else:
-                card_types = merge_parts.run_card_types(os.path.dirname(os.path.abspath(args.delta)))
+                handoff = _load_handoff_quiet(os.path.dirname(os.path.abspath(args.delta)))
+            card_types = merge_parts.handoff_card_types(handoff) if isinstance(handoff, dict) else {}
             sc_path = find_scaffold(args.delta, args.scaffold)
             scaffold = _load(sc_path) if sc_path else None
             hook_block, hook_warn = hook_lines(delta, scaffold)
-            lines = term_lines(delta, card_types) + gate_lines(delta, card_types, scaffold) + hook_block
+            guess_block, guess_warn = guess_check.delta_guess_lines(
+                delta, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
+            lines = term_lines(delta, card_types) + gate_lines(delta, card_types, scaffold) + hook_block + guess_block
             lines += [x for x in assembly_lines(delta, scaffold) if x not in lines]
             for line in lines:
                 print(line)
             warns = warn_lines(delta, _load(args.deep) if args.deep else None) + hook_warn
-            warns += accuracy_warn_lines(delta, scaffold)
+            warns += accuracy_warn_lines(delta, scaffold) + guess_warn
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 인용 번역 대조는 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:
@@ -681,11 +703,15 @@ def main(argv=None):
             lines = (deep_lines(shard, fda483_ids(handoff)) + deep_term_lines(shard)
                      + deep_absence_lines(shard) + deep_basis_lines(shard) + deep_gate_lines(shard, handoff))
             sc_path = find_scaffold(args.shard, args.scaffold)
-            lines += deep_assembly_lines(shard, handoff, _load(sc_path) if sc_path else None)
+            scaffold = _load(sc_path) if sc_path else None
+            lines += deep_assembly_lines(shard, handoff, scaffold)
+            guess_block, guess_warn = guess_check.deep_guess_lines(
+                shard, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
+            lines += guess_block
             for line in lines:
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()
-            warns += accuracy_warn_lines({"cards": {}}, None, shard, handoff)
+            warns += accuracy_warn_lines({"cards": {}}, None, shard, handoff) + guess_warn
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 국문 병기 관문(483·WL·WHOPIR)은 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:

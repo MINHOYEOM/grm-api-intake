@@ -1,12 +1,12 @@
 {
- "status": "재작업",
- "round": 1,
+ "status": "완료",
+ "round": 2,
  "published": false,
  "rehearsal": true,
  "code_gate": {
   "ran": true,
   "exit": 0,
-  "message": "assemble_publish_brief exit 0 · check_en_slots exit 0 (deep-source 사본 58/62장)"
+  "message": "2차: merge_parts exit 0 · rework-diff 통과(반려 카드만 변경) · assemble_publish_brief exit 0(채택 138·스킵 17, deep 58/62) · check_en_slots exit 0"
  },
  "cards": [
   {
@@ -4397,16 +4397,20 @@
   },
   {
    "web_card_id": "D-0167-2027",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "가능성을 단정으로 / 국·영 불일치",
-     "slot": "en.title_issue",
-     "evidence": "원문 'complaints ... related to potential leaks from small perforations'; 국문 제목은 '누출 의심'인데 영문 제목 'recalled over pinhole leaks'는 '의심/potential'이 빠져 누출을 단정"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [],
    "checked": [
+    {
+     "slot": "en.title_issue",
+     "claim": "Dialysis bags recalled for suspected pinhole leaks",
+     "source": "complaints have been received related to potential leaks from small perforations in the print area on the primary bag"
+    },
+    {
+     "slot": "title_issue",
+     "claim": "백 미세 구멍 누출 의심 투석액 회수",
+     "source": "complaints have been received related to potential leaks from small perforations in the print area on the primary bag"
+    },
     {
      "slot": "hook_line",
      "claim": "백 인쇄 부위 미세 구멍 누출 의심",
@@ -4669,14 +4673,9 @@
  ],
  "counts": {
   "cards": 144,
-  "pass": 143,
-  "reject": 1,
-  "fails_total": 1,
+  "pass": 144,
+  "reject": 0,
+  "fails_total": 0,
   "notes_total": 30
- },
- "rework": {
-  "cards": [
-   "D-0167-2027"
-  ]
  }
 }

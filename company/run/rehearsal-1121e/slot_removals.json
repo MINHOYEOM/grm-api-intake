@@ -1,0 +1,95 @@
+{
+  "removed": [
+    {
+      "web_card_id": "fda483-196305",
+      "slot": "deep.key_violations[3]",
+      "item": "칸 삭제",
+      "action": "지적 3번을 뺌(남은 지적 3개)",
+      "evidence": "갈색 잔류물은 2026-03-30 점검에서 확인된 것(원문 'On 30March2026 ... noted'); 카드는 2026-03-31로 적음(03-31은 흰 잔류물 재관찰 날짜)"
+    },
+    {
+      "web_card_id": "fda483-196412",
+      "slot": "deep.inspectional_significance",
+      "item": "칸 삭제",
+      "action": "선택 절을 비움",
+      "evidence": "'관찰 5는 2026-07-13 시험 중 증식 촉진 시험 기록 문제' — 2026-07-13 은 관찰 5 C(미생물 검토자 용수 시험 기록 미서명)에만 붙은 날짜이고 증식 촉진 시험(A·B)에는 날짜가 없음. 앞 문장 '시설 상태'도 원문은 equipment status(설비 상태)"
+    },
+    {
+      "web_card_id": "fda483-196414",
+      "slot": "deep.key_violations[2]",
+      "item": "칸 삭제",
+      "action": "지적 2번을 뺌(남은 지적 3개)",
+      "evidence": "관찰 7 원문은 '[redacted] analyzer'의 삭제 방지 설정 해제만 적고 '원료의약품' 분석기라는 분류는 원문에 없음(가려진 값을 채움)"
+    },
+    {
+      "web_card_id": "fda483-196378",
+      "slot": "deep.key_violations[1].risk",
+      "item": "심층 삭제",
+      "action": "심층분석 통째로 뺌(지적이 하나도 남지 않는다)",
+      "evidence": "원문에 없는 말: '시정 조치 뒤에도 같은 배치에서 다시 실패' — 원문은 바늘 위치를 표시한 뒤의 후속 배치(subsequent batches)와 시험 배치가 실패했다고 적어 '같은 배치'가 아니다(detail_ko 는 '이후 배치'로 맞게 적음)."
+    },
+    {
+      "web_card_id": "fda483-196378",
+      "slot": "deep.key_violations[0].observation",
+      "item": "심층 삭제",
+      "action": "심층분석 통째로 뺌(지적이 하나도 남지 않는다)",
+      "evidence": "사실 오류: '중대 결함 합격 기준…없다' — 원문 D 는 주요(major) 결함의 합격 기준이 정해지지 않았다는 것이고, 과학적 근거 부재는 중대·주요·기타 결함 한계 전부(E)다. 중대 결함으로 바뀌어 있다."
+    },
+    {
+      "web_card_id": "fda483-196391",
+      "slot": "deep.key_violations[1]",
+      "item": "심층 삭제",
+      "action": "지적 1번을 뺌(남은 지적 3개)",
+      "evidence": "원문에 없는 결합: '42일과 50일 후에 같은 원인' — 원문은 42일(DEV26017)만 'same root cause'로 적고, 50일(DEV26019)은 원인을 적지 않음"
+    },
+    {
+      "web_card_id": "fda483-196397",
+      "slot": "deep.observations_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 10칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "가려진·깨진 값을 추정해 채움: observations_ko[1] H항 '최대 6개월' — 원문은 'undetected for up to 6' 에서 단위가 끊겨 있는데 '개월' 을 보태 적음"
+    },
+    {
+      "web_card_id": "fda483-196399",
+      "slot": "deep.key_violations[0].risk",
+      "item": "심층 삭제",
+      "action": "지적 0번을 뺌(남은 지적 3개)",
+      "evidence": "가려진·깨진 값을 추정해 채움: 원문 'distributed on 22 Jun 20224' 의 연도가 깨졌는데 2024-06-22 로 확정해 적음(출하 승인은 22 Jul 2024 — 순서도 안 맞음)"
+    },
+    {
+      "web_card_id": "fda483-196385",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "'백업 없이 지워진다고 경영진이 진술' — 원문에서 경영진이 말한 것은 경보 이력 원자료가 며칠간 시스템에 저장된 뒤 지워진다는 것이고, 백업을 하지 않았다는 것은 FDA 의 지적이다. FDA 지적을 경영진 진술로 합쳤다(영문 hook 도 같은 칸)."
+    },
+    {
+      "web_card_id": "fda483-196397",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'제품에 닿을 수 있는 탱크 덮개' — 원문은 'according to your manufacturing floor SME, the cover could contact the product' 인데 '진술' 표기 없이 사실로 적음(STYLE R3)"
+    },
+    {
+      "web_card_id": "fda483-196403",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'2019년 공정 밸리데이션 뒤 들인 새 설비' — 원문은 2019년 공정 밸리데이션 문서가 새 설비를 언급(references new equipment)한다는 것이라 '뒤에 들인' 이 아님"
+    },
+    {
+      "web_card_id": "d60bdc71408a",
+      "slot": "key_facts[3]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 3번 뺌",
+      "evidence": "'당국 조치'로 적은 상업 배치 회수·제조 유통 중단은 회사가 한 조치다(원문 'We acknowledge that ... was recalled', 'you have discontinued'). 당국 조치가 아니라 분류 오류"
+    },
+    {
+      "web_card_id": "fda483-196413",
+      "slot": "key_facts[3]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 3번 뺌",
+      "evidence": "관찰 4 원문에서 '실제 상업 제조 조건을 재현하지 않음'은 배지충전(media fill)에만 붙고, 연기 시험은 공기 흐름·난류 문제만 적음 — 카드는 둘을 묶어 연기 시험도 상업 조건을 반영하지 못했다고 씀(국·영 모두)"
+    }
+  ]
+}

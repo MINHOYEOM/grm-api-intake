@@ -1101,10 +1101,6 @@
      {
       "observation": "2024-08 설비를 이동하고 자동 정치 세척만 수행한 뒤 세척 확인을 수행하지 않았고, 이후 생산한 두 로트는 조치 수준 바이오버든 초과로 불합격되었다(관찰 3).",
       "risk": ""
-     },
-     {
-      "observation": "2026-03-31 컬럼 충전 구역에서 알 수 없는 갈색 잔류물과 변색이 청결 상태로 보관된 크로마토그래피 호스 안에서 확인되었다(관찰 5).",
-      "risk": ""
      }
     ],
     "inspectional_significance": "2024-06-12~2024-07-09 FDA 실사에서도 외관시험에서 입자 오염이 확인된 원료의약품 로트의 출하가 지적되었다(관찰 1).",
@@ -5354,23 +5350,7 @@
      "Robin P. Mathew"
     ]
    },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "육안검사 공정이 눈에 보이는 입자나 중대 결함이 있는 바이알을 신뢰성 있게 검출·불합격 처리한다는 보증이 없다. 검사자 적격성평가는 검출이 쉬운 입자 중심으로 이뤄졌고, 중대 결함 합격 기준과 한계의 과학적 근거가 없다(관찰 1)."
-     },
-     {
-      "observation": "무균 충전 구역의 비생균 입자수 한계 일탈이 반복됐는데도 충분히 조사하지 않았다. 세 건의 사람 접촉 일탈에서 조사는 작업자 재교육만 시정 조치로 확인했다(관찰 2).",
-      "risk": "신청 제출용 시험 배치 두 개에서 기준일탈(OOS)이 반복됐고, 시정 조치 뒤에도 같은 배치에서 다시 실패해 시정 조치가 미흡했다(관찰 2)."
-     }
-    ],
-    "inspectional_significance": "실사 기간은 2026-03-16~2026-03-27이며 지적은 2건이다(관찰 1~2). 관찰 2는 2024년 11월~2025년 1월 비생균 입자수 일탈을 적는다.",
-    "required_remediation": {
-     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
-     "items": []
-    },
-    "administrative_risks": ""
-   },
+   "deep_analysis": null,
    "source_body_captured": true,
    "merged_count": 1,
    "merged_items": [],
@@ -5947,7 +5927,6 @@
      "official": "pending"
     }
    },
-   "hook_line": "경보 이력 원자료가 백업 없이 시스템에서 지워진다고 경영진이 진술",
    "en": {
     "title_issue": "Inadequate rationale for environmental sampling",
     "summary": "FDA issued a Form 483 with 3 observations to Kavis Pharma LLC, citing the rationale for environmental sampling in non-sterile production suites, backup of alarm history raw data and DSCSA procedures.",
@@ -5961,8 +5940,7 @@
      "Is there a documented scientific rationale for environmental monitoring locations and frequency in non-sterile production areas? (Observation 1)",
      "Do you back up alarm history raw data from component production systems before it is erased? (Observation 2)",
      "Is there a documented procedure to notify FDA and trading partners when product is determined to be illegitimate? (Observation 3)"
-    ],
-    "hook_line": "Management reported alarm history raw data is erased from the system without backup"
+    ]
    },
    "inspection": {
     "v": 1,
@@ -6391,10 +6369,6 @@
      {
       "observation": "배양 공정 실패와 관련해 반복된 일탈에 대해 적절한 조사, 근본원인 규명, 시정 및 예방조치(CAPA) 시행이 이루어지지 않았고, 고객 시료가 복구할 수 없게 손실되었다(관찰 1).",
       "risk": "DEV26001은 3건의 과배양 사건을 조사하면서 근본원인을 인력(분석자 부주의)으로 결론지었으나, 이후 DEV26020은 방법이 주된 원인이라고 결론지었다."
-     },
-     {
-      "observation": "CAPA26001이 시행된 뒤 42일과 50일 후에 같은 원인의 배양 일탈이 다시 발생했으나 회사는 효과성을 다시 평가하지 않았고, CAPA26001은 2026-03-03에야 효과 없음으로 종결되었다(관찰 1).",
-      "risk": ""
      },
      {
       "observation": "참조표준품을 USP 참조표준품과 비교해 동등성을 검증하지 않은 채 2026-01~2026-05의 여러 배치에 대해 역가시험을 수행했다(관찰 2).",
@@ -7261,7 +7235,7 @@
     "관찰 3: 핵심 공정 설비의 성능적격성평가에서 범위·한계가 데이터로 뒷받침되지 않았고 최악 조건에서 검증하지 않음",
     "관찰 4: 제조 현장 전문가가 일상적으로 한다고 진술한 공정 단계가 제조기록서에 기록되지 않음"
    ],
-   "implication": "2026-01-27 제조 중 누출이 관찰됐으나 바닥에 샌 물질을 제거·불활성화하는 조치를 즉시 하지 않았다(관찰 1). 회사는 제품에 닿을 수 있는 탱크 덮개를 비접촉 부위로 보고 세척 밸리데이션 면봉 채취에서 뺐다(관찰 1). 공정 성능 적격성평가 배치의 출하 시험에 쓴 분석법은 사용 전에 검증되지 않았다(관찰 2). 시험 결과 계산에 쓰는 Excel 템플릿의 계산 결과는 전자 형태로 보관되지 않았다(관찰 2). 시험실에서 표준품과 검체를 다르게 처리해 서로 다른 피크가 적분됐다(관찰 5).",
+   "implication": "",
    "checks": [
     "다품목 제조 위험평가에 제품 누출에 따른 오염 위험이 들어가는가? (관찰 1)",
     "전자 데이터 시스템을 검증한 뒤에 공정 성능 적격성평가 배치를 시험하는가? (관찰 2)",
@@ -7275,36 +7249,36 @@
       "number": "1",
       "deficiency": "There is a lack of assurance that your drug substance (DS) manufacturing operations are appropriately designed to ensure the prevention ofcontamination of equipment or product by environmental and processing conditions that would be expected to have an adverse effect on product quality.",
       "detail": "Specifically, A. Your documented multiproduct manufacturing risk assessments, RA-2022-12 (version 6, approve date 20-JAN-2026) and RA-23004 (version 2, approve date 26-SEP-2025) are deficient. For example,;. The risk assessment failed to identify or appropriately evaluate the potential cross-contamination risks associated withgy processes performed in the DS manufacturing areas. Specifically, em operations are performedda Sawa olyZ DS, including [redacted] operations. [heseqq) Operations: were performed without adequate protection ofexposed product to the Grade D environment. ii. The risk assessment failed to evaluate potential contamination risks resulting from product spills and leakages occurring on non-product contact equipment surfaces or within surrounding and supporting manufacturing areas, On 27-JAN-2026, during observation of4)4 DS yo) operation, leakage from))4» was observed. No mitigation actions were taken immediately to ensure and demonstrate the removal and inactivation of the materials leaked onto the manufacturing floor. iii. Your cleaning validation (CY) risk assessment failed to consider manufacturing equipment’s actual iti; -onsi: ctual condition of use. For example, you consider theg cover Off)4), Tank in the: SEE EMPL OTEE(S) Drug Substance Manufacturer me OOM & «ay not product contacting and therefore not requiring swabbing during CV. However, according to your manufacturing floor SME, the cover could contact the product during the transfer ofthe,cy B. Your cleaning validation and verification program for manufacturing process equipment is inadequate to prevent cross-contamination. For example, i. No data were generated to support the use of visual inspection on the cleanliness of the equipment, including badiad ii, Swab sampling locations are not clearly defined for your cleaning validation studies. C. Your firm lacks an established cleaning and sanitization program to prevent the introduction of microbial contamination into controlled DS manufacturing environments. In particular, i, Your disinfectant efficacy studies such as 96-1041R (version 0, approve date 13-AUG-20235), 96-0775R (version 0, approve date 13-MAY-2025), and 96-0991R (version |, approve date 31- DEC-2025), do not adequately support the sanitization procedures for the antimicrobial and sporicida! effectiveness of the disinfectants and sporicidal agents for all representative manufacturing surfaces. For examples, materials of construction for ay interior surfaces an [redacted] a refrigerators, and unspecified §) 4 were not included in the studies. ii, The cleaning and sanitization procedures for the Grade D areas of the DS manufacturing facility [SOP 10-0060 (version 40, effective date 31-DEC-2025)] lack sufficient details regarding wetted (contact) time to enable reproducibility. In addition, the SOP does not require documentation of the contact time in the cleaning logbooks during facility cleaning and sanitization. D. During the walkthrough inspection of the drug substance manufacturing areas in your facility, the following deficiencies were observed: i. Multiple pieces ofequipment are present during thegq operation stage of 9)a including ead The equipment remains in place during cleaning ofthe q room after batch production. Consequently, there is no assurance that all areas are adequately cleaned and free of cross- contamination. SEE Drug Substance Manufacturer il. Gq Particulates or stains were observed at the inside bottom surfaces of), refrigerators (Equipment IDs: Oo Additionally, cracks were observed in refrigerator ID9, These refrigerators are used to store gya s c) p, including i. plates were observed positioned beneath the 4)iy systems to distribute heavy loads. These plates created uneven surfaces in the vicinity of the 4cy system and could not be easily cleaned. There is no assurance that your current cleaning procedures are adequate to remove potential contaminants from under or around these plates. E. systems used in the manufacturing ofDS 4a is not properly maintained to assure the [redacted] |S free of contamination. For example, 1. Qy [redacted] y__“rainage was observed having slow moving or stagnant gy) near the gy egy system and storage tanks. 4 was observed discharging directly into the drainage near thep storage tank. Black (mold like) stains were clearly visible where the a pipe is located. ii. Container used to ae was placed near proximity to the facility cleaning tools including brooms and cloth mops. The container had no lid and was placed on the floor upside down. iil. Tubing is used to connectpo system with [redacted] systems (1) in theme LOOM 45«ay It was observed to remain connected tothe systems while the systems were not in use, According to your manufacturing floor SME the tubing is not routinely replaced. The requirement and procedure to rinse, clean, dry, and testing the tubing were not described in SOP 04-0569 (version 3, approve date 20-NOV-2023) and such actions were not documented.",
-      "deficiency_ko": "원료의약품(DS) 제조 작업이 제품 품질에 불리한 영향을 줄 것으로 예상되는 환경·공정 조건에 의한 설비나 제품의 오염을 막도록 적절하게 설계됐다는 보증이 없다.",
-      "detail_ko": "구체적으로, A. 회사의 문서화된 다제품 제조 위험성 평가 RA-2022-12(버전 6, 승인일 2026-01-20)와 RA-23004(버전 2, 승인일 2025-09-26)는 미흡하다. 예를 들면 i. 위험성 평가는 원료의약품 제조 구역에서 수행하는 [가림] 공정과 관련한 잠재적 교차오염 위험을 확인하거나 적절하게 평가하지 못했다. 구체적으로 [가림] 작업을 포함한 [가림] 작업이 원료의약품 [가림]에서 수행된다. 이 [가림] 작업은 노출된 제품을 D등급 환경에 적절히 보호하지 않은 채 수행됐다. ii. 위험성 평가는 제품 비접촉 설비 표면이나 주변·지원 제조 구역에서 일어나는 제품 유출과 누출로 인한 잠재적 오염 위험을 평가하지 못했다. 2026-01-27 원료의약품 [가림] 작업을 관찰하는 중 [가림]에서 누출이 관찰됐다. 제조실 바닥으로 누출된 물질의 제거와 불활성화를 보증하고 입증하는 완화 조치가 즉시 취해지지 않았다. iii. 회사의 세척 밸리데이션(CV) 위험성 평가는 제조 설비의 실제 사용 상태를 고려하지 못했다. 예를 들어 회사는 탱크의 [가림] 덮개가 제품과 접촉하지 않으므로 세척 밸리데이션 중 면봉 채취가 필요 없다고 본다. 그러나 제조 현장 전문가에 따르면 덮개는 [가림] 이송 중 제품에 닿을 수 있다. B. 제조 공정 설비의 세척 밸리데이션·확인 프로그램은 교차오염을 막기에 미흡하다. 예를 들면 i. 설비의 청결 상태에 육안검사를 쓰는 것을 뒷받침하는 자료가 생성되지 않았다. ii. 세척 밸리데이션 연구의 면봉 채취 위치가 분명히 정해져 있지 않다. C. 회사에는 관리되는 원료의약품 제조 환경에 미생물 오염이 들어오는 것을 막는 문서화된 청소·소독 프로그램이 수립돼 있지 않다. 특히 i. 소독제 효능 연구 96-1041R(버전 0, 승인일 2025-08-13), 96-0775R(버전 0, 승인일 2025-05-13), 96-0991R(버전 1, 승인일 2025-12-31)은 대표적인 모든 제조 표면에 대한 소독제와 살포자제의 항균·살포자 효과를 소독 절차가 뒷받침한다는 점을 충분히 보이지 못한다. 예를 들어 [가림] 내부 표면, [가림], 냉장고, 명시되지 않은 [가림]의 구조 재질이 연구에 포함되지 않았다. ii. 원료의약품 제조 시설 D등급 구역의 청소·소독 절차(SOP 10-0060, 버전 40, 발효일 2025-12-31)에는 재현성을 확보하기 위한 접촉 시간에 관한 세부 내용이 충분하지 않다. 또한 이 SOP는 시설 청소·소독 중 접촉 시간을 청소 기록부에 문서화하라고 요구하지 않는다. D. 회사 시설의 원료의약품 제조 구역 현장 확인 중 다음 미흡 사항이 관찰됐다. i. [가림] 공정 단계 중 [가림]을 포함한 여러 설비가 있다. 이 설비는 배치 생산 뒤 [가림] 실 청소 중에도 제자리에 있다. 따라서 모든 구역이 충분히 청소되고 교차오염이 없다는 보증이 없다. [가림]에서 입자나 얼룩이 [가림] 냉장고(설비 ID [가림])의 안쪽 바닥 표면에서 관찰됐다. 또한 냉장고 ID [가림]에는 균열이 관찰됐다. 이 냉장고는 [가림]를 보관하는 데 쓰인다. ii. 무거운 하중을 분산하려고 [가림] 시스템 아래에 판이 놓여 있었다. 이 판은 [가림] 시스템 주변에 고르지 않은 표면을 만들었고 쉽게 청소할 수 없었다. 현재 청소 절차가 판 아래나 주변의 잠재적 오염물을 제거하기에 적절하다는 보증이 없다. E. 원료의약품 [가림] 제조에 쓰는 [가림] 시스템이 [가림]에 오염이 없음을 보증하도록 적절히 유지관리되지 않는다. 예를 들면 i. [가림] 시스템과 저장 탱크 근처의 [가림] 배수구에서 천천히 흐르거나 고인 [가림]이 관찰됐다. [가림] 저장 탱크 근처의 배수구로 [가림]이 직접 배출되고 있었다. [가림] 배관이 있는 곳에는 곰팡이로 보이는 검은 얼룩이 뚜렷이 보였다. ii. [가림]에 쓰는 용기가 빗자루와 천 걸레를 포함한 시설 청소 도구 가까이에 놓여 있었다. 이 용기에는 뚜껑이 없었고 바닥에 뒤집혀 놓여 있었다. iii. 튜브는 [가림]실의 [가림] 시스템과 [가림] 시스템을 연결하는 데 쓰인다. 시스템을 쓰지 않는 동안에도 튜브가 시스템에 연결된 채 있는 것이 관찰됐다. 제조 현장 전문가에 따르면 튜브는 정기적으로 교체되지 않는다. 튜브를 헹구고 청소하고 건조하고 시험하는 요건과 절차는 SOP 04-0569(버전 3, 승인일 2023-11-20)에 기술돼 있지 않았고 이런 조치는 문서화되지 않았다."
+      "deficiency_ko": "국문 해석을 싣지 않았다 — 원문을 본다.",
+      "detail_ko": "국문 해석을 싣지 않았다 — 원문을 본다."
      },
      {
       "number": "2",
       "deficiency": "Your firm has not established adequate procedural and technical controls to protect the electronic data acquisition systems used for the manufacture of ww DS in your manufacturing facility.",
       "detail": "SEE JEMPLOVE EIS) No. 69, 12 Street, Hangzhou Economic and Technologica Development Zone Specifically, A. Partial performance qualification (PQ) of theaw system was conducted after the drug substance Process Performance Qualification (PPQ) batches were manufactured and tested for release. Critical functions such as user permission and system administrative permission settings, user’s ability to delete data and methods, data storage, and audit trail were not fully validated until the PQ was approved on 03-OCT-2021. B. Theea analytical method used to measure{4 content for the release testing of PPQ batches was not verified prior to use for such testing. No system suitability information was generated for thegyq testing. The use of unverified method for PPQ batch release testing provides no assurance that the test results are accurate or reliable. C. Excel templates are used to calculate quality control (QC) analytical testing results. The calculation results are not retained in the electronic form and cannot be traced to the analyst who performs the calculation. The printed copy cannot be traced to the time ofcalculation, and the signature cannot be verified or reviewed. D. During walkthroughs of manufacturing areas, a use of)4) timersgw a to record time in batch record was observed. There are no instructions in batch record or operating procedures to use the g)(__ timers to measure and record time in batch records. Timers used to record time in the batch records or test record in the manufacturing areas and QC laboratory are not initially qualified, and& drifts are allowed. E. During a walkthrough of the reference standard storage room jy an employee was observed to make an incorrect entry to the reference standard freezer Instrument/Equipment Log, ID 2009102704. Specifically, incorrect date was entered in the Instrument/Equipment Log ‘date end’, which was immediately overwritten to indicate the correct date. SOP 01-0004 Record Control Procedure, rev.27, date effective: 16-JAN-2026 instructs employees to “cross out the erroneous item by drawing a straight single line through the item, to keep the original content legible. Correct pos clearly near the item, and make a remark about the correction reason, with signature and date of the correction.” F. Unique user account and password were not set up for the analysts who use the Sartorius electronic balance in the QC lab to conduct QC testing. G. Procedures and technical controls are not established to effectively control and detect unauthorized use ofanalytical samples and reference standards, creating opportunities for selective reporting or unauthorized testing. H. [redacted] check ofga user account information (conducted [redacted] by IT personnel [SOP 04-0842 (version 2, approve date 25-JUL-2024) does not detect user account changes that occur during g allowing potential unauthorized access or privilege changes to go undetected for up to 6 I, The snapshot function is enabled for 4) Analysts can process analytical runs using this function before the run or the sequence is completed, allowing potential manipulation of integration parameters, reprocessing ofdata, or aborting unfavorable results before final results are recorded in the official record.",
-      "deficiency_ko": "회사 제조 시설에서 [가림] 원료의약품 제조에 쓰는 전자 자료 취득 시스템을 보호하는 적절한 절차적·기술적 관리를 수립하지 않았다.",
-      "detail_ko": "구체적으로, A. [가림] 시스템의 일부 성능 적격성평가(PQ)가 원료의약품 공정 성능 적격성평가(PPQ) 배치를 제조하고 출하 시험을 한 뒤에 수행됐다. 사용자 권한과 시스템 관리자 권한 설정, 사용자의 자료·방법 삭제 능력, 자료 저장, 감사추적기록 같은 핵심 기능은 성능 적격성평가(PQ)가 2021-10-03 승인될 때까지 완전히 밸리데이션되지 않았다. B. 공정 성능 적격성평가(PPQ) 배치의 출하 시험에서 [가림] 함량을 측정하는 데 쓴 [가림] 분석법은 시험에 쓰기 전에 확인되지 않았다. [가림] 시험에 대한 시스템 적합성 정보가 생성되지 않았다. 확인되지 않은 방법을 공정 성능 적격성평가(PPQ) 배치 출하 시험에 쓴 것은 시험 결과가 정확하거나 신뢰할 수 있다는 보증이 되지 못한다. C. 품질관리 분석 시험 결과를 계산하는 데 엑셀(Excel) 템플릿을 쓴다. 계산 결과는 전자 형태로 보관되지 않으며 계산을 한 분석자까지 추적할 수 없다. 출력본은 계산 시점까지 추적할 수 없고 서명은 확인하거나 검토할 수 없다. D. 제조 구역 현장 확인 중 제조기록서에 시간을 기록하는 데 [가림] 타이머를 쓰는 것이 관찰됐다. 제조기록서나 작업 절차서에는 [가림] 타이머를 써서 시간을 측정하고 제조기록서에 기록하라는 지침이 없다. 제조 구역과 품질관리 시험실에서 제조기록서나 시험 기록에 시간을 기록하는 데 쓰는 타이머는 초기 적격성평가를 받지 않았고 [가림] 편차가 허용된다. E. 표준물질 보관실 현장 확인 중 한 직원이 표준물질 냉동고 기기·설비 기록부(ID 2009102704)에 잘못 기입하는 것이 관찰됐다. 구체적으로 기기·설비 기록부의 '종료 날짜'에 잘못된 날짜가 기입됐고 바로 덮어써서 올바른 날짜로 바뀌었다. SOP 01-0004 기록 관리 절차(개정 27, 발효일 2026-01-16)는 직원이 '틀린 항목에 한 줄을 곧게 그어 원래 내용을 읽을 수 있게 하고, 올바른 내용을 항목 근처에 분명히 적고, 정정 사유를 서명·날짜와 함께 적는다'고 지시한다. F. 품질관리 시험실에서 품질관리 시험에 Sartorius 전자저울을 쓰는 분석자에게 고유한 사용자 계정과 비밀번호가 설정돼 있지 않았다. G. 분석 시료와 표준물질의 무단 사용을 효과적으로 관리하고 검출하는 절차와 기술적 관리가 수립돼 있지 않아 선택적 보고나 무단 시험의 기회가 생긴다. H. 정보기술 담당자가 [가림] 수행하는 사용자 계정 정보 확인(SOP 04-0842, 버전 2, 승인일 2024-07-25)은 [가림] 동안 일어나는 사용자 계정 변경을 검출하지 못해 무단 접근이나 권한 변경이 최대 6개월 동안 발견되지 않을 수 있다. I. [가림]에 스냅샷 기능이 사용 가능하게 돼 있다. 분석자는 실행이나 시퀀스가 끝나기 전에 이 기능으로 분석 실행을 처리할 수 있어, 적분 변수를 조작하거나 자료를 다시 처리하거나 공식 기록에 최종 결과가 기록되기 전에 불리한 결과를 중단할 수 있다."
+      "deficiency_ko": "국문 해석을 싣지 않았다 — 원문을 본다.",
+      "detail_ko": "국문 해석을 싣지 않았다 — 원문을 본다."
      },
      {
       "number": "3",
       "deficiency": "Your firm lacks adequate assurance that the critical process equipment, used for the manufacturing of @ @ DS, is maintained in a validated state.",
       "detail": "Specifically, A. You failed to perform proper PQ studies for the 9 Specifically, i. Noi was conducted. range/limits were not supported by data. m. we limits provided in thegq were not the same as the limits provided in the equipment qualifications, iv. You failed to demonstrate that was qualified and challenged under the worst-case conditions.",
-      "deficiency_ko": "[가림] 원료의약품 제조에 쓰는 핵심 공정 설비가 밸리데이션된 상태로 유지된다는 충분한 보증이 없다.",
-      "detail_ko": "구체적으로, A. 회사는 [가림]에 대한 적절한 성능 적격성평가(PQ) 연구를 수행하지 않았다. 구체적으로 i. [가림]은 수행되지 않았다. ii. [가림] 범위·한계가 자료로 뒷받침되지 않았다. iii. [가림]에 제시된 한계가 설비 적격성평가에 제시된 한계와 같지 않았다. iv. [가림]이 최악 조건에서 적격성평가를 받고 도전됐다는 점을 입증하지 못했다."
+      "deficiency_ko": "국문 해석을 싣지 않았다 — 원문을 본다.",
+      "detail_ko": "국문 해석을 싣지 않았다 — 원문을 본다."
      },
      {
       "number": "4",
       "deficiency": "Your firm failed to prepare batch production records to include complete information relating to the accomplishment ofeach significant step in the manufacture of the batch, for each batch of 4) DS.",
       "detail": "Specifically, A. Your manufacturing floor SME stated that after addition of g) 4 starting material, [redacted] is used to a)a (Equipment ID 4) Via ay [redacted] However, such step was not documented in the executed batch records including PPQ batches and recent batch records including Batch [redacted] a B. During a mock run of the §)9 procedure per MBR4 4 an operatorgya which was used to sinha - [redacted] is not specified in the manufacturing procedures or batch manufacturing records (e.g., Section 5.3.1.2 [redacted] of the MBR). Your manufacturing floor SME stated that the g)4 step is routinely performed during manufacturing process. However, it is not specified and not documented in the batch records.",
-      "deficiency_ko": "[가림] 원료의약품의 배치마다 배치 제조의 각 중요한 단계의 수행에 관한 완전한 정보를 담도록 배치 제조기록서를 작성하지 않았다.",
-      "detail_ko": "구체적으로, A. 회사의 제조 현장 전문가는 출발물질 [가림]을 첨가한 뒤 [가림]이 설비 [가림]을 통해 [가림]에 쓰인다고 진술했다. 그러나 이 단계는 공정 성능 적격성평가(PPQ) 배치와 배치 [가림]을 포함한 최근 배치 기록을 포함해 작성 완료된 제조기록서에 기록되지 않았다. B. 마스터 제조기록서(MBR) [가림]에 따른 [가림] 절차의 모의 실행 중 작업자가 [가림]을 했고, 이는 제조 절차나 배치 제조기록서(예: MBR 5.3.1.2항)에 명시돼 있지 않다. 제조 현장 전문가는 이 [가림] 단계가 제조 중 정기적으로 수행된다고 진술했다. 그러나 이는 명시돼 있지 않고 제조기록서에 기록되지 않는다."
+      "deficiency_ko": "국문 해석을 싣지 않았다 — 원문을 본다.",
+      "detail_ko": "국문 해석을 싣지 않았다 — 원문을 본다."
      },
      {
       "number": "5",
       "deficiency": "Standard operating procedures or work instructions are not followed or are inadequate.",
       "detail": "Specifically, A. During a QC laboratory walkthrough, data processing for [redacted] using SOP 50-1033 Standard Test Procedure for Related Substance and Assay Determination of4)¢) by HPLC, rev. 3, date effective: 30-OCT-2025, was observed. Reference standard samples and the product test samples were processed differently resulting in different peaks being integrated. The SOP 50-1033 does not specify that the reference standard and the test samples should be processed to assure consistent integration. B. During a walkthrough of the [redacted] gy ROOM aya) [redacted] qy [redacted] Sampling procedure was observed. A portion ofga was collected and transferred to a test tube using a sampling tool. The quantity of [redacted] ‘or in-process testing durin [redacted] is not specified in the SOP 50-0050 or batch records and was not confirmed during sampling. C. During an in-processga) test in the 6a Room [redacted] an operator did not perform an inspection Ofg)a used for in-process testing 4 a as required per SOP 50-0050 wm Testing, rev.7, date effective 31-MAY-2021. SOP 50-0050 states.)(4 (OTC) D. Norisk assessment or gap analysis was performed to waive the requirement for method verification for appearance testing. E. Time observed on select devices (e.g., computers, 4), Systems, balances) in the manufacturing areas was different. SOP 07-0023 Standard Operating Procedure for Time Calibration, rev. 6, date effective 31-MAY-2024, requires)... calibration of“instruments and meters that are not connected to the NTP time server.” EMPL OVEE(S) SGNATURE EUPLOYEE(S| NAME AND TITLE (Pnnt or Type) DATE ISSLEO aeene Sl. Yiwei Li, Supervisor OF THIS t (L Jacek Cieslak, Lead Interdisciplinary Scientist 2/3/2026 PAGE Thuy Thanh Nguyen, Supervisor",
-      "deficiency_ko": "표준작업절차서나 작업 지침을 따르지 않거나 미흡하다.",
-      "detail_ko": "구체적으로, A. 품질관리 시험실 현장 확인 중 SOP 50-1033 '[가림] 관련 물질 및 함량 결정 표준 시험 절차, 고성능 액체크로마토그래피'(개정 3, 발효일 2025-10-30)에 따른 [가림]의 자료 처리가 관찰됐다. 표준물질 시료와 제품 시험 시료가 다르게 처리돼 서로 다른 피크가 적분됐다. SOP 50-1033은 일관된 적분을 보증하도록 표준물질과 시험 시료를 처리하라고 정하지 않는다. B. [가림]실의 [가림] 시료 채취 절차 현장 확인 중 [가림]의 일부를 채취해 시료 채취 도구로 시험관에 옮기는 것이 관찰됐다. [가림] 중 공정 중 시험을 위한 [가림]의 양은 SOP 50-0050이나 제조기록서에 정해져 있지 않고 시료 채취 중에도 확인되지 않았다. C. [가림]실의 공정 중 [가림] 시험 중 작업자가 SOP 50-0050 [가림] 시험(개정 7, 발효일 2021-05-31)이 요구하는 대로 공정 중 시험에 쓰는 [가림]의 검사를 수행하지 않았다. SOP 50-0050은 [원문이 여기서 끊겨 있다]. D. 외관 시험의 방법 확인 요건을 면제하기 위한 위험성 평가나 차이 분석이 수행되지 않았다. E. 제조 구역의 일부 장치(예: 컴퓨터, [가림] 시스템, 저울)에서 관찰한 시간이 서로 달랐다. SOP 07-0023 시간 교정 표준작업절차서(개정 6, 발효일 2024-05-31)는 NTP 시간 서버에 연결돼 있지 않은 기기와 계측기의 교정을 요구한다."
+      "deficiency_ko": "국문 해석을 싣지 않았다 — 원문을 본다.",
+      "detail_ko": "국문 해석을 싣지 않았다 — 원문을 본다."
      }
     ]
    },
@@ -7347,7 +7321,7 @@
    "en": {
     "title_issue": "Multiproduct cross-contamination risk assessment",
     "summary": "FDA issued a Form 483 with 5 observations to Chinese Peptide Company, a drug substance manufacturer in China, citing multiproduct cross-contamination risk assessment and cleaning validation, electronic data controls, equipment performance qualification, batch record completeness and procedure compliance.",
-    "implication": "On 2026-01-27, leakage was observed during an operation, and no mitigation actions were taken immediately to remove and inactivate the leaked material (Observation 1). A tank cover that could contact product was treated as non-product contact and excluded from swabbing during cleaning validation (Observation 1). The analytical method used for PPQ batch release testing was not verified before use (Observation 2). Calculation results from Excel templates used for QC testing were not retained in electronic form (Observation 2). In the laboratory, reference standard and test samples were processed differently, resulting in different peaks being integrated (Observation 5).",
+    "implication": "",
     "key_facts": [
      "Observation 1: multiproduct risk assessments RA-2022-12 and RA-23004 failed to appropriately evaluate cross-contamination risks and contamination from product spills and leakages",
      "Observation 2: PPQ batches were manufactured and tested for release before critical functions such as data deletion permissions and audit trail were fully validated",
@@ -7374,31 +7348,31 @@
       "no": "1",
       "sev": "observation",
       "orig": "There is a lack of assurance that your drug substance (DS) manufacturing operations are appropriately designed to ensure the prevention ofcontamination of equipment or product by environmental and processing conditions that would be expected to have an adverse effect on product quality.",
-      "text": "원료의약품(DS) 제조 작업이 제품 품질에 불리한 영향을 줄 것으로 예상되는 환경·공정 조건에 의한 설비나 제품의 오염을 막도록 적절하게 설계됐다는 보증이 없다."
+      "text": "국문 해석을 싣지 않았다 — 원문을 본다."
      },
      {
       "no": "2",
       "sev": "observation",
       "orig": "Your firm has not established adequate procedural and technical controls to protect the electronic data acquisition systems used for the manufacture of ww DS in your manufacturing facility.",
-      "text": "회사 제조 시설에서 [가림] 원료의약품 제조에 쓰는 전자 자료 취득 시스템을 보호하는 적절한 절차적·기술적 관리를 수립하지 않았다."
+      "text": "국문 해석을 싣지 않았다 — 원문을 본다."
      },
      {
       "no": "3",
       "sev": "observation",
       "orig": "Your firm lacks adequate assurance that the critical process equipment, used for the manufacturing of @ @ DS, is maintained in a validated state.",
-      "text": "[가림] 원료의약품 제조에 쓰는 핵심 공정 설비가 밸리데이션된 상태로 유지된다는 충분한 보증이 없다."
+      "text": "국문 해석을 싣지 않았다 — 원문을 본다."
      },
      {
       "no": "4",
       "sev": "observation",
       "orig": "Your firm failed to prepare batch production records to include complete information relating to the accomplishment ofeach significant step in the manufacture of the batch, for each batch of 4) DS.",
-      "text": "[가림] 원료의약품의 배치마다 배치 제조의 각 중요한 단계의 수행에 관한 완전한 정보를 담도록 배치 제조기록서를 작성하지 않았다."
+      "text": "국문 해석을 싣지 않았다 — 원문을 본다."
      },
      {
       "no": "5",
       "sev": "observation",
       "orig": "Standard operating procedures or work instructions are not followed or are inadequate.",
-      "text": "표준작업절차서나 작업 지침을 따르지 않거나 미흡하다."
+      "text": "국문 해석을 싣지 않았다 — 원문을 본다."
      }
     ],
     "actions": []
@@ -7754,10 +7728,6 @@
    },
    "deep_analysis": {
     "key_violations": [
-     {
-      "observation": "원료의약품 배치가 시스템 적합성 시험을 수행하지 않은 상태의 동일성 분석 결과로 출하 판정을 받았고, 품질관리 담당자는 시스템 적합성이 수행되었다고 잘못 기록한 채 분석을 검토·승인했다(관찰 1).",
-      "risk": "해당 배치는 2024-06-22에 출하된 것으로 적혀 있다."
-     },
      {
       "observation": "안정성 챔버가 보안이 확보되지 않은 시험실 공개 구역에 있어 접근이 통제되지 않았고, 일부 안정성 시료는 온도 관리·모니터링이 없는 캐비닛에 보관되었다(관찰 2).",
       "risk": ""
@@ -8427,7 +8397,7 @@
     "관찰 4: [가림] 시스템이 기한이 지난 [가림]로 49일째 운영됐고 밸리데이션되지 않은 상태로 제조에 쓰임",
     "관찰 5: 기준일탈 결과의 근본원인·제품 영향 조사와 시정 및 예방조치(CAPA)를 했다는 증거를 제시하지 못함"
    ],
-   "implication": "유효기한이 지난 원료가 제품 제조에 쓰였다(관찰 1). 회사는 유효기한 뒤 사용을 뒷받침하는 과학적 근거나 재시험 자료를 제시하지 못했다(관찰 1). 외부 시험기관 적격성평가는 시험기관이 직접 작성한 점검표에만 의존했다(관찰 1). 회사는 2019년 공정 밸리데이션 뒤 들인 새 설비가 기존 설비와 동등한지 평가한 문서를 제시하지 못했다(관찰 2). 경영진은 기준일탈 결과 추세 분석과 일탈·CAPA 정기 검토를 요구하는 내부 절차가 없다고 진술했다(관찰 3). 회사는 규격 한도 미만 결과를 포함한 [가림] 값으로 2026-04-21 출하를 승인했다(관찰 5). 그 기준일탈에 대한 조사는 문서화되지 않았다(관찰 5). 원료·부품 보관 창고에서는 온도 매핑과 습도 모니터링을 하지 않았다(관찰 6). 세척·위생처리 완료 표시가 붙은 충전기 표면에 검은 잔류물이 보였다(관찰 11).",
+   "implication": "",
    "checks": [
     "출하 판정을 맡은 외부 인력의 권한과 책임을 품질계약으로 정했는가? (관찰 1)",
     "제품마다 연간 제품 품질 평가를 하는가? (관찰 3)",
@@ -8563,7 +8533,7 @@
    "en": {
     "title_issue": "Quality unit authority and OOS investigations",
     "summary": "FDA issued a Form 483 with 11 observations to Topical Pharmaceuticals, Inc., an OTC drug manufacturer, citing quality unit authority and procedures, OOS investigations, annual product reviews, system validation and storage area controls.",
-    "implication": "An expired drug ingredient was used in the manufacture of drug products (Observation 1). The firm could not provide scientific justification or retest data for its use beyond expiration (Observation 1). Qualification of third-party laboratories relied solely on a self-reported checklist completed by the laboratory (Observation 1). The firm could not provide an assessment of whether new equipment introduced after the 2019 process validation was equivalent to the replaced equipment (Observation 2). Management stated that no internal procedure requires OOS results to be trended or deviations and CAPAs to be reviewed regularly (Observation 3). The firm used a [redacted] of results, including results below the specification limit, to approve release on 2026-04-21 (Observation 5). There was no documented investigation into those OOS results (Observation 5). The warehouse storing APIs and components had no temperature mapping or humidity monitoring (Observation 6). A filler bearing cleaned and sanitized status designations had visible black residue on its surfaces (Observation 11).",
+    "implication": "",
     "key_facts": [
      "Observation 1: key personnel responsible for batch release decisions are contractors without quality agreements, and the firm could not provide written procedures for OOS results (repeat observation from 2022)",
      "Observation 3: the firm could not provide annual product reviews for each drug product",
@@ -9967,7 +9937,7 @@
       "observation": "회수 용매의 출납·추적 기록이 충분하지 않다. 회수 용매 저장 탱크의 확인된 양이 장부상 남아야 할 양보다 적은 것으로 보였으며 실사 시점에 맞추지 못했다(관찰 4)."
      }
     ],
-    "inspectional_significance": "관찰 2는 2026-07-13 현장 확인에서 시설 상태가 실사 중 세 번 바뀐 것을 적는다. 관찰 5는 2026-07-13 시험 중 증식 촉진 시험 기록 문제를 적는다.",
+    "inspectional_significance": "",
     "required_remediation": {
      "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
      "items": []
@@ -10097,8 +10067,7 @@
    "key_facts": [
     "관찰 1: 미국 출하 배치 무균 충전 중 열린 병 위에서 개입하고도 병을 제거하지 않았고 개입을 제조기록서에 기록하지 않음",
     "관찰 2: 공정 품질보증 인원이 노출하지 않은 평판을 무균 충전 구역 시료로 기록해 제출함",
-    "관찰 3: 제한출입차단시스템 내부 Grade A 표면 세척을 하지 않았는데 세척 기록에 서명함",
-    "관찰 4: 기류 시각화 시험과 배지충전이 실제 상업 생산 조건을 반영하지 못함"
+    "관찰 3: 제한출입차단시스템 내부 Grade A 표면 세척을 하지 않았는데 세척 기록에 서명함"
    ],
    "implication": "한 작업자는 무균 충전 중 청정실에서 개인 휴대전화를 썼다(관찰 1). 부분 사용한 무균 자재 봉투를 제한출입차단시스템 밖에 보관했다가 다음 배치에 다시 넣을 수 있었다(관찰 1). 2026년 2월 이후 무균 충전한 미국 출하 배치를 검토한 결과 [가림]개 배치는 검토한 표면 모니터링 지점에서 시료를 채취하지 않았다(관찰 2). 실사 중 다시 확인한 평판에서 눈에 보이는 균 증식이 있었고 한 작업자 시료는 한계를 넘었다(관찰 2). 시료채취와 판독 문제를 실사 중 논의한 뒤 Grade A 기준 초과와 Grade B 균 증식이 확인됐다(관찰 2). 미국 출하 배치의 육안검사 불량 한도 초과 일탈에서 조사는 그 물품의 특성을 확인해 출처를 밝히려 하지 않았다(관찰 5).",
    "checks": [
@@ -10194,8 +10163,7 @@
     "key_facts": [
      "Observation 1: during aseptic filling of US batches, interventions over open bottles were made without removing them and were not recorded in the batch record",
      "Observation 2: in-process QA personnel submitted unexposed plates recorded as samples from the aseptic filling area",
-     "Observation 3: cleaning records for Grade A surfaces inside the RABS were signed although the cleaning was not performed",
-     "Observation 4: smoke studies and media fills did not reflect actual commercial manufacturing conditions"
+     "Observation 3: cleaning records for Grade A surfaces inside the RABS were signed although the cleaning was not performed"
     ],
     "checks": [
      "Are all aseptic filling interventions recorded in the batch record? (Observation 1)",
@@ -10390,9 +10358,6 @@
      },
      {
       "observation": "전수 육안검사 허용 기준을 승인된 변경 관리 없이 소급해서 [가림]%로 바꿨다. (관찰 3)"
-     },
-     {
-      "observation": "원료의약품 [가림] 분석기의 전자 데이터를 보관하는 중 삭제 방지 설정이 해제되어 작업자가 데이터 파일을 무단 삭제하는 것이 시연됐다. (관찰 7)"
      },
      {
       "observation": "2026-05-04 원료의약품 배치 생산 중 작업자가 잘못된 시료로 시험한 오류에 대해 2026-05-14 실사관 문의 뒤에야 일탈을 열었다. (관찰 11)"
@@ -13880,8 +13845,7 @@
    "key_facts": [
     "위반 1: 공정 밸리데이션·상업 배치의 여러 안정성 시점 함량 기준일탈을 같은 원인으로 돌리고 상업 배치 출하를 계속함(21 CFR 211.192)",
     "위반 2: 공정 성능 적격성평가 배치가 한 주성분 규격에 부적합했는데도 공정 밸리데이션 보고서를 승인함(21 CFR 211.100(a))",
-    "회신과 FDA 판단: 회사는 시험법 고유의 변동을 원인으로 들었으나 FDA는 이를 뒷받침하는 데이터가 없다며 받아들이지 않음",
-    "당국 조치: 상업 배치 회수, 해당 의약품 제조·유통 중단"
+    "회신과 FDA 판단: 회사는 시험법 고유의 변동을 원인으로 들었으나 FDA는 이를 뒷받침하는 데이터가 없다며 받아들이지 않음"
    ],
    "implication": "재시험으로 확정된 함량 기준일탈을 얻고도 시장 조치를 하지 않았고, 조사는 과학적 근거 없이 열린 채로 남았다(위반 1). FDA는 미국 시장에 남은 유효기간 내 배치의 품질 영향 위험평가가 회신에 없다고 지적했다(위반 1). 공정 밸리데이션 보고서는 입도 분포와 정제 두께의 변동과 제안 범위를 벗어난 결과를 적었으나 그 특성의 규격을 정하지 않았다(위반 2). FDA는 이 의약품의 치료역이 좁아 함량 규격 준수가 중요하다고 밝혔다(위반 2).",
    "checks": [
@@ -13956,8 +13920,7 @@
     "key_facts": [
      "Violation 1: OOS assay results at multiple stability timepoints for process validation and commercial batches were attributed to the same root causes while commercial batches continued to be released (21 CFR 211.192)",
      "Violation 2: the process validation report was approved even though a PPQ batch failed the specification for one active ingredient (21 CFR 211.100(a))",
-     "Response and FDA's assessment: the firm cited inherent analytical method variability, but FDA found the response inadequate because no supporting data was provided",
-     "Agency action: a commercial batch was recalled, and the firm discontinued manufacture and distribution of the drug products"
+     "Response and FDA's assessment: the firm cited inherent analytical method variability, but FDA found the response inadequate because no supporting data was provided"
     ],
     "checks": [
      "Are assay OOS results without a confirmed laboratory error extended to a manufacturing investigation? (Violation 1)",
@@ -19257,7 +19220,7 @@
    },
    "hook_line": "복막투석액 5품목, 백 인쇄 부위 미세 구멍 누출 의심 Class II",
    "en": {
-    "title_issue": "Dialysis bags recalled over pinhole leaks",
+    "title_issue": "Dialysis bags recalled for suspected pinhole leaks",
     "summary": "Five Fresenius Medical Care Renal Therapies Group, LLC products, including DELFLEX peritoneal dialysis solution, were recalled for lack of assurance of sterility (Class II).",
     "implication": "",
     "key_facts": [

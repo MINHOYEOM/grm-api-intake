@@ -4,7 +4,7 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
 이 작업이 그날 이미 했으면 건너뛴다.
 
 ## 읽을 것
-`company/CHARTER.md` · `company/CLOUD.md` · 이 파일. 도구 사용법은 `findings_translate.py --help` 만 본다(코드를 고치지 않는다).
+`company/CHARTER.md` · `company/CLOUD.md` · 이 파일 · `company/translation/PLAYBOOK.md`(용어 일치 지침과 표본 판정의 오류 유형 이름 — 절차 6·12 에 덧붙는다). 도구 사용법은 `findings_translate.py --help` 만 본다(코드를 고치지 않는다).
 
 ## 무엇을 왜
 `findings.finding_text`(영문 원문, 불변)에 국문 `finding_text_ko` 를 채운다. 국문이 없으면 공개 RLS(`006_findings_publish_gate.sql`)가

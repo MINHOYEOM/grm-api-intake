@@ -1,0 +1,263 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-21",
+ "shard": "G",
+ "items": {
+  "fda483-196372": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "멸균 배치가 2022-06-13부터 2022-08-25까지 74일 동안 제조 설비의 세척이나 멸균 없이 이어진 캠페인에서 제조됐고, 공정 모의시험은 이 실제 생산 작업을 대표하지 않았다. (관찰 1)"
+     },
+     {
+      "observation": "충전 라인의 연기 흐름 시험 영상은 화각이 좁아 난류 없는 기류를 보여 주지 못했고, 작업자가 Grade A 충전 라인을 지나가는 개입의 영향을 보이는 시험도 수행되지 않았다. (관찰 2)"
+     },
+     {
+      "observation": "무균 충전 인원은 퇴장할 때마다 장갑과 가운을 모니터링하지 않고 최종 퇴장 시에만 시료를 채취한다. (관찰 3)"
+     },
+     {
+      "observation": "육안검사 인원의 적격성평가 기록이 결함 시험 양식 작성 완료뿐이고, 생산 작업장 인원이 재적격성평가를 승인할 수 있다. (관찰 5)"
+     }
+    ],
+    "inspectional_significance": "한 배지충전에서는 예상 충전 작업 동안 미생물 증식을 막으려고 배지를 두 번 조제했으나, 이는 일상 생산에서 쓰는 방식이 아니다. (관찰 1) 한 무균 작업자는 최근 두 번의 배지충전에서 시료 채취 교육을 받지 않은 채 2023-01-18 이후에도 무균 충전 활동에 계속 참여했다. (관찰 5)",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 준수되지 않는다.",
+     "detail_ko": "구체적으로, a. 공정 모의시험은 미국 시장에 유통되는 멸균 주사제를 만드는 데 쓰는 Unit의 멸균 원료의약품 실제 생산 작업을 대표하지 않는다. 멸균 배치가 2022-06-13부터 2022-08-25까지(74일) 제조 설비의 세척이나 멸균 없이 이어진 제조 캠페인에서 제조됐다. 캠페인 종료 시점과 배지충전 시작 전에, 멸균 제품 접촉 표면이 있는 설비는 다음과 같이 세척됐다. i. 2022-08-26에 일부 설비에 대한 주기가 수행됐다. ii. 2022-08-28에 일부 설비에 대한 주기가 수행됐다. iii. 2022-08-29에 탱크와 원료의약품 충전 라인에 대한 주기가 수행됐다. iv. 이후 추가로 첨가된 용량이 잔류물 수준과 양을 계산하는 데 쓰였다. b. 배지충전에서 위 나열한 설비에 대한 시료를 채취하려고 배수구에 물질을 놓은 것으로 보고됐고, 이후 이 물질은 배지충전 배양에 사용됐다. 배치 기록에는 이에 대한 지침도 문서도 없었다. 또 다른 배지충전에서는 비멸균 물질을 두 가지로 따로 조제해 용해한 뒤 설비 표면에 접촉시켰고, 설비와 접촉한 뒤 모두 배지 용기에 담아 배지충전 배양에 사용했다. 배치 기록에는 이에 대한 지침도 문서도 없었다. 항생제 잔류물을 억제하려고 각 용기에 물질이 쓰였다. d. 또 다른 배지충전에서는 비멸균 물질 두 가지를 따로 조제해 용해하고 옮겼으며, 멸균 조제물은 용해 후 다시 옮겨 원료의약품 충전 라인에서 충전했다. 멸균 처리한 배지 두 가지를 따로 조제해 용기에 채우고 배양했으나, 제품 접촉 표면에 닿는 물질은 첨가되지 않았다. e. 한 배지충전의 배양 기록에는 시험 세부 사항이 없다. i. 일정 온도에서의 배양 날짜와 다른 온도로의 이동이 배지충전 시험 기록에 문서화돼 있지 않다. ii. 성장 촉진 기록에 접종액 확인 문서가 없다. f. 공정 모의시험은 Unit 작업장에서 주사제 배치를 충전하는 데 쓰는 완제품 무균 충전의 실제 생산 작업을 대표하지 않는다. i. 2023-03-24에 충전한 배지충전을 위해 배지 두 번을 조제했다. 첫 번째 조제물은 오전 8:26부터 충전됐고, 두 번째 조제물은 오후 2:03부터 충전됐다. 회사는 예상되는 충전 작업 동안 미생물 증식을 막으려고 배지를 두 번 조제했다고 밝혔으나, 일상 생산에서는 이런 방식을 쓰지 않는다. ii. 충전된 모든 바이알이 배양되지는 않는다. 한 배지충전은 일정 수의 바이알을 충전했으나, 충전만 계획했고 나머지 바이알은 배제됐기 때문에 일부 충전 바이알만 배양했다. iii. 조제한 배지 전부가 배양되지는 않는다. 무균 공정 지침 절차서 QUAL1009.B '완제의약품 무균 공정 모의시험 지침'은 '모의시험의 모든 배지는 배양돼야 한다'고 정하나, 한 탱크의 배지는 배지충전에서 폐기됐다. iv. 배지충전 중 오작동을 바로잡는 개입이 두 번 수행됐다. 회사는 바이알이 언제 충전됐는지 추적해 충전을 특정 개입과 연결할 수 없다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "생산 중 공기 오염이 발생할 수 있는 구역에 오염물질을 관리하는 적절한 배기 시스템이나 그 밖의 시스템이 없다.",
+     "detail_ko": "a. Unit 작업장의 연기 흐름 시험은 난류 없는 기류를 보여 주지 못한다. 이 충전 라인은 주사제 배치를 충전하는 데 쓰였다. 예를 들어 i. 동적 연기 흐름 시험 영상은 바이알, 바이알 트랙 라인을 이동하는 바이알, 마개 체결 동작, 충전 라인 밖으로의 이동을 보여 주나 영상의 화각이 좁다. 영상은 바이알의 근접 장면을 보여 주며 연기가 바이알 충전 라인으로 난류 없이 흐른다는 점을 보여 주지 못한다. ii. 이 시험은 조작 중 연기 흐름에 미치는 영향을 보여 주지 못한다. 연기 흐름 시험 중 15회의 조작이 시연됐으나 연기의 흐름이 작업자가 개입을 수행하는 위치 가까이에 있지 않았다. iii. 연기 흐름 시험 영상은 허용된 개입을 보여 주나 화각이 좁아(바이알 근접 장면뿐) 바이알 충전 라인에서 연기의 흐름에 난류가 없음을 보여 주지 못한다. iv. 작업자는 매 충전 작업마다 충전 라인 뒷면에 접근하려고 Grade A 충전 라인을 지나가야 한다. 이 개입에는 바이알 트랙 라인을 들어 올리고 반대편으로 걸어가는 동작이 필요하다. 바이알 트랙 라인을 들어 올리거나 사람이 Grade A 충전 라인을 지나갈 때의 영향을 보이는 연기 흐름 시험은 수행되지 않았다. b. 다른 Unit 작업장의 연기 흐름 시험은 난류 없는 기류를 보여 주지 못한다. 이 충전 라인은 주사제 배치를 충전하는 데 쓰였다. 예를 들어 i. 동적 연기 흐름 시험 영상은 바이알, 바이알 트랙 라인을 이동하는 바이알, 마개 체결 동작, 충전 라인 밖으로의 이동을 보여 주나 영상의 화각이 좁고, 연기가 충전 라인으로 난류 없이 흐른다는 점을 보여 주지 못한다. ii. 이 시험은 조작 중 연기 흐름에 미치는 영향을 보여 주지 못한다. 10회의 조작이 시연됐으나 연기의 흐름이 작업자가 개입을 수행하는 위치 가까이에 있지 않았다. iii. 바이알이 각 장비에 이르는 경로에서의 연기 흐름이 연기 흐름 시험에 포함되지 않았다. 바이알은 장비 37101에 이르기 전, 장비 37102에 이르기 전, 장비 37103에 이르기 전에 일정 거리를 이동한다. iv. 장비 37102와 37103으로 바이알을 반입하는 연기 흐름 시험은 바이알 이동 중 기류의 영향을 보여 주기에 충분하지 않다."
+    },
+    {
+     "number": "3",
+     "deficiency_ko": "무균 가공 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+     "detail_ko": "구체적으로, a. 충전 라인의 비생균 입자 모니터링 위치가 바이알 트랙 가까이에 있지 않다. 바이알이 이동해 방향을 바꾸는 지점은 바이알 트랙에서 떨어진 위치에 있는 온라인 비생균 입자 포트로 모니터링된다. b. 무균 충전 라인에서 일하는 직원은 절차서 QCJ723L '무균 공정 환경의 미생물 모니터링'이 요구하는 대로 퇴장할 때마다 장갑과 가운을 모니터링하도록 요구받지 않는다. 이 절차서는 Grade A·Grade B 인원에 대해 '무균실을 나가기 전에 작업자는 시료를 채취한다'고 정한다. 모든 완제의약품 충전실의 작업자는 필요에 따라 퇴장할 수 있으나 최종 퇴장 시에만 시료를 채취하도록 요구받는다. c. Unit 작업장에서 멸균 완제의약품 제제화에 쓰는 물질은 사용 지점에서 모니터링되지 않는다. 이 물질은 탱크에 모이고 이 탱크의 물이 주사제 제조에 쓰이나, 사용 지점은 모니터링되지 않는다."
+    },
+    {
+     "number": "4",
+     "deficiency_ko": "시험실 관리에 의약품이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립이 포함돼 있지 않다.",
+     "detail_ko": "구체적으로, a. 미국 시장에 유통되는 멸균 주사제의 무균시험은 용기 안의 미생물 증식 판정을 요구한다. 증식 여부를 판독할 때마다, 그리고 최종 평가 때 확인을 문서화하라는 요건이 없다. b. 환경 모니터링 시료, 물 시료, 제품 바이오버든 시료는 플라스틱 봉지에 담아 배양기에 보관한 배지 평판에서 배양된다. 회사는 이것이 환경 분리균과 스트레스를 받은 다른 균의 증식에 영향을 주지 않음을 보이는 연구를 하지 않았다. c. 배지충전 시료의 성장 촉진 시험에는 미생물 접종액의 확인이 없다."
+    },
+    {
+     "number": "5",
+     "deficiency_ko": "품질관리부서의 책임과 절차가 서면으로 정해져 있지 않다.",
+     "detail_ko": "구체적으로, 회사에는 작업장 Unit의 무균 충전 작업자와 육안검사 인원의 최초·재적격성평가를 감독하는 확립된 교육 절차가 없다. A. 회사에는 작업장 Unit의 교육 프로그램을 규율하는 '제조 및 품질 시스템 인원 교육'이라는 절차서 QUAL116.P가 하나 있다. 이 절차서에는 무균 충전 인원의 가운 착용 적격성평가와 배지충전 참여 요건, 육안검사 인원의 적격성평가 과정에 대한 품질 감독이 없다. 이 절차서는 지정된 교육 각각의 요건을 정하지 못했고, 적격성평가 과정을 식별하지 못했으며, 인원 적격성평가를 검토·승인하는 각 부서에 책임을 위임하지 못했다. B. 회사의 품질 관리자는 육안검사 인원의 적격성평가 기록이 결함 시험 양식(PLA1160.ATCH-02-F03) 작성 완료뿐임을 인정했다. 검토자 서명이 항상 품질보증 인원인 것은 아니며, 육안검사 인원은 생산 작업장 인원에 의해 재적격성평가를 승인받을 수 있다. C. 의사에게서 받은 시력 검사 기록은 수행된 시험 평가의 세부 사항을 제공하지 않는다. 이 시험이 원거리 시력과 근거리 시력을 시험했는지 논의하지 않는다. 또한 육안검사 적격성평가를 위해 이 기록을 검토하는 절차에 관한 논의가 없다. 품질 관리자는 시력 검사 정보가 인원 적격성평가를 위해 검토되지 않음을 확인했다. D. 2022-06-01자 배지충전 배치 기록과 2023-01-12자 배치 기록을 검토한 결과, 한 무균 작업자가 두 배지충전 중 어느 쪽에서도 시료 채취 교육을 받지 않았다. 2023-01-18자 모의시험 계획서와 보고서는 이 작업자가 시료 채취 교육을 마쳐야 한다고 정하나, 최근 두 번의 배지충전 동안 완료한 것으로 나타나지 않는다. 이 작업자는 2023-01-18 이후에도 작업자로서 무균 충전 활동에 계속 참여하고 있다. 작업자를 서로 다른 역할과 과업으로 구분하고 각기 다른 배지충전 요건을 두는 절차가 없다."
+    }
+   ]
+  },
+  "fda483-196408": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "훈증 밸리데이션 보고서가 닿기 어려운 구역에 생물학적 지표를 놓은 과학적 근거를 충분히 평가하지 않았다. (관찰 1)"
+     },
+     {
+      "observation": "2021-04-23 폐쇄회로 영상에서 작업자의 팔이 RABS의 Grade A 구역 안으로 뻗었으나, 작업자 진입 뒤 소독제로 Grade A 구역을 닦는 것과 같은 세척 지시를 정한 승인된 절차가 없었다. (관찰 1)"
+     },
+     {
+      "observation": "보관 시료에서 100% 육안검사 중 배제되지 않은 결함 바이알이 여러 개 확인됐다. (관찰 2)"
+     },
+     {
+      "observation": "충전 설비 4대의 설비 일지에 세척·유지보수 활동에 대한 2인 확인이 문서화돼 있지 않았다. (관찰 3)"
+     }
+    ],
+    "inspectional_significance": "품질 담당 책임자는 시료 채취 교육을 받지 못한 무균 작업자에 대해 확인하지 않았다. (관찰 1) 훈증 밸리데이션 보고서는 2020-06-22, 2020-07-27, 2020-10-13에 승인됐다. (관찰 1) 보관 시료에는 제품·배치마다 결함 바이알이 무작위로 선택돼 포함돼 있었다. (관찰 2)",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "무균 가공 구역의 청정 상태를 만들기 위한 실·설비의 세척 및 소독 시스템이 미흡하다.",
+     "detail_ko": "구체적으로, A) 훈증: 실사관은 훈증 밸리데이션 연구와 관련된 다음 문서를 검토했다. '시설 훈증 밸리데이션 보고서'(SV-FUS 01, 승인일 2020-06-22), '시설 훈증 밸리데이션 보고서'(SV-FUS 01, 승인일 2020-10-13), '시설 훈증 밸리데이션 보고서'(SV-FUS 01, 승인일 2020-07-27). 이 밸리데이션 보고서는 닿기 어려운 구역에 생물학적 지표를 놓은 과학적 근거를 충분히 평가하지 않아 미흡하다. 예를 들어 여러 Unit에 RABS가 있고, 밸리데이션 중 RABS에는 생물학적 지표로 챌린지하지 않았다. B) 2021-04-23 실사관은 무균 원료의약품 배치 제조에 대한 Unit의 폐쇄회로(CCTV) 영상을 검토했다. 작업자의 팔이 RABS의 Grade A 구역 안으로 뻗는 것이 관찰됐다. 작업장 관리자도 작업자가 진입한 뒤 Grade A 구역을 소독제로 닦는 것과 같은 세척 지시를 제공하는 승인된 절차가 없음을 확인했다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 준수되지 않는다.",
+     "detail_ko": "구체적으로, 절차서 PLA1160 '육안검사 작업 절차'는 결함(치명·중요·경미)의 종류를 정의하고, 작업자가 충전된 바이알을 100% 확인해 치명·중요·경미 결함 기준에 해당하는 바이알을 배제하도록 정한다. 보관·참조 시료를 검토하던 중 100% 육안검사에서 배제되지 않은 결함 바이알이 여러 개 있음을 확인했다. 확인된 제품·배치 번호마다 약간의 바이알을 검토 중 무작위로 골랐다. 예로 제품, 배치 번호, 제조일, 결함 범주, 결함 바이알 수를 표로 정리했다."
+    },
+    {
+     "number": "3",
+     "deficiency_ko": "세척·유지보수를 이중 확인하는 사람이 설비 세척·사용 일지에 날짜·서명·약자를 기재하지 않는다.",
+     "detail_ko": "구체적으로, 실사관은 설비 일지를 검토했고 수행된 활동에 대한 2인 확인이 설비 일지에 문서화돼 있지 않음을 확인했다. 예를 들어 다음 설비 일지에는 수행된 활동에 대한 2인 확인이 없었다. 설비 ID FD36102 RABS 충전, 설비 ID RABS36101 충전기, 설비 ID SF36301 충전기, 설비 ID SF36401."
+    }
+   ]
+  },
+  "fda483-196650": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "원료의약품 세척 밸리데이션이 비전용 부품의 시료 채취나 분석 확인을 포함하지 않았다. (관찰 1)"
+     },
+     {
+      "observation": "원료의약품과 중간체 제조에 쓰는 설비의 측정 기능이 2019년 적격성평가 이후 재교정되거나 확인되지 않았다. (관찰 1)"
+     },
+     {
+      "observation": "최초 공정 성능 적격성평가(PPQ)의 균질성 시험에 출하 규격의 품질 특성인 입도 분포 시험이 포함되지 않았다. (관찰 2)"
+     }
+    ],
+    "inspectional_significance": "공정 변경 뒤 후속 PPQ에서 입도에 대한 균질성 평가가 다시 수행되지 않았다. (관찰 2) 입도를 개선하려고 원료의약품의 한 공정 단계를 추가로 변경했다. (관찰 2)",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "설비의 세척과 교정에 관한 서면 절차가 충분히 기술돼 있지 않거나 충분히 준수되지 않는다.",
+     "detail_ko": "구체적으로, A. 세척 밸리데이션 프로그램은 모든 설비에 대한 분석 확인을 포함하지 않는다. 예를 들어 원료의약품에 대한 세척 밸리데이션에는 이 부품을 시료 채취에서 제외하는 것을 밸리데이션하고 세척 공정이 분석상 허용 가능한 수준까지 세척할 수 있음을 보증하는, 비전용 부품의 시료 채취나 분석 확인이 포함되지 않았다. 이 부품은 원료의약품 제조의 한 공정 단계에서 쓰인다. B. 원료의약품 제조 중 사용하는 설비는 성능을 확인하려고 정기적으로 교정되지 않는다. 중간체와 원료의약품 제조에 쓰는 최소 일부 설비의 관련 측정 기능은 2019년 적격성평가 이후 재교정되거나 확인되지 않았다. 이 항목은 원료의약품 제조 공정 전반의 여러 단계에서 기록되는 정의된 변수다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "공정 밸리데이션 활동이 제조 공정이 사전에 정한 품질 특성을 충족하는 원료의약품을 재현성 있게 제조할 수 있음을 충분히 입증하지 못한다.",
+     "detail_ko": "구체적으로, 원료의약품의 최초 공정 성능 적격성평가(PPQ) 중 수행한 균질성 시험은 함량, 유연물질, 잔류 용매, 수분 함량을 평가했다. 그러나 입도 분포 시험은 균질성 시험(해당 물질 포함)의 일부로 포함되지 않았으며, 입도 분포는 출하 규격의 품질 특성이다. 또한 원료의약품의 입도에 기인한 후속 공정 문제 때문에 한 공정이 이 원료의약품에 도입됐다. 입도를 개선하려고 원료의약품의 한 공정 단계도 추가로 변경됐다. 그러나 이후 PPQ 중 균질성 평가는 입도에 대해 다시 수행되지 않았다. 또한 입도를 포함한 균질성은 한 PPQ의 일부로 수행됐으나, 이 공정은 원래 제조 공정과 동일하지 않아 해당 공정이 없는 배치의 균질성을 대표하지 않는다."
+    }
+   ]
+  },
+  "0f3a6eeb815d": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.165(a) and 211.165(b)",
+      "original": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release. Your firm also failed to conduct appropriate laboratory testing, as necessary, for each batch of drug product required to be free of objectionable microorganisms (21 CFR 211.165(a) and 211.165(b)). Your firm manufactures OTC drug products such as (b)(4) which are labeled as “sterile.” Based on the records and information provided, you do not demonstrate that you conduct adequate finished drug product testing including microbiological tests on your OTC drug products. For example, you indicate that you do not test each batch of finished drug product for conformance to product release specifications before each batch release. This includes not conducting sterility testing on your drug product purporting to be sterile. Testing is an essential part of CGMP to ensure that the drug products you manufacture conform to all pre-determined quality attributes appropriate for their intended use. Drug products must be tested for identity and strength of the active ingredient, prior to release and distribution. Without adequate testing, you do not have scientific evidence to assure that your drug products conform to appropriate specifications before release.",
+      "description": "회사는 출하 전에 각 의약품 배치가 유효 성분의 확인과 함량을 포함한 최종 규격에 적합하다는 적절한 시험실 판정을 받지 못했다. 또한 객관적 미생물이 없어야 하는 각 의약품 배치에 필요한 적절한 시험실 시험도 하지 못했다. 회사는 '멸균'으로 표시된 [가림] 등 일반의약품(OTC)을 제조한다. 제출한 기록과 정보에 근거할 때, 회사가 미생물 시험을 포함한 적절한 완제의약품 시험을 한다는 점이 입증되지 않는다. 예를 들어 회사는 각 배치를 출하하기 전에 제품 출하 규격 적합성을 시험하지 않는다고 밝혔다. 여기에는 멸균을 표방하는 의약품에 대한 무균시험을 하지 않은 것이 포함된다. 시험은 CGMP의 필수 부분이며, 회사가 제조하는 의약품이 의도한 용도에 맞게 미리 정한 모든 품질 특성에 적합함을 보증한다. 의약품은 출하·유통 전에 유효 성분의 확인과 함량을 시험해야 한다. 적절한 시험이 없으면, 출하 전에 의약품이 적절한 규격에 적합하다고 보증할 과학적 근거가 없다.",
+      "risk": "서한은 회사가 '멸균'으로 표시한 제품이 실제로 멸균임을 입증하지 못했다고 적었다."
+     },
+     {
+      "citation": "21 CFR 211.100(a)",
+      "original": "Your firm failed to establish written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)). Based on the records and information you provided, you do not demonstrate that your manufacturing processes are reproducible and controlled to yield a product of uniform character and quality. Specifically, your response states that your firm does not have process validation procedures or process validation studies. This includes not conducting studies to demonstrate your process can ensure sterility of a drug product purporting to be sterile.",
+      "description": "회사는 제조하는 의약품이 표방하는 확인·함량·품질·순도를 갖추도록 설계된 생산 및 공정 관리의 서면 절차를 수립하지 못했다. 제출한 기록과 정보에 근거할 때, 회사의 제조 공정이 재현 가능하고 관리되어 균일한 특성과 품질의 제품을 만든다는 점이 입증되지 않는다. 구체적으로, 회사의 회신은 회사에 공정 밸리데이션 절차나 공정 밸리데이션 연구가 없다고 밝혔다. 여기에는 멸균을 표방하는 의약품의 무균성을 공정이 보증할 수 있음을 보이는 연구를 하지 않은 것이 포함된다."
+     },
+     {
+      "citation": "21 CFR 211.22",
+      "original": "Your firm’s quality unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). Based on the records and information you provided, you do not demonstrate that your quality unit (QU) has adequately exercised its responsibilities and authority for the manufacture of your OTC drug products. For example, your QU failed to ensure the following: Adequate laboratory control procedures to ensure that drug products conform to appropriate standards of identity, strength, quality and purity (21 CFR 211.160(b)). The establishment of an adequate ongoing stability program (21 CFR 211.166(a)).",
+      "description": "회사의 품질부서는 제조된 의약품이 CGMP를 준수하고 확인·함량·품질·순도의 확립된 규격을 충족하도록 보증할 책임을 이행하지 못했다. 제출한 기록과 정보에 근거할 때, 회사의 품질부서가 OTC 의약품 제조에 대한 책임과 권한을 적절히 행사했다는 점이 입증되지 않는다. 예를 들어 품질부서는 다음을 보증하지 못했다. 의약품이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하는 적절한 시험실 관리 절차(21 CFR 211.160(b)). 적절한 지속적 안정성 프로그램의 수립(21 CFR 211.166(a))."
+     }
+    ],
+    "fda_evaluation": "FDA는 2026-01-20 요청에 대해 회사가 제출한 기록과 이후 연락을 검토했다. FDA는 이 기록과 정보에 근거할 때 회사가 미생물 시험을 포함한 적절한 완제의약품 시험을 하고 있음이 입증되지 않는다고 적었다. (위반 1) FDA는 같은 근거에서 회사의 제조 공정이 재현 가능하고 관리된다는 점이 입증되지 않는다고 적었다. (위반 2) FDA는 회사의 품질부서가 책임과 권한을 적절히 행사했음이 입증되지 않는다고 적었고, 회사의 품질 시스템이 부적절하다고 적었다. (위반 3)",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 안에 서면으로 회신한다.",
+     "items": [
+      "회신을 CDER-OC-OMQ-Communications@fda.hhs.gov로 보낸다.",
+      "회신 이메일 제목에 FEI 3013504845와 ATTN: Rory Geyer를 적는다.",
+      "제품이 FD&C Act와 FDA 규정을 위반하지 않았음을 보여 주는 정보가 있으면 회신에 포함한다."
+     ]
+    },
+    "administrative_risks": "FDA는 2026-09-30에 이 회사에서 수입용으로 제공된 모든 의약품을 Import Alert 66-40에 올렸다고 적었다. FDA는 2026-10-21 전화회의에서 '멸균'으로 표시된 사용기한 내 전 로트의 회수를 권고했고, 회사는 2026-10-22에 회수에 동의했다고 적었다. FDA는 위반이 모두 해결되고 CGMP 준수가 확인될 때까지 이 회사를 의약품 제조업체로 적은 신규 신청서나 보충 신청서의 승인을 보류할 수 있다고 적었다. FDA는 시정조치 이행을 확인하려고 실사할 수 있다고 적었다."
+   },
+   "violations_ko": [
+    {
+     "number": "1",
+     "statement_ko": "회사는 각 의약품 배치에 대해 출하 전 유효 성분의 확인과 함량을 포함한 최종 규격에 대한 적절한 시험실 적합 판정을 받지 못했다. 또한 객관적 미생물이 없어야 하는 각 의약품 배치에 필요한 적절한 시험실 시험을 하지 못했다 (21 CFR 211.165(a) 및 211.165(b))."
+    },
+    {
+     "number": "2",
+     "statement_ko": "회사는 제조하는 의약품이 표방하는 확인·함량·품질·순도를 갖추도록 설계된 생산 및 공정 관리의 서면 절차를 수립하지 못했다 (21 CFR 211.100(a))."
+    },
+    {
+     "number": "3",
+     "statement_ko": "회사의 품질부서는 제조된 의약품이 CGMP를 준수하고 확인·함량·품질·순도의 확립된 규격을 충족하도록 보증할 책임을 이행하지 못했다 (21 CFR 211.22)."
+    }
+   ]
+  },
+  "ed75ff499f75": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.192",
+      "original": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). You failed to adequately investigate multiple out-of-specification (OOS) and out-of-limit (OOL) results from your drug component and over-the-counter (OTC) drug product testing. For example: Your (b)(4) assay result for (b)(4) Lot (b)(4) drug product exceeded the (b)(4) % specification limit, and retesting confirmed the OOS result. Instead of rejecting the entire lot, you released most of the lot based on passing results obtained from additional limited sampling which did not ensure all drug products released met your (b)(4) assay specification.",
+      "description": "회사는 배치나 그 구성 성분이 규격을 충족하지 못한 설명되지 않은 불일치나 실패를, 그 배치가 이미 출하됐는지 여부와 관계없이 철저히 조사하지 못했다. 회사는 의약품 구성 성분과 일반의약품(OTC) 시험에서 나온 여러 기준일탈(OOS) 결과와 한도 이탈 결과를 적절히 조사하지 못했다. 예를 들어, 한 의약품 로트의 함량시험 결과가 규격 한도를 초과했고 재시험도 기준일탈(OOS) 결과를 확인했다. 회사는 로트 전체를 불합격시키지 않고, 추가로 제한적으로 시료를 채취해 얻은 합격 결과를 근거로 로트 대부분을 출하했다. 이 추가 시료 채취는 출하한 모든 의약품이 함량 규격을 충족함을 보증하지 못했다.",
+      "risk": "서한은 로트 일부만 불합격시키는 관행이 회사에 잘 관리된 제조·출하 절차가 없다는 표시라고 적었다."
+     },
+     {
+      "citation": "21 CFR 211.160(b)",
+      "original": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)). (b)(4) Specifications Your (b)(4) specification limit for (b)(4) (e.g. not more than (b)(4) parts per million) exceeded the (b)(4) USP monograph specification limit (e.g., not more than (b)(4) parts per million). The review of your (b)(4) OOS investigations conducted between 2024 and 2026 documented (b)(4) measurements as high as (b)(4) ppm.",
+      "description": "회사는 구성 성분, 의약품 용기, 마개, 공정 중 물질, 표시, 의약품이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격, 기준, 시료채취 계획, 시험 절차를 포함하는 시험실 관리를 수립하지 못했다. 회사의 [가림] 규격 한도는 USP 각조 규격 한도를 초과했다. 2024년부터 2026년까지 수행한 기준일탈(OOS) 조사를 검토한 결과 측정값이 [가림] ppm까지 높게 기록돼 있었다."
+     },
+     {
+      "citation": "21 CFR 211.84(d)(1)",
+      "original": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product (21 CFR 211.84(d)(1)). You failed to perform adequate identity testing of each incoming lot of (b)(4) used as a component in the manufacture of your OTC (b)(4) drug products. For example, you failed to adequately test your incoming (b)(4) , used as an active ingredient, for (b)(4) . Identity testing of high-risk drug components, such as (b)(4) , includes limit tests in the USP to ensure that the component meets the relevant safety limits for (b)(4) levels. Because you did not perform identity testing on each shipment of each lot using the USP identification test that detects hazardous impurities, you failed to ensure the acceptability of these components for use in the manufacture of your drug products.",
+      "description": "회사는 의약품 구성 성분마다 확인을 위한 시험을 최소 하나 수행하지 못했다. 회사는 OTC 의약품 제조에 구성 성분으로 쓰는 입고 로트 각각에 대해 적절한 확인시험을 수행하지 못했다. 예를 들어 유효 성분으로 쓰는 입고 원료를 적절히 시험하지 못했다. 고위험 의약품 구성 성분의 확인시험에는 해당 구성 성분이 관련 안전 한도에 적합한지 확인하는 USP의 한도시험이 포함된다. 회사는 위험한 불순물을 검출하는 USP 확인시험으로 각 입고분의 각 로트를 시험하지 않았으므로, 이 구성 성분이 의약품 제조에 쓰기에 적합함을 보증하지 못했다."
+     },
+     {
+      "citation": "21 CFR 211.194(a)",
+      "original": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)). You failed to exercise appropriate controls over your computerized systems. During the inspection, you admitted to preserving raw chromatographic data but failing to retain the processed chromatograms. Additionally, you lacked adequate controls for the spreadsheets and documents used for CGMP data entry, review, and retention. During the inspection, our investigator identified several uncontrolled and unlocked worksheets containing CGMP trending data for the (b)(4) system, leaving the data vulnerable to alteration or deletion.",
+      "description": "회사는 시험실 기록이 확립된 규격과 기준에 대한 적합성을 보증하는 데 필요한 모든 시험에서 나온 완전한 데이터를 포함하도록 보증하지 못했다. 회사는 전산화 시스템에 대한 적절한 관리를 하지 못했다. 실사 중 회사는 원시 크로마토그래피 데이터는 보존하지만 처리된 크로마토그램은 보관하지 못했음을 인정했다. 또한 CGMP 데이터 입력, 검토, 보관에 쓰는 스프레드시트와 문서에 대한 적절한 관리가 없었다. 실사 중 실사관은 [가림] 시스템의 CGMP 경향 데이터를 담은, 관리되지 않고 잠겨 있지 않은 워크시트 여러 개를 확인했고, 이 데이터는 변경이나 삭제에 노출돼 있었다."
+     }
+    ],
+    "fda_evaluation": "FDA는 2026-08-11 Form FDA 483 회신을 상세히 검토했다. FDA는 회신의 위반 1 대응이 부적절하다고 적었고, 소급 배치 검토의 범위와 기준이 정해지지 않았으며 시료 채취 전략에 과학적 타당성이 없다고 적었다. (위반 1) FDA는 USP 규격에 맞지 않는 [가림]으로 제조한 의약품의 위험 평가가 없다고 적었다. (위반 2) FDA는 [가림] 오염 시료 시험 결과나 USP 각조의 확인시험을 일상적으로 수행하겠다는 약속이 회신에 없다고 적었다. (위반 3) FDA는 소급 데이터 완전성 평가가 어떻게 모든 간극을 찾아낼지 설명이 없고, 절차 확정과 소프트웨어 평가·밸리데이션의 일정도 없다고 적었다. (위반 4)",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 안에 서면으로 회신한다.",
+     "items": [
+      "최초 실사일부터 지난 3년간 미국 제품의 무효화된 기준일탈(OOS) 결과 전체(공정 중, 출하, 안정성 시험 포함)에 대한 소급 독립 검토와 결과 요약 보고서를 제출한다. (위반 1)",
+      "기준일탈(OOS) 결과와 한도 이탈 결과 조사 시스템의 포괄적 검토와 시정 및 예방조치(CAPA) 계획을 제출한다. (위반 1)",
+      "[가림] 시스템 실패가 미국에 유통 중이거나 사용기한 내인 모든 완제의약품 로트의 품질에 미친 영향의 상세 위험 평가와, 고객 통지·제품 회수 같은 조치를 제출한다. (위반 1)",
+      "시험실 관행, 절차, 방법, 설비, 문서, 분석자 역량의 포괄적 독립 평가와 시험실 시스템 시정 계획을 제출한다. (위반 2)",
+      "총 균수와 균종 동정에 쓴 미생물 시험법의 용도 적합성에 대한 포괄적 평가와 시정 및 예방조치(CAPA)를 제출한다. (위반 2)",
+      "독립 제3자 검토 후 제품별 시험법의 특이성, 검출한계, 완건성, 재현성, 반복성을 다룬 갱신 밸리데이션 계획서와 최종 보고서를 제출한다. (위반 2)",
+      "확인시험과 균종 동정을 포함한 갱신 분석 절차를 제출한다. (위반 2)",
+      "적합한 [가림] 시스템을 운영하기 위한 시정 계획을 제출한다. (위반 2)",
+      "입고 구성 성분 로트마다 시험·출하에 쓰는 화학 및 미생물 품질관리 규격을 제출한다. (위반 3)",
+      "각 구성 성분 로트를 확인·함량·품질·순도의 모든 규격에 대해 어떻게 시험할지 설명하고, 입고 로트마다 최소 하나의 확인시험을 수행하겠다고 약속한다. (위반 3)",
+      "서한 날짜로부터 30일 안에 사용기한 내인 모든 구성 성분 로트의 보관시료 시험 결과를 제출하겠다고 약속한다. 보관시료가 없으면 해당 완제의약품 배치의 보관시료를 시험한다. (위반 3)",
+      "제조·시험실 운영의 문서 시스템에 대한 포괄적 평가와 시정 및 예방조치(CAPA) 계획을 제출한다. (위반 4)",
+      "크로마토그래피 피크 처리법의 갱신 밸리데이션과, 처리된 크로마토그램이 컴퓨터 시스템에 보관됨을 보여 주는 증거를 제출한다. (위반 4)",
+      "회신 이메일 제목에 FEI 1520307과 ATTN: Christopher Keating을 적는다."
+     ]
+    },
+    "administrative_risks": "FDA는 미해결 위반이 다른 연방 기관의 계약 수여를 막을 수 있다고 적었다. FDA는 위반을 해결하지 않으면 수출 증명서 발급을 보류할 수 있다고 적었다. FDA는 위반이 모두 해결되고 CGMP 준수가 확인될 때까지 이 회사를 의약품 제조업체로 적은 신규 신청서나 보충 신청서의 승인을 보류할 수 있다고 적었다. FDA는 시정조치 이행을 확인하려고 재실사할 수 있다고 적었다."
+   },
+   "violations_ko": [
+    {
+     "number": "1",
+     "statement_ko": "회사는 배치나 그 구성 성분이 규격을 충족하지 못한 설명되지 않은 불일치나 실패를, 그 배치가 이미 출하됐는지 여부와 관계없이 철저히 조사하지 못했다 (21 CFR 211.192)."
+    },
+    {
+     "number": "2",
+     "statement_ko": "회사는 구성 성분, 의약품 용기, 마개, 공정 중 물질, 표시, 의약품이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격, 기준, 시료채취 계획, 시험 절차를 포함하는 시험실 관리를 수립하지 못했다 (21 CFR 211.160(b))."
+    },
+    {
+     "number": "3",
+     "statement_ko": "회사는 의약품 구성 성분마다 확인을 위한 시험을 최소 하나 수행하지 못했다 (21 CFR 211.84(d)(1))."
+    },
+    {
+     "number": "4",
+     "statement_ko": "회사는 시험실 기록이 확립된 규격과 기준에 대한 적합성을 보증하는 데 필요한 모든 시험에서 나온 완전한 데이터를 포함하도록 보증하지 못했다 (21 CFR 211.194(a))."
+    }
+   ]
+  },
+  "admin-2026008256": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "｢약사법｣ 제62조제11호",
+      "original": "품질부적합: 성상",
+      "description": "해당 품목이 품질부적합(성상)으로 판정됐다."
+     }
+    ],
+    "disposition_basis": "처분은 해당품목 제조업무정지 3개월이며, 정지 기간은 2026-12-02부터 2027-03-01까지다. 처분문의 최종처분일자는 2026-11-18이고 공개종료일자는 2027-06-01이다. 처분문은 적용법령으로 ｢약사법｣ 제62조제11호, ｢약사법｣ 제76조제1항제4호와 제76조제3항을 적었다.",
+    "required_remediation": {
+     "deadline": "해당품목 제조업무정지 3개월(2026-12-02~2027-03-01)",
+     "items": [
+      "해당품목 제조업무정지 3개월(2026-12-02~2027-03-01)"
+     ]
+    },
+    "administrative_risks": "처분문은 처분의 기준으로 ｢의약품 등의 안전에 관한 규칙｣ 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제39호 라목 11)을 적었다."
+   }
+  }
+ }
+}

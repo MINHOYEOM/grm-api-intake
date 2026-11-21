@@ -1,1 +1,1 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{"status":"완료","round":1,"worker":"델타-2","fixed":[{"id":"fda483-196417","shard":"D","changed":["en.title_issue"]},{"id":"fda483-196443","shard":"E","changed":["summary"]}],"unfixed":[]}

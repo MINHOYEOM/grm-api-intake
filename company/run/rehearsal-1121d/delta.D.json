@@ -308,7 +308,7 @@
     "보관 검체를 유효기간 동안 매년 육안 확인하는가? (관찰 4)"
    ],
    "en": {
-    "title_issue": "Negative control OOS failures not investigated",
+    "title_issue": "Negative control OOS not thoroughly investigated",
     "hook_line": "Three negative control failures were each treated as isolated analyst errors",
     "summary": "FDA issued a Form 483 with 4 observations to LGM Pharma Solutions, LLC, an API and drug manufacturer in the US, citing control of variability in tablet production, assay specifications and method validation, OOS investigations and visual examination of reserve samples.",
     "key_facts": [

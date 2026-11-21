@@ -99,6 +99,8 @@ python company/editorial/rehearsal_check.py ../_rehearsal-{회차}/company/run/r
 3. `copyedit.json` 의 코드 검사가 `ran: true`, `exit: 0` 이다.
 4. 교열 reject 가 0 이다 — 재작업 1회(`next/RUN.md` 5-1항)를 거친 2차 판정이어도 된다. 그때는 `rework.json` 이 `완료` 이고 1차 기록 `copyedit.r1.json` 이 남아 있어야 한다. (실발행의 마감 조건과 같다 — `copyedit.md` 4번은 코드 검사 exit 0 **이고** reject 0 일 때만 반납한다. reject 가 하나라도 있으면 월요일에는 반납하지 않고 09:30 백업이 발행한다. 그래서 `copyedit.json` 이 `완료`·exit 0 이어도 reject 가 남았으면 그 회차는 성공이 아니다.)
 4-1. 교열이 카드를 전부 원문과 맞춰 봤다 — `copyedit.json` 의 카드 줄마다 `checked` 근거가 있고, `copyedit_evidence.py check` 와 같은 함수로 근거의 원문 조각이 그 카드 원문에 글자 그대로 있다(리허설 1121b: 표본 17장만 읽고 153장 `reject 0` — 이 항목이 없어 통과로 보였다).
+4-2. 심층에서만 걸린 반려 카드가 남아 있지 않다 — 교열이 `blank_slots.py deep-auto` 를 돌렸다(`next/copyedit.md` 2-4). `완료` 회차에 심층 삭제 주의가 있으면 뺀 기록 `slot_removals.json` 이 실행 폴더에 있다
+   (리허설 1121b: 반려 21장 중 12장이 심층에서만 걸려 10장 상한을 넘겼다 — 대표 결정으로 심층은 코드가 빼고 통과, 재작업 상한 25장).
 5. `scaffold.json` 이 그 날짜의 것이고 델타의 카드를 전부 갖고 있다. handoff 의 모든 행이 상태를 하나씩 받는다(발행·미채택·보류·오류 중 하나 — 빈 행 0).
 6. (사람) Notion·main·날짜 브랜치에 리허설이 쓴 것이 없다 — Notion handoff·Intake 행의 마지막 수정 시각, `git log origin/main`, `git ls-remote origin 'claude/company-20*'` 로 본다.
 

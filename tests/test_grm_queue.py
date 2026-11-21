@@ -1328,7 +1328,7 @@ class EditorialGitHandoffTest(unittest.TestCase):
                                   "counts": {"reject": 0}})
             put("scaffold.json", {"brief": {"run_date_kst": "2026-11-16"}, "cards": [{"id": "a"}]})
             results = rc.check(folder, hp)
-            self.assertEqual([ok for _, _, ok, _ in results], [True] * 6, results)
+            self.assertEqual([ok for _, _, ok, _ in results], [True] * 7, results)
             # 스캐폴드가 다른 날짜면 5번, 교열 reject 가 있으면 4번(근거 없는 reject 는 4-1 도), 지문이 다르면 1번이 실패한다.
             put("scaffold.json", {"brief": {"run_date_kst": "2026-11-09"}, "cards": [{"id": "a"}]})
             put("copyedit.json", {"status": "완료", "code_gate": {"ran": True, "exit": 0},
@@ -1337,7 +1337,14 @@ class EditorialGitHandoffTest(unittest.TestCase):
             put("desk.json", {"status": "완료", "handoff_ref": dict(ref, sha256="0" * 64),
                               "shards": {"delta": {"A": ["a"]}, "deep": {}}})
             self.assertEqual([ok for _, _, ok, _ in rc.check(folder, hp)],
-                             [False, True, True, False, False, False])
+                             [False, True, True, False, False, True, False])
+            # 4-2: 심층 칸에서만 걸린 반려가 남았으면(blank_slots.py deep-auto 를 안 돌렸다) 실패한다.
+            put("copyedit.json", {"status": "보류", "code_gate": {"ran": True, "exit": 0},
+                                  "cards": [{"web_card_id": "a", "verdict": "reject", "fails": [
+                                      {"item": "자가점검 9", "slot": "deep.key_violations[0].observation", "evidence": "e"}]}],
+                                  "counts": {"reject": 1}})
+            got = {num: ok for num, _, ok, _ in rc.check(folder, hp)}
+            self.assertFalse(got["4-2"])
 
 
 class CompareTest(unittest.TestCase):

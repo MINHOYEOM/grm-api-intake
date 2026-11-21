@@ -105,6 +105,113 @@ class BlankSlotsTest(unittest.TestCase):
                 with open(p("out.json"), encoding="utf-8") as f:
                     self.assertEqual(json.load(f)["cards"]["a"]["key_facts"], ["사실 1", "사실 2"])
 
+    # ── 심층 삭제(copyedit.md 2-4 · 리허설 1121b) ─────────────────────────────
+    @staticmethod
+    def _deep483():
+        return {"p": {"deep_analysis": {
+            "key_violations": [{"observation": "지적 0"}, {"observation": "지적 1"}, {"observation": "지적 2"}],
+            "inspectional_significance": "의미", "required_remediation": {"deadline": "d", "items": []},
+            "administrative_risks": ""},
+            "observations_ko": [{"number": "1", "deficiency_ko": "결함", "detail_ko": "추정한 값"},
+                                {"number": "2", "deficiency_ko": "결함 2", "detail_ko": "멀쩡"}],
+            "source_text": "원문"},
+            "w": {"deep_analysis": {"key_violations": [{"description": "x"}, {"description": "y"}],
+                                    "fda_evaluation": "평가", "required_remediation": {"deadline": "d", "items": ["i0"]},
+                                    "administrative_risks": "위험"},
+                  "violations_ko": [{"number": "1", "statement_ko": "위반"}]},
+            "h": {"ncr_ko": {"outcome_ko": "결과", "s9_ko": "추정", "s9_title_ko": "제목"}}}
+
+    def _deep_apply(self, *slots):
+        deep = self._deep483()
+        reqs = [(s.split(":", 1)[0], s.split(":", 1)[1], "사유") for s in slots]
+        log = []
+        problems, done = bs.apply_blanks({"cards": {}}, deep, [], reqs, log)
+        return deep, problems, done, log
+
+    def test_deep_auto_turns_deep_only_rejects_into_pass_and_counts_the_rest(self):
+        ce_ = {"cards": [
+            {"web_card_id": "p", "verdict": "reject", "fails": [
+                {"item": "자가점검 9", "slot": "deep.observations_ko[0].detail_ko", "evidence": "가린 값 추정"}]},
+            {"web_card_id": "m", "verdict": "reject", "fails": [
+                {"item": "자가점검 9", "slot": "deep.fda_evaluation", "evidence": "e"},
+                {"item": "자가점검 2", "slot": "title_issue", "evidence": "e"}]},
+            {"web_card_id": "q", "verdict": "pass", "fails": [], "checked": [
+                {"slot": "deep.key_violations[1].observation", "claim": "x", "absent": True}]}],
+            "rework": {"cards": ["p", "m"]}}
+        converted, remaining, added = bs.deep_auto(ce_)
+        self.assertEqual((converted, remaining), (["p"], ["m"]))
+        self.assertEqual(added, ["q.deep.key_violations[1].observation"])
+        p = ce_["cards"][0]
+        self.assertEqual((p["verdict"], p["fails"]), ("pass", []))
+        self.assertEqual(p["notes"][0]["item"], bs.DEEP_ITEM)
+        self.assertEqual(ce_["rework"]["cards"], ["m"])
+        self.assertEqual((ce_["counts"]["reject"], ce_["counts"]["pass"]), (1, 2))
+        self.assertEqual(bs.deep_auto(ce_)[:2], ([], ["m"]))           # 다시 돌려도 같다
+        self.assertEqual(len(bs.deep_requests(ce_)), 2)
+
+    def test_deep_removal_removes_item_or_drops_whole_analysis(self):
+        deep, problems, done, log = self._deep_apply("p:deep.key_violations[2].observation",
+                                                    "p:deep.key_violations[0].observation")
+        self.assertEqual(problems, [])
+        self.assertEqual(deep["p"]["deep_analysis"]["key_violations"], [{"observation": "지적 1"}])
+        self.assertEqual({e["item"] for e in log}, {bs.DEEP_ITEM})
+        # 필수 절(경고서한 fda_evaluation) → 심층분석 통째. 번역(violations_ko)·원문은 남는다.
+        deep, problems, _, _ = self._deep_apply("w:deep.fda_evaluation")
+        self.assertEqual(problems, [])
+        self.assertNotIn("deep_analysis", deep["w"])
+        self.assertEqual(deep["w"]["violations_ko"][0]["statement_ko"], "위반")
+        # 지적을 전부 빼면 통째 · 경고서한 시정 항목이 0 이 되면 통째 · 경고서한 administrative_risks 는 필수 절
+        for slots in (("p:deep.key_violations[0]", "p:deep.key_violations[1]", "p:deep.key_violations[2]"),
+                      ("w:deep.required_remediation.items[0]",), ("w:deep.administrative_risks",)):
+            deep, problems, _, _ = self._deep_apply(*slots)
+            self.assertEqual(problems, [], slots)
+            self.assertNotIn("deep_analysis", deep[slots[0][0]], slots)
+        # 483 선택 절은 비우기만
+        deep, problems, _, _ = self._deep_apply("p:deep.inspectional_significance")
+        self.assertEqual(deep["p"]["deep_analysis"]["inspectional_significance"], "")
+
+    def test_deep_removal_replaces_translation_with_fixed_notice(self):
+        deep, problems, _, _ = self._deep_apply("p:deep.observations_ko[0].detail_ko", "h:deep.ncr_ko.s9_ko",
+                                               "h:deep.ncr_ko.s9_title_ko", "w:deep.violations_ko[0]")
+        self.assertEqual(problems, [])
+        self.assertEqual(deep["p"]["observations_ko"][0],
+                         {"number": "1", "deficiency_ko": "결함", "detail_ko": bs.TRANSLATION_NOTICE})
+        self.assertEqual(deep["p"]["observations_ko"][1]["detail_ko"], "멀쩡")
+        self.assertIn("deep_analysis", deep["p"])                    # 번역만 바꾸고 심층분석은 그대로
+        self.assertEqual(deep["h"]["ncr_ko"]["s9_ko"], bs.TRANSLATION_NOTICE)
+        self.assertEqual(deep["h"]["ncr_ko"]["s9_title_ko"], bs.TRANSLATION_NOTICE_TITLE)
+        self.assertEqual(deep["w"]["violations_ko"][0]["statement_ko"], bs.TRANSLATION_NOTICE)
+        # 없는 칸·없는 카드는 문제(칸 이름을 잘못 적었다 — 반려로 되돌린다)
+        self.assertTrue(self._deep_apply("p:deep.observations_ko[9].detail_ko")[1])
+        self.assertTrue(self._deep_apply("zz:deep.key_violations[0]")[1])
+
+    def test_verify_allows_lost_deep_only_for_deep_removal_cards(self):
+        reqs = bs.blank_requests(_ce("deep.key_violations[0]"))
+        lost = {"cards": [{"id": "a", "deep_analysis": None, "en": {}}]}
+        self.assertEqual(len(bs.verify_blanks(lost, reqs)), 1)
+        dreqs = [("a", "deep.fda_evaluation", "사유")]
+        self.assertEqual(bs.verify_blanks(lost, reqs, dreqs), [])
+        self.assertEqual(bs.deep_lost(lost, dreqs), ["a"])
+        self.assertEqual(bs.deep_lost(lost, [("a", "deep.ncr_ko.s9_ko", "사유")]), [])
+
+    def test_cli_deep_auto_then_apply_writes_log(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = lambda n: os.path.join(tmp, n)
+            ce_ = {"cards": [{"web_card_id": "p", "verdict": "reject", "fails": [
+                {"item": "자가점검 9", "slot": "deep.key_violations[1].observation", "evidence": "추정"}]}]}
+            for name, obj in (("ce.json", ce_), ("d.json", {"cards": {"p": {"title_issue": "t"}}}),
+                              ("dp.json", self._deep483())):
+                with open(p(name), "w", encoding="utf-8") as f:
+                    json.dump(obj, f, ensure_ascii=False)
+            self.assertEqual(bs.main(["deep-auto", p("ce.json")]), 0)
+            self.assertEqual(bs.main(["apply", p("ce.json"), p("d.json"), p("out.json"), "--deep-in", p("dp.json"),
+                                      "--deep-out", p("dpo.json"), "--log", p("log.json")]), 0)
+            with open(p("log.json"), encoding="utf-8") as f:
+                log = json.load(f)["removed"]
+            self.assertEqual([(e["web_card_id"], e["slot"]) for e in log], [("p", "deep.key_violations[1].observation")])
+            with open(p("dpo.json"), encoding="utf-8") as f:
+                self.assertEqual(len(json.load(f)["p"]["deep_analysis"]["key_violations"]), 2)
+
     def test_copyedit_md_two_editions_point_to_the_script(self):
         for folder in ((), ("next",)):
             with open(os.path.join(ROOT, "company", "editorial", *folder, "copyedit.md"), encoding="utf-8") as f:
@@ -113,6 +220,18 @@ class BlankSlotsTest(unittest.TestCase):
             self.assertIn("python company/editorial/blank_slots.py apply company/run/{run_date_kst}/copyedit.json", text, folder)
             self.assertIn("blank_slots.py verify", text, folder)
             self.assertIn("**재작업(3-1)으로 되돌릴 때는 반영하지 않는다**", text, folder)
+            self.assertIn("2-4. **심층 삭제", text, folder)
+            self.assertIn("python company/editorial/blank_slots.py deep-auto company/run/{run_date_kst}/copyedit.json", text, folder)
+            self.assertIn("--log company/run/{run_date_kst}/slot_removals.json", text, folder)
+            self.assertIn("reject 1~25장", text, folder)
+            self.assertNotIn("reject 1~10장", text, folder)
+            self.assertIn(bs.TRANSLATION_NOTICE, text, folder)
+        for folder in ((), ("next",)):
+            with open(os.path.join(ROOT, "company", "editorial", *folder, "RUN.md"), encoding="utf-8") as f:
+                text = f.read()
+            self.assertIn("reject 가 1~25장", text, folder)
+            self.assertIn("샤드 파일별로 서브 에이전트에 나눠", text, folder)
+        self.assertEqual(bs.REWORK_CAP, 25)
 
 
 if __name__ == "__main__":

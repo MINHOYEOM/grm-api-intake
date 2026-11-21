@@ -98,23 +98,41 @@
    ```
    mkdir -p _scaffold && cp -n company/run/{run_date_kst}/delta.json _scaffold/delta.pre_blank.json && cp -n company/run/{run_date_kst}/deep_delta.json _scaffold/deep.pre_blank.json
    python company/editorial/blank_slots.py apply company/run/{run_date_kst}/copyedit.json _scaffold/delta.pre_blank.json company/run/{run_date_kst}/delta.json \
-     --deep-in _scaffold/deep.pre_blank.json --deep-out company/run/{run_date_kst}/deep_delta.json
+     --deep-in _scaffold/deep.pre_blank.json --deep-out company/run/{run_date_kst}/deep_delta.json \
+     --log company/run/{run_date_kst}/slot_removals.json
    ```
    (`cp -n` 은 이미 있는 칸 삭제 전 사본을 덮지 않는다 — 다시 돌려도 같은 사본에서 같은 결과가 나온다.) exit≠0 이면 메시지의 카드는 비울 수 없는 칸이었다 — `reject` 로 바꾼다.
+   (`--log company/run/{run_date_kst}/slot_removals.json` 을 붙인다 — 뺀 칸·처리·사유가 남고, 마감 1번에 같이 커밋한다. 아래 2-4 심층 삭제도 같은 명령이 반영한다.)
    그다음 **1번 코드 검사를 다시 돌린다**(`deep-source` 검사용 사본도 새 `deep_delta.json` 으로 다시 만든다). exit 0 이고, 이어서
    `python company/editorial/blank_slots.py verify company/run/{run_date_kst}/copyedit.json company/run/{run_date_kst}/brief_check.json` 도 exit 0 이어야 통과다
-   (심층을 비운 카드가 심층 게이트에 걸려 심층을 통째로 잃지 않았는지 본다 — 심층 게이트 실패는 조립을 막지 않는다).
+   (칸 삭제로 심층을 비운 카드가 심층 게이트에 걸려 심층을 통째로 잃지 않았는지 본다 — 심층 게이트 실패는 조립을 막지 않는다. 2-4 심층 삭제 카드는 심층이 빠져도 통과 — `심층 없이 발행` 줄로 알린다).
    하나라도 실패하면 `cp _scaffold/delta.pre_blank.json company/run/{run_date_kst}/delta.json && cp _scaffold/deep.pre_blank.json company/run/{run_date_kst}/deep_delta.json` 로 되돌리고
    그 카드를 `reject` 로 바꿔 3-1 대로 처리한다. `code_gate` 에는 다시 돌린 결과를 적는다. 마감 1번이 push 하는 `delta.json`·`deep_delta.json` 은 칸을 비운 이 파일이다.
    **재작업(3-1)으로 되돌릴 때는 반영하지 않는다** — 칸 삭제는 `notes` 에만 두고 `delta.json` 은 판정한 그대로 커밋한다(2차의 `merge_parts.py` 가 샤드에서 델타를 다시 만들고
    `rework-diff` 가 1차 델타와 대조하므로, 1차에 비우면 반려 안 된 카드가 바뀐 것으로 걸린다). 2차는 `rework-diff` 와 코드 검사 뒤, 마감 전에 위 순서로 반영한다(1차에서 옮긴 `pass` 카드의 칸 삭제 포함).
+2-4. **심층 삭제 — 반려가 심층 칸에만 있으면 코드가 심층을 빼고 통과(2026-11-21 대표 결정 · 리허설 1121b: 반려 21장 중 12장이 심층에서만 걸렸다).**
+   판정은 2-2 표 그대로 한다 — 심층(`deep.…`)에 정확성 오류가 있으면 종전처럼 `reject` 와 `fails`(`slot: "deep.<키>"`)로 적는다. 손으로 통과로 바꾸지 않는다.
+   판정을 다 적고(조각을 합친 뒤) **반려 수를 세기 전에** 코드가 가른다:
+   ```
+   python company/editorial/blank_slots.py deep-auto company/run/{run_date_kst}/copyedit.json
+   ```
+   `fails` 가 **전부** `deep.` 칸인 카드는 `pass` 가 되고 `fails` 는 `notes` `{"item": "심층 삭제", …}` 로 옮겨진다(`counts` 다시 셈 · `rework.cards` 에서 빠짐).
+   통과 카드의 `checked` 에 `absent: true` 인 심층 칸도 심층 삭제 주의가 붙는다. 앞면 칸(`title_issue`·`key_facts`·`en.…` 등) 반려가 하나라도 있으면 그대로 `reject` 다.
+   마지막 줄의 `남은 반려 N장` 이 3-1 의 reject 수다. 같은 파일에 다시 돌려도 결과가 같다.
+   반영은 2-3 과 같은 `blank_slots.py apply`(같은 때 · 같은 사본 규칙 · `--log`)가 한다 — 뺄 수 있으면 그 항목만, 아니면 그 카드의 심층분석을 통째로 뺀다:
+   `deep.key_violations[i]` → 그 지적만(하나도 안 남으면 통째) · `deep.required_remediation.items[i]` → 그 항목만(경고서한·행정처분은 하나는 남아야) ·
+   483 선택 절 → 비움 · 그 밖의 심층분석 절(`fda_evaluation`·`disposition_basis` 등 필수 절) → 심층분석 통째(카드는 앞면·원문 블록으로 발행) ·
+   원문 블록의 국문 해석(`deep.observations_ko[i].…`·`deep.violations_ko[i].…`·`deep.ncr_ko.…`) → 빼면 원문·국문 병기 게이트가 호 전체를 막으므로 고정 안내문
+   (`국문 해석을 싣지 않았다 — 원문을 본다.`)으로 바꾼다. 뺀 내용은 `slot_removals.json` 에 남는다. 이 칸들을 가리키던 `checked` 근거는 반영 뒤 카드에 없어도 1-1 검사가 걸지 않는다.
+   `apply` 가 exit 1 이면(심층 델타에 없는 카드·없는 번역 칸 — 칸 이름을 잘못 적었다) 그 카드를 `reject` 로 되돌린다.
 3. **직접 고치지 않는다.** 판정만 한다. 기준표에 없는 취향 지적을 하지 않는다.
-3-1. **반려가 있으면 기자에게 한 번 되돌린다(재작업 1회 — 2026-11-14 대표 결정).** 조건: 코드 검사 exit 0 · reject 1~10장 · 이 호의 첫 판정(`copyedit.json` 이 아직 없었다).
-   **코드 검사가 카드 몇 장 때문에 실패한 때도 같다(리허설 1118 — 2026-11-17).** 실패 메시지(`LLM 슬롯 주입 검증 실패`·`발행본 조립 검증 실패`)의 줄마다 카드 id 가 하나씩 들어 있고(`<카드 id>.<슬롯>` 또는 `카드 '<카드 id>': … <슬롯> …` — 리허설 1120 의 원문 부재 단정이 뒤의 꼴) 그 카드가 1~10장이면
+3-1. **반려가 있으면 기자에게 한 번 되돌린다(재작업 1회 — 2026-11-14 대표 결정 · 상한 25장 2026-11-21).** 조건: 코드 검사 exit 0 · reject 1~25장(2-4 `deep-auto` **뒤**의 수 — 심층에서만 걸린 카드는 세지 않는다) · 이 호의 첫 판정(`copyedit.json` 이 아직 없었다).
+   **코드 검사가 카드 몇 장 때문에 실패한 때도 같다(리허설 1118 — 2026-11-17).** 실패 메시지(`LLM 슬롯 주입 검증 실패`·`발행본 조립 검증 실패`)의 줄마다 카드 id 가 하나씩 들어 있고(`<카드 id>.<슬롯>` 또는 `카드 '<카드 id>': … <슬롯> …` — 리허설 1120 의 원문 부재 단정이 뒤의 꼴) 그 카드가 1~25장이면
    의미 점검을 하지 않고 그 카드들을 `rework.cards` 로, `cards` 에 `verdict: "reject"` 와 줄마다 `fails` `{"item": "코드 검사", "slot": "<슬롯>", "evidence": "<그 줄>"}` 로 적어 `재작업` 으로 되돌린다.
-   2차(3-2)는 코드 검사를 다시 돌린 뒤 의미 점검을 **전 카드**에 한다(1차에 못 했으므로). 카드 id 가 없는 줄(`delta.tldr` 등)이 하나라도 있거나 10장을 넘으면 종전대로 `보류`.
+   2차(3-2)는 코드 검사를 다시 돌린 뒤 의미 점검을 **전 카드**에 한다(1차에 못 했으므로). 카드 id 가 없는 줄(`delta.tldr` 등)이 하나라도 있거나 25장을 넘으면 종전대로 `보류`.
    그러면 마감하지 않고 `copyedit.json` 을 `"status": "재작업"`, `"round": 1`, `"published": false`, `"rework": {"cards": ["<반려 카드 id>", …]}` 로 써서
-   `delta.json`(판정한 그대로)과 함께 커밋·push 하고 끝낸다. Notion 에는 아무것도 쓰지 않는다. reject 가 10장을 넘거나 코드 검사가 실패면 되돌리지 않고 종전대로 `보류`.
+   `delta.json`(판정한 그대로)과 함께 커밋·push 하고 끝낸다. Notion 에는 아무것도 쓰지 않는다. reject 가 25장을 넘거나 코드 검사가 실패면 되돌리지 않고 종전대로 `보류`.
+   **1차 교열은 늦어도 09:00 까지 `재작업` 을 push 한다** — 재작업 기자(09:02)는 09:12 까지만 기다린다. 반려가 많을수록 재작업·2차가 길어진다(`RUN.md` 5-1 시간표).
 3-2. **다시 판정(2차).** 시작할 때 `copyedit.json` 이 이미 `재작업` 이면 이 실행은 2차다(`완료`·`보류`·`실패` 면 곧바로 종료).
    **예약작업 프롬프트에 `역할: 교열(2차)` 가 있는 실행(09:12 슬롯)은 2차만 한다** — `copyedit.json` 이 아직 없으면 1차 교열(08:45)이 아직 샤드를 기다리는 중이다:
    아무것도 쓰지 않고 종료한다(1차 판정을 대신하지 않는다 — 두 교열이 따로 판정하거나 1차가 `CONSUMED` 를 찍은 뒤 `copyedit.json` 을 덮어쓰면 아무도 발행하지 않는다).
@@ -129,6 +147,8 @@
    ```
    `rework-diff` 가 exit≠0 이면(반려되지 않은 카드가 바뀌었거나 카드가 늘고 줄었다) 판정하지 않고 `보류`. exit 0 이면 1번(코드 검사)을 다시 돌리고,
    **반려됐던 카드만** 2·2-1번 전 항목으로 다시 판정한다(나머지 카드는 글자가 그대로이므로 1차 판정 `pass` 를 그대로 옮긴다).
+   반려 카드가 10장을 넘으면 1-1 처럼 서브 에이전트 여러 개(조각마다 2-2 표를 글자 그대로)로 나눠 동시에 판정한다 — 09:20 전에 마감까지 가야 한다.
+   다시 판정한 뒤에도 2-4 `deep-auto` 를 돌린다(2차에 심층에서만 걸린 카드도 심층 삭제로 통과).
    결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남으면 `보류`** — 더 되돌리지 않는다(백업이 발행한다).
    2차에 다시 판정한 카드는 `checked` 도 새 문장으로 다시 적는다(옛 근거의 `claim` 이 고친 문장에 없으면 검사가 걸린다). 옮긴 `pass` 카드는 1차 줄(근거 포함)을 그대로 옮긴다.
    2차도 `완료` 전에 1-1 의 `copyedit_evidence.py check` exit 0 이어야 한다.
@@ -138,7 +158,7 @@
    (Notion handoff 가 OPEN 으로 남아 09:30 백업 Routine 이 발행한다). 통과면 이 순서로 (`RUN.md` 0항 `반납 길: git` 인 호):
    1. **반납 = 실행 폴더 push.** 코드 검사에 쓴 스캐폴드를 **그 파일 그대로** 실행 폴더에 복사한다(다시 저장·정렬하지 않는다):
       `cp _scaffold/brief_web_$U.json company/run/{run_date_kst}/scaffold.json`.
-      `delta.json`·(있으면) `deep_delta.json`·`scaffold.json`·`copyedit.json`(`status: 완료`, `published: true`)을 커밋·push 한다(RUN.md 3항 방식).
+      `delta.json`·(있으면) `deep_delta.json`·`scaffold.json`·`copyedit.json`(`status: 완료`, `published: true`)·(칸 삭제·심층 삭제가 있었으면) `slot_removals.json` 을 커밋·push 한다(RUN.md 3항 방식).
       발행 브릿지가 이 브랜치에서 가져가 main 에 넣는다 — Notion 에 델타를 예치하지 않는다(v16 [산출물 — 델타 Notion 예치] 의 예치·글자 대조는 하지 않는다).
       push 가 3번 거절되면 Notion 에 아무것도 쓰지 않고 `실패` 로 끝낸다.
    2. push 가 끝나면 **곧바로** Notion handoff 페이지(제목 `OPEN GRM Routine Handoff {run_date_kst}`)를 v16 [0단계] PL-10 마감대로 `CONSUMED` 로 바꾼다
@@ -169,10 +189,10 @@
 }
 ```
 `checked` 는 카드마다 필수다(1-1 — 원문이 없는 카드만 `source_absent`). `fails` 는 반려 근거(2-2 표 왼쪽)만, `notes` 는 주의(표 오른쪽)만 적는다 — 없으면 빈 배열이거나 키를 빼도 된다. `verdict` 는 `pass`·`reject` 둘뿐이다(주의 카드도 `pass`).
-`counts.reject` 는 `verdict: "reject"` 카드 수다 — `notes`(칸 삭제 포함)는 세지 않는다.
+`counts.reject` 는 `verdict: "reject"` 카드 수다 — `notes`(칸 삭제·심층 삭제 포함)는 세지 않는다.
 같은 폴더에 `copyedit.md` — 헌장의 맨 위 3줄만.
 
 `copyedit.json` 에 `"published": true|false` 를 더해, 마감까지 했는지 적는다.
 
 ## 하지 않는 것
-슬롯 수정(반려 카드는 기자가 고친다 — 3-1. 2-3 칸 삭제는 `blank_slots.py` 로만), 카드 채택 변경, 검색, 마감 4번 밖의 Notion 쓰기(행 Status 포함), 다른 직무 파일 수정.
+슬롯 수정(반려 카드는 기자가 고친다 — 3-1. 2-3 칸 삭제·2-4 심층 삭제는 `blank_slots.py` 로만), 카드 채택 변경, 검색, 마감 4번 밖의 Notion 쓰기(행 Status 포함), 다른 직무 파일 수정.

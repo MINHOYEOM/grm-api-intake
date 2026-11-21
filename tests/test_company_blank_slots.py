@@ -212,6 +212,51 @@ class BlankSlotsTest(unittest.TestCase):
             with open(p("dpo.json"), encoding="utf-8") as f:
                 self.assertEqual(len(json.load(f)["p"]["deep_analysis"]["key_violations"]), 2)
 
+    # ── 판정 전 사전 점검(copyedit.md 2-5 · 리허설 1121c) ──────────────────────
+    @staticmethod
+    def _1121c():
+        """리허설 1121c fda483-196441 의 꼴: 핵심 사실 하나뿐인 카드에 `key_facts[0]` 칸 삭제 — 1차는 재작업이라 apply 를 안 돌렸다."""
+        delta = _delta()
+        delta["cards"]["k"] = {"title_issue": "제목", "summary": "요약", "hook_line": "한 줄", "key_facts": ["유일한 사실"],
+                               "en": {"title_issue": "T", "summary": "S", "hook_line": "H", "key_facts": ["only fact"]}}
+        ce = {"cards": [
+            {"web_card_id": "a", "verdict": "pass", "fails": [],
+             "notes": [{"item": "칸 삭제", "slot": "key_facts[1]", "evidence": "사유"}]},
+            {"web_card_id": "k", "verdict": "pass", "fails": [],
+             "notes": [{"item": "칸 삭제", "slot": "hook_line", "evidence": "사유"},
+                       {"item": "칸 삭제", "slot": "key_facts[0]", "evidence": "원문보다 강한 단정"}]},
+            {"web_card_id": "r", "verdict": "reject", "fails": [{"item": "사실 오류", "slot": "summary", "evidence": "x"}],
+             "notes": [{"item": "칸 삭제", "slot": "summary", "evidence": "반려 카드 — 재작업으로 간다"}]}]}
+        return delta, ce
+
+    def test_check_names_only_pass_cards_whose_blank_would_be_refused_and_changes_nothing(self):
+        delta, ce = self._1121c()
+        deep = _deep()
+        before = json.dumps([delta, deep, ce], ensure_ascii=False, sort_keys=True)
+        refused = bs.refused_cards(ce, delta, deep)
+        self.assertEqual(list(refused), ["k"])                       # a 는 비울 수 있고 r 은 이미 반려
+        self.assertIn("핵심 사실이 하나뿐", refused["k"][0])
+        self.assertEqual(json.dumps([delta, deep, ce], ensure_ascii=False, sort_keys=True), before)
+        # apply 와 같은 판정 — 같은 입력으로 apply 를 돌리면 같은 카드 때문에 거부된다.
+        problems, _ = bs.apply_blanks(json.loads(json.dumps(delta)), deep,
+                                      [r for r in bs.blank_requests(ce) if r[0] != "r"])
+        self.assertTrue(problems and all(p.startswith("k.") for p in problems), problems)
+
+    def test_cli_check_exit_and_untouched_files(self):
+        delta, ce = self._1121c()
+        with tempfile.TemporaryDirectory() as tmp:
+            p = lambda n: os.path.join(tmp, n)
+            for name, obj in (("d.json", delta), ("dp.json", _deep()), ("ce.json", ce)):
+                with open(p(name), "w", encoding="utf-8") as f:
+                    json.dump(obj, f, ensure_ascii=False)
+            mtimes = {n: os.path.getmtime(p(n)) for n in ("d.json", "dp.json", "ce.json")}
+            self.assertEqual(bs.main(["check", p("ce.json"), p("d.json"), p("dp.json")]), 1)
+            self.assertEqual({n: os.path.getmtime(p(n)) for n in mtimes}, mtimes)
+            ce["cards"][1]["notes"] = ce["cards"][1]["notes"][:1]       # key_facts[0] 를 빼면(교열이 reject 로 옮김) 통과
+            with open(p("ce.json"), "w", encoding="utf-8") as f:
+                json.dump(ce, f, ensure_ascii=False)
+            self.assertEqual(bs.main(["check", p("ce.json"), p("d.json")]), 0)
+
     def test_copyedit_md_two_editions_point_to_the_script(self):
         for folder in ((), ("next",)):
             with open(os.path.join(ROOT, "company", "editorial", *folder, "copyedit.md"), encoding="utf-8") as f:
@@ -226,6 +271,9 @@ class BlankSlotsTest(unittest.TestCase):
             self.assertIn("reject 1~25장", text, folder)
             self.assertNotIn("reject 1~10장", text, folder)
             self.assertIn(bs.TRANSLATION_NOTICE, text, folder)
+            self.assertIn("2-5. **칸 삭제 사전 점검", text, folder)
+            self.assertIn("python company/editorial/blank_slots.py check company/run/{run_date_kst}/copyedit.json", text, folder)
+            self.assertLess(text.index("2-5. **칸 삭제 사전 점검"), text.index("3-1. **반려가 있으면"), folder)
         for folder in ((), ("next",)):
             with open(os.path.join(ROOT, "company", "editorial", *folder, "RUN.md"), encoding="utf-8") as f:
                 text = f.read()

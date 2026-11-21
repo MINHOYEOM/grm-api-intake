@@ -1978,6 +1978,11 @@
      "slot": "deep.inspectional_significance",
      "claim": "스프레이 시험성적서 보고일은 2026-03-24이다",
      "source": "reported on March 24, 2026 by third party laboratory"
+    },
+    {
+     "slot": "deep.key_violations[10].observation",
+     "claim": "새 미사용 혼합 드럼에 실제 상태를 반영하지 않는 청결 상태 표시가 붙어 있었고",
+     "source": "new unused mixing drums bearing clean status designations that did not reflect the true condition of the equipment"
     }
    ]
   },
@@ -2473,14 +2478,8 @@
   },
   {
    "web_card_id": "fda483-196417",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "원문보다 강한 단정·국영 불일치",
-     "slot": "en.title_issue",
-     "evidence": "영문 'not investigated' 는 원문 'failed to thoroughly investigate'(조사는 열렸으나 각각 시험자 오류로 처리)보다 강하고, 한국어 '조사 미흡'과 뜻이 다르다"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [
     {
      "item": "숫자 표기",
@@ -2516,8 +2515,8 @@
     },
     {
      "slot": "en.title_issue",
-     "claim": "Negative control OOS failures not investigated",
-     "absent": true
+     "claim": "Negative control OOS not thoroughly investigated",
+     "source": "Your firm failed to thoroughly investigate three recurring Total Aerobic Microbial Count"
     }
    ]
   },
@@ -2910,14 +2909,8 @@
   },
   {
    "web_card_id": "fda483-196443",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "원문에 없는 말·국영 불일치",
-     "slot": "summary",
-     "evidence": "한국어 요약의 '임상시험 의뢰자' — 원문(본문 없음)은 시설 유형 'Sponsor' 뿐이고 임상시험 언급이 없다. 영문 'a sponsor' 에는 없는 뜻"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [],
    "checked": [
     {
@@ -2932,8 +2925,13 @@
     },
     {
      "slot": "summary",
-     "claim": "임상시험 의뢰자",
-     "absent": true
+     "claim": "의뢰자",
+     "source": "시설 유형: Sponsor"
+    },
+    {
+     "slot": "en.summary",
+     "claim": "a sponsor",
+     "source": "시설 유형: Sponsor"
     }
    ]
   },
@@ -5457,24 +5455,18 @@
  ],
  "counts": {
   "cards": 153,
-  "pass": 151,
-  "reject": 2,
-  "fails_total": 2,
+  "pass": 153,
+  "reject": 0,
+  "fails_total": 0,
   "notes_total": 132
  },
- "status": "재작업",
- "round": 1,
+ "status": "완료",
+ "round": 2,
  "published": false,
  "rehearsal": true,
  "code_gate": {
   "ran": true,
   "exit": 0,
   "message": ""
- },
- "rework": {
-  "cards": [
-   "fda483-196417",
-   "fda483-196443"
-  ]
  }
 }

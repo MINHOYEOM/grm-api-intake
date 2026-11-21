@@ -1,0 +1,193 @@
+{
+  "removed": [
+    {
+      "web_card_id": "fda483-196370",
+      "slot": "deep.observations_ko[0].detail_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 1칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "원문 깨진 값 추정: 원문 'was released to the U.S. market based on a t round of visual inspection and a passing AQL' 의 'round' 앞 글자가 OCR 로 깨져('t') 차수를 알 수 없는데 '1차' 로 채움(앞면 hook·checks 는 같은 자리를 '추가 검사'로 채워 서로도 어긋남)"
+    },
+    {
+      "web_card_id": "fda483-196370",
+      "slot": "deep.key_violations[0]",
+      "item": "칸 삭제",
+      "action": "지적 0번을 뺌(남은 지적 3개)",
+      "evidence": "observation 의 '1차 육안검사와 합격 품질 수준 판정 결과만으로' — 깨진 값('t round')을 '1차'로 채우고 '만으로'(배타) 를 더함"
+    },
+    {
+      "web_card_id": "fda483-196377",
+      "slot": "deep.key_violations[3]",
+      "item": "칸 삭제",
+      "action": "지적 3번을 뺌(남은 지적 3개)",
+      "evidence": "observation 의 '시료를 플레이트에 점적했다' — 원문은 '[redacted] of … lot was [redacted] onto a [redacted] plate and this was not a [redacted] sample' 로 동사·시료 종류가 가려졌는데 '점적'으로 채움"
+    },
+    {
+      "web_card_id": "fda483-196382",
+      "slot": "deep.key_violations[4]",
+      "item": "칸 삭제",
+      "action": "지적 4번을 뺌(남은 지적 4개)",
+      "evidence": "observation 의 '보고서 5건' — 원문은 날짜 5개를 나열했을 뿐 건수를 적지 않았다(세어서 만든 숫자)"
+    },
+    {
+      "web_card_id": "fda483-196403",
+      "slot": "deep.inspectional_significance",
+      "item": "칸 삭제",
+      "action": "선택 절을 비움",
+      "evidence": "이메일에 적힌 시험일은 2025-10-22 — 원문은 an email from third party laboratory dated 10/22/2025(이메일 날짜)이지 시험일이 아니다. 같은 심층의 번역 칸은 2025-10-22자 이메일로 바르게 적었다"
+    },
+    {
+      "web_card_id": "fda483-196409",
+      "slot": "deep.key_violations[6]",
+      "item": "칸 삭제",
+      "action": "지적 6번을 뺌(남은 지적 6개)",
+      "evidence": "원문은 'The function of the alarms in the incubators is tested [redacted]' — 가려진 부분을 '정해진 간격으로 이뤄지지 않았다'로 추정해 채움"
+    },
+    {
+      "web_card_id": "fda483-196502",
+      "slot": "deep.key_violations[0]",
+      "item": "칸 삭제",
+      "action": "지적 0번을 뺌(남은 지적 3개)",
+      "evidence": "원문 관찰 1은 'The sample obtained is not the bulk solution' 과 조제 용액 이송 서술만 있고, 시료를 이송 '뒤' 채취했다거나 그래서 대표성이 없다는 인과는 없다(원문에 없는 결합)"
+    },
+    {
+      "web_card_id": "fda483-196650",
+      "slot": "deep.key_violations[1]",
+      "item": "칸 삭제",
+      "action": "지적 1번을 뺌(남은 지적 2개)",
+      "evidence": "같은 사유: '설비 가운데 최소 [가림]개'로 가려진 대상을 설비로 채움(심층 observations_ko 는 '관련된 [가림]'으로 정확)"
+    },
+    {
+      "web_card_id": "fda483-196381",
+      "slot": "deep.inspectional_significance",
+      "item": "칸 삭제",
+      "action": "선택 절을 비움",
+      "evidence": "관찰 1 원문은 OCR 가 깨져('vials in storage … YG) all OM vials ofplacental stem cells were distributed on 01/21/2022') 'CMV 양성 조직을 포함한 바이알이 출고됐다'는 결합을 원문에서 확인할 수 없다 — 깨진 값을 추정해 채운 문장"
+    },
+    {
+      "web_card_id": "fda483-196260",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "'기준일탈 뒤 … 출하'는 출하가 OOS 이후라는 순서를 말하나 원문은 출하 시점을 적지 않음(관찰 5 제목도 '이미 유통된 배치 여부와 무관')"
+    },
+    {
+      "web_card_id": "fda483-196260",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'원료 입고 때 각 배치의 한 포대에서 시료 하나만 외부 시험기관에 보냈다'는 품질책임자 진술을 사실로 적음. 원문은 '진술'이며 현장 시료 채취·발송을 확인할 문서가 없다고 함(관찰 6)"
+    },
+    {
+      "web_card_id": "fda483-196370",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "'추가 검사 뒤 미국 출하' — 원문은 'a t round of visual inspection'(OCR 깨짐)이라 '추가'를 확정할 수 없다. 심층은 같은 자리를 '1차'로 적어 앞면·심층이 어긋난다"
+    },
+    {
+      "web_card_id": "fda483-196377",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'환자용 주사기 무균 분주를 한다' — 원문은 'sterile [redacted] into … patient … syringes'(동사 가려짐)인데 '분주'로 채웠다. 같은 칸의 '최종 주사기 값은 기록되지 않았고'도 가려진 명사를 '값'으로 채움"
+    },
+    {
+      "web_card_id": "fda483-196382",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'보고서를 시험기관 02에 전달하지 않아 임상시험심사위원회 검토로 이어지지 않았다' — 원문은 '시험기관 02 에 제공하지 못해 IRB 제출을 보장하지 못했다'일 뿐 IRB 검토가 안 됐다는 결과는 없다(원문보다 강한 단정)"
+    },
+    {
+      "web_card_id": "fda483-196405",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "마개 봉투를 분무 소독할 때 — 원문은 the stopper bag was sprayed with [redacted] 로 분무한 물질이 가려져 있어 소독이라 적은 것은 가려진 값을 추정해 채운 것(영문 during disinfection 도 같음). 같은 심층은 분무로만 적었다"
+    },
+    {
+      "web_card_id": "fda483-196413",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "관찰 5 문장의 '입자의 출처' — 원문은 'did not attempt to characterize the articles to determine their sources'(문장 끝도 잘림)이고 '입자(particle)'는 원문에 없다(심층은 '물품'). 원문에 없는 분류를 보탬"
+    },
+    {
+      "web_card_id": "fda483-196452",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "국·영 짝 불일치: en.hook_line 에만 'three'(연속 3개 로트)가 있고 한국어 hook_line 은 '연속 로트'로 숫자가 없다"
+    },
+    {
+      "web_card_id": "fda483-196456",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "원문은 'the completed [redacted] report' — 가려진 보고서 종류를 '밸리데이션 보고서'로 채움(②). 연구 미완료는 'the study has still not been completed' 로만 확인됨"
+    },
+    {
+      "web_card_id": "fda483-196650",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "원문 관찰 1B: 2019년 이후 재교정·확인되지 않은 것은 'The [가림], related to at least [가림] ... used during manufacture'의 가려진 대상이며 설비 자체로 적을 수 없다(②) — en.hook_line 도 같음"
+    },
+    {
+      "web_card_id": "recall-c5d40bc8b3d1",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "\"1품목\" 은 원문·facts 에 글자 그대로 없는 세어서 만든 숫자(hook 숫자 원문 대조 ③) — en.hook_line \"One\" 도 같은 칸"
+    },
+    {
+      "web_card_id": "fda483-196426",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "원문은 실사 중 교육 기록이 '제시되지 않았다(no training records were provided)'인데 hook 은 '교육 기록 없이'(기록 부재)로 더 강하게 단정 — 국·영 모두. implication 은 '제시되지 않았다'로 정확"
+    },
+    {
+      "web_card_id": "fda483-196305",
+      "slot": "key_facts[1]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 1번 뺌",
+      "evidence": "'전날 야간조'는 원문에 없음 — 원문은 '다음 날 주간조(dayshift)가 서명'뿐이고 앞 근무조가 야간조라는 표기가 없다(en 'night operators' 도 같음)"
+    },
+    {
+      "web_card_id": "fda483-196370",
+      "slot": "checks[0]",
+      "item": "칸 삭제",
+      "action": "국·영 checks 0번 뺌",
+      "evidence": "'추가 검사로 출하할 때' — 같은 깨진 값('t round')을 '추가'로 채움"
+    },
+    {
+      "web_card_id": "fda483-196455",
+      "slot": "key_facts[0]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 0번 뺌",
+      "evidence": "원문(OCR 깨짐) 'lack of data to support the use of reference or the determination of batches for the fewer es by the method' 에 '[가림] 시험법'·'표준품'을 확정해 적을 근거가 없다(R10)"
+    },
+    {
+      "web_card_id": "fda483-196639",
+      "slot": "key_facts[3]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 3번 뺌",
+      "evidence": "원문 'do not always extend'(항상 확대되지는 않음)를 '확대되지 않고'로 단정(en도 같음) — 심층은 '항상 확대되지는 않고'로 정확히 적음"
+    },
+    {
+      "web_card_id": "fda483-196639",
+      "slot": "key_facts[0]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 0번 뺌",
+      "evidence": "국·영 짝 불일치·강도 변경: 영문은 'no complete documentation'인데 한국어는 '문서가 없음'(원문 'does not have complete documentation')"
+    },
+    {
+      "web_card_id": "fda483-196650",
+      "slot": "key_facts[1]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 1번 뺌",
+      "evidence": "같은 사유: 가려진 대상을 '설비'로 채움"
+    }
+  ]
+}

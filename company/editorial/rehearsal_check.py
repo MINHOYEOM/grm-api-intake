@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""리허설 결과 점검 — `REHEARSAL.md` 의 성공 판정 1~5 를 코드로 본다. 읽기만 한다.
+"""리허설 결과 점검 — `REHEARSAL.md` 의 성공 판정 1~5(+4-1 교열 전수 대조)를 코드로 본다. 읽기만 한다.
 
     python company/editorial/rehearsal_check.py <실행 폴더> <handoff 파일>
 
@@ -15,6 +15,9 @@ sys.path.insert(0, ROOT)
 
 import delta_bridge  # noqa: E402
 import grm_queue  # noqa: E402
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import copyedit_evidence  # noqa: E402
 
 
 def _load(path):
@@ -66,6 +69,17 @@ def check(folder, handoff_path):
     out.append((4, "교열 reject 0", copyedit.get("status") == "완료" and n_reject == 0 and rework_ok,
                 f"status={copyedit.get('status')!r} reject={n_reject} round={rnd!r}"
                 + ("" if rework_ok else " — 재작업 기록(rework.json 완료 · copyedit.r1.json 재작업)이 없다")))
+
+    # 4-1. 교열이 카드를 전부 원문과 맞춰 봤는가(리허설 1121b — 표본 정독으로 reject 0). 교열 마감 전 점검과 같은 함수.
+    if copyedit.get("status") == "완료":
+        lines, stats = copyedit_evidence.check(
+            delta, copyedit, _load(os.path.join(folder, "deep_delta.json")), handoff,
+            _load(copyedit_evidence.find_scaffold(folder, handoff) or os.path.join(folder, "scaffold.json")))
+        out.append(("4-1", "교열 전수 대조 근거(카드마다 원문 조각)", not lines,
+                    copyedit_evidence.summary_line(stats) + (f" — 첫 줄: {lines[0][:160]}" if lines else "")))
+    else:
+        out.append(("4-1", "교열 전수 대조 근거(카드마다 원문 조각)", False,
+                    f"status={copyedit.get('status')!r} — 완료가 아니면 보지 않는다"))
 
     detail, ok = "", False
     if isinstance(delta, dict) and isinstance(handoff, dict):

@@ -28,6 +28,25 @@
       <p class="ct-note" style="margin-top:10px">{{ _('본문은 원문(영어)입니다. 국문 번역은 준비 중입니다.') }}</p>
       {%- endif %}
     </section>
+    {#- [구글 품질 2단계 2026-11-20] 이 조항을 인용한 지적 — 우리 문서(483·경고서한)의 지적 cfr_refs 로 센
+        건수 + 최근 사례(본문 무절단). 뷰는 clause_text_page.citing_findings, 인용이 없으면 그리지 않는다. -#}
+    {%- if cite %}
+    <section>
+      <h2 class="ct-sec-h">{{ _('이 조항을 인용한 지적') }}</h2>
+      <p class="ct-note" style="margin-bottom:12px">{{ _('공개 문서에서 이 조항을 인용한 지적 {n}건 가운데 최근 사례입니다.', n=cite.findings) }}</p>
+      <div class="ct-cites">
+        {%- for s in cite.samples %}
+        <article class="ct-cite">
+          <p class="ct-cite-m"><span>{{ agency_labels.get(s.agency, s.agency) }}</span><span>{{ s.firm_name }}</span><span>{{ s.published_date }}</span></p>
+          <p class="ct-cite-t">{{ s.body }}</p>
+          {%- if s.doc_slug %}
+          <a class="ct-cite-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">{{ _('이 문서의 지적 전체 보기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          {%- endif %}
+        </article>
+        {%- endfor %}
+      </div>
+    </section>
+    {%- endif %}
     {%- if clause.notes %}
     <section>
       <h2 class="ct-sec-h">{{ _('각주·출처 표기') }}</h2>

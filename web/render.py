@@ -4425,6 +4425,23 @@ def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
     }
 
 
+def clause_text_cites(docs_data: "dict[str, Any] | None",
+                      views: dict[str, dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
+    """[구글 품질 2단계 2026-11-20] 언어 → (조항 원문 페이지 주소 → 이 조항을 인용한 지적).
+
+    렌더·sitemap 판정·테스트가 이 한 함수를 본다(갈라지지 않게). 영어 트리는 문서 페이지가 서는
+    문서(doc_is_english)만, 본문은 원문(영어)만 센다 — findings/clause 영어판과 같은 규율."""
+    docs = (docs_data or {}).get("documents") or []
+    out = {DEFAULT_LANG: clause_text_page.citing_findings(
+        docs, views[DEFAULT_LANG], lambda f: finding_body(f, DEFAULT_LANG))}
+    if "en" in views:
+        out["en"] = clause_text_page.citing_findings(
+            docs, views["en"],
+            lambda f: "" if _HANGUL_RE.search(finding_body(f, "en")) else finding_body(f, "en"),
+            doc_ok=doc_is_english)
+    return out
+
+
 def doc_is_english(doc: dict[str, Any]) -> bool:
     """이 문서를 **영어 트리에 낼 수 있는가** — 원문이 실제로 영어인가.
 
@@ -8236,6 +8253,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [기준 조항 원문 2026-11-15] /clauses/ 색인·문서 목차·조항 페이지 — ko·en 같은 함수(두 벌 금지).
     # 본문은 영어 원문 그대로라 두 트리가 같은 경로를 낸다(en_paths 는 위에서 같은 뷰로 선언).
     # sitemap lastmod 는 비운다 — 조항에는 개정일 필드가 없고, 수집일은 수정일이 아니다(지어낸 날짜 금지).
+    # [구글 품질 2단계 2026-11-20] 21 CFR 조항마다 "이 조항을 인용한 지적" — 언어마다 그 트리에 문서
+    # 페이지가 있는 문서만 센다. 렌더와 sitemap 판정(아래 D·E 루프)이 같은 값을 본다.
+    _ct_cites = clause_text_cites(docs_data, clause_text_views)
     if clause_text_view["sources"]:
         for _lg, _pg, _em, _tr in trees:
             _ctv = clause_text_views.get(_lg, clause_text_view_en)
@@ -8243,6 +8263,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 continue
             _ct_cases = clause_slugs if _lg == DEFAULT_LANG else {c["slug"] for c in clause_views_en}
             _ct_terms = clause_text_page.terms_by_href(_ctv, glossary_terms, _lg)
+            _ct_cite = _ct_cites.get(_lg) or {}
+            _ct_labels = {k: _tr(v) for k, v in _clause_agency_labels.items()}
             _ip = _pg(clause_text_page.ROUTE)
             _em("clauses_index.html", _ip,
                 page_title=_tr("기준 조항 원문 · GRM"),
@@ -8267,7 +8289,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for _d, _c in clause_text_page.pages(_ctv):
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
-                _ct_gni = clause_text_page.google_noindex_reason(_d, _c, _lg)
+                _cite = _ct_cite.get(_c["href"])
+                _ct_gni = clause_text_page.google_noindex_reason(
+                    _d, _c, _lg, (_cite or {}).get("documents", 0))
                 _em("clause_text.html", _cp,
                     page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
                     nav_active="findings",
@@ -8279,6 +8303,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     cases_href=(f"findings/clause/{clause_slug(_sec)}/"
                                 if _sec and clause_slug(_sec) in _ct_cases else ""),
                     terms=_ct_terms.get(_c["href"]) or [],
+                    cite=_cite, agency_labels=_ct_labels,
                     google_noindex=bool(_ct_gni),
                 )
         for _path in sorted(clause_text_page.tree_paths(clause_text_view)):
@@ -8287,7 +8312,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (영문 트리 경로는 en_paths 로 sitemap 에 들어가므로 언어마다 따로 센다).
     for _lg in (DEFAULT_LANG, "en"):
         for _d, _c in clause_text_page.pages(clause_text_views[_lg]):
-            _why = clause_text_page.google_noindex_reason(_d, _c, _lg)
+            _why = clause_text_page.google_noindex_reason(
+                _d, _c, _lg, (_ct_cites[_lg].get(_c["href"]) or {}).get("documents", 0))
             if _why:
                 _mark_google_noindex(_lg, _c["href"], f"clause_{_why}")
 

@@ -34,15 +34,21 @@
   python company/editorial/blank_slots.py deep-auto <copyedit.json> [--cap 25]
   python company/editorial/blank_slots.py apply <copyedit.json> <delta 입력> <delta 출력> [--deep-in X --deep-out Y] [--log Z]
   python company/editorial/blank_slots.py verify <copyedit.json> <brief_check.json>
+  python company/editorial/blank_slots.py check <copyedit.json> <delta.json> [deep_delta.json]
 
 `deep-auto` 는 `copyedit.json` 을 제자리에서 고친다(같은 파일에 다시 돌려도 결과가 같다) — 남은 반려 수와 재작업 상한을 낸다.
 `apply` 는 입력을 읽고 출력에 쓴다 — 같은 입력으로 다시 돌려도 결과가 같다(입력은 칸 삭제 전 사본이어야 한다).
 `--log` 를 주면 뺀 것을 카드·칸·처리·사유로 JSON 에 남긴다(발행본 감사용 — 실행 폴더 `slot_removals.json` 으로 커밋한다).
 `verify` 는 다시 돌린 조립본에서 비운 칸이 비었는지, 칸 삭제로 심층을 건드린 카드가 심층을 잃지 않았는지 본다
 (심층 게이트 실패는 조립을 막지 않고 심층만 조용히 빠지므로 exit 0 만으로는 모른다). 심층 삭제 카드는 심층이 빠져도 된다(한 줄로 알린다).
+`check` 는 판정 전 사전 점검이다(리허설 1121c — 1차가 재작업으로 가면 `apply` 를 돌리지 않아 거부될 칸 삭제가 2차 마감에서야
+드러나 `보류` 가 됐다: fda483-196441 `key_facts[0]`). `apply` 와 같은 함수를 카드마다 메모리 사본에 돌려 **반려가 아닌 카드 중
+칸 삭제·심층 삭제가 거부될 카드**만 낸다. 파일은 바꾸지 않는다 — 1차·2차 모두 재작업·완료를 정하기 전에 돌린다.
+델타는 칸 삭제 **전** 것이어야 한다(이미 `apply` 한 델타에 돌리면 뺀 칸을 또 빼려 해 거짓 거부가 난다).
 exit 0 = 통과 · 1 = 문제(아무것도 쓰지 않는다) · 2 = 입력 오류.
 """
 import argparse
+import copy
 import json
 import re
 import sys
@@ -378,6 +384,33 @@ def apply_blanks(delta, deep, requests, deep_reqs=None, log=None):
     return problems, done
 
 
+def refused_cards(copyedit, delta, deep=None):
+    """{카드 id: [문제 줄]} — 반려가 아닌 카드 중 `apply` 가 거부할 칸 삭제·심층 삭제가 있는 카드(순수 · 입력을 바꾸지 않는다).
+
+    카드마다 그 카드의 델타·심층 항목만 깊은 사본으로 떼어 `apply_blanks` 를 돌린다 — `apply` 와 같은 판정이고,
+    한 카드의 거부가 다른 카드의 결과에 섞이지 않는다."""
+    reqs, dreqs = {}, {}
+    for cid, slot, why in blank_requests(copyedit):
+        reqs.setdefault(cid, []).append((cid, slot, why))
+    for cid, slot, why in deep_requests(copyedit):
+        dreqs.setdefault(cid, []).append((cid, slot, why))
+    verdict = {str(c.get("web_card_id")): c.get("verdict")
+               for c in copyedit.get("cards") or [] if isinstance(c, dict) and c.get("web_card_id")}
+    cards = (delta or {}).get("cards") if isinstance((delta or {}).get("cards"), dict) else {}
+    out = {}
+    for cid in dict.fromkeys(list(reqs) + list(dreqs)):
+        if verdict.get(cid) == "reject":
+            continue                  # 이미 재작업으로 간다 — 기자가 고친 뒤 2차가 다시 판정한다
+        one = {"cards": {cid: copy.deepcopy(cards[cid])} if cid in cards else {}}
+        one_deep = None
+        if isinstance(deep, dict):
+            one_deep = {cid: copy.deepcopy(deep[cid])} if cid in deep else {}
+        problems, _done = apply_blanks(one, one_deep, reqs.get(cid, []), dreqs.get(cid, []))
+        if problems:
+            out[cid] = problems
+    return out
+
+
 def verify_blanks(brief, requests, deep_reqs=None):
     """다시 돌린 조립본에서 칸 삭제가 반영됐는지(문제 줄, 순수). 심층 삭제 카드는 심층이 빠져도 문제가 아니다."""
     problems = []
@@ -444,11 +477,18 @@ def main(argv=None):
     v = sub.add_parser("verify")
     v.add_argument("copyedit")
     v.add_argument("brief")
+    c = sub.add_parser("check")
+    c.add_argument("copyedit")
+    c.add_argument("delta")
+    c.add_argument("deep", nargs="?")
     args = ap.parse_args(argv)
     try:
         copyedit = _load(args.copyedit)
         if args.cmd == "verify":
             brief = _load(args.brief)
+        elif args.cmd == "check":
+            delta = _load(args.delta)
+            deep = _load(args.deep) if args.deep else None
         elif args.cmd == "apply":
             delta = _load(args.delta_in)
             deep = _load(args.deep_in) if args.deep_in else None
@@ -468,6 +508,14 @@ def main(argv=None):
         print(f"심층 삭제로 통과 {len(converted)}장 · 남은 반려 {len(remaining)}장({verdict})")
         return 0
     requests, dreqs = blank_requests(copyedit), deep_requests(copyedit)
+    if args.cmd == "check":
+        refused = refused_cards(copyedit, delta if isinstance(delta, dict) else {}, deep)
+        for cid, problems in refused.items():
+            for p in problems:
+                print(f"거부: {cid} — {p}")
+        print(f"칸 삭제 {len(requests)}건 · 심층 삭제 {len(dreqs)}건 · 거부될 카드 {len(refused)}장"
+              + (f" ({', '.join(refused)}) — reject 로 바꾼다(비울 수 없는 칸 — 기자가 고친다)" if refused else ""))
+        return 1 if refused else 0
     if args.cmd == "verify":
         problems = verify_blanks(brief if isinstance(brief, dict) else {}, requests, dreqs)
         for cid in deep_lost(brief if isinstance(brief, dict) else {}, dreqs):

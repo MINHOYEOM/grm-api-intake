@@ -142,6 +142,28 @@ class CopyeditEvidenceTest(unittest.TestCase):
         rej["cards"][1]["verdict"] = "reject"
         self.assertTrue(any("reject 인데 fails 가 비었다" in l for l in _bad(rej)))
 
+    def test_refused_blank_on_pass_card_fails_until_applied(self):
+        # 리허설 1121c: 핵심 사실 하나뿐인 카드의 key_facts[0] 칸 삭제 — 1차 판정 때 잡아 재작업으로 보내야 한다.
+        ce_ = _full()
+        ce_["cards"][0]["notes"] = [{"item": "칸 삭제", "slot": "key_facts[0]", "evidence": "원문보다 강한 단정"}]
+        self.assertEqual(_bad(ce_), [])                                   # 기본(blank_check 끔)은 종전 그대로
+        delta = _delta()
+        delta["cards"]["a"]["en"]["key_facts"] = ["Observation 1: no OOS procedure"]
+        lines, stats = ce.check(delta, ce_, _deep(), _handoff(), None, blank_check=True)
+        self.assertTrue(any(l.startswith("a:") and "칸 삭제를 반영할 수 없다" in l and "핵심 사실이 하나뿐" in l
+                            for l in lines), lines)
+        self.assertEqual(stats["bad"], 1)
+        with tempfile.TemporaryDirectory() as tmp:
+            for name, obj in (("delta.json", _delta()), ("deep_delta.json", _deep()), ("handoff.json", _handoff()),
+                              ("copyedit.json", ce_)):
+                with open(os.path.join(tmp, name), "w", encoding="utf-8") as f:
+                    json.dump(obj, f, ensure_ascii=False)
+            hp = os.path.join(tmp, "handoff.json")
+            self.assertEqual(ce.main(["check", tmp, hp]), 1)              # 반영 전 — CLI 는 켜고 돈다
+            with open(os.path.join(tmp, "slot_removals.json"), "w", encoding="utf-8") as f:
+                json.dump({"removed": []}, f)
+            self.assertEqual(ce.main(["check", tmp, hp]), 0)              # 반영 기록이 있으면 이미 비운 델타 — 보지 않는다
+
     def test_cli_check_and_merge(self):
         with tempfile.TemporaryDirectory() as tmp:
             def put(name, obj):

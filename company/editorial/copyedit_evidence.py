@@ -33,6 +33,8 @@
     심층 삭제 카드는 `deep.<키>` 근거 요구도 없다(심층이 통째로 빠질 수 있다).
   - 원문이 정말 없는 카드(handoff·스캐폴드 어디에도 본문이 없다)는 `checked` 대신 `"source_absent": "<사유>"` — 코드가 원문이 있다고 보면 실패다.
   - `reject` 카드는 `fails` 가 비어 있으면 안 된다.
+  - `pass` 카드의 칸 삭제·심층 삭제가 `blank_slots.py apply` 에서 거부되면 실패다(`blank_slots.py check` 와 같은 판정 · 리허설 1121c).
+    실행 폴더에 `slot_removals.json` 이 있으면(이미 반영한 델타) 이 항목은 보지 않는다.
 
 저장소 루트에서 돌린다. 네트워크·DB·Notion 을 쓰지 않는다. 읽을 수 없으면 exit 2.
 """
@@ -244,8 +246,26 @@ def card_problems(cid, entry, card, deep_entry, row, sc_card):
     return probs
 
 
-def check(delta, copyedit, deep=None, handoff=None, scaffold=None):
-    """(문제 줄 목록, 요약 dict). 문제 줄이 비어 있으면 통과."""
+def _blank_slots():
+    """같은 폴더의 `blank_slots.py`(칸 삭제 반영기) — 파일 경로로 불러 sys.path 에 기대지 않는다."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "company_blank_slots_for_evidence", os.path.join(os.path.dirname(os.path.abspath(__file__)), "blank_slots.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def blank_applied(folder):
+    """실행 폴더의 델타가 이미 칸 삭제를 반영했는가 — `blank_slots.py apply --log` 는 성공할 때만 `slot_removals.json` 을 쓴다."""
+    return os.path.isfile(os.path.join(folder, "slot_removals.json"))
+
+
+def check(delta, copyedit, deep=None, handoff=None, scaffold=None, blank_check=False):
+    """(문제 줄 목록, 요약 dict). 문제 줄이 비어 있으면 통과.
+
+    `blank_check=True` 면 `pass` 카드의 칸 삭제·심층 삭제가 `blank_slots.py apply` 에서 거부될지도 본다(리허설 1121c —
+    1차 재작업 뒤 2차 마감에서야 거부가 드러나 `보류`). 델타가 칸 삭제 **전** 것일 때만 켠다(호출자가 `blank_applied` 로 가른다)."""
     lines = []
     cards = (delta or {}).get("cards") if isinstance(delta, dict) else None
     if not isinstance(cards, dict) or not cards:
@@ -268,12 +288,15 @@ def check(delta, copyedit, deep=None, handoff=None, scaffold=None):
     if missing:
         lines.append(f"판정 줄이 없는 카드 {len(missing)}: {', '.join(missing[:10])}" + (" …" if len(missing) > 10 else ""))
     rows, scs, dps = handoff_rows(handoff), scaffold_cards(scaffold), deep_items(deep)
+    refused = _blank_slots().refused_cards(copyedit, delta, deep if isinstance(deep, dict) else None) if blank_check else {}
     ok = bad = 0
     for cid, card in cards.items():
         if cid not in by_id:
             bad += 1
             continue
         probs = card_problems(cid, by_id[cid], card, dps.get(cid), rows.get(cid), scs.get(cid))
+        probs += [f"칸 삭제를 반영할 수 없다(blank_slots.py check) — reject 로 바꾼다(비울 수 없는 칸 — 기자가 고친다): {p}"
+                  for p in refused.get(cid, [])]
         if probs:
             bad += 1
             lines.append(f"{cid}: " + " · ".join(probs))
@@ -294,7 +317,7 @@ def check_folder(folder, handoff_path, copyedit_path=None, scaffold_path=None):
     deep = _load_opt(os.path.join(folder, "deep_delta.json"))
     sp = find_scaffold(folder, handoff, scaffold_path)
     scaffold = _load_opt(sp) if sp else None
-    lines, stats = check(delta, copyedit, deep, handoff, scaffold)
+    lines, stats = check(delta, copyedit, deep, handoff, scaffold, blank_check=not blank_applied(folder))
     if not isinstance(handoff, dict):
         lines.insert(0, f"handoff 를 읽지 못했다: {handoff_path}")
     return lines, stats

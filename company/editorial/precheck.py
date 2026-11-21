@@ -24,6 +24,8 @@
         (정제수·용수·물·산도·누설·불순물·엑셀·배지·소독제·내시경·수십·박층)이 사실 칸에 있는데 그 카드 원문 전체
         (handoff 행 + 스캐폴드 결정론 필드)에 대응하는 말이 영어로도 한국어로도 없으면 **막는다**(`가림 값 채움 …`).
         권고 칸(implication·checks)·handoff 행이 없는 카드·관찰 단위 대조·'원료'는 경고만(`가림 값 채움 의심 …`).
+        **개인 실명**(2026-11-21 대표 결정)은 경고만(`개인 실명 의심 …` — `private_name_warn_lines`): 원문 483 수신인 칸·
+        Mr./Dr. 등 호칭 뒤 이름이 카드 산문에 나오면 한 줄. 업체명 낱말은 뺀다. `deep` 도 같은 함수로 심층 칸·국문 병기를 본다.
 
     python company/editorial/precheck.py deep-source <handoff 파일> <deep_delta 파일> --out <검사용 파일>
         심층분석 델타의 각 카드에 그 주 handoff 의 `deep_analysis_input.body_full` 을 `source_text` 로 붙인
@@ -562,6 +564,80 @@ def accuracy_warn_lines(delta, scaffold=None, deep=None, handoff=None):
     return out
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# [리허설 1121] 개인 실명 — 2026-11-21 대표 결정: 공직자·규제기관 공식 발표 속 직함상 공식 인물 외에는 개인 실명을 싣지 않는다.
+# 원문에서 **개인 이름 자리가 확실한 곳**만 이름을 뽑는다: 483 머리말 'INDIVIDUAL TO WHOM REPORT (IS) ISSUED' 칸(수신인),
+# 'Mr./Mrs./Ms./Dr./Prof.' 호칭 바로 뒤(경고서한 'Dear Mr. …'·WHOPIR 'Mr. … as Managing Director'). 업체명(`firm`·`headline`)에
+# 든 낱말은 뺀다(개인 사업체는 업체명 자체가 사람 이름 — 업체명으로서는 싣는다). 번역·음역은 못 잡는다 — **경고만**.
+# ─────────────────────────────────────────────────────────────────────────────
+_HONORIFIC_NAME_RE = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof)[.,]?\s+((?:[A-Z][A-Za-z'\-]+\.?\s?){1,3})")
+_ISSUED_TO_RE = re.compile(r"INDIVIDUAL\s+TO\s+WHOM\s+REPORT\b.{0,12}?ISSUED(.{0,160}?)FIRM\s*NAME", re.S | re.I)
+_ISSUED_LEAD_RE = re.compile(r"^(?:[\W_]*(?:To|TO)\s*:)?[\W_]*(?:(?:Mr|Mrs|Ms|Dr|Prof)[.,]?\s+)?")
+_NAME_TOKEN_RE = re.compile(r"[A-Z][A-Za-z'\-]{2,}")
+
+
+def source_person_names(text, firm_text=""):
+    """원문 → 개인 이름 낱말 집합(순수). 업체명에 든 낱말·전부 대문자 낱말(FIRM·NAME·NMI 등 서식 글자)은 뺀다."""
+    text = text or ""
+    cands = [m.group(1) for m in _HONORIFIC_NAME_RE.finditer(text)]
+    for m in _ISSUED_TO_RE.finditer(text):
+        block = _ISSUED_LEAD_RE.sub("", re.sub(r"\s+", " ", m.group(1)).strip())
+        cands.append(re.split(r",| - | — |–", block, maxsplit=1)[0])
+    firm_low = (firm_text or "").lower()
+    toks = set()
+    for c in cands:
+        for t in _NAME_TOKEN_RE.findall(c):
+            if not t.isupper() and t.lower() not in firm_low:
+                toks.add(t)
+    return toks
+
+
+def _name_source(row, sc):
+    src = guess_check.card_source(row, sc)
+    if isinstance(row, dict) and row.get("ncr_translation_input"):
+        src += "\n" + guess_check._dump(row["ncr_translation_input"])
+    return re.sub(r"\\[nrt]", " ", src)   # JSON 덤프의 '\n' 글자 — 남겨 두면 'Mr' 앞 낱말 경계가 사라진다
+
+
+def _firm_text(row, sc):
+    parts = []
+    if isinstance(row, dict):
+        parts += [str(row.get(k) or "") for k in ("firm", "headline")]
+        pi = row.get("prose_input")
+        if isinstance(pi, dict):
+            parts.append(str(pi.get("firm_or_product") or ""))
+    if isinstance(sc, dict):
+        parts += [str(f.get("value") or "") for f in sc.get("facts") or []
+                  if isinstance(f, dict) and f.get("label") in ("제조소/업체", "주제", "업체")]
+    return " ".join(parts)
+
+
+def private_name_warn_lines(delta=None, deep=None, rows=None, scaffold_cards=None):
+    """개인 실명 경고 줄(순수) — 막지 않는다. 카드 산문(델타 한·영 슬롯, 심층 칸·국문 병기)에 그 카드 원문의 개인 이름 낱말이 나오면 한 줄."""
+    rows, scaffold_cards = rows or {}, scaffold_cards or {}
+    out = []
+
+    def check(cid, slots, tag):
+        row, sc = rows.get(cid), scaffold_cards.get(cid)
+        if not (row or sc):
+            return
+        names = source_person_names(_name_source(row, sc), _firm_text(row, sc))
+        for slot, text in slots:
+            hit = sorted(n for n in names if re.search(rf"(?<![A-Za-z]){re.escape(n)}(?![A-Za-z])", text))
+            if hit:
+                out.append(f"개인 실명 의심 {cid}.{tag}{slot}: {', '.join(hit)} — 원문의 개인 이름(483 수신인·호칭 뒤 이름)이다. "
+                           f"공직자·규제기관 공식 인물이 아니면 '시설 책임자'·'업체 대표'·'해당 임원'으로 쓴다")
+
+    cards = delta.get("cards") if isinstance(delta, dict) and isinstance(delta.get("cards"), dict) else {}
+    for cid, card in cards.items():
+        if isinstance(card, dict):
+            check(cid, [(s, t) for s, t, _ in guess_check.delta_slots(card)], "")
+    items = deep.get("items") if isinstance(deep, dict) and isinstance(deep.get("items"), dict) else deep
+    for cid, entry in (items or {}).items() if isinstance(items, dict) else ():
+        check(cid, [(s, t) for s, t, _, _ in guess_check.deep_slots(entry)], "deep.")
+    return out
+
+
 def deep_lines(shard, ids_483):
     """심층 샤드의 국문 병기 자리·결손 줄(순수)."""
     out = []
@@ -689,6 +765,7 @@ def main(argv=None):
                 print(line)
             warns = warn_lines(delta, _load(args.deep) if args.deep else None) + hook_warn
             warns += accuracy_warn_lines(delta, scaffold) + guess_warn
+            warns += private_name_warn_lines(delta, None, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 인용 번역 대조는 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:
@@ -712,6 +789,7 @@ def main(argv=None):
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()
             warns += accuracy_warn_lines({"cards": {}}, None, shard, handoff) + guess_warn
+            warns += private_name_warn_lines(None, shard, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 국문 병기 관문(483·WL·WHOPIR)은 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:

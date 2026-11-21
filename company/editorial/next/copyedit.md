@@ -61,7 +61,40 @@
    사본을 못 받아 검사를 못 하면 그것도 **통과가 아니다**(결과에 `막힘: scaffold 사본 — <사유>` 한 줄).
 2. **의미 점검.** 카드마다 v16 [발행 전 산문 자가 점검] 1~10번과 [핵심 원칙] 2-1(원문 부재 주장 금지)을 O/X 로 판정한다. 심층 칸이 있는 카드는 위 '3-1. 문체'도 판정한다.
    X 는 근거(슬롯 이름 + 코드 `facts`/`prose_input` 의 어느 값과 어긋나는지)를 적는다.
-2-1. **`hook_line` 점검(있는 카드만).** 한국어 `hook_line` 과 `en.hook_line` 각각 `STYLE.md` §12 로 O/X: ① 금칙어 없음(신호, 볼 만, 필요가, 가능성, 시사, 우려, 느낌표·물음표·이모지) ② 공백 포함 **한국어 40자 이내 · 영문 90자 이내**(영문에 40자를 적용하지 않는다) ③ **숫자 원문 대조** — 문장의 모든 숫자가 같은 카드의 코드 `facts`·483 `observations`·WL `violations` 본문에 글자 그대로 있어야 한다(세어서 만든 숫자·반올림 X) ④ 근거 없는 사실·원문보다 강한 단정 없음(진술은 "진술" 표기) ⑤ 사전 용어는 사전 표기, 영문 약어 없음 ⑥ 업체명·제목 반복 없음. 근거를 못 찾으면 X 로 적고(`item: "hook_line"`) 기자가 필드를 비우도록 되돌린다. `hook_line` 이 없는 카드는 점검 대상이 아니다(없는 것이 정상).
+2-1. **`hook_line` 점검(있는 카드만).** 한국어 `hook_line` 과 `en.hook_line` 각각 `STYLE.md` §12 로 O/X: ① 금칙어 없음(신호, 볼 만, 필요가, 가능성, 시사, 우려, 느낌표·물음표·이모지) ② 공백 포함 **한국어 40자 이내 · 영문 90자 이내**(영문에 40자를 적용하지 않는다) ③ **숫자 원문 대조** — 문장의 모든 숫자가 같은 카드의 코드 `facts`·483 `observations`·WL `violations` 본문에 글자 그대로 있어야 한다(세어서 만든 숫자·반올림 X) ④ 근거 없는 사실·원문보다 강한 단정 없음(진술은 "진술" 표기) ⑤ 사전 용어는 사전 표기, 영문 약어 없음 ⑥ 업체명·제목 반복 없음. 근거를 못 찾으면(①③④) 아래 2-3 칸 삭제(`slot: "hook_line"`)로 적는다 — 기자에게 되돌리지 않는다. `hook_line` 이 없는 카드는 점검 대상이 아니다(없는 것이 정상).
+2-2. **반려와 주의 — 반려는 정확성 문제만(2026-11-21 대표 결정).** 2·2-1번의 X 를 아래 표로 가른다. 반려(`reject`)는 표 왼쪽 줄에 해당할 때만이다.
+   오른쪽 줄(문체)은 카드를 `verdict: "pass"` 로 두고 `notes` 에 적기만 한다 — 재작업(`rework.cards`)에 넣지 않고, reject 수에 세지 않는다.
+   한 카드에 둘 다 있으면 `reject` 이고, 문체 지적은 그 카드의 `notes` 에 따로 적는다(`fails` 에는 반려 근거만).
+   단 왼쪽 줄의 오류가 **선택 칸에만** 있으면 반려하지 않고 아래 2-3 칸 삭제로 처리한다.
+
+   | 판정 | 해당하는 것 |
+   |---|---|
+   | **반려 `reject`** (`fails`) — 정확성 | ① 사실 오류: 원문·코드 `facts` 와 다른 숫자·날짜·이름·조항(세어서 만든 숫자 포함) ② 원문에 없는 말: 원문에 없는 사실·결합·분류를 보탬, 가려진(`[redacted]`·비공개)·OCR 깨진 값을 추정해 채움, 원문 부재 단정([핵심 원칙] 2-1) ③ 원문보다 강한 단정: 가능성·추정을 단정으로, 업체 직원의 말을 사실로(STYLE R3 — "진술" 표기 없음) ④ 금칙어(`hook_line` ① 포함 — 화면이 그 줄을 숨긴다) ⑤ 마크업·깨진 형식 ⑥ 국·영 짝 불일치(한쪽에만 있는 사실·숫자·뜻) ⑦ 개인 실명 등 공개 위험 ⑧ 코드 게이트 실패(1번 — `hook_line` 길이 ② 포함) |
+   | **주의 `pass`** (`notes`) — 문체 | 같은 대상 다른 이름(앞면↔심층 포함) · 한 문장에 사실 여러 개 · 용어표 표기 차이·목록 밖 약어(코드가 세는 것은 기자의 `precheck.py` 사전 점검이 막는다) · 군말 · 문장 길이·리듬 · `hook_line` 문체 규칙(⑤ 사전 표기·영문 약어, ⑥ 업체명·제목 반복 — 단 금칙어는 반려) · 근거 번호 `(관찰 N)` 표기 형식 · 날짜·조항 표기 꼴 |
+
+   판정을 여러 조각(서브 에이전트)으로 나누면 **조각마다 지시 문장에 이 표를 글자 그대로 붙인다**(리허설 1121a — 조각 4개가 따로 엄격도를 정해 59장 반려, 전부 문체·용어였다).
+   조각 결과를 합칠 때 표 오른쪽 줄에 해당하는 반려는 `notes` 로 옮기고 `pass` 로 고친다.
+   `notes` 는 이 호의 발행을 막지 않고, 다음 주 지시문·용어표를 고치는 재료로 남는다.
+2-3. **칸 삭제 — 정확성 오류가 선택 칸에만 있으면 칸을 비우고 통과(2026-11-21 대표 결정).** 2-2 왼쪽(반려) 오류가 아래 칸에만 있으면
+   그 카드는 `verdict: "pass"` 로 두고 칸마다 `notes` 에 `{"item": "칸 삭제", "slot": "<칸>", "evidence": "<사유 — 원문과 어디가 어긋나는지>"}` 를 적는다.
+   칸은 교열이 손으로 지우지 않는다 — `blank_slots.py` 가 국·영 짝으로 비운다(비우기만 하므로 새 문장이 생기지 않는다).
+   비울 수 있는 칸: `hook_line` · `implication` · `checks` · `checks[i]`(남는 점검 2~3개) · `key_facts[i]`(하나 이상 남을 때) ·
+   FDA 483 심층의 `deep.key_violations[i]`(하나 이상 남을 때)·`deep.inspectional_significance`·`deep.administrative_risks`. `i` 는 한국어 목록에서 0부터 센 위치다(영문은 같은 위치가 빠진다).
+   `title_issue`·`summary`·인용 번역·경고서한·행정처분 심층 절은 필수 칸이다 — 거기 오류가 있으면 반려(`fails`). 칸 안의 문장 일부만 지우는 것은 칸 삭제가 아니다.
+   **반영은 마감하는 판정에서만.** 칸 삭제 말고 reject 가 0 이면(1차든 2차든) 4번 마감 **전에** 반영한다:
+   ```
+   mkdir -p _scaffold && cp -n company/run/{run_date_kst}/delta.json _scaffold/delta.pre_blank.json && cp -n company/run/{run_date_kst}/deep_delta.json _scaffold/deep.pre_blank.json
+   python company/editorial/blank_slots.py apply company/run/{run_date_kst}/copyedit.json _scaffold/delta.pre_blank.json company/run/{run_date_kst}/delta.json \
+     --deep-in _scaffold/deep.pre_blank.json --deep-out company/run/{run_date_kst}/deep_delta.json
+   ```
+   (`cp -n` 은 이미 있는 칸 삭제 전 사본을 덮지 않는다 — 다시 돌려도 같은 사본에서 같은 결과가 나온다.) exit≠0 이면 메시지의 카드는 비울 수 없는 칸이었다 — `reject` 로 바꾼다.
+   그다음 **1번 코드 검사를 다시 돌린다**(`deep-source` 검사용 사본도 새 `deep_delta.json` 으로 다시 만든다). exit 0 이고, 이어서
+   `python company/editorial/blank_slots.py verify company/run/{run_date_kst}/copyedit.json company/run/{run_date_kst}/brief_check.json` 도 exit 0 이어야 통과다
+   (심층을 비운 카드가 심층 게이트에 걸려 심층을 통째로 잃지 않았는지 본다 — 심층 게이트 실패는 조립을 막지 않는다).
+   하나라도 실패하면 `cp _scaffold/delta.pre_blank.json company/run/{run_date_kst}/delta.json && cp _scaffold/deep.pre_blank.json company/run/{run_date_kst}/deep_delta.json` 로 되돌리고
+   그 카드를 `reject` 로 바꿔 3-1 대로 처리한다. `code_gate` 에는 다시 돌린 결과를 적는다. 마감 1번이 push 하는 `delta.json`·`deep_delta.json` 은 칸을 비운 이 파일이다.
+   **재작업(3-1)으로 되돌릴 때는 반영하지 않는다** — 칸 삭제는 `notes` 에만 두고 `delta.json` 은 판정한 그대로 커밋한다(2차의 `merge_parts.py` 가 샤드에서 델타를 다시 만들고
+   `rework-diff` 가 1차 델타와 대조하므로, 1차에 비우면 반려 안 된 카드가 바뀐 것으로 걸린다). 2차는 `rework-diff` 와 코드 검사 뒤, 마감 전에 위 순서로 반영한다(1차에서 옮긴 `pass` 카드의 칸 삭제 포함).
 3. **직접 고치지 않는다.** 판정만 한다. 기준표에 없는 취향 지적을 하지 않는다.
 3-1. **반려가 있으면 기자에게 한 번 되돌린다(재작업 1회 — 2026-11-14 대표 결정).** 조건: 코드 검사 exit 0 · reject 1~10장 · 이 호의 첫 판정(`copyedit.json` 이 아직 없었다).
    **코드 검사가 카드 몇 장 때문에 실패한 때도 같다(리허설 1118 — 2026-11-17).** 실패 메시지(`LLM 슬롯 주입 검증 실패`·`발행본 조립 검증 실패`)의 줄마다 카드 id 가 하나씩 들어 있고(`<카드 id>.<슬롯>` 또는 `카드 '<카드 id>': … <슬롯> …` — 리허설 1120 의 원문 부재 단정이 뒤의 꼴) 그 카드가 1~10장이면
@@ -113,13 +146,16 @@
   "round": 1,
   "code_gate": {"ran": true, "exit": 0, "message": ""},
   "cards": [{"web_card_id": "...", "verdict": "pass|reject",
-             "fails": [{"item": "자가점검 9", "slot": "key_facts", "evidence": "한 줄"}]}],
-  "counts": {"cards": 0, "pass": 0, "reject": 0, "fails_total": 0}
+             "fails": [{"item": "자가점검 9", "slot": "key_facts", "evidence": "한 줄"}],
+             "notes": [{"item": "같은 이름", "slot": "deep.key_violations[0].observation", "evidence": "한 줄"}]}],
+  "counts": {"cards": 0, "pass": 0, "reject": 0, "fails_total": 0, "notes_total": 0}
 }
 ```
+`fails` 는 반려 근거(2-2 표 왼쪽)만, `notes` 는 주의(표 오른쪽)만 적는다 — 없으면 빈 배열이거나 키를 빼도 된다. `verdict` 는 `pass`·`reject` 둘뿐이다(주의 카드도 `pass`).
+`counts.reject` 는 `verdict: "reject"` 카드 수다 — `notes`(칸 삭제 포함)는 세지 않는다.
 같은 폴더에 `copyedit.md` — 헌장의 맨 위 3줄만.
 
 `copyedit.json` 에 `"published": true|false` 를 더해, 마감까지 했는지 적는다.
 
 ## 하지 않는 것
-슬롯 수정(반려 카드는 기자가 고친다 — 3-1), 카드 채택 변경, 검색, 마감 4번 밖의 Notion 쓰기(행 Status 포함), 다른 직무 파일 수정.
+슬롯 수정(반려 카드는 기자가 고친다 — 3-1. 2-3 칸 삭제는 `blank_slots.py` 로만), 카드 채택 변경, 검색, 마감 4번 밖의 Notion 쓰기(행 Status 포함), 다른 직무 파일 수정.

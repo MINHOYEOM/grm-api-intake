@@ -282,6 +282,12 @@ class ReworkDiffTest(unittest.TestCase):
         self.assertEqual(problems, [])
         self.assertEqual(notes, ["고침 b: summary"])
 
+    def test_notes_on_pass_card_are_not_rejections(self):
+        """[11-21] 교열 '주의'(pass + notes)는 재작업 대상이 아니다 — rejected_ids 에 안 들어간다."""
+        r1 = json.loads(json.dumps(self.R1, ensure_ascii=False))
+        r1["cards"][0]["notes"] = [{"item": "같은 이름", "slot": "summary", "evidence": "한 줄"}]
+        self.assertEqual(precheck.rejected_ids(r1), {"b"})
+
     def test_touching_a_passed_card_is_out_of_scope(self):
         new = self._new(a=_card(summary="다른 문장."), b=_card(summary="고친 문장."))
         problems, _ = precheck.rework_diff(self.OLD, new, {"b"})
@@ -362,6 +368,11 @@ class ReworkInstructionsTest(unittest.TestCase):
             Path(tmp, "copyedit.json").write_text(
                 json.dumps(dict(done, counts={"reject": 1}), ensure_ascii=False), encoding="utf-8")
             self.assertFalse(four())                                   # 2차에도 반려가 남았다
+            noted = dict(done, cards=[{"web_card_id": "a", "verdict": "pass", "fails": [],
+                                       "notes": [{"item": "같은 이름", "slot": "summary", "evidence": "한 줄"}]}],
+                         counts={"reject": 0, "notes_total": 1})
+            Path(tmp, "copyedit.json").write_text(json.dumps(noted, ensure_ascii=False), encoding="utf-8")
+            self.assertTrue(four())                                    # [11-21] 주의(notes)는 반려가 아니다
             Path(tmp, "copyedit.json").write_text(
                 json.dumps(dict(done, round=1), ensure_ascii=False), encoding="utf-8")
             self.assertTrue(four())                                    # 1차에 바로 통과(종전)

@@ -1056,6 +1056,15 @@ class LoadGitRunTest(unittest.TestCase):
         self.assertTrue(run["adoptable"], run["reason"])
         self.assertEqual(run["branch"], "claude/company-2026-07-13")
 
+    def test_pass_with_notes_still_adoptable(self) -> None:
+        """[11-21] 교열 '주의'(pass + notes · counts.notes_total)는 반려가 아니다 — 채택을 막지 않는다."""
+        ce = json.loads(json.dumps(_COPYEDIT_OK))
+        ce["cards"][0]["notes"] = [{"item": "같은 이름", "slot": "deep.key_violations", "evidence": "한 줄"}]
+        ce["counts"]["notes_total"] = 1
+        run = db.load_git_run("2026-07-13", read=_git_reader(
+            {"delta.json": _git_delta(), "copyedit.json": ce}))
+        self.assertTrue(run["adoptable"], run["reason"])
+
     def test_held_copyedit_not_adoptable_but_delta_kept_for_compare(self) -> None:
         run = db.load_git_run("2026-07-13", read=_git_reader(
             {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_HELD}))

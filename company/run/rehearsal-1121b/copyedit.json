@@ -1,0 +1,792 @@
+{
+ "status": "완료",
+ "round": 1,
+ "rehearsal": true,
+ "published": false,
+ "code_gate": {
+  "ran": true,
+  "exit": 0,
+  "message": "merge_parts exit 0(델타 153·심층 65) · assemble_publish_brief exit 0(채택 145·스킵 18, 심층 병합 61) · check_en_slots exit 0"
+ },
+ "cards": [
+  {
+   "web_card_id": "fda483-196254",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196260",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196305",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196306",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196307",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196308",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196309",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196312",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196313",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196317",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196318",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196320",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196321",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196327",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196329",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196335",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196340",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196343",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196348",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196351",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196352",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196353",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196354",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196355",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196356",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196362",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196363",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196370",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196371",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196372",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196373",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196374",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196375",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196376",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196377",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196378",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196379",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196380",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196382",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196384",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196385",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196387",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196388",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196390",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196391",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196392",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196393",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196394",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196395",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196397",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196398",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196399",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196400",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196401",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196402",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196403",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196404",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196405",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196407",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196408",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196409",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196410",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196411",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196412",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196413",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196414",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196416",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196417",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196418",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196425",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196427",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196429",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196430",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196431",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196432",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196433",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196435",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196437",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196441",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196443",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196444",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196445",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196447",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196449",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196451",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196452",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196455",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196456",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196457",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196458",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196463",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196464",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196502",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196588",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196637",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196639",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196640",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196641",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196650",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196880",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0f3a6eeb815d",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "55c08c82779b",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "d60bdc71408a",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "ed75ff499f75",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008242",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008244",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008255",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008256",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008296",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q7txc0kHQ0",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-30a2ef396db1",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-327eae52c8bb",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-53d37db1b711",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-6ffa973e2763",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-74000539e83e",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-8a5c7d80ccf0",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-9cf757ea745d",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-bb9291755916",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-bc51804c85aa",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-c5d40bc8b3d1",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0165-2027",
+   "verdict": "pass",
+   "fails": [],
+   "notes": [
+    {
+     "item": "주의",
+     "slot": "hook_line",
+     "evidence": "회수 29,085병은 대표 품목 수량인데 카드는 2품목 병합(외 1품목) — 문체상 주의, 사실 오류 아님(implication 에 '대표 품목' 명시)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "0a7b0d339de9",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "9730858b8989",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "a74d4fbdccdd",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "ad04c5ea4a99",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196381",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196386",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "fda483-196426",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82964",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "hc-82965",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "0888f05a0fd6",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "ac07673512db",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admin-2026008238",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "admrul-2100000288220",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "data0008-15206",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "data0011-15996",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "data0011-15997",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q7XhpAwI0q",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q7XhpAwhFA",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "gmpinspect-1Q7txc0kUrl",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "ef50339bb834",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0114-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0157-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0158-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0159-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0167-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0173-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "D-0182-2027",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "recall-fb-24e87667c9a6a108",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "who-whopir-492199ae88d3",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "who-whopir-98cfb8b39789",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "who-whopir-af14a079113a",
+   "verdict": "pass",
+   "fails": []
+  },
+  {
+   "web_card_id": "who-whopir-d6ea75f7687f",
+   "verdict": "pass",
+   "fails": []
+  }
+ ],
+ "counts": {
+  "cards": 153,
+  "pass": 153,
+  "reject": 0,
+  "fails_total": 0,
+  "notes_total": 1
+ }
+}

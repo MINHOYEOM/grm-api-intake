@@ -825,5 +825,36 @@ class CopyeditRules1121aTest(unittest.TestCase):
             self.assertIn("v16_terms", rep)
 
 
+class PrivateName1121Test(unittest.TestCase):
+    """개인 실명 경고(2026-11-21 대표 결정) — 483 수신인·호칭 뒤 이름이 산문에 나오면 경고, 업체명은 통과."""
+
+    BODY_483 = ("INDIVIDUAL TO WHOM REPORT IS ISSUED\nTo:\nMr, Mitsuo Sugiyama, Vice President, General Plant Manager\n"
+                "FIRM NAME\nSTREET ADDRESS\nDaiichi Sankyo Chemical Pharma Co., Ltd.\nOBSERVATION 1 Procedures were not followed.")
+
+    def test_483_recipient_and_whopir_honorific_warn(self):
+        rows = {
+            "fda483-1": {"web_card_id": "fda483-1", "kind": "fda-483", "firm": "Daiichi Sankyo Chemical Pharma Co., Ltd.",
+                         "deep_analysis_input": {"body_full": self.BODY_483}},
+            "who-1": {"web_card_id": "who-1", "kind": "who-inspection", "firm": "Cipla (Kurkumbh D-7) - FPP",
+                      "ncr_translation_input": {"s9": "The company had recently appointed Mr. Achin Gupta as Managing Director & Global CEO."}},
+        }
+        delta = {"cards": {"fda483-1": _card(summary="FDA가 Mitsuo Sugiyama 부사장에게 483을 발행했다."),
+                           "who-1": _card()}}
+        deep = {"items": {"who-1": {"ncr_ko": {"s9_ko": "회사는 최근 Achin Gupta를 대표이사로 임명했다."}}}}
+        warns = precheck.private_name_warn_lines(delta, deep, rows, {})
+        self.assertEqual(len(warns), 2, warns)
+        self.assertTrue(any(w.startswith("개인 실명 의심 fda483-1.summary: Mitsuo, Sugiyama") for w in warns), warns)
+        self.assertTrue(any(w.startswith("개인 실명 의심 who-1.deep.ncr_ko.s9_ko: Achin, Gupta") for w in warns), warns)
+
+    def test_sole_proprietor_firm_name_not_flagged(self):
+        # 개인 사업체는 업체명 자체가 사람 이름 — 업체명으로서는 싣는다(리허설 1121 fda483-196329). 원문 호칭 이름도 업체명 낱말이면 뺀다.
+        rows = {"fda483-2": {"web_card_id": "fda483-2", "kind": "fda-483", "firm": "Kenneth F Tesch",
+                             "headline": "[FDA 483] Kenneth F Tesch",
+                             "deep_analysis_input": {"body_full": "Dear Mr. Tesch: OBSERVATION 1 residue above tolerance."}}}
+        delta = {"cards": {"fda483-2": _card(summary="FDA가 생산자 Kenneth F Tesch에 483을 발행했다.")}}
+        self.assertEqual(precheck.private_name_warn_lines(delta, None, rows, {}), [])
+        self.assertEqual(precheck.source_person_names("INDIVIDUAL TO WHOM REPORT ISSUED\nFIRM NAME\nSTREET ADDRESS"), set())
+
+
 if __name__ == "__main__":
     unittest.main()

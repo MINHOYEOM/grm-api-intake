@@ -799,6 +799,15 @@ class CopyeditRules1121aTest(unittest.TestCase):
             self.assertIn("경고: 가능성 표현 누락 d.title_issue", out.getvalue())
             self.assertEqual(code, 0)
 
+    def test_assembly_style_lint_keeps_old_rules(self):
+        # 백업 Routine 은 옛 v16 으로 쓴다 — 발행 조립의 표현 검사(기본값)는 새 규칙을 세지 않는다(2026-11-21 대표 결정).
+        delta = {"cards": {"a": _card(hook_line="결함 바이알 다수 발견", key_facts=["관찰 2: 외관 검사 절차 없음"])}}
+        self.assertEqual(inject_slots.lint_prose_style(delta).terms, {})
+        self.assertTrue(inject_slots.lint_prose_style(delta, v16_rules=True).terms)
+        deep = {"d": {"deep_analysis": {"key_violations": [{"observation": "시각검사 중 불합격(관찰 5)."}]}}}
+        self.assertEqual(inject_slots.deep_term_hits(deep), [])
+        self.assertEqual(inject_slots.lint_deep_prose_style(deep).terms, {})
+
     def test_reporter_instructions_name_new_lines(self):
         for rel in ("reporter.md", "next/reporter.md"):
             rep = (ROOT / "company" / "editorial" / rel).read_text(encoding="utf-8")

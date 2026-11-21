@@ -17,7 +17,7 @@
         `--deep <심층 델타·샤드>` 를 주면 심층 칸 산문의 경고(금지 표현·반복 문장)도 낸다. 행정처분 요약 주어 검사도 **경고만**
         (`경고:` 로 시작하는 줄 — exit 코드에 들어가지 않는다). 심층 [용어·표기] 차단은 `deep` 명령이 한다.
         **[용어·표기] 표의 한글 표기·군말('다수'·'장기간' 등)은 v16 문서에서 읽는다**(`inject_slots.v16_terms` — 리허설 1121a:
-        표 줄 `외관검사` 가 손 베낌 표에 빠져 있었고 군말 줄은 코드에 0줄이었다). `hook_line` 한국어의 목록 약어도 막는다(`hook_line 약어 …`).
+        표 줄 `외관검사` 가 손 베낌 표에 빠져 있었고 군말 줄은 코드에 0줄이었다). 이 규칙은 **사전 점검 전용**이다 — 발행 조립은 종전 규칙(백업 Routine 보호). `hook_line` 한국어의 목록 약어도 막는다(`hook_line 약어 …`).
         경고만: 영문 `hook_line` 약어(교열 판정이 갈린다)·약어 후보·진술 표기(R3)·정확성 대조(`accuracy_warn_lines` —
         가림 값 채움 의심·가능성 표현 누락·원문에 없는 수·회수 사유 덧붙임).
 
@@ -88,7 +88,8 @@ def warn_lines(delta, deep=None):
 def term_lines(delta, card_types=None):
     """표현 검사 줄 + 길이 상한 위반 줄(순수). `card_types` = {카드 id: 카드 유형}(선택)."""
     card_types = card_types or {}
-    out = [line for line in inject_slots.lint_prose_style(delta).lines() if not line.startswith("시사점 맺음 반복")]
+    out = [line for line in inject_slots.lint_prose_style(delta, v16_rules=True).lines()
+           if not line.startswith("시사점 맺음 반복")]
     hook = inject_slots._HOOK_LINE_MAX
     title = inject_slots._MAX_TITLE_ISSUE
     cards = delta.get("cards") if isinstance(delta.get("cards"), dict) else {}
@@ -307,7 +308,7 @@ def fda483_ids(payload):
 
 def deep_term_lines(shard):
     """심층 칸 산문의 [용어·표기] 위반 줄(순수) — 델타와 같은 함수(`inject_slots.term_hits`)를 슬롯마다."""
-    return [f"심층 용어 {cid}.{slot}: {lab}" for cid, slot, lab in inject_slots.deep_term_hits(shard)]
+    return [f"심층 용어 {cid}.{slot}: {lab}" for cid, slot, lab in inject_slots.deep_term_hits(shard, v16_rules=True)]
 
 
 def deep_gate_lines(shard, handoff):

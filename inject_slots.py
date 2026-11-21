@@ -800,6 +800,7 @@ _TERM_RE = tuple((re.compile(p), fix) for p, fix in _TERM_VARIANTS)
 # ② 군말 줄("다수·반복적으로·장기간" → …) — 낱말 경계로만 센다('대다수'·'다수결' 은 아니다).
 # ③ 영문 약어 목록·목록 밖 약어 예·기관·제도 이름·단위 — `hook_line` 약어 검사(precheck)가 쓴다.
 # 문서가 없으면(배포 환경 등) 빈 규칙 — 손 베낌 검사는 그대로 돈다.
+# ★①②는 **기자 사전 점검 전용**(`term_hits(..., v16_rules=True)`) — 발행 조립의 표현 검사는 종전 규칙 그대로다(백업 Routine 보호).
 # ─────────────────────────────────────────────────────────────────────────────
 _V16_PROMPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "prompts", "GRM_Prompt_v16.md")
 _JOSA_AFTER = r"(?=$|[^가-힣]|(?:이|가|을|를|은|는|의|에|로|으로|와|과|도|만)(?![가-힣]))"
@@ -904,13 +905,15 @@ def v16_table_hits(blob: str, rules: dict[str, Any] | None = None) -> list[str]:
     return out
 
 
-def term_hits(blob: str, context: str | None = None) -> list[str]:
+def term_hits(blob: str, context: str | None = None, v16_rules: bool = False) -> list[str]:
     """[용어·표기] 막는 검사의 **단일 원천**(순수) — 걸린 라벨 목록. 델타 카드 산문과 심층 칸 산문이 이 함수를 같이 부른다.
 
     ★리허설 1120b: 델타는 이 규칙으로 막고 심층은 경고만 해서, 교열이 심층 산문 용어로 19장을 반려했다.
     규칙을 두 벌 두지 않는다 — 표에 줄을 더하면 델타·심층 사전 점검이 같이 는다.
     ① 표 왼쪽 표기 ② 허용 약어 단독(`context`(없으면 `blob`)에 한글 표기 없음 — '처음 한 번'은 카드 단위)
-    ③ OOS 는 처음 한 번 뒤에도 맨 약어 금지 ④ 목록 밖 약어 ⑤ v16 문서에서 읽은 표 한글 표기·군말(`v16_table_hits`)."""
+    ③ OOS 는 처음 한 번 뒤에도 맨 약어 금지 ④ 목록 밖 약어 ⑤ v16 문서에서 읽은 표 한글 표기·군말(`v16_table_hits`).
+    ⑤ 는 `v16_rules=True` 일 때만 — 기자 사전 점검 전용. 발행 조립(`assemble_publish_brief`)은 끈 채 부른다:
+    월요일 백업 Routine 은 옛 v16(붙여넣은 사본)으로 쓰므로, 조립 규칙이 늘면 STYLE_LINT_BLOCKING 을 켜는 날 백업까지 막힌다(2026-11-21 대표 결정)."""
     context = blob if context is None else context
     out: list[str] = []
     for rx, fix in _TERM_RE:
@@ -928,7 +931,8 @@ def term_hits(blob: str, context: str | None = None) -> list[str]:
     for rx, abbr, ko in _ABBR_OFF_RE:
         if rx.search(blob):
             out.append(f"목록 밖 약어 '{abbr}'→{ko}")
-    out.extend(v16_table_hits(blob))   # [리허설 1121a] ⑤ v16 문서에서 읽은 표 한글 표기·군말
+    if v16_rules:   # [리허설 1121a] ⑤ v16 문서에서 읽은 표 한글 표기·군말 — 기자 사전 점검(precheck)만 켠다
+        out.extend(v16_table_hits(blob))
     return out
 
 # [2026-11-16 재측정] v16 [용어·표기] 에 11-16 에 더한 줄(docs/prompts/GRM_Prompt_v16.md) 중 코드로 셀 수 있는 것.
@@ -1007,7 +1011,7 @@ def _deep_prose_texts(entry: Any) -> list[str]:
     return [t for _, t in _deep_prose_slots(entry)]
 
 
-def deep_term_hits(deep: Any) -> list[tuple[str, str, str]]:
+def deep_term_hits(deep: Any, v16_rules: bool = False) -> list[tuple[str, str, str]]:
     """심층 칸 산문의 [용어·표기] 위반 (카드 id, 슬롯, 라벨) 목록(순수) — `term_hits` 를 **슬롯마다** 부른다.
 
     슬롯 단위인 까닭: 화면은 위반 항목을 따로따로 보여 주고, 교열도 슬롯마다 '처음 한 번은 한글 뒤 괄호'를 본다
@@ -1021,7 +1025,7 @@ def deep_term_hits(deep: Any) -> list[tuple[str, str, str]]:
     for cid, entry in deep.items():
         slots = _deep_prose_slots(entry)
         card = "\n".join(t for _, t in slots)
-        out.extend((str(cid), slot, lab) for slot, text in slots for lab in term_hits(text, card))
+        out.extend((str(cid), slot, lab) for slot, text in slots for lab in term_hits(text, card, v16_rules))
     return out
 
 
@@ -1174,7 +1178,7 @@ def _ending(text: str) -> str:
     return t[-_ENDING_CHARS:] if len(t) >= _ENDING_CHARS else ""
 
 
-def lint_prose_style(delta: dict[str, Any]) -> StyleReport:
+def lint_prose_style(delta: dict[str, Any], v16_rules: bool = False) -> StyleReport:
     """델타 한국어 산문의 표현 검사(순수). 경고 재료만 만든다 — 차단 판단은 호출자 몫."""
     rep = StyleReport()
     cards = delta.get("cards") or {}
@@ -1198,7 +1202,7 @@ def lint_prose_style(delta: dict[str, Any]) -> StyleReport:
         for lab, rx in _BANNED_RE:
             if rx.search(blob):
                 rep.banned.setdefault(lab, []).append(str(cid))
-        for lab in term_hits(blob):
+        for lab in term_hits(blob, v16_rules=v16_rules):
             rep.terms.setdefault(lab, []).append(str(cid))
         for rx, fix in _WARN_TERM_RE:
             m = rx.search(blob)

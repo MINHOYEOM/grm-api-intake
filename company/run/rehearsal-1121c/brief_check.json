@@ -2665,7 +2665,7 @@
    "type_tag": "483",
    "headline_target": "Kenneth F Tesch",
    "title_issue": "식용 조직 암피실린 잔류 초과",
-   "summary": "FDA가 미국의 축산 농가 Kenneth F Tesch에 Form 483(관찰사항 1건)을 발행했다. 식용 조직의 약물 잔류가 허용 기준을 넘은 동물을 주 간 거래에 내놓은 것을 지적했다.",
+   "summary": "FDA가 미국의 개인 축산 농가에 Form 483(관찰사항 1건)을 발행했다. 식용 조직의 약물 잔류가 허용 기준을 넘은 동물을 주 간 거래에 내놓은 것을 지적했다.",
    "facts": [
     {
      "label": "발행일",
@@ -2725,7 +2725,7 @@
    "hook_line": "소 신장에서 암피실린 0.0799 ppm 검출, 허용치는 0.01 ppm",
    "en": {
     "title_issue": "Ampicillin residue above tolerance",
-    "summary": "FDA issued a Form 483 with 1 observation to Kenneth F Tesch, a grower in the USA, citing a food-producing animal offered for interstate commerce with a drug residue in edible tissue above tolerance.",
+    "summary": "FDA issued a Form 483 with 1 observation to an individual grower in the USA, citing a food-producing animal offered for interstate commerce with a drug residue in edible tissue above tolerance.",
     "implication": "",
     "key_facts": [
      "Observation 1: an animal offered for sale had an ampicillin residue in the kidney at 0.0799 ppm (tolerance 0.01 ppm)",
@@ -3045,7 +3045,7 @@
    "type_tag": "483",
    "headline_target": "Matthew A. Leo",
    "title_issue": "도축 소 멜록시캄 잔류",
-   "summary": "FDA가 미국의 육우 목장 Matthew A. Leo에 Form 483(관찰사항 2건)을 발행했다. 식용 조직에 약물이 잔류한 소를 도축용으로 출하한 것과 투약 기록이 불완전한 것을 지적했다.",
+   "summary": "FDA가 미국의 개인 육우 목장에 Form 483(관찰사항 2건)을 발행했다. 식용 조직에 약물이 잔류한 소를 도축용으로 출하한 것과 투약 기록이 불완전한 것을 지적했다.",
    "facts": [
     {
      "label": "발행일",
@@ -3110,7 +3110,7 @@
    "hook_line": "도축 소 신장에서 허용치가 없는 멜록시캄이 검출됨",
    "en": {
     "title_issue": "Meloxicam residue in slaughtered steer",
-    "summary": "FDA issued a Form 483 with 2 observations to Matthew A. Leo, a beef ranch in the USA, citing a steer delivered for slaughter with a drug residue in edible tissue and incomplete treatment records.",
+    "summary": "FDA issued a Form 483 with 2 observations to an individual beef ranch in the USA, citing a steer delivered for slaughter with a drug residue in edible tissue and incomplete treatment records.",
     "implication": "",
     "key_facts": [
      "Observation 1: USDA tests found meloxicam in the kidney of a steer delivered for slaughter for human food, and there is no tolerance for meloxicam in edible tissues of cattle",
@@ -5782,7 +5782,7 @@
    "signal_label": "High",
    "type_tag": "483",
    "headline_target": "Rapa Therapeutics LLC",
-   "title_issue": "임상시험 모니터링 계획 미수립",
+   "title_issue": "임상시험 모니터링 계획 이행 미흡",
    "summary": "FDA가 임상시험 의뢰자 Rapa Therapeutics LLC에 Form 483(관찰사항 1건)을 발행했다. 시험 모니터링과 시험계획서 준수 보증이 부족하다고 지적했다.",
    "facts": [
     {
@@ -5809,7 +5809,7 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "관찰 1: 임상시험 모니터링 계획과 표준작업절차서(SOP) 없이 모니터링을 수행하는 등 시험계획서 준수 보증 미흡"
+    "관찰 1: 모니터링 절차와 위험 기반 모니터링 방식을 충분히 기술한 임상시험 모니터링 계획과 표준작업절차서(SOP)를 모니터링 시작 전에 이행하지 않음"
    ],
    "implication": "기관 01 시험대상자 2명의 이상사례 전자 증례기록서 원자료 검증을 하지 않았다(관찰 1). 기관 01·02 전체 시험대상자의 병용약물 원자료 검증을 하지 않았다(관찰 1). 2021-05-28부터 2021-10-13까지 기관 01에서 용혈 혈액 시료로 시험계획서 일탈 8건이 있었다(관찰 1). 자료안전성모니터링위원회 보고서 5건을 기관 02에 제공하지 않았다(관찰 1).",
    "checks": [
@@ -5869,11 +5869,11 @@
    },
    "hook_line": "용혈 혈액 시료로 안전성 검사 결과가 빠진 일탈 8건",
    "en": {
-    "title_issue": "No clinical monitoring plan in place",
+    "title_issue": "Clinical monitoring plan not implemented",
     "summary": "FDA issued a Form 483 with 1 observation to Rapa Therapeutics LLC, a clinical trial sponsor, citing failure to ensure proper monitoring and protocol compliance.",
     "implication": "Source data verification of the adverse event eCRF was not performed for two subjects at Site 01 (Observation 1). Source data verification of concomitant medications was not performed for all subjects at Sites 01 and 02 (Observation 1). Eight protocol deviations involving hemolyzed blood samples occurred at Site 01 between May 28, 2021, and October 13, 2021 (Observation 1). DSMB reports dated 2/16/2021, 8/3/2021, 5/3/2022, 2/21/2023 and 11/15/2023 were not provided to Site 02 (Observation 1).",
     "key_facts": [
-     "Observation 1: monitoring performed without a clinical monitoring plan and SOPs, and the study not ensured to follow the protocol"
+     "Observation 1: a clinical monitoring plan and SOPs adequately describing the monitoring procedures and risk-based approach were not implemented before monitoring began"
     ],
     "checks": [
      "Are a monitoring plan and SOPs in place before monitoring starts? (Observation 1)",
@@ -12663,7 +12663,7 @@
    "signal_label": "High",
    "type_tag": "483",
    "headline_target": "Haematologic Technologies, LLC",
-   "title_issue": "기준일탈 조사 없이 재시험",
+   "title_issue": "기준일탈 조사 문서 없이 재시험",
    "summary": "FDA가 미국의 위탁시험기관 Haematologic Technologies, LLC에 Form 483(관찰사항 1건)을 발행했다. 기준일탈(OOS) 결과를 철저히 검토하지 않았다고 지적했다.",
    "facts": [
     {
@@ -12690,7 +12690,7 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "관찰 1: 최초 기준일탈 결과의 근본원인을 조사하지 않고 재시험했으며 정해진 재시험 절차를 따르지 않음"
+    "관찰 1: 재시험 전에 최초 기준일탈 결과의 근본원인을 철저히 조사했다는 문서가 없고, 정해진 재시험 절차를 따랐다는 증거도 없음"
    ],
    "implication": "2024-12-12 연 일탈 2025-005에서 역가 분석 결과가 고객 규격 450-575 IU/vial보다 낮았다(관찰 1). 품질보증은 이를 계획된 일탈로 처리하고 시험을 중단했으며, 고객 지시로 한 재시험은 역가 규격에 맞았다(관찰 1). 절차서 SOP 10044는 재시험 전에 최초 기준일탈 조사를 요구한다(관찰 1).",
    "checks": [
@@ -12720,19 +12720,19 @@
      "official": "pending"
     }
    },
-   "hook_line": "역가 기준일탈 결과를 조사 없이 고객 지시로 재시험해 합격",
+   "hook_line": "역가 기준일탈 결과를 고객 지시로 재시험해 합격",
    "en": {
-    "title_issue": "Retest without OOS investigation",
+    "title_issue": "Retest without documented OOS investigation",
     "summary": "FDA issued a Form 483 with 1 observation to contract testing laboratory Haematologic Technologies, LLC in the USA, citing failure to thoroughly review OOS results.",
     "implication": "Under deviation 2025-005 opened on 2024-12-12, potency runs gave results below the client's specification of 450-575 IU/vial (Observation 1). QA made it a planned deviation and stopped testing, and a retest on the client's instruction met the potency specification (Observation 1). SOP 10044 requires an investigation of an initial OOS before retesting (Observation 1).",
     "key_facts": [
-     "Observation 1: retesting done without investigating the root cause of initial OOS results and without following predefined retest procedures"
+     "Observation 1: no documentation that a thorough investigation of the root cause of the initial OOS results was done before retesting, and no evidence that predefined retest procedures were followed"
     ],
     "checks": [
      "Is retesting blocked until the initial OOS result is investigated? (Observation 1)",
      "Do you follow your own OOS investigation procedure even when a client requests a retest? (Observation 1)"
     ],
-    "hook_line": "Failing potency results retested on client instruction without investigation, then passed"
+    "hook_line": "Failing potency results retested on client instruction, then passed"
    },
    "inspection": {
     "v": 1,
@@ -20296,7 +20296,7 @@
     },
     {
      "original": "notified BluePoint Pharmaceuticals Laboratories regarding potential glass particle contamination (foreign glass fragment) identified in the product batch.",
-     "translation": "가 BluePoint Pharmaceuticals Laboratories에 해당 제품 배치에서 확인된 유리 입자 오염(유리 조각) 의심을 통보했다."
+     "translation": "위 업체가 BluePoint Pharmaceuticals Laboratories에 해당 제품 배치에서 확인된 유리 입자 오염(유리 조각) 의심을 통보했다."
     }
    ],
    "evidence_basis": "Intake raw",

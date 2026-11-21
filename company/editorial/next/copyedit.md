@@ -59,6 +59,19 @@
    기자는 원문을 델타에 옮겨 적지 않는다(v16). 발행 브릿지는 조립 직전에 같은 원문을 붙인다 — 붙이지 않고 검사하면 조항 인용이 전부 '원문에 없음'으로 나와
    교열의 검사 결과가 발행 결과와 달라진다(리허설 1113c: 26장 중 11장). 사본은 커밋하지 않는다 — 반납하는 `deep_delta.json` 은 기자가 낸 그대로다.
    사본을 못 받아 검사를 못 하면 그것도 **통과가 아니다**(결과에 `막힘: scaffold 사본 — <사유>` 한 줄).
+1-1. **전수 대조 — 카드를 한 장도 빼지 않고 원문과 맞춰 읽는다(리허설 1121b — 2026-11-21).** 1121b 교열은 153장을 4.5분에 `reject 0` 으로 냈지만
+   스스로 "카드별 전수 정독은 아님(표본)" 이라 적었다(원문 대조 17장). 그래서 카드마다 맞춰 본 근거를 `checked` 로 적고, 코드가 그 근거를 원문과 대조한다.
+   카드와 원문을 나란히 보는 묶음: `python company/editorial/copyedit_evidence.py show company/run/{run_date_kst} _handoff/handoff_$D.json`(묶음 목록 · `$D` = `desk.json` 의 `handoff_ref.date`) →
+   `… show company/run/{run_date_kst} _handoff/handoff_$D.json --batch K`(K번째 20장 · 카드 국·영 슬롯·심층 칸 + handoff 원문·스캐폴드 `facts`·483 관찰).
+   심층 원문 전문이 필요하면 `--full`. 카드마다 `checked` 에 `{"slot": "<칸>", "claim": "<카드 문장에서 글자 그대로>", "source": "<그 카드 원문에서 글자 그대로 — 공백 빼고 8자 이상>"}` 를 적는다:
+   서로 다른 원문 조각 2개 이상 · 앞면 칸(`title_issue`·`summary`·`key_facts`·`implication`·`checks`) 1개 이상 · 한국어 `hook_line` 이 있으면 `hook_line` 1개 · 심층이 있는 카드는 `deep.<키>` 1개.
+   원문에서 못 찾은 사실은 `{"slot", "claim", "absent": true}` — 필수 칸이면 그 카드는 `reject`(2-2 ②), 선택 칸이면 2-3 칸 삭제 주의를 같은 칸으로 적는다(없으면 검사가 걸린다).
+   원문이 정말 없는 카드만 `checked` 대신 `"source_absent": "<사유>"` — 코드가 원문이 있다고 보면 실패다.
+   묶음을 서브 에이전트로 나눠도 된다(예: 40장씩 4개 — 아래 2-2 표를 조각마다 붙인다). 조각마다 `_scaffold/copyedit.part<K>.json`(`{"cards": [...]}`)에 쓰고
+   `python company/editorial/copyedit_evidence.py merge company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.part*.json` 로 합친다(델타 순서 · `counts` 다시 셈).
+   **`완료` 를 쓰기 전에** `python company/editorial/copyedit_evidence.py check company/run/{run_date_kst} _handoff/handoff_$D.json` 이 exit 0 이어야 한다.
+   exit 1 이면 줄마다 나온 카드를 마저 읽고 근거를 채워 다시 돌린다 — 표본만 읽고 `완료` 를 쓰지 않는다. 09:20 까지 0 으로 못 만들면 `보류`(백업이 발행한다).
+   이 검사는 근거를 "적었는가" 를 본다 — 판정의 기준은 그대로 2-2 표다(근거가 있어도 정확성 오류가 있으면 `reject`).
 2. **의미 점검.** 카드마다 v16 [발행 전 산문 자가 점검] 1~10번과 [핵심 원칙] 2-1(원문 부재 주장 금지)을 O/X 로 판정한다. 심층 칸이 있는 카드는 위 '3-1. 문체'도 판정한다.
    X 는 근거(슬롯 이름 + 코드 `facts`/`prose_input` 의 어느 값과 어긋나는지)를 적는다.
 2-1. **`hook_line` 점검(있는 카드만).** 한국어 `hook_line` 과 `en.hook_line` 각각 `STYLE.md` §12 로 O/X: ① 금칙어 없음(신호, 볼 만, 필요가, 가능성, 시사, 우려, 느낌표·물음표·이모지) ② 공백 포함 **한국어 40자 이내 · 영문 90자 이내**(영문에 40자를 적용하지 않는다) ③ **숫자 원문 대조** — 문장의 모든 숫자가 같은 카드의 코드 `facts`·483 `observations`·WL `violations` 본문에 글자 그대로 있어야 한다(세어서 만든 숫자·반올림 X) ④ 근거 없는 사실·원문보다 강한 단정 없음(진술은 "진술" 표기) ⑤ 사전 용어는 사전 표기, 영문 약어 없음 ⑥ 업체명·제목 반복 없음. 근거를 못 찾으면(①③④) 아래 2-3 칸 삭제(`slot: "hook_line"`)로 적는다 — 기자에게 되돌리지 않는다. `hook_line` 이 없는 카드는 점검 대상이 아니다(없는 것이 정상).
@@ -117,9 +130,11 @@
    `rework-diff` 가 exit≠0 이면(반려되지 않은 카드가 바뀌었거나 카드가 늘고 줄었다) 판정하지 않고 `보류`. exit 0 이면 1번(코드 검사)을 다시 돌리고,
    **반려됐던 카드만** 2·2-1번 전 항목으로 다시 판정한다(나머지 카드는 글자가 그대로이므로 1차 판정 `pass` 를 그대로 옮긴다).
    결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남으면 `보류`** — 더 되돌리지 않는다(백업이 발행한다).
+   2차에 다시 판정한 카드는 `checked` 도 새 문장으로 다시 적는다(옛 근거의 `claim` 이 고친 문장에 없으면 검사가 걸린다). 옮긴 `pass` 카드는 1차 줄(근거 포함)을 그대로 옮긴다.
+   2차도 `완료` 전에 1-1 의 `copyedit_evidence.py check` exit 0 이어야 한다.
    **2차가 코드 검사 exit 0 · reject 0 이면 곧바로 아래 4번 마감을 1번(`scaffold.json` 복사 → `delta.json`·`deep_delta.json`·`scaffold.json`·`copyedit.json` push)부터 한다.**
    `copyedit.json` 에 `완료` 만 적고 끝내면 브릿지가 가져갈 반납이 없어 백업이 발행한다(리허설 1120d — 2차 통과 뒤 `scaffold.json` 이 없었다).
-4. **마감 — 코드 검사 exit 0 이고 reject 0 일 때만.** 하나라도 아니면 Notion 에 아무것도 쓰지 않고 끝낸다
+4. **마감 — 코드 검사 exit 0 이고 reject 0 일 때만.** 전수 대조(1-1 `copyedit_evidence.py check`) exit 0 도 조건이다 — 근거가 빠진 카드가 있으면 reject 0 은 0 이 아니다. 하나라도 아니면 Notion 에 아무것도 쓰지 않고 끝낸다
    (Notion handoff 가 OPEN 으로 남아 09:30 백업 Routine 이 발행한다). 통과면 이 순서로 (`RUN.md` 0항 `반납 길: git` 인 호):
    1. **반납 = 실행 폴더 push.** 코드 검사에 쓴 스캐폴드를 **그 파일 그대로** 실행 폴더에 복사한다(다시 저장·정렬하지 않는다):
       `cp _scaffold/brief_web_$U.json company/run/{run_date_kst}/scaffold.json`.
@@ -147,11 +162,13 @@
   "code_gate": {"ran": true, "exit": 0, "message": ""},
   "cards": [{"web_card_id": "...", "verdict": "pass|reject",
              "fails": [{"item": "자가점검 9", "slot": "key_facts", "evidence": "한 줄"}],
-             "notes": [{"item": "같은 이름", "slot": "deep.key_violations[0].observation", "evidence": "한 줄"}]}],
+             "notes": [{"item": "같은 이름", "slot": "deep.key_violations[0].observation", "evidence": "한 줄"}],
+             "checked": [{"slot": "summary", "claim": "카드 문장 그대로", "source": "원문 조각 그대로"},
+                         {"slot": "hook_line", "claim": "…", "source": "…"}]}],
   "counts": {"cards": 0, "pass": 0, "reject": 0, "fails_total": 0, "notes_total": 0}
 }
 ```
-`fails` 는 반려 근거(2-2 표 왼쪽)만, `notes` 는 주의(표 오른쪽)만 적는다 — 없으면 빈 배열이거나 키를 빼도 된다. `verdict` 는 `pass`·`reject` 둘뿐이다(주의 카드도 `pass`).
+`checked` 는 카드마다 필수다(1-1 — 원문이 없는 카드만 `source_absent`). `fails` 는 반려 근거(2-2 표 왼쪽)만, `notes` 는 주의(표 오른쪽)만 적는다 — 없으면 빈 배열이거나 키를 빼도 된다. `verdict` 는 `pass`·`reject` 둘뿐이다(주의 카드도 `pass`).
 `counts.reject` 는 `verdict: "reject"` 카드 수다 — `notes`(칸 삭제 포함)는 세지 않는다.
 같은 폴더에 `copyedit.md` — 헌장의 맨 위 3줄만.
 

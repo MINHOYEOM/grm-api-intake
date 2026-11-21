@@ -1323,12 +1323,13 @@ class EditorialGitHandoffTest(unittest.TestCase):
             put("delta.A.json", {"status": "완료", "cards": {"a": {}}})
             put("delta.json", {"cards": {"a": {}}, "tldr": [], "handoff_ref": ref, "deferred": []})
             put("copyedit.json", {"status": "완료", "code_gate": {"ran": True, "exit": 0},
-                                  "cards": [{"web_card_id": "a", "verdict": "pass"}],
+                                  "cards": [{"web_card_id": "a", "verdict": "pass",
+                                             "source_absent": "본문 없는 행(테스트)"}],
                                   "counts": {"reject": 0}})
             put("scaffold.json", {"brief": {"run_date_kst": "2026-11-16"}, "cards": [{"id": "a"}]})
             results = rc.check(folder, hp)
-            self.assertEqual([ok for _, _, ok, _ in results], [True] * 5, results)
-            # 스캐폴드가 다른 날짜면 5번, 교열 reject 가 있으면 4번, 지문이 다르면 1번이 실패한다.
+            self.assertEqual([ok for _, _, ok, _ in results], [True] * 6, results)
+            # 스캐폴드가 다른 날짜면 5번, 교열 reject 가 있으면 4번(근거 없는 reject 는 4-1 도), 지문이 다르면 1번이 실패한다.
             put("scaffold.json", {"brief": {"run_date_kst": "2026-11-09"}, "cards": [{"id": "a"}]})
             put("copyedit.json", {"status": "완료", "code_gate": {"ran": True, "exit": 0},
                                   "cards": [{"web_card_id": "a", "verdict": "reject"}],
@@ -1336,7 +1337,7 @@ class EditorialGitHandoffTest(unittest.TestCase):
             put("desk.json", {"status": "완료", "handoff_ref": dict(ref, sha256="0" * 64),
                               "shards": {"delta": {"A": ["a"]}, "deep": {}}})
             self.assertEqual([ok for _, _, ok, _ in rc.check(folder, hp)],
-                             [False, True, True, False, False])
+                             [False, True, True, False, False, False])
 
 
 class CompareTest(unittest.TestCase):

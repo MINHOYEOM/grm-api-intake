@@ -16,6 +16,10 @@
         조립이 한국어 서사를 갈아 써서 생긴 반쪽 영어(`조립 검사 영문 게이트 …`, 리허설 1120j). 스캐폴드 사본(`_scaffold/brief_web_<날짜>.json`, `--scaffold`)이 있으면 인용 번역 대조까지 본다.
         `--deep <심층 델타·샤드>` 를 주면 심층 칸 산문의 경고(금지 표현·반복 문장)도 낸다. 행정처분 요약 주어 검사도 **경고만**
         (`경고:` 로 시작하는 줄 — exit 코드에 들어가지 않는다). 심층 [용어·표기] 차단은 `deep` 명령이 한다.
+        **[용어·표기] 표의 한글 표기·군말('다수'·'장기간' 등)은 v16 문서에서 읽는다**(`inject_slots.v16_terms` — 리허설 1121a:
+        표 줄 `외관검사` 가 손 베낌 표에 빠져 있었고 군말 줄은 코드에 0줄이었다). `hook_line` 한국어의 목록 약어도 막는다(`hook_line 약어 …`).
+        경고만: 영문 `hook_line` 약어(교열 판정이 갈린다)·약어 후보·진술 표기(R3)·정확성 대조(`accuracy_warn_lines` —
+        가림 값 채움 의심·가능성 표현 누락·원문에 없는 수·회수 사유 덧붙임).
 
     python company/editorial/precheck.py deep-source <handoff 파일> <deep_delta 파일> --out <검사용 파일>
         심층분석 델타의 각 카드에 그 주 handoff 의 `deep_analysis_input.body_full` 을 `source_text` 로 붙인
@@ -346,6 +350,52 @@ def deep_basis_lines(shard):
             for cid, slot in inject_slots.deep_483_basis_hits(shard)]
 
 
+_HOOK_CAPS_RE = re.compile(r"(?<![A-Za-z0-9_/-])([A-Z][A-Z0-9/]*[A-Z])s?(?![A-Za-z0-9_/-])")
+_ROMAN_RE = re.compile(r"[IVX]+")
+
+
+def hook_abbr_hits(text, lang):
+    """`hook_line` 의 영문 약어 → (목록 약어, 그 밖의 약어 후보)(순수). 규칙은 v16 [용어·표기] 절을 읽어 쓴다
+    (`inject_slots.v16_terms` — 약어 목록·목록 밖 약어 예·기관·제도 이름·단위). 숫자가 든 토큰(KF94)·로마 숫자(Class II)는 약어가 아니다.
+    목록 = v16 목록 약어 + 목록 밖 약어 예 + 조립 검사의 목록 밖 약어(`inject_slots._ABBR_OFF_LIST`).
+    그 밖의 후보는 한국어 두 글자·영문 세 글자 이상만 낸다(US·ID 같은 낱말은 세지 않는다)."""
+    rules = inject_slots.v16_terms()
+    listed_set = rules["listed"] | rules["off_list"] | {a for a, _ in inject_slots._ABBR_OFF_LIST}
+    known = rules["institutions"] | rules["units"]
+    listed, other = [], []
+    for tok in _HOOK_CAPS_RE.findall(text or ""):
+        if tok in listed_set:
+            listed.append(tok)
+        elif (tok not in known and not _ROMAN_RE.fullmatch(tok) and not re.search(r"\d", tok)
+              and len(tok) >= (2 if lang == "ko" else 3)):
+            other.append(tok)
+    return sorted(set(listed)), sorted(set(other))
+
+
+_STATEMENT_RE = re.compile(r"\b(according to|stated|states|reported|told|explained|indicated|informed|said|"
+                           r"confirmed|claimed|acknowledged|admitted)\b", re.I)
+_STATEMENT_MARK = {"ko": re.compile(r"진술|말했|밝혔|설명했|보고했|답했"),
+                   "en": re.compile(r"\b(stated|said|according|reported|told|claimed|per)\b", re.I)}
+_SENTENCE_RE = re.compile(r"(?<=[.;])\s+")
+
+
+def hook_statement_hits(text, lang, card):
+    """`hook_line` 숫자 중 483 원문 관찰에서 **직원·경영진 말 문장에만** 있는 것(순수 — 진술 표기가 있으면 빈 목록).
+    STYLE §12 R3('업체 직원의 말은 진술'). 숫자 없는 진술 사실은 못 잡는다 — 경고만(리허설 1121a 교열 반려 3장 중 1장)."""
+    if not text or _STATEMENT_MARK["ko" if lang == "ko" else "en"].search(text):
+        return []
+    dd = card.get("deterministic_detail") if isinstance(card, dict) else None
+    obs = dd.get("observations") if isinstance(dd, dict) else None
+    said, other = set(), set()
+    for o in obs or []:
+        if not isinstance(o, dict):
+            continue
+        for s in _SENTENCE_RE.split(" ".join(str(o.get(k) or "") for k in ("deficiency", "detail"))):
+            (said if _STATEMENT_RE.search(s) else other).update(re.findall(r"\d+", s))
+    only = said - other
+    return sorted({n for n in re.findall(r"\d+", text) if n in only})
+
+
 def hook_lines(delta, scaffold=None):
     """(막는 줄, 경고 줄) — `hook_line` 을 화면과 같은 함수로 본다(순수).
 
@@ -368,6 +418,17 @@ def hook_lines(delta, scaffold=None):
             if not (isinstance(raw, str) and raw.strip()):
                 continue
             bad = render.hook_line_banned(raw, lang)
+            listed, other = hook_abbr_hits(raw, lang)
+            if listed and lang == "ko":
+                block.append(f"hook_line 약어 {cid}.{label}: {', '.join(listed)} — 한 줄 안에서는 목록 약어도 한글로만(v16 [용어·표기])")
+            elif listed:
+                warn.append(f"hook_line 약어 {cid}.{label}: {', '.join(listed)} — 영문 한 줄의 약어 금지는 교열 판정이 갈린다(STYLE §12 R7 대 v16 '영문은 원문 공식 용어')")
+            if other:
+                warn.append(f"hook_line 약어 후보 {cid}.{label}: {', '.join(other)} — 기관·제도 이름이 아니면 풀어 쓴다(STYLE §12 R7)")
+            if cid in sc:
+                st = hook_statement_hits(raw, lang, sc[cid])
+                if st:
+                    warn.append(f"hook_line 진술 표기 {cid}.{label}: 숫자 {', '.join(st)} 는 원문에서 직원·경영진 말(According to·stated 등)에만 있다 — '진술'로 표기(STYLE §12 R3)")
             if bad:
                 block.append(f"hook_line 금칙어 {cid}.{label}: {', '.join(bad)} — 다른 말로 쓰거나 필드를 지운다(STYLE §12 ①)")
             elif cid in sc:
@@ -377,6 +438,108 @@ def hook_lines(delta, scaffold=None):
                 if not render._valid_hook_line(card, "ko" if lang == "ko" else "en"):
                     warn.append(f"hook_line 화면에서 숨김 {cid}.{label} — 숫자가 코드 facts·상세에 글자 그대로 있는지 본다")
     return block, warn
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# [리허설 1121a] 교열 정확성 반려(R10 가림 값 채움·가능성 누락·세어서 만든 숫자·회수 사유 덧붙임)를 근거 대조로 **경고**한다.
+# 넷 다 '원문 낱말 ↔ 카드 국문 낱말' 대응을 코드가 확정할 수 없어(번역·바꿔 쓰기) 막지 않는다 — 세 리허설 실측은 PR 본문.
+# ─────────────────────────────────────────────────────────────────────────────
+_REDACT_RE = re.compile(r"\[redacted\]|\(b\)\s?\(4\)|\[판독불가\]|\[비공개\]", re.I)
+_REDACT_NEAR = 25    # 숫자 앞뒤 이 글자 안에 가림 표지가 있어야 센다(문장 단위는 483 원문이 가림투성이라 통과 카드 절반이 걸렸다)
+_HEDGE_SRC_RE = re.compile(r"\b(potential(ly)?|possible|possibly|may|might|could|suspected)\b", re.I)
+_HEDGE_KO_RE = re.compile(r"의심|수 있|가능|잠재|추정|우려")
+_COUNT_RE = re.compile(r"(?<![\d.,:/~-])(\d{1,3})\s?(건|개|회|명|곳|차례|배치|로트|종|품목|바이알|병|봉)")
+_EN_NUM = {w: str(i) for i, w in enumerate(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen "
+    "seventeen eighteen nineteen twenty".split())}
+_RECALL_FRAME = ("회수", "영업", "사유", "강제", "명령", "으로", "품목", "제품", "동일", "일괄")
+
+
+def _obs_text(card):
+    dd = card.get("deterministic_detail") if isinstance(card, dict) else None
+    obs = dd.get("observations") if isinstance(dd, dict) else None
+    return [" ".join(str(o.get(k) or "") for k in ("deficiency", "detail")) for o in obs or [] if isinstance(o, dict)]
+
+
+def _num_in_source(n, src):
+    if re.search(rf"(?<![\d.]){re.escape(n)}(?![\d])", src):
+        return True
+    return any(v == n and re.search(rf"\b{w}\b", src, re.I) for w, v in _EN_NUM.items())
+
+
+def count_number_hits(text, src):
+    """'8건'·'14회' 같은 세는 숫자 중 원문(`src`)에 숫자로도 영어 낱말로도 없는 것(순수 — v16 R2 '세어서 만든 숫자 금지').
+    조립 근거 게이트 D3 는 4자리 이상만, 화면 숫자 대조는 `hook_line` 만 봐서 심층 '편차 보고서 8건'(원문 목록 8줄·서로 다른 보고서 7건)을 놓쳤다."""
+    if not src:
+        return []
+    return sorted({m.group(1) + m.group(2) for m in _COUNT_RE.finditer(text or "") if not _num_in_source(m.group(1), src)})
+
+
+def redaction_anchor_hits(text, obs_texts):
+    """카드 숫자(두 자리 이상) 중 원문 관찰에서 **가림 표지([redacted]·(b)(4)) 바로 곁에만** 나오는 것(순수 — STYLE R10).
+    그 문장을 근거로 쓴 카드가 가려진 값을 구체 명사로 채웠는지 사람이 대조한다(1121a '유효기간 지난 부품 49일')."""
+    marked, clean = set(), set()
+    for t in obs_texts:
+        for m in re.finditer(r"(?<![\d.])\d{2,}(?!\d)", t):
+            near = t[max(0, m.start() - _REDACT_NEAR):m.end() + _REDACT_NEAR]
+            (marked if _REDACT_RE.search(near) else clean).add(m.group(0))
+    only = marked - clean
+    return sorted({n for n in re.findall(r"(?<![\d.])\d{2,}(?!\d)", text or "") if n in only})
+
+
+def _card_slots(d):
+    out = [(k, d.get(k)) for k in ("title_issue", "hook_line", "summary", "implication")]
+    for k in ("key_facts", "checks"):
+        out += [(f"{k}[{i}]", x) for i, x in enumerate(d.get(k) or [])]
+    return [(k, v) for k, v in out if isinstance(v, str) and v.strip()]
+
+
+def accuracy_warn_lines(delta, scaffold=None, deep=None, handoff=None):
+    """정확성 경고 줄(순수) — 막지 않는다. 스캐폴드가 없으면 델타 쪽은 건너뛴다(원문이 없으면 대조를 못 한다)."""
+    out = []
+    sc = {}
+    if isinstance(scaffold, dict) and isinstance(scaffold.get("cards"), list):
+        sc = {c.get("id"): c for c in scaffold["cards"] if isinstance(c, dict)}
+    cards = delta.get("cards") if isinstance(delta, dict) and isinstance(delta.get("cards"), dict) else {}
+    for cid, d in cards.items():
+        c = sc.get(cid)
+        if not (isinstance(d, dict) and isinstance(c, dict)):
+            continue
+        dtype = (c.get("deterministic_detail") or {}).get("type") if isinstance(c.get("deterministic_detail"), dict) else None
+        obs = _obs_text(c)
+        facts = " ".join(str(f.get("value") or "") for f in c.get("facts") or [] if isinstance(f, dict))
+        facts += " " + str((c.get("deterministic_detail") or {}).get("count") or "")
+        quotes = " ".join(str(q.get("original") or "") for q in c.get("quotes") or [] if isinstance(q, dict))
+        for slot, text in _card_slots(d):
+            if obs:
+                for n in redaction_anchor_hits(text, obs):
+                    out.append(f"가림 값 채움 의심 {cid}.{slot}: 숫자 {n} 의 원문 문장에 가림 표지가 있다 — 가려진 값을 명사로 채우지 않았는지(STYLE R10)")
+                for n in count_number_hits(text, " ".join(obs) + " " + facts):
+                    out.append(f"원문에 없는 수 {cid}.{slot}: '{n}' — 원문 숫자·낱말에 없다(세어서 만든 숫자 금지, v16 R2)")
+        if dtype == "openfda_recall_detail" and _HEDGE_SRC_RE.search(quotes):
+            for slot in ("title_issue", "hook_line"):
+                text = d.get(slot)
+                if isinstance(text, str) and text.strip() and not _HEDGE_KO_RE.search(text):
+                    out.append(f"가능성 표현 누락 {cid}.{slot}: 원문 사유가 '{_HEDGE_SRC_RE.search(quotes).group(0)}' 인데 단정형 — '의심' 등으로(v16 문장 규칙 ④)")
+        if dtype == "mfds_recall_detail":
+            src = " ".join(str(f.get("value") or "") for f in c.get("facts") or [] if isinstance(f, dict))
+            src += " " + quotes + " " + str(c["deterministic_detail"].get("enforcement") or "")
+            for slot in ("title_issue", "hook_line", "summary"):
+                text = d.get(slot)
+                novel = sorted({w for w in re.findall(r"[가-힣]{2,}", text or "")
+                                if w[:2] not in src and not w.startswith(_RECALL_FRAME)})
+                if novel:
+                    out.append(f"회수 사유 덧붙임 {cid}.{slot}: {', '.join(novel)} — 원문 제품명·사유에 없는 낱말(v16 문장 규칙 ⑤)")
+    bodies = handoff_bodies(handoff) if isinstance(handoff, dict) else {}
+    items = deep.get("items", deep) if isinstance(deep, dict) else {}
+    for cid, entry in (items or {}).items():
+        src = bodies.get(cid)
+        if not src:
+            continue
+        for slot, text in inject_slots._deep_prose_slots(entry):
+            for n in count_number_hits(text, src):
+                out.append(f"원문에 없는 수 {cid}.deep.{slot}: '{n}' — 원문 숫자·낱말에 없다(세어서 만든 숫자 금지, v16 R2)")
+    return out
 
 
 def deep_lines(shard, ids_483):
@@ -502,6 +665,7 @@ def main(argv=None):
             for line in lines:
                 print(line)
             warns = warn_lines(delta, _load(args.deep) if args.deep else None) + hook_warn
+            warns += accuracy_warn_lines(delta, scaffold)
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 인용 번역 대조는 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:
@@ -520,6 +684,7 @@ def main(argv=None):
             for line in lines:
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()
+            warns += accuracy_warn_lines({"cards": {}}, None, shard, handoff)
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 국문 병기 관문(483·WL·WHOPIR)은 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:

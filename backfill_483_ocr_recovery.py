@@ -610,10 +610,12 @@ def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
         "firm_name": nrow.get("company", ""),
     }
     observations = _extract_483_observations_from_text(text, header_hints) if text else []
-    # body_full="" — deep 전문 보존은 ENABLE_FDA_483_DEEP 게이트 산출물이고, 이 복구의
-    # 목표는 findings 를 만드는 결정론 층(excerpt/observations)이다. 원 적재 경로
-    # (collect_fda_backfill.run_483)도 body_full 을 "" 로 넘긴다 — 그 계약을 그대로 지킨다.
-    return _to_item(nrow, excerpt, observations, "", status)
+    # [2026-11-22] 전문(fda483_body_full)도 보존한다 — 일일 수집의 deep 경로와 같은 규칙(관찰 1건 이상일 때만
+    # 받은 텍스트 그대로). 종전엔 "" 로 넘겨, 상한 밖이라 이 복구로 되살아난 483 이 관찰은 있는데 전문이 없어
+    # 심층 대상(card_scaffold.deep_analysis_ready)에서 빠졌다 → 관찰 국문이 붙지 않아 사이트 빌드가 호 전체를
+    # 막았다(11-18 수집 52행 · 리허설 1122a 모의 발행 49장). 대량 공개 주마다 되풀이되던 구멍이다.
+    body_full = text if observations else ""
+    return _to_item(nrow, excerpt, observations, body_full, status)
 
 
 # ---------------------------------------------------------------------------

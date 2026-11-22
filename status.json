@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-22T07:26:49Z",
+ "generated_at": "2026-11-22T08:40:47Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 45002364788,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-22T08:20:39Z",
+    "updatedAt": "2026-11-22T08:40:35Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45002364788"
+   },
    {
     "databaseId": 44961528995,
     "status": "completed",
@@ -45,17 +56,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44647534191"
-   },
-   {
-    "databaseId": 44428913807,
-    "status": "completed",
-    "conclusion": "failure",
-    "event": "schedule",
-    "createdAt": "2026-11-19T00:25:45Z",
-    "updatedAt": "2026-11-19T00:39:07Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44428913807"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -231,6 +231,17 @@
   ],
   "grm-scaffold-mirror.yml": [
    {
+    "databaseId": 45003922447,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "workflow_run",
+    "createdAt": "2026-11-22T08:40:41Z",
+    "updatedAt": "2026-11-22T08:40:45Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45003922447"
+   },
+   {
     "databaseId": 44962353507,
     "status": "completed",
     "conclusion": "success",
@@ -273,17 +284,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44650483363"
-   },
-   {
-    "databaseId": 44430718096,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-19T00:39:10Z",
-    "updatedAt": "2026-11-19T00:39:11Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44430718096"
    }
   ],
   "grm-watchlist-notify.yml": [
@@ -403,11 +403,11 @@
   "grm-findings-translate-apply.yml": [
    {
     "databaseId": 44998263047,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-22T07:26:45Z",
-    "updatedAt": "2026-11-22T07:26:48Z",
+    "updatedAt": "2026-11-22T07:31:59Z",
     "headBranch": "main",
     "displayTitle": "Merge pull request #1862 from MINHOYEOM/claude/findings-translate-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44998263047"
@@ -574,11 +574,11 @@
   "grm-stranded-batch-pr.yml": [
    {
     "databaseId": 44998246302,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-22T07:26:31Z",
-    "updatedAt": "2026-11-22T07:26:34Z",
+    "updatedAt": "2026-11-22T07:26:57Z",
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44998246302"
@@ -665,6 +665,11 @@
   ]
  },
  "intake_artifacts": [
+  {
+   "run_id": 45002364788,
+   "created_at": "2026-11-22T08:20:39Z",
+   "has_web_brief": true
+  },
   {
    "run_id": 44961528995,
    "created_at": "2026-11-21T23:23:02Z",

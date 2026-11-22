@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-21",
+ "measured_on": "2026-11-22",
  "window_days": 60,
  "totals": {
-  "items": 493
+  "items": 491
  },
  "by_source": [
   {
@@ -32,7 +32,7 @@
   },
   {
    "v": "ISPE",
-   "c": 20
+   "c": 19
   },
   {
    "v": "MHRA Inspectorate",
@@ -44,7 +44,7 @@
   },
   {
    "v": "WHO",
-   "c": 2
+   "c": 1
   }
  ],
  "items": [
@@ -3484,20 +3484,6 @@
    "published_date": "2026-09-23",
    "title": "Revision of PIC/S GMP Guide (PE 009-18)",
    "official_url": "http://www.picscheme.org/en/news/149/revision-of-pics-gmp-guide-pe-009-18"
-  },
-  {
-   "source": "ISPE",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-22",
-   "title": "Scope 3 Sustainability in the Pharmaceutical Industry: Reality or Aspiration?",
-   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/scope-3-sustainability-pharmaceutical-industry-reality-or"
-  },
-  {
-   "source": "WHO",
-   "source_kind": "who-inspection",
-   "published_date": "2026-09-22",
-   "title": "[WHOPIR] Lupin (Ankleshwar)",
-   "official_url": "https://extranet.who.int/prequal/sites/default/files/whopir_files/I-03994_WHOPIR_Lupin_Ankleshwar.pdf"
   }
  ]
 }

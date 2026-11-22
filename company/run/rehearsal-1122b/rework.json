@@ -1,1 +1,7 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{"status":"완료","round":1,"worker":"델타-2","fixed":[
+ {"id":"fda483-196405","shard":"C","changed":["en.hook_line","en.key_facts","en.checks"]},
+ {"id":"fda483-196408","shard":"D","changed":["en.hook_line","en.key_facts","en.implication","en.checks"]},
+ {"id":"fda483-196414","shard":"D","changed":["en.key_facts"]},
+ {"id":"fda483-196430","shard":"D","changed":["en.key_facts"]},
+ {"id":"fda483-196433","shard":"D","changed":["en.implication"]}
+],"unfixed":[],"note":"영문 '100%' (한국어 '전수') → 'full'/'fully' — EN_INVENTED_NUMBER ['100'] 해소. precheck terms delta.C·delta.D exit 0"}

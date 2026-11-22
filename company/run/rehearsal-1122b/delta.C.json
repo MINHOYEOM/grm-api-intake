@@ -578,16 +578,16 @@
    ],
    "en": {
     "title_issue": "No full reinspection after black particles found",
-    "hook_line": "Only sample inspection, no 100% reinspection, after more particles were found",
+    "hook_line": "Only sample inspection, no full reinspection, after more particles were found",
     "summary": "FDA issued a Form 483 with 3 observations to GE HealthCare Shanghai Co. Ltd, a sterile drug manufacturer, citing reexamination of containers with black particles, gowning and equipment identification in the filling area, and data backup controls.",
     "key_facts": [
-     "Observation 1: after black particles traced to the container supplier were found, batches shipped to the US were not 100% reinspected",
+     "Observation 1: after black particles traced to the container supplier were found, batches shipped to the US were not fully reinspected",
      "Observation 2: goggles removed in the Grade A filling area and hung on the wall, forehead and eyebrows exposed; filling line tools not identified",
      "Observation 3: manufacturing data backed up to unprotected storage drives without QA verification"
     ],
     "implication": "Deviation DEV-11527 was initiated on 2024-02-22 and found two types of black particles, embedded in the wall and adhered to the inner surface (Observation 1). After the initial re-inspection, additional units with adhered and embedded particles were found (Observation 1). When a stopper bag was sprayed, the bottom was never sprayed (Observation 2). Because tools had no identification, dented parts being replaced could not be traced (Observation 2).",
     "checks": [
-     "Are batches with confirmed container particle defects 100% reinspected before shipment? (Observation 1)",
+     "Are batches with confirmed container particle defects fully reinspected before shipment? (Observation 1)",
      "Does each filling tool in the Grade A area have an identification number? (Observation 2)",
      "Does QA verify the content of equipment data backups? (Observation 3)"
     ]

@@ -21,18 +21,18 @@
    ],
    "en": {
     "title_issue": "Fumigation validation, missed visual defects",
-    "hook_line": "Retain samples contained defective vials not rejected during 100% visual inspection",
+    "hook_line": "Retain samples contained defective vials not rejected during full visual inspection",
     "summary": "FDA issued a Form 483 with 3 observations to Qilu Antibiotics Pharmaceutical Co., LTD., a drug manufacturer in China, citing cleaning and disinfection of aseptic areas, failure to follow visual inspection procedures, and two-person verification in equipment logs.",
     "key_facts": [
      "Observation 1: fumigation validation reports did not assess the rationale for biological indicator placement at hard to reach areas",
      "Observation 1: CCTV of sterile API manufacturing on 2021-04-23 showed an operator's arm extending into the Grade A area",
-     "Observation 2: multiple vials with defects not rejected during 100% visual inspection were found among retain samples",
+     "Observation 2: multiple vials with defects not rejected during full visual inspection were found among retain samples",
      "Observation 3: equipment log books, including filling machines, did not document two-person verification"
     ],
-    "implication": "The workshop manager confirmed there is no approved procedure providing cleaning instructions (Observation 1). SOP PLA1160 requires vials with critical, major or minor defects to be rejected during 100% inspection (Observation 2).",
+    "implication": "The workshop manager confirmed there is no approved procedure providing cleaning instructions (Observation 1). SOP PLA1160 requires vials with critical, major or minor defects to be rejected during full inspection (Observation 2).",
     "checks": [
      "Are biological indicators placed at hard to reach areas in fumigation validation? (Observation 1)",
-     "Are retain samples used to check for defects missed by 100% visual inspection? (Observation 2)",
+     "Are retain samples used to check for defects missed by full visual inspection? (Observation 2)",
      "Is two-person verification recorded in equipment cleaning and use logs? (Observation 3)"
     ]
    }
@@ -226,7 +226,7 @@
     "hook_line": "Visual inspection reject rates rose with each process performance qualification batch",
     "summary": "FDA issued a Form 483 with 11 observations to Shanghai Henlius Biopharmaceutical Co., Ltd., a drug substance and drug product manufacturer in China, citing process performance qualification, visible particle investigations, changes to visual inspection criteria, cleaning validation, laboratory and electronic data controls, and clean area controls.",
     "key_facts": [
-     "Observation 1: three PPQ batches showed increasingly high rejection rates in 100% visual inspection, mainly due to visible particulates",
+     "Observation 1: three PPQ batches showed increasingly high rejection rates in full visual inspection, mainly due to visible particulates",
      "Observation 2: the investigation into high visible particulate defects was inconclusive on root cause",
      "Observation 3: the visual inspection acceptance criterion was revised retrospectively without an approved change control",
      "Observation 7: deletion protection was removed during data archiving, and an operator demonstrated unauthorized deletion of data files"
@@ -454,7 +454,7 @@
     "hook_line": "Particulate defects rose from the engineering batch onward without investigation",
     "summary": "FDA issued a Form 483 with 2 observations to Thermo Fisher Biopharma Services PTE, LTD (TFBS), a drug product manufacturer in Singapore, citing an inadequate visual inspection program and a manufacturing process that does not consistently meet specifications.",
     "key_facts": [
-     "Observation 1: defects from 100% visual inspection were not adequately trended or investigated for root cause",
+     "Observation 1: defects from full visual inspection were not adequately trended or investigated for root cause",
      "Observation 1: critical particulate defects trended upward from the engineering batch through the PPQ batches without investigation",
      "Observation 2: aseptic process simulations were repeatedly invalidated or aborted due to media leakage, vial breakage and atypical stopper rejects",
      "Observation 2: some of the PPQ batches manufactured to date were rejected"
@@ -561,7 +561,7 @@
      "Observation 6: process validation batches were shipped to the US before stability data, and all three failed specifications at the three-month accelerated time point",
      "Observation 8: electronic data and audit trail review procedures are inadequate, a repeat observation from the 2022 FDA inspection"
     ],
-    "implication": "Environmental monitoring location selection was also a repeat observation from the 2018 Warning Letter (Observation 3). A sporicidal is not periodically used on all surfaces in the aseptic filling areas (Observation 4). Bubbling ceiling panels in the Grade B area identified in a work request dated 2026-03-23 had no further corrective action (Observation 5). Rejects from 100% visual inspection were not evaluated for defect type or source (Observation 7). Environmental and personnel monitoring records were made after samples were returned to the incubation room (Observation 9).",
+    "implication": "Environmental monitoring location selection was also a repeat observation from the 2018 Warning Letter (Observation 3). A sporicidal is not periodically used on all surfaces in the aseptic filling areas (Observation 4). Bubbling ceiling panels in the Grade B area identified in a work request dated 2026-03-23 had no further corrective action (Observation 5). Rejects from full visual inspection were not evaluated for defect type or source (Observation 7). Environmental and personnel monitoring records were made after samples were returned to the incubation room (Observation 9).",
     "checks": [
      "Are equipment surfaces that contact sterile components sterilized between batches? (Observation 2)",
      "Is stability data obtained before shipping batches made after process changes? (Observation 6)",

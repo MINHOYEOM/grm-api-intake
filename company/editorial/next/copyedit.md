@@ -54,7 +54,10 @@
    exit≠0 이면 코드 검사 실패와 같다(여기서 안 보면 `CONSUMED` 뒤에 발행이 멈춘다): 메시지의 빠진 카드가 1~5장이면(예시에 전부 나온다) 그 카드들을 3-1 대로 `재작업`
    (`fails` `{"item": "영문 게이트", "slot": "en", "evidence": "<메시지>"}`), 그보다 많거나 `brief.en.tldr 없음` 이 있으면 `보류`.
    이어서 **렌더 게이트** `python check_render_gate.py company/run/{run_date_kst}/brief_check.json` 를 돌린다 — 사이트 빌드(`web/render.py` 발행 게이트: 483 관찰 국문·WL 위반항목 국문·WHOPIR 국문·영문 사실 칸)와 같은 판정이다.
-   exit≠0 이면 **재작업하지 않고 `보류`** 다(사유에 첫 줄을 그대로 적는다). 483 관찰 국문은 심층 대상 카드에만 붙어 기자가 고칠 수 없고, 이대로 마감하면 `CONSUMED` 뒤에 사이트 빌드가 멈춰 백업도 돌지 않는다(리허설 1122a 모의 발행 — 2026-11-22). `보류` 면 Notion 이 `OPEN` 으로 남아 09:30 백업이 발행한다.
+   exit≠0 이면 코드 검사 실패와 같다(이대로 마감하면 `CONSUMED` 뒤에 사이트 빌드가 멈춰 백업도 돌지 않는다 — 리허설 1122a 모의 발행, 2026-11-22). 위반 종류로 나눈다:
+   - `483 관찰 국문`·`WL 위반항목 국문`·`WHOPIR 국문` 이 하나라도 있으면 **`보류`**(사유에 첫 줄 그대로). 국문 병기는 심층 대상 카드에만 붙어 기자가 고칠 수 없다. `보류` 면 Notion 이 `OPEN` 으로 남아 09:30 백업이 발행한다.
+   - `영문 사실 칸`(`EN_INVENTED_NUMBER` — 영문이 한국어판·표에 없는 수치를 말함, 예: 한국어 '전수' 를 영문 '100%' 로)만 있고 `카드:` 줄의 카드가 1~25장이면 그 카드들을 3-1 대로 `재작업`
+     (`fails` `{"item": "렌더 게이트", "slot": "en", "evidence": "<위반 줄>"}` — 기자는 영문에서 그 수치를 빼거나 한국어판에 있는 표현으로 바꾼다). 25장을 넘으면 `보류`.
    **`--deep` 에는 원문을 붙인 검사용 사본을 넘긴다**(`deep_delta.json` 이 있을 때):
    `python company/editorial/precheck.py deep-source _handoff/handoff_$D.json company/run/{run_date_kst}/deep_delta.json --out _scaffold/deep_check.json`
    → `--deep _scaffold/deep_check.json`. 심층분석의 근거 대조는 그 주 handoff 의 원문(`deep_analysis_input.body_full`)이 기준선인데,

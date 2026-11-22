@@ -202,6 +202,26 @@ def assembled_en_lines(cards, out):
         before = dict(cards[cid], id=cid, card_type=c.get("card_type"))
         if check_en_slots.card_problem(before) is None:
             lines.append(f"조립 검사 영문 게이트 {prob[1]} — 조립 뒤 영문 미완결(조립 전엔 완결)")
+    return lines + assembled_en_fact_lines(cards, out)
+
+
+def assembled_en_fact_lines(cards, out):
+    """조립 **뒤** 카드에 사이트 빌드의 영문 사실 칸 게이트(`render.validate_brief_en_facts`)를 돌린 줄(순수).
+
+    ★리허설 1122b(2026-11-22): 한국어 '전수 재검사' 를 영문 '100% reinspection' 으로 쓴 카드 5장이 교열 렌더 게이트
+      (`check_render_gate.py`)에서 `EN_INVENTED_NUMBER ['100']` 로 걸렸다. 영문은 한국어판·표에 없는 수치를 말하면 안 된다 —
+      기자 단계에서 같은 판정을 돌려 교열 전에 고치게 한다."""
+    import check_en_slots  # noqa: F401 — web/ 를 경로에 올린다(render import)
+    import render
+    brief = out.get("brief") or {}
+    lines = []
+    for c in out.get("cards") or []:
+        if not isinstance(c, dict) or c.get("id") not in cards:
+            continue
+        for v in render.validate_brief_en_facts([{"brief": brief, "cards": [c]}]):
+            tail = v.split("EN_INVENTED_NUMBER", 1)[-1].strip()
+            lines.append(f"조립 검사 영문 사실 {c.get('id')} — 영문에 한국어판·표에 없는 수치 {tail}"
+                         " (예: '전수' 를 '100%' 로 쓰지 말 것 — 수치를 빼거나 한국어판 표현대로)")
     return lines
 
 

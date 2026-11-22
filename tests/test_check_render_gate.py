@@ -63,5 +63,39 @@ class RenderGateTest(unittest.TestCase):
             self.assertIn("python check_render_gate.py company/run/{run_date_kst}/brief_check.json", text, rel)
 
 
+
+class PrecheckEnFactTest(unittest.TestCase):
+    """기자 사전 점검이 같은 영문 사실 판정을 조립 뒤 카드에 돌린다(리허설 1122b — '전수' → '100%')."""
+
+    def setUp(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("company_precheck_rg", ROOT / "company" / "editorial" / "precheck.py")
+        self.pc = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.pc)
+
+    def _out(self, en_hook):
+        card = {"id": "fda483-1", "summary": "검은 입자 발견 뒤 전수 재검사 없이 표본만 검사",
+                "en": {"summary": en_hook}}
+        return {"brief": {"publish_date": "2026-11-23"}, "cards": [card]}
+
+    def test_invented_number_is_flagged(self):
+        lines = self.pc.assembled_en_fact_lines({"fda483-1": {}}, self._out("No 100% reinspection after particles found"))
+        self.assertEqual(len(lines), 1)
+        self.assertIn("조립 검사 영문 사실 fda483-1", lines[0])
+        self.assertIn("100", lines[0])
+
+    def test_same_meaning_without_number_passes(self):
+        self.assertEqual(self.pc.assembled_en_fact_lines({"fda483-1": {}}, self._out("No full reinspection after particles found")), [])
+
+    def test_only_this_shards_cards(self):
+        self.assertEqual(self.pc.assembled_en_fact_lines({}, self._out("No 100% reinspection")), [])
+
+    def test_copyedit_splits_render_gate_outcomes(self):
+        for rel in ("company/editorial/copyedit.md", "company/editorial/next/copyedit.md"):
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            self.assertIn('{"item": "렌더 게이트", "slot": "en"', text, rel)
+            self.assertIn("`483 관찰 국문`·`WL 위반항목 국문`·`WHOPIR 국문` 이 하나라도 있으면 **`보류`**", text, rel)
+
+
 if __name__ == "__main__":
     unittest.main()

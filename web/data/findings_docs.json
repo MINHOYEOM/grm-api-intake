@@ -1,10 +1,10 @@
 {
  "schema_version": "grm-findings-docs/v1",
- "measured_on": "2026-11-15",
+ "measured_on": "2026-11-21",
  "min_findings": 3,
  "totals": {
-  "documents": 3608,
-  "findings": 23159
+  "documents": 3651,
+  "findings": 23406
  },
  "by_agency": [
   {
@@ -13,7 +13,7 @@
   },
   {
    "v": "FDA",
-   "c": 1994
+   "c": 2037
   },
   {
    "v": "HC",
@@ -31,11 +31,11 @@
  "excluded": [
   {
    "reason": "국문 지적 0건",
-   "documents": 6
+   "documents": 11
   },
   {
    "reason": "국문 지적 3건 미만",
-   "documents": 3215
+   "documents": 3273
   },
   {
    "reason": "업체명 없음(숫자뿐이거나 빈 값)",
@@ -96329,7 +96329,8 @@
    "evidence_url": "https://www.fda.gov/media/196272/download",
    "categories": [
     "무균보증/무균공정",
-    "오염/교차오염 관리"
+    "오염/교차오염 관리",
+    "기타 품질시스템"
    ],
    "findings": [
     {
@@ -96349,6 +96350,30 @@
      "text_ko": "귀사는 무균 제조구역에서 작업하는 작업자가 적절히 교육훈련되었음을 보증하지 못했으며, 이는 해당 구역 직원의 현장교육(OJT) 기록이 미흡한 데서 확인된다(원문 일부 훼손).",
      "category_label_ko": "무균보증/무균공정",
      "text_orig": "Your firm failed to ensure that operators working in aseptic manufacturing areas are adequately trained, as evidenced by deficient On-the-Job Training (OJT) records for personnel in them@ _ area."
+    },
+    {
+     "finding_id": "finding-c116cf51338afc2c291f1718",
+     "text_ko": "의약품 충전 작업의 기류 가시화 시험(air visualization study)에서 관찰된 무균 조작(aseptic practices)이 부적절하다. 무균공정 중재(intervention) 시 여러 핵심 구역(critical zones)에서 퍼스트 에어(first air)가 가로막혔다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic practices observed in air visualization studies oe drug product filling operations are inadequate in that first air was obstructed in different m@ critical zones during aseptic processing interventions."
+    },
+    {
+     "finding_id": "finding-e0a2d2ce343c954bae169cf4",
+     "text_ko": "@@ 의약품에 대한 육안검사(visual inspection) 프로그램이 부적절하다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The visual inspection program for @@ drug product is inadequate."
+    },
+    {
+     "finding_id": "finding-e44152589ad45fd2ea7dc7d5",
+     "text_ko": "귀사는 여러 공정 중(in-process) 시료에서 미생물 집락 성장이 검출되었음에도 @ 원료의약품의 공정 중 bioburden 시험 결과를 검토하지 않았다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Your firm failed to review in-process bioburden testing results form@ drug substance, as microbial colony growth was detected in multiple in-processy@ samples."
+    },
+    {
+     "finding_id": "finding-fed337e26cc85a7e44dc411a",
+     "text_ko": "무균 표방 의약품의 미생물 오염 방지를 위한 절차에 적절한 무균 조작(aseptic practices)이 포함되어 있지 않다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile do not include adequate aseptic practices."
     }
    ]
   },
@@ -96365,7 +96390,11 @@
    "categories": [
     "기타 품질시스템",
     "설비/시설",
-    "시험실/품질관리"
+    "시험실/품질관리",
+    "안정성/보관",
+    "표시/포장",
+    "품질부서 관리감독",
+    "원자재/공급업체 관리"
    ],
    "findings": [
     {
@@ -96403,6 +96432,36 @@
      "text_ko": "제품의 불순물 프로파일(impurity profile)을 작성하기 위한 시험계획서(study protocol)가 없었고, 검토할 수 있는 불순물 프로파일도 없었다(원문 일부 훼손).",
      "category_label_ko": "기타 품질시스템",
      "text_orig": "There was no study protocol to for developing an impurity profile on the product nor there was an impurity profile on@@ for review."
+    },
+    {
+     "finding_id": "finding-af7114f01956b62c5c4073c9",
+     "text_ko": "서면으로 작성되어 승인된 안정성시험 계획서(protocol)가 없다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "There is no written and approved stability study protocol."
+    },
+    {
+     "finding_id": "finding-c6b4134bf5bd04e75c56b8df",
+     "text_ko": "12/10부터 7/12까지, 미국 내 사용 표시가 있는 @@ 완제품 배치의 수량이 미국으로 출하되었다.",
+     "category_label_ko": "표시/포장",
+     "text_orig": "From 12/10 to 7/12, quantities of@@ finished batches of bearing a labeling for use ir have been shipped to USA."
+    },
+    {
+     "finding_id": "finding-ca9b3b11e110ae6745b6e3f4",
+     "text_ko": "현 제조소에서 강제 분해시험(forced degradation study)이 수행되거나 ®® _ 생산된 적이 없다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "No forced degradation studies have been performed or®® _ produced at the current manufacturing site."
+    },
+    {
+     "finding_id": "finding-d25d963be7009e18db71418f",
+     "text_ko": "SOP 10-103 은 QA 가 제조소로 반품된 제품을 확인하고 시료채취하도록 요구한다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "SOP 10-103 requires QA to check and sample products that are returned to the site."
+    },
+    {
+     "finding_id": "finding-e39bdee857a473c6002e87d6",
+     "text_ko": "완제품 생산에 사용되는 조(Crude) 제품이 @ 개의 서로 다른 공급업체에서 생산된다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "The Crude product used to produce the finished product is produced byg@ different suppliers."
     }
    ],
    "inspector_names": [
@@ -96455,6 +96514,12 @@
      "text_ko": "oom에서 사용되는 저울 ID # SC-DZC-17-06은 amo 표준 분동을 사용하여 교정되었으며 칭량 범위는 0) 사이이다(원문 일부 훼손). 또한 날짜가 기재된 업체 교정성적서에는 해당 저울이 저울의 칭량 범위 내에서 교정되었다는 표시가 없었다.",
      "category_label_ko": "설비/시설",
      "text_orig": "The scale, ID # SC-DZC-17-06, which is used in the oom, is@@ calibrated using amo standard weight weighing range is between 0) In addition the vendor calibration certificate dated id not indicate that the scale had been calibrated within the scale weighing range."
+    },
+    {
+     "finding_id": "finding-ab61585289c5c20c641ef788",
+     "text_ko": "업체는 벌크 보관시간(hold-time) 시험을 실시했으나, 생산의 @@ 조(crude) 단계에 대한 벌크 보관시간 데이터는 제시하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The firm has conducted bulk hold-time studies for th peratio e firm, however, did not produce bulk hold-time data for the@@ crude stages ofthe roduction."
     }
    ]
   },
@@ -96471,7 +96536,8 @@
    "categories": [
     "시험실/품질관리",
     "기타 품질시스템",
-    "문서화/기록관리"
+    "문서화/기록관리",
+    "설비/시설"
    ],
    "findings": [
     {
@@ -96494,11 +96560,52 @@
      "text_ko": "마스터 배치 생산기록서에 개별 공정 단계 및/또는 전체 공정에서 중간체와 원료의약품(API)의 품질이 충족되도록 하기 위한 시간 제한과 상세한 생산 지침이 설정되어 있지 않다.",
      "category_label_ko": "문서화/기록관리",
      "text_orig": "The master batch production record lacks an established time limit and detailed production instructions to ensure the quality of intermediates and APIs are met for individual processing steps and/or total process."
+    },
+    {
+     "finding_id": "finding-aef6dcb7d9d9a9ecfe5802f1",
+     "text_ko": "중간체 및 원료의약품(API) 제조에 사용되는 설비는 의약품의 안전성, 확인, 함량, 품질 및 순도를 변화시킬 수 있는 오염을 방지하도록 양호한 수리 상태로 유지되어야 한다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment used in the manufacture of intermediates and API’s should be maintained in a good state ofrepair to prevent contamination that would alter the safety, identity, strength, quality and purity ofthe drug product."
     }
    ],
    "inspector_names": [
     "Alan A. Rivera",
     "Chad Rice"
+   ]
+  },
+  {
+   "document_id": "fda483-196279",
+   "slug": "fda483-196279",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Biosafety Testing Laboratory in Agricultural Technology Research Institute (ATRI)",
+   "firm_key": "biosafety testing laboratory in agricultural technology research institute (atri)",
+   "published_date": "2026-11-13",
+   "inspection_date": "2026-04-27",
+   "evidence_url": "https://www.fda.gov/media/196279/download",
+   "categories": [
+    "시험실/품질관리",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-592126c571f140520661061a",
+     "text_ko": "모든 시험실 기록이 확립된 규격 및 기준에 대한 적합성을 보증하는 데 필요한 모든 시험과 검사에서 얻은 정확하고 완전한 데이터를 포함하고 있지는 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Not all laboratory records include accurate and complete data derived from all tests and examinations necessary to assure compliance with established specifications and standards."
+    },
+    {
+     "finding_id": "finding-5ca61ff97e61a063e9ba95f3",
+     "text_ko": "시험실 관리에 시험 대상 물질이 확인(identity), 함량, 품질 및 순도에 대한 적절한 기준에 부합함을 보장하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to ensure that test materials conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-dd62cdedf6a6518e1c7a5a97",
+     "text_ko": "분석 시험의 무효 처리(invalidation) 및 재분석이 과학적으로 타당하게 정당화되고, 품질 검토 및 경향 분석(trending)을 위한 적절한 시스템 하에서 문서화되어 있지 않은 경우가 있다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Analytical assay invalidation and reanalysis are not always scientifically justified and documented under an appropriate system for quality review and trending."
+    }
    ]
   },
   {
@@ -96516,7 +96623,8 @@
     "품질부서 관리감독",
     "시험실/품질관리",
     "설비/시설",
-    "원자재/공급업체 관리"
+    "원자재/공급업체 관리",
+    "공정밸리데이션"
    ],
    "findings": [
     {
@@ -96548,10 +96656,69 @@
      "text_ko": "완제의약품 각 구성 성분의 확인(identity)이, 특정 확인시험이 있는 경우 이를 사용하여 최소 1개의 시험을 실시함으로써 검증되지 않고 있다.",
      "category_label_ko": "원자재/공급업체 관리",
      "text_orig": "The identity of each component of a drug product is not verified by conducting at least one test to verify the identity, using specific identity tests if they exist."
+    },
+    {
+     "finding_id": "finding-bae590c200e9b464c70f22c9",
+     "text_ko": "시험실 관리에 확인(identity), 함량(strength), 품질 및 순도의 적절한 기준에 부합함을 보장하도록 설계된, 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-db17a514b8503affce768d30",
+     "text_ko": "각 의약품의 품질 기준을 평가하여 규격 또는 제조·관리 절차의 변경 필요성을 판단하기 위해, 기록 내 데이터를 최소 연 1회 검토할 수 있도록 기록이 유지되고 있지 않다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Records are not maintained so that data therein can be reviewed at least annually to evaluate the quality standards of each drug product to determine the need for changes in specifications or manufacturing or control procedures."
+    },
+    {
+     "finding_id": "finding-f9974b0d3f4eb3c35b33a6d6",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인(identity), 함량(strength), 순도 및 품질을 갖도록 보장하기 위한 생산 및 공정관리 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
     }
    ],
    "inspector_names": [
     "Jose M Cayuela"
+   ]
+  },
+  {
+   "document_id": "fda483-196282",
+   "slug": "fda483-196282",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "MSN Life Sciences Private Limited, Unit II",
+   "firm_key": "msn life sciences unit ii",
+   "published_date": "2026-11-13",
+   "inspection_date": "2024-09-13",
+   "evidence_url": "https://www.fda.gov/media/196282/download",
+   "categories": [
+    "설비/시설",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-23fe8b8b1deb506c6e8cdb44",
+     "text_ko": "귀사의 생산구역은 직원을 위한 적절한 세척 시설을 갖추고 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Your production areas fail to provide adequate washing facilities for personnel."
+    },
+    {
+     "finding_id": "finding-b6a84c309496ba3370f07723",
+     "text_ko": "품질 부문(quality unit)이 모든 API 제품에 대한 중대한 일탈 또는 부적합과 관련 조사를 전부 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Your quality unit failed to review all critical deviations or non-conformances and related investigations for all API products."
+    },
+    {
+     "finding_id": "finding-e77400f9da1ee4a82fd0349f",
+     "text_ko": "귀사의 품질 부문(quality unit)은 중대한 일탈이 조사되고 해결되도록 보장하는 핵심 책임 중 하나를 수행하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Your quality unit failed to perform one of it's core responsibilities to ensure that critical deviations are investigated and resolved."
+    },
+    {
+     "finding_id": "finding-eb74565a76c0c23097f13a09",
+     "text_ko": "귀사는 중대한 일탈 및/또는 배치가 규격에 부합하지 못한 사안을 철저히 조사하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Your firm failed to thoroughly investigate critical deviations and/or the failure(s) of a batch to meet specifications."
+    }
    ]
   },
   {
@@ -96569,7 +96736,8 @@
     "안정성/보관",
     "시험실/품질관리",
     "공정밸리데이션",
-    "표시/포장"
+    "표시/포장",
+    "일탈/CAPA/조사"
    ],
    "findings": [
     {
@@ -96607,6 +96775,18 @@
      "text_ko": "의약품 표시 작업에 사용되도록 불출된 표시사항(labeling)에 대한 엄격한 관리가 이루어지지 않고 있다.",
      "category_label_ko": "표시/포장",
      "text_orig": "Strict control is not exercised over labeling issued for use in drug product labeling operations."
+    },
+    {
+     "finding_id": "finding-c097040e059d936057c5b5f3",
+     "text_ko": "배치가 이미 출하되었는지와 관계없이 설명되지 않은 불일치를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-e44700391fea18cb9e393b7e",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인(identity), 함량(strength), 순도 및 품질을 갖도록 보장하기 위한 생산 및 공정관리에 대한 적절한 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
     }
    ]
   },
@@ -96623,7 +96803,9 @@
    "categories": [
     "일탈/CAPA/조사",
     "설비/시설",
-    "기타 품질시스템"
+    "기타 품질시스템",
+    "시험실/품질관리",
+    "표시/포장"
    ],
    "findings": [
     {
@@ -96649,6 +96831,18 @@
      "text_ko": "문서화된 생산 및 공정관리 절차로부터의 일탈(deviation)이 기록되고 그 타당성이 설명되지 않았다.",
      "category_label_ko": "일탈/CAPA/조사",
      "text_orig": "Deviations from written production and process control procedures are not recorded and justified."
+    },
+    {
+     "finding_id": "finding-ba5fa8d691b5ddbc893d1b24",
+     "text_ko": "시험실 관리에 의약품이 확인(identity), 함량(strength), 품질 및 순도의 적절한 기준에 부합함을 보장하도록 설계된, 과학적으로 타당하고 적절한 기준, 시료채취 계획 및 시험 절차의 수립이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate standards, sampling plans and test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-d9d53768c3e74655a7751c24",
+     "text_ko": "보관용 의약품 검체(reserve sample)가 제품 표시에 부합하는 조건으로 보관되고 있지 않다.",
+     "category_label_ko": "표시/포장",
+     "text_orig": "Reserve drug product samples are not retained and stored under conditions consistent with product labeling."
     }
    ],
    "inspector_names": [
@@ -96701,6 +96895,24 @@
      "text_ko": "시료를 채취할 용기의 수와 각 용기에서 채취하는 물질의 양이 적절한 기준에 근거하지 않고 있다.",
      "category_label_ko": "원자재/공급업체 관리",
      "text_orig": "The number of containers to be sampled and amount of material taken from each container is not based upon appropriate criteria."
+    },
+    {
+     "finding_id": "finding-ae9fef0c5ea9607528d68920",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 대한 서면 절차가 수립되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product."
+    },
+    {
+     "finding_id": "finding-b08945d26b413bc01c7efa03",
+     "text_ko": "출하 전 의약품의 시험 및 출고에 최종 규격, 그리고 각 유효성분의 확인(identity) 및 함량(strength)에 대한 적합 여부를 확인하는 적절한 시험실 판정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the final specifications and identity and strength of each active ingredient prior to release."
+    },
+    {
+     "finding_id": "finding-dc0e6f9f8770b7270b7ac252",
+     "text_ko": "기록에 각 구성 성분(component)의 개별 재고 기록과, 관련 의약품 배치 또는 로트를 확인할 수 있는 충분한 정보를 담은 각 구성 성분 사용량의 수불 대조(reconciliation)가 포함되어 있지 않다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Records fail to include an individual inventory record of each component and reconciliation of the use of each component with sufficient information to allow determination of any associated batch or lot of drug product."
     }
    ],
    "inspector_names": [
@@ -96722,7 +96934,8 @@
    "categories": [
     "안정성/보관",
     "시험실/품질관리",
-    "설비/시설"
+    "설비/시설",
+    "품질부서 관리감독"
    ],
    "findings": [
     {
@@ -96760,6 +96973,18 @@
      "text_ko": "시험실 기록에 시험 결과와 그 결과가 확립된 규격과 어떻게 비교되는지에 대한 기재가 포함되어 있지 않아 미흡하다.",
      "category_label_ko": "시험실/품질관리",
      "text_orig": "Laboratory records are deficient in that they do not include a statement of the results of tests and how they compare to the established specifications."
+    },
+    {
+     "finding_id": "finding-aceb32b97c8b036ecffcc839",
+     "text_ko": "출하 전 의약품의 시험 및 출고에 각 유효성분의 확인(identity) 및 함량(strength)에 대한 적합 여부를 확인하는 적절한 시험실 판정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the identity and strength of each active ingredient prior to release."
+    },
+    {
+     "finding_id": "finding-f2ba118f9be67f99e08dad1e",
+     "text_ko": "품질관리 부문의 책임과 절차가 서면화되어 있지 않고 충분히 이행되지 않고 있다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed."
     }
    ]
   },
@@ -96778,7 +97003,9 @@
     "안정성/보관",
     "품질부서 관리감독",
     "공정밸리데이션",
-    "시험실/품질관리"
+    "시험실/품질관리",
+    "무균보증/무균공정",
+    "표시/포장"
    ],
    "findings": [
     {
@@ -96810,6 +97037,30 @@
      "text_ko": "시험실 관리에는 구성 성분, 의약품 용기, 의약품 마개, 공정 중 물질, 표시사항(labeling) 및 완제의약품이 확인(identity), 함량, 품질 및 순도에 대한 적절한 기준에 부합함을 보증하도록 설계된 과학적으로 타당하고 적절한 규격, 기준, 시료채취 계획 및 시험 절차의 수립이 포함되어야 한다.",
      "category_label_ko": "시험실/품질관리",
      "text_orig": "Laboratory controls shall include the establishment of scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, drug product closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity."
+    },
+    {
+     "finding_id": "finding-abef04fa0856ba5d5296a715",
+     "text_ko": "출하 전 의약품의 시험 및 출고에 최종 규격, 각 유효성분의 확인(identity) 및 함량(strength)에 대한 적합 여부를 확인하는 적절한 시험실 판정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the final specifications, identity, and strength of each active ingredient prior to release."
+    },
+    {
+     "finding_id": "finding-bb757e8ca4f5b996bbba8662",
+     "text_ko": "설비와 기구는 의약품의 안전성, 확인, 함량, 품질 또는 순도를 공식 또는 기타 확립된 요건 이하로 변화시킬 수 있는 오작동이나 오염을 방지하기 위해 적절한 주기로 세척·유지관리되어야 하며, 의약품의 특성에 따라 적절히 소독 및/또는 멸균되어야 한다. 구체적으로, 2025년 7월 24일(07/24/2025) 귀사 제조시설에서 현장 점검 중 상태 표시 라벨이 부착되지 않은 다수의 0) 탱크와 이송 탱크를 확인했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Equipment and utensils shall be cleaned, maintained, and, as appropriate for the nature of the drug, sanitized and/or sterilized at appropriate intervals to prevent malfunctions or contamination that may alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements, Specifically, On 07/24/2025, during my walkthrough inspection at your manufacturing facility, I observed multiple 0) tanks and transfer tanks without proper status labels."
+    },
+    {
+     "finding_id": "finding-c24988f979cf7d650f8cb20c",
+     "text_ko": "의약품 표시 작업에 사용하도록 불출되는 표시자재(labeling)에 대해 엄격한 관리가 이루어져야 한다.",
+     "category_label_ko": "표시/포장",
+     "text_orig": "Strict control shall be exercised over labeling issued for use in drug product labeling operations."
+    },
+    {
+     "finding_id": "finding-cdca33588855e3c936fbe541",
+     "text_ko": "생산 및 공정관리에 대한 적절한 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Failure to establish adequate written procedures for production and process controls."
     }
    ],
    "inspector_names": [
@@ -96869,7 +97120,10 @@
    "categories": [
     "설비/시설",
     "시험실/품질관리",
-    "컴퓨터화시스템"
+    "컴퓨터화시스템",
+    "품질부서 관리감독",
+    "안정성/보관",
+    "일탈/CAPA/조사"
    ],
    "findings": [
     {
@@ -96889,6 +97143,30 @@
      "text_ko": "품질관리 기록의 변경이 권한 있는 직원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 통제가 이루어지지 않고 있다.",
      "category_label_ko": "컴퓨터화시스템",
      "text_orig": "Appropriate controls are not exercised over computers or related systems to assure that changes in quality control records are instituted only by authorized personnel."
+    },
+    {
+     "finding_id": "finding-b01efd4a9ad4c99834b2f710",
+     "text_ko": "원료의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비의 세척 및 유지관리에 대한 서면 절차가 미흡하다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures are deficient for the cleaning and maintenance of equipment used in the manufacturing, processing, packing, or holding of a drug substance."
+    },
+    {
+     "finding_id": "finding-bb15c1c729a294934e9cec11",
+     "text_ko": "품질관리 부문의 책임과 절차가 서면화되어 있지 않고 충분히 이행되지 않고 있다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed."
+    },
+    {
+     "finding_id": "finding-c2083435b14da2a9709fe88c",
+     "text_ko": "원료의약품 및 중간체의 안정성 특성을 평가하도록 설계된 서면 시험 프로그램이 없다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "There is no written testing program designed to assess the stability characteristics of drug substances and intermediates."
+    },
+    {
+     "finding_id": "finding-ca90b5ecf7d57645805bf36d",
+     "text_ko": "설명되지 않은 불일치 및 배치 또는 그 구성 성분이 규격에 부합하지 못한 사안에 대한 조사의 서면 기록에 결론과 후속 조치가 항상 포함되어 있지는 않다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Written records of investigation into unexplained discrepancies and the failure ofa batch or any of its components to meet specification do not always include the conclusions and follow-up."
     }
    ],
    "inspector_names": [
@@ -96914,7 +97192,9 @@
     "설비/시설",
     "안정성/보관",
     "무균보증/무균공정",
-    "일탈/CAPA/조사"
+    "일탈/CAPA/조사",
+    "문서화/기록관리",
+    "컴퓨터화시스템"
    ],
    "findings": [
     {
@@ -97003,6 +97283,30 @@
      "cfr_refs": [
       "section 5"
      ]
+    },
+    {
+     "finding_id": "finding-b25b435791739458ab5ebaa5",
+     "text_ko": "마스터 생산 및 관리 기록서(master production and control records)의 작성 절차를 준수하지 않았다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "Procedures for the preparation of master production and control records are not followed."
+    },
+    {
+     "finding_id": "finding-b9e198e03e82e20db7775510",
+     "text_ko": "마스터 생산 및 관리 기록서 또는 기타 기록의 변경이 권한 있는 직원에 의해서만 이루어지도록 보장하는 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지지 않고 있다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel."
+    },
+    {
+     "finding_id": "finding-d8c474113e83281fd69ed96e",
+     "text_ko": "설비와 기구가 의약품의 안전성, 확인, 함량, 품질 또는 순도를 변화시킬 수 있는 오작동과 오염을 방지하기 위한 적절한 주기로 유지관리되고 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment and utensils are not maintained at appropriate intervals to prevent malfunctions and contamination that would alter the safety, identity, strength, quality or purity of the drug product."
+    },
+    {
+     "finding_id": "finding-e7de4a31d97e3c4d518435b1",
+     "text_ko": "시험실 관리에 의약품이 확인(identity), 함량(strength), 품질 및 순도의 적절한 기준에 부합함을 보장하도록 설계된, 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity."
     }
    ],
    "inspector_names": [
@@ -97024,7 +97328,8 @@
    "categories": [
     "무균보증/무균공정",
     "설비/시설",
-    "공정밸리데이션"
+    "공정밸리데이션",
+    "일탈/CAPA/조사"
    ],
    "findings": [
     {
@@ -97062,6 +97367,12 @@
      "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비가 의도된 용도에 맞는 작업을 용이하게 하는 적절한 설계로 되어 있지 않다.",
      "category_label_ko": "설비/시설",
      "text_orig": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use."
+    },
+    {
+     "finding_id": "finding-d3cc39d6e79f9fa4cc3301aa",
+     "text_ko": "배치가 이미 출하되었는지와 관계없이 설명되지 않은 불일치를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed."
     }
    ],
    "inspector_names": [
@@ -97070,6 +97381,1944 @@
     "Ogechi C Nna",
     "Talia A Faison",
     "Wayne E Seifert"
+   ]
+  },
+  {
+   "document_id": "fda483-196305",
+   "slug": "fda483-196305",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Genzyme Corporation",
+   "firm_key": "genzyme",
+   "published_date": "2026-11-16",
+   "inspection_date": "2026-04-09",
+   "evidence_url": "https://www.fda.gov/media/196305/download",
+   "categories": [
+    "설비/시설",
+    "시험실/품질관리",
+    "기타 품질시스템",
+    "일탈/CAPA/조사",
+    "오염/교차오염 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-6fc4a397bbb5d03520887dd2",
+     "text_ko": "원료의약품 제조설비가 적절하게 세척 및 유지관리되지 않고 있다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Drug substance manufacturing equipment is not cleaned and maintained appropriately."
+    },
+    {
+     "finding_id": "finding-84281d405f52b3e2cab4b88c",
+     "text_ko": "구체적으로, 적절한 시험실 관리 체계를 수립하고 따르지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Specifically, Failure to establish and follow adequate laboratory control mechanisms."
+    },
+    {
+     "finding_id": "finding-84963ab70f06d3d5ef5f44ca",
+     "text_ko": "적절한 생산관리 절차를 수립하고 따르지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Failure to establish and follow adequate production control procedures."
+    },
+    {
+     "finding_id": "finding-c7810281de72142ba60f348b",
+     "text_ko": "핵심 원료의약품 제조설비를 이동 및 재설치한 후 적절하게 재적격성평가(re-qualify)하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Failure to adequately re-qualify critical drug substance manufacturing equipment after movement and re- installation."
+    },
+    {
+     "finding_id": "finding-cc4a0b94559b46bfbb1b11b8",
+     "text_ko": "벌크 원료의약품 제조와 관련된 중대한 일탈(deviation)을 적절히 조사하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Failure to adequately investigate significant deviations regarding bulk drug substance manufacture."
+    },
+    {
+     "finding_id": "finding-ff7521171a4664ecd70a9ea7",
+     "text_ko": "문서화된 입자 오염이 확인된 원료의약품을 출하(release)했다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Release of drug substance with documented particle contamination."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196306",
+   "slug": "fda483-196306",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Baxter Healthcare Corporation",
+   "firm_key": "baxter healthcare",
+   "published_date": "2026-11-16",
+   "inspection_date": "2026-04-02",
+   "evidence_url": "https://www.fda.gov/media/196306/download",
+   "categories": [
+    "시험실/품질관리",
+    "설비/시설",
+    "무균보증/무균공정",
+    "일탈/CAPA/조사",
+    "교육/작업자",
+    "오염/교차오염 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1038c98f5cbd6bf4cddfa843",
+     "text_ko": "통계적 품질관리 기준에 적절한 합격 수준과 불합격 수준이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The statistical quality control criteria fail to include appropriate acceptance levels and rejection levels."
+    },
+    {
+     "finding_id": "finding-10d5c11b5252cd3e9830cdbc",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비가 의도된 용도에 맞는 작업을 용이하게 하도록 적절하게 설계되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use."
+    },
+    {
+     "finding_id": "finding-2234b4968631bb0d5c5f2009",
+     "text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위해 설계된 절차에 무균공정(aseptic) 및 멸균공정에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization process."
+    },
+    {
+     "finding_id": "finding-2351f74946e53c836c4d3875",
+     "text_ko": "배치가 이미 출하되었는지와 상관없이, 설명되지 않은 불일치 및 배치 또는 그 구성 성분이 규격에 부합하지 못한 경우에 대해 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-7f4d57b7e03d7b1a311ceb98",
+     "text_ko": "문서화된 생산 및 공정관리 절차로부터의 일탈(deviation)이 기록되지 않고 있다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Deviations from written production and process control procedures are not recorded."
+    },
+    {
+     "finding_id": "finding-a3968ccdc4fa16e29e66a7ee",
+     "text_ko": "확립된 규격, 기준, 샘플링 계획, 시험 절차 및 시험실 관리 체계가 수행 시점에 따라지거나 문서화되지 않고 있다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Established specifications, standards, sampling plans, test procedures and laboratory control mechanisms are not followed and documented at the time of performance."
+    },
+    {
+     "finding_id": "finding-a3ad0d50b56edf460ae124a3",
+     "text_ko": "직원이 자신의 직무로 수행하는 특정 작업에 대한 교육훈련을 받지 않고 있다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Employees are not given training in the particular operations they perform as part of their function."
+    },
+    {
+     "finding_id": "finding-c72560fb7ed792b0e0a0ffb2",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 대한 문서화된 절차가 수립되어 있지 않고 따라지지도 않고 있다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures are not established and followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product."
+    },
+    {
+     "finding_id": "finding-e74d6955042f49c3404e0505",
+     "text_ko": "오염 또는 혼입을 방지하는 데 필요한 관리 시스템이 미흡하다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "The control systems necessary to prevent contamination or mix-ups are deficient.",
+     "cfr_refs": [
+      "section 7"
+     ]
+    }
+   ],
+   "inspector_names": [
+    "Robert J Ham",
+    "Supreet K Sran",
+    "Logan T Williams"
+   ]
+  },
+  {
+   "document_id": "fda483-196307",
+   "slug": "fda483-196307",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Spectrum Laboratory Products Inc.",
+   "firm_key": "spectrum laboratory products",
+   "published_date": "2026-11-16",
+   "inspection_date": "2026-03-20",
+   "evidence_url": "https://www.fda.gov/media/196307/download",
+   "categories": [
+    "설비/시설",
+    "품질부서 관리감독",
+    "세척밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-2b04edb1a357a784f43af273",
+     "text_ko": "귀사는 중간체 및 원료의약품(API) 제조에 사용되는 건물, 시설 및 설비를 청결한 상태로 적절히 유지하지 않았고, 설비 세척에 대한 적절한 문서화된 절차도 수립하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Your firm failed to properly maintain buildings, facilities, and equipment used in the manufacture of intermediates and APIs in a clean condition, and failed to establish adequate written procedures for cleaning equipment."
+    },
+    {
+     "finding_id": "finding-7469d834b492e00baf410baa",
+     "text_ko": "귀사의 품질부서는 모든 적절한 품질 관련 문서를 활동이 수행되는 시점에 기록·검토·승인하지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Your quality unit failed to record, review, and approve all appropriate quality-related documents at the time activities are performed.",
+     "cfr_refs": [
+      "section 5"
+     ]
+    },
+    {
+     "finding_id": "finding-c8a99adc82ce1616913368b2",
+     "text_ko": "귀사는 설비의 세척 및 유지관리에 대한 문서화된 절차를 적절히 밸리데이션하지 않았고, 밸리데이션 이후 적절한 주기로 세척 절차를 모니터링하지 않았다.",
+     "category_label_ko": "세척밸리데이션",
+     "text_orig": "Your firm failed to adequately validate written procedures for cleaning and maintenance of equipment, and failed to monitor cleaning procedures at appropriate intervals after validation."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196309",
+   "slug": "fda483-196309",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Antaria Pty Ltd.",
+   "firm_key": "antaria pty",
+   "published_date": "2026-11-16",
+   "inspection_date": "2023-11-17",
+   "evidence_url": "https://www.fda.gov/media/196309/download",
+   "categories": [
+    "밸리데이션/적격성평가",
+    "기타 품질시스템",
+    "시험실/품질관리",
+    "안정성/보관",
+    "일탈/CAPA/조사",
+    "품질부서 관리감독"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-52a9147f0ab1823501a89ec3",
+     "text_ko": "귀사는 장기(30°C/65%RH — Oven ID 0-0007) 및 가속 안정성 시험에 사용하는 안정성 챔버를 완전히 적격성평가하지 않았다.",
+     "category_label_ko": "밸리데이션/적격성평가",
+     "text_orig": "Your firm has not fully qualified the stability chambers used for long term (30°C/65%RH — Oven ID 0-0007) and accelerated stability studies."
+    },
+    {
+     "finding_id": "finding-74ad638760fa1da6ea3a69a6",
+     "text_ko": "귀사는 의약품 시험에 사용하는 조제 작업표준품, 이동상, 희석액 및 기타 조제물에 대해 사용기한을 지정하지 않는다(YMA rr. 포함).",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Your firm does not assign an expiration date for prepared working standards, mobile phases, diluents and other preparations used for performing testing of drug products, including (YMA rr."
+    },
+    {
+     "finding_id": "finding-777caf8c5dc290c2c5dc085b",
+     "text_ko": "시험실 기록에 시험 중 얻은 모든 데이터의 완전한 기록이 없고, 시료의 조제 및 시험과 관련된 중요 정보의 문서화도 항상 포함되어 있지는 않아 미흡하다. 예를 들어 a) 의약품 시료의 시험(함량시험(assay), 원소 불순물 및 기타 필수 USP 시험 포함)에 사용되는 표준 원액, 작업표준품, 기준 표준액, 시료 용액, 희석액, 이동상, 시약 및 기타 조제물의 조제에 대한 문서화가 없다(MAP. 포함).",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records are deficient in that they do not include a complete record of all data obtained during testing and do not always include documentation of pertinent information related to the preparation and testing of a sample, For example, a) There is no documentation of the preparation of standard stock solutions, working standards, reference standard solutions, sample solutions, diluents, mobile phases, reagents, and other preparations used for performing testing of drug samples including for assay, elemental impurities, and other required USP tests for testing of drug products to include (MAP."
+    },
+    {
+     "finding_id": "finding-78e79a500b8591f2d10f71d2",
+     "text_ko": "귀사는 승인된 시험방법을 항상 따르지는 않고 있다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Your firm is not always following the approved test method."
+    },
+    {
+     "finding_id": "finding-a19e60463fde632a14d2a3d8",
+     "text_ko": "의약품의 안정성 특성을 평가하기 위해 설계된 문서화된 시험 프로그램이 없다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "There is no written testing program designed to assess the stability characteristics of drug products."
+    },
+    {
+     "finding_id": "finding-aa1721ade8ebf88022de52fc",
+     "text_ko": "QC 시험실에서 사용하는 저울의 교정이 적절하게 이루어지지 않고 있다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Calibration of balances used in the QC Laboratory are not calibrated appropriately."
+    },
+    {
+     "finding_id": "finding-b8a9451a50f8ad8834e55d6f",
+     "text_ko": "배치가 이미 출하되었는지와 상관없이, 설명되지 않은 불일치 또는 배치 또는 그 구성 성분이 규격에 부합하지 못한 경우를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy or the failure of a batch or any of its components to meet any of its specifications, whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-bc2bcfcd83a3fd861d64bf92",
+     "text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않고 충분히 이행되지 않고 있다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed."
+    },
+    {
+     "finding_id": "finding-d5dc49659be79ebcc6c38cf1",
+     "text_ko": "귀사에는 OAM usp(원료의약품) 및 기타 의약품의 안정성 시험에 사용된 시험방법이 안정성 지시(stability indicating) 방법임을 보여주는 문서가 없다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Your firm has no documentation to show the test methods used for stability testing of OAM usp (API) and other drug products are stability indicating."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196312",
+   "slug": "fda483-196312",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Glenmark Pharmaceuticals Limited",
+   "firm_key": "glenmark pharmaceuticals",
+   "published_date": "2026-11-16",
+   "inspection_date": "2026-06-30",
+   "evidence_url": "https://www.fda.gov/media/196312/download",
+   "categories": [
+    "시험실/품질관리",
+    "원자재/공급업체 관리",
+    "오염/교차오염 관리",
+    "컴퓨터화시스템",
+    "설비/시설",
+    "불만/회수"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-10b14736286b4a4115ede4eb",
+     "text_ko": "시험실 기록에 확립된 규격 및 기준에 대한 적합성을 보증하는 데 필요한 모든 시험·검사·분석에서 나온 완전한 데이터가 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include complete data derived from all tests, examinations, and assays necessary to assure compliance with established specifications and standards."
+    },
+    {
+     "finding_id": "finding-58cc707ffc673deb96526200",
+     "text_ko": "각 원료(component)가 순도, 함량, 품질에 대한 모든 문서화된 규격에 적합한지 시험되지 않고 있다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Each component is not tested for conformity with all written specifications for purity, strength, and quality."
+    },
+    {
+     "finding_id": "finding-9b5834251a53675d293cdd82",
+     "text_ko": "귀사 작업의 관리 시스템이 오염 또는 혼입을 방지하기에 적절하지 않다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Control systems for the firm's operations are not adequate to prevent contamination or mix-ups."
+    },
+    {
+     "finding_id": "finding-a19d539957deea4a2c89f00c",
+     "text_ko": "마스터 생산 및 관리 기록 또는 기타 기록의 변경이 권한 있는 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 통제가 이루어지지 않았다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "Appropriate controls were not exercised over computer or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel."
+    },
+    {
+     "finding_id": "finding-c0b1c5493204655fcd5f918e",
+     "text_ko": "제품의 안전성·확인·함량·품질 또는 순도를 변화시킬 수 있는 오염을 방지하기 위해 설비와 기구가 적절한 주기로 세척 또는 소독(sanitize)되지 않고 있다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment and utensils are not cleaned or sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product."
+    },
+    {
+     "finding_id": "finding-c6a7f9d2e432f9c02eb612e7",
+     "text_ko": "연간 제품 품질평가에 대한 문서화된 절차가 따라지지 않고 있으며, 평가에 각 의약품별 불만(complaint) 기록 검토가 포함되어 있지 않아 미흡하다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Written procedures for annual product reviews are not followed, and the reviews are deficient in that they do not address a review of complaint records for each drug product."
+    }
+   ],
+   "inspector_names": [
+    "Lisa L. Flores"
+   ]
+  },
+  {
+   "document_id": "fda483-196313",
+   "slug": "fda483-196313",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Samchundang Pharma Co., Ltd.",
+   "firm_key": "samchundang pharma",
+   "published_date": "2026-11-16",
+   "inspection_date": "2026-05-19",
+   "evidence_url": "https://www.fda.gov/media/196313/download",
+   "categories": [
+    "공정밸리데이션",
+    "설비/시설",
+    "무균보증/무균공정",
+    "일탈/CAPA/조사",
+    "불만/회수"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-195b4ba2b701908dbc172cf4",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인(identity)·함량(strength)·순도(purity)·품질을 갖도록 설계된 생산 및 공정관리에 대한 적절한 문서화된 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-2fb7f45adb1d8eab13f8a357",
+     "text_ko": "제품의 안전성·확인·함량·품질 또는 순도를 변화시킬 수 있는 오염을 방지하기 위해 설비와 기구가 적절한 주기로 소독(sanitize)되지 않고 있다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment and utensils are not sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product."
+    },
+    {
+     "finding_id": "finding-337a3e8ca5fd0530f6e1c3bf",
+     "text_ko": "무균공정(aseptic processing) 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions."
+    },
+    {
+     "finding_id": "finding-5ce944ac597ff0e7f2f62af3",
+     "text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위해 설계된 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process."
+    },
+    {
+     "finding_id": "finding-95968d3ba4fcb74284bd33de",
+     "text_ko": "의약품의 무균공정(aseptic processing) 관련 작업에서 오염 또는 혼입을 방지하기 위한 분리된 또는 규정된 구역이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to aseptic processing of drug products."
+    },
+    {
+     "finding_id": "finding-9e9b262c36fb25c2887d1f6d",
+     "text_ko": "배치가 이미 출하되었는지와 상관없이, 설명되지 않은 불일치를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-db8b0fcd104efd92418e897c",
+     "text_ko": "의약품과 관련된 서면 및 구두 불만(complaint)의 처리를 기술한 절차가 미흡하게 작성되었거나 미흡하게 이행되고 있다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Procedures describing the handling of written and oral complaints related to drug products are deficiently written or followed."
+    },
+    {
+     "finding_id": "finding-f26584f7a074b70d5b766457",
+     "text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위해 설계된 절차가 수립되어 있지 않거나 따라지지 않고 있다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed."
+    }
+   ],
+   "inspector_names": [
+    "Khoa Nathan V Tran",
+    "Damaris Y Hernandez"
+   ]
+  },
+  {
+   "document_id": "fda483-196320",
+   "slug": "fda483-196320",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Alkem Laboratories Limited",
+   "firm_key": "alkem laboratories",
+   "published_date": "2026-11-17",
+   "inspection_date": "2023-12-01",
+   "evidence_url": "https://www.fda.gov/media/196320/download",
+   "categories": [
+    "기타 품질시스템",
+    "교육/작업자",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1622ac7ab1c5b7015bd7acc8",
+     "text_ko": "API 시험에 대한 밸리데이션된 방법이 수립되어 있지 않다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Validated methods have not been established for testing of API's."
+    },
+    {
+     "finding_id": "finding-1a9aaa1f3efd2b5f0f8696bc",
+     "text_ko": "완제 API의 제조, 가공, 포장, 보관에 종사하는 직원이 지정된 업무를 수행하는 데 필요한 교육훈련을 받지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Employees engaged in the manufacture, processing, packing, holding of finished API's lack the training required to perform their assigned functions."
+    },
+    {
+     "finding_id": "finding-724ad4762b9c957c2a566cb7",
+     "text_ko": "조사가 미흡하다. 예상치 못한 결과의 모든 잠재 근본원인을 평가하지 않았고, 영향을 받았을 수 있는 원료의약품(API)으로 조사를 적절히 확대하지도 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Investigations are inadequate in that they do not evaluate all potential root causes of unexpected results nor are they adequately extended to potentially impacted API."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196321",
+   "slug": "fda483-196321",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Apothecon Pharmaceuticals Pvt. Ltd.",
+   "firm_key": "apothecon pharmaceuticals",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-05-01",
+   "evidence_url": "https://www.fda.gov/media/196321/download",
+   "categories": [
+    "설비/시설",
+    "문서화/기록관리",
+    "무균보증/무균공정",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-159da495c790de934e587fe9",
+     "text_ko": "원료의약품 및/또는 의약품 생산에 사용되는 설비의 세척 및 예방정비에 대한 서면 절차가 수립되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures have not been established for cleaning and preventative maintenance of equipment used in the production of your drug substance and/or drug products."
+    },
+    {
+     "finding_id": "finding-1f944521a3aee9dece335be6",
+     "text_ko": "귀사 벌크 원료의약품의 배치 생산·관리 기록에 각 배치의 생산과 관리에 관한 완전한 정보가 포함되어 있지 않다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "Batch production and control records of your bulk drug substances do not include complete information relating to the production and control of each batch."
+    },
+    {
+     "finding_id": "finding-3cc3d49d582e22c46e5dbba3",
+     "text_ko": "무균공정(aseptic processing) 구역의 설비 세척 및 소독(무균 상태를 조성하기 위한) 시스템이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the equipment to produce aseptic conditions."
+    },
+    {
+     "finding_id": "finding-43deb33980c51522573befec",
+     "text_ko": "무균(sterile)을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process."
+    },
+    {
+     "finding_id": "finding-741cf501695769406a27181e",
+     "text_ko": "시험실 관리에 의약품이 적절한 기준(확인, 함량, 품질, 순도)에 적합함을 보장하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-85937672f7e089881755632d",
+     "text_ko": "무균공정 구역에서 환경 조건을 모니터링하는 체계가 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196335",
+   "slug": "fda483-196335",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Pausch LLC",
+   "firm_key": "pausch",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-03-23",
+   "evidence_url": "https://www.fda.gov/media/196335/download",
+   "categories": [
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-157429d354b49e5c08cc141b",
+     "text_ko": "최고경영진이 품질경영시스템(QMS)의 지속적인 적합성, 충족성, 효과성을 보장하기 위해 문서화된 계획 주기로 이를 검토하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Top management did not review the quality management system at documented planned intervals to ensure its continued suitability, adequacy, and effectiveness."
+    },
+    {
+     "finding_id": "finding-3ac664d2540f859c80b69ee9",
+     "text_ko": "구매한 제품이 지정된 구매 정보에 부합하도록 보장하는 절차가 적절히 문서화되어 있지 않다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Procedures to ensure that purchased product conforms to specified purchasing information have not been adequately documented."
+    },
+    {
+     "finding_id": "finding-3fadce5f4f0524f7f44d4ace",
+     "text_ko": "부적합(nonconformity)의 원인을 제거하여 재발을 방지하기 위한 시정조치가 적절히 취해지지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Corrective action was not adequately taken to eliminate the cause of nonconformities in order to prevent recurrence.",
+     "cfr_refs": [
+      "section 2"
+     ]
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196351",
+   "slug": "fda483-196351",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Jiangsu Hengrui Pharmaceuticals",
+   "firm_key": "jiangsu hengrui pharmaceuticals",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-04-15",
+   "evidence_url": "https://www.fda.gov/media/196351/download",
+   "categories": [
+    "무균보증/무균공정",
+    "설비/시설",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-02c0b419f4fea53a1c812b76",
+     "text_ko": "무균공정(aseptic processing) 구역은 무균 조건을 만들기 위한 세척·소독 시스템에 결함이 있다. (원문 일부 판독 불가)",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecti the to prod aseptic conditions."
+    },
+    {
+     "finding_id": "finding-193ca676c7c56fa50db2210f",
+     "text_ko": "멸균 의약품으로 표방하는 제품의 미생물 오염을 방지하기 위한 절차에 멸균 공정에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the sterilization process."
+    },
+    {
+     "finding_id": "finding-19e8c13755a1a2c20634788d",
+     "text_ko": "세척 및 유지관리에 대한 서면 절차에 책임 지정, 사용되는 방법·설비·재료에 대한 충분히 상세한 설명, 적절한 세척과 유지관리를 보장하는 데 필요한 설비 분해·재조립 방법에 대한 충분히 상세한 설명이 포함되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures for cleaning and maintenance fail to include assignment of responsibility, description in sufficient detail of methods, equipment and materials used and description in sufficient detail of the methods of disassembling and reassembling equipment as necessary to assure proper cleaning and maintenance."
+    },
+    {
+     "finding_id": "finding-649d0e7b827faf5c9d0dfe90",
+     "text_ko": "오염 또는 혼입(mix-up)을 방지하기 위한 분리 또는 구분된 구역이 의약품의 무균공정(aseptic processing) 관련 작업과 관련하여 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to aseptic processing of drug products."
+    },
+    {
+     "finding_id": "finding-86c34e09e6b5bb3a4ed2c7b1",
+     "text_ko": "안정성 시험 중 ®® = ——_ 분해 불순물을 측정하는 데 사용한 TLC 시험법이 안정성 지표 시험법(stability indicating)임이 입증되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The TLC test method for determining®® = ——_ degradation impurities used during stability has not been proven to be stability indicating."
+    },
+    {
+     "finding_id": "finding-8dce45a27be25b7dc16c35a7",
+     "text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196370",
+   "slug": "fda483-196370",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Amneal Pharmaceuticals Private Limited",
+   "firm_key": "amneal pharmaceuticals",
+   "published_date": "2026-11-17",
+   "inspection_date": "2025-03-19",
+   "evidence_url": "https://www.fda.gov/media/196370/download",
+   "categories": [
+    "공정밸리데이션",
+    "일탈/CAPA/조사",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1b3378d5e243e117cc14e3e2",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인(identity), 함량(strength), 순도(purity), 품질(quality)을 갖추도록 보장하기 위한 생산 및 공정관리 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-30ca9708d6025c7cc393991f",
+     "text_ko": "원인이 설명되지 않은 불일치, 그리고 배치 또는 그 구성 성분이 규격에 적합하지 않은 경우에 대해, 해당 배치가 이미 출하되었는지와 관계없이 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-357985e1a4a10451f20b1058",
+     "text_ko": "시험관리(laboratory controls)에, 확인·함량·품질·순도의 적절한 기준에 부합하도록 보장하기 위해 설계된 과학적으로 타당하고 적절한 [원문에서 단어 누락] 설정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate designed to assure that conform to appropriate standards of identity, strength, quality and purity.",
+     "cfr_refs": [
+      "section 5"
+     ]
+    }
+   ],
+   "inspector_names": [
+    "Anastasia M Shields",
+    "Alan A Rivera"
+   ]
+  },
+  {
+   "document_id": "fda483-196372",
+   "slug": "fda483-196372",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Qilu Antibiotics Pharmaceutical Co., LTD.",
+   "firm_key": "qilu antibiotics pharmaceutical",
+   "published_date": "2026-11-17",
+   "inspection_date": "2023-05-30",
+   "evidence_url": "https://www.fda.gov/media/196372/download",
+   "categories": [
+    "기타 품질시스템",
+    "무균보증/무균공정"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-06ee17daf98b87f17f6dedfd",
+     "text_ko": "품질관리부서(QCU)에 적용되는 책임과 절차 … (원문이 중간에 끊겨 있음)",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The responsibilities and procedure applicable to the quality contro!"
+    },
+    {
+     "finding_id": "finding-26a4277f0dbd3e47458d70a1",
+     "text_ko": "무균공정(aseptic processing) 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions."
+    },
+    {
+     "finding_id": "finding-7f0645259cae120cf3fe56be",
+     "text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 준수되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug product purporting to be sterile are not followed."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196375",
+   "slug": "fda483-196375",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "TOYO Pharmaceutical Co., Ltd.",
+   "firm_key": "toyo pharmaceutical",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-06-12",
+   "evidence_url": "https://www.fda.gov/media/196375/download",
+   "categories": [
+    "컴퓨터화시스템",
+    "시험실/품질관리",
+    "품질부서 관리감독"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-056f5496c271cfeccb5f477f",
+     "text_ko": "마스터 생산·관리 기록 또는 기타 기록의 변경이 권한 있는 인원에 의해서만 이루어지도록 보장하기 위한 컴퓨터 및 관련 시스템에 대한 적절한 관리가 이루어지지 않고 있다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel."
+    },
+    {
+     "finding_id": "finding-0611e76401f3ddf9b2e1a1ba",
+     "text_ko": "의약품 보관용 검체(reserve sample)가 시판 제품과 본질적으로 동일한 특성을 가진 직접 용기·마개 시스템에 보관되고 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Drug product reserve samples are not stored in an immediate container-closure system that has essentially the same characteristics as the marketed product."
+    },
+    {
+     "finding_id": "finding-3368a6a4d69b4afe8c65771f",
+     "text_ko": "품질관리 부서에 적용되는 책임과 절차가 서면화되어 있지 않고 충분히 준수되지 않는다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed."
+    }
+   ],
+   "inspector_names": [
+    "Wayne D Mcgrath"
+   ]
+  },
+  {
+   "document_id": "fda483-196377",
+   "slug": "fda483-196377",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Ionetix Corporation",
+   "firm_key": "ionetix",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-04-02",
+   "evidence_url": "https://www.fda.gov/media/196377/download",
+   "categories": [
+    "원자재/공급업체 관리",
+    "기타 품질시스템",
+    "설비/시설",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1310d4a7154933ee6cf73c19",
+     "text_ko": "구성 성분(component)의 각 로트에 대해 신뢰할 수 있는 공급업체를 출처로 사용하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "You did not usea reliable supplier as a source of each lot of component."
+    },
+    {
+     "finding_id": "finding-51bff6608937295b026060cf",
+     "text_ko": "귀사는 PET 의약품의 확인·함량·품질·순도를 유지하도록 하는 규격을 시행 전에 승인 또는 불승인하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "You did not approve or reject, before implementation, specifications to ensure that they maintain the identity, strength, quality, and purity of a PET drug."
+    },
+    {
+     "finding_id": "finding-670e5d458cea5a5232800c9f",
+     "text_ko": "귀사는 PET 의약품의 확인·함량·품질·순도에 악영향을 미치거나 부적절하게 사용·유지될 경우 오류 또는 무효한 시험 결과를 낳을 수 있다고 합리적으로 예상되는 모든 설비가 의도된 용도에 적합하고 적절히 설치·유지관리되며 유효한 결과를 반복적으로 산출할 수 있도록, 절차를 이행하고 그 절차에 따라 활동을 문서화하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "You did not implement procedures and document your activities in accordance with your procedures to ensure that all equipment is suitable for its intended purposes and properly installed, maintained, and capable of repeatedly producing valid results that could reasonably be expected to adversely affect the identity, strength, quality, or purity of a PET drug, or give erroneous or invalid test results when improperly used or maintained."
+    },
+    {
+     "finding_id": "finding-69573b7036eb798f7bab8b65",
+     "text_ko": "귀사는 절차로부터의 모든 일탈(deviation)이 정당화되도록 보장하는 생산 및 공정관리 서면 절차를 갖추지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "You did not have written production and process control procedures to ensure that any deviations from the procedures are justified.",
+     "cfr_refs": [
+      "section 7"
+     ]
+    }
+   ],
+   "inspector_names": [
+    "Joanne E King"
+   ]
+  },
+  {
+   "document_id": "fda483-196381",
+   "slug": "fda483-196381",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "CellSure, L3C",
+   "firm_key": "cellsure l3c",
+   "published_date": "2026-11-17",
+   "inspection_date": "2023-12-08",
+   "evidence_url": "https://www.fda.gov/media/196381/download",
+   "categories": [
+    "안정성/보관",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0766b2d668050e2dd21bebd1",
+     "text_ko": "의약품의 안정성 특성을 평가하기 위한 서면 시험 프로그램이 없다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "There is no written testing program designed to assess the stability characteristics of drug products."
+    },
+    {
+     "finding_id": "finding-0810d77208c0fa8dd1ed51cc",
+     "text_ko": "의약품 보관(warehousing) 절차가 수립되어 있지 않다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Procedures describing the warehousing of drug products are not established."
+    },
+    {
+     "finding_id": "finding-8d87aa89251540038529b77e",
+     "text_ko": "공여자(donor)에 대해 전염성 병원체 및 질환의 위험 요인을 확인하기 위한 관련 의무기록 검토 방식의 선별이 이루어지지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Donors were not screened by a review of relevant medical records for risk factors of communicable disease agents and diseases."
+    }
+   ],
+   "inspector_names": [
+    "Emily B Camire",
+    "Creighton T Tuzon"
+   ]
+  },
+  {
+   "document_id": "fda483-196388",
+   "slug": "fda483-196388",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Jubilant HollisterStier LLC",
+   "firm_key": "jubilant hollisterstier",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-06-17",
+   "evidence_url": "https://www.fda.gov/media/196388/download",
+   "categories": [
+    "설비/시설",
+    "일탈/CAPA/조사",
+    "원자재/공급업체 관리",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-08505e5b0916e28aeaa1a104",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비가 의도된 용도의 작업을 용이하게 하는 적절한 설계로 되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use."
+    },
+    {
+     "finding_id": "finding-1561a8b51b379f49a5d95eff",
+     "text_ko": "설명되지 않은 불일치에 대한 조사의 서면 기록에 결론과 후속 조치가 항상 포함되어 있지 않다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Written records of investigations into unexplained discrepancies do not always include the conclusions and follow-up."
+    },
+    {
+     "finding_id": "finding-260286a9a426ecacb2e26a21",
+     "text_ko": "원료(component) 시험이 미흡하다. 각 원료가 순도·함량·품질에 대한 모든 해당 서면 규격에 적합한지 시험되지 않는다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Component testing is deficient in that each component is not tested for conformity with all appropriate written specifications for purity, strength, and quality."
+    },
+    {
+     "finding_id": "finding-33a7ce09bb67b28b7b004ba7",
+     "text_ko": "원료 보관에 관한 서면 절차가 준수되지 않는다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Written procedures are not followed for the storage of components."
+    },
+    {
+     "finding_id": "finding-49624ac28cb63fd60bc34d48",
+     "text_ko": "확립된 시험 절차가 준수되지 않는다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Established test procedures are not followed.",
+     "cfr_refs": [
+      "section 5",
+      "section 2"
+     ]
+    },
+    {
+     "finding_id": "finding-4ea7f1632fefc2ab8b1aa509",
+     "text_ko": "시험법의 감도(sensitivity)가 확립되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The sensitivity of test methods have not been established."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196392",
+   "slug": "fda483-196392",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Alcami Carolinas Corporation",
+   "firm_key": "alcami carolinas",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-04-22",
+   "evidence_url": "https://www.fda.gov/media/196392/download",
+   "categories": [
+    "품질부서 관리감독",
+    "시험실/품질관리",
+    "교육/작업자",
+    "공정밸리데이션",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-00755575c3eb7217dc04c9cc",
+     "text_ko": "품질관리부서(QCU)의 책임과 절차가 문서화되어 있지 않다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing."
+    },
+    {
+     "finding_id": "finding-0bd29dc8980b7b4b45dec76a",
+     "text_ko": "시험 기록에 원본 기록의 정확성과 완전성을 검토했음을 보여주는 제2의 인원의 이니셜 또는 서명이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include the initials or signature of a second person showing that the original records have been reviewed for accuracy and completeness."
+    },
+    {
+     "finding_id": "finding-1111f3d276fe5330c4d2b321",
+     "text_ko": "의약품 가공에 종사하는 직원이 지정된 업무를 수행하는 데 필요한 교육훈련을 받지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Employees engaged in the processing of a drug product lack the training required to perform their assigned functions."
+    },
+    {
+     "finding_id": "finding-20c509c7b50ed04162dd7d33",
+     "text_ko": "시험관리 체계(변경 사항 포함)의 설정이 해당 조직 단위에 의해 작성되고 품질관리부서(QCU)가 검토·승인하지 않고 있다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The establishment of laboratory control mechanisms including any changes thereto, are not drafted by the appropriate organizational unit and reviewed and approved by the quality control unit."
+    },
+    {
+     "finding_id": "finding-22a53a892af6feb57d8c6a79",
+     "text_ko": "귀사는 의약품이 표방하거나 표시된 확인(identity)·함량(strength)·순도(purity)·품질을 갖추도록 보장하기 위한 생산 및 공정관리 서면 절차를 적절히 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-31542c0f1b5ae5d16bad8ee9",
+     "text_ko": "시험실 기록에 확립된 규격 및 기준 준수를 보장하는 데 필요한 모든 시험·검사·분석에서 도출된 완전한 데이터가 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards."
+    },
+    {
+     "finding_id": "finding-80777bee954dacade484fbd7",
+     "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않은 불일치를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed."
+    }
+   ],
+   "inspector_names": [
+    "Steven A Brettler",
+    "Sonya M Edmonds"
+   ]
+  },
+  {
+   "document_id": "fda483-196393",
+   "slug": "fda483-196393",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Jiangsu Hengrui Pharmaceuticals CO. Ltd",
+   "firm_key": "jiangsu hengrui pharmaceuticals",
+   "published_date": "2026-11-17",
+   "inspection_date": "2023-08-29",
+   "evidence_url": "https://www.fda.gov/media/196393/download",
+   "categories": [
+    "안정성/보관",
+    "시험실/품질관리",
+    "무균보증/무균공정"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1fac0b9b7523d9c532a25299",
+     "text_ko": "배치 제조 중 사용되는 모든 조제(compounding) 및 보관 용기가 내용물 또는 배치의 공정 단계를 나타내도록 항상 적절히 표시되어 있지 않다. 구체적으로 a) 워크숍의 조제 탱크가 15 Au 23에 올바르게 표시되어 있지 않았다. (원문 일부 판독 불가)",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "All compounding and storage containers used during the production ofa batch of drug product is not properly identified at all times to indicate contents or the phase of processing of the batch Snecifies a) Compounding tanks in Workshon ed to manufacture ere not correctly labeled on 15 Au 23."
+    },
+    {
+     "finding_id": "finding-2ec2af9f263715615086b7eb",
+     "text_ko": "시험관리(laboratory controls)에 의약품이 확인·함량·품질·순도의 적절한 기준에 부합하도록 보장하기 위한 과학적으로 타당하고 적절한 시험 절차 설정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment ofscientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-539ca807f0f7211f171bb5e0",
+     "text_ko": "무균공정(aseptic processing) 구역의 환경 조건 모니터링 시스템이 미흡하다. ifi a) Workshops iia의 무균충전(aseptic filling) 라인에서 중요 개입(critical intervention)을 수행하는 작업자가 Grade A 충전라인에서 개입을 마친 후 모니터링되지 않는다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditio ifi a) Operators performing critically |) @@interventions on aseptic filling lines in Workshops iia are not monitored after completing the intervention on the Grade A filling line."
+    },
+    {
+     "finding_id": "finding-7a1bb7715bc3f82f882824cc",
+     "text_ko": "무균공정 구역에서 무균 조건을 관리하는 데 사용하는 설비의 유지관리 체계가 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196395",
+   "slug": "fda483-196395",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Genzyme Corporation",
+   "firm_key": "genzyme",
+   "published_date": "2026-11-17",
+   "inspection_date": "2024-08-30",
+   "evidence_url": "https://www.fda.gov/media/196395/download",
+   "categories": [
+    "공정밸리데이션",
+    "품질부서 관리감독",
+    "무균보증/무균공정"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-01ecd7e01aa3991dde726aa7",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인(identity), 함량(strength), 순도(purity), 품질(quality)을 갖추도록 보장하기 위한 생산 및 공정관리 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-11ea20f02ec874cf8d09a838",
+     "text_ko": "귀사의 품질부서(QU)는 GMP 제조 운영 전반에서 적절한 감독을 제공하기 위한 권한 및/또는 책임을 충분히 행사하지 않고 있다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Your Quality Unit (QU) is not fully exercising its authority and/or responsibilities to provide adequate oversight throughout your GMP manufacturing operations."
+    },
+    {
+     "finding_id": "finding-3f5da4dfca5b3bf438efc05e",
+     "text_ko": "무균(sterile)을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립되어 준수되고 있지 않다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196397",
+   "slug": "fda483-196397",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Chinese Peptide Company",
+   "firm_key": "chinese peptide",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-02-03",
+   "evidence_url": "https://www.fda.gov/media/196397/download",
+   "categories": [
+    "컴퓨터화시스템",
+    "설비/시설",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-542dfa640b7a5fbf774e5023",
+     "text_ko": "귀사는 제조시설에서 DS 제조에 사용되는 전자 데이터 획득 시스템을 보호하기 위한 적절한 절차적·기술적 통제를 수립하지 않았다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "Your firm has not established adequate procedural and technical controls to protect the electronic data acquisition systems used for the manufacture of ww DS in your manufacturing facility."
+    },
+    {
+     "finding_id": "finding-6907b34114cfe50f69451f36",
+     "text_ko": "귀사의 원료의약품(DS) 제조 운영이 제품 품질에 악영향을 미칠 것으로 예상되는 환경 및 공정 조건에 의한 설비 또는 제품의 오염을 방지하도록 적절히 설계되었다는 보증이 부족하다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "There is a lack of assurance that your drug substance (DS) manufacturing operations are appropriately designed to ensure the prevention ofcontamination of equipment or product by environmental and processing conditions that would be expected to have an adverse effect on product quality."
+    },
+    {
+     "finding_id": "finding-71d587bfa2ef04beb7dd6b47",
+     "text_ko": "표준작업절차서(SOP) 또는 작업지침서가 준수되지 않거나 미흡하다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Standard operating procedures or work instructions are not followed or are inadequate."
+    },
+    {
+     "finding_id": "finding-7f5942f573e911a8c82e5a33",
+     "text_ko": "귀사는 @ @ DS 제조에 사용하는 핵심 공정 설비가 밸리데이션된 상태로 유지되고 있다는 충분한 보증이 부족하다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Your firm lacks adequate assurance that the critical process equipment, used for the manufacturing of @ @ DS, is maintained in a validated state."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196398",
+   "slug": "fda483-196398",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Altaire Pharmaceuticals Inc.",
+   "firm_key": "altaire pharmaceuticals",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-04-21",
+   "evidence_url": "https://www.fda.gov/media/196398/download",
+   "categories": [
+    "무균보증/무균공정",
+    "교육/작업자",
+    "공정밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-06a982ae69dbb9092a36cc1e",
+     "text_ko": "멸균 의약품으로 표방하는 제품의 미생물 오염을 방지하기 위한 절차가 수립·이행되고 있지 않다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+     "cfr_refs": [
+      "section 7"
+     ]
+    },
+    {
+     "finding_id": "finding-3965ee9889672352c50a0938",
+     "text_ko": "의약품의 제조·가공·포장·보관에 종사하는 직원이 맡은 기능을 수행하는 데 필요한 교육훈련을 받지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Employees engaged in the manufacture, processing, packing and holding of a drug product lack the training required to perform their assigned functions.",
+     "cfr_refs": [
+      "section 7"
+     ]
+    },
+    {
+     "finding_id": "finding-479700d302d8f34bdca08df2",
+     "text_ko": "귀사는 의약품이 표방하거나 표시된 확인·함량·순도·품질을 갖추도록 보장하기 위한 생산 및 공정관리 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+     "cfr_refs": [
+      "section 3"
+     ]
+    }
+   ],
+   "inspector_names": [
+    "Bijoy Panicker"
+   ]
+  },
+  {
+   "document_id": "fda483-196399",
+   "slug": "fda483-196399",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Bachem Americas Inc.",
+   "firm_key": "bachem americas",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-05-20",
+   "evidence_url": "https://www.fda.gov/media/196399/download",
+   "categories": [
+    "설비/시설",
+    "일탈/CAPA/조사",
+    "품질부서 관리감독",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-212a9618883ec1ddff2fda86",
+     "text_ko": "반복 지적사항. 귀사는 (b)(4) 및 API 제조에 사용되는 건물·시설을 청결하고 관리된 상태로 적절히 유지하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Repeat Observation Your firm failed to properly maintain buildings and facilities used in the manufacture of(b) (4) and API in clean and controlled conditions."
+    },
+    {
+     "finding_id": "finding-24e25a115bd377606002f40d",
+     "text_ko": "귀사의 품질부서(Quality unit)는 철저하고 적절한 시험실 조사를 수행하지 않았고, 적절한 근본원인을 도출하지 않았으며, 다른 배치로 조사를 확대하지 않았고, 적절한 시정·예방조치를 제안하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Your Quality unit failed to perform thorough and adequate laboratory investigations, to obtain appropriate root cause, extend to other batches and proposed adequate corrective /preventive actions.",
+     "cfr_refs": [
+      "section 11"
+     ]
+    },
+    {
+     "finding_id": "finding-3fda3043f752dafb0aacec43",
+     "text_ko": "품질부서(Quality Unit)는 원료의약품(drug substance)이 출하 승인 전에 최종 규격에 대한 적합 여부를 적절히 시험실에서 판정하여 시험 및 출하 승인되도록 보장하지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The Quality Unit failed to ensure that the drug substance was tested and released for distribution with appropriate laboratory determination of satisfactory conformance to final specifications prior to release."
+    },
+    {
+     "finding_id": "finding-79874d6246b21b3b528482cb",
+     "text_ko": "확립된 시험실 관리가 미흡하다. 의약품이 적절한 기준(확인, 함량, 품질, 순도)에 적합함을 보장하기에 충분한 과학적으로 타당하고 적절한 시험 절차가 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The established laboratory controls are madequate, as they do not include scientifically sound and appropriate test procedures sufficient to ensure that they conform to appropriate standards of identity, strength, quality and purity.",
+     "cfr_refs": [
+      "section 8"
+     ]
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196403",
+   "slug": "fda483-196403",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Topical Pharmaceuticals, Inc.",
+   "firm_key": "topical pharmaceuticals",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-05-07",
+   "evidence_url": "https://www.fda.gov/media/196403/download",
+   "categories": [
+    "불만/회수",
+    "설비/시설",
+    "문서화/기록관리",
+    "시험실/품질관리",
+    "공정밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-112a46b4c322e4cf3c23c8e5",
+     "text_ko": "각 의약품에 대한 불만, 회수, 반품 또는 재생 의약품, 수행된 조사에 대한 검토 규정을 포함하여 최소 연 1회 실시하는 평가에 대한 서면 절차가 수립되어 있지 않다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Written procedures are not established for evaluations done at least annually and including provisions for a review of complaints, recalls, returned or salvaged drug products and investigations conducted for each drug product."
+    },
+    {
+     "finding_id": "finding-133be1ceb836d0c54058fcbf",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물이 세척, 유지관리, 적절한 작업을 용이하게 하는 적합한 구조로 되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Buildings used in the manufacture, processing, packing, or holding of a drug product do not have the suitable construction to facilitate cleaning, maintenance, and proper operations."
+    },
+    {
+     "finding_id": "finding-2b38376d8fac231a491c9044",
+     "text_ko": "배치 생산 및 관리 기록(batch production and control records)에 각 배치의 생산 및 관리에 관한 완전한 정보가 포함되어 있지 않다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "Batch production and control records do not include complete information relating to the production and control of each batch."
+    },
+    {
+     "finding_id": "finding-34396d8902fb93faa61b3dcd",
+     "text_ko": "의약품의 제조·가공·포장·보관에 사용되는 설비(기구 포함)의 세척 및 유지관리에 관한 서면 절차가 수립되어 준수되고 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures are not established and followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product."
+    },
+    {
+     "finding_id": "finding-4c21ecfabe21bca49353b6e5",
+     "text_ko": "시험관리(laboratory controls)에 원료·공정 중 물질·의약품이 확인·함량·품질·순도의 적절한 기준에 부합하도록 보장하기 위한 과학적으로 타당하고 적절한 시료채취 계획 및 시험 절차 설정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate sampling plans and test procedures designed to assure that components, in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-87478f3e16fc091ed56cd2d0",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인(identity), 함량(strength), 순도, 품질을 갖추었음을 보장하도록 설계된 생산 및 공정관리에 관한 서면 절차를 수립하지 못했다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    }
+   ],
+   "inspector_names": [
+    "Angela C Welker",
+    "Scott D Mcgrew",
+    "Chikitsa S Patel"
+   ]
+  },
+  {
+   "document_id": "fda483-196409",
+   "slug": "fda483-196409",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Qilu Pharmaceutical (Hainan) Co., Ltd.",
+   "firm_key": "qilu pharmaceutical (hainan)",
+   "published_date": "2026-11-17",
+   "inspection_date": "2023-05-19",
+   "evidence_url": "https://www.fda.gov/media/196409/download",
+   "categories": [
+    "시험실/품질관리",
+    "무균보증/무균공정",
+    "불만/회수",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-24203bdb3929a062ab01a7c3",
+     "text_ko": "시험관리(laboratory controls)에 의약품이 확인·함량·품질·순도의 적절한 기준에 부합하도록 보장하기 위한 과학적으로 타당하고 적절한 규격 설정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate specification designed to assure that the drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-261752be28bb4adc4de60e7e",
+     "text_ko": "시험관리(laboratory controls)에 의약품이 확인·함량·품질·순도의 적절한 기준에 부합하도록 보장하기 위한 과학적으로 타당하고 적절한 시험 절차 설정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality, and purity."
+    },
+    {
+     "finding_id": "finding-473ecce0bb87dad8d4703b24",
+     "text_ko": "무균(sterile)을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 준수되고 있지 않다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination ofdrug product purporting to be sterile are not followed."
+    },
+    {
+     "finding_id": "finding-7a827a7ac7a3cfa16a8bccb1",
+     "text_ko": "불만(complaint) 처리 절차가 미흡하다. 불만이 FDA에 보고해야 하는 중대하거나 예상치 못한 의약품 이상반응에 해당하는지 판단하기 위한 검토 규정이 포함되어 있지 않다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Complaint procedures are deficient in that they do not include provisions that allow for the review to determine if the complaints represent serious and/or unexpected adverse drug experiences which are required to be reported to FDA."
+    },
+    {
+     "finding_id": "finding-868a9b533692017a0fd45474",
+     "text_ko": "계측기기의 교정(calibration)이 적절한 주기로 이루어지지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The calibration of instruments is not done at suitable intervals."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196410",
+   "slug": "fda483-196410",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "International Laboratories Corp",
+   "firm_key": "international laboratories",
+   "published_date": "2026-11-17",
+   "inspection_date": "2024-09-20",
+   "evidence_url": "https://www.fda.gov/media/196410/download",
+   "categories": [
+    "시험실/품질관리",
+    "공정밸리데이션",
+    "일탈/CAPA/조사",
+    "품질부서 관리감독"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-2e5bec1a9bb977407f930bc7",
+     "text_ko": "각 입고분 내 구성 성분(component) 각 로트의 인수 시 서면 규격 적합성을 판단하기 위해 채취한 시료가 대표성이 없다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Samples taken to determine conformance to appropriate written specifications for the acceptance of each lot within each shipment of components are not representative."
+    },
+    {
+     "finding_id": "finding-458de98f402b19e8613a7230",
+     "text_ko": "귀사는 의약품이 표방하거나 표시된 확인·함량·순도·품질을 갖추도록 보장하기 위한 생산 및 공정관리 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-674e35591e88051ba06c1392",
+     "text_ko": "시험실 기록에 확립된 규격 및 기준 준수를 보장하는 데 필요한 모든 시험·검사·분석에서 도출된 완전한 데이터가 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards."
+    },
+    {
+     "finding_id": "finding-7279818714212bf4e512a9a6",
+     "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않은 불일치와 배치 또는 그 구성 성분이 규격을 충족하지 못한 경우를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-8a82636494839bb3066830a8",
+     "text_ko": "품질관리부서의 책임과 절차가 서면으로 작성되어 있지 않다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing."
+    }
+   ],
+   "inspector_names": [
+    "Samantha E Cleek",
+    "Tamil Arasu"
+   ]
+  },
+  {
+   "document_id": "fda483-196412",
+   "slug": "fda483-196412",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Wanbury Limited",
+   "firm_key": "wanbury",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-07-17",
+   "evidence_url": "https://www.fda.gov/media/196412/download",
+   "categories": [
+    "시험실/품질관리",
+    "문서화/기록관리",
+    "공정밸리데이션",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-2a84d69b5d190c3913d0452f",
+     "text_ko": "시험실 기록이 정확하거나 완전하지 않으며, 제2의 인원이 검토하지 않는다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records are not accurate and/or complete, and are not reviewed by a second person."
+    },
+    {
+     "finding_id": "finding-4bf0fc2f65e48970b1189586",
+     "text_ko": "승인된 배치생산기록(BPR)에 명시된 필수 공정 단계가 수행되지 않았고, 제조 활동이 실시간으로 문서화되지 않았다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "A mandatory process step specified in the approved Batch Production Record (BPR) was not performed, and manufacturing activities were not contemporaneously documented."
+    },
+    {
+     "finding_id": "finding-66ce33325e8b3d9eef20f084",
+     "text_ko": "공정 밸리데이션이 미흡하다. 원료의약품(API)을 생산하는 데 밸리데이션된 공정에 명시된 것보다 예상 밖으로 많은 양의 원료가 필요했다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Process validation is deficient in that an unexpected amount of raw material than specified in your validated process was needed in order to produce an active pharmaceutical ingredient."
+    },
+    {
+     "finding_id": "finding-715cb7603459245af032d32d",
+     "text_ko": "미생물 위험관리 및 부적합(non-conformance) 조사 절차가 미흡했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Inadequate Microbiological Risk Management and Non-Conformance Investigation Procedures."
+    }
+   ],
+   "inspector_names": [
+    "Jared P. Stevens"
+   ]
+  },
+  {
+   "document_id": "fda483-196414",
+   "slug": "fda483-196414",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Shanghai Henlius Biopharmaceutical Co., Ltd.",
+   "firm_key": "shanghai henlius biopharmaceutical",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-05-20",
+   "evidence_url": "https://www.fda.gov/media/196414/download",
+   "categories": [
+    "시험실/품질관리",
+    "기타 품질시스템",
+    "세척밸리데이션",
+    "밸리데이션/적격성평가",
+    "오염/교차오염 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-32e64dba3268b78c06b77e74",
+     "text_ko": "귀사의 품질관리 시험실의 시험 및 시료 관리 절차와 통제가 부적절하거나 준수되지 않는다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Your quality control laboratory procedures and controls for test and sample management are inadequate or not followed."
+    },
+    {
+     "finding_id": "finding-402f19e59813940e4c67052d",
+     "text_ko": "귀사는 w@ mg ml PPQ 배치의 100% 육안검사(visual inspection)에서 확인된 가시적 입자 불합격률의 점진적 상승을 적절히 조사하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Your firm failed to adequately investigate the progressively increasing high visible particulate rejection rates identified during 100% visual inspection ofthew@ mg ml PPQ batches."
+    },
+    {
+     "finding_id": "finding-48413f490da67f84c91a5ab3",
+     "text_ko": "귀사의 제조설비 및 구성품에 대한 세척 밸리데이션 프로그램은, 원료의약품과 완제의약품 제조에 사용되는 설비가 오염 또는 이월(carryover)을 방지하도록 일관되게 세척될 수 있음을 입증하기에 부적절하다.",
+     "category_label_ko": "세척밸리데이션",
+     "text_orig": "Your firm’s cleaning validation programs for manufacturing equipment and components are inadequate in demonstrating that equipment used in drug substance and drug product manufacturing can be consistently cleaned to prevent contamination or carryover."
+    },
+    {
+     "finding_id": "finding-76f826a36eba09f14f0cc327",
+     "text_ko": "귀사는 데이터 보관(archiving) 과정에서 전자 시험실 데이터가 무단으로 삭제되는 것을 방지할 적절한 관리체계를 수립하지 못했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Your firm failed to establish adequate controls to prevent unauthorized deletion of electronic laboratory data during data archiving process."
+    },
+    {
+     "finding_id": "finding-821289ac049c417e386fde17",
+     "text_ko": "귀사는 Mg@~@nL 제형(presentation)의 공정성능적격성평가(PPQ) 동안 제조공정이 관리 상태를 유지했고 확립된 품질 특성을 충족하는 의약품을 일관되게 생산할 수 있음을 입증하지 못했다.",
+     "category_label_ko": "밸리데이션/적격성평가",
+     "text_orig": "Your firm failed to demonstrate that the manufacturing process remained in a state of control and was capable of consistently producing drug product meeting established quality attributes during process performance qualification (PPQ) form Mg@~@nL presentation."
+    },
+    {
+     "finding_id": "finding-85161c8abf14ef9441ee2a57",
+     "text_ko": "분류된 제조 구역(classified manufacturing areas) 내 오염을 방지하고 적절한 조건을 유지하기 위한 절차와 관행이 미흡하다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Procedures and practices intended to prevent contamination and maintain appropriate conditions within classified manufacturing areas are inadequate."
+    },
+    {
+     "finding_id": "finding-899fc484cf30dd5f7a36086e",
+     "text_ko": "귀사는 시험실 시료 취급 오류를 적시에 조사하지 못했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Your firm failed to investigate a laboratory sample handling error in a timely manner."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196416",
+   "slug": "fda483-196416",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Owen Biosciences Inc.",
+   "firm_key": "owen biosciences",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-05-15",
+   "evidence_url": "https://www.fda.gov/media/196416/download",
+   "categories": [
+    "품질부서 관리감독",
+    "일탈/CAPA/조사",
+    "오염/교차오염 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-3fcd416311459559435fded4",
+     "text_ko": "품질관리 부서에 적용되는 책임과 절차가 충분히 준수되지 않는다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not fully followed."
+    },
+    {
+     "finding_id": "finding-5aa73192fc733470e11db807",
+     "text_ko": "원인이 설명되지 않은 불일치, 그리고 배치 또는 그 구성 성분이 규격에 적합하지 않은 경우에 대한 조사의 서면 기록이 작성되지 않는다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Written records are not made of investigations into unexplained discrepancies and the failure of a batch or any of its components to meet specifications."
+    },
+    {
+     "finding_id": "finding-8d0bc48cbd6dd6a81bea937d",
+     "text_ko": "무균일 필요가 없는 의약품에서 부적합 미생물을 방지하기 위한 절차가 수립되어 있지 않다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Procedures designed to prevent objectionable microorganisms in drug products not required to be sterile are not established."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196417",
+   "slug": "fda483-196417",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "LGM Pharma Solutions, LLC",
+   "firm_key": "lgm pharma solutions",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-05-18",
+   "evidence_url": "https://www.fda.gov/media/196417/download",
+   "categories": [
+    "시험실/품질관리",
+    "공정밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-184a55b827772229d32daa9d",
+     "text_ko": "시험관리(laboratory controls)에 구성 성분, 공정 중 물질, 의약품이 적절한 확인(identity), 함량(strength), 품질(quality), 순도(purity) 기준에 부합하도록 보장하기 위한 과학적으로 타당하고 적절한 규격과 시험방법의 설정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications and test procedures designed to assure that components, in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-5ce5d47ba0e60da50966e178",
+     "text_ko": "귀사는 의약품이 표방하거나 표시된 확인·함량·순도·품질을 갖추도록 보장하기 위한 생산 및 공정관리 서면 절차를 적절히 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-84af0c46652f98fc75c325af",
+     "text_ko": "허용되는 통계적 절차로 선정한 의약품의 대표 시료 로트 또는 배치의 보관용 검체(reserve samples)를, 변질 징후를 확인하기 위해 최소 연 1회 육안 검사하지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Reserve samples from representative sample lots or batches of drug products selected by acceptable statistical procedures are not examined visually at least once a year for evidence of deterioration."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196418",
+   "slug": "fda483-196418",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Samson Pharmaceuticals, Inc.",
+   "firm_key": "samson pharmaceuticals",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-04-29",
+   "evidence_url": "https://www.fda.gov/media/196418/download",
+   "categories": [
+    "설비/시설",
+    "시험실/품질관리",
+    "무균보증/무균공정"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0fd7e2ed059d69fb0642877d",
+     "text_ko": "계측기기의 교정이 설정된 서면 프로그램에 따라 적절한 주기로 이루어지지 않고 있다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The calibration of instruments is not done at suitable intervals in accordance with an established written program."
+    },
+    {
+     "finding_id": "finding-2aaf9f8cc5ba52054436b4e6",
+     "text_ko": "시험관리 체계(변경 사항 포함)의 수립이 적절한 조직 단위에서 작성되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The establishment of laboratory control mechanisms including any changes thereto, are not drafted by the appropriate organizational unit."
+    },
+    {
+     "finding_id": "finding-5940f17c5ba6c1f1921e23b8",
+     "text_ko": "무균(sterile)을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·서면화되어 준수되고 있지 않다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196431",
+   "slug": "fda483-196431",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "USV Private Limited",
+   "firm_key": "usv",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-04-17",
+   "evidence_url": "https://www.fda.gov/media/196431/download",
+   "categories": [
+    "무균보증/무균공정",
+    "일탈/CAPA/조사",
+    "원자재/공급업체 관리",
+    "시험실/품질관리",
+    "공정밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1c50443f3557de6bf6491278",
+     "text_ko": "무균공정(aseptic processing) 구역에서 사용되는 공급업체와 물질을 적격성 평가·관리·평가하기 위한 서면 절차가 수립되지 않았거나, 문서화되지 않았거나, 이행되지 않고 있다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Written procedures for qualifying, controlling, and evaluating suppliers and materials used in aseptic processing areas are not established, written or followed."
+    },
+    {
+     "finding_id": "finding-21f34b83da66f6c99b7d3b49",
+     "text_ko": "원인이 설명되지 않은 불일치, 그리고 배치 또는 그 구성 성분이 규격에 적합하지 않은 경우에 대해, 해당 배치가 이미 출하되었는지와 관계없이 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-30302718b848380cd131b903",
+     "text_ko": "각 원료(component)가 순도·함량·품질에 대한 모든 서면 규격에 적합한지 시험되지 않는다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Each component is not tested for conformity with all written specifications for purity, strength, and quality."
+    },
+    {
+     "finding_id": "finding-4c08f2b2bc7ee4d9e873793a",
+     "text_ko": "시험실 기록에 확립된 규격 및 기준 준수를 보장하는 데 필요한 모든 시험·검사·분석에서 도출된 완전한 데이터가 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include complete data derived from all tests, examinations, and assay necessary to assure compliance with established specifications and standards."
+    },
+    {
+     "finding_id": "finding-7a1d66c44df28f062e2aa5ce",
+     "text_ko": "무균(sterile)을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process."
+    },
+    {
+     "finding_id": "finding-7ab05824018610f7d150c61b",
+     "text_ko": "공정 중 물질과 의약품의 특성에 변동을 일으킬 수 있는 제조공정의 산출물을 모니터링하고 그 성능을 밸리데이션하는 관리 절차가 수립되어 있지 않다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196432",
+   "slug": "fda483-196432",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Kite Pharma, Inc.",
+   "firm_key": "kite pharma",
+   "published_date": "2026-11-17",
+   "inspection_date": "2025-08-27",
+   "evidence_url": "https://www.fda.gov/media/196432/download",
+   "categories": [
+    "기타 품질시스템",
+    "설비/시설",
+    "공정밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0652bc7a88f7df1c166554da",
+     "text_ko": "컴퓨터 및 관련 시스템에 대한 처방(formula)·기록·데이터의 입력과 출력이 정확성에 대해 확인되지 않고 있다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Input to and output from the computer, related systems of formulas and records or data are not checked for accuracy."
+    },
+    {
+     "finding_id": "finding-2423e69b12a9fd2f4f1b23ec",
+     "text_ko": "위생(sanitation)에 사용할 방법·설비·물품을 충분히 상세하게 기술한 서면 절차가 없다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "There is a lack ofwritten procedures describing in sufficient detail the methods, equipment and materials to be used for sanitation."
+    },
+    {
+     "finding_id": "finding-28bced963007691bf9f65f66",
+     "text_ko": "귀사는 의약품이 표방하거나 표시된 확인·함량·순도·품질을 갖추도록 보장하기 위한 생산 및 공정관리 서면 절차를 적절히 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196433",
+   "slug": "fda483-196433",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Hanlim Pharm Co., Ltd.",
+   "firm_key": "hanlim pharm",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-04-24",
+   "evidence_url": "https://www.fda.gov/media/196433/download",
+   "categories": [
+    "공정밸리데이션",
+    "안정성/보관",
+    "무균보증/무균공정",
+    "오염/교차오염 관리",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-00fbb7f196a93d5d092b38b9",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인(identity), 함량(strength), 순도(purity), 품질(quality)을 갖추도록 보장하기 위한 생산 및 공정관리 서면 절차를 적절히 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-0dbdc29df76ce88431a5099c",
+     "text_ko": "안정성 시험 결과가 사용기한(expiration date) 설정에 활용되지 않고 있다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "Results of stability testing are not used in determining expiration dates."
+    },
+    {
+     "finding_id": "finding-203a8bfe27f14f5c6578b770",
+     "text_ko": "무균공정(aseptic processing) 구역은 무균 조건을 만들기 위한 실내 및 설비의 세척·소독 시스템에 결함이 있다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions."
+    },
+    {
+     "finding_id": "finding-22c027e19e9483f455530878",
+     "text_ko": "무균(sterile)을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process."
+    },
+    {
+     "finding_id": "finding-2693edd9796e59e25cbbdaa3",
+     "text_ko": "오염 또는 혼입(mix-up)을 방지하는 데 필요한 분리 또는 구분된 구역과 관리 시스템이 미흡하다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "The separate or defined areas and control systems necessary to prevent contamination or mix-ups are deficient."
+    },
+    {
+     "finding_id": "finding-323e3e92cedee8a362e4617f",
+     "text_ko": "무균(sterile)을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립되어 준수되고 있지 않다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed."
+    },
+    {
+     "finding_id": "finding-4bb4673b126e40fef7f0d185",
+     "text_ko": "의약품의 안전성·확인·함량·품질·순도를 변화시킬 수 있는 오염을 방지하기 위해 설비와 기구가 적절한 주기로 유지관리되고 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment and utensils are not maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196444",
+   "slug": "fda483-196444",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Genzyme Ireland Limited",
+   "firm_key": "genzyme ireland",
+   "published_date": "2026-11-17",
+   "inspection_date": "2026-01-20",
+   "evidence_url": "https://www.fda.gov/media/196444/download",
+   "categories": [
+    "설비/시설",
+    "품질부서 관리감독",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-49bd655069863f070408de5f",
+     "text_ko": "의약품의 안전성·확인·함량·품질·순도를 변화시킬 수 있는 오염을 방지하기 위해 설비와 기구가 적절한 주기로 세척·유지관리되고 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment and utensils are not cleaned and maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product."
+    },
+    {
+     "finding_id": "finding-51ecb521c9cd7712eef38734",
+     "text_ko": "품질관리 부서에 적용되는 책임과 절차가 서면화되어 있지 않고 충분히 준수되지 않는다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed."
+    },
+    {
+     "finding_id": "finding-6af774b5e49b8e21dd79d1b6",
+     "text_ko": "서면 생산 및 공정관리 절차에서의 일탈(deviation)이 타당하게 설명되지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Deviations from written production and process control procedures are not justified."
+    },
+    {
+     "finding_id": "finding-7dab628d1376e1a5104c8f06",
+     "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않은 불일치와 배치 또는 그 구성 성분이 규격을 충족하지 못한 경우를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure ofa batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196456",
+   "slug": "fda483-196456",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Serum Institute of India Pvt. Limited Manjari Site",
+   "firm_key": "serum institute of india manjari site",
+   "published_date": "2026-11-17",
+   "inspection_date": "2024-07-02",
+   "evidence_url": "https://www.fda.gov/media/196456/download",
+   "categories": [
+    "기타 품질시스템",
+    "밸리데이션/적격성평가"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-2b6eb09a6f9b0957d0981422",
+     "text_ko": "2024년 1월 29일 확인된 DEV-003-2024-0049는 치명적 결함(critical defect)을 나타냈다. (6)(4) ()@) 이(가) (BY(4)), 배치 (6)(4)의 AQL 시험 중 관찰되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "DEV-003-2024-0049 detected on January 29, 2024 indicateda critical defect,(6)(4) ()@) was observed during AQL of (BY(4), batch (6)(4)."
+    },
+    {
+     "finding_id": "finding-2e14d4e0ac0b4acb8d1618a5",
+     "text_ko": "참조표준품 적격성평가(qualification) 보고서에 데이터가 부족하며, 해당 자료는 (6)(4)))) 및 완제의약품의 출하 승인(release)을 뒷받침하는 보조 정보로 쓰인다.",
+     "category_label_ko": "밸리데이션/적격성평가",
+     "text_orig": "There is a lack of data in the qualification report for reference reference standard and serves as supportive information for the for the release of(6)(4)))) and drug product."
+    },
+    {
+     "finding_id": "finding-43a089bdcec84ddecf82eb40",
+     "text_ko": "COVID 백신을 주사기에 충전하는 충전라인 및 (6b)(4) 에 사용되는 (6)(4)의 재적격성평가(requalification)가 부적절하다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Requalification ofthe (6) (4) used to (6)(4) the filling (6)(4) filling line and (6b)(4) yy) where COVID vaccine is filled into syringes is inadequate."
+    },
+    {
+     "finding_id": "finding-6e1ee74f35c003cdd97eceac",
+     "text_ko": "밸리데이션 연구에 of ee Bs rand . 에 대한 비교 가능한 성능을 뒷받침하기에 충분한 데이터가 없다.",
+     "category_label_ko": "밸리데이션/적격성평가",
+     "text_orig": "There is insufficient data in the validation study to support comparable performance with respect to of ee Bs rand ."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196457",
+   "slug": "fda483-196457",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "MassBiologics South Coast",
+   "firm_key": "massbiologics south coast",
+   "published_date": "2026-11-17",
+   "inspection_date": "2024-08-12",
+   "evidence_url": "https://www.fda.gov/media/196457/download",
+   "categories": [
+    "일탈/CAPA/조사",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1f20a84ebefde7a3c7f2e040",
+     "text_ko": "일탈(deviation) 및 조사가 적시에 종결되지 않고 있다. 구체적으로 01GN014에 따르면 일탈은 사건(incident)의 경우 영업일 기준 (b)(4)일 이내, 레벨 (…) 일탈의 경우 영업일 기준 (b)(4)일 이내, 레벨 (…) 일탈의 경우 (b)(4)일 이내에 종결해야 한다. (원문 일부 판독 불가)",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Deviations and investigations are not being closed in a timely manner Specifically, According to 01GN014, deviations must be closed within |business days for incident, within © business days for Level|~ deviations, and within) (»)(4) days for Level ~ deviations."
+    },
+    {
+     "finding_id": "finding-224a710df69d214a4e46ff15",
+     "text_ko": "확립된 절차 또는 프로토콜을 따르지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Failure to follow established procedures or protocols."
+    },
+    {
+     "finding_id": "finding-2a21aca843ad4211b72406a3",
+     "text_ko": "문서관리 프로세스가 적절히 관리되고 있지 않다. 구체적으로, a.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Document management process is not properly controlled Specifically, a."
+    },
+    {
+     "finding_id": "finding-3cebe05701117f50b328c77f",
+     "text_ko": "서면 표준작업절차서(SOP)의 상세 내용이 충분하지 않다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Lack of sufficient details in the written standard operating procedures."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196502",
+   "slug": "fda483-196502",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Jiangsu Hengrui Pharmaceuticals CO. LTD.",
+   "firm_key": "jiangsu hengrui pharmaceuticals",
+   "published_date": "2026-11-17",
+   "inspection_date": "2023-08-29",
+   "evidence_url": "https://www.fda.gov/media/196502/download",
+   "categories": [
+    "문서화/기록관리",
+    "시험실/품질관리",
+    "무균보증/무균공정",
+    "안정성/보관"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-04e243a070db5161608416f1",
+     "text_ko": "배치 생산·관리 기록에 제조, 가공, 보관의 각 중요 단계를 수행했다는 문서화가 포함되어 있지 않아 미흡하다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "The batch production and control records are deficient in that they do not include documentation ofthe accomplishment of each significant step in manufacturing, processing, and holding."
+    },
+    {
+     "finding_id": "finding-21cd90f47796e6d70affbe89",
+     "text_ko": "확립된 시험 절차가 수행 시점에 문서화되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Established test procedures are not documented at the time ofperformance."
+    },
+    {
+     "finding_id": "finding-628fff87a97bba99ddda3a3b",
+     "text_ko": "무균공정(aseptic processing) 구역의 무균 상태를 관리하는 데 사용되는 설비의 유지관리 시스템이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions."
+    },
+    {
+     "finding_id": "finding-65a1710d034c7c174b57db29",
+     "text_ko": "시험관리(laboratory controls)에 의약품이 확인·함량·품질·순도의 적절한 기준에 부합하도록 보장하기 위한 과학적으로 타당하고 적절한 시험 절차 설정이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment ofscientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-89930a3a07c5d091bff3c247",
+     "text_ko": "의약품 배치 생산에 사용하는 모든 조제(compounding) 및 보관 용기에 내용물 또는 배치의 공정 단계를 나타내는 표시가 항상 적절히 되어 있지는 않다. Snecifies a) Compounding tanks in Workshon ed to manufacture ere not correctly labeled on 15 Au 23.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "All compounding and storage containers used during the production ofa batch of drug product is not properly identified at all times to indicate contents or the phase of processing of the batch Snecifies a) Compounding tanks in Workshon ed to manufacture ere not correctly labeled on 15 Au 23."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-196639",
+   "slug": "fda483-196639",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Daiichi Sankyo Chemical Pharma Co., Ltd.",
+   "firm_key": "daiichi sankyo chemical pharma",
+   "published_date": "2026-11-19",
+   "inspection_date": "2019-01-25",
+   "evidence_url": "https://www.fda.gov/media/196639/download",
+   "categories": [
+    "기타 품질시스템",
+    "일탈/CAPA/조사",
+    "안정성/보관"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-3c8c533c1307eb5b16cff64c",
+     "text_ko": "내부 1차 기준물질(in-house primary reference standard)의 확인(identity)과 순도(purity)를 충분히 입증하기 위해 수행한 시험의 적절한 문서가 보관되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Appropriate documentation oftesting performed to fully establish the identity and purity of the in-house primary reference standard was not retained."
+    },
+    {
+     "finding_id": "finding-3d806ef96e036e21cc2b7c93",
+     "text_ko": "설명되지 않은 불일치(discrepancy)에 대한 조사 기록이 항상 충분히 조사된 것은 아니다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Written records of investigations into unexplained discrepancies are not always fully investigated."
+    },
+    {
+     "finding_id": "finding-94f30061ec2174bc52af4934",
+     "text_ko": "내부 2차 기준물질(in-house secondary reference standard)의 각 배치에 대해 1차 기준물질과의 비교로 적합성을 판정하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Suitability of each batch of in-house secondary reference standard is not determined by comparison against a primary reference standard."
+    },
+    {
+     "finding_id": "finding-9930ed3b54c09f533d380692",
+     "text_ko": "서면 안정성 프로그램이 원료의약품 중간체를 시판 용기 마개 시스템(container closure system)과 동일한 시스템에서 시험하도록 보장하지 않는다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The written stability program does not assure testing ofthe drug substance intermediate in the same container closure system as that in which it is marketed."
+    }
+   ],
+   "inspector_names": [
+    "Zachary L. Stamm"
+   ]
+  },
+  {
+   "document_id": "fda483-196640",
+   "slug": "fda483-196640",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Daiichi Sankyo Europe GmbH",
+   "firm_key": "daiichi sankyo europe",
+   "published_date": "2026-11-19",
+   "inspection_date": "2025-07-18",
+   "evidence_url": "https://www.fda.gov/media/196640/download",
+   "categories": [
+    "일탈/CAPA/조사",
+    "시험실/품질관리",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-6b0151857594d58f6391f4a0",
+     "text_ko": "배치가 이미 출하되었는지 여부와 관계없이, 설명되지 않은 불일치와 배치 또는 그 구성 성분이 규격을 충족하지 못한 경우를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-999ac11633985bdf6f2e656a",
+     "text_ko": "시험실 기록에 확립된 규격 및 기준에 대한 적합성을 보장하는 데 필요한 모든 시험·검사·분석에서 나온 완전한 데이터가 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards."
+    },
+    {
+     "finding_id": "finding-efdc6ab363b74903e08c3a52",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용하는 기구를 포함한 설비의 세척 및 유지보수에 관한 서면 절차가 수립되어 있지 않거나 준수되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures are not established and followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product."
+    }
+   ],
+   "inspector_names": [
+    "Joseph A Piechocki"
+   ]
+  },
+  {
+   "document_id": "fda483-196711",
+   "slug": "fda483-196711",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Vetter Pharma-Fertigung GmbH & Co. KG",
+   "firm_key": "vetter pharma-fertigung & kg",
+   "published_date": "2026-11-13",
+   "inspection_date": "2024-04-24",
+   "evidence_url": "https://www.fda.gov/media/196711/download",
+   "categories": [
+    "무균보증/무균공정",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-235077a11472ac3accece3ca",
+     "text_ko": "무균(sterile)을 표방하는 완제의약품(DP)의 미생물 오염을 방지하기 위한 절차가 수립되지 않았고 이행되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug product (DP) purporting to be sterile are not established and followed."
+    },
+    {
+     "finding_id": "finding-8085e2b693627bda4ee1b261",
+     "text_ko": "DP에 대한 육안검사(visual inspection) 프로그램이 미흡하여 결함을 제거하지 못했고, 그 결과 여러 차례의 전수(100%) 육안검사가 주요 결함(major defect) 허용 기준을 충족하지 못했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The visual inspection program forDp is deficient and was not able to remove defects, resulting in multiple 100% visual inspections failing the major defect acceptance criterion."
+    },
+    {
+     "finding_id": "finding-b05eac31777abcb19bb04a22",
+     "text_ko": "A등급(Grade A) 핵심 충전 작업 후 무균공정(aseptic processing) 구역의 환경 모니터링이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Environmental monitoring of aseptic processing areas following critical GradeA filling operations is deficient."
+    }
    ]
   },
   {
@@ -97124,7 +99373,8 @@
    "categories": [
     "설비/시설",
     "기타 품질시스템",
-    "공정밸리데이션"
+    "공정밸리데이션",
+    "불만/회수"
    ],
    "findings": [
     {
@@ -97144,6 +99394,12 @@
      "text_ko": "공정 중 물질과 완제의약품의 특성에 변동을 일으킬 수 있는 제조공정의 산출물을 모니터링하고 그 성능을 밸리데이션하는 관리 절차가 수립되지 않았다.",
      "category_label_ko": "공정밸리데이션",
      "text_orig": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product."
+    },
+    {
+     "finding_id": "finding-aa916f22f8a09d139c9feda1",
+     "text_ko": "의약품 관련 서면 및 구두 불만(complaint)의 처리를 기술한 불만 처리 절차가 미흡하다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Complaint handling procedures describing the handling of written and oral complaint related to drug products are deficient."
     }
    ],
    "inspector_names": [
@@ -97163,7 +99419,10 @@
    "categories": [
     "오염/교차오염 관리",
     "무균보증/무균공정",
-    "교육/작업자"
+    "교육/작업자",
+    "기타 품질시스템",
+    "설비/시설",
+    "환경모니터링"
    ],
    "findings": [
     {
@@ -97183,7 +99442,87 @@
      "text_ko": "직원들이 가운(gowning apparel)을 부적절하게 착용하여 가운이 오염되었을 수 있다.",
      "category_label_ko": "교육/작업자",
      "text_orig": "Personnel donned gowning apparel improperly, in a way that may have caused the gowning apparel to become contaminated."
+    },
+    {
+     "finding_id": "finding-b662451064e02c4bf04fe1c0",
+     "text_ko": "ISO 5 구역 및 청정등급 구역에서 비멸균 소독제와 세척용 와이프를 사용했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Use of non-sterile disinfecting agents and cleaning wipes in the ISO 5 area and classified areas."
+    },
+    {
+     "finding_id": "finding-cd648e459e259ad104aa3331",
+     "text_ko": "가장 극한적이고 도전적인 최악 조건(worst-case)에서 무균 생산 작업을 면밀히 모사하는 배지충전(media fill)을 실시하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Failure to conduct media fills that closely simulate aseptic production operations under the worst-case, most-challenging, and stressful conditions."
+    },
+    {
+     "finding_id": "finding-d9a9cca4c8d6931cbb4645c7",
+     "text_ko": "생산 구역에 세척하기 어렵거나, 다공성이거나, 입자를 발생시키거나, 눈에 띄게 더러운 설비 또는 표면이 있다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Production areas have difficult to clean or contain porous, particle generating, or visibly dirty equipment or surfaces."
+    },
+    {
+     "finding_id": "finding-df52a5f9586f1d094ae359e1",
+     "text_ko": "교차오염을 방지하기 위한 작업 표면, 기구 및/또는 인원의 적절한 봉쇄(containment), 분리 및/또는 세척 없이 유해 의약품(hazardous drugs)이 생산되었다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Hazardous drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination."
+    },
+    {
+     "finding_id": "finding-ef5b7f95875edfc0cb2a04c5",
+     "text_ko": "청정등급 구역의 정기 환경 모니터링이 부적절하다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "Inadequate routine environmental monitoring in the classified areas."
+    },
+    {
+     "finding_id": "finding-f6d6b14d5e3b3fb8889922cd",
+     "text_ko": "작업자 시료채취(personnel sampling)가 적절하지 않다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Lack of adequate personnel sampling."
+    },
+    {
+     "finding_id": "finding-f74111e938da409f53188f9c",
+     "text_ko": "작업자가 핵심 구역(critical area) 또는 그에 바로 인접한 구역에서 빠르게 움직여 일방향 기류(unidirectional airflow)를 교란했을 가능성이 있다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Personnel were observed moving quickly in a critical area or in an area immediately adjacent to a critical area likely causing disruption of unidirectional airflow."
     }
+   ]
+  },
+  {
+   "document_id": "fda483-196834",
+   "slug": "fda483-196834",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "STAQ Pharma Inc",
+   "firm_key": "staq pharma",
+   "published_date": "2026-11-13",
+   "inspection_date": "2026-09-08",
+   "evidence_url": "https://www.fda.gov/media/196834/download",
+   "categories": [
+    "무균보증/무균공정",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-28a99be16a61ab443ba2e333",
+     "text_ko": "무균(sterile)을 표방하는 완제의약품의 미생물 오염을 방지하기 위한 절차가 그러하지 않다(원문 문장이 불완전하게 끝남: \"are not.\").",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not."
+    },
+    {
+     "finding_id": "finding-c70c563b398da2849a9f5716",
+     "text_ko": "의약품의 제조, 가공, 포장 및 보관에 사용되는 건물이 양호한 수리 상태로 유지되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Buildings used in the manufacturing, processing, packing and holding of a drug product are not maintained in a good state of repair."
+    },
+    {
+     "finding_id": "finding-e9e1df5b58d42229a0950395",
+     "text_ko": "설비와 기구가 의약품의 안전성, 확인, 함량, 품질 또는 순도를 변화시킬 수 있는 오작동과 오염을 방지하기 위한 적절한 주기로 세척·유지관리되고 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment and utensils are not cleaned and maintained at appropriate intervals to prevent malfunctions and contamination that would alter the safety, identity, strength, quality or purity of the drug product."
+    }
+   ],
+   "inspector_names": [
+    "John P Mistler"
    ]
   },
   {
@@ -97202,7 +99541,9 @@
     "시험실/품질관리",
     "설비/시설",
     "공정밸리데이션",
-    "규제보고/변경관리"
+    "규제보고/변경관리",
+    "일탈/CAPA/조사",
+    "품질부서 관리감독"
    ],
    "findings": [
     {
@@ -97262,6 +99603,54 @@
       "section 503",
       "section 506"
      ]
+    },
+    {
+     "finding_id": "finding-b9dc8258a5b212e65ec47916",
+     "text_ko": "무균 표방 의약품의 미생물 오염 방지를 위한 절차에 무균공정(aseptic process)에 대한 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process."
+    },
+    {
+     "finding_id": "finding-bc6b1a8b8a52426fd05af083",
+     "text_ko": "무균공정(aseptic processing) 구역의 공기 공급이 양압 하에서 고효율 미립자 공기(HEPA) 필터를 통해 여과되도록 하는 점이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding air supply that is filtered through high-efficiency particulate air filters under positive pressure."
+    },
+    {
+     "finding_id": "finding-bd87bb93eb353be42bdaa15a",
+     "text_ko": "배치가 이미 출하되었는지와 관계없이 설명되지 않은 불일치를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-ecb4e252bfca96853835b39d",
+     "text_ko": "품질관리 부문이 실시하는 시료채취 및 시험의 판정기준이 각 배치가 승인 및 출고의 조건인 각 해당 규격에 부합함을 보장하기에 적절하지 않다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Acceptance criteria for the sampling and testing conducted by the quality control unit is not adequate to assure that batches of drug products meet each appropriate specification as a condition for their approval and release."
+    },
+    {
+     "finding_id": "finding-f2e502405ab5dfc55f13d6a5",
+     "text_ko": "무균공정(aseptic processing) 구역의 환경 상태 모니터링 시스템이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions."
+    },
+    {
+     "finding_id": "finding-f317a515e967c35943cc0b5b",
+     "text_ko": "품질관리 부문(quality control unit)이 없다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "There is no quality control unit."
+    },
+    {
+     "finding_id": "finding-f7609b51c9913e93857961c8",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 대한 서면 절차가 수립되어 있지 않고 이행되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures are not established and followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product."
+    },
+    {
+     "finding_id": "finding-fcf4ce685db1c3f26aac9025",
+     "text_ko": "무균공정(aseptic processing) 구역의 바닥이 매끄럽지 않거나 및/또는 쉽게 청소할 수 있는 단단한 표면이 아니다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient in that floors are not smooth and/or hard smfaces that are easily cleanable."
     }
    ],
    "inspector_names": [

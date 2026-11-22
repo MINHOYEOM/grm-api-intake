@@ -10008,16 +10008,16 @@
     "summary": "FDA issued a Form 483 with 3 observations to GE HealthCare Shanghai Co. Ltd, a sterile drug manufacturer, citing reexamination of containers with black particles, gowning and equipment identification in the filling area, and data backup controls.",
     "implication": "Deviation DEV-11527 was initiated on 2024-02-22 and found two types of black particles, embedded in the wall and adhered to the inner surface (Observation 1). After the initial re-inspection, additional units with adhered and embedded particles were found (Observation 1). When a stopper bag was sprayed, the bottom was never sprayed (Observation 2). Because tools had no identification, dented parts being replaced could not be traced (Observation 2).",
     "key_facts": [
-     "Observation 1: after black particles traced to the container supplier were found, batches shipped to the US were not 100% reinspected",
+     "Observation 1: after black particles traced to the container supplier were found, batches shipped to the US were not fully reinspected",
      "Observation 2: goggles removed in the Grade A filling area and hung on the wall, forehead and eyebrows exposed; filling line tools not identified",
      "Observation 3: manufacturing data backed up to unprotected storage drives without QA verification"
     ],
     "checks": [
-     "Are batches with confirmed container particle defects 100% reinspected before shipment? (Observation 1)",
+     "Are batches with confirmed container particle defects fully reinspected before shipment? (Observation 1)",
      "Does each filling tool in the Grade A area have an identification number? (Observation 2)",
      "Does QA verify the content of equipment data backups? (Observation 3)"
     ],
-    "hook_line": "Only sample inspection, no 100% reinspection, after more particles were found"
+    "hook_line": "Only sample inspection, no full reinspection, after more particles were found"
    },
    "inspection": {
     "v": 1,
@@ -10293,19 +10293,19 @@
    "en": {
     "title_issue": "Fumigation validation, missed visual defects",
     "summary": "FDA issued a Form 483 with 3 observations to Qilu Antibiotics Pharmaceutical Co., LTD., a drug manufacturer in China, citing cleaning and disinfection of aseptic areas, failure to follow visual inspection procedures, and two-person verification in equipment logs.",
-    "implication": "The workshop manager confirmed there is no approved procedure providing cleaning instructions (Observation 1). SOP PLA1160 requires vials with critical, major or minor defects to be rejected during 100% inspection (Observation 2).",
+    "implication": "The workshop manager confirmed there is no approved procedure providing cleaning instructions (Observation 1). SOP PLA1160 requires vials with critical, major or minor defects to be rejected during full inspection (Observation 2).",
     "key_facts": [
      "Observation 1: fumigation validation reports did not assess the rationale for biological indicator placement at hard to reach areas",
      "Observation 1: CCTV of sterile API manufacturing on 2021-04-23 showed an operator's arm extending into the Grade A area",
-     "Observation 2: multiple vials with defects not rejected during 100% visual inspection were found among retain samples",
+     "Observation 2: multiple vials with defects not rejected during full visual inspection were found among retain samples",
      "Observation 3: equipment log books, including filling machines, did not document two-person verification"
     ],
     "checks": [
      "Are biological indicators placed at hard to reach areas in fumigation validation? (Observation 1)",
-     "Are retain samples used to check for defects missed by 100% visual inspection? (Observation 2)",
+     "Are retain samples used to check for defects missed by full visual inspection? (Observation 2)",
      "Is two-person verification recorded in equipment cleaning and use logs? (Observation 3)"
     ],
-    "hook_line": "Retain samples contained defective vials not rejected during 100% visual inspection"
+    "hook_line": "Retain samples contained defective vials not rejected during full visual inspection"
    },
    "inspection": {
     "v": 1,
@@ -11508,7 +11508,7 @@
     "summary": "FDA issued a Form 483 with 11 observations to Shanghai Henlius Biopharmaceutical Co., Ltd., a drug substance and drug product manufacturer in China, citing process performance qualification, visible particle investigations, changes to visual inspection criteria, cleaning validation, laboratory and electronic data controls, and clean area controls.",
     "implication": "Rejection rates for two batches exceeded the pre-defined acceptance criterion for major defects (Observation 1). The sampling for the investigation had no documented justification of representativeness (Observation 2). During filling on 2026-05-13 an operator did not set equipment as required by SOP-00273, and an equipment cover was cracked and held with transparent tape (Observation 5). A 2026-05-04 error in which a wrong sample was tested was not raised as a deviation until 2026-05-14, after the inspector inquired (Observation 11).",
     "key_facts": [
-     "Observation 1: three PPQ batches showed increasingly high rejection rates in 100% visual inspection, mainly due to visible particulates",
+     "Observation 1: three PPQ batches showed increasingly high rejection rates in full visual inspection, mainly due to visible particulates",
      "Observation 2: the investigation into high visible particulate defects was inconclusive on root cause",
      "Observation 3: the visual inspection acceptance criterion was revised retrospectively without an approved change control",
      "Observation 7: deletion protection was removed during data archiving, and an operator demonstrated unauthorized deletion of data files"
@@ -12693,7 +12693,7 @@
     "summary": "FDA issued a Form 483 with 2 observations to Thermo Fisher Biopharma Services PTE, LTD (TFBS), a drug product manufacturer in Singapore, citing an inadequate visual inspection program and a manufacturing process that does not consistently meet specifications.",
     "implication": "A recurring container defect called Check was observed frequently during the second PPQ campaign but was not investigated (Observation 1). Multiple batches failed the AQL for critical defects (Observation 1). A post-PPQ batch was delayed on April 28 by a particle monitoring system malfunction and did not resume until April 29 (Observation 2).",
     "key_facts": [
-     "Observation 1: defects from 100% visual inspection were not adequately trended or investigated for root cause",
+     "Observation 1: defects from full visual inspection were not adequately trended or investigated for root cause",
      "Observation 1: critical particulate defects trended upward from the engineering batch through the PPQ batches without investigation",
      "Observation 2: aseptic process simulations were repeatedly invalidated or aborted due to media leakage, vial breakage and atypical stopper rejects",
      "Observation 2: some of the PPQ batches manufactured to date were rejected"
@@ -13333,7 +13333,7 @@
    "en": {
     "title_issue": "Repeat aseptic findings, stability failures",
     "summary": "FDA issued a Form 483 with 11 observations to Hanlim Pharm Co., Ltd., an OTC sterile drug manufacturer in South Korea, citing aseptic practices, equipment sterilization and smoke studies, environmental monitoring, disinfection, equipment maintenance, stability-based expiry dating, visual inspection, data review, cross-contamination prevention, and leachables methods.",
-    "implication": "Environmental monitoring location selection was also a repeat observation from the 2018 Warning Letter (Observation 3). A sporicidal is not periodically used on all surfaces in the aseptic filling areas (Observation 4). Bubbling ceiling panels in the Grade B area identified in a work request dated 2026-03-23 had no further corrective action (Observation 5). Rejects from 100% visual inspection were not evaluated for defect type or source (Observation 7). Environmental and personnel monitoring records were made after samples were returned to the incubation room (Observation 9).",
+    "implication": "Environmental monitoring location selection was also a repeat observation from the 2018 Warning Letter (Observation 3). A sporicidal is not periodically used on all surfaces in the aseptic filling areas (Observation 4). Bubbling ceiling panels in the Grade B area identified in a work request dated 2026-03-23 had no further corrective action (Observation 5). Rejects from full visual inspection were not evaluated for defect type or source (Observation 7). Environmental and personnel monitoring records were made after samples were returned to the incubation room (Observation 9).",
     "key_facts": [
      "Observation 1: during aseptic filling operators reached over open tubes with their arms, torso and head, a repeat observation from the October 2018 FDA Warning Letter",
      "Observation 2: equipment surfaces that contact sterile components are not sterilized and are only disinfected between batches",

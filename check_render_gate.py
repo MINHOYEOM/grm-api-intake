@@ -58,7 +58,12 @@ def summarize(violations: "list[tuple[str, str]]") -> str:
 
 
 def main(argv: "list[str] | None" = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+    ap =argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("brief", help="조립 산출물(brief_web_*.json 또는 교열 brief_check.json)")
     args = ap.parse_args(argv)
     try:

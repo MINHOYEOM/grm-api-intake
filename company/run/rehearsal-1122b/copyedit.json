@@ -1,0 +1,89 @@
+{
+ "status": "재작업",
+ "round": 1,
+ "published": false,
+ "rehearsal": true,
+ "code_gate": {
+  "ran": true,
+  "exit": 1,
+  "message": "조립 exit 0 · 영문 게이트 exit 0 · 렌더 게이트 exit 1: 렌더 게이트 위반 5건(영문 사실 칸 5건) · 카드 5장 — EN_INVENTED_NUMBER ['100'] (fda483-196405·196408·196414·196430·196433)"
+ },
+ "cards": [
+  {
+   "web_card_id": "fda483-196405",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "렌더 게이트",
+     "slot": "en",
+     "evidence": "영문 사실 칸: 2026-11-22 / card fda483-196405: EN_INVENTED_NUMBER ['100']"
+    }
+   ],
+   "notes": []
+  },
+  {
+   "web_card_id": "fda483-196408",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "렌더 게이트",
+     "slot": "en",
+     "evidence": "영문 사실 칸: 2026-11-22 / card fda483-196408: EN_INVENTED_NUMBER ['100']"
+    }
+   ],
+   "notes": []
+  },
+  {
+   "web_card_id": "fda483-196414",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "렌더 게이트",
+     "slot": "en",
+     "evidence": "영문 사실 칸: 2026-11-22 / card fda483-196414: EN_INVENTED_NUMBER ['100']"
+    }
+   ],
+   "notes": []
+  },
+  {
+   "web_card_id": "fda483-196430",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "렌더 게이트",
+     "slot": "en",
+     "evidence": "영문 사실 칸: 2026-11-22 / card fda483-196430: EN_INVENTED_NUMBER ['100']"
+    }
+   ],
+   "notes": []
+  },
+  {
+   "web_card_id": "fda483-196433",
+   "verdict": "reject",
+   "fails": [
+    {
+     "item": "렌더 게이트",
+     "slot": "en",
+     "evidence": "영문 사실 칸: 2026-11-22 / card fda483-196433: EN_INVENTED_NUMBER ['100']"
+    }
+   ],
+   "notes": []
+  }
+ ],
+ "counts": {
+  "cards": 5,
+  "pass": 0,
+  "reject": 5,
+  "fails_total": 5,
+  "notes_total": 0
+ },
+ "rework": {
+  "cards": [
+   "fda483-196405",
+   "fda483-196408",
+   "fda483-196414",
+   "fda483-196430",
+   "fda483-196433"
+  ]
+ }
+}

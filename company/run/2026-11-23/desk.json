@@ -1,0 +1,2351 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-23",
+ "handoff_title": "OPEN GRM Routine Handoff 2026-11-23",
+ "handoff_ref": {
+  "date": "2026-11-23",
+  "sha256": "7ec6a7d1a4a6f7343b2ee3790db9f9634006c626424507573fa4ec25ddfd0c70",
+  "rows": 223
+ },
+ "rows": [
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196254",
+   "web_card_id": "fda483-196254",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "reflow",
+   "reason": "지난주(11-16) 처리분 재유입"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196260",
+   "web_card_id": "fda483-196260",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "reflow",
+   "reason": "지난주(11-16) 처리분 재유입"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196305",
+   "web_card_id": "fda483-196305",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196306",
+   "web_card_id": "fda483-196306",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196307",
+   "web_card_id": "fda483-196307",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196308",
+   "web_card_id": "fda483-196308",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196309",
+   "web_card_id": "fda483-196309",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196312",
+   "web_card_id": "fda483-196312",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196313",
+   "web_card_id": "fda483-196313",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196317",
+   "web_card_id": "fda483-196317",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196318",
+   "web_card_id": "fda483-196318",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196320",
+   "web_card_id": "fda483-196320",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196321",
+   "web_card_id": "fda483-196321",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196327",
+   "web_card_id": "fda483-196327",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196329",
+   "web_card_id": "fda483-196329",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196335",
+   "web_card_id": "fda483-196335",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196340",
+   "web_card_id": "fda483-196340",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196343",
+   "web_card_id": "fda483-196343",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196348",
+   "web_card_id": "fda483-196348",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196351",
+   "web_card_id": "fda483-196351",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196352",
+   "web_card_id": "fda483-196352",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196353",
+   "web_card_id": "fda483-196353",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196354",
+   "web_card_id": "fda483-196354",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196355",
+   "web_card_id": "fda483-196355",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196356",
+   "web_card_id": "fda483-196356",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196362",
+   "web_card_id": "fda483-196362",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196363",
+   "web_card_id": "fda483-196363",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196370",
+   "web_card_id": "fda483-196370",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196371",
+   "web_card_id": "fda483-196371",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196372",
+   "web_card_id": "fda483-196372",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196373",
+   "web_card_id": "fda483-196373",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196374",
+   "web_card_id": "fda483-196374",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196375",
+   "web_card_id": "fda483-196375",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196376",
+   "web_card_id": "fda483-196376",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196377",
+   "web_card_id": "fda483-196377",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196378",
+   "web_card_id": "fda483-196378",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196379",
+   "web_card_id": "fda483-196379",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196380",
+   "web_card_id": "fda483-196380",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196382",
+   "web_card_id": "fda483-196382",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196384",
+   "web_card_id": "fda483-196384",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196385",
+   "web_card_id": "fda483-196385",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196387",
+   "web_card_id": "fda483-196387",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196388",
+   "web_card_id": "fda483-196388",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196390",
+   "web_card_id": "fda483-196390",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196391",
+   "web_card_id": "fda483-196391",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196392",
+   "web_card_id": "fda483-196392",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196393",
+   "web_card_id": "fda483-196393",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196394",
+   "web_card_id": "fda483-196394",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196395",
+   "web_card_id": "fda483-196395",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196397",
+   "web_card_id": "fda483-196397",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196398",
+   "web_card_id": "fda483-196398",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196399",
+   "web_card_id": "fda483-196399",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196400",
+   "web_card_id": "fda483-196400",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196401",
+   "web_card_id": "fda483-196401",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196402",
+   "web_card_id": "fda483-196402",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196403",
+   "web_card_id": "fda483-196403",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196404",
+   "web_card_id": "fda483-196404",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196405",
+   "web_card_id": "fda483-196405",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196407",
+   "web_card_id": "fda483-196407",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196408",
+   "web_card_id": "fda483-196408",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196409",
+   "web_card_id": "fda483-196409",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196410",
+   "web_card_id": "fda483-196410",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196411",
+   "web_card_id": "fda483-196411",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196412",
+   "web_card_id": "fda483-196412",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196413",
+   "web_card_id": "fda483-196413",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196414",
+   "web_card_id": "fda483-196414",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196416",
+   "web_card_id": "fda483-196416",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196417",
+   "web_card_id": "fda483-196417",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196418",
+   "web_card_id": "fda483-196418",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196425",
+   "web_card_id": "fda483-196425",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196427",
+   "web_card_id": "fda483-196427",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196429",
+   "web_card_id": "fda483-196429",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196430",
+   "web_card_id": "fda483-196430",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196431",
+   "web_card_id": "fda483-196431",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196432",
+   "web_card_id": "fda483-196432",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196433",
+   "web_card_id": "fda483-196433",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196435",
+   "web_card_id": "fda483-196435",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196437",
+   "web_card_id": "fda483-196437",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196441",
+   "web_card_id": "fda483-196441",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196443",
+   "web_card_id": "fda483-196443",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196444",
+   "web_card_id": "fda483-196444",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196445",
+   "web_card_id": "fda483-196445",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196447",
+   "web_card_id": "fda483-196447",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196449",
+   "web_card_id": "fda483-196449",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196451",
+   "web_card_id": "fda483-196451",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196452",
+   "web_card_id": "fda483-196452",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196455",
+   "web_card_id": "fda483-196455",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196456",
+   "web_card_id": "fda483-196456",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196457",
+   "web_card_id": "fda483-196457",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196458",
+   "web_card_id": "fda483-196458",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196463",
+   "web_card_id": "fda483-196463",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196464",
+   "web_card_id": "fda483-196464",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196502",
+   "web_card_id": "fda483-196502",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196588",
+   "web_card_id": "fda483-196588",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196637",
+   "web_card_id": "fda483-196637",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196639",
+   "web_card_id": "fda483-196639",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196640",
+   "web_card_id": "fda483-196640",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196641",
+   "web_card_id": "fda483-196641",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196650",
+   "web_card_id": "fda483-196650",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196880",
+   "web_card_id": "fda483-196880",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "0f3a6eeb815d",
+   "web_card_id": "0f3a6eeb815d",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "55c08c82779b",
+   "web_card_id": "55c08c82779b",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "d60bdc71408a",
+   "web_card_id": "d60bdc71408a",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "ed75ff499f75",
+   "web_card_id": "ed75ff499f75",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026008242",
+   "web_card_id": "admin-2026008242",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026008244",
+   "web_card_id": "admin-2026008244",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026008255",
+   "web_card_id": "admin-2026008255",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026008256",
+   "web_card_id": "admin-2026008256",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026008296",
+   "web_card_id": "admin-2026008296",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "gmpinspect-1Q7txc0kHQ0",
+   "web_card_id": "gmpinspect-1Q7txc0kHQ0",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-30a2ef396db1",
+   "web_card_id": "recall-30a2ef396db1",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-327eae52c8bb",
+   "web_card_id": "recall-327eae52c8bb",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-53d37db1b711",
+   "web_card_id": "recall-53d37db1b711",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-6ffa973e2763",
+   "web_card_id": "recall-6ffa973e2763",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-74000539e83e",
+   "web_card_id": "recall-74000539e83e",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-8a5c7d80ccf0",
+   "web_card_id": "recall-8a5c7d80ccf0",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-9cf757ea745d",
+   "web_card_id": "recall-9cf757ea745d",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-bb9291755916",
+   "web_card_id": "recall-bb9291755916",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-bc51804c85aa",
+   "web_card_id": "recall-bc51804c85aa",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-bcb6083c9c35",
+   "web_card_id": null,
+   "signal_tier": "Tier 3",
+   "merged_into": "MFDS::recall-bb9291755916",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-c5d40bc8b3d1",
+   "web_card_id": "recall-c5d40bc8b3d1",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0165-2027",
+   "web_card_id": "D-0165-2027",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0166-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 3",
+   "merged_into": "OpenFDA Recall::D-0165-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "0a7b0d339de9",
+   "web_card_id": "0a7b0d339de9",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "9730858b8989",
+   "web_card_id": "9730858b8989",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "a74d4fbdccdd",
+   "web_card_id": "a74d4fbdccdd",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "ad04c5ea4a99",
+   "web_card_id": "ad04c5ea4a99",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196381",
+   "web_card_id": "fda483-196381",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196386",
+   "web_card_id": "fda483-196386",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196426",
+   "web_card_id": "fda483-196426",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "Health Canada",
+   "document_id": "hc-82964",
+   "web_card_id": "hc-82964",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "Health Canada",
+   "document_id": "hc-82965",
+   "web_card_id": "hc-82965",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "ISPE",
+   "document_id": "0888f05a0fd6",
+   "web_card_id": "0888f05a0fd6",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "ISPE",
+   "document_id": "ac07673512db",
+   "web_card_id": "ac07673512db",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026008238",
+   "web_card_id": "admin-2026008238",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admrul-2100000288220",
+   "web_card_id": "admrul-2100000288220",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0008-15206",
+   "web_card_id": "data0008-15206",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0011-15996",
+   "web_card_id": "data0011-15996",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0011-15997",
+   "web_card_id": "data0011-15997",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "gmpinspect-1Q7XhpAwI0q",
+   "web_card_id": "gmpinspect-1Q7XhpAwI0q",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "gmpinspect-1Q7XhpAwhFA",
+   "web_card_id": "gmpinspect-1Q7XhpAwhFA",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "gmpinspect-1Q7txc0kUrl",
+   "web_card_id": "gmpinspect-1Q7txc0kUrl",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "document_id": "ef50339bb834",
+   "web_card_id": "ef50339bb834",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0114-2027",
+   "web_card_id": "D-0114-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0115-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0116-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0117-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0118-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0119-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0120-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0121-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0122-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0123-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0124-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0125-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0126-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0127-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0128-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0129-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0130-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0131-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0132-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0133-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0134-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0135-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0136-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0137-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0138-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0139-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0140-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0141-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0142-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0143-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0144-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0145-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0146-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0147-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0148-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0149-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0150-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0151-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0152-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0153-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0154-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0155-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0114-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0157-2027",
+   "web_card_id": "D-0157-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0158-2027",
+   "web_card_id": "D-0158-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0159-2027",
+   "web_card_id": "D-0159-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0160-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0159-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0161-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0159-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0167-2027",
+   "web_card_id": "D-0167-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0168-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0167-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0169-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0167-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0170-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0167-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0171-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0167-2027",
+   "action": "render",
+   "reason": "병합 멤버(대표 카드로 렌더)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0173-2027",
+   "web_card_id": "D-0173-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0182-2027",
+   "web_card_id": "D-0182-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "recall-fb-24e87667c9a6a108",
+   "web_card_id": "recall-fb-24e87667c9a6a108",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "WHO",
+   "document_id": "who-whopir-492199ae88d3",
+   "web_card_id": "who-whopir-492199ae88d3",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "WHO",
+   "document_id": "who-whopir-98cfb8b39789",
+   "web_card_id": "who-whopir-98cfb8b39789",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "WHO",
+   "document_id": "who-whopir-af14a079113a",
+   "web_card_id": "who-whopir-af14a079113a",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "WHO",
+   "document_id": "who-whopir-d6ea75f7687f",
+   "web_card_id": "who-whopir-d6ea75f7687f",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "1d9759b41ff0",
+   "web_card_id": "1d9759b41ff0",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "74030b79bdf2",
+   "web_card_id": "74030b79bdf2",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "b3753e6d62c7",
+   "web_card_id": "b3753e6d62c7",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "EMA",
+   "document_id": "2561126e6d7c",
+   "web_card_id": "2561126e6d7c",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "EMA",
+   "document_id": "8b95096fb867",
+   "web_card_id": "8b95096fb867",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "EMA",
+   "document_id": "a88680568dc2",
+   "web_card_id": "a88680568dc2",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "EMA",
+   "document_id": "d288d37f3aea",
+   "web_card_id": "d288d37f3aea",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23351",
+   "web_card_id": "2026-23351",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23366",
+   "web_card_id": "2026-23366",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23367",
+   "web_card_id": "2026-23367",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23413",
+   "web_card_id": "2026-23413",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23414",
+   "web_card_id": "2026-23414",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23541",
+   "web_card_id": "2026-23541",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23542",
+   "web_card_id": "2026-23542",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23668",
+   "web_card_id": "2026-23668",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23692",
+   "web_card_id": "2026-23692",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23740",
+   "web_card_id": "2026-23740",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-23750",
+   "web_card_id": "2026-23750",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "Health Canada",
+   "document_id": "hc-82954",
+   "web_card_id": "hc-82954",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "ISPE",
+   "document_id": "9f68357174c9",
+   "web_card_id": "9f68357174c9",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0009-44322",
+   "web_card_id": "data0009-44322",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1"
+  }
+ ],
+ "search_findings": [],
+ "shards": {
+  "delta": {
+   "A": [
+    "fda483-196305",
+    "fda483-196306",
+    "fda483-196307",
+    "fda483-196308",
+    "fda483-196309",
+    "fda483-196312",
+    "fda483-196313",
+    "fda483-196317",
+    "fda483-196318",
+    "fda483-196320",
+    "fda483-196321",
+    "fda483-196327",
+    "fda483-196329",
+    "fda483-196335",
+    "fda483-196340",
+    "fda483-196343",
+    "fda483-196348",
+    "fda483-196351",
+    "fda483-196352"
+   ],
+   "B": [
+    "fda483-196353",
+    "fda483-196354",
+    "fda483-196355",
+    "fda483-196356",
+    "fda483-196362",
+    "fda483-196363",
+    "fda483-196370",
+    "fda483-196371",
+    "fda483-196372",
+    "fda483-196373",
+    "fda483-196374",
+    "fda483-196375",
+    "fda483-196376",
+    "fda483-196377",
+    "fda483-196378",
+    "fda483-196379",
+    "fda483-196380",
+    "fda483-196382",
+    "fda483-196384"
+   ],
+   "C": [
+    "fda483-196385",
+    "fda483-196387",
+    "fda483-196388",
+    "fda483-196390",
+    "fda483-196391",
+    "fda483-196392",
+    "fda483-196393",
+    "fda483-196394",
+    "fda483-196395",
+    "fda483-196397",
+    "fda483-196398",
+    "fda483-196399",
+    "fda483-196400",
+    "fda483-196401",
+    "fda483-196402",
+    "fda483-196403",
+    "fda483-196404",
+    "fda483-196405",
+    "fda483-196407"
+   ],
+   "D": [
+    "fda483-196408",
+    "fda483-196409",
+    "fda483-196410",
+    "fda483-196411",
+    "fda483-196412",
+    "fda483-196413",
+    "fda483-196414",
+    "fda483-196416",
+    "fda483-196417",
+    "fda483-196418",
+    "fda483-196425",
+    "fda483-196427",
+    "fda483-196429",
+    "fda483-196430",
+    "fda483-196431",
+    "fda483-196432",
+    "fda483-196433",
+    "fda483-196435",
+    "fda483-196437"
+   ],
+   "E": [
+    "fda483-196441",
+    "fda483-196443",
+    "fda483-196444",
+    "fda483-196445",
+    "fda483-196447",
+    "fda483-196449",
+    "fda483-196451",
+    "fda483-196452",
+    "fda483-196455",
+    "fda483-196456",
+    "fda483-196457",
+    "fda483-196458",
+    "fda483-196463",
+    "fda483-196464",
+    "fda483-196502",
+    "fda483-196588",
+    "fda483-196637",
+    "fda483-196639",
+    "fda483-196640"
+   ],
+   "F": [
+    "fda483-196641",
+    "fda483-196650",
+    "fda483-196880",
+    "0f3a6eeb815d",
+    "55c08c82779b",
+    "d60bdc71408a",
+    "ed75ff499f75",
+    "admin-2026008242",
+    "admin-2026008244",
+    "admin-2026008255",
+    "admin-2026008256",
+    "admin-2026008296",
+    "gmpinspect-1Q7txc0kHQ0",
+    "recall-30a2ef396db1",
+    "recall-327eae52c8bb",
+    "recall-53d37db1b711",
+    "recall-6ffa973e2763",
+    "recall-74000539e83e",
+    "recall-8a5c7d80ccf0"
+   ],
+   "G": [
+    "recall-9cf757ea745d",
+    "recall-bb9291755916",
+    "recall-bc51804c85aa",
+    "recall-c5d40bc8b3d1",
+    "D-0165-2027",
+    "0a7b0d339de9",
+    "9730858b8989",
+    "a74d4fbdccdd",
+    "ad04c5ea4a99",
+    "fda483-196381",
+    "fda483-196386",
+    "fda483-196426",
+    "hc-82964",
+    "hc-82965",
+    "0888f05a0fd6",
+    "ac07673512db",
+    "admin-2026008238",
+    "admrul-2100000288220",
+    "data0008-15206"
+   ],
+   "H": [
+    "data0011-15996",
+    "data0011-15997",
+    "gmpinspect-1Q7XhpAwI0q",
+    "gmpinspect-1Q7XhpAwhFA",
+    "gmpinspect-1Q7txc0kUrl",
+    "ef50339bb834",
+    "D-0114-2027",
+    "D-0157-2027",
+    "D-0158-2027",
+    "D-0159-2027",
+    "D-0167-2027",
+    "D-0173-2027",
+    "D-0182-2027",
+    "recall-fb-24e87667c9a6a108",
+    "who-whopir-492199ae88d3",
+    "who-whopir-98cfb8b39789",
+    "who-whopir-af14a079113a",
+    "who-whopir-d6ea75f7687f"
+   ]
+  },
+  "deep": {
+   "A": [
+    "fda483-196348",
+    "fda483-196373",
+    "fda483-196379",
+    "fda483-196398",
+    "fda483-196407",
+    "fda483-196417"
+   ],
+   "B": [
+    "fda483-196327",
+    "fda483-196376",
+    "fda483-196399",
+    "fda483-196400",
+    "fda483-196432",
+    "fda483-196445"
+   ],
+   "C": [
+    "fda483-196307",
+    "fda483-196317",
+    "fda483-196363",
+    "fda483-196412",
+    "fda483-196416",
+    "fda483-196431"
+   ],
+   "D": [
+    "fda483-196355",
+    "fda483-196395",
+    "fda483-196408",
+    "fda483-196414",
+    "fda483-196588",
+    "fda483-196386"
+   ],
+   "E": [
+    "fda483-196306",
+    "fda483-196390",
+    "fda483-196394",
+    "fda483-196411",
+    "fda483-196458",
+    "fda483-196641"
+   ],
+   "F": [
+    "fda483-196372",
+    "fda483-196433",
+    "fda483-196441",
+    "fda483-196447",
+    "fda483-196464",
+    "fda483-196637",
+    "0f3a6eeb815d"
+   ],
+   "G": [
+    "fda483-196374",
+    "fda483-196377",
+    "fda483-196382",
+    "fda483-196401",
+    "fda483-196402",
+    "fda483-196444",
+    "d60bdc71408a",
+    "who-whopir-492199ae88d3",
+    "who-whopir-98cfb8b39789",
+    "who-whopir-af14a079113a",
+    "who-whopir-d6ea75f7687f"
+   ],
+   "H": [
+    "fda483-196351",
+    "fda483-196354",
+    "fda483-196370",
+    "fda483-196418",
+    "fda483-196449",
+    "fda483-196463",
+    "fda483-196880"
+   ],
+   "I": [
+    "fda483-196356",
+    "fda483-196362",
+    "fda483-196388",
+    "fda483-196391",
+    "fda483-196409",
+    "fda483-196452",
+    "fda483-196426"
+   ],
+   "J": [
+    "fda483-196312",
+    "fda483-196329",
+    "fda483-196384",
+    "fda483-196405",
+    "fda483-196455",
+    "fda483-196502",
+    "fda483-196640"
+   ],
+   "K": [
+    "fda483-196320",
+    "fda483-196321",
+    "fda483-196343",
+    "fda483-196393",
+    "fda483-196443",
+    "fda483-196456",
+    "fda483-196650"
+   ],
+   "L": [
+    "fda483-196318",
+    "fda483-196371",
+    "fda483-196380",
+    "fda483-196397",
+    "fda483-196429",
+    "fda483-196457",
+    "ed75ff499f75"
+   ],
+   "M": [
+    "fda483-196353",
+    "fda483-196378",
+    "fda483-196387",
+    "fda483-196413",
+    "fda483-196430",
+    "fda483-196437",
+    "fda483-196451"
+   ],
+   "N": [
+    "fda483-196309",
+    "fda483-196313",
+    "fda483-196335",
+    "fda483-196392",
+    "fda483-196425",
+    "fda483-196435",
+    "admin-2026008242",
+    "admin-2026008255",
+    "admin-2026008256"
+   ],
+   "O": [
+    "fda483-196305",
+    "fda483-196308",
+    "fda483-196340",
+    "fda483-196352",
+    "fda483-196375",
+    "fda483-196404",
+    "fda483-196427"
+   ],
+   "P": [
+    "fda483-196385",
+    "fda483-196403",
+    "fda483-196410",
+    "fda483-196639",
+    "55c08c82779b",
+    "admin-2026008244",
+    "admin-2026008296",
+    "fda483-196381",
+    "admin-2026008238"
+   ]
+  },
+  "tldr": "T"
+ },
+ "counts": {
+  "rows": 223,
+  "render": 200,
+  "skip": 21,
+  "reflow": 2,
+  "error": 0,
+  "defer": 0,
+  "websearch_used": 3,
+  "webfetch_used": 0
+ }
+}

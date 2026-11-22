@@ -1,0 +1,165 @@
+{
+  "removed": [
+    {
+      "web_card_id": "fda483-196305",
+      "slot": "deep.key_violations[1]",
+      "item": "칸 삭제",
+      "action": "지적 1번을 뺌(남은 지적 3개)",
+      "evidence": "'야간 작업자'는 원문에 없음 — 원문은 2026-03-01 작업자와 2026-03-02 주간 근무조만 적고 야간 근무는 쓰지 않음"
+    },
+    {
+      "web_card_id": "fda483-196352",
+      "slot": "deep.key_violations[0]",
+      "item": "칸 삭제",
+      "action": "지적 0번을 뺌(남은 지적 5개)",
+      "evidence": "'8 CFU 이하 생육'은 원문 'microbial growth of 8 CFU'에 없는 '이하'를 보탬(원문 문장 깨짐) — 125회 수치 자체는 원문과 같음"
+    },
+    {
+      "web_card_id": "fda483-196353",
+      "slot": "deep.key_violations[3]",
+      "item": "칸 삭제",
+      "action": "지적 3번을 뺌(남은 지적 6개)",
+      "evidence": "뒷머리로 만진 대상은 원문에서 가려져 있는데(‘the [redacted] located at the front of the line’) '내부 표면'으로 채웠고, 두 작업자의 서로 다른 관찰(뒷머리 접촉 / 가슴·허리·팔뚝으로 내부 표면 접촉)을 한 문장으로 결합함"
+    },
+    {
+      "web_card_id": "fda483-196395",
+      "slot": "deep.key_violations[2]",
+      "item": "칸 삭제",
+      "action": "지적 2번을 뺌(남은 지적 3개)",
+      "evidence": "\"일탈 조사 6건\"은 세어서 만든 숫자로 원문에 없음 — 원문 관찰 3 은 A~F 항목에 QU-022745·QE-040663·QE-033408·QE-035325·QE-043392·QE-035410·QE-015182·QE-033078 등 8개 일탈 번호를 적음"
+    },
+    {
+      "web_card_id": "fda483-196399",
+      "slot": "deep.key_violations[5]",
+      "item": "칸 삭제",
+      "action": "지적 5번을 뺌(남은 지적 6개)",
+      "evidence": "observation 의 격리하기로 한 뒤 사용 서술과 risk \"더는 승인 상태가 아니어서 생산에 쓰면 안 됐다\"가 업체 통보(we were informed)를 진술 표기 없이 사실로 적음"
+    },
+    {
+      "web_card_id": "fda483-196405",
+      "slot": "deep.key_violations[1]",
+      "item": "칸 삭제",
+      "action": "지적 1번을 뺌(남은 지적 2개)",
+      "evidence": "\"고글을 벗어 벽에 걸거나\"는 원문(걸이에 걸었으나 고글이 벽에 닿음)과 다른 사실. 확신 중간"
+    },
+    {
+      "web_card_id": "fda483-196408",
+      "slot": "deep.key_violations[2]",
+      "item": "칸 삭제",
+      "action": "지적 2번을 뺌(남은 지적 2개)",
+      "evidence": "\"충전 설비 4대\"는 세어서 만든 숫자이고 4번째 설비(Equipment ID: SF36401)는 원문에 충전기라고 적혀 있지 않음 — 추정으로 채움"
+    },
+    {
+      "web_card_id": "fda483-196502",
+      "slot": "deep.key_violations[0]",
+      "item": "칸 삭제",
+      "action": "지적 0번을 뺌(남은 지적 3개)",
+      "evidence": "'조제액이 ... 탱크에 들어간 뒤의 시료가 대표적이지 않다' — 원문은 'The sample obtained is not the bulk solution' 과 조제액 이송·탱크 투입을 따로 적었을 뿐, 시료를 탱크 투입 뒤에 채취했다고 적지 않음(원문에 없는 결합)"
+    },
+    {
+      "web_card_id": "fda483-196447",
+      "slot": "deep.observations_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 2칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "① 사실 오류: observations_ko[0].number 가 '1' — 장갑 소독은 원문 관찰 4(4a). 번호는 코드 관찰 추출(deterministic_detail)이 OCR '|)' 를 1 로 읽어 정한 병합 키라 기자가 못 고친다(rework.json 이의). 앞면 key_facts 는 '관찰 4' 로 원문과 맞다"
+    },
+    {
+      "web_card_id": "fda483-196371",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "hook_line 한국어는 '과충전·저충전을 잡아낼 장치가 없음'이나 원문은 'no mechanism to detect significant under/over fills' — '심한(significant)'이 빠져 원문보다 강한 단정이며 영문 hook 과도 뜻이 어긋남"
+    },
+    {
+      "web_card_id": "fda483-196391",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "국문 \"이 표준품으로 역가시험을 했다\"의 \"이 표준품\"이 바로 앞 문장의 미국약전 표준품을 가리켜, 원문(미국약전 아닌 다른 표준품으로 역가시험)과 뜻이 어긋나고 영문(\"The unverified standard\")과도 짝이 맞지 않음"
+    },
+    {
+      "web_card_id": "fda483-196393",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "\"자동 육안검사기 검체가 기준에 여러 번 불합격해도\"의 \"여러 번\"은 원문의 깨진 값(can fail acceptance criteria §Kimes — OCR)을 횟수로 추정해 채운 것(심층은 \"[가림]번\"으로 가림). 확신 낮음"
+    },
+    {
+      "web_card_id": "fda483-196399",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "\"승인 상태가 아닌\"은 원문에서 점검관이 업체로부터 전해 들은 내용(we were informed was no longer in approved status)인데 진술 표기 없이 사실로 단정(STYLE R3)"
+    },
+    {
+      "web_card_id": "fda483-196430",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'2차 공정성능적격성평가 캠페인' — 원문 OCR 은 'during the seco Q campaign'(깨짐)이라 'PPQ' 를 추정해 채움(심층도 '두 번째 캠페인'만 씀); 영문 'second PPQ campaign' 도 같음"
+    },
+    {
+      "web_card_id": "d60bdc71408a",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'입자 크기 분포와 정제 두께가 제안 범위를 벗어났으나 공정 중 규격을 정하지 않았다' — 원문은 'outside of your proposed ranges' 로 범위가 있었다고 쓰고 'did not establish appropriate specifications'(적절한 규격 미설정)라고 했다. 규격을 정하지 않았다는 단정은 원문보다 강하다(영문 'no in-process specifications were set' 도 같음)"
+    },
+    {
+      "web_card_id": "recall-74000539e83e",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "영문 hook 'failed assay of curcuminoids' — 'curcuminoids'(쿠르쿠미노이드) 묶음 분류와 'failed' 는 원문('정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합)')에 없고 한국어 hook('정량법 사유로 회수명령(강제)')에도 없다. 원문에 없는 분류(②)·국·영 짝 불일치(⑥)"
+    },
+    {
+      "web_card_id": "d60bdc71408a",
+      "slot": "key_facts[3]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 3번 뺌",
+      "evidence": "'당국 조치: 상업 배치 1개 회수, 해당 제품 제조·유통 중단'(영문 'Agency action') — 원문은 FDA 가 업체의 회수('commercial batch ... was recalled')와 제조·유통 중단('you have discontinued the manufacture and distribution')을 인정한다고 적었을 뿐 당국 조치가 아니다. '1개'는 가려진 배치 표기((b)(4))에서 센 숫자"
+    },
+    {
+      "web_card_id": "fda483-196390",
+      "slot": "key_facts[0]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 0번 뺌",
+      "evidence": "\"더러운 환기구\"의 \"더러운\"은 원문 OCR 깨진 값(I observed trty return air vents)을 추정해 채운 것 — 원문에서 dirty 를 확인할 수 없음"
+    },
+    {
+      "web_card_id": "fda483-196399",
+      "slot": "key_facts[2]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 2번 뺌",
+      "evidence": "\"승인 상태가 아닌 원료 드럼\"을 진술 표기 없이 사실로 단정 — 원문은 업체에서 전해 들은 내용(we were informed ...)"
+    },
+    {
+      "web_card_id": "fda483-196405",
+      "slot": "key_facts[1]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 1번 뺌",
+      "evidence": "\"고글을 벗어 벽에 걸고\"는 원문과 다름 — 원문은 고글을 걸이(hanger)에 걸었는데 그 고글이 시설 벽에 닿았다(hang the goggles on the hanger where the goggles contacted the wall). 확신 중간"
+    },
+    {
+      "web_card_id": "fda483-196409",
+      "slot": "checks[1]",
+      "item": "칸 삭제",
+      "action": "국·영 checks 1번 뺌",
+      "evidence": "국문 \"마개 공급\"은 원문 stoppering station(마개 체결 스테이션 활동, 연기 연구가 다루지 않음)과 뜻이 다르고 영문 점검(\"including stoppering\")과도 짝이 맞지 않음. 확신 중간"
+    },
+    {
+      "web_card_id": "fda483-196416",
+      "slot": "key_facts[3]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 3번 뺌",
+      "evidence": "국문 '비전용 설비 세척 절차와 판매 제품 공정 밸리데이션을 확보하지 않음' — 원문은 'Failure to ensure cleaning procedures for non-dedicated equipment were validated'(세척 절차가 밸리데이션되도록 보장하지 못함)이라 '세척 밸리데이션' 이 '세척 절차 확보'로 바뀜(영문도 'validated' 누락)"
+    },
+    {
+      "web_card_id": "fda483-196444",
+      "slot": "key_facts[2]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 2번 뺌",
+      "evidence": "국문 '녹 색 변색' — 원문은 'brownish red discoloration consistent with rust'(갈색빛 붉은 변색); '녹 색'은 녹색(green)으로 읽혀 영문 'brownish red' 와 어긋남"
+    }
+  ]
+}

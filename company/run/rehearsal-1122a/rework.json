@@ -1,1 +1,11 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{
+ "status": "완료",
+ "round": 1,
+ "worker": "델타-2",
+ "fixed": [
+  {"id": "fda483-196348", "shard": "A", "changed": ["key_facts"]},
+  {"id": "fda483-196445", "shard": "E", "changed": ["title_issue", "hook_line", "key_facts"]}
+ ],
+ "unfixed": [],
+ "note": "196348: 원문 본문 미확보 — '관찰: 확인 불가'를 같은 호 통과 카드와 같은 '당국 조치: Form 483 발행'으로. 196445: '조사 없이'→'재시험 전 조사 미흡'(not thorough), 같은 근거의 notes(hook_line·key_facts[0] '항상 따르지는 않음')도 함께 반영. 두 샤드 precheck terms exit 0."
+}

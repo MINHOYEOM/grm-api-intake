@@ -108,11 +108,11 @@
    }
   },
   "fda483-196445": {
-   "title_issue": "역가 기준일탈 조사 없이 재시험",
-   "hook_line": "역가 결과가 고객 규격 미만이었으나 조사 없이 재시험",
+   "title_issue": "역가 기준일탈 재시험 전 조사 미흡",
+   "hook_line": "역가가 고객 규격 미만이었으나 재시험 전 조사 미흡",
    "summary": "FDA가 위탁 시험기관 Haematologic Technologies, LLC에 Form 483(관찰사항 1건)을 발행했다. 규격을 충족하지 못한 시험 결과를 철저히 검토하지 않았다고 지적했다.",
    "key_facts": [
-    "관찰 1: 재시험 전에 최초 기준일탈(OOS) 조사를 요구하는 절차서 10044를 따르지 않음"
+    "관찰 1: 재시험 전에 최초 기준일탈(OOS) 조사를 요구하는 절차서 10044를 항상 따르지는 않음"
    ],
    "implication": "일탈 2025-005는 2024-12-12 시작됐다(관찰 1). 품질보증 부서는 이를 계획된 일탈로 처리하고 시험을 중단하기로 했다(관찰 1). 고객 지시로 한 재시험은 역가 규격을 충족했다(관찰 1).",
    "checks": [
@@ -120,11 +120,11 @@
     "규격 미달 결과를 계획된 일탈로 바꿔 처리하지 못하게 막는가? (관찰 1)"
    ],
    "en": {
-    "title_issue": "Potency OOS retested without investigation",
-    "hook_line": "Potency results below the client's specification retested without investigation",
+    "title_issue": "Potency OOS not fully investigated before retest",
+    "hook_line": "Potency below client specification; no thorough root-cause investigation before retest",
     "summary": "FDA issued a Form 483 with 1 observation to Haematologic Technologies, LLC, a contract testing laboratory, citing failure to thoroughly review results that did not meet specifications.",
     "key_facts": [
-     "Observation 1: procedure 10044, which requires investigation of an initial OOS before retesting, was not followed"
+     "Observation 1: procedure 10044, which requires investigation of an initial OOS before retesting, is not always followed"
     ],
     "implication": "Deviation 2025-005 was initiated on 2024-12-12 (Observation 1). Quality Assurance made it a planned deviation and discontinued testing (Observation 1). A retest performed at the client's instruction met the potency specification (Observation 1).",
     "checks": [

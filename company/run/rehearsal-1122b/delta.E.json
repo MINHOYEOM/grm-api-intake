@@ -5,10 +5,10 @@
  "cards": {
   "fda483-196441": {
    "title_issue": "선량계 대기 시간 위험 미평가",
-   "hook_line": "조사 후 선량계 대기 시간을 위험평가하지 않아 기준이 없음",
+   "hook_line": "선량계 대기 시간 위험을 평가하지 않아 적절한 대기 시간 미수립",
    "summary": "FDA가 이탈리아 위탁 멸균업체 Steris S.p.A.에 Form 483(관찰사항 1건)을 발행했다. 품질경영시스템 공정 관리에 위험 기반 접근을 제대로 적용하지 않았다고 지적했다.",
    "key_facts": [
-    "관찰 1: 공정 고장모드영향분석이 선량계 컨디셔닝을 위해요소로 식별했으나 제품 조사 후 컨디셔닝까지의 대기 시간 위험을 평가하지 않아 대기 시간 기준을 정하지 않음"
+    "관찰 1: 공정 고장모드영향분석이 선량계 컨디셔닝을 위해요소로 식별했으나 제품 조사 후 컨디셔닝까지의 대기 시간 위험을 평가하지 않아 적절히 규정된 대기 시간을 수립하지 않음"
    ],
    "implication": "선량계 사용 작업지침은 조사 종료부터 배양 시작까지 시간을 교정 때와 비슷하게 하도록 정했으나 교정 검증 보고서에는 대기 시간이 기록되지 않았다(관찰 1). 선량계 공급업체 기술보고서는 대기 시간을 측정 편차에 기여하는 요인으로 들고 전자선 시설의 최적 대기 시간을 조사 후 최소 1시간으로 적었다(관찰 1). 위험평가는 선량계 제조 결함 위험과 현행 선량계 입고 검사의 효과도 평가하지 않았다(관찰 1).",
    "checks": [
@@ -18,7 +18,7 @@
    ],
    "en": {
     "title_issue": "Dosimeter wait-time risk not assessed",
-    "hook_line": "Post-irradiation dosimeter wait-time not risk-assessed, so no specified wait-time",
+    "hook_line": "Dosimeter wait-time risk not assessed, so no adequately specified wait-time established",
     "summary": "FDA issued a Form 483 with 1 observation to Steris S.p.A., a contract sterilizer in Italy, finding that a risk-based approach to process control in the quality management system was not adequately applied.",
     "key_facts": [
      "Observation 1: the pFMEA identifies dosimeter conditioning as a hazard but does not assess the risk of the wait-time between irradiation and post-irradiation conditioning, so no adequately specified wait-time has been established"
@@ -98,8 +98,8 @@
    }
   },
   "fda483-196445": {
-   "title_issue": "기준일탈 조사 없이 재시험",
-   "hook_line": "역가 기준일탈을 조사 없이 계획된 일탈로 돌리고 재시험 합격",
+   "title_issue": "기준일탈 철저 조사 기록 없이 재시험",
+   "hook_line": "역가 기준일탈을 계획된 일탈로 처리하고 고객 지시로 재시험 합격",
    "summary": "FDA가 위탁시험기관 Haematologic Technologies, LLC에 Form 483(관찰사항 1건)을 발행했다. 기준일탈(OOS) 결과를 철저히 검토하지 않았다고 지적했다.",
    "key_facts": [
     "관찰 1: 고객 역가 규격 450-575 IU/vial에 못 미친 기준일탈 결과를 품질보증 부서가 계획된 일탈로 처리해 시험을 중단했고, 고객 지시로 재시험해 합격함"
@@ -110,8 +110,8 @@
     "고객이 재시험을 지시해도 자체 기준일탈 절차를 따르는가? (관찰 1)"
    ],
    "en": {
-    "title_issue": "OOS retested without investigation",
-    "hook_line": "Potency failure made a planned deviation and retested to pass without investigation",
+    "title_issue": "OOS retest, no thorough investigation record",
+    "hook_line": "Potency failure made a planned deviation, then retested to pass on client instruction",
     "summary": "FDA issued a Form 483 with 1 observation to Haematologic Technologies, LLC, a contract testing laboratory, finding failure to thoroughly review OOS results.",
     "key_facts": [
      "Observation 1: potency results below the client's specification of 450-575 IU/vial were made a planned deviation by Quality Assurance and testing was discontinued, then retested on the client's instruction and passed"
@@ -125,17 +125,17 @@
   },
   "fda483-196447": {
    "title_issue": "작업자 장갑 소독 미준수",
-   "summary": "FDA가 Adimmune Corporation에 승인 전 실사 뒤 Form 483(관찰사항 1건)을 발행했다. 직원이 절차대로 장갑을 정기 소독하지 않았다고 지적했다.",
+   "summary": "FDA가 Adimmune Corporation에 승인 전 실사 뒤 Form 483을 발행했다. 직원이 절차대로 장갑을 정기 소독하지 않은 점 등을 지적했다.",
    "key_facts": [
-    "관찰 1: 주 제조 작업자가 절차대로 장갑을 정기적으로 소독하지 않음"
+    "관찰 4: 주 제조 작업자가 절차대로 장갑을 정기적으로 소독하지 않음"
    ],
    "implication": "",
    "checks": [],
    "en": {
     "title_issue": "Staff not sanitizing gloves per procedure",
-    "summary": "FDA issued a Form 483 with 1 observation to Adimmune Corporation after a pre-approval inspection, finding that staff were not regularly sanitizing their gloves as per procedure.",
+    "summary": "FDA issued a Form 483 to Adimmune Corporation after a pre-approval inspection, citing among others that staff were not regularly sanitizing their gloves as per procedure.",
     "key_facts": [
-     "Observation 1: main manufacturing staff were not regularly sanitizing their gloves as per procedure"
+     "Observation 4: main manufacturing staff were not regularly sanitizing their gloves as per procedure"
     ],
     "implication": "",
     "checks": []
@@ -221,7 +221,7 @@
   },
   "fda483-196455": {
    "title_issue": "중간체 최대 보관 시간 미검증",
-   "summary": "FDA가 Novavax CZ 제조소에 Form 483(관찰사항 3건)을 발행했다. 기준물질 사용 근거, 중간체 보관 시간 밸리데이션, 소독제 효력 시험을 지적했다.",
+   "summary": "FDA가 Novavax CZ 제조소에 Form 483을 발행했다. 기준물질 사용 근거, 중간체 보관 시간 밸리데이션, 소독제 효력 시험 등을 지적했다.",
    "key_facts": [
     "관찰 2: 기준물질 사용과 시험법의 배치 판정을 뒷받침할 데이터가 부족함",
     "관찰 3: 중간체의 제안 최대 보관 시간을 생산 규모 제조 공정에서 밸리데이션하지 않음",
@@ -234,7 +234,7 @@
    ],
    "en": {
     "title_issue": "Intermediate hold times not validated",
-    "summary": "FDA issued a Form 483 with 3 observations to Novavax CZ, citing data supporting the use of a reference, validation of intermediate hold times and disinfectant efficacy studies.",
+    "summary": "FDA issued a Form 483 to Novavax CZ, citing among others data supporting the use of a reference, validation of intermediate hold times and disinfectant efficacy studies.",
     "key_facts": [
      "Observation 2: there is a lack of data to support the use of a reference or the determination of batches by the method",
      "Observation 3: proposed maximum holding times for intermediates have not been validated for the manufacturing process at production scale",

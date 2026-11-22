@@ -16,11 +16,11 @@
    "checks": [],
    "en": {
     "title_issue": "Recall for sulfur dioxide failure",
-    "hook_line": "One herbal product recalled for failing the sulfur dioxide test (mandatory order)",
-    "summary": "One herbal product was recalled for failing the sulfur dioxide test (mandatory recall order).",
+    "hook_line": "One product recalled for failing the sulfur dioxide test (mandatory order)",
+    "summary": "One product was recalled for failing the sulfur dioxide test (mandatory recall order).",
     "key_facts": [
      "Reason: sulfur dioxide test failure",
-     "Product and scope: one herbal product",
+     "Product and scope: one product",
      "Type: mandatory recall order"
     ],
     "implication": "",
@@ -64,11 +64,11 @@
    "checks": [],
    "en": {
     "title_issue": "Recall for heavy metal (cadmium)",
-    "hook_line": "One herbal product recalled for heavy metal (cadmium) (mandatory order)",
-    "summary": "One herbal product was recalled for heavy metal (cadmium) (mandatory recall order).",
+    "hook_line": "One product recalled for heavy metal (cadmium) (mandatory order)",
+    "summary": "One product was recalled for heavy metal (cadmium) (mandatory recall order).",
     "key_facts": [
      "Reason: heavy metal (cadmium)",
-     "Product and scope: one herbal product",
+     "Product and scope: one product",
      "Type: mandatory recall order"
     ],
     "implication": "",
@@ -135,14 +135,14 @@
    }
   },
   "0a7b0d339de9": {
-   "title_issue": "기준일탈 결과 지침 3.0판 발행",
-   "summary": "ECA 분석 품질관리 그룹이 2026년 11월 실험실 데이터 관리 지침 기준일탈(OOS) 결과 3.0판을 발행했다(ECA 보도).",
+   "title_issue": "기준일탈 지침 3.0판 발행",
+   "summary": "ECA 분석 품질관리 그룹이 2026년 11월 실험실 데이터 관리 지침 기준일탈(OOS) 3.0판을 발행했다(ECA 보도).",
    "key_facts": [],
    "implication": "",
    "checks": [],
    "en": {
-    "title_issue": "OOS results guidance version 3.0 published",
-    "summary": "The ECA Analytical Quality Control Group published version 3.0 of its laboratory data management guidance on out of specification (OOS) results in November 2026 (ECA report).",
+    "title_issue": "OOS guidance version 3.0 published",
+    "summary": "The ECA Analytical Quality Control Group published version 3.0 of its laboratory data management guidance on out of specification (OOS) in November 2026 (ECA report).",
     "key_facts": [],
     "implication": "",
     "checks": []
@@ -392,7 +392,7 @@
    "en": {
     "title_issue": "Late risk management reports",
     "hook_line": "Risk management results and periodic safety reports filed late, 1-month sales suspension",
-    "summary": "MFDS issued a warning and a 1-month sales suspension for the products to a manufacturer that submitted risk management results and periodic safety update reports for three tablet products after the reporting period.",
+    "summary": "MFDS issued a warning and a 1-month sales suspension for the products to a company that submitted risk management results and periodic safety update reports for three tablet products after the reporting period.",
     "key_facts": [
      "Violation: risk management results under the risk management plan and periodic safety update reports submitted after the reporting period",
      "Sanction: warning (2026-11-23) and 1-month sales suspension for the products (2026-11-23 to 2026-12-22), covering three tablet products"

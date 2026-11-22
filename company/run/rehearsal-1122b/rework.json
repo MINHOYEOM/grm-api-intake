@@ -1,1 +1,87 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{
+ "status": "완료",
+ "round": 1,
+ "worker": "델타-2",
+ "fixed": [
+  {
+   "id": "fda483-196441",
+   "shard": "E",
+   "changed": [
+    "key_facts",
+    "hook_line",
+    "en.hook_line"
+   ]
+  },
+  {
+   "id": "fda483-196445",
+   "shard": "E",
+   "changed": [
+    "title_issue",
+    "hook_line",
+    "en.title_issue",
+    "en.hook_line"
+   ]
+  },
+  {
+   "id": "fda483-196447",
+   "shard": "E",
+   "changed": [
+    "summary",
+    "key_facts",
+    "en.summary",
+    "en.key_facts"
+   ]
+  },
+  {
+   "id": "fda483-196455",
+   "shard": "E",
+   "changed": [
+    "summary",
+    "en.summary"
+   ]
+  },
+  {
+   "id": "recall-9cf757ea745d",
+   "shard": "G",
+   "changed": [
+    "en.summary",
+    "en.hook_line",
+    "en.key_facts"
+   ]
+  },
+  {
+   "id": "recall-bc51804c85aa",
+   "shard": "G",
+   "changed": [
+    "en.summary",
+    "en.hook_line",
+    "en.key_facts"
+   ]
+  },
+  {
+   "id": "0a7b0d339de9",
+   "shard": "G",
+   "changed": [
+    "title_issue",
+    "summary",
+    "en.title_issue",
+    "en.summary"
+   ]
+  },
+  {
+   "id": "admin-2026008238",
+   "shard": "G",
+   "changed": [
+    "en.summary"
+   ]
+  }
+ ],
+ "unfixed": [],
+ "이의": [
+  "fda483-196447 deep.observations_ko — 고치지 않음(deep.F 그대로). 관찰 번호는 코드 스캐폴드 deterministic_detail 이 원문 OCR '|)'(=1) 뒤의 장갑 소독 관찰 하나만 '1'로 뽑은 것이고 observations_ko 는 그 번호를 키로 병합된다. 국문 번호만 '4'로 바꾸면 병합이 끊겨 국문 없는 483 관찰이 되고 배포 게이트(render.validate_483_observations)가 호 전체를 막는다(조립 시험: 병합 0건 확인). 관찰 추출 코드 수정 사안 — 앞면 key_facts 는 원문대로 '관찰 4', 요약 건수는 세어 만든 숫자 금지(R2)라 뺐다."
+ ],
+ "precheck": {
+  "delta.E": "exit 0",
+  "delta.G": "exit 0"
+ }
+}

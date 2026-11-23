@@ -1377,6 +1377,45 @@ def normalize_firm_name(name: str) -> str:
     return text
 
 
+# [개인 사업자 2026-11-23] 업체명 칸이 **사람 이름**인 경우(483 수신 업체가 개인 농장·개인 사업자 —
+# 11-23호 'Kenneth F Tesch'·'Matthew A. Leo'). 2026-11-21 대표 결정(공직자·기관 대표 공식 발표 외 개인 실명 금지)에 따라
+# 그 자리는 '개인 사업자' 로 쓴다. 표기는 여기 한 곳(`web/render.py` 가 영어 트리에서 같은 표로 바꾼다 — #1876).
+# 판정은 **확실한 꼴만**: 이름 + 가운데 이니셜 + 성(`Kenneth F Tesch`·`Matthew A. Leo`·`Frederick J. Raal`), 법인·업종 낱말 없음.
+# 두 낱말 이름('Novo Nordisk'·'Sanofi Pasteur'·'Excel Vision' — 브리프 483 업체 449곳 실측 8곳이 전부 법인)은 코드가 못 가른다.
+REDACTED_PERSON_BY_LANG = {"ko": "개인 사업자", "en": "Individual business"}
+_PERSON_NAME_RE = re.compile(
+    r"^[A-Z][a-z'\-]+(?:\s+[A-Z][a-z'\-]+)?\s+[A-Z]\.?\s+[A-Z][a-zA-Z'\-]+(?:,?\s+(?:Jr|Sr|II|III|IV)\.?)?$")
+_PERSON_TWO_RE = re.compile(r"^[A-Z][a-z'\-]+\s+[A-Z][a-zA-Z'\-]+$")
+_ORG_WORD_RE = re.compile(
+    r"\b(inc|llc|l\.l\.c|ltd|limited|co|corp|corporation|company|gmbh|ag|sa|spa|srl|bv|nv|plc|pvt|private|pte|kk|oy|ab|"
+    r"lp|llp|dba|farms?|ranch|dairy|labs?|laborator\w*|pharma\w*|health\w*|medical|clinic|hospital|cent(?:er|re)|group|"
+    r"industr\w*|international|enterprises?|services?|scien\w*|technolog\w*|solutions|products|holdings|partners|"
+    r"associates|trust|universit\w*|institute|foundation|research|bio\w*|chem\w*|manufactur\w*|packag\w*|distribut\w*|"
+    r"supply|cooperative|coop|feeds?|mill|livestock|cattle|calves|veal|poultry|sales|store|market|the|and|of)\b",
+    re.IGNORECASE)
+_INDIVIDUAL_ESTABLISHMENT_RE = re.compile(
+    r"grower|ranch|farm|dairy|feedlot|producer|calf|veal|clinical investigator|individual", re.IGNORECASE)
+
+
+def person_firm_name(name: str) -> bool:
+    """업체명 칸 값이 **확실히** 사람 이름 꼴이면 True(순수). '개인 사업자' 로 가릴 대상이다."""
+    text = _FIRM_WHITESPACE_RE.sub(" ", _text(name)).strip()
+    return bool(text) and not _ORG_WORD_RE.search(text) and bool(_PERSON_NAME_RE.match(text))
+
+
+def person_firm_name_suspect(name: str, establishment_type: str = "") -> bool:
+    """확실하진 않지만 사람 이름일 수 있는 업체명(순수 — 경고용): 두 낱말 이름 + 개인 시설 유형(농장·목장·임상시험자 등)."""
+    text = _FIRM_WHITESPACE_RE.sub(" ", _text(name)).strip()
+    if not text or person_firm_name(text) or _ORG_WORD_RE.search(text):
+        return False
+    return bool(_PERSON_TWO_RE.match(text)) and bool(_INDIVIDUAL_ESTABLISHMENT_RE.search(_text(establishment_type)))
+
+
+def redact_person_firm(name: str, lang: str = "ko") -> str:
+    """업체명 칸 값 → 사람 이름이면 '개인 사업자'(그 언어 표기), 아니면 그대로(순수)."""
+    return REDACTED_PERSON_BY_LANG.get(lang, REDACTED_PERSON_BY_LANG["ko"]) if person_firm_name(name) else name
+
+
 _FIRM_PAREN_RE = re.compile(r"\([^)]*\)")
 _FIRM_AND_RE = re.compile(r"\s+and\s+")
 _FIRM_AMP_RE = re.compile(r"\s*&\s*")

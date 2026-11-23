@@ -847,13 +847,16 @@ class PrivateName1121Test(unittest.TestCase):
         self.assertTrue(any(w.startswith("개인 실명 의심 who-1.deep.ncr_ko.s9_ko: Achin, Gupta") for w in warns), warns)
 
     def test_sole_proprietor_firm_name_not_flagged(self):
-        # 개인 사업체는 업체명 자체가 사람 이름 — 업체명으로서는 싣는다(리허설 1121 fda483-196329). 원문 호칭 이름도 업체명 낱말이면 뺀다.
+        # 이 경고(수신인·호칭 이름)는 업체명 낱말을 뺀다 — 업체명이 사람 이름인 경우는 **차단** 규칙
+        # (`guess_check.delta_source_lines` `개인 실명 …`, 2026-11-23 — 11-23 실발행 196329·196343)이 따로 막는다.
         rows = {"fda483-2": {"web_card_id": "fda483-2", "kind": "fda-483", "firm": "Kenneth F Tesch",
                              "headline": "[FDA 483] Kenneth F Tesch",
                              "deep_analysis_input": {"body_full": "Dear Mr. Tesch: OBSERVATION 1 residue above tolerance."}}}
         delta = {"cards": {"fda483-2": _card(summary="FDA가 생산자 Kenneth F Tesch에 483을 발행했다.")}}
         self.assertEqual(precheck.private_name_warn_lines(delta, None, rows, {}), [])
         self.assertEqual(precheck.source_person_names("INDIVIDUAL TO WHOM REPORT ISSUED\nFIRM NAME\nSTREET ADDRESS"), set())
+        block, _ = precheck.guess_check.delta_source_lines(delta, rows, {})
+        self.assertTrue(block and block[0].startswith("개인 실명 fda483-2.summary"), block)
 
 
 if __name__ == "__main__":

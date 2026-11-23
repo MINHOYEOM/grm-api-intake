@@ -91,7 +91,7 @@ _BROAD_FAILURE_RATIO = 0.5
 KNOWN_RAW_KEYS = frozenset({
     "firm", "posted_date", "letter_date", "issuing_office", "subject", "url",
     "office_gate_verdict", "wl_body_excerpt", "wl_body_full", "wl_violations",
-    "wl_body_status",
+    "wl_body_status", "wl_violations_status",
 })
 # 다시 읽어도 결과가 같을 사유. 이 표식이 붙은 행은 후보가 아니다(재시도가 끊긴다).
 DEFINITIVE_STATUSES = ("no-anchor",)

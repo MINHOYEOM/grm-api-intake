@@ -560,6 +560,7 @@ grm-api-intake/
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
 ├─ backfill_483_body_full.py      # 전문(fda483_body_full) 없이 굳은 최근 483 소급 — Notion 원문 → 없으면 PDF 재독(일일 규칙) → raw_signal_apply_version(repair, 전문 키 + 실사관 빈칸이면 공통 함수로 채움)·dry 기본
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
+├─ backfill_wl_violations_reextract.py # 저장 본문(wl_body_full)만으로 경고서한 위반항목 재추출(외부 요청 0) — 수집과 같은 build_wl_item→extract_wl_violations_detail(F1·F1b·F2·F3·F3b·F4)·글자 그대로 검사·옛 목록 축소 금지·raw 두 칸(wl_violations·wl_violations_status)만 raw_signal_apply_version(reextract)·dry 기본·`grm-wl-violations-reextract.yml`
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
 ├─ backfill_eu_ncr_additional_plan.py # EU NCR ncr_additional(후속 설명) 소급 계획(같은 계획 스키마·기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
 ├─ fda483_notion_raw_sync.py       # 미소비(New) Notion 483(`--source wl` = WL) 행 중 관찰(WL=전문) 없는 raw 를 Supabase 의 raw 로 교체 · 483 범위 밖 확정 행은 Skipped 마감(주간 브리프 입력) — 회수 예약 실행의 마지막 단계

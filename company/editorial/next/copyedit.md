@@ -75,7 +75,7 @@
    묶음을 서브 에이전트로 나눠도 된다(예: 40장씩 4개 — 아래 2-2 표를 조각마다 붙인다). 조각마다 `_scaffold/copyedit.part<K>.json`(`{"cards": [...]}`)에 쓰고
    `python company/editorial/copyedit_evidence.py merge company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.part*.json` 로 합친다(델타 순서 · `counts` 다시 셈).
    **`완료` 를 쓰기 전에** `python company/editorial/copyedit_evidence.py check company/run/{run_date_kst} _handoff/handoff_$D.json` 이 exit 0 이어야 한다.
-   exit 1 이면 줄마다 나온 카드를 마저 읽고 근거를 채워 다시 돌린다 — 표본만 읽고 `완료` 를 쓰지 않는다. 09:20 까지 0 으로 못 만들면 `보류`(백업이 발행한다).
+   exit 1 이면 줄마다 나온 카드를 마저 읽고 근거를 채워 다시 돌린다 — 표본만 읽고 `완료` 를 쓰지 않는다. 09:20 까지 0 으로 못 만들면 — 1차는 `보류`, 2차는 3-3 `defer` 가 근거 미비 카드만 미루고 마감한다.
    이 검사는 근거를 "적었는가" 를 본다 — 판정의 기준은 그대로 2-2 표다(근거가 있어도 정확성 오류가 있으면 `reject`).
 2. **의미 점검.** 카드마다 v16 [발행 전 산문 자가 점검] 1~10번과 [핵심 원칙] 2-1(원문 부재 주장 금지)을 O/X 로 판정한다. 심층 칸이 있는 카드는 위 '3-1. 문체'도 판정한다.
    X 는 근거(슬롯 이름 + 코드 `facts`/`prose_input` 의 어느 값과 어긋나는지)를 적는다.
@@ -158,7 +158,7 @@
    **예약작업 프롬프트에 `역할: 교열(2차)` 가 있는 실행(09:12 슬롯)은 2차만 한다** — `copyedit.json` 이 아직 없으면 1차 교열(08:45)이 아직 샤드를 기다리는 중이다:
    아무것도 쓰지 않고 종료한다(1차 판정을 대신하지 않는다 — 두 교열이 따로 판정하거나 1차가 `CONSUMED` 를 찍은 뒤 `copyedit.json` 을 덮어쓰면 아무도 발행하지 않는다).
    `재작업` 이 아니면(`완료`·`보류`·`실패`) 역시 아무것도 쓰지 않고 종료한다.
-   `rework.json` 이 `완료` 가 될 때까지 09:20 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 아니면 `copyedit.json` 을 `보류` 로 고쳐 push 하고 끝낸다. `완료` 면:
+   `rework.json` 이 `완료` 가 될 때까지 09:20 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 아니면 보류하지 않는다 — 재작업 카드만 미루고 1차 판정 그대로 마감한다(아래 3-3 `defer --rework-unfinished` → 4번). `완료` 면:
    ```
    mkdir -p _scaffold && cp company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.r1.json && cp company/run/{run_date_kst}/delta.json _scaffold/delta.r1.json
    cp company/run/{run_date_kst}/deep_delta.json _scaffold/deep_delta.r1.json
@@ -170,10 +170,27 @@
    **반려됐던 카드만** 2·2-1번 전 항목으로 다시 판정한다(나머지 카드는 글자가 그대로이므로 1차 판정 `pass` 를 그대로 옮긴다).
    반려 카드가 10장을 넘으면 1-1 처럼 서브 에이전트 여러 개(조각마다 2-2 표를 글자 그대로)로 나눠 동시에 판정한다 — 09:20 전에 마감까지 가야 한다.
    다시 판정한 뒤에도 2-4 `deep-auto` 와 2-5 사전 점검을 돌린다(2차에 심층에서만 걸린 카드도 심층 삭제로 통과 · 지울 수 있는 칸만 걸린 카드는 칸 삭제로 통과 · 1차 칸 삭제는 `deep-auto` 가 잇는다 · 거부될 칸 삭제는 `reject` — 2차라 `보류`).
-   `보류` 를 쓰기 전에 `deep-auto` 의 마지막 줄 `남은 반려 N장` 이 0 이 아닌지 다시 본다 — 1차가 칸 삭제로 정한 칸을 2차가 `fails` 로 올려 `보류` 로 닫으면 안 된다.
-   결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남으면 `보류`** — 더 되돌리지 않는다(백업이 발행한다).
+   `deep-auto` 의 마지막 줄 `남은 반려 N장` 을 본다 — 1차가 칸 삭제로 정한 칸을 2차가 `fails` 로 올려도 코드가 칸 삭제로 통과시킨다.
+   2차에 코드 검사(1번)에 걸린 카드는 그 카드에 `verdict: "reject"` · `fails` `{"item": "코드 검사", "slot": "<슬롯>", "evidence": "<그 줄>"}` 로 적는다(재작업은 더 없다 — 3-3 이 그 카드를 미룬다).
+   결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남아도 `보류` 하지 않는다 — 3-3 으로 그 카드만 미루고 나머지로 마감한다(2026-11-23 대표 방침: 백업 v16 은 꺼졌다 · 편집팀이 끝까지 마감).**
    2차에 다시 판정한 카드는 `checked` 도 새 문장으로 다시 적는다(옛 근거의 `claim` 이 고친 문장에 없으면 검사가 걸린다). 옮긴 `pass` 카드는 1차 줄(근거 포함)을 그대로 옮긴다.
    2차도 `완료` 전에 1-1 의 `copyedit_evidence.py check` exit 0 이어야 한다.
+   **2차 재작업 카드는 `checked` 를 새로 적는다** — 고친 문장을 원문과 다시 맞추고, 1차 반려 칸마다 근거 하나씩(1차 근거를 옮겨 적지 않는다).
+   비우면 `copyedit_evidence.py check` 가 그 카드를 실패로 낸다(11-23 실전: 재작업 8장의 `checked` 가 비어 수동 마감까지 막혔다). 반려 안 된 카드의 근거는 `deep-auto` 가 1차 줄에서 잇는다.
+3-3. **카드 단위 보류 — 2차에도 못 고친 카드만 다음 주로 미루고 호는 마감한다(2026-11-23 대표 방침: 보류는 백업으로 넘기는 출구가 아니다).**
+   2차가 판정·`deep-auto`·2-5 사전 점검·근거 채우기를 다 한 뒤(늦어도 09:20), 4번 마감 **전에** 돌린다(델타는 칸 삭제 전 것 · `apply` 전):
+   ```
+   python company/editorial/blank_slots.py defer company/run/{run_date_kst} _handoff/handoff_$D.json
+   ```
+   (handoff 경로는 1-1 `copyedit_evidence.py check` 에 준 것과 같다.) 코드가 `deep-auto` 를 같은 함수로 한 번 더 돌린 뒤(칸 삭제로 풀리는 카드는 미루지 않는다),
+   남은 `reject` 카드 · 칸 삭제가 거부될 카드 · 근거 미비 카드(1-1 과 같은 함수)를 델타·심층에서 빼고 `delta.deferred` 에 올린다 — 그 행은 다음 주 handoff 에 다시 들어온다.
+   그 카드 업체가 나오는 한 줄 요약(`tldr`·`tldr_en`)은 같은 위치에서 국·영 함께 빠진다. 판정 줄은 `copyedit.json` 의 `deferred_cards`(사유 포함)로 옮겨진다.
+   exit 0 이면 곧바로 4번 마감(칸 삭제 반영·코드 검사 재실행 포함)으로 간다 — 미룬 카드는 `copyedit.md` 마감 보고에 장수와 사유를 적는다.
+   exit 1(미룰 카드가 25장 초과 · 카드로 가를 수 없는 문제 · 요약이 전부 미룰 카드)일 때만 `보류` 다 — 사유를 그대로 적고 비서실에 알린다(사람이 본다).
+   재작업이 09:20 까지 `완료` 가 아니면(`rework.json`) `merge_parts.py` 를 돌리지 않고 1차 판정 그대로에서
+   `python company/editorial/blank_slots.py defer company/run/{run_date_kst} _handoff/handoff_$D.json --rework-unfinished` 로 재작업 카드를 미루고 마감한다.
+   왜 재작업 2회가 아닌가: 리허설 1121c·1122b·11-23 의 2차 반려는 같은 부류가 되풀이됐고, 한 번 더 되돌리면 기자·교열이 10~20분씩 더 들어 마감 시각을 넘긴다.
+   미루기는 코드가 바로 하고(새 문장 0), 그 카드는 다음 주에 처음부터 다시 쓰인다 — 틀린 카드를 싣지도, 한 장 때문에 호 전체를 멈추지도 않는다.
    **2차가 코드 검사 exit 0 · reject 0 이면 곧바로 아래 4번 마감을 1번(`scaffold.json` 복사 → `delta.json`·`deep_delta.json`·`scaffold.json`·`copyedit.json` push)부터 한다.**
    `copyedit.json` 에 `완료` 만 적고 끝내면 브릿지가 가져갈 반납이 없어 백업이 발행한다(리허설 1120d — 2차 통과 뒤 `scaffold.json` 이 없었다).
 4. **마감 — 코드 검사 exit 0 이고 reject 0 일 때만.** 전수 대조(1-1 `copyedit_evidence.py check`) exit 0 도 조건이다 — 근거가 빠진 카드가 있으면 reject 0 은 0 이 아니다. 하나라도 아니면 Notion 에 아무것도 쓰지 않고 끝낸다

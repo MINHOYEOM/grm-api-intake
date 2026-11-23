@@ -33,6 +33,8 @@
     심층 삭제 카드는 `deep.<키>` 근거 요구도 없다(심층이 통째로 빠질 수 있다).
   - 원문이 정말 없는 카드(handoff·스캐폴드 어디에도 본문이 없다)는 `checked` 대신 `"source_absent": "<사유>"` — 코드가 원문이 있다고 보면 실패다.
   - `reject` 카드는 `fails` 가 비어 있으면 안 된다.
+  - 2차 판정이면(실행 폴더·`_scaffold/` 의 `copyedit.r1.json` 이 `재작업`) 재작업 카드는 `checked` 가 비면 안 되고, 1차 반려 칸마다
+    고친 문장의 근거가 있어야 한다(11-23 실전: 2차가 재작업 8장의 근거를 비워 수동 마감까지 막혔다 — `rework_must_slots`).
   - `pass` 카드의 칸 삭제·심층 삭제가 `blank_slots.py apply` 에서 거부되면 실패다(`blank_slots.py check` 와 같은 판정 · 리허설 1121c).
     실행 폴더에 `slot_removals.json` 이 있으면(이미 반영한 델타) 이 항목은 보지 않는다.
 
@@ -175,9 +177,45 @@ def _covered(slot, blanked):
     return any(b and (b == slot or slot.startswith(b) or b.startswith(slot)) for b in blanked)
 
 
-def card_problems(cid, entry, card, deep_entry, row, sc_card):
-    """한 카드의 근거 문제 — 문자열 목록(빈 목록 = 통과)."""
+def rework_must_slots(copyedit, first):
+    """2차 판정이면 {재작업 카드 id: [1차 반려 칸]} — 그 칸은 2차가 고친 문장으로 새 근거를 적어야 한다(11-23 실전:
+    2차가 재작업 8장의 `checked` 를 비워 냈다). 1차 기록(`copyedit.r1.json`)이 `재작업` 이 아니면 빈 dict."""
+    if not (isinstance(first, dict) and first.get("status") == "재작업"):
+        return {}
+    rework = {str(c) for c in ((first.get("rework") or {}).get("cards") or [])}
+    out = {}
+    for c in first.get("cards") or []:
+        cid = str(c.get("web_card_id")) if isinstance(c, dict) else ""
+        if cid in rework:
+            out[cid] = [str(f.get("slot") or "").strip() for f in c.get("fails") or []
+                        if isinstance(f, dict) and str(f.get("slot") or "").strip()]
+    for cid in rework - set(out):
+        out[cid] = []
+    return out
+
+
+def card_problems(cid, entry, card, deep_entry, row, sc_card, must_slots=None):
+    """한 카드의 근거 문제 — 문자열 목록(빈 목록 = 통과).
+
+    `must_slots`(목록)를 주면 2차의 재작업 카드다 — `checked` 가 비면 안 되고(1차 근거를 옮겨 적는 것으로 채우지 않는다),
+    1차 반려 칸마다 지금 카드 문장에 있는 근거가 하나씩 있어야 한다(그 칸을 칸 삭제·심층 삭제하면 요구하지 않는다)."""
     probs = []
+    if must_slots is not None and not entry.get("source_absent"):   # 원문 없는 카드는 아래 source_absent 판정이 본다
+        checked_now = entry.get("checked") if isinstance(entry.get("checked"), list) else []
+        if not checked_now:
+            probs.append("2차 재작업 카드인데 checked 가 비었다 — 고친 문장을 원문과 다시 맞춰 근거를 적는다(재작업 카드는 1차 근거를 옮기지 않는다)")
+        else:
+            ctext_now = card_text(card, deep_entry)
+            blanked_now = _blanked_slots(entry)
+            have = {slot_base(c.get("slot")) for c in checked_now
+                    if isinstance(c, dict) and norm(str(c.get("claim") or "")) in ctext_now}
+            for s in must_slots:
+                # 영문 게이트·렌더 게이트(`en`)처럼 사실 칸이 아닌 반려는 코드 검사가 다시 본다.
+                if slot_base(s) not in set(FRONT_SLOTS) | {"hook_line", "deep"}:
+                    continue
+                if _covered(s, blanked_now) or slot_base(s) in have:
+                    continue
+                probs.append(f"2차 재작업 카드 — 1차 반려 칸 {s} 의 고친 문장 근거가 없다")
     verdict = entry.get("verdict")
     if verdict not in ("pass", "reject"):
         probs.append(f"verdict={verdict!r} (pass·reject 만)")
@@ -261,18 +299,28 @@ def blank_applied(folder):
     return os.path.isfile(os.path.join(folder, "slot_removals.json"))
 
 
-def check(delta, copyedit, deep=None, handoff=None, scaffold=None, blank_check=False):
+def check(delta, copyedit, deep=None, handoff=None, scaffold=None, blank_check=False, first=None):
     """(문제 줄 목록, 요약 dict). 문제 줄이 비어 있으면 통과.
 
     `blank_check=True` 면 `pass` 카드의 칸 삭제·심층 삭제가 `blank_slots.py apply` 에서 거부될지도 본다(리허설 1121c —
-    1차 재작업 뒤 2차 마감에서야 거부가 드러나 `보류`). 델타가 칸 삭제 **전** 것일 때만 켠다(호출자가 `blank_applied` 로 가른다)."""
+    1차 재작업 뒤 2차 마감에서야 거부가 드러나 `보류`). 델타가 칸 삭제 **전** 것일 때만 켠다(호출자가 `blank_applied` 로 가른다).
+    `first`(1차 `copyedit.r1.json`)를 주면 2차다 — 재작업 카드는 새 근거가 있어야 한다(`rework_must_slots`)."""
+    lines, stats, _per = card_issues(delta, copyedit, deep, handoff, scaffold, blank_check, first)
+    return lines, stats
+
+
+def card_issues(delta, copyedit, deep=None, handoff=None, scaffold=None, blank_check=False, first=None):
+    """(문제 줄 목록, 요약 dict, {카드 id: [문제]}) — `check` 와 같은 판정에 카드별 문제를 더한다.
+    카드 id 가 없는 문제(델타·판정 파일이 비었다)는 줄 목록에만 있다. 판정 줄이 없는 카드는 `["판정 줄 없음"]`."""
     lines = []
     cards = (delta or {}).get("cards") if isinstance(delta, dict) else None
     if not isinstance(cards, dict) or not cards:
-        return ["delta.json 에 카드가 없다"], {"cards": 0, "ok": 0, "bad": 0}
+        return ["delta.json 에 카드가 없다"], {"cards": 0, "ok": 0, "bad": 0}, {}
     entries = (copyedit or {}).get("cards") if isinstance(copyedit, dict) else None
     if not isinstance(entries, list):
-        return ["copyedit.json 에 cards 목록이 없다"], {"cards": len(cards), "ok": 0, "bad": len(cards)}
+        return ["copyedit.json 에 cards 목록이 없다"], {"cards": len(cards), "ok": 0, "bad": len(cards)}, {}
+    must = rework_must_slots(copyedit, first)
+    per = {}
     by_id, dup = {}, []
     for e in entries:
         cid = e.get("web_card_id") if isinstance(e, dict) else None
@@ -293,21 +341,34 @@ def check(delta, copyedit, deep=None, handoff=None, scaffold=None, blank_check=F
     for cid, card in cards.items():
         if cid not in by_id:
             bad += 1
+            per[cid] = ["판정 줄 없음"]
             continue
-        probs = card_problems(cid, by_id[cid], card, dps.get(cid), rows.get(cid), scs.get(cid))
+        probs = card_problems(cid, by_id[cid], card, dps.get(cid), rows.get(cid), scs.get(cid), must.get(cid))
         probs += [f"칸 삭제를 반영할 수 없다(blank_slots.py check) — reject 로 바꾼다(비울 수 없는 칸 — 기자가 고친다): {p}"
                   for p in refused.get(cid, [])]
         if probs:
             bad += 1
+            per[cid] = probs
             lines.append(f"{cid}: " + " · ".join(probs))
         else:
             ok += 1
-    return lines, {"cards": len(cards), "ok": ok, "bad": bad, "missing": len(missing), "extra": len(extra)}
+    return lines, {"cards": len(cards), "ok": ok, "bad": bad, "missing": len(missing), "extra": len(extra)}, per
 
 
 def summary_line(stats):
     return (f"교열 전수 대조: 카드 {stats['cards']}장 중 근거 충족 {stats['ok']}장 · 미충족 {stats['bad']}장"
             f" (판정 줄 없음 {stats.get('missing', 0)} · 델타 밖 {stats.get('extra', 0)})")
+
+
+def load_first(folder, copyedit):
+    """1차 교열 기록 — 실행 폴더 `copyedit.r1.json`, 없으면 `_scaffold/copyedit.r1.json`(3-2 가 2차 시작 때 남긴다).
+    `재작업` 기록이고 카드가 지금 판정과 같을 때만(다른 호의 남은 사본을 쓰지 않는다). 지금 판정이 1차 기록 그대로면 None(아직 1차)."""
+    ids = lambda ce: {str(c.get("web_card_id")) for c in (ce or {}).get("cards") or [] if isinstance(c, dict)}
+    for p in (os.path.join(folder, "copyedit.r1.json"), os.path.join("_scaffold", "copyedit.r1.json")):
+        first = _load_opt(p)
+        if isinstance(first, dict) and first.get("status") == "재작업" and ids(first) and ids(first) == ids(copyedit):
+            return None if first == copyedit else first
+    return None
 
 
 def check_folder(folder, handoff_path, copyedit_path=None, scaffold_path=None):
@@ -317,7 +378,8 @@ def check_folder(folder, handoff_path, copyedit_path=None, scaffold_path=None):
     deep = _load_opt(os.path.join(folder, "deep_delta.json"))
     sp = find_scaffold(folder, handoff, scaffold_path)
     scaffold = _load_opt(sp) if sp else None
-    lines, stats = check(delta, copyedit, deep, handoff, scaffold, blank_check=not blank_applied(folder))
+    lines, stats = check(delta, copyedit, deep, handoff, scaffold, blank_check=not blank_applied(folder),
+                         first=load_first(folder, copyedit))
     if not isinstance(handoff, dict):
         lines.insert(0, f"handoff 를 읽지 못했다: {handoff_path}")
     return lines, stats

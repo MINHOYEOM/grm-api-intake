@@ -76,7 +76,8 @@ def check(folder, handoff_path):
         lines, stats = copyedit_evidence.check(
             delta, copyedit, _load(os.path.join(folder, "deep_delta.json")), handoff,
             _load(copyedit_evidence.find_scaffold(folder, handoff) or os.path.join(folder, "scaffold.json")),
-            blank_check=not copyedit_evidence.blank_applied(folder))
+            blank_check=not copyedit_evidence.blank_applied(folder),
+            first=copyedit_evidence.load_first(folder, copyedit))
         out.append(("4-1", "교열 전수 대조 근거(카드마다 원문 조각)", not lines,
                     copyedit_evidence.summary_line(stats) + (f" — 첫 줄: {lines[0][:160]}" if lines else "")))
     else:

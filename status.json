@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T01:25:38Z",
+ "generated_at": "2026-11-23T01:36:14Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45094792492,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-23T01:28:47Z",
+    "updatedAt": "2026-11-23T01:36:00Z",
+    "headBranch": "main",
+    "displayTitle": "fix(483): 관찰 건수를 원문 번호 표제에서 센다 — 단정 못 하면 비운다 (#1871)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45094792492"
+   },
+   {
     "databaseId": 45093695848,
     "status": "completed",
     "conclusion": "success",
@@ -216,17 +227,6 @@
     "headBranch": "publish/brief-2026-11-23",
     "displayTitle": "publish(web): 2026-11-23 개인 실명 2건을 일반 표현으로 (11-21 대표 결정·#1860)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090759499"
-   },
-   {
-    "databaseId": 45090517513,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "pull_request",
-    "createdAt": "2026-11-23T00:44:14Z",
-    "updatedAt": "2026-11-23T00:47:06Z",
-    "headBranch": "publish/brief-2026-11-23",
-    "displayTitle": "publish(web): 2026-11-23 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090517513"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45095465792,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-23T01:36:02Z",
+    "updatedAt": "2026-11-23T01:36:03Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45095465792"
+   },
+   {
     "databaseId": 45094478874,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44983533696"
-   },
-   {
-    "databaseId": 44965220065,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-22T00:09:12Z",
-    "updatedAt": "2026-11-22T00:09:19Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44965220065"
    }
   ],
   "grm-findings-translate-apply.yml": [

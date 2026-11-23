@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T06:29:52Z",
+ "generated_at": "2026-11-23T07:46:11Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -60,6 +60,17 @@
   ],
   "grm-delta-bridge.yml": [
    {
+    "databaseId": 45130338753,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-23T07:20:14Z",
+    "updatedAt": "2026-11-23T07:20:38Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45130338753"
+   },
+   {
     "databaseId": 45100947235,
     "status": "completed",
     "conclusion": "success",
@@ -102,17 +113,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43814731108"
-   },
-   {
-    "databaseId": 43788930323,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-16T01:54:04Z",
-    "updatedAt": "2026-11-16T01:54:26Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788930323"
    }
   ],
   "grm-web-publish.yml": [
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45132511842,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-23T07:37:56Z",
+    "updatedAt": "2026-11-23T07:45:49Z",
+    "headBranch": "main",
+    "displayTitle": "linkedin(anatomy): 2026-11-23 사건 해부 슬롯 a1·a2 — 기준일탈 부실 조사·설비 청결 불량 / …",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45132511842"
+   },
+   {
     "databaseId": 45123577859,
     "status": "completed",
     "conclusion": "success",
@@ -216,17 +227,6 @@
     "headBranch": "main",
     "displayTitle": "fix(편집팀): 교열 판정이 갈린 4가지를 사전 점검 코드로 고정 — 개인 실명·가림 값 추측·진술 단정·날짜 (#1881)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45119832742"
-   },
-   {
-    "databaseId": 45115772042,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-23T05:07:06Z",
-    "updatedAt": "2026-11-23T05:14:23Z",
-    "headBranch": "feat/firm-group-cluster-1123",
-    "displayTitle": "feat(브리프): 같은 업체 그룹 카드 매주 자동 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45115772042"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45133468509,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-23T07:45:52Z",
+    "updatedAt": "2026-11-23T07:46:01Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45133468509"
+   },
+   {
     "databaseId": 45124449369,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45113397274"
-   },
-   {
-    "databaseId": 45108290893,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-23T03:50:14Z",
-    "updatedAt": "2026-11-23T03:50:15Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45108290893"
    }
   ],
   "grm-findings-translate-apply.yml": [

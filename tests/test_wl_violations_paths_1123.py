@@ -193,6 +193,48 @@ class ContentCompletenessGapTest(unittest.TestCase):
         self.assertEqual(rep["issues"][0]["action"], "close")
 
 
+class RealDryMisfireTest(unittest.TestCase):
+    """실제 DB dry(11-23, 1,403행)에서 찾은 오검출 세 유형 — 원문 발췌(공백 정규화) 그대로."""
+
+    def test_api_lead_including_not_limited_to_is_region(self) -> None:
+        # df43f47188af — 도입이 'observed specific deviations including, but not limited to, the following.'
+        text = ("During our inspection, our investigators observed specific deviations including, but not limited to, "
+                "the following. 1. Failure to properly maintain buildings and facilities used in the manufacture of "
+                "API. Facility Conditions You failed to maintain your drug manufacturing facility in a good state of "
+                "repair. This may also render your (b)(4) USP adulterated under section 501(b) of the FD&C Act.")
+        rows, fmt = ci.extract_wl_violations_detail(text)
+        self.assertEqual(fmt, "F2")
+        self.assertEqual([r["statement"] for r in rows],
+                         ["Failure to properly maintain buildings and facilities used in the manufacture of API."])
+
+    def test_label_quote_is_its_own_sentence(self) -> None:
+        # 287aa0c57364 — 라벨 인용 뒤 '[from your product’s label]' 에 마침표가 없다.
+        text = ("EZRICARE Artificial Tears “Drug Facts . . . Uses . . . ■ for use as a protectant against further "
+                "irritation or to relieve dryness of the eye” [from your product’s label] EZRICARE Artificial Tears "
+                "is misbranded under section 502(j) of the FD&C Act.")
+        rows, fmt = ci.extract_wl_violations_detail(text)
+        self.assertEqual(fmt, "F4")
+        self.assertEqual(rows[0]["statement"],
+                         "EZRICARE Artificial Tears is misbranded under section 502(j) of the FD&C Act.")
+
+    def test_glued_compounding_heading_is_stripped(self) -> None:
+        # 5f1bb791f6cd — 'B. Violations of the FDCA Adulterated Drug Products The FDA investigator noted …'
+        text = ("U.S.C. §§ 351(a)(2)(B), 352(f)(1) and 355(a)]. B. Violations of the FDCA Adulterated Drug Products "
+                "The FDA investigator noted that drug products intended or expected to be sterile were prepared, "
+                "packed, or held under insanitary conditions, whereby they may have become contaminated with filth or "
+                "rendered injurious to health, causing your drug products to be adulterated under section "
+                "501(a)(2)(A) of the FDCA. For example, the investigator observed that: 1. Your facility lacked a "
+                "certified ISO 5 classified area for sterile compounding.")
+        rows, fmt = ci.extract_wl_violations_detail(text)
+        self.assertEqual(fmt, "F4")
+        self.assertTrue(rows[0]["statement"].startswith("The FDA investigator noted that drug products"))
+        self.assertIn("501(a)(2)(A)", rows[0]["citation"])
+
+    def test_hypothetical_may_render_not_a_verdict(self) -> None:
+        self.assertEqual(ci.extract_wl_violations_detail(
+            "This may also render your (b)(4) USP adulterated under section 501(b) of the FD&C Act.")[0], [])
+
+
 class ReextractToolTest(unittest.TestCase):
     def test_fill_and_mark_and_same(self) -> None:
         rows = [

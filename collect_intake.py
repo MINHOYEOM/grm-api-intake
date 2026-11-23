@@ -2871,13 +2871,21 @@ def _extract_wl_violations_f1(text: str, end_re: "re.Pattern[str]") -> list[dict
 #   · 못 뽑으면 빈 목록 + 사유(`wl_violations_status`) — 호출부(build_wl_item)가 raw 에 남긴다.
 _WL_VIOLATION_END_F1B_RE = re.compile(r"[)\]]\s*\.")          # F1b: '[21 CFR 211.192].' 대괄호 종결
 _WL_SENT_CITE_END_RE = re.compile(r"[)\]]\s*\.$")             # F3b: 문장이 인용 괄호로 끝난다
-_WL_SENT_BREAK_RE = re.compile(r"[.?!][\"”’)]?\s+(?=[A-Z“\"]|\d{1,2}\s+[A-Z])")
+# 문장 끝: 마침표류(+닫는 따옴표) 또는 라벨 인용 출처 꼬리 '[from your product’s label]'(뒤 문장과 마침표 없이 붙는다).
+_WL_SENT_BREAK_RE = re.compile(r"([.?!][\"”’)]?|\[from [^\]]{1,80}\])\s+(?=[A-Z“\"]|\d{1,2}\s+[A-Z])")
 _WL_SENT_ABBREV = frozenset({"U.S", "U.S.C", "Co", "No", "Nos", "Mr", "Ms", "Mrs", "Dr", "e.g", "i.e",
                              "vs", "St", "al", "approx", "Fig", "Ref", "Vol", "Sec", "Corp"})
 _WL_SENT_TOKEN_RE = re.compile(r"([A-Za-z][A-Za-z.]*)$")
 _WL_FOOTNOTE_LEAD_RE = re.compile(r"^\d{1,2}\s+(?=[A-Z“\"])")
+# 평문 본문에서 문장 머리에 붙어 버린 소제목(조제약국 서한 'Violations of the FDCA Adulterated Drug Products The FDA
+# investigator noted …'). 닫힌 목록만 떼고 문장은 원문 그대로 둔다(소제목은 문장이 아니다).
+_WL_GLUED_HEAD_RES = (
+    re.compile(r"^Violations of the (?:FDCA|FD&C Act|Federal Food, Drug, and Cosmetic Act)\s+(?=[A-Z])"),
+    re.compile(r"^(?:Adulterated|Misbranded) Drug Products\s+(?=[A-Z“\"])"),
+)
 _WL_REGION_START_RE = re.compile(
-    r"Violations of the Federal Food, Drug, and Cosmetic Act|The following (?:are )?(?:deviations|violations)\b")
+    r"Violations of the Federal Food, Drug, and Cosmetic Act|The following (?:are )?(?:deviations|violations)\b"
+    r"|(?:deviations|violations) including, but not limited to, the following")
 _WL_CONCLUSION_RE = re.compile(r"(?:(?<=[.?!”\")\]] )|^)Conclusion\b")
 _WL_F1_HEAD_SENT_RE = re.compile(r"^(?:Your firm|Your|You)\b[^.]{0,80}?\b(?:failed|did not)\b")
 _WL_F2_HEAD_RE = re.compile(r"(?<![\w.)])(\d{1,2})\.\s+(?=Failure (?:to|of)\b)")
@@ -2914,7 +2922,7 @@ _WL_F4_P2_RES = tuple(re.compile(p) for p in (
 # 위반은 F1~F3b 의 표제여야 하고, 거기서 못 뽑으면 빈 목록 + 사유로 남겨 상시 점검에 걸리게 한다.
 _WL_F4_EXCLUDE_RE = re.compile(
     r"\bif\b|\bas defined\b|^With certain exceptions|^A drug is\b|\bappears? to be\b|\bmay be detained\b"
-    r"|^We may\b|^Please be advised\b|\brecommend|\bbecause your methods, facilities, or controls", re.I)
+    r"|^We may\b|\bmay (?:also )?(?:render|cause|be)\b|^Please be advised\b|\brecommend|\bbecause your methods, facilities, or controls", re.I)
 _WL_SECTION_LIST_RE = re.compile(
     r"\bsections?\s+(\d{3}[A-Za-z]?(?:\([0-9A-Za-z]{1,6}\))*"
     r"(?:\s*(?:,\s*and|,|and|or)\s+\d{3}[A-Za-z]?(?:\([0-9A-Za-z]{1,6}\))*)*)")
@@ -2937,7 +2945,7 @@ def _wl_sentence_end(t: str, start: int, limit: int) -> int:
         tok = _WL_SENT_TOKEN_RE.search(t, max(start, m.start() - 12), m.start())
         if tok and tok.group(1) in _WL_SENT_ABBREV:
             continue
-        return m.start() + 1 + (1 if t[m.start() + 1:m.start() + 2] in "\"”’)" else 0)
+        return m.end(1)
     return limit
 
 
@@ -2952,6 +2960,8 @@ def _wl_sentences(t: str, start: int, end: int) -> list[str]:
             break
         stop = _wl_sentence_end(t, pos, end)
         s = _WL_FOOTNOTE_LEAD_RE.sub("", t[pos:stop].strip())
+        for head_re in _WL_GLUED_HEAD_RES:
+            s = head_re.sub("", s)
         if s:
             out.append(s)
         pos = stop

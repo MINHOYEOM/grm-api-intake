@@ -121,6 +121,7 @@ if str(REPO_ROOT) not in sys.path:
 from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
 from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
 from grm_findings import FIRM_KEY_ALIASES  # noqa: E402
+from grm_findings import REDACTED_PERSON_BY_LANG as _GRM_REDACTED_PERSON_BY_LANG  # noqa: E402
 import graph_export  # noqa: E402
 import clause_citations  # noqa: E402
 # [FDA 지적 조항 × 업체 2026-11-10] 업체 페이지·조항 페이지 블록(로더·매칭·뷰).
@@ -201,7 +202,7 @@ _FIRM_PLACEHOLDER = "원문 미기재"
 # 넣자 영문 페이지 카드 머리·목차·data-firm-key 6곳에 한글이 보였다. 데이터는 국문 한 벌만
 # 적고, 영어 트리는 `_card_with_english_narrative` 가 이 표로 바꿔 넘긴다(템플릿은 고르지 않는다).
 # 가린 이름은 실제 업체가 아니므로 업체 프로파일로 잇지 않는다(`_firm_key_for_card`).
-REDACTED_PERSON_BY_LANG = {"ko": "개인 사업자", "en": "Individual business"}
+REDACTED_PERSON_BY_LANG = _GRM_REDACTED_PERSON_BY_LANG   # 표기 단일 출처 = grm_findings(스캐폴드·사전 점검과 같은 표)
 REDACTED_PERSON = REDACTED_PERSON_BY_LANG["ko"]
 
 # [영문 사실표 2026-09-23] 사실값 중 **고정 어휘 토큰**(실명이 아니라 상태값)은 영어

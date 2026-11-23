@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T00:44:41Z",
+ "generated_at": "2026-11-23T00:49:46Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -61,11 +61,11 @@
   "grm-delta-bridge.yml": [
    {
     "databaseId": 45090249293,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_dispatch",
     "createdAt": "2026-11-23T00:41:29Z",
-    "updatedAt": "2026-11-23T00:41:35Z",
+    "updatedAt": "2026-11-23T00:45:26Z",
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090249293"
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45090517513,
+    "databaseId": 45090763169,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
+    "createdAt": "2026-11-23T00:46:50Z",
+    "updatedAt": "2026-11-23T00:47:09Z",
+    "headBranch": "publish/brief-2026-11-23",
+    "displayTitle": "publish(web): 2026-11-23 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090763169"
+   },
+   {
+    "databaseId": 45090759499,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-23T00:46:47Z",
+    "updatedAt": "2026-11-23T00:47:08Z",
+    "headBranch": "publish/brief-2026-11-23",
+    "displayTitle": "publish(web): 2026-11-23 개인 실명 2건을 일반 표현으로 (11-21 대표 결정·#1860)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090759499"
+   },
+   {
+    "databaseId": 45090517513,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "pull_request",
     "createdAt": "2026-11-23T00:44:14Z",
-    "updatedAt": "2026-11-23T00:44:17Z",
+    "updatedAt": "2026-11-23T00:47:06Z",
     "headBranch": "publish/brief-2026-11-23",
     "displayTitle": "publish(web): 2026-11-23 주간 브리프",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090517513"
    },
    {
     "databaseId": 45090511404,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "cancelled",
     "event": "push",
     "createdAt": "2026-11-23T00:44:10Z",
-    "updatedAt": "2026-11-23T00:44:14Z",
+    "updatedAt": "2026-11-23T00:47:04Z",
     "headBranch": "publish/brief-2026-11-23",
     "displayTitle": "publish(web): 2026-11-23 주간 브리프 (자동 조립)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090511404"
    },
    {
     "databaseId": 45090287527,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-23T00:41:52Z",
-    "updatedAt": "2026-11-23T00:41:56Z",
+    "updatedAt": "2026-11-23T00:49:28Z",
     "headBranch": "main",
     "displayTitle": "bridge(web): 2026-11-23 편집팀 git 반납 커밋 (자동)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090287527"
-   },
-   {
-    "databaseId": 45088805724,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-23T00:26:41Z",
-    "updatedAt": "2026-11-23T00:33:06Z",
-    "headBranch": "claude/fix-483-obs-count-1326ac",
-    "displayTitle": "fix(483): 관찰 건수를 원문 번호 표제에서 센다 — 단정 못 하면 비운다",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45088805724"
-   },
-   {
-    "databaseId": 45088759664,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-23T00:26:12Z",
-    "updatedAt": "2026-11-23T00:32:52Z",
-    "headBranch": "claude/fix-483-obs-count-1326ac",
-    "displayTitle": "fix(483): 관찰 건수를 원문 번호 표제에서 센다 — 단정 못 하면 비운다",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45088759664"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45091017715,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-23T00:49:31Z",
+    "updatedAt": "2026-11-23T00:49:33Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45091017715"
+   },
+   {
     "databaseId": 45064439349,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44868423699"
-   },
-   {
-    "databaseId": 44676827733,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-20T04:48:19Z",
-    "updatedAt": "2026-11-20T04:48:29Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44676827733"
    }
   ],
   "grm-findings-translate-apply.yml": [

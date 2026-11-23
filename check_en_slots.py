@@ -28,10 +28,18 @@ def _filled(value) -> bool:
 
 
 def card_problem(card: dict) -> "tuple[str, str] | None":
-    """카드 한 장의 영문 판정 — 완결이면 None, 아니면 ("missing", id) 또는 ("partial", "id(빠짐: …)").
+    """카드 한 장의 영문 판정 — 완결이면 None, 아니면 ("missing", id) 또는 ("partial", "id(빠짐: …)")
+    또는 ("hangul", "id(한글: headline_target,…)").
+
+    ★"hangul"(2026-11-23): 해외 기관 카드의 국·영 공용 코드 칸(`headline_target`·`facts[].value`)이 영어 트리에서도
+      한글로 그려지는 경우. 11-23호에서 실명을 가린 '개인 사업자'가 영문 카드 머리·목차·data-firm-key 에 그대로 나갔다.
+      판정은 `render.en_code_slot_hangul`(영어 트리가 실제로 그리는 값) 그대로다(두 벌 금지).
 
     `find_problems` 와 편집팀 사전 점검(`company/editorial/precheck.py terms`)이 **같이** 부른다(두 벌 금지)."""
     if render.card_has_english(card):
+        slots = render.en_code_slot_hangul(card)
+        if slots:
+            return ("hangul", f"{card.get('id') or '?'}(한글: {','.join(slots)})")
         return None
     en = card.get("en")
     cid = str(card.get("id") or "?")
@@ -48,11 +56,15 @@ def find_problems(doc: dict) -> list[str]:
     out: list[str] = []
     missing_all: list[str] = []
     partial: list[str] = []
+    hangul: list[str] = []
     for c in cards:
         prob = card_problem(c)
         if prob is None:
             continue
-        (missing_all if prob[0] == "missing" else partial).append(prob[1])
+        {"missing": missing_all, "hangul": hangul}.get(prob[0], partial).append(prob[1])
+    if hangul:
+        out.append(f"영문 코드 칸에 한글 {len(hangul)}장 (예: {', '.join(hangul[:5])}"
+                   " — 국·영 공용 칸엔 국문 표기를 넣지 말고 render 의 언어별 표기를 쓸 것)")
     if missing_all:
         out.append(f"en 없음 {len(missing_all)}/{len(cards)}장 (예: {', '.join(missing_all[:5])})")
     if partial:

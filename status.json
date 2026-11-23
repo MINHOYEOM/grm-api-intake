@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-22T23:48:37Z",
+ "generated_at": "2026-11-23T00:44:41Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -60,6 +60,17 @@
   ],
   "grm-delta-bridge.yml": [
    {
+    "databaseId": 45090249293,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-23T00:41:29Z",
+    "updatedAt": "2026-11-23T00:41:35Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090249293"
+   },
+   {
     "databaseId": 44710622310,
     "status": "completed",
     "conclusion": "success",
@@ -102,20 +113,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788668824"
-   },
-   {
-    "databaseId": 42570416355,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-09T05:59:51Z",
-    "updatedAt": "2026-11-09T06:00:08Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42570416355"
    }
   ],
   "grm-web-publish.yml": [
+   {
+    "databaseId": 45090287415,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-23T00:41:52Z",
+    "updatedAt": "2026-11-23T00:44:13Z",
+    "headBranch": "main",
+    "displayTitle": "bridge(web): 2026-11-23 편집팀 git 반납 커밋 (자동)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090287415"
+   },
    {
     "databaseId": 43793464419,
     "status": "completed",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "brief(10-26): FDA 483 관찰 #1 한국어 결손 4건 보강 — 재조립 거부 해소 (#1214 extractio…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568599030"
-   },
-   {
-    "databaseId": 42568356278,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T05:37:15Z",
-    "updatedAt": "2026-11-09T05:38:38Z",
-    "headBranch": "main",
-    "displayTitle": "fix(brief): 새 실사 카드 틀은 11-09 이후 호에만 — 옛 호 재조립 소급 방지 (#1412)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568356278"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45063682184,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-22T19:57:46Z",
-    "updatedAt": "2026-11-22T20:05:32Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1869 from MINHOYEOM/claude/glossary-fig-daily-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45063682184"
+    "databaseId": 45090517513,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-23T00:44:14Z",
+    "updatedAt": "2026-11-23T00:44:17Z",
+    "headBranch": "publish/brief-2026-11-23",
+    "displayTitle": "publish(web): 2026-11-23 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090517513"
    },
    {
-    "databaseId": 45020660869,
+    "databaseId": 45090511404,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-23T00:44:10Z",
+    "updatedAt": "2026-11-23T00:44:14Z",
+    "headBranch": "publish/brief-2026-11-23",
+    "displayTitle": "publish(web): 2026-11-23 주간 브리프 (자동 조립)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090511404"
+   },
+   {
+    "databaseId": 45090287527,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-23T00:41:52Z",
+    "updatedAt": "2026-11-23T00:41:56Z",
+    "headBranch": "main",
+    "displayTitle": "bridge(web): 2026-11-23 편집팀 git 반납 커밋 (자동)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090287527"
+   },
+   {
+    "databaseId": 45088805724,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-22T12:07:27Z",
-    "updatedAt": "2026-11-22T12:14:10Z",
-    "headBranch": "claude/glossary-fig-daily-20261122-2106",
-    "displayTitle": "glossary(fig): 2026-11-22 새 그림 0 · 다시 그림 0 · 보류 5 — 데이터 전송·밸리데이션 종합계획서·진본 사본·품질방침·품질목표",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45020660869"
+    "createdAt": "2026-11-23T00:26:41Z",
+    "updatedAt": "2026-11-23T00:33:06Z",
+    "headBranch": "claude/fix-483-obs-count-1326ac",
+    "displayTitle": "fix(483): 관찰 건수를 원문 번호 표제에서 센다 — 단정 못 하면 비운다",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45088805724"
    },
    {
-    "databaseId": 45020657287,
+    "databaseId": 45088759664,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-22T12:07:25Z",
-    "updatedAt": "2026-11-22T12:14:53Z",
-    "headBranch": "claude/glossary-fig-daily-20261122-2106",
-    "displayTitle": "glossary(fig): 2026-11-22 새 그림 0 · 다시 그림 0 · 보류 5 — 데이터 전송·밸리데이션 종합계획…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45020657287"
-   },
-   {
-    "databaseId": 44983012635,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-22T03:59:05Z",
-    "updatedAt": "2026-11-22T04:05:52Z",
-    "headBranch": "main",
-    "displayTitle": "chore: refresh recent regulatory news (#1864)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44983012635"
-   },
-   {
-    "databaseId": 44980976800,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-22T03:30:49Z",
-    "updatedAt": "2026-11-22T03:38:16Z",
-    "headBranch": "automation/news-auto-44980896669",
-    "displayTitle": "chore: refresh recent regulatory news",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44980976800"
+    "createdAt": "2026-11-23T00:26:12Z",
+    "updatedAt": "2026-11-23T00:32:52Z",
+    "headBranch": "claude/fix-483-obs-count-1326ac",
+    "displayTitle": "fix(483): 관찰 건수를 원문 번호 표제에서 센다 — 단정 못 하면 비운다",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45088759664"
    }
   ],
   "grm-scaffold-mirror.yml": [

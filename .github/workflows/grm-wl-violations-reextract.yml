@@ -7,9 +7,6 @@ name: GRM WL Violations Re-extract From Stored Body
 # 기본은 dry-run(apply=false). 수동 실행 전용(예약 없음) — 앞으로의 행은 일일 수집·과거분 백필·WL 복구가 같은 함수로 채우고,
 # 빠진 행은 내용 완전성 감시(content_completeness.py (V))가 매일 센다.
 on:
-  push:   # TEMP-DRY: PR 전 실제 DB dry 1회용 — apply 입력이 없어 dry-run 고정. 머지 전 삭제
-    branches: [fix/wl-violations-parser-1123]
-    paths: ['.github/workflows/grm-wl-violations-reextract.yml']
   workflow_dispatch:
     inputs:
       apply:

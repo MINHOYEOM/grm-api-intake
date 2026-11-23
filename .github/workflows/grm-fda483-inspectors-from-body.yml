@@ -12,6 +12,10 @@ on:
         description: '실제로 쓴다(기본 false = dry-run)'
         type: boolean
         default: false
+      audit_filled:
+        description: '이미 채워진 행도 감사 — 전문에 없거나 이름이 아닌 저장 이름을 공통 함수 결과로 덮어씀(요약 표에 따로 표시)'
+        type: boolean
+        default: false
       since:
         description: 'collected_at 하한(YYYY-MM-DD, 비우면 전부)'
         type: string
@@ -57,6 +61,7 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           IN_APPLY: ${{ inputs.apply }}
+          IN_AUDIT: ${{ inputs.audit_filled }}
           IN_SINCE: ${{ inputs.since }}
           IN_DOCS: ${{ inputs.doc_ids }}
           IN_LIMIT: ${{ inputs.limit }}
@@ -75,11 +80,12 @@ jobs:
           if [ -n "${IN_SINCE:-}" ]; then args+=(--since "$IN_SINCE"); fi
           if [ -n "${IN_DOCS:-}" ]; then args+=(--doc-ids "$IN_DOCS"); fi
           if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
+          if [ "${IN_AUDIT:-false}" = "true" ]; then args+=(--audit-filled); fi
           python backfill_483_inspectors_from_body.py "${args[@]}"
           rc=$?
           {
             echo "### FDA 483 실사관 재추출"
-            echo "- apply: \`${IN_APPLY:-false}\` · since: \`${IN_SINCE:-전부}\` · limit: \`${IN_LIMIT:-2000}\` · exit: \`${rc}\`"
+            echo "- apply: \`${IN_APPLY:-false}\` · audit_filled: \`${IN_AUDIT:-false}\` · since: \`${IN_SINCE:-전부}\` · limit: \`${IN_LIMIT:-2000}\` · exit: \`${rc}\`"
             head -c 60000 table.md 2>/dev/null || echo '(표 없음)'
           } >> "$GITHUB_STEP_SUMMARY"
           exit $rc

@@ -549,7 +549,7 @@ grm-api-intake/
 ├─ collect_fda_inspections.py      # FDA 실사 등급(NAI/VAI/OAI) DDAPI 수집기 → public.fda_inspections 직행(findings/카드 미생성·GMP 외 ProjectArea 클라이언트 배제·회계연도 창 실행일 계산·월 1회 크론 + 수동 dispatch)
 ├─ probe_source_reachability.py    # 후보 소스에 러너가 닿는지 착수 전 1회 판정(기본 UA/브라우저 UA 2회 → OPEN·UA_GATED·BLOCKED) · `--targets silent` = 무음 12종(피드 항목 수·최신 날짜·파서 표식 검사)
 ├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
-├─ backfill_483_inspectors_from_body.py # 저장 전문(fda483_body_full)만으로 실사관 재추출(외부 요청 0) — 공통 함수 _extract_483_inspectors·글자 그대로 검사·raw_signal_apply_version(repair)+빈 findings.inspector_names 만 PATCH·dry 기본·행별 사유
+├─ backfill_483_inspectors_from_body.py # 저장 전문(fda483_body_full)만으로 실사관 재추출(외부 요청 0) — 공통 함수 _extract_483_inspectors·글자 그대로 검사·raw_signal_apply_version(repair)+빈 findings.inspector_names 만 PATCH·dry 기본·행별 사유·--audit-filled 로 전문에 없는/이름 아닌 저장 이름 감사·덮어쓰기
 ├─ mfds_gmp_cert_snapshot.py      # 식약처 GMP 적합판정서 월 1회 전체 목록 → mfds_gmp_cert(142) 적재·업체 연결(브리프 무접촉)
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)

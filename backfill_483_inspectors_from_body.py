@@ -25,6 +25,12 @@
      (적재 때 raw 에서 복사되는 칸이라 raw 만 고치면 검색·문서 페이지에 안 나온다). 이미 이름이 있는 행은 건드리지 않는다.
   무료 Nano DB — 한 번에 하나, 회차 상한 `--limit`(기본 2,000).
 
+감사 모드(`--audit-filled`, 2026-11-23 비서실 요청):
+  이미 실사관이 **채워진** 행도 본다. 저장된 이름 중 하나라도 ① 그 행 전문에 글자 그대로 없거나 ② 이름 문법
+  (`_valid_inspector_name` — 직함 낱말 `Team Lead`·`Compliance Officer …` 거부)에 어긋나면 그 행을 **덮어쓰기**
+  대상으로 표시하고, 공통 함수 결과로 바꾼다. 결과가 비면 실사관 키를 지우고(빈칸) 사유를 남긴다.
+  findings 는 그 문서 행 중 **옛 저장 이름과 같은 값**을 가진 행만 새 값으로 바꾼다. 문제없는 행은 건드리지 않는다.
+
 기본은 dry-run: 행별 전·후 표(문서 id·뽑은 이름·전문 속 위치 발췌)와 남는 행 사유를 JSON·Markdown 으로 쓴다.
 `--rows-json` 은 DB 대신 미리 받아 둔 행(raw_signal_id·document_id·body·…)으로 dry-run 한다(자격증명 불필요).
 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (값은 로그에 남기지 않는다).
@@ -67,8 +73,14 @@ class Report:
     unchanged: int = 0
     conflict: int = 0
     findings_rows_patched: int = 0
+    # 감사 모드 — 이미 채워진 행
+    audited: int = 0                # 점검한 채워진 행
+    audit_ok: int = 0               # 저장 이름이 전부 전문에 글자 그대로 있고 문법도 맞음
+    overwrite: int = 0              # 덮어쓰기 대상(틀린 저장 이름 있음)
+    overwrite_to_empty: int = 0     # 그중 공통 함수도 못 뽑아 빈칸이 되는 행
     errors: list[str] = field(default_factory=list)
     rows: list[dict[str, Any]] = field(default_factory=list)
+    audit_rows: list[dict[str, Any]] = field(default_factory=list)   # 덮어쓰기 대상만
 
 
 def _loads(value: Any) -> dict[str, Any]:
@@ -88,15 +100,41 @@ def row_body(row: dict[str, Any]) -> str:
     return str(_loads(row.get("raw_json")).get(BODY_KEY) or "")
 
 
+def stored_names(row: dict[str, Any]) -> list[str]:
+    """지금 저장된 실사관 이름 — DB 행이면 raw_json 안, 미리 받은 행이면 insp 칸."""
+    value = row.get("insp") if "body" in row else _loads(row.get("raw_json")).get(INSPECTORS_KEY)
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except ValueError:
+            value = []
+    return [str(n).strip() for n in value if str(n).strip()] if isinstance(value, list) else []
+
+
+def _status(row: dict[str, Any]) -> str:
+    return str(row.get("st") or "") if "body" in row \
+        else str(_loads(row.get("raw_json")).get("fda483_text_status") or "")
+
+
 def is_target(row: dict[str, Any]) -> bool:
-    """전문 있음 ∧ 실사관 없음 ∧ 범위 밖 아님."""
-    if "body" in row:          # 미리 받은 행 — 조회 조건으로 이미 걸렀다(st = fda483_text_status)
-        return bool(row_body(row)) and str(row.get("st") or "") != OUT_OF_SCOPE
-    raw = _loads(row.get("raw_json"))
-    names = raw.get(INSPECTORS_KEY)
-    has_names = isinstance(names, list) and any(str(n).strip() for n in names)
-    return (bool(raw.get(BODY_KEY)) and not has_names
-            and str(raw.get("fda483_text_status") or "") != OUT_OF_SCOPE)
+    """채우기 대상 — 전문 있음 ∧ 실사관 없음 ∧ 범위 밖 아님."""
+    return bool(row_body(row)) and not stored_names(row) and _status(row) != OUT_OF_SCOPE
+
+
+def is_audit_target(row: dict[str, Any]) -> bool:
+    """감사 대상 — 전문 있음 ∧ 실사관 **있음** ∧ 범위 밖 아님."""
+    return bool(row_body(row)) and bool(stored_names(row)) and _status(row) != OUT_OF_SCOPE
+
+
+def bad_stored_names(names: list[str], body: str) -> list[dict[str, str]]:
+    """저장 이름 중 틀린 것 — 전문에 글자 그대로 없음(`not-in-body`) 또는 이름 문법 위반(`not-a-name`)."""
+    bad = []
+    for n in names:
+        if not fda483._inspector_name_in_text(n, body):
+            bad.append({"name": n, "why": "not-in-body"})
+        elif not fda483._valid_inspector_name(n, allow_caps=True, max_tokens=5):
+            bad.append({"name": n, "why": "not-a-name"})
+    return bad
 
 
 def name_excerpt(body: str, name: str) -> str:
@@ -136,17 +174,94 @@ def evaluate(row: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def audit(row: dict[str, Any]) -> dict[str, Any] | None:
+    """채워진 행 감사 → 덮어쓰기 대상이면 표 한 줄, 문제없으면 None."""
+    body = row_body(row)
+    before = stored_names(row)
+    bad = bad_stored_names(before, body)
+    if not bad:
+        return None
+    line = evaluate(row)
+    line.update(before=before, bad=bad, action="overwrite")
+    return line
+
+
+def _apply_one(row: dict[str, Any], line: dict[str, Any], rep: Report, *, overwrite: bool,
+               applier: Callable[..., dict[str, Any]],
+               findings_patcher: Callable[..., tuple[int, str]] | None) -> None:
+    raw = _loads(row.get("raw_json"))
+    now = raw.get(INSPECTORS_KEY) or []
+    if overwrite:
+        if list(now) != list(line["before"]):          # 그사이 바뀌었으면 손대지 않는다
+            rep.unchanged += 1
+            return
+        if line["after"]:
+            raw[INSPECTORS_KEY] = list(line["after"])
+        else:
+            raw.pop(INSPECTORS_KEY, None)               # 빈칸 — 키를 달지 않는 수집기 관례(_to_item)
+        diff = {"replaced": INSPECTORS_KEY, "removed": [b["name"] for b in line["bad"]],
+                "why": sorted({b["why"] for b in line["bad"]}), "names": len(line["after"]),
+                "source": BODY_KEY, "audit": True}
+    else:
+        if now:                                         # 그사이 채워졌으면 덮지 않는다
+            rep.unchanged += 1
+            return
+        raw[INSPECTORS_KEY] = list(line["after"])
+        diff = {"added": [INSPECTORS_KEY], "names": len(line["after"]), "source": BODY_KEY}
+    import raw_versioning as rv
+    raw_text, sha = rv.canonical_raw(raw)
+    record = {"raw_json": raw_text, "raw_sha256": sha, "row_json": str(row.get("row_json") or "")}
+    result = applier(raw_signal_id=line["raw_signal_id"],
+                     expected_raw_sha256=str(row.get("raw_sha256") or ""),
+                     record=record, change_kind="repair", changed_by=CHANGED_BY, diff_summary=diff)
+    status = str(result.get("status") or "error")
+    if status == "applied":
+        rep.applied += 1
+        if findings_patcher is not None:
+            if overwrite:
+                n, err = findings_patcher(line["raw_signal_id"], list(line["after"]),
+                                          only_value=list(line["before"]))
+            else:
+                n, err = findings_patcher(line["raw_signal_id"], list(line["after"]))
+            rep.findings_rows_patched += n
+            if err:
+                rep.errors.append(f"findings({line['document_id']}):{err}")
+    elif status == "unchanged":
+        rep.unchanged += 1
+    elif status == "conflict":
+        rep.conflict += 1
+    else:
+        rep.errors.append(f"apply({line['document_id']}):{result.get('error') or status}")
+
+
 def run(rows: list[dict[str, Any]], *, apply: bool, limit: int = DEFAULT_LIMIT,
         applier: Callable[..., dict[str, Any]] | None = None,
-        findings_patcher: Callable[[str, list[str]], tuple[int, str]] | None = None) -> Report:
+        findings_patcher: Callable[..., tuple[int, str]] | None = None,
+        audit_filled: bool = False) -> Report:
     rep = Report(mode="apply" if apply else "dry-run")
-    targets = []
+    targets, filled = [], []
     for row in rows:
         rep.scanned += 1
         if is_target(row):
             targets.append(row)
+        elif audit_filled and is_audit_target(row):
+            filled.append(row)
     targets = targets[:limit] if limit else targets
     rep.targets = len(targets)
+    for row in filled:
+        rep.audited += 1
+        line = audit(row)
+        if line is None:
+            rep.audit_ok += 1
+            continue
+        rep.overwrite += 1
+        rep.overwrite_to_empty += not line["after"]
+        if line["reason"] == "not-verbatim":
+            rep.not_verbatim += 1
+        rep.audit_rows.append(line)
+        if apply and line["reason"] != "not-verbatim":
+            _apply_one(row, line, rep, overwrite=True, applier=applier,
+                       findings_patcher=findings_patcher)
     for row in targets:
         line = evaluate(row)
         rep.rows.append(line)
@@ -164,33 +279,8 @@ def run(rows: list[dict[str, Any]], *, apply: bool, limit: int = DEFAULT_LIMIT,
                     rep.reasons_with_signature_block.get(line["reason"], 0) + 1
         if not apply or not line["after"]:
             continue
-        raw = _loads(row.get("raw_json"))
-        if raw.get(INSPECTORS_KEY):                       # 그사이 채워졌으면 덮지 않는다
-            rep.unchanged += 1
-            continue
-        raw[INSPECTORS_KEY] = list(line["after"])
-        import raw_versioning as rv
-        raw_text, sha = rv.canonical_raw(raw)
-        record = {"raw_json": raw_text, "raw_sha256": sha, "row_json": str(row.get("row_json") or "")}
-        result = applier(raw_signal_id=line["raw_signal_id"],
-                         expected_raw_sha256=str(row.get("raw_sha256") or ""),
-                         record=record, change_kind="repair", changed_by=CHANGED_BY,
-                         diff_summary={"added": [INSPECTORS_KEY], "names": len(line["after"]),
-                                       "source": BODY_KEY})
-        status = str(result.get("status") or "error")
-        if status == "applied":
-            rep.applied += 1
-            if findings_patcher is not None:
-                n, err = findings_patcher(line["raw_signal_id"], list(line["after"]))
-                rep.findings_rows_patched += n
-                if err:
-                    rep.errors.append(f"findings({line['document_id']}):{err}")
-        elif status == "unchanged":
-            rep.unchanged += 1
-        elif status == "conflict":
-            rep.conflict += 1
-        else:
-            rep.errors.append(f"apply({line['document_id']}):{result.get('error') or status}")
+        _apply_one(row, line, rep, overwrite=False, applier=applier,
+                   findings_patcher=findings_patcher)
     return rep
 
 
@@ -209,14 +299,18 @@ def fetch_rows(base_url: str, service_key: str, *, since: str = "",
 
 
 def patch_empty_findings(base_url: str, service_key: str, raw_signal_id: str,
-                         names: list[str]) -> tuple[int, str]:
-    """그 문서의 findings 행 중 inspector_names 가 빈 배열인 행만 채운다. (갱신 행 수, 오류 요약)."""
+                         names: list[str], *, only_value: list[str] | None = None) -> tuple[int, str]:
+    """그 문서의 findings 행 중 inspector_names 가 빈 배열인 행만 채운다. (갱신 행 수, 오류 요약).
+
+    `only_value`(감사 덮어쓰기) — 빈 배열 대신 **옛 저장 이름과 같은 값**인 행만 바꾼다."""
     import requests
     import findings_supabase_backfill as fsb
+    match = json.dumps(only_value if only_value is not None else [], ensure_ascii=False,
+                       separators=(",", ":"))
     try:
         resp = requests.patch(
             f"{base_url}/rest/v1/findings",
-            params={"raw_signal_id": f"eq.{raw_signal_id}", "inspector_names": "eq.[]"},
+            params={"raw_signal_id": f"eq.{raw_signal_id}", "inspector_names": f"eq.{match}"},
             json={"inspector_names": names},
             headers={"apikey": service_key, "Authorization": f"Bearer {service_key}",
                      "Content-Type": "application/json", "Prefer": "return=representation"},
@@ -247,6 +341,16 @@ def markdown(rep: Report) -> str:
         ev = " / ".join(e for e in r["evidence"] if e).replace("|", "¦")[:400]
         lines.append(f"| {r['document_id']} | {'있음' if r['signature_block'] else '없음'} | (빈칸) | "
                      f"{', '.join(r['after']) or '—'} | {r['reason']} | {ev} |")
+    if rep.audited:
+        lines += ["", f"## ⚠ 덮어쓰기 대상 — 이미 채워진 행 감사 {rep.audited}행 중 {rep.overwrite}행",
+                  f"(문제없음 {rep.audit_ok} · 덮어쓰면 빈칸이 되는 행 {rep.overwrite_to_empty})", "",
+                  "| 문서 | 지금 저장된 이름 | 틀린 이름(왜) | 바꿀 값 | 사유 | 전문 속 위치 발췌 |",
+                  "|---|---|---|---|---|---|"]
+        for r in rep.audit_rows:
+            ev = " / ".join(e for e in r["evidence"] if e).replace("|", "¦")[:400]
+            bad = ", ".join(f"{b['name']}({b['why']})" for b in r["bad"])
+            lines.append(f"| **{r['document_id']}** | {', '.join(r['before'])} | {bad} | "
+                         f"{', '.join(r['after']) or '(빈칸)'} | {r['reason']} | {ev} |")
     return "\n".join(lines) + "\n"
 
 
@@ -264,6 +368,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help="회차 상한(무료 Nano — 2,000 이하)")
     ap.add_argument("--report", default="fda483_inspectors_from_body_report.json")
     ap.add_argument("--markdown", default="", help="행별 전·후 표 Markdown 경로")
+    ap.add_argument("--audit-filled", action="store_true",
+                    help="이미 채워진 행도 감사 — 전문에 없거나 이름이 아닌 저장 이름이 있으면 공통 함수 결과로 덮어씀")
     ap.add_argument("--supabase-url", default="")
     ap.add_argument("--service-role-key", default="")
     args = ap.parse_args(argv)
@@ -276,7 +382,7 @@ def main(argv: list[str] | None = None) -> int:
         rows = json.loads(Path(args.rows_json).read_text(encoding="utf-8"))
         if doc_ids:
             rows = [r for r in rows if r.get("document_id") in set(doc_ids)]
-        rep = run(rows, apply=False, limit=args.limit)
+        rep = run(rows, apply=False, limit=args.limit, audit_filled=args.audit_filled)
     else:
         from grm_cli import normalize_supabase_url, resolve_supabase_service_credentials
         creds = resolve_supabase_service_credentials(args)
@@ -289,15 +395,17 @@ def main(argv: list[str] | None = None) -> int:
         import raw_versioning as rv
         rep = run(rows, apply=args.apply, limit=args.limit,
                   applier=(lambda **kw: rv.apply_version(base, key, **kw)) if args.apply else None,
-                  findings_patcher=(lambda rid, names: patch_empty_findings(base, key, rid, names))
-                  if args.apply else None)
+                  findings_patcher=(lambda rid, names, **kw: patch_empty_findings(base, key, rid, names, **kw))
+                  if args.apply else None, audit_filled=args.audit_filled)
     Path(args.report).write_text(json.dumps(asdict(rep), ensure_ascii=False, indent=1), encoding="utf-8")
     if args.markdown:
         Path(args.markdown).write_text(markdown(rep), encoding="utf-8")
     print(f"483 실사관 재추출 {rep.mode}: 대상 {rep.targets} · 서명란 있음 {rep.with_signature_block} "
           f"(채움 {rep.extracted_with_signature_block}) · 전체 채움 {rep.extracted} · 남음 {rep.reasons} "
           f"· 안전장치 {rep.not_verbatim} · 적용 {rep.applied} · 같음 {rep.unchanged} · 충돌 {rep.conflict} "
-          f"· findings {rep.findings_rows_patched}행 · 오류 {len(rep.errors)}")
+          f"· findings {rep.findings_rows_patched}행 · 오류 {len(rep.errors)}"
+          + (f" · 감사 {rep.audited}(문제없음 {rep.audit_ok} · 덮어쓰기 {rep.overwrite}"
+             f" · 그중 빈칸 {rep.overwrite_to_empty})" if args.audit_filled else ""))
     return 1 if rep.errors or rep.not_verbatim else 0
 
 

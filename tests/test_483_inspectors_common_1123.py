@@ -230,6 +230,45 @@ class ReextractToolTest(unittest.TestCase):
         self.assertEqual(patched, [("rid-ok", ["Jose F Velez"])])
         self.assertEqual(rep.findings_rows_patched, 2)
 
+    def _audit_rows(self):
+        body = (SIG + "SEE REVERSE| Thai T Duong,\nInvestigator\n7/31/2025\n")
+        conflict = (SIG + "SEE REVERSE| Shafig Ahadi,\nInvestigator\n11/25/2025\n"
+                    + SIG + "SEE REVERSE| Shafiq Ahadi,\nInvestigator\n11/25/2025\n Team Lead")
+        return [
+            # 195273 꼴 — 저장 이름이 전문에 없음 → 전문의 이름으로
+            _db_row("notin", {"fda483_body_full": body, "fda483_inspectors": ["Michelle L Johnson"]}),
+            # 195531 꼴 — 직함이 이름으로 저장, 공통 함수도 못 뽑음 → 빈칸
+            _db_row("title", {"fda483_body_full": conflict,
+                              "fda483_inspectors": ["Team Lead", "Shafig Ahadi"]}),
+            # 문제없는 행 — 손대지 않음
+            _db_row("good", {"fda483_body_full": body, "fda483_inspectors": ["Thai T Duong"]}),
+        ]
+
+    def test_audit_marks_only_wrong_stored_names(self):
+        rep = tool.run(self._audit_rows(), apply=False, audit_filled=True)
+        self.assertEqual((rep.audited, rep.audit_ok, rep.overwrite, rep.overwrite_to_empty), (3, 1, 2, 1))
+        by_doc = {r["document_id"]: r for r in rep.audit_rows}
+        self.assertEqual(by_doc["notin"]["bad"], [{"name": "Michelle L Johnson", "why": "not-in-body"}])
+        self.assertEqual(by_doc["notin"]["after"], ["Thai T Duong"])
+        self.assertEqual(by_doc["title"]["bad"], [{"name": "Team Lead", "why": "not-a-name"}])
+        self.assertEqual(by_doc["title"]["after"], [])
+        self.assertEqual(by_doc["title"]["reason"], f.INSPECTORS_OCR_CONFLICT)
+        self.assertIn("덮어쓰기 대상", tool.markdown(rep))
+        self.assertEqual(tool.run(self._audit_rows(), apply=False).audited, 0)   # 플래그 없으면 감사 안 함
+
+    def test_audit_apply_overwrites_raw_and_matching_findings_only(self):
+        calls, patched = [], []
+        tool.run(self._audit_rows(), apply=True, audit_filled=True,
+                 applier=lambda **kw: calls.append(kw) or {"status": "applied"},
+                 findings_patcher=lambda rid, names, **kw: patched.append((rid, names, kw)) or (1, ""))
+        raws = {c["raw_signal_id"]: json.loads(c["record"]["raw_json"]) for c in calls}
+        self.assertEqual(set(raws), {"rid-notin", "rid-title"})
+        self.assertEqual(raws["rid-notin"]["fda483_inspectors"], ["Thai T Duong"])
+        self.assertNotIn("fda483_inspectors", raws["rid-title"])                 # 빈칸 = 키 없음
+        self.assertEqual(patched[0], ("rid-notin", ["Thai T Duong"],
+                                      {"only_value": ["Michelle L Johnson"]}))
+        self.assertEqual(patched[1], ("rid-title", [], {"only_value": ["Team Lead", "Shafig Ahadi"]}))
+
     def test_rows_json_mode_refuses_apply(self):
         self.assertEqual(tool.main(["--rows-json", "x.json", "--apply"]), 2)
 

@@ -213,3 +213,44 @@ class InstructionsRequireTheCheckTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReworkEvidenceTest(unittest.TestCase):
+    """2차 재작업 카드는 근거를 새로 적어야 한다(11-23 실전 — 재작업 8장의 checked 가 비어 수동 마감까지 막혔다)."""
+
+    @staticmethod
+    def _first():
+        f = _full()
+        f["status"] = "재작업"
+        f["rework"] = {"cards": ["b"]}
+        f["cards"][1] = {"web_card_id": "b", "verdict": "reject", "checked": f["cards"][1]["checked"],
+                         "fails": [{"item": "③", "slot": "summary", "evidence": "x"}]}
+        return f
+
+    def test_rework_card_needs_fresh_checked_covering_first_round_fail_slot(self):
+        first = self._first()
+        second = _full()
+        self.assertEqual(ce.rework_must_slots(second, first), {"b": ["summary"]})
+        self.assertEqual(ce.check(_delta(), second, _deep(), _handoff(), None, first=first)[0], [])
+        empty = _full()
+        empty["cards"][1]["checked"] = []
+        lines = ce.check(_delta(), empty, _deep(), _handoff(), None, first=first)[0]
+        self.assertTrue(lines and lines[0].startswith("b: 2차 재작업 카드인데 checked 가 비었다"), lines)
+        # 고친 칸(summary) 근거 없이 다른 칸 근거만 있으면 실패 · 그 칸을 칸 삭제하면 요구하지 않는다
+        other = _full()
+        other["cards"][1]["checked"] = [other["cards"][1]["checked"][1],
+                                        {"slot": "title_issue", "claim": "회수", "source": "Recall: Beta tablets"}]
+        self.assertTrue(any("1차 반려 칸 summary" in l for l in ce.check(_delta(), other, _deep(), _handoff(), None, first=first)[0]))
+        _lines, _stats, per = ce.card_issues(_delta(), other, _deep(), _handoff(), None, first=first)
+        self.assertEqual(list(per), ["b"])
+        # 1차가 아닌 판정에만 — first 없이는 종전과 같다
+        self.assertEqual(ce.check(_delta(), other, _deep(), _handoff(), None)[0], [])
+
+    def test_load_first_only_same_issue_rework_record(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            first = self._first()
+            with open(os.path.join(tmp, "copyedit.r1.json"), "w", encoding="utf-8") as f:
+                json.dump(first, f, ensure_ascii=False)
+            self.assertEqual(ce.load_first(tmp, _full()), first)
+            self.assertIsNone(ce.load_first(tmp, first))                # 아직 1차 그대로
+            self.assertIsNone(ce.load_first(tmp, {"cards": [{"web_card_id": "zz"}]}))

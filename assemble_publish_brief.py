@@ -37,6 +37,7 @@ from typing import Any
 
 import inject_slots
 import card_weight
+import firm_groups
 import inspection_card
 from grm_taxonomy import is_out_of_scope_483
 
@@ -824,6 +825,17 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
 
     report.adopted = len(adopted_cards)
     report.resources = len(resource_notes)
+
+    # [업체 그룹 묶음 2026-11-23] 화면 묶음은 렌더가 등록 원천(web/data/firm_groups.json)·같은 FEI
+    # 로만 정한다. 여기서는 카드를 바꾸지 않고, 같은 이름 계열인데 한 묶음으로 덮이지 않는 카드를
+    # '그룹 등록 후보'로 알린다(막지 않음). 원천 형식이 깨졌으면(근거 칸 비움 등) 발행을 막는다 —
+    # 렌더가 같은 원천을 읽다 죽기 전에 원인을 조립에서 보이게.
+    try:
+        _fg_reg = firm_groups.load_registry()
+        for line in firm_groups.candidate_lines(adopted_cards, _fg_reg):
+            report.warnings.append(f"[그룹] {line}")
+    except (firm_groups.RegistryError, ValueError) as e:
+        report.errors.append(f"[그룹] {e}")
 
     # 브리프 메타 재계산(assemble_web_brief 규약 미러) — 채택분 기준.
     out = copy.deepcopy(injected)

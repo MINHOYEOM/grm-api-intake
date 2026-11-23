@@ -542,6 +542,11 @@ if(_nt&&_nm){
        값은 속성에서 읽어 textContent 로만 넣는다(HTML 삽입 금지). */
     var tag=card.getAttribute('data-tag');
     if(tag){ var m=a.querySelector('.meta'); if(m) m.textContent=tag; }
+    /* [업체 그룹 묶음 2026-11-23] 옛 실사 표시·실사일 — 요약줄에도(textContent 만). */
+    var oi=card.getAttribute('data-old-insp');
+    if(oi){ var m2=a.querySelector('.meta'); if(m2){ var s=document.createElement('span');
+      s.className='old-insp-s'; s.style.cssText='display:inline-block;margin-right:8px;padding:0 7px;border:1px solid var(--coral);border-radius:999px;color:var(--coral-2);font-weight:600';
+      s.textContent=oi; m2.insertBefore(s, m2.firstChild); } }
     a.addEventListener('click', function(e){
       e.preventDefault(); setView('full', true);   /* 카드 하나 펼침 — 독자의 보기 선택으로 저장하지 않는다 */
       var t=document.getElementById(card.id);

@@ -101,6 +101,8 @@ python company/editorial/rehearsal_check.py ../_rehearsal-{회차}/company/run/r
 4-1. 교열이 카드를 전부 원문과 맞춰 봤다 — `copyedit.json` 의 카드 줄마다 `checked` 근거가 있고, `copyedit_evidence.py check` 와 같은 함수로 근거의 원문 조각이 그 카드 원문에 글자 그대로 있다(리허설 1121b: 표본 17장만 읽고 153장 `reject 0` — 이 항목이 없어 통과로 보였다).
 4-2. 심층에서만 걸린 반려 카드가 남아 있지 않다 — 교열이 `blank_slots.py deep-auto` 를 돌렸다(`next/copyedit.md` 2-4). `완료` 회차에 심층 삭제 주의가 있으면 뺀 기록 `slot_removals.json` 이 실행 폴더에 있다
    (리허설 1121b: 반려 21장 중 12장이 심층에서만 걸려 10장 상한을 넘겼다 — 대표 결정으로 심층은 코드가 빼고 통과, 재작업 상한 25장).
+4-3. 지울 수 있는 칸(선택 칸·심층)만 걸린 반려 카드가 남아 있지 않고, 2차 판정이 1차의 칸 삭제 주의를 잃지 않았다 — `deep-auto` 와 같은 함수(`blankable_notes`·`carry_first`)로 본다
+   (11-23 실전: 1차가 칸 삭제로 정한 fda483-196441 `hook_line` 을 2차가 `fails` 로 올려 반려 1장으로 `보류`).
 5. `scaffold.json` 이 그 날짜의 것이고 델타의 카드를 전부 갖고 있다. handoff 의 모든 행이 상태를 하나씩 받는다(발행·미채택·보류·오류 중 하나 — 빈 행 0).
 6. (사람) Notion·main·날짜 브랜치에 리허설이 쓴 것이 없다 — Notion handoff·Intake 행의 마지막 수정 시각, `git log origin/main`, `git ls-remote origin 'claude/company-20*'` 로 본다.
 

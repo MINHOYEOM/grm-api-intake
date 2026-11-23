@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T04:42:14Z",
+ "generated_at": "2026-11-23T05:53:34Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45112679583,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45120244871,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-23T04:34:39Z",
-    "updatedAt": "2026-11-23T04:42:04Z",
+    "createdAt": "2026-11-23T05:50:12Z",
+    "updatedAt": "2026-11-23T05:50:16Z",
     "headBranch": "feat/firm-group-cluster-1123",
     "displayTitle": "feat(브리프): 같은 업체 그룹 카드 매주 자동 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45112679583"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45120244871"
    },
    {
-    "databaseId": 45112625798,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45120241356,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-23T04:34:06Z",
-    "updatedAt": "2026-11-23T04:41:54Z",
+    "createdAt": "2026-11-23T05:50:10Z",
+    "updatedAt": "2026-11-23T05:50:14Z",
     "headBranch": "feat/firm-group-cluster-1123",
-    "displayTitle": "feat(브리프): 같은 업체 그룹 카드를 매주 자동으로 한 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45112625798"
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into feat/firm-group-clust…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45120241356"
    },
    {
-    "databaseId": 45112459132,
+    "databaseId": 45119832742,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-23T04:32:23Z",
-    "updatedAt": "2026-11-23T04:41:48Z",
+    "createdAt": "2026-11-23T05:46:12Z",
+    "updatedAt": "2026-11-23T05:53:19Z",
     "headBranch": "main",
-    "displayTitle": "chore: refresh recent regulatory news (#1878)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45112459132"
+    "displayTitle": "fix(편집팀): 교열 판정이 갈린 4가지를 사전 점검 코드로 고정 — 개인 실명·가림 값 추측·진술 단정·날짜 (#1881)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45119832742"
    },
    {
-    "databaseId": 45110372806,
+    "databaseId": 45115772042,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-23T04:11:54Z",
-    "updatedAt": "2026-11-23T04:19:20Z",
-    "headBranch": "claude/linkedin-anatomy-2026-11-23",
-    "displayTitle": "linkedin(anatomy): 2026-11-23 사건 해부 슬롯 a1·a2 — 기준일탈 부실 조사·설비 청결 불량 / 함량 기준일탈 조사 미흡·공정 밸리데이션 부실",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45110372806"
+    "createdAt": "2026-11-23T05:07:06Z",
+    "updatedAt": "2026-11-23T05:14:23Z",
+    "headBranch": "feat/firm-group-cluster-1123",
+    "displayTitle": "feat(브리프): 같은 업체 그룹 카드 매주 자동 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45115772042"
    },
    {
-    "databaseId": 45110359977,
+    "databaseId": 45115769920,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-23T04:11:46Z",
-    "updatedAt": "2026-11-23T04:19:58Z",
-    "headBranch": "claude/linkedin-anatomy-2026-11-23",
-    "displayTitle": "linkedin(anatomy): 2026-11-23 사건 해부 슬롯 a1·a2 — 기준일탈 부실 조사·설비 청결 불량 / …",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45110359977"
+    "createdAt": "2026-11-23T05:07:05Z",
+    "updatedAt": "2026-11-23T05:15:15Z",
+    "headBranch": "feat/firm-group-cluster-1123",
+    "displayTitle": "test(web): 골든 재동결 — 요약줄 옛 실사 JS 5줄(브리프 5장)·en.json 키 추가 해시(영문 5장)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45115769920"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45120568183,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-23T05:53:21Z",
+    "updatedAt": "2026-11-23T05:53:23Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45120568183"
+   },
+   {
     "databaseId": 45113397274,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45094478874"
-   },
-   {
-    "databaseId": 45091017715,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-23T00:49:31Z",
-    "updatedAt": "2026-11-23T00:49:33Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45091017715"
    }
   ],
   "grm-findings-translate-apply.yml": [

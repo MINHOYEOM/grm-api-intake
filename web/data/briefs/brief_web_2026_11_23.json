@@ -2989,9 +2989,9 @@
    "signal_tier": 3,
    "signal_label": "High",
    "type_tag": "483",
-   "headline_target": "Kenneth F Tesch",
+   "headline_target": "개인 사업자",
    "title_issue": "식용 소 신장 암피실린 허용치 초과",
-   "summary": "FDA가 축산 농가 Kenneth F Tesch(업체)에 Form 483(관찰사항 1건)을 발행했다. 식용 조직에 허용치를 넘는 약물 잔류가 있는 동물을 주간 거래에 내놓았다고 지적했다.",
+   "summary": "FDA가 축산 농가(개인 사업자)에 Form 483(관찰사항 1건)을 발행했다. 식용 조직에 허용치를 넘는 약물 잔류가 있는 동물을 주간 거래에 내놓았다고 지적했다.",
    "facts": [
     {
      "label": "발행일",
@@ -3003,7 +3003,7 @@
     },
     {
      "label": "제조소/업체",
-     "value": "Kenneth F Tesch · FEI 3041017158"
+     "value": "개인 사업자 · FEI 3041017158"
     },
     {
      "label": "시설 · 유형",
@@ -3068,7 +3068,7 @@
    "hook_line": "소 신장에서 암피실린 0.0799 ppm 검출, 허용치 0.01 ppm",
    "en": {
     "title_issue": "Ampicillin residue above tolerance in cow",
-    "summary": "FDA issued a Form 483 with 1 observation to Kenneth F Tesch (the firm), a grower, for offering a food-producing animal for interstate commerce with a drug residue above tolerance in edible tissue.",
+    "summary": "FDA issued a Form 483 with 1 observation to a grower (an individual business), for offering a food-producing animal for interstate commerce with a drug residue above tolerance in edible tissue.",
     "implication": "The cow was treated with ampicillin on the farm on 2025-08-16 and 2025-08-19 (Observation 1).",
     "key_facts": [
      "Observation 1: an animal offered for sale had ampicillin residue of 0.0799 ppm in the kidney (tolerance 0.01 ppm)"
@@ -3447,9 +3447,9 @@
    "signal_tier": 3,
    "signal_label": "High",
    "type_tag": "483",
-   "headline_target": "Matthew A. Leo",
+   "headline_target": "개인 사업자",
    "title_issue": "도축 소 신장 멜록시캄 검출",
-   "summary": "FDA가 육우 목장 Matthew A. Leo(업체)에 Form 483(관찰사항 2건)을 발행했다. 식용 조직에서 약물이 검출된 동물을 주간 거래에 내놓고 투약 기록을 완전하게 유지하지 않았다고 지적했다.",
+   "summary": "FDA가 육우 목장(개인 사업자)에 Form 483(관찰사항 2건)을 발행했다. 식용 조직에서 약물이 검출된 동물을 주간 거래에 내놓고 투약 기록을 완전하게 유지하지 않았다고 지적했다.",
    "facts": [
     {
      "label": "발행일",
@@ -3461,7 +3461,7 @@
     },
     {
      "label": "제조소/업체",
-     "value": "Matthew A. Leo · FEI 3041047522"
+     "value": "개인 사업자 · FEI 3041047522"
     },
     {
      "label": "시설 · 유형",
@@ -3534,7 +3534,7 @@
    "hook_line": "투약 기록에 없는 멜록시캄이 도축 소 신장에서 검출",
    "en": {
     "title_issue": "Meloxicam found in slaughtered steer",
-    "summary": "FDA issued a Form 483 with 2 observations to Matthew A. Leo (the firm), a beef ranch, for offering an animal with a drug residue in edible tissue for interstate commerce and not keeping complete treatment records.",
+    "summary": "FDA issued a Form 483 with 2 observations to a beef ranch (an individual business), for offering an animal with a drug residue in edible tissue for interstate commerce and not keeping complete treatment records.",
     "implication": "USDA tests found meloxicam, while the steer's treatment records showed no meloxicam treatment (Observation 2).",
     "key_facts": [
      "Observation 1: meloxicam found in the kidney of a steer delivered for slaughter; no tolerance exists for meloxicam in edible cattle tissue",

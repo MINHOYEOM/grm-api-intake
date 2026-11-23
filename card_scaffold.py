@@ -843,11 +843,20 @@ def _detail_fda_483_observations(row: dict[str, Any], raw: dict[str, Any]) -> di
     norm = [o for o in norm if _is_legible_deficiency(o["deficiency"])]
     if not norm:
         return None
-    detail: dict[str, Any] = {
-        "type": "fda_483_observations",
-        "count": len(norm),
-        "observations": norm,
-    }
+    # [건수 2026-11-23] count 는 원문 관찰 건수다 — rows 길이로 두면 게이트에서 빠진 관찰만큼
+    # 조용히 줄어든다(실측 196455: 원문 6건 → "관찰사항 3건"). 수집기가 원문 번호 표제로 센
+    # `raw.fda_483_observation_count` 가 있으면 그것을(None = 단정 불가 → count 비움), 없으면
+    # (낡은 raw) 같은 규칙 함수로 rows 번호만 보고 센다 — 번호가 건너뛰면 비운다.
+    from collect_fda_483 import fda483_observation_count   # 규칙의 단일 출처
+    if "fda_483_observation_count" in raw:
+        stored = raw.get("fda_483_observation_count")
+        count = stored if isinstance(stored, int) and stored > 0 else None
+    else:
+        count = fda483_observation_count(norm)
+    detail: dict[str, Any] = {"type": "fda_483_observations"}
+    if count is not None:
+        detail["count"] = count
+    detail["observations"] = norm
     # [OCR 출처 표기 2026-07-27] 이 영문이 **원문 텍스트층**인지 **우리가 OCR 로 판독한 것**
     # 인지 구분한다. 스캔 483 OCR 폴백 도입 이후 두 경로가 섞이는데, 렌더는 이 블록을
     # "원문 · FDA 483" 이라고 표시한다 — 우리 판독 결과를 원문이라고 부르면 그건 거짓이다

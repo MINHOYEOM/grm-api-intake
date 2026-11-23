@@ -338,7 +338,7 @@ def markdown(rep: Report) -> str:
              "| 문서 | 서명란 | 전 | 후(뽑은 이름) | 사유 | 전문 속 위치 발췌 |",
              "|---|---|---|---|---|---|"]
     for r in rep.rows:
-        ev = " / ".join(e for e in r["evidence"] if e).replace("|", "¦")[:400]
+        ev = " / ".join(e for e in r["evidence"] if e).replace("|", "¦")
         lines.append(f"| {r['document_id']} | {'있음' if r['signature_block'] else '없음'} | (빈칸) | "
                      f"{', '.join(r['after']) or '—'} | {r['reason']} | {ev} |")
     if rep.audited:
@@ -347,7 +347,7 @@ def markdown(rep: Report) -> str:
                   "| 문서 | 지금 저장된 이름 | 틀린 이름(왜) | 바꿀 값 | 사유 | 전문 속 위치 발췌 |",
                   "|---|---|---|---|---|---|"]
         for r in rep.audit_rows:
-            ev = " / ".join(e for e in r["evidence"] if e).replace("|", "¦")[:400]
+            ev = " / ".join(e for e in r["evidence"] if e).replace("|", "¦")
             bad = ", ".join(f"{b['name']}({b['why']})" for b in r["bad"])
             lines.append(f"| **{r['document_id']}** | {', '.join(r['before'])} | {bad} | "
                          f"{', '.join(r['after']) or '(빈칸)'} | {r['reason']} | {ev} |")

@@ -1,18 +1,18 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-22",
+ "measured_on": "2026-11-23",
  "window_days": 60,
  "totals": {
-  "items": 491
+  "items": 480
  },
  "by_source": [
   {
    "v": "OpenFDA Recall",
-   "c": 192
+   "c": 182
   },
   {
    "v": "Federal Register",
-   "c": 78
+   "c": 80
   },
   {
    "v": "ECA Academy",
@@ -20,7 +20,7 @@
   },
   {
    "v": "MFDS",
-   "c": 48
+   "c": 47
   },
   {
    "v": "EMA",
@@ -36,11 +36,11 @@
   },
   {
    "v": "MHRA Inspectorate",
-   "c": 12
+   "c": 11
   },
   {
    "v": "PIC/S",
-   "c": 3
+   "c": 2
   },
   {
    "v": "WHO",
@@ -48,6 +48,20 @@
   }
  ],
  "items": [
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-23",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Extralabel Drug Use in Animals",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/23/2026-23740/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-23",
+   "title": "Tobacco Products Scientific Advisory Committee; Notice of Meeting; Establishment of a Public Docket; Request for Comments",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/23/2026-23750/tobacco-products-scientific-advisory-committee-notice-of-meeting-establishment-of-a-public-docket"
+  },
   {
    "source": "Federal Register",
    "source_kind": "Notice",
@@ -3393,97 +3407,6 @@
    "published_date": "2026-09-24",
    "title": "[HC] Apo-Semaglutide Injection : Incorrect dose display",
    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/apo-semaglutide-injection-incorrect-dose-display-0"
-  },
-  {
-   "source": "MFDS",
-   "source_kind": "guidance-industry",
-   "published_date": "2026-09-23",
-   "title": "의료제품 개발 상담 사례집(의약품, 바이오의약품, 의료기기)",
-   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15955"
-  },
-  {
-   "source": "MHRA Inspectorate",
-   "source_kind": "Class 4 Medicines Defect Notification",
-   "published_date": "2026-09-23",
-   "title": "Class 4 Medicines Defect Notification: B. Braun Melsungen AG, Meropenem 1000 mg powder and solvent for solution for infusion, EL(26)A/39",
-   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-b-braun-melsungen-ag-meropenem-1000-mg-powder-and-solvent-for-solution-for-infusion-el-26-a-slash-39"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class I",
-   "published_date": "2026-09-23",
-   "title": "Thyroid Tablets, USP, 1/2 Grain (30 mg), Each tablet contains: levothyroxine (T4) 19 mcg, liothyronine (T3) 4.5 mcg, 100 Tablets, Rx only, Distributed by: Vitruvias Therapeutics, Auburn, AL 36830, Product of USA, NDC 69680-166-00.",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Chlorthalidone Tablets, USP, 25 mg, 100 Tablets per bottle, Rx only, Manufactured by: Inventia Healthcare Limited. NDC: 64980-599-01",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Dopamine HCl Inj., USP, 200 mg/5 mL (40 mg/mL), 5 mL Single-dose, 25 vials per tray, Rx only, Distributed by Hospira, Inc., Lake Forest, IL 60045 USA, Vial NDC 0409-5820-11, Carton NDC 0409-5820-01.",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Fluphenazine HCl Elixir, USP, 10 mg per 2 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0653-04",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Fluphenazine HCl Elixir, USP, 15 mg per 3 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0653-04",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Fluphenazine HCl Elixir, USP, 2.5 mg per 5 mL, Delivers: 5 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0654-16",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Fluphenazine HCl Elixir, USP, 20 mg per 4 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0653-04",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Fluphenazine HCl Elixir, USP, 5 mg per 1 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0653-04",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Fluphenazine HCl Elixir, USP, 5 mg per 10 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0654-16",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Class II",
-   "published_date": "2026-09-23",
-   "title": "Lidocaine Ointment USP, 5%, Speermint Flavor, 50 g Jar, Rx only, Mfd. by: Taro Pharmaceuticals Inc., Brampton, Ontario, L6T1C, Canada, Dist By: Taro Pharmaceuticals U.S.A. Inc. Hawthorne NY 70532 NDC: 51672-3008-5",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "PIC/S",
-   "source_kind": "PIC/S",
-   "published_date": "2026-09-23",
-   "title": "Revision of PIC/S GMP Guide (PE 009-18)",
-   "official_url": "http://www.picscheme.org/en/news/149/revision-of-pics-gmp-guide-pe-009-18"
   }
  ]
 }

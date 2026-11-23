@@ -549,6 +549,7 @@ grm-api-intake/
 ├─ collect_fda_inspections.py      # FDA 실사 등급(NAI/VAI/OAI) DDAPI 수집기 → public.fda_inspections 직행(findings/카드 미생성·GMP 외 ProjectArea 클라이언트 배제·회계연도 창 실행일 계산·월 1회 크론 + 수동 dispatch)
 ├─ probe_source_reachability.py    # 후보 소스에 러너가 닿는지 착수 전 1회 판정(기본 UA/브라우저 UA 2회 → OPEN·UA_GATED·BLOCKED) · `--targets silent` = 무음 12종(피드 항목 수·최신 날짜·파서 표식 검사)
 ├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
+├─ backfill_483_inspectors_from_body.py # 저장 전문(fda483_body_full)만으로 실사관 재추출(외부 요청 0) — 공통 함수 _extract_483_inspectors·글자 그대로 검사·raw_signal_apply_version(repair)+빈 findings.inspector_names 만 PATCH·dry 기본·행별 사유
 ├─ mfds_gmp_cert_snapshot.py      # 식약처 GMP 적합판정서 월 1회 전체 목록 → mfds_gmp_cert(142) 적재·업체 연결(브리프 무접촉)
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
@@ -556,7 +557,7 @@ grm-api-intake/
 ├─ backfill_483_obs_split.py  # 앞 관찰 상세가 삼킨 483 관찰을 저장 raw 에서 나눔(현행 수집기 앵커 규칙 재사용·PDF 불필요·`raw_signal_apply_version` 경유, dry-run 기본)
 ├─ raw_versioning.py, raw_signals_rebaseline.py # [원문 갱신 규칙 R1·R2] 정본 원문을 바꾸는 유일한 길(DB 함수 `raw_signal_apply_version`·보관표 `raw_signal_versions`, 148) · 지문이 내용과 어긋난 483·MFDS 행 기준선 재매김(+MFDS 참석자 재동기화, dry-run 기본, `grm-raw-signals-rebaseline.yml`). 직접 PATCH 는 `tests/test_raw_signals_write_guard.py` 가 막는다 — R3: 수리 도구 4개도 이 경로(`replace_raw`·`apply_record`), 함수 밖 원문 변경은 DB 트리거가 거부(150)
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
-├─ backfill_483_body_full.py      # 전문(fda483_body_full) 없이 굳은 최근 483 소급 — Notion 원문 → 없으면 PDF 재독(일일 규칙) → raw_signal_apply_version(repair, 전문 키 하나만 추가)·dry 기본
+├─ backfill_483_body_full.py      # 전문(fda483_body_full) 없이 굳은 최근 483 소급 — Notion 원문 → 없으면 PDF 재독(일일 규칙) → raw_signal_apply_version(repair, 전문 키 + 실사관 빈칸이면 공통 함수로 채움)·dry 기본
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
 ├─ backfill_eu_ncr_additional_plan.py # EU NCR ncr_additional(후속 설명) 소급 계획(같은 계획 스키마·기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄

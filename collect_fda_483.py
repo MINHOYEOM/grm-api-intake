@@ -42,6 +42,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from difflib import SequenceMatcher
 import shutil
 import subprocess
 import time
@@ -1760,7 +1761,9 @@ _INSPECTOR_TITLES = (
 )
 # 이름 토큰 1개: 대문자 시작 + [a-zA-Z'-] 연속 + 마침표 0~1개(중간이니셜 `F.`). 길이 상한은
 # 느슨히 두고(백트래킹 폭주 방지) 정밀 검사는 `_valid_inspector_name`이 담당한다.
-_INSPECTOR_TOKEN_RE = r"[A-Z][a-zA-Z'\-]{0,24}\.?"
+# [2026-11-23] 하이픈은 뒤에 글자가 올 때만 토큰에 넣는다 — `Sran- Investigator` 처럼 이름 끝에 붙은
+# 구분 하이픈을 토큰이 삼키면 뒤 구분자 판정이 어긋났다(Wilimczyk-Macri 같은 겹성은 그대로).
+_INSPECTOR_TOKEN_RE = r"[A-Z](?:[a-zA-Z']|-(?=[A-Za-z])){0,24}\.?"
 # 쉼표 앞의 "대문자 시작 토큰" 연속 구간(run) — 토큰 사이는 스페이스 1개(개행/파이프 등
 # 다른 구분자가 끼면 그 자리에서 매칭이 끊긴다 — "SEE REVERSE| Jose…"의 `|`처럼 서식 잡음이
 # 이름을 오염시키지 못하게 막는 부수 효과가 있다).
@@ -1781,8 +1784,62 @@ _INSPECTOR_TITLE_ALT = "|".join(re.escape(t) for t in _INSPECTOR_TITLES)
 # 검증을 통과해야 하고, 교차 확증 (a)/(b)도 그대로 요구된다. `[ \t]*` 로 좁혀 개행은 넘지
 # 않는다(다른 줄의 토큰이 이름으로 붙는 것을 막는다).
 _INSPECTOR_CANDIDATE_RE = re.compile(
-    rf"(?P<run>{_INSPECTOR_RUN_RE})[ \t]*,[ \t\r\n]*(?P<title>{_INSPECTOR_TITLE_ALT})\b"
+    rf"(?<![A-Za-z'\-])(?P<run>{_INSPECTOR_RUN_RE})[ \t]*,[ \t\r\n]*(?P<title>{_INSPECTOR_TITLE_ALT})\b"
 )
+# ── [2026-11-23] 서명란 형식 확장 — 저장 전문 163행 실측(GRM 수집완전성 점검 11-22, 9-3 R4) ──
+# 서명란이 있는데 이름을 못 뽑던 형식들. 직함 목록(`_INSPECTOR_TITLES`)은 상세 청소(`_SIGNER_TITLES`)가
+# 함께 쓰므로 건드리지 않고, **추출 전용** 직함 패턴을 따로 둔다(직함 텍스트는 저장하지 않는다).
+#   · 약칭·수식어: `Margaret M Annes, cso` · `Xiuju Lu, Lead CSO` · `Nicole Li, Lead Consumer Safety Officer`
+#     · `Pratik S. Upadhyay, DDC Investigator` · `Steven A. Brettler, GDUFA- Investigator`
+#     · `Wayne Seifert, Senior Regulatory Specialist` · `Athena Russell,\nStaff Fellow`
+#   · OCR 로 깨진 직함: `Megan T Ziegler, I nvestigat or`
+#   · 구분자: 쉼표 외에 ` - `(`Rowena S. Nguyen - Investigator`) · `/`(`Paula A. Trost/Investigator`)
+#     · OCR 이 쉼표를 마침표로 읽은 꼴(`Prabhu P Raju. Investigator`)
+#   · 학위가 끼는 꼴: `Liqun Zhao, Ph.D., Pharmaceutical Scientist` · `Hung H. Do, M.Sc., Investigator`
+_INSPECTOR_TITLE_EXT_RX = (
+    r"(?:(?:Lead|Senior|Sr\.?|Supervisory|Drug|DDC|ORA|GDUFA)[ \t=\-]*)*"
+    r"(?:Investigator|INVESTIGATOR|I[ ]?nvest[ ]?igat[ ]?o[ ]?r|Inspector|Consumer[ \t\r\n]+Safety"
+    r"|(?i:cso)|Microbiologist|Biologist|Chemist|Analyst|FDA[ \t]+Center[ \t]+Employee"
+    r"|Staff[ \t\r\n]+[Ff]ellow|Biological[ \t\r\n]+Reviewer|Pharmaceutical[ \t\r\n]+(?:Scientist|Quality)"
+    r"|Regulatory[ \t\r\n]+Specialist|Pharmacokineticist|Pharmacologist|Branch[ \t]+Chief"
+    r"|Medical[ \t]+Officer|(?:Team|Inspection)[ \t]+Lead)\b"
+)
+# 학위 — 이름 바로 뒤 쉼표 다음에 오는 학위는 그 자리가 사람 이름이라는 강한 증거다.
+# 박사급(STRONG)은 직함이 쪽 끝에서 잘려도(`Madushini Dharmasena, Ph.D.,` + 줄바꿈) 이름으로 받는다.
+_INSPECTOR_STRONG_DEGREE_RX = r"(?:Ph\.?[ ]?[D0O]\.?|PhD|Pharm\.?[ ]?D\.?|PharmD|DHSc\.?)"
+_INSPECTOR_DEGREE_RX = (
+    rf"(?:{_INSPECTOR_STRONG_DEGREE_RX}|M\.?Sc\.?|MS/OSH|M\.?S\.?|MPH|RN|MBA|DVM)"
+)
+# 이름 뒤 구분자: 쉼표 · 공백-하이픈 · 하이픈-공백 · 슬래시 · (2글자 이상 토큰 끝 마침표 뒤) 공백.
+_INSPECTOR_SEP_RX = (
+    r"(?:[ \t]*,[ \t\r\n]*|[ \t]+-[ \t\r\n]*|-[ \t]+|[ \t]*/[ \t]*|(?<=[a-z]{2}\.)[ \t]+)"
+)
+_INSPECTOR_DEGREE_SEQ_RX = rf"(?:{_INSPECTOR_DEGREE_RX}[ \t]*[,.\-]*[ \t\r\n]*)*"
+_INSPECTOR_EXT_CANDIDATE_RE = re.compile(
+    rf"(?<![A-Za-z'\-])(?P<run>{_INSPECTOR_RUN_RE}){_INSPECTOR_SEP_RX}"
+    rf"(?:{_INSPECTOR_DEGREE_SEQ_RX}(?P<title>{_INSPECTOR_TITLE_EXT_RX})"
+    rf"|(?P<degree>{_INSPECTOR_STRONG_DEGREE_RX})(?=[\s,.\-]))"
+)
+# 전자 483 양식 — `SEE REVERSE | Robert J.\nHam,\nInvestigator`. 서명 칸 머리말 바로 뒤라 이름이
+# 줄바꿈으로 갈라져도 받는다(토큰 사이 공백 한 칸 대신 공백 문자 하나 — 개행 포함).
+_INSPECTOR_EFORM_RE = re.compile(
+    r"(?:SEE[ \t]*REVERSE|OF[ \t]+THIS[ \t]+PAGE)\s*\|+\}?\s*"
+    rf"(?P<run>{_INSPECTOR_TOKEN_RE}(?:\s{_INSPECTOR_TOKEN_RE}){{1,4}})[ \t]*,\s*"
+    rf"(?P<title>{_INSPECTOR_TITLE_EXT_RX})"
+)
+# 전자서명(PIV) 줄 — `Melissa D. Ray -S` · `WAYNE MCGRATH -S`. 대문자 이름도 받되 저장은 원문 그대로.
+# 공백 + `-S` 만 받는다(`Dharmasena-S`·`Brettier-s` 처럼 붙거나 소문자인 OCR 꼴은 받지 않는다).
+_INSPECTOR_PIV_TOKEN_RE = r"(?:[A-Z](?:[a-zA-Z']|-(?=[A-Za-z])){0,24}\.?)"
+_INSPECTOR_PIV_RE = re.compile(
+    rf"(?<![A-Za-z'\-])(?P<run>{_INSPECTOR_PIV_TOKEN_RE}(?: {_INSPECTOR_PIV_TOKEN_RE}){{1,7}})"
+    r"[ \t]+-S(?![A-Za-z])"
+)
+_INSPECTOR_PIV_CONTEXT_RE = re.compile(r"Digitally|signed by|SIGNATURE|DATE\s+ISSUED|SEE\s+REVERSE")
+_INSPECTOR_PIV_CONTEXT_WINDOW = 160
+# 서명란 판정(남는 행 사유 분류용) — 보고서 9-3 의 정의 그대로.
+_SIGNATURE_BLOCK_RE = re.compile(r"EMPLOYEE\(S\) SIGNATURE|Investigator")
+# 원문 가림 — `(b)(6)`(개인정보) 가 서명란 근처에 있으면 이름이 가려진 것이다. 이름으로 바꾸지 않는다.
+_INSPECTOR_REDACTION_RE = re.compile(r"\(\s*b\s*\)\s*\(\s*6\s*\)|Redacted\s*B6", re.I)
 # 교차 확증 (a) — 직함 뒤 60자 이내 날짜. [2026-07-30 교정 확인] 서명블록 두 번째 이후
 # 서명자는 날짜가 OCR 로 깨지는 경우(`0227-2026`·`0417-2026` — 슬래시 없음)가 실측에서
 # 흔하다. 여기서 패턴을 넓히지 않는다 — 넓히면 산문 오탐이 늘어난다. 이런 경우는 (b)
@@ -1832,6 +1889,18 @@ _INSPECTOR_FORM_VOCAB = {
     "SEE", "REVERSE", "PAGE", "FORM", "DATE", "ISSUED", "EMPLOYEE", "SIGNATURE",
     "THIS", "AND", "THE", "OF", "FDA", "AMENDMENT", "REPORT", "FIRM", "NAME",
     "TITLE", "ADDRESS",
+    # [2026-11-23] 전자서명 줄·가림 표시·직함 단어가 이름 자리에 끼는 것을 막는다.
+    "DIGITALLY", "SIGNED", "BY", "REDACTED", "DISTRICT", "OFFICE", "INVESTIGATOR",
+    "INSPECTOR", "CSO", "PREVIOUS", "EDITION", "OBSOLETE", "INSPECTIONAL", "OBSERVATIONS",
+    # 직함 낱말 — `Thomas Finn, Team Lead, Microbiologist` 에서 `Team Lead` 가 이름으로 저장돼 있었다
+    # (fda483-195531 실측). 첫 글자만 대문자여도 끝 토큰이 아니면 거부된다(`_valid_inspector_name`).
+    "TEAM", "LEAD", "INSPECTION", "COMPLIANCE", "CONSUMER", "SAFETY", "SUPERVISORY", "SENIOR",
+    "STAFF", "FELLOW", "REVIEWER", "SPECIALIST", "REGULATORY", "PHARMACEUTICAL", "BIOLOGICAL",
+    "OFFICER", "BRANCH", "CHIEF", "SCIENTIST", "QUALITY",
+    # 직함 둘째 줄 — `Lata C. Mathew, PhD⏎Preapproval Manager/ Investigator`(fda483-196378 실측).
+    "MANAGER", "PREAPPROVAL", "DIRECTOR", "PRESIDENT", "HEAD", "PROGRAM", "COORDINATOR",
+    "ASSOCIATE", "ASSISTANT", "DEPUTY", "ACTING", "SUPERVISOR", "ANALYST", "CHEMIST",
+    "MICROBIOLOGIST", "BIOLOGIST",
 }
 
 
@@ -1922,14 +1991,17 @@ def _dedupe_inspector_names(names: list[str]) -> list[str]:
     return out
 
 
-def _valid_inspector_name(name: str) -> bool:
+def _valid_inspector_name(name: str, *, allow_caps: bool = False, max_tokens: int = 4) -> bool:
     """이름 문법 검증(순수 함수) — 토큰 2~4개·토큰당 ≤20자·전체 4~60자·양식 어휘 제외.
 
     정규식(`_INSPECTOR_NAME_RE`)이 이미 대부분 걸러내지만, 여기서 다시 명시적으로 검사해
     거부 조건을 코드로 auditable 하게 남긴다(숫자·기호 오염은 애초에 정규식 문법이 막고,
-    여기서는 길이 상한·양식 어휘까지 마저 확인)."""
+    여기서는 길이 상한·양식 어휘까지 마저 확인).
+
+    `allow_caps` — 전자서명 줄(`WAYNE MCGRATH -S`)처럼 **이름 전체가** 대문자인 경우만 받는다
+    (대문자·소문자가 섞인 `Charles Y. KUO` 는 OCR 혼동으로 보고 거부)."""
     tokens = name.split(" ")
-    if not (2 <= len(tokens) <= 4):
+    if not (2 <= len(tokens) <= max_tokens):
         return False
     if not (4 <= len(name) <= 60):
         return False
@@ -1938,18 +2010,215 @@ def _valid_inspector_name(name: str) -> bool:
     # 조각은 식별에 쓸모가 없을뿐더러 같은 사람을 중복 표시하게 만든다.
     if len(tokens[0].rstrip(".")) < 2:
         return False
-    for tok in tokens:
+    # [2026-11-23] 끝 토큰이 홑이니셜이면 성이 잘린 조각이다(`John M.`).
+    if len(tokens[-1].rstrip(".")) < 2:
+        return False
+    all_caps = all(t.rstrip(".").isupper() for t in tokens)
+    if all_caps and not allow_caps:
+        return False
+    for i, tok in enumerate(tokens):
         if len(tok) > 20 or not re.fullmatch(r"[A-Z][a-zA-Z'\-]*\.?", tok):
             return False
-        if tok.rstrip(".").upper() in _INSPECTOR_FORM_VOCAB:
+        core = tok.rstrip(".")
+        # [2026-11-23] 마침표는 이니셜(한 글자) 뒤에만 — `Grieg. Margaret M. Annes` 처럼 앞줄 낱말이
+        # 마침표째 이름에 붙는 OCR 꼴을 막는다.
+        if tok.endswith(".") and len(core) != 1:
             return False
+        # 양식 어휘 — 대문자로 적힌 양식 낱말은 어디서든 거부. 첫 글자만 대문자인 낱말은 성(끝 토큰)
+        # 자리일 때만 허용한다(`Jackson Y See` 의 See 는 성이다 — 종전엔 SEE 로 보고 버렸다).
+        if core.upper() in _INSPECTOR_FORM_VOCAB:
+            if core.isupper() or i != len(tokens) - 1:
+                return False
+        if all_caps:
+            continue                              # 전부 대문자인 전자서명 이름 — 형태 검사 대상 아님
         if not _inspector_token_shape_ok(tok):   # 게이트① OCR 대소문자 혼동
             return False
     return True
 
 
+def _inspector_name_in_text(name: str, text: str) -> bool:
+    """안전장치 — 이름이 그 문서 전문 안에 **글자 그대로** 있는가.
+
+    토큰은 철자·대소문자·마침표까지 원문과 같아야 하고, 토큰 사이만 공백 문자(띄어쓰기·줄바꿈)
+    차이를 허용한다(서명 칸에서 이름이 줄바꿈으로 갈라진 `Robert J.\\nHam` 을 위해서). 앞뒤는 글자
+    경계여야 한다(`Shafigq` 안의 `Shafig` 는 일치로 보지 않는다).
+    이 검사를 통과하지 못한 이름은 어떤 경로로 만들어졌든 내보내지 않는다 — 다른 문서·프로파일에서
+    빌려오거나 철자를 고쳐 쓰는 경로가 생겨도 여기서 막힌다."""
+    toks = [t for t in (name or "").split(" ") if t]
+    if not toks or not text:
+        return False
+    rx = r"(?<![A-Za-z])" + r"\s+".join(re.escape(t) for t in toks) + r"(?![A-Za-z])"
+    return re.search(rx, text) is not None
+
+
+def _same_person_middle_initial(a: str, b: str) -> bool:
+    """같은 문서에서 가운데 이니셜만 있고 없는 두 표기(`Madushini Dharmasena` ↔
+    `Madushini N. Dharmasena`)인가 — 첫·끝 토큰이 같고 남는 토큰이 전부 홑이니셜."""
+    ka, kb = _inspector_key(a).split(" "), _inspector_key(b).split(" ")
+    if len(ka) == len(kb) or ka[0] != kb[0] or ka[-1] != kb[-1]:
+        return False
+    longer, shorter = (ka, kb) if len(ka) > len(kb) else (kb, ka)
+    extra = list(longer[1:-1])
+    for t in shorter[1:-1]:
+        if t in extra:
+            extra.remove(t)
+        else:
+            return False
+    return all(len(t) == 1 for t in extra)
+
+
+def _same_person_initial_vs_middle(a: str, b: str) -> bool:
+    """`Thuy Thanh Nguyen` ↔ `Thuy T. Nguyen` — 토큰 수가 같고, 다른 자리는 한쪽이 홑이니셜이며
+    다른 쪽 낱말이 그 글자로 시작할 때만. 둘 다 원문 그대로이고, 남기는 쪽은 먼저 나온 표기다."""
+    ka, kb = _inspector_key(a).split(" "), _inspector_key(b).split(" ")
+    if len(ka) != len(kb) or len(ka) < 3 or ka[0] != kb[0] or ka[-1] != kb[-1]:
+        return False
+    diff = [(x, y) for x, y in zip(ka[1:-1], kb[1:-1]) if x != y]
+    return bool(diff) and all(
+        (len(x) == 1 and y.startswith(x)) or (len(y) == 1 and x.startswith(y)) for x, y in diff)
+
+
+def _same_person_hyphen_given(a: str, b: str) -> bool:
+    """`Bao-Ngoc Nguyen` ↔ `Bao Nguyen` — 나머지 토큰이 같고 첫 토큰 하나가 다른 쪽 겹이름의 앞부분."""
+    ka, kb = _inspector_key(a).split(" "), _inspector_key(b).split(" ")
+    if len(ka) != len(kb) or ka[1:] != kb[1:] or ka[0] == kb[0]:
+        return False
+    return ka[0].split("-")[0] == kb[0] or kb[0].split("-")[0] == ka[0]
+
+
+# 실사관 추출 사유 코드 — 빈칸으로 남는 행이 왜 비었는지(사람 확인 대상 분류용).
+INSPECTORS_OK = "ok"
+INSPECTORS_NO_TEXT = "no-text"                      # 전문이 없다
+INSPECTORS_NO_SIGNATURE = "no-signature-block"      # 전문에 서명란(EMPLOYEE(S) SIGNATURE·Investigator)이 없다
+INSPECTORS_REDACTED = "redacted"                    # 서명란은 있으나 이름이 (b)(6) 로 가려졌다
+INSPECTORS_OCR_CONFLICT = "ocr-spelling-conflict"   # 같은 사람이 두 철자로 읽혔다 — 어느 쪽인지 모른다
+INSPECTORS_PARSER_LIMIT = "parser-limit"            # 서명란은 있으나 이름 형식을 못 읽었다(OCR 훼손 등)
+
+
+def _inspector_confirmed(body: str, name_start: int, title_end: int) -> bool:
+    """서명블록 문맥 교차 확증 — 이름 앞 200자 안 서명 마커 또는 직함 뒤 60자 안 날짜."""
+    before = body[max(0, name_start - _INSPECTOR_MARKER_LOOKBEHIND):name_start]
+    after = body[title_end:title_end + _INSPECTOR_DATE_LOOKAHEAD]
+    return bool(_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after))
+
+
+def _inspector_strip_run(run: str) -> tuple[str, int]:
+    """run → (이름, 앞에서 벗겨낸 글자 수). 왼쪽 양식 어휘를 벗기고 끝 토큰의 마침표(이니셜 아님)를 뗀다.
+
+    토큰 사이 공백 문자(개행 포함)는 띄어쓰기 한 칸으로 모은다 — 저장 이름은 원문 토큰 그대로다."""
+    tokens = run.split()
+    offset = 0
+    rest = run
+    # 전자서명 꼬리(`Feonen-S`)가 붙은 토큰까지는 앞줄 서명 잔여물이다 — 그 뒤부터가 이름 후보.
+    glued = [i for i, t in enumerate(tokens) if t.rstrip(".").endswith("-S")]
+    drop = glued[-1] + 1 if glued else 0
+    while tokens and (drop > 0 or tokens[0].rstrip(".").upper() in _INSPECTOR_FORM_VOCAB):
+        drop = max(0, drop - 1)
+        idx = rest.find(tokens[0])
+        cut = idx + len(tokens[0])
+        while cut < len(rest) and rest[cut].isspace():
+            cut += 1
+        offset += cut
+        rest = rest[cut:]
+        tokens = tokens[1:]
+    if tokens and tokens[-1].endswith(".") and len(tokens[-1].rstrip(".")) >= 2:
+        tokens[-1] = tokens[-1].rstrip(".")      # `Raju.`(쉼표를 마침표로 읽은 OCR) → `Raju`
+    return " ".join(tokens), offset
+
+
+def _extract_483_inspectors_detail(text: str) -> tuple[list[str], str]:
+    """`_extract_483_inspectors` 의 본체 — (이름 목록, 사유 코드). 사유는 이름이 있으면 `ok`.
+
+    일일 수집·과거분 백필·OCR 복구·전문 백필·실사관 재추출 도구가 모두 이 함수(또는 이름만 돌려주는
+    `_extract_483_inspectors`)를 부른다 — 규칙을 다른 곳에 베끼지 않는다.
+    """
+    body = text or ""
+    if not body.strip():
+        return [], INSPECTORS_NO_TEXT
+    # (위치, 이름) — 서명 칸 이름(직함·학위·전자 양식) 먼저, 전자서명(PIV) 줄은 뒤에. 같은 사람의 두
+    # 표기는 앞(인쇄된 이름)이 남는다.
+    primary: list[tuple[int, str]] = []
+    for m in _INSPECTOR_EXT_CANDIDATE_RE.finditer(body):
+        name, offset = _inspector_strip_run(m.group("run"))
+        if not _valid_inspector_name(name):
+            continue
+        name_start = m.start("run") + offset
+        end = m.end("title") if m.group("title") else m.end("degree")
+        if not _inspector_confirmed(body, name_start, end):
+            continue                                   # 확증 없음 — 산문 오탐 방지
+        primary.append((name_start, name))
+    for m in _INSPECTOR_EFORM_RE.finditer(body):
+        name, offset = _inspector_strip_run(m.group("run"))
+        # 전자 양식 서명 칸은 머리말 바로 뒤라 겹성(`Milton J De Jesus Tavarez`)까지 5토큰을 받는다.
+        if not _valid_inspector_name(name, max_tokens=5):
+            continue
+        primary.append((m.start("run") + offset, name))   # 서명 칸 머리말 자체가 확증
+    primary.sort(key=lambda p: p[0])
+    piv: list[str] = []
+    for m in _INSPECTOR_PIV_RE.finditer(body):
+        name, _ = _inspector_strip_run(m.group("run"))
+        if not _valid_inspector_name(name, allow_caps=True):
+            continue
+        lo = max(0, m.start() - _INSPECTOR_PIV_CONTEXT_WINDOW)
+        if not _INSPECTOR_PIV_CONTEXT_RE.search(body, lo, m.end() + _INSPECTOR_PIV_CONTEXT_WINDOW):
+            continue
+        # 전자서명 줄은 글씨가 작아 OCR 이 앞 글자를 잘라 먹는다(실측 `MONE E. PITTS` ← SIMONE).
+        # 그래서 ①인쇄된 이름(primary)과 비슷하면 버리고(인쇄된 이름이 기준) ②같은 표기가 문서에
+        # **두 번 이상** 그대로 나올 때만 받는다 — 쪽마다 따로 읽힌 판독이 일치해야 믿는다.
+        if any(SequenceMatcher(None, _inspector_key(name), _inspector_key(p)).ratio()
+               >= _INSPECTOR_NEAR_DUP_RATIO for _, p in primary):
+            continue
+        if len(re.findall(r"(?<![A-Za-z])" + re.escape(m.group("run")) + r"[ \t]+-S(?![A-Za-z])",
+                          body)) < 2:
+            continue
+        piv.append(name)
+    out: list[str] = []
+    seen: set[str] = set()
+    for name in [n for _, n in primary] + piv:
+        key = _inspector_key(name)
+        if key in seen or any(_same_person_middle_initial(name, o)
+                              or _same_person_initial_vs_middle(name, o)
+                              or _same_person_hyphen_given(name, o) for o in out):
+            continue
+        seen.add(key)
+        out.append(name)
+        if len(out) >= _INSPECTOR_MAX_CANDIDATES:
+            break                                      # 병리적 입력 상한(중복 정리 전 원시분)
+    # 앞 낱말이 OCR 잡음인 긴 표기(`Qvrtee Margaret M. Annes`, 서명 칸 7번 중 1번)와 그 뒷부분 이름
+    # (`Margaret M. Annes`, 4번)이 함께 있으면, 서명 칸 후보로 **더 자주** 읽힌 뒷부분 이름을 남긴다.
+    # 횟수가 같으면 종전대로 긴 쪽(조각 흡수)이다.
+    cand_count: dict[str, int] = {}
+    for _, n in primary:
+        cand_count[_inspector_key(n)] = cand_count.get(_inspector_key(n), 0) + 1
+    keys = {n: _inspector_key(n).split(" ") for n in out}
+    out = [n for n in out if not any(
+        o != n and len(keys[o]) < len(keys[n]) and keys[n][-len(keys[o]):] == keys[o]
+        and cand_count.get(" ".join(keys[o]), 0) > cand_count.get(" ".join(keys[n]), 0)
+        for o in out)]
+    final = _dedupe_inspector_names(out)
+    # 안전장치 — 전문에 글자 그대로 없는 이름은 버린다(위 경로는 원문 조각만 쓰지만 계약으로 고정).
+    final = [n for n in final if _inspector_name_in_text(n, body)]
+    if final and not _inspector_names_are_consistent(final):
+        # 게이트② 문서 내 합의 — 같은 이름이 두 철자로 읽힌 문서는 통째로 버린다.
+        # (조각 흡수 **뒤에** 판정한다: 조각은 정상적으로 부분 일치하므로 먼저 걸러야
+        #  근사 중복 판정이 오작동하지 않는다. 순서가 계약이다.)
+        return [], INSPECTORS_OCR_CONFLICT
+    if final:
+        return final[:_INSPECTOR_MAX_RESULTS], INSPECTORS_OK
+    if not _SIGNATURE_BLOCK_RE.search(body):
+        return [], INSPECTORS_NO_SIGNATURE
+    if any(_INSPECTOR_REDACTION_RE.search(body, max(0, m.start() - 300), m.end() + 300)
+           for m in _INSPECTOR_MARKER_RE.finditer(body)):
+        return [], INSPECTORS_REDACTED
+    return [], INSPECTORS_PARSER_LIMIT
+
+
 def _extract_483_inspectors(text: str) -> list[str]:
     """483 PDF **원시**(청소 전) 텍스트 → 서명블록 실사관 이름 목록(등장 순서·중복 제거).
+
+    ★실사관 추출의 **유일한 공통 함수**다 — 일일 수집(`collect_fda_483`)·과거분 백필
+    (`collect_fda_backfill`)·OCR 복구(`backfill_483_ocr_recovery._rebuild_item`)·전문 백필
+    (`backfill_483_body_full`)·저장 전문 재추출(`backfill_483_inspectors_from_body`)이 모두 이것을 부른다.
 
     반드시 `_clean_observation_detail`/`_FDA483_FOOTER_RE` 로 청소하기 **전** 텍스트에서
     호출해야 한다 — 그 청소 로직은 서명블록을 지우는 것이 목적이고(발행 게이트가 그 결과에
@@ -1957,50 +2226,14 @@ def _extract_483_inspectors(text: str) -> list[str]:
 
     계약: 이름 문법(`_valid_inspector_name`)을 통과하고, 서명블록 문맥 교차 확증(직함 뒤
     60자 이내 날짜 **또는** 이름 앞 200자 이내 서명블록 마커) 중 하나라도 만족해야 채택한다.
-    확증이 없으면 형태만 맞아도 버린다 — 관찰 산문의 "Investigator <이름> noted…"는 애초에
-    어순이 반대라 이 정규식 자체가 잡지 않지만(이름이 뒤에 오면 대상 밖), 어순이 우연히
-    맞아도 확증 없이는 채택하지 않는 것이 이 함수의 정밀도 원칙이다.
+    ★돌려주는 모든 이름은 **그 text 안에 글자 그대로 있다**(`_inspector_name_in_text`) — 다른 문서·
+    실사관 프로파일에서 빌려오거나 철자를 고치지 않는다. `(b)(6)` 가림은 이름으로 만들지 않는다.
 
     최대 `_INSPECTOR_MAX_RESULTS`명. 어떤 예외도 밖으로 던지지 않는다(입력이 비정상이어도
     빈 리스트 — 이름을 지어내거나 추측 보정하지 않는다: 확신이 없으면 빈 리스트가 정답).
     """
     try:
-        body = text or ""
-        if not body.strip():
-            return []
-        out: list[str] = []
-        seen: set[str] = set()
-        for m in _INSPECTOR_CANDIDATE_RE.finditer(body):
-            tokens = m.group("run").split(" ")
-            # 왼쪽부터 양식 어휘 토큰을 벗겨낸다("SIGNATURE Christina K Theodorou" →
-            # "Christina K Theodorou") — 위 run 정규식 주석 참조. 이름 한복판/끝에 낀 양식
-            # 어휘는 여기서 안 걸러지고 `_valid_inspector_name`이 마저 거부한다.
-            offset = 0
-            while tokens and tokens[0].rstrip(".").upper() in _INSPECTOR_FORM_VOCAB:
-                offset += len(tokens[0]) + 1        # 벗겨낸 토큰 + 뒤따르는 스페이스 1개
-                tokens = tokens[1:]
-            name = " ".join(tokens)
-            if not _valid_inspector_name(name):
-                continue
-            name_start = m.start("run") + offset
-            before = body[max(0, name_start - _INSPECTOR_MARKER_LOOKBEHIND):name_start]
-            after = body[m.end("title"):m.end("title") + _INSPECTOR_DATE_LOOKAHEAD]
-            if not (_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after)):
-                continue                                   # 확증 없음 — 산문 오탐 방지
-            key = _inspector_key(name)
-            if key in seen:
-                continue
-            seen.add(key)
-            out.append(name)
-            if len(out) >= _INSPECTOR_MAX_CANDIDATES:
-                break                                  # 병리적 입력 상한(중복 정리 전 원시분)
-        final = _dedupe_inspector_names(out)
-        # 게이트② 문서 내 합의 — 같은 이름이 두 철자로 읽힌 문서는 통째로 버린다.
-        # (조각 흡수 **뒤에** 판정한다: 조각은 정상적으로 부분 일치하므로 먼저 걸러야
-        #  근사 중복 판정이 오작동하지 않는다. 순서가 계약이다.)
-        if not _inspector_names_are_consistent(final):
-            return []
-        return final[:_INSPECTOR_MAX_RESULTS]
+        return _extract_483_inspectors_detail(text)[0]
     except Exception:  # noqa: BLE001 — 어떤 실패도 이름을 지어내는 대신 빈 리스트로 degrade
         return []
 

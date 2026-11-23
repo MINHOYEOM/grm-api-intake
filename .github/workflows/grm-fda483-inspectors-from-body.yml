@@ -1,0 +1,96 @@
+name: GRM FDA 483 Inspectors From Stored Body
+
+# [483 실사관 재추출 · 2026-11-23] 저장된 전문(fda483_body_full)만 읽어 빈 실사관(fda483_inspectors)을 채운다.
+# backfill_483_inspectors_from_body.py — 공통 함수 collect_fda_483._extract_483_inspectors · 외부 요청 0.
+# 뽑은 이름은 그 행 전문 안에 글자 그대로 있어야만 쓴다(안전장치 걸린 행이 있으면 exit 1).
+# 쓰기: raw_signal_apply_version(repair, 실사관 키 하나 추가) → 그 문서의 findings 중 inspector_names 가 빈 행만 PATCH.
+# 기본은 dry-run(apply=false). 수동 실행 전용(예약 없음) — 앞으로의 행은 일일 수집·OCR 복구·전문 백필이 같은 함수로 채운다.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: '실제로 쓴다(기본 false = dry-run)'
+        type: boolean
+        default: false
+      since:
+        description: 'collected_at 하한(YYYY-MM-DD, 비우면 전부)'
+        type: string
+        default: ''
+      doc_ids:
+        description: 'document_id 목록(쉼표 구분, 비우면 대상 전부)'
+        type: string
+        default: ''
+      limit:
+        description: '회차 상한(무료 Nano — 2000 이하)'
+        type: string
+        default: '2000'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fda483-inspectors-from-body
+  cancel-in-progress: false
+
+jobs:
+  reextract:
+    name: Re-extract fda483_inspectors
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Re-extract (dry-run unless apply=true)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_APPLY: ${{ inputs.apply }}
+          IN_SINCE: ${{ inputs.since }}
+          IN_DOCS: ${{ inputs.doc_ids }}
+          IN_LIMIT: ${{ inputs.limit }}
+        run: |
+          set -uo pipefail
+          if [ -n "${IN_SINCE:-}" ] && ! printf '%s' "$IN_SINCE" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+            echo "::error::since 는 YYYY-MM-DD"; exit 2
+          fi
+          if ! printf '%s' "${IN_LIMIT:-2000}" | grep -qE '^[0-9]+$' || [ "${IN_LIMIT:-2000}" -gt 2000 ]; then
+            echo "::error::limit 은 2000 이하 숫자"; exit 2
+          fi
+          if [ -n "${IN_DOCS:-}" ] && ! printf '%s' "$IN_DOCS" | grep -qE '^[A-Za-z0-9_, -]+$'; then
+            echo "::error::doc_ids 는 영숫자·쉼표·하이픈만"; exit 2
+          fi
+          args=(--limit "${IN_LIMIT:-2000}" --report report.json --markdown table.md)
+          if [ -n "${IN_SINCE:-}" ]; then args+=(--since "$IN_SINCE"); fi
+          if [ -n "${IN_DOCS:-}" ]; then args+=(--doc-ids "$IN_DOCS"); fi
+          if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
+          python backfill_483_inspectors_from_body.py "${args[@]}"
+          rc=$?
+          {
+            echo "### FDA 483 실사관 재추출"
+            echo "- apply: \`${IN_APPLY:-false}\` · since: \`${IN_SINCE:-전부}\` · limit: \`${IN_LIMIT:-2000}\` · exit: \`${rc}\`"
+            head -c 60000 table.md 2>/dev/null || echo '(표 없음)'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fda483-inspectors-from-body
+          path: |
+            report.json
+            table.md
+          if-no-files-found: ignore
+          retention-days: 30

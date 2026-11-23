@@ -599,6 +599,7 @@ def scan_mixed_pdfs(rows: list[dict[str, Any]], *, delay_seconds: float = 0.3,
 def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
     """라이브 수집과 **같은 함수**로 IntakeItem 재구성. None 이면 도메인 게이트 드롭."""
     from collect_fda_483 import (
+        _extract_483_inspectors,
         _extract_483_observations_from_text,
         _extract_fda483_excerpt,
         _to_item,
@@ -615,7 +616,10 @@ def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
     # 심층 대상(card_scaffold.deep_analysis_ready)에서 빠졌다 → 관찰 국문이 붙지 않아 사이트 빌드가 호 전체를
     # 막았다(11-18 수집 52행 · 리허설 1122a 모의 발행 49장). 대량 공개 주마다 되풀이되던 구멍이다.
     body_full = text if observations else ""
-    return _to_item(nrow, excerpt, observations, body_full, status)
+    # [2026-11-23] 실사관도 일일 수집과 **같은 공통 함수**로 뽑아 넘긴다(R3 — 종전엔 넘기지 않아 복구된 행은
+    # 실사관 칸이 처음부터 비었다, 수집완전성 점검 11-22 9-3: 서명란 있는 44행). 반드시 청소 전 원시 text.
+    inspectors = _extract_483_inspectors(text) if text else []
+    return _to_item(nrow, excerpt, observations, body_full, status, inspectors=inspectors)
 
 
 # ---------------------------------------------------------------------------

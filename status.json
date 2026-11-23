@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T00:49:46Z",
+ "generated_at": "2026-11-23T01:25:38Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,23 +174,45 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45093695848,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-23T01:17:12Z",
+    "updatedAt": "2026-11-23T01:25:17Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1873 from MINHOYEOM/publish/brief-2026-11-23",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45093695848"
+   },
+   {
+    "databaseId": 45091739132,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-23T00:57:02Z",
+    "updatedAt": "2026-11-23T01:04:25Z",
+    "headBranch": "claude/fix-483-obs-count-1326ac",
+    "displayTitle": "fix(483): 관찰 건수를 원문 번호 표제에서 센다 — 단정 못 하면 비운다",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45091739132"
+   },
+   {
     "databaseId": 45090763169,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-23T00:46:50Z",
-    "updatedAt": "2026-11-23T00:47:09Z",
+    "updatedAt": "2026-11-23T00:55:22Z",
     "headBranch": "publish/brief-2026-11-23",
     "displayTitle": "publish(web): 2026-11-23 주간 브리프",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090763169"
    },
    {
     "databaseId": 45090759499,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-23T00:46:47Z",
-    "updatedAt": "2026-11-23T00:47:08Z",
+    "updatedAt": "2026-11-23T00:55:38Z",
     "headBranch": "publish/brief-2026-11-23",
     "displayTitle": "publish(web): 2026-11-23 개인 실명 2건을 일반 표현으로 (11-21 대표 결정·#1860)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090759499"
@@ -205,28 +227,6 @@
     "headBranch": "publish/brief-2026-11-23",
     "displayTitle": "publish(web): 2026-11-23 주간 브리프",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090517513"
-   },
-   {
-    "databaseId": 45090511404,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-23T00:44:10Z",
-    "updatedAt": "2026-11-23T00:47:04Z",
-    "headBranch": "publish/brief-2026-11-23",
-    "displayTitle": "publish(web): 2026-11-23 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090511404"
-   },
-   {
-    "databaseId": 45090287527,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-23T00:41:52Z",
-    "updatedAt": "2026-11-23T00:49:28Z",
-    "headBranch": "main",
-    "displayTitle": "bridge(web): 2026-11-23 편집팀 git 반납 커밋 (자동)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090287527"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45094478874,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-23T01:25:20Z",
+    "updatedAt": "2026-11-23T01:25:27Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45094478874"
+   },
+   {
     "databaseId": 45091017715,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44965220065"
-   },
-   {
-    "databaseId": 44868423699,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-21T04:55:36Z",
-    "updatedAt": "2026-11-21T04:55:44Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44868423699"
    }
   ],
   "grm-findings-translate-apply.yml": [

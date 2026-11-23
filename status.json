@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T03:42:40Z",
+ "generated_at": "2026-11-23T03:50:31Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -175,33 +175,33 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 45107525805,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-23T03:42:07Z",
-    "updatedAt": "2026-11-23T03:42:11Z",
+    "updatedAt": "2026-11-23T03:50:12Z",
     "headBranch": "main",
     "displayTitle": "fix(en): 공용 코드 칸의 국문 표기를 뷰가 언어별로 — 11-23 영문 '개인 사업자' 6곳 + 영문 게이트 (#1876)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107525805"
    },
    {
     "databaseId": 45107103687,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-23T03:37:46Z",
-    "updatedAt": "2026-11-23T03:37:50Z",
+    "updatedAt": "2026-11-23T03:44:40Z",
     "headBranch": "claude/quiz-weekly-202648",
     "displayTitle": "quiz(weekly): 202648 문항 4개 (브리프 2 + 개념 2)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107103687"
    },
    {
     "databaseId": 45107099254,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-23T03:37:43Z",
-    "updatedAt": "2026-11-23T03:37:47Z",
+    "updatedAt": "2026-11-23T03:45:39Z",
     "headBranch": "claude/quiz-weekly-202648",
     "displayTitle": "quiz(weekly): 202648 문항 4개 (브리프 2 + 개념 2)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107099254"
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45108290893,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-23T03:50:14Z",
+    "updatedAt": "2026-11-23T03:50:15Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45108290893"
+   },
+   {
     "databaseId": 45095465792,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45064439349"
-   },
-   {
-    "databaseId": 44983533696,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-22T04:05:57Z",
-    "updatedAt": "2026-11-22T04:05:58Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44983533696"
    }
   ],
   "grm-findings-translate-apply.yml": [

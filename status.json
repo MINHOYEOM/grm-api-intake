@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T09:26:21Z",
+ "generated_at": "2026-11-23T10:42:27Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -460,11 +460,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 45133843806,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-23T07:48:57Z",
-    "updatedAt": "2026-11-23T07:49:01Z",
+    "updatedAt": "2026-11-23T10:03:07Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45133843806"

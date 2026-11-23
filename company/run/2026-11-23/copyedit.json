@@ -1,6 +1,6 @@
 {
- "status": "재작업",
- "round": 1,
+ "status": "보류",
+ "round": 2,
  "published": false,
  "code_gate": {
   "ran": true,
@@ -121,47 +121,10 @@
   },
   {
    "web_card_id": "fda483-196308",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "사실 오류",
-     "slot": "key_facts[0]",
-     "evidence": "원문은 최악 조건 API 가 빠진([redacted]) '뒤' 다른 세척 밸리데이션을 하지 못했다고 적고 보고서는 2022-06-03 갱신됨 — 카드는 기준을 '2019-08-09 승인 보고서 이후'로 바꿈(en.key_facts[0] 도 같음). key_facts 가 1개뿐이라 칸 삭제 불가"
-    },
-    {
-     "item": "원문에 없는 말",
-     "slot": "deep.key_violations[0].observation",
-     "evidence": "원문 'was discounted fo Prod'(OCR 깨짐)를 '제조 목록에서 빠진'으로 채움"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [],
-   "checked": [
-    {
-     "slot": "title_issue",
-     "claim": "세척 밸리데이션 현행 설비 사용 미반영",
-     "source": "cleaning validation is not representative of current equipment usage"
-    },
-    {
-     "slot": "key_facts[0]",
-     "claim": "2019-08-09 승인 보고서 NQPV432 이후 해당 설비군을 다시 밸리데이션하지 않음",
-     "source": "However, your firm failed to conduct another cleaning validation for the equipment that is grouped in"
-    },
-    {
-     "slot": "implication",
-     "claim": "미국에 판매되는 원료의약품이 해당 설비군에서 제조됐다",
-     "source": "which is marketed for U.S.. is manufactured using"
-    },
-    {
-     "slot": "deep.key_violations[1].observation",
-     "claim": "미국에 판매하는 [가림] 원료의약품은 같은 그룹의 설비로 제조한다",
-     "source": "which is marketed for U.S.. is manufactured using"
-    },
-    {
-     "slot": "deep.key_violations[0].observation",
-     "claim": "제조 목록에서 빠진 뒤",
-     "absent": true
-    }
-   ]
+   "checked": []
   },
   {
    "web_card_id": "fda483-196309",
@@ -2156,72 +2119,10 @@
   },
   {
    "web_card_id": "fda483-196410",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "원문보다 강한 단정",
-     "slot": "summary",
-     "evidence": "기준일탈 조사 문서 \"조작\"(en fabricated)은 원문에서 미생물 부서장이 인정·확인한 내용인데 summary 에 인정·진술 표기 없음(implication \"조작된 조사서들\"도 같음)"
-    },
-    {
-     "item": "사실 오류",
-     "slot": "key_facts[1]",
-     "evidence": "조사서와 기록대장을 모두 2024-09-12에 만들었다고 적음 — 원문은 조사서 2024-09-12(검사 나흘 전), 제본 기록부는 검사 사흘 전(en 동일)"
-    },
-    {
-     "item": "국·영 짝 불일치",
-     "slot": "hook_line",
-     "evidence": "한국어는 \"진술\"로 표기하나 en.hook_line 은 진술 표기 없이 created just before inspection and backdated 로 단정(R3)"
-    },
-    {
-     "item": "사실 오류",
-     "slot": "deep.key_violations[2].observation",
-     "evidence": "보고서와 기록부를 검사 나흘 전 2024-09-12에 만들었다고 적음 — 제본 기록부는 사흘 전"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [],
-   "checked": [
-    {
-     "slot": "title_issue",
-     "claim": "기준일탈 조사서 사후 작성·원자료 부",
-     "source": "they were fabricated and created only on 12SEP2024, four days before the start of the inspection"
-    },
-    {
-     "slot": "hook_line",
-     "claim": "기준일탈 조사서를 실사 직전 만들고 서명일을 소급했다고 진술",
-     "source": "The microbiology manager acknowledged that they fabricated these documents with falsified information and backdated signatures"
-    },
-    {
-     "slot": "summary",
-     "claim": "시험 원자료 부재, 기준일탈(OOS) 조사 문",
-     "source": "The microbiology manager confirmed that the logbook entry dates were also fabricated"
-    },
-    {
-     "slot": "key_facts[0]",
-     "claim": "저울·pH 측정기 값이 기록되지 않았",
-     "source": "your laboratory balances and pH meters do not have printing or data storing capabilities and the reported values are not documented"
-    },
-    {
-     "slot": "implication",
-     "claim": "품질보증 책임자는 컴퓨터 저장 공간이 모자라 품질관리 인원이 데이터를 지웠을 수 있다고 진술했다(관찰 1).",
-     "source": "The QA Manager stated that QC personnel may have deleted these data due to lack of writing space on the computer"
-    },
-    {
-     "slot": "deep.key_violations[4].observation",
-     "claim": "독립형 고성능 액체크로마토그래피 컴퓨터에서 분석자가 시각과 날짜를 바꾸고",
-     "source": "An analyst was able to alter the time and date on the computer system that runs the stand alone HPLC unit"
-    },
-    {
-     "slot": "key_facts[1]",
-     "claim": "미생물 책임자가 기준일탈 조사서와 기록대장을 2024-09-12",
-     "absent": true
-    },
-    {
-     "slot": "deep.key_violations[2].observation",
-     "claim": "이 보고서와 기록부는 검사 시작 나흘 전인 2024-09-12에",
-     "absent": true
-    }
-   ]
+   "checked": []
   },
   {
    "web_card_id": "fda483-196411",
@@ -2326,37 +2227,10 @@
   },
   {
    "web_card_id": "fda483-196414",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "③ 원문보다 강한 단정",
-     "slot": "title_issue",
-     "evidence": "제목 '이물 불량 증가 미조사'(en: 'not investigated') — 원문 관찰 2는 'failed to adequately investigate'이고 조사는 있었으나 근본원인을 정하지 못한 채 끝났다('inconclusive'). 조사 자체가 없었다는 뜻으로 읽힘"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [],
-   "checked": [
-    {
-     "slot": "key_facts[3]",
-     "claim": "작업자가 데이터 파일 무단 삭제를 시연함",
-     "source": "demonstrated unauthorized deletion of data files"
-    },
-    {
-     "slot": "hook_line",
-     "claim": "육안검사 불량률이 계속 높아짐",
-     "source": "These batches exhibited increasingly high overall rejection rates"
-    },
-    {
-     "slot": "implication",
-     "claim": "2026-05-17 C등급 제조실 바닥에 생물학적 위해 폐기물 봉투가 열린 채 놓여 있었다",
-     "source": "was observed lying directly on the floor in Grade C manufacturing Room"
-    },
-    {
-     "slot": "deep.key_violations[5].observation",
-     "claim": "실사관이 문의한 2026-05-14에야 일탈로 개시됐다",
-     "source": "No deviation was initiated until May 14, 2026 after inquired by inspector."
-    }
-   ]
+   "checked": []
   },
   {
    "web_card_id": "fda483-196416",
@@ -2724,8 +2598,8 @@
    "fails": [
     {
      "item": "③ 원문보다 강한 단정",
-     "slot": "key_facts[0]",
-     "evidence": "'조사 후 대기 시간 미설정' — 원문은 'an adequately specified post irradiation wait-time has not been established'(적절히 정해진 대기 시간이 없음)이고 SOP 3.1.2에 30분 이상 720분 미만 대기 규정이 있어 '미설정'과 다름. 영문 'no adequately specified wait time'과도 불일치. 핵심 사실이 하나뿐이라 칸 삭제 불가"
+     "slot": "hook_line",
+     "evidence": "hook_line '대기 시간을 정하지 않음'(en 'No specified wait time') — 원문은 'an adequately specified post irradiation wait-time has not been established'(적절히 정해진 대기 시간이 없음)이고 SOP 3.1.2 에 30분 이상 720분 미만 대기 규정이 있다. 1차가 key_facts 에서 반려한 것과 같은 과장이 hook_line 에 남았다(재작업은 key_facts 만 고침)"
     }
    ],
    "notes": [
@@ -2735,33 +2609,7 @@
      "evidence": "'대기 시간을 정하지 않음' — 원문은 'an adequately specified post irradiation wait-time has not been established'(적절히 정해진 대기 시간이 없음)이고 SOP 3.1.2에 30분 이상 720분 미만 대기 규정이 있어 '정하지 않음'과 다름"
     }
    ],
-   "checked": [
-    {
-     "slot": "summary",
-     "claim": "품질경영시스템 공정 관리에 위험 기반 접근을 적절히 적용하지 않았다고 지적했다",
-     "source": "A risk-based approach to the control of the appropriate processes needed for the quality management system has not been adequately applied."
-    },
-    {
-     "slot": "key_facts[0]",
-     "claim": "조사 후 대기 시간 미설정",
-     "absent": true
-    },
-    {
-     "slot": "implication",
-     "claim": "전자선 시설의 최적 대기 시간은 조사 뒤 최소 한 시간이라고 밝혔다",
-     "source": "for facilities using electron beam devices, the optimal wait time is at least one-hour post-irradiation"
-    },
-    {
-     "slot": "deep.key_violations[2].observation",
-     "claim": "pFMEA는 선량계 제조 결함의 위험도",
-     "source": "does not evaluate or assess the risk posed by dosimeter manufacturing defects"
-    },
-    {
-     "slot": "hook_line",
-     "claim": "선량계 조사 뒤 배양 시작까지 대기 시간",
-     "source": "the time between end of the irradiation and beginning of incubation time should be similar as during the calibration exercise"
-    }
-   ]
+   "checked": []
   },
   {
    "web_card_id": "fda483-196443",
@@ -2867,19 +2715,8 @@
   },
   {
    "web_card_id": "fda483-196447",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "① 사실 오류",
-     "slot": "summary",
-     "evidence": "summary '관찰사항 1건'은 원문과 다르다 — 원문 483 은 (1)~(4) 관찰 4건(혼동 방지 절차 미준수·공급업체 분석 검증 미실시·예방 정비 절차 미수립·작업 절차 미준수). 코드 deterministic_detail 이 4)a 하나만 읽어 count 1 로 센 것이 원인"
-    },
-    {
-     "item": "① 사실 오류",
-     "slot": "key_facts[0]",
-     "evidence": "'관찰 1: 작업자가 절차서대로 장갑을 정기 소독하지 않음' — 원문에서 장갑 소독은 관찰 4)a(\"4) Written operating procedures are not followed ... a. On March 30, 2026 ... staff not regularly sanitizing their gloves\")이고 관찰 1 은 혼동 방지 절차. 같은 카드 심층은 관찰 4 로 적어 앞면·심층 번호도 어긋남"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [
     {
      "item": "코드 원인",
@@ -2887,23 +2724,7 @@
      "evidence": "원문 관찰 번호·건수를 코드(deterministic_detail)가 잘못 읽음 — 기자 문장 수정만으로는 맞출 수 없어 코드 쪽 확인 필요"
     }
    ],
-   "checked": [
-    {
-     "slot": "hook_line",
-     "claim": "주 제조 작업자가 절차대로 장갑을 정기 소독하지 않음",
-     "source": "we observed the main manufacturing staffworking"
-    },
-    {
-     "slot": "summary",
-     "claim": "작업자가 절차대로 장갑을 정기적으로 소독하지 않았다고 지적했다",
-     "source": "staff not regularly sanitizing their gloves as per procedure"
-    },
-    {
-     "slot": "deep.key_violations[3].observation",
-     "claim": "2026-03-30 제형 조제 작업 관찰에서 작업자가 장갑을 절차대로 소독하지 않은 채",
-     "source": "On March 30, 2026, during observation ofthe Formulation process, we observed staff not regularly sanitizing"
-    }
-   ]
+   "checked": []
   },
   {
    "web_card_id": "fda483-196449",
@@ -2991,14 +2812,8 @@
   },
   {
    "web_card_id": "fda483-196455",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "① 사실 오류",
-     "slot": "summary",
-     "evidence": "summary '관찰사항 3건'은 원문과 다르다 — 원문 483 은 관찰 1~6(6건). 같은 카드 심층도 관찰 1~6 을 담음. 코드 deterministic_detail 이 관찰 2·3·4 만 읽어 count 3 으로 센 것이 원인"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [
     {
      "item": "코드 원인",
@@ -3006,28 +2821,7 @@
      "evidence": "원문 관찰 건수를 코드(deterministic_detail)가 잘못 읽음 — 코드 쪽 확인 필요"
     }
    ],
-   "checked": [
-    {
-     "slot": "hook_line",
-     "claim": "중간체 최대 보관 시간을 생산 규모에서 밸리데이션하지 않음",
-     "source": "have not been validated for the manufacturing process at production scale"
-    },
-    {
-     "slot": "key_facts[2]",
-     "claim": "업체가 수행한 소독제 효력 시험에 시설 분리 균주 미포함",
-     "source": "Vendor performed Disinfectant efficacy studies"
-    },
-    {
-     "slot": "implication",
-     "claim": "회사는 시설 분리 균주를 포함할 소독제 효력 시험 계획서를 제출했다",
-     "source": "Firm provided a disinfectant effective study protocol that will include facility isolates for the study"
-    },
-    {
-     "slot": "deep.key_violations[3].observation",
-     "claim": "[가림] 완전성 실패가 2021-08~2023-04 편차 총 25건으로 보고됐는데",
-     "source": "A total of25 deviations related to"
-    }
-   ]
+   "checked": []
   },
   {
    "web_card_id": "fda483-196456",
@@ -4416,42 +4210,10 @@
   },
   {
    "web_card_id": "admin-2026008238",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "② 원문에 없는 말(⑥ 국·영 짝 불일치)",
-     "slot": "en.summary",
-     "evidence": "영문이 처분 대상을 'a manufacturer'로 분류했으나 원문은 '진양제약(주)'만 적고 제조업체라는 분류가 없음(판매업무정지 처분문) — 한국어 summary 에는 없는 분류"
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [],
-   "checked": [
-    {
-     "slot": "hook_line",
-     "claim": "위해성 관리 결과·정기 안전성정보 늦게 제출, 판매업무정지 1개월",
-     "source": "해당 품목 판매업무정지 1개월"
-    },
-    {
-     "slot": "key_facts[0]",
-     "claim": "정기적인 최신 안전성정보를",
-     "source": "정기적인 최신 안전성정보(PSUR)를 보고기간 이후에 제출한 사실이 있음"
-    },
-    {
-     "slot": "key_facts[2]",
-     "claim": "약사법 제32조의2·제37조의3·제76조",
-     "source": "「약사법」제32조의2 및 제37조의3"
-    },
-    {
-     "slot": "deep.key_violations[0].original",
-     "claim": "1) 위해성 관리 계획에 따른 위해성 관리 실시 결과를 보고기간 이후에 제출하였으며,",
-     "source": "1) 위해성 관리 계획에 따른 위해성 관리 실시 결과를 보고기간 이후에 제출하였으며,"
-    },
-    {
-     "slot": "en.summary",
-     "claim": "to a manufacturer that submitted risk management results",
-     "absent": true
-    }
-   ]
+   "checked": []
   },
   {
    "web_card_id": "admrul-2100000288220",
@@ -4748,14 +4510,8 @@
   },
   {
    "web_card_id": "D-0167-2027",
-   "verdict": "reject",
-   "fails": [
-    {
-     "item": "⑥ 국·영 짝 불일치",
-     "slot": "en.title_issue",
-     "evidence": "한국어 title_issue '투석액 백 미세 천공 누출 의심 회수' 는 '의심'을 담지만 en.title_issue 'Dialysis bag perforation leak recall' 은 누출을 사실로 읽힌다. 원문은 'complaints have been received related to potential leaks'(누출 가능성 불만)이다."
-    }
-   ],
+   "verdict": "pass",
+   "fails": [],
    "notes": [
     {
      "item": "금칙어 확인",
@@ -4763,28 +4519,7 @@
      "evidence": "번역문에 '누출 가능성'(원문 potential leaks 번역). 산문 칸이 아니라 원문 번역이어서 반려 대상으로 보지 않음"
     }
    ],
-   "checked": [
-    {
-     "slot": "summary",
-     "claim": "무균 보증 부족으로 회수됐다(Class II)",
-     "source": "Lack of Assurance of Sterility"
-    },
-    {
-     "slot": "key_facts[0]",
-     "claim": "1차 백 인쇄 부위의 작은 천공으로 누출이 의심된다는 불만 접수",
-     "source": "complaints have been received related to potential leaks from small perforations in the print area on the primary bag"
-    },
-    {
-     "slot": "key_facts[1]",
-     "claim": "4,232 케이스",
-     "source": "4,232 cases"
-    },
-    {
-     "slot": "hook_line",
-     "claim": "복막투석액 백 인쇄 부위 미세 천공 누출 의심 불만으로 회수",
-     "source": "potential leaks from small perforations in the print area on the primary bag"
-    }
-   ]
+   "checked": []
   },
   {
    "web_card_id": "D-0173-2027",
@@ -5011,9 +4746,9 @@
  ],
  "counts": {
   "cards": 151,
-  "pass": 143,
-  "reject": 8,
-  "fails_total": 13,
+  "pass": 150,
+  "reject": 1,
+  "fails_total": 1,
   "notes_total": 97
  },
  "rework": {
@@ -5027,5 +4762,6 @@
    "admin-2026008238",
    "D-0167-2027"
   ]
- }
+ },
+ "hold_reason": "2차에도 reject 1장(fda483-196441 hook_line) — 재작업은 1회뿐이라 보류, 09:30 백업이 발행한다"
 }

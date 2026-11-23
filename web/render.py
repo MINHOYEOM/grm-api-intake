@@ -196,6 +196,14 @@ _FIRM_FACT_LABELS = frozenset({"업체", "제조소", "제조소/업체", "업�
 _FIRM_VALUE_SEPS = (" (", " · ")
 _FIRM_PLACEHOLDER = "원문 미기재"
 
+# [개인 사업자 2026-11-23] 개인(농장주 등) 실명을 가린 자리의 표기 — 언어별로 **뷰가** 정한다.
+# 11-23호(#1873)에서 `headline_target`·업체 사실값(국·영 공용 코드 칸)에 국문 '개인 사업자'를
+# 넣자 영문 페이지 카드 머리·목차·data-firm-key 6곳에 한글이 보였다. 데이터는 국문 한 벌만
+# 적고, 영어 트리는 `_card_with_english_narrative` 가 이 표로 바꿔 넘긴다(템플릿은 고르지 않는다).
+# 가린 이름은 실제 업체가 아니므로 업체 프로파일로 잇지 않는다(`_firm_key_for_card`).
+REDACTED_PERSON_BY_LANG = {"ko": "개인 사업자", "en": "Individual business"}
+REDACTED_PERSON = REDACTED_PERSON_BY_LANG["ko"]
+
 # [영문 사실표 2026-09-23] 사실값 중 **고정 어휘 토큰**(실명이 아니라 상태값)은 영어
 # 트리에서 tr() 을 태워 실제로 번역한다 — "미확인"이 업체/제조소 라벨 아래 있어도
 # 그 값은 "이름이 없다"는 뜻이지 실제 이름이 아니다. 목록은 실측(web/data/briefs 전량
@@ -231,7 +239,7 @@ def _firm_key_for_card(card: dict[str, Any]) -> str:
             if idx != -1 and idx < cut:
                 cut = idx
         name = value[:cut].strip()
-        if not name or name == _FIRM_PLACEHOLDER:
+        if not name or name == _FIRM_PLACEHOLDER or name in REDACTED_PERSON_BY_LANG.values():
             return ""
         return _normalize_firm_name(name)
     return ""
@@ -585,9 +593,82 @@ def _card_with_english_narrative(card: dict[str, Any], lang: str) -> dict[str, A
     """
     if lang != DEFAULT_LANG and card_has_english(card):
         en = card["en"]
-        return {**card, **{f: en.get(f, [] if f in ("key_facts", "checks") else "")
-                           for f in CARD_NARRATIVE_FIELDS}}
+        return {**card, **_code_slots_for_lang(card, lang),
+                **{f: en.get(f, [] if f in ("key_facts", "checks") else "")
+                   for f in CARD_NARRATIVE_FIELDS}}
     return card
+
+
+# [영문 코드 칸 2026-11-23] 코드가 국문으로 덧붙이는 정형 조각 — 영어 트리에서 뷰가 영어로 바꾼다.
+# 실측(web/data/briefs 전량): 회수 병합 `… 외 N품목` 79·`외 N곳` 6·`외 N개사` 2·`외 N건` 1, MHRA `발행기관`
+# `MHRA (영국)` 3. 이름 부분은 원문 그대로 두고 꼬리만 바꾼다(실명은 옮기지 않는다 — 불변식 #8).
+_EN_MORE_SUFFIX_RE = re.compile(r" 외 (\d+)(품목|곳|개사|건)$")
+_EN_MORE_NOUN = {"품목": "product", "곳": "site", "개사": "firm", "건": ""}
+_EN_CODE_FRAGMENTS = (("(영국)", "(UK)"),)
+
+
+def _code_slot_value_for_lang(value: str, lang: str) -> str:
+    """코드 칸 값 1개 → 그 언어 표기(한국어 트리는 항등). 가린 실명·정형 꼬리·국가 괄호만 바꾼다."""
+    if lang == DEFAULT_LANG or not isinstance(value, str) or not _HANGUL_RE.search(value):
+        return value
+    word = REDACTED_PERSON_BY_LANG.get(lang)
+    if word:
+        value = value.replace(REDACTED_PERSON, word)
+    for ko, en in _EN_CODE_FRAGMENTS:
+        value = value.replace(ko, en)
+    m = _EN_MORE_SUFFIX_RE.search(value)
+    if m:
+        n, noun = int(m.group(1)), _EN_MORE_NOUN[m.group(2)]
+        tail = f" and {n} more" + (f" {noun}{'' if n == 1 else 's'}" if noun else "")
+        value = value[:m.start()] + tail
+    return value
+
+
+def _code_slots_for_lang(card: dict[str, Any], lang: str) -> dict[str, Any]:
+    """코드 칸(`headline_target`·`facts[].value`)을 그 언어 표기로 바꾼 값들(바뀐 것이 없으면 {} — 원본 무변형).
+
+    국·영 공용 칸이라 데이터는 국문 한 벌만 적는다. 언어별 표기는 여기(뷰)가 정한다 — 템플릿은 고르지 않는다."""
+    if lang == DEFAULT_LANG:
+        return {}
+    out: dict[str, Any] = {}
+    target = card.get("headline_target")
+    new_target = _code_slot_value_for_lang(target, lang)
+    if new_target != target:
+        out["headline_target"] = new_target
+    facts = card.get("facts") or []
+    new_facts = [({**f, "value": _code_slot_value_for_lang(f["value"], lang)}
+                  if isinstance(f, dict) and isinstance(f.get("value"), str) else f) for f in facts]
+    if new_facts != facts:
+        out["facts"] = new_facts
+    return out
+
+
+def en_code_slot_hangul(card: dict[str, Any]) -> list[str]:
+    """영어 트리에서 **해외 기관 카드**의 코드 칸(`headline_target`·`facts[].value`)에 한글이 남은 자리 목록.
+
+    식약처 카드는 업체·기관 실명이 원래 한국어라 그대로 두고 화면이 밝힌다(`count_ko_only_names`).
+    해외 카드의 코드 칸에 한글이 있으면 실명이 아니라 사람이 넣은 국문 표기다 — 11-23호 '개인 사업자'.
+    판정은 영어 트리가 실제로 그리는 값(`_card_with_english_narrative` 뒤, 사실값은 `_fact_value_for_lang`
+    뒤)으로 한다. `check_en_slots.card_problem` 이 부른다(두 벌 금지)."""
+    if card.get("agency") == "MFDS" or not _is_renderable(card):
+        return []
+    view = _card_with_english_narrative(card, "en")
+    out: list[str] = []
+    if _HANGUL_RE.search(str(view.get("headline_target") or "")):
+        out.append("headline_target")
+    for i, f in enumerate(view.get("facts") or []):
+        if not isinstance(f, dict):
+            continue
+        value, _ = _fact_value_for_lang(str(f.get("label") or ""), str(f.get("value") or ""),
+                                        "en", _sentinel_blank_tr)
+        if _HANGUL_RE.search(value):
+            out.append(f"facts[{i}]")
+    return out
+
+
+def _sentinel_blank_tr(text: str, **_kw: Any) -> str:
+    """`en_code_slot_hangul` 전용 — 고정 어휘 토큰(`_FACT_SENTINEL_VALUES`)은 영어 트리가 반드시 번역하므로 빈 값으로 본다."""
+    return "" if text in _FACT_SENTINEL_VALUES else text
 
 
 def _fact_value_for_lang(label: str, value: str, lang: str,

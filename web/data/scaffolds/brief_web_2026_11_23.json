@@ -1426,7 +1426,7 @@
    "signal_tier": 3,
    "signal_label": "High",
    "type_tag": "483",
-   "headline_target": "Kenneth F Tesch",
+   "headline_target": "개인 사업자",
    "title_issue": "",
    "summary": "",
    "facts": [
@@ -1440,7 +1440,7 @@
     },
     {
      "label": "제조소/업체",
-     "value": "Kenneth F Tesch · FEI 3041017158"
+     "value": "개인 사업자 · FEI 3041017158"
     },
     {
      "label": "시설 · 유형",
@@ -1655,7 +1655,7 @@
    "signal_tier": 3,
    "signal_label": "High",
    "type_tag": "483",
-   "headline_target": "Matthew A. Leo",
+   "headline_target": "개인 사업자",
    "title_issue": "",
    "summary": "",
    "facts": [
@@ -1669,7 +1669,7 @@
     },
     {
      "label": "제조소/업체",
-     "value": "Matthew A. Leo · FEI 3041047522"
+     "value": "개인 사업자 · FEI 3041047522"
     },
     {
      "label": "시설 · 유형",

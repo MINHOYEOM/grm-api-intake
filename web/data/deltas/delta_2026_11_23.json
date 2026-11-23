@@ -375,7 +375,7 @@
   "fda483-196329": {
    "title_issue": "식용 소 신장 암피실린 허용치 초과",
    "hook_line": "소 신장에서 암피실린 0.0799 ppm 검출, 허용치 0.01 ppm",
-   "summary": "FDA가 축산 농가 Kenneth F Tesch(업체)에 Form 483(관찰사항 1건)을 발행했다. 식용 조직에 허용치를 넘는 약물 잔류가 있는 동물을 주간 거래에 내놓았다고 지적했다.",
+   "summary": "FDA가 축산 농가(개인 사업자)에 Form 483(관찰사항 1건)을 발행했다. 식용 조직에 허용치를 넘는 약물 잔류가 있는 동물을 주간 거래에 내놓았다고 지적했다.",
    "key_facts": [
     "관찰 1: 판매한 소의 신장에서 암피실린 0.0799 ppm 검출(허용치 0.01 ppm)"
    ],
@@ -387,7 +387,7 @@
    "en": {
     "title_issue": "Ampicillin residue above tolerance in cow",
     "hook_line": "Ampicillin at 0.0799 ppm in kidney against a 0.01 ppm tolerance",
-    "summary": "FDA issued a Form 483 with 1 observation to Kenneth F Tesch (the firm), a grower, for offering a food-producing animal for interstate commerce with a drug residue above tolerance in edible tissue.",
+    "summary": "FDA issued a Form 483 with 1 observation to a grower (an individual business), for offering a food-producing animal for interstate commerce with a drug residue above tolerance in edible tissue.",
     "key_facts": [
      "Observation 1: an animal offered for sale had ampicillin residue of 0.0799 ppm in the kidney (tolerance 0.01 ppm)"
     ],
@@ -465,7 +465,7 @@
   "fda483-196343": {
    "title_issue": "도축 소 신장 멜록시캄 검출",
    "hook_line": "투약 기록에 없는 멜록시캄이 도축 소 신장에서 검출",
-   "summary": "FDA가 육우 목장 Matthew A. Leo(업체)에 Form 483(관찰사항 2건)을 발행했다. 식용 조직에서 약물이 검출된 동물을 주간 거래에 내놓고 투약 기록을 완전하게 유지하지 않았다고 지적했다.",
+   "summary": "FDA가 육우 목장(개인 사업자)에 Form 483(관찰사항 2건)을 발행했다. 식용 조직에서 약물이 검출된 동물을 주간 거래에 내놓고 투약 기록을 완전하게 유지하지 않았다고 지적했다.",
    "key_facts": [
     "관찰 1: 도축용으로 보낸 거세우 신장에서 멜록시캄 검출, 소 식용 조직에 멜록시캄 허용치 없음",
     "관찰 2: 투약 기록 불완전, 투여 경로·도축 휴약기간과 그 종료일 누락"
@@ -478,7 +478,7 @@
    "en": {
     "title_issue": "Meloxicam found in slaughtered steer",
     "hook_line": "Meloxicam absent from treatment records was found in the steer's kidney",
-    "summary": "FDA issued a Form 483 with 2 observations to Matthew A. Leo (the firm), a beef ranch, for offering an animal with a drug residue in edible tissue for interstate commerce and not keeping complete treatment records.",
+    "summary": "FDA issued a Form 483 with 2 observations to a beef ranch (an individual business), for offering an animal with a drug residue in edible tissue for interstate commerce and not keeping complete treatment records.",
     "key_facts": [
      "Observation 1: meloxicam found in the kidney of a steer delivered for slaughter; no tolerance exists for meloxicam in edible cattle tissue",
      "Observation 2: incomplete treatment records lacking route of administration, withdrawal times and the dates they would be observed"

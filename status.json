@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T06:14:02Z",
+ "generated_at": "2026-11-23T06:29:52Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45123577859,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-23T06:21:44Z",
+    "updatedAt": "2026-11-23T06:29:32Z",
+    "headBranch": "main",
+    "displayTitle": "feat(브리프): 같은 업체 그룹 카드 매주 자동 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고 (#1880)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45123577859"
+   },
+   {
     "databaseId": 45120244871,
     "status": "completed",
     "conclusion": "success",
@@ -216,17 +227,6 @@
     "headBranch": "feat/firm-group-cluster-1123",
     "displayTitle": "feat(브리프): 같은 업체 그룹 카드 매주 자동 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45115772042"
-   },
-   {
-    "databaseId": 45115769920,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-23T05:07:05Z",
-    "updatedAt": "2026-11-23T05:15:15Z",
-    "headBranch": "feat/firm-group-cluster-1123",
-    "displayTitle": "test(web): 골든 재동결 — 요약줄 옛 실사 JS 5줄(브리프 5장)·en.json 키 추가 해시(영문 5장)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45115769920"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45124449369,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-23T06:29:35Z",
+    "updatedAt": "2026-11-23T06:29:42Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45124449369"
+   },
+   {
     "databaseId": 45122504473,
     "status": "completed",
     "conclusion": "success",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45108290893"
-   },
-   {
-    "databaseId": 45095465792,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-23T01:36:02Z",
-    "updatedAt": "2026-11-23T01:36:03Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45095465792"
    }
   ],
   "grm-findings-translate-apply.yml": [

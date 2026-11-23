@@ -26,6 +26,8 @@
         권고 칸(implication·checks)·handoff 행이 없는 카드·관찰 단위 대조·'원료'는 경고만(`가림 값 채움 의심 …`).
         **개인 실명**(2026-11-21 대표 결정)은 경고만(`개인 실명 의심 …` — `private_name_warn_lines`): 원문 483 수신인 칸·
         Mr./Dr. 등 호칭 뒤 이름이 카드 산문에 나오면 한 줄. 업체명 낱말은 뺀다. `deep` 도 같은 함수로 심층 칸·국문 병기를 본다.
+        **그룹 등록 후보**(2026-11-23 대표 결정)는 경고만(`그룹 등록 후보: …` — `firm_groups.candidate_lines`, 조립과 같은 함수):
+        같은 이름 계열 카드가 등록 그룹(`web/data/firm_groups.json`)·같은 FEI 로 한 묶음이 안 되면 한 줄. 이름으로 묶지는 않는다.
         **원문 대조 4가지**(2026-11-23 — 교열 판정이 회차마다 갈린 유형, `guess_check.delta_source_lines`·`deep_source_lines`):
         막음 = `개인 실명 …`(업체명이 사람 이름 — 이니셜 꼴 — 인데 산문에 그 이름, '개인 사업자'로)·`가림 값 추측 …`(원문 'W [redacted]'
         → 카드 영문 'W equipment/parts' 같은 일반 채움 명사)·`원문에 없는 날짜 …`·`날짜 불일치 …`(`실사일:` 이름표 날짜 ≠ 코드 facts).
@@ -82,6 +84,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import firm_groups  # noqa: E402  [업체 그룹 묶음 2026-11-23] 조립과 같은 후보 함수
 import guess_check  # noqa: E402
 import inject_slots  # noqa: E402
 import merge_parts  # noqa: E402
@@ -112,6 +115,17 @@ def warn_lines(delta, deep=None):
     if deep is not None:
         out += inject_slots.lint_deep_prose_style(deep).warn_lines()
     return out
+
+
+def group_candidate_lines(delta, scaffold):
+    """[업체 그룹 묶음 2026-11-23] 채택 카드 중 같은 이름 계열인데 등록 그룹·같은 FEI 로 한 묶음이
+    안 되는 카드 → '그룹 등록 후보' 경고(막지 않음). 조립(assemble_publish_brief)과 **같은 함수**
+    (`firm_groups.candidate_lines`)를 부른다 — 규칙을 베끼지 않는다. 스캐폴드가 없으면 빈 목록."""
+    if not isinstance(scaffold, dict):
+        return []
+    ids = set((delta or {}).get("cards") or {})
+    cards = [c for c in scaffold.get("cards") or [] if c.get("id") in ids]
+    return firm_groups.candidate_lines(cards)
 
 
 def term_lines(delta, card_types=None):
@@ -833,6 +847,7 @@ def main(argv=None):
             warns = warn_lines(delta, _load(args.deep) if args.deep else None) + hook_warn
             warns += accuracy_warn_lines(delta, scaffold) + guess_warn + src_warn
             warns += private_name_warn_lines(delta, None, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
+            warns += group_candidate_lines(delta, scaffold)
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 인용 번역 대조는 건너뛰었다 — 교열 코드 검사에서 본다")
             for line in warns:

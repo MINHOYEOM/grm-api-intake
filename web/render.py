@@ -137,6 +137,7 @@ from grm_findings import evidence_url_quality_error as _evidence_url_quality_err
 # 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
 from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
 import card_weight as _cw  # noqa: E402  [카드 무게 2026-11-10] 지적 건수·무지적 판정 공유
+import firm_groups as _fg  # noqa: E402  [업체 그룹 묶음 2026-11-23] 등록 근거로만 묶는다
 
 # [다국어 2단계 2026-09-03] 문구 사전 — 키는 한국어 원문, 한국어 빌드는 항등(바이트 불변).
 # `tr("…")` 은 render_site 가 언어별로 만드는 번역기, `N_("…")` 은 모듈 상수를 키로
@@ -1452,6 +1453,93 @@ def _annotate_toc_distinguishers(card_views: list[dict[str, Any]]) -> None:
             cv["toc_distinguisher"] = cv.get("title_issue") or cv.get("anchor", "")
 
 
+# ── [업체 그룹 묶음 2026-11-23 · 대표 결정] ───────────────────────────────────────
+# 같은 그룹(등록 원천 web/data/firm_groups.json) 또는 같은 FEI 카드가 한 묶음(섹션·소제목)
+# 안에 2장 이상이면 나란히 붙이고 머리말 한 줄을 단다. 이름이 비슷한 것만으로는 묶지 않는다
+# (판정은 firm_groups.cluster_key — FEI 가 근거). 카드 데이터·문안은 건드리지 않고 뷰에만 싣는다.
+# 실사일이 게시일보다 2년(OLD_INSPECTION_DAYS — 근거는 firm_groups 주석) 넘게 앞선 카드는
+# '옛 실사' 표시와 실사일을 카드 머리에 올린다. 같은 게시일의 옛 실사가 2장 이상이면 '일괄 공개'.
+def _annotate_firm_groups(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any]],
+                          tr: Translator = _KO) -> None:
+    """뷰에 `fgroup_key`(묶음 열쇠·2장 이상일 때만)·`fgroup_name`·`fgroup_sites`·`fgroup_kind`·
+    `old_insp` 를 단다. `cards_raw` 는 `card_views` 와 같은 순서의 원본 카드."""
+    reg = _fg.default_registry()
+    idx = _fg.fei_index(reg)
+    en = not lang_is_ko(tr)
+    keys = [_fg.cluster_key(raw, idx) for raw in cards_raw]
+    runs: dict[tuple[Any, ...], int] = {}
+    for cv, k in zip(card_views, keys):
+        if k:
+            rk = (cv.get("group"), cv.get("group_label"), k)
+            runs[rk] = runs.get(rk, 0) + 1
+    old_by_pub: dict[str, int] = {}
+    for raw in cards_raw:
+        if _fg.is_old_inspection(raw):
+            pub = _fg.inspection_dates(raw)[1].isoformat()  # type: ignore[index]
+            old_by_pub[pub] = old_by_pub.get(pub, 0) + 1
+    for cv, raw, k in zip(card_views, cards_raw, keys):
+        if k and runs.get((cv.get("group"), cv.get("group_label"), k), 0) >= 2:
+            cv["fgroup_key"] = k
+            fei = _fg.card_fei(raw)
+            g = idx.get(fei)
+            cv["fgroup_fei"] = fei
+            cv["fgroup_kind"] = _fg.doc_kind(raw)
+            cv["fgroup_name"] = ((g["name_en"] if en else g["name_ko"]) if g
+                                 else _fg.card_firm_name(raw))
+            cv["fgroup_registered"] = bool(g)
+        if _fg.is_old_inspection(raw):
+            insp, pub = _fg.inspection_dates(raw)  # type: ignore[misc]
+            years = (pub - insp).days // 365
+            batch = old_by_pub.get(pub.isoformat(), 0) >= 2
+            cv["old_insp"] = {
+                "label": tr("옛 실사 일괄 공개") if batch else tr("옛 실사 공개"),
+                "date": insp.isoformat(),
+                "date_label": tr("실사일 {date}", date=insp.isoformat()),
+                "lag": tr("게시 {n}년 전 실사", n=years),
+            }
+
+
+def _fgroup_head(members: list[dict[str, Any]], tr: Translator) -> str:
+    """묶음 머리말 — '○○ 그룹 — 시설 N곳 · 483 M건' (같은 FEI 묶음은 '업체명 — 483 M건')."""
+    first = members[0]
+    kinds: dict[str, int] = {}
+    for cv in members:
+        kinds[cv.get("fgroup_kind") or ""] = kinds.get(cv.get("fgroup_kind") or "", 0) + 1
+    parts: list[str] = []
+    if first.get("fgroup_registered"):
+        name = tr("{name} 그룹", name=first.get("fgroup_name") or "")
+        parts.append(tr("시설 {n}곳", n=len({cv.get("fgroup_fei") for cv in members})))
+    else:
+        name = first.get("fgroup_name") or ""
+    for kind, n in kinds.items():
+        if kind == "483":
+            parts.append(tr("483 {n}건", n=n))
+        elif kind == "WL":
+            parts.append(tr("경고서한 {n}건", n=n))
+        else:
+            parts.append(f"{tr(kind)} {tr('{n}건', n=n)}".strip())
+    return f"{name} — {' · '.join(parts)}"
+
+
+def _mark_fgroup_runs(cards: list[dict[str, Any]], tr: Translator) -> None:
+    """섹션 안에서 연속한 같은 묶음 카드에 시작·끝 표시와 머리말을 단다(2장 이상만)."""
+    i = 0
+    while i < len(cards):
+        k = cards[i].get("fgroup_key")
+        if not k:
+            i += 1
+            continue
+        j = i
+        while (j + 1 < len(cards) and cards[j + 1].get("fgroup_key") == k
+               and cards[j + 1].get("group_label") == cards[i].get("group_label")):
+            j += 1
+        if j > i:
+            cards[i]["fgrp_open"] = True
+            cards[i]["fgrp_head"] = _fgroup_head(cards[i:j + 1], tr)
+            cards[j]["fgrp_close"] = True
+        i = j + 1
+
+
 def _is_renderable(card: dict[str, Any]) -> bool:
     """렌더 제외 카드 판별(방어적 — 상류 순수성 미가정, §3.2/§3.3 렌더러 책임).
 
@@ -1531,6 +1619,7 @@ def _build_sections(card_views: list[dict[str, Any]],
     for s in sections:
         s["count"] = len(s["cards"])
         _mark_row_runs(s["cards"], tr)
+        _mark_fgroup_runs(s["cards"], tr)
     return sections
 
 
@@ -1627,16 +1716,38 @@ def _order_by_weight(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     묶음 = 연속한 (group, group_label) 구간(섹션 · 국내 소제목). 구간 안에서만 안정 정렬하므로
     섹션·소제목 순서와 같은 무게 안의 원래 순서는 그대로다. 무게 값이 하나도 없는 호(11-16 앞)는
-    입력 그대로 돌려준다(바이트 불변)."""
-    if not any(cv.get("weight") for cv in card_views):
+    입력 그대로 돌려준다(바이트 불변).
+
+    [업체 그룹 묶음 2026-11-23] 같은 묶음 열쇠(`fgroup_key`) 카드는 한 덩어리로 움직인다 —
+    덩어리의 무게는 구성원 중 가장 무거운 것, 자리는 그 무게 안에서 첫 구성원의 자리.
+    구성원끼리는 원래 순서. 묶음도 무게도 없는 호는 입력 그대로다."""
+    if not any(cv.get("weight") or cv.get("fgroup_key") for cv in card_views):
         return card_views
+
+    def _sorted_run(run: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        crank: dict[str, int] = {}
+        cfirst: dict[str, int] = {}
+        for i, v in enumerate(run):
+            k = v.get("fgroup_key")
+            if k:
+                crank[k] = min(crank.get(k, 9), _WEIGHT_RANK.get(v.get("weight"), 1))
+                cfirst.setdefault(k, i)
+
+        def sk(iv: "tuple[int, dict[str, Any]]") -> tuple[int, int, int]:
+            i, v = iv
+            k = v.get("fgroup_key")
+            if k:
+                return (crank[k], cfirst[k], i)
+            return (_WEIGHT_RANK.get(v.get("weight"), 1), i, i)
+        return [v for _, v in sorted(enumerate(run), key=sk)]
+
     out: list[dict[str, Any]] = []
     run: list[dict[str, Any]] = []
     key: Any = object()
     for cv in card_views + [None]:                     # type: ignore[list-item]
         k = None if cv is None else (cv.get("group"), cv.get("group_label"))
         if cv is None or k != key:
-            out.extend(sorted(run, key=lambda v: _WEIGHT_RANK.get(v.get("weight"), 1)))
+            out.extend(_sorted_run(run))
             run, key = [], k
         if cv is not None:
             run.append(cv)
@@ -1652,7 +1763,9 @@ def _mark_row_runs(cards: list[dict[str, Any]], tr: Translator) -> None:
             continue
         j = i
         while (j + 1 < len(cards) and cards[j + 1].get("weight") == "row"
-               and cards[j + 1].get("group_label") == cards[i].get("group_label")):
+               and cards[j + 1].get("group_label") == cards[i].get("group_label")
+               # [업체 그룹 묶음] 표 묶음은 업체 묶음 경계에서 끊는다(묶음 상자 안팎이 엇갈리지 않게).
+               and cards[j + 1].get("fgroup_key") == cards[i].get("fgroup_key")):
             j += 1
         run = cards[i:j + 1]
         by_agency: dict[str, int] = {}
@@ -8610,6 +8723,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         card_views = [_card_view(c, tr, lang, doc_url_index, en_paths, anatomy_slugs)
                       for c in cards_sorted]
         _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
+        _annotate_firm_groups(card_views, cards_sorted, tr)  # 업체 그룹 묶음·옛 실사 표시
         sections = _build_sections(card_views, tr)
         ctx = _brief_context(b, issue_no, tr)
         # [브리프 자료실 스트립] 이 브리프가 커버하는 주간(window)에 실제로 든 자료실
@@ -8662,6 +8776,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             en_card_views = [_card_view(c, en_tr, "en", doc_url_index, en_paths)
                              for c in cards_sorted]
             _annotate_toc_distinguishers(en_card_views)
+            _annotate_firm_groups(en_card_views, cards_sorted, en_tr)
             en_brief_page = en_page(f"briefs/{pub}/")
             if brief_term_index_by_lang:
                 _en_sel = select_brief_term_links(

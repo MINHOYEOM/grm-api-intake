@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "_doc": "업체 그룹(모회사-시설) 단일 원천. 브리프 화면이 같은 그룹 카드를 한 묶음으로 보여 줄 때 이 파일만 본다(firm_groups.py). 등록은 시설마다 FEI·원문 업체명·원문 주소·근거 출처를 함께 적는다 — 이름이 비슷하다는 것만으로는 등록하지 않는다. 후보는 조립·사전 점검이 '그룹 등록 후보' 경고로 알려 준다.",
+  "groups": [
+    {
+      "key": "qilu-pharmaceutical",
+      "name_ko": "Qilu Pharmaceutical",
+      "name_en": "Qilu Pharmaceutical",
+      "parent_legal_name": "Qilu Pharmaceutical Co., Ltd.",
+      "registered_at": "2026-11-23",
+      "registered_by": "대표 결정 2026-11-23 (11-23 호 Qilu 483 5장)",
+      "basis": "FDA 483 원문 머리(업체명·주소)와 FDA 실사 대시보드 등록명. 3009831352 와 3021324493 은 483 원문 주소가 같은 No. 849 Dongjia, Licheng District, Jinan 이다. 3003802432 는 같은 법인명(Qilu Pharmaceutical Co., Ltd.)의 High Tech Zone 시설, 3008250362 는 법인명에 모회사명을 단 Hainan 자회사다.",
+      "members": [
+        {
+          "fei": "3009831352",
+          "legal_name": "Qilu Antibiotics Pharmaceutical Co., Ltd.",
+          "address": "No. 849 Dongjia Town, Licheng District, Jinan, Shandong 250105, China",
+          "evidence": ["FDA 483 fda483-196408 원문 머리", "FDA 483 fda483-196372 원문 머리", "FDA 실사 대시보드 등록명 'Qilu Antibiotics Pharmaceutical Co. , Ltd.' (Jinan)"]
+        },
+        {
+          "fei": "3021324493",
+          "legal_name": "Qilu Pharmaceutical Co., Ltd.",
+          "address": "No. 849 Dongjia Town, Licheng District, Jinan, Shandong 250105, China",
+          "evidence": ["FDA 483 fda483-196373 원문 머리 (Sterile API Manufacturer)"]
+        },
+        {
+          "fei": "3003802432",
+          "legal_name": "Qilu Pharmaceutical Co., Ltd. (High Tech Zone Site)",
+          "address": "No. 317 Xinluo Road, High Tech Zone, Jinan, Shandong 250101, China",
+          "evidence": ["FDA 483 fda483-196374 원문 머리", "FDA 실사 대시보드 등록명 'Qilu Pharmaceutical Co., Ltd. (High Tech Zone Site)' (Jinan)"]
+        },
+        {
+          "fei": "3008250362",
+          "legal_name": "Qilu Pharmaceutical (Hainan) Co., Ltd.",
+          "address": "No. 273-A Nanhai Avenue, National High-Tech Zone, Haikou, Hainan 570314, China",
+          "evidence": ["FDA 483 fda483-196409 원문 머리", "FDA 실사 대시보드 등록명 'Qilu Pharmaceutical (Hainan) Co. Ltd.' (Haikou)"]
+        }
+      ]
+    }
+  ]
+}

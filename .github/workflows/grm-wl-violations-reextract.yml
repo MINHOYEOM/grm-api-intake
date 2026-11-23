@@ -1,0 +1,89 @@
+name: GRM WL Violations Re-extract From Stored Body
+
+# [WL 위반항목 재추출 · 2026-11-23] 저장된 본문(wl_body_full)만 읽어 빈·낡은 위반항목(wl_violations)을 다시 뽑는다.
+# backfill_wl_violations_reextract.py — 수집과 같은 함수 collect_intake.build_wl_item → extract_wl_violations_detail · 외부 요청 0.
+# 바꾸는 칸은 raw 의 wl_violations·wl_violations_status 둘뿐(row_json 그대로). 새 문장은 본문에 글자 그대로 있어야 쓴다.
+# 쓰기: raw_signal_apply_version(reextract · 옛 판 보관 · 읽은 뒤 바뀌었으면 conflict). 무료 Nano — 회차 2,000 이하.
+# 기본은 dry-run(apply=false). 수동 실행 전용(예약 없음) — 앞으로의 행은 일일 수집·과거분 백필·WL 복구가 같은 함수로 채우고,
+# 빠진 행은 내용 완전성 감시(content_completeness.py (V))가 매일 센다.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: '실제로 쓴다(기본 false = dry-run). dry 숫자를 비서실이 확인하고 대표 승인 뒤에만 true'
+        type: boolean
+        default: false
+      doc_ids:
+        description: 'document_id 목록(쉼표 구분, 비우면 대상 전부)'
+        type: string
+        default: ''
+      limit:
+        description: '회차 쓰기 상한(무료 Nano — 2000 이하)'
+        type: string
+        default: '2000'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wl-violations-reextract
+  cancel-in-progress: false
+
+jobs:
+  reextract:
+    name: Re-extract wl_violations
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Re-extract (dry-run unless apply=true)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_APPLY: ${{ inputs.apply }}
+          IN_DOCS: ${{ inputs.doc_ids }}
+          IN_LIMIT: ${{ inputs.limit }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          set -uo pipefail
+          if ! printf '%s' "${IN_LIMIT:-2000}" | grep -qE '^[0-9]+$' || [ "${IN_LIMIT:-2000}" -gt 2000 ]; then
+            echo "::error::limit 은 2000 이하 숫자"; exit 2
+          fi
+          if [ -n "${IN_DOCS:-}" ] && ! printf '%s' "$IN_DOCS" | grep -qE '^[A-Za-z0-9_, -]+$'; then
+            echo "::error::doc_ids 는 영숫자·쉼표·하이픈만"; exit 2
+          fi
+          args=(--limit "${IN_LIMIT:-2000}" --report report.json --markdown table.md)
+          if [ -n "${IN_DOCS:-}" ]; then args+=(--doc-ids "$IN_DOCS"); fi
+          if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
+          python backfill_wl_violations_reextract.py "${args[@]}"
+          rc=$?
+          {
+            echo "### 경고서한 위반항목 재추출"
+            echo "- apply: \`${IN_APPLY:-false}\` · limit: \`${IN_LIMIT:-2000}\` · exit: \`${rc}\`"
+            head -c 60000 table.md 2>/dev/null || echo '(표 없음)'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: wl-violations-reextract
+          path: |
+            report.json
+            table.md
+          if-no-files-found: ignore
+          retention-days: 30

@@ -29,7 +29,7 @@ import collect_intake as ci  # noqa: E402
 _FIX = os.path.join(_ROOT, "tests", "fixtures", "wl_violations_1123")
 
 # 수리가 끝난 형식을 여기에 적는다(예: {"F1b", "F2"}). 비어 있으면 fails_now 표본은 전부 예상 실패.
-_FIXED_FORMATS: set[str] = set()
+_FIXED_FORMATS: set[str] = {"F1b", "F2", "F3", "F3b", "F4"}
 
 
 def _load_samples() -> list[dict]:

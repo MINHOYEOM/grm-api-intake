@@ -205,11 +205,11 @@
    "group": "B-704-refusal",
    "format": "F4",
    "status": "fails_now",
-   "note": "기록 제공 거부. 위반 = 301(e) 금지행위 문장(원문 그대로)",
+   "note": "기록 제공 거부. 위반 = 301(e) 금지행위 문장(원문 그대로). [11-23 수리] 판정 문장이 'Refusal to Provide Records' 소제목보다 앞(머리말)에 있어 그 소제목 아래 문장이 아니다 — 같은 구조의 7e75 와 맞춰 heading '' 로 정정",
    "expected": [
     {
      "number": "1",
-     "heading": "Refusal to Provide Records",
+     "heading": "",
      "statement": "It is a prohibited act under section 301(e) of the FD&C Act (21 U.S.C. 331(e)) to refuse to permit access to or copying of any record as required by section 704(a).",
      "citation": "FD&C Act 301(e) · FD&C Act 704(a)"
     }

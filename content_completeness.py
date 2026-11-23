@@ -22,6 +22,10 @@
       * 그 밖의 소스는 **코드로** 본다: 사이트 계층(web/·supabase/·findings_*·kg_*) 또는 브리프 조립 파일이
         칸 이름을 문자열로 읽는지.
       경보: 아무도 안 읽는 칸 / findings 소스인데 도달률 5% 미만인 긴 칸(중앙값 300자 이상).
+  (V) 경고서한 위반항목 빈칸(2026-11-23) — 본문(`wl_body_full`)은 있는데 `wl_violations` 도 사유 표식
+      (`wl_violations_status`)도 없는 행. 추출 함수(`collect_intake.build_wl_item`)를 거치지 않은 적재 경로의
+      흔적이다(10-28 이전 백필 770행). 판정은 수집기와 같은 함수 `collect_intake.wl_violations_gap_kind`.
+      0 이 아니면 경보. 고치는 길: grm-wl-violations-reextract.yml(dry → 대표 승인 → apply).
 
 의도된 것은 경보하지 않는다 — `INTENTIONAL_CAPS`(설계상 발췌)·`INTENTIONAL_UNSHOWN`(추출 원료·정형 문구)에
   이유와 함께 적는다. 표에 없는 새 칸은 기본이 경보다(사람이 판단해 표에 올리거나 고친다).
@@ -511,8 +515,34 @@ def collect_stats(raw_rows: Iterable[dict[str, Any]], finding_rows: Iterable[dic
     return list(stats.values()), joined
 
 
+def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20) -> dict[str, Any]:
+    """(V) 경고서한 위반항목 빈칸 — 사유별 행 수(수집기와 같은 판정 함수)."""
+    from collect_intake import wl_violations_gap_kind
+    from grm_common import SOURCE_FDA_WL
+    by_kind: dict[str, int] = defaultdict(int)
+    unmarked_docs: list[str] = []
+    for r in raw_rows:
+        if str(r.get("source") or "") != SOURCE_FDA_WL:
+            continue
+        raw = r.get("raw_json")
+        if isinstance(raw, str):
+            try:
+                raw = json.loads(raw)
+            except ValueError:
+                continue
+        kind = wl_violations_gap_kind(raw if isinstance(raw, dict) else {})
+        if not kind:
+            continue
+        by_kind[kind] += 1
+        if kind == "unmarked" and len(unmarked_docs) < max_docs:
+            unmarked_docs.append(str(r.get("document_id") or ""))
+    return {"unmarked": by_kind.get("unmarked", 0), "by_kind": dict(sorted(by_kind.items())),
+            "unmarked_docs": unmarked_docs}
+
+
 def build_report(stats: list[FieldStats], findings_text: dict[str, str], *, today: date,
-                 root: Path = ROOT, run_url: str = "") -> dict[str, Any]:
+                 root: Path = ROOT, run_url: str = "",
+                 wl_gaps: dict[str, Any] | None = None) -> dict[str, Any]:
     code_caps = scan_code_caps(root)
     trunc = detect_truncation(stats, code_caps, today)
     files = code_files(root)
@@ -535,7 +565,9 @@ def build_report(stats: list[FieldStats], findings_text: dict[str, str], *, toda
                        "site_reach_min": SITE_REACH_MIN, "unshown_alarm_median": UNSHOWN_ALARM_MEDIAN},
         "fields_scanned": len(stats), "truncation": trunc, "usage": usage,
         "counts": {"truncated": len(alarms_t), "unused": len(alarms_u),
-                   "intentional_caps": len(trunc) - len(alarms_t)},
+                   "intentional_caps": len(trunc) - len(alarms_t),
+                   "wl_violation_gaps": int((wl_gaps or {}).get("unmarked") or 0)},
+        "wl_violation_gaps": wl_gaps or {},
     }
     report["issues"] = plan_issues(report)
     return report
@@ -590,14 +622,24 @@ def render_markdown(report: dict[str, Any]) -> str:
                   "| 소스 | 칸 | 값 수 | 중앙 길이 | 쓰임 | 도달률 | 읽는 파일 |", "|---|---|---:|---:|---|---|---|"]
         lines += [_usage_line(u) + (f" 의도: {u['intentional']}" if u["intentional"] else "") for u in rest]
         lines += ["", "</details>", ""]
-    if not t_alarm and not u_alarm:
+    g = report.get("wl_violation_gaps") or {}
+    if c.get("wl_violation_gaps"):
+        lines += ["## 경고서한 위반항목 빈칸(본문 있음 · 사유 표식 없음)", "",
+                  f"**{c['wl_violation_gaps']}행** — 추출 함수를 거치지 않은 적재 경로의 흔적. "
+                  "고치는 길: `grm-wl-violations-reextract.yml`(dry → 대표 승인 → apply).", "",
+                  f"사유별: {g.get('by_kind')}", "",
+                  f"문서 예: {', '.join(g.get('unmarked_docs') or [])}", ""]
+    elif g:
+        lines += [f"경고서한 위반항목: {g.get('by_kind')} (사유 표식 없는 빈칸 0)", ""]
+    if not t_alarm and not u_alarm and not c.get("wl_violation_gaps"):
         lines.append("이상 없음.")
     return "\n".join(lines) + "\n"
 
 
 def fingerprint(report: dict[str, Any]) -> str:
     keys = sorted([f"T|{t['source']}|{t['path']}|{t['cap']}" for t in report["truncation"] if not t["intentional"]]
-                  + [f"U|{u['source']}|{u['path']}" for u in report["usage"] if u["alarm"]])
+                  + [f"U|{u['source']}|{u['path']}" for u in report["usage"] if u["alarm"]]
+                  + (["V|wl_violations"] if report["counts"].get("wl_violation_gaps") else []))
     return "content-fp:" + hashlib.sha256("\n".join(keys).encode("utf-8")).hexdigest()[:16]
 
 
@@ -606,13 +648,14 @@ def plan_issues(report: dict[str, Any]) -> list[dict[str, Any]]:
     칸마다 이슈를 열지 않고 하나로 모은다(감시기 이슈가 쏟아지면 무시당한다 — 2026-10 교훈)."""
     c = report["counts"]
     base = {"key": "content", "source": "내용 완전성", "title": ISSUE_TITLE, "labels": list(ISSUE_LABELS)}
-    if c["truncated"] or c["unused"]:
+    if c["truncated"] or c["unused"] or c.get("wl_violation_gaps"):
         fp = fingerprint(report)
         body = render_markdown(report) + "\n" + (f"실행: {report['run_url']}\n\n" if report.get("run_url") else "") + \
             "데이터는 고치지 않았다(감시는 읽기 전용). 의도된 칸이면 `content_completeness.py` 의 " \
             "`INTENTIONAL_CAPS`/`INTENTIONAL_UNSHOWN` 에 이유와 함께 올리고, 아니면 수집·표시를 고친다.\n\n" + f"<!-- {fp} -->\n"
         return [{**base, "action": "open", "body": body, "fingerprint": fp, "verdict": "found",
-                 "comment": f"목록이 바뀌었습니다 — 잘림 {c['truncated']}칸 · 안 쓰이는 칸 {c['unused']}개"}]
+                 "comment": f"목록이 바뀌었습니다 — 잘림 {c['truncated']}칸 · 안 쓰이는 칸 {c['unused']}개"
+                            f" · 경고서한 위반항목 빈칸 {c.get('wl_violation_gaps', 0)}행"}]
     return [{**base, "action": "close", "verdict": "ok",
              "comment": "잘림·안 쓰이는 칸이 더 보이지 않아 자동으로 닫습니다."}]
 
@@ -634,7 +677,7 @@ def run(env: dict[str, str], *, today: date, run_url: str = "", session: Any = N
         sel = ",".join([id_col] + ([] if src_col.startswith("=") else [src_col]) + list(cols))
         extra[table] = list(fetch_table(base, key, table, sel, f"{id_col}.asc", session))
     stats, ftext = collect_stats(raw, finds, extra)
-    return build_report(stats, ftext, today=today, run_url=run_url)
+    return build_report(stats, ftext, today=today, run_url=run_url, wl_gaps=wl_violation_gaps(raw))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -656,6 +699,9 @@ def main(argv: list[str] | None = None) -> int:
     c = report["counts"]
     if c["truncated"] or c["unused"]:
         print(f"::warning title=content-completeness::잘림 의심 {c['truncated']}칸 · 안 쓰이는 칸 {c['unused']}개", flush=True)
+    if c.get("wl_violation_gaps"):
+        print(f"::warning title=wl-violations-gap::경고서한 본문 있음·위반항목 없음·사유 표식 없음 {c['wl_violation_gaps']}행 "
+              "— grm-wl-violations-reextract.yml 로 재추출", flush=True)
     return 0
 
 

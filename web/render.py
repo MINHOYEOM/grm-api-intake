@@ -424,7 +424,10 @@ def _detail_preview(dd: dict[str, Any] | None, tr: Translator = _KO) -> str:
     if not isinstance(dd, dict):
         return ""
     if dd.get("type") == "fda_483_observations":
-        return tr("Observation {n}건", n=dd.get("count") or 0)
+        # count 가 비면(원문 번호 불연속 — 건수 단정 불가) 숫자를 지어내지 않는다.
+        if not isinstance(dd.get("count"), int):
+            return ""
+        return tr("Observation {n}건", n=dd["count"])
     return ""
 
 

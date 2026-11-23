@@ -2611,10 +2611,51 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
             if ok or (frag and m.group(1) not in headed)]
 
 
+def fda483_observation_count(
+    rows: list[dict[str, Any]], seen: list[str] | None = None,
+) -> int | None:
+    """원문 관찰 **건수**(카드 `deterministic_detail.count`·요약 "관찰사항 N건"의 근거). 순수 함수.
+
+    [2026-11-23] 건수를 `len(rows)` 로 두면 조용히 틀린다 — rows 는 **공개 가능한 표제만**
+    남긴 목록이라, 번호 표제를 찾고도 표제가 OCR 로 깨져 게이트에서 빠진 관찰은 건수에서도
+    사라진다(실측 fda483-196455: 원문 1~6, rows 2·3·4 → "관찰사항 3건"). 건수는 rows 가 아니라
+    **rows 를 만든 경로가 본 번호 표제 전체**(`seen` — `_extract_483_observations_from_text`
+    가 채운다)에서 센다.
+
+      ① `seen` 이 1..N 연속이고 rows 번호가 전부 그 안이면 → N (게이트에서 빠진 관찰 포함)
+      ② 아니면 rows 번호 자체가 1..len 연속일 때만 → len(rows) (종전 값과 같다)
+      ③ 둘 다 아니면 → **None**: 번호가 건너뛰거나(2·3·4) 중복되면 건수를 단정할 수 없다.
+         호출부는 count 를 비워 둔다(조용히 틀린 숫자를 쓰지 않는다 — rows 는 그대로 둔다).
+    """
+    def _nums(values: list[str]) -> list[int] | None:
+        out: list[int] = []
+        for v in values:
+            s = str(v or "").strip()
+            if not s.isdigit():
+                return None
+            out.append(int(s))
+        return out
+
+    row_nums = _nums([str(r.get("number", "")) for r in rows if isinstance(r, dict)])
+    if not row_nums:
+        return None
+    seen_nums = _nums(list(seen)) if seen else None
+    if seen_nums and seen_nums == list(range(1, len(seen_nums) + 1)) \
+            and all(1 <= n <= len(seen_nums) for n in row_nums):
+        return len(seen_nums)
+    if row_nums == list(range(1, len(row_nums) + 1)):
+        return len(row_nums)
+    return None
+
+
 def _extract_483_observations_from_text(
     text: str, header_hints: dict[str, str] | None = None,
+    seen: list[str] | None = None,
 ) -> list[dict[str, str]]:
     """483 PDF 텍스트층 → Observation 번호별 결정론 구조.
+
+    `seen`(선택)을 넘기면 반환 rows 를 만든 경로가 본 **번호 표제 전체**(게이트에서 빠진
+    표제 포함, 순서대로)를 채운다 — 건수는 `fda483_observation_count(rows, seen)` 로 센다.
 
     `WE OBSERVED` 이후 `OBSERVATION N` 앵커로 분할하고, 각 Observation 의 첫 문장을
     deficiency 로 둔다. 유효 deficiency 가 없거나 텍스트층 깨짐률이 높으면 [] 로 degrade.
@@ -2648,6 +2689,7 @@ def _extract_483_observations_from_text(
         hints,
         gate=_is_publishable_deficiency,
         fragment_heads=True,
+        seen=seen,
     )
     if primary:
         return primary
@@ -2656,7 +2698,7 @@ def _extract_483_observations_from_text(
     # 정상 문서 1,545개의 출력이 byte 단위로 불변임을 측정이 아니라 구조로 보장한다.
     # (예외 2026-11-13: 정상 게이트가 서식 뒷면 안내문 표제를 거르므로, 안내문 행만 내던 문서는
     #  여기로 넘어온다 — _is_publishable_deficiency 참고.)
-    return _recover_483_observations(body, m, hints)
+    return _recover_483_observations(body, m, hints, seen=seen)
 
 
 def _with_glyph_first_anchor(body: str, anchors: list[re.Match[str]]) -> list[re.Match[str]]:
@@ -2717,6 +2759,7 @@ def _observations_from_anchors(
     hints: dict[str, str],
     gate: Callable[[str], bool],
     fragment_heads: bool = False,
+    seen: list[str] | None = None,
 ) -> list[dict[str, str]]:
     """앵커 목록 → Observation rows. 앵커 찾기(finder)와 표제 통과 기준(gate)만 갈아끼운다
     — 정상 경로와 회수 경로가 **같은 조립 코드**를 쓰게 해 둘이 갈라지지 않도록 한다.
@@ -2724,11 +2767,16 @@ def _observations_from_anchors(
     `fragment_heads`(`_select_observation_anchors` 를 쓰는 경로만 켠다): 표제가 조각(".")이라
     gate 에서 버려질 행만, 조각 머리를 건너뛴 문장(`_split_past_fragment_head`)으로 다시 본다.
     gate 를 통과하던 행은 이 분기에 닿지 않으므로 종전 출력이 그대로다. 회수 경로(②~⑤)는
-    앵커에 상호참조 거름(①~③·고아 번호)이 없어 켜지 않는다."""
+    앵커에 상호참조 거름(①~③·고아 번호)이 없어 켜지 않는다.
+
+    `seen`: 결과가 비어있지 않을 때만, 이 호출이 본 번호 표제 전체(gate 에서 빠진 것 포함)로
+    **덮어쓴다** — 경로들이 "처음 비어있지 않은 결과"를 반환하므로 마지막으로 채워진 값이 곧
+    반환 rows 를 만든 경로의 번호다(`fda483_observation_count` 입력)."""
     matches = finder(body)
     if not matches:
         return []
     out: list[dict[str, str]] = []
+    numbers: list[str] = []
     for i, obs in enumerate(matches):
         start = obs.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
@@ -2743,6 +2791,12 @@ def _observations_from_anchors(
         # 남는다(실측: 신규 727건 중 23건이 정상 경로로 들어오면서 "| There is a failure…"
         # 형태로 저장됐다). 순수 접두 제거라 정상 표제에는 영향이 없다(내용 절단 상한 있음).
         deficiency = strip_leading_observation_noise(deficiency)
+        # 건수 근거(`seen`)에는 gate 에서 빠질 표제도 넣는다 — 단, 서식 뒷면 안내문(`1. Pursuant
+        # to Section 704(b)… 2. To assist firms…`)은 관찰이 아니므로 넣지 않는다(실측 196455:
+        # 관찰 1~6 뒤에 안내문 1·2 가 붙어 번호가 1..6,1,2 가 됐다). 청소 전 구간 머리로 본다 —
+        # 청소가 `704(b)` 의 `(b)` 를 마스킹 표기로 지워 표제로는 안내문 판정이 안 된다.
+        if not (_FORM_NOTICE_RE.search(seg, 0, 200) or _FORM_NOTICE_RE.search(deficiency or "")):
+            numbers.append(obs.group(1) if obs.group(1).isdigit() else "1")
         if not gate(deficiency) and fragment_heads:
             frag_head, frag_rest, lower_enum = _split_past_fragment_head(chunk)
             if not lower_enum and gate(frag_head):
@@ -2759,11 +2813,14 @@ def _observations_from_anchors(
             "detail": _finalize_detail(clean_detail),
         }
         out.append(row)
+    if out and seen is not None:
+        seen[:] = numbers
     return out
 
 
 def _recover_483_observations(
     body: str, we_observed: re.Match[str] | None, hints: dict[str, str],
+    seen: list[str] | None = None,
 ) -> list[dict[str, str]]:
     """정상 경로가 0건일 때만 도는 회수 경로(순서대로 시도, 처음 성공한 것을 쓴다).
 
@@ -2786,7 +2843,7 @@ def _recover_483_observations(
             found = _observations_from_anchors(
                 _cut_at_annotations(body),
                 lambda s: _select_observation_anchors(s, list(_OBS_RE.finditer(s))),
-                hints, gate=gate, fragment_heads=True,
+                hints, gate=gate, fragment_heads=True, seen=seen,
             )
             if found:
                 return found
@@ -2812,10 +2869,22 @@ def _recover_483_observations(
     recovery = _OBS_MARKER_RECOVERY_RE.search(body)
     if we_observed is None and recovery is None:
         recovery = _FORM_MARKER_LINE_RE.search(body)
-    for marker in _marker_candidates(we_observed, recovery):
-        found = _run_recovery_ladder(body, marker, hints, gate)
-        if found:
-            return found
+    #
+    # ★⑤(번호 없는 단일 관찰)는 **모든 마커가 번호 목록을 못 낼 때만** 쓴다(2026-11-23).
+    #   첫 마커로 ⑤ 가 나오면 그대로 반환하던 탓에, 산문 "we observed"(관찰 본문 속 문장)가
+    #   첫 마커가 되면 그 뒤 꼬리 한 문장이 "관찰 1건"이 되고, 양식 마커 `(I) (WE) OBSERVED`
+    #   뒤의 진짜 번호 목록 `1) 2) 3) 4)` 는 두 번째 마커라 시도조차 안 됐다(실측
+    #   fda483-196447: 원문 관찰 4건 → 관찰 4)a 의 꼬리를 "관찰 1"로 저장, 요약 "관찰사항 1건").
+    #   ⑤ 는 번호라는 구조 근거가 없는 가장 약한 회수이므로, 번호 근거가 있는 결과보다 앞설
+    #   수 없다. 첫 패스(⑤ 끔)에서 아무 마커도 못 내면 둘째 패스가 **종전과 같은 순서**로
+    #   ⑤ 를 허용하므로, 번호 목록이 어느 마커로도 안 나오는 문서의 결과는 그대로다.
+    markers = _marker_candidates(we_observed, recovery)
+    for allow_single in (False, True):
+        for marker in markers:
+            found = _run_recovery_ladder(body, marker, hints, gate,
+                                         allow_single=allow_single, seen=seen)
+            if found:
+                return found
     return []
 
 
@@ -2842,13 +2911,17 @@ def _marker_candidates(
 
 def _run_recovery_ladder(
     body: str, marker: re.Match[str] | None, hints: dict[str, str], gate: Any,
+    allow_single: bool = True, seen: list[str] | None = None,
 ) -> list[dict[str, str]]:
-    """주어진 마커 하나로 ②→③→④ 를 순서대로 시도한다(처음 성공한 것을 쓴다)."""
+    """주어진 마커 하나로 ②→③→④(→⑤) 를 순서대로 시도한다(처음 성공한 것을 쓴다).
+
+    `allow_single=False` 면 ⑤(번호 없는 단일 관찰)를 건너뛴다 — `_recover_483_observations`
+    가 번호 근거 있는 결과를 모든 마커에서 먼저 찾을 때 쓴다."""
     scoped = _cut_at_annotations(body[marker.end():] if marker is not None else body)
 
     # ② 느슨한 앵커(OCR 공백·`OBSERVATION #1`). 정상 앵커가 0건인 문서에서만 여기 온다.
     found = _observations_from_anchors(
-        scoped, lambda s: list(_OBS_LOOSE_RE.finditer(s)), hints, gate=gate)
+        scoped, lambda s: list(_OBS_LOOSE_RE.finditer(s)), hints, gate=gate, seen=seen)
     if found:
         return found
 
@@ -2857,7 +2930,7 @@ def _run_recovery_ladder(
     #    놓친다(실측 120702·129953·142274·83523·167686). ⑤ 로 흘려보내면 표제가
     #    "OBSERVATION l ..." 처럼 앞머리가 붙은 채 저장되므로 여기서 제대로 잡는다.
     found = _observations_from_anchors(
-        scoped, lambda s: list(_OBS_GLYPH_NUM_RE.finditer(s)), hints, gate=gate)
+        scoped, lambda s: list(_OBS_GLYPH_NUM_RE.finditer(s)), hints, gate=gate, seen=seen)
     if found:
         for row in found:
             row["number"] = "1"      # 글리프는 언제나 1(2 이상은 ②가 이미 숫자로 잡는다)
@@ -2871,26 +2944,56 @@ def _run_recovery_ladder(
     #    ③ 이 잡는 `1. ` 양식 문서는 첫 앵커 조건에서 빠지므로 지금 회수되는 문서의 출력은 불변이다.
     found = _observations_from_anchors(
         scoped, lambda s: _select_hyphen_numbered_anchors(
-            s, list(_HYPHEN_NUMBERED_OBS_RE.finditer(s))), hints, gate=gate)
+            s, list(_HYPHEN_NUMBERED_OBS_RE.finditer(s))), hints, gate=gate, seen=seen)
     if found:
         return found
 
     found = _observations_from_anchors(
-        scoped, lambda s: list(_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
+        scoped, lambda s: _with_missing_first_item(s, list(_NUMBERED_OBS_RE.finditer(s))),
+        hints, gate=gate, seen=seen)
     if found:
-        return _repair_ocr_leading_digit(found)
+        found = _repair_ocr_leading_digit(found)
+        if seen is not None:      # 건수 근거도 같은 번호 교정을 거친다(13·4·6 → 3·4·6)
+            seen[:] = [r["number"] for r in
+                       _repair_ocr_leading_digit([{"number": n} for n in seen])]
+        return found
 
     # ④ 닫는 괄호 번호(`1)` · `1.)`). ③ 이 0건일 때만 — 한 문서가 두 양식을 섞어 쓰지
     # 않으므로 순서대로 시도하면 충분하고, 서로의 오탐을 만들지 않는다.
     found = _observations_from_anchors(
-        scoped, lambda s: list(_PAREN_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
+        scoped, lambda s: _with_missing_first_item(
+            s, list(_PAREN_NUMBERED_OBS_RE.finditer(s))), hints, gate=gate, seen=seen)
     if found:
         return found
 
     # ⑤ **번호가 아예 없는 단일 관찰**(옛 양식·조제약국 위생불량 483). 마커 바로 다음 줄이
     #   곧 지적문인데 ②③④ 는 전부 **번호를 전제**해 아무것도 못 잡는다(실측 36건).
     #   여기까지 왔다는 것은 정상 경로와 ①~④ 가 **모두 0건**이라는 뜻이다.
-    return _single_unnumbered_observation(scoped, hints, gate)
+    if not allow_single:
+        return []
+    found = _single_unnumbered_observation(scoped, hints, gate)
+    if found and seen is not None:
+        seen[:] = ["1"]
+    return found
+
+
+# [첫 항목 번호 결손 2026-11-23] 번호 목록(③ `N.`·④ `N)`)의 **1번 표제만** 번호 모양이 깨져
+# 앵커가 2번부터 잡히는 꼴. 스캔 OCR 이 `1)` 을 `|)` 로 읽거나(실측 fda483-196447
+# "OBSERVED:\n|) Your firm failed…"), `1.` 의 마침표를 떨군다(실측 fda483-196455
+# "OBSERVED:\n1 There i inadequate…"). 1번이 빠지면 관찰 하나가 통째로 사라지고 건수도 1 줄어든다.
+# ★오탐면을 좁게: 첫 앵커가 정확히 `2` 일 때만, 그리고 **마커 바로 뒤**(사이에 공백·`:`·`.` 만)
+#   에서만 찾는다 — 문서 중간의 `1`·`I`·`|` 는 볼 일이 없다. 1번이 이미 잡힌 문서는 손대지 않는다.
+_FIRST_ITEM_RE = re.compile(r"[\s:.]*([1Il|])\s*[.)]?\s+(?=[A-Z\"“])")
+
+
+def _with_missing_first_item(scoped: str, anchors: list[re.Match[str]]) -> list[re.Match[str]]:
+    """번호 목록 앵커가 `2` 부터 시작하면, 마커 바로 뒤의 깨진 1번 표제를 앞에 붙인다(순수 함수)."""
+    if not anchors or anchors[0].group(1) != "2":
+        return anchors
+    first = _FIRST_ITEM_RE.match(scoped)
+    if first is None or first.end() > anchors[0].start():
+        return anchors
+    return [first, *anchors]
 
 
 def _select_hyphen_numbered_anchors(
@@ -3043,7 +3146,8 @@ def _site_country(country: str, state: str) -> str:
 def _to_item(nrow: dict[str, str], excerpt: str,
              observations: list[dict[str, str]] | None = None,
              body_full: str = "", text_status: str = "",
-             inspectors: list[str] | None = None) -> IntakeItem | None:
+             inspectors: list[str] | None = None,
+             observation_count: int | None | str = "same") -> IntakeItem | None:
     """정규화 행(+excerpt) → IntakeItem. 수의/기기/식품 도메인은 None(드롭).
 
     `body_full`(비공백)이면 raw 에 `fda483_body_full` 로 실어 deep_analysis fan-out 입력으로 쓴다
@@ -3131,6 +3235,11 @@ def _to_item(nrow: dict[str, str], excerpt: str,
         raw_payload["fda483_excerpt"] = excerpt
     if observations:
         raw_payload["fda_483_observations"] = observations
+        # [건수 2026-11-23] 원문 관찰 건수가 rows 길이와 다를 때만 싣는다(같으면 키 없음 — 골든
+        # additive). None = 번호 불연속으로 단정 불가 → 스캐폴드가 count 를 비운다.
+        # 기본값 "same" = 호출부가 건수를 따로 세지 않음(백필 등 — 스캐폴드가 rows 로 센다).
+        if observation_count != "same" and observation_count != len(observations):
+            raw_payload["fda_483_observation_count"] = observation_count
     if inspectors:
         raw_payload["fda483_inspectors"] = inspectors   # 서명블록 실사관 이름(결정론·정밀도 최우선)
     if body_full:
@@ -3299,6 +3408,7 @@ def collect_fda_483(
         # 실패는 키 미기록 + warning(graceful — 결정론/deep 어느 층이 빠져도 요약카드는 유지).
         excerpt = ""
         observations: list[dict[str, str]] = []
+        observation_count: int | None | str = "same"
         body_full = ""
         inspectors: list[str] = []
         # [결손 사유 전파 2026-07-20] 본문을 못 얻었을 때 **왜** 못 얻었는지. 종전엔 이 사유가
@@ -3371,11 +3481,20 @@ def collect_fda_483(
                     log("WARN", warn + " — 메타 카드로 유지(manual_review)")
                 if observations_enabled:
                     observations_health["attempted"] += 1
+                    obs_seen: list[str] = []
                     observations = (
-                        _extract_483_observations_from_text(text, header_hints) if text else []
+                        _extract_483_observations_from_text(text, header_hints, seen=obs_seen)
+                        if text else []
                     )
                     if observations:
                         observations_health["extracted"] += 1
+                        observation_count = fda483_observation_count(observations, obs_seen)
+                        if observation_count is None:
+                            warn = (f"FDA 483 관찰 건수 단정 불가(번호 "
+                                    f"{[o.get('number') for o in observations]}·표제 {obs_seen}): "
+                                    f"{pdf_url}")
+                            observations_health["warnings"].append(warn)
+                            log("WARN", warn + " — count 비움(rows 는 보존)")
                     else:
                         observations_health["failed"] += 1
                         warn = (f"FDA 483 observations 실패"
@@ -3401,7 +3520,7 @@ def collect_fda_483(
                         log("WARN", warn + " — 분석층 없이 발행(결정론 상세·요약카드는 유지)")
 
         item = _to_item(nrow, excerpt, observations, body_full, text_status,
-                        inspectors=inspectors)
+                        inspectors=inspectors, observation_count=observation_count)
         if item is None and fetched:
             # 버린 문서의 추출 실패는 수집 품질이 아니다 — 시도(attempted)는 실제 비용이라 남기고
             # 실패·경고만 되돌린다. 경보 판정(grm_health)은 failed>0 만 본다.

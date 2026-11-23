@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T05:53:34Z",
+ "generated_at": "2026-11-23T06:14:02Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -175,22 +175,22 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 45120244871,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-23T05:50:12Z",
-    "updatedAt": "2026-11-23T05:50:16Z",
+    "updatedAt": "2026-11-23T05:56:59Z",
     "headBranch": "feat/firm-group-cluster-1123",
     "displayTitle": "feat(브리프): 같은 업체 그룹 카드 매주 자동 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45120244871"
    },
    {
     "databaseId": 45120241356,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-23T05:50:10Z",
-    "updatedAt": "2026-11-23T05:50:14Z",
+    "updatedAt": "2026-11-23T05:58:03Z",
     "headBranch": "feat/firm-group-cluster-1123",
     "displayTitle": "Merge remote-tracking branch 'origin/main' into feat/firm-group-clust…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45120241356"
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45122504473,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-23T06:11:55Z",
+    "updatedAt": "2026-11-23T06:13:51Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45122504473"
+   },
+   {
     "databaseId": 45120568183,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45095465792"
-   },
-   {
-    "databaseId": 45094478874,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-23T01:25:20Z",
-    "updatedAt": "2026-11-23T01:25:27Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45094478874"
    }
   ],
   "grm-findings-translate-apply.yml": [

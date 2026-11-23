@@ -6,7 +6,7 @@
 1121a 는 같은 153장을 16분에 전부 읽고 실제 정확성 오류를 찾았다. 그래서 카드마다 **맞춰 본 사실과 원문 조각**을 적게 하고,
 그 조각이 정말 그 카드의 원문에 있는지 코드가 본다 — 조각을 지어내면 걸리고, 원문을 펴 보지 않으면 적을 수 없다.
 
-    python company/editorial/copyedit_evidence.py show <실행 폴더> <handoff 파일> [--size 20] [--batch K] [--full] [--scaffold <파일>]
+    python company/editorial/copyedit_evidence.py show <실행 폴더> <handoff 파일> [--size 20] [--batch K] [--full] [--scaffold <파일>] [--ids a,b]
         카드를 K번째 묶음(1부터)씩 **카드 문장 + 그 카드의 원문**으로 나란히 낸다. `--batch` 를 빼면 묶음 목록만 낸다.
         원문 = handoff 행(`prose_input`·`body`·`raw_excerpt`·`quotes`)과 스캐폴드 카드(`facts`·483 관찰 `deterministic_detail`).
         심층 원문 전문(`deep_analysis_input.body_full`)은 길어서 `--full` 일 때만 낸다(근거 조각은 전문에서 따도 된다).
@@ -366,7 +366,8 @@ def load_first(folder, copyedit):
     ids = lambda ce: {str(c.get("web_card_id")) for c in (ce or {}).get("cards") or [] if isinstance(c, dict)}
     for p in (os.path.join(folder, "copyedit.r1.json"), os.path.join("_scaffold", "copyedit.r1.json")):
         first = _load_opt(p)
-        if isinstance(first, dict) and first.get("status") == "재작업" and ids(first) and ids(first) == ids(copyedit):
+        dropped = {str(d.get("web_card_id")) for d in (copyedit or {}).get("dropped_cards") or [] if isinstance(d, dict)}
+        if isinstance(first, dict) and first.get("status") == "재작업" and ids(first) and ids(first) == ids(copyedit) | dropped:
             return None if first == copyedit else first
     return None
 
@@ -443,7 +444,7 @@ def _compact(v, drop=("body_full",)):
     return v
 
 
-def show(folder, handoff_path, size=20, batch=None, full=False, scaffold_path=None):
+def show(folder, handoff_path, size=20, batch=None, full=False, scaffold_path=None, only=None):
     handoff = _load(handoff_path)
     delta = _load(os.path.join(folder, "delta.json"))
     deep = deep_items(_load_opt(os.path.join(folder, "deep_delta.json")))
@@ -451,6 +452,9 @@ def show(folder, handoff_path, size=20, batch=None, full=False, scaffold_path=No
     scs = scaffold_cards(_load_opt(sp) if sp else None)
     rows = handoff_rows(handoff)
     ids = list(delta.get("cards") or {})
+    if only:                       # `--ids` — 근거를 다시 적을 카드만(blank_slots.py finish 가 낸 목록) 한 묶음으로
+        ids = [c for c in ids if c in set(only)]
+        size, batch = max(len(ids), 1), 1
     groups = [ids[i:i + size] for i in range(0, len(ids), size)]
     out = []
     if not batch:
@@ -505,6 +509,7 @@ def main(argv=None):
     s.add_argument("handoff")
     s.add_argument("--size", type=int, default=20)
     s.add_argument("--batch", type=int)
+    s.add_argument("--ids", help="이 카드만(쉼표) — blank_slots.py finish 의 '근거 다시' 목록")
     s.add_argument("--full", action="store_true")
     s.add_argument("--scaffold")
     c = sub.add_parser("check")
@@ -519,7 +524,8 @@ def main(argv=None):
     args = ap.parse_args(argv)
     try:
         if args.cmd == "show":
-            print(show(args.folder, args.handoff, args.size, args.batch, args.full, args.scaffold))
+            print(show(args.folder, args.handoff, args.size, args.batch, args.full, args.scaffold,
+                       [x for x in (args.ids or '').split(',') if x.strip()] or None))
             return 0
         if args.cmd == "merge":
             code, msg = merge(args.copyedit, args.parts, args.delta)

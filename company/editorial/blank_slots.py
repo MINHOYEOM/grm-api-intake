@@ -38,11 +38,11 @@
 
   python company/editorial/blank_slots.py deep-auto <copyedit.json> [--cap 25] [--delta D] [--deep DD] [--r1 R] [--r1-delta RD] [--r1-deep RE]
       (델타·심층·1차 기록은 빼면 copyedit.json 옆 delta.json·deep_delta.json·copyedit.r1.json(없으면 _scaffold/), 1차 델타는 _scaffold/delta.r1.json)
-④ 카드 단위 보류(2026-11-23 대표 방침 — 백업 v16 은 꺼졌다 · 보류는 출구가 아니다) — `defer` 가 2차에도 못 고친 카드
-   (남은 반려 · 칸 삭제 거부 · 근거 미비 — `copyedit_evidence.card_issues` 와 같은 함수)만 델타에서 빼 `delta.deferred` 로 다음 주에
-   돌리고, 나머지로 마감하게 한다. 25장 초과·카드로 가를 수 없는 문제일 때만 exit 1(보류).
+④ 마감 전 다음 할 일(2026-11-23 대표 방침 — 백업 v16 은 꺼졌다 · 불완전한 카드는 싣지 않고 이월하지도 않는다) — `finish` 가
+   deep-auto 를 같은 함수로 다시 돌린 뒤 근거 미비 → 재작업 2회차 → 대표 결정 순으로 다음 할 일을 낸다. 카드를 미루지 않는다.
+   카드를 빼는 것은 대표 결정이 있을 때만(`--drop … --decision …`).
 
-  python company/editorial/blank_slots.py defer <실행 폴더> <handoff> [--scaffold S] [--cap 25] [--rework-unfinished]
+  python company/editorial/blank_slots.py finish <실행 폴더> <handoff> [--scaffold S] [--rework2-cap 5] [--drop id,… --decision "…"]
   python company/editorial/blank_slots.py apply <copyedit.json> <delta 입력> <delta 출력> [--deep-in X --deep-out Y] [--log Z]
   python company/editorial/blank_slots.py verify <copyedit.json> <brief_check.json>
   python company/editorial/blank_slots.py check <copyedit.json> <delta.json> [deep_delta.json]
@@ -554,6 +554,9 @@ def refused_cards(copyedit, delta, deep=None):
     return out
 
 
+REWORK2_CAP = 5            # 같은 날 재작업 2회차로 되돌릴 수 있는 카드 수 — RUN.md 5-1 실측(재작업 장당 2~3분 고정 비용 · 2차 재판정)으로 09:25 안
+
+
 def _recount(copyedit):
     cards = [c for c in copyedit.get("cards") or [] if isinstance(c, dict)]
     counts = dict(copyedit.get("counts") or {})
@@ -561,58 +564,86 @@ def _recount(copyedit):
                    "pass": sum(c.get("verdict") == "pass" for c in cards),
                    "reject": sum(c.get("verdict") == "reject" for c in cards),
                    "fails_total": sum(len(c.get("fails") or []) for c in cards),
-                   "notes_total": sum(len(c.get("notes") or []) for c in cards),
-                   "deferred": len(copyedit.get("deferred_cards") or [])})
+                   "notes_total": sum(len(c.get("notes") or []) for c in cards)})
+    if copyedit.get("dropped_cards"):
+        counts["dropped"] = len(copyedit["dropped_cards"])
     copyedit["counts"] = counts
 
 
-def defer_cards(copyedit, delta, deep, issues, scaffold=None, cap=REWORK_CAP, extra=()):
-    """카드 단위 보류 — 2차에도 못 고친 카드만 이번 호에서 빼고 다음 주로 미룬다(제자리 · 순수). (미룬 id, 문제 줄).
+def finish_plan(copyedit, delta, deep, issues, rework2_cap=REWORK2_CAP):
+    """2차 마감 전 다음 할 일(순수 · 입력을 바꾸지 않는다) — (단계, {카드 id: [사유]}).
 
-    11-23 실전: 반려 1장(그것도 지울 수 있는 칸)이 호 전체를 `보류` 시켰고 백업(v16)이 발행했다. 백업은 꺼졌다(대표 방침) —
-    편집팀 안에서 끝까지 마감한다. 대상 = 남은 `reject` 카드 ∪ 칸 삭제가 거부될 `pass` 카드(`refused_cards`) ∪ 근거 미비 카드
-    (`issues` = `copyedit_evidence.card_issues` 의 카드별 문제 — 같은 함수) ∪ `extra`(재작업이 끝나지 않은 카드).
-    - 델타·심층에서 그 카드를 뺀다 — 조립은 델타에 없는 카드를 채택 밖으로 넘긴다(`assemble_publish_brief` 2단계 채택 필터).
-    - `delta.deferred` 에 카드 id 를 더한다 — 상태 계산(`grm_queue.compute_states`)이 `deferred` 로 두고 다음 주 handoff 에 다시 올린다.
-    - 한 줄 요약(`tldr`·`tldr_en`)에 그 카드 업체(스캐폴드 `headline_target`)가 나오면 그 줄을 같은 위치에서 국·영 함께 뺀다.
-      요약이 하나도 안 남으면 미루지 않는다(문제).
-    - 판정 줄은 `cards` 에서 `deferred_cards`(사유 포함)로 옮기고 `counts`·`rework.cards` 를 다시 센다.
-    대상이 `cap` 장을 넘으면 아무것도 바꾸지 않는다(문제 — 한 호의 수가 이만큼 무너지면 사람이 본다)."""
-    entries = {str(c.get("web_card_id")): c for c in copyedit.get("cards") or [] if isinstance(c, dict)}
-    cards = delta.get("cards") if isinstance(delta.get("cards"), dict) else {}
-    reasons = {}
-    for cid, c in entries.items():
-        if c.get("verdict") == "reject":
-            reasons.setdefault(cid, []).extend(
-                f"반려 {f.get('slot', '')}: {f.get('item', '')}" for f in c.get("fails") or [] if isinstance(f, dict))
-            reasons.setdefault(cid, [])
+    11-23 실전과 대표 원칙(11-22: 불완전한 카드는 발행하지 않는다 · 이월이 아니라 제때 다 받는다)에 따라 카드를 미루지 않는다.
+      "근거"      근거 미비 카드가 있다(`issues` = `copyedit_evidence.card_issues` — 같은 함수). 2차가 같은 실행 안에서 그 카드만 다시
+                  원문과 대조해 `checked` 를 적는다(11-23: 근거만 빠진 14장은 원문 대조로 모두 통과 — 교열 누락이지 카드 결함이 아니다).
+      "재작업2"   내용 반려(남은 `reject` · 칸 삭제가 거부될 카드)가 1~`rework2_cap` 장이고 2회차를 아직 안 했다 — 같은 날 기자가 한 번 더 고친다.
+      "대표 결정" 2회차 뒤에도 남았거나 상한을 넘는다 — 그 카드 목록·사유를 대표에게 올려 같은 날 결정을 받는다(미루지 않는다).
+      "마감"      남은 것이 없다 — 4번 마감으로 간다.
+    근거가 먼저다 — 근거를 다 적어야 반려 판정도 믿을 수 있다."""
+    gaps = {cid: list(p) for cid, p in (issues or {}).items() if p}
+    if gaps:
+        return "근거", gaps
+    content = {}
+    for c in copyedit.get("cards") or []:
+        if isinstance(c, dict) and c.get("verdict") == "reject":
+            content[str(c.get("web_card_id"))] = [f"반려 {f.get('slot', '')}: {f.get('item', '')} — {f.get('evidence', '')}"[:300]
+                                                  for f in c.get("fails") or [] if isinstance(f, dict)] or ["반려(사유 없음)"]
     for cid, probs in refused_cards(copyedit, delta, deep).items():
-        reasons.setdefault(cid, []).extend(f"칸 삭제 거부: {p}" for p in probs)
-    for cid, probs in (issues or {}).items():
-        if probs:
-            reasons.setdefault(cid, []).extend(f"근거: {p}" for p in probs)
-    for cid in extra:
-        reasons.setdefault(str(cid), []).append("재작업이 마감 전에 끝나지 않았다")
-    targets = [cid for cid in cards if cid in reasons]
-    if not targets:
-        return [], []
-    if len(targets) > cap:
-        return [], [f"미룰 카드 {len(targets)}장 — 상한 {cap}장 초과(한 호가 이만큼 무너지면 사람이 본다)"]
-    firms = {}
-    for sc in (scaffold or {}).get("cards") or []:
-        if isinstance(sc, dict) and str(sc.get("id")) in targets:
-            name = str(sc.get("headline_target") or "").strip()
-            if len(name) >= 3:
-                firms[str(sc.get("id"))] = name
-    tl = list(delta.get("tldr") or [])
-    te = list(delta.get("tldr_en") or [])
+        content.setdefault(cid, []).extend(f"칸 삭제 거부: {p}" for p in probs)
+    if not content:
+        return "마감", {}
+    done2 = {str(x) for x in ((copyedit.get("rework2") or {}).get("cards") or [])}
+    if not done2 and len(content) <= rework2_cap:
+        return "재작업2", content
+    return "대표 결정", content
+
+
+def decision_request_md(run_date, content, done2):
+    """대표 결정 요청 — 헌장 '남기는 것' 꼴(맨 위 3줄)."""
+    lines = ["상태: 보류",
+             f"한 일: {run_date} 교열 2차 — 고치지 못한 카드 {len(content)}장, 미루지 않고 대표 결정을 기다린다",
+             f"대표가 볼 것: 카드 {len(content)}장 처리 결정(아래) — 결정 전에는 이 호를 발행하지 않는다",
+             "",
+             f"재작업 2회차: {'했다' if done2 else '못 했다(상한 ' + str(REWORK2_CAP) + '장 초과)'}",
+             "",
+             "| 카드 | 사유 |", "|---|---|"]
+    for cid, reasons in content.items():
+        lines.append(f"| {cid} | {' · '.join(reasons).replace('|', '/')[:400]} |")
+    lines += ["",
+              "결정 예시(하나를 골라 비서실에 준다):",
+              "1. 고쳐서 발행 — 고칠 문장을 지시한다(비서실이 기자 재작업으로 반영하고 교열 2차를 다시 돈다).",
+              "2. 그 카드를 빼고 지금 발행 — `python company/editorial/blank_slots.py finish <실행 폴더> <handoff> "
+              "--drop <id,…> --decision \"<대표 결정 원문>\"` 뒤 마감 4번.",
+              "3. 발행을 늦추고 기다린다."]
+    return "\n".join(lines) + "\n"
+
+
+def drop_cards(copyedit, delta, deep, ids, decision, scaffold=None):
+    """대표 결정으로만 — 고르신 카드를 이번 호에서 뺀다(제자리 · 순수). (뺀 id, 문제 줄).
+
+    `copyedit.decision_request.cards` 에 있는 카드만 뺄 수 있다(대표에게 올린 카드). 델타·심층에서 빼고, 그 카드 업체
+    (스캐폴드 `headline_target`)가 나오는 한 줄 요약(`tldr`·`tldr_en`)은 같은 위치에서 국·영 함께 뺀다. `delta.deferred` 에는
+    올리지 않는다 — 이월할지는 대표 결정 문구가 정한다. 판정 줄은 `dropped_cards`(결정 원문 포함)로 옮긴다."""
+    asked = {str(x) for x in ((copyedit.get("decision_request") or {}).get("cards") or [])}
+    ids = [str(i) for i in ids]
+    if not str(decision or "").strip():
+        return [], ["대표 결정 원문(--decision)이 없다"]
+    stray = [i for i in ids if i not in asked]
+    if stray:
+        return [], [f"대표에게 올리지 않은 카드는 뺄 수 없다: {', '.join(stray)}"]
+    cards = delta.get("cards") if isinstance(delta.get("cards"), dict) else {}
+    targets = [cid for cid in ids if cid in cards]
+    firms = {str(sc.get("id")): str(sc.get("headline_target") or "").strip()
+             for sc in (scaffold or {}).get("cards") or [] if isinstance(sc, dict) and str(sc.get("id")) in targets}
+    firms = {k: v for k, v in firms.items() if len(v) >= 3}
+    tl, te = list(delta.get("tldr") or []), list(delta.get("tldr_en") or [])
     hit = lambda line: any(f in str(line) for f in firms.values())
     drop_ko = {i for i, line in enumerate(tl) if hit(line)}
     drop_en = {i for i, line in enumerate(te) if hit(line)}
     if len(tl) == len(te):
         drop_ko = drop_en = drop_ko | drop_en
     if (tl and len(drop_ko) >= len(tl)) or (te and len(drop_en) >= len(te)):
-        return [], ["한 줄 요약이 전부 미룰 카드 이야기다 — 요약 없이 발행할 수 없다(데스크가 요약을 다시 쓴다)"]
+        return [], ["한 줄 요약이 전부 뺄 카드 이야기다 — 데스크가 요약을 다시 써야 한다"]
     if drop_ko:
         delta["tldr"] = [line for i, line in enumerate(tl) if i not in drop_ko]
     if drop_en:
@@ -621,16 +652,15 @@ def defer_cards(copyedit, delta, deep, issues, scaffold=None, cap=REWORK_CAP, ex
         cards.pop(cid, None)
         if isinstance(deep, dict):
             deep.pop(cid, None)
-    delta["deferred"] = sorted(set(str(x) for x in delta.get("deferred") or []) | set(targets))
-    moved = copyedit.setdefault("deferred_cards", [])
+    moved = copyedit.setdefault("dropped_cards", [])
     for cid in targets:
-        moved.append({"web_card_id": cid, "reasons": reasons[cid],
-                      "tldr_dropped": bool(firms.get(cid) and (drop_ko or drop_en))})
+        moved.append({"web_card_id": cid, "decision": decision})
     copyedit["cards"] = [c for c in copyedit.get("cards") or []
                          if not (isinstance(c, dict) and str(c.get("web_card_id")) in set(targets))]
-    rework = copyedit.get("rework")
-    if isinstance(rework, dict) and isinstance(rework.get("cards"), list):
-        rework["cards"] = [c for c in rework["cards"] if c not in set(targets)]
+    for key in ("rework", "rework2"):
+        r = copyedit.get(key)
+        if isinstance(r, dict) and isinstance(r.get("cards"), list):
+            r["cards"] = [c for c in r["cards"] if c not in set(targets)]
     _recount(copyedit)
     return targets, []
 
@@ -682,7 +712,8 @@ def _dump(obj, path):
 
 def _same_cards(a, b):
     ids = lambda ce: {str(c.get("web_card_id")) for c in (ce or {}).get("cards") or [] if isinstance(c, dict)}
-    return bool(ids(a)) and ids(a) == ids(b)
+    dropped = {str(d.get("web_card_id")) for d in (b or {}).get("dropped_cards") or [] if isinstance(d, dict)}
+    return bool(ids(a)) and ids(a) == ids(b) | dropped        # b 에서 대표 결정으로 뺀 카드는 a 에만 있다
 
 
 def _deep_auto_inputs(args, copyedit):
@@ -719,14 +750,17 @@ def _deep_auto_inputs(args, copyedit):
 def _evidence_module():
     import importlib.util
     spec = importlib.util.spec_from_file_location(
-        "company_copyedit_evidence_for_defer", os.path.join(os.path.dirname(os.path.abspath(__file__)), "copyedit_evidence.py"))
+        "company_copyedit_evidence_for_finish", os.path.join(os.path.dirname(os.path.abspath(__file__)), "copyedit_evidence.py"))
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
 
 
-def _main_defer(args):
-    """2차 마감 직전 — 못 고친 카드만 미루고 나머지로 마감한다. exit 0 = 마감해도 된다 · 1 = 미룰 수 없다(보류) · 2 = 입력 오류."""
+FINISH_EXIT = {"마감": 0, "근거": 3, "재작업2": 4, "대표 결정": 5}
+
+
+def _main_finish(args):
+    """2차 마감 전 — 다음 할 일을 정한다. exit 0 마감 · 3 근거 다시 · 4 재작업 2회차 · 5 대표 결정 요청 · 1 문제 · 2 입력 오류."""
     ev = _evidence_module()
     p = lambda name: os.path.join(args.folder, name)
     try:
@@ -737,57 +771,92 @@ def _main_defer(args):
         print(f"입력 오류: {e}")
         return 2
     if os.path.isfile(p("slot_removals.json")):
-        print("입력 오류: 칸 삭제를 이미 반영한 델타다 — defer 는 apply(마감 4번) 전에 돌린다")
+        print("입력 오류: 칸 삭제를 이미 반영한 델타다 — finish 는 apply(마감 4번) 전에 돌린다")
         return 2
-    first = ev.load_first(args.folder, copyedit)
-    extra = []
+    sp = ev.find_scaffold(args.folder, handoff, args.scaffold)
+    scaffold = _load(sp) if sp and os.path.isfile(sp) else None
+    if args.drop:
+        targets, problems = drop_cards(copyedit, delta, deep, [x for x in args.drop.split(",") if x.strip()],
+                                       args.decision, scaffold)
+        for pr in problems:
+            print(f"문제: {pr}")
+        if problems:
+            print("아무것도 쓰지 않았다")
+            return 1
+        _dump(delta, p("delta.json"))
+        if deep is not None:
+            _dump(deep, p("deep_delta.json"))
+        copyedit.setdefault("decision_request", {})["decision"] = args.decision
+        _dump(copyedit, p("copyedit.json"))
+        print(f"대표 결정으로 뺀 카드 {len(targets)}장: {', '.join(targets)} — finish 를 다시 돌린다")
+        return 0
     if args.rework_unfinished:
         if copyedit.get("status") != "재작업":
             print("입력 오류: --rework-unfinished 는 copyedit.json 이 1차 `재작업` 그대로일 때만")
             return 2
-        extra = [str(c) for c in ((copyedit.get("rework") or {}).get("cards") or [])]
-        # 재작업 카드의 반려는 1차 것이다 — 미룰 사유는 '재작업 미완'으로 충분하다.
-    elif first is None:
+        rework = {str(c) for c in ((copyedit.get("rework") or {}).get("cards") or [])}
+        content = {str(c.get("web_card_id")): ["재작업이 마감 전에 끝나지 않았다"]
+                   + [f"1차 반려 {f.get('slot', '')}: {f.get('item', '')}" for f in c.get("fails") or [] if isinstance(f, dict)]
+                   for c in copyedit.get("cards") or [] if isinstance(c, dict) and str(c.get("web_card_id")) in rework}
+        copyedit["status"], copyedit["published"] = "결정 대기", False
+        copyedit["decision_request"] = {"cards": list(content), "reasons": content, "rework2_done": False,
+                                        "rework_unfinished": True}
+        with open(p("decision_request.md"), "w", encoding="utf-8") as f:
+            f.write(decision_request_md(os.path.basename(os.path.normpath(args.folder)), content, False))
+        _dump(copyedit, p("copyedit.json"))
+        print(f"재작업 미완 — 1차 반려 {len(content)}장을 대표 결정 요청으로 올렸다(미루지 않는다)")
+        return FINISH_EXIT["대표 결정"]
+    first = ev.load_first(args.folder, copyedit)
+    if first is None:
         print("입력 오류: 2차 판정이 아니다(1차 기록 copyedit.r1.json 이 없거나 지금 판정이 1차 그대로) — 1차 반려는 재작업(3-1)으로 간다")
         return 2
+    # 같은 함수로 deep-auto 를 다시 — 칸 삭제·심층 삭제로 풀리는 카드는 통과, 1차 결정·근거는 잇는다.
+    sc = lambda n: os.path.join("_scaffold", n)
+    fd = _load(sc("delta.r1.json")) if os.path.isfile(sc("delta.r1.json")) else None
+    fe = _load(sc("deep_delta.r1.json")) if os.path.isfile(sc("deep_delta.r1.json")) else None
+    before = json.dumps(copyedit, ensure_ascii=False, sort_keys=True)
     report = {}
-    if first is not None:
-        # 미루기 전에 deep-auto 를 같은 함수로 다시 돌린다 — 칸 삭제·심층 삭제로 풀리는 카드는 미루지 않고 통과시킨다.
-        fd = _load(os.path.join("_scaffold", "delta.r1.json")) if os.path.isfile(os.path.join("_scaffold", "delta.r1.json")) else None
-        fe = (_load(os.path.join("_scaffold", "deep_delta.r1.json"))
-              if os.path.isfile(os.path.join("_scaffold", "deep_delta.r1.json")) else None)
-        deep_auto(copyedit, args.cap, delta=delta, deep=deep, first=first, report=report, first_delta=fd, first_deep=fe)
-        for cid in report.get("blanked", []):
-            print(f"지울 수 있는 칸만 반려 → 통과(칸 삭제): {cid}")
-    sp = ev.find_scaffold(args.folder, handoff, args.scaffold)
-    scaffold = _load(sp) if sp and os.path.isfile(sp) else None
+    deep_auto(copyedit, delta=delta, deep=deep, first=first, report=report, first_delta=fd, first_deep=fe)
+    for cid in report.get("blanked", []):
+        print(f"지울 수 있는 칸만 반려 → 통과(칸 삭제): {cid}")
     lines, _stats, per = ev.card_issues(delta, copyedit, deep, handoff, scaffold, blank_check=True, first=first)
     loose = [l for l in lines if not any(l.startswith(f"{cid}:") for cid in per)
              and not l.startswith("판정 줄이 없는 카드")]
     if loose:
+        if json.dumps(copyedit, ensure_ascii=False, sort_keys=True) != before:
+            _dump(copyedit, p("copyedit.json"))
         for l in loose:
             print(f"문제: {l}")
-        print("카드로 가를 수 없는 문제 — 미루지 않았다(보류)")
+        print("카드로 가를 수 없는 문제 — 판정 파일을 고친 뒤 다시 돌린다")
         return 1
-    targets, problems = defer_cards(copyedit, delta, deep, per, scaffold, args.cap, extra)
-    for pr in problems:
-        print(f"문제: {pr}")
-    if problems:
-        print("아무것도 쓰지 않았다(보류)")
-        return 1
-    if targets or report.get("blanked") or report.get("carried"):
-        if args.rework_unfinished:
-            copyedit["round"] = 2
-            copyedit["rework_unfinished"] = True
-        _dump(delta, p("delta.json"))
-        if deep is not None:
-            _dump(deep, p("deep_delta.json"))
+    step, cards = finish_plan(copyedit, delta, deep, per, args.rework2_cap)
+    if step == "근거":
+        for cid, probs in cards.items():
+            print(f"근거 다시: {cid} — {' · '.join(probs)[:300]}")
+        print(f"근거를 다시 적을 카드 {len(cards)}장 — 같은 실행 안에서 그 카드만 원문과 다시 대조한다:"
+              f" python company/editorial/copyedit_evidence.py show {args.folder} {args.handoff} --ids {','.join(cards)}")
+    elif step == "재작업2":
+        copyedit["rework2"] = {"cards": list(cards)}
+        for cid, reasons in cards.items():
+            print(f"재작업 2회차: {cid} — {' · '.join(reasons)[:300]}")
+        print(f"재작업 2회차 {len(cards)}장 — copyedit.md 3-3 대로 기자(서브 에이전트)가 같은 날 한 번 더 고친다")
+    elif step == "대표 결정":
+        done2 = bool((copyedit.get("rework2") or {}).get("cards"))
+        copyedit["status"] = "결정 대기"
+        copyedit["published"] = False
+        copyedit["decision_request"] = {"cards": list(cards), "reasons": cards, "rework2_done": done2}
+        run_date = os.path.basename(os.path.normpath(args.folder))
+        with open(p("decision_request.md"), "w", encoding="utf-8") as f:
+            f.write(decision_request_md(run_date, cards, done2))
+        for cid, reasons in cards.items():
+            print(f"대표 결정 필요: {cid} — {' · '.join(reasons)[:300]}")
+        print(f"고치지 못한 카드 {len(cards)}장 — 미루지 않는다. decision_request.md 를 push 하고 대표 결정을 기다린다(결정 전 발행 없음)")
+    else:
+        print("근거·반려 모두 0 — 마감(4번)으로 간다")
+    if json.dumps(copyedit, ensure_ascii=False, sort_keys=True) != before:
+        _recount(copyedit)
         _dump(copyedit, p("copyedit.json"))
-        for d in copyedit.get("deferred_cards") or []:
-            if d["web_card_id"] in targets:
-                print(f"미룸: {d['web_card_id']} — {' · '.join(d['reasons'])[:200]}")
-    print(f"다음 주로 미룬 카드 {len(targets)}장 · 남은 카드 {len(delta.get('cards') or {})}장 — 마감(4번)으로 간다")
-    return 0
+    return FINISH_EXIT[step]
 
 
 def main(argv=None):
@@ -813,13 +882,15 @@ def main(argv=None):
     a.add_argument("--deep-in")
     a.add_argument("--deep-out")
     a.add_argument("--log")
-    df = sub.add_parser("defer")
-    df.add_argument("folder", help="실행 폴더(company/run/<날짜>)")
-    df.add_argument("handoff", help="handoff 파일(copyedit_evidence 와 같은 것)")
-    df.add_argument("--scaffold")
-    df.add_argument("--cap", type=int, default=REWORK_CAP)
-    df.add_argument("--rework-unfinished", action="store_true",
-                    help="재작업이 09:20 까지 끝나지 않았다 — 1차 판정 그대로에서 재작업 카드를 미룬다")
+    fn = sub.add_parser("finish")
+    fn.add_argument("folder", help="실행 폴더(company/run/<날짜>)")
+    fn.add_argument("handoff", help="handoff 파일(copyedit_evidence 와 같은 것)")
+    fn.add_argument("--scaffold")
+    fn.add_argument("--rework2-cap", type=int, default=REWORK2_CAP)
+    fn.add_argument("--drop", help="대표 결정으로 뺄 카드 id(쉼표) — decision_request 에 올린 카드만")
+    fn.add_argument("--decision", help="대표 결정 원문(--drop 과 함께)")
+    fn.add_argument("--rework-unfinished", action="store_true",
+                    help="재작업이 09:20 까지 끝나지 않았다 — 1차 반려 카드를 대표 결정 요청으로 올린다")
     v = sub.add_parser("verify")
     v.add_argument("copyedit")
     v.add_argument("brief")
@@ -828,8 +899,8 @@ def main(argv=None):
     c.add_argument("delta")
     c.add_argument("deep", nargs="?")
     args = ap.parse_args(argv)
-    if args.cmd == "defer":
-        return _main_defer(args)
+    if args.cmd == "finish":
+        return _main_finish(args)
     try:
         copyedit = _load(args.copyedit)
         if args.cmd == "verify":

@@ -107,7 +107,7 @@
    "title_issue": "세척 밸리데이션 현행 설비 사용 미반영",
    "summary": "FDA가 원료의약품(API) 제조소 Nortec Quimica S.A.에 Form 483(관찰사항 1건)을 발행했다. 세척 밸리데이션이 현재 설비 사용을 대표하지 않는다고 지적했다.",
    "key_facts": [
-    "관찰 1: 세척 밸리데이션이 현재 설비 사용을 대표하지 않음, 2019-08-09 승인 보고서 NQPV432 이후 해당 설비군을 다시 밸리데이션하지 않음"
+    "관찰 1: 세척 밸리데이션이 현재 설비 사용을 대표하지 않음, 보고서 NQPV432(2019-08-09 승인, 2022-06-03 갱신)의 설비군에 대해 [가림] 이후 세척 밸리데이션을 다시 하지 않음"
    ],
    "implication": "미국에 판매되는 원료의약품이 해당 설비군에서 제조됐다(관찰 1).",
    "checks": [
@@ -118,7 +118,7 @@
     "title_issue": "Cleaning validation not reflecting current use",
     "summary": "FDA issued a Form 483 with 1 observation to Nortec Quimica S.A., an API manufacturer, stating that its cleaning validation is not representative of current equipment usage.",
     "key_facts": [
-     "Observation 1: cleaning validation not representative of current equipment usage; no new validation of the equipment group after report NQPV432 approved 2019-08-09"
+     "Observation 1: cleaning validation not representative of current equipment usage; no further cleaning validation of the equipment group covered by report NQPV432 (approved 2019-08-09, updated 2022-06-03) after [redacted]"
     ],
     "implication": "An API marketed for the U.S. is manufactured on that equipment group (Observation 1).",
     "checks": [

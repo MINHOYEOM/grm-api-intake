@@ -70,13 +70,13 @@
   "fda483-196410": {
    "title_issue": "기준일탈 조사서 사후 작성·원자료 부재",
    "hook_line": "기준일탈 조사서를 실사 직전 만들고 서명일을 소급했다고 진술",
-   "summary": "FDA가 일반의약품 제조소 International Laboratories Corp에 Form 483(관찰사항 7건)을 발행했다. 시험 원자료 부재, 기준일탈(OOS) 조사 문서 조작, 컴퓨터 시스템 통제 미흡 등을 지적했다.",
+   "summary": "FDA가 일반의약품 제조소 International Laboratories Corp에 Form 483(관찰사항 7건)을 발행했다. 시험 원자료 부재, 미생물 책임자가 인정한 기준일탈(OOS) 조사 문서 조작, 컴퓨터 시스템 통제 미흡 등을 지적했다.",
    "key_facts": [
     "관찰 1: 미국 출하 일반의약품의 출하 시험 원자료를 제시하지 못했고 저울·pH 측정기 값이 기록되지 않았음",
-    "관찰 2: 미생물 책임자가 기준일탈 조사서와 기록대장을 2024-09-12에 만들고 서명 날짜를 소급했다고 인정함",
+    "관찰 2: 미생물 책임자가 기준일탈 조사서는 실사 나흘 전인 2024-09-12에, 기록대장은 실사 사흘 전에 만들었고 서명 날짜를 소급했다고 인정함",
     "관찰 3: 분석자가 고성능 액체크로마토그래피 컴퓨터의 날짜·시각을 바꾸고 폴더를 만들고 지울 수 있었음"
    ],
-   "implication": "품질보증 책임자는 컴퓨터 저장 공간이 모자라 품질관리 인원이 데이터를 지웠을 수 있다고 진술했다(관찰 1). 조작된 조사서들은 '실험실 오류'를 원인으로 결론 내고 시정조치를 하지 않았다(관찰 2). 2023-10-03 저장탱크에서 채취한 검체에서 그람음성균이 나왔을 때 기준일탈 조사를 열지 않았다(관찰 2). 품질보증을 포함해 누구도 승인하지 않은 절차서가 시행일을 달고 쓰이고 있었다(관찰 3). 주요 설비의 세척 후 보관시간 연구와 벌크 보관시간 연구를 하지 않았다(관찰 4). 미국 출하 제품의 미생물 시험법 적합성 시험을 하지 않았다(관찰 6).",
+   "implication": "품질보증 책임자는 컴퓨터 저장 공간이 모자라 품질관리 인원이 데이터를 지웠을 수 있다고 진술했다(관찰 1). 미생물 책임자가 조작을 인정한 조사서들은 '실험실 오류'를 원인으로 결론 내고 시정조치를 하지 않았다(관찰 2). 2023-10-03 저장탱크에서 채취한 검체에서 그람음성균이 나왔을 때 기준일탈 조사를 열지 않았다(관찰 2). 품질보증을 포함해 누구도 승인하지 않은 절차서가 시행일을 달고 쓰이고 있었다(관찰 3). 주요 설비의 세척 후 보관시간 연구와 벌크 보관시간 연구를 하지 않았다(관찰 4). 미국 출하 제품의 미생물 시험법 적합성 시험을 하지 않았다(관찰 6).",
    "checks": [
     "출력·저장 기능이 없는 저울·pH 측정기의 값을 측정 즉시 분석자 이름과 함께 기록하는가? (관찰 1)",
     "기준일탈 조사 기록대장이 품질보증이 발행·관리하는 문서인가? (관찰 3)",
@@ -84,14 +84,14 @@
    ],
    "en": {
     "title_issue": "Backdated OOS investigations and missing raw data",
-    "hook_line": "Out-of-specification investigation records created just before inspection and backdated",
-    "summary": "FDA issued a Form 483 with 7 observations to OTC drug manufacturer International Laboratories Corp, citing missing raw test data, fabricated OOS investigation records and inadequate computer system controls.",
+    "hook_line": "Microbiology manager stated OOS records were made just before inspection, backdated",
+    "summary": "FDA issued a Form 483 with 7 observations to OTC drug manufacturer International Laboratories Corp, citing missing raw test data, OOS investigation records the microbiology manager acknowledged fabricating, and inadequate computer system controls.",
     "key_facts": [
      "Observation 1: the firm could not provide release test data for OTC products shipped to the U.S., and balance and pH meter values were not documented",
-     "Observation 2: the microbiology manager acknowledged OOS investigation reports and the log were created on 2024-09-12 with backdated signatures",
+     "Observation 2: the microbiology manager acknowledged the OOS investigation reports were created on 2024-09-12, four days before the inspection, and the bound log three days before, with backdated signatures",
      "Observation 3: an analyst could alter the time and date and create and delete folders on the computer running the HPLC"
     ],
-    "implication": "The QA manager stated that QC personnel may have deleted data due to lack of space on the computer (Observation 1). The fabricated investigations concluded 'genuine lab error' as the cause and no corrective actions were taken (Observation 2). No OOS investigation was opened when gram negative species was observed in a storage tank sample taken on 2023-10-03 (Observation 2). SOPs were in use with effective dates but had never been approved by anyone, including QA (Observation 3). No clean hold time studies on critical equipment or bulk hold time studies were conducted (Observation 4). Microbial method suitability testing was not performed for U.S. market products (Observation 6).",
+    "implication": "The QA manager stated that QC personnel may have deleted data due to lack of space on the computer (Observation 1). The investigations the microbiology manager acknowledged fabricating concluded 'genuine lab error' as the cause and no corrective actions were taken (Observation 2). No OOS investigation was opened when gram negative species was observed in a storage tank sample taken on 2023-10-03 (Observation 2). SOPs were in use with effective dates but had never been approved by anyone, including QA (Observation 3). No clean hold time studies on critical equipment or bulk hold time studies were conducted (Observation 4). Microbial method suitability testing was not performed for U.S. market products (Observation 6).",
     "checks": [
      "Are values from balances and pH meters without printing or storage recorded immediately with the analyst's name? (Observation 1)",
      "Is the OOS investigation log a document issued and controlled by QA? (Observation 3)",
@@ -198,7 +198,7 @@
    }
   },
   "fda483-196414": {
-   "title_issue": "적격성평가 배치 이물 불량 증가 미조사",
+   "title_issue": "적격성평가 배치 이물 불량 증가 조사 미흡",
    "hook_line": "공정 성능 적격성평가 세 배치의 육안검사 불량률이 계속 높아짐",
    "summary": "FDA가 Shanghai Henlius Biopharmaceutical Co., Ltd.에 Form 483(관찰사항 11건)을 발행했다. 공정 성능 적격성평가 배치의 이물 불량, 육안검사 기준의 소급 변경, 세척 밸리데이션, 전자 데이터 삭제 통제 등을 지적했다.",
    "key_facts": [
@@ -214,7 +214,7 @@
     "크로마토그래피 소프트웨어에서 분석자가 적분 중 결과값을 볼 수 없게 권한을 나눴는가? (관찰 6)"
    ],
    "en": {
-    "title_issue": "Rising particulate rejects in PPQ not investigated",
+    "title_issue": "PPQ particulate rejects inadequately investigated",
     "hook_line": "Visual inspection reject rates rose across three process performance qualification batches",
     "summary": "FDA issued a Form 483 with 11 observations to Shanghai Henlius Biopharmaceutical Co., Ltd., citing visible particulate rejects in PPQ batches, a retrospective change to visual inspection criteria, cleaning validation and controls against electronic data deletion.",
     "key_facts": [

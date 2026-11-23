@@ -8,7 +8,7 @@
    "hook_line": "선량계 조사 뒤 배양 시작까지 대기 시간을 정하지 않음",
    "summary": "FDA가 이탈리아의 위탁 멸균업체 Steris S.p.A.에 Form 483(관찰사항 1건)을 발행했다. 품질경영시스템 공정 관리에 위험 기반 접근을 적절히 적용하지 않았다고 지적했다.",
    "key_facts": [
-    "관찰 1: 공정 고장모드 영향분석이 선량계 조사 뒤 컨디셔닝까지 대기 시간의 위험을 평가하지 않음, 조사 후 대기 시간 미설정"
+    "관찰 1: 공정 고장모드 영향분석이 선량계 조사 뒤 컨디셔닝까지 대기 시간의 위험을 평가하지 않음, 적절히 정해진 조사 후 대기 시간이 없음"
    ],
    "implication": "교정 검증 보고서(2025-07-14)는 대기 시간을 기록하지 않았다(관찰 1). 선량계 공급업체 기술 보고서는 대기 시간이 측정 편차에 영향을 줄 수 있고 전자선 시설의 최적 대기 시간은 조사 뒤 최소 한 시간이라고 밝혔다(관찰 1). 선량계 제조 결함의 위험과 입고 검사의 효과도 평가하지 않았다(관찰 1).",
    "checks": [
@@ -20,7 +20,7 @@
     "hook_line": "No specified wait time between dosimeter irradiation and incubation",
     "summary": "FDA issued a Form 483 with 1 observation to Steris S.p.A., a contract sterilizer in Italy, stating that a risk-based approach to controlling quality management system processes was not adequately applied.",
     "key_facts": [
-     "Observation 1: process FMEA does not assess risks of the wait time between dosimeter irradiation and post-irradiation conditioning; no adequately specified wait time"
+     "Observation 1: process FMEA does not assess risks of the wait time between dosimeter irradiation and post-irradiation conditioning; an adequately specified post-irradiation wait time has not been established"
     ],
     "implication": "The calibration verification report dated 2025-07-14 does not record the wait time (Observation 1). The dosimeter supplier's technical report states wait time can contribute to measurement variance and that the optimal wait for electron beam facilities is at least one hour post-irradiation (Observation 1). The risk of dosimeter manufacturing defects and the effectiveness of receiving inspection were also not assessed (Observation 1).",
     "checks": [
@@ -120,18 +120,18 @@
   "fda483-196447": {
    "title_issue": "작업자 장갑 소독 미준수",
    "hook_line": "주 제조 작업자가 절차대로 장갑을 정기 소독하지 않음",
-   "summary": "FDA가 Adimmune Corporation에 승인 전 실사 결과 Form 483(관찰사항 1건)을 발행했다. 작업자가 절차대로 장갑을 정기적으로 소독하지 않았다고 지적했다.",
+   "summary": "FDA가 Adimmune Corporation에 승인 전 실사 결과 Form 483(관찰사항 4건)을 발행했다. 혼동 방지 절차 미준수, 공급업체 분석 결과 검증 미실시, 예방 정비 절차 미수립, 작업자 장갑 소독 미준수를 지적했다.",
    "key_facts": [
-    "관찰 1: 작업자가 절차서대로 장갑을 정기 소독하지 않음"
+    "관찰 4: 작업자가 절차서대로 장갑을 정기 소독하지 않음"
    ],
    "implication": "",
    "checks": [],
    "en": {
     "title_issue": "Gloves not sanitized per procedure",
     "hook_line": "Main manufacturing staff did not regularly sanitize gloves per procedure",
-    "summary": "FDA issued a Form 483 with 1 observation to Adimmune Corporation following a pre-approval inspection, citing staff not regularly sanitizing their gloves as per procedure.",
+    "summary": "FDA issued a Form 483 with 4 observations to Adimmune Corporation following a pre-approval inspection, citing procedures to prevent mix-ups not followed, no testing to verify supplier analyses, no established preventive maintenance procedure, and staff not regularly sanitizing their gloves as per procedure.",
     "key_facts": [
-     "Observation 1: staff not regularly sanitizing their gloves as per procedure"
+     "Observation 4: staff not regularly sanitizing their gloves as per procedure"
     ],
     "implication": "",
     "checks": []
@@ -218,7 +218,7 @@
   "fda483-196455": {
    "title_issue": "중간체 보관 시간 밸리데이션 미실시",
    "hook_line": "중간체 최대 보관 시간을 생산 규모에서 밸리데이션하지 않음",
-   "summary": "FDA가 Novavax CZ에 Form 483(관찰사항 3건)을 발행했다. 중간체 최대 보관 시간을 생산 규모에서 밸리데이션하지 않은 것 등을 지적했다.",
+   "summary": "FDA가 Novavax CZ에 Form 483(관찰사항 6건)을 발행했다. 중간체 최대 보관 시간을 생산 규모에서 밸리데이션하지 않은 것 등을 지적했다.",
    "key_facts": [
     "관찰 2: 시험법의 표준품 사용을 뒷받침하는 자료 부족",
     "관찰 3: 중간체 최대 보관 시간을 생산 규모 제조공정에서 밸리데이션하지 않음",
@@ -232,7 +232,7 @@
    "en": {
     "title_issue": "Intermediate hold times not validated",
     "hook_line": "Maximum intermediate holding times not validated at production scale",
-    "summary": "FDA issued a Form 483 with 3 observations to Novavax CZ, citing maximum holding times for intermediates not validated at production scale, among other issues.",
+    "summary": "FDA issued a Form 483 with 6 observations to Novavax CZ, citing maximum holding times for intermediates not validated at production scale, among other issues.",
     "key_facts": [
      "Observation 2: lack of data to support the method's use of reference",
      "Observation 3: proposed maximum holding times for intermediates not validated at production scale",

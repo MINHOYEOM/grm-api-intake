@@ -1,1 +1,87 @@
-{"status":"진행","round":1,"worker":"재작업-1"}
+{
+ "status": "완료",
+ "round": 1,
+ "worker": "재작업-1",
+ "fixed": [
+  {
+   "id": "fda483-196308",
+   "shard": "A",
+   "changed": [
+    "key_facts",
+    "en.key_facts"
+   ],
+   "deep_shard": "O",
+   "deep_changed": [
+    "key_violations[0].observation"
+   ]
+  },
+  {
+   "id": "fda483-196410",
+   "shard": "D",
+   "changed": [
+    "summary",
+    "en.summary",
+    "implication",
+    "en.implication",
+    "key_facts",
+    "en.key_facts",
+    "en.hook_line"
+   ],
+   "deep_shard": "P",
+   "deep_changed": [
+    "key_violations[2].observation"
+   ]
+  },
+  {
+   "id": "fda483-196414",
+   "shard": "D",
+   "changed": [
+    "title_issue",
+    "en.title_issue"
+   ]
+  },
+  {
+   "id": "fda483-196441",
+   "shard": "E",
+   "changed": [
+    "key_facts",
+    "en.key_facts"
+   ]
+  },
+  {
+   "id": "fda483-196447",
+   "shard": "E",
+   "changed": [
+    "summary",
+    "en.summary",
+    "key_facts",
+    "en.key_facts"
+   ]
+  },
+  {
+   "id": "fda483-196455",
+   "shard": "E",
+   "changed": [
+    "summary",
+    "en.summary"
+   ]
+  },
+  {
+   "id": "admin-2026008238",
+   "shard": "G",
+   "changed": [
+    "en.summary"
+   ]
+  },
+  {
+   "id": "D-0167-2027",
+   "shard": "H",
+   "changed": [
+    "en.title_issue"
+   ]
+  }
+ ],
+ "unfixed": [],
+ "precheck": "terms delta.A/D/E/G/H exit 0 · deep O/P exit 0",
+ "note": "fda483-196410 implication 은 반려 근거에 '(implication 도 같음)'으로 적혀 함께 고침(같은 카드 안)."
+}

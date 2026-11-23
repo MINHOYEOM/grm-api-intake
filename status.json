@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T01:36:14Z",
+ "generated_at": "2026-11-23T03:42:40Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -60,6 +60,17 @@
   ],
   "grm-delta-bridge.yml": [
    {
+    "databaseId": 45100947235,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-23T02:34:01Z",
+    "updatedAt": "2026-11-23T02:34:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45100947235"
+   },
+   {
     "databaseId": 45090249293,
     "status": "completed",
     "conclusion": "success",
@@ -102,20 +113,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788930323"
-   },
-   {
-    "databaseId": 43788668824,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-16T01:51:16Z",
-    "updatedAt": "2026-11-16T01:51:47Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788668824"
    }
   ],
   "grm-web-publish.yml": [
+   {
+    "databaseId": 45107525855,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "push",
+    "createdAt": "2026-11-23T03:42:07Z",
+    "updatedAt": "2026-11-23T03:42:31Z",
+    "headBranch": "main",
+    "displayTitle": "fix(en): 공용 코드 칸의 국문 표기를 뷰가 언어별로 — 11-23 영문 '개인 사업자' 6곳 + 영문 게이트 (#1876)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107525855"
+   },
    {
     "databaseId": 45090287415,
     "status": "completed",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "fix(brief): 11-09 경고서한 카드의 가림 표시 노출 정리 + 본문 슬롯 가드 (#1410)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568688495"
-   },
-   {
-    "databaseId": 42568599030,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T05:39:53Z",
-    "updatedAt": "2026-11-09T05:41:23Z",
-    "headBranch": "main",
-    "displayTitle": "brief(10-26): FDA 483 관찰 #1 한국어 결손 4건 보강 — 재조립 거부 해소 (#1214 extractio…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568599030"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45094792492,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45107525805,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-23T01:28:47Z",
-    "updatedAt": "2026-11-23T01:36:00Z",
+    "createdAt": "2026-11-23T03:42:07Z",
+    "updatedAt": "2026-11-23T03:42:11Z",
     "headBranch": "main",
-    "displayTitle": "fix(483): 관찰 건수를 원문 번호 표제에서 센다 — 단정 못 하면 비운다 (#1871)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45094792492"
+    "displayTitle": "fix(en): 공용 코드 칸의 국문 표기를 뷰가 언어별로 — 11-23 영문 '개인 사업자' 6곳 + 영문 게이트 (#1876)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107525805"
    },
    {
-    "databaseId": 45093695848,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-23T01:17:12Z",
-    "updatedAt": "2026-11-23T01:25:17Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1873 from MINHOYEOM/publish/brief-2026-11-23",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45093695848"
+    "databaseId": 45107103687,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-23T03:37:46Z",
+    "updatedAt": "2026-11-23T03:37:50Z",
+    "headBranch": "claude/quiz-weekly-202648",
+    "displayTitle": "quiz(weekly): 202648 문항 4개 (브리프 2 + 개념 2)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107103687"
    },
    {
-    "databaseId": 45091739132,
+    "databaseId": 45107099254,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-23T03:37:43Z",
+    "updatedAt": "2026-11-23T03:37:47Z",
+    "headBranch": "claude/quiz-weekly-202648",
+    "displayTitle": "quiz(weekly): 202648 문항 4개 (브리프 2 + 개념 2)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107099254"
+   },
+   {
+    "databaseId": 45099708267,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-23T00:57:02Z",
-    "updatedAt": "2026-11-23T01:04:25Z",
-    "headBranch": "claude/fix-483-obs-count-1326ac",
-    "displayTitle": "fix(483): 관찰 건수를 원문 번호 표제에서 센다 — 단정 못 하면 비운다",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45091739132"
+    "createdAt": "2026-11-23T02:21:10Z",
+    "updatedAt": "2026-11-23T02:27:49Z",
+    "headBranch": "fix/en-sole-proprietor-1123",
+    "displayTitle": "fix(en): 공용 코드 칸 국문 표기를 뷰가 언어별로 + 영문 게이트 — 11-23 '개인 사업자' 6곳·실명 사본 정리·장부",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45099708267"
    },
    {
-    "databaseId": 45090763169,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-23T00:46:50Z",
-    "updatedAt": "2026-11-23T00:55:22Z",
-    "headBranch": "publish/brief-2026-11-23",
-    "displayTitle": "publish(web): 2026-11-23 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090763169"
-   },
-   {
-    "databaseId": 45090759499,
+    "databaseId": 45099658468,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-23T00:46:47Z",
-    "updatedAt": "2026-11-23T00:55:38Z",
-    "headBranch": "publish/brief-2026-11-23",
-    "displayTitle": "publish(web): 2026-11-23 개인 실명 2건을 일반 표현으로 (11-21 대표 결정·#1860)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45090759499"
+    "createdAt": "2026-11-23T02:20:38Z",
+    "updatedAt": "2026-11-23T02:28:01Z",
+    "headBranch": "fix/en-sole-proprietor-1123",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into fix/en-sole-proprieto…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45099658468"
    }
   ],
   "grm-scaffold-mirror.yml": [

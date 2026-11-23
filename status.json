@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T03:50:31Z",
+ "generated_at": "2026-11-23T04:42:14Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45107525805,
+    "databaseId": 45112679583,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-23T04:34:39Z",
+    "updatedAt": "2026-11-23T04:42:04Z",
+    "headBranch": "feat/firm-group-cluster-1123",
+    "displayTitle": "feat(브리프): 같은 업체 그룹 카드 매주 자동 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45112679583"
+   },
+   {
+    "databaseId": 45112625798,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-23T03:42:07Z",
-    "updatedAt": "2026-11-23T03:50:12Z",
+    "createdAt": "2026-11-23T04:34:06Z",
+    "updatedAt": "2026-11-23T04:41:54Z",
+    "headBranch": "feat/firm-group-cluster-1123",
+    "displayTitle": "feat(브리프): 같은 업체 그룹 카드를 매주 자동으로 한 묶음 + 옛 실사 일괄 공개 표시 + 그룹 등록 후보 경고",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45112625798"
+   },
+   {
+    "databaseId": 45112459132,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-23T04:32:23Z",
+    "updatedAt": "2026-11-23T04:41:48Z",
     "headBranch": "main",
-    "displayTitle": "fix(en): 공용 코드 칸의 국문 표기를 뷰가 언어별로 — 11-23 영문 '개인 사업자' 6곳 + 영문 게이트 (#1876)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107525805"
+    "displayTitle": "chore: refresh recent regulatory news (#1878)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45112459132"
    },
    {
-    "databaseId": 45107103687,
+    "databaseId": 45110372806,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-23T03:37:46Z",
-    "updatedAt": "2026-11-23T03:44:40Z",
-    "headBranch": "claude/quiz-weekly-202648",
-    "displayTitle": "quiz(weekly): 202648 문항 4개 (브리프 2 + 개념 2)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107103687"
+    "createdAt": "2026-11-23T04:11:54Z",
+    "updatedAt": "2026-11-23T04:19:20Z",
+    "headBranch": "claude/linkedin-anatomy-2026-11-23",
+    "displayTitle": "linkedin(anatomy): 2026-11-23 사건 해부 슬롯 a1·a2 — 기준일탈 부실 조사·설비 청결 불량 / 함량 기준일탈 조사 미흡·공정 밸리데이션 부실",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45110372806"
    },
    {
-    "databaseId": 45107099254,
+    "databaseId": 45110359977,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-23T03:37:43Z",
-    "updatedAt": "2026-11-23T03:45:39Z",
-    "headBranch": "claude/quiz-weekly-202648",
-    "displayTitle": "quiz(weekly): 202648 문항 4개 (브리프 2 + 개념 2)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45107099254"
-   },
-   {
-    "databaseId": 45099708267,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-23T02:21:10Z",
-    "updatedAt": "2026-11-23T02:27:49Z",
-    "headBranch": "fix/en-sole-proprietor-1123",
-    "displayTitle": "fix(en): 공용 코드 칸 국문 표기를 뷰가 언어별로 + 영문 게이트 — 11-23 '개인 사업자' 6곳·실명 사본 정리·장부",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45099708267"
-   },
-   {
-    "databaseId": 45099658468,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-23T02:20:38Z",
-    "updatedAt": "2026-11-23T02:28:01Z",
-    "headBranch": "fix/en-sole-proprietor-1123",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into fix/en-sole-proprieto…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45099658468"
+    "createdAt": "2026-11-23T04:11:46Z",
+    "updatedAt": "2026-11-23T04:19:58Z",
+    "headBranch": "claude/linkedin-anatomy-2026-11-23",
+    "displayTitle": "linkedin(anatomy): 2026-11-23 사건 해부 슬롯 a1·a2 — 기준일탈 부실 조사·설비 청결 불량 / …",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45110359977"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45113397274,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-23T04:41:52Z",
+    "updatedAt": "2026-11-23T04:42:00Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45113397274"
+   },
+   {
     "databaseId": 45108290893,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45091017715"
-   },
-   {
-    "databaseId": 45064439349,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-22T20:05:34Z",
-    "updatedAt": "2026-11-22T20:05:42Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45064439349"
    }
   ],
   "grm-findings-translate-apply.yml": [

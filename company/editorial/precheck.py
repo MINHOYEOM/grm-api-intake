@@ -26,6 +26,14 @@
         권고 칸(implication·checks)·handoff 행이 없는 카드·관찰 단위 대조·'원료'는 경고만(`가림 값 채움 의심 …`).
         **개인 실명**(2026-11-21 대표 결정)은 경고만(`개인 실명 의심 …` — `private_name_warn_lines`): 원문 483 수신인 칸·
         Mr./Dr. 등 호칭 뒤 이름이 카드 산문에 나오면 한 줄. 업체명 낱말은 뺀다. `deep` 도 같은 함수로 심층 칸·국문 병기를 본다.
+        **원문 대조 4가지**(2026-11-23 — 교열 판정이 회차마다 갈린 유형, `guess_check.delta_source_lines`·`deep_source_lines`):
+        막음 = `개인 실명 …`(업체명이 사람 이름 — 이니셜 꼴 — 인데 산문에 그 이름, '개인 사업자'로)·`가림 값 추측 …`(원문 'W [redacted]'
+        → 카드 영문 'W equipment/parts' 같은 일반 채움 명사)·`원문에 없는 날짜 …`·`날짜 불일치 …`(`실사일:` 이름표 날짜 ≠ 코드 facts).
+        경고 = `진술 단정 의심 …`(원문 직원 진술 문장에만 있는 말을 진술 표기 없이)·`날짜 연도 확인 …`·심층 날짜(OCR 전문이라 경고).
+
+    python company/editorial/precheck.py source <실행 폴더> <handoff 파일> [--scaffold <파일>]
+        교열 코드 검사 — 합친 `delta.json`·`deep_delta.json` 에 위 원문 대조 4가지를 **기자와 같은 함수**로 돌린다.
+        차단 줄이 있으면 exit 1(교열은 그 카드를 `reject`), 경고 줄은 교열이 2-2 표로 판정하고 근거를 남긴다.
 
     python company/editorial/precheck.py deep-source <handoff 파일> <deep_delta 파일> --out <검사용 파일>
         심층분석 델타의 각 카드에 그 주 handoff 의 `deep_analysis_input.body_full` 을 `source_text` 로 붙인
@@ -588,7 +596,8 @@ def accuracy_warn_lines(delta, scaffold=None, deep=None, handoff=None):
 # [리허설 1121] 개인 실명 — 2026-11-21 대표 결정: 공직자·규제기관 공식 발표 속 직함상 공식 인물 외에는 개인 실명을 싣지 않는다.
 # 원문에서 **개인 이름 자리가 확실한 곳**만 이름을 뽑는다: 483 머리말 'INDIVIDUAL TO WHOM REPORT (IS) ISSUED' 칸(수신인),
 # 'Mr./Mrs./Ms./Dr./Prof.' 호칭 바로 뒤(경고서한 'Dear Mr. …'·WHOPIR 'Mr. … as Managing Director'). 업체명(`firm`·`headline`)에
-# 든 낱말은 뺀다(개인 사업체는 업체명 자체가 사람 이름 — 업체명으로서는 싣는다). 번역·음역은 못 잡는다 — **경고만**.
+# 든 낱말은 여기서 뺀다 — 업체명 자체가 사람 이름인 경우는 `guess_check.person_firm_lines` 가 **막는다**(2026-11-23,
+# 11-23 실발행 196329·196343 — 이 경고가 업체명이라며 빼던 자리). 번역·음역은 못 잡는다 — **경고만**.
 # ─────────────────────────────────────────────────────────────────────────────
 _HONORIFIC_NAME_RE = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof)[.,]?\s+((?:[A-Z][A-Za-z'\-]+\.?\s?){1,3})")
 _ISSUED_TO_RE = re.compile(r"INDIVIDUAL\s+TO\s+WHOM\s+REPORT\b.{0,12}?ISSUED(.{0,160}?)FIRM\s*NAME", re.S | re.I)
@@ -656,6 +665,38 @@ def private_name_warn_lines(delta=None, deep=None, rows=None, scaffold_cards=Non
     for cid, entry in (items or {}).items() if isinstance(items, dict) else ():
         check(cid, [(s, t) for s, t, _, _ in guess_check.deep_slots(entry)], "deep.")
     return out
+
+
+def source_lines(delta, deep, handoff, scaffold):
+    """교열 코드 검사 — 4가지 원문 대조(개인 실명·가림 값 추측·진술 단정·날짜)를 **기자 사전 점검과 같은 함수**로 합친 델타·심층에 돌린다(순수).
+    (차단 줄, 경고 줄). 차단 줄은 교열이 `reject`(`fails` item `코드 검사`)로, 경고 줄은 2-2 표로 판정하고 근거를 남긴다."""
+    rows, sc = guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold)
+    block, warn = guess_check.delta_source_lines(delta, rows, sc)
+    if isinstance(deep, dict):
+        b, w = guess_check.deep_source_lines(deep, rows, sc)
+        block, warn = block + b, warn + w
+    return block, warn
+
+
+def source_main(args):
+    folder = os.path.abspath(args.run)
+    delta = _load(os.path.join(folder, "delta.json"))
+    deep_path = os.path.join(folder, "deep_delta.json")
+    deep = _load(deep_path) if os.path.isfile(deep_path) else None
+    handoff = _load(args.handoff)
+    if not (isinstance(delta, dict) and isinstance(handoff, dict)):
+        raise ValueError("delta.json·handoff 가 객체가 아니다")
+    sc_path = find_scaffold(os.path.join(folder, "delta.json"), args.scaffold)
+    scaffold = _load(sc_path) if sc_path else None
+    block, warn = source_lines(delta, deep, handoff, scaffold)
+    for line in block:
+        print(line)
+    for line in warn:
+        print(f"경고: {line}")
+    if not sc_path:
+        print("경고: 스캐폴드 사본이 없어 코드 facts(실사일·발행일·업체 칸) 대조가 빠졌다 — 1번의 _scaffold/brief_web_<날짜>.json 을 받아 다시 돌린다")
+    print(f"원문 대조: 차단 {len(block)}건" + ("" if block else " — 통과") + (f" · 경고 {len(warn)}건(판정·근거 필요)" if warn else ""))
+    return 1 if block else 0
 
 
 def deep_lines(shard, ids_483):
@@ -757,6 +798,10 @@ def main(argv=None):
     p.add_argument("handoff")
     p.add_argument("shard")
     p.add_argument("--scaffold", help="그 주 스캐폴드 사본(없으면 _scaffold/brief_web_<날짜>.json 을 찾는다)")
+    s = sub.add_parser("source")
+    s.add_argument("run")
+    s.add_argument("handoff")
+    s.add_argument("--scaffold", help="그 주 스캐폴드 사본(없으면 _scaffold/brief_web_<날짜>.json 을 찾는다)")
     r = sub.add_parser("rework-diff")
     r.add_argument("old")
     r.add_argument("new")
@@ -779,12 +824,14 @@ def main(argv=None):
             hook_block, hook_warn = hook_lines(delta, scaffold)
             guess_block, guess_warn = guess_check.delta_guess_lines(
                 delta, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
-            lines = term_lines(delta, card_types) + gate_lines(delta, card_types, scaffold) + hook_block + guess_block
+            src_block, src_warn = guess_check.delta_source_lines(
+                delta, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
+            lines = term_lines(delta, card_types) + gate_lines(delta, card_types, scaffold) + hook_block + guess_block + src_block
             lines += [x for x in assembly_lines(delta, scaffold) if x not in lines]
             for line in lines:
                 print(line)
             warns = warn_lines(delta, _load(args.deep) if args.deep else None) + hook_warn
-            warns += accuracy_warn_lines(delta, scaffold) + guess_warn
+            warns += accuracy_warn_lines(delta, scaffold) + guess_warn + src_warn
             warns += private_name_warn_lines(delta, None, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 인용 번역 대조는 건너뛰었다 — 교열 코드 검사에서 본다")
@@ -804,11 +851,13 @@ def main(argv=None):
             lines += deep_assembly_lines(shard, handoff, scaffold)
             guess_block, guess_warn = guess_check.deep_guess_lines(
                 shard, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
-            lines += guess_block
+            src_block, src_warn = guess_check.deep_source_lines(
+                shard, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
+            lines += guess_block + src_block
             for line in lines:
                 print(line)
             warns = inject_slots.lint_deep_prose_style(shard).warn_lines()
-            warns += accuracy_warn_lines({"cards": {}}, None, shard, handoff) + guess_warn
+            warns += accuracy_warn_lines({"cards": {}}, None, shard, handoff) + guess_warn + src_warn
             warns += private_name_warn_lines(None, shard, guess_check.handoff_rows(handoff), guess_check.scaffold_index(scaffold))
             if not sc_path:
                 warns.append("스캐폴드 사본(_scaffold/brief_web_<날짜>.json)이 없어 국문 병기 관문(483·WL·WHOPIR)은 건너뛰었다 — 교열 코드 검사에서 본다")
@@ -817,6 +866,8 @@ def main(argv=None):
             print(f"심층 사전 점검: {len(lines)}건" + ("" if lines else " — 통과")
                   + (f" · 경고 {len(warns)}건(막지 않음)" if warns else ""))
             return 1 if lines else 0
+        if args.cmd == "source":
+            return source_main(args)
         if args.cmd == "rework-diff":
             old, new, copyedit = _load(args.old), _load(args.new), _load(args.copyedit)
             if not all(isinstance(x, dict) for x in (old, new, copyedit)):

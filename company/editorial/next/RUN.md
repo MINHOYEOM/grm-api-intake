@@ -71,7 +71,7 @@ git fetch origin claude/queue-handoff && git show FETCH_HEAD:handoff_$D.json > _
 |---|---|---|---|
 | 08:45 | 교열 (1차) | Sonnet | 코드 검사 exit 0 인데 reject 가 1~25장이면(심층에서만 걸린 카드는 코드가 심층을 빼고 통과 — `copyedit.md` 2-4 · 세지 않는다) 마감하지 않고 `copyedit.json` 을 `재작업` 으로 남긴다(`copyedit.md` 3-1). 늦어도 09:00 까지 push |
 | 09:02 (1차 직후) | 재작업 기자 (`재작업-1`) | Opus | `copyedit.json` 이 `재작업` 일 때만 — 반려 카드의 지적된 슬롯만 고치고 `rework.json` `완료`(`reporter.md` "재작업"). 아니면 바로 종료 |
-| 09:12 (재작업 직후) | 교열 (2차) | Sonnet | `rework.json` 이 `완료` 면 다시 합치고(`merge_parts.py`) 반려됐던 카드만 다시 판정. reject 0 이면 마감, 남으면 `보류`(`copyedit.md` 3-2) |
+| 09:12 (재작업 직후) | 교열 (2차) | Sonnet | `rework.json` 이 `완료` 면 다시 합치고(`merge_parts.py`) 반려됐던 카드만 다시 판정. reject 0 이면 마감, 남으면 `blank_slots.py finish`(`copyedit.md` 3-3 — 근거 다시 → 재작업 2회차 ≤5장 → 대표 결정. 카드를 미루지 않는다) |
 
 - 재작업은 **한 번뿐**이다. 2차에도 반려가 남거나, 반려되지 않은 카드가 바뀌었거나(`precheck.py rework-diff`), 시한을 넘기면 종전대로 백업이 발행한다.
 - **09:25 시한은 그대로다** — 2차 교열도 09:25 까지 마감 2번을 못 하면 `실패` 로 끝낸다. 그래서 재작업이 월요일에 실제로 돌려면

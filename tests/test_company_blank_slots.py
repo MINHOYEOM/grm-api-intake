@@ -257,6 +257,184 @@ class BlankSlotsTest(unittest.TestCase):
                 json.dump(ce, f, ensure_ascii=False)
             self.assertEqual(bs.main(["check", p("ce.json"), p("d.json")]), 0)
 
+    # ── 칸 삭제 자동 통과·1차 이음(11-23 실전 fda483-196441) ──────────────────────
+    @staticmethod
+    def _1123():
+        """11-23 의 꼴: 1차가 `hook_line` 을 칸 삭제로 정한 재작업 카드 — 2차가 같은 칸을 `fails` 로 올려 `보류`."""
+        delta = _delta()
+        delta["cards"]["k"] = {"title_issue": "제목", "summary": "요약", "hook_line": "대기 시간을 정하지 않음",
+                               "key_facts": ["고친 사실"],
+                               "en": {"title_issue": "T", "summary": "S", "hook_line": "No wait time", "key_facts": ["fixed"]}}
+        first = {"status": "재작업", "rework": {"cards": ["k"]}, "cards": [
+            {"web_card_id": "a", "verdict": "pass", "fails": [],
+             "notes": [{"item": "칸 삭제", "slot": "checks[0]", "evidence": "사유"}]},
+            {"web_card_id": "k", "verdict": "reject",
+             "fails": [{"item": "③ 원문보다 강한 단정", "slot": "key_facts[0]", "evidence": "x"}],
+             "notes": [{"item": "칸 삭제", "slot": "hook_line", "evidence": "원문보다 강한 단정"}]}]}
+        second = {"status": "재작업", "round": 2, "rework": {"cards": ["k"]}, "cards": [
+            {"web_card_id": "a", "verdict": "pass", "fails": [], "notes": []},
+            {"web_card_id": "k", "verdict": "reject",
+             "fails": [{"item": "③ 원문보다 강한 단정", "slot": "hook_line", "evidence": "1차와 같은 과장"}],
+             "notes": []}]}
+        return delta, first, second
+
+    def test_reject_only_on_blankable_slots_passes_with_blank_notes(self):
+        delta, _first, second = self._1123()
+        before = json.dumps(delta, ensure_ascii=False, sort_keys=True)
+        report = {}
+        converted, remaining, _ = bs.deep_auto(second, delta=delta, deep=_deep(), report=report)
+        self.assertEqual((converted, remaining, report["blanked"]), (["k"], [], ["k"]))
+        k = second["cards"][1]
+        self.assertEqual((k["verdict"], k["fails"]), ("pass", []))
+        self.assertEqual([(n["item"], n["slot"]) for n in k["notes"]], [(bs.ITEM, "hook_line")])
+        self.assertEqual((second["counts"]["reject"], second["rework"]["cards"]), (0, []))
+        self.assertEqual(json.dumps(delta, ensure_ascii=False, sort_keys=True), before)   # 델타는 건드리지 않는다
+        self.assertEqual(bs.refused_cards(second, delta, _deep()), {})                       # 마감(apply) 가능
+        self.assertEqual(bs.deep_auto(second, delta=delta, deep=_deep())[:2], ([], []))      # 다시 돌려도 같다
+        self.assertEqual(len(second["cards"][1]["notes"]), 1)
+
+    def test_reject_stays_when_check_would_refuse_or_slot_is_required(self):
+        delta, _first, second = self._1123()
+        cases = [
+            [{"item": "③", "slot": "key_facts[0]", "evidence": "핵심 사실 하나뿐"}],           # apply 거부 → 반려
+            [{"item": "③", "slot": "summary", "evidence": "필수 칸"}],
+            [{"item": "③", "slot": "hook_line", "evidence": "e"}, {"item": "②", "slot": "title_issue", "evidence": "e"}],
+            [{"item": "렌더 게이트", "slot": "hook_line", "evidence": "코드 게이트는 풀지 않는다"}],
+        ]
+        for fails in cases:
+            ce = json.loads(json.dumps(second))
+            ce["cards"][1]["fails"] = fails
+            self.assertEqual(bs.deep_auto(ce, delta=delta, deep=_deep())[1], ["k"], fails)
+            self.assertEqual(ce["cards"][1]["fails"], fails)
+        # 델타를 주지 않으면 종전대로(심층만 반려만 통과)
+        self.assertEqual(bs.deep_auto(json.loads(json.dumps(second)))[1], ["k"])
+        # en. 접두는 국·영 짝으로 빼므로 같은 칸이다
+        ce = json.loads(json.dumps(second))
+        ce["cards"][1]["fails"][0]["slot"] = "en.hook_line"
+        self.assertEqual(bs.deep_auto(ce, delta=delta, deep=_deep())[1], [])
+        self.assertEqual(ce["cards"][1]["notes"][0]["slot"], "hook_line")
+
+    def test_carry_first_keeps_first_round_blank_decisions(self):
+        delta, first, second = self._1123()
+        first_delta = json.loads(json.dumps(delta))
+        # 반려 안 된 카드 a 의 1차 칸 삭제는 2차가 적지 않아도 잇는다. 재작업 카드 k 는 칸 글자가 1차와 같으면 잇는다.
+        ce = json.loads(json.dumps(second))
+        ce["cards"][1]["fails"] = [{"item": "③", "slot": "summary", "evidence": "다른 반려"}]
+        carried, skipped = bs.carry_first(ce, first, delta, None, first_delta, None)
+        self.assertEqual((carried, skipped), (["a.checks[0]", "k.hook_line"], []))
+        self.assertEqual(bs.carry_first(ce, first, delta, None, first_delta, None), ([], []))   # 다시 돌려도 같다
+        # 기자가 hook_line 을 고쳤으면(1차 델타와 다르면) · 1차 델타가 없으면 재작업 카드는 잇지 않는다(리허설 1122a).
+        changed = json.loads(json.dumps(first_delta))
+        changed["cards"]["k"]["hook_line"] = "옛 문장"
+        for fd in (changed, None):
+            ce = json.loads(json.dumps(second))
+            ce["cards"][1]["fails"] = [{"item": "③", "slot": "summary", "evidence": "다른 반려"}]
+            self.assertEqual(bs.carry_first(ce, first, delta, None, fd, None), (["a.checks[0]"], ["k.hook_line"]))
+        # 2차가 같은 칸을 다른 이름으로 적었거나(checks) 반려로 옮겼으면 잇지 않는다(둘 다면 apply 가 거부 — 리허설 1121c).
+        ce = json.loads(json.dumps(second))
+        ce["cards"][0]["notes"] = [{"item": "칸 삭제", "slot": "checks", "evidence": "2차가 통째로"}]
+        self.assertEqual(bs.carry_first(ce, first, delta, None, first_delta, None)[0], [])
+        self.assertEqual(bs.refused_cards(ce, delta), {})
+
+    def test_cli_deep_auto_reads_sibling_delta_and_r1(self):
+        delta, first, second = self._1123()
+        with tempfile.TemporaryDirectory() as tmp:
+            p = lambda n: os.path.join(tmp, n)
+            for name, obj in (("delta.json", delta), ("copyedit.r1.json", first), ("copyedit.json", second)):
+                with open(p(name), "w", encoding="utf-8") as f:
+                    json.dump(obj, f, ensure_ascii=False)
+            self.assertEqual(bs.main(["deep-auto", p("copyedit.json")]), 0)
+            with open(p("copyedit.json"), encoding="utf-8") as f:
+                got = json.load(f)
+            self.assertEqual(got["counts"]["reject"], 0)
+            self.assertEqual([(n["item"], n["slot"]) for n in got["cards"][0]["notes"]], [(bs.ITEM, "checks[0]")])
+            # 다른 호의 1차 기록(카드가 다르다)은 잇지 않는다
+            other = dict(first, cards=[dict(first["cards"][0], web_card_id="zz")])
+            with open(p("copyedit.r1.json"), "w", encoding="utf-8") as f:
+                json.dump(other, f, ensure_ascii=False)
+            with open(p("copyedit.json"), "w", encoding="utf-8") as f:
+                json.dump(second, f, ensure_ascii=False)
+            self.assertEqual(bs.main(["deep-auto", p("copyedit.json")]), 0)
+            with open(p("copyedit.json"), encoding="utf-8") as f:
+                self.assertEqual(json.load(f)["cards"][0]["notes"], [])
+
+    # ── 2차 마감 전 다음 할 일(finish · 2026-11-23 대표 방침 — 미루지 않는다) ──────────────────────
+    def test_finish_plan_order_evidence_then_rework2_then_ceo(self):
+        delta, _first, second = self._1123()
+        ce = json.loads(json.dumps(second))
+        ce["cards"][1]["fails"] = [{"item": "③", "slot": "summary", "evidence": "필수 칸"}]
+        before = json.dumps([delta, ce], ensure_ascii=False, sort_keys=True)
+        # 근거 미비가 먼저다 — 반려가 있어도 근거부터 다시 적게 한다.
+        self.assertEqual(bs.finish_plan(ce, delta, None, {"a": ["checked 없음"], "k": []}), ("근거", {"a": ["checked 없음"]}))
+        step, cards = bs.finish_plan(ce, delta, None, {})
+        self.assertEqual((step, list(cards)), ("재작업2", ["k"]))
+        self.assertEqual(json.dumps([delta, ce], ensure_ascii=False, sort_keys=True), before)   # 아무것도 바꾸지 않는다
+        self.assertEqual(bs.finish_plan(ce, delta, None, {}, rework2_cap=0)[0], "대표 결정")      # 상한 초과
+        ce["rework2"] = {"cards": ["k"]}
+        self.assertEqual(bs.finish_plan(ce, delta, None, {})[0], "대표 결정")                     # 2회차 뒤에도 남음
+        ce["cards"][1].update(verdict="pass", fails=[])
+        self.assertEqual(bs.finish_plan(ce, delta, None, {}), ("마감", {}))
+
+    def test_drop_only_with_ceo_decision_for_requested_cards(self):
+        delta, _first, ce = self._1123()
+        delta["tldr"], delta["tldr_en"] = ["Acme Labs 경고서한", "다른 소식"], ["Acme Labs warned", "Other news"]
+        scaffold = {"cards": [{"id": "k", "headline_target": "Acme Labs"}]}
+        self.assertTrue(bs.drop_cards(ce, delta, None, ["k"], "빼고 발행", scaffold)[1])           # 올린 적 없는 카드
+        ce["decision_request"] = {"cards": ["k"]}
+        self.assertTrue(bs.drop_cards(ce, delta, None, ["k"], "", scaffold)[1])                    # 결정 원문 없음
+        self.assertEqual(sorted(delta["cards"]), ["a", "k"])
+        self.assertEqual(bs.drop_cards(ce, delta, None, ["k"], "대표: k 는 빼고 발행", scaffold), (["k"], []))
+        self.assertEqual(sorted(delta["cards"]), ["a"])
+        self.assertNotIn("deferred", delta)                                                         # 이월 표식은 달지 않는다
+        self.assertEqual((delta["tldr"], delta["tldr_en"]), (["다른 소식"], ["Other news"]))
+        self.assertEqual(ce["dropped_cards"], [{"web_card_id": "k", "decision": "대표: k 는 빼고 발행"}])
+
+    def test_cli_finish_steps_and_never_removes_cards(self):
+        delta, first, second = self._1123()
+        delta["cards"]["s"] = {"title_issue": "제목", "summary": "요약", "key_facts": ["사실"],
+                               "en": {"title_issue": "T", "summary": "S", "key_facts": ["F"]}}
+        for ce in (first, second):
+            ce["cards"] = [dict(c, source_absent="본문 없는 행(테스트)") for c in ce["cards"]]
+        first["cards"].append({"web_card_id": "s", "verdict": "reject", "source_absent": "테스트",
+                               "fails": [{"item": "③", "slot": "summary", "evidence": "필수"}]})
+        first["rework"]["cards"].append("s")
+        second["cards"].append({"web_card_id": "s", "verdict": "reject", "source_absent": "테스트",
+                                "fails": [{"item": "③", "slot": "summary", "evidence": "2차에도 남음"}]})
+        with tempfile.TemporaryDirectory() as tmp:
+            p = lambda n: os.path.join(tmp, n)
+
+            def put(name, obj):
+                with open(p(name), "w", encoding="utf-8") as f:
+                    json.dump(obj, f, ensure_ascii=False)
+
+            def get(name):
+                with open(p(name), encoding="utf-8") as f:
+                    return json.load(f)
+            for name, obj in (("delta.json", delta), ("copyedit.r1.json", first), ("copyedit.json", second),
+                              ("handoff.json", {"run_date_kst": "2099-01-01", "rows": []})):
+                put(name, obj)
+            self.assertEqual(bs.main(["finish", tmp, p("handoff.json")]), 4)        # k 는 칸 삭제로 통과 · s 는 2회차
+            got = get("copyedit.json")
+            self.assertEqual(got["rework2"], {"cards": ["s"]})
+            self.assertEqual(sorted(get("delta.json")["cards"]), ["a", "k", "s"])    # 카드를 빼지 않는다
+            self.assertEqual(bs.main(["finish", tmp, p("handoff.json")]), 5)        # 2회차 뒤에도 남음 → 대표 결정
+            got = get("copyedit.json")
+            self.assertEqual((got["status"], got["decision_request"]["cards"]), ("결정 대기", ["s"]))
+            with open(p("decision_request.md"), encoding="utf-8") as f:
+                self.assertTrue(f.read().startswith("상태: 보류\n한 일: "))
+            self.assertEqual(sorted(get("delta.json")["cards"]), ["a", "k", "s"])
+            self.assertEqual(bs.main(["finish", tmp, p("handoff.json"), "--drop", "s", "--decision", "대표: s 빼고 발행"]), 0)
+            self.assertEqual(bs.main(["finish", tmp, p("handoff.json")]), 0)        # 마감
+            self.assertEqual(sorted(get("delta.json")["cards"]), ["a", "k"])
+            # 1차 판정 그대로에는 쓰지 않는다 · 재작업 미완이면 1차 반려를 대표 결정으로 올린다(미루지 않는다).
+            put("copyedit.json", first)
+            put("delta.json", delta)
+            os.remove(p("copyedit.r1.json"))
+            self.assertEqual(bs.main(["finish", tmp, p("handoff.json")]), 2)
+            self.assertEqual(bs.main(["finish", tmp, p("handoff.json"), "--rework-unfinished"]), 5)
+            self.assertEqual(sorted(get("copyedit.json")["decision_request"]["cards"]), ["k", "s"])
+            self.assertEqual(sorted(get("delta.json")["cards"]), ["a", "k", "s"])
+
     def test_copyedit_md_two_editions_point_to_the_script(self):
         for folder in ((), ("next",)):
             with open(os.path.join(ROOT, "company", "editorial", *folder, "copyedit.md"), encoding="utf-8") as f:
@@ -274,6 +452,16 @@ class BlankSlotsTest(unittest.TestCase):
             self.assertIn("2-5. **칸 삭제 사전 점검", text, folder)
             self.assertIn("python company/editorial/blank_slots.py check company/run/{run_date_kst}/copyedit.json", text, folder)
             self.assertLess(text.index("2-5. **칸 삭제 사전 점검"), text.index("3-1. **반려가 있으면"), folder)
+            self.assertIn("**지울 수 있는 칸만 걸린 반려도 코드가 통과시킨다", text, folder)
+            self.assertIn("1차 칸 삭제는 `deep-auto` 가 잇는다", text, folder)
+            self.assertNotIn("반려가 하나라도 있으면 그대로 `reject` 다.", text, folder)
+            self.assertIn("3-3. **2차 마감 전 다음 할 일", text, folder)
+            self.assertIn("python company/editorial/blank_slots.py finish company/run/{run_date_kst} _handoff/handoff_$D.json", text, folder)
+            self.assertNotIn("blank_slots.py defer", text, folder)
+            self.assertIn("--ids <id,…>", text, folder)
+            self.assertIn("--rework-unfinished", text, folder)
+            self.assertNotIn("**2차에도 reject 가 남으면 `보류`**", text, folder)
+            self.assertIn("**2차 재작업 카드는 `checked` 를 새로 적는다**", text, folder)
         for folder in ((), ("next",)):
             with open(os.path.join(ROOT, "company", "editorial", *folder, "RUN.md"), encoding="utf-8") as f:
                 text = f.read()

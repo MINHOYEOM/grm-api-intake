@@ -71,7 +71,7 @@
    묶음을 서브 에이전트로 나눠도 된다(예: 40장씩 4개 — 아래 2-2 표를 조각마다 붙인다). 조각마다 `_scaffold/copyedit.part<K>.json`(`{"cards": [...]}`)에 쓰고
    `python company/editorial/copyedit_evidence.py merge company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.part*.json` 로 합친다(델타 순서 · `counts` 다시 셈).
    **`완료` 를 쓰기 전에** `python company/editorial/copyedit_evidence.py check company/run/{run_date_kst} _handoff/handoff_$D.json` 이 exit 0 이어야 한다.
-   exit 1 이면 줄마다 나온 카드를 마저 읽고 근거를 채워 다시 돌린다 — 표본만 읽고 `완료` 를 쓰지 않는다. 09:20 까지 0 으로 못 만들면 `보류`(백업이 발행한다).
+   exit 1 이면 줄마다 나온 카드를 마저 읽고 근거를 채워 다시 돌린다 — 표본만 읽고 `완료` 를 쓰지 않는다. 09:20 까지 0 으로 못 만들면 — 1차는 `보류`, 2차는 3-3 `finish` 가 근거 빈 카드 목록을 내고 그 카드만 다시 대조한다(카드를 미루지 않는다).
    이 검사는 근거를 "적었는가" 를 본다 — 판정의 기준은 그대로 2-2 표다(근거가 있어도 정확성 오류가 있으면 `reject`).
 2. **의미 점검.** 카드마다 v16 [발행 전 산문 자가 점검] 1~10번과 [핵심 원칙] 2-1(원문 부재 주장 금지)을 O/X 로 판정한다. 심층 칸이 있는 카드는 위 '3-1. 문체'도 판정한다.
    X 는 근거(슬롯 이름 + 코드 `facts`/`prose_input` 의 어느 값과 어긋나는지)를 적는다.
@@ -118,7 +118,10 @@
    python company/editorial/blank_slots.py deep-auto company/run/{run_date_kst}/copyedit.json
    ```
    `fails` 가 **전부** `deep.` 칸인 카드는 `pass` 가 되고 `fails` 는 `notes` `{"item": "심층 삭제", …}` 로 옮겨진다(`counts` 다시 셈 · `rework.cards` 에서 빠짐).
-   통과 카드의 `checked` 에 `absent: true` 인 심층 칸도 심층 삭제 주의가 붙는다. 앞면 칸(`title_issue`·`key_facts`·`en.…` 등) 반려가 하나라도 있으면 그대로 `reject` 다.
+   통과 카드의 `checked` 에 `absent: true` 인 심층 칸도 심층 삭제 주의가 붙는다.
+   **지울 수 있는 칸만 걸린 반려도 코드가 통과시킨다(11-23 실전 — fda483-196441 `hook_line` 하나로 호 전체가 `보류`).** `fails` 가 전부 2-3 의 비울 수 있는 칸(`hook_line`·`implication`·`checks`·`key_facts[i]`·483 심층 선택 절)이나 심층 칸이고 `apply` 가 전부 받아 주면(2-5 `check` 와 같은 함수로 판정 — 규칙을 따로 두지 않는다) `pass` 가 되고 `fails` 는 `칸 삭제`·`심층 삭제` 주의로 옮겨진다. 필수 칸(`title_issue`·`summary`·인용·`en`)·하나뿐인 `key_facts[0]`·코드 게이트 반려(`코드 검사`·`영문 게이트`·`렌더 게이트`·`칸 삭제 불가`)는 그대로 `reject` 다. 델타는 같은 실행 폴더의 `delta.json`·`deep_delta.json`(칸 삭제 전)을 읽는다.
+   2차에는 1차 기록(`copyedit.r1.json` — 실행 폴더, 없으면 `_scaffold/`)의 칸 삭제·심층 삭제 주의를 **먼저 잇는다** — 2차가 다시 적지 않아도 1차 결정은 남는다. 반려 안 된 카드는 그대로 잇고, 재작업 카드는 그 칸 글자가 1차 델타(`_scaffold/delta.r1.json`·`deep_delta.r1.json`)와 같을 때만 잇는다(기자가 고쳤으면 2차가 다시 판정). 같은 칸을 가리키는 주의·반려가 이미 있으면 잇지 않는다.
+   `deep-auto` 가 통과시킨 카드도 `pass` 카드다 — `checked` 근거(1-1)가 있어야 한다(2차에 다시 판정한 카드는 반려로 적었더라도 근거를 적는다).
    마지막 줄의 `남은 반려 N장` 이 3-1 의 reject 수다. 같은 파일에 다시 돌려도 결과가 같다.
    반영은 2-3 과 같은 `blank_slots.py apply`(같은 때 · 같은 사본 규칙 · `--log`)가 한다 — 뺄 수 있으면 그 항목만, 아니면 그 카드의 심층분석을 통째로 뺀다:
    `deep.key_violations[i]` → 그 지적만(하나도 안 남으면 통째) · `deep.required_remediation.items[i]` → 그 항목만(경고서한·행정처분은 하나는 남아야) ·
@@ -151,7 +154,7 @@
    **예약작업 프롬프트에 `역할: 교열(2차)` 가 있는 실행(09:12 슬롯)은 2차만 한다** — `copyedit.json` 이 아직 없으면 1차 교열(08:45)이 아직 샤드를 기다리는 중이다:
    아무것도 쓰지 않고 종료한다(1차 판정을 대신하지 않는다 — 두 교열이 따로 판정하거나 1차가 `CONSUMED` 를 찍은 뒤 `copyedit.json` 을 덮어쓰면 아무도 발행하지 않는다).
    `재작업` 이 아니면(`완료`·`보류`·`실패`) 역시 아무것도 쓰지 않고 종료한다.
-   `rework.json` 이 `완료` 가 될 때까지 09:20 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 아니면 `copyedit.json` 을 `보류` 로 고쳐 push 하고 끝낸다. `완료` 면:
+   `rework.json` 이 `완료` 가 될 때까지 09:20 KST 까지 2분마다 다시 확인하고(리허설은 시각 무시), 그때도 아니면 보류하지 않는다 — 1차 반려 카드를 대표 결정 요청으로 올린다(아래 3-3 `finish --rework-unfinished`). `완료` 면:
    ```
    mkdir -p _scaffold && cp company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.r1.json && cp company/run/{run_date_kst}/delta.json _scaffold/delta.r1.json
    cp company/run/{run_date_kst}/deep_delta.json _scaffold/deep_delta.r1.json
@@ -162,10 +165,40 @@
    `rework-diff` 가 exit≠0 이면(반려되지 않은 카드가 바뀌었거나 카드가 늘고 줄었다) 판정하지 않고 `보류`. exit 0 이면 1번(코드 검사)을 다시 돌리고,
    **반려됐던 카드만** 2·2-1번 전 항목으로 다시 판정한다(나머지 카드는 글자가 그대로이므로 1차 판정 `pass` 를 그대로 옮긴다).
    반려 카드가 10장을 넘으면 1-1 처럼 서브 에이전트 여러 개(조각마다 2-2 표를 글자 그대로)로 나눠 동시에 판정한다 — 09:20 전에 마감까지 가야 한다.
-   다시 판정한 뒤에도 2-4 `deep-auto` 와 2-5 사전 점검을 돌린다(2차에 심층에서만 걸린 카드도 심층 삭제로 통과 · 거부될 칸 삭제는 `reject` — 2차라 `보류`).
-   결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남으면 `보류`** — 더 되돌리지 않는다(백업이 발행한다).
+   다시 판정한 뒤에도 2-4 `deep-auto` 와 2-5 사전 점검을 돌린다(2차에 심층에서만 걸린 카드도 심층 삭제로 통과 · 지울 수 있는 칸만 걸린 카드는 칸 삭제로 통과 · 1차 칸 삭제는 `deep-auto` 가 잇는다 · 거부될 칸 삭제는 `reject` — 2차라 `보류`).
+   `deep-auto` 의 마지막 줄 `남은 반려 N장` 을 본다 — 1차가 칸 삭제로 정한 칸을 2차가 `fails` 로 올려도 코드가 칸 삭제로 통과시킨다.
+   2차에 코드 검사(1번)에 걸린 카드는 그 카드에 `verdict: "reject"` · `fails` `{"item": "코드 검사", "slot": "<슬롯>", "evidence": "<그 줄>"}` 로 적는다(3-3 `finish` 가 재작업 2회차·대표 결정으로 보낸다).
+   결과는 `copyedit.json` 을 `"round": 2` 로 새로 쓰고, 1차 기록은 `copyedit.r1.json` 으로 실행 폴더에 남긴다. **2차에도 reject 가 남아도 `보류` 하지 않는다 — 3-3 `finish` 로 재작업 2회차, 그래도 남으면 대표 결정을 받는다(2026-11-23 대표 방침: 백업 v16 은 꺼졌다 · 카드를 이월하지 않는다).**
    2차에 다시 판정한 카드는 `checked` 도 새 문장으로 다시 적는다(옛 근거의 `claim` 이 고친 문장에 없으면 검사가 걸린다). 옮긴 `pass` 카드는 1차 줄(근거 포함)을 그대로 옮긴다.
    2차도 `완료` 전에 1-1 의 `copyedit_evidence.py check` exit 0 이어야 한다.
+   **2차 재작업 카드는 `checked` 를 새로 적는다** — 고친 문장을 원문과 다시 맞추고, 1차 반려 칸마다 근거 하나씩(1차 근거를 옮겨 적지 않는다).
+   비우면 `copyedit_evidence.py check` 가 그 카드를 실패로 낸다(11-23 실전: 재작업 8장의 `checked` 가 비어 수동 마감까지 막혔다). 반려 안 된 카드의 근거는 `deep-auto` 가 1차 줄에서 잇는다.
+3-3. **2차 마감 전 다음 할 일 — 근거 다시 → 재작업 2회차 → 대표 결정(2026-11-23 대표 방침: 백업 v16 은 꺼졌다 · 불완전한 카드는 싣지 않고 이월하지도 않는다).**
+   2차가 판정·`deep-auto`·2-5 사전 점검을 다 한 뒤, 4번 마감 **전에** 돌린다(델타는 칸 삭제 전 것 · `apply` 전 · handoff 는 1-1 과 같은 파일):
+   ```
+   python company/editorial/blank_slots.py finish company/run/{run_date_kst} _handoff/handoff_$D.json
+   ```
+   코드가 `deep-auto` 를 같은 함수로 한 번 더 돌린 뒤(칸 삭제·심층 삭제로 풀리는 카드는 통과 · 1차 결정·근거는 잇는다) 다음 할 일을 exit 로 낸다. 카드를 미루지 않는다.
+   - **exit 3 근거 다시** — `근거 다시:` 줄의 카드는 근거가 빠졌거나 틀렸다(1-1 과 같은 함수). 카드 결함이 아니라 교열 누락이다(11-23: 근거만 빠진 14장은 원문 대조로 모두 통과).
+     같은 실행 안에서 그 카드만 `python company/editorial/copyedit_evidence.py show company/run/{run_date_kst} _handoff/handoff_$D.json --ids <id,…>` 로 원문과 나란히 다시 읽고
+     `checked` 를 적는다(재작업 카드는 1차 반려 칸마다 고친 문장의 근거). 읽다가 원문과 어긋나면 그 카드를 `reject` 로 바꾼다. 그리고 `finish` 를 다시 돌린다.
+   - **exit 4 재작업 2회차** — 내용 반려가 1~5장이고 2회차를 아직 안 했다(`copyedit.json` 에 `rework2.cards` 가 적힌다). 같은 날 기자가 한 번 더 고친다:
+     ```
+     cp company/run/{run_date_kst}/copyedit.json _scaffold/copyedit.r2.json && cp company/run/{run_date_kst}/delta.json _scaffold/delta.r2.json
+     cp company/run/{run_date_kst}/deep_delta.json _scaffold/deep_delta.r2.json
+     ```
+     서브 에이전트 **하나**를 기자로 띄워 `reporter.md` "재작업 2회차" 절만 하게 한다(교열은 슬롯을 직접 고치지 않는다 — 쓰는 이와 보는 이가 다르다). `rework2.json` 이 `완료` 면
+     `merge_parts.py` → `precheck.py rework-diff _scaffold/delta.r2.json company/run/{run_date_kst}/delta.json _scaffold/copyedit.r2.json --deep-old _scaffold/deep_delta.r2.json --deep-new company/run/{run_date_kst}/deep_delta.json`
+     (exit≠0 이면 2회차 결과를 버리고 `git checkout` 으로 샤드를 되돌린 뒤 exit 5 로 간다) → 코드 검사(1번) → 그 카드만 2·2-1번으로 다시 판정(근거 새로) → `finish` 를 다시 돌린다.
+     시간 근거(`RUN.md` 5-1 실측): 재작업은 장당 2~3분이 대부분 고정 비용이고 2차 재판정·코드 검사가 약 4분이다 — 2차가 09:16 전후에 끝나면 5장 2회차와 재판정이 09:25 안에 들어간다. 그래서 상한 5장.
+   - **exit 5 대표 결정** — 2회차 뒤에도 남았거나 5장을 넘는다. 코드가 `copyedit.json` 을 `결정 대기` 로 바꾸고 `decision_request.md`(헌장 3줄 · 카드·사유·결정 예시)를 쓴다.
+     `copyedit.json`·`decision_request.md`·`delta.json`·`deep_delta.json` 을 커밋·push 하고 끝낸다 — 결정 전에는 발행하지 않는다(브릿지는 `완료` 가 아닌 반납을 가져가지 않는다).
+     비서실이 같은 날 대표 결정을 받아 이어 간다: 고칠 문장 지시면 기자 재작업 → 2차 다시, 빼고 발행이면
+     `python company/editorial/blank_slots.py finish company/run/{run_date_kst} _handoff/handoff_$D.json --drop <id,…> --decision "<대표 결정 원문>"` → `finish` → 4번 마감.
+     카드를 빼는 것은 대표 결정이 있을 때만이다(`--drop` 은 `decision_request` 에 올린 카드만 받는다).
+   - **exit 0 마감** — 근거·반려 모두 0. 곧바로 4번 마감으로 간다. exit 1 은 카드로 가를 수 없는 문제(판정 줄 중복 등)다 — 판정 파일을 고쳐 다시 돌린다.
+   재작업이 09:20 까지 `완료` 가 아니면(`rework.json`) `merge_parts.py` 를 돌리지 않고
+   `python company/editorial/blank_slots.py finish company/run/{run_date_kst} _handoff/handoff_$D.json --rework-unfinished` 로 1차 반려 카드를 대표 결정 요청으로 올린다(exit 5).
    **2차가 코드 검사 exit 0 · reject 0 이면 곧바로 아래 4번 마감을 1번(`scaffold.json` 복사 → `delta.json`·`deep_delta.json`·`scaffold.json`·`copyedit.json` push)부터 한다.**
    `copyedit.json` 에 `완료` 만 적고 끝내면 브릿지가 가져갈 반납이 없어 백업이 발행한다(리허설 1120d — 2차 통과 뒤 `scaffold.json` 이 없었다).
 4. **마감 — 코드 검사 exit 0 이고 reject 0 일 때만.** 전수 대조(1-1 `copyedit_evidence.py check`) exit 0 도 조건이다 — 근거가 빠진 카드가 있으면 reject 0 은 0 이 아니다. 하나라도 아니면 Notion 에 아무것도 쓰지 않고 끝낸다

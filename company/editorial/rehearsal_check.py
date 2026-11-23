@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""리허설 결과 점검 — `REHEARSAL.md` 의 성공 판정 1~5(+4-1 교열 전수 대조 · 4-2 심층 삭제)를 코드로 본다. 읽기만 한다.
+"""리허설 결과 점검 — `REHEARSAL.md` 의 성공 판정 1~5(+4-1 교열 전수 대조 · 4-2 심층 삭제 · 4-3 칸 삭제 자동 통과·1차 이음)를 코드로 본다. 읽기만 한다.
 
     python company/editorial/rehearsal_check.py <실행 폴더> <handoff 파일>
 
@@ -76,7 +76,8 @@ def check(folder, handoff_path):
         lines, stats = copyedit_evidence.check(
             delta, copyedit, _load(os.path.join(folder, "deep_delta.json")), handoff,
             _load(copyedit_evidence.find_scaffold(folder, handoff) or os.path.join(folder, "scaffold.json")),
-            blank_check=not copyedit_evidence.blank_applied(folder))
+            blank_check=not copyedit_evidence.blank_applied(folder),
+            first=copyedit_evidence.load_first(folder, copyedit))
         out.append(("4-1", "교열 전수 대조 근거(카드마다 원문 조각)", not lines,
                     copyedit_evidence.summary_line(stats) + (f" — 첫 줄: {lines[0][:160]}" if lines else "")))
     else:
@@ -97,6 +98,24 @@ def check(folder, handoff_path):
     out.append(("4-2", "심층만 반려된 카드 0 · 심층 삭제 기록", ok,
                 f"심층만 반려 {len(deep_only)}장{(' ' + str(deep_only[:5])) if deep_only else ''} · 심층 삭제 주의 {n_deep_notes}건"
                 f" · slot_removals.json {logged}줄" + (" — 반영 기록이 없다" if need_log and not logged else "")))
+
+    # 4-3. 지울 수 있는 칸(선택 칸·심층)만 걸린 반려가 남지 않았는가 · 2차가 1차의 칸 삭제를 잃지 않았는가(11-23 실전 —
+    #      fda483-196441 hook_line 하나로 호 전체가 `보류`). deep-auto 와 같은 함수(blankable_notes = check)로 판정한다.
+    #      칸 삭제를 이미 반영한 델타(slot_removals.json)면 자동 통과 판정은 볼 수 없다 — 그때는 반려가 0 이어야 4번이 통과한다.
+    deep = _load(os.path.join(folder, "deep_delta.json"))
+    blankable = []
+    if not copyedit_evidence.blank_applied(folder) and isinstance(delta, dict):
+        blankable = [str(c.get("web_card_id")) for c in rejects
+                     if blank_slots.blankable_notes(c, delta, deep if isinstance(deep, dict) else None) is not None]
+    lost = []
+    if rnd != 1:
+        first = _load(os.path.join(folder, "copyedit.r1.json"))
+        probe = json.loads(json.dumps(copyedit))
+        lost, _skipped = blank_slots.carry_first(probe, first, delta, deep)
+    out.append(("4-3", "지울 수 있는 칸만 반려된 카드 0 · 1차 칸 삭제 유지", not blankable and not lost,
+                f"칸 삭제로 통과할 반려 {len(blankable)}장{(' ' + str(blankable[:5])) if blankable else ''}"
+                f" · 2차에서 빠진 1차 칸 삭제 {len(lost)}건{(' ' + str(lost[:5])) if lost else ''}"
+                + (" — blank_slots.py deep-auto 를 다시 돌린다" if blankable or lost else "")))
 
     detail, ok = "", False
     if isinstance(delta, dict) and isinstance(handoff, dict):

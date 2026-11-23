@@ -114,7 +114,12 @@
 3. 고친 샤드마다 `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` 이 exit 0 인지 본다
    (심층 샤드는 `python company/editorial/precheck.py deep _handoff/handoff_$D.json company/run/{run_date_kst}/deep.{S}.json`).
 4. `rework.json` 을 `{"status":"완료","round":1,"worker":"…","fixed":[{"id":"<web_card_id>","shard":"B","changed":["summary","key_facts"]}],"unfixed":["<못 고친 카드 id>"]}` 로 고쳐
-   고친 샤드 파일과 함께 커밋·push 한다. **재작업은 한 번뿐이다** — 다시 반려되면 그 호는 백업이 발행한다.
+   고친 샤드 파일과 함께 커밋·push 한다. 다시 반려되면 교열 2차가 같은 날 "재작업 2회차"를 한 번 더 부른다(아래).
+
+## 재작업 2회차 — 교열 2차가 같은 날 한 번 더 부를 때만 (2026-11-23 대표 방침 — 백업 없음 · 이월 없음)
+교열 2차가 서브 에이전트로 띄운 기자만 이 절을 한다(예약 슬롯 없음). 위 "재작업" 1~3번과 같다 — 다른 점만:
+- 대상은 `copyedit.json` 의 `rework2.cards` 와 그 카드의 `fails` 다(`rework.cards` 가 아니다). 맡기 표식·결과는 `rework2.json`(`"round": 2`).
+- 결과는 `rework2.json` 을 `{"status":"완료","round":2,"fixed":[…],"unfixed":[…]}` 로 써서 고친 샤드와 함께 커밋한다. 더 되돌리는 회차는 없다 — 남으면 교열이 대표 결정을 받는다.
 
 ## 결과 — `company/run/{run_date_kst}/`
 - `delta.{A,B}.json` — 위 표. `cards` 값의 형태는 v16 [출력] envelope 의 카드 항목 그대로(선택 필드 `hook_line`·`en.hook_line` 포함 — 위 하는 일 4번). 그 밖의 키 금지.

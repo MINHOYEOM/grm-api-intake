@@ -2795,7 +2795,7 @@ def _observations_from_anchors(
         # to Section 704(b)… 2. To assist firms…`)은 관찰이 아니므로 넣지 않는다(실측 196455:
         # 관찰 1~6 뒤에 안내문 1·2 가 붙어 번호가 1..6,1,2 가 됐다). 청소 전 구간 머리로 본다 —
         # 청소가 `704(b)` 의 `(b)` 를 마스킹 표기로 지워 표제로는 안내문 판정이 안 된다.
-        if not (_FORM_NOTICE_RE.search(seg[:200]) or _FORM_NOTICE_RE.search(deficiency or "")):
+        if not (_FORM_NOTICE_RE.search(seg, 0, 200) or _FORM_NOTICE_RE.search(deficiency or "")):
             numbers.append(obs.group(1) if obs.group(1).isdigit() else "1")
         if not gate(deficiency) and fragment_heads:
             frag_head, frag_rest, lower_enum = _split_past_fragment_head(chunk)

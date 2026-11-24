@@ -156,5 +156,88 @@ class RecollectTest(unittest.TestCase):
         self.assertEqual(report.still_empty, 1)
 
 
+class TimeBudgetTest(unittest.TestCase):
+    """워크플로 제한 안에 리포트가 반드시 남는다 — 첫 dry-run(88행+)이 30분을 넘겨 취소되며 결과가 사라졌다."""
+
+    _fetch = RecollectTest._fetch
+
+    class _Clock:
+        def __init__(self, step):
+            self.t, self.step = 0.0, step
+
+        def __call__(self):
+            return self.t
+
+        def sleep(self, _s):
+            self.t += self.step                     # 요청 1건(간격+응답)이 step 초
+
+    def _budget_run(self, n_rows, budget, step, **kw):
+        rows = [_row(f"d{i}", OLD_HEAD) for i in range(n_rows)]
+        clock = self._Clock(step)
+        fetch = self._fetch(_CI_LETTER)
+
+        def timed(url):
+            clock.t += step
+            return fetch(url)
+        upsert = mock.MagicMock(return_value=(201, [], ""))
+        sink = []
+        report, code = rec.run(
+            base_url="https://x.supabase.co", service_key="k", dry_run=True, delay_seconds=0,
+            fetch_raw_signals=lambda base, key, **k: list(rows), fetch_letter=timed, upsert_raw_signal=upsert,
+            sleeper=lambda _s: None, rebuild_body_start=True, time_budget_seconds=budget, clock=clock,
+            progress_cb=lambda r: sink.append(r.attempted), **kw)
+        return report, code, sink
+
+    def test_budget_stops_and_lists_remaining_rows(self):
+        report, code, _sink = self._budget_run(10, budget=35, step=10)       # 행당 10초 → 4건 본 뒤 소진
+        self.assertEqual(code, 0)
+        self.assertTrue(report.budget_exhausted)
+        self.assertEqual((report.attempted, report.deferred_next), (4, 6))
+        self.assertEqual(len(report.deferred_docs), 6)
+        self.assertEqual(report.candidates_total, 10)
+        self.assertEqual(report.avg_seconds_per_attempt, 10.0)
+        self.assertEqual(report.time_budget_seconds, 35)
+
+    def test_within_budget_defers_nothing(self):
+        report, _c, _s = self._budget_run(3, budget=100, step=10)
+        self.assertFalse(report.budget_exhausted)
+        self.assertEqual((report.attempted, report.deferred_next), (3, 0))
+
+    def test_limit_rows_are_reported_as_next_round(self):
+        report, _c, _s = self._budget_run(5, budget=1000, step=1, limit=2)
+        self.assertEqual((report.attempted, report.deferred_next, report.candidates_total), (2, 3, 5))
+
+    def test_progress_is_flushed_every_row(self):
+        _r, _c, sink = self._budget_run(4, budget=1000, step=1)
+        self.assertGreaterEqual(len(sink), 4)                       # 중간에 끊겨도 마지막 상태가 파일에 남는 근거
+
+    def test_main_leaves_a_report_file_even_when_budget_is_exhausted(self):
+        import tempfile
+        rows = [_row(f"d{i}", OLD_HEAD) for i in range(6)]
+        clock = self._Clock(10)
+        fetch = self._fetch(_CI_LETTER)
+
+        def timed(url):
+            clock.t += 10
+            return fetch(url)
+        real_run = rec.run
+
+        def run(**kw):
+            return real_run(**{**kw, "fetch_raw_signals": lambda b, k, **x: list(rows), "fetch_letter": timed,
+                               "sleeper": lambda _s: None, "clock": clock})
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "report.json")
+            with mock.patch.object(rec, "run", run),                     mock.patch.object(rec, "_resolve_credentials", return_value=("https://x.supabase.co", "k")):
+                code = rec.main(["--rebuild-body-start", "--delay-seconds", "0", "--time-budget-seconds", "25",
+                                 "--report-path", path])
+            self.assertEqual(code, 0)
+            data = json.loads(open(path, encoding="utf-8").read())
+            self.assertTrue(data["budget_exhausted"])
+            self.assertEqual(data["deferred_next"] + data["attempted"], 6)
+
+    def test_default_budget_leaves_margin_inside_workflow_timeout(self):
+        self.assertLessEqual(rec.DEFAULT_TIME_BUDGET_SECONDS, 25 * 60)     # 워크플로 timeout-minutes 30
+
+
 if __name__ == "__main__":
     unittest.main()

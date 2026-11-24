@@ -188,8 +188,8 @@ class BodyFullBackfillTest(unittest.TestCase):
         body = SIG + "Jose F Velez, Investigator\n2/27/2026\n"
         row = _db_row("d", {"media_id": "1", "fda_483_observations": [{"number": "1"}]})
         patched: list = []
-        rep = bb.run([row], set(), apply=True, probe_pdf=False, notion_index={"d": "p"}, since="x",
-                     notion_body=lambda _p: body, pdf_body=lambda *_a: ("", "x"),
+        rep = bb.run([row], set(), apply=True, probe_pdf=False, since="x",
+                     pdf_body=lambda *_a: (body, "x"),
                      applier=lambda **kw: {"status": "applied"}, sleeper=lambda _s: None,
                      findings_patcher=lambda rid, names: patched.append((rid, names)) or "")
         self.assertEqual(rep.inspectors_added, 1)

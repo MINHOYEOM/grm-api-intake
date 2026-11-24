@@ -68,7 +68,7 @@ import findings_supabase_backfill as fsb
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, log
+from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, body_shrunk, log
 from grm_http_policy import (
     FDA_483_MIXED_PDF_DELAY_SECONDS,
     FDA_483_MIXED_PDF_HTTP_RETRIES,
@@ -157,6 +157,7 @@ class OcrRecoveryReport:
     attempted: int = 0                  # 실제 PDF fetch 를 시도한 문서 수
     recovered: int = 0                  # 본문 확보(dry-run=교체 예정, apply=upsert 성공)
     recovered_excerpt_only: int = 0     # 그 중 관찰문 0건 — 발췌만 살고 findings 는 0
+    shrunk: int = 0                     # 새 전문이 짧아 교체하지 않은 행
     named_no_gain: int = 0              # named: 관찰 증가 없음·표제 소실·본문 손실로 교체하지 않음
     named_text_loss: list[dict[str, Any]] = field(default_factory=list)  # [11-13] 본문 손실 차단 내역
     still_empty: int = 0                # ↓ 두 사건의 합(하위호환 유지). 진단에는 쓰지 말 것.
@@ -188,6 +189,16 @@ def _default_sleep(seconds: float) -> None:
 
 def _bump(report: OcrRecoveryReport, reason: str) -> None:
     report.failure_reasons[reason] = report.failure_reasons.get(reason, 0) + 1
+
+
+def _would_shrink_body(report: OcrRecoveryReport, old_raw: dict[str, Any],
+                       new_raw: dict[str, Any], label: str) -> bool:
+    if not body_shrunk(old_raw.get("fda483_body_full"), new_raw.get("fda483_body_full")):
+        return False
+    report.shrunk += 1
+    _bump(report, "shrunk")
+    log("WARN", f"483 전문 축소로 교체 건너뜀: {label}")
+    return True
 
 
 def _count_recovered(report: OcrRecoveryReport, observations: list[Any]) -> None:
@@ -814,6 +825,8 @@ def _resolve_capped_status(
         _bump(report, "raw_signal_id_mismatch")
         report.errors.append(f"{label}: raw_signal_id_mismatch")
         return
+    if _would_shrink_body(report, raw, _json_object(record.get("raw_json")), label):
+        return
     if dry_run:
         report.status_resolved += 1
         return
@@ -1020,6 +1033,8 @@ def run(
             continue
 
         new_raw = _json_object(record.get("raw_json"))
+        if _would_shrink_body(report, raw, new_raw, label):
+            continue
         observations = new_raw.get("fda_483_observations") or []
         if not (new_raw.get("fda483_excerpt") or observations):
             # 텍스트는 받았지만 결정론 층이 아무것도 못 뽑았다 — 교체 이득이 없다.

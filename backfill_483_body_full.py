@@ -39,7 +39,7 @@ import findings_supabase_append as fsa
 import findings_supabase_backfill as fsb
 import raw_versioning as rv
 import backfill_483_inspectors_from_body as inspectors_from_body
-from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_483, log
+from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_483, body_shrunk, log
 from grm_http_policy import FDA_BACKFILL_DELAY_SECONDS
 
 BODY_KEY = "fda483_body_full"
@@ -65,6 +65,7 @@ class Report:
     pdf_no_observations: int = 0     # 받았지만 관찰사항이 파싱되지 않음 → 일일 규칙상 전문 아님
     pdf_failed: int = 0
     pdf_not_probed: int = 0          # dry-run 에서 PDF 를 받지 않은 수
+    shrunk: int = 0                  # 기존 전문보다 짧아 건너뛴 행
     applied: int = 0
     inspectors_added: int = 0        # 전문과 함께 실사관(fda483_inspectors)도 새로 채운 행
     unchanged: int = 0
@@ -222,6 +223,10 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
                 continue
             via = "pdf"
             rep.via_pdf += 1
+        if body_shrunk(raw.get(BODY_KEY), body):
+            rep.shrunk += 1
+            rep.note("shrunk", doc)
+            continue
         if not apply:
             continue
         record, _sha = new_record(row, body)

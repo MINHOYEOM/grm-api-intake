@@ -147,6 +147,39 @@ def _run(**over):
 
 class RecoveryRunTest(unittest.TestCase):
 
+    def test_only_shorter_full_body_is_skipped(self) -> None:
+        _, _, _, rid = _run()
+        for case, old_body, shrunk in (
+            ("shorter", _TEXT + "\nFinal paragraph.", True),
+            ("same normalized length", _TEXT.replace(" ", "   "), False),
+            ("longer", _TEXT[:100], False),
+            ("empty old body", "", False),
+        ):
+            with self.subTest(case=case):
+                row = _row(rid)
+                row["raw_json"] = {**json.loads(row["raw_json"]), "fda483_body_full": old_body}
+                report, code, upsert, _ = _run(rows=[row], dry_run=False)
+                self.assertEqual((code, report.shrunk, report.recovered), (0, int(shrunk), int(not shrunk)))
+                self.assertEqual(report.failure_reasons.get("shrunk", 0), int(shrunk))
+                if shrunk:
+                    upsert.assert_not_called()
+                else:
+                    upsert.assert_called_once()
+                    saved = rec._json_object(upsert.call_args.args[2]["raw_json"])
+                    self.assertEqual(saved["fda483_body_full"], _TEXT)
+
+    def test_cap_status_rebuild_cannot_drop_existing_full_body(self) -> None:
+        _, _, _, rid = _run()
+        row = _row(rid, status="not-attempted")
+        row["raw_json"] = {**json.loads(row["raw_json"]), "fda483_body_full": _TEXT}
+        report, code, upsert, _ = _run(
+            rows=[row], dry_run=False, mode=rec.MODE_COLLECTION_CAPPED,
+            fetch_text=lambda url: ("", "scan-no-text"),
+        )
+        self.assertEqual((code, report.shrunk, report.status_resolved), (0, 1, 0))
+        self.assertEqual(report.failure_reasons["shrunk"], 1)
+        upsert.assert_not_called()
+
     def test_dry_run_reports_recovery_without_writing(self) -> None:
         report, code, upsert, _rid = _run()
         self.assertEqual(code, 0)

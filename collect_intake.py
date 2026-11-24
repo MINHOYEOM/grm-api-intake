@@ -2453,10 +2453,8 @@ def collect_pics_rss(start: date, end: date) -> tuple[list[IntakeItem], str | No
     return collect_rss_feed(_PICS_FEED_SPEC, start, end)
 
 
-def _extract_eca_article_excerpt(
-    html_text: str, *, max_chars: int | None = ECA_ARTICLE_EXCERPT_MAX_CHARS,
-) -> str:
-    """gmp-compliance.org 기사 HTML → 본문 excerpt. max_chars=None 이면 자르지 않는다.
+def _extract_eca_article_excerpt(html_text: str) -> str:
+    """gmp-compliance.org 기사 HTML → 본문 excerpt(≤1200자).
 
     간단·보수적 추출: script/style/nav/header/footer 제거 후 `<p>` 태그 텍스트만 이어붙인다
     (구조 파싱 불요 — 사이트 마크업 변경에 강건). 앵커 탐색 없이 문서 처음부터 순서대로 결합.
@@ -2472,12 +2470,10 @@ def _extract_eca_article_excerpt(
         if t:
             parts.append(t)
     joined = " ".join(parts).strip()
-    return joined[:max_chars].strip()
+    return joined[:ECA_ARTICLE_EXCERPT_MAX_CHARS].strip()
 
 
-def _fetch_article_excerpt(
-    url: str, log_label: str, *, max_chars: int | None = ECA_ARTICLE_EXCERPT_MAX_CHARS,
-) -> str:
+def _fetch_article_excerpt(url: str, log_label: str) -> str:
     """전문지 기사 페이지 fetch → 본문 excerpt(_extract_eca_article_excerpt 재사용 — 내용
     무관 제네릭 <p> 결합 방식이라 ECA 외 소스에도 그대로 쓸 수 있다). 실패(403/timeout/
     네트워크)는 graceful("").
@@ -2499,7 +2495,7 @@ def _fetch_article_excerpt(
     except requests.RequestException as e:
         log("WARN", f"{log_label} 기사 본문 fetch 실패(카드 그대로): {truncate(str(e), 120)}")
         return ""
-    excerpt = _extract_eca_article_excerpt(resp.text, max_chars=max_chars)
+    excerpt = _extract_eca_article_excerpt(resp.text)
     if not excerpt:
         log("INFO", f"{log_label} 기사 본문 <p> 텍스트 미발견 — 카드 그대로: {truncate(url, 80)}")
     return excerpt

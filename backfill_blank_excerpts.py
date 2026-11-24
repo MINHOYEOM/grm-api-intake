@@ -9,11 +9,13 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from collections.abc import Callable, Iterable
 from contextlib import redirect_stdout
 from dataclasses import dataclass
+from html import unescape
 from typing import Any
 
 import collect_intake as intake
@@ -134,9 +136,39 @@ def _read_whopir(url: str) -> tuple[str, dict[str, Any] | None, str]:
     return who._fetch_whopir_detail(url)
 
 
+def _extract_full_article_excerpt(html_text: str) -> str:
+    """Apply the collector paragraph selection without a length cap."""
+    text = html_text or ""
+    text = re.sub(r"(?is)<(script|style|nav|header|footer)[^>]*>.*?</\1>", " ", text)
+    paras = re.findall(r"(?is)<p[^>]*>(.*?)</p>", text)
+    parts: list[str] = []
+    for p in paras:
+        t = re.sub(r"(?s)<[^>]+>", " ", p)
+        t = unescape(t)
+        t = re.sub(r"\s+", " ", t).strip()
+        if t:
+            parts.append(t)
+    return " ".join(parts)
+
+
 def _read_article(url: str, label: str) -> str:
     time.sleep(intake.ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
-    return intake._fetch_article_excerpt(url, label, max_chars=None)
+    try:
+        resp = intake.requests.get(url, timeout=intake.ECA_ARTICLE_EXCERPT_FETCH_TIMEOUT, headers={
+            "User-Agent": "GRM-Intake/1.1 (+github-actions)",
+            "Accept": "text/html",
+        })
+        if resp.status_code == 403:
+            intake.log("WARN", f"{label} 기사 본문 403 — excerpt 건너뜀(카드 그대로): {intake.truncate(url, 80)}")
+            return ""
+        resp.raise_for_status()
+    except intake.requests.RequestException as e:
+        intake.log("WARN", f"{label} 기사 본문 fetch 실패(카드 그대로): {intake.truncate(str(e), 120)}")
+        return ""
+    excerpt = _extract_full_article_excerpt(resp.text)
+    if not excerpt:
+        intake.log("INFO", f"{label} 기사 본문 <p> 텍스트 미발견 — 카드 그대로: {intake.truncate(url, 80)}")
+    return excerpt
 
 
 def _read_mhra(url: str) -> str:
@@ -145,6 +177,12 @@ def _read_mhra(url: str) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--apply", action="store_true", help="판독 결과를 DB에 저장")
     args = parser.parse_args(argv)

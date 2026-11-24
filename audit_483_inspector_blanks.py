@@ -7,6 +7,8 @@ SUPABASE_URL and a SELECT-only credential in SUPABASE_READ_ONLY_KEY.
 """
 from __future__ import annotations
 
+import sys
+
 import argparse
 from collections import Counter
 import json
@@ -60,6 +62,11 @@ def _fetch_rows(url: str, read_only_key: str) -> list[dict]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--rows-json", type=Path, help="Read a local JSON array of FDA 483 rows.")

@@ -23,7 +23,7 @@ fda.gov 보호(11-24): www.fda.gov 를 두드리는 대상(fda_host)은 한 틱�
   중이면 0개 — 나머지는 deferred(다음 틱). 수집은 dispatch_cap(12시간 1건, 사람 수동 포함)으로 하루 상한을 둔다.
 
 판정은 표준 라이브러리만 쓴다(러너에 의존성 설치 불필요). tests/test_schedule_catchup.py 가
-TARGETS 의 cron 과 실제 워크플로 cron 이 어긋나면 CI 를 빨갛게 만든다.
+분류표에서 빠진 예약과 TARGETS 의 cron 불일치를 막는다.
 """
 from __future__ import annotations
 
@@ -66,6 +66,65 @@ FDA_FETCH_MODULES = ("collect_fda_483", "collect_intake")
 ACTIVE_STATUSES = ("queued", "in_progress", "waiting", "pending", "requested")
 
 
+# 예약 전수 분류. 근거는 각 워크플로의 주석·실행 스크립트 머리말을 요약한다.
+# A: 데이터·발행 결손 → TARGETS. B: 후속 실행이 회수. C: 감시·알림. D: 외부 발송 → 보완 금지.
+CRON_AUDIT: dict[str, tuple[str, str]] = {
+    # A — 시점별 기록, 발행 마감, 또는 원문 회수 경로.
+    "grm-db-backup.yml": ("A", "암호화 주간 덤프. 다음 주 덤프로 빠진 주의 복구 지점을 만들 수 없다."),
+    "grm-delta-bridge.yml": ("A", "월요일 발행에 필요한 해당 슬롯의 Notion 델타를 main 에 이관한다."),
+    "grm-fda483-body-full-backfill.yml": ("A", "최근 45일 483 전문을 채워 월요일 handoff 전에 본문을 확보한다."),
+    "grm-fda483-ocr-recovery.yml": ("A", "일일 수집이 다시 받지 않는 483·WL 본문을 정해진 회수 창과 상한 안에서 채운다."),
+    "grm-intake.yml": ("A", "최근 7일을 수집하지만 월요일 발행은 해당 handoff 마감에 의존한다."),
+    "grm-mfds-gmp-cert-monthly.yml": ("A", "전체 현황 재수집과 별개로 mfds_gmp_cert_snapshot.py 가 관측일별 적재 건수를 기록한다."),
+    "grm-publish-watchdog.yml": ("A", "해당 월요일의 델타 누락·발행 정체를 감시하고 가능한 발행 단계를 복구한다."),
+    "grm-rum-analytics.yml": ("A", "RUM 은 8일 재수집하지만 collect_newsletter_subscribers.py 는 KST 당일 구독자 수만 기록한다."),
+    "grm-stranded-batch-pr.yml": ("A", "미머지 번역 배치로 생긴 적재 공백과 월요일 링크드인 초안 PR 정체를 해소한다."),
+    # B — 다음 실행에서 이전 작업분을 포함하거나 최신 상태로 다시 만든다.
+    "grm-deficiency-examples.yml": ("B", "날짜 증분 대신 SOURCES 원본을 다시 읽어 멱등 적재한다."),
+    "grm-fda-citations-snapshot.yml": ("B", "원장에서 공개 조항 JSON 전체를 재산출한다."),
+    "grm-fda-citations.yml": ("B", "활성 상태의 다음 월간 실행이 최근 7개 회계연도 전량을 다시 upsert 한다."),
+    "grm-fda-inspections-backfill.yml": ("B", "8·15·22일 복구 예약이 미갱신 월을 확인하며 매번 최근 7개 회계연도 전량을 갱신한다."),
+    "grm-feedback-retention.yml": ("B", "정리 시점에 완료 후 365일을 넘긴 전체 행을 대상으로 하므로 누락분도 다시 잡힌다."),
+    "grm-findings-backfill-fetch.yml": ("B", "자동 백필은 적재 상태에서 다음 구간을 계산하므로 실행이 빠져도 건너뛰지 않는다."),
+    "grm-findings-docs.yml": ("B", "findings_docs_refresh.py 가 문서 색인 정본을 현재 공개 데이터로 다시 만든다."),
+    "grm-findings-embed.yml": ("B", "매일 신규분만 계산하되 미임베딩 행은 다음 회차에 남는다. 회차 상한은 2,000행이다."),
+    "grm-findings-facets.yml": ("B", "모음 페이지의 건수·최근 사례를 현재 데이터에서 재측정한다."),
+    "grm-findings-review-promote.yml": ("B", "남아 있는 needs_review 행을 다음 회차에도 조회한다."),
+    "grm-findings-search-cache-sync.yml": ("B", "사전 파일 변경 push 와 금요일 백스톱이 같은 최신 검색어 목록을 동기화한다."),
+    "grm-glossary-cases.yml": ("B", "다음 번에 용어별 사례 건수를 현재 데이터에서 다시 측정한다."),
+    "grm-hc-inspection-backfill.yml": ("B", "주간 실행이 겹치는 최근 60일 창을 멱등 재수집한다."),
+    "grm-kg-link.yml": ("B", "일일 그래프 연결은 최근 7일을 다시 처리한다."),
+    "grm-library-staging.yml": ("B", "나머지 요일의 복구 예약이 격리 이슈와 자료실 신선도를 보고 다시 만든다."),
+    "grm-news-refresh.yml": ("B", "raw_signals 에서 소식 정본을 매일 다시 만들고 브리프 요약도 갱신한다."),
+    "grm-ops-alarm.yml": ("B", "이슈 이벤트와 시간당 재대조가 열린 경보·완료 상태를 운영 업무에 반영한다."),
+    "grm-schedule-catchup.yml": ("B", "후속 30분 예약과 workflow_run 이 아직 유효한 보완 슬롯을 재검사한다."),
+    "grm-supabase-keepalive.yml": ("B", "월·수·금 중 한 회를 놓쳐도 다음 ping 까지 최대 5일로 7일 휴면 기준 안이다."),
+    # C — 관측·상태 보고·경보.
+    "grm-brief-audit.yml": ("C", "발행된 웹 브리프의 출처 근거를 사후 검증한다."),
+    "grm-checklist-examples-verify.yml": ("C", "자가점검 사례가 해당 조항의 실제 지적인지 검증한다."),
+    "grm-db-size-health.yml": ("C", "별도 pg_cron 이 기록한 용량을 읽어 한도·기록 정지를 알린다."),
+    "grm-findings-backlog-monitor.yml": ("C", "미번역 격차와 검수 백로그가 임계를 넘으면 이슈로 알린다."),
+    "grm-findings-classification-audit.yml": ("C", "지적 분류 표류를 읽기 전용으로 점검한다."),
+    "grm-findings-review-queue.yml": ("C", "검수 대기 건수와 최장 대기 시간을 재고 이슈로 알린다."),
+    "grm-findings-search-cache-health.yml": ("C", "검색 캐시 적재는 별도 pg_cron 이 하고 이 잡은 신선도를 감시한다."),
+    "grm-findings-taxonomy-drift.yml": ("C", "현행 분류기와 저장된 분류 차이를 조회한다."),
+    "grm-gsc-index-sample.yml": ("C", "Google 색인 표본 점검 결과를 요약과 아티팩트로 남긴다."),
+    "grm-library-linkcheck.yml": ("C", "library_linkcheck.py 가 기존 자료실 URL의 상태를 점검해 상태 스냅샷을 쓴다."),
+    "grm-newsletter-freshness.yml": ("C", "해당 호 실발송 여부를 사후 확인하고 지연 이슈를 연다."),
+    "grm-ops-measure.yml": ("C", "ops_measure_github.py 가 운영 목표의 현재 측정값과 최근 성공 시각을 갱신한다."),
+    "grm-ops-status.yml": ("C", "클라우드가 읽도록 최근 Actions 실행 요약을 상태 브랜치에 복사한다."),
+    "grm-quiz-freshness.yml": ("C", "별도 데스크톱 작업의 주간 퀴즈 생성 여부를 감시한다."),
+    "grm-reconciliation.yml": ("C", "주간 소스별 수집량 급락과 근거 URL 오염을 감시한다."),
+    "grm-site-error-watch.yml": ("C", "Cloudflare 실요청의 전날 오류 급증과 최근 배포 실패를 감시한다."),
+    "grm-site-probe.yml": ("C", "공개 화면·브리프 신선도·RPC 지연을 합성 점검한다."),
+    "grm-source-verification.yml": ("C", "발행된 483·WL 카드를 원문과 사후 대조해 이슈로 알린다."),
+    # D — 받은편지함에 실제로 발송한다.
+    "grm-newsletter-send.yml": ("D", "발행된 브리프 뉴스레터를 Brevo 로 발송한다."),
+    "grm-ops-decision-mail.yml": ("D", "새 운영 결정의 결재 요청을 대표 메일함으로 발송한다."),
+    "grm-watchlist-notify.yml": ("D", "관심 업체에 새 지적이 있는 사용자에게 다이제스트를 발송한다."),
+}
+
+
 # 근거: 발행·데이터 경로에서 '예약이 안 돌면 조용히 빈다'고 확인된 것만. 외부 발송(grm-newsletter-send)은 자동 재기동하지 않는다.
 # 순서 = 같은 틱에 FDA 계열이 여럿 밀렸을 때의 우선순위(수집이 먼저).
 TARGETS: tuple[Target, ...] = (
@@ -89,6 +148,12 @@ TARGETS: tuple[Target, ...] = (
            "월요일 델타 이관(07-13·07-20 지각 실측) — 멱등, 이미 이관됐으면 skip"),
     Target("grm-publish-watchdog.yml", ("13 0,2,4 * * 1",), 60, 6 * 60, {},
            "월요일 발행 감시·자가 복구(07-20 3h28m 지각 실측)"),
+    Target("grm-db-backup.yml", ("37 20 * * 0",), 60, 6 * 60, {},
+           "주간 암호화 백업 — 그 주의 복구 지점 확보"),
+    Target("grm-mfds-gmp-cert-monthly.yml", ("40 18 1 * *",), 90, 12 * 60, {"mode": "apply"},
+           "식약처 GMP 적합판정서 월간 관측 — 예약과 같은 KST 날짜에 적재"),
+    Target("grm-rum-analytics.yml", ("30 4 * * *", "30 16 * * *"), 90, 6 * 60, {},
+           "성장 지표 수집 — 예약과 같은 KST 날짜의 구독자 수 확보"),
 )
 
 

@@ -1,4 +1,4 @@
-"""예약 지각 보완기(schedule_catchup.py) — 대상 목록·cron 정합 + 판정 단위 시험 (2026-11-24)."""
+"""예약 지각 보완기 — 예약 전수 분류·대상 정합·판정 시험."""
 from __future__ import annotations
 
 import os
@@ -35,6 +35,16 @@ def workflow_crons(name: str) -> tuple[str, ...]:
             elif re.match(r"^  \S", line) or re.match(r"^\S", line):
                 break
     return tuple(out)
+
+
+def has_workflow_schedule(name: str) -> bool:
+    """on 블록에서 schedule 키를 찾는다. cron 값의 표기 방식과 무관하다."""
+    for block in re.split(r"(?m)^(?=[^\s#])", _read(name)):
+        trigger = re.match(r"""^(?:on|'on'|"on")[ \t]*:""", block)
+        if trigger:
+            return bool(re.search(r"""(?m)(?:^[ \t]+|[{,][ \t]*)(?:schedule|'schedule'|"schedule")[ \t]*:""",
+                                  block[trigger.end():]))
+    return False
 
 
 def workflow_name(name: str) -> str:
@@ -74,6 +84,20 @@ BODY = next(t for t in sc.TARGETS if t.workflow == "grm-fda483-body-full-backfil
 
 
 class TargetsMatchWorkflows(unittest.TestCase):
+    def test_every_scheduled_workflow_is_classified(self):
+        scheduled = {name for name in os.listdir(WF_DIR)
+                     if name.endswith((".yml", ".yaml")) and has_workflow_schedule(name)}
+        self.assertSetEqual(scheduled, set(sc.CRON_AUDIT),
+                            "새 예약은 CRON_AUDIT 에 분류·근거를 적고, 사라진 예약은 표에서 빼라")
+        for name, (category, reason) in sc.CRON_AUDIT.items():
+            with self.subTest(name):
+                self.assertIn(category, {"A", "B", "C", "D"})
+                self.assertTrue(reason.strip())
+
+    def test_targets_match_data_gap_category(self):
+        data_gaps = {name for name, (category, _) in sc.CRON_AUDIT.items() if category == "A"}
+        self.assertSetEqual({t.workflow for t in sc.TARGETS}, data_gaps)
+
     def test_every_target_cron_equals_workflow_schedule(self):
         for t in sc.TARGETS:
             with self.subTest(t.workflow):
@@ -99,8 +123,9 @@ class TargetsMatchWorkflows(unittest.TestCase):
             self.assertGreater(t.max_late_min, t.grace_min)
 
     def test_outbound_send_is_never_a_target(self):
+        outbound = {"grm-newsletter-send.yml", "grm-ops-decision-mail.yml", "grm-watchlist-notify.yml"}
         names = {t.workflow for t in sc.TARGETS}
-        self.assertNotIn("grm-newsletter-send.yml", names)   # 외부 발송은 자동 재기동 금지
+        self.assertTrue(names.isdisjoint(outbound), names & outbound)
 
     def test_wakeup_paths_point_at_real_workflows(self):
         text = _read("grm-schedule-catchup.yml")

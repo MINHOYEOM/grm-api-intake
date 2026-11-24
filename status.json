@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-24T02:32:27Z",
+ "generated_at": "2026-11-24T04:05:59Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 45323080860,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-24T03:58:02Z",
+    "updatedAt": "2026-11-24T04:05:49Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45323080860"
+   },
    {
     "databaseId": 45301070728,
     "status": "completed",
@@ -100,17 +111,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44840744981"
-   },
-   {
-    "databaseId": 44765532296,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-20T15:39:53Z",
-    "updatedAt": "2026-11-20T15:50:22Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44765532296"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -229,12 +229,45 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45312664569,
+    "databaseId": 45323599568,
     "status": "in_progress",
     "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-24T04:02:33Z",
+    "updatedAt": "2026-11-24T04:02:37Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1893 from MINHOYEOM/feat/wl-violations-followup-1124",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45323599568"
+   },
+   {
+    "databaseId": 45316582256,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-24T03:01:42Z",
+    "updatedAt": "2026-11-24T03:09:50Z",
+    "headBranch": "feat/wl-violations-followup-1124",
+    "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45316582256"
+   },
+   {
+    "databaseId": 45313754083,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-24T02:37:30Z",
+    "updatedAt": "2026-11-24T02:44:48Z",
+    "headBranch": "feat/wl-violations-followup-1124",
+    "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45313754083"
+   },
+   {
+    "databaseId": 45312664569,
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-24T02:28:44Z",
-    "updatedAt": "2026-11-24T02:28:48Z",
+    "updatedAt": "2026-11-24T02:35:55Z",
     "headBranch": "feat/wl-violations-followup-1124",
     "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45312664569"
@@ -249,42 +282,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1885 from MINHOYEOM/claude/glossary-weekly-202648",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45312137797"
-   },
-   {
-    "databaseId": 45311020302,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T02:15:23Z",
-    "updatedAt": "2026-11-24T02:23:21Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1892 from MINHOYEOM/feat/admin-intake-status",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45311020302"
-   },
-   {
-    "databaseId": 45308638468,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-24T01:55:51Z",
-    "updatedAt": "2026-11-24T02:02:56Z",
-    "headBranch": "feat/wl-violations-followup-1124",
-    "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45308638468"
-   },
-   {
-    "databaseId": 45308624451,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T01:55:44Z",
-    "updatedAt": "2026-11-24T02:02:50Z",
-    "headBranch": "feat/wl-violations-followup-1124",
-    "displayTitle": "fix(wl): 본문 앞 결손 원인 수리 + 재수집 도구 가드 + 지원 형식 F5·F6 + heading 카드 전달",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45308624451"
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 45323986321,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-24T04:05:52Z",
+    "updatedAt": "2026-11-24T04:05:59Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45323986321"
+   },
    {
     "databaseId": 45302676277,
     "status": "completed",
@@ -328,17 +339,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45072179665"
-   },
-   {
-    "databaseId": 45071202149,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-22T21:16:48Z",
-    "updatedAt": "2026-11-22T21:16:49Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45071202149"
    }
   ],
   "grm-watchlist-notify.yml": [
@@ -732,6 +732,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 45323080860,
+   "created_at": "2026-11-24T03:58:02Z",
+   "has_web_brief": true
+  },
+  {
    "run_id": 45301070728,
    "created_at": "2026-11-24T00:55:33Z",
    "has_web_brief": true
@@ -755,12 +760,168 @@
    "run_id": 45039409414,
    "created_at": "2026-11-22T15:38:12Z",
    "has_web_brief": true
-  },
-  {
-   "run_id": 45002364788,
-   "created_at": "2026-11-22T08:20:39Z",
-   "has_web_brief": true
   }
  ],
- "intake_counts": []
+ "intake_counts": [
+  {
+   "schema": "grm-intake-counts/v1",
+   "run_id": 45323080860,
+   "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45323080860",
+   "created_at": "2026-11-24T03:58:02Z",
+   "conclusion": "success",
+   "run_date_kst": "2026-11-24",
+   "event": "schedule",
+   "dry_run": false,
+   "active": [
+    "eca",
+    "ema",
+    "fr",
+    "mhra",
+    "pics",
+    "recall",
+    "wl"
+   ],
+   "total": 433,
+   "sources": [
+    {
+     "key": "fr",
+     "label": "Federal Register",
+     "fetched": 11,
+     "error": false
+    },
+    {
+     "key": "recall",
+     "label": "OpenFDA Recall",
+     "fetched": 119,
+     "error": false
+    },
+    {
+     "key": "ema",
+     "label": "EMA RSS",
+     "fetched": 3,
+     "error": false
+    },
+    {
+     "key": "mhra",
+     "label": "MHRA RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mhra_alert",
+     "label": "MHRA Drug/Device Alerts",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "pics",
+     "label": "PIC/S RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eca",
+     "label": "ECA Academy RSS",
+     "fetched": 10,
+     "error": false
+    },
+    {
+     "key": "wl",
+     "label": "FDA Warning Letters",
+     "fetched": 4,
+     "error": false
+    },
+    {
+     "key": "mfds",
+     "label": "MFDS RSS",
+     "fetched": 2,
+     "error": false
+    },
+    {
+     "key": "mfds_law",
+     "label": "MFDS Law/Admrul",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_recall",
+     "label": "MFDS Recall",
+     "fetched": 41,
+     "error": false
+    },
+    {
+     "key": "mfds_admin",
+     "label": "MFDS Admin",
+     "fetched": 22,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_cert",
+     "label": "MFDS GMP Certificate",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_safety_letter",
+     "label": "MFDS Safety Letter",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_inspection",
+     "label": "MFDS GMP Inspection",
+     "fetched": 2,
+     "error": false
+    },
+    {
+     "key": "ich",
+     "label": "ICH",
+     "fetched": 31,
+     "error": false
+    },
+    {
+     "key": "who",
+     "label": "WHO",
+     "fetched": 172,
+     "error": false
+    },
+    {
+     "key": "hc",
+     "label": "Health Canada",
+     "fetched": 8,
+     "error": false
+    },
+    {
+     "key": "fda483",
+     "label": "FDA 483",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "ispe",
+     "label": "ISPE iSpeak RSS",
+     "fetched": 8,
+     "error": false
+    },
+    {
+     "key": "search",
+     "label": "Brave Search",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eu_gmp_ncr",
+     "label": "EU GMP NCR (EudraGMDP)",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mhra_gmp_ncr",
+     "label": "MHRA GMP NCR",
+     "fetched": 0,
+     "error": false
+    }
+   ]
+  }
+ ]
 }

@@ -92,6 +92,42 @@ def _string_escapes(segment):
                 yield from REGEX_ESCAPE.findall(token.string)
 
 
+def _assigned_pattern(pattern, parents):
+    """Resolve a name from a preceding simple assignment in the same block."""
+    statement = pattern
+    while not isinstance(statement, ast.stmt):
+        statement = parents[statement]
+        if isinstance(statement, (ast.Lambda, ast.ListComp, ast.SetComp,
+                                  ast.DictComp, ast.GeneratorExp)):
+            return None
+
+    for _, block in ast.iter_fields(parents[statement]):
+        if isinstance(block, list) and statement in block:
+            break
+    else:
+        return None
+
+    for previous in reversed(block[:block.index(statement)]):
+        if isinstance(previous, ast.Assign):
+            targets = previous.targets
+        elif isinstance(previous, ast.AnnAssign):
+            targets = [previous.target]
+        else:
+            targets = []
+        if any(isinstance(target, ast.Name) and target.id == pattern.id for target in targets):
+            return previous.value
+        if any(
+            isinstance(node, ast.Name) and node.id == pattern.id
+            and isinstance(node.ctx, (ast.Store, ast.Del))
+            or isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+            and node.name == pattern.id
+            or isinstance(node, ast.alias) and (node.asname or node.name.split(".")[0]) == pattern.id
+            for node in ast.walk(previous)
+        ):
+            return None
+    return None
+
+
 def _regex_findings(source, nodes, aliases):
     if "\x08" in source:
         for token in tokenize.generate_tokens(io.StringIO(source).readline):
@@ -101,6 +137,8 @@ def _regex_findings(source, nodes, aliases):
 
     # AST column offsets count UTF-8 bytes.
     lines = source.encode("utf-8").split(b"\n")
+    parents = {child: node for node in nodes for child in ast.iter_child_nodes(node)}
+    reported = set()
     for call in nodes:
         if not isinstance(call, ast.Call):
             continue
@@ -108,7 +146,11 @@ def _regex_findings(source, nodes, aliases):
         if module != "re" or function not in REGEX_FUNCTIONS:
             continue
         pattern = call.args[0] if call.args else _keyword(call, "pattern")
+        if isinstance(pattern, ast.Name):
+            pattern = _assigned_pattern(pattern, parents)
         for literal in _literal_parts(pattern):
+            if literal in reported:
+                continue
             if isinstance(literal, ast.Constant) and not isinstance(literal.value, (str, bytes)):
                 continue
             start, end = literal.lineno - 1, literal.end_lineno - 1
@@ -118,6 +160,7 @@ def _regex_findings(source, nodes, aliases):
             segment = b"\n".join(parts).decode("utf-8")
             escapes = sorted(set(_string_escapes(segment)))
             if escapes:
+                reported.add(literal)
                 yield literal.lineno, ", ".join(escapes), segment
 
 
@@ -219,6 +262,38 @@ def _inspect(source, path):
     nodes = list(ast.walk(tree))
     aliases = _imports(nodes)
     return list(_regex_findings(source, nodes, aliases)), _stdout_finding(tree, nodes, aliases)
+
+
+class RegexVariableLintTest(unittest.TestCase):
+    def test_assigned_pattern(self):
+        source = r'''import re
+PATTERN = "\bword\b"
+re.compile(PATTERN)
+re.search(pattern=PATTERN, string="word")
+'''
+        findings, _ = _inspect(source, "fixture.py")
+        self.assertEqual(findings, [(2, r"\b", r'"\bword\b"')])
+
+    def test_reassigned_pattern(self):
+        source = r'''import re
+pattern = "\bword\b"
+pattern = r"\bword\b"
+re.compile(pattern)
+'''
+        findings, _ = _inspect(source, "fixture.py")
+        self.assertEqual(findings, [])
+
+    def test_annotated_pattern_in_function(self):
+        source = r'''import re
+def other():
+    pattern: str = "\d+"
+    re.compile(pattern)
+
+def another(pattern):
+    re.compile(pattern)
+'''
+        findings, _ = _inspect(source, "fixture.py")
+        self.assertEqual(findings, [(3, r"\d", r'"\d+"')])
 
 
 class PythonStringLintTest(unittest.TestCase):

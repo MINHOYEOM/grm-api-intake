@@ -638,6 +638,13 @@ def _evaluate_health(
             warning[:240],
         )
 
+    if stats.mfds_admin_total_count_warning:
+        health.add_warning(
+            "mfds-admin-total-count",
+            "MFDS Admin",
+            stats.mfds_admin_total_count_warning,
+        )
+
     # WHY-1 P1: excerpt 실패/cap 표면화. 카드 자체는 graceful degrade(링크/메타 카드
     # 유지)이므로 warning-only — failure 승격 금지(§3.5, exit 0 유지). flag off 면
     # 카운터가 전부 0 이라 finding 미발생(무변경).

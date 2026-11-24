@@ -12,10 +12,13 @@
 import os
 import sys
 import unittest
+from datetime import date
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import collect_intake as ci
+import collect_mfds_admin_action as mfds_admin
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -180,6 +183,40 @@ def _codes(findings):
 
 
 class EvaluateHealthFailureBranchTest(unittest.TestCase):
+    def test_mfds_admin_warns_only_above_source_total_count_threshold(self) -> None:
+        day = date(2026, 11, 22)
+        for total_count, should_warn in ((1501, True), (1500, False)):
+            with self.subTest(total_count=total_count):
+                response = {
+                    "header": {"resultCode": "00"},
+                    "body": {
+                        "totalCount": total_count,
+                        "numOfRows": total_count,
+                        "items": {"item": {"LAST_SETTLE_DATE": "2026-11-21"}},
+                    },
+                }
+                with (
+                    patch.object(mfds_admin, "http_get_json", return_value=response),
+                    patch.object(mfds_admin, "log") as log,
+                    patch.object(mfds_admin, "LAST_HEALTH", {}),
+                ):
+                    items, error = mfds_admin.collect_mfds_admin_actions(day, day, "dummy")
+                    warning = mfds_admin.LAST_HEALTH["total_count_warning"]
+                self.assertEqual(items, [])
+                self.assertIsNone(error)
+                stats = ci.CollectionStats(mfds_admin_total_count_warning=warning)
+                health = ci._evaluate_health(**_health_kwargs(stats=stats))
+                self.assertEqual(health.exit_code, 0)
+                if should_warn:
+                    self.assertIn("[GRM 문제]", warning)
+                    self.assertIn("1,501", warning)
+                    log.assert_any_call("WARN", warning)
+                    self.assertIn("mfds-admin-total-count", _codes(health.warnings))
+                else:
+                    self.assertEqual(warning, "")
+                    self.assertTrue(all(call.args[0] != "WARN" for call in log.call_args_list))
+                    self.assertNotIn("mfds-admin-total-count", _codes(health.warnings))
+
     def test_clean_run_is_ok_exit0(self) -> None:
         health = ci._evaluate_health(**_health_kwargs())
         self.assertEqual(health.status, "ok")

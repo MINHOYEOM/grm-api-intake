@@ -1,0 +1,69 @@
+name: GRM Schedule Catch-up (예약 지각 보완)
+
+# [2026-11-24] GitHub 예약(schedule) 지각·누락 보완기 — schedule_catchup.py.
+# 중요한 예약 워크플로(schedule_catchup.TARGETS)가 '예정 시각 + 허용 지각' 안에 안 돌았으면 예약과 같은 인자로
+# workflow_dispatch 한다. 11-22 부터 483 전문 소급이 7시간 지각·하루 누락, 11-23 링크드인 슬롯 PR 3시간 미머지.
+#
+# ## 깨우는 경로 — 이 보완기 자신도 예약 하나에만 기대지 않는다
+#  ① 자기 cron 30분마다(:19·:49, 정각 혼잡대 회피)
+#  ② workflow_run(완료): GRM CI — push·PR 이벤트로 돌아 예약 큐와 무관하다. 그리고 30분·1시간 주기
+#     운영 워크플로 3개(서로 다른 분에 걸린 예약 — 하나가 밀려도 다른 것이 깨운다).
+#  클라우드 Routine 은 /actions 403(외부 dispatch 불가), PC 예약작업은 11-14 로 백업이 끝나 쓰지 않는다. 비용 0(공개 저장소 Actions).
+#
+# ## 안전 장치
+#  - 멱등: 슬롯 이후 실행(schedule·dispatch, 진행 중 포함)이 있으면 아무것도 안 한다. concurrency 로 보완기끼리 직렬.
+#  - 보완 기한(max_late)이 지난 슬롯은 건드리지 않는다. 외부 발송·수집(grm-newsletter-send·grm-intake)은 대상 아님.
+#  - 경보: automation-failure 이슈 하나에 슬롯별 댓글 1회(dispatch 실패·보완 실행 실패·비활성 워크플로).
+#  - PR 코드는 실행하지 않는다 — workflow_run 이어도 main 의 schedule_catchup.py 만 체크아웃한다.
+on:
+  schedule:
+    - cron: '19,49 * * * *'
+  workflow_run:
+    workflows:
+      - "GRM CI (compile + tests)"
+      - "GRM Ops Status (Actions 요약 → 브랜치 사본)"
+      - "GRM Ops Decision Mail"
+      - "GRM Ops Alarm Owner"
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '판정만 출력(dispatch·경보 없음)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  actions: write   # 대상 워크플로 workflow_dispatch
+  issues: write    # 경보 이슈
+
+concurrency:
+  group: grm-schedule-catchup
+  cancel-in-progress: false
+
+jobs:
+  catchup:
+    name: 예약 지각 판정·보완
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: |
+            schedule_catchup.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - name: 판정·보완
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CATCHUP_REF: ${{ github.event.repository.default_branch }}
+          IN_DRY: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          set -uo pipefail
+          args=()
+          if [ "${IN_DRY}" = "true" ]; then args+=(--dry-run); fi
+          python schedule_catchup.py "${args[@]}"

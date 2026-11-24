@@ -8444,8 +8444,9 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn("<h2>Inspection findings from the FDA, Europe and Korea, every week</h2>", en_glossary)
         self.assertIn("<h2>Get the week's FDA, EU and MFDS inspection findings</h2>", en_findings)
         # 홈 첫 화면 줄형 칸은 두 언어 모두, 지적사항 목록 첫 화면 칸은 영문만(render.py sub_inline_lists).
-        self.assertIn('class="grm-inl"', en_home)
-        self.assertIn('class="grm-inl"', ko_home)
+        # [홈 구독 밴드 2026-11-24] 홈 첫 화면 칸은 색 면 밴드(grm-inl--band)가 됐다 — 같은 칸·같은 폼.
+        self.assertIn('class="grm-inl grm-inl--band"', en_home)
+        self.assertIn('class="grm-inl grm-inl--band"', ko_home)
         self.assertIn('class="grm-inl"', en_findings)
         ko_findings = (out / "findings/index.html").read_text(encoding="utf-8")
         self.assertNotIn('class="grm-inl"', ko_findings)
@@ -8454,6 +8455,60 @@ class WebRenderHardeningTest(unittest.TestCase):
         # 실물 링크 — 영문 메일의 주인공(지적 기록) 면으로.
         self.assertIn("See recent findings first", en_home)
         self.assertNotIn("최근 지적 기록 먼저 보기", ko_home)
+
+    def test_home_subscribe_band_on_ko_and_en_home(self):
+        """[홈 구독 밴드 2026-11-24 · 대표 "어디서 구독해야 할지 모르겠다"] 국·영 홈 첫 화면(검색 바로 아래)에
+        색 면 구독 밴드가 있어야 한다. 밴드는 줄형 칸과 같은 폼·같은 자리 키(top)라 funnel 160 inline_top_* ×
+        084 경로('/'·'/en/')로 홈 밴드 제출만 따로 센다 — 그래서 자리 키·SIGNUP_PATH 칸·각 언어 폼도 함께 본다.
+        영문 홈 밴드에는 한글이 0 이어야 한다."""
+        import re as _re
+        a0, e0 = render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN
+        ko_action = "https://ko.example.com/subscribe"
+        en_action = "https://en.example.com/subscribe"
+        s0 = render.SIGNUP_PATH_FIELDS
+        try:
+            # 라이브와 같이 084 경로 칸을 켠다(GRM_SIGNUP_PATH_FIELDS=1 — 라이브 홈에 SIGNUP_PATH 칸이 있다).
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = ko_action, en_action
+            render.SIGNUP_PATH_FIELDS = True
+            out = self._render_site([_minimal_brief("2026-06-11")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = a0, e0
+            render.SIGNUP_PATH_FIELDS = s0
+        for lang, rel, action in (("ko", "index.html", ko_action), ("en", "en/index.html", en_action)):
+            html = (out / rel).read_text(encoding="utf-8")
+            self.assertEqual(html.count('data-sub-zone="home-band"'), 1, f"{lang} 홈: 구독 밴드가 없다(또는 둘)")
+            start = html.index('<aside class="grm-inl grm-inl--band"')
+            band = html[start:html.index("</aside>", start)]
+            self.assertIn('data-sub-slot="top"', band, f"{lang}: 자리 키 top 이 아니면 funnel 이 홈 밴드를 못 센다")
+            self.assertIn(f'class="grm-inl-form" action="{action}"', band, f"{lang}: 자기 언어 리스트 폼이 아니다")
+            self.assertIn('name="SIGNUP_PATH"', band, f"{lang}: 084 경로 칸이 없다")
+            self.assertIn('class="sub-hp"', band)
+            self.assertEqual(band.count("<li>"), 3, f"{lang}: 사실 세 칸")
+            # 첫 화면: 소개·검색이 있는 첫 구획 안, '제공 정보' 구획보다 앞.
+            top_sec = html[html.index('<section class="wrap home-top">'):]
+            self.assertLess(top_sec.index('grm-inl--band'), top_sec.index("</section>"), f"{lang}: 밴드가 첫 구획 밖이다")
+            # 한글 안전(§4)·검은 띠 금지.
+            self.assertNotIn("letter-spacing", band)
+            self.assertNotIn("text-transform", band)
+            if lang == "en":
+                self.assertIsNone(_re.search(r"[가-힣]", band), "영문 홈 밴드에 한글이 있다")
+                self.assertIn("FDA, EU and MFDS inspection findings, every week by email", band)
+        css = (out / "index.html").read_text(encoding="utf-8")
+        rule = _re.search(r"\.grm-inl--band\{([^}]*)\}", css).group(1)
+        self.assertIn("background:#FBEEE7", rule, "밴드는 밝은 색 면이다(검은 띠 금지)")
+        # 구독한 브라우저에서도 밴드는 숨기지 않는다 — 숨김 루프가 --band 를 건너뛴다.
+        self.assertIn("if(!rows[i].classList.contains('grm-inl--band'))rows[i].hidden=true", css)
+
+    def test_home_subscribe_band_absent_when_newsletter_off(self):
+        """env-off(로컬·CI) 빌드는 밴드 출력 0 — 골든 byte-diff 0 계약."""
+        a0, e0 = render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN
+        try:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = "", ""
+            out = self._render_site([_minimal_brief("2026-06-12")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = a0, e0
+        for rel in ("index.html", "en/index.html"):
+            self.assertNotIn("home-band", (out / rel).read_text(encoding="utf-8"))
 
     def test_subscriber_chooses_mail_language_when_both_lists_exist(self):
         """[구독 언어 선택 2026-10-18] 두 리스트 폼이 모두 있으면 밴드·배너 양쪽에 '받을 메일

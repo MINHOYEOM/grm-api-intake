@@ -19,6 +19,8 @@
 경보(automation-failure 이슈 하나에 슬롯별 댓글 1회):
   - dispatch API 실패 · 보완 dispatch(github-actions[bot])로 돈 실행이 실패로 끝남 · 비활성 워크플로.
   예약 실행 자체의 실패는 각 워크플로의 기존 경보 몫이라 여기서 중복으로 울리지 않는다.
+fda.gov 보호(11-24): www.fda.gov 를 두드리는 대상(fda_host)은 한 틱에 1개만 dispatch 하고, FDA 계열 실행이 큐·진행
+  중이면 0개 — 나머지는 deferred(다음 틱). 수집은 dispatch_cap(12시간 1건, 사람 수동 포함)으로 하루 상한을 둔다.
 
 판정은 표준 라이브러리만 쓴다(러너에 의존성 설치 불필요). tests/test_schedule_catchup.py 가
 TARGETS 의 cron 과 실제 워크플로 cron 이 어긋나면 CI 를 빨갛게 만든다.
@@ -52,21 +54,38 @@ class Target:
     max_late_min: int             # 슬롯이 이보다 오래되면 보완하지 않는다(다음 슬롯 몫)
     inputs: dict[str, str] = field(default_factory=dict)   # 예약 실행과 같은 일을 하게 하는 dispatch 입력
     why: str = ""
+    fda_host: bool = False        # www.fda.gov 를 두드린다 — 한 틱에 FDA 계열은 1개만 깨운다(시험이 워크플로에서 다시 판정)
+    dispatch_cap: int = 0         # >0 이면 cap_window_min 안 dispatch 실행(사람 수동 + 보완기 합산)이 이만큼 있으면 더 깨우지 않는다
+    cap_window_min: int = 0
 
 
-# 근거: 발행·데이터 경로에서 '예약이 안 돌면 조용히 빈다'고 확인된 것만. 수집(grm-intake)은 dispatch 의미가
-# 예약과 달라(일요일 슬롯별 역할) 넣지 않는다. 외부 발송(grm-newsletter-send)은 자동 재기동하지 않는다.
+# www.fda.gov 에 직접 요청을 보내는 모듈. 워크플로가 실행하는 진입 스크립트가 이 중 하나이거나 이것을 직접 import 하면
+# FDA 계열이다(tests/test_schedule_catchup.py 가 TARGETS 의 fda_host 와 대조). 11-22 Akamai 차단은 같은 날 수동 run 이
+# 몰린 직후였다(데이터품질팀 조사 11-24) — 보완기가 지각 슬롯을 모아 동시에 두드리지 않게 한다.
+FDA_FETCH_MODULES = ("collect_fda_483", "collect_intake")
+ACTIVE_STATUSES = ("queued", "in_progress", "waiting", "pending", "requested")
+
+
+# 근거: 발행·데이터 경로에서 '예약이 안 돌면 조용히 빈다'고 확인된 것만. 외부 발송(grm-newsletter-send)은 자동 재기동하지 않는다.
+# 순서 = 같은 틱에 FDA 계열이 여럿 밀렸을 때의 우선순위(수집이 먼저).
 TARGETS: tuple[Target, ...] = (
+    # [11-24] 11-23 18:17Z 슬롯부터 실행 기록 없음 → 비서실 수동 dispatch. 입력 없는 dispatch = 기본값(window 7·전 소스·
+    # 플래그 inherit=저장소 변수)이라 예약과 같은 수집이다. 여러 번 돌아도 handoff 는 07:00 KST 뒤 동결(grm_handoff).
+    # 허용 지각 4시간 — 예약이 평소 3~6.5시간 늦게 와서(11-16 주석 실측) 짧게 잡으면 매일 두 번 돈다. 22:17Z = 07:17 KST 는
+    # 편집팀이 handoff 를 읽기(07:20) 직전이다. 일요일 슬롯 3개(월 00~01 KST)는 19:07Z 쯤 보완된다.
+    # 하루 상한 — 12시간 안에 dispatch 실행(사람 수동 포함)이 1건이라도 있으면 보완하지 않는다(fda.gov 요청 누적 방지).
+    Target("grm-intake.yml", ("17 18 * * *", "7 15 * * 0", "43 15 * * 0", "19 16 * * 0"), 240, 18 * 60, {},
+           "일일 수집 — 11-23 슬롯 누락, 월요일 handoff 의 원천", fda_host=True, dispatch_cap=1, cap_window_min=12 * 60),
     Target("grm-fda483-body-full-backfill.yml", ("7 13 * * *",), 90, 20 * 60,
            {"apply": "true", "since": SINCE_45D, "ocr_page_budget": "1500"},
-           "483 전문 소급 — 월요일 handoff 전 안전망(11-22·23 지각/누락)"),
+           "483 전문 소급 — 월요일 handoff 전 안전망(11-22·23 지각/누락)", fda_host=True),
     Target("grm-fda483-ocr-recovery.yml", ("37 23 * * *",), 90, 20 * 60,
            {"apply": "true", "mode": "recoverable", "target": "all", "ocr_page_budget": "600"},
-           "483·WL 본문 회수 — 빠지면 그날 상한 밖 문서가 본문 없이 남는다"),
+           "483·WL 본문 회수 — 빠지면 그날 상한 밖 문서가 본문 없이 남는다", fda_host=True),
     Target("grm-stranded-batch-pr.yml", ("41 */6 * * *", "41 6,8,10 * * 1"), 60, 5 * 60,
            {"dry_run": "false"},
            "방치된 배치·링크드인 슬롯 PR 머지(11-23 #1879 3시간 미머지)"),
-    Target("grm-delta-bridge.yml", ("7,37 22-23 * * 0", "7,37 0-4 * * 1"), 45, 4 * 60, {},
+    Target("grm-delta-bridge.yml", ("7,37 22-23 * * 0", "7,37 0-5 * * 1"), 45, 4 * 60, {},
            "월요일 델타 이관(07-13·07-20 지각 실측) — 멱등, 이미 이관됐으면 skip"),
     Target("grm-publish-watchdog.yml", ("13 0,2,4 * * 1",), 60, 6 * 60, {},
            "월요일 발행 감시·자가 복구(07-20 3h28m 지각 실측)"),
@@ -145,7 +164,7 @@ def latest_slot(crons: Iterable[str], before: datetime, lookback_min: int) -> da
 @dataclass
 class Decision:
     workflow: str
-    action: str                   # ok | dispatch | not-due | disabled | alarm-failed
+    action: str                   # ok | dispatch | not-due | disabled | capped | deferred | alarm-failed
     slot: datetime | None = None
     reason: str = ""
     inputs: dict[str, str] = field(default_factory=dict)
@@ -185,6 +204,13 @@ def decide(target: Target, now: datetime, runs: list[dict[str, Any]], state: str
                         run_url=str(latest.get("html_url") or ""))
     if state != "active":
         return Decision(target.workflow, "disabled", slot, f"워크플로 상태 {state} — 보완하지 않음")
+    if target.dispatch_cap > 0:
+        window_start = now - timedelta(minutes=target.cap_window_min)
+        recent = [r for r in runs if r.get("event") == "workflow_dispatch" and r.get("created_at")
+                  and _ts(r["created_at"]) >= window_start]
+        if len(recent) >= target.dispatch_cap:
+            return Decision(target.workflow, "capped", slot,
+                            f"최근 {target.cap_window_min // 60}시간 dispatch {len(recent)}건 ≥ 상한 {target.dispatch_cap} — 보완하지 않음")
     late = int((now - slot).total_seconds() // 60)
     return Decision(target.workflow, "dispatch", slot, f"슬롯 {slot:%m-%d %H:%MZ} 후 {late}분 실행 없음",
                     inputs=resolve_inputs(target.inputs, slot))
@@ -239,13 +265,40 @@ class GitHub:
 def run_all(gh: Any, now: datetime, *, ref: str, dry_run: bool,
             targets: Iterable[Target] = TARGETS, sleeper: Callable[[float], None] = time.sleep,
             log: Callable[[str], None] = print) -> list[Decision]:
-    out: list[Decision] = []
+    targets = list(targets)
+    planned: list[tuple[Target, Decision]] = []
+    fda_busy: list[str] = []          # 지금 큐·진행 중인 FDA 계열 실행
     for t in targets:
-        since = now - timedelta(minutes=t.grace_min + t.max_late_min + 60)
+        since = now - timedelta(minutes=max(t.grace_min + t.max_late_min + 60, t.cap_window_min))
         try:
-            d = decide(t, now, gh.runs_since(t.workflow, since), gh.workflow_state(t.workflow))
+            runs = gh.runs_since(t.workflow, since)
+            d = decide(t, now, runs, gh.workflow_state(t.workflow))
+            if t.fda_host and any(r.get("status") in ACTIVE_STATUSES for r in runs):
+                fda_busy.append(t.workflow)
         except Exception as exc:  # noqa: BLE001 — 한 대상 실패가 나머지를 막지 않게
             d = Decision(t.workflow, "error", reason=f"조회 실패 {type(exc).__name__}: {exc}")
+        planned.append((t, d))
+    return _act(gh, planned, fda_busy, now, ref=ref, dry_run=dry_run, sleeper=sleeper, log=log)
+
+
+def gate_fda(planned: list[tuple[Target, Decision]], fda_busy: list[str]) -> None:
+    """한 틱에 FDA 계열 dispatch 는 1개. 이미 FDA 계열이 큐·진행 중이면 0개. 밀린 것은 다음 틱(deferred)."""
+    started = bool(fda_busy)
+    for t, d in planned:
+        if not (t.fda_host and d.action == "dispatch"):
+            continue
+        if started:
+            d.action = "deferred"
+            d.reason += " → FDA 계열 " + (f"진행 중({', '.join(fda_busy)})" if fda_busy else "이번 틱 1건 기동") + " — 다음 틱"
+        else:
+            started = True
+
+
+def _act(gh: Any, planned: list[tuple[Target, Decision]], fda_busy: list[str], now: datetime, *, ref: str,
+         dry_run: bool, sleeper: Callable[[float], None], log: Callable[[str], None]) -> list[Decision]:
+    gate_fda(planned, fda_busy)
+    out: list[Decision] = []
+    for t, d in planned:
         marker = f"<!-- catchup:{t.workflow}:{d.slot:%Y-%m-%dT%H:%MZ} -->" if d.slot else ""
         if d.action == "dispatch" and not dry_run:
             try:

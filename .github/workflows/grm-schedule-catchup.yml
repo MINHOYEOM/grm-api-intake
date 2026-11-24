@@ -12,7 +12,10 @@ name: GRM Schedule Catch-up (예약 지각 보완)
 #
 # ## 안전 장치
 #  - 멱등: 슬롯 이후 실행(schedule·dispatch, 진행 중 포함)이 있으면 아무것도 안 한다. concurrency 로 보완기끼리 직렬.
-#  - 보완 기한(max_late)이 지난 슬롯은 건드리지 않는다. 외부 발송·수집(grm-newsletter-send·grm-intake)은 대상 아님.
+#  - 보완 기한(max_late)이 지난 슬롯은 건드리지 않는다. 외부 발송(grm-newsletter-send)은 대상 아님.
+#  - 수집(grm-intake)은 12시간 안 dispatch(사람 수동 포함) 1건이면 보완하지 않는다(11-24 추가).
+#  - www.fda.gov 계열(수집·483 전문 소급·483/WL 본문 회수)은 한 틱에 1개만, FDA 계열이 큐·진행 중이면 0개 —
+#    나머지는 다음 틱(11-22 Akamai 차단이 같은 날 수동 run 이 몰린 직후였다).
 #  - 경보: automation-failure 이슈 하나에 슬롯별 댓글 1회(dispatch 실패·보완 실행 실패·비활성 워크플로).
 #  - PR 코드는 실행하지 않는다 — workflow_run 이어도 main 의 schedule_catchup.py 만 체크아웃한다.
 on:

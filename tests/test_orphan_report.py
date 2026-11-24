@@ -81,6 +81,31 @@ jobs:
             ".github/workflows/self.yml", ".github/workflows/unused.yaml",
         ]))
 
+    def test_inline_jobs_recognize_only_job_level_workflow_calls(self):
+        for name in ("inline", "multiline", "mixed", "next-line", "nested", "commented"):
+            self.workflow(f"{name}.yml", "on: workflow_call\n")
+        self.workflow("inline-caller.yml", """
+on: push
+jobs: {first: {uses: ./.github/workflows/inline.yml},
+       second: { # uses: ./.github/workflows/commented.yml
+         'uses': "./.github/workflows/multiline.yml"},
+       normal: {steps: [{uses: ./.github/workflows/nested.yml}]}}
+""")
+        self.workflow("mixed-caller.yml", """
+on: push
+jobs:
+  reuse: {
+    uses: ./.github/workflows/mixed.yml}
+""")
+        self.workflow("next-line-caller.yml", """
+on: push
+jobs:
+  {reuse: {uses: ./.github/workflows/next-line.yml}}
+""")
+        self.assertEqual(orphan_report.find_orphans(self.root), ([], [
+            ".github/workflows/commented.yml", ".github/workflows/nested.yml",
+        ]))
+
     def test_cli_prints_markdown_and_leaves_tree_unchanged(self):
         self.write("idle.py")
         self.workflow("idle.yaml", "on: workflow_call\n")

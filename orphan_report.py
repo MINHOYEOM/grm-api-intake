@@ -60,7 +60,10 @@ def _repository_files(root):
 WORKFLOW_KEY = re.compile(r"""^(on|'on'|"on"|name|jobs):[ \t]*(.*)$""")
 EVENT_ENTRY = re.compile(r"""^(?:-\s+)?['"]?([\w-]+)['"]?(?=\s*(?::|$))""")
 FLOW_TOKEN = re.compile(r"""'[^']*'|"[^"]*"|[\[\]{},:]|[^\s\[\]{},:'"]+""")
-LOCAL_WORKFLOW = re.compile(r"""^uses:\s*['"]?\./\.github/workflows/([^\s'"]+)""")
+FLOW_JOB_TOKEN = re.compile(r"(?<!\S)#[^\n]*|" + FLOW_TOKEN.pattern)
+LOCAL_WORKFLOW_PATH = r"""\./\.github/workflows/([^\s'"]+)"""
+LOCAL_WORKFLOW = re.compile(r"""^(?:uses|'uses'|"uses"):\s*['"]?""" + LOCAL_WORKFLOW_PATH)
+FLOW_JOB = re.compile(r"""^(?:'[^']+'|"[^"]+"|[\w-]+):\s*(\{.*)$""")
 STEP_COMMAND = re.compile(r"^(?:-\s+)?(?:run|script):\s*(.*)$")
 
 
@@ -111,15 +114,53 @@ def _workflow_events(lines):
             if (match := EVENT_ENTRY.match(line.lstrip()))}
 
 
+def _flow_workflow_calls(source, field_depth):
+    tokens = [token for token in FLOW_JOB_TOKEN.findall(source) if not token.startswith("#")]
+    depth = 0
+    for index, token in enumerate(tokens):
+        if token in {"{", "["}:
+            depth += 1
+        elif token in {"}", "]"}:
+            depth -= 1
+            if depth == 0:
+                break
+        elif (
+            depth == field_depth
+            and token.strip("'\"") == "uses"
+            and tokens[index - 1] in {"{", ","}
+        ):
+            field = tokens[index + 1:index + 4]
+            if len(field) == 3 and field[0] == ":" and field[2] in {",", "}"}:
+                if target := re.fullmatch(LOCAL_WORKFLOW_PATH, field[1].strip("'\"")):
+                    yield target[1]
+
+
 def _workflow_calls(lines):
+    if not lines:
+        return
     body = lines[1:]
+    header = lines[0]
+    if header.startswith("{"):
+        yield from _flow_workflow_calls("\n".join(lines), field_depth=2)
+        return
+    if not header.split("#", 1)[0].strip() and body and body[0].lstrip().startswith("{"):
+        yield from _flow_workflow_calls("\n".join(body), field_depth=2)
+        return
+
     job_indent = min((len(line) - len(line.lstrip()) for line in body), default=0)
     job_field_indent = None
+    flow_job = []
     command = []
     command_indent = 0
     for line in [*body, ""]:
         content = line.lstrip()
         indent = len(line) - len(content)
+        if flow_job:
+            if content and (indent > job_indent or content.startswith("}")):
+                flow_job.append(content)
+            else:
+                yield from _flow_workflow_calls("\n".join(flow_job), field_depth=1)
+                flow_job.clear()
         if command and indent > command_indent:
             command.append(content)
             continue
@@ -129,10 +170,12 @@ def _workflow_calls(lines):
             command.clear()
         if indent == job_indent:
             job_field_indent = None
+            if job := FLOW_JOB.match(content):
+                flow_job.append(job[1])
         elif indent > job_indent:
             if job_field_indent is None:
                 job_field_indent = indent
-            if indent == job_field_indent and (target := LOCAL_WORKFLOW.match(content)):
+            if not flow_job and indent == job_field_indent and (target := LOCAL_WORKFLOW.match(content)):
                 yield target[1]
             if indent > job_field_indent and (step := STEP_COMMAND.match(content)):
                 command = [step[1]]

@@ -15,10 +15,10 @@
 | handoff 날짜 `D` | 이번 주 월요일 | **회차표의 재료 날짜**(아래 실행표). 브랜치 `claude/queue-handoff` 에 8일간 남아 있는 파일이다 |
 | 브랜치 | `claude/company-{D}` | **`claude/company-rehearsal-{회차}`** (회차 = 실행표의 네 자리 숫자) |
 | 폴더 | `company/run/{D}/` | **`company/run/rehearsal-{회차}/`** |
-| Notion handoff 가 OPEN 인지 확인(RUN.md 2항) | 한다 | **하지 않는다**(재료 날짜의 handoff 는 이미 닫혔거나 월요일분이 아니다) |
+| 이 호가 이미 main 에 있는지 확인(RUN.md 2항) | 한다 | **하지 않는다**(재료 날짜의 호는 이미 발행됐거나 월요일분이 아니다) |
 | 시각·대기(07:20, 09:20 까지 재확인 등) | 지킨다 | 무시한다. 앞 직무가 끝나면 바로 다음 직무 |
 | 검색 보강(v16 [1단계]) | WebSearch 9·WebFetch 5 | 그대로(한도 같음) |
-| 교열 마감 4번 | 반납 push → Notion CONSUMED | **1번(실행 폴더 push)까지만.** `copyedit.json` 은 `status: 완료`, `published: false`, `"rehearsal": true` |
+| 교열 마감 4번 | 반납 push → 브릿지 요청 | **1번(실행 폴더 push)까지만.** `copyedit.json` 은 `status: 완료`, `published: false`, `"rehearsal": true` |
 
 ## 브랜치는 방금 받은 main 에서 만든다
 리허설 브랜치도 `next/RUN.md` 3항의 순서 그대로 올라탄다(`B` = `claude/company-rehearsal-{회차}`): 원격에 있으면 그 위에, 없으면 `git fetch origin main` 한 `FETCH_HEAD` 에서.

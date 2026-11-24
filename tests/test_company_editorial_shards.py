@@ -329,7 +329,9 @@ class WorkerLoopInstructionTest(unittest.TestCase):
             self.assertIn(req, ce, folder)
             self.assertIn("claude/request-{run_date_kst}-delta-bridge", ce, folder)
             self.assertIn("리허설은 이 단계를 하지 않는다(`REHEARSAL.md` 금지)", ce, folder)
-            self.assertLess(ce.index("2. push 가 끝나면 **곧바로**"), ce.index("3. **브릿지 요청"))
+            # [노션 은퇴] 마감 2번은 Notion CONSUMED 가 아니라 '노션 마감 없음' — 브릿지 요청은 그 뒤 3번.
+            self.assertLess(ce.index("2. **Notion 마감은 없다.**"), ce.index("3. **브릿지 요청"))
+            self.assertNotIn("2. push 가 끝나면 **곧바로**", ce, folder)
             self.assertIn(line, self._read(*folder, "reporter.md"), folder)
         reh = self._read("REHEARSAL.md")
         self.assertIn("워크플로 실행 요청(`claude/request-*` 마커)", reh)          # 리허설 금지가 덮는다

@@ -77,6 +77,9 @@ jobs:
       # [노션 은퇴 준비] 심층분석 원문 정본을 어디서 읽나 — notion(기본) | git(DB handoff 의 브랜치 사본, 못 읽으면 노션).
       #   델타에 handoff_ref 가 있는 호(편집팀이 git handoff 로 만든 호)는 이 값과 무관하게 git 사본을 읽는다.
       GRM_HANDOFF_BODY_SOURCE: ${{ vars.GRM_HANDOFF_BODY_SOURCE || 'notion' }}
+      # [노션 은퇴] off 면 브릿지가 노션을 읽지도 쓰지도 않는다 — 정본은 git 반납 하나, 노션 예비 길·CONSUMED 없음
+      #   (delta_bridge.notion_off). 수집기·원천 대조와 같은 변수.
+      GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -145,6 +148,7 @@ jobs:
 
       - name: Notion 마감(CONSUMED) — 커밋+push 성공 후에만
         # git 반납으로 기록한 run 은 노션 페이지를 닫지 않는다 — 닫을 대상은 노션에서 읽은 페이지뿐이다.
+        # [노션 은퇴] GRM_INTAKE_NOTION=off 면 브릿지가 source=git 만 내므로 이 단계는 돌지 않는다(delta_bridge.notion_off).
         if: steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source != 'git'
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}

@@ -68,7 +68,7 @@ import findings_supabase_backfill as fsb
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import SOURCE_FDA_483, log
+from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, log
 from grm_taxonomy import is_out_of_scope_483_establishment
 
 
@@ -358,6 +358,8 @@ def dump_texts(doc_ids: list[str], out_dir: str, *,
         if text:
             Path(out_dir, f"{name}.txt").write_text(text, encoding="utf-8")
         rows.append({"doc": name, "url": url, "status": status, "chars": len(text or "")})
+        if status == FDA_BOT_BLOCK:
+            break
     return rows
 
 
@@ -558,6 +560,8 @@ def scan_mixed_pdfs(rows: list[dict[str, Any]], *, delay_seconds: float = 0.3,
                 pages = doc.page_count
                 layer = "\n".join(p.get_text("text") for p in doc)
             unread = c.count_unread_image_pages(data)
+        except FdaBotBlockError:
+            raise
         except Exception:  # noqa: BLE001 — 진단: 건별 실패는 세고 계속
             failed += 1
             continue
@@ -946,6 +950,12 @@ def run(
             _bump(report, reason)
             report.errors.append(f"{label}: {reason}")
             continue
+
+        if status == FDA_BOT_BLOCK:
+            report.failed += 1
+            _bump(report, FDA_BOT_BLOCK)
+            report.errors.append(f"{label}: {FDA_BOT_BLOCK}")
+            break
 
         if not text:
             # OCR 을 다시 돌려도 본문이 없다 — 기존 행을 그대로 둔다. 빈손을 다른 빈손으로

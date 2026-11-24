@@ -288,11 +288,10 @@ class EvaluateHealthFailureBranchTest(unittest.TestCase):
         # IP 차단성 일시 장애라 warning(exit 0). 표식 없는 구조 변경은 failure 유지.
         stats = ci.CollectionStats()
         stats.fda483_error = True
-        stats.fda483_error_msg = ("FDA 483 수집 실패: 백본 3단 모두 483 행 0 — 소스 구조 변경 또는 "
-                                  "일시 장애(수동 확인 필요) [일시 차단: abuse-detection-apology]")
+        stats.fda483_error_msg = "fda-bot-block"
         health = ci._evaluate_health(**_health_kwargs(
             stats=stats, active={"fr", "recall"}, enable_fda483=True))
-        self.assertIn("transient-source-error:fda483", _codes(health.warnings))
+        self.assertIn("fda-bot-block", _codes(health.warnings))
         self.assertEqual(health.exit_code, 0)
         stats.fda483_error_msg = "FDA 483 수집 실패: 백본 3단 모두 483 행 0 — 소스 구조 변경"
         health = ci._evaluate_health(**_health_kwargs(

@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
-from grm_common import INTAKE_SOURCE_SPECS, KR_EGRESS_PROXY_UNREACHABLE, log
+from grm_common import FDA_BOT_BLOCK, INTAKE_SOURCE_SPECS, KR_EGRESS_PROXY_UNREACHABLE, log
 from source_silence import evaluate_silence, watched_sources
 
 
@@ -91,7 +91,7 @@ _TRANSIENT_ERROR_MARKERS = [
     "http 502", "http 503", "http 504", "bad gateway",
     "service unavailable", "gateway timeout",
     # Akamai 봇차단(호스트 전체 apology 404, 2026-11-19 FDA WL·483 동시) — IP 차단성 일시 장애.
-    "abuse-detection-apology",
+    FDA_BOT_BLOCK,
 ]
 _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES = {"mfds-rss", "mfds-gmp-inspection"}
 _MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {
@@ -526,7 +526,12 @@ def _evaluate_health(
 
         for failed, code, source, detail in enabled_source_failures:
             if failed:
-                if code in _WARN_ONLY_SOURCE_CODES:
+                if FDA_BOT_BLOCK in detail:
+                    health.add_warning(
+                        FDA_BOT_BLOCK, source,
+                        f"{FDA_BOT_BLOCK} — {source} 수집 중단", detail[:240],
+                    )
+                elif code in _WARN_ONLY_SOURCE_CODES:
                     # 표면화는 하되 run 을 적색으로 만들지 않는다(발행 스캐폴드 선택이
                     # `--status success` 라 적색 = 그 주 발행 차단 — 상수 주석 참조).
                     health.add_warning(

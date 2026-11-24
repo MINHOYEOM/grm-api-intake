@@ -1,0 +1,559 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-24",
+ "shard": "F",
+ "cards": {
+  "fda483-196640": {
+   "title_issue": "수동 적분 사유·승인 기록 없음",
+   "hook_line": "출하 시험 크로마토그램에 사유·승인 기록 없는 수동 적분",
+   "summary": "FDA가 완제의약품 제조소 Daiichi Sankyo Europe GmbH에 Form 483(관찰사항 3건)을 발행했다. 시험실 기록, 불일치 조사, 설비 세척·유지 절차가 지적됐다.",
+   "key_facts": [
+    "관찰 1: 크로마토그래피 시스템의 수동 적분 사용 절차가 없고, 출하 시험 시료의 수동 적분에 사유와 승인 기록이 없음",
+    "관찰 2: 타정 중 정제가 펀치에 붙는 일탈에서 근본원인을 찾지 못했고 재발 건수를 평가하지 않음",
+    "관찰 3: 세척 완료로 기록된 설비와 타정 펀치 각인 안에 잔류물로 보이는 것이 남아 있었음"
+   ],
+   "implication": "한 프로젝트 폴더에서는 개별 주입의 [가림]%가 수동 적분돼 있었다(관찰 1). 일탈 보고서는 같은 문제가 지난 12개월 안에 있었다고 적었으나 추가 시정조치가 필요한지 평가하지 않았다(관찰 2).",
+   "checks": [
+    "수동 적분마다 사유와 승인을 감사추적기록에 남기는가? (관찰 1)",
+    "반복되는 타정 일탈의 재발 건수를 집계해 시정조치를 정하는가? (관찰 2)",
+    "세척 완료 표시 전에 타정 펀치 각인 안쪽 잔류물을 확인하는가? (관찰 3)"
+   ],
+   "en": {
+    "title_issue": "Manual integration without reason or approval",
+    "hook_line": "Release test chromatograms manually integrated with no reason or authorization recorded",
+    "summary": "FDA issued a Form 483 with 3 observations to Daiichi Sankyo Europe GmbH, a drug product manufacturer. Observations covered laboratory records, discrepancy investigations and equipment cleaning and maintenance procedures.",
+    "key_facts": [
+     "Observation 1: no procedure for manual integration in the chromatography system, and manual integrations of release samples had no reason or authorization documented",
+     "Observation 2: a deviation for tablets sticking to the punch during compression identified no root cause and did not assess recurrence",
+     "Observation 3: apparent residue remained on equipment documented as clean and within the debossing of tablet punches"
+    ],
+    "implication": "In one project folder, [redacted]% of individual injections had been manually integrated (Observation 1). The deviation stated the issue had occurred within the last 12 months but did not assess whether additional corrective actions were needed (Observation 2).",
+    "checks": [
+     "Is each manual integration's reason and approval captured in the audit trail? (Observation 1)",
+     "Are recurring compression deviations counted to decide on corrective action? (Observation 2)",
+     "Is residue inside punch debossing checked before equipment is labeled clean? (Observation 3)"
+    ]
+   }
+  },
+  "fda483-196641": {
+   "title_issue": "핵심 공급업체 감사 미실시",
+   "hook_line": "엔도톡신 시험기 공급업체 등 핵심 공급업체를 감사하지 않음",
+   "summary": "FDA가 제조소 HG Medical USA, LLC에 Form 483(관찰사항 1건)을 발행했다. 승인 공급업체·위탁업체 기록이 제대로 마련되지 않았다고 지적했다.",
+   "key_facts": [
+    "관찰 1: 품질경영시스템 없이 승인 공급업체 목록에 오른 핵심 공급업체를 요구된 감사 없이 승인함"
+   ],
+   "implication": "감사를 받지 않은 핵심 공급업체에는 부동태화 공정의 엔도톡신 시험기 공급업체, [가림] 물 처리 서비스업체, 부동태화 설비 서비스업체가 있었다(관찰 1).",
+   "checks": [
+    "승인 공급업체 목록의 핵심 공급업체마다 요구된 감사를 마쳤는가? (관찰 1)",
+    "설비 정비·물 처리 같은 서비스업체도 핵심 공급업체로 평가하는가? (관찰 1)"
+   ],
+   "en": {
+    "title_issue": "Critical suppliers not audited",
+    "hook_line": "Critical suppliers, including the endotoxin tester supplier, were not audited",
+    "summary": "FDA issued a Form 483 with 1 observation to HG Medical USA, LLC, a manufacturer. FDA observed that records of acceptable suppliers and contractors were not adequately established.",
+    "key_facts": [
+     "Observation 1: critical suppliers without a quality management system were placed on the approved supplier list without the required audit"
+    ],
+    "implication": "Unaudited critical suppliers included the supplier of the endotoxin tester used during passivation, the service provider for the [redacted] water treatment supply, and the passivation equipment service provider (Observation 1).",
+    "checks": [
+     "Has every critical supplier on the approved list received the required audit? (Observation 1)",
+     "Are service providers such as equipment and water treatment vendors assessed as critical suppliers? (Observation 1)"
+    ]
+   }
+  },
+  "fda483-196650": {
+   "title_issue": "세척 밸리데이션 누락·계측 장비 미교정",
+   "hook_line": "2019년 적격성평가 이후 재교정·검증하지 않은 공정 계측 장비",
+   "summary": "FDA가 원료의약품 제조소 Jilin Asymchem Pharmaceuticals Co., Ltd.에 Form 483(관찰사항 2건)을 발행했다. 설비 세척·교정 절차와 공정 밸리데이션이 지적됐다.",
+   "key_facts": [
+    "관찰 1: 세척 밸리데이션이 비전용 [가림]의 시료 채취·분석 검증을 포함하지 않았고, 공정 변수를 재는 장비를 2019년 적격성평가 이후 재교정·검증하지 않음",
+    "관찰 2: 공정 성능 적격성평가의 균질성 시험에 출하 규격 항목인 입자 크기 분포가 빠짐"
+   ],
+   "implication": "입자 크기 문제로 공정과 한 단계를 바꾼 뒤에도 후속 공정 성능 적격성평가에서 입자 크기 균질성을 다시 평가하지 않았다(관찰 2).",
+   "checks": [
+    "세척 밸리데이션에서 제외한 비전용 설비에 분석 근거가 있는가? (관찰 1)",
+    "공정 변수를 재는 장비를 정해진 주기로 교정하는가? (관찰 1)",
+    "균질성 시험에 출하 규격의 입자 크기 분포가 들어가는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "Cleaning validation gaps, instruments uncalibrated",
+    "hook_line": "Process instruments not recalibrated or verified since their 2019 qualification",
+    "summary": "FDA issued a Form 483 with 2 observations to Jilin Asymchem Pharmaceuticals Co., Ltd., a drug substance manufacturer. Observations covered equipment cleaning and calibration procedures and process validation.",
+    "key_facts": [
+     "Observation 1: cleaning validation did not include sampling or analytical verification of non-dedicated [redacted], and instruments for a recorded parameter have not been recalibrated or verified since 2019 qualification",
+     "Observation 2: homogeneity testing in PPQ did not include particle size distribution, a release specification attribute"
+    ],
+    "implication": "After the process and one step were changed because of particle size issues, homogeneity for particle size was not reassessed in the subsequent PPQ (Observation 2).",
+    "checks": [
+     "Is there analytical justification for excluding non-dedicated equipment from cleaning validation? (Observation 1)",
+     "Are instruments measuring process parameters calibrated on a defined schedule? (Observation 1)",
+     "Does homogeneity testing include particle size distribution from the release specification? (Observation 2)"
+    ]
+   }
+  },
+  "fda483-196880": {
+   "title_issue": "결합제품 기기 고장 의료기기 보고 누락",
+   "hook_line": "희석액 이송 불완전 불만에도 의료기기 보고서 미제출",
+   "summary": "FDA가 혈장분획제제 제조소 Baxalta US Inc.에 Form 483(관찰사항 2건)을 발행했다. 의료기기 보고 기한과 제조기록서의 주요 설비 표시가 지적됐다.",
+   "key_facts": [
+    "관찰 1: 의약품·의료기기 결합제품 Vonvendi의 기기 구성품 고장 불만에 대해 30일 안에 의료기기 보고서를 제출하지 않음",
+    "관찰 2: 제조기록서 전반에 주요 설비 식별 표시가 없음"
+   ],
+   "implication": "보고되지 않은 불만에는 기기를 통한 희석액 이송이 불완전하다는 불만과 결함 기기 불만이 있었다(관찰 1). 이 기기 구성품(Mix2Vial)은 동결건조 의약품을 재구성하는 데 쓰인다(관찰 1).",
+   "checks": [
+    "결합제품 기기 구성품 불만이 의료기기 보고 대상인지 30일 안에 판정하는가? (관찰 1)",
+    "제조기록서에 사용한 주요 설비 식별 번호를 기록하는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "Device malfunction reports not filed",
+    "hook_line": "No medical device reports filed for complaints of incomplete diluent transfer",
+    "summary": "FDA issued a Form 483 with 2 observations to Baxalta US Inc., a plasma derivative manufacturer. Observations covered medical device reporting timelines and identification of major equipment in batch records.",
+    "key_facts": [
+     "Observation 1: no MDR submitted within 30 days for malfunction complaints on the device constituent of the combination product Vonvendi",
+     "Observation 2: batch production records do not identify critical equipment"
+    ],
+    "implication": "Unreported complaints included incomplete diluent transfer via the device and a defective device (Observation 1). The device constituent (Mix2Vial) is used to reconstitute the lyophilized drug product (Observation 1).",
+    "checks": [
+     "Are device constituent complaints assessed for MDR reportability within 30 days? (Observation 1)",
+     "Do batch records identify the major equipment used? (Observation 2)"
+    ]
+   }
+  },
+  "0f3a6eeb815d": {
+   "title_issue": "무균 표시 제품 무균시험 미실시",
+   "hook_line": "무균 표시 일반의약품의 무균시험과 배치별 출하 시험을 안 함",
+   "summary": "FDA가 중국의 일반의약품 제조소 Shenzhen Benliju Biotech Co., Ltd.에 경고서한을 발행했다. 기록 요청에 따라 받은 자료를 검토해 출하 시험, 생산·공정 관리 절차, 품질부서 책임 위반 3건을 지적했다.",
+   "key_facts": [
+    "위반 1: 배치별 출하 규격 시험과 미생물 시험 미실시, 무균 표시 제품의 무균시험 미실시(21 CFR 211.165(a))",
+    "위반 2: 생산·공정 관리 절차 미수립(21 CFR 211.100(a))",
+    "위반 3: 품질부서 책임 미이행(21 CFR 211.22)",
+    "당국 조치: 2026-09-30 수입경보 66-40 등재, 무균 표시 제품 전 로트 회수 권고에 회사가 2026-10-22 동의"
+   ],
+   "implication": "회사는 기록 요청 회신에서 공정 밸리데이션 절차나 공정 밸리데이션 연구가 없다고 밝혔다(위반 2). FDA는 무균 표시 제품의 무균성이 입증되지 않았다며 2026-10-21 유효기간 내 전 로트 회수를 권고했다. FDA는 자격을 갖춘 컨설턴트를 고용해 전체 운영의 6개 시스템 감사를 받도록 권고했다.",
+   "checks": [
+    "무균 표시 제품의 배치마다 무균시험 결과가 있는가? (위반 1)",
+    "모든 배치를 출하 규격 시험 뒤에 출하하는가? (위반 1)",
+    "제품별 공정 밸리데이션 연구가 있는가? (위반 2)"
+   ],
+   "en": {
+    "title_issue": "No sterility testing of products labeled sterile",
+    "hook_line": "No sterility testing or batch release testing of products labeled sterile",
+    "summary": "FDA issued a warning letter to Shenzhen Benliju Biotech Co., Ltd., an OTC drug manufacturer in China. Based on a review of records requested from the firm, FDA cited three violations covering release testing, production and process control procedures and quality unit responsibilities.",
+    "key_facts": [
+     "Violation 1: no batch release testing against specifications or microbial testing, including no sterility testing of products labeled sterile (21 CFR 211.165(a))",
+     "Violation 2: no written production and process control procedures (21 CFR 211.100(a))",
+     "Violation 3: quality unit responsibilities not exercised (21 CFR 211.22)",
+     "Agency action: placed on Import Alert 66-40 on 2026-09-30; the firm agreed on 2026-10-22 to FDA's recommendation to recall all sterile-labeled lots"
+    ],
+    "implication": "The firm's response to the records request stated it has no process validation procedures or studies (Violation 2). On 2026-10-21 FDA recommended recalling all lots within expiry labeled sterile because their sterility had not been demonstrated. FDA recommended engaging a qualified consultant to perform a comprehensive six-system audit.",
+    "checks": [
+     "Does each batch of a product labeled sterile have a sterility test result? (Violation 1)",
+     "Is every batch tested against release specifications before release? (Violation 1)",
+     "Is there a process validation study for each product? (Violation 2)"
+    ]
+   }
+  },
+  "55c08c82779b": {
+   "title_issue": "기준일탈 조사 미흡·대량 무효화",
+   "hook_line": "시험실 과오가 확인 안 된 결과를 시험자·절차 과오로 돌려 무효화",
+   "summary": "FDA가 아르헨티나의 원료의약품 제조소 Umicore Argentina S.A.에 경고서한을 발행했다. 기준일탈(OOS) 조사·시정조치와 설비·건물 청결 유지 위반을 지적했다.",
+   "key_facts": [
+    "위반 1: 기준일탈 결과의 조사·기록과 시정조치 미흡 — 2021년 이후 기준일탈 300건 넘게 조사가 미흡했고 그중 200건 넘게 무효화",
+    "위반 2: 원료의약품 제조 설비·건물·시설을 청결하게 유지하지 않음",
+    "회신과 FDA 판단: 회사는 조사 미흡을 인정하고 종결된 조사를 재평가하겠다고 했으나 FDA는 회신이 부적절하다고 판단",
+    "당국 조치: 15영업일 안에 서면 회신, 자격을 갖춘 컨설턴트 고용 권고"
+   ],
+   "implication": "실사관이 검토한 기준일탈 조사 30건에서는 1단계 조사에서 시험실 과오가 확인되지 않으면 2단계 조사를 하지 않거나 시험자·절차 과오로 돌리는 일이 반복됐다(위반 1). 원료의약품 총호기성균 규격 초과 조사에서 균을 동정하지 않았고, 이 문제는 2018년 실사에서도 지적됐다(위반 1). 회사는 탱크의 벗겨진 물질이 공사 기초재라고 했으나 분석 데이터와 이전 배치 영향 평가가 없었다(위반 2). 제대로 배수되지 않는 이송 배관이 어떻게 세척 완료로 반복 승인됐는지 설명하지 않았다(위반 2).",
+   "checks": [
+    "1단계 조사에서 시험실 과오가 확인되지 않으면 제조 조사로 넘기는가? (위반 1)",
+    "미생물 기준일탈 때 균을 동정하는가? (위반 1)",
+    "배수가 안 되는 배관을 세척 밸리데이션에서 평가했는가? (위반 2)"
+   ],
+   "en": {
+    "title_issue": "OOS investigations inadequate, mass invalidation",
+    "hook_line": "With no lab error confirmed, failing results were blamed on analysts and invalidated",
+    "summary": "FDA issued a warning letter to Umicore Argentina S.A., an API manufacturer in Argentina. FDA cited deviations in OOS investigations and corrective actions, and in keeping equipment, buildings and facilities clean.",
+    "key_facts": [
+     "Violation 1: inadequate investigation, documentation and corrective action for OOS results; over 300 OOS results since 2021 inadequately investigated, more than 200 invalidated",
+     "Violation 2: equipment, buildings and facilities used for API manufacture not maintained in a clean condition",
+     "Response and FDA's assessment: the firm acknowledged investigation deficiencies and committed to reevaluate closed investigations; FDA found the response inadequate",
+     "Agency action: written response within 15 business days; engagement of a qualified consultant recommended"
+    ],
+    "implication": "In 30 OOS records reviewed, when Phase I found no conclusive laboratory error, Phase II was either not conducted or the results were attributed to analyst or procedural error (Violation 1). Investigations of API samples exceeding total aerobic count did not include microbial identification, which was previously cited in the 2018 inspection (Violation 1). The firm stated peeling material on a tank was excess construction base material but provided no analytical data or impact assessment of previous batches (Violation 2). The firm did not explain how a transfer line not designed to drain properly was repeatedly released as clean (Violation 2).",
+    "checks": [
+     "Does a Phase I with no confirmed lab error lead to a manufacturing investigation? (Violation 1)",
+     "Are organisms identified in microbial OOS investigations? (Violation 1)",
+     "Has cleaning validation addressed lines that do not drain properly? (Violation 2)"
+    ]
+   }
+  },
+  "d60bdc71408a": {
+   "title_issue": "안정성 기준일탈 알고도 출하 지속",
+   "hook_line": "같은 원인의 함량 기준일탈을 알고도 상업 배치 출하를 이어 감",
+   "summary": "FDA가 미국의 의약품 제조소 LGM Pharma Solutions, LLC에 경고서한을 발행했다. 불일치 조사와 생산·공정 관리 절차 위반 2건을 지적했다.",
+   "key_facts": [
+    "위반 1: 공정 밸리데이션·상업 배치의 안정성 함량 기준일탈(OOS) 조사 미흡(21 CFR 211.192)",
+    "위반 2: 생산·공정 관리 절차 미흡(21 CFR 211.100(a))",
+    "회신과 FDA 판단: 회사는 시험법 변동성이 기여했을 것이라고 했으나 FDA는 뒷받침 데이터가 없어 회신이 부적절하다고 판단",
+    "당국 조치: 상업 배치 1개 회수 확인, 해당 제품 생산 중단 약속 확인, 컨설턴트 고용 권고"
+   ],
+   "implication": "회사는 공정 밸리데이션 배치의 기준일탈을 시험법과 원료의 변동성 탓으로 돌리고 출하하지 않았다는 이유로 품질 영향이 없다고 결론 냈다(위반 1). 상업 배치 기준일탈 조사도 같은 원인을 들었는데 회사는 상업 배치 출하를 계속했다(위반 1). 재시험에서 기준일탈이 확인됐을 때 적절한 시장 조치를 하지 않았고 조사는 과학적 근거 없이 열려 있었다(위반 1).",
+   "checks": [
+    "밸리데이션 배치와 같은 원인의 기준일탈이 상업 배치에 나오면 출하를 멈추고 조사를 넓히는가? (위반 1)",
+    "기준일탈이 확인되면 유통 중 제품의 시장 조치를 바로 검토하는가? (위반 1)",
+    "시험법 변동성을 원인으로 들 때 데이터로 뒷받침하는가? (위반 1)"
+   ],
+   "en": {
+    "title_issue": "Releases continued despite stability OOS",
+    "hook_line": "Commercial batches kept being released despite assay failures with the same root cause",
+    "summary": "FDA issued a warning letter to LGM Pharma Solutions, LLC, a drug manufacturer in the USA. FDA cited two violations covering discrepancy investigations and production and process control procedures.",
+    "key_facts": [
+     "Violation 1: inadequate investigation of stability assay OOS results in process validation and commercial batches (21 CFR 211.192)",
+     "Violation 2: inadequate written production and process control procedures (21 CFR 211.100(a))",
+     "Response and FDA's assessment: the firm stated method variability may have contributed; FDA found the response inadequate because no supporting data was provided",
+     "Agency action: recall of one commercial batch acknowledged, commitment to cease production acknowledged, consultant recommended"
+    ],
+    "implication": "The firm attributed OOS results in process validation batches to method and raw material variability and concluded there was no quality impact because those batches were not released (Violation 1). Investigations of commercial batch OOS results listed the same root causes, yet the firm continued releasing commercial batches (Violation 1). The firm did not take appropriate market action when a retest confirmed an OOS assay result, and the investigation remained open without scientific justification (Violation 1).",
+    "checks": [
+     "When commercial batches show OOS with the same cause as validation batches, are releases stopped and investigations extended? (Violation 1)",
+     "Is market action assessed promptly once an OOS result is confirmed? (Violation 1)",
+     "Is method variability supported by data when cited as a root cause? (Violation 1)"
+    ]
+   }
+  },
+  "ed75ff499f75": {
+   "title_issue": "기준일탈 확인 로트 대부분 출하",
+   "hook_line": "함량 재시험에서 기준일탈을 확인하고도 로트 대부분을 출하",
+   "summary": "FDA가 미국의 일반의약품 제조소 Natural Essentials, Inc.에 경고서한을 발행했다. 불일치 조사, 시험실 관리, 원료 확인시험, 시험 기록 위반 4건을 지적했다.",
+   "key_facts": [
+    "위반 1: 기준일탈(OOS)·한도 초과 결과 조사 미흡(21 CFR 211.192)",
+    "위반 2: 과학적으로 타당한 규격·시험 절차 미수립(21 CFR 211.160(b))",
+    "위반 3: 원료마다 최소 1개 확인시험 미실시(21 CFR 211.84(d)(1))",
+    "위반 4: 시험 기록에 완전한 데이터 미포함(21 CFR 211.194(a))"
+   ],
+   "implication": "함량 재시험에서 기준일탈이 확인됐는데도 회사는 제한된 추가 채취의 합격 결과로 로트 대부분을 출하했다(위반 1). 2025~2026년 출하 시험에서 검출된 미생물을 동정하지 않았고 재시험 합격으로 원래 결과를 무효화했다(위반 1). 2023년 FDA 실사에서도 [가림] 시스템 밸리데이션 미완료와 미생물 검출 조사 미흡이 지적됐다(위반 1). 회사는 전자 기록 관리 절차를 만들겠다고 회신했으나 FDA는 회신이 부적절하다고 판단했다(위반 4). 분석 뒤 수정 때문에 이전에 처리한 크로마토그램을 재구성할 수 없었다(위반 4).",
+   "checks": [
+    "기준일탈이 확인된 로트를 추가 채취 결과로 일부 출하하지 않는가? (위반 1)",
+    "출하 시험에서 검출된 미생물을 동정하는가? (위반 1)",
+    "입고 원료 로트마다 확인시험을 하는가? (위반 3)"
+   ],
+   "en": {
+    "title_issue": "Most of a confirmed OOS lot released",
+    "hook_line": "Most of a lot released after a retest confirmed an out-of-specification assay result",
+    "summary": "FDA issued a warning letter to Natural Essentials, Inc., an OTC drug manufacturer in the USA. FDA cited four violations covering discrepancy investigations, laboratory controls, component identity testing and laboratory records.",
+    "key_facts": [
+     "Violation 1: inadequate investigation of OOS and out-of-limit results (21 CFR 211.192)",
+     "Violation 2: no scientifically sound specifications and test procedures (21 CFR 211.160(b))",
+     "Violation 3: at least one identity test not conducted for each component (21 CFR 211.84(d)(1))",
+     "Violation 4: laboratory records lacked complete data (21 CFR 211.194(a))"
+    ],
+    "implication": "Although retesting confirmed an OOS assay result, the firm released most of the lot based on passing results from additional limited sampling (Violation 1). Between 2025 and 2026, microorganisms detected in release testing were not identified, and original failing results were invalidated on passing retests (Violation 1). FDA's 2023 inspection also noted incomplete validation of the [redacted] system and inadequate investigations into microbial recoveries (Violation 1). The firm committed to developing an electronic records control procedure, but FDA found the response inadequate (Violation 4). Post-analysis modifications prevented reconstruction of previously processed chromatograms (Violation 4).",
+    "checks": [
+     "Is a lot with a confirmed OOS result kept from partial release based on extra sampling? (Violation 1)",
+     "Are microorganisms detected in release testing identified? (Violation 1)",
+     "Is an identity test performed on every incoming component lot? (Violation 3)"
+    ]
+   }
+  },
+  "admin-2026008242": {
+   "title_issue": "품질시험 부적합 제품 출하 과징금",
+   "hook_line": "품질시험 부적합 제품을 출하해 과징금 1,500,000원",
+   "summary": "식약처가 스미스앤드네퓨(주)에 수입 의약품 박티그라(클로르헥시딘아세트산염)의 수입업무정지 1개월을 갈음한 과징금 1,500,000원을 처분했다. 품질시험 결과 부적합한 제품을 출하해 자사기준서를 지키지 않았다.",
+   "key_facts": [
+    "위반: 품질시험 결과 부적합한 제품을 출하해 자사기준서 미준수",
+    "처분: 수입업무정지 1개월을 갈음한 과징금 1,500,000원",
+    "근거: 약사법 제42조제5항, 의약품 등의 안전에 관한 규칙 제60조제2항제6호"
+   ],
+   "implication": "",
+   "checks": [
+    "품질시험 부적합 판정이 난 제조번호는 출하 단계에서 막히는가?",
+    "수입 완제의약품 출하 전에 품질시험 결과를 품질부서가 확인하는가?"
+   ],
+   "en": {
+    "title_issue": "Fine for releasing product that failed QC",
+    "hook_line": "Product that failed quality testing was released, leading to a 1,500,000 won fine",
+    "summary": "MFDS imposed a fine of 1,500,000 won, in lieu of a one-month import suspension, on an importer of a chlorhexidine acetate product. The importer released product that failed quality testing, contrary to its own standards.",
+    "key_facts": [
+     "Violation: product that failed quality testing was released, contrary to the company's own standards",
+     "Sanction: fine of 1,500,000 won in lieu of a one-month import suspension",
+     "Basis: Pharmaceutical Affairs Act Article 42(5); Enforcement Rule on the Safety of Medicinal Products Article 60(2)(6)"
+    ],
+    "implication": "",
+    "checks": [
+     "Are batches that failed quality testing blocked at release?",
+     "Does the quality unit confirm quality test results before imported finished products are released?"
+    ]
+   }
+  },
+  "admin-2026008244": {
+   "title_issue": "유통 한약재 기원식물 부적합",
+   "hook_line": "유통 한약재 관능(성상) 기원식물 부적합, 제조업무정지 3개월",
+   "summary": "식약처가 (주)허브팜에 해당 품목 제조업무정지 3개월을 처분했다. 유통 한약재 품질검사에서 관능(성상) 항목이 기원식물 부적합으로 판정됐다.",
+   "key_facts": [
+    "위반: 유통한약재 품질검사 부적합 — 관능(성상), 기원식물 부적합",
+    "경위: 제조번호 N250708228, 사용기한 2028-07-07",
+    "처분: 해당 품목 제조업무정지 3개월(2026-12-02~2027-03-01)",
+    "근거: 약사법 제62조제11호"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Herbal medicine fails botanical origin test",
+    "hook_line": "Herbal medicine on the market failed the botanical origin check; 3-month suspension",
+    "summary": "MFDS suspended manufacturing of the product for 3 months at a herbal medicine manufacturer. Market surveillance testing found the herbal medicine failed the organoleptic (appearance) test for botanical origin.",
+    "key_facts": [
+     "Violation: failed market quality test — organoleptic (appearance), botanical origin not conforming",
+     "Timeline: batch N250708228, expiry 2028-07-07",
+     "Sanction: 3-month manufacturing suspension for the product (2026-12-02 to 2027-03-01)",
+     "Basis: Pharmaceutical Affairs Act Article 62(11)"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026008255": {
+   "title_issue": "업무정지 중 제조·출하로 허가 취소",
+   "hook_line": "제조업무정지 기간에 충전·포장·출하를 계속해 품목 허가 취소",
+   "summary": "식약처가 (주)동방코스메틱에 해당 품목 허가 취소를 처분했다. 제조업무정지 기간 중 충전·포장·출하를 하고, 광고업무정지 기간 중 광고 문구를 쓴 제품을 판매했다.",
+   "key_facts": [
+    "위반: 업무정지 기간 중 정지된 업무 수행, 제조·관리 의무 미준수 2차 위반, 변경사항 미신고",
+    "경위: 제조업무정지 3개월(2026-03-17~2026-06-16) 중 충전·포장·출하, 광고업무정지 2개월(2025-09-17~2025-11-16) 중 광고 문구를 쓴 제품 판매",
+    "처분: 해당 품목 허가 취소(2026-11-26자)",
+    "근거: 약사법 제76조제1항제3호"
+   ],
+   "implication": "제조기록서 일부(충·포장공정 등)를 작성하지 않았고 품목신고증의 기준 및 시험방법에 따른 확인시험·함량시험을 하지 않았다. pH조정제(중화제) 원료인 과산화수소수35%의 분량을 임의로 늘리고도 변경신고를 하지 않았다. 위반사항이 둘 이상이어서 가장 무거운 행정처분 기준을 따랐다.",
+   "checks": [
+    "업무정지 처분 기간에 해당 품목의 제조·출하를 막는 장치가 있는가?",
+    "원료 분량을 바꿀 때 출하 전에 변경신고 여부를 확인하는가?",
+    "품목신고증의 확인시험·함량시험을 제조번호마다 하는가?"
+   ],
+   "en": {
+    "title_issue": "Approval revoked for working during suspension",
+    "hook_line": "Filling, packaging and shipping continued during a suspension; product approval revoked",
+    "summary": "MFDS revoked the product approval of a manufacturer. During a manufacturing suspension the company carried out filling, packaging and shipping, and during an advertising suspension it sold product bearing advertising text.",
+    "key_facts": [
+     "Violation: suspended operations performed during suspension, second violation of manufacturing and control obligations, unreported changes",
+     "Timeline: filling, packaging and shipping during a 3-month manufacturing suspension (2026-03-17 to 2026-06-16); product with advertising text sold during a 2-month advertising suspension (2025-09-17 to 2025-11-16)",
+     "Sanction: revocation of the product approval (effective 2026-11-26)",
+     "Basis: Pharmaceutical Affairs Act Article 76(1)(3)"
+    ],
+    "implication": "Parts of the batch records (filling and packaging steps) were not completed, and identification and assay tests required by the product notification were not performed. The quantity of 35% hydrogen peroxide, a pH adjuster, was increased without filing a change notification. Because there were two or more violations, the heaviest sanction standard was applied.",
+    "checks": [
+     "Is manufacturing and shipping of a product blocked during a suspension period?",
+     "Is a change notification confirmed before shipping when an ingredient quantity changes?",
+     "Are the identification and assay tests in the product notification performed for every batch?"
+    ]
+   }
+  },
+  "admin-2026008256": {
+   "title_issue": "성상 부적합 제조업무정지",
+   "hook_line": "품질부적합(성상)으로 해당 품목 제조업무정지 3개월",
+   "summary": "식약처가 (주)바른한방제약에 해당 품목 제조업무정지 3개월을 처분했다. 품질부적합(성상) 때문이다.",
+   "key_facts": [
+    "위반: 품질부적합 — 성상",
+    "처분: 해당 품목 제조업무정지 3개월(2026-12-02~2027-03-01)",
+    "근거: 약사법 제62조제11호"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Suspension for appearance failure",
+    "hook_line": "Quality failure (appearance) led to a 3-month manufacturing suspension for the product",
+    "summary": "MFDS suspended manufacturing of the product for 3 months at a manufacturer because of a quality failure (appearance).",
+    "key_facts": [
+     "Violation: quality failure — appearance",
+     "Sanction: 3-month manufacturing suspension for the product (2026-12-02 to 2027-03-01)",
+     "Basis: Pharmaceutical Affairs Act Article 62(11)"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026008296": {
+   "title_issue": "주성분 시험성적서 대체·제조원 변경 미신고",
+   "hook_line": "주성분 시험을 원료 제조사 시험성적서로 갈음해 11개 제조단위 판매",
+   "summary": "식약처가 주식회사 케이앤제이씨에 해당 품목 제조업무정지 3개월 15일을 처분했다. 의약외품 소독용 에탄올의 주성분 시험성적서를 원료 제조사의 시험성적서로 갈음하고 주성분 제조원 변경을 신고하지 않았다.",
+   "key_facts": [
+    "위반: 제조 관리 의무 미준수, 주성분 제조원 변경 미신고",
+    "경위: 11개 제조단위에서 주성분(에탄올(95)) 시험성적서를 신고한 기준 규격(KP)과 다른 원료 제조사 시험성적서로 갈음",
+    "처분: 해당 품목 제조업무정지 3개월 15일(2026-12-03~2027-03-17)",
+    "근거: 약사법 제37조제1항, 제38조제1항, 제31조제9항"
+   ],
+   "implication": "주성분 제조원을 진케미칼로 신고했으나 2025~2026년 제조한 11개 제조단위에는 Korea Alcohol Industrial Co., Ltd와 Marquis Energy LLC가 제조한 원료를 투입했다.",
+   "checks": [
+    "주성분 입고 때 신고한 기준 규격(KP)으로 자체 시험하는가?",
+    "원료 제조원이 바뀌면 출하 전에 변경신고 여부를 확인하는가?"
+   ],
+   "en": {
+    "title_issue": "Supplier COA substituted, source change unreported",
+    "hook_line": "Raw material supplier certificates used in place of required testing for 11 batches",
+    "summary": "MFDS suspended manufacturing of the product for 3 months and 15 days at a manufacturer of a disinfectant ethanol quasi-drug. The company relied on the raw material maker's certificates of analysis for the active ingredient and did not report a change of the ingredient's manufacturer.",
+    "key_facts": [
+     "Violation: manufacturing control obligations not met; change of active ingredient manufacturer not reported",
+     "Timeline: for 11 batches, certificates of analysis for the active ingredient (ethanol (95)) were replaced with a raw material maker's certificates that differ from the registered KP standard",
+     "Sanction: 3-month 15-day manufacturing suspension for the product (2026-12-03 to 2027-03-17)",
+     "Basis: Pharmaceutical Affairs Act Articles 37(1), 38(1) and 31(9)"
+    ],
+    "implication": "The active ingredient manufacturer was registered as one supplier, but the 11 batches made in 2025 and 2026 used material made by Korea Alcohol Industrial Co., Ltd and Marquis Energy LLC.",
+    "checks": [
+     "Is the active ingredient tested in-house against the registered KP standard on receipt?",
+     "Is a change notification confirmed before shipping when a raw material manufacturer changes?"
+    ]
+   }
+  },
+  "gmpinspect-1Q7txc0kHQ0": {
+   "title_issue": "청정등급 관리·무균 공정 밸리데이션 지적",
+   "hook_line": "무균 공정 밸리데이션 기준 보완은 이행계획서 타당성 인정",
+   "summary": "식약처가 (주)퓨쳐켐 제3공장의 방사성의약품 주사제 제조를 정기 실사하고 지적(보완)사항이 있다고 평가했다. 품질경영, 시설장비, 제조 분야에서 지적이 나왔다.",
+   "key_facts": [
+    "지적 1: 제조시설 세척·평가 관련 일부 세척방법서 미흡(품질경영, 기타)",
+    "지적 2: 제조소 내 오염 방지를 위한 청정등급 유지 및 관리 체계 미흡(시설장비)",
+    "지적 4: 최악 조건과 발생 가능한 무균 조작·간섭 활동을 포함하도록 무균 공정 밸리데이션 기준 보완(제조)",
+    "후속: 지적 1~3 보완완료, 지적 4·5 이행계획서 타당성 인정"
+   ],
+   "implication": "상세 제조방법을 반영해 제조지시서를 개선·운영하도록 지적됐다(지적 3). 기계·설비의 세척 적절성 확인과 문서화도 미흡하다고 지적됐다(지적 5). 기타 지적사항은 이행계획 확인 뒤 타당성이 인정되면 GMP 적합판정서가 발급된다.",
+   "checks": [
+    "무균 공정 밸리데이션에 최악 조건과 간섭 활동을 포함하는가? (지적 4)",
+    "청정등급별 유지·관리 기준과 모니터링 체계가 문서로 있는가? (지적 2)",
+    "설비 세척 적절성을 확인하고 문서로 남기는가? (지적 5)"
+   ],
+   "en": {
+    "title_issue": "Cleanroom grade control, aseptic validation cited",
+    "hook_line": "Revision of aseptic process validation criteria accepted on an implementation plan",
+    "summary": "MFDS conducted a routine GMP inspection of a radiopharmaceutical injection manufacturing site and found deficiencies. Findings covered quality management, facilities and equipment, and manufacturing.",
+    "key_facts": [
+     "Finding 1: some cleaning instructions for manufacturing equipment cleaning and evaluation inadequate (quality management, other)",
+     "Finding 2: inadequate system for maintaining and managing cleanroom grades to prevent contamination (facilities and equipment)",
+     "Finding 4: aseptic process validation criteria to be revised to include worst-case conditions and possible aseptic manipulations and interventions (manufacturing)",
+     "Follow-up: findings 1 to 3 corrected; implementation plans for findings 4 and 5 accepted"
+    ],
+    "implication": "The site was asked to improve and operate manufacturing instructions reflecting detailed manufacturing methods (Finding 3). Verification and documentation of equipment cleaning adequacy were also found inadequate (Finding 5). For other-category findings, a GMP compliance certificate is issued once the implementation plan is confirmed as adequate.",
+    "checks": [
+     "Does aseptic process validation include worst-case conditions and interventions? (Finding 4)",
+     "Are maintenance and monitoring criteria for each cleanroom grade documented? (Finding 2)",
+     "Is equipment cleaning adequacy verified and documented? (Finding 5)"
+    ]
+   }
+  },
+  "recall-30a2ef396db1": {
+   "title_issue": "중금속(카드뮴) 회수",
+   "hook_line": "중금속(카드뮴) 사유로 회수명령(강제)",
+   "summary": "선일강활이 중금속(카드뮴) 사유로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 중금속(카드뮴)",
+    "제품·범위: 선일강활",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for heavy metal (cadmium)",
+    "hook_line": "Mandatory recall order for heavy metal (cadmium)",
+    "summary": "A herbal medicine product was recalled for heavy metal (cadmium) (mandatory recall order).",
+    "key_facts": [
+     "Reason: heavy metal (cadmium)",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-327eae52c8bb": {
+   "title_issue": "중금속(납, 카드뮴) 회수",
+   "hook_line": "중금속(납, 카드뮴) 사유로 회수명령(강제)",
+   "summary": "현진창출이 중금속(납, 카드뮴) 사유로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 중금속(납, 카드뮴)",
+    "제품·범위: 현진창출",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for heavy metals (lead, cadmium)",
+    "hook_line": "Mandatory recall order for heavy metals (lead, cadmium)",
+    "summary": "A herbal medicine product was recalled for heavy metals (lead, cadmium) (mandatory recall order).",
+    "key_facts": [
+     "Reason: heavy metals (lead, cadmium)",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-53d37db1b711": {
+   "title_issue": "이산화황 사유 회수",
+   "hook_line": "이산화황 사유로 회수명령(강제)",
+   "summary": "현진천마가 이산화황 사유로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 이산화황",
+    "제품·범위: 현진천마",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for sulfur dioxide",
+    "hook_line": "Mandatory recall order for sulfur dioxide",
+    "summary": "A herbal medicine product was recalled for sulfur dioxide (mandatory recall order).",
+    "key_facts": [
+     "Reason: sulfur dioxide",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-6ffa973e2763": {
+   "title_issue": "이산화황 사유 회수",
+   "hook_line": "이산화황 사유로 회수명령(강제)",
+   "summary": "자연세상목단피가 이산화황 사유로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 이산화황",
+    "제품·범위: 자연세상목단피",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for sulfur dioxide",
+    "hook_line": "Mandatory recall order for sulfur dioxide",
+    "summary": "A herbal medicine product was recalled for sulfur dioxide (mandatory recall order).",
+    "key_facts": [
+     "Reason: sulfur dioxide",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-74000539e83e": {
+   "title_issue": "정량법 사유 회수",
+   "hook_line": "정량법 사유로 회수명령(강제)",
+   "summary": "이풀잎강황이 정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합) 사유로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 정량법(쿠르쿠민, 데메톡시쿠르쿠민 및 비스데메톡시쿠르쿠민의 합)",
+    "제품·범위: 이풀잎강황",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall over assay",
+    "hook_line": "Mandatory recall order over the assay test",
+    "summary": "A herbal medicine product was recalled for its assay (sum of curcumin, demethoxycurcumin and bisdemethoxycurcumin) (mandatory recall order).",
+    "key_facts": [
+     "Reason: assay (sum of curcumin, demethoxycurcumin and bisdemethoxycurcumin)",
+     "Product and scope: one product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  }
+ }
+}

@@ -668,6 +668,7 @@ class CollectionStats:
     mfds_admin_insert_failed: int = 0
     mfds_admin_error: bool = False
     mfds_admin_error_msg: str = ""
+    mfds_admin_total_count_warning: str = ""
     mfds_gmp_cert_fetched: int = 0
     mfds_gmp_cert_inserted: int = 0
     mfds_gmp_cert_skipped_dup: int = 0
@@ -4613,10 +4614,12 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             mfds_admin_items = []
         else:
             try:
-                from collect_mfds_admin_action import collect_mfds_admin_actions
+                import collect_mfds_admin_action as mfds_admin
                 # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
-                mfds_admin_items, mfds_admin_err = collect_mfds_admin_actions(
+                mfds_admin_items, mfds_admin_err = mfds_admin.collect_mfds_admin_actions(
                     enf_start, end, data_go_kr_service_key)
+                stats.mfds_admin_total_count_warning = mfds_admin.LAST_HEALTH.get(
+                    "total_count_warning", "")
             except Exception as e:
                 mfds_admin_items, mfds_admin_err = [], str(e)
         stats.mfds_admin_fetched = len(mfds_admin_items)

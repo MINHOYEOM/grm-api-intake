@@ -10043,6 +10043,13 @@ class WebGuideEnTest(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
 
 
+class WebGlossaryTermCountTest(unittest.TestCase):
+    def test_glossary_keeps_at_least_257_terms(self):
+        # 기존 용어 수를 하한으로 고정해 주간 증설 때는 갱신할 필요가 없다.
+        terms = render.load_glossary() or []
+        self.assertGreaterEqual(len(terms), 257, "용어사전 정본의 용어 수가 줄었다")
+
+
 class WebGlossaryRenderTest(unittest.TestCase):
     """[용어사전 트랙 C 2차] /glossary/ — glossary.json(정본)을 초성 색인 1페이지로
     결정론 렌더. 값(term_ko/term_en/easy_ko/출처) 무변형, 파생은 초성 버킷·related 라벨뿐.

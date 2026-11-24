@@ -209,27 +209,28 @@ class Fda483KnownIdsPreQueryTest(unittest.TestCase):
 
     def _call(self, *, enabled=True, side_effect=None, result=None):
         from unittest.mock import patch
-        with patch.object(ci, "notion_query_existing_doc_ids",
-                          side_effect=side_effect,
-                          return_value=result if result is not None else set()) as q:
+        with patch.object(ci.grm_queue, "QueueStore") as store:
+            query = store.return_value.queue_keys_for_source
+            query.side_effect = side_effect
+            query.return_value = result or set()
             got = ci._fda483_known_document_ids(
-                "tok", "db", self.RUN_DATE, self.ENF_START, self.END_D, enabled=enabled)
-        return got, q
+                self.RUN_DATE, self.ENF_START, self.END_D, enabled=enabled,
+                db=("https://example.test", "key"))
+        return got, query
 
     def test_returns_the_known_key_set(self):
         got, q = self._call(result={"FDA 483::fda483-1", "FDA 483::fda483-2"})
         self.assertEqual(got, {"FDA 483::fda483-1", "FDA 483::fda483-2"})
-        self.assertEqual(q.call_args.kwargs["source_names"], {ci.SOURCE_FDA_483})
+        self.assertEqual(q.call_args.args[0], ci.SOURCE_FDA_483)
 
     def test_window_covers_the_whole_collection_window(self):
         """조회 창이 수집 창보다 좁으면 창 앞쪽 문서를 매일 다시 받는다."""
         _got, q = self._call()
-        self.assertGreaterEqual(q.call_args.kwargs["window_days"],
-                                (self.END_D - self.ENF_START).days + 1)
+        self.assertLessEqual(date.fromisoformat(q.call_args.args[1]), self.ENF_START)
 
     def test_query_failure_degrades_to_todays_behaviour(self):
         """★조회가 죽어도 None — 수집은 그대로 돌고 비용만 는다(중단하지 않는다)."""
-        got, _q = self._call(side_effect=RuntimeError("notion down"))
+        got, _q = self._call(side_effect=RuntimeError("queue unavailable"))
         self.assertIsNone(got)
 
     def test_disabled_never_queries(self):

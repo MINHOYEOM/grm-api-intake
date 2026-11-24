@@ -9,7 +9,7 @@ name: GRM FDA Coverage Gate (발행 전 FDA 본문 결손 점검)
 #   ① 임계 미만 → 끝(요약만 남김, 열린 경고 이슈가 있으면 닫음).
 #   ② 483 결손이 임계 이상이고 Routine(07:30 KST) 전 여유가 있으면 → **자동 회수**:
 #      grm-fda483-ocr-recovery(recoverable · 그 문서들만 · apply)를 돌려 Supabase 를 고치고
-#      미소비 Notion 483 행을 동기화한 뒤, 그 날짜 handoff 가 아직 OPEN(New)이면 grm-intake 를
+#      해당 날짜의 DB handoff 가 OPEN(New)이면 grm-intake 를
 #      다시 돌려 **handoff·스캐폴드를 재생성**한다. 그 결과를 다시 센다.
 #   ③ 그래도 남거나(파서 0건·스캔 판독 실패 등) 자동 경로가 없는 결손(WL·회수)이면 →
 #      `automation-warning` 경고 이슈(Admin 운영 상태 센터에 그대로 뜬다).
@@ -178,12 +178,6 @@ jobs:
         id: handoff
         if: steps.recover.outputs.done == 'true'
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          # [노션 은퇴 준비] handoff 상태를 어디서 읽나 — notion(기본) | db(대기열 표 intake_handoffs).
-          GRM_HANDOFF_STATUS_SOURCE: ${{ vars.GRM_HANDOFF_STATUS_SOURCE || 'notion' }}
-          # [노션 은퇴] off 면 노션 handoff 페이지가 없다 — 위 변수와 무관하게 DB 기록(intake_handoffs)으로 답한다.
-          GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           RUN_DATE: ${{ steps.ctx.outputs.run_date }}

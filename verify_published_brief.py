@@ -1,34 +1,5 @@
 #!/usr/bin/env python3
-"""GRM 발행 후 출처 링크 근거(provenance) 탐지(detective) — W1 belt-and-suspenders.
-
-발행(주간 Routine)은 LLM+MCP 라 결정론 **차단**은 발행 직전 예방 게이트
-(`brief_lint.run_publish_gate` / Publish Lint 17)에 의존한다. 이 모듈은 그 게이트를
-**발행 후 독립적으로 재실행**하는 2차 방어선이다 — (1) `lint_link_provenance`류(출처 근거)와
-(2) `lint_publish_structure`(구조: PL1 잔존토큰·PL3/16 금지문법)를 둘 다 재판정하고, FAIL
-(MFDS 날조 시그니처 `brd/*/view.do?seq=` 등)이면 운영 경고 JSON 을 낸다. CI
-(`grm-brief-audit.yml`)가 이 JSON 을 기존 `GRM Intake 운영 경고` Issue 로 띄운다.
-
-**대조 대상(2026-07-07 전환)**: 진입점 `run_audit()` 은 **웹 발행본**
-(`web/data/briefs/brief_web_{date}.json` — 현재 실 채널)을 우선 감사한다. 이 경로는
-파일 기반이라 brief 자체를 얻는 데 네트워크가 필요 없다(발행 PR 이 사람 승인 머지된 뒤에야
-CI 체크아웃에 존재 → 이미 신뢰된 입력). Notion `🌐 GRM Weekly Brief` DB 는 6/22 이후 신규
-페이지가 쓰이지 않는 **레거시**이며, 웹 발행본이 하나도 없을 때만 쓰는 폴백으로 남긴다
-(과거 페이지 삭제 없음). 상세 스코프·드롭한 체크 3개의 근거는 `run_audit`/`classify_web`
-주변 주석과 `GRM_SYSTEM.md` §2.1 ⑤/⑥ 참조. 레거시 `run()`(Notion 경로)은 완전 불변 — 발행
-주체 CC Routine 은 커넥터가 Notion 뿐이라 인-루틴 `--structure` 게이트를 코드로 못 돌리므로
-Notion 폴백이 살아있는 동안엔 이 발행 후 탐지가 요일류 결함의 유일 결정론 방어선이었다(W2).
-
-**과알림 0 원칙:**
-- 알림은 **FAIL 만** 트리거한다(WARN·미확인은 정보로만 본문에 싣고 알림 트리거 아님).
-- MFDS 미근거 링크 = FAIL(네트워크 없이 결정론 — 오탐 0, 실제 W24 사고 클래스).
-- 비-MFDS 미근거 링크는 live verify 가 **명확히 나쁨**(404·오류셸·기대어 부재)일 때만 FAIL
-  로 승격하고, 일시 네트워크 실패(unknown)는 알리지 않는다.
-- (Notion 폴백 한정) 토큰·페이지·handoff 부재 또는 fetch 실패는 `ok:true`(건너뜀)로 처리 —
-  false-red 금지. 웹 경로는 파일 존재 시 네트워크 의존이 없어 이 skip 클래스가 발생하지 않는다.
-
-순수 코어(URL 추출·분류·Issue JSON)는 네트워크 없이 단위테스트된다. Notion I/O 만
-lazy import(`collect_intake` 의 검증된 `notion_api_request` 재사용, 레거시 폴백 전용).
-"""
+"""Audit the latest published web brief for source provenance and structure."""
 from __future__ import annotations
 
 import copy
@@ -40,14 +11,6 @@ from typing import Any, Iterable
 
 import brief_lint as bl
 from grm_common import env_flag
-
-# Weekly Brief(발행) DB — v16 프롬프트 [발송] 의 ID. env 로 override 가능.
-# **레거시(2026-07-07 확인)**: 6/22 이후 신규 페이지가 쓰이지 않는다 — 실 발행 채널은
-# `web/data/briefs/`(아래 §웹 발행본 감사)로 대체됐다. 이 DB·경로는 웹 발행본을 못 찾을 때만
-# 쓰는 **폴백**으로 남긴다(과거 페이지 삭제 없음 — 참고용 보존). 상세=GRM_SYSTEM.md §2.1 ⑤/⑥.
-DEFAULT_WEEKLY_BRIEF_DB_ID = "3653142f-dc11-8049-806d-e0a779cafd90"
-# Intake/handoff DB — handoff page(Source=GRM Handoff)가 사는 곳(= NOTION_DATABASE_ID).
-DEFAULT_INTAKE_DB_ID = "7784c71fb7b343749b2bee5d04db7926"
 
 DEFAULT_AUDIT_JSON = "grm-brief-audit.json"
 # 웹 발행본(현 실채널) 디렉터리 — 규약은 `web/data/briefs/README.md`(주차당 1파일·
@@ -334,48 +297,6 @@ def _patchable_rich_text(rt: dict[str, Any], replacements: dict[str, str]) -> tu
     return out, changed
 
 
-def apply_autofix_replacements(token: str, blocks: list[dict[str, Any]],
-                               replacements: dict[str, str]) -> int:
-    """Notion rich_text 링크를 replacement map 으로 PATCH 한다. 호출자는 flag 를 확인한다."""
-    if not replacements:
-        return 0
-    ci = _ci()
-    patched = 0
-
-    def _walk(block_list: Iterable[dict[str, Any]]) -> None:
-        nonlocal patched
-        for block in block_list or []:
-            if not isinstance(block, dict):
-                continue
-            btype = block.get("type")
-            payload = block.get(btype, {}) if btype else {}
-            if isinstance(payload, dict) and isinstance(payload.get("rich_text"), list):
-                rich_text = []
-                changed = False
-                for rt in payload["rich_text"]:
-                    if isinstance(rt, dict):
-                        new_rt, rt_changed = _patchable_rich_text(rt, replacements)
-                        rich_text.append(new_rt)
-                        changed = changed or rt_changed
-                    else:
-                        rich_text.append(rt)
-                if changed and block.get("id"):
-                    ci.notion_api_request(
-                        "PATCH",
-                        f"https://api.notion.com/v1/blocks/{block['id']}",
-                        token,
-                        body={btype: {"rich_text": rich_text}},
-                    )
-                    patched += 1
-            if isinstance(payload, dict) and isinstance(payload.get("children"), list):
-                _walk(payload["children"])
-            if isinstance(block.get("children"), list):
-                _walk(block["children"])
-
-    _walk(blocks)
-    return patched
-
-
 def build_audit_json(alerts: list[bl.LintFinding],
                      info: list[bl.LintFinding],
                      *,
@@ -406,8 +327,7 @@ def skipped_json(note: str, *, run_date_kst: str = "", skip_class: str = "") -> 
     """대조 불가(토큰·brief·handoff 부재·fetch 실패) → ok:true 건너뜀(false-red 금지).
 
     `skip_class` 로 skip 을 두 클래스로 나눈다(과알림 0 유지 — CI 가 이 값으로 분기):
-      - ``"infra"``   = 탐지선(detective) 자체가 죽음(NOTION_TOKEN 부재·Notion 조회/본문
-                        fetch 실패). 발행 후 2차 방어선이 무력화된 상태 → CI(grm-brief-audit)
+      - "infra" means a valid published web brief could not be found.
                         가 **스케줄 실행에서만** 운영 경고로 표면화한다(토큰 만료 시 탐지선이
                         무기한 죽어도 신호 0 이던 침묵 실패를 차단).
       - ``"content"`` = 탐지선은 살아있고 대조 **대상**이 없음(Weekly Brief 페이지 없음·
@@ -440,126 +360,6 @@ def format_audit_report(result: dict[str, Any]) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Notion I/O — lazy import(collect_intake 재사용). 단위테스트는 stub 으로 대체.
-# ─────────────────────────────────────────────────────────────────────────────
-def _ci():  # lazy — 순수 코어/테스트는 collect_intake(=requests) 를 import 하지 않는다.
-    import collect_intake as ci
-    return ci
-
-
-_BRIEF_MAX_BLOCK_PAGES = 40   # children 100/page · 브리프 한 페이지 분량 안전 상한
-_BRIEF_MAX_DEPTH = 4          # callout>table>row 정도. 무한 재귀 방지.
-
-
-def fetch_latest_brief(token: str, db_id: str) -> dict[str, Any] | None:
-    """Weekly Brief DB 에서 가장 최근 발행 페이지 1건(메타) 조회.
-
-    정렬 기준: `발행일` 속성 내림차순(1차) · `created_time` 내림차순(2차, tie-break).
-    created_time 단독 정렬 시 나중에 생성된 과거 주차 중복 페이지가 최신으로
-    잘못 선택되는 사고가 있었다(발행일 역행 회귀, Issue #110).
-    """
-    ci = _ci()
-    body = {"page_size": 1, "sorts": [
-        {"property": "발행일", "direction": "descending"},
-        {"timestamp": "created_time", "direction": "descending"},
-    ]}
-    data = ci.notion_api_request(
-        "POST", ci.NOTION_DB_QUERY_URL_TPL.format(db_id=db_id), token, body=body)
-    results = data.get("results", [])
-    if not results:
-        return None
-    page = results[0]
-    title = ""
-    props = page.get("properties", {})
-    for prop in props.values():
-        if isinstance(prop, dict) and prop.get("type") == "title":
-            title = "".join(t.get("plain_text", "") for t in prop.get("title", []))
-            break
-    return {"id": page.get("id", ""), "url": page.get("url", ""), "title": title}
-
-
-def _fetch_block_children(token: str, block_id: str, depth: int) -> list[dict[str, Any]]:
-    ci = _ci()
-    url_tpl = ci.NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=block_id)
-    import urllib.parse
-    out: list[dict[str, Any]] = []
-    cursor: str | None = None
-    for _ in range(_BRIEF_MAX_BLOCK_PAGES):
-        req = url_tpl + (f"?start_cursor={urllib.parse.quote(cursor)}" if cursor else "")
-        data = ci.notion_api_request("GET", req, token)
-        for block in data.get("results", []):
-            if depth < _BRIEF_MAX_DEPTH and block.get("has_children"):
-                kids = _fetch_block_children(token, block.get("id", ""), depth + 1)
-                block.setdefault("children", []).extend(kids)
-            out.append(block)
-        if not data.get("has_more"):
-            break
-        cursor = data.get("next_cursor")
-    return out
-
-
-def fetch_brief_blocks(token: str, page_id: str) -> list[dict[str, Any]]:
-    """발행 페이지 본문(중첩 블록 재귀) 블록 리스트 — URL·평문 추출 공용 입력."""
-    return _fetch_block_children(token, page_id, 0)
-
-
-def fetch_brief_urls(token: str, page_id: str) -> list[str]:
-    """발행 페이지 본문(중첩 블록 재귀)에서 모든 링크 URL 추출."""
-    return extract_urls_from_blocks(fetch_brief_blocks(token, page_id))
-
-
-def fetch_latest_consumed_handoff_rows(token: str, db_id: str) -> list[dict[str, Any]]:
-    """Intake DB 에서 가장 최근 CONSUMED handoff(Status=Processed)의 rows[] 복원."""
-    ci = _ci()
-    body = {
-        "filter": {"and": [
-            {"property": ci.PROP_TYPE_CLASS, "select": {"equals": "routine-handoff"}},
-            {"property": ci.PROP_STATUS, "select": {"equals": "Processed"}},
-        ]},
-        "sorts": [{"timestamp": "last_edited_time", "direction": "descending"}],
-        "page_size": 1,
-    }
-    data = ci.notion_api_request(
-        "POST", ci.NOTION_DB_QUERY_URL_TPL.format(db_id=db_id), token, body=body)
-    results = data.get("results", [])
-    if not results:
-        return []
-    page_id = results[0].get("id", "")
-    text = _fetch_page_code_json(token, page_id)
-    if not text:
-        return []
-    try:
-        obj = json.loads(text)
-    except json.JSONDecodeError:
-        return []
-    return bl.extract_handoff_rows(obj)
-
-
-def _fetch_page_code_json(token: str, page_id: str) -> str:
-    """페이지 본문의 JSON code block 들을 순서대로 이어붙여 반환(handoff payload 복원)."""
-    ci = _ci()
-    import urllib.parse
-    url_tpl = ci.NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=page_id)
-    chunks: list[str] = []
-    cursor: str | None = None
-    for _ in range(ci._INTAKE_RAW_MAX_PAGES):
-        req = url_tpl + (f"?start_cursor={urllib.parse.quote(cursor)}" if cursor else "")
-        data = ci.notion_api_request("GET", req, token)
-        for block in data.get("results", []):
-            if block.get("type") != "code":
-                continue
-            code = block.get("code", {})
-            if (code.get("language") or "") not in ("json", "plain text", ""):
-                continue
-            for rt in code.get("rich_text", []):
-                chunks.append(rt.get("plain_text")
-                              or rt.get("text", {}).get("content", "") or "")
-        if not data.get("has_more"):
-            break
-        cursor = data.get("next_cursor")
-    return "".join(chunks)
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 # 웹 발행본(`web/data/briefs/`) 감사 — 2026-07-07 근본 전환. 파일 기반이라 네트워크 0(brief
 # 자체를 얻는 데 Notion 토큰·API 호출이 필요 없다 — 발행 PR 이 사람 승인으로 머지된 뒤에야
@@ -707,96 +507,14 @@ def run_web(brief_path: str, brief_json: dict[str, Any], *,
 # ─────────────────────────────────────────────────────────────────────────────
 # 실행
 # ─────────────────────────────────────────────────────────────────────────────
-def run_audit(token: str, *, weekly_db_id: str, intake_db_id: str,
-             verify: bool = True,
-             web_briefs_dir: str = DEFAULT_WEB_BRIEFS_DIR) -> dict[str, Any]:
-    """탐지 진입점(CLI 기본) — 웹 발행본 우선, 없으면 Notion(레거시) 폴백.
-
-    `web_briefs_dir` 에 유효한 `brief_web_*.json` 이 하나라도 있으면 그 최신본만 감사하고
-    Notion 은 아예 조회하지 않는다(중복 알림 방지). 웹 발행본이 하나도 없을 때만 기존 `run()`
-    (Notion 경로, 완전 불변)으로 넘어간다 — 웹 파이프 도입 전 과거 상태·과도기 대비.
-    """
+def run_audit(*, verify: bool = True,
+              web_briefs_dir: str = DEFAULT_WEB_BRIEFS_DIR) -> dict[str, Any]:
+    """Audit the latest valid web brief."""
     found = find_latest_web_brief(web_briefs_dir)
     if found is not None:
         path, data = found
         return run_web(path, data, verify=verify)
-    return run(token, weekly_db_id=weekly_db_id, intake_db_id=intake_db_id, verify=verify)
-
-
-def run(token: str, *, weekly_db_id: str, intake_db_id: str,
-        verify: bool = True) -> dict[str, Any]:
-    """탐지 1회 실행 → audit JSON(출처 근거 + 구조). 대조 불가/오류는 ok:true 건너뜀(false-red 금지).
-
-    URL 근거 대조(handoff 필요)와 별개로, 발행 본문 평문에 `lint_publish_structure` 를 돌려
-    구조 위반(요일·잔존토큰·금지문법)도 alert 로 집계한다 — 구조 검사는 handoff 없이도
-    가능하지만 본 함수는 근거 대조와 한 번에 묶어 실행한다(handoff 미발견 시 전체 건너뜀).
-    """
-    if not token:
-        # infra: 토큰 부재 = 탐지선 자체가 못 뜬다(만료 시 무기한 침묵 방지 → 스케줄 경보).
-        return skipped_json("NOTION_TOKEN 부재 — 발행 후 탐지 건너뜀", skip_class="infra")
-    try:
-        brief = fetch_latest_brief(token, weekly_db_id)
-    except Exception as exc:  # noqa: BLE001
-        # infra: Notion 조회 실패(만료·권한·네트워크) = 탐지선 죽음.
-        return skipped_json(f"Weekly Brief 조회 실패(건너뜀): {str(exc)[:160]}",
-                            skip_class="infra")
-    if not brief:
-        # content: 탐지선은 살아있고 발행 대상만 없음 → 무알림(발행 부재는 다른 경로가 커버).
-        return skipped_json("Weekly Brief 페이지 없음 — 건너뜀", skip_class="content")
-    try:
-        rows = fetch_latest_consumed_handoff_rows(token, intake_db_id)
-    except Exception as exc:  # noqa: BLE001
-        # infra: handoff 조회 실패 = 탐지선 죽음.
-        return skipped_json(f"handoff 조회 실패(건너뜀): {str(exc)[:160]}",
-                            skip_class="infra")
-    if not rows:
-        # content: 근거 집합이 없으면 모든 링크가 미근거로 보여 과알림 → 대조 불가로 건너뜀
-        # (탐지선은 살아있고 대조 대상 handoff 만 없음 → 무알림).
-        return skipped_json("CONSUMED handoff 미발견 — 근거 대조 불가, 건너뜀",
-                            skip_class="content")
-    try:
-        blocks = fetch_brief_blocks(token, brief["id"])
-    except Exception as exc:  # noqa: BLE001
-        # infra: 본문 fetch 실패 = 탐지선 죽음.
-        return skipped_json(f"브리프 본문 fetch 실패(건너뜀): {str(exc)[:160]}",
-                            skip_class="infra")
-    urls = extract_urls_from_blocks(blocks)
-    text = extract_text_from_blocks(blocks)
-
-    verdict = (lambda u: definitive_verdict(u)) if verify else None
-    alerts, info = classify(rows, urls, verdict=verdict, published_text=text)
-    # 구조 위반(PL1 잔존토큰·PL3/16 금지문법·PL14 요일=날짜)도 alert 로 포함한다 —
-    # 발행 직전 `--structure` 게이트와 동등한 결정론 검사(네트워크 0 → 과알림 0). MCP 전용
-    # Routine 은 인-루틴 게이트를 코드로 못 돌리므로 이 탐지가 요일류 결함의 유일 결정론 방어선.
-    struct_alerts = [f for f in bl.lint_publish_structure(text) if f.severity == bl.SEV_FAIL]
-    # scaffold 고정 셀 전사 무결성(PL18) — handoff card_scaffold 의 W2 표 고정 셀(FEI·발행일·
-    # 시설유형·Class·문서번호 등)이 발행본에 글자그대로 보존됐는지 결정론 대조(06-22 FDA 483/
-    # Lancora 사고 클래스). 렌더된 카드만·과알림 0. 전부 FAIL 만 반환하므로 그대로 alert 에 합산.
-    scaffold_cell_alerts = bl.lint_scaffold_fixed_cells(rows, text)
-    # 수집 현황 '수집' 숫자(총계+소스별)를 handoff 정본과 대조한다(W2) — 발행물 LLM 집계가
-    # 수집기 산출과 어긋나면 FAIL(요일 PL14 와 동형 결정론 검사·네트워크 0 → 과알림 0). 정본은
-    # handoff rows 로 독립 재집계(build_coverage_collected = W1 이 handoff 에 싣는 값과 동일 산식).
-    try:
-        expected_cov = _ci().build_coverage_collected(_ci().coverage_source_counts(rows))
-    except Exception:  # noqa: BLE001 — 정본 산출 실패는 대조 생략(false-red 금지)
-        expected_cov = None
-    cov_findings = bl.lint_coverage_counts(expected_cov, text)
-    cov_alerts = [f for f in cov_findings if f.severity == bl.SEV_FAIL]
-    info = info + [f for f in cov_findings if f.severity != bl.SEV_FAIL]
-    alerts = struct_alerts + cov_alerts + scaffold_cell_alerts + alerts
-    note = ""
-    if alerts and _enable_brief_autofix():
-        replacements = build_autofix_replacements(rows, urls, published_text=text)
-        if replacements:
-            try:
-                patched = apply_autofix_replacements(token, blocks, replacements)
-                note = f"ENABLE_BRIEF_AUTOFIX=true — URL self-heal PATCH {patched} block(s)."
-            except Exception as exc:  # noqa: BLE001
-                note = f"ENABLE_BRIEF_AUTOFIX=true — URL self-heal 실패: {str(exc)[:160]}"
-        else:
-            note = "ENABLE_BRIEF_AUTOFIX=true — unambiguous URL replacement 없음(알림만)."
-    return build_audit_json(alerts, info, brief_title=brief.get("title", ""),
-                            brief_url=brief.get("url", ""), note=note)
+    return skipped_json("No valid published web brief found", skip_class="infra")
 
 
 def main(argv: "list[str] | None" = None) -> int:
@@ -813,22 +531,14 @@ def main(argv: "list[str] | None" = None) -> int:
                    help="audit 결과 JSON 출력 경로.")
     p.add_argument("--web-briefs-dir",
                    default=os.environ.get("GRM_WEB_BRIEFS_DIR", DEFAULT_WEB_BRIEFS_DIR),
-                   help="웹 발행본 디렉터리(현 실채널). 유효한 brief_web_*.json 이 있으면 "
-                        "이 경로만 감사하고 Notion 은 조회하지 않는다 — 없을 때만 Notion 폴백.")
+                   help="Directory containing published brief_web_*.json files.")
     p.add_argument("--no-verify", action="store_true",
                    help="비-MFDS 미근거 링크 live verify 생략(MFDS 결정론 FAIL 만).")
     p.add_argument("--exit-nonzero-on-fail", action="store_true",
                    help="(로컬용) alert 발생 시 exit 1. CI 는 JSON 으로 Issue 처리(기본 exit 0).")
     args = p.parse_args(argv)
 
-    token = os.environ.get("NOTION_TOKEN", "").strip()
-    weekly_db = (os.environ.get("GRM_WEEKLY_BRIEF_DB_ID") or DEFAULT_WEEKLY_BRIEF_DB_ID).strip()
-    intake_db = (os.environ.get("NOTION_DATABASE_ID")
-                 or os.environ.get("GRM_INTAKE_DB_ID")
-                 or DEFAULT_INTAKE_DB_ID).strip()
-
-    result = run_audit(token, weekly_db_id=weekly_db, intake_db_id=intake_db,
-                       verify=not args.no_verify, web_briefs_dir=args.web_briefs_dir)
+    result = run_audit(verify=not args.no_verify, web_briefs_dir=args.web_briefs_dir)
     try:
         with open(args.out, "w", encoding="utf-8") as fh:
             json.dump(result, fh, ensure_ascii=False, indent=2)

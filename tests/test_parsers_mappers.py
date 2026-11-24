@@ -5,16 +5,13 @@
   _stable_doc_id·_safe_date_iso — 모든 수집기의 윈도우 필터·dedup 의 기반.
 - _FDAWLTableParser·_parse_wl_date: FDA WL HTML 테이블 파싱(노이즈 게이트는
   test_noise_filters 가 커버 — 여기선 파싱만).
-- build_notion_properties/children: IntakeItem→Notion 매핑. raw JSON code block
-  보존(Evidence A 재검증)·1900자 청크 분할·누락 필드 graceful 생략.
 
 테스트 전용 배치 — 프로덕션 로직 무변경.
 """
-import json
 import os
 import sys
 import unittest
-from datetime import date, datetime
+from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -165,120 +162,12 @@ class ParseWlDateTest(unittest.TestCase):
         self.assertEqual(ci._parse_wl_date("99/99/2026"), "")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# T2-c. build_notion_properties / build_notion_children
-# ─────────────────────────────────────────────────────────────────────────────
-RUN_DATE = date(2026, 6, 10)
-COLLECTED = datetime(2026, 6, 10, 3, 17)
-
-
-def _item(**over):
-    base = dict(
-        source=ci.SOURCE_MFDS, document_id="recall-abc123", date_iso="2026-06-08",
-        headline="[회수·판매중지] 테스트정", official_url="https://mfds.go.kr/x",
-        type_or_class="recall-quality", firm="테스트제약",
-        body="회수 사유 본문", api_query="https://apis.data.go.kr/x?y=1",
-        qa_relevance="Likely", signal_tier="Tier 3",
-        raw_payload={"RTRVL_RESN": "함량부적합", "PRDUCT": "테스트정"},
-        language="KO", region_jurisdiction="Korea (MFDS)",
-    )
-    base.update(over)
-    return ci.IntakeItem(**base)
-
-
-class BuildNotionPropertiesTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self._saved = os.environ.pop("ENABLE_MODALITY_TAG", None)
-
-    def tearDown(self) -> None:
-        if self._saved is not None:
-            os.environ["ENABLE_MODALITY_TAG"] = self._saved
-        else:
-            os.environ.pop("ENABLE_MODALITY_TAG", None)
-
-    def test_core_property_mapping(self) -> None:
-        props = ci.build_notion_properties(_item(), RUN_DATE, COLLECTED)
-        self.assertEqual(props[ci.PROP_SOURCE]["select"]["name"], ci.SOURCE_MFDS)
-        self.assertEqual(props[ci.PROP_DOC_ID]["rich_text"][0]["text"]["content"],
-                         "recall-abc123")
-        self.assertEqual(props[ci.PROP_SIGNAL_TIER]["select"]["name"], "Tier 3")
-        self.assertEqual(props[ci.PROP_QA_RELEVANCE]["select"]["name"], "Likely")
-        self.assertEqual(props[ci.PROP_STATUS]["select"]["name"], "New")
-        self.assertEqual(props[ci.PROP_RUN_DATE]["date"]["start"], "2026-06-10")
-        self.assertEqual(props[ci.PROP_DATE]["date"]["start"], "2026-06-08")
-        self.assertEqual(props[ci.PROP_OFFICIAL_URL]["url"], "https://mfds.go.kr/x")
-        self.assertEqual(props[ci.PROP_API_QUERY]["url"],
-                         "https://apis.data.go.kr/x?y=1")
-        self.assertEqual(props[ci.PROP_LANGUAGE]["select"]["name"], "KO")
-        # Name 타이틀: 소스 프리픽스 + doc id.
-        title = props[ci.PROP_NAME]["title"][0]["text"]["content"]
-        self.assertTrue(title.startswith("MFDS recall-abc123"))
-
-    def test_missing_optional_fields_are_omitted_not_none(self) -> None:
-        # 빈 url/date/firm → 속성 자체 생략(None 값이 props 에 들어가면 Notion 400).
-        props = ci.build_notion_properties(
-            _item(official_url="", date_iso="", firm="", api_query="", body=""),
-            RUN_DATE, COLLECTED)
-        for key in (ci.PROP_OFFICIAL_URL, ci.PROP_DATE, ci.PROP_FIRM,
-                    ci.PROP_API_QUERY, ci.PROP_BODY):
-            self.assertNotIn(key, props)
-        self.assertTrue(all(v is not None for v in props.values()))
-
-    def test_modality_gate_on_off(self) -> None:
-        # ENABLE_MODALITY_TAG=true 일 때만 Modality select 기록(안전 게이트).
-        os.environ["ENABLE_MODALITY_TAG"] = "true"
-        props_on = ci.build_notion_properties(_item(), RUN_DATE, COLLECTED)
-        self.assertIn(ci.PROP_MODALITY, props_on)
-        self.assertIn(props_on[ci.PROP_MODALITY]["select"]["name"],
-                      (ci.MODALITY_CHEMICAL, ci.MODALITY_BIOLOGIC, ci.MODALITY_OTHER))
-        os.environ["ENABLE_MODALITY_TAG"] = "false"
-        props_off = ci.build_notion_properties(_item(), RUN_DATE, COLLECTED)
-        self.assertNotIn(ci.PROP_MODALITY, props_off)
-
-
-class RichTextChunkingTest(unittest.TestCase):
-    def test_long_text_split_into_1900_char_chunks(self) -> None:
-        text = "가" * 4500
-        parts = ci._rich_text(text)
-        self.assertEqual(len(parts), 3)                       # 1900+1900+700
-        self.assertTrue(all(
-            len(p["text"]["content"]) <= ci.NOTION_RICH_TEXT_CHUNK for p in parts))
-        self.assertEqual("".join(p["text"]["content"] for p in parts), text)
-
-    def test_empty_returns_empty_list(self) -> None:
-        self.assertEqual(ci._rich_text(""), [])
-
+class TruncateTest(unittest.TestCase):
     def test_truncate_appends_ellipsis_within_limit(self) -> None:
         self.assertEqual(ci.truncate("짧음", 10), "짧음")
         out = ci.truncate("a" * 3000, 1900)
         self.assertEqual(len(out), 1900)
         self.assertTrue(out.endswith("…"))
-
-
-class BuildNotionChildrenTest(unittest.TestCase):
-    def test_raw_payload_round_trips_through_code_blocks(self) -> None:
-        # Evidence A 재검증용 — code block 들을 이어붙이면 원본 JSON 완전 복원.
-        item = _item(raw_payload={"RTRVL_RESN": "함량부적합 " * 800,   # JSON >1900자 보장
-                                  "PRDUCT": "테스트정", "n": 42})
-        blocks = ci.build_notion_children(item)
-        self.assertEqual(blocks[0]["type"], "heading_3")
-        self.assertEqual(
-            blocks[0]["heading_3"]["rich_text"][0]["text"]["content"],
-            "Raw API payload")
-        code_blocks = [b for b in blocks[1:] if b["type"] == "code"]
-        self.assertEqual(len(code_blocks), len(blocks) - 1)   # heading 외 전부 code
-        for b in code_blocks:
-            self.assertEqual(b["code"]["language"], "json")
-            self.assertLessEqual(len(b["code"]["rich_text"][0]["text"]["content"]),
-                                 ci.NOTION_CODE_BLOCK_CHUNK)
-        rejoined = "".join(
-            b["code"]["rich_text"][0]["text"]["content"] for b in code_blocks)
-        self.assertEqual(json.loads(rejoined), item.raw_payload)
-        self.assertGreater(len(code_blocks), 1)               # 장문 → 청크 분할 검증
-
-    def test_small_payload_single_code_block(self) -> None:
-        blocks = ci.build_notion_children(_item(raw_payload={"k": "v"}))
-        self.assertEqual(len(blocks), 2)                      # heading + code 1개
 
 
 if __name__ == "__main__":

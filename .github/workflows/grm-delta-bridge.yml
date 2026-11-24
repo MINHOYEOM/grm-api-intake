@@ -1,16 +1,7 @@
-name: GRM Delta Bridge (Notion → git)
+name: GRM Delta Bridge (Git editorial return)
 
-# 클라우드 델타 브릿지(Fix A, §2) — 사람 컴퓨터가 꺼져 있어도 발행 준비가 진행되도록,
-# 클라우드 Routine 이 Notion Intake DB 에 예치한 슬롯 델타(OPEN GRM Web Delta {date})를
-# 읽어 web/data/deltas/delta_{date}.json 으로 커밋+push 한다(수집기가 handoff 를 Notion 에
-# 남기는 것과 정확히 대칭 — 이 워크플로가 그 반대편에서 읽어간다).
-#
-# 파이프:
-#   Notion OPEN GRM Web Delta {date} (Routine 예치, A-1)
-#     → delta_bridge.py (select_open_delta → extract_delta → write_delta)
-#       → web/data/deltas/delta_{date}.json(+deep_{date}.json) 커밋 + push (PAT)
-#         → grm-web-publish.yml 이 push 트리거로 자동 기동
-#     (노션 은퇴 ③ 뒤: 노션 CONSUMED 마감 없음 — 정본은 편집팀·백업 v17 의 git 반납, 변수 GRM_INTAKE_NOTION=off 전용)
+# Validates the editorial or backup return and records its delta and scaffold.
+# The commit on main triggers grm-web-publish.yml.
 #
 # 무인 라이브 0: 이 워크플로우는 델타 커밋까지만 — main 에 직접 push 하지만 발행 PR/프리뷰/
 # 라이브는 건드리지 않는다(④ grm-web-publish.yml 이하가 별도로 이어받음).
@@ -37,15 +28,9 @@ on:
   workflow_dispatch:
     inputs:
       publish_date:
-        description: '발행일 YYYY-MM-DD (선택 — 미지정 시 최신 OPEN Web Delta 페이지 날짜)'
+        description: 'Publication date YYYY-MM-DD (defaults to today in KST)'
         required: false
         type: string
-      source:
-        description: '정본 길 — default 면 저장소 변수 GRM_DELTA_SOURCE(없으면 notion). notion=노션 정본·git 은 비교만 / git=편집팀 브랜치 먼저·노션 예비'
-        required: false
-        type: choice
-        default: 'default'
-        options: ['default', 'notion', 'git']
       compare_only:
         description: '쓰지 않고 비교만 — main 에 기록된 그 주 델타 vs claude/company-{날짜} 반납 (publish_date 필수)'
         required: false
@@ -68,18 +53,6 @@ jobs:
   bridge:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      GRM_INTAKE_DB_ID: '7784c71fb7b343749b2bee5d04db7926'
-      # [2026-11-12] 결과 반납 정본 길(재검토안 3절 1단계). 기본 notion = 지금과 같고 git 반납은
-      #   비교만(차이표는 Actions 요약 + 아티팩트 delta-compare). git 으로 바꾸려면 저장소 변수
-      #   GRM_DELTA_SOURCE=git. 같은 날 두 길이 다르면 먼저 main 에 기록된 쪽이 이긴다.
-      GRM_DELTA_SOURCE: ${{ (github.event.inputs.source != 'default' && github.event.inputs.source) || vars.GRM_DELTA_SOURCE || 'notion' }}
-      # [노션 은퇴 준비] 심층분석 원문 정본을 어디서 읽나 — notion(기본) | git(DB handoff 의 브랜치 사본, 못 읽으면 노션).
-      #   델타에 handoff_ref 가 있는 호(편집팀이 git handoff 로 만든 호)는 이 값과 무관하게 git 사본을 읽는다.
-      GRM_HANDOFF_BODY_SOURCE: ${{ vars.GRM_HANDOFF_BODY_SOURCE || 'notion' }}
-      # [노션 은퇴] off 면 브릿지가 노션을 읽지도 쓰지도 않는다 — 정본은 git 반납 하나, 노션 예비 길·CONSUMED 없음
-      #   (delta_bridge.notion_off). 수집기·원천 대조와 같은 변수.
-      GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -100,28 +73,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # [노션 은퇴 ③ 2026-11-24] 노션 CONSUMED 마감·노션 행 상태(notion-sync) 단계를 지웠다 — 노션 길로 기록한 호를
-      #   닫을 단계가 없으니 이 워크플로는 변수 GRM_INTAKE_NOTION=off 에서만 돈다. 노션을 다시 켜려면 이 PR 을 되돌린다.
-      - name: 노션 off 확인 (③ 정리 뒤에는 off 에서만 돈다)
-        if: vars.GRM_INTAKE_NOTION != 'off'
-        run: |
-          echo "::error title=노션 off 아님::저장소 변수 GRM_INTAKE_NOTION 이 off 가 아니다(현재: '${{ vars.GRM_INTAKE_NOTION }}'). 노션 마감 단계가 없어 노션 길로 기록하면 같은 예치를 매 회차 다시 집는다. 변수를 off 로 두거나 ③ 정리 PR 을 되돌린다."
-          exit 1
-
       - name: 델타 브릿지 실행(select → extract → write)
         id: bridge
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: |
           set -euo pipefail
-          ARGS=(--db "$GRM_INTAKE_DB_ID")
+          ARGS=()
           if [ -n "${{ github.event.inputs.publish_date }}" ]; then
             ARGS+=(--publish-date "${{ github.event.inputs.publish_date }}")
           fi
           if [ "${{ github.event.inputs.compare_only }}" = "true" ]; then
             ARGS+=(--compare-only)
           fi
-          echo "정본 길: $GRM_DELTA_SOURCE"
           python delta_bridge.py "${ARGS[@]}"
 
       - name: 두 길 비교표 보관

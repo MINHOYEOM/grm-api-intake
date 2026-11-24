@@ -1,31 +1,5 @@
 #!/usr/bin/env python3
-"""GRM 웹 발행 클라우드 자동화 — Fix A: 클라우드 델타 브릿지 (설계 §2, A-3).
-
-클라우드 Routine 은 Notion 커넥터만 있어 git 에 못 쓴다. Routine 이 완성 슬롯 델타 JSON 을
-Notion Intake DB 페이지(`OPEN GRM Web Delta {date}`)에 예치하면(A-1), 이 스크립트가 그 반대편
-에서 읽어 `web/data/deltas/delta_{date}.json` 으로 커밋 가능한 파일을 만든다 — 수집기가
-handoff 를 Notion 에 남기는 것과 정확히 대칭(`grm_handoff.py` 의 읽기/소비 패턴을 미러링).
-
-`grm_notion.py`(`notion_headers`·`notion_api_request`) 를 재사용한다 — 새 HTTP 클라이언트를
-만들지 않는다. 검증은 `inject_slots` 의 슬롯 계약(최소: 최상위 dict + cards dict + tldr list)을
-재사용한다.
-
-순수 판정(select_open_delta·extract_delta·write_delta)과 얇은 I/O(consume_delta·main)를
-분리한다. 실행 순서(A-2 워크플로가 기대):
-  1) main() 이 select → extract → write 를 수행하고 wrote/date 를 $GITHUB_OUTPUT 에 낸다.
-  2) 워크플로가 wrote=true 일 때만 git add/commit/push.
-  3) push 성공 후에만 `--consume` 재실행으로 Notion 페이지를 CONSUMED 처리한다
-     (커밋 전 CONSUMED 금지 — handoff PL-10 순서와 동형, 소비=영구 처리).
-
-OPEN 델타 페이지가 없으면 클린 skip(exit 0). 구조 불량 델타는 fail-loud(exit 1) — 조용히
-빈 델타를 커밋하지 않는다. 같은 publish_date 파일이 이미 있고 내용이 다르면 exit 1(재발행은
-사람 판단). 내용이 같으면 wrote=false(멱등 no-op).
-
-[2026-08-17] deep 델타의 `source_text`(근거 대조 기준선)는 **Routine 이 옮겨 적은 것을 믿지
-않고** 그 주 handoff 페이지의 `deep_analysis_input.body_full` 에서 직접 읽어 맞춘다
-(`fetch_handoff_body_full`→`apply_handoff_source_text`). 전사 경로가 사라져 무인 실행에서
-사람 대조가 필요 없어진다. handoff 를 못 읽으면 예치본으로 종전과 동일하게 진행(비차단).
-"""
+"""Validate editorial Git returns and record the weekly delta and scaffold."""
 from __future__ import annotations
 
 import argparse
@@ -36,18 +10,6 @@ import sys
 from typing import Any
 
 from grm_common import log
-from grm_notion import (
-    NOTION_BLOCK_CHILDREN_URL_TPL,
-    NOTION_DB_QUERY_URL_TPL,
-    NOTION_PAGE_URL_TPL,
-    NotionHandoffError,
-    PROP_NAME,
-    PROP_STATUS,
-    PROP_TYPE_CLASS,
-    _rich_text,
-    _select,
-    notion_api_request,
-)
 
 try:
     import inject_slots
@@ -58,12 +20,6 @@ try:
     import verify_deep_analysis as _vda
 except ImportError:  # pragma: no cover — 항상 동봉되지만 방어적으로.
     _vda = None  # type: ignore[assignment]
-
-try:
-    from grm_handoff import handoff_id_for, notion_find_handoff_page
-except ImportError:  # pragma: no cover — 항상 동봉되지만 방어적으로.
-    handoff_id_for = None  # type: ignore[assignment]
-    notion_find_handoff_page = None  # type: ignore[assignment]
 
 
 TYPE_WEB_DELTA = "web-delta"
@@ -86,154 +42,6 @@ _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 class DeltaBridgeError(RuntimeError):
     """브릿지 fail-loud 전용 예외 — 구조 불량/네트워크 실패를 조용히 넘기지 않는다."""
-
-
-def _plain_text(parts: list[dict[str, Any]] | None) -> str:
-    if not parts:
-        return ""
-    return "".join(p.get("plain_text", "") for p in parts).strip()
-
-
-def _prop_title(props: dict[str, Any], name: str) -> str:
-    return _plain_text(props.get(name, {}).get("title", []))
-
-
-def _prop_select(props: dict[str, Any], name: str) -> str:
-    return (props.get(name, {}).get("select") or {}).get("name", "") or ""
-
-
-def _date_from_title(title: str) -> str:
-    """`OPEN GRM Web Delta {date}` / `OPEN GRM Web Deep Delta {date}` 제목에서 날짜만 추출."""
-    for prefix in (TITLE_PREFIX_OPEN_DEEP, TITLE_PREFIX_OPEN):
-        if title.startswith(prefix):
-            return title[len(prefix):].strip()
-    return ""
-
-
-def _query_open_pages(token: str, db_id: str,
-                       type_class: str) -> list[tuple[str, dict[str, Any]]]:
-    """Intake DB 에서 `Type or Class=<type_class> ∧ Status=New` 페이지를 (run_date, page)로.
-
-    제목에서 날짜를 못 뽑는 페이지는 skip(WARN). 페이지네이션 상한 25(handoff 동형).
-    """
-    url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
-    body: dict[str, Any] = {
-        "filter": {"and": [
-            {"property": PROP_TYPE_CLASS, "select": {"equals": type_class}},
-            {"property": PROP_STATUS, "select": {"equals": "New"}},
-        ]},
-        "page_size": 100,
-    }
-    candidates: list[tuple[str, dict[str, Any]]] = []
-    start_cursor: str | None = None
-    for _ in range(25):  # OPEN 페이지는 소수 — 안전 상한(handoff 패턴과 동형)
-        if start_cursor:
-            body["start_cursor"] = start_cursor
-        elif "start_cursor" in body:
-            del body["start_cursor"]
-        data = notion_api_request("POST", url, token, body=body)
-        for page in data.get("results", []):
-            title = _prop_title(page.get("properties", {}), PROP_NAME)
-            run_date = _date_from_title(title)
-            if not run_date:
-                log("WARN", f"{type_class} 페이지 제목에서 날짜 파생 실패 — skip: {title!r}")
-                continue
-            candidates.append((run_date, page))
-        if not data.get("has_more"):
-            break
-        start_cursor = data.get("next_cursor")
-    else:
-        log("WARN", f"{type_class} OPEN 조회 25페이지 상한 도달 — 일부 페이지 누락 가능")
-    return candidates
-
-
-def select_open_delta(token: str, db_id: str,
-                       publish_date: str | None = None) -> dict[str, Any] | None:
-    """Intake DB 에서 `Type or Class=web-delta ∧ Status=New` OPEN 페이지 1건을 고른다.
-
-    `publish_date` 지정 시 그 날짜의 OPEN 페이지. 미지정 시 제목에서 파생한 날짜가
-    **가장 큰**(최신) 페이지 1건(K4-1 "최신 OPEN 이 입력" 동형 — '오늘'을 계산하지 않는다).
-    없으면 None(클린 skip 판단은 호출부 몫).
-    """
-    candidates = _query_open_pages(token, db_id, TYPE_WEB_DELTA)
-    if not candidates:
-        return None
-
-    if publish_date:
-        matches = [pg for d, pg in candidates if d == publish_date]
-        if not matches:
-            return None
-        # 동일 날짜 복수(비정상) — 가장 최근 편집분 우선(handoff notion_find_handoff_page 동형).
-        matches.sort(key=lambda p: p.get("last_edited_time", ""), reverse=True)
-        return matches[0]
-
-    candidates.sort(key=lambda item: item[0])  # run_date(YYYY-MM-DD) 문자열 정렬 = 날짜순
-    return candidates[-1][1]
-
-
-def select_open_deep_delta(token: str, db_id: str,
-                            publish_date: str) -> dict[str, Any] | None:
-    """`Type or Class=web-deep-delta ∧ Status=New` 중 **날짜가 정확히 일치**하는 1건.
-
-    **왜 별도 페이지를 조회하나(2026-08-03 사고).** 예치 규약(`GRM_Prompt_v16.md`,
-    `GRM_Routine_델타예치_스니펫.md`)은 deep 델타를 web-delta 페이지의 두 번째 코드블록
-    **또는** 별도 페이지 `OPEN GRM Web Deep Delta {date}`(`web-deep-delta`)로 예치하는 걸
-    허용한다. 그런데 브릿지는 `web-delta` 만 조회해, Routine 이 문서대로 별도 페이지를 쓴 주에
-    deep 이 **조용히 유실**됐다(브릿지는 exit 0 성공 + "deep 없음(정상)" 로그 — 진짜 정상과
-    유실이 같은 문장으로 나와 3주간 아무도 못 봤다). 상수 `TYPE_WEB_DEEP_DELTA` 는 정의만
-    돼 있고 선택 경로에 배선돼 있지 않았다.
-
-    ⚠️ `publish_date` 는 **필수**다(최신 1건 폴백 없음). deep 은 그 주 delta 의 카드 id 공간에
-    종속되므로, 지난 주 잔류 OPEN deep 페이지가 이번 주 delta 에 짝지어지면 카드 id 가 전부
-    빗나가 조용히 유실된다 — '최신'이 아니라 '같은 날짜'만 짝이다.
-    """
-    if not publish_date:
-        raise DeltaBridgeError("select_open_deep_delta: publish_date 필수(날짜 정확일치만 허용)")
-    matches = [pg for d, pg in _query_open_pages(token, db_id, TYPE_WEB_DEEP_DELTA)
-               if d == publish_date]
-    if not matches:
-        return None
-    if len(matches) > 1:
-        log("WARN", f"web-deep-delta OPEN 페이지가 {publish_date} 에 {len(matches)}건 — "
-                    "가장 최근 편집분 사용(비정상: 중복 예치 확인 필요)")
-    matches.sort(key=lambda p: p.get("last_edited_time", ""), reverse=True)
-    return matches[0]
-
-
-def _fetch_code_blocks(token: str, page_id: str) -> list[str]:
-    """페이지 본문의 code 블록 원문 텍스트들을 순서대로 반환. 코드블록이 아니면 skip.
-
-    ★파싱하지 않고 원문을 그대로 보존한다 — Notion 은 긴 본문을 여러 code 블록으로
-    쪼개 저장할 수 있어(작성 도구 의존), 블록 단위 선-파싱은 쪼개진 델타를 전부 버리는
-    침묵 실패가 된다. 파싱·결합 전략은 extract_delta 가 담당(A/B/C 폴백)."""
-    url = NOTION_BLOCK_CHILDREN_URL_TPL.format(block_id=page_id)
-    texts: list[str] = []
-    start_cursor: str | None = None
-    for _ in range(25):
-        req_url = url
-        if start_cursor:
-            req_url = f"{url}?start_cursor={start_cursor}"
-        data = notion_api_request("GET", req_url, token)
-        for block in data.get("results", []):
-            if block.get("type") != "code":
-                continue
-            code = block.get("code", {})
-            text = "".join(
-                rt.get("plain_text") or rt.get("text", {}).get("content", "") or ""
-                for rt in code.get("rich_text", [])
-            )
-            if text.strip():
-                texts.append(text)
-        if not data.get("has_more"):
-            break
-        start_cursor = data.get("next_cursor")
-    else:
-        # [2026-08-17] 상한 도달을 **말은 하게** 한다. 델타 페이지는 블록이 몇 개뿐이라 이 상한이
-        # 걸릴 일이 없었지만, handoff 페이지는 payload 전문이 1,900자씩 쪼개져 실려 실측 175~230
-        # 블록(2~3 API 페이지)이다. 조용히 잘리면 뒤이은 json 파싱이 실패해 "handoff 없음"으로
-        # degrade 하는데, 그 로그만 봐서는 페이지가 없는 건지 잘린 건지 구별할 수 없다.
-        log("WARN", f"코드블록 조회 25페이지 상한 도달(page={page_id}) — 본문 일부 누락 가능")
-    return texts
 
 
 def _validate_envelope(obj: Any, *, what: str) -> dict[str, Any]:
@@ -479,58 +287,6 @@ def extract_handoff_body_full(payload: dict[str, Any]) -> dict[str, str]:
     return bodies
 
 
-def fetch_handoff_body_full(token: str, db_id: str, publish_date: str) -> dict[str, str]:
-    """그 주 Routine handoff 페이지에서 카드별 심층분석 입력 원문을 되찾아 온다.
-
-    **왜 되찾아 오나(2026-08-17).** 종전 계약은 deep 델타의 `source_text` 에 그 카드의
-    `body_full`(483 은 12~14k자)을 **클라우드 Routine 이 그대로 옮겨 적어** 예치하라고 요구했다.
-    그런데 `source_text` 는 장식이 아니라 **근거 대조의 기준선**이다 — `verify_deep_analysis` 의
-    D2(조항 인용)·D4(원문 verbatim)·D5b(483 절단)가 전부 이 문자열 안에서 근거를 찾고,
-    조립 단계의 `_refresh_483_observations`·`_refresh_wl_violations` 는 이 문자열을 **다시
-    파싱**해 발행 카드의 결정론 블록을 만든다. 즉 LLM 이 옮겨 적다 흘린 만큼이 그대로
-    "원문에 없는 것"이 된다.
-    2026-08-17 실측: Routine 이 예치한 6건이 **6건 전부** body_full 과 달랐다(각 51~241자,
-    말미 업체주소·업체번호·사업자등록번호 블록이 통째로 누락). 무인 실행에는 대조할 사람이 없다.
-
-    `body_full` 은 애초에 **같은 Notion DB 의 그 주 handoff 페이지 안에**
-    `rows[].deep_analysis_input.body_full` 로 이미 있다(Routine 이 그걸 읽고 분석했다).
-    그러니 옮겨 적게 하지 말고 브릿지가 직접 읽는다 — 전사 경로 자체가 없어진다.
-
-    ★ 여기서 가져오는 값이 **정확히 분석기가 본 입력**이라는 점이 핵심이다. 게이트는 "LLM 이
-    받은 원문"과 대조해야 맞다. 더 풍부한 텍스트로 대조하면 게이트가 과하게 관대해지고,
-    더 빈약한 텍스트로 대조하면 멀쩡한 인용이 거짓 FAIL 난다.
-
-    짝은 **날짜 정확일치**만이다(`routine-handoff::{publish_date}`) — 예치 규약이
-    `publish_date` = 그 handoff 의 `run_date_kst` 로 못박고 있다. '최신 handoff' 폴백을 두면
-    지난 주 원문으로 이번 주 분석을 대조하게 되고, 그건 조용한 오염이다
-    (`select_open_deep_delta` 의 판단과 동형).
-
-    반환: `{web_card_id: body_full}`. 페이지 없음·구조 불량은 빈 dict(호출부가 폴백).
-    """
-    if notion_find_handoff_page is None or handoff_id_for is None:  # pragma: no cover
-        log("WARN", "grm_handoff 미탑재 — handoff 원문 정본화 skip(예치된 source_text 사용)")
-        return {}
-    handoff_id = handoff_id_for(publish_date)
-    # `request=` 로 **이 모듈의** notion_api_request 를 넘긴다 — 그래야 브릿지의 Notion I/O 가
-    # 전부 한 이름을 지나가고, 호출부 테스트가 그 하나만 막으면 실제 네트워크로 새지 않는다.
-    page = notion_find_handoff_page(token, db_id, handoff_id, request=notion_api_request)
-    if page is None:
-        log("WARN", f"handoff 페이지 미발견({handoff_id}) — 예치된 source_text 를 그대로 사용")
-        return {}
-    texts = [t for t in _fetch_code_blocks(token, page.get("id", ""))
-             if isinstance(t, str) and t.strip()]
-    # payload 는 JSON 하나가 1,900자 단위 code 블록으로 쪼개져 실린다(`_handoff_blocks`) —
-    # 결합해야 파싱된다. 블록 단위 선-파싱은 전량 실패한다(_fetch_code_blocks 주석 동형).
-    payload = _try_json_dict("".join(texts))
-    if payload is None:
-        log("WARN", f"handoff payload JSON 파싱 실패({handoff_id}, 블록 {len(texts)}개) — "
-                    "예치된 source_text 를 그대로 사용")
-        return {}
-    bodies = extract_handoff_body_full(payload)
-    log("INFO", f"handoff 심층분석 입력 원문 {len(bodies)}건 확보({handoff_id})")
-    return bodies
-
-
 def apply_handoff_source_text(deep: dict[str, Any],
                               bodies: dict[str, str]) -> dict[str, int]:
     """deep 델타 각 카드의 `source_text` 를 handoff `body_full` 로 **정본화**한다(순수 함수).
@@ -581,21 +337,8 @@ def apply_handoff_source_text(deep: dict[str, Any],
     return stats
 
 
-ENV_HANDOFF_BODY_SOURCE = "GRM_HANDOFF_BODY_SOURCE"   # notion(기본) | git
 HANDOFF_MIRROR_BRANCH = "claude/queue-handoff"        # grm-queue-handoff-mirror.yml 이 쓰는 브랜치
 _HANDOFF_FETCHED: dict[str, bool] = {}
-
-
-def handoff_body_source() -> str:
-    """심층분석 원문 정본을 어디서 읽나 — 저장소 변수 GRM_HANDOFF_BODY_SOURCE(없으면 notion).
-
-    notion  그 주 Notion handoff 페이지(종전).
-    git     DB 로 만든 handoff 의 브랜치 사본(`claude/queue-handoff:handoff_{날짜}.json`). 못 읽으면 Notion.
-    델타에 `handoff_ref` 가 있는 호(편집팀이 git handoff 로 만든 호)는 이 변수와 무관하게 git 을 읽는다 —
-    정본은 "분석기가 실제로 본 입력"이어야 하기 때문이다(`_authoritative_source_text`).
-    """
-    value = os.environ.get(ENV_HANDOFF_BODY_SOURCE, "").strip().lower()
-    return SOURCE_GIT if value == SOURCE_GIT else SOURCE_NOTION
 
 
 def git_read_handoff(date_str: str) -> "str | None":
@@ -653,47 +396,18 @@ def fetch_handoff_body_full_git(date_str: str, expected_sha: str = "",
     return bodies
 
 
-def _authoritative_source_text(token: str, db_id: str, date_str: str,
-                               deep: dict[str, Any],
+def _authoritative_source_text(date_str: str, deep: dict[str, Any],
                                handoff_ref: "dict[str, Any] | None" = None) -> None:
-    """deep 델타의 `source_text` 를 그 주 handoff 원문으로 맞춘다(얇은 I/O·**비차단**).
-
-    `_merge_deep_from_separate_page` 와 같은 이유로 실패가 delta 브릿지를 죽이면 안 된다 —
-    이건 선택 계층(deep)의 품질 개선이고, delta 기록은 주간 발행의 필수 경로다. 실패하면
-    예치된 `source_text` 로 종전과 100% 동일하게 진행한다(WARN 만 남긴다).
-
-    [노션 은퇴 준비 2026-11-13] 어느 handoff 에서 읽나:
-      - 델타에 `handoff_ref` 가 있다(편집팀이 git handoff 로 만든 호) → **git 사본만**, 지문까지 맞아야 쓴다.
-        맞지 않으면 Notion 으로 넘어가지 않는다 — Notion handoff 는 그 분석기가 본 입력이 아니다.
-      - 없다 + 변수 `GRM_HANDOFF_BODY_SOURCE=git` → git 사본, 못 읽으면 Notion.
-      - 없다 + 변수 없음(기본) → Notion(종전과 같다).
-    """
-    ref = handoff_ref if isinstance(handoff_ref, dict) else None
-    if ref is not None or handoff_body_source() == SOURCE_GIT or notion_off():
-        try:
-            bodies = fetch_handoff_body_full_git(date_str, str((ref or {}).get("sha256") or ""))
-        except Exception as e:  # noqa: BLE001 — 선택 계층. 어떤 실패도 델타 기록을 막지 않는다
-            log("WARN", f"handoff git 사본 조회 실패({date_str}): {type(e).__name__}: {e}")
-            bodies = None
-        if bodies is not None:
-            if bodies:
-                apply_handoff_source_text(deep, bodies)
-            return
-        if ref is not None:
-            log("WARN", f"git handoff 로 만든 호({date_str})인데 사본을 쓸 수 없음 — "
-                        "반납된 source_text 로 계속(Notion handoff 로 대신하지 않는다)")
-            return
-        if notion_off():
-            log("WARN", f"handoff git 사본 없음({date_str}) — GRM_INTAKE_NOTION=off 라 Notion 을 읽지 않고 "
-                        "반납된 source_text 로 계속")
-            return
-        log("WARN", f"handoff git 사본 없음({date_str}) — Notion handoff 로 넘어감")
+    """Use the Git handoff body when available, checking the input hash when supplied."""
+    ref = handoff_ref if isinstance(handoff_ref, dict) else {}
     try:
-        bodies = fetch_handoff_body_full(token, db_id, date_str)
-    except (DeltaBridgeError, NotionHandoffError) as e:
-        log("WARN", f"handoff 원문 조회 실패({date_str}) — 예치된 source_text 로 계속: {e}")
-        return
-    if bodies:
+        bodies = fetch_handoff_body_full_git(date_str, str(ref.get("sha256") or ""))
+    except Exception as e:  # The deep layer must not block the brief.
+        log("WARN", f"Handoff Git lookup failed ({date_str}): {type(e).__name__}: {e}")
+        bodies = None
+    if bodies is None:
+        log("WARN", f"Handoff Git copy unavailable ({date_str}); using returned source_text")
+    elif bodies:
         apply_handoff_source_text(deep, bodies)
 
 
@@ -703,65 +417,6 @@ def _try_json_dict(text: str) -> dict[str, Any] | None:
     except (ValueError, TypeError):
         return None
     return obj if isinstance(obj, dict) else None
-
-
-def extract_delta(page: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] | None, str]:
-    """페이지에서 (delta, deep|None, publish_date) 추출·검증.
-
-    본문 code 블록 결합 전략(작성 도구가 긴 본문을 여러 블록으로 쪼개도 견딘다):
-      A) 블록1 = delta envelope (+블록2 = deep 맨몸 dict) — 예치 규약 기본형.
-      B) 전체 블록 결합 = 단일 delta envelope (Notion 분할 저장 대응).
-      C) 마지막 블록 제외 결합 = delta envelope + 마지막 블록 = deep.
-    deep 델타는 맨몸 `{document_id: {...}}` — cards/tldr 봉투 금지(_validate_deep,
-    assemble --deep 소비 계약). envelope 검증(최상위 dict + cards dict + tldr list)은
-    fail-loud — 구조 불량이면 DeltaBridgeError.
-    가능하면 `inject_slots.validate_injection` 류 슬롯 계약도 참고하되(카드 id 정합은
-    scaffold 가 없어 이 시점엔 알 수 없으므로), 여기서는 envelope 형태만 강제한다
-    (슬롯 세부 가드는 조립 단계 assemble_publish_brief/inject_slots 가 다시 강제).
-    `publish_date` 는 본문 delta 안 값 우선, 없으면 페이지 제목에서 파생.
-    형식은 `^\\d{4}-\\d{2}-\\d{2}$` 강제.
-    """
-    props = page.get("properties", {})
-    title = _prop_title(props, PROP_NAME)
-    title_date = _date_from_title(title)
-
-    texts = page.get("_code_blocks")
-    if texts is None:
-        raise DeltaBridgeError(
-            "extract_delta 는 page['_code_blocks'] (사전 fetch 된 코드블록 원문 리스트)를 "
-            "요구합니다 — select_open_delta 호출 후 _attach_code_blocks 로 채우세요.")
-    texts = [t for t in texts if isinstance(t, str) and t.strip()]
-    if not texts:
-        raise DeltaBridgeError(f"페이지 {title!r}: 코드 블록(델타 envelope JSON) 없음")
-
-    parsed = [_try_json_dict(t) for t in texts]
-    delta: dict[str, Any] | None = None
-    deep: dict[str, Any] | None = None
-    # A) 기본형(예치 규약): 블록1 = delta envelope, (있으면) 블록2 = deep 맨몸 dict.
-    if parsed[0] is not None and _is_envelope(parsed[0]):
-        delta = _validate_envelope(parsed[0], what="delta envelope")
-        if len(texts) > 1:
-            if parsed[1] is None:
-                raise DeltaBridgeError("deep delta 블록 JSON 파싱 실패(블록 2)")
-            deep = parsed[1]
-    # B) Notion 이 긴 본문을 여러 code 블록으로 쪼갠 경우 — 전체 결합이 단일 delta.
-    if delta is None:
-        joined = _try_json_dict("".join(texts))
-        if joined is not None and _is_envelope(joined):
-            delta = _validate_envelope(joined, what="delta envelope(다중 블록 결합)")
-    # C) 쪼개진 delta + 마지막 블록이 deep 인 경우.
-    if delta is None and len(texts) >= 2:
-        head = _try_json_dict("".join(texts[:-1]))
-        if head is not None and _is_envelope(head) and parsed[-1] is not None:
-            delta = _validate_envelope(head, what="delta envelope(다중 블록 결합)")
-            deep = parsed[-1]
-    if delta is None:
-        diag = " · ".join(
-            f"블록{i + 1}={'dict' if p is not None else '파싱실패/비dict'}"
-            for i, p in enumerate(parsed))
-        raise DeltaBridgeError(
-            f"페이지 {title!r}: 델타 envelope(cards+tldr)를 어떤 결합으로도 못 찾음 — {diag}")
-    return finalize_delta(delta, deep, title_date)
 
 
 def finalize_delta(delta: dict[str, Any], deep: "dict[str, Any] | None",
@@ -805,54 +460,6 @@ def finalize_delta(delta: dict[str, Any], deep: "dict[str, Any] | None",
             log("WARN", f"inject_slots 슬롯 계약 참고 검증 실패(무시): {e}")
 
     return delta, deep, publish_date
-
-
-def extract_deep_page(page: dict[str, Any]) -> dict[str, Any]:
-    """별도 `web-deep-delta` 페이지 → deep 델타 맨몸 dict. fail-loud.
-
-    web-delta 페이지와 달리 envelope(cards+tldr)가 **없다** — 본문 전체가 deep dict 하나다.
-    `_fetch_code_blocks` 주석과 같은 이유로 Notion 이 긴 본문을 여러 code 블록으로 쪼갤 수
-    있으므로, 블록1 단독 → 전체 결합 순으로 시도한다(쪼개진 deep 을 통째로 버리지 않기 위해).
-
-    ★[2026-08-17] 키 정규화(`normalize_deep_key_namespace`)를 **여기서** 건다.
-    `normalize_deep_key_namespace` 의 docstring 은 "별도 페이지로 온 deep 은 delta 경로를 타지
-    않는다"고 그 위험을 정확히 적어두고도, 정작 이 경로에서 그 함수를 부르는 곳이 없었다
-    (정의만 있고 배선이 없는 슬롯 — 이 저장소의 상습 결함 계열).
-    """
-    props = page.get("properties", {})
-    title = _prop_title(props, PROP_NAME)
-    texts = page.get("_code_blocks")
-    if texts is None:
-        raise DeltaBridgeError(
-            "extract_deep_page 는 page['_code_blocks'] 를 요구합니다 — _attach_code_blocks 선행.")
-    texts = [t for t in texts if isinstance(t, str) and t.strip()]
-    if not texts:
-        raise DeltaBridgeError(f"deep 페이지 {title!r}: 코드 블록(deep 델타 JSON) 없음")
-
-    first = _try_json_dict(texts[0])
-    if first is not None and not _is_envelope(first) and len(texts) == 1:
-        return _normalized_deep(first)
-    joined = _try_json_dict("".join(texts))
-    if joined is not None:
-        return _normalized_deep(joined)
-    if first is not None:
-        return _normalized_deep(first)
-    raise DeltaBridgeError(
-        f"deep 페이지 {title!r}: deep 델타 JSON 파싱 실패(블록 {len(texts)}개, 단독·결합 모두)")
-
-
-def _normalized_deep(obj: Any) -> dict[str, Any]:
-    """구조 검증 + 키 네임스페이스 정규화를 한 묶음으로(별도 deep 페이지 전용 진입점)."""
-    deep = _validate_deep(obj)
-    normalize_deep_key_namespace(deep)
-    return deep
-
-
-def _attach_code_blocks(token: str, page: dict[str, Any]) -> dict[str, Any]:
-    """select_open_delta 결과 page 에 본문 code 블록을 fetch 해 붙인다(extract_delta 입력)."""
-    page = dict(page)
-    page["_code_blocks"] = _fetch_code_blocks(token, page.get("id", ""))
-    return page
 
 
 def _under(date_str: str) -> str:
@@ -929,21 +536,6 @@ def _write_deep_file(deep: dict[str, Any], date_str: str) -> bool:
     return True
 
 
-def write_deep_only(deep: dict[str, Any], date_str: str) -> bool:
-    """delta 는 이미 커밋됐고 deep 만 뒤늦게 확보한 주의 **소급 기록**(2026-08-03 복구 경로).
-
-    ⚠️ 그 날짜의 `delta_{date}.json` 이 **이미 있을 때만** 쓴다 — delta 없는 deep 은 조립
-    입력이 될 수 없어(카드 id 짝이 없다) 고아 파일이 되고, 다음 주 브릿지의 중복 가드만
-    건드린다. '짝이 있는가'를 먼저 묻는 게 이 함수의 존재 이유다.
-    """
-    delta_path = _delta_path(date_str)
-    if not os.path.exists(delta_path):
-        raise DeltaBridgeError(
-            f"deep 단독 기록 거부: {delta_path} 가 없습니다 — deep 은 그 주 delta 의 카드 id "
-            f"공간에 종속됩니다(고아 deep 방지). delta 부터 브릿지하세요.")
-    return _write_deep_file(deep, date_str)
-
-
 # ── 결과 반납 git 길 (재검토안 3절 1단계, 2026-11-12) ─────────────────────────────────
 #
 # 편집팀(클라우드)은 결과를 브랜치 `claude/company-{date}` 의 `company/run/{date}/` 에 쓰고, 교열이
@@ -960,8 +552,6 @@ def write_deep_only(deep: dict[str, Any], date_str: str) -> bool:
 # 늦게 와 이미 기록된 파일과 다르면 오류로 멈추지 않고 차이표만 남긴다(발행 흐름을 막지 않는다).
 # 노션 모드에서 git 쪽은 어떤 경우에도 파일을 쓰지 않는다.
 
-ENV_DELTA_SOURCE = "GRM_DELTA_SOURCE"
-SOURCE_NOTION = "notion"
 SOURCE_GIT = "git"
 GIT_BRANCH_TPL = "claude/company-{date}"
 GIT_RUN_DIR_TPL = "company/run/{date}"
@@ -971,27 +561,6 @@ GIT_RUN_DIR_TPL = "company/run/{date}"
 #   한 날짜에 main 에 쓰는 것은 하나뿐이다 — 먼저 기록된 쪽이 이긴다(_existing_conflicts).
 BACKUP_SUBDIR = "backup"
 COMPARE_DIR = "_delta_compare"  # 워크플로가 아티팩트로 올린다(커밋 대상 아님)
-
-
-def resolve_source(cli_value: "str | None") -> str:
-    """정본 길 결정 — CLI > 환경변수 > 기본 `notion`. 모르는 값은 안전한 `notion` 으로(WARN)."""
-    raw = (cli_value or os.environ.get(ENV_DELTA_SOURCE) or SOURCE_NOTION).strip().lower()
-    if raw not in (SOURCE_NOTION, SOURCE_GIT):
-        log("WARN", f"{ENV_DELTA_SOURCE}={raw!r} 는 모르는 값 — 기본 `notion` 으로 진행")
-        return SOURCE_NOTION
-    return raw
-
-
-def notion_off() -> bool:
-    """[노션 은퇴 2026-11-23 이후] 저장소 변수 GRM_INTAKE_NOTION=off — 브릿지도 노션을 읽지도 쓰지도 않는다.
-
-    수집기와 같은 변수·같은 판정(`grm_queue.notion_intake_off`). off 면:
-      · 정본 길은 언제나 git(편집팀 반납). 노션 예비 길·노션 예치 비교·CONSUMED 마감이 없다.
-      · 채택 가능한 반납이 검증에서 떨어지면 노션으로 넘기지 않고 **빨간 run** 으로 드러낸다.
-      · `NOTION_TOKEN` 이 없어도 돈다.
-    """
-    import grm_queue
-    return grm_queue.notion_intake_off()
 
 
 def _kst_today() -> str:
@@ -1213,7 +782,7 @@ def _publish_compare(report: dict[str, Any], meta: dict[str, Any]) -> None:
         log("WARN", f"비교 결과 기록 실패(무시): {e}")
 
 
-def prepare_git_run(token: str, db_id: str, run: dict[str, Any]
+def prepare_git_run(run: dict[str, Any]
                     ) -> tuple[dict[str, Any], dict[str, Any] | None, str]:
     """git 반납을 노션 예치와 **같은 문**(finalize → handoff 원문 정본화 → 게이트)에 통과시킨다."""
     if run.get("delta") is None:
@@ -1225,13 +794,13 @@ def prepare_git_run(token: str, db_id: str, run: dict[str, Any]
         raise DeltaBridgeError(
             f"git 반납 publish_date={date_str} 가 브랜치 날짜 {run['date']} 와 다릅니다")
     if deep is not None:
-        _authoritative_source_text(token, db_id, date_str, deep,
+        _authoritative_source_text(date_str, deep,
                                    handoff_ref=delta.get("handoff_ref"))
         deep = _gate_deep_analysis(deep)
     return delta, deep, date_str
 
 
-def _compare_with_git(token: str, db_id: str, date_str: str, source: str,
+def _compare_with_git(date_str: str, source: str,
                       delta: dict[str, Any], deep: "dict[str, Any] | None",
                       written_from: str, run: "dict[str, Any] | None" = None,
                       read=None) -> None:
@@ -1245,7 +814,7 @@ def _compare_with_git(token: str, db_id: str, date_str: str, source: str,
             _publish_compare(compare_deltas(delta, deep, None, None), meta)
             return
         try:
-            g_delta, g_deep, _ = prepare_git_run(token, db_id, run)
+            g_delta, g_deep, _ = prepare_git_run(run)
         except DeltaBridgeError as e:
             meta["reason"] += f" · git 쪽 검증 실패: {e}"
             g_delta, g_deep = run.get("delta"), run.get("deep")
@@ -1346,17 +915,9 @@ def _copyedit_done(date_str: str, read=None) -> bool:
     return bool(obj) and obj.get("status") == "완료" and obj.get("published") is True
 
 
-def bridge_from_git(token: str, db_id: str, date_str: str, read=None,
-                    held: "list[str] | None" = None, notion: bool = True) -> "int | None":
-    """git 모드: 채택 가능한 git 반납이 있으면 기록하고 종료코드를, 아니면 None(노션으로 넘김).
-
-    git 쪽 검증이 실패해도 None 을 돌려 노션 예비 길로 넘어간다 — 노션은 예비이자 검증된 길이다.
-    `held` 를 주면, 교열이 반납을 **완료**로 마쳤는데 git 으로 기록하지 못한 사유를 거기에 적는다
-    (main 이 노션에서도 쓰지 못했을 때 run 을 실패로 끝내는 근거 — 11-23 사전 점검 B).
-    notion=False(GRM_INTAKE_NOTION=off): 넘어갈 노션 길이 없다. 채택 조건을 채운 반납이 검증에서
-    떨어지면 None 대신 DeltaBridgeError 를 올려 run 을 빨갛게 만든다(조용히 '반납 없음'처럼 끝나지 않게).
-    노션 예치 비교도 하지 않는다.
-    """
+def bridge_from_git(date_str: str, read=None,
+                    held: "list[str] | None" = None) -> "int | None":
+    """Write the first adoptable return. Record why completed returns were held."""
     def _hold(reason: str) -> None:
         if held is not None and _copyedit_done(date_str, read=read):
             held.append(reason)
@@ -1366,14 +927,10 @@ def bridge_from_git(token: str, db_id: str, date_str: str, read=None,
     failure: "DeltaBridgeError | None" = None
     if run["adoptable"]:
         try:
-            picked = _prepare_adoptable(token, db_id, run, read)
+            picked = _prepare_adoptable(run, read)
         except DeltaBridgeError as e:
             failure = e
             log("WARN", f"편집팀 git 반납 검증 실패 — 백업 반납을 본다: {e}")
-        except NotionHandoffError as e:
-            log("WARN", f"git 반납 처리 중 노션 조회 실패 — 노션 예치로 넘어감: {e}")
-            _hold(f"git 반납 처리 중 노션 조회 실패: {e}")
-            return None
     else:
         log("INFO", f"편집팀 git 반납 채택 안 함({run['branch']}): {run['reason']}")
     if picked is None:
@@ -1381,28 +938,19 @@ def bridge_from_git(token: str, db_id: str, date_str: str, read=None,
         brun = load_git_run(date_str, read=read, sub=BACKUP_SUBDIR)
         if brun["adoptable"]:
             try:
-                picked = _prepare_adoptable(token, db_id, brun, read)
+                picked = _prepare_adoptable(brun, read)
                 run = brun
                 log("INFO", f"백업 v17 반납을 쓴다({brun['branch']} 의 {BACKUP_SUBDIR}/)")
             except DeltaBridgeError as e:
                 failure = failure or e
                 log("WARN", f"백업 git 반납 검증 실패: {e}")
-            except NotionHandoffError as e:
-                log("WARN", f"백업 반납 처리 중 노션 조회 실패 — 노션 예치로 넘어감: {e}")
-                _hold(f"백업 반납 처리 중 노션 조회 실패: {e}")
-                return None
         elif brun["found"]:
             log("INFO", f"백업 git 반납 채택 안 함: {brun['reason']}")
     if picked is None:
         _hold(f"git 반납 검증 실패: {failure}" if failure is not None
               else f"git 반납 채택 안 함({run['branch']}): {run['reason']}")
         if failure is not None:
-            if not notion:
-                raise DeltaBridgeError(f"git 반납 검증 실패(노션 예비 길 없음): {failure}") from failure
-            log("WARN", f"git 반납 검증 실패 — 노션 예치로 넘어감: {failure}")
-            return None
-        if notion:
-            log("INFO", "채택할 git 반납 없음 — 노션 예치로 넘어감")
+            raise DeltaBridgeError(f"Git return validation failed: {failure}") from failure
         return None
     delta, deep, date_str, scaffold_text = picked
 
@@ -1420,22 +968,6 @@ def bridge_from_git(token: str, db_id: str, date_str: str, read=None,
         wrote = write_delta(delta, deep, date_str)
         if scaffold_text is not None and write_scaffold(scaffold_text, date_str):
             wrote = True
-        # 같은 날 노션 예치도 있으면 비교만 하고 그 페이지는 OPEN 으로 둔다(사람이 볼 물증).
-        # GRM_INTAKE_NOTION=off 면 노션을 읽지 않는다.
-        try:
-            page = None if not notion else select_open_delta(token, db_id, publish_date=date_str)
-            if page is not None:
-                n_delta, n_deep, _ = extract_delta(_attach_code_blocks(token, page))
-                if n_deep is not None:
-                    _authoritative_source_text(token, db_id, date_str, n_deep)
-                    n_deep = _gate_deep_analysis(n_deep)
-                meta = {"date": date_str, "source": SOURCE_GIT, "written_from": "git",
-                        "branch": run["branch"], "adoptable": True, "reason": run["reason"]}
-                _publish_compare(compare_deltas(n_delta, n_deep, delta, deep), meta)
-                log("WARN", f"노션 OPEN 델타({date_str})도 있습니다 — git 을 기록했고 노션 페이지는 "
-                            "OPEN 으로 남깁니다(중복 반납 확인).")
-        except Exception as e:  # noqa: BLE001 — 관측 전용
-            log("WARN", f"노션 예치 비교 실패(무시): {e}")
 
     _github_output("wrote", "true" if wrote else "false")
     _github_output("date", date_str)
@@ -1445,10 +977,10 @@ def bridge_from_git(token: str, db_id: str, date_str: str, read=None,
     return 0
 
 
-def _prepare_adoptable(token: str, db_id: str, run: dict[str, Any], read=None
+def _prepare_adoptable(run: dict[str, Any], read=None
                        ) -> tuple[dict[str, Any], "dict[str, Any] | None", str, "str | None"]:
     """채택 조건을 채운 반납 하나를 발행 문(검증·원문 정본화·스캐폴드)에 통과시킨다. 실패는 DeltaBridgeError."""
-    delta, deep, date_str = prepare_git_run(token, db_id, run)
+    delta, deep, date_str = prepare_git_run(run)
     try:
         scaffold_text = load_run_scaffold(run, delta, read=read)
     except DeltaBridgeError as e:
@@ -1456,120 +988,15 @@ def _prepare_adoptable(token: str, db_id: str, run: dict[str, Any], read=None
     return delta, deep, date_str, scaffold_text
 
 
-def compare_only(token: str, db_id: str, date_str: str, read=None) -> int:
+def compare_only(date_str: str, read=None) -> int:
     """이미 main 에 기록된 그 주 델타와 git 반납을 비교만 한다(쓰기·노션 마감 없음)."""
     e_delta, e_deep = _load_existing(date_str)
     if e_delta is None:
         log("WARN", f"{_delta_path(date_str)} 없음 — 비교할 기록본이 없습니다")
-    _compare_with_git(token, db_id, date_str, "compare-only", e_delta or {}, e_deep,
+    _compare_with_git(date_str, "compare-only", e_delta or {}, e_deep,
                       written_from="(비교 전용)", read=read)
     _github_output("wrote", "false")
     _github_output("date", date_str)
-    return 0
-
-
-def consume_delta(token: str, page: dict[str, Any]) -> None:
-    """페이지 Status→Processed, Title→CONSUMED. 커밋·push 성공 **후**에만 호출할 것
-    (handoff PL-10 순서 동형 — 소비=영구 처리이므로 커밋 전에 하지 않는다)."""
-    props = page.get("properties", {})
-    title = _prop_title(props, PROP_NAME)
-    date_str = _date_from_title(title)
-    is_deep = title.startswith(TITLE_PREFIX_OPEN_DEEP)
-    prefix_open = TITLE_PREFIX_OPEN_DEEP if is_deep else TITLE_PREFIX_OPEN
-    new_title = title.replace(prefix_open, TITLE_PREFIX_CONSUMED, 1) if title.startswith(
-        prefix_open) else f"{TITLE_PREFIX_CONSUMED}{date_str}"
-    page_id = page.get("id", "")
-    notion_api_request(
-        "PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id), token,
-        body={"properties": {
-            PROP_NAME: {"title": _rich_text(new_title)},
-            PROP_STATUS: _select("Processed"),
-        }})
-    log("INFO", f"web-delta 페이지 CONSUMED 처리 완료: {new_title} ({page_id})")
-
-
-def _merge_deep_from_separate_page(token: str, db_id: str, date_str: str,
-                                    deep: "dict[str, Any] | None") -> "dict[str, Any] | None":
-    """web-delta 본문에 deep 블록이 없으면 별도 `web-deep-delta` 페이지에서 가져온다.
-
-    두 경로 모두 예치 규약상 정당하므로 **블록2가 있으면 그쪽이 정본**이고, 이 함수는
-    그때 조회조차 하지 않는다(네트워크 절약이 아니라 우선순위를 코드로 못박는 것).
-    단, 둘 다 존재하면 조용히 덮지 않고 WARN 으로 표면화한다 — 내용이 다를 수 있는데
-    어느 쪽을 버렸는지 로그에 안 남으면 2026-08-03 과 같은 침묵 유실이 반복된다.
-
-    ⚠️ **이 경로의 실패는 delta 브릿지를 죽이지 않는다(WARN 후 deep=None).** deep 은 없어도
-    그 주가 6슬롯으로 발행되는 **선택 계층**이고, delta 기록은 주간 발행의 필수 경로다.
-    선택 기능의 파싱·네트워크 실패가 필수 경로를 인질로 잡으면, 고치려던 것(deep 유실)보다
-    더 큰 것(그 주 발행 전체)을 잃는다. 대신 침묵하지 않는다 — WARN 으로 사유를 남기고,
-    그 페이지는 CONSUMED 하지 않아 OPEN 인 채로 남는다(사람이 볼 수 있는 물증).
-    """
-    try:
-        deep_page = select_open_deep_delta(token, db_id, date_str)
-        if deep is not None:
-            if deep_page is not None:
-                log("WARN", f"deep 델타가 web-delta 블록2와 별도 페이지에 **둘 다** 있습니다"
-                            f"({date_str}) — 블록2를 정본으로 사용하고 별도 페이지는 OPEN 으로 "
-                            f"남깁니다(사람이 중복 예치를 확인할 것).")
-            return deep
-        if deep_page is None:
-            return None
-        log("INFO", f"deep 델타를 별도 web-deep-delta 페이지에서 확보: {date_str}")
-        deep_page = _attach_code_blocks(token, deep_page)
-        return extract_deep_page(deep_page)
-    except (DeltaBridgeError, NotionHandoffError) as e:
-        log("WARN", f"별도 web-deep-delta 페이지 처리 실패({date_str}) — 이번 주는 deep 없이 "
-                    f"6슬롯만 발행합니다(delta 는 정상 기록). 페이지는 OPEN 유지: {e}")
-        return None
-
-
-def _consume_deep_page_if_persisted(token: str, db_id: str,
-                                     delta_page: dict[str, Any]) -> None:
-    """별도 deep 페이지는 **그 deep 이 실제로 파일로 남았을 때만** CONSUMED 처리한다.
-
-    파일 존재를 조건으로 두는 이유 — 소비는 영구 처리라, 쓰지도 못한 deep 페이지를 닫으면
-    다음 실행에서 다시 주울 기회까지 사라진다(침묵 유실의 재생산). 조건 불충족이면 OPEN 으로
-    남겨 사람이 볼 수 있게 둔다.
-    """
-    date_str = _date_from_title(_prop_title(delta_page.get("properties", {}), PROP_NAME))
-    if not date_str:
-        return
-    # delta 페이지 소비는 이미 끝났다 — 여기서 예외가 나가면 워크플로가 실패로 뒤집혀
-    # "커밋·push·delta consume 은 됐는데 스텝은 red" 라는 오해를 만든다. 비차단.
-    try:
-        deep_page = select_open_deep_delta(token, db_id, date_str)
-        if deep_page is None:
-            return
-        if not os.path.exists(_deep_path(date_str)):
-            log("WARN", f"web-deep-delta 페이지({date_str})가 OPEN 이지만 "
-                        f"{_deep_path(date_str)} 가 없어 CONSUMED 처리하지 않습니다 — "
-                        f"deep 이 기록되지 않았습니다(원인 확인 필요).")
-            return
-        consume_delta(token, deep_page)
-    except (DeltaBridgeError, NotionHandoffError) as e:
-        log("WARN", f"web-deep-delta 페이지 CONSUMED 처리 실패({date_str}) — OPEN 유지: {e}")
-
-
-def _bridge_deep_only(token: str, db_id: str, publish_date: str,
-                       consume: bool) -> "int | None":
-    """OPEN web-delta 가 없을 때의 deep 단독 처리. 처리했으면 종료코드, 아니면 None."""
-    deep_page = select_open_deep_delta(token, db_id, publish_date)
-    if deep_page is None:
-        return None
-    if consume:
-        if not os.path.exists(_deep_path(publish_date)):
-            log("WARN", f"deep 단독 consume 거부: {_deep_path(publish_date)} 없음")
-            return None
-        consume_delta(token, deep_page)
-        return 0
-    log("INFO", f"OPEN web-delta 없음 · web-deep-delta 단독 확보 — 소급 기록: {publish_date}")
-    deep_page = _attach_code_blocks(token, deep_page)
-    deep = extract_deep_page(deep_page)
-    _authoritative_source_text(token, db_id, publish_date, deep)  # 게이트 **전에** 정본화
-    deep = _gate_deep_analysis(deep)
-    wrote = bool(deep) and write_deep_only(deep, publish_date)
-    _github_output("wrote", "true" if wrote else "false")
-    _github_output("date", publish_date)
-    print(f"브릿지 완료(deep 단독): date={publish_date} wrote={wrote}")
     return 0
 
 
@@ -1613,123 +1040,32 @@ def main(argv: list[str] | None = None) -> int:
             pass
 
     ap = argparse.ArgumentParser(
-        description="Notion web-delta 페이지 → web/data/deltas/delta_{date}.json 브릿지.")
-    ap.add_argument("--db", required=True, help="Notion Intake DB id")
-    ap.add_argument("--publish-date", default=None,
-                     help="특정 발행일(YYYY-MM-DD) 강제 선택. 미지정 시 최신 OPEN web-delta.")
-    ap.add_argument("--consume", action="store_true",
-                     help="write 없이, 지정된(또는 최신) OPEN 페이지를 CONSUMED 처리만 한다. "
-                          "커밋·push 성공 뒤 워크플로의 별도 단계에서 호출할 것.")
-    ap.add_argument("--source", choices=(SOURCE_NOTION, SOURCE_GIT), default=None,
-                     help="정본 길. 미지정 시 환경변수 GRM_DELTA_SOURCE, 그것도 없으면 notion.")
+        description="Record a Git editorial return in web/data/deltas.")
+    ap.add_argument("--publish-date", default=None, help="Publication date (YYYY-MM-DD)")
     ap.add_argument("--compare-only", action="store_true",
                      help="쓰지 않고, main 에 이미 기록된 그 주 델타와 git 반납을 비교만 한다 "
                           "(--publish-date 필수).")
     args = ap.parse_args(argv)
-    source = resolve_source(args.source)
-    off = notion_off()
-    if off:
-        # [노션 은퇴] 노션 길이 없다 — 정본은 git 반납 하나, 노션 마감(CONSUMED)도 없다.
-        if args.consume:
-            log("INFO", "GRM_INTAKE_NOTION=off — 노션 마감(CONSUMED) 없음, 할 일 없음")
-            return 0
-        if source != SOURCE_GIT:
-            log("WARN", f"GRM_INTAKE_NOTION=off 인데 정본 길이 {source!r} — git 으로 진행(노션 길 없음)")
-            source = SOURCE_GIT
-
-    token = os.environ.get("NOTION_TOKEN", "")
-    if not token and not off:
-        print("ERROR: NOTION_TOKEN 환경변수 없음", file=sys.stderr)
-        return 1
-
     if args.compare_only:
         if not args.publish_date:
             print("ERROR: --compare-only 는 --publish-date 가 필요합니다", file=sys.stderr)
             return 1
-        return compare_only(token, args.db, args.publish_date)
+        return compare_only(args.publish_date)
 
     git_held: list[str] = []
-    git_date = ""
-    if source == SOURCE_GIT and not args.consume:
-        git_date = args.publish_date or _kst_today()
-        try:
-            rc = bridge_from_git(token, args.db, git_date, held=git_held, notion=not off)
-        except DeltaBridgeError as e:
-            print(f"ERROR: {e}", file=sys.stderr)
-            return 1
-        if rc is not None:
-            return rc
-        if off:
-            # 반납이 아직 없거나 교열이 `완료` 가 아니다 — 30분 뒤 회차가 다시 본다. 자동 백업은 없다.
-            _github_output("wrote", "false")
-            _github_output("date", git_date)
-            if _fail_unrecorded_return(git_date, git_held,
-                                       "GRM_INTAKE_NOTION=off 라 노션 예비 길도 없다 — 이번 run 은 아무것도 쓰지 않았다."):
-                return 1
-            log("INFO", f"git 반납 없음/미채택({git_date}) — GRM_INTAKE_NOTION=off 라 노션 예비 길 없음")
-            return 0
-
+    git_date = args.publish_date or _kst_today()
     try:
-        page = select_open_delta(token, args.db, publish_date=args.publish_date)
-    except NotionHandoffError as e:
-        print(f"ERROR: Notion 조회 실패: {e}", file=sys.stderr)
-        return 1
-
-    if page is None:
-        # [deep 소급 복구 2026-08-03] delta 는 이미 소비/커밋됐는데 deep 만 남은 주 —
-        # `--publish-date` 로 명시했을 때만 deep 단독 경로를 연다(스케줄 크론에서는 절대
-        # 발화하지 않는다). 이 경로가 없으면 08-03 같은 주는 브릿지로 **복구가 불가능**하다.
-        if args.publish_date:
-            try:
-                rc = _bridge_deep_only(token, args.db, args.publish_date, consume=args.consume)
-            except DeltaBridgeError as e:
-                print(f"ERROR: {e}", file=sys.stderr)
-                return 1
-            except NotionHandoffError as e:
-                print(f"ERROR: Notion 조회 실패: {e}", file=sys.stderr)
-                return 1
-            if rc is not None:
-                return rc
-        _github_output("wrote", "false")
-        if _fail_unrecorded_return(git_date, git_held,
-                                   "노션에도 OPEN 델타가 없어 이번 run 은 아무것도 쓰지 않았다."):
-            return 1
-        log("INFO", "no OPEN web-delta — nothing to bridge")
-        return 0
-
-    if args.consume:
-        try:
-            consume_delta(token, page)
-            _consume_deep_page_if_persisted(token, args.db, page)
-        except NotionHandoffError as e:
-            print(f"ERROR: consume 실패: {e}", file=sys.stderr)
-            return 1
-        return 0
-
-    try:
-        page = _attach_code_blocks(token, page)
-        delta, deep, date_str = extract_delta(page)
-        deep = _merge_deep_from_separate_page(token, args.db, date_str, deep)
-        if deep is not None:
-            # [2026-08-17] 근거 대조의 기준선(`source_text`)을 그 주 handoff 원문으로 맞춘 **뒤**
-            # 게이트를 돌린다 — 순서 불가침. 게이트가 보는 원문이 곧 판정이다.
-            _authoritative_source_text(token, args.db, date_str, deep)
-            deep = _gate_deep_analysis(deep)  # 클라우드 생성 deep 근거 검증(write 직전)
-        # [2026-11-12] 노션 길로 기록하기 **전에** git 반납과 비교해 차이표를 남긴다(비차단).
-        # 기록 뒤에 하면 중복 가드 오류로 기록이 멈춘 run 에서 비교가 빠진다.
-        _compare_with_git(token, args.db, date_str, source, delta, deep, written_from="노션")
-        wrote = write_delta(delta, deep, date_str)
+        rc = bridge_from_git(git_date, held=git_held)
     except DeltaBridgeError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 1
-    except NotionHandoffError as e:
-        print(f"ERROR: Notion 조회 실패: {e}", file=sys.stderr)
+    if rc is not None:
+        return rc
+    _github_output("wrote", "false")
+    _github_output("date", git_date)
+    if _fail_unrecorded_return(git_date, git_held, "No files were written."):
         return 1
-
-    _github_output("wrote", "true" if wrote else "false")
-    _github_output("date", date_str)
-    _github_output("source", SOURCE_NOTION)
-    print(f"브릿지 완료: date={date_str} wrote={wrote}")
+    log("INFO", f"No adoptable Git return({git_date})")
     return 0
 
 

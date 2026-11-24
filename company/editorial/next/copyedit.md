@@ -222,7 +222,7 @@
       그 파일만 `git add` · 커밋 · `git push origin claude/request-{run_date_kst}-delta-bridge` → `git checkout claude/company-{run_date_kst}` 로 돌아온다.
       결과는 기다리지 않는다(크론이 예비다). push 가 거절되면 `copyedit.md` 에 `막힘: Actions — 브릿지 요청` 한 줄만 남긴다. 리허설은 이 단계를 하지 않는다(`REHEARSAL.md` 금지).
    4. **행 Status 는 찍지 않는다.** v16 [Status 갱신] 의 규칙(`render`·병합 멤버·`reflow`→Processed · `skip`→Skipped · `error`→Error · `defer`→미변경)은
-      코드가 적용한다 — 브릿지가 델타를 main 에 넣으면 DB 대기열이 발행 결과로 상태를 다시 계산한다. 노션 행 기록(`grm_queue.py notion-sync`)은 Notion 을 끈 뒤로 돌지 않는다.
+      코드가 적용한다 — 브릿지가 델타를 main 에 넣으면 DB 대기열이 발행 결과로 상태를 다시 계산한다.
 
 ## 결과 — `company/run/{run_date_kst}/copyedit.json`
 ```

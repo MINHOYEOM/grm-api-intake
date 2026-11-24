@@ -1,36 +1,5 @@
 #!/usr/bin/env python3
-"""원천 대조 감시 — "원천이 올린 문서 = 수집 + 의도적 제외 + 미뤄짐" 등식을 매일 센다.
-
-왜 있나
-  기존 감시(grm_health · source_silence · reconciliation_audit · fda_body_coverage)는 모두 **우리 과거값·
-  마지막 수집일**과만 비교한다. FDA 가 483·경고서한을 한꺼번에 대량 게시해 일부가 누락돼도 "평소 대비"로는
-  보이지 않는다. 이 감시는 **원천 목록 자체**를 다시 받아 문서 하나하나가 어디에 있는지 센다.
-
-등식(소스마다, 소스별 창 안의 원천 목록 S)
-  S = 수집됨 ∪ 의도적 제외 ∪ 미뤄짐   — 어디에도 없으면 **놓침**.
-  * 수집됨   = Notion Intake DB 에 `source::document_id` 가 있다. **수집기 dedup 과 같은 조회**
-               (`grm_notion.notion_query_existing_keys`)라서 두 곳의 "있다" 기준이 갈라질 수 없다.
-  * 의도적 제외 = 제외 장부(`public.intake_exclusion`, migration 130)에 행이 있다(basis 가 metadata/text).
-  * 미뤄짐   = 제외 장부에 basis=`text_missing` 행이 있다 — 본문을 못 얻은 채 메타만으로 판정해 수집기가
-               "판정 끝"으로 보지 않고 다음 실행에 다시 보는 문서(하루 한도·OCR 예산 등). 같은 문서가
-               `DEFERRED_MAX_DAYS` 일을 넘게 남아 있으면(first_seen 기준) 놓침으로 **승격**한다.
-  * 최근 미시도 = 게시일이 오늘(KST) 기준 `DEFERRED_MAX_DAYS` 일 이내이고 수집·제외 어디에도 없는 문서(이유
-               `recent_not_yet_attempted`) — 대량 게시일 하루 한도로 아직 시도 전인 것. 기한을 넘기면 놓침.
-  * 장부 이전(pre_ledger) = 장부 연결 전에 게시돼 장부에 없을 수 있는 문서 — 첫 2주만 별도 칸.
-
-★원천 목록은 수집기의 관련성 필터를 **거치지 않는다**(필터 자체가 틀렸을 때도 잡으려고). 단 HTTP·파싱
-  헬퍼(User-Agent 포함 — FDA 는 헤더가 다르면 다른 응답을 준다)와 문서 키 식(`_stable_doc_id` 등)은
-  수집기 것을 그대로 재사용한다. 키 식이 갈라지면 모든 문서가 놓침으로 보이므로 시험이 핀으로 잠근다.
-
-판정(소스별) — 기존 #1274 경보가 장애·조용함·구조를 구분하지 못해 무시당한 교훈
-  ok / missed(놓침 ≥1) / source_unreachable(원천 접속 불가 — 놓침으로 세지 않는다) /
-  source_quiet(원천 자체가 0건) / deferred_only(전부 미뤄짐) /
-  store_unreachable(우리 저장소를 못 읽어 대조 불가 — 놓침으로 세지 않는다) / disabled(수집기가 꺼진 소스).
-
-비차단: 이상이 있어도 exit 0. 결과는 JSON·step summary 로 남기고 이슈 계획(`issues`)을 JSON 에 싣는다
-(이슈를 열고 닫는 일은 워크플로의 github-script 가 한다 — 기존 감시들의 관례).
-서비스키·API 키는 로그·예외 문구에 싣지 않는다.
-"""
+"""Compare source listings against stored raw signals and the exclusion ledger."""
 from __future__ import annotations
 
 import argparse
@@ -315,7 +284,7 @@ def reconcile_source(
         if spec.url_dedup and collected_urls and doc.url:
             # 같은 기사가 날짜만 바꿔 재게시되면 키가 달라진다 — 수집기는 정규화 URL 로 중복을 막는다
             # (`collect_intake._CANONICAL_URL_DEDUP_SOURCES`). 같은 기준으로 '이미 있음'을 센다.
-            from grm_notion import canonical_url_key
+            from grm_common import canonical_url_key
             if canonical_url_key(spec.source, doc.url) in collected_urls:
                 counts["collected"] += 1
                 continue
@@ -989,27 +958,6 @@ def _flag(env: Any, name: str, default: bool) -> bool:
 # ─────────────────────────────────────────────────────────────────────────────
 # 저장소 읽기 — 수집됨(Notion, 수집기 dedup 과 같은 조회) · 제외 장부(Supabase, 읽기 전용)
 # ─────────────────────────────────────────────────────────────────────────────
-def load_collected_keys(run_date: date, window_days: int, sources: set[str],
-                        token: str, db_id: str) -> tuple[set[str], set[str]]:
-    """수집기 dedup 과 **같은 함수**로 (`source::document_id` 집합, `source::정규화URL` 집합)을 만든다.
-
-    Run Date(수집일) 기준 창이다. 수집일은 게시일 이후이므로 게시 창을 덮는 창이면 충분하다.
-    실패하면 StoreReadError."""
-    from grm_notion import NotionDedupeQueryError, notion_query_existing_keys
-    try:
-        keys = notion_query_existing_keys(token, db_id, run_date, window_days=window_days,
-                                          source_names=sources)
-    except NotionDedupeQueryError as exc:
-        raise StoreReadError(f"Notion 중복 조회 실패: {safe_error(exc)}") from None
-    except Exception as exc:  # noqa: BLE001
-        raise StoreReadError(f"Notion 조회 실패: {type(exc).__name__}") from None
-    return keys.doc_ids, keys.url_keys
-
-
-def load_collected(run_date: date, window_days: int, sources: set[str],
-                   token: str, db_id: str) -> set[str]:
-    """`load_collected_keys` 의 문서 키 쪽(기존 호출부 호환)."""
-    return load_collected_keys(run_date, window_days, sources, token, db_id)[0]
 
 
 def load_collected_keys_supabase(base_url: str, service_key: str, sources: Iterable[str],
@@ -1021,7 +969,7 @@ def load_collected_keys_supabase(base_url: str, service_key: str, sources: Itera
     '수집됨'으로 세므로, Notion 기준에서 놓침으로 보이던 것이 여기서는 수집됨일 수 있다(그쪽이 맞다).
     실패하면 StoreReadError(키·예외 문구는 싣지 않는다).
     """
-    from grm_notion import canonical_url_key
+    from grm_common import canonical_url_key
     http = session or requests
     headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
     url = f"{base_url.rstrip('/')}/rest/v1/raw_signals"
@@ -1056,37 +1004,6 @@ def load_collected_keys_supabase(base_url: str, service_key: str, sources: Itera
         else:
             raise StoreReadError("정본(raw_signals)이 상한(100,000행)을 넘어 절단됐다")
     return ids, urls
-
-
-def shadow_diff(notion_report: dict[str, Any], db_report: dict[str, Any],
-                db_keys: int) -> dict[str, Any]:
-    """Notion 기준 보고서와 Supabase 기준 보고서의 차이(순수 함수). 판정은 바꾸지 않는다 — 기록만.
-
-    소스마다 '놓침' 문서 집합이 같은지 본다. 다르면 어느 쪽에서만 놓침인지 document_id 를 남긴다.
-    """
-    db_by_key = {s["key"]: s for s in db_report.get("sources") or []}
-    rows: list[dict[str, Any]] = []
-    for s in notion_report.get("sources") or []:
-        d = db_by_key.get(s["key"])
-        if d is None:
-            continue
-        n_missed = {m["document_id"] for m in s.get("missed") or []}
-        d_missed = {m["document_id"] for m in d.get("missed") or []}
-        if s["verdict"] == d["verdict"] and n_missed == d_missed \
-                and s["counts"]["collected"] == d["counts"]["collected"]:
-            continue
-        rows.append({
-            "key": s["key"], "label": s["label"],
-            "verdict_notion": s["verdict"], "verdict_supabase": d["verdict"],
-            "collected_notion": s["counts"]["collected"], "collected_supabase": d["counts"]["collected"],
-            "missed_notion": len(n_missed), "missed_supabase": len(d_missed),
-            "missed_only_notion": sorted(n_missed - d_missed)[:MAX_LISTED_IN_ISSUE],
-            "missed_only_supabase": sorted(d_missed - n_missed)[:MAX_LISTED_IN_ISSUE],
-        })
-    return {"ok": True, "error": "", "collected_keys": db_keys,
-            "same": not rows, "sources_differ": len(rows), "differences": rows,
-            "missed_total_notion": notion_report["totals"]["missed"],
-            "missed_total_supabase": db_report["totals"]["missed"]}
 
 
 def load_ledger(base_url: str, service_key: str, sources: Iterable[str],
@@ -1250,45 +1167,17 @@ def run(*, run_date: date, base_days: int, enf_days: int, specs: Iterable[Source
     collected_urls: set[str] | None = None
     ledger: dict[str, dict[str, LedgerRow]] | None = None
     store_error = ledger_error = ""
-    token = str(env.get("NOTION_TOKEN") or "").strip()
-    db_id = str(env.get("NOTION_DATABASE_ID") or "").strip()
     sb_url = str(env.get("SUPABASE_URL") or "").strip()
     sb_key = str(env.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
     names = {s.source for s in specs}
-    # [노션 끄기 2026-11-13] GRM_INTAKE_NOTION=off 면 '수집됨' 키를 노션이 아니라 정본(raw_signals)에서
-    # 읽는다 — 수집기가 노션에 행을 만들지 않으므로 노션 기준이면 전부 '놓침'으로 보인다. 기본(on)은 종전.
-    notion_off = str(env.get("GRM_INTAKE_NOTION") or "").strip().lower() == "off"
     if not use_store:
         store_error = ledger_error = "저장소 대조 생략(--no-store)"
     else:
-        if notion_off:
-            if not sb_url.lower().startswith("https://") or not sb_key:
-                store_error = "SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정"
-            else:
-                try:
-                    collected, collected_urls = load_collected_keys_supabase(sb_url, sb_key, sorted(names))
-                except StoreReadError as exc:
-                    collected = collected_urls = None
-                    store_error = str(exc)
-        elif not token or not db_id:
-            store_error = "NOTION_TOKEN/NOTION_DATABASE_ID 미설정"
+        if not sb_url.lower().startswith("https://") or not sb_key:
+            store_error = "SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정"
         else:
-            # 창 소스는 가장 넓은 게시 창 + 여유로 한 번, 스냅샷 소스(ICH·WHO)는 수집기 스냅샷 dedup 과
-            # 같은 3년 창을 그 소스로만 한정해 한 번 더(전체를 3년으로 넓히면 Notion 페이지 상한에 걸린다).
-            windowed = [s for s in specs if s.window_kind != WINDOW_SNAPSHOT]
-            snap_names = {s.source for s in specs if s.window_kind == WINDOW_SNAPSHOT}
             try:
-                collected, collected_urls = set(), set()
-                if windowed:
-                    widest = max((windows[s.key][1] - windows[s.key][0]).days for s in windowed)
-                    ids, urls = load_collected_keys(run_date, widest + NOTION_DEDUP_MARGIN_DAYS,
-                                                    {s.source for s in windowed}, token, db_id)
-                    collected |= ids
-                    collected_urls |= urls
-                if snap_names:
-                    ids, urls = load_collected_keys(run_date, SNAPSHOT_DEDUP_DAYS, snap_names, token, db_id)
-                    collected |= ids
-                    collected_urls |= urls
+                collected, collected_urls = load_collected_keys_supabase(sb_url, sb_key, sorted(names))
             except StoreReadError as exc:
                 collected = collected_urls = None
                 store_error = str(exc)
@@ -1302,37 +1191,8 @@ def run(*, run_date: date, base_days: int, enf_days: int, specs: Iterable[Source
     report = build_report(run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
                           collected=collected, store_error=store_error, ledger=ledger,
                           ledger_error=ledger_error, run_url=run_url, collected_urls=collected_urls)
-    # [노션 은퇴 준비 2026-11-13] 같은 원천 목록을 **정본(Supabase raw_signals) 기준**으로 한 번 더 판정해
-    # 차이를 보고서에 남긴다(그림자). 판정·이슈는 Notion 기준 그대로다 — 위 report 를 건드리지 않는다.
-    # 기본 꺼짐(ENABLE_RECONCILE_SUPABASE_SHADOW). 실패해도 본 보고서에는 영향이 없다.
-    if notion_off:
-        report["collected_basis"] = "supabase"      # 가산 키 — 이 보고서의 '수집됨' 근거가 정본이다
-    elif use_store and _flag(env, "ENABLE_RECONCILE_SUPABASE_SHADOW", False):
-        report["shadow_supabase"] = _supabase_shadow(
-            report, run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
-            ledger=ledger, ledger_error=ledger_error, sb_url=sb_url, sb_key=sb_key, names=names)
+    report["collected_basis"] = "supabase"      # 가산 키 — 이 보고서의 '수집됨' 근거가 정본이다
     return report
-
-
-def _supabase_shadow(report: dict[str, Any], *, run_date: date, specs: tuple[SourceSpec, ...],
-                     outcomes: dict[str, FetchOutcome], windows: dict[str, tuple[date, date]],
-                     ledger: "dict[str, dict[str, LedgerRow]] | None", ledger_error: str,
-                     sb_url: str, sb_key: str, names: set[str]) -> dict[str, Any]:
-    fail = {"ok": False, "same": None, "sources_differ": None, "differences": []}
-    if not report["store"]["collected_ok"] or ledger is None:
-        return dict(fail, error="Notion 기준 대조가 성립하지 않아 비교하지 않음")
-    if not sb_url.lower().startswith("https://") or not sb_key:
-        return dict(fail, error="SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정")
-    try:
-        ids, urls = load_collected_keys_supabase(sb_url, sb_key, sorted(names))
-        db_report = build_report(run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
-                                 collected=ids, store_error="", ledger=ledger,
-                                 ledger_error=ledger_error, collected_urls=urls)
-        return shadow_diff(report, db_report, len(ids))
-    except StoreReadError as exc:
-        return dict(fail, error=str(exc))
-    except Exception as exc:  # noqa: BLE001 — 그림자가 본 감시를 죽이면 안 된다
-        return dict(fail, error=f"그림자 판정 실패: {type(exc).__name__}")
 
 
 def _emit(line: str) -> None:

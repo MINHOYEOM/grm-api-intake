@@ -165,82 +165,8 @@ class MergeRecallV2SerializationTest(unittest.TestCase):
         self.assertNotIn("RTRVL_RESN", blob)
 
 
-class EmitBranchTest(unittest.TestCase):
-    def _run_emit(self, flag: str | None):
-        captured = {}
-
-        # **kw: emit 경로가 넘기는 추가 인자(예: sealed_dates)를 흡수한다 — 이 mock 은
-        # Notion 호출 대역일 뿐 시그니처를 고정하는 계약이 아니다.
-        def fake_upsert(token, db_id, payload, generated_at, compact=False, **kw):
-            captured["payload"] = payload
-            captured["compact"] = compact
-            return "pid", "url"
-
-        env = {} if flag is None else {"ENABLE_HANDOFF_V2": flag}
-        with mock.patch.dict(os.environ, env, clear=True), \
-             mock.patch.object(grm_handoff, "notion_query_new_intake_rows", return_value=_enriched_rows()), \
-             mock.patch.object(grm_handoff, "enrich_rows_with_raw",
-                               side_effect=lambda t, rows, inmemory_raw=None: (rows, {})), \
-             mock.patch.object(grm_handoff, "notion_upsert_routine_handoff", side_effect=fake_upsert):
-            ci.emit_routine_handoff("tok", "db", RUN_DATE, 7, GEN_AT)
-        return captured
-
-    def test_flag_off_uses_v1(self) -> None:
-        cap = self._run_emit(None)
-        self.assertEqual(cap["payload"]["schema_version"], "grm-routine-handoff/v1")
-        self.assertFalse(cap["compact"])
-        self.assertNotIn("card_scaffold", cap["payload"]["rows"][0])
-
-    def test_flag_on_uses_v2(self) -> None:
-        cap = self._run_emit("true")
-        self.assertEqual(cap["payload"]["schema_version"], "grm-routine-handoff/v2")
-        self.assertTrue(cap["compact"])
-        self.assertIn("card_scaffold", cap["payload"]["rows"][0])
 
 
-class ChildrenChunkTest(unittest.TestCase):
-    def test_create_splits_blocks_over_limit(self) -> None:
-        fake_blocks = [{"object": "block", "n": i} for i in range(200)]
-        create_children = {}
-        append_calls = {}
-
-        def fake_api(method, url, token, body=None, **kw):
-            if method == "POST":
-                create_children["count"] = len(body.get("children", []))
-                return {"id": "newpage", "url": "u"}
-            return {}
-
-        def fake_append(token, page_id, blocks):
-            append_calls["count"] = len(blocks)
-
-        with mock.patch.object(grm_handoff, "_handoff_blocks", return_value=fake_blocks), \
-             mock.patch.object(grm_handoff, "_handoff_page_properties", return_value={}), \
-             mock.patch.object(grm_handoff, "notion_find_handoff_page", return_value=None), \
-             mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api), \
-             mock.patch.object(grm_handoff, "notion_append_page_children", side_effect=fake_append):
-            ci.notion_upsert_routine_handoff("tok", "db",
-                                             {"handoff_id": "h"}, GEN_AT, compact=True)
-        self.assertEqual(create_children["count"], 90)   # 생성은 ≤90
-        self.assertEqual(append_calls["count"], 110)      # 나머지 append
-
-    def test_create_no_split_when_small(self) -> None:
-        fake_blocks = [{"object": "block", "n": i} for i in range(10)]
-        create_children = {}
-
-        def fake_api(method, url, token, body=None, **kw):
-            if method == "POST":
-                create_children["count"] = len(body.get("children", []))
-                return {"id": "p", "url": "u"}
-            return {}
-
-        with mock.patch.object(grm_handoff, "_handoff_blocks", return_value=fake_blocks), \
-             mock.patch.object(grm_handoff, "_handoff_page_properties", return_value={}), \
-             mock.patch.object(grm_handoff, "notion_find_handoff_page", return_value=None), \
-             mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api), \
-             mock.patch.object(grm_handoff, "notion_append_page_children") as append:
-            ci.notion_upsert_routine_handoff("tok", "db", {"handoff_id": "h"}, GEN_AT)
-        self.assertEqual(create_children["count"], 10)
-        append.assert_not_called()  # ≤90 이면 분할 없음(v1 기존 동작 유지)
 
 
 _V1_ROWS = [
@@ -271,17 +197,6 @@ class V1FrozenSnapshotTest(unittest.TestCase):
             expected = f.read()
         self.assertEqual(serialized, expected)
 
-    def test_v1_blocks_structure_unchanged(self) -> None:
-        # 업서트 직렬화 경로 회귀: 헤더 4블록 + code 블록, v1 은 indent=2(compact 아님)
-        blocks = ci._handoff_blocks(self._v1_payload())
-        types = [b["type"] for b in blocks]
-        self.assertEqual(types[:4], ["heading_2", "paragraph", "paragraph", "heading_3"])
-        self.assertTrue(all(t == "code" for t in types[4:]))
-        self.assertEqual(blocks[0]["heading_2"]["rich_text"][0]["text"]["content"],
-                         "GRM Routine Handoff")
-        code_text = blocks[4]["code"]["rich_text"][0]["text"]["content"]
-        self.assertIn('\n  "', code_text)  # indent 2칸 존재(v1 직렬화)
-
     def test_v1_has_no_v2_fields(self) -> None:
         payload = self._v1_payload()
         self.assertEqual(payload["schema_version"], "grm-routine-handoff/v1")
@@ -305,92 +220,6 @@ def _handoff_page(handoff_id: str, run_date: str, status: str, pid: str) -> dict
     }
 
 
-class StalePriorOpenHandoffTest(unittest.TestCase):
-    """B1 (K4-1): 새 OPEN emit 전 직전 OPEN → STALE+Skipped · 개별 row 불변 · OPEN 1개만."""
-
-    def test_prior_open_staled_rows_untouched(self) -> None:
-        calls = []
-
-        def fake_api(method, url, token, body=None, **kw):
-            calls.append((method, url, body))
-            if method == "POST" and "/query" in url:
-                return {"results": [_handoff_page(
-                    "routine-handoff::2026-06-07", "2026-06-07", "New", "prior-page")],
-                    "has_more": False}
-            return {}
-
-        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api):
-            staled = ci.notion_stale_prior_open_handoffs(
-                "tok", "db", keep_handoff_id="routine-handoff::2026-06-08",
-                superseded_by="2026-06-08")
-
-        self.assertEqual(staled, 1)
-        patches = [c for c in calls if c[0] == "PATCH"]
-        self.assertEqual(len(patches), 1)                      # 직전 OPEN 1건만 PATCH
-        _, purl, pbody = patches[0]
-        self.assertIn("prior-page", purl)                      # handoff page 자신
-        props = pbody["properties"]
-        self.assertEqual(set(props.keys()), {"Name", "Status"})  # 불가침: 두 속성만
-        self.assertEqual(props["Status"]["select"]["name"], "Skipped")
-        title = props["Name"]["title"][0]["text"]["content"]
-        self.assertIn("STALE GRM Routine Handoff 2026-06-07", title)
-        self.assertIn("superseded by 2026-06-08", title)
-
-    def test_current_open_not_self_staled(self) -> None:
-        # 오늘(keep) handoff 만 OPEN 이면 STALE 0건 — 자기 자신 봉인 금지.
-        def fake_api(method, url, token, body=None, **kw):
-            if method == "POST" and "/query" in url:
-                return {"results": [_handoff_page(
-                    "routine-handoff::2026-06-08", "2026-06-08", "New", "today-page")],
-                    "has_more": False}
-            raise AssertionError("PATCH 호출되면 안 됨(자기 봉인 금지)")
-
-        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api):
-            staled = ci.notion_stale_prior_open_handoffs(
-                "tok", "db", keep_handoff_id="routine-handoff::2026-06-08",
-                superseded_by="2026-06-08")
-        self.assertEqual(staled, 0)
-
-    def test_multiple_prior_opens_all_staled_single_remains(self) -> None:
-        # OPEN 다수(06-06·06-07) + 오늘(06-08) → 직전 2건 STALE, 오늘만 OPEN 유지.
-        patched_ids = []
-
-        def fake_api(method, url, token, body=None, **kw):
-            if method == "POST" and "/query" in url:
-                return {"results": [
-                    _handoff_page("routine-handoff::2026-06-06", "2026-06-06", "New", "p6"),
-                    _handoff_page("routine-handoff::2026-06-07", "2026-06-07", "New", "p7"),
-                    _handoff_page("routine-handoff::2026-06-08", "2026-06-08", "New", "p8"),
-                ], "has_more": False}
-            if method == "PATCH":
-                patched_ids.append(url)
-            return {}
-
-        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api):
-            staled = ci.notion_stale_prior_open_handoffs(
-                "tok", "db", keep_handoff_id="routine-handoff::2026-06-08",
-                superseded_by="2026-06-08")
-        self.assertEqual(staled, 2)
-        self.assertTrue(any("p6" in u for u in patched_ids))
-        self.assertTrue(any("p7" in u for u in patched_ids))
-        self.assertFalse(any("p8" in u for u in patched_ids))  # 오늘(keep)은 불변
-
-    def test_upsert_invokes_stale_guard_before_write(self) -> None:
-        # 와이어링: notion_upsert_routine_handoff 가 emit 전 STALE 가드를 호출한다.
-        with mock.patch.object(grm_handoff, "notion_stale_prior_open_handoffs", return_value=0) as guard, \
-             mock.patch.object(grm_handoff, "_handoff_blocks", return_value=[]), \
-             mock.patch.object(grm_handoff, "_handoff_page_properties", return_value={}), \
-             mock.patch.object(grm_handoff, "notion_find_handoff_page", return_value=None), \
-             mock.patch.object(grm_handoff, "notion_api_request",
-                               side_effect=lambda *a, **k: {"id": "p", "url": "u"}):
-            ci.notion_upsert_routine_handoff(
-                "tok", "db",
-                {"handoff_id": "routine-handoff::2026-06-08", "run_date_kst": "2026-06-08"},
-                GEN_AT)
-        guard.assert_called_once()
-        self.assertEqual(guard.call_args.kwargs["keep_handoff_id"],
-                         "routine-handoff::2026-06-08")
-        self.assertEqual(guard.call_args.kwargs["superseded_by"], "2026-06-08")
 
 
 class CoverageCollectedTest(unittest.TestCase):

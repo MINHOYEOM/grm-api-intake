@@ -311,17 +311,6 @@ class SupabaseSilenceShadowTest(unittest.TestCase):
         self.assertEqual(out["silent_notion"], live)
         self.assertEqual(out["silent_db"], live)
 
-    def test_collector_wiring_is_gated_and_cannot_break_the_watchdog(self) -> None:
-        src = open(os.path.join(REPO, "collect_intake.py"), encoding="utf-8").read()
-        i = src.index('env_flag("ENABLE_SILENCE_SUPABASE_SHADOW")')
-        block = src[i:i + 1400]
-        self.assertIn("query_last_seen_supabase(", block)
-        self.assertIn('store_counters.setdefault("monitor_shadow", {})["silence"]', block)
-        self.assertIn("except Exception as e:  # noqa: BLE001 — 그림자가 감시·수집을 죽이면 안 된다", block)
-        # 노션 기준 판정(coverage_silent_sources)이 그림자보다 먼저 확정된다.
-        self.assertLess(src.index("coverage_silent_sources = {\n                finding.notion_source"), i)
-        wf = open(os.path.join(REPO, ".github", "workflows", "grm-intake.yml"), encoding="utf-8").read()
-        self.assertIn("ENABLE_SILENCE_SUPABASE_SHADOW: ${{ vars.ENABLE_SILENCE_SUPABASE_SHADOW || 'false' }}", wf)
 
 
 if __name__ == "__main__":

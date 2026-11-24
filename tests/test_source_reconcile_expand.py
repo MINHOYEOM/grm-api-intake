@@ -101,9 +101,6 @@ class SpecTest(unittest.TestCase):
         for k in ("ich", "who_insp"):
             self.assertEqual(w[k], (RUN - __import__("datetime").timedelta(days=1095), RUN), k)
 
-    def test_snapshot_window_matches_collector_dedup(self):
-        src = (ROOT / "collect_intake.py").read_text(encoding="utf-8")
-        self.assertIn(f"_SNAPSHOT_DEDUP_WINDOW_DAYS = {sr.SNAPSHOT_DEDUP_DAYS}", src)
 
     def test_flags_match_intake_workflow_defaults(self):
         intake = (ROOT / ".github" / "workflows" / "grm-intake.yml").read_text(encoding="utf-8")
@@ -176,7 +173,7 @@ class RssKeyAndLedgerTest(unittest.TestCase):
         spec = sr.SPEC_BY_KEY["eca"]
         d = sr.SourceDoc(document_id="new-id", url="https://www.gmp-compliance.org/a/", title="t",
                          published="2026-11-20")
-        from grm_notion import canonical_url_key
+        from grm_common import canonical_url_key
         res = sr.reconcile_source(spec, sr.FetchOutcome(docs=[d]), run_date=RUN, window=(START, RUN),
                                   collected=set(), ledger={},
                                   collected_urls={canonical_url_key(spec.source, "https://www.gmp-compliance.org/a")})
@@ -318,26 +315,6 @@ class LedgerWiringTest(unittest.TestCase):
         self.assertEqual((res.counts["pre_ledger"], res.counts["missed"]), (1, 0))
 
 
-class SnapshotStoreTest(unittest.TestCase):
-    def test_snapshot_sources_read_with_three_year_window_only_for_their_source(self):
-        calls = []
-
-        def fake(run_date, window_days, sources, token, db_id):
-            calls.append((window_days, frozenset(sources)))
-            return ({"ICH::ich-1"} if "ICH" in sources else {"EMA::e1"}), set()
-        specs = [sr.SPEC_BY_KEY["ich"], sr.SPEC_BY_KEY["ema"]]
-        env = {"NOTION_TOKEN": "t", "NOTION_DATABASE_ID": "d", "ENABLE_ICH": "true",
-               "SUPABASE_URL": "https://x.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "k"}
-        fetchers = {"ich": lambda s, e: sr.FetchOutcome(docs=[sr.SourceDoc("ich-1")]),
-                    "ema": lambda s, e: sr.FetchOutcome(docs=[sr.SourceDoc("e1", published="2026-11-29")])}
-        with patch.object(sr, "load_collected_keys", side_effect=fake), \
-                patch.object(sr, "load_ledger", return_value={}):
-            rep = sr.run(run_date=RUN, base_days=7, enf_days=30, specs=specs, fetchers=fetchers, env=env)
-        self.assertIn((sr.SNAPSHOT_DEDUP_DAYS, frozenset({"ICH"})), calls)
-        self.assertIn((7 + sr.NOTION_DEDUP_MARGIN_DAYS, frozenset({"EMA"})), calls)
-        by = {s["key"]: s for s in rep["sources"]}
-        self.assertEqual(by["ich"]["counts"]["collected"], 1)
-        self.assertEqual(by["ema"]["counts"]["collected"], 1)
 
 
 class WorkflowContractTest(unittest.TestCase):

@@ -18,16 +18,15 @@ _BASE_RAW = {"media_id": "1", "firm": "Acme", "fda_483_observations": [{"number"
              "fda483_excerpt": "x"}
 
 
-def _run(rows, *, apply=False, probe_pdf=False, index=None, notion=None, pdf=None, ledger=()):
+def _run(rows, *, apply=False, probe_pdf=False, pdf=None, ledger=()):
     calls: list[dict] = []
 
     def applier(**kw):
         calls.append(kw)
         return {"status": "applied"}
 
-    rep = bb.run(rows, set(ledger), apply=apply, probe_pdf=probe_pdf, notion_index=index or {},
+    rep = bb.run(rows, set(ledger), apply=apply, probe_pdf=probe_pdf,
                  since="2026-06-01",
-                 notion_body=notion or (lambda _pid: ""),
                  pdf_body=pdf or (lambda _raw, _doc: ("", "fetch-fail")),
                  applier=applier if apply else None, sleeper=lambda _s: None)
     return rep, calls
@@ -48,9 +47,8 @@ class DryRunTest(unittest.TestCase):
     def test_dry_counts_paths_without_writing_or_pdf(self) -> None:
         pdf_calls = []
         rows = [_row("fda483-1", dict(_BASE_RAW)), _row("fda483-2", dict(_BASE_RAW))]
-        rep, calls = _run(rows, index={"fda483-1": "p1"}, notion=lambda pid: "FULL TEXT",
-                          pdf=lambda raw, doc: pdf_calls.append(doc) or ("", "x"))
-        self.assertEqual((rep.via_notion, rep.notion_missing, rep.pdf_not_probed), (1, 1, 1))
+        rep, calls = _run(rows, pdf=lambda raw, doc: pdf_calls.append(doc) or ("", "x"))
+        self.assertEqual((rep.via_pdf, rep.pdf_not_probed), (0, 2))
         self.assertEqual(calls, [])
         self.assertEqual(pdf_calls, [])
 
@@ -64,7 +62,7 @@ class DryRunTest(unittest.TestCase):
 class ApplyTest(unittest.TestCase):
     def test_adds_only_body_key_and_uses_expected_sha(self) -> None:
         row = _row("fda483-1", dict(_BASE_RAW))
-        rep, calls = _run([row], apply=True, index={"fda483-1": "p1"}, notion=lambda pid: "FULL")
+        rep, calls = _run([row], apply=True, pdf=lambda raw, doc: ("FULL", "ok"))
         self.assertEqual(rep.applied, 1)
         (call,) = calls
         self.assertEqual(call["expected_raw_sha256"], row["raw_sha256"])
@@ -73,7 +71,7 @@ class ApplyTest(unittest.TestCase):
         self.assertEqual(new_raw, dict(_BASE_RAW, fda483_body_full="FULL"))
         self.assertEqual(call["record"]["raw_sha256"], rv.canonical_raw(new_raw)[1])
         self.assertEqual(call["record"]["row_json"], row["row_json"])
-        self.assertEqual(call["diff_summary"]["via"], "notion")
+        self.assertEqual(call["diff_summary"]["via"], "pdf")
 
     def test_pdf_fallback_and_no_observation_is_not_written(self) -> None:
         rows = [_row("fda483-1", dict(_BASE_RAW)), _row("fda483-2", dict(_BASE_RAW))]
@@ -86,20 +84,13 @@ class ApplyTest(unittest.TestCase):
     def test_conflict_and_errors_are_counted(self) -> None:
         rows = [_row("fda483-1", dict(_BASE_RAW)), _row("fda483-2", dict(_BASE_RAW))]
         answers = iter([{"status": "conflict"}, {"status": "error", "error": "http_500"}])
-        rep = bb.run(rows, set(), apply=True, probe_pdf=False, notion_index={},
-                     since="2026-06-01", notion_body=lambda p: "",
+        rep = bb.run(rows, set(), apply=True, probe_pdf=False,
+                     since="2026-06-01",
                      pdf_body=lambda raw, doc: ("PDF", "ok"),
                      applier=lambda **kw: next(answers), sleeper=lambda _s: None)
         self.assertEqual(rep.conflict, 1)
         self.assertEqual(rep.errors, ["apply(fda483-2):http_500"])
 
-    def test_notion_exception_falls_back_to_pdf(self) -> None:
-        def boom(_pid):
-            raise RuntimeError("x")
-        rep, calls = _run([_row("fda483-1", dict(_BASE_RAW))], apply=True,
-                          index={"fda483-1": "p1"}, notion=boom, pdf=lambda raw, doc: ("PDF", "ok"))
-        self.assertEqual((rep.via_pdf, rep.applied), (1, 1))
-        self.assertEqual(rep.errors, ["notion(fda483-1):RuntimeError"])
 
 
 if __name__ == "__main__":

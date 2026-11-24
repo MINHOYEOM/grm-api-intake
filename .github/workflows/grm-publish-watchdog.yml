@@ -132,7 +132,7 @@ jobs:
           set -euo pipefail
           # 델타 부재의 가장 흔한 원인은 Routine 실패가 아니라 **브릿지 크론 지각**이다
           # (2026-07-20 실측: 목표 09:30 KST 크론이 13:12 KST 에 발화). 그렇다면 브릿지를
-          # 그냥 돌리면 복구된다 — Notion 의 OPEN 델타는 그대로 남아 있기 때문. 예치 자체가
+          # Rerun the bridge to pick up an existing editorial or backup Git return.
           # 없으면 브릿지가 무해 skip 하고 아래 재확인이 실패해 경보 경로로 넘어간다.
           echo "브릿지 기동 시도 — $DELTA 부재 · 사유: ${{ steps.decide.outputs.dispatch_reason }}"
           if ! gh workflow run grm-delta-bridge.yml --ref main; then
@@ -359,10 +359,9 @@ jobs:
               `- 복구 결과: \`${recovered}\` (기동 시 원격 main 을 최대 10분 폴링해 재확인)`,
               `- 오늘 브릿지 dispatch 누적: ${dispatchesToday}회 (상한 도달 시 추가 기동을 중단합니다)`,
               '',
-              '복구까지 실패했다면 크론 지각이 아니라 **Notion 에 OPEN 델타 자체가 없다**는 뜻일 가능성이 높습니다(브릿지는 예치가 있으면 기동만으로 복구된다). 다음을 확인하세요:',
-              '- Claude Routine(월 07:30 KST 예약 에이전트) 실행 여부 · MCP 연결 상태',
-              '- Notion Intake DB 에 `OPEN GRM Web Delta` 페이지가 예치됐는지(Status=New)',
-              `- 편집팀 git 반납: 브랜치 \`claude/company-${pubDate}\` 의 \`company/run/${pubDate}/delta.json\`·\`copyedit.json\`(status 완료) — 저장소 변수 GRM_DELTA_SOURCE=git 일 때만 브릿지가 이것으로 기록합니다(기본 notion 은 비교만)`,
+              '브릿지 재실행 후에도 델타가 없으면 다음을 확인하세요.',
+              '- 편집팀과 백업 Routine 실행 여부',
+              `- 편집팀 git 반납: 브랜치 \`claude/company-${pubDate}\` 의 \`company/run/${pubDate}/delta.json\`·\`copyedit.json\`(status 완료)`,
               '- 델타 브릿지 run 로그 — 예치가 있는데도 실패했다면 그쪽이 원인입니다',
               '',
               '사람 복구(멱등 — 이미 이관됐으면 무해 skip): `gh workflow run grm-delta-bridge.yml`',

@@ -23,7 +23,7 @@ from unittest import mock
 
 import collect_intake as ci
 import findings_store as store
-import grm_notion
+from grm_common import canonical_url_key
 import grm_queue as gq
 
 _SUPABASE = ("https://example.supabase.co", "service-role-secret-token")
@@ -117,7 +117,7 @@ class ClassifyTest(unittest.TestCase):
         self.assertEqual(st.raw_ingested_at([("S", "a"), ("S", "b")]),
                          {"S::a": "2026-11-19T00:00:00+00:00"})
         self.assertEqual(st.source_url_keys(["ECA Academy"]),
-                         {grm_notion.canonical_url_key("ECA Academy", "https://EX.org/a/#frag")})
+                         {canonical_url_key("ECA Academy", "https://EX.org/a/#frag")})
 
         class Broken:
             def request(self, *a, **k):
@@ -131,41 +131,30 @@ class ClassifyTest(unittest.TestCase):
 
 class InsertItemsQueueCriterionTest(unittest.TestCase):
     def _insert(self, items, **kw):
-        return ci.insert_items("tok", "db", items, _RUN, _AT, set(), False, modality_enabled=False,
+        return ci.insert_items(items, _AT, set(), False,
                                findings_supabase=_SUPABASE, **kw)
 
     def test_heal_documents_go_to_the_queue_only(self):
         queued, counters = [], ci._new_store_counters()
         with mock.patch.object(ci.time, "sleep"), \
-                mock.patch.object(ci, "append_intake_item_to_supabase") as supa, \
-                mock.patch.object(ci, "notion_create_page") as notion:
+                mock.patch.object(ci, "append_intake_item_to_supabase") as supa:
             got = self._insert([_item("heal")], queue_new_items=queued, queue_on_store=True,
                                queue_only_keys={f"{SRC}::heal"}, store_counters=counters)
         supa.assert_not_called()
-        notion.assert_not_called()
         self.assertEqual(got, (0, 1, 0))
         self.assertEqual([it.document_id for it in queued], ["heal"])
         self.assertEqual(counters["queue_healed"], 1)
 
-    def test_queue_follows_the_store_not_notion(self):
+    def test_queue_follows_the_store(self):
         queued = []
         with mock.patch.object(ci.time, "sleep"), \
                 mock.patch.object(ci, "append_intake_item_to_supabase",
-                                  side_effect=[_ok("inserted"), _ok("duplicate"), _ok("invalid")]), \
-                mock.patch.object(ci, "notion_create_page", side_effect=[False, True, True]):
-            got = self._insert([_item("saved-notion-fails"), _item("dup"), _item("store-fails")],
+                                  side_effect=[_ok("inserted"), _ok("duplicate"), _ok("invalid")]):
+            got = self._insert([_item("saved"), _item("dup"), _item("store-fails")],
                                queue_new_items=queued, queue_on_store=True)
         # 정본에 있다고 확인된 두 건만 — 노션이 실패한 첫 건도 들어가고, 정본이 거부한 셋째는 안 들어간다.
-        self.assertEqual([it.document_id for it in queued], ["saved-notion-fails", "dup"])
+        self.assertEqual([it.document_id for it in queued], ["saved", "dup"])
         self.assertEqual(got, (2, 0, 1))
-
-    def test_notion_criterion_is_unchanged_when_the_switch_is_off(self):
-        queued = []
-        with mock.patch.object(ci.time, "sleep"), \
-                mock.patch.object(ci, "append_intake_item_to_supabase", return_value=_ok()), \
-                mock.patch.object(ci, "notion_create_page", side_effect=[False, True]):
-            self._insert([_item("notion-fails"), _item("ok")], queue_new_items=queued)
-        self.assertEqual([it.document_id for it in queued], ["ok"])     # 종전: 노션 행이 생긴 문서만
 
 
 class _FakeQueueStore:
@@ -191,138 +180,14 @@ class _FakeQueueStore:
         return None if type(self).url_fail else set()
 
 
-class MainDbDedupTest(unittest.TestCase):
-    DOCS = ("wl-new", "wl-have", "wl-heal", "wl-old")
-
-    def setUp(self):
-        _FakeQueueStore.made, _FakeQueueStore.fail, _FakeQueueStore.url_fail = 0, False, False
-
-    def _run_main(self, extra_env, *, notion_keys=(), notion_error=False):
-        stats = ci.CollectionStats()
-        groups = [[] for _ in range(22)]
-        groups[7] = [_item(d) for d in self.DOCS]                      # wl_items
-        collected = (stats,) + tuple(groups)
-        env = {"NOTION_TOKEN": "tok", "NOTION_DATABASE_ID": "db",
-               "ENABLE_FINDINGS_SUPABASE_APPEND": "true", "RAW_SIGNALS_HEAL": "false",
-               "RAW_UPDATE_APPLY": "false", "ENABLE_SOURCE_SILENCE_WATCHDOG": "false",
-               "SUPABASE_URL": _SUPABASE[0], "SUPABASE_SERVICE_ROLE_KEY": _SUPABASE[1]}
-        env.update(extra_env)
-        keys = grm_notion.ExistingKeys(doc_ids={f"{SRC}::{d}" for d in notion_keys}, url_keys=set())
-        nq = (mock.patch.object(ci, "notion_query_existing_keys",
-                                side_effect=grm_notion.NotionDedupeQueryError("timeout"))
-              if notion_error else mock.patch.object(ci, "notion_query_existing_keys", return_value=keys))
-        with tempfile.TemporaryDirectory() as d:
-            env["GRM_HEALTH_JSON"] = os.path.join(d, "grm-health.json")
-            with mock.patch.dict(os.environ, env), \
-                    mock.patch.object(sys, "argv", ["collect_intake.py"]), \
-                    mock.patch.object(ci, "now_kst", return_value=_NOW), \
-                    mock.patch.object(ci.time, "sleep"), \
-                    mock.patch.object(ci, "notion_verify_modality_property", return_value=True), \
-                    mock.patch.object(ci, "notion_verify_handoff_ref_property", return_value=True), \
-                    mock.patch.object(ci, "probe_kr_egress_proxy", return_value=("unconfigured", "")), \
-                    mock.patch.object(ci, "_fda483_known_document_ids", return_value=None), \
-                    mock.patch.object(ci, "_configure_exclusion_ledger"), \
-                    mock.patch.object(ci, "_run_collection", return_value=collected), nq, \
-                    mock.patch.object(ci, "notion_count_aged_unconsumed_new", return_value=0), \
-                    mock.patch.object(ci, "existing_raw_signal_ids", return_value=set()), \
-                    mock.patch.object(gq, "QueueStore", _FakeQueueStore), \
-                    mock.patch.object(gq, "run_shadow", return_value={}) as shadow, \
-                    mock.patch.object(ci, "append_intake_item_to_supabase", return_value=_ok()) as supa, \
-                    mock.patch.object(ci, "notion_create_page", return_value=True) as create:
-                for name in ("GRM_INTAKE_DEDUP_SOURCE", "ENABLE_INTAKE_DEDUP_SHADOW",
-                             "ENABLE_INTAKE_QUEUE_SHADOW"):
-                    if name not in extra_env:
-                        os.environ.pop(name, None)
-                code = ci.main()
-            with open(env["GRM_HEALTH_JSON"], encoding="utf-8") as f:
-                payload = json.load(f)
-        created = [c[0][2].document_id for c in create.call_args_list]
-        stored = [c[0][2].document_id for c in supa.call_args_list]
-        queued = ([it.document_id for it in shadow.call_args.kwargs["new_items"]]
-                  if shadow.call_args else None)
-        return code, created, stored, queued, payload["store"]
-
-    def test_default_never_reads_the_database_for_dedup(self):
-        code, created, stored, queued, st = self._run_main({}, notion_keys=("wl-have",))
-        self.assertEqual(code, 0)
-        self.assertEqual(_FakeQueueStore.made, 0)
-        self.assertEqual(created, ["wl-new", "wl-heal", "wl-old"])       # 노션 기준 그대로
-        self.assertNotIn("dedup_shadow", st)
-        self.assertEqual(st["dedup_mode"], "notion")
-        self.assertIsNone(queued)
-
-    def test_db_basis_decides_new_have_heal_old(self):
-        # 노션 조회는 일부러 다른 답을 준다 — DB 기준이 이기는지 본다.
-        code, created, stored, queued, st = self._run_main(
-            {"GRM_INTAKE_DEDUP_SOURCE": "supabase"}, notion_keys=("wl-new",))
-        self.assertEqual(code, 0)
-        self.assertEqual(created, ["wl-new"])                 # 새 문서만 정본·노션에 쓴다
-        self.assertEqual(stored, ["wl-new"])
-        self.assertEqual(sorted(queued), ["wl-heal", "wl-new"])   # 보충은 대기열에만
-        self.assertEqual(st["dedup_mode"], "supabase")
-        self.assertEqual(st["queue_healed"], 1)
-        self.assertEqual(st["dedup_shadow"]["db"], {"new": 1, "have": 1, "heal": 1, "old": 1})
-        self.assertEqual(st["dedup_shadow"]["heal_by_source"], {SRC: {"count": 1, "sample": ["wl-heal"]}})
-
-    def test_db_basis_keeps_collecting_when_notion_lookup_is_down(self):
-        code, created, _stored, queued, st = self._run_main(
-            {"GRM_INTAKE_DEDUP_SOURCE": "supabase"}, notion_error=True)
-        self.assertEqual(code, 0)
-        self.assertEqual(created, ["wl-new"])
-        self.assertEqual(sorted(queued), ["wl-heal", "wl-new"])
-        self.assertEqual(st["dedup_mode"], "supabase")
-        self.assertIsNone(st["dedup_shadow"]["same"])
-
-    def test_db_lookup_failure_falls_back_to_the_notion_basis(self):
-        for attr in ("fail", "url_fail"):
-            with self.subTest(attr=attr):
-                self.setUp()
-                setattr(_FakeQueueStore, attr, True)
-                code, created, _stored, queued, st = self._run_main(
-                    {"GRM_INTAKE_DEDUP_SOURCE": "supabase"}, notion_keys=("wl-have", "wl-old"))
-                self.assertEqual(code, 0)
-                self.assertEqual(created, ["wl-new", "wl-heal"])       # 노션 기준
-                self.assertEqual(st["dedup_mode"], "notion")
-                self.assertIsNone(queued)                              # 그림자도 꺼져 있다
-                self.assertNotIn("queue_healed", st)
-
-    def test_shadow_only_records_and_changes_nothing(self):
-        code, created, stored, queued, st = self._run_main(
-            {"ENABLE_INTAKE_DEDUP_SHADOW": "true"}, notion_keys=("wl-have", "wl-heal"))
-        self.assertEqual(code, 0)
-        self.assertEqual(created, ["wl-new", "wl-old"])       # 판정은 노션 기준
-        self.assertEqual(stored, ["wl-new", "wl-old"])
-        self.assertEqual(st["dedup_mode"], "notion")
-        self.assertIsNone(queued)
-        sh = st["dedup_shadow"]
-        self.assertEqual(sh["db"], {"new": 1, "have": 1, "heal": 1, "old": 1})
-        self.assertEqual(sh["only_notion_new_sample"], [f"{SRC}::wl-old"])
-        self.assertEqual(sh["only_db_new_sample"], [f"{SRC}::wl-heal"])
-        self.assertFalse(sh["same"])
-
-    def test_workflow_passes_both_switches_default_off(self):
-        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        with open(os.path.join(root, ".github", "workflows", "grm-intake.yml"), encoding="utf-8") as f:
-            wf = f.read()
-        self.assertIn("GRM_INTAKE_DEDUP_SOURCE: ${{ vars.GRM_INTAKE_DEDUP_SOURCE || 'notion' }}", wf)
-        self.assertIn("ENABLE_INTAKE_DEDUP_SHADOW: ${{ vars.ENABLE_INTAKE_DEDUP_SHADOW || 'false' }}", wf)
-        self.assertEqual(gq.dedup_source(), "notion")
-
-
-
 class Fda483PrefetchDbTest(unittest.TestCase):
     """FDA 483 선조회(PDF·OCR 건너뛰기)를 DB 대기열 기준으로 — 중복 판정과 같은 변수를 따른다."""
 
     START = datetime(2026, 10, 21, tzinfo=timezone.utc).date()
 
     def _known(self, **kw):
-        return ci._fda483_known_document_ids("tok", "db", _RUN, self.START, _RUN, enabled=True, **kw)
+        return ci._fda483_known_document_ids(_RUN, self.START, _RUN, enabled=True, **kw)
 
-    def test_default_reads_notion_and_never_the_queue(self):
-        with mock.patch.object(gq, "QueueStore", side_effect=AssertionError("대기열을 읽으면 안 된다")), \
-                mock.patch.object(ci, "notion_query_existing_doc_ids", return_value={"FDA 483::n1"}), \
-                mock.patch.object(ci, "log"):
-            self.assertEqual(self._known(), {"FDA 483::n1"})
 
     def test_db_basis_reads_queued_483_within_the_window(self):
         seen = {}
@@ -335,38 +200,12 @@ class Fda483PrefetchDbTest(unittest.TestCase):
                 seen["args"] = (source, since)
                 return {"FDA 483::q1", "FDA 483::q2"}
         with mock.patch.object(gq, "QueueStore", Store), \
-                mock.patch.object(ci, "notion_query_existing_doc_ids",
-                                  side_effect=AssertionError("노션을 읽으면 안 된다")), \
                 mock.patch.object(ci, "log"):
             got = self._known(db=_SUPABASE)
         self.assertEqual(got, {"FDA 483::q1", "FDA 483::q2"})
         self.assertEqual(seen["cred"], _SUPABASE)
         self.assertEqual(seen["args"], ("FDA 483", "2026-10-20"))      # 창 = 집행 시작~오늘(31일)
 
-    def test_db_failure_falls_back_to_notion(self):
-        class Broken:
-            def __init__(self, url, key):
-                pass
-
-            def queue_keys_for_source(self, source, since):
-                raise gq.QueueStoreError("intake_queue GET: http_500")
-        with mock.patch.object(gq, "QueueStore", Broken), \
-                mock.patch.object(ci, "notion_query_existing_doc_ids", return_value={"FDA 483::n1"}), \
-                mock.patch.object(ci, "log"):
-            self.assertEqual(self._known(db=_SUPABASE), {"FDA 483::n1"})
-
-    def test_db_connection_follows_the_dedup_switch(self):
-        cfg = mock.MagicMock()
-        cfg.findings_supabase_url = _SUPABASE[0]
-        env = {"SUPABASE_SERVICE_ROLE_KEY": _SUPABASE[1]}
-        with mock.patch.dict(os.environ, env):
-            os.environ.pop(gq.DEDUP_SOURCE_ENV, None)
-            self.assertIsNone(ci._fda483_prefetch_db(cfg, False))                 # 기본 = 노션
-            os.environ[gq.DEDUP_SOURCE_ENV] = "supabase"
-            self.assertEqual(ci._fda483_prefetch_db(cfg, False), _SUPABASE)
-            self.assertIsNone(ci._fda483_prefetch_db(cfg, True))                  # dry-run 은 읽지 않는다
-            os.environ.pop("SUPABASE_SERVICE_ROLE_KEY")
-            self.assertIsNone(ci._fda483_prefetch_db(cfg, False))
 
     def test_store_query_is_scoped_to_source_and_window(self):
         calls = []
@@ -402,38 +241,6 @@ class HandoffStatusDbTest(unittest.TestCase):
                                                    store=Store({"status": db_status})), word)
         self.assertEqual(cov.handoff_status_db("2026-11-16", base_url="u", service_key="k",
                                                store=Store(None)), "missing")
-
-    def test_cli_default_is_notion_and_db_needs_the_switch(self):
-        import contextlib
-        import io as _io
-        import fda_body_coverage as cov
-
-        def run(env):
-            out = _io.StringIO()
-            with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
-                for name in ("GRM_HANDOFF_STATUS_SOURCE", "NOTION_TOKEN", "NOTION_DATABASE_ID",
-                             "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"):
-                    if name not in env:
-                        os.environ.pop(name, None)
-                with mock.patch.object(cov, "handoff_status", return_value="New") as notion, \
-                        mock.patch.object(cov, "handoff_status_db", return_value="Processed") as dbf:
-                    self.assertEqual(cov.main(["handoff-status", "--date", "2026-11-16"]), 0)
-                    return out.getvalue().strip(), notion.call_count, dbf.call_count
-        self.assertEqual(run({"NOTION_TOKEN": "t", "NOTION_DATABASE_ID": "d"}),
-                         ("handoff_status=New", 1, 0))
-        self.assertEqual(run({"GRM_HANDOFF_STATUS_SOURCE": "db", "SUPABASE_URL": _SUPABASE[0],
-                              "SUPABASE_SERVICE_ROLE_KEY": _SUPABASE[1]}),
-                         ("handoff_status=Processed", 0, 1))
-        # DB 기준인데 접속 정보가 없으면 '모름' — 재생성하지 않는 쪽으로 간다.
-        self.assertEqual(run({"GRM_HANDOFF_STATUS_SOURCE": "db"})[0], "handoff_status=error:KeyError")
-
-    def test_workflow_passes_the_switch_default_notion(self):
-        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        with open(os.path.join(root, ".github", "workflows", "grm-fda-coverage-gate.yml"),
-                  encoding="utf-8") as f:
-            wf = f.read()
-        self.assertIn("GRM_HANDOFF_STATUS_SOURCE: ${{ vars.GRM_HANDOFF_STATUS_SOURCE || 'notion' }}", wf)
-        self.assertIn("steps.handoff.outputs.handoff_status == 'New'", wf)   # 재생성 조건은 그대로 이 낱말
 
 
 if __name__ == "__main__":

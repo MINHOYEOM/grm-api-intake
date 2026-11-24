@@ -175,23 +175,10 @@ if __name__ == "__main__":
 
 
 class HandoffStatusTest(unittest.TestCase):
-    def test_reads_status_of_that_dates_handoff(self):
-        seen = {}
 
-        def finder(token, db, hid):
-            seen["hid"] = hid
-            return {"properties": {"Status": {"select": {"name": "Processed"}}}}
-
-        self.assertEqual(cov.handoff_status("2026-11-02", token="t", db_id="d", find_page=finder),
-                         "Processed")
-        self.assertEqual(seen["hid"], "routine-handoff::2026-11-02")
-
-    def test_missing_page(self):
-        self.assertEqual(cov.handoff_status("2026-11-02", token="t", db_id="d",
-                                            find_page=lambda *a: None), "missing")
 
     def test_cli_failure_is_reported_not_raised(self):
-        env = {k: v for k, v in os.environ.items() if k not in ("NOTION_TOKEN", "NOTION_DATABASE_ID")}
+        env = {k: v for k, v in os.environ.items() if k not in ("SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY")}
         out = subprocess.run(
             [sys.executable, os.path.join(ROOT, "fda_body_coverage.py"), "handoff-status",
              "--date", "2026-11-02"], capture_output=True, text=True, encoding="utf-8",

@@ -2,7 +2,7 @@
 """raw_signals.modality 소급 — 비어 있는 행의 제품군을 수집기와 같은 함수로 다시 계산해 채운다.
 
 배경(2026-11-12 재생 대조, `GRM_재생대조_결과_2026-11-12.md`):
-  Notion 적재(`grm_notion.notion_create_page`)는 `compute_modality(raw, headline, body,
+  당시 Notion 적재는 `compute_modality(raw, headline, body,
   type_or_class, firm)` 로 제품군을 붙이지만, 정본 행을 만드는 `findings_store.raw_signal_from_intake_item`
   은 그 칸을 싣지 않았다. 그래서 raw_signals 9천여 행의 99% 가 modality 빈칸이고, DB 로 만든
   handoff 의 카드 문안·묶음이 노션 것과 달라졌다. 새 행은 같은 PR 에서 수집 시점에 채운다.

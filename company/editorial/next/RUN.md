@@ -9,8 +9,8 @@
 
 ## 0. 이번 호의 길 (사람이 바꾸는 두 줄 — 전환한 호부터)
 - `handoff 길: git` — handoff 를 저장소 브랜치 `claude/queue-handoff` 의 파일에서 읽는다(2항). 수집기가 DB 로 만든 것이다.
-- `반납 길: git` — 교열이 통과시킨 델타는 실행 폴더에 push 한 파일이다. 발행 브릿지가 가져간다(`copyedit.md` 마감). 이 줄은 더 바꾸지 않는다(`notion` 길은 없어졌다). 저장소 변수 `GRM_DELTA_SOURCE=git` 과 짝이고, `GRM_INTAKE_NOTION=off` 면 브릿지는 그 변수와 무관하게 git 만 본다.
-- **Notion 은 발행 길에 없다**(대표 결정 — 11-23 호 편집팀 발행 성공 뒤). 어떤 직무도 Notion 을 읽거나 쓰지 않는다. 저장소 변수 `GRM_INTAKE_NOTION=off` 와 짝이다.
+- `반납 길: git` — 교열이 통과시킨 델타는 실행 폴더에 push 한 파일이다. 발행 브릿지가 가져간다(`copyedit.md` 마감). 이 줄은 더 바꾸지 않는다.
+- **Notion 은 발행 길에 없다**(대표 결정 — 11-23 호 편집팀 발행 성공 뒤). 어떤 직무도 Notion 을 읽거나 쓰지 않는다.
 - **편집팀 직무는 백업을 기다리거나 부르지 않는다** — 이 파일의 "자동 백업은 없다"는 그 뜻이다. v16 백업 Routine(월 09:30)은 꺼졌고,
   그 자리는 **백업 v17**(`company/editorial/backup.md`, 월 09:30 · 별도 Routine)이 맡는다: 발행 브릿지가 편집팀 반납을 쓸 수 없을 때만 같은 브랜치의
   `company/run/{D}/backup/` 에 따로 반납한다(편집팀 파일은 건드리지 않는다). 백업도 못 넘긴 호는 종합상황실 10:45 확인(`company/situation-room/brief-prep.md`)이

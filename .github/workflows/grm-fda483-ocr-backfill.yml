@@ -26,9 +26,9 @@ on:
         type: string
         default: '0'
       delay_seconds:
-        description: 'PDF 요청 간 대기(초)'
+        description: 'PDF 요청 간 대기(초). 비우면 도구 기본값.'
         type: string
-        default: '0.5'
+        default: ''
 
 permissions:
   contents: read
@@ -99,7 +99,10 @@ jobs:
           test -f "$published" || { echo "발행본 없음: $published"; exit 1; }
           args=(--out-deep-patch "deep_patch_${under}.json" \
                 --out-report "ocr_report_${under}.json" \
-                --delay "$DELAY" --limit "$LIMIT")
+                --limit "$LIMIT")
+          if [ -n "$DELAY" ]; then
+            args+=(--delay "$DELAY")
+          fi
           if [ -n "$DOC_IDS" ]; then
             args+=(--doc-ids "$DOC_IDS")
           else

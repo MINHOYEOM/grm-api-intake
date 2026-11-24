@@ -79,6 +79,7 @@ import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_WL, log
+from grm_http_policy import FDA_WL_RECOVERY_DELAY_SECONDS
 
 SCHEMA_VERSION = "grm-wl-body-recovery/v1"
 
@@ -86,7 +87,7 @@ DEFAULT_TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
 _DEFAULT_PAGE_SIZE = 1000
 # fda.gov robots Crawl-Delay 는 백필 페치가 30초로 지킨다. 회수 대상은 하루 한 줌이라
 # 그 정도 간격도 부담이 없다 — 기본값을 같은 예의 수준으로 둔다.
-_DEFAULT_DELAY_SECONDS = 5.0
+_DEFAULT_DELAY_SECONDS = FDA_WL_RECOVERY_DELAY_SECONDS
 DEFAULT_TIME_BUDGET_SECONDS = 1200.0   # 워크플로 timeout-minutes 30 에서 10분 여유(마지막 fetch·재시도·리포트)
 _MAX_SAMPLES = 20
 _BROAD_FAILURE_MIN_ATTEMPTS = 3

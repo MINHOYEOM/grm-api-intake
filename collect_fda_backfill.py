@@ -96,6 +96,7 @@ import grm_findings as gf
 from grm_cli import header_ci as _header_ci
 from grm_cli import parse_content_range as _parse_content_range
 from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html, log
+from grm_http_policy import FDA_BACKFILL_DELAY_SECONDS, FDA_HTTP_RETRIES
 
 
 SCHEMA_VERSION = "grm-findings-backfill-fetch/v1"
@@ -684,7 +685,7 @@ def run_wl(
 
     try:
         sleeper(delay)
-        html = http_get_html(ci.FDA_WL_URL, timeout=30, retries=3, label="FDA WL backfill config")
+        html = http_get_html(ci.FDA_WL_URL, timeout=30, retries=FDA_HTTP_RETRIES, label="FDA WL backfill config")
         config = _extract_datatable_config(html, WL_SOLR_VIEW_NAME)
         if config is None:
             raise RuntimeError("fda-wl-ajax-config-missing")
@@ -703,7 +704,7 @@ def run_wl(
         )
         url = config["url"] + "?" + urlencode(params)
         text = http_get_html(
-            url, timeout=30, retries=3,
+            url, timeout=30, retries=FDA_HTTP_RETRIES,
             headers={
                 "Accept": "application/json, text/javascript, */*; q=0.01",
                 "Referer": ci.FDA_WL_URL,
@@ -767,7 +768,9 @@ def run_wl(
             letter_html, fetch_status = "", ci.WL_BODY_STATUS_OK
             try:
                 sleeper(delay)
-                letter_html = http_get_html(wl_href, timeout=20, retries=3, label="FDA WL backfill body")
+                letter_html = http_get_html(
+                    wl_href, timeout=20, retries=FDA_HTTP_RETRIES, label="FDA WL backfill body",
+                )
             except FdaBotBlockError:
                 report.errors.append(FDA_BOT_BLOCK)
                 break
@@ -1024,7 +1027,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "run; exits cleanly with auto_complete=true once both backlogs are exhausted. "
         "Mutually exclusive with --source/--offset.",
     )
-    parser.add_argument("--delay", type=float, default=30)
+    parser.add_argument("--delay", type=float, default=FDA_BACKFILL_DELAY_SECONDS)
     parser.add_argument(
         "--dry-run", action="store_true", default=False,
         help="List + triage only (skip_existing/skip_gated) -- never fetch documents or POST.",

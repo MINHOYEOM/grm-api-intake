@@ -480,10 +480,11 @@ def fetch_page(alert_no: str) -> tuple[bytes, dict[str, str]]:
     import requests
 
     from grm_common import DEFAULT_USER_AGENT, FdaBotBlockError, fda_checked_request
+    from grm_http_policy import FDA_IMPORT_ALERT_FETCH_ATTEMPTS
 
     url = URL_TMPL.format(page_id=ALERTS[alert_no]["page_id"])
     last: Exception | None = None
-    for _ in range(3):
+    for _ in range(FDA_IMPORT_ALERT_FETCH_ATTEMPTS):
         try:
             r = fda_checked_request(requests.get, url, headers={"User-Agent": DEFAULT_USER_AGENT,
                                            "Accept": "text/html,application/xhtml+xml"}, timeout=120)

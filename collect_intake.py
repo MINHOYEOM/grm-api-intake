@@ -3469,8 +3469,12 @@ def build_wl_item(
     office_verdict: str,
     excerpt: tuple[str, str] | None,
     full: tuple[str, str] | None,
+    record_tier: bool = True,
 ) -> IntakeItem:
     """WL 목록 행 + 본문 fetch 결과 → IntakeItem (네트워크 0 · 결정론).
+
+    `record_tier=False` 는 본문 교체 후속(`raw_body_followup`)이 **이미 저장된 행**의 분류를 다시
+    계산할 때 쓴다 — 같은 판정을 두 번 세면 tier 관측 계기가 부푼다(`record_tier_decision`).
 
     라이브 수집(`collect_fda_warning_letters`)과 예약 회수(`backfill_wl_body_recovery.py`)가
     **같은 이 함수**로 행을 만든다 — 회수가 raw 를 손으로 기워 `raw_sha256`·tier 가 어긋나는
@@ -3549,8 +3553,9 @@ def build_wl_item(
             "Tier 3", "wl_cgmp_body",
             t2_matches=tier_decision.t2_matches, t3_matches=tier_decision.t3_matches)
         tier_blob_parts.append(body_for_tier)
-    record_tier_decision(tier_decision, SOURCE_FDA_WL,
-                         " ".join(p for p in tier_blob_parts if p))
+    if record_tier:
+        record_tier_decision(tier_decision, SOURCE_FDA_WL,
+                             " ".join(p for p in tier_blob_parts if p))
 
     return IntakeItem(
         source=SOURCE_FDA_WL,

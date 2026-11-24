@@ -33,6 +33,20 @@ _CI_LETTER = (
 )
 
 
+
+# [본문 교체 후속 2026-11-24] 이 파일의 시험은 회수 경로만 본다 — 후속(raw_body_followup.followup)은 네트워크
+# (findings 조회·삽입)를 쓰므로 대역으로 바꾼다. 후속 호출 계약은 tests/test_raw_body_followup.py 가 본다.
+_FOLLOWUP_PATCH = mock.patch.object(rec.rbf, "followup",
+                                    lambda base, key, pairs, dry_run: ({"rows": len(pairs)}, {"items": []}))
+
+
+def setUpModule():  # noqa: N802
+    _FOLLOWUP_PATCH.start()
+
+
+def tearDownModule():  # noqa: N802
+    _FOLLOWUP_PATCH.stop()
+
 class AnchorStartTest(unittest.TestCase):
     def test_weak_specifically_anchor_does_not_cut_the_violation_narrative(self):
         full = ci._extract_wl_body_full(_CI_LETTER)

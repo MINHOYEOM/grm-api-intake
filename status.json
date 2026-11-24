@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24T23:48:11Z",
+ "generated_at": "2026-11-24T23:58:05Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45513293652,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-24T23:50:26Z",
+    "updatedAt": "2026-11-24T23:57:41Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1921 from MINHOYEOM/codex/drop-count-asserts",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45513293652"
+   },
+   {
     "databaseId": 45503883012,
     "status": "completed",
     "conclusion": "success",
@@ -271,27 +282,16 @@
     "headBranch": "codex/wl-pair-restore-dry",
     "displayTitle": "feat(wl): 본문만 바뀐 짝 findings restore 계획 도구 (기본 dry)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45499647459"
-   },
-   {
-    "databaseId": 45499636582,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T22:18:12Z",
-    "updatedAt": "2026-11-24T22:31:47Z",
-    "headBranch": "codex/wl-pair-restore-dry",
-    "displayTitle": "fix: 교차 검토 지적 반영 — 본문 해시 비교를 DB 함수로(마이그레이션 167 추가·미적용)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45499636582"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 45512969235,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-24T23:48:02Z",
-    "updatedAt": "2026-11-24T23:48:07Z",
+    "updatedAt": "2026-11-24T23:48:17Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45512969235"
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45514271326,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-24T23:57:48Z",
+    "updatedAt": "2026-11-24T23:57:56Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45514271326"
+   },
+   {
     "databaseId": 45458784946,
     "status": "completed",
     "conclusion": "skipped",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45344085997"
-   },
-   {
-    "databaseId": 45324574724,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-24T04:10:53Z",
-    "updatedAt": "2026-11-24T04:10:54Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45324574724"
    }
   ],
   "grm-findings-translate-apply.yml": [

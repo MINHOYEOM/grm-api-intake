@@ -173,7 +173,7 @@ flowchart TD
     D --> E["6슬롯 산문 + 심층분석<br/>company/run/&lt;날짜&gt;/ 반납"]
     E -->|반납 사용 불가| V["월 09:30 KST 백업 v17<br/>company/run/&lt;날짜&gt;/backup/ 반납"]
     V --> F
-    E --> F["grm-delta-bridge 월 07:07~13:37 30분 간격<br/>git 반납만 수집 · 심층분석 근거 검증"]
+    E --> F["grm-delta-bridge 월 07:07~14:37 30분 간격<br/>git 반납만 수집 · 심층분석 근거 검증"]
     F --> G[grm-web-publish 자동 조립<br/>발행 PR publish/brief-날짜]
     G --> H[grm-web-deploy<br/>Cloudflare 프리뷰 URL]
     H --> I{{사람: Admin 승인 1클릭<br/>= 유일한 사람 개입}}
@@ -190,7 +190,7 @@ flowchart TD
 |---|---|---|---|---|
 | ① | 매일 수집 → Supabase → 저장소 handoff + 빈슬롯 스캐폴드 artifact | `grm-intake.yml` | cron 매일 03:17 KST + 월 00:07·00:43·01:19 KST | 없음 |
 | ② | 월요일 카드 분석 → 슬롯 델타 + **심층분석 생성** → `company/run/<날짜>/` 반납. 편집팀 반납을 쓸 수 없을 때만 `backup/`에 백업 반납 | 클라우드 브리프편집팀(`company/editorial/`) · 백업 v17(`company/editorial/backup.md`) | 월 07:20·08:00·08:40·09:05 · 백업 09:30 KST | 없음 |
-| ③ | git 반납만 가져와 델타를 이관(deep는 `verify_deep_analysis` 게이트 통과분만) | `delta_bridge.py`(`grm-delta-bridge.yml`) | cron 월 07:07~13:37 KST **30분 간격 14회**(PAT push) | 없음 |
+| ③ | git 반납만 가져와 델타를 이관(deep는 `verify_deep_analysis` 게이트 통과분만) | `delta_bridge.py`(`grm-delta-bridge.yml`) | cron 월 07:07~14:37 KST **30분 간격 16회**(PAT push) | 없음 |
 | ④ | 스캐폴드+델타 → 발행본 조립 → 캐노니컬 브랜치 `publish/brief-{date}` PR | `grm-web-publish.yml` | ③ 델타 커밋(PAT라 자동 트리거) | 없음 |
 | ⑤ | 발행본 렌더 → 미리보기 URL | `grm-web-deploy.yml` | ④ PR 생성 | 없음 |
 | ⑥ | **미리보기 확인 후 승인 = PR 머지** | Admin 승인 버튼 → `admin-github`(check-runs green 게이트) | 사람 클릭 | **있음(유일)** |

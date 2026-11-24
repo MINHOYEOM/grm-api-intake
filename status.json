@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-23T18:51:13Z",
+ "generated_at": "2026-11-24T00:58:54Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 45301070728,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-24T00:55:33Z",
+    "updatedAt": "2026-11-24T00:55:38Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45301070728"
+   },
    {
     "databaseId": 45084280088,
     "status": "completed",
@@ -45,20 +56,20 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45069455261"
-   },
-   {
-    "databaseId": 45039409414,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-22T15:38:12Z",
-    "updatedAt": "2026-11-22T15:50:46Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45039409414"
    }
   ],
   "grm-delta-bridge.yml": [
+   {
+    "databaseId": 45300796973,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-24T00:53:29Z",
+    "updatedAt": "2026-11-24T00:53:52Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45300796973"
+   },
    {
     "databaseId": 45130338753,
     "status": "completed",
@@ -102,17 +113,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44710622310"
-   },
-   {
-    "databaseId": 43814731108,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-16T06:08:23Z",
-    "updatedAt": "2026-11-16T06:08:51Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43814731108"
    }
   ],
   "grm-web-publish.yml": [
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45241270892,
+    "databaseId": 45300504007,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-23T18:42:43Z",
-    "updatedAt": "2026-11-23T18:50:56Z",
+    "createdAt": "2026-11-24T00:51:14Z",
+    "updatedAt": "2026-11-24T00:58:39Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1883 from MINHOYEOM/claude/glossary-fig-daily-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45241270892"
+    "displayTitle": "linkedin: 해부판 어림 표현 한 문장 겹침 게이트(국·영) + 11-23 a1 문장 재작성 (#1887)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45300504007"
    },
    {
-    "databaseId": 45171382158,
+    "databaseId": 45295397019,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-24T00:13:29Z",
+    "updatedAt": "2026-11-24T00:21:25Z",
+    "headBranch": "feat/git-backup-v17-v2",
+    "displayTitle": "Merge feat/notion-off-v2 (#1886) into backup-v17 — #1886 다음 날 같은 날 머지…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45295397019"
+   },
+   {
+    "databaseId": 45295285220,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-23T12:07:54Z",
-    "updatedAt": "2026-11-23T12:16:08Z",
-    "headBranch": "claude/glossary-fig-daily-20261123-2106",
-    "displayTitle": "glossary(fig): 2026-11-23 새 그림 0 · 다시 그림 0 · 보류 5 — 공급업체 적격성평가·위험 분석·청정실 적격성평가·FMEA·품질매뉴얼",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45171382158"
+    "createdAt": "2026-11-24T00:12:44Z",
+    "updatedAt": "2026-11-24T00:21:11Z",
+    "headBranch": "linkedin/anatomy-numbers-ledger-1124",
+    "displayTitle": "linkedin: 해부판 어림 표현 한 문장 겹침 게이트(국·영)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45295285220"
    },
    {
-    "databaseId": 45171373716,
+    "databaseId": 45295269628,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-23T12:07:51Z",
-    "updatedAt": "2026-11-23T12:15:57Z",
-    "headBranch": "claude/glossary-fig-daily-20261123-2106",
-    "displayTitle": "glossary(fig): 2026-11-23 새 그림 0 · 다시 그림 0 · 보류 5 — 공급업체 적격성평가·위험 분석·…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45171373716"
+    "createdAt": "2026-11-24T00:12:37Z",
+    "updatedAt": "2026-11-24T00:20:15Z",
+    "headBranch": "linkedin/anatomy-numbers-ledger-1124",
+    "displayTitle": "linkedin: 해부판 어림 표현 한 문장 겹침 게이트(국·영) + 11-23 a1 문장 재작성",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45295269628"
    },
    {
-    "databaseId": 45136904189,
+    "databaseId": 45295008801,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-23T08:13:41Z",
-    "updatedAt": "2026-11-23T08:21:19Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1877 from MINHOYEOM/claude/quiz-weekly-202648",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45136904189"
-   },
-   {
-    "databaseId": 45132511842,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-23T07:37:56Z",
-    "updatedAt": "2026-11-23T07:45:49Z",
-    "headBranch": "main",
-    "displayTitle": "linkedin(anatomy): 2026-11-23 사건 해부 슬롯 a1·a2 — 기준일탈 부실 조사·설비 청결 불량 / …",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45132511842"
+    "createdAt": "2026-11-24T00:10:44Z",
+    "updatedAt": "2026-11-24T00:19:15Z",
+    "headBranch": "feat/notion-off-v2",
+    "displayTitle": "Merge main into notion-off — #1872·#1881 교열 규칙 위에 노션 은퇴를 다시 얹는다 + 노션 …",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45295008801"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45301468551,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-24T00:58:44Z",
+    "updatedAt": "2026-11-24T00:58:45Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45301468551"
+   },
+   {
     "databaseId": 45242709216,
     "status": "completed",
     "conclusion": "skipped",
@@ -387,20 +398,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45133468509"
-   },
-   {
-    "databaseId": 45124449369,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-23T06:29:35Z",
-    "updatedAt": "2026-11-23T06:29:42Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45124449369"
    }
   ],
   "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 45297689150,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-24T00:30:20Z",
+    "updatedAt": "2026-11-24T00:33:54Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1884 from MINHOYEOM/claude/findings-translate-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45297689150"
+   },
    {
     "databaseId": 45136925085,
     "status": "completed",
@@ -444,20 +455,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1832 from MINHOYEOM/claude/findings-translate-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44697212932"
-   },
-   {
-    "databaseId": 44483420955,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-19T07:55:59Z",
-    "updatedAt": "2026-11-19T07:59:20Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1819 from MINHOYEOM/claude/findings-translate-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44483420955"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 45293346194,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-23T23:58:52Z",
+    "updatedAt": "2026-11-23T23:58:55Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45293346194"
+   },
    {
     "databaseId": 45133843806,
     "status": "completed",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44940676318"
-   },
-   {
-    "databaseId": 44879628044,
-    "status": "completed",
-    "conclusion": "failure",
-    "event": "schedule",
-    "createdAt": "2026-11-21T07:18:26Z",
-    "updatedAt": "2026-11-21T07:20:35Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44879628044"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -573,6 +573,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 45296467831,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-24T00:21:17Z",
+    "updatedAt": "2026-11-24T00:30:37Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45296467831"
+   },
+   {
     "databaseId": 45241240938,
     "status": "completed",
     "conclusion": "success",
@@ -615,17 +626,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44998246302"
-   },
-   {
-    "databaseId": 44942730572,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-21T19:46:33Z",
-    "updatedAt": "2026-11-21T19:46:55Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44942730572"
    }
   ],
   "grm-cloud-request.yml": [
@@ -689,11 +689,6 @@
   {
    "run_id": 45071052190,
    "created_at": "2026-11-22T21:15:14Z",
-   "has_web_brief": true
-  },
-  {
-   "run_id": 45039409414,
-   "created_at": "2026-11-22T15:38:12Z",
    "has_web_brief": true
   }
  ]

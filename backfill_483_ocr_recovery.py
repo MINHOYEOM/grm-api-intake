@@ -717,10 +717,11 @@ def _patch_raw_json(
                    diff_summary={"reason": "483_status_marker"})
 
 
-def _mark_out_of_scope_in_place(
+def _mark_status_in_place(
     report: OcrRecoveryReport,
     rid: str,
     raw: dict[str, Any],
+    status: str,
     *,
     label: str,
     base: str,
@@ -729,12 +730,12 @@ def _mark_out_of_scope_in_place(
     patch_fn: Callable[..., None],
     row: dict[str, Any] | None = None,
 ) -> None:
-    """시설 유형으로 범위 밖인 행의 표식을 `out-of-scope` 로 — 다른 키는 그대로 둔다."""
+    """기존 원문에서 상태 표식만 갱신한다."""
     if dry_run:
         report.status_resolved += 1
         return
     try:
-        patch_fn(base, service_key, rid, {**raw, "fda483_text_status": OUT_OF_SCOPE_STATUS}, row=row)
+        patch_fn(base, service_key, rid, {**raw, "fda483_text_status": status}, row=row)
     except Exception as exc:  # noqa: BLE001
         report.failed += 1
         _bump(report, f"patch_failed:{type(exc).__name__}")
@@ -805,8 +806,16 @@ def _resolve_capped_status(
     dry_run: bool,
     rebuild_fn: Callable[..., Any],
     upsert_fn: Callable[..., tuple[int, list[dict[str, Any]] | None, str]],
+    patch_fn: Callable[..., None],
 ) -> None:
-    """상한 표식을 실제 사유로 교체한다 — 본문 복구와 같은 재구성·id 검증·upsert 경로."""
+    """상한 표식을 실제 사유로 교체하고 기존 전문을 보존한다."""
+    if body_shrunk(raw.get("fda483_body_full"), None):
+        _mark_status_in_place(
+            report, str(row.get("raw_signal_id") or ""), raw, status,
+            label=label, base=base, service_key=service_key, dry_run=dry_run,
+            patch_fn=patch_fn, row=row,
+        )
+        return
     try:
         item = rebuild_fn(nrow_from_raw_payload(raw), "", status)
     except Exception as exc:  # noqa: BLE001
@@ -824,8 +833,6 @@ def _resolve_capped_status(
         report.id_mismatch += 1
         _bump(report, "raw_signal_id_mismatch")
         report.errors.append(f"{label}: raw_signal_id_mismatch")
-        return
-    if _would_shrink_body(report, raw, _json_object(record.get("raw_json")), label):
         return
     if dry_run:
         report.status_resolved += 1
@@ -865,7 +872,7 @@ def run(
     fetch_text: Callable[[str], tuple[str, str]] | None = None,
     rebuild_item: Callable[..., Any] | None = None,
     upsert_raw_signal: Callable[..., tuple[int, list[dict[str, Any]] | None, str]] | None = None,
-    patch_raw_json: Callable[[str, str, str, dict[str, Any]], None] | None = None,
+    patch_raw_json: Callable[..., None] | None = None,
     sleeper: Sleeper | None = None,
 ) -> tuple[OcrRecoveryReport, int]:
     """지연 바인딩 설계(collect_eu_ncr_backfill.run·backfill_483_inspectors.run 과 동일):
@@ -946,8 +953,9 @@ def run(
             #   (`extraction_gap_by_source`)가 이 행을 결손으로 센다. 재구성은 게이트가 드롭하므로
             #   표식만 `out-of-scope` 로 제자리 PATCH 한다(PDF fetch 없음 · 다른 키 불변).
             if str(raw.get("fda483_text_status") or "") != OUT_OF_SCOPE_STATUS:
-                _mark_out_of_scope_in_place(
-                    report, rid, raw, label=label, base=base, service_key=service_key,
+                _mark_status_in_place(
+                    report, rid, raw, OUT_OF_SCOPE_STATUS,
+                    label=label, base=base, service_key=service_key,
                     dry_run=dry_run, patch_fn=patch_fn, row=r,
                 )
             continue
@@ -990,7 +998,7 @@ def run(
                     and not _same_definitive_reason(raw, status)):
                 _resolve_capped_status(
                     report, r, raw, status, label=label, base=base, service_key=service_key,
-                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn,
+                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn, patch_fn=patch_fn,
                 )
             continue
 
@@ -1017,7 +1025,7 @@ def run(
                 _resolve_capped_status(
                     report, r, raw, OUT_OF_SCOPE_STATUS, label=label, base=base,
                     service_key=service_key, dry_run=dry_run, rebuild_fn=rebuild_fn,
-                    upsert_fn=upsert_fn,
+                    upsert_fn=upsert_fn, patch_fn=patch_fn,
                 )
                 report.gate_dropped = counted   # 재구성도 드롭이면 이미 센 1건 — 중복 계수 방지
             continue
@@ -1047,7 +1055,7 @@ def run(
                 # 미상으로 남았다(2026-10-28 실측 25건 — EIR 송부 공문·주 정부 실사 기록 등).
                 _resolve_capped_status(
                     report, r, raw, status, label=label, base=base, service_key=service_key,
-                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn,
+                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn, patch_fn=patch_fn,
                 )
             continue
 

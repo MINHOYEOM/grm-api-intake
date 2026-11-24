@@ -5,18 +5,16 @@
 결과를 N 개 조로 **겹침·누락 없이** 나눠 병렬 잡(grm-ci.yml matrix)에서 돌린다.
 
 ## 나누는 단위
-- 기본 단위는 **TestCase 클래스**다. 시간의 대부분이 한 모듈(`tests/test_web_render.py` shim →
-  `web/tests/test_render.py` 의 클래스 100여 개, 클래스마다 setUpClass 가 사이트를 빌드)에
-  몰려 있어 모듈 단위로는 균형이 안 맞는다. setUpClass 상태는 클래스 안에 갇히므로 클래스
-  단위로 갈라도 안전하다.
+- 기본 배정 단위는 **시험 모듈**이다. `tests/test_web_render.py` shim이 불러오는
+  `web/tests/test_render.py`는 실측 약 23분이 걸려 기존처럼 **TestCase 클래스**로 나눈다.
 - 모듈이 `setUpModule`/`tearDownModule` 을 정의하면 **모듈 전체가 한 단위**다(모듈 상태 보존).
 - import 실패(_FailedTest)는 모듈 단위로 취급 — 실패는 어느 조에서든 반드시 빨갛게 나온다.
 
 ## 균형
 `tests/ci_shard_timings.json`({단위: 초})을 읽어 **탐욕(LPT) 배정**을 한다: 무거운 단위부터
-가장 가벼운 조에 넣는다. 동점은 이름·인덱스 순이라 결정론적이다. 기록이 없는 새 단위는
-테스트 수 x DEFAULT_SECONDS_PER_TEST 로 어림한다.
-기록 갱신: 각 샤드가 `--record out.json` 으로 단위별 실측을 남기고(CI 가 아티팩트로 업로드),
+가장 가벼운 조에 넣는다. 파일별 기록은 기존 클래스별 실측을 합산한다. 기록이 없는 파일은
+실측한 파일의 평균, 새 렌더 클래스는 실측한 렌더 클래스의 평균으로 어림한다.
+기록 갱신: 각 샤드가 `--record out.json` 으로 기존 단위별 실측을 남기고(CI 가 아티팩트로 업로드),
 `--merge a.json b.json ... --into tests/ci_shard_timings.json` 로 합쳐 커밋한다.
 """
 from __future__ import annotations
@@ -27,6 +25,7 @@ import sys
 import time
 import unittest
 from pathlib import Path
+from statistics import mean
 
 from ci_network_guard import ExternalNetworkBlocked, NetworkGuard
 
@@ -34,6 +33,7 @@ ROOT = Path(__file__).resolve().parent
 TESTS_DIR = ROOT / "tests"
 TIMINGS_PATH = TESTS_DIR / "ci_shard_timings.json"
 DEFAULT_SECONDS_PER_TEST = 0.05
+RENDER_TEST_MODULE = "test_render"
 
 
 def iter_tests(suite):
@@ -52,7 +52,7 @@ def _module_name(test) -> str:
 
 
 def unit_key(test) -> str:
-    """샤딩 단위 키. 모듈이 모듈 수준 fixture 를 쓰면 모듈, 아니면 클래스."""
+    """실측 기록의 키. 모듈 fixture가 있으면 모듈, 아니면 클래스."""
     mod = _module_name(test)
     if type(test).__name__ == "_FailedTest":
         return mod
@@ -70,10 +70,12 @@ def discover(start_dir: Path = TESTS_DIR) -> list:
 
 
 def group_units(tests: list) -> dict:
-    """{단위 키: [테스트...]} - 발견 순서를 유지한다."""
+    """{배정 단위: [테스트...]} — 발견 순서를 유지한다."""
     units: dict = {}
-    for t in tests:
-        units.setdefault(unit_key(t), []).append(t)
+    for test in tests:
+        module = _module_name(test)
+        key = unit_key(test) if module == RENDER_TEST_MODULE else module
+        units.setdefault(key, []).append(test)
     return units
 
 
@@ -85,10 +87,28 @@ def load_timings(path: Path = TIMINGS_PATH) -> dict:
     return {k: float(v) for k, v in data.items() if isinstance(v, (int, float))}
 
 
-def weight_of(key: str, n_tests: int, timings: dict) -> float:
-    if key in timings:
-        return timings[key]
-    return max(n_tests, 1) * DEFAULT_SECONDS_PER_TEST
+def shard_weights(units: dict, timings: dict) -> dict:
+    recorded = {}
+    render_prefix = f"{RENDER_TEST_MODULE}."
+    file_seconds = []
+    render_seconds = []
+    for key, tests in units.items():
+        timing_keys = dict.fromkeys(unit_key(test) for test in tests)
+        seconds = [timings[name] for name in timing_keys if name in timings]
+        if seconds:
+            recorded[key] = sum(seconds)
+            samples = render_seconds if key.startswith(render_prefix) else file_seconds
+            samples.append(recorded[key])
+
+    file_average = mean(file_seconds) if file_seconds else None
+    render_average = mean(render_seconds) if render_seconds else None
+    weights = {}
+    for key, tests in units.items():
+        default = render_average if key.startswith(render_prefix) else file_average
+        if default is None:
+            default = len(tests) * DEFAULT_SECONDS_PER_TEST
+        weights[key] = recorded.get(key, default)
+    return weights
 
 
 def partition(weights: dict, total: int) -> list:
@@ -98,7 +118,7 @@ def partition(weights: dict, total: int) -> list:
     bins = [[] for _ in range(total)]
     loads = [0.0] * total
     for key in sorted(weights, key=lambda k: (-weights[k], k)):
-        i = min(range(total), key=lambda j: (loads[j], j))
+        i = min(range(total), key=lambda j: (loads[j], len(bins[j]), j))
         bins[i].append(key)
         loads[i] += weights[key]
     return bins
@@ -107,7 +127,7 @@ def partition(weights: dict, total: int) -> list:
 def select_shard(units: dict, index: int, total: int, timings: dict) -> list:
     if not 0 <= index < total:
         raise ValueError(f"index {index} 는 0..{total - 1} 범위여야 한다")
-    weights = {k: weight_of(k, len(v), timings) for k, v in units.items()}
+    weights = shard_weights(units, timings)
     mine = set(partition(weights, total)[index])
     return [t for k, v in units.items() if k in mine for t in v]
 
@@ -193,7 +213,7 @@ def _run_shard(args, guard):
     units = group_units(discover())
     timings = load_timings()
     tests = select_shard(units, args.index, args.total, timings)
-    n_units = len({unit_key(t) for t in tests})
+    n_units = len(group_units(tests))
     print(f"shard {args.index}/{args.total}: {len(tests)} tests, {n_units} units "
           f"(전체 {sum(len(v) for v in units.values())} tests, 기록 {len(timings)} units)")
     if args.list:

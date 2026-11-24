@@ -625,11 +625,12 @@ class CollectionStats:
     wl_body_full_attempted: int = 0
     wl_body_full_failed: int = 0
     # [WL 위반항목 빈칸 2026-11-23] 본문은 있는데 위반항목이 빈 편지 — 사유별 수. `unsupported_format`
-    # (지원 형식 F1~F4 밖)은 새 형식 신호, '사유 없음'(unmarked)은 build_wl_item 을 거치지 않은 경로 신호.
+    # 은 새 형식 신호, '사유 없음'(unmarked)은 build_wl_item 을 거치지 않은 경로 신호.
     wl_violations_filled: int = 0
     wl_violations_unsupported: int = 0
     wl_violations_unmarked: int = 0
     wl_violations_unsupported_docs: list[str] = field(default_factory=list)
+    wl_violations_out_of_scope: dict[str, int] = field(default_factory=dict)
     # [WL 목록 절단 2026-10-27] 목록을 어느 경로로 읽었는가 · 정적 HTML 폴백이 창을 다 못
     # 덮었을 가능성(절단 의심). 정적 페이지는 최신 10행만 준다.
     wl_listing_backbone: str = ""
@@ -2946,11 +2947,18 @@ _WL_SECTION_TOKEN_RE = re.compile(r"\d{3}[A-Za-z]?(?:\([0-9A-Za-z]{1,6}\))*")
 _WL_PHS_ACT_RE = re.compile(r"\s*of the (?:Public Health Service Act|PHS Act)\b")
 _WL_BODY_HEAD_TRUNCATED_RE = re.compile(r"^\s*(?:Specifically,|\d{1,2}\s+As described|Conclusion\b)")
 
-# 빈 목록 사유(`wl_violations_status`) — 닫힌 목록. 상시 점검은 '본문 있음 · 위반항목 없음 · 사유 없음'을 센다.
+# 빈 목록 사유(`wl_violations_status`) — 닫힌 목록.
 WL_VIOLATIONS_STATUS_OUT_OF_SCOPE = "out_of_scope"            # 관련도 Unrelated·담배센터 — F2~F4 미적용
 WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED = "body_head_truncated"  # 저장 본문이 'Specifically,'·각주로 시작
-WL_VIOLATIONS_STATUS_UNSUPPORTED = "unsupported_format"      # 지원 형식(F1~F4) 어디에도 안 맞음
-WL_VIOLATIONS_STATUSES = (WL_VIOLATIONS_STATUS_OUT_OF_SCOPE, WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED,
+WL_VIOLATIONS_STATUS_UNSUPPORTED = "unsupported_format"
+WL_VIOLATIONS_STATUS_OPDP = "opdp_promotional"
+WL_VIOLATIONS_STATUS_DSCSA_OFFSET = "dscsa_numbering_offset"
+WL_VIOLATIONS_STATUS_NARRATIVE_CGMP = "narrative_cgmp"
+WL_VIOLATIONS_STATUS_NON_DRUG = "non_drug_scope"
+WL_VIOLATIONS_SCOPE_STATUSES = (WL_VIOLATIONS_STATUS_OUT_OF_SCOPE, WL_VIOLATIONS_STATUS_OPDP,
+                               WL_VIOLATIONS_STATUS_DSCSA_OFFSET, WL_VIOLATIONS_STATUS_NARRATIVE_CGMP,
+                               WL_VIOLATIONS_STATUS_NON_DRUG)
+WL_VIOLATIONS_STATUSES = (*WL_VIOLATIONS_SCOPE_STATUSES, WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED,
                           WL_VIOLATIONS_STATUS_UNSUPPORTED)
 WL_VIOLATION_FORMATS = ("F1", "F1b", "F2", "F3", "F3b", "F4", "F5", "F6")
 
@@ -3085,6 +3093,23 @@ def _extract_wl_f4(t: str) -> list[dict[str, str]]:
 # F6 — 번호 없는 BIMO(임상시험자·IRB·스폰서) 표제: `You failed to … [21 CFR 312.60].` 등장 순서대로.
 # 둘 다 F4 뒤에 시도한다(앞 형식이 이미 뽑은 서한의 결과는 바뀌지 않는다 — 회귀 0).
 _WL_F5_HEAD_RE = re.compile(r"(?<![\w.)(])(\d{1,2})[.)]\s+(?=(?:Failure (?:to|of)\b|(?:Your firm|Your|You)\b))")
+_WL_DSCSA_RE = re.compile(r"\b(?:Drug Supply Chain Security Act|DSCSA)\b", re.I)
+_WL_DSCSA_SECTION_582_RE = re.compile(r"\bsections?\s+582\b|\b360eee-1\b", re.I)
+_WL_DSCSA_WHOLESALE_RE = re.compile(r"\bsections?\s+503\(e\)", re.I)
+_WL_OPDP_RE = re.compile(r"\b(?:Office of Prescription Drug Promotion|OPDP)\b", re.I)
+_WL_PROMOTIONAL_VIOLATION_RE = re.compile(
+    r"(?:^|(?<=[.!?] ))Your promotional (?:communications?|materials?|claims?) "
+    r"(?:is|are|was|were) (?:false(?: or misleading)?|misleading)\b", re.I)
+_WL_NON_DRUG_RE = re.compile(
+    r"\bfecal microbiota (?:transplant(?:ation|s)?|products?)\b"
+    r"|\bivermectin\b.{0,160}\b(?:for sale|for purchase|sold|selling)\b"
+    r"|\b(?:offer(?:s|ed|ing)?|market(?:s|ed|ing)?|sell(?:s|ing)?|sold)\b.{0,120}\bivermectin\b", re.I)
+_WL_DRUG_CGMP_RE = re.compile(
+    r"\b(?:CGMP|current good manufacturing practice)s?\b"
+    r"|\b21 CFR (?:parts? )?(?:210|211)\b|\b501\(a\)\(2\)\(B\)", re.I)
+_WL_CGMP_DEFICIENCY_RE = re.compile(
+    r"\b(?:violations?|deviations?|deficienc(?:y|ies)|fail(?:ed|ure)|did not|inadequate)\b", re.I)
+_WL_NUMBERED_HEAD_RE = re.compile(r"(?<![\w.])(?:\(\d{1,2}\)|\d{1,2}[.)])\s+[A-Z]")
 _WL_F5_CITE_GROUP_RE = re.compile(
     r"\[[^\[\]]{0,160}?(?:CFR|Act|[Ss]ection)[^\[\]]{0,160}?\]"
     r"|\((?:[^()]|\([^()]*\)|\((?:[^()]|\([^()]*\))*\))*?(?:21 CFR|FD&C Act|PHS Act|[Ss]ection \d{3})"
@@ -3114,20 +3139,39 @@ def _wl_f5_statement(t: str, start: int, limit: int) -> tuple[str, int]:
     return stmt, end
 
 
-def _extract_wl_f5(t: str) -> list[dict[str, str]]:
-    """F5 — 연속 번호 표제(1부터 빠짐없이). 번호가 끊기거나 표제 형태가 아니면 거기서 멈춘다(각주·본문 목록 오인 차단)."""
+def _wl_dscsa_starts_at_two(t: str) -> bool:
+    first = _WL_F5_HEAD_RE.search(t)
+    if not first or first.group(1) != "2":
+        return False
+    if _WL_DSCSA_RE.search(t):
+        return True
+    next_head = _WL_F5_HEAD_RE.search(t, first.end())
+    stmt, _ = _wl_f5_statement(t, first.end(), next_head.start() if next_head else len(t))
+    return bool(_WL_DSCSA_SECTION_582_RE.search(stmt))
+
+
+def _extract_wl_f5(t: str, *, dscsa_offset: bool = False) -> list[dict[str, str]]:
+    """F5 — 연속 번호 표제. DSCSA 예외는 2부터 모든 후보 표제가 조건을 충족해야 한다."""
     c = _WL_CONCLUSION_RE.search(t)
     limit = c.start() if c else len(t)
     out: list[dict[str, str]] = []
-    expect = 1
-    for m in _WL_F5_HEAD_RE.finditer(t, 0, limit):
+    expect = 2 if dscsa_offset else 1
+    heads = list(_WL_F5_HEAD_RE.finditer(t, 0, limit))
+    for i, m in enumerate(heads):
         if int(m.group(1)) != expect:
+            if dscsa_offset:
+                return []
             continue
-        stmt, _end = _wl_f5_statement(t, m.end(), limit)
+        stop = heads[i + 1].start() if dscsa_offset and i + 1 < len(heads) else limit
+        stmt, _end = _wl_f5_statement(t, m.end(), stop)
+        if dscsa_offset and not (_WL_DSCSA_SECTION_582_RE.search(stmt) or _WL_DSCSA_WHOLESALE_RE.search(stmt)):
+            return []
         if not stmt:
             continue
         # 표제 형태 확인: 결함 서술('Failure …')이거나 인용을 단 문장이어야 한다.
         if not (_WL_FAILURE_SENT_RE.match(stmt) or _wl_citations(stmt) or _WL_F5_CITE_GROUP_RE.search(stmt)):
+            if dscsa_offset:
+                return []
             continue
         row = _wl_row(expect, stmt)
         if not row["citation"]:           # 'FD&C Act Section 503(e)' 처럼 기존 인용 추출기가 못 읽는 괄호 인용 — 문장 안 글자 그대로
@@ -3156,7 +3200,24 @@ def _extract_wl_f6(t: str) -> list[dict[str, str]]:
     return out
 
 
-def extract_wl_violations_detail(text: str, *, extended: bool = True) -> tuple[list[dict[str, str]], str]:
+def _wl_violations_scope_reason(t: str, *, issuing_office: str = "") -> str:
+    conclusion = _WL_CONCLUSION_RE.search(t)
+    findings = t[:conclusion.start()] if conclusion else t
+    if _WL_OPDP_RE.search(issuing_office) or _WL_PROMOTIONAL_VIOLATION_RE.search(findings):
+        return WL_VIOLATIONS_STATUS_OPDP
+    if _wl_dscsa_starts_at_two(findings):
+        return WL_VIOLATIONS_STATUS_DSCSA_OFFSET
+    if _WL_NON_DRUG_RE.search(findings):
+        return WL_VIOLATIONS_STATUS_NON_DRUG
+    if (_WL_DRUG_CGMP_RE.search(findings) and _WL_CGMP_DEFICIENCY_RE.search(findings)
+            and not _WL_NUMBERED_HEAD_RE.search(findings)):
+        return WL_VIOLATIONS_STATUS_NARRATIVE_CGMP
+    return ""
+
+
+def extract_wl_violations_detail(
+    text: str, *, extended: bool = True, issuing_office: str = "",
+) -> tuple[list[dict[str, str]], str]:
     """WL 본문 → (위반항목, 형식 또는 빈 사유). 일일 수집·과거분 백필·WL 복구·재추출이 모두 이 함수
     (`build_wl_item` 경유)를 부른다 — 경로마다 규칙이 갈라지는 일을 막는다.
 
@@ -3187,8 +3248,17 @@ def extract_wl_violations_detail(text: str, *, extended: bool = True) -> tuple[l
             rows = fn(t)
             if rows:
                 return rows, fmt
+        conclusion = _WL_CONCLUSION_RE.search(t)
+        findings = t[:conclusion.start()] if conclusion else t
+        if _wl_dscsa_starts_at_two(findings):
+            rows = _extract_wl_f5(findings, dscsa_offset=True)
+            if rows:
+                return rows, "F5"
     if _WL_BODY_HEAD_TRUNCATED_RE.match(t):
         return [], WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED
+    scope_reason = _wl_violations_scope_reason(t, issuing_office=issuing_office)
+    if scope_reason:
+        return [], scope_reason
     if not extended:
         return [], WL_VIOLATIONS_STATUS_OUT_OF_SCOPE
     return [], WL_VIOLATIONS_STATUS_UNSUPPORTED
@@ -3200,17 +3270,25 @@ def wl_violations_gap_kind(raw: dict[str, Any]) -> str:
     "unmarked" = 본문이 있는데 위반항목도 사유 표식도 없다 → 추출을 부르지 않은 경로로 들어온 행
     (10-28 이전 백필 `_wl_item_from_row` 770행이 정확히 이 모양). 일일 수집 요약(health)·내용 완전성 감시·
     재추출 도구가 이 한 함수로 센다."""
-    if not isinstance(raw, dict) or not str(raw.get("wl_body_full") or "").strip():
+    if not isinstance(raw, dict):
+        return ""
+    body = str(raw.get("wl_body_full") or "")
+    if not body.strip():
         return ""
     if isinstance(raw.get("wl_violations"), list) and raw["wl_violations"]:
         return "filled"
     status = str(raw.get("wl_violations_status") or "")
+    if status in (WL_VIOLATIONS_STATUS_UNSUPPORTED, WL_VIOLATIONS_STATUS_OUT_OF_SCOPE, WL_VIOLATIONS_STATUS_OPDP):
+        reason = _wl_violations_scope_reason(
+            " ".join(body.split()), issuing_office=str(raw.get("issuing_office") or ""))
+        return reason or (WL_VIOLATIONS_STATUS_UNSUPPORTED if status == WL_VIOLATIONS_STATUS_OPDP else status)
     return status if status in WL_VIOLATIONS_STATUSES else "unmarked"
 
 
 def wl_violations_run_counts(items: list[Any]) -> dict[str, Any]:
     """이번 수집분 WL 항목의 위반항목 집계 — 수집 요약 health 경고 입력."""
-    out: dict[str, Any] = {"filled": 0, "unsupported": 0, "unmarked": 0, "unsupported_docs": []}
+    out: dict[str, Any] = {"filled": 0, "unsupported": 0, "unmarked": 0, "unsupported_docs": [],
+                           "out_of_scope": {}}
     for it in items:
         kind = wl_violations_gap_kind(getattr(it, "raw_payload", None) or {})
         if kind == "filled":
@@ -3220,6 +3298,8 @@ def wl_violations_run_counts(items: list[Any]) -> dict[str, Any]:
         elif kind == WL_VIOLATIONS_STATUS_UNSUPPORTED:
             out["unsupported"] += 1
             out["unsupported_docs"].append(str(getattr(it, "document_id", "") or ""))
+        elif kind in WL_VIOLATIONS_SCOPE_STATUSES:
+            out["out_of_scope"][kind] = out["out_of_scope"].get(kind, 0) + 1
     return out
 
 
@@ -3520,7 +3600,8 @@ def build_wl_item(
             # [2026-11-23] 못 뽑으면 사유(`wl_violations_status`)를 남긴다 — 상시 점검이 '본문 있음 ·
             # 위반항목 없음 · 사유 없음'을 세어 경로 누락(10-28 이전 백필 770행 같은)을 잡는다.
             violations, v_status = extract_wl_violations_detail(
-                body_full, extended=wl_violations_extended_scope(relevance, issuing_office))
+                body_full, extended=wl_violations_extended_scope(relevance, issuing_office),
+                issuing_office=issuing_office)
             if violations:
                 wl_raw["wl_violations"] = violations
             elif v_status:
@@ -4532,6 +4613,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         stats.wl_violations_unsupported = wl_v["unsupported"]
         stats.wl_violations_unmarked = wl_v["unmarked"]
         stats.wl_violations_unsupported_docs = wl_v["unsupported_docs"]
+        stats.wl_violations_out_of_scope = wl_v["out_of_scope"]
         wl_listing = LAST_WL_HEALTH.get("listing") or {}
         stats.wl_listing_backbone = str(wl_listing.get("backbone") or "")
         stats.wl_listing_truncated = bool(wl_listing.get("truncated"))

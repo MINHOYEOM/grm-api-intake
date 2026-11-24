@@ -77,6 +77,91 @@ class RealLetterFormatTest(unittest.TestCase):
         rows, fmt = ci._extract_wl_f5(" ".join(body.split())), "F5"
         self.assertEqual(rows, [])                         # 1 이 없으면 표제 목록이 아니다
 
+    def test_dscsa_f5_keeps_original_numbers_when_the_first_heading_is_two(self):
+        sample = next(s for s in _load()["samples"] if s["document_id"] == "4672e34f6553")
+        body = sample["wl_body_full"]
+        preamble, headings = body.split("1. Your firm", 1)
+        body = preamble + "2. Your firm" + headings.split("2. Your firm", 1)[1]
+        rows, fmt = ci.extract_wl_violations_detail(body)
+        self.assertEqual(fmt, "F5")
+        self.assertEqual([row["number"] for row in rows], sample["expect_numbers"][1:])
+        for row in rows:
+            self.assertIn(row["statement"], _norm(body))
+            self.assertIn("582(", row["citation"])
+
+    def test_dscsa_section_on_the_heading_is_evidence_without_the_act_name(self):
+        heading = (
+            "2. Your firm conducted transactions with trading partners that were not authorized "
+            "(FD&C Act Section 582(c)(3))."
+        )
+        rows, fmt = ci.extract_wl_violations_detail(heading)
+        self.assertEqual(fmt, "F5")
+        self.assertEqual([row["number"] for row in rows], ["2"])
+
+    def test_dscsa_offset_without_cited_heading_is_a_reason(self):
+        body = ("The Drug Supply Chain Security Act (DSCSA) applies to your operations. "
+                "2. Your firm conducted transactions with trading partners that were not authorized.")
+        self.assertEqual(ci.extract_wl_violations_detail(body), ([], "dscsa_numbering_offset"))
+
+    def test_dscsa_offset_does_not_report_a_partial_list_as_f5(self):
+        prefix = (
+            "2. Your firm conducted transactions with trading partners that were not authorized "
+            "(FD&C Act Section 582(c)(3)). "
+        )
+        for heading in (
+            "3. Your firm did not document the required corrective actions.",
+            "4. Your firm failed to identify suspect product (FD&C Act Section 582(c)(4)).",
+        ):
+            with self.subTest(heading=heading):
+                self.assertEqual(ci.extract_wl_violations_detail(prefix + heading),
+                                 ([], "dscsa_numbering_offset"))
+
+
+class BlankReasonTest(unittest.TestCase):
+    def test_opdp_reply_instructions_do_not_hide_unknown_format(self):
+        for lead in ("", "Conclusion "):
+            with self.subTest(lead=lead):
+                body = (
+                    "Your firm failed a requirement described below in a new format. "
+                    + lead + "Please submit your response to the Office of Prescription Drug Promotion (OPDP)."
+                )
+                self.assertEqual(ci.extract_wl_violations_detail(body), ([], "unsupported_format"))
+                for status in ("unsupported_format", "opdp_promotional"):
+                    raw = {"wl_body_full": body, "wl_violations_status": status}
+                    self.assertEqual(ci.wl_violations_gap_kind(raw), "unsupported_format")
+
+    def test_opdp_from_promotional_violation(self):
+        body = "Your promotional communications are false or misleading with respect to risk."
+        self.assertEqual(ci.extract_wl_violations_detail(body), ([], "opdp_promotional"))
+
+    def test_opdp_office_and_narrative_cgmp_from_real_letter_snippets(self):
+        with open(_FIX_1123, encoding="utf-8") as f:
+            samples = {s["document_id"]: s for s in json.load(f)["samples"]}
+        for doc, marker, status in (
+            ("0f446242e39b", "Office of Prescription Drug Promotion", "opdp_promotional"),
+            ("0f65bd3c5c70", "Failure of your quality unit", "narrative_cgmp"),
+        ):
+            with self.subTest(status=status):
+                body = samples[doc]["wl_body_full"]
+                office = samples[doc]["issuing_office"]
+                snippet = body[body.index(marker):].split(". ", 1)[0] + "."
+                self.assertEqual(ci.extract_wl_violations_detail(snippet, issuing_office=office), ([], status))
+                self.assertEqual(ci.wl_violations_gap_kind({
+                    "wl_body_full": snippet, "wl_violations_status": "unsupported_format",
+                    "issuing_office": office,
+                }), status)
+
+    def test_non_drug_scope_and_unknown_format_use_body_evidence(self):
+        for body, status in (
+            ("We reviewed your fecal microbiota transplantation products.", "non_drug_scope"),
+            ("Your website offers ivermectin for sale.", "non_drug_scope"),
+            ("The laboratory tested ivermectin samples.", "unsupported_format"),
+            ("The FDA reviewed your CGMP records.", "unsupported_format"),
+            ("Your firm failed a requirement described below in a new format.", "unsupported_format"),
+        ):
+            with self.subTest(body=body):
+                self.assertEqual(ci.extract_wl_violations_detail(body), ([], status))
+
 
 class NoRegressionTest(unittest.TestCase):
     def test_earlier_formats_are_untouched_by_f5_f6(self):

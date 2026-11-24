@@ -23,6 +23,16 @@ class TestBriefPreviewCheck(unittest.TestCase):
         self.assertNotIn("ko 0장", rows["옛 실사 표시"])
         self.assertNotIn("ko 0상자", rows["묶음 카드"])
 
+    def test_preview_treats_missing_and_null_brief_as_empty(self):
+        doc = preview.read_brief(preview.DATA / "briefs" / ISSUE)
+        doc.pop("brief", None)
+        expected = preview.check_preview({**doc, "brief": {}})
+        self.assertEqual(tuple(label for label, _, _ in expected), LABELS)
+
+        for metadata in ({}, {"brief": None}):
+            with self.subTest(metadata=metadata):
+                self.assertEqual(preview.check_preview({**doc, **metadata}), expected)
+
     def test_preview_warns_on_mutations(self):
         doc = preview.read_brief(preview.DATA / "briefs" / ISSUE)
         scaffold = preview.read_brief(preview.DATA / "scaffolds" / ISSUE)

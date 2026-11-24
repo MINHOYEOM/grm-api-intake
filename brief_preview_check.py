@@ -89,7 +89,7 @@ def check_preview(doc, scaffold=None):
         (card for card in doc["cards"] if render._is_renderable(card)),
         key=lambda card: (card.get("render_order") is None, card.get("render_order")),
     )
-    doc = {**doc, "cards": cards}
+    doc = {**doc, "brief": doc.get("brief") or {}, "cards": cards}
     names = personal_name_refs(cards, scaffold)
     hangul = english_hangul_refs(doc)
     # 영문 슬롯 게이트의 한글 항목은 위에서 별도로 집계한다.

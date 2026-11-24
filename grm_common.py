@@ -372,6 +372,15 @@ def text_field(raw: dict[str, Any], key: str) -> str:
     return str(raw.get(key) or "").strip()
 
 
+def normalize_whitespace(text: str | None) -> str:
+    return " ".join(str(text or "").split())
+
+
+def body_shrunk(old_body: str | None, new_body: str | None) -> bool:
+    """Compare body lengths after ignoring whitespace-only differences."""
+    return len(normalize_whitespace(new_body)) < len(normalize_whitespace(old_body))
+
+
 def parse_datago_date(raw: str) -> str:
     """Parse ``YYYYMMDD`` date strings used by data.go.kr APIs → ISO format."""
     raw = (raw or "").strip()

@@ -13,7 +13,7 @@ import sys
 
 PR_FIELDS = (
     "number,title,baseRefName,headRefName,isCrossRepository,isDraft,"
-    "statusCheckRollup,changedFiles,files"
+    "statusCheckRollup,changedFiles"
 )
 CI_FAILURES = {"FAILURE", "ERROR", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED", "STARTUP_FAILURE", "STALE"}
 CI_PENDING = {"PENDING", "EXPECTED", "QUEUED", "IN_PROGRESS", "REQUESTED", "WAITING", "PENDING_APPROVAL"}
@@ -36,13 +36,21 @@ def load_open_prs():
         limit *= 2
 
     for pr in prs:
-        if len(pr["files"] or []) < pr["changedFiles"]:
-            # The file connection nested in gh pr list can be truncated.
-            pages = gh_json(
-                "api", "--paginate", "--slurp",
-                f"repos/{{owner}}/{{repo}}/pulls/{pr['number']}/files?per_page=100",
-            )
-            pr["files"] = [{"path": file["filename"]} for page in pages for file in page]
+        if not pr["changedFiles"]:
+            pr["files"] = []
+            continue
+        # The REST file list includes the previous filename for renames.
+        pages = gh_json(
+            "api", "--paginate", "--slurp",
+            f"repos/{{owner}}/{{repo}}/pulls/{pr['number']}/files?per_page=100",
+        )
+        pr["files"] = []
+        for page in pages:
+            for file in page:
+                entry = {"path": file["filename"]}
+                if file.get("previous_filename"):
+                    entry["previous_path"] = file["previous_filename"]
+                pr["files"].append(entry)
     return prs
 
 
@@ -73,6 +81,7 @@ def merge_plan(prs):
         files = {file["path"] for file in pr["files"] or []}
         if len(files) != pr.get("changedFiles", len(files)):
             raise ValueError(f"#{number}의 변경 파일 목록이 완전하지 않습니다.")
+        files.update(file["previous_path"] for file in pr["files"] or [] if file.get("previous_path"))
         for path in sorted(files):
             by_file[path].append(number)
         if not pr["isCrossRepository"]:

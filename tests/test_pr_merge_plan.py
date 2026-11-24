@@ -109,7 +109,7 @@ class MergePlanTest(unittest.TestCase):
 
     def test_live_collection_reads_extra_file_pages(self):
         pr = self.prs[3]
-        pr["files"] = pr["files"][:1]
+        del pr["files"]
         with patch.object(plan, "gh_json", side_effect=[
             [pr], [[{"filename": "web/render.py"}], [{"filename": "web/templates/brief.html"}]],
         ]) as gh:
@@ -126,6 +126,23 @@ class MergePlanTest(unittest.TestCase):
         self.prs[3]["files"] = self.prs[3]["files"][:1]
         with self.assertRaisesRegex(ValueError, "#102"):
             plan.render(self.prs)
+
+    def test_live_rename_overlaps_modifications_to_both_paths(self):
+        prs = [self.prs[0], self.prs[2], self.prs[4]]
+        for pr in prs:
+            del pr["files"]
+        with patch.object(plan, "gh_json", side_effect=[
+            prs,
+            [[{"filename": "collect_intake.py", "previous_filename": "draft.py", "status": "renamed"}]],
+            [[{"filename": "draft.py", "status": "modified"}]],
+            [[{"filename": "collect_intake.py", "status": "modified"}]],
+        ]):
+            _, overlaps = plan.merge_plan(plan.load_open_prs())
+
+        self.assertEqual(overlaps, {
+            (103, 104): ["collect_intake.py"],
+            (104, 105): ["draft.py"],
+        })
 
     def test_offline_cli_renders_summary_without_gh(self):
         output = io.StringIO()

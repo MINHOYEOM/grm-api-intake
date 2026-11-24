@@ -5,7 +5,7 @@
   "code_gate": {
     "ran": true,
     "exit": 0,
-    "message": "assemble_publish_brief 조립 완료 · check_en_slots 통과 · check_render_gate 통과 · precheck source 차단 0(경고 6 판정함)"
+    "message": "assemble_publish_brief·check_en_slots·check_render_gate·precheck source(차단 0)·blank_slots verify 모두 exit 0"
   },
   "cards": [
     {
@@ -929,14 +929,8 @@
     },
     {
       "web_card_id": "fda483-196353",
-      "verdict": "reject",
-      "fails": [
-        {
-          "item": "② 원문에 없는 말",
-          "slot": "title_issue",
-          "evidence": "국문 제목 '무균 작업자 동선·풍속 연속 감시 없음' 이 '연속 감시 없음'을 동선에도 걸어 읽힌다 — 원문은 풍속(HEPA)의 연속 모니터링 부재(관찰 2)와 동선 설계 보증 없음(관찰 1)이고 동선의 '감시' 부재는 말하지 않는다. 영문 'No continuous aseptic flow or airflow monitoring' 도 같다(1차가 영문을 국문에 맞춰 같은 결함을 영·국 양쪽에 둠)"
-        }
-      ],
+      "verdict": "pass",
+      "fails": [],
       "notes": [
         {
           "item": "코드 경고 판정",
@@ -952,14 +946,14 @@
           "item": "문체",
           "slot": "implication",
           "evidence": "관찰 2 한 문장에 사실 여러 개(작업자가 장갑 낀 손바닥·뒷머리·가슴·허리·팔뚝으로 닿음)"
+        },
+        {
+          "item": "2차 재판정",
+          "slot": "title_issue",
+          "evidence": "재작업 2회차 제목: 동선(관찰 1)과 풍속 연속 감시 부재(관찰 2)를 각각 서술 — 원문과 일치"
         }
       ],
       "checked": [
-        {
-          "slot": "en.title_issue",
-          "claim": "airflow monitoring",
-          "source": "failed to continuous monitoring HEPA air velocity in critical areas"
-        },
         {
           "slot": "key_facts[1]",
           "claim": "A등급 구역의 HEPA 필터 풍속을 연속 모니터링하지 않음",
@@ -987,8 +981,18 @@
         },
         {
           "slot": "title_issue",
-          "claim": "무균 작업자 동선·풍속 연속 감시 없음",
-          "absent": true
+          "claim": "HEPA 풍속 연속 감시 없음",
+          "source": "failed to continuous monitoring HEPA air velocity in critical areas"
+        },
+        {
+          "slot": "title_issue",
+          "claim": "무균 동선 미흡",
+          "source": "There is no assurance that the current flow of personnel through the different rooms in the aseptic area"
+        },
+        {
+          "slot": "en.title_issue",
+          "claim": "no continuous HEPA monitoring",
+          "source": "failed to continuous monitoring HEPA air velocity in critical areas"
         }
       ]
     },
@@ -1331,6 +1335,11 @@
           "slot": "deep.observations_ko[0].detail_ko",
           "claim": "이 문서는 FDA 대표가 시설 실사 중 작성한 관찰사항을 나열한다",
           "source": "BY THE FDA REPRESENTATIVE(S) DURING"
+        },
+        {
+          "slot": "summary",
+          "claim": "의약품 제조소 Qilu Pharmaceutical Co., LTD.",
+          "source": "시설 유형: Drug Manufacturer"
         }
       ]
     },
@@ -5754,10 +5763,10 @@
   ],
   "counts": {
     "cards": 153,
-    "pass": 152,
-    "reject": 1,
-    "fails_total": 1,
-    "notes_total": 189
+    "pass": 153,
+    "reject": 0,
+    "fails_total": 0,
+    "notes_total": 190
   },
   "rework": {
     "cards": [
@@ -5777,5 +5786,6 @@
     "cards": [
       "fda483-196353"
     ]
-  }
+  },
+  "rehearsal": true
 }

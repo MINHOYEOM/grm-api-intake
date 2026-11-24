@@ -38,7 +38,7 @@
    }
   },
   "fda483-196353": {
-   "title_issue": "무균 작업자 동선·풍속 연속 감시 없음",
+   "title_issue": "무균 동선 미흡·HEPA 풍속 연속 감시 없음",
    "hook_line": "장갑을 바꾸려면 무균 공정실을 나와 공용 복도를 지나야 함",
    "summary": "FDA가 스웨덴의 무균 의약품 제조소 Rechon Life Science AB에 Form 483(관찰사항 6건)을 발행했다. 무균 구역 인원 동선, 무균공정 밸리데이션, 소독 효과 검증, 환경 모니터링 위치, 시험실 조사, 건물 유지가 지적됐다.",
    "key_facts": [
@@ -54,7 +54,7 @@
     "기준일탈 결과를 재시험으로 무효화할 때 근본원인 근거를 조사 보고서에 남기는가? (관찰 5)"
    ],
    "en": {
-    "title_issue": "No continuous aseptic flow or airflow monitoring",
+    "title_issue": "Poor personnel flow; no continuous HEPA monitoring",
     "hook_line": "To change gloves, operators must leave the aseptic room and walk through shared corridors",
     "summary": "FDA issued a Form 483 with 6 observations to Rechon Life Science AB, a sterile drug products manufacturer in Sweden. Observations covered personnel flow in the aseptic area, aseptic process validation, disinfection effectiveness, environmental monitoring locations, laboratory investigations and building maintenance.",
     "key_facts": [

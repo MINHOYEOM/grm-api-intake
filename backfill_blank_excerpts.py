@@ -102,8 +102,9 @@ def backfill(
             continue
 
         if source == SOURCE_WHO:
-            excerpt, report, status = readers.whopir(url)
-            recovered = {"whopir_report": report, "whopir_excerpt": excerpt}
+            _, report, status = readers.whopir(url)
+            # 수집기의 발췌는 길이 제한이 있으므로 백필은 구조화 전문만 저장한다.
+            recovered = {field: report}
         elif source == SOURCE_MHRA:
             recovered = {field: readers.mhra(url)}
             status = "empty_body"

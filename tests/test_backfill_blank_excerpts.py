@@ -92,7 +92,30 @@ class BackfillBlankExcerptsTest(unittest.TestCase):
         write.assert_called_once_with(original, {"metadata": {"retain": True}, field: LONG_TEXT}, [field])
         self.assertEqual(json.loads(original["raw_json"]), {"metadata": {"retain": True}})
 
-    def test_whopir_partial_and_empty_results(self):
+    def test_whopir_apply_saves_only_the_full_structured_report(self):
+        url = "https://who.int/1.pdf"
+        original = row(b.SOURCE_WHO, "who-whopir-1", {"pdf_url": url})
+        pdf_text = (
+            f"Part 2\n\nSummary of the findings and comments\n\n1. Documentation\n{LONG_TEXT}\n\n"
+            "Part 3\nThe site was compliant.\n"
+        )
+        readers = b.Readers(b._read_whopir, self.readers.article, self.readers.mhra)
+        write = Mock()
+
+        with (
+            patch.object(b.time, "sleep"),
+            patch.object(b.who, "http_get_bytes", return_value=b"pdf"),
+            patch("collect_mfds_gmp_inspection._extract_pdf_text", return_value=(pdf_text, "ok")),
+        ):
+            results = b.backfill([original], readers, apply=True, write=write)
+
+        self.assertTrue(results[0]["complete"])
+        self.assertEqual(results[0]["fields"], ["whopir_report"])
+        saved = write.call_args.args[1]
+        self.assertNotIn("whopir_excerpt", saved)
+        self.assertEqual(saved["whopir_report"]["sections"][0]["text"], LONG_TEXT)
+
+    def test_whopir_excerpt_without_report_and_empty_results(self):
         self.readers.whopir.return_value = ("excerpt only", None, "no-structure")
         self.readers.article.return_value = " "
         rows = [
@@ -104,10 +127,8 @@ class BackfillBlankExcerptsTest(unittest.TestCase):
 
         results = b.backfill(rows, self.readers, apply=True, write=write)
 
-        self.assertEqual([r["status"] for r in results], ["applied", "empty_excerpt", "missing_url"])
-        self.assertIs(results[0]["complete"], False)
-        self.assertEqual(write.call_args.args[1]["whopir_excerpt"], "excerpt only")
-        self.assertEqual(write.call_count, 1)
+        self.assertEqual([r["status"] for r in results], ["no-structure", "empty_excerpt", "missing_url"])
+        write.assert_not_called()
 
     def test_version_conflict_is_reported_and_other_rows_continue(self):
         rows = [row(b.SOURCE_MHRA, "conflict", {}, url=ALERT_URL),

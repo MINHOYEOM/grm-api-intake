@@ -1,7 +1,7 @@
 """Measure editorial stages from the committer timestamps in a local Git ref.
 
-Claims and intermediate artifacts can mark the first observed activity. A
-result file marks the last recorded result, regardless of its status. The
+Claims and intermediate artifacts can mark the first observed activity. For
+rework, only a completed status marks a recorded result. The
 interval between those records is not necessarily the worker's runtime or
 the time between pushes.
 """
@@ -44,12 +44,24 @@ def git(*args, check=True):
 def history(revision, folder):
     output = git(
         "log", "--full-history", "--reverse", "--topo-order", "--no-renames",
-        "--format=%x1e%cI", "--name-only", "-z", revision, "--", folder,
+        "--format=%x1e%H %cI", "--name-only", "-z", revision, "--", folder,
     ).stdout
     for record in output.split("\x1e")[1:]:
-        timestamp, _, paths = record.partition("\0")
+        header, _, paths = record.partition("\0")
+        commit, timestamp = header.split()
         files = {path.removeprefix(folder) for path in paths.strip("\n").split("\0") if path}
-        yield datetime.fromisoformat(timestamp.strip()).astimezone(KST), files
+        yield commit, datetime.fromisoformat(timestamp).astimezone(KST), files
+
+
+def rework_completed(commit, path):
+    result = git("show", f"{commit}:{path}", check=False)
+    if result.returncode != 0:
+        return False
+    try:
+        payload = json.loads(result.stdout)
+    except ValueError:
+        return False
+    return isinstance(payload, dict) and payload.get("status") == "완료"
 
 
 def stage_records(revision, folder):
@@ -62,7 +74,7 @@ def stage_records(revision, folder):
             results[stage].append(timestamp)
 
     merged_outputs = {"delta.json", "deep_delta.json", "brief_check.json"}
-    for timestamp, files in history(revision, folder):
+    for commit, timestamp, files in history(revision, folder):
         if files & {"desk.json", "claims/desk.claim"}:
             record("desk", timestamp, "desk.json" in files)
 
@@ -75,10 +87,9 @@ def stage_records(revision, folder):
                 if claim or result:
                     record(stage, timestamp, result)
 
-        if "rework.json" in files:
-            record("rework", timestamp, True)
+        for path in rework_files:
+            record(path.removesuffix(".json"), timestamp, rework_completed(commit, folder + path))
         if "rework2.json" in files:
-            record("rework2", timestamp, True)
             record("copyedit_r2", timestamp, False)
 
         review_stage = "copyedit_r2" if activity["rework"] or activity["rework2"] else "copyedit_r1"

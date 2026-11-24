@@ -74,7 +74,7 @@ class StageTimingTests(unittest.TestCase):
             ("09:12:00", {"delta.json": '{"revision":1}'}),
             ("09:19:00", {"copyedit.json": '{"round":2}', "copyedit.r1.json": '{"round":1}'}),
             ("09:21:00", {"deep.B.json": "{}"}),
-            ("09:25:01", {"copyedit.json": '{"status":"완료"}', "rework2.json": "{}", "delta.A.json": '{"revision":2}'}),
+            ("09:25:01", {"copyedit.json": '{"status":"완료"}', "rework2.json": '{"status":"완료"}', "delta.A.json": '{"revision":2}'}),
             ("09:30:00", {"backup/claim": "claim"}),
             ("09:45:00", {"backup/copyedit.json": "{}"}),
         ]])
@@ -123,6 +123,21 @@ class StageTimingTests(unittest.TestCase):
         rows = {row["stage"]: row for row in json.loads(run_cli(tmp_path, "--json"))["stages"]}
         self.assertIs(rows["copyedit_r1"]["overdue"], True)
         self.assertIsNone(rows["rework"]["start_kst"])
+
+    def test_rework_claims_mark_start_without_result_or_verdict(self):
+        tmp_path = self.enterContext(tempfile.TemporaryDirectory(dir=Path.cwd()))
+        make_history(tmp_path, [
+            (epoch("09:02:00"), {"rework.json": '{"status":"진행","round":1}'}),
+            (epoch("09:19:00"), {"rework2.json": '{"status":"진행","round":2}'}),
+        ])
+        rows = {row["stage"]: row for row in json.loads(run_cli(tmp_path, "--json"))["stages"]}
+        for stage, clock in (("rework", "09:02:00"), ("rework2", "09:19:00")):
+            with self.subTest(stage=stage):
+                row = rows[stage]
+                self.assertEqual(row["start_kst"], f"{RUN_DATE}T{clock}+09:00")
+                self.assertIsNone(row["end_kst"])
+                self.assertIsNone(row["duration_seconds"])
+                self.assertIsNone(row["overdue"])
 
     def test_deadlines_match_run_schedule(self):
         schedule_lines = []

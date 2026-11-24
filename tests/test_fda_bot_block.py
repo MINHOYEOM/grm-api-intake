@@ -87,6 +87,70 @@ class FdaBotBlockTests(TestCase):
         self.assertEqual(collect_fda_483.LAST_HEALTH["status"], FDA_BOT_BLOCK)
         self.assertEqual(get.call_count, 1)
 
+    def test_blocked_wl_body_keeps_cards_and_stops_body_requests(self):
+        day = date(2026, 11, 25)
+        firms = ["Alpha Pharma", "Beta Pharma", "Gamma Pharma"]
+        rows = [{"_cols": ["11/25/2026", "11/20/2026", f"{firm}|HREF:/wl/{i}",
+                           "Center for Drug Evaluation and Research", "CGMP Violations"]}
+                for i, firm in enumerate(firms)]
+        for blocked_stage in ("excerpt", "full"):
+            with (
+                self.subTest(blocked_stage=blocked_stage),
+                patch.dict(os.environ, {"ENABLE_WL_BODY": "true", "ENABLE_WL_BODY_FULL": "true"}),
+                patch.object(requests, "get", return_value=response(status=200)),
+                patch.object(collect_intake, "_fetch_wl_listing_datatables", return_value=rows),
+                patch.object(collect_intake, "_fetch_wl_body_excerpt") as excerpt,
+                patch.object(collect_intake, "_fetch_wl_body_full") as full,
+            ):
+                second_excerpt = "" if blocked_stage == "excerpt" else "Second excerpt"
+                excerpt.side_effect = [("First excerpt", "ok"),
+                                       (second_excerpt, "ok" if second_excerpt else FDA_BOT_BLOCK)]
+                full.side_effect = [("First full text", "ok"), ("", FDA_BOT_BLOCK)]
+
+                items, err = collect_intake.collect_fda_warning_letters(day, day)
+
+                self.assertEqual(err, FDA_BOT_BLOCK)
+                self.assertEqual([item.firm for item in items], firms)
+                self.assertEqual(items[0].raw_payload["wl_body_full"], "First full text")
+                self.assertEqual(items[1].raw_payload.get("wl_body_excerpt", ""), second_excerpt)
+                self.assertNotIn("wl_body_excerpt", items[2].raw_payload)
+                self.assertEqual(excerpt.call_count, 2)
+                self.assertEqual(full.call_count, 1 if blocked_stage == "excerpt" else 2)
+                health = collect_intake.LAST_WL_HEALTH
+                self.assertEqual(health["listing"]["detail"], FDA_BOT_BLOCK)
+                self.assertEqual(health["wl_body" if blocked_stage == "excerpt"
+                                        else "wl_body_full"]["failed"], 1)
+
+    def test_blocked_483_pdf_keeps_cards_and_stops_pdf_requests(self):
+        day = date(2026, 11, 25)
+        firms = ["Alpha Pharma", "Beta Pharma", "Gamma Pharma"]
+        rows = [{"media_id": str(i), "company": firm, "record_type": "483",
+                 "establishment_type": "Drug Manufacturer", "fei": "1234567",
+                 "state": "NJ", "record_date": "11/20/2026", "publish_date": "11/25/2026"}
+                for i, firm in enumerate(firms, 1)]
+        with (
+            patch.object(collect_fda_483, "_fetch_html_rows", return_value=(rows, 3, True)),
+            patch.object(collect_fda_483, "_pdf_caps", return_value=(3, 3)),
+            patch.object(collect_fda_483, "FDA483_EXCERPT_DELAY_SECONDS", 0),
+            patch.object(collect_fda_483, "_fetch_fda483_pdf_text", side_effect=[
+                ("OBSERVATION 1 Aseptic processing was deficient and media fills failed.", "ok"),
+                ("", FDA_BOT_BLOCK),
+            ]) as fetch,
+        ):
+            items, err = collect_fda_483.collect_fda_483(day, day)
+
+        self.assertEqual(err, FDA_BOT_BLOCK)
+        self.assertEqual([item.firm for item in items], firms)
+        self.assertIn("fda483_excerpt", items[0].raw_payload)
+        self.assertEqual(items[1].raw_payload["fda483_text_status"], FDA_BOT_BLOCK)
+        self.assertNotIn("fda483_excerpt", items[2].raw_payload)
+        self.assertEqual(fetch.call_count, 2)
+        health = collect_fda_483.LAST_HEALTH
+        self.assertEqual(health["status"], FDA_BOT_BLOCK)
+        self.assertTrue(health["source_degraded"])
+        self.assertEqual(health["fda483_excerpt"]["attempted"], 2)
+        self.assertEqual(health["fda483_excerpt"]["failed"], 1)
+
     def test_manual_warning_below_threshold(self):
         self.check_manual_warning(2)
 

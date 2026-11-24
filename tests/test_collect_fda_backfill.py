@@ -315,16 +315,15 @@ class Fda483IdentityTest(unittest.TestCase):
             + "Batch records lacked required review.\n" * 400
             + "End of the extracted PDF text.\n"
         )
-        for deep, observations, pdf_text, expected_body in (
-            ("true", "true", text, text),
-            ("true", "false", text, text),
-            ("false", "true", text, None),
-            ("true", "true", "Cover page only.", None),
+        for deep, pdf_text, expected_body in (
+            ("true", text, text),
+            ("false", text, None),
+            ("true", "Cover page only.", None),
         ):
-            with self.subTest(deep=deep, observations=observations, has_findings=pdf_text == text), \
+            with self.subTest(deep=deep, has_findings=pdf_text == text), \
                  mock.patch.dict(os.environ, {
                      "ENABLE_FDA_483_DEEP": deep,
-                     "ENABLE_FDA_483_OBSERVATIONS": observations,
+                     "ENABLE_FDA_483_OBSERVATIONS": "true",
                  }):
                 pdf_result = (pdf_text, "ocr-ok")
                 with mock.patch("collect_fda_483._fetch_html_rows",
@@ -351,6 +350,27 @@ class Fda483IdentityTest(unittest.TestCase):
                 else:
                     self.assertEqual(raw["fda483_body_full"], expected_body)
                 self.assertEqual(raw_json.encode("utf-8"), daily_record["raw_json"].encode("utf-8"))
+
+    def test_backfill_keeps_observations_when_daily_flag_is_off(self) -> None:
+        text = "OBSERVATION 3\nYour firm failed to investigate discrepancies.\n"
+        for deep in ("false", "true"):
+            with self.subTest(deep=deep), mock.patch.dict(os.environ, {
+                "ENABLE_FDA_483_DEEP": deep,
+                "ENABLE_FDA_483_OBSERVATIONS": "false",
+            }):
+                report, exit_code, post, _pdf, _sleeper = _run_483(
+                    pdf_side_effect=[(text, "ocr-ok")],
+                )
+                self.assertEqual(exit_code, 0)
+                self.assertEqual(report.invalid, 0)
+                posted = _posted_records(post)
+                self.assertEqual(len(posted), 1)
+                raw = json.loads(posted[0]["raw_json"])
+                self.assertEqual([row["number"] for row in raw["fda_483_observations"]], ["3"])
+                if deep == "true":
+                    self.assertEqual(raw["fda483_body_full"], text)
+                else:
+                    self.assertNotIn("fda483_body_full", raw)
 
     def test_backfill_raw_signal_identical_to_daily_collector_path(self) -> None:
         # Daily path: drive collect_fda_483.collect_fda_483 itself (its row source

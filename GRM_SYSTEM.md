@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.327` |
-| 최종 수정일 | 2026-11-23 |
+| 문서 버전 | `v1.328` |
+| 최종 수정일 | 2026-11-24 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -323,6 +323,7 @@ flowchart TD
 - `grm-fda483-ocr-recovery.yml` 예약 실행 실패 — 잡별 이슈 `GRM FDA 483 예약 회수 실패` / `GRM FDA WL 본문 예약 회수 실패`(`automation-warning`). 다음 성공 시 자동 닫힘. WL 잡은 시도 3건 이상 중 절반 넘게 다시 403·5xx 면(러너 차단 의심) 실패로 본다.
 - `grm-source-verification.yml` — 발행된 483/WL 카드를 원문과 재대조해 "수집 실패로 처음부터 못 받은 상세"를 탐지. 이슈 `[source-verify] 발행 카드가 원문보다 적게 보여주는 항목이 있습니다`.
 - `grm-findings-taxonomy-drift.yml` — 라이브 분류(category_code)가 현행 분류기와 어긋난 행 수를 매주 재측정(적용은 사람이 별도 dispatch). 이슈 `[taxonomy-drift] 라이브 분류가 현행 분류기와 어긋나 있습니다`.
+- `grm-schedule-catchup.yml`(2026-11-24 신설, `schedule_catchup.py`) — **예약 지각 보완기.** 중요 예약 워크플로 5개(483 전문 소급·483/WL 본문 회수·배치 PR 워치독·델타 브릿지·발행 감시 — `TARGETS`)가 '예정 시각 + 허용 지각' 안에 안 돌았으면 예약과 같은 인자로 dispatch 한다. 깨우는 경로는 자기 cron(30분) + workflow_run(GRM CI·운영 워크플로 3개) — 예약 하나에만 기대지 않는다. 슬롯 이후 실행이 있으면 아무것도 안 함(멱등)·보완 기한 지난 슬롯은 손대지 않음. dispatch 실패·보완 실행 실패·비활성은 이슈 `GRM 예약 지각 보완기 경보`(`automation-failure`)에 슬롯별 댓글 1회. 대상 cron 과 실제 워크플로 cron 이 어긋나면 `tests/test_schedule_catchup.py` 가 실패.
 - `grm-stranded-batch-pr.yml`(신설) — 초록인 일일 번역 배치 PR 이 3시간 넘게 안 머지되면 PAT 로 자동 머지, 검사 실패·충돌·outbox 잔류는 이슈로만. 이슈 `일일 번역 배치 PR 방치 — 검사 실패 또는 충돌`.
 - `grm-db-backup.yml` 실패 이슈(신설) — 주간 암호화 DB 백업(행 수 대조 검증) 실패 시 표면화. 이슈 `GRM DB 백업 실패`.
 - `grm-findings-backfill-fetch.yml` backfill-fetch 3연속 실패 이슈(신설) — 483/WL 백필 fetch 가 스케줄 실행에서 3회 연속 실패(예: 리딩룸 봇차단)하면 표면화. 이슈 `GRM Findings Backfill Fetch 연속 실패`.
@@ -589,6 +590,7 @@ grm-api-intake/
 ├─ fda_import_alert_relay.py       # 수입경보 PC 중계 — 러너에서 FDA accessdata가 막혀(404) 한국 PC에서 받아 올린다(워크플로 cron 꺼짐)
 ├─ collect_fda_citations.py        # FDA Data Dashboard 실사 지적 조항 수집 → fda_inspection_citations(133), Supabase 직행·Notion 무접촉
 ├─ collect_deficiency_examples.py  # 실사 지적 사례(업체명 없음) 수집 — 일본 PMDA 연차보고서 별첨·영국 MHRA GMP 지적 원자료(134)
+├─ schedule_catchup.py            # 예약 지각 보완기 — 중요 예약 워크플로가 예정+허용 지각 안에 안 돌면 같은 인자로 dispatch·경보(grm-schedule-catchup)
 ├─ site_error_watch.py             # 사이트 오류 징후 일일 감시 — Cloudflare 5xx·404 급증·배포 실패 → 경보 이슈(grm-site-error-watch, 기본 꺼짐)
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
 ├─ grm_queue.py                    # 주간 대기열(DB, 그림자) — intake_queue·intake_handoffs(149). 일일 수집이 넣은 문서만 후보 · 행 상태는 main 의 델타·발행본에서 매번 다시 계산 · DB 로 만든 handoff 를 노션 것과 비교(ENABLE_INTAKE_QUEUE_SHADOW, 발행은 노션 그대로)
@@ -755,7 +757,7 @@ grm-api-intake/
    ├─ grm-deficiency-examples.yml        # [지적 사례] collect_deficiency_examples.py 실행(ENABLE_DEFICIENCY_EXAMPLES)
    ├─ grm-site-error-watch.yml           # [사이트 오류] site_error_watch.py 일일 점검, 기본 꺼짐
    ├─ grm-ops-center-sql-check.yml       # [운영 센터] 122·123·124·127(시드)·125(결정 쓰기)·126(업무 지시)·128(자동 측정) 를 격리 PostgreSQL 에서 실행 + 뮤테이션 — PR 경로 필터, 비밀값 없음
-   ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml
+   ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml, grm-schedule-catchup.yml
    ├─ grm-newsletter-send.yml, grm-watchlist-notify.yml, grm-admin-backend-deploy.yml
    ├─ grm-brief-audit.yml, grm-reconciliation.yml, grm-supabase-keepalive.yml
    ├─ grm-source-verification.yml        # 발행 카드 ↔ 원문 대조(주간 화요일) — 불일치 시 이슈

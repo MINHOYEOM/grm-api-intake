@@ -1457,7 +1457,7 @@ class CollectorCliRejectsEmptyNumericArgsTest(unittest.TestCase):
         걸린다(워크플로에 같은 숫자를 또 적는 대신)."""
         args = mod.build_arg_parser().parse_args([])
         self.assertEqual(args.max_pages, 10)
-        self.assertEqual(args.chunk_size, 1000)
+        self.assertEqual(args.chunk_size, 500)
         text = _WORKFLOW_PATH.read_text(encoding="utf-8")
         self.assertIn("default: '10'", text)
         self.assertIn("default: '1000'", text)

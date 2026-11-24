@@ -93,6 +93,7 @@ import collect_intake as ci
 import findings_store
 import findings_supabase_append as fsa
 import grm_findings as gf
+from grm_cli import BulkWriteError, BulkWriteRun
 from grm_cli import header_ci as _header_ci
 from grm_cli import parse_content_range as _parse_content_range
 from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html, log
@@ -249,6 +250,7 @@ def fetch_existing_document_ids(
 
 def _post_raw_signals(
     base_url: str, service_key: str, records: list[dict[str, Any]], errors_out: list[str],
+    *, bulk: BulkWriteRun | None = None,
 ) -> int:
     """Batch-POST valid raw_signal records, 10 at a time, on_conflict=raw_signal_id
     (idempotent -- Prefer: resolution=ignore-duplicates is baked into
@@ -257,16 +259,23 @@ def _post_raw_signals(
     counted or treated as an error).
     """
     appended = 0
-    for start in range(0, len(records), _POST_BATCH_SIZE):
-        chunk = records[start:start + _POST_BATCH_SIZE]
+
+    def send(chunk, _offset):
+        nonlocal appended
         payload = [fsa._raw_signal_payload(r) for r in chunk]
         _status, rows, err = fsa._post_rows(
             base_url, service_key, "raw_signals", payload, "raw_signal_id",
         )
         if err:
             errors_out.append(f"raw_signals-post-failed:{err}")
-            continue
+            return False
         appended += len(rows or [])
+        return True
+
+    try:
+        (bulk or BulkWriteRun()).write(records, send, batch_size=_POST_BATCH_SIZE)
+    except BulkWriteError as exc:
+        errors_out.append(f"bulk-write:{exc}")
     return appended
 
 
@@ -328,6 +337,7 @@ def run_483(
     service_key: str,
     sleeper: Sleeper | None = None,
     existing_ids: set[str] | None = None,
+    bulk: BulkWriteRun | None = None,
     today: date | None = None,
 ) -> tuple[BackfillFetchReport, int]:
     sleeper = sleeper or _default_sleep
@@ -500,7 +510,10 @@ def run_483(
         to_post.append(record)
 
     if not dry_run and to_post:
-        report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors)
+        report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors, bulk=bulk)
+        if any(error.startswith("bulk-write:") for error in report.errors):
+            report.next_offset = offset
+            return report, 1
 
     # [침묵 금지 2026-07-30] 보류가 있었으면 stderr 로 띄운다 — 리포트 JSON 은 잡 요약을
     # 펼쳐야 보이지만 stderr 는 로그 본문에 남는다. 이 워크플로는 무인 스케줄이라 사람이
@@ -658,6 +671,7 @@ def run_wl(
     service_key: str,
     sleeper: Sleeper | None = None,
     existing_ids: set[str] | None = None,
+    bulk: BulkWriteRun | None = None,
 ) -> tuple[BackfillFetchReport, int]:
     sleeper = sleeper or _default_sleep
     report = BackfillFetchReport(source="fda_wl", offset=offset, max_docs=max_docs)
@@ -769,7 +783,10 @@ def run_wl(
         to_post.append(record)
 
     if not dry_run and to_post:
-        report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors)
+        report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors, bulk=bulk)
+        if any(error.startswith("bulk-write:") for error in report.errors):
+            report.next_offset = offset
+            return report, 1
 
     return report, 0
 
@@ -863,6 +880,7 @@ def run_auto(
     existing_counts: dict[str, int] = {}
     exit_code = 0
     caught_up_all = True
+    bulk = BulkWriteRun()
 
     for cli_name, source_const in _AUTO_SOURCES:
         order.append(cli_name)
@@ -888,7 +906,7 @@ def run_auto(
             report, code = runner(
                 offset=offset, max_docs=max_docs, delay=delay, dry_run=dry_run,
                 base_url=base_url, service_key=service_key, sleeper=sleeper,
-                existing_ids=existing_ids,
+                existing_ids=existing_ids, bulk=bulk,
             )
             attempts.append(report)
             pages += 1

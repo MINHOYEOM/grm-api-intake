@@ -44,6 +44,7 @@
      `s03`(heading·sub·pairs 3~5·있으면 repeat) · `s04.items`(국문과 같은 ref) · `s05`(heading·comment 숫자 없이·`topic_label`=DB 분류의 영어 이름·`cfr_labels`=국문 `cfr_rows` 와 같은 수·`map_header`) ·
      `s06`(not_stated 2~3 + basis · question `?`) · `caption`(lead·claims·contrast·requests·similar·not_stated).
    - **한글 0자**(근거·basis 포함). 업체명·지명 없이 "a sterile injectable manufacturer" 같은 별칭.
+   - 어림 표현(국·영 공통): '넘게·약·over·N+' 같은 어림은 **한 문장에 하나**. 분수형은 분모에만 쓰고 문장을 나눈다 — "기준일탈 300건 넘게를 조사하지 않았습니다. 이 중 200건 넘게는 무효화됐습니다." 서한에 정확한 수가 있으면 정확한 수. 어기면 `--check` 가 막는다.
    - 후킹(`STYLE.md` §13 영문판): 본문 첫 문장은 약 75자 안, 'FDA …'·'A firm …'으로 시작하지 않고 숫자나 원문 인용(‘…’)을 넣는다. 첫 문장은 마침표가 따옴표 **밖** 소문자 뒤에 오게 끝낸다(‘adequate’. 로 끝내면 문장 끝을 못 찾는다).
    - 문체: 미국 QA 실무자가 동료에게 쓰듯 짧은 평서. underscores·crucial·moreover·notably·landscape 같은 말은 검사가 막는다.
 6. 검사: `python3.12 web/linkedin_grm.py --brief web/data/briefs/brief_web_$U.json --check`(편마다 `[a1]`·`[a2]`, 국문·영문·규칙 순위까지 본다, 영문 문제는 `en.` 으로 시작). 한 편만 볼 때는 `--rank 2`. 문제가 나오면 그 칸만 고친다. **세 번 고쳐도 0건이 아니면** 브랜치를 push 하지 않고

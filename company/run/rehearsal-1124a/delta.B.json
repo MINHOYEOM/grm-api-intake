@@ -54,7 +54,7 @@
     "기준일탈 결과를 재시험으로 무효화할 때 근본원인 근거를 조사 보고서에 남기는가? (관찰 5)"
    ],
    "en": {
-    "title_issue": "Aseptic personnel flow and air velocity monitoring",
+    "title_issue": "No continuous aseptic flow or airflow monitoring",
     "hook_line": "To change gloves, operators must leave the aseptic room and walk through shared corridors",
     "summary": "FDA issued a Form 483 with 6 observations to Rechon Life Science AB, a sterile drug products manufacturer in Sweden. Observations covered personnel flow in the aseptic area, aseptic process validation, disinfection effectiveness, environmental monitoring locations, laboratory investigations and building maintenance.",
     "key_facts": [
@@ -550,7 +550,7 @@
    "hook_line": "용혈 시료로 안전성 검사 결과를 못 얻은 계획서 일탈 8건",
    "summary": "FDA가 임상시험 의뢰자 Rapa Therapeutics LLC에 Form 483(관찰사항 1건)을 발행했다. 임상시험 모니터링과 계획서 준수를 보장하지 못했다고 지적했다.",
    "key_facts": [
-    "관찰 1: 임상시험 모니터링 계획과 표준작업절차서(SOP) 없이 모니터링을 했고, 이상사례·병용약물 원자료 검증을 하지 않음"
+    "관찰 1: 위험 기반 모니터링 방식을 충분히 기술한 임상시험 모니터링 계획과 표준작업절차서(SOP)를 모니터링 전에 이행하지 않았고, 이상사례·병용약물 원자료 검증을 하지 않음"
    ],
    "implication": "기관 01의 대상자 2명은 전자 자료 수집 시스템에 이상사례가 보고되지 않았다(관찰 1). 기관 01·02에서 계획서가 요구한 예방 약물이 시스템에 보고되지 않았다(관찰 1). 기관 01에서 2021-05-28부터 2021-10-13까지 용혈 시료로 인한 계획서 일탈이 8건 있었고, 재채혈을 하지 않았거나 재채혈 결과를 받지 못했다(관찰 1). 자료안전성모니터링위원회 보고서 5건을 기관 02에 제공하지 않아 임상시험심사위원회 제출을 보장하지 못했다(관찰 1).",
    "checks": [
@@ -563,7 +563,7 @@
     "hook_line": "Eight protocol deviations where hemolyzed samples prevented key safety lab results",
     "summary": "FDA issued a Form 483 with 1 observation to Rapa Therapeutics LLC, a clinical study sponsor. FDA observed failure to ensure proper monitoring of the study and conduct in accordance with the protocol.",
     "key_facts": [
-     "Observation 1: clinical monitoring performed without a monitoring plan and SOPs, and no source data verification of adverse event and concomitant medication eCRFs"
+     "Observation 1: failed to implement, before monitoring, a clinical monitoring plan and SOPs that adequately describe the risk-based monitoring approach, and no source data verification of adverse event and concomitant medication eCRFs"
     ],
     "implication": "No adverse events were reported in the electronic data capture system for two subjects at Site 01 (Observation 1). Study-required prophylactic medications for subjects at Sites 01 and 02 were not reported in the system (Observation 1). Eight protocol deviations involving hemolyzed blood samples occurred at Site 01 from 2021-05-28 to 2021-10-13, and re-draws were not performed or their results were not obtained (Observation 1). Five data safety monitoring board reports were not provided to Site 02 for submission to the IRB (Observation 1).",
     "checks": [

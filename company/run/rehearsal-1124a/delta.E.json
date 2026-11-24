@@ -416,25 +416,25 @@
    }
   },
   "fda483-196464": {
-   "title_issue": "임상시험 의뢰자 모니터링 미흡",
+   "title_issue": "임상시험 모니터링 미흡",
    "hook_line": "시험약 인계 기록에 사용기한·시간이 빠졌으나 모니터링 보고서에 없음",
-   "summary": "FDA가 임상시험 의뢰자 Avotres Inc.에 Form 483(관찰사항 1건)을 발행했다. 연구를 제대로 모니터링하지 않았다고 지적했다.",
+   "summary": "FDA가 Avotres Inc.에 Form 483(관찰사항 1건)을 발행했다. 연구를 제대로 모니터링하지 않았다고 지적했다.",
    "key_facts": [
     "관찰 1: 연구 모니터링 미흡, 시험약 제조업체에 위임한 활동을 수행·감독하지 않음"
    ],
-   "implication": "품질 계약상 의뢰자 책임인 시험약 개발 단계별 모니터링을 하지 않았다(관찰 1). 이 때문에 인계 기록(Chain of Custody) 양식에 필수 항목이 빠졌다(관찰 1). 대상자 인계 기록에 시험약 사용기한·시간이 없었다(관찰 1).",
+   "implication": "품질 계약상 위임된 책임인 시험약 개발 단계별 모니터링을 하지 않았다(관찰 1). 이 때문에 인계 기록(Chain of Custody) 양식에 필수 항목이 빠졌다(관찰 1). 대상자 인계 기록에 시험약 사용기한·시간이 없었다(관찰 1).",
    "checks": [
     "시험약 제조업체에 위임한 활동을 의뢰자가 감독한 기록이 있는가? (관찰 1)",
     "모니터링 방문 때 시험약 인계 기록의 필수 항목을 확인하는가? (관찰 1)"
    ],
    "en": {
-    "title_issue": "Sponsor did not ensure proper study monitoring",
+    "title_issue": "Failure to ensure proper study monitoring",
     "hook_line": "Chain of custody forms lacked expiry date or time, unnoted in monitoring reports",
-    "summary": "FDA issued a Form 483 with 1 observation to Avotres Inc., a study sponsor, citing failure to ensure proper monitoring of the study.",
+    "summary": "FDA issued a Form 483 with 1 observation to Avotres Inc., citing failure to ensure proper monitoring of the study.",
     "key_facts": [
      "Observation 1: proper study monitoring not ensured; activities delegated to the investigational product manufacturer not conducted or overseen"
     ],
-    "implication": "The sponsor did not monitor the investigational product across development phases, a responsibility under the quality agreement (Observation 1). This contributed to missing elements in the Chain of Custody forms (Observation 1). Subject Chain of Custody forms lacked an expiration date or time for the investigational product (Observation 1).",
+    "implication": "The firm did not monitor the investigational product across development phases, a delegated responsibility under the quality agreement (Observation 1). This contributed to missing elements in the Chain of Custody forms (Observation 1). Subject Chain of Custody forms lacked an expiration date or time for the investigational product (Observation 1).",
     "checks": [
      "Do you have records of sponsor oversight of activities delegated to the product manufacturer? (Observation 1)",
      "Do monitoring visits verify required elements in chain of custody forms? (Observation 1)"
@@ -478,7 +478,7 @@
   "fda483-196588": {
    "title_issue": "불만 처리 기록 관리 미흡",
    "hook_line": "불만 기록 일부에 검토 서명·날짜가 없음",
-   "summary": "FDA가 의료기기 제조소 NanoHive Medical LLC에 Form 483(관찰사항 1건)을 발행했다. 불만 처리 기록을 적절히 유지하지 않았다고 지적했다.",
+   "summary": "FDA가 제조소 NanoHive Medical LLC에 Form 483(관찰사항 1건)을 발행했다. 불만 처리 기록을 적절히 유지하지 않았다고 지적했다.",
    "key_facts": [
     "관찰 1: 불만 처리 기록 관리 미흡, 불만 처리 절차서 SOP-032대로 기록하지 않음"
    ],
@@ -490,7 +490,7 @@
    "en": {
     "title_issue": "Complaint handling records not maintained",
     "hook_line": "Some complaint records reviewed lacked review signatures and dates",
-    "summary": "FDA issued a Form 483 with 1 observation to NanoHive Medical LLC, a medical device manufacturer, stating that complaint handling records were not adequately maintained.",
+    "summary": "FDA issued a Form 483 with 1 observation to NanoHive Medical LLC, a manufacturer, stating that complaint handling records were not adequately maintained.",
     "key_facts": [
      "Observation 1: complaint records not adequately maintained; not documented as required by complaint handling procedure SOP-032"
     ],

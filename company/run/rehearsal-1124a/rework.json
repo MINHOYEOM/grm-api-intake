@@ -1,1 +1,13 @@
-{"status":"진행","round":1,"worker":"델타-2"}
+{"status":"완료","round":1,"worker":"델타-2","fixed":[
+ {"id":"fda483-196353","shard":"B","changed":["en.title_issue"]},
+ {"id":"fda483-196382","shard":"B","changed":["key_facts","en.key_facts"]},
+ {"id":"fda483-196382","shard":"deep.B","changed":["deep.key_violations[0].observation"]},
+ {"id":"fda483-196464","shard":"E","changed":["title_issue","en.title_issue","summary","en.summary","implication","en.implication"]},
+ {"id":"fda483-196588","shard":"E","changed":["summary","en.summary"]},
+ {"id":"recall-30a2ef396db1","shard":"F","changed":["en.summary"]},
+ {"id":"recall-327eae52c8bb","shard":"F","changed":["en.summary"]},
+ {"id":"recall-53d37db1b711","shard":"F","changed":["en.summary"]},
+ {"id":"recall-6ffa973e2763","shard":"F","changed":["en.summary"]},
+ {"id":"recall-74000539e83e","shard":"F","changed":["en.summary"]},
+ {"id":"admin-2026008238","shard":"G","changed":["en.summary"]}
+],"unfixed":[]}

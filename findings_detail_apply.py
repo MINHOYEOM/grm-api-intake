@@ -14,7 +14,8 @@
     (재추출·복원) 그 관찰과의 대응이 깨졌을 수 있으므로 쓰지 않는다(matched_zero).
   - detail_text·detail_text_ko 는 둘 다 비어 있지 않아야 한다(반쪽 행을 만들지 않는다).
 
-멱등: 같은 배치를 다시 적용하면 같은 값을 다시 쓴다. git 쓰기 없음.
+멱등: 같은 배치를 다시 적용하면 라이브가 이미 같은 값인 항목은 PATCH 하지 않는다(unchanged, 2026-11-20).
+git 쓰기 없음.
 exit code: 자격증명/URL 오류 또는 항목 오류(errored>0) → 1, 그 외 0.
 """
 from __future__ import annotations
@@ -33,6 +34,8 @@ from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 
 DEFAULT_OUTBOX_DIR = "translations/detail_outbox"
 ITEM_KEYS = ("finding_id", "finding_text_md5", "detail_text", "detail_text_ko")
+# GET 투영: 표제 대조용 finding_text + 같은 값이면 PATCH 를 건너뛰기 위한 두 칸(2026-11-20).
+GET_SELECT = "finding_text,detail_text,detail_text_ko"
 _MD5_RE = re.compile(r"[0-9a-f]{32}")
 _HANGUL_RE = re.compile(r"[가-힣]")
 
@@ -78,15 +81,19 @@ Sender = Callable[..., tuple[int, list[dict[str, Any]] | None, str]]
 
 def apply_item(base: str, key: str, item: dict[str, Any], *, send: Sender = _send_findings_request
                ) -> tuple[str, str]:
-    """(outcome, detail) — outcome ∈ succeeded·matched_zero·errored."""
+    """(outcome, detail) — outcome ∈ succeeded·matched_zero·unchanged·errored."""
     fid = str(item["finding_id"])
-    _s, rows, err = send("get", base, key, params={"finding_id": f"eq.{fid}", "select": "finding_text"})
+    _s, rows, err = send("get", base, key, params={"finding_id": f"eq.{fid}", "select": GET_SELECT})
     if err:
         return "errored", f"{fid}: GET {err}"
     live = [r for r in (rows or []) if md5_text(str(r.get("finding_text") or "")) == item["finding_text_md5"]]
     if not live:
         return "matched_zero", ""
     body = {"detail_text": str(item["detail_text"]), "detail_text_ko": str(item["detail_text_ko"])}
+    # [DB 용량 3단계 · 2026-11-20] 라이브가 이미 같은 값이면 PATCH 를 보내지 않는다. 수동 전체 재적용(약 1만 건)과
+    # 수정된 배치 파일 재적용이 detail_text(TOAST 큰 칸)를 같은 값으로 통째로 다시 써 findings 빈자리를 키웠다(11-11 6회).
+    if all(k in live[0] for k in body) and all(str(live[0].get(k) or "") == v for k, v in body.items()):
+        return "unchanged", ""
     _s, prows, perr = send("patch", base, key, params={"finding_id": f"eq.{fid}"}, json_body=body)
     if perr:
         return "errored", f"{fid}: PATCH {perr}"
@@ -103,7 +110,7 @@ def run(paths: list[Path], base: str, key: str, *, dry_run: bool = False,
     items, errors = load_items(paths)
     report: dict[str, Any] = {"mode": "dry_run" if dry_run else "apply", "files": [p.name for p in paths],
                               "items_total": len(items), "invalid": 0, "succeeded": 0,
-                              "matched_zero": 0, "errored": 0, "errors": errors}
+                              "matched_zero": 0, "unchanged": 0, "errored": 0, "errors": errors}
     for item in items:
         why = validate_item(item)
         if why:

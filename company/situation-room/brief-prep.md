@@ -17,7 +17,7 @@ Notion 은 보지 않는다 — 발행 길에서 빠졌다(편집팀 `company/ed
 2. **main 반영** — `git fetch origin main` 후 `web/data/deltas/delta_$UNDER.json`·`deep_$UNDER.json` 이 있는지.
    git 반납이 있는데 파일이 없으면 브릿지가 아직 안 돈 것이다(크론이 13:37 까지 30분마다 돈다) → `대기: 브릿지`.
    **스캐폴드 동결**도 본다 — main 의 `delta_$UNDER.json` 에 `handoff_ref` 키가 있으면(편집팀이 git handoff 로 만든 호) `web/data/scaffolds/brief_web_$UNDER.json` 도 main 에 있어야 한다.
-   없으면 `★스캐폴드 동결 없음`(발행 조립이 다른 스캐폴드를 쓰게 된다 — `상태: 보류`). `handoff_ref` 가 없는 호(백업이 발행한 호)는 이 파일이 없는 것이 정상이다.
+   없으면 `★스캐폴드 동결 없음`(발행 조립이 다른 스캐폴드를 쓰게 된다 — `상태: 보류`). `handoff_ref` 가 없는 호(11-23 이전 노션 길·v16 백업으로 만든 지난 호)는 이 파일이 없는 것이 정상이다.
 3. **발행 PR** — 열린 PR 중 head 가 `publish/brief-$D` 인 것. head sha 의 check-runs 가 전부 `success` 인지.
 4. **심층분석** — PR 브랜치의 `web/data/briefs/brief_web_$UNDER.json` 을 `git show` 로 읽어, `"deep_analysis" in card` 인 카드마다
    ① `deep_analysis` 가 비어 있지 않은가 ② `fda-483` 카드는 `observations_ko` 의 `number` 가 `deterministic_detail.observations[].number` 와 1:1 이고

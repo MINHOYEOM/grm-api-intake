@@ -14,6 +14,18 @@
 6. `company/editorial/STYLE.md` §12 — `hook_line` 작성 규칙(그 절만)
 7. 심층 샤드만: 맡은 카드 유형의 정본 심층 지시문(`docs/prompts/GRM_Prompt_Deep{WL,Admin,Fda483}_v1.md`) 전체
 
+## ★ 최우선 규칙 — 가려진·깨진 값은 채우지 않는다 (리허설 1121b: 전수 교열 반려 21장 중 약 2/3)
+델타 슬롯·심층 칸(`observations_ko`·`key_violations`·`fda_evaluation` 등)·영문 칸 모두에 적용한다. 아래 모든 규칙보다 먼저 지킨다.
+- 원문이 `[redacted]`·`(b)(4)`·OCR 로 깨진 글자인 자리에 **구체 명사·숫자·분류를 넣지 않는다** — 그 자리는 `[가림]`(영문 `[redacted]`)으로 두거나 그 구절을 뺀다.
+  앞뒤 문맥·다른 관찰·업계 상식으로 짐작한 값도 채움이다(1121b 반려 예: `[redacted] meter`→'산도계', `Line [redacted] Tester`→'누설시험',
+  `[redacted] vials per minute`→'분당 수십 개', `[redacted] system`→'정제수 시스템', `specifications for [redacted]`→'불순물 규격', `worksheets`→'엑셀', `the [redacted] was present`→'배지').
+- **원문보다 세게 쓰지 않는다.** `probable`·`potential`·`suspected` 는 '추정'·'가능성'·'의심'으로(‘확인’ 아님), `inadequate`·`not thorough` 는 '미흡'·'철저하지 않음'으로(‘없이’·‘미조사’ 아님).
+- **예시 목록의 개수는 총수가 아니다** — `For example:` 아래 4건은 '4곳'이 아니라 '예를 들어'. 원문이 세지 않은 수는 쓰지 않는다.
+- 사전 점검이 `가림 값 채움 <id>.<슬롯>` 줄로 막는다(원문 어디에도 없는 낱말 — 정제수·용수·물·산도·누설·불순물·엑셀·배지·소독제·내시경·수십·박층).
+  사전에 없는 추정('일부'·'훨씬 뒤'·'설비')은 코드가 못 센다 — 쓰는 순간 원문 글자와 대조한다. `경고: 가림 값 채움 의심` 줄은 원문과 대조해 채운 값이면 고친다.
+- **개인 실명은 싣지 않는다(2026-11-21 대표 결정).** 공직자·규제기관 공식 발표에 직함으로 나오는 공식 인물 외에는 483 수신인·경고서한 수신인·업체 임원·농장주 등 개인 이름을 쓰지 않는다 — '시설 책임자'·'업체 대표'·'해당 임원'으로 쓴다. 업체명(법인명)은 그대로 둔다. **업체명 자체가 사람 이름이면(개인 농장·개인 사업자 — 이름 + 가운데 이니셜 + 성, 법인 낱말 없음) 업체명으로서도 쓰지 않고 '개인 사업자'(영문 'an individual business')로 쓴다** — 예: 'FDA가 축산 농가(개인 사업자)에 483 발행'. 카드 머리·업체 사실값 같은 코드 칸은 스캐폴드가 같은 표기로 이미 바꿔 둔다(`grm_findings.redact_person_firm`). `precheck.py terms` 의 `개인 실명 …` 줄은 막힘(exit 1)이고, `경고: 개인 실명 의심` 줄도 고친다(11-23 실발행: 이 문단이 이름을 쓰라고 해 교열이 통과시켰다).
+- **원문 대조 4가지는 코드가 막는다(2026-11-23 — 교열 판정이 회차마다 갈렸다).** `precheck.py terms`·`deep` 이 같은 함수(`guess_check.delta_source_lines`·`deep_source_lines`)로 본다: `개인 실명 …`(위) · `가림 값 추측 …`(원문 `filling [redacted]` 를 `filling parts/equipment`·'충전 부품'으로 — 가림 표지 앞 낱말 + 원문에 없는 일반 명사. 국문 짝도 같이 고친다) · `원문에 없는 날짜 …`(카드 날짜가 원문·코드 facts 어디에도 없다) · `날짜 불일치 …`(`실사일:`·`실사 기간:`·`발행일:` 이름표 날짜가 코드 facts 와 다르다 — 다른 기관 실사 날짜면 '근거로 쓴 실사: …'). 경고만: `진술 단정 의심 …`(원문이 직원 진술 stated·acknowledged·according to 로만 적은 내용을 진술 표기 없이 — '진술'·'인정' 을 붙인다) · `날짜 연도 확인 …` · 심층 `원문에 없는 날짜 의심 …`.
+
 ## 맡는 v16 절
 - v16: [역할]
 - v16: [핵심 원칙]
@@ -36,7 +48,8 @@
 
 ## 어느 샤드인가 — 예약작업 프롬프트가 `워커: 델타-1 | 델타-1+ | 심층-2 …` 한 줄로 알려 준다 (2026-11-02 가변 샤드)
 샤드는 데스크 계획(`desk.json` 의 `shards`)에 있는 만큼 — A, B, C… 와 가상 샤드 `T`(tldr). 어느 샤드를 할지는 **RUN.md 7항 루프**가 정한다
-(`shard_claim.py next` → `claim`). 자기 종류(델타=Opus·심층=Sonnet)가 아닌 샤드는 가져오지 않는다. 가져온 샤드의 결과 파일이 이미 `완료`면 건너뛴다.
+(`shard_claim.py check … --until 08:55 --wait` 가 `CLAIM <S>` 를 내면 `claim` — `next` 를 쓰지 않는다). 자기 종류(델타=Opus·심층=Sonnet)가 아닌 샤드는 가져오지 않는다. 가져온 샤드의 결과 파일이 이미 `완료`면 건너뛴다.
+`claim` 이 실패(exit 1)하면 그 샤드는 남의 것이다 — git 을 손대지 말고(claim 파일 수정·commit·push·rebase·reset 모두 하지 않는다) 곧바로 `check` 로 돌아간다.
 자기 샤드 목록이 비어 있으면 빈 결과(`완료`)를 쓰고 다음으로. 샤드를 끝낼 때마다 결과 파일을 커밋·push 하고(RUN.md 3항) 루프로 돌아간다.
 **`shard_claim.py check` 가 exit 0 을 내기 전에는 끝내지 않는다**(RUN.md 7항) — 원문이 길다·많이 못 가져간다는 판단으로 빈 샤드를 남기고 끝내지 않는다.
 
@@ -56,6 +69,7 @@
 2. v16 [출력] envelope 그대로 한국어·영문(`en`·`tldr_en`) 슬롯을 채운다. **제목 이슈 길이는 조립 검사가 센다: `title_issue` 25자 이내, `en.title_issue` 50자 이내(공백 포함).** 한 장이라도 넘으면 호 전체 조립이 거부된다 — 쓰고 나서 글자 수를 세고, 넘으면 수식어를 빼 줄인다.
 3. 심층분석 대상이 있으면 v16 [2단계 (선택·additive)] 대로 만든다. **국문 병기(`observations_ko`·`violations_ko`·`ncr_ko`)는 카드 층에 둔다** — `items.<web_card_id>.observations_ko` 이고 `deep_analysis` 안이 아니다
    (v16 스키마 줄이 4섹션과 나란히 적어 두어 안에 넣기 쉽다. 안에 넣으면 분석 게이트가 FAIL 할 때 번역까지 사라져 483 관찰 국문 없음으로 호 전체 조립이 거부된다 — 리허설 1114b).
+   관찰 번호가 겹치는 483(원문 OCR 이 `5` 를 두 번 쓰거나 이전 실사 관찰을 `Observation 1:` 꼴로 인용)도 관찰마다 하나씩, **스캐폴드 관찰 순서 그대로 같은 번호**로 넣는다 — 조립이 같은 번호 안에서는 나온 순서로 짝짓는다(리허설 1120i).
    FDA 483 카드는 `observations_ko` 가 ★필수다. 심층 샤드를 `완료`로 내기 전에 `python company/editorial/precheck.py deep _handoff/handoff_{run_date_kst}.json company/run/{run_date_kst}/deep.{S}.json` 이 **exit 0(0건)** 인지 본다
    (handoff 사본은 아래 6번의 받기 명령으로 먼저 받는다). **심층 칸 산문(observation·description·risk·inspectional_significance·fda_evaluation·disposition_basis·administrative_risks·items)도 v16 [용어·표기]를 그대로 따른다** —
    `심층 용어 <id>.<슬롯>: …` 줄은 델타 사전 점검과 **같은 함수**(`inject_slots.term_hits`)가 낸 것이고 교열이 반려하는 바로 그 표기다(리허설 1120b: 경고만이라 넘겼다가 19장 반려).
@@ -86,6 +100,7 @@
    다만 `지침·안내서`·`고시·개정법령`·`규제 소식` 카드에서 원문에 머리말 사실이 없으면 `[]`(v16 — 머리말을 붙여 요약을 다시 쓰지 않는다).
    비워도 되는 칸은 그 경우의 `key_facts` 와 `implication`·`checks`·`hook_line` 뿐이다(코드가 카드 유형을 handoff 에서 읽어 이 세 유형만 받는다 — 다른 유형의 빈 `key_facts` 는 여전히 합치기가 호 전체를 거부한다).
    `경고:` 로 시작하는 줄(행정처분 요약 주어·심층 칸 문체)은 exit 코드에 들어가지 않지만 고칠 수 있으면 고친다. 걸린 줄이 있으면 그 카드의 그 슬롯만 고치고 다시 돌린다(exit 0 이 될 때까지).
+   **[용어·표기] 표의 한글 표기·군말은 사전 점검이 v16 문서에서 그대로 읽어 막는다**(`inject_slots.v16_terms` — `외관 검사`·`시각검사`→`육안검사`, `경고 기준`→`경고한계`, 군말 `다수`·`장기간`은 원문 숫자로(없으면 `반복`까지). `hook_line` 한국어는 목록 약어도 쓰지 않는다). `경고: 가림 값 채움 의심`·`가능성 표현 누락`·`원문에 없는 수`·`회수 사유 덧붙임`·`hook_line 진술 표기`·`hook_line 약어`(영문)는 막지 않지만 원문과 대조해 맞으면 고친다(리허설 1121a).
    코드가 못 세는 표기도 같은 표를 따른다 — 시험 결과·시험실 조사를 말하는 `규격 이탈`·`규격 외`·`규격 부적합`은 `기준일탈(OOS)`.
    **회수 사유의 `○○ 규격 부적합`(원문 `Failed … Specification(s)`)은 그대로 쓴다**(`용출 규격 부적합` — 2026-11-14 대표 결정). 같은 뜻은 한 호 안에서 한 가지 표기로.
 
@@ -100,7 +115,12 @@
 3. 고친 샤드마다 `python company/editorial/precheck.py terms company/run/{run_date_kst}/delta.{S}.json` 이 exit 0 인지 본다
    (심층 샤드는 `python company/editorial/precheck.py deep _handoff/handoff_$D.json company/run/{run_date_kst}/deep.{S}.json`).
 4. `rework.json` 을 `{"status":"완료","round":1,"worker":"…","fixed":[{"id":"<web_card_id>","shard":"B","changed":["summary","key_facts"]}],"unfixed":["<못 고친 카드 id>"]}` 로 고쳐
-   고친 샤드 파일과 함께 커밋·push 한다. **재작업은 한 번뿐이다** — 다시 반려되면 그 호는 반납되지 않는다(자동 백업은 없다 — 종합상황실이 잡고 대표가 정한다).
+   고친 샤드 파일과 함께 커밋·push 한다. 다시 반려되면 교열 2차가 같은 날 "재작업 2회차"를 한 번 더 부른다(아래).
+
+## 재작업 2회차 — 교열 2차가 같은 날 한 번 더 부를 때만 (2026-11-23 대표 방침 — 백업 없음 · 이월 없음)
+교열 2차가 서브 에이전트로 띄운 기자만 이 절을 한다(예약 슬롯 없음). 위 "재작업" 1~3번과 같다 — 다른 점만:
+- 대상은 `copyedit.json` 의 `rework2.cards` 와 그 카드의 `fails` 다(`rework.cards` 가 아니다). 맡기 표식·결과는 `rework2.json`(`"round": 2`).
+- 결과는 `rework2.json` 을 `{"status":"완료","round":2,"fixed":[…],"unfixed":[…]}` 로 써서 고친 샤드와 함께 커밋한다. 더 되돌리는 회차는 없다 — 남으면 교열이 대표 결정을 받는다.
 
 ## 결과 — `company/run/{run_date_kst}/`
 - `delta.{A,B}.json` — 위 표. `cards` 값의 형태는 v16 [출력] envelope 의 카드 항목 그대로(선택 필드 `hook_line`·`en.hook_line` 포함 — 위 하는 일 4번). 그 밖의 키 금지.

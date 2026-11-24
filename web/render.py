@@ -121,6 +121,7 @@ if str(REPO_ROOT) not in sys.path:
 from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
 from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
 from grm_findings import FIRM_KEY_ALIASES  # noqa: E402
+from grm_findings import REDACTED_PERSON_BY_LANG as _GRM_REDACTED_PERSON_BY_LANG  # noqa: E402
 import graph_export  # noqa: E402
 import clause_citations  # noqa: E402
 # [FDA 지적 조항 × 업체 2026-11-10] 업체 페이지·조항 페이지 블록(로더·매칭·뷰).
@@ -136,6 +137,7 @@ from grm_findings import evidence_url_quality_error as _evidence_url_quality_err
 # 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
 from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
 import card_weight as _cw  # noqa: E402  [카드 무게 2026-11-10] 지적 건수·무지적 판정 공유
+import firm_groups as _fg  # noqa: E402  [업체 그룹 묶음 2026-11-23] 등록 근거로만 묶는다
 
 # [다국어 2단계 2026-09-03] 문구 사전 — 키는 한국어 원문, 한국어 빌드는 항등(바이트 불변).
 # `tr("…")` 은 render_site 가 언어별로 만드는 번역기, `N_("…")` 은 모듈 상수를 키로
@@ -196,6 +198,14 @@ _FIRM_FACT_LABELS = frozenset({"업체", "제조소", "제조소/업체", "업�
 _FIRM_VALUE_SEPS = (" (", " · ")
 _FIRM_PLACEHOLDER = "원문 미기재"
 
+# [개인 사업자 2026-11-23] 개인(농장주 등) 실명을 가린 자리의 표기 — 언어별로 **뷰가** 정한다.
+# 11-23호(#1873)에서 `headline_target`·업체 사실값(국·영 공용 코드 칸)에 국문 '개인 사업자'를
+# 넣자 영문 페이지 카드 머리·목차·data-firm-key 6곳에 한글이 보였다. 데이터는 국문 한 벌만
+# 적고, 영어 트리는 `_card_with_english_narrative` 가 이 표로 바꿔 넘긴다(템플릿은 고르지 않는다).
+# 가린 이름은 실제 업체가 아니므로 업체 프로파일로 잇지 않는다(`_firm_key_for_card`).
+REDACTED_PERSON_BY_LANG = _GRM_REDACTED_PERSON_BY_LANG   # 표기 단일 출처 = grm_findings(스캐폴드·사전 점검과 같은 표)
+REDACTED_PERSON = REDACTED_PERSON_BY_LANG["ko"]
+
 # [영문 사실표 2026-09-23] 사실값 중 **고정 어휘 토큰**(실명이 아니라 상태값)은 영어
 # 트리에서 tr() 을 태워 실제로 번역한다 — "미확인"이 업체/제조소 라벨 아래 있어도
 # 그 값은 "이름이 없다"는 뜻이지 실제 이름이 아니다. 목록은 실측(web/data/briefs 전량
@@ -231,7 +241,7 @@ def _firm_key_for_card(card: dict[str, Any]) -> str:
             if idx != -1 and idx < cut:
                 cut = idx
         name = value[:cut].strip()
-        if not name or name == _FIRM_PLACEHOLDER:
+        if not name or name == _FIRM_PLACEHOLDER or name in REDACTED_PERSON_BY_LANG.values():
             return ""
         return _normalize_firm_name(name)
     return ""
@@ -424,7 +434,10 @@ def _detail_preview(dd: dict[str, Any] | None, tr: Translator = _KO) -> str:
     if not isinstance(dd, dict):
         return ""
     if dd.get("type") == "fda_483_observations":
-        return tr("Observation {n}건", n=dd.get("count") or 0)
+        # count 가 비면(원문 번호 불연속 — 건수 단정 불가) 숫자를 지어내지 않는다.
+        if not isinstance(dd.get("count"), int):
+            return ""
+        return tr("Observation {n}건", n=dd["count"])
     return ""
 
 
@@ -582,9 +595,82 @@ def _card_with_english_narrative(card: dict[str, Any], lang: str) -> dict[str, A
     """
     if lang != DEFAULT_LANG and card_has_english(card):
         en = card["en"]
-        return {**card, **{f: en.get(f, [] if f in ("key_facts", "checks") else "")
-                           for f in CARD_NARRATIVE_FIELDS}}
+        return {**card, **_code_slots_for_lang(card, lang),
+                **{f: en.get(f, [] if f in ("key_facts", "checks") else "")
+                   for f in CARD_NARRATIVE_FIELDS}}
     return card
+
+
+# [영문 코드 칸 2026-11-23] 코드가 국문으로 덧붙이는 정형 조각 — 영어 트리에서 뷰가 영어로 바꾼다.
+# 실측(web/data/briefs 전량): 회수 병합 `… 외 N품목` 79·`외 N곳` 6·`외 N개사` 2·`외 N건` 1, MHRA `발행기관`
+# `MHRA (영국)` 3. 이름 부분은 원문 그대로 두고 꼬리만 바꾼다(실명은 옮기지 않는다 — 불변식 #8).
+_EN_MORE_SUFFIX_RE = re.compile(r" 외 (\d+)(품목|곳|개사|건)$")
+_EN_MORE_NOUN = {"품목": "product", "곳": "site", "개사": "firm", "건": ""}
+_EN_CODE_FRAGMENTS = (("(영국)", "(UK)"),)
+
+
+def _code_slot_value_for_lang(value: str, lang: str) -> str:
+    """코드 칸 값 1개 → 그 언어 표기(한국어 트리는 항등). 가린 실명·정형 꼬리·국가 괄호만 바꾼다."""
+    if lang == DEFAULT_LANG or not isinstance(value, str) or not _HANGUL_RE.search(value):
+        return value
+    word = REDACTED_PERSON_BY_LANG.get(lang)
+    if word:
+        value = value.replace(REDACTED_PERSON, word)
+    for ko, en in _EN_CODE_FRAGMENTS:
+        value = value.replace(ko, en)
+    m = _EN_MORE_SUFFIX_RE.search(value)
+    if m:
+        n, noun = int(m.group(1)), _EN_MORE_NOUN[m.group(2)]
+        tail = f" and {n} more" + (f" {noun}{'' if n == 1 else 's'}" if noun else "")
+        value = value[:m.start()] + tail
+    return value
+
+
+def _code_slots_for_lang(card: dict[str, Any], lang: str) -> dict[str, Any]:
+    """코드 칸(`headline_target`·`facts[].value`)을 그 언어 표기로 바꾼 값들(바뀐 것이 없으면 {} — 원본 무변형).
+
+    국·영 공용 칸이라 데이터는 국문 한 벌만 적는다. 언어별 표기는 여기(뷰)가 정한다 — 템플릿은 고르지 않는다."""
+    if lang == DEFAULT_LANG:
+        return {}
+    out: dict[str, Any] = {}
+    target = card.get("headline_target")
+    new_target = _code_slot_value_for_lang(target, lang)
+    if new_target != target:
+        out["headline_target"] = new_target
+    facts = card.get("facts") or []
+    new_facts = [({**f, "value": _code_slot_value_for_lang(f["value"], lang)}
+                  if isinstance(f, dict) and isinstance(f.get("value"), str) else f) for f in facts]
+    if new_facts != facts:
+        out["facts"] = new_facts
+    return out
+
+
+def en_code_slot_hangul(card: dict[str, Any]) -> list[str]:
+    """영어 트리에서 **해외 기관 카드**의 코드 칸(`headline_target`·`facts[].value`)에 한글이 남은 자리 목록.
+
+    식약처 카드는 업체·기관 실명이 원래 한국어라 그대로 두고 화면이 밝힌다(`count_ko_only_names`).
+    해외 카드의 코드 칸에 한글이 있으면 실명이 아니라 사람이 넣은 국문 표기다 — 11-23호 '개인 사업자'.
+    판정은 영어 트리가 실제로 그리는 값(`_card_with_english_narrative` 뒤, 사실값은 `_fact_value_for_lang`
+    뒤)으로 한다. `check_en_slots.card_problem` 이 부른다(두 벌 금지)."""
+    if card.get("agency") == "MFDS" or not _is_renderable(card):
+        return []
+    view = _card_with_english_narrative(card, "en")
+    out: list[str] = []
+    if _HANGUL_RE.search(str(view.get("headline_target") or "")):
+        out.append("headline_target")
+    for i, f in enumerate(view.get("facts") or []):
+        if not isinstance(f, dict):
+            continue
+        value, _ = _fact_value_for_lang(str(f.get("label") or ""), str(f.get("value") or ""),
+                                        "en", _sentinel_blank_tr)
+        if _HANGUL_RE.search(value):
+            out.append(f"facts[{i}]")
+    return out
+
+
+def _sentinel_blank_tr(text: str, **_kw: Any) -> str:
+    """`en_code_slot_hangul` 전용 — 고정 어휘 토큰(`_FACT_SENTINEL_VALUES`)은 영어 트리가 반드시 번역하므로 빈 값으로 본다."""
+    return "" if text in _FACT_SENTINEL_VALUES else text
 
 
 def _fact_value_for_lang(label: str, value: str, lang: str,
@@ -1367,6 +1453,93 @@ def _annotate_toc_distinguishers(card_views: list[dict[str, Any]]) -> None:
             cv["toc_distinguisher"] = cv.get("title_issue") or cv.get("anchor", "")
 
 
+# ── [업체 그룹 묶음 2026-11-23 · 대표 결정] ───────────────────────────────────────
+# 같은 그룹(등록 원천 web/data/firm_groups.json) 또는 같은 FEI 카드가 한 묶음(섹션·소제목)
+# 안에 2장 이상이면 나란히 붙이고 머리말 한 줄을 단다. 이름이 비슷한 것만으로는 묶지 않는다
+# (판정은 firm_groups.cluster_key — FEI 가 근거). 카드 데이터·문안은 건드리지 않고 뷰에만 싣는다.
+# 실사일이 게시일보다 2년(OLD_INSPECTION_DAYS — 근거는 firm_groups 주석) 넘게 앞선 카드는
+# '옛 실사' 표시와 실사일을 카드 머리에 올린다. 같은 게시일의 옛 실사가 2장 이상이면 '일괄 공개'.
+def _annotate_firm_groups(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any]],
+                          tr: Translator = _KO) -> None:
+    """뷰에 `fgroup_key`(묶음 열쇠·2장 이상일 때만)·`fgroup_name`·`fgroup_sites`·`fgroup_kind`·
+    `old_insp` 를 단다. `cards_raw` 는 `card_views` 와 같은 순서의 원본 카드."""
+    reg = _fg.default_registry()
+    idx = _fg.fei_index(reg)
+    en = not lang_is_ko(tr)
+    keys = [_fg.cluster_key(raw, idx) for raw in cards_raw]
+    runs: dict[tuple[Any, ...], int] = {}
+    for cv, k in zip(card_views, keys):
+        if k:
+            rk = (cv.get("group"), cv.get("group_label"), k)
+            runs[rk] = runs.get(rk, 0) + 1
+    old_by_pub: dict[str, int] = {}
+    for raw in cards_raw:
+        if _fg.is_old_inspection(raw):
+            pub = _fg.inspection_dates(raw)[1].isoformat()  # type: ignore[index]
+            old_by_pub[pub] = old_by_pub.get(pub, 0) + 1
+    for cv, raw, k in zip(card_views, cards_raw, keys):
+        if k and runs.get((cv.get("group"), cv.get("group_label"), k), 0) >= 2:
+            cv["fgroup_key"] = k
+            fei = _fg.card_fei(raw)
+            g = idx.get(fei)
+            cv["fgroup_fei"] = fei
+            cv["fgroup_kind"] = _fg.doc_kind(raw)
+            cv["fgroup_name"] = ((g["name_en"] if en else g["name_ko"]) if g
+                                 else _fg.card_firm_name(raw))
+            cv["fgroup_registered"] = bool(g)
+        if _fg.is_old_inspection(raw):
+            insp, pub = _fg.inspection_dates(raw)  # type: ignore[misc]
+            years = (pub - insp).days // 365
+            batch = old_by_pub.get(pub.isoformat(), 0) >= 2
+            cv["old_insp"] = {
+                "label": tr("옛 실사 일괄 공개") if batch else tr("옛 실사 공개"),
+                "date": insp.isoformat(),
+                "date_label": tr("실사일 {date}", date=insp.isoformat()),
+                "lag": tr("게시 {n}년 전 실사", n=years),
+            }
+
+
+def _fgroup_head(members: list[dict[str, Any]], tr: Translator) -> str:
+    """묶음 머리말 — '○○ 그룹 — 시설 N곳 · 483 M건' (같은 FEI 묶음은 '업체명 — 483 M건')."""
+    first = members[0]
+    kinds: dict[str, int] = {}
+    for cv in members:
+        kinds[cv.get("fgroup_kind") or ""] = kinds.get(cv.get("fgroup_kind") or "", 0) + 1
+    parts: list[str] = []
+    if first.get("fgroup_registered"):
+        name = tr("{name} 그룹", name=first.get("fgroup_name") or "")
+        parts.append(tr("시설 {n}곳", n=len({cv.get("fgroup_fei") for cv in members})))
+    else:
+        name = first.get("fgroup_name") or ""
+    for kind, n in kinds.items():
+        if kind == "483":
+            parts.append(tr("483 {n}건", n=n))
+        elif kind == "WL":
+            parts.append(tr("경고서한 {n}건", n=n))
+        else:
+            parts.append(f"{tr(kind)} {tr('{n}건', n=n)}".strip())
+    return f"{name} — {' · '.join(parts)}"
+
+
+def _mark_fgroup_runs(cards: list[dict[str, Any]], tr: Translator) -> None:
+    """섹션 안에서 연속한 같은 묶음 카드에 시작·끝 표시와 머리말을 단다(2장 이상만)."""
+    i = 0
+    while i < len(cards):
+        k = cards[i].get("fgroup_key")
+        if not k:
+            i += 1
+            continue
+        j = i
+        while (j + 1 < len(cards) and cards[j + 1].get("fgroup_key") == k
+               and cards[j + 1].get("group_label") == cards[i].get("group_label")):
+            j += 1
+        if j > i:
+            cards[i]["fgrp_open"] = True
+            cards[i]["fgrp_head"] = _fgroup_head(cards[i:j + 1], tr)
+            cards[j]["fgrp_close"] = True
+        i = j + 1
+
+
 def _is_renderable(card: dict[str, Any]) -> bool:
     """렌더 제외 카드 판별(방어적 — 상류 순수성 미가정, §3.2/§3.3 렌더러 책임).
 
@@ -1446,6 +1619,7 @@ def _build_sections(card_views: list[dict[str, Any]],
     for s in sections:
         s["count"] = len(s["cards"])
         _mark_row_runs(s["cards"], tr)
+        _mark_fgroup_runs(s["cards"], tr)
     return sections
 
 
@@ -1542,16 +1716,38 @@ def _order_by_weight(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     묶음 = 연속한 (group, group_label) 구간(섹션 · 국내 소제목). 구간 안에서만 안정 정렬하므로
     섹션·소제목 순서와 같은 무게 안의 원래 순서는 그대로다. 무게 값이 하나도 없는 호(11-16 앞)는
-    입력 그대로 돌려준다(바이트 불변)."""
-    if not any(cv.get("weight") for cv in card_views):
+    입력 그대로 돌려준다(바이트 불변).
+
+    [업체 그룹 묶음 2026-11-23] 같은 묶음 열쇠(`fgroup_key`) 카드는 한 덩어리로 움직인다 —
+    덩어리의 무게는 구성원 중 가장 무거운 것, 자리는 그 무게 안에서 첫 구성원의 자리.
+    구성원끼리는 원래 순서. 묶음도 무게도 없는 호는 입력 그대로다."""
+    if not any(cv.get("weight") or cv.get("fgroup_key") for cv in card_views):
         return card_views
+
+    def _sorted_run(run: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        crank: dict[str, int] = {}
+        cfirst: dict[str, int] = {}
+        for i, v in enumerate(run):
+            k = v.get("fgroup_key")
+            if k:
+                crank[k] = min(crank.get(k, 9), _WEIGHT_RANK.get(v.get("weight"), 1))
+                cfirst.setdefault(k, i)
+
+        def sk(iv: "tuple[int, dict[str, Any]]") -> tuple[int, int, int]:
+            i, v = iv
+            k = v.get("fgroup_key")
+            if k:
+                return (crank[k], cfirst[k], i)
+            return (_WEIGHT_RANK.get(v.get("weight"), 1), i, i)
+        return [v for _, v in sorted(enumerate(run), key=sk)]
+
     out: list[dict[str, Any]] = []
     run: list[dict[str, Any]] = []
     key: Any = object()
     for cv in card_views + [None]:                     # type: ignore[list-item]
         k = None if cv is None else (cv.get("group"), cv.get("group_label"))
         if cv is None or k != key:
-            out.extend(sorted(run, key=lambda v: _WEIGHT_RANK.get(v.get("weight"), 1)))
+            out.extend(_sorted_run(run))
             run, key = [], k
         if cv is not None:
             run.append(cv)
@@ -1567,7 +1763,9 @@ def _mark_row_runs(cards: list[dict[str, Any]], tr: Translator) -> None:
             continue
         j = i
         while (j + 1 < len(cards) and cards[j + 1].get("weight") == "row"
-               and cards[j + 1].get("group_label") == cards[i].get("group_label")):
+               and cards[j + 1].get("group_label") == cards[i].get("group_label")
+               # [업체 그룹 묶음] 표 묶음은 업체 묶음 경계에서 끊는다(묶음 상자 안팎이 엇갈리지 않게).
+               and cards[j + 1].get("fgroup_key") == cards[i].get("fgroup_key")):
             j += 1
         run = cards[i:j + 1]
         by_agency: dict[str, int] = {}
@@ -4070,6 +4268,44 @@ def is_thin_firm_page(firm: dict[str, Any], lang: str = DEFAULT_LANG) -> bool:
     return len(docs) <= THIN_FIRM_MAX_DOCS and excerpt <= THIN_FIRM_MAX_EXCERPT_BYTES
 
 
+# [구글 품질 1단계 2026-11-19] 중복 문서(규칙 B)도 구글에서만 뺀다.
+# 왜: HC 보고서는 표준 문구를 써서 영문 지적의 92%가 다른 문서와 글자까지 같다. 얇지 않아도
+# "다른 문서의 사본"이라 사이트 단위 품질 판정을 끌어내린다(범위안 2026-11-19, 대표 결정 1).
+# 판정 단위는 **지적 하나의 본문**(그 언어로 페이지에 실리는 것 — finding_body)이고, 공백·대소문자만
+# 정규화해 **다른 문서**에 글자 그대로 있으면 중복이다. 비교 모집단은 같은 언어 본문의 전 문서다.
+# 렌더 입력만으로 결정론이라, 2단계 보강으로 본문이 달라지면 다음 빌드에서 자동으로 돌아온다.
+DUP_DOC_MIN_RATIO = 0.8
+
+
+def _dup_key(text: str) -> str:
+    return re.sub(r"\s+", " ", text or "").strip().lower()
+
+
+def doc_duplicate_ratios(documents: list[dict[str, Any]],
+                         lang: str = DEFAULT_LANG) -> dict[str, float]:
+    """document_id → 지적 가운데 다른 문서에도 글자 그대로 있는 비율(0~1). 지적이 없으면 0."""
+    owners: dict[str, set[str]] = {}
+    keys_by_doc: dict[str, list[str]] = {}
+    for d in documents:
+        keys = [k for k in (_dup_key(finding_body(f, lang)) for f in d.get("findings") or []) if k]
+        keys_by_doc[d["document_id"]] = keys
+        for k in keys:
+            owners.setdefault(k, set()).add(d["document_id"])
+    return {i: (sum(1 for k in keys if len(owners[k]) > 1) / len(keys) if keys else 0.0)
+            for i, keys in keys_by_doc.items()}
+
+
+def is_duplicate_doc_page(doc: dict[str, Any], ratios: dict[str, float]) -> bool:
+    """규칙 B — 지적의 80% 이상이 다른 문서에 글자 그대로 있다(ratios 는 그 언어로 잰 값)."""
+    return ratios.get(doc.get("document_id", ""), 0.0) >= DUP_DOC_MIN_RATIO
+
+
+def google_noindex_doc_page(doc: dict[str, Any], lang: str,
+                            ratios: dict[str, float]) -> bool:
+    """문서 페이지를 구글에서 뺄까(A 얇음 또는 B 중복). 템플릿 메타와 sitemap 이 **이 함수 하나**를 본다."""
+    return is_thin_doc_page(doc, lang) or is_duplicate_doc_page(doc, ratios)
+
+
 # ── [SEO 2단계 2026-11-09] 문서·업체 페이지의 GRM 고유 맥락 ─────────────────────────
 # 1단계(googlebot noindex)는 얇은 페이지를 빼는 것이었고, 이 단계는 **원문에 없는 정보**를
 # 더한다. 문서 페이지는 공개 문서를 옮긴 것이라 그대로는 사본이다. 우리만 가진 연결 두 가지를
@@ -5645,6 +5881,10 @@ SITE_BASE_URL = os.environ.get(
     "GRM_SITE_BASE_URL", "https://grm-solutions.com").rstrip("/")
 
 
+#: [구글 품질 1단계 2026-11-19] IndexNow 용 전체 sitemap 파일명(구글용 sitemap.xml 과 별개).
+SITEMAP_FULL_NAME = "sitemap-full.xml"
+
+
 def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = False) -> str:
     """robots.txt — 공개 페이지 허용 + sitemap 포인터. Admin 은 비색인, /cdn-cgi/ 는 크롤 차단."""
     lines = [
@@ -5983,12 +6223,16 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
                       base_url: str = SITE_BASE_URL,
                       glossary_term_ids: "list[str] | None" = None,
                       facet_paths: "list[tuple[str, str]] | None" = None,
-                      en_paths: "set[str] | None" = None) -> str:
+                      en_paths: "set[str] | None" = None,
+                      exclude_paths: "set[str] | frozenset[str]" = frozenset()) -> str:
     """sitemap.xml — 랜딩 + 아카이브 + 각 호. canonical = 트레일링 슬래시 디렉터리형
     (`/`·`/archive/`·`/briefs/{pub}/`). lastmod = publish_date(YYYY-MM-DD)만 — 랜딩·
     아카이브는 최신 publish_date. 정렬 = publish_date desc. 생성시각/난수 0(byte 고정).
 
     URL·날짜는 전부 ASCII(http(s)·YYYY-MM-DD)라 XML 메타문자 부재 — 무변형 결합.
+
+    exclude_paths: [구글 품질 1단계 2026-11-19] 뺄 사이트 경로(접두 포함, 예 `en/findings/doc/x/`).
+    구글용 sitemap.xml 은 googlebot noindex 페이지를 빼고, IndexNow 용 sitemap-full.xml 은 비워 전부 싣는다.
     """
     pubs = sorted((b["brief"].get("publish_date", "") for b in briefs),
                   reverse=True)
@@ -6040,14 +6284,15 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         *(f"  <url><loc>{base_url}/{path}</loc>"
           + (f"<lastmod>{mod}</lastmod>" if mod else "")
           + "</url>"
-          for path, mod in (facet_paths or [])),
+          for path, mod in (facet_paths or []) if path not in exclude_paths),
         # [주간 퀴즈] 트랙 C — 상설 학습 콘텐츠라 brief publish_date 와 분리(lastmod 생략).
         f"  <url><loc>{base_url}/quiz/</loc></url>",
         # [다국어 3단계] 영어 트리 — 본문이 영어로 성립하는 면만 등록한다(EN_TREE_STATIC).
         # 경로는 렌더가 실제로 쓴 집합 그대로라(손으로 다시 적지 않는다) 페이지와 sitemap 이
         # 갈라질 수 없다. lastmod 는 비운다 — 한국어 짝과 같은 데이터라 별도 날짜가 없다.
         *(f"  <url><loc>{base_url}/{LANG_PREFIXES['en']}{p}</loc></url>"
-          for p in sorted((en_paths or set()) - EN_SITEMAP_EXCLUDED)),
+          for p in sorted((en_paths or set()) - EN_SITEMAP_EXCLUDED)
+          if f"{LANG_PREFIXES['en']}{p}" not in exclude_paths),
     ]
     for pub in pubs:
         lines.append(
@@ -7275,6 +7520,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   사후 필터(표본에서 한글만 제거)로는 표본만 고쳐지고 머리 숫자가 거짓으로 남는다.
     # 사례 → 문서 링크는 **그 트리에 있는 문서**로만 잇는다(link_doc_slugs).
     facet_paths: list[tuple[str, str]] = []
+    # [구글 품질 1단계 2026-11-19] 구글에서만 뺄 페이지의 사이트 경로(접두 포함 — sitemap 줄과 같은 꼴).
+    # 페이지의 googlebot noindex 와 **같은 판정 함수**에서 채운다 — 둘이 갈라지면 구글에 "색인하지 말라"와
+    # "색인해 달라"를 동시에 보낸다(11-09 #1429 가 그랬다). 데이터에서 파생하므로 렌더 스위치와 무관하다.
+    # sitemap.xml(구글이 읽는 것)은 이 집합을 빼고, sitemap-full.xml(IndexNow 용)은 전부 싣는다.
+    google_noindex_paths: set[str] = set()
+    google_noindex_counts: dict[str, int] = {}
+
+    def _mark_google_noindex(lang: str, path: str, kind: str) -> None:
+        google_noindex_paths.add(f"{LANG_PREFIXES[lang]}{path}")
+        ck = f"{kind}:{lang}"
+        google_noindex_counts[ck] = google_noindex_counts.get(ck, 0) + 1
 
     def emit_facet_tree(facets_data, mkpage, emit_page, tr, lang_key, link_doc_slugs):
         if not facets_data:
@@ -7884,6 +8140,21 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             "en": {c["section"]: c for c in clause_views_en},
         }
         _doc_slugs_by_lang = {DEFAULT_LANG: {d["slug"] for d in documents}, "en": en_doc_slugs}
+        # [구글 품질 1단계] 중복률은 언어마다 그 언어 본문으로 잰다(전 문서 모집단).
+        dup_ratios_by_lang = {_lg: doc_duplicate_ratios(documents, _lg)
+                              for _lg in (DEFAULT_LANG, "en")}
+        google_noindex_doc = {
+            _lg: {d["slug"] for d in documents
+                  if (_lg == DEFAULT_LANG or d["slug"] in en_doc_slugs)
+                  and google_noindex_doc_page(d, _lg, dup_ratios_by_lang[_lg])}
+            for _lg in (DEFAULT_LANG, "en")}
+        for _lg, _slugs in google_noindex_doc.items():
+            for d in documents:
+                if d["slug"] not in _slugs:
+                    continue
+                _mark_google_noindex(
+                    _lg, f"findings/doc/{d['slug']}/",
+                    "doc_thin" if is_thin_doc_page(d, _lg) else "doc_dup")
 
         for doc in documents:
             # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
@@ -7963,7 +8234,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          (_tr("문서로 찾기"), "findings/docs/")),
                         (doc["firm_name"], "")]),
                     doc=_doc, agency_labels=_labels,
-                    thin_page=is_thin_doc_page(doc, _lg),
+                    google_noindex=doc["slug"] in google_noindex_doc[_lg],
                     source_label=doc_source_label(doc),
                     # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                     # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
@@ -8007,6 +8278,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for fp in firm_pages:
             facet_paths.append((page(f"findings/firm/{fp['slug']}/").site_path,
                                 fp["last_seen"]))
+        # [구글 품질 1단계] 얇은 업체(규칙 C) — 페이지 메타와 같은 술어(is_thin_firm_page).
+        for _lg, _fps in ((DEFAULT_LANG, firm_pages), ("en", en_firm_pages)):
+            for fp in _fps:
+                if is_thin_firm_page(fp, _lg):
+                    _mark_google_noindex(_lg, f"findings/firm/{fp['slug']}/", "firm_thin")
         # [수입경보 1단계 2026-11-10] 업체 페이지 상단 표시. 매칭은 **업체 정본 키의 전체 문서
         # 표기명**으로 한 번만 한다(영어판도 같은 결과 — 언어 트리가 매칭을 바꾸면 안 된다).
         # 스냅샷이 없으면 빈 dict → 표시 없음(빌드 계속).
@@ -8062,7 +8338,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
                              (_tr("업체"), "findings/firm/"), (fp["name"], "")]),
                          firm=_fp, agency_labels=agency_labels_by_lang[_lg],
-                         thin_page=is_thin_firm_page(fp, _lg),
+                         google_noindex=is_thin_firm_page(fp, _lg),
                          similar_firms=firm_similar_view(
                              fp["documents"], similar_by_doc, docs_by_id, _lg,
                              _doc_slugs_by_lang.get(_lg), _canonical_firm_key,
@@ -8189,6 +8465,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for _d, _c in clause_text_page.pages(_ctv):
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
+                _ct_gni = clause_text_page.google_noindex_reason(_d, _c, _lg)
                 _em("clause_text.html", _cp,
                     page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
                     nav_active="findings",
@@ -8200,9 +8477,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     cases_href=(f"findings/clause/{clause_slug(_sec)}/"
                                 if _sec and clause_slug(_sec) in _ct_cases else ""),
                     terms=_ct_terms.get(_c["href"]) or [],
+                    google_noindex=bool(_ct_gni),
                 )
         for _path in sorted(clause_text_page.tree_paths(clause_text_view)):
             facet_paths.append((page(_path).site_path, ""))
+    # [구글 품질 1단계] 조항 D·E — sitemap 제외 집합은 렌더 루프 밖에서 같은 술어로 채운다
+    # (영문 트리 경로는 en_paths 로 sitemap 에 들어가므로 언어마다 따로 센다).
+    for _lg in (DEFAULT_LANG, "en"):
+        for _d, _c in clause_text_page.pages(clause_text_views[_lg]):
+            _why = clause_text_page.google_noindex_reason(_d, _c, _lg)
+            if _why:
+                _mark_google_noindex(_lg, _c["href"], f"clause_{_why}")
 
     # [해외 지적 사례 전체 2026-11-10] 기관별 전체 목록(전 행 서버 렌더 — 필터는 인라인 스크립트가 숨길 뿐)
     # + MHRA 조항 집계표. ko·en 같은 함수, 본문은 원문(영어) 그대로.
@@ -8438,6 +8723,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         card_views = [_card_view(c, tr, lang, doc_url_index, en_paths, anatomy_slugs)
                       for c in cards_sorted]
         _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
+        _annotate_firm_groups(card_views, cards_sorted, tr)  # 업체 그룹 묶음·옛 실사 표시
         sections = _build_sections(card_views, tr)
         ctx = _brief_context(b, issue_no, tr)
         # [브리프 자료실 스트립] 이 브리프가 커버하는 주간(window)에 실제로 든 자료실
@@ -8490,6 +8776,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             en_card_views = [_card_view(c, en_tr, "en", doc_url_index, en_paths)
                              for c in cards_sorted]
             _annotate_toc_distinguishers(en_card_views)
+            _annotate_firm_groups(en_card_views, cards_sorted, en_tr)
             en_brief_page = en_page(f"briefs/{pub}/")
             if brief_term_index_by_lang:
                 _en_sel = select_brief_term_links(
@@ -8758,13 +9045,25 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
            build_llms_txt(briefs, glossary_term_ids=glossary_term_ids, en_paths=en_paths,
                           facet_paths=facet_paths))
     written.append("llms.txt")
+    # [구글 품질 1단계 2026-11-19] sitemap 두 벌.
+    #   · sitemap.xml      — 구글용(GSC·robots.txt 가 가리키는 것). googlebot noindex 페이지를 뺀다 —
+    #     noindex 와 "색인해 달라"를 동시에 보내지 않는다.
+    #   · sitemap-full.xml — 전체 목록. IndexNow(네이버·빙) 증분 제출이 이것끼리 비교한다. robots.txt 에는
+    #     싣지 않는다 — Sitemap 줄은 모든 크롤러가 읽어 구글에도 다시 noindex 페이지를 내밀게 된다.
+    #     네이버·빙 계정에 추가 등록할지는 사람이 정한다(외부 계정 변경).
     _write(out_dir / "sitemap.xml",
            build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids,
-                             facet_paths=facet_paths, en_paths=en_paths))
+                             facet_paths=facet_paths, en_paths=en_paths,
+                             exclude_paths=google_noindex_paths))
     written.append("sitemap.xml")
+    _write(out_dir / SITEMAP_FULL_NAME,
+           build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids,
+                             facet_paths=facet_paths, en_paths=en_paths))
+    written.append(SITEMAP_FULL_NAME)
 
     return {"out_dir": str(out_dir), "written": written,
-            "briefs": len(briefs), "latest": latest_slug}
+            "briefs": len(briefs), "latest": latest_slug,
+            "google_noindex": dict(sorted(google_noindex_counts.items()))}
 
 
 class Fda483ObservationValidationError(ValueError):

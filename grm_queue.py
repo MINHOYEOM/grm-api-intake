@@ -21,7 +21,10 @@
     error      status_hint=Error (카드가 실렸어도 Error 가 우선)
     processed  발행본에 카드로 실림(병합 멤버는 대표를 따른다)
     deferred   델타의 `deferred` 목록에 있음 → 다음 handoff 에 다시 들어간다
-    skipped    그 밖 — 사유: out_of_scope_483 · tier1 · watch · carded_not_published · not_carded
+    new        사유 not_carded — handoff 에 올랐지만 카드가 되지 않았고 따로 닫을 사유도 없음.
+               열린 채 두어 다음 주 handoff 후보로 다시 올린다(수집일 창 N일 안에서만). 노션에서 Status 를
+               바꾸지 않아 `New` 로 남던 것과 같은 동작(2026-11-19 대표 결정 — 11-16 호 483 2건)
+    skipped    그 밖 — 사유: out_of_scope_483 · tier1 · watch · carded_not_published
 """
 from __future__ import annotations
 
@@ -83,6 +86,27 @@ def past_publish_freeze(generated_at: Any) -> bool:
     """이 실행 시각이 발행 요일 동결 시각(07:00 KST)을 지났나. 시각을 못 읽으면 지난 것으로 본다(안전한 쪽)."""
     kst = to_kst(generated_at)
     return kst is None or kst.hour >= PUBLISH_DAY_FREEZE_HOUR_KST
+
+
+def past_publish_freeze_at_write(handoff_date: str, now: "datetime | None" = None) -> bool:
+    """**쓰기 직전의 실제 시각**이 그 handoff 날짜의 동결 시각(07:00 KST)을 지났나.
+
+    `generated_at` 은 수집 실행의 **시작** 시각이다. 06:4x 에 시작해 07:0x 에 끝나는 실행은 시작 시각으로만 보면
+    동결 전이라 handoff 를 다시 쓰고, 데스크가 07:20 에 읽은 사본의 지문이 바뀐다(→ 보류 → 백업 발행).
+    노션 길(`grm_handoff.publish_day_handoff_frozen`)과 같은 산식: 같은 날 07:00 이후 또는 다음 날(자정을 넘긴 실행)이면 동결.
+    `now` 는 시험용(기본 = 지금). naive 는 KST 로 본다. 날짜를 못 읽으면 False(시작 시각 판정에 맡긴다).
+    """
+    try:
+        day = date.fromisoformat(str(handoff_date)[:10])
+    except ValueError:
+        return False
+    now_k = to_kst(now if now is not None else datetime.now(KST))
+    if now_k is None:
+        return True
+    days = (now_k.date() - day).days
+    if days == 1:
+        return True
+    return days == 0 and now_k.hour >= PUBLISH_DAY_FREEZE_HOUR_KST
 
 
 def is_publish_day(handoff_date: str) -> bool:
@@ -405,7 +429,9 @@ def compute_states(manifest: list[dict[str, Any]], delta: dict[str, Any],
             return STATE_SKIPPED, "tier1"
         if row.get("section") == "watch":
             return STATE_SKIPPED, "watch"
-        return STATE_SKIPPED, "not_carded"
+        # 카드가 안 된 행은 닫지 않는다 — 다음 주 후보로 다시 올린다(노션의 'Status 미변경 = New' 와 같다).
+        # 창(window_days) 밖으로 나가면 후보에서 저절로 빠진다.
+        return STATE_NEW, "not_carded"
 
     by_key = {row_key(r.get("source", ""), r.get("document_id", "")): r for r in manifest}
     out: dict[str, dict[str, str]] = {}
@@ -1118,7 +1144,7 @@ def build_db_handoff(store: QueueStore, run_date: date, window_days: int,
 
 
 def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
-                   generated_at: datetime) -> dict[str, Any]:
+                   generated_at: datetime, *, freeze_now: "datetime | None" = None) -> dict[str, Any]:
     """오늘 handoff 를 표에 남기고(open), 이전 open 을 stale 로 닫는다.
 
     **이미 닫힌 날짜는 다시 쓰지 않는다(동결).** 월요일 델타가 main 에 들어와 consumed 가 된 뒤
@@ -1132,7 +1158,11 @@ def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
     if existing is not None and existing.get("status") != HANDOFF_OPEN:
         return {"staled": 0, "frozen": str(existing.get("status") or "")}
     if (existing is not None and is_publish_day(handoff_date)
-            and past_publish_freeze(generated_at) and not handoff_refresh_requested()):
+            and (past_publish_freeze(generated_at)
+                 or past_publish_freeze_at_write(handoff_date, freeze_now))
+            and not handoff_refresh_requested()):
+        # 판정 시각은 **지금(쓰기 직전)** 이다 — 실행 시작 시각(generated_at)만 보면 06:4x 시작·07:0x 종료 실행이
+        # 동결 뒤에 다시 쓴다(2026-11-20 감사). 시작 시각이 이미 07:00 뒤면 그것으로도 동결(종전 그대로).
         # 발행 요일(월)의 handoff 는 **07:00 KST 부터 동결**된다. 편집팀은 07:20 부터 이 기록의 사본을 읽고 일한다.
         # 그 뒤 같은 날 수집을 다시 돌려 행 목록을 바꾸면, 편집팀이 못 본 행이 그 호의 '미채택'으로 닫힌다.
         # 재실행의 새 행은 대기열에 new 로 남아 화요일 handoff 에 들어간다.
@@ -1203,7 +1233,8 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
                silent_sources: Iterable[str] = (), repo_root: str = ".",
                out_dir: "str | None" = None, store: "QueueStore | None" = None,
                canonical: bool = False,
-               canonical_web_brief_dir: "str | None" = None) -> dict[str, Any]:
+               canonical_web_brief_dir: "str | None" = None,
+               freeze_now: "datetime | None" = None) -> dict[str, Any]:
     """그림자 한 바퀴: 넣기 → 상태 다시 계산 → DB handoff → 노션 것과 비교 → 파일로 남기기.
 
     `notion_status_lookup(handoff_date, keys)` 를 주면 최근 consumed 호의 계산 상태를 노션 Status 와
@@ -1272,7 +1303,7 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
                 (run_date - timedelta(days=RECONCILE_LOOKBACK_DAYS)).isoformat())
                 if h.get("status") == HANDOFF_OPEN
                 and str(h.get("handoff_date") or "") != run_date.isoformat()]
-        recorded = record_handoff(store, payload, window_days, generated_at)
+        recorded = record_handoff(store, payload, window_days, generated_at, freeze_now=freeze_now)
         report["staled"] = recorded["staled"]
         report["handoff_frozen"] = recorded["frozen"]
         _write(os.path.join(out_dir, handoff_file_name(run_date, recorded["frozen"])),

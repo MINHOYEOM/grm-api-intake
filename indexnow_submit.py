@@ -7,8 +7,14 @@
 `/{INDEXNOW_KEY}.txt` 를 dist 루트에 내보낸다).
 
 사용:
-  python indexnow_submit.py --sitemap web/dist/sitemap.xml --previous prev_sitemap.xml
-  python indexnow_submit.py --sitemap web/dist/sitemap.xml --all      # 첫 전수 제출
+  python indexnow_submit.py --sitemap web/dist/sitemap-full.xml --previous prev_sitemap_full.xml
+  python indexnow_submit.py --sitemap web/dist/sitemap-full.xml --all      # 첫 전수 제출
+
+[구글 품질 1단계 2026-11-19] 비교 대상은 **전체 목록 `sitemap-full.xml`** 이다. `sitemap.xml` 은 이제
+구글용이라 googlebot noindex 페이지(약 6천 장)가 빠져 있다 — 그걸로 비교하면 네이버·빙이 그 페이지를
+새로 받지 못하고, 둘을 섞어 비교하면(이전=구글용·지금=전체) 빠진 몫 전부가 "새 URL"로 대량 재제출된다.
+그래서 증분 제출에는 상한(--max-urls, 기본 MAX_INCREMENTAL)을 두고, 넘으면 아무것도 보내지 않는다
+(빙의 대량 제출 자제 권고). 정말 전수가 필요하면 사람이 --all 로 돌린다.
 
 --previous 가 있으면 새 URL 또는 `<lastmod>` 가 바뀐 URL 만 보낸다. 제출 실패(4xx/5xx·네트워크)는
 배포를 막지 않도록 경고만 남기고 exit 0 (`--strict` 일 때만 exit 1).
@@ -32,6 +38,9 @@ BATCH_SIZE = 10000
 TIMEOUT = 30
 RETRIES = 2
 OK_STATUS = (200, 202)
+#: 증분 제출 1회 상한. 평시 증분은 수십~수백 건이고, 가장 큰 정상 증분(11-16 조항 원문 신설)이 약 2,900건
+#: 이었다. 구글용·전체 sitemap 을 섞어 비교하는 사고는 약 6천 건이라 이 선에서 막힌다.
+MAX_INCREMENTAL = 5000
 
 
 def parse_sitemap(text: str) -> dict[str, str]:
@@ -125,6 +134,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--endpoint", action="append", help="엔드포인트(여러 번 가능, 기본 네이버+빙)")
     ap.add_argument("--dry-run", action="store_true", help="대상 수만 출력하고 전송 안 함")
     ap.add_argument("--strict", action="store_true", help="실패 시 exit 1")
+    ap.add_argument("--max-urls", type=int, default=MAX_INCREMENTAL,
+                    help="증분 제출 상한 — 넘으면 보내지 않는다(--all 에는 적용 안 함)")
     args = ap.parse_args(argv)
 
     current = parse_sitemap(_read(args.sitemap))
@@ -141,6 +152,10 @@ def main(argv: list[str] | None = None) -> int:
 
     urls = diff_urls(current, previous)
     print(f"IndexNow: sitemap {len(current)}건 중 제출 대상 {len(urls)}건")
+    if previous is not None and len(urls) > args.max_urls:
+        print(f"::warning::증분 {len(urls)}건이 상한 {args.max_urls}건을 넘어 제출하지 않음 — "
+              "비교 대상 sitemap 이 서로 다른 목록인지 확인(전수는 grm-indexnow-full.yml)")
+        return 1 if args.strict else 0
     if not urls or args.dry_run:
         return 0
     result = submit(urls, tuple(args.endpoint) if args.endpoint else ENDPOINTS)

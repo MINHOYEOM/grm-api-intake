@@ -42,6 +42,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from difflib import SequenceMatcher
 import shutil
 import subprocess
 import time
@@ -1760,7 +1761,9 @@ _INSPECTOR_TITLES = (
 )
 # 이름 토큰 1개: 대문자 시작 + [a-zA-Z'-] 연속 + 마침표 0~1개(중간이니셜 `F.`). 길이 상한은
 # 느슨히 두고(백트래킹 폭주 방지) 정밀 검사는 `_valid_inspector_name`이 담당한다.
-_INSPECTOR_TOKEN_RE = r"[A-Z][a-zA-Z'\-]{0,24}\.?"
+# [2026-11-23] 하이픈은 뒤에 글자가 올 때만 토큰에 넣는다 — `Sran- Investigator` 처럼 이름 끝에 붙은
+# 구분 하이픈을 토큰이 삼키면 뒤 구분자 판정이 어긋났다(Wilimczyk-Macri 같은 겹성은 그대로).
+_INSPECTOR_TOKEN_RE = r"[A-Z](?:[a-zA-Z']|-(?=[A-Za-z])){0,24}\.?"
 # 쉼표 앞의 "대문자 시작 토큰" 연속 구간(run) — 토큰 사이는 스페이스 1개(개행/파이프 등
 # 다른 구분자가 끼면 그 자리에서 매칭이 끊긴다 — "SEE REVERSE| Jose…"의 `|`처럼 서식 잡음이
 # 이름을 오염시키지 못하게 막는 부수 효과가 있다).
@@ -1781,8 +1784,62 @@ _INSPECTOR_TITLE_ALT = "|".join(re.escape(t) for t in _INSPECTOR_TITLES)
 # 검증을 통과해야 하고, 교차 확증 (a)/(b)도 그대로 요구된다. `[ \t]*` 로 좁혀 개행은 넘지
 # 않는다(다른 줄의 토큰이 이름으로 붙는 것을 막는다).
 _INSPECTOR_CANDIDATE_RE = re.compile(
-    rf"(?P<run>{_INSPECTOR_RUN_RE})[ \t]*,[ \t\r\n]*(?P<title>{_INSPECTOR_TITLE_ALT})\b"
+    rf"(?<![A-Za-z'\-])(?P<run>{_INSPECTOR_RUN_RE})[ \t]*,[ \t\r\n]*(?P<title>{_INSPECTOR_TITLE_ALT})\b"
 )
+# ── [2026-11-23] 서명란 형식 확장 — 저장 전문 163행 실측(GRM 수집완전성 점검 11-22, 9-3 R4) ──
+# 서명란이 있는데 이름을 못 뽑던 형식들. 직함 목록(`_INSPECTOR_TITLES`)은 상세 청소(`_SIGNER_TITLES`)가
+# 함께 쓰므로 건드리지 않고, **추출 전용** 직함 패턴을 따로 둔다(직함 텍스트는 저장하지 않는다).
+#   · 약칭·수식어: `Margaret M Annes, cso` · `Xiuju Lu, Lead CSO` · `Nicole Li, Lead Consumer Safety Officer`
+#     · `Pratik S. Upadhyay, DDC Investigator` · `Steven A. Brettler, GDUFA- Investigator`
+#     · `Wayne Seifert, Senior Regulatory Specialist` · `Athena Russell,\nStaff Fellow`
+#   · OCR 로 깨진 직함: `Megan T Ziegler, I nvestigat or`
+#   · 구분자: 쉼표 외에 ` - `(`Rowena S. Nguyen - Investigator`) · `/`(`Paula A. Trost/Investigator`)
+#     · OCR 이 쉼표를 마침표로 읽은 꼴(`Prabhu P Raju. Investigator`)
+#   · 학위가 끼는 꼴: `Liqun Zhao, Ph.D., Pharmaceutical Scientist` · `Hung H. Do, M.Sc., Investigator`
+_INSPECTOR_TITLE_EXT_RX = (
+    r"(?:(?:Lead|Senior|Sr\.?|Supervisory|Drug|DDC|ORA|GDUFA)[ \t=\-]*)*"
+    r"(?:Investigator|INVESTIGATOR|I[ ]?nvest[ ]?igat[ ]?o[ ]?r|Inspector|Consumer[ \t\r\n]+Safety"
+    r"|(?i:cso)|Microbiologist|Biologist|Chemist|Analyst|FDA[ \t]+Center[ \t]+Employee"
+    r"|Staff[ \t\r\n]+[Ff]ellow|Biological[ \t\r\n]+Reviewer|Pharmaceutical[ \t\r\n]+(?:Scientist|Quality)"
+    r"|Regulatory[ \t\r\n]+Specialist|Pharmacokineticist|Pharmacologist|Branch[ \t]+Chief"
+    r"|Medical[ \t]+Officer|(?:Team|Inspection)[ \t]+Lead)\b"
+)
+# 학위 — 이름 바로 뒤 쉼표 다음에 오는 학위는 그 자리가 사람 이름이라는 강한 증거다.
+# 박사급(STRONG)은 직함이 쪽 끝에서 잘려도(`Madushini Dharmasena, Ph.D.,` + 줄바꿈) 이름으로 받는다.
+_INSPECTOR_STRONG_DEGREE_RX = r"(?:Ph\.?[ ]?[D0O]\.?|PhD|Pharm\.?[ ]?D\.?|PharmD|DHSc\.?)"
+_INSPECTOR_DEGREE_RX = (
+    rf"(?:{_INSPECTOR_STRONG_DEGREE_RX}|M\.?Sc\.?|MS/OSH|M\.?S\.?|MPH|RN|MBA|DVM)"
+)
+# 이름 뒤 구분자: 쉼표 · 공백-하이픈 · 하이픈-공백 · 슬래시 · (2글자 이상 토큰 끝 마침표 뒤) 공백.
+_INSPECTOR_SEP_RX = (
+    r"(?:[ \t]*,[ \t\r\n]*|[ \t]+-[ \t\r\n]*|-[ \t]+|[ \t]*/[ \t]*|(?<=[a-z]{2}\.)[ \t]+)"
+)
+_INSPECTOR_DEGREE_SEQ_RX = rf"(?:{_INSPECTOR_DEGREE_RX}[ \t]*[,.\-]*[ \t\r\n]*)*"
+_INSPECTOR_EXT_CANDIDATE_RE = re.compile(
+    rf"(?<![A-Za-z'\-])(?P<run>{_INSPECTOR_RUN_RE}){_INSPECTOR_SEP_RX}"
+    rf"(?:{_INSPECTOR_DEGREE_SEQ_RX}(?P<title>{_INSPECTOR_TITLE_EXT_RX})"
+    rf"|(?P<degree>{_INSPECTOR_STRONG_DEGREE_RX})(?=[\s,.\-]))"
+)
+# 전자 483 양식 — `SEE REVERSE | Robert J.\nHam,\nInvestigator`. 서명 칸 머리말 바로 뒤라 이름이
+# 줄바꿈으로 갈라져도 받는다(토큰 사이 공백 한 칸 대신 공백 문자 하나 — 개행 포함).
+_INSPECTOR_EFORM_RE = re.compile(
+    r"(?:SEE[ \t]*REVERSE|OF[ \t]+THIS[ \t]+PAGE)\s*\|+\}?\s*"
+    rf"(?P<run>{_INSPECTOR_TOKEN_RE}(?:\s{_INSPECTOR_TOKEN_RE}){{1,4}})[ \t]*,\s*"
+    rf"(?P<title>{_INSPECTOR_TITLE_EXT_RX})"
+)
+# 전자서명(PIV) 줄 — `Melissa D. Ray -S` · `WAYNE MCGRATH -S`. 대문자 이름도 받되 저장은 원문 그대로.
+# 공백 + `-S` 만 받는다(`Dharmasena-S`·`Brettier-s` 처럼 붙거나 소문자인 OCR 꼴은 받지 않는다).
+_INSPECTOR_PIV_TOKEN_RE = r"(?:[A-Z](?:[a-zA-Z']|-(?=[A-Za-z])){0,24}\.?)"
+_INSPECTOR_PIV_RE = re.compile(
+    rf"(?<![A-Za-z'\-])(?P<run>{_INSPECTOR_PIV_TOKEN_RE}(?: {_INSPECTOR_PIV_TOKEN_RE}){{1,7}})"
+    r"[ \t]+-S(?![A-Za-z])"
+)
+_INSPECTOR_PIV_CONTEXT_RE = re.compile(r"Digitally|signed by|SIGNATURE|DATE\s+ISSUED|SEE\s+REVERSE")
+_INSPECTOR_PIV_CONTEXT_WINDOW = 160
+# 서명란 판정(남는 행 사유 분류용) — 보고서 9-3 의 정의 그대로.
+_SIGNATURE_BLOCK_RE = re.compile(r"EMPLOYEE\(S\) SIGNATURE|Investigator")
+# 원문 가림 — `(b)(6)`(개인정보) 가 서명란 근처에 있으면 이름이 가려진 것이다. 이름으로 바꾸지 않는다.
+_INSPECTOR_REDACTION_RE = re.compile(r"\(\s*b\s*\)\s*\(\s*6\s*\)|Redacted\s*B6", re.I)
 # 교차 확증 (a) — 직함 뒤 60자 이내 날짜. [2026-07-30 교정 확인] 서명블록 두 번째 이후
 # 서명자는 날짜가 OCR 로 깨지는 경우(`0227-2026`·`0417-2026` — 슬래시 없음)가 실측에서
 # 흔하다. 여기서 패턴을 넓히지 않는다 — 넓히면 산문 오탐이 늘어난다. 이런 경우는 (b)
@@ -1832,6 +1889,18 @@ _INSPECTOR_FORM_VOCAB = {
     "SEE", "REVERSE", "PAGE", "FORM", "DATE", "ISSUED", "EMPLOYEE", "SIGNATURE",
     "THIS", "AND", "THE", "OF", "FDA", "AMENDMENT", "REPORT", "FIRM", "NAME",
     "TITLE", "ADDRESS",
+    # [2026-11-23] 전자서명 줄·가림 표시·직함 단어가 이름 자리에 끼는 것을 막는다.
+    "DIGITALLY", "SIGNED", "BY", "REDACTED", "DISTRICT", "OFFICE", "INVESTIGATOR",
+    "INSPECTOR", "CSO", "PREVIOUS", "EDITION", "OBSOLETE", "INSPECTIONAL", "OBSERVATIONS",
+    # 직함 낱말 — `Thomas Finn, Team Lead, Microbiologist` 에서 `Team Lead` 가 이름으로 저장돼 있었다
+    # (fda483-195531 실측). 첫 글자만 대문자여도 끝 토큰이 아니면 거부된다(`_valid_inspector_name`).
+    "TEAM", "LEAD", "INSPECTION", "COMPLIANCE", "CONSUMER", "SAFETY", "SUPERVISORY", "SENIOR",
+    "STAFF", "FELLOW", "REVIEWER", "SPECIALIST", "REGULATORY", "PHARMACEUTICAL", "BIOLOGICAL",
+    "OFFICER", "BRANCH", "CHIEF", "SCIENTIST", "QUALITY",
+    # 직함 둘째 줄 — `Lata C. Mathew, PhD⏎Preapproval Manager/ Investigator`(fda483-196378 실측).
+    "MANAGER", "PREAPPROVAL", "DIRECTOR", "PRESIDENT", "HEAD", "PROGRAM", "COORDINATOR",
+    "ASSOCIATE", "ASSISTANT", "DEPUTY", "ACTING", "SUPERVISOR", "ANALYST", "CHEMIST",
+    "MICROBIOLOGIST", "BIOLOGIST",
 }
 
 
@@ -1922,14 +1991,17 @@ def _dedupe_inspector_names(names: list[str]) -> list[str]:
     return out
 
 
-def _valid_inspector_name(name: str) -> bool:
+def _valid_inspector_name(name: str, *, allow_caps: bool = False, max_tokens: int = 4) -> bool:
     """이름 문법 검증(순수 함수) — 토큰 2~4개·토큰당 ≤20자·전체 4~60자·양식 어휘 제외.
 
     정규식(`_INSPECTOR_NAME_RE`)이 이미 대부분 걸러내지만, 여기서 다시 명시적으로 검사해
     거부 조건을 코드로 auditable 하게 남긴다(숫자·기호 오염은 애초에 정규식 문법이 막고,
-    여기서는 길이 상한·양식 어휘까지 마저 확인)."""
+    여기서는 길이 상한·양식 어휘까지 마저 확인).
+
+    `allow_caps` — 전자서명 줄(`WAYNE MCGRATH -S`)처럼 **이름 전체가** 대문자인 경우만 받는다
+    (대문자·소문자가 섞인 `Charles Y. KUO` 는 OCR 혼동으로 보고 거부)."""
     tokens = name.split(" ")
-    if not (2 <= len(tokens) <= 4):
+    if not (2 <= len(tokens) <= max_tokens):
         return False
     if not (4 <= len(name) <= 60):
         return False
@@ -1938,18 +2010,215 @@ def _valid_inspector_name(name: str) -> bool:
     # 조각은 식별에 쓸모가 없을뿐더러 같은 사람을 중복 표시하게 만든다.
     if len(tokens[0].rstrip(".")) < 2:
         return False
-    for tok in tokens:
+    # [2026-11-23] 끝 토큰이 홑이니셜이면 성이 잘린 조각이다(`John M.`).
+    if len(tokens[-1].rstrip(".")) < 2:
+        return False
+    all_caps = all(t.rstrip(".").isupper() for t in tokens)
+    if all_caps and not allow_caps:
+        return False
+    for i, tok in enumerate(tokens):
         if len(tok) > 20 or not re.fullmatch(r"[A-Z][a-zA-Z'\-]*\.?", tok):
             return False
-        if tok.rstrip(".").upper() in _INSPECTOR_FORM_VOCAB:
+        core = tok.rstrip(".")
+        # [2026-11-23] 마침표는 이니셜(한 글자) 뒤에만 — `Grieg. Margaret M. Annes` 처럼 앞줄 낱말이
+        # 마침표째 이름에 붙는 OCR 꼴을 막는다.
+        if tok.endswith(".") and len(core) != 1:
             return False
+        # 양식 어휘 — 대문자로 적힌 양식 낱말은 어디서든 거부. 첫 글자만 대문자인 낱말은 성(끝 토큰)
+        # 자리일 때만 허용한다(`Jackson Y See` 의 See 는 성이다 — 종전엔 SEE 로 보고 버렸다).
+        if core.upper() in _INSPECTOR_FORM_VOCAB:
+            if core.isupper() or i != len(tokens) - 1:
+                return False
+        if all_caps:
+            continue                              # 전부 대문자인 전자서명 이름 — 형태 검사 대상 아님
         if not _inspector_token_shape_ok(tok):   # 게이트① OCR 대소문자 혼동
             return False
     return True
 
 
+def _inspector_name_in_text(name: str, text: str) -> bool:
+    """안전장치 — 이름이 그 문서 전문 안에 **글자 그대로** 있는가.
+
+    토큰은 철자·대소문자·마침표까지 원문과 같아야 하고, 토큰 사이만 공백 문자(띄어쓰기·줄바꿈)
+    차이를 허용한다(서명 칸에서 이름이 줄바꿈으로 갈라진 `Robert J.\\nHam` 을 위해서). 앞뒤는 글자
+    경계여야 한다(`Shafigq` 안의 `Shafig` 는 일치로 보지 않는다).
+    이 검사를 통과하지 못한 이름은 어떤 경로로 만들어졌든 내보내지 않는다 — 다른 문서·프로파일에서
+    빌려오거나 철자를 고쳐 쓰는 경로가 생겨도 여기서 막힌다."""
+    toks = [t for t in (name or "").split(" ") if t]
+    if not toks or not text:
+        return False
+    rx = r"(?<![A-Za-z])" + r"\s+".join(re.escape(t) for t in toks) + r"(?![A-Za-z])"
+    return re.search(rx, text) is not None
+
+
+def _same_person_middle_initial(a: str, b: str) -> bool:
+    """같은 문서에서 가운데 이니셜만 있고 없는 두 표기(`Madushini Dharmasena` ↔
+    `Madushini N. Dharmasena`)인가 — 첫·끝 토큰이 같고 남는 토큰이 전부 홑이니셜."""
+    ka, kb = _inspector_key(a).split(" "), _inspector_key(b).split(" ")
+    if len(ka) == len(kb) or ka[0] != kb[0] or ka[-1] != kb[-1]:
+        return False
+    longer, shorter = (ka, kb) if len(ka) > len(kb) else (kb, ka)
+    extra = list(longer[1:-1])
+    for t in shorter[1:-1]:
+        if t in extra:
+            extra.remove(t)
+        else:
+            return False
+    return all(len(t) == 1 for t in extra)
+
+
+def _same_person_initial_vs_middle(a: str, b: str) -> bool:
+    """`Thuy Thanh Nguyen` ↔ `Thuy T. Nguyen` — 토큰 수가 같고, 다른 자리는 한쪽이 홑이니셜이며
+    다른 쪽 낱말이 그 글자로 시작할 때만. 둘 다 원문 그대로이고, 남기는 쪽은 먼저 나온 표기다."""
+    ka, kb = _inspector_key(a).split(" "), _inspector_key(b).split(" ")
+    if len(ka) != len(kb) or len(ka) < 3 or ka[0] != kb[0] or ka[-1] != kb[-1]:
+        return False
+    diff = [(x, y) for x, y in zip(ka[1:-1], kb[1:-1]) if x != y]
+    return bool(diff) and all(
+        (len(x) == 1 and y.startswith(x)) or (len(y) == 1 and x.startswith(y)) for x, y in diff)
+
+
+def _same_person_hyphen_given(a: str, b: str) -> bool:
+    """`Bao-Ngoc Nguyen` ↔ `Bao Nguyen` — 나머지 토큰이 같고 첫 토큰 하나가 다른 쪽 겹이름의 앞부분."""
+    ka, kb = _inspector_key(a).split(" "), _inspector_key(b).split(" ")
+    if len(ka) != len(kb) or ka[1:] != kb[1:] or ka[0] == kb[0]:
+        return False
+    return ka[0].split("-")[0] == kb[0] or kb[0].split("-")[0] == ka[0]
+
+
+# 실사관 추출 사유 코드 — 빈칸으로 남는 행이 왜 비었는지(사람 확인 대상 분류용).
+INSPECTORS_OK = "ok"
+INSPECTORS_NO_TEXT = "no-text"                      # 전문이 없다
+INSPECTORS_NO_SIGNATURE = "no-signature-block"      # 전문에 서명란(EMPLOYEE(S) SIGNATURE·Investigator)이 없다
+INSPECTORS_REDACTED = "redacted"                    # 서명란은 있으나 이름이 (b)(6) 로 가려졌다
+INSPECTORS_OCR_CONFLICT = "ocr-spelling-conflict"   # 같은 사람이 두 철자로 읽혔다 — 어느 쪽인지 모른다
+INSPECTORS_PARSER_LIMIT = "parser-limit"            # 서명란은 있으나 이름 형식을 못 읽었다(OCR 훼손 등)
+
+
+def _inspector_confirmed(body: str, name_start: int, title_end: int) -> bool:
+    """서명블록 문맥 교차 확증 — 이름 앞 200자 안 서명 마커 또는 직함 뒤 60자 안 날짜."""
+    before = body[max(0, name_start - _INSPECTOR_MARKER_LOOKBEHIND):name_start]
+    after = body[title_end:title_end + _INSPECTOR_DATE_LOOKAHEAD]
+    return bool(_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after))
+
+
+def _inspector_strip_run(run: str) -> tuple[str, int]:
+    """run → (이름, 앞에서 벗겨낸 글자 수). 왼쪽 양식 어휘를 벗기고 끝 토큰의 마침표(이니셜 아님)를 뗀다.
+
+    토큰 사이 공백 문자(개행 포함)는 띄어쓰기 한 칸으로 모은다 — 저장 이름은 원문 토큰 그대로다."""
+    tokens = run.split()
+    offset = 0
+    rest = run
+    # 전자서명 꼬리(`Feonen-S`)가 붙은 토큰까지는 앞줄 서명 잔여물이다 — 그 뒤부터가 이름 후보.
+    glued = [i for i, t in enumerate(tokens) if t.rstrip(".").endswith("-S")]
+    drop = glued[-1] + 1 if glued else 0
+    while tokens and (drop > 0 or tokens[0].rstrip(".").upper() in _INSPECTOR_FORM_VOCAB):
+        drop = max(0, drop - 1)
+        idx = rest.find(tokens[0])
+        cut = idx + len(tokens[0])
+        while cut < len(rest) and rest[cut].isspace():
+            cut += 1
+        offset += cut
+        rest = rest[cut:]
+        tokens = tokens[1:]
+    if tokens and tokens[-1].endswith(".") and len(tokens[-1].rstrip(".")) >= 2:
+        tokens[-1] = tokens[-1].rstrip(".")      # `Raju.`(쉼표를 마침표로 읽은 OCR) → `Raju`
+    return " ".join(tokens), offset
+
+
+def _extract_483_inspectors_detail(text: str) -> tuple[list[str], str]:
+    """`_extract_483_inspectors` 의 본체 — (이름 목록, 사유 코드). 사유는 이름이 있으면 `ok`.
+
+    일일 수집·과거분 백필·OCR 복구·전문 백필·실사관 재추출 도구가 모두 이 함수(또는 이름만 돌려주는
+    `_extract_483_inspectors`)를 부른다 — 규칙을 다른 곳에 베끼지 않는다.
+    """
+    body = text or ""
+    if not body.strip():
+        return [], INSPECTORS_NO_TEXT
+    # (위치, 이름) — 서명 칸 이름(직함·학위·전자 양식) 먼저, 전자서명(PIV) 줄은 뒤에. 같은 사람의 두
+    # 표기는 앞(인쇄된 이름)이 남는다.
+    primary: list[tuple[int, str]] = []
+    for m in _INSPECTOR_EXT_CANDIDATE_RE.finditer(body):
+        name, offset = _inspector_strip_run(m.group("run"))
+        if not _valid_inspector_name(name):
+            continue
+        name_start = m.start("run") + offset
+        end = m.end("title") if m.group("title") else m.end("degree")
+        if not _inspector_confirmed(body, name_start, end):
+            continue                                   # 확증 없음 — 산문 오탐 방지
+        primary.append((name_start, name))
+    for m in _INSPECTOR_EFORM_RE.finditer(body):
+        name, offset = _inspector_strip_run(m.group("run"))
+        # 전자 양식 서명 칸은 머리말 바로 뒤라 겹성(`Milton J De Jesus Tavarez`)까지 5토큰을 받는다.
+        if not _valid_inspector_name(name, max_tokens=5):
+            continue
+        primary.append((m.start("run") + offset, name))   # 서명 칸 머리말 자체가 확증
+    primary.sort(key=lambda p: p[0])
+    piv: list[str] = []
+    for m in _INSPECTOR_PIV_RE.finditer(body):
+        name, _ = _inspector_strip_run(m.group("run"))
+        if not _valid_inspector_name(name, allow_caps=True):
+            continue
+        lo = max(0, m.start() - _INSPECTOR_PIV_CONTEXT_WINDOW)
+        if not _INSPECTOR_PIV_CONTEXT_RE.search(body, lo, m.end() + _INSPECTOR_PIV_CONTEXT_WINDOW):
+            continue
+        # 전자서명 줄은 글씨가 작아 OCR 이 앞 글자를 잘라 먹는다(실측 `MONE E. PITTS` ← SIMONE).
+        # 그래서 ①인쇄된 이름(primary)과 비슷하면 버리고(인쇄된 이름이 기준) ②같은 표기가 문서에
+        # **두 번 이상** 그대로 나올 때만 받는다 — 쪽마다 따로 읽힌 판독이 일치해야 믿는다.
+        if any(SequenceMatcher(None, _inspector_key(name), _inspector_key(p)).ratio()
+               >= _INSPECTOR_NEAR_DUP_RATIO for _, p in primary):
+            continue
+        if len(re.findall(r"(?<![A-Za-z])" + re.escape(m.group("run")) + r"[ \t]+-S(?![A-Za-z])",
+                          body)) < 2:
+            continue
+        piv.append(name)
+    out: list[str] = []
+    seen: set[str] = set()
+    for name in [n for _, n in primary] + piv:
+        key = _inspector_key(name)
+        if key in seen or any(_same_person_middle_initial(name, o)
+                              or _same_person_initial_vs_middle(name, o)
+                              or _same_person_hyphen_given(name, o) for o in out):
+            continue
+        seen.add(key)
+        out.append(name)
+        if len(out) >= _INSPECTOR_MAX_CANDIDATES:
+            break                                      # 병리적 입력 상한(중복 정리 전 원시분)
+    # 앞 낱말이 OCR 잡음인 긴 표기(`Qvrtee Margaret M. Annes`, 서명 칸 7번 중 1번)와 그 뒷부분 이름
+    # (`Margaret M. Annes`, 4번)이 함께 있으면, 서명 칸 후보로 **더 자주** 읽힌 뒷부분 이름을 남긴다.
+    # 횟수가 같으면 종전대로 긴 쪽(조각 흡수)이다.
+    cand_count: dict[str, int] = {}
+    for _, n in primary:
+        cand_count[_inspector_key(n)] = cand_count.get(_inspector_key(n), 0) + 1
+    keys = {n: _inspector_key(n).split(" ") for n in out}
+    out = [n for n in out if not any(
+        o != n and len(keys[o]) < len(keys[n]) and keys[n][-len(keys[o]):] == keys[o]
+        and cand_count.get(" ".join(keys[o]), 0) > cand_count.get(" ".join(keys[n]), 0)
+        for o in out)]
+    final = _dedupe_inspector_names(out)
+    # 안전장치 — 전문에 글자 그대로 없는 이름은 버린다(위 경로는 원문 조각만 쓰지만 계약으로 고정).
+    final = [n for n in final if _inspector_name_in_text(n, body)]
+    if final and not _inspector_names_are_consistent(final):
+        # 게이트② 문서 내 합의 — 같은 이름이 두 철자로 읽힌 문서는 통째로 버린다.
+        # (조각 흡수 **뒤에** 판정한다: 조각은 정상적으로 부분 일치하므로 먼저 걸러야
+        #  근사 중복 판정이 오작동하지 않는다. 순서가 계약이다.)
+        return [], INSPECTORS_OCR_CONFLICT
+    if final:
+        return final[:_INSPECTOR_MAX_RESULTS], INSPECTORS_OK
+    if not _SIGNATURE_BLOCK_RE.search(body):
+        return [], INSPECTORS_NO_SIGNATURE
+    if any(_INSPECTOR_REDACTION_RE.search(body, max(0, m.start() - 300), m.end() + 300)
+           for m in _INSPECTOR_MARKER_RE.finditer(body)):
+        return [], INSPECTORS_REDACTED
+    return [], INSPECTORS_PARSER_LIMIT
+
+
 def _extract_483_inspectors(text: str) -> list[str]:
     """483 PDF **원시**(청소 전) 텍스트 → 서명블록 실사관 이름 목록(등장 순서·중복 제거).
+
+    ★실사관 추출의 **유일한 공통 함수**다 — 일일 수집(`collect_fda_483`)·과거분 백필
+    (`collect_fda_backfill`)·OCR 복구(`backfill_483_ocr_recovery._rebuild_item`)·전문 백필
+    (`backfill_483_body_full`)·저장 전문 재추출(`backfill_483_inspectors_from_body`)이 모두 이것을 부른다.
 
     반드시 `_clean_observation_detail`/`_FDA483_FOOTER_RE` 로 청소하기 **전** 텍스트에서
     호출해야 한다 — 그 청소 로직은 서명블록을 지우는 것이 목적이고(발행 게이트가 그 결과에
@@ -1957,50 +2226,14 @@ def _extract_483_inspectors(text: str) -> list[str]:
 
     계약: 이름 문법(`_valid_inspector_name`)을 통과하고, 서명블록 문맥 교차 확증(직함 뒤
     60자 이내 날짜 **또는** 이름 앞 200자 이내 서명블록 마커) 중 하나라도 만족해야 채택한다.
-    확증이 없으면 형태만 맞아도 버린다 — 관찰 산문의 "Investigator <이름> noted…"는 애초에
-    어순이 반대라 이 정규식 자체가 잡지 않지만(이름이 뒤에 오면 대상 밖), 어순이 우연히
-    맞아도 확증 없이는 채택하지 않는 것이 이 함수의 정밀도 원칙이다.
+    ★돌려주는 모든 이름은 **그 text 안에 글자 그대로 있다**(`_inspector_name_in_text`) — 다른 문서·
+    실사관 프로파일에서 빌려오거나 철자를 고치지 않는다. `(b)(6)` 가림은 이름으로 만들지 않는다.
 
     최대 `_INSPECTOR_MAX_RESULTS`명. 어떤 예외도 밖으로 던지지 않는다(입력이 비정상이어도
     빈 리스트 — 이름을 지어내거나 추측 보정하지 않는다: 확신이 없으면 빈 리스트가 정답).
     """
     try:
-        body = text or ""
-        if not body.strip():
-            return []
-        out: list[str] = []
-        seen: set[str] = set()
-        for m in _INSPECTOR_CANDIDATE_RE.finditer(body):
-            tokens = m.group("run").split(" ")
-            # 왼쪽부터 양식 어휘 토큰을 벗겨낸다("SIGNATURE Christina K Theodorou" →
-            # "Christina K Theodorou") — 위 run 정규식 주석 참조. 이름 한복판/끝에 낀 양식
-            # 어휘는 여기서 안 걸러지고 `_valid_inspector_name`이 마저 거부한다.
-            offset = 0
-            while tokens and tokens[0].rstrip(".").upper() in _INSPECTOR_FORM_VOCAB:
-                offset += len(tokens[0]) + 1        # 벗겨낸 토큰 + 뒤따르는 스페이스 1개
-                tokens = tokens[1:]
-            name = " ".join(tokens)
-            if not _valid_inspector_name(name):
-                continue
-            name_start = m.start("run") + offset
-            before = body[max(0, name_start - _INSPECTOR_MARKER_LOOKBEHIND):name_start]
-            after = body[m.end("title"):m.end("title") + _INSPECTOR_DATE_LOOKAHEAD]
-            if not (_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after)):
-                continue                                   # 확증 없음 — 산문 오탐 방지
-            key = _inspector_key(name)
-            if key in seen:
-                continue
-            seen.add(key)
-            out.append(name)
-            if len(out) >= _INSPECTOR_MAX_CANDIDATES:
-                break                                  # 병리적 입력 상한(중복 정리 전 원시분)
-        final = _dedupe_inspector_names(out)
-        # 게이트② 문서 내 합의 — 같은 이름이 두 철자로 읽힌 문서는 통째로 버린다.
-        # (조각 흡수 **뒤에** 판정한다: 조각은 정상적으로 부분 일치하므로 먼저 걸러야
-        #  근사 중복 판정이 오작동하지 않는다. 순서가 계약이다.)
-        if not _inspector_names_are_consistent(final):
-            return []
-        return final[:_INSPECTOR_MAX_RESULTS]
+        return _extract_483_inspectors_detail(text)[0]
     except Exception:  # noqa: BLE001 — 어떤 실패도 이름을 지어내는 대신 빈 리스트로 degrade
         return []
 
@@ -2611,10 +2844,51 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
             if ok or (frag and m.group(1) not in headed)]
 
 
+def fda483_observation_count(
+    rows: list[dict[str, Any]], seen: list[str] | None = None,
+) -> int | None:
+    """원문 관찰 **건수**(카드 `deterministic_detail.count`·요약 "관찰사항 N건"의 근거). 순수 함수.
+
+    [2026-11-23] 건수를 `len(rows)` 로 두면 조용히 틀린다 — rows 는 **공개 가능한 표제만**
+    남긴 목록이라, 번호 표제를 찾고도 표제가 OCR 로 깨져 게이트에서 빠진 관찰은 건수에서도
+    사라진다(실측 fda483-196455: 원문 1~6, rows 2·3·4 → "관찰사항 3건"). 건수는 rows 가 아니라
+    **rows 를 만든 경로가 본 번호 표제 전체**(`seen` — `_extract_483_observations_from_text`
+    가 채운다)에서 센다.
+
+      ① `seen` 이 1..N 연속이고 rows 번호가 전부 그 안이면 → N (게이트에서 빠진 관찰 포함)
+      ② 아니면 rows 번호 자체가 1..len 연속일 때만 → len(rows) (종전 값과 같다)
+      ③ 둘 다 아니면 → **None**: 번호가 건너뛰거나(2·3·4) 중복되면 건수를 단정할 수 없다.
+         호출부는 count 를 비워 둔다(조용히 틀린 숫자를 쓰지 않는다 — rows 는 그대로 둔다).
+    """
+    def _nums(values: list[str]) -> list[int] | None:
+        out: list[int] = []
+        for v in values:
+            s = str(v or "").strip()
+            if not s.isdigit():
+                return None
+            out.append(int(s))
+        return out
+
+    row_nums = _nums([str(r.get("number", "")) for r in rows if isinstance(r, dict)])
+    if not row_nums:
+        return None
+    seen_nums = _nums(list(seen)) if seen else None
+    if seen_nums and seen_nums == list(range(1, len(seen_nums) + 1)) \
+            and all(1 <= n <= len(seen_nums) for n in row_nums):
+        return len(seen_nums)
+    if row_nums == list(range(1, len(row_nums) + 1)):
+        return len(row_nums)
+    return None
+
+
 def _extract_483_observations_from_text(
     text: str, header_hints: dict[str, str] | None = None,
+    seen: list[str] | None = None,
 ) -> list[dict[str, str]]:
     """483 PDF 텍스트층 → Observation 번호별 결정론 구조.
+
+    `seen`(선택)을 넘기면 반환 rows 를 만든 경로가 본 **번호 표제 전체**(게이트에서 빠진
+    표제 포함, 순서대로)를 채운다 — 건수는 `fda483_observation_count(rows, seen)` 로 센다.
 
     `WE OBSERVED` 이후 `OBSERVATION N` 앵커로 분할하고, 각 Observation 의 첫 문장을
     deficiency 로 둔다. 유효 deficiency 가 없거나 텍스트층 깨짐률이 높으면 [] 로 degrade.
@@ -2648,6 +2922,7 @@ def _extract_483_observations_from_text(
         hints,
         gate=_is_publishable_deficiency,
         fragment_heads=True,
+        seen=seen,
     )
     if primary:
         return primary
@@ -2656,7 +2931,7 @@ def _extract_483_observations_from_text(
     # 정상 문서 1,545개의 출력이 byte 단위로 불변임을 측정이 아니라 구조로 보장한다.
     # (예외 2026-11-13: 정상 게이트가 서식 뒷면 안내문 표제를 거르므로, 안내문 행만 내던 문서는
     #  여기로 넘어온다 — _is_publishable_deficiency 참고.)
-    return _recover_483_observations(body, m, hints)
+    return _recover_483_observations(body, m, hints, seen=seen)
 
 
 def _with_glyph_first_anchor(body: str, anchors: list[re.Match[str]]) -> list[re.Match[str]]:
@@ -2717,6 +2992,7 @@ def _observations_from_anchors(
     hints: dict[str, str],
     gate: Callable[[str], bool],
     fragment_heads: bool = False,
+    seen: list[str] | None = None,
 ) -> list[dict[str, str]]:
     """앵커 목록 → Observation rows. 앵커 찾기(finder)와 표제 통과 기준(gate)만 갈아끼운다
     — 정상 경로와 회수 경로가 **같은 조립 코드**를 쓰게 해 둘이 갈라지지 않도록 한다.
@@ -2724,11 +3000,16 @@ def _observations_from_anchors(
     `fragment_heads`(`_select_observation_anchors` 를 쓰는 경로만 켠다): 표제가 조각(".")이라
     gate 에서 버려질 행만, 조각 머리를 건너뛴 문장(`_split_past_fragment_head`)으로 다시 본다.
     gate 를 통과하던 행은 이 분기에 닿지 않으므로 종전 출력이 그대로다. 회수 경로(②~⑤)는
-    앵커에 상호참조 거름(①~③·고아 번호)이 없어 켜지 않는다."""
+    앵커에 상호참조 거름(①~③·고아 번호)이 없어 켜지 않는다.
+
+    `seen`: 결과가 비어있지 않을 때만, 이 호출이 본 번호 표제 전체(gate 에서 빠진 것 포함)로
+    **덮어쓴다** — 경로들이 "처음 비어있지 않은 결과"를 반환하므로 마지막으로 채워진 값이 곧
+    반환 rows 를 만든 경로의 번호다(`fda483_observation_count` 입력)."""
     matches = finder(body)
     if not matches:
         return []
     out: list[dict[str, str]] = []
+    numbers: list[str] = []
     for i, obs in enumerate(matches):
         start = obs.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
@@ -2743,6 +3024,12 @@ def _observations_from_anchors(
         # 남는다(실측: 신규 727건 중 23건이 정상 경로로 들어오면서 "| There is a failure…"
         # 형태로 저장됐다). 순수 접두 제거라 정상 표제에는 영향이 없다(내용 절단 상한 있음).
         deficiency = strip_leading_observation_noise(deficiency)
+        # 건수 근거(`seen`)에는 gate 에서 빠질 표제도 넣는다 — 단, 서식 뒷면 안내문(`1. Pursuant
+        # to Section 704(b)… 2. To assist firms…`)은 관찰이 아니므로 넣지 않는다(실측 196455:
+        # 관찰 1~6 뒤에 안내문 1·2 가 붙어 번호가 1..6,1,2 가 됐다). 청소 전 구간 머리로 본다 —
+        # 청소가 `704(b)` 의 `(b)` 를 마스킹 표기로 지워 표제로는 안내문 판정이 안 된다.
+        if not (_FORM_NOTICE_RE.search(seg, 0, 200) or _FORM_NOTICE_RE.search(deficiency or "")):
+            numbers.append(obs.group(1) if obs.group(1).isdigit() else "1")
         if not gate(deficiency) and fragment_heads:
             frag_head, frag_rest, lower_enum = _split_past_fragment_head(chunk)
             if not lower_enum and gate(frag_head):
@@ -2759,11 +3046,14 @@ def _observations_from_anchors(
             "detail": _finalize_detail(clean_detail),
         }
         out.append(row)
+    if out and seen is not None:
+        seen[:] = numbers
     return out
 
 
 def _recover_483_observations(
     body: str, we_observed: re.Match[str] | None, hints: dict[str, str],
+    seen: list[str] | None = None,
 ) -> list[dict[str, str]]:
     """정상 경로가 0건일 때만 도는 회수 경로(순서대로 시도, 처음 성공한 것을 쓴다).
 
@@ -2786,7 +3076,7 @@ def _recover_483_observations(
             found = _observations_from_anchors(
                 _cut_at_annotations(body),
                 lambda s: _select_observation_anchors(s, list(_OBS_RE.finditer(s))),
-                hints, gate=gate, fragment_heads=True,
+                hints, gate=gate, fragment_heads=True, seen=seen,
             )
             if found:
                 return found
@@ -2812,10 +3102,22 @@ def _recover_483_observations(
     recovery = _OBS_MARKER_RECOVERY_RE.search(body)
     if we_observed is None and recovery is None:
         recovery = _FORM_MARKER_LINE_RE.search(body)
-    for marker in _marker_candidates(we_observed, recovery):
-        found = _run_recovery_ladder(body, marker, hints, gate)
-        if found:
-            return found
+    #
+    # ★⑤(번호 없는 단일 관찰)는 **모든 마커가 번호 목록을 못 낼 때만** 쓴다(2026-11-23).
+    #   첫 마커로 ⑤ 가 나오면 그대로 반환하던 탓에, 산문 "we observed"(관찰 본문 속 문장)가
+    #   첫 마커가 되면 그 뒤 꼬리 한 문장이 "관찰 1건"이 되고, 양식 마커 `(I) (WE) OBSERVED`
+    #   뒤의 진짜 번호 목록 `1) 2) 3) 4)` 는 두 번째 마커라 시도조차 안 됐다(실측
+    #   fda483-196447: 원문 관찰 4건 → 관찰 4)a 의 꼬리를 "관찰 1"로 저장, 요약 "관찰사항 1건").
+    #   ⑤ 는 번호라는 구조 근거가 없는 가장 약한 회수이므로, 번호 근거가 있는 결과보다 앞설
+    #   수 없다. 첫 패스(⑤ 끔)에서 아무 마커도 못 내면 둘째 패스가 **종전과 같은 순서**로
+    #   ⑤ 를 허용하므로, 번호 목록이 어느 마커로도 안 나오는 문서의 결과는 그대로다.
+    markers = _marker_candidates(we_observed, recovery)
+    for allow_single in (False, True):
+        for marker in markers:
+            found = _run_recovery_ladder(body, marker, hints, gate,
+                                         allow_single=allow_single, seen=seen)
+            if found:
+                return found
     return []
 
 
@@ -2842,13 +3144,17 @@ def _marker_candidates(
 
 def _run_recovery_ladder(
     body: str, marker: re.Match[str] | None, hints: dict[str, str], gate: Any,
+    allow_single: bool = True, seen: list[str] | None = None,
 ) -> list[dict[str, str]]:
-    """주어진 마커 하나로 ②→③→④ 를 순서대로 시도한다(처음 성공한 것을 쓴다)."""
+    """주어진 마커 하나로 ②→③→④(→⑤) 를 순서대로 시도한다(처음 성공한 것을 쓴다).
+
+    `allow_single=False` 면 ⑤(번호 없는 단일 관찰)를 건너뛴다 — `_recover_483_observations`
+    가 번호 근거 있는 결과를 모든 마커에서 먼저 찾을 때 쓴다."""
     scoped = _cut_at_annotations(body[marker.end():] if marker is not None else body)
 
     # ② 느슨한 앵커(OCR 공백·`OBSERVATION #1`). 정상 앵커가 0건인 문서에서만 여기 온다.
     found = _observations_from_anchors(
-        scoped, lambda s: list(_OBS_LOOSE_RE.finditer(s)), hints, gate=gate)
+        scoped, lambda s: list(_OBS_LOOSE_RE.finditer(s)), hints, gate=gate, seen=seen)
     if found:
         return found
 
@@ -2857,7 +3163,7 @@ def _run_recovery_ladder(
     #    놓친다(실측 120702·129953·142274·83523·167686). ⑤ 로 흘려보내면 표제가
     #    "OBSERVATION l ..." 처럼 앞머리가 붙은 채 저장되므로 여기서 제대로 잡는다.
     found = _observations_from_anchors(
-        scoped, lambda s: list(_OBS_GLYPH_NUM_RE.finditer(s)), hints, gate=gate)
+        scoped, lambda s: list(_OBS_GLYPH_NUM_RE.finditer(s)), hints, gate=gate, seen=seen)
     if found:
         for row in found:
             row["number"] = "1"      # 글리프는 언제나 1(2 이상은 ②가 이미 숫자로 잡는다)
@@ -2871,26 +3177,56 @@ def _run_recovery_ladder(
     #    ③ 이 잡는 `1. ` 양식 문서는 첫 앵커 조건에서 빠지므로 지금 회수되는 문서의 출력은 불변이다.
     found = _observations_from_anchors(
         scoped, lambda s: _select_hyphen_numbered_anchors(
-            s, list(_HYPHEN_NUMBERED_OBS_RE.finditer(s))), hints, gate=gate)
+            s, list(_HYPHEN_NUMBERED_OBS_RE.finditer(s))), hints, gate=gate, seen=seen)
     if found:
         return found
 
     found = _observations_from_anchors(
-        scoped, lambda s: list(_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
+        scoped, lambda s: _with_missing_first_item(s, list(_NUMBERED_OBS_RE.finditer(s))),
+        hints, gate=gate, seen=seen)
     if found:
-        return _repair_ocr_leading_digit(found)
+        found = _repair_ocr_leading_digit(found)
+        if seen is not None:      # 건수 근거도 같은 번호 교정을 거친다(13·4·6 → 3·4·6)
+            seen[:] = [r["number"] for r in
+                       _repair_ocr_leading_digit([{"number": n} for n in seen])]
+        return found
 
     # ④ 닫는 괄호 번호(`1)` · `1.)`). ③ 이 0건일 때만 — 한 문서가 두 양식을 섞어 쓰지
     # 않으므로 순서대로 시도하면 충분하고, 서로의 오탐을 만들지 않는다.
     found = _observations_from_anchors(
-        scoped, lambda s: list(_PAREN_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
+        scoped, lambda s: _with_missing_first_item(
+            s, list(_PAREN_NUMBERED_OBS_RE.finditer(s))), hints, gate=gate, seen=seen)
     if found:
         return found
 
     # ⑤ **번호가 아예 없는 단일 관찰**(옛 양식·조제약국 위생불량 483). 마커 바로 다음 줄이
     #   곧 지적문인데 ②③④ 는 전부 **번호를 전제**해 아무것도 못 잡는다(실측 36건).
     #   여기까지 왔다는 것은 정상 경로와 ①~④ 가 **모두 0건**이라는 뜻이다.
-    return _single_unnumbered_observation(scoped, hints, gate)
+    if not allow_single:
+        return []
+    found = _single_unnumbered_observation(scoped, hints, gate)
+    if found and seen is not None:
+        seen[:] = ["1"]
+    return found
+
+
+# [첫 항목 번호 결손 2026-11-23] 번호 목록(③ `N.`·④ `N)`)의 **1번 표제만** 번호 모양이 깨져
+# 앵커가 2번부터 잡히는 꼴. 스캔 OCR 이 `1)` 을 `|)` 로 읽거나(실측 fda483-196447
+# "OBSERVED:\n|) Your firm failed…"), `1.` 의 마침표를 떨군다(실측 fda483-196455
+# "OBSERVED:\n1 There i inadequate…"). 1번이 빠지면 관찰 하나가 통째로 사라지고 건수도 1 줄어든다.
+# ★오탐면을 좁게: 첫 앵커가 정확히 `2` 일 때만, 그리고 **마커 바로 뒤**(사이에 공백·`:`·`.` 만)
+#   에서만 찾는다 — 문서 중간의 `1`·`I`·`|` 는 볼 일이 없다. 1번이 이미 잡힌 문서는 손대지 않는다.
+_FIRST_ITEM_RE = re.compile(r"[\s:.]*([1Il|])\s*[.)]?\s+(?=[A-Z\"“])")
+
+
+def _with_missing_first_item(scoped: str, anchors: list[re.Match[str]]) -> list[re.Match[str]]:
+    """번호 목록 앵커가 `2` 부터 시작하면, 마커 바로 뒤의 깨진 1번 표제를 앞에 붙인다(순수 함수)."""
+    if not anchors or anchors[0].group(1) != "2":
+        return anchors
+    first = _FIRST_ITEM_RE.match(scoped)
+    if first is None or first.end() > anchors[0].start():
+        return anchors
+    return [first, *anchors]
 
 
 def _select_hyphen_numbered_anchors(
@@ -3043,7 +3379,8 @@ def _site_country(country: str, state: str) -> str:
 def _to_item(nrow: dict[str, str], excerpt: str,
              observations: list[dict[str, str]] | None = None,
              body_full: str = "", text_status: str = "",
-             inspectors: list[str] | None = None) -> IntakeItem | None:
+             inspectors: list[str] | None = None,
+             observation_count: int | None | str = "same") -> IntakeItem | None:
     """정규화 행(+excerpt) → IntakeItem. 수의/기기/식품 도메인은 None(드롭).
 
     `body_full`(비공백)이면 raw 에 `fda483_body_full` 로 실어 deep_analysis fan-out 입력으로 쓴다
@@ -3131,6 +3468,11 @@ def _to_item(nrow: dict[str, str], excerpt: str,
         raw_payload["fda483_excerpt"] = excerpt
     if observations:
         raw_payload["fda_483_observations"] = observations
+        # [건수 2026-11-23] 원문 관찰 건수가 rows 길이와 다를 때만 싣는다(같으면 키 없음 — 골든
+        # additive). None = 번호 불연속으로 단정 불가 → 스캐폴드가 count 를 비운다.
+        # 기본값 "same" = 호출부가 건수를 따로 세지 않음(백필 등 — 스캐폴드가 rows 로 센다).
+        if observation_count != "same" and observation_count != len(observations):
+            raw_payload["fda_483_observation_count"] = observation_count
     if inspectors:
         raw_payload["fda483_inspectors"] = inspectors   # 서명블록 실사관 이름(결정론·정밀도 최우선)
     if body_full:
@@ -3299,6 +3641,7 @@ def collect_fda_483(
         # 실패는 키 미기록 + warning(graceful — 결정론/deep 어느 층이 빠져도 요약카드는 유지).
         excerpt = ""
         observations: list[dict[str, str]] = []
+        observation_count: int | None | str = "same"
         body_full = ""
         inspectors: list[str] = []
         # [결손 사유 전파 2026-07-20] 본문을 못 얻었을 때 **왜** 못 얻었는지. 종전엔 이 사유가
@@ -3371,11 +3714,20 @@ def collect_fda_483(
                     log("WARN", warn + " — 메타 카드로 유지(manual_review)")
                 if observations_enabled:
                     observations_health["attempted"] += 1
+                    obs_seen: list[str] = []
                     observations = (
-                        _extract_483_observations_from_text(text, header_hints) if text else []
+                        _extract_483_observations_from_text(text, header_hints, seen=obs_seen)
+                        if text else []
                     )
                     if observations:
                         observations_health["extracted"] += 1
+                        observation_count = fda483_observation_count(observations, obs_seen)
+                        if observation_count is None:
+                            warn = (f"FDA 483 관찰 건수 단정 불가(번호 "
+                                    f"{[o.get('number') for o in observations]}·표제 {obs_seen}): "
+                                    f"{pdf_url}")
+                            observations_health["warnings"].append(warn)
+                            log("WARN", warn + " — count 비움(rows 는 보존)")
                     else:
                         observations_health["failed"] += 1
                         warn = (f"FDA 483 observations 실패"
@@ -3401,7 +3753,7 @@ def collect_fda_483(
                         log("WARN", warn + " — 분석층 없이 발행(결정론 상세·요약카드는 유지)")
 
         item = _to_item(nrow, excerpt, observations, body_full, text_status,
-                        inspectors=inspectors)
+                        inspectors=inspectors, observation_count=observation_count)
         if item is None and fetched:
             # 버린 문서의 추출 실패는 수집 품질이 아니다 — 시도(attempted)는 실제 비용이라 남기고
             # 실패·경고만 되돌린다. 경보 판정(grm_health)은 failed>0 만 본다.

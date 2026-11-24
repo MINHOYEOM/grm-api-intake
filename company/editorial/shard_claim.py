@@ -9,19 +9,24 @@
     python company/editorial/shard_claim.py claim  <run_folder> <delta|deep> <샤드> <워커id>   # 0=내가 잡음, 1=졌음
     python company/editorial/shard_claim.py claim  <run_folder> desk desk <데스크id>          # 데스크 잠금(RUN.md 5-2)
     python company/editorial/shard_claim.py desk   <run_folder>                              # done|held|stale|free
-    python company/editorial/shard_claim.py check  <run_folder> <delta|deep> <워커id> [--until 08:55]
+    python company/editorial/shard_claim.py check  <run_folder> <delta|deep> <워커id> [--until 08:55] [--wait]
         # 워커가 끝내도 되는가 — exit 0 = 끝내도 됨(DONE·DEADLINE·NO_TAKEOVER), exit 1 = 끝내면 안 됨(CLAIM <S> · WAIT <S> <초>)
+        # --wait: 판정이 WAIT 이면 파이썬이 그 초만큼(한 번에 WAIT_MAX_SEC=90초 이하) 스스로 기다린 뒤 다시 받아 판정한 줄을 낸다
+        #         — 셸 `sleep` 이 필요 없다(Bash 도구 기본 시한 120초 · Routine 세션의 긴 sleep 차단, 2026-11-20 감사).
 
 · 샤드 상태 — 완료(`{kind}.{S}.json` 의 status=완료) · 점유(claim 파일, 만든 지 STALE_MIN 분 이내) · 비어 있음.
   점유한 지 STALE_MIN 분이 넘도록 결과가 없으면 죽은 워커로 보고 **가로챌 수 있다**(다른 워커가 덮어쓴다).
 · delta 에는 가상 샤드 `T`(브리프 tldr·tldr_en)가 있다 — 모든 델타 샤드가 완료된 뒤에만 `next` 가 내놓는다.
 · claim 의 원자성: claim 파일을 커밋해 push 한다. 거절되면 pull --rebase 를 하고, 같은 파일이 이미 남의 것이면
-  (add/add 충돌 또는 새 점유) **졌다**. 3번까지 재시도.
+  (add/add 충돌 또는 새 점유) **졌다**. 3번까지 재시도. push 가 성공해도 원격의 claim 파일을 다시 읽어 내 이름이
+  아니면 졌다(2026-11-20 리허설 1120i deep.B 이중 점유). 판정과 쓰기 사이에 작업 폴더의 HEAD 가 움직였으면 다시 판정한다.
 · 결과 파일(`delta.A.json` 등)은 이 스크립트가 쓰지 않는다 — 기자가 쓴다.
 · check — 워커의 종료 판단은 코드가 한다(2026-11-19 리허설 1120g: 심층 워커가 빈 샤드 5개를 두고 '분량이 크다'며 스스로 끝냈다.
   사전 점검 3번: 08:40 보강은 점유 25분이 안 된 샤드를 '없음'으로 보고 바로 끝나, 08:15 뒤 잡힌 샤드가 죽으면 이어받을 워커가 없었다).
   남은 샤드가 남의 점유 중이면 그 점유가 죽은 것으로 판정되는 시각(점유+25분)까지 기다리라고 답한다 — 단 그 시각이 시한(--until)을 넘으면
   이어받을 수 없으므로 끝내도 된다. 자기 종류가 모두 완료면 곧바로 끝내도 된다(비용 0).
+· T 는 시한(--until)에서 뺀다 — 델타 본 샤드가 모두 완료이고 T 만 남았으면 08:55 가 지나도 CLAIM T 를 낸다
+  (2026-11-20 감사: 08:56 에 DEADLINE 으로 끝나 T 가 고아가 되면 merge_parts 가 'tldr 없음'으로 멈춰 백업이 발행했다).
 """
 import datetime
 import json
@@ -31,7 +36,7 @@ import sys
 import time
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
-WAIT_MAX_SEC = 300  # 대기는 한 번에 5분 이하(RUN.md 5-2)
+WAIT_MAX_SEC = 90  # 대기는 한 번에 90초 이하 — Bash 도구 기본 시한 120초 안에 끝나야 한다(RUN.md 5-2·7항)
 
 STALE_MIN = 25
 RETRIES = 3
@@ -138,14 +143,18 @@ def exit_check(folder, kind, worker=None, until=None, now=None):
     DONE            자기 종류 샤드(+T)가 모두 완료
     DEADLINE        시한(until, epoch 초)을 넘었다 — 새 샤드를 잡지 않는다
     CLAIM <S>       빈 샤드·죽은 점유·내 점유가 있다 → 끝내지 말고 가져간다
-    WAIT <S> <초>   남이 점유 중 — 그 점유가 죽은 것으로 판정될 수 있는 시각까지(한 번에 5분 이하) 기다렸다 다시 확인
+    WAIT <S> <초>   남이 점유 중 — 그 점유가 죽은 것으로 판정될 수 있는 시각까지(한 번에 WAIT_MAX_SEC 이하) 기다렸다 다시 확인
     NO_TAKEOVER     남은 점유가 죽은 것으로 판정되는 시각이 시한 뒤라 이어받을 수 없다
     """
     now = time.time() if now is None else now
     mine = [r for r in status(folder, now) if r[0] == kind]
     if all(r[2] == "done" for r in mine):
         return True, "DONE"
-    if until is not None and now >= until:
+    tldr = _plan(folder).get("tldr")
+    only_t_left = (kind == "delta" and bool(tldr)
+                   and all(r[2] == "done" for r in mine if r[1] != tldr))
+    if until is not None and now >= until and not only_t_left:
+        # T 만 남았으면 시한을 적용하지 않는다 — 시한은 '새 본 샤드를 잡지 않는다'는 뜻이고, T 는 짧은 마무리다.
         return True, "DEADLINE"
     if worker:
         for _, s, st, c in mine:
@@ -180,6 +189,26 @@ def _repo_root(folder):
     return out.stdout.strip()
 
 
+def _remote_claim_is_mine(root, remote, branch, rel, worker, at):
+    """push 성공 뒤 원격 브랜치의 claim 파일을 다시 읽는다 — 내 이름·내 시각이면 True.
+
+    2026-11-20 리허설 1120i: deep.B 를 심층-2 가 잡은 1.8초 뒤 심층-1+ 가 같은 파일을 덮어써 push 했다(수정 커밋).
+    push 성공만 믿으면 두 워커가 모두 '내가 잡음'으로 일한다. 원격을 못 읽으면(네트워크) push 성공을 믿는다.
+    """
+    if _git(root, "fetch", "-q", remote, branch, check=False).returncode != 0:
+        return True
+    shown = _git(root, "show", f"FETCH_HEAD:{rel}", check=False)
+    try:
+        c = json.loads(shown.stdout) if shown.returncode == 0 else None
+    except ValueError:
+        c = None
+    if not isinstance(c, dict) or c.get("worker") != worker or c.get("at") != at:
+        print(f"claim 확인 실패: 원격 {rel} 이 {c.get('worker') if isinstance(c, dict) else '없음'} 의 것 — 졌음",
+              file=sys.stderr)
+        return False
+    return True
+
+
 def claim(folder, kind, shard, worker, now=None, remote="origin"):
     """claim 파일을 커밋·push 한다. True = 내가 잡음, False = 졌음(남이 잡았거나 이미 완료)."""
     root = _repo_root(folder)
@@ -187,6 +216,7 @@ def claim(folder, kind, shard, worker, now=None, remote="origin"):
     branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
     for _ in range(RETRIES):
         _git(root, "pull", "--rebase", remote, branch, check=False)
+        head0 = _git(root, "rev-parse", "HEAD", check=False).stdout.strip()
         now_t = time.time() if now is None else now
         if _result_done(folder, kind, shard):
             return False
@@ -198,11 +228,17 @@ def claim(folder, kind, shard, worker, now=None, remote="origin"):
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump({"worker": worker, "at": now_t, "kind": kind, "shard": shard}, f)
             f.write("\n")
+        if _git(root, "rev-parse", "HEAD", check=False).stdout.strip() != head0:
+            # 판정과 쓰기 사이에 이 작업 폴더의 HEAD 가 움직였다 = 같은 폴더를 다른 워커가 함께 쓴다
+            # (리허설 1120i deep.B). 방금 쓴 파일을 HEAD 판으로 되돌리고 처음부터 다시 판정한다.
+            if _git(root, "checkout", "HEAD", "--", rel, check=False).returncode != 0:
+                os.remove(path)
+            continue
         _git(root, "add", rel)
         _git(root, "commit", "-m", f"claim {kind}.{shard} by {worker}", "--only", rel, check=False)
         pushed = _git(root, "push", remote, f"HEAD:{branch}", check=False)
         if pushed.returncode == 0:
-            return True
+            return _remote_claim_is_mine(root, remote, branch, rel, worker, now_t)
         rb = _git(root, "pull", "--rebase", remote, branch, check=False)
         if rb.returncode != 0:  # add/add 충돌 = 남이 같은 파일을 먼저 올렸다
             _git(root, "rebase", "--abort", check=False)
@@ -210,6 +246,21 @@ def claim(folder, kind, shard, worker, now=None, remote="origin"):
             return False
         # 충돌 없이 얹혔다면 다시 push 를 시도하기 전에 남의 점유가 생겼는지 루프 머리에서 확인한다
     return False
+
+
+def _sleep(sec):
+    time.sleep(sec)
+
+
+def _check_once(folder, kind, worker, hhmm):
+    try:  # 남의 결과·점유를 새로 받는다(실패해도 로컬 상태로 판단)
+        root = _repo_root(folder)
+        branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+        _git(root, "pull", "--rebase", "origin", branch, check=False)
+    except (OSError, subprocess.CalledProcessError):
+        pass
+    now = time.time()
+    return exit_check(folder, kind, worker, until_ts(hhmm, now), now)
 
 
 def main(argv):
@@ -242,15 +293,14 @@ def main(argv):
             k = rest.index("--until")
             hhmm = rest[k + 1]
             rest = rest[:k] + rest[k + 2:]
+        block = "--wait" in rest
+        rest = [a for a in rest if a != "--wait"]
         kind, worker = rest[0], (rest[1] if len(rest) > 1 else None)
-        try:  # 남의 결과·점유를 새로 받는다(실패해도 로컬 상태로 판단)
-            root = _repo_root(folder)
-            branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
-            _git(root, "pull", "--rebase", "origin", branch, check=False)
-        except (OSError, subprocess.CalledProcessError):
-            pass
-        now = time.time()
-        ok, line = exit_check(folder, kind, worker, until_ts(hhmm, now), now)
+        ok, line = _check_once(folder, kind, worker, hhmm)
+        if block and not ok and line.startswith("WAIT "):
+            # 파이썬이 대신 기다린다(한 번, WAIT_MAX_SEC 이하) — 셸 sleep 없이 루프를 돈다
+            _sleep(min(WAIT_MAX_SEC, max(1, int(line.split()[-1]))))
+            ok, line = _check_once(folder, kind, worker, hhmm)
         print(line)
         return 0 if ok else 1
     print("모르는 명령:", cmd)

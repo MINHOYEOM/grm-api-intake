@@ -11,6 +11,7 @@ raw_payload 의 키 이름이 바뀌면 즉시 깨진다.
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 import unittest
@@ -379,6 +380,16 @@ class CollectionCappedModeTest(unittest.TestCase):
         self.assertNotIn("fda483_text_status", record["raw_json"])
         self.assertEqual(record["collected_at"], "2026-07-28T01:02:03Z")
 
+    def test_recovered_row_keeps_body_full_for_deep(self):
+        # [2026-11-22] 되살린 483 이 관찰만 있고 전문이 없으면 심층 대상에서 빠져 관찰 국문이 붙지 않고,
+        # 사이트 빌드(render.validate_483_observations)가 호 전체를 막는다(11-18 수집 52행).
+        report, code, upsert, _rid = self._capped_run(dry_run=False)
+        self.assertEqual(code, 0)
+        raw = upsert.call_args[0][2]["raw_json"]
+        raw = json.loads(raw) if isinstance(raw, str) else raw
+        self.assertTrue(raw.get("fda_483_observations"))
+        self.assertTrue(str(raw.get("fda483_body_full") or "").strip())
+
     def test_definitive_empty_result_replaces_cap_marker(self):
         """404·텍스트층 없음이면 상한 표식을 실제 사유로 바꿔 매 실행 재시도를 끊는다."""
         report, _code, upsert, rid = self._capped_run(
@@ -424,9 +435,6 @@ class CollectionCappedModeTest(unittest.TestCase):
             rec.build_arg_parser().parse_args(["--mode", "collection-capped"]).mode,
             rec.MODE_COLLECTION_CAPPED)
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 # ── [사각지대 모드 2026-08-01] 관찰 키가 없는 행 선택 ──────────────────────────
@@ -1112,3 +1120,19 @@ class HolderCutGuardTest(unittest.TestCase):
                 self.assertTrue({"lost_chars", "runs", "sample"} <= entry.keys())
                 self.assertGreaterEqual(entry["holder_cut_chars"], rec.NAMED_HOLDER_CUT_MIN_CHARS)
                 self.assertEqual(code, 0)
+
+
+class BodyFullRuleTest(unittest.TestCase):
+    """복구 재구성의 전문 규칙 = 일일 수집 deep 경로와 같다(관찰 1건 이상일 때만 받은 텍스트 그대로)."""
+
+    def test_body_full_when_observations(self):
+        raw = _raw_payload(_TEXT, "pdf-ok-ocr")
+        self.assertTrue(raw.get("fda_483_observations"))
+        self.assertEqual(raw.get("fda483_body_full"), _TEXT)
+
+    def test_no_body_full_without_text(self):
+        self.assertNotIn("fda483_body_full", rec._rebuild_item(_nrow(), "", "not-attempted").raw_payload)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24T06:24:58Z",
+ "generated_at": "2026-11-24T06:56:00Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,12 +229,23 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45343095979,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-24T06:47:39Z",
+    "updatedAt": "2026-11-24T06:55:39Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1899 from MINHOYEOM/fix/wl-superseded-166",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45343095979"
+   },
+   {
     "databaseId": 45339548411,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-24T06:19:04Z",
-    "updatedAt": "2026-11-24T06:19:08Z",
+    "updatedAt": "2026-11-24T06:26:59Z",
     "headBranch": "fix/wl-superseded-166",
     "displayTitle": "feat(findings): 옛 본문에만 남은 findings 를 '대체됨'으로 숨김 — 새 글이 공개된 문서만, 매일 판정 (166)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45339548411"
@@ -271,17 +282,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1893 from MINHOYEOM/feat/wl-violations-followup-1124",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45323599568"
-   },
-   {
-    "databaseId": 45316582256,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-24T03:01:42Z",
-    "updatedAt": "2026-11-24T03:09:50Z",
-    "headBranch": "feat/wl-violations-followup-1124",
-    "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45316582256"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45344085997,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-24T06:55:42Z",
+    "updatedAt": "2026-11-24T06:55:49Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45344085997"
+   },
+   {
     "databaseId": 45324574724,
     "status": "completed",
     "conclusion": "skipped",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45301468551"
-   },
-   {
-    "databaseId": 45242709216,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-23T18:51:00Z",
-    "updatedAt": "2026-11-23T18:51:01Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45242709216"
    }
   ],
   "grm-findings-translate-apply.yml": [

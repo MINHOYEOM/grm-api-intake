@@ -184,6 +184,11 @@ def render(prs):
 
 
 def main(argv=None):
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", metavar="JSON", help="Read a saved gh PR list (use - for stdin).")
     args = parser.parse_args(argv)

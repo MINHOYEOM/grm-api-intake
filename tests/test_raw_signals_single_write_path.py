@@ -93,14 +93,22 @@ def _raw_table(node, bindings):
 def python_writes(source: str, path: str) -> list[tuple[int, str]]:
     violations = []
 
-    def scan(node, bindings):
+    def scan(node, bindings, prefer_assignments):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             bindings = bindings.copy()
+            prefer_assignments = prefer_assignments.copy()
         if isinstance(node, (ast.Assign, ast.AnnAssign)):
             targets = node.targets if isinstance(node, ast.Assign) else [node.target]
             for target in targets:
                 if isinstance(target, ast.Name):
                     bindings[target.id] = node.value
+                if isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name):
+                    headers = bindings.get(target.value.id)
+                    key = _text(target.slice, bindings)
+                    if isinstance(headers, ast.Dict) and key.lower() == "prefer" and node.value is not None:
+                        prefer_assignments[headers] = {
+                            **prefer_assignments.get(headers, {}), key: _text(node.value, bindings),
+                        }
         if isinstance(node, ast.JoinedStr) or isinstance(node, ast.Constant) and isinstance(node.value, str):
             sql = _text(node, bindings)
             if "raw_signals" in sql.lower():
@@ -126,11 +134,13 @@ def python_writes(source: str, path: str) -> list[tuple[int, str]]:
                 headers = _argument(node, len(node.args), "headers")
                 if isinstance(headers, ast.Name):
                     headers = bindings.get(headers.id)
-                if isinstance(headers, ast.Dict) and any(
-                    _text(key, bindings).lower() == "prefer" and "merge-duplicates" in _text(value, bindings).lower()
-                    for key, value in zip(headers.keys, headers.values)
-                ):
-                    violations.append((node.lineno, "POST merge-duplicates"))
+                if isinstance(headers, ast.Dict):
+                    header_values = {_text(key, bindings): _text(value, bindings)
+                                     for key, value in zip(headers.keys, headers.values)}
+                    header_values.update(prefer_assignments.get(headers, {}))
+                    if any(key.lower() == "prefer" and "merge-duplicates" in value.lower()
+                           for key, value in header_values.items()):
+                        violations.append((node.lineno, "POST merge-duplicates"))
             if method == "_post_rows" and _raw_table(_argument(node, 2, "table"), bindings):
                 resolution = _argument(node, len(node.args), "resolution")
                 if resolution is not None and _text(resolution, bindings) != "ignore-duplicates":
@@ -144,9 +154,9 @@ def python_writes(source: str, path: str) -> list[tuple[int, str]]:
                         and _raw_table(_argument(table, 0, "table_name"), bindings)):
                     violations.append((node.lineno, method))
         for child in ast.iter_child_nodes(node):
-            scan(child, bindings)
+            scan(child, bindings, prefer_assignments)
 
-    scan(ast.parse(source, filename=path), {})
+    scan(ast.parse(source, filename=path), {}, {})
     return violations
 
 
@@ -195,6 +205,23 @@ class RawSignalsSingleWritePathTests(unittest.TestCase):
             'requests.post(f"{base}/rest/v1/raw_signals", headers=headers, json=rows)'
         )
         self.assertTrue(python_writes(source, "new/subdir/tool.py"))
+
+    def test_detects_post_merge_duplicates_after_header_assignment(self):
+        source = (
+            'headers = {}\n'
+            'key = "pReFeR"\n'
+            'headers[key] = "resolution=merge-duplicates"\n'
+            'requests.post(f"{base}/rest/v1/raw_signals", headers=headers, json=rows)'
+        )
+        self.assertEqual(python_writes(source, "new.py"), [(4, "POST merge-duplicates")])
+
+    def test_allows_post_after_prefer_header_is_overwritten(self):
+        source = (
+            'headers = {"Prefer": "resolution=merge-duplicates"}\n'
+            'headers["Prefer"] = "resolution=ignore-duplicates"\n'
+            'requests.post(f"{base}/rest/v1/raw_signals", headers=headers, json=rows)'
+        )
+        self.assertEqual(python_writes(source, "new.py"), [])
 
     def test_detects_python_bypasses_post_rows_upsert(self):
         source = (

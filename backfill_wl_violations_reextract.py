@@ -123,7 +123,8 @@ def reextract_raw(raw: dict[str, Any]) -> tuple[list[dict[str, str]], str, str]:
     status = str(new_raw.get("wl_violations_status") or "")
     # 형식 라벨(표용) — 같은 함수·같은 범위 판정. 결과가 build_wl_item 과 다르면 경로가 갈라진 것이다.
     rows2, fmt = ci.extract_wl_violations_detail(
-        _s("wl_body_full"), extended=ci.wl_violations_extended_scope(item.qa_relevance, _s("issuing_office")))
+        _s("wl_body_full"), extended=ci.wl_violations_extended_scope(item.qa_relevance, _s("issuing_office")),
+        issuing_office=_s("issuing_office"))
     if rows2 != rows:
         raise RuntimeError("build_wl_item 과 extract_wl_violations_detail 결과 불일치")
     return rows, status, (fmt if rows else "")

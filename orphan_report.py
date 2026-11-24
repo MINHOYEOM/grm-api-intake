@@ -1,3 +1,4 @@
+import sys
 """List root scripts and GitHub Actions workflows with no visible use."""
 
 import argparse
@@ -243,6 +244,11 @@ def render_report(scripts, workflows):
 
 
 def main():
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", type=Path, nargs="?", default=Path(__file__).resolve().parent)
     args = parser.parse_args()

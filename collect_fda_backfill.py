@@ -11,10 +11,10 @@ already expose their full history behind the same server-side DataTables AJAX me
     collector's static HTML listing (`collect_intake.collect_fda_warning_letters`, which
     only sees the current/recent page) -- it exists only to reach historical volume.
 
-This module fetches those two sources in caller-controlled chunks (--offset/--max-docs)
-and appends new `raw_signals` rows directly to Supabase -- Notion is never touched (the
-weekly brief queue must not see backfill noise). MFDS/nedrug is out of scope (robots
-Disallow: /).
+The CLI lists and triages those two sources in caller-controlled chunks by default.
+With `--apply`, it fetches documents and appends new `raw_signals` rows directly to
+Supabase. Notion is never touched (the weekly brief queue must not see backfill
+noise). MFDS/nedrug is out of scope (robots Disallow: /).
 
 F2c adds an unattended `--auto` mode on top: no --source/--offset needed -- the run
 scans list pages from the head (existing/gated rows require no document GET), continues
@@ -1015,8 +1015,9 @@ def run_auto(
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="GRM FIND-1 F2b -- chunked backfill fetch of historical FDA 483 / "
-        "Warning Letter documents directly into Supabase raw_signals (bypasses Notion; "
-        "robots Crawl-Delay=30 aware; one source per run -- 483/WL share a host)."
+        "Warning Letter documents (--apply writes directly to Supabase raw_signals; "
+        "bypasses Notion; robots Crawl-Delay=30 aware; 483/WL share a host).",
+        allow_abbrev=False,
     )
     # --source is required unless --auto (checked in main -- explicit exit-2 check,
     # matching the existing credential-validation style).
@@ -1036,10 +1037,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "Mutually exclusive with --source/--offset.",
     )
     parser.add_argument("--delay", type=float, default=FDA_BACKFILL_DELAY_SECONDS)
-    parser.add_argument(
-        "--dry-run", action="store_true", default=False,
-        help="List + triage only (skip_existing/skip_gated) -- never fetch documents or POST.",
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--dry-run", dest="apply", action="store_false",
+        help="List + triage only (default); skip document fetches and writes.",
     )
+    mode.add_argument(
+        "--apply", action="store_true",
+        help="Fetch documents and append new rows to Supabase raw_signals.",
+    )
+    parser.set_defaults(apply=False)
     parser.add_argument("--supabase-url", help="Falls back to $SUPABASE_URL")
     parser.add_argument("--service-role-key", help="Falls back to $SUPABASE_SERVICE_ROLE_KEY")
     parser.add_argument("--output", help="Optional path to also write the JSON report to.")
@@ -1080,14 +1087,14 @@ def main(argv: list[str] | None = None) -> int:
         report_dict, exit_code = run_auto(
             max_docs=args.max_docs, delay=args.delay,
             fetch_budget=args.auto_fetch_budget,
-            dry_run=args.dry_run, base_url=base, service_key=key,
+            dry_run=not args.apply, base_url=base, service_key=key,
         )
     else:
         runner = _RUNNERS[args.source]
         report, exit_code = runner(
             offset=args.offset if args.offset is not None else 0,
             max_docs=args.max_docs, delay=args.delay,
-            dry_run=args.dry_run, base_url=base, service_key=key,
+            dry_run=not args.apply, base_url=base, service_key=key,
         )
         report_dict = asdict(report)
 

@@ -27,7 +27,7 @@ import unittest
 from pathlib import Path
 from statistics import mean
 
-from ci_network_guard import ExternalNetworkBlocked, NetworkGuard
+from ci_network_guard import ExternalNetworkBlocked, run_guarded
 
 ROOT = Path(__file__).resolve().parent
 TESTS_DIR = ROOT / "tests"
@@ -201,12 +201,7 @@ def main(argv=None) -> int:
     # `unittest discover -s tests` 와 동일하게 tests/ 를 sys.path 에 둔다(+ 루트 모듈 import).
     sys.path.insert(0, str(TESTS_DIR))
     sys.path.insert(0, str(ROOT))
-    guard = NetworkGuard()
-    with guard.installed():
-        status = _run_shard(args, guard)
-    for violation in guard.violations:
-        print(violation, file=sys.stderr)
-    return 1 if guard.violations else status
+    return run_guarded(lambda guard: _run_shard(args, guard))
 
 
 def _run_shard(args, guard):

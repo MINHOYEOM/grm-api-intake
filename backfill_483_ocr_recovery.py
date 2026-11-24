@@ -599,6 +599,7 @@ def scan_mixed_pdfs(rows: list[dict[str, Any]], *, delay_seconds: float = 0.3,
 def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
     """라이브 수집과 **같은 함수**로 IntakeItem 재구성. None 이면 도메인 게이트 드롭."""
     from collect_fda_483 import (
+        _extract_483_inspectors,
         _extract_483_observations_from_text,
         _extract_fda483_excerpt,
         _to_item,
@@ -610,10 +611,15 @@ def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
         "firm_name": nrow.get("company", ""),
     }
     observations = _extract_483_observations_from_text(text, header_hints) if text else []
-    # body_full="" — deep 전문 보존은 ENABLE_FDA_483_DEEP 게이트 산출물이고, 이 복구의
-    # 목표는 findings 를 만드는 결정론 층(excerpt/observations)이다. 원 적재 경로
-    # (collect_fda_backfill.run_483)도 body_full 을 "" 로 넘긴다 — 그 계약을 그대로 지킨다.
-    return _to_item(nrow, excerpt, observations, "", status)
+    # [2026-11-22] 전문(fda483_body_full)도 보존한다 — 일일 수집의 deep 경로와 같은 규칙(관찰 1건 이상일 때만
+    # 받은 텍스트 그대로). 종전엔 "" 로 넘겨, 상한 밖이라 이 복구로 되살아난 483 이 관찰은 있는데 전문이 없어
+    # 심층 대상(card_scaffold.deep_analysis_ready)에서 빠졌다 → 관찰 국문이 붙지 않아 사이트 빌드가 호 전체를
+    # 막았다(11-18 수집 52행 · 리허설 1122a 모의 발행 49장). 대량 공개 주마다 되풀이되던 구멍이다.
+    body_full = text if observations else ""
+    # [2026-11-23] 실사관도 일일 수집과 **같은 공통 함수**로 뽑아 넘긴다(R3 — 종전엔 넘기지 않아 복구된 행은
+    # 실사관 칸이 처음부터 비었다, 수집완전성 점검 11-22 9-3: 서명란 있는 44행). 반드시 청소 전 원시 text.
+    inspectors = _extract_483_inspectors(text) if text else []
+    return _to_item(nrow, excerpt, observations, body_full, status, inspectors=inspectors)
 
 
 # ---------------------------------------------------------------------------

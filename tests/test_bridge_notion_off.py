@@ -135,6 +135,21 @@ class BridgeNotionOffTest(unittest.TestCase):
         self._files({"delta.json": bad, "copyedit.json": _COPYEDIT_OK})
         self.assertEqual(db.main(["--db", "dbid", "--publish-date", DATE]), 1)
 
+    def test_copyedit_done_but_unrecorded_is_red_not_a_clean_skip(self) -> None:
+        # [11-23 사전 점검 B × 노션 off] 교열은 `완료`·published 로 마쳤는데 반납을 채택할 수 없다(델타 파일 없음).
+        # 노션 예비 길이 없으니 초록 '반납 없음' 으로 끝나면 그 주가 조용히 발행되지 않는다 → exit 1.
+        self._files({"copyedit.json": _COPYEDIT_OK})
+        rc = db.main(["--db", "dbid", "--publish-date", DATE])
+        self.assertEqual(rc, 1)
+        self.assertEqual(self._outputs().get("wrote"), "false")
+        with open(os.environ["GITHUB_STEP_SUMMARY"], encoding="utf-8") as f:
+            self.assertIn("교열 반납 미기록", f.read())
+        # 이미 main 에 그 주 델타가 있으면(브릿지가 앞 회차에 가져갔다) 해당 없음 — 초록.
+        os.remove(self._out)
+        pathlib.Path(DELTA).parent.mkdir(parents=True, exist_ok=True)
+        pathlib.Path(DELTA).write_text("{}", encoding="utf-8")
+        self.assertEqual(db.main(["--db", "dbid", "--publish-date", DATE]), 0)
+
     def test_consume_is_a_no_op(self) -> None:
         self.assertEqual(db.main(["--db", "dbid", "--consume", "--publish-date", DATE]), 0)
 

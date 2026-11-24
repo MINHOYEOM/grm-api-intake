@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{#- [SEO 2026-11-09] 얇은 문서는 구글봇만 noindex(네이버는 색인 유지) — 판정은 render.is_thin_doc_page. -#}
-{% block meta_robots %}{% if thin_page %}<meta name="googlebot" content="noindex, follow" />
+{#- [SEO 2026-11-09·11-19] 구글에서만 뺄 문서(얇음 A·중복 B)는 구글봇만 noindex(네이버·빙은 색인 유지) — 판정은 render.google_noindex_doc_page, sitemap.xml 도 같은 판정으로 뺀다. -#}
+{% block meta_robots %}{% if google_noindex %}<meta name="googlebot" content="noindex, follow" />
 {% endif %}{% endblock %}
 {% block content %}
 {#- [검색 유입] 문서 단위 페이지 — /findings/doc/{document_id}/.

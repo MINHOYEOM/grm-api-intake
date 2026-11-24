@@ -89,6 +89,9 @@ DEFAULT_OUTBOX_DIR = "translations/outbox"
 DEFAULT_TIMEOUT_SECONDS = 15
 _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
 
+# GET 투영: 원문 대조용 finding_text + 같은 값이면 PATCH 를 건너뛰기 위한 두 칸(2026-11-20 DB 용량 3단계).
+_GET_SELECT = "finding_text,finding_text_ko,translation_method"
+
 _REQUIRED_ITEM_KEYS = ("finding_id", "finding_text", "finding_text_ko", "translation_method")
 
 
@@ -206,7 +209,8 @@ def _apply_one_finding(
     """Read-before-write apply of one outbox item, keyed on finding_id only.
 
     Returns (outcome, error_detail) where outcome is one of "succeeded",
-    "matched_zero", or "errored" -- the same three-way accounting the previous
+    "matched_zero", "unchanged" (live row already holds these values -- no
+    PATCH sent, 2026-11-20), or "errored" -- the same three-way accounting the previous
     single-PATCH design produced. No request URL ever carries finding_text
     (see the module docstring: it can be 30k chars and blew past the ~32 KB
     edge URL limit). Instead a short GET fetches the live finding_text by
@@ -237,7 +241,7 @@ def _apply_one_finding(
         "get",
         base_url,
         service_key,
-        params={"finding_id": f"eq.{finding_id}", "select": "finding_text"},
+        params={"finding_id": f"eq.{finding_id}", "select": _GET_SELECT},
         timeout=timeout,
     )
     if err:
@@ -276,6 +280,13 @@ def _apply_one_finding(
     }
     if kind == RESTORE_KIND:
         body["finding_text"] = finding_text  # 영문·국문 동시 교체(한 PATCH = 한 UPDATE)
+
+    # [DB 용량 3단계 · 2026-11-20] 라이브 행이 이미 이 값이면 PATCH 를 보내지 않는다. outbox 는 매 실행
+    # 모든 배치를 다시 읽으므로(지금 5개 333항목 중 새 항목은 ~50) 나머지는 같은 값 재쓰기였다 — PostgreSQL 은
+    # 같은 값 UPDATE 도 새 행 판을 써서 findings 에 빈자리가 쌓인다. GET 응답에 칸이 없으면(옛 모양) 종전대로 쓴다.
+    live = live_matches[0]
+    if all(k in live for k in body) and all(str(live.get(k) or "") == v for k, v in body.items()):
+        return "unchanged", ""
     _status, prows, perr = _send_findings_request(
         "patch",
         base_url,
@@ -321,6 +332,7 @@ def apply_outbox(
         "items_total": 0,
         "items_succeeded": 0,
         "items_matched_zero": 0,
+        "items_unchanged": 0,   # 2026-11-20: 라이브가 이미 같은 값 — PATCH 안 보냄(쓰기 0)
         "items_errored": 0,
         "errors": [],
     }
@@ -360,6 +372,8 @@ def apply_outbox(
                 report["items_succeeded"] += 1
             elif outcome == "matched_zero":
                 report["items_matched_zero"] += 1
+            elif outcome == "unchanged":
+                report["items_unchanged"] += 1
             else:
                 report["items_errored"] += 1
                 report["errors"].append(f"{path.name}: {detail}")

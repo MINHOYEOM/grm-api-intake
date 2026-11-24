@@ -684,6 +684,26 @@ def _evaluate_health(
             "메타 카드로 적재(다음 날 예약 회수 grm-fda483-ocr-recovery · recover-wl 이 다시 받는다)",
             f"attempted={stats.wl_body_full_attempted} failed={stats.wl_body_full_failed}",
         )
+    # [WL 위반항목 빈칸 2026-11-23] 본문은 있는데 위반항목이 비었다. unmarked(사유 표식도 없음)는
+    # build_wl_item 을 거치지 않은 경로(10-28 이전 백필 770행의 원인) — 0 이어야 한다. unsupported 는
+    # 지원 형식(F1~F4) 밖 새 서한 형식 — 원문을 보고 collect_intake 위반항목 추출기에 형식을 더한다.
+    if getattr(stats, "wl_violations_unmarked", 0) > 0:
+        health.add_warning(
+            "wl-violations-unmarked",
+            "FDA WL",
+            f"WL 본문은 있는데 위반항목·사유 표식이 모두 없는 편지 {stats.wl_violations_unmarked}건 — "
+            "추출 함수(build_wl_item)를 거치지 않은 적재 경로가 있다",
+            f"unmarked={stats.wl_violations_unmarked}",
+        )
+    if getattr(stats, "wl_violations_unsupported", 0) > 0:
+        docs = ",".join(getattr(stats, "wl_violations_unsupported_docs", [])[:10])
+        health.add_warning(
+            "wl-violations-unsupported",
+            "FDA WL",
+            f"WL 위반항목을 못 뽑은 편지 {stats.wl_violations_unsupported}건(지원 형식 밖) — "
+            "원문 형식을 보고 추출기에 형식 추가(지어내기 금지·원문 문장 그대로)",
+            f"unsupported={stats.wl_violations_unsupported} filled={stats.wl_violations_filled} docs={docs}",
+        )
     # [WL 목록 절단 2026-10-27] DataTables 전수 뷰가 죽어 정적 표(최신 10행)로 폴백했고, 그
     # 10행이 전부 수집 창 안이라 창 안 편지가 더 있는지 알 수 없다. 화요일 게시가 10건을
     # 넘으면 나머지는 Notion 에 들어오지 않는다(10-05 호 cGMP WL 4건 누락의 원인).

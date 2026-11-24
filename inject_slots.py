@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import os
 import re
 import sys
 from collections import Counter
@@ -491,21 +492,46 @@ def _merge_observation_translations(card: dict[str, Any], obs_ko: Any,
 
     결정론 English 관찰(수집기 산출)은 그대로 두고 국문만 additive 로 얹는다 → 웹 렌더가
     원문(영문)+국문 병기. 번호가 안 맞거나 관찰 블록이 없으면 조용히 건너뛴다(비차단). 값은
-    문자열 강제·평문(렌더러가 이스케이프). deep_analysis 와 독립이라 실패해도 카드는 발행된다."""
+    문자열 강제·평문(렌더러가 이스케이프). deep_analysis 와 독립이라 실패해도 카드는 발행된다.
+
+    [번호 중복 2026-11-20 리허설 1120i] 원문(OCR)이 같은 번호를 두 번 쓰는 483 이 있다 —
+    fda483-196399 `1,2,3,5,5,6,7,8`(4 가 5 로 읽힘), fda483-196254 `1,1,2,3,4,1,2,2`(이전 실사 관찰 인용).
+    번호 하나에 관찰 하나만 남기던 매칭은 앞선 같은 번호 관찰에 국문을 못 붙여, 기자가 번역을 다 넣어도
+    배포 게이트(`render.validate_483_observations`)가 호 전체를 막았다. 그래서 **같은 번호 안에서는
+    나온 순서로** 짝짓는다(번호 N 의 k 번째 번역 → 번호 N 의 k 번째 관찰). 같은 번호의 관찰 수와 번역 수가
+    다르면 순서를 믿을 수 없으므로 종전대로(그 번호의 마지막 관찰에 마지막 번역) 붙인다 — 번호가 유일한
+    정상 카드는 결과가 종전과 같다."""
     if not isinstance(obs_ko, list) or not obs_ko:
         return
     dd = card.get("deterministic_detail")
     if not (isinstance(dd, dict) and dd.get("type") == "fda_483_observations"):
         return
-    by_num = {str(o.get("number")): o for o in dd.get("observations", [])
-              if isinstance(o, dict)}
-    merged = 0
+    obs_by_num: dict[str, list[dict[str, Any]]] = {}
+    for o in dd.get("observations", []):
+        if isinstance(o, dict):
+            obs_by_num.setdefault(str(o.get("number")), []).append(o)
+    ko_by_num: dict[str, list[dict[str, Any]]] = {}
+    for t in obs_ko:
+        if isinstance(t, dict):
+            ko_by_num.setdefault(str(t.get("number")), []).append(t)
+    pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    seen: dict[str, int] = {}
     for t in obs_ko:
         if not isinstance(t, dict):
             continue
-        obs = by_num.get(str(t.get("number")))
-        if obs is None:
+        num = str(t.get("number"))
+        k = seen.get(num, 0)
+        seen[num] = k + 1
+        group = obs_by_num.get(num)
+        if not group:
             continue
+        if len(group) > 1 and len(group) == len(ko_by_num[num]):
+            # 같은 번호 여럿 — 나온 순서로 1:1.
+            pairs.append((group[k], t))
+        else:
+            pairs.append((group[-1], t))
+    merged = 0
+    for obs, t in pairs:
         if t.get("deficiency_ko"):
             obs["deficiency_ko"] = str(t["deficiency_ko"])
             merged += 1
@@ -764,14 +790,130 @@ _ABBR_OFF_RE = tuple((re.compile(rf"(?<![A-Za-z0-9_/-]){a}(?![A-Za-z0-9_/-])"), 
 _BANNED_RE = tuple((lab, re.compile(p)) for lab, p in _BANNED_PHRASES)
 _TERM_RE = tuple((re.compile(p), fix) for p, fix in _TERM_VARIANTS)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# [리허설 1121a] v16 [용어·표기] 절을 **문서에서 읽는다**(단일 원천 — 위 손 베낌 표가 표류한 자리를 메운다).
+# 교열 반려 '외관 검사'(표 줄 `외관검사` 가 위 손 베낌에 빠져 있었다)·'다수'(군말 줄은 코드에 0줄) 를 막는다.
+# 읽는 것: ① 표 왼쪽 표기 중 **한글만으로 된 것**(괄호·숫자·로마자·'단독' 이 든 표기는 조건부라 손 베낌·별도 검사 몫)
+#   — 위 손 베낌·경고 표·금지 표현이 이미 잡는 표기는 건너뛴다(11-16 줄은 계속 경고만).
+#   네 글자 이상 한 낱말은 띄어 쓴 변형('외관 검사')도 잡고, 오른쪽 표기 안에 든 경우('시험성적서' 속 '성적서')·
+#   다른 낱말에 붙은 경우(법령 용어 '의약품공급자' 속 '공급자' — 1120h 통과 카드)는 세지 않는다.
+# ② 군말 줄("다수·반복적으로·장기간" → …) — 낱말 경계로만 센다('대다수'·'다수결' 은 아니다).
+# ③ 영문 약어 목록·목록 밖 약어 예·기관·제도 이름·단위 — `hook_line` 약어 검사(precheck)가 쓴다.
+# 문서가 없으면(배포 환경 등) 빈 규칙 — 손 베낌 검사는 그대로 돈다.
+# ★①②는 **기자 사전 점검 전용**(`term_hits(..., v16_rules=True)`) — 발행 조립의 표현 검사는 종전 규칙 그대로다(백업 Routine 보호).
+# ─────────────────────────────────────────────────────────────────────────────
+_V16_PROMPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "prompts", "GRM_Prompt_v16.md")
+_JOSA_AFTER = r"(?=$|[^가-힣]|(?:이|가|을|를|은|는|의|에|로|으로|와|과|도|만)(?![가-힣]))"
+_CAPS_RE = re.compile(r"[A-Z][A-Z0-9/]*[A-Z]")
 
-def term_hits(blob: str, context: str | None = None) -> list[str]:
+
+def _v16_section(text: str) -> str:
+    start = text.find("[용어·표기 —")
+    if start < 0:
+        return ""
+    end = text.find("\n[", start + 1)
+    return text[start:end if end > 0 else len(text)]
+
+
+def _plain_ko_item(item: str) -> bool:
+    return (bool(re.search(r"[가-힣]", item)) and not re.search(r"[()A-Za-z0-9~]|단독", item))
+
+
+def _term_item_regex(item: str) -> str:
+    """표기 → 정규식. 네 글자 이상 한 낱말은 글자 사이 띄어쓰기 변형도, 낱말 사이는 붙여 쓴 변형도 잡는다.
+    마지막 낱말이 한 글자('규격 외')면 뒤에 조사만 허용한다('규격 외관' 은 아니다)."""
+    ws = item.split()
+    words = [r"\s?".join(map(re.escape, w)) if len(w) >= 4 else re.escape(w) for w in ws]
+    return r"\s?".join(words) + (_JOSA_AFTER if len(ws[-1]) == 1 else "")
+
+
+def _right_terms(cell: str) -> tuple[str, list[str]]:
+    head = re.split(r"\s+—\s+|\*\*", cell, maxsplit=1)[0].strip()
+    terms = [re.sub(r"\([^)]*\)|\"[^\"]*\"", "", t).strip() for t in head.split(" · ")]
+    return head, [t for t in terms if t]
+
+
+def _covered_by_old_rules(item: str) -> bool:
+    return (any(rx.search(item) for rx, _ in _TERM_RE) or any(rx.search(item) for rx, _ in _WARN_TERM_RE)
+            or any(rx.search(item) for _, rx in _BANNED_RE))
+
+
+def parse_v16_terms(text: str) -> dict[str, Any]:
+    """v16 문서 글 → {"table": [(정규식, 맞출 표기, 오른쪽 표기들)], "filler": [(정규식, 맞출 표기)],
+    "listed"·"off_list"·"institutions"·"units": 약어 집합}(순수). 절이 없으면 빈 규칙."""
+    sec = _v16_section(text)
+    out: dict[str, Any] = {"table": [], "filler": [], "listed": set(), "off_list": set(),
+                           "institutions": set(), "units": set()}
+    if not sec:
+        return out
+    for line in sec.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")] if line.startswith("|") else []
+        if len(cells) != 2 or cells[0] in ("쓰지 말 것",) or set(cells[0]) <= set("-"):
+            continue
+        fix, rights = _right_terms(cells[1])
+        for item in (x.strip() for x in cells[0].split(" · ")):
+            if _plain_ko_item(item) and not _covered_by_old_rules(item):
+                out["table"].append((re.compile(r"(?<![가-힣])" + _term_item_regex(item)), fix, tuple(rights)))
+    flat = " ".join(sec.split())
+    m = re.search(r"군말:(.*?)문장 규칙:", flat)
+    for left, right in re.findall(r'"([^"]+)"\s*→\s*(.+?)(?=\s*·\s*"|\.\s|$)', m.group(1) if m else ""):
+        for item in (x.strip() for x in left.split("·")):
+            if not _plain_ko_item(item):
+                continue
+            tail = "" if item.endswith("다") or len(item.split()[-1]) == 1 else _JOSA_AFTER
+            out["filler"].append((re.compile(r"(?<![가-힣])" + _term_item_regex(item) + tail),
+                                  right.strip()))
+    m = re.search(r"영문 약어:(.*?)기관·제도 이름", flat)
+    out["listed"] = set(_CAPS_RE.findall(m.group(1))) if m else set()
+    m = re.search(r"기관·제도 이름\((.*?)\)은 그대로", flat)
+    out["institutions"] = set(_CAPS_RE.findall(m.group(1))) if m else set()
+    m = re.search(r"목록에 없는 약어\((.*?)\)", flat)
+    out["off_list"] = set(_CAPS_RE.findall(m.group(1))) if m else set()
+    m = re.search(r"단위\(([^()]*)\)는 약어가 아니다", flat)
+    out["units"] = set(_CAPS_RE.findall(m.group(1))) if m else set()
+    return out
+
+
+_V16_CACHE: dict[str, dict[str, Any]] = {}
+
+
+def v16_terms(path: str = _V16_PROMPT) -> dict[str, Any]:
+    """`parse_v16_terms` 를 v16 문서에 돌린 결과(경로마다 한 번). 문서를 못 읽으면 빈 규칙."""
+    if path not in _V16_CACHE:
+        try:
+            with open(path, encoding="utf-8") as f:
+                _V16_CACHE[path] = parse_v16_terms(f.read())
+        except OSError:
+            _V16_CACHE[path] = parse_v16_terms("")
+    return _V16_CACHE[path]
+
+
+def v16_table_hits(blob: str, rules: dict[str, Any] | None = None) -> list[str]:
+    """v16 문서에서 읽은 표 왼쪽 표기·군말 위반 라벨(순수 — `rules` 를 주면 그것으로). `term_hits` 가 부른다."""
+    rules = v16_terms() if rules is None else rules
+    out: list[str] = []
+    for rx, fix, rights in rules["table"]:
+        spans = [(r.start(), r.end()) for t in rights for r in re.finditer(re.escape(t), blob)]
+        for m in rx.finditer(blob):
+            if not any(a <= m.start() and m.end() <= b for a, b in spans):
+                out.append(f"'{m.group(0)}'→{fix}")
+                break
+    for rx, fix in rules["filler"]:
+        m = rx.search(blob)
+        if m:
+            out.append(f"군말 '{m.group(0)}'→{fix}")
+    return out
+
+
+def term_hits(blob: str, context: str | None = None, v16_rules: bool = False) -> list[str]:
     """[용어·표기] 막는 검사의 **단일 원천**(순수) — 걸린 라벨 목록. 델타 카드 산문과 심층 칸 산문이 이 함수를 같이 부른다.
 
     ★리허설 1120b: 델타는 이 규칙으로 막고 심층은 경고만 해서, 교열이 심층 산문 용어로 19장을 반려했다.
     규칙을 두 벌 두지 않는다 — 표에 줄을 더하면 델타·심층 사전 점검이 같이 는다.
     ① 표 왼쪽 표기 ② 허용 약어 단독(`context`(없으면 `blob`)에 한글 표기 없음 — '처음 한 번'은 카드 단위)
-    ③ OOS 는 처음 한 번 뒤에도 맨 약어 금지 ④ 목록 밖 약어."""
+    ③ OOS 는 처음 한 번 뒤에도 맨 약어 금지 ④ 목록 밖 약어 ⑤ v16 문서에서 읽은 표 한글 표기·군말(`v16_table_hits`).
+    ⑤ 는 `v16_rules=True` 일 때만 — 기자 사전 점검 전용. 발행 조립(`assemble_publish_brief`)은 끈 채 부른다:
+    월요일 백업 Routine 은 옛 v16(붙여넣은 사본)으로 쓰므로, 조립 규칙이 늘면 STYLE_LINT_BLOCKING 을 켜는 날 백업까지 막힌다(2026-11-21 대표 결정)."""
     context = blob if context is None else context
     out: list[str] = []
     for rx, fix in _TERM_RE:
@@ -789,6 +931,8 @@ def term_hits(blob: str, context: str | None = None) -> list[str]:
     for rx, abbr, ko in _ABBR_OFF_RE:
         if rx.search(blob):
             out.append(f"목록 밖 약어 '{abbr}'→{ko}")
+    if v16_rules:   # [리허설 1121a] ⑤ v16 문서에서 읽은 표 한글 표기·군말 — 기자 사전 점검(precheck)만 켠다
+        out.extend(v16_table_hits(blob))
     return out
 
 # [2026-11-16 재측정] v16 [용어·표기] 에 11-16 에 더한 줄(docs/prompts/GRM_Prompt_v16.md) 중 코드로 셀 수 있는 것.
@@ -867,7 +1011,7 @@ def _deep_prose_texts(entry: Any) -> list[str]:
     return [t for _, t in _deep_prose_slots(entry)]
 
 
-def deep_term_hits(deep: Any) -> list[tuple[str, str, str]]:
+def deep_term_hits(deep: Any, v16_rules: bool = False) -> list[tuple[str, str, str]]:
     """심층 칸 산문의 [용어·표기] 위반 (카드 id, 슬롯, 라벨) 목록(순수) — `term_hits` 를 **슬롯마다** 부른다.
 
     슬롯 단위인 까닭: 화면은 위반 항목을 따로따로 보여 주고, 교열도 슬롯마다 '처음 한 번은 한글 뒤 괄호'를 본다
@@ -881,7 +1025,7 @@ def deep_term_hits(deep: Any) -> list[tuple[str, str, str]]:
     for cid, entry in deep.items():
         slots = _deep_prose_slots(entry)
         card = "\n".join(t for _, t in slots)
-        out.extend((str(cid), slot, lab) for slot, text in slots for lab in term_hits(text, card))
+        out.extend((str(cid), slot, lab) for slot, text in slots for lab in term_hits(text, card, v16_rules))
     return out
 
 
@@ -1034,7 +1178,7 @@ def _ending(text: str) -> str:
     return t[-_ENDING_CHARS:] if len(t) >= _ENDING_CHARS else ""
 
 
-def lint_prose_style(delta: dict[str, Any]) -> StyleReport:
+def lint_prose_style(delta: dict[str, Any], v16_rules: bool = False) -> StyleReport:
     """델타 한국어 산문의 표현 검사(순수). 경고 재료만 만든다 — 차단 판단은 호출자 몫."""
     rep = StyleReport()
     cards = delta.get("cards") or {}
@@ -1058,7 +1202,7 @@ def lint_prose_style(delta: dict[str, Any]) -> StyleReport:
         for lab, rx in _BANNED_RE:
             if rx.search(blob):
                 rep.banned.setdefault(lab, []).append(str(cid))
-        for lab in term_hits(blob):
+        for lab in term_hits(blob, v16_rules=v16_rules):
             rep.terms.setdefault(lab, []).append(str(cid))
         for rx, fix in _WARN_TERM_RE:
             m = rx.search(blob)

@@ -103,6 +103,7 @@ jobs:
             } else {
               lines.push(`- 검토 대기 전체: **${r.needs_review}**건 (검색 화면에 보이는 scope ok: ${r.needs_review_visible}건)`);
               lines.push(`- 가장 오래된 건: **${r.oldest_age_days}일** · 기한 ${r.max_age_days}일 초과: **${r.overdue}**건`);
+              lines.push(`- 범위 밖(non_pharma 등) 기한 ${r.out_of_scope_max_age_days}일 — 기한 안에서 기다리는 범위 밖 행: ${r.out_of_scope_waiting}건 (경보 아님)`);
               lines.push(`- 소스별: ${Object.entries(r.by_source || {}).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
               lines.push(`- 범위별: ${Object.entries(r.by_scope || {}).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
               lines.push('');

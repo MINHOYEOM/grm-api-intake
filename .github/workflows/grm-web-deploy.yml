@@ -177,11 +177,24 @@ jobs:
             echo "::warning::Cloudflare 시크릿 미등록 — 배포 스킵(빌드/아티팩트만). 사람이 CLOUDFLARE_API_TOKEN·CLOUDFLARE_ACCOUNT_ID 등록 후 자동 활성."
           fi
 
-      # IndexNow — 배포 '전' 라이브 sitemap 을 받아 둔다(배포 후 새/변경 URL 비교용). 비차단.
+      # IndexNow — 배포 '전' 라이브 **전체** sitemap(sitemap-full.xml)을 받아 둔다(배포 후 새/변경 URL 비교용). 비차단.
+      # [구글 품질 1단계 2026-11-19] sitemap.xml 은 구글용(googlebot noindex 페이지 제외)이라 비교에 쓰지 않는다.
+      #   전체 목록이 라이브에 아직 없을 때(이 변경의 첫 배포 = 404)만 옛 sitemap.xml 로 갈음한다 — 그때의
+      #   sitemap.xml 은 분리 전 전체 목록이라 같은 모집단이다. 404 가 아닌 실패(네트워크 등)는 대체하지 않고
+      #   건너뛴다(대체하면 축소된 구글용과 비교돼 수천 건이 대량 재제출된다 — 제출기 상한도 막는다).
       - name: Fetch live sitemap before deploy (non-blocking)
         if: steps.creds.outputs.have == 'true' && github.event_name == 'push' && github.ref_name == 'main'
         continue-on-error: true
-        run: curl -fsSL --max-time 60 https://grm-solutions.com/sitemap.xml -o "${{ runner.temp }}/prev_sitemap.xml"
+        run: |
+          PREV="${{ runner.temp }}/prev_sitemap.xml"
+          CODE=$(curl -sSL --max-time 60 -o "$PREV" -w '%{http_code}' https://grm-solutions.com/sitemap-full.xml || echo 000)
+          if [ "$CODE" = "404" ]; then
+            echo "sitemap-full.xml 없음(첫 배포) — 분리 전 sitemap.xml 로 비교"
+            curl -fsSL --max-time 60 https://grm-solutions.com/sitemap.xml -o "$PREV"
+          elif [ "$CODE" != "200" ]; then
+            rm -f "$PREV"
+            echo "::warning::sitemap-full.xml 받기 실패(HTTP $CODE) — 이번 배포는 IndexNow 건너뜀"
+          fi
 
       # ── C3: 배포(Cloudflare Pages) — prod/preview 분류는 Cloudflare 가 브랜치명으로 판정. ──
       #   production 브랜치(vars.CF_PAGES_PROD_BRANCH, Cloudflare 설정과 일치)로의 머지만 라이브.
@@ -203,7 +216,7 @@ jobs:
         continue-on-error: true
         run: |
           if [ -s "${{ runner.temp }}/prev_sitemap.xml" ]; then
-            python indexnow_submit.py --sitemap web/dist/sitemap.xml --previous "${{ runner.temp }}/prev_sitemap.xml"
+            python indexnow_submit.py --sitemap web/dist/sitemap-full.xml --previous "${{ runner.temp }}/prev_sitemap.xml"
           else
             echo "::warning::이전 sitemap 없음 — IndexNow 제출 건너뜀(전수는 grm-indexnow-full.yml)"
           fi

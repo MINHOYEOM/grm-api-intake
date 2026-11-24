@@ -99,6 +99,8 @@ def build(sources: list[dict[str, Any]]) -> dict[str, Any]:
                     "preview": "" if c.get("title") else _preview(c.get("text") or ""),
                     "depth": _depth(c["number"]),
                     "chars": c.get("chars") or 0,
+                    # [구글 품질 1단계 2026-11-19] 국문 번역(2단계가 채운다). 있으면 국문 페이지가 구글에 돌아온다.
+                    "text_ko": c.get("text_ko") or "",
                 })
             pages = [c for c in clauses if c["href"]]
             for i, c in enumerate(pages):
@@ -133,6 +135,25 @@ def tree_paths(view: dict[str, Any]) -> set[str]:
             out.add(d["path"])
             out |= {c["href"] for c in d["clauses"] if c["href"]}
     return out
+
+
+# [구글 품질 1단계 2026-11-19] 구글에서만 뺄 조항 페이지(googlebot noindex + sitemap.xml 제외).
+#   D. 국문 트리인데 본문이 외국어 원문뿐(국문 번역 `text_ko` 없음) — 같은 영어 본문이 ko·en 두 주소에 선다.
+#   E. 그 언어 페이지에 실리는 본문이 GOOGLE_MIN_CHARS 자 미만 — 원문 한 줄에 이전/다음 링크뿐인 페이지.
+# 판정은 정본 데이터만 보므로, 2단계에서 `text_ko` 가 채워지면 다음 빌드에서 자동으로 돌아온다.
+GOOGLE_MIN_CHARS = 300
+
+
+def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str) -> str:
+    """"" 이면 구글 색인 대상. 아니면 "untranslated"(D) 또는 "short"(E)."""
+    foreign = (doc.get("source") or {}).get("lang", "en") != "ko"
+    if lang == "ko" and foreign:
+        if not clause.get("text_ko"):
+            return "untranslated"
+        n = len(clause["text_ko"])
+    else:
+        n = clause.get("chars") or 0
+    return "short" if n < GOOGLE_MIN_CHARS else ""
 
 
 def pages(view: dict[str, Any]):

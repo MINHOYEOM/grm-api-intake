@@ -48,6 +48,8 @@ from typing import Any
 # evidence_url 품질 분류기(EVIDENCE_URL_BLOCKLIST)를 단일 진실원으로 재사용한다
 # (2026-09-10 정보출처 링크 게이트, 아래 _dual_links 주석 참조).
 from grm_findings import evidence_url_quality_error
+# 업체명 칸이 사람 이름(개인 농장·개인 사업자)이면 '개인 사업자' — 표기·판정 단일 출처(11-21 대표 결정·#1876 과 같은 표).
+from grm_findings import redact_person_firm
 
 # grm_taxonomy 는 stdlib-only 순수함수 층이고 card_scaffold 를 import 하지 않는다(순환 없음).
 # 제품군 값은 분류기와 렌더가 같은 문자열을 써야 하므로 평면 복제하지 않고 직접 가져온다
@@ -843,11 +845,20 @@ def _detail_fda_483_observations(row: dict[str, Any], raw: dict[str, Any]) -> di
     norm = [o for o in norm if _is_legible_deficiency(o["deficiency"])]
     if not norm:
         return None
-    detail: dict[str, Any] = {
-        "type": "fda_483_observations",
-        "count": len(norm),
-        "observations": norm,
-    }
+    # [건수 2026-11-23] count 는 원문 관찰 건수다 — rows 길이로 두면 게이트에서 빠진 관찰만큼
+    # 조용히 줄어든다(실측 196455: 원문 6건 → "관찰사항 3건"). 수집기가 원문 번호 표제로 센
+    # `raw.fda_483_observation_count` 가 있으면 그것을(None = 단정 불가 → count 비움), 없으면
+    # (낡은 raw) 같은 규칙 함수로 rows 번호만 보고 센다 — 번호가 건너뛰면 비운다.
+    from collect_fda_483 import fda483_observation_count   # 규칙의 단일 출처
+    if "fda_483_observation_count" in raw:
+        stored = raw.get("fda_483_observation_count")
+        count = stored if isinstance(stored, int) and stored > 0 else None
+    else:
+        count = fda483_observation_count(norm)
+    detail: dict[str, Any] = {"type": "fda_483_observations"}
+    if count is not None:
+        detail["count"] = count
+    detail["observations"] = norm
     # [OCR 출처 표기 2026-07-27] 이 영문이 **원문 텍스트층**인지 **우리가 OCR 로 판독한 것**
     # 인지 구분한다. 스캔 483 OCR 폴백 도입 이후 두 경로가 섞이는데, 렌더는 이 블록을
     # "원문 · FDA 483" 이라고 표시한다 — 우리 판독 결과를 원문이라고 부르면 그건 거짓이다
@@ -1475,7 +1486,7 @@ def _doc_number(kind: str, row: dict[str, Any]) -> str:
 # safety-letter·regulation)는 extra_rows=None → dispatcher 가 _w2_extra_default.
 def _w2_extra_wl(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     # §12(B): Site Country·issue_date·CFR 조항 없음 → letter_date, 조항행 생략
-    rows = [("업체/제조소", _first(raw.get("firm"), row.get("firm")) or VALUE_UNKNOWN)]
+    rows = [("업체/제조소", redact_person_firm(_first(raw.get("firm"), row.get("firm"))) or VALUE_UNKNOWN)]
     ld = _first(raw.get("letter_date"), raw.get("posted_date"))
     if ld:
         rows.append(("발행 부서/일자", _first(raw.get("issuing_office")) + (f" · {ld}" if ld else "")))
@@ -1571,7 +1582,7 @@ def _w2_extra_mhra_recall(row: dict[str, Any], raw: dict[str, Any]) -> list[tupl
 
 def _w2_extra_fda_483(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     # §6: 회사·FEI·Establishment Type·Record Type·실사일(발행일=Publish 은 발행일 행).
-    firm = _first(raw.get("firm"), row.get("firm")) or VALUE_UNKNOWN
+    firm = redact_person_firm(_first(raw.get("firm"), row.get("firm"))) or VALUE_UNKNOWN
     fei = raw.get("fei_number", "")
     rows = [("제조소/업체", firm + (f" · FEI {fei}" if fei else ""))]
     meta = " · ".join(p for p in (raw.get("establishment_type", ""),
@@ -1863,8 +1874,9 @@ def _headline_target(row: dict[str, Any]) -> str:
 
     `_title()`(markdown)과 `CardScaffold.to_web_card()`(JSON)가 **이 단일 헬퍼를 공유**해
     제목과 web-card `headline_target` 이 항상 같은 verbatim 값을 갖게 한다(드리프트 차단, §3.5).
+    업체명이 사람 이름(개인 사업자)이면 '개인 사업자' 로 쓴다(`grm_findings.redact_person_firm` — 사실표 업체 칸과 같은 함수).
     """
-    return _truncate_at_sentence(_first(row.get("firm"), row.get("headline")), 60)
+    return _truncate_at_sentence(_first(redact_person_firm(_first(row.get("firm"))), row.get("headline")), 60)
 
 
 def _title(kind: str, row: dict[str, Any]) -> str:

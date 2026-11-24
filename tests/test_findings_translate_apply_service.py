@@ -130,7 +130,7 @@ class ApplySuccessTest(unittest.TestCase):
         self.assertEqual(get.call_count, 1)
         _, gkwargs = get.call_args
         self.assertEqual(gkwargs["params"]["finding_id"], "eq.f-001")
-        self.assertEqual(gkwargs["params"]["select"], "finding_text")
+        self.assertEqual(gkwargs["params"]["select"], "finding_text,finding_text_ko,translation_method")
         self.assertNotIn("finding_text", gkwargs["params"])  # never a URL predicate
         self.assertEqual(gkwargs["headers"]["apikey"], _SERVICE_KEY)
         self.assertEqual(gkwargs["headers"]["Authorization"], f"Bearer {_SERVICE_KEY}")
@@ -461,6 +461,64 @@ class IdempotentReplayTest(unittest.TestCase):
         self.assertEqual(second["items_matched_zero"], 1)
         self.assertEqual(first["items_errored"], 0)
         self.assertEqual(second["items_errored"], 0)
+
+
+class SkipUnchangedTest(unittest.TestCase):
+    """[DB 용량 3단계 · 2026-11-20] 라이브가 이미 같은 국문·방식이면 PATCH 를 보내지 않는다.
+
+    뮤테이션: _apply_one_finding 의 unchanged 분기를 지우면 test_same_values_send_no_patch 가 깨진다.
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+
+    def _get_live(self, ko: str, method: str = "llm_assisted"):
+        def _fake(url, params=None, json=None, headers=None, timeout=None):  # noqa: A002
+            return _FakeResponse(200, [{"finding_text": _live_text_for(params["finding_id"]),
+                                        "finding_text_ko": ko, "translation_method": method}])
+        return _fake
+
+    def test_same_values_send_no_patch(self) -> None:
+        _write_outbox_file(self._tmp.name, "batch1.json", [_outbox_item(1)])
+        with _patch_get(side_effect=self._get_live("관찰사항 1 국문 번역.")), _patch_patch() as patch:
+            report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY)
+        patch.assert_not_called()
+        self.assertEqual(report["items_unchanged"], 1)
+        self.assertEqual(report["items_succeeded"], 0)
+        self.assertEqual(report["items_errored"], 0)
+
+    def test_different_ko_still_patches(self) -> None:
+        _write_outbox_file(self._tmp.name, "batch1.json", [_outbox_item(1)])
+        with _patch_get(side_effect=self._get_live("옛 번역")), _patch_patch(
+            return_value=_FakeResponse(200, [{"finding_id": "f-001"}])
+        ) as patch:
+            report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY)
+        self.assertEqual(patch.call_count, 1)
+        self.assertEqual(report["items_succeeded"], 1)
+        self.assertEqual(report["items_unchanged"], 0)
+
+    def test_different_method_still_patches(self) -> None:
+        _write_outbox_file(self._tmp.name, "batch1.json", [_outbox_item(1)])
+        with _patch_get(side_effect=self._get_live("관찰사항 1 국문 번역.", "machine")), _patch_patch(
+            return_value=_FakeResponse(200, [{"finding_id": "f-001"}])
+        ) as patch:
+            report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY)
+        self.assertEqual(patch.call_count, 1)
+        self.assertEqual(report["items_succeeded"], 1)
+
+    def test_null_live_ko_vs_item_patches(self) -> None:
+        _write_outbox_file(self._tmp.name, "batch1.json", [_outbox_item(1)])
+
+        def _fake(url, params=None, json=None, headers=None, timeout=None):  # noqa: A002
+            return _FakeResponse(200, [{"finding_text": _live_text_for(params["finding_id"]),
+                                        "finding_text_ko": None, "translation_method": None}])
+        with _patch_get(side_effect=_fake), _patch_patch(
+            return_value=_FakeResponse(200, [{"finding_id": "f-001"}])
+        ) as patch:
+            report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY)
+        self.assertEqual(patch.call_count, 1)
+        self.assertEqual(report["items_succeeded"], 1)
 
 
 class CredentialsTest(unittest.TestCase):

@@ -38,9 +38,11 @@ from typing import Any, Callable
 import findings_supabase_append as fsa
 import findings_supabase_backfill as fsb
 import raw_versioning as rv
+import backfill_483_inspectors_from_body as inspectors_from_body
 from grm_common import SOURCE_FDA_483, log
 
 BODY_KEY = "fda483_body_full"
+INSPECTORS_KEY = "fda483_inspectors"
 OUT_OF_SCOPE = "out-of-scope"
 SELECT_COLUMNS = "raw_signal_id,document_id,published_date,raw_json,row_json,raw_sha256"
 CHANGED_BY = "backfill_483_body_full"
@@ -63,6 +65,7 @@ class Report:
     pdf_failed: int = 0
     pdf_not_probed: int = 0          # dry-run 에서 PDF 를 받지 않은 수
     applied: int = 0
+    inspectors_added: int = 0        # 전문과 함께 실사관(fda483_inspectors)도 새로 채운 행
     unchanged: int = 0
     conflict: int = 0
     errors: list[str] = field(default_factory=list)
@@ -156,6 +159,13 @@ def body_from_pdf(raw: dict[str, Any], doc_id: str) -> tuple[str, str]:
 def new_record(row: dict[str, Any], body: str) -> tuple[dict[str, Any], str]:
     raw = _loads(row.get("raw_json"))
     raw[BODY_KEY] = body
+    # [2026-11-23] 전문을 채우면서 실사관도 같은 공통 함수로 뽑는다(R5 — 종전엔 전문만 쓰고 실사관 칸은
+    # 빈 채로 남았다, 수집완전성 점검 11-22 9-3). 이미 이름이 있으면 덮지 않는다. 못 뽑으면 키를 달지 않는다.
+    if not raw.get(INSPECTORS_KEY):
+        import collect_fda_483 as fda483
+        names = fda483._extract_483_inspectors(body)
+        if names:
+            raw[INSPECTORS_KEY] = names
     raw_text, sha = rv.canonical_raw(raw)
     return {"raw_json": raw_text, "raw_sha256": sha, "row_json": str(row.get("row_json") or "")}, sha
 
@@ -167,7 +177,8 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
         notion_body: Callable[[str], str],
         pdf_body: Callable[[dict[str, Any], str], tuple[str, str]],
         applier: Callable[..., dict[str, Any]] | None,
-        sleeper: Callable[[float], None] = time.sleep) -> Report:
+        sleeper: Callable[[float], None] = time.sleep,
+        findings_patcher: Callable[[str, list[str]], str] | None = None) -> Report:
     rep = Report(mode="apply" if apply else "dry-run", since=since)
     for row in select_targets(rows, ledger, rep):
         doc = str(row.get("document_id") or "")
@@ -209,13 +220,23 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
         if not apply:
             continue
         record, _sha = new_record(row, body)
+        new_names = (_loads(record["raw_json"]).get(INSPECTORS_KEY) or []) \
+            if not raw.get(INSPECTORS_KEY) else []
+        added = [BODY_KEY] + ([INSPECTORS_KEY] if new_names else [])
         result = applier(raw_signal_id=str(row["raw_signal_id"]),
                          expected_raw_sha256=str(row.get("raw_sha256") or ""),
                          record=record, change_kind="repair", changed_by=CHANGED_BY,
-                         diff_summary={"added": [BODY_KEY], "via": via, "chars": len(body)})
+                         diff_summary={"added": added, "via": via, "chars": len(body)})
         status = str(result.get("status") or "error")
         if status == "applied":
             rep.applied += 1
+            if new_names:
+                rep.inspectors_added += 1
+                if findings_patcher is not None:
+                    # findings 행의 inspector_names 는 적재 때 raw 에서 복사된다 — 빈 행만 같은 이름으로.
+                    err = findings_patcher(str(row["raw_signal_id"]), list(new_names))
+                    if err:
+                        rep.errors.append(f"findings({doc}):{err}")
         elif status == "unchanged":
             rep.unchanged += 1
         elif status == "conflict":
@@ -260,13 +281,15 @@ def main(argv: list[str] | None = None) -> int:
 
     rep = run(rows, ledger, apply=args.apply, probe_pdf=args.probe_pdf, notion_index=index,
               since=args.since, notion_body=lambda pid: body_from_notion(token, pid),
-              pdf_body=body_from_pdf, applier=_apply if args.apply else None)
+              pdf_body=body_from_pdf, applier=_apply if args.apply else None,
+              findings_patcher=(lambda rid, names: inspectors_from_body.patch_empty_findings(
+                  base_url, service_key, rid, names)[1]) if args.apply else None)
     with open(args.report, "w", encoding="utf-8") as fh:
         json.dump(asdict(rep), fh, ensure_ascii=False, indent=1)
     log("INFO", f"483 전문 소급 {rep.mode}: 대상 {rep.targets} · 노션 {rep.via_notion} · PDF {rep.via_pdf} "
                 f"· 노션 없음 {rep.notion_missing}(PDF 미확인 {rep.pdf_not_probed}) "
                 f"· 관찰 파싱 안 됨 {rep.pdf_no_observations} · PDF 실패 {rep.pdf_failed} "
-                f"· 적용 {rep.applied} · 같음 {rep.unchanged} · 충돌 {rep.conflict} · 오류 {len(rep.errors)}")
+                f"· 적용 {rep.applied}(실사관도 채움 {rep.inspectors_added}) · 같음 {rep.unchanged} · 충돌 {rep.conflict} · 오류 {len(rep.errors)}")
     return 1 if rep.errors and args.apply else 0
 
 

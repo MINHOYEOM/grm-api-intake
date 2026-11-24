@@ -33,6 +33,7 @@
 실제 발행 없이 그 지시문으로 같은 순서를 돌려 보는 법은 `REHEARSAL.md`, 점검은 `rehearsal_check.py`.
 2026-11-23 전환 때 사람이 할 일(next/ 를 실발행 자리로 옮기기·저장소 변수)은 `SWITCH_2026-11-23.md`.
 `precheck.py` 는 교열 전에 코드가 셀 수 있는 것(용어·약어 표기, 길이)을 기자가 먼저 세고, 교열의 심층분석 검사에 handoff 원문을 붙이는 도구다.
+`guess_check.py` 는 `precheck.py` 가 부르는 가림·깨진 값 채움 검사다(원문 어디에도 없는 낱말을 사실 칸에 쓰면 차단 — 리허설 1121b).
 
 ## 매주 남는 기록
 `claude/company-{날짜}` 브랜치의 `company/run/{날짜}/` — `desk.json` · `delta.{A,B}.json` · `deep.{A,B}.json` · (합친) `delta.json` · `copyedit.json`(`published` 로 누가 발행했는지).

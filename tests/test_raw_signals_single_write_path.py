@@ -10,9 +10,8 @@ from __future__ import annotations
 import ast
 import re
 import subprocess
+import unittest
 from pathlib import Path
-
-import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_COLUMNS = {"raw_json", "row_json", "raw_sha256", "record_json", "body", "raw_sha"}
@@ -151,75 +150,106 @@ def python_writes(source: str, path: str) -> list[tuple[int, str]]:
     return violations
 
 
-def test_raw_signals_single_write_path():
-    paths = subprocess.check_output(
-        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "*.py", "*.sql"],
-        cwd=ROOT,
-    ).decode("utf-8").split("\0")
-    offenders = []
-    for path in sorted(set(filter(None, paths))):
-        file = ROOT / path
-        if {"tests", "fixtures"} & set(file.relative_to(ROOT).parts[:-1]) or not file.is_file():
-            continue
-        source = file.read_text(encoding="utf-8-sig")
-        if "raw_signals" not in source.lower():
-            continue
-        scan = python_writes if file.suffix == ".py" else sql_writes
-        offenders.extend(f"{path}:{line} ({kind})" for line, kind in scan(source, path))
-    assert not offenders, "Use raw_versioning / raw_signal_apply_version:\n" + "\n".join(offenders)
+class RawSignalsSingleWritePathTests(unittest.TestCase):
+    def test_raw_signals_single_write_path(self):
+        paths = subprocess.check_output(
+            ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "*.py", "*.sql"],
+            cwd=ROOT,
+        ).decode("utf-8").split("\0")
+        offenders = []
+        for path in sorted(set(filter(None, paths))):
+            file = ROOT / path
+            if {"tests", "fixtures"} & set(file.relative_to(ROOT).parts[:-1]) or not file.is_file():
+                continue
+            source = file.read_text(encoding="utf-8-sig")
+            if "raw_signals" not in source.lower():
+                continue
+            scan = python_writes if file.suffix == ".py" else sql_writes
+            offenders.extend(f"{path}:{line} ({kind})" for line, kind in scan(source, path))
+        self.assertFalse(offenders, "Use raw_versioning / raw_signal_apply_version:\n" + "\n".join(offenders))
 
+    def test_post_rows_defaults_to_initial_insert(self):
+        source = (ROOT / "findings_supabase_append.py").read_text(encoding="utf-8")
+        helper = next(node for node in ast.parse(source).body
+                      if isinstance(node, ast.FunctionDef) and node.name == "_post_rows")
+        defaults = dict(zip((arg.arg for arg in helper.args.kwonlyargs), helper.args.kw_defaults))
+        self.assertEqual(_text(defaults["resolution"], {}), "ignore-duplicates")
 
-def test_post_rows_defaults_to_initial_insert():
-    source = (ROOT / "findings_supabase_append.py").read_text(encoding="utf-8")
-    helper = next(node for node in ast.parse(source).body
-                  if isinstance(node, ast.FunctionDef) and node.name == "_post_rows")
-    defaults = dict(zip((arg.arg for arg in helper.args.kwonlyargs), helper.args.kw_defaults))
-    assert _text(defaults["resolution"], {}) == "ignore-duplicates"
+    def test_detects_python_bypasses_request_patch(self):
+        source = (
+            'url = f"{base}/rest/v1/raw_signals?raw_signal_id=eq.{row_id}"\n'
+            'session.request("PATCH", url, json={"raw_json": raw})'
+        )
+        self.assertTrue(python_writes(source, "new/subdir/tool.py"))
 
+    def test_detects_python_bypasses_table_update(self):
+        source = (
+            'table = "raw_signals"\n'
+            'client.table(table).update({"row_json": raw}).eq("raw_signal_id", row_id).execute()'
+        )
+        self.assertTrue(python_writes(source, "new/subdir/tool.py"))
 
-@pytest.mark.parametrize("source", [
-    'url = f"{base}/rest/v1/raw_signals?raw_signal_id=eq.{row_id}"\n'
-    'session.request("PATCH", url, json={"raw_json": raw})',
-    'table = "raw_signals"\n'
-    'client.table(table).update({"row_json": raw}).eq("raw_signal_id", row_id).execute()',
-    'headers = {"Prefer": "return=minimal,resolution=merge-duplicates"}\n'
-    'requests.post(f"{base}/rest/v1/raw_signals", headers=headers, json=rows)',
-    '_post_rows(base, key, table="raw_signals", rows=rows, resolution="merge-duplicates")',
-    'conn.execute("UPDATE raw_signals SET raw_sha256 = ?")',
-])
-def test_detects_python_bypasses(source):
-    assert python_writes(source, "new/subdir/tool.py")
+    def test_detects_python_bypasses_post_merge_duplicates(self):
+        source = (
+            'headers = {"Prefer": "return=minimal,resolution=merge-duplicates"}\n'
+            'requests.post(f"{base}/rest/v1/raw_signals", headers=headers, json=rows)'
+        )
+        self.assertTrue(python_writes(source, "new/subdir/tool.py"))
 
+    def test_detects_python_bypasses_post_rows_upsert(self):
+        source = (
+            '_post_rows(base, key, table="raw_signals", rows=rows, resolution="merge-duplicates")'
+        )
+        self.assertTrue(python_writes(source, "new/subdir/tool.py"))
 
-@pytest.mark.parametrize("source", [
-    'UPDATE "public"."raw_signals" AS r\nSET (raw_json, row_json) = (a, b);',
-    "INSERT INTO raw_signals VALUES (1) ON CONFLICT (id) DO UPDATE SET raw_sha256 = excluded.raw_sha256;",
-    "INSERT OR REPLACE INTO raw_signals VALUES (1);",
-    "MERGE INTO raw_signals r USING source s ON r.id = s.id WHEN MATCHED THEN UPDATE SET raw_json = s.raw_json;",
-])
-def test_detects_sql_bypasses(source):
-    assert sql_writes(source, "new.sql")
+    def test_detects_python_bypasses_embedded_sql_update(self):
+        source = (
+            'conn.execute("UPDATE raw_signals SET raw_sha256 = ?")'
+        )
+        self.assertTrue(python_writes(source, "new/subdir/tool.py"))
 
+    def test_detects_sql_bypasses_update(self):
+        source = (
+            'UPDATE "public"."raw_signals" AS r\nSET (raw_json, row_json) = (a, b);'
+        )
+        self.assertTrue(sql_writes(source, "new.sql"))
 
-def test_canonical_migration_does_not_exempt_other_writes():
-    source = """
+    def test_detects_sql_bypasses_insert_on_conflict_update(self):
+        source = (
+            "INSERT INTO raw_signals VALUES (1) ON CONFLICT (id) DO UPDATE SET raw_sha256 = excluded.raw_sha256;"
+        )
+        self.assertTrue(sql_writes(source, "new.sql"))
+
+    def test_detects_sql_bypasses_insert_or_replace(self):
+        source = (
+            "INSERT OR REPLACE INTO raw_signals VALUES (1);"
+        )
+        self.assertTrue(sql_writes(source, "new.sql"))
+
+    def test_detects_sql_bypasses_merge(self):
+        source = (
+            "MERGE INTO raw_signals r USING source s ON r.id = s.id WHEN MATCHED THEN UPDATE SET raw_json = s.raw_json;"
+        )
+        self.assertTrue(sql_writes(source, "new.sql"))
+
+    def test_canonical_migration_does_not_exempt_other_writes(self):
+        source = """
         CREATE OR REPLACE FUNCTION public.raw_signal_apply_version()
         RETURNS void AS $$
           UPDATE public.raw_signals SET raw_json = new_raw;
         $$ LANGUAGE sql;
         UPDATE public.raw_signals SET raw_json = 'bypass';
-    """
-    assert sql_writes(source, "web/migrations/150_raw_signals_write_lock.sql") == [(6, "update")]
+        """
+        self.assertEqual(sql_writes(source, "web/migrations/150_raw_signals_write_lock.sql"), [(6, "update")])
 
-
-def test_allows_reads_metadata_and_initial_inserts():
-    assert not sql_writes("""
+    def test_allows_reads_metadata_and_initial_inserts(self):
+        self.assertFalse(sql_writes("""
         -- update raw_signals set raw_json = 'bad';
         update raw_signals set modality = 'chemical' where raw_json is not null;
         insert into raw_signals (raw_json) values ('{}') on conflict do nothing;
-    """, "new.sql")
-    assert not python_writes("""
+        """, "new.sql"))
+        self.assertFalse(python_writes("""
 requests.get(f"{base}/rest/v1/raw_signals")
 _post_rows(base, key, "raw_signals", rows, resolution="ignore-duplicates")
 raw_versioning.replace_raw(base, key, row, new_raw)
-    """, "new.py")
+        """, "new.py"))

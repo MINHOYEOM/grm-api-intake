@@ -172,22 +172,6 @@ def summary_markdown(report: CoverageReport, *, title: str = "FDA 카드 본문 
     return "\n".join(lines) + "\n"
 
 
-def handoff_status(run_date: str, *, token: str, db_id: str,
-                   find_page: Any = None) -> str:
-    """그 날짜 handoff page 의 Status(`New`=OPEN · `Processed`=CONSUMED · `Skipped`=STALE)
-    또는 `missing`. handoff 재생성(수집 재실행) 전에 반드시 `New` 인지 본다 — 이미 소비된
-    handoff 를 다시 쓰면(멱등성 v1 경로는 재패치한다) 발행이 끝난 주가 OPEN 으로 되살아난다."""
-    import grm_handoff
-    finder = find_page or grm_handoff.notion_find_handoff_page
-    page = finder(token, db_id, grm_handoff.handoff_id_for(run_date))
-    if not page:
-        return "missing"
-    return str(grm_handoff._intake_page_snapshot(page).get("status") or "missing")
-
-
-HANDOFF_STATUS_SOURCE_ENV = "GRM_HANDOFF_STATUS_SOURCE"     # notion(기본) | db
-
-
 def handoff_status_db(run_date: str, *, base_url: str, service_key: str, store: Any = None) -> str:
     """[노션 은퇴 준비] 같은 판정을 DB 대기열 기록(`intake_handoffs`)으로 — 반환 낱말은 노션과 같다.
 
@@ -229,19 +213,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "handoff-status":
         import os
-        import grm_queue
-        source = (os.environ.get(HANDOFF_STATUS_SOURCE_ENV, "") or "notion").strip().lower()
-        if grm_queue.notion_intake_off():
-            # [노션 은퇴] GRM_INTAKE_NOTION=off 면 노션 handoff 페이지가 만들어지지 않는다 — 노션에 물으면
-            # 언제나 `missing` 이라 FDA 본문 회수 뒤의 handoff 재생성이 조용히 꺼진다. DB 기록으로 답한다.
-            source = "db"
         try:
-            if source == "db":
-                status = handoff_status_db(args.date, base_url=os.environ["SUPABASE_URL"],
-                                           service_key=os.environ["SUPABASE_SERVICE_ROLE_KEY"])
-            else:
-                status = handoff_status(args.date, token=os.environ["NOTION_TOKEN"],
-                                        db_id=os.environ["NOTION_DATABASE_ID"])
+            status = handoff_status_db(args.date, base_url=os.environ["SUPABASE_URL"],
+                                       service_key=os.environ["SUPABASE_SERVICE_ROLE_KEY"])
         except Exception as e:  # noqa: BLE001 — 모르면 재생성하지 않는다(안전 쪽)
             status = f"error:{type(e).__name__}"
         _emit({"handoff_status": status})

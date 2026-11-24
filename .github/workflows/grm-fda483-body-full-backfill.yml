@@ -1,7 +1,7 @@
 name: GRM FDA 483 Body-Full Backfill
 
 # [483 전문 소급 · 2026-11-12] 정본 raw_signals 에 전문(fda483_body_full) 없이 굳은 최근 483 을 채운다.
-# backfill_483_body_full.py — ① Notion 행 원문의 전문 ② 없으면 PDF 다시 읽기(일일 수집 규칙).
+# Recover the full text from the PDF with the daily collector parser.
 # 쓰기는 원문 갱신 함수 raw_signal_apply_version(148)로만, 지금 raw 에 전문 키 하나만 더한다.
 # 기본은 dry-run(apply=false). dry 에서 PDF 까지 확인하려면 probe_pdf=true(쓰지 않음).
 # ★예약 실행(2026-11-22): 매일 22:07 KST 에 apply 한다(최근 45일 · OCR 1500쪽). 상한 밖으로 본문 없이 적재된 483 을
@@ -18,7 +18,7 @@ on:
         type: boolean
         default: false
       probe_pdf:
-        description: 'dry-run 에서도 Notion 에 없는 행의 PDF 를 받아 판정해 본다'
+        description: 'Read and check PDFs during a dry run'
         type: boolean
         default: false
       since:
@@ -70,8 +70,6 @@ jobs:
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           IN_APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
           IN_PROBE: ${{ inputs.probe_pdf }}
           IN_SINCE: ${{ github.event_name != 'schedule' && inputs.since || '' }}

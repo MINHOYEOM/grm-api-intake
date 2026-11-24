@@ -113,7 +113,7 @@ class KrEgressProxyTest(EnvMixin, unittest.TestCase):
         self.assertEqual(grm_common._proxies_for("https://apis.data.go.kr/1170000/law/lawSearchList.do"), expected)
         # 경계는 음성 검사로 고정한다 — KR 정부 호스트가 아니면 프록시를 타지 않는다.
         self.assertIsNone(grm_common._proxies_for("https://api.fda.gov/drug/enforcement.json"))
-        self.assertIsNone(grm_common._proxies_for("https://api.notion.com/v1/pages"))
+        self.assertIsNone(grm_common._proxies_for("https://example.org/v1/pages"))
         self.assertIsNone(grm_common._proxies_for("https://data.go.kr.evil.example.com/x"))
 
     def test_http_get_json_passes_proxy_to_requests(self) -> None:

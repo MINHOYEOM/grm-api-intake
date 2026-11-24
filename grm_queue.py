@@ -34,7 +34,7 @@ import json
 import os
 import sys
 from datetime import date, datetime, timedelta, timezone
-from typing import Any, Callable, Iterable
+from typing import Any, Iterable
 
 import requests
 
@@ -126,46 +126,6 @@ DEDUP_NEW = "new"         # 정본에 없다 → 저장하고 대기열에 넣�
 DEDUP_HAVE = "have"       # 정본·대기열 둘 다 있다 → 이미 받음
 DEDUP_HEAL = "heal"       # 정본에 있고 대기열에 없고 저장이 최근 → 대기열에만 넣는다(보충)
 DEDUP_OLD = "old"         # 정본에 있고 대기열에 없고 저장이 오래전 → 이미 받음(대기열 기록 이전)
-
-
-NOTION_INTAKE_ENV = "GRM_INTAKE_NOTION"          # on(기본) | off
-
-
-def notion_intake_off() -> bool:
-    """수집기가 노션 Intake DB 를 **쓰지도 읽지도 않는가** — 저장소 변수 GRM_INTAKE_NOTION=off 일 때만 참.
-
-    off 면 행 생성·handoff 페이지·중복 조회·무음 감시·창 밖 미소비 수·그림자 비교의 노션 호출이 전부
-    사라진다. 그러면 중복 판정과 handoff 는 DB 밖에 근거가 없으므로 아래 두 getter 도 DB 로 답한다
-    (변수 셋을 따로 맞출 필요가 없고, 어긋난 조합이 생기지 않는다).
-    """
-    return os.environ.get(NOTION_INTAKE_ENV, "").strip().lower() == "off"
-
-
-def dedup_source() -> str:
-    """중복 판정·대기열 넣기 기준을 어디에 두나 — 저장소 변수 GRM_INTAKE_DEDUP_SOURCE(없으면 notion)."""
-    if notion_intake_off():
-        return "supabase"
-    return "supabase" if os.environ.get(DEDUP_SOURCE_ENV, "").strip().lower() == "supabase" else "notion"
-
-
-HANDOFF_SOURCE_ENV = "GRM_HANDOFF_SOURCE"        # notion(기본) | db
-
-
-def handoff_source() -> str:
-    """그날 handoff·스캐폴드의 정본을 어디서 만드나 — 저장소 변수 GRM_HANDOFF_SOURCE(없으면 notion).
-
-    db 면 `run_shadow` 가 만든 DB handoff 가 정본이다: 발행 스캐폴드(`brief_web_*.json`)를 수집기의
-    스캐폴드 자리(GRM_WEB_BRIEF_DIR)에 내고, health 의 handoff 성패도 그 결과로 정한다.
-    노션 handoff 페이지는 노션 쓰기가 살아 있는 동안 거울로 계속 만든다(백업 Routine 이 읽는다).
-    """
-    if notion_intake_off():
-        return "db"
-    return "db" if os.environ.get(HANDOFF_SOURCE_ENV, "").strip().lower() == "db" else "notion"
-
-
-def dedup_shadow_enabled() -> bool:
-    """판정은 노션 기준 그대로 두고, DB 기준이었다면 어땠을지를 health 에 남긴다(기본 꺼짐)."""
-    return env_flag("ENABLE_INTAKE_DEDUP_SHADOW")
 
 
 def classify_dedup(keys: Iterable[str], raw_ingested: dict[str, str], queue_keys: set[str],
@@ -552,27 +512,6 @@ def _same_relative_order(n_rows: dict[str, dict[str, Any]], d_rows: dict[str, di
     by_notion = sorted(both, key=lambda k: (_num(n_rows[k]), k))
     by_db = sorted(both, key=lambda k: (_num(d_rows[k]), k))
     return by_notion == by_db
-
-
-def _explain_only_notion(store: Any, cmp_: dict[str, Any]) -> None:
-    """'노션에만' 행 중 코드가 범위 밖 483 으로 이미 닫은 행을 따로 뺀다.
-
-    노션 길은 그 행을 handoff 에 싣고 발행 조립에서 뺀다. DB 길은 handoff 전에 뺀다. 발행 결과는 같다.
-    남은 `only_notion` 이 진짜로 설명되지 않은 차이다. 조회 실패는 분류만 못 할 뿐 비교는 남긴다.
-    """
-    cmp_["only_notion_out_of_scope"] = []
-    keys = [tuple(k.split("::", 1)) for k in cmp_.get("only_notion") or [] if "::" in k]
-    if not keys:
-        return
-    try:
-        rows = store.queue_rows(keys)
-    except QueueStoreError:
-        return
-    closed = sorted(k for k, r in rows.items()
-                    if r.get("state") == STATE_SKIPPED
-                    and str(r.get("state_reason") or "").startswith("out_of_scope_483"))
-    cmp_["only_notion_out_of_scope"] = closed
-    cmp_["only_notion"] = [k for k in cmp_["only_notion"] if k not in set(closed)]
 
 
 def compare_states(computed: dict[str, dict[str, str]],
@@ -963,46 +902,6 @@ def enqueue_items(store: QueueStore, items: Iterable[Any], run_date: date,
     return summary
 
 
-def heal_from_notion(store: QueueStore, notion_payload: dict[str, Any],
-                     generated_at: datetime) -> dict[str, int]:
-    """노션 handoff 에는 있는데 DB 대기열에 없는 행을 다시 넣는다(매일).
-
-    대기열 넣기는 "그 실행에 노션 행이 새로 생긴 문서"에만 한 번 일어난다. 그날 넣기가 실패하면
-    (표 오류·그림자 꺼짐·정본 저장 지연) 다음 날에는 노션 중복이라 다시 시도되지 않는다. 노션이
-    대기열 정본인 동안에는 노션 handoff(=지금 Status=New 인 행 전부)가 기준이므로, 거기 있는 행은
-    대기열에도 있어야 한다. 이미 있는 행은 상태가 무엇이든 건드리지 않는다.
-    수집일은 노션 행의 Run Date·Collected At 을 쓴다(둘 다 없으면 넣지 않고 failed 로 센다 —
-    지어내지 않는다).
-    """
-    wanted: dict[str, dict[str, Any]] = {}
-    for row in notion_payload.get("rows") or []:
-        if isinstance(row, dict) and row.get("source") and row.get("document_id"):
-            wanted.setdefault(row_key(row["source"], row["document_id"]), row)
-    summary = {"checked": len(wanted), "missing": 0, "inserted": 0, "failed": 0}
-    if not wanted:
-        return summary
-    have = store.queue_rows([(r["source"], r["document_id"]) for r in wanted.values()])
-    for key in sorted(set(wanted) - set(have)):
-        row = wanted[key]
-        summary["missing"] += 1
-        seen = to_kst(row.get("collected_at"))
-        run_date = str(row.get("run_date") or "")[:10] or (seen.date().isoformat() if seen else "")
-        if not run_date:
-            summary["failed"] += 1
-            continue
-        if seen is None:
-            seen = datetime.fromisoformat(run_date + "T00:00:00").replace(tzinfo=KST)
-        try:
-            summary["inserted"] += store.enqueue([{
-                "source": row["source"], "document_id": row["document_id"],
-                "first_seen_run_date": run_date, "first_seen_at": seen.isoformat(),
-                "enqueued_by": "heal"}])
-        except QueueStoreError as e:
-            summary["failed"] += 1
-            log("WARN", f"대기열 보충 실패(정본에 없거나 표 오류) {key}: {e}")
-    return summary
-
-
 def _read_json(path: str) -> "dict[str, Any] | None":
     try:
         with open(path, encoding="utf-8") as f:
@@ -1124,18 +1023,12 @@ def build_db_handoff(store: QueueStore, run_date: date, window_days: int,
                      silent_sources: Iterable[str] = (), apply: bool = True,
                      web_brief_dir: "str | None" = None
                      ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """대기열 + 정본만으로 handoff v2 payload 를 만든다(노션 호출 없음).
-
-    카드 조립은 노션 경로와 **같은 함수**를 쓴다(`enrich_rows_with_raw` →
-    `build_routine_handoff_payload_v2`). 달라지는 것은 재료뿐이다.
-    """
+    """Build the v2 handoff from queued documents and their stored raw records."""
     import grm_handoff as gh   # 순환 import 방지 — grm_handoff 는 이 모듈을 모른다
 
     rows, raws, stats = load_candidates(store, run_date, window_days,
                                         gh._HANDOFF_V2_ROW_KEEP, apply=apply)
-    # 원문이 없는 행은 빈 dict 를 주면 안 된다(노션 fetch 폴백으로 빠져 token 없이 실패 처리된다).
-    # 그 폴백이 곧 '원문 미확보 → Evidence B·Error' 강등이고, 그것이 올바른 결과다.
-    enriched, _ = gh.enrich_rows_with_raw("", rows, inmemory_raw=raws, sleep_s=0)
+    enriched = gh.enrich_rows_with_raw(rows, raws)
     payload = gh.build_routine_handoff_payload_v2(enriched, run_date, display_window_days,
                                                   generated_at, silent_sources=silent_sources)
     if web_brief_dir:
@@ -1228,17 +1121,12 @@ def _copy_web_brief(src_dir: str, dst_dir: str, run_date: date) -> str:
 
 def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datetime,
                window_days: int, display_window_days: int, new_items: Iterable[Any] = (),
-               notion_payload: "dict[str, Any] | None" = None,
-               notion_status_lookup: "Callable[[str, list[str]], dict[str, str]] | None" = None,
                silent_sources: Iterable[str] = (), repo_root: str = ".",
                out_dir: "str | None" = None, store: "QueueStore | None" = None,
                canonical: bool = False,
                canonical_web_brief_dir: "str | None" = None,
                freeze_now: "datetime | None" = None) -> dict[str, Any]:
     """그림자 한 바퀴: 넣기 → 상태 다시 계산 → DB handoff → 노션 것과 비교 → 파일로 남기기.
-
-    `notion_status_lookup(handoff_date, keys)` 를 주면 최근 consumed 호의 계산 상태를 노션 Status 와
-    비교한다. 어느 단계가 실패해도 예외를 올리지 않고 `warnings` 에 적는다(발행 경로 보호).
 
     `canonical=True`(GRM_HANDOFF_SOURCE=db) 면 이 handoff 가 정본이다. 보고서에 `canonical` 키를 더해
     성패를 돌려주고(`ok`·`rows`·`frozen`·`aged_open`·`error`), `canonical_web_brief_dir` 를 주면 발행
@@ -1263,14 +1151,6 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
             report["warnings"].append(f"대기열에 못 넣은 문서 {report['enqueue']['failed']}건")
     except QueueStoreError as e:
         report["warnings"].append(f"대기열 넣기 실패: {e}")
-
-    if notion_payload is not None:
-        try:
-            report["heal"] = heal_from_notion(store, notion_payload, generated_at)
-            if report["heal"]["failed"]:
-                report["warnings"].append(f"대기열 보충 실패 {report['heal']['failed']}건")
-        except QueueStoreError as e:
-            report["warnings"].append(f"대기열 보충 실패: {e}")
 
     reconciled: dict[str, Any] = {}
     try:
@@ -1323,25 +1203,6 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
         if canonical:
             report["canonical"]["error"] = f"DB handoff 생성 실패: {type(e).__name__}: {truncate(str(e), 160)}"
 
-    if payload is not None and notion_payload is not None:
-        try:
-            report["compare"] = compare_payloads(notion_payload, payload)
-            _explain_only_notion(store, report["compare"])
-        except Exception as e:  # noqa: BLE001
-            report["warnings"].append(f"handoff 비교 실패: {type(e).__name__}")
-
-    if notion_status_lookup is not None:
-        report["state_compare"] = []
-        for handoff_date in sorted(reconciled.get("by_date") or {})[-2:]:
-            states = reconciled["by_date"][handoff_date]
-            try:
-                statuses = notion_status_lookup(handoff_date, sorted(states))
-                st = compare_states(states, statuses)
-                st["handoff_date"] = handoff_date
-                report["state_compare"].append(st)
-            except Exception as e:  # noqa: BLE001
-                report["warnings"].append(f"{handoff_date} 상태 비교 실패: {type(e).__name__}")
-
     try:
         _write(os.path.join(out_dir, f"queue_shadow_{run_date.isoformat()}.json"),
                json.dumps(report, ensure_ascii=False, indent=1) + "\n")
@@ -1361,271 +1222,6 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
                 f"노션과 공통 {cmp_.get('common', '?')} · 칸까지 같음 {cmp_.get('identical', '?')} · "
                 f"노션에만 {len(cmp_.get('only_notion') or [])} · DB에만 {len(cmp_.get('only_db') or [])}")
     return report
-
-
-def notion_status_map(token: str, db_id: str, handoff_date: str,
-                      window_days: int = 30) -> dict[str, str]:
-    """그 호의 수집 창에 있는 노션 Intake 행의 현재 Status(비교 전용 — 읽기만 한다).
-
-    같은 문서가 노션에 두 번 들어간 경우(재유입) 수집일이 늦은 행의 값을 쓴다.
-    """
-    return {k: v["status"] for k, v in
-            notion_rows_in_window(token, db_id, handoff_date, window_days).items()}
-
-
-def notion_rows_in_window(token: str, db_id: str, handoff_date: str,
-                          window_days: int = 30) -> dict[str, dict[str, str]]:
-    """그 호의 수집 창에 있는 노션 Intake 행 — {source::document_id: {"page_id","status"}}. 읽기만."""
-    import grm_handoff as gh
-    from grm_notion import NOTION_DB_QUERY_URL_TPL, PROP_RUN_DATE
-
-    end = date.fromisoformat(handoff_date)
-    body: dict[str, Any] = {"filter": {"and": [
-        {"property": PROP_RUN_DATE, "date": {"on_or_after": (end - timedelta(days=window_days)).isoformat()}},
-        {"property": PROP_RUN_DATE, "date": {"on_or_before": end.isoformat()}},
-    ]}, "page_size": 100}
-    best: dict[str, tuple[str, str, str]] = {}
-    cursor = None
-    for _ in range(60):
-        if cursor:
-            body["start_cursor"] = cursor
-        data = gh.notion_api_request("POST", NOTION_DB_QUERY_URL_TPL.format(db_id=db_id), token,
-                                     body=body)
-        for page in data.get("results", []):
-            snap = gh._intake_page_snapshot(page)
-            if snap["type_or_class"] == gh.TYPE_ROUTINE_HANDOFF or not snap["document_id"]:
-                continue
-            key = row_key(snap["source"], snap["document_id"])
-            if key not in best or snap["run_date"] >= best[key][0]:
-                best[key] = (snap["run_date"], snap["status"], snap["page_id"])
-        if not data.get("has_more"):
-            break
-        cursor = data.get("next_cursor")
-    return {k: {"status": v[1], "page_id": v[2]} for k, v in best.items()}
-
-
-# ─────────────────────────────── 과거 기록 채우기(history) ───────────────────────────────
-# 대기열(intake_queue)은 그림자를 켠 11-10 수집분부터만 있다. 노션 Intake 의 지난 N일 행을 그대로 옮겨
-# "언제 대기열에 들어왔고 어떻게 끝났나"의 기록을 과거로 늘린다. 쓰임: 무음 감시의 DB 기준 판정
-# (소스별 마지막 수집일), 창 밖 미소비 경고, 그리고 노션을 끈 뒤에도 남는 처리 이력.
-# 노션 Status 를 그대로 옮긴다(New→new · Processed→processed · Skipped→skipped · Error→error).
-# 이미 대기열에 있는 행은 건드리지 않는다. 정본(raw_signals)에 없는 행은 넣지 않고 따로 센다.
-
-HISTORY_ENQUEUED_BY = "history"
-HISTORY_ROLLBACK_SQL = "delete from public.intake_queue where enqueued_by = 'history';"
-_NON_QUEUE_TYPES = ("routine-handoff", "web-delta", "web-deep-delta")   # handoff·델타 예치 페이지
-
-
-def notion_history_rows(token: str, db_id: str, start: date, end: date,
-                        max_pages: int = 400) -> list[dict[str, str]]:
-    """노션 Intake 에서 Run Date 가 [start, end] 인 행 전부(읽기만). 상한에 닿으면 예외 — 잘린 채 쓰지 않는다."""
-    import grm_handoff as gh
-    from grm_notion import NOTION_DB_QUERY_URL_TPL, PROP_RUN_DATE
-
-    body: dict[str, Any] = {"filter": {"and": [
-        {"property": PROP_RUN_DATE, "date": {"on_or_after": start.isoformat()}},
-        {"property": PROP_RUN_DATE, "date": {"on_or_before": end.isoformat()}},
-    ]}, "page_size": 100}
-    out: list[dict[str, str]] = []
-    cursor = None
-    for _ in range(max_pages):
-        if cursor:
-            body["start_cursor"] = cursor
-        data = gh.notion_api_request("POST", NOTION_DB_QUERY_URL_TPL.format(db_id=db_id), token,
-                                     body=body)
-        for page in data.get("results", []):
-            snap = gh._intake_page_snapshot(page)
-            out.append({k: str(snap.get(k) or "") for k in (
-                "source", "document_id", "run_date", "collected_at", "status", "type_or_class")})
-        if not data.get("has_more"):
-            return out
-        cursor = data.get("next_cursor")
-    raise QueueStoreError(f"노션 조회가 상한({max_pages}쪽)에 닿았다 — 기간을 줄여 다시 돌릴 것")
-
-
-def plan_history(notion_rows: list[dict[str, str]], queue_keys: set[str],
-                 raw_keys: "set[str] | None") -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """노션 행 → 대기열에 넣을 계획(순수 함수). 반환 (넣을 행, 집계).
-
-    - handoff·델타 예치 페이지, 키(소스·문서 번호)나 수집일이 없는 행은 뺀다.
-    - 같은 문서가 노션에 두 번 있으면 수집일이 늦은 행 하나만(대기열은 문서당 1행).
-    - 이미 대기열에 있는 문서는 뺀다(`already_in_queue`).
-    - `raw_keys` 를 주면 정본에 없는 문서를 뺀다(`no_raw` — FK 로 어차피 거부된다). None 이면 판정 생략.
-    - 알 수 없는 Status 는 넣지 않는다(`unknown_status`).
-    """
-    stats: dict[str, Any] = {"notion_rows": len(notion_rows), "not_queue_rows": 0, "no_key_or_date": 0,
-                             "duplicates_in_notion": 0, "already_in_queue": 0, "no_raw": 0,
-                             "unknown_status": 0, "planned": 0, "by_source": {}, "by_state": {},
-                             "no_raw_examples": [], "run_date_min": "", "run_date_max": ""}
-    best: dict[str, dict[str, str]] = {}
-    for r in notion_rows:
-        if r.get("type_or_class") in _NON_QUEUE_TYPES or r.get("source") == "GRM Handoff":
-            stats["not_queue_rows"] += 1
-            continue
-        if not r.get("source") or not r.get("document_id") or not r.get("run_date"):
-            stats["no_key_or_date"] += 1
-            continue
-        key = row_key(r["source"], r["document_id"])
-        if key in best:
-            stats["duplicates_in_notion"] += 1
-            if r["run_date"] < best[key]["run_date"]:
-                continue
-        best[key] = r
-    plan: list[dict[str, Any]] = []
-    for key in sorted(best):
-        r = best[key]
-        if key in queue_keys:
-            stats["already_in_queue"] += 1
-            continue
-        if raw_keys is not None and key not in raw_keys:
-            stats["no_raw"] += 1
-            if len(stats["no_raw_examples"]) < 10:
-                stats["no_raw_examples"].append(key)
-            continue
-        state = NOTION_STATUS_TO_STATE.get(r.get("status", ""))
-        if state is None:
-            stats["unknown_status"] += 1
-            continue
-        run_date = r["run_date"][:10]
-        seen = to_kst(r.get("collected_at")) or datetime.fromisoformat(run_date + "T00:00:00").replace(tzinfo=KST)
-        plan.append({"source": r["source"], "document_id": r["document_id"],
-                     "first_seen_run_date": run_date, "first_seen_at": seen.isoformat(),
-                     "enqueued_by": HISTORY_ENQUEUED_BY, "state": state,
-                     "state_reason": "" if state == STATE_NEW else "notion_history"})
-        stats["by_source"][r["source"]] = stats["by_source"].get(r["source"], 0) + 1
-        stats["by_state"][state] = stats["by_state"].get(state, 0) + 1
-    stats["planned"] = len(plan)
-    if plan:
-        stats["run_date_min"] = min(p["first_seen_run_date"] for p in plan)
-        stats["run_date_max"] = max(p["first_seen_run_date"] for p in plan)
-    stats["by_source"] = dict(sorted(stats["by_source"].items()))
-    return plan, stats
-
-
-def backfill_history(store: Any, token: str, db_id: str, *, end: date, days: int, apply: bool = False,
-                     reader: "Callable[..., list[dict[str, str]]] | None" = None,
-                     raw_lookup: "Callable[[list[tuple[str, str]]], set[str] | None] | None" = None
-                     ) -> dict[str, Any]:
-    """노션의 지난 `days` 일 행으로 대기열 과거 기록을 채운다. `apply=False` 면 계획과 집계만."""
-    start = end - timedelta(days=days)
-    rows = (reader or notion_history_rows)(token, db_id, start, end)
-    queue_keys = store.all_queue_keys()
-    pairs = sorted({(r["source"], r["document_id"]) for r in rows
-                    if r.get("source") and r.get("document_id")
-                    and row_key(r["source"], r["document_id"]) not in queue_keys})
-    raw_keys = (raw_lookup or store.existing_raw_keys)(pairs)
-    plan, stats = plan_history(rows, queue_keys, raw_keys)
-    out: dict[str, Any] = {"window": {"start": start.isoformat(), "end": end.isoformat(), "days": days},
-                           "apply": bool(apply), "queue_rows_before": len(queue_keys),
-                           "raw_check": "ok" if raw_keys is not None else "정본 존재 확인 실패 — 적용 금지",
-                           "stats": stats, "rollback_sql": HISTORY_ROLLBACK_SQL}
-    if not apply:
-        return out
-    if raw_keys is None:
-        out["applied"] = {"inserted": 0, "error": "정본 존재 확인을 못 해 쓰지 않았다"}
-        return out
-    out["applied"] = {"inserted": store.enqueue(plan)}
-    return out
-
-
-# 표 state → 노션 Status. deferred 는 없다 — 노션에서 보류는 "Status 를 바꾸지 않는다"이다.
-STATE_TO_NOTION_STATUS = {
-    STATE_PROCESSED: "Processed", STATE_SKIPPED: "Skipped", STATE_ERROR: "Error",
-}
-
-
-def plan_notion_sync(states: dict[str, dict[str, str]], closed_keys: Iterable[str],
-                     notion_rows: dict[str, dict[str, str]]) -> tuple[list[dict[str, str]], dict[str, int]]:
-    """코드가 계산한 상태를 노션 행 Status 에 옮길 계획(순수 함수).
-
-    [대기열 3단계] 편집팀이 DB handoff 를 읽으면 행에 노션 page_id 가 없어 교열이 Status 를 손으로 찍을 수
-    없다. 백업 길이 노션에 남아 있는 동안에는 노션 행 Status 가 맞아야 지난 행이 다음 주 노션 handoff 에
-    다시 들어오지 않는다 → 코드가 찍는다.
-    규칙
-      - **지금 노션에서 New 인 행만** 바꾼다. 이미 Processed·Skipped·Error 인 행(사람·Routine·다른 도구가
-        찍은 것)은 건드리지 않는다. 되돌리는 방향(→New)은 없다.
-      - processed→Processed · skipped→Skipped · error→Error. deferred 는 바꾸지 않는다(다음 주 재유입).
-      - `closed_keys`(범위 밖 483 으로 handoff 전에 닫은 행)는 Skipped.
-      - 노션에서 찾지 못한 행은 건너뛰고 센다(만들지 않는다).
-    반환 (할 일 목록 [{key,page_id,status}], 집계).
-    """
-    wanted: dict[str, str] = {}
-    for key, verdict in states.items():
-        target = STATE_TO_NOTION_STATUS.get(verdict.get("state", ""))
-        if target:
-            wanted[key] = target
-    for key in closed_keys:
-        wanted.setdefault(key, "Skipped")
-    todo: list[dict[str, str]] = []
-    stats = {"rows": len(states), "deferred": sum(1 for v in states.values()
-                                                  if v.get("state") == STATE_DEFERRED),
-             "not_in_notion": 0, "already_set": 0, "to_set": 0}
-    for key in sorted(wanted):
-        row = notion_rows.get(key)
-        if row is None or not row.get("page_id"):
-            stats["not_in_notion"] += 1
-            continue
-        if row.get("status") != "New":
-            stats["already_set"] += 1
-            continue
-        todo.append({"key": key, "page_id": row["page_id"], "status": wanted[key]})
-    stats["to_set"] = len(todo)
-    for item in todo:
-        stats[item["status"]] = stats.get(item["status"], 0) + 1
-    return todo, stats
-
-
-def notion_sync(store: Any, token: str, db_id: str, handoff_date: str, repo_root: str = ".", *,
-                apply: bool = False, force: bool = False,
-                rows_reader: "Callable[..., dict[str, dict[str, str]]] | None" = None,
-                patch_status: "Callable[[str, str], None] | None" = None) -> dict[str, Any]:
-    """그 호의 계산 상태를 노션 행 Status 에 찍는다. `apply=False` 면 계획만.
-
-    대상은 **git handoff 로 만든 호**(델타에 `handoff_ref`)뿐이다. 노션 handoff 로 만든 호는 Routine·교열이
-    직접 찍으므로 건드리지 않는다(`force=True` 로만 넘는다). 델타가 main 에 없으면 아무것도 하지 않는다.
-    """
-    out: dict[str, Any] = {"handoff_date": handoff_date, "apply": bool(apply), "skipped": "",
-                           "patched": 0, "failed": 0}
-    delta, brief, _ = publish_files(repo_root, handoff_date)
-    if delta is None:
-        out["skipped"] = "main 에 그 날짜 델타 없음"
-        return out
-    if not force and not isinstance(delta.get("handoff_ref"), dict):
-        out["skipped"] = "노션 handoff 로 만든 호(handoff_ref 없음) — Routine·교열이 찍는다"
-        return out
-    record = store.get_handoff_manifest(handoff_date)
-    if record is None or not isinstance(record.get("manifest"), list):
-        out["skipped"] = "DB 에 그 날짜 handoff 기록 없음"
-        return out
-    states = compute_states(record["manifest"], delta, brief, handoff_date)
-    window = int(record.get("window_days") or 30)
-    start, end = candidate_window(date.fromisoformat(handoff_date), window)
-    closed = [row_key(r.get("source", ""), r.get("document_id", ""))
-              for r in store.closed_out_of_scope(start, end)]
-    reader = rows_reader or notion_rows_in_window
-    todo, stats = plan_notion_sync(states, closed, reader(token, db_id, handoff_date, window))
-    out["stats"] = stats
-    out["examples"] = [f"{t['key']} → {t['status']}" for t in todo[:10]]
-    if not apply:
-        return out
-    if patch_status is None:
-        import time
-
-        import grm_handoff as gh
-        from grm_notion import NOTION_PAGE_URL_TPL, PROP_STATUS, _select
-
-        def patch_status(page_id: str, status: str) -> None:
-            gh.notion_api_request("PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id), token,
-                                  body={"properties": {PROP_STATUS: _select(status)}})
-            time.sleep(0.34)
-    for item in todo:
-        try:
-            patch_status(item["page_id"], item["status"])
-            out["patched"] += 1
-        except Exception as e:  # noqa: BLE001 — 한 행 실패가 나머지를 막지 않는다(다시 돌리면 남은 New 만 찍는다)
-            out["failed"] += 1
-            log("WARN", f"노션 Status 기록 실패 {item['key']}: {type(e).__name__}")
-    return out
 
 
 def health_summary(report: dict[str, Any]) -> dict[str, Any]:
@@ -1717,18 +1313,6 @@ def main(argv: "list[str] | None" = None) -> int:
     seed.add_argument("--apply", action="store_true", help="실제로 쓴다(기본은 계획만 출력)")
     ref = sub.add_parser("handoff-ref", help="handoff 파일의 날짜·지문·행 수(desk.json 의 handoff_ref)")
     ref.add_argument("path")
-    syn = sub.add_parser("notion-sync", help="그 호의 계산 상태를 노션 행 Status 에 찍는다(git handoff 호만)")
-    syn.add_argument("--date", required=True, help="발행일 YYYY-MM-DD")
-    syn.add_argument("--repo-root", default=".")
-    syn.add_argument("--db", default="", help="노션 Intake DB id(없으면 NOTION_DATABASE_ID·GRM_INTAKE_DB_ID)")
-    syn.add_argument("--apply", action="store_true", help="실제로 쓴다(기본은 계획만 출력)")
-    syn.add_argument("--force", action="store_true", help="handoff_ref 없는 호에도 적용(사람만)")
-    his = sub.add_parser("backfill-history",
-                         help="노션의 지난 N일 행으로 대기열 과거 기록을 채운다(상태 포함)")
-    his.add_argument("--days", type=int, default=120)
-    his.add_argument("--end", default="", help="끝 날짜 YYYY-MM-DD(기본 오늘 KST)")
-    his.add_argument("--db", default="", help="노션 Intake DB id(없으면 NOTION_DATABASE_ID·GRM_INTAKE_DB_ID)")
-    his.add_argument("--apply", action="store_true", help="실제로 쓴다(기본은 계획만 출력)")
     rec = sub.add_parser("reconcile", help="main 발행 파일로 행 상태를 다시 계산한다")
     rec.add_argument("--run-date", default="")
     rec.add_argument("--repo-root", default=".")
@@ -1754,37 +1338,6 @@ def main(argv: "list[str] | None" = None) -> int:
             if args.apply:
                 print(json.dumps({"inserted": store.enqueue(plan)}))
             return 0
-        if args.cmd == "backfill-history":
-            token = os.environ.get("NOTION_TOKEN", "").strip()
-            db_id = (args.db or os.environ.get("NOTION_DATABASE_ID", "")
-                     or os.environ.get("GRM_INTAKE_DB_ID", "")).strip()
-            if not token or not db_id:
-                print("NOTION_TOKEN·노션 DB id 가 필요하다", file=sys.stderr)
-                return 1
-            if not 1 <= args.days <= 400:
-                print("--days 는 1~400", file=sys.stderr)
-                return 1
-            end = date.fromisoformat(args.end) if args.end else datetime.now(KST).date()
-            out = backfill_history(store, token, db_id, end=end, days=args.days, apply=bool(args.apply))
-            print(json.dumps(out, ensure_ascii=False, indent=1))
-            return 1 if (out.get("applied") or {}).get("error") else 0
-        if args.cmd == "notion-sync":
-            token = os.environ.get("NOTION_TOKEN", "").strip()
-            db_id = (args.db or os.environ.get("NOTION_DATABASE_ID", "")
-                     or os.environ.get("GRM_INTAKE_DB_ID", "")).strip()
-            if not token or not db_id:
-                print("NOTION_TOKEN·노션 DB id 가 필요하다", file=sys.stderr)
-                return 1
-            apply = bool(args.apply)
-            if apply and not args.force:
-                # [노션 은퇴 ③] 워크플로 단계와 변수 ENABLE_QUEUE_NOTION_STATUS_SYNC 는 지웠다 — 노션을 되돌려
-                #   켰을 때 사람이 손으로만 돌린다(--apply --force).
-                print("노션 행 Status 기록은 수동 전용이다 — --force 없이는 쓰지 않는다(계획만)", file=sys.stderr)
-                apply = False
-            out = notion_sync(store, token, db_id, args.date, args.repo_root,
-                              apply=apply, force=bool(args.force))
-            print(json.dumps(out, ensure_ascii=False, indent=1))
-            return 1 if out.get("failed") else 0
         run_date = date.fromisoformat(args.run_date) if args.run_date else datetime.now(KST).date()
         out = reconcile(store, args.repo_root, run_date, apply=bool(args.apply))
         print(json.dumps({k: v for k, v in out.items() if k != "by_date"},

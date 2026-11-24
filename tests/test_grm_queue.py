@@ -286,9 +286,6 @@ class ReconcileTest(unittest.TestCase):
                                           **{gq.row_key(src, d): "New" for d in docs}})
         self.assertEqual(cmp_["mismatch"], 0)
         # 노션 Status 기록 계획도 New 행을 건드리지 않는다.
-        todo, _ = gq.plan_notion_sync(states, [], {gq.row_key(src, d): {"page_id": f"p{d}", "status": "New"}
-                                                   for d in docs})
-        self.assertEqual(todo, [])
 
     def test_uncarded_row_leaves_candidates_after_window(self):
         self._handoff("2026-11-09", "ab")
@@ -392,7 +389,7 @@ class DbHandoffTest(unittest.TestCase):
                 snap.update(page_id=f"page-{rec['document_id']}", title="t", status="New")
                 notion_rows.append(snap)
                 inmem[key] = raw
-            enriched, _ = gh.enrich_rows_with_raw("", notion_rows, inmemory_raw=inmem, sleep_s=0)
+            enriched = gh.enrich_rows_with_raw(notion_rows, inmem)
             notion_payload = gh.build_routine_handoff_payload_v2(enriched, RUN, 7, GEN)
         self.assertEqual(stats["handoff"], 2)
         self.assertEqual(db_payload["handoff_id"], "routine-handoff::2026-11-16")
@@ -585,53 +582,6 @@ class FreezeTest(unittest.TestCase):
         self.assertEqual(len(self.store.handoffs["2026-11-17"]["manifest"]), 3)
 
 
-class HealTest(unittest.TestCase):
-    def setUp(self):
-        self.store = FakeStore()
-        for doc in ("in-queue", "lost", "done"):
-            self.store.add_raw(_record("FR", doc))
-        self.store.enqueue([{"source": "FR", "document_id": d,
-                             "first_seen_run_date": "2026-11-10",
-                             "first_seen_at": "2026-11-10T03:30:00+09:00"}
-                            for d in ("in-queue", "done")])
-        self.store.queue["FR::done"]["state"] = "processed"
-        self.payload = {"rows": [
-            {"source": "FR", "document_id": "in-queue", "run_date": "2026-11-10"},
-            {"source": "FR", "document_id": "lost", "run_date": "2026-11-11",
-             "collected_at": "2026-11-11T03:31:00.000+09:00"},
-            {"source": "FR", "document_id": "done", "run_date": "2026-11-10"},
-            {"source": "FR", "document_id": "no-raw", "run_date": "2026-11-11",
-             "collected_at": "2026-11-11T03:31:00.000+09:00"},
-        ]}
-
-    def test_reenqueues_only_missing_rows_with_notion_run_date(self):
-        with patch.object(gq, "log"):
-            out = gq.heal_from_notion(self.store, self.payload, GEN)
-        self.assertEqual(out, {"checked": 4, "missing": 2, "inserted": 1, "failed": 1})
-        lost = self.store.queue["FR::lost"]
-        self.assertEqual((lost["first_seen_run_date"], lost["enqueued_by"], lost["state"]),
-                         ("2026-11-11", "heal", "new"))
-        self.assertEqual(self.store.queue["FR::done"]["state"], "processed")   # 있던 행은 그대로
-        with patch.object(gq, "log"):
-            again = gq.heal_from_notion(self.store, self.payload, GEN)
-        self.assertEqual((again["missing"], again["inserted"]), (1, 0))        # no-raw 만 남는다
-
-    def test_shadow_reports_heal_and_health_summary(self):
-        with tempfile.TemporaryDirectory() as tmp, patch.object(gq, "log"), \
-                patch.object(gh, "log"), patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
-            report = gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
-                                   display_window_days=7, store=self.store, out_dir=tmp,
-                                   repo_root=tmp, notion_payload=self.payload)
-            with open(os.path.join(tmp, "queue_shadow_2026-11-16.md"), encoding="utf-8") as f:
-                md = f.read()
-        self.assertEqual(report["heal"]["inserted"], 1)
-        self.assertIn("대기열 보충", md)
-        health = gq.health_summary(report)
-        self.assertEqual((health["healed"], health["heal_missing"], health["heal_failed"]), (1, 2, 1))
-        self.assertEqual(health["handoff_frozen"], "")
-        self.assertTrue(all(not isinstance(v, (list, dict)) for v in health.values()))
-
-
 class BuilderConditionsTest(unittest.TestCase):
     """재생 대조 10절에서 나온 빌더 조건 — 공백 · 483 범위."""
 
@@ -690,21 +640,6 @@ class BuilderConditionsTest(unittest.TestCase):
             self.assertEqual(gq.pre_handoff_skip_reason(
                 "FDA 483", {"establishment_type": est, "fda_483_observations": []}), want)
 
-    def test_only_notion_rows_closed_as_out_of_scope_are_reported_as_explained(self):
-        self._enq("FDA 483", "blood", raw={"establishment_type": "Blood Bank"})
-        self._enq("FDA 483", "drug", raw={"establishment_type": "Drug Manufacturer"})
-        notion = {"rows": [{"source": "FDA 483", "document_id": d, "run_date": "2026-11-12"}
-                           for d in ("blood", "drug", "missing")]}
-        with tempfile.TemporaryDirectory() as tmp, patch.object(gq, "log"), \
-                patch.object(gh, "log"), patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
-            report = gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
-                                   display_window_days=7, store=self.store, out_dir=tmp,
-                                   repo_root=tmp, notion_payload=notion)
-        cmp_ = report["compare"]
-        self.assertEqual(cmp_["only_notion_out_of_scope"], ["FDA 483::blood"])
-        self.assertEqual(cmp_["only_notion"], ["FDA 483::missing"])
-        self.assertIn("설명됨", gq.render_report_md(report))
-
 
 class HandoffMirrorWorkflowTest(unittest.TestCase):
     """브랜치 사본 워크플로와 수집기의 파일 이름 계약."""
@@ -744,9 +679,8 @@ class HandoffMirrorWorkflowTest(unittest.TestCase):
         self.assertIn('int(p.get("row_count",len(p["rows"])))==len(p["rows"])', self.wf)
 
     def test_handoff_file_is_written_only_after_the_whole_collection(self):
-        # 실패 run 의 파일도 온전하다는 근거: run_shadow 는 수집기 끝(노션 handoff 뒤)에서 한 번만 돈다.
         src = (ROOT / "collect_intake.py").read_text(encoding="utf-8")
-        self.assertLess(src.index("emit_routine_handoff("), src.index("grm_queue.run_shadow("))
+        self.assertLess(src.index("insert_items(", src.index("def main(")), src.index("grm_queue.run_shadow("))
         self.assertLess(src.index("grm_queue.run_shadow("), src.rindex("return health.exit_code"))
 
     def test_branch_is_rewritten_as_a_single_parentless_commit(self):
@@ -761,10 +695,8 @@ class OrderTest(unittest.TestCase):
     def test_shadow_runs_after_the_daily_raw_update(self):
         src = (ROOT / "collect_intake.py").read_text(encoding="utf-8")
         update = src.index("raw_update.apply_updates(")
-        notion_emit = src.index("handoff_row_count, handoff_url = emit_routine_handoff(")
         shadow = src.index("grm_queue.run_shadow(")
-        self.assertLess(update, notion_emit)      # 노션 handoff 도 R4 뒤
-        self.assertLess(notion_emit, shadow)      # DB handoff 는 그 뒤(비교 대상이 있어야 한다)
+        self.assertLess(update, shadow)
         self.assertEqual(src.count("grm_queue.run_shadow("), 1)
 
 
@@ -840,236 +772,6 @@ class HandoffRefTest(unittest.TestCase):
         self.assertEqual(out["handoff_ref"], delta["handoff_ref"])
         self.assertEqual(out["deferred"], ["FR::b"])
         self.assertEqual(json.loads(delta_bridge._dumps(out))["deferred"], ["FR::b"])
-
-
-class NotionSyncTest(unittest.TestCase):
-    """git handoff 로 만든 호의 행 상태를 코드가 노션 Status 에 찍는다(3단계)."""
-
-    def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self.tmp.cleanup)
-        self.root = self.tmp.name
-        os.makedirs(os.path.join(self.root, "web", "data", "deltas"))
-        os.makedirs(os.path.join(self.root, "web", "data", "briefs"))
-        self.store = FakeStore()
-        for doc in ("pub", "skip", "hold", "stamped", "gone"):
-            self.store.add_raw(_record("FR", doc))
-        self.store.add_raw(_record("FDA 483", "oos"))
-        self.store.enqueue([{"source": s, "document_id": d, "first_seen_run_date": "2026-11-12",
-                             "first_seen_at": "2026-11-12T03:30:00+09:00"}
-                            for s, d in [("FR", "pub"), ("FR", "skip"), ("FR", "hold"),
-                                         ("FR", "stamped"), ("FR", "gone"), ("FDA 483", "oos")]])
-        self.store.queue["FDA 483::oos"].update(state="skipped", state_reason="out_of_scope_483_rule")
-        self.payload = {"run_date_kst": "2026-11-16", "generated_at_kst": "x", "row_count": 5,
-                        "rows": [{"source": "FR", "document_id": d, "web_card_id": d}
-                                 for d in ("pub", "skip", "hold", "stamped", "gone")]}
-        gq.record_handoff(self.store, self.payload, 30, GEN)
-        self.store.handoffs["2026-11-16"]["window_days"] = 30
-        self.notion = {"FR::pub": {"page_id": "p-pub", "status": "New"},
-                       "FR::skip": {"page_id": "p-skip", "status": "New"},
-                       "FR::hold": {"page_id": "p-hold", "status": "New"},
-                       "FR::stamped": {"page_id": "p-st", "status": "Processed"},
-                       "FDA 483::oos": {"page_id": "p-oos", "status": "New"},
-                       "FR::unrelated": {"page_id": "p-x", "status": "New"}}
-        self.patched = []
-
-    def _delta(self, ref=True, **extra):
-        body = {"publish_date": "2026-11-16", "cards": {"pub": {}, "stamped": {}}, "tldr": [],
-                "deferred": ["FR::hold"]}
-        if ref:
-            body["handoff_ref"] = gq.handoff_ref(self.payload)
-        body.update(extra)
-        with open(os.path.join(self.root, "web", "data", "deltas", "delta_2026_11_16.json"), "w",
-                  encoding="utf-8") as f:
-            json.dump(body, f)
-
-    def _sync(self, **kw):
-        return gq.notion_sync(self.store, "tok", "db", "2026-11-16", self.root,
-                              rows_reader=lambda *a: self.notion,
-                              patch_status=lambda pid, st: self.patched.append((pid, st)), **kw)
-
-    def test_dry_run_plans_and_writes_nothing(self):
-        self._delta()
-        out = self._sync()
-        self.assertEqual(self.patched, [])
-        self.assertEqual(out["stats"]["to_set"], 2)
-        self.assertEqual((out["stats"]["Processed"], out["stats"]["Skipped"]), (1, 1))
-
-    def test_apply_stamps_only_rows_that_are_new_in_notion(self):
-        self._delta()
-        out = self._sync(apply=True)
-        self.assertEqual(sorted(self.patched), [("p-oos", "Skipped"), ("p-pub", "Processed")])
-        self.assertEqual((out["patched"], out["failed"]), (2, 0))
-        # 카드가 안 된 행(skip)은 New 그대로 — 다음 주 후보로 다시 오른다(11-19 대표 결정 A).
-        self.assertNotIn("p-skip", [p for p, _ in self.patched])
-        stats = out["stats"]
-        self.assertEqual(stats["deferred"], 1)            # 보류 행은 건드리지 않는다(다음 주 재유입)
-        self.assertEqual(stats["already_set"], 1)         # 이미 찍힌 행은 그대로
-        self.assertEqual(stats["not_in_notion"], 0)       # 노션에 없는 행(gone)도 카드가 안 돼 열린 채 — 찍을 것 없음
-        self.assertNotIn(("p-hold", "Skipped"), self.patched)
-        self.assertNotIn("p-x", [p for p, _ in self.patched])   # handoff 밖 행은 손대지 않는다
-
-    def test_notion_handoff_issue_is_left_to_the_routine(self):
-        self._delta(ref=False)
-        out = self._sync(apply=True)
-        self.assertEqual(self.patched, [])
-        self.assertIn("handoff_ref 없음", out["skipped"])
-        self._sync(apply=True, force=True)
-        self.assertTrue(self.patched)
-
-    def test_no_delta_or_no_record_does_nothing(self):
-        out = self._sync(apply=True)
-        self.assertIn("델타 없음", out["skipped"])
-        self._delta()
-        del self.store.handoffs["2026-11-16"]
-        out = self._sync(apply=True)
-        self.assertIn("handoff 기록 없음", out["skipped"])
-        self.assertEqual(self.patched, [])
-
-    def test_one_failed_row_does_not_stop_the_rest(self):
-        self._delta()
-
-        def patch_status(pid, st):
-            if pid == "p-pub":
-                raise RuntimeError("notion 500")
-            self.patched.append((pid, st))
-        with patch.object(gq, "log"):
-            out = gq.notion_sync(self.store, "tok", "db", "2026-11-16", self.root, apply=True,
-                                 rows_reader=lambda *a: self.notion, patch_status=patch_status)
-        self.assertEqual((out["patched"], out["failed"]), (1, 1))
-
-    def test_plan_never_moves_a_row_back_to_new(self):
-        todo, _ = gq.plan_notion_sync({"FR::a": {"state": "new"}, "FR::b": {"state": "deferred"}},
-                                      [], {"FR::a": {"page_id": "1", "status": "Processed"},
-                                           "FR::b": {"page_id": "2", "status": "Processed"}})
-        self.assertEqual(todo, [])
-        self.assertNotIn("New", gq.STATE_TO_NOTION_STATUS.values())
-
-    def test_cli_does_not_write_while_the_switch_is_off(self):
-        import contextlib
-        import io as _io
-        self._delta()
-        calls = {}
-
-        def fake_sync(store, token, db_id, day, root, *, apply, force):
-            calls["apply"] = apply
-            return {"failed": 0}
-        env = {"NOTION_TOKEN": "t", "NOTION_DATABASE_ID": "d", "SUPABASE_URL": "https://x.supabase.co",
-               "SUPABASE_SERVICE_ROLE_KEY": "k"}
-        with patch.dict(os.environ, env), patch.object(gq, "notion_sync", side_effect=fake_sync), \
-                contextlib.redirect_stdout(_io.StringIO()), contextlib.redirect_stderr(_io.StringIO()):
-            # [노션 은퇴 ③] 변수 스위치는 없다 — 옛 변수를 켜 둬도 --force 없이는 쓰지 않는다(수동 전용).
-            os.environ["ENABLE_QUEUE_NOTION_STATUS_SYNC"] = "true"
-            self.assertEqual(gq.main(["notion-sync", "--date", "2026-11-16", "--apply"]), 0)
-            self.assertFalse(calls["apply"])
-            gq.main(["notion-sync", "--date", "2026-11-16", "--apply", "--force"])
-            self.assertTrue(calls["apply"])
-
-    def test_bridge_workflow_no_longer_writes_notion_status(self):
-        """[노션 은퇴 ③] 브릿지 워크플로에 노션 행 Status 기록 단계·변수가 없다(off 에서 할 일이 없었다)."""
-        wf = (ROOT / ".github" / "workflows" / "grm-delta-bridge.yml").read_text(encoding="utf-8")
-        self.assertNotIn("grm_queue.py notion-sync", wf)
-        self.assertNotIn("ENABLE_QUEUE_NOTION_STATUS_SYNC", wf)
-
-
-class HistoryBackfillTest(unittest.TestCase):
-    """노션의 지난 N일 행으로 대기열 과거 기록을 채운다(상태 포함)."""
-
-    def setUp(self):
-        self.store = FakeStore()
-        for doc in ("done", "skipped", "open", "inq", "dup"):
-            self.store.add_raw(_record("FR", doc))
-        self.store.enqueue([{"source": "FR", "document_id": "inq", "first_seen_run_date": "2026-11-10",
-                             "first_seen_at": "2026-11-10T03:30:00+09:00"}])
-        self.rows = [
-            {"source": "FR", "document_id": "done", "run_date": "2026-09-01",
-             "collected_at": "2026-09-01T03:31:00.000+09:00", "status": "Processed", "type_or_class": "Rule"},
-            {"source": "FR", "document_id": "skipped", "run_date": "2026-09-02", "collected_at": "",
-             "status": "Skipped", "type_or_class": "Rule"},
-            {"source": "FR", "document_id": "open", "run_date": "2026-11-09", "collected_at": "",
-             "status": "New", "type_or_class": "Rule"},
-            {"source": "FR", "document_id": "inq", "run_date": "2026-11-10", "collected_at": "",
-             "status": "Processed", "type_or_class": "Rule"},                     # 이미 대기열에 있음
-            {"source": "FR", "document_id": "noraw", "run_date": "2026-09-03", "collected_at": "",
-             "status": "Processed", "type_or_class": "Rule"},                     # 정본에 없음
-            {"source": "FR", "document_id": "dup", "run_date": "2026-08-01", "collected_at": "",
-             "status": "Processed", "type_or_class": "Rule"},
-            {"source": "FR", "document_id": "dup", "run_date": "2026-10-01", "collected_at": "",
-             "status": "Skipped", "type_or_class": "Rule"},                       # 같은 문서 재유입 — 늦은 쪽
-            {"source": "GRM Handoff", "document_id": "routine-handoff::2026-09-07", "run_date": "2026-09-07",
-             "collected_at": "", "status": "Processed", "type_or_class": "routine-handoff"},
-            {"source": "FR", "document_id": "web-delta::2026-09-07", "run_date": "2026-09-07",
-             "collected_at": "", "status": "Processed", "type_or_class": "web-delta"},
-            {"source": "FR", "document_id": "weird", "run_date": "2026-09-05", "collected_at": "",
-             "status": "Archived", "type_or_class": "Rule"},
-            {"source": "FR", "document_id": "", "run_date": "2026-09-05", "collected_at": "",
-             "status": "New", "type_or_class": "Rule"},
-        ]
-        self.store.add_raw(_record("FR", "weird"))
-
-    def _run(self, **kw):
-        return gq.backfill_history(self.store, "tok", "db", end=date(2026, 11, 13), days=120,
-                                   reader=lambda *a: self.rows, **kw)
-
-    def test_dry_run_reports_plan_and_writes_nothing(self):
-        before = dict(self.store.queue)
-        out = self._run()
-        self.assertEqual(self.store.queue, before)
-        st = out["stats"]
-        self.assertEqual(st["planned"], 4)
-        self.assertEqual(st["by_state"], {"processed": 1, "skipped": 2, "new": 1})
-        self.assertEqual(st["by_source"], {"FR": 4})
-        self.assertEqual((st["already_in_queue"], st["no_raw"], st["duplicates_in_notion"],
-                          st["not_queue_rows"], st["unknown_status"], st["no_key_or_date"]),
-                         (1, 1, 1, 2, 1, 1))
-        self.assertEqual(st["no_raw_examples"], ["FR::noraw"])
-        self.assertEqual((st["run_date_min"], st["run_date_max"]), ("2026-09-01", "2026-11-09"))
-        self.assertEqual(out["rollback_sql"], gq.HISTORY_ROLLBACK_SQL)
-        self.assertEqual(out["window"], {"start": "2026-07-16", "end": "2026-11-13", "days": 120})
-        self.assertNotIn("applied", out)
-
-    def test_apply_copies_notion_status_and_leaves_existing_rows_alone(self):
-        out = self._run(apply=True)
-        self.assertEqual(out["applied"], {"inserted": 4})
-        q = self.store.queue
-        self.assertEqual((q["FR::done"]["state"], q["FR::done"]["enqueued_by"],
-                          q["FR::done"]["first_seen_run_date"]), ("processed", "history", "2026-09-01"))
-        self.assertEqual(q["FR::done"]["first_seen_at"], "2026-09-01T03:31:00+09:00")
-        self.assertEqual(q["FR::skipped"]["first_seen_at"], "2026-09-02T00:00:00+09:00")   # 시각 없으면 그날 0시
-        self.assertEqual((q["FR::dup"]["state"], q["FR::dup"]["first_seen_run_date"]),
-                         ("skipped", "2026-10-01"))
-        self.assertEqual((q["FR::open"]["state"], q["FR::open"]["state_reason"]), ("new", ""))
-        self.assertEqual(q["FR::inq"]["state"], "new")                 # 이미 있던 행은 그대로
-        self.assertNotIn("enqueued_by", q["FR::inq"])
-        self.assertNotIn("FR::noraw", q)
-        again = self._run(apply=True)
-        self.assertEqual(again["applied"], {"inserted": 0})            # 다시 돌려도 중복 0
-        self.assertEqual(again["stats"]["planned"], 0)
-
-    def test_never_writes_when_the_raw_check_failed(self):
-        out = self._run(apply=True, raw_lookup=lambda pairs: None)
-        self.assertIn("error", out["applied"])
-        self.assertNotIn("FR::done", self.store.queue)
-        self.assertIn("적용 금지", out["raw_check"])
-
-    def test_rollback_sql_only_touches_history_rows(self):
-        self.assertEqual(gq.HISTORY_ROLLBACK_SQL,
-                         "delete from public.intake_queue where enqueued_by = 'history';")
-        plan, _ = gq.plan_history(self.rows, set(), None)
-        self.assertTrue(plan and all(p["enqueued_by"] == gq.HISTORY_ENQUEUED_BY for p in plan))
-
-    def test_reader_refuses_a_truncated_read(self):
-        with patch.object(gh, "notion_api_request",
-                          return_value={"results": [], "has_more": True, "next_cursor": "c"}):
-            with self.assertRaises(gq.QueueStoreError):
-                gq.notion_history_rows("tok", "db", date(2026, 7, 1), date(2026, 11, 13), max_pages=3)
-
-    def test_workflow_offers_the_command_and_validates_days(self):
-        wf = (ROOT / ".github" / "workflows" / "grm-intake-queue.yml").read_text(encoding="utf-8")
-        self.assertIn("options: [seed, reconcile, backfill-history]", wf)
-        self.assertIn('args=(backfill-history --days "$IN_DAYS")', wf)
-        self.assertIn("NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}", wf)
-        self.assertIn("grep -qE '^[0-9]{1,3}$'", wf)
 
 
 class KeepShadowHealthTest(unittest.TestCase):
@@ -1190,19 +892,11 @@ class EditorialGitHandoffTest(unittest.TestCase):
         import delta_bridge
         copyedit = self._read(*self.NEXT, "copyedit.md")
         self.assertIn(f"company/run/{{run_date_kst}}/{delta_bridge.SCAFFOLD_RUN_NAME}", copyedit)
-        self.assertIn("grm_queue.py notion-sync", copyedit)
+        self.assertNotIn("grm_queue.py notion-sync", copyedit)
         self.assertIn("행 Status 는 찍지 않는다", copyedit)
         desk = self._read(*self.NEXT, "desk.md")
         self.assertIn('"handoff_ref": {"date"', desk)       # merge_parts 가 읽는 키
 
-    def test_run_md_names_the_real_switches(self):
-        run = self._read(*self.NEXT, "RUN.md")
-        intake = self._read(".github", "workflows", "grm-intake.yml")
-        bridge = self._read(".github", "workflows", "grm-delta-bridge.yml")
-        self.assertIn("GRM_QUEUE_HANDOFF_REFRESH", run)
-        self.assertIn("vars.GRM_QUEUE_HANDOFF_REFRESH", intake)
-        self.assertIn("GRM_DELTA_SOURCE", run)
-        self.assertIn("vars.GRM_DELTA_SOURCE", bridge)
 
     def test_run_branch_is_cut_from_a_fresh_fetch_not_the_stale_tracking_ref(self):
         # 2026-11-13 리허설: 실행 환경의 origin/main 이 11-06 이라, 거기서 만든 브랜치에 next/ 와 handoff_ref.py 가 없었다.
@@ -1430,22 +1124,21 @@ class ShadowTest(unittest.TestCase):
                 patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
             report = gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
                                    display_window_days=7, store=Broken(), out_dir=tmp,
-                                   repo_root=tmp, notion_payload={"rows": []})
+                                   repo_root=tmp)
             self.assertTrue(any("DB handoff 생성 실패" in w for w in report["warnings"]))
             self.assertNotIn("compare", report)
             self.assertTrue(os.path.exists(os.path.join(tmp, "queue_shadow_2026-11-16.md")))
 
-    def test_full_round_writes_files_and_compares(self):
+    def test_full_round_writes_files(self):
         store = FakeStore()
         store.add_raw(_record("Federal Register", "2026-1"))
         with tempfile.TemporaryDirectory() as tmp, patch.object(gq, "log"), \
                 patch.object(gh, "log"), patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}):
             report = gq.run_shadow(("u", "k"), run_date=RUN, generated_at=GEN, window_days=30,
                                    display_window_days=7, store=store, out_dir=tmp, repo_root=tmp,
-                                   new_items=[_Item("Federal Register", "2026-1")],
-                                   notion_payload={"rows": []})
+                                   new_items=[_Item("Federal Register", "2026-1")])
             self.assertEqual(report["enqueue"]["inserted"], 1)
-            self.assertEqual(report["compare"]["only_db"], ["Federal Register::2026-1"])
+            self.assertEqual(report["candidates"]["handoff"], 1)
             self.assertEqual(report["warnings"], [])
             for name in ("handoff_db_2026-11-16.json", "brief_web_2026_11_16.json",
                          "queue_shadow_2026-11-16.json"):
@@ -1489,13 +1182,6 @@ class MigrationTest(unittest.TestCase):
         self.assertNotIn("create policy", sql.lower())
         self.assertNotIn("drop ", sql.lower())            # 가산만
         self.assertIn("references public.raw_signals (source, document_id)", sql)
-
-
-class HandoffPayloadOutTest(unittest.TestCase):
-    def test_payload_out_is_optional_and_additive(self):
-        import inspect
-        sig = inspect.signature(gh.emit_routine_handoff)
-        self.assertIsNone(sig.parameters["payload_out"].default)
 
 
 if __name__ == "__main__":

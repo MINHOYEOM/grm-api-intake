@@ -26,17 +26,9 @@ def _item(source: str, doc_id: str, url: str, date_iso: str = "2026-08-17") -> c
 
 
 def _insert(items, existing=None, url_keys=None):
-    """notion_create_page 를 성공으로 스텁하고 insert_items 실행 → (inserted, skipped, failed)."""
-    existing = set() if existing is None else existing
-    with mock.patch.object(ci.time, "sleep"), \
-            mock.patch.object(ci, "notion_create_page", return_value=True):
-        return ci.insert_items(
-            "tok", "db", items,
-            date(2026, 8, 24),
-            datetime(2026, 8, 24, tzinfo=timezone.utc),
-            existing, False,
-            existing_url_keys=url_keys,
-            modality_enabled=False)
+    """Exercise URL and document deduplication without writing to storage."""
+    return ci.insert_items(items, datetime(2026, 8, 17, tzinfo=timezone.utc),
+                           set() if existing is None else existing, True, existing_url_keys=url_keys)
 
 
 class CanonicalUrlKeyTest(unittest.TestCase):

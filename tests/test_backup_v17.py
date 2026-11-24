@@ -141,7 +141,7 @@ class GateUsableTest(unittest.TestCase):
         with mock.patch.object(db, "git_read_handoff", return_value=None):
             ok, why = bg.usable(db, DATE, self._read(files), "")
             with self.assertRaises(db.DeltaBridgeError):  # 브릿지는 거절한다
-                db._prepare_adoptable("", "", db.load_git_run(DATE, read=self._read(files)), self._read(files))
+                db._prepare_adoptable(db.load_git_run(DATE, read=self._read(files)), self._read(files))
         self.assertFalse(ok)
         self.assertIn("브릿지 검증", why)
         st = _state(editorial_usable=ok, editorial_reason=why, desk={"status": "완료"},
@@ -162,27 +162,17 @@ class GateUsableTest(unittest.TestCase):
                  "봉투 위반": {"delta.json": bad_env, "copyedit.json": _COPYEDIT_OK},
                  "호 날짜 다름": {"delta.json": wrong_date, "copyedit.json": _COPYEDIT_OK},
                  "스캐폴드 없음": {"delta.json": no_scaffold, "copyedit.json": _COPYEDIT_OK}}
-        env = {"GRM_INTAKE_NOTION": "off"}
         for name, files in cases.items():
-            with self.subTest(name), mock.patch.dict(os.environ, env), \
-                    mock.patch.object(db, "git_read_handoff", return_value=None), \
-                    mock.patch.object(db, "notion_api_request", side_effect=AssertionError("노션 호출 금지")):
+            with self.subTest(name), mock.patch.object(db, "git_read_handoff", return_value=None):
                 gate_ok, _ = bg.usable(db, DATE, self._read(files), "")
                 run = db.load_git_run(DATE, read=self._read(files))
                 try:
-                    bridge_ok = run["adoptable"] and db._prepare_adoptable("", "", run, self._read(files)) is not None
+                    bridge_ok = run["adoptable"] and db._prepare_adoptable(run, self._read(files)) is not None
                 except db.DeltaBridgeError:
                     bridge_ok = False
                 self.assertEqual(gate_ok, bridge_ok, name)
                 self.assertEqual(gate_ok, name == "정상", name)
 
-    def test_usable_restores_notion_env(self) -> None:
-        files = {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_OK}
-        with mock.patch.dict(os.environ, {}, clear=False), \
-                mock.patch.object(db, "git_read_handoff", return_value=None):
-            os.environ.pop("GRM_INTAKE_NOTION", None)
-            bg.usable(db, DATE, self._read(files), "")
-            self.assertNotIn("GRM_INTAKE_NOTION", os.environ)
 
     def test_backup_subfolder_is_read(self) -> None:
         files = {"backup/delta.json": _git_delta(), "backup/copyedit.json": _COPYEDIT_OK}
@@ -196,13 +186,8 @@ class BridgeBackupTest(unittest.TestCase):
         self._tmp = tempfile.TemporaryDirectory()
         os.chdir(self._tmp.name)
         self._out = os.path.join(self._tmp.name, "gh_output.txt")
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("NOTION_TOKEN", db.ENV_DELTA_SOURCE, db.ENV_HANDOFF_BODY_SOURCE)}
-        env.update({"GRM_INTAKE_NOTION": "off", "GITHUB_OUTPUT": self._out,
-                    "GITHUB_STEP_SUMMARY": os.path.join(self._tmp.name, "summary.md")})
-        self._patches = [mock.patch.dict(os.environ, env, clear=True),
-                         mock.patch.object(db, "notion_api_request",
-                                           side_effect=AssertionError("노션 호출 금지")),
+        env = {"GITHUB_OUTPUT": self._out, "GITHUB_STEP_SUMMARY": os.path.join(self._tmp.name, "summary.md")}
+        self._patches = [mock.patch.dict(os.environ, env),
                          mock.patch.object(db, "git_read_handoff", return_value=None)]
         for p in self._patches:
             p.start()
@@ -215,7 +200,7 @@ class BridgeBackupTest(unittest.TestCase):
 
     def _run(self, files) -> int:
         with mock.patch.object(db, "git_read_run_file", side_effect=_git_reader(files)):
-            return db.main(["--db", "x", "--publish-date", DATE])
+            return db.main(["--publish-date", DATE])
 
     def _outputs(self) -> dict:
         if not os.path.exists(self._out):

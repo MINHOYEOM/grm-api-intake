@@ -1,24 +1,11 @@
 #!/usr/bin/env python3
-"""GRM Intake — Notion API 클라이언트 층 (배치5 Phase1, collect_intake 에서 verbatim 분리).
-
-Notion HTTP 를 만지는 저수준 래퍼 + preflight + dedupe 조회 + 페이지네이션 + 속성/children
-빌드 + 인테이크 페이지 생성. `notion_api_request`·`notion_create_page` 의 재시도 로직은 통합
-하지 않고 원형 그대로 이동한다(통합은 별도 배치). collect_intake 로의 역참조 없음(단방향:
-collect_intake → grm_notion, grm_handoff → grm_notion). 기존 참조 경로
-(collect_intake.notion_create_page 등)는 collect_intake 가 이 모듈을 재수출해 보존한다.
-
-`IntakeItem` 은 시그니처 주석으로만 참조되며 `from __future__ import annotations` 로 지연
-평가되는 문자열이라 런타임 import 가 불필요하다(순환 방지·타입 위치는 collect_intake 유지).
-"""
+"""Pure helpers for legacy intake records and canonical URL deduplication."""
 from __future__ import annotations
 
 import json
-import time
-from datetime import date, datetime, timedelta
-from typing import Any, NamedTuple
+from datetime import date, datetime
+from typing import Any, NamedTuple, TYPE_CHECKING
 from urllib.parse import urlsplit, urlunsplit
-
-import requests
 
 from grm_common import (
     NOTION_RICH_TEXT_CHUNK,
@@ -36,9 +23,6 @@ from grm_common import (
     SOURCE_RECALL,
     chunk_text,
     env_flag,
-    log,
-    retry_after_seconds,
-    truncate,
 )
 from grm_taxonomy import (
     MODALITY_BIOLOGIC,
@@ -48,19 +32,8 @@ from grm_taxonomy import (
 )
 
 
-NOTION_API_VERSION = "2022-06-28"
-
-
-NOTION_PAGES_URL = "https://api.notion.com/v1/pages"
-
-
-NOTION_PAGE_URL_TPL = "https://api.notion.com/v1/pages/{page_id}"
-
-
-NOTION_DB_QUERY_URL_TPL = "https://api.notion.com/v1/databases/{db_id}/query"
-
-
-NOTION_BLOCK_CHILDREN_URL_TPL = "https://api.notion.com/v1/blocks/{block_id}/children"
+if TYPE_CHECKING:
+    from collect_intake import IntakeItem
 
 
 PROP_NAME = "Name"
@@ -153,129 +126,6 @@ MODALITY_OPTIONS = (MODALITY_CHEMICAL, MODALITY_BIOLOGIC, MODALITY_OTHER)
 NOTION_CODE_BLOCK_CHUNK = 1900
 
 
-def notion_headers(token: str) -> dict[str, str]:
-    return {
-        "Authorization": f"Bearer {token}",
-        "Notion-Version": NOTION_API_VERSION,
-        "Content-Type": "application/json",
-    }
-
-
-class NotionDedupeQueryError(RuntimeError):
-    """Notion 중복 조회 실패 전용 예외 — insert 중단 판단에 사용."""
-    pass
-
-
-class NotionHandoffError(RuntimeError):
-    """Routine handoff 생성/갱신 실패 전용 예외."""
-    pass
-
-
-def notion_api_request(method: str, url: str, token: str, *,
-                       body: dict[str, Any] | None = None,
-                       retries: int = 2) -> dict[str, Any]:
-    """Notion JSON API 호출 공통 래퍼. 429/5xx 는 짧게 재시도한다."""
-    last_err: Exception | None = None
-    for attempt in range(retries + 1):
-        try:
-            resp = requests.request(method, url, json=body,
-                                    headers=notion_headers(token), timeout=30)
-            if resp.status_code == 429 and attempt < retries:
-                sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
-                log("WARN", f"Notion API 429 rate-limit — {sleep_s}s 후 재시도 "
-                            f"({attempt + 1}/{retries + 1})")
-                time.sleep(sleep_s)
-                continue
-            if resp.status_code >= 500 and attempt < retries:
-                log("WARN", f"Notion API {resp.status_code} — 재시도 "
-                            f"({attempt + 1}/{retries + 1}) body={resp.text[:200]}")
-                time.sleep(2 ** attempt)
-                continue
-            if resp.status_code >= 400:
-                raise NotionHandoffError(
-                    f"Notion API {method} {url} 실패 ({resp.status_code}): "
-                    f"{resp.text[:300]}"
-                )
-            if not resp.text:
-                return {}
-            return resp.json()
-        except requests.RequestException as e:
-            last_err = e
-            if attempt < retries:
-                log("WARN", f"Notion API 네트워크 오류 — 재시도 "
-                            f"({attempt + 1}/{retries + 1}) err={e}")
-                time.sleep(2 ** attempt)
-                continue
-            break
-        except ValueError as e:
-            raise NotionHandoffError(f"Notion API JSON 파싱 실패: {e}") from e
-    raise NotionHandoffError(f"Notion API {method} {url} 실패: {last_err}")
-
-
-def notion_verify_modality_property(token: str, db_id: str) -> bool:
-    """ENABLE_MODALITY_TAG=true 활성화 시 Notion 'Modality' 속성 사전 점검(preflight).
-
-    DB 에 'Modality' 가 Select 타입으로 존재하는지 확인한다. 없거나 타입이 다르면
-    첫 insert 부터 전부 실패하므로, 그 전에 깨끗하게 False 를 반환해 호출부가
-    'N건 insert 실패' 대신 '스키마 불일치'로 한 번에 알리고 graceful degrade 하도록 한다.
-
-    반환: True = 기록 진행 OK / False = 스키마 불일치(이번 실행 Modality 기록 건너뜀).
-    (Select 옵션 Chemical/Biologic/Other 누락은 insert 시 자동 생성되므로 경고만.)
-    """
-    url = f"https://api.notion.com/v1/databases/{db_id}"
-    try:
-        data = notion_api_request("GET", url, token)
-    except NotionHandoffError as e:
-        log("WARN", f"Modality preflight: DB 조회 실패 — {e}")
-        return False
-    prop = (data.get("properties", {}) or {}).get(PROP_MODALITY)
-    if not prop:
-        log("ERROR", f"Modality preflight 실패: Notion DB 에 '{PROP_MODALITY}' 속성이 없습니다. "
-                     f"Select 속성(옵션 {', '.join(MODALITY_OPTIONS)})을 먼저 생성하세요.")
-        return False
-    ptype = prop.get("type")
-    if ptype != "select":
-        log("ERROR", f"Modality preflight 실패: '{PROP_MODALITY}' 속성 타입이 '{ptype}' — "
-                     f"'select' 여야 합니다.")
-        return False
-    options = {o.get("name") for o in (prop.get("select", {}).get("options") or [])}
-    missing = set(MODALITY_OPTIONS) - options
-    if missing:
-        log("WARN", f"Modality preflight: select 옵션 {sorted(missing)} 미존재 "
-                    f"— insert 시 자동 생성됨(스키마 의도 확인 권장).")
-    else:
-        log("INFO", f"Modality preflight OK — '{PROP_MODALITY}' select 옵션 {sorted(options)}")
-    return True
-
-
-def notion_verify_handoff_ref_property(token: str, db_id: str) -> bool:
-    """ENABLE_HANDOFF_IDEMPOTENCY_V2=true 활성화 시 'Handoff Ref' 속성 사전 점검(preflight).
-
-    DB 에 'Handoff Ref' 가 rich_text 타입으로 존재하는지 확인한다. 없거나 타입이 다르면
-    emit 의 ref 기록·reconcile 이 전부 실패하므로, 그 전에 False 를 반환해 호출부가
-    이번 실행만 v2 를 끄고 v1(날짜 윈도우+K4-1)으로 graceful degrade 하도록 한다
-    (`notion_verify_modality_property` 선례와 동일 패턴).
-    """
-    url = f"https://api.notion.com/v1/databases/{db_id}"
-    try:
-        data = notion_api_request("GET", url, token)
-    except NotionHandoffError as e:
-        log("WARN", f"Handoff Ref preflight: DB 조회 실패 — {e}")
-        return False
-    prop = (data.get("properties", {}) or {}).get(PROP_HANDOFF_REF)
-    if not prop:
-        log("ERROR", f"Handoff Ref preflight 실패: Notion DB 에 '{PROP_HANDOFF_REF}' 속성이 "
-                     f"없습니다. Rich text 속성을 먼저 생성하세요.")
-        return False
-    ptype = prop.get("type")
-    if ptype != "rich_text":
-        log("ERROR", f"Handoff Ref preflight 실패: '{PROP_HANDOFF_REF}' 속성 타입이 "
-                     f"'{ptype}' — 'rich_text' 여야 합니다.")
-        return False
-    log("INFO", f"Handoff Ref preflight OK — '{PROP_HANDOFF_REF}' rich_text 확인")
-    return True
-
-
 def canonical_url_key(source: str, url: str) -> str:
     """`source::정규화URL` — **기사 단위 permalink** 를 쓰는 소스의 2차 dedup 키.
 
@@ -309,144 +159,6 @@ class ExistingKeys(NamedTuple):
 
     doc_ids: set[str]   # "{source}::{document_id}"
     url_keys: set[str]  # "{source}::{정규화 official_url}"
-
-
-# dedup 조회의 페이지당 시도 수(첫 시도 + 재시도 3회). 네트워크 오류 대기는 2·4·8초라
-# 매번 30초 timeout 이 나도 페이지당 최악 약 2분 — job 상한(35분) 안이다.
-_DEDUP_ATTEMPTS = 4
-
-
-def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
-                                  window_days: int = 7,
-                                  source_names: set[str] | None = None) -> set[str]:
-    """`notion_query_existing_keys(...).doc_ids` — 기존 호출부 호환 래퍼(반환 불변)."""
-    return notion_query_existing_keys(
-        token, db_id, run_date, window_days=window_days,
-        source_names=source_names).doc_ids
-
-
-def notion_query_existing_keys(token: str, db_id: str, run_date: date,
-                               window_days: int = 7,
-                               source_names: set[str] | None = None) -> ExistingKeys:
-    """최근 window_days 일(KST Run Date 기준) row 의 'source::document_id' key set 반환.
-
-    daily 수집 전환(Phase 1)으로 dedupe 윈도우를 '당일' → '최근 window_days 일'로 확장.
-    동일 항목이 윈도우 내 여러 daily run 에서 재삽입되는 것을 방지한다.
-
-    dedupe key 형식: "{source}::{doc_id}"
-    예) "Federal Register::{doc_id}", "OpenFDA Recall::{doc_id}",
-        "Brave Search::{sha1(url)[:12]}" (Phase 2a 신규)
-    Source 를 포함해 소스 간 ID 충돌을 방지한다.
-
-    Raises:
-        NotionDedupeQueryError: 조회 실패 시 — caller 가 insert 중단 여부를 결정.
-    """
-    url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
-    existing: set[str] = set()
-    url_keys: set[str] = set()
-    window_start = (run_date - timedelta(days=window_days)).isoformat()
-    and_filters: list[dict[str, Any]] = [
-        {"property": PROP_RUN_DATE, "date": {"on_or_after": window_start}},
-        {"property": PROP_RUN_DATE, "date": {"on_or_before": run_date.isoformat()}},
-    ]
-    # source_names 지정 시 Source 한정(snapshot 소스 long-horizon dedup용).
-    if source_names:
-        and_filters.append({
-            "or": [{"property": PROP_SOURCE, "select": {"equals": s}}
-                   for s in sorted(source_names)]
-        })
-    body: dict[str, Any] = {
-        "filter": {"and": and_filters},
-        "page_size": 100,
-    }
-    start_cursor: str | None = None
-    page_count = 0
-    # P2 개선: dedup 윈도우가 enforcement(최대 30일)×전 소스로 넓어졌으므로 상한을 상향한다.
-    # 100p × 100 = 10,000 row 헤드룸. 그래도 초과하면 partial 반환 대신 예외(아래 for-else).
-    _DEDUP_MAX_PAGES = 100
-    try:
-        for _ in range(_DEDUP_MAX_PAGES):  # 안전 페이지 상한
-            page_count += 1
-            if start_cursor:
-                body["start_cursor"] = start_cursor
-            elif "start_cursor" in body:
-                del body["start_cursor"]
-            data: dict[str, Any] | None = None
-            for attempt in range(_DEDUP_ATTEMPTS):
-                last = attempt == _DEDUP_ATTEMPTS - 1
-                try:
-                    resp = requests.post(url, json=body, headers=notion_headers(token),
-                                         timeout=30)
-                except requests.RequestException as e:
-                    # ★[2026-09-27] 네트워크 예외도 재시도한다. 종전 루프는 **응답이 온 경우**
-                    #   (429·5xx)만 재시도해서, ReadTimeout·ConnectionError 는 첫 시도에서 곧장
-                    #   아래 except 로 빠져 insert 전면 중단이 됐다 — run 36272185568: 평소 2~4초
-                    #   걸리는 첫 페이지가 30초 무응답 1회 → 그날 적재 0건·handoff 미생성.
-                    #   이 조회는 읽기라 되풀이해도 부작용이 없다(timeout 을 재시도하지 않는
-                    #   `notion_create_page` 는 쓰기라서 중복 row 가 생길 수 있는 경우다).
-                    #   다 쓰면 종전대로 예외 — 불완전한 dedup 으로 insert 하지 않는다.
-                    if last:
-                        raise
-                    sleep_s = 2 ** (attempt + 1)
-                    log("WARN", f"Notion dedupe 네트워크 오류 — {sleep_s}s 후 재시도 "
-                                f"({attempt + 1}/{_DEDUP_ATTEMPTS}) page={page_count} err={e}")
-                    time.sleep(sleep_s)
-                    continue
-                if resp.status_code == 429 and not last:
-                    sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
-                    log("WARN", f"Notion dedupe 429 rate-limit — {sleep_s}s 후 재시도 "
-                                f"({attempt + 1}/{_DEDUP_ATTEMPTS})")
-                    time.sleep(sleep_s)
-                    continue
-                if resp.status_code >= 500 and not last:
-                    log("WARN", f"Notion dedupe 조회 실패 ({resp.status_code}) "
-                                f"attempt={attempt + 1}/{_DEDUP_ATTEMPTS} body={resp.text[:200]}")
-                    time.sleep(2 ** attempt)
-                    continue
-                resp.raise_for_status()
-                data = resp.json()
-                break
-            if data is None:
-                raise NotionDedupeQueryError(
-                    f"Notion 중복 조회 실패 (RunDate={run_date}): empty response"
-                )
-            for pg in data.get("results", []):
-                props = pg.get("properties", {})
-                # Source
-                src = (props.get(PROP_SOURCE, {}).get("select") or {}).get("name", "")
-                # Document ID
-                doc_id_arr = props.get(PROP_DOC_ID, {}).get("rich_text", [])
-                doc_id = "".join(rt.get("plain_text", "") for rt in doc_id_arr).strip()
-                if src and doc_id:
-                    existing.add(f"{src}::{doc_id}")
-                # Official URL — 같은 패스에서 2차 dedup 키도 모은다(추가 요청 없음).
-                # 소비는 `_CANONICAL_URL_DEDUP_SOURCES` 에 든 소스에 한정되므로, 여기서
-                # 전 소스를 모아도 다른 소스의 판정에는 영향이 없다.
-                official = (props.get(PROP_OFFICIAL_URL, {}) or {}).get("url") or ""
-                if src and official:
-                    key = canonical_url_key(src, official)
-                    if key:
-                        url_keys.add(key)
-            if not data.get("has_more"):
-                break
-            start_cursor = data.get("next_cursor")
-        else:
-            # for-else: 상한을 모두 소진했는데 break 되지 않음 = has_more 잔존 = 상한 도달.
-            # P2 개선: 일부 기존 row를 놓친 채 진행하면 중복 삽입 방어가 깨지므로,
-            # WARN 후 partial 반환 대신 예외를 던져 caller(main)가 insert를 중단하게 한다.
-            raise NotionDedupeQueryError(
-                f"Notion 중복 조회 {_DEDUP_MAX_PAGES}페이지 상한 도달 — "
-                f"dedup set 불완전(existing={len(existing)}건), 중복 삽입 방지 위해 중단"
-            )
-    except (requests.RequestException, ValueError) as e:
-        # 중복 조회 실패 시 빈 set을 반환하면 모든 item을 신규로 판단해 대량 중복 insert 위험.
-        # 안전하게 예외를 던져 caller 가 insert 중단 여부를 결정하도록 한다.
-        raise NotionDedupeQueryError(
-            f"Notion 중복 조회 실패 (RunDate={run_date}): {e}"
-        ) from e
-    log("INFO", f"Notion 기존 row {len(existing)} 건 (최근 {window_days}일, ~{run_date}) "
-                f"· URL 키 {len(url_keys)} 건")
-    return ExistingKeys(doc_ids=existing, url_keys=url_keys)
 
 
 # Notion API 한도: rich_text 배열은 최대 100 요소. 저장 단계 절단 금지 원칙의 유일한 예외이며,
@@ -623,87 +335,3 @@ def build_raw_payload_children(raw_payload: dict[str, Any]) -> list[dict[str, An
             },
         })
     return blocks
-
-
-def _append_overflow_children(token: str, resp: Any, doc_id: str,
-                              children: list[dict[str, Any]]) -> None:
-    """페이지 생성 후 남은 블록을 90개씩 PATCH /blocks/{id}/children 로 덧붙인다.
-
-    페이지는 이미 만들어졌으므로 실패해도 예외를 올리지 않는다(재삽입 시 중복 방지).
-    """
-    try:
-        page_id = resp.json()["id"]
-    except (ValueError, KeyError, TypeError) as e:
-        log("ERROR", f"Notion 추가 블록 append 불가 — 페이지 id 없음 doc={doc_id} err={e}")
-        return
-    url = f"https://api.notion.com/v1/blocks/{page_id}/children"
-    for i in range(0, len(children), NOTION_APPEND_BATCH):
-        batch = children[i:i + NOTION_APPEND_BATCH]
-        try:
-            notion_api_request("PATCH", url, token, body={"children": batch})
-        except NotionHandoffError as e:
-            log("ERROR", f"Notion 추가 블록 append 실패 doc={doc_id} "
-                         f"batch={i // NOTION_APPEND_BATCH + 1} err={e}")
-            return
-
-
-def notion_create_page(token: str, db_id: str, item: IntakeItem,
-                       run_date: date, collected_at: datetime,
-                       retries: int = 2, *,
-                       modality_enabled: bool | None = None) -> bool:
-    """Notion 페이지 생성. 429/5xx 는 재시도, 4xx(429 제외)는 즉시 실패."""
-    all_children = build_notion_children(item)
-    body = {
-        "parent": {"database_id": db_id},
-        "properties": build_notion_properties(item, run_date, collected_at,
-                                              modality_enabled=modality_enabled),
-        "children": all_children[:NOTION_CREATE_CHILDREN_MAX],
-    }
-    overflow_children = all_children[NOTION_CREATE_CHILDREN_MAX:]
-    # 재시도 불필요 상태 코드 (클라이언트 에러 — 재시도해도 동일 결과)
-    _NO_RETRY_CODES = {400, 401, 403, 404, 409}
-
-    last_err: Exception | None = None
-    for attempt in range(retries + 1):
-        try:
-            resp = requests.post(NOTION_PAGES_URL, json=body,
-                                 headers=notion_headers(token), timeout=30)
-            if resp.status_code < 400:
-                if overflow_children:
-                    _append_overflow_children(token, resp, item.document_id,
-                                              overflow_children)
-                return True
-            if resp.status_code in _NO_RETRY_CODES:
-                log("ERROR", f"Notion 페이지 생성 실패 ({resp.status_code}, 재시도 없음) "
-                            f"doc={item.document_id} body={resp.text[:300]}")
-                return False
-            if resp.status_code == 429:
-                retry_after = retry_after_seconds(resp, attempt, max_sleep=30)
-                # 마지막 attempt 직전에는 sleep 후 재시도해도 의미 없으므로 생략
-                if attempt < retries:
-                    log("WARN", f"Notion 429 rate-limit doc={item.document_id} "
-                                f"— {retry_after}s 후 재시도 ({attempt + 1}/{retries + 1})")
-                    time.sleep(retry_after)
-                continue
-            # 500/502/503/504 등 서버 에러 — 지수 백오프 재시도
-            log("WARN", f"Notion 페이지 생성 실패 ({resp.status_code}) "
-                        f"doc={item.document_id} attempt={attempt + 1}/{retries + 1} "
-                        f"body={resp.text[:200]}")
-            if attempt < retries:
-                time.sleep(2 ** attempt)
-        except requests.Timeout as e:
-            # Timeout: Notion이 서버 측에서 이미 row를 생성했을 수 있으므로 retry 금지.
-            # retry 시 duplicate row 위험. 즉시 실패 처리 후 상위에서 insert_failed 집계.
-            log("ERROR", f"Notion 페이지 생성 timeout — retry 금지 (duplicate 방지) "
-                         f"doc={item.document_id} err={e}")
-            return False
-        except requests.RequestException as e:
-            # 그 외 네트워크 오류 (ConnectionError 등): 서버 미수신 가능성 높으므로 재시도
-            last_err = e
-            log("WARN", f"Notion 페이지 생성 네트워크 오류 doc={item.document_id} "
-                        f"attempt={attempt + 1}/{retries + 1} err={e}")
-            if attempt < retries:
-                time.sleep(2 ** attempt)
-
-    log("ERROR", f"Notion 페이지 생성 최종 실패 doc={item.document_id} last_err={last_err}")
-    return False

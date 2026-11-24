@@ -156,48 +156,6 @@ class FileWriteTest(unittest.TestCase):
             self.assertTrue(os.path.isfile(path))
 
 
-class EmitBranchTest(unittest.TestCase):
-    """emit_routine_handoff 가 web_brief_dir 지정 + v2 경로일 때만 산출하는지(D5)."""
-
-    def _run(self, *, flag: str | None, web_dir: str | None):
-        # **kw: emit 경로가 넘기는 추가 인자(예: sealed_dates)를 흡수한다 — 이 mock 은
-        # Notion 호출 대역일 뿐 시그니처를 고정하는 계약이 아니다.
-        def fake_upsert(token, db_id, payload, generated_at, compact=False, **kw):
-            return "pid", "url"
-
-        env = {} if flag is None else {"ENABLE_HANDOFF_V2": flag}
-        with mock.patch.dict(os.environ, env, clear=True), \
-             mock.patch.object(grm_handoff, "notion_query_new_intake_rows",
-                               return_value=_enriched_rows()), \
-             mock.patch.object(grm_handoff, "enrich_rows_with_raw",
-                               side_effect=lambda t, rows, inmemory_raw=None: (rows, {})), \
-             mock.patch.object(grm_handoff, "notion_upsert_routine_handoff", side_effect=fake_upsert):
-            ci.emit_routine_handoff("tok", "db", RUN_DATE, 7, GEN_AT,
-                                    web_brief_dir=web_dir)
-
-    def test_v2_with_dir_writes_file(self) -> None:
-        with tempfile.TemporaryDirectory() as d:
-            self._run(flag="true", web_dir=d)
-            self.assertTrue(os.path.isfile(os.path.join(d, "brief_web_2026_06_22.json")))
-
-    def test_v2_without_dir_no_file(self) -> None:
-        with tempfile.TemporaryDirectory() as d:
-            self._run(flag="true", web_dir=None)
-            self.assertEqual(os.listdir(d), [])
-
-    def test_v1_path_no_file_even_with_dir(self) -> None:
-        # flag off → v1 경로(scaffold 카드 없음) → web brief 미산출
-        with tempfile.TemporaryDirectory() as d:
-            self._run(flag=None, web_dir=d)
-            self.assertEqual(os.listdir(d), [])
-
-    def test_web_emit_failure_does_not_break_handoff(self) -> None:
-        # web brief 빌드가 던져도 handoff 는 정상 반환(비차단).
-        with tempfile.TemporaryDirectory() as d, \
-             mock.patch.object(grm_handoff, "emit_web_brief_file",
-                               side_effect=RuntimeError("boom")):
-            # _run 내부에서 예외가 새지 않아야 한다(통과 = 비차단 보장).
-            self._run(flag="true", web_dir=d)
 
 
 if __name__ == "__main__":

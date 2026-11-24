@@ -304,265 +304,14 @@ class TestAuditJson(unittest.TestCase):
         self.assertIn("SKIP", vpb.format_audit_report(vpb.skipped_json("x")))
 
 
-class TestFetchLatestBriefSort(unittest.TestCase):
-    """회귀: `발행일` 속성 내림차순(1차)로 정렬 요청해야 한다.
-
-    created_time(생성시각) 단독 정렬은 나중에 생성된 과거 주차 중복 페이지를
-    최신으로 잘못 뽑는 사고를 냈다(Issue #110 — 06-17 발행 중복 페이지가
-    06-22 진짜 최신 페이지보다 먼저 선택됨). Notion 서버가 실제 정렬을 수행하므로
-    여기서는 클라이언트가 올바른 정렬 조건을 요청하는지만 검증한다."""
-
-    def test_requests_published_date_desc_as_primary_sort(self):
-        import collect_intake as ci
-
-        fake_response = {"results": [
-            {"id": "p1", "url": "u1",
-             "properties": {"Name": {"type": "title",
-                                      "title": [{"plain_text": "Brief"}]}}},
-        ]}
-        with mock.patch.object(ci, "notion_api_request",
-                                return_value=fake_response) as mock_req:
-            vpb.fetch_latest_brief("tok", "db123")
-
-        self.assertEqual(mock_req.call_count, 1)
-        _args, kwargs = mock_req.call_args
-        sorts = kwargs["body"]["sorts"]
-        self.assertEqual(sorts[0], {"property": "발행일", "direction": "descending"})
-        self.assertEqual(sorts[1],
-                          {"timestamp": "created_time", "direction": "descending"})
-
-    def test_created_time_alone_is_not_the_only_sort(self):
-        """created_time 단독 정렬(수정 전 버그 재발)을 회귀 방지로 명시 배제."""
-        import collect_intake as ci
-
-        with mock.patch.object(ci, "notion_api_request",
-                                return_value={"results": []}) as mock_req:
-            vpb.fetch_latest_brief("tok", "db123")
-
-        sorts = mock_req.call_args.kwargs["body"]["sorts"]
-        self.assertNotEqual(
-            sorts, [{"timestamp": "created_time", "direction": "descending"}])
 
 
-class TestRunSkips(unittest.TestCase):
-    def test_no_token_skips(self):
-        j = vpb.run("", weekly_db_id="w", intake_db_id="i")
-        self.assertTrue(j["ok"])
-        self.assertIn("NOTION_TOKEN", j["note"])
-
-    def test_no_handoff_skips_not_alert(self):
-        """근거 대조 불가(handoff 미발견)는 과알림 0 — ok:true 건너뜀."""
-        with mock.patch.object(vpb, "fetch_latest_brief",
-                               return_value={"id": "p", "url": "u", "title": "t"}), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows", return_value=[]):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
-        self.assertTrue(j["ok"])
-        self.assertIn("handoff", j["note"])
-
-    def test_full_flow_detects_leak(self):
-        with mock.patch.object(vpb, "fetch_latest_brief",
-                               return_value={"id": "p", "url": "u", "title": "Brief"}), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               return_value=HANDOFF_ROWS), \
-             mock.patch.object(vpb, "fetch_brief_blocks",
-                               return_value=[
-                                   _callout_with_link(HANDOFF_ROWS[0]["official_url"]),
-                                   _callout_with_link(
-                                       "https://www.mfds.go.kr/brd/m_99/view.do?seq=1"),
-                               ]):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
-        self.assertFalse(j["ok"])
-        self.assertEqual(j["fail_count"], 1)
-
-    def test_full_flow_detects_weekday_mismatch(self):
-        """W2: 구조 탐지 — 푸터 요일 오류(06-17=수인데 화요일)를 발행 후 결정론 FAIL 로 잡는다."""
-        with mock.patch.object(vpb, "fetch_latest_brief",
-                               return_value={"id": "p", "url": "u", "title": "Brief"}), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               return_value=HANDOFF_ROWS), \
-             mock.patch.object(vpb, "fetch_brief_blocks",
-                               return_value=[_paragraph("발행일: 2026-06-17 화요일"),
-                                             _callout_with_link(HANDOFF_ROWS[0]["official_url"])]):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
-        self.assertFalse(j["ok"])
-        codes = [a["code"] for a in j["alerts"]]
-        self.assertIn("PL14-WEEKDAY", codes)
-
-    def test_full_flow_clean_brief_passes(self):
-        """정상(요일 정확·미근거 링크 없음) → ok:true, 과알림 0."""
-        with mock.patch.object(vpb, "fetch_latest_brief",
-                               return_value={"id": "p", "url": "u", "title": "Brief"}), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               return_value=HANDOFF_ROWS), \
-             mock.patch.object(vpb, "fetch_brief_blocks",
-                               return_value=[_paragraph("발행일: 2026-06-17 수요일"),
-                                             _callout_with_link(HANDOFF_ROWS[0]["official_url"])]):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
-        self.assertTrue(j["ok"])
-        self.assertEqual(j["fail_count"], 0)
 
 
-class TestRunCoverage(unittest.TestCase):
-    """W2: 발행 후 탐지 — 수집 현황 '수집' 숫자가 handoff 정본과 어긋나면 FAIL 로 잡는다.
-
-    detective 는 handoff rows(여기 MFDS 1건)로 정본을 재집계(coverage_source_counts +
-    build_coverage_collected)해 발행물 수집 callout 과 대조한다(네트워크 0 → 과알림 0).
-    """
-
-    def _run_with_brief_text(self, coverage_text):
-        with mock.patch.object(vpb, "fetch_latest_brief",
-                               return_value={"id": "p", "url": "u", "title": "Brief"}), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               return_value=HANDOFF_ROWS), \
-             mock.patch.object(vpb, "fetch_brief_blocks",
-                               return_value=[_paragraph(coverage_text),
-                                             _callout_with_link(HANDOFF_ROWS[0]["official_url"])]):
-            return vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
-
-    def test_collected_mismatch_is_alert(self):
-        # handoff 정본 = MFDS 1건(total 1). 발행물이 9건/MFDS 9 로 집계 → FAIL.
-        j = self._run_with_brief_text("Intake row 9건 (MFDS 9)")
-        self.assertFalse(j["ok"])
-        codes = [a["code"] for a in j["alerts"]]
-        self.assertIn("PL15-COVERAGE-TOTAL", codes)
-        self.assertIn("PL15-COVERAGE-SOURCE", codes)
-
-    def test_collected_match_passes(self):
-        # 발행물 수집 = 정본과 일치(MFDS 1, 나머지 known 0 은 생략 정상) → 과알림 0.
-        j = self._run_with_brief_text("Intake row 1건 (MFDS 1)")
-        self.assertTrue(j["ok"])
-        self.assertEqual(j["fail_count"], 0)
-
-    def test_no_coverage_callout_no_alert(self):
-        # 수집 callout 부재(요일 푸터만) → 대조 불가, 추측 금지(과알림 0).
-        j = self._run_with_brief_text("발행일: 2026-06-17 수요일")
-        self.assertTrue(j["ok"])
 
 
-class TestRunScaffoldCells(unittest.TestCase):
-    """Track A — 발행 후 탐지가 scaffold 고정 셀 전사오류(PL18)를 FAIL 로 잡는다(06-22 FDA 483).
-
-    handoff card_scaffold(W2 고정 셀) ↔ 발행 본문 평문을 결정론 대조(네트워크 0 → 과알림 0).
-    """
-
-    FDA483_ROW = {
-        "source": "FDA 483", "document_id": "fda483-192439",
-        "card_scaffold": (
-            "### [FDA 483 실사 관찰 · FDA] BPI Labs, LLC — **{{TITLE_ISSUE}}**\n\n"
-            "<table>\n"
-            "<tr><td>**발행일**</td><td>2026-05-27</td></tr>\n"
-            "<tr><td>**문서번호**</td><td>`fda483-192439`</td></tr>\n"
-            "<tr><td>**제조소/업체**</td><td>BPI Labs, LLC · FEI 3015156709</td></tr>\n"
-            "<tr><td>**시설 · 유형**</td><td>Outsourcing Facility · 483</td></tr>\n"
-            "</table>"),
-    }
-
-    def _run(self, blocks):
-        with mock.patch.object(vpb, "fetch_latest_brief",
-                               return_value={"id": "p", "url": "u", "title": "Brief"}), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               return_value=[self.FDA483_ROW]), \
-             mock.patch.object(vpb, "fetch_brief_blocks", return_value=blocks):
-            return vpb.run("tok", weekly_db_id="w", intake_db_id="i", verify=False)
-
-    def _cells(self, fei):
-        # 발행 카드 평문: 문서번호 보존(렌더 판정) + FEI 칸만 가변.
-        return [_paragraph("발행일 2026-05-27"),
-                _paragraph("문서번호 fda483-192439"),
-                _paragraph(f"제조소/업체 BPI Labs, LLC · FEI {fei}"),
-                _paragraph("시설 · 유형 Outsourcing Facility · 483")]
-
-    def test_fei_mutation_detected(self):
-        j = self._run(self._cells("3016534068"))   # 3015156709 -> 3016534068 (6/22 오류)
-        self.assertFalse(j["ok"])
-        self.assertIn("PL18-SCAFFOLD-CELL", [a["code"] for a in j["alerts"]])
-
-    def test_verbatim_card_passes(self):
-        j = self._run(self._cells("3015156709"))    # scaffold 그대로 전사 → 과알림 0
-        self.assertTrue(j["ok"], msg=j["alerts"])
-        self.assertEqual(j["fail_count"], 0)
-
-    def test_unrendered_card_not_flagged(self):
-        # 문서번호가 발행본에 없으면(미렌더) 검사 제외 — FEI 변형이어도 무알림.
-        blocks = [_paragraph("제조소/업체 BPI Labs, LLC · FEI 3016534068")]
-        j = self._run(blocks)
-        self.assertTrue(j["ok"], msg=j["alerts"])
 
 
-class TestSkipClass(unittest.TestCase):
-    """W1 탐지선 침묵 방지: skip 을 infra(탐지선 죽음)/content(대상 부재)로 분류한다.
-
-    CI(grm-brief-audit)가 이 값으로 분기해 **infra skip 만** 스케줄에서 경보한다(과알림 0).
-    각 skip 경로의 skip_class 를 동결한다 — 6 경로 = infra 4 · content 2.
-    """
-
-    _BRIEF = {"id": "p", "url": "u", "title": "t"}
-
-    def test_skipped_json_carries_skip_class(self):
-        self.assertEqual(vpb.skipped_json("x", skip_class="infra")["skip_class"], "infra")
-        self.assertEqual(vpb.skipped_json("x", skip_class="content")["skip_class"], "content")
-        self.assertEqual(vpb.skipped_json("x")["skip_class"], "")  # 기본값 = 미분류
-
-    def test_no_token_is_infra(self):
-        j = vpb.run("", weekly_db_id="w", intake_db_id="i")
-        self.assertEqual(j["skip_class"], "infra")
-        self.assertIn("NOTION_TOKEN", j["note"])
-
-    def test_weekly_brief_query_failure_is_infra(self):
-        with mock.patch.object(vpb, "fetch_latest_brief", side_effect=RuntimeError("boom")):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
-        self.assertEqual(j["skip_class"], "infra")
-        self.assertIn("Weekly Brief 조회 실패", j["note"])
-
-    def test_weekly_brief_missing_is_content(self):
-        with mock.patch.object(vpb, "fetch_latest_brief", return_value=None):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
-        self.assertEqual(j["skip_class"], "content")
-
-    def test_handoff_query_failure_is_infra(self):
-        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               side_effect=RuntimeError("boom")):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
-        self.assertEqual(j["skip_class"], "infra")
-        self.assertIn("handoff", j["note"])
-
-    def test_consumed_handoff_missing_is_content(self):
-        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows", return_value=[]):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
-        self.assertEqual(j["skip_class"], "content")
-
-    def test_brief_body_fetch_failure_is_infra(self):
-        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               return_value=HANDOFF_ROWS), \
-             mock.patch.object(vpb, "fetch_brief_blocks", side_effect=RuntimeError("boom")):
-            j = vpb.run("tok", weekly_db_id="w", intake_db_id="i")
-        self.assertEqual(j["skip_class"], "infra")
-
-    def test_six_skip_paths_are_infra4_content2(self):
-        """분포 동결: 6 skip 경로 = infra 4 · content 2 (분류가 바뀌면 이 테스트가 잡는다)."""
-        classes = []
-        classes.append(vpb.run("", weekly_db_id="w", intake_db_id="i")["skip_class"])
-        with mock.patch.object(vpb, "fetch_latest_brief", side_effect=RuntimeError("x")):
-            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
-        with mock.patch.object(vpb, "fetch_latest_brief", return_value=None):
-            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
-        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               side_effect=RuntimeError("x")):
-            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
-        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows", return_value=[]):
-            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
-        with mock.patch.object(vpb, "fetch_latest_brief", return_value=self._BRIEF), \
-             mock.patch.object(vpb, "fetch_latest_consumed_handoff_rows",
-                               return_value=HANDOFF_ROWS), \
-             mock.patch.object(vpb, "fetch_brief_blocks", side_effect=RuntimeError("x")):
-            classes.append(vpb.run("tok", weekly_db_id="w", intake_db_id="i")["skip_class"])
-        self.assertEqual(classes.count("infra"), 4)
-        self.assertEqual(classes.count("content"), 2)
 
 
 class TestAuditJsonSkipClass(unittest.TestCase):
@@ -589,32 +338,6 @@ class TestAuditJsonSkipClass(unittest.TestCase):
         self.assertEqual(j["info"], [])
 
 
-class TestMainWeeklyDbIdEnvFallback(unittest.TestCase):
-    """main() 의 GRM_WEEKLY_BRIEF_DB_ID 해석: CI 에서 미등록 vars 는 빈 문자열로
-    치환되어 주입된다(키 자체가 사라지지 않음). os.environ.get(key, default) 는
-    키가 존재하되 값이 "" 인 경우 default 로 폴백하지 않으므로, 빈 문자열이
-    그대로 Notion database_id 로 쓰이면 API 요청 URL 이 깨진다(회귀 방지).
-
-    main() 은 2026-07-07 부로 `run_audit()`(웹 우선·Notion 폴백)을 호출한다 — Notion
-    db_id 해석 로직 자체는 불변이라 이 테스트는 mock 대상만 `run_audit` 으로 갱신한다.
-    """
-
-    def test_empty_env_falls_back_to_default_db_id(self):
-        with mock.patch.dict(os.environ, {"GRM_WEEKLY_BRIEF_DB_ID": "",
-                                           "NOTION_TOKEN": "tok"}), \
-             mock.patch.object(vpb, "run_audit",
-                               return_value=vpb.build_audit_json([], [])) as mock_run:
-            vpb.main([])
-        self.assertEqual(mock_run.call_args.kwargs["weekly_db_id"],
-                          vpb.DEFAULT_WEEKLY_BRIEF_DB_ID)
-
-    def test_nonempty_env_is_used_verbatim(self):
-        with mock.patch.dict(os.environ, {"GRM_WEEKLY_BRIEF_DB_ID": "custom-db-id",
-                                           "NOTION_TOKEN": "tok"}), \
-             mock.patch.object(vpb, "run_audit",
-                               return_value=vpb.build_audit_json([], [])) as mock_run:
-            vpb.main([])
-        self.assertEqual(mock_run.call_args.kwargs["weekly_db_id"], "custom-db-id")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -783,26 +506,15 @@ class TestRunWebAndAudit(unittest.TestCase):
         self.assertFalse(j["ok"])
         self.assertEqual(j["fail_count"], 1)
 
-    def test_run_audit_prefers_web_over_notion(self):
-        """웹 발행본이 있으면 Notion 은 조회하지 않는다(중복 알림 방지)."""
-        self._write("brief_web_2026_07_06.json",
-                    _web_brief("2026-07-06", [_web_card("c1")]))
-        with mock.patch.object(vpb, "run") as mock_notion_run:
-            j = vpb.run_audit("tok", weekly_db_id="w", intake_db_id="i",
-                              verify=False, web_briefs_dir=self.tmp)
-        mock_notion_run.assert_not_called()
-        self.assertTrue(j["ok"])
+    def test_run_audit_uses_the_latest_web_brief(self):
+        self._write("brief_web_2026_07_06.json", _web_brief("2026-07-06", [_web_card("c1")]))
+        result = vpb.run_audit(verify=False, web_briefs_dir=self.tmp)
+        self.assertTrue(result["ok"])
 
-    def test_run_audit_falls_back_to_notion_when_no_web_brief(self):
-        """웹 브리프 디렉터리가 비어 있으면(과도기·마이그레이션 전) 기존 Notion 경로로."""
-        with mock.patch.object(vpb, "run",
-                               return_value=vpb.skipped_json("no token", skip_class="infra")
-                               ) as mock_notion_run:
-            j = vpb.run_audit("", weekly_db_id="w", intake_db_id="i",
-                              verify=False, web_briefs_dir=self.tmp)
-        mock_notion_run.assert_called_once_with(
-            "", weekly_db_id="w", intake_db_id="i", verify=False)
-        self.assertEqual(j["skip_class"], "infra")
+    def test_run_audit_reports_missing_web_brief(self):
+        result = vpb.run_audit(verify=False, web_briefs_dir=self.tmp)
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["skip_class"], "infra")
 
 
 if __name__ == "__main__":

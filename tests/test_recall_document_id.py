@@ -68,7 +68,7 @@ class RecallDocumentIdTest(unittest.TestCase):
         items = [ci._recall_to_item(_rec(recall_number=""), "q"),
                  ci._recall_to_item(_rec(recall_number="N/A", code_info="Lot B456"), "q")]
         existing: set[str] = set()
-        ins, sk, fail = ci.insert_items("t", "db", items, date(2026, 11, 8), ci.now_kst(),
+        ins, sk, fail = ci.insert_items(items, ci.now_kst(),
                                         existing, True)
         self.assertEqual((ins, sk, fail), (2, 0, 0))
         self.assertEqual(len(existing), 2)

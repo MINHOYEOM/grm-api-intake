@@ -450,44 +450,6 @@ class TestVetHardExclude(unittest.TestCase):
         self.assertEqual(rel, "Possible")
 
 
-class TestModalityPreflight(unittest.TestCase):
-    """Notion 'Modality' 스키마 preflight — 네트워크 없이 notion_api_request 를 대체."""
-
-    def tearDown(self):
-        if hasattr(self, "_orig"):
-            grm_notion.notion_api_request = self._orig
-
-    def _patch(self, fake):
-        # notion_verify_modality_property 는 grm_notion(배치5 Phase1) 에 있으므로
-        # 그 정의 모듈의 notion_api_request 를 대체해야 preflight 호출이 fake 를 본다.
-        self._orig = grm_notion.notion_api_request
-        grm_notion.notion_api_request = fake
-
-    def test_ok_select_with_all_options(self):
-        self._patch(lambda *a, **k: {"properties": {"Modality": {
-            "type": "select", "select": {"options": [
-                {"name": "Chemical"}, {"name": "Biologic"}, {"name": "Other"}]}}}})
-        self.assertTrue(ci.notion_verify_modality_property("t", "db"))
-
-    def test_missing_property_returns_false(self):
-        self._patch(lambda *a, **k: {"properties": {}})
-        self.assertFalse(ci.notion_verify_modality_property("t", "db"))
-
-    def test_wrong_type_returns_false(self):
-        self._patch(lambda *a, **k: {"properties": {"Modality": {"type": "rich_text"}}})
-        self.assertFalse(ci.notion_verify_modality_property("t", "db"))
-
-    def test_missing_options_still_ok(self):
-        # select 옵션은 insert 시 자동 생성되므로 일부 누락은 True(경고만)
-        self._patch(lambda *a, **k: {"properties": {"Modality": {
-            "type": "select", "select": {"options": [{"name": "Chemical"}]}}}})
-        self.assertTrue(ci.notion_verify_modality_property("t", "db"))
-
-    def test_db_query_error_returns_false(self):
-        def boom(*a, **k):
-            raise ci.NotionHandoffError("boom")
-        self._patch(boom)
-        self.assertFalse(ci.notion_verify_modality_property("t", "db"))
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 제품군 축 분리 성질 가드 (2026-09-21)

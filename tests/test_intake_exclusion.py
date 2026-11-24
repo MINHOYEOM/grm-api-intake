@@ -415,7 +415,7 @@ class OtherWiringTest(unittest.TestCase):
                              headline="Some product", official_url="https://fda.example/recalls",
                              type_or_class="Class II")
         with patch.object(xl, "LEDGER", led):
-            ins, sk, fail = ci.insert_items("t", "db", [item], RUN, ci.now_kst(), set(), True)
+            ins, sk, fail = ci.insert_items([item], ci.now_kst(), set(), True)
         self.assertEqual((ins, sk, fail), (0, 0, 0))
         (key, row), = led._pending.items()
         self.assertEqual(key[0], ci.SOURCE_RECALL)
@@ -428,7 +428,7 @@ class OtherWiringTest(unittest.TestCase):
         item = ci.IntakeItem(source=ci.SOURCE_FDA_WL, document_id="abc123def456", date_iso="2026-11-05",
                              headline="x", official_url="https://u", type_or_class="Warning Letter")
         with patch.object(xl, "LEDGER", led):
-            ci.insert_items("t", "db", [item], RUN, ci.now_kst(), set(), True)
+            ci.insert_items([item], ci.now_kst(), set(), True)
         self.assertIn((ci.SOURCE_FDA_WL, "abc123def456"), led._released)
 
     def test_wl_exclusion_uses_same_doc_id_as_build_wl_item(self):

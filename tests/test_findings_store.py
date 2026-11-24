@@ -174,21 +174,17 @@ class FindingsStoreTest(unittest.TestCase):
 
 
 class CollectIntakeFindingsAppendTest(unittest.TestCase):
-    def test_insert_items_appends_raw_signal_after_notion_success(self) -> None:
+    def test_insert_items_appends_raw_signal_after_supabase_success(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             db = os.path.join(td, "findings.sqlite3")
             existing: set[str] = set()
-            with mock.patch.object(ci.time, "sleep"), \
-                    mock.patch.object(ci, "notion_create_page", return_value=True):
+            with mock.patch.object(ci, "_append_supabase_copy", return_value="saved"):
                 got = ci.insert_items(
-                    "tok",
-                    "db",
                     [_item()],
-                    datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                     datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                     existing,
                     False,
-                    modality_enabled=False,
+                    findings_supabase=("https://example.test", "key"),
                     findings_sqlite_path=db,
                 )
 
@@ -206,17 +202,13 @@ class CollectIntakeFindingsAppendTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             db = os.path.join(td, "findings.sqlite3")
             existing: set[str] = set()
-            with mock.patch.object(ci.time, "sleep"), \
-                    mock.patch.object(ci, "notion_create_page", return_value=True):
+            with mock.patch.object(ci, "_append_supabase_copy", return_value="saved"):
                 got = ci.insert_items(
-                    "tok",
-                    "db",
                     [_item()],
-                    datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                     datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                     existing,
                     False,
-                    modality_enabled=False,
+                    findings_supabase=("https://example.test", "key"),
                     findings_sqlite_path=db,
                     findings_sqlite_include_findings=True,
                 )
@@ -240,16 +232,13 @@ class CollectIntakeFindingsAppendTest(unittest.TestCase):
     def test_insert_items_dry_run_does_not_write_sqlite(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             db = os.path.join(td, "findings.sqlite3")
-            with mock.patch.object(ci, "notion_create_page") as create_page:
+            with mock.patch.object(ci, "_append_supabase_copy") as create_page:
                 got = ci.insert_items(
-                    "tok",
-                    "db",
                     [_item()],
-                    datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                     datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                     set(),
                     True,
-                    modality_enabled=False,
+                    findings_supabase=("https://example.test", "key"),
                     findings_sqlite_path=db,
                 )
 
@@ -257,39 +246,31 @@ class CollectIntakeFindingsAppendTest(unittest.TestCase):
             create_page.assert_not_called()
             self.assertFalse(os.path.exists(db))
 
-    def test_sqlite_append_failure_does_not_change_notion_insert_stats(self) -> None:
-        with mock.patch.object(ci.time, "sleep"), \
-                mock.patch.object(ci, "notion_create_page", return_value=True), \
+    def test_sqlite_append_failure_reports_failure(self) -> None:
+        with mock.patch.object(ci, "_append_supabase_copy", return_value="saved"), \
                 mock.patch.object(ci, "append_intake_item_to_sqlite", side_effect=OSError("disk full")):
             got = ci.insert_items(
-                "tok",
-                "db",
                 [_item()],
-                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                 datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                 set(),
                 False,
-                modality_enabled=False,
+                findings_supabase=("https://example.test", "key"),
                 findings_sqlite_path="findings.sqlite3",
             )
 
         self.assertEqual(got, (1, 0, 0))
 
-    def test_findings_append_failure_does_not_change_notion_insert_stats(self) -> None:
-        with mock.patch.object(ci.time, "sleep"), \
-                mock.patch.object(ci, "notion_create_page", return_value=True), \
+    def test_findings_append_failure_reports_failure(self) -> None:
+        with mock.patch.object(ci, "_append_supabase_copy", return_value="saved"), \
                 mock.patch.object(
                     ci, "append_intake_item_with_findings_to_sqlite", side_effect=OSError("disk full")
                 ):
             got = ci.insert_items(
-                "tok",
-                "db",
                 [_item()],
-                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                 datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                 set(),
                 False,
-                modality_enabled=False,
+                findings_supabase=("https://example.test", "key"),
                 findings_sqlite_path="findings.sqlite3",
                 findings_sqlite_include_findings=True,
             )
@@ -303,80 +284,56 @@ class CollectIntakeFindingsSupabaseAppendTest(unittest.TestCase):
     _SUPABASE = ("https://example.supabase.co", "service-role-secret-token")
 
     def test_flag_off_default_never_calls_supabase(self) -> None:
-        with mock.patch.object(ci.time, "sleep"), \
-                mock.patch.object(ci, "notion_create_page", return_value=True), \
-                mock.patch.object(ci, "append_intake_item_to_supabase") as append_supabase:
+        with mock.patch.object(ci, "append_intake_item_to_supabase") as append_supabase:
             got = ci.insert_items(
-                "tok",
-                "db",
                 [_item()],
-                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                 datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                 set(),
                 False,
-                modality_enabled=False,
             )
 
-        self.assertEqual(got, (1, 0, 0))
+        self.assertEqual(got, (0, 0, 1))
         append_supabase.assert_not_called()
 
     def test_dry_run_never_calls_supabase(self) -> None:
-        with mock.patch.object(ci, "notion_create_page") as create_page, \
-                mock.patch.object(ci, "append_intake_item_to_supabase") as append_supabase:
+        with mock.patch.object(ci, "append_intake_item_to_supabase") as append_supabase:
             got = ci.insert_items(
-                "tok",
-                "db",
                 [_item()],
-                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                 datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                 set(),
                 True,
-                modality_enabled=False,
                 findings_supabase=self._SUPABASE,
             )
 
         self.assertEqual(got, (1, 0, 0))
-        create_page.assert_not_called()
         append_supabase.assert_not_called()
 
-    def test_supabase_append_failure_does_not_change_notion_insert_stats(self) -> None:
-        with mock.patch.object(ci.time, "sleep"), \
-                mock.patch.object(ci, "notion_create_page", return_value=True), \
-                mock.patch.object(ci, "append_intake_item_to_supabase", side_effect=OSError("network down")):
+    def test_supabase_append_failure_reports_failure(self) -> None:
+        with mock.patch.object(ci, "append_intake_item_to_supabase", side_effect=OSError("network down")):
             got = ci.insert_items(
-                "tok",
-                "db",
                 [_item()],
-                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                 datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                 set(),
                 False,
-                modality_enabled=False,
                 findings_supabase=self._SUPABASE,
             )
 
-        self.assertEqual(got, (1, 0, 0))
+        self.assertEqual(got, (0, 0, 1))
 
-    def test_supabase_findings_append_failure_does_not_change_notion_insert_stats(self) -> None:
-        with mock.patch.object(ci.time, "sleep"), \
-                mock.patch.object(ci, "notion_create_page", return_value=True), \
-                mock.patch.object(
+    def test_supabase_findings_append_failure_reports_failure(self) -> None:
+        with mock.patch.object(
                     ci, "append_intake_item_with_findings_to_supabase", side_effect=OSError("network down")
                 ):
             got = ci.insert_items(
-                "tok",
-                "db",
                 [_item()],
-                datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                 datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                 set(),
                 False,
-                modality_enabled=False,
                 findings_supabase=self._SUPABASE,
                 findings_supabase_include_findings=True,
             )
 
-        self.assertEqual(got, (1, 0, 0))
+        self.assertEqual(got, (0, 0, 1))
 
     def test_sqlite_and_supabase_both_on_calls_both(self) -> None:
         import findings_store as store_result_module  # local alias to build a stub result
@@ -384,20 +341,14 @@ class CollectIntakeFindingsSupabaseAppendTest(unittest.TestCase):
         stub_result = store_result_module.RawSignalAppendResult("inserted", raw_signal_id="rawsig-x")
         with tempfile.TemporaryDirectory() as td:
             db = os.path.join(td, "findings.sqlite3")
-            with mock.patch.object(ci.time, "sleep"), \
-                    mock.patch.object(ci, "notion_create_page", return_value=True), \
-                    mock.patch.object(
+            with mock.patch.object(
                         ci, "append_intake_item_to_supabase", return_value=stub_result
                     ) as append_supabase:
                 got = ci.insert_items(
-                    "tok",
-                    "db",
                     [_item()],
-                    datetime(2026, 7, 8, tzinfo=timezone.utc).date(),
                     datetime(2026, 7, 8, 0, 0, tzinfo=timezone.utc),
                     set(),
                     False,
-                    modality_enabled=False,
                     findings_sqlite_path=db,
                     findings_supabase=self._SUPABASE,
                 )

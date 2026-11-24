@@ -4,7 +4,7 @@ GRM API Intake Collector — v15.1 Phase 2
 
 Federal Register API + OpenFDA Drug Enforcement API + RSS 피드 (EMA · MHRA · PIC/S · ECA)
 + FDA Warning Letters 를 호출해 지난 7일 (KST 기준) 항목을 수집하고,
-Notion "GRM API Intake" 데이터베이스에 raw 필드를 저장한다.
+Store the raw source records in Supabase raw_signals.
 
 설계 원칙:
 1. KST 기준 7일 윈도우 — 모든 날짜는 Asia/Seoul 로 계산
@@ -16,12 +16,10 @@ Notion "GRM API Intake" 데이터베이스에 raw 필드를 저장한다.
                       / Expert Secondary
 
 환경 변수 (GitHub Secrets):
-- NOTION_TOKEN       : Notion Integration token (secret_…)
-- NOTION_DATABASE_ID : "GRM API Intake" DB ID
 - OPENFDA_API_KEY    : OpenFDA 무료 API key (선택, 없으면 no-key 사용)
 
 CLI 옵션:
-- --dry-run : Notion 호출 없이 stdout 에 요약만 출력
+- --dry-run : collect and summarize without writing
 - --window-days N : 기본 7. 백필 테스트 시 변경
 - --sources : 수집 소스 선택 (기본: all). 예: --sources fr recall ema mhra pics eca wl
 """
@@ -176,14 +174,7 @@ from grm_common import (
 # ── [배치5] Phase1 Notion 클라이언트 층 분리 — grm_notion 재수출(하위호환·테스트·위성 무수정) ──
 from grm_notion import (
     MODALITY_OPTIONS,
-    NOTION_API_VERSION,
-    NOTION_BLOCK_CHILDREN_URL_TPL,
     NOTION_CODE_BLOCK_CHUNK,
-    NOTION_DB_QUERY_URL_TPL,
-    NOTION_PAGES_URL,
-    NOTION_PAGE_URL_TPL,
-    NotionDedupeQueryError,
-    NotionHandoffError,
     PROP_API_QUERY,
     PROP_BODY,
     PROP_COLLECTED_AT,
@@ -219,14 +210,7 @@ from grm_notion import (
     _url,
     build_notion_children,
     build_notion_properties,
-    notion_api_request,
-    notion_create_page,
-    notion_headers,
     canonical_url_key,
-    notion_query_existing_doc_ids,
-    notion_query_existing_keys,
-    notion_verify_handoff_ref_property,
-    notion_verify_modality_property,
 )
 
 # ── [배치5] Phase2 handoff/web emit 층 분리 — grm_handoff 재수출(하위호환·테스트·위성 무수정) ──
@@ -235,15 +219,10 @@ from grm_handoff import (
     HANDOFF_SCHEMA_VERSION,
     HANDOFF_SCHEMA_VERSION_V2,
     TYPE_ROUTINE_HANDOFF,
-    _AGED_NEW_MAX_PAGES,
-    _AGED_NEW_PAGE_SIZE,
     _COVERAGE_KNOWN_SOURCES,
     _DEFAULT_HANDOFF_WINDOW_DAYS,
-    _HANDOFF_REF_ROWS_MAX_PAGES,
     _HANDOFF_V2_ROW_KEEP,
-    _INTAKE_RAW_MAX_PAGES,
     _KO_WEEKDAYS_FULL,
-    _NOTION_CHILDREN_CREATE_LIMIT,
     _dedupe_latest_rows,
     _enable_handoff_idempotency_v2,
     _enable_handoff_v2,
@@ -257,28 +236,13 @@ from grm_handoff import (
     _prop_select,
     _prop_title,
     _prop_url,
-    _query_new_rows_with_ref,
-    attach_raw_to_rows,
     build_coverage_collected,
     build_inmemory_raw,
     build_routine_handoff_payload,
     build_routine_handoff_payload_v2,
     build_web_brief_payload_v2,
     coverage_source_counts,
-    emit_routine_handoff,
     emit_web_brief_file,
-    enrich_rows_with_raw,
-    fetch_intake_raw_payload,
-    notion_append_page_children,
-    notion_archive_page_children,
-    notion_count_aged_unconsumed_new,
-    notion_find_handoff_page,
-    notion_mark_rows_handoff_ref,
-    notion_query_new_intake_rows,
-    notion_reconcile_handoff_refs,
-    notion_revert_refs_for_handoff,
-    notion_stale_prior_open_handoffs,
-    notion_upsert_routine_handoff,
     unconsumed_publish_handoffs,
     resolve_handoff_window_days,
     resolve_web_brief_dir,
@@ -941,8 +905,6 @@ class RunConfig:
     explicit_sources: bool
     active: frozenset[str]
     # ── 자격증명 / 키 ────────────────────────────────────────────────────────
-    notion_token: str
-    notion_db: str
     openfda_key: str | None
     data_go_kr_key: str
     data_go_kr_service_key: str
@@ -995,8 +957,6 @@ class RunConfig:
             requested_sources=requested_sources,
             explicit_sources=args.sources is not None,
             active=active,
-            notion_token=os.environ.get("NOTION_TOKEN", "").strip(),
-            notion_db=os.environ.get("NOTION_DATABASE_ID", "").strip(),
             openfda_key=os.environ.get("OPENFDA_API_KEY", "").strip() or None,
             data_go_kr_key=os.environ.get("DATA_GO_KR_KEY", "").strip(),
             data_go_kr_service_key=os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip(),
@@ -3869,57 +3829,19 @@ def _append_supabase_copy(findings_supabase: tuple[str, str], item: IntakeItem,
         return "failed"
 
 
-def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
-                 run_date: date, collected_at: datetime,
+def insert_items(items: Iterable[IntakeItem], collected_at: datetime,
                  existing_ids: set[str], dry_run: bool, *,
                  existing_url_keys: set[str] | None = None,
-                 modality_enabled: bool | None = None,
                  findings_sqlite_path: str | None = None,
                  findings_sqlite_include_findings: bool = False,
                  findings_supabase: tuple[str, str] | None = None,
                  findings_supabase_include_findings: bool = False,
                  heal_candidates: list[IntakeItem] | None = None,
                  store_counters: dict[str, Any] | None = None,
-                 fallback_checked: set[str] | None = None,
                  queue_new_items: list[IntakeItem] | None = None,
                  queue_on_store: bool = False,
-                 queue_only_keys: set[str] | None = None,
-                 notion_write: bool = True) -> tuple[int, int, int]:
-    """삽입 실행. 반환: (inserted, skipped, failed)
-
-    [대기열 0단계 2026-11-12] 저장 순서: **Supabase(정본) 먼저 → Notion(주간 대기열) 다음**.
-    종전엔 Notion 이 성공해야만 Supabase 에 썼다 — Notion 이 멈추면 DB 도 비었다. 이제 Notion 이
-    실패해도 Supabase 사본은 남고(`notion_failed_supabase_kept`), 다음 실행의 Notion 중복 조회에
-    그 키가 없으므로 Notion 행은 다시 시도된다(Supabase 는 ignore-duplicates 라 무해).
-    반환값의 failed 는 종전과 같이 **Notion 생성 실패** 건수다(주간 대기열에서 빠질 수 있는 건).
-
-    fallback_checked(Notion 중복 조회 실패 → Supabase 키로 대신 판정한 모드)를 주면, 그 집합은
-    "Supabase 에 물어본 dedup 키" 전체다. 거기 없는 항목(게시일 없음 — Supabase 에 없으므로 이미
-    Notion 에 있어도 모른다, ICH 스냅샷이 매일 재유입될 위험 · 조회 뒤에 수집된 검색 항목)과 정규화
-    URL 2차 dedup 소스(URL 키를 Supabase 에서 얻을 수 없다)는 **쓰지 않고 다음 실행으로 미룬다**.
-    원천이 다음 실행에 다시 내주므로(수집 창 7~35일) 유실이 아니다.
-    또 이 모드에서는 Supabase 가 "새로 저장됨"(saved)이라고 답한 항목만 Notion 에 쓴다. failed·duplicate
-    는 "Notion 에는 이미 있는데 Supabase 가 거부해 온 행"일 수 있어 미룬다(지난 소식 재게재 방지).
-
-    평소(대체 모드가 아닐 때) 중복 판정은 **Notion 단독**이다. Notion ∪ Supabase 합집합으로 하지 않는
-    이유: Supabase 저장은 됐는데 Notion 생성만 실패한 항목이 다음 실행에 "이미 있음"으로 건너뛰어져
-    주간 대기열에서 영영 빠진다.
-
-    [수집 완전성 2026-11-08] heal_candidates(리스트)를 주면 Notion 에 이미 있어 건너뛴 항목을
-    거기에 모은다 — 호출부가 `heal_supabase_copies` 로 Supabase 사본에 없는 것만 채운다.
-    미지정(None)이면 종전과 완전히 같다.
-
-    [배치6 Phase2] modality_enabled: main 이 preflight 로 결정한 effective 값을 전달하면
-    row 당 env 재독해 없이 그대로 build_notion_properties 로 흐른다(미지정 시 env 폴백).
-
-    [기사 permalink 2차 dedup 2026-08-24] existing_url_keys 를 주면
-    `_CANONICAL_URL_DEDUP_SOURCES` 소스에 한해 정규화 URL 로도 중복을 막는다. 미지정(None)이면
-    종전과 완전히 동일하게 동작한다 — 이 인자를 넘기지 않는 호출부는 영향받지 않는다.
-
-    [노션 끄기 2026-11-13] notion_write=False(GRM_INTAKE_NOTION=off) 면 노션 행을 만들지 않는다.
-    "들어갔다"의 기준은 **정본에 있다는 것이 확인됨**(saved·duplicate)이고, 반환값의 failed 는
-    **정본 저장 실패** 건수다(그 문서는 다음 수집에 새 문서로 다시 온다). 기본값(True)이면 종전과 같다.
-    """
+                 queue_only_keys: set[str] | None = None) -> tuple[int, int, int]:
+    """Store source records and report inserted, skipped, and failed counts."""
     inserted = 0
     skipped = 0
     failed = 0
@@ -3954,14 +3876,6 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             existing_ids.add(dedup_key)
             skipped += 1
             continue
-        if fallback_checked is not None and (dedup_key not in fallback_checked
-                                             or item.source in _CANONICAL_URL_DEDUP_SOURCES):
-            # Supabase 키로는 "이미 Notion 에 있음"을 판정할 수 없는 항목 — 쓰지 않고 미룬다.
-            log("INFO", f"중복 판정 대체 모드 — 판정 불가로 다음 실행에 미룸 "
-                        f"source={item.source} id={item.document_id}")
-            _store_count(store_counters, "fallback_deferred")
-            skipped += 1
-            continue
         # 2차: 같은 기사가 날짜만 바꿔 다시 온 경우(doc_id 가 달라져 위 검사를 빠져나간다).
         # 누적(insert 후 add)이라 **배치 안 중복**과 **실행 간 중복**을 한자리에서 함께 막는다.
         url_key = ""
@@ -3994,22 +3908,7 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             # [대기열 5단계] 넣기 기준 = 정본에 있다는 것이 확인된 문서. 노션 행 생성의 성패와 무관하다.
             # 정본 저장이 실패한 문서는 넣지 않는다(FK) — 내일 다시 새 문서로 온다.
             queue_new_items.append(item)
-        if fallback_checked is not None and supa_status != "saved":
-            # 대체 판정 모드에서는 Supabase 가 "새로 저장됨"이라고 답한 항목만 Notion 에 쓴다.
-            # failed(유효성 거부 등 — Notion 에는 이미 있을 수 있다)·duplicate 는 판정이 확실하지
-            # 않으므로 미룬다. 지난 소식이 Notion 에 다시 들어가 다음 브리프에 재게재되는 것을 막는다.
-            log("INFO", f"중복 판정 대체 모드 — Supabase 응답 {supa_status or '없음'} 이라 "
-                        f"Notion 적재를 다음 실행으로 미룸 source={item.source} id={item.document_id}")
-            _store_count(store_counters, "fallback_deferred")
-            skipped += 1
-            continue
-        if notion_write:
-            # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
-            time.sleep(0.34)
-            ok = notion_create_page(token, db_id, item, run_date, collected_at,
-                                    modality_enabled=modality_enabled)
-        else:
-            ok = supa_status in {"saved", "duplicate"}
+        ok = supa_status in {"saved", "duplicate"}
         if ok:
             inserted += 1
             existing_ids.add(dedup_key)
@@ -4051,18 +3950,10 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                 except Exception as e:  # noqa: BLE001 — additive sidecar must not break Notion flow.
                     mode = "raw_signals+findings" if findings_sqlite_include_findings else "raw_signals"
                     log("WARN", f"FIND-1 {mode} SQLite append 실패 doc={item.document_id}: {e}")
-        elif not notion_write:
+        else:
             failed += 1
             log("WARN", f"정본 저장 실패 — 대기열에 넣지 않음(다음 수집에 다시 온다) "
                         f"source={item.source} doc={item.document_id} status={supa_status or '꺼짐'}")
-        else:
-            failed += 1
-            _store_count(store_counters, "notion_failed")
-            kept = supa_status in {"saved", "duplicate"}
-            if kept:
-                _store_count(store_counters, "notion_failed_supabase_kept")
-            log("WARN", f"insert 최종 실패 — 다음 항목으로 진행 doc={item.document_id} "
-                        f"(Supabase 정본: {'저장됨' if kept else (supa_status or '꺼짐')})")
     return inserted, skipped, failed
 
 
@@ -4134,40 +4025,6 @@ def heal_supabase_copies(supabase_url: str, service_key: str, items: list[Intake
                 f"다음 실행으로 미룸 {summary['deferred']} · WHO 보강 전 건너뜀 {summary['skipped_bare']} · "
                 f"게시일 없음 건너뜀 {summary.get('skipped_undated', 0)}")
     return summary
-
-
-def supabase_fallback_dedup_keys(supabase_url: str, service_key: str,
-                                 items: Iterable[IntakeItem], collected_at: datetime,
-                                 ) -> tuple[set[str], set[str]] | None:
-    """[대기열 0단계 2026-11-12] Notion 중복 조회가 실패했을 때 Supabase 로 대신 판정한다.
-
-    09-27 사고: Notion 조회 30초 무응답 1회 → 그날 적재 0건. 이제 Supabase raw_signals 에
-    이번에 수집한 항목의 키를 직접 물어 "이미 받음"을 판정한다(창 제한 없음 — 고유 키).
-    반환: (물어본 dedup 키 전체, 그중 이미 있는 키). Supabase 조회도 실패하면 None
-    → 호출부는 종전처럼 중단한다(모르는 채로 전부 넣지 않는다).
-    게시일 없는 항목도 묻는다(published_date null 허용 — migration 147).
-    """
-    by_id: dict[str, str] = {}
-    for item in items:
-        if not item.document_id:
-            continue
-        try:
-            record = raw_signal_from_intake_item(item, collected_at=collected_at)
-        except Exception as e:  # noqa: BLE001 — 키를 못 만들면 판정 불가(미룸)로 둔다
-            log("WARN", f"중복 판정 대체: raw_signal_id 계산 실패 source={item.source} "
-                        f"id={item.document_id}: {type(e).__name__}")
-            continue
-        rid = str(record.get("raw_signal_id") or "")
-        if rid:
-            by_id[rid] = f"{item.source}::{item.document_id}"
-    if not by_id:
-        return set(), set()
-    present = existing_raw_signal_ids(supabase_url, service_key, list(by_id))
-    if present is None:
-        return None
-    checked = set(by_id.values())
-    existing = {key for rid, key in by_id.items() if rid in present}
-    return checked, existing
 
 
 _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
@@ -4254,39 +4111,14 @@ def _dedupe_abort_health_payload(
     dry_run: bool,
     requested_sources: list[str],
     active: set[str],
-    db_basis: bool = False,
 ) -> dict[str, Any]:
-    """중복 조회 실패로 insert 전에 멈출 때 쓰는 health JSON.
-
-    db_basis=True(GRM_INTAKE_NOTION=off): 멈춘 조회가 노션이 아니라 정본·대기열이다 — 코드·문구만 다르다.
-
-    ★[2026-09-27] 이 경로는 health JSON 을 쓰기 전에 `return 1` 했다. 그래서 실패 이슈
-      #1084 에는 "Health status: unavailable · health JSON 없음"만 찍혀 원인이 없었고,
-      실행일도 UTC 날짜 폴백(09-26)으로 적혔다(실제 KST 실행일은 09-27). 판정은 그대로
-      failure(exit 1) — 불완전한 dedup 으로 insert 하지 않는 설계는 두고, 왜 멈췄는지와
-      어떻게 되살리는지만 이슈까지 보낸다. 수집 결과(sources)는 이미 나와 있으니 함께 싣는다.
-    """
+    """Write health details when DB deduplication fails before insertion."""
     health = HealthCheckResult()
-    if db_basis:
-        health.add_failure(
-            "intake-dedupe-db-failed", "Supabase",
-            "정본·대기열 중복 조회 실패 — 중복 삽입을 막으려고 적재 전에 중단(이날 수집분 미적재·"
-            "handoff 미생성). 노션을 꺼 둔 상태(GRM_INTAKE_NOTION=off)라 되돌아갈 기준이 없다. 일시 "
-            "장애면 실패 job 재실행으로 복구한다(넘기면 다음 정기 실행이 수집 윈도우로 되받는다)",
-            str(error),
-        )
-        health.finalize()
-        return _health_payload(
-            health=health, stats=stats, run_date=run_date, start=start, end=end,
-            event_name=event_name, dry_run=dry_run, requested_sources=requested_sources,
-            active=active, flags={}, handoff_emitted=False, handoff_failed=False,
-            handoff_row_count=0, handoff_url="", handoff_error_msg="",
-        )
     health.add_failure(
-        "notion-dedupe-query-failed", "Notion",
-        "Notion 중복 조회 실패 — 중복 삽입을 막으려고 적재 전에 중단(이날 수집분 미적재·"
-        "handoff 미생성). 일시 장애면 실패 job 재실행으로 복구(KST 같은 날이면 그날 "
-        "handoff 까지 복구, 넘기면 다음 정기 실행이 수집 윈도우로 되받는다)",
+        "intake-dedupe-db-failed", "Supabase",
+        "정본·대기열 중복 조회 실패 — 중복 삽입을 막으려고 적재 전에 중단(이날 수집분 미적재·"
+        "handoff 미생성). 일시 "
+        "장애면 실패 job 재실행으로 복구한다(넘기면 다음 정기 실행이 수집 윈도우로 되받는다)",
         str(error),
     )
     health.finalize()
@@ -4321,12 +4153,8 @@ def _fda483_prefetch_enabled(cfg: RunConfig, dry_run: bool) -> bool:
 
 
 def _fda483_prefetch_db(cfg: "RunConfig", dry_run: bool) -> "tuple[str, str] | None":
-    """FDA 483 선조회를 DB 대기열로 할 때의 접속 정보 — 중복 판정이 DB 기준일 때만(아니면 None = 노션).
-
-    중복 판정과 같은 변수(GRM_INTAKE_DEDUP_SOURCE)를 따른다 — 선조회와 적재 판정이 서로 다른 곳을 보면
-    "건너뛴 문서"와 "새 문서"가 어긋난다.
-    """
-    if dry_run or grm_queue.dedup_source() != "supabase":
+    """Connection settings for the FDA 483 queue prefetch."""
+    if dry_run:
         return None
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     if not cfg.findings_supabase_url or not key:
@@ -4335,7 +4163,7 @@ def _fda483_prefetch_db(cfg: "RunConfig", dry_run: bool) -> "tuple[str, str] | N
 
 
 def _fda483_known_document_ids(
-    token: str, db_id: str, run_date: date, enf_start: date, end: date, *, enabled: bool,
+    run_date: date, enf_start: date, end: date, *, enabled: bool,
     db: "tuple[str, str] | None" = None,
 ) -> set[str] | None:
     """FDA 483 수집 **전에** 이미 저장된 문서 키를 조회한다(없으면 None → 종전 동작).
@@ -4350,31 +4178,16 @@ def _fda483_known_document_ids(
     ★실패는 절대 수집을 막지 않는다 — 조회가 죽으면 None 을 돌려 **오늘과 똑같이** 동작한다.
       건너뛰기는 비용 최적화이지 정합성 장치가 아니다(정합성은 적재 dedup 이 계속 책임진다).
     """
-    if not enabled:
+    if not enabled or db is None:
         return None
     window = max(1, (end - enf_start).days + 1)
-    if db is not None:
-        # [대기열 5단계] DB 기준: **대기열(intake_queue)에 들어온** 483 만 기보유로 본다 — 노션 행과 같은 뜻이다.
-        # 정본(raw_signals) 전체로 보면 과거분 백필이 본문 없이 먼저 넣은 문서까지 건너뛰어 전문을 영영 못 받는다.
-        # 실패하면 아래 노션 조회로 넘어간다.
-        try:
-            since = (run_date - timedelta(days=window)).isoformat()
-            known = grm_queue.QueueStore(db[0], db[1]).queue_keys_for_source(SOURCE_FDA_483, since)
-            log("INFO", f"FDA 483 기보유 {len(known)}건(대기열, 최근 {window}일) — PDF·OCR 건너뛰기 대상")
-            return known
-        except Exception as e:  # noqa: BLE001 — 어떤 실패도 수집을 멈추지 않는다
-            log("WARN", f"FDA 483 기보유 대기열 조회 실패 — 노션 조회로 넘어감: {type(e).__name__}")
     try:
-        if not token or not db_id:
-            # GRM_INTAKE_NOTION=off — 노션에 묻지 않는다(자격증명을 비워서 들어온다).
-            raise RuntimeError("노션 자격증명 없음(GRM_INTAKE_NOTION=off)")
-        known = notion_query_existing_doc_ids(
-            token, db_id, run_date, window_days=window,
-            source_names={SOURCE_FDA_483})
-    except Exception as e:  # noqa: BLE001 — 어떤 실패도 수집을 멈추지 않는다
-        log("WARN", f"FDA 483 기보유 조회 실패 — 전량 재수집으로 진행(비용만 증가): {e}")
+        since = (run_date - timedelta(days=window)).isoformat()
+        known = grm_queue.QueueStore(*db).queue_keys_for_source(SOURCE_FDA_483, since)
+    except Exception as e:  # The prefetch only saves PDF and OCR work.
+        log("WARN", f"FDA 483 queue lookup failed; proceeding with collection: {type(e).__name__}")
         return None
-    log("INFO", f"FDA 483 기보유 {len(known)}건(최근 {window}일) — PDF·OCR 건너뛰기 대상")
+    log("INFO", f"FDA 483: {len(known)} documents already queued in the last {window} days")
     return known
 
 
@@ -5122,11 +4935,9 @@ def main() -> int:
     #    별칭(하위 main 본문 무수정) — Phase4 에서 하위 함수로 config 를 전달하며 정리한다. ──
     cfg = RunConfig.from_env(args)
     requested_sources = cfg.requested_sources
-    explicit_sources = cfg.explicit_sources
+
     active = set(cfg.active)
 
-    notion_token = cfg.notion_token
-    notion_db = cfg.notion_db
     openfda_key = cfg.openfda_key
     data_go_kr_key = cfg.data_go_kr_key
     data_go_kr_service_key = cfg.data_go_kr_service_key
@@ -5154,63 +4965,19 @@ def main() -> int:
     if enable_scrape:
         log("WARN", "ENABLE_SCRAPE=true 이지만 Web Scrape 수집기는 아직 미구현 — 건너뜀")
 
-    # [노션 끄기 2026-11-13] GRM_INTAKE_NOTION=off — 이 실행은 노션 Intake DB 를 쓰지도 읽지도 않는다.
-    # 자격증명을 비워 두면 아래 "자격증명이 있을 때만" 도는 노션 조회(preflight·무음 감시·창 밖 미소비 수·
-    # 그림자 상태 비교)가 전부 꺼진다. 기본(on)이면 이 블록은 아무것도 하지 않는다.
-    notion_off = grm_queue.notion_intake_off()
-    if notion_off:
-        notion_token = notion_db = ""
-        log("INFO", "GRM_INTAKE_NOTION=off — 노션 Intake DB 를 쓰지도 읽지도 않는다(정본·대기열은 Supabase)")
-        if not args.dry_run and not (cfg.findings_supabase_append_requested and cfg.findings_supabase_url
-                                     and os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()):
-            log("ERROR", "GRM_INTAKE_NOTION=off 는 Supabase 저장이 켜져 있어야 한다 — "
-                         "ENABLE_FINDINGS_SUPABASE_APPEND=true · SUPABASE_URL · SUPABASE_SERVICE_ROLE_KEY 필요")
-            return 2
-    elif not args.dry_run:
-        if not notion_token or not notion_db:
-            log("ERROR", "NOTION_TOKEN / NOTION_DATABASE_ID 환경변수 필요")
-            return 2
+    if not args.dry_run and not (cfg.findings_supabase_append_requested and cfg.findings_supabase_url
+                                 and os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()):
+        log("ERROR", "수집하려면 Supabase 저장이 켜져 있어야 한다 — "
+                     "ENABLE_FINDINGS_SUPABASE_APPEND=true · SUPABASE_URL · SUPABASE_SERVICE_ROLE_KEY 필요")
+        return 2
 
-    # Modality 기록 활성 시 스키마 preflight — 속성 미생성/타입 불일치면 이번 실행은
-    # Modality 기록만 끄고 수집은 계속(graceful degrade). preflight 는 read-only(GET)이므로
-    # dry-run 에서도 토큰/DB 가 있으면 수행해, 활성화 전 검증 루프로 쓸 수 있게 한다.
+    # Keep the health payload flags for retired intake preflights.
     modality_requested = cfg.modality_requested
-    modality_preflight_disabled = False
-    modality_preflight_skipped = False
-    if modality_requested and notion_token and notion_db:
-        if not notion_verify_modality_property(notion_token, notion_db):
-            modality_preflight_disabled = True
-            # [배치6 Phase2] os.environ 변조 제거 — 아래 insert 루프가 modality_effective 를
-            # build_notion_properties 로 직접 전달하므로 env 를 제어채널로 쓸 필요가 없다.
-            log("WARN", "ENABLE_MODALITY_TAG=true 이나 'Modality' 스키마 불일치 — "
-                        "이번 실행은 Modality 태그를 건너뜁니다(수집은 계속).")
-    elif modality_requested:
-        # 토큰/DB 없이 요청만 된 경우(예: 자격증명 없는 로컬 dry-run) — preflight 미수행.
-        # 실제 기록도 자격증명 없이는 불가하므로 EFFECTIVE 를 false 로 두어 오해를 막는다.
-        modality_preflight_skipped = True
-        log("WARN", "ENABLE_MODALITY_TAG=true 이나 NOTION 자격증명이 없어 preflight 생략 — "
-                    "Modality 태그 기록은 자격증명+속성이 있을 때만 동작(EFFECTIVE=false).")
-    modality_effective = (modality_requested and not modality_preflight_disabled
-                          and not modality_preflight_skipped)
-
-    # 멱등성 v2 활성 시 'Handoff Ref' 스키마 preflight — 부재/타입 불일치면 이번 실행은
-    # v2 만 끄고 v1(날짜 윈도우+K4-1)로 graceful degrade(Modality preflight 선례 패턴).
+    modality_preflight_disabled = modality_effective = False
+    modality_preflight_skipped = modality_requested
     handoff_idem_requested = cfg.handoff_idem_requested
-    handoff_idem_preflight_disabled = False
-    handoff_idem_preflight_skipped = False
-    if handoff_idem_requested and notion_token and notion_db:
-        if not notion_verify_handoff_ref_property(notion_token, notion_db):
-            handoff_idem_preflight_disabled = True
-            os.environ["ENABLE_HANDOFF_IDEMPOTENCY_V2"] = "false"
-            log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 'Handoff Ref' 스키마 "
-                        "불일치 — 이번 실행은 v1(날짜 윈도우) 경로로 폴백합니다(수집은 계속).")
-    elif handoff_idem_requested:
-        handoff_idem_preflight_skipped = True
-        log("WARN", "ENABLE_HANDOFF_IDEMPOTENCY_V2=true 이나 NOTION 자격증명이 없어 "
-                    "preflight 생략 — 멱등성 v2 는 자격증명+속성이 있을 때만 동작.")
-    handoff_idem_effective = (handoff_idem_requested
-                              and not handoff_idem_preflight_disabled
-                              and not handoff_idem_preflight_skipped)
+    handoff_idem_preflight_disabled = handoff_idem_effective = False
+    handoff_idem_preflight_skipped = handoff_idem_requested
 
     now_k = now_kst()
     run_date = kst_run_date(now_k)
@@ -5254,61 +5021,12 @@ def main() -> int:
      eu_gmp_ncr_items, mhra_gmp_ncr_items) = _run_collection(
         cfg, active, run_date, start, end, enf_start,
         fda483_known_ids=_fda483_known_document_ids(
-            notion_token, notion_db, run_date, enf_start, end,
+            run_date, enf_start, end,
             enabled=_fda483_prefetch_enabled(cfg, args.dry_run),
             db=_fda483_prefetch_db(cfg, args.dry_run)))
 
-    # 3) Notion 기존 row (중복 제거)
-    # RAPS_NEWS 등 freshness=pm(31일) 소스가 있으면 dedupe 윈도우를 35일로 확장
-    # (7일 윈도우 시 8일 전 RAPS URL이 누락되어 재삽입될 수 있음 — Task #13)
-    _SEARCH_DEDUP_WINDOW_DAYS = 35  # pm(31일) + 여유 4일
-    # P0: dedup 윈도우는 가장 넓은 수집 윈도우(enforcement 30일)를 반드시 덮어야 한다.
-    # 그래야 enforcement 윈도우로 backfill된 과거 일자 항목이 다음 실행에서 중복 재삽입되지 않는다.
-    dedup_window_days = max(
-        args.window_days,
-        mfds_enforcement_window_days,
-        _SEARCH_DEDUP_WINDOW_DAYS if enable_search else 0,
-    )
-    log("INFO", f"dedupe window={dedup_window_days}일 (window_days={args.window_days}, enable_search={enable_search})")
-
-    # P1: snapshot 소스(ICH·WHO)는 날짜 미단언/URL 기반 안정 스냅샷이라 매 실행 동일 항목을 재수집한다.
-    # 기본 dedup 윈도우(≤30일)를 넘으면 같은 항목이 다시 New로 들어오므로(월간 중복 삽입),
-    # 이들 소스만 별도로 장기(3년) Source-한정 dedup을 조회해 합친다.
-    # (전체 윈도우를 3년으로 늘리면 Notion 페이지 cap에 걸릴 수 있어 Source 필터로 한정.)
-    _SNAPSHOT_DEDUP_WINDOW_DAYS = 1095
-    _SNAPSHOT_SOURCES = {SOURCE_ICH, SOURCE_WHO}
-
-    # [대기열 0단계 2026-11-12] Notion 조회 실패를 곧바로 중단하지 않고 기록만 해 둔다.
-    # 아래에서 Supabase 설정이 정해진 뒤 Supabase 키로 대신 판정한다(그것도 안 되면 종전처럼 중단).
-    notion_dedupe_error: Exception | None = None
-    if args.dry_run or notion_off:
-        existing: set[str] = set()
-        existing_url_keys: set[str] = set()
-    else:
-        try:
-            _keys = notion_query_existing_keys(notion_token, notion_db, run_date,
-                                               window_days=dedup_window_days)
-            existing = _keys.doc_ids
-            existing_url_keys = _keys.url_keys
-        except NotionDedupeQueryError as e:
-            log("ERROR", f"Notion 중복 조회 실패 — Supabase 키로 대신 판정을 시도한다: {e}")
-            notion_dedupe_error = e
-            existing = set()
-            existing_url_keys = set()
-        snapshot_active = ({SOURCE_ICH} if enable_ich else set()) | ({SOURCE_WHO} if enable_who else set())
-        if snapshot_active and notion_dedupe_error is None:
-            try:
-                snap_existing = notion_query_existing_doc_ids(
-                    notion_token, notion_db, run_date,
-                    window_days=_SNAPSHOT_DEDUP_WINDOW_DAYS,
-                    source_names=snapshot_active)
-                existing |= snap_existing
-                log("INFO", f"snapshot dedup({sorted(snapshot_active)}) +{len(snap_existing)}건 "
-                            f"(최근 {_SNAPSHOT_DEDUP_WINDOW_DAYS}일)")
-            except NotionDedupeQueryError as e:
-                log("ERROR", f"snapshot dedup 조회 실패 — Supabase 키로 대신 판정을 시도한다: {e}")
-                notion_dedupe_error = e
-
+    existing: set[str] = set()
+    existing_url_keys: set[str] = set()
     collected_at = now_k
     findings_sqlite_path = None
     findings_sqlite_include_findings = False
@@ -5343,10 +5061,8 @@ def main() -> int:
         log("WARN", "ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND=true 이지만 "
                     "ENABLE_FINDINGS_SUPABASE_APPEND=false 이므로 Supabase append 비활성")
 
-    # [대기열 0단계 2026-11-12] Notion 중복 조회가 실패했으면 Supabase 로 대신 판정한다.
     store_counters = _new_store_counters()
     stats.store_summary = store_counters
-    fallback_checked: set[str] | None = None
     _all_collected: list[IntakeItem] = [
         it for group in (
             fr_items, recall_items, ema_items, mhra_items, mhra_alert_items, pics_items,
@@ -5356,14 +5072,9 @@ def main() -> int:
             ispe_items, eu_gmp_ncr_items, mhra_gmp_ncr_items)
         for it in group]
 
-    # [대기열 5단계 2026-11-13] 중복 판정·대기열 넣기 기준을 DB(정본 raw_signals + 대기열 intake_queue)로.
-    #   GRM_INTAKE_DEDUP_SOURCE=supabase  → DB 기준으로 판정한다. 조회가 실패하면 그날은 노션 기준(아래 종전 길).
-    #   ENABLE_INTAKE_DEDUP_SHADOW=true   → 판정은 노션 기준 그대로, DB 기준이었다면 어땠을지를 health 에 남긴다.
-    #   둘 다 꺼져 있으면(기본) 이 블록은 아무것도 하지 않는다 — DB 를 읽지도 않는다.
     queue_db_dedup = False
     queue_only_keys: set[str] = set()
-    _want_db_dedup = grm_queue.dedup_source() == "supabase"
-    if findings_supabase and not args.dry_run and (_want_db_dedup or grm_queue.dedup_shadow_enabled()):
+    if findings_supabase and not args.dry_run:
         try:
             _qstore = grm_queue.QueueStore(findings_supabase[0], findings_supabase[1])
             _classes = grm_queue.lookup_dedup(
@@ -5373,70 +5084,34 @@ def main() -> int:
             _qstore, _classes = None, None
         if _classes is None:
             store_counters["dedup_shadow"] = {"error": "정본·대기열 조회 실패"}
-            if _want_db_dedup:
-                log("WARN", "GRM_INTAKE_DEDUP_SOURCE=supabase 이지만 정본·대기열 조회 실패 — 오늘은 노션 기준으로 판정")
         else:
-            if notion_off:
-                store_counters["dedup_shadow"] = dict(
-                    grm_queue.dedup_shadow_summary(_classes, set()), same=None,
-                    note="노션 끔 — 비교 없음")
-            elif notion_dedupe_error is None:
-                store_counters["dedup_shadow"] = grm_queue.dedup_shadow_summary(_classes, existing)
+            store_counters["dedup_shadow"] = dict(
+                grm_queue.dedup_shadow_summary(_classes, set()), same=None,
+                note="노션 끔 — 비교 없음")
+            _url_keys = _qstore.source_url_keys(sorted(_CANONICAL_URL_DEDUP_SOURCES))
+            if _url_keys is None:
+                log("WARN", "DB 기준 URL 2차 중복 키 조회 실패 — 오늘은 노션 기준으로 판정")
             else:
-                store_counters["dedup_shadow"] = dict(
-                    grm_queue.dedup_shadow_summary(_classes, set()), same=None,
-                    note="노션 조회 실패 — 비교 없음")
-            if _want_db_dedup:
-                _url_keys = _qstore.source_url_keys(sorted(_CANONICAL_URL_DEDUP_SOURCES))
-                if _url_keys is None:
-                    log("WARN", "DB 기준 URL 2차 중복 키 조회 실패 — 오늘은 노션 기준으로 판정")
-                else:
-                    existing = {k for k, c in _classes.items()
-                                if c in (grm_queue.DEDUP_HAVE, grm_queue.DEDUP_OLD)}
-                    existing_url_keys = _url_keys
-                    queue_only_keys = {k for k, c in _classes.items() if c == grm_queue.DEDUP_HEAL}
-                    queue_db_dedup = True
-                    notion_dedupe_error = None      # 노션 조회가 죽었어도 DB 기준으로 계속한다
-                    store_counters["dedup_mode"] = "supabase"
-                    log("INFO", "중복 판정 DB 기준: "
-                                + " · ".join(f"{k} {v}" for k, v in store_counters["dedup_shadow"]["db"].items()))
-
-    if notion_off and not args.dry_run and not queue_db_dedup:
-        # 노션을 끈 상태에서 정본·대기열 조회가 실패했다 — 되돌아갈 노션 기준이 없다. 모르는 채로 전부
-        # 새 문서로 넣지 않고 적재 전에 멈춘다(재실행으로 복구. 원천은 다음 실행에 같은 문서를 다시 준다).
-        log("ERROR", "GRM_INTAKE_NOTION=off 인데 정본·대기열 중복 조회 실패 — 적재 단계 중단")
+                existing = {k for k, c in _classes.items()
+                            if c in (grm_queue.DEDUP_HAVE, grm_queue.DEDUP_OLD)}
+                existing_url_keys = _url_keys
+                queue_only_keys = {k for k, c in _classes.items() if c == grm_queue.DEDUP_HEAL}
+                queue_db_dedup = True
+                store_counters["dedup_mode"] = "supabase"
+                log("INFO", "중복 판정 DB 기준: "
+                            + " · ".join(f"{k} {v}" for k, v in store_counters["dedup_shadow"]["db"].items()))
+    if not args.dry_run and not queue_db_dedup:
+        log("ERROR", "정본·대기열 중복 조회 실패 — 적재 단계 중단")
         store_counters["notion"] = "off"
         _write_health_json(health_json_path, _dedupe_abort_health_payload(
             error=RuntimeError("raw_signals·intake_queue 조회 실패"), stats=stats, run_date=run_date,
             start=start, end=end, event_name=event_name, dry_run=args.dry_run,
-            requested_sources=list(requested_sources), active=active, db_basis=True))
+            requested_sources=list(requested_sources), active=active))
         return 1
-
-    if notion_dedupe_error is not None:
-        fb = (supabase_fallback_dedup_keys(findings_supabase[0], findings_supabase[1],
-                                           _all_collected, now_k)
-              if findings_supabase else None)
-        if fb is None:
-            # Supabase 도 판정 불가(꺼짐·조회 실패) → 빈 set 으로 진행하면 대량 중복 → 종전처럼 중단
-            log("ERROR", "Supabase 대체 판정도 불가 — duplicate insert 방지를 위해 insert 단계 중단")
-            _write_health_json(health_json_path, _dedupe_abort_health_payload(
-                error=notion_dedupe_error, stats=stats, run_date=run_date, start=start, end=end,
-                event_name=event_name, dry_run=args.dry_run,
-                requested_sources=list(requested_sources), active=active))
-            return 1
-        fallback_checked, _fb_existing = fb
-        existing |= _fb_existing
-        store_counters["dedup_mode"] = "supabase-fallback"
-        store_counters["dedup_error"] = f"{type(notion_dedupe_error).__name__}"
-        log("WARN", f"중복 판정 대체 모드(Supabase): 물어본 키 {len(fallback_checked)} · "
-                    f"이미 있음 {len(_fb_existing)} — 게시일 없음·URL 2차 dedup 소스는 다음 실행으로 미룸")
 
     # 4) 삽입 (반환: inserted, skipped, failed)
     # [배치6 Phase2] 소스별 insert_items + stats 대입 19블록을 INTAKE_SOURCE_SPECS 레지스트리로
     # 구동한다(setattr). search 는 수집+삽입이 결합된 별도 블록(아래)이라 여기서 건너뛴다.
-    # modality_enabled=modality_effective 를 전달해 build_notion_properties 의 row 당 env
-    # 재독해를 제거(→ 아래 os.environ 변조도 불필요). 순서(=existing dedup 누적 순서)는 레지스트리
-    # 순서로 기존과 byte 동일하다.
     # [WHOPIR 보강 시점 2026-07-27] WHO 실사보고서 PDF 는 **중복 제거 뒤 신규 항목에만** 받는다.
     # 종전엔 수집 루프 안에서 목록 순서대로 받았는데, WHO 목록은 최신순이 아니라 알파벳순이라
     # fetch 예산(40)을 매일 같은 앞쪽 40건이 다 써버렸다 — 새로 올라온 뒤쪽 보고서는 카드는
@@ -5471,19 +5146,10 @@ def main() -> int:
         "eu_gmp_ncr": eu_gmp_ncr_items,
         "mhra_gmp_ncr": mhra_gmp_ncr_items,
     }
-    # [수집 완전성 2026-11-08] Notion 중복으로 건너뛴 항목 → Supabase 사본 보충 후보.
-    # 사본 append 가 켜져 있을 때 기본으로 돈다. 끄려면 RAW_SIGNALS_HEAL=false.
+    # Keep existing records for raw drift checks and version updates.
     heal_candidates: list[IntakeItem] | None = (
         [] if findings_supabase and env_flag("RAW_SIGNALS_HEAL", True) else None)
-    # [대기열 그림자 2026-11-12] 노션 대기열에 새로 들어간 항목을 모아 DB 대기열(intake_queue)에도
-    # 넣는다. ENABLE_INTAKE_QUEUE_SHADOW 가 꺼져 있으면 None = 종전과 완전히 같다.
-    # [handoff 정본 DB 2026-11-13] GRM_HANDOFF_SOURCE=db 면 아래 DB handoff 가 정본이다(스캐폴드·health).
-    # 꺼져 있으면(기본 notion) 이 값은 False 이고 아래 모든 분기가 종전 길을 탄다.
-    handoff_db = bool(grm_queue.handoff_source() == "db" and args.emit_routine_handoff
-                      and findings_supabase and not args.dry_run)
-    if grm_queue.handoff_source() == "db" and args.emit_routine_handoff and not handoff_db \
-            and not args.dry_run:
-        log("WARN", "GRM_HANDOFF_SOURCE=db 이지만 Supabase 설정이 없어 노션 handoff 를 정본으로 진행")
+    handoff_db = bool(args.emit_routine_handoff and findings_supabase and not args.dry_run)
     queue_new_items: list[IntakeItem] | None = (
         [] if findings_supabase and not args.dry_run
         and (grm_queue.shadow_enabled() or queue_db_dedup or handoff_db) else None)
@@ -5491,20 +5157,16 @@ def main() -> int:
         if spec.prefix == "search":
             continue  # search 는 아래 결합 블록에서 처리
         ins, sk, fail = insert_items(
-            notion_token, notion_db, _insert_items_map[spec.prefix],
-            run_date, collected_at, existing, args.dry_run,
+            _insert_items_map[spec.prefix], collected_at, existing, args.dry_run,
             existing_url_keys=existing_url_keys,
-            modality_enabled=modality_effective,
             findings_sqlite_path=findings_sqlite_path,
             findings_sqlite_include_findings=findings_sqlite_include_findings,
             findings_supabase=findings_supabase,
             findings_supabase_include_findings=findings_supabase_include_findings,
             heal_candidates=heal_candidates,
             store_counters=store_counters,
-            fallback_checked=fallback_checked,
             queue_new_items=queue_new_items,
-            queue_on_store=queue_db_dedup, queue_only_keys=queue_only_keys,
-            notion_write=not notion_off)
+            queue_on_store=queue_db_dedup, queue_only_keys=queue_only_keys)
         setattr(stats, f"{spec.prefix}_inserted", ins)
         setattr(stats, f"{spec.prefix}_skipped_dup", sk)
         setattr(stats, f"{spec.prefix}_insert_failed", fail)
@@ -5575,19 +5237,15 @@ def main() -> int:
             log("WARN", f"Brave Search 오류: {search_err}")
 
         src_in, src_sk, src_fail = insert_items(
-            notion_token, notion_db, search_items,
-            run_date, collected_at, existing, args.dry_run,
+            search_items, collected_at, existing, args.dry_run,
             existing_url_keys=existing_url_keys,
-            modality_enabled=modality_effective,
             findings_sqlite_path=findings_sqlite_path,
             findings_sqlite_include_findings=findings_sqlite_include_findings,
             findings_supabase=findings_supabase,
             findings_supabase_include_findings=findings_supabase_include_findings,
             store_counters=store_counters,
-            fallback_checked=fallback_checked,
             queue_new_items=queue_new_items,
             queue_on_store=queue_db_dedup, queue_only_keys=queue_only_keys,
-            notion_write=not notion_off,
         )
         stats.search_inserted = src_in
         stats.search_skipped_dup = src_sk
@@ -5611,27 +5269,16 @@ def main() -> int:
     source_last_seen: dict[str, Any] | None = None
     source_silence_errors: tuple[str, ...] = ()
     coverage_silent_sources: set[str] = set()
-    # [노션 끄기] 노션을 껐으면 같은 판정을 DB 대기열(intake_queue)의 소스별 마지막 수집일로 한다.
-    silence_from_db = bool(notion_off and findings_supabase)
-    if (env_flag("ENABLE_SOURCE_SILENCE_WATCHDOG", True)
-            and ((notion_token and notion_db) or silence_from_db) and not args.dry_run):
+    if env_flag("ENABLE_SOURCE_SILENCE_WATCHDOG", True) and findings_supabase and not args.dry_run:
         try:
-            from source_silence import evaluate_silence, query_last_seen, watched_sources
-            if silence_from_db:
-                from source_silence import query_last_seen_supabase
-                _seen, _errs, _hist = query_last_seen_supabase(
-                    findings_supabase[0], findings_supabase[1],
-                    [w.notion_source for w in watched_sources()], run_date=run_date)
-                store_counters.setdefault("monitor", {})["silence"] = {
-                    "basis": "intake_queue",
-                    "history_start": _hist.isoformat() if _hist else "",
-                    "judged": len(_seen), "errors": len(_errs)}
-            else:
-                _seen, _errs = query_last_seen(
-                    notion_token, notion_db,
-                    [w.notion_source for w in watched_sources()],
-                    run_date=run_date,
-                )
+            from source_silence import evaluate_silence, query_last_seen_supabase, watched_sources
+            _seen, _errs, _hist = query_last_seen_supabase(
+                findings_supabase[0], findings_supabase[1],
+                [w.notion_source for w in watched_sources()], run_date=run_date)
+            store_counters.setdefault("monitor", {})["silence"] = {
+                "basis": "intake_queue",
+                "history_start": _hist.isoformat() if _hist else "",
+                "judged": len(_seen), "errors": len(_errs)}
             source_last_seen, source_silence_errors = _seen, tuple(_errs)
             # coverage 줄용 무음 집합 — health 와 **같은 판정 함수·같은 활성 매핑**을 쓴다
             # (두 계기가 다른 답을 내면 사람이 어느 쪽도 못 믿는다).
@@ -5653,21 +5300,6 @@ def main() -> int:
                 for finding in evaluate_silence(
                     last_seen=_seen, run_date=run_date, source_enabled=_enabled_map)
             }
-            # [노션 은퇴 준비 2026-11-13] 같은 판정을 DB 대기열(intake_queue) 기준으로도 계산해 차이를
-            # health JSON `store.monitor_shadow.silence` 에 남긴다. 판정·경고·coverage 줄은 노션 기준 그대로.
-            # 기본 꺼짐. 실패해도 위 판정에는 영향이 없다(아래에서 따로 잡는다).
-            if findings_supabase and not silence_from_db and env_flag("ENABLE_SILENCE_SUPABASE_SHADOW"):
-                try:
-                    from source_silence import query_last_seen_supabase, silence_shadow
-                    _db_seen, _db_errs, _hist = query_last_seen_supabase(
-                        findings_supabase[0], findings_supabase[1],
-                        [w.notion_source for w in watched_sources()], run_date=run_date)
-                    store_counters.setdefault("monitor_shadow", {})["silence"] = silence_shadow(
-                        notion_last_seen=_seen, db_last_seen=_db_seen, run_date=run_date,
-                        source_enabled=_enabled_map, db_errors=_db_errs, history_start=_hist)
-                except Exception as e:  # noqa: BLE001 — 그림자가 감시·수집을 죽이면 안 된다
-                    store_counters.setdefault("monitor_shadow", {})["silence"] = {
-                        "error": type(e).__name__}
         except Exception as e:  # noqa: BLE001 — 감시가 수집을 죽이면 안 된다
             source_last_seen = None
             source_silence_errors = (f"watchdog: {e}",)
@@ -5685,87 +5317,6 @@ def main() -> int:
     # B1: 윈도우는 emit 여부와 무관하게 결정(노후 미소비 New 경고 기준으로도 사용).
     handoff_window_days = cfg.handoff_window_days
     aged_unconsumed_new = 0
-    handoff_payloads: list[dict[str, Any]] = []   # 대기열 그림자 비교용(노션으로 만든 payload)
-    handoff_frozen: list[str] = []   # 발행일 동결로 handoff 를 건너뛰었으면 그 페이지 상태
-    if args.emit_routine_handoff and notion_off:
-        log("INFO", "GRM_INTAKE_NOTION=off — 노션 handoff 페이지를 만들지 않는다(정본은 DB handoff)")
-    elif args.emit_routine_handoff:
-        if args.dry_run:
-            log("INFO", "--emit-routine-handoff 지정됐지만 dry-run 이므로 Notion handoff 생성 생략")
-        elif stats.has_insert_failures():
-            handoff_failed = True
-            handoff_error_msg = "insert failure가 있어 partial handoff 생성 생략"
-            log("ERROR", f"Routine handoff 생성 생략: {handoff_error_msg}")
-        else:
-            try:
-                handoff_sources = None
-                if explicit_sources and "none" not in requested_sources:
-                    handoff_sources = {
-                        _SOURCE_TOKEN_TO_NOTION[src]
-                        for src in requested_sources
-                        if src in _SOURCE_TOKEN_TO_NOTION
-                    }
-                handoff_doc_ids = set(args.handoff_doc_ids or []) or None
-                # G2 와이어링: 당일 수집분 raw 를 메모리로 전달(과거 New row 만 fetch 폴백).
-                # v1 경로(ENABLE_HANDOFF_V2 off)는 inmemory_raw 미사용 → 무영향.
-                # [WHOPIR 보강본 가림 방지 2026-08-24] WHOPIR 는 목록 전량을 매일 재수집하지만
-                # PDF 보강(enrich_whopir_items)은 신규 항목에만 돈다 — 재수집분의 bare raw 를
-                # 캐시에 올리면 메모리 우선 규칙이 Notion children 의 보강본(whopir_report)을
-                # 가려 주간 스캐폴드 WHOPIR 상세가 통째로 비었다(08-03 이후 발행분 전수).
-                # bare 항목만 빼서 fetch 폴백(=Notion 보강본)으로 흐르게 한다.
-                try:
-                    from collect_who import whopir_raw_is_bare as _whopir_bare
-                    who_items_cacheable = [
-                        it for it in who_items if not _whopir_bare(it.raw_payload)]
-                except ImportError:      # 수집기 부재 환경 — 종전 동작 유지(비차단)
-                    who_items_cacheable = who_items
-                inmemory_raw = build_inmemory_raw(
-                    fr_items, recall_items, ema_items, mhra_items, pics_items, eca_items,
-                    wl_items, mfds_items, mfds_law_items, mfds_recall_items,
-                    mfds_admin_items, mfds_gmp_cert_items, mfds_safety_letter_items,
-                    mfds_gmp_inspection_items, ich_items, who_items_cacheable, hc_items,
-                    fda483_items, search_items, ispe_items, eu_gmp_ncr_items,
-                    mhra_gmp_ncr_items)
-                # §1-B: web brief emit 활성 시 산출 디렉터리(없으면 None=비활성). raw 가
-                # 살아있는 handoff v2 경로 내부에서만 산출(빈슬롯 grm-web-card/v1).
-                web_brief_dir = resolve_web_brief_dir() if _enable_web_brief_emit() else None
-                if handoff_db:
-                    web_brief_dir = None    # 스캐폴드는 DB handoff 가 낸다(아래) — 노션 것은 거울이라 내지 않는다
-                handoff_row_count, handoff_url = emit_routine_handoff(
-                    notion_token, notion_db, run_date, handoff_window_days, collected_at,
-                    source_names=handoff_sources, doc_ids=handoff_doc_ids,
-                    inmemory_raw=inmemory_raw,
-                    # B1 조회/표시 분리: 브리프 "검색 기간"은 수집 윈도우(주간) 유지.
-                    display_window_days=args.window_days,
-                    web_brief_dir=web_brief_dir,
-                    # 무음 소스는 coverage 줄에 `0(점검필요)` 로 찍힌다(§3 2026-09-14).
-                    silent_sources=coverage_silent_sources,
-                    sealed_dates=handoff_sealed_dates,
-                    payload_out=handoff_payloads,
-                    frozen_out=handoff_frozen)
-                handoff_emitted = True
-                if handoff_frozen:
-                    # 발행일 동결(grm_handoff.publish_day_handoff_frozen) — 이번 실행은 handoff 를 쓰지 않았다.
-                    _sum_path = os.environ.get("GITHUB_STEP_SUMMARY")
-                    if _sum_path:
-                        try:
-                            with open(_sum_path, "a", encoding="utf-8") as f:
-                                f.write(f"> 🧊 발행일 handoff 동결 — {run_date} handoff 가 이미 있어"
-                                        f"(Status={handoff_frozen[0]}) 다시 쓰지 않았다. 07:00 KST 이후 재실행은"
-                                        f" 무해 종료한다(새 행은 다음 handoff 로). 아래 handoff 행 수는 기존 페이지 값이다.\n\n")
-                        except OSError:
-                            pass
-            except NotionHandoffError as e:
-                handoff_failed = True
-                handoff_error_msg = str(e)
-                log("ERROR", f"Routine handoff 생성 실패: {handoff_error_msg}")
-
-    # [대기열 그림자 2026-11-12] 같은 handoff 를 DB(intake_queue + raw_signals)만으로 한 번 더 만들어
-    # 노션 것과 비교하고, 행 상태를 main 발행 파일에서 다시 계산한다. 발행은 노션 handoff 그대로다.
-    # 어떤 실패도 수집 결과를 바꾸지 않는다(경고만).
-    # ★순서: 반드시 원문 갱신(R4, 위의 raw_update.apply_updates) **뒤**에 돈다. 노션 handoff 는 오늘
-    #   다시 받은 판으로 카드를 만들므로, DB 도 오늘 판이 반영된 뒤에 읽어야 둘이 같다(재생 대조 10-1).
-    #   시험(test_grm_queue.OrderTest)이 이 순서를 잠근다.
     shadow_report: dict[str, Any] | None = None
     if queue_new_items is not None and findings_supabase:
         try:
@@ -5779,11 +5330,6 @@ def main() -> int:
                 findings_supabase, run_date=run_date, generated_at=collected_at,
                 window_days=handoff_window_days, display_window_days=args.window_days,
                 new_items=queue_new_items,
-                notion_payload=(handoff_payloads[-1] if handoff_payloads else None),
-                notion_status_lookup=(
-                    (lambda handoff_date, _keys: grm_queue.notion_status_map(
-                        notion_token, notion_db, handoff_date, handoff_window_days))
-                    if notion_token and notion_db else None),
                 silent_sources=coverage_silent_sources, **_canonical_kwargs)
             # health JSON 의 `store.queue` 로 남긴다(가산 키) — 넣기·보충·동결·경고 수.
             store_counters["queue"] = grm_queue.health_summary(shadow_report)
@@ -5792,22 +5338,16 @@ def main() -> int:
             log("WARN", f"대기열 그림자 실패(수집·노션 handoff 는 정상): "
                         f"{type(e).__name__}: {truncate(str(e), 160)}")
 
-    # [handoff 정본 DB 2026-11-13] GRM_HANDOFF_SOURCE=db — 그날 handoff 의 성패는 DB handoff 가 정한다.
-    # 노션 handoff 페이지(위)는 거울이다: 그 결과는 `store.handoff_source.notion_mirror` 에만 남기고,
-    # 실패해도 handoff 실패로 치지 않는다(노션 행 생성 실패는 종전대로 따로 failure 로 잡힌다).
     if handoff_db:
         _canon = (shadow_report or {}).get("canonical") or {}
         store_counters["handoff_source"] = {
             "source": "db",
-            "notion_mirror": ("off" if notion_off else "ok" if handoff_emitted
-                              else "failed" if handoff_failed else "skipped"),
+            "notion_mirror": "off",
             "notion_mirror_rows": handoff_row_count,
             "notion_mirror_error": handoff_error_msg,
             "frozen": str(_canon.get("frozen") or ""),
             "web_brief": bool(_canon.get("web_brief")),
         }
-        if handoff_failed:
-            log("WARN", f"노션 handoff 거울 실패(정본은 DB handoff): {handoff_error_msg}")
         handoff_emitted = bool(_canon.get("ok"))
         handoff_failed = not handoff_emitted
         handoff_row_count = int(_canon.get("rows") or 0)
@@ -5816,30 +5356,11 @@ def main() -> int:
             str(_canon.get("error") or "") or "DB handoff 를 만들지 못했다(대기열 그림자 실패)")
         if handoff_failed:
             log("ERROR", f"DB handoff(정본) 생성 실패: {handoff_error_msg}")
-        if notion_off:
-            # 노션의 '봉인된 handoff 날짜'·'창 밖 미소비 New 수'에 해당하는 값을 DB 기록에서 받는다.
-            handoff_sealed_dates = [str(d) for d in (_canon.get("staled_dates") or [])]
-            aged_unconsumed_new = int(_canon.get("aged_open") or 0)
-    if notion_off:
-        store_counters["notion"] = "off"
+        handoff_sealed_dates = [str(d) for d in (_canon.get("staled_dates") or [])]
+        aged_unconsumed_new = int(_canon.get("aged_open") or 0)
+    store_counters["notion"] = "off"
 
-    # B1 임시 방어 ②: 윈도우 밖 미소비 New 카운트(읽기전용 — dry-run 도 자격증명이
-    # 있으면 수행해 검증 루프로 쓸 수 있다). 실패는 조용한 0 이 아니라 경고로 표면화.
     aged_new_query_error = ""
-    if notion_token and notion_db:
-        try:
-            aged_unconsumed_new = notion_count_aged_unconsumed_new(
-                notion_token, notion_db, run_date, handoff_window_days)
-            if aged_unconsumed_new and handoff_idem_effective:
-                # Codex P2: v2 effective — 노후 New 는 ref 기반 쿼리가 자동 재투입(정보성).
-                log("INFO", f"handoff 윈도우({handoff_window_days}일) 밖 미소비 New row "
-                            f"{aged_unconsumed_new}건 — 멱등성 v2 자동 재투입 대상(다음 emit 포함)")
-            elif aged_unconsumed_new:
-                log("WARN", f"handoff 윈도우({handoff_window_days}일) 밖 미소비 New row "
-                            f"{aged_unconsumed_new}건 — Routine 누락/지연 의심")
-        except Exception as e:  # noqa: BLE001 — 감시 실패가 수집 자체를 죽이면 안 됨
-            aged_new_query_error = str(e)
-            log("WARN", f"노후 미소비 New row 카운트 조회 실패: {aged_new_query_error}")
 
     flags = {
         "ENABLE_SEARCH": enable_search,

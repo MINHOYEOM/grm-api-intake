@@ -162,7 +162,7 @@ concurrency:
 
 jobs:
   collect:
-    name: Collect sources → Notion Intake
+    name: Collect sources into Supabase
     runs-on: ubuntu-latest
     # [2026-07-27] 20 → 35. FDA 483 스캔본 OCR(실측 ≈2.2s/쪽·예산 200쪽 ≈ 7분)과 PDF 상한
     # 40 → 60 상향이 이 job 안에서 돌기 때문. 예산·상한 둘 다 env 로 닫혀 있어 상한선이 있다.
@@ -212,8 +212,6 @@ jobs:
 
       - name: Run collector
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
@@ -353,7 +351,6 @@ jobs:
           #   off 면 행 생성·handoff 페이지·중복 조회·무음 감시·창 밖 미소비 수·그림자 비교의 노션 호출이 전부
           #   사라지고, 중복 판정과 handoff 는 DB 기준이 된다(위 두 변수 값과 무관). Supabase 저장이 꺼져 있으면
           #   실행을 거부한다(exit 2). **은퇴 목록 7절 조건을 모두 채우고 대표 승인을 받은 뒤에만 off.**
-          GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
           # §1-B(ENABLE_WEB_BRIEF_EMIT·GRM_WEB_BRIEF_DIR)는 job-level env 에 정의(upload 스텝과 공유).
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음
@@ -553,10 +550,10 @@ jobs:
                 ...warningLines,
                 '',
                 '점검 항목:',
-                '1. Notion Integration 토큰 유효성',
-                '2. Notion DB 스키마 (속성 이름·타입)',
+                '1. Supabase URL and service role key',
+                '2. raw_signals and intake_queue availability',
                 '3. Federal Register / OpenFDA / RSS / FDA WL / MFDS / ICH / WHO / Health Canada 상태',
-                '4. GitHub Secrets 값 (NOTION_TOKEN, OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_SERVICE_KEY, MFDS_HTTP_PROXY, LAW_GO_KR_OC)',
+                '4. GitHub Secrets 값 (OPENFDA_API_KEY, BRAVE_API_KEY, DATA_GO_KR_SERVICE_KEY, MFDS_HTTP_PROXY, LAW_GO_KR_OC)',
                 '5. Repository Variables (ENABLE_SEARCH, ENABLE_MFDS, ENABLE_MFDS_LAW, ENABLE_MFDS_RECALL, ENABLE_MFDS_ADMIN, ENABLE_MFDS_GMP_CERT, ENABLE_MFDS_SAFETY_LETTER, ENABLE_MFDS_GMP_INSPECTION, ENABLE_GMP_DEFICIENCY_TABLE, ENABLE_ICH, ENABLE_WHO, ENABLE_HC, ENABLE_FDA_483, ENABLE_FDA_483_OBSERVATIONS, ENABLE_MOLEG_API, ENABLE_SCRAPE, ENABLE_WHOPIR_EXCERPT, ENABLE_WL_BODY, ENABLE_WL_BODY_FULL, ENABLE_MFDS_ADMIN_BODY_FULL, ENABLE_ECA_ARTICLE_EXCERPT, ENABLE_MODALITY_TAG, MFDS_RSS_BOARD_MODE, MFDS_RSS_BOARD_IDS) 설정 확인',
                 '6. MFDS 활성화 시 RSS/API 상태 확인; ENABLE_MOLEG_API=true인 경우 DATA_GO_KR_KEY/OC/IP 인가 확인',
                 '',

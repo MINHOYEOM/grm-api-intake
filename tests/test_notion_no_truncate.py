@@ -67,45 +67,6 @@ class RichTextTests(unittest.TestCase):
         self.assertTrue(title.endswith(long))
 
 
-class CreatePageTests(unittest.TestCase):
-    def _run(self, n_blocks, patch_side_effect=None):
-        with mock.patch.object(grm_notion, "build_notion_properties", return_value={}), \
-             mock.patch.object(grm_notion, "build_notion_children",
-                               return_value=_blocks(n_blocks)), \
-             mock.patch.object(grm_notion.requests, "post",
-                               return_value=_resp()) as post, \
-             mock.patch.object(grm_notion, "notion_api_request",
-                               side_effect=patch_side_effect or (lambda *a, **k: {})) as api:
-            ok = grm_notion.notion_create_page("tok", "db", _item(), RUN_DATE, NOW)
-        return ok, post, api
-
-    def test_le_100_single_create(self):
-        ok, post, api = self._run(100)
-        self.assertTrue(ok)
-        self.assertEqual(post.call_count, 1)
-        self.assertEqual(len(post.call_args.kwargs["json"]["children"]), 100)
-        api.assert_not_called()
-
-    def test_over_100_create_then_batched_appends(self):
-        ok, post, api = self._run(300)
-        self.assertTrue(ok)
-        self.assertEqual(post.call_count, 1)
-        self.assertEqual(len(post.call_args.kwargs["json"]["children"]), 100)
-        sizes = [len(c.kwargs["body"]["children"]) for c in api.call_args_list]
-        self.assertEqual(sizes, [90, 90, 20])
-        for c in api.call_args_list:
-            self.assertEqual(c.args[0], "PATCH")
-            self.assertTrue(c.args[1].endswith("/v1/blocks/page-1/children"))
-        # 순서 보존: 생성분 + append 분 = 원본 그대로
-        sent = list(post.call_args.kwargs["json"]["children"])
-        for c in api.call_args_list:
-            sent += c.kwargs["body"]["children"]
-        self.assertEqual(sent, _blocks(300))
-
-    def test_append_failure_keeps_page_created(self):
-        ok, post, api = self._run(150, patch_side_effect=grm_notion.NotionHandoffError("x"))
-        self.assertTrue(ok)
-        self.assertEqual(api.call_count, 1)
 
 
 class SearchSnippetTests(unittest.TestCase):

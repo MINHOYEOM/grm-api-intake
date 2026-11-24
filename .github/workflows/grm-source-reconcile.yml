@@ -10,7 +10,7 @@ name: GRM Source Reconcile (daily, after intake)
 # 건너뛴다(수집 실패는 수집 쪽 이슈가 알리고, 이 잡이 돌면 전부 놓침으로 오독된다).
 # 수동 실행: workflow_dispatch(창 일수 입력).
 #
-# 비차단: 읽기 전용(Notion 조회·제외 장부 조회·원천 GET). 이상이 있어도 파이프라인을 막지 않고 이슈로만 알린다.
+# 비차단: 읽기 전용(raw_signals 조회·제외 장부 조회·원천 GET). 이상이 있어도 파이프라인을 막지 않고 이슈로만 알린다.
 # 끄기: repo 변수 ENABLE_SOURCE_RECONCILE=false (워크플로 job 조건만 읽는다 — 코드는 읽지 않아 .env.example 에 싣지 않는다).
 
 on:
@@ -71,10 +71,6 @@ jobs:
         id: reconcile
         continue-on-error: true
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          # [노션 끄기] off 면 '수집됨' 키를 노션이 아니라 정본(raw_signals)에서 읽는다. 수집기와 같은 변수.
-          GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
           OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
           MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
           # 식약처 회수·행정처분(data.go.kr) — 수집기와 같은 시크릿. 읽기(GET)만 한다.
@@ -83,9 +79,6 @@ jobs:
           MFDS_RSS_BOARD_IDS: ${{ vars.MFDS_RSS_BOARD_IDS || '' }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          # [노션 은퇴 준비] '수집됨'을 정본(Supabase raw_signals) 기준으로도 판정해 차이를 보고서에 남긴다(그림자).
-          # 판정·이슈는 Notion 기준 그대로. 기본 꺼짐.
-          ENABLE_RECONCILE_SUPABASE_SHADOW: ${{ vars.ENABLE_RECONCILE_SUPABASE_SHADOW || 'false' }}
           # 수집기가 꺼 둔 소스는 대조에서 뺀다(수집기와 같은 변수·같은 기본값).
           ENABLE_MFDS: ${{ vars.ENABLE_MFDS || 'true' }}
           ENABLE_FDA_483: ${{ vars.ENABLE_FDA_483 || 'true' }}

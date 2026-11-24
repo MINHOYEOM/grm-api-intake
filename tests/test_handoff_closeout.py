@@ -76,43 +76,6 @@ class UnconsumedPublishHandoffsTest(unittest.TestCase):
                          ["2026-09-14"])
 
 
-class SealedDatesWiringTest(unittest.TestCase):
-    """봉인 함수가 날짜를 실제로 내보내는지 — 반환값(건수)은 그대로여야 한다."""
-
-    def _seal(self, pages: list[dict], keep: str, out: list[str] | None):
-        def fake_api(method, url, token, body=None, **kw):
-            if method == "POST" and "/query" in url:
-                return {"results": pages, "has_more": False}
-            return {}
-
-        with mock.patch.object(grm_handoff, "notion_api_request", side_effect=fake_api):
-            return ci.notion_stale_prior_open_handoffs(
-                "tok", "db", keep_handoff_id=keep, superseded_by="2026-09-15",
-                sealed_dates=out)
-
-    def test_sealed_dates_collected(self) -> None:
-        out: list[str] = []
-        staled = self._seal(
-            [_handoff_page("routine-handoff::2026-09-14", "2026-09-14", "New", "p14")],
-            keep="routine-handoff::2026-09-15", out=out)
-        self.assertEqual(staled, 1)
-        self.assertEqual(out, ["2026-09-14"])
-        self.assertEqual(unconsumed_publish_handoffs(out), ["2026-09-14"])
-
-    def test_kept_handoff_is_not_collected(self) -> None:
-        out: list[str] = []
-        staled = self._seal(
-            [_handoff_page("routine-handoff::2026-09-15", "2026-09-15", "New", "p15")],
-            keep="routine-handoff::2026-09-15", out=out)
-        self.assertEqual(staled, 0)
-        self.assertEqual(out, [])
-
-    def test_out_param_is_optional(self) -> None:
-        """기존 호출부(out-param 없음)는 그대로 동작해야 한다 — 반환 계약 불변."""
-        staled = self._seal(
-            [_handoff_page("routine-handoff::2026-09-14", "2026-09-14", "New", "p14")],
-            keep="routine-handoff::2026-09-15", out=None)
-        self.assertEqual(staled, 1)
 
 
 class HealthWiringTest(unittest.TestCase):

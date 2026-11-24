@@ -133,8 +133,8 @@ class WatchdogRunsBeforeHandoffTest(unittest.TestCase):
 
     def test_query_precedes_handoff_emit_in_main(self) -> None:
         src = inspect.getsource(ci.main)
-        q = src.find("query_last_seen(")
-        e = src.find("emit_routine_handoff(")
+        q = src.find("query_last_seen_supabase(")
+        e = src.find("grm_queue.run_shadow(")
         h = src.find("_evaluate_health(")
         self.assertGreater(q, 0)
         self.assertGreater(e, 0)

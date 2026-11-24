@@ -34,7 +34,6 @@ START_DEADLINE = "11:00"    # 이 뒤에는 시작하지 않는다
 FINISH_DEADLINE = "13:15"   # 백업이 이때까지 반납하지 못하면 `실패` 로 끝낸다(뒤에 브릿지 13:37·14:07·14:37)
 BRIDGE_LAST = "14:37"       # 발행 브릿지 월요일 마지막 회차(grm-delta-bridge.yml '7,37 0-5 * * 1')
 TERMINAL = ("보류", "실패")
-NOTION_ENV = "GRM_INTAKE_NOTION"
 
 
 def _status(obj):
@@ -132,24 +131,16 @@ def usable(delta_bridge, date, read, sub):
 
     채택 조건(`load_git_run`)만이 아니라 브릿지가 기록 직전에 도는 검증 전부 — 봉투·슬롯 계약·호 날짜
     (`prepare_git_run`)와 스캐폴드(`load_run_scaffold`) — 를 똑같이 돈다. 하나라도 떨어지면 "쓸 수 없다".
-    노션은 보지 않는다(`GRM_INTAKE_NOTION=off` 로 돈다 — 백업이 도는 것은 노션 off 뒤다). 검증 중 어떤
     예외도 "쓸 수 없다"로 읽는다 — 그쪽이 안전하다(브릿지는 편집팀 → 백업 순으로 보고 main 엔 먼저 기록된
     하나만 남으므로, 판정이 지나치게 RUN 이어도 두 번 나가지 않는다).
     """
     run = delta_bridge.load_git_run(date, read=read, sub=sub)
     if not run["adoptable"]:
         return False, run["reason"]
-    prev = os.environ.get(NOTION_ENV)
-    os.environ[NOTION_ENV] = "off"
     try:
-        delta_bridge._prepare_adoptable(os.environ.get("NOTION_TOKEN", ""), "", run, read)
+        delta_bridge._prepare_adoptable(run, read)
     except Exception as e:  # noqa: BLE001 — 브릿지가 거절할 반납은 판정도 거절한다
         return False, f"채택 조건은 채웠으나 브릿지 검증에서 떨어진다: {e}"
-    finally:
-        if prev is None:
-            os.environ.pop(NOTION_ENV, None)
-        else:
-            os.environ[NOTION_ENV] = prev
     return True, run["reason"]
 
 

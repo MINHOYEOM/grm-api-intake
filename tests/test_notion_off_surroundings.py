@@ -1,142 +1,37 @@
 #!/usr/bin/env python3
-"""[노션 끄기 2026-11-13] 수집기 밖에서 노션 Intake DB 를 읽고 쓰는 곳도 같은 변수(GRM_INTAKE_NOTION)를 따른다.
+"""Reconciliation uses stored source keys and keeps failures distinct from misses."""
 
-지키는 것:
-- 원천 대조: off 면 '수집됨' 키를 정본(raw_signals)에서 읽는다 — 노션을 읽지 않는다. 기본(on)은 종전.
-  (수집기가 노션에 행을 만들지 않는데 노션 기준으로 대조하면 전부 '놓침'으로 보인다.)
-- 483·WL 노션 원문 동기화, 노션 행 Status 기록: off 면 워크플로 단계가 돌지 않는다. 기본은 종전 조건 그대로.
-"""
-
-from __future__ import annotations
-
-import re
-import sys
 import unittest
-from datetime import date
-from pathlib import Path
+from datetime import date, timedelta
 from unittest.mock import patch
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-
-import source_reconcile as sr  # noqa: E402
-
-RUN = date(2026, 12, 1)             # 유예(2026-11-22) 이후 — 놓침이 놓침으로 판정되는 날
-WF = ROOT / ".github" / "workflows"
+import source_reconcile as sr
 
 
-def _doc(doc_id: str) -> "sr.SourceDoc":
-    return sr.SourceDoc(document_id=doc_id, title=f"t {doc_id}", url=f"https://example.org/{doc_id}",
-                        published="2026-11-25")
-
-
-class ReconcileBasisTest(unittest.TestCase):
-    ENV = {"NOTION_TOKEN": "t", "NOTION_DATABASE_ID": "d", "SUPABASE_URL": "https://x.supabase.co",
-           "SUPABASE_SERVICE_ROLE_KEY": "KEY"}
-
-    def _run(self, env_extra, *, notion_ids=("a",), db_ids=("a", "b"), db_error=None):
+class SourceReconcileStoreTest(unittest.TestCase):
+    def run_reconcile(self, *, collected=(), error=None, credentials=True):
+        run_date = date(2026, 11, 20)
         spec = sr.SPEC_BY_KEY["wl"]
-        env = dict(self.ENV, **env_extra)
+        doc = sr.SourceDoc("doc", "https://example.test/doc", "Title", (run_date - timedelta(days=5)).isoformat())
+        env = {"SUPABASE_URL": "https://x.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "k"} if credentials else {}
+        keys = {f"{spec.source}::{key}" for key in collected}
+        with patch.object(sr, "load_collected_keys_supabase", return_value=(keys, set()),
+                          side_effect=error), patch.object(sr, "load_ledger", return_value={}):
+            return sr.run(run_date=run_date, base_days=7, enf_days=30, specs=[spec],
+                          fetchers={"wl": lambda *_: sr.FetchOutcome(docs=[doc])}, env=env)
 
-        def db_keys(*_a, **_k):
-            if db_error:
-                raise db_error
-            return {f"{spec.source}::{i}" for i in db_ids}, set()
-        with patch.object(sr, "load_collected_keys",
-                          return_value=({f"{spec.source}::{i}" for i in notion_ids}, set())) as notion, \
-                patch.object(sr, "load_ledger", return_value={spec.source: {}}), \
-                patch.object(sr, "load_collected_keys_supabase", side_effect=db_keys) as db:
-            rep = sr.run(run_date=RUN, base_days=7, enf_days=30, specs=[spec],
-                         fetchers={"wl": lambda s, e: sr.FetchOutcome(docs=[_doc("a"), _doc("b")])},
-                         env=env)
-        return rep, notion, db
+    def test_stored_document_is_counted_as_collected(self):
+        report = self.run_reconcile(collected=["doc"])
+        self.assertEqual(report["collected_basis"], "supabase")
+        self.assertEqual(report["sources"][0]["counts"]["collected"], 1)
 
-    def test_default_reads_notion_and_has_no_new_key(self):
-        for extra in ({}, {"GRM_INTAKE_NOTION": "on"}, {"GRM_INTAKE_NOTION": "false"}):
-            with self.subTest(extra=extra):
-                rep, notion, db = self._run(extra)
-                notion.assert_called()
-                db.assert_not_called()
-                self.assertNotIn("collected_basis", rep)
-                self.assertEqual(rep["sources"][0]["verdict"], sr.V_MISSED)   # 노션에는 a 뿐
+    def test_missing_document_is_reported(self):
+        report = self.run_reconcile()
+        self.assertEqual(report["sources"][0]["counts"]["missed"], 1)
 
-    def test_off_reads_the_canonical_store_and_never_notion(self):
-        rep, notion, db = self._run({"GRM_INTAKE_NOTION": "off"})
-        notion.assert_not_called()
-        db.assert_called_once()
-        self.assertEqual(rep["collected_basis"], "supabase")
-        self.assertEqual(rep["sources"][0]["verdict"], sr.V_OK)               # 정본에는 a·b 둘 다
-        self.assertEqual(rep["totals"]["missed"], 0)
-
-    def test_off_still_finds_what_the_store_does_not_have(self):
-        rep, _notion, _db = self._run({"GRM_INTAKE_NOTION": "off"}, notion_ids=("a", "b"), db_ids=("a",))
-        self.assertEqual(rep["sources"][0]["verdict"], sr.V_MISSED)
-        self.assertEqual(rep["totals"]["missed"], 1)
-
-    def test_off_needs_no_notion_credentials(self):
-        rep, notion, _db = self._run({"GRM_INTAKE_NOTION": "off", "NOTION_TOKEN": "",
-                                      "NOTION_DATABASE_ID": ""})
-        notion.assert_not_called()
-        self.assertEqual(rep["sources"][0]["verdict"], sr.V_OK)
-
-    def test_off_store_failure_is_unreachable_not_missed(self):
-        rep, notion, _db = self._run({"GRM_INTAKE_NOTION": "off"},
-                                     db_error=sr.StoreReadError("정본(raw_signals) 조회 HTTP 500"))
-        notion.assert_not_called()                                            # 노션으로 되돌아가지 않는다
-        self.assertEqual(rep["sources"][0]["verdict"], sr.V_STORE_UNREACHABLE)
-        self.assertEqual(rep["totals"]["missed"], 0)
-
-    def test_off_without_supabase_settings_is_unreachable(self):
-        rep, _notion, db = self._run({"GRM_INTAKE_NOTION": "off", "SUPABASE_SERVICE_ROLE_KEY": ""})
-        db.assert_not_called()
-        self.assertEqual(rep["sources"][0]["verdict"], sr.V_STORE_UNREACHABLE)
-
-    def test_off_does_not_run_the_shadow_against_itself(self):
-        rep, _notion, db = self._run({"GRM_INTAKE_NOTION": "off",
-                                      "ENABLE_RECONCILE_SUPABASE_SHADOW": "true"})
-        self.assertNotIn("shadow_supabase", rep)
-        db.assert_called_once()
-
-    def test_workflow_passes_the_switch_default_on(self):
-        wf = (WF / "grm-source-reconcile.yml").read_text(encoding="utf-8")
-        self.assertIn("GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}", wf)
-
-
-def _step(workflow: str, name_part: str) -> str:
-    text = (WF / workflow).read_text(encoding="utf-8")
-    blocks = re.split(r"\n(?=      - name: )", text)
-    found = [b for b in blocks if b.lstrip().startswith("- name: ") and name_part in b.splitlines()[0]]
-    assert len(found) == 1, (workflow, name_part, len(found))
-    return found[0]
-
-
-def _if_line(step: str) -> str:
-    lines = [ln.strip() for ln in step.splitlines() if ln.strip().startswith("if:")]
-    assert len(lines) == 1, lines
-    return lines[0]
-
-
-class WorkflowStepGateTest(unittest.TestCase):
-    OFF = "vars.GRM_INTAKE_NOTION != 'off'"
-
-    def test_notion_raw_sync_steps_skip_when_off_and_keep_their_old_condition(self):
-        for name in ("Sync empty Notion 483 rows", "Sync Notion WL rows"):
-            with self.subTest(step=name):
-                cond = _if_line(_step("grm-fda483-ocr-recovery.yml", name))
-                self.assertEqual(
-                    cond, "if: ${{ (github.event_name == 'schedule' || inputs.apply) && " + self.OFF + " }}")
-
-    def test_the_recovery_itself_is_not_gated(self):
-        text = (WF / "grm-fda483-ocr-recovery.yml").read_text(encoding="utf-8")
-        self.assertEqual(text.count(self.OFF), 2)        # 노션 동기화 두 단계뿐 — 회수·findings 는 그대로
-
-    def test_notion_status_sync_step_is_gone(self):
-        # [노션 은퇴 ③] 노션 행 Status 기록 단계는 지웠다. off 조건은 잡 첫머리 'off 확인' 한 곳에만 있다.
-        text = (WF / "grm-delta-bridge.yml").read_text(encoding="utf-8")
-        self.assertNotIn("노션 행 Status 기록", text)
-        self.assertEqual(text.count(self.OFF), 1)
-        self.assertEqual(_if_line(_step("grm-delta-bridge.yml", "노션 off 확인")), "if: " + self.OFF)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_failed_read_cannot_produce_a_miss(self):
+        for settings in ({"error": sr.StoreReadError("http_500")}, {"credentials": False}):
+            with self.subTest(settings=settings):
+                report = self.run_reconcile(**settings)
+                self.assertFalse(report["store"]["collected_ok"])
+                self.assertEqual(report["sources"][0]["counts"]["missed"], 0)

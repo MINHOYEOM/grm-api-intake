@@ -136,7 +136,7 @@ class WlBodyRecoveryReport:
     elapsed_seconds: float = 0.0
     budget_exhausted: bool = False
     deferred_next: int = 0              # 상한·예산으로 이번에 못 본 행 수(다음 회차)
-    deferred_docs: list[str] = field(default_factory=list)   # 그 document_id(최대 200)
+    deferred_docs: list[str] = field(default_factory=list)   # 그 document_id 전부(자르지 않는다)
     avg_seconds_per_attempt: float = 0.0
     head_rebuild: dict[str, int] = field(default_factory=dict)   # 쓸 행의 새 위반항목 결과(형식 F*/사유별 행 수)
     status_resolved: int = 0            # 확정 사유(404·no-anchor)로 표식만 교체
@@ -580,7 +580,6 @@ def run(
 
     report.elapsed_seconds = round(clock_fn() - t0, 1)
     report.deferred_next = len(report.deferred_docs)
-    report.deferred_docs = report.deferred_docs[:200]
     if report.attempted:
         report.avg_seconds_per_attempt = round(report.elapsed_seconds / report.attempted, 1)
     if progress_cb is not None:

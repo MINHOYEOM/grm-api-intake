@@ -73,6 +73,23 @@ class TestAudit483InspectorBlanks(unittest.TestCase):
         self.assertEqual(report["scanned"], len(rows))
         self.assertEqual([row["document_id"] for row in report["rows"]], ["target"])
 
+    def test_null_and_whitespace_inspectors_are_blank(self):
+        body = "OBSERVATION 1\nIncomplete batch records."
+        rows = [
+            {"document_id": "null", "raw_json": json.dumps({
+                "fda483_body_full": body, "fda483_inspectors": [None],
+            })},
+            {"document_id": "whitespace", "body": body, "insp": ["", " \t"]},
+            {"document_id": "null-and-whitespace", "body": body, "insp": [None, " \t"]},
+            {"document_id": "filled", "body": body, "insp": [None, " \t", "Avery Sharpe"]},
+        ]
+
+        report = tool.audit(rows)
+
+        self.assertEqual(report["counts"], {"no_signature_block": 3})
+        self.assertEqual([row["document_id"] for row in report["rows"]],
+                         ["null", "whitespace", "null-and-whitespace"])
+
     def test_fixture_cli_prints_dry_report(self):
         stdout = StringIO()
         with TemporaryDirectory() as directory:

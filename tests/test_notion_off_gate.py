@@ -156,7 +156,8 @@ class PublishPathInstructionsTest(unittest.TestCase):
 
     FILES = [("company", "editorial", f) for f in ("RUN.md", "desk.md", "reporter.md", "copyedit.md")] + \
             [("company", "editorial", "next", f) for f in ("RUN.md", "desk.md", "reporter.md", "copyedit.md")] + \
-            [("company", "situation-room", "brief-prep.md")]
+            [("company", "situation-room", "brief-prep.md"),
+             ("company", "editorial", "backup.md")]          # 백업 v17 — 노션 없이 도는 월요일 자동 백업
     FORBIDDEN = (
         "CONSUMED` 로 바꾼다",          # 교열의 노션 마감
         "OPEN(Status=New)",             # 데스크의 노션 OPEN 확인

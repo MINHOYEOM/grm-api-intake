@@ -78,7 +78,7 @@ import raw_body_followup as rbf
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import SOURCE_FDA_WL, body_shrunk, log, normalize_whitespace
+from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_WL, body_shrunk, log, normalize_whitespace
 
 SCHEMA_VERSION = "grm-wl-body-recovery/v1"
 
@@ -100,7 +100,7 @@ KNOWN_RAW_KEYS = frozenset({
 })
 # 다시 읽어도 결과가 같을 사유. 이 표식이 붙은 행은 후보가 아니다(재시도가 끊긴다).
 DEFINITIVE_STATUSES = ("no-anchor",)
-BOT_BLOCK_STATUS = "fetch-fail:bot-block"   # collect_intake.WL_BODY_STATUS_BOT_BLOCK 과 같은 값(테스트가 대조)
+BOT_BLOCK_STATUS = FDA_BOT_BLOCK
 
 # 영구 403 정책(모듈 docstring). 표식은 모두 `fetch-403` 토큰으로 시작한다 — 하류 사유 매핑 계약.
 STATUS_403 = "fetch-403"
@@ -498,9 +498,9 @@ def run(
             report.bot_blocked = True
             report.stopped_at = label
             report.still_empty += 1
-            _bump(report, "bot-block")
-            report.errors.append(f"{label}: fda-bot-block — 이후 요청 중단")
-            log("ERROR", f"FDA 봇 차단 감지({label}) — 남은 행 요청을 중단합니다")
+            _bump(report, BOT_BLOCK_STATUS)
+            report.errors.append(f"{label}: {BOT_BLOCK_STATUS} — 이후 요청 중단")
+            log("ERROR", f"{BOT_BLOCK_STATUS} ({label}) — 남은 행 요청을 중단합니다")
             break
         if not full and rebuild_body_start:
             # 있는 본문을 표식으로 덮지 않는다 — 이번에 못 받았으면 그대로 둔다.

@@ -201,6 +201,16 @@ class RecoveryRunTest(unittest.TestCase):
         self.assertNotIn("fda483_text_status", record["raw_json"])        # 결손 사유 소멸
         self.assertIn("fda_483_observations", record["raw_json"])
 
+    def test_fda_bot_block_stops_before_fetching_or_storing_more_rows(self) -> None:
+        fetch = mock.Mock(return_value=("", "fda-bot-block"))
+        rows = [_row("rawsig-a"), {**_row("rawsig-b"), "document_id": "fda483-555002"}]
+        report, _code, upsert, _rid = _run(dry_run=False, rows=rows, fetch_text=fetch)
+
+        self.assertEqual(report.candidates, 2)
+        self.assertEqual(report.failure_reasons, {"fda-bot-block": 1})
+        fetch.assert_called_once()
+        upsert.assert_not_called()
+
     def test_still_empty_document_is_left_alone(self) -> None:
         """OCR 재시도에도 본문이 없으면 **쓰지 않는다** — 빈손을 빈손으로 덮지 않는다."""
         report, code, upsert, _rid = _run(

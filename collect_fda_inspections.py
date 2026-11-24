@@ -88,7 +88,7 @@ from typing import Any, Callable
 import requests
 
 import findings_supabase_append as fsa
-from grm_common import log, retry_after_seconds
+from grm_common import fda_checked_request, log, retry_after_seconds
 
 SCHEMA_VERSION = "grm-fda-inspections-backfill/v1"
 
@@ -304,7 +304,7 @@ def ddapi_post(
     last_err: Exception | None = None
     for attempt in range(retries + 1):
         try:
-            resp = requests.post(url, json=body, headers=headers, timeout=timeout)
+            resp = fda_checked_request(requests.post, url, json=body, headers=headers, timeout=timeout)
         except requests.RequestException as e:
             last_err = e
             log("WARN", f"DDAPI POST 실패({attempt + 1}/{retries + 1}): {type(e).__name__}: {e}")

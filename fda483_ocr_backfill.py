@@ -48,7 +48,7 @@ import time
 from typing import Any
 
 import collect_fda_483 as f483
-from grm_common import log
+from grm_common import FDA_BOT_BLOCK, log
 
 # fda.gov robots Crawl-Delay 는 30s 지만 이 경로는 daily 수집기와 같은 /media/<id>/download
 # 이고 수집기 자체가 0.5s 로 운영돼 왔다(동일 예의 수준 유지). 상향은 --delay 로.
@@ -112,6 +112,9 @@ def run(doc_ids: list[str], delay: float = DEFAULT_DELAY_SECONDS,
         if i and delay:
             sleeper(delay)
         row = recover_document(doc_id)
+        if row["status"] == FDA_BOT_BLOCK:
+            report.append(row)
+            break
         if row["observation_count"]:
             # 조립(`_refresh_483_observations`)이 읽는 입력. 관찰은 조립이 같은 파서로 다시
             # 뽑으므로 패치에 싣지 않는다(단일 진실 = source_text). `source_text_status` 는

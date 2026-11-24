@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from urllib.parse import urlencode, urlparse
-from typing import Any
+from typing import Any, Callable
 
 import requests
 
@@ -56,6 +56,60 @@ def log(level: str, msg: str) -> None:
         encoding = sys.stdout.encoding or "utf-8"
         safe = line.encode(encoding, errors="replace").decode(encoding, errors="replace")
         print(safe, flush=True)
+
+
+FDA_BOT_BLOCK = "fda-bot-block"
+_FDA_BOT_BLOCK_MARKERS = (b"abuse-detection-apology", b"apology_objects")
+_fda_blocked = False
+
+
+class FdaBotBlockError(RuntimeError):
+    """FDA rejected this run's requests with an Akamai apology page."""
+
+    def __init__(self) -> None:
+        super().__init__(FDA_BOT_BLOCK)
+
+
+def fda_checked_request(
+    send: Callable[..., requests.Response], url: str, **kwargs: Any,
+) -> requests.Response:
+    """Check FDA responses before parsing or HTTP retries, then stop further FDA requests."""
+    host = (urlparse(url).hostname or "").lower()
+    if host != "fda.gov" and not host.endswith(".fda.gov"):
+        return send(url, **kwargs)
+    if _fda_blocked:
+        raise FdaBotBlockError()
+
+    response = send(url, **kwargs)
+    final_url = str(getattr(response, "url", "") or "").lower().encode("utf-8")
+    body = getattr(response, "content", None)
+    if not isinstance(body, bytes):
+        body = str(getattr(response, "text", "") or "").encode("utf-8")
+    body = body.lower()
+    if any(marker in final_url or marker in body for marker in _FDA_BOT_BLOCK_MARKERS):
+        _record_fda_bot_block()
+        raise FdaBotBlockError()
+    return response
+
+
+def _record_fda_bot_block() -> None:
+    global _fda_blocked
+    _fda_blocked = True
+    message = f"{FDA_BOT_BLOCK} — 이후 FDA 요청 중단"
+    log("WARN", message)
+    for env_key, line in (
+        ("GITHUB_STEP_SUMMARY", f"- ⚠️ {message}"),
+        ("GITHUB_OUTPUT", "fda_bot_block=true"),
+    ):
+        path = os.environ.get(env_key)
+        if path:
+            try:
+                with open(path, "a", encoding="utf-8") as output:
+                    output.write(line + "\n")
+            except OSError as exc:
+                log("WARN", f"{FDA_BOT_BLOCK}: {env_key} 기록 실패 ({type(exc).__name__})")
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        print(f"::warning::{message}", flush=True)
 
 
 def env_flag(name: str, default: bool = False) -> bool:
@@ -168,7 +222,7 @@ def kr_egress_get(url: str, **kwargs: Any) -> requests.Response:
     if proxies and kr_proxy_circuit_open():
         return requests.get(url, proxies=None, **kwargs)
     try:
-        resp = requests.get(url, proxies=proxies, **kwargs)
+        resp = fda_checked_request(requests.get, url, proxies=proxies, **kwargs)
     except requests.RequestException as e:
         proxy = (proxies or {}).get("https") or (proxies or {}).get("http") or ""
         if not proxy or not _is_proxy_hop_failure(e, proxy):

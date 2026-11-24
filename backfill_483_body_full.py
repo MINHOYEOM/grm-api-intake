@@ -39,7 +39,7 @@ import findings_supabase_append as fsa
 import findings_supabase_backfill as fsb
 import raw_versioning as rv
 import backfill_483_inspectors_from_body as inspectors_from_body
-from grm_common import SOURCE_FDA_483, body_shrunk, log
+from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_483, body_shrunk, log
 
 BODY_KEY = "fda483_body_full"
 INSPECTORS_KEY = "fda483_inspectors"
@@ -208,6 +208,10 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
                 rep.pdf_failed += 1
                 rep.errors.append(f"pdf({doc}):{type(exc).__name__}")
                 continue
+            if status == FDA_BOT_BLOCK:
+                rep.pdf_failed += 1
+                rep.errors.append(f"pdf({doc}):{FDA_BOT_BLOCK}")
+                break
             if not body:
                 if status == "no-observations":
                     rep.pdf_no_observations += 1

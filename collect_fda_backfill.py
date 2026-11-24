@@ -428,7 +428,6 @@ def run_483(
         elif isinstance(total, (int, float)) and offset + len(raw_rows) >= total:
             report.exhausted = True
 
-    observations_enabled = fda483._observations_enabled()
     deep_enabled = fda483._deep_enabled()
     to_post: list[dict[str, Any]] = []
     for nrow in nrows:
@@ -467,15 +466,14 @@ def run_483(
                 "firm_name": nrow.get("company", ""),
             }
             obs_seen: list[str] = []
-            parsed = (
+            observations = (
                 fda483._extract_483_observations_from_text(text, header_hints, seen=obs_seen)
-                if text and (observations_enabled or deep_enabled) else []
+                if text else []
             )
-            observations = parsed if observations_enabled else []
             observation_count = (
                 fda483.fda483_observation_count(observations, obs_seen) if observations else "same"
             )
-            body_full = text if deep_enabled and parsed else ""
+            body_full = text if deep_enabled and observations else ""
             # [실사관 배선 2026-07-31] 일일 수집기(collect_fda_483.collect_fda_483)와 동일한
             # 위치·조건으로 맞춘다 -- ENABLE_FDA_483_OBSERVATIONS/ENABLE_FDA_483_DEEP 과
             # 무관하게 항상 수행하는 순수 결정론 파서다(네트워크 추가 요청 0 -- 위에서 이미
@@ -498,8 +496,8 @@ def run_483(
             report.skipped_ocr_unavailable += 1
             continue
 
-        # Same construction function the daily collector calls -- guarantees identical
-        # IntakeItem (headline/body/raw_payload/document_id/signal_tier/etc.) for this row.
+        # Share the daily collector's item builder while preserving backfill observations
+        # regardless of the daily observation flag.
         # [결손 사유 전파 2026-07-20] `text_status` 도 넘긴다 — 일일 수집 경로와 raw_payload
         # 가 **바이트 동일**해야 하는 계약(Fda483IdentityTest)이라, 한쪽만 사유를 실으면 깨진다.
         # [실사관 배선 2026-07-31] `inspectors` 도 넘긴다 — 안 넘기면 이 경로로 들어오는 483

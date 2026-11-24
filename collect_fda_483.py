@@ -3619,6 +3619,7 @@ def collect_fda_483(
     known = skip_document_ids or set()
     skipped_known = 0
     skipped_excluded = 0
+    body_error = None
     for nrow in in_window:
         media_id = nrow["media_id"]
         if not media_id or media_id in seen:
@@ -3670,7 +3671,7 @@ def collect_fda_483(
         # ★ `capped` 로 루프를 빠져나가지 않는다 — 종전 `and not capped` 는 상한 도달 후
         #   첫 문서에서만 분기를 평가해 **몇 건이 통째로 빠졌는지 셀 수 없었다**. 이제 전건을
         #   지나가며 미시도 수를 센다(작업은 여전히 상한까지만 — 비용 불변).
-        if pdf_url:
+        if pdf_url and not body_error:
             in_scope_attempted = (excerpt_health["attempted"]
                                   - excerpt_health["dropped_out_of_scope"])
             burst = burst_granted and _burst_active()
@@ -3695,8 +3696,7 @@ def collect_fda_483(
                 # 이 text 에서 앵커 뒤 1500자만 다시 잘라 산출물 불변.
                 text, status = _fetch_fda483_pdf_text(pdf_url)
                 if status == FDA_BOT_BLOCK:
-                    LAST_HEALTH["status"] = FDA_BOT_BLOCK
-                    return [], FDA_BOT_BLOCK
+                    body_error = FDA_BOT_BLOCK
                 fetched = True
                 text_status = status if not text else "ok"
                 # [실사관 추출 2026-07-30] 반드시 **청소 이전** 원시 text 에서 추출한다 —
@@ -3787,6 +3787,8 @@ def collect_fda_483(
         "fda483_skipped_known": skipped_known,
         "fda483_skipped_excluded": skipped_excluded,   # 제외 장부(같은 규칙 버전)로 건너뛴 수
     }
+    if body_error:
+        LAST_HEALTH["status"] = body_error
     # [침묵 금지 2026-07-30] 엔진 부재는 문서 사정이 아니라 **환경 사정**이다 — 고치면
     # 되찾을 수 있는 결손이므로 건수와 사유를 로그에 올리고, health 경보로도 승격시킨다
     # (grm_health.fda483-ocr-engine-missing). 종전에는 status 문자열만 raw 에 묻혔다.
@@ -3826,4 +3828,4 @@ def collect_fda_483(
                 f"· inspectors attempted={inspectors_health['attempted']} "
                 f"extracted={inspectors_health['extracted']} "
                 f"failed={inspectors_health['failed']}")
-    return items, None
+    return items, body_error

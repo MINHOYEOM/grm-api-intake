@@ -1,4 +1,4 @@
-"""Check explicit client-role EXECUTE revocations in checked-in SQL."""
+"""Check client-role and PUBLIC EXECUTE revocations in checked-in SQL."""
 
 import re
 import unittest
@@ -103,9 +103,10 @@ KNOWN_MISSING_REVOKES = {
     ("public.findings_inspector_key(text)", "037_findings_inspector_profile.sql"),
 }
 KNOWN_VIOLATIONS = {
-    (signature, role, filename, "missing explicit REVOKE")
+    (signature, role, filename, reason)
     for signature, filename in KNOWN_MISSING_REVOKES
     for role in CLIENT_ROLES
+    for reason in ("missing explicit REVOKE", "default EXECUTE for PUBLIC")
 } | {
     # 092 renamed the old implementation and retained its 079 client grants.
     ("public.findings_similar_to_compute(text, integer)", role, "079_findings_similar_perf.sql", "granted EXECUTE")
@@ -208,7 +209,8 @@ class Function:
     created_in: str
     definer: bool = False
     internal: bool = False
-    # Missing entries mean no explicit revoke since creation. ALTER and REPLACE retain ACLs.
+    # Missing entries retain the creation defaults. None records an explicit revoke.
+    # ALTER and REPLACE retain ACLs.
     acl: dict = field(default_factory=dict)
 
 
@@ -290,12 +292,36 @@ def _violations(migrations):
             if (source := function.acl.get(role, function.created_in)) is not None:
                 reason = "granted EXECUTE" if role in function.acl else "missing explicit REVOKE"
                 violations.add((signature, role, source, reason))
-            if public_grant := function.acl.get("public"):
-                violations.add((signature, role, public_grant, "granted EXECUTE to PUBLIC"))
+            if (public_grant := function.acl.get("public", function.created_in)) is not None:
+                reason = "granted EXECUTE to PUBLIC" if "public" in function.acl else "default EXECUTE for PUBLIC"
+                violations.add((signature, role, public_grant, reason))
     return violations
 
 
 class MigrationFunctionGrantsTest(unittest.TestCase):
+    def test_public_execute_requires_its_own_revoke(self):
+        signature = "public.internal_example()"
+        migrations = [
+            ("001.sql", """
+                CREATE FUNCTION public.internal_example() RETURNS integer
+                    LANGUAGE sql AS $$ SELECT 1 $$;
+                REVOKE EXECUTE ON FUNCTION public.internal_example() FROM anon, authenticated;
+            """),
+        ]
+        self.assertEqual(
+            _violations(migrations),
+            {(signature, role, "001.sql", "default EXECUTE for PUBLIC") for role in CLIENT_ROLES},
+        )
+
+        migrations.append(("002.sql", "REVOKE EXECUTE ON FUNCTION public.internal_example() FROM PUBLIC;"))
+        self.assertEqual(_violations(migrations), set())
+
+        migrations.append(("003.sql", "GRANT EXECUTE ON FUNCTION public.internal_example() TO PUBLIC;"))
+        self.assertEqual(
+            _violations(migrations),
+            {(signature, role, "003.sql", "granted EXECUTE to PUBLIC") for role in CLIENT_ROLES},
+        )
+
     def test_migration_functions_revoke_client_execute(self):
         supabase = sorted((ROOT / "supabase/migrations").glob("*.sql"))
         web = sorted(

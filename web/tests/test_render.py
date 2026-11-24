@@ -10043,6 +10043,13 @@ class WebGuideEnTest(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
 
 
+class WebGlossaryTermCountTest(unittest.TestCase):
+    def test_glossary_keeps_at_least_257_terms(self):
+        # 기존 용어 수를 하한으로 고정해 주간 증설 때는 갱신할 필요가 없다.
+        terms = render.load_glossary() or []
+        self.assertGreaterEqual(len(terms), 257, "용어사전 정본의 용어 수가 줄었다")
+
+
 class WebGlossaryRenderTest(unittest.TestCase):
     """[용어사전 트랙 C 2차] /glossary/ — glossary.json(정본)을 초성 색인 1페이지로
     결정론 렌더. 값(term_ko/term_en/easy_ko/출처) 무변형, 파생은 초성 버킷·related 라벨뿐.
@@ -10110,23 +10117,7 @@ class WebGlossaryRenderTest(unittest.TestCase):
         self.assertEqual(buckets, sorted(expected_present, key=lambda b: (order.get(b, 99), b)))
         self.assertEqual(self.html.count('<section class="gl-group"'), len(buckets))
         self.assertEqual(view["total"], len(self.terms))
-        # 총 어휘 수 가드(교체 정합 — 9차 자율 런 G1). 용어를 **교체**할 때 실수로
-        # 개수가 줄어드는 것을 잡는 장치라, 의도적 증설 때는 실측치로 갱신한다.
-        # 200(v3) → 226: 2026-08-04 트랙③ 미국 FDA 법문 표현 중심 26어 추가.
-        # 226 → 242: 2026-09-02 코퍼스(findings_docs.json) 최빈 미수록 표현 16어 추가
-        # (sanitation·master-production-record·ongoing-stability-programme·job-description·
-        # mix-up·training·certificate-of-analysis·returned-product·pressure-differential·
-        # sporicidal-agent·time-limits-on-production·yield·reconciliation·equipment-use-log·
-        # distribution-record·pest-control).
-        # 242 → 243: 2026-09-29 주간 용어 추가 202640(summary-of-product-characteristics).
-        # 243 → 245: 2026-10-06 주간 용어 추가 202641(adulterated-drug·package-leaflet).
-        # 245 → 246: 2026-10-27 주간 용어 추가 202644(advanced-therapy-medicinal-product).
-        # 246 → 247: 2026-11-02 주간 용어 추가 202645(colony-forming-unit).
-        # 247 → 248: 2026-11-10 주간 용어 추가 202646(recall-classification).
-        # 248 → 254: 2026-11-16 네이버 검색 수요 용어 6개(MES·HVAC·FMEA·CTD·DMF·LIMS).
-        # 254 → 255: 2026-11-16 QMS 를 PQS 별칭에서 떼어 별도 용어(quality-management-system)로.
-        # 255 → 256: 2026-11-17 import-alert(수입경보) 추가.
-        self.assertEqual(len(self.terms), 257)
+        self.assertIn(f'id="grm-gl-count" data-total="{len(self.terms)}"', self.html)
 
     def test_source_url_renders_source_as_link(self):
         # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).

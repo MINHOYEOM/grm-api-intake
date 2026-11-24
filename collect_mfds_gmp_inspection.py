@@ -238,7 +238,7 @@ class _AttachmentParse:
     error: str = ""
     # [상세보기 결정론 승격 2026-07-02] periodic PDF 지적 표 구조 추출 결과 + 관측 상태.
     deficiencies: list[dict[str, str]] = field(default_factory=list)
-    deficiency_table_status: str = ""  # extracted|empty|gate-degraded|parse-fail|skipped-type
+    deficiency_table_status: str = ""  # extracted|empty|unreadable|gate-degraded|parse-fail|skipped-type
 
 
 class _InspectionTableParser(HTMLParser):
@@ -895,8 +895,8 @@ def _parse_deficiency_table(
 ) -> tuple[list[dict[str, str]], str]:
     """지적 표 추출 오케스트레이션(플래그·유형분기·품질게이트). 반환 (rows, status).
 
-    플래그 off·비PDF·본문없음 → ("", "") 로 완전 무영향(현행 플로우 불변). periodic PDF 만
-    시도하고, 추출 실패·유형 unknown·플래그 off = 조용히 요약카드 유지(degrade 우선).
+    플래그 off·미지원 포맷·본문 없음은 ([], "")를 반환한다. 사전평가를 제외한
+    PDF/HWPX에서 추출을 시도하고, 0행이면 본문 판정에 따라 상태를 기록한다.
     """
     if not (_deficiency_table_enabled() and text
             and file_format in _DEFICIENCY_TABLE_FORMATS):
@@ -933,15 +933,11 @@ def _parse_deficiency_table(
     if deficiency == "present":
         log("WARN", "MFDS GMP 지적 표 0행(지적사항 present) — 요약카드 유지: " f"{doc_id}")
         return [], "gate-degraded"
-    # ★[침묵 사각지대 가드 2026-08-25] assess=`unknown` + 표 0행은 "표가 없는 게 정상"이
-    # 아니라 **판정 불능과 추출 실패가 겹친** 상태다 — 원문에 표가 실재하는데 파서가 0행을
-    # 낸 문서(실측: 서울대병원)가 여태 소리 없이 empty 로 흘렀다(WARN 은 present 조합만).
-    # status 는 "empty" 그대로 둔다: raw_payload 값·health 카운터(attempted/failed) 등
-    # 기존 산출물 byte 불변이 목표고, 이 가드는 WARN 로그와 health 관측 항목만 더한다
-    # (관측은 _tally_deficiency_table_health 가 raw_payload 의 같은 조합으로 기록).
     if deficiency == "unknown":
-        log("WARN", "MFDS GMP 지적 표 0행(지적사항 unknown) — 판정 불능이라 표 실재 시 "
-                    f"유실일 수 있음: {doc_id}")
+        # 점검 보고서 9-3절의 11-20 건은 원문 대조가 필요하다.
+        # 0행만으로는 표의 존재나 지적 내용을 확정할 수 없다.
+        log("WARN", f"MFDS GMP 결함표 판독 불명 — 원문 대조 필요: {doc_id}")
+        return [], "unreadable"
     return [], "empty"  # '지적사항 없음' 정상(적합 배지) — 표 없음이 맞음
 
 
@@ -1009,7 +1005,9 @@ def _set_last_health(
 def _body(raw: dict[str, str], attachment: _AttachmentParse,
           manual_review: bool = False) -> str:
     parts = []
-    if manual_review:
+    if attachment.deficiency_table_status == "unreadable":
+        parts.append("⚠️ 결함표 판독 불명 — 원문 대조 필요")
+    elif manual_review:
         parts.append("⚠️ 첨부 자동판독 불가 — 지적사항 유무 수동 확인 필요 "
                      f"(상태: {attachment.status}). 아래 다운로드 링크에서 직접 확인할 것.")
     parts += [
@@ -1073,8 +1071,8 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
     # P0 개선: 첨부를 자동판독하지 못해 지적사항 유무를 확정 못한 경우(주로 구형 .hwp/OLE,
     # 다운로드 실패, 스캔본 등)에는 침묵 강등되지 않도록 '수동확인 필요' 플래그를 남긴다.
     # 무차별 Tier 3 승격은 노이즈가 크므로 Tier 2는 유지하되, Routine이 사람 확인을 큐잉하도록 표시.
-    manual_review = attachment.deficiency == "unknown" and attachment.status not in (
-        "pdf-ok", "hwpx-ok",
+    manual_review = attachment.deficiency_table_status == "unreadable" or (
+        attachment.deficiency == "unknown" and attachment.status not in ("pdf-ok", "hwpx-ok")
     )
 
     raw_payload: dict[str, Any] = {
@@ -1126,7 +1124,7 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
 def _tally_deficiency_table_health(health: dict[str, Any], item: IntakeItem) -> None:
     """수집 항목 1건의 지적 표 관측 상태를 health 누적기에 반영(결정론·부작용 없음)."""
     status = str(item.raw_payload.get("gmp_deficiency_table_status") or "")
-    if status not in ("extracted", "empty", "gate-degraded", "parse-fail"):
+    if status not in ("extracted", "empty", "unreadable", "gate-degraded", "parse-fail"):
         return  # 플래그 off / 비PDF / skipped-type 은 attempted 로 세지 않음
     health["attempted"] += 1
     if status == "extracted":
@@ -1134,11 +1132,11 @@ def _tally_deficiency_table_health(health: dict[str, Any], item: IntakeItem) -> 
     elif status in ("gate-degraded", "parse-fail"):
         health["failed"] += 1
         health["warnings"].append(f"{status}: {item.firm}")
+    elif status == "unreadable":
+        health["warnings"].append(f"{status}: {item.firm}")
     elif status == "empty" and str(
             item.raw_payload.get("attachment_deficiency_assessment") or "") == "unknown":
-        # ★[침묵 사각지대 가드 2026-08-25] empty + assess=unknown 조합의 health 관측.
-        # 카운터(attempted/extracted/failed)는 종전 그대로 — 실패 단정이 아니라 "표가
-        # 실재하면 유실일 수 있는" 후보의 가시화라, warnings 항목만 더한다.
+        # 이전 수집 결과의 판독 불명 표기.
         health["warnings"].append(f"empty-unknown: {item.firm}")
 
 

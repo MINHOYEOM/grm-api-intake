@@ -2,7 +2,9 @@
 
 from pathlib import Path
 import re
+from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 
 WORKFLOWS = Path(__file__).resolve().parents[1] / ".github" / "workflows"
@@ -29,8 +31,8 @@ BOOL_COMPARISON = re.compile(
 ENV = r"(?<![\w.])env(?:\.[\w-]+|\[\s*'[\w-]+'\s*\])"
 ENV_GATE = re.compile(rf"{ENV}\s*==\s*'true'|'true'\s*==\s*{ENV}", re.I)
 SECRET = re.compile(r"(?<![\w.])secrets\s*[.\[]", re.I)
-ECHO_COMMAND = re.compile(
-    r"^\s*(?:(?:then|do|else)\s+|[({]\s*)?(?:command\s+|builtin\s+)?echo(?=\s|$)",
+OUTPUT_COMMAND = re.compile(
+    r"^\s*(?:(?:then|do|else)\s+|[({]\s*)?(?:command\s+|builtin\s+)?(echo|printf)(?=\s|$)",
     re.I,
 )
 SHELL_SEGMENT = re.compile(r"""(?:\\.|"(?:\\.|[^"\\])*"|'[^']*'|[^"'\\;&|])+""")
@@ -162,21 +164,23 @@ def _lint(source):
                 for segment in SHELL_SEGMENT.finditer(masked):
                     comment = next((m for m in YAML_COMMENT.finditer(segment[0]) if not m[1]), None)
                     end = segment.start() + comment.start() if comment else segment.end()
-                    if not ECHO_COMMAND.match(segment[0]):
+                    output_command = OUTPUT_COMMAND.match(segment[0])
+                    if not output_command:
                         if comment:
                             break
                         continue
                     for match in EXPRESSION.finditer(script, segment.start(), end):
                         expression = re.sub(QUOTED, "''", match[1])
                         if SECRET.search(expression):
-                            yield command[script.count("\n", 0, match.start())][0], "echo-secret"
+                            number = command[script.count("\n", 0, match.start())][0]
+                            yield number, f"{output_command[1].lower()}-secret"
                     if comment:
                         break
 
 
 class WorkflowLintTest(unittest.TestCase):
     def test_repository_workflows(self):
-        paths = sorted(WORKFLOWS.glob("*.yml"))
+        paths = sorted((*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")))
         self.assertTrue(paths, f"워크플로 없음 ({WORKFLOWS})")
         failures = []
         used_exceptions = set()
@@ -243,7 +247,7 @@ jobs:
             with self.subTest(expression=expression):
                 self.assertEqual(list(_lint(workflow + expression)), [])
 
-    def test_secret_echo_mutations(self):
+    def test_secret_output_mutations(self):
         workflow = """\
 steps:
   - env:
@@ -259,7 +263,21 @@ steps:
       echo \\
         "${{ secrets['TOKEN'] }}"
 """
-        self.assertEqual(list(_lint(workflow)), [(11, "echo-secret"), (13, "echo-secret")])
+        self.assertEqual(
+            list(_lint(workflow)),
+            [(8, "printf-secret"), (11, "echo-secret"), (13, "echo-secret")],
+        )
+
+    def test_repository_workflows_includes_yaml(self):
+        with TemporaryDirectory(dir=WORKFLOWS.parents[1]) as directory:
+            workflows = Path(directory)
+            (workflows / "valid.yml").write_text("run: echo ok\n", encoding="utf-8")
+            (workflows / "invalid.yaml").write_text(
+                "run: echo ${{ 1 + 2 }}\n", encoding="utf-8"
+            )
+            with patch(__name__ + ".WORKFLOWS", workflows):
+                with self.assertRaisesRegex(AssertionError, r"invalid\.yaml:1 \[arithmetic\]"):
+                    self.test_repository_workflows()
 
     def test_env_gate_is_warning(self):
         self.assertEqual(

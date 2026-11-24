@@ -51,6 +51,7 @@ REGION_MFDS = "Korea (MFDS)"
 
 PAGE_SIZE = 100
 MAX_PAGES = 20
+TOTAL_COUNT_WARNING_THRESHOLD = 1_500
 
 # [백필 관측 2026-08-05] recall 과 동형 — 페이지 실패는 1건이라도 수집했으면
 # `(items, None)` 으로 조용히 부분 성공한다. 반환값 규약(매일 라인)은 그대로 두고
@@ -68,9 +69,18 @@ def _set_last_health(
     page_warnings: list[str],
 ) -> None:
     global LAST_HEALTH
+    total_count_warning = ""
+    if total_count > TOTAL_COUNT_WARNING_THRESHOLD:
+        total_count_warning = (
+            f"[GRM 문제] 식약처 행정처분 원천 총건수 {total_count:,}건 "
+            f"— 경보 기준 {TOTAL_COUNT_WARNING_THRESHOLD:,}건 초과 "
+            f"(수집 상한 {MAX_PAGES * PAGE_SIZE:,}건)"
+        )
+        log("WARN", total_count_warning)
     LAST_HEALTH = {
         "collected": collected,
         "total_count": total_count,
+        "total_count_warning": total_count_warning,
         "pages_seen": pages_seen,
         "truncated": truncated,
         "filtered": filtered,

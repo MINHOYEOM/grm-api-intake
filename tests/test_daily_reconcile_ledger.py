@@ -73,6 +73,22 @@ class DailyReconcileLedgerTest(unittest.TestCase):
                 self.assertEqual(row["measurement_status"], "unavailable")
                 self.assertIsNone(row["difference"])
 
+    def test_none_health_marks_only_that_source_unavailable(self):
+        admin, recall = build_daily_rows(
+            DAY,
+            {"mfds_admin": None, "mfds_recall": _health(5)},
+            {"mfds_admin": 3, "mfds_recall": 7},
+        )
+
+        self.assertEqual(admin, {
+            "day": "2026-11-25", "source": "mfds_admin", "source_total": None,
+            "db_count": 3, "difference": None, "measurement_status": "unavailable",
+            "pages_seen": None, "truncated": None, "page_warning_count": None,
+        })
+        self.assertEqual(recall["source"], "mfds_recall")
+        self.assertEqual(recall["measurement_status"], "measured")
+        self.assertEqual(recall["difference"], -2)
+
     def test_partial_collection_is_visible_even_if_counts_match_when_truncated(self):
         self._assert_partial_collection_is_visible_even_if_counts_match({"truncated": True}, 0)
 

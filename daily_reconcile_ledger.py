@@ -18,19 +18,22 @@ def _count(value: object) -> int | None:
 
 def build_daily_rows(
     day: date,
-    source_health: Mapping[str, Mapping[str, object]],
+    source_health: Mapping[str, Mapping[str, object] | None],
     db_counts: Mapping[str, int | None],
 ) -> list[dict[str, str | int | bool | None]]:
     """날짜와 소스당 한 행을 반환한다.
 
-    호출자는 해당 날짜의 수집기 LAST_HEALTH를 전달한다. total_count는 날짜·
+    호출자는 해당 날짜의 수집기 LAST_HEALTH를 전달한다. 수집 상태가 없으면
+    해당 소스 키를 생략하거나 None을 전달한다. total_count는 날짜·
     관련성 필터 전의 API 목록 총수다. DB 건수는 같은 목록 범위와 단위로 집계한
     값만 전달하고, 그런 집계가 없으면 키를 생략하거나 None을 전달한다.
     건수 차이는 원천 총수 - DB 건수이며 문서별 누락이나 완전성은 여기서 판정하지 않는다.
     """
     rows: list[dict[str, str | int | bool | None]] = []
     for source in SUPPORTED_SOURCES:
-        health = source_health.get(source, {})
+        health = source_health.get(source)
+        if health is None:
+            health = {}
         source_total = _count(health.get("total_count"))
         pages_seen = _count(health.get("pages_seen"))
         truncated = health.get("truncated")

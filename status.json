@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24T02:23:37Z",
+ "generated_at": "2026-11-24T02:32:27Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45312664569,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-24T02:28:44Z",
+    "updatedAt": "2026-11-24T02:28:48Z",
+    "headBranch": "feat/wl-violations-followup-1124",
+    "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45312664569"
+   },
+   {
+    "databaseId": 45312137797,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-24T02:24:28Z",
+    "updatedAt": "2026-11-24T02:32:10Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1885 from MINHOYEOM/claude/glossary-weekly-202648",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45312137797"
+   },
+   {
     "databaseId": 45311020302,
     "status": "completed",
     "conclusion": "success",
@@ -260,28 +282,6 @@
     "headBranch": "feat/wl-violations-followup-1124",
     "displayTitle": "fix(wl): 본문 앞 결손 원인 수리 + 재수집 도구 가드 + 지원 형식 F5·F6 + heading 카드 전달",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45308624451"
-   },
-   {
-    "databaseId": 45306022712,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-24T01:34:23Z",
-    "updatedAt": "2026-11-24T01:41:52Z",
-    "headBranch": "feat/admin-intake-status",
-    "displayTitle": "feat(admin): 발행·운영 탭 '수집 현황' — 26시간 지연 표시 + 소스별 건수",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45306022712"
-   },
-   {
-    "databaseId": 45305987932,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T01:34:06Z",
-    "updatedAt": "2026-11-24T01:42:01Z",
-    "headBranch": "feat/admin-intake-status",
-    "displayTitle": "feat(admin): 발행·운영 탭 '수집 현황' — 마지막 수집 26시간 초과 지연 표시 + 소스별 건수",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45305987932"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45313106477,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-24T02:32:14Z",
+    "updatedAt": "2026-11-24T02:32:15Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45313106477"
+   },
+   {
     "databaseId": 45312005136,
     "status": "completed",
     "conclusion": "skipped",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45212792019"
-   },
-   {
-    "databaseId": 45137954144,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-23T08:21:24Z",
-    "updatedAt": "2026-11-23T08:21:25Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45137954144"
    }
   ],
   "grm-findings-translate-apply.yml": [
@@ -628,6 +628,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 45312094446,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-24T02:24:08Z",
+    "updatedAt": "2026-11-24T02:24:41Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45312094446"
+   },
+   {
     "databaseId": 45296467831,
     "status": "completed",
     "conclusion": "success",
@@ -670,17 +681,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45063667718"
-   },
-   {
-    "databaseId": 44998246302,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-22T07:26:31Z",
-    "updatedAt": "2026-11-22T07:26:57Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44998246302"
    }
   ],
   "grm-cloud-request.yml": [

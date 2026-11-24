@@ -211,9 +211,10 @@ def starts_after_cut_head(body: str) -> bool:
 
     [2026-11-24] 본문 시작 앵커 'specifically,' 가 회신 부적절 단락에서 처음 걸리는 서한(임상시험자·GLP·허위광고 등)은
     대문자로 시작해 `starts_mid_sentence` 에 안 걸렸지만 위반 서술을 통째로 잃었다(저장 88행). 수집기의 판정
-    (`collect_intake._WL_BODY_HEAD_TRUNCATED_RE` → 사유 `body_head_truncated`)과 같은 정규식(한 곳)이다."""
-    import collect_intake as ci
-    return bool(ci._WL_BODY_HEAD_TRUNCATED_RE.match(str(body or "")))
+    (`collect_intake._WL_BODY_HEAD_TRUNCATED_RE` → 사유 `body_head_truncated`)의 부분집합(각주 머리 제외)이다."""
+    # 각주 머리('1 As described …')는 서한 자체가 그렇게 시작하는 경우가 있어(실측 80행) 후보에서 뺀다 — 다시 받아도 같다.
+    # 그래도 위반항목을 못 뽑아 `body_head_truncated` 사유가 붙은 행은 is_body_start_candidate 가 사유로 잡는다.
+    return bool(re.match(r"\s*(?:Specifically,|Conclusion\b)", str(body or "")))
 
 
 def is_body_start_candidate(raw: dict[str, Any], *, explicit: bool = False) -> bool:

@@ -112,6 +112,16 @@ class RecollectTest(unittest.TestCase):
         report, _c, _u = self._run([ok, other], self._fetch(_CI_LETTER), dry_run=True)
         self.assertEqual(report.candidates, 1)
 
+    def test_candidate_rule_covers_specifically_conclusion_and_marked_rows_but_not_footnote_starts(self):
+        c = rec.is_body_start_candidate
+        raw = lambda b, **k: {"wl_body_full": b, **k}                       # noqa: E731
+        self.assertTrue(c(raw("Specifically, x.")))
+        self.assertTrue(c(raw("Conclusion The violations cited")))
+        self.assertTrue(c(raw("violation of section 505(a).")))               # 소문자 시작(10-28 수리분)
+        self.assertTrue(c(raw("1 As described below, x", wl_violations_status="body_head_truncated")))
+        self.assertFalse(c(raw("1 As described below, x")))                   # 서한 자체가 각주로 시작 — 다시 받아도 같다
+        self.assertFalse(c(raw("During our inspection, x")))
+
     def test_recollect_writes_longer_body_and_reports_old_to_new_length(self):
         row = _row("d1", OLD_HEAD)
         report, code, upsert = self._run([row], self._fetch(_CI_LETTER))

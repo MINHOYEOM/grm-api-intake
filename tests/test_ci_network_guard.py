@@ -4,10 +4,12 @@ import sys
 import unittest
 import urllib.request
 from contextlib import redirect_stderr, redirect_stdout
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import requests
 
+import ci_network_guard
 import ci_shard
 from ci_network_guard import ExternalNetworkBlocked, NetworkGuard
 
@@ -30,6 +32,23 @@ class NetworkGuardTest(unittest.TestCase):
                 socket.create_connection((host, 5432))
             self.assertEqual(connect.call_count, 4)
 
+    def test_sendmsg_blocks_external_destination_before_transport(self):
+        sock = SimpleNamespace(family=socket.AF_INET)
+        guard = NetworkGuard()
+        buffers = [b"test"]
+        with (
+            patch.object(socket.socket, "sendmsg", create=True) as sendmsg,
+            guard.installed(),
+        ):
+            with self.assertRaisesRegex(ExternalNetworkBlocked, r"socket\.sendmsg"):
+                socket.socket.sendmsg(sock, buffers, [], 0, (HOST, 443))
+            with self.assertRaisesRegex(ExternalNetworkBlocked, r"socket\.sendmsg"):
+                socket.socket.sendmsg(sock, buffers, address=(HOST, 443))
+            sendmsg.assert_not_called()
+            socket.socket.sendmsg(sock, buffers, [], 0, ("127.0.0.1", 443))
+            socket.socket.sendmsg(sock, buffers)
+            self.assertEqual(sendmsg.call_count, 2)
+
     def test_http_clients_block_target_before_transport(self):
         with (
             patch.object(requests.adapters.HTTPAdapter, "send") as requests_transport,
@@ -41,6 +60,29 @@ class NetworkGuardTest(unittest.TestCase):
                     get(URL)
             requests_transport.assert_not_called()
             urllib_transport.assert_not_called()
+
+    def test_direct_unittest_fails_on_block_swallowed_during_discovery(self):
+        class PassingTest(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        def discover(*args, **kwargs):
+            try:
+                socket.create_connection((HOST, 443))
+            except ExternalNetworkBlocked:
+                pass
+            return unittest.TestSuite([PassingTest()])
+
+        stderr = io.StringIO()
+        with (
+            patch.object(socket, "create_connection") as transport,
+            patch.object(unittest.TestLoader, "discover", side_effect=discover),
+            redirect_stderr(stderr),
+        ):
+            self.assertEqual(ci_network_guard.main(["runner", "discover"]), 1)
+            transport.assert_not_called()
+        self.assertIn("Ran 1 test", stderr.getvalue())
+        self.assertIn(HOST, stderr.getvalue())
 
     def test_shard_fails_even_when_the_test_catches_the_block(self):
         class CatchesNetworkError(unittest.TestCase):

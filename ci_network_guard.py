@@ -3,6 +3,7 @@
 import ipaddress
 import socket
 import sys
+import unittest
 import urllib.request
 from contextlib import ExitStack, contextmanager
 from functools import wraps
@@ -79,6 +80,10 @@ class NetworkGuard:
                 if sock.family in (socket.AF_INET, socket.AF_INET6):
                     check_address(name, args[-1] if args else kwargs["address"])
 
+            def check_sendmsg(name, sock, buffers, ancdata=(), flags=0, address=None):
+                if sock.family in (socket.AF_INET, socket.AF_INET6):
+                    check_address(name, address)
+
             def check_lookup(name, host, *args, **kwargs):
                 if host != "" and host != b"":
                     self._check(host, f"socket.{name}")
@@ -93,8 +98,31 @@ class NetworkGuard:
             intercept(socket, "create_connection", check_address)
             for name in ("connect", "connect_ex", "sendto"):
                 intercept(socket.socket, name, check_socket)
+            if hasattr(socket.socket, "sendmsg"):
+                intercept(socket.socket, "sendmsg", check_sendmsg)
             for name in ("getaddrinfo", "gethostbyname", "gethostbyname_ex"):
                 intercept(socket, name, check_lookup)
             intercept(requests.Session, "send", check_requests)
             intercept(urllib.request.OpenerDirector, "open", check_urllib)
             yield self
+
+
+def run_guarded(run):
+    guard = NetworkGuard()
+    with guard.installed():
+        status = run(guard)
+    for violation in guard.violations:
+        print(violation, file=sys.stderr)
+    return 1 if guard.violations else status
+
+
+def main(argv=None):
+    def run(_guard):
+        program = unittest.main(module=None, argv=argv, exit=False)
+        return 0 if program.result.wasSuccessful() else 1
+
+    return run_guarded(run)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

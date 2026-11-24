@@ -42,6 +42,28 @@ def workflow_name(name: str) -> str:
     return m.group(1).strip().strip("'\"") if m else ""
 
 
+def entry_scripts(name: str) -> set[str]:
+    """워크플로가 `python X.py` / `python -m X` 로 실행하는 루트 모듈."""
+    found = set(re.findall(r"python3?\s+(?:-m\s+)?([A-Za-z_]\w*)(?:\.py)?\b", _read(name)))
+    return {m for m in found if os.path.exists(os.path.join(ROOT, m + ".py"))}
+
+
+def direct_imports(mod: str) -> set[str]:
+    with open(os.path.join(ROOT, mod + ".py"), encoding="utf-8") as fh:
+        text = fh.read()
+    out: set[str] = set()
+    for a, b in re.findall(r"^\s*(?:from\s+(\w+)\s+import|import\s+([\w, ]+))", text, re.M):
+        for n in (a or b).split(","):
+            out.add(n.strip().split(" ")[0])
+    return out
+
+
+def hits_fda(name: str) -> bool:
+    """진입 스크립트가 FDA 요청 모듈이거나 그것을 직접 import 하면 FDA 계열."""
+    fetch = set(sc.FDA_FETCH_MODULES)
+    return any(m in fetch or direct_imports(m) & fetch for m in entry_scripts(name))
+
+
 def run(event: str, created: datetime, status: str = "completed", conclusion: str = "success",
         actor: str = "someone") -> dict:
     return {"event": event, "created_at": created.strftime("%Y-%m-%dT%H:%M:%SZ"), "status": status,
@@ -92,13 +114,34 @@ class TargetsMatchWorkflows(unittest.TestCase):
         self.assertIn(workflow_name("grm-ci.yml"), listed)
         self.assertTrue(workflow_crons("grm-schedule-catchup.yml"))
 
+    def test_fda_host_flag_matches_workflow_code(self):
+        for t in sc.TARGETS:
+            with self.subTest(t.workflow):
+                self.assertEqual(t.fda_host, hits_fda(t.workflow),
+                                 f"fda_host 분류가 워크플로 코드와 다르다(진입 스크립트 {sorted(entry_scripts(t.workflow))})")
+
+    def test_fda_fetch_modules_really_call_www_fda_gov(self):
+        for m in sc.FDA_FETCH_MODULES:
+            with open(os.path.join(ROOT, m + ".py"), encoding="utf-8") as fh:
+                self.assertIn("www.fda.gov", fh.read(), m)
+
+    def test_known_fda_families(self):
+        fda = {t.workflow for t in sc.TARGETS if t.fda_host}
+        self.assertEqual(fda, {"grm-intake.yml", "grm-fda483-body-full-backfill.yml", "grm-fda483-ocr-recovery.yml"})
+
+    def test_intake_is_a_capped_target(self):
+        intake = next(t for t in sc.TARGETS if t.workflow == "grm-intake.yml")
+        self.assertEqual((intake.dispatch_cap, intake.inputs), (1, {}))
+        self.assertGreater(intake.cap_window_min, 0)
+        self.assertEqual(sc.TARGETS[0].workflow, "grm-intake.yml")   # FDA 계열 우선순위: 수집 먼저
+
     def test_catchup_itself_is_not_a_target(self):
         self.assertNotIn("grm-schedule-catchup.yml", {t.workflow for t in sc.TARGETS})
 
 
 class CronParse(unittest.TestCase):
     def test_lists_ranges_steps(self):
-        c = sc.Cron.parse("7,37 0-4 * * 1")
+        c = sc.Cron.parse("7,37 0-5 * * 1")
         self.assertTrue(c.matches(datetime(2026, 11, 23, 4, 37, tzinfo=UTC)))     # 월
         self.assertFalse(c.matches(datetime(2026, 11, 24, 4, 37, tzinfo=UTC)))    # 화
         s = sc.Cron.parse("41 */6 * * *")
@@ -236,6 +279,82 @@ class RunAll(unittest.TestCase):
         self.assertFalse(b[0].alerted)
         self.assertEqual(len(gh.alarms), 1)
         self.assertIn("grm-fda483-body-full-backfill.yml:2026-11-23T13:07Z", gh.alarms[0][0])
+
+
+INTAKE = next(t for t in sc.TARGETS if t.workflow == "grm-intake.yml")
+OCR = next(t for t in sc.TARGETS if t.workflow == "grm-fda483-ocr-recovery.yml")
+
+
+class IntakeCap(unittest.TestCase):
+    slot = datetime(2026, 11, 23, 18, 17, tzinfo=UTC)
+
+    def test_11_23_intake_gap_dispatches(self):
+        now = datetime(2026, 11, 23, 22, 30, tzinfo=UTC)      # 슬롯 + 4h13m, 실행 없음(실사고)
+        d = sc.decide(INTAKE, now, [run("schedule", datetime(2026, 11, 22, 23, 37, tzinfo=UTC))])
+        self.assertEqual((d.action, d.slot, d.inputs), ("dispatch", self.slot, {}))
+
+    def test_within_four_hours_waits_for_late_schedule(self):
+        d = sc.decide(INTAKE, self.slot + timedelta(hours=3, minutes=50), [])
+        self.assertNotEqual(d.action, "dispatch")
+
+    def test_manual_dispatch_within_12h_caps(self):
+        now = datetime(2026, 11, 23, 22, 30, tzinfo=UTC)
+        manual = run("workflow_dispatch", self.slot - timedelta(hours=2))     # 슬롯 전 사람 수동 실행
+        d = sc.decide(INTAKE, now, [manual])
+        self.assertEqual(d.action, "capped")
+
+    def test_old_manual_dispatch_does_not_cap(self):
+        now = datetime(2026, 11, 23, 22, 30, tzinfo=UTC)
+        d = sc.decide(INTAKE, now, [run("workflow_dispatch", now - timedelta(hours=13))])
+        self.assertEqual(d.action, "dispatch")
+
+    def test_sunday_monday_slots(self):
+        now = datetime(2026, 11, 29, 20, 30, tzinfo=UTC)      # 일 16:19Z 슬롯 + 4h11m
+        d = sc.decide(INTAKE, now, [])
+        self.assertEqual((d.action, d.slot), ("dispatch", datetime(2026, 11, 29, 16, 19, tzinfo=UTC)))
+
+
+class FdaGate(unittest.TestCase):
+    now = datetime(2026, 11, 24, 3, 30, tzinfo=UTC)
+
+    def _gh(self, extra=None):
+        gh = FakeGH(runs=extra or [])
+        return gh
+
+    def test_only_one_fda_dispatch_per_tick(self):
+        gh = self._gh()
+        ds = sc.run_all(gh, self.now, ref="main", dry_run=False, targets=[BODY, OCR, INTAKE],
+                        sleeper=lambda s: None, log=lambda m: None)
+        acts = {d.workflow: d.action for d in ds}
+        self.assertEqual(len(gh.dispatched), 1)
+        self.assertEqual(list(acts.values()).count("dispatch"), 1)
+        self.assertGreaterEqual(list(acts.values()).count("deferred"), 1)
+
+    def test_priority_follows_targets_order(self):
+        planned = [(t, sc.Decision(t.workflow, "dispatch")) for t in (INTAKE, BODY, OCR)]
+        sc.gate_fda(planned, [])
+        self.assertEqual([d.action for _, d in planned], ["dispatch", "deferred", "deferred"])
+
+    def test_running_fda_job_defers_all(self):
+        planned = [(t, sc.Decision(t.workflow, "dispatch")) for t in (BODY, OCR)]
+        sc.gate_fda(planned, ["grm-intake.yml"])
+        self.assertEqual([d.action for _, d in planned], ["deferred", "deferred"])
+
+    def test_non_fda_targets_are_not_gated(self):
+        stranded = next(t for t in sc.TARGETS if t.workflow == "grm-stranded-batch-pr.yml")
+        planned = [(BODY, sc.Decision(BODY.workflow, "dispatch")), (stranded, sc.Decision(stranded.workflow, "dispatch"))]
+        sc.gate_fda(planned, ["grm-intake.yml"])
+        self.assertEqual([d.action for _, d in planned], ["deferred", "dispatch"])
+
+    def test_in_progress_intake_run_blocks_body_full(self):
+        busy = run("schedule", self.now - timedelta(minutes=5), status="in_progress")
+        gh = FakeGH(runs=[busy])
+        # 같은 FakeGH 가 모든 워크플로에 같은 runs 를 돌려주므로, BODY 슬롯(11-23 13:07)은 이 실행이 덮지 않게 이전 시각으로
+        busy["created_at"] = "2026-11-23T12:00:00Z"
+        ds = sc.run_all(gh, self.now, ref="main", dry_run=False, targets=[INTAKE, BODY],
+                        sleeper=lambda s: None, log=lambda m: None)
+        self.assertEqual(gh.dispatched, [])
+        self.assertIn("deferred", [d.action for d in ds])
 
 
 if __name__ == "__main__":

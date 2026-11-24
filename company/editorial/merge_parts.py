@@ -102,25 +102,43 @@ def handoff_card_types(payload):
     return out
 
 
+_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def handoff_date(folder, run_date=None):
+    """실행 폴더가 읽을 handoff 의 날짜(YYYY-MM-DD). 모르면 None. `find_handoff`·`precheck.find_scaffold` 가 같이 쓴다.
+
+    순서: 폴더의 `desk.json` `handoff_ref.date` → `run_date` → 폴더 이름 → `desk.json` `run_date_kst`.
+    데스크가 적은 handoff 지문의 날짜가 가장 정확하다 — 월요일 실행은 넷이 모두 같은 날이다.
+
+    ★2026-11-24 리허설 1124a: 교열 합치기가 `run_card_types(folder, desk['run_date_kst'])` 로 실행일(11-24)을
+      넘겨 handoff_ref.date(재료 11-23)보다 앞서 쓰였다 → `_handoff/handoff_2026-11-24.json` 이 없어 카드 유형을
+      몰라 소식·지침·고시 카드의 빈 key_facts 를 영문 미완결로 세어 exit 1(교열이 임시 사본으로 우회)."""
+    desk = None
+    try:
+        desk = _load(os.path.join(folder, "desk.json"))
+    except (OSError, ValueError):
+        desk = None
+    desk = desk if isinstance(desk, dict) else {}
+    ref = desk.get("handoff_ref") if isinstance(desk.get("handoff_ref"), dict) else {}
+    for cand in (ref.get("date"), run_date, os.path.basename(os.path.normpath(folder)), desk.get("run_date_kst")):
+        d = str(cand or "")[:10]
+        if _DATE_RE.fullmatch(d):
+            return d
+    return None
+
+
 def find_handoff(folder, run_date=None):
     """실행 폴더의 handoff 파일 경로(`_handoff/handoff_<날짜>.json`). 없으면 None.
 
-    날짜는 `run_date` → 폴더 이름 → 폴더의 `desk.json`(`handoff_ref.date`·`run_date_kst`) 순.
+    날짜는 `handoff_date`(desk.json handoff_ref.date → run_date → 폴더 이름 → run_date_kst).
     현재 작업 폴더와 저장소 루트를 차례로 본다(RUN.md 2항이 루트에 받는다).
 
     ★2026-11-17 리허설 폴더(`rehearsal-1118`)는 이름이 날짜가 아니라 기자 사전 점검(precheck terms)이
       handoff 를 못 찾고 모든 카드를 필수로 보아 거짓 차단했다(리허설 1118 준비 점검). 데스크가 적은
       handoff_ref 날짜로 찾는다."""
-    d = str(run_date or os.path.basename(os.path.normpath(folder)) or "")[:10]
-    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
-        try:
-            desk = _load(os.path.join(folder, "desk.json"))
-        except (OSError, ValueError):
-            desk = None
-        if isinstance(desk, dict):
-            ref = desk.get("handoff_ref") if isinstance(desk.get("handoff_ref"), dict) else {}
-            d = str(ref.get("date") or desk.get("run_date_kst") or "")[:10]
-    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
+    d = handoff_date(folder, run_date)
+    if not d:
         return None
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     for base in (os.getcwd(), root):

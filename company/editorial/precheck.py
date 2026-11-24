@@ -294,21 +294,11 @@ def deep_assembly_lines(shard, handoff, scaffold):
 
 def find_scaffold(delta_path, explicit=None):
     """그 주 스캐폴드 사본 경로(`_scaffold/brief_web_<YYYY_MM_DD>.json`). 없으면 None.
-    날짜는 델타 폴더의 `desk.json` handoff_ref.date → run_date_kst → 폴더 이름(merge_parts.find_handoff 와 같은 순서)."""
+    날짜는 `merge_parts.handoff_date`(desk.json handoff_ref.date → 폴더 이름 → run_date_kst) — handoff 와 같은 함수."""
     if explicit:
         return explicit
-    folder = os.path.dirname(os.path.abspath(delta_path))
-    d = ""
-    try:
-        desk = _load(os.path.join(folder, "desk.json"))
-        if isinstance(desk, dict):
-            ref = desk.get("handoff_ref") if isinstance(desk.get("handoff_ref"), dict) else {}
-            d = str(ref.get("date") or desk.get("run_date_kst") or "")[:10]
-    except (OSError, ValueError):
-        pass
-    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
-        d = os.path.basename(os.path.normpath(folder))[:10]
-    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
+    d = merge_parts.handoff_date(os.path.dirname(os.path.abspath(delta_path)))
+    if not d:
         return None
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     for base in (os.getcwd(), root):

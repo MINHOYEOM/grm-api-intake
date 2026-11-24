@@ -54,6 +54,7 @@ Notion 은 보지 않는다 — 발행 길에서 빠졌다(편집팀 `company/ed
 ## 기록
 `if git fetch origin claude/company-$D; then git checkout -B claude/company-$D FETCH_HEAD; else git fetch origin main && git checkout -b claude/company-$D FETCH_HEAD; fi` — 있으면 그 위에, 없으면 방금 받은 main(`FETCH_HEAD`)에서 브랜치를 만든다. `origin/main` 이라는 이름은 쓰지 않는다(실행 환경의 것은 며칠 전 것일 수 있다 — 2026-11-13 리허설: 11-06 커밋). `company/run/$D/brief-prep.md` 하나만 쓰고 커밋·push.
 첫 3줄은 `CHARTER.md` 형식(`상태:` 로 시작) — PC 백업이 이 첫 줄을 읽고 건너뛸지 정한다. 3줄 바로 아래 4번째 줄에 `편집팀: …` 한 줄(5번 판정), 5번째 줄에 `백업: …` 한 줄(5-1)을 둔다. 다른 직무의 파일은 건드리지 않는다.
+- 월 10:45 판정 때 `python company/editorial/stage_timing.py "$D"` 출력의 마지막 `단계 실측: …` 한 줄을 결과 파일 `brief-prep.md` 의 6번째 줄에 붙인다. 실행할 수 없으면 `단계 실측: 확인 불가(<사유>)`를 적는다.
 
 ## 금지
 발행 PR 머지 · Notion 읽기·쓰기 · 심층분석 생성 · Supabase 쓰기 · 허용 동작 밖의 워크플로 요청.

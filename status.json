@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24T04:11:10Z",
+ "generated_at": "2026-11-24T06:24:58Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,39 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45339548411,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-24T06:19:04Z",
+    "updatedAt": "2026-11-24T06:19:08Z",
+    "headBranch": "fix/wl-superseded-166",
+    "displayTitle": "feat(findings): 옛 본문에만 남은 findings 를 '대체됨'으로 숨김 — 새 글이 공개된 문서만, 매일 판정 (166)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45339548411"
+   },
+   {
+    "databaseId": 45334087356,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-24T05:32:58Z",
+    "updatedAt": "2026-11-24T05:41:05Z",
+    "headBranch": "fix/wl-superseded-166",
+    "displayTitle": "feat(findings): 옛 본문에만 남은 findings 를 '대체됨'으로 숨김 — 새 글이 공개된 문서만, 매일 판정 (166)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45334087356"
+   },
+   {
+    "databaseId": 45334025677,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-24T05:32:25Z",
+    "updatedAt": "2026-11-24T05:40:22Z",
+    "headBranch": "fix/wl-superseded-166",
+    "displayTitle": "feat(findings): 옛 본문에만 남은 findings 를 '대체됨'으로 숨김 — 새 글이 공개된 문서만, 매일 판정…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45334025677"
+   },
+   {
     "databaseId": 45323599568,
     "status": "completed",
     "conclusion": "success",
@@ -249,39 +282,6 @@
     "headBranch": "feat/wl-violations-followup-1124",
     "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45316582256"
-   },
-   {
-    "databaseId": 45313754083,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-24T02:37:30Z",
-    "updatedAt": "2026-11-24T02:44:48Z",
-    "headBranch": "feat/wl-violations-followup-1124",
-    "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45313754083"
-   },
-   {
-    "databaseId": 45312664569,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-24T02:28:44Z",
-    "updatedAt": "2026-11-24T02:35:55Z",
-    "headBranch": "feat/wl-violations-followup-1124",
-    "displayTitle": "fix(wl): 본문 앞 결손 수리·재수집 가드·지원 형식 F5/F6·heading 카드 전달 (머지 금지 · DB 쓰기 없음)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45312664569"
-   },
-   {
-    "databaseId": 45312137797,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T02:24:28Z",
-    "updatedAt": "2026-11-24T02:32:10Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1885 from MINHOYEOM/claude/glossary-weekly-202648",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45312137797"
    }
   ],
   "grm-scaffold-mirror.yml": [

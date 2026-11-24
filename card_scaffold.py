@@ -790,6 +790,34 @@ _DEFICIENCY_ROW_KEYS = ("area", "severity", "legal_basis", "summary", "followup"
 _FDA483_OBSERVATION_ROW_KEYS = ("number", "deficiency", "detail")
 _WL_VIOLATION_ROW_KEYS = ("number", "statement", "citation")
 
+# [WL heading 카드 전달 2026-11-24] 위반항목 행의 `heading`(F4 닫힌 어휘 소제목 — 영어 원문)은 11-23 파서가 뽑아
+# raw 에 싣는데 카드 행 키 목록(`_WL_VIOLATION_ROW_KEYS`)에 없어 **카드 직전에서 떨어졌다**. 비면 키를 달지 않는다
+# (기존 골든·카드 계약 불변). `heading` 은 영어 원문이라 영문 화면에도 그대로 나가고, 국문 라벨 `heading_ko` 는
+# 닫힌 어휘 사전에서 결정론으로 만든다(`*_ko` 접미라 영문 렌더가 자동으로 걷어낸다 — 영문 화면에 한글 0).
+# 어휘가 늘면(collect_intake._WL_F4_HEADINGS) 여기도 늘어야 한다 — tests/test_wl_heading_card_1124.py 가 막는다.
+WL_HEADING_KO: dict[str, str] = {
+    "Unapproved New Drug and Unlicensed Biological Product Violations": "미승인 신약·무허가 생물의약품 위반",
+    "Unapproved New Drug Violations": "미승인 신약 위반",
+    "Misbranded Drug Violations": "표시(Misbranded) 위반 의약품",
+    "False or Misleading Risk Presentation": "허위·오인 소지 위험 제시",
+    "Refusal to Provide Records": "기록 제공 거부",
+}
+
+
+def wl_violation_row(v: dict[str, Any]) -> dict[str, str]:
+    """위반항목 1행 → 카드 행. 스캐폴드(`_detail_wl_violations`)와 조립 시점 재추출(`assemble_publish_brief.
+    _refresh_wl_violations`)이 **같은 함수**를 쓴다 — 한쪽만 heading 을 달고 한쪽은 떨어뜨리는 표류 차단."""
+    r = {k: str(v.get(k, "") or "") for k in _WL_VIOLATION_ROW_KEYS}
+    if v.get("statement_ko"):                    # 있을 때만 — 없으면 키 미추가(골든 불변)
+        r["statement_ko"] = str(v["statement_ko"])
+    heading = str(v.get("heading") or "").strip()
+    if heading:                                  # 있을 때만 — 없으면 키 미추가(골든 불변)
+        r["heading"] = heading
+        ko = WL_HEADING_KO.get(heading)
+        if ko:
+            r["heading_ko"] = ko
+    return r
+
 
 # per-kind 결정론 상세 슬롯 생성기 — SourceSpec.detail 로 배선. WL `deep_analysis`(LLM 분석층·
 # fan-out·게이트)와 **완전 별개**의 결정론 층(생성 0 → 환각 0, 근거대조 게이트 불필요). 해당
@@ -897,10 +925,7 @@ def _detail_wl_violations(row: dict[str, Any], raw: dict[str, Any]) -> dict[str,
     for v in rows:
         if not isinstance(v, dict):
             continue
-        r = {k: str(v.get(k, "") or "") for k in _WL_VIOLATION_ROW_KEYS}
-        if v.get("statement_ko"):                    # 있을 때만 — 없으면 키 미추가(골든 불변)
-            r["statement_ko"] = str(v["statement_ko"])
-        norm.append(r)
+        norm.append(wl_violation_row(v))
     norm = [v for v in norm if v["statement"]]
     if not norm:
         return None

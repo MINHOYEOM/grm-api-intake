@@ -1278,6 +1278,7 @@ def _refresh_wl_violations(out: dict[str, Any], deep_deltas: dict[str, Any],
     바뀐 카드는 report 에 남긴다 — 조용한 주입 금지.
     """
     import collect_intake as _ci          # 지연 import — 조립 경로가 수집기 로드에 묶이지 않게
+    from card_scaffold import wl_violation_row
 
     for card in out.get("cards", []):
         if card.get("card_type") != "Warning Letter":
@@ -1289,7 +1290,7 @@ def _refresh_wl_violations(out: dict[str, Any], deep_deltas: dict[str, Any],
         source_text = payload.get("source_text") if isinstance(payload, dict) else None
         if not (isinstance(source_text, str) and source_text.strip()):
             continue
-        fresh = _ci.extract_wl_violations_from_text(source_text)
+        fresh = [wl_violation_row(v) for v in _ci.extract_wl_violations_from_text(source_text)]   # 스캐폴드와 같은 행 함수(heading 유지)
         if not fresh:
             continue                      # degrade — 기존 상태 유지
         before = [(v.get("number"), v.get("statement")) for v in (dd or {}).get("violations", [])

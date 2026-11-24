@@ -9177,6 +9177,11 @@ def validate_wl_violations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
             if not (isinstance(v.get("statement_ko"), str) and v.get("statement_ko").strip()):
                 violations.append(
                     f"{brief_label} / card {card_id} / violation #{num}: MISSING_STATEMENT_KO")
+            # [2026-11-24] 소제목(heading)이 있으면 국문 라벨(heading_ko)도 있어야 한다 — 카드 행 함수
+            # (`card_scaffold.wl_violation_row`)가 닫힌 어휘 사전에서 만든다. 없으면 어휘가 늘었는데 사전이 안 따라온 것.
+            if str(v.get("heading") or "").strip() and not str(v.get("heading_ko") or "").strip():
+                violations.append(
+                    f"{brief_label} / card {card_id} / violation #{num}: MISSING_HEADING_KO")
 
     for item in cards_or_briefs:
         if "brief" in item and "cards" in item:

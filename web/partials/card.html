@@ -288,7 +288,7 @@
   <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>{{ _("위반항목 상세") }} <span class="sub">· {{ _("{n}건", n=dd.count) }} · {{ _("원문 기반") }}</span></summary>
     {%- for r in dd.violations %}
     <div class="dt-row obs-row">
-      <div class="dt-h"><span class="obs-num">{{ _("위반 {n}", n=r.number) }}</span>{% if r.citation %}<span class="dt-law">{{ r.citation }}</span>{% endif %}</div>
+      <div class="dt-h"><span class="obs-num">{{ _("위반 {n}", n=r.number) }}</span>{% if r.citation %}<span class="dt-law">{{ r.citation }}</span>{% endif %}{% if r.heading %}<span class="dt-chip">{{ r.heading_ko or r.heading }}</span>{% endif %}</div>
       {%- if r.statement_ko %}
       <div class="obs-orig"><span class="viol-lang">{{ _("원문 · FDA Warning Letter") }}</span><p class="obs-en">{{ r.statement }}</p></div>
       <div class="obs-ko"><span class="viol-lang ko">{{ _("국문 해석") }}</span><p class="dt-sum">{{ r.statement_ko }}</p></div>

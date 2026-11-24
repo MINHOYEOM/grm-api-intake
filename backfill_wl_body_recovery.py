@@ -95,6 +95,7 @@ KNOWN_RAW_KEYS = frozenset({
 })
 # 다시 읽어도 결과가 같을 사유. 이 표식이 붙은 행은 후보가 아니다(재시도가 끊긴다).
 DEFINITIVE_STATUSES = ("no-anchor",)
+BOT_BLOCK_STATUS = "fetch-fail:bot-block"   # collect_intake.WL_BODY_STATUS_BOT_BLOCK 과 같은 값(테스트가 대조)
 
 # 영구 403 정책(모듈 docstring). 표식은 모두 `fetch-403` 토큰으로 시작한다 — 하류 사유 매핑 계약.
 STATUS_403 = "fetch-403"
@@ -123,6 +124,11 @@ class WlBodyRecoveryReport:
     permanent_403_docs: list[str] = field(default_factory=list)
     rebuild_body_start: bool = False    # --rebuild-body-start 모드
     body_start_unchanged: int = 0       # 그 모드에서 다시 받은 본문이 기존과 같음 — 쓰지 않음
+    body_shrunk: int = 0                # 그 모드에서 새 본문이 옛 본문보다 짧음 — 쓰지 않음(대표 원칙: 줄어드는 행 금지)
+    body_diverged: int = 0              # 그 모드에서 옛 본문 앞부분이 새 본문에 없음 — 다른 글 — 쓰지 않음
+    bot_blocked: bool = False           # fda.gov 봇 차단(abuse-detection-apology) 감지 — 즉시 중단(남은 행은 다음 실행)
+    stopped_at: str = ""                # 중단한 document_id
+    head_rebuild: dict[str, int] = field(default_factory=dict)   # 쓸 행의 새 위반항목 결과(형식 F*/사유별 행 수)
     status_resolved: int = 0            # 확정 사유(404·no-anchor)로 표식만 교체
     unknown_keys: int = 0               # 저장 raw 에 모르는 키 — 손대지 않음
     id_mismatch: int = 0                # 재구성 id ≠ 기존 — 손대지 않음(0 이어야 정상)
@@ -190,10 +196,32 @@ def starts_mid_sentence(body: str) -> bool:
     return bool(re.match(r"[a-z]", str(body or "")))
 
 
+def starts_after_cut_head(body: str) -> bool:
+    """본문이 'Specifically,'·각주('1 As described')로 시작하는가 — 위반 서술 앞부분이 잘린 흔적.
+
+    [2026-11-24] 본문 시작 앵커 'specifically,' 가 회신 부적절 단락에서 처음 걸리는 서한(임상시험자·GLP·허위광고 등)은
+    대문자로 시작해 `starts_mid_sentence` 에 안 걸렸지만 위반 서술을 통째로 잃었다(저장 88행). 수집기의 판정
+    (`collect_intake._WL_BODY_HEAD_TRUNCATED_RE` → 사유 `body_head_truncated`)과 같은 정규식(한 곳)이다."""
+    import collect_intake as ci
+    return bool(ci._WL_BODY_HEAD_TRUNCATED_RE.match(str(body or "")))
+
+
 def is_body_start_candidate(raw: dict[str, Any], *, explicit: bool = False) -> bool:
-    """`--rebuild-body-start` 대상: 본문이 있고, 소문자로 시작하거나 사람이 지정한 행."""
+    """`--rebuild-body-start` 대상: 본문이 있고, 소문자·'Specifically,' 로 시작하거나 사람이 지정한 행."""
     full = str(raw.get("wl_body_full") or "")
-    return bool(full) and (explicit or starts_mid_sentence(full))
+    return bool(full) and (explicit or starts_mid_sentence(full) or starts_after_cut_head(full)
+                           or str(raw.get("wl_violations_status") or "") == "body_head_truncated")
+
+
+def _norm_ws(text: str) -> str:
+    return " ".join(str(text or "").split())
+
+
+def old_body_inside_new(old_full: str, new_full: str, probe_chars: int = 200) -> bool:
+    """옛(잘린) 본문의 앞 `probe_chars` 자가 새 본문 안에 그대로 있는가 — 같은 편지를 다시 받았다는 대조.
+    새 본문이 옛 본문의 **앞쪽을 더한** 것일 때만 참이다(다른 글이 오면 거짓 → 쓰지 않는다)."""
+    probe = _norm_ws(old_full)[:probe_chars]
+    return bool(probe) and probe in _norm_ws(new_full)
 
 
 def first_403_date(raw: dict[str, Any], collected_at: str) -> date | None:
@@ -424,6 +452,16 @@ def run(
             report.errors.append(f"{label}: fetch_raised:{type(exc).__name__}")
             continue
 
+        if status == BOT_BLOCK_STATUS:
+            # [2026-11-24] fda.gov 가 막았다 — 같은 IP 로 더 두드리면 차단만 길어진다. 즉시 멈추고 알린다(남은 행은
+            # 다음 실행에서 이어진다 — 쓴 행은 후보에서 빠지므로 멱등).
+            report.bot_blocked = True
+            report.stopped_at = label
+            report.still_empty += 1
+            _bump(report, "bot-block")
+            report.errors.append(f"{label}: fda-bot-block — 이후 요청 중단")
+            log("ERROR", f"FDA 봇 차단 감지({label}) — 남은 행 요청을 중단합니다")
+            break
         if not full and rebuild_body_start:
             # 있는 본문을 표식으로 덮지 않는다 — 이번에 못 받았으면 그대로 둔다.
             report.still_empty += 1
@@ -432,6 +470,20 @@ def run(
         old_full = str(raw.get("wl_body_full") or "")
         if rebuild_body_start and full == old_full:
             report.body_start_unchanged += 1
+            continue
+        if rebuild_body_start and len(_norm_ws(full)) < len(_norm_ws(old_full)):
+            report.body_shrunk += 1               # 줄어드는 행은 쓰지 않는다
+            _bump(report, "body_shrunk")
+            report.body_changes.append({"raw_signal_id": str(r.get("raw_signal_id") or ""),
+                                        "old_chars": len(old_full), "new_chars": len(full),
+                                        "skipped": "shrunk"})
+            continue
+        if rebuild_body_start and starts_after_cut_head(old_full) and not old_body_inside_new(old_full, full):
+            report.body_diverged += 1             # 다시 받은 글이 옛 본문을 품지 않는다 — 다른 글
+            _bump(report, "body_diverged")
+            report.body_changes.append({"raw_signal_id": str(r.get("raw_signal_id") or ""),
+                                        "old_chars": len(old_full), "new_chars": len(full),
+                                        "skipped": "diverged"})
             continue
         if not full:
             new_status = status
@@ -482,6 +534,9 @@ def run(
         violations = (getattr(item, "raw_payload", {}) or {}).get("wl_violations") or []
         report.recovered += 1
         if rebuild_body_start:
+            _payload = getattr(item, "raw_payload", {}) or {}
+            _key = ("filled" if violations else str(_payload.get("wl_violations_status") or "unmarked"))
+            report.head_rebuild[_key] = report.head_rebuild.get(_key, 0) + 1
             report.body_changes.append({
                 "raw_signal_id": str(r.get("raw_signal_id") or ""),
                 "old_chars": len(old_full), "new_chars": len(full)})

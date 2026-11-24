@@ -3096,6 +3096,9 @@ _WL_DSCSA_RE = re.compile(r"\b(?:Drug Supply Chain Security Act|DSCSA)\b", re.I)
 _WL_DSCSA_SECTION_582_RE = re.compile(r"\bsections?\s+582\b|\b360eee-1\b", re.I)
 _WL_DSCSA_WHOLESALE_RE = re.compile(r"\bsections?\s+503\(e\)", re.I)
 _WL_OPDP_RE = re.compile(r"\b(?:Office of Prescription Drug Promotion|OPDP)\b", re.I)
+_WL_PROMOTIONAL_VIOLATION_RE = re.compile(
+    r"(?:^|(?<=[.!?] ))Your promotional (?:communications?|materials?|claims?) "
+    r"(?:is|are|was|were) (?:false(?: or misleading)?|misleading)\b", re.I)
 _WL_NON_DRUG_RE = re.compile(
     r"\bfecal microbiota (?:transplant(?:ation|s)?|products?)\b"
     r"|\bivermectin\b.{0,160}\b(?:for sale|for purchase|sold|selling)\b"
@@ -3147,7 +3150,7 @@ def _wl_dscsa_starts_at_two(t: str) -> bool:
 
 
 def _extract_wl_f5(t: str, *, dscsa_offset: bool = False) -> list[dict[str, str]]:
-    """F5 — 연속 번호 표제. DSCSA 예외에서는 2부터 원문 번호와 조항을 확인한다."""
+    """F5 — 연속 번호 표제. DSCSA 예외는 2부터 모든 후보 표제가 조건을 충족해야 한다."""
     c = _WL_CONCLUSION_RE.search(t)
     limit = c.start() if c else len(t)
     out: list[dict[str, str]] = []
@@ -3156,16 +3159,18 @@ def _extract_wl_f5(t: str, *, dscsa_offset: bool = False) -> list[dict[str, str]
     for i, m in enumerate(heads):
         if int(m.group(1)) != expect:
             if dscsa_offset:
-                break
+                return []
             continue
         stop = heads[i + 1].start() if dscsa_offset and i + 1 < len(heads) else limit
         stmt, _end = _wl_f5_statement(t, m.end(), stop)
         if dscsa_offset and not (_WL_DSCSA_SECTION_582_RE.search(stmt) or _WL_DSCSA_WHOLESALE_RE.search(stmt)):
-            break
+            return []
         if not stmt:
             continue
         # 표제 형태 확인: 결함 서술('Failure …')이거나 인용을 단 문장이어야 한다.
         if not (_WL_FAILURE_SENT_RE.match(stmt) or _wl_citations(stmt) or _WL_F5_CITE_GROUP_RE.search(stmt)):
+            if dscsa_offset:
+                return []
             continue
         row = _wl_row(expect, stmt)
         if not row["citation"]:           # 'FD&C Act Section 503(e)' 처럼 기존 인용 추출기가 못 읽는 괄호 인용 — 문장 안 글자 그대로
@@ -3194,11 +3199,11 @@ def _extract_wl_f6(t: str) -> list[dict[str, str]]:
     return out
 
 
-def _wl_violations_scope_reason(t: str) -> str:
-    if _WL_OPDP_RE.search(t):
-        return WL_VIOLATIONS_STATUS_OPDP
+def _wl_violations_scope_reason(t: str, *, issuing_office: str = "") -> str:
     conclusion = _WL_CONCLUSION_RE.search(t)
     findings = t[:conclusion.start()] if conclusion else t
+    if _WL_OPDP_RE.search(issuing_office) or _WL_PROMOTIONAL_VIOLATION_RE.search(findings):
+        return WL_VIOLATIONS_STATUS_OPDP
     if _wl_dscsa_starts_at_two(findings):
         return WL_VIOLATIONS_STATUS_DSCSA_OFFSET
     if _WL_NON_DRUG_RE.search(findings):
@@ -3209,7 +3214,9 @@ def _wl_violations_scope_reason(t: str) -> str:
     return ""
 
 
-def extract_wl_violations_detail(text: str, *, extended: bool = True) -> tuple[list[dict[str, str]], str]:
+def extract_wl_violations_detail(
+    text: str, *, extended: bool = True, issuing_office: str = "",
+) -> tuple[list[dict[str, str]], str]:
     """WL 본문 → (위반항목, 형식 또는 빈 사유). 일일 수집·과거분 백필·WL 복구·재추출이 모두 이 함수
     (`build_wl_item` 경유)를 부른다 — 경로마다 규칙이 갈라지는 일을 막는다.
 
@@ -3248,7 +3255,7 @@ def extract_wl_violations_detail(text: str, *, extended: bool = True) -> tuple[l
                 return rows, "F5"
     if _WL_BODY_HEAD_TRUNCATED_RE.match(t):
         return [], WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED
-    scope_reason = _wl_violations_scope_reason(t)
+    scope_reason = _wl_violations_scope_reason(t, issuing_office=issuing_office)
     if scope_reason:
         return [], scope_reason
     if not extended:
@@ -3270,8 +3277,10 @@ def wl_violations_gap_kind(raw: dict[str, Any]) -> str:
     if isinstance(raw.get("wl_violations"), list) and raw["wl_violations"]:
         return "filled"
     status = str(raw.get("wl_violations_status") or "")
-    if status in (WL_VIOLATIONS_STATUS_UNSUPPORTED, WL_VIOLATIONS_STATUS_OUT_OF_SCOPE):
-        return _wl_violations_scope_reason(" ".join(body.split())) or status
+    if status in (WL_VIOLATIONS_STATUS_UNSUPPORTED, WL_VIOLATIONS_STATUS_OUT_OF_SCOPE, WL_VIOLATIONS_STATUS_OPDP):
+        reason = _wl_violations_scope_reason(
+            " ".join(body.split()), issuing_office=str(raw.get("issuing_office") or ""))
+        return reason or (WL_VIOLATIONS_STATUS_UNSUPPORTED if status == WL_VIOLATIONS_STATUS_OPDP else status)
     return status if status in WL_VIOLATIONS_STATUSES else "unmarked"
 
 
@@ -3590,7 +3599,8 @@ def build_wl_item(
             # [2026-11-23] 못 뽑으면 사유(`wl_violations_status`)를 남긴다 — 상시 점검이 '본문 있음 ·
             # 위반항목 없음 · 사유 없음'을 세어 경로 누락(10-28 이전 백필 770행 같은)을 잡는다.
             violations, v_status = extract_wl_violations_detail(
-                body_full, extended=wl_violations_extended_scope(relevance, issuing_office))
+                body_full, extended=wl_violations_extended_scope(relevance, issuing_office),
+                issuing_office=issuing_office)
             if violations:
                 wl_raw["wl_violations"] = violations
             elif v_status:

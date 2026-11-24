@@ -154,7 +154,8 @@ class DailySummaryHealthTest(unittest.TestCase):
             _It({"wl_body_full": "b", "wl_violations": [{"number": "1"}]}),
             _It({"wl_body_full": "b", "wl_violations_status": "unsupported_format"}, "dX"),
             _It({"wl_body_full": "b"}),
-            _It({"wl_body_full": "b", "wl_violations_status": "opdp_promotional"}),
+            _It({"wl_body_full": "b", "wl_violations_status": "opdp_promotional",
+                 "issuing_office": "Office of Prescription Drug Promotion"}),
             _It({}),
         ])
         self.assertEqual((c["filled"], c["unsupported"], c["unmarked"], c["unsupported_docs"]), (1, 1, 1, ["dX"]))
@@ -183,7 +184,7 @@ class ContentCompletenessGapTest(unittest.TestCase):
             {"source": "FDA Warning Letter", "document_id": "f",
              "raw_json": {"wl_body_full": "b", "wl_violations_status": "unsupported_format"}},
             {"source": "FDA Warning Letter", "document_id": "g",
-             "raw_json": {"wl_body_full": "Office of Prescription Drug Promotion",
+             "raw_json": {"wl_body_full": "b", "issuing_office": "Office of Prescription Drug Promotion",
                           "wl_violations_status": "unsupported_format"}},
         ]
         g = cc.wl_violation_gaps(rows)

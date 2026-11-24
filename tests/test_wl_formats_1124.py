@@ -103,21 +103,52 @@ class RealLetterFormatTest(unittest.TestCase):
                 "2. Your firm conducted transactions with trading partners that were not authorized.")
         self.assertEqual(ci.extract_wl_violations_detail(body), ([], "dscsa_numbering_offset"))
 
+    def test_dscsa_offset_does_not_report_a_partial_list_as_f5(self):
+        prefix = (
+            "2. Your firm conducted transactions with trading partners that were not authorized "
+            "(FD&C Act Section 582(c)(3)). "
+        )
+        for heading in (
+            "3. Your firm did not document the required corrective actions.",
+            "4. Your firm failed to identify suspect product (FD&C Act Section 582(c)(4)).",
+        ):
+            with self.subTest(heading=heading):
+                self.assertEqual(ci.extract_wl_violations_detail(prefix + heading),
+                                 ([], "dscsa_numbering_offset"))
+
 
 class BlankReasonTest(unittest.TestCase):
-    def test_opdp_and_narrative_cgmp_from_real_letter_snippets(self):
+    def test_opdp_reply_instructions_do_not_hide_unknown_format(self):
+        for lead in ("", "Conclusion "):
+            with self.subTest(lead=lead):
+                body = (
+                    "Your firm failed a requirement described below in a new format. "
+                    + lead + "Please submit your response to the Office of Prescription Drug Promotion (OPDP)."
+                )
+                self.assertEqual(ci.extract_wl_violations_detail(body), ([], "unsupported_format"))
+                for status in ("unsupported_format", "opdp_promotional"):
+                    raw = {"wl_body_full": body, "wl_violations_status": status}
+                    self.assertEqual(ci.wl_violations_gap_kind(raw), "unsupported_format")
+
+    def test_opdp_from_promotional_violation(self):
+        body = "Your promotional communications are false or misleading with respect to risk."
+        self.assertEqual(ci.extract_wl_violations_detail(body), ([], "opdp_promotional"))
+
+    def test_opdp_office_and_narrative_cgmp_from_real_letter_snippets(self):
         with open(_FIX_1123, encoding="utf-8") as f:
-            bodies = {s["document_id"]: s["wl_body_full"] for s in json.load(f)["samples"]}
+            samples = {s["document_id"]: s for s in json.load(f)["samples"]}
         for doc, marker, status in (
             ("0f446242e39b", "Office of Prescription Drug Promotion", "opdp_promotional"),
             ("0f65bd3c5c70", "Failure of your quality unit", "narrative_cgmp"),
         ):
             with self.subTest(status=status):
-                body = bodies[doc]
+                body = samples[doc]["wl_body_full"]
+                office = samples[doc]["issuing_office"]
                 snippet = body[body.index(marker):].split(". ", 1)[0] + "."
-                self.assertEqual(ci.extract_wl_violations_detail(snippet), ([], status))
+                self.assertEqual(ci.extract_wl_violations_detail(snippet, issuing_office=office), ([], status))
                 self.assertEqual(ci.wl_violations_gap_kind({
                     "wl_body_full": snippet, "wl_violations_status": "unsupported_format",
+                    "issuing_office": office,
                 }), status)
 
     def test_non_drug_scope_and_unknown_format_use_body_evidence(self):

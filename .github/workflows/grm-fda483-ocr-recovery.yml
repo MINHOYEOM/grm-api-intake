@@ -407,7 +407,7 @@ jobs:
 
       # [본문 교체 후속 2026-11-24] 모든 원문 교체는 raw_signal_versions 에 옛 판을 남긴다(R3). 최근 14일 안에 본문이
       # 바뀐 WL 행을 다시 대조해(멱등) 빠진 findings 를 넣고, 자동으로 해야 할 일이 남으면(분류가 새 본문 판정과
-      # 다름 · 넣지 못한 findings) 실패로 경보한다 — 어느 도구가 바꿨든 같은 함수로 맞춘다.
+      # 다름 · 넣지 못한 findings · 숨김 판정이 DB 재확인과 어긋남) 실패로 경보한다 — 어느 도구가 바꿨든 같은 함수로 맞춘다.
       # 수동 입력 wl_followup_changed_by 를 주면 그 도구가 바꾼 행만 대조한다(apply 입력을 따른다).
       - name: Body-change followup (reclassify + findings) catch-up & check
         if: ${{ always() && (github.event_name == 'schedule' || inputs.wl_followup_changed_by != '') }}
@@ -418,7 +418,9 @@ jobs:
           IN_CHANGED_BY: ${{ inputs.wl_followup_changed_by }}
         run: |
           set -euo pipefail
-          FARGS=(--report-path wl_body_followup_report.json --plan-path wl_body_followup_catchup_plan.json)
+          # --supersede: 새 글이 모두 정리되고 공개된 문서에서만 옛 본문에만 남은 공개 행을 '대체됨'으로 숨긴다(166).
+          # migration 166 적용 전에는 경고만(supersede_unavailable) — 실패가 아니다.
+          FARGS=(--report-path wl_body_followup_report.json --plan-path wl_body_followup_catchup_plan.json --supersede)
           if [ -n "${IN_CHANGED_BY}" ]; then
             FARGS+=(--changed-by-like "${IN_CHANGED_BY}")
           else

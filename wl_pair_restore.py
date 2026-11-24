@@ -2,7 +2,6 @@
 """Preview a raw_body_followup restore plan, or apply its source-text changes."""
 
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -11,8 +10,8 @@ import sys
 
 
 PLAN_SCHEMA = "grm-wl-truncation-restore-plan/v1"
-WL_SOURCE = "FDA Warning Letter"
 TEXT_COLUMN = "finding_text"
+RESTORE_STATUSES = {"applied", "already_applied", "no_match", "stale", "concurrent_change"}
 
 
 def load_changes(path):
@@ -53,43 +52,38 @@ def load_changes(path):
     return changes
 
 
-def apply_change(change, base_url, service_key, *, send):
-    """Check the planned hash and condition the update on the exact live text."""
-    filters = {
-        "finding_id": f"eq.{change['finding_id']}",
-        "raw_signal_id": f"eq.{change['raw_signal_id']}",
-        "source": f"eq.{WL_SOURCE}",
+def apply_change(change, base_url, service_key):
+    """Let the database check the planned hash and update the locked row."""
+    import requests
+
+    url = f"{base_url}/rest/v1/rpc/grm_wl_pair_restore"
+    headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
+    payload = {
+        "p_finding_id": change["finding_id"],
+        "p_raw_signal_id": change["raw_signal_id"],
+        "p_old_md5": change["before_md5"][TEXT_COLUMN],
+        "p_new_text": change["after"][TEXT_COLUMN],
     }
-    _, rows, error = send(
-        "get", base_url, service_key, params={**filters, "select": TEXT_COLUMN}
-    )
-    if error:
-        return f"get_failed:{error}"
-    if not rows:
-        return "no_match"
-    if len(rows) != 1 or not isinstance(rows[0].get(TEXT_COLUMN), str):
-        return "unexpected_get_result"
-
-    old_text = rows[0][TEXT_COLUMN]
-    new_text = change["after"][TEXT_COLUMN]
-    if old_text == new_text:
-        return "already_applied"
-    if hashlib.md5(old_text.encode("utf-8")).hexdigest() != change["before_md5"][TEXT_COLUMN]:
-        return "stale"
-
-    # Keep the predicate in the PATCH so a concurrent body change cannot be overwritten.
-    _, rows, error = send(
-        "patch", base_url, service_key,
-        params={**filters, TEXT_COLUMN: f"eq.{old_text}", "select": "finding_id"},
-        json_body={TEXT_COLUMN: new_text},
-    )
-    if error:
-        return f"patch_failed:{error}"
-    if not rows:
-        return "concurrent_change"
-    if rows != [{"finding_id": change["finding_id"]}]:
-        return "unexpected_patch_result"
-    return "applied"
+    for attempt in range(2):
+        try:
+            response = requests.post(url, headers=headers, json=payload, timeout=15)
+        except requests.exceptions.Timeout:
+            if attempt == 0:
+                continue
+            return "rpc_failed:timeout"
+        except requests.exceptions.RequestException as exc:
+            return f"rpc_failed:{type(exc).__name__}"
+        if response.status_code < 500:
+            break
+    if not 200 <= response.status_code < 300:
+        return f"rpc_failed:http_{response.status_code}"
+    try:
+        status = response.json()
+    except ValueError:
+        return "unexpected_rpc_result"
+    if isinstance(status, str) and status in RESTORE_STATUSES:
+        return status
+    return "unexpected_rpc_result"
 
 
 def main(argv=None):
@@ -109,13 +103,11 @@ def main(argv=None):
         service_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
         if not base_url.startswith("https://") or not service_key:
             parser.error("--apply requires HTTPS SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY")
-        from findings_translate_apply_service import _send_findings_request
-
         results = []
         for change in changes:
-            status = apply_change(change, base_url, service_key, send=_send_findings_request)
+            status = apply_change(change, base_url, service_key)
             results.append({"finding_id": change["finding_id"], "status": status})
-            if status not in {"applied", "already_applied", "no_match", "stale", "concurrent_change"}:
+            if status not in RESTORE_STATUSES:
                 failed = True
         report["results"] = results
 

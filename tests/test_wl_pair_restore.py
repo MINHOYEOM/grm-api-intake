@@ -8,7 +8,8 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
-import findings_translate_apply_service as translate_apply
+import requests
+
 import raw_body_followup
 import raw_update
 import wl_pair_restore
@@ -51,7 +52,7 @@ class TestWlPairRestore(unittest.TestCase):
 
     def test_default_previews_only_source_text(self):
         with patch.object(
-            translate_apply, "_send_findings_request",
+            requests, "post",
             side_effect=AssertionError("dry run contacted the database"),
         ) as send:
             result = self.run_cli()
@@ -66,30 +67,24 @@ class TestWlPairRestore(unittest.TestCase):
             }],
         })
 
-    def test_apply_preserves_human_fields_and_is_idempotent(self):
-        original = self.live.copy()
-        patches = []
-
-        def send(verb, base_url, key, *, params, json_body=None):
-            self.assertEqual(params["finding_id"], "eq.wl-finding")
-            self.assertEqual(params["raw_signal_id"], "eq.wl-signal")
-            self.assertEqual(params["source"], "eq.FDA Warning Letter")
-            if verb == "get":
-                return 200, [{"finding_text": self.live["finding_text"]}], ""
-            self.assertEqual(params["finding_text"], f"eq.{self.live['finding_text']}")
-            patches.append(json_body)
-            self.live.update(json_body)
-            return 200, [{"finding_id": "wl-finding"}], ""
-
-        with patch.object(translate_apply, "_send_findings_request", send), patch.dict(
+    def test_apply_sends_only_source_text_and_reports_repeat_status(self):
+        with patch.object(requests, "post") as post, patch.dict(
             os.environ, SUPABASE_URL="https://example.invalid", SUPABASE_SERVICE_ROLE_KEY="test-key"
         ):
+            post.return_value.status_code = 200
+            post.return_value.json.side_effect = ["applied", "already_applied"]
             for expected in ("applied", "already_applied"):
                 with self.subTest(expected=expected):
                     result = self.run_cli("--apply")
                     self.assertEqual(result["results"][0]["status"], expected)
-                    self.assertEqual(self.live, {**original, "finding_text": NEW})
-        self.assertEqual(patches, [{"finding_text": NEW}])
+        self.assertEqual(post.call_count, 2)
+        for call in post.call_args_list:
+            self.assertEqual(call.kwargs["json"], {
+                "p_finding_id": self.live["finding_id"],
+                "p_raw_signal_id": self.live["raw_signal_id"],
+                "p_old_md5": hashlib.md5(OLD.encode()).hexdigest(),
+                "p_new_text": NEW,
+            })
 
     def test_empty_plan_is_noop_without_credentials(self):
         self.document["items"].clear()
@@ -101,32 +96,44 @@ class TestWlPairRestore(unittest.TestCase):
                 with self.subTest(flags=flags):
                     self.assertEqual(self.run_cli(*flags), {"apply": bool(flags), "changes": []})
 
-    def assert_unmatched_change_status(self, rows, expected):
-        def send(verb, *args, **kwargs):
-            self.assertEqual(verb, "get")
-            return 200, rows, ""
+    def test_long_body_uses_one_rpc_with_full_replacement_in_json(self):
+        old_text = "한" * 4000
+        new_text = "새 본문\n" + "글" * 5000
+        old_hash = hashlib.md5(old_text.encode("utf-8")).hexdigest()
+        self.document["items"][0].update(finding_text_old_md5=old_hash, finding_text=new_text)
+        self.plan_path.write_text(json.dumps(self.document), encoding="utf-8")
 
+        with (
+            patch.dict(os.environ, SUPABASE_URL="https://example.invalid", SUPABASE_SERVICE_ROLE_KEY="test-key"),
+            patch.object(requests, "get", side_effect=AssertionError("unexpected GET")),
+            patch.object(requests, "patch", side_effect=AssertionError("unexpected PATCH")),
+            patch.object(requests, "post") as post,
+        ):
+            post.return_value.status_code = 200
+            post.return_value.json.return_value = "applied"
+            result = self.run_cli("--apply")
+
+        self.assertEqual(result["results"], [{"finding_id": "wl-finding", "status": "applied"}])
+        post.assert_called_once()
+        self.assertEqual(post.call_args.args, (
+            "https://example.invalid/rest/v1/rpc/grm_wl_pair_restore",
+        ))
+        self.assertNotIn("params", post.call_args.kwargs)
+        self.assertEqual(post.call_args.kwargs["json"], {
+            "p_finding_id": "wl-finding",
+            "p_raw_signal_id": "wl-signal",
+            "p_old_md5": old_hash,
+            "p_new_text": new_text,
+        })
+
+    def test_reports_rpc_status_for_skipped_updates(self):
         change, = wl_pair_restore.load_changes(self.plan_path)
-        self.assertEqual(
-            wl_pair_restore.apply_change(change, "https://example.invalid", "key", send=send),
-            expected,
-        )
-
-    def test_missing_row_is_not_patched(self):
-        self.assert_unmatched_change_status([], "no_match")
-
-    def test_stale_row_is_not_patched(self):
-        self.assert_unmatched_change_status([{"finding_text": "Newer edit"}], "stale")
-
-    def test_concurrent_change_is_not_overwritten(self):
-        def send(verb, *args, params, **kwargs):
-            if verb == "get":
-                return 200, [{"finding_text": OLD}], ""
-            self.assertEqual(params["finding_text"], f"eq.{OLD}")
-            return 200, [], ""
-
-        change, = wl_pair_restore.load_changes(self.plan_path)
-        self.assertEqual(
-            wl_pair_restore.apply_change(change, "https://example.invalid", "key", send=send),
-            "concurrent_change",
-        )
+        for status in ("no_match", "stale", "concurrent_change"):
+            with self.subTest(status=status), patch.object(requests, "post") as post:
+                post.return_value.status_code = 200
+                post.return_value.json.return_value = status
+                self.assertEqual(
+                    wl_pair_restore.apply_change(change, "https://example.invalid", "key"),
+                    status,
+                )
+                post.assert_called_once()

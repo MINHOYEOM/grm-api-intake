@@ -23,7 +23,7 @@ from unittest import mock
 
 import collect_intake as ci
 import findings_store as store
-import grm_notion
+from grm_common import canonical_url_key
 import grm_queue as gq
 
 _SUPABASE = ("https://example.supabase.co", "service-role-secret-token")
@@ -117,7 +117,7 @@ class ClassifyTest(unittest.TestCase):
         self.assertEqual(st.raw_ingested_at([("S", "a"), ("S", "b")]),
                          {"S::a": "2026-11-19T00:00:00+00:00"})
         self.assertEqual(st.source_url_keys(["ECA Academy"]),
-                         {grm_notion.canonical_url_key("ECA Academy", "https://EX.org/a/#frag")})
+                         {canonical_url_key("ECA Academy", "https://EX.org/a/#frag")})
 
         class Broken:
             def request(self, *a, **k):

@@ -3480,7 +3480,7 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     if text_status and text_status not in ("ok", "") and not (excerpt or observations or body_full):
         raw_payload["fda483_text_status"] = text_status   # 결손 사유(본문 전무일 때만)
 
-    # Modality 는 insert 시 notion_create_page 가 raw_payload(product_type)+headline/body 로
+    # Modality 는 raw_signals 행을 만들 때 분류기가 raw_payload(product_type)+headline/body 로
     # compute_modality 한다(IntakeItem 에 저장 필드 없음 — 타 수집기와 동일).
     label = "FDA 483" if record_type == RECORD_TYPE_483 else "FDA EIR"
     locale = country or (f"{state}, United States" if state else "")

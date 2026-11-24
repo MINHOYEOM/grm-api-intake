@@ -115,7 +115,6 @@ class MigrationContract(unittest.TestCase):
         self.assertNotIn("NOTION", wf)
         self.assertIn("mfds_gmp_cert_snapshot.py", wf)
         src = (ROOT / "mfds_gmp_cert_snapshot.py").read_text(encoding="utf-8")
-        self.assertNotIn("import grm_notion", src)
         self.assertNotIn("collect_intake", src)
 
 

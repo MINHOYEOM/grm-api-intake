@@ -11,7 +11,7 @@ import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode, urlparse, urlsplit, urlunsplit
 from typing import Any
 
 import requests
@@ -747,6 +747,34 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR", warn_only=True,
                      notion_source=SOURCE_MHRA_GMP_NCR, silence_days=180),
 )
+
+
+def canonical_url_key(source: str, url: str) -> str:
+    """`source::정규화URL` — **기사 단위 permalink** 를 쓰는 소스의 2차 dedup 키.
+
+    ⚠️ 이 키는 `document_id` 키를 **대체하지 않는다**(그건 불가침이다 — 바꾸면 기존 전 row 의
+    id 가 달라져 일제히 신규로 재유입된다). 같은 기사가 **날짜만 바꿔 다시 오는** 경우를 잡는
+    **추가 층**일 뿐이다: `_stable_doc_id` 가 `date_iso` 를 키에 넣으므로 RSS 가 기사를 재게시하면
+    doc_id 자체가 달라져 doc_id 기반 dedup 으로는 구조적으로 잡을 수 없다(2026-08-24 실측:
+    ECA 126행 중 고유 기사 75개 — 중복 40.5%, 간격은 1~2일이 압도적).
+
+    정규화는 **보수적**으로만 한다 — scheme·host 소문자화, fragment 제거, 말미 슬래시 1개 제거.
+    query 는 **보존**한다(`?id=123` 처럼 query 가 문서를 가르는 사이트가 있어, 지우면 서로 다른
+    문서가 한 키로 뭉쳐 조용히 유실된다). 정규화가 과하면 dedup 은 곧 데이터 손실이 된다.
+    """
+    raw = (url or "").strip()
+    if not raw:
+        return ""
+    try:
+        parts = urlsplit(raw)
+    except ValueError:
+        return f"{source}::{raw.lower()}"
+    path = parts.path
+    if len(path) > 1 and path.endswith("/"):
+        path = path[:-1]
+    normalized = urlunsplit((
+        parts.scheme.lower(), parts.netloc.lower(), path, parts.query, ""))
+    return f"{source}::{normalized}"
 
 
 def truncate(text: str, limit: int = NOTION_RICH_TEXT_CHUNK) -> str:

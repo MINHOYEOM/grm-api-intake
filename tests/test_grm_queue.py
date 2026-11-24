@@ -605,9 +605,8 @@ class BuilderConditionsTest(unittest.TestCase):
     def test_notion_snapshot_reader_trims_the_same_way(self):
         # 정규화 기준이 노션 읽기 규칙이라는 것을 잠근다 — 그쪽이 바뀌면 여기도 다시 봐야 한다.
         page = {"properties": {"Headline": {"rich_text": [{"plain_text": "회수 공지\r"}]}}}
-        import grm_notion
         snap = gh._intake_page_snapshot(
-            {"properties": {grm_notion.PROP_HEADLINE: page["properties"]["Headline"]}})
+            page)
         self.assertEqual(snap["headline"], "회수 공지")
 
     def test_483_out_of_scope_by_current_rule_is_closed_before_handoff(self):

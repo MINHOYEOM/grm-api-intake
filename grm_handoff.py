@@ -14,7 +14,6 @@ from grm_common import (
     SOURCE_FDA_483,
     SOURCE_FDA_WL,
     SOURCE_FR,
-    SOURCE_HANDOFF,
     SOURCE_HC,
     SOURCE_ICH,
     SOURCE_ISPE,
@@ -25,42 +24,8 @@ from grm_common import (
     SOURCE_RECALL,
     SOURCE_WHO,
     _env_int,
-    chunk_text,
     env_flag,
     log,
-)
-from grm_notion import (
-    NOTION_CODE_BLOCK_CHUNK,
-    PROP_API_QUERY,
-    PROP_BODY,
-    PROP_COLLECTED_AT,
-    PROP_COMMENTS_CLOSE,
-    PROP_DATE,
-    PROP_DISTRIBUTION,
-    PROP_DOC_ID,
-    PROP_EVIDENCE_CANDIDATE,
-    PROP_FIRM,
-    PROP_HEADLINE,
-    PROP_LANGUAGE,
-    PROP_MODALITY,
-    PROP_NAME,
-    PROP_OFFICIAL_URL,
-    PROP_OSD_RELEVANCE,
-    PROP_QA_RELEVANCE,
-    PROP_RAW_EXCERPT,
-    PROP_REGION_JURISDICTION,
-    PROP_RUN_DATE,
-    PROP_SEARCH_QUERY,
-    PROP_SIGNAL_TIER,
-    PROP_SITE_COUNTRY,
-    PROP_SOURCE,
-    PROP_SOURCE_TYPE,
-    PROP_SOURCE_URL,
-    PROP_STATUS,
-    PROP_TYPE_CLASS,
-    _datetime_iso,
-    _rich_text,
-    _select,
 )
 from card_scaffold import (
     assemble_web_brief,
@@ -124,37 +89,38 @@ def _prop_url(props: dict[str, Any], name: str) -> str:
 
 
 def _intake_page_snapshot(page: dict[str, Any]) -> dict[str, Any]:
+    """Decode a historical intake page in the original handoff row format."""
     props = page.get("properties", {})
     return {
         "page_id": page.get("id", ""),
         "page_url": page.get("url", ""),
-        "title": _prop_title(props, PROP_NAME),
-        "source": _prop_select(props, PROP_SOURCE),
-        "document_id": _prop_rich_text(props, PROP_DOC_ID),
-        "date": _prop_date(props, PROP_DATE),
-        "headline": _prop_rich_text(props, PROP_HEADLINE),
-        "official_url": _prop_url(props, PROP_OFFICIAL_URL),
-        "source_url": _prop_url(props, PROP_SOURCE_URL),
-        "type_or_class": _prop_select(props, PROP_TYPE_CLASS),
-        "firm": _prop_rich_text(props, PROP_FIRM),
-        "body": _prop_rich_text(props, PROP_BODY),
-        "distribution": _prop_rich_text(props, PROP_DISTRIBUTION),
-        "comments_close": _prop_date(props, PROP_COMMENTS_CLOSE),
-        "run_date": _prop_date(props, PROP_RUN_DATE),
-        "collected_at": _prop_date(props, PROP_COLLECTED_AT),
-        "api_query": _prop_url(props, PROP_API_QUERY),
-        "search_query": _prop_rich_text(props, PROP_SEARCH_QUERY),
-        "raw_excerpt": _prop_rich_text(props, PROP_RAW_EXCERPT),
-        "qa_relevance": _prop_select(props, PROP_QA_RELEVANCE),
-        "osd_relevance": _prop_select(props, PROP_OSD_RELEVANCE),
-        "modality": _prop_select(props, PROP_MODALITY),
-        "source_type": _prop_select(props, PROP_SOURCE_TYPE),
-        "signal_tier": _prop_select(props, PROP_SIGNAL_TIER),
-        "evidence_candidate": _prop_select(props, PROP_EVIDENCE_CANDIDATE),
-        "language": _prop_select(props, PROP_LANGUAGE),
-        "region_jurisdiction": _prop_select(props, PROP_REGION_JURISDICTION),
-        "site_country": _prop_rich_text(props, PROP_SITE_COUNTRY),
-        "status": _prop_select(props, PROP_STATUS),
+        "title": _prop_title(props, "Name"),
+        "source": _prop_select(props, "Source"),
+        "document_id": _prop_rich_text(props, "Document ID"),
+        "date": _prop_date(props, "Date"),
+        "headline": _prop_rich_text(props, "Headline"),
+        "official_url": _prop_url(props, "Official URL"),
+        "source_url": _prop_url(props, "Source URL"),
+        "type_or_class": _prop_select(props, "Type or Class"),
+        "firm": _prop_rich_text(props, "Firm"),
+        "body": _prop_rich_text(props, "Body"),
+        "distribution": _prop_rich_text(props, "Distribution"),
+        "comments_close": _prop_date(props, "Comments Close"),
+        "run_date": _prop_date(props, "Run Date (KST)"),
+        "collected_at": _prop_date(props, "Collected At"),
+        "api_query": _prop_url(props, "API Query"),
+        "search_query": _prop_rich_text(props, "Search Query"),
+        "raw_excerpt": _prop_rich_text(props, "Raw Excerpt"),
+        "qa_relevance": _prop_select(props, "QA Relevance"),
+        "osd_relevance": _prop_select(props, "OSD Relevance"),
+        "modality": _prop_select(props, "Modality"),
+        "source_type": _prop_select(props, "Source Type"),
+        "signal_tier": _prop_select(props, "Signal Tier"),
+        "evidence_candidate": _prop_select(props, "Evidence Candidate"),
+        "language": _prop_select(props, "Language"),
+        "region_jurisdiction": _prop_select(props, "Region/Jurisdiction"),
+        "site_country": _prop_rich_text(props, "Site Country"),
+        "status": _prop_select(props, "Status"),
     }
 
 
@@ -526,80 +492,6 @@ def emit_web_brief_file(rows: list[dict[str, Any]], run_date: date, window_days:
     return path
 
 
-def _handoff_page_properties(payload: dict[str, Any],
-                             generated_at: datetime) -> dict[str, Any]:
-    run_date = payload["run_date_kst"]
-    row_count = payload["row_count"]
-    title = f"OPEN GRM Routine Handoff {run_date}"
-    body = (
-        f"New-only Routine handoff. rows={row_count}; "
-        f"window={payload['window_start']}~{payload['window_end']}; "
-        f"generated_at={payload['generated_at_kst']}"
-    )
-    return {
-        PROP_NAME: {"title": _rich_text(title)},
-        PROP_SOURCE: _select(SOURCE_HANDOFF),
-        PROP_DOC_ID: {"rich_text": _rich_text(payload["handoff_id"])},
-        PROP_DATE: {"date": {"start": run_date}},
-        PROP_HEADLINE: {"rich_text": _rich_text(f"Routine New-only handoff ({row_count} rows)")},
-        PROP_TYPE_CLASS: _select(TYPE_ROUTINE_HANDOFF),
-        PROP_BODY: {"rich_text": _rich_text(body)},
-        PROP_RUN_DATE: {"date": {"start": run_date}},
-        PROP_COLLECTED_AT: _datetime_iso(generated_at),
-        PROP_STATUS: _select("New"),
-    }
-
-
-def _handoff_blocks(payload: dict[str, Any], compact: bool = False) -> list[dict[str, Any]]:
-    # v2(compact=True): sort_keys 결정론 + 공백 제거(크기 절감, §12G). v1: 기존 indent=2 유지(바이트 동일).
-    if compact:
-        json_payload = json.dumps(payload, ensure_ascii=False, sort_keys=True,
-                                  separators=(",", ":"))
-    else:
-        json_payload = json.dumps(payload, ensure_ascii=False, indent=2)
-    blocks: list[dict[str, Any]] = [
-        {
-            "object": "block",
-            "type": "heading_2",
-            "heading_2": {"rich_text": _rich_text("GRM Routine Handoff")},
-        },
-        {
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {"rich_text": _rich_text(
-                f"HANDOFF_ID: {payload['handoff_id']} | "
-                f"SCHEMA: {payload['schema_version']} | "
-                f"ROW_COUNT: {payload['row_count']}"
-            )},
-        },
-        {
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {"rich_text": _rich_text(
-                f"WINDOW: {payload['window_start']}~{payload['window_end']} | "
-                f"GENERATED_AT_KST: {payload['generated_at_kst']}"
-            )},
-        },
-        {
-            "object": "block",
-            "type": "heading_3",
-            "heading_3": {"rich_text": _rich_text("Payload JSON")},
-        },
-    ]
-    for chunk in chunk_text(json_payload, NOTION_CODE_BLOCK_CHUNK):
-        blocks.append({
-            "object": "block",
-            "type": "code",
-            "code": {
-                "language": "json",
-                "rich_text": [{"type": "text", "text": {"content": chunk}}],
-            },
-        })
-    return blocks
-
-
-# 발행 요일(월=0). 그날의 handoff 는 Routine 이 소비해 CONSUMED(Processed)로 끝나야 하고,
-# 다음 날 수집기가 STALE 로 봉인한다면 그 주 Routine 이 **마감을 안 한 것**이다.
 PUBLISH_WEEKDAY = 0
 
 

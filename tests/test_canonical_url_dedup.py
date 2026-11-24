@@ -16,7 +16,7 @@ from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import collect_intake as ci  # noqa: E402
-from grm_notion import canonical_url_key  # noqa: E402
+from grm_common import canonical_url_key  # noqa: E402
 
 
 def _item(source: str, doc_id: str, url: str, date_iso: str = "2026-08-17") -> ci.IntakeItem:

@@ -307,7 +307,7 @@ class SupabaseCollectedKeysTest(unittest.TestCase):
         self.assertIn("FDA Warning Letter::last", ids)
         self.assertEqual(http.get.call_count, 2)
         self.assertEqual(http.get.call_args.kwargs["params"]["source"], "eq.FDA Warning Letter")
-        from grm_notion import canonical_url_key
+        from grm_common import canonical_url_key
         self.assertEqual(urls, {canonical_url_key("FDA Warning Letter", "https://EX.org/p/#x")})
         bad = MagicMock()
         bad.get.return_value = MagicMock(status_code=401)

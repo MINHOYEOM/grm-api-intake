@@ -167,52 +167,10 @@ from grm_common import (
     SOURCE_RECALL,
     SOURCE_WHO,
     _env_int,
+    canonical_url_key,
     chunk_text,
     truncate,
 )
-
-# ── [배치5] Phase1 Notion 클라이언트 층 분리 — grm_notion 재수출(하위호환·테스트·위성 무수정) ──
-from grm_notion import (
-    MODALITY_OPTIONS,
-    NOTION_CODE_BLOCK_CHUNK,
-    PROP_API_QUERY,
-    PROP_BODY,
-    PROP_COLLECTED_AT,
-    PROP_COMMENTS_CLOSE,
-    PROP_DATE,
-    PROP_DISTRIBUTION,
-    PROP_DOC_ID,
-    PROP_EVIDENCE_CANDIDATE,
-    PROP_FIRM,
-    PROP_HANDOFF_REF,
-    PROP_HEADLINE,
-    PROP_LANGUAGE,
-    PROP_MODALITY,
-    PROP_NAME,
-    PROP_OFFICIAL_URL,
-    PROP_OSD_RELEVANCE,
-    PROP_QA_RELEVANCE,
-    PROP_RAW_EXCERPT,
-    PROP_REGION_JURISDICTION,
-    PROP_RUN_DATE,
-    PROP_SEARCH_QUERY,
-    PROP_SIGNAL_TIER,
-    PROP_SITE_COUNTRY,
-    PROP_SOURCE,
-    PROP_SOURCE_TYPE,
-    PROP_SOURCE_URL,
-    PROP_STATUS,
-    PROP_TYPE_CLASS,
-    _date_iso,
-    _datetime_iso,
-    _rich_text,
-    _select,
-    _url,
-    build_notion_children,
-    build_notion_properties,
-    canonical_url_key,
-)
-
 # ── [배치5] Phase2 handoff/web emit 층 분리 — grm_handoff 재수출(하위호환·테스트·위성 무수정) ──
 from grm_handoff import (
     COVERAGE_SOURCE_LABELS,
@@ -227,9 +185,6 @@ from grm_handoff import (
     _enable_handoff_idempotency_v2,
     _enable_handoff_v2,
     _enable_web_brief_emit,
-    _handoff_blocks,
-    _handoff_page_properties,
-    _intake_page_snapshot,
     _plain_text,
     _prop_date,
     _prop_rich_text,
@@ -3962,7 +3917,6 @@ def insert_items(items: Iterable[IntakeItem], collected_at: datetime,
 # 다시 나와도 Notion 중복으로 건너뛰어 영영 사본에 없다(ICH 0행·WHO 171건 중 20행). 건너뛴
 # 항목을 모아 사본에 없는 것만 같은 append 함수로 채운다. 조회가 실패하면 아무것도 쓰지 않는다
 # (모르는 채로 전부 POST 하지 않는다 — ignore-duplicates 라 무해하지만 호출 수가 수백 배다).
-# 원천에 다시 나오지 않는 옛 행은 이 경로로 못 채운다 → backfill_raw_signals_from_notion.py.
 RAW_SIGNALS_HEAL_MAX_DEFAULT = 300
 
 

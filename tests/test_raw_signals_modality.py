@@ -1,6 +1,6 @@
 """raw_signals.modality — 수집 시점 기록 + 기존 행 소급(2026-11-12 재생 대조 A).
 
-Notion 적재(`grm_notion.notion_create_page`)와 정본 행(`findings_store.raw_signal_from_intake_item`)이
+표준 제품군 분류 함수와 정본 행(`findings_store.raw_signal_from_intake_item`)이
 같은 함수·같은 입력으로 제품군을 정해야 DB 로 만든 handoff 가 노션 것과 같아진다.
 """
 from __future__ import annotations
@@ -25,13 +25,12 @@ def _item(**kw) -> ci.IntakeItem:
     return ci.IntakeItem(**base)
 
 
-def _notion_path_modality(item: ci.IntakeItem) -> str:
-    # grm_notion.notion_create_page 와 같은 호출(입력 순서까지).
+def _expected_modality(item: ci.IntakeItem) -> str:
     return compute_modality(item.raw_payload, item.headline, item.body, item.type_or_class, item.firm)
 
 
 class IntakeRecordCarriesModalityTest(unittest.TestCase):
-    def test_record_modality_equals_notion_path(self) -> None:
+    def test_record_modality_matches_classifier(self) -> None:
         for item in (
             _item(),
             _item(source="OpenFDA Recall", document_id="D-1", headline="Amlodipine Tablets 10 mg",
@@ -42,7 +41,7 @@ class IntakeRecordCarriesModalityTest(unittest.TestCase):
         ):
             with self.subTest(source=item.source):
                 rec = findings_store.raw_signal_from_intake_item(item)
-                expected = _notion_path_modality(item)
+                expected = _expected_modality(item)
                 self.assertEqual(rec.get("modality") or "", expected)
                 self.assertEqual(json.loads(rec["row_json"]).get("modality", ""), expected)
 
@@ -67,7 +66,7 @@ class BackfillPlanTest(unittest.TestCase):
     def test_backfill_matches_intake_computation(self) -> None:
         item = _item()
         row = self._row("r1", item)
-        self.assertEqual(bm.modality_for_row(row), _notion_path_modality(item))
+        self.assertEqual(bm.modality_for_row(row), _expected_modality(item))
 
     def test_plan_skips_filled_and_unknown(self) -> None:
         bio = _item()
@@ -76,11 +75,11 @@ class BackfillPlanTest(unittest.TestCase):
         rows = [self._row("r1", bio), self._row("r2", bio, modality="Chemical"),
                 self._row("r3", unknown), self._row("r4", bio, modality="")]
         result = bm.plan(rows)
-        expected = _notion_path_modality(bio)
+        expected = _expected_modality(bio)
         self.assertTrue(expected)
         self.assertEqual(result["skipped_already_filled"], 1)
         self.assertEqual(result["_ids"], {expected: ["r1", "r4"]})
-        self.assertEqual(result["unknown"], 1 if not _notion_path_modality(unknown) else 0)
+        self.assertEqual(result["unknown"], 1 if not _expected_modality(unknown) else 0)
 
     def test_apply_chunks_and_passes_value(self) -> None:
         calls: list[tuple[list[str], str]] = []

@@ -55,8 +55,8 @@ class ResolveHandoffWindowDaysTest(unittest.TestCase):
 
 def _fake_page(source: str = "MFDS", type_class: str = "recall-quality") -> dict:
     return {"id": "pg-x", "properties": {
-        ci.PROP_SOURCE: {"select": {"name": source}},
-        ci.PROP_TYPE_CLASS: {"select": {"name": type_class}},
+        "Source": {"select": {"name": source}},
+        "Type or Class": {"select": {"name": type_class}},
     }}
 
 

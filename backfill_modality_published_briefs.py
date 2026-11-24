@@ -17,7 +17,7 @@
 
 재생(replay) 방식 — 왜 신뢰할 수 있나
 ------------------------------------
-발행 카드의 `modality` 는 수집 시점에 `grm_notion.notion_create_page` 가
+과거 발행 카드의 `modality` 는 수집기가
 `compute_modality(item.raw_payload, item.headline, item.body, item.type_or_class,
 item.firm)` 로 계산해 Notion 에 적은 값이다. Supabase `raw_signals` 는 그 입력을 둘 다
 그대로 보관한다 — `raw_json` = raw_payload, `row_json` = IntakeItem(headline/body/
@@ -126,7 +126,7 @@ def _fetch_replay_inputs(base_url: str, service_key: str) -> dict[str, dict[str,
 def _replay_args(entry: dict[str, Any]) -> tuple[dict[str, Any], tuple[str, ...]]:
     """raw_signals 행 → compute_modality 인자(raw_payload, *text_parts).
 
-    ★인자 순서·구성은 grm_notion.notion_create_page 의 호출부와 한 글자도 달라선 안 된다:
+    ★당시 수집 판정을 재현하려면 분류기에 같은 입력을 같은 순서로 넘겨야 한다:
         compute_modality(item.raw_payload, item.headline, item.body,
                          item.type_or_class, item.firm)
     """

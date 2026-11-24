@@ -284,7 +284,7 @@ def reconcile_source(
         if spec.url_dedup and collected_urls and doc.url:
             # 같은 기사가 날짜만 바꿔 재게시되면 키가 달라진다 — 수집기는 정규화 URL 로 중복을 막는다
             # (`collect_intake._CANONICAL_URL_DEDUP_SOURCES`). 같은 기준으로 '이미 있음'을 센다.
-            from grm_notion import canonical_url_key
+            from grm_common import canonical_url_key
             if canonical_url_key(spec.source, doc.url) in collected_urls:
                 counts["collected"] += 1
                 continue
@@ -969,7 +969,7 @@ def load_collected_keys_supabase(base_url: str, service_key: str, sources: Itera
     '수집됨'으로 세므로, Notion 기준에서 놓침으로 보이던 것이 여기서는 수집됨일 수 있다(그쪽이 맞다).
     실패하면 StoreReadError(키·예외 문구는 싣지 않는다).
     """
-    from grm_notion import canonical_url_key
+    from grm_common import canonical_url_key
     http = session or requests
     headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
     url = f"{base_url.rstrip('/')}/rest/v1/raw_signals"

@@ -197,17 +197,6 @@ class V1FrozenSnapshotTest(unittest.TestCase):
             expected = f.read()
         self.assertEqual(serialized, expected)
 
-    def test_v1_blocks_structure_unchanged(self) -> None:
-        # 업서트 직렬화 경로 회귀: 헤더 4블록 + code 블록, v1 은 indent=2(compact 아님)
-        blocks = ci._handoff_blocks(self._v1_payload())
-        types = [b["type"] for b in blocks]
-        self.assertEqual(types[:4], ["heading_2", "paragraph", "paragraph", "heading_3"])
-        self.assertTrue(all(t == "code" for t in types[4:]))
-        self.assertEqual(blocks[0]["heading_2"]["rich_text"][0]["text"]["content"],
-                         "GRM Routine Handoff")
-        code_text = blocks[4]["code"]["rich_text"][0]["text"]["content"]
-        self.assertIn('\n  "', code_text)  # indent 2칸 존재(v1 직렬화)
-
     def test_v1_has_no_v2_fields(self) -> None:
         payload = self._v1_payload()
         self.assertEqual(payload["schema_version"], "grm-routine-handoff/v1")

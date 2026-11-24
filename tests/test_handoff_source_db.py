@@ -28,7 +28,6 @@ sys.path.insert(0, str(ROOT / "tests"))
 import collect_intake as ci  # noqa: E402
 import grm_handoff as gh  # noqa: E402
 import grm_health  # noqa: E402
-import grm_notion  # noqa: E402
 import grm_queue as gq  # noqa: E402
 from test_grm_queue import FakeStore, _Item, _record  # noqa: E402
 from test_intake_db_dedup import _FakeQueueStore, _item, _ok, _NOW, _SUPABASE  # noqa: E402

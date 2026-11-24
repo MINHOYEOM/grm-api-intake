@@ -8,7 +8,7 @@
   "한 번에 블록 100개" 뿐이고 이것도 자르기가 아니라 **나눠 담기**로 푼다.
 
 무엇을 막나
-  수집·적재 코드(collect_*·backfill_*·findings_store·findings_extractors·grm_notion·grm_common 등)에서
+  수집·적재 코드(collect_*·backfill_*·findings_store·findings_extractors·grm_common 등)에서
   ① 길이 상한 상수 정의(`*_MAX_CHARS`·`*_CHAR_CAP`·`*_EXCERPT_LIMIT` …) ② `truncate(` 호출
   ③ 100자 이상 문자열 자르기(`[:240]`·`[:SOME_MAX_CHARS]`) 를 줄 단위로 찾는다.
   **아래 `ALLOWED` 에 없는 새 줄이 생기면 실패한다.** 로그·오류 문구 자르기는 세지 않는다.
@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 SCOPE_GLOBS = ("collect_*.py", "backfill_*.py", "findings_store.py", "findings_extractors.py", "findings_supabase*.py",
-               "grm_notion.py", "grm_common.py", "grm_findings.py", "library_collect_*.py", "mfds_*.py", "fda483_*.py",
+               "grm_common.py", "grm_findings.py", "library_collect_*.py", "mfds_*.py", "fda483_*.py",
                "eudragmdp_client.py", "mhra_gmdp_client.py", "import_alerts_refresh.py", "deficiency_cases_refresh.py",
                "fda_citation_firms_refresh.py", "findings_translate*.py")
 
@@ -120,7 +120,6 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('findings_extractors.py', 'if len(deficiency) >= _FDA483_FRAGMENT_MAX_LEN:'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
     ('findings_extractors.py', 'return len(d) < _FDA483_FRAGMENT_MAX_LEN and len(_FDA483_WORD_RE.findall(d)) < 3'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
     ('findings_extractors.py', 'len(deficiency) < _FDA483_FRAGMENT_MAX_LEN'): ('decision', '483 단독 짧은 표제 판정(30자 미만) — 대체 표제+나머지 상세 = 원 상세, 저장은 원문'),
-    ('grm_notion.py', 'props[PROP_TYPE_CLASS] = _select(item.type_or_class[:100])'): ('genuine', 'Notion select 옵션 이름 100자 한도'),
 }
 
 

@@ -173,7 +173,7 @@ class RssKeyAndLedgerTest(unittest.TestCase):
         spec = sr.SPEC_BY_KEY["eca"]
         d = sr.SourceDoc(document_id="new-id", url="https://www.gmp-compliance.org/a/", title="t",
                          published="2026-11-20")
-        from grm_notion import canonical_url_key
+        from grm_common import canonical_url_key
         res = sr.reconcile_source(spec, sr.FetchOutcome(docs=[d]), run_date=RUN, window=(START, RUN),
                                   collected=set(), ledger={},
                                   collected_urls={canonical_url_key(spec.source, "https://www.gmp-compliance.org/a")})

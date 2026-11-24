@@ -14,7 +14,6 @@ from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import collect_intake as ci
-import grm_notion  # 배치5 Phase1: notion_api_request 정의 모듈(preflight 대체 대상)
 
 
 class TestComputeModality(unittest.TestCase):

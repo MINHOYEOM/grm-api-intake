@@ -1,7 +1,6 @@
 """Supabase raw_signals 사본 누락 수리 (2026-11-08 수집 완전성 ③-3).
 
 - 수집기: Notion 중복으로 건너뛴 항목 중 사본에 없는 것만 채운다(heal_supabase_copies).
-- 1회성 백필: backfill_raw_signals_from_notion — 기본 dry-run, --apply 일 때만 쓴다.
 """
 from __future__ import annotations
 

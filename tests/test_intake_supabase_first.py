@@ -22,7 +22,6 @@ from unittest import mock
 
 import collect_intake as ci
 import findings_store as store
-import grm_notion
 from grm_health import _evaluate_health
 
 _SUPABASE = ("https://example.supabase.co", "service-role-secret-token")

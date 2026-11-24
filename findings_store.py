@@ -146,7 +146,7 @@ def raw_signal_from_intake_item(item: Any, *, collected_at: Any = "") -> dict[st
         "language": _text_attr(item, "language"),
         "region_jurisdiction": _text_attr(item, "region_jurisdiction"),
         "site_country": _text_attr(item, "site_country"),
-        # [2026-11-12 제품군] Notion 행과 같은 판정(grm_notion.notion_create_page 와 같은 입력)을
+        # [2026-11-12 제품군] 과거 Notion 행과 같은 입력으로 계산한 제품군을
         # 정본에도 싣는다. 없으면 DB 로 만든 handoff 의 카드 문안·묶음이 노션 것과 달라진다
         # (11-12 재생 대조: 제품군만 채워도 완전일치 30→55/68, 72→96/115). 판별 근거가 없으면 "".
         "modality": item_modality(item, raw),
@@ -155,7 +155,7 @@ def raw_signal_from_intake_item(item: Any, *, collected_at: Any = "") -> dict[st
 
 
 def item_modality(item: Any, raw: dict[str, Any]) -> str:
-    """수집 항목의 제품군 — Notion 적재(`notion_create_page`)와 같은 함수·같은 입력 순서."""
+    """수집 원문과 항목 필드로 제품군을 계산한다."""
     return compute_modality(
         raw, _text_attr(item, "headline"), _text_attr(item, "body"),
         _text_attr(item, "type_or_class"), _text_attr(item, "firm"),

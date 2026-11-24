@@ -301,8 +301,7 @@ def snapshot_from_raw_signal(record: dict[str, Any], queue_row: dict[str, Any],
 def pre_handoff_skip_reason(source: str, raw: dict[str, Any]) -> str:
     """handoff 에 싣기 전에 코드가 닫는 행 — FDA 483 범위 밖 두 가지.
 
-    out_of_scope_483       수집 때 찍힌 표식(`fda483_text_status=out-of-scope`). 노션에서는
-                           `fda483_notion_raw_sync` 가 같은 행을 Status=Skipped 로 닫는다.
+    out_of_scope_483       수집 때 찍힌 표식(`fda483_text_status=out-of-scope`).
     out_of_scope_483_rule  표식은 없지만 지금 규칙(`grm_taxonomy.is_out_of_scope_483`)으로 범위 밖.
                            범위 규칙이 넓어지기 전에 저장된 행이다. 노션 길에서는 handoff 에 실렸다가
                            발행 조립(`assemble_publish_brief._is_out_of_scope_483_card`)에서 빠진다.
@@ -807,7 +806,7 @@ class QueueStore:
 
     def source_url_keys(self, sources: Iterable[str]) -> "set[str] | None":
         """기사형 소스의 정규화 URL 2차 중복 키(`source::정규화URL`)를 정본에서 만든다. 실패하면 None."""
-        from grm_notion import canonical_url_key
+        from grm_common import canonical_url_key
         out: set[str] = set()
         for source in sources:
             try:

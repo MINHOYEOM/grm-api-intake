@@ -27,7 +27,7 @@ class RepositoryInventoryTest(unittest.TestCase):
 class PublishPathInstructionsTest(unittest.TestCase):
     """클라우드 Routine 이 읽는 발행 길 지시문 — off 뒤 노션을 읽거나 쓰라고 하지 않는다."""
 
-    FILES = [("company", "editorial", f) for f in ("RUN.md", "desk.md", "reporter.md", "copyedit.md")] + \
+    FILES = [("company", "editorial", f) for f in ("RUN.md", "desk.md", "reporter.md", "copyedit.md", "REHEARSAL.md")] + \
             [("company", "editorial", "next", f) for f in ("RUN.md", "desk.md", "reporter.md", "copyedit.md")] + \
             [("company", "situation-room", "brief-prep.md"),
              ("company", "editorial", "backup.md")]          # 백업 v17 — 노션 없이 도는 월요일 자동 백업

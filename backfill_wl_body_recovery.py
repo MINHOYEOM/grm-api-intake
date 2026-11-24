@@ -83,6 +83,7 @@ _DEFAULT_PAGE_SIZE = 1000
 # fda.gov robots Crawl-Delay 는 백필 페치가 30초로 지킨다. 회수 대상은 하루 한 줌이라
 # 그 정도 간격도 부담이 없다 — 기본값을 같은 예의 수준으로 둔다.
 _DEFAULT_DELAY_SECONDS = 5.0
+DEFAULT_TIME_BUDGET_SECONDS = 1200.0   # 워크플로 timeout-minutes 30 에서 10분 여유(마지막 fetch·재시도·리포트)
 _MAX_SAMPLES = 20
 _BROAD_FAILURE_MIN_ATTEMPTS = 3
 _BROAD_FAILURE_RATIO = 0.5
@@ -95,6 +96,7 @@ KNOWN_RAW_KEYS = frozenset({
 })
 # 다시 읽어도 결과가 같을 사유. 이 표식이 붙은 행은 후보가 아니다(재시도가 끊긴다).
 DEFINITIVE_STATUSES = ("no-anchor",)
+BOT_BLOCK_STATUS = "fetch-fail:bot-block"   # collect_intake.WL_BODY_STATUS_BOT_BLOCK 과 같은 값(테스트가 대조)
 
 # 영구 403 정책(모듈 docstring). 표식은 모두 `fetch-403` 토큰으로 시작한다 — 하류 사유 매핑 계약.
 STATUS_403 = "fetch-403"
@@ -123,6 +125,20 @@ class WlBodyRecoveryReport:
     permanent_403_docs: list[str] = field(default_factory=list)
     rebuild_body_start: bool = False    # --rebuild-body-start 모드
     body_start_unchanged: int = 0       # 그 모드에서 다시 받은 본문이 기존과 같음 — 쓰지 않음
+    body_shrunk: int = 0                # 그 모드에서 새 본문이 옛 본문보다 짧음 — 쓰지 않음(대표 원칙: 줄어드는 행 금지)
+    body_diverged: int = 0              # 그 모드에서 옛 본문 앞부분이 새 본문에 없음 — 다른 글 — 쓰지 않음
+    bot_blocked: bool = False           # fda.gov 봇 차단(abuse-detection-apology) 감지 — 즉시 중단(남은 행은 다음 실행)
+    stopped_at: str = ""                # 중단한 document_id
+    # [시간 예산 2026-11-24] 워크플로 제한(30분) 안에 리포트가 반드시 남게 한다 — 첫 dry-run 이 시간 초과로 취소되면서
+    # 결과가 통째로 사라졌다. 예산을 넘기면 남은 행은 '다음 회차 대상'으로 적고 정상 종료한다(멱등 — 쓴 행은 후보에서 빠진다).
+    candidates_total: int = 0           # 상한(limit·예산) 적용 전 후보 수
+    time_budget_seconds: float = 0.0    # 0 = 무제한
+    elapsed_seconds: float = 0.0
+    budget_exhausted: bool = False
+    deferred_next: int = 0              # 상한·예산으로 이번에 못 본 행 수(다음 회차)
+    deferred_docs: list[str] = field(default_factory=list)   # 그 document_id 전부(자르지 않는다)
+    avg_seconds_per_attempt: float = 0.0
+    head_rebuild: dict[str, int] = field(default_factory=dict)   # 쓸 행의 새 위반항목 결과(형식 F*/사유별 행 수)
     status_resolved: int = 0            # 확정 사유(404·no-anchor)로 표식만 교체
     unknown_keys: int = 0               # 저장 raw 에 모르는 키 — 손대지 않음
     id_mismatch: int = 0                # 재구성 id ≠ 기존 — 손대지 않음(0 이어야 정상)
@@ -190,10 +206,33 @@ def starts_mid_sentence(body: str) -> bool:
     return bool(re.match(r"[a-z]", str(body or "")))
 
 
+def starts_after_cut_head(body: str) -> bool:
+    """본문이 'Specifically,'·각주('1 As described')로 시작하는가 — 위반 서술 앞부분이 잘린 흔적.
+
+    [2026-11-24] 본문 시작 앵커 'specifically,' 가 회신 부적절 단락에서 처음 걸리는 서한(임상시험자·GLP·허위광고 등)은
+    대문자로 시작해 `starts_mid_sentence` 에 안 걸렸지만 위반 서술을 통째로 잃었다(저장 88행). 수집기의 판정
+    (`collect_intake._WL_BODY_HEAD_TRUNCATED_RE` → 사유 `body_head_truncated`)의 부분집합(각주 머리 제외)이다."""
+    # 각주 머리('1 As described …')는 서한 자체가 그렇게 시작하는 경우가 있어(실측 80행) 후보에서 뺀다 — 다시 받아도 같다.
+    # 그래도 위반항목을 못 뽑아 `body_head_truncated` 사유가 붙은 행은 is_body_start_candidate 가 사유로 잡는다.
+    return bool(re.match(r"\s*(?:Specifically,|Conclusion\b)", str(body or "")))
+
+
 def is_body_start_candidate(raw: dict[str, Any], *, explicit: bool = False) -> bool:
-    """`--rebuild-body-start` 대상: 본문이 있고, 소문자로 시작하거나 사람이 지정한 행."""
+    """`--rebuild-body-start` 대상: 본문이 있고, 소문자·'Specifically,' 로 시작하거나 사람이 지정한 행."""
     full = str(raw.get("wl_body_full") or "")
-    return bool(full) and (explicit or starts_mid_sentence(full))
+    return bool(full) and (explicit or starts_mid_sentence(full) or starts_after_cut_head(full)
+                           or str(raw.get("wl_violations_status") or "") == "body_head_truncated")
+
+
+def _norm_ws(text: str) -> str:
+    return " ".join(str(text or "").split())
+
+
+def old_body_inside_new(old_full: str, new_full: str, probe_chars: int = 200) -> bool:
+    """옛(잘린) 본문의 앞 `probe_chars` 자가 새 본문 안에 그대로 있는가 — 같은 편지를 다시 받았다는 대조.
+    새 본문이 옛 본문의 **앞쪽을 더한** 것일 때만 참이다(다른 글이 오면 거짓 → 쓰지 않는다)."""
+    probe = _norm_ws(old_full)[:probe_chars]
+    return bool(probe) and probe in _norm_ws(new_full)
 
 
 def first_403_date(raw: dict[str, Any], collected_at: str) -> date | None:
@@ -351,12 +390,17 @@ def run(
     sleeper: Sleeper | None = None,
     today: date | None = None,
     rebuild_body_start: bool = False,
+    time_budget_seconds: float | None = None,
+    clock: Callable[[], float] | None = None,
+    progress_cb: Callable[[WlBodyRecoveryReport], None] | None = None,
 ) -> tuple[WlBodyRecoveryReport, int]:
     fetch_raw = fetch_raw_signals or _fetch_raw_signals
     letter_fn = fetch_letter or _fetch_letter
     rebuild_fn = rebuild_item or _rebuild_item
     upsert_fn = upsert_raw_signal or _upsert_raw_signal
     sleep_fn = sleeper or _default_sleep
+    clock_fn = clock or time.monotonic
+    t0 = clock_fn()
     today = today or datetime.now(timezone.utc).date()
 
     report = WlBodyRecoveryReport(mode="dry_run" if dry_run else "apply", limit=limit,
@@ -395,12 +439,25 @@ def run(
     if wanted:
         targets = [r for r in targets if _named(r)]
     targets.sort(key=lambda r: str(r.get("raw_signal_id") or ""))
+    report.candidates_total = len(targets)
     if limit is not None and limit > 0:     # 0 이하 = 전건(형제 백필과 같은 규약)
+        report.deferred_docs.extend(str(r.get("document_id") or "") for r in targets[limit:])
         targets = targets[:limit]
     report.candidates = len(targets)
+    report.time_budget_seconds = float(time_budget_seconds or 0)
 
-    for r in targets:
+    for idx, r in enumerate(targets):
         label = str(r.get("document_id") or r.get("raw_signal_id") or "")
+        elapsed = clock_fn() - t0
+        if time_budget_seconds and elapsed >= time_budget_seconds:
+            # 예산 소진 — 이 행부터 끝까지는 다음 회차. 리포트는 정상으로 남는다.
+            report.budget_exhausted = True
+            report.deferred_docs.extend(str(x.get("document_id") or "") for x in targets[idx:])
+            log("WARN", f"WL 회수 시간 예산 {time_budget_seconds:g}초 소진 — 남은 {len(targets) - idx}건은 다음 회차")
+            break
+        if progress_cb is not None and idx:
+            report.elapsed_seconds = round(elapsed, 1)
+            progress_cb(report)
         raw = _json_object(r.get("raw_json"))
         unknown = sorted(set(raw) - KNOWN_RAW_KEYS)
         if unknown:
@@ -424,6 +481,16 @@ def run(
             report.errors.append(f"{label}: fetch_raised:{type(exc).__name__}")
             continue
 
+        if status == BOT_BLOCK_STATUS:
+            # [2026-11-24] fda.gov 가 막았다 — 같은 IP 로 더 두드리면 차단만 길어진다. 즉시 멈추고 알린다(남은 행은
+            # 다음 실행에서 이어진다 — 쓴 행은 후보에서 빠지므로 멱등).
+            report.bot_blocked = True
+            report.stopped_at = label
+            report.still_empty += 1
+            _bump(report, "bot-block")
+            report.errors.append(f"{label}: fda-bot-block — 이후 요청 중단")
+            log("ERROR", f"FDA 봇 차단 감지({label}) — 남은 행 요청을 중단합니다")
+            break
         if not full and rebuild_body_start:
             # 있는 본문을 표식으로 덮지 않는다 — 이번에 못 받았으면 그대로 둔다.
             report.still_empty += 1
@@ -432,6 +499,20 @@ def run(
         old_full = str(raw.get("wl_body_full") or "")
         if rebuild_body_start and full == old_full:
             report.body_start_unchanged += 1
+            continue
+        if rebuild_body_start and len(_norm_ws(full)) < len(_norm_ws(old_full)):
+            report.body_shrunk += 1               # 줄어드는 행은 쓰지 않는다
+            _bump(report, "body_shrunk")
+            report.body_changes.append({"raw_signal_id": str(r.get("raw_signal_id") or ""),
+                                        "old_chars": len(old_full), "new_chars": len(full),
+                                        "skipped": "shrunk"})
+            continue
+        if rebuild_body_start and starts_after_cut_head(old_full) and not old_body_inside_new(old_full, full):
+            report.body_diverged += 1             # 다시 받은 글이 옛 본문을 품지 않는다 — 다른 글
+            _bump(report, "body_diverged")
+            report.body_changes.append({"raw_signal_id": str(r.get("raw_signal_id") or ""),
+                                        "old_chars": len(old_full), "new_chars": len(full),
+                                        "skipped": "diverged"})
             continue
         if not full:
             new_status = status
@@ -482,6 +563,9 @@ def run(
         violations = (getattr(item, "raw_payload", {}) or {}).get("wl_violations") or []
         report.recovered += 1
         if rebuild_body_start:
+            _payload = getattr(item, "raw_payload", {}) or {}
+            _key = ("filled" if violations else str(_payload.get("wl_violations_status") or "unmarked"))
+            report.head_rebuild[_key] = report.head_rebuild.get(_key, 0) + 1
             report.body_changes.append({
                 "raw_signal_id": str(r.get("raw_signal_id") or ""),
                 "old_chars": len(old_full), "new_chars": len(full)})
@@ -494,6 +578,12 @@ def run(
                 **({"old_head": old_full[:60], "new_head": full[:60]} if rebuild_body_start else {}),
             })
 
+    report.elapsed_seconds = round(clock_fn() - t0, 1)
+    report.deferred_next = len(report.deferred_docs)
+    if report.attempted:
+        report.avg_seconds_per_attempt = round(report.elapsed_seconds / report.attempted, 1)
+    if progress_cb is not None:
+        progress_cb(report)
     head = "[DRY] 교체 예정" if dry_run else "회수 upsert"
     log("INFO", f"WL 본문 {head} {report.recovered}건(위반 표제 {report.violations_recovered}건) "
                 f"· 대상 {report.candidates}건 · 이번에도 못 받음 {report.still_empty}건 "
@@ -518,7 +608,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--rebuild-body-start", action="store_true", default=False,
                    help="본문이 있지만 문장 중간(소문자)에서 시작하는 행(+ --doc-ids 지정 행)을 다시 "
                         "받아 재구성한다(수동 전용 — 모듈 docstring).")
-    p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록.")
+    p.add_argument("--time-budget-seconds", type=float, default=DEFAULT_TIME_BUDGET_SECONDS,
+                   help=f"이번 실행의 시간 예산(초, 기본 {DEFAULT_TIME_BUDGET_SECONDS:g} — 워크플로 제한 30분 안에 리포트가 "
+                        "남게). 넘으면 남은 행은 deferred_docs 로 적고 정상 종료. 0 = 무제한.")
+    p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록(행마다 갱신 — 중간에 끊겨도 마지막 상태가 남는다).")
     p.add_argument("--supabase-url", help="미지정 시 $SUPABASE_URL")
     p.add_argument("--service-role-key", help="미지정 시 $SUPABASE_SERVICE_ROLE_KEY")
     return p
@@ -535,11 +628,20 @@ def main(argv: list[str] | None = None) -> int:
               file=sys.stderr)
         return 2
     base_url, service_key = creds
+    def _flush(rep: WlBodyRecoveryReport) -> None:
+        if args.report_path:
+            tmp = Path(args.report_path + ".tmp")
+            tmp.write_text(json.dumps(asdict(rep), ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+                           encoding="utf-8")
+            tmp.replace(args.report_path)
+
     report, code = run(
         base_url=base_url, service_key=service_key, dry_run=not args.apply,
         limit=args.limit, delay_seconds=args.delay_seconds,
         doc_ids=_parse_doc_ids(args.doc_ids),
         rebuild_body_start=args.rebuild_body_start,
+        time_budget_seconds=args.time_budget_seconds or None,
+        progress_cb=_flush if args.report_path else None,
     )
     payload = json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2)
     print(payload)

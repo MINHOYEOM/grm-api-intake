@@ -1,6 +1,7 @@
 """Check explicit client-role EXECUTE revocations in checked-in SQL."""
 
 import re
+import unittest
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -294,16 +295,20 @@ def _violations(migrations):
     return violations
 
 
-def test_migration_functions_revoke_client_execute():
-    supabase = sorted((ROOT / "supabase/migrations").glob("*.sql"))
-    web = sorted(
-        (ROOT / "web/migrations").glob("[0-9]*.sql"),
-        key=lambda path: (int(re.match(r"\d+", path.name)[0]), path.name),
-    )
-    assert supabase and web, "Expected SQL migrations in both directories"
-    violations = _violations((path.name, path.read_text(encoding="utf-8-sig")) for path in supabase + web)
-    new_violations = violations - KNOWN_VIOLATIONS
-    assert not new_violations, "New client EXECUTE violations:\n" + "\n".join(
-        f"{filename}: {signature} / {role}: {reason}"
-        for signature, role, filename, reason in sorted(new_violations)
-    )
+class MigrationFunctionGrantsTest(unittest.TestCase):
+    def test_migration_functions_revoke_client_execute(self):
+        supabase = sorted((ROOT / "supabase/migrations").glob("*.sql"))
+        web = sorted(
+            (ROOT / "web/migrations").glob("[0-9]*.sql"),
+            key=lambda path: (int(re.match(r"\d+", path.name)[0]), path.name),
+        )
+        self.assertTrue(supabase and web, "Expected SQL migrations in both directories")
+        violations = _violations((path.name, path.read_text(encoding="utf-8-sig")) for path in supabase + web)
+        new_violations = violations - KNOWN_VIOLATIONS
+        self.assertFalse(
+            new_violations,
+            "New client EXECUTE violations:\n" + "\n".join(
+                f"{filename}: {signature} / {role}: {reason}"
+                for signature, role, filename, reason in sorted(new_violations)
+            ),
+        )

@@ -3664,6 +3664,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         return [], msg
 
     items: list[IntakeItem] = []
+    body_error = None
     for row in listing_rows:
         cols = row.get("_cols", [])
         if len(cols) < 4:
@@ -3729,13 +3730,11 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         # WHY-1 #2: 게이트 통과(유지) WL 의 편지 본문에서 위반 excerpt 추출(flag on 시).
         # 실패는 graceful(키 미기록 → 목록 메타 카드 유지). in-window 유지 WL 은 소수라 부담 낮음.
         excerpt_result: tuple[str, str] | None = None
-        if wl_body_enabled and wl_href:
+        if wl_body_enabled and wl_href and not body_error:
             wl_body_health["attempted"] += 1
             excerpt_result = _fetch_wl_body_excerpt(wl_href)
             if excerpt_result[1] == FDA_BOT_BLOCK:
-                wl_body_health["failed"] += 1
-                listing_health["detail"] = FDA_BOT_BLOCK
-                return [], FDA_BOT_BLOCK
+                body_error = FDA_BOT_BLOCK
             if not excerpt_result[0]:
                 wl_body_health["failed"] += 1
 
@@ -3743,13 +3742,11 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         # (docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력. wl_body_enabled 와 완전
         # 독립 — 기존 excerpt 플로우는 이 블록의 영향을 받지 않는다(additive).
         full_result: tuple[str, str] | None = None
-        if wl_body_full_enabled and wl_href:
+        if wl_body_full_enabled and wl_href and not body_error:
             wl_body_full_health["attempted"] += 1
             full_result = _fetch_wl_body_full(wl_href)
             if full_result[1] == FDA_BOT_BLOCK:
-                wl_body_full_health["failed"] += 1
-                listing_health["detail"] = FDA_BOT_BLOCK
-                return [], FDA_BOT_BLOCK
+                body_error = FDA_BOT_BLOCK
             if not full_result[0]:
                 wl_body_full_health["failed"] += 1
 
@@ -3760,7 +3757,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         ))
 
     log("INFO", f"FDA WL 수집 완료: {len(items)}건")
-    return items, None
+    if body_error:
+        listing_health["detail"] = body_error
+    return items, body_error
 
 
 # ─────────────────────────────────────────────────────────────────────────────

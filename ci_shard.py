@@ -28,6 +28,8 @@ import time
 import unittest
 from pathlib import Path
 
+from ci_network_guard import ExternalNetworkBlocked, NetworkGuard
+
 ROOT = Path(__file__).resolve().parent
 TESTS_DIR = ROOT / "tests"
 TIMINGS_PATH = TESTS_DIR / "ci_shard_timings.json"
@@ -119,8 +121,22 @@ class _TimedResult(unittest.TextTestResult):
         self.unit_seconds = {}
         self._last = time.perf_counter()
 
+    def startTest(self, test):
+        super().startTest(test)
+        self.guard.test_id = test.id()
+        self._network_start = len(self.guard.violations)
+
+    def addSuccess(self, test):
+        violations = self.guard.violations[self._network_start:]
+        if violations:
+            error = ExternalNetworkBlocked("\n".join(violations))
+            self.addFailure(test, (type(error), error, None))
+        else:
+            super().addSuccess(test)
+
     def stopTest(self, test):
         super().stopTest(test)
+        self.guard.test_id = None
         now = time.perf_counter()
         key = unit_key(test)
         self.unit_seconds[key] = self.unit_seconds.get(key, 0.0) + (now - self._last)
@@ -165,6 +181,15 @@ def main(argv=None) -> int:
     # `unittest discover -s tests` 와 동일하게 tests/ 를 sys.path 에 둔다(+ 루트 모듈 import).
     sys.path.insert(0, str(TESTS_DIR))
     sys.path.insert(0, str(ROOT))
+    guard = NetworkGuard()
+    with guard.installed():
+        status = _run_shard(args, guard)
+    for violation in guard.violations:
+        print(violation, file=sys.stderr)
+    return 1 if guard.violations else status
+
+
+def _run_shard(args, guard):
     units = group_units(discover())
     timings = load_timings()
     tests = select_shard(units, args.index, args.total, timings)
@@ -176,7 +201,12 @@ def main(argv=None) -> int:
             print(t.id())
         return 0
 
-    runner = unittest.TextTestRunner(verbosity=2, resultclass=_TimedResult)
+    def make_result(*args):
+        result = _TimedResult(*args)
+        result.guard = guard
+        return result
+
+    runner = unittest.TextTestRunner(verbosity=2, resultclass=make_result)
     result = runner.run(unittest.TestSuite(tests))
     if args.record:
         Path(args.record).write_text(

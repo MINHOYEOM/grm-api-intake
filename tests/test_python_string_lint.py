@@ -21,9 +21,7 @@ STRING_PREFIX = re.compile(r"[a-zA-Z]*")
 
 # Count identical findings rather than allowing all regexes in a known file.
 # Line numbers are deliberately omitted so unrelated edits can move the code.
-REGEX_BASELINE = Counter({
-    ("web/render.py", "embedded 0x08", 'r"\x08(\\d{2})/(\\d{2})/(\\d{4})\x08"'): 1,
-})
+REGEX_BASELINE = Counter()
 STDOUT_BASELINE = frozenset({
     "company/editorial/merge_parts.py",
     "company/ops/intake_counts.py",

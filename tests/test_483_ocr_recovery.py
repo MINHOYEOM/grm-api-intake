@@ -168,17 +168,29 @@ class RecoveryRunTest(unittest.TestCase):
                     saved = rec._json_object(upsert.call_args.args[2]["raw_json"])
                     self.assertEqual(saved["fda483_body_full"], _TEXT)
 
-    def test_cap_status_rebuild_cannot_drop_existing_full_body(self) -> None:
+    def test_definitive_empty_updates_only_status_when_full_body_exists(self) -> None:
         _, _, _, rid = _run()
         row = _row(rid, status="not-attempted")
-        row["raw_json"] = {**json.loads(row["raw_json"]), "fda483_body_full": _TEXT}
-        report, code, upsert, _ = _run(
-            rows=[row], dry_run=False, mode=rec.MODE_COLLECTION_CAPPED,
-            fetch_text=lambda url: ("", "scan-no-text"),
-        )
-        self.assertEqual((code, report.shrunk, report.status_resolved), (0, 1, 0))
-        self.assertEqual(report.failure_reasons["shrunk"], 1)
-        upsert.assert_not_called()
+        raw = {**_raw_payload(), "fda483_body_full": _TEXT, "fda483_text_status": "not-attempted"}
+        row["raw_json"] = raw
+        for dry_run in (True, False):
+            with self.subTest(dry_run=dry_run):
+                patch_raw = mock.Mock()
+                report, code, upsert, _ = _run(
+                    rows=[row], dry_run=dry_run, mode=rec.MODE_RECOVERABLE,
+                    fetch_text=lambda url: ("", "scan-no-text"), patch_raw_json=patch_raw,
+                )
+                self.assertEqual((code, report.shrunk, report.status_resolved), (0, 0, 1))
+                upsert.assert_not_called()
+                if dry_run:
+                    patch_raw.assert_not_called()
+                else:
+                    saved = patch_raw.call_args.args[3]
+                    patch_raw.assert_called_once_with(
+                        "https://example.supabase.co", "k", rid,
+                        {**raw, "fda483_text_status": "scan-no-text"}, row=row,
+                    )
+                    self.assertFalse(rec.is_recovery_candidate(saved, rec.MODE_RECOVERABLE))
 
     def test_dry_run_reports_recovery_without_writing(self) -> None:
         report, code, upsert, _rid = _run()

@@ -128,6 +128,13 @@ class WorkflowInventoryTest(unittest.TestCase):
                 cond = _if_line(block)
                 self.assertTrue("steps.bridge.outputs.source != 'git'" in cond or SWITCH_SKIP in cond, name)
 
+    def test_bridge_stops_before_writing_unless_off(self) -> None:
+        """[노션 은퇴 ③] 노션 마감 단계가 없으니 브릿지는 off 에서만 기록한다 — off 확인이 기록 단계보다 앞."""
+        text = (WF / "grm-delta-bridge.yml").read_text(encoding="utf-8")
+        names = [n for n, _ in _steps(text)[1]]
+        self.assertLess(names.index("노션 off 확인 (③ 정리 뒤에는 off 에서만 돈다)"),
+                        names.index("델타 브릿지 실행(select → extract → write)"))
+
     def test_off_aware_scripts_use_the_one_switch(self) -> None:
         for script, test in OFF_AWARE.items():
             with self.subTest(script=script):

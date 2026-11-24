@@ -1532,7 +1532,6 @@ def backfill_history(store: Any, token: str, db_id: str, *, end: date, days: int
 STATE_TO_NOTION_STATUS = {
     STATE_PROCESSED: "Processed", STATE_SKIPPED: "Skipped", STATE_ERROR: "Error",
 }
-NOTION_SYNC_ENV = "ENABLE_QUEUE_NOTION_STATUS_SYNC"
 
 
 def plan_notion_sync(states: dict[str, dict[str, str]], closed_keys: Iterable[str],
@@ -1777,8 +1776,10 @@ def main(argv: "list[str] | None" = None) -> int:
                 print("NOTION_TOKEN·노션 DB id 가 필요하다", file=sys.stderr)
                 return 1
             apply = bool(args.apply)
-            if apply and not (args.force or env_flag("ENABLE_QUEUE_NOTION_STATUS_SYNC")):
-                print(f"{NOTION_SYNC_ENV} 가 꺼져 있어 쓰지 않는다(계획만)", file=sys.stderr)
+            if apply and not args.force:
+                # [노션 은퇴 ③] 워크플로 단계와 변수 ENABLE_QUEUE_NOTION_STATUS_SYNC 는 지웠다 — 노션을 되돌려
+                #   켰을 때 사람이 손으로만 돌린다(--apply --force).
+                print("노션 행 Status 기록은 수동 전용이다 — --force 없이는 쓰지 않는다(계획만)", file=sys.stderr)
                 apply = False
             out = notion_sync(store, token, db_id, args.date, args.repo_root,
                               apply=apply, force=bool(args.force))

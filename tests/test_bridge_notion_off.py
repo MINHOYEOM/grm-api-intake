@@ -194,10 +194,13 @@ class WiringAndInstructionsTest(unittest.TestCase):
     def test_workflows_pass_the_switch(self) -> None:
         bridge = self._read(".github", "workflows", "grm-delta-bridge.yml")
         self.assertIn("GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}", bridge)
-        # CONSUMED 단계는 source != git 일 때만 돈다 — off 면 브릿지가 git 만 낸다(위 시험들).
-        consume = bridge[bridge.index("- name: Notion 마감(CONSUMED)"):]
-        consume = consume[:consume.index("run:")]
-        self.assertIn("steps.bridge.outputs.source != 'git'", consume)
+        # [노션 은퇴 ③] CONSUMED 마감 단계는 지웠다. 대신 잡 첫머리에서 off 가 아니면 빨갛게 멈춘다
+        #   (노션 길로 기록하고 닫지 못하는 일이 없게).
+        self.assertNotIn("--consume", bridge)
+        guard = bridge[bridge.index("- name: 노션 off 확인"):]
+        guard = guard[:guard.index("- name: 델타 브릿지 실행")]
+        self.assertIn("if: vars.GRM_INTAKE_NOTION != 'off'", guard)
+        self.assertIn("exit 1", guard)
         gate = self._read(".github", "workflows", "grm-fda-coverage-gate.yml")
         step = gate[gate.index("- name: handoff 상태 확인"):]
         step = step[:step.index("run:")]

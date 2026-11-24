@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24T04:05:59Z",
+ "generated_at": "2026-11-24T04:11:10Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -230,11 +230,11 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 45323599568,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-24T04:02:33Z",
-    "updatedAt": "2026-11-24T04:02:37Z",
+    "updatedAt": "2026-11-24T04:10:47Z",
     "headBranch": "main",
     "displayTitle": "Merge pull request #1893 from MINHOYEOM/feat/wl-violations-followup-1124",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45323599568"
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45324574724,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-24T04:10:53Z",
+    "updatedAt": "2026-11-24T04:10:54Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45324574724"
+   },
+   {
     "databaseId": 45313106477,
     "status": "completed",
     "conclusion": "skipped",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45242709216"
-   },
-   {
-    "databaseId": 45212792019,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-23T16:06:52Z",
-    "updatedAt": "2026-11-23T16:07:54Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45212792019"
    }
   ],
   "grm-findings-translate-apply.yml": [

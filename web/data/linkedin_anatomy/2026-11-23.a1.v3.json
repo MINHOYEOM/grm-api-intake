@@ -9,8 +9,8 @@
   "cover": {
     "chip": "FDA 경고서한 · 기준일탈 조사",
     "headline": [
-      "기준일탈 300건 넘게 중,",
-      "200건 넘게 무효화"
+      "기준일탈 200건 넘게,",
+      "재분석 합격만으로 무효화"
     ],
     "sub": "원료의약품 제조소 · 기준일탈 조사·설비 청결",
     "quote": {
@@ -27,7 +27,7 @@
     "rows": [
       {
         "cite": "FD&C Act 501(a)(2)(B)",
-        "text": "2021년 이후 기준일탈 300건 넘게, 200건 넘게 무효화",
+        "text": "2021년 이후 기준일탈 300건 넘게 조사 부실. 무효화는 200건 넘게",
         "evidence": [
           "2021년 이후 함량, 관련 물질·불순물, 미생물 모니터링, 용수 품질과 관련한 기준일탈(OOS) 결과 300건 넘게를 적절히 조사하지 않았고, 이 가운데 200건 넘게가 무효화됐다"
         ],
@@ -186,8 +186,8 @@
     "question": "우리 기준일탈 무효화에는 재분석 합격 말고 어떤 근거가 있나요?"
   },
   "caption": {
-    "lead": "기준일탈 결과 300건 넘게 중 200건 넘게가 무효화됐습니다. FDA 실사관은 조사 기록 30건에서 같은 양상을 확인했습니다. 한 원료의약품 제조소가 받은 경고서한입니다.",
-    "claims": "지적은 두 가지입니다. 첫째는 기준일탈 조사입니다. 2021년 이후 기준일탈 300건 넘게를 제대로 조사하지 않았고 200건 넘게가 무효화됐습니다. 1단계에서 시험실 오류가 확정되지 않았을 때 2단계 조사를 하지 않았거나 분석자 탓으로 돌렸습니다. 최초 결과는 재분석의 합격 결과만으로 무효화됐고, 시정 조치는 분석자 재교육으로 일률 처리됐습니다. 총 호기성 미생물 수를 초과한 시료의 조사에는 미생물 동정이 없었습니다. 둘째는 설비·시설 청결입니다. 탱크 제품 접촉면에서 물질이 벗겨졌고, ‘세척 완료’ 탱크에 잔류물이 있었으며, 이송 배관에는 물이 고여 있었습니다. 살아 있는 곤충도 관찰됐습니다.",
+    "lead": "기준일탈 결과 300건 넘게를 조사하지 않았습니다. 이 중 200건 넘게는 무효화됐습니다. FDA 실사관은 조사 기록 30건에서 같은 양상을 확인했습니다. 한 원료의약품 제조소가 받은 경고서한입니다.",
+    "claims": "지적은 두 가지입니다. 첫째는 기준일탈 조사입니다. 2021년 이후 기준일탈 300건 넘게를 제대로 조사하지 않았습니다. 이 중 200건 넘게가 무효화됐습니다. 1단계에서 시험실 오류가 확정되지 않았을 때 2단계 조사를 하지 않았거나 분석자 탓으로 돌렸습니다. 최초 결과는 재분석의 합격 결과만으로 무효화됐고, 시정 조치는 분석자 재교육으로 일률 처리됐습니다. 총 호기성 미생물 수를 초과한 시료의 조사에는 미생물 동정이 없었습니다. 둘째는 설비·시설 청결입니다. 탱크 제품 접촉면에서 물질이 벗겨졌고, ‘세척 완료’ 탱크에 잔류물이 있었으며, 이송 배관에는 물이 고여 있었습니다. 살아 있는 곤충도 관찰됐습니다.",
     "contrast": "회사는 2026-06-30 회신에서 종결된 조사를 재평가하고 3년 소급 검토를 하겠다고 약속했습니다. FDA는 무효화됐을 수 있는 결과가 닿은 배치의 임시 관리가 없다고 봤습니다. 출하 배치의 위험평가에는 결론을 뒷받침하는 자료가 없다고 했습니다. 미생물 동정 프로그램에는 동정이 필요한 기준이 없다고 했습니다. 설비 회신은 분석 자료와 이전 배치의 소급 영향평가가 부족하다고 봤습니다.",
     "requests": "FDA는 지난 3년간 핵심 조사 전체의 독립 소급 검토, 시정 및 예방조치 프로그램의 독립 평가, 미국 제품의 무효화된 기준일탈 전체 검토, 기준일탈 조사 체계의 시정 계획을 요구했습니다. 설비 감독 계획, 세척 효과 평가, 용수 모니터링 절차도 요구했습니다. 회신 기한은 서한 수령 후 15영업일입니다.",
     "similar": "우리 지적사항 DB에서 이번 지적과 닮은 과거 사례를 찾아봤습니다.",
@@ -197,8 +197,8 @@
     "cover": {
       "chip": "FDA warning letter · OOS investigations",
       "headline": [
-        "Over 300 OOS results,",
-        "200+ were invalidated"
+        "Over 200 OOS results",
+        "invalidated on retest alone"
       ],
       "sub": "API site · OOS investigations and cleanliness",
       "quote": {
@@ -214,7 +214,7 @@
       "rows": [
         {
           "cite": "FD&C Act 501(a)(2)(B)",
-          "text": "Since 2021, over 300 OOS results uninvestigated; 200+ invalidated",
+          "text": "Since 2021, over 300 OOS results uninvestigated. Invalidated: 200+",
           "evidence": [
             "You failed to adequately investigate over 300 out-of-specification (OOS) results related to assay, related substances/impurities, microbiological monitoring, and water quality since 2021, of which more than 200 OOS results were invalidated."
           ],
@@ -347,8 +347,8 @@
       "question": "Beyond a passing retest, what supports our OOS invalidations?"
     },
     "caption": {
-      "lead": "Over 300 OOS results since 2021, and more than 200 were invalidated. FDA reviewed 30 investigation records and saw the same pattern. The warning letter went to an API manufacturer.",
-      "claims": "FDA cited two failures. First, OOS investigations. Over 300 results since 2021 were not adequately investigated, and more than 200 were invalidated. When Phase I found no conclusive lab error, Phase II was skipped or the analyst was blamed. Initial results were invalidated solely on passing reanalysis. Samples over the aerobic count limit had no organism identification. Second, cleanliness. Material peeled inside a tank, a ‘clean’ tank had residues, water stood in a transfer line, and live insects were seen.",
+      "lead": "Over 300 OOS results since 2021 were not adequately investigated. More than 200 were invalidated. FDA reviewed 30 investigation records and saw the same pattern. The warning letter went to an API manufacturer.",
+      "claims": "FDA cited two failures. First, OOS investigations. Over 300 results since 2021 were not adequately investigated. More than 200 of them were invalidated. When Phase I found no conclusive lab error, Phase II was skipped or the analyst was blamed. Initial results were invalidated solely on passing reanalysis. Samples over the aerobic count limit had no organism identification. Second, cleanliness. Material peeled inside a tank, a ‘clean’ tank had residues, water stood in a transfer line, and live insects were seen.",
       "contrast": "In its June 30, 2026 reply, the firm committed to reopen closed OOS and complaint cases and run a three-year retrospective review. FDA said there were no interim controls for batches possibly affected by invalidated results. The risk assessment for distributed batches had no supporting data. The equipment reply lacked analytical data and retrospective impact assessments.",
       "requests": "FDA asked for an independent review of all critical investigations over three years, an independent CAPA assessment, a review of every invalidated OOS result for U.S. products, and an OOS system remediation plan. It also asked for facility oversight, a cleaning effectiveness review, and a water monitoring procedure. The reply is due within 15 business days of receipt.",
       "similar": "We looked for similar past findings in the GRM findings database.",

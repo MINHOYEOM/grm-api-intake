@@ -87,6 +87,11 @@ def apply_change(change, base_url, service_key):
 
 
 def main(argv=None):
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--plan", required=True, help="raw_body_followup plan JSON")
     parser.add_argument("--apply", action="store_true", help="Apply after operator approval")

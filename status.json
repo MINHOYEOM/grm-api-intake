@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-24T18:22:29Z",
+ "generated_at": "2026-11-24T23:48:11Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 45510178938,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-24T23:27:51Z",
+    "updatedAt": "2026-11-24T23:48:00Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45510178938"
+   },
    {
     "databaseId": 45323080860,
     "status": "completed",
@@ -100,17 +111,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44961528995"
-   },
-   {
-    "databaseId": 44840744981,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-20T23:59:39Z",
-    "updatedAt": "2026-11-21T00:21:12Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44840744981"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -229,62 +229,73 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45456840869,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T18:11:45Z",
-    "updatedAt": "2026-11-24T18:22:10Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1903 from MINHOYEOM/claude/glossary-fig-daily-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45456840869"
-   },
-   {
-    "databaseId": 45446407535,
+    "databaseId": 45503883012,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-24T17:14:49Z",
-    "updatedAt": "2026-11-24T17:45:24Z",
-    "headBranch": "codex/string-lint",
-    "displayTitle": "test: 정규식 raw 누락·0x08·stdout 인코딩 정적 검사",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45446407535"
-   },
-   {
-    "databaseId": 45446388003,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T17:14:43Z",
-    "updatedAt": "2026-11-24T17:48:52Z",
-    "headBranch": "codex/string-lint",
-    "displayTitle": "test: 0x08 기준선 항목 제거(#1931 에서 수정됨)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45446388003"
-   },
-   {
-    "databaseId": 45446308705,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-24T17:14:18Z",
-    "updatedAt": "2026-11-24T17:36:54Z",
+    "createdAt": "2026-11-24T22:45:28Z",
+    "updatedAt": "2026-11-24T23:10:45Z",
     "headBranch": "codex/fix-tidy-date-re",
     "displayTitle": "fix(web): _TIDY_DATE_RE 의 \\b 가 0x08 로 박혀 정규식이 안 맞던 결함",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45446308705"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45503883012"
    },
    {
-    "databaseId": 45446288198,
+    "databaseId": 45503872818,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-24T17:14:12Z",
-    "updatedAt": "2026-11-24T17:52:26Z",
+    "createdAt": "2026-11-24T22:45:24Z",
+    "updatedAt": "2026-11-24T23:34:37Z",
     "headBranch": "codex/fix-tidy-date-re",
-    "displayTitle": "fix(web): _TIDY_DATE_RE 의 \\b 가 0x08 로 박혀 있던 결함 복원 + 시험",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45446288198"
+    "displayTitle": "test(web): 골든 brief_2026-06-26 재동결 — 날짜 정규식 복원으로 중복 '실사일' 한 줄이 숨겨짐(1줄)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45503872818"
+   },
+   {
+    "databaseId": 45499701328,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-24T22:18:36Z",
+    "updatedAt": "2026-11-24T22:28:14Z",
+    "headBranch": "codex/string-lint",
+    "displayTitle": "test: 정규식 raw 누락·0x08·stdout 인코딩 정적 검사",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45499701328"
+   },
+   {
+    "databaseId": 45499647459,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-24T22:18:16Z",
+    "updatedAt": "2026-11-24T22:48:50Z",
+    "headBranch": "codex/wl-pair-restore-dry",
+    "displayTitle": "feat(wl): 본문만 바뀐 짝 findings restore 계획 도구 (기본 dry)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45499647459"
+   },
+   {
+    "databaseId": 45499636582,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-24T22:18:12Z",
+    "updatedAt": "2026-11-24T22:31:47Z",
+    "headBranch": "codex/wl-pair-restore-dry",
+    "displayTitle": "fix: 교차 검토 지적 반영 — 본문 해시 비교를 DB 함수로(마이그레이션 167 추가·미적용)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45499636582"
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 45512969235,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "workflow_run",
+    "createdAt": "2026-11-24T23:48:02Z",
+    "updatedAt": "2026-11-24T23:48:07Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45512969235"
+   },
    {
     "databaseId": 45323986321,
     "status": "completed",
@@ -328,17 +339,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45075246902"
-   },
-   {
-    "databaseId": 45072179665,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-22T21:27:15Z",
-    "updatedAt": "2026-11-22T21:27:24Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45072179665"
    }
   ],
   "grm-watchlist-notify.yml": [
@@ -457,6 +457,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 45509969219,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-24T23:26:20Z",
+    "updatedAt": "2026-11-24T23:36:21Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1934 from MINHOYEOM/claude/findings-translate-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45509969219"
+   },
+   {
     "databaseId": 45297689150,
     "status": "completed",
     "conclusion": "success",
@@ -499,20 +510,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1848 from MINHOYEOM/claude/findings-translate-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44881417441"
-   },
-   {
-    "databaseId": 44697212932,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-20T07:44:41Z",
-    "updatedAt": "2026-11-20T07:49:25Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1832 from MINHOYEOM/claude/findings-translate-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44697212932"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 45501777334,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-24T22:31:50Z",
+    "updatedAt": "2026-11-24T23:18:14Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45501777334"
+   },
    {
     "databaseId": 45370598411,
     "status": "completed",
@@ -556,17 +567,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45062666654"
-   },
-   {
-    "databaseId": 44996164953,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-22T06:59:32Z",
-    "updatedAt": "2026-11-22T09:09:52Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44996164953"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -628,6 +628,28 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 45503810073,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-24T22:45:00Z",
+    "updatedAt": "2026-11-24T23:26:37Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45503810073"
+   },
+   {
+    "databaseId": 45490304631,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-24T21:21:41Z",
+    "updatedAt": "2026-11-24T21:22:05Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45490304631"
+   },
+   {
     "databaseId": 45456708258,
     "status": "completed",
     "conclusion": "success",
@@ -659,28 +681,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45350035194"
-   },
-   {
-    "databaseId": 45312094446,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-24T02:24:08Z",
-    "updatedAt": "2026-11-24T02:24:41Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45312094446"
-   },
-   {
-    "databaseId": 45296467831,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-24T00:21:17Z",
-    "updatedAt": "2026-11-24T00:30:37Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45296467831"
    }
   ],
   "grm-cloud-request.yml": [
@@ -732,6 +732,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 45510178938,
+   "created_at": "2026-11-24T23:27:51Z",
+   "has_web_brief": true
+  },
+  {
    "run_id": 45323080860,
    "created_at": "2026-11-24T03:58:02Z",
    "has_web_brief": true
@@ -755,14 +760,169 @@
    "run_id": 45071052190,
    "created_at": "2026-11-22T21:15:14Z",
    "has_web_brief": true
-  },
-  {
-   "run_id": 45039409414,
-   "created_at": "2026-11-22T15:38:12Z",
-   "has_web_brief": true
   }
  ],
  "intake_counts": [
+  {
+   "schema": "grm-intake-counts/v1",
+   "run_id": 45510178938,
+   "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45510178938",
+   "created_at": "2026-11-24T23:27:51Z",
+   "conclusion": "success",
+   "run_date_kst": "2026-11-25",
+   "event": "workflow_dispatch",
+   "dry_run": false,
+   "active": [
+    "eca",
+    "ema",
+    "fr",
+    "mhra",
+    "pics",
+    "recall",
+    "wl"
+   ],
+   "total": 448,
+   "sources": [
+    {
+     "key": "fr",
+     "label": "Federal Register",
+     "fetched": 8,
+     "error": false
+    },
+    {
+     "key": "recall",
+     "label": "OpenFDA Recall",
+     "fetched": 119,
+     "error": false
+    },
+    {
+     "key": "ema",
+     "label": "EMA RSS",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mhra",
+     "label": "MHRA RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mhra_alert",
+     "label": "MHRA Drug/Device Alerts",
+     "fetched": 2,
+     "error": false
+    },
+    {
+     "key": "pics",
+     "label": "PIC/S RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eca",
+     "label": "ECA Academy RSS",
+     "fetched": 10,
+     "error": false
+    },
+    {
+     "key": "wl",
+     "label": "FDA Warning Letters",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mfds",
+     "label": "MFDS RSS",
+     "fetched": 2,
+     "error": false
+    },
+    {
+     "key": "mfds_law",
+     "label": "MFDS Law/Admrul",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_recall",
+     "label": "MFDS Recall",
+     "fetched": 42,
+     "error": false
+    },
+    {
+     "key": "mfds_admin",
+     "label": "MFDS Admin",
+     "fetched": 23,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_cert",
+     "label": "MFDS GMP Certificate",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_safety_letter",
+     "label": "MFDS Safety Letter",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_inspection",
+     "label": "MFDS GMP Inspection",
+     "fetched": 2,
+     "error": false
+    },
+    {
+     "key": "ich",
+     "label": "ICH",
+     "fetched": 31,
+     "error": false
+    },
+    {
+     "key": "who",
+     "label": "WHO",
+     "fetched": 172,
+     "error": false
+    },
+    {
+     "key": "hc",
+     "label": "Health Canada",
+     "fetched": 8,
+     "error": false
+    },
+    {
+     "key": "fda483",
+     "label": "FDA 483",
+     "fetched": 19,
+     "error": false
+    },
+    {
+     "key": "ispe",
+     "label": "ISPE iSpeak RSS",
+     "fetched": 8,
+     "error": false
+    },
+    {
+     "key": "search",
+     "label": "Brave Search",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eu_gmp_ncr",
+     "label": "EU GMP NCR (EudraGMDP)",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mhra_gmp_ncr",
+     "label": "MHRA GMP NCR",
+     "fetched": 0,
+     "error": false
+    }
+   ]
+  },
   {
    "schema": "grm-intake-counts/v1",
    "run_id": 45323080860,

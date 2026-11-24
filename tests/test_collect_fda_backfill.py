@@ -309,6 +309,49 @@ def _posted_records(post_mock) -> list[dict]:
 
 
 class Fda483IdentityTest(unittest.TestCase):
+    def test_backfill_fulltext_matches_daily_storage(self) -> None:
+        text = (
+            "OBSERVATION 3\nYour firm failed to investigate discrepancies.\n"
+            + "Batch records lacked required review.\n" * 400
+            + "End of the extracted PDF text.\n"
+        )
+        for deep, observations, pdf_text, expected_body in (
+            ("true", "true", text, text),
+            ("true", "false", text, text),
+            ("false", "true", text, None),
+            ("true", "true", "Cover page only.", None),
+        ):
+            with self.subTest(deep=deep, observations=observations, has_findings=pdf_text == text), \
+                 mock.patch.dict(os.environ, {
+                     "ENABLE_FDA_483_DEEP": deep,
+                     "ENABLE_FDA_483_OBSERVATIONS": observations,
+                 }):
+                pdf_result = (pdf_text, "ocr-ok")
+                with mock.patch("collect_fda_483._fetch_html_rows",
+                                return_value=([dict(_483_NROW)], 1, False)), \
+                     mock.patch("collect_fda_483._fetch_fda483_pdf_text",
+                                return_value=pdf_result), \
+                     mock.patch("collect_fda_483.time.sleep"):
+                    items, err = fda483.collect_fda_483(date(2026, 5, 1), date(2026, 6, 30))
+                self.assertIsNone(err)
+                self.assertEqual(len(items), 1)
+                daily_record = findings_store.raw_signal_from_intake_item(items[0])
+
+                report, exit_code, post, _pdf, _sleeper = _run_483(
+                    pdf_side_effect=[pdf_result],
+                )
+                self.assertEqual(exit_code, 0)
+                self.assertEqual(report.invalid, 0)
+                posted = _posted_records(post)
+                self.assertEqual(len(posted), 1)
+                raw_json = posted[0]["raw_json"]
+                raw = json.loads(raw_json)
+                if expected_body is None:
+                    self.assertNotIn("fda483_body_full", raw)
+                else:
+                    self.assertEqual(raw["fda483_body_full"], expected_body)
+                self.assertEqual(raw_json.encode("utf-8"), daily_record["raw_json"].encode("utf-8"))
+
     def test_backfill_raw_signal_identical_to_daily_collector_path(self) -> None:
         # Daily path: drive collect_fda_483.collect_fda_483 itself (its row source
         # mocked to the same normalized row; PDF text mocked to the same failure).

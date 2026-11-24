@@ -16,10 +16,13 @@
        본문 길이 합이 90% 미만 · 목록(관찰·위반·지적) 원소 수 감소 · 실패 표식 새로 생김 · 끝이 '…' 로 잘린
        관찰이 새로 생김.
   5) 그 밖이면 raw_signal_apply_version(148) 으로 바꾼다(change_kind=source_update, 옛 판 보관).
-     raw_json 만 바꾼다 — row_json·제목·업체 등 열 값은 그대로 둔다(오늘 판이 덜 채운 판일 수 있다).
+     row_json·제목·업체 등 열 값은 그대로 둔다(오늘 판이 덜 채운 판일 수 있다). 단 [2026-11-24] 본문이 바뀐
+     행은 row_json 의 **분류 칸**(관련도·tier·제품군)만 새 본문으로 다시 낸다 — `raw_body_followup.
+     reclassified_row_json`(일일 수집과 같은 build 함수). 재구성 함수가 없는 소스는 종전대로 그대로.
      MFDS 실사 문서는 실사자 표를 새 지문으로 다시 맞춘다.
 
-지적사항(findings) — 4-1절: 지우고 다시 넣지 않는다. 옛 판·새 판을 같은 추출기로 뽑아 **같은 ordinal** 끼리
+지적사항(findings) — 4-1절: 지우고 다시 넣지 않는다. [2026-11-24] 아래 짝짓기와 새 본문에만 있는 글 넣기는
+`raw_body_followup.followup`(본문을 바꾸는 모든 길의 공용 함수)이 한다. 옛 판·새 판을 같은 추출기로 뽑아 **같은 ordinal** 끼리
 짝짓는다. 본문만 바뀐 짝(새 본문이 옛 본문으로 시작하거나 첫 줄=표제가 같음)은 WL 복원과 **같은 형식**의
 restore 계획(grm-wl-truncation-restore-plan/v1)에 싣는다 → 번역 세션이 `findings_translate.py
 --export-restore` 로 영문·국문을 한 PATCH 로 교체한다(옛 본문 md5 대조, finding_id 유지).
@@ -42,6 +45,7 @@ import findings_extractors as fe
 import findings_store
 import grm_findings as gf
 import mfds_inspection_attendees_store as mas
+import raw_body_followup as rbf
 import raw_versioning as rv
 from grm_common import (
     SOURCE_BRAVE, SOURCE_ECA, SOURCE_EMA, SOURCE_EPR, SOURCE_EU_GMP_NCR, SOURCE_FDA_483,
@@ -306,6 +310,7 @@ def apply_updates(base_url: str, service_key: str, items: Iterable[Any], *,
                   apply_fn: Callable[..., dict[str, Any]] | None = None,
                   sync_fn: Callable[[str, str, dict[str, Any]], None] | None = None,
                   extract: Callable[[dict[str, Any]], list[dict[str, Any]]] | None = None,
+                  append_fn: Callable[..., tuple[int, int, bool, list[str]]] | None = None,
                   now: datetime | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
     """건너뛴 항목의 오늘 판으로 정본을 갱신한다. 반환: (요약, restore 계획)."""
     get = get or requests.get
@@ -316,6 +321,7 @@ def apply_updates(base_url: str, service_key: str, items: Iterable[Any], *,
     summary: dict[str, Any] = {"dry_run": dry_run, "candidates": 0, "lookup_failed": 0,
                                "missing_in_db": 0, "applied": 0, "would_apply": 0, "capped": 0,
                                "conflict": 0, "errors": 0, "attendees_resynced": 0,
+                               "reclassified": 0, "reclassify_errors": 0, "findings_inserted": 0,
                                "by_source": {}, "findings": Counter(), "rejected_examples": []}
     plan_items: list[dict[str, Any]] = []
     plan = {"schema_version": RESTORE_PLAN_SCHEMA_VERSION, "report": {}, "items": plan_items}
@@ -367,15 +373,28 @@ def apply_updates(base_url: str, service_key: str, items: Iterable[Any], *,
     applied_pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
     for rid, row, d in updates:
         text, sha = rv.canonical_raw(d["merged"])
+        row_json = str(row.get("row_json") or "") or "{}"
+        source = str(row.get("source") or "")
+        if rbf.body_changed(source, _json_obj(row.get("raw_json")) or {}, d["merged"]):
+            # [2026-11-24] 본문이 바뀌면 분류 칸을 새 본문으로 — 원문과 **같은 호출**로 바꿔야 한다
+            # (DB 함수는 원문이 같으면 unchanged 라 row_json 만 나중에 고칠 길이 없다).
+            try:
+                new_row_json = rbf.reclassified_row_json(source, d["merged"], row_json)
+            except Exception as exc:  # noqa: BLE001 — 분류 실패는 세고 종전 row_json 으로 간다
+                new_row_json = None
+                summary["reclassify_errors"] += 1
+                log("WARN", f"원문 갱신(R4) 분류 재계산 실패 {row.get('document_id')}: {type(exc).__name__}")
+            if new_row_json is not None:
+                summary["reclassified"] += int(new_row_json != row_json)
+                row_json = new_row_json
         if dry_run:
             summary["would_apply"] += 1
-            applied_pairs.append((row, dict(row, raw_json=text, raw_sha256=sha)))
+            applied_pairs.append((row, dict(row, raw_json=text, raw_sha256=sha, row_json=row_json)))
             continue
         try:
             res = apply_fn(base_url, service_key, raw_signal_id=rid,
                            expected_raw_sha256=str(row.get("raw_sha256") or ""),
-                           record={"raw_json": text, "raw_sha256": sha,
-                                   "row_json": str(row.get("row_json") or "") or "{}"},
+                           record={"raw_json": text, "raw_sha256": sha, "row_json": row_json},
                            change_kind="source_update", changed_by=changed_by,
                            content_sha256=d["content_sha256"], diff_summary=d["diff_summary"])
         except Exception as exc:  # noqa: BLE001 — 건별 실패는 넘긴다
@@ -388,7 +407,7 @@ def apply_updates(base_url: str, service_key: str, items: Iterable[Any], *,
             summary["errors"] += 1
             continue
         summary["applied"] += 1
-        new_row = dict(row, raw_json=text, raw_sha256=sha)
+        new_row = dict(row, raw_json=text, raw_sha256=sha, row_json=row_json)
         if (row.get("source"), row.get("source_kind")) == (SOURCE_MFDS, "gmp-inspection"):
             try:
                 sync_fn(base_url, service_key, new_row)
@@ -397,32 +416,32 @@ def apply_updates(base_url: str, service_key: str, items: Iterable[Any], *,
                 log("WARN", f"원문 갱신(R4) 실사자 재동기화 실패 {row.get('document_id')}: {type(exc).__name__}")
         applied_pairs.append((row, new_row))
 
-    # 지적사항: 옛 판·새 판 재추출 → 같은 ordinal 짝 → restore 계획(쓰지 않음)
+    # 지적사항: 공용 후속(raw_body_followup) — 같은 추출기로 옛 판·새 판, 본문만 바뀐 짝은 restore 계획,
+    # 새 본문에만 있는 글은 일일 적재와 같은 삽입 함수로 넣는다. 기존 findings 행은 쓰지 않는다.
     if applied_pairs:
-        ids = [str(r.get("raw_signal_id")) for r, _ in applied_pairs]
-        live_rows = _get_rows(base_url, service_key, "findings",
-                              "finding_id,raw_signal_id,finding_text,published_date",
-                              "raw_signal_id", ids, get=get)
-        if live_rows is None:
+        fu, fu_plan = rbf.followup(
+            base_url, service_key, applied_pairs, dry_run=dry_run,
+            get_rows=lambda b, k, t, sel, key, ids: _get_rows(b, k, t, sel, key, ids, get=get),
+            append_fn=append_fn, extract=extract)
+        if fu.get("lookup_failed"):
             summary["findings"]["lookup_failed"] += 1
-        else:
-            live = {str(r.get("finding_id")): r for r in live_rows}
-            for old_row, new_row in applied_pairs:
-                try:
-                    pairs = pair_findings(extract(old_row), extract(new_row), live)
-                except Exception as exc:  # noqa: BLE001
-                    summary["findings"][f"extract_raised:{type(exc).__name__}"] += 1
-                    continue
-                plan_items.extend(pairs.pop("restore"))
-                summary["findings"].update({k: v for k, v in pairs.items() if v})
+        for err in fu.get("errors") or []:
+            if "extract_raised" in err:
+                summary["findings"][f"extract_raised:{err.rsplit(':', 1)[-1]}"] += 1
+        summary["findings"].update({k: v for k, v in (fu.get("findings") or {}).items()
+                                    if v and k != "restore"})
+        summary["findings_inserted"] = int(fu.get("inserted") or 0)
+        summary["findings_pending_insert"] = int(fu.get("pending_insert") or 0)
+        plan_items.extend(fu_plan.get("items") or [])
     summary["findings"]["restore"] = len(plan_items)
     summary["by_source"] = {s: dict(c) for s, c in sorted(per.items())}
     for s, c in summary["by_source"].items():
         log("INFO", f"원문 갱신(R4) {s}: " + " · ".join(f"{k} {v}" for k, v in sorted(c.items())))
     log("INFO", f"원문 갱신(R4){' [DRY]' if dry_run else ''}: 반영 {summary['applied'] or summary['would_apply']} · "
                 f"상한 초과 {summary['capped']} · 충돌 {summary['conflict']} · 오류 {summary['errors']} · "
-                f"지적 restore {len(plan_items)} · 검토 필요 "
-                f"{sum(summary['findings'].get(k, 0) for k in ('ambiguous', 'new_only', 'old_only'))}")
+                f"분류 재계산 {summary['reclassified']} · 지적 restore {len(plan_items)} · 지적 넣기 "
+                f"{summary['findings_inserted']} · 검토 필요 "
+                f"{sum(summary['findings'].get(k, 0) for k in ('ambiguous', 'stale'))}")
     return _finish(summary, plan, now)
 
 

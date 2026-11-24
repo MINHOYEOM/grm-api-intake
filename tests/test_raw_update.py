@@ -173,7 +173,15 @@ class ApplyUpdatesTest(unittest.TestCase):
         self.assertEqual(kw["expected_raw_sha256"], row["raw_sha256"])
         self.assertEqual(kw["change_kind"], "source_update")
         self.assertEqual(json.loads(kw["record"]["raw_json"])["wl_body_full"], "Your firm failed to validate.")
-        self.assertEqual(kw["record"]["row_json"], row["row_json"])     # 열 값은 그대로
+        # [2026-11-24] 본문이 바뀌면 분류 칸만 새 본문 판정(raw_body_followup), 나머지 row_json 칸은 그대로.
+        new_row, old_row = json.loads(kw["record"]["row_json"]), json.loads(row["row_json"])
+        keys = set(ru.rbf.CLASSIFICATION_KEYS)
+        self.assertEqual({k: v for k, v in new_row.items() if k not in keys},
+                         {k: v for k, v in old_row.items() if k not in keys})
+        expected = json.loads(ru.rbf.reclassified_row_json(
+            "FDA Warning Letter", json.loads(kw["record"]["raw_json"]), row["row_json"]))
+        self.assertEqual(new_row, expected)
+        self.assertEqual(summary["reclassified"], 1)
         self.assertEqual(set(kw["record"]), {"raw_json", "raw_sha256", "row_json"})
         self.assertEqual(plan["schema_version"], "grm-wl-truncation-restore-plan/v1")
 

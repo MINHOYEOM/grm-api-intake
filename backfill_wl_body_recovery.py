@@ -48,10 +48,13 @@ fda.gov 의 403 은 러너 IP 봇 차단이다. GitHub 러너 IP 는 날마다 �
 있는** 행 중 소문자로 시작하는 행(+ `--doc-ids` 로 지정한 행)을 다시 받아 같은 `build_wl_item`
 으로 재구성한다. 다시 받은 본문이 없거나(403 등) 기존과 같으면 쓰지 않는다 — 있는 본문을 표식으로
 덮지 않는다. 예약 실행은 이 모드를 쓰지 않는다. findings 는 M12 가 "findings 없는 행"만 보므로
-이 모드로 바뀐 행의 findings 는 재생성되지 않는다(필요하면 별도 재변환).
+## 본문 교체 후속 (2026-11-24)
 
-findings 재생성은 이 스크립트가 하지 않는다 — 본문이 채워지면 M12(`findings_supabase_backfill.py`)
-가 "findings 없는 raw_signal" 로 보고 변환한다. 워크플로가 그 체인을 잇는다.
+본문을 바꾼 행은 쓰기 직후 `raw_body_followup.followup` 을 부른다(본문을 바꾸는 모든 길의 공용 함수).
+분류(row_json)는 같은 `build_wl_item` 레코드로 원문과 한 번에 바뀌고, findings 는 같은 추출기로 다시 뽑아
+새 본문에만 있는 글을 일일 적재와 같은 삽입 함수로 넣는다. 본문만 바뀐 짝은 restore 계획(`--plan-path`),
+옛 본문에만 남은 행은 건드리지 않고 리포트 `followup.per_row[].stale_ids` 에 남긴다(사람 검토).
+본문이 처음 채워진 행(findings 0건)은 종전대로 M12 체인도 돈다 — 둘 다 멱등이라 겹쳐도 중복이 없다.
 
 exit code: 자격증명/URL/조회 실패 → 2 · 건별 실패가 광범위(시도의 절반 이상)면 → 1 · 그 외 0.
 dry-run(기본)은 fetch·재구성까지 하고 쓰기만 건너뛴다.
@@ -71,6 +74,7 @@ from typing import Any, Callable
 
 import findings_store
 import findings_supabase_backfill as fsb
+import raw_body_followup as rbf
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
@@ -148,6 +152,9 @@ class WlBodyRecoveryReport:
     samples: list[dict[str, Any]] = field(default_factory=list)
     # --rebuild-body-start 에서 본문이 바뀐 행 전부의 길이 변화(apply 전 짧아지는 행을 가려낸다).
     body_changes: list[dict[str, Any]] = field(default_factory=list)
+    # [본문 교체 후속 2026-11-24] raw_body_followup.followup 요약(분류 전→후·findings 넣기·restore·stale).
+    followup: dict[str, Any] = field(default_factory=dict)
+    restore_plan_items: int = 0
 
 
 def _default_sleep(seconds: float) -> None:
@@ -287,17 +294,8 @@ def _fetch_letter(url: str) -> tuple[str, str, str]:
 
 
 def _rebuild_item(raw: dict[str, Any], excerpt: tuple[str, str], full: tuple[str, str]) -> Any:
-    """저장 raw + 새 본문 → 라이브 수집과 **같은 함수**(`build_wl_item`)로 IntakeItem."""
-    from collect_intake import build_wl_item
-
-    def _s(key: str) -> str:
-        return str(raw.get(key) or "")
-
-    return build_wl_item(
-        firm=_s("firm"), posted_raw=_s("posted_date"), letter_date_raw=_s("letter_date"),
-        issuing_office=_s("issuing_office"), subject=_s("subject"), wl_href=_s("url"),
-        office_verdict=_s("office_gate_verdict"), excerpt=excerpt, full=full,
-    )
+    """저장 raw + 새 본문 → 라이브 수집과 **같은 함수**(`build_wl_item`)로 IntakeItem(공용 `raw_body_followup`)."""
+    return rbf.rebuild_wl_item(raw, excerpt=excerpt, full=full)
 
 
 # ---------------------------------------------------------------------------
@@ -349,8 +347,11 @@ def _is_broad_failure(report: WlBodyRecoveryReport) -> bool:
 
 def _write(report: WlBodyRecoveryReport, *, label: str, row: dict[str, Any], item: Any,
            base: str, service_key: str, dry_run: bool,
-           upsert_fn: Callable[..., tuple[int, list[dict[str, Any]] | None, str]]) -> bool:
-    """재구성 item → 레코드 → id 검증 → (apply 면) upsert. 성공 여부."""
+           upsert_fn: Callable[..., tuple[int, list[dict[str, Any]] | None, str]],
+           written: list[tuple[dict[str, Any], dict[str, Any]]] | None = None) -> bool:
+    """재구성 item → 레코드 → id 검증 → (apply 면) upsert. 성공 여부.
+
+    성공하면 (옛 행, 새 행) 을 `written` 에 더한다 — 끝에서 본문 교체 후속(`raw_body_followup`)이 받는다."""
     record = findings_store.raw_signal_from_intake_item(
         item, collected_at=str(row.get("collected_at") or ""),   # ★원본 시점 보존
     )
@@ -360,7 +361,15 @@ def _write(report: WlBodyRecoveryReport, *, label: str, row: dict[str, Any], ite
         _bump(report, "raw_signal_id_mismatch")
         report.errors.append(f"{label}: raw_signal_id_mismatch")
         return False
+    # 후속(raw_body_followup)이 받는 옛·새 행 — 조회는 칸을 좁혀 source·schema_version 이 없으므로 레코드
+    # 칸을 바탕에 깔고, 옛 행은 읽은 원문·분류·지문으로 덮는다(추출기 검증에 필요한 칸이 둘 다 갖춰진다).
+    new_row = dict(record)
+    old_row = dict(record, raw_json=row.get("raw_json"),
+                   row_json=row.get("row_json") or record.get("row_json"),
+                   raw_sha256=row.get("raw_sha256") or record.get("raw_sha256"))
     if dry_run:
+        if written is not None:
+            written.append((old_row, new_row))
         return True
     try:
         _status, _returned, err = upsert_fn(base, service_key, record, row=row)
@@ -372,6 +381,8 @@ def _write(report: WlBodyRecoveryReport, *, label: str, row: dict[str, Any], ite
         report.errors.append(f"{label}: upsert_failed:{err}")
         log("WARN", f"WL raw_signals upsert 실패 {label}: {err}")
         return False
+    if written is not None:
+        written.append((old_row, new_row))
     return True
 
 
@@ -393,11 +404,15 @@ def run(
     time_budget_seconds: float | None = None,
     clock: Callable[[], float] | None = None,
     progress_cb: Callable[[WlBodyRecoveryReport], None] | None = None,
+    followup_fn: Callable[..., tuple[dict[str, Any], dict[str, Any]]] | None = None,
+    plan_sink: Callable[[dict[str, Any]], None] | None = None,
 ) -> tuple[WlBodyRecoveryReport, int]:
     fetch_raw = fetch_raw_signals or _fetch_raw_signals
     letter_fn = fetch_letter or _fetch_letter
     rebuild_fn = rebuild_item or _rebuild_item
     upsert_fn = upsert_raw_signal or _upsert_raw_signal
+    follow_fn = followup_fn or rbf.followup
+    written: list[tuple[dict[str, Any], dict[str, Any]]] = []
     sleep_fn = sleeper or _default_sleep
     clock_fn = clock or time.monotonic
     t0 = clock_fn()
@@ -537,7 +552,8 @@ def run(
                 report.errors.append(f"{label}: rebuild_raised:{type(exc).__name__}")
                 continue
             if not _write(report, label=label, row=r, item=item, base=base,
-                          service_key=service_key, dry_run=dry_run, upsert_fn=upsert_fn):
+                          service_key=service_key, dry_run=dry_run, upsert_fn=upsert_fn,
+                          written=written):
                 continue
             if is_permanent_403(new_status):
                 report.permanent_403 += 1
@@ -558,7 +574,8 @@ def run(
             report.errors.append(f"{label}: rebuild_raised:{type(exc).__name__}")
             continue
         if not _write(report, label=label, row=r, item=item, base=base,
-                      service_key=service_key, dry_run=dry_run, upsert_fn=upsert_fn):
+                      service_key=service_key, dry_run=dry_run, upsert_fn=upsert_fn,
+                          written=written):
             continue
         violations = (getattr(item, "raw_payload", {}) or {}).get("wl_violations") or []
         report.recovered += 1
@@ -578,6 +595,19 @@ def run(
                 **({"old_head": old_full[:60], "new_head": full[:60]} if rebuild_body_start else {}),
             })
 
+    # [본문 교체 후속] 쓴(dry-run 이면 쓸) 행 전부를 공용 함수로 — 분류 점검·findings 넣기·restore 계획.
+    followup_failed = False
+    if written:
+        try:
+            fu_summary, fu_plan = follow_fn(base, service_key, written, dry_run=dry_run)
+        except Exception as exc:  # noqa: BLE001 — 후속 실패는 경보로(본문 교체는 이미 끝났다)
+            fu_summary, fu_plan = {"errors": [f"followup_raised:{type(exc).__name__}"]}, {"items": []}
+            followup_failed = True
+        report.followup = fu_summary
+        report.restore_plan_items = len(fu_plan.get("items") or [])
+        if plan_sink is not None and fu_plan.get("items"):
+            plan_sink(fu_plan)
+        followup_failed = followup_failed or bool(fu_summary.get("write_errors")) or bool(fu_summary.get("lookup_failed"))
     report.elapsed_seconds = round(clock_fn() - t0, 1)
     report.deferred_next = len(report.deferred_docs)
     if report.attempted:
@@ -589,7 +619,7 @@ def run(
                 f"· 대상 {report.candidates}건 · 이번에도 못 받음 {report.still_empty}건 "
                 f"· 확정 사유로 표식 교체 {report.status_resolved}건 · 영구 403 확정 "
                 f"{report.permanent_403}건 · 실패 {report.failed}건")
-    return report, (1 if _is_broad_failure(report) else 0)
+    return report, (1 if (_is_broad_failure(report) or followup_failed) else 0)
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -612,6 +642,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help=f"이번 실행의 시간 예산(초, 기본 {DEFAULT_TIME_BUDGET_SECONDS:g} — 워크플로 제한 30분 안에 리포트가 "
                         "남게). 넘으면 남은 행은 deferred_docs 로 적고 정상 종료. 0 = 무제한.")
     p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록(행마다 갱신 — 중간에 끊겨도 마지막 상태가 남는다).")
+    p.add_argument("--plan-path", default="",
+                   help="본문만 바뀐 findings 짝의 restore 계획(grm-wl-truncation-restore-plan/v1) 경로 — 항목이 있을 때만 쓴다.")
     p.add_argument("--supabase-url", help="미지정 시 $SUPABASE_URL")
     p.add_argument("--service-role-key", help="미지정 시 $SUPABASE_SERVICE_ROLE_KEY")
     return p
@@ -642,6 +674,9 @@ def main(argv: list[str] | None = None) -> int:
         rebuild_body_start=args.rebuild_body_start,
         time_budget_seconds=args.time_budget_seconds or None,
         progress_cb=_flush if args.report_path else None,
+        plan_sink=(lambda plan: Path(args.plan_path).write_text(
+            json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"))
+        if args.plan_path else None,
     )
     payload = json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2)
     print(payload)

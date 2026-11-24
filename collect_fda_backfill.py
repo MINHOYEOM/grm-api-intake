@@ -96,7 +96,7 @@ import grm_findings as gf
 from grm_cli import BulkWriteError, BulkWriteRun
 from grm_cli import header_ci as _header_ci
 from grm_cli import parse_content_range as _parse_content_range
-from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html, log
+from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html, log
 
 
 SCHEMA_VERSION = "grm-findings-backfill-fetch/v1"
@@ -364,6 +364,9 @@ def run_483(
         config = fda483._datatable_ajax_config(html)
         if config is None:
             raise RuntimeError("fda483-ajax-config-missing")
+    except FdaBotBlockError:
+        report.errors.append(FDA_BOT_BLOCK)
+        return report, 2
     except Exception as e:  # noqa: BLE001
         primary_error = f"list-config-failed:{type(e).__name__}"
 
@@ -372,6 +375,9 @@ def run_483(
         try:
             sleeper(delay)
             data = fda483._fetch_datatable_page(config, start=offset, length=max_docs, draw=1)
+        except FdaBotBlockError:
+            report.errors.append(FDA_BOT_BLOCK)
+            return report, 2
         except Exception as e:  # noqa: BLE001
             primary_error = f"list-page-failed:{type(e).__name__}"
 
@@ -394,7 +400,11 @@ def run_483(
             f"2차 전수 JSON 백본({fda483.BACKBONE_LEGACY_JSON})으로 폴백 시도",
         )
         sleeper(delay)
-        json_rows, _json_total = fda483._fetch_legacy_json_rows()
+        try:
+            json_rows, _json_total = fda483._fetch_legacy_json_rows()
+        except FdaBotBlockError:
+            report.errors.append(FDA_BOT_BLOCK)
+            return report, 2
         if not json_rows:
             report.errors.append(primary_error)
             report.errors.append("json-backbone-failed")
@@ -454,6 +464,9 @@ def run_483(
             sleeper(delay)
             pdf_url = fda483._pdf_url(media_id)
             text, text_status = fda483._fetch_fda483_pdf_text(pdf_url)
+            if text_status == FDA_BOT_BLOCK:
+                report.errors.append(FDA_BOT_BLOCK)
+                break
             excerpt = fda483._extract_fda483_excerpt(text) if text else ""
             header_hints = {
                 "establishment_type": nrow.get("establishment_type", ""),
@@ -526,7 +539,7 @@ def run_483(
             file=sys.stderr,
         )
 
-    return report, 0
+    return report, 2 if FDA_BOT_BLOCK in report.errors else 0
 
 
 # ---------------------------------------------------------------------------
@@ -689,6 +702,9 @@ def run_wl(
         config = _extract_datatable_config(html, WL_SOLR_VIEW_NAME)
         if config is None:
             raise RuntimeError("fda-wl-ajax-config-missing")
+    except FdaBotBlockError:
+        report.errors.append(FDA_BOT_BLOCK)
+        return report, 2
     except Exception as e:  # noqa: BLE001
         report.errors.append(f"list-config-failed:{type(e).__name__}")
         return report, 2
@@ -712,6 +728,9 @@ def run_wl(
         data = json.loads(text)
         if not isinstance(data, dict):
             data = {}
+    except FdaBotBlockError:
+        report.errors.append(FDA_BOT_BLOCK)
+        return report, 2
     except Exception as e:  # noqa: BLE001
         report.errors.append(f"list-page-failed:{type(e).__name__}")
         return report, 2
@@ -763,6 +782,9 @@ def run_wl(
             try:
                 sleeper(delay)
                 letter_html = http_get_html(wl_href, timeout=20, retries=3, label="FDA WL backfill body")
+            except FdaBotBlockError:
+                report.errors.append(FDA_BOT_BLOCK)
+                break
             except Exception as e:  # noqa: BLE001
                 # Graceful degrade (matches collect_intake's own WL body fetch failure
                 # handling) -- item still gets appended, with wl_body_status so the daily
@@ -788,7 +810,7 @@ def run_wl(
             report.next_offset = offset
             return report, 1
 
-    return report, 0
+    return report, 2 if FDA_BOT_BLOCK in report.errors else 0
 
 
 # ---------------------------------------------------------------------------

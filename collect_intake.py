@@ -50,6 +50,9 @@ import requests
 import grm_queue
 import intake_exclusion as _xl
 from grm_common import (
+    FDA_BOT_BLOCK,
+    FdaBotBlockError,
+    fda_checked_request,
     HTTPClientError,
     KR_EGRESS_PROXY_REACHABLE,
     KR_EGRESS_PROXY_UNREACHABLE,
@@ -3314,7 +3317,7 @@ def _fetch_wl_listing_datatables(html_text: str, start: date) -> list[dict[str, 
             params[f"columns[{i}][orderable]"] = "true"
             params[f"columns[{i}][search][value]"] = ""
             params[f"columns[{i}][search][regex]"] = "false"
-        resp = requests.get(config["url"] + "?" + urllib.parse.urlencode(params), timeout=30,
+        resp = fda_checked_request(requests.get, config["url"] + "?" + urllib.parse.urlencode(params), timeout=30,
                             headers={
                                 "User-Agent": "GRM-Intake/1.1 (+github-actions)",
                                 "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -3361,15 +3364,7 @@ def wl_static_listing_may_be_truncated(rows: list[dict[str, Any]], start: date) 
 WL_BODY_STATUS_OK = "ok"
 WL_BODY_STATUS_403 = "fetch-403"
 WL_BODY_STATUS_NO_ANCHOR = "no-anchor"
-# [차단 판정 한 곳 2026-11-24] fda.gov(Akamai)는 요청이 몰리면 403 이 아니라 `apology_objects/abuse-detection-apology`
-# 404 로 바꿔 돌려준다 — 종전엔 "404 Not Found"(파일 없음)와 구분이 안 됐다. 'fetch-fail:' 접두는 그대로라 하류 사유
-# 매핑(card_scaffold._ABSENT_REASON_LABELS)은 바뀌지 않는다. 같은 IP 즉시 재시도는 차단을 길게 하므로 재시도하지 않는다.
-WL_BODY_STATUS_BOT_BLOCK = "fetch-fail:bot-block"
-FDA_BOT_BLOCK_MARKERS = ("abuse-detection-apology", "apology_objects")
-
-
-def is_fda_bot_block_url(url: object) -> bool:
-    return any(m in str(url or "") for m in FDA_BOT_BLOCK_MARKERS)
+WL_BODY_STATUS_BOT_BLOCK = FDA_BOT_BLOCK
 
 
 # [WL 본문 재시도 2026-10-28] 편지 페이지 GET 은 종전 **한 번**이었다. 일시 장애(5xx·429·
@@ -3395,13 +3390,10 @@ def _fetch_wl_letter_html(url: str, label: str = "") -> tuple[str, str]:
     for attempt in range(1, WL_BODY_FETCH_ATTEMPTS + 1):
         transient = False
         try:
-            resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
+            resp = fda_checked_request(requests.get, url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
                 "User-Agent": "GRM-Intake/1.1 (+github-actions)",
                 "Accept": "text/html",
             })
-            if is_fda_bot_block_url(getattr(resp, "url", "")):
-                log("WARN", f"FDA WL 본문{label} 봇 차단(abuse-detection-apology) — 재시도하지 않음: {truncate(url, 80)}")
-                return "", WL_BODY_STATUS_BOT_BLOCK
             if resp.status_code == 403:
                 log("WARN", f"FDA WL 본문{label} 403 — 건너뜀(메타 카드 유지): {truncate(url, 80)}")
                 return "", WL_BODY_STATUS_403
@@ -3410,6 +3402,8 @@ def _fetch_wl_letter_html(url: str, label: str = "") -> tuple[str, str]:
             if attempt > 1:
                 log("INFO", f"FDA WL 본문{label} 재시도 {attempt}회차 성공: {truncate(url, 80)}")
             return resp.text, WL_BODY_STATUS_OK
+        except FdaBotBlockError:
+            return "", WL_BODY_STATUS_BOT_BLOCK
         except (requests.Timeout, requests.ConnectionError) as e:
             transient = True
             last_error = truncate(str(e), 120)
@@ -3622,7 +3616,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     LAST_WL_HEALTH = {"wl_body": wl_body_health, "wl_body_full": wl_body_full_health,
                       "listing": listing_health}
     try:
-        resp = requests.get(FDA_WL_URL, timeout=30, headers={
+        resp = fda_checked_request(requests.get, FDA_WL_URL, timeout=30, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
             "Accept": "text/html",
         })
@@ -3631,6 +3625,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
             return [], "HTTP 403"
         resp.raise_for_status()
         html_text = resp.text
+    except FdaBotBlockError:
+        listing_health["detail"] = FDA_BOT_BLOCK
+        return [], FDA_BOT_BLOCK
     except requests.RequestException as e:
         log("WARN", f"FDA WL HTTP 실패: {e}")
         return [], str(e)
@@ -3640,6 +3637,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     try:
         listing_rows = _fetch_wl_listing_datatables(html_text, start)
         listing_health["backbone"] = WL_LISTING_BACKBONE_DATATABLES
+    except FdaBotBlockError:
+        listing_health["detail"] = FDA_BOT_BLOCK
+        return [], FDA_BOT_BLOCK
     except (requests.RequestException, ValueError, RuntimeError) as e:
         listing_health["detail"] = truncate(f"{type(e).__name__}: {e}", 160)
         log("WARN", f"FDA WL DataTables 목록 실패 — 정적 HTML(최신 10행)로 폴백: "
@@ -3729,6 +3729,10 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         if wl_body_enabled and wl_href:
             wl_body_health["attempted"] += 1
             excerpt_result = _fetch_wl_body_excerpt(wl_href)
+            if excerpt_result[1] == FDA_BOT_BLOCK:
+                wl_body_health["failed"] += 1
+                listing_health["detail"] = FDA_BOT_BLOCK
+                return [], FDA_BOT_BLOCK
             if not excerpt_result[0]:
                 wl_body_health["failed"] += 1
 
@@ -3739,6 +3743,10 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         if wl_body_full_enabled and wl_href:
             wl_body_full_health["attempted"] += 1
             full_result = _fetch_wl_body_full(wl_href)
+            if full_result[1] == FDA_BOT_BLOCK:
+                wl_body_full_health["failed"] += 1
+                listing_health["detail"] = FDA_BOT_BLOCK
+                return [], FDA_BOT_BLOCK
             if not full_result[0]:
                 wl_body_full_health["failed"] += 1
 

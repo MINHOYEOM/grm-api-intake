@@ -128,6 +128,8 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           IN_DELAY: ${{ inputs.delay }}
+          ENABLE_FDA_483_OBSERVATIONS: ${{ vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
+          ENABLE_FDA_483_DEEP: ${{ vars.ENABLE_FDA_483_DEEP || 'false' }}
         run: |
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto }}" = "true" ]; then
             # F2c auto mode: never uses the manual source/offset dispatch inputs

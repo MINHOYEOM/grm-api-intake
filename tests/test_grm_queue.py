@@ -958,22 +958,18 @@ class NotionSyncTest(unittest.TestCase):
                "SUPABASE_SERVICE_ROLE_KEY": "k"}
         with patch.dict(os.environ, env), patch.object(gq, "notion_sync", side_effect=fake_sync), \
                 contextlib.redirect_stdout(_io.StringIO()), contextlib.redirect_stderr(_io.StringIO()):
-            os.environ.pop(gq.NOTION_SYNC_ENV, None)
+            # [노션 은퇴 ③] 변수 스위치는 없다 — 옛 변수를 켜 둬도 --force 없이는 쓰지 않는다(수동 전용).
+            os.environ["ENABLE_QUEUE_NOTION_STATUS_SYNC"] = "true"
             self.assertEqual(gq.main(["notion-sync", "--date", "2026-11-16", "--apply"]), 0)
             self.assertFalse(calls["apply"])
-            os.environ[gq.NOTION_SYNC_ENV] = "true"
-            gq.main(["notion-sync", "--date", "2026-11-16", "--apply"])
+            gq.main(["notion-sync", "--date", "2026-11-16", "--apply", "--force"])
             self.assertTrue(calls["apply"])
 
-    def test_bridge_workflow_step_is_gated_and_non_blocking(self):
+    def test_bridge_workflow_no_longer_writes_notion_status(self):
+        """[노션 은퇴 ③] 브릿지 워크플로에 노션 행 Status 기록 단계·변수가 없다(off 에서 할 일이 없었다)."""
         wf = (ROOT / ".github" / "workflows" / "grm-delta-bridge.yml").read_text(encoding="utf-8")
-        step = wf[wf.index("노션 행 Status 기록 (git handoff 호"):wf.index("- name: OPEN 델타 없음")]
-        self.assertIn("steps.bridge.outputs.source == 'git'", step)
-        self.assertIn("vars.ENABLE_QUEUE_NOTION_STATUS_SYNC || 'false'", step)
-        self.assertIn("grm_queue.py notion-sync", step)
-        self.assertIn("::warning::", step)
-        self.assertNotIn("continue-on-error", step)
-        self.assertNotRegex(step, r"(?m)^\s*exit[ $]")        # 실패해도 워크플로를 빨갛게 세우지 않는다
+        self.assertNotIn("grm_queue.py notion-sync", wf)
+        self.assertNotIn("ENABLE_QUEUE_NOTION_STATUS_SYNC", wf)
 
 
 class HistoryBackfillTest(unittest.TestCase):

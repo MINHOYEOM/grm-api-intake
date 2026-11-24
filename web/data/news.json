@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-23",
+ "measured_on": "2026-11-24",
  "window_days": 60,
  "totals": {
-  "items": 480
+  "items": 477
  },
  "by_source": [
   {
@@ -12,11 +12,11 @@
   },
   {
    "v": "Federal Register",
-   "c": 80
+   "c": 79
   },
   {
    "v": "ECA Academy",
-   "c": 74
+   "c": 77
   },
   {
    "v": "MFDS",
@@ -24,11 +24,11 @@
   },
   {
    "v": "EMA",
-   "c": 43
+   "c": 39
   },
   {
    "v": "Health Canada",
-   "c": 21
+   "c": 20
   },
   {
    "v": "ISPE",
@@ -48,6 +48,27 @@
   }
  ],
  "items": [
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-23",
+   "title": "Approval: CMDh Updates \"Blue Box Requirements\" Once Again",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/approval-cmdh-updates-blue-box-requirements-once-again"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-23",
+   "title": "Refusal to Provide Records Costs API Manufacturer Access to the U.S. Market",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/refusal-to-provide-records-costs-api-manufacturer-access-to-the-u-s-market"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-23",
+   "title": "Supply Chain Under the Microscope: FDA&#39;s now Samples Drugs Straight from Pharmacies and Distributors",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/supply-chain-under-the-microscope-fdas-now-samples-drugs-straight-from-pharmacies-and-distributors"
+  },
   {
    "source": "Federal Register",
    "source_kind": "Notice",
@@ -3365,48 +3386,6 @@
    "published_date": "2026-09-25",
    "title": "[HC] Sanofi-Aventis Canada Inc. recalling certain insulin pens and cartridges",
    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/sanofi-aventis-canada-inc-recalling-certain-insulin-pens-and-cartridges"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "inspections",
-   "published_date": "2026-09-24",
-   "title": "INS-GCP-1 procedure for coordinating good-clinical-practice inspections requested by the CHMP",
-   "official_url": "https://www.ema.europa.eu/system/files/documents/regulatory-procedural-guideline/procedure-coordinating-gcp-inspections-requested-chmp-rev1-en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-09-24",
-   "title": "INS-GCP-1 procedure for coordinating good-clinical-practice inspections requested by the CHMP",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/ins-gcp-1-procedure-coordinating-good-clinical-practice-inspections-requested-chmp_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-24",
-   "title": "Draft guideline on the clinical requirements for medicines intended for the treatment of sickle cell disease",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-clinical-requirements-medicines-intended-treatment-sickle-cell-disease_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-09-24",
-   "title": "Draft guideline on the clinical requirements for medicines intended for the treatment of thalassaemia",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-clinical-requirements-medicines-intended-treatment-thalassaemia_en.pdf"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-24",
-   "title": "Improving Patient Access to Deceased Donor Islet Cells and Cell Products; Request for Information",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/24/2026-19563/improving-patient-access-to-deceased-donor-islet-cells-and-cell-products-request-for-information"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-24",
-   "title": "[HC] Apo-Semaglutide Injection : Incorrect dose display",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/apo-semaglutide-injection-incorrect-dose-display-0"
   }
  ]
 }

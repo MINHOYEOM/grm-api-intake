@@ -60,6 +60,7 @@ from grm_taxonomy import (
     is_pharma_establishment_483,
     is_veterinary_domain,
 )
+from grm_http_policy import FDA_483_PDF_DELAY_SECONDS, FDA_HTTP_RETRIES
 from grm_common import (
     FDA_BOT_BLOCK, FdaBotBlockError, _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log,
 )
@@ -94,7 +95,7 @@ TYPE_FDA_EIR = "EIR"        # type_or_class — EIR
 LANGUAGE_EN = "EN"
 REGION_FDA = "USA (FDA)"
 
-HTTP_RETRIES = 3
+HTTP_RETRIES = FDA_HTTP_RETRIES
 FDA_483_JSON_TIMEOUT = 60
 FDA_483_HTML_TIMEOUT = 30
 FDA_483_HTML_PAGE_LENGTH = 100
@@ -115,7 +116,7 @@ _MIN_COLS = 8
 # 재사용하고, 483 특유 관찰사항 앵커만 새로 둔다. 비용·예의: per-item timeout/delay + 최신 N건 cap.
 FDA483_EXCERPT_MAX_CHARS = 1500
 FDA483_EXCERPT_FETCH_TIMEOUT = 20
-FDA483_EXCERPT_DELAY_SECONDS = 0.5
+FDA483_EXCERPT_DELAY_SECONDS = FDA_483_PDF_DELAY_SECONDS
 # [수집 사각 수리 2026-07-27] 종전 상한 40 은 **윈도우 후보 수(실측 108)의 3분의 1**이었다.
 # 정렬이 publish desc 라 최신 40건 밖의 483 은 **어느 날 실행에서도** PDF 를 받지 못하고, 한 번
 # Notion 에 들어가면 재시도 기회도 없다(스캐폴드는 New 행에서만 생성). 그렇게 통째로 건너뛴

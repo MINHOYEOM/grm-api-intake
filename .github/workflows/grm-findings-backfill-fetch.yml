@@ -62,9 +62,9 @@ on:
         type: string
         default: 'true'
       delay:
-        description: 'Seconds to sleep between fda.gov requests (robots Crawl-Delay)'
+        description: 'Seconds between FDA requests. Leave blank for the collector default.'
         type: string
-        default: '30'
+        default: ''
       auto:
         description: 'true = one F2c --auto pass (ignores source/offset/max_docs/dry_run/delay above)'
         type: boolean
@@ -127,6 +127,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_DELAY: ${{ inputs.delay }}
           ENABLE_FDA_483_OBSERVATIONS: ${{ vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
           ENABLE_FDA_483_DEEP: ${{ vars.ENABLE_FDA_483_DEEP || 'false' }}
         run: |
@@ -136,15 +137,19 @@ jobs:
             # source's scan position and enforces a real-document fetch budget; when
             # both backlogs are exhausted it exits 0 after a couple of list
             # requests with auto_complete=true (cheap steady state -- see header).
-            ARGS=(--auto --max-docs 100 --auto-fetch-budget 300 --delay 30 --output fetch_report.json)
+            ARGS=(--auto --apply --max-docs 100 --auto-fetch-budget 300 --output fetch_report.json)
           else
             ARGS=(--source "${{ inputs.source }}"
                   --offset "${{ inputs.offset }}"
                   --max-docs "${{ inputs.max_docs }}"
-                  --delay "${{ inputs.delay }}"
                   --output fetch_report.json)
+            if [ -n "$IN_DELAY" ]; then
+              ARGS+=(--delay "$IN_DELAY")
+            fi
             if [ "${{ inputs.dry_run }}" = "true" ]; then
               ARGS+=(--dry-run)
+            else
+              ARGS+=(--apply)
             fi
           fi
           python collect_fda_backfill.py "${ARGS[@]}"

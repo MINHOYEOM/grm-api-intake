@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from unittest import mock
 
 import backfill_483_body_full as bb
 import raw_versioning as rv
@@ -62,6 +63,14 @@ class DryRunTest(unittest.TestCase):
 
 
 class ApplyTest(unittest.TestCase):
+    def test_write_guard_rejects_shrink_if_a_filled_row_reaches_backfill(self) -> None:
+        row = _row("fda483-1", dict(_BASE_RAW, fda483_body_full="The full inspection text"))
+        with mock.patch.object(bb, "select_targets", return_value=[row]):
+            rep, calls = _run([row], apply=True, pdf=lambda raw, doc: ("The full inspection", "ok"))
+        self.assertEqual((rep.shrunk, rep.applied), (1, 0))
+        self.assertEqual(rep.examples["shrunk"], ["fda483-1"])
+        self.assertEqual(calls, [])
+
     def test_adds_only_body_key_and_uses_expected_sha(self) -> None:
         row = _row("fda483-1", dict(_BASE_RAW))
         rep, calls = _run([row], apply=True, index={"fda483-1": "p1"}, notion=lambda pid: "FULL")

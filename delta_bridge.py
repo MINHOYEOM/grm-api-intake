@@ -36,6 +36,7 @@ import sys
 from typing import Any
 
 from grm_common import log
+from grm_findings import redact_person_firm_source
 from grm_notion import (
     NOTION_BLOCK_CHILDREN_URL_TPL,
     NOTION_DB_QUERY_URL_TPL,
@@ -468,6 +469,9 @@ def extract_handoff_body_full(payload: dict[str, Any]) -> dict[str, str]:
             if isinstance(row.get("deep_analysis_input"), dict) else None
         if not (isinstance(card_id, str) and card_id and isinstance(body, str) and body.strip()):
             continue
+        # [개인 사업자 2026-11-25] 업체명이 사람 이름이면 원문의 그 이름·번지를 지운다 — deep `source_text` 는
+        # 공개 저장소에 실린다(11-23호 196329 농장 번지). 법인 업체 원문은 그대로다.
+        body = redact_person_firm_source(body, str(row.get("firm") or ""))
         if card_id in bodies:
             if bodies[card_id] != body:
                 dupes += 1

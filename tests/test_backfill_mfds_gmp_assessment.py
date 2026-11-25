@@ -12,7 +12,9 @@ import backfill_mfds_gmp_assessment as b  # noqa: E402
 
 def _row(text: str, assess: str = "unknown", excerpt: str = "",
          rid: str = "rawsig-1", as_str: bool = False):
-    payload = {"attachment_text": text, "attachment_deficiency_assessment": assess}
+    # 상태 칸은 중립값(skipped-type: 수집 시점 관측값이라 백필이 안 건드림)으로 고정 — 판정 시험만 본다.
+    payload = {"attachment_text": text, "attachment_deficiency_assessment": assess,
+               "gmp_deficiency_table_status": "skipped-type"}
     if excerpt:
         payload["attachment_deficiency_excerpt"] = excerpt
     raw = json.dumps(payload, ensure_ascii=False) if as_str else payload
@@ -91,8 +93,82 @@ class PlanRowTest(unittest.TestCase):
     def test_uses_the_real_collector_functions_not_a_copy(self):
         """★사본 금지 — 판정은 수집기 함수를 그대로 import 해서 쓴다."""
         import collect_mfds_gmp_inspection as g
-        self.assertIs(b._assess_deficiency, g._assess_deficiency)
+        self.assertIs(b.assess_deficiency_with_rows, g.assess_deficiency_with_rows)
         self.assertIs(b._extract_deficiency_excerpt, g._extract_deficiency_excerpt)
+
+
+# ── #9 판정 보강 2026-11-25: 표 행 승격 + 상태 칸 채우기 ─────────────────────
+def _row2(payload: dict, rid: str = "rawsig-2"):
+    return {"raw_signal_id": rid, "raw_json": payload}
+
+
+class StatusAndRowsTest(unittest.TestCase):
+    def test_extracted_rows_with_unknown_assessment_is_promoted(self):
+        """status=extracted 인데 본문 판정이 unknown 인 113건형 → present."""
+        plan = b.plan_row(_row2({
+            "attachment_text": "본문 판정 불능", "attachment_deficiency_assessment": "unknown",
+            "gmp_deficiency_table_status": "extracted",
+            "gmp_deficiencies": [{"field": "품질"}]}))
+        self.assertEqual((plan["old"], plan["new"]), ("unknown", "present"))
+        self.assertFalse(plan["changed_status"])
+
+    def test_rerun_after_row_promotion_is_not_a_downgrade(self):
+        """승격된 행을 다시 돌려도 present→unknown 강등으로 오인하지 않는다(멱등)."""
+        self.assertIsNone(b.plan_row(_row2({
+            "attachment_text": "본문 판정 불능", "attachment_deficiency_assessment": "present",
+            "gmp_deficiency_table_status": "extracted",
+            "gmp_deficiencies": [{"field": "품질"}]})))
+
+    def test_missing_status_is_filled_from_stored_text(self):
+        """R1 행(상태 없음·판정 none) → empty. 판정은 그대로."""
+        plan = b.plan_row(_row2({
+            "attachment_text": "의약품 제조소 GMP 정기실태조사 결과 평가 결과 지적(보완)사항(Deficiencies) 없음",
+            "attachment_deficiency_assessment": "none",
+            "attachment_deficiency_excerpt": "x"}))
+        self.assertEqual(plan["kind"], "update")
+        self.assertFalse(plan["changed_assess"])
+        self.assertEqual((plan["status_old"], plan["status_new"]), ("", "empty"))
+        self.assertEqual(plan["raw_json"]["gmp_deficiency_table_status"], "empty")
+
+    def test_footnoted_table_row_gets_present_and_gate_degraded(self):
+        """한국코러스형: status=empty·unknown → present + gate-degraded(표 파서 0행)."""
+        from tests.test_gmp_inspection import _FOOTNOTE_TABLE_TEXT
+        plan = b.plan_row(_row2({
+            "attachment_text": _FOOTNOTE_TABLE_TEXT,
+            "attachment_deficiency_assessment": "unknown",
+            "attachment_deficiency_excerpt": "e",
+            "gmp_deficiency_table_status": "empty"}))
+        self.assertEqual((plan["old"], plan["new"]), ("unknown", "present"))
+        self.assertEqual(plan["status_new"], "gate-degraded")
+
+    def test_empty_with_unknown_becomes_unreadable(self):
+        plan = b.plan_row(_row2({
+            "attachment_text": "판정 불능 본문", "attachment_deficiency_assessment": "unknown",
+            "attachment_deficiency_excerpt": "e", "gmp_deficiency_table_status": "empty"}))
+        self.assertEqual(plan["status_new"], "unreadable")
+
+    def test_observed_statuses_are_never_overwritten(self):
+        for status in ("extracted", "skipped-type", "gate-degraded", "parse-fail", "unreadable"):
+            with self.subTest(status=status):
+                self.assertIsNone(b.plan_row(_row2({
+                    "attachment_text": "평가 결과: 적합",
+                    "attachment_deficiency_assessment": "none",
+                    "attachment_deficiency_excerpt": "평가 결과: 적합",
+                    "gmp_deficiency_table_status": status})))
+
+    def test_empty_none_row_is_unchanged(self):
+        self.assertIsNone(b.plan_row(_row2({
+            "attachment_text": "지적(보완)사항 없음", "attachment_deficiency_assessment": "none",
+            "attachment_deficiency_excerpt": "지적(보완)사항 없음",
+            "gmp_deficiency_table_status": "empty"})))
+
+    def test_no_text_row_stays_no_text(self):
+        self.assertEqual(b.plan_row(_row2({"gmp_deficiency_table_status": ""}))["kind"], "no_text")
+
+    def test_uses_shared_functions_not_copies(self):
+        import collect_mfds_gmp_inspection as g
+        self.assertIs(b.assess_deficiency_with_rows, g.assess_deficiency_with_rows)
+        self.assertIs(b.derive_table_status, g.derive_table_status)
 
 
 if __name__ == "__main__":

@@ -68,7 +68,7 @@ import findings_supabase_backfill as fsb
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, log
+from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, body_shrunk, log
 from grm_taxonomy import is_out_of_scope_483_establishment
 
 
@@ -152,6 +152,7 @@ class OcrRecoveryReport:
     attempted: int = 0                  # 실제 PDF fetch 를 시도한 문서 수
     recovered: int = 0                  # 본문 확보(dry-run=교체 예정, apply=upsert 성공)
     recovered_excerpt_only: int = 0     # 그 중 관찰문 0건 — 발췌만 살고 findings 는 0
+    shrunk: int = 0                     # 새 전문이 짧아 교체하지 않은 행
     named_no_gain: int = 0              # named: 관찰 증가 없음·표제 소실·본문 손실로 교체하지 않음
     named_text_loss: list[dict[str, Any]] = field(default_factory=list)  # [11-13] 본문 손실 차단 내역
     still_empty: int = 0                # ↓ 두 사건의 합(하위호환 유지). 진단에는 쓰지 말 것.
@@ -183,6 +184,16 @@ def _default_sleep(seconds: float) -> None:
 
 def _bump(report: OcrRecoveryReport, reason: str) -> None:
     report.failure_reasons[reason] = report.failure_reasons.get(reason, 0) + 1
+
+
+def _would_shrink_body(report: OcrRecoveryReport, old_raw: dict[str, Any],
+                       new_raw: dict[str, Any], label: str) -> bool:
+    if not body_shrunk(old_raw.get("fda483_body_full"), new_raw.get("fda483_body_full")):
+        return False
+    report.shrunk += 1
+    _bump(report, "shrunk")
+    log("WARN", f"483 전문 축소로 교체 건너뜀: {label}")
+    return True
 
 
 def _count_recovered(report: OcrRecoveryReport, observations: list[Any]) -> None:
@@ -700,10 +711,11 @@ def _patch_raw_json(
                    diff_summary={"reason": "483_status_marker"})
 
 
-def _mark_out_of_scope_in_place(
+def _mark_status_in_place(
     report: OcrRecoveryReport,
     rid: str,
     raw: dict[str, Any],
+    status: str,
     *,
     label: str,
     base: str,
@@ -712,12 +724,12 @@ def _mark_out_of_scope_in_place(
     patch_fn: Callable[..., None],
     row: dict[str, Any] | None = None,
 ) -> None:
-    """시설 유형으로 범위 밖인 행의 표식을 `out-of-scope` 로 — 다른 키는 그대로 둔다."""
+    """기존 원문에서 상태 표식만 갱신한다."""
     if dry_run:
         report.status_resolved += 1
         return
     try:
-        patch_fn(base, service_key, rid, {**raw, "fda483_text_status": OUT_OF_SCOPE_STATUS}, row=row)
+        patch_fn(base, service_key, rid, {**raw, "fda483_text_status": status}, row=row)
     except Exception as exc:  # noqa: BLE001
         report.failed += 1
         _bump(report, f"patch_failed:{type(exc).__name__}")
@@ -788,8 +800,16 @@ def _resolve_capped_status(
     dry_run: bool,
     rebuild_fn: Callable[..., Any],
     upsert_fn: Callable[..., tuple[int, list[dict[str, Any]] | None, str]],
+    patch_fn: Callable[..., None],
 ) -> None:
-    """상한 표식을 실제 사유로 교체한다 — 본문 복구와 같은 재구성·id 검증·upsert 경로."""
+    """상한 표식을 실제 사유로 교체하고 기존 전문을 보존한다."""
+    if body_shrunk(raw.get("fda483_body_full"), None):
+        _mark_status_in_place(
+            report, str(row.get("raw_signal_id") or ""), raw, status,
+            label=label, base=base, service_key=service_key, dry_run=dry_run,
+            patch_fn=patch_fn, row=row,
+        )
+        return
     try:
         item = rebuild_fn(nrow_from_raw_payload(raw), "", status)
     except Exception as exc:  # noqa: BLE001
@@ -846,7 +866,7 @@ def run(
     fetch_text: Callable[[str], tuple[str, str]] | None = None,
     rebuild_item: Callable[..., Any] | None = None,
     upsert_raw_signal: Callable[..., tuple[int, list[dict[str, Any]] | None, str]] | None = None,
-    patch_raw_json: Callable[[str, str, str, dict[str, Any]], None] | None = None,
+    patch_raw_json: Callable[..., None] | None = None,
     sleeper: Sleeper | None = None,
 ) -> tuple[OcrRecoveryReport, int]:
     """지연 바인딩 설계(collect_eu_ncr_backfill.run·backfill_483_inspectors.run 과 동일):
@@ -927,8 +947,9 @@ def run(
             #   (`extraction_gap_by_source`)가 이 행을 결손으로 센다. 재구성은 게이트가 드롭하므로
             #   표식만 `out-of-scope` 로 제자리 PATCH 한다(PDF fetch 없음 · 다른 키 불변).
             if str(raw.get("fda483_text_status") or "") != OUT_OF_SCOPE_STATUS:
-                _mark_out_of_scope_in_place(
-                    report, rid, raw, label=label, base=base, service_key=service_key,
+                _mark_status_in_place(
+                    report, rid, raw, OUT_OF_SCOPE_STATUS,
+                    label=label, base=base, service_key=service_key,
                     dry_run=dry_run, patch_fn=patch_fn, row=r,
                 )
             continue
@@ -971,7 +992,7 @@ def run(
                     and not _same_definitive_reason(raw, status)):
                 _resolve_capped_status(
                     report, r, raw, status, label=label, base=base, service_key=service_key,
-                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn,
+                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn, patch_fn=patch_fn,
                 )
             continue
 
@@ -998,7 +1019,7 @@ def run(
                 _resolve_capped_status(
                     report, r, raw, OUT_OF_SCOPE_STATUS, label=label, base=base,
                     service_key=service_key, dry_run=dry_run, rebuild_fn=rebuild_fn,
-                    upsert_fn=upsert_fn,
+                    upsert_fn=upsert_fn, patch_fn=patch_fn,
                 )
                 report.gate_dropped = counted   # 재구성도 드롭이면 이미 센 1건 — 중복 계수 방지
             continue
@@ -1014,6 +1035,8 @@ def run(
             continue
 
         new_raw = _json_object(record.get("raw_json"))
+        if _would_shrink_body(report, raw, new_raw, label):
+            continue
         observations = new_raw.get("fda_483_observations") or []
         if not (new_raw.get("fda483_excerpt") or observations):
             # 텍스트는 받았지만 결정론 층이 아무것도 못 뽑았다 — 교체 이득이 없다.
@@ -1026,7 +1049,7 @@ def run(
                 # 미상으로 남았다(2026-10-28 실측 25건 — EIR 송부 공문·주 정부 실사 기록 등).
                 _resolve_capped_status(
                     report, r, raw, status, label=label, base=base, service_key=service_key,
-                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn,
+                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn, patch_fn=patch_fn,
                 )
             continue
 

@@ -5947,6 +5947,20 @@ def main() -> int:
             aged_new_query_error = str(e)
             log("WARN", f"노후 미소비 New row 카운트 조회 실패: {aged_new_query_error}")
 
+    fda483_fulltext_gap_count = None
+    fda483_fulltext_gap_query_failed = False
+    if enable_fda483 and not args.dry_run and cfg.findings_supabase_url:
+        gap_read_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+        if gap_read_key:
+            from findings_supabase_backfill import read_fda483_fulltext_gap_count
+
+            try:
+                fda483_fulltext_gap_count = read_fda483_fulltext_gap_count(
+                    cfg.findings_supabase_url, gap_read_key,
+                )
+            except RuntimeError:
+                fda483_fulltext_gap_query_failed = True
+
     flags = {
         "ENABLE_SEARCH": enable_search,
         "ENABLE_MFDS": enable_mfds,
@@ -6020,6 +6034,8 @@ def main() -> int:
         run_date=run_date,
         kr_egress_proxy_status=kr_proxy_status,
         kr_egress_proxy_detail=kr_proxy_detail,
+        fda483_fulltext_gap_count=fda483_fulltext_gap_count,
+        fda483_fulltext_gap_query_failed=fda483_fulltext_gap_query_failed,
     )
     health_payload = _health_payload(
         health=health,

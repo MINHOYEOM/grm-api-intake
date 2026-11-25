@@ -251,9 +251,12 @@ jobs:
         id: fdacov
         # 가시화 전용 — 이 스텝의 실패가 발행 PR 생성을 막아서는 안 된다.
         continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
-          python fda_body_coverage.py check \
+          python fda_body_coverage.py check --read-db \
             --brief "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json" \
             --intake-event publish --summary-md "$GITHUB_STEP_SUMMARY" \
             --issue-md fda_coverage_lines.md | tee -a "$GITHUB_OUTPUT"

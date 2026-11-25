@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 import findings_supabase_backfill as fsb
+import grm_findings as gf
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import SOURCE_FDA_483
@@ -84,12 +85,17 @@ def _detail_after_heading(detail: str, heading: str) -> str | None:
     return detail[m.end():].lstrip()
 
 
-def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]], *, stale_only: bool = False
-                ) -> tuple[list[dict[str, Any]], dict]:
+def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]], *, stale_only: bool = False,
+                prose_growth_only: bool = True) -> tuple[list[dict[str, Any]], dict]:
     """(대기열 — 최신 먼저, 집계). 순수 함수.
 
     stale_only: 이미 국문이 있는 행 중 **지금 원문 상세가 저장된 detail_text 와 다른 행**만(다시 읽기로 원문이
-    바뀐 것 — 2026-11-11 실측 73%). 아니면 국문이 아직 없는 행."""
+    바뀐 것 — 2026-11-11 실측 73%). 아니면 국문이 아직 없는 행.
+
+    prose_growth_only(stale 에서만, 기본 켬 · 2026-11-26): 원문 상세의 **본문(산문 낱말)이 늘어난 행만** 싣는다.
+    쪽 끝 절단 소급(#1966)이 바꾸는 1,511관찰 중 약 770은 서명란 꼬리·가림 표시만 걷힌 행이라 국문을 다시
+    만들 이유가 없다. 건너뛴 행은 `junk_only_skipped` 로 따로 센다(조용히 빠지지 않게). 기준은 다시 읽기
+    백필의 복원 계수와 같은 함수(`grm_findings.fda483_prose_grew`)다."""
     by_key: dict[tuple[str, str], list[str]] = defaultdict(list)
     frag_details: dict[str, list[str]] = defaultdict(list)   # 표제가 조각인 관찰의 detail(raw 별)
     for r in raws:
@@ -101,7 +107,7 @@ def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]], *, s
                 if _is_fragment_heading(o.get("deficiency")):
                     frag_details[str(r.get("raw_signal_id"))].append(str(o["detail"]))
     queue, stats = [], {"findings": len(findings), "queued": 0, "no_detail": 0, "ambiguous": 0, "unchanged": 0,
-                        "detail_head": 0, "heading_only": 0}
+                        "detail_head": 0, "heading_only": 0, "junk_only_skipped": 0}
     for f in findings:
         hits = by_key.get((str(f.get("raw_signal_id")), _heading_key(f.get("finding_text"))), [])
         by_detail_head = False
@@ -121,6 +127,9 @@ def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]], *, s
             continue
         if stale_only and hits[0] == str(f.get("detail_text") or ""):
             stats["unchanged"] += 1
+            continue
+        if stale_only and prose_growth_only and not gf.fda483_prose_grew(str(f.get("detail_text") or ""), hits[0]):
+            stats["junk_only_skipped"] += 1
             continue
         stats["detail_head"] += int(by_detail_head)
         queue.append({"finding_id": str(f["finding_id"]), "finding_text_md5": _md5(f.get("finding_text") or ""),
@@ -148,6 +157,21 @@ def write_shards(queue: list[dict[str, Any]], out: Path, shards: tuple[str, ...]
     return summary
 
 
+def fetch_inputs(base: str, service_key: str, mode: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """대기열 입력(읽기 전용) — findings(483·scope ok·국문 유무는 mode 로) + 483 raw. 일일 stale 감시
+    (`findings_detail_stale_monitor`)도 이 함수를 그대로 써서 대기열과 같은 모집단을 센다."""
+    findings = fsb._fetch_all_pages(
+        base, service_key, "findings", select="finding_id,raw_signal_id,published_date,finding_text,detail_text",
+        page_size=1000, order="finding_id.asc",
+        extra_params={"source": f"eq.{SOURCE_FDA_483}", "scope_status": "eq.ok",
+                      "detail_text_ko": "not.is.null" if mode == "stale" else "is.null"})
+    raws = fsb._fetch_all_pages(
+        base, service_key, "raw_signals", select="raw_signal_id,raw_json", page_size=200,
+        order="raw_signal_id.asc",
+        extra_params={"source": f"eq.{SOURCE_FDA_483}", "raw_json": "like.*fda_483_observations*"})
+    return findings, raws
+
+
 def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -156,6 +180,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--mode", choices=("pending", "stale"), default="pending",
                    help="pending = 국문 없는 행 · stale = 국문 있으나 원문이 바뀐 행(재번역).")
     p.add_argument("--prefix", default="", help="묶음 이름(쉼표). 기본 pending=A,B,C · stale=R.")
+    p.add_argument("--all-changes", action="store_true", default=False,
+                   help="stale: 본문(산문 낱말)이 늘지 않은 행(잡문만 걷힌 행)까지 싣는다. 기본은 늘어난 행만.")
     p.add_argument("--supabase-url")
     p.add_argument("--service-role-key")
     args = p.parse_args(argv)
@@ -164,16 +190,9 @@ def main(argv: list[str] | None = None) -> int:
         print("findings_detail_export: Supabase 자격 증명 필요", file=sys.stderr)
         return 2
     base = _normalize_base_url(creds[0])
-    findings = fsb._fetch_all_pages(
-        base, creds[1], "findings", select="finding_id,raw_signal_id,published_date,finding_text,detail_text",
-        page_size=1000, order="finding_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_483}", "scope_status": "eq.ok",
-                      "detail_text_ko": "not.is.null" if args.mode == "stale" else "is.null"})
-    raws = fsb._fetch_all_pages(
-        base, creds[1], "raw_signals", select="raw_signal_id,raw_json", page_size=200,
-        order="raw_signal_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_483}", "raw_json": "like.*fda_483_observations*"})
-    queue, stats = build_queue(findings, raws, stale_only=args.mode == "stale")
+    findings, raws = fetch_inputs(base, creds[1], args.mode)
+    queue, stats = build_queue(findings, raws, stale_only=args.mode == "stale",
+                               prose_growth_only=not args.all_changes)
     out = Path(args.out)
     shards = tuple(x for x in args.prefix.split(",") if x) or (("R",) if args.mode == "stale" else SHARDS)
     summary = write_shards(queue, out, shards)

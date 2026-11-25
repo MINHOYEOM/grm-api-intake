@@ -158,6 +158,7 @@ import clause_text_page  # noqa: E402  [기준 조항 원문 2026-11-15] /clause
 import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
 import news_page  # noqa: E402  [최근 규제 소식 2026-11-10]
 import inspection_notes_page  # noqa: E402  [실사 대비 노트 2026-11-15] 주제별 지적 문장 묶음
+import doc_gist  # noqa: E402  [구글 품질 2단계 2026-11-20] 국문 짧은 문서 첫머리 'GRM 요지'
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -4410,6 +4411,28 @@ def doc_clause_view(doc: dict[str, Any], clause_by_section: dict[str, dict[str, 
     return out
 
 
+STANDARD_REFS_SHOW = 6
+
+
+def doc_standard_view(doc: dict[str, Any], text_view: dict[str, Any],
+                      labels: "dict[str, tuple[str, str]]",
+                      limit: int = STANDARD_REFS_SHOW) -> list[dict[str, str]]:
+    """[GRM 연결 빈 문서 2026-11-20] 이 문서의 지적 본문이 적은 기준의 **원문 페이지**(/clauses/) 링크.
+    비슷한 지적도 조항 지도도 없는 문서에만 쓴다(호출부가 가른다). 라벨→주소는 ref_href 가 확실할 때만 낸다."""
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for label in clause_text_page.cited_standard_labels(doc):
+        href = clause_text_page.ref_href(text_view, label)
+        if not href or href in seen or href not in labels:
+            continue
+        seen.add(href)
+        code, title = labels[href]
+        out.append({"href": href, "code": code, "title": title})
+        if len(out) >= limit:
+            break
+    return out
+
+
 def firm_similar_view(firm_docs: list[dict[str, Any]],
                       similar: dict[str, list[list[Any]]],
                       docs_by_id: dict[str, dict[str, Any]], lang: str,
@@ -4618,6 +4641,23 @@ def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
         "request_head": link(parts["request_head"]) if parts["request_head"] else "",
         "requests": [link(r) for r in parts["requests"]],
     }
+
+
+def clause_text_cites(docs_data: "dict[str, Any] | None",
+                      views: dict[str, dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
+    """[구글 품질 2단계 2026-11-20] 언어 → (조항 원문 페이지 주소 → 이 조항을 인용한 지적).
+
+    렌더·sitemap 판정·테스트가 이 한 함수를 본다(갈라지지 않게). 영어 트리는 문서 페이지가 서는
+    문서(doc_is_english)만, 본문은 원문(영어)만 센다 — findings/clause 영어판과 같은 규율."""
+    docs = (docs_data or {}).get("documents") or []
+    out = {DEFAULT_LANG: clause_text_page.citing_findings(
+        docs, views[DEFAULT_LANG], lambda f: finding_body(f, DEFAULT_LANG))}
+    if "en" in views:
+        out["en"] = clause_text_page.citing_findings(
+            docs, views["en"],
+            lambda f: "" if _HANGUL_RE.search(finding_body(f, "en")) else finding_body(f, "en"),
+            doc_ok=doc_is_english)
+    return out
 
 
 def doc_is_english(doc: dict[str, Any]) -> bool:
@@ -5256,13 +5296,21 @@ _HOME_TLDR_PREFIXES: tuple[tuple[str, str], ...] = (
 )
 
 
-_HOME_MIDDOT_RE = re.compile(r"(\S)·")
+_HOME_MIDDOT_TOKEN_RE = re.compile(r"\S+")
+
+
+def _home_nobreak_token(m: "re.Match[str]") -> str:
+    tok = m.group(0)
+    return f'<span class="ht-nb">{tok}</span>' if re.search(r"\S·", tok) else tok
 
 
 def home_nobreak_middot(line: str) -> Markup:
     """가운뎃점 앞에서 줄이 끊기지 않게 한다 — "위조·DEG" 가 "위조 / ·DEG" 로 갈라지면 다음
-    줄이 점으로 시작한다(375px 실측). 글자는 그대로 두고 앞 글자와 점만 한 덩어리로 묶는다."""
-    return Markup(_HOME_MIDDOT_RE.sub(r'<span class="ht-nb">\1·</span>', str(_escape(line or ""))))
+    줄이 점으로 시작한다(375px 실측). 글자는 그대로 두고 **띄어쓰기 단위 낱말 전체**를 묶는다.
+    [2026-11-26] 예전에는 점 앞 한 글자만 묶어("충<span>전·</span>포") 낱말 한가운데에 태그
+    경계가 생겼다 — 화면 읽기·텍스트 추출이 "충 전· 포 장·"·"충포출하한"으로 깨졌다. 태그 경계는
+    늘 빈칸 자리에만 둔다(test_home_keypoints_have_no_tag_inside_a_word 가 지킨다)."""
+    return Markup(_HOME_MIDDOT_TOKEN_RE.sub(_home_nobreak_token, str(_escape(line or ""))))
 
 
 def home_source_tag(line: str) -> dict[str, str]:
@@ -6121,6 +6169,18 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         " 한국어 풀이·공식 출처·실제 지적사례 연결",
         f"- [자료실]({base_url}/library/): FDA·EMA·PIC/S·ICH·WHO·식약처 지침·가이드라인"
         " 공식 원문 링크",
+    ]
+    # [검색 유입 점검 2026-11-26] 조항 원문·실사 대비 노트가 이 안내에 없었다 — 빙 유입의 둘째 묶음이
+    # 조항 원문(en/clauses·en/library)인데 AI 검색에는 알리지 않았다. 국문 트리는 영문 트리와 같은
+    # 렌더러가 함께 내므로 영문 면이 있으면 국문 면도 있다(없는 면은 적지 않는다).
+    _ep = en_paths or set()
+    if "clauses/" in _ep:
+        lines.append(f"- [기준 조항 원문]({base_url}/clauses/): 식약처 GMP·21 CFR·EU GMP·ICH 조항을"
+                     " 원문 그대로 — 21 CFR 조항은 그 조항을 인용한 실제 지적과 연결")
+    if "inspection-notes/" in _ep:
+        lines.append(f"- [실사 대비 노트]({base_url}/inspection-notes/): 주제별로 실사에서 실제"
+                     " 지적된 문장과 출처")
+    lines += [
         f"- [이용안내]({base_url}/guide/): 서비스 활용법과 자주 묻는 질문",
         f"- [주간 퀴즈]({base_url}/quiz/): 그 주 규제 소식 기반 학습 퀴즈",
         f"- [소개]({base_url}/about/): 서비스를 만든 이유와 만드는 방식, 연락처",
@@ -6168,6 +6228,11 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
      "{terms} GMP and quality terms explained in plain English with official sources"),
     ("library/", "Reference library",
      "Official FDA, EMA, PIC/S, ICH, WHO and MFDS guidance documents"),
+    ("clauses/", "Regulation texts",
+     "21 CFR, EU GMP and ICH clauses in their original wording; 21 CFR clauses list"
+     " the findings that cite them"),
+    ("inspection-notes/", "Inspection readiness notes",
+     "Topic notes built from sentences regulators actually wrote in findings, with sources"),
     ("archive/", "Weekly brief archive", "Past weekly regulatory briefs"),
     ("guide/", "Guide", "How to use the service, and frequently asked questions"),
     ("quiz/", "Weekly quiz", "Learning quiz based on that week's regulatory news"),
@@ -8131,7 +8196,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # [SEO 2단계 2026-11-09] GRM 고유 맥락 입력 — 비슷한 지적(정본 파일)·조항(뷰 재사용).
         similar_by_doc = load_findings_similar() if render_doc_pages else {}
         partial_detail_ids = load_partial_detail_ids() if render_doc_pages else frozenset()
+        # [구글 품질 2단계 2026-11-20] GRM 요지(translations/doc_gist_outbox) — 지적 본문 해시가 같고 검사를 통과한 것만.
+        doc_gists = doc_gist.load_outbox() if render_doc_pages else {}
         docs_by_id = {d["document_id"]: d for d in documents}
+        clause_labels_by_lang = {_lg: clause_text_page.href_labels(_v)
+                                 for _lg, _v in clause_text_views.items()}
         clause_by_section_by_lang = {
             DEFAULT_LANG: {c["section"]: c for c in clause_views},
             "en": {c["section"]: c for c in clause_views_en},
@@ -8192,6 +8261,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     if _index else [])
                 _used: set[str] = set()
                 _labels = agency_labels_by_lang[_lg]
+                _similar_cases = doc_similar_view(
+                    doc, similar_by_doc.get(doc["document_id"]), docs_by_id, _lg,
+                    _doc_slugs_by_lang.get(_lg), _canonical_firm_key)
+                _cited_clauses = doc_clause_view(
+                    doc, clause_by_section_by_lang.get(_lg, {}), _lg)
                 # 분류 라벨은 **데이터에 한국어로** 실려 있고 템플릿이 그대로 찍는다 —
                 # 언어 트리에 맞춰 뷰에서 번역한 사본을 넘긴다(정본 데이터는 무변형).
                 _doc = doc if _lg == DEFAULT_LANG else {
@@ -8251,17 +8325,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
                     # [다국어] 그 언어 트리에 있는 것만 잇는다(_firm_slug_for).
                     firm_page_slug=_firm_slug_for(doc, _lg),
-                    similar_cases=doc_similar_view(
-                        doc, similar_by_doc.get(doc["document_id"]), docs_by_id, _lg,
-                        _doc_slugs_by_lang.get(_lg), _canonical_firm_key),
+                    doc_gist=(doc_gist.view(doc, doc_gists) if _lg == DEFAULT_LANG else None),
+                    similar_cases=_similar_cases,
                     # [UI 2단 2026-11-12] 483 '구체 내용' — 본문은 런타임(doc-detail.js)이
                     # findings 의 상세 칸을 읽어 붙인다(파일에 싣지 않는다 — 국문만 830만 자).
                     detail_runtime=(doc.get("source") == "FDA 483"),
                     detail_partial_ids=sorted(
                         f["finding_id"] for f in (doc.get("findings") or [])
                         if f.get("finding_id") in partial_detail_ids),
-                    cited_clauses=doc_clause_view(
-                        doc, clause_by_section_by_lang.get(_lg, {}), _lg),
+                    cited_clauses=_cited_clauses,
+                    standard_refs=(
+                        [] if (_similar_cases or _cited_clauses) else doc_standard_view(
+                            doc, clause_text_views.get(_lg, clause_text_view_en),
+                            clause_labels_by_lang.get(_lg, {}))),
                     backlinks=build_backlink_panel(
                         "doc", doc.get("document_id", ""), index=card_issue_index,
                         lang=_lg,
@@ -8431,6 +8507,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [기준 조항 원문 2026-11-15] /clauses/ 색인·문서 목차·조항 페이지 — ko·en 같은 함수(두 벌 금지).
     # 본문은 영어 원문 그대로라 두 트리가 같은 경로를 낸다(en_paths 는 위에서 같은 뷰로 선언).
     # sitemap lastmod 는 비운다 — 조항에는 개정일 필드가 없고, 수집일은 수정일이 아니다(지어낸 날짜 금지).
+    # [구글 품질 2단계 2026-11-20] 21 CFR 조항마다 "이 조항을 인용한 지적" — 언어마다 그 트리에 문서
+    # 페이지가 있는 문서만 센다. 렌더와 sitemap 판정(아래 D·E 루프)이 같은 값을 본다.
+    _ct_cites = clause_text_cites(docs_data, clause_text_views)
     if clause_text_view["sources"]:
         for _lg, _pg, _em, _tr in trees:
             _ctv = clause_text_views.get(_lg, clause_text_view_en)
@@ -8438,6 +8517,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 continue
             _ct_cases = clause_slugs if _lg == DEFAULT_LANG else {c["slug"] for c in clause_views_en}
             _ct_terms = clause_text_page.terms_by_href(_ctv, glossary_terms, _lg)
+            _ct_cite = _ct_cites.get(_lg) or {}
+            _ct_labels = {k: _tr(v) for k, v in _clause_agency_labels.items()}
             _ip = _pg(clause_text_page.ROUTE)
             _em("clauses_index.html", _ip,
                 page_title=_tr("기준 조항 원문 · GRM"),
@@ -8462,7 +8543,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for _d, _c in clause_text_page.pages(_ctv):
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
-                _ct_gni = clause_text_page.google_noindex_reason(_d, _c, _lg)
+                _cite = _ct_cite.get(_c["href"])
+                _ct_gni = clause_text_page.google_noindex_reason(
+                    _d, _c, _lg, (_cite or {}).get("documents", 0))
                 _em("clause_text.html", _cp,
                     page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
                     nav_active="findings",
@@ -8474,6 +8557,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     cases_href=(f"findings/clause/{clause_slug(_sec)}/"
                                 if _sec and clause_slug(_sec) in _ct_cases else ""),
                     terms=_ct_terms.get(_c["href"]) or [],
+                    cite=_cite, agency_labels=_ct_labels,
                     google_noindex=bool(_ct_gni),
                 )
         for _path in sorted(clause_text_page.tree_paths(clause_text_view)):
@@ -8482,7 +8566,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (영문 트리 경로는 en_paths 로 sitemap 에 들어가므로 언어마다 따로 센다).
     for _lg in (DEFAULT_LANG, "en"):
         for _d, _c in clause_text_page.pages(clause_text_views[_lg]):
-            _why = clause_text_page.google_noindex_reason(_d, _c, _lg)
+            _why = clause_text_page.google_noindex_reason(
+                _d, _c, _lg, (_ct_cites[_lg].get(_c["href"]) or {}).get("documents", 0))
             if _why:
                 _mark_google_noindex(_lg, _c["href"], f"clause_{_why}")
 
@@ -9098,7 +9183,7 @@ _FOOTER_GARBAGE_RE = re.compile(
     r"|(?-i:Digitally\s+signed\s+by)"     # 대문자 D 스탬프만 — 산문 "digitally signed by the …" 제외
     r"|observations\s+of\s+objectionable\s+conditions"
     r"|PURSUANT\s+TO\s+SECTION\s+704\s*\(b\)"
-    r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
+    r"|(?-i:EMP[A-Za-z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
     # [2026-10-27] 연속 기재 양식 마지막 줄의 실사일·서명자 나열(수집기 ④와 같은 마커).
     r"|(?-i:[*\"]?\s*DATES\s+OF\s+INSPECTION)|Dates\s+of\s+inspection\s*:",
     re.I,

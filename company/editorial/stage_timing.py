@@ -1,3 +1,4 @@
+import sys
 """Measure editorial stages from the committer timestamps in a local Git ref.
 
 Claims and intermediate artifacts can mark the first observed activity. For
@@ -196,6 +197,11 @@ def print_report(report):
 
 
 def main():
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run_date", help="YYYY-MM-DD or rehearsal run folder name")
     parser.add_argument("--branch", help="Local Git ref (default: claude/company-<run_date>)")

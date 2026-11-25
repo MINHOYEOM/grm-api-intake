@@ -39,6 +39,7 @@ env:
   FAILURE_ISSUE_TITLE: 'GRM FDA 지적 조항 월간 갱신 실패'
 
 permissions:
+  actions: read
   contents: read
   issues: write
 
@@ -80,6 +81,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Check today's FDA manual runs (KST)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/fda_manual_run_warning.py
 
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0

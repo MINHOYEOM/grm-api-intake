@@ -142,7 +142,7 @@ FAKE_FIXTURE_NAMES = frozenset((
     "Orlena Ostrell Pelkastrom Pelvik Qiu Quell Quent Quorvala Ravel Tasindra Tor Torvel Twisk Varsten Vasky Velloc "
     "Velmor Veshan Zha Zun Doe Roe Testerson Example "
     "Oren Kalpa Ravinor Teskamal Dravin Tavo Wexo Marika Chova Darik Venmarz Ilhan Barvi Orvin Kesta Bennick Varch "
-    "Ovan Kelmoti Brant Keltham Bertil Hovanick Dorsev").split())
+    "Ovan Kelmoti Brant Keltham Bertil Hovanick Dorsev Velmora Quist Torvald Brennick Orsolya Venn").split())
 # 규제기관 공식 서명자(시험 원문에 나오는 FDA 공무원) — 11-21 결정상 가리지 않는 대상이라 그대로 둔다.
 OFFICIAL_FIXTURE_NAMES = frozenset(("Garthwaite",))   # FDA Compliance Officer(경고서한 서명란)
 _TEXT_SUFFIXES = (".json", ".txt", ".md", ".html", ".csv")
@@ -277,6 +277,66 @@ class ClassifyTest(unittest.TestCase):
         self.assertTrue(guess_check._name_hit("Ostrell", text))
         self.assertFalse(any(guess_check._name_hit(n, text.replace("Darvin G. Ostrell", "[recipient]"))
                              for n in names))
+
+
+class PersonalStreetAddressTest(unittest.TestCase):
+    """[2026-11-25] 개인 사업자 카드의 번지 주소 — 발행본·조립 입력 **모두** 막는다(저장소가 공개라 입력도 공개).
+    11-23호 196329(개인 농장)는 이름을 '개인 사업자'로 바꾼 뒤에도 deep `source_text` 에 번지가 남았다.
+    판정 = `grm_findings.street_addresses`(규제기관 사무소 주소 칸 제외). 자동 정리 = 발행 브릿지
+    `delta_bridge.extract_handoff_body_full` → `grm_findings.redact_person_firm_source`(같은 함수)."""
+
+    @staticmethod
+    def _personal_hits(copies):
+        from grm_findings import REDACTED_PERSON_BY_LANG, person_firm_name, street_addresses
+        marks = tuple(REDACTED_PERSON_BY_LANG.values())
+        personal, firm, slots_by = set(), defaultdict(list), defaultdict(list)
+        for path, payload in copies:
+            for card_id, card in _cards(payload):
+                firm[card_id] += [str(card.get(k) or "") for k in ("firm", "headline_target")]
+                firm[card_id] += [str(f.get("value") or "") for f in card.get("facts") or []
+                                  if isinstance(f, dict)]
+                for slot, value in _text_slots(card):
+                    slots_by[card_id].append((path, slot, value))
+                    if any(m in value for m in marks):
+                        personal.add(card_id)
+        personal |= {cid for cid, vals in firm.items() if any(person_firm_name(v.strip()) for v in vals)}
+        return sorted(f"{path} | {cid} | {slot} | {addr!r}"
+                      for cid in personal for path, slot, value in slots_by[cid]
+                      for _, _, addr in street_addresses(value))
+
+    def test_no_personal_street_address_in_any_copy(self):
+        hits = self._personal_hits(_copies())
+        self.assertEqual(hits, [], "개인 사업자 카드에 번지 주소가 있다 — 도시·주 단위까지만 둔다"
+                                   "(grm_findings.redact_street_addresses, 표기 '[번지 생략]').\n" + "\n".join(hits))
+
+    def test_judge_catches_farm_and_skips_agency_office(self):
+        import grm_findings as g
+        text = ("DISTRICT ADDRESS AND PHONE NUMBER\n250 Marquette Ave,\nSte.\n600\nMinneapolis,\nMN 55401\n"
+                "NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED\nJorn K Testerson, Owner\nFIRM NAME\n"
+                "STREET ADDRESS\nJorn K Testerson\n990001\nExample Ave\nCITY, STATE, ZIP CODE, COUNTRY")
+        self.assertEqual([a for _, _, a in g.street_addresses(text)], ["990001\nExample Ave"])
+        out = g.redact_person_firm_source(text, "Jorn K Testerson")
+        self.assertNotIn("Example Ave", out)
+        self.assertNotIn("Testerson", out)
+        self.assertIn("250 Marquette Ave", out)          # 규제기관 사무소 주소는 남는다
+        self.assertIn(g.STREET_REDACTED, out)
+
+    def test_corporate_source_untouched(self):
+        import grm_findings as g
+        text = "FIRM NAME\nRK Pharma Inc.\n401 N Middletown Rd Building 21"
+        self.assertEqual(g.redact_person_firm_source(text, "RK Pharma Inc."), text)
+
+    def test_bridge_redacts_person_firm_body(self):
+        import delta_bridge
+        payload = {"rows": [
+            {"web_card_id": "fda483-1", "firm": "Jorn K Testerson",
+             "deep_analysis_input": {"body_full": "FIRM NAME\nJorn K Testerson\n990001\nExample Ave\nOBSERVATION 1"}},
+            {"web_card_id": "fda483-2", "firm": "Acme Pharma Inc.",
+             "deep_analysis_input": {"body_full": "FIRM NAME\nAcme Pharma Inc.\n12 Main Street\nOBSERVATION 1"}}]}
+        bodies = delta_bridge.extract_handoff_body_full(payload)
+        self.assertNotIn("Example Ave", bodies["fda483-1"])
+        self.assertNotIn("Testerson", bodies["fda483-1"])
+        self.assertIn("12 Main Street", bodies["fda483-2"])
 
 
 if __name__ == "__main__":

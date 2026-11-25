@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.336` |
-| 최종 수정일 | 2026-11-25 |
+| 문서 버전 | `v1.337` |
+| 최종 수정일 | 2026-11-26 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -318,6 +318,7 @@ flowchart TD
 - `grm-quiz-freshness.yml` — 이번 주 주간 퀴즈 문항이 실제로 생성됐는지(데스크톱 로컬 예약 태스크 침묵 감시). 이슈 `[quiz-freshness] 이번 주 퀴즈 문항이 생성되지 않았습니다`.
 - `grm-newsletter-freshness.yml` — 이번 주 뉴스레터가 실제로 발송됐는지 Brevo 캠페인 상태로 직접 확인(스케줄 성공·dispatch_log 는 진실이 아니다). 이슈 `[newsletter-freshness] 이번 주 뉴스레터가 발송되지 않았습니다`.
 - `grm-findings-backlog-monitor.yml` — 미번역 격차·검수 백로그 임계 초과 감시(`findings_stats()` RPC). 이슈 `[findings-backlog] 번역/검수 백로그가 임계를 초과했습니다`.
+- `grm-findings-detail-stale-monitor.yml` — 매일 21:30 UTC, 483 상세 재번역 대기(`findings_detail_export --mode stale` 과 같은 함수, 본문이 늘어난 행만)를 세어 Actions 캐시에 일별 기록. 0 보다 큰 상태가 3일 넘게 줄지 않으면 이슈 `[findings-detail-stale] 483 상세 재번역 대기가 줄지 않습니다`, 줄면 자동 종료. 번역 배치는 만들지 않는다.
 - `grm-reconciliation.yml` — 소스별 주간 수집량의 과거 대비 비정상 낙차(무음 실패·피드 파손·IP 차단) 감지. 비차단 — `::warning::`·Job Summary 로만 표면화(이슈 없음).
 - `grm-fda-coverage-gate.yml`(2026-10-27 신설) — **발행 전** FDA 카드 본문 결손 점검. 월요일 정기 수집의 스캐폴드에서 FDA 483·WL·OpenFDA 회수 카드 중 본문·상세가 없는 건수·비율을 센다(FR 은 관측만). 임계: 483 = **3건 이상 그리고 10% 이상**(대량 공개 주와 한산한 주를 함께 다루려고 둘 다 요구), WL·회수 = 1건 이상(정상이면 늘 본문이 있다). 483 이 넘으면 결손 문서만 `recoverable` 회수 → 그 날짜 handoff를 갱신할 수 있고 07:00 KST 전이면 `grm-intake` 를 다시 돌려 handoff·스캐폴드를 재생성한 뒤 다시 센다. 남으면 이슈 `GRM FDA 본문 결손 경고(발행 전 점검)`(`automation-warning`·`grm-fda-coverage` — Admin 운영 상태 센터에 뜬다). 발행 PR 본문(`grm-web-publish`)과 워치독(발행 브랜치 재확인)도 같은 판정을 싣는다. 발행을 막지는 않는다 — 결손 483 은 정직한 '본문 미확보' 묶음 카드로 나가고, 사람이 승인 전에 본다.
 - `grm-fda483-ocr-recovery.yml` 예약 실행 실패 — 잡별 이슈 `GRM FDA 483 예약 회수 실패` / `GRM FDA WL 본문 예약 회수 실패`(`automation-warning`). 다음 성공 시 자동 닫힘. WL 잡은 시도 3건 이상 중 절반 넘게 다시 403·5xx 면(러너 차단 의심) 실패로 본다.
@@ -546,6 +547,8 @@ grm-api-intake/
 ├─ collect_mfds_safety_letter.py   # 공공데이터포털 식약처 안전성 서한 수집기
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
 ├─ clause_text_collect.py         # [기준 원문 2026-11-15] 21 CFR 210·211(eCFR XML)·EU GMP Part I 1~9장+Annex 1·ICH Q7/Q9(R1)/Q10(PDF)·식약처 「의약품 제조 및 품질관리에 관한 규정」 조문+별표 1~18(국가법령정보센터 화면·첨부 PDF, 키 없이) 원문 → 조항 단위 `web/data/clauses/{cfr21,eu_gmp,ich,mfds_gmp}.json`(무절단·DB 아님) + `translation_queue.json`(국문 번역 대기). 수동 CLI·이용 조건은 `web/data/clauses/SOURCES.md`. ★`library_collect_*` 이름 금지(자료실 플러그인 자동 발견에 걸린다)
+├─ clause_translate_kit.py        # [구글 품질 2단계 2026-11-20] 국문 조항 참고 번역 키트 — export(묶음)·qa(결정론 검사)·status(큐 `web/data/clauses/translation_queue.json`). 번역 정본 `translations/clause_outbox/*.json`, 빌드가 `web/clause_translation.py` 로 덧씌움(원문 해시가 바뀌면 버리고 큐로)
+├─ doc_gist_kit.py                # [구글 품질 2단계 2026-11-20] 국문 짧은 문서 GRM 요지 키트 — 대상 선정·export·qa·status. 정본 `translations/doc_gist_outbox/*.json`, 검사·뷰 `web/doc_gist.py`(통과한 요지만 국문 문서 페이지에 싣는다)
 ├─ collect_eu_gmp_ncr.py           # EU GMP NCR(EudraGMDP) 수집기 — News+Findings 이중편입
 ├─ ema_document.py                # EMA 원문(기사 HTML·문서 PDF) → 전문 공통 판독기(11-25 #8) — 일일 수집기 EMA 경로·빈칸 백필이 같은 함수를 부른다. 저장 단계 절단 없음(article_excerpt, 넘치면 article_excerpt_parts 로 분할)·메타 ema_document·간격 2초/429 재시도. 빈칸은 content_completeness 가 매일 센다
 ├─ eudragmdp_client.py             # EudraGMDP GMP 비준수 requests 클라이언트(세션·페이징·상세·PDF)
@@ -586,6 +589,7 @@ grm-api-intake/
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ conftest.py                      # pytest/unittest 공통 진입에서 네트워크 가드 적용
 ├─ ci_network_guard.py              # CI·로컬 시험의 외부 네트워크 차단 가드
+├─ ci_slot_wait.py                 # push 전 PR CI 자리 및 수집 시간 창 확인
 ├─ pr_merge_plan.py                 # 열린 PR 머지 순서·파일 겹침 예측(읽기 전용)
 ├─ audit_483_inspector_blanks.py    # FDA 483 실사관 빈칸 사유 판정(dry)
 ├─ wl_pair_restore.py               # WL 본문만 바뀐 짝 findings restore 계획 도구(기본 dry)
@@ -677,6 +681,7 @@ grm-api-intake/
 ├─ fda483_notion_raw_sync.py           # 미소비 Notion 483 행의 빈 raw를 Supabase 본문으로 보충
 ├─ fda483_ocr_backfill.py              # 스캔 483의 관찰 원문 OCR 소급 복구
 ├─ findings_backlog_monitor.py         # 지적사항 번역 격차·검수 대기·추출 격차 임계 감시
+├─ findings_detail_stale_monitor.py    # 483 상세 재번역(stale) 대기 일일 계수 — 3일 넘게 줄지 않으면 이슈(읽기 전용)
 ├─ findings_classification_audit.py    # 지적사항 분류 표류 읽기 전용 감사
 ├─ findings_exporter.py                # 수집 원문과 선택적 지적사항을 dry-run으로 내보내기
 ├─ findings_notion_export.py           # 실데이터 백필용 Notion Intake 읽기 전용 내보내기

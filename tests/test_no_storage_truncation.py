@@ -85,6 +85,7 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('backfill_wl_truncation_restore.py', 'max_old_chars: int = DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('backfill_wl_truncation_restore.py', '"wl": {"source": SOURCE_FDA_WL, "ellipsis": ELLIPSIS, "max_old_chars": DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('backfill_wl_truncation_restore.py', 'return new_text[:280].rstrip() + "..."'): ('decision', '옛 483 표제 280자 절단 재현(진단용 legacy_match — 저장 아님)'),
+    ('backfill_483_detail_refresh.py', '"deficiency": str(o.get("deficiency") or "")[:160],'): ('diagnostic', '새로 잡히는 관찰 보고서 표본(new_observation_samples) — 저장 아님, raw 에는 전문을 덧붙인다'),
     ('collect_deficiency_examples.py', 'ent["sample"] = [{"locator": r.locator, "statement": r.statement[:160], "clauses": r.clauses[:3],'): ('diagnostic', '실행 리포트 표본'),
     ('collect_deficiency_examples.py', 'found.append({"agency": agency, "lang": lang, "url": href, "label": label[:200]})'): ('diagnostic', '자료 목록 탐색 결과 라벨(리포트용)'),
     ('collect_fda_483.py', 'FDA483_EXCERPT_MAX_CHARS = 1500'): ('excerpt', '483 발췌(카드 미리보기) — 전문은 fda_483_observations(표제·상세 무절단, 11-10)와 fda483_body_full(심층 분석 켜진 문서)'),

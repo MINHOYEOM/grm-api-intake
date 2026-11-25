@@ -117,6 +117,11 @@ def run_guarded(run):
 
 
 def main(argv=None):
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     def run(_guard):
         program = unittest.main(module=None, argv=argv, exit=False)
         return 0 if program.result.wasSuccessful() else 1

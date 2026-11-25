@@ -17,6 +17,8 @@ from typing import Any, Iterable
 
 import requests
 
+from grm_cli import BulkWriteRun
+
 HC_SOURCE = "Health Canada Inspection"
 BASIS = "hc_regulation_raw"
 KEY_PREFIX = "Canada "
@@ -135,27 +137,37 @@ def fetch_raw(base: str, key: str, doc_ids: list[str], timeout: float = 120.0) -
     return out
 
 
-def write_edges(base: str, key: str, edges: list[dict[str, Any]], timeout: float = 120.0) -> int | None:
+def write_edges(base: str, key: str, edges: list[dict[str, Any]], timeout: float = 120.0,
+                *, bulk: BulkWriteRun | None = None) -> int | None:
     """finding_clause 에 멱등 삽입(기존 행 불변). 표 미적용(404)이면 None."""
     sent = 0
-    for i in range(0, len(edges), BATCH):
-        chunk = edges[i:i + BATCH]
+
+    def send(batch, _offset):
+        nonlocal sent
+        chunk = batch
         resp = _call(lambda: requests.post(
             f"{base}/rest/v1/finding_clause",
             headers=_headers(key, Prefer="resolution=ignore-duplicates,return=minimal"),
             params={"on_conflict": "finding_id,citation_key,citation_paragraph"}, json=chunk, timeout=timeout))
         if resp.status_code == 404:
-            return None
+            raise requests.HTTPError(response=resp)
         if resp.status_code not in (200, 201, 204):
             raise RuntimeError(f"finding_clause HTTP {resp.status_code}")
         sent += len(chunk)
+    try:
+        (bulk or BulkWriteRun()).write(edges, send, batch_size=BATCH)
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code == 404:
+            return None
+        raise
     return sent
 
 
-def link_recent(base: str, key: str, since_iso: str) -> tuple[dict[str, Any], int | None]:
+def link_recent(base: str, key: str, since_iso: str,
+                *, bulk: BulkWriteRun | None = None) -> tuple[dict[str, Any], int | None]:
     findings = fetch_findings(base, key, since_iso)
     docs = sorted({f["raw_signal_id"] for f in findings if f.get("raw_signal_id")})
     raw = fetch_raw(base, key, docs)
     edges, stats = build_edges(findings, raw)
-    sent = write_edges(base, key, edges) if edges else 0
+    sent = write_edges(base, key, edges, bulk=bulk) if edges else 0
     return stats, sent

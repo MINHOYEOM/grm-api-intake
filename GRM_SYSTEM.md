@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.332` |
-| 최종 수정일 | 2026-11-24 |
+| 문서 버전 | `v1.335` |
+| 최종 수정일 | 2026-11-25 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -547,6 +547,7 @@ grm-api-intake/
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
 ├─ clause_text_collect.py         # [기준 원문 2026-11-15] 21 CFR 210·211(eCFR XML)·EU GMP Part I 1~9장+Annex 1·ICH Q7/Q9(R1)/Q10(PDF)·식약처 「의약품 제조 및 품질관리에 관한 규정」 조문+별표 1~18(국가법령정보센터 화면·첨부 PDF, 키 없이) 원문 → 조항 단위 `web/data/clauses/{cfr21,eu_gmp,ich,mfds_gmp}.json`(무절단·DB 아님) + `translation_queue.json`(국문 번역 대기). 수동 CLI·이용 조건은 `web/data/clauses/SOURCES.md`. ★`library_collect_*` 이름 금지(자료실 플러그인 자동 발견에 걸린다)
 ├─ collect_eu_gmp_ncr.py           # EU GMP NCR(EudraGMDP) 수집기 — News+Findings 이중편입
+├─ ema_document.py                # EMA 원문(기사 HTML·문서 PDF) → 전문 공통 판독기(11-25 #8) — 일일 수집기 EMA 경로·빈칸 백필이 같은 함수를 부른다. 저장 단계 절단 없음(article_excerpt, 넘치면 article_excerpt_parts 로 분할)·메타 ema_document·간격 2초/429 재시도. 빈칸은 content_completeness 가 매일 센다
 ├─ eudragmdp_client.py             # EudraGMDP GMP 비준수 requests 클라이언트(세션·페이징·상세·PDF)
 ├─ collect_mhra_gmp_ncr.py         # MHRA GMP NCR 수집기 — EU NCR 영국판(News+Findings·아카이브 없음)
 ├─ mhra_gmdp_client.py             # MHRA GMDP 비준수 requests 클라이언트(세션 독립·필터→상세)
@@ -562,11 +563,12 @@ grm-api-intake/
 ├─ mfds_gmp_cert_snapshot.py      # 식약처 GMP 적합판정서 월 1회 전체 목록 → mfds_gmp_cert(142) 적재·업체 연결(브리프 무접촉)
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
+├─ backfill_blank_excerpts.py     # WHOPIR·EMA·ECA·MHRA 원문 빈칸 백필(주간계획 #8, #1908 — dry-run 기본·소스/적재일 범위·grm-blank-excerpts-backfill.yml)
 ├─ backfill_483_detail_refresh.py  # 저장된 483 관찰 상세(detail)만 다시 읽어 제자리 교체(쪽 넘김·서명란·가림 표시 수리 소급 — 표제·원문 전문·실사관 불변, dry-run 기본)
 ├─ backfill_483_obs_split.py  # 앞 관찰 상세가 삼킨 483 관찰을 저장 raw 에서 나눔(현행 수집기 앵커 규칙 재사용·PDF 불필요·`raw_signal_apply_version` 경유, dry-run 기본)
 ├─ raw_versioning.py, raw_signals_rebaseline.py # [원문 갱신 규칙 R1·R2] 정본 원문을 바꾸는 유일한 길(DB 함수 `raw_signal_apply_version`·보관표 `raw_signal_versions`, 148) · 지문이 내용과 어긋난 483·MFDS 행 기준선 재매김(+MFDS 참석자 재동기화, dry-run 기본, `grm-raw-signals-rebaseline.yml`). 직접 PATCH 는 `tests/test_raw_signals_write_guard.py` 가 막는다 — R3: 수리 도구 4개도 이 경로(`replace_raw`·`apply_record`), 함수 밖 원문 변경은 DB 트리거가 거부(150)
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
-├─ backfill_483_body_full.py      # 전문(fda483_body_full) 없이 굳은 최근 483 소급 — 원문 미확보 시 PDF 재독(일일 규칙) → raw_signal_apply_version(repair, 전문 키 + 실사관 빈칸이면 공통 함수로 채움)·dry 기본
+├─ backfill_483_body_full.py      # 전문(fda483_body_full) 없이 굳은 최근 483 소급 — 원문 미확보 시 PDF 재독(일일 규칙) → raw_signal_apply_version(repair, 전문 키 + 실사관 빈칸이면 공통 함수로 채움)·dry 기본·`--doc-ids` 로 정해진 문서만
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
 ├─ backfill_wl_violations_reextract.py # 저장 본문(wl_body_full)만으로 경고서한 위반항목 재추출(외부 요청 0) — 수집과 같은 build_wl_item→extract_wl_violations_detail(F1·F1b·F2·F3·F3b·F4·F5·F6 — F5 연속 번호 표제(API·HCT/P·DSCSA), F6 번호 없는 BIMO `You failed … [21 CFR …]`; 카드 행은 `card_scaffold.wl_violation_row` 한 함수로 heading·heading_ko 까지 전달)·글자 그대로 검사·옛 목록 축소 금지·raw 두 칸(wl_violations·wl_violations_status)만 raw_signal_apply_version(reextract)·dry 기본·`grm-wl-violations-reextract.yml`
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
@@ -578,6 +580,7 @@ grm-api-intake/
 ├─ backfill_wl_violation_ko.py     # WL 위반항목 국문(violations_ko) 소급 병합 — deep 델타 → 발행 브리프 JSON(재조립 없이, inject_slots 병합 함수 재사용)
 ├─ grm_mfds_item_class.py          # 국내 품목기준코드(ITEM_SEQ) → MFDS 허가정보 ATC·주성분 + 의약품안전나라 `품목구분`(한약·의약외품 포함) 조회 — 제품군 **근거**만 raw_payload 에 싣고 판정은 compute_modality 가 한다(조회 0건을 '의약외품'으로 단정하지 않음·프로세스당 조회 상한)
 ├─ grm_common.py                   # 공통 HTTP·유틸 — KR egress 프록시(`kr_egress_get`: 홉 실패 시 직결 1회 폴백 + 회로차단기(홉 실패 후 600초 프록시 생략) · `probe_kr_egress_proxy`: TCP 도달 preflight)
+├─ grm_http_policy.py              # 외부 HTTP 호스트별 요청 간격·재시도 기본값 한 곳(#1927 — www.fda.gov 경로별 기존 값 유지·CLI 재정의 허용)
 ├─ grm_health.py, source_silence.py  # health 판정(소스 오류·`kr-egress-proxy-unreachable`·`source-silent:*` 전부 warning) · Supabase 마지막 수집일 기반 무음 판정(레지스트리 `silence_days` 3단 10/21/35일 · ICH 는 제외)
 ├─ probe_mfds_egress.py            # MFDS/nedrug/law.go.kr 러너 도달 프로브 — 첫 줄 `[PROXY] reachable|unreachable|unconfigured`
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
@@ -603,6 +606,7 @@ grm-api-intake/
 ├─ keep_shadow_health.py          # 수집 health JSON 의 store(중복 판정·무음 감시 그림자 기록)를 grm-queue-shadow 아티팩트에 남기고 실행 요약에 적는다 — health JSON 은 아티팩트로 안 올라가 실행 뒤 읽을 곳이 없었다(11-13)
 ├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, inspection_card.py(실사 결과 카드 앞면 블록 — 등급·지적 목록·당국 조치 결정론, 11-08), card_weight.py(카드 무게 — 깊이·표준·표 한 줄을 유형·등급·지적 건수·사유 길이로 판정, 11-16호부터, 11-10), firm_groups.py(업체 그룹 묶음 — 등록 원천 web/data/firm_groups.json·같은 FEI 로만 판정, 옛 실사 기준, 그룹 등록 후보 경고, 11-23), check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), check_render_gate.py(사이트 렌더 발행 게이트를 교열 코드 검사에서 미리 — 11-22), delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
+├─ brief_preview_check.py          # 발행 브리프 미리보기 5유형 점검(#1922 — grm-web-publish.yml 경고 단계, Markdown 표 출력)
 ├─ brief_metrics_ledger.py          # 호별 품질 지표(말투·심층 상투어·483 마감기한 등)를 발행본에서 읽어 JSONL/CSV 한 줄로 누적 — 읽기 전용·발행 직후 수동 실행
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
 ├─ fda_body_coverage.py             # 발행 전 FDA 카드 본문 결손 점검(483·WL·회수 건수·비율·임계 → ok/recover/alert) + handoff 상태 조회 — 판정 순수 함수
@@ -825,7 +829,8 @@ grm-api-intake/
    ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·잡별 예약 실패 경보)
    ├─ grm-483-obs-split.yml             # 483 관찰 분할 소급(backfill_483_obs_split.py)을 자격증명 러너에서 실행(workflow_dispatch 전용·apply 기본 false·apply 는 main ref 만·doc_ids 선택) → 아티팩트 fda483-obs-split-report-{dry|apply}(30일)
-   ├─ grm-fda483-body-full-backfill.yml # 483 전문 소급(workflow_dispatch·apply 기본 false·probe_pdf·since·limit) → 아티팩트 fda483-body-full-report(30일)
+   ├─ grm-fda483-body-full-backfill.yml # 483 전문 소급(workflow_dispatch·apply 기본 false·probe_pdf·since·limit·doc_ids) → 아티팩트 fda483-body-full-report(30일)
+   ├─ grm-blank-excerpts-backfill.yml # WHOPIR·EMA·ECA·MHRA 빈칸 백필(수동·apply 기본 false·sources·ingested_since) → 아티팩트 blank-excerpts-report(30일)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
    ├─ grm-eu-ncr-additional-plan.yml # EU NCR additional 소급 계획 생성(workflow_dispatch·GET 만) → 아티팩트 eu-ncr-additional-plan(90일)
    ├─ grm-raw-signals-modality-backfill.yml # raw_signals.modality 소급(workflow_dispatch·apply 기본 false=dry-run) → 아티팩트 modality-backfill-report(30일)

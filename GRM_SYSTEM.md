@@ -586,6 +586,7 @@ grm-api-intake/
 ├─ grm_health.py, source_silence.py  # health 판정(소스 오류·`kr-egress-proxy-unreachable`·`source-silent:*` 전부 warning) · Supabase 마지막 수집일 기반 무음 판정(레지스트리 `silence_days` 3단 10/21/35일 · ICH 는 제외)
 ├─ probe_mfds_egress.py            # MFDS/nedrug/law.go.kr 러너 도달 프로브 — 첫 줄 `[PROXY] reachable|unreachable|unconfigured`
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
+├─ ci_slot_wait.py                 # push 전 PR CI 자리 및 수집 시간 창 확인
 ├─ pr_merge_plan.py                 # 열린 PR 머지 순서·파일 겹침 예측(읽기 전용)
 ├─ audit_483_inspector_blanks.py    # FDA 483 실사관 빈칸 사유 판정(dry)
 ├─ wl_pair_restore.py               # WL 본문만 바뀐 짝 findings restore 계획 도구(기본 dry)

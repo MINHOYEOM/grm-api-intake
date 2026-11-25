@@ -1657,10 +1657,7 @@ def _glance_line(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any
         u = ((raw.get("sources") or {}).get("official_url") or "").strip()
         if u.startswith("http"):
             by_type.setdefault(cv.get("card_type") or "", []).append(u)
-    country_ko: dict[str, str] = {}
-    for name, code in _gf._COUNTRY_CODE_MAP.items():
-        if code not in country_ko and _HANGUL_RE.search(name):
-            country_ko[code] = name
+    country_ko = _gf.country_labels_ko()
     best: "tuple[float, str] | None" = None
     for t, urls in by_type.items():
         n = len(urls)

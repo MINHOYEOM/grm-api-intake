@@ -54,6 +54,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
+from grm_findings import match_country_term
+
 SCHEMA_VERSION = "grm-fda-import-alert/v1"
 
 ALERTS: dict[str, dict[str, Any]] = {
@@ -262,7 +264,7 @@ def firm_key(alert_no: str, country: str, name: str) -> str:
 
 
 def is_korea(country: str) -> bool:
-    return normalize_country(country).startswith("KOREA") and "DEMOCRATIC" not in normalize_country(country)
+    return match_country_term(country) == "KR"
 
 
 def consolidate(alert_no: str, firms: list[FirmBlock]) -> tuple[dict[str, dict[str, Any]], int]:

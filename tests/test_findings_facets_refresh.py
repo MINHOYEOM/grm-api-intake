@@ -20,7 +20,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import findings_facets_refresh as ffr  # noqa: E402
-import grm_findings  # noqa: E402
 
 
 def _resp(findings: int, documents: int, agencies=(), firms=(), docs=()):
@@ -45,32 +44,17 @@ def _finding(fid, text_ko="지적 본문", **kw):
 
 
 class CountryLabelDerivationTest(unittest.TestCase):
-    """국가 한국어 표기는 정본(_COUNTRY_CODE_MAP) 역인덱스에서 파생한다 — 사본 금지.
-
-    그 맵은 마이그레이션 055 의 SQL CASE 와 파리티가 테스트로 고정돼 있어, 이 스크립트가
-    자기 사본을 들면 즉시 갈라진다.
-    """
-
     def test_labels_come_from_canonical_map(self):
         labels = ffr.country_labels_ko()
         self.assertEqual(labels["US"], "미국")
         self.assertEqual(labels["KR"], "대한민국")
         self.assertEqual(labels["CA"], "캐나다")
 
-    def test_every_label_is_a_key_of_the_canonical_map(self):
-        canonical = grm_findings._COUNTRY_CODE_MAP
-        for code, name in ffr.country_labels_ko().items():
-            self.assertIn(name, canonical, f"정본에 없는 표기: {name}")
-            self.assertEqual(canonical[name], code)
-
-    def test_codes_without_korean_name_are_absent(self):
-        # IS·MY 는 정본에 한국어 키가 없다 → 라벨이 없어야 하고, 호출부가 페이지를 만들지
-        # 않는다(제목이 "IS" 인 페이지는 검색에 무의미하다).
+    def test_extended_labels_are_available_for_facets(self):
         labels = ffr.country_labels_ko()
-        for code in ("IS", "MY"):
-            if code in labels:
-                self.skipTest(f"정본 맵이 늘어 {code} 한국어 표기가 생겼다 — 이 기대는 낡았다")
-        self.assertNotIn("IS", labels)
+        self.assertEqual(labels["IS"], "아이슬란드")
+        self.assertEqual(labels["MY"], "말레이시아")
+        self.assertNotIn("XX", labels)
 
 
 class SlugifyTest(unittest.TestCase):

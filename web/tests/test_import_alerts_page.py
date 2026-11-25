@@ -82,6 +82,22 @@ class ListViewTest(unittest.TestCase):
         self.assertEqual((v["rows"][0]["country_key"], v["rows"][0]["country_label"]),
                          ("x-atlantis", "ATLANTIS"))
 
+    def test_country_term_labels_use_complete_input(self):
+        for country, expected_ko, expected_en in (
+            ("Niger", "니제르", "Niger"),
+            ("Nigeria", "나이지리아", "Nigeria"),
+            ("Nigerian", "Nigerian", "Nigerian"),
+            ("인도네시아", "인도네시아", "Indonesia"),
+            ("EU", "유럽연합", "European Union"),
+            ("유럽연합", "유럽연합", "European Union"),
+            ("EUGMP", "EUGMP", "EUGMP"),
+            ("U.K.", "영국", "United Kingdom"),
+        ):
+            for lang, expected in (("ko", expected_ko), ("en", expected_en)):
+                with self.subTest(country=country, lang=lang):
+                    view = iap.list_view(self._one(country), tr=render.Translator(lang), lang=lang)
+                    self.assertEqual(view["rows"][0]["country_label"], expected)
+
     def test_extra_country_korean_only_on_ko(self):
         # [2026-11-10] 68코드 표 밖 나라는 한국어 화면에서만 보충 표로 — 영어 화면은 FDA 표기 그대로.
         ko = iap.list_view(self._one("PAKISTAN"), tr=render.Translator("ko"), lang="ko")

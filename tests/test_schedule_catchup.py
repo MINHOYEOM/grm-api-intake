@@ -81,6 +81,8 @@ def run(event: str, created: datetime, status: str = "completed", conclusion: st
 
 
 BODY = next(t for t in sc.TARGETS if t.workflow == "grm-fda483-body-full-backfill.yml")
+INTAKE = next(t for t in sc.TARGETS if t.workflow == "grm-intake.yml")
+OCR = next(t for t in sc.TARGETS if t.workflow == "grm-fda483-ocr-recovery.yml")
 
 
 class TargetsMatchWorkflows(unittest.TestCase):
@@ -110,7 +112,7 @@ class TargetsMatchWorkflows(unittest.TestCase):
             with self.subTest(t.workflow):
                 text = _read(t.workflow)
                 self.assertIn("workflow_dispatch", text)
-                for key in t.inputs:
+                for key in sc.APPLY_INPUTS.get(t.workflow, sc.CHECK_INPUTS.get(t.workflow, {})):
                     self.assertRegex(text, rf"(?m)^      {re.escape(key)}:\s*$", f"dispatch 입력 {key} 없음")
 
     def test_targets_are_unique_and_parse(self):
@@ -122,10 +124,15 @@ class TargetsMatchWorkflows(unittest.TestCase):
             self.assertGreater(t.grace_min, 0)
             self.assertGreater(t.max_late_min, t.grace_min)
 
-    def test_outbound_send_is_never_a_target(self):
+    def test_outbound_send_is_never_a_target_or_allowed(self):
         outbound = {"grm-newsletter-send.yml", "grm-ops-decision-mail.yml", "grm-watchlist-notify.yml"}
         names = {t.workflow for t in sc.TARGETS}
-        self.assertTrue(names.isdisjoint(outbound), names & outbound)
+        self.assertEqual(outbound.intersection(names | sc.APPLY_INPUTS.keys() | sc.CHECK_INPUTS.keys()), set())
+
+    def test_only_approved_targets_can_apply(self):
+        self.assertEqual(sc.APPLY_INPUTS.keys(), {BODY.workflow, "grm-db-backup.yml", OCR.workflow})
+        self.assertTrue(sc.APPLY_INPUTS.keys().isdisjoint(sc.CHECK_INPUTS))
+        self.assertLessEqual(sc.APPLY_INPUTS.keys() | sc.CHECK_INPUTS.keys(), {t.workflow for t in sc.TARGETS})
 
     def test_wakeup_paths_point_at_real_workflows(self):
         text = _read("grm-schedule-catchup.yml")
@@ -155,9 +162,7 @@ class TargetsMatchWorkflows(unittest.TestCase):
         self.assertEqual(fda, {"grm-intake.yml", "grm-fda483-body-full-backfill.yml", "grm-fda483-ocr-recovery.yml"})
 
     def test_intake_is_a_capped_target(self):
-        intake = next(t for t in sc.TARGETS if t.workflow == "grm-intake.yml")
-        self.assertEqual((intake.dispatch_cap, intake.inputs), (1, {}))
-        self.assertGreater(intake.cap_window_min, 0)
+        self.assertEqual((INTAKE.dispatch_cap, INTAKE.cap_window_min), (1, 12 * 60))
         self.assertEqual(sc.TARGETS[0].workflow, "grm-intake.yml")   # FDA 계열 우선순위: 수집 먼저
 
     def test_catchup_itself_is_not_a_target(self):
@@ -199,6 +204,12 @@ class Decide(unittest.TestCase):
         self.assertEqual(d.slot, self.slot)
         self.assertEqual(d.inputs, {"apply": "true", "since": "2026-10-09", "ocr_page_budget": "1500"})
 
+    def test_11_24_ocr_gap_dispatches_approved_recovery(self):
+        slot = datetime(2026, 11, 24, 23, 37, tzinfo=UTC)
+        d = sc.decide(OCR, slot + timedelta(hours=2), [])
+        self.assertEqual((d.action, d.slot), ("dispatch", slot))
+        self.assertEqual(d.inputs, {"apply": "true", "mode": "recoverable", "target": "all", "ocr_page_budget": "600"})
+
     def test_within_grace_does_nothing(self):
         d = sc.decide(BODY, self.slot + timedelta(minutes=60), [])
         self.assertEqual(d.action, "not-due")       # 허용 지각 안 — 전날 슬롯은 보완 기한 밖
@@ -237,7 +248,7 @@ class Decide(unittest.TestCase):
 
     def test_too_old_slot_is_left_alone(self):
         weekly = sc.Target("x.yml", ("0 0 * * 1",), 30, 120)
-        self.assertEqual(sc.decide(weekly, datetime(2026, 11, 23, 2, 0, tzinfo=UTC), []).action, "dispatch")
+        self.assertEqual(sc.decide(weekly, datetime(2026, 11, 23, 2, 0, tzinfo=UTC), []).action, "alarm-only")
         self.assertEqual(sc.decide(weekly, datetime(2026, 11, 23, 2, 31, tzinfo=UTC), []).action, "not-due")
 
     def test_disabled_workflow_is_not_dispatched(self):
@@ -248,8 +259,7 @@ class Decide(unittest.TestCase):
         stranded = next(t for t in sc.TARGETS if t.workflow == "grm-stranded-batch-pr.yml")
         now = datetime(2026, 11, 23, 9, 50, tzinfo=UTC)          # 월 08:41Z 슬롯 + 69분
         d = sc.decide(stranded, now, [run("schedule", datetime(2026, 11, 23, 7, 40, tzinfo=UTC))])
-        self.assertEqual((d.action, d.slot), ("dispatch", datetime(2026, 11, 23, 8, 41, tzinfo=UTC)))
-        self.assertEqual(d.inputs, {"dry_run": "false"})
+        self.assertEqual((d.action, d.slot, d.inputs), ("alarm-only", datetime(2026, 11, 23, 8, 41, tzinfo=UTC), {}))
 
 
 class FakeGH:
@@ -283,6 +293,7 @@ class RunAll(unittest.TestCase):
         gh = FakeGH()
         sc.run_all(gh, self.now, ref="main", dry_run=False, targets=[BODY], sleeper=lambda s: None, log=lambda m: None)
         self.assertEqual(len(gh.dispatched), 1)
+        self.assertIn("슬롯 2026-11-23 13:07 UTC · 모드 apply", gh.alarms[0][1])
         # 다음 보완기 실행 — 방금 만든 실행이 슬롯을 덮는다
         gh.runs[-1]["created_at"] = (self.now + timedelta(seconds=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
         sc.run_all(gh, self.now + timedelta(minutes=30), ref="main", dry_run=False, targets=[BODY],
@@ -305,9 +316,36 @@ class RunAll(unittest.TestCase):
         self.assertEqual(len(gh.alarms), 1)
         self.assertIn("grm-fda483-body-full-backfill.yml:2026-11-23T13:07Z", gh.alarms[0][0])
 
-
-INTAKE = next(t for t in sc.TARGETS if t.workflow == "grm-intake.yml")
-OCR = next(t for t in sc.TARGETS if t.workflow == "grm-fda483-ocr-recovery.yml")
+    def test_missing_slots_use_only_the_workflow_policy(self):
+        cases = {
+            "grm-intake.yml": ("2026-11-23T18:17Z", {"dry_run": "true"}, "점검"),
+            "grm-delta-bridge.yml": ("2026-11-22T22:07Z", {"compare_only": "true", "publish_date": "2026-11-23"}, "점검"),
+            "grm-mfds-gmp-cert-monthly.yml": ("2026-11-01T18:40Z", {"mode": "dry-run"}, "점검"),
+            "grm-rum-analytics.yml": ("2026-11-23T04:30Z", {"probe": "true"}, "점검"),
+            "grm-stranded-batch-pr.yml": ("2026-11-23T08:41Z", None, "경보"),
+            "grm-publish-watchdog.yml": ("2026-11-23T00:13Z", None, "경보"),
+            "grm-db-backup.yml": ("2026-11-22T20:37Z", {}, "apply"),
+        }
+        targets = {t.workflow: t for t in sc.TARGETS}
+        self.assertEqual(cases.keys() - {"grm-db-backup.yml"}, targets.keys() - sc.APPLY_INPUTS.keys())
+        for name, (stamp, inputs, mode) in cases.items():
+            with self.subTest(name):
+                target = targets[name]
+                slot = sc._ts(stamp)
+                now = slot + timedelta(minutes=target.grace_min)
+                gh = FakeGH()
+                sc.run_all(gh, now, ref="main", dry_run=False, targets=[target],
+                           sleeper=lambda s: None, log=lambda m: None)
+                self.assertEqual(gh.dispatched, [] if inputs is None else [(name, "main", inputs)])
+                self.assertEqual(len(gh.alarms), 1)
+                self.assertIn(f"슬롯 {slot:%Y-%m-%d %H:%M} UTC · 모드 {mode}", gh.alarms[0][1])
+                if gh.runs:
+                    gh.runs[-1]["created_at"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+                again = sc.run_all(gh, now, ref="main", dry_run=False, targets=[target],
+                                   sleeper=lambda s: None, log=lambda m: None)
+                if mode == "점검":
+                    self.assertEqual(again[0].action, "check-recorded")
+                self.assertEqual(len(gh.alarms), 1)
 
 
 class IntakeCap(unittest.TestCase):
@@ -316,7 +354,7 @@ class IntakeCap(unittest.TestCase):
     def test_11_23_intake_gap_dispatches(self):
         now = datetime(2026, 11, 23, 22, 30, tzinfo=UTC)      # 슬롯 + 4h13m, 실행 없음(실사고)
         d = sc.decide(INTAKE, now, [run("schedule", datetime(2026, 11, 22, 23, 37, tzinfo=UTC))])
-        self.assertEqual((d.action, d.slot, d.inputs), ("dispatch", self.slot, {}))
+        self.assertEqual((d.action, d.slot, d.inputs), ("dispatch", self.slot, {"dry_run": "true"}))
 
     def test_within_four_hours_waits_for_late_schedule(self):
         d = sc.decide(INTAKE, self.slot + timedelta(hours=3, minutes=50), [])

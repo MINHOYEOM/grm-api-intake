@@ -5,7 +5,7 @@
   - grm-fda483-body-full-backfill(22:07 KST) 11-22 분이 7시간 늦게, 11-23 분은 이튿날 오전까지 실행 기록 없음.
   - 링크드인 해부 슬롯 PR #1879 가 워치독(grm-stranded-batch-pr) 예약 지연으로 3시간 미머지.
 일어나지 않은 실행은 경보를 울리지 않는다. 이 모듈은 대상 목록(TARGETS)의 '가장 최근 예정 시각(슬롯)'마다
-그 시각 이후 만들어진 실행이 있는지 보고, 없으면 예약과 같은 인자로 dispatch 한다.
+그 시각 이후 만들어진 실행이 있는지 보고, 없으면 대상별로 적용·점검을 기동하거나 경보만 남긴다.
 
 깨우는 경로(grm-schedule-catchup.yml) — 보완기 자신도 GitHub 예약 하나에만 기대지 않는다:
   ① 자기 cron(30분마다) ② workflow_run: GRM CI(push·PR 이벤트로 돈다 — 예약 큐와 무관) 와
@@ -16,8 +16,8 @@
     보완 dispatch 로 생긴 실행도 그 슬롯을 덮으므로 같은 슬롯을 두 번 기동하지 않는다.
   - 워크플로 concurrency 그룹으로 보완기 실행끼리 겹치지 않는다. dispatch 뒤 새 실행이 목록에 보일 때까지 잠깐 기다린다.
   - 슬롯이 max_late 보다 오래됐으면 건드리지 않는다(다음 슬롯이 대신한다 — 하루 지난 일을 몰래 돌리지 않는다).
-경보(automation-failure 이슈 하나에 슬롯별 댓글 1회):
-  - dispatch API 실패 · 보완 dispatch(github-actions[bot])로 돈 실행이 실패로 끝남 · 비활성 워크플로.
+경보(automation-failure 이슈 하나에 슬롯·처리 결과별 1회):
+  - 누락 슬롯의 UTC 시각과 처리 모드, dispatch API 실패, 보완 실행 실패를 기록한다.
   예약 실행 자체의 실패는 각 워크플로의 기존 경보 몫이라 여기서 중복으로 울리지 않는다.
 fda.gov 보호(11-24): www.fda.gov 를 두드리는 대상(fda_host)은 한 틱에 1개만 dispatch 하고, FDA 계열 실행이 큐·진행
   중이면 0개 — 나머지는 deferred(다음 틱). 수집은 dispatch_cap(12시간 1건, 사람 수동 포함)으로 하루 상한을 둔다.
@@ -44,6 +44,22 @@ ALARM_TITLE = "GRM 예약 지각 보완기 경보"
 COVERING_EVENTS = ("schedule", "workflow_dispatch")
 FAILED_CONCLUSIONS = ("failure", "timed_out", "startup_failure")
 SINCE_45D = "{slot_minus_45d}"              # 483 전문 소급: 예약 실행은 '최근 45일'(실행 날 기준)
+PUBLISH_DATE_KST = "{slot_date_kst}"
+
+# 키가 실제 작업을 기동할 수 있는 허용 목록이다. DB 백업에는 apply 입력이 없다.
+APPLY_INPUTS: dict[str, dict[str, str]] = {
+    "grm-fda483-body-full-backfill.yml": {"apply": "true", "since": SINCE_45D, "ocr_page_budget": "1500"},
+    "grm-db-backup.yml": {},
+    "grm-fda483-ocr-recovery.yml": {
+        "apply": "true", "mode": "recoverable", "target": "all", "ocr_page_budget": "600",
+    },
+}
+CHECK_INPUTS: dict[str, dict[str, str]] = {
+    "grm-intake.yml": {"dry_run": "true"},
+    "grm-delta-bridge.yml": {"compare_only": "true", "publish_date": PUBLISH_DATE_KST},
+    "grm-mfds-gmp-cert-monthly.yml": {"mode": "dry-run"},
+    "grm-rum-analytics.yml": {"probe": "true"},
+}
 
 
 @dataclass(frozen=True)
@@ -52,8 +68,6 @@ class Target:
     crons: tuple[str, ...]        # 워크플로 on.schedule 과 같아야 한다(시험이 고정)
     grace_min: int                # 허용 지각(분) — 이 시간이 지나도 실행이 없으면 보완
     max_late_min: int             # 슬롯이 이보다 오래되면 보완하지 않는다(다음 슬롯 몫)
-    inputs: dict[str, str] = field(default_factory=dict)   # 예약 실행과 같은 일을 하게 하는 dispatch 입력
-    why: str = ""
     fda_host: bool = False        # www.fda.gov 를 두드린다 — 한 틱에 FDA 계열은 1개만 깨운다(시험이 워크플로에서 다시 판정)
     dispatch_cap: int = 0         # >0 이면 cap_window_min 안 dispatch 실행(사람 수동 + 보완기 합산)이 이만큼 있으면 더 깨우지 않는다
     cap_window_min: int = 0
@@ -125,35 +139,20 @@ CRON_AUDIT: dict[str, tuple[str, str]] = {
 }
 
 
-# 근거: 발행·데이터 경로에서 '예약이 안 돌면 조용히 빈다'고 확인된 것만. 외부 발송(grm-newsletter-send)은 자동 재기동하지 않는다.
-# 순서 = 같은 틱에 FDA 계열이 여럿 밀렸을 때의 우선순위(수집이 먼저).
+# CRON_AUDIT 의 A군. 두 입력 목록에 없는 대상은 경보만 남긴다.
+# 순서 = 같은 틱에 FDA 계열이 여럿 밀렸을 때의 우선순위(Intake 점검이 먼저).
 TARGETS: tuple[Target, ...] = (
-    # [11-24] 11-23 18:17Z 슬롯부터 실행 기록 없음 → 비서실 수동 dispatch. 입력 없는 dispatch = 기본값(window 7·전 소스·
-    # 플래그 inherit=저장소 변수)이라 예약과 같은 수집이다. 여러 번 돌아도 handoff 는 07:00 KST 뒤 동결(grm_handoff).
-    # 허용 지각 4시간 — 예약이 평소 3~6.5시간 늦게 와서(11-16 주석 실측) 짧게 잡으면 매일 두 번 돈다. 22:17Z = 07:17 KST 는
-    # 편집팀이 handoff 를 읽기(07:20) 직전이다. 일요일 슬롯 3개(월 00~01 KST)는 19:07Z 쯤 보완된다.
-    # 하루 상한 — 12시간 안에 dispatch 실행(사람 수동 포함)이 1건이라도 있으면 보완하지 않는다(fda.gov 요청 누적 방지).
-    Target("grm-intake.yml", ("17 18 * * *", "7 15 * * 0", "43 15 * * 0", "19 16 * * 0"), 240, 18 * 60, {},
-           "일일 수집 — 11-23 슬롯 누락, 월요일 handoff 의 원천", fda_host=True, dispatch_cap=1, cap_window_min=12 * 60),
-    Target("grm-fda483-body-full-backfill.yml", ("7 13 * * *",), 90, 20 * 60,
-           {"apply": "true", "since": SINCE_45D, "ocr_page_budget": "1500"},
-           "483 전문 소급 — 월요일 handoff 전 안전망(11-22·23 지각/누락)", fda_host=True),
-    Target("grm-fda483-ocr-recovery.yml", ("37 23 * * *",), 90, 20 * 60,
-           {"apply": "true", "mode": "recoverable", "target": "all", "ocr_page_budget": "600"},
-           "483·WL 본문 회수 — 빠지면 그날 상한 밖 문서가 본문 없이 남는다", fda_host=True),
-    Target("grm-stranded-batch-pr.yml", ("41 */6 * * *", "41 6,8,10 * * 1"), 60, 5 * 60,
-           {"dry_run": "false"},
-           "방치된 배치·링크드인 슬롯 PR 머지(11-23 #1879 3시간 미머지)"),
-    Target("grm-delta-bridge.yml", ("7,37 22-23 * * 0", "7,37 0-5 * * 1"), 45, 4 * 60, {},
-           "월요일 델타 이관(07-13·07-20 지각 실측) — 멱등, 이미 이관됐으면 skip"),
-    Target("grm-publish-watchdog.yml", ("13 0,2,4 * * 1",), 60, 6 * 60, {},
-           "월요일 발행 감시·자가 복구(07-20 3h28m 지각 실측)"),
-    Target("grm-db-backup.yml", ("37 20 * * 0",), 60, 6 * 60, {},
-           "주간 암호화 백업 — 그 주의 복구 지점 확보"),
-    Target("grm-mfds-gmp-cert-monthly.yml", ("40 18 1 * *",), 90, 12 * 60, {"mode": "apply"},
-           "식약처 GMP 적합판정서 월간 관측 — 예약과 같은 KST 날짜에 적재"),
-    Target("grm-rum-analytics.yml", ("30 4 * * *", "30 16 * * *"), 90, 6 * 60, {},
-           "성장 지표 수집 — 예약과 같은 KST 날짜의 구독자 수 확보"),
+    # Intake 예약은 평소 3~6.5시간 지각한다. FDA 요청 누적을 막기 위해 수동 기동도 상한에 포함한다.
+    Target("grm-intake.yml", ("17 18 * * *", "7 15 * * 0", "43 15 * * 0", "19 16 * * 0"), 240, 18 * 60,
+           fda_host=True, dispatch_cap=1, cap_window_min=12 * 60),
+    Target("grm-fda483-body-full-backfill.yml", ("7 13 * * *",), 90, 20 * 60, fda_host=True),
+    Target("grm-fda483-ocr-recovery.yml", ("37 23 * * *",), 90, 20 * 60, fda_host=True),
+    Target("grm-stranded-batch-pr.yml", ("41 */6 * * *", "41 6,8,10 * * 1"), 60, 5 * 60),
+    Target("grm-delta-bridge.yml", ("7,37 22-23 * * 0", "7,37 0-5 * * 1"), 45, 4 * 60),
+    Target("grm-publish-watchdog.yml", ("13 0,2,4 * * 1",), 60, 6 * 60),
+    Target("grm-db-backup.yml", ("37 20 * * 0",), 60, 6 * 60),
+    Target("grm-mfds-gmp-cert-monthly.yml", ("40 18 1 * *",), 90, 12 * 60),
+    Target("grm-rum-analytics.yml", ("30 4 * * *", "30 16 * * *"), 90, 6 * 60),
 )
 
 
@@ -229,7 +228,7 @@ def latest_slot(crons: Iterable[str], before: datetime, lookback_min: int) -> da
 @dataclass
 class Decision:
     workflow: str
-    action: str                   # ok | dispatch | not-due | disabled | capped | deferred | alarm-failed
+    action: str                   # ok | check-recorded | dispatch | not-due | disabled | capped | deferred | alarm-* | error
     slot: datetime | None = None
     reason: str = ""
     inputs: dict[str, str] = field(default_factory=dict)
@@ -246,6 +245,8 @@ def resolve_inputs(inputs: dict[str, str], slot: datetime) -> dict[str, str]:
     for k, v in inputs.items():
         if v == SINCE_45D:
             v = (slot - timedelta(days=45)).strftime("%Y-%m-%d")
+        elif v == PUBLISH_DATE_KST:
+            v = slot.astimezone(timezone(timedelta(hours=9))).date().isoformat()
         out[k] = v
     return out
 
@@ -260,13 +261,17 @@ def decide(target: Target, now: datetime, runs: list[dict[str, Any]], state: str
     if covering:
         latest = max(covering, key=lambda r: _ts(r["created_at"]))
         actor = ((latest.get("triggering_actor") or latest.get("actor") or {}).get("login") or "")
-        if (latest.get("event") == "workflow_dispatch" and actor == BOT_LOGIN
-                and latest.get("status") == "completed" and latest.get("conclusion") in FAILED_CONCLUSIONS):
-            return Decision(target.workflow, "alarm-failed", slot,
-                            f"보완 실행이 {latest.get('conclusion')} 로 끝남", run_url=str(latest.get("html_url") or ""))
+        run_url = str(latest.get("html_url") or "")
+        if latest.get("event") == "workflow_dispatch" and actor == BOT_LOGIN:
+            if latest.get("status") == "completed" and latest.get("conclusion") in FAILED_CONCLUSIONS:
+                return Decision(target.workflow, "alarm-failed", slot,
+                                f"보완 실행이 {latest.get('conclusion')} 로 끝남", run_url=run_url)
+            if target.workflow in CHECK_INPUTS and not any(r.get("event") == "schedule" for r in covering):
+                return Decision(target.workflow, "check-recorded", slot,
+                                f"슬롯 이후 점검 실행 있음({latest.get('status')})", run_url=run_url)
         return Decision(target.workflow, "ok", slot,
                         f"슬롯 이후 실행 있음({latest.get('event')}·{latest.get('status')})",
-                        run_url=str(latest.get("html_url") or ""))
+                        run_url=run_url)
     if state != "active":
         return Decision(target.workflow, "disabled", slot, f"워크플로 상태 {state} — 보완하지 않음")
     if target.dispatch_cap > 0:
@@ -277,8 +282,11 @@ def decide(target: Target, now: datetime, runs: list[dict[str, Any]], state: str
             return Decision(target.workflow, "capped", slot,
                             f"최근 {target.cap_window_min // 60}시간 dispatch {len(recent)}건 ≥ 상한 {target.dispatch_cap} — 보완하지 않음")
     late = int((now - slot).total_seconds() // 60)
-    return Decision(target.workflow, "dispatch", slot, f"슬롯 {slot:%m-%d %H:%MZ} 후 {late}분 실행 없음",
-                    inputs=resolve_inputs(target.inputs, slot))
+    reason = f"슬롯 {slot:%m-%d %H:%MZ} 후 {late}분 실행 없음"
+    inputs = APPLY_INPUTS.get(target.workflow, CHECK_INPUTS.get(target.workflow))
+    if inputs is None:
+        return Decision(target.workflow, "alarm-only", slot, reason)
+    return Decision(target.workflow, "dispatch", slot, reason, inputs=resolve_inputs(inputs, slot))
 
 
 # ── GitHub API(표준 라이브러리) ──────────────────────────────────────────────
@@ -310,19 +318,25 @@ class GitHub:
         self.call("POST", f"/actions/workflows/{wf}/dispatches", {"ref": ref, "inputs": inputs})
 
     def alarm(self, marker: str, text: str) -> str:
-        """경보 이슈(하나)에 슬롯별 1회 댓글. 이미 같은 표식이 있으면 아무것도 안 한다."""
+        """경보 이슈에 슬롯·처리 결과별 1회 기록한다."""
         issues = self.call("GET", f"/issues?state=open&labels={ALARM_LABEL}&per_page=100")
         issue = next((i for i in issues if i.get("title") == ALARM_TITLE and "pull_request" not in i), None)
         body = f"{marker}\n{text}"
         if issue is None:
             made = self.call("POST", "/issues", {"title": ALARM_TITLE, "labels": [ALARM_LABEL], "body":
-                             "중요 예약 워크플로가 예정 시각에 돌지 않아 보완기(schedule_catchup.py)가 대신 기동했는데 "
-                             "실패했거나 기동하지 못한 경우를 모은다. 슬롯마다 댓글 1회.\n\n" + body})
+                             "중요 예약 워크플로의 누락 슬롯, 처리 모드와 결과를 모은다.\n\n" + body})
             return f"이슈 #{made.get('number')} 생성"
         n = issue["number"]
-        comments = self.call("GET", f"/issues/{n}/comments?per_page=100")
-        if any(marker in str(c.get("body") or "") for c in comments):
+        if marker in str(issue.get("body") or ""):
             return f"이슈 #{n} 이미 표기됨"
+        page = 1
+        while True:
+            comments = self.call("GET", f"/issues/{n}/comments?per_page=100&page={page}")
+            if any(marker in str(c.get("body") or "") for c in comments):
+                return f"이슈 #{n} 이미 표기됨"
+            if len(comments) < 100:
+                break
+            page += 1
         self.call("POST", f"/issues/{n}/comments", {"body": body})
         return f"이슈 #{n} 댓글"
 
@@ -364,22 +378,23 @@ def _act(gh: Any, planned: list[tuple[Target, Decision]], fda_busy: list[str], n
     gate_fda(planned, fda_busy)
     out: list[Decision] = []
     for t, d in planned:
-        marker = f"<!-- catchup:{t.workflow}:{d.slot:%Y-%m-%dT%H:%MZ} -->" if d.slot else ""
         if d.action == "dispatch" and not dry_run:
             try:
                 gh.dispatch(t.workflow, ref, d.inputs)
-                d.reason += " → dispatch 함"
-                for _ in range(6):                         # 다음 보완기 실행이 이 실행을 보도록(멱등)
-                    sleeper(5)
-                    if any(r.get("event") == "workflow_dispatch" for r in gh.runs_since(t.workflow, now - timedelta(minutes=1))):
-                        break
             except Exception as exc:  # noqa: BLE001
                 d.action = "alarm-dispatch-failed"
                 d.reason += f" → dispatch 실패 {type(exc).__name__}: {exc}"
-        if d.action.startswith("alarm") or d.action == "disabled":
-            text = f"- `{t.workflow}` 슬롯 {d.slot:%Y-%m-%d %H:%M} UTC · {d.action} · {d.reason} {d.run_url}".rstrip()
+            else:
+                d.reason += " → dispatch 요청 수락"
+        if d.action in {"dispatch", "disabled", "capped", "deferred"} or d.action.startswith("alarm"):
+            mode = "경보"
+            if d.action in {"dispatch", "alarm-failed", "alarm-dispatch-failed"}:
+                mode = "apply" if t.workflow in APPLY_INPUTS else "점검"
+            marker = f"<!-- catchup:{t.workflow}:{d.slot:%Y-%m-%dT%H:%MZ}:{mode}:{d.action} -->"
+            text = (f"- `{t.workflow}` 슬롯 {d.slot:%Y-%m-%d %H:%M} UTC · 모드 {mode} · "
+                    f"{d.action} · {d.reason} {d.run_url}").rstrip()
             if dry_run:
-                d.reason += " (dry-run: 경보 생략)"
+                d.reason += f" (모드 {mode}, dry-run: 경보 생략)"
             else:
                 try:
                     res = gh.alarm(marker, text)
@@ -387,6 +402,14 @@ def _act(gh: Any, planned: list[tuple[Target, Decision]], fda_busy: list[str], n
                     d.reason += f" · {res}"
                 except Exception as exc:  # noqa: BLE001
                     d.reason += f" · 경보 실패 {type(exc).__name__}"
+        if d.action == "dispatch" and not dry_run:
+            try:
+                for _ in range(6):                         # 다음 보완기 실행이 이 실행을 보도록(멱등)
+                    sleeper(5)
+                    if any(r.get("event") == "workflow_dispatch" for r in gh.runs_since(t.workflow, now - timedelta(minutes=1))):
+                        break
+            except Exception as exc:  # noqa: BLE001
+                d.reason += f" · dispatch 실행 조회 실패 {type(exc).__name__}: {exc}"
         log(f"[catchup] {t.workflow}: {d.action} — {d.reason}")
         out.append(d)
     return out

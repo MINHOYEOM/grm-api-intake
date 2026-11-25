@@ -24,6 +24,39 @@
 {%- elif sub_kind == 'findings' %}{% set _t = _("지적사항 주간 메일") %}{% set _d = _("매주 FDA·EU·식약처 실사 지적 소식을 원문 링크와 함께 받아 보세요.") %}
 {%- else %}{% set _t = _("주간 실사 지적 메일") %}{% set _d = _("FDA·EU·식약처의 새 실사 지적을 매주 받아 보세요.") %}
 {%- endif -%}
+{%- if sub_band %}
+{#- [홈 구독 밴드 2026-11-24 · 대표 요청 "어디서 구독해야 할지 모르겠다"] 홈 첫 화면의 색 면 밴드(시안 C = 전폭 띠 A + 카드 B 섞은 안).
+    줄형 칸과 **같은 칸**이다 — class 가 grm-inl 로 시작하고 폼·숨은 칸·자리 키(top)가 같아서 제출·성공 표시·
+    funnel 계측(160 inline_top_* × 076 구역 × 084 경로 × 087 유입)이 그대로 붙는다. 새 구독 경로는 없다.
+    data-sub-zone="home-band" 는 이 칸의 이름표다(시험·화면 점검용 — DB 로 보내지 않는다).
+    ★이미 구독한 브라우저에서도 숨기지 않는다(base.html 의 grm-inl 숨김이 --band 를 건너뛴다) — 구독자 화면에서
+      구독 칸이 전부 사라져 '어디서 구독하나'가 된 것이 이 밴드의 출발점이다(동료에게 권하는 자리이기도 하다).
+    사실 문안만: 기관 수는 하단 밴드 지적사항 DB 칸과 같은 여섯 기관. 발송 요일은 앞세우지 않는다. -#}
+<aside class="grm-inl grm-inl--band" data-sub-slot="top" data-sub-zone="home-band" aria-label="{{ _('메일 구독') }}">
+  <div class="grm-inl-in">
+    <div class="grm-inl-tx">
+      <p class="grm-band-eb">{{ _("GRM 주간 브리프") }}</p>
+      <h2 class="grm-band-t">{{ _("FDA·EU·식약처 실사 지적, 매주 메일로 받아 보세요") }}</h2>
+      <ul class="grm-band-facts">
+        <li><b>{{ _("6개 기관") }}</b><span>{{ _("FDA·EU·영국·WHO·캐나다·식약처") }}</span></li>
+        <li><b>{{ _("기관 원문") }}</b><span>{{ _("지적마다 원문 링크") }}</span></li>
+        <li><b>{{ _("무료") }}</b><span>{{ _("언제든 해지") }}</span></li>
+      </ul>
+    </div>
+    <div class="grm-band-act">
+      <form class="grm-inl-form" action="{{ newsletter_form_action }}" method="post">
+        <input type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
+        <input type="text" name="email_address_check" value="" class="sub-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <input type="hidden" name="locale" value="en" />
+        {% if signup_path_fields %}<input type="hidden" name="SIGNUP_PATH" value="" /><input type="hidden" name="SIGNUP_LANG" value="" />{% endif %}
+        <button class="grm-inl-btn" type="submit">{{ _("무료 구독") }}</button>
+      </form>
+      <p class="grm-band-n">{{ _("확인 메일의 버튼을 누르면 구독이 완료됩니다.") }}</p>
+    </div>
+  </div>
+  <p class="grm-inl-done" role="status" aria-live="polite" hidden><b>{{ _("확인 메일을 보냈습니다") }}</b> {{ _("메일의 구독 확인 버튼을 누르면 구독이 완료됩니다.") }}</p>
+</aside>
+{%- else -%}
 {% if sub_wrap %}<div class="wrap">{% endif %}<aside class="grm-inl{% if sub_stack %} grm-inl--stack{% endif %}" data-sub-slot="{{ sub_slot or 'top' }}" aria-label="{{ _('메일 구독') }}">
   <div class="grm-inl-in">
     <div class="grm-inl-tx"><b>{{ _t }}</b><span>{{ _d }}</span></div>
@@ -37,4 +70,5 @@
   </div>
   <p class="grm-inl-done" role="status" aria-live="polite" hidden><b>{{ _("확인 메일을 보냈습니다") }}</b> {{ _("메일의 구독 확인 버튼을 누르면 구독이 완료됩니다.") }}</p>
 </aside>{% if sub_wrap %}</div>{% endif %}
+{%- endif -%}
 {%- endif -%}

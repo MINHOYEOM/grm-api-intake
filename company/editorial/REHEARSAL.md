@@ -15,10 +15,10 @@
 | handoff 날짜 `D` | 이번 주 월요일 | **회차표의 재료 날짜**(아래 실행표). 브랜치 `claude/queue-handoff` 에 8일간 남아 있는 파일이다 |
 | 브랜치 | `claude/company-{D}` | **`claude/company-rehearsal-{회차}`** (회차 = 실행표의 네 자리 숫자) |
 | 폴더 | `company/run/{D}/` | **`company/run/rehearsal-{회차}/`** |
-| Notion handoff 가 OPEN 인지 확인(RUN.md 2항) | 한다 | **하지 않는다**(재료 날짜의 handoff 는 이미 닫혔거나 월요일분이 아니다) |
+| 이 호가 이미 main 에 있는지 확인(RUN.md 2항) | 한다 | **하지 않는다**(재료 날짜의 호는 이미 발행됐거나 월요일분이 아니다) |
 | 시각·대기(07:20, 09:20 까지 재확인 등) | 지킨다 | 무시한다. 앞 직무가 끝나면 바로 다음 직무 |
 | 검색 보강(v16 [1단계]) | WebSearch 9·WebFetch 5 | 그대로(한도 같음) |
-| 교열 마감 4번 | 반납 push → Notion CONSUMED | **1번(실행 폴더 push)까지만.** `copyedit.json` 은 `status: 완료`, `published: false`, `"rehearsal": true` |
+| 교열 마감 4번 | 반납 push → 브릿지 요청 | **1번(실행 폴더 push)까지만.** `copyedit.json` 은 `status: 완료`, `published: false`, `"rehearsal": true` |
 
 ## 브랜치는 방금 받은 main 에서 만든다
 리허설 브랜치도 `next/RUN.md` 3항의 순서 그대로 올라탄다(`B` = `claude/company-rehearsal-{회차}`): 원격에 있으면 그 위에, 없으면 `git fetch origin main` 한 `FETCH_HEAD` 에서.
@@ -47,6 +47,7 @@
 | `1120d` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120d` | `company/run/rehearsal-1120d/` — 1차 반려 1장(심층 조항 인용) → 재작업(심층) → 2차 reject 0 · 점검 1~4 통과 · **5 실패(2차 뒤 마감 1번 누락 — `scaffold.json` 없음)**. 3-2 에 2차 통과 → 4번 마감 명시 |
 | `1120e` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120e` | `company/run/rehearsal-1120e/` — **성공**: 1차 reject 0/89 · 코드 검사 exit 0 · 점검 1~6 통과 · 심층 샤드 F 를 아무 워커도 안 가져가 심층 워커 재실행으로 마무리(1120b 와 같은 꼴) · 두 PC 가 같은 Routine 을 동시에 지휘함 |
 | `1120f` | 11-17(화) | `2026-11-16` | `claude/company-rehearsal-1120f` | `company/run/rehearsal-1120f/` — **성공**: 데스크 19:16 · 워커 4개 19:20 시작·샤드 14개(델타 6·심층 8) 19:41 전부 완료(보강 불필요) · 선확인 위반 0 · 채택 86카드(근거 A35·B51·C0) · 교열 1차 89/89 통과·반려 0 · 점검 1~6 통과 · 마감 산출 완비(`scaffold.json` 포함) — 티로 지휘·해밀턴 8 재확인 |
+| `1124a` | 11-24(화) | `2026-11-23` | `claude/company-rehearsal-1124a` | `company/run/rehearsal-1124a/` — 노션 off(`GRM_INTAKE_NOTION=off`) 뒤 첫 회차 · #1872(칸 삭제 자동 통과·1차 이음·2차 근거 강제·finish)·#1881(precheck 4유형) 실산출물 검증 — **성공**: 데스크 10:34~10:36 · 워커 4개 10:36 시작·샤드 25개(델타 9·심층 16) 11:05 전부 완료(보강 불필요) · 1차 153장 중 반려 10(코드 검사 exit 0 · precheck source 차단 0·경고 6) → 재작업 11:20 → 2차 `finish` exit 3(근거 다시 7장) → exit 4(재작업 2회차 1장, 서브 에이전트 기자) → exit 0 · 2차 reject 0 · 칸 삭제 28·심층 삭제 5(1차 칸 삭제 28 → 2차 28, 빠짐 0) · 점검 1~5 통과 · 조립 dry exit 0 · 196329·196343 실명은 스캐폴드가 먼저 가려 기자 문장에 0. **결함 1**: 교열 합치기가 `run_date_kst`(11-24)로 handoff 를 찾아 exit 1 — 교열이 임시 사본으로 우회. `merge_parts.handoff_date`(handoff_ref.date 우선) 로 수리 |
 
 **11-17 결론: 1120e·1120f 연속 성공 → 전환 조건 충족. 같은 날 대표 승인으로 실발행 지시문을 옮겼다(SWITCH 1절 (가)).**
 같은 Routine 을 두 PC 가 동시에 지휘하지 않는다(1120e 에서 겹쳤다) — 리허설·운영 지휘 PC 는 장부에 먼저 적는다.
@@ -63,6 +64,7 @@
 | 3 | 순서 2 시작 40분 뒤 (14:10 쯤) | 같음 | 보강 워커: 델타 1개(`델타-1+`) + 심층 1개(`심층-1+`) | `python company/editorial/shard_claim.py status <실행 폴더>` 가 전 샤드 완료 + `delta.T.json` 완료. 미완이 남으면 보강 워커를 한 번 더 돌린다 |
 | 4 | 전 샤드 완료 직후 (15:00 쯤) | 같음 | 교열 (1개) | `copyedit.json` 이 push 됐다 |
 | 4-1 | 교열이 `재작업` 을 남겼을 때만 | 같음 | 델타 워커 1개(이름 무관 — `copyedit.json` 이 `재작업` 이면 재작업 절을 한다) → 끝나면 교열을 한 번 더 | `rework.json` 이 `완료` → 다시 돌린 교열의 `copyedit.json` 이 `round: 2` 로 push 됐다 |
+| 4-2 | 2차 교열의 `blank_slots.py finish` 가 exit 3·4·5 를 낼 때 | 같음 | (Routine 없음) 교열 2차가 같은 실행 안에서 한다 — exit 3 근거 다시 · exit 4 서브 에이전트 기자 1개로 재작업 2회차(≤5장) → 재판정 → `finish` 다시 (`copyedit.md` 3-3) | `finish` exit 0 → 마감 1번 push. exit 5(`결정 대기` + `decision_request.md`)면 리허설은 거기서 멈추고 그 사유를 그대로 적는다(대표 결정은 받지 않는다) |
 | 5 | 교열 뒤 | 같음 | (Routine 아님) 아래 "점검" — 비서실 세션이 PC 에서 | `rehearsal_check.py` 결과 + 6번 확인을 적는다 |
 
 - **반납 push 확인이 첫 판정이다.** 데스크가 끝났다고 하면 가장 먼저 `git ls-remote origin claude/company-rehearsal-{회차}` 로 브랜치가 원격에 생겼는지,
@@ -98,8 +100,14 @@ python company/editorial/rehearsal_check.py ../_rehearsal-{회차}/company/run/r
 2. 계획한 샤드가 전부 `완료`이고 `delta.json` 이 있다(`merge_parts.py` exit 0 의 결과).
 3. `copyedit.json` 의 코드 검사가 `ran: true`, `exit: 0` 이다.
 4. 교열 reject 가 0 이다 — 재작업 1회(`next/RUN.md` 5-1항)를 거친 2차 판정이어도 된다. 그때는 `rework.json` 이 `완료` 이고 1차 기록 `copyedit.r1.json` 이 남아 있어야 한다. (실발행의 마감 조건과 같다 — `copyedit.md` 4번은 코드 검사 exit 0 **이고** reject 0 일 때만 반납한다. reject 가 하나라도 있으면 월요일에는 반납하지 않고 09:30 백업이 발행한다. 그래서 `copyedit.json` 이 `완료`·exit 0 이어도 reject 가 남았으면 그 회차는 성공이 아니다.)
+4-1. 교열이 카드를 전부 원문과 맞춰 봤다 — `copyedit.json` 의 카드 줄마다 `checked` 근거가 있고, `copyedit_evidence.py check` 와 같은 함수로 근거의 원문 조각이 그 카드 원문에 글자 그대로 있다(리허설 1121b: 표본 17장만 읽고 153장 `reject 0` — 이 항목이 없어 통과로 보였다).
+4-2. 심층에서만 걸린 반려 카드가 남아 있지 않다 — 교열이 `blank_slots.py deep-auto` 를 돌렸다(`next/copyedit.md` 2-4). `완료` 회차에 심층 삭제 주의가 있으면 뺀 기록 `slot_removals.json` 이 실행 폴더에 있다
+   (리허설 1121b: 반려 21장 중 12장이 심층에서만 걸려 10장 상한을 넘겼다 — 대표 결정으로 심층은 코드가 빼고 통과, 재작업 상한 25장).
+4-3. 지울 수 있는 칸(선택 칸·심층)만 걸린 반려 카드가 남아 있지 않고, 2차 판정이 1차의 칸 삭제 주의를 잃지 않았다 — `deep-auto` 와 같은 함수(`blankable_notes`·`carry_first`)로 본다
+   (11-23 실전: 1차가 칸 삭제로 정한 fda483-196441 `hook_line` 을 2차가 `fails` 로 올려 반려 1장으로 `보류`).
 5. `scaffold.json` 이 그 날짜의 것이고 델타의 카드를 전부 갖고 있다. handoff 의 모든 행이 상태를 하나씩 받는다(발행·미채택·보류·오류 중 하나 — 빈 행 0).
-6. (사람) Notion·main·날짜 브랜치에 리허설이 쓴 것이 없다 — Notion handoff·Intake 행의 마지막 수정 시각, `git log origin/main`, `git ls-remote origin 'claude/company-20*'` 로 본다.
+6. (사람) main·날짜 브랜치에 리허설이 쓴 것이 없다 — `git log origin/main`, `git ls-remote origin 'claude/company-20*'` 로 본다.
+   (11-24 부터 Notion 은 발행 길에 없다 — `GRM_INTAKE_NOTION=off`. 리허설 프롬프트·지시문 어디에도 Notion 을 읽거나 쓰는 단계가 없으므로 Notion 수정 시각은 더 보지 않는다.)
 
 두 회차 모두 성공이면 다음 월요일에 전환한다(`1114`·`1115` → 11-16, `1118`·`1120` → 11-23). 한 번이라도 실패면 원인을 고치고 회차를 하나 더 돌린다 — 월요일 07:00 전까지 두 번 성공을 채우지 못하면 전환을 한 주 미룬다.
 

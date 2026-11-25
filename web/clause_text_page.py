@@ -163,10 +163,18 @@ def tree_paths(view: dict[str, Any]) -> set[str]:
 #   E. 그 언어 페이지에 실리는 본문이 GOOGLE_MIN_CHARS 자 미만 — 원문 한 줄에 이전/다음 링크뿐인 페이지.
 # 판정은 정본 데이터만 보므로, 2단계에서 `text_ko` 가 채워지면 다음 빌드에서 자동으로 돌아온다.
 GOOGLE_MIN_CHARS = 300
+#: [구글 품질 2단계 2026-11-20] 짧은 원문(E)이라도 이 조항을 인용한 공개 문서가 이만큼 있으면 페이지에
+#: "이 조항을 인용한 지적" 블록이 서서 원문 한 줄짜리가 아니다 → E 에서 풀린다. 값은 `/findings/clause/`
+#: 조항 페이지 임계(render.CLAUSE_MIN_DOCUMENTS = 3)와 같다. D(국문 미번역)는 풀지 않는다 — 국문 페이지의
+#: 영어 원문 중복은 인용 블록으로 해소되지 않고, 국문 착지는 `/findings/clause/` 가 이미 맡는다.
+GOOGLE_MIN_CITED_DOCS = 3
 
 
-def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str) -> str:
-    """"" 이면 구글 색인 대상. 아니면 "untranslated"(D) 또는 "short"(E)."""
+def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str,
+                          cited_docs: int = 0) -> str:
+    """"" 이면 구글 색인 대상. 아니면 "untranslated"(D) 또는 "short"(E).
+
+    `cited_docs` = 그 언어 트리에서 이 조항을 인용한 공개 문서 수(`citing_findings` 의 documents)."""
     foreign = (doc.get("source") or {}).get("lang", "en") != "ko"
     if lang == "ko" and foreign:
         if not clause.get("text_ko"):
@@ -174,7 +182,90 @@ def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str
         n = len(clause["text_ko"])
     else:
         n = clause.get("chars") or 0
-    return "short" if n < GOOGLE_MIN_CHARS else ""
+    if n < GOOGLE_MIN_CHARS and cited_docs < GOOGLE_MIN_CITED_DOCS:
+        return "short"
+    return ""
+
+
+# ── [구글 품질 2단계 2026-11-20] 이 조항을 인용한 지적 ──────────────────────────
+# 21 CFR 조항 페이지는 공식 원문 한 문단 + 이전/다음 링크뿐이라 eCFR 사본과 다를 게 없었다.
+# 우리 문서(483·경고서한)의 지적 `cfr_refs` 가 그 조항을 가리키면, 몇 건이 인용했는지와 최근 사례를
+# 조항 원문 바로 아래에 싣는다 — 원문과 실제 지적을 한 화면에서 잇는 것이 이 페이지의 GRM 몫이다.
+# 하위항 `(a)(1)` 은 섹션으로 접는다(조항 페이지가 섹션 단위다). 1271.x 처럼 네 자리 Part 도 받는다.
+# ★`cfr_refs` 만 믿으면 안 된다(11-20 실측): 경고서한 지적의 `cfr_refs` 에는 그 단락 뒤의 권고문
+# ("211.34 에 따라 컨설턴트를…")이나 다른 위반의 조항까지 섞여, 211.34 는 225건으로 세지는데 정작 그 조항을
+# 지적한 문장은 0건이었다. 그래서 **본문 머리의 첫 인용**("…하지 않았다(21 CFR 211.192).")에 그 섹션이 있는
+# 지적만 센다 — 지적 문장이 스스로 근거로 든 조항이다. 211.192 143→114, 211.84 194→184, 211.34 225→0.
+CITE_SAMPLES = 3
+_CITE_SEC = re.compile(r"^21 CFR (\d{1,4})\.(\d+)")
+HEAD_MAX_CHARS = 600
+_HEAD_END = re.compile(r"\)\.|\.\s|\n|$")
+_SEC_NUM = re.compile(r"(?<![\d.])(\d{1,4}\.\d+)")
+
+
+def headline_sections(text: str) -> set[str]:
+    """지적 본문 **머리**(앞 HEAD_MAX_CHARS 자) 안의 첫 `21 CFR` 인용 구간(그 문장 끝까지)에 적힌 섹션 번호들.
+
+    머리에 인용이 없으면 빈 집합 — 뒤쪽 권고문("consultant qualified as set forth in 21 CFR 211.34",
+    실측 위치 698~4,508자)을 머리 인용으로 오독하지 않는다. 머리는 첫 문장이 아니라 글자 수로 끊는다 —
+    FDA 는 규정 문구를 한 문장 인용한 뒤 둘째 문장 끝에 조항을 다는 일이 많다(211.84 실측: 첫 문장 끝
+    104~217자, 인용 239~458자)."""
+    t = text or ""
+    i = t.find("21 CFR")
+    if i < 0 or i > HEAD_MAX_CHARS:
+        return set()
+    j = _HEAD_END.search(t, i).start()
+    return set(_SEC_NUM.findall(t[i:j]))
+
+
+def citing_findings(docs: "list[dict[str, Any]] | None", view: dict[str, Any], body,
+                    *, doc_ok=None, max_samples: int = CITE_SAMPLES) -> dict[str, dict[str, Any]]:
+    """조항 페이지 주소 → {"documents", "findings", "samples"}. 순수 함수(입력은 커밋 정본뿐).
+
+    `body(finding)` 는 읽는 언어의 지적 본문("" 이면 그 지적은 이 언어 트리에서 세지 않는다).
+    `doc_ok(doc)` 가 거짓인 문서는 세지 않는다(그 언어 트리에 문서 페이지가 없으면 링크가 깨진다).
+    사례는 공개일 내림차순 → 문서 id → 지적 id 로 완전 결정론이고, 본문은 자르지 않는다."""
+    rows: dict[str, list[dict[str, Any]]] = {}
+    doc_ids: dict[str, set] = {}
+    for d in docs or []:
+        if doc_ok is not None and not doc_ok(d):
+            continue
+        for f in d.get("findings") or []:
+            head = None
+            secs = set()
+            for r in f.get("cfr_refs") or []:
+                m = _CITE_SEC.match(str(r or "").strip())
+                if not m:
+                    continue
+                if head is None:  # 판정은 원문(없으면 국문) 기준 — 읽는 언어와 무관하게 같은 집합이다
+                    head = headline_sections(f.get("text_orig") or f.get("text_ko") or "")
+                sec = f"{m.group(1)}.{m.group(2)}"
+                if sec in head:
+                    secs.add((m.group(1), sec))
+            if not secs:
+                continue
+            text = (body(f) or "").strip()
+            if not text:
+                continue
+            for part, sec in sorted(secs):
+                c = _find(view, "cfr21", part, sec)
+                if not c or not c.get("href"):
+                    continue
+                rows.setdefault(c["href"], []).append({
+                    "agency": d.get("agency") or "",
+                    "firm_name": d.get("firm_name") or "",
+                    "published_date": d.get("published_date") or "",
+                    "doc_slug": d.get("slug") or "",
+                    "document_id": d.get("document_id") or "",
+                    "finding_id": f.get("finding_id") or "",
+                    "body": text,
+                })
+                doc_ids.setdefault(c["href"], set()).add(d.get("document_id") or d.get("slug") or "")
+    out = {}
+    for href, rs in rows.items():
+        rs.sort(key=lambda r: (r["published_date"], r["document_id"], r["finding_id"]), reverse=True)
+        out[href] = {"documents": len(doc_ids[href]), "findings": len(rs), "samples": rs[:max_samples]}
+    return out
 
 
 def pages(view: dict[str, Any]):
@@ -278,6 +369,52 @@ def ref_href(view: dict[str, Any], label: str) -> str:
 def cfr_href(view: dict[str, Any], section: str) -> str:
     """`211.192` → 그 조항 원문 페이지(없으면 "")."""
     return ref_href(view, f"21 CFR {section}")
+
+
+def href_labels(view: dict[str, Any]) -> dict[str, tuple[str, str]]:
+    """주소 → (코드, 제목). 문서 목차 주소와 조항 페이지 주소 모두(문서 페이지 '인용한 기준 원문' 표시용)."""
+    out: dict[str, tuple[str, str]] = {}
+    for d in (view.get("index") or {}).values():
+        out.setdefault(d["path"], (d["code"], d["title"]))
+        for c in d["clauses"]:
+            if c["href"]:
+                out[c["href"]] = (c["code"], c["title"])
+    return out
+
+
+_ANNEX1_RE = re.compile(r"\bAnnex\s+1(?!\d)")
+_GMP_RE = re.compile(r"\b(?:EU\s+)?GMP\b|EudraLex", re.I)
+_ICH_TEXT_RE = re.compile(r"\bICH\s+(Q7|Q9|Q10)\b(?!\s*\(R1\)\s*§)")
+_CFR_TEXT_RE = re.compile(r"\b21\s*CFR\s*(?:§\s*)?(\d{1,4}\.\d+)")
+_CFR_LABEL_RE =re.compile(r"^(21 CFR \d{1,4}\.\d+)(?:\([A-Za-z0-9]+\))*$")
+
+
+def cited_standard_labels(doc: dict[str, Any]) -> list[str]:
+    """문서의 지적 본문이 **글자 그대로 적은** 기준 라벨(정규화). 추측하지 않는다.
+    · 21 CFR 섹션: 지적의 cfr_refs
+    · ICH Q7/Q9/Q10, EU GMP Annex 1: 영문 원문에 이름이 적힌 것(Annex 1 은 같은 지적에 GMP 가 함께 있을 때만)
+    식약처 '[별표 N] 제X호' 는 일부러 뺀다 — 점검 평가표의 번호이지 고시 별표 번호가 아니다."""
+    out: list[str] = []
+    seen: set[str] = set()
+
+    def add(label: str) -> None:
+        if label not in seen:
+            seen.add(label)
+            out.append(label)
+
+    for f in doc.get("findings") or []:
+        for r in f.get("cfr_refs") or []:
+            m = _CFR_LABEL_RE.match((r or "").strip())
+            if m:
+                add(m.group(1))
+        text = f.get("text_orig") or ""
+        for m in _CFR_TEXT_RE.finditer(text):
+            add(f"21 CFR {m.group(1)}")
+        for m in _ICH_TEXT_RE.finditer(text):
+            add(f"ICH {m.group(1)}")
+        if _ANNEX1_RE.search(text) and _GMP_RE.search(text):
+            add("EU GMP Annex 1")
+    return out
 
 
 def terms_by_href(view: dict[str, Any], glossary_terms: "list[dict[str, Any]] | None",

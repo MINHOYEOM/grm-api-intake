@@ -1215,6 +1215,12 @@
       "findings": 34,
       "documents": 32,
       "note": "경고서한 본문에서 FDA가 업체 제품을 수입경보(Import Alert 번호)에 올렸다는 문장 — 같은 뜻(2026-11-17, 3건 확인)"
+    },
+    {
+      "id": "acceptance-quality-limit",
+      "q": "AQL",
+      "findings": 19,
+      "documents": 18
     }
   ],
   "excluded": [

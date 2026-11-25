@@ -130,12 +130,12 @@ class WorkflowStepGateTest(unittest.TestCase):
         text = (WF / "grm-fda483-ocr-recovery.yml").read_text(encoding="utf-8")
         self.assertEqual(text.count(self.OFF), 2)        # 노션 동기화 두 단계뿐 — 회수·findings 는 그대로
 
-    def test_notion_status_sync_step_skips_when_off(self):
-        cond = _if_line(_step("grm-delta-bridge.yml", "노션 행 Status 기록"))
-        self.assertEqual(cond, "if: steps.bridge.outputs.wrote == 'true' && "
-                               "steps.bridge.outputs.source == 'git' && " + self.OFF)
+    def test_notion_status_sync_step_is_gone(self):
+        # [노션 은퇴 ③] 노션 행 Status 기록 단계는 지웠다. off 조건은 잡 첫머리 'off 확인' 한 곳에만 있다.
         text = (WF / "grm-delta-bridge.yml").read_text(encoding="utf-8")
-        self.assertEqual(text.count(self.OFF), 1)        # 브릿지의 다른 단계는 건드리지 않는다
+        self.assertNotIn("노션 행 Status 기록", text)
+        self.assertEqual(text.count(self.OFF), 1)
+        self.assertEqual(_if_line(_step("grm-delta-bridge.yml", "노션 off 확인")), "if: " + self.OFF)
 
 
 if __name__ == "__main__":

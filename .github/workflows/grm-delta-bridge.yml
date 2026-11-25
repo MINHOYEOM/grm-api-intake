@@ -10,7 +10,7 @@ name: GRM Delta Bridge (Notion → git)
 #     → delta_bridge.py (select_open_delta → extract_delta → write_delta)
 #       → web/data/deltas/delta_{date}.json(+deep_{date}.json) 커밋 + push (PAT)
 #         → grm-web-publish.yml 이 push 트리거로 자동 기동
-#     → push 성공 후에만 delta_bridge.py --consume 으로 Notion 페이지 CONSUMED 처리
+#     (노션 은퇴 ③ 뒤: 노션 CONSUMED 마감 없음 — 정본은 편집팀·백업 v17 의 git 반납, 변수 GRM_INTAKE_NOTION=off 전용)
 #
 # 무인 라이브 0: 이 워크플로우는 델타 커밋까지만 — main 에 직접 push 하지만 발행 PR/프리뷰/
 # 라이브는 건드리지 않는다(④ grm-web-publish.yml 이하가 별도로 이어받음).
@@ -32,8 +32,8 @@ on:
     #   이관됐으면 wrote=false 로 1분 내 무해 종료(delta_bridge.main: return 0)라 비용이 낮다.
     #   일 22:07~23:37 UTC = 월 07:07~08:37 KST (Routine 예치 07:30 KST 전후를 감싼다)
     - cron: '7,37 22-23 * * 0'
-    #   월 00:07~04:37 UTC = 월 09:07~13:37 KST (예치 지연·크론 지각을 흡수)
-    - cron: '7,37 0-4 * * 1'
+    #   월 00:07~05:37 UTC = 월 09:07~14:37 KST (예치 지연·크론 지각 흡수 + 백업 v17 반납 시한 13:15 뒤 세 회차)
+    - cron: '7,37 0-5 * * 1'
   workflow_dispatch:
     inputs:
       publish_date:
@@ -77,6 +77,9 @@ jobs:
       # [노션 은퇴 준비] 심층분석 원문 정본을 어디서 읽나 — notion(기본) | git(DB handoff 의 브랜치 사본, 못 읽으면 노션).
       #   델타에 handoff_ref 가 있는 호(편집팀이 git handoff 로 만든 호)는 이 값과 무관하게 git 사본을 읽는다.
       GRM_HANDOFF_BODY_SOURCE: ${{ vars.GRM_HANDOFF_BODY_SOURCE || 'notion' }}
+      # [노션 은퇴] off 면 브릿지가 노션을 읽지도 쓰지도 않는다 — 정본은 git 반납 하나, 노션 예비 길·CONSUMED 없음
+      #   (delta_bridge.notion_off). 수집기·원천 대조와 같은 변수.
+      GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -96,6 +99,14 @@ jobs:
           set -euo pipefail
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      # [노션 은퇴 ③ 2026-11-24] 노션 CONSUMED 마감·노션 행 상태(notion-sync) 단계를 지웠다 — 노션 길로 기록한 호를
+      #   닫을 단계가 없으니 이 워크플로는 변수 GRM_INTAKE_NOTION=off 에서만 돈다. 노션을 다시 켜려면 이 PR 을 되돌린다.
+      - name: 노션 off 확인 (③ 정리 뒤에는 off 에서만 돈다)
+        if: vars.GRM_INTAKE_NOTION != 'off'
+        run: |
+          echo "::error title=노션 off 아님::저장소 변수 GRM_INTAKE_NOTION 이 off 가 아니다(현재: '${{ vars.GRM_INTAKE_NOTION }}'). 노션 마감 단계가 없어 노션 길로 기록하면 같은 예치를 매 회차 다시 집는다. 변수를 off 로 두거나 ③ 정리 PR 을 되돌린다."
+          exit 1
 
       - name: 델타 브릿지 실행(select → extract → write)
         id: bridge
@@ -139,53 +150,14 @@ jobs:
             git add "web/data/scaffolds/brief_web_${U}.json"
           fi
           SRC="${{ steps.bridge.outputs.source }}"
-          if [ "$SRC" = "git" ]; then MSG="편집팀 git 반납"; else MSG="라우틴 델타"; fi
+          # [백업 v17] 누가 쓴 반납인가 — by=editorial(편집팀) | backup(백업 v17). delta_bridge.bridge_from_git 출력.
+          BY="${{ steps.bridge.outputs.by }}"
+          if [ "$SRC" != "git" ]; then MSG="라우틴 델타"
+          elif [ "$BY" = "backup" ]; then MSG="백업 v17 git 반납 (by=backup)"
+          else MSG="편집팀 git 반납 (by=editorial)"; fi
           git commit -m "bridge(web): ${{ steps.bridge.outputs.date }} ${MSG} 커밋 (자동)"
           git push
-
-      - name: Notion 마감(CONSUMED) — 커밋+push 성공 후에만
-        # git 반납으로 기록한 run 은 노션 페이지를 닫지 않는다 — 닫을 대상은 노션에서 읽은 페이지뿐이다.
-        if: steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source != 'git'
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: |
-          set -euo pipefail
-          ARGS=(--db "$GRM_INTAKE_DB_ID" --consume)
-          if [ -n "${{ github.event.inputs.publish_date }}" ]; then
-            ARGS+=(--publish-date "${{ github.event.inputs.publish_date }}")
-          else
-            ARGS+=(--publish-date "${{ steps.bridge.outputs.date }}")
-          fi
-          python delta_bridge.py "${ARGS[@]}"
-
-      # [대기열 3단계 2026-11-13] git handoff 로 만든 호는 행에 노션 page_id 가 없어 교열이 행 Status 를
-      # 손으로 찍지 못한다. 백업 길이 노션에 남아 있는 동안 노션 행 Status 가 맞아야 지난 행이 다음 주 노션
-      # handoff 에 다시 들어오지 않는다 → 코드가 계산한 상태(grm_queue)를 노션에 찍는다.
-      #   · 기본 꺼짐(vars.ENABLE_QUEUE_NOTION_STATUS_SYNC). 꺼져 있으면 계획만 실행 요약에 남긴다.
-      #   · 델타에 handoff_ref 가 없는 호(노션 handoff 로 만든 호)는 도구가 스스로 건너뛴다.
-      #   · 지금 New 인 행만 바꾼다. 실패해도 발행은 이미 끝났다 — 경고로 남기고 수동 재실행한다.
-      - name: 노션 행 Status 기록 (git handoff 호 · 코드 계산)
-        # [노션 끄기] vars.GRM_INTAKE_NOTION=off 면 건너뛴다 — 노션에 찍을 행이 더 생기지 않는다.
-        if: steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source == 'git' && vars.GRM_INTAKE_NOTION != 'off'
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          ENABLE_QUEUE_NOTION_STATUS_SYNC: ${{ vars.ENABLE_QUEUE_NOTION_STATUS_SYNC || 'false' }}
-        run: |
-          set -uo pipefail
-          python grm_queue.py notion-sync --date "${{ steps.bridge.outputs.date }}" --db "$GRM_INTAKE_DB_ID" --apply > notion_sync.json
-          rc=$?
-          {
-            echo "### 노션 행 Status 기록 (ENABLE_QUEUE_NOTION_STATUS_SYNC=${ENABLE_QUEUE_NOTION_STATUS_SYNC})"
-            echo '```json'
-            head -c 4000 notion_sync.json
-            echo
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-          if [ "$rc" -ne 0 ]; then
-            echo "::warning::노션 행 Status 기록 실패(exit $rc) — 발행에는 영향 없음. grm_queue.py notion-sync 로 다시 돌릴 것"
-          fi
+          echo "### 브릿지 기록: ${{ steps.bridge.outputs.date }} · source=${SRC} · by=${BY:-notion} — ${MSG}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: OPEN 델타 없음 — 클린 skip
         if: steps.bridge.outputs.wrote != 'true'

@@ -467,6 +467,26 @@ class MergeFda483DisclosuresTest(unittest.TestCase):
         self.assertEqual(len(rep["merged_items"]), 3)
         self.assertIn("3건", rep["summary"])
 
+    def test_digest_rewrites_english_too(self):
+        """[리허설 1120j] 한국어 서사를 디제스트로 갈아 쓰면 영문도 같은 디제스트여야 한다.
+
+        대표가 기자의 낱장 en(시사점·점검 없음)을 그대로 들고 나가 영문 게이트(check_en_slots)가 exit 1 이었다.
+        11-02 호는 손으로 쓴 영문 건수(11)가 한국어(4)와 달랐다 — 같은 n 이어야 한다."""
+        import check_en_slots
+        cards = [self._card("fda483-1", "Alpha Corp · FEI 1", "01/01/2024"),
+                 self._card("fda483-2", "Beta", "02/02/2024"),
+                 self._card("fda483-3", "Gamma", "03/03/2024")]
+        cards[0]["en"] = {"title_issue": "Form 483 to a manufacturer", "summary": "One firm.",
+                          "key_facts": ["k"], "implication": "", "checks": [], "hook_line": "x"}
+        rep = next(c for c in apb.merge_fda483_disclosures(cards) if c["id"] == "fda483-1")
+        self.assertIsNone(check_en_slots.card_problem(rep))
+        self.assertIn("3 Form 483", rep["en"]["summary"])
+        self.assertIn("Records released: 3", rep["en"]["key_facts"][0])
+        self.assertIn("Alpha Corp, FEI 1, plus 2 others", rep["en"]["key_facts"][1])
+        self.assertNotIn("hook_line", rep["en"])          # 한국어 hook_line 을 빼듯 영문도 뺀다
+        self.assertEqual(len(rep["en"]["checks"]), len(rep["checks"]))
+        self.assertEqual(cards[0]["en"]["summary"], "One firm.")   # 입력 카드는 그대로(순수)
+
     def test_single_content_less_483_unchanged(self):
         cards = [self._card("fda483-1", "Alpha", "01/01/2024")]
         self.assertEqual(apb.merge_fda483_disclosures(cards), cards)  # 1건 무변화

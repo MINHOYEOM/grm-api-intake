@@ -5311,5 +5311,23 @@
     ],
     "source_url": "https://www.fda.gov/industry/actions-enforcement/import-alerts",
     "easy_en": "Import Alerts protect consumers against products with a history of known violations. FDA can detain future shipments of a listed product without testing or physically examining it."
+  },
+  {
+    "id": "acceptance-quality-limit",
+    "term_ko": "허용품질한계",
+    "term_en": "Acceptance Quality Limit (AQL)",
+    "aliases": [
+      "합격품질한계",
+      "허용 품질 한계",
+      "Acceptable Quality Limit"
+    ],
+    "easy_ko": "로트를 계속 이어서 합격 판정용 샘플링으로 검사할 때, 감수할 수 있는 최악의 공정 평균을 나타내는 품질 한계입니다.",
+    "definition_source": "U.S. FDA, Inspection of Injectable Products for Visible Particulates: Guidance for Industry (Draft, 2021), footnote 18 (ASTM E456 인용)",
+    "related": [
+      "visual-inspection",
+      "acceptance-criteria"
+    ],
+    "source_url": "https://www.fda.gov/media/154868/download",
+    "easy_en": "The quality limit that is the worst tolerable process average when a continuing series of lots is submitted for acceptance sampling."
   }
 ]

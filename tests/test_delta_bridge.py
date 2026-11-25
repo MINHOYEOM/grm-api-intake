@@ -20,7 +20,7 @@ import pathlib
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -1056,6 +1056,15 @@ class LoadGitRunTest(unittest.TestCase):
         self.assertTrue(run["adoptable"], run["reason"])
         self.assertEqual(run["branch"], "claude/company-2026-07-13")
 
+    def test_pass_with_notes_still_adoptable(self) -> None:
+        """[11-21] 교열 '주의'(pass + notes · counts.notes_total)는 반려가 아니다 — 채택을 막지 않는다."""
+        ce = json.loads(json.dumps(_COPYEDIT_OK))
+        ce["cards"][0]["notes"] = [{"item": "같은 이름", "slot": "deep.key_violations", "evidence": "한 줄"}]
+        ce["counts"]["notes_total"] = 1
+        run = db.load_git_run("2026-07-13", read=_git_reader(
+            {"delta.json": _git_delta(), "copyedit.json": ce}))
+        self.assertTrue(run["adoptable"], run["reason"])
+
     def test_held_copyedit_not_adoptable_but_delta_kept_for_compare(self) -> None:
         run = db.load_git_run("2026-07-13", read=_git_reader(
             {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_HELD}))
@@ -1216,11 +1225,12 @@ class GitReturnMainTest(MainIntegrationTest):
         return json.dumps({"schema_version": "grm-web-card/v1", "brief": {"run_date_kst": run_date},
                            "cards": [{"id": i} for i in ids]}, ensure_ascii=False, indent=1) + "\n"
 
-    def _run_git(self, files):
+    def _run_git(self, files, rc_expected=0):
         self._git(files)
-        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])):
+        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])), \
+                redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
-        self.assertEqual(rc, 0)
+        self.assertEqual(rc, rc_expected)
         return self._read_outputs()
 
     def test_git_handoff_issue_freezes_the_checked_scaffold_verbatim(self) -> None:
@@ -1233,7 +1243,8 @@ class GitReturnMainTest(MainIntegrationTest):
 
     def test_git_handoff_issue_without_scaffold_is_not_published_from_git(self) -> None:
         g = dict(_git_delta("git"), handoff_ref=self._REF)
-        out = self._run_git({"delta.json": g, "copyedit.json": _COPYEDIT_OK})
+        # 교열은 완료인데 git 으로도 노션으로도 못 썼다 → 조용한 skip 대신 실패(11-23 사전 점검 B)
+        out = self._run_git({"delta.json": g, "copyedit.json": _COPYEDIT_OK}, rc_expected=1)
         self.assertEqual(out.get("wrote"), "false")              # 노션 예치도 없으므로 아무것도 안 씀
         self.assertFalse(pathlib.Path(self._DELTA).exists())
         self.assertFalse(pathlib.Path(self._SCAFFOLD).exists())
@@ -1245,7 +1256,7 @@ class GitReturnMainTest(MainIntegrationTest):
                     "{\"cards\": \"x\"}", "not json"):
             with self.subTest(bad=bad[:30]):
                 out = self._run_git({"delta.json": g, "copyedit.json": _COPYEDIT_OK,
-                                     "scaffold.json": bad})
+                                     "scaffold.json": bad}, rc_expected=1)
                 self.assertEqual(out.get("wrote"), "false")
                 self.assertFalse(pathlib.Path(self._DELTA).exists())
                 self.assertFalse(pathlib.Path(self._SCAFFOLD).exists())
@@ -1335,6 +1346,71 @@ class GitReturnMainTest(MainIntegrationTest):
                          .read_text(encoding="utf-8"))
         self.assertTrue(rep["report"]["identical"])
 
+    # ── 11-23 사전 점검 B: 교열 완료인데 아무 길로도 못 쓰면 실패 ───────────────────
+    def test_copyedit_done_but_unrecorded_fails_with_reason_in_summary(self) -> None:
+        g = _git_delta("git")
+        g["publish_date"] = "2026-07-06"                    # 검증 실패(날짜 불일치)
+        self._git({"delta.json": g, "copyedit.json": _COPYEDIT_OK})
+        err = io.StringIO()
+        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])), \
+                redirect_stdout(io.StringIO()), redirect_stderr(err):
+            rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 1)
+        self.assertEqual(self._read_outputs().get("wrote"), "false")
+        self.assertIn("git 반납 검증 실패", err.getvalue())
+        summary = pathlib.Path(self._summary).read_text(encoding="utf-8")
+        self.assertIn("교열 반납 미기록 (2026-07-13)", summary)
+        self.assertIn("publish_date=2026-07-06", summary)
+
+    def test_copyedit_done_with_bad_gate_also_fails(self) -> None:
+        bad = dict(_COPYEDIT_OK, code_gate={"ran": True, "exit": 1})
+        out = self._run_git({"delta.json": _git_delta("git"), "copyedit.json": bad}, rc_expected=1)
+        self.assertEqual(out.get("wrote"), "false")
+        self.assertIn("채택 안 함", pathlib.Path(self._summary).read_text(encoding="utf-8"))
+
+    def test_copyedit_held_keeps_the_clean_skip(self) -> None:
+        out = self._run_git({"delta.json": _git_delta("git"), "copyedit.json": _COPYEDIT_HELD})
+        self.assertEqual(out.get("wrote"), "false")
+
+    def test_copyedit_done_but_not_published_keeps_the_clean_skip(self) -> None:
+        g = _git_delta("git")
+        g["publish_date"] = "2026-07-06"
+        unpublished = dict(_COPYEDIT_OK, published=False)
+        out = self._run_git({"delta.json": g, "copyedit.json": unpublished})
+        self.assertEqual(out.get("wrote"), "false")
+
+    def test_no_git_return_keeps_the_clean_skip(self) -> None:
+        out = self._run_git({})
+        self.assertEqual(out.get("wrote"), "false")
+
+    def test_already_recorded_week_is_not_failed(self) -> None:
+        os.makedirs("web/data/deltas")
+        pathlib.Path(self._DELTA).write_bytes(db._dumps(_valid_delta()).encode("utf-8"))
+        g = _git_delta("git")
+        g["publish_date"] = "2026-07-06"
+        self._run_git({"delta.json": g, "copyedit.json": _COPYEDIT_OK})   # rc 0
+
+    def test_notion_fallback_still_writes_when_git_fails(self) -> None:
+        g = _git_delta("git")
+        g["publish_date"] = "2026-07-06"
+        self._git({"delta.json": g, "copyedit.json": _COPYEDIT_OK})
+        fake = _TypeAwareNotion([_delta_page("p1", "2026-07-13")],
+                                blocks={"p1": [_code_block(_git_delta("notion"))]})
+        with mock.patch.object(db, "notion_api_request", side_effect=fake):
+            rc = db.main(["--db", "dbid", "--source", "git", "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self._written()["cards"]["mfds-1"]["summary"], "notion")
+
+    def test_compare_only_keeps_old_behaviour_even_if_git_unrecordable(self) -> None:
+        g = _git_delta("git")
+        g["publish_date"] = "2026-07-06"
+        self._git({"delta.json": g, "copyedit.json": _COPYEDIT_OK})
+        with mock.patch.object(db, "notion_api_request", side_effect=_TypeAwareNotion([])), \
+                redirect_stdout(io.StringIO()):
+            rc = db.main(["--db", "dbid", "--source", "git", "--compare-only",
+                          "--publish-date", "2026-07-13"])
+        self.assertEqual(rc, 0)
+
     def test_compare_only_requires_date(self) -> None:
         with redirect_stderr(io.StringIO()):
             rc = db.main(["--db", "dbid", "--compare-only"])
@@ -1352,9 +1428,10 @@ class DeltaBridgeWorkflowGuardTest(unittest.TestCase):
     def test_default_source_is_notion(self) -> None:
         self.assertIn("|| vars.GRM_DELTA_SOURCE || 'notion' }}", self.text)
 
-    def test_consume_skipped_for_git_writes(self) -> None:
-        self.assertIn("steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source != 'git'",
-                      self.text)
+    def test_consume_step_removed_and_off_guard_first(self) -> None:
+        # [노션 은퇴 ③] 노션 CONSUMED 마감 단계는 지웠다 — 브릿지는 GRM_INTAKE_NOTION=off 에서만 기록한다.
+        self.assertNotIn("--consume", self.text)
+        self.assertLess(self.text.index("- name: 노션 off 확인"), self.text.index("- name: 델타 브릿지 실행"))
 
     def test_compare_dir_is_never_committed(self) -> None:
         adds = [ln for ln in self.text.splitlines() if ln.strip().startswith("git add")]

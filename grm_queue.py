@@ -39,7 +39,7 @@ from typing import Any, Callable, Iterable
 import requests
 
 import grm_findings as gf
-from grm_cli import normalize_supabase_url
+from grm_cli import BulkWriteError, BulkWriteRun, normalize_supabase_url
 from grm_common import SOURCE_FDA_483, env_flag, log, truncate
 from grm_taxonomy import is_out_of_scope_483
 
@@ -86,6 +86,27 @@ def past_publish_freeze(generated_at: Any) -> bool:
     """이 실행 시각이 발행 요일 동결 시각(07:00 KST)을 지났나. 시각을 못 읽으면 지난 것으로 본다(안전한 쪽)."""
     kst = to_kst(generated_at)
     return kst is None or kst.hour >= PUBLISH_DAY_FREEZE_HOUR_KST
+
+
+def past_publish_freeze_at_write(handoff_date: str, now: "datetime | None" = None) -> bool:
+    """**쓰기 직전의 실제 시각**이 그 handoff 날짜의 동결 시각(07:00 KST)을 지났나.
+
+    `generated_at` 은 수집 실행의 **시작** 시각이다. 06:4x 에 시작해 07:0x 에 끝나는 실행은 시작 시각으로만 보면
+    동결 전이라 handoff 를 다시 쓰고, 데스크가 07:20 에 읽은 사본의 지문이 바뀐다(→ 보류 → 백업 발행).
+    노션 길(`grm_handoff.publish_day_handoff_frozen`)과 같은 산식: 같은 날 07:00 이후 또는 다음 날(자정을 넘긴 실행)이면 동결.
+    `now` 는 시험용(기본 = 지금). naive 는 KST 로 본다. 날짜를 못 읽으면 False(시작 시각 판정에 맡긴다).
+    """
+    try:
+        day = date.fromisoformat(str(handoff_date)[:10])
+    except ValueError:
+        return False
+    now_k = to_kst(now if now is not None else datetime.now(KST))
+    if now_k is None:
+        return True
+    days = (now_k.date() - day).days
+    if days == 1:
+        return True
+    return days == 0 and now_k.hour >= PUBLISH_DAY_FREEZE_HOUR_KST
 
 
 def is_publish_day(handoff_date: str) -> bool:
@@ -716,11 +737,18 @@ class QueueStore:
     def enqueue(self, rows: list[dict[str, Any]]) -> int:
         """대기열에 넣는다(이미 있으면 그대로 둔다). 반환 = 새로 들어간 행 수."""
         inserted = 0
-        for i in range(0, len(rows), _KEY_CHUNK):
+
+        def send(batch, _offset):
+            nonlocal inserted
             got = self._call("POST", "intake_queue", params={"on_conflict": "source,document_id"},
-                             body=rows[i:i + _KEY_CHUNK],
+                             body=batch,
                              prefer="resolution=ignore-duplicates,return=representation")
             inserted += len(got) if isinstance(got, list) else 0
+
+        try:
+            BulkWriteRun().write(rows, send, batch_size=_KEY_CHUNK)
+        except BulkWriteError as exc:
+            raise QueueStoreError(str(exc)) from None
         return inserted
 
     def open_candidates(self, start: str, end: str) -> list[dict[str, Any]]:
@@ -1123,7 +1151,7 @@ def build_db_handoff(store: QueueStore, run_date: date, window_days: int,
 
 
 def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
-                   generated_at: datetime) -> dict[str, Any]:
+                   generated_at: datetime, *, freeze_now: "datetime | None" = None) -> dict[str, Any]:
     """오늘 handoff 를 표에 남기고(open), 이전 open 을 stale 로 닫는다.
 
     **이미 닫힌 날짜는 다시 쓰지 않는다(동결).** 월요일 델타가 main 에 들어와 consumed 가 된 뒤
@@ -1137,7 +1165,11 @@ def record_handoff(store: QueueStore, payload: dict[str, Any], window_days: int,
     if existing is not None and existing.get("status") != HANDOFF_OPEN:
         return {"staled": 0, "frozen": str(existing.get("status") or "")}
     if (existing is not None and is_publish_day(handoff_date)
-            and past_publish_freeze(generated_at) and not handoff_refresh_requested()):
+            and (past_publish_freeze(generated_at)
+                 or past_publish_freeze_at_write(handoff_date, freeze_now))
+            and not handoff_refresh_requested()):
+        # 판정 시각은 **지금(쓰기 직전)** 이다 — 실행 시작 시각(generated_at)만 보면 06:4x 시작·07:0x 종료 실행이
+        # 동결 뒤에 다시 쓴다(2026-11-20 감사). 시작 시각이 이미 07:00 뒤면 그것으로도 동결(종전 그대로).
         # 발행 요일(월)의 handoff 는 **07:00 KST 부터 동결**된다. 편집팀은 07:20 부터 이 기록의 사본을 읽고 일한다.
         # 그 뒤 같은 날 수집을 다시 돌려 행 목록을 바꾸면, 편집팀이 못 본 행이 그 호의 '미채택'으로 닫힌다.
         # 재실행의 새 행은 대기열에 new 로 남아 화요일 handoff 에 들어간다.
@@ -1208,7 +1240,8 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
                silent_sources: Iterable[str] = (), repo_root: str = ".",
                out_dir: "str | None" = None, store: "QueueStore | None" = None,
                canonical: bool = False,
-               canonical_web_brief_dir: "str | None" = None) -> dict[str, Any]:
+               canonical_web_brief_dir: "str | None" = None,
+               freeze_now: "datetime | None" = None) -> dict[str, Any]:
     """그림자 한 바퀴: 넣기 → 상태 다시 계산 → DB handoff → 노션 것과 비교 → 파일로 남기기.
 
     `notion_status_lookup(handoff_date, keys)` 를 주면 최근 consumed 호의 계산 상태를 노션 Status 와
@@ -1277,7 +1310,7 @@ def run_shadow(supabase: tuple[str, str], *, run_date: date, generated_at: datet
                 (run_date - timedelta(days=RECONCILE_LOOKBACK_DAYS)).isoformat())
                 if h.get("status") == HANDOFF_OPEN
                 and str(h.get("handoff_date") or "") != run_date.isoformat()]
-        recorded = record_handoff(store, payload, window_days, generated_at)
+        recorded = record_handoff(store, payload, window_days, generated_at, freeze_now=freeze_now)
         report["staled"] = recorded["staled"]
         report["handoff_frozen"] = recorded["frozen"]
         _write(os.path.join(out_dir, handoff_file_name(run_date, recorded["frozen"])),
@@ -1506,7 +1539,6 @@ def backfill_history(store: Any, token: str, db_id: str, *, end: date, days: int
 STATE_TO_NOTION_STATUS = {
     STATE_PROCESSED: "Processed", STATE_SKIPPED: "Skipped", STATE_ERROR: "Error",
 }
-NOTION_SYNC_ENV = "ENABLE_QUEUE_NOTION_STATUS_SYNC"
 
 
 def plan_notion_sync(states: dict[str, dict[str, str]], closed_keys: Iterable[str],
@@ -1751,8 +1783,10 @@ def main(argv: "list[str] | None" = None) -> int:
                 print("NOTION_TOKEN·노션 DB id 가 필요하다", file=sys.stderr)
                 return 1
             apply = bool(args.apply)
-            if apply and not (args.force or env_flag("ENABLE_QUEUE_NOTION_STATUS_SYNC")):
-                print(f"{NOTION_SYNC_ENV} 가 꺼져 있어 쓰지 않는다(계획만)", file=sys.stderr)
+            if apply and not args.force:
+                # [노션 은퇴 ③] 워크플로 단계와 변수 ENABLE_QUEUE_NOTION_STATUS_SYNC 는 지웠다 — 노션을 되돌려
+                #   켰을 때 사람이 손으로만 돌린다(--apply --force).
+                print("노션 행 Status 기록은 수동 전용이다 — --force 없이는 쓰지 않는다(계획만)", file=sys.stderr)
                 apply = False
             out = notion_sync(store, token, db_id, args.date, args.repo_root,
                               apply=apply, force=bool(args.force))

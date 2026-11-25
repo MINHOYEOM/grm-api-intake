@@ -1397,6 +1397,7 @@ def _forced_full_ocr(data: bytes, text: str, status: str, max_chars: int) -> tup
     if is_ocr_engine_unavailable(full_status):
         full_text, full_status = _ocr_483_pdf_text_uncounted(data, max_chars, force_all=True)
     full_text = normalize_pdf_ligatures(full_text)
+    _LAST_FORCED_READ.update(text=full_text, status=full_status, adopted=False)
     if not full_text.strip():
         return text, status
     old_n = len(_extract_483_observations_from_text(text)) if text else 0
@@ -1404,7 +1405,22 @@ def _forced_full_ocr(data: bytes, text: str, status: str, max_chars: int) -> tup
         return text, status
     _record_ocr_outcome(full_status)
     _OCR_HEALTH["reocr_adopted"] += 1
+    _LAST_FORCED_READ["adopted"] = True
     return full_text, full_status
+
+
+# [11-26] 마지막 강제 판독 결과 — 채택되지 않아도 사람 확인 자료로 남기기 위해 진단 덤프(dump_texts)가 읽는다.
+# 수집·회수의 산출에는 쓰이지 않는다(읽기 전용 진단 상태). 191183: 강제 판독이 버려져 덤프에 글자층만 남았다.
+_LAST_FORCED_READ: dict[str, Any] = {"text": "", "status": "", "adopted": False}
+
+
+def reset_last_forced_read() -> None:
+    _LAST_FORCED_READ.update(text="", status="", adopted=False)
+
+
+def last_forced_read() -> dict[str, Any]:
+    """직전 `_forced_full_ocr` 의 판독 전문·상태·채택 여부(없으면 text="")."""
+    return dict(_LAST_FORCED_READ)
 
 
 # tesseract CLI(fast)는 단어 끝 `l` 을 `!` 로 읽는 일이 잦다 — "quality contro! unit",

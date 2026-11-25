@@ -10,8 +10,17 @@
     "finding_id": "finding-0b0c1035bdcdabfbe07725d3",
     "document_id": "fda483-189485",
     "source": "https://www.fda.gov/media/189485/download",
-    "reason": "깨진 글자층 스캔 — force_ocr dry 로 먼저 다시 판독하고, 그래도 깨지면 사람이 PDF 로 확인.",
-    "status": "todo"
+    "reason": "깨진 글자층 스캔. force_ocr dry(run 45624873621)는 문장을 살렸으나 글자층의 RABS 구절을 잃고 가림 자리를 빈칸으로 빼 영문 교체 부적합 → 사람 확인 국문.",
+    "status": "review",
+    "page": "6 of 13 (Observation 4)",
+    "draft_basis": "운영 detail_text(글자층) + force_ocr 판독(run 45624873621) 맞대기. 가림 자리는 [redacted], 두 판 모두 깨진 구절은 [판독 불확실].",
+    "draft_ko": "구체적으로, A. 실사관은 [redacted] 충전 라인에서 [redacted] 제품 배치 #[redacted]([redacted] 2025) 및 [redacted] 배치 #[redacted]([redacted] 2025) 제조를 위한 무균 설치·충전 작업을 관찰하면서 다음과 같은 무균 공정 결함을 확인했다. i. [redacted] 중 [redacted] 장치의 [redacted] 부분이 [redacted] 위의 일차 공기(first air)를 방해했다. 이어서 접근 제한 장벽 시스템(RABS) 안의 [redacted] [판독 불확실: 층류(laminar flow) 장치 관련 구절]. ii. 충전·마개 장착 작업대 설치 중 작업자가 [redacted] 수집 호스와 [redacted] 등 보호되지 않은 무균 부품을 장갑 낀 손으로 다루는 것이 관찰되었다. 이 부품들은 충전·마개 장착 공정 중 노출된 [redacted]와 제품 바로 위에 위치한다. iii. [redacted] 튜브 설치 중 작업자의 장갑 낀 손과 비무균 [redacted]이 노출된 튜브 위의 일차 공기를 방해했다. B. 귀사의 [redacted] 육안 검사 프로그램은 귀사 시설에서 제조한 완제품이 표방하는 품질 특성을 갖추었음을 충분히 보증하지 못한다. 구체적으로, [redacted] 안에 이물이나 입자가 든 [redacted]는 용기 완전성을 손상시키고 무균 제품의 미생물 오염 위험을 만들 수 있는데도 치명 결함(critical defect)으로 분류되지 않는다.",
+    "check_points": [
+      "A 첫 문장: 충전 라인 이름·제품명·배치 번호·날짜가 가림인지(글자층·강제 판독 모두 판독 불가)",
+      "A.i 둘째 문장: RABS 안 [redacted] 층류(laminar flow) 장치 구절 — 강제 판독에서 통째로 빠짐",
+      "B: '[redacted] 육안 검사 프로그램'의 가림 위치"
+    ],
+    "data_issue": "운영 detail_text 가 쪽 경계(6쪽 끝)에서 끊겨 같은 관찰의 C 항(무균 작업자 적격성 — 배지충전 중 모든 중요 개입 수행 요구 없음)이 빠져 있다. 초안은 운영 영문 범위(A·B)만 옮겼다. C 복원은 483 상세 추출 쪽 일감."
   },
   {
     "finding_id": "finding-6f0a83c4708369e5e72bd97e",

@@ -752,6 +752,56 @@ def decide_freshness(latest_publish_date: "str | None", as_of: _date,
         f"브리프 {latest_publish_date} 캠페인 {campaign.get('id')} 상태={status!r} — 발송 확인")
 
 
+# ── 발행 머지 기준 유예(2026-11-25) ───────────────────────────────────────────
+# 11-23 은 발행 PR 머지(01:17Z) 뒤 workflow_run 발송이 skipped 됐는데, 이 감시의 첫 검사가
+# 월 20:13 KST 라 그사이 아무도 몰랐다(대표가 15:11 KST 에 손으로 보냈다). 이제 월요일 낮에도
+# 매시간 검사하되, 기준을 "발행 PR 이 머지된 시각 + N시간"으로 둔다 — 머지 직후 발송이 도는
+# 중인 정상 상황을 미발송으로 부르지 않게. 판정은 decide_freshness 결과 위에 얹는 순수 함수다.
+DEFAULT_PUBLISH_GRACE_HOURS = 2.0
+# 머지 시각을 모를 때(발행 PR 조회 실패 등)·이번 주 호가 아직 없을 때는 예전 첫 검사 시각
+# (월 20시 KST) 전까지 경보하지 않는다 — 월요일 낮 매시간 검사가 오경보를 내지 않게.
+DEFAULT_QUIET_UNTIL_KST_HOUR = 20
+
+
+def _parse_utc(value: "str | None") -> "_datetime | None":
+    if not value or not str(value).strip():
+        return None
+    v = str(value).strip().replace("Z", "+00:00")
+    try:
+        d = _datetime.fromisoformat(v)
+    except ValueError:
+        return None
+    return d if d.tzinfo else d.replace(tzinfo=_timezone.utc)
+
+
+def apply_publish_grace(verdict: str, reason: str, *, merged_at: "_datetime | None",
+                        now: "_datetime | None",
+                        grace_hours: float = DEFAULT_PUBLISH_GRACE_HOURS,
+                        quiet_until_kst_hour: int = DEFAULT_QUIET_UNTIL_KST_HOUR,
+                        ) -> "tuple[str, str]":
+    """decide_freshness 결과를 머지 시각 기준으로 조정. 'pending' = 아직 경보할 때가 아님.
+
+    now 가 None(과거 재현 `--as-of`)이면 손대지 않는다 — 예전 판정 그대로.
+    not-sent: 머지 시각을 알면 머지 후 grace_hours 안에는 pending, 지나면 not-sent.
+              모르면 월요일 quiet_until_kst_hour 시 전엔 pending.
+    brief-missing: 월요일 quiet_until_kst_hour 시 전엔 pending(발행 전 오전·오후 검사).
+    """
+    if now is None or verdict not in ("not-sent", "brief-missing"):
+        return verdict, reason
+    now_kst = now.astimezone(KST)
+    early_monday = now_kst.weekday() == 0 and now_kst.hour < quiet_until_kst_hour
+    if verdict == "not-sent" and merged_at is not None:
+        elapsed_h = (now - merged_at).total_seconds() / 3600.0
+        if elapsed_h < grace_hours:
+            return "pending", (f"{reason} — 발행 머지 {elapsed_h:.1f}시간 전, 유예 {grace_hours:g}시간 "
+                               f"안(발송 진행 중일 수 있음)")
+        return verdict, f"{reason} — 발행 머지 후 {elapsed_h:.1f}시간 지남(유예 {grace_hours:g}시간)"
+    if early_monday:
+        return "pending", (f"{reason} — 월요일 {quiet_until_kst_hour}시(KST) 전"
+                           f"{'·머지 시각 모름' if verdict == 'not-sent' else ''} — 아직 경보하지 않음")
+    return verdict, reason
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 def _env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
@@ -790,6 +840,12 @@ def main(argv: "list[str] | None" = None) -> int:
     ap.add_argument("--no-linkcheck", action="store_true", help="링크체크 게이트 건너뜀(오프라인 검증)")
     ap.add_argument("--as-of", default="", help="freshness 모드 전용 — KST 기준 검사일(YYYY-MM-DD). 비우면 오늘")
     ap.add_argument("--output", type=Path, default=None, help="freshness 모드 전용 — 판정 리포트 JSON 저장 경로")
+    ap.add_argument("--merged-at", default="",
+                    help="freshness 모드 전용 — 최신 호 발행 PR 머지 시각(ISO, UTC). 머지 후 유예 판정에 쓴다")
+    ap.add_argument("--grace-hours", type=float, default=DEFAULT_PUBLISH_GRACE_HOURS,
+                    help="freshness 모드 전용 — 발행 머지 후 이 시간 안엔 미발송을 경보하지 않음")
+    ap.add_argument("--now", default="",
+                    help="freshness 모드 전용 — 현재 시각(ISO) 재현용. 비우면 지금(--as-of 를 주면 유예 미적용)")
     args = ap.parse_args(argv)
 
     # 스케줄 해석 보조 — 최신 발행일만 결정론으로 출력(게이트·로딩·네트워크 0).
@@ -826,17 +882,25 @@ def main(argv: "list[str] | None" = None) -> int:
                     verdict, reason = decide_freshness(latest, as_of, campaign)
                     campaign_status = campaign.get("status") if campaign else None
 
+        # 머지 기준 유예 — 실시간 검사에만(과거 재현 --as-of 는 예전 판정 그대로).
+        now = _parse_utc(args.now) if args.now else (None if args.as_of else _datetime.now(_timezone.utc))
+        merged_at = _parse_utc(args.merged_at)
+        verdict, reason = apply_publish_grace(verdict, reason, merged_at=merged_at, now=now,
+                                              grace_hours=args.grace_hours)
+
         report = {
             "verdict": verdict, "reason": reason, "as_of": as_of.isoformat(),
             "latest_publish_date": latest, "campaign_name": campaign_name,
             "campaign_status": campaign_status,
+            "merged_at": merged_at.isoformat() if merged_at else None,
             "checked_at_kst": _datetime.now(KST).isoformat(timespec="seconds"),
         }
         print(f"뉴스레터 신선도: {verdict} — {reason}")
         if args.output is not None:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
-        return 0 if verdict == "ok" else (2 if verdict == "api-error" else 1)
+        # 0=발송 확인 · 1=미발송/미발행(경보) · 2=조회 실패(경보 아님) · 3=유예 중(경보 아님)
+        return {"ok": 0, "api-error": 2, "pending": 3}.get(verdict, 1)
 
     if not args.publish_date:
         ap.error("--publish-date 필요(latest-date·freshness 모드 제외)")

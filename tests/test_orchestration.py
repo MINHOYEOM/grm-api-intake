@@ -813,5 +813,41 @@ class PublicFeedSourceErrorReportingTest(unittest.TestCase):
         self.assertEqual([c for c in _codes(h.warnings) if c.startswith("source-error:")], [])
 
 
+class AdminPageOrderTest(unittest.TestCase):
+    """정렬 방향 판정(#9) — 추가 요청 없이 이미 받은 쪽의 처분일로 한 번 확인한다."""
+
+    def test_newest_first(self):
+        self.assertEqual(mfds_admin.judge_page_order(
+            [("2026-11-21", "2026-11-01"), ("2026-10-30", "2024-01-05")]), "newest-first")
+
+    def test_oldest_first(self):
+        self.assertEqual(mfds_admin.judge_page_order(
+            [("2019-01-02", "2019-03-01"), ("2026-10-30", "2026-11-21")]), "oldest-first")
+
+    def test_unknown_when_no_dates_or_equal(self):
+        self.assertEqual(mfds_admin.judge_page_order([]), "unknown")
+        self.assertEqual(mfds_admin.judge_page_order([("", "")]), "unknown")
+        self.assertEqual(mfds_admin.judge_page_order([("2026-11-21", "2026-11-21")]), "unknown")
+
+    def test_collector_logs_order_and_warns_only_when_oldest_first(self):
+        day = date(2026, 11, 22)
+        for items, expect_warn, verdict in (
+            ([{"LAST_SETTLE_DATE": "20261121"}, {"LAST_SETTLE_DATE": "20261101"}], False, "newest-first"),
+            ([{"LAST_SETTLE_DATE": "20261101"}, {"LAST_SETTLE_DATE": "20261121"}], True, "oldest-first"),
+        ):
+            with self.subTest(verdict=verdict):
+                response = {"header": {"resultCode": "00"},
+                            "body": {"totalCount": 2, "numOfRows": 2, "items": {"item": items}}}
+                with (
+                    patch.object(mfds_admin, "http_get_json", return_value=response),
+                    patch.object(mfds_admin, "log") as log,
+                    patch.object(mfds_admin, "LAST_HEALTH", {}),
+                ):
+                    mfds_admin.collect_mfds_admin_actions(day, day, "dummy")
+                    self.assertEqual(mfds_admin.LAST_HEALTH["order_check"], verdict)
+                warns = [c for c in log.call_args_list if c.args[0] == "WARN"]
+                self.assertEqual(bool(warns), expect_warn)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T15:35:55Z",
+ "generated_at": "2026-11-25T16:13:58Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45645271415,
+    "databaseId": 45651462075,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-25T16:09:43Z",
+    "updatedAt": "2026-11-25T16:09:47Z",
+    "headBranch": "claude/llms-clause-rows-1126",
+    "displayTitle": "feat(seo): llms.txt 에 조항 원문·실사 대비 노트 — 빙·AI 검색이 닿는 면을 알린다",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45651462075"
+   },
+   {
+    "databaseId": 45651452406,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-25T16:09:38Z",
+    "updatedAt": "2026-11-25T16:09:42Z",
+    "headBranch": "claude/home-keypoint-spacing-1126",
+    "displayTitle": "fix(홈): '이번 주 핵심' 가운뎃점 묶음을 낱말 단위로 — 글자 사이 태그 경계 제거",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45651452406"
+   },
+   {
+    "databaseId": 45650914992,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T15:26:54Z",
-    "updatedAt": "2026-11-25T15:35:17Z",
+    "createdAt": "2026-11-25T16:05:11Z",
+    "updatedAt": "2026-11-25T16:13:27Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1836 from MINHOYEOM/claude/google-quality-stage2-…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45645271415"
+    "displayTitle": "Merge pull request #1841 from MINHOYEOM/claude/google-quality-stage2-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45650914992"
    },
    {
-    "databaseId": 45644235256,
+    "databaseId": 45649526078,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T15:21:28Z",
-    "updatedAt": "2026-11-25T15:28:50Z",
-    "headBranch": "codex/mhra-body-refetch",
-    "displayTitle": "main 병합: §5.1 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45644235256"
+    "createdAt": "2026-11-25T15:53:53Z",
+    "updatedAt": "2026-11-25T16:04:12Z",
+    "headBranch": "codex/firm-pages-weekly-fix",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/firm-pages-week…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45649526078"
    },
    {
-    "databaseId": 45644202744,
+    "databaseId": 45649514860,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T15:21:17Z",
-    "updatedAt": "2026-11-25T15:30:16Z",
-    "headBranch": "codex/ema-relevance-apply",
-    "displayTitle": "main 병합: §5.1 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45644202744"
-   },
-   {
-    "databaseId": 45641997547,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T15:09:41Z",
-    "updatedAt": "2026-11-25T15:17:01Z",
-    "headBranch": "codex/automation-pr-stall",
-    "displayTitle": "main 병합: §5.1 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45641997547"
-   },
-   {
-    "databaseId": 45641851451,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T15:08:52Z",
-    "updatedAt": "2026-11-25T15:17:27Z",
-    "headBranch": "codex/483-fulltext-gap-alarm",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/483-fulltext-ga…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45641851451"
+    "createdAt": "2026-11-25T15:53:47Z",
+    "updatedAt": "2026-11-25T16:01:46Z",
+    "headBranch": "codex/483-dump-pdf",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/483-dump-pdf",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45649514860"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45651913678,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T16:13:32Z",
+    "updatedAt": "2026-11-25T16:13:48Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45651913678"
+   },
+   {
     "databaseId": 45646869838,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612451891"
-   },
-   {
-    "databaseId": 45594486522,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T10:23:15Z",
-    "updatedAt": "2026-11-25T10:23:16Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45594486522"
    }
   ],
   "grm-findings-translate-apply.yml": [

@@ -108,7 +108,9 @@ def stored_names(row: dict[str, Any]) -> list[str]:
             value = json.loads(value)
         except ValueError:
             value = []
-    return [str(n).strip() for n in value if str(n).strip()] if isinstance(value, list) else []
+    if not isinstance(value, list):
+        return []
+    return [str(n).strip() for n in value if n is not None and str(n).strip()]
 
 
 def _status(row: dict[str, Any]) -> str:

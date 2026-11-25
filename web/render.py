@@ -6754,8 +6754,18 @@ def _make_env(lang: str = DEFAULT_LANG,
     env.filters["gmp_operations"] = split_gmp_operations
     # [다국어 2단계] 템플릿 전역 `_("…")` — 문구 사전. 한국어는 항등(Markup 으로 그대로),
     # 영어는 카탈로그 결손 시 즉시 실패. 슬롯 `{name}` 값은 escape 된다.
-    env.globals["_"] = (translator or Translator(lang)).template_gettext()
+    tr = translator or Translator(lang)
+    env.globals["_"] = tr.template_gettext()
+    # [구독 권유 정리 2026-11-26] 구독 칸·하단 밴드·팝업이 말하는 기관 목록은 여기 한 곳에서만
+    # 정한다. 곳마다 따로 적다가 "FDA·EU·영국·WHO·캐나다·식약처"·"FDA·EMA·PIC/S·식약처"·
+    # "FDA·EU·식약처"가 한 화면에 섞였다. 템플릿은 {{ sub_agencies }}·{{ sub_agency_n }} 만 쓴다
+    # (tests/test_subscribe_prompts.py 가 템플릿에 기관 목록을 손으로 적으면 실패한다).
+    env.globals["sub_agencies"] = Markup(_escape(tr("FDA·EU·영국·WHO·캐나다·식약처")))
+    env.globals["sub_agency_n"] = len(SUBSCRIBE_AGENCIES)
     return env
+
+
+SUBSCRIBE_AGENCIES = ("FDA", "EU", "영국", "WHO", "캐나다", "식약처")
 
 
 def _write(path: Path, text: str) -> None:

@@ -42,11 +42,13 @@ import sys
 import time
 from typing import Any
 
+from grm_http_policy import FDA_PUBLISHED_SOURCE_CHECK_DELAY_SECONDS
+
 BRIEF_GLOB = os.path.join("web", "data", "briefs", "brief_web_*.json")
 DELTA_GLOB = os.path.join("web", "data", "deltas", "delta_*.json")
 
 # 요청 간 간격(초). 소스 서버에 부담을 주지 않기 위한 최소 예의 — 주 1회·수십 건 규모다.
-REQUEST_DELAY = 0.5
+REQUEST_DELAY = FDA_PUBLISHED_SOURCE_CHECK_DELAY_SECONDS
 
 
 def _published_state(weeks: int) -> "tuple[dict[str, dict[str, Any]], list[str]]":
@@ -160,12 +162,15 @@ def _is_out_of_scope_483(est: str, text: str) -> bool:
 def _found_wl(url: str) -> "tuple[int, str]":
     import collect_intake as ci
     import requests
+    from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, fda_checked_request
     if not url:
         return 0, "no-url"
     try:
-        resp = requests.get(url, timeout=25, headers={
+        resp = fda_checked_request(requests.get, url, timeout=25, headers={
             "User-Agent": "GRM-SourceVerify/1.0 (+github-actions)", "Accept": "text/html"})
         resp.raise_for_status()
+    except FdaBotBlockError:
+        return 0, FDA_BOT_BLOCK
     except Exception as e:                                    # noqa: BLE001 — 네트워크는 graceful
         return 0, f"fetch-fail:{type(e).__name__}"
     full = ci._extract_wl_body_full(resp.text)

@@ -340,15 +340,8 @@ class BackboneChainTest(unittest.TestCase):
             rows, count, degraded = f._fetch_html_rows(START)
         return rows, count, degraded, calls
 
-    def test_apology_redirect_exception_sets_bot_blocked_flag(self):
-        exc = RuntimeError("404 Client Error for url: https://www.fda.gov/apology_objects/abuse-detection-apology.html")
-        self._run(html_exc=exc, json_exc=RuntimeError("HTTP 404"))
-        self.assertTrue(f._LAST_BOT_BLOCKED)
-        self._run(html_exc=RuntimeError("read timed out"), json_exc=RuntimeError("HTTP 404"))
-        self.assertFalse(f._LAST_BOT_BLOCKED)
-
-    def test_akamai_blocked_html_falls_back_to_full_json(self):
-        # 봇차단 apology 200(설정·표 없음) → 전수 JSON 백본이 전수 수집(EIR 은 제외).
+    def test_html_without_table_falls_back_to_full_json(self):
+        # 설정·표 없는 HTML → 전수 JSON 백본이 전수 수집(EIR 은 제외).
         rows, count, degraded, calls = self._run(
             html=_APOLOGY_HTML,
             json_data=[_json_row(9001), _json_row(9002, EIR_TYPE), _json_row(9003)])
@@ -1997,14 +1990,15 @@ class InspectorExtractionTest(unittest.TestCase):
     def test_space_before_comma_is_tolerated(self):
         # [2026-07-30 프로덕션 실측] 스캔 OCR 이 쉼표를 이름에서 한 칸 떼어놓는 변형이
         # 38문서 존재한다(정상 쉼표 421문서 대비 ~9%). Catalent 실측 원문 기준.
-        # ★같은 블록의 "Joohi Castelvetere , Investigat or" 는 **직함 자체가 OCR 로 깨져**
-        #  ("Investigat or") 여전히 누락되는 게 정답이다 — 정밀도 우선 계약상 추측 복원은
-        #  하지 않는다. 이 테스트는 그 경계를 함께 고정한다.
+        # [2026-11-23 경계 변경] 같은 블록의 "Joohi Castelvetere , Investigat or" 는 직함이
+        #  OCR 로 깨졌지만(`Investigat or`·`I nvest igat o r`) 이제 받는다 — 직함은 서명란 문맥
+        #  확인에만 쓰이고 저장되지 않으며, 저장되는 이름은 원문에 글자 그대로 있다(추측 복원 아님).
+        #  저장 전문 163행 실측에서 `Megan T Ziegler, I nvestigat or` 꼴이 이 때문에 빈칸이었다.
         text = ("EM\"'-OYEE(S) SIGNATURE SEE Joohi Castelvetere , Investigat or 04/24/2026 "
                 "REVERSE OF Robert J Ham, Investigator THIS PAGE "
                 "Brandy N LePage , Investigator FORM FDA 413")
         self.assertEqual(f._extract_483_inspectors(text),
-                         ["Robert J Ham", "Brandy N LePage"])
+                         ["Joohi Castelvetere", "Robert J Ham", "Brandy N LePage"])
 
     def test_space_before_comma_does_not_admit_form_vocab(self):
         # 공백-쉼표 허용이 양식 어휘를 이름으로 승격시키지 않는지(오탐 회귀 가드).

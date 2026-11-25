@@ -25,8 +25,10 @@
 {% if showcase and showcase.examples %}
     <p class="home-eg"><span>{{ _("예시") }}</span>{% for ex in showcase.examples %}<a href="{{ rel_root }}search/index.html?q={{ ex | urlencode }}">{{ ex }}</a>{% endfor %}</p>
 {% endif %}
-{#- [구독 유입 2026-11-17] 첫 화면 소개·검색 아래 줄형 구독 칸(두 언어) — newsletter 게이트 안(env-off 출력 0). -#}
-{%- with sub_kind='home', sub_slot='top' %}{% include "partials/sub_inline.html" %}{% endwith %}
+{#- [구독 유입 2026-11-17 → 홈 구독 밴드 2026-11-24] 첫 화면 소개·검색 바로 아래 색 면 구독 밴드(두 언어) — 줄형 칸과 같은
+    부분 템플릿·같은 폼·같은 자리 키(top)라 홈의 inline_top_submit = 이 밴드다. newsletter 게이트 안(env-off 출력 0).
+    test_home_subscribe_band_* 가 국·영 홈에서 이 밴드가 빠지면 실패한다. -#}
+{%- with sub_kind='home', sub_slot='top', sub_band=True %}{% include "partials/sub_inline.html" %}{% endwith %}
 {#- [4-A 2026-11-15] 누적 건수 줄(문서·지적·기준일)은 홈에서 뺐다 — 주 1회 스냅샷이라 기준일이
     늘 며칠 낡아 보인다(대표 결정). 같은 수는 찾아보기·지적 검색 화면에 그대로 있다. #}
   </section>

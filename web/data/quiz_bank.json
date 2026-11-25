@@ -2485,5 +2485,101 @@
       "Continuing checks on the particle and microbial condition of cleanrooms and clean air equipment, at defined locations and frequencies"
     ],
     "explanation_en": "The sterility test checks by the pharmacopoeial method whether viable microorganisms are detected in a sample (EU GMP Annex 1 §§10.4–10.7; 21 CFR 211.167(a)). The others describe bioburden, the aseptic process simulation (media fill), and environmental monitoring."
+  },
+  {
+    "id": "q-202648-01",
+    "question_ko": "Qilu Pharmaceutical (Hainan)에 발행된 FDA 483(관찰 7건) 중 배양을 마친 배지충전 바이알의 판독 방식에 대한 지적은?",
+    "choices": [
+      "바이알 충전 라인 스모크 스터디에서 난류와 연기 상승이 보였고 마개 공정·환경 모니터링 검체 채취가 스터디에 빠짐",
+      "이상사례 보고 28건 중 21건을 환자 식별 정보 부족을 이유로 무효 보고로 종결함",
+      "바이알을 하나씩 들지 않고 트레이째 판독해 바이알마다 미생물 증식을 확인했다는 보증이 없음",
+      "불순물 값이 평소보다 높은 원료의약품 로트로 만든 완제품을 유효기간 끝까지 규격 이내라는 근거 없이 출하 승인함"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "FDA는 배양을 마친 배지충전 바이알을 하나씩 들지 않고 트레이째 판독해, 바이알마다 미생물 증식을 확인했다는 보증이 없다고 지적했습니다(관찰 2). 나머지는 같은 483의 스모크 스터디(관찰 1)·불순물 규격 근거(관찰 4)·이상사례 검토(관찰 6) 지적입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-11-23/#fda483-196409",
+    "difficulty": "normal",
+    "week": "202648",
+    "question_en": "Among the seven observations on the FDA Form 483 issued to Qilu Pharmaceutical (Hainan) Co., Ltd., which one concerns how incubated media-fill vials were read?",
+    "choices_en": [
+      "In the smoke study of the vial filling line, turbulence and rising smoke were seen, and the stoppering process and environmental monitoring sampling were left out of the study",
+      "21 of 28 adverse event reports were closed as invalid for lack of patient identification information",
+      "Vials were read tray by tray without lifting each one, so there is no assurance that each vial was checked for microbial growth",
+      "Finished product made from drug substance lots with higher-than-usual impurity values was approved for release without a scientific basis that it stays within specification through expiry"
+    ],
+    "explanation_en": "FDA cited that incubated media-fill vials were read tray by tray rather than one by one, so there is no assurance that each vial was checked for microbial growth (Observation 2). The others are the same 483's smoke study (Observation 1), impurity specification basis (Observation 4), and adverse event review (Observation 6) findings."
+  },
+  {
+    "id": "q-202648-02",
+    "question_ko": "Element Materials Technology Boston - Acton Inc.에 발행된 FDA 483(관찰 4건) 중 오염 사건의 조사 방식에 대한 지적은?",
+    "choices": [
+      "무균시험 음성 대조에서 곰팡이가 자란 건의 조사를 시험자 실수로 결론 내고 환경 모니터링으로 오염원을 찾지 않음",
+      "무균시험실 공조설비 예방정비 뒤 재인증 요건이 없어 2025-04-10 정비 뒤 재인증하지 않음",
+      "ISO-5 생물안전작업대 표면 시료의 조치 기준이 위험평가와 다르고 과학적 근거가 없음",
+      "생물안전작업대 앞 그릴의 정체 모를 흰 잔류물과 갈색으로 변색된 천장 타일 2장"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "FDA는 무균시험 음성 대조에서 곰팡이가 자란 건의 조사를 시험자 실수로 결론 내고 환경 모니터링으로 오염원을 찾지 않았다고 지적했습니다(관찰 4). 나머지는 같은 483의 재인증(관찰 1)·조치 기준(관찰 2)·시설 유지(관찰 3) 지적입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-11-23/#fda483-196380",
+    "difficulty": "normal",
+    "week": "202648",
+    "question_en": "Among the four observations on the FDA Form 483 issued to Element Materials Technology Boston - Acton Inc., which one concerns how a contamination event was investigated?",
+    "choices_en": [
+      "The investigation of mold growth in a sterility test negative control was concluded to be analyst error, and environmental monitoring was not used to find the source of contamination",
+      "There was no requirement to recertify the sterility test suite HVAC after preventive maintenance, and it was not recertified after the 2025-04-10 maintenance",
+      "The action criteria for surface samples from the ISO-5 biological safety cabinet differ from the risk assessment and have no scientific basis",
+      "An unidentified white residue on the grille in front of the biological safety cabinet and 2 ceiling tiles discolored brown"
+    ],
+    "explanation_en": "FDA cited that the investigation of mold growth in a sterility test negative control was concluded to be analyst error without using environmental monitoring to find the source (Observation 4). The others are the same 483's recertification (Observation 1), action criteria (Observation 2), and facility maintenance (Observation 3) findings."
+  },
+  {
+    "id": "q-202648-03",
+    "question_ko": "의약품 제조 및 품질관리기준(GMP)에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "의약품이 의도한 용도에 필요한 품질을 갖도록 영향을 주는 모든 사항을 포괄적으로 마련한 체계입니다.",
+      "원료·중간체·포장자재·완제품이 정한 규격에 맞는지 확인하기 위한 규격 설정, 검체채취, 시험과 승인 활동입니다.",
+      "제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과 자원을 연결한 관리체계입니다.",
+      "의약품이 허가된 용도와 품질기준에 맞게 일관되게 생산·관리되도록 하는 품질보증의 일부입니다."
+    ],
+    "answer_index": 3,
+    "explanation_ko": "GMP는 의약품이 허가된 용도와 품질기준에 맞게 일관되게 생산·관리되도록 하는 품질보증의 일부입니다(ICH Q10 §§1.5–1.8; 21 CFR 211.22). 나머지는 각각 품질보증, 품질관리, 의약품 품질시스템에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "gmp",
+    "difficulty": "easy",
+    "week": "202648",
+    "question_en": "Which statement correctly describes Good Manufacturing Practice (GMP)?",
+    "choices_en": [
+      "The total arrangement of everything that bears on ensuring a medicine has the quality required for its intended use.",
+      "Setting specifications, sampling, testing, and approving so that materials, intermediates, packaging materials, and finished products conform to the defined specifications.",
+      "The management system that links organisation, responsibilities, procedures, processes, and resources so that quality objectives are achieved across the product lifecycle.",
+      "The part of quality assurance ensuring that medicines are consistently produced and controlled to the quality standards appropriate to their intended use."
+    ],
+    "explanation_en": "GMP is the part of quality assurance ensuring that medicines are consistently produced and controlled to the quality standards appropriate to their intended use (ICH Q10 §§1.5–1.8; 21 CFR 211.22). The others describe quality assurance, quality control, and the pharmaceutical quality system."
+  },
+  {
+    "id": "q-202648-04",
+    "question_ko": "의약품 품질관리(QC)에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "의약품이 허가된 용도와 품질기준에 맞게 일관되게 생산·관리되도록 하는 품질보증의 일부입니다.",
+      "원료·중간체·포장자재·완제품이 정한 규격에 맞는지 확인하기 위한 규격 설정, 검체채취, 시험과 승인 활동입니다.",
+      "의약품이 의도한 용도에 필요한 품질을 갖도록 영향을 주는 모든 사항을 포괄적으로 마련한 체계입니다.",
+      "제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과 자원을 연결한 관리체계입니다."
+    ],
+    "answer_index": 1,
+    "explanation_ko": "품질관리는 원료·중간체·포장자재·완제품이 정한 규격에 맞는지 확인하기 위한 규격 설정, 검체채취, 시험과 승인 활동입니다(ICH Q10 §§1.5–1.8; 21 CFR 211.22). 나머지는 각각 GMP, 품질보증, 의약품 품질시스템에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "quality-control",
+    "difficulty": "easy",
+    "week": "202648",
+    "question_en": "Which statement correctly describes Quality Control (QC) for medicines?",
+    "choices_en": [
+      "The part of quality assurance ensuring that medicines are consistently produced and controlled to the quality standards appropriate to their intended use.",
+      "Setting specifications, sampling, testing, and approving so that materials, intermediates, packaging materials, and finished products conform to the defined specifications.",
+      "The total arrangement of everything that bears on ensuring a medicine has the quality required for its intended use.",
+      "The management system that links organisation, responsibilities, procedures, processes, and resources so that quality objectives are achieved across the product lifecycle."
+    ],
+    "explanation_en": "Quality control is setting specifications, sampling, testing, and approving so that materials, intermediates, packaging materials, and finished products conform to the defined specifications (ICH Q10 §§1.5–1.8; 21 CFR 211.22). The others describe GMP, quality assurance, and the pharmaceutical quality system."
   }
 ]

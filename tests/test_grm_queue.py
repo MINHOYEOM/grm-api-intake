@@ -958,22 +958,18 @@ class NotionSyncTest(unittest.TestCase):
                "SUPABASE_SERVICE_ROLE_KEY": "k"}
         with patch.dict(os.environ, env), patch.object(gq, "notion_sync", side_effect=fake_sync), \
                 contextlib.redirect_stdout(_io.StringIO()), contextlib.redirect_stderr(_io.StringIO()):
-            os.environ.pop(gq.NOTION_SYNC_ENV, None)
+            # [노션 은퇴 ③] 변수 스위치는 없다 — 옛 변수를 켜 둬도 --force 없이는 쓰지 않는다(수동 전용).
+            os.environ["ENABLE_QUEUE_NOTION_STATUS_SYNC"] = "true"
             self.assertEqual(gq.main(["notion-sync", "--date", "2026-11-16", "--apply"]), 0)
             self.assertFalse(calls["apply"])
-            os.environ[gq.NOTION_SYNC_ENV] = "true"
-            gq.main(["notion-sync", "--date", "2026-11-16", "--apply"])
+            gq.main(["notion-sync", "--date", "2026-11-16", "--apply", "--force"])
             self.assertTrue(calls["apply"])
 
-    def test_bridge_workflow_step_is_gated_and_non_blocking(self):
+    def test_bridge_workflow_no_longer_writes_notion_status(self):
+        """[노션 은퇴 ③] 브릿지 워크플로에 노션 행 Status 기록 단계·변수가 없다(off 에서 할 일이 없었다)."""
         wf = (ROOT / ".github" / "workflows" / "grm-delta-bridge.yml").read_text(encoding="utf-8")
-        step = wf[wf.index("노션 행 Status 기록 (git handoff 호"):wf.index("- name: OPEN 델타 없음")]
-        self.assertIn("steps.bridge.outputs.source == 'git'", step)
-        self.assertIn("vars.ENABLE_QUEUE_NOTION_STATUS_SYNC || 'false'", step)
-        self.assertIn("grm_queue.py notion-sync", step)
-        self.assertIn("::warning::", step)
-        self.assertNotIn("continue-on-error", step)
-        self.assertNotRegex(step, r"(?m)^\s*exit[ $]")        # 실패해도 워크플로를 빨갛게 세우지 않는다
+        self.assertNotIn("grm_queue.py notion-sync", wf)
+        self.assertNotIn("ENABLE_QUEUE_NOTION_STATUS_SYNC", wf)
 
 
 class HistoryBackfillTest(unittest.TestCase):
@@ -1323,12 +1319,13 @@ class EditorialGitHandoffTest(unittest.TestCase):
             put("delta.A.json", {"status": "완료", "cards": {"a": {}}})
             put("delta.json", {"cards": {"a": {}}, "tldr": [], "handoff_ref": ref, "deferred": []})
             put("copyedit.json", {"status": "완료", "code_gate": {"ran": True, "exit": 0},
-                                  "cards": [{"web_card_id": "a", "verdict": "pass"}],
+                                  "cards": [{"web_card_id": "a", "verdict": "pass",
+                                             "source_absent": "본문 없는 행(테스트)"}],
                                   "counts": {"reject": 0}})
             put("scaffold.json", {"brief": {"run_date_kst": "2026-11-16"}, "cards": [{"id": "a"}]})
             results = rc.check(folder, hp)
-            self.assertEqual([ok for _, _, ok, _ in results], [True] * 5, results)
-            # 스캐폴드가 다른 날짜면 5번, 교열 reject 가 있으면 4번, 지문이 다르면 1번이 실패한다.
+            self.assertEqual([ok for _, _, ok, _ in results], [True] * 8, results)
+            # 스캐폴드가 다른 날짜면 5번, 교열 reject 가 있으면 4번(근거 없는 reject 는 4-1 도), 지문이 다르면 1번이 실패한다.
             put("scaffold.json", {"brief": {"run_date_kst": "2026-11-09"}, "cards": [{"id": "a"}]})
             put("copyedit.json", {"status": "완료", "code_gate": {"ran": True, "exit": 0},
                                   "cards": [{"web_card_id": "a", "verdict": "reject"}],
@@ -1336,7 +1333,22 @@ class EditorialGitHandoffTest(unittest.TestCase):
             put("desk.json", {"status": "완료", "handoff_ref": dict(ref, sha256="0" * 64),
                               "shards": {"delta": {"A": ["a"]}, "deep": {}}})
             self.assertEqual([ok for _, _, ok, _ in rc.check(folder, hp)],
-                             [False, True, True, False, False])
+                             [False, True, True, False, False, True, True, False])
+            # 4-2: 심층 칸에서만 걸린 반려가 남았으면(blank_slots.py deep-auto 를 안 돌렸다) 실패한다.
+            put("copyedit.json", {"status": "보류", "code_gate": {"ran": True, "exit": 0},
+                                  "cards": [{"web_card_id": "a", "verdict": "reject", "fails": [
+                                      {"item": "자가점검 9", "slot": "deep.key_violations[0].observation", "evidence": "e"}]}],
+                                  "counts": {"reject": 1}})
+            got = {num: ok for num, _, ok, _ in rc.check(folder, hp)}
+            self.assertFalse(got["4-2"])
+            # 4-3: 지울 수 있는 칸(hook_line)만 걸린 반려가 남았으면 실패한다(11-23 — deep-auto 가 칸 삭제로 통과시켰어야 한다).
+            put("copyedit.json", {"status": "보류", "code_gate": {"ran": True, "exit": 0},
+                                  "cards": [{"web_card_id": "a", "verdict": "reject", "fails": [
+                                      {"item": "③ 원문보다 강한 단정", "slot": "hook_line", "evidence": "e"}]}],
+                                  "counts": {"reject": 1}})
+            got = {num: ok for num, _, ok, _ in rc.check(folder, hp)}
+            self.assertTrue(got["4-2"])
+            self.assertFalse(got["4-3"])
 
 
 class CompareTest(unittest.TestCase):

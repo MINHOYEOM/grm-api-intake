@@ -47,9 +47,19 @@ from zoneinfo import ZoneInfo
 
 import requests
 
+import ema_document
 import grm_queue
 import intake_exclusion as _xl
+from grm_http_policy import (
+    FDA_WL_BODY_FETCH_ATTEMPTS as WL_BODY_FETCH_ATTEMPTS,
+    FDA_WL_BODY_RETRY_BACKOFF_SECONDS as WL_BODY_RETRY_BACKOFF_SECONDS,
+    FDA_WL_BODY_RETRYABLE_STATUS as _WL_RETRYABLE_STATUS,
+    NOTION_WRITE_DELAY_SECONDS,
+)
 from grm_common import (
+    FDA_BOT_BLOCK,
+    FdaBotBlockError,
+    fda_checked_request,
     HTTPClientError,
     KR_EGRESS_PROXY_REACHABLE,
     KR_EGRESS_PROXY_UNREACHABLE,
@@ -416,6 +426,7 @@ _WL_BODY_ANCHORS_PRIMARY = (
     r"fda\s+review\s+violations",
     r"specifically,",
 )
+_WL_BODY_ANCHORS_WEAK = (r"specifically,",)   # 1차 앵커 중 위치가 서한 어디든 될 수 있는 것 — 단독이면 폴백이 앞설 때 양보
 _WL_BODY_ANCHORS_FALLBACK = (
     r"this\s+warning\s+letter",
     r"\bviolations?\b",
@@ -623,6 +634,13 @@ class CollectionStats:
     # 않았다 — excerpt 와 같은 warning-only 관측.
     wl_body_full_attempted: int = 0
     wl_body_full_failed: int = 0
+    # [WL 위반항목 빈칸 2026-11-23] 본문은 있는데 위반항목이 빈 편지 — 사유별 수. `unsupported_format`
+    # 은 새 형식 신호, '사유 없음'(unmarked)은 build_wl_item 을 거치지 않은 경로 신호.
+    wl_violations_filled: int = 0
+    wl_violations_unsupported: int = 0
+    wl_violations_unmarked: int = 0
+    wl_violations_unsupported_docs: list[str] = field(default_factory=list)
+    wl_violations_out_of_scope: dict[str, int] = field(default_factory=dict)
     # [WL 목록 절단 2026-10-27] 목록을 어느 경로로 읽었는가 · 정적 HTML 폴백이 창을 다 못
     # 덮었을 가능성(절단 의심). 정적 페이지는 최신 10행만 준다.
     wl_listing_backbone: str = ""
@@ -661,6 +679,7 @@ class CollectionStats:
     mfds_admin_insert_failed: int = 0
     mfds_admin_error: bool = False
     mfds_admin_error_msg: str = ""
+    mfds_admin_total_count_warning: str = ""
     mfds_gmp_cert_fetched: int = 0
     mfds_gmp_cert_inserted: int = 0
     mfds_gmp_cert_skipped_dup: int = 0
@@ -2317,16 +2336,22 @@ EMA_ARTICLE_EXCERPT_CAP = 30
 
 
 def _enrich_ema_article_excerpts(items: list[IntakeItem]) -> None:
-    """관련 EMA 항목의 기사 본문을 raw_payload["article_excerpt"] 에 싣는다(in-place).
+    """관련 EMA 항목의 원문 전문(기사 HTML·문서 PDF)을 raw_payload["article_excerpt"] 에 싣는다(in-place).
+
+    판독 메타·실패 사유는 raw_payload["ema_document"] 에 남는다(ema_document.raw_patch).
 
     실패(403/timeout/본문 미발견)는 graceful — 그 항목만 본문 없이 남고 수집은 계속된다.
     """
     fetched = 0
     capped = False
     for item in items:
-        if item.qa_relevance not in ("Likely", "Possible"):
-            continue          # 카드가 될 항목만 — 무관 항목까지 긁지 않는다
         if not item.official_url:
+            continue
+        # 카드가 될 항목만 — 무관 항목까지 긁지 않는다. [11-25 #8] 단, EMA 문서(PDF)는 제목에 분류
+        # 키워드가 없어 미판정(Pending)으로 오는 일이 대부분이다(빈칸 106행 전부 Pending). 관련도 판정의
+        # 근거가 본문뿐이므로 미판정 문서는 읽는다. 무관(Unrelated)은 여전히 읽지 않는다.
+        if item.qa_relevance not in ("Likely", "Possible") and not (
+                item.qa_relevance == "Pending" and ema_document.is_document_url(item.official_url)):
             continue
         if item.raw_payload.get("article_excerpt"):
             continue
@@ -2336,13 +2361,17 @@ def _enrich_ema_article_excerpts(items: list[IntakeItem]) -> None:
                             "나머지 항목은 본문 없이 유지")
                 capped = True
             break
-        time.sleep(ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
-        excerpt = _fetch_article_excerpt(item.official_url, "EMA")
+        # [11-25 #8] 기사 HTML·문서 PDF 모두 공통 판독기(ema_document)가 **전문**을 읽는다. 저장
+        # 단계에서 자르지 않는다(대표 결정) — 화면·브리프 입력은 card_scaffold 가 줄인다. 간격 2초·
+        # 429 재시도는 판독기 안(#1938 값). 빈칸 백필(backfill_blank_excerpts)도 같은 함수를 부른다.
+        doc = ema_document.read_ema_fulltext(item.official_url)
         fetched += 1
-        if excerpt:
-            item.raw_payload["article_excerpt"] = excerpt
+        ema_document.apply_to_raw(item.raw_payload, doc)
+        if not doc.ok:
+            level = "WARN" if ema_document.is_document_url(item.official_url) else "INFO"
+            log(level, f"EMA 원문 전문 미확보({doc.status}) — 카드 그대로: {truncate(item.official_url, 80)}")
     if fetched:
-        log("INFO", f"EMA 기사 본문 fetch {fetched}건 시도")
+        log("INFO", f"EMA 원문 fetch {fetched}건 시도")
 
 
 def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
@@ -2676,6 +2705,14 @@ def _extract_wl_body_span(html_text: str, max_chars: int | None) -> str:
         return ""
     opening = _wl_letter_opening(text)
     start = _earliest_anchor(text, _WL_BODY_ANCHORS_PRIMARY)
+    if start is not None and start == _earliest_anchor(text, _WL_BODY_ANCHORS_WEAK):
+        # [본문 앞 결손 2026-11-24] 'Specifically,' 는 서한 어느 단락에서든 나온다. 임상시험자·GLP·허위광고 서한은
+        # 위반 서술 뒤 '회신이 부적절하다' 단락에서야 처음 나와(예: 11,348자 중 8,319번째) 거기서 자르면 본문이
+        # 'Specifically,' 로 시작하고 앞의 위반 서술을 통째로 잃는다(저장 88행). 이 약한 앵커가 유일한 1차 앵커이고
+        # 폴백 앵커(violation·this warning letter …)가 더 앞에 있으면 폴백 층으로 내려간다.
+        fb = _earliest_anchor(text, _WL_BODY_ANCHORS_FALLBACK)
+        if fb is not None and fb < start:
+            start = None
     if start is None:
         start = _earliest_anchor(text, _WL_BODY_ANCHORS_FALLBACK)
         if start is not None and opening is not None and opening <= start:
@@ -2711,9 +2748,15 @@ _WL_ABBREV_TAIL_RE = re.compile(
 _WL_SENTENCE_LOOKBACK = 500   # 이보다 먼 마침표는 같은 문장이 아니다 — 못 찾으면 앵커 그대로
 
 
+# [인사말 없는 서한 2026-11-24] 'Dear' 없이 `RE: 721806 Bernard Gramlich:` 로 시작하는 서한(미승인 의약품 인터넷 판매·
+# 펩타이드·SARMs 등)은 위 정규식에 안 걸려 첫 단락이 '인사말 뒤'로 인정받지 못했다 — 폴백 앵커('violations')가 결론
+# 단락('Conclusion The violations cited …')에서 처음 걸려 **본문이 'Conclusion' 으로 시작**하고 위반 서술이 통째로 빠졌다.
+_WL_RE_SALUTATION_RE = re.compile(r"\bRE:\s+(?:[A-Za-z#.\- ]{0,24})?\d{5,7}\b[^:]{0,160}?:\s*")
+
+
 def _wl_letter_opening(text: str) -> int | None:
-    """서한 인사말(`Dear Mr. X:`) 바로 뒤 위치. 없으면 None."""
-    m = _WL_SALUTATION_RE.search(text)
+    """서한 인사말(`Dear Mr. X:` · `RE: 721806 Name:`) 바로 뒤 위치. 없으면 None."""
+    m = _WL_SALUTATION_RE.search(text) or _WL_RE_SALUTATION_RE.search(text)
     return m.end() if m else None
 
 
@@ -2809,13 +2852,18 @@ _WL_VIOLATION_CITE_RE = re.compile(r"21 CFR \d+\.\d+(?:\([^()\s]{1,6}\))*")
 _WL_VIOLATION_LOOKAHEAD = 1200   # 표제문 1개의 최대 길이(그 안에 조항 인용이 없으면 표제 아님)
 
 
-def extract_wl_violations_from_text(text: str) -> list[dict[str, str]]:
-    """WL 본문 텍스트 → 위반 표제 목록 `[{number, statement, citation}]`(순수·결정론).
+def extract_wl_violations_from_text(text: str, *, extended: bool = True) -> list[dict[str, str]]:
+    """WL 본문 텍스트 → 위반 표제 목록 `[{number, statement, citation[, heading]}]`(순수·결정론).
 
-    `statement` 는 원문 영어 **그대로**(요약·의역 0), `citation` 은 표제문 안의 `21 CFR` 조항을
-    등장 순서대로 ` · ` 로 이은 문자열(없으면 ""). 형식이 다른 편지(번호 목록 없는 미승인의약품
-    WL 등)에서는 빈 리스트를 돌려준다 — 호출부는 그때 상세 슬롯을 아예 달지 않는다.
+    `statement` 는 원문 영어 **그대로**(요약·의역 0), `citation` 은 표제문 안에 실제로 적힌 조항을
+    등장 순서대로 ` · ` 로 이은 문자열(없으면 ""). 형식별 경계는 `extract_wl_violations_detail`.
+    못 뽑으면 빈 리스트 — 호출부는 그때 상세 슬롯을 아예 달지 않는다.
     """
+    return extract_wl_violations_detail(text, extended=extended)[0]
+
+
+def _extract_wl_violations_f1(text: str, end_re: "re.Pattern[str]") -> list[dict[str, str]]:
+    """F1(번호 + `Your firm failed … (21 CFR …).`) — 2026-07-20 원 파서. `end_re` 만 F1b 에서 넓힌다."""
     if not text:
         return []
     out: list[dict[str, str]] = []
@@ -2836,7 +2884,7 @@ def extract_wl_violations_from_text(text: str) -> list[dict[str, str]]:
                 or _WL_VIOLATION_PLAIN_SKIP_RE.match(seg)
                 or not _WL_VIOLATION_PLAIN_DEFECT_RE.search(seg[:cfr.start()])):
             continue
-        end = _WL_VIOLATION_END_RE.search(seg, cfr.end())
+        end = end_re.search(seg, cfr.end())
         if not end:
             continue                       # ③ 표제문 종결 미확인 → 버린다
         if num <= last_num:
@@ -2847,6 +2895,437 @@ def extract_wl_violations_from_text(text: str) -> list[dict[str, str]]:
         out.append({"number": str(num), "statement": statement,
                     "citation": " · ".join(cites)})
     return out
+
+
+# ── [WL 위반항목 형식 확장 2026-11-23] ───────────────────────────────────────────────
+# 데이터품질팀 재현(공유 노트 wl_violations_repro_1123.md · tests/test_wl_violations_repro_1123.py):
+# F1(번호 + 'Your firm failed … (21 CFR …).') 밖의 서한이 빈 목록으로 남았다. 대표 결정(11-22) —
+# 비CGMP 경고서한도 위반항목 필수, 원문 문장 그대로·지어내기 금지. 공통 규칙:
+#   · statement 는 원문 한 문장 그대로(공백만 정규화). 요약·의역·문장 잇기 0.
+#   · heading 은 닫힌 어휘(`_WL_F4_HEADINGS`)에 있는 원문 소제목만. 밖이면 키를 달지 않는다.
+#   · citation 은 그 문장 안에 실제로 적힌 조항만(21 CFR · section NNN). 없으면 "".
+#   · F1 결과는 바이트 동일. 새 형식은 앞 형식이 빈 목록일 때만 차례로(F1b → F2 → F3 → F3b → F4).
+#   · 못 뽑으면 빈 목록 + 사유(`wl_violations_status`) — 호출부(build_wl_item)가 raw 에 남긴다.
+_WL_VIOLATION_END_F1B_RE = re.compile(r"[)\]]\s*\.")          # F1b: '[21 CFR 211.192].' 대괄호 종결
+_WL_SENT_CITE_END_RE = re.compile(r"[)\]]\s*\.$")             # F3b: 문장이 인용 괄호로 끝난다
+# 문장 끝: 마침표류(+닫는 따옴표) 또는 라벨 인용 출처 꼬리 '[from your product’s label]'(뒤 문장과 마침표 없이 붙는다).
+_WL_SENT_BREAK_RE = re.compile(r"([.?!][\"”’)]?|\[from [^\]]{1,80}\])\s+(?=[A-Z“\"]|\d{1,2}\s+[A-Z])")
+_WL_SENT_ABBREV = frozenset({"U.S", "U.S.C", "Co", "No", "Nos", "Mr", "Ms", "Mrs", "Dr", "e.g", "i.e",
+                             "vs", "St", "al", "approx", "Fig", "Ref", "Vol", "Sec", "Corp"})
+_WL_SENT_TOKEN_RE = re.compile(r"([A-Za-z][A-Za-z.]*)$")
+_WL_FOOTNOTE_LEAD_RE = re.compile(r"^\d{1,2}\s+(?=[A-Z“\"])")
+# 평문 본문에서 문장 머리에 붙어 버린 소제목(조제약국 서한 'Violations of the FDCA Adulterated Drug Products The FDA
+# investigator noted …'). 닫힌 목록만 떼고 문장은 원문 그대로 둔다(소제목은 문장이 아니다).
+_WL_GLUED_HEAD_RES = (
+    re.compile(r"^Violations of the (?:FDCA|FD&C Act|Federal Food, Drug, and Cosmetic Act)\s+(?=[A-Z])"),
+    re.compile(r"^(?:Adulterated|Misbranded) Drug Products\s+(?=[A-Z“\"])"),
+)
+_WL_REGION_START_RE = re.compile(
+    r"Violations of the Federal Food, Drug, and Cosmetic Act|The following (?:are )?(?:deviations|violations)\b"
+    r"|(?:deviations|violations) including, but not limited to, the following")
+_WL_CONCLUSION_RE = re.compile(r"(?:(?<=[.?!”\")\]] )|^)Conclusion\b")
+_WL_F1_HEAD_SENT_RE = re.compile(r"^(?:Your firm|Your|You)\b[^.]{0,80}?\b(?:failed|did not)\b")
+_WL_F2_HEAD_RE = re.compile(r"(?<![\w.)])(\d{1,2})\.\s+(?=Failure (?:to|of)\b)")
+_WL_FAILURE_SENT_RE = re.compile(r"^Failure (?:to|of)\b")
+_WL_F3_LEAD_RE = re.compile(
+    r"The following (?:are )?(?:deviations|violations)(?: (?:were|are))? identified during our "
+    r"(?:inspection|review)(?: and (?:inspection|review))?\.\s+As a reminder, this is not an "
+    r"all-inclusive list of [^.]{0,160}\.\s+")
+# F4 닫힌 어휘 소제목(원문 표본 확인분만 — 늘릴 때는 원문 표본을 보고 추가). 긴 것부터.
+_WL_F4_HEADINGS = (
+    "Unapproved New Drug and Unlicensed Biological Product Violations",
+    "Unapproved New Drug Violations",
+    "Misbranded Drug Violations",
+    "False or Misleading Risk Presentation",
+    "Refusal to Provide Records",
+)
+_WL_F4_HEADING_RE = re.compile(
+    r"(?:(?<=[.?!:”\")\]] )|^)(" + "|".join(re.escape(h) for h in _WL_F4_HEADINGS) + r")(?= [A-Z“\"]|$)")
+_WL_F4_P1_RES = tuple(re.compile(p) for p in (
+    r"\b(?:is|are)\s+(?:an?\s+)?(?:unapproved new drugs?|misbranded(?:\s+drugs?)?|adulterated)\b.*?"
+    r"\b(?:under|within the meaning of|in violation of)\s+sections?\s+\d{3}",
+    r"\b(?:renders?|causes?|causing)\b.*?\b(?:misbranded|adulterated)\s+under\s+sections?\s+\d{3}",
+    r"\bYou failed to obtain approved applications?\s+pursuant to section 505\b",
+    r"\bUnder section 501\(j\).*?\badulterated\b",
+    r"\b(?:is|are)\s+(?:false or\s+)?misleading because\b",
+    r"\bmisbrands?\b.*?\bin violation of\b",
+))
+_WL_F4_P2_RES = tuple(re.compile(p) for p in (
+    r"\bviolates?\s+sections?\s+301\(",
+    r"\bprohibited act under section 301\(",
+    r"\bis prohibited under section 301\(",
+))
+# 정의·안내 문장 제외. CGMP 머리말('Because your methods, facilities, or controls …')도 뺀다 — CGMP 서한의
+# 위반은 F1~F3b 의 표제여야 하고, 거기서 못 뽑으면 빈 목록 + 사유로 남겨 상시 점검에 걸리게 한다.
+_WL_F4_EXCLUDE_RE = re.compile(
+    r"\bif\b|\bas defined\b|^With certain exceptions|^A drug is\b|\bappears? to be\b|\bmay be detained\b"
+    r"|^We may\b|\bmay (?:also )?(?:render|cause|be)\b|^Please be advised\b|\brecommend|\bbecause your methods, facilities, or controls", re.I)
+_WL_SECTION_LIST_RE = re.compile(
+    r"\bsections?\s+(\d{3}[A-Za-z]?(?:\([0-9A-Za-z]{1,6}\))*"
+    r"(?:\s*(?:,\s*and|,|and|or)\s+\d{3}[A-Za-z]?(?:\([0-9A-Za-z]{1,6}\))*)*)")
+_WL_SECTION_TOKEN_RE = re.compile(r"\d{3}[A-Za-z]?(?:\([0-9A-Za-z]{1,6}\))*")
+_WL_PHS_ACT_RE = re.compile(r"\s*of the (?:Public Health Service Act|PHS Act)\b")
+_WL_BODY_HEAD_TRUNCATED_RE = re.compile(r"^\s*(?:Specifically,|\d{1,2}\s+As described|Conclusion\b)")
+
+# 빈 목록 사유(`wl_violations_status`) — 닫힌 목록.
+WL_VIOLATIONS_STATUS_OUT_OF_SCOPE = "out_of_scope"            # 관련도 Unrelated·담배센터 — F2~F4 미적용
+WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED = "body_head_truncated"  # 저장 본문이 'Specifically,'·각주로 시작
+WL_VIOLATIONS_STATUS_UNSUPPORTED = "unsupported_format"
+WL_VIOLATIONS_STATUS_OPDP = "opdp_promotional"
+WL_VIOLATIONS_STATUS_DSCSA_OFFSET = "dscsa_numbering_offset"
+WL_VIOLATIONS_STATUS_NARRATIVE_CGMP = "narrative_cgmp"
+WL_VIOLATIONS_STATUS_NON_DRUG = "non_drug_scope"
+WL_VIOLATIONS_SCOPE_STATUSES = (WL_VIOLATIONS_STATUS_OUT_OF_SCOPE, WL_VIOLATIONS_STATUS_OPDP,
+                               WL_VIOLATIONS_STATUS_DSCSA_OFFSET, WL_VIOLATIONS_STATUS_NARRATIVE_CGMP,
+                               WL_VIOLATIONS_STATUS_NON_DRUG)
+WL_VIOLATIONS_STATUSES = (*WL_VIOLATIONS_SCOPE_STATUSES, WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED,
+                          WL_VIOLATIONS_STATUS_UNSUPPORTED)
+WL_VIOLATION_FORMATS = ("F1", "F1b", "F2", "F3", "F3b", "F4", "F5", "F6")
+
+
+def _wl_sentence_end(t: str, start: int, limit: int) -> int:
+    """`t[start:]` 의 첫 문장 끝(마침표 포함 위치 다음). 약어(U.S.·Co.·No. 등) 뒤는 끊지 않는다."""
+    for m in _WL_SENT_BREAK_RE.finditer(t, start, limit):
+        tok = _WL_SENT_TOKEN_RE.search(t, max(start, m.start() - 12), m.start())
+        if tok and tok.group(1) in _WL_SENT_ABBREV:
+            continue
+        return m.end(1)
+    return limit
+
+
+def _wl_sentences(t: str, start: int, end: int) -> list[str]:
+    """`t[start:end]` 를 문장으로 자른다(평문 본문 — 각주 번호 머리는 떼고, 공백만 정규화)."""
+    out: list[str] = []
+    pos = start
+    while pos < end:
+        while pos < end and t[pos] == " ":
+            pos += 1
+        if pos >= end:
+            break
+        stop = _wl_sentence_end(t, pos, end)
+        s = _WL_FOOTNOTE_LEAD_RE.sub("", t[pos:stop].strip())
+        for head_re in _WL_GLUED_HEAD_RES:
+            s = head_re.sub("", s)
+        if s:
+            out.append(s)
+        pos = stop
+    return out
+
+
+def _wl_citations(statement: str) -> str:
+    """문장 안에 실제로 적힌 조항만 — `21 CFR …` 과 `section(s) NNN(..)` (법 이름이 PHS Act 면 그대로)."""
+    cites: list[str] = list(_WL_VIOLATION_CITE_RE.findall(statement))
+    for m in _WL_SECTION_LIST_RE.finditer(statement):
+        act = "PHS Act" if _WL_PHS_ACT_RE.match(statement, m.end()) else "FD&C Act"
+        cites.extend(f"{act} {tok}" for tok in _WL_SECTION_TOKEN_RE.findall(m.group(1)))
+    return " · ".join(dict.fromkeys(cites))
+
+
+def _wl_row(num: int, statement: str, heading: str = "") -> dict[str, str]:
+    row = {"number": str(num), "statement": statement, "citation": _wl_citations(statement)}
+    if heading:                       # 빈 소제목은 키 미추가 — 기존 골든·카드 계약 불변
+        row["heading"] = heading
+    return row
+
+
+def _wl_violation_region(t: str) -> tuple[int, int] | None:
+    """위반 구간: 'Violations of the FD&C Act' / 'The following (are) deviations|violations' ~ 'Conclusion' 앞."""
+    m = _WL_REGION_START_RE.search(t)
+    if not m:
+        return None
+    c = _WL_CONCLUSION_RE.search(t, m.end())
+    return m.start(), (c.start() if c else len(t))
+
+
+def _extract_wl_f2(t: str, region: tuple[int, int]) -> list[dict[str, str]]:
+    """F2 — API 서한 'N. Failure (to|of) …' 번호 표제. 표제 = 번호 뒤 첫 문장, 번호는 1부터 연속만."""
+    out: list[dict[str, str]] = []
+    expect = 1
+    for m in _WL_F2_HEAD_RE.finditer(t, region[0], region[1]):
+        if int(m.group(1)) != expect:
+            continue
+        stop = _wl_sentence_end(t, m.end(), region[1])
+        out.append(_wl_row(expect, t[m.end():stop].strip()))
+        expect += 1
+    return out
+
+
+def _extract_wl_f3(t: str, region: tuple[int, int]) -> list[dict[str, str]]:
+    """F3 — 번호 없는 단일 표제: 'The following … identified during our review. As a reminder, … .' 바로 다음 문장."""
+    m = _WL_F3_LEAD_RE.search(t, region[0], region[1])
+    if not m:
+        return []
+    s = _wl_sentences(t, m.end(), _wl_sentence_end(t, m.end(), region[1]))
+    if s and (_WL_FAILURE_SENT_RE.match(s[0]) or _WL_F1_HEAD_SENT_RE.match(s[0])):
+        return [_wl_row(1, s[0])]
+    return []
+
+
+def _extract_wl_f3b(t: str, region: tuple[int, int]) -> list[dict[str, str]]:
+    """F3b — 번호 없는 'Your firm … failed … (21 CFR …).' 문장. F1 머리·종결 규칙을 번호 없이, 등장 순서대로."""
+    out: list[dict[str, str]] = []
+    for s in _wl_sentences(t, region[0], region[1]):
+        if (_WL_F1_HEAD_SENT_RE.match(s) and _WL_VIOLATION_CFR_RE.search(s)
+                and _WL_SENT_CITE_END_RE.search(s)):
+            if s not in (r["statement"] for r in out):
+                out.append(_wl_row(len(out) + 1, s))
+    return out
+
+
+def _wl_f4_pick(sentences: list[str]) -> str:
+    for pats in (_WL_F4_P1_RES, _WL_F4_P2_RES):
+        for s in sentences:
+            if _WL_F4_EXCLUDE_RE.search(s):
+                continue
+            if any(p.search(s) for p in pats):
+                return s
+    return ""
+
+
+def _extract_wl_f4(t: str) -> list[dict[str, str]]:
+    """F4 — 법 조항 판정 문장. 닫힌 어휘 소제목 구간마다 첫 판정 문장 1개(P1 상태 → 없으면 P2 금지행위).
+    소제목이 하나도 없으면 편지 전체(결론 앞)에서 1개."""
+    c = _WL_CONCLUSION_RE.search(t)
+    body_end = c.start() if c else len(t)
+    heads = list(_WL_F4_HEADING_RE.finditer(t, 0, body_end))
+    out: list[dict[str, str]] = []
+    if not heads:
+        s = _wl_f4_pick(_wl_sentences(t, 0, body_end))
+        return [_wl_row(1, s)] if s else []
+    for i, h in enumerate(heads):
+        sec_end = heads[i + 1].start() if i + 1 < len(heads) else body_end
+        s = _wl_f4_pick(_wl_sentences(t, h.end(), sec_end))
+        if s:
+            out.append(_wl_row(len(out) + 1, s, h.group(1)))
+    if not out:
+        # 소제목 아래엔 판정 문장이 없고 머리말에만 있는 서한(기록 제공 거부 00ae·7e75 — 판정 문장이
+        # 'Refusal to Provide Records' 소제목보다 앞). 편지 전체에서 1개, 소제목은 달지 않는다(그 아래 문장이 아님).
+        s = _wl_f4_pick(_wl_sentences(t, 0, body_end))
+        return [_wl_row(1, s)] if s else []
+    return out
+
+
+# ── [지원 형식 확장 2026-11-24] F5·F6 ───────────────────────────────────────────────
+# 11-23 수리 뒤에도 남은 '지원 형식 밖'(unsupported_format 58 + 앞부분 복원분)의 실서한을 분류해 추가한 두 형식이다.
+# F5 — 번호 표제(`1.` · `1)`) 가 연속으로 이어진다: ① `N. Failure to …` (API 704(a)(4)·CGMP 번호 표제, 인용 없이 문장으로 끝남)
+#      ② `N) Failure to … [21 CFR 1271.80(c)].` (인체세포·조직 HCT/P) ③ `N. Your firm … (FD&C Act Section 503(e))`
+#      (DSCSA 도매유통). 표제는 번호 뒤 첫 문장이되, 인용 괄호 바로 뒤에 마침표 없이 본문이 이어지면 인용 끝까지.
+# F6 — 번호 없는 BIMO(임상시험자·IRB·스폰서) 표제: `You failed to … [21 CFR 312.60].` 등장 순서대로.
+# 둘 다 F4 뒤에 시도한다(앞 형식이 이미 뽑은 서한의 결과는 바뀌지 않는다 — 회귀 0).
+_WL_F5_HEAD_RE = re.compile(r"(?<![\w.)(])(\d{1,2})[.)]\s+(?=(?:Failure (?:to|of)\b|(?:Your firm|Your|You)\b))")
+_WL_DSCSA_RE = re.compile(r"\b(?:Drug Supply Chain Security Act|DSCSA)\b", re.I)
+_WL_DSCSA_SECTION_582_RE = re.compile(r"\bsections?\s+582\b|\b360eee-1\b", re.I)
+_WL_DSCSA_WHOLESALE_RE = re.compile(r"\bsections?\s+503\(e\)", re.I)
+_WL_OPDP_RE = re.compile(r"\b(?:Office of Prescription Drug Promotion|OPDP)\b", re.I)
+_WL_PROMOTIONAL_VIOLATION_RE = re.compile(
+    r"(?:^|(?<=[.!?] ))Your promotional (?:communications?|materials?|claims?) "
+    r"(?:is|are|was|were) (?:false(?: or misleading)?|misleading)\b", re.I)
+_WL_NON_DRUG_RE = re.compile(
+    r"\bfecal microbiota (?:transplant(?:ation|s)?|products?)\b"
+    r"|\bivermectin\b.{0,160}\b(?:for sale|for purchase|sold|selling)\b"
+    r"|\b(?:offer(?:s|ed|ing)?|market(?:s|ed|ing)?|sell(?:s|ing)?|sold)\b.{0,120}\bivermectin\b", re.I)
+_WL_DRUG_CGMP_RE = re.compile(
+    r"\b(?:CGMP|current good manufacturing practice)s?\b"
+    r"|\b21 CFR (?:parts? )?(?:210|211)\b|\b501\(a\)\(2\)\(B\)", re.I)
+_WL_CGMP_DEFICIENCY_RE = re.compile(
+    r"\b(?:violations?|deviations?|deficienc(?:y|ies)|fail(?:ed|ure)|did not|inadequate)\b", re.I)
+_WL_NUMBERED_HEAD_RE = re.compile(r"(?<![\w.])(?:\(\d{1,2}\)|\d{1,2}[.)])\s+[A-Z]")
+_WL_F5_CITE_GROUP_RE = re.compile(
+    r"\[[^\[\]]{0,160}?(?:CFR|Act|[Ss]ection)[^\[\]]{0,160}?\]"
+    r"|\((?:[^()]|\([^()]*\)|\((?:[^()]|\([^()]*\))*\))*?(?:21 CFR|FD&C Act|PHS Act|[Ss]ection \d{3})"
+    r"(?:[^()]|\([^()]*\)|\((?:[^()]|\([^()]*\))*\))*\)")
+_WL_F5_MAX_STATEMENT = 1200
+_WL_F6_HEAD_RE = re.compile(
+    r"(?:(?<=[.?!:”\")\]] )|^)((?:You|Your firm|Your)\b[^.\[\]]{0,40}?\b(?:failed|did not)\b[^\[\]]{5,700}?"
+    r"\[(?:21 CFR|Section|section)[^\[\]]{3,160}\])(?:\.|(?=\s))")
+
+
+def _wl_f5_statement(t: str, start: int, limit: int) -> tuple[str, int]:
+    """번호 표제 1개의 문장(원문 그대로)과 끝 위치. 못 자르면 ("", start)."""
+    s_end = _wl_sentence_end(t, start, limit)
+    cite = _WL_F5_CITE_GROUP_RE.search(t, start, s_end if s_end > start else limit)
+    end = s_end
+    if cite is None:
+        # 문장 끝 앞에서 인용이 안 잡혔어도, 마침표 없이 인용으로 끝나고 본문이 이어지는 표제가 있다.
+        wide = _WL_F5_CITE_GROUP_RE.search(t, start, min(limit, start + 400))
+        if wide is not None and re.match(r"\s+[A-Z]", t[wide.end():wide.end() + 3]) \
+                and not re.search(r"[.?!]\s+[A-Z]", t[start:wide.start()]):
+            end = wide.end()
+    elif re.match(r"\.?\s+[A-Z“\"]", t[cite.end():cite.end() + 3]) and cite.end() < s_end:
+        end = cite.end() + (1 if t[cite.end():cite.end() + 1] == "." else 0)
+    stmt = t[start:end].strip()
+    if not stmt or len(stmt) > _WL_F5_MAX_STATEMENT:
+        return "", start
+    return stmt, end
+
+
+def _wl_dscsa_starts_at_two(t: str) -> bool:
+    first = _WL_F5_HEAD_RE.search(t)
+    if not first or first.group(1) != "2":
+        return False
+    if _WL_DSCSA_RE.search(t):
+        return True
+    next_head = _WL_F5_HEAD_RE.search(t, first.end())
+    stmt, _ = _wl_f5_statement(t, first.end(), next_head.start() if next_head else len(t))
+    return bool(_WL_DSCSA_SECTION_582_RE.search(stmt))
+
+
+def _extract_wl_f5(t: str, *, dscsa_offset: bool = False) -> list[dict[str, str]]:
+    """F5 — 연속 번호 표제. DSCSA 예외는 2부터 모든 후보 표제가 조건을 충족해야 한다."""
+    c = _WL_CONCLUSION_RE.search(t)
+    limit = c.start() if c else len(t)
+    out: list[dict[str, str]] = []
+    expect = 2 if dscsa_offset else 1
+    heads = list(_WL_F5_HEAD_RE.finditer(t, 0, limit))
+    for i, m in enumerate(heads):
+        if int(m.group(1)) != expect:
+            if dscsa_offset:
+                return []
+            continue
+        stop = heads[i + 1].start() if dscsa_offset and i + 1 < len(heads) else limit
+        stmt, _end = _wl_f5_statement(t, m.end(), stop)
+        if dscsa_offset and not (_WL_DSCSA_SECTION_582_RE.search(stmt) or _WL_DSCSA_WHOLESALE_RE.search(stmt)):
+            return []
+        if not stmt:
+            continue
+        # 표제 형태 확인: 결함 서술('Failure …')이거나 인용을 단 문장이어야 한다.
+        if not (_WL_FAILURE_SENT_RE.match(stmt) or _wl_citations(stmt) or _WL_F5_CITE_GROUP_RE.search(stmt)):
+            if dscsa_offset:
+                return []
+            continue
+        row = _wl_row(expect, stmt)
+        if not row["citation"]:           # 'FD&C Act Section 503(e)' 처럼 기존 인용 추출기가 못 읽는 괄호 인용 — 문장 안 글자 그대로
+            groups = [g[1:-1].strip() for g in _WL_F5_CITE_GROUP_RE.findall(stmt)]
+            row["citation"] = " · ".join(dict.fromkeys(g for g in groups if g))
+        out.append(row)
+        expect += 1
+    return out
+
+
+def _extract_wl_f6(t: str) -> list[dict[str, str]]:
+    """F6 — 번호 없는 'You failed … [21 CFR …].' 표제(BIMO). 등장 순서대로, 같은 문장은 한 번만."""
+    c = _WL_CONCLUSION_RE.search(t)
+    limit = c.start() if c else len(t)
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for m in _WL_F6_HEAD_RE.finditer(t, 0, limit):
+        stmt = m.group(1).strip()
+        end = m.end(1)
+        if t[end:end + 1] == ".":
+            stmt += "."
+        if stmt in seen:
+            continue
+        seen.add(stmt)
+        out.append(_wl_row(len(out) + 1, stmt))
+    return out
+
+
+def _wl_violations_scope_reason(t: str, *, issuing_office: str = "") -> str:
+    conclusion = _WL_CONCLUSION_RE.search(t)
+    findings = t[:conclusion.start()] if conclusion else t
+    if _WL_OPDP_RE.search(issuing_office) or _WL_PROMOTIONAL_VIOLATION_RE.search(findings):
+        return WL_VIOLATIONS_STATUS_OPDP
+    if _wl_dscsa_starts_at_two(findings):
+        return WL_VIOLATIONS_STATUS_DSCSA_OFFSET
+    if _WL_NON_DRUG_RE.search(findings):
+        return WL_VIOLATIONS_STATUS_NON_DRUG
+    if (_WL_DRUG_CGMP_RE.search(findings) and _WL_CGMP_DEFICIENCY_RE.search(findings)
+            and not _WL_NUMBERED_HEAD_RE.search(findings)):
+        return WL_VIOLATIONS_STATUS_NARRATIVE_CGMP
+    return ""
+
+
+def extract_wl_violations_detail(
+    text: str, *, extended: bool = True, issuing_office: str = "",
+) -> tuple[list[dict[str, str]], str]:
+    """WL 본문 → (위반항목, 형식 또는 빈 사유). 일일 수집·과거분 백필·WL 복구·재추출이 모두 이 함수
+    (`build_wl_item` 경유)를 부른다 — 경로마다 규칙이 갈라지는 일을 막는다.
+
+    형식(`WL_VIOLATION_FORMATS`): F1 → F1b → F2 → F3 → F3b → F4 → F5 → F6, 앞 형식이 빈 목록일 때만 다음을 시도.
+    `extended=False`(관련도 Unrelated·담배센터)면 F1·F1b 만 — 비의약 서한에 법 조항 문장이 붙지 않게.
+    빈 목록이면 두 번째 값이 사유(`WL_VIOLATIONS_STATUSES`), 본문 자체가 없으면 "".
+    """
+    if not text or not text.strip():
+        return [], ""
+    rows = _extract_wl_violations_f1(text, _WL_VIOLATION_END_RE)
+    if rows:
+        return rows, "F1"
+    rows = _extract_wl_violations_f1(text, _WL_VIOLATION_END_F1B_RE)
+    if rows:
+        return rows, "F1b"
+    t = " ".join(text.split())
+    if extended:
+        region = _wl_violation_region(t)
+        if region:
+            for fmt, fn in (("F2", _extract_wl_f2), ("F3", _extract_wl_f3), ("F3b", _extract_wl_f3b)):
+                rows = fn(t, region)
+                if rows:
+                    return rows, fmt
+        rows = _extract_wl_f4(t)
+        if rows:
+            return rows, "F4"
+        for fmt, fn in (("F5", _extract_wl_f5), ("F6", _extract_wl_f6)):
+            rows = fn(t)
+            if rows:
+                return rows, fmt
+        conclusion = _WL_CONCLUSION_RE.search(t)
+        findings = t[:conclusion.start()] if conclusion else t
+        if _wl_dscsa_starts_at_two(findings):
+            rows = _extract_wl_f5(findings, dscsa_offset=True)
+            if rows:
+                return rows, "F5"
+    if _WL_BODY_HEAD_TRUNCATED_RE.match(t):
+        return [], WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED
+    scope_reason = _wl_violations_scope_reason(t, issuing_office=issuing_office)
+    if scope_reason:
+        return [], scope_reason
+    if not extended:
+        return [], WL_VIOLATIONS_STATUS_OUT_OF_SCOPE
+    return [], WL_VIOLATIONS_STATUS_UNSUPPORTED
+
+
+def wl_violations_gap_kind(raw: dict[str, Any]) -> str:
+    """WL raw 1행의 위반항목 상태 — "" (본문 없음) · "filled" · 사유(`WL_VIOLATIONS_STATUSES`) · "unmarked".
+
+    "unmarked" = 본문이 있는데 위반항목도 사유 표식도 없다 → 추출을 부르지 않은 경로로 들어온 행
+    (10-28 이전 백필 `_wl_item_from_row` 770행이 정확히 이 모양). 일일 수집 요약(health)·내용 완전성 감시·
+    재추출 도구가 이 한 함수로 센다."""
+    if not isinstance(raw, dict):
+        return ""
+    body = str(raw.get("wl_body_full") or "")
+    if not body.strip():
+        return ""
+    if isinstance(raw.get("wl_violations"), list) and raw["wl_violations"]:
+        return "filled"
+    status = str(raw.get("wl_violations_status") or "")
+    if status in (WL_VIOLATIONS_STATUS_UNSUPPORTED, WL_VIOLATIONS_STATUS_OUT_OF_SCOPE, WL_VIOLATIONS_STATUS_OPDP):
+        reason = _wl_violations_scope_reason(
+            " ".join(body.split()), issuing_office=str(raw.get("issuing_office") or ""))
+        return reason or (WL_VIOLATIONS_STATUS_UNSUPPORTED if status == WL_VIOLATIONS_STATUS_OPDP else status)
+    return status if status in WL_VIOLATIONS_STATUSES else "unmarked"
+
+
+def wl_violations_run_counts(items: list[Any]) -> dict[str, Any]:
+    """이번 수집분 WL 항목의 위반항목 집계 — 수집 요약 health 경고 입력."""
+    out: dict[str, Any] = {"filled": 0, "unsupported": 0, "unmarked": 0, "unsupported_docs": [],
+                           "out_of_scope": {}}
+    for it in items:
+        kind = wl_violations_gap_kind(getattr(it, "raw_payload", None) or {})
+        if kind == "filled":
+            out["filled"] += 1
+        elif kind == "unmarked":
+            out["unmarked"] += 1
+        elif kind == WL_VIOLATIONS_STATUS_UNSUPPORTED:
+            out["unsupported"] += 1
+            out["unsupported_docs"].append(str(getattr(it, "document_id", "") or ""))
+        elif kind in WL_VIOLATIONS_SCOPE_STATUSES:
+            out["out_of_scope"][kind] = out["out_of_scope"].get(kind, 0) + 1
+    return out
+
+
+def wl_violations_extended_scope(qa_relevance: str, issuing_office: str) -> bool:
+    """F2~F4(비CGMP 판정 문장 포함)를 적용할 서한인가 — 관련도 Unrelated·담배센터 발행은 아니다."""
+    return qa_relevance != "Unrelated" and "tobacco" not in (issuing_office or "").lower()
 
 
 # WHY-1 #2 P1: WL 본문 excerpt 관측용 — collect_who.LAST_HEALTH 동형 패턴.
@@ -2936,7 +3415,7 @@ def _fetch_wl_listing_datatables(html_text: str, start: date) -> list[dict[str, 
             params[f"columns[{i}][orderable]"] = "true"
             params[f"columns[{i}][search][value]"] = ""
             params[f"columns[{i}][search][regex]"] = "false"
-        resp = requests.get(config["url"] + "?" + urllib.parse.urlencode(params), timeout=30,
+        resp = fda_checked_request(requests.get, config["url"] + "?" + urllib.parse.urlencode(params), timeout=30,
                             headers={
                                 "User-Agent": "GRM-Intake/1.1 (+github-actions)",
                                 "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -2983,6 +3462,7 @@ def wl_static_listing_may_be_truncated(rows: list[dict[str, Any]], start: date) 
 WL_BODY_STATUS_OK = "ok"
 WL_BODY_STATUS_403 = "fetch-403"
 WL_BODY_STATUS_NO_ANCHOR = "no-anchor"
+WL_BODY_STATUS_BOT_BLOCK = FDA_BOT_BLOCK
 
 
 # [WL 본문 재시도 2026-10-28] 편지 페이지 GET 은 종전 **한 번**이었다. 일시 장애(5xx·429·
@@ -2991,9 +3471,6 @@ WL_BODY_STATUS_NO_ANCHOR = "no-anchor"
 # 그래서 일시 장애에 한해 짧게 재시도한다. **403 은 재시도하지 않는다** — fda.gov 의 403 은
 # 같은 러너 IP 에 대한 봇 차단이라 몇 초 뒤 같은 IP 로 다시 두드려도 결과가 같고 차단만
 # 길어진다. 403 은 다음 날 다른 러너에서 도는 예약 회수(`backfill_wl_body_recovery.py`)가 맡는다.
-WL_BODY_FETCH_ATTEMPTS = 3
-WL_BODY_RETRY_BACKOFF_SECONDS = (2.0, 5.0)
-_WL_RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 _wl_retry_sleep: Callable[[float], None] = time.sleep   # 테스트가 패치한다
 
 
@@ -3008,7 +3485,7 @@ def _fetch_wl_letter_html(url: str, label: str = "") -> tuple[str, str]:
     for attempt in range(1, WL_BODY_FETCH_ATTEMPTS + 1):
         transient = False
         try:
-            resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
+            resp = fda_checked_request(requests.get, url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
                 "User-Agent": "GRM-Intake/1.1 (+github-actions)",
                 "Accept": "text/html",
             })
@@ -3020,6 +3497,8 @@ def _fetch_wl_letter_html(url: str, label: str = "") -> tuple[str, str]:
             if attempt > 1:
                 log("INFO", f"FDA WL 본문{label} 재시도 {attempt}회차 성공: {truncate(url, 80)}")
             return resp.text, WL_BODY_STATUS_OK
+        except FdaBotBlockError:
+            return "", WL_BODY_STATUS_BOT_BLOCK
         except (requests.Timeout, requests.ConnectionError) as e:
             transient = True
             last_error = truncate(str(e), 120)
@@ -3079,8 +3558,12 @@ def build_wl_item(
     office_verdict: str,
     excerpt: tuple[str, str] | None,
     full: tuple[str, str] | None,
+    record_tier: bool = True,
 ) -> IntakeItem:
     """WL 목록 행 + 본문 fetch 결과 → IntakeItem (네트워크 0 · 결정론).
+
+    `record_tier=False` 는 본문 교체 후속(`raw_body_followup`)이 **이미 저장된 행**의 분류를 다시
+    계산할 때 쓴다 — 같은 판정을 두 번 세면 tier 관측 계기가 부푼다(`record_tier_decision`).
 
     라이브 수집(`collect_fda_warning_letters`)과 예약 회수(`backfill_wl_body_recovery.py`)가
     **같은 이 함수**로 행을 만든다 — 회수가 raw 를 손으로 기워 `raw_sha256`·tier 가 어긋나는
@@ -3122,9 +3605,15 @@ def build_wl_item(
             # [WL 위반항목 결정론 추출 2026-07-20] 전문에서 위반 표제를 결정론 추출해
             # 함께 싣는다(FDA 483 의 `fda_483_observations` 동형 — 네트워크 0·순수 함수).
             # 카드 상세 슬롯의 입력. 형식이 달라 못 뽑으면 키 자체를 달지 않는다.
-            violations = extract_wl_violations_from_text(body_full)
+            # [2026-11-23] 못 뽑으면 사유(`wl_violations_status`)를 남긴다 — 상시 점검이 '본문 있음 ·
+            # 위반항목 없음 · 사유 없음'을 세어 경로 누락(10-28 이전 백필 770행 같은)을 잡는다.
+            violations, v_status = extract_wl_violations_detail(
+                body_full, extended=wl_violations_extended_scope(relevance, issuing_office),
+                issuing_office=issuing_office)
             if violations:
                 wl_raw["wl_violations"] = violations
+            elif v_status:
+                wl_raw["wl_violations_status"] = v_status
         else:
             # excerpt 가 이미 사유를 남겼으면 덮어쓰지 않는다(setdefault) — 같은 편지
             # 이니 사유도 같을 확률이 높지만, excerpt 쪽 사유가 우선(먼저 시도됨).
@@ -3154,8 +3643,9 @@ def build_wl_item(
             "Tier 3", "wl_cgmp_body",
             t2_matches=tier_decision.t2_matches, t3_matches=tier_decision.t3_matches)
         tier_blob_parts.append(body_for_tier)
-    record_tier_decision(tier_decision, SOURCE_FDA_WL,
-                         " ".join(p for p in tier_blob_parts if p))
+    if record_tier:
+        record_tier_decision(tier_decision, SOURCE_FDA_WL,
+                             " ".join(p for p in tier_blob_parts if p))
 
     return IntakeItem(
         source=SOURCE_FDA_WL,
@@ -3222,7 +3712,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     LAST_WL_HEALTH = {"wl_body": wl_body_health, "wl_body_full": wl_body_full_health,
                       "listing": listing_health}
     try:
-        resp = requests.get(FDA_WL_URL, timeout=30, headers={
+        resp = fda_checked_request(requests.get, FDA_WL_URL, timeout=30, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
             "Accept": "text/html",
         })
@@ -3231,6 +3721,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
             return [], "HTTP 403"
         resp.raise_for_status()
         html_text = resp.text
+    except FdaBotBlockError:
+        listing_health["detail"] = FDA_BOT_BLOCK
+        return [], FDA_BOT_BLOCK
     except requests.RequestException as e:
         log("WARN", f"FDA WL HTTP 실패: {e}")
         return [], str(e)
@@ -3240,6 +3733,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     try:
         listing_rows = _fetch_wl_listing_datatables(html_text, start)
         listing_health["backbone"] = WL_LISTING_BACKBONE_DATATABLES
+    except FdaBotBlockError:
+        listing_health["detail"] = FDA_BOT_BLOCK
+        return [], FDA_BOT_BLOCK
     except (requests.RequestException, ValueError, RuntimeError) as e:
         listing_health["detail"] = truncate(f"{type(e).__name__}: {e}", 160)
         log("WARN", f"FDA WL DataTables 목록 실패 — 정적 HTML(최신 10행)로 폴백: "
@@ -3261,6 +3757,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         return [], msg
 
     items: list[IntakeItem] = []
+    body_error = None
     for row in listing_rows:
         cols = row.get("_cols", [])
         if len(cols) < 4:
@@ -3326,9 +3823,11 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         # WHY-1 #2: 게이트 통과(유지) WL 의 편지 본문에서 위반 excerpt 추출(flag on 시).
         # 실패는 graceful(키 미기록 → 목록 메타 카드 유지). in-window 유지 WL 은 소수라 부담 낮음.
         excerpt_result: tuple[str, str] | None = None
-        if wl_body_enabled and wl_href:
+        if wl_body_enabled and wl_href and not body_error:
             wl_body_health["attempted"] += 1
             excerpt_result = _fetch_wl_body_excerpt(wl_href)
+            if excerpt_result[1] == FDA_BOT_BLOCK:
+                body_error = FDA_BOT_BLOCK
             if not excerpt_result[0]:
                 wl_body_health["failed"] += 1
 
@@ -3336,9 +3835,11 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         # (docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력. wl_body_enabled 와 완전
         # 독립 — 기존 excerpt 플로우는 이 블록의 영향을 받지 않는다(additive).
         full_result: tuple[str, str] | None = None
-        if wl_body_full_enabled and wl_href:
+        if wl_body_full_enabled and wl_href and not body_error:
             wl_body_full_health["attempted"] += 1
             full_result = _fetch_wl_body_full(wl_href)
+            if full_result[1] == FDA_BOT_BLOCK:
+                body_error = FDA_BOT_BLOCK
             if not full_result[0]:
                 wl_body_full_health["failed"] += 1
 
@@ -3349,7 +3850,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         ))
 
     log("INFO", f"FDA WL 수집 완료: {len(items)}건")
-    return items, None
+    if body_error:
+        listing_health["detail"] = body_error
+    return items, body_error
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -3605,7 +4108,7 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             continue
         if notion_write:
             # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
-            time.sleep(0.34)
+            time.sleep(NOTION_WRITE_DELAY_SECONDS)
             ok = notion_create_page(token, db_id, item, run_date, collected_at,
                                     modality_enabled=modality_enabled)
         else:
@@ -4126,6 +4629,12 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         wl_body_full_health = LAST_WL_HEALTH.get("wl_body_full") or {}
         stats.wl_body_full_attempted = int(wl_body_full_health.get("attempted") or 0)
         stats.wl_body_full_failed = int(wl_body_full_health.get("failed") or 0)
+        wl_v = wl_violations_run_counts(wl_items)
+        stats.wl_violations_filled = wl_v["filled"]
+        stats.wl_violations_unsupported = wl_v["unsupported"]
+        stats.wl_violations_unmarked = wl_v["unmarked"]
+        stats.wl_violations_unsupported_docs = wl_v["unsupported_docs"]
+        stats.wl_violations_out_of_scope = wl_v["out_of_scope"]
         wl_listing = LAST_WL_HEALTH.get("listing") or {}
         stats.wl_listing_backbone = str(wl_listing.get("backbone") or "")
         stats.wl_listing_truncated = bool(wl_listing.get("truncated"))
@@ -4208,10 +4717,12 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             mfds_admin_items = []
         else:
             try:
-                from collect_mfds_admin_action import collect_mfds_admin_actions
+                import collect_mfds_admin_action as mfds_admin
                 # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
-                mfds_admin_items, mfds_admin_err = collect_mfds_admin_actions(
+                mfds_admin_items, mfds_admin_err = mfds_admin.collect_mfds_admin_actions(
                     enf_start, end, data_go_kr_service_key)
+                stats.mfds_admin_total_count_warning = mfds_admin.LAST_HEALTH.get(
+                    "total_count_warning", "")
             except Exception as e:
                 mfds_admin_items, mfds_admin_err = [], str(e)
         stats.mfds_admin_fetched = len(mfds_admin_items)

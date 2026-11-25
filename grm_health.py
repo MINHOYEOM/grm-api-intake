@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
-from grm_common import INTAKE_SOURCE_SPECS, KR_EGRESS_PROXY_UNREACHABLE, log
+from grm_common import FDA_BOT_BLOCK, INTAKE_SOURCE_SPECS, KR_EGRESS_PROXY_UNREACHABLE, log
 from source_silence import evaluate_silence, watched_sources
 
 
@@ -91,7 +91,7 @@ _TRANSIENT_ERROR_MARKERS = [
     "http 502", "http 503", "http 504", "bad gateway",
     "service unavailable", "gateway timeout",
     # Akamai 봇차단(호스트 전체 apology 404, 2026-11-19 FDA WL·483 동시) — IP 차단성 일시 장애.
-    "abuse-detection-apology",
+    FDA_BOT_BLOCK,
 ]
 _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES = {"mfds-rss", "mfds-gmp-inspection"}
 _MFDS_FEATURE_SOURCE_CODES = _MFDS_PUBLIC_ENDPOINT_SOURCE_CODES | {
@@ -526,7 +526,12 @@ def _evaluate_health(
 
         for failed, code, source, detail in enabled_source_failures:
             if failed:
-                if code in _WARN_ONLY_SOURCE_CODES:
+                if FDA_BOT_BLOCK in detail:
+                    health.add_warning(
+                        FDA_BOT_BLOCK, source,
+                        f"{FDA_BOT_BLOCK} — {source} 수집 중단", detail[:240],
+                    )
+                elif code in _WARN_ONLY_SOURCE_CODES:
                     # 표면화는 하되 run 을 적색으로 만들지 않는다(발행 스캐폴드 선택이
                     # `--status success` 라 적색 = 그 주 발행 차단 — 상수 주석 참조).
                     health.add_warning(
@@ -638,6 +643,13 @@ def _evaluate_health(
             warning[:240],
         )
 
+    if stats.mfds_admin_total_count_warning:
+        health.add_warning(
+            "mfds-admin-total-count",
+            "MFDS Admin",
+            stats.mfds_admin_total_count_warning,
+        )
+
     # WHY-1 P1: excerpt 실패/cap 표면화. 카드 자체는 graceful degrade(링크/메타 카드
     # 유지)이므로 warning-only — failure 승격 금지(§3.5, exit 0 유지). flag off 면
     # 카운터가 전부 0 이라 finding 미발생(무변경).
@@ -683,6 +695,32 @@ def _evaluate_health(
             f"WL 본문 전문 {stats.wl_body_full_failed}건 확보 실패 — 위반항목 상세·심층분석 없이 "
             "메타 카드로 적재(다음 날 예약 회수 grm-fda483-ocr-recovery · recover-wl 이 다시 받는다)",
             f"attempted={stats.wl_body_full_attempted} failed={stats.wl_body_full_failed}",
+        )
+    # 미지 형식만 경고하고 사유 미기록과 대상 밖 사유는 요약에 남긴다.
+    if getattr(stats, "wl_violations_unmarked", 0) > 0:
+        health.add_info(
+            "wl-violations-unmarked",
+            "FDA WL",
+            f"WL 본문은 있는데 위반항목·사유 표식이 모두 없는 편지 {stats.wl_violations_unmarked}건 — "
+            "추출 함수(build_wl_item)를 거치지 않은 적재 경로가 있다",
+            f"unmarked={stats.wl_violations_unmarked}",
+        )
+    scope = getattr(stats, "wl_violations_out_of_scope", {})
+    if scope:
+        health.add_info(
+            "wl-violations-out-of-scope",
+            "FDA WL",
+            f"WL 위반항목 추출 대상 밖 {sum(scope.values())}건",
+            ", ".join(f"{reason}={count}" for reason, count in sorted(scope.items())),
+        )
+    if getattr(stats, "wl_violations_unsupported", 0) > 0:
+        docs = ",".join(getattr(stats, "wl_violations_unsupported_docs", [])[:10])
+        health.add_warning(
+            "wl-violations-unsupported",
+            "FDA WL",
+            f"WL 위반항목을 못 뽑은 편지 {stats.wl_violations_unsupported}건(지원 형식 밖) — "
+            "원문 형식을 보고 추출기에 형식 추가(지어내기 금지·원문 문장 그대로)",
+            f"unsupported={stats.wl_violations_unsupported} filled={stats.wl_violations_filled} docs={docs}",
         )
     # [WL 목록 절단 2026-10-27] DataTables 전수 뷰가 죽어 정적 표(최신 10행)로 폴백했고, 그
     # 10행이 전부 수집 창 안이라 창 안 편지가 더 있는지 알 수 없다. 화요일 게시가 10건을

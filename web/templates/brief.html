@@ -95,6 +95,12 @@
       {%- if card.group_head %}
       <div class="grp-h">{{ card.group_head }}</div>
       {%- endif %}
+      {%- if card.fgrp_open %}
+      {#- [업체 그룹 묶음 2026-11-23] 같은 그룹(등록 근거)·같은 FEI 카드를 한 상자로 — 카드는 시설·문서별 그대로.
+          grm.css 프리즈 — 인라인. 검은 띠 없이 옅은 테두리 + 머리말 한 줄. -#}
+      <div class="fgrp" data-fgroup="{{ card.fgroup_key }}" style="margin:28px 0 8px;padding:4px 14px 6px;border:1px solid var(--line);border-left:3px solid var(--coral);border-radius:var(--rad-s)">
+        <div class="fgrp-h" style="margin:10px 0 2px;font-size:14px;font-weight:700;color:var(--ink)"><i class="ti ti-building-factory-2" aria-hidden="true" style="color:var(--coral);margin-right:6px"></i>{{ card.fgrp_head }}</div>
+      {%- endif %}
       {%- if card.weight == 'row' %}
       {#- [카드 무게 2026-11-10 · 결정 B] 표 한 줄 — 업체·제품·사유·등급(구분)·날짜·원문 링크.
           누르면 그 자리에서 지금 카드처럼 펼친다(시사점·점검 없음 — render._card_view). -#}
@@ -110,6 +116,9 @@
       {%- endif %}
       {%- else %}
       {% include "partials/card.html" %}
+      {%- endif %}
+      {%- if card.fgrp_close %}
+      </div>
       {%- endif %}
       {%- endfor %}
       </div>
@@ -418,6 +427,11 @@ body.brief-summary #cards .rowc[open]>article.card{display:block}
        값은 속성에서 읽어 textContent 로만 넣는다(HTML 삽입 금지). */
     var tag=card.getAttribute('data-tag');
     if(tag){ var m=a.querySelector('.meta'); if(m) m.textContent=tag; }
+    /* [업체 그룹 묶음 2026-11-23] 옛 실사 표시·실사일 — 요약줄에도(textContent 만). */
+    var oi=card.getAttribute('data-old-insp');
+    if(oi){ var m2=a.querySelector('.meta'); if(m2){ var s=document.createElement('span');
+      s.className='old-insp-s'; s.style.cssText='display:inline-block;margin-right:8px;padding:0 7px;border:1px solid var(--coral);border-radius:999px;color:var(--coral-2);font-weight:600';
+      s.textContent=oi; m2.insertBefore(s, m2.firstChild); } }
     a.addEventListener('click', function(e){
       e.preventDefault(); setView('full', true);   /* 카드 하나 펼침 — 독자의 보기 선택으로 저장하지 않는다 */
       var t=document.getElementById(card.id);

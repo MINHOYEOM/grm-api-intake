@@ -1056,6 +1056,15 @@ class LoadGitRunTest(unittest.TestCase):
         self.assertTrue(run["adoptable"], run["reason"])
         self.assertEqual(run["branch"], "claude/company-2026-07-13")
 
+    def test_pass_with_notes_still_adoptable(self) -> None:
+        """[11-21] 교열 '주의'(pass + notes · counts.notes_total)는 반려가 아니다 — 채택을 막지 않는다."""
+        ce = json.loads(json.dumps(_COPYEDIT_OK))
+        ce["cards"][0]["notes"] = [{"item": "같은 이름", "slot": "deep.key_violations", "evidence": "한 줄"}]
+        ce["counts"]["notes_total"] = 1
+        run = db.load_git_run("2026-07-13", read=_git_reader(
+            {"delta.json": _git_delta(), "copyedit.json": ce}))
+        self.assertTrue(run["adoptable"], run["reason"])
+
     def test_held_copyedit_not_adoptable_but_delta_kept_for_compare(self) -> None:
         run = db.load_git_run("2026-07-13", read=_git_reader(
             {"delta.json": _git_delta(), "copyedit.json": _COPYEDIT_HELD}))
@@ -1419,9 +1428,10 @@ class DeltaBridgeWorkflowGuardTest(unittest.TestCase):
     def test_default_source_is_notion(self) -> None:
         self.assertIn("|| vars.GRM_DELTA_SOURCE || 'notion' }}", self.text)
 
-    def test_consume_skipped_for_git_writes(self) -> None:
-        self.assertIn("steps.bridge.outputs.wrote == 'true' && steps.bridge.outputs.source != 'git'",
-                      self.text)
+    def test_consume_step_removed_and_off_guard_first(self) -> None:
+        # [노션 은퇴 ③] 노션 CONSUMED 마감 단계는 지웠다 — 브릿지는 GRM_INTAKE_NOTION=off 에서만 기록한다.
+        self.assertNotIn("--consume", self.text)
+        self.assertLess(self.text.index("- name: 노션 off 확인"), self.text.index("- name: 델타 브릿지 실행"))
 
     def test_compare_dir_is_never_committed(self) -> None:
         adds = [ln for ln in self.text.splitlines() if ln.strip().startswith("git add")]

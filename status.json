@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T12:39:04Z",
+ "generated_at": "2026-11-25T12:53:39Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,34 +229,45 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45614024587,
+    "databaseId": 45616876416,
     "status": "in_progress",
     "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-25T12:45:44Z",
+    "updatedAt": "2026-11-25T12:46:22Z",
+    "headBranch": "fix/farm-address-1125",
+    "displayTitle": "fix(privacy): 11-23호 개인 농장 번지 생략 + 개인 사업자 번지 게이트·브릿지 자동 정리",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45616876416"
+   },
+   {
+    "databaseId": 45614024587,
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-25T12:28:04Z",
-    "updatedAt": "2026-11-25T12:34:33Z",
+    "updatedAt": "2026-11-25T12:41:46Z",
     "headBranch": "codex/ci-slot-wait",
     "displayTitle": "main 병합: §5.1 충돌 해소",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45614024587"
    },
    {
     "databaseId": 45613901035,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-25T12:27:17Z",
-    "updatedAt": "2026-11-25T12:36:30Z",
+    "updatedAt": "2026-11-25T12:44:10Z",
     "headBranch": "codex/483-inspectors-names",
     "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/483-inspectors-…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45613901035"
    },
    {
     "databaseId": 45612111567,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-25T12:16:04Z",
-    "updatedAt": "2026-11-25T12:33:54Z",
+    "updatedAt": "2026-11-25T12:42:04Z",
     "headBranch": "claude/fixture-and-debarment-names-1125",
     "displayTitle": "fix(privacy): 시험 자료 실명 22건 정리 + FDA 자격박탈 대상자 실명(판정·자동 가림·06-22 발행본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612111567"
@@ -271,17 +282,6 @@
     "headBranch": "claude/fixture-and-debarment-names-1125",
     "displayTitle": "fix(privacy): FDA 자격박탈 명령 대상 개인 실명 — 판정·자동 가림·06-22 발행본·시험 자료",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612097828"
-   },
-   {
-    "databaseId": 45611389287,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T12:11:27Z",
-    "updatedAt": "2026-11-25T12:34:08Z",
-    "headBranch": "claude/mfds-gmp-recollect-1125",
-    "displayTitle": "Merge branch 'main' into claude/mfds-gmp-recollect-1125",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45611389287"
    }
   ],
   "grm-scaffold-mirror.yml": [

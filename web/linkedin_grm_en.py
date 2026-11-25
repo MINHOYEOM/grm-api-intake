@@ -157,6 +157,8 @@ def validate_en(card: dict, slots: dict, findings: dict, letter: str) -> list[st
         extra = la._nums(t) - allowed
         if extra:
             probs.append(f"{path}: numbers not in the letter or DB {sorted(extra)}")
+        probs += la.approx_overlap_problems(path, t, "en")
+    probs += la.approx_headline_problems("en.cover.headline", (en.get("cover") or {}).get("headline") or [], "en")
 
     def _ev_ok(path: str, ev: Any, text: str = "") -> None:
         evs = la._ev_list(ev)

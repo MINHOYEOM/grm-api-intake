@@ -137,7 +137,8 @@ class EmaExcerptCaptureTest(unittest.TestCase):
         self.assertEqual(len(items), 1)
         excerpt = items[0].raw_payload.get("article_excerpt", "")
         self.assertTrue(excerpt.startswith("EMA’s human medicines committee (CHMP)"))
-        mock_sleep.assert_called_with(ci.ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
+        # [11-25 #8] EMA 는 공통 판독기(ema_document)를 거친다 — 간격은 #1938 값 2초.
+        mock_sleep.assert_called_with(ci.ema_document.BACKFILL_ARTICLE_DELAY_SECONDS)
 
     def test_the_number_that_was_asserted_without_evidence_is_now_in_our_input(self):
         """★이 PR 의 존재 이유 — "12" 가 우리가 가진 텍스트 안에 있어야 한다.

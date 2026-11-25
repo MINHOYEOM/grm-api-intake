@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Shared deterministic helpers for GRM command-line and PostgREST tools.
 
-This module only normalizes inputs and reads/writes local JSON. It has no
-network or database side effects, so service modules can share byte-identical
-boundary behavior without importing one another.
+This module provides local helpers and coordinates bulk writes through
+caller-provided callbacks. It does not open network or database connections.
 """
 
 from __future__ import annotations
@@ -11,8 +10,74 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
+
+
+BULK_BATCH_MAX = 500
+BULK_RUN_MAX = 2_000
+_BULK_PAUSE_SECONDS = 1.0
+_BULK_FAILURE_LIMIT = 2
+_Row = TypeVar("_Row")
+
+
+class BulkWriteError(RuntimeError):
+    """The run exhausted its row budget or reached the failure limit."""
+
+
+class BulkWriteRun:
+    """Share one budget across related writes in a command invocation.
+
+    A callback sends a single batch and returns False on a failed batch
+    that the caller wants to record and continue past. Exceptions stop
+    immediately. The budget counts attempted rows, including failed batches.
+    """
+
+    def __init__(self) -> None:
+        self.attempted = 0
+        self._consecutive_failures = 0
+
+    @property
+    def remaining(self) -> int:
+        return BULK_RUN_MAX - self.attempted
+
+    def require_capacity(self, count: int) -> None:
+        if count > self.remaining:
+            raise BulkWriteError(
+                f"bulk write needs {count} rows, only {self.remaining} remain in this run"
+            )
+
+    def write(
+        self,
+        rows: list[_Row],
+        send: Callable[[list[_Row], int], bool | None],
+        *,
+        batch_size: int = BULK_BATCH_MAX,
+    ) -> None:
+        if batch_size < 1:
+            raise ValueError("bulk write batch_size must be positive")
+        if self._consecutive_failures >= _BULK_FAILURE_LIMIT:
+            raise BulkWriteError("bulk write stopped after consecutive batch failures")
+        self.require_capacity(len(rows))
+        size = min(batch_size, BULK_BATCH_MAX)
+        for offset in range(0, len(rows), size):
+            batch = rows[offset:offset + size]
+            if self.attempted:
+                time.sleep(_BULK_PAUSE_SECONDS)
+            self.attempted += len(batch)
+            try:
+                sent = send(batch, offset)
+            except Exception:
+                self._consecutive_failures = _BULK_FAILURE_LIMIT
+                raise
+            if sent is False:
+                self._consecutive_failures += 1
+                if self._consecutive_failures >= _BULK_FAILURE_LIMIT:
+                    raise BulkWriteError("bulk write stopped after consecutive batch failures")
+            else:
+                self._consecutive_failures = 0
 
 
 def load_json_object(path: str | Path) -> dict[str, Any]:

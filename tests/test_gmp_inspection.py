@@ -631,22 +631,35 @@ class TestParseDeficiencyTableGate(unittest.TestCase):
                 g._parse_deficiency_table(b"%PDF", "pdf", "", "present", "d"),
                 ([], ""))
 
-    def test_warn_fires_when_unknown_and_no_table(self):
-        """★[침묵 사각지대 가드 2026-08-25] empty + assess=unknown 은 WARN 이 울린다.
-
-        종전엔 WARN 이 present 조합만이라, 원문에 표가 실재하는데 파서가 0행을 낸 문서
-        (실측: 서울대병원)가 판정 불능(unknown)이면 소리 없이 empty 로 흘렀다. 가드는
-        로그만 더한다 — status 는 "empty" 그대로(raw_payload 등 산출물 byte 불변)."""
+    def test_unknown_and_no_table_is_unreadable(self):
         data = _build_pdf(self._PERIODIC_TITLE, None)  # 표 없음
         captured: list[tuple[str, str]] = []
         with _FlagCtx("true"), mock.patch.object(
                 g, "log", side_effect=lambda lvl, msg: captured.append((lvl, msg))):
             rows, status = g._parse_deficiency_table(
                 data, "pdf", self._PERIODIC_TITLE, "unknown", "doc-unk-warn")
-        self.assertEqual((rows, status), ([], "empty"))   # 산출 status 불변
+        self.assertEqual((rows, status), ([], "unreadable"))
         self.assertTrue(
-            any(lvl == "WARN" and "doc-unk-warn" in msg for lvl, msg in captured),
-            f"empty+unknown 조합인데 WARN 미발화: {captured}")
+            any(lvl == "WARN" and "판독 불명" in msg and "doc-unk-warn" in msg
+                for lvl, msg in captured))
+
+    def test_item_preserves_unreadable_status_for_source_review(self):
+        data = _hwpx_bytes([[["제조소명", "테스트제약"]]])
+        raw = {"doc_id": "doc-review", "manufacturer": "테스트제약",
+               "registered_date": "2026-11-20"}
+        with _FlagCtx("true"), mock.patch.object(g, "_get_bytes", return_value=data), \
+             mock.patch.object(g, "ATTACHMENT_REQUEST_DELAY_SECONDS", 0):
+            item = g._to_item(raw, "")
+
+        self.assertIsNotNone(item)
+        payload = item.raw_payload
+        self.assertEqual(payload["attachment_parse_status"], "hwpx-ok")
+        self.assertEqual(payload["attachment_deficiency_assessment"], "unknown")
+        self.assertEqual(payload["gmp_deficiency_table_status"], "unreadable")
+        self.assertNotIn("gmp_deficiencies", payload)
+        self.assertTrue(payload["manual_review_required"])
+        self.assertIn("결함표 판독 불명", item.body)
+        self.assertEqual(item.signal_tier, "Tier 2")
 
     def test_no_warn_when_none_and_no_table(self):
         # 비발화 대조군: '지적사항 없음'(none) + 표 없음은 정상 — 경고가 없어야 한다.
@@ -673,7 +686,7 @@ class TestParseDeficiencyTableGate(unittest.TestCase):
 
 
 class TestDeficiencyTableHealthTally(unittest.TestCase):
-    """★[침묵 사각지대 가드 2026-08-25] empty+unknown 조합의 health 관측(순수 dict 로직)."""
+    """지적 표 판독 상태의 health 카운터와 경고를 확인한다."""
 
     @staticmethod
     def _item(status: str, assess: str, firm: str = "테스트제약") -> SimpleNamespace:
@@ -692,6 +705,14 @@ class TestDeficiencyTableHealthTally(unittest.TestCase):
         self.assertEqual(h["attempted"], 1)     # 카운터는 종전 그대로
         self.assertEqual(h["failed"], 0)
         self.assertEqual(h["warnings"], ["empty-unknown: 테스트제약"])
+
+    def test_unreadable_records_source_review_warning(self):
+        h = self._fresh()
+        g._tally_deficiency_table_health(h, self._item("unreadable", "unknown"))
+        self.assertEqual(h["attempted"], 1)
+        self.assertEqual(h["extracted"], 0)
+        self.assertEqual(h["failed"], 0)
+        self.assertEqual(h["warnings"], ["unreadable: 테스트제약"])
 
     def test_empty_none_stays_silent(self):
         # 비발화: '지적사항 없음' + 표 없음은 정상이라 관측 항목도 없다.

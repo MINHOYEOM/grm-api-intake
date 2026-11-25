@@ -1,0 +1,358 @@
+{
+  "schema": "grm-anatomy-slots/v3",
+  "pub": "2026-11-23",
+  "rank": 1,
+  "card_id": "55c08c82779b",
+  "firm_alias": "한 원료의약품 제조소",
+  "status": "weekly",
+  "selection": "ANATOMY_CARDS.md 규칙(신호 등급 → 날짜를 뺀 구체 수치 수 → 지적 건수): 55c08c82779b (3, 3, 3) > d60bdc71408a (3, 0, 4) = ed75ff499f75 (3, 0, 4)",
+  "cover": {
+    "chip": "FDA 경고서한 · 기준일탈 조사",
+    "headline": [
+      "기준일탈 200건 넘게,",
+      "재분석 합격만으로 무효화"
+    ],
+    "sub": "원료의약품 제조소 · 기준일탈 조사·설비 청결",
+    "quote": {
+      "en": "The initial OOS results were then invalidated based solely on passing results after reanalysis.",
+      "ko": "이후 최초 기준일탈 결과는 재분석에서 나온 합격 결과만을 근거로 무효화됐다."
+    },
+    "line": "FDA 요구: 시험실 원인을 확정 못 하면 제조 원인 조사를 시작",
+    "line_evidence": [
+      "시험실 원인을 확정할 수 없을 때 제조 원인에 대한 철저한 조사 시작"
+    ]
+  },
+  "s02": {
+    "heading": "FDA가 지적한 네 가지",
+    "rows": [
+      {
+        "cite": "FD&C Act 501(a)(2)(B)",
+        "text": "2021년 이후 기준일탈 300건 넘게 조사 부실. 무효화는 200건 넘게",
+        "evidence": [
+          "2021년 이후 함량, 관련 물질·불순물, 미생물 모니터링, 용수 품질과 관련한 기준일탈(OOS) 결과 300건 넘게를 적절히 조사하지 않았고, 이 가운데 200건 넘게가 무효화됐다"
+        ],
+        "sim_query": "기준일탈 무효화 재분석 조사",
+        "sim_short": "기준일탈 무효화·조사 부실",
+        "sim_situation": "기준일탈.*(?:무효|재시험|재분석)|OOS.*무효"
+      },
+      {
+        "cite": "FD&C Act 501(a)(2)(B)",
+        "text": "시험실 오류가 불명확해도 2단계 조사 없이 분석자 탓",
+        "evidence": [
+          "1단계 조사에서 확정적인 시험실 오류가 확인되지 않았을 때 2단계 조사를 하지 않았거나, 불합격 결과를 분석자나 절차 오류 탓으로 부적절하게 돌렸다",
+          "이후 최초 기준일탈 결과는 재분석에서 나온 합격 결과만을 근거로 무효화됐다"
+        ],
+        "sim_query": "2단계 조사 분석자 오류 재교육",
+        "sim_short": "2단계 조사 생략",
+        "sim_situation": "2단계|Phase ?II|분석자.*(?:오류|탓)|재교육"
+      },
+      {
+        "cite": "FD&C Act 501(a)(2)(B)",
+        "text": "미생물 수 초과 시료의 조사에 균 동정이 없음",
+        "evidence": [
+          "총 호기성 미생물 수 규격을 초과한 원료의약품 시료에 대한 회사의 조사에는 미생물 동정이 포함되지 않았다"
+        ],
+        "sim_query": "미생물 기준일탈 동정 집락",
+        "sim_short": "균 동정 없는 조사",
+        "sim_situation": "미생물 동정|집락|동정"
+      },
+      {
+        "cite": "FD&C Act 501(a)(2)(B)",
+        "text": "탱크 박리·잔류물, 배관 고인 물, 살아 있는 곤충",
+        "evidence": [
+          "탱크 제품 접촉면 박리, '세척 완료' 탱크의 잔류물, 이송 배관 고인 물, 살아 있는 곤충 등 설비·시설을 청결하게 유지하지 않음"
+        ],
+        "sim_query": "설비 잔류물 곤충 고인 물 청결",
+        "sim_short": "설비·시설 청결 불량",
+        "sim_situation": "곤충|해충|고인 물|잔류물|박리"
+      }
+    ]
+  },
+  "s03": {
+    "heading": "회신 네 가지, FDA는 불충분하다고 봤다",
+    "sub": "2026-06-30 회신에 대한 FDA 평가",
+    "pairs": [
+      {
+        "response": "닫은 조사를 다시 열고 3년 소급 검토",
+        "why": "무효화됐을 수 있는 결과가 닿은 배치의 임시 관리가 없다",
+        "evidence": [
+          "회사는 종결된 조사 재평가와 3년 소급 검토를 약속했으나",
+          "부적절하게 무효화됐을 수 있는 결과의 영향을 받은 원료의약품 배치에 대한 적절한 임시 관리가 없다고 적었다"
+        ]
+      },
+      {
+        "response": "미생물 동정 프로그램을 만들겠다",
+        "why": "동정이 필요한 기준과 개발 중 임시 관리가 없다",
+        "evidence": [
+          "미생물 동정 프로그램 약속에는 동정이 필요한 기준과 프로그램 개발 중 임시 관리가 없다고 적었다"
+        ]
+      },
+      {
+        "response": "벗겨진 물질은 시공 기초 재료",
+        "why": "설치적격성평가 보고서에만 기대고 분석적 규명이 없다",
+        "evidence": [
+          "벗겨진 물질이 초과 시공 기초 재료라는 결론은 설치적격성평가 보고서에만 의존하고 분석적 규명이 없다고 적었다"
+        ]
+      },
+      {
+        "response": "이송 배관 배수 불량을 인정",
+        "why": "반복해서 ‘청소됨’으로 승인한 경위를 설명하지 않았다",
+        "evidence": [
+          "이송 라인의 배수가 설계상 불량함을 인정하면서도 이 설비를 반복해서 '청소됨'으로 승인·출하한 경위를 설명하지 않았다고 적었다"
+        ]
+      }
+    ],
+    "repeat": {
+      "label": "반복 지적",
+      "text": "미생물 조사에서 집락 특성을 확인하지 않은 문제는 2018년 실사에서도 지적됐다.",
+      "evidence": [
+        "미생물 기준일탈 조사에서 집락 특성 확인이 없는 문제는 2018년 실사에서 이미 지적됐다"
+      ]
+    }
+  },
+  "s04": {
+    "heading": "FDA가 요구한 것 — 아홉 가지 중 네 가지",
+    "items": [
+      {
+        "ref": 0,
+        "title": "조사 3년 소급 검토",
+        "text": "지난 3년간 핵심 조사 전부를 독립 검토하고 적절성을 평가한다."
+      },
+      {
+        "ref": 1,
+        "title": "CAPA 독립 평가",
+        "text": "시정 및 예방조치 프로그램을 독립 평가하고 개선 계획을 낸다."
+      },
+      {
+        "ref": 2,
+        "title": "무효화 OOS 검토",
+        "text": "미국 제품의 무효화된 기준일탈 전부를 3년 거슬러 검토해 보고한다."
+      },
+      {
+        "ref": 3,
+        "title": "OOS 조사 체계",
+        "text": "품질부서 감독과 개정 절차를 포함한 시정 계획을 낸다."
+      }
+    ]
+  },
+  "s05": {
+    "heading": "이번 지적과 닮은 과거 사례",
+    "comment": "같은 기준일탈 조사 지적은 다른 서한에도 나왔다. 사례는 사이트 유사 사례 검색 결과다.",
+    "topic": "일탈/CAPA/조사",
+    "cfr_rows": [
+      [
+        "기준일탈 조사",
+        "21 CFR 211.192"
+      ],
+      [
+        "설비 세척·유지",
+        "21 CFR 211.67"
+      ],
+      [
+        "건물 위생",
+        "21 CFR 211.56"
+      ]
+    ],
+    "map_header": "대응 조항 기준(서한은 조항 번호를 적지 않음)",
+    "map_note": "서한은 조항 번호를 적지 않았다. 같은 취지의 완제의약품 cGMP(21 CFR 211) 조항으로 센 값이다.",
+    "keywords": [
+      "OOS invalidation",
+      "microbial identification",
+      "equipment cleanliness"
+    ],
+    "term_ids": [
+      "oos",
+      "laboratory-investigation",
+      "capa",
+      "cleaning-validation"
+    ]
+  },
+  "s06": {
+    "heading": "서한이 적지 않은 것",
+    "not_stated": [
+      {
+        "text": "무효화된 200건 넘는 결과가 어느 제품·배치인지 적지 않았다.",
+        "basis": "위반 1 원문 ‘more than 200 OOS results were invalidated’ — 제품·배치 식별이 없다"
+      },
+      {
+        "text": "검토한 기록 30건 중 몇 건이 무효화됐는지 적지 않았다.",
+        "basis": "위반 1 원문 ‘review of 30 OOS investigation records and found a consistent pattern’ — 건수 구분이 없다"
+      },
+      {
+        "text": "곤충이 관찰된 날짜와 횟수는 적지 않았다.",
+        "basis": "위반 2 원문 ‘A flying insect was observed’ · ‘Live insects on and around equipment’ — 날짜·횟수가 없다"
+      }
+    ],
+    "question": "우리 기준일탈 무효화에는 재분석 합격 말고 어떤 근거가 있나요?"
+  },
+  "caption": {
+    "lead": "기준일탈 결과 300건 넘게를 조사하지 않았습니다. 이 중 200건 넘게는 무효화됐습니다. FDA 실사관은 조사 기록 30건에서 같은 양상을 확인했습니다. 한 원료의약품 제조소가 받은 경고서한입니다.",
+    "claims": "지적은 두 가지입니다. 첫째는 기준일탈 조사입니다. 2021년 이후 기준일탈 300건 넘게를 제대로 조사하지 않았습니다. 이 중 200건 넘게가 무효화됐습니다. 1단계에서 시험실 오류가 확정되지 않았을 때 2단계 조사를 하지 않았거나 분석자 탓으로 돌렸습니다. 최초 결과는 재분석의 합격 결과만으로 무효화됐고, 시정 조치는 분석자 재교육으로 일률 처리됐습니다. 총 호기성 미생물 수를 초과한 시료의 조사에는 미생물 동정이 없었습니다. 둘째는 설비·시설 청결입니다. 탱크 제품 접촉면에서 물질이 벗겨졌고, ‘세척 완료’ 탱크에 잔류물이 있었으며, 이송 배관에는 물이 고여 있었습니다. 살아 있는 곤충도 관찰됐습니다.",
+    "contrast": "회사는 2026-06-30 회신에서 종결된 조사를 재평가하고 3년 소급 검토를 하겠다고 약속했습니다. FDA는 무효화됐을 수 있는 결과가 닿은 배치의 임시 관리가 없다고 봤습니다. 출하 배치의 위험평가에는 결론을 뒷받침하는 자료가 없다고 했습니다. 미생물 동정 프로그램에는 동정이 필요한 기준이 없다고 했습니다. 설비 회신은 분석 자료와 이전 배치의 소급 영향평가가 부족하다고 봤습니다.",
+    "requests": "FDA는 지난 3년간 핵심 조사 전체의 독립 소급 검토, 시정 및 예방조치 프로그램의 독립 평가, 미국 제품의 무효화된 기준일탈 전체 검토, 기준일탈 조사 체계의 시정 계획을 요구했습니다. 설비 감독 계획, 세척 효과 평가, 용수 모니터링 절차도 요구했습니다. 회신 기한은 서한 수령 후 15영업일입니다.",
+    "similar": "우리 지적사항 DB에서 이번 지적과 닮은 과거 사례를 찾아봤습니다.",
+    "not_stated": "서한에 없는 것: 무효화된 200건 넘는 결과의 제품·배치, 검토한 30건 중 무효화 건수, 곤충이 관찰된 날짜와 횟수."
+  },
+  "en": {
+    "cover": {
+      "chip": "FDA warning letter · OOS investigations",
+      "headline": [
+        "Over 200 OOS results",
+        "invalidated on retest alone"
+      ],
+      "sub": "API site · OOS investigations and cleanliness",
+      "quote": {
+        "text": "The initial OOS results were then invalidated based solely on passing results after reanalysis."
+      },
+      "line": "FDA: no proven lab error means look at manufacturing causes",
+      "line_evidence": [
+        "Whenever an investigation lacks conclusive evidence of laboratory error, a thorough investigation of potential manufacturing causes must be performed."
+      ]
+    },
+    "s02": {
+      "heading": "Four findings",
+      "rows": [
+        {
+          "cite": "FD&C Act 501(a)(2)(B)",
+          "text": "Since 2021, over 300 OOS results uninvestigated. Invalidated: 200+",
+          "evidence": [
+            "You failed to adequately investigate over 300 out-of-specification (OOS) results related to assay, related substances/impurities, microbiological monitoring, and water quality since 2021, of which more than 200 OOS results were invalidated."
+          ],
+          "short": "OOS invalidation"
+        },
+        {
+          "cite": "FD&C Act 501(a)(2)(B)",
+          "text": "No Phase II work when lab error was not proven; blamed on analysts",
+          "evidence": [
+            "when Phase I investigations found no conclusive laboratory error, Phase II investigations were either not conducted or improperly attributed the failing results to analyst or procedural error",
+            "The initial OOS results were then invalidated based solely on passing results after reanalysis."
+          ],
+          "short": "Phase II skipped"
+        },
+        {
+          "cite": "FD&C Act 501(a)(2)(B)",
+          "text": "Microbial counts over limit, with no organism identification",
+          "evidence": [
+            "your investigations into API samples that exceeded the specification for total aerobic count did not include microbial identification"
+          ],
+          "short": "No organism ID"
+        },
+        {
+          "cite": "FD&C Act 501(a)(2)(B)",
+          "text": "Peeling tank surface, stagnant water, live insects",
+          "evidence": [
+            "Peeling material on the product contact side",
+            "Stagnant water filling the transfer line",
+            "Live insects on and around equipment and floors"
+          ],
+          "short": "Equipment and facility cleanliness"
+        }
+      ]
+    },
+    "s03": {
+      "heading": "Four responses, none enough",
+      "sub": "FDA's review of the June 30, 2026 reply",
+      "pairs": [
+        {
+          "response": "Reopen cases; three-year review",
+          "why": "No interim controls for batches hit by invalidated results",
+          "evidence": [
+            "commit to reevaluating the previously closed OOS and complaint investigations",
+            "fails to implement appropriate interim controls for API batches potentially affected by improperly invalidated results"
+          ]
+        },
+        {
+          "response": "Build a microbial ID program",
+          "why": "No criteria for when ID is required, no interim controls",
+          "evidence": [
+            "Your commitment to establishing a microbial identification program does not include criteria for when identification is required or interim controls during program development."
+          ]
+        },
+        {
+          "response": "Peeling is excess base material",
+          "why": "Rests on the IQ report alone, with no analytical ID",
+          "evidence": [
+            "was excess construction base material",
+            "relies solely on your installation qualification report and is unsupported by analytical identification"
+          ]
+        },
+        {
+          "response": "Admitted poor line drainage",
+          "why": "Never explained repeated ‘clean’ releases",
+          "evidence": [
+            "While you acknowledge that the transfer line was not designed to drain properly, you fail to explain how this equipment was repeatedly approved and released as “clean.”"
+          ]
+        }
+      ],
+      "repeat": {
+        "label": "Cited before",
+        "text": "Missing colony checks in microbial OOS cases were already cited in 2018.",
+        "evidence": [
+          "The lack of colony characterization during microbial OOS investigations was previously cited in your 2018 inspection."
+        ]
+      }
+    },
+    "s04": {
+      "heading": "What FDA asked for: four of nine",
+      "items": [
+        {
+          "ref": 0,
+          "title": "Investigation review",
+          "text": "Independent review of all critical investigations for the last three years."
+        },
+        {
+          "ref": 1,
+          "title": "CAPA program review",
+          "text": "Independent assessment of the CAPA program, with a plan to fix it."
+        },
+        {
+          "ref": 2,
+          "title": "Invalid OOS review",
+          "text": "Review of every invalidated OOS result for U.S. products, shipped or not."
+        },
+        {
+          "ref": 3,
+          "title": "OOS system overhaul",
+          "text": "A plan covering QU oversight of lab investigations and revised procedures."
+        }
+      ]
+    },
+    "s05": {
+      "heading": "Past cases like this one",
+      "comment": "Similar OOS findings appear in other letters. Cases come from the site's similar-case search.",
+      "topic_label": "Deviations / CAPA / investigations",
+      "cfr_labels": [
+        "OOS investigation",
+        "Equipment cleaning and maintenance",
+        "Building sanitation"
+      ],
+      "map_header": "Matched sections (the letter cites no section number)"
+    },
+    "s06": {
+      "heading": "What the letter does not say",
+      "not_stated": [
+        {
+          "text": "It does not say which products or batches the 200+ invalidated results belong to.",
+          "basis": "Violation 1: ‘more than 200 OOS results were invalidated’ — no product or batch given"
+        },
+        {
+          "text": "It does not say how many of the 30 records reviewed involved invalidation.",
+          "basis": "Violation 1: ‘review of 30 OOS investigation records’ — no split by outcome"
+        },
+        {
+          "text": "It gives no dates or count for the insect sightings.",
+          "basis": "Violation 2: ‘A flying insect was observed’ · ‘Live insects on and around equipment’ — no dates or numbers"
+        }
+      ],
+      "question": "Beyond a passing retest, what supports our OOS invalidations?"
+    },
+    "caption": {
+      "lead": "Over 300 OOS results since 2021 were not adequately investigated. More than 200 were invalidated. FDA reviewed 30 investigation records and saw the same pattern. The warning letter went to an API manufacturer.",
+      "claims": "FDA cited two failures. First, OOS investigations. Over 300 results since 2021 were not adequately investigated. More than 200 of them were invalidated. When Phase I found no conclusive lab error, Phase II was skipped or the analyst was blamed. Initial results were invalidated solely on passing reanalysis. Samples over the aerobic count limit had no organism identification. Second, cleanliness. Material peeled inside a tank, a ‘clean’ tank had residues, water stood in a transfer line, and live insects were seen.",
+      "contrast": "In its June 30, 2026 reply, the firm committed to reopen closed OOS and complaint cases and run a three-year retrospective review. FDA said there were no interim controls for batches possibly affected by invalidated results. The risk assessment for distributed batches had no supporting data. The equipment reply lacked analytical data and retrospective impact assessments.",
+      "requests": "FDA asked for an independent review of all critical investigations over three years, an independent CAPA assessment, a review of every invalidated OOS result for U.S. products, and an OOS system remediation plan. It also asked for facility oversight, a cleaning effectiveness review, and a water monitoring procedure. The reply is due within 15 business days of receipt.",
+      "similar": "We looked for similar past findings in the GRM findings database.",
+      "not_stated": "Not in the letter: the products or batches behind the 200+ invalidated results, and dates or counts for the insect sightings."
+    }
+  }
+}

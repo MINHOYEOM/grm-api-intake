@@ -523,6 +523,21 @@ function warningIssueSummary(issue: Record<string, unknown>) {
   };
 }
 
+// 소스별 건수 기록 — grm-ops-status.yml 이 claude/ops-status 브랜치 status.json 의 intake_counts 로 쌓는다.
+// 못 읽어도(권한·브랜치 없음) 운영 화면 전체는 그대로 — 화면은 '소스별 건수는 다음 수집부터'로 안내한다.
+async function intakeCounts(): Promise<Array<Record<string, unknown>>> {
+  try {
+    const res = await githubFetch(`/contents/status.json?ref=${encodeURIComponent("claude/ops-status")}`, {
+      headers: { Accept: "application/vnd.github.raw+json" },
+    });
+    if (!res.ok) return [];
+    const rows = (res.payload as Record<string, unknown>).intake_counts;
+    return Array.isArray(rows) ? rows.slice(0, 14) as Array<Record<string, unknown>> : [];
+  } catch (_) {
+    return [];
+  }
+}
+
 async function opsOverview() {
   const defs = workflowMap();
   const runs = await listRuns();
@@ -579,6 +594,7 @@ async function opsOverview() {
   const inProgress = runs.filter((run) => run.status && run.status !== "completed").length;
   const warningIssues = await openWarningIssues();
   const sourceWorkflow = workflows.find((item) => item.action === "intake_run");
+  const intake_counts = await intakeCounts();
   return {
     ok: workflows.every((item) => item.ok),
     repo: repoName(),
@@ -597,6 +613,7 @@ async function opsOverview() {
         : "no-run",
     },
     workflows,
+    intake_counts,
     incidents,
     configuration_warnings: configurationWarnings,
     warning_issues: warningIssues,

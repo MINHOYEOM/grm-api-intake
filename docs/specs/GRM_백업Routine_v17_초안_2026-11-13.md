@@ -1,5 +1,9 @@
 # 백업 Routine v17 초안 — git handoff 를 읽고 git 으로 반납한다 (2026-11-13, 초안)
 
+> **2026-11-19: 이 초안은 `company/editorial/backup.md`(지시문)·`company/editorial/backup_gate.py`(판정)로 구체화됐다.** 바뀐 점 —
+> 반납 폴더를 편집팀 폴더 덮어쓰기(5절)가 아니라 하위 폴더 `company/run/{날짜}/backup/` 로 나눴고(브릿지가 편집팀 → 백업 순으로 본다),
+> v16 Routine 을 고치지 않고 **새 Routine** 으로 만들어 2절의 push 의문(결과 브랜치 고정)을 피한다. 아래 본문은 기록으로 둔다.
+
 **상태: 초안. 아직 어디에도 붙여 넣지 않는다.** 4단계(백업 길 전환)의 지시문 준비물이다.
 현행은 `docs/prompts/GRM_Prompt_v16.md`(백업 Routine "Global Regulatory Monitoring [GRM]", 월 09:30 KST)이고, 이 문서는 **v16 에서 바뀌는 절만** 적는다. 카드 쓰는 법(§B [1단계]·[2단계]·[출력] 6슬롯·심층분석)은 한 글자도 바꾸지 않는다.
 

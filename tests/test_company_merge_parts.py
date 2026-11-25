@@ -138,3 +138,30 @@ class FindHandoffRehearsalFolderTest(unittest.TestCase):
             run = os.path.join(root, "rehearsal-1118")
             os.makedirs(run)
             self.assertIsNone(mp.find_handoff(run))
+
+    def test_handoff_ref_date_beats_run_date_kst(self):
+        """2026-11-24 리허설 1124a: 실행일(11-24) ≠ 재료(11-23). 합치기가 run_date_kst 를 넘겨도 handoff_ref.date 로 찾는다."""
+        with tempfile.TemporaryDirectory() as root:
+            run = os.path.join(root, "company", "run", "rehearsal-1124a")
+            os.makedirs(run)
+            os.makedirs(os.path.join(root, "_handoff"))
+            row = {"web_card_id": "n1", "card_scaffold": "### [소식 · FDA] 제목\n"}
+            with open(os.path.join(root, "_handoff", "handoff_2026-11-23.json"), "w", encoding="utf-8") as f:
+                json.dump({"rows": [row]}, f)
+            with open(os.path.join(run, "desk.json"), "w", encoding="utf-8") as f:
+                json.dump({"status": "완료", "run_date_kst": "2026-11-24",
+                           "handoff_ref": {"date": "2026-11-23", "sha256": "x", "rows": 1}}, f)
+            cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                self.assertEqual(mp.handoff_date(run, "2026-11-24"), "2026-11-23")
+                self.assertTrue(mp.find_handoff(run, "2026-11-24").endswith("handoff_2026-11-23.json"))
+                self.assertEqual(mp.run_card_types(run, "2026-11-24"), {"n1": "소식"})
+            finally:
+                os.chdir(cwd)
+
+    def test_monday_folder_name_without_desk(self):
+        with tempfile.TemporaryDirectory() as root:
+            run = os.path.join(root, "2026-11-30")
+            os.makedirs(run)
+            self.assertEqual(mp.handoff_date(run), "2026-11-30")

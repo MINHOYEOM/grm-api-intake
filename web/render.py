@@ -121,6 +121,7 @@ if str(REPO_ROOT) not in sys.path:
 from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
 from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
 from grm_findings import FIRM_KEY_ALIASES  # noqa: E402
+from grm_findings import REDACTED_PERSON_BY_LANG as _GRM_REDACTED_PERSON_BY_LANG  # noqa: E402
 import graph_export  # noqa: E402
 import clause_citations  # noqa: E402
 # [FDA 지적 조항 × 업체 2026-11-10] 업체 페이지·조항 페이지 블록(로더·매칭·뷰).
@@ -136,6 +137,7 @@ from grm_findings import evidence_url_quality_error as _evidence_url_quality_err
 # 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
 from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
 import card_weight as _cw  # noqa: E402  [카드 무게 2026-11-10] 지적 건수·무지적 판정 공유
+import firm_groups as _fg  # noqa: E402  [업체 그룹 묶음 2026-11-23] 등록 근거로만 묶는다
 
 # [다국어 2단계 2026-09-03] 문구 사전 — 키는 한국어 원문, 한국어 빌드는 항등(바이트 불변).
 # `tr("…")` 은 render_site 가 언어별로 만드는 번역기, `N_("…")` 은 모듈 상수를 키로
@@ -196,6 +198,14 @@ _FIRM_FACT_LABELS = frozenset({"업체", "제조소", "제조소/업체", "업�
 _FIRM_VALUE_SEPS = (" (", " · ")
 _FIRM_PLACEHOLDER = "원문 미기재"
 
+# [개인 사업자 2026-11-23] 개인(농장주 등) 실명을 가린 자리의 표기 — 언어별로 **뷰가** 정한다.
+# 11-23호(#1873)에서 `headline_target`·업체 사실값(국·영 공용 코드 칸)에 국문 '개인 사업자'를
+# 넣자 영문 페이지 카드 머리·목차·data-firm-key 6곳에 한글이 보였다. 데이터는 국문 한 벌만
+# 적고, 영어 트리는 `_card_with_english_narrative` 가 이 표로 바꿔 넘긴다(템플릿은 고르지 않는다).
+# 가린 이름은 실제 업체가 아니므로 업체 프로파일로 잇지 않는다(`_firm_key_for_card`).
+REDACTED_PERSON_BY_LANG = _GRM_REDACTED_PERSON_BY_LANG   # 표기 단일 출처 = grm_findings(스캐폴드·사전 점검과 같은 표)
+REDACTED_PERSON = REDACTED_PERSON_BY_LANG["ko"]
+
 # [영문 사실표 2026-09-23] 사실값 중 **고정 어휘 토큰**(실명이 아니라 상태값)은 영어
 # 트리에서 tr() 을 태워 실제로 번역한다 — "미확인"이 업체/제조소 라벨 아래 있어도
 # 그 값은 "이름이 없다"는 뜻이지 실제 이름이 아니다. 목록은 실측(web/data/briefs 전량
@@ -231,7 +241,7 @@ def _firm_key_for_card(card: dict[str, Any]) -> str:
             if idx != -1 and idx < cut:
                 cut = idx
         name = value[:cut].strip()
-        if not name or name == _FIRM_PLACEHOLDER:
+        if not name or name == _FIRM_PLACEHOLDER or name in REDACTED_PERSON_BY_LANG.values():
             return ""
         return _normalize_firm_name(name)
     return ""
@@ -424,7 +434,10 @@ def _detail_preview(dd: dict[str, Any] | None, tr: Translator = _KO) -> str:
     if not isinstance(dd, dict):
         return ""
     if dd.get("type") == "fda_483_observations":
-        return tr("Observation {n}건", n=dd.get("count") or 0)
+        # count 가 비면(원문 번호 불연속 — 건수 단정 불가) 숫자를 지어내지 않는다.
+        if not isinstance(dd.get("count"), int):
+            return ""
+        return tr("Observation {n}건", n=dd["count"])
     return ""
 
 
@@ -582,9 +595,82 @@ def _card_with_english_narrative(card: dict[str, Any], lang: str) -> dict[str, A
     """
     if lang != DEFAULT_LANG and card_has_english(card):
         en = card["en"]
-        return {**card, **{f: en.get(f, [] if f in ("key_facts", "checks") else "")
-                           for f in CARD_NARRATIVE_FIELDS}}
+        return {**card, **_code_slots_for_lang(card, lang),
+                **{f: en.get(f, [] if f in ("key_facts", "checks") else "")
+                   for f in CARD_NARRATIVE_FIELDS}}
     return card
+
+
+# [영문 코드 칸 2026-11-23] 코드가 국문으로 덧붙이는 정형 조각 — 영어 트리에서 뷰가 영어로 바꾼다.
+# 실측(web/data/briefs 전량): 회수 병합 `… 외 N품목` 79·`외 N곳` 6·`외 N개사` 2·`외 N건` 1, MHRA `발행기관`
+# `MHRA (영국)` 3. 이름 부분은 원문 그대로 두고 꼬리만 바꾼다(실명은 옮기지 않는다 — 불변식 #8).
+_EN_MORE_SUFFIX_RE = re.compile(r" 외 (\d+)(품목|곳|개사|건)$")
+_EN_MORE_NOUN = {"품목": "product", "곳": "site", "개사": "firm", "건": ""}
+_EN_CODE_FRAGMENTS = (("(영국)", "(UK)"),)
+
+
+def _code_slot_value_for_lang(value: str, lang: str) -> str:
+    """코드 칸 값 1개 → 그 언어 표기(한국어 트리는 항등). 가린 실명·정형 꼬리·국가 괄호만 바꾼다."""
+    if lang == DEFAULT_LANG or not isinstance(value, str) or not _HANGUL_RE.search(value):
+        return value
+    word = REDACTED_PERSON_BY_LANG.get(lang)
+    if word:
+        value = value.replace(REDACTED_PERSON, word)
+    for ko, en in _EN_CODE_FRAGMENTS:
+        value = value.replace(ko, en)
+    m = _EN_MORE_SUFFIX_RE.search(value)
+    if m:
+        n, noun = int(m.group(1)), _EN_MORE_NOUN[m.group(2)]
+        tail = f" and {n} more" + (f" {noun}{'' if n == 1 else 's'}" if noun else "")
+        value = value[:m.start()] + tail
+    return value
+
+
+def _code_slots_for_lang(card: dict[str, Any], lang: str) -> dict[str, Any]:
+    """코드 칸(`headline_target`·`facts[].value`)을 그 언어 표기로 바꾼 값들(바뀐 것이 없으면 {} — 원본 무변형).
+
+    국·영 공용 칸이라 데이터는 국문 한 벌만 적는다. 언어별 표기는 여기(뷰)가 정한다 — 템플릿은 고르지 않는다."""
+    if lang == DEFAULT_LANG:
+        return {}
+    out: dict[str, Any] = {}
+    target = card.get("headline_target")
+    new_target = _code_slot_value_for_lang(target, lang)
+    if new_target != target:
+        out["headline_target"] = new_target
+    facts = card.get("facts") or []
+    new_facts = [({**f, "value": _code_slot_value_for_lang(f["value"], lang)}
+                  if isinstance(f, dict) and isinstance(f.get("value"), str) else f) for f in facts]
+    if new_facts != facts:
+        out["facts"] = new_facts
+    return out
+
+
+def en_code_slot_hangul(card: dict[str, Any]) -> list[str]:
+    """영어 트리에서 **해외 기관 카드**의 코드 칸(`headline_target`·`facts[].value`)에 한글이 남은 자리 목록.
+
+    식약처 카드는 업체·기관 실명이 원래 한국어라 그대로 두고 화면이 밝힌다(`count_ko_only_names`).
+    해외 카드의 코드 칸에 한글이 있으면 실명이 아니라 사람이 넣은 국문 표기다 — 11-23호 '개인 사업자'.
+    판정은 영어 트리가 실제로 그리는 값(`_card_with_english_narrative` 뒤, 사실값은 `_fact_value_for_lang`
+    뒤)으로 한다. `check_en_slots.card_problem` 이 부른다(두 벌 금지)."""
+    if card.get("agency") == "MFDS" or not _is_renderable(card):
+        return []
+    view = _card_with_english_narrative(card, "en")
+    out: list[str] = []
+    if _HANGUL_RE.search(str(view.get("headline_target") or "")):
+        out.append("headline_target")
+    for i, f in enumerate(view.get("facts") or []):
+        if not isinstance(f, dict):
+            continue
+        value, _ = _fact_value_for_lang(str(f.get("label") or ""), str(f.get("value") or ""),
+                                        "en", _sentinel_blank_tr)
+        if _HANGUL_RE.search(value):
+            out.append(f"facts[{i}]")
+    return out
+
+
+def _sentinel_blank_tr(text: str, **_kw: Any) -> str:
+    """`en_code_slot_hangul` 전용 — 고정 어휘 토큰(`_FACT_SENTINEL_VALUES`)은 영어 트리가 반드시 번역하므로 빈 값으로 본다."""
+    return "" if text in _FACT_SENTINEL_VALUES else text
 
 
 def _fact_value_for_lang(label: str, value: str, lang: str,
@@ -679,7 +765,7 @@ def _valid_hook_line(card: dict[str, Any], lang: str) -> str:
 _TIDY_483_LABELS = ("발행일", "제조소/업체", "시설 · 유형", "실사일")
 
 
-_TIDY_DATE_RE = re.compile(r"(\d{2})/(\d{2})/(\d{4})")
+_TIDY_DATE_RE = re.compile(r"\b(\d{2})/(\d{2})/(\d{4})\b")
 
 
 def _norm_tidy_value(v: str) -> str:
@@ -1367,6 +1453,93 @@ def _annotate_toc_distinguishers(card_views: list[dict[str, Any]]) -> None:
             cv["toc_distinguisher"] = cv.get("title_issue") or cv.get("anchor", "")
 
 
+# ── [업체 그룹 묶음 2026-11-23 · 대표 결정] ───────────────────────────────────────
+# 같은 그룹(등록 원천 web/data/firm_groups.json) 또는 같은 FEI 카드가 한 묶음(섹션·소제목)
+# 안에 2장 이상이면 나란히 붙이고 머리말 한 줄을 단다. 이름이 비슷한 것만으로는 묶지 않는다
+# (판정은 firm_groups.cluster_key — FEI 가 근거). 카드 데이터·문안은 건드리지 않고 뷰에만 싣는다.
+# 실사일이 게시일보다 2년(OLD_INSPECTION_DAYS — 근거는 firm_groups 주석) 넘게 앞선 카드는
+# '옛 실사' 표시와 실사일을 카드 머리에 올린다. 같은 게시일의 옛 실사가 2장 이상이면 '일괄 공개'.
+def _annotate_firm_groups(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any]],
+                          tr: Translator = _KO) -> None:
+    """뷰에 `fgroup_key`(묶음 열쇠·2장 이상일 때만)·`fgroup_name`·`fgroup_sites`·`fgroup_kind`·
+    `old_insp` 를 단다. `cards_raw` 는 `card_views` 와 같은 순서의 원본 카드."""
+    reg = _fg.default_registry()
+    idx = _fg.fei_index(reg)
+    en = not lang_is_ko(tr)
+    keys = [_fg.cluster_key(raw, idx) for raw in cards_raw]
+    runs: dict[tuple[Any, ...], int] = {}
+    for cv, k in zip(card_views, keys):
+        if k:
+            rk = (cv.get("group"), cv.get("group_label"), k)
+            runs[rk] = runs.get(rk, 0) + 1
+    old_by_pub: dict[str, int] = {}
+    for raw in cards_raw:
+        if _fg.is_old_inspection(raw):
+            pub = _fg.inspection_dates(raw)[1].isoformat()  # type: ignore[index]
+            old_by_pub[pub] = old_by_pub.get(pub, 0) + 1
+    for cv, raw, k in zip(card_views, cards_raw, keys):
+        if k and runs.get((cv.get("group"), cv.get("group_label"), k), 0) >= 2:
+            cv["fgroup_key"] = k
+            fei = _fg.card_fei(raw)
+            g = idx.get(fei)
+            cv["fgroup_fei"] = fei
+            cv["fgroup_kind"] = _fg.doc_kind(raw)
+            cv["fgroup_name"] = ((g["name_en"] if en else g["name_ko"]) if g
+                                 else _fg.card_firm_name(raw))
+            cv["fgroup_registered"] = bool(g)
+        if _fg.is_old_inspection(raw):
+            insp, pub = _fg.inspection_dates(raw)  # type: ignore[misc]
+            years = (pub - insp).days // 365
+            batch = old_by_pub.get(pub.isoformat(), 0) >= 2
+            cv["old_insp"] = {
+                "label": tr("옛 실사 일괄 공개") if batch else tr("옛 실사 공개"),
+                "date": insp.isoformat(),
+                "date_label": tr("실사일 {date}", date=insp.isoformat()),
+                "lag": tr("게시 {n}년 전 실사", n=years),
+            }
+
+
+def _fgroup_head(members: list[dict[str, Any]], tr: Translator) -> str:
+    """묶음 머리말 — '○○ 그룹 — 시설 N곳 · 483 M건' (같은 FEI 묶음은 '업체명 — 483 M건')."""
+    first = members[0]
+    kinds: dict[str, int] = {}
+    for cv in members:
+        kinds[cv.get("fgroup_kind") or ""] = kinds.get(cv.get("fgroup_kind") or "", 0) + 1
+    parts: list[str] = []
+    if first.get("fgroup_registered"):
+        name = tr("{name} 그룹", name=first.get("fgroup_name") or "")
+        parts.append(tr("시설 {n}곳", n=len({cv.get("fgroup_fei") for cv in members})))
+    else:
+        name = first.get("fgroup_name") or ""
+    for kind, n in kinds.items():
+        if kind == "483":
+            parts.append(tr("483 {n}건", n=n))
+        elif kind == "WL":
+            parts.append(tr("경고서한 {n}건", n=n))
+        else:
+            parts.append(f"{tr(kind)} {tr('{n}건', n=n)}".strip())
+    return f"{name} — {' · '.join(parts)}"
+
+
+def _mark_fgroup_runs(cards: list[dict[str, Any]], tr: Translator) -> None:
+    """섹션 안에서 연속한 같은 묶음 카드에 시작·끝 표시와 머리말을 단다(2장 이상만)."""
+    i = 0
+    while i < len(cards):
+        k = cards[i].get("fgroup_key")
+        if not k:
+            i += 1
+            continue
+        j = i
+        while (j + 1 < len(cards) and cards[j + 1].get("fgroup_key") == k
+               and cards[j + 1].get("group_label") == cards[i].get("group_label")):
+            j += 1
+        if j > i:
+            cards[i]["fgrp_open"] = True
+            cards[i]["fgrp_head"] = _fgroup_head(cards[i:j + 1], tr)
+            cards[j]["fgrp_close"] = True
+        i = j + 1
+
+
 def _is_renderable(card: dict[str, Any]) -> bool:
     """렌더 제외 카드 판별(방어적 — 상류 순수성 미가정, §3.2/§3.3 렌더러 책임).
 
@@ -1446,6 +1619,7 @@ def _build_sections(card_views: list[dict[str, Any]],
     for s in sections:
         s["count"] = len(s["cards"])
         _mark_row_runs(s["cards"], tr)
+        _mark_fgroup_runs(s["cards"], tr)
     return sections
 
 
@@ -1542,16 +1716,38 @@ def _order_by_weight(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     묶음 = 연속한 (group, group_label) 구간(섹션 · 국내 소제목). 구간 안에서만 안정 정렬하므로
     섹션·소제목 순서와 같은 무게 안의 원래 순서는 그대로다. 무게 값이 하나도 없는 호(11-16 앞)는
-    입력 그대로 돌려준다(바이트 불변)."""
-    if not any(cv.get("weight") for cv in card_views):
+    입력 그대로 돌려준다(바이트 불변).
+
+    [업체 그룹 묶음 2026-11-23] 같은 묶음 열쇠(`fgroup_key`) 카드는 한 덩어리로 움직인다 —
+    덩어리의 무게는 구성원 중 가장 무거운 것, 자리는 그 무게 안에서 첫 구성원의 자리.
+    구성원끼리는 원래 순서. 묶음도 무게도 없는 호는 입력 그대로다."""
+    if not any(cv.get("weight") or cv.get("fgroup_key") for cv in card_views):
         return card_views
+
+    def _sorted_run(run: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        crank: dict[str, int] = {}
+        cfirst: dict[str, int] = {}
+        for i, v in enumerate(run):
+            k = v.get("fgroup_key")
+            if k:
+                crank[k] = min(crank.get(k, 9), _WEIGHT_RANK.get(v.get("weight"), 1))
+                cfirst.setdefault(k, i)
+
+        def sk(iv: "tuple[int, dict[str, Any]]") -> tuple[int, int, int]:
+            i, v = iv
+            k = v.get("fgroup_key")
+            if k:
+                return (crank[k], cfirst[k], i)
+            return (_WEIGHT_RANK.get(v.get("weight"), 1), i, i)
+        return [v for _, v in sorted(enumerate(run), key=sk)]
+
     out: list[dict[str, Any]] = []
     run: list[dict[str, Any]] = []
     key: Any = object()
     for cv in card_views + [None]:                     # type: ignore[list-item]
         k = None if cv is None else (cv.get("group"), cv.get("group_label"))
         if cv is None or k != key:
-            out.extend(sorted(run, key=lambda v: _WEIGHT_RANK.get(v.get("weight"), 1)))
+            out.extend(_sorted_run(run))
             run, key = [], k
         if cv is not None:
             run.append(cv)
@@ -1567,7 +1763,9 @@ def _mark_row_runs(cards: list[dict[str, Any]], tr: Translator) -> None:
             continue
         j = i
         while (j + 1 < len(cards) and cards[j + 1].get("weight") == "row"
-               and cards[j + 1].get("group_label") == cards[i].get("group_label")):
+               and cards[j + 1].get("group_label") == cards[i].get("group_label")
+               # [업체 그룹 묶음] 표 묶음은 업체 묶음 경계에서 끊는다(묶음 상자 안팎이 엇갈리지 않게).
+               and cards[j + 1].get("fgroup_key") == cards[i].get("fgroup_key")):
             j += 1
         run = cards[i:j + 1]
         by_agency: dict[str, int] = {}
@@ -4445,6 +4643,23 @@ def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
         "request_head": link(parts["request_head"]) if parts["request_head"] else "",
         "requests": [link(r) for r in parts["requests"]],
     }
+
+
+def clause_text_cites(docs_data: "dict[str, Any] | None",
+                      views: dict[str, dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
+    """[구글 품질 2단계 2026-11-20] 언어 → (조항 원문 페이지 주소 → 이 조항을 인용한 지적).
+
+    렌더·sitemap 판정·테스트가 이 한 함수를 본다(갈라지지 않게). 영어 트리는 문서 페이지가 서는
+    문서(doc_is_english)만, 본문은 원문(영어)만 센다 — findings/clause 영어판과 같은 규율."""
+    docs = (docs_data or {}).get("documents") or []
+    out = {DEFAULT_LANG: clause_text_page.citing_findings(
+        docs, views[DEFAULT_LANG], lambda f: finding_body(f, DEFAULT_LANG))}
+    if "en" in views:
+        out["en"] = clause_text_page.citing_findings(
+            docs, views["en"],
+            lambda f: "" if _HANGUL_RE.search(finding_body(f, "en")) else finding_body(f, "en"),
+            doc_ok=doc_is_english)
+    return out
 
 
 def doc_is_english(doc: dict[str, Any]) -> bool:
@@ -8266,6 +8481,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [기준 조항 원문 2026-11-15] /clauses/ 색인·문서 목차·조항 페이지 — ko·en 같은 함수(두 벌 금지).
     # 본문은 영어 원문 그대로라 두 트리가 같은 경로를 낸다(en_paths 는 위에서 같은 뷰로 선언).
     # sitemap lastmod 는 비운다 — 조항에는 개정일 필드가 없고, 수집일은 수정일이 아니다(지어낸 날짜 금지).
+    # [구글 품질 2단계 2026-11-20] 21 CFR 조항마다 "이 조항을 인용한 지적" — 언어마다 그 트리에 문서
+    # 페이지가 있는 문서만 센다. 렌더와 sitemap 판정(아래 D·E 루프)이 같은 값을 본다.
+    _ct_cites = clause_text_cites(docs_data, clause_text_views)
     if clause_text_view["sources"]:
         for _lg, _pg, _em, _tr in trees:
             _ctv = clause_text_views.get(_lg, clause_text_view_en)
@@ -8273,6 +8491,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 continue
             _ct_cases = clause_slugs if _lg == DEFAULT_LANG else {c["slug"] for c in clause_views_en}
             _ct_terms = clause_text_page.terms_by_href(_ctv, glossary_terms, _lg)
+            _ct_cite = _ct_cites.get(_lg) or {}
+            _ct_labels = {k: _tr(v) for k, v in _clause_agency_labels.items()}
             _ip = _pg(clause_text_page.ROUTE)
             _em("clauses_index.html", _ip,
                 page_title=_tr("기준 조항 원문 · GRM"),
@@ -8297,7 +8517,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for _d, _c in clause_text_page.pages(_ctv):
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
-                _ct_gni = clause_text_page.google_noindex_reason(_d, _c, _lg)
+                _cite = _ct_cite.get(_c["href"])
+                _ct_gni = clause_text_page.google_noindex_reason(
+                    _d, _c, _lg, (_cite or {}).get("documents", 0))
                 _em("clause_text.html", _cp,
                     page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
                     nav_active="findings",
@@ -8309,6 +8531,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     cases_href=(f"findings/clause/{clause_slug(_sec)}/"
                                 if _sec and clause_slug(_sec) in _ct_cases else ""),
                     terms=_ct_terms.get(_c["href"]) or [],
+                    cite=_cite, agency_labels=_ct_labels,
                     google_noindex=bool(_ct_gni),
                 )
         for _path in sorted(clause_text_page.tree_paths(clause_text_view)):
@@ -8317,7 +8540,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (영문 트리 경로는 en_paths 로 sitemap 에 들어가므로 언어마다 따로 센다).
     for _lg in (DEFAULT_LANG, "en"):
         for _d, _c in clause_text_page.pages(clause_text_views[_lg]):
-            _why = clause_text_page.google_noindex_reason(_d, _c, _lg)
+            _why = clause_text_page.google_noindex_reason(
+                _d, _c, _lg, (_ct_cites[_lg].get(_c["href"]) or {}).get("documents", 0))
             if _why:
                 _mark_google_noindex(_lg, _c["href"], f"clause_{_why}")
 
@@ -8555,6 +8779,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         card_views = [_card_view(c, tr, lang, doc_url_index, en_paths, anatomy_slugs)
                       for c in cards_sorted]
         _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
+        _annotate_firm_groups(card_views, cards_sorted, tr)  # 업체 그룹 묶음·옛 실사 표시
         sections = _build_sections(card_views, tr)
         ctx = _brief_context(b, issue_no, tr)
         # [브리프 자료실 스트립] 이 브리프가 커버하는 주간(window)에 실제로 든 자료실
@@ -8607,6 +8832,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             en_card_views = [_card_view(c, en_tr, "en", doc_url_index, en_paths)
                              for c in cards_sorted]
             _annotate_toc_distinguishers(en_card_views)
+            _annotate_firm_groups(en_card_views, cards_sorted, en_tr)
             en_brief_page = en_page(f"briefs/{pub}/")
             if brief_term_index_by_lang:
                 _en_sel = select_brief_term_links(
@@ -9007,6 +9233,11 @@ def validate_wl_violations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
             if not (isinstance(v.get("statement_ko"), str) and v.get("statement_ko").strip()):
                 violations.append(
                     f"{brief_label} / card {card_id} / violation #{num}: MISSING_STATEMENT_KO")
+            # [2026-11-24] 소제목(heading)이 있으면 국문 라벨(heading_ko)도 있어야 한다 — 카드 행 함수
+            # (`card_scaffold.wl_violation_row`)가 닫힌 어휘 사전에서 만든다. 없으면 어휘가 늘었는데 사전이 안 따라온 것.
+            if str(v.get("heading") or "").strip() and not str(v.get("heading_ko") or "").strip():
+                violations.append(
+                    f"{brief_label} / card {card_id} / violation #{num}: MISSING_HEADING_KO")
 
     for item in cards_or_briefs:
         if "brief" in item and "cards" in item:

@@ -425,7 +425,97 @@
     });
   }
 
-  var api = { render: render, renderAlarms: renderAlarms, renderSummary: renderSummary, renderDocs: renderDocs, renderTeams: renderTeams,
+  // ── 수집 현황 — 운영 API(admin-github?action=ops)의 intake 실행 목록과 ops-status 사본의 소스별 건수 ──
+  // 판정은 여기 한 곳: 마지막 '성공한' 수집이 끝난 지 26시간을 넘으면 지연(매일 03:17 KST 예정 + 2시간 여유).
+  // 실패·진행 중인 실행은 새 수집으로 치지 않는다 — 하루 누락이 '정상'으로 보이지 않게 한다.
+  var INTAKE_LATE_HOURS = 26;
+  var INTAKE_WORKFLOW = "grm-intake.yml";
+  var BASELINE_MIN_RUNS = 3;   // 평소 값을 말하려면 이전 수집이 이만큼은 있어야 한다
+  function kstText(value) {
+    var t = Date.parse(value);
+    if (isNaN(t)) return "—";
+    var k = new Date(t + 9 * 3600 * 1000), z = function (n) { return (n < 10 ? "0" : "") + n; };
+    return z(k.getUTCMonth() + 1) + "-" + z(k.getUTCDate()) + " " + z(k.getUTCHours()) + ":" + z(k.getUTCMinutes()) + " KST";
+  }
+  function hoursText(ms) {
+    var h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+    return h >= 48 ? Math.floor(h / 24) + "일 " + (h % 24) + "시간" : h + "시간 " + m + "분";
+  }
+  function intakeVerdict(runs, nowMs) {
+    var list = arr(runs).filter(function (r) { return r && r.workflow_id === INTAKE_WORKFLOW && r.relevant !== false; });
+    list.sort(function (a, b) { return String(b.created_at || "").localeCompare(String(a.created_at || "")); });
+    var running = list.filter(function (r) { return r.status && r.status !== "completed"; })[0] || null;
+    var done = list.filter(function (r) { return r.status === "completed"; });
+    var ok = done.filter(function (r) { return r.conclusion === "success"; })[0] || null;
+    var lastDone = done[0] || null;
+    var out = { kind: "none", lateHours: INTAKE_LATE_HOURS, last: ok, elapsedMs: null, running: running,
+                lastFailed: !!(lastDone && lastDone !== ok && lastDone.conclusion !== "success") ? lastDone : null };
+    if (!ok) return out;
+    var at = Date.parse(ok.updated_at || ok.created_at);
+    if (isNaN(at)) return out;
+    out.elapsedMs = nowMs - at;
+    out.kind = out.elapsedMs > INTAKE_LATE_HOURS * 3600000 ? "late" : "ok";
+    return out;
+  }
+  function median(xs) {
+    var a = xs.slice().sort(function (x, y) { return x - y; }), n = a.length;
+    return n ? (n % 2 ? a[(n - 1) / 2] : (a[n / 2 - 1] + a[n / 2]) / 2) : 0;
+  }
+  // 최근 수집 한 번의 소스별 건수 + '평소보다 0'. 평소 = 이전 수집들의 중앙값(이전 BASELINE_MIN_RUNS 회 이상일 때만).
+  // 이번 실행에서 꺼진 소스(active 에 없음)는 0 이어도 표시하지 않는다.
+  function intakeSources(history) {
+    var h = arr(history).filter(function (r) { return r && Array.isArray(r.sources); });
+    h.sort(function (a, b) { return String(b.created_at || "").localeCompare(String(a.created_at || "")); });
+    if (!h.length) return null;
+    var latest = h[0], prior = h.slice(1, 8);
+    var active = Array.isArray(latest.active) ? latest.active : null;
+    var rows = latest.sources.map(function (s) {
+      var vals = prior.map(function (r) {
+        var m = r.sources.filter(function (x) { return x.key === s.key; })[0];
+        return m ? num(m.fetched) || 0 : null;
+      }).filter(function (v) { return v != null; });
+      var base = vals.length >= BASELINE_MIN_RUNS ? median(vals) : null;
+      var on = active ? active.indexOf(s.key) >= 0 : true;
+      var n = num(s.fetched) || 0;
+      return { key: s.key, label: s.label || s.key, fetched: n, base: base, on: on, error: !!s.error,
+               zero: on && n === 0 && base != null && base >= 1 };
+    });
+    return { latest: latest, rows: rows, zeros: rows.filter(function (r) { return r.zero; }), errors: rows.filter(function (r) { return r.on && r.error; }),
+             totals: h.slice(0, 7).map(function (r) { return { at: r.created_at, total: r.total, url: r.url, conclusion: r.conclusion }; }) };
+  }
+  function renderIntake(ops, nowMs) {
+    var v = intakeVerdict(ops && ops.runs, nowMs);
+    var hist = ops && ops.intake_counts;
+    var kind = v.kind === "ok" ? "ok" : (v.kind === "late" ? "bad" : "warn");
+    var head;
+    if (v.kind === "late") head = "수집 지연 — 마지막 수집 후 " + hoursText(v.elapsedMs) + " 지났습니다 (기준 " + v.lateHours + "시간)";
+    else if (v.kind === "ok") head = "수집 정상 — 마지막 수집 후 " + hoursText(v.elapsedMs) + " 경과";
+    else head = "수집 기록 없음 — 최근 실행 중 성공한 수집이 없습니다";
+    var h = '<div class="admin-ops-brief ' + kind + '" data-intake-verdict="' + (v.kind === "late" ? "late" : v.kind) + '"><div><h3>' + esc(head) + "</h3><p>" +
+      (v.last ? "마지막 수집 " + esc(kstText(v.last.updated_at || v.last.created_at)) + " · " : "") + "예정: 매일 03:17 KST" +
+      (v.running ? " · 지금 수집 실행 중" : "") +
+      (v.lastFailed ? " · 가장 최근 실행은 실패(" + esc(kstText(v.lastFailed.created_at)) + ")" : "") + "</p>" +
+      (v.last && safeUrl(v.last.html_url) ? '<small><a href="' + esc(safeUrl(v.last.html_url)) + '" target="_blank" rel="noopener">GitHub 실행 보기</a>' +
+        (v.lastFailed && safeUrl(v.lastFailed.html_url) ? ' · <a href="' + esc(safeUrl(v.lastFailed.html_url)) + '" target="_blank" rel="noopener">실패한 실행</a>' : "") + "</small>" : "") +
+      "</div></div>";
+    var s = intakeSources(hist);
+    if (!s) return h + '<p class="admin-section-sub">소스별 건수는 다음 수집부터 쌓입니다 (실행이 끝나면 운영 요약이 갱신됩니다).</p>';
+    var cap = "소스별 건수 — " + kstText(s.latest.created_at) + " 수집 · 합계 " + fmtNum(s.latest.total) + "건" +
+      (s.zeros.length ? " · 평소보다 0건 " + s.zeros.length + "곳" : "");
+    h += '<h4 class="admin-section-sub">' + esc(cap) + "</h4>";
+    h += '<table class="admin-table" data-intake-table><thead><tr><th>소스</th><th>이번</th><th>평소</th><th></th></tr></thead><tbody>' +
+      s.rows.filter(function (r) { return r.on; }).map(function (r) {
+        var tag = r.error ? '<span class="admin-pill bad">오류</span>' : (r.zero ? '<span class="admin-pill warn">평소보다 0건</span>' : "");
+        return "<tr" + (r.zero || r.error ? ' data-intake-flag="1"' : "") + "><td>" + esc(r.label) + "</td><td>" + fmtNum(r.fetched) + "</td><td>" +
+          (r.base == null ? "—" : fmtNum(r.base)) + "</td><td>" + tag + "</td></tr>";
+      }).join("") + "</tbody></table>";
+    var tl = s.totals.map(function (t) {
+      return esc(kstText(t.at)) + " " + fmtNum(t.total) + "건" + (t.conclusion && t.conclusion !== "success" ? "(" + esc(t.conclusion) + ")" : "");
+    }).join(" · ");
+    return h + '<p class="admin-section-sub">최근 수집 합계: ' + tl + "</p>";
+  }
+
+  var api = { intakeVerdict: intakeVerdict, intakeSources: intakeSources, renderIntake: renderIntake, INTAKE_LATE_HOURS: INTAKE_LATE_HOURS, kstText: kstText, render: render, renderAlarms: renderAlarms, renderSummary: renderSummary, renderDocs: renderDocs, renderTeams: renderTeams,
               renderWeek: renderWeek, renderTaskSheet: renderTaskSheet, teamOptions: teamOptions, memberOptions: memberOptions,
               validateTask: validateTask, taskTeams: taskTeams, TASK_MSG: TASK_MSG,
               bind: bind, approveLabel: approveLabel, memberStatus: memberStatus, dayLabel: dayLabel, daysLeft: daysLeft, clock: clock, STATE_WORD: STATE_WORD };

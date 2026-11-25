@@ -59,6 +59,7 @@ from typing import Any
 from urllib.parse import quote
 
 import requests
+from grm_cli import BULK_RUN_MAX, BulkWriteError, BulkWriteRun
 
 # ── 시간 조건(노이즈 방어) ────────────────────────────────────────────────────
 INGESTED_WINDOW_DAYS = 7          # (a) 최근 수집분만
@@ -452,12 +453,16 @@ def insert_notification_log(base_url: str, service_key: str,
     url = f"{base_url}/rest/v1/firm_watch_notification_log"
     headers = dict(_headers(service_key))
     headers["Prefer"] = "resolution=ignore-duplicates,return=minimal"
-    for i in range(0, len(pairs), _IN_CHUNK_SIZE):
-        chunk = pairs[i:i + _IN_CHUNK_SIZE]
+    def send(chunk, _offset):
         body = [{"user_id": uid, "finding_id": fid} for uid, fid in chunk]
-        status, _data, err = _request_with_retry("POST", url, headers=headers, json_body=body)
+        _status, _data, err = _request_with_retry("POST", url, headers=headers, json_body=body)
         if err:
-            return err
+            raise BulkWriteError(err)
+
+    try:
+        BulkWriteRun().write(pairs, send, batch_size=_IN_CHUNK_SIZE)
+    except BulkWriteError as exc:
+        return str(exc)
     return ""
 
 
@@ -574,6 +579,12 @@ def run(*, supabase_url: str, service_role_key: str, brevo_api_key: str,
                 "firms": len(firms),
                 "findings": sum(len(m.finding_ids) for m in firms.values()),
             })
+        return report
+
+    if findings_total > BULK_RUN_MAX:
+        report["errors"].append(
+            f"notification_log needs {findings_total} rows (limit {BULK_RUN_MAX}); no emails sent"
+        )
         return report
 
     # 실발송 경로 -- 자격 확인.

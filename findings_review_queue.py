@@ -92,6 +92,9 @@ def summarize(
         scope = str(row.get("scope_status") or "")
         by_source[src] = by_source.get(src, 0) + 1
         by_scope[scope] = by_scope.get(scope, 0) + 1
+        if scope == "superseded":
+            # [166] 본문 재수집으로 새 글에 대체돼 숨긴 옛 행 — 검수 대상이 아니다(세기만 한다).
+            continue
         ts = _parse_ts(row.get("ingested_at"))
         if ts is None:
             # 시각이 없으면 나이를 모른다 — 조용히 0일로 치지 않고 초과로 본다.

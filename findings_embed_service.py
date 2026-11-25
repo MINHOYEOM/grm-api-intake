@@ -64,6 +64,7 @@ import requests
 
 import findings_supabase_backfill as fsb
 import grm_findings as gf
+from grm_cli import BULK_RUN_MAX, BulkWriteError, BulkWriteRun
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 
 
@@ -658,6 +659,9 @@ def run_embed(
     #   sha 비교 없이 already_current 로 센다 -- 그 행들의 483 raw_json 을 읽지 않아도
     #   된다(B 입력의 가장 무거운 조회). 본문이 바뀐 행의 재임베딩(드리프트 감지)은
     #   new_only 를 끈 회차(cron 기본값)가 맡는다.
+    if not dry_run:
+        limit = BULK_RUN_MAX if limit is None or limit < 0 else min(limit, BULK_RUN_MAX)
+
     if new_only:
         remaining: list[dict[str, Any]] = []
         for finding in findings:
@@ -759,13 +763,20 @@ def run_embed(
     ]
 
     upserted = 0
-    for start in range(0, len(rows), _DB_UPSERT_BATCH_SIZE):
-        batch = rows[start:start + _DB_UPSERT_BATCH_SIZE]
+
+    def send(batch, start):
+        nonlocal upserted
         _status, _resp_rows, err = _upsert_embeddings_batch(base, service_key, batch)
         if err:
             report["errors"].append(_sanitize_error(f"upsert batch failed at offset {start} ({err})"))
-            continue
+            return False
         upserted += len(batch)
+        return True
+
+    try:
+        BulkWriteRun().write(rows, send, batch_size=_DB_UPSERT_BATCH_SIZE)
+    except BulkWriteError as exc:
+        report["errors"].append(str(exc))
 
     report["upserted"] = upserted
     report["elapsed_seconds"] = round(time.monotonic() - t0, 3)

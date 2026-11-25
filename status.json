@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T14:43:16Z",
+ "generated_at": "2026-11-25T15:35:55Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45634932232,
+    "databaseId": 45645271415,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T14:31:09Z",
-    "updatedAt": "2026-11-25T14:42:46Z",
+    "createdAt": "2026-11-25T15:26:54Z",
+    "updatedAt": "2026-11-25T15:35:17Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1954 from MINHOYEOM/fix/farm-address-1125",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634932232"
+    "displayTitle": "Merge pull request #1836 from MINHOYEOM/claude/google-quality-stage2-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45645271415"
    },
    {
-    "databaseId": 45634247025,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-25T14:27:25Z",
-    "updatedAt": "2026-11-25T14:35:02Z",
-    "headBranch": "codex/daily-reconcile-ledger",
-    "displayTitle": "feat(recon): 매일 대조 장부 1단계 (draft)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634247025"
-   },
-   {
-    "databaseId": 45634244700,
+    "databaseId": 45644235256,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T14:27:24Z",
-    "updatedAt": "2026-11-25T14:35:41Z",
-    "headBranch": "codex/ci-slot-wait",
+    "createdAt": "2026-11-25T15:21:28Z",
+    "updatedAt": "2026-11-25T15:28:50Z",
+    "headBranch": "codex/mhra-body-refetch",
     "displayTitle": "main 병합: §5.1 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634244700"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45644235256"
    },
    {
-    "databaseId": 45634236488,
+    "databaseId": 45644202744,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T14:27:20Z",
-    "updatedAt": "2026-11-25T14:34:50Z",
-    "headBranch": "codex/daily-reconcile-ledger",
-    "displayTitle": "main 병합: MFDS 수집 건수 필드(order_check)와 대조 장부 필드 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634236488"
-   },
-   {
-    "databaseId": 45634227607,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T14:27:17Z",
-    "updatedAt": "2026-11-25T14:35:45Z",
-    "headBranch": "codex/ci-no-network",
+    "createdAt": "2026-11-25T15:21:17Z",
+    "updatedAt": "2026-11-25T15:30:16Z",
+    "headBranch": "codex/ema-relevance-apply",
     "displayTitle": "main 병합: §5.1 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634227607"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45644202744"
+   },
+   {
+    "databaseId": 45641997547,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T15:09:41Z",
+    "updatedAt": "2026-11-25T15:17:01Z",
+    "headBranch": "codex/automation-pr-stall",
+    "displayTitle": "main 병합: §5.1 충돌 해소",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45641997547"
+   },
+   {
+    "databaseId": 45641851451,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T15:08:52Z",
+    "updatedAt": "2026-11-25T15:17:27Z",
+    "headBranch": "codex/483-fulltext-gap-alarm",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/483-fulltext-ga…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45641851451"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45646869838,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T15:35:22Z",
+    "updatedAt": "2026-11-25T15:35:36Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45646869838"
+   },
+   {
     "databaseId": 45637047680,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45594486522"
-   },
-   {
-    "databaseId": 45559200187,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T06:15:02Z",
-    "updatedAt": "2026-11-25T06:15:03Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45559200187"
    }
   ],
   "grm-findings-translate-apply.yml": [

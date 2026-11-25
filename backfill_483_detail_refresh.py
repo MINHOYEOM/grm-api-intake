@@ -33,7 +33,7 @@ import findings_supabase_backfill as fsb
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import SOURCE_FDA_483
+from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_483
 
 DEFAULT_SINCE = "2026-08-10"
 _ALL_TIME = "1900-01-01"
@@ -390,11 +390,15 @@ def run(
                 continue
             sleep_fn(delay_seconds)
             try:
-                text, _status = text_fn(pdf_url)
+                text, status = text_fn(pdf_url)
             except Exception as exc:  # noqa: BLE001 — 건별 실패는 넘긴다(멱등 재실행)
                 report.failed += 1
                 report.errors.append(f"{doc}: fetch_raised:{type(exc).__name__}")
                 continue
+            if status == FDA_BOT_BLOCK:
+                report.failed += 1
+                report.errors.append(f"{doc}: {FDA_BOT_BLOCK}")
+                break
             if not text:
                 report.no_text += 1
                 continue

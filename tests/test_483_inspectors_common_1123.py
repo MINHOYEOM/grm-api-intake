@@ -11,11 +11,16 @@ R3(OCR 복구가 실사관을 안 넘김) · R5(전문 백필이 실사관을 �
 """
 from __future__ import annotations
 
+from contextlib import redirect_stderr, redirect_stdout
 import inspect
+import io
 import json
 import os
+from pathlib import Path
 import sys
+import tempfile
 import unittest
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -84,6 +89,14 @@ class NoFabricatedNamesAcceptanceTest(unittest.TestCase):
 
 
 class FormatsTest(unittest.TestCase):
+    def test_saved_signature_before_reverse_marker_with_broken_date(self):
+        fixture = Path(__file__).with_name("fixtures") / "fda483_195241_pagebreak.txt"
+        body = fixture.read_text(encoding="utf-8")
+        expected = [line.split("|")[-1].split(",")[0].strip() for line in body.splitlines()
+                    if ", DDC Investigator" in line]
+        self.assertEqual(len(expected), 2)
+        self.assertEqual(f._extract_483_inspectors(body), expected)
+
     def test_measured_signature_formats(self):
         for text, want in FORMATS:
             self.assertEqual(f._extract_483_inspectors(text), want, text[:120])
@@ -271,6 +284,86 @@ class ReextractToolTest(unittest.TestCase):
 
     def test_rows_json_mode_refuses_apply(self):
         self.assertEqual(tool.main(["--rows-json", "x.json", "--apply"]), 2)
+
+
+class NamesJsonTest(unittest.TestCase):
+    def test_dry_run_cli_reports_before_and_after(self):
+        rows = [{"document_id": "filled", "body": "가상 실사관", "insp": ["예전 이름"]},
+                {"document_id": "empty", "body": "시험 전용이름"}]
+        fill = {"filled": ["가상 실사관"], "empty": ["시험 전용이름"]}
+        with tempfile.TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()) as stdout:
+            root = Path(tmp)
+            rows_path, names_path, report_path = (root / name for name in
+                                                  ("rows.json", "names.json", "report.json"))
+            rows_path.write_text(json.dumps(rows), encoding="utf-8")
+            names_path.write_text(json.dumps({"rule": "exact", "verified_at": "test", "fill": fill}),
+                                  encoding="utf-8-sig")
+            self.assertEqual(tool.main(["--rows-json", str(rows_path), "--names-json", str(names_path),
+                                        "--report", str(report_path)]), 0)
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        self.assertEqual(report["applied"], 0)
+        self.assertEqual([(r["before"], r["after"]) for r in report["rows"]],
+                         [(["예전 이름"], ["예전 이름"]), ([], ["시험 전용이름"])])
+        self.assertIn("| empty | 없음 | (빈칸) | 시험 전용이름 |", stdout.getvalue())
+
+    def test_apply_cli_lists_all_failures_and_writes_nothing(self):
+        rows = [
+            _db_row("ok", {tool.BODY_KEY: "Synthetic Inspector"}),
+            _db_row("broken", {tool.BODY_KEY: "Wrapped\nInspector", tool.INSPECTORS_KEY: ["Old Fixture"]}),
+            _db_row("empty", {tool.BODY_KEY: " \r\n"}),
+        ]
+        fill = {"ok": ["Synthetic Inspector"], "broken": ["Wrapped Inspector", "Missing Fixture"],
+                "missing": ["Absent Fixture"], "empty": ["Empty Fixture"]}
+        with tempfile.TemporaryDirectory() as tmp:
+            names_path = Path(tmp) / "names.json"
+            names_path.write_text(json.dumps({"fill": fill}), encoding="utf-8")
+            report_path = Path(tmp) / "report.json"
+            with (
+                patch("grm_cli.resolve_supabase_service_credentials", return_value=("https://test.invalid", "fake")),
+                patch.object(tool, "fetch_rows", return_value=rows) as fetch,
+                patch.object(rv, "apply_version") as apply_version,
+                patch.object(tool, "patch_empty_findings") as patch_findings,
+                redirect_stdout(io.StringIO()),
+                redirect_stderr(io.StringIO()) as stderr,
+            ):
+                self.assertEqual(tool.main(["--names-json", str(names_path), "--apply",
+                                            "--report", str(report_path)]), 1)
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        fetch.assert_called_once_with("https://test.invalid", "fake", doc_ids=list(fill), include_bodyless=True)
+        apply_version.assert_not_called()
+        patch_findings.assert_not_called()
+        self.assertEqual(len(report["errors"]), 3)
+        for message in ('broken: not-verbatim ["Wrapped Inspector", "Missing Fixture"]',
+                        "missing: missing-document", "empty: missing-body"):
+            self.assertIn(message, stderr.getvalue())
+
+    def test_apply_preserves_full_body_and_updates_only_matching_findings(self):
+        body = "x" * 30000 + "\r\nSynthetic  Inspector\nWrapped\nFixture"
+        names = ["Synthetic  Inspector", "Wrapped\nFixture"]
+        raw = {tool.BODY_KEY: body, "other_field": "kept", tool.INSPECTORS_KEY: ["Old Fixture"]}
+        row = _db_row("example", raw)
+        applier = Mock(return_value={"status": "applied"})
+        patcher = Mock(return_value=(2, ""))
+        report = tool.run_names([row], {"example": names}, apply=True, overwrite=True,
+                                applier=applier, findings_patcher=patcher)
+        self.assertEqual((report.applied, report.findings_rows_patched), (1, 2))
+        call = applier.call_args.kwargs
+        self.assertEqual(call["expected_raw_sha256"], row["raw_sha256"])
+        self.assertEqual(call["change_kind"], "repair")
+        self.assertEqual(json.loads(call["record"]["raw_json"]), dict(raw, fda483_inspectors=names))
+        patcher.assert_called_once_with("rid-example", names, only_value=["Old Fixture"])
+
+    def test_apply_fills_blank_and_skips_filled_by_default(self):
+        fill = {"blank": ["Synthetic Inspector"], "filled": ["Synthetic Inspector"]}
+        raw = {tool.BODY_KEY: "Synthetic Inspector"}
+        rows = [_db_row("blank", raw), _db_row("filled", dict(raw, fda483_inspectors=["Old Fixture"]))]
+        applier = Mock(return_value={"status": "applied"})
+        patcher = Mock(return_value=(1, ""))
+        report = tool.run_names(rows, fill, apply=True, applier=applier, findings_patcher=patcher)
+        self.assertEqual((report.applied, report.unchanged), (1, 1))
+        applier.assert_called_once()
+        self.assertEqual(applier.call_args.kwargs["raw_signal_id"], "rid-blank")
+        patcher.assert_called_once_with("rid-blank", ["Synthetic Inspector"])
 
 
 if __name__ == "__main__":

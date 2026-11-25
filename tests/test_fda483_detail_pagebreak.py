@@ -85,14 +85,14 @@ class PageJoinTest(unittest.TestCase):
                "DEPARTMENT OF HEALTH AND HUMAN SERVICES\nFOOD AND DRUG ADMINISTRATION\n"
                "DISTRICT ADDRESS AND PHONE NUMBER\n12420 Parklawn Drive, Room 2032 Rockville, MD 20857\n"
                "11/03/2025-1 1/14/2025\n3009883410\nNAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED\n"
-               "Mr. Atul Shastri, President-Operations\nFIRM NAME\nSTREET ADDRESS\n"
+               "Mr. Ovan Kelmoti, President-Operations\nFIRM NAME\nSTREET ADDRESS\n"
                "Unit - 2, A - 1128 & B - 1127 Bhiwadi\nRiico Industrial Area, Rajasthan, 301019, India\n"
                "Sterile Drug Product Manufacturer\n"
                "operator's gowning is sampled for environmental monitoring at the end of setup.\n")
         out = c._clean_observation_chunk(c._join_483_pages(seg, "Sterile Drug Product Manufacturer"))
         self.assertTrue(out.endswith("blocking laminar airflow. The operator's gowning is sampled for "
                                      "environmental monitoring at the end of setup."), out)
-        for junk in ("Flores", "Bhiwadi", "Shastri", "Manufacturer"):
+        for junk in ("Flores", "Bhiwadi", "Kelmoti", "Manufacturer"):
             self.assertNotIn(junk, out)
 
     def test_header_without_establishment_label_ends_at_email(self):

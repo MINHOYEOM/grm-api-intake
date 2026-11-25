@@ -1964,3 +1964,60 @@ CREATE INDEX IF NOT EXISTS idx_findings_facets
 CREATE INDEX IF NOT EXISTS idx_findings_firm
   ON findings (firm_name, published_date);
 """
+
+
+# ── [11-26] FDA 483 서명란 판독 변형 — **꼬리 전용** 표지(수집기·발행 게이트가 이 함수 하나를 쓴다) ──
+# 판독이 서명란 머리 `EMPLOYEE(S)` 를 `EMF'I..OYEE(S)`·`EIM'LOYEE(S)`·`EM PL OYEE($)`·`ENPI.OVEE(S)` 로,
+# `SIGNATURE` 를 `SIGNA TURE`·`SIGNATIJRE` 로 깨뜨리면 기존 표지(`EMP…OY`·`SIGNATURE`)가 못 잡는다.
+# 공통점은 꼬리 `O‥E‥(S` 다(대문자 O·여는 괄호·S/5/$). 운영 저장 상세 실측(11-26): 이 꼴 336관찰(221문서).
+# ★그러나 쪽 경계 **중간**에 박힌 것도 많다 — 표지 뒤로 산문이 이어진다(106768 "EMPL OWEE(S) and reuse.
+#   The firm does not track…", 187975·190601·195189). 이것을 자르는 표지로 쓰면 쪽 잇기가 실패한 자리에서
+#   관찰이 잘린다(저장 단계 절단 금지 위반). 또 `SIGNAT…` 는 산문 표제 "ELECTRONIC SIGNATURES" 와 겹친다
+#   (193583). 그래서 **뒤에 산문이 없을 때만**(소문자 3자+ 낱말 2개 이하) 상세 꼬리의 서명란으로 본다 —
+#   이 규칙으로는 문장을 지울 수 없다. 중간 것은 손대지 않는다(게이트도 막지 않는다).
+_FDA483_SIGNER_VARIANT_RE = re.compile(
+    r"(?<=[A-Za-z.'!;:\~\"\-])O[^\s(]{0,3}E[^\s(]{0,3}[({][S5$]"
+    r"|S[I1l]G[NW]A ?T")
+_FDA483_PROSE_WORD_RE = re.compile(r"(?<![A-Za-z])[a-z]{3,}(?![A-Za-z])")
+FDA483_SIGNER_TAIL_MAX_PROSE = 2
+
+
+def fda483_signer_variant_tail_start(text: str) -> int | None:
+    """상세 꼬리의 판독 변형 서명란 시작 위치(순수 함수). 없으면 None.
+
+    표지 뒤에 산문 낱말이 `FDA483_SIGNER_TAIL_MAX_PROSE` 개 이하일 때만 서명란으로 본다. 시작은 표지가 든
+    낱말의 머리이고, 바로 앞 짧은 대문자 조각(`EM PL`·`E MP L` 처럼 판독이 벌린 것)까지 함께 걷는다."""
+    t = text or ""
+    for m in _FDA483_SIGNER_VARIANT_RE.finditer(t):
+        if len(_FDA483_PROSE_WORD_RE.findall(t, m.end())) > FDA483_SIGNER_TAIL_MAX_PROSE:
+            continue
+        start = m.start()
+        while start > 0 and not t[start - 1].isspace():
+            start -= 1
+        while True:
+            head = t[:start].rstrip()
+            prev = head[head.rfind(" ") + 1:] if head else ""
+            if not prev or len(prev) > 3 or any(ch.islower() for ch in prev) or prev.endswith((".", ",", ":", ";")):
+                break
+            start = len(head) - len(prev)
+        return start
+    return None
+
+
+# ── [11-26] 483 상세 본문 양 — 산문 낱말(소문자 3자 이상) 수와 "본문이 늘었나" 판정(한 벌) ────────────
+# 다시 읽기 백필(backfill_483_detail_refresh 의 복원 계수)과 재번역 대기열(findings_detail_export
+# --mode stale 의 산문 증가 조건)이 이 두 함수를 함께 쓴다 — 같은 기준이어야 "백필이 늘었다고 센 행"과
+# "번역팀에 가는 행"이 맞는다. 쪽 블록 잡문(서명자·머리말·양식 낱말)은 대문자·약어라 거의 세지 않는다.
+FDA483_PROSE_TOLERANCE = 0.05
+FDA483_PROSE_MIN_GROWTH = 5
+
+
+def fda483_prose_words(text: str) -> int:
+    """본문 양 — 산문 낱말 수(순수 함수)."""
+    return len(_FDA483_PROSE_WORD_RE.findall(text or ""))
+
+
+def fda483_prose_grew(old_text: str, new_text: str) -> bool:
+    """새 판이 옛 판보다 본문이 늘었나(순수 함수) — 5낱말 이상이면서 5% 넘게. 판독 흔들림은 늘었다고 보지 않는다."""
+    before, after = fda483_prose_words(old_text), fda483_prose_words(new_text)
+    return after - before >= FDA483_PROSE_MIN_GROWTH and after > before * (1 + FDA483_PROSE_TOLERANCE)

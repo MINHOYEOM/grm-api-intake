@@ -302,3 +302,32 @@ class PageEndItemCut1125Test(unittest.TestCase):
     def test_marker_matches_ocr_variant_but_not_prose(self):
         self.assertTrue(c._FDA483_FOOTER_RE.search("EMPlOVEE{S) NAME ANO Till£"))
         self.assertIsNone(c._FDA483_FOOTER_RE.search("the employees were observed handling parts"))
+
+
+class SignerVariantTailOnly1126Test(unittest.TestCase):
+    """[11-26] 판독 변형 서명란(`EMF'I..OYEE(S)`·`EIM'LOYEE(S)`·`SIGNA T…`)은 **꼬리일 때만** 걷는다.
+
+    운영 저장 상세 실측: 이 꼴 336관찰 중 다수가 쪽 경계 **중간**(표지 뒤로 산문이 이어짐)이다. 자르는 표지로
+    쓰면 문장이 지워지므로, 뒤에 산문이 없을 때만 서명란으로 본다(수집기·발행 게이트가 같은 함수). 이름은 가짜."""
+
+    def test_tail_variants_are_trimmed(self):
+        for tail in (r"EMF'I..OYEE(S) SIGNA T\lRE Investigator$~-- DATEISSUEil",
+                     "EIM'LOYEE(S) Sterile and Non- Sterile Drug Manufacturer",
+                     "EM PLOYEE($) S.GNATURE OATe l-s::iUI!O Velmora Quist",
+                     r"ENPI.OVEE(S)SIGNAl\JRE DI\TEISSVEO Torvald Brennick, Investigator"):
+            d = c.trim_detail_tail("Records were not reviewed by the quality unit. " + tail)
+            self.assertEqual(d, "Records were not reviewed by the quality unit.", tail)
+
+    def test_mid_text_variant_keeps_the_sentence(self):
+        body = ("Garments are disposed of after use, EMPL OWEE(S) and reuse. The firm does not track and "
+                "reconcile cleanroom garments that are expired.")
+        self.assertEqual(c.trim_detail_tail(body), body)
+
+    def test_prose_heading_with_signatures_is_not_signer(self):
+        body = ("ELECTRONIC RECORDS AND ELECTRONIC SIGNA TURES The system used for this study was reviewed "
+                "and no discrepancies were found in the records.")
+        self.assertIsNone(c.gf.fda483_signer_variant_tail_start(body))
+
+    def test_prose_employee_word_is_not_a_marker(self):
+        self.assertIsNone(c.gf.fda483_signer_variant_tail_start(
+            "the employee(s) were observed without gowns in the aseptic core."))

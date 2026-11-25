@@ -2726,6 +2726,10 @@ def trim_detail_tail(detail: str) -> str:
     if m:
         nm = _SIGNER_NAME_BEFORE_RE.search(d, max(0, m.start() - 60), m.start())
         d = d[:nm.start() if nm else m.start()].rstrip(" :-\t")
+    # [11-26] 판독 변형 서명란(`EMF'I..OYEE(S) SIGNA T…`) — 뒤에 산문이 없을 때만 걷는다(발행 게이트와 같은 함수).
+    variant = gf.fda483_signer_variant_tail_start(d)
+    if variant is not None:
+        d = d[:variant].rstrip(" :-\t")
     return d
 
 

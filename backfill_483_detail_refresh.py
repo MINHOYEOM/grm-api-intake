@@ -93,6 +93,11 @@ class DetailRefreshReport:
     pagebreak_samples: list[dict[str, Any]] = field(default_factory=list)
 
 
+def _gf():
+    import grm_findings as gf
+    return gf
+
+
 def _collector():
     import collect_fda_483 as c   # 지연 import — 테스트가 모듈 함수를 바꿔 끼울 수 있게
     return c
@@ -134,7 +139,7 @@ def tidy_old_detail(detail: str) -> str:
 # 본문 양은 산문 낱말(소문자 3자 이상, 수집기 `_LOWER_WORD_RE` 와 같은 판정)로 센다: 쪽 블록 잡문
 # (서명자·머리말·양식 낱말)은 대문자·약어라 거의 세지 않으므로, 잡문만 걷힌 정상 교체는 막지 않는다.
 # 판독(OCR) 판이 달라 생기는 작은 흔들림은 허용한다(5%).
-SHRINK_TOLERANCE = 0.05
+SHRINK_TOLERANCE = 0.05   # = grm_findings.FDA483_PROSE_TOLERANCE
 SHRINK_MIN_WORDS = 20
 EXTEND_MIN_WORDS = 5
 _ITEM_HEAD_RE = re.compile(r"(?<![A-Za-z0-9])(?:([A-L])\.\s+(?=[A-Z(])|(i{1,3}|iv|vi{0,3}|ix)\.\s)")
@@ -142,8 +147,9 @@ _SAMPLE_MAX = 20
 
 
 def prose_words(text: str) -> int:
-    """본문 양 — 산문 낱말 수(순수 함수). 수집기의 산문 판정과 같은 정규식을 쓴다."""
-    return len(_collector()._LOWER_WORD_RE.findall(text or ""))
+    """본문 양 — 산문 낱말 수(순수 함수). 재번역 대기열과 같은 함수(`grm_findings.fda483_prose_words`)."""
+    import grm_findings as gf
+    return gf.fda483_prose_words(text)
 
 
 def shrinks_body(old_text: str, new_text: str) -> bool:
@@ -496,7 +502,7 @@ def run(
             pb, pa = prose_words(_obs_text(o_old)), prose_words(_obs_text(o_new))
             report.prose_words_before += pb
             report.prose_words_after += pa
-            if pa - pb < EXTEND_MIN_WORDS or pa <= pb * (1 + SHRINK_TOLERANCE):
+            if not _gf().fda483_prose_grew(_obs_text(o_old), _obs_text(o_new)):
                 continue                      # 판독 흔들림 수준의 차이는 복원으로 세지 않는다
             report.pagebreak_extended += 1
             doc_pagebreak = True

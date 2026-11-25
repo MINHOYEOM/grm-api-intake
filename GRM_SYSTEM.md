@@ -545,6 +545,8 @@ grm-api-intake/
 ├─ collect_mfds_safety_letter.py   # 공공데이터포털 식약처 안전성 서한 수집기
 ├─ collect_ich.py, collect_who.py, collect_hc.py, collect_fda_483.py, collect_search.py
 ├─ clause_text_collect.py         # [기준 원문 2026-11-15] 21 CFR 210·211(eCFR XML)·EU GMP Part I 1~9장+Annex 1·ICH Q7/Q9(R1)/Q10(PDF)·식약처 「의약품 제조 및 품질관리에 관한 규정」 조문+별표 1~18(국가법령정보센터 화면·첨부 PDF, 키 없이) 원문 → 조항 단위 `web/data/clauses/{cfr21,eu_gmp,ich,mfds_gmp}.json`(무절단·DB 아님) + `translation_queue.json`(국문 번역 대기). 수동 CLI·이용 조건은 `web/data/clauses/SOURCES.md`. ★`library_collect_*` 이름 금지(자료실 플러그인 자동 발견에 걸린다)
+├─ clause_translate_kit.py        # [구글 품질 2단계 2026-11-20] 국문 조항 참고 번역 키트 — export(묶음)·qa(결정론 검사)·status(큐 `web/data/clauses/translation_queue.json`). 번역 정본 `translations/clause_outbox/*.json`, 빌드가 `web/clause_translation.py` 로 덧씌움(원문 해시가 바뀌면 버리고 큐로)
+├─ doc_gist_kit.py                # [구글 품질 2단계 2026-11-20] 국문 짧은 문서 GRM 요지 키트 — 대상 선정·export·qa·status. 정본 `translations/doc_gist_outbox/*.json`, 검사·뷰 `web/doc_gist.py`(통과한 요지만 국문 문서 페이지에 싣는다)
 ├─ collect_eu_gmp_ncr.py           # EU GMP NCR(EudraGMDP) 수집기 — News+Findings 이중편입
 ├─ ema_document.py                # EMA 원문(기사 HTML·문서 PDF) → 전문 공통 판독기(11-25 #8) — 일일 수집기 EMA 경로·빈칸 백필이 같은 함수를 부른다. 저장 단계 절단 없음(article_excerpt, 넘치면 article_excerpt_parts 로 분할)·메타 ema_document·간격 2초/429 재시도. 빈칸은 content_completeness 가 매일 센다
 ├─ eudragmdp_client.py             # EudraGMDP GMP 비준수 requests 클라이언트(세션·페이징·상세·PDF)

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T00:26:45Z",
+ "generated_at": "2026-11-25T01:23:53Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -172,6 +172,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 45525342608,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "push",
+    "createdAt": "2026-11-25T01:23:05Z",
+    "updatedAt": "2026-11-25T01:23:44Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1937 from MINHOYEOM/claude/published-names-redact",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45525342608"
+   },
+   {
     "databaseId": 45107525855,
     "status": "completed",
     "conclusion": "failure",
@@ -214,74 +225,63 @@
     "headBranch": "main",
     "displayTitle": "bridge(web): 2026-11-16 라우틴 델타 커밋 (자동)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/43788711900"
-   },
-   {
-    "databaseId": 42568688495,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T05:40:49Z",
-    "updatedAt": "2026-11-09T05:42:51Z",
-    "headBranch": "main",
-    "displayTitle": "fix(brief): 11-09 경고서한 카드의 가림 표시 노출 정리 + 본문 슬롯 가드 (#1410)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568688495"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45517200242,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45525342586,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-25T00:19:35Z",
-    "updatedAt": "2026-11-25T00:26:25Z",
+    "createdAt": "2026-11-25T01:23:05Z",
+    "updatedAt": "2026-11-25T01:23:09Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1931 from MINHOYEOM/codex/fix-tidy-date-re",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45517200242"
+    "displayTitle": "Merge pull request #1937 from MINHOYEOM/claude/published-names-redact",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45525342586"
    },
    {
-    "databaseId": 45515309235,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45523604392,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-25T00:05:32Z",
-    "updatedAt": "2026-11-25T00:12:58Z",
-    "headBranch": "claude/published-names-redact",
-    "displayTitle": "fix(privacy): 공개 발행본 14장 개인 실명 정리 + 발행 사본 실명 게이트(기존=경고·새 호=실패) — #1916 위",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45515309235"
+    "createdAt": "2026-11-25T01:09:22Z",
+    "updatedAt": "2026-11-25T01:16:27Z",
+    "headBranch": "codex/daily-reconcile-ledger",
+    "displayTitle": "feat(recon): 매일 대조 장부 1단계 (draft)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45523604392"
    },
    {
-    "databaseId": 45515307354,
+    "databaseId": 45523599612,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T00:05:31Z",
-    "updatedAt": "2026-11-25T00:13:54Z",
-    "headBranch": "claude/published-names-redact",
-    "displayTitle": "fix(privacy): 11-23 deep source_text fda483-196407 수신인 머리글 'Lu Yun' →…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45515307354"
+    "createdAt": "2026-11-25T01:09:19Z",
+    "updatedAt": "2026-11-25T01:20:56Z",
+    "headBranch": "codex/daily-reconcile-ledger",
+    "displayTitle": "feat(recon): 대표 결정 반영 — 제외·중복 분리, 일별 장부 migration 168(미적용), 수집 끝 단계(기…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45523599612"
    },
    {
-    "databaseId": 45514829859,
+    "databaseId": 45522524658,
     "status": "completed",
-    "conclusion": "cancelled",
-    "event": "pull_request",
-    "createdAt": "2026-11-25T00:02:01Z",
-    "updatedAt": "2026-11-25T00:05:48Z",
-    "headBranch": "claude/published-names-redact",
-    "displayTitle": "fix(privacy): 공개 발행본 14장 개인 실명 정리 + 발행 사본 실명 게이트(기존=경고·새 호=실패) — #1916 위",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45514829859"
-   },
-   {
-    "databaseId": 45514816262,
-    "status": "completed",
-    "conclusion": "cancelled",
+    "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T00:01:55Z",
-    "updatedAt": "2026-11-25T00:05:47Z",
-    "headBranch": "claude/published-names-redact",
-    "displayTitle": "fix(privacy): 공개 발행본 14장 개인 실명 → 역할 표기 + 발행 사본 실명 게이트(기존=경고·새 호=실패)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45514816262"
+    "createdAt": "2026-11-25T01:00:56Z",
+    "updatedAt": "2026-11-25T01:08:07Z",
+    "headBranch": "codex/schedule-audit",
+    "displayTitle": "fix(schedule): 보완기 apply 자동 지정 금지 — 워크플로별 허용 목록(483 전문 백필·DB 백업·483 O…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45522524658"
+   },
+   {
+    "databaseId": 45522505807,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T01:00:48Z",
+    "updatedAt": "2026-11-25T01:09:45Z",
+    "headBranch": "codex/bulk-write-helper",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/bulk-write-helper",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45522505807"
    }
   ],
   "grm-scaffold-mirror.yml": [

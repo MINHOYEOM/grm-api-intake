@@ -660,8 +660,8 @@ def _person_candidates(text):
                 and re.search(r"\d", line_before):
             continue                                   # 'Patterson Dr Ste 100' — 번지수 뒤 Dr 은 Drive
         cand = m.group(1)
-        if re.match(r"[A-Z][A-Za-z\-]*['’]s\b", cand):
-            continue                                   # "Dr. Reddy's Laboratories" — 소유격은 회사명
+        if re.match(r"[A-Z][A-Za-z\-]*(?:['’]|&#0?39;|&apos;)s\b", text[m.start(1):m.start(1) + 40]):
+            continue                                   # "Dr. Reddy's"·'Dr. Reddy’s'·'Dr. Reddy&#039;s' — 소유격은 회사명
         parts = _NAME_TOKEN_RE.findall(cand)
         if len(parts) >= 2:
             last = cand.rfind(parts[-1])

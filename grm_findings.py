@@ -1378,9 +1378,9 @@ def normalize_firm_name(name: str) -> str:
 
 
 # [개인 사업자 2026-11-23] 업체명 칸이 **사람 이름**인 경우(483 수신 업체가 개인 농장·개인 사업자 —
-# 11-23호 'Kenneth F Tesch'·'Matthew A. Leo'). 2026-11-21 대표 결정(공직자·기관 대표 공식 발표 외 개인 실명 금지)에 따라
+# 11-23호 'Bennick F Varch'·'Matthew A. Leo'). 2026-11-21 대표 결정(공직자·기관 대표 공식 발표 외 개인 실명 금지)에 따라
 # 그 자리는 '개인 사업자' 로 쓴다. 표기는 여기 한 곳(`web/render.py` 가 영어 트리에서 같은 표로 바꾼다 — #1876).
-# 판정은 **확실한 꼴만**: 이름 + 가운데 이니셜 + 성(`Kenneth F Tesch`·`Matthew A. Leo`·`Frederick J. Raal`), 법인·업종 낱말 없음.
+# 판정은 **확실한 꼴만**: 이름 + 가운데 이니셜 + 성(`Bennick F Varch`·`Matthew A. Leo`·`Frederick J. Raal`), 법인·업종 낱말 없음.
 # 두 낱말 이름('Novo Nordisk'·'Sanofi Pasteur'·'Excel Vision' — 브리프 483 업체 449곳 실측 8곳이 전부 법인)은 코드가 못 가른다.
 REDACTED_PERSON_BY_LANG = {"ko": "개인 사업자", "en": "Individual business"}
 _PERSON_NAME_RE = re.compile(

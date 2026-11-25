@@ -140,7 +140,11 @@ FIXTURE_NAMES_BASELINE = Path(__file__).resolve().parent / "fixtures" / "fixture
 FAKE_FIXTURE_NAMES = frozenset((
     "Arbel Brimtal Danqui Darvin Dovan Dravesh Hadrin Jorn Kavrin Kelvaro Ko Ka Krest Mirel More Mark Morlai Okonder "
     "Orlena Ostrell Pelkastrom Pelvik Qiu Quell Quent Quorvala Ravel Tasindra Tor Torvel Twisk Varsten Vasky Velloc "
-    "Velmor Veshan Zha Zun Doe Roe Testerson Example").split())
+    "Velmor Veshan Zha Zun Doe Roe Testerson Example "
+    "Oren Kalpa Ravinor Teskamal Dravin Tavo Wexo Marika Chova Darik Venmarz Ilhan Barvi Orvin Kesta Bennick Varch "
+    "Ovan Kelmoti Brant Keltham").split())
+# 규제기관 공식 서명자(시험 원문에 나오는 FDA 공무원) — 11-21 결정상 가리지 않는 대상이라 그대로 둔다.
+OFFICIAL_FIXTURE_NAMES = frozenset(("Garthwaite",))   # FDA Compliance Officer(경고서한 서명란)
 _TEXT_SUFFIXES = (".json", ".txt", ".md", ".html", ".csv")
 
 
@@ -182,7 +186,7 @@ def fixture_name_keys():
     for path, values in _test_material():
         for value in values:
             for name in precheck.source_person_names(value):
-                if name not in FAKE_FIXTURE_NAMES:
+                if name not in FAKE_FIXTURE_NAMES and name not in OFFICIAL_FIXTURE_NAMES:
                     keys[_name_key(path, name)] = name
     return keys
 
@@ -200,6 +204,10 @@ class TestMaterialNoPersonalNamesTest(unittest.TestCase):
             print(f"\n[경고] 시험 자료 기존 실명 {old}건(기준 목록, 막지 않음)" + (f" · 정리돼 사라진 기준 {stale}건" if stale else ""))
         self.assertEqual(new, [], "시험 자료·시험 코드에 실명이 있다(공개 저장소). 같은 꼴의 가짜 이름으로 바꾸고, "
                                   "새 가짜 이름이면 FAKE_FIXTURE_NAMES 에 더한다.")
+
+    def test_baseline_stays_empty(self):
+        """기준 목록은 11-25 에 비웠다 — 실명을 기준 목록에 넣어 경고로 돌리지 않는다(가짜 이름으로 바꾼다)."""
+        self.assertEqual(json.loads(FIXTURE_NAMES_BASELINE.read_text(encoding="utf-8"))["entries"], [])
 
     def test_fake_names_are_caught_without_allowlist(self):
         """허용 목록이 판정을 대신하지 않는다 — 가짜 이름도 판정 함수에는 이름으로 잡힌다(게이트가 살아 있다)."""

@@ -153,6 +153,7 @@ on:
         default: 'inherit'
 
 permissions:
+  actions: read
   contents: read
   issues: write  # 실패 시 자동 이슈 생성용
 
@@ -181,6 +182,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Check today's FDA manual runs (KST)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/fda_manual_run_warning.py
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0

@@ -519,12 +519,13 @@ def collect_stats(raw_rows: Iterable[dict[str, Any]], finding_rows: Iterable[dic
 def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20) -> dict[str, Any]:
     """(V) 경고서한 위반항목 빈칸 — 사유별 행 수(수집기와 같은 판정 함수)."""
     from collect_intake import (
-        WL_VIOLATIONS_SCOPE_STATUSES, WL_VIOLATIONS_STATUS_UNSUPPORTED, wl_violations_gap_kind,
+        WL_VIOLATIONS_SCOPE_STATUSES, WL_VIOLATIONS_STATUS_UNSUPPORTED, is_wl_glp, wl_violations_gap_kind,
     )
     from grm_common import SOURCE_FDA_WL
     by_kind: dict[str, int] = defaultdict(int)
     unmarked_docs: list[str] = []
     unsupported_docs: list[str] = []
+    glp_zero = 0
     for r in raw_rows:
         if str(r.get("source") or "") != SOURCE_FDA_WL:
             continue
@@ -534,7 +535,11 @@ def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20)
                 raw = json.loads(raw)
             except ValueError:
                 continue
-        kind = wl_violations_gap_kind(raw if isinstance(raw, dict) else {})
+        if not isinstance(raw, dict):
+            continue
+        if is_wl_glp(raw) and not (isinstance(raw.get("wl_violations"), list) and raw["wl_violations"]):
+            glp_zero += 1
+        kind = wl_violations_gap_kind(raw)
         if not kind:
             continue
         by_kind[kind] += 1
@@ -545,7 +550,7 @@ def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20)
     return {"unmarked": by_kind.get("unmarked", 0), "by_kind": dict(sorted(by_kind.items())),
             "unmarked_docs": unmarked_docs,
             "unsupported": by_kind.get(WL_VIOLATIONS_STATUS_UNSUPPORTED, 0),
-            "unsupported_docs": unsupported_docs,
+            "unsupported_docs": unsupported_docs, "glp_zero": glp_zero,
             "out_of_scope": {kind: by_kind[kind] for kind in WL_VIOLATIONS_SCOPE_STATUSES if kind in by_kind}}
 
 
@@ -616,6 +621,7 @@ def build_report(stats: list[FieldStats], findings_text: dict[str, str], *, toda
         "counts": {"truncated": len(alarms_t), "unused": len(alarms_u),
                    "intentional_caps": len(trunc) - len(alarms_t),
                    "wl_violation_gaps": int((wl_gaps or {}).get("unsupported") or 0),
+                   "wl_glp_zero": int((wl_gaps or {}).get("glp_zero") or 0),
                    "ema_document_gaps": int((ema_gaps or {}).get("blank") or 0)},
         "wl_violation_gaps": wl_gaps or {},
         "ema_document_gaps": ema_gaps or {},
@@ -684,6 +690,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         if scope:
             reasons = ", ".join(f"{reason} {count}행" for reason, count in sorted(scope.items()))
             lines += [f"추출 대상 밖 {sum(scope.values())}행 ({reasons})", ""]
+    if "glp_zero" in g:
+        lines += [f"GLP 경고서한 중 위반항목 0건인 서한 {c['wl_glp_zero']}행", ""]
     e = report.get("ema_document_gaps") or {}
     if c.get("ema_document_gaps"):
         lines += ["## EMA 문서(PDF) 본문 빈칸", "",
@@ -691,7 +699,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                   "`grm-blank-excerpts-backfill.yml`(sources=ema)로 채우고, 사유가 남으면 판독기(ema_document)를 고칩니다.", "",
                   f"사유별: {e.get('by_reason', {})}", "",
                   f"문서 예: {', '.join(e.get('docs') or [])}", ""]
-    if not t_alarm and not u_alarm and not c.get("wl_violation_gaps") and not c.get("ema_document_gaps"):
+    if not t_alarm and not u_alarm and not any(c.get(k) for k in ("wl_violation_gaps", "wl_glp_zero", "ema_document_gaps")):
         lines.append("이상 없음.")
     return "\n".join(lines) + "\n"
 
@@ -700,6 +708,7 @@ def fingerprint(report: dict[str, Any]) -> str:
     keys = sorted([f"T|{t['source']}|{t['path']}|{t['cap']}" for t in report["truncation"] if not t["intentional"]]
                   + [f"U|{u['source']}|{u['path']}" for u in report["usage"] if u["alarm"]]
                   + (["V|wl_violations"] if report["counts"].get("wl_violation_gaps") else [])
+                  + ([f"V|wl_glp_zero|{report['counts']['wl_glp_zero']}"] if report["counts"].get("wl_glp_zero") else [])
                   + (["E|ema_document"] if report["counts"].get("ema_document_gaps") else []))
     return "content-fp:" + hashlib.sha256("\n".join(keys).encode("utf-8")).hexdigest()[:16]
 
@@ -709,7 +718,7 @@ def plan_issues(report: dict[str, Any]) -> list[dict[str, Any]]:
     칸마다 이슈를 열지 않고 하나로 모은다(감시기 이슈가 쏟아지면 무시당한다 — 2026-10 교훈)."""
     c = report["counts"]
     base = {"key": "content", "source": "내용 완전성", "title": ISSUE_TITLE, "labels": list(ISSUE_LABELS)}
-    if c["truncated"] or c["unused"] or c.get("wl_violation_gaps") or c.get("ema_document_gaps"):
+    if c["truncated"] or c["unused"] or any(c.get(k) for k in ("wl_violation_gaps", "wl_glp_zero", "ema_document_gaps")):
         fp = fingerprint(report)
         body = render_markdown(report) + "\n" + (f"실행: {report['run_url']}\n\n" if report.get("run_url") else "") + \
             "데이터는 고치지 않았다(감시는 읽기 전용). 의도된 칸이면 `content_completeness.py` 의 " \
@@ -717,6 +726,7 @@ def plan_issues(report: dict[str, Any]) -> list[dict[str, Any]]:
         return [{**base, "action": "open", "body": body, "fingerprint": fp, "verdict": "found",
                  "comment": f"목록이 바뀌었습니다 — 잘림 {c['truncated']}칸 · 안 쓰이는 칸 {c['unused']}개"
                             f" · 경고서한 위반항목 빈칸 {c.get('wl_violation_gaps', 0)}행"
+                            f" · GLP 경고서한 위반항목 0건 {c.get('wl_glp_zero', 0)}행"
                             f" · EMA 문서 본문 빈칸 {c.get('ema_document_gaps', 0)}행"}]
     return [{**base, "action": "close", "verdict": "ok",
              "comment": "잘림·안 쓰이는 칸이 더 보이지 않아 자동으로 닫습니다."}]

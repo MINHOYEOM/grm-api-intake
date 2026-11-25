@@ -30,6 +30,7 @@
 
 기본은 dry-run: 행별 전·후 표(문서 id·형식·항목 수·첫 statement 발췌)와 남는 빈 행 사유를 JSON·Markdown 으로 쓴다.
 `--rows-json` 은 DB 대신 미리 받아 둔 행(raw_signal_id·document_id·raw_json…)으로 dry-run 한다(자격증명 불필요).
+`--glp-census --rows-json` 은 GLP 서한의 빈 행과 재추출로 채울 수 있는 행을 읽기 전용으로 집계한다.
 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (값은 로그에 남기지 않는다).
 exit: 자격증명·조회 실패 2 · 안전장치(not_verbatim) 또는 쓰기 실패가 있으면 1 · 그 외 0.
 """
@@ -190,6 +191,31 @@ def ci_known_raw_keys() -> frozenset[str]:
     return KNOWN_RAW_KEYS
 
 
+def glp_census(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    counts = {"glp": 0, "zero_before": 0, "fillable": 0, "zero_after": 0}
+    remaining: Counter[str] = Counter()
+    for row in rows:
+        if row.get("source") and row["source"] != SOURCE_FDA_WL:
+            continue
+        raw = _json_object(row.get("raw_json"))
+        if not ci.is_wl_glp(raw):
+            continue
+        counts["glp"] += 1
+        if isinstance(raw.get("wl_violations"), list) and raw["wl_violations"]:
+            continue
+        counts["zero_before"] += 1
+        if not _norm(raw.get("wl_body_full") or ""):
+            remaining["no_body"] += 1
+            continue
+        result = classify(row)
+        if result["kind"] == "fill":
+            counts["fillable"] += 1
+        else:
+            remaining[result.get("reason") or result.get("status") or result["kind"]] += 1
+    counts["zero_after"] = counts["zero_before"] - counts["fillable"]
+    return {"mode": "dry-run", **counts, "zero_after_by_reason": dict(sorted(remaining.items()))}
+
+
 def run(rows: list[dict[str, Any]], *, apply: bool, limit: int,
         writer: Callable[[dict[str, Any], dict[str, Any], dict[str, Any]], str] | None = None) -> Report:
     rep = Report(mode="apply" if apply else "dry-run", limit=limit)
@@ -327,9 +353,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help=f"회차 쓰기 상한(최대 {MAX_LIMIT})")
     ap.add_argument("--doc-ids", default="", help="document_id 쉼표 목록(비우면 전부)")
     ap.add_argument("--rows-json", default="", help="DB 대신 미리 받아 둔 행 JSON(list 또는 {rows:[]}) — dry 전용")
+    ap.add_argument("--glp-census", action="store_true", help="GLP 빈 행 전수 집계(--rows-json 필수)")
     ap.add_argument("--report", default="report.json")
     ap.add_argument("--markdown", default="table.md")
     args = ap.parse_args(argv)
+    if args.glp_census and (not args.rows_json or args.apply):
+        ap.error("--glp-census 는 --rows-json 을 지정한 dry-run 에서만 사용할 수 있습니다")
     limit = max(0, min(int(args.limit), MAX_LIMIT))
     doc_ids = [d.strip() for d in args.doc_ids.split(",") if d.strip()]
     writer = None
@@ -341,6 +370,11 @@ def main(argv: list[str] | None = None) -> int:
         rows = data.get("rows", []) if isinstance(data, dict) else data
         if doc_ids:
             rows = [r for r in rows if str(r.get("document_id")) in doc_ids]
+        if args.glp_census:
+            summary = json.dumps(glp_census(rows), ensure_ascii=False, indent=2)
+            Path(args.report).write_text(summary + "\n", encoding="utf-8")
+            print(summary)
+            return 0
     else:
         from grm_cli import normalize_supabase_url, resolve_supabase_service_credentials
         creds = resolve_supabase_service_credentials(argparse.Namespace(supabase_url="", service_role_key=""))

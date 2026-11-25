@@ -13,8 +13,10 @@ from __future__ import annotations
 import json
 import os
 import sys
+import tempfile
 import unittest
 from datetime import date
+from pathlib import Path
 from unittest import mock
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -309,6 +311,66 @@ class ReextractToolTest(unittest.TestCase):
         rep = rx.run([_row(_raw_from_sample(_sample("511a2f6e48e7")), "r1", "511a")], apply=False, limit=2000)
         md = rx.render_markdown(rep)
         self.assertIn("| 511a | fill | F1b | 0→5 |", md)
+
+
+class GlpViolationsTest(unittest.TestCase):
+    statements = (
+        "Specifically, Example Labs failed to retain records, contrary to 21 CFR 58.195(b).",
+        "The study director did not document deviations from the protocol (Section 58.33(b)).",
+        "Example Labs failed to maintain the records as required by 21 CFR 58.190(a).",
+    )
+
+    def test_part_58_citation_forms_are_extracted_verbatim(self) -> None:
+        body = f"{self.statements[0]} 2) {self.statements[1]} {self.statements[2]}"
+        rows, fmt = ci.extract_wl_violations_detail(body)
+        self.assertEqual(fmt, "F7")
+        self.assertEqual([row["statement"] for row in rows], list(self.statements))
+        self.assertEqual([row["citation"] for row in rows],
+                         ["21 CFR 58.195(b)", "Section 58.33(b)", "21 CFR 58.190(a)"])
+        self.assertEqual(ci.extract_wl_violations_detail(body, extended=False)[0], [])
+
+    def test_guidance_and_citations_in_other_sentences_do_not_count(self) -> None:
+        body = ("Example Labs failed to log an event. See Section 58.33(b) for details. "
+                "If you failed to keep records, review 21 CFR 58.190(a). "
+                "Conclusion. " + self.statements[2])
+        self.assertEqual(ci.extract_wl_violations_detail(body)[0], [])
+
+    def test_census_cli_uses_only_input_rows(self) -> None:
+        raw = {"firm": "Example Labs", "subject": "Good Laboratory Practice",
+               "wl_body_full": self.statements[0]}
+        rows = [_row(raw), _row({"subject": "GLP"}),
+                _row({**raw, "wl_violations": [{"number": "1"}]}),
+                _row({"wl_body_full": "Example Labs is subject to 21 CFR Part 58."}),
+                _row({"subject": "GLP-1 products", "wl_body_full": "Example Labs markets GLP-1 products."}),
+                {**_row(raw), "source": "FDA 483"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            source, report = Path(tmp) / "rows.json", Path(tmp) / "report.json"
+            source.write_text(json.dumps({"rows": rows}), encoding="utf-8")
+            with mock.patch.object(rx, "fetch_rows") as fetch, mock.patch.object(rx, "make_writer") as writer, \
+                    mock.patch("sys.stdout"), mock.patch("sys.stderr"):
+                args = ["--glp-census", "--rows-json", str(source), "--report", str(report)]
+                self.assertEqual(rx.main(args), 0)
+                with self.assertRaises(SystemExit) as invalid:
+                    rx.main([*args, "--apply"])
+                self.assertEqual(invalid.exception.code, 2)
+                fetch.assert_not_called()
+                writer.assert_not_called()
+            summary = json.loads(report.read_text(encoding="utf-8"))
+        self.assertEqual(summary, {"mode": "dry-run", "glp": 4, "zero_before": 3,
+                                   "fillable": 1, "zero_after": 2,
+                                   "zero_after_by_reason": {"no_body": 1, "unsupported_format": 1}})
+
+    def test_scheduled_audit_warns_only_with_glp_zero_rows(self) -> None:
+        wl = {"source": "FDA Warning Letter", "raw_json": {"firm": "Example Labs", "subject": "GLP"}}
+        filled = {**wl, "raw_json": {"wl_body_full": self.statements[0], "wl_violations": [{"number": "1"}]}}
+        for rows, expected in (([wl, filled, {**wl, "source": "FDA 483"}], 1), ([filled], 0)):
+            with self.subTest(expected=expected):
+                report = cc.build_report([], {}, today=date(2026, 11, 26), wl_gaps=cc.wl_violation_gaps(rows))
+                self.assertEqual(report["counts"]["wl_glp_zero"], expected)
+                issue = report["issues"][0]
+                self.assertEqual(issue["action"], "open" if expected else "close")
+                if expected:
+                    self.assertIn("GLP 경고서한 중 위반항목 0건인 서한 1행", issue["body"])
 
 
 if __name__ == "__main__":

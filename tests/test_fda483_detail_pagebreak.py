@@ -271,3 +271,34 @@ class NoStorageCapTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PageEndItemCut1125Test(unittest.TestCase):
+    """[11-25] 189485 꼴 — 6쪽 끝 서명란 `EMPlOVEE{S)`(L 을 소문자 l 로 판독) 뒤 다음 쪽 첫 항목 `C.`.
+
+    고정 자료(fda483_pagebreak_item_c_1125.txt)는 그 쪽 경계 모양만 옮긴 합성 원문이다(이름·업체는 가짜).
+    옛 저장 행은 B 항에서 끝나 C·D 항이 없었다(번역팀 발견, finding-0b0c1035bdcdabfbe07725d3)."""
+
+    HINTS = {"establishment_type": "Drug Substance and Drug Product Manufacturer",
+             "fei_number": "3000000001", "firm_name": "Examplefirm HF."}
+
+    def _obs(self) -> list[dict[str, str]]:
+        with open(os.path.join(FIX, "fda483_pagebreak_item_c_1125.txt"), encoding="utf-8") as fh:
+            return c._extract_483_observations_from_text(fh.read(), self.HINTS)
+
+    def test_next_page_first_item_is_kept(self):
+        obs = self._obs()
+        self.assertEqual([o["number"] for o in obs], ["4", "5"])
+        d = obs[0]["detail"]
+        self.assertIn("C. Aseptic personnel qualification", d)
+        self.assertTrue(d.endswith("is maintained in a validated state."), d[-120:])
+
+    def test_lowercase_l_signer_block_is_removed(self):
+        d = self._obs()[0]["detail"]
+        for junk in ("EMPlOVEE", "Velmora", "Torvald", "REVERSE", "EOl710N", "Sampleway", "C£1NUMBER"):
+            self.assertNotIn(junk, d)
+        self.assertIn("the sterile product. C. Aseptic", d)
+
+    def test_marker_matches_ocr_variant_but_not_prose(self):
+        self.assertTrue(c._FDA483_FOOTER_RE.search("EMPlOVEE{S) NAME ANO Till£"))
+        self.assertIsNone(c._FDA483_FOOTER_RE.search("the employees were observed handling parts"))

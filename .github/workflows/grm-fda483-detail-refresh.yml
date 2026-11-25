@@ -124,6 +124,7 @@ jobs:
           print(f"후보 {r['candidates']} · 원문 전문 {r['from_body_full']} · PDF {r['from_pdf']} · 본문 없음 {r['no_text']} · 실패 {r['failed']}")
           print(f"바뀐 문서 {r['docs_changed']} · 바뀐 관찰 {r['observations_changed']} (짝 맞음 {r['observations_matched']} / 짝 없음 {r['observations_unmatched']}) · PATCH {r['patched']}\n")
           print(f"옛 상한 잘림 의심 관찰 {r['truncated_before']} → {r['truncated_after']} · 표제 복원 {r['deficiency_restored']} (truncated_only={r['truncated_only']})\n")
+          print(f"쪽 끝 절단 복원: 본문 늘어난 관찰 {r['pagebreak_extended']} (문서 {r['pagebreak_docs']}) · 그중 새 하위 항목 생김 {r['pagebreak_items_added']} · 산문 낱말 {r['prose_words_before']} → {r['prose_words_after']} · 본문 축소 가드로 막음 {r['shrink_blocked']}\n")
           print("| 지표 | 전 | 후 |\n|---|---|---|")
           b, a = r["before"], r["after"]
           for k, label in (("observations", "상세 있는 관찰"), ("complete_sentence", "문장 온전"),

@@ -233,3 +233,72 @@ class FirstSentenceNoCapTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# [11-25 쪽 끝 절단 소급] 189485 꼴 — 옛 저장 행은 6쪽 서명란에서 끊겨 다음 쪽 첫 항목(C.)이 없었다.
+_PB_DEF = ("Procedures designed to prevent microbiological contamination of drug products purporting to be "
+           "sterile are not established and followed.")
+_PB_OLD_DETAIL = (
+    "Specifically, A. While observing the setup and filling operations on the filling line, the following "
+    "deficiencies in the aseptic processes were noted: i. During installation of the filling stations the "
+    "operator was observed handling unprotected sterile parts with gloved hands. These components are "
+    "positioned directly above the exposed product during the filling and stoppering process. B. Your visual "
+    "inspection program does not provide adequate assurance that finished products possess their purported "
+    "quality attributes. Specifically, containers with foreign matter are not classified as critical defects, "
+    "despite their potential to compromise container integrity and to create a risk of microbial "
+    "contamination of the sterile product. EMPlOVEE{S) NAME ANO Till£ Velmora Quist, PhD, Pharmaceutical "
+    "Scientist SEE Torvald Brennick, PhD, Lead Biologist REVERSE OF THIS PAGE")
+
+
+def _pb_raw(old_detail: str = _PB_OLD_DETAIL) -> dict:
+    with open(os.path.join(FIX, "fda483_pagebreak_item_c_1125.txt"), encoding="utf-8") as fh:
+        body = fh.read()
+    return {"fda483_body_full": body,
+            "establishment_type": "Drug Substance and Drug Product Manufacturer", "firm": "Examplefirm HF.",
+            b._OBS_KEY: [{"number": "4", "deficiency": _PB_DEF, "detail": old_detail}]}
+
+
+class PageEndCutBackfillTest(unittest.TestCase):
+    def test_next_page_item_is_restored_and_counted(self):
+        patched: dict = {}
+        rep = b.run([_row(_pb_raw())], dry_run=False, patch_fn=lambda rid, r: patched.update(r),
+                    text_fn=lambda u: self.fail("PDF 를 받으면 안 된다"))
+        d = patched[b._OBS_KEY][0]["detail"]
+        self.assertIn("C. Aseptic personnel qualification", d)
+        self.assertNotIn("Velmora", d)
+        self.assertEqual((rep.pagebreak_extended, rep.pagebreak_items_added, rep.pagebreak_docs), (1, 1, 1))
+        self.assertEqual(rep.pagebreak_samples[0]["items_added"], ["C", "D"])
+        self.assertEqual(rep.shrink_blocked, 0)
+        self.assertGreater(rep.prose_words_after, rep.prose_words_before)
+
+    def test_dry_run_reports_without_writing(self):
+        rep = b.run([_row(_pb_raw())], dry_run=True, patch_fn=lambda rid, r: self.fail("쓰면 안 된다"))
+        self.assertEqual((rep.pagebreak_items_added, rep.patched), (1, 0))
+
+    def test_shrinking_reread_is_blocked_and_old_kept(self):
+        longer = _PB_OLD_DETAIL.replace("REVERSE OF THIS PAGE", "") + (
+            " C. Aseptic personnel qualification does not require the inclusion of all critical interventions "
+            "during aseptic process simulation and the media fill records were never reviewed by anyone at all "
+            "in the quality unit during the period covered by this inspection or before it.")
+        rep = b.run([_row(_pb_raw(longer))], dry_run=True)
+        self.assertEqual(rep.shrink_blocked, 0, "다시 읽은 판이 옛 판보다 길면 막지 않는다")
+        # 다시 읽은 판(원문)보다 옛 판이 본문이 많다 → 바꾸지 않는다
+        old = [{"number": "4", "deficiency": _PB_DEF, "detail": longer + " " + longer}]
+        new = [{"number": "4", "deficiency": _PB_DEF, "detail": "Specifically, A. While observing the setup."}]
+        refreshed, _m, _u = b.refreshed_observations(old, new)
+        self.assertEqual(refreshed[0]["detail"], "Specifically, A. While observing the setup.")
+        guarded, blocked = b.guard_shrink(old, refreshed)
+        self.assertEqual(blocked, [0])
+        self.assertTrue(guarded[0]["detail"].startswith(longer[:200]))
+
+    def test_footer_only_cleanup_is_not_blocked(self):
+        old = [{"number": "4", "deficiency": _PB_DEF, "detail": _PB_OLD_DETAIL}]
+        cleaned = _PB_OLD_DETAIL.split(" EMPlOVEE")[0]
+        guarded, blocked = b.guard_shrink(old, [{**old[0], "detail": cleaned}])
+        self.assertEqual(blocked, [])
+        self.assertEqual(guarded[0]["detail"], cleaned)
+
+    def test_prose_and_item_helpers(self):
+        self.assertEqual(b.item_heads("A. The x. B. Two items ii. three"), {"A", "B", "ii"})
+        self.assertEqual(b.prose_words("SEE REVERSE Velmora Quist, PhD the sterile product"), 3)
+        self.assertFalse(b.shrinks_body("short text", ""))

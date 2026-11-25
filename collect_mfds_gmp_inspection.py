@@ -1103,6 +1103,43 @@ def _body(raw: dict[str, str], attachment: _AttachmentParse,
     return "\n".join(part for part in parts if not part.endswith(": "))
 
 
+def attachment_payload_fields(attachment: _AttachmentParse,
+                              manual_review: bool) -> dict[str, Any]:
+    """첨부 파싱 결과 → raw_payload 의 첨부 관련 키 전부(수집기·재수집 CLI 공용 단일 함수).
+
+    `_to_item` 이 쓰던 블록을 그대로 옮긴 것이다(키·조건 불변). 이미 있는 행의 본문을 다시
+    채우는 도구(`recollect_mfds_gmp_attachment.py`)가 같은 키를 같은 규칙으로 만들게 한다.
+    """
+    out: dict[str, Any] = {
+        "attachment_parse_status": attachment.status,
+        "attachment_file_format": attachment.file_format,
+        "attachment_bytes": attachment.bytes_downloaded,
+        "attachment_pages": attachment.pages,
+        "attachment_deficiency_assessment": attachment.deficiency,
+        "manual_review_required": manual_review,
+    }
+    if attachment.error:
+        out["attachment_parse_error"] = attachment.error
+    if attachment.text:
+        out["attachment_text"] = attachment.text
+    if attachment.deficiency_excerpt:
+        out["attachment_deficiency_excerpt"] = attachment.deficiency_excerpt
+    # [상세보기 결정론 승격 2026-07-02] periodic 지적 표 성공 시만 구조 배열 기록(card_scaffold
+    # deterministic_detail 소비). status 는 관측용(플래그 on 시도분만) — off 면 키 자체 부재.
+    if attachment.deficiencies:
+        out["gmp_deficiencies"] = attachment.deficiencies
+    if attachment.deficiency_table_status:
+        out["gmp_deficiency_table_status"] = attachment.deficiency_table_status
+    return out
+
+
+def attachment_manual_review(attachment: _AttachmentParse) -> bool:
+    """`_to_item` 의 manual_review 판정과 같은 식(재수집 CLI 공용)."""
+    return attachment.deficiency_table_status == "unreadable" or (
+        attachment.deficiency == "unknown" and attachment.status not in ("pdf-ok", "hwpx-ok")
+    )
+
+
 def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
     doc_id = raw.get("doc_id", "").strip()
     manufacturer = raw.get("manufacturer", "").strip()
@@ -1131,33 +1168,14 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
     # P0 개선: 첨부를 자동판독하지 못해 지적사항 유무를 확정 못한 경우(주로 구형 .hwp/OLE,
     # 다운로드 실패, 스캔본 등)에는 침묵 강등되지 않도록 '수동확인 필요' 플래그를 남긴다.
     # 무차별 Tier 3 승격은 노이즈가 크므로 Tier 2는 유지하되, Routine이 사람 확인을 큐잉하도록 표시.
-    manual_review = attachment.deficiency_table_status == "unreadable" or (
-        attachment.deficiency == "unknown" and attachment.status not in ("pdf-ok", "hwpx-ok")
-    )
+    manual_review = attachment_manual_review(attachment)
 
     raw_payload: dict[str, Any] = {
         "source": "nedrug CCBBD03",
         **raw,
         "download_url": download_url,
-        "attachment_parse_status": attachment.status,
-        "attachment_file_format": attachment.file_format,
-        "attachment_bytes": attachment.bytes_downloaded,
-        "attachment_pages": attachment.pages,
-        "attachment_deficiency_assessment": attachment.deficiency,
-        "manual_review_required": manual_review,
+        **attachment_payload_fields(attachment, manual_review),
     }
-    if attachment.error:
-        raw_payload["attachment_parse_error"] = attachment.error
-    if attachment.text:
-        raw_payload["attachment_text"] = attachment.text
-    if attachment.deficiency_excerpt:
-        raw_payload["attachment_deficiency_excerpt"] = attachment.deficiency_excerpt
-    # [상세보기 결정론 승격 2026-07-02] periodic 지적 표 성공 시만 구조 배열 기록(card_scaffold
-    # deterministic_detail 소비). status 는 관측용(플래그 on 시도분만) — off 면 키 자체 부재.
-    if attachment.deficiencies:
-        raw_payload["gmp_deficiencies"] = attachment.deficiencies
-    if attachment.deficiency_table_status:
-        raw_payload["gmp_deficiency_table_status"] = attachment.deficiency_table_status
 
     return IntakeItem(
         source=SOURCE_MFDS,

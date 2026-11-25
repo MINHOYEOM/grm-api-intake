@@ -40,13 +40,14 @@ import findings_supabase_backfill as fsb
 import raw_versioning as rv
 import backfill_483_inspectors_from_body as inspectors_from_body
 from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_483, body_shrunk, log
+from grm_http_policy import FDA_BACKFILL_DELAY_SECONDS
 
 BODY_KEY = "fda483_body_full"
 INSPECTORS_KEY = "fda483_inspectors"
 OUT_OF_SCOPE = "out-of-scope"
 SELECT_COLUMNS = "raw_signal_id,document_id,published_date,raw_json,row_json,raw_sha256"
 CHANGED_BY = "backfill_483_body_full"
-_PDF_DELAY_S = 30.0          # fda.gov robots Crawl-Delay
+_PDF_DELAY_S = float(FDA_BACKFILL_DELAY_SECONDS)
 _NOTION_SLEEP_S = 0.34       # Notion 3 req/s
 
 

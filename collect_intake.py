@@ -49,6 +49,12 @@ import requests
 
 import grm_queue
 import intake_exclusion as _xl
+from grm_http_policy import (
+    FDA_WL_BODY_FETCH_ATTEMPTS as WL_BODY_FETCH_ATTEMPTS,
+    FDA_WL_BODY_RETRY_BACKOFF_SECONDS as WL_BODY_RETRY_BACKOFF_SECONDS,
+    FDA_WL_BODY_RETRYABLE_STATUS as _WL_RETRYABLE_STATUS,
+    NOTION_WRITE_DELAY_SECONDS,
+)
 from grm_common import (
     FDA_BOT_BLOCK,
     FdaBotBlockError,
@@ -3454,9 +3460,6 @@ WL_BODY_STATUS_BOT_BLOCK = FDA_BOT_BLOCK
 # 그래서 일시 장애에 한해 짧게 재시도한다. **403 은 재시도하지 않는다** — fda.gov 의 403 은
 # 같은 러너 IP 에 대한 봇 차단이라 몇 초 뒤 같은 IP 로 다시 두드려도 결과가 같고 차단만
 # 길어진다. 403 은 다음 날 다른 러너에서 도는 예약 회수(`backfill_wl_body_recovery.py`)가 맡는다.
-WL_BODY_FETCH_ATTEMPTS = 3
-WL_BODY_RETRY_BACKOFF_SECONDS = (2.0, 5.0)
-_WL_RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 _wl_retry_sleep: Callable[[float], None] = time.sleep   # 테스트가 패치한다
 
 
@@ -4094,7 +4097,7 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             continue
         if notion_write:
             # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
-            time.sleep(0.34)
+            time.sleep(NOTION_WRITE_DELAY_SECONDS)
             ok = notion_create_page(token, db_id, item, run_date, collected_at,
                                     modality_enabled=modality_enabled)
         else:

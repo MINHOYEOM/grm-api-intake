@@ -69,6 +69,11 @@ import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, body_shrunk, log
+from grm_http_policy import (
+    FDA_483_MIXED_PDF_DELAY_SECONDS,
+    FDA_483_MIXED_PDF_HTTP_RETRIES,
+    FDA_483_PDF_DELAY_SECONDS,
+)
 from grm_taxonomy import is_out_of_scope_483_establishment
 
 
@@ -76,7 +81,7 @@ SCHEMA_VERSION = "grm-483-ocr-recovery/v2"
 
 DEFAULT_TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
 _DEFAULT_PAGE_SIZE = 1000
-_DEFAULT_DELAY_SECONDS = 0.5
+_DEFAULT_DELAY_SECONDS = FDA_483_PDF_DELAY_SECONDS
 _MAX_SAMPLES = 20
 
 # 광범위 실패 판정 임계값 — backfill_483_inspectors 와 동일 규약(절대 기준 아님).
@@ -540,7 +545,7 @@ def text_loss_reason(loss: dict) -> str:
 _OBS_HEAD_RE = re.compile(r"(?i)\bOBSERVATION\s*#?\s*(\d{1,3})\b")
 
 
-def scan_mixed_pdfs(rows: list[dict[str, Any]], *, delay_seconds: float = 0.3,
+def scan_mixed_pdfs(rows: list[dict[str, Any]], *, delay_seconds: float = FDA_483_MIXED_PDF_DELAY_SECONDS,
                     fetch_bytes: Callable[[str], bytes] | None = None,
                     sleep_fn: Callable[[float], None] | None = None) -> dict[str, Any]:
     """[11-12 진단 전용·쓰기 없음] 섞인 PDF(글자 없는 이미지 쪽이 있는 문서) 규모를 센다. OCR 은 하지 않는다.
@@ -552,7 +557,8 @@ def scan_mixed_pdfs(rows: list[dict[str, Any]], *, delay_seconds: float = 0.3,
     from grm_common import http_get_bytes
 
     def _default_fetch(url: str) -> bytes:
-        return http_get_bytes(url, timeout=30, retries=2, headers={"Accept": "application/pdf"},
+        return http_get_bytes(url, timeout=30, retries=FDA_483_MIXED_PDF_HTTP_RETRIES,
+                              headers={"Accept": "application/pdf"},
                               label="FDA 483 PDF(scan)")
 
     get = fetch_bytes or _default_fetch

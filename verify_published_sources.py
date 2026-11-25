@@ -42,11 +42,13 @@ import sys
 import time
 from typing import Any
 
+from grm_http_policy import FDA_PUBLISHED_SOURCE_CHECK_DELAY_SECONDS
+
 BRIEF_GLOB = os.path.join("web", "data", "briefs", "brief_web_*.json")
 DELTA_GLOB = os.path.join("web", "data", "deltas", "delta_*.json")
 
 # 요청 간 간격(초). 소스 서버에 부담을 주지 않기 위한 최소 예의 — 주 1회·수십 건 규모다.
-REQUEST_DELAY = 0.5
+REQUEST_DELAY = FDA_PUBLISHED_SOURCE_CHECK_DELAY_SECONDS
 
 
 def _published_state(weeks: int) -> "tuple[dict[str, dict[str, Any]], list[str]]":

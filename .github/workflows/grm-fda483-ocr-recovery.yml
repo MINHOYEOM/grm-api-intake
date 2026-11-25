@@ -53,9 +53,9 @@ on:
         type: string
         default: ''
       delay_seconds:
-        description: 'PDF 요청 간 대기(초) — fda.gov 예의.'
+        description: '요청 간 대기(초). 비우면 483/WL 각 도구의 기본값.'
         type: string
-        default: '0.5'
+        default: ''
       doc_ids:
         description: '선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분). 비우면 대상 전건. collection-capped·recoverable 모드에서 지목하면 out-of-scope 표식 행도 다시 읽는다(게이트 수정 후 오판 표식 재회수).'
         type: string
@@ -161,7 +161,7 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           IN_APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
           IN_LIMIT: ${{ inputs.limit }}
-          IN_DELAY: ${{ inputs.delay_seconds || '0.5' }}
+          IN_DELAY: ${{ inputs.delay_seconds }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
           IN_MODE: ${{ github.event_name == 'schedule' && 'recoverable' || inputs.mode }}
           IN_DIAG: ${{ github.event_name != 'schedule' && inputs.diag || 'none' }}
@@ -169,7 +169,10 @@ jobs:
           FDA483_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}
         run: |
           set -euo pipefail
-          ARGS=(--report-path ocr_recovery_report.json --delay-seconds "${IN_DELAY}" --mode "${IN_MODE}")
+          ARGS=(--report-path ocr_recovery_report.json --mode "${IN_MODE}")
+          if [ -n "${IN_DELAY}" ]; then
+            ARGS+=(--delay-seconds "${IN_DELAY}")
+          fi
           if [ "${IN_APPLY}" = "true" ]; then
             ARGS+=(--apply)
           fi
@@ -187,7 +190,8 @@ jobs:
             exit 0
           fi
           if [ "${IN_DIAG}" = "scan-mixed" ]; then
-            DARGS=(--scan-mixed --report-path ocr_recovery_report.json --delay-seconds "${IN_DELAY}")
+            DARGS=(--scan-mixed --report-path ocr_recovery_report.json)
+            if [ -n "${IN_DELAY}" ]; then DARGS+=(--delay-seconds "${IN_DELAY}"); fi
             if [ -n "${IN_DOC_IDS}" ]; then DARGS+=(--doc-ids "${IN_DOC_IDS}"); fi
             if [ -n "${IN_LIMIT}" ]; then DARGS+=(--limit "${IN_LIMIT}"); fi
             python backfill_483_ocr_recovery.py "${DARGS[@]}"
@@ -238,12 +242,13 @@ jobs:
           IN_EVENT: ${{ github.event_name }}
           IN_APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
           IN_LIMIT: ${{ inputs.limit }}
-          IN_DELAY: ${{ inputs.delay_seconds || '0.5' }}
+          IN_DELAY: ${{ inputs.delay_seconds }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
           IN_MODE: ${{ github.event_name == 'schedule' && 'recoverable' || inputs.mode }}
           IN_OCR_BUDGET: ${{ github.event_name == 'schedule' && '600' || inputs.ocr_page_budget }}
           IN_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}
         run: |
+          IN_DELAY="${IN_DELAY:-도구 기본값}"
           {
             echo "### GRM FDA 483 OCR Recovery (\`${IN_EVENT}\`)"
             echo ""
@@ -405,8 +410,8 @@ jobs:
           if [ -n "${IN_LIMIT}" ]; then
             ARGS+=(--limit "${IN_LIMIT}")
           fi
-          # 483 용 기본 0.5초는 WL 에 쓰지 않는다 — 비우면 스크립트 기본(5초).
-          if [ -n "${IN_DELAY}" ] && [ "${IN_DELAY}" != "0.5" ]; then
+          # 공용 입력에 쓰이던 483 기본값을 받은 경우 WL 도구 기본값을 사용한다.
+          if [ -n "${IN_DELAY}" ] && [ "${IN_DELAY}" != "$(python -c 'from grm_http_policy import FDA_483_PDF_DELAY_SECONDS as delay; print(delay)')" ]; then
             ARGS+=(--delay-seconds "${IN_DELAY}")
           fi
           if [ -n "${IN_DOC_IDS}" ]; then

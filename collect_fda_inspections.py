@@ -89,6 +89,7 @@ import requests
 
 import findings_supabase_append as fsa
 from grm_common import fda_checked_request, log, retry_after_seconds
+from grm_http_policy import FDA_DDAPI_HTTP_RETRIES, FDA_DDAPI_RETRY_BACKOFF_BASE_SECONDS
 
 SCHEMA_VERSION = "grm-fda-inspections-backfill/v1"
 
@@ -137,7 +138,7 @@ UPSERT_RESOLUTION = "merge-duplicates"   # 위 모듈독스트링 참고 -- igno
 UPSERT_CHUNK_SIZE = 1000                 # 6,417건을 한 POST 에 몰지 않는다(413/timeout 방어).
 
 DEFAULT_TIMEOUT_SECONDS = 60
-DEFAULT_RETRIES = 2
+DEFAULT_RETRIES = FDA_DDAPI_HTTP_RETRIES
 
 # 이 스크립트가 매개하는 http_post / poster 는 테스트에서 인자로 치환된다.
 HttpPost = Callable[..., Any]
@@ -309,7 +310,7 @@ def ddapi_post(
             last_err = e
             log("WARN", f"DDAPI POST 실패({attempt + 1}/{retries + 1}): {type(e).__name__}: {e}")
             if attempt < retries:
-                time.sleep(2 ** attempt)
+                time.sleep(FDA_DDAPI_RETRY_BACKOFF_BASE_SECONDS ** attempt)
                 continue
             raise RuntimeError(f"DDAPI POST 최종 실패: {last_err}") from last_err
 
@@ -323,7 +324,7 @@ def ddapi_post(
         if resp.status_code >= 500:
             if attempt < retries:
                 log("WARN", f"DDAPI 5xx({resp.status_code}) 재시도 {attempt + 1}/{retries + 1}")
-                time.sleep(2 ** attempt)
+                time.sleep(FDA_DDAPI_RETRY_BACKOFF_BASE_SECONDS ** attempt)
                 continue
             raise RuntimeError(f"DDAPI POST HTTP {resp.status_code} 최종 실패")
 

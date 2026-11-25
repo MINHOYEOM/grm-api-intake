@@ -1888,6 +1888,8 @@ _INSPECTOR_REDACTION_RE = re.compile(r"\(\s*b\s*\)\s*\(\s*6\s*\)|Redacted\s*B6",
 # 서명자 여럿이 그 뒤를 잇는 구조라, 뒤쪽 서명자도 200자 룩비하인드 안에 마커가 든다.
 _INSPECTOR_DATE_RE = re.compile(r"\d{1,2}/\d{1,2}/\d{2,4}")
 _INSPECTOR_DATE_LOOKAHEAD = 60
+# 저장 전문 195241: 첫 서명 이름이 SEE REVERSE 앞에 있고 날짜가 OCR로 깨졌다.
+_INSPECTOR_REVERSE_LINE_RE = re.compile(r"\n[ \t]*SEE[ \t]+REVERSE[ \t]*(?=\r?\n)")
 # 교차 확증 (b) — 이름 앞 200자 이내 서명블록 마커. 대문자 고정(re.I 미사용) — 산문의 소문자
 # "signature"/"employee" 언급을 오탐하지 않는다. EMP…OY 는 `_FDA483_FOOTER_RE`와 동형(OCR
 # 변형 EMPLOYEE 흡수).
@@ -2077,14 +2079,17 @@ def _valid_inspector_name(name: str, *, allow_caps: bool = False, max_tokens: in
     return True
 
 
-def _inspector_name_in_text(name: str, text: str) -> bool:
+def _inspector_name_in_text(name: str, text: str, *, exact: bool = False) -> bool:
     """안전장치 — 이름이 그 문서 전문 안에 **글자 그대로** 있는가.
 
     토큰은 철자·대소문자·마침표까지 원문과 같아야 하고, 토큰 사이만 공백 문자(띄어쓰기·줄바꿈)
     차이를 허용한다(서명 칸에서 이름이 줄바꿈으로 갈라진 `Robert J.\\nHam` 을 위해서). 앞뒤는 글자
     경계여야 한다(`Shafigq` 안의 `Shafig` 는 일치로 보지 않는다).
+    exact=True는 검증된 JSON 입력에 쓰며 공백까지 같은 부분 문자열만 받는다.
     이 검사를 통과하지 못한 이름은 어떤 경로로 만들어졌든 내보내지 않는다 — 다른 문서·프로파일에서
     빌려오거나 철자를 고쳐 쓰는 경로가 생겨도 여기서 막힌다."""
+    if exact:
+        return bool(name and name.strip()) and name in text
     toks = [t for t in (name or "").split(" ") if t]
     if not toks or not text:
         return False
@@ -2137,10 +2142,14 @@ INSPECTORS_PARSER_LIMIT = "parser-limit"            # 서명란은 있으나 이
 
 
 def _inspector_confirmed(body: str, name_start: int, title_end: int) -> bool:
-    """서명블록 문맥 교차 확증 — 이름 앞 200자 안 서명 마커 또는 직함 뒤 60자 안 날짜."""
+    """앞의 서명 마커, 뒤의 날짜 또는 독립된 서명 줄 뒤 SEE REVERSE로 확인한다."""
     before = body[max(0, name_start - _INSPECTOR_MARKER_LOOKBEHIND):name_start]
     after = body[title_end:title_end + _INSPECTOR_DATE_LOOKAHEAD]
-    return bool(_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after))
+    if _INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after):
+        return True
+    line_start = body.rfind("\n", 0, name_start) + 1
+    return (not body[line_start:name_start].strip() and not after.partition("\n")[0].strip()
+            and bool(_INSPECTOR_REVERSE_LINE_RE.search(after)))
 
 
 def _inspector_strip_run(run: str) -> tuple[str, int]:

@@ -50,7 +50,7 @@ permissions:
   contents: read
 
 # 2026-11-08: unittest 를 4 샤드(matrix)로 병렬화했다 — 직렬 29분 -> 샤드당 약 8~10분.
-#   나누기는 `ci_shard.py`(TestCase 클래스 단위, tests/ci_shard_timings.json 실측으로 탐욕 균형).
+#   ci_shard.py는 기존 실측으로 시험 파일을 배정하고, 웹 렌더 시험만 TestCase 클래스별로 나눈다.
 #   샤드 잡 이름은 `unittest (shard N)`, 이전 체크 이름 `test` 는 아래 집계 잡이 이어받는다
 #   (하나라도 실패·취소면 실패). 병합 게이트(admin-github)는 head sha 의 모든 check-run 을
 #   읽고, 다른 워크플로의 workflow_run 은 워크플로 전체 결론을 보므로 이름 변경에 영향이 없다.

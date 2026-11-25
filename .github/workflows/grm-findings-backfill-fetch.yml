@@ -62,15 +62,16 @@ on:
         type: string
         default: 'true'
       delay:
-        description: 'Seconds to sleep between fda.gov requests (robots Crawl-Delay)'
+        description: 'Seconds between FDA requests. Leave blank for the collector default.'
         type: string
-        default: '30'
+        default: ''
       auto:
         description: 'true = one F2c --auto pass (ignores source/offset/max_docs/dry_run/delay above)'
         type: boolean
         default: false
 
 permissions:
+  actions: read
   contents: read
   issues: write   # 3연속 스케줄 실패 표면화 이슈 생성/코멘트/종료용(2026-09-10)
 
@@ -86,6 +87,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Check today's FDA manual runs (KST)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/fda_manual_run_warning.py
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -118,6 +127,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_DELAY: ${{ inputs.delay }}
           ENABLE_FDA_483_OBSERVATIONS: ${{ vars.ENABLE_FDA_483_OBSERVATIONS || 'false' }}
           ENABLE_FDA_483_DEEP: ${{ vars.ENABLE_FDA_483_DEEP || 'false' }}
         run: |
@@ -127,15 +137,19 @@ jobs:
             # source's scan position and enforces a real-document fetch budget; when
             # both backlogs are exhausted it exits 0 after a couple of list
             # requests with auto_complete=true (cheap steady state -- see header).
-            ARGS=(--auto --max-docs 100 --auto-fetch-budget 300 --delay 30 --output fetch_report.json)
+            ARGS=(--auto --apply --max-docs 100 --auto-fetch-budget 300 --output fetch_report.json)
           else
             ARGS=(--source "${{ inputs.source }}"
                   --offset "${{ inputs.offset }}"
                   --max-docs "${{ inputs.max_docs }}"
-                  --delay "${{ inputs.delay }}"
                   --output fetch_report.json)
+            if [ -n "$IN_DELAY" ]; then
+              ARGS+=(--delay "$IN_DELAY")
+            fi
             if [ "${{ inputs.dry_run }}" = "true" ]; then
               ARGS+=(--dry-run)
+            else
+              ARGS+=(--apply)
             fi
           fi
           python collect_fda_backfill.py "${ARGS[@]}"

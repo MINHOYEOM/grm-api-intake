@@ -73,12 +73,13 @@ class BotBlockTest(unittest.TestCase):
     def test_apology_redirect_is_named_and_not_retried(self):
         resp = _Resp("", 404)
         resp.url = "https://www.fda.gov/apology_objects/abuse-detection-apology.html"
-        with mock.patch.object(ci.requests, "get", return_value=resp) as g, \
+        with mock.patch("grm_common._fda_blocked", False), \
+             mock.patch.object(ci.requests, "get", return_value=resp) as g, \
                 mock.patch.object(ci, "_wl_retry_sleep", lambda _s: None):
             html, status = ci._fetch_wl_letter_html("https://www.fda.gov/x")
         self.assertEqual((html, status), ("", ci.WL_BODY_STATUS_BOT_BLOCK))
         self.assertEqual(g.call_count, 1)                       # 즉시 재시도는 차단만 길게 한다
-        self.assertTrue(status.startswith("fetch-fail"))        # 하류 사유 매핑(접두) 불변
+        self.assertEqual(status, "fda-bot-block")
 
     def test_status_constant_is_shared_with_recovery_tool(self):
         self.assertEqual(rec.BOT_BLOCK_STATUS, ci.WL_BODY_STATUS_BOT_BLOCK)

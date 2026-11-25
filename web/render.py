@@ -765,7 +765,7 @@ def _valid_hook_line(card: dict[str, Any], lang: str) -> str:
 _TIDY_483_LABELS = ("발행일", "제조소/업체", "시설 · 유형", "실사일")
 
 
-_TIDY_DATE_RE = re.compile(r"(\d{2})/(\d{2})/(\d{4})")
+_TIDY_DATE_RE = re.compile(r"\b(\d{2})/(\d{2})/(\d{4})\b")
 
 
 def _norm_tidy_value(v: str) -> str:

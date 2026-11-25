@@ -521,17 +521,21 @@ def wl_docs_from_rows(rows: list[dict[str, Any]], start: date, end: date) -> lis
 def fetch_wl(start: date, end: date) -> FetchOutcome:
     """FDA WL: 정적 페이지에서 DataTables 설정을 읽어 전수 뷰(게시일 내림차순)를 창 시작일까지 받는다."""
     import collect_intake as ci
+    from grm_common import FdaBotBlockError, fda_checked_request
+
     try:
-        resp = requests.get(ci.FDA_WL_URL, timeout=HTTP_TIMEOUT,
+        resp = fda_checked_request(requests.get, ci.FDA_WL_URL, timeout=HTTP_TIMEOUT,
                             headers={"User-Agent": _UA, "Accept": "text/html"})
         resp.raise_for_status()
-    except requests.RequestException as exc:
+    except (requests.RequestException, FdaBotBlockError) as exc:
         raise SourceFetchError(safe_error(exc)) from None
     notes: list[str] = []
     partial = False
     try:
         rows = ci._fetch_wl_listing_datatables(resp.text, start)
         notes.append("백본=datatables")
+    except FdaBotBlockError as exc:
+        raise SourceFetchError(str(exc)) from None
     except (requests.RequestException, ValueError, RuntimeError) as exc:
         parser = ci._FDAWLTableParser()
         parser.feed(resp.text)

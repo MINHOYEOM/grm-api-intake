@@ -10,10 +10,13 @@ the same document.
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import unittest
+from contextlib import redirect_stdout
 from datetime import date
+from pathlib import Path
 from unittest import mock
 
 import requests as _requests
@@ -923,6 +926,37 @@ class FetchExistingDocumentIdsTest(unittest.TestCase):
 
 
 class CliTest(unittest.TestCase):
+    def test_cli_writes_only_with_apply(self) -> None:
+        env = {"SUPABASE_URL": _BASE_URL, "SUPABASE_SERVICE_ROLE_KEY": _SERVICE_KEY}
+        for flags, apply in (([], False), (["--dry-run"], False), (["--apply"], True)):
+            with self.subTest(flags=flags):
+                with mock.patch.dict(os.environ, env), \
+                     mock.patch.object(backfill, "_default_sleep"), \
+                     mock.patch.object(backfill, "fetch_existing_document_ids", return_value=set()), \
+                     mock.patch.object(backfill, "http_get_html", side_effect=[
+                         _WL_PAGE_HTML, _wl_ajax_json([list(_WL_AJAX_ROW)], 1),
+                         _WL_LETTER_HTML_NO_ANCHOR,
+                     ]) as get_html, \
+                     mock.patch.object(backfill, "_post_raw_signals", return_value=1) as post, \
+                     redirect_stdout(io.StringIO()) as output:
+                    self.assertEqual(backfill.main(["--source", "fda_wl", *flags]), 0)
+                report = json.loads(output.getvalue())
+                self.assertEqual(report["listed"], 1)
+                if apply:
+                    post.assert_called_once()
+                    self.assertEqual(get_html.call_count, 3)
+                    self.assertEqual(report["appended"], 1)
+                else:
+                    post.assert_not_called()
+                    self.assertEqual(get_html.call_count, 2)
+                    self.assertEqual(len(report["would_fetch"]), 1)
+
+    def test_cli_rejects_conflicting_flags_and_abbreviated_apply(self) -> None:
+        for flags in (["--apply", "--dry-run"], ["--appl"]):
+            with self.subTest(flags=flags), self.assertRaises(SystemExit) as exc:
+                backfill.build_arg_parser().parse_args(["--auto", *flags])
+            self.assertEqual(exc.exception.code, 2)
+
     def test_missing_credentials_is_exit_2(self) -> None:
         env = {k: v for k, v in os.environ.items()
                if k not in ("SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY")}
@@ -957,6 +991,24 @@ class CliTest(unittest.TestCase):
         self.assertEqual(data["schema_version"], "grm-findings-backfill-fetch/v1")
         self.assertEqual(data["next_offset"], 200)
         self.assertNotIn(_SERVICE_KEY, json.dumps(data))
+
+
+class BackfillFetchWorkflowTest(unittest.TestCase):
+    def test_workflow_passes_apply_for_scheduled_and_manual_writes(self) -> None:
+        workflow = (Path(__file__).resolve().parents[1] / ".github" / "workflows"
+                    / "grm-findings-backfill-fetch.yml").read_text(encoding="utf-8")
+        self.assertRegex(
+            workflow,
+            r'if \[ "\$\{\{ github\.event_name \}\}" = "schedule" \] \|\| '
+            r'\[ "\$\{\{ inputs\.auto \}\}" = "true" \]; then\n'
+            r'(?:[ \t]+#[^\n]*\n)*[ \t]+ARGS=\(--auto --apply(?: |\))',
+        )
+        self.assertRegex(
+            workflow,
+            r'if \[ "\$\{\{ inputs\.dry_run \}\}" = "true" \]; then\s+'
+            r'ARGS\+=\(--dry-run\)\s+else\s+ARGS\+=\(--apply\)\s+fi\s+fi\s+'
+            r'python collect_fda_backfill\.py "\$\{ARGS\[@\]\}"',
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -1105,7 +1157,7 @@ class AutoCliExclusionTest(unittest.TestCase):
         self._main_expect_2_no_work(["--auto", "--offset", "100"])
 
     def test_manual_mode_without_source_is_exit_2(self) -> None:
-        self._main_expect_2_no_work(["--dry-run"])
+        self._main_expect_2_no_work([])
 
 
 class AutoReportSchemaTest(unittest.TestCase):
@@ -1168,6 +1220,7 @@ class AutoReportSchemaTest(unittest.TestCase):
             run_auto_mock.assert_called_once()
             self.assertEqual(run_auto_mock.call_args.kwargs["max_docs"], 200)
             self.assertEqual(run_auto_mock.call_args.kwargs["fetch_budget"], 300)
+            self.assertIs(run_auto_mock.call_args.kwargs["dry_run"], True)
             with open(out_path, encoding="utf-8") as f:
                 data = json.load(f)
         self.assertIs(data["auto"], True)

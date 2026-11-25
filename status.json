@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T01:23:53Z",
+ "generated_at": "2026-11-25T01:32:37Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45525342586,
+    "databaseId": 45526267490,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
+    "createdAt": "2026-11-25T01:30:40Z",
+    "updatedAt": "2026-11-25T01:30:44Z",
+    "headBranch": "codex/inspector-blank-dry",
+    "displayTitle": "fix: CLI main() 에서 stdout UTF-8 재설정(main 의 test_cli_stdout_encoding 가드)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526267490"
+   },
+   {
+    "databaseId": 45526243844,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-25T01:30:30Z",
+    "updatedAt": "2026-11-25T01:30:34Z",
+    "headBranch": "codex/wl-pair-restore-dry",
+    "displayTitle": "feat(wl): 본문만 바뀐 짝 findings restore 계획 도구 (기본 dry)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526243844"
+   },
+   {
+    "databaseId": 45526239247,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-25T01:30:28Z",
+    "updatedAt": "2026-11-25T01:30:32Z",
+    "headBranch": "codex/wl-pair-restore-dry",
+    "displayTitle": "fix: CLI main() 에서 stdout UTF-8 재설정(main 의 test_cli_stdout_encoding 가드)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526239247"
+   },
+   {
+    "databaseId": 45525342586,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
     "createdAt": "2026-11-25T01:23:05Z",
-    "updatedAt": "2026-11-25T01:23:09Z",
+    "updatedAt": "2026-11-25T01:31:30Z",
     "headBranch": "main",
     "displayTitle": "Merge pull request #1937 from MINHOYEOM/claude/published-names-redact",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45525342586"
    },
    {
     "databaseId": 45523604392,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-25T01:09:22Z",
-    "updatedAt": "2026-11-25T01:16:27Z",
+    "updatedAt": "2026-11-25T01:24:35Z",
     "headBranch": "codex/daily-reconcile-ledger",
     "displayTitle": "feat(recon): 매일 대조 장부 1단계 (draft)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45523604392"
-   },
-   {
-    "databaseId": 45523599612,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T01:09:19Z",
-    "updatedAt": "2026-11-25T01:20:56Z",
-    "headBranch": "codex/daily-reconcile-ledger",
-    "displayTitle": "feat(recon): 대표 결정 반영 — 제외·중복 분리, 일별 장부 migration 168(미적용), 수집 끝 단계(기…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45523599612"
-   },
-   {
-    "databaseId": 45522524658,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T01:00:56Z",
-    "updatedAt": "2026-11-25T01:08:07Z",
-    "headBranch": "codex/schedule-audit",
-    "displayTitle": "fix(schedule): 보완기 apply 자동 지정 금지 — 워크플로별 허용 목록(483 전문 백필·DB 백업·483 O…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45522524658"
-   },
-   {
-    "databaseId": 45522505807,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T01:00:48Z",
-    "updatedAt": "2026-11-25T01:09:45Z",
-    "headBranch": "codex/bulk-write-helper",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/bulk-write-helper",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45522505807"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45526386041,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T01:31:34Z",
+    "updatedAt": "2026-11-25T01:31:35Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526386041"
+   },
+   {
     "databaseId": 45518107921,
     "status": "completed",
     "conclusion": "skipped",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45357167589"
-   },
-   {
-    "databaseId": 45349928070,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-24T07:41:24Z",
-    "updatedAt": "2026-11-24T07:41:25Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45349928070"
    }
   ],
   "grm-findings-translate-apply.yml": [
@@ -515,11 +515,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 45501777334,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-24T22:31:50Z",
-    "updatedAt": "2026-11-24T23:18:14Z",
+    "updatedAt": "2026-11-25T01:32:30Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45501777334"

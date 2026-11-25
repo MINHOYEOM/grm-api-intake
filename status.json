@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T16:50:39Z",
+ "generated_at": "2026-11-25T19:26:50Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45683887653,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T19:18:31Z",
+    "updatedAt": "2026-11-25T19:26:25Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1966 from MINHOYEOM/claude/483-pagebreak-detail-1125",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45683887653"
+   },
+   {
     "databaseId": 45656724179,
     "status": "completed",
     "conclusion": "success",
@@ -271,17 +282,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1835 from MINHOYEOM/automation/glossary-cases-aut…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45655323530"
-   },
-   {
-    "databaseId": 45653559503,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-25T16:24:42Z",
-    "updatedAt": "2026-11-25T16:33:03Z",
-    "headBranch": "claude/llms-clause-rows-1126",
-    "displayTitle": "feat(seo): llms.txt 에 조항 원문·실사 대비 노트 — 빙·AI 검색이 닿는 면을 알린다",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45653559503"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45685214287,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T19:26:28Z",
+    "updatedAt": "2026-11-25T19:26:40Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45685214287"
+   },
+   {
     "databaseId": 45656781426,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45637047680"
-   },
-   {
-    "databaseId": 45620391512,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T13:07:29Z",
-    "updatedAt": "2026-11-25T13:07:44Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45620391512"
    }
   ],
   "grm-findings-translate-apply.yml": [

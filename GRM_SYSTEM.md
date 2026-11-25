@@ -534,6 +534,7 @@ flowchart TD
 grm-api-intake/
 ├─ GRM_SYSTEM.md, CLAUDE.md, requirements.txt
 ├─ collect_intake.py               # 수집 오케스트레이터(단일 진입점)
+├─ orphan_report.py                # 루트 스크립트·워크플로 미사용 후보를 읽기 전용으로 출력
 ├─ findings_search_cache_health.py # [151] 검색 캐시 daily 갱신 감시(실패·신선 부족 → exit 1, grm-findings-search-cache-health.yml)
 ├─ indexnow_submit.py              # [검색 노출 2026-11-10] IndexNow 제출 — 배포 직후 새/변경 URL 을 네이버·빙에 통지(키 상수=공개값, render 가 /{키}.txt 방출). 수동 전수는 grm-indexnow-full.yml. tests/test_indexnow_submit.py
 ├─ collect_mfds.py                 # 식약처 수집기
@@ -585,6 +586,7 @@ grm-api-intake/
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ conftest.py                      # pytest/unittest 공통 진입에서 네트워크 가드 적용
 ├─ ci_network_guard.py              # CI·로컬 시험의 외부 네트워크 차단 가드
+├─ audit_483_inspector_blanks.py    # FDA 483 실사관 빈칸 사유 판정(dry)
 ├─ wl_pair_restore.py               # WL 본문만 바뀐 짝 findings restore 계획 도구(기본 dry)
 ├─ ci_shard.py                     # CI unittest 샤딩 러너(클래스 단위 LPT 균형, tests/ci_shard_timings.json) — grm-ci.yml 4 샤드
 ├─ intake_exclusion.py             # 수집 제외 장부 — 원천에서 받았지만 규칙으로 의도적으로 버린 문서의 기록(130). 규칙 버전이 같을 때만 재수신 생략

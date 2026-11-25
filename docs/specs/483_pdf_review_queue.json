@@ -1,0 +1,30 @@
+[
+  {
+    "finding_id": "finding-a66d9efba33b663dd230f4f7",
+    "document_id": "fda483-195280",
+    "source": "https://www.fda.gov/media/195280/download",
+    "reason": "손글씨 483 — 운영 영문·400dpi 판독(run 45574640061) 모두 판독 불가. 사람이 PDF 를 보고 국문을 쓴다.",
+    "status": "todo"
+  },
+  {
+    "finding_id": "finding-0b0c1035bdcdabfbe07725d3",
+    "document_id": "fda483-189485",
+    "source": "https://www.fda.gov/media/189485/download",
+    "reason": "깨진 글자층 스캔 — force_ocr dry 로 먼저 다시 판독하고, 그래도 깨지면 사람이 PDF 로 확인.",
+    "status": "todo"
+  },
+  {
+    "finding_id": "finding-6f0a83c4708369e5e72bd97e",
+    "document_id": "fda483-191183",
+    "source": "https://www.fda.gov/media/191183/download",
+    "reason": "깨진 글자층 스캔 — force_ocr dry 로 먼저 다시 판독하고, 그래도 깨지면 사람이 PDF 로 확인.",
+    "status": "todo"
+  },
+  {
+    "finding_id": "finding-3d480b7d0e687a2435302fc3",
+    "document_id": "fda483-85847",
+    "source": "https://www.fda.gov/media/85847/download",
+    "reason": "isolate 번호 H2012l4BQ 가 H201214BQ 인지 원본 PDF 로만 확인 가능(글자층도 H2012l4BQ).",
+    "status": "todo"
+  }
+]

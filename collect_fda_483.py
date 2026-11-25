@@ -167,6 +167,18 @@ FDA483_OCR_MAX_PAGES = 30        # OCR 비용 상한(문서당) — 현실 483 �
 # [CLI 판독 2026-10-28] 관찰 0건 문서의 전면 재판독(`_full_ocr_fallback`)은 tesseract **CLI** 로
 # 쪽을 읽는다. 쪽당 상한 — 멈춘 프로세스가 잡을 붙잡지 않게.
 FDA483_REOCR_PAGE_TIMEOUT = 120
+
+
+def _force_ocr_enabled() -> bool:
+    """[강제 판독 2026-11-25] `FDA483_FORCE_OCR` 가 켜져 있으면 텍스트층이 있어도 쪽 전체를 다시 판독한다.
+
+    실측(11-25 dump-text run 45574640061): 189485·191183 은 PDF 에 **깨진 글자층**이 이미 있어
+    ("Wh;le obsecv;\\;h;~puc setup") 400dpi 로 돌려도 그 글자층을 그대로 읽었다 — OCR 이 한 번도 돌지
+    않았다. 1회성 회수 워크플로(grm-fda483-ocr-recovery `force_ocr`)에서만 켠다. 일일 수집·예약 실행은
+    이 env 를 넣지 않으므로 동작이 바뀌지 않는다. 호출 시점에 읽어 테스트가 env 로 바꿀 수 있다."""
+    return (os.environ.get("FDA483_FORCE_OCR") or "").strip().lower() in ("1", "true", "yes", "on")
+
+
 # 483 마지막 장 정형 고지문 — 이 문구만 남은 텍스트층은 "본문 없음"과 같다(스캔 판정 신호).
 _FDA483_NOTICE_ANCHOR = "observations of objectionable conditions"
 # [2026-10-27] 식품 실사(FD&C Act **805**조) 양식의 고지문은 "conditions" 가 아니라
@@ -1128,6 +1140,8 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
     text, status = _read_fda483_pdf_text(data, max_chars, _extract_pdf_text)
+    if _force_ocr_enabled() and _ocr_enabled():
+        return _forced_full_ocr(data, text, status, max_chars)
     if not text or _extract_483_observations_from_text(text) or not _ocr_enabled():
         return text, status
     # [전면 OCR 폴백 2026-10-28] 본문을 읽었는데 관찰이 0건이다. 실측(findings 0건 483 79건
@@ -1370,6 +1384,27 @@ def _full_ocr_fallback(data: bytes, text: str, status: str, max_chars: int) -> t
         _OCR_HEALTH["reocr_adopted"] += 1
         return full_text, full_status
     return text, status
+
+
+def _forced_full_ocr(data: bytes, text: str, status: str, max_chars: int) -> tuple[str, str]:
+    """`FDA483_FORCE_OCR` 경로 — 텍스트층을 무시하고 모든 쪽을 다시 판독한다(CLI 우선, 없으면 내장 엔진).
+
+    채택 조건: 판독 결과가 비지 않고 관찰 수가 텍스트층보다 **줄지 않을 때**. 그렇지 않으면 원래 텍스트를
+    그대로 돌려준다(산출을 줄이지 않는다). 운영 행 교체 여부는 이 함수가 아니라 회수 도구의 가드
+    (named: 관찰 증가·표제 유지·본문 손실 차단, 공통: body_shrunk)가 그대로 정한다 — 강제 판독은 읽기만 바꾼다."""
+    _OCR_HEALTH["reocr_tried"] += 1
+    full_text, full_status = _reocr_483_pdf_text(data, max_chars)
+    if is_ocr_engine_unavailable(full_status):
+        full_text, full_status = _ocr_483_pdf_text_uncounted(data, max_chars, force_all=True)
+    full_text = normalize_pdf_ligatures(full_text)
+    if not full_text.strip():
+        return text, status
+    old_n = len(_extract_483_observations_from_text(text)) if text else 0
+    if len(_extract_483_observations_from_text(full_text)) < old_n:
+        return text, status
+    _record_ocr_outcome(full_status)
+    _OCR_HEALTH["reocr_adopted"] += 1
+    return full_text, full_status
 
 
 # tesseract CLI(fast)는 단어 끝 `l` 을 `!` 로 읽는 일이 잦다 — "quality contro! unit",

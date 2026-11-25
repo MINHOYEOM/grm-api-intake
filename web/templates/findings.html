@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [구독 권유 정리 2026-11-26] 첫 화면 줄형 칸이 이 화면의 구독 칸이다 — 하단 밴드를 끈다(base.html). -#}
+{% set sub_inline_on = sub_inline_lists %}
 {% block content %}
 {#- FIND-1 M3c — 규제 지적사항 검색(라이브 데이터, Supabase PostgREST 직접 fetch).
     빌드시 카드/facet 을 고정할 수 없다(브리프 아카이브와 달리 findings 는 실시간 축적) →
@@ -18,7 +20,7 @@
         기관 나열·건수 긴 문장은 검색창 아래 작은 한 줄(.fnd-total)로 내렸다. -#}
     <p class="reveal" style="animation-delay:.14s">{{ _("세계 규제기관이 제약 현장에서 지적한 내용을 원문 그대로 한국어로 찾아봅니다.") }}</p>
     {#- [구독 유입 2026-11-17] 첫 화면 줄형 구독 칸 — 켜는 언어는 render.py 가 정한다(sub_inline_lists, 영문만). -#}
-    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top' %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
+    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top', sub_anchor=True %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
 {% if reactions_enabled %}    <p class="fnd-watch">{{ _("관심 업체 알림 — 업체 화면에서 관심 업체로 등록하면 새 지적 기록을 주간 메일로 알려 드립니다.") }} <a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 찾기") }}</a></p>
 <style>.fnd-watch{margin:10px 0 0;font-family:var(--sans);font-size:13.5px;color:var(--muted);word-break:keep-all}.fnd-watch a{color:var(--coral-2);font-weight:600;text-decoration:none}.fnd-watch a:hover{color:var(--coral)}</style>
 {% endif %}  </div>

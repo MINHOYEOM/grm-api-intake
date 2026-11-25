@@ -102,7 +102,7 @@ def _findings(copies):
             if blocked:
                 findings[path, card_id].update(line.split(":", 1)[0] for line in blocked)
         for slot, value in slots:
-            if any(guess_check._name_hit(name, value) for name in source_names[card_id]):
+            if precheck.person_name_hits(source_names[card_id], value):
                 findings[path, card_id].add(slot)
     return findings
 

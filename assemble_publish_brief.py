@@ -154,6 +154,8 @@ class AssembleReport:
     refreshed_483_ids: list[str] = field(default_factory=list)
     # 델타가 채택했지만 범위 밖이라 뺀 483 카드 id(dropped_ids 의 부분집합).
     out_of_scope_483_ids: list[str] = field(default_factory=list)
+    # [2026-11-25] 원문 상세의 개인 이름을 역할 표기로 바꾼 카드 id(`_redact_person_names`).
+    redacted_name_ids: list[str] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -747,6 +749,10 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
                 + ", ".join(str(i) for i in late_ids[:8])
                 + (" …" if len(late_ids) > 8 else ""))
 
+    # [개인 실명 자동 가림 2026-11-25] 재추출·번역 병합 **뒤**, 디제스트 접기·실사 앞면 블록 **앞** — 앞면 블록이
+    # 가린 관찰에서 만들어지게. 원문(deep `source_text`·raw_signals)은 그대로, 화면 사본만 바꾼다.
+    _redact_person_names(adopted_cards, deep_deltas or {}, report)
+
     # [FDA 483 공개 디제스트 2026-07-13] 관찰 원문 없는 483 공개 카드 다건 → 목록카드 1장.
     adopted_cards = merge_fda483_disclosures(adopted_cards)
 
@@ -994,6 +1000,94 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
             f"{[b[0] for b in before]} → {[a[0] for a in after]} · 건수 "
             f"{(dd or {}).get('count')} → {count if count is not None else '비움(번호 불연속 — 단정 불가)'} "
             f"({'스캐폴드가 낡은 파서 산출' if before else '스캐폴드에 블록 없음 — 신설'})")
+
+
+# ── 개인 실명 자동 가림(2026-11-25) ─────────────────────────────────────────────
+# 11-21 대표 결정: 공직자·규제기관 공식 서명자 외 개인 실명은 싣지 않는다. 483 관찰 원문에는 수신인 머리글
+# ('NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED Jean G. Allaume, Vice President')이 쪽마다 섞여 들어오고,
+# WHO 실사 보고서 원문에는 업체 임원 이름('Mr. Achin Gupta as Managing Director')이 있다. 11-25 #1937 은 이것을
+# 손으로 바꿨다 — 이 함수가 매주 조립 때 같은 일을 한다. 판정은 편집팀 precheck·발행 사본 게이트와 **같은 함수**
+# (`precheck.source_person_roles`·`person_name_spans`)이고, FDA 실사관 서명(`inspectors[]`)과 업체명은 가리지 않는다.
+PERSON_NAME_LABELS = {
+    "fda_483_observations": {
+        "en": {"recipient": "[recipient]", "fda_contact": "[FDA contact]", "person": "[individual]"},
+        "ko": {"recipient": "[수신인]", "fda_contact": "[FDA 담당자]", "person": "[개인]"},
+    },
+    "whopir_report": {
+        "en": {"person": "[company executive]"},
+        "ko": {"person": "[업체 임원]"},
+    },
+}
+_PERSON_NAME_SKIP_KEYS = frozenset(("type", "inspectors", "number", "count", "text_source", "report_kind"))
+
+
+def _detail_text_slots(node: Any, path: str = ""):
+    """결정론 상세 → (경로, 문자열)들 — 실사관 칸·코드 칸은 뺀다."""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if k not in _PERSON_NAME_SKIP_KEYS:
+                yield from _detail_text_slots(v, f"{path}.{k}" if path else k)
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from _detail_text_slots(v, f"{path}[{i}]")
+    elif isinstance(node, str) and node.strip():
+        yield path, node
+
+
+def _redact_detail_node(node: Any, roles: dict[str, str], labels: dict[str, dict[str, str]],
+                        lang: str = "en") -> int:
+    """결정론 상세를 제자리에서 가린다 — 바꾼 자리 수. `*_ko` 칸 아래는 국문 표기."""
+    from company.editorial import precheck as _pc
+    n = 0
+    if isinstance(node, dict):
+        for k, v in list(node.items()):
+            if k in _PERSON_NAME_SKIP_KEYS:
+                continue
+            sub = "ko" if k.endswith("_ko") else lang
+            if isinstance(v, str):
+                new, cnt = _pc.redact_person_names(v, roles, labels[sub])
+                if cnt:
+                    node[k], n = new, n + cnt
+            else:
+                n += _redact_detail_node(v, roles, labels, sub)
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            if isinstance(v, str):
+                new, cnt = _pc.redact_person_names(v, roles, labels[lang])
+                if cnt:
+                    node[i], n = new, n + cnt
+            else:
+                n += _redact_detail_node(v, roles, labels, lang)
+    return n
+
+
+def card_person_roles(card: dict[str, Any], source_text: str = "") -> dict[str, str]:
+    """카드의 원문 개인 이름 {낱말: 역할}(순수) — deep `source_text` + 결정론 상세 원문에서, 업체명·실사관 낱말은 뺀다."""
+    from company.editorial import precheck as _pc
+    dd = card.get("deterministic_detail") if isinstance(card.get("deterministic_detail"), dict) else {}
+    firm = f"{_pc._firm_text(None, card)} {card.get('headline_target') or ''}"
+    inspectors = " ".join(str(x.get("name") if isinstance(x, dict) else x) for x in dd.get("inspectors") or [])
+    texts = ([source_text] if isinstance(source_text, str) and source_text.strip() else []) \
+        + [v for _, v in _detail_text_slots(dd)]
+    return _pc.merge_person_roles(texts, firm, exclude_text=inspectors)
+
+
+def _redact_person_names(cards: list[dict[str, Any]], deep_deltas: dict[str, Any],
+                         report: "AssembleReport") -> None:
+    """483 관찰·WHO 실사 보고서 상세의 개인 이름 → 역할 표기(제자리). 카드 산문(LLM 칸)은 사전 점검·게이트가 막는다."""
+    for card in cards:
+        dd = card.get("deterministic_detail")
+        if not (isinstance(dd, dict) and dd.get("type") in PERSON_NAME_LABELS):
+            continue
+        payload = deep_deltas.get(card.get("id")) or {}
+        src = payload.get("source_text") if isinstance(payload, dict) else ""
+        roles = card_person_roles(card, src or "")
+        if not roles:
+            continue
+        n = _redact_detail_node(dd, roles, PERSON_NAME_LABELS[dd["type"]])
+        if n:
+            report.redacted_name_ids.append(str(card.get("id")))
+            report.warnings.append(f"[실명 가림] {card.get('id')}: 원문 상세 {n}곳의 개인 이름을 역할 표기로 바꿈")
 
 
 # ── 결정론 상세 유형 분류 — "원문 서사를 손에 쥐었는가" ────────────────────────

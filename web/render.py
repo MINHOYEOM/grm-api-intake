@@ -133,6 +133,7 @@ import collect_fda_import_alert as _ia  # noqa: E402
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
 # (재수집 없음), 렌더 단에도 같은 분류기로 최후 방어선을 둔다(단일 진실원 재사용).
 from grm_findings import evidence_url_quality_error as _evidence_url_quality_error  # noqa: E402
+from grm_findings import fda483_signer_variant_tail_start as _gf_signer_variant_tail_start  # noqa: E402
 # [WHOPIR 결론 한 줄 2026-11-03] 결론은 접힌 상세(`deterministic_detail.outcome`)에만 있었다.
 # 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
 from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
@@ -9220,7 +9221,9 @@ def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str
             if isinstance(detail, str) and detail.strip():
                 if not (isinstance(obs.get("detail_ko"), str) and obs.get("detail_ko").strip()):
                     violations.append(f"{loc}: MISSING_DETAIL_KO")
-                if _FOOTER_GARBAGE_RE.search(detail):
+                # [11-26] 판독 변형 서명란은 꼬리일 때만 — 수집기 trim_detail_tail 과 같은 함수.
+                if (_FOOTER_GARBAGE_RE.search(detail)
+                        or _gf_signer_variant_tail_start(detail) is not None):
                     violations.append(f"{loc}: FOOTER_GARBAGE")
 
     for item in cards_or_briefs:

@@ -45,28 +45,28 @@
    "code": "21 CFR 211.22",
    "chars": 1132,
    "sha": "da112c668a186bfd",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-25",
    "code": "21 CFR 211.25",
    "chars": 1294,
    "sha": "63263e9429f37288",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-28",
    "code": "21 CFR 211.28",
    "chars": 1117,
    "sha": "0b9f60c8e7740a80",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-34",
    "code": "21 CFR 211.34",
    "chars": 361,
    "sha": "f10d1ea052420828",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-42",
@@ -87,14 +87,14 @@
    "code": "21 CFR 211.46",
    "chars": 840,
    "sha": "a667bd5030aff06b",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-48",
    "code": "21 CFR 211.48",
    "chars": 575,
    "sha": "596425ba0dbe12cd",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-50",
@@ -115,7 +115,7 @@
    "code": "21 CFR 211.56",
    "chars": 1356,
    "sha": "144e8df5c5fc8025",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-58",
@@ -129,21 +129,21 @@
    "code": "21 CFR 211.63",
    "chars": 236,
    "sha": "cee819a652c311eb",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-65",
    "code": "21 CFR 211.65",
    "chars": 639,
    "sha": "5134ff7f894420c9",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-67",
    "code": "21 CFR 211.67",
    "chars": 1350,
    "sha": "1485cc863e0aa34e",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-68",
@@ -171,7 +171,7 @@
    "code": "21 CFR 211.82",
    "chars": 494,
    "sha": "c33af3a3592104ee",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-84",
@@ -192,7 +192,7 @@
    "code": "21 CFR 211.87",
    "chars": 404,
    "sha": "d00f0e0aeceaece4",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-89",
@@ -206,14 +206,14 @@
    "code": "21 CFR 211.94",
    "chars": 898,
    "sha": "9c0713caa4479512",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-100",
    "code": "21 CFR 211.100",
    "chars": 729,
    "sha": "3a2729e47dbebbb1",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-101",
@@ -227,14 +227,14 @@
    "code": "21 CFR 211.103",
    "chars": 403,
    "sha": "89d3b62316564fe4",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-105",
    "code": "21 CFR 211.105",
    "chars": 683,
    "sha": "81614335f061707f",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-110",
@@ -248,21 +248,21 @@
    "code": "21 CFR 211.111",
    "chars": 318,
    "sha": "64d19f8fcf7c36a2",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-113",
    "code": "21 CFR 211.113",
    "chars": 414,
    "sha": "bf20719b89de4961",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-115",
    "code": "21 CFR 211.115",
    "chars": 402,
    "sha": "025015e33c72e660",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-122",
@@ -409,7 +409,7 @@
    "code": "21 CFR 211.192",
    "chars": 883,
    "sha": "623102175ff6f74f",
-   "status": "pending"
+   "status": "done"
   },
   {
    "id": "cfr21/211/211-194",

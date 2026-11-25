@@ -17,6 +17,20 @@
     {%- if clause.path %}<p class="ct-path" lang="{{ doc.source.lang }}">{{ clause.path | join(' › ') }}</p>{% endif %}
   </div>
   <div class="wrap ct-body">
+    {#- [구글 품질 2단계 2026-11-20] 국문 참고 번역(translations/clause_outbox → clause_translation.apply).
+        국문 트리에서 번역이 있을 때만 원문 위에 둔다. 안내 문구는 원천별로 뷰가 정한다(ICH·EC 는 '승인 번역 아님'). -#}
+    {%- if lang == 'ko' and clause.ko_paras %}
+    <section>
+      <h2 class="ct-sec-h">{{ doc.source.ko_label }}</h2>
+      {%- if clause.title_ko %}<p class="ct-sub">{{ clause.title_ko }}</p>{% endif %}
+      <div class="ct-text" lang="ko">
+        {%- for p in clause.ko_paras %}
+        <p>{{ p }}</p>
+        {%- endfor %}
+      </div>
+      <p class="ct-note" style="margin-top:10px">{{ doc.source.ko_note }}</p>
+    </section>
+    {%- endif %}
     <section>
       <h2 class="ct-sec-h">{{ _('조항 원문') }}</h2>
       <div class="ct-text" lang="{{ doc.source.lang }}">
@@ -24,7 +38,7 @@
         <p>{{ p }}</p>
         {%- endfor %}
       </div>
-      {%- if lang == 'ko' and doc.source.lang != 'ko' %}
+      {%- if lang == 'ko' and doc.source.lang != 'ko' and not clause.ko_paras %}
       <p class="ct-note" style="margin-top:10px">{{ _('본문은 원문(영어)입니다. 국문 번역은 준비 중입니다.') }}</p>
       {%- endif %}
     </section>

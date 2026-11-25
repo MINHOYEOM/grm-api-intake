@@ -31,10 +31,24 @@ SOURCE_SLUG = {"mfds_gmp": "mfds-gmp", "cfr21": "cfr21", "eu_gmp": "eu-gmp", "ic
 #: 화면 머리 표지(eyebrow) — 고유명사라 번역하지 않는다.
 SOURCE_KICK = {"mfds_gmp": "KR · 식약처 고시", "cfr21": "US · 21 CFR", "eu_gmp": "EU · EudraLex Vol.4", "ich": "ICH"}
 PREVIEW_CHARS = 140
+#: [구글 품질 2단계 2026-11-20] 국문 참고 번역 머리 안내(국문 트리 전용 — 영문 트리에는 번역 블록이 없다).
+#  ICH 법적 고지: 번역본은 그 사실을 밝히고 ICH 가 승인한 것처럼 보이면 안 된다(SOURCES.md). EC 재이용 결정도 같은 취지.
+#  문구는 뷰가 넘긴다 — 국문 전용 블록이라 en.json 키를 만들지 않는다(i18n lint: 템플릿에 감싸지 않은 한글 금지).
+KO_LABEL = "국문 참고 번역"
+KO_NOTE = {
+    "ich": "GRM 이 옮긴 참고 번역입니다. ICH 가 승인한 번역이 아니며, 기준은 아래 영어 원문입니다.",
+    "eu_gmp": "GRM 이 옮긴 참고 번역입니다. 유럽연합(EC)의 공식 번역이 아니며, 기준은 아래 영어 원문입니다.",
+    "_": "GRM 이 옮긴 참고 번역입니다. 법적 효력은 아래 영어 원문에 있습니다.",
+}
 
 
-def load_sources(data_dir: "Path | None" = None) -> list[dict[str, Any]]:
-    """원천 파일들. 없거나 깨졌거나 스키마가 다르면 그 원천만 빠진다(빌드 계속)."""
+def load_sources(data_dir: "Path | None" = None,
+                 translations_dir: "Path | None" = None) -> list[dict[str, Any]]:
+    """원천 파일들. 없거나 깨졌거나 스키마가 다르면 그 원천만 빠진다(빌드 계속).
+
+    [구글 품질 2단계 2026-11-20] 정본 폴더(data_dir 생략)를 읽을 때는 국문 참고 번역
+    (`translations/clause_outbox/*.json`)을 원문 해시가 같은 조항에만 덧씌운다(clause_translation.apply).
+    다른 폴더를 읽을 때는 translations_dir 을 줄 때만 덧씌운다."""
     d = DATA_DIR if data_dir is None else data_dir
     out = []
     for key in SOURCE_ORDER:
@@ -48,6 +62,9 @@ def load_sources(data_dir: "Path | None" = None) -> list[dict[str, Any]]:
         if obj.get("schema") != SCHEMA or not obj.get("clauses"):
             continue
         out.append(obj)
+    if data_dir is None or translations_dir is not None:
+        import clause_translation
+        clause_translation.apply(out, clause_translation.load_outbox(translations_dir))
     return out
 
 
@@ -101,6 +118,9 @@ def build(sources: list[dict[str, Any]]) -> dict[str, Any]:
                     "chars": c.get("chars") or 0,
                     # [구글 품질 1단계 2026-11-19] 국문 번역(2단계가 채운다). 있으면 국문 페이지가 구글에 돌아온다.
                     "text_ko": c.get("text_ko") or "",
+                    # [구글 품질 2단계 2026-11-20] 국문 참고 번역의 화면 몫 — 국문 트리 템플릿만 쓴다.
+                    "title_ko": c.get("title_ko") or "",
+                    "ko_paras": [p for p in (c.get("text_ko") or "").split("\n\n") if p.strip()],
                 })
             pages = [c for c in clauses if c["href"]]
             for i, c in enumerate(pages):
@@ -118,7 +138,8 @@ def build(sources: list[dict[str, Any]]) -> dict[str, Any]:
                       "title": src.get("title") or "", "publisher": src.get("publisher") or "",
                       "url": src.get("url") or "", "license": src.get("license") or "",
                       "license_url": src.get("license_url") or "",
-                      "retrieved": src.get("retrieved") or "", "docs": docs})
+                      "retrieved": src.get("retrieved") or "", "docs": docs,
+                      "ko_label": KO_LABEL, "ko_note": KO_NOTE.get(key, KO_NOTE["_"])})
     for sv in views:
         for d in sv["docs"]:
             d["source"] = sv
@@ -348,6 +369,52 @@ def ref_href(view: dict[str, Any], label: str) -> str:
 def cfr_href(view: dict[str, Any], section: str) -> str:
     """`211.192` → 그 조항 원문 페이지(없으면 "")."""
     return ref_href(view, f"21 CFR {section}")
+
+
+def href_labels(view: dict[str, Any]) -> dict[str, tuple[str, str]]:
+    """주소 → (코드, 제목). 문서 목차 주소와 조항 페이지 주소 모두(문서 페이지 '인용한 기준 원문' 표시용)."""
+    out: dict[str, tuple[str, str]] = {}
+    for d in (view.get("index") or {}).values():
+        out.setdefault(d["path"], (d["code"], d["title"]))
+        for c in d["clauses"]:
+            if c["href"]:
+                out[c["href"]] = (c["code"], c["title"])
+    return out
+
+
+_ANNEX1_RE = re.compile(r"\bAnnex\s+1(?!\d)")
+_GMP_RE = re.compile(r"\b(?:EU\s+)?GMP\b|EudraLex", re.I)
+_ICH_TEXT_RE = re.compile(r"\bICH\s+(Q7|Q9|Q10)\b(?!\s*\(R1\)\s*§)")
+_CFR_TEXT_RE = re.compile(r"\b21\s*CFR\s*(?:§\s*)?(\d{1,4}\.\d+)")
+_CFR_LABEL_RE =re.compile(r"^(21 CFR \d{1,4}\.\d+)(?:\([A-Za-z0-9]+\))*$")
+
+
+def cited_standard_labels(doc: dict[str, Any]) -> list[str]:
+    """문서의 지적 본문이 **글자 그대로 적은** 기준 라벨(정규화). 추측하지 않는다.
+    · 21 CFR 섹션: 지적의 cfr_refs
+    · ICH Q7/Q9/Q10, EU GMP Annex 1: 영문 원문에 이름이 적힌 것(Annex 1 은 같은 지적에 GMP 가 함께 있을 때만)
+    식약처 '[별표 N] 제X호' 는 일부러 뺀다 — 점검 평가표의 번호이지 고시 별표 번호가 아니다."""
+    out: list[str] = []
+    seen: set[str] = set()
+
+    def add(label: str) -> None:
+        if label not in seen:
+            seen.add(label)
+            out.append(label)
+
+    for f in doc.get("findings") or []:
+        for r in f.get("cfr_refs") or []:
+            m = _CFR_LABEL_RE.match((r or "").strip())
+            if m:
+                add(m.group(1))
+        text = f.get("text_orig") or ""
+        for m in _CFR_TEXT_RE.finditer(text):
+            add(f"21 CFR {m.group(1)}")
+        for m in _ICH_TEXT_RE.finditer(text):
+            add(f"ICH {m.group(1)}")
+        if _ANNEX1_RE.search(text) and _GMP_RE.search(text):
+            add("EU GMP Annex 1")
+    return out
 
 
 def terms_by_href(view: dict[str, Any], glossary_terms: "list[dict[str, Any]] | None",

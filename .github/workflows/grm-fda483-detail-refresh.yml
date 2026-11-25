@@ -92,7 +92,7 @@ jobs:
           FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}
         run: |
           set -euo pipefail
-          ARGS=(--report-path detail_refresh_report.json)
+          ARGS=(--report-path detail_refresh_report.json --stale-preview-path stale_preview.json)
           if [ -n "${IN_SINCE}" ]; then
             ARGS+=(--since "${IN_SINCE}")
           fi
@@ -139,5 +139,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: detail-refresh-report
-          path: detail_refresh_report.json
+          path: |
+            detail_refresh_report.json
+            stale_preview.json
           if-no-files-found: ignore

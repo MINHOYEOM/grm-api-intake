@@ -8,6 +8,7 @@
     python company/editorial/shard_claim.py next   <run_folder> <delta|deep>       # 가져갈 샤드 한 줄(없으면 NONE)
     python company/editorial/shard_claim.py claim  <run_folder> <delta|deep> <샤드> <워커id>   # 0=내가 잡음, 1=졌음
     python company/editorial/shard_claim.py claim  <run_folder> desk desk <데스크id>          # 데스크 잠금(RUN.md 5-2)
+    python company/editorial/shard_claim.py save-delta <run_folder> <샤드> <워커id> <임시 JSON> [--apply]
     python company/editorial/shard_claim.py desk   <run_folder>                              # done|held|stale|free
     python company/editorial/shard_claim.py check  <run_folder> <delta|deep> <워커id> [--until 08:55] [--wait]
         # 워커가 끝내도 되는가 — exit 0 = 끝내도 됨(DONE·DEADLINE·NO_TAKEOVER), exit 1 = 끝내면 안 됨(CLAIM <S> · WAIT <S> <초>)
@@ -20,7 +21,7 @@
 · claim 의 원자성: claim 파일을 커밋해 push 한다. 거절되면 pull --rebase 를 하고, 같은 파일이 이미 남의 것이면
   (add/add 충돌 또는 새 점유) **졌다**. 3번까지 재시도. push 가 성공해도 원격의 claim 파일을 다시 읽어 내 이름이
   아니면 졌다(2026-11-20 리허설 1120i deep.B 이중 점유). 판정과 쓰기 사이에 작업 폴더의 HEAD 가 움직였으면 다시 판정한다.
-· 결과 파일(`delta.A.json` 등)은 이 스크립트가 쓰지 않는다 — 기자가 쓴다.
+· 델타 기자는 `save-delta` 로 점유를 확인한다. 이 명령은 기본 dry-run 이며 `--apply` 일 때만 결과를 저장한다.
 · check — 워커의 종료 판단은 코드가 한다(2026-11-19 리허설 1120g: 심층 워커가 빈 샤드 5개를 두고 '분량이 크다'며 스스로 끝냈다.
   사전 점검 3번: 08:40 보강은 점유 25분이 안 된 샤드를 '없음'으로 보고 바로 끝나, 08:15 뒤 잡힌 샤드가 죽으면 이어받을 워커가 없었다).
   남은 샤드가 남의 점유 중이면 그 점유가 죽은 것으로 판정되는 시각(점유+25분)까지 기다리라고 답한다 — 단 그 시각이 시한(--until)을 넘으면
@@ -33,7 +34,10 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import time
+from pathlib import Path
+from string import ascii_uppercase
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 WAIT_MAX_SEC = 90  # 대기는 한 번에 90초 이하 — Bash 도구 기본 시한 120초 안에 끝나야 한다(RUN.md 5-2·7항)
@@ -84,6 +88,33 @@ def _claim_state(folder, kind, shard, now):
         return "free", None
     age_min = (now - float(c.get("at", 0))) / 60.0
     return ("held" if age_min <= STALE_MIN else "stale"), c
+
+
+def save_delta_result(folder, shard, worker, source, *, apply=False, now=None):
+    """현재 델타 점유자의 JSON을 검사하고, apply일 때만 최종 경로에 저장한다."""
+    if len(shard) != 1 or shard not in ascii_uppercase or not worker.strip():
+        raise ValueError("샤드 또는 워커 이름이 올바르지 않습니다")
+
+    def require_claim():
+        state, record = _claim_state(folder, "delta", shard, time.time() if now is None else now)
+        if state != "held" or record.get("worker") != worker:
+            raise PermissionError(f"delta.{shard}: {worker}의 유효한 점유가 없습니다")
+
+    require_claim()
+    data = Path(source).read_bytes()
+    if not isinstance(json.loads(data.decode("utf-8")), dict):
+        raise ValueError("산출물은 UTF-8 JSON 객체여야 합니다")
+    if apply:
+        result = Path(_result_path(folder, "delta", shard))
+        staged = tempfile.NamedTemporaryFile(dir=result.parent, delete=False)
+        staged_path = Path(staged.name)
+        try:
+            with staged:
+                staged.write(data)
+            require_claim()
+            staged_path.replace(result)
+        finally:
+            staged_path.unlink(missing_ok=True)
 
 
 def status(folder, now=None):
@@ -264,8 +295,11 @@ def _check_once(folder, kind, worker, hhmm):
 
 
 def main(argv):
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     if len(argv) < 3:
         print(__doc__)
         return 2
@@ -286,6 +320,18 @@ def main(argv):
         return 0
     if cmd == "claim":
         return 0 if claim(folder, argv[3], argv[4], argv[5]) else 1
+    if cmd == "save-delta":
+        if len(argv) not in (6, 7) or (len(argv) == 7 and argv[6] != "--apply"):
+            print("사용법: save-delta <실행 폴더> <샤드> <워커id> <임시 JSON> [--apply]", file=sys.stderr)
+            return 2
+        apply = len(argv) == 7
+        try:
+            save_delta_result(folder, argv[3], argv[4], argv[5], apply=apply)
+        except (OSError, ValueError) as exc:
+            print(exc, file=sys.stderr)
+            return 1
+        print("저장 완료" if apply else "dry-run: 점유 및 JSON 확인 완료")
+        return 0
     if cmd == "check":
         rest = argv[3:]
         hhmm = None

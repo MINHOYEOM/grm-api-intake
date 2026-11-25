@@ -167,6 +167,18 @@ FDA483_OCR_MAX_PAGES = 30        # OCR 비용 상한(문서당) — 현실 483 �
 # [CLI 판독 2026-10-28] 관찰 0건 문서의 전면 재판독(`_full_ocr_fallback`)은 tesseract **CLI** 로
 # 쪽을 읽는다. 쪽당 상한 — 멈춘 프로세스가 잡을 붙잡지 않게.
 FDA483_REOCR_PAGE_TIMEOUT = 120
+
+
+def _force_ocr_enabled() -> bool:
+    """[강제 판독 2026-11-25] `FDA483_FORCE_OCR` 가 켜져 있으면 텍스트층이 있어도 쪽 전체를 다시 판독한다.
+
+    실측(11-25 dump-text run 45574640061): 189485·191183 은 PDF 에 **깨진 글자층**이 이미 있어
+    ("Wh;le obsecv;\\;h;~puc setup") 400dpi 로 돌려도 그 글자층을 그대로 읽었다 — OCR 이 한 번도 돌지
+    않았다. 1회성 회수 워크플로(grm-fda483-ocr-recovery `force_ocr`)에서만 켠다. 일일 수집·예약 실행은
+    이 env 를 넣지 않으므로 동작이 바뀌지 않는다. 호출 시점에 읽어 테스트가 env 로 바꿀 수 있다."""
+    return (os.environ.get("FDA483_FORCE_OCR") or "").strip().lower() in ("1", "true", "yes", "on")
+
+
 # 483 마지막 장 정형 고지문 — 이 문구만 남은 텍스트층은 "본문 없음"과 같다(스캔 판정 신호).
 _FDA483_NOTICE_ANCHOR = "observations of objectionable conditions"
 # [2026-10-27] 식품 실사(FD&C Act **805**조) 양식의 고지문은 "conditions" 가 아니라
@@ -1128,6 +1140,8 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
     text, status = _read_fda483_pdf_text(data, max_chars, _extract_pdf_text)
+    if _force_ocr_enabled() and _ocr_enabled():
+        return _forced_full_ocr(data, text, status, max_chars)
     if not text or _extract_483_observations_from_text(text) or not _ocr_enabled():
         return text, status
     # [전면 OCR 폴백 2026-10-28] 본문을 읽었는데 관찰이 0건이다. 실측(findings 0건 483 79건
@@ -1370,6 +1384,27 @@ def _full_ocr_fallback(data: bytes, text: str, status: str, max_chars: int) -> t
         _OCR_HEALTH["reocr_adopted"] += 1
         return full_text, full_status
     return text, status
+
+
+def _forced_full_ocr(data: bytes, text: str, status: str, max_chars: int) -> tuple[str, str]:
+    """`FDA483_FORCE_OCR` 경로 — 텍스트층을 무시하고 모든 쪽을 다시 판독한다(CLI 우선, 없으면 내장 엔진).
+
+    채택 조건: 판독 결과가 비지 않고 관찰 수가 텍스트층보다 **줄지 않을 때**. 그렇지 않으면 원래 텍스트를
+    그대로 돌려준다(산출을 줄이지 않는다). 운영 행 교체 여부는 이 함수가 아니라 회수 도구의 가드
+    (named: 관찰 증가·표제 유지·본문 손실 차단, 공통: body_shrunk)가 그대로 정한다 — 강제 판독은 읽기만 바꾼다."""
+    _OCR_HEALTH["reocr_tried"] += 1
+    full_text, full_status = _reocr_483_pdf_text(data, max_chars)
+    if is_ocr_engine_unavailable(full_status):
+        full_text, full_status = _ocr_483_pdf_text_uncounted(data, max_chars, force_all=True)
+    full_text = normalize_pdf_ligatures(full_text)
+    if not full_text.strip():
+        return text, status
+    old_n = len(_extract_483_observations_from_text(text)) if text else 0
+    if len(_extract_483_observations_from_text(full_text)) < old_n:
+        return text, status
+    _record_ocr_outcome(full_status)
+    _OCR_HEALTH["reocr_adopted"] += 1
+    return full_text, full_status
 
 
 # tesseract CLI(fast)는 단어 끝 `l` 을 `!` 로 읽는 일이 잦다 — "quality contro! unit",
@@ -1853,6 +1888,8 @@ _INSPECTOR_REDACTION_RE = re.compile(r"\(\s*b\s*\)\s*\(\s*6\s*\)|Redacted\s*B6",
 # 서명자 여럿이 그 뒤를 잇는 구조라, 뒤쪽 서명자도 200자 룩비하인드 안에 마커가 든다.
 _INSPECTOR_DATE_RE = re.compile(r"\d{1,2}/\d{1,2}/\d{2,4}")
 _INSPECTOR_DATE_LOOKAHEAD = 60
+# 저장 전문 195241: 첫 서명 이름이 SEE REVERSE 앞에 있고 날짜가 OCR로 깨졌다.
+_INSPECTOR_REVERSE_LINE_RE = re.compile(r"\n[ \t]*SEE[ \t]+REVERSE[ \t]*(?=\r?\n)")
 # 교차 확증 (b) — 이름 앞 200자 이내 서명블록 마커. 대문자 고정(re.I 미사용) — 산문의 소문자
 # "signature"/"employee" 언급을 오탐하지 않는다. EMP…OY 는 `_FDA483_FOOTER_RE`와 동형(OCR
 # 변형 EMPLOYEE 흡수).
@@ -2042,14 +2079,17 @@ def _valid_inspector_name(name: str, *, allow_caps: bool = False, max_tokens: in
     return True
 
 
-def _inspector_name_in_text(name: str, text: str) -> bool:
+def _inspector_name_in_text(name: str, text: str, *, exact: bool = False) -> bool:
     """안전장치 — 이름이 그 문서 전문 안에 **글자 그대로** 있는가.
 
     토큰은 철자·대소문자·마침표까지 원문과 같아야 하고, 토큰 사이만 공백 문자(띄어쓰기·줄바꿈)
     차이를 허용한다(서명 칸에서 이름이 줄바꿈으로 갈라진 `Robert J.\\nHam` 을 위해서). 앞뒤는 글자
     경계여야 한다(`Shafigq` 안의 `Shafig` 는 일치로 보지 않는다).
+    exact=True는 검증된 JSON 입력에 쓰며 공백까지 같은 부분 문자열만 받는다.
     이 검사를 통과하지 못한 이름은 어떤 경로로 만들어졌든 내보내지 않는다 — 다른 문서·프로파일에서
     빌려오거나 철자를 고쳐 쓰는 경로가 생겨도 여기서 막힌다."""
+    if exact:
+        return bool(name and name.strip()) and name in text
     toks = [t for t in (name or "").split(" ") if t]
     if not toks or not text:
         return False
@@ -2102,10 +2142,14 @@ INSPECTORS_PARSER_LIMIT = "parser-limit"            # 서명란은 있으나 이
 
 
 def _inspector_confirmed(body: str, name_start: int, title_end: int) -> bool:
-    """서명블록 문맥 교차 확증 — 이름 앞 200자 안 서명 마커 또는 직함 뒤 60자 안 날짜."""
+    """앞의 서명 마커, 뒤의 날짜 또는 독립된 서명 줄 뒤 SEE REVERSE로 확인한다."""
     before = body[max(0, name_start - _INSPECTOR_MARKER_LOOKBEHIND):name_start]
     after = body[title_end:title_end + _INSPECTOR_DATE_LOOKAHEAD]
-    return bool(_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after))
+    if _INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after):
+        return True
+    line_start = body.rfind("\n", 0, name_start) + 1
+    return (not body[line_start:name_start].strip() and not after.partition("\n")[0].strip()
+            and bool(_INSPECTOR_REVERSE_LINE_RE.search(after)))
 
 
 def _inspector_strip_run(run: str) -> tuple[str, int]:

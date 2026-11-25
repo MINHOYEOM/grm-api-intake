@@ -1163,5 +1163,103 @@ class TestRedactionGuardPDF(unittest.TestCase):
         self.assertEqual((rows, status), ([], "gate-degraded"))
 
 
+# ── #9 판정 보강 2026-11-25 ────────────────────────────────────────────────
+_FOOTNOTE_TABLE_TEXT = '평가 결과: 지적(보완)사항(Deficiencies)\n1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시\n2) PIC/S 정의에 따라 중대, 중요, 기타로 작성\n3) 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함\n분야1)\n구분2)\n근거 법령\n지적(보완)사항 요약3)\n비고\n시험실\n중요\n의약품 등의 안전에 관한 규칙[별표1의2]\n11.2 라목\n시판 후 안정성시험\n미실시\n보완완료\n기타\n의약품 등의 안전에 관한 규칙[별표1의2]\n11.3\n보관검체의 포장형태\n상이\n보완완료\n'
+_HEADER_ONLY_TEXT = "지적(보완)사항 분류 : 분야 구분 근거 법령 지적(보완)사항 요약 한약정책과"
+
+
+class TableTextAssessmentTest(unittest.TestCase):
+    def test_footnoted_deficiency_table_is_present(self):
+        """각주(1)~3))가 낀 결론 줄 + 표 데이터 행 → present(한국코러스 11-20 형)."""
+        self.assertEqual(g._assess_deficiency(_FOOTNOTE_TABLE_TEXT), "present")
+
+    def test_header_without_data_row_stays_unknown(self):
+        """헤더만 있고 행이 없으면 추정하지 않는다(사람이 본다)."""
+        self.assertEqual(g._assess_deficiency(_HEADER_ONLY_TEXT), "unknown")
+
+    def test_footnote_enumeration_alone_is_not_a_row(self):
+        """각주의 '품질경영, 시설장비, …' 나열·'중대, 중요, 기타' 는 데이터 행이 아니다."""
+        text = ("지적(보완)사항(Deficiencies) 1) 분야: 품질경영, 시설장비, 제조, 시험실 "
+                "2) 중대, 중요, 기타로 작성 분야 구분 근거 법령 지적(보완)사항 요약")
+        self.assertEqual(g._assess_deficiency(text), "unknown")
+
+    def test_none_wins_over_table_rule(self):
+        """'없음' 명시 문서는 표 규칙이 건드리지 않는다(승격 전용·none 우선)."""
+        text = "평가 결과 지적(보완)사항 없음 분야 구분 근거 법령 지적(보완)사항 요약 시험실 중요"
+        self.assertEqual(g._assess_deficiency(text), "none")
+
+    def test_existing_present_and_none_verdicts_unchanged(self):
+        self.assertEqual(g._assess_deficiency("평가 결과: 지적(보완)사항 있음"), "present")
+        self.assertEqual(g._assess_deficiency("평가 결과: 적합"), "none")
+        self.assertEqual(g._assess_deficiency(""), "unknown")
+
+
+class AssessWithRowsTest(unittest.TestCase):
+    def test_rows_promote_unknown_to_present(self):
+        self.assertEqual(g.assess_deficiency_with_rows("판정 불능 본문", 3), "present")
+
+    def test_rows_never_override_none(self):
+        self.assertEqual(g.assess_deficiency_with_rows("지적(보완)사항 없음", 2), "none")
+
+    def test_no_rows_keeps_text_verdict(self):
+        self.assertEqual(g.assess_deficiency_with_rows("판정 불능 본문", 0), "unknown")
+
+
+class DeriveTableStatusTest(unittest.TestCase):
+    def test_rows_extracted(self):
+        self.assertEqual(g.derive_table_status("x", 2, "present"), "extracted")
+
+    def test_none_is_empty(self):
+        self.assertEqual(g.derive_table_status("지적(보완)사항 없음", 0, "none"), "empty")
+
+    def test_present_without_rows_is_gate_degraded(self):
+        self.assertEqual(g.derive_table_status("본문", 0, "present"), "gate-degraded")
+
+    def test_unknown_without_rows_is_unreadable(self):
+        self.assertEqual(g.derive_table_status("본문", 0, "unknown"), "unreadable")
+
+    def test_no_text_is_blank(self):
+        self.assertEqual(g.derive_table_status("", 0, "unknown"), "")
+
+    def test_matches_collector_zero_row_rule(self):
+        """수집기 `_parse_deficiency_table` 0행 분기와 같은 값을 낸다(규칙 복제 어긋남 방지)."""
+        with mock.patch.object(g, "_deficiency_table_enabled", return_value=True), \
+                mock.patch.object(g, "_extract_deficiency_table", return_value=[]):
+            for text, verdict in (("지적(보완)사항 없음", "none"),
+                                  ("평가 결과: 지적(보완)사항 있음", "present"),
+                                  ("판정 불능", "unknown")):
+                _rows, status = g._parse_deficiency_table(b"", "pdf", text, verdict, "T")
+                self.assertEqual(status, g.derive_table_status(text, 0, verdict), verdict)
+
+
+class ExcerptTrailingNoiseTest(unittest.TestCase):
+    """문서 끝 부서명 머리글(글자 사이 공백)이 발췌 꼬리에 붙는 서식 잡음 제거."""
+
+    _GAS = ("❍ 의약품 제조 및 품질관리기준(GMP) 평가 결과: 지적(보완)사항 없음\n"
+            "의\n료\n제\n품\n안\n전\n과")
+
+    def test_spaced_department_header_is_stripped(self):
+        self.assertEqual(g._extract_deficiency_excerpt(self._GAS),
+                         "평가 결과: 지적(보완)사항 없음")
+
+    def test_other_department_headers_are_stripped(self):
+        self.assertEqual(g.strip_excerpt_noise("지적(보완)사항 없음 한 약 정 책 과"),
+                         "지적(보완)사항 없음")
+
+    def test_real_sentences_and_short_runs_are_kept(self):
+        for keep in ("지적(보완)사항 3건 품질경영 미흡",
+                     "지적(보완)사항 없음 의 료 제",           # 3토큰 — 문장일 수 있음
+                     "지적(보완)사항 있음 시험실 중요 보완완료 의약품안전관리과"):
+            self.assertEqual(g.strip_excerpt_noise(keep), keep)
+
+    def test_mid_text_spaced_letters_are_not_touched(self):
+        text = "지적(보완)사항 있음 의 료 제 품 안 전 과 관련 시정 요청"
+        self.assertEqual(g.strip_excerpt_noise(text), text)
+
+    def test_idempotent(self):
+        once = g.strip_excerpt_noise("지적(보완)사항 없음 의 료 제 품 안 전 과")
+        self.assertEqual(g.strip_excerpt_noise(once), once)
+
+
 if __name__ == "__main__":
     unittest.main()

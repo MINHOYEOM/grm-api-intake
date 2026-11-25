@@ -33,6 +33,8 @@
 
 기본은 dry-run: 행별 전·후 표(문서 id·뽑은 이름·전문 속 위치 발췌)와 남는 행 사유를 JSON·Markdown 으로 쓴다.
 `--rows-json` 은 DB 대신 미리 받아 둔 행(raw_signal_id·document_id·body·…)으로 dry-run 한다(자격증명 불필요).
+`--names-json PATH` 는 검증한 이름 목록({"fill": {"문서 id": ["이름", ...]}})을 사용한다.
+모든 입력 행의 전문에서 이름을 문자 그대로 확인한 뒤에만 적용한다. `--overwrite` 는 채워진 행도 교체한다.
 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (값은 로그에 남기지 않는다).
 """
 from __future__ import annotations
@@ -191,7 +193,7 @@ def audit(row: dict[str, Any]) -> dict[str, Any] | None:
 def _apply_one(row: dict[str, Any], line: dict[str, Any], rep: Report, *, overwrite: bool,
                applier: Callable[..., dict[str, Any]],
                findings_patcher: Callable[..., tuple[int, str]] | None) -> None:
-    raw = _loads(row.get("raw_json"))
+    raw = _loads(row.get("raw_json")).copy()
     now = raw.get(INSPECTORS_KEY) or []
     if overwrite:
         if list(now) != list(line["before"]):          # 그사이 바뀌었으면 손대지 않는다
@@ -201,9 +203,10 @@ def _apply_one(row: dict[str, Any], line: dict[str, Any], rep: Report, *, overwr
             raw[INSPECTORS_KEY] = list(line["after"])
         else:
             raw.pop(INSPECTORS_KEY, None)               # 빈칸 — 키를 달지 않는 수집기 관례(_to_item)
-        diff = {"replaced": INSPECTORS_KEY, "removed": [b["name"] for b in line["bad"]],
-                "why": sorted({b["why"] for b in line["bad"]}), "names": len(line["after"]),
-                "source": BODY_KEY, "audit": True}
+        diff = {"replaced": INSPECTORS_KEY, "names": len(line["after"]), "source": BODY_KEY}
+        if "bad" in line:
+            diff.update(removed=[b["name"] for b in line["bad"]],
+                        why=sorted({b["why"] for b in line["bad"]}), audit=True)
     else:
         if now:                                         # 그사이 채워졌으면 덮지 않는다
             rep.unchanged += 1
@@ -286,12 +289,85 @@ def run(rows: list[dict[str, Any]], *, apply: bool, limit: int = DEFAULT_LIMIT,
     return rep
 
 
+def run_names(rows: list[dict[str, Any]], fill: dict[str, list[str]], *, apply: bool,
+              overwrite: bool = False, limit: int = DEFAULT_LIMIT,
+              applier: Callable[..., dict[str, Any]] | None = None,
+              findings_patcher: Callable[..., tuple[int, str]] | None = None) -> Report:
+    """입력 전체를 검증한 뒤 기존 버전 저장 경로로 반영한다."""
+    rep = Report(mode="apply" if apply else "dry-run", scanned=len(rows), targets=len(fill))
+    by_doc: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        by_doc.setdefault(row.get("document_id"), []).append(row)
+
+    changes = []
+    for doc, names in fill.items():
+        if not isinstance(names, list) or not names or any(
+                not isinstance(name, str) or not name.strip() for name in names):
+            rep.errors.append(f"{doc}: invalid-names (비어 있지 않은 문자열 배열 필요)")
+            continue
+        matches = by_doc.get(doc, [])
+        if len(matches) != 1:
+            reason = "missing-document" if not matches else "ambiguous-document"
+            rep.errors.append(f"{doc}: {reason}")
+            continue
+        row = matches[0]
+        raw = _loads(row.get("raw_json"))
+        body = raw.get(BODY_KEY) if "raw_json" in row else row.get("body")
+        if not isinstance(body, str) or not body.strip():
+            rep.errors.append(f"{doc}: missing-body")
+            continue
+        missing = [n for n in names if not fda483._inspector_name_in_text(n, body, exact=True)]
+        if missing:
+            rep.not_verbatim += 1
+            rep.errors.append(f"{doc}: not-verbatim {json.dumps(missing, ensure_ascii=False)}")
+            continue
+
+        stored = (raw.get(INSPECTORS_KEY) or []) if "raw_json" in row else stored_names(row)
+        before = stored if isinstance(stored, list) else [stored]
+        reason = "names-json"
+        if _status(row) == OUT_OF_SCOPE:
+            reason = OUT_OF_SCOPE
+        elif before and not overwrite:
+            reason = "already-filled"
+        elif not isinstance(stored, list):
+            rep.errors.append(f"{doc}: invalid-stored-names")
+            continue
+        elif before == names:
+            reason = "unchanged"
+        changed = reason == "names-json"
+        sig = bool(_SIGNATURE_RE.search(body))
+        line = {"raw_signal_id": str(row.get("raw_signal_id") or ""), "document_id": doc,
+                "signature_block": sig, "before": before, "after": names if changed else before,
+                "reason": reason, "evidence": [f"@{body.index(n)}" for n in names] if changed else []}
+        rep.rows.append(line)
+        rep.with_signature_block += sig
+        if changed:
+            rep.extracted += 1
+            rep.extracted_with_signature_block += sig
+            changes.append((row, line))
+        else:
+            rep.unchanged += 1
+            rep.reasons[reason] = rep.reasons.get(reason, 0) + 1
+            if sig:
+                rep.reasons_with_signature_block[reason] = rep.reasons_with_signature_block.get(reason, 0) + 1
+
+    if limit and len(changes) > limit:
+        rep.errors.append(f"limit-exceeded: {len(changes)} > {limit}")
+    if apply and not rep.errors:
+        for row, line in changes:
+            _apply_one(row, line, rep, overwrite=bool(line["before"]), applier=applier,
+                       findings_patcher=findings_patcher)
+    return rep
+
+
 # ── Supabase ─────────────────────────────────────────────────────────────────
 
 def fetch_rows(base_url: str, service_key: str, *, since: str = "",
-               doc_ids: list[str] | None = None) -> list[dict[str, Any]]:
+               doc_ids: list[str] | None = None, include_bodyless: bool = False) -> list[dict[str, Any]]:
     import findings_supabase_backfill as fsb
-    extra: dict[str, str] = {"source": f"eq.{SOURCE_FDA_483}", "raw_json": f"like.*{BODY_KEY}*"}
+    extra: dict[str, str] = {"source": f"eq.{SOURCE_FDA_483}"}
+    if not include_bodyless:
+        extra["raw_json"] = f"like.*{BODY_KEY}*"
     if since:
         extra["collected_at"] = f"gte.{since}"
     if doc_ids:
@@ -341,8 +417,10 @@ def markdown(rep: Report) -> str:
              "|---|---|---|---|---|---|"]
     for r in rep.rows:
         ev = " / ".join(e for e in r["evidence"] if e).replace("|", "¦")
-        lines.append(f"| {r['document_id']} | {'있음' if r['signature_block'] else '없음'} | (빈칸) | "
-                     f"{', '.join(r['after']) or '—'} | {r['reason']} | {ev} |")
+        before, after = (", ".join(map(str, r[key])).replace("|", "¦").replace("\r", "␍").replace("\n", "⏎")
+                         for key in ("before", "after"))
+        lines.append(f"| {r['document_id']} | {'있음' if r['signature_block'] else '없음'} | {before or '(빈칸)'} | "
+                     f"{after or '—'} | {r['reason']} | {ev} |")
     if rep.audited:
         lines += ["", f"## ⚠ 덮어쓰기 대상 — 이미 채워진 행 감사 {rep.audited}행 중 {rep.overwrite}행",
                   f"(문제없음 {rep.audit_ok} · 덮어쓰면 빈칸이 되는 행 {rep.overwrite_to_empty})", "",
@@ -353,6 +431,8 @@ def markdown(rep: Report) -> str:
             bad = ", ".join(f"{b['name']}({b['why']})" for b in r["bad"])
             lines.append(f"| **{r['document_id']}** | {', '.join(r['before'])} | {bad} | "
                          f"{', '.join(r['after']) or '(빈칸)'} | {r['reason']} | {ev} |")
+    if rep.errors:
+        lines += ["", "## 오류", *(f"- {error}" for error in rep.errors)]
     return "\n".join(lines) + "\n"
 
 
@@ -365,6 +445,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     ap.add_argument("--apply", action="store_true", help="실제로 쓴다(기본 dry-run)")
     ap.add_argument("--rows-json", default="", help="DB 대신 미리 받은 행 JSON 으로 dry-run")
+    ap.add_argument("--names-json", type=Path, help="검증된 문서별 실사관 이름 JSON 경로")
+    ap.add_argument("--overwrite", action="store_true", help="--names-json 입력으로 이미 채워진 이름도 교체")
     ap.add_argument("--since", default="", help="collected_at 하한(YYYY-MM-DD)")
     ap.add_argument("--doc-ids", default="", help="document_id 목록(쉼표·공백 구분)")
     ap.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help="회차 상한(무료 Nano — 2,000 이하)")
@@ -376,7 +458,22 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--service-role-key", default="")
     args = ap.parse_args(argv)
     doc_ids = [d for d in re.split(r"[,\s]+", args.doc_ids.strip()) if d]
+    fill = None
+    if args.overwrite and not args.names_json:
+        ap.error("--overwrite 에는 --names-json 이 필요하다")
+    if args.names_json:
+        if args.audit_filled or doc_ids or args.since:
+            ap.error("--names-json 은 --audit-filled, --doc-ids, --since 와 함께 쓸 수 없다")
+        try:
+            data = json.loads(args.names_json.read_text(encoding="utf-8-sig"))
+            fill = data.get("fill") if isinstance(data, dict) else None
+            if not isinstance(fill, dict) or any(not re.fullmatch(r"[A-Za-z0-9_.-]+", doc) for doc in fill):
+                raise ValueError("fill 에 document_id 별 이름 목록이 필요하다")
+        except (OSError, ValueError) as exc:
+            print(f"ERROR: --names-json: {exc}", file=sys.stderr)
+            return 2
 
+    applier = findings_patcher = None
     if args.rows_json:
         if args.apply:
             print("ERROR: --rows-json 은 dry-run 전용이다", file=sys.stderr)
@@ -384,7 +481,6 @@ def main(argv: list[str] | None = None) -> int:
         rows = json.loads(Path(args.rows_json).read_text(encoding="utf-8"))
         if doc_ids:
             rows = [r for r in rows if r.get("document_id") in set(doc_ids)]
-        rep = run(rows, apply=False, limit=args.limit, audit_filled=args.audit_filled)
     else:
         from grm_cli import normalize_supabase_url, resolve_supabase_service_credentials
         creds = resolve_supabase_service_credentials(args)
@@ -393,12 +489,28 @@ def main(argv: list[str] | None = None) -> int:
             print("ERROR: SUPABASE_URL(https)·SUPABASE_SERVICE_ROLE_KEY 가 필요하다", file=sys.stderr)
             return 2
         key = creds[1]
-        rows = fetch_rows(base, key, since=args.since, doc_ids=doc_ids)
-        import raw_versioning as rv
+        if fill is None:
+            rows = fetch_rows(base, key, since=args.since, doc_ids=doc_ids)
+        else:
+            ids = list(fill)
+            rows = []
+            for start in range(0, len(ids), 200):
+                rows.extend(fetch_rows(base, key, doc_ids=ids[start:start + 200], include_bodyless=True))
+        if args.apply:
+            import raw_versioning as rv
+            applier = lambda **kw: rv.apply_version(base, key, **kw)
+            findings_patcher = lambda rid, names, **kw: patch_empty_findings(base, key, rid, names, **kw)
+
+    if fill is None:
         rep = run(rows, apply=args.apply, limit=args.limit,
-                  applier=(lambda **kw: rv.apply_version(base, key, **kw)) if args.apply else None,
-                  findings_patcher=(lambda rid, names, **kw: patch_empty_findings(base, key, rid, names, **kw))
-                  if args.apply else None, audit_filled=args.audit_filled)
+                  applier=applier, findings_patcher=findings_patcher, audit_filled=args.audit_filled)
+    else:
+        rep = run_names(rows, fill, apply=args.apply, overwrite=args.overwrite, limit=args.limit,
+                        applier=applier, findings_patcher=findings_patcher)
+        if not args.apply:
+            print(markdown(rep), end="")
+        for error in rep.errors:
+            print(f"ERROR: {error}", file=sys.stderr)
     Path(args.report).write_text(json.dumps(asdict(rep), ensure_ascii=False, indent=1), encoding="utf-8")
     if args.markdown:
         Path(args.markdown).write_text(markdown(rep), encoding="utf-8")

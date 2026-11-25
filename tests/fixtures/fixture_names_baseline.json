@@ -1,27 +1,4 @@
 {
- "_comment": "시험 자료·시험 코드 실명 게이트 기준 목록(경고) — 2026-11-25 main 에 이미 있던 시험 재료·코드의 개인 이름. 이름 대신 sha256 앞 12자로 적는다(공개 저장소에 이름을 다시 늘어놓지 않으려고). 정리해서 사라진 항목은 지운다. 새 항목은 넣지 않는다 — 새 시험 재료는 가짜 이름(FAKE_FIXTURE_NAMES)을 쓴다.",
- "entries": [
-  "tests/fixtures/fda483_104952_tesseract_cli.txt | sha256:2ae0f064b95f",
-  "tests/fixtures/fda483_104952_tesseract_cli.txt | sha256:755d18cb6912",
-  "tests/fixtures/fda483_104952_tesseract_cli.txt | sha256:e753d3a08b76",
-  "tests/fixtures/fda483_195241_pagebreak.txt | sha256:1bea44bfa1f9",
-  "tests/fixtures/fda483_195241_pagebreak.txt | sha256:4a6dda304990",
-  "tests/fixtures/fda483_195279_text.txt | sha256:a4ce74f58d7e",
-  "tests/fixtures/fda483_195646_text.txt | sha256:5a99c57b24b4",
-  "tests/fixtures/fda483_195646_text.txt | sha256:6456d256d43c",
-  "tests/fixtures/fda483_196447_glyph_paren_list.txt | sha256:74918c1794cf",
-  "tests/fixtures/fda483_196447_glyph_paren_list.txt | sha256:e17e9875a2a7",
-  "tests/fixtures/wl_truncation_real_bodies.json | sha256:6831301ed45b",
-  "tests/fixtures/wl_violations_1123/samples.json | sha256:a6b54c20a7b9",
-  "tests/fixtures/wl_violations_1123/samples.json | sha256:c47a4374f058",
-  "tests/fixtures/wl_violations_1124/samples.json | sha256:ee8422735fdc",
-  "tests/test_company_precheck.py | sha256:55162b835094",
-  "tests/test_company_precheck.py | sha256:755d18cb6912",
-  "tests/test_company_precheck.py | sha256:cb66c905ee23",
-  "tests/test_fda483_detail_pagebreak.py | sha256:561ef72ea333",
-  "tests/test_fda483_detail_pagebreak.py | sha256:e1e221ca06ed",
-  "tests/test_fda_483.py | sha256:2ae0f064b95f",
-  "tests/test_findings_html_entity_repair.py | sha256:2ae0f064b95f",
-  "tests/test_grm_findings.py | sha256:db605e8f7191"
- ]
+ "_comment": "시험 자료·시험 코드 실명 게이트 기준 목록(경고). 2026-11-25 에 main 에 있던 22건(13개 파일)을 같은 꼴의 가짜 이름으로 바꿔 비웠다. 새 항목은 넣지 않는다 — 새 시험 재료는 가짜 이름(FAKE_FIXTURE_NAMES)을 쓰고, 규제기관 공식 서명자만 OFFICIAL_FIXTURE_NAMES 에 둔다. 항목 꼴: 파일 | sha256:이름 해시 앞 12자.",
+ "entries": []
 }

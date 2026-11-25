@@ -63,6 +63,11 @@ def decide(event_name: str, wr_conclusion: str, head_message: str | None) -> tup
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ok, reason, pub = decide(os.environ.get("EVENT_NAME", ""),
                              os.environ.get("WR_CONCLUSION", ""),
                              os.environ.get("HEAD_MESSAGE", ""))

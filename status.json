@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T12:53:39Z",
+ "generated_at": "2026-11-25T13:07:57Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,12 +229,34 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45616876416,
+    "databaseId": 45620333178,
     "status": "in_progress",
     "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-25T13:07:08Z",
+    "updatedAt": "2026-11-25T13:07:13Z",
+    "headBranch": "tmp/all-combined-1125",
+    "displayTitle": "Merge remote-tracking branch 'origin/fix/farm-address-1125' into tmp/…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45620333178"
+   },
+   {
+    "databaseId": 45618941598,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T12:58:44Z",
+    "updatedAt": "2026-11-25T13:07:22Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1961 from MINHOYEOM/claude/fixture-and-debarment-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45618941598"
+   },
+   {
+    "databaseId": 45616876416,
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-25T12:45:44Z",
-    "updatedAt": "2026-11-25T12:46:22Z",
+    "updatedAt": "2026-11-25T12:54:47Z",
     "headBranch": "fix/farm-address-1125",
     "displayTitle": "fix(privacy): 11-23호 개인 농장 번지 생략 + 개인 사업자 번지 게이트·브릿지 자동 정리",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45616876416"
@@ -260,28 +282,6 @@
     "headBranch": "codex/483-inspectors-names",
     "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/483-inspectors-…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45613901035"
-   },
-   {
-    "databaseId": 45612111567,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-25T12:16:04Z",
-    "updatedAt": "2026-11-25T12:42:04Z",
-    "headBranch": "claude/fixture-and-debarment-names-1125",
-    "displayTitle": "fix(privacy): 시험 자료 실명 22건 정리 + FDA 자격박탈 대상자 실명(판정·자동 가림·06-22 발행본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612111567"
-   },
-   {
-    "databaseId": 45612097828,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T12:15:57Z",
-    "updatedAt": "2026-11-25T12:38:06Z",
-    "headBranch": "claude/fixture-and-debarment-names-1125",
-    "displayTitle": "fix(privacy): FDA 자격박탈 명령 대상 개인 실명 — 판정·자동 가림·06-22 발행본·시험 자료",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612097828"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45620391512,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T13:07:29Z",
+    "updatedAt": "2026-11-25T13:07:44Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45620391512"
+   },
+   {
     "databaseId": 45612451891,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45537737310"
-   },
-   {
-    "databaseId": 45526386041,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T01:31:34Z",
-    "updatedAt": "2026-11-25T01:31:35Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526386041"
    }
   ],
   "grm-findings-translate-apply.yml": [

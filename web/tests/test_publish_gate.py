@@ -207,3 +207,18 @@ class SignerVariantTailGate1126Test(unittest.TestCase):
     def test_gate_and_collector_share_one_function(self):
         import grm_findings as gf
         self.assertIs(render._gf_signer_variant_tail_start, gf.fda483_signer_variant_tail_start)
+
+
+class BareSignatureHeadingGate1126Test(unittest.TestCase):
+    """[11-26] 산문 표제 "ELECTRONIC SIGNATURES" 는 잔재가 아니다 — 수집기와 같은 함수로 판정한다."""
+
+    def _v(self, detail):
+        return render.validate_483_observations([_brief([_card([_obs(1, detail=detail, detail_ko="국문.")])])])
+
+    def test_prose_heading_is_not_blocked(self):
+        self.assertEqual(self._v("Audit trails were not reviewed. ELECTRONIC RECORDS AND ELECTRONIC SIGNATURES "
+                                 "Shared login credentials were used by four analysts on the system."), [])
+
+    def test_bare_signature_signer_line_is_blocked(self):
+        v = self._v("The batch record was incomplete. SIGNATURE | Velmora Quist 07/02/2025")
+        self.assertTrue(any("FOOTER_GARBAGE" in x for x in v), v)

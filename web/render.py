@@ -134,6 +134,7 @@ import collect_fda_import_alert as _ia  # noqa: E402
 # (재수집 없음), 렌더 단에도 같은 분류기로 최후 방어선을 둔다(단일 진실원 재사용).
 from grm_findings import evidence_url_quality_error as _evidence_url_quality_error  # noqa: E402
 from grm_findings import fda483_signer_variant_tail_start as _gf_signer_variant_tail_start  # noqa: E402
+from grm_findings import fda483_bare_signature_is_prose as _gf_bare_signature_is_prose  # noqa: E402
 # [WHOPIR 결론 한 줄 2026-11-03] 결론은 접힌 상세(`deterministic_detail.outcome`)에만 있었다.
 # 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
 from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
@@ -9194,6 +9195,22 @@ _FOOTER_GARBAGE_RE = re.compile(
 )
 
 
+_BARE_SIGNATURE_RE = re.compile(r"(?-i:SIGNATURE|SIGJ)")
+
+
+def _footer_garbage_hit(detail: str) -> bool:
+    """[11-26] `_FOOTER_GARBAGE_RE` 검출 — 단, 산문 표제의 맨 SIGNATURE("ELECTRONIC SIGNATURES")는 잔재로 보지
+    않는다. 판정은 수집기 절단점과 같은 함수(`grm_findings.fda483_bare_signature_is_prose`)."""
+    for m in _FOOTER_GARBAGE_RE.finditer(detail):
+        if not _BARE_SIGNATURE_RE.fullmatch(m.group(0)):
+            return True
+        lo, hi = max(0, m.start() - 200), min(len(detail), m.end() + 200)
+        near = any(not _BARE_SIGNATURE_RE.fullmatch(x.group(0)) for x in _FOOTER_GARBAGE_RE.finditer(detail, lo, hi))
+        if not _gf_bare_signature_is_prose(detail, m.end(), other_marker_near=near):
+            return True
+    return False
+
+
 def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
     """FDA 483 Observation 카드 발행 게이트 — 브리프 리스트(각 {"brief":…, "cards":[...]}
     형태, load_briefs() 산출 그대로) 또는 카드 리스트를 받아 위반 목록(사람이 읽을 문자열)을
@@ -9222,7 +9239,7 @@ def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str
                 if not (isinstance(obs.get("detail_ko"), str) and obs.get("detail_ko").strip()):
                     violations.append(f"{loc}: MISSING_DETAIL_KO")
                 # [11-26] 판독 변형 서명란은 꼬리일 때만 — 수집기 trim_detail_tail 과 같은 함수.
-                if (_FOOTER_GARBAGE_RE.search(detail)
+                if (_footer_garbage_hit(detail)
                         or _gf_signer_variant_tail_start(detail) is not None):
                     violations.append(f"{loc}: FOOTER_GARBAGE")
 

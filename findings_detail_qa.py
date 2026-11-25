@@ -66,7 +66,8 @@ ESTAB_HEADER_RE = re.compile(
     r"\b(?:API|Drug|Device|Outsourcing|Pharmaceutical|Biologics?|Sterile|Human\s+Drug|Medical\s+Device)\s+"
     r"(?:Manufacturer|Facility|Packager|Relabeler|Repacker)\b|\bproducer\s+of\b|\bCompounding\s+Pharmacy\b",
     re.IGNORECASE)
-REDACT_VARIANT_RE = re.compile(r"\(b\)\s*\(\d\)|(?<!\()b\)\s*\(\d\)|\(\)\s*\(\d\)|\(b\s*\(\d\)")
+# 조항 인용(503B(b)(2)(A)·211.67(b)(4))은 가림 표시가 아니다 — 숫자나 "숫자+대문자" 바로 뒤의 (b)(n) 은 뺀다(11-25 표제 오탐 25건).
+REDACT_VARIANT_RE = re.compile(r"(?<!\d)(?<!\d[A-Z])\(b\)\s*\(\d\)|(?<![(\dA-Z])b\)\s*\(\d\)|\(\)\s*\(\d\)|(?<!\d)(?<!\d[A-Z])\(b\s*\(\d\)")
 _QUOTED_RE = re.compile(r"\"[^\"]{1,200}\"|“[^”]{1,200}”|‘[^’]{1,200}’|「[^」]{1,200}」")
 _LATIN_RUN_RE = re.compile(r"(?:[A-Za-z][A-Za-z'’.\-]*[\s,;:/]+){4,}[A-Za-z][A-Za-z'’.\-]*")
 _FUNC_WORD_RE = re.compile(
@@ -139,6 +140,7 @@ def _codes(text: str) -> set[str]:
 
 
 OCR_DROPPED_MAX = 10
+_LOT_AT_RE = re.compile(r"(?<![\w@])\d{4,}@\d{1,3}(?![\w@])")
 
 
 def _check_strict(en: str, ko: str, dropped: Any = None, kept: Any = None) -> list[str]:
@@ -169,6 +171,12 @@ def _check_strict(en: str, ko: str, dropped: Any = None, kept: Any = None) -> li
     missing = [n for n, c in need.items() if have[n] < c and n not in ko and n not in drop]
     if missing:
         problems.append("numbers_missing:" + ",".join(missing[:5]))
+    # 로트 번호(170612@1·07022014@43)는 통째로 옮긴다 — 숫자 검사는 @ 앞뒤를 따로 세므로, 뒷자리를 ocr_dropped 로
+    # 빼고 [redacted] 로 바꾼 번역이 통과했다(11-25 표제 실측). 토큰 전체를 ocr_dropped 에 적은 경우만 면제.
+    lots = sorted({m.group(0) for m in _LOT_AT_RE.finditer(en) if _outside(mask, m.start())
+                   and m.group(0) not in ko and m.group(0) not in drop})
+    if lots:
+        problems.append("lot_missing:" + ",".join(lots[:5]))
     if ko.count(_REDACTED) < en.count(_REDACTED) - redact_dropped:
         problems.append(f"redacted_count:{en.count(_REDACTED)}->{ko.count(_REDACTED)}")
     # 길이 비율은 양식 칸·머리글을 뺀 본문 기준(머리글이 큰 항목에서 머리글을 덧붙이게 만들지 않게).

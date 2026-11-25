@@ -32,6 +32,8 @@ TARGET_FIELDS = {
     SOURCE_MHRA: "mhra_alert_body",
 }
 MHRA_ALERT_PREFIX = "https://www.gov.uk/drug-device-alerts/"
+SOURCE_KEYS = {"who": SOURCE_WHO, "ema": SOURCE_EMA, "eca": SOURCE_ECA, "mhra": SOURCE_MHRA}
+_DATE_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
 
 
 @dataclass(frozen=True)
@@ -186,7 +188,15 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--apply", action="store_true", help="판독 결과를 DB에 저장")
+    parser.add_argument("--source", action="append", choices=sorted(SOURCE_KEYS),
+                        help="이 소스만(여러 번 지정 가능). 없으면 네 소스 전부")
+    parser.add_argument("--ingested-since", default="",
+                        help="적재일(ingested_at) 하한 YYYY-MM-DD — 완전성 점검 범위(최근 60일)만 돌릴 때")
+    parser.add_argument("--output", default="", help="JSON 결과를 이 파일에도 쓴다")
     args = parser.parse_args(argv)
+    if args.ingested_since and not _DATE_RE.match(args.ingested_since):
+        parser.error("--ingested-since 는 YYYY-MM-DD")
+    sources = [SOURCE_KEYS[k] for k in (args.source or [])] or list(TARGET_FIELDS)
     base = normalize_supabase_url(os.environ.get("SUPABASE_URL", ""))
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     if not base or not key:
@@ -194,11 +204,14 @@ def main(argv: list[str] | None = None) -> int:
 
     rows = []
     try:
-        for source in TARGET_FIELDS:
+        for source in sources:
+            params = {"source": f"eq.{source}"}
+            if args.ingested_since:
+                params["ingested_at"] = f"gte.{args.ingested_since}"
             rows.extend(fsb._fetch_all_pages(
                 base, key, "raw_signals",
                 select="source,document_id,official_url,raw_signal_id,raw_sha256,raw_json,row_json",
-                page_size=500, order="raw_signal_id.asc", extra_params={"source": f"eq.{source}"},
+                page_size=500, order="raw_signal_id.asc", extra_params=params,
             ))
     except RuntimeError:
         print("raw_signals 조회 실패", file=sys.stderr)
@@ -212,7 +225,18 @@ def main(argv: list[str] | None = None) -> int:
     with redirect_stdout(sys.stderr):
         results = backfill(rows, Readers(_read_whopir, _read_article, _read_mhra),
                            apply=args.apply, write=write)
-    print(json.dumps({"mode": "apply" if args.apply else "dry_run", "rows": results}, indent=2))
+    summary: dict[str, dict[str, int]] = {}
+    for r in results:
+        bucket = summary.setdefault(r["source"], {})
+        key_ = "complete" if r.get("complete") else r["status"]
+        bucket[key_] = bucket.get(key_, 0) + 1
+    out = json.dumps({"mode": "apply" if args.apply else "dry_run", "sources": sources,
+                      "ingested_since": args.ingested_since, "summary": summary,
+                      "rows": results}, ensure_ascii=False, indent=2)
+    print(out)
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as fh:
+            fh.write(out)
     return int(any(r["status"] != "excluded_unrelated" and not r.get("complete") for r in results))
 
 

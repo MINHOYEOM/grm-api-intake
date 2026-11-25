@@ -150,3 +150,36 @@ class BackfillBlankExcerptsTest(unittest.TestCase):
                 f"{LONG_TEXT} Next & last.",
             )
         get.assert_called_once()
+
+
+class ScopeOptionsTest(unittest.TestCase):
+    """[11-25 #8] 완전성 점검 범위(소스·최근 적재분)만 dry/apply 할 수 있어야 한다."""
+
+    ENV = {"SUPABASE_URL": "https://example.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "k"}
+
+    def _main(self, argv):
+        with patch.dict("os.environ", self.ENV), \
+                patch.object(b.fsb, "_fetch_all_pages", return_value=[]) as fetch, \
+                patch("sys.stdout"):
+            code = b.main(argv)
+        return code, [c.kwargs["extra_params"] for c in fetch.call_args_list]
+
+    def test_default_reads_all_four_sources_without_date_filter(self):
+        code, params = self._main([])
+        self.assertEqual(code, 0)
+        self.assertEqual([p["source"] for p in params],
+                         [f"eq.{s}" for s in b.TARGET_FIELDS])
+        self.assertTrue(all("ingested_at" not in p for p in params))
+
+    def test_source_and_ingested_since_narrow_the_read(self):
+        _code, params = self._main(["--source", "eca", "--source", "who",
+                                    "--ingested-since", "2026-09-23"])
+        self.assertEqual(params, [
+            {"source": f"eq.{b.SOURCE_ECA}", "ingested_at": "gte.2026-09-23"},
+            {"source": f"eq.{b.SOURCE_WHO}", "ingested_at": "gte.2026-09-23"},
+        ])
+
+    def test_bad_date_is_rejected(self):
+        with patch.dict("os.environ", self.ENV), patch("sys.stderr"):
+            with self.assertRaises(SystemExit):
+                b.main(["--ingested-since", "09-23"])

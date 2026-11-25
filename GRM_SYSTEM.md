@@ -534,6 +534,7 @@ flowchart TD
 grm-api-intake/
 ├─ GRM_SYSTEM.md, CLAUDE.md, requirements.txt
 ├─ collect_intake.py               # 수집 오케스트레이터(단일 진입점)
+├─ orphan_report.py                # 루트 스크립트·워크플로 미사용 후보를 읽기 전용으로 출력
 ├─ findings_search_cache_health.py # [151] 검색 캐시 daily 갱신 감시(실패·신선 부족 → exit 1, grm-findings-search-cache-health.yml)
 ├─ indexnow_submit.py              # [검색 노출 2026-11-10] IndexNow 제출 — 배포 직후 새/변경 URL 을 네이버·빙에 통지(키 상수=공개값, render 가 /{키}.txt 방출). 수동 전수는 grm-indexnow-full.yml. tests/test_indexnow_submit.py
 ├─ collect_mfds.py                 # 식약처 수집기

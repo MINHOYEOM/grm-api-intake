@@ -600,7 +600,7 @@ class Fda483PageHeaderScrubTest(unittest.TestCase):
         # 이어지면 관찰 본문 전체가 사라진다(잡음 제거가 아니라 데이터 손실). 본문은 남아야 한다.
         text = (
             "NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT IS ISSUED "
-            "TO: Dr. Frank P. Pearson, Medical Center Director "
+            "TO: Dr. Brant P. Keltham, Medical Center Director "
             "Personnel engaged in aseptic processing were observed wearing non-sterile gloves."
         )
         cleaned = gf.strip_fda483_page_header(text, **self.HINTS)

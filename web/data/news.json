@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-24",
+ "measured_on": "2026-11-25",
  "window_days": 60,
  "totals": {
-  "items": 477
+  "items": 474
  },
  "by_source": [
   {
@@ -11,12 +11,12 @@
    "c": 182
   },
   {
-   "v": "Federal Register",
-   "c": 79
+   "v": "ECA Academy",
+   "c": 78
   },
   {
-   "v": "ECA Academy",
-   "c": 77
+   "v": "Federal Register",
+   "c": 75
   },
   {
    "v": "MFDS",
@@ -27,16 +27,16 @@
    "c": 39
   },
   {
-   "v": "Health Canada",
-   "c": 20
-  },
-  {
    "v": "ISPE",
    "c": 19
   },
   {
+   "v": "Health Canada",
+   "c": 18
+  },
+  {
    "v": "MHRA Inspectorate",
-   "c": 11
+   "c": 13
   },
   {
    "v": "PIC/S",
@@ -48,6 +48,27 @@
   }
  ],
  "items": [
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-24",
+   "title": "What is the Process for Cleaning Validation in the Pharmaceutical Industry?",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/what-is-the-process-for-cleaning-validation-in-the-pharmaceutical-industry"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 2 Medicines Recall",
+   "published_date": "2026-11-24",
+   "title": "Class 2 Medicines Recall: Quadrant Pharmaceuticals Limited (Parallel Import), Brintellix 5 mg film-coated tablets, EL(26)A/49",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-quadrant-pharmaceuticals-limited-parallel-import-brintellix-5-mg-film-coated-tablets-el-26-a-slash-49"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 4 Medicines Defect Notification",
+   "published_date": "2026-11-24",
+   "title": "Class 4 Medicines Defect Notification: Atnahs Pharma UK Limited, Toradol 30 mg/mL Solution for Injection, EL(26)A/50",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-atnahs-pharma-uk-limited-toradol-30-mg-slash-ml-solution-for-injection-el-26-a-slash-50"
+  },
   {
    "source": "ECA Academy",
    "source_kind": "GMP News",
@@ -3344,48 +3365,6 @@
    "published_date": "2026-09-28",
    "title": "변경관리 계획서 자료 검토에 관한 업무",
    "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15296"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-25",
-   "title": "Dermatologic and Ophthalmic Drugs Advisory Committee; Notice of Meeting; Establishment of a Public Docket; Request for Comments-New Drug Application (NDA) 219694 for Atropine Sulfate Ophthalmic Solution, 0.01%",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/25/2026-19700/dermatologic-and-ophthalmic-drugs-advisory-committee-notice-of-meeting-establishment-of-a-public"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Notice",
-   "published_date": "2026-09-25",
-   "title": "Robotically-Assisted Surgical Devices-Premarket Submissions; Draft Guidance for Industry and Food and Drug Administration Staff; Availability",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/25/2026-19704/robotically-assisted-surgical-devices-premarket-submissions-draft-guidance-for-industry-and-food-and"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Proposed Rule",
-   "published_date": "2026-09-25",
-   "title": "Filing of Color Additive Petition From Doehler GmbH; Request To Amend the Color Additive Regulations To Provide for the Safe Use of Calcium Sulfate in Various Foods at Levels Consistent With Good Manufacturing Practice",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/25/2026-19658/filing-of-color-additive-petition-from-doehler-gmbh-request-to-amend-the-color-additive-regulations"
-  },
-  {
-   "source": "Federal Register",
-   "source_kind": "Rule",
-   "published_date": "2026-09-25",
-   "title": "Food Additives Permitted for Direct Addition to Food for Human Consumption; Vitamin D2 Inactive Bakers Yeast",
-   "official_url": "https://www.federalregister.gov/documents/2026/09/25/2026-19656/food-additives-permitted-for-direct-addition-to-food-for-human-consumption-vitamin-d2-inactive"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-25",
-   "title": "[HC] Limited number of Sarclisa single use vials may have been frozen during shipment",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/limited-number-sarclisa-single-use-vials-may-have-been-frozen-during-shipment"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-25",
-   "title": "[HC] Sanofi-Aventis Canada Inc. recalling certain insulin pens and cartridges",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/sanofi-aventis-canada-inc-recalling-certain-insulin-pens-and-cartridges"
   }
  ]
 }

@@ -47,6 +47,7 @@ from zoneinfo import ZoneInfo
 
 import requests
 
+import ema_document
 import grm_queue
 import intake_exclusion as _xl
 from grm_http_policy import (
@@ -2335,16 +2336,22 @@ EMA_ARTICLE_EXCERPT_CAP = 30
 
 
 def _enrich_ema_article_excerpts(items: list[IntakeItem]) -> None:
-    """관련 EMA 항목의 기사 본문을 raw_payload["article_excerpt"] 에 싣는다(in-place).
+    """관련 EMA 항목의 원문 전문(기사 HTML·문서 PDF)을 raw_payload["article_excerpt"] 에 싣는다(in-place).
+
+    판독 메타·실패 사유는 raw_payload["ema_document"] 에 남는다(ema_document.raw_patch).
 
     실패(403/timeout/본문 미발견)는 graceful — 그 항목만 본문 없이 남고 수집은 계속된다.
     """
     fetched = 0
     capped = False
     for item in items:
-        if item.qa_relevance not in ("Likely", "Possible"):
-            continue          # 카드가 될 항목만 — 무관 항목까지 긁지 않는다
         if not item.official_url:
+            continue
+        # 카드가 될 항목만 — 무관 항목까지 긁지 않는다. [11-25 #8] 단, EMA 문서(PDF)는 제목에 분류
+        # 키워드가 없어 미판정(Pending)으로 오는 일이 대부분이다(빈칸 106행 전부 Pending). 관련도 판정의
+        # 근거가 본문뿐이므로 미판정 문서는 읽는다. 무관(Unrelated)은 여전히 읽지 않는다.
+        if item.qa_relevance not in ("Likely", "Possible") and not (
+                item.qa_relevance == "Pending" and ema_document.is_document_url(item.official_url)):
             continue
         if item.raw_payload.get("article_excerpt"):
             continue
@@ -2354,13 +2361,17 @@ def _enrich_ema_article_excerpts(items: list[IntakeItem]) -> None:
                             "나머지 항목은 본문 없이 유지")
                 capped = True
             break
-        time.sleep(ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
-        excerpt = _fetch_article_excerpt(item.official_url, "EMA")
+        # [11-25 #8] 기사 HTML·문서 PDF 모두 공통 판독기(ema_document)가 **전문**을 읽는다. 저장
+        # 단계에서 자르지 않는다(대표 결정) — 화면·브리프 입력은 card_scaffold 가 줄인다. 간격 2초·
+        # 429 재시도는 판독기 안(#1938 값). 빈칸 백필(backfill_blank_excerpts)도 같은 함수를 부른다.
+        doc = ema_document.read_ema_fulltext(item.official_url)
         fetched += 1
-        if excerpt:
-            item.raw_payload["article_excerpt"] = excerpt
+        ema_document.apply_to_raw(item.raw_payload, doc)
+        if not doc.ok:
+            level = "WARN" if ema_document.is_document_url(item.official_url) else "INFO"
+            log(level, f"EMA 원문 전문 미확보({doc.status}) — 카드 그대로: {truncate(item.official_url, 80)}")
     if fetched:
-        log("INFO", f"EMA 기사 본문 fetch {fetched}건 시도")
+        log("INFO", f"EMA 원문 fetch {fetched}건 시도")
 
 
 def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:

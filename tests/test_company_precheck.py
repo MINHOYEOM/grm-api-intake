@@ -836,23 +836,23 @@ class PrivateName1121Test(unittest.TestCase):
             "fda483-1": {"web_card_id": "fda483-1", "kind": "fda-483", "firm": "Daiichi Sankyo Chemical Pharma Co., Ltd.",
                          "deep_analysis_input": {"body_full": self.BODY_483}},
             "who-1": {"web_card_id": "who-1", "kind": "who-inspection", "firm": "Cipla (Kurkumbh D-7) - FPP",
-                      "ncr_translation_input": {"s9": "The company had recently appointed Mr. Achin Gupta as Managing Director & Global CEO."}},
+                      "ncr_translation_input": {"s9": "The company had recently appointed Mr. Orvin Kesta as Managing Director & Global CEO."}},
         }
         delta = {"cards": {"fda483-1": _card(summary="FDA가 Mitsuo Sugiyama 부사장에게 483을 발행했다."),
                            "who-1": _card()}}
-        deep = {"items": {"who-1": {"ncr_ko": {"s9_ko": "회사는 최근 Achin Gupta를 대표이사로 임명했다."}}}}
+        deep = {"items": {"who-1": {"ncr_ko": {"s9_ko": "회사는 최근 Orvin Kesta를 대표이사로 임명했다."}}}}
         warns = precheck.private_name_warn_lines(delta, deep, rows, {})
         self.assertEqual(len(warns), 2, warns)
         self.assertTrue(any(w.startswith("개인 실명 의심 fda483-1.summary: Mitsuo, Sugiyama") for w in warns), warns)
-        self.assertTrue(any(w.startswith("개인 실명 의심 who-1.deep.ncr_ko.s9_ko: Achin, Gupta") for w in warns), warns)
+        self.assertTrue(any(w.startswith("개인 실명 의심 who-1.deep.ncr_ko.s9_ko: Kesta, Orvin") for w in warns), warns)
 
     def test_sole_proprietor_firm_name_not_flagged(self):
         # 이 경고(수신인·호칭 이름)는 업체명 낱말을 뺀다 — 업체명이 사람 이름인 경우는 **차단** 규칙
         # (`guess_check.delta_source_lines` `개인 실명 …`, 2026-11-23 — 11-23 실발행 196329·196343)이 따로 막는다.
-        rows = {"fda483-2": {"web_card_id": "fda483-2", "kind": "fda-483", "firm": "Kenneth F Tesch",
-                             "headline": "[FDA 483] Kenneth F Tesch",
-                             "deep_analysis_input": {"body_full": "Dear Mr. Tesch: OBSERVATION 1 residue above tolerance."}}}
-        delta = {"cards": {"fda483-2": _card(summary="FDA가 생산자 Kenneth F Tesch에 483을 발행했다.")}}
+        rows = {"fda483-2": {"web_card_id": "fda483-2", "kind": "fda-483", "firm": "Bennick F Varch",
+                             "headline": "[FDA 483] Bennick F Varch",
+                             "deep_analysis_input": {"body_full": "Dear Mr. Varch: OBSERVATION 1 residue above tolerance."}}}
+        delta = {"cards": {"fda483-2": _card(summary="FDA가 생산자 Bennick F Varch에 483을 발행했다.")}}
         self.assertEqual(precheck.private_name_warn_lines(delta, None, rows, {}), [])
         self.assertEqual(precheck.source_person_names("INDIVIDUAL TO WHOM REPORT ISSUED\nFIRM NAME\nSTREET ADDRESS"), set())
         block, _ = precheck.guess_check.delta_source_lines(delta, rows, {})

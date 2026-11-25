@@ -434,14 +434,16 @@ class StoreReadError(RuntimeError):
     pass
 
 
-def fetch_table(base_url: str, key: str, table: str, select: str, order: str, session: Any = None) -> Iterator[dict[str, Any]]:
+def fetch_table(base_url: str, key: str, table: str, select: str, order: str, session: Any = None,
+                filters: dict[str, str] | None = None) -> Iterator[dict[str, Any]]:
     http = session or requests
     headers = {"apikey": key, "Authorization": f"Bearer {key}"}
     url = f"{base_url.rstrip('/')}/rest/v1/{table}"
     offset = 0
     for _ in range(MAX_PAGES):
         try:
-            resp = http.get(url, params={"select": select, "order": order, "limit": str(PAGE), "offset": str(offset)},
+            resp = http.get(url, params={**(filters or {}), "select": select, "order": order,
+                                         "limit": str(PAGE), "offset": str(offset)},
                             headers=headers, timeout=HTTP_TIMEOUT)
         except requests.exceptions.RequestException as exc:
             raise StoreReadError(f"{table} 조회 실패: {type(exc).__name__}") from None
@@ -547,9 +549,49 @@ def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20)
             "out_of_scope": {kind: by_kind[kind] for kind in WL_VIOLATIONS_SCOPE_STATUSES if kind in by_kind}}
 
 
+def ema_document_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20) -> dict[str, Any]:
+    """(E) EMA 문서(PDF) 링크인데 본문이 빈 행 — 사유별 행 수(수집기·백필과 같은 판정 함수).
+
+    [11-25 #8] 수집기와 백필이 HTML `<p>` 만 읽어 PDF 문서 행이 빈 채로 굳었다(106행). 공통 판독기
+    (ema_document)가 생긴 뒤에도 빈 행이 남으면 매일 이 감시가 이슈로 올린다. 무관 판정(Unrelated)은 뺀다.
+    """
+    import ema_document
+    from grm_common import SOURCE_EMA
+    by_reason: dict[str, int] = defaultdict(int)
+    docs: list[str] = []
+    for r in raw_rows:
+        if str(r.get("source") or "") != SOURCE_EMA:
+            continue
+        meta = r.get("row_json")
+        if isinstance(meta, str):
+            try:
+                meta = json.loads(meta) if meta.strip() else {}
+            except ValueError:
+                meta = {}
+        if isinstance(meta, dict) and meta.get("qa_relevance") == "Unrelated":
+            continue
+        raw = r.get("raw_json")
+        if isinstance(raw, str):
+            try:
+                raw = json.loads(raw)
+            except ValueError:
+                continue
+        raw = raw if isinstance(raw, dict) else {}
+        meta = meta if isinstance(meta, dict) else {}
+        url = str(r.get("official_url") or meta.get("official_url") or raw.get("link") or "")
+        reason = ema_document.blank_document_gap(url, raw)
+        if not reason:
+            continue
+        by_reason[reason] += 1
+        if len(docs) < max_docs:
+            docs.append(str(r.get("document_id") or ""))
+    return {"blank": sum(by_reason.values()), "by_reason": dict(sorted(by_reason.items())), "docs": docs}
+
+
 def build_report(stats: list[FieldStats], findings_text: dict[str, str], *, today: date,
                  root: Path = ROOT, run_url: str = "",
-                 wl_gaps: dict[str, Any] | None = None) -> dict[str, Any]:
+                 wl_gaps: dict[str, Any] | None = None,
+                 ema_gaps: dict[str, Any] | None = None) -> dict[str, Any]:
     code_caps = scan_code_caps(root)
     trunc = detect_truncation(stats, code_caps, today)
     files = code_files(root)
@@ -573,8 +615,10 @@ def build_report(stats: list[FieldStats], findings_text: dict[str, str], *, toda
         "fields_scanned": len(stats), "truncation": trunc, "usage": usage,
         "counts": {"truncated": len(alarms_t), "unused": len(alarms_u),
                    "intentional_caps": len(trunc) - len(alarms_t),
-                   "wl_violation_gaps": int((wl_gaps or {}).get("unsupported") or 0)},
+                   "wl_violation_gaps": int((wl_gaps or {}).get("unsupported") or 0),
+                   "ema_document_gaps": int((ema_gaps or {}).get("blank") or 0)},
         "wl_violation_gaps": wl_gaps or {},
+        "ema_document_gaps": ema_gaps or {},
     }
     report["issues"] = plan_issues(report)
     return report
@@ -640,7 +684,14 @@ def render_markdown(report: dict[str, Any]) -> str:
         if scope:
             reasons = ", ".join(f"{reason} {count}행" for reason, count in sorted(scope.items()))
             lines += [f"추출 대상 밖 {sum(scope.values())}행 ({reasons})", ""]
-    if not t_alarm and not u_alarm and not c.get("wl_violation_gaps"):
+    e = report.get("ema_document_gaps") or {}
+    if c.get("ema_document_gaps"):
+        lines += ["## EMA 문서(PDF) 본문 빈칸", "",
+                  f"**{c['ema_document_gaps']}행** — 원문이 EMA 문서 링크인데 전문이 비었습니다. "
+                  "`grm-blank-excerpts-backfill.yml`(sources=ema)로 채우고, 사유가 남으면 판독기(ema_document)를 고칩니다.", "",
+                  f"사유별: {e.get('by_reason', {})}", "",
+                  f"문서 예: {', '.join(e.get('docs') or [])}", ""]
+    if not t_alarm and not u_alarm and not c.get("wl_violation_gaps") and not c.get("ema_document_gaps"):
         lines.append("이상 없음.")
     return "\n".join(lines) + "\n"
 
@@ -648,7 +699,8 @@ def render_markdown(report: dict[str, Any]) -> str:
 def fingerprint(report: dict[str, Any]) -> str:
     keys = sorted([f"T|{t['source']}|{t['path']}|{t['cap']}" for t in report["truncation"] if not t["intentional"]]
                   + [f"U|{u['source']}|{u['path']}" for u in report["usage"] if u["alarm"]]
-                  + (["V|wl_violations"] if report["counts"].get("wl_violation_gaps") else []))
+                  + (["V|wl_violations"] if report["counts"].get("wl_violation_gaps") else [])
+                  + (["E|ema_document"] if report["counts"].get("ema_document_gaps") else []))
     return "content-fp:" + hashlib.sha256("\n".join(keys).encode("utf-8")).hexdigest()[:16]
 
 
@@ -657,14 +709,15 @@ def plan_issues(report: dict[str, Any]) -> list[dict[str, Any]]:
     칸마다 이슈를 열지 않고 하나로 모은다(감시기 이슈가 쏟아지면 무시당한다 — 2026-10 교훈)."""
     c = report["counts"]
     base = {"key": "content", "source": "내용 완전성", "title": ISSUE_TITLE, "labels": list(ISSUE_LABELS)}
-    if c["truncated"] or c["unused"] or c.get("wl_violation_gaps"):
+    if c["truncated"] or c["unused"] or c.get("wl_violation_gaps") or c.get("ema_document_gaps"):
         fp = fingerprint(report)
         body = render_markdown(report) + "\n" + (f"실행: {report['run_url']}\n\n" if report.get("run_url") else "") + \
             "데이터는 고치지 않았다(감시는 읽기 전용). 의도된 칸이면 `content_completeness.py` 의 " \
             "`INTENTIONAL_CAPS`/`INTENTIONAL_UNSHOWN` 에 이유와 함께 올리고, 아니면 수집·표시를 고친다.\n\n" + f"<!-- {fp} -->\n"
         return [{**base, "action": "open", "body": body, "fingerprint": fp, "verdict": "found",
                  "comment": f"목록이 바뀌었습니다 — 잘림 {c['truncated']}칸 · 안 쓰이는 칸 {c['unused']}개"
-                            f" · 경고서한 위반항목 빈칸 {c.get('wl_violation_gaps', 0)}행"}]
+                            f" · 경고서한 위반항목 빈칸 {c.get('wl_violation_gaps', 0)}행"
+                            f" · EMA 문서 본문 빈칸 {c.get('ema_document_gaps', 0)}행"}]
     return [{**base, "action": "close", "verdict": "ok",
              "comment": "잘림·안 쓰이는 칸이 더 보이지 않아 자동으로 닫습니다."}]
 
@@ -679,6 +732,10 @@ def run(env: dict[str, str], *, today: date, run_url: str = "", session: Any = N
         raise StoreReadError("SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정")
     raw = list(fetch_table(base, key, "raw_signals", "raw_signal_id,document_id,source,collected_at,raw_json",
                            "raw_signal_id.asc", session))
+    # raw_json·row_json 은 text 열이라 JSON 경로 선택(->>)을 못 쓴다. EMA 행만 따로 읽는다.
+    from grm_common import SOURCE_EMA
+    ema_rows = list(fetch_table(base, key, "raw_signals", "raw_signal_id,document_id,source,official_url,raw_json,row_json",
+                                "raw_signal_id.asc", session, filters={"source": f"eq.{SOURCE_EMA}"}))
     finds = list(fetch_table(base, key, "findings", "finding_id,raw_signal_id,source,finding_text,finding_text_ko,detail_text,detail_text_ko",
                              "finding_id.asc", session))
     extra = {}
@@ -686,7 +743,8 @@ def run(env: dict[str, str], *, today: date, run_url: str = "", session: Any = N
         sel = ",".join([id_col] + ([] if src_col.startswith("=") else [src_col]) + list(cols))
         extra[table] = list(fetch_table(base, key, table, sel, f"{id_col}.asc", session))
     stats, ftext = collect_stats(raw, finds, extra)
-    return build_report(stats, ftext, today=today, run_url=run_url, wl_gaps=wl_violation_gaps(raw))
+    return build_report(stats, ftext, today=today, run_url=run_url, wl_gaps=wl_violation_gaps(raw),
+                        ema_gaps=ema_document_gaps(ema_rows))
 
 
 def main(argv: list[str] | None = None) -> int:

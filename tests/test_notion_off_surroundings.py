@@ -123,8 +123,13 @@ class WorkflowStepGateTest(unittest.TestCase):
         for name in ("Sync empty Notion 483 rows", "Sync Notion WL rows"):
             with self.subTest(step=name):
                 cond = _if_line(_step("grm-fda483-ocr-recovery.yml", name))
-                self.assertEqual(
-                    cond, "if: ${{ (github.event_name == 'schedule' || inputs.apply) && " + self.OFF + " }}")
+                if name == "Sync empty Notion 483 rows":
+                    # diag=dump-pdf 는 진단 전용 — apply 가 켜져 있어도 노션 동기화에 닿지 않는다.
+                    expected = ("if: ${{ (github.event_name == 'schedule' || (inputs.apply && inputs.diag != 'dump-pdf')) && "
+                                + self.OFF + " }}")
+                else:
+                    expected = "if: ${{ (github.event_name == 'schedule' || inputs.apply) && " + self.OFF + " }}"
+                self.assertEqual(cond, expected)
 
     def test_the_recovery_itself_is_not_gated(self):
         text = (WF / "grm-fda483-ocr-recovery.yml").read_text(encoding="utf-8")

@@ -167,6 +167,18 @@ FDA483_OCR_MAX_PAGES = 30        # OCR 비용 상한(문서당) — 현실 483 �
 # [CLI 판독 2026-10-28] 관찰 0건 문서의 전면 재판독(`_full_ocr_fallback`)은 tesseract **CLI** 로
 # 쪽을 읽는다. 쪽당 상한 — 멈춘 프로세스가 잡을 붙잡지 않게.
 FDA483_REOCR_PAGE_TIMEOUT = 120
+
+
+def _force_ocr_enabled() -> bool:
+    """[강제 판독 2026-11-25] `FDA483_FORCE_OCR` 가 켜져 있으면 텍스트층이 있어도 쪽 전체를 다시 판독한다.
+
+    실측(11-25 dump-text run 45574640061): 189485·191183 은 PDF 에 **깨진 글자층**이 이미 있어
+    ("Wh;le obsecv;\\;h;~puc setup") 400dpi 로 돌려도 그 글자층을 그대로 읽었다 — OCR 이 한 번도 돌지
+    않았다. 1회성 회수 워크플로(grm-fda483-ocr-recovery `force_ocr`)에서만 켠다. 일일 수집·예약 실행은
+    이 env 를 넣지 않으므로 동작이 바뀌지 않는다. 호출 시점에 읽어 테스트가 env 로 바꿀 수 있다."""
+    return (os.environ.get("FDA483_FORCE_OCR") or "").strip().lower() in ("1", "true", "yes", "on")
+
+
 # 483 마지막 장 정형 고지문 — 이 문구만 남은 텍스트층은 "본문 없음"과 같다(스캔 판정 신호).
 _FDA483_NOTICE_ANCHOR = "observations of objectionable conditions"
 # [2026-10-27] 식품 실사(FD&C Act **805**조) 양식의 고지문은 "conditions" 가 아니라
@@ -575,7 +587,9 @@ _FDA483_FOOTER_RE = re.compile(
     r"|PURSUANT\s+TO\s+SECTION\s+704\s*\(b\)"
     #   ③ OCR 이 Y 를 V 로 읽은 EMPLOYEE(S) — "EMPLOVEE(S" (위 EMP..OY 마커가 OY 를 못 찾는다).
     #      대문자 고정 — 산문의 "employees" 는 오탐하지 않는다.
-    r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
+    #      [11-25] EMP 뒤 L 을 소문자 l 로 읽은 "EMPlOVEE{S)"(189485 6쪽)도 잡는다 — 못 잡으면 뒤의
+    #      `INSPECTIONAL OBSERVATIONS` 가 쪽 경계 시작이 돼 서명자 블록이 상세 본문에 남았다.
+    r"|(?-i:EMP[A-Za-z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
     #   ④ [2026-10-27] 연속 기재 양식(Continuation Sheet) 마지막 줄 "*DATES OF INSPECTION
     #      1/21/2026(Wed), … <실사관 이름>" — 발행분 42관찰의 detail 끝에 실사일 나열과 서명자
     #      이름이 그대로 실렸다. 대문자 고정이고 괄호 없는 "DATES" 만 잡는다 — 페이지 머리말 칸
@@ -589,6 +603,28 @@ _FDA483_FOOTER_RE = re.compile(
     re.I,
 )
 _BOILERPLATE_RE = _FDA483_FOOTER_RE  # 후방호환 별칭(옛 이름 참조 안전)
+
+# [11-26] 맨 `SIGNATURE` 표지는 산문 표제와 겹친다 — "ELECTRONIC RECORDS AND ELECTRONIC SIGNATURES"(Part 11
+# 관찰 소제목, 실측 193583 EIR 본문). 관찰 안에 이 표제가 오면 첫 표지에서 자르는 규칙이 그 뒤 문장을 지웠다
+# (저장 단계 절단). 다른 양식 표지가 곁에 없는 **맨 SIGNATURE** 이고 뒤에 산문이 이어지면(산문 낱말 2개 초과,
+# 판독 변형 서명란과 같은 기준 `grm_findings.FDA483_SIGNER_TAIL_MAX_PROSE`) 자르는 자리로 보지 않는다.
+# 진짜 서명란은 EMPLOYEE(S)·SEE REVERSE·DATE ISSUED 같은 다른 표지가 함께 있거나 뒤가 이름·날짜뿐이라 그대로 잘린다.
+_BARE_SIGNATURE_RE = re.compile(r"(?-i:SIGNATURE|SIGJ)")
+_FOOTER_NEIGHBOR_WINDOW = 200
+
+
+def _footer_cut(text: str, pos: int = 0, endpos: int | None = None) -> "re.Match[str] | None":
+    """`_FDA483_FOOTER_RE.search` 와 같되, 산문 표제의 맨 SIGNATURE 는 건너뛴다(순수 함수)."""
+    end = len(text) if endpos is None else endpos
+    for m in _FDA483_FOOTER_RE.finditer(text, pos, end):
+        if not _BARE_SIGNATURE_RE.fullmatch(m.group(0)):
+            return m
+        lo, hi = max(0, m.start() - _FOOTER_NEIGHBOR_WINDOW), min(len(text), m.end() + _FOOTER_NEIGHBOR_WINDOW)
+        others = [x for x in _FDA483_FOOTER_RE.finditer(text, lo, hi) if not _BARE_SIGNATURE_RE.fullmatch(x.group(0))]
+        if gf.fda483_bare_signature_is_prose(text, m.end(), other_marker_near=bool(others), endpos=end):
+            continue
+        return m
+    return None
 # 위 EMPLOYEE 마커가 선행 고립 I/l 을 흡수하지 못하는 잔여 경우를 대비한 안전망(가벼운 후처리).
 # 실제 산문에서 문장이 고립된 단일 I/l 로 끝나는 경우는 사실상 없어(대명사 "I"는 문장 중간),
 # 오탐 위험 없이 절단 후 남은 낱자 잔재만 제거한다.
@@ -1128,6 +1164,8 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
     text, status = _read_fda483_pdf_text(data, max_chars, _extract_pdf_text)
+    if _force_ocr_enabled() and _ocr_enabled():
+        return _forced_full_ocr(data, text, status, max_chars)
     if not text or _extract_483_observations_from_text(text) or not _ocr_enabled():
         return text, status
     # [전면 OCR 폴백 2026-10-28] 본문을 읽었는데 관찰이 0건이다. 실측(findings 0건 483 79건
@@ -1370,6 +1408,43 @@ def _full_ocr_fallback(data: bytes, text: str, status: str, max_chars: int) -> t
         _OCR_HEALTH["reocr_adopted"] += 1
         return full_text, full_status
     return text, status
+
+
+def _forced_full_ocr(data: bytes, text: str, status: str, max_chars: int) -> tuple[str, str]:
+    """`FDA483_FORCE_OCR` 경로 — 텍스트층을 무시하고 모든 쪽을 다시 판독한다(CLI 우선, 없으면 내장 엔진).
+
+    채택 조건: 판독 결과가 비지 않고 관찰 수가 텍스트층보다 **줄지 않을 때**. 그렇지 않으면 원래 텍스트를
+    그대로 돌려준다(산출을 줄이지 않는다). 운영 행 교체 여부는 이 함수가 아니라 회수 도구의 가드
+    (named: 관찰 증가·표제 유지·본문 손실 차단, 공통: body_shrunk)가 그대로 정한다 — 강제 판독은 읽기만 바꾼다."""
+    _OCR_HEALTH["reocr_tried"] += 1
+    full_text, full_status = _reocr_483_pdf_text(data, max_chars)
+    if is_ocr_engine_unavailable(full_status):
+        full_text, full_status = _ocr_483_pdf_text_uncounted(data, max_chars, force_all=True)
+    full_text = normalize_pdf_ligatures(full_text)
+    _LAST_FORCED_READ.update(text=full_text, status=full_status, adopted=False)
+    if not full_text.strip():
+        return text, status
+    old_n = len(_extract_483_observations_from_text(text)) if text else 0
+    if len(_extract_483_observations_from_text(full_text)) < old_n:
+        return text, status
+    _record_ocr_outcome(full_status)
+    _OCR_HEALTH["reocr_adopted"] += 1
+    _LAST_FORCED_READ["adopted"] = True
+    return full_text, full_status
+
+
+# [11-26] 마지막 강제 판독 결과 — 채택되지 않아도 사람 확인 자료로 남기기 위해 진단 덤프(dump_texts)가 읽는다.
+# 수집·회수의 산출에는 쓰이지 않는다(읽기 전용 진단 상태). 191183: 강제 판독이 버려져 덤프에 글자층만 남았다.
+_LAST_FORCED_READ: dict[str, Any] = {"text": "", "status": "", "adopted": False}
+
+
+def reset_last_forced_read() -> None:
+    _LAST_FORCED_READ.update(text="", status="", adopted=False)
+
+
+def last_forced_read() -> dict[str, Any]:
+    """직전 `_forced_full_ocr` 의 판독 전문·상태·채택 여부(없으면 text="")."""
+    return dict(_LAST_FORCED_READ)
 
 
 # tesseract CLI(fast)는 단어 끝 `l` 을 `!` 로 읽는 일이 잦다 — "quality contro! unit",
@@ -1700,7 +1775,7 @@ def _skip_pagebreak_block(chunk: str) -> str:
     """관찰 표제 **직후**에 온 페이지 경계 양식 블록을 건너뛴 본문을 돌려준다(순수 함수).
 
     푸터가 표제 바로 뒤가 아니면(= 관찰 끝의 정상 푸터) 입력을 그대로 돌려준다."""
-    m = _FDA483_FOOTER_RE.search(chunk or "")
+    m = _footer_cut(chunk or "")
     if not m or m.start() > _PAGEBREAK_FOOTER_HEAD:
         return chunk
     offset = 0
@@ -1716,7 +1791,7 @@ def _skip_pagebreak_block(chunk: str) -> str:
 def _clean_observation_chunk(chunk: str) -> str:
     """Observation 본문 chunk 에서 페이지 하단 서명/양식 푸터 블록을 제거(가장 이른 마커에서 절단)."""
     text = re.sub(r"[\r\f]+", "\n", chunk or "")
-    m = _FDA483_FOOTER_RE.search(text)
+    m = _footer_cut(text)
     if m:
         text = text[:m.start()]
     text = _TRAILING_STRAY_LETTER_RE.sub("", text)
@@ -1730,7 +1805,7 @@ def _clean_observation_detail(detail: str) -> str:
     (Mixlab Obs2·5)은 deficiency 만 표시하고 detail 은 생략(garbage 미노출). 순수 함수.
     (재추출뿐 아니라 이미 저장된 detail 문자열 재청소(backfill)에도 그대로 쓴다.)"""
     text = re.sub(r"\s+", " ", detail or "").strip()
-    m = _FDA483_FOOTER_RE.search(text)
+    m = _footer_cut(text)
     if m:
         # 주의: 여기서 `.` 를 rstrip 대상에서 제외한다(구버전은 " :-.\t" 로 마침표까지 잘라
         # 정상 문장의 종결 마침표까지 날리는 부작용이 있었다 — 2026-07-12 hardening 에서 수정).
@@ -1853,6 +1928,8 @@ _INSPECTOR_REDACTION_RE = re.compile(r"\(\s*b\s*\)\s*\(\s*6\s*\)|Redacted\s*B6",
 # 서명자 여럿이 그 뒤를 잇는 구조라, 뒤쪽 서명자도 200자 룩비하인드 안에 마커가 든다.
 _INSPECTOR_DATE_RE = re.compile(r"\d{1,2}/\d{1,2}/\d{2,4}")
 _INSPECTOR_DATE_LOOKAHEAD = 60
+# 저장 전문 195241: 첫 서명 이름이 SEE REVERSE 앞에 있고 날짜가 OCR로 깨졌다.
+_INSPECTOR_REVERSE_LINE_RE = re.compile(r"\n[ \t]*SEE[ \t]+REVERSE[ \t]*(?=\r?\n)")
 # 교차 확증 (b) — 이름 앞 200자 이내 서명블록 마커. 대문자 고정(re.I 미사용) — 산문의 소문자
 # "signature"/"employee" 언급을 오탐하지 않는다. EMP…OY 는 `_FDA483_FOOTER_RE`와 동형(OCR
 # 변형 EMPLOYEE 흡수).
@@ -2042,14 +2119,17 @@ def _valid_inspector_name(name: str, *, allow_caps: bool = False, max_tokens: in
     return True
 
 
-def _inspector_name_in_text(name: str, text: str) -> bool:
+def _inspector_name_in_text(name: str, text: str, *, exact: bool = False) -> bool:
     """안전장치 — 이름이 그 문서 전문 안에 **글자 그대로** 있는가.
 
     토큰은 철자·대소문자·마침표까지 원문과 같아야 하고, 토큰 사이만 공백 문자(띄어쓰기·줄바꿈)
     차이를 허용한다(서명 칸에서 이름이 줄바꿈으로 갈라진 `Robert J.\\nHam` 을 위해서). 앞뒤는 글자
     경계여야 한다(`Shafigq` 안의 `Shafig` 는 일치로 보지 않는다).
+    exact=True는 검증된 JSON 입력에 쓰며 공백까지 같은 부분 문자열만 받는다.
     이 검사를 통과하지 못한 이름은 어떤 경로로 만들어졌든 내보내지 않는다 — 다른 문서·프로파일에서
     빌려오거나 철자를 고쳐 쓰는 경로가 생겨도 여기서 막힌다."""
+    if exact:
+        return bool(name and name.strip()) and name in text
     toks = [t for t in (name or "").split(" ") if t]
     if not toks or not text:
         return False
@@ -2102,10 +2182,14 @@ INSPECTORS_PARSER_LIMIT = "parser-limit"            # 서명란은 있으나 이
 
 
 def _inspector_confirmed(body: str, name_start: int, title_end: int) -> bool:
-    """서명블록 문맥 교차 확증 — 이름 앞 200자 안 서명 마커 또는 직함 뒤 60자 안 날짜."""
+    """앞의 서명 마커, 뒤의 날짜 또는 독립된 서명 줄 뒤 SEE REVERSE로 확인한다."""
     before = body[max(0, name_start - _INSPECTOR_MARKER_LOOKBEHIND):name_start]
     after = body[title_end:title_end + _INSPECTOR_DATE_LOOKAHEAD]
-    return bool(_INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after))
+    if _INSPECTOR_MARKER_RE.search(before) or _INSPECTOR_DATE_RE.search(after):
+        return True
+    line_start = body.rfind("\n", 0, name_start) + 1
+    return (not body[line_start:name_start].strip() and not after.partition("\n")[0].strip()
+            and bool(_INSPECTOR_REVERSE_LINE_RE.search(after)))
 
 
 def _inspector_strip_run(run: str) -> tuple[str, int]:
@@ -2296,7 +2380,7 @@ def _signer_cut(text: str, start: int = 0, end: int | None = None) -> int | None
 def _footer_start(text: str, lo: int, hi: int) -> int | None:
     """쪽 번호(hi) 앞 서명란 블록의 시작. 마커가 하나도 없으면 None(쪽 경계로 보지 않는다)."""
     cands: list[int] = []
-    m = _FDA483_FOOTER_RE.search(text, lo, hi)
+    m = _footer_cut(text, lo, hi)
     if m:
         cands.append(m.start())
     s = _signer_cut(text, lo, hi)
@@ -2504,8 +2588,13 @@ def _is_prose_line(line: str) -> bool:
     return not (_SIGNER_TITLE_RE.search(s) or _FOOTER_MARK_RE.search(s))
 
 
-def _footer_block_resume(text: str, fs: int, before: str, est_hint: str) -> int | None:
-    """서명란 시작(fs) 뒤 본문 재개 줄의 시작 위치. 확신 조건을 못 넘으면 None."""
+def _footer_block_resume(text: str, fs: int, before: str, est_hint: str,
+                         mark_from: int | None = None) -> int | None:
+    """서명란 시작(fs) 뒤 본문 재개 줄의 시작 위치. 확신 조건을 못 넘으면 None.
+
+    마커 종류는 `mark_from`(서명란 블록 맨 윗줄, 기본 fs)부터 센다 — [11-26 191183] 첫 잘림 마커가
+    `FORM FDA` 이고 그 위 줄들(`SEE` / 이름 / `REVERSE OF` / 이름 / `THIS PAGE`)이 서명란인 쪽에서,
+    fs 부터만 세면 마커가 1종뿐이라 잇지 못하고 관찰이 그 쪽 끝에서 잘렸다."""
     end = min(len(text), fs + _FOOTER_JOIN_WINDOW)
     p = text.find("\n", fs)
     while p != -1 and p < end:
@@ -2515,7 +2604,8 @@ def _footer_block_resume(text: str, fs: int, before: str, est_hint: str) -> int 
             return None                              # 양식 뒷면 고지·회신 편지·다음 관찰 표제 — 관찰은 여기서 끝났다
         if _is_prose_line(line) and not _is_header_value_line(line, est_hint) \
                 and not _looks_like_est_value(line, est_hint):
-            marks = {m.group(0).upper()[:5] for m in _FOOTER_MARK_RE.finditer(text, fs, p)}
+            lo = fs if mark_from is None else min(mark_from, fs)
+            marks = {m.group(0).upper()[:5] for m in _FOOTER_MARK_RE.finditer(text, lo, p)}
             if len(marks) < 2 or not before.strip():
                 return None
             # 대문자로 시작하는 새 문장은 받지 않는다 — 앵커를 잃은 **다음 관찰 표제**(실측 90268
@@ -2572,7 +2662,7 @@ def _join_footer_pages(seg: str, est_hint: str = "") -> str:
     out: list[str] = []
     cursor = 0
     while True:
-        m = _FDA483_FOOTER_RE.search(seg, cursor)
+        m = _footer_cut(seg, cursor)
         if not m:
             break
         fs = m.start()
@@ -2588,7 +2678,7 @@ def _join_footer_pages(seg: str, est_hint: str = "") -> str:
             ls = _signer_lines_start(seg, max(cursor, fs - _PAGE_BLOCK_WINDOW), ls)
         start = _header_block_start(seg, max(cursor, fs - _PAGE_BLOCK_WINDOW), ls)
         before = seg[cursor:start].rstrip()
-        resume = _footer_block_resume(seg, fs, before, est_hint)
+        resume = _footer_block_resume(seg, fs, before, est_hint, mark_from=ls)
         if resume is None:
             break
         out.append(seg[cursor:start])
@@ -2664,6 +2754,10 @@ def trim_detail_tail(detail: str) -> str:
     if m:
         nm = _SIGNER_NAME_BEFORE_RE.search(d, max(0, m.start() - 60), m.start())
         d = d[:nm.start() if nm else m.start()].rstrip(" :-\t")
+    # [11-26] 판독 변형 서명란(`EMF'I..OYEE(S) SIGNA T…`) — 뒤에 산문이 없을 때만 걷는다(발행 게이트와 같은 함수).
+    variant = gf.fda483_signer_variant_tail_start(d)
+    if variant is not None:
+        d = d[:variant].rstrip(" :-\t")
     return d
 
 
@@ -2923,8 +3017,8 @@ def _extract_483_observations_from_text(
     scoped = _scope_to_observation_list(body)
     primary = _observations_from_anchors(
         _cut_at_annotations(scoped),
-        lambda s: _with_glyph_first_anchor(
-            s, _select_observation_anchors(s, list(_OBS_RE.finditer(s)))),
+        lambda s: _with_gap_heading_anchors(s, _with_glyph_first_anchor(
+            s, _select_observation_anchors(s, list(_OBS_RE.finditer(s))))),
         hints,
         gate=_is_publishable_deficiency,
         fragment_heads=True,
@@ -2954,6 +3048,44 @@ def _with_glyph_first_anchor(body: str, anchors: list[re.Match[str]]) -> list[re
     if glyph is None:
         return anchors
     return [glyph, *anchors]
+
+
+# [11-26 191183] 번호가 건너뛴 자리(1 → 3)의 깨진 표제 줄 — `OBSERVATIO~ 2`. 정상 앵커(`_OBS_RE`)가 못 읽어
+# 관찰 2 가 관찰 1 상세에 통째로 붙거나(쪽 잇기 뒤) 사라졌다(쪽 끝 절단 때). **줄 전체가 표제뿐**인 줄만
+# 받는다 — 문장 속 상호참조(`refer to Observation 2.`)는 같은 줄에 산문이 있어 걸리지 않는다.
+_OBS_GAP_HEADING_RE = re.compile(
+    r"(?m)^[ \t]*O\s?B\s?S\s?E\s?R\s?V\s?A\s?T\s?I\S{0,3}?[ \t]*[#.:\-]?[ \t]*(\d{1,2})[ \t]*[.:]?[ \t]*$")
+
+
+_GAP_XREF_BEFORE_RE = re.compile(r"\b(?:refer\s+to|see|per|in|under|and|of)\s*[\r\n]+\s*$", re.I)
+
+
+def _with_gap_heading_anchors(body: str, anchors: list[re.Match[str]]) -> list[re.Match[str]]:
+    """앵커 번호가 건너뛴 구간(n → m, m-n ≥ 2)에서 빠진 번호의 깨진 표제 줄을 찾아 끼운다(순수 함수).
+
+    빠진 번호가 아닌 줄·구간 밖 줄은 보지 않으므로 번호가 이어지는 문서의 출력은 바뀌지 않는다."""
+    out: list[re.Match[str]] = []
+    for i, a in enumerate(anchors):
+        out.append(a)
+        if i + 1 >= len(anchors):
+            break
+        b = anchors[i + 1]
+        try:
+            lo_n, hi_n = int(a.group(1)), int(b.group(1))
+        except (TypeError, ValueError):
+            continue
+        if hi_n - lo_n < 2:
+            continue
+        want = lo_n + 1
+        for g in _OBS_GAP_HEADING_RE.finditer(body, a.end(), b.start()):
+            if _GAP_XREF_BEFORE_RE.search(body, max(a.end(), g.start() - 40), g.start()):
+                continue                    # `…please refer to⏎OBSERVATION 2⏎` — 줄을 넘긴 상호참조
+            if int(g.group(1)) == want:
+                out.append(g)
+                want += 1
+                if want >= hi_n:
+                    break
+    return out
 
 
 def _scope_to_observation_list(body: str) -> str:

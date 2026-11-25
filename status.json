@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24T23:58:05Z",
+ "generated_at": "2026-11-25T00:26:45Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45513293652,
+    "databaseId": 45517200242,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-24T23:50:26Z",
-    "updatedAt": "2026-11-24T23:57:41Z",
+    "createdAt": "2026-11-25T00:19:35Z",
+    "updatedAt": "2026-11-25T00:26:25Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1921 from MINHOYEOM/codex/drop-count-asserts",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45513293652"
+    "displayTitle": "Merge pull request #1931 from MINHOYEOM/codex/fix-tidy-date-re",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45517200242"
    },
    {
-    "databaseId": 45503883012,
+    "databaseId": 45515309235,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-24T22:45:28Z",
-    "updatedAt": "2026-11-24T23:10:45Z",
-    "headBranch": "codex/fix-tidy-date-re",
-    "displayTitle": "fix(web): _TIDY_DATE_RE 의 \\b 가 0x08 로 박혀 정규식이 안 맞던 결함",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45503883012"
+    "createdAt": "2026-11-25T00:05:32Z",
+    "updatedAt": "2026-11-25T00:12:58Z",
+    "headBranch": "claude/published-names-redact",
+    "displayTitle": "fix(privacy): 공개 발행본 14장 개인 실명 정리 + 발행 사본 실명 게이트(기존=경고·새 호=실패) — #1916 위",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45515309235"
    },
    {
-    "databaseId": 45503872818,
+    "databaseId": 45515307354,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-24T22:45:24Z",
-    "updatedAt": "2026-11-24T23:34:37Z",
-    "headBranch": "codex/fix-tidy-date-re",
-    "displayTitle": "test(web): 골든 brief_2026-06-26 재동결 — 날짜 정규식 복원으로 중복 '실사일' 한 줄이 숨겨짐(1줄)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45503872818"
+    "createdAt": "2026-11-25T00:05:31Z",
+    "updatedAt": "2026-11-25T00:13:54Z",
+    "headBranch": "claude/published-names-redact",
+    "displayTitle": "fix(privacy): 11-23 deep source_text fda483-196407 수신인 머리글 'Lu Yun' →…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45515307354"
    },
    {
-    "databaseId": 45499701328,
+    "databaseId": 45514829859,
     "status": "completed",
-    "conclusion": "success",
+    "conclusion": "cancelled",
     "event": "pull_request",
-    "createdAt": "2026-11-24T22:18:36Z",
-    "updatedAt": "2026-11-24T22:28:14Z",
-    "headBranch": "codex/string-lint",
-    "displayTitle": "test: 정규식 raw 누락·0x08·stdout 인코딩 정적 검사",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45499701328"
+    "createdAt": "2026-11-25T00:02:01Z",
+    "updatedAt": "2026-11-25T00:05:48Z",
+    "headBranch": "claude/published-names-redact",
+    "displayTitle": "fix(privacy): 공개 발행본 14장 개인 실명 정리 + 발행 사본 실명 게이트(기존=경고·새 호=실패) — #1916 위",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45514829859"
    },
    {
-    "databaseId": 45499647459,
+    "databaseId": 45514816262,
     "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-24T22:18:16Z",
-    "updatedAt": "2026-11-24T22:48:50Z",
-    "headBranch": "codex/wl-pair-restore-dry",
-    "displayTitle": "feat(wl): 본문만 바뀐 짝 findings restore 계획 도구 (기본 dry)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45499647459"
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-25T00:01:55Z",
+    "updatedAt": "2026-11-25T00:05:47Z",
+    "headBranch": "claude/published-names-redact",
+    "displayTitle": "fix(privacy): 공개 발행본 14장 개인 실명 → 역할 표기 + 발행 사본 실명 게이트(기존=경고·새 호=실패)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45514816262"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45518107921,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T00:26:33Z",
+    "updatedAt": "2026-11-25T00:26:35Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45518107921"
+   },
+   {
     "databaseId": 45514271326,
     "status": "completed",
     "conclusion": "skipped",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45349928070"
-   },
-   {
-    "databaseId": 45344085997,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-24T06:55:42Z",
-    "updatedAt": "2026-11-24T06:55:49Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45344085997"
    }
   ],
   "grm-findings-translate-apply.yml": [

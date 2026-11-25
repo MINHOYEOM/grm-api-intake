@@ -1,0 +1,96 @@
+name: GRM Blank Excerpts Backfill
+
+# [빈칸 백필 · 2026-11-25] 수집 완전성 점검(11-22) 9-3 — WHOPIR 보고서·EMA/ECA 발췌·MHRA 경보 본문이
+# 빈 채로 굳은 행(주로 노션 이관 백필 R1)을 원문 재방문으로 채운다. backfill_blank_excerpts.py 를 부른다.
+# 기본은 dry-run(apply=false) — 원문은 읽되 DB 에 쓰지 않는다. 쓰기는 raw_versioning.replace_raw(버전 기록)로만.
+# 요청 간격은 도구 안의 수집기 상수(WHO 5초·ECA/EMA·MHRA 수집기 기본)를 따른다. 예약 실행 없음(수동 전용).
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: '실제로 쓴다(기본 false = dry-run)'
+        type: boolean
+        default: false
+      sources:
+        description: '소스(쉼표 구분: who,ema,eca,mhra). 비우면 네 소스 전부'
+        type: string
+        default: ''
+      ingested_since:
+        description: '적재일 하한(YYYY-MM-DD). 비우면 전 기간'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blank-excerpts-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: Backfill blank excerpts
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install OCR engine (tesseract)
+        uses: ./.github/actions/setup-ocr
+        with:
+          required: 'false'
+
+      - name: Backfill (dry-run unless apply=true)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_APPLY: ${{ inputs.apply }}
+          IN_SOURCES: ${{ inputs.sources }}
+          IN_SINCE: ${{ inputs.ingested_since }}
+        run: |
+          set -uo pipefail
+          args=(--output blank_excerpts_report.json)
+          if [ -n "${IN_SINCE:-}" ]; then
+            if ! printf '%s' "$IN_SINCE" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+              echo "::error::ingested_since 는 YYYY-MM-DD"; exit 2
+            fi
+            args+=(--ingested-since "$IN_SINCE")
+          fi
+          if [ -n "${IN_SOURCES:-}" ]; then
+            for s in ${IN_SOURCES//,/ }; do
+              case "$s" in who|ema|eca|mhra) args+=(--source "$s") ;; *) echo "::error::알 수 없는 소스: $s"; exit 2 ;; esac
+            done
+          fi
+          if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
+          python backfill_blank_excerpts.py "${args[@]}" > /dev/null
+          rc=$?
+          {
+            echo "### Blank excerpts backfill"
+            echo "- apply: \`${IN_APPLY:-false}\` · sources: \`${IN_SOURCES:-전부}\` · ingested_since: \`${IN_SINCE:-전 기간}\` · exit: \`${rc}\` (1 = 못 채운 행 있음)"
+            echo '```json'
+            python -c "import json; d=json.load(open('blank_excerpts_report.json', encoding='utf-8')); print(json.dumps(d['summary'], ensure_ascii=False, indent=1))" 2>/dev/null || echo '(리포트 없음)'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          # 1 = 남은 빈칸이 있다는 신호(리포트로 확인) — 실행 실패로 보지 않는다.
+          if [ "$rc" -ge 2 ]; then exit "$rc"; fi
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: blank-excerpts-report
+          path: blank_excerpts_report.json
+          if-no-files-found: ignore
+          retention-days: 30

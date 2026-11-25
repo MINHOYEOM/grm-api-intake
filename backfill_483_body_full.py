@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from dataclasses import asdict, dataclass, field
@@ -72,6 +73,11 @@ class Report:
     conflict: int = 0
     errors: list[str] = field(default_factory=list)
     examples: dict[str, list[str]] = field(default_factory=dict)
+    rows: list[dict[str, Any]] = field(default_factory=list)   # 행별 결과(문서·결과·옛→새 전문 길이)
+
+    def row(self, doc: str, outcome: str, old_chars: int = 0, new_chars: int = 0, via: str = "") -> None:
+        self.rows.append({"document_id": doc, "outcome": outcome, "old_chars": old_chars,
+                          "new_chars": new_chars, "via": via})
 
     def note(self, key: str, doc_id: str) -> None:
         bucket = self.examples.setdefault(key, [])
@@ -91,12 +97,34 @@ def _loads(text: Any) -> dict[str, Any]:
 
 # ── 대상 ─────────────────────────────────────────────────────────────────────
 
-def fetch_candidates(base_url: str, service_key: str, since: str) -> list[dict[str, Any]]:
+def fetch_candidates(base_url: str, service_key: str, since: str,
+                     doc_ids: list[str] | None = None) -> list[dict[str, Any]]:
+    """doc_ids 가 있으면 그 문서만 본다(게시일 하한 무시) — 완전성 점검 목록처럼 정해진 행만 다시 돌릴 때."""
+    params = {"source": f"eq.{SOURCE_FDA_483}", "raw_json": f"not.like.*{BODY_KEY}*"}
+    if doc_ids:
+        params["document_id"] = "in.(" + ",".join(doc_ids) + ")"
+    else:
+        params["published_date"] = f"gte.{since}"
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals", select=SELECT_COLUMNS, page_size=200,
-        order="raw_signal_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_483}", "published_date": f"gte.{since}",
-                      "raw_json": f"not.like.*{BODY_KEY}*"})
+        order="raw_signal_id.asc", extra_params=params)
+
+
+_DOC_ID_RE = re.compile(r"^fda483-[0-9]+$")
+
+
+def parse_doc_ids(value: str) -> list[str]:
+    """쉼표·공백 구분 목록 → document_id 목록. 숫자만 주면 `fda483-` 를 붙인다. 형식이 틀리면 ValueError."""
+    out: list[str] = []
+    for token in re.split(r"[\s,]+", value or ""):
+        if not token:
+            continue
+        doc = token if token.startswith("fda483-") else f"fda483-{token}"
+        if not _DOC_ID_RE.match(doc):
+            raise ValueError(f"document_id 형식이 아니다: {token!r}")
+        if doc not in out:
+            out.append(doc)
+    return out
 
 
 def fetch_ledger_ids(base_url: str, service_key: str) -> set[str]:
@@ -117,9 +145,11 @@ def select_targets(rows: list[dict[str, Any]], ledger: set[str], rep: Report) ->
         doc = str(row.get("document_id") or "")
         if str(raw.get("fda483_text_status") or "") == OUT_OF_SCOPE:
             rep.skipped_out_of_scope += 1
+            rep.row(doc, "skipped_out_of_scope")
             continue
         if doc in ledger:
             rep.skipped_ledger += 1
+            rep.row(doc, "skipped_ledger")
             continue
         out.append(row)
     rep.targets = len(out)
@@ -186,6 +216,7 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
         doc = str(row.get("document_id") or "")
         raw = _loads(row.get("raw_json"))
         body, via = "", ""
+        old_chars = len(str(raw.get(BODY_KEY) or ""))
         page_id = notion_index.get(doc, "")
         if page_id:
             sleeper(_NOTION_SLEEP_S)
@@ -201,6 +232,7 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
             rep.note("notion_missing", doc)
             if not (apply or probe_pdf):
                 rep.pdf_not_probed += 1
+                rep.row(doc, "pdf_not_probed", old_chars)
                 continue
             sleeper(_PDF_DELAY_S)
             try:
@@ -208,26 +240,32 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
             except Exception as exc:  # noqa: BLE001
                 rep.pdf_failed += 1
                 rep.errors.append(f"pdf({doc}):{type(exc).__name__}")
+                rep.row(doc, f"pdf_failed:{type(exc).__name__}", old_chars)
                 continue
             if status == FDA_BOT_BLOCK:
                 rep.pdf_failed += 1
                 rep.errors.append(f"pdf({doc}):{FDA_BOT_BLOCK}")
+                rep.row(doc, FDA_BOT_BLOCK, old_chars)
                 break
             if not body:
                 if status == "no-observations":
                     rep.pdf_no_observations += 1
                     rep.note("pdf_no_observations", doc)
+                    rep.row(doc, "pdf_no_observations", old_chars)
                 else:
                     rep.pdf_failed += 1
                     rep.note(f"pdf_failed:{status}", doc)
+                    rep.row(doc, f"pdf_failed:{status}", old_chars)
                 continue
             via = "pdf"
             rep.via_pdf += 1
         if body_shrunk(raw.get(BODY_KEY), body):
             rep.shrunk += 1
             rep.note("shrunk", doc)
+            rep.row(doc, "shrunk", old_chars, len(body), via)
             continue
         if not apply:
+            rep.row(doc, "would_apply", old_chars, len(body), via)
             continue
         record, _sha = new_record(row, body)
         new_names = (_loads(record["raw_json"]).get(INSPECTORS_KEY) or []) \
@@ -238,6 +276,7 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
                          record=record, change_kind="repair", changed_by=CHANGED_BY,
                          diff_summary={"added": added, "via": via, "chars": len(body)})
         status = str(result.get("status") or "error")
+        rep.row(doc, status, old_chars, len(body), via)
         if status == "applied":
             rep.applied += 1
             if new_names:
@@ -270,7 +309,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--since", default="2026-06-01", help="게시일 하한(YYYY-MM-DD)")
     ap.add_argument("--limit", type=int, default=0, help="처리할 최대 대상 수(0=전부)")
     ap.add_argument("--report", default="fda483_body_full_report.json")
+    ap.add_argument("--doc-ids", default="",
+                    help="이 document_id 들만 처리(쉼표 구분, 숫자만 써도 됨). 주면 --since 는 무시")
     args = ap.parse_args(argv)
+    try:
+        doc_ids = parse_doc_ids(args.doc_ids)
+    except ValueError as exc:
+        ap.error(str(exc))
 
     base_url = fsa._normalize_base_url(os.environ.get("SUPABASE_URL", "").strip())
     service_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
@@ -280,7 +325,7 @@ def main(argv: list[str] | None = None) -> int:
         log("ERROR", "SUPABASE_URL(https)·SUPABASE_SERVICE_ROLE_KEY·NOTION_TOKEN·NOTION_DATABASE_ID 가 필요하다")
         return 2
 
-    rows = fetch_candidates(base_url, service_key, args.since)
+    rows = fetch_candidates(base_url, service_key, args.since, doc_ids)
     if args.limit:
         rows = rows[:args.limit]
     ledger = fetch_ledger_ids(base_url, service_key)

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T19:26:50Z",
+ "generated_at": "2026-11-25T20:02:06Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45689606516,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T19:53:28Z",
+    "updatedAt": "2026-11-25T20:01:34Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1975 from MINHOYEOM/claude/home-keypoint-spacing-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45689606516"
+   },
+   {
     "databaseId": 45683887653,
     "status": "completed",
     "conclusion": "success",
@@ -271,17 +282,6 @@
     "headBranch": "codex/ko-country-names-40",
     "displayTitle": "feat(국가명): 한국어 국가명 표 40개국 확장 + 용어 매칭 경계 강화(접두어 오매칭 차단)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45656679708"
-   },
-   {
-    "databaseId": 45655323530,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T16:34:23Z",
-    "updatedAt": "2026-11-25T16:42:12Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1835 from MINHOYEOM/automation/glossary-cases-aut…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45655323530"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45690937320,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T20:01:41Z",
+    "updatedAt": "2026-11-25T20:01:53Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45690937320"
+   },
+   {
     "databaseId": 45685214287,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45646869838"
-   },
-   {
-    "databaseId": 45637047680,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T14:42:50Z",
-    "updatedAt": "2026-11-25T14:43:02Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45637047680"
    }
   ],
   "grm-findings-translate-apply.yml": [

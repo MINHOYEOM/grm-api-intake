@@ -196,10 +196,44 @@ def _check_strict(en: str, ko: str, dropped: Any = None, kept: Any = None) -> li
     return problems
 
 
-def check(en: str, ko: str, *, strict: bool = False, ocr_dropped: Any = None, kept_tokens: Any = None) -> list[str]:
-    """어긴 규칙 목록(빈 목록 = 통과). 순수 함수. strict=True 는 11-15 읽기 좋음 규칙까지 본다."""
+# [사람 PDF 확인 2026-11-25] 영문 detail_text 가 판독 불가 수준(손글씨·깨진 글자층)인 행은 사람이 FDA 원본 PDF 를
+# 보고 국문을 쓴다. 그때 국문 숫자·코드는 원본과 맞고 OCR 영문과는 어긋나므로, 확인 기록이 온전한 행만
+# **숫자·코드·로트 대조**를 면제한다. 한글·한자·가림 개수·길이·읽기 좋음 검사는 그대로 본다.
+# 기록 = {"by": 확인한 사람, "at": "YYYY-MM-DD", "source": "https://www.fda.gov/media/<번호>/download", "pages": "2-3"}
+# — 배치 파일(git)에 그대로 남아 누가 언제 어느 쪽을 봤는지가 감사 기록이 된다. 표시가 없는 행은 종전대로 검사.
+PDF_VERIFIED_EXEMPT = ("numbers_missing:", "codes_missing:", "lot_missing:")
+_PDF_SOURCE_RE = re.compile(r"https://www\.fda\.gov/media/\d+/download")
+_ISO_DATE_RE = re.compile(r"20\d\d-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])")
+
+
+def pdf_verified_problem(rec: Any) -> str:
+    """pdf_verified 기록의 형식 오류 사유(없으면 ""). 순수 함수."""
+    if not isinstance(rec, dict):
+        return "not_a_dict"
+    if not str(rec.get("by") or "").strip():
+        return "by"
+    if not _ISO_DATE_RE.fullmatch(str(rec.get("at") or "")):
+        return "at"
+    if not _PDF_SOURCE_RE.fullmatch(str(rec.get("source") or "")):
+        return "source"
+    if not str(rec.get("pages") or "").strip():
+        return "pages"
+    return ""
+
+
+def check(en: str, ko: str, *, strict: bool = False, ocr_dropped: Any = None, kept_tokens: Any = None,
+          pdf_verified: Any = None) -> list[str]:
+    """어긴 규칙 목록(빈 목록 = 통과). 순수 함수. strict=True 는 11-15 읽기 좋음 규칙까지 본다.
+
+    pdf_verified: 사람이 원본 PDF 로 확인한 기록(위 주석) — 온전하면 숫자·코드·로트 대조만 면제, 형식이 틀리면 실격."""
     if strict:
-        return _check_strict(str(en or ""), str(ko or ""), ocr_dropped, kept_tokens)
+        probs = _check_strict(str(en or ""), str(ko or ""), ocr_dropped, kept_tokens)
+        if pdf_verified is None:
+            return probs
+        why = pdf_verified_problem(pdf_verified)
+        if why:
+            return probs + ["pdf_verified_invalid:" + why]
+        return [p for p in probs if not p.startswith(PDF_VERIFIED_EXEMPT)]
     problems: list[str] = []
     en, ko = str(en or ""), str(ko or "")
     if not _HANGUL_RE.search(ko):
@@ -226,7 +260,8 @@ def check_items(items: list[dict[str, Any]], *, strict: bool = False) -> dict[st
     out: dict[str, list[str]] = {}
     for it in items:
         probs = check(it.get("detail_text", ""), it.get("detail_text_ko", ""), strict=strict,
-                      ocr_dropped=it.get("ocr_dropped"), kept_tokens=it.get("kept_tokens"))
+                      ocr_dropped=it.get("ocr_dropped"), kept_tokens=it.get("kept_tokens"),
+                      pdf_verified=it.get("pdf_verified"))
         if probs:
             out[str(it.get("finding_id"))] = probs
     return out

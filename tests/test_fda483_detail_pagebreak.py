@@ -331,3 +331,30 @@ class SignerVariantTailOnly1126Test(unittest.TestCase):
     def test_prose_employee_word_is_not_a_marker(self):
         self.assertIsNone(c.gf.fda483_signer_variant_tail_start(
             "the employee(s) were observed without gowns in the aseptic core."))
+
+
+class BareSignatureProseHeading1126Test(unittest.TestCase):
+    """[11-26] 관찰 안의 산문 표제 "ELECTRONIC RECORDS AND ELECTRONIC SIGNATURES"(Part 11) 에서 자르지 않는다.
+
+    종전엔 맨 `SIGNATURE` 표지가 첫 절단점이 돼 표제 뒤 문장이 저장 단계에서 지워졌다(합성 재현). 운영 저장분은
+    0건(193583 은 표제가 EIR 본문에 있어 관찰 밖)이지만 Part 11 관찰에서 언제든 생기는 꼴이라 막아 둔다."""
+
+    TEXT = ("OBSERVATION 1\nElectronic records were not adequately controlled.\n"
+            "Specifically, audit trails were not reviewed for the chromatography system.\n"
+            "ELECTRONIC RECORDS AND ELECTRONIC SIGNATURES\n"
+            "Shared login credentials were used by four analysts and the system lacked unique user accounts.\n"
+            "OBSERVATION 2\nWritten procedures were not followed.\nSpecifically, the cleaning log was incomplete.\n")
+
+    def test_heading_and_following_sentence_are_kept(self):
+        obs = c._extract_483_observations_from_text(self.TEXT, {})
+        self.assertEqual([o["number"] for o in obs], ["1", "2"])
+        self.assertTrue(obs[0]["detail"].endswith("the system lacked unique user accounts."), obs[0]["detail"])
+
+    def test_real_bare_signature_signer_line_still_cuts(self):
+        d = c._clean_observation_chunk("The batch record was incomplete. SIGNATURE | Velmora Quist 07/02/2025")
+        self.assertNotIn("Velmora", d)
+
+    def test_signature_next_to_other_markers_still_cuts(self):
+        d = c._clean_observation_chunk(
+            "The log was incomplete. EMPLOYEE(S) SIGNATURE DATE ISSUED the reviewer then signed the record")
+        self.assertEqual(d, "The log was incomplete.")

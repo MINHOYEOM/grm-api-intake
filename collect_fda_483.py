@@ -603,6 +603,30 @@ _FDA483_FOOTER_RE = re.compile(
     re.I,
 )
 _BOILERPLATE_RE = _FDA483_FOOTER_RE  # 후방호환 별칭(옛 이름 참조 안전)
+
+# [11-26] 맨 `SIGNATURE` 표지는 산문 표제와 겹친다 — "ELECTRONIC RECORDS AND ELECTRONIC SIGNATURES"(Part 11
+# 관찰 소제목, 실측 193583 EIR 본문). 관찰 안에 이 표제가 오면 첫 표지에서 자르는 규칙이 그 뒤 문장을 지웠다
+# (저장 단계 절단). 다른 양식 표지가 곁에 없는 **맨 SIGNATURE** 이고 뒤에 산문이 이어지면(산문 낱말 2개 초과,
+# 판독 변형 서명란과 같은 기준 `grm_findings.FDA483_SIGNER_TAIL_MAX_PROSE`) 자르는 자리로 보지 않는다.
+# 진짜 서명란은 EMPLOYEE(S)·SEE REVERSE·DATE ISSUED 같은 다른 표지가 함께 있거나 뒤가 이름·날짜뿐이라 그대로 잘린다.
+_BARE_SIGNATURE_RE = re.compile(r"(?-i:SIGNATURE|SIGJ)")
+_FOOTER_NEIGHBOR_WINDOW = 200
+_FOOTER_PROSE_WINDOW = 400
+
+
+def _footer_cut(text: str, pos: int = 0, endpos: int | None = None) -> "re.Match[str] | None":
+    """`_FDA483_FOOTER_RE.search` 와 같되, 산문 표제의 맨 SIGNATURE 는 건너뛴다(순수 함수)."""
+    end = len(text) if endpos is None else endpos
+    for m in _FDA483_FOOTER_RE.finditer(text, pos, end):
+        if not _BARE_SIGNATURE_RE.fullmatch(m.group(0)):
+            return m
+        lo, hi = max(0, m.start() - _FOOTER_NEIGHBOR_WINDOW), min(len(text), m.end() + _FOOTER_NEIGHBOR_WINDOW)
+        others = [x for x in _FDA483_FOOTER_RE.finditer(text, lo, hi) if not _BARE_SIGNATURE_RE.fullmatch(x.group(0))]
+        after = text[m.end():min(end, m.end() + _FOOTER_PROSE_WINDOW)]
+        if not others and gf.fda483_prose_words(after) > gf.FDA483_SIGNER_TAIL_MAX_PROSE:
+            continue
+        return m
+    return None
 # 위 EMPLOYEE 마커가 선행 고립 I/l 을 흡수하지 못하는 잔여 경우를 대비한 안전망(가벼운 후처리).
 # 실제 산문에서 문장이 고립된 단일 I/l 로 끝나는 경우는 사실상 없어(대명사 "I"는 문장 중간),
 # 오탐 위험 없이 절단 후 남은 낱자 잔재만 제거한다.
@@ -1753,7 +1777,7 @@ def _skip_pagebreak_block(chunk: str) -> str:
     """관찰 표제 **직후**에 온 페이지 경계 양식 블록을 건너뛴 본문을 돌려준다(순수 함수).
 
     푸터가 표제 바로 뒤가 아니면(= 관찰 끝의 정상 푸터) 입력을 그대로 돌려준다."""
-    m = _FDA483_FOOTER_RE.search(chunk or "")
+    m = _footer_cut(chunk or "")
     if not m or m.start() > _PAGEBREAK_FOOTER_HEAD:
         return chunk
     offset = 0
@@ -1769,7 +1793,7 @@ def _skip_pagebreak_block(chunk: str) -> str:
 def _clean_observation_chunk(chunk: str) -> str:
     """Observation 본문 chunk 에서 페이지 하단 서명/양식 푸터 블록을 제거(가장 이른 마커에서 절단)."""
     text = re.sub(r"[\r\f]+", "\n", chunk or "")
-    m = _FDA483_FOOTER_RE.search(text)
+    m = _footer_cut(text)
     if m:
         text = text[:m.start()]
     text = _TRAILING_STRAY_LETTER_RE.sub("", text)
@@ -1783,7 +1807,7 @@ def _clean_observation_detail(detail: str) -> str:
     (Mixlab Obs2·5)은 deficiency 만 표시하고 detail 은 생략(garbage 미노출). 순수 함수.
     (재추출뿐 아니라 이미 저장된 detail 문자열 재청소(backfill)에도 그대로 쓴다.)"""
     text = re.sub(r"\s+", " ", detail or "").strip()
-    m = _FDA483_FOOTER_RE.search(text)
+    m = _footer_cut(text)
     if m:
         # 주의: 여기서 `.` 를 rstrip 대상에서 제외한다(구버전은 " :-.\t" 로 마침표까지 잘라
         # 정상 문장의 종결 마침표까지 날리는 부작용이 있었다 — 2026-07-12 hardening 에서 수정).
@@ -2358,7 +2382,7 @@ def _signer_cut(text: str, start: int = 0, end: int | None = None) -> int | None
 def _footer_start(text: str, lo: int, hi: int) -> int | None:
     """쪽 번호(hi) 앞 서명란 블록의 시작. 마커가 하나도 없으면 None(쪽 경계로 보지 않는다)."""
     cands: list[int] = []
-    m = _FDA483_FOOTER_RE.search(text, lo, hi)
+    m = _footer_cut(text, lo, hi)
     if m:
         cands.append(m.start())
     s = _signer_cut(text, lo, hi)
@@ -2634,7 +2658,7 @@ def _join_footer_pages(seg: str, est_hint: str = "") -> str:
     out: list[str] = []
     cursor = 0
     while True:
-        m = _FDA483_FOOTER_RE.search(seg, cursor)
+        m = _footer_cut(seg, cursor)
         if not m:
             break
         fs = m.start()

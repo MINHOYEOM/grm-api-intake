@@ -55,6 +55,7 @@ from collect_mfds_gmp_inspection import (
     _extract_deficiency_excerpt,
     assess_deficiency_with_rows,
     derive_table_status,
+    strip_excerpt_noise,
 )
 
 SOURCE = "MFDS"
@@ -185,7 +186,11 @@ def plan_row(row: dict[str, Any]) -> dict[str, Any] | None:
     changed_assess = new != old
     # excerpt 는 **채우기만** 한다. 기존 값을 다른 값으로 바꾸지 않는다(발행된 카드의
     # 인용문이 소급으로 흔들리면 안 된다 — 앵커를 맨 뒤에 둔 이유와 같은 규율).
-    fill_excerpt = bool(new_excerpt) and not old_excerpt
+    # 예외 하나: 옛 값이 "새 값 + 꼬리 서식 잡음(글자 사이 공백 부서명)"이면 잡음만 걷어낸 새 값으로
+    # 바꾼다(내용은 같고 꼬리만 다르다 — 인용문이 흔들리지 않는다). 그 밖의 다른 값은 그대로 둔다.
+    clean_excerpt = bool(new_excerpt) and bool(old_excerpt) and old_excerpt != new_excerpt \
+        and strip_excerpt_noise(old_excerpt) == new_excerpt
+    fill_excerpt = (bool(new_excerpt) and not old_excerpt) or clean_excerpt
 
     old_status = str(payload.get("gmp_deficiency_table_status") or "")
     new_status = old_status

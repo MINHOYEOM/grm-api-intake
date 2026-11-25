@@ -171,5 +171,29 @@ class StatusAndRowsTest(unittest.TestCase):
         self.assertIs(b.derive_table_status, g.derive_table_status)
 
 
+class ExcerptNoiseCleanTest(unittest.TestCase):
+    _TEXT = ("의약품 제조소 GMP 정기실태조사 결과 평가 결과: 지적(보완)사항 없음\n"
+             "의\n료\n제\n품\n안\n전\n과")
+
+    def _payload(self, excerpt):
+        return {"attachment_text": self._TEXT, "attachment_deficiency_assessment": "none",
+                "attachment_deficiency_excerpt": excerpt,
+                "gmp_deficiency_table_status": "skipped-type"}
+
+    def test_stored_excerpt_with_noise_is_replaced_by_clean_one(self):
+        """옛 발췌 = 새 발췌 + 꼬리 잡음 → 잡음만 걷어낸 값으로 교체(내용 불변)."""
+        plan = b.plan_row(_row2(self._payload("평가 결과: 지적(보완)사항 없음 의 료 제 품 안 전 과")))
+        self.assertEqual(plan["kind"], "update")
+        self.assertTrue(plan["fill_excerpt"])
+        self.assertEqual(plan["raw_json"]["attachment_deficiency_excerpt"],
+                         "평가 결과: 지적(보완)사항 없음")
+
+    def test_clean_excerpt_is_untouched(self):
+        self.assertIsNone(b.plan_row(_row2(self._payload("평가 결과: 지적(보완)사항 없음"))))
+
+    def test_unrelated_stored_excerpt_is_still_never_overwritten(self):
+        self.assertIsNone(b.plan_row(_row2(self._payload("기존에 뽑아 둔 다른 인용문"))))
+
+
 if __name__ == "__main__":
     unittest.main()

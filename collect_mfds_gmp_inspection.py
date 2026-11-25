@@ -390,6 +390,17 @@ def _get_bytes(url: str, *, timeout: int = 30, accept: str = "*/*") -> bytes:
     )
 
 
+# [서식 잡음 2026-11-25] 문서 맨 끝의 부서명 머리글이 글자 사이 공백으로 쪼개져("의 료 제 품 안
+# 전 과", "한 약 정 책 과") 발췌 끝에 그대로 붙었다. 한 글자짜리 한글 토큰이 4개 이상 이어진
+# **꼬리**만 자른다 — 본문 중간은 건드리지 않고, 실제 문장(토큰이 2자 이상)은 걸리지 않는다.
+_EXCERPT_TRAILING_SPACED_NOISE_RE = re.compile(r"(?:\s+[가-힣](?=\s|$)){4,}\s*$")
+
+
+def strip_excerpt_noise(excerpt: str) -> str:
+    """발췌 끝에 붙은 글자 사이 공백 부서명 머리글을 제거(없으면 그대로). 순수 함수."""
+    return _EXCERPT_TRAILING_SPACED_NOISE_RE.sub("", excerpt or "").strip()
+
+
 def _extract_deficiency_excerpt(text: str) -> str:
     """표지·개요를 건너뛰고 '평가 결과 지적(보완)사항' 결론 섹션부터 반환(없으면 "").
 
@@ -403,7 +414,7 @@ def _extract_deficiency_excerpt(text: str) -> str:
     for pat in _DEFICIENCY_EXCERPT_PATTERNS:
         m = re.search(pat, compact)
         if m:
-            return compact[m.start():].strip()
+            return strip_excerpt_noise(compact[m.start():].strip())
     return ""
 
 

@@ -1232,5 +1232,34 @@ class DeriveTableStatusTest(unittest.TestCase):
                 self.assertEqual(status, g.derive_table_status(text, 0, verdict), verdict)
 
 
+class ExcerptTrailingNoiseTest(unittest.TestCase):
+    """문서 끝 부서명 머리글(글자 사이 공백)이 발췌 꼬리에 붙는 서식 잡음 제거."""
+
+    _GAS = ("❍ 의약품 제조 및 품질관리기준(GMP) 평가 결과: 지적(보완)사항 없음\n"
+            "의\n료\n제\n품\n안\n전\n과")
+
+    def test_spaced_department_header_is_stripped(self):
+        self.assertEqual(g._extract_deficiency_excerpt(self._GAS),
+                         "평가 결과: 지적(보완)사항 없음")
+
+    def test_other_department_headers_are_stripped(self):
+        self.assertEqual(g.strip_excerpt_noise("지적(보완)사항 없음 한 약 정 책 과"),
+                         "지적(보완)사항 없음")
+
+    def test_real_sentences_and_short_runs_are_kept(self):
+        for keep in ("지적(보완)사항 3건 품질경영 미흡",
+                     "지적(보완)사항 없음 의 료 제",           # 3토큰 — 문장일 수 있음
+                     "지적(보완)사항 있음 시험실 중요 보완완료 의약품안전관리과"):
+            self.assertEqual(g.strip_excerpt_noise(keep), keep)
+
+    def test_mid_text_spaced_letters_are_not_touched(self):
+        text = "지적(보완)사항 있음 의 료 제 품 안 전 과 관련 시정 요청"
+        self.assertEqual(g.strip_excerpt_noise(text), text)
+
+    def test_idempotent(self):
+        once = g.strip_excerpt_noise("지적(보완)사항 없음 의 료 제 품 안 전 과")
+        self.assertEqual(g.strip_excerpt_noise(once), once)
+
+
 if __name__ == "__main__":
     unittest.main()

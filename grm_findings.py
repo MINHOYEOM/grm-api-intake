@@ -1416,6 +1416,49 @@ def redact_person_firm(name: str, lang: str = "ko") -> str:
     return REDACTED_PERSON_BY_LANG.get(lang, REDACTED_PERSON_BY_LANG["ko"]) if person_firm_name(name) else name
 
 
+# [개인 번지 주소 2026-11-25] 개인 사업자(개인 농장 등) 카드의 원문에는 업체명 자리에 사람 이름이, 그 아래
+# 'STREET ADDRESS' 칸에 **집 주소(번지)** 가 있다 — 11-23호 196329 는 이름을 '개인 사업자'로 바꾼 뒤에도 deep
+# `source_text` 에 번지가 남았다. 개인정보 최소화: 개인 사업자 카드에서는 번지를 싣지 않고 도시·주 단위까지만 둔다.
+# 규제기관 사무소 주소(483 머리말 'DISTRICT ADDRESS' 칸)는 공공기관 주소라 뺀다.
+STREET_REDACTED = "[번지 생략]"
+_STREET_SUFFIX = (r"(?:Avenue|Ave|Road|Rd|Street|St|Lane|Ln|Drive|Dr|Highway|Hwy|Boulevard|Blvd|Way|Court|Ct|"
+                  r"Place|Pl|Trail|Trl|Parkway|Pkwy|Circle|Cir|Pike|Terrace|Ter)")
+STREET_ADDRESS_RE = re.compile(
+    r"(?<![\w/.\-])(?:[NSEW]\s?)?\d{1,6}[A-Z]?\s+(?:(?:[NSEW]|North|South|East|West)\.?\s+)?"
+    r"(?:[A-Z][A-Za-z'\-]+\.?\s+){1,4}" + _STREET_SUFFIX + r"\b\.?")
+_AGENCY_ADDRESS_HEAD_RE = re.compile(r"DISTRICT\s+(?:OFFICE\s+)?ADDRESS", re.I)
+_AGENCY_ADDRESS_END_RE = re.compile(r"FIRM\s+NAME|STREET\s+ADDRESS|NAME\s+AND\s+TITLE|INDIVIDUAL\s+TO\s+WHOM", re.I)
+
+
+def street_addresses(text: str) -> list[tuple[int, int, str]]:
+    """원문 → 번지 주소 (시작, 끝, 글자) 목록(순수). 규제기관 사무소 주소 칸('DISTRICT ADDRESS' 뒤)은 뺀다."""
+    text = _text(text)
+    agency = []
+    for m in _AGENCY_ADDRESS_HEAD_RE.finditer(text):
+        end = _AGENCY_ADDRESS_END_RE.search(text, m.end())
+        agency.append((m.end(), min(end.start() if end else len(text), m.end() + 250)))
+    return [(m.start(), m.end(), m.group(0)) for m in STREET_ADDRESS_RE.finditer(text)
+            if not any(a <= m.start() < b for a, b in agency)]
+
+
+def redact_street_addresses(text: str) -> str:
+    """번지 주소를 `STREET_REDACTED` 로 바꾼다(순수) — 개인 사업자 카드에만 쓴다. 규제기관 주소는 그대로."""
+    text = _text(text)
+    for start, end, _ in reversed(street_addresses(text)):
+        text = text[:start] + STREET_REDACTED + text[end:]
+    return text
+
+
+def redact_person_firm_source(text: str, firm: str) -> str:
+    """원문 → 업체명이 사람 이름(개인 사업자)이면 그 이름은 '개인 사업자', 번지는 `STREET_REDACTED` 로(순수).
+    법인 업체는 원문 그대로다. 발행 브릿지가 deep `source_text` 를 붙일 때 쓴다(공개 저장소에 실린다)."""
+    text, firm = _text(text), _FIRM_WHITESPACE_RE.sub(" ", _text(firm)).strip()
+    if not text or not person_firm_name(firm):
+        return text
+    name_re = re.compile(r"\s+".join(re.escape(t) for t in firm.split()))
+    return redact_street_addresses(name_re.sub(REDACTED_PERSON_BY_LANG["ko"], text))
+
+
 _FIRM_PAREN_RE = re.compile(r"\([^)]*\)")
 _FIRM_AND_RE = re.compile(r"\s+and\s+")
 _FIRM_AMP_RE = re.compile(r"\s*&\s*")

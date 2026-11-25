@@ -35,7 +35,9 @@ import re
 import time
 from datetime import date
 
-from grm_common import http_get_html, log
+from requests import HTTPError
+
+from grm_common import LIBRARY_REQUEST_BLOCKED_PREFIX, http_get_html, log
 
 
 LIBRARY_SOURCE = "ema"
@@ -83,6 +85,7 @@ _LEGACY_SLUG_ALIASES: dict[str, str] = {
 }
 _GDP_RE = re.compile(r"good distribution|(?<![a-z])gdp(?![a-z])|wholesale", re.I)
 _GMP_RE = re.compile(r"good manufacturing|(?<![a-z])gmp(?![a-z])|manufactur", re.I)
+_ABUSE_NOTICE_RE = re.compile(r"abuse[\s-]+detection|apology_objects", re.I)
 
 # 현행 카탈로그(수기 큐레이션) id 앵커: URL 슬러그 → 기존 id. append-only.
 _ID_ANCHORS: dict[str, str] = {
@@ -244,9 +247,33 @@ def build_guideline_item(url: str, title: str, page_html: str) -> dict[str, str]
     return item
 
 
+class _RequestBlocked(RuntimeError):
+    def __init__(self, reason: str, url: str) -> None:
+        self.reason = reason
+        super().__init__(f"{self.summary} ({url})")
+
+    @property
+    def summary(self) -> str:
+        return f"{LIBRARY_REQUEST_BLOCKED_PREFIX}{self.reason}) — 구조 변경 아님"
+
+
 def _get(url: str) -> str:
     time.sleep(REQUEST_DELAY_SECONDS)
-    return http_get_html(url, timeout=HTTP_TIMEOUT_SECONDS, retries=HTTP_RETRIES, label="EMA")
+    try:
+        page = http_get_html(url, timeout=HTTP_TIMEOUT_SECONDS, retries=HTTP_RETRIES, label="EMA")
+    except (HTTPError, RuntimeError) as exc:
+        # http_get_html 은 최종 요청 실패를 RuntimeError 로 감싸고 HTTPError 를 원인에 남긴다.
+        cause = exc if isinstance(exc, HTTPError) else exc.__cause__
+        response = cause.response if isinstance(cause, HTTPError) else None
+        if response is not None:
+            if response.status_code in (429, 403):
+                raise _RequestBlocked(str(response.status_code), url) from exc
+            if _ABUSE_NOTICE_RE.search(response.url or "") or _ABUSE_NOTICE_RE.search(response.text):
+                raise _RequestBlocked("abuse 안내", url) from exc
+        raise
+    if _ABUSE_NOTICE_RE.search(page):
+        raise _RequestBlocked("abuse 안내", url)
+    return page
 
 
 def collect_library_items(run_date: date) -> tuple[list[dict[str, str]], str | None]:
@@ -254,6 +281,8 @@ def collect_library_items(run_date: date) -> tuple[list[dict[str, str]], str | N
     log("INFO", f"자료실 수집: {LIBRARY_SOURCE} ({COMPILATION_URL})")
     try:
         compilation_html = _get(COMPILATION_URL)
+    except _RequestBlocked as exc:
+        return [], str(exc)
     except Exception as exc:  # noqa: BLE001
         return [], f"EMA 절차 모음 페이지 수집 실패({COMPILATION_URL}): {exc}"
     procedures = parse_procedures(compilation_html)
@@ -264,6 +293,8 @@ def collect_library_items(run_date: date) -> tuple[list[dict[str, str]], str | N
     log("INFO", f"자료실 수집: {LIBRARY_SOURCE} ({MANUFACTURING_GUIDELINES_URL})")
     try:
         listing_html = _get(MANUFACTURING_GUIDELINES_URL)
+    except _RequestBlocked as exc:
+        return procedures, str(exc)
     except Exception as exc:  # noqa: BLE001
         return procedures, (f"EMA 품질-제조 가이드라인 목록 수집 실패"
                             f"({MANUFACTURING_GUIDELINES_URL}): {exc}")
@@ -280,6 +311,7 @@ def collect_library_items(run_date: date) -> tuple[list[dict[str, str]], str | N
         except Exception:  # noqa: BLE001
             failed.append(url)
     errors: list[str] = []
+    blocked: _RequestBlocked | None = None
     if failed:
         # 한 번 쉬고 실패분만 다시 받는다 — 일시 429 로 소스 전체가 격리되지 않게.
         log("WARN", f"EMA 상세 {len(failed)}건 실패 → {RETRY_COOLDOWN_SECONDS:.0f}s 쉬고 재시도")
@@ -287,6 +319,9 @@ def collect_library_items(run_date: date) -> tuple[list[dict[str, str]], str | N
         for url in failed:
             try:
                 pages[url] = _get(url)
+            except _RequestBlocked as exc:
+                blocked = blocked or exc
+                errors.append(f"{_slug(url)}: {exc.reason}")
             except Exception as exc:  # noqa: BLE001
                 errors.append(f"{_slug(url)}: {exc}")
     guidelines: list[dict[str, str]] = [
@@ -297,7 +332,8 @@ def collect_library_items(run_date: date) -> tuple[list[dict[str, str]], str | N
     log("INFO", f"자료실 수집 완료: {LIBRARY_SOURCE} 수집 {scanned}건 / keep {len(items)}건"
                 f" (절차 {len(procedures)} + 과학 가이드라인 {len(guidelines)})")
     if errors:
-        return items, "EMA 가이드라인 상세 페이지 일부 실패: " + "; ".join(errors)
+        prefix = f"{blocked.summary}. " if blocked else ""
+        return items, prefix + "EMA 가이드라인 상세 페이지 일부 실패: " + "; ".join(errors)
     return items, None
 
 

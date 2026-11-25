@@ -25,6 +25,7 @@ from typing import Any, Iterable
 
 import collect_ich
 import collect_mfds
+from grm_common import LIBRARY_REQUEST_BLOCKED_PREFIX
 
 CATALOG_FIELDS = (
     "id", "code", "title_en", "title_ko", "doc_type", "published_date",
@@ -256,13 +257,16 @@ def build(
     if overlap:
         raise ValueError(f"레거시/플러그인 소스 충돌: {', '.join(sorted(overlap))}")
     errors = {key: value for key, value in (collector_errors or {}).items() if value}
+    skipped = dict(skipped_sources or {})
     report: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION, "generated_on": run_date.isoformat(),
         "live_catalog_swapped": False, "sources": {},
         "collector_errors": collector_errors or {},
         # 이번 실행에서 격리한 소스 {source: 사유}. 후보·스왑 대상에서 빠지므로 그 소스의
         # 라이브 카탈로그는 지난주 그대로 남는다(삭제 아님 — 이번 주만 못 받은 것).
-        "skipped_sources": dict(skipped_sources or {}),
+        "skipped_sources": skipped,
+        "blocked_sources": sorted(source for source, reason in skipped.items()
+                                  if reason.startswith(LIBRARY_REQUEST_BLOCKED_PREFIX)),
     }
     for source, raw_items in {**legacy, **plugins}.items():
         baseline = _load_catalog(baseline_dir / f"{source}.json")

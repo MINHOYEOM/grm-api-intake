@@ -38,6 +38,9 @@ MFDS_EGRESS_HOSTS = {
 }
 
 
+LIBRARY_REQUEST_BLOCKED_PREFIX = "요청 차단("
+
+
 class HTTPClientError(RuntimeError):
     """HTTP 4xx error with status code attached."""
 

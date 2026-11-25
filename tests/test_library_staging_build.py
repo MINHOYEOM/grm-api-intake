@@ -9,6 +9,10 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
+from requests import Response
+
+import grm_common
+import library_collect_ema as ema
 import library_staging_build as builder
 
 
@@ -262,6 +266,44 @@ class PluginBuildTest(unittest.TestCase):
             self.assertTrue(report["live_catalog_swapped"])
             self.assertTrue(report["gate"]["automatic_merge_allowed"])
             self.assertEqual(report["gate"]["review_reasons"], [])
+
+    def test_ema_zero_items_distinguishes_blocked_responses_from_structure_changes(self):
+        cases = (
+            (429, "", "요청 차단(429) — 구조 변경 아님", ["ema"]),
+            (403, "", "요청 차단(403) — 구조 변경 아님", ["ema"]),
+            (200, "<h1>Abuse Detection Apology</h1>", "요청 차단(abuse 안내)", ["ema"]),
+            (200, "<h1>Compilation of Union procedures</h1>", "페이지 구조 변경 의심", []),
+        )
+        for status, body, expected_reason, blocked_sources in cases:
+            with self.subTest(status=status, reason=expected_reason), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                live = self._catalog(root, "mfds", [])
+                self._catalog(root, "ich", [])
+                self._catalog(root, "ema", [{"id": "ema-keep", "title_en": "Keep",
+                                            "official_url": ema.COMPILATION_URL}])
+                before = (live / "ema.json").read_bytes()
+                response = Response()
+                response.status_code = status
+                response.url = ema.COMPILATION_URL
+                response.encoding = "utf-8"
+                response._content = body.encode("utf-8")
+                report_path = root / "diff.json"
+                with mock.patch.object(grm_common, "kr_egress_get", return_value=response), \
+                     mock.patch.object(ema.time, "sleep"), \
+                     mock.patch.object(builder.collect_mfds, "collect_mfds", return_value=([], None)), \
+                     mock.patch.object(builder.collect_ich, "collect_ich", return_value=([], None)), \
+                     mock.patch.object(builder, "discover_collectors", return_value={"ema": ema}):
+                    result = builder.main([
+                        "--baseline-dir", str(live), "--staging-dir", str(root / "staging"),
+                        "--report", str(report_path), "--sources", "mfds,ich,ema",
+                    ])
+
+                self.assertEqual(result, 0)
+                report = json.loads(report_path.read_text(encoding="utf-8"))
+                self.assertIn(expected_reason, report["skipped_sources"]["ema"])
+                self.assertEqual(report["blocked_sources"], blocked_sources)
+                self.assertNotIn("ema", report["sources"])
+                self.assertEqual((live / "ema.json").read_bytes(), before)
 
     def test_quarantine_is_not_a_review_reason_but_a_contaminated_source_is(self):
         base = {"sources": {"ich": {"baseline_count": 10, "new_count": 1,

@@ -19,6 +19,7 @@
 FDA 483 의 전용 실사관 칸(`deterministic_detail.inspectors[]`)은 규제기관 공식 서명자라 제외한다.
 """
 
+import hashlib
 import json
 import re
 import unittest
@@ -102,7 +103,7 @@ def _findings(copies):
             if blocked:
                 findings[path, card_id].update(line.split(":", 1)[0] for line in blocked)
         for slot, value in slots:
-            if any(guess_check._name_hit(name, value) for name in source_names[card_id]):
+            if precheck.person_name_hits(source_names[card_id], value):
                 findings[path, card_id].add(slot)
     return findings
 
@@ -127,6 +128,87 @@ def classify(found, baseline):
     block = sorted(k for k in found - baseline if k.startswith(DISPLAYED_PREFIX))
     warn = sorted(k for k in found if k not in block)
     return block, warn
+
+
+# ── 시험 자료·시험 코드 실명 게이트(2026-11-25) ────────────────────────────────────────────────
+# 저장소가 공개다. 발행본에서 지운 실명이 시험 재료(`tests/fixtures/**`)·시험 코드(`tests/*.py`)로 되살아나면 안 된다
+# (#1955 가 #1937 이전 원문을 시험 재료로 실어 지운 이름을 되살릴 뻔했다). 판정은 발행 사본 게이트와 같은 함수.
+#   · 막음 = 허용 목록(가짜 이름)에도, 기존 기준 목록에도 없는 이름.
+#   · 경고 = 기준 목록(main 에 이미 있던 자료의 이름 — 이름 대신 해시로 적는다). 지우면 기준 목록에서도 뺀다.
+FIXTURE_NAMES_BASELINE = Path(__file__).resolve().parent / "fixtures" / "fixture_names_baseline.json"
+# 시험용 가짜 이름(실존 인물 아님)과 관용 자리표시 이름.
+FAKE_FIXTURE_NAMES = frozenset((
+    "Arbel Brimtal Danqui Darvin Dovan Dravesh Hadrin Jorn Kavrin Kelvaro Ko Ka Krest Mirel More Mark Morlai Okonder "
+    "Orlena Ostrell Pelkastrom Pelvik Qiu Quell Quent Quorvala Ravel Tasindra Tor Torvel Twisk Varsten Vasky Velloc "
+    "Velmor Veshan Zha Zun Doe Roe Testerson Example").split())
+_TEXT_SUFFIXES = (".json", ".txt", ".md", ".html", ".csv")
+
+
+def _strings(value):
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for v in value.values():
+            yield from _strings(v)
+    elif isinstance(value, list):
+        for v in value:
+            yield from _strings(v)
+
+
+def _test_material():
+    here = Path(__file__).resolve().parent
+    files = [p for p in sorted((here / "fixtures").rglob("*")) if p.is_file() and p.suffix in _TEXT_SUFFIXES
+             and p != FIXTURE_NAMES_BASELINE]
+    files += sorted(here.glob("*.py"))
+    for path in files:
+        raw = path.read_bytes().decode("utf-8", errors="replace")
+        if path.suffix == ".json":
+            try:
+                yield path, list(_strings(json.loads(raw)))
+                continue
+            except ValueError:
+                pass
+        yield path, [raw]
+
+
+def _name_key(path, name):
+    digest = hashlib.sha256(name.encode("utf-8")).hexdigest()[:12]
+    return f"{path.relative_to(ROOT).as_posix()} | sha256:{digest}"
+
+
+def fixture_name_keys():
+    """시험 자료·코드의 원문 개인 이름 → `파일 | sha256:…` 집합(가짜 이름 제외)."""
+    keys = {}
+    for path, values in _test_material():
+        for value in values:
+            for name in precheck.source_person_names(value):
+                if name not in FAKE_FIXTURE_NAMES:
+                    keys[_name_key(path, name)] = name
+    return keys
+
+
+class TestMaterialNoPersonalNamesTest(unittest.TestCase):
+    """시험 재료·시험 코드에 새 실명이 들어오면 실패한다 — 공개 저장소."""
+
+    def test_no_new_personal_names_in_tests(self):
+        found = fixture_name_keys()
+        baseline = set(json.loads(FIXTURE_NAMES_BASELINE.read_text(encoding="utf-8"))["entries"])
+        new = sorted(f"{k.split(' | ')[0]} | {found[k]}" for k in set(found) - baseline)
+        stale = len(baseline - set(found))
+        old = len(set(found) & baseline)
+        if old or stale:
+            print(f"\n[경고] 시험 자료 기존 실명 {old}건(기준 목록, 막지 않음)" + (f" · 정리돼 사라진 기준 {stale}건" if stale else ""))
+        self.assertEqual(new, [], "시험 자료·시험 코드에 실명이 있다(공개 저장소). 같은 꼴의 가짜 이름으로 바꾸고, "
+                                  "새 가짜 이름이면 FAKE_FIXTURE_NAMES 에 더한다.")
+
+    def test_fake_names_are_caught_without_allowlist(self):
+        """허용 목록이 판정을 대신하지 않는다 — 가짜 이름도 판정 함수에는 이름으로 잡힌다(게이트가 살아 있다)."""
+        fx = json.loads((Path(__file__).resolve().parent / "fixtures" / "person_names_1123_pre1937.json")
+                        .read_text(encoding="utf-8"))
+        names = set()
+        for value in _strings(fx):
+            names |= precheck.source_person_names(value)
+        self.assertTrue({"Velmor", "Quell", "Brimtal", "Dravesh", "Torvel"} <= names)
 
 
 class PublishedCopiesNoPersonalNamesTest(unittest.TestCase):
@@ -181,11 +263,11 @@ class ClassifyTest(unittest.TestCase):
         self.assertEqual(classify({k}, set()), ([], [k]))
 
     def test_same_judge_as_precheck(self):
-        text = "NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED Jean G. Allaume, Vice President FIRM NAME"
+        text = "NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED Darvin G. Ostrell, Vice President FIRM NAME"
         names = precheck.source_person_names(text, "Acme Pharma")
-        self.assertIn("Allaume", names)
-        self.assertTrue(guess_check._name_hit("Allaume", text))
-        self.assertFalse(any(guess_check._name_hit(n, text.replace("Jean G. Allaume", "[recipient]"))
+        self.assertIn("Ostrell", names)
+        self.assertTrue(guess_check._name_hit("Ostrell", text))
+        self.assertFalse(any(guess_check._name_hit(n, text.replace("Darvin G. Ostrell", "[recipient]"))
                              for n in names))
 
 

@@ -26,8 +26,17 @@
     "finding_id": "finding-6f0a83c4708369e5e72bd97e",
     "document_id": "fda483-191183",
     "source": "https://www.fda.gov/media/191183/download",
-    "reason": "깨진 글자층 스캔 — force_ocr dry 로 먼저 다시 판독하고, 그래도 깨지면 사람이 PDF 로 확인.",
-    "status": "todo"
+    "reason": "깨진 글자층 스캔. force_ocr dry(run 45670879796)는 쪽 머리말·문장 골격을 살렸으나 관찰 수가 줄어 불채택이고, 가림 자리를 ®@ 같은 잡음으로 바꾸고 줄 끝을 잘라(1쪽 'in 2 product i') 영문 교체 부적합 → 사람 확인 국문.",
+    "status": "review",
+    "page": "1~3 of 18 (Observation 1, 표 1~3)",
+    "draft_basis": "운영 detail_text(글자층) + force_ocr 판독(run 45670879796) 맞대기. 가림 자리는 [redacted]. 표 값은 두 판 모두 가림이라 옮기지 않고 표가 있다는 사실만 적었다.",
+    "draft_ko": "구체적으로, 귀사의 품질 부서는 규제상 허용 섭취량(AI) 한도를 충족하지 못한 [redacted] 의약품 배치에 대해 적절한 시장 조치를 취하지 않았다. 예를 들어, [redacted] 캡슐(USP)의 상업용 배치 [redacted]개가 [redacted] 위해성 평가의 일부로 분석되었을 때 [redacted] 불순물의 AI 한도 NMT [redacted] ppm 을 충족하지 못했다. 표 1 에는 함량, 배치 번호, 제조일, 사용기한, 시험일, 시험 시점의 검체 경과 기간, 결과가 실려 있으나 값은 모두 가려져 있다. 추가 상업용 배치 [redacted]개에 대한 귀사의 후속 평가에서 [redacted]개 배치가 [redacted] 분석 시 [redacted] 불순물의 AI 한도 NMT [redacted] ppm 을 충족하지 못했다. 세부 내용은 표 2 와 같다(값은 가림). 추가 상업용 배치 [redacted]개를 더 평가한 결과, [redacted] 중 분석했을 때 [redacted]개 배치가 [redacted] 불순물의 AI 한도 NMT [redacted] ppm 을 충족하지 못한 것으로 드러났다. 세부 내용은 표 3 과 같다(값은 가림).",
+    "check_points": [
+      "1쪽 첫 문장: '적절한 시장 조치' 대상이 '[redacted] 의약품 배치' 인지(글자층 'b:4tcl1P<: nf..th..JJ~..rrvg product', 강제 판독은 줄 끝 잘림)",
+      "1쪽: 불순물 이름·AI 한도 수치가 가림인지(글자층 '11 •1 l\\TMl (b)(4)', 강제 판독 없음)",
+      "3쪽 표 머리글 '(NMT 4 ppm)' — 글자층에만 있고 강제 판독은 'NMT@@ ppm'. 실제 4 ppm 인지 가림 조각인지 확인 후 초안에 반영"
+    ],
+    "data_issue": "관찰 1 은 1~7쪽인데 운영 detail_text 는 3쪽 끝에서 끊겨 4~7쪽(A. 기준 초과 배치 계속 출하·조사 미실시·SOP 3건 위반, 표 4, D. 건강위해평가 미실시 등)이 빠져 있다. 초안은 운영 영문 범위(1~3쪽)만 옮겼다. 4~7쪽 복원은 483 상세 추출 쪽 일감."
   },
   {
     "finding_id": "finding-3d480b7d0e687a2435302fc3",

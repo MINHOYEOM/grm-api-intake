@@ -1,12 +1,6 @@
 {
  "_comment": "발행 사본 실명 게이트 기준 목록(경고) — 2026-11-25 시점 기존 판정. 여기 있는 항목은 막지 않고 경고로만 센다. 기준일(2026_11_25) 이후 호의 발행본은 넣을 수 없다(테스트가 막는다). 정리해서 사라진 항목은 지워도 된다 — 추가는 기존 호 사본에 한해, 실명이 아님(오탐)을 확인한 경우에만.",
  "entries": [
-  "web/data/briefs/brief_web_2026_08_10.json | 20b61b36580f | deep_analysis.required_remediation.items[3]",
-  "web/data/briefs/brief_web_2026_11_02.json | fda483-195551 | deterministic_detail.observations[1].detail",
-  "web/data/briefs/brief_web_2026_11_02.json | fda483-195551 | deterministic_detail.observations[2].deficiency",
-  "web/data/briefs/brief_web_2026_11_02.json | fda483-195551 | en.key_facts[2]",
-  "web/data/briefs/brief_web_2026_11_02.json | fda483-195551 | key_facts[2]",
-  "web/data/briefs/brief_web_2026_11_16.json | fda483-196842 | deterministic_detail.observations[2].detail",
   "web/data/deltas/deep_2026_07_12.json | fda483-193530 | source_text",
   "web/data/deltas/deep_2026_07_12.json | fda483-193531 | source_text",
   "web/data/deltas/deep_2026_07_12.json | fda483-193541 | source_text",
@@ -64,7 +58,6 @@
   "web/data/deltas/deep_2026_07_27.json | fda483-193813 | source_text",
   "web/data/deltas/deep_2026_07_27.json | fda483-193819 | source_text",
   "web/data/deltas/deep_2026_08_10.json | 03dfb7e91f6b | source_text",
-  "web/data/deltas/deep_2026_08_10.json | 20b61b36580f | deep_analysis.required_remediation.items[3]",
   "web/data/deltas/deep_2026_08_10.json | 20b61b36580f | source_text",
   "web/data/deltas/deep_2026_08_31.json | 702264c05c8b | source_text",
   "web/data/deltas/deep_2026_09_07.json | a9cbe135c72a | source_text",
@@ -493,8 +486,6 @@
   "web/data/deltas/delta_2026_10_26.json | fda483-195659 | en.key_facts[0]",
   "web/data/deltas/delta_2026_10_26.json | fda483-195659 | en.summary",
   "web/data/deltas/delta_2026_10_26.json | fda483-195659 | key_facts[0]",
-  "web/data/deltas/delta_2026_10_26.json | fda483-195659 | summary",
-  "web/data/deltas/delta_2026_11_02.json | fda483-195551 | en.key_facts[2]",
-  "web/data/deltas/delta_2026_11_02.json | fda483-195551 | key_facts[2]"
+  "web/data/deltas/delta_2026_10_26.json | fda483-195659 | summary"
  ]
 }

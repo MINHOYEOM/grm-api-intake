@@ -2588,8 +2588,13 @@ def _is_prose_line(line: str) -> bool:
     return not (_SIGNER_TITLE_RE.search(s) or _FOOTER_MARK_RE.search(s))
 
 
-def _footer_block_resume(text: str, fs: int, before: str, est_hint: str) -> int | None:
-    """서명란 시작(fs) 뒤 본문 재개 줄의 시작 위치. 확신 조건을 못 넘으면 None."""
+def _footer_block_resume(text: str, fs: int, before: str, est_hint: str,
+                         mark_from: int | None = None) -> int | None:
+    """서명란 시작(fs) 뒤 본문 재개 줄의 시작 위치. 확신 조건을 못 넘으면 None.
+
+    마커 종류는 `mark_from`(서명란 블록 맨 윗줄, 기본 fs)부터 센다 — [11-26 191183] 첫 잘림 마커가
+    `FORM FDA` 이고 그 위 줄들(`SEE` / 이름 / `REVERSE OF` / 이름 / `THIS PAGE`)이 서명란인 쪽에서,
+    fs 부터만 세면 마커가 1종뿐이라 잇지 못하고 관찰이 그 쪽 끝에서 잘렸다."""
     end = min(len(text), fs + _FOOTER_JOIN_WINDOW)
     p = text.find("\n", fs)
     while p != -1 and p < end:
@@ -2599,7 +2604,8 @@ def _footer_block_resume(text: str, fs: int, before: str, est_hint: str) -> int 
             return None                              # 양식 뒷면 고지·회신 편지·다음 관찰 표제 — 관찰은 여기서 끝났다
         if _is_prose_line(line) and not _is_header_value_line(line, est_hint) \
                 and not _looks_like_est_value(line, est_hint):
-            marks = {m.group(0).upper()[:5] for m in _FOOTER_MARK_RE.finditer(text, fs, p)}
+            lo = fs if mark_from is None else min(mark_from, fs)
+            marks = {m.group(0).upper()[:5] for m in _FOOTER_MARK_RE.finditer(text, lo, p)}
             if len(marks) < 2 or not before.strip():
                 return None
             # 대문자로 시작하는 새 문장은 받지 않는다 — 앵커를 잃은 **다음 관찰 표제**(실측 90268
@@ -2672,7 +2678,7 @@ def _join_footer_pages(seg: str, est_hint: str = "") -> str:
             ls = _signer_lines_start(seg, max(cursor, fs - _PAGE_BLOCK_WINDOW), ls)
         start = _header_block_start(seg, max(cursor, fs - _PAGE_BLOCK_WINDOW), ls)
         before = seg[cursor:start].rstrip()
-        resume = _footer_block_resume(seg, fs, before, est_hint)
+        resume = _footer_block_resume(seg, fs, before, est_hint, mark_from=ls)
         if resume is None:
             break
         out.append(seg[cursor:start])
@@ -3011,8 +3017,8 @@ def _extract_483_observations_from_text(
     scoped = _scope_to_observation_list(body)
     primary = _observations_from_anchors(
         _cut_at_annotations(scoped),
-        lambda s: _with_glyph_first_anchor(
-            s, _select_observation_anchors(s, list(_OBS_RE.finditer(s)))),
+        lambda s: _with_gap_heading_anchors(s, _with_glyph_first_anchor(
+            s, _select_observation_anchors(s, list(_OBS_RE.finditer(s))))),
         hints,
         gate=_is_publishable_deficiency,
         fragment_heads=True,
@@ -3042,6 +3048,44 @@ def _with_glyph_first_anchor(body: str, anchors: list[re.Match[str]]) -> list[re
     if glyph is None:
         return anchors
     return [glyph, *anchors]
+
+
+# [11-26 191183] 번호가 건너뛴 자리(1 → 3)의 깨진 표제 줄 — `OBSERVATIO~ 2`. 정상 앵커(`_OBS_RE`)가 못 읽어
+# 관찰 2 가 관찰 1 상세에 통째로 붙거나(쪽 잇기 뒤) 사라졌다(쪽 끝 절단 때). **줄 전체가 표제뿐**인 줄만
+# 받는다 — 문장 속 상호참조(`refer to Observation 2.`)는 같은 줄에 산문이 있어 걸리지 않는다.
+_OBS_GAP_HEADING_RE = re.compile(
+    r"(?m)^[ \t]*O\s?B\s?S\s?E\s?R\s?V\s?A\s?T\s?I\S{0,3}?[ \t]*[#.:\-]?[ \t]*(\d{1,2})[ \t]*[.:]?[ \t]*$")
+
+
+_GAP_XREF_BEFORE_RE = re.compile(r"\b(?:refer\s+to|see|per|in|under|and|of)\s*[\r\n]+\s*$", re.I)
+
+
+def _with_gap_heading_anchors(body: str, anchors: list[re.Match[str]]) -> list[re.Match[str]]:
+    """앵커 번호가 건너뛴 구간(n → m, m-n ≥ 2)에서 빠진 번호의 깨진 표제 줄을 찾아 끼운다(순수 함수).
+
+    빠진 번호가 아닌 줄·구간 밖 줄은 보지 않으므로 번호가 이어지는 문서의 출력은 바뀌지 않는다."""
+    out: list[re.Match[str]] = []
+    for i, a in enumerate(anchors):
+        out.append(a)
+        if i + 1 >= len(anchors):
+            break
+        b = anchors[i + 1]
+        try:
+            lo_n, hi_n = int(a.group(1)), int(b.group(1))
+        except (TypeError, ValueError):
+            continue
+        if hi_n - lo_n < 2:
+            continue
+        want = lo_n + 1
+        for g in _OBS_GAP_HEADING_RE.finditer(body, a.end(), b.start()):
+            if _GAP_XREF_BEFORE_RE.search(body, max(a.end(), g.start() - 40), g.start()):
+                continue                    # `…please refer to⏎OBSERVATION 2⏎` — 줄을 넘긴 상호참조
+            if int(g.group(1)) == want:
+                out.append(g)
+                want += 1
+                if want >= hi_n:
+                    break
+    return out
 
 
 def _scope_to_observation_list(body: str) -> str:

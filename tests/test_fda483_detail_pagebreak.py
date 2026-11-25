@@ -358,3 +358,53 @@ class BareSignatureProseHeading1126Test(unittest.TestCase):
         d = c._clean_observation_chunk(
             "The log was incomplete. EMPLOYEE(S) SIGNATURE DATE ISSUED the reviewer then signed the record")
         self.assertEqual(d, "The log was incomplete.")
+
+
+class GarbledHeaderPageJoinAndGapHeading1126Test(unittest.TestCase):
+    """[11-26 191183] 관찰 1(1~8쪽)이 7쪽 끝에서 잘리고 관찰 2 가 통째로 빠졌다.
+
+    ① 다음 쪽 머리말이 판독으로 깨져(`TYPE ESTAB!.1$1<..EJ<T`) 닻이 없고, 서명란 닻 경로는 마커 종류를
+       첫 잘림 마커(`FORM FDA`)부터만 세어 1종뿐이라 잇지 못했다 — 위 줄의 `SEE`·`REVERSE OF`·`THIS PAGE`
+       가 같은 서명란이다.
+    ② 관찰 2 표제가 `OBSERVATIO~ 2` 로 깨져 정상 앵커가 못 읽었다(번호 1 → 3 으로 건너뜀).
+    고정 자료는 191183 의 쪽 경계 꼴을 그대로 두고 이름·업체만 가짜로 바꿨다."""
+
+    def setUp(self):
+        with open(os.path.join(FIX, "fda483_garbled_header_gap_heading_1126.txt"), encoding="utf-8") as fh:
+            self.obs = c._extract_483_observations_from_text(fh.read(), {})
+        self.by = {o["number"]: o for o in self.obs}
+
+    def test_observation_continues_across_garbled_page_header(self):
+        d = self.by["1"]["detail"]
+        self.assertIn("sections 4.1 which requires assessment of the\nlikelihood of occurrence", d.replace(" likelihood", "\nlikelihood"))
+        self.assertTrue(d.endswith("cannot be ruled out."))
+        for junk in ("REVERSE", "THIS PAGE", "Quist", "Brennick", "FORM FDA", "Quillmere", "ESTAB"):
+            self.assertNotIn(junk, d)
+
+    def test_gap_heading_recovers_observation_2_and_keeps_it_out_of_1(self):
+        self.assertEqual([o["number"] for o in self.obs], ["1", "2", "3"])
+        self.assertTrue(self.by["2"]["deficiency"].startswith("The accuracy, sensitivity"))
+        self.assertNotIn("accuracy", self.by["1"]["detail"])
+
+    def test_gap_heading_only_fills_missing_numbers_on_heading_only_lines(self):
+        body = ("OBSERVATION 1\nThe quality unit failed to review records.\nSpecifically, please refer to\n"
+                "OBSERVATION 3: .\nfor the related deviation and the batches listed.\n"
+                "OBSERVATION 3\nEquipment is not cleaned at appropriate intervals.\n")
+        anchors = c._with_gap_heading_anchors(body, list(c._OBS_RE.finditer(body))[::2])
+        self.assertEqual([a.group(1) for a in anchors], ["1", "3"])     # 2 줄이 없다 — 아무것도 끼우지 않는다
+        body2 = body.replace("OBSERVATION 3: .", "OBSERVATI0N 2 and the following")
+        anchors2 = c._with_gap_heading_anchors(body2, [m for m in c._OBS_RE.finditer(body2)])
+        self.assertEqual([a.group(1) for a in anchors2], ["1", "3"])    # 문장 속 표기는 표제 줄이 아니다
+        body3 = body.replace("OBSERVATION 3: .", "OBSERVATION 2")       # 줄을 넘긴 상호참조(`refer to⏎…`)
+        anchors3 = c._with_gap_heading_anchors(body3, [m for m in c._OBS_RE.finditer(body3) if m.group(1) != "2"])
+        self.assertEqual([a.group(1) for a in anchors3], ["1", "3"])
+
+    def test_mark_count_includes_signer_lines_above_first_cut_marker(self):
+        text = ("deviation of your procedure which requires assessment of the\nSEE\nVelmora Quist, Investigator\n"
+                "REVERSE OF\nTorvald Brennick, Investigator\nTHIS PAGE\nFORM FDA 483 (09/08)\n"
+                "likelihood of occurrence of the hazard when the results are detected.\n")
+        fs = text.index("FORM FDA")
+        ls = text.index("SEE")
+        self.assertIsNone(c._footer_block_resume(text, fs, text[:ls], ""))
+        self.assertEqual(c._footer_block_resume(text, fs, text[:ls], "", mark_from=ls),
+                         text.index("likelihood"))

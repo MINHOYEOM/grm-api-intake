@@ -142,7 +142,7 @@ FAKE_FIXTURE_NAMES = frozenset((
     "Orlena Ostrell Pelkastrom Pelvik Qiu Quell Quent Quorvala Ravel Tasindra Tor Torvel Twisk Varsten Vasky Velloc "
     "Velmor Veshan Zha Zun Doe Roe Testerson Example "
     "Oren Kalpa Ravinor Teskamal Dravin Tavo Wexo Marika Chova Darik Venmarz Ilhan Barvi Orvin Kesta Bennick Varch "
-    "Ovan Kelmoti Brant Keltham Bertil Hovanick Dorsev Velmora Quist Torvald Brennick").split())
+    "Ovan Kelmoti Brant Keltham Bertil Hovanick Dorsev Velmora Quist Torvald Brennick Orsolya Venn").split())
 # 규제기관 공식 서명자(시험 원문에 나오는 FDA 공무원) — 11-21 결정상 가리지 않는 대상이라 그대로 둔다.
 OFFICIAL_FIXTURE_NAMES = frozenset(("Garthwaite",))   # FDA Compliance Officer(경고서한 서명란)
 _TEXT_SUFFIXES = (".json", ".txt", ".md", ".html", ".csv")

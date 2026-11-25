@@ -21,6 +21,7 @@ MB = 1024 * 1024
 NOW = dt.datetime(2026, 11, 13, 1, 0, tzinfo=dt.timezone.utc)
 WF = (ROOT / ".github" / "workflows" / "grm-db-size-health.yml").read_text(encoding="utf-8")
 MIG = (ROOT / "web" / "migrations" / "154_db_size_daily.sql").read_text(encoding="utf-8")
+MIG165 = (ROOT / "web" / "migrations" / "165_db_size_status_conservative.sql").read_text(encoding="utf-8")
 
 
 def _status(db_mb: float, growth_mb: float | None = None, recorded: str = "2026-11-13T00:05:00Z") -> dict:
@@ -37,8 +38,13 @@ class EvaluateTest(unittest.TestCase):
         self.assertEqual(h.evaluate(_status(366, 1.0), now=NOW), [])
 
     def test_warn_ratio(self):
-        problems = h.evaluate(_status(410, 0.1), now=NOW)
+        problems = h.evaluate(_status(430, 0.1), now=NOW)  # 86% ≥ 85%
         self.assertTrue(any("사용률" in p for p in problems))
+
+    def test_warn_ratio_is_85_percent(self):
+        # 165: 기준 85%. 410/500 = 82% 는 정상, 뮤테이션(0.80 로 되돌리기)이면 이 시험이 깨진다.
+        self.assertEqual(h.WARN_RATIO, 0.85)
+        self.assertEqual(h.evaluate(_status(410, 0.1), now=NOW), [])
 
     def test_runway(self):
         problems = h.evaluate(_status(366, 3.0), now=NOW)  # 134MB / 3MB ≈ 45일
@@ -55,6 +61,24 @@ class EvaluateTest(unittest.TestCase):
 
     def test_no_record(self):
         self.assertTrue(h.evaluate({"limit_bytes": 500 * MB}, now=NOW))
+
+    def test_used_bytes_preferred_over_db_bytes(self):
+        # 165: used_bytes(DB 전체 합, template 포함)가 있으면 그것으로 센다 — db_bytes 만 보면 낙관 쪽으로 어긋난다.
+        s = _status(400, 0.1)          # db_bytes 80%
+        self.assertEqual(h.evaluate(s, now=NOW), [])
+        s["used_bytes"] = int(430 * MB)  # 전체 합 86%
+        self.assertTrue(any("사용률" in p for p in h.evaluate(s, now=NOW)))
+        self.assertEqual(h.used_bytes({"db_bytes": 5}), 5.0)
+        self.assertEqual(h.used_bytes({"db_bytes": 5, "used_bytes": 7}), 7.0)
+
+    def test_median_growth_preferred(self):
+        # 165: 일회성 적재가 낀 7일 평균(3.6MB) 대신 중앙값(1.3MB)으로 한도까지 일수를 본다.
+        s = _status(390, 3.6)
+        s["growth_7d_median_per_day"] = int(1.3 * MB)
+        self.assertEqual(h.growth_per_day(s), int(1.3 * MB))
+        self.assertEqual(h.evaluate(s, now=NOW), [])          # 110MB / 1.3MB ≈ 85일 → 정상
+        del s["growth_7d_median_per_day"]
+        self.assertTrue(any("한도까지" in p for p in h.evaluate(s, now=NOW)))  # 평균이면 ≈ 31일
 
     def test_growth_window_fallback(self):
         s = _status(366)
@@ -78,6 +102,26 @@ class WiringTest(unittest.TestCase):
         self.assertIn("revoke execute on function public.grm_db_size_status() from public, anon, authenticated;", MIG)
         self.assertIn("grant execute on function public.grm_db_size_status() to service_role;", MIG)
         self.assertNotIn("to anon", MIG)
+
+    def test_migration_165_conservative_and_additive(self):
+        code = "\n".join(l for l in MIG165.splitlines() if not l.strip().startswith("--"))
+        self.assertIn("'limit_bytes',       (select b from lim)", code)
+        self.assertIn("select 500000000::bigint as b", code)
+        self.assertIn("sum(pg_database_size(d.datname))", code)
+        self.assertNotIn("524288000", code)
+        # 154 의 키는 전부 남는다(가산만)
+        for key in ("'limit_bytes'", "'day'", "'db_bytes'", "'used_ratio'", "'rows'", "'growth_7d_per_day'",
+                    "'growth_28d_per_day'", "'growth_all_per_day'", "'recorded_at'", "'top_tables'",
+                    "'used_bytes'", "'growth_7d_median_per_day'"):
+            self.assertIn(key, code)
+        self.assertIn("percentile_cont(0.5)", code)
+        self.assertIn("returns jsonb\nlanguage sql stable security definer set search_path to 'public' as $$", code)
+        self.assertIn("revoke execute on function public.grm_db_size_status() from public, anon, authenticated;", code)
+        self.assertIn("grant execute on function public.grm_db_size_status() to service_role;", code)
+        self.assertIn("revoke execute on function public.grm_db_size_record() from public, anon, authenticated;", code)
+        self.assertIn("add column if not exists used_bytes bigint", code)
+        self.assertNotIn("to anon", code)
+        self.assertNotIn(b"\r\n", (ROOT / "web" / "migrations" / "165_db_size_status_conservative.sql").read_bytes())
 
     def test_cli_status_json(self):
         import json

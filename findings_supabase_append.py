@@ -34,6 +34,7 @@ import requests
 import findings_extractors
 import findings_store
 import grm_findings as gf
+from grm_cli import BULK_BATCH_MAX, BulkWriteError, BulkWriteRun
 from grm_cli import normalize_supabase_url as _normalize_base_url
 
 
@@ -92,6 +93,27 @@ def _finding_payload(record: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _changed_rows(
+    base_url: str, service_key: str, table: str, rows: list[dict[str, Any]], on_conflict: str,
+) -> list[dict[str, Any]]:
+    """Resume large FDA fiscal-year loads from the values already in the target."""
+    from findings_supabase_backfill import _fetch_all_pages
+
+    keys = on_conflict.split(",")
+    years = sorted({row["fiscal_year"] for row in rows})
+    existing = _fetch_all_pages(
+        base_url, service_key, table, select=",".join(rows[0]), page_size=500,
+        order=",".join(f"{key}.asc" for key in keys),
+        extra_params={"fiscal_year": f"in.({','.join(map(str, years))})"},
+    )
+
+    def row_key(row):
+        return tuple(row[key] for key in keys)
+
+    stored = {row_key(row): row for row in existing}
+    return [row for row in rows if stored.get(row_key(row)) != row]
+
+
 def _post_rows(
     base_url: str,
     service_key: str,
@@ -122,6 +144,8 @@ def _post_rows(
     default: silently overwriting on re-collection would let a degraded run clobber
     good data.
     """
+    if len(rows) > BULK_BATCH_MAX:
+        return 0, None, "bulk_batch_limit"
     url = f"{base_url}/rest/v1/{table}"
     headers = {
         "apikey": service_key,
@@ -196,9 +220,11 @@ def _append_findings_row_by_row(
 ) -> tuple[int, int, bool, list[str]]:
     inserted = 0
     duplicate = 0
-    had_error = False
     errors: list[str] = []
-    for finding in findings:
+
+    def send(batch, _offset):
+        nonlocal inserted, duplicate
+        finding = batch[0]
         status, rows, err = _post_rows(
             base_url, service_key, "findings", [_finding_payload(finding)], "finding_id",
         )
@@ -207,37 +233,63 @@ def _append_findings_row_by_row(
             # batch on_conflict target (finding_id) cannot express — treat as
             # a content-level duplicate, matching the SQLite dedupe semantics.
             duplicate += 1
-            continue
+            return True
         if err:
-            had_error = True
             errors.append(f"findings row POST failed finding_id={finding.get('finding_id', '')}: {err}")
-            continue
+            return False
         if rows:
             inserted += 1
         else:
             duplicate += 1
-    return inserted, duplicate, had_error, errors
+        return True
+
+    try:
+        BulkWriteRun().write(findings, send, batch_size=1)
+    except BulkWriteError as exc:
+        errors.append(str(exc))
+    return inserted, duplicate, bool(errors), errors
 
 
 def _append_findings_batch(
     base_url: str,
     service_key: str,
     findings: list[dict[str, Any]],
+    *,
+    bulk: BulkWriteRun | None = None,
 ) -> tuple[int, int, bool, list[str]]:
     if not findings:
         return 0, 0, False, []
 
-    status, rows, err = _post_rows(
-        base_url, service_key, "findings", [_finding_payload(f) for f in findings], "finding_id",
-    )
-    if status == 409:
-        return _append_findings_row_by_row(base_url, service_key, findings)
-    if err:
-        return 0, 0, True, [f"findings batch POST failed: {err}"]
+    inserted = 0
+    duplicate = 0
+    errors: list[str] = []
 
-    inserted = len(rows or [])
-    duplicate = len(findings) - inserted
-    return inserted, duplicate, False, []
+    def send(batch, _offset):
+        nonlocal inserted, duplicate
+        status, rows, err = _post_rows(
+            base_url, service_key, "findings", [_finding_payload(f) for f in batch], "finding_id",
+        )
+        if status == 409:
+            added, duplicates, had_error, row_errors = _append_findings_row_by_row(
+                base_url, service_key, batch,
+            )
+            inserted += added
+            duplicate += duplicates
+            errors.extend(row_errors)
+            return not had_error
+        if err:
+            errors.append(f"findings batch POST failed: {err}")
+            return False
+        added = len(rows or [])
+        inserted += added
+        duplicate += len(batch) - added
+        return True
+
+    try:
+        (bulk or BulkWriteRun()).write(findings, send)
+    except BulkWriteError as exc:
+        errors.append(str(exc))
+    return inserted, duplicate, bool(errors), errors
 
 
 def _append_raw_signal_with_findings(

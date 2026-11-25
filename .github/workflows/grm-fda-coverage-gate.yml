@@ -182,6 +182,8 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           # [노션 은퇴 준비] handoff 상태를 어디서 읽나 — notion(기본) | db(대기열 표 intake_handoffs).
           GRM_HANDOFF_STATUS_SOURCE: ${{ vars.GRM_HANDOFF_STATUS_SOURCE || 'notion' }}
+          # [노션 은퇴] off 면 노션 handoff 페이지가 없다 — 위 변수와 무관하게 DB 기록(intake_handoffs)으로 답한다.
+          GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           RUN_DATE: ${{ steps.ctx.outputs.run_date }}

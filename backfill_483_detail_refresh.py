@@ -33,7 +33,8 @@ import findings_supabase_backfill as fsb
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import SOURCE_FDA_483
+from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_483
+from grm_http_policy import FDA_483_PDF_DELAY_SECONDS
 
 DEFAULT_SINCE = "2026-08-10"
 _ALL_TIME = "1900-01-01"
@@ -358,7 +359,7 @@ def run(
     limit: int | None = None,
     doc_ids: set[str] | None = None,
     truncated_only: bool = False,
-    delay_seconds: float = 0.5,
+    delay_seconds: float = FDA_483_PDF_DELAY_SECONDS,
     text_fn: Callable[[str], tuple[str, str]] = _fetch_text,
     patch_fn: Callable[[dict[str, Any], dict[str, Any]], None] | None = None,
     sleep_fn: Callable[[float], None] = time.sleep,
@@ -390,11 +391,15 @@ def run(
                 continue
             sleep_fn(delay_seconds)
             try:
-                text, _status = text_fn(pdf_url)
+                text, status = text_fn(pdf_url)
             except Exception as exc:  # noqa: BLE001 — 건별 실패는 넘긴다(멱등 재실행)
                 report.failed += 1
                 report.errors.append(f"{doc}: fetch_raised:{type(exc).__name__}")
                 continue
+            if status == FDA_BOT_BLOCK:
+                report.failed += 1
+                report.errors.append(f"{doc}: {FDA_BOT_BLOCK}")
+                break
             if not text:
                 report.no_text += 1
                 continue
@@ -461,7 +466,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="옛 저장 상한(상세 1,200자·표제 280자+'...')에 걸린 관찰이 있는 문서만.")
     p.add_argument("--limit", type=int, default=None, help="처리 문서 수 상한.")
     p.add_argument("--doc-ids", default="", help="선택: document_id/raw_signal_id 목록(공백·쉼표).")
-    p.add_argument("--delay-seconds", type=float, default=0.5, help="PDF 요청 간 대기(초).")
+    p.add_argument("--delay-seconds", type=float, default=FDA_483_PDF_DELAY_SECONDS, help="PDF 요청 간 대기(초).")
     p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록.")
     p.add_argument("--supabase-url", help="미지정 시 $SUPABASE_URL")
     p.add_argument("--service-role-key", help="미지정 시 $SUPABASE_SERVICE_ROLE_KEY")

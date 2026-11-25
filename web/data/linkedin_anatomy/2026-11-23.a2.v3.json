@@ -1,0 +1,346 @@
+{
+  "schema": "grm-anatomy-slots/v3",
+  "pub": "2026-11-23",
+  "rank": 2,
+  "card_id": "d60bdc71408a",
+  "firm_alias": "한 완제의약품 제조소",
+  "status": "weekly",
+  "selection": "ANATOMY_CARDS.md 규칙(신호 등급 → 날짜를 뺀 구체 수치 수 → 지적 건수): 55c08c82779b (3, 3, 3) > d60bdc71408a (3, 0, 4) = ed75ff499f75 (3, 0, 4)",
+  "cover": {
+    "chip": "FDA 경고서한 · 기준일탈 조사",
+    "headline": [
+      "밸리데이션 배치와 같은 원인,",
+      "상업 배치 출하는 계속"
+    ],
+    "sub": "완제의약품 제조소 · 21 CFR 211.192·211.100(a)",
+    "quote": {
+      "en": "Despite knowing this information, you continued to release commercial batches after your process validation batches.",
+      "ko": "이를 알면서도 회사는 공정 밸리데이션 배치 이후에도 상업 배치를 계속 출고했다."
+    },
+    "line": "FDA: 방법 변동성 주장을 뒷받침할 데이터가 없다",
+    "line_evidence": [
+      "회사가 방법 변동성 주장을 뒷받침하는 데이터를 제시하지 않았으므로 응답은 부적절하다"
+    ]
+  },
+  "s02": {
+    "heading": "FDA가 지적한 네 가지, 조항별로",
+    "rows": [
+      {
+        "cite": "21 CFR 211.192",
+        "text": "밸리데이션 배치 OOS를 방법·원료 변동 탓으로 돌림",
+        "evidence": [
+          "회사는 공정 밸리데이션 배치의 기준일탈 함량 결과를 분석법의 변동성과 입고 원료 [가림]의 변동성 탓으로 돌렸다"
+        ],
+        "sim_query": "기준일탈 함량 분석법 변동성 원료",
+        "sim_short": "OOS를 방법 변동 탓으로",
+        "sim_situation": "분석법.*변동|방법 변동|기준일탈.*변동"
+      },
+      {
+        "cite": "21 CFR 211.192",
+        "text": "같은 근본원인을 알고도 상업 배치 출고를 이어감",
+        "evidence": [
+          "상업 배치의 기준일탈 함량 결과에 대한 회사의 조사는 공정 밸리데이션 배치에서 확인한 것과 같은 근본원인을 적었다",
+          "이를 알면서도 회사는 공정 밸리데이션 배치 이후에도 상업 배치를 계속 출고했다"
+        ],
+        "sim_query": "기준일탈 근본원인 상업 배치 출고",
+        "sim_short": "원인 알고도 출고",
+        "sim_situation": "근본원인.*(?:출고|출하)|출하.*기준일탈"
+      },
+      {
+        "cite": "21 CFR 211.192",
+        "text": "재시험에서 확정된 OOS에도 시장 조치 없이 조사를 열어 둠",
+        "evidence": [
+          "또한 회사는 [가림] 정제의 재시험에서 [가림] 기준일탈 함량 결과를 확인했을 때 적절한 시장 조치를 하지 않았다",
+          "회사의 기준일탈 조사는 과학적 근거 없이 열린 채로 남아 있었고"
+        ],
+        "sim_query": "기준일탈 재시험 시장 조치 조사 지연",
+        "sim_short": "시장 조치 지연",
+        "sim_situation": "시장 조치|조사.*(?:열린|미종결)|회수.*지연"
+      },
+      {
+        "cite": "21 CFR 211.100(a)",
+        "text": "PPQ 배치가 규격 부적합인데도 밸리데이션 보고서 승인",
+        "evidence": [
+          "공정 성능 적격성평가(PPQ) 중 [가림] 배치 하나가 유효성분 하나인 [가림]에 대한 [가림] 규격을 충족하지 못했다",
+          "회사의 공정 밸리데이션 보고서는 확인된 기준일탈 [가림] 부적합에도 승인됐으며"
+        ],
+        "sim_query": "공정 성능 적격성평가 기준일탈 밸리데이션 보고서 승인",
+        "sim_short": "PPQ 부적합에도 승인",
+        "sim_situation": "공정 성능 적격성|PPQ|밸리데이션 보고서"
+      }
+    ]
+  },
+  "s03": {
+    "heading": "회신 세 가지, FDA는 모두 부적절하다고 봤다",
+    "sub": "2026-06-09 회신에 대한 FDA 평가",
+    "pairs": [
+      {
+        "response": "방법 변동성이 원인일 수 있다",
+        "why": "변동성 주장을 뒷받침하는 데이터를 내지 않았다",
+        "evidence": [
+          "회사는 응답에서 분석법의 [가림] 단계에 내재한 변동성이 기준일탈(OOS) 결과에 기여했을 수 있다고 진술한다",
+          "회사가 방법 변동성 주장을 뒷받침하는 데이터를 제시하지 않았으므로 응답은 부적절하다"
+        ]
+      },
+      {
+        "response": "상업 배치는 라벨 규격 안이다",
+        "why": "유효기간 남은 배치의 경향 분석 데이터와 위험평가가 없다",
+        "evidence": [
+          "방법 변동성 주장을 뒷받침하는",
+          "유효기간이 남은 [가림] 정제의 경향 분석된 출고·안정성 데이터가 응답에 없고",
+          "제조하여 미국 시장에서 유효기간이 남아 있는 [가림] 정제 여러 배치에 대한 기준일탈 결과의 품질 영향 위험 평가를 제시하지 않았다"
+        ]
+      },
+      {
+        "response": "방법 변동성을 더 파악하겠다",
+        "why": "분석법과 핵심 품질 특성 규격까지 공정 평가가 충분하지 않다",
+        "evidence": [
+          "제조 공정(분석법과 공정 중 핵심 품질 특성 규격 수립 포함) 평가가 충분하지 않아 응답이 부적절하다고 평가했다"
+        ]
+      }
+    ],
+    "repeat": {
+      "label": "생산 중단",
+      "text": "회사는 해당 의약품 생산을 중단하기로 약속했다. 상업 배치 하나는 회수됐다.",
+      "evidence": [
+        "회사는 [가림] 의약품 생산을 중단하기로 약속했다",
+        "당국 조치: 상업 배치 회수"
+      ]
+    }
+  },
+  "s04": {
+    "heading": "FDA가 요구한 것 — 여섯 가지 중 네 가지",
+    "items": [
+      {
+        "ref": 0,
+        "title": "시험실 독립 평가",
+        "text": "시험실 관행·방법·설비·분석자 역량을 독립 평가하고 시정 계획을 낸다."
+      },
+      {
+        "ref": 1,
+        "title": "무효화 OOS 검토",
+        "text": "미국 시장·유효기간 내 의약품의 무효화된 기준일탈을 모두 독립 검토한다."
+      },
+      {
+        "ref": 2,
+        "title": "OOS 조사 체계",
+        "text": "품질부서 감독과 개정 절차를 포함한 시정 계획을 낸다."
+      },
+      {
+        "ref": 3,
+        "title": "경영진 감독 강화",
+        "text": "수명주기 감독과 공정 변동 원인을 찾는 데이터 중심 프로그램을 낸다."
+      }
+    ]
+  },
+  "s05": {
+    "heading": "이번 지적과 닮은 과거 사례",
+    "comment": "같은 조항은 다른 제조소 서한에도 인용됐다. 사례는 사이트 유사 사례 검색 결과다.",
+    "topic": "공정밸리데이션",
+    "cfr_rows": [
+      [
+        "기준일탈 조사",
+        "21 CFR 211.192"
+      ],
+      [
+        "생산·공정관리 절차",
+        "21 CFR 211.100(a)"
+      ]
+    ],
+    "map_header": "이번 서한이 인용한 조항",
+    "keywords": [
+      "process validation OOS",
+      "PPQ failure",
+      "method variability"
+    ],
+    "term_ids": [
+      "process-validation",
+      "oos",
+      "capa",
+      "laboratory-investigation"
+    ]
+  },
+  "s06": {
+    "heading": "서한이 적지 않은 것",
+    "not_stated": [
+      {
+        "text": "재시험에서 확정된 기준일탈의 함량 값은 적지 않았다.",
+        "basis": "위반 1 원문 ‘a confirmed (b)(4) OOS assay result from a retest’ — 측정값이 없다"
+      },
+      {
+        "text": "회수된 상업 배치의 번호와 제품명은 가림 처리됐다.",
+        "basis": "원문 ‘commercial batch (b)(4) of (b)(4) Tablets USP’ — 배치 번호·제품명이 가려져 있다"
+      },
+      {
+        "text": "PPQ에서 부적합이 나온 유효성분 이름은 가림 처리됐다.",
+        "basis": "위반 2 원문 ‘one of the active ingredients, (b)(4)’ — 성분명이 가려져 있다"
+      }
+    ],
+    "question": "우리 PPQ 배치의 기준일탈은 상업 출하 전에 원인이 닫혔나요?"
+  },
+  "caption": {
+    "lead": "‘같은 근본원인’을 알고도 상업 배치를 계속 출고했습니다. 회사는 밸리데이션 배치의 기준일탈을 미국에 출고되지 않았다는 이유로 품질 영향이 없다고 결론 냈습니다. 한 완제의약품 제조소가 받은 경고서한입니다.",
+    "claims": "지적은 두 가지입니다. 21 CFR 211.192로는 기준일탈 조사입니다. 회사는 밸리데이션 배치의 함량 기준일탈을 분석법과 원료의 변동성 탓으로 돌렸습니다. 상업 배치 조사에도 같은 근본원인을 적었는데 출고를 이어갔습니다. 재시험에서 기준일탈이 확정됐을 때도 적절한 시장 조치를 하지 않았고, 조사는 과학적 근거 없이 열려 있었습니다. 21 CFR 211.100(a)로는 공정 밸리데이션입니다. 공정 성능 적격성평가(PPQ) 배치 하나가 유효성분 규격에 부적합했는데, 정당화 없이 밸리데이션 보고서를 승인했습니다.",
+    "contrast": "회사는 2026-06-09 회신에서 분석법 단계의 고유 변동성이 기준일탈에 기여했을 수 있다고 답했습니다. FDA는 변동성 주장을 뒷받침하는 데이터가 없어 부적절하다고 봤습니다. 유효기간이 남은 배치의 경향 분석된 출고·안정성 데이터와 위험평가도 없었습니다. 제조 공정 평가는 분석법과 핵심 품질 특성 규격 수립까지 충분하지 않다고 평가했습니다. 회사는 해당 의약품 생산을 중단하기로 약속했습니다.",
+    "requests": "FDA는 시험실 시스템의 독립 평가, 무효화된 기준일탈 전체의 소급 독립 검토, 기준일탈 조사 체계의 시정 계획, 경영진 감독과 데이터 중심의 공정 변동 관리 프로그램을 요구했습니다. 밸리데이션 프로그램 요약과 평가, 공정 성능 적격성평가 일정도 요구했습니다. 회신 기한은 서한 수령 후 15영업일입니다.",
+    "similar": "우리 지적사항 DB에서 이번 지적과 닮은 과거 사례를 찾아봤습니다.",
+    "not_stated": "서한에 없는 것: 재시험에서 확정된 기준일탈의 함량 값, 회수된 배치의 번호와 제품명, 부적합이 나온 유효성분 이름(가림 처리)."
+  },
+  "en": {
+    "cover": {
+      "chip": "FDA warning letter · OOS investigations",
+      "headline": [
+        "Same root causes known,",
+        "batches still shipped"
+      ],
+      "sub": "Finished-drug site · 21 CFR 211.192, 211.100(a)",
+      "quote": {
+        "text": "Despite knowing this information, you continued to release commercial batches after your process validation batches."
+      },
+      "line": "FDA: no data to support the method variability claim",
+      "line_evidence": [
+        "you did not provide data to support your claim of method variability"
+      ]
+    },
+    "s02": {
+      "heading": "Four findings, by section",
+      "rows": [
+        {
+          "cite": "21 CFR 211.192",
+          "text": "Validation-batch OOS blamed on method and material variability",
+          "evidence": [
+            "you attributed OOS assay results of process validation batches to variability of both your analytical method and the incoming raw material"
+          ],
+          "short": "OOS blamed on variability"
+        },
+        {
+          "cite": "21 CFR 211.192",
+          "text": "Same root causes known, commercial batches still released",
+          "evidence": [
+            "your investigation of OOS assay results for commercial batches listed the same root causes that were identified for process validation batches",
+            "Despite knowing this information, you continued to release commercial batches after your process validation batches."
+          ],
+          "short": "Released despite known cause"
+        },
+        {
+          "cite": "21 CFR 211.192",
+          "text": "No market action on a confirmed retest OOS; case left open",
+          "evidence": [
+            "you did not take appropriate market action at the time you obtained a confirmed",
+            "Your OOS investigation remained open without scientific justification"
+          ],
+          "short": "Market action delayed"
+        },
+        {
+          "cite": "21 CFR 211.100(a)",
+          "text": "A PPQ batch failed a specification; the report was approved anyway",
+          "evidence": [
+            "Your process validation report was approved despite the confirmed OOS",
+            "No justification or scientific rationale was included in your decision to conclude that your process validation was acceptable."
+          ],
+          "short": "PPQ failure approved"
+        }
+      ]
+    },
+    "s03": {
+      "heading": "Three responses, all found inadequate",
+      "sub": "FDA's review of the June 9, 2026 reply",
+      "pairs": [
+        {
+          "response": "Method variability may explain it",
+          "why": "No data given to support the variability claim",
+          "evidence": [
+            "you state that inherent variability of the (b)(4) step of the analytical method may have contributed to OOS results",
+            "Your response is inadequate because you did not provide data to support your claim of method variability."
+          ]
+        },
+        {
+          "response": "No commercial batch is out of spec",
+          "why": "No trended data or risk assessment for batches in expiry",
+          "evidence": [
+            "none of the commercial [batches] have a reportable result that lies outside the",
+            "You did not provide trended drug product release and stability data for the",
+            "tablets that remain in expiration and on the U.S. market"
+          ]
+        },
+        {
+          "response": "Will study method variability",
+          "why": "The process review did not reach the method or in-process specs",
+          "evidence": [
+            "you could better understand the variability of your method and will evaluate and trend stability and release data for current batches",
+            "you have not fully and adequately evaluated your manufacturing process which includes the analytical method and establishing appropriate specifications for in-process CQA"
+          ]
+        }
+      ],
+      "repeat": {
+        "label": "Production ceased",
+        "text": "The firm committed to cease production of the affected products. One commercial batch was recalled.",
+        "evidence": [
+          "We acknowledge your commitment to cease production of",
+          "was recalled for being"
+        ]
+      }
+    },
+    "s04": {
+      "heading": "What FDA asked for: four of six",
+      "items": [
+        {
+          "ref": 0,
+          "title": "Lab system review",
+          "text": "Independent review of lab practices, methods and analyst competency."
+        },
+        {
+          "ref": 1,
+          "title": "Invalid OOS review",
+          "text": "Review of invalidated OOS results for products in the U.S. market and within expiry."
+        },
+        {
+          "ref": 2,
+          "title": "OOS system overhaul",
+          "text": "A plan covering QU oversight of lab investigations and revised procedures."
+        },
+        {
+          "ref": 3,
+          "title": "Oversight and variation",
+          "text": "A data-driven program to find sources of process variability."
+        }
+      ]
+    },
+    "s05": {
+      "heading": "Past cases like this one",
+      "comment": "The same sections appear in other sites' letters. Cases come from the site's similar-case search.",
+      "topic_label": "Process validation",
+      "cfr_labels": [
+        "OOS investigation",
+        "Production and process control procedures"
+      ],
+      "map_header": "Sections this letter cites"
+    },
+    "s06": {
+      "heading": "What the letter does not say",
+      "not_stated": [
+        {
+          "text": "It gives no value for the confirmed retest OOS assay result.",
+          "basis": "Violation 1: ‘a confirmed (b)(4) OOS assay result from a retest’ — no value given"
+        },
+        {
+          "text": "The recalled commercial batch and product are redacted.",
+          "basis": "‘commercial batch (b)(4) of (b)(4) Tablets USP’ — lot and product name redacted"
+        },
+        {
+          "text": "The active ingredient that failed in PPQ is redacted.",
+          "basis": "Violation 2: ‘one of the active ingredients, (b)(4)’ — name redacted"
+        }
+      ],
+      "question": "Was every PPQ OOS closed before commercial release?"
+    },
+    "caption": {
+      "lead": "Same root causes, yet it ‘continued to release’ batches. The firm had called the validation-batch OOS results harmless because they never shipped. The warning letter went to a finished-drug manufacturer.",
+      "claims": "FDA cited two failures. Under 21 CFR 211.192, OOS investigations. The firm blamed validation-batch OOS assay results on method and raw material variability. Its commercial-batch investigation listed the same root causes, and it kept releasing. After a confirmed retest OOS, it took no appropriate market action and left the case open. Under 21 CFR 211.100(a), process validation. A PPQ batch failed a specification for one active ingredient, and the report was approved without justification.",
+      "contrast": "In its June 9, 2026 reply, the firm said inherent method variability may have contributed to the OOS results. FDA said no data supported that claim. There was no trended release and stability data for batches still in expiry, and the process review did not reach the method or in-process specifications. The firm committed to cease production of the product.",
+      "requests": "FDA asked for an independent lab system assessment, a review of every invalidated OOS result for products on the U.S. market, a remediation plan for the OOS investigation system, and a data-driven program on process variability. It also asked for a validation program summary and a PPQ timeline. The reply is due within 15 business days of receipt.",
+      "similar": "We looked for similar past findings in the GRM findings database.",
+      "not_stated": "Not in the letter: the value of the confirmed retest OOS assay, and the recalled batch, product and failing ingredient (redacted)."
+    }
+  }
+}

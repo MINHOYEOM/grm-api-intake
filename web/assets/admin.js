@@ -1519,9 +1519,23 @@
   function renderOpsMonitor(errorMessage) {
     renderOpsBrief(errorMessage);
     renderOpsSummary(errorMessage);
+    renderIntakeStatus(errorMessage);
     renderWorkflowPipeline(errorMessage);
     renderWorkflowCards(errorMessage);
     renderOpsIncidents(errorMessage);
+  }
+  // 수집 현황 — 판정·그리기는 admin-ops.js(GRMOps.renderIntake). 실행 목록은 운영 API, 소스별 건수는 ops-status 사본.
+  function intakeLate() {
+    return !!(window.GRMOps && state.ops && window.GRMOps.intakeVerdict(state.ops.runs, Date.now()).kind === "late");
+  }
+  function renderIntakeStatus(errorMessage) {
+    var host = byId("grm-intake");
+    if (!host) return;
+    if (errorMessage || !state.ops) {
+      host.innerHTML = '<div class="admin-empty">' + esc(errorMessage || "운영 데이터를 불러오지 못했습니다.") + "</div>";
+      return;
+    }
+    host.innerHTML = window.GRMOps ? window.GRMOps.renderIntake(state.ops, Date.now()) : '<div class="admin-empty">수집 현황 화면을 불러오지 못했습니다.</div>';
   }
   function renderOpsBrief(errorMessage) {
     var host = byId("grm-ops-brief");
@@ -1544,11 +1558,13 @@
       ? (warnings.length + configWarnings.length)
       : Number(summary.warning_total || 0);
     var sourceBad = summary.source_ok === false || sourceStatus === "실패";
-    var kind = sourceBad || incidentCount || configWarnings.length ? "bad" : (warningTotal || inProgress ? "warn" : "ok");
+    var intakeIsLate = intakeLate();
+    var kind = sourceBad || intakeIsLate || incidentCount || configWarnings.length ? "bad" : (warningTotal || inProgress ? "warn" : "ok");
     var title = kind === "bad" ? "즉시 조치 필요" : (kind === "warn" ? "주의해서 확인" : "운영 정상");
     var icon = kind === "bad" ? "ti-alert-triangle" : (kind === "warn" ? "ti-alert-circle" : "ti-shield-check");
     var statusBits = [];
     if (sourceBad) statusBits.push(sourceStatus === "확인 중" ? "규제소스 수집 상태 확인 필요" : "규제소스 수집 " + sourceStatus);
+    if (intakeIsLate) statusBits.push("수집 지연(마지막 성공 수집 후 26시간 초과)");
     if (incidentCount) statusBits.push(number(incidentCount) + "개 실패 작업");
     if (configWarnings.length) statusBits.push(number(configWarnings.length) + "개 설정 경고");
     if (!statusBits.length && inProgress) statusBits.push(number(inProgress) + "개 워크플로우 실행 중");

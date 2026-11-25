@@ -11,10 +11,10 @@ already expose their full history behind the same server-side DataTables AJAX me
     collector's static HTML listing (`collect_intake.collect_fda_warning_letters`, which
     only sees the current/recent page) -- it exists only to reach historical volume.
 
-This module fetches those two sources in caller-controlled chunks (--offset/--max-docs)
-and appends new `raw_signals` rows directly to Supabase -- Notion is never touched (the
-weekly brief queue must not see backfill noise). MFDS/nedrug is out of scope (robots
-Disallow: /).
+The CLI lists and triages those two sources in caller-controlled chunks by default.
+With `--apply`, it fetches documents and appends new `raw_signals` rows directly to
+Supabase. Notion is never touched (the weekly brief queue must not see backfill
+noise). MFDS/nedrug is out of scope (robots Disallow: /).
 
 F2c adds an unattended `--auto` mode on top: no --source/--offset needed -- the run
 scans list pages from the head (existing/gated rows require no document GET), continues
@@ -93,9 +93,11 @@ import collect_intake as ci
 import findings_store
 import findings_supabase_append as fsa
 import grm_findings as gf
+from grm_cli import BulkWriteError, BulkWriteRun
 from grm_cli import header_ci as _header_ci
 from grm_cli import parse_content_range as _parse_content_range
-from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html, log
+from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html, log
+from grm_http_policy import FDA_BACKFILL_DELAY_SECONDS, FDA_HTTP_RETRIES
 
 
 SCHEMA_VERSION = "grm-findings-backfill-fetch/v1"
@@ -249,6 +251,7 @@ def fetch_existing_document_ids(
 
 def _post_raw_signals(
     base_url: str, service_key: str, records: list[dict[str, Any]], errors_out: list[str],
+    *, bulk: BulkWriteRun | None = None,
 ) -> int:
     """Batch-POST valid raw_signal records, 10 at a time, on_conflict=raw_signal_id
     (idempotent -- Prefer: resolution=ignore-duplicates is baked into
@@ -257,16 +260,23 @@ def _post_raw_signals(
     counted or treated as an error).
     """
     appended = 0
-    for start in range(0, len(records), _POST_BATCH_SIZE):
-        chunk = records[start:start + _POST_BATCH_SIZE]
+
+    def send(chunk, _offset):
+        nonlocal appended
         payload = [fsa._raw_signal_payload(r) for r in chunk]
         _status, rows, err = fsa._post_rows(
             base_url, service_key, "raw_signals", payload, "raw_signal_id",
         )
         if err:
             errors_out.append(f"raw_signals-post-failed:{err}")
-            continue
+            return False
         appended += len(rows or [])
+        return True
+
+    try:
+        (bulk or BulkWriteRun()).write(records, send, batch_size=_POST_BATCH_SIZE)
+    except BulkWriteError as exc:
+        errors_out.append(f"bulk-write:{exc}")
     return appended
 
 
@@ -328,6 +338,7 @@ def run_483(
     service_key: str,
     sleeper: Sleeper | None = None,
     existing_ids: set[str] | None = None,
+    bulk: BulkWriteRun | None = None,
     today: date | None = None,
 ) -> tuple[BackfillFetchReport, int]:
     sleeper = sleeper or _default_sleep
@@ -354,6 +365,9 @@ def run_483(
         config = fda483._datatable_ajax_config(html)
         if config is None:
             raise RuntimeError("fda483-ajax-config-missing")
+    except FdaBotBlockError:
+        report.errors.append(FDA_BOT_BLOCK)
+        return report, 2
     except Exception as e:  # noqa: BLE001
         primary_error = f"list-config-failed:{type(e).__name__}"
 
@@ -362,6 +376,9 @@ def run_483(
         try:
             sleeper(delay)
             data = fda483._fetch_datatable_page(config, start=offset, length=max_docs, draw=1)
+        except FdaBotBlockError:
+            report.errors.append(FDA_BOT_BLOCK)
+            return report, 2
         except Exception as e:  # noqa: BLE001
             primary_error = f"list-page-failed:{type(e).__name__}"
 
@@ -384,7 +401,11 @@ def run_483(
             f"2차 전수 JSON 백본({fda483.BACKBONE_LEGACY_JSON})으로 폴백 시도",
         )
         sleeper(delay)
-        json_rows, _json_total = fda483._fetch_legacy_json_rows()
+        try:
+            json_rows, _json_total = fda483._fetch_legacy_json_rows()
+        except FdaBotBlockError:
+            report.errors.append(FDA_BOT_BLOCK)
+            return report, 2
         if not json_rows:
             report.errors.append(primary_error)
             report.errors.append("json-backbone-failed")
@@ -417,6 +438,7 @@ def run_483(
         elif isinstance(total, (int, float)) and offset + len(raw_rows) >= total:
             report.exhausted = True
 
+    deep_enabled = fda483._deep_enabled()
     to_post: list[dict[str, Any]] = []
     for nrow in nrows:
         media_id = nrow.get("media_id", "")
@@ -444,15 +466,24 @@ def run_483(
             sleeper(delay)
             pdf_url = fda483._pdf_url(media_id)
             text, text_status = fda483._fetch_fda483_pdf_text(pdf_url)
+            if text_status == FDA_BOT_BLOCK:
+                report.errors.append(FDA_BOT_BLOCK)
+                break
             excerpt = fda483._extract_fda483_excerpt(text) if text else ""
             header_hints = {
                 "establishment_type": nrow.get("establishment_type", ""),
                 "fei_number": nrow.get("fei", ""),
                 "firm_name": nrow.get("company", ""),
             }
+            obs_seen: list[str] = []
             observations = (
-                fda483._extract_483_observations_from_text(text, header_hints) if text else []
+                fda483._extract_483_observations_from_text(text, header_hints, seen=obs_seen)
+                if text else []
             )
+            observation_count = (
+                fda483.fda483_observation_count(observations, obs_seen) if observations else "same"
+            )
+            body_full = text if deep_enabled and observations else ""
             # [실사관 배선 2026-07-31] 일일 수집기(collect_fda_483.collect_fda_483)와 동일한
             # 위치·조건으로 맞춘다 -- ENABLE_FDA_483_OBSERVATIONS/ENABLE_FDA_483_DEEP 과
             # 무관하게 항상 수행하는 순수 결정론 파서다(네트워크 추가 요청 0 -- 위에서 이미
@@ -475,14 +506,15 @@ def run_483(
             report.skipped_ocr_unavailable += 1
             continue
 
-        # Same construction function the daily collector calls -- guarantees identical
-        # IntakeItem (headline/body/raw_payload/document_id/signal_tier/etc.) for this row.
+        # Share the daily collector's item builder while preserving backfill observations
+        # regardless of the daily observation flag.
         # [결손 사유 전파 2026-07-20] `text_status` 도 넘긴다 — 일일 수집 경로와 raw_payload
         # 가 **바이트 동일**해야 하는 계약(Fda483IdentityTest)이라, 한쪽만 사유를 실으면 깨진다.
         # [실사관 배선 2026-07-31] `inspectors` 도 넘긴다 — 안 넘기면 이 경로로 들어오는 483
         # 문서만 raw_payload 에 `fda483_inspectors` 가 영구히 빠진다(daily 와의 동일성 계약).
-        item = fda483._to_item(nrow, excerpt, observations, "", text_status,
-                                inspectors=inspectors)
+        item = fda483._to_item(nrow, excerpt, observations, body_full,
+                               text_status if not text else "ok",
+                               inspectors=inspectors, observation_count=observation_count)
         if item is None:
             # Domain-excluded by the shared QA gate inside _to_item (veterinary/device/food
             # -- same drop the daily collector performs). Not an error; not appended.
@@ -500,7 +532,10 @@ def run_483(
         to_post.append(record)
 
     if not dry_run and to_post:
-        report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors)
+        report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors, bulk=bulk)
+        if any(error.startswith("bulk-write:") for error in report.errors):
+            report.next_offset = offset
+            return report, 1
 
     # [침묵 금지 2026-07-30] 보류가 있었으면 stderr 로 띄운다 — 리포트 JSON 은 잡 요약을
     # 펼쳐야 보이지만 stderr 는 로그 본문에 남는다. 이 워크플로는 무인 스케줄이라 사람이
@@ -513,7 +548,7 @@ def run_483(
             file=sys.stderr,
         )
 
-    return report, 0
+    return report, 2 if FDA_BOT_BLOCK in report.errors else 0
 
 
 # ---------------------------------------------------------------------------
@@ -658,6 +693,7 @@ def run_wl(
     service_key: str,
     sleeper: Sleeper | None = None,
     existing_ids: set[str] | None = None,
+    bulk: BulkWriteRun | None = None,
 ) -> tuple[BackfillFetchReport, int]:
     sleeper = sleeper or _default_sleep
     report = BackfillFetchReport(source="fda_wl", offset=offset, max_docs=max_docs)
@@ -671,10 +707,13 @@ def run_wl(
 
     try:
         sleeper(delay)
-        html = http_get_html(ci.FDA_WL_URL, timeout=30, retries=3, label="FDA WL backfill config")
+        html = http_get_html(ci.FDA_WL_URL, timeout=30, retries=FDA_HTTP_RETRIES, label="FDA WL backfill config")
         config = _extract_datatable_config(html, WL_SOLR_VIEW_NAME)
         if config is None:
             raise RuntimeError("fda-wl-ajax-config-missing")
+    except FdaBotBlockError:
+        report.errors.append(FDA_BOT_BLOCK)
+        return report, 2
     except Exception as e:  # noqa: BLE001
         report.errors.append(f"list-config-failed:{type(e).__name__}")
         return report, 2
@@ -687,7 +726,7 @@ def run_wl(
         )
         url = config["url"] + "?" + urlencode(params)
         text = http_get_html(
-            url, timeout=30, retries=3,
+            url, timeout=30, retries=FDA_HTTP_RETRIES,
             headers={
                 "Accept": "application/json, text/javascript, */*; q=0.01",
                 "Referer": ci.FDA_WL_URL,
@@ -698,6 +737,9 @@ def run_wl(
         data = json.loads(text)
         if not isinstance(data, dict):
             data = {}
+    except FdaBotBlockError:
+        report.errors.append(FDA_BOT_BLOCK)
+        return report, 2
     except Exception as e:  # noqa: BLE001
         report.errors.append(f"list-page-failed:{type(e).__name__}")
         return report, 2
@@ -748,7 +790,12 @@ def run_wl(
             letter_html, fetch_status = "", ci.WL_BODY_STATUS_OK
             try:
                 sleeper(delay)
-                letter_html = http_get_html(wl_href, timeout=20, retries=3, label="FDA WL backfill body")
+                letter_html = http_get_html(
+                    wl_href, timeout=20, retries=FDA_HTTP_RETRIES, label="FDA WL backfill body",
+                )
+            except FdaBotBlockError:
+                report.errors.append(FDA_BOT_BLOCK)
+                break
             except Exception as e:  # noqa: BLE001
                 # Graceful degrade (matches collect_intake's own WL body fetch failure
                 # handling) -- item still gets appended, with wl_body_status so the daily
@@ -769,9 +816,12 @@ def run_wl(
         to_post.append(record)
 
     if not dry_run and to_post:
-        report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors)
+        report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors, bulk=bulk)
+        if any(error.startswith("bulk-write:") for error in report.errors):
+            report.next_offset = offset
+            return report, 1
 
-    return report, 0
+    return report, 2 if FDA_BOT_BLOCK in report.errors else 0
 
 
 # ---------------------------------------------------------------------------
@@ -863,6 +913,7 @@ def run_auto(
     existing_counts: dict[str, int] = {}
     exit_code = 0
     caught_up_all = True
+    bulk = BulkWriteRun()
 
     for cli_name, source_const in _AUTO_SOURCES:
         order.append(cli_name)
@@ -888,7 +939,7 @@ def run_auto(
             report, code = runner(
                 offset=offset, max_docs=max_docs, delay=delay, dry_run=dry_run,
                 base_url=base_url, service_key=service_key, sleeper=sleeper,
-                existing_ids=existing_ids,
+                existing_ids=existing_ids, bulk=bulk,
             )
             attempts.append(report)
             pages += 1
@@ -982,8 +1033,9 @@ def run_auto(
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="GRM FIND-1 F2b -- chunked backfill fetch of historical FDA 483 / "
-        "Warning Letter documents directly into Supabase raw_signals (bypasses Notion; "
-        "robots Crawl-Delay=30 aware; one source per run -- 483/WL share a host)."
+        "Warning Letter documents (--apply writes directly to Supabase raw_signals; "
+        "bypasses Notion; robots Crawl-Delay=30 aware; 483/WL share a host).",
+        allow_abbrev=False,
     )
     # --source is required unless --auto (checked in main -- explicit exit-2 check,
     # matching the existing credential-validation style).
@@ -1002,11 +1054,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "run; exits cleanly with auto_complete=true once both backlogs are exhausted. "
         "Mutually exclusive with --source/--offset.",
     )
-    parser.add_argument("--delay", type=float, default=30)
-    parser.add_argument(
-        "--dry-run", action="store_true", default=False,
-        help="List + triage only (skip_existing/skip_gated) -- never fetch documents or POST.",
+    parser.add_argument("--delay", type=float, default=FDA_BACKFILL_DELAY_SECONDS)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--dry-run", dest="apply", action="store_false",
+        help="List + triage only (default); skip document fetches and writes.",
     )
+    mode.add_argument(
+        "--apply", action="store_true",
+        help="Fetch documents and append new rows to Supabase raw_signals.",
+    )
+    parser.set_defaults(apply=False)
     parser.add_argument("--supabase-url", help="Falls back to $SUPABASE_URL")
     parser.add_argument("--service-role-key", help="Falls back to $SUPABASE_SERVICE_ROLE_KEY")
     parser.add_argument("--output", help="Optional path to also write the JSON report to.")
@@ -1047,14 +1105,14 @@ def main(argv: list[str] | None = None) -> int:
         report_dict, exit_code = run_auto(
             max_docs=args.max_docs, delay=args.delay,
             fetch_budget=args.auto_fetch_budget,
-            dry_run=args.dry_run, base_url=base, service_key=key,
+            dry_run=not args.apply, base_url=base, service_key=key,
         )
     else:
         runner = _RUNNERS[args.source]
         report, exit_code = runner(
             offset=args.offset if args.offset is not None else 0,
             max_docs=args.max_docs, delay=args.delay,
-            dry_run=args.dry_run, base_url=base, service_key=key,
+            dry_run=not args.apply, base_url=base, service_key=key,
         )
         report_dict = asdict(report)
 

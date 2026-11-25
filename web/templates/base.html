@@ -344,17 +344,19 @@
   var links=document.querySelectorAll('a[href="#subscribe"]');
   if(!sec||!links.length)return;
   // hidden 속성은 author display(.grm-next a·.home-links a)에 진다 — style 로 직접 끈다.
-  if(sec.hidden){for(var i=0;i<links.length;i++){var li=links[i].closest&&links[i].closest('li');(li||links[i]).style.display='none';}return;}
+  // [홈 구독 밴드 2026-11-24] 구독한 브라우저라 하단 밴드가 숨어도, 홈 밴드(--band)가 있으면 헤더 '무료 구독'은 남아 그리로 간다.
+  var hb=document.querySelector('.grm-inl--band');
+  if(sec.hidden&&!hb){for(var i=0;i<links.length;i++){var li=links[i].closest&&links[i].closest('li');(li||links[i]).style.display='none';}return;}
   // [구독 유입 2026-11-17] 본문 속 줄형 칸(.grm-inl)이 있으면 화면에서 가장 가까운 칸으로 간다
   // (헤더 상시 '무료 구독'이 페이지 맨 끝까지 끌고 내려가지 않게). 밴드는 늘 후보다.
   function nearest(){
-    var c=[sec],r=document.querySelectorAll('.grm-inl'),mid=window.innerHeight/2,best=sec,bd=Infinity;
+    var c=sec.hidden?[]:[sec],r=document.querySelectorAll('.grm-inl'),mid=window.innerHeight/2,best=sec.hidden?hb:sec,bd=Infinity;
     for(var k=0;k<r.length;k++){if(!r[k].hidden&&r[k].offsetParent!==null)c.push(r[k]);}
     for(var m=0;m<c.length;m++){var b=c[m].getBoundingClientRect(),d=Math.abs(b.top+b.height/2-mid);if(d<bd){bd=d;best=c[m];}}
     return best;
   }
   function go(e){
-    if(sec.hidden)return;
+    if(sec.hidden&&!hb)return;
     e.preventDefault();
     var t=nearest();
     var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -878,13 +880,29 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-inl--stack .grm-inl-in{grid-template-columns:1fr}
 @media (max-width:720px){.grm-inl-in{grid-template-columns:1fr}.grm-inl-btn{padding:0 16px}}
 @media (prefers-reduced-motion:reduce){.grm-inl.sub-flash{transition:none}}
+/* [홈 구독 밴드 2026-11-24] 색 면(밝은 코랄 바탕 + 왼쪽 코랄 선) — 검은 띠 금지, 강조색 하나. 줄형 칸의 위아래 선 대신 면으로 구획한다. */
+.grm-inl--band{margin:30px 0 4px;padding:26px 30px;background:#FBEEE7;border:1px solid #F1D5C8;border-left:5px solid var(--coral);border-radius:10px}
+.grm-inl--band[hidden]{display:none}
+.grm-inl--band .grm-inl-in{grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:16px 44px}
+.grm-band-eb{margin:0 0 6px;font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--coral-2)}
+.grm-band-t{margin:0;font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.35;color:var(--ink);word-break:keep-all}
+.grm-band-facts{display:flex;flex-wrap:wrap;gap:10px 0;margin:16px 0 0;padding:0;list-style:none}
+.grm-band-facts li{padding:0 20px;border-left:1px solid rgba(0,0,0,.12)}
+.grm-band-facts li:first-child{padding-left:0;border-left:0}
+.grm-band-facts b{display:block;font-family:var(--sans);font-size:15px;font-weight:700;color:var(--coral-2)}
+.grm-band-facts span{display:block;margin-top:2px;font-family:var(--sans);font-size:12.5px;line-height:1.5;color:var(--muted);white-space:nowrap}
+.grm-band-n{margin:8px 0 0;font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
+.grm-inl--band .grm-inl-form input[type=email],.grm-inl--band .grm-inl-btn{height:48px}
+@media (max-width:980px){.grm-inl--band .grm-inl-in{grid-template-columns:1fr}}
+@media (max-width:720px){.grm-inl--band{padding:20px 18px;border-left-width:4px}.grm-band-t{font-size:20px}.grm-band-facts li{padding:0 16px 0 0;border-left:0}.grm-band-facts span{white-space:normal}}
 </style>
 <script>
 (function(){
   var rows=document.querySelectorAll('.grm-inl');
   if(!rows.length)return;
   try{
-    if(localStorage.getItem('grm-sub-ok')){for(var i=0;i<rows.length;i++)rows[i].hidden=true;return;}
+    // 홈 구독 밴드(--band)는 구독한 브라우저에서도 남긴다 — 다른 칸이 다 숨으면 구독 자리를 찾을 수 없다(2026-11-24).
+    if(localStorage.getItem('grm-sub-ok')){for(var i=0;i<rows.length;i++)if(!rows[i].classList.contains('grm-inl--band'))rows[i].hidden=true;}
   }catch(_){}
   if(!window.fetch)return;
   for(var j=0;j<rows.length;j++)(function(row){
@@ -901,7 +919,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       if(inn)inn.hidden=true;
       if(done)done.hidden=false;
       // 같은 페이지의 다른 줄형 칸은 접는다(구독한 사람에게 또 권하지 않는다). 밴드는 다음 방문부터 숨는다.
-      for(var k=0;k<rows.length;k++)if(rows[k]!==row)rows[k].hidden=true;
+      for(var k=0;k<rows.length;k++)if(rows[k]!==row&&!rows[k].classList.contains('grm-inl--band'))rows[k].hidden=true;
     });
   })(rows[j]);
 })();

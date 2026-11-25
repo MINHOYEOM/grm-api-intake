@@ -166,6 +166,42 @@ class ApplyTest(unittest.TestCase):
         self.assertEqual(send.calls, [])
         self.assertEqual(rep["mode"], "dry_run")
 
+    # [DB 용량 3단계 · 2026-11-20] 라이브가 이미 같은 값이면 PATCH 를 보내지 않는다.
+    # 뮤테이션: apply_item 의 unchanged 분기를 지우면 test_same_values_are_not_rewritten 이 깨진다.
+    def _send_live(self, detail, detail_ko):
+        calls = []
+
+        def send(verb, base, key, *, params=None, json_body=None, **_kw):
+            calls.append((verb, params, json_body))
+            if verb == "get":
+                return 200, [{"finding_text": "Heading.", "detail_text": detail, "detail_text_ko": detail_ko}], ""
+            return 200, [{}], ""
+        return send, calls
+
+    def test_get_asks_for_current_detail(self):
+        send = _Send()
+        self._run([_item()], send)
+        self.assertEqual(send.calls[0][1]["select"], "finding_text,detail_text,detail_text_ko")
+
+    def test_same_values_are_not_rewritten(self):
+        send, calls = self._send_live(EN, KO)
+        rep = self._run([_item()], send)
+        self.assertEqual(rep["unchanged"], 1)
+        self.assertEqual(rep["succeeded"], 0)
+        self.assertEqual([c[0] for c in calls], ["get"])
+
+    def test_changed_ko_is_written(self):
+        send, calls = self._send_live(EN, "옛 번역")
+        rep = self._run([_item()], send)
+        self.assertEqual(rep["succeeded"], 1)
+        self.assertEqual([c[0] for c in calls], ["get", "patch"])
+
+    def test_null_live_detail_is_written(self):
+        send, calls = self._send_live(None, None)
+        rep = self._run([_item()], send)
+        self.assertEqual(rep["succeeded"], 1)
+        self.assertEqual(rep["unchanged"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

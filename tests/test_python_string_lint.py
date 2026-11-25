@@ -28,6 +28,7 @@ STDOUT_BASELINE = frozenset({
     "company/ops/ops_status.py",
     "tests/test_findings_docs_refresh.py",
     "tests/test_no_storage_truncation.py",
+    "tests/test_published_copies_no_personal_names.py",
     "web/tests/test_render.py",
 })
 

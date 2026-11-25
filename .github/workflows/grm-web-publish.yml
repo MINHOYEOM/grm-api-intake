@@ -193,6 +193,10 @@ jobs:
             --carry-only \
             --summary "$GITHUB_STEP_SUMMARY"
 
+      - name: 브리프 미리보기 5유형 요약(경고만)
+        continue-on-error: true
+        run: python brief_preview_check.py "${{ steps.r.outputs.pub }}" --scaffold "_scaffold/brief_web_${{ steps.r.outputs.under }}.json" >> "$GITHUB_STEP_SUMMARY" || { echo "::warning::브리프 미리보기 점검을 실행하지 못했습니다."; echo "### 브리프 미리보기 5유형 점검 실행 오류" >> "$GITHUB_STEP_SUMMARY"; }
+
       - name: 영문 슬롯 게이트 — 빠졌으면 PR 을 만들기 전에 실패
         # [2026-11-02] 영문 갈래가 빠진 채 PR 이 열려 CI test 3건이 뒤늦게 실패한 사고의 재발 방지.
         # 델타(영문 포함)가 아직 안 온 호는 여기서 멈추고 원인·빠진 목록을 한 줄로 낸다.

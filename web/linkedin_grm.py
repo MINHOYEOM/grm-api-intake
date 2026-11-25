@@ -268,6 +268,8 @@ def validate_v3(card: dict, slots: dict, findings: dict) -> list[str]:
         extra = la._nums(t) - allowed
         if extra:
             probs.append(f"{path}: 원천·DB 에 없는 숫자 {sorted(extra)}")
+        probs += la.approx_overlap_problems(path, t)
+    probs += la.approx_headline_problems("cover.headline", cv.get("headline") or [])
 
     def _ev_ok(path: str, ev: Any, text: str = "") -> None:
         evs = la._ev_list(ev)

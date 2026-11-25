@@ -16,6 +16,8 @@ WATCH = [
     "grm-wl-truncation-restore-plan.yml", "grm-stranded-batch-pr.yml", "grm-cloud-request.yml",
 ]
 KEEP_RUNS = 5
+INTAKE_RUNS = 10     # 수집은 하루 1회 + 수동 복구 — 최근 일주일치 소스별 건수가 들어오게 넉넉히
+KEEP_COUNTS = 14     # status.json 에 쌓아 두는 소스별 건수 기록 수
 INTAKE_PROBE = 6  # 아티팩트 보유 여부를 확인할 최근 intake 성공 run 수
 FIELDS = "databaseId,status,conclusion,event,createdAt,updatedAt,headBranch,displayTitle,url"
 
@@ -25,17 +27,53 @@ def gh(args):
                           encoding="utf-8").stdout
 
 
-def collect(run=gh, repo="", now=None):
+def fetch_counts(run, run_id, tmp_dir):
+    """수집 실행 하나의 grm-intake-counts 아티팩트 → 기록 dict. 없거나(만료·옛 실행) 손상이면 None."""
+    import os
+    try:
+        run(["run", "download", str(run_id), "-n", "grm-intake-counts", "-D", tmp_dir])
+        with open(os.path.join(tmp_dir, "intake_counts.json"), encoding="utf-8") as f:
+            rec = json.load(f)
+        return rec if isinstance(rec, dict) and rec.get("sources") is not None else None
+    except Exception:
+        return None
+
+
+def gather_counts(run, intake_runs, prev):
+    """최근 intake 실행의 소스별 건수 기록을 모은다. 이미 받은 실행은 재다운로드하지 않는다(prev)."""
+    import tempfile
+    have = {r.get("run_id"): r for r in (prev or []) if isinstance(r, dict) and r.get("run_id")}
+    out = dict(have)
+    for r in intake_runs:
+        rid = r.get("databaseId")
+        if r.get("status") != "completed" or rid in out:
+            continue
+        with tempfile.TemporaryDirectory() as tmp:
+            rec = fetch_counts(run, rid, tmp)
+        if rec:
+            rec["run_id"] = rid
+            rec["created_at"] = r.get("createdAt") or rec.get("created_at")
+            rec["conclusion"] = r.get("conclusion")
+            rec["url"] = r.get("url") or rec.get("url")
+            out[rid] = rec
+    rows = sorted(out.values(), key=lambda x: str(x.get("created_at") or ""), reverse=True)
+    return rows[:KEEP_COUNTS]
+
+
+def collect(run=gh, repo="", now=None, prev_counts=None):
     now = now or datetime.datetime.now(datetime.timezone.utc)
-    out = {"generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "workflows": {}, "intake_artifacts": []}
+    out = {"generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "workflows": {}, "intake_artifacts": [], "intake_counts": []}
     for wf in WATCH:
         try:
-            runs = json.loads(run(["run", "list", "--workflow", wf, "-L", str(KEEP_RUNS),
+            runs = json.loads(run(["run", "list", "--workflow", wf,
+                                   "-L", str(INTAKE_RUNS if wf == "grm-intake.yml" else KEEP_RUNS),
                                    "--json", FIELDS]))
         except Exception as exc:  # 한 워크플로의 실패가 전체를 막지 않는다
             out["workflows"][wf] = {"error": type(exc).__name__}
             continue
         out["workflows"][wf] = [{k: r.get(k) for k in FIELDS.split(",")} for r in runs]
+    intake_runs = [r for r in (out["workflows"].get("grm-intake.yml") or []) if isinstance(r, dict)]
+    out["intake_counts"] = gather_counts(run, intake_runs, prev_counts)
     ok = [r for r in (out["workflows"].get("grm-intake.yml") or []) if isinstance(r, dict)
           and r.get("conclusion") == "success"][:INTAKE_PROBE]
     for r in ok:
@@ -63,10 +101,15 @@ def main(argv):
     if len(argv) != 2:
         print("usage: ops_status.py <status.json>", file=sys.stderr)
         return 2
-    new = collect(repo=repo)
     try:
         with open(argv[1], encoding="utf-8") as f:
             old = json.load(f)
+    except (OSError, ValueError):
+        old = None
+    new = collect(repo=repo, prev_counts=(old or {}).get("intake_counts"))
+    try:
+        if old is None:
+            raise ValueError
         if same_ignoring_time(old, new):
             print("변경 없음")
             return 0

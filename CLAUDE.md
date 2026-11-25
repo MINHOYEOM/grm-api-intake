@@ -22,5 +22,5 @@
 - CLI·PostgREST 경계 공통 헬퍼: `grm_cli.py` (JSON object I/O·URL/헤더/Content-Range·service-role 자격증명 해석)
 - 자동 실행: `.github/workflows/grm-intake.yml` (매일 18:17 UTC = 익일 03:17 KST 수집, Routine 발행은 매주 월 07:30 KST)
 - 현행 Routine 프롬프트: `docs/prompts/GRM_Prompt_v16.md` (내부 버전 v16)
-- 저장: Notion `GRM API Intake`(수집 staging) + Supabase `grm-reactions`(FIND-1 findings·웹 반응). `🌐 GRM Weekly Brief` DB는 레거시(웹 발행으로 대체).
+- 저장: Supabase `grm-reactions`가 수집 정본·대기열(`raw_signals`·`intake_handoffs` 등)과 FIND-1 지적사항·웹 반응을 저장한다. Notion은 수집·발행 경로에서 제외한다.
 - 발행: 웹 정적 사이트(`web/render.py` → Cloudflare Pages, 주 채널) + 이메일 뉴스레터(Brevo). Findings 검색은 `/findings/`.

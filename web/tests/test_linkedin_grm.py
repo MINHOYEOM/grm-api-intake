@@ -539,5 +539,79 @@ class DistTest(unittest.TestCase):
             lg.main(["--brief", str(BRIEF)])
 
 
+# ── 어림 표현 겹침 게이트 (2026-11-24) ────────────────────────────────────────────────────────
+# 11-23 a1 첫 줄 "기준일탈 300건 넘게 중 200건 넘게가 무효화됐습니다" — 한 문장에 어림이 둘. 슬롯을 쓰는 건
+# LLM 이라 생성 코드가 아니라 게이트(validate_v3·validate_en·validate_slots)가 막는다.
+_SKIP_KEYS = {"evidence", "line_evidence", "basis", "quote", "sim_query", "sim_short", "sim_situation", "cite", "en",
+              "chip", "selection", "firm_alias", "status", "schema", "pub", "card_id"}
+
+
+def _leaves(node, path="", skip=_SKIP_KEYS):
+    if isinstance(node, str):
+        yield path, node
+    elif isinstance(node, dict):
+        for k, v in node.items():
+            if k not in skip:
+                yield from _leaves(v, f"{path}.{k}" if path else k, skip)
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from _leaves(v, f"{path}[{i}]", skip)
+
+
+class ApproxOverlapTest(unittest.TestCase):
+    OLD_KO = "기준일탈 결과 300건 넘게 중 200건 넘게가 무효화됐습니다."
+    OLD_EN = "Over 300 OOS results since 2021, and more than 200 were invalidated."
+
+    def test_11_23_a1_sentences_are_flagged(self):
+        self.assertEqual(len(la.approx_marks(self.OLD_KO)), 2)
+        self.assertTrue(la.approx_overlap_problems("lead", self.OLD_KO))
+        self.assertTrue(la.approx_overlap_problems("lead", self.OLD_EN, "en"))
+        self.assertTrue(la.approx_headline_problems("h", ["기준일탈 300건 넘게 중,", "200건 넘게 무효화"]))
+        self.assertTrue(la.approx_headline_problems("h", ["Over 300 OOS results,", "200+ were invalidated"], "en"))
+
+    def test_one_approximation_per_sentence_passes(self):
+        ok = "기준일탈 결과 300건 넘게를 조사하지 않았습니다. 이 중 200건 넘게는 무효화됐습니다."
+        self.assertEqual(la.approx_overlap_problems("lead", ok), [])
+        ok_en = "Over 300 OOS results since 2021 were not adequately investigated. More than 200 were invalidated."
+        self.assertEqual(la.approx_overlap_problems("lead", ok_en, "en"), [])
+        self.assertEqual(la.approx_overlap_problems("x", "정확히 312건 중 207건이 무효화됐습니다."), [])
+        self.assertEqual(la.approx_overlap_problems("x", "300건 넘게 중 207건이 무효화됐습니다."), [])
+
+    def test_unrelated_words_are_not_approximations(self):
+        # '이상 경향'(abnormal trend)·'약속' 은 어림이 아니다
+        self.assertEqual(la.approx_marks("서한은 이를 이상 경향이라고 적었고 회사는 약속했습니다."), [])
+        self.assertEqual(la.approx_marks("In 2026 the firm reviewed 30 records."), [])
+
+    def test_validators_reject_old_lead(self):
+        card = la.pick_anatomy_card(_doc())
+        s = _slots()
+        s["caption"]["lead"] = "ISO 5 균이 100건 넘게 중 90건 넘게가 유사 집락으로 기록됐습니다. " + s["caption"]["lead"]
+        p = lg.validate_v3(card, s, FINDINGS)
+        self.assertTrue(any("caption.lead" in x and "어림 표현" in x for x in p), p)
+        s = _slots()
+        s["cover"]["headline"] = ["ISO 5 균 100건 넘게,", "90건 넘게 유사 집락"]
+        p = lg.validate_v3(card, s, FINDINGS)
+        self.assertTrue(any("cover.headline" in x and "어림 표현" in x for x in p), p)
+
+    def test_every_committed_slot_passes_the_gate(self):
+        files = sorted((WEB_DIR / "data" / "linkedin_anatomy").glob("*.v3.json"))
+        self.assertTrue(files)
+        bad: list[str] = []
+        for f in files:
+            d = json.loads(f.read_text(encoding="utf-8"))
+            for path, t in _leaves({k: v for k, v in d.items() if k != "en"}):
+                if path.startswith("cover.headline"):
+                    continue
+                bad += [f"{f.name} {x}" for x in la.approx_overlap_problems(path, t)]
+            bad += [f"{f.name} {x}" for x in la.approx_headline_problems("cover.headline", (d.get("cover") or {}).get("headline") or [])]
+            en = d.get("en") or {}
+            for path, t in _leaves(en, "en", _SKIP_KEYS - {"en"}):
+                if path.startswith("en.cover.headline"):
+                    continue
+                bad += [f"{f.name} {x}" for x in la.approx_overlap_problems(path, t, "en")]
+            bad += [f"{f.name} {x}" for x in la.approx_headline_problems("en.cover.headline", (en.get("cover") or {}).get("headline") or [], "en")]
+        self.assertEqual(bad, [])
+
+
 if __name__ == "__main__":
     unittest.main()

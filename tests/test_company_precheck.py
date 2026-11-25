@@ -282,6 +282,12 @@ class ReworkDiffTest(unittest.TestCase):
         self.assertEqual(problems, [])
         self.assertEqual(notes, ["고침 b: summary"])
 
+    def test_notes_on_pass_card_are_not_rejections(self):
+        """[11-21] 교열 '주의'(pass + notes)는 재작업 대상이 아니다 — rejected_ids 에 안 들어간다."""
+        r1 = json.loads(json.dumps(self.R1, ensure_ascii=False))
+        r1["cards"][0]["notes"] = [{"item": "같은 이름", "slot": "summary", "evidence": "한 줄"}]
+        self.assertEqual(precheck.rejected_ids(r1), {"b"})
+
     def test_touching_a_passed_card_is_out_of_scope(self):
         new = self._new(a=_card(summary="다른 문장."), b=_card(summary="고친 문장."))
         problems, _ = precheck.rework_diff(self.OLD, new, {"b"})
@@ -362,6 +368,11 @@ class ReworkInstructionsTest(unittest.TestCase):
             Path(tmp, "copyedit.json").write_text(
                 json.dumps(dict(done, counts={"reject": 1}), ensure_ascii=False), encoding="utf-8")
             self.assertFalse(four())                                   # 2차에도 반려가 남았다
+            noted = dict(done, cards=[{"web_card_id": "a", "verdict": "pass", "fails": [],
+                                       "notes": [{"item": "같은 이름", "slot": "summary", "evidence": "한 줄"}]}],
+                         counts={"reject": 0, "notes_total": 1})
+            Path(tmp, "copyedit.json").write_text(json.dumps(noted, ensure_ascii=False), encoding="utf-8")
+            self.assertTrue(four())                                    # [11-21] 주의(notes)는 반려가 아니다
             Path(tmp, "copyedit.json").write_text(
                 json.dumps(dict(done, round=1), ensure_ascii=False), encoding="utf-8")
             self.assertTrue(four())                                    # 1차에 바로 통과(종전)
@@ -705,6 +716,147 @@ class AssembledEnGate1120jTest(unittest.TestCase):
             lines = precheck.assembly_lines(delta, self._scaffold("fda483-1", "fda483-2"))
         self.assertIn("조립 검사 영문 게이트 fda483-1(빠짐: implication,checks) — 조립 뒤 영문 미완결(조립 전엔 완결)",
                       lines)
+
+
+class CopyeditRules1121aTest(unittest.TestCase):
+    """리허설 1121a: 교열 1차 59장 반려 중 기계로 셀 수 있는 규칙(용어표·군말·hook 약어)을 사전 점검이 놓쳤다.
+    규칙은 v16 [용어·표기] 절을 문서에서 읽는다(`inject_slots.v16_terms`) — 표에 줄을 더하면 사전 점검도 는다."""
+
+    def _terms(self, **kw):
+        return [x for x in precheck.term_lines({"cards": {"a": _card(**kw)}}) if x.startswith("용어 표기")]
+
+    def test_rules_are_read_from_v16_document(self):
+        rules = inject_slots.v16_terms()
+        self.assertTrue(rules["table"] and rules["filler"])
+        self.assertTrue({"OOS", "CAPA", "API", "HVAC"} <= rules["listed"])
+        self.assertTrue({"OOT", "CMO"} <= rules["off_list"])
+        self.assertIn("FDA", rules["institutions"])
+        self.assertIn("CFU", rules["units"])
+        # 문서가 없으면 빈 규칙(손 베낌 검사는 그대로)
+        self.assertEqual(inject_slots.v16_terms(str(ROOT / "없는_문서.md"))["table"], [])
+
+    def test_table_terms_and_spacing_variant_block(self):
+        self.assertTrue(any("외관 검사" in x for x in self._terms(key_facts=["관찰 2: 최종 제품 외관 검사 절차가 없음"])))
+        self.assertTrue(any("경고 기준" in x for x in self._terms(implication="경고 기준 미만이라 일탈을 열지 않았다.")))
+        deep = {"items": {"d": {"deep_analysis": {"key_violations": [{"observation": "시각검사 중 불합격 한도를 넘었다(관찰 5)."}]}}}}
+        self.assertTrue(any("시각검사" in x for x in precheck.deep_term_lines(deep)))
+
+    def test_table_terms_do_not_hit_right_hand_or_compound_words(self):
+        self.assertEqual(self._terms(summary="육안검사와 시험성적서(COA)를 확인하지 않았다."), [])
+        self.assertEqual(self._terms(summary="의약품공급자는 완제의약품을 공급하는 경우 보고한다."), [])
+        self.assertEqual(self._terms(summary="환경 모니터링 결과를 검토하지 않았다."), [])
+
+    def test_filler_words_block_with_word_boundary(self):
+        self.assertTrue(any("다수" in x for x in self._terms(hook_line="결함 바이알 다수 발견")))
+        self.assertTrue(any("장기간" in x for x in self._terms(implication="최대 보관 기한 없이 장기간 보관됐다.")))
+        self.assertEqual(self._terms(summary="대다수 로트를 다수결로 정했다."), [])
+
+    def test_hook_abbreviation_ko_blocks_en_warns(self):
+        block, warn = precheck.hook_lines({"cards": {"a": _card(hook_line="OOS 결과 14건 반복")}})
+        self.assertTrue(any("hook_line 약어" in x and "OOS" in x for x in block))
+        en = dict(_card()["en"], hook_line="Fourteen recurring endotoxin OOS and OOT results")
+        block, warn = precheck.hook_lines({"cards": {"a": _card(en=en)}})
+        self.assertEqual(block, [])
+        self.assertTrue(any("OOS, OOT" in x for x in warn))
+        # 기관·단위·로마 숫자·숫자 든 등급은 약어가 아니다
+        en = dict(_card()["en"], hook_line="FDA found 12 CFU in Class II KF94 masks under CGMP")
+        self.assertEqual(precheck.hook_lines({"cards": {"a": _card(en=en, hook_line="CGMP 위반 KF94 마스크 Class II 회수")}}), ([], []))
+
+    def test_hook_statement_number_warns(self):
+        sc = {"cards": [{"id": "a", "deterministic_detail": {"observations": [{"number": "8", "deficiency": "No procedure.",
+              "detail": "Liquid was observed in April 2026. According to the Associate VP, the firm has not cleaned it since March 2011."}]}}]}
+        _, warn = precheck.hook_lines({"cards": {"a": _card(hook_line="2011년 설치 이후 세척한 적 없는 설비")}}, sc)
+        self.assertTrue(any("진술 표기" in x and "2011" in x for x in warn))
+        _, warn = precheck.hook_lines({"cards": {"a": _card(hook_line="2011년 설치 이후 세척하지 않았다고 진술")}}, sc)
+        self.assertFalse(any("진술 표기" in x for x in warn))
+
+    def test_accuracy_warnings(self):
+        sc = {"cards": [
+            {"id": "r", "facts": [{"label": "제품", "value": "허브팜절패모"}], "quotes": [{"original": "중금속(카드뮴)"}],
+             "deterministic_detail": {"type": "mfds_recall_detail", "enforcement": "회수명령 (강제)"}},
+            {"id": "d", "facts": [], "quotes": [{"original": "complaints related to potential leaks from small perforations"}],
+             "deterministic_detail": {"type": "openfda_recall_detail"}},
+            {"id": "o", "facts": [{"label": "관찰사항", "value": "5"}], "deterministic_detail": {"type": "fda483", "count": 5, "observations": [
+                {"number": "4", "deficiency": "x", "detail": "The system operated with an expired [redacted] for 49 days. Three batches failed."}]}}]}
+        delta = {"cards": {
+            "r": _card(title_issue="카드뮴 부적합 회수", hook_line="한약재 절패모, 중금속(카드뮴) 부적합으로 회수명령(강제)"),
+            "d": _card(title_issue="백 인쇄부 작은 구멍 누출 회수", hook_line="복막투석액 백 누출 의심 불만 접수"),
+            "o": _card(summary="FDA가 관찰사항 5건을 적었다.", hook_line="유효기간 지난 부품으로 49일 운전",
+                       implication="3배치가 불합격이었다. 8건을 조사하지 않았다.")}}
+        lines = precheck.accuracy_warn_lines(delta, sc)
+        text = "\n".join(lines)
+        self.assertIn("회수 사유 덧붙임 r.title_issue: 부적합", text)
+        self.assertIn("한약재", text)
+        self.assertIn("가능성 표현 누락 d.title_issue", text)
+        self.assertNotIn("가능성 표현 누락 d.hook_line", text)          # '의심' 이 있다
+        self.assertIn("가림 값 채움 의심 o.hook_line: 숫자 49", text)
+        self.assertIn("원문에 없는 수 o.implication: '8건'", text)
+        self.assertNotIn("'5건'", text)                                 # 관찰사항 수는 코드 facts 에 있다
+        self.assertNotIn("'3배치'", text)                               # 원문 'Three'
+
+    def test_cli_prints_accuracy_as_warning_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "delta.A.json")
+            sc = os.path.join(tmp, "sc.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump({"cards": {"d": _card()}}, f, ensure_ascii=False)
+            with open(sc, "w", encoding="utf-8") as f:
+                json.dump({"cards": [{"id": "d", "quotes": [{"original": "potential glass particles"}],
+                                      "deterministic_detail": {"type": "openfda_recall_detail"}}]}, f)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), mock.patch.object(precheck, "assembly_lines", return_value=[]), \
+                    mock.patch.object(precheck, "gate_lines", return_value=[]):
+                code = precheck.main(["terms", path, "--scaffold", sc])
+            self.assertIn("경고: 가능성 표현 누락 d.title_issue", out.getvalue())
+            self.assertEqual(code, 0)
+
+    def test_assembly_style_lint_keeps_old_rules(self):
+        # 백업 Routine 은 옛 v16 으로 쓴다 — 발행 조립의 표현 검사(기본값)는 새 규칙을 세지 않는다(2026-11-21 대표 결정).
+        delta = {"cards": {"a": _card(hook_line="결함 바이알 다수 발견", key_facts=["관찰 2: 외관 검사 절차 없음"])}}
+        self.assertEqual(inject_slots.lint_prose_style(delta).terms, {})
+        self.assertTrue(inject_slots.lint_prose_style(delta, v16_rules=True).terms)
+        deep = {"d": {"deep_analysis": {"key_violations": [{"observation": "시각검사 중 불합격(관찰 5)."}]}}}
+        self.assertEqual(inject_slots.deep_term_hits(deep), [])
+        self.assertEqual(inject_slots.lint_deep_prose_style(deep).terms, {})
+
+    def test_reporter_instructions_name_new_lines(self):
+        for rel in ("reporter.md", "next/reporter.md"):
+            rep = (ROOT / "company" / "editorial" / rel).read_text(encoding="utf-8")
+            self.assertIn("v16_terms", rep)
+
+
+class PrivateName1121Test(unittest.TestCase):
+    """개인 실명 경고(2026-11-21 대표 결정) — 483 수신인·호칭 뒤 이름이 산문에 나오면 경고, 업체명은 통과."""
+
+    BODY_483 = ("INDIVIDUAL TO WHOM REPORT IS ISSUED\nTo:\nMr, Mitsuo Sugiyama, Vice President, General Plant Manager\n"
+                "FIRM NAME\nSTREET ADDRESS\nDaiichi Sankyo Chemical Pharma Co., Ltd.\nOBSERVATION 1 Procedures were not followed.")
+
+    def test_483_recipient_and_whopir_honorific_warn(self):
+        rows = {
+            "fda483-1": {"web_card_id": "fda483-1", "kind": "fda-483", "firm": "Daiichi Sankyo Chemical Pharma Co., Ltd.",
+                         "deep_analysis_input": {"body_full": self.BODY_483}},
+            "who-1": {"web_card_id": "who-1", "kind": "who-inspection", "firm": "Cipla (Kurkumbh D-7) - FPP",
+                      "ncr_translation_input": {"s9": "The company had recently appointed Mr. Achin Gupta as Managing Director & Global CEO."}},
+        }
+        delta = {"cards": {"fda483-1": _card(summary="FDA가 Mitsuo Sugiyama 부사장에게 483을 발행했다."),
+                           "who-1": _card()}}
+        deep = {"items": {"who-1": {"ncr_ko": {"s9_ko": "회사는 최근 Achin Gupta를 대표이사로 임명했다."}}}}
+        warns = precheck.private_name_warn_lines(delta, deep, rows, {})
+        self.assertEqual(len(warns), 2, warns)
+        self.assertTrue(any(w.startswith("개인 실명 의심 fda483-1.summary: Mitsuo, Sugiyama") for w in warns), warns)
+        self.assertTrue(any(w.startswith("개인 실명 의심 who-1.deep.ncr_ko.s9_ko: Achin, Gupta") for w in warns), warns)
+
+    def test_sole_proprietor_firm_name_not_flagged(self):
+        # 이 경고(수신인·호칭 이름)는 업체명 낱말을 뺀다 — 업체명이 사람 이름인 경우는 **차단** 규칙
+        # (`guess_check.delta_source_lines` `개인 실명 …`, 2026-11-23 — 11-23 실발행 196329·196343)이 따로 막는다.
+        rows = {"fda483-2": {"web_card_id": "fda483-2", "kind": "fda-483", "firm": "Kenneth F Tesch",
+                             "headline": "[FDA 483] Kenneth F Tesch",
+                             "deep_analysis_input": {"body_full": "Dear Mr. Tesch: OBSERVATION 1 residue above tolerance."}}}
+        delta = {"cards": {"fda483-2": _card(summary="FDA가 생산자 Kenneth F Tesch에 483을 발행했다.")}}
+        self.assertEqual(precheck.private_name_warn_lines(delta, None, rows, {}), [])
+        self.assertEqual(precheck.source_person_names("INDIVIDUAL TO WHOM REPORT ISSUED\nFIRM NAME\nSTREET ADDRESS"), set())
+        block, _ = precheck.guess_check.delta_source_lines(delta, rows, {})
+        self.assertTrue(block and block[0].startswith("개인 실명 fda483-2.summary"), block)
 
 
 if __name__ == "__main__":

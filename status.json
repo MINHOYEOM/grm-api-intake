@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-25T22:28:33Z",
+ "generated_at": "2026-11-25T22:46:41Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 45713603518,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-25T22:29:06Z",
+    "updatedAt": "2026-11-25T22:29:11Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45713603518"
+   },
    {
     "databaseId": 45533605021,
     "status": "completed",
@@ -100,17 +111,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45039409414"
-   },
-   {
-    "databaseId": 45002364788,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-22T08:20:39Z",
-    "updatedAt": "2026-11-22T08:40:35Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45002364788"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45714938668,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T22:38:21Z",
+    "updatedAt": "2026-11-25T22:46:10Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1979 from MINHOYEOM/claude/subscribe-prompts-1126",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45714938668"
+   },
+   {
     "databaseId": 45708398389,
     "status": "completed",
     "conclusion": "success",
@@ -271,17 +282,6 @@
     "headBranch": "codex/unittest-collect-guard",
     "displayTitle": "Merge remote-tracking branch 'origin/codex/ci-shard-balance' into cod…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45706962189"
-   },
-   {
-    "databaseId": 45706839745,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T21:42:47Z",
-    "updatedAt": "2026-11-25T21:50:40Z",
-    "headBranch": "codex/ci-shard-balance",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/ci-shard-balance",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45706839745"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45716025260,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T22:46:14Z",
+    "updatedAt": "2026-11-25T22:46:30Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45716025260"
+   },
+   {
     "databaseId": 45709466311,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45685214287"
-   },
-   {
-    "databaseId": 45656781426,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T16:42:16Z",
-    "updatedAt": "2026-11-25T16:50:26Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45656781426"
    }
   ],
   "grm-findings-translate-apply.yml": [

@@ -24,6 +24,8 @@ import findings_supabase_backfill as fsb
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url
 from grm_common import SOURCE_ECA, SOURCE_EMA, SOURCE_MHRA, SOURCE_WHO
+from grm_http_policy import (BACKFILL_429_RETRY_WAITS_SECONDS, BACKFILL_ARTICLE_DELAY_SECONDS,
+                             BACKFILL_WHO_DELAY_SECONDS)
 
 TARGET_FIELDS = {
     SOURCE_WHO: "whopir_report",
@@ -135,7 +137,7 @@ def backfill(
 
 
 def _read_whopir(url: str) -> tuple[str, dict[str, Any] | None, str]:
-    time.sleep(who.WHOPIR_EXCERPT_DELAY_SECONDS)
+    time.sleep(max(who.WHOPIR_EXCERPT_DELAY_SECONDS, BACKFILL_WHO_DELAY_SECONDS))
     return who._fetch_whopir_detail(url)
 
 
@@ -154,13 +156,30 @@ def _extract_full_article_excerpt(html_text: str) -> str:
     return " ".join(parts)
 
 
-def _read_article(url: str, label: str) -> str:
-    time.sleep(intake.ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
-    try:
+def _retry_wait(resp: Any, attempt: int) -> float:
+    value = str(resp.headers.get("Retry-After") or "").strip()
+    if value.isdigit():
+        return min(float(value), 300.0)
+    return BACKFILL_429_RETRY_WAITS_SECONDS[attempt]
+
+
+def _get_article(url: str, sleeper: Callable[[float], None] | None = None) -> Any:
+    """429 는 Retry-After(없으면 30·60초)만큼 쉬고 두 번까지 다시 묻는다."""
+    for attempt in range(len(BACKFILL_429_RETRY_WAITS_SECONDS) + 1):
         resp = intake.requests.get(url, timeout=intake.ECA_ARTICLE_EXCERPT_FETCH_TIMEOUT, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
             "Accept": "text/html",
         })
+        if resp.status_code != 429 or attempt == len(BACKFILL_429_RETRY_WAITS_SECONDS):
+            return resp
+        (sleeper or time.sleep)(_retry_wait(resp, attempt))
+    return resp
+
+
+def _read_article(url: str, label: str) -> str:
+    time.sleep(max(intake.ECA_ARTICLE_EXCERPT_DELAY_SECONDS, BACKFILL_ARTICLE_DELAY_SECONDS))
+    try:
+        resp = _get_article(url)
         if resp.status_code == 403:
             intake.log("WARN", f"{label} 기사 본문 403 — excerpt 건너뜀(카드 그대로): {intake.truncate(url, 80)}")
             return ""
@@ -175,7 +194,7 @@ def _read_article(url: str, label: str) -> str:
 
 
 def _read_mhra(url: str) -> str:
-    time.sleep(intake.MHRA_ALERT_BODY_DELAY_SECONDS)
+    time.sleep(max(intake.MHRA_ALERT_BODY_DELAY_SECONDS, BACKFILL_ARTICLE_DELAY_SECONDS))
     return intake._fetch_mhra_alert_body(url)
 
 

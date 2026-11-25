@@ -183,3 +183,33 @@ class ScopeOptionsTest(unittest.TestCase):
         with patch.dict("os.environ", self.ENV), patch("sys.stderr"):
             with self.assertRaises(SystemExit):
                 b.main(["--ingested-since", "09-23"])
+
+class ArticlePacingTest(unittest.TestCase):
+    """[11-25 dry 실측] EMA 1초 간격에서 429 연발 — 예의 간격 2초 + 429 재시도."""
+
+    def _resp(self, code, headers=None, text="<p>body</p>"):
+        return SimpleNamespace(status_code=code, headers=headers or {}, text=text,
+                               raise_for_status=Mock())
+
+    def test_429_waits_retry_after_then_reads(self):
+        get = Mock(side_effect=[self._resp(429, {"Retry-After": "7"}), self._resp(200)])
+        sleep = Mock()
+        with patch.object(b.intake.requests, "get", get), patch.object(b.time, "sleep", sleep):
+            self.assertEqual(b._read_article("https://www.ema.europa.eu/en/news/x", "EMA"), "body")
+        self.assertEqual(get.call_count, 2)
+        waits = [c.args[0] for c in sleep.call_args_list]
+        self.assertEqual(waits[0], b.BACKFILL_ARTICLE_DELAY_SECONDS)
+        self.assertEqual(waits[1], 7.0)
+
+    def test_429_gives_up_after_two_retries(self):
+        get = Mock(return_value=self._resp(429))
+        with patch.object(b.intake.requests, "get", get), patch.object(b.time, "sleep") as sleep:
+            resp = b._get_article("https://www.ema.europa.eu/en/news/x")
+        self.assertEqual(resp.status_code, 429)
+        self.assertEqual(get.call_count, 3)
+        self.assertEqual([c.args[0] for c in sleep.call_args_list],
+                         list(b.BACKFILL_429_RETRY_WAITS_SECONDS))
+
+    def test_courtesy_delays_are_at_least_the_report_rule(self):
+        self.assertGreaterEqual(b.BACKFILL_WHO_DELAY_SECONDS, 5.0)
+        self.assertGreaterEqual(b.BACKFILL_ARTICLE_DELAY_SECONDS, 2.0)

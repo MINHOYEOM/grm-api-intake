@@ -35,6 +35,7 @@ import re
 from datetime import date
 
 from grm_common import http_get_json, log
+from grm_http_policy import FDA_GUIDANCE_HTTP_RETRIES
 
 
 LIBRARY_SOURCE = "fda_guidance"
@@ -43,7 +44,7 @@ DATASET_URL = "https://www.fda.gov/files/api/datatables/static/search-for-guidan
 SITE_BASE = "https://www.fda.gov"
 GUIDANCE_PATH = "/regulatory-information/search-fda-guidance-documents/"
 HTTP_TIMEOUT_SECONDS = 90
-HTTP_RETRIES = 2
+HTTP_RETRIES = FDA_GUIDANCE_HTTP_RETRIES
 MIN_EXPECTED_ROWS = 500        # 이보다 적으면 데이터셋 축소/구조 변경 의심 → error
 
 _TAG_RE = re.compile(r"<[^>]+>")

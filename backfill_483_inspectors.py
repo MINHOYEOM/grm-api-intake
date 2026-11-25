@@ -63,7 +63,8 @@ from typing import Any, Callable
 import findings_supabase_backfill as fsb
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import SOURCE_FDA_483, log
+from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_483, log
+from grm_http_policy import FDA_483_PDF_DELAY_SECONDS
 
 import requests
 
@@ -73,7 +74,7 @@ SCHEMA_VERSION = "grm-483-inspector-backfill/v1"
 DEFAULT_TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
 _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout — mirrors fsb/fsa convention.
 _DEFAULT_PAGE_SIZE = 1000
-_DEFAULT_DELAY_SECONDS = 0.5
+_DEFAULT_DELAY_SECONDS = FDA_483_PDF_DELAY_SECONDS
 _MAX_SAMPLES = 20
 
 # 광범위 실패 판정 임계값(문서 상단 참고) — 절대 기준이 아니라 이 스크립트의 판단.
@@ -368,6 +369,11 @@ def run(
         sleep_fn(delay_seconds)
         try:
             text, status = text_fn(pdf_url)
+            if status == FDA_BOT_BLOCK:
+                report.failed += 1
+                _bump(report, FDA_BOT_BLOCK)
+                report.errors.append(f"{label}: {FDA_BOT_BLOCK}")
+                break
         except Exception as exc:  # noqa: BLE001 — 건별 실패는 계속(멱등 재실행 가능)
             report.failed += 1
             reason = f"fetch_raised:{type(exc).__name__}"

@@ -33,15 +33,16 @@ on:
         type: string
         default: ''
       delay_seconds:
-        description: 'PDF 요청 간 대기(초) — fda.gov 예의.'
+        description: 'PDF 요청 간 대기(초). 비우면 도구 기본값.'
         type: string
-        default: '0.5'
+        default: ''
       force:
         description: 'true = inspector_names 가 이미 채워진 문서도 재처리한다(기본 false — 멱등 스킵).'
         type: boolean
         default: false
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -57,6 +58,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Check today's FDA manual runs (KST)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/fda_manual_run_warning.py
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -86,8 +95,12 @@ jobs:
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DELAY: ${{ inputs.delay_seconds }}
         run: |
-          ARGS=(--report-path inspector_backfill_report.json --delay-seconds "${{ inputs.delay_seconds }}")
+          ARGS=(--report-path inspector_backfill_report.json)
+          if [ -n "$DELAY" ]; then
+            ARGS+=(--delay-seconds "$DELAY")
+          fi
           if [ "${{ inputs.apply }}" = "true" ]; then
             ARGS+=(--apply)
           fi
@@ -101,11 +114,14 @@ jobs:
 
       - name: Write step summary
         if: always()
+        env:
+          DELAY: ${{ inputs.delay_seconds }}
         run: |
+          DELAY="${DELAY:-도구 기본값}"
           {
             echo "### GRM FDA 483 Inspector Name Backfill"
             echo ""
-            echo "apply: \`${{ inputs.apply }}\` / force: \`${{ inputs.force }}\` / limit: \`${{ inputs.limit }}\` / delay_seconds: \`${{ inputs.delay_seconds }}\`"
+            echo "apply: \`${{ inputs.apply }}\` / force: \`${{ inputs.force }}\` / limit: \`${{ inputs.limit }}\` / delay_seconds: \`${DELAY}\`"
             echo ""
             if [ -f inspector_backfill_report.json ]; then
               echo '```json'

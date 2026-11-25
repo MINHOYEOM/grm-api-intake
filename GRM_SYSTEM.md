@@ -584,6 +584,7 @@ grm-api-intake/
 ├─ grm_health.py, source_silence.py  # health 판정(소스 오류·`kr-egress-proxy-unreachable`·`source-silent:*` 전부 warning) · Supabase 마지막 수집일 기반 무음 판정(레지스트리 `silence_days` 3단 10/21/35일 · ICH 는 제외)
 ├─ probe_mfds_egress.py            # MFDS/nedrug/law.go.kr 러너 도달 프로브 — 첫 줄 `[PROXY] reachable|unreachable|unconfigured`
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
+├─ pr_merge_plan.py                 # 열린 PR 머지 순서·파일 겹침 예측(읽기 전용)
 ├─ audit_483_inspector_blanks.py    # FDA 483 실사관 빈칸 사유 판정(dry)
 ├─ wl_pair_restore.py               # WL 본문만 바뀐 짝 findings restore 계획 도구(기본 dry)
 ├─ ci_shard.py                     # CI unittest 샤딩 러너(클래스 단위 LPT 균형, tests/ci_shard_timings.json) — grm-ci.yml 4 샤드
@@ -664,6 +665,7 @@ grm-api-intake/
 ├─ gsc_index_sample.py          # [성장·유입] 구글 색인 표본 점검(주 1회, grm-gsc-index-sample.yml) — 문서 페이지를 render.is_thin_doc_page 로 얇음/두꺼움으로 나눠 주차 고정 표본을 URL Inspection API 로 확인. Job Summary·아티팩트만, DB 쓰기 없음
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ backfill_mfds_gmp_assessment.py     # 저장 텍스트로 식약처 GMP 실사 첨부 지적 재판정
+├─ recollect_mfds_gmp_attachment.py    # 식약처 GMP 실사 기존 행의 첨부 본문 재수집 CLI(국내 IP PC 전용, dry 기본, --ids)
 ├─ backfill_raw_signals_from_notion.py # Notion에만 남은 수집 행의 Supabase 사본 보충
 ├─ backfill_recall_detail.py           # 기존 발행 회수 카드에 결정론 상세 소급 병합
 ├─ collect_rum_referrer_paths.py       # RUM 유입 출처와 도착 경로 교차 집계

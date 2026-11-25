@@ -56,3 +56,12 @@ FDA Form 483 실사 관찰의 상세 서술("Specifically, …")을 한국어로
 ⑥ 양식 칸 ⑦ 업소 머리글 ⑧ 가림 표시 변형 ⑨ 번역 안 된 영어 문장(5낱말 이상·기능어 2개 이상, 따옴표 안 제외)
 ⑩ 낱말 속 숫자·기호 찌꺼기가 국문에 남으면 실격이다. 새 outbox 파일은 CI(`tests/test_findings_detail_apply.py`)에서
 strict 로 검사한다 — 옛 파일은 `tests/fixtures/detail_outbox_legacy.txt` 목록으로만 옛 규칙을 쓴다.
+
+## 원본 PDF 로 쓴 국문 (`pdf_verified`, 2026-11-25)
+영문 detail_text 가 판독 불가 수준(손글씨·깨진 글자층)이라 번역할 수 없는 행은 사람이 FDA 원본 PDF 를 보고 국문을 쓴다.
+대상은 `docs/specs/483_pdf_review_queue.json`(status todo). 깨진 글자층 스캔은 먼저 `grm-fda483-ocr-recovery`
+(`mode=named`·`force_ocr=true`·`diag=dump-text`·apply 끔)로 다시 판독해 보고, 그래도 깨질 때만 사람이 본다.
+- 항목에 `"pdf_verified": {"by": 확인한 사람, "at": "YYYY-MM-DD", "source": "https://www.fda.gov/media/<번호>/download", "pages": "2-3"}` 를 둔다.
+- 기록이 온전하면 strict 는 **숫자·코드·로트 대조만** 면제한다(국문 숫자는 원본과 맞고 OCR 영문과는 어긋나므로).
+  한글·한자·가림 개수·길이·읽기 좋음 검사는 그대로다. 기록 칸이 하나라도 비거나 형식이 틀리면 `pdf_verified_invalid` 로 실격.
+- 영문 detail_text 는 여전히 운영 값 그대로 싣는다(바이트 불변). 끝나면 목록의 status 를 done 으로 바꾼다.

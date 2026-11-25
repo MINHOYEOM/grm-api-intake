@@ -901,6 +901,111 @@ class NewsletterFreshnessWorkflowTest(unittest.TestCase):
     def test_monitor_step_continues_on_error(self):
         self.assertIn("continue-on-error: true", self.text)
 
+    def test_monday_hourly_cron_after_publish(self):
+        # 11-25 — 월요일 낮 매시간(10:43~19:43 KST) 검사, 기준은 발행 PR 머지 + 유예.
+        self.assertIn("'43 1-10 * * 1'", self.text)
+
+    def test_merge_time_lookup_by_publish_branch(self):
+        self.assertIn('--head "publish/brief-${LATEST}"', self.text)
+        self.assertIn("--merged-at $MERGED_AT", self.text)
+        self.assertIn("pull-requests: read", self.text)
+
+    def test_pending_neither_alarms_nor_closes(self):
+        self.assertIn("report.verdict === 'pending'", self.text)
+        # 종료(복구) 스텝은 exit 0(ok)일 때만 — pending 은 exit 3 이라 닫지 않는다.
+        self.assertIn("if: steps.monitor.outcome == 'success'", self.text)
+
+
+# ── 발행 머지 기준 유예(2026-11-25) — apply_publish_grace ─────────────────────
+class NewsletterPublishGraceTest(unittest.TestCase):
+    """11-23 재현: 발행 PR 머지 01:17Z, 발송 skipped. 머지 + 2시간이 지나면 경보해야 한다."""
+
+    MERGED = dt.datetime(2026, 11, 23, 1, 17, 9, tzinfo=dt.timezone.utc)
+
+    def _g(self, verdict, *, now, merged_at=MERGED):
+        return newsletter.apply_publish_grace(verdict, "r", merged_at=merged_at, now=now)
+
+    def test_within_grace_is_pending(self):
+        v, reason = self._g("not-sent", now=self.MERGED + dt.timedelta(minutes=50))
+        self.assertEqual(v, "pending")
+        self.assertIn("유예", reason)
+
+    def test_after_grace_alarms_on_monday_afternoon(self):
+        # 11-23 12:43 KST(03:43Z) 매시간 검사 — 머지 2.4시간 뒤 → not-sent(경보).
+        v, _ = self._g("not-sent", now=dt.datetime(2026, 11, 23, 3, 43, tzinfo=dt.timezone.utc))
+        self.assertEqual(v, "not-sent")
+
+    def test_unknown_merge_time_quiet_until_20_kst_monday(self):
+        v, _ = self._g("not-sent", merged_at=None,
+                       now=dt.datetime(2026, 11, 23, 5, 43, tzinfo=dt.timezone.utc))   # 14:43 KST
+        self.assertEqual(v, "pending")
+        v, _ = self._g("not-sent", merged_at=None,
+                       now=dt.datetime(2026, 11, 23, 11, 13, tzinfo=dt.timezone.utc))  # 20:13 KST
+        self.assertEqual(v, "not-sent")
+
+    def test_brief_missing_quiet_on_monday_before_publish(self):
+        v, _ = self._g("brief-missing", merged_at=None,
+                       now=dt.datetime(2026, 11, 23, 1, 43, tzinfo=dt.timezone.utc))   # 10:43 KST
+        self.assertEqual(v, "pending")
+        # 화요일 아침은 예전대로 경보.
+        v, _ = self._g("brief-missing", merged_at=None,
+                       now=dt.datetime(2026, 11, 24, 0, 13, tzinfo=dt.timezone.utc))
+        self.assertEqual(v, "brief-missing")
+
+    def test_ok_and_api_error_untouched(self):
+        now = self.MERGED + dt.timedelta(minutes=5)
+        self.assertEqual(self._g("ok", now=now)[0], "ok")
+        self.assertEqual(self._g("api-error", now=now)[0], "api-error")
+
+    def test_no_now_keeps_legacy_verdict(self):
+        self.assertEqual(self._g("not-sent", now=None)[0], "not-sent")
+        self.assertEqual(self._g("brief-missing", now=None)[0], "brief-missing")
+
+
+class NewsletterFreshnessGraceCLITest(unittest.TestCase):
+    """CLI --merged-at/--now 경로 — pending 은 exit 3, 유예가 지나면 exit 1."""
+
+    AS_OF = NewsletterFreshnessCLITest.AS_OF
+    _monday = NewsletterFreshnessCLITest._monday
+    _write_brief = NewsletterFreshnessCLITest._write_brief
+
+    def _run_grace(self, *, now, merged_at):
+        pub = self._monday().isoformat()
+
+        class _Missing(newsletter.NewsletterSender):
+            def __init__(self, *a, **k):
+                pass
+
+            def find_campaign(self, n):
+                return None
+
+        orig = newsletter.BrevoSender
+        newsletter.BrevoSender = _Missing
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                data_dir = pathlib.Path(td) / "d"
+                self._write_brief(data_dir, pub)
+                out = pathlib.Path(td) / "report.json"
+                with _env_patch(NEWSLETTER_API_KEY="key-123"):
+                    rc = newsletter.main([
+                        "--mode", "freshness", "--data", str(data_dir), "--as-of", self.AS_OF,
+                        "--now", now, "--merged-at", merged_at, "--output", str(out)])
+                report = json.loads(out.read_text(encoding="utf-8"))
+        finally:
+            newsletter.BrevoSender = orig
+        return rc, report
+
+    def test_pending_exit_3(self):
+        rc, report = self._run_grace(now="2026-09-21T02:00:00Z", merged_at="2026-09-21T01:30:00Z")
+        self.assertEqual(rc, 3)
+        self.assertEqual(report["verdict"], "pending")
+        self.assertEqual(report["merged_at"], "2026-09-21T01:30:00+00:00")
+
+    def test_after_grace_exit_1(self):
+        rc, report = self._run_grace(now="2026-09-21T04:00:00Z", merged_at="2026-09-21T01:30:00Z")
+        self.assertEqual(rc, 1)
+        self.assertEqual(report["verdict"], "not-sent")
+
 
 if __name__ == "__main__":
     unittest.main()

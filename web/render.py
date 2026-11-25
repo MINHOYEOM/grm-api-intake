@@ -5276,13 +5276,21 @@ _HOME_TLDR_PREFIXES: tuple[tuple[str, str], ...] = (
 )
 
 
-_HOME_MIDDOT_RE = re.compile(r"(\S)·")
+_HOME_MIDDOT_TOKEN_RE = re.compile(r"\S+")
+
+
+def _home_nobreak_token(m: "re.Match[str]") -> str:
+    tok = m.group(0)
+    return f'<span class="ht-nb">{tok}</span>' if re.search(r"\S·", tok) else tok
 
 
 def home_nobreak_middot(line: str) -> Markup:
     """가운뎃점 앞에서 줄이 끊기지 않게 한다 — "위조·DEG" 가 "위조 / ·DEG" 로 갈라지면 다음
-    줄이 점으로 시작한다(375px 실측). 글자는 그대로 두고 앞 글자와 점만 한 덩어리로 묶는다."""
-    return Markup(_HOME_MIDDOT_RE.sub(r'<span class="ht-nb">\1·</span>', str(_escape(line or ""))))
+    줄이 점으로 시작한다(375px 실측). 글자는 그대로 두고 **띄어쓰기 단위 낱말 전체**를 묶는다.
+    [2026-11-26] 예전에는 점 앞 한 글자만 묶어("충<span>전·</span>포") 낱말 한가운데에 태그
+    경계가 생겼다 — 화면 읽기·텍스트 추출이 "충 전· 포 장·"·"충포출하한"으로 깨졌다. 태그 경계는
+    늘 빈칸 자리에만 둔다(test_home_keypoints_have_no_tag_inside_a_word 가 지킨다)."""
+    return Markup(_HOME_MIDDOT_TOKEN_RE.sub(_home_nobreak_token, str(_escape(line or ""))))
 
 
 def home_source_tag(line: str) -> dict[str, str]:

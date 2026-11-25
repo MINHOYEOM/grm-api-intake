@@ -39,7 +39,7 @@ from typing import Any, Callable, Iterable
 import requests
 
 import grm_findings as gf
-from grm_cli import normalize_supabase_url
+from grm_cli import BulkWriteError, BulkWriteRun, normalize_supabase_url
 from grm_common import SOURCE_FDA_483, env_flag, log, truncate
 from grm_taxonomy import is_out_of_scope_483
 
@@ -737,11 +737,18 @@ class QueueStore:
     def enqueue(self, rows: list[dict[str, Any]]) -> int:
         """대기열에 넣는다(이미 있으면 그대로 둔다). 반환 = 새로 들어간 행 수."""
         inserted = 0
-        for i in range(0, len(rows), _KEY_CHUNK):
+
+        def send(batch, _offset):
+            nonlocal inserted
             got = self._call("POST", "intake_queue", params={"on_conflict": "source,document_id"},
-                             body=rows[i:i + _KEY_CHUNK],
+                             body=batch,
                              prefer="resolution=ignore-duplicates,return=representation")
             inserted += len(got) if isinstance(got, list) else 0
+
+        try:
+            BulkWriteRun().write(rows, send, batch_size=_KEY_CHUNK)
+        except BulkWriteError as exc:
+            raise QueueStoreError(str(exc)) from None
         return inserted
 
     def open_candidates(self, start: str, end: str) -> list[dict[str, Any]]:

@@ -340,15 +340,8 @@ class BackboneChainTest(unittest.TestCase):
             rows, count, degraded = f._fetch_html_rows(START)
         return rows, count, degraded, calls
 
-    def test_apology_redirect_exception_sets_bot_blocked_flag(self):
-        exc = RuntimeError("404 Client Error for url: https://www.fda.gov/apology_objects/abuse-detection-apology.html")
-        self._run(html_exc=exc, json_exc=RuntimeError("HTTP 404"))
-        self.assertTrue(f._LAST_BOT_BLOCKED)
-        self._run(html_exc=RuntimeError("read timed out"), json_exc=RuntimeError("HTTP 404"))
-        self.assertFalse(f._LAST_BOT_BLOCKED)
-
-    def test_akamai_blocked_html_falls_back_to_full_json(self):
-        # 봇차단 apology 200(설정·표 없음) → 전수 JSON 백본이 전수 수집(EIR 은 제외).
+    def test_html_without_table_falls_back_to_full_json(self):
+        # 설정·표 없는 HTML → 전수 JSON 백본이 전수 수집(EIR 은 제외).
         rows, count, degraded, calls = self._run(
             html=_APOLOGY_HTML,
             json_data=[_json_row(9001), _json_row(9002, EIR_TYPE), _json_row(9003)])

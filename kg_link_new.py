@@ -31,7 +31,7 @@ import requests
 import kg_edges
 import kg_hc_clause
 import kg_product
-from grm_cli import normalize_supabase_url, resolve_supabase_service_credentials
+from grm_cli import BulkWriteRun, normalize_supabase_url, resolve_supabase_service_credentials
 
 ROOT = Path(__file__).resolve().parent
 PAGE = 1000
@@ -122,21 +122,30 @@ def fetch_recent_texts(base: str, key: str, since_iso: str, timeout: float = 120
         offset += PAGE
 
 
-def write_term_edges(base: str, key: str, edges: list[dict[str, Any]], timeout: float = 120.0) -> int | None:
+def write_term_edges(base: str, key: str, edges: list[dict[str, Any]], timeout: float = 120.0,
+                *, bulk: BulkWriteRun | None = None) -> int | None:
     """finding_term 에 멱등 삽입. 표 미적용(404)이면 None."""
     sent = 0
-    for i in range(0, len(edges), BATCH):
+
+    def send(batch, _offset):
+        nonlocal sent
         chunk = [{"finding_id": e["finding_id"], "term_id": e["term_id"], "surface": e["surface"],
-                  "confidence": e["confidence"]} for e in edges[i:i + BATCH]]
+                  "confidence": e["confidence"]} for e in batch]
         resp = _call(lambda: requests.post(
             f"{base}/rest/v1/finding_term",
             headers=_headers(key, Prefer="resolution=ignore-duplicates,return=minimal"),
             params={"on_conflict": "finding_id,term_id"}, json=chunk, timeout=timeout))
         if resp.status_code == 404:
-            return None
+            raise requests.HTTPError(response=resp)
         if resp.status_code not in (200, 201, 204):
             raise RuntimeError(f"finding_term HTTP {resp.status_code}")
         sent += len(chunk)
+    try:
+        (bulk or BulkWriteRun()).write(edges, send, batch_size=BATCH)
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code == 404:
+            return None
+        raise
     return sent
 
 
@@ -191,13 +200,14 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     key = creds[1]
     since = (datetime.now(timezone.utc) - timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    bulk = BulkWriteRun()
     try:
         if a.only_similar:
             r = link_similar(base, key, a.days, budget_s=a.similar_budget)
             print("[kg-link] 유사 지적(only): " + (json.dumps(r, ensure_ascii=False) if r is not None else "SKIP(114 미적용)"))
             return 0
         if a.only_product:
-            n_prod, sent_prod = kg_product.link_recent(base, key, since)
+            n_prod, sent_prod = kg_product.link_recent(base, key, since, bulk=bulk)
             print(f"[kg-link] 제품군(only): 엣지 {n_prod:,} · "
                   + (f"전송 {sent_prod:,}" if sent_prod is not None else "SKIP(111 미적용)"))
             return 0
@@ -219,7 +229,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"[kg-link] GMP 적합판정 연결 건너뜀: {exc}", file=sys.stderr)
         if os.environ.get("GRM_KG_HC_CLAUSE") == "1":  # 기본 꺼짐 — 캐나다 C.02.xxx 조항 연결(원문 regulation 필드)
             try:
-                st, n_hc = kg_hc_clause.link_recent(base, key, since)
+                st, n_hc = kg_hc_clause.link_recent(base, key, since, bulk=bulk)
                 print(f"[kg-link] 캐나다 조항: {json.dumps(st, ensure_ascii=False)} · "
                       + (f"전송 {n_hc:,}" if n_hc is not None else "SKIP(finding_clause 없음)"))
             except RuntimeError as exc:  # 부가 단계 — 지적 연결을 실패시키지 않는다
@@ -227,10 +237,10 @@ def main(argv: list[str] | None = None) -> int:
         terms = json.loads(Path(a.glossary).read_text(encoding="utf-8"))
         rows = fetch_recent_texts(base, key, since)
         edges, _stats = compute_edges(rows, terms)
-        sent = write_term_edges(base, key, edges)
+        sent = write_term_edges(base, key, edges, bulk=bulk)
         print(f"[kg-link] 용어: 지적 {len(rows):,}건 스캔 · 엣지 {len(edges):,} · "
               + (f"전송 {sent:,}" if sent is not None else "SKIP(107 미적용)"))
-        n_prod, sent_prod = kg_product.link_recent(base, key, since)
+        n_prod, sent_prod = kg_product.link_recent(base, key, since, bulk=bulk)
         print(f"[kg-link] 제품군: 엣지 {n_prod:,} · "
               + (f"전송 {sent_prod:,}" if sent_prod is not None else "SKIP(111 미적용)"))
         if not a.skip_similar:

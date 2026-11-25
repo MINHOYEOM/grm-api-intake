@@ -29,6 +29,7 @@ from typing import Any, Callable
 
 import findings_supabase_append as fsa
 import findings_supabase_backfill as fsb
+from grm_cli import BulkWriteRun
 from grm_common import log
 from grm_taxonomy import compute_modality
 
@@ -113,14 +114,13 @@ def _patch_chunk(base_url: str, service_key: str, ids: list[str], value: str) ->
 def apply_plan(result: dict[str, Any], *, base_url: str, service_key: str,
                patcher: Callable[[str, str, list[str], str], None] | None = None) -> dict[str, int]:
     patcher = patcher or _patch_chunk
+    bulk = BulkWriteRun()
     done: dict[str, int] = {}
     for value, ids in sorted(result["_ids"].items()):
-        n = 0
-        for i in range(0, len(ids), PATCH_CHUNK):
-            chunk = ids[i:i + PATCH_CHUNK]
-            patcher(base_url, service_key, chunk, value)
-            n += len(chunk)
-        done[value] = n
+        selected = ids[:bulk.remaining]
+        bulk.write(selected, lambda chunk, _: patcher(base_url, service_key, chunk, value),
+                   batch_size=PATCH_CHUNK)
+        done[value] = len(selected)
     return done
 
 
@@ -147,8 +147,13 @@ def main(argv: list[str] | None = None) -> int:
     result = plan(rows)
     report = {k: v for k, v in result.items() if k != "_ids"}
     report["mode"] = "apply" if args.apply else "dry-run"
+    deferred = 0
     if args.apply:
         report["patched"] = apply_plan(result, base_url=base_url, service_key=service_key)
+        deferred = sum(result["to_fill"].values()) - sum(report["patched"].values())
+        if deferred:
+            report["write_deferred"] = deferred
+            log("WARN", f"modality: {deferred} rows deferred; rerun the same scope")
     with open(args.report, "w", encoding="utf-8") as fh:
         json.dump(report, fh, ensure_ascii=False, indent=1)
     log("INFO", f"modality 소급 {report['mode']}: 빈칸 {report['scanned']}행 · 채움 "
@@ -156,7 +161,7 @@ def main(argv: list[str] | None = None) -> int:
                 + (f" · 기록 {report['patched']}" if args.apply else ""))
     for source, counts in report["per_source"].items():
         log("INFO", f"  {source}: {counts}")
-    return 0
+    return int(deferred > 0)
 
 
 if __name__ == "__main__":

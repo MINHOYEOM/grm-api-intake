@@ -479,17 +479,20 @@ def build_payload(alert_no: str, run_date: str, snapshot: dict[str, Any],
 def fetch_page(alert_no: str) -> tuple[bytes, dict[str, str]]:
     import requests
 
-    from grm_common import DEFAULT_USER_AGENT
+    from grm_common import DEFAULT_USER_AGENT, FdaBotBlockError, fda_checked_request
+    from grm_http_policy import FDA_IMPORT_ALERT_FETCH_ATTEMPTS
 
     url = URL_TMPL.format(page_id=ALERTS[alert_no]["page_id"])
     last: Exception | None = None
-    for _ in range(3):
+    for _ in range(FDA_IMPORT_ALERT_FETCH_ATTEMPTS):
         try:
-            r = requests.get(url, headers={"User-Agent": DEFAULT_USER_AGENT,
+            r = fda_checked_request(requests.get, url, headers={"User-Agent": DEFAULT_USER_AGENT,
                                            "Accept": "text/html,application/xhtml+xml"}, timeout=120)
             if r.status_code != 200:
                 raise RuntimeError(f"HTTP {r.status_code} for {url}")
             return r.content, {"last_modified": r.headers.get("Last-Modified", ""), "url": url}
+        except FdaBotBlockError:
+            raise
         except (requests.RequestException, RuntimeError) as exc:
             last = exc
     raise RuntimeError(f"fetch failed: {url} ({last})")

@@ -60,7 +60,10 @@ from grm_taxonomy import (
     is_pharma_establishment_483,
     is_veterinary_domain,
 )
-from grm_common import _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log
+from grm_http_policy import FDA_483_PDF_DELAY_SECONDS, FDA_HTTP_RETRIES
+from grm_common import (
+    FDA_BOT_BLOCK, FdaBotBlockError, _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log,
+)
 from collect_intake import (
     IntakeItem,
     SOURCE_FDA_483,
@@ -92,7 +95,7 @@ TYPE_FDA_EIR = "EIR"        # type_or_class — EIR
 LANGUAGE_EN = "EN"
 REGION_FDA = "USA (FDA)"
 
-HTTP_RETRIES = 3
+HTTP_RETRIES = FDA_HTTP_RETRIES
 FDA_483_JSON_TIMEOUT = 60
 FDA_483_HTML_TIMEOUT = 30
 FDA_483_HTML_PAGE_LENGTH = 100
@@ -113,7 +116,7 @@ _MIN_COLS = 8
 # 재사용하고, 483 특유 관찰사항 앵커만 새로 둔다. 비용·예의: per-item timeout/delay + 최신 N건 cap.
 FDA483_EXCERPT_MAX_CHARS = 1500
 FDA483_EXCERPT_FETCH_TIMEOUT = 20
-FDA483_EXCERPT_DELAY_SECONDS = 0.5
+FDA483_EXCERPT_DELAY_SECONDS = FDA_483_PDF_DELAY_SECONDS
 # [수집 사각 수리 2026-07-27] 종전 상한 40 은 **윈도우 후보 수(실측 108)의 3분의 1**이었다.
 # 정렬이 publish desc 라 최신 40건 밖의 483 은 **어느 날 실행에서도** PDF 를 받지 못하고, 한 번
 # Notion 에 들어가면 재시도 기회도 없다(스캐폴드는 New 행에서만 생성). 그렇게 통째로 건너뛴
@@ -368,7 +371,6 @@ BACKBONE_DATATABLES = "datatables"
 BACKBONE_LEGACY_JSON = "legacy-json"
 BACKBONE_STATIC_HTML = "static-html"
 _LAST_BACKBONE = BACKBONE_DATATABLES
-_LAST_BOT_BLOCKED = False  # 리딩룸 HTML 이 abuse-detection apology 로 막혔는지(직전 호출)
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _MEDIA_RE = re.compile(r"/media/(\d+)/download")
@@ -968,6 +970,8 @@ def _fetch_legacy_json_rows() -> tuple[list[dict[str, str]], int]:
     try:
         data = http_get_json(FDA_483_JSON_URL, timeout=FDA_483_JSON_TIMEOUT,
                              retries=HTTP_RETRIES)
+    except FdaBotBlockError:
+        raise
     except Exception as e:  # noqa: BLE001
         log("WARN", f"FDA 483 전수 JSON 백본 fetch 실패: {str(e)[:120]}")
         return [], 0
@@ -987,18 +991,16 @@ def _fetch_html_rows(start_date: date | None = None) -> tuple[list[dict[str, str
     (한번 사망했던 레거시 엔드포인트라 "살아있되 갱신 정지"가 현실 위험 — 침묵 누락 금지).
     사용 백본은 module 전역 `_LAST_BACKBONE` 에 기록(관측용).
     """
-    global _LAST_BACKBONE, _LAST_BOT_BLOCKED
-    _LAST_BOT_BLOCKED = False
+    global _LAST_BACKBONE
     static_rows: list[dict[str, str]] = []
     static_count = 0
     config = None
     try:
         html_text = http_get_html(OII_READING_ROOM_URL, timeout=FDA_483_HTML_TIMEOUT,
                                   retries=HTTP_RETRIES, label="FDA 483 HTML")
+    except FdaBotBlockError:
+        raise
     except Exception as e:  # noqa: BLE001
-        # [2026-11-19] Akamai 호스트 전체 봇차단(apology 404) 표식 — 실패 문구에 실어 health 가
-        # 일시 차단(경고)으로 분류하게 한다. 구조 변경(표식 없음)은 그대로 failure.
-        _LAST_BOT_BLOCKED = "abuse-detection-apology" in str(e)
         log("WARN", f"FDA 483 HTML fetch 실패: {str(e)[:120]} — 전수 JSON 백본 시도")
     else:
         static_rows, static_count = _html_norm_rows(html_text)
@@ -1025,6 +1027,8 @@ def _fetch_html_rows(start_date: date | None = None) -> tuple[list[dict[str, str
                     valid = [d for d in dates if d]
                     if valid and min(valid) < start_date.isoformat():
                         break
+        except FdaBotBlockError:
+            raise
         except Exception as e:  # noqa: BLE001
             log("WARN", f"FDA 483 DataTables 페이지 fetch 실패: {str(e)[:160]} — "
                         "전수 JSON 백본 시도")
@@ -1119,6 +1123,8 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
             pdf_url, timeout=FDA483_EXCERPT_FETCH_TIMEOUT, retries=HTTP_RETRIES,
             headers={"Accept": "application/pdf"}, label="FDA 483 PDF",
         )
+    except FdaBotBlockError:
+        return "", FDA_BOT_BLOCK
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
     text, status = _read_fda483_pdf_text(data, max_chars, _extract_pdf_text)
@@ -3538,9 +3544,8 @@ def collect_fda_483(
     - 윈도우 내 0건 → 정상(빈 리스트·error 없음).
     - PDF excerpt/Observation 실패는 graceful(키 미기록·메타 카드 유지·LAST_HEALTH 경고).
     """
-    global LAST_HEALTH, _LAST_BACKBONE, _LAST_BOT_BLOCKED
+    global LAST_HEALTH, _LAST_BACKBONE
     _LAST_BACKBONE = BACKBONE_DATATABLES     # 실행별 리셋(테스트 스텁 시 이전 값 누출 방지)
-    _LAST_BOT_BLOCKED = False
     # [발행일 추가 예산] 진입 시점에 마감 전이면 넓힌 예산으로 시작하고, 루프에서 마감이
     # 지나는 순간 기본 예산으로 되돌린다(이미 쓴 만큼은 기본 예산에서 차감).
     burst_granted = _burst_active()
@@ -3588,7 +3593,11 @@ def collect_fda_483(
     }
 
     log("INFO", f"FDA 483 수집(백본 3단 DataTables→전수JSON→정적HTML): {OII_READING_ROOM_URL}")
-    keep_rows, html_data_count, source_degraded = _fetch_html_rows(start)
+    try:
+        keep_rows, html_data_count, source_degraded = _fetch_html_rows(start)
+    except FdaBotBlockError:
+        LAST_HEALTH["status"] = FDA_BOT_BLOCK
+        return [], FDA_BOT_BLOCK
     if not keep_rows:
         LAST_HEALTH = {
             "fda483_excerpt": excerpt_health,
@@ -3599,9 +3608,7 @@ def collect_fda_483(
             "backbone": _LAST_BACKBONE,
         }
         return [], ("FDA 483 수집 실패: 백본 3단(DataTables/전수JSON/정적HTML) 모두 483 행 0 — "
-                    "소스 구조 변경 또는 일시 장애(수동 확인 필요)"
-                    + (" [일시 차단: abuse-detection-apology — 호스트 전체 봇차단]"
-                       if _LAST_BOT_BLOCKED else ""))
+                    "소스 구조 변경 또는 일시 장애(수동 확인 필요)")
 
     # Publish Date 윈도우 필터(전수 평가·정렬 비의존). 최신 N건 excerpt cap 위해 publish desc 정렬.
     in_window = [r for r in keep_rows
@@ -3613,6 +3620,7 @@ def collect_fda_483(
     known = skip_document_ids or set()
     skipped_known = 0
     skipped_excluded = 0
+    body_error = None
     for nrow in in_window:
         media_id = nrow["media_id"]
         if not media_id or media_id in seen:
@@ -3664,7 +3672,7 @@ def collect_fda_483(
         # ★ `capped` 로 루프를 빠져나가지 않는다 — 종전 `and not capped` 는 상한 도달 후
         #   첫 문서에서만 분기를 평가해 **몇 건이 통째로 빠졌는지 셀 수 없었다**. 이제 전건을
         #   지나가며 미시도 수를 센다(작업은 여전히 상한까지만 — 비용 불변).
-        if pdf_url:
+        if pdf_url and not body_error:
             in_scope_attempted = (excerpt_health["attempted"]
                                   - excerpt_health["dropped_out_of_scope"])
             burst = burst_granted and _burst_active()
@@ -3688,6 +3696,8 @@ def collect_fda_483(
                 # 뒤 Observation 까지 담기게(공유 엔진 12000 기본이 절단하던 것 보완). excerpt 는
                 # 이 text 에서 앵커 뒤 1500자만 다시 잘라 산출물 불변.
                 text, status = _fetch_fda483_pdf_text(pdf_url)
+                if status == FDA_BOT_BLOCK:
+                    body_error = FDA_BOT_BLOCK
                 fetched = True
                 text_status = status if not text else "ok"
                 # [실사관 추출 2026-07-30] 반드시 **청소 이전** 원시 text 에서 추출한다 —
@@ -3778,6 +3788,8 @@ def collect_fda_483(
         "fda483_skipped_known": skipped_known,
         "fda483_skipped_excluded": skipped_excluded,   # 제외 장부(같은 규칙 버전)로 건너뛴 수
     }
+    if body_error:
+        LAST_HEALTH["status"] = body_error
     # [침묵 금지 2026-07-30] 엔진 부재는 문서 사정이 아니라 **환경 사정**이다 — 고치면
     # 되찾을 수 있는 결손이므로 건수와 사유를 로그에 올리고, health 경보로도 승격시킨다
     # (grm_health.fda483-ocr-engine-missing). 종전에는 status 문자열만 raw 에 묻혔다.
@@ -3817,4 +3829,4 @@ def collect_fda_483(
                 f"· inspectors attempted={inspectors_health['attempted']} "
                 f"extracted={inspectors_health['extracted']} "
                 f"failed={inspectors_health['failed']}")
-    return items, None
+    return items, body_error

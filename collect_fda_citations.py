@@ -77,7 +77,7 @@ from collect_fda_inspections import (
     fiscal_year_window,
     parse_response,
 )
-from grm_common import log
+from grm_common import fda_checked_request, log
 
 SCHEMA_VERSION = "grm-fda-citations/v1"
 
@@ -313,7 +313,7 @@ def load_classified_inspection_ids(base_url: str, service_key: str, *,
     offset = 0
     while True:
         try:
-            resp = requests.get(url, headers=headers, timeout=timeout, params={
+            resp = fda_checked_request(requests.get, url, headers=headers, timeout=timeout, params={
                 "select": "inspection_id", "order": "inspection_id",
                 "limit": LINK_PAGE_SIZE, "offset": offset})
         except requests.RequestException as e:

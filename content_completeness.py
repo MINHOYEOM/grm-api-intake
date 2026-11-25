@@ -22,9 +22,8 @@
       * 그 밖의 소스는 **코드로** 본다: 사이트 계층(web/·supabase/·findings_*·kg_*) 또는 브리프 조립 파일이
         칸 이름을 문자열로 읽는지.
       경보: 아무도 안 읽는 칸 / findings 소스인데 도달률 5% 미만인 긴 칸(중앙값 300자 이상).
-  (V) 경고서한 위반항목 빈칸(2026-11-23) — 본문(`wl_body_full`)은 있는데 `wl_violations` 도 사유 표식
-      (`wl_violations_status`)도 없는 행. 추출 함수(`collect_intake.build_wl_item`)를 거치지 않은 적재 경로의
-      흔적이다(10-28 이전 백필 770행). 판정은 수집기와 같은 함수 `collect_intake.wl_violations_gap_kind`.
+  (V) 경고서한 위반항목 빈칸 — 본문이 있는 행을 사유별로 집계하고 미지 형식만 경보로 올린다.
+      판정은 수집기와 같은 함수 `collect_intake.wl_violations_gap_kind`.
       0 이 아니면 경보. 고치는 길: grm-wl-violations-reextract.yml(dry → 대표 승인 → apply).
 
 의도된 것은 경보하지 않는다 — `INTENTIONAL_CAPS`(설계상 발췌)·`INTENTIONAL_UNSHOWN`(추출 원료·정형 문구)에
@@ -517,10 +516,13 @@ def collect_stats(raw_rows: Iterable[dict[str, Any]], finding_rows: Iterable[dic
 
 def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20) -> dict[str, Any]:
     """(V) 경고서한 위반항목 빈칸 — 사유별 행 수(수집기와 같은 판정 함수)."""
-    from collect_intake import wl_violations_gap_kind
+    from collect_intake import (
+        WL_VIOLATIONS_SCOPE_STATUSES, WL_VIOLATIONS_STATUS_UNSUPPORTED, wl_violations_gap_kind,
+    )
     from grm_common import SOURCE_FDA_WL
     by_kind: dict[str, int] = defaultdict(int)
     unmarked_docs: list[str] = []
+    unsupported_docs: list[str] = []
     for r in raw_rows:
         if str(r.get("source") or "") != SOURCE_FDA_WL:
             continue
@@ -536,8 +538,13 @@ def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20)
         by_kind[kind] += 1
         if kind == "unmarked" and len(unmarked_docs) < max_docs:
             unmarked_docs.append(str(r.get("document_id") or ""))
+        if kind == WL_VIOLATIONS_STATUS_UNSUPPORTED and len(unsupported_docs) < max_docs:
+            unsupported_docs.append(str(r.get("document_id") or ""))
     return {"unmarked": by_kind.get("unmarked", 0), "by_kind": dict(sorted(by_kind.items())),
-            "unmarked_docs": unmarked_docs}
+            "unmarked_docs": unmarked_docs,
+            "unsupported": by_kind.get(WL_VIOLATIONS_STATUS_UNSUPPORTED, 0),
+            "unsupported_docs": unsupported_docs,
+            "out_of_scope": {kind: by_kind[kind] for kind in WL_VIOLATIONS_SCOPE_STATUSES if kind in by_kind}}
 
 
 def build_report(stats: list[FieldStats], findings_text: dict[str, str], *, today: date,
@@ -566,7 +573,7 @@ def build_report(stats: list[FieldStats], findings_text: dict[str, str], *, toda
         "fields_scanned": len(stats), "truncation": trunc, "usage": usage,
         "counts": {"truncated": len(alarms_t), "unused": len(alarms_u),
                    "intentional_caps": len(trunc) - len(alarms_t),
-                   "wl_violation_gaps": int((wl_gaps or {}).get("unmarked") or 0)},
+                   "wl_violation_gaps": int((wl_gaps or {}).get("unsupported") or 0)},
         "wl_violation_gaps": wl_gaps or {},
     }
     report["issues"] = plan_issues(report)
@@ -624,13 +631,15 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines += ["", "</details>", ""]
     g = report.get("wl_violation_gaps") or {}
     if c.get("wl_violation_gaps"):
-        lines += ["## 경고서한 위반항목 빈칸(본문 있음 · 사유 표식 없음)", "",
-                  f"**{c['wl_violation_gaps']}행** — 추출 함수를 거치지 않은 적재 경로의 흔적. "
-                  "고치는 길: `grm-wl-violations-reextract.yml`(dry → 대표 승인 → apply).", "",
-                  f"사유별: {g.get('by_kind')}", "",
-                  f"문서 예: {', '.join(g.get('unmarked_docs') or [])}", ""]
-    elif g:
-        lines += [f"경고서한 위반항목: {g.get('by_kind')} (사유 표식 없는 빈칸 0)", ""]
+        lines += ["## 경고서한 위반항목 빈칸(미지 형식)", "",
+                  f"**{c['wl_violation_gaps']}행** — 원문 형식을 확인해 추출 규칙을 보완합니다.", "",
+                  f"문서 예: {', '.join(g.get('unsupported_docs') or [])}", ""]
+    if g:
+        lines += [f"경고서한 위반항목 사유별 집계: {g.get('by_kind', {})}", ""]
+        scope = g.get("out_of_scope") or {}
+        if scope:
+            reasons = ", ".join(f"{reason} {count}행" for reason, count in sorted(scope.items()))
+            lines += [f"추출 대상 밖 {sum(scope.values())}행 ({reasons})", ""]
     if not t_alarm and not u_alarm and not c.get("wl_violation_gaps"):
         lines.append("이상 없음.")
     return "\n".join(lines) + "\n"
@@ -700,8 +709,7 @@ def main(argv: list[str] | None = None) -> int:
     if c["truncated"] or c["unused"]:
         print(f"::warning title=content-completeness::잘림 의심 {c['truncated']}칸 · 안 쓰이는 칸 {c['unused']}개", flush=True)
     if c.get("wl_violation_gaps"):
-        print(f"::warning title=wl-violations-gap::경고서한 본문 있음·위반항목 없음·사유 표식 없음 {c['wl_violation_gaps']}행 "
-              "— grm-wl-violations-reextract.yml 로 재추출", flush=True)
+        print(f"::warning title=wl-violations-gap::경고서한 위반항목 미지 형식 {c['wl_violation_gaps']}행", flush=True)
     return 0
 
 

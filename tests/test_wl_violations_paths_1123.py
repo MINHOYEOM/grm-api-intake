@@ -131,11 +131,11 @@ class StatusMarkerTest(unittest.TestCase):
 
 
 class DailySummaryHealthTest(unittest.TestCase):
-    def _codes(self, **overrides) -> set[str]:
+    def _health(self, **overrides):
         stats = ci.CollectionStats()
         for k, v in overrides.items():
             setattr(stats, k, v)
-        health = _evaluate_health(
+        return _evaluate_health(
             stats=stats, active={"wl"}, enable_search=False,
             enable_mfds=False, enable_mfds_law=False, enable_mfds_recall=False,
             enable_mfds_admin=False, enable_mfds_gmp_cert=False,
@@ -145,7 +145,6 @@ class DailySummaryHealthTest(unittest.TestCase):
             emit_routine_handoff=False, handoff_emitted=False, handoff_failed=False,
             handoff_error_msg="",
         )
-        return {w.code for w in health.warnings}
 
     def test_run_counts(self) -> None:
         class _It:
@@ -155,20 +154,25 @@ class DailySummaryHealthTest(unittest.TestCase):
             _It({"wl_body_full": "b", "wl_violations": [{"number": "1"}]}),
             _It({"wl_body_full": "b", "wl_violations_status": "unsupported_format"}, "dX"),
             _It({"wl_body_full": "b"}),
+            _It({"wl_body_full": "b", "wl_violations_status": "opdp_promotional",
+                 "issuing_office": "Office of Prescription Drug Promotion"}),
             _It({}),
         ])
         self.assertEqual((c["filled"], c["unsupported"], c["unmarked"], c["unsupported_docs"]), (1, 1, 1, ["dX"]))
+        self.assertEqual(c["out_of_scope"], {"opdp_promotional": 1})
 
     def test_warnings(self) -> None:
-        self.assertIn("wl-violations-unmarked", self._codes(wl_fetched=2, wl_violations_unmarked=1))
-        self.assertIn("wl-violations-unsupported", self._codes(wl_fetched=2, wl_violations_unsupported=1))
-        clean = self._codes(wl_fetched=2, wl_violations_filled=2)
-        self.assertNotIn("wl-violations-unmarked", clean)
-        self.assertNotIn("wl-violations-unsupported", clean)
+        health = self._health(wl_fetched=3, wl_violations_unmarked=1, wl_violations_unsupported=1,
+                              wl_violations_out_of_scope={"opdp_promotional": 1})
+        self.assertEqual({w.code for w in health.warnings if w.code.startswith("wl-violations-")},
+                         {"wl-violations-unsupported"})
+        self.assertIn("wl-violations-unmarked", {item.code for item in health.infos})
+        scope = next(item for item in health.infos if item.code == "wl-violations-out-of-scope")
+        self.assertIn("opdp_promotional=1", scope.detail)
 
 
 class ContentCompletenessGapTest(unittest.TestCase):
-    def test_counts_only_unmarked_wl_rows(self) -> None:
+    def test_reports_known_reasons_and_alarms_only_on_unknown_format(self) -> None:
         rows = [
             {"source": "FDA Warning Letter", "document_id": "a", "raw_json": json.dumps({"wl_body_full": "b"})},
             {"source": "FDA Warning Letter", "document_id": "b",
@@ -177,18 +181,30 @@ class ContentCompletenessGapTest(unittest.TestCase):
              "raw_json": json.dumps({"wl_body_full": "b", "wl_violations": [{"number": "1"}]})},
             {"source": "FDA Warning Letter", "document_id": "d", "raw_json": json.dumps({"firm": "x"})},
             {"source": "FDA 483", "document_id": "e", "raw_json": json.dumps({"wl_body_full": "b"})},
+            {"source": "FDA Warning Letter", "document_id": "f",
+             "raw_json": {"wl_body_full": "b", "wl_violations_status": "unsupported_format"}},
+            {"source": "FDA Warning Letter", "document_id": "g",
+             "raw_json": {"wl_body_full": "b", "issuing_office": "Office of Prescription Drug Promotion",
+                          "wl_violations_status": "unsupported_format"}},
         ]
         g = cc.wl_violation_gaps(rows)
         self.assertEqual(g["unmarked"], 1)
         self.assertEqual(g["unmarked_docs"], ["a"])
-        self.assertEqual(g["by_kind"], {"body_head_truncated": 1, "filled": 1, "unmarked": 1})
+        self.assertEqual(g["unsupported_docs"], ["f"])
+        self.assertEqual(g["out_of_scope"], {"opdp_promotional": 1})
+        self.assertEqual(g["by_kind"], {"body_head_truncated": 1, "filled": 1, "unmarked": 1,
+                                        "opdp_promotional": 1, "unsupported_format": 1})
         rep = cc.build_report([], {}, today=date(2026, 11, 23), wl_gaps=g)
         self.assertEqual(rep["counts"]["wl_violation_gaps"], 1)
         self.assertEqual(rep["issues"][0]["action"], "open")
         self.assertIn("경고서한 위반항목 빈칸", cc.render_markdown(rep))
+        self.assertIn("추출 대상 밖 1행 (opdp_promotional 1행)", cc.render_markdown(rep))
 
     def test_zero_gap_closes(self) -> None:
-        rep = cc.build_report([], {}, today=date(2026, 11, 23), wl_gaps={"unmarked": 0, "by_kind": {"filled": 3}})
+        rep = cc.build_report([], {}, today=date(2026, 11, 23), wl_gaps={
+            "unmarked": 1, "unsupported": 0, "by_kind": {"unmarked": 1, "opdp_promotional": 1},
+            "out_of_scope": {"opdp_promotional": 1},
+        })
         self.assertEqual(rep["counts"]["wl_violation_gaps"], 0)
         self.assertEqual(rep["issues"][0]["action"], "close")
 

@@ -14158,7 +14158,7 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertEqual(render.home_source_tag("FDA, 주사제 Class I 회수"),
                          {"src_cls": "fda", "src_label": "FDA"})
         self.assertEqual(str(render.home_nobreak_middot("위조·DEG <b>")),
-                         '위<span class="ht-nb">조·</span>DEG &lt;b&gt;')
+                         '<span class="ht-nb">위조·DEG</span> &lt;b&gt;')
         self.assertEqual(render.home_source_tag("식약처, 제조업무정지 3개월")["src_cls"], "mfds")
         self.assertEqual(render.home_source_tag("Health Canada recalls a product")["src_cls"], "hc")
         # 기관 이름이 낱말의 앞부분일 뿐이면(EUDAMED·FDA483) 표지를 달지 않는다.

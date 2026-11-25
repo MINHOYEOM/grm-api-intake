@@ -29,6 +29,11 @@ on:
     # 비정각 관행 — 여기서도 :13 을 쓴다).
     - cron: '13 11 * * 1'
     - cron: '13 0 * * 2'
+    # ★ 2026-11-25 — 월요일 낮 매시간(10:43~19:43 KST). 11-23 은 발행 PR 머지(10:17 KST) 뒤
+    #   workflow_run 발송이 skipped 됐는데 첫 검사가 20:13 이라 아무도 몰랐다. 기준은 "발행 PR
+    #   머지 시각 + 2시간"(newsletter.apply_publish_grace) — 그 전이거나 아직 발행 전이면 pending
+    #   (경보·종료 둘 다 안 함). 머지 시각을 못 찾으면 예전처럼 20시부터 경보한다.
+    - cron: '43 1-10 * * 1'
   workflow_dispatch:
     inputs:
       as_of:
@@ -39,6 +44,7 @@ on:
 permissions:
   contents: read
   issues: write        # 미발송 주 알림 이슈 생성/갱신/종료
+  pull-requests: read  # 발행 PR(publish/brief-날짜) 머지 시각 조회
 
 concurrency:
   group: newsletter-freshness
@@ -61,8 +67,25 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # 미발송(exit 1)·API 오류(exit 2)는 job 하드 실패가 아니라 이슈/요약으로 처리한다 —
-      # outcome 을 뒤에서 분기.
+      # 최신 호의 발행 PR 머지 시각 — 머지 방식(merge·squash·rebase)과 무관하게 PR 의 mergedAt.
+      # 못 찾으면 빈 값(그럼 예전처럼 월 20시부터 경보). 조회 실패가 감시를 죽이지 않게 || true.
+      - name: Find publish PR merge time (read-only)
+        id: merged
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LATEST="$(python web/newsletter.py --mode latest-date 2>/dev/null || true)"
+          MERGED_AT=""
+          if [ -n "$LATEST" ]; then
+            MERGED_AT="$(gh pr list -R "$GITHUB_REPOSITORY" --state merged --base main \
+                          --head "publish/brief-${LATEST}" --limit 5 --json mergedAt \
+                          --jq '[.[].mergedAt] | sort | last // empty' 2>/dev/null || true)"
+          fi
+          echo "최신 호 ${LATEST:-(없음)} · 발행 PR 머지 시각 ${MERGED_AT:-(모름)}"
+          echo "merged_at=$MERGED_AT" >> "$GITHUB_OUTPUT"
+
+      # 미발송(exit 1)·API 오류(exit 2)·유예 중(exit 3)은 job 하드 실패가 아니라 이슈/요약으로
+      # 처리한다 — outcome 을 뒤에서 분기.
       - name: Check newsletter freshness (read-only Brevo query)
         id: monitor
         continue-on-error: true
@@ -71,10 +94,14 @@ jobs:
           GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
           # 입력은 env 로 전달(쉘 ${{ }} 직접 보간 금지 — 스크립트 인젝션 회피).
           AS_OF_INPUT: ${{ inputs.as_of }}
+          MERGED_AT: ${{ steps.merged.outputs.merged_at }}
         run: |
           ARGS="--mode freshness --output newsletter_freshness.json"
           if [ -n "$AS_OF_INPUT" ]; then
             ARGS="$ARGS --as-of $AS_OF_INPUT"
+          fi
+          if [ -n "$MERGED_AT" ]; then
+            ARGS="$ARGS --merged-at $MERGED_AT"
           fi
           python web/newsletter.py $ARGS
 
@@ -109,6 +136,11 @@ jobs:
               core.warning(`뉴스레터 신선도 감시 — Brevo 조회 실패로 판정하지 못했습니다: ${report.reason || '(사유 없음)'}`);
               return;
             }
+            // pending — 발행 머지 후 유예 안이거나 아직 발행 전(월요일 낮). 경보도 종료도 하지 않는다.
+            if (report.verdict === 'pending') {
+              core.notice(`뉴스레터 신선도 감시 — 유예 중: ${report.reason || ''}`);
+              return;
+            }
 
             const title = '[newsletter-freshness] 이번 주 뉴스레터가 발송되지 않았습니다';
             const label = 'newsletter-freshness';
@@ -118,12 +150,13 @@ jobs:
             lines.push(`- 사유: ${report.reason || '(없음)'}`);
             lines.push(`- 검사 기준일(KST): ${report.as_of || '?'}`);
             lines.push(`- 최신 브리프 발행일: ${report.latest_publish_date || '(없음)'}`);
+            lines.push(`- 발행 PR 머지 시각(UTC): ${report.merged_at || '(모름)'}`);
             if (report.campaign_name) {
               lines.push(`- 캠페인: ${report.campaign_name} (상태: ${report.campaign_status || '?'})`);
             }
             lines.push('');
             if (report.verdict === 'not-sent') {
-              lines.push('**확인할 것** — Admin 콘솔 뉴스레터 발송 버튼, 또는:');
+              lines.push('**확인할 것** — 발행 배포 뒤 `GRM Newsletter Send` 런이 skipped 였는지(trigger-gate 의 is_publish·reason). 발송은 Admin 콘솔 뉴스레터 발송 버튼, 또는:');
               lines.push('```');
               lines.push('gh workflow run grm-newsletter-send.yml -f publish_date=<날짜> -f mode=send');
               lines.push('```');

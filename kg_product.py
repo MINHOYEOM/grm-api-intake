@@ -28,6 +28,7 @@ import re
 import sys
 from typing import Any, Iterable
 
+from grm_cli import BulkWriteRun
 import grm_taxonomy as tx
 
 MIN_CONFIDENCE = 0.8
@@ -255,14 +256,17 @@ def fetch_rows(base: str, key: str, since_iso: str | None = None, timeout: float
     return rows
 
 
-def write_edges(base: str, key: str, edges: list[dict[str, Any]], timeout: float = 120.0) -> int | None:
+def write_edges(base: str, key: str, edges: list[dict[str, Any]], timeout: float = 120.0,
+                *, bulk: BulkWriteRun | None = None) -> int | None:
     """finding_product 에 멱등 삽입(ignore-duplicates). 표 미적용(404)이면 None."""
     import requests
 
     sent = 0
-    for i in range(0, len(edges), 500):
+
+    def send(batch, _offset):
+        nonlocal sent
         chunk = [{k: e[k] for k in ("finding_id", "axis", "value", "confidence", "basis", "evidence")}
-                 for e in edges[i:i + 500]]
+                 for e in batch]
         try:
             r = requests.post(
                 f"{base}/rest/v1/finding_product",
@@ -272,17 +276,25 @@ def write_edges(base: str, key: str, edges: list[dict[str, Any]], timeout: float
         except requests.RequestException as exc:
             raise RuntimeError(f"요청 실패: {type(exc).__name__}") from None
         if r.status_code == 404:
-            return None
+            raise requests.HTTPError(response=r)
         if r.status_code not in (200, 201, 204):
             raise RuntimeError(f"finding_product HTTP {r.status_code}")
         sent += len(chunk)
+
+    try:
+        (bulk or BulkWriteRun()).write(edges, send)
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code == 404:
+            return None
+        raise
     return sent
 
 
-def link_recent(base: str, key: str, since_iso: str) -> tuple[int, int | None]:
+def link_recent(base: str, key: str, since_iso: str,
+                *, bulk: BulkWriteRun | None = None) -> tuple[int, int | None]:
     """일일 증분: (연결 후보 수, 전송 수 | None=111 미적용). kg_link_new.py 가 부른다."""
     edges, _stats = build_product_edges(fetch_rows(base, key, since_iso))
-    return len(edges), write_edges(base, key, edges)
+    return len(edges), write_edges(base, key, edges, bulk=bulk)
 
 
 def main(argv: list[str] | None = None) -> int:

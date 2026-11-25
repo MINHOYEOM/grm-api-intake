@@ -1,7 +1,7 @@
 # 용어·교육팀 · 주간 용어 추가 — 모델 Sonnet · 화 08:00 KST
 
 ## 읽을 것 (이 순서로, 이것만)
-1. `company/CHARTER.md` · `company/CLOUD.md`
+1. `company/CHARTER.md` · `company/CLOUD.md` · `company/education/PLAYBOOK.md`(교본·점검 질문 — 아래 정본 프롬프트와 부딪히면 정본이 이긴다)
 2. `docs/prompts/GRM_주간용어추가_프롬프트_v1.md` — **처음부터 끝까지 정독하고 그대로 따른다.** 아래 "클라우드에서 다른 점"만 예외다.
 
 ## 클라우드에서 다른 점

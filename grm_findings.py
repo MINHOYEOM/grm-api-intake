@@ -1378,9 +1378,9 @@ def normalize_firm_name(name: str) -> str:
 
 
 # [개인 사업자 2026-11-23] 업체명 칸이 **사람 이름**인 경우(483 수신 업체가 개인 농장·개인 사업자 —
-# 11-23호 'Kenneth F Tesch'·'Matthew A. Leo'). 2026-11-21 대표 결정(공직자·기관 대표 공식 발표 외 개인 실명 금지)에 따라
+# 11-23호 'Bennick F Varch'·'Matthew A. Leo'). 2026-11-21 대표 결정(공직자·기관 대표 공식 발표 외 개인 실명 금지)에 따라
 # 그 자리는 '개인 사업자' 로 쓴다. 표기는 여기 한 곳(`web/render.py` 가 영어 트리에서 같은 표로 바꾼다 — #1876).
-# 판정은 **확실한 꼴만**: 이름 + 가운데 이니셜 + 성(`Kenneth F Tesch`·`Matthew A. Leo`·`Frederick J. Raal`), 법인·업종 낱말 없음.
+# 판정은 **확실한 꼴만**: 이름 + 가운데 이니셜 + 성(`Bennick F Varch`·`Matthew A. Leo`·`Frederick J. Raal`), 법인·업종 낱말 없음.
 # 두 낱말 이름('Novo Nordisk'·'Sanofi Pasteur'·'Excel Vision' — 브리프 483 업체 449곳 실측 8곳이 전부 법인)은 코드가 못 가른다.
 REDACTED_PERSON_BY_LANG = {"ko": "개인 사업자", "en": "Individual business"}
 _PERSON_NAME_RE = re.compile(
@@ -1411,9 +1411,85 @@ def person_firm_name_suspect(name: str, establishment_type: str = "") -> bool:
     return bool(_PERSON_TWO_RE.match(text)) and bool(_INDIVIDUAL_ESTABLISHMENT_RE.search(_text(establishment_type)))
 
 
+# [자격박탈 대상자 2026-11-25] FDA 자격박탈 명령(Federal Register 'Final Debarment Order')은 공식 처분이지만 대상이
+# **민간 개인**이라 11-21 결정상 실명을 싣지 않는다(06-22 호 실발행분). 문서 제목 '<이름>: Final Debarment Order' 와
+# 본문 '… debarring <이름> for/from …' 두 꼴만 잡는다. 법인 낱말이 있으면(회사 자격박탈) 사람이 아니다.
+DEBARRED_PERSON_BY_LANG = {"ko": "[자격박탈 대상자]", "en": "[debarred individual]"}
+_DEBARMENT_TITLE_RE = re.compile(
+    r"(?<![A-Za-z])((?:[A-Z][A-Za-z'\-]*\.?\s+){1,4}[A-Z][A-Za-z'\-]+)\s*[:;]\s*(?:[A-Z][A-Za-z ]{0,40};\s*)?"
+    r"(?:Final\s+)?(?:Debarment|Disqualification)\s+Order")
+_AGENCY_WORD_RE = re.compile(
+    r"\b(?:administration|agency|department|office|service|commission|notice|order|federal|register|hearing|"
+    r"denial|final|proposed|rule|docket|united|states|food|drug)\b", re.IGNORECASE)
+_DEBARRING_RE = re.compile(
+    r"\bdebarring\s+((?:[A-Z][A-Za-z'\-]*\.?\s+){1,4}?[A-Z][A-Za-z'\-]+)(?=\s*(?:,|\(|for\b|from\b|\.|$))")
+
+
+def debarred_person_names(text: str) -> list[str]:
+    """자격박탈 명령 문구 속 개인 이름(순수) — 제목 '<이름>: Final Debarment Order'·본문 'debarring <이름> for …'."""
+    out = []
+    for rx in (_DEBARMENT_TITLE_RE, _DEBARRING_RE):
+        for m in rx.finditer(_text(text)):
+            name = m.group(1).strip()
+            if not (_ORG_WORD_RE.search(name) or _AGENCY_WORD_RE.search(name)) and name not in out:
+                out.append(name)
+    return out
+
+
+def redact_debarred_person(text: str, names: "list[str] | None" = None, lang: str = "en") -> str:
+    """자격박탈 대상자 이름 → 역할 표기(순수). `names` 를 안 주면 그 글에서 찾는다. URL 같은 소문자 꼴은 건드리지 않는다."""
+    label = DEBARRED_PERSON_BY_LANG.get(lang, DEBARRED_PERSON_BY_LANG["en"])
+    for name in sorted(names if names is not None else debarred_person_names(text), key=len, reverse=True):
+        text = re.sub(r"(?<![A-Za-z])" + re.escape(name) + r"(?![A-Za-z])", label, text)
+    return text
+
+
 def redact_person_firm(name: str, lang: str = "ko") -> str:
     """업체명 칸 값 → 사람 이름이면 '개인 사업자'(그 언어 표기), 아니면 그대로(순수)."""
     return REDACTED_PERSON_BY_LANG.get(lang, REDACTED_PERSON_BY_LANG["ko"]) if person_firm_name(name) else name
+
+
+# [개인 번지 주소 2026-11-25] 개인 사업자(개인 농장 등) 카드의 원문에는 업체명 자리에 사람 이름이, 그 아래
+# 'STREET ADDRESS' 칸에 **집 주소(번지)** 가 있다 — 11-23호 196329 는 이름을 '개인 사업자'로 바꾼 뒤에도 deep
+# `source_text` 에 번지가 남았다. 개인정보 최소화: 개인 사업자 카드에서는 번지를 싣지 않고 도시·주 단위까지만 둔다.
+# 규제기관 사무소 주소(483 머리말 'DISTRICT ADDRESS' 칸)는 공공기관 주소라 뺀다.
+STREET_REDACTED = "[번지 생략]"
+_STREET_SUFFIX = (r"(?:Avenue|Ave|Road|Rd|Street|St|Lane|Ln|Drive|Dr|Highway|Hwy|Boulevard|Blvd|Way|Court|Ct|"
+                  r"Place|Pl|Trail|Trl|Parkway|Pkwy|Circle|Cir|Pike|Terrace|Ter)")
+STREET_ADDRESS_RE = re.compile(
+    r"(?<![\w/.\-])(?:[NSEW]\s?)?\d{1,6}[A-Z]?\s+(?:(?:[NSEW]|North|South|East|West)\.?\s+)?"
+    r"(?:[A-Z][A-Za-z'\-]+\.?\s+){1,4}" + _STREET_SUFFIX + r"\b\.?")
+_AGENCY_ADDRESS_HEAD_RE = re.compile(r"DISTRICT\s+(?:OFFICE\s+)?ADDRESS", re.I)
+_AGENCY_ADDRESS_END_RE = re.compile(r"FIRM\s+NAME|STREET\s+ADDRESS|NAME\s+AND\s+TITLE|INDIVIDUAL\s+TO\s+WHOM", re.I)
+
+
+def street_addresses(text: str) -> list[tuple[int, int, str]]:
+    """원문 → 번지 주소 (시작, 끝, 글자) 목록(순수). 규제기관 사무소 주소 칸('DISTRICT ADDRESS' 뒤)은 뺀다."""
+    text = _text(text)
+    agency = []
+    for m in _AGENCY_ADDRESS_HEAD_RE.finditer(text):
+        end = _AGENCY_ADDRESS_END_RE.search(text, m.end())
+        agency.append((m.end(), min(end.start() if end else len(text), m.end() + 250)))
+    return [(m.start(), m.end(), m.group(0)) for m in STREET_ADDRESS_RE.finditer(text)
+            if not any(a <= m.start() < b for a, b in agency)]
+
+
+def redact_street_addresses(text: str) -> str:
+    """번지 주소를 `STREET_REDACTED` 로 바꾼다(순수) — 개인 사업자 카드에만 쓴다. 규제기관 주소는 그대로."""
+    text = _text(text)
+    for start, end, _ in reversed(street_addresses(text)):
+        text = text[:start] + STREET_REDACTED + text[end:]
+    return text
+
+
+def redact_person_firm_source(text: str, firm: str) -> str:
+    """원문 → 업체명이 사람 이름(개인 사업자)이면 그 이름은 '개인 사업자', 번지는 `STREET_REDACTED` 로(순수).
+    법인 업체는 원문 그대로다. 발행 브릿지가 deep `source_text` 를 붙일 때 쓴다(공개 저장소에 실린다)."""
+    text, firm = _text(text), _FIRM_WHITESPACE_RE.sub(" ", _text(firm)).strip()
+    if not text or not person_firm_name(firm):
+        return text
+    name_re = re.compile(r"\s+".join(re.escape(t) for t in firm.split()))
+    return redact_street_addresses(name_re.sub(REDACTED_PERSON_BY_LANG["ko"], text))
 
 
 _FIRM_PAREN_RE = re.compile(r"\([^)]*\)")
@@ -1888,3 +1964,71 @@ CREATE INDEX IF NOT EXISTS idx_findings_facets
 CREATE INDEX IF NOT EXISTS idx_findings_firm
   ON findings (firm_name, published_date);
 """
+
+
+# ── [11-26] FDA 483 서명란 판독 변형 — **꼬리 전용** 표지(수집기·발행 게이트가 이 함수 하나를 쓴다) ──
+# 판독이 서명란 머리 `EMPLOYEE(S)` 를 `EMF'I..OYEE(S)`·`EIM'LOYEE(S)`·`EM PL OYEE($)`·`ENPI.OVEE(S)` 로,
+# `SIGNATURE` 를 `SIGNA TURE`·`SIGNATIJRE` 로 깨뜨리면 기존 표지(`EMP…OY`·`SIGNATURE`)가 못 잡는다.
+# 공통점은 꼬리 `O‥E‥(S` 다(대문자 O·여는 괄호·S/5/$). 운영 저장 상세 실측(11-26): 이 꼴 336관찰(221문서).
+# ★그러나 쪽 경계 **중간**에 박힌 것도 많다 — 표지 뒤로 산문이 이어진다(106768 "EMPL OWEE(S) and reuse.
+#   The firm does not track…", 187975·190601·195189). 이것을 자르는 표지로 쓰면 쪽 잇기가 실패한 자리에서
+#   관찰이 잘린다(저장 단계 절단 금지 위반). 또 `SIGNAT…` 는 산문 표제 "ELECTRONIC SIGNATURES" 와 겹친다
+#   (193583). 그래서 **뒤에 산문이 없을 때만**(소문자 3자+ 낱말 2개 이하) 상세 꼬리의 서명란으로 본다 —
+#   이 규칙으로는 문장을 지울 수 없다. 중간 것은 손대지 않는다(게이트도 막지 않는다).
+_FDA483_SIGNER_VARIANT_RE = re.compile(
+    r"(?<=[A-Za-z.'!;:\~\"\-])O[^\s(]{0,3}E[^\s(]{0,3}[({][S5$]"
+    r"|S[I1l]G[NW]A ?T")
+_FDA483_PROSE_WORD_RE = re.compile(r"(?<![A-Za-z])[a-z]{3,}(?![A-Za-z])")
+FDA483_SIGNER_TAIL_MAX_PROSE = 2
+
+
+def fda483_signer_variant_tail_start(text: str) -> int | None:
+    """상세 꼬리의 판독 변형 서명란 시작 위치(순수 함수). 없으면 None.
+
+    표지 뒤에 산문 낱말이 `FDA483_SIGNER_TAIL_MAX_PROSE` 개 이하일 때만 서명란으로 본다. 시작은 표지가 든
+    낱말의 머리이고, 바로 앞 짧은 대문자 조각(`EM PL`·`E MP L` 처럼 판독이 벌린 것)까지 함께 걷는다."""
+    t = text or ""
+    for m in _FDA483_SIGNER_VARIANT_RE.finditer(t):
+        if len(_FDA483_PROSE_WORD_RE.findall(t, m.end())) > FDA483_SIGNER_TAIL_MAX_PROSE:
+            continue
+        start = m.start()
+        while start > 0 and not t[start - 1].isspace():
+            start -= 1
+        while True:
+            head = t[:start].rstrip()
+            prev = head[head.rfind(" ") + 1:] if head else ""
+            if not prev or len(prev) > 3 or any(ch.islower() for ch in prev) or prev.endswith((".", ",", ":", ";")):
+                break
+            start = len(head) - len(prev)
+        return start
+    return None
+
+
+# ── [11-26] 483 상세 본문 양 — 산문 낱말(소문자 3자 이상) 수와 "본문이 늘었나" 판정(한 벌) ────────────
+# 다시 읽기 백필(backfill_483_detail_refresh 의 복원 계수)과 재번역 대기열(findings_detail_export
+# --mode stale 의 산문 증가 조건)이 이 두 함수를 함께 쓴다 — 같은 기준이어야 "백필이 늘었다고 센 행"과
+# "번역팀에 가는 행"이 맞는다. 쪽 블록 잡문(서명자·머리말·양식 낱말)은 대문자·약어라 거의 세지 않는다.
+FDA483_PROSE_TOLERANCE = 0.05
+FDA483_PROSE_MIN_GROWTH = 5
+
+
+def fda483_prose_words(text: str) -> int:
+    """본문 양 — 산문 낱말 수(순수 함수)."""
+    return len(_FDA483_PROSE_WORD_RE.findall(text or ""))
+
+
+def fda483_prose_grew(old_text: str, new_text: str) -> bool:
+    """새 판이 옛 판보다 본문이 늘었나(순수 함수) — 5낱말 이상이면서 5% 넘게. 판독 흔들림은 늘었다고 보지 않는다."""
+    before, after = fda483_prose_words(old_text), fda483_prose_words(new_text)
+    return after - before >= FDA483_PROSE_MIN_GROWTH and after > before * (1 + FDA483_PROSE_TOLERANCE)
+
+
+def fda483_bare_signature_is_prose(text: str, end: int, *, other_marker_near: bool, endpos: int | None = None) -> bool:
+    """맨 `SIGNATURE` 표지가 서명란이 아니라 산문 표제("ELECTRONIC SIGNATURES")인가(순수 함수).
+
+    곁(±200자)에 다른 양식 표지가 없고, 표지 뒤 400자 안에 산문 낱말이 `FDA483_SIGNER_TAIL_MAX_PROSE` 개를
+    넘으면 산문으로 본다. 수집기의 절단점(`collect_fda_483._footer_cut`)과 발행 게이트가 같이 쓴다."""
+    if other_marker_near:
+        return False
+    stop = len(text or "") if endpos is None else endpos
+    return fda483_prose_words((text or "")[end:min(stop, end + 400)]) > FDA483_SIGNER_TAIL_MAX_PROSE

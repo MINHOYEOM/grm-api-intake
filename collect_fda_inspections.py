@@ -88,6 +88,7 @@ from typing import Any, Callable
 import requests
 
 import findings_supabase_append as fsa
+from grm_cli import BULK_BATCH_MAX, BulkWriteError, BulkWriteRun
 from grm_common import fda_checked_request, log, retry_after_seconds
 from grm_http_policy import FDA_DDAPI_HTTP_RETRIES, FDA_DDAPI_RETRY_BACKOFF_BASE_SECONDS
 
@@ -135,7 +136,7 @@ _VALID_CLASSIFICATION_CODES = ("NAI", "VAI", "OAI")   # 058 CHECK 제약과 동�
 TABLE = "fda_inspections"
 ON_CONFLICT = "inspection_id"
 UPSERT_RESOLUTION = "merge-duplicates"   # 위 모듈독스트링 참고 -- ignore-duplicates 아님.
-UPSERT_CHUNK_SIZE = 1000                 # 6,417건을 한 POST 에 몰지 않는다(413/timeout 방어).
+UPSERT_CHUNK_SIZE = BULK_BATCH_MAX
 
 DEFAULT_TIMEOUT_SECONDS = 60
 DEFAULT_RETRIES = FDA_DDAPI_HTTP_RETRIES
@@ -492,8 +493,17 @@ def run(
         report.would_upsert = len(payloads)
         log("INFO", f"[DRY] upsert 대상 {len(payloads)}건 (실적재 없음)")
     else:
-        for i in range(0, len(payloads), chunk_size):
-            chunk = payloads[i:i + chunk_size]
+        bulk = BulkWriteRun()
+        pending = payloads
+        if len(payloads) > bulk.remaining:
+            try:
+                pending = fsa._changed_rows(base_url, service_key, TABLE, payloads, ON_CONFLICT)
+            except RuntimeError as exc:
+                report.errors.append(str(exc))
+                return report, 1
+        selected = pending[:bulk.remaining]
+
+        def send(chunk, i):
             status, _rows, err = poster(
                 base_url, service_key, TABLE, chunk, ON_CONFLICT,
                 resolution=UPSERT_RESOLUTION,
@@ -503,8 +513,17 @@ def run(
                 report.errors.append(
                     f"upsert_chunk_failed(start={i},size={len(chunk)}):status={status}:{err}")
                 log("WARN", f"upsert 청크 실패 start={i} size={len(chunk)} status={status}: {err}")
-                continue
+                return False
             report.upserted += len(chunk)
+            return True
+
+        try:
+            bulk.write(selected, send, batch_size=chunk_size)
+        except BulkWriteError as exc:
+            report.errors.append(str(exc))
+        deferred = len(pending) - len(selected)
+        if deferred:
+            report.errors.append(f"write_deferred:{deferred}:rerun_same_selection")
         log("INFO", f"적재 {report.upserted}건 / 청크실패 {report.upsert_chunk_failed}")
 
     # ★★0건 하한 -- 무인 월간 크론으로 승격하면서 신설(2026-08-12).
@@ -536,7 +555,7 @@ def run(
                      f"(수신 {report.received_total}건 / 제외 {report.excluded_by_project_area})")
         return report, 2
 
-    exit_code = 1 if (report.normalize_failed or report.upsert_chunk_failed
+    exit_code = 1 if (report.errors or report.normalize_failed or report.upsert_chunk_failed
                       or report.duplicate_inspection_ids) else 0
     return report, exit_code
 

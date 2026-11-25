@@ -37,6 +37,10 @@
   .fd-src span{font-family:var(--sans);font-size:13px;color:var(--muted);word-break:keep-all}
   /* [실사관 표기 2026-08-31] 기존 사실 행(fd-meta 칩)과 같은 자리 — 코호트 링크는
      동적 층(findings.js)의 몫이라 여기는 <a> 없이 평문+보조문구만 낸다. */
+  .fd-gist{margin-top:16px;padding:12px 16px;border-left:3px solid var(--coral-2);font-family:var(--sans);word-break:keep-all}
+  .fd-gist b{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+  .fd-gist p{margin:0;font-size:15.5px;line-height:1.7;color:var(--body)}
+  .fd-gist small{display:block;margin-top:6px;font-size:12.5px;color:var(--muted)}
   .fd-insp{margin-top:12px;font-family:var(--sans);font-size:13.5px;color:var(--body);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;word-break:keep-all}
   .fd-insp b{font-weight:500;color:var(--ink)}
   .fd-insp span{font-size:12.5px;color:var(--muted)}
@@ -140,6 +144,11 @@
       <span class="fd-chip">{{ _("지적 {n}건", n=(doc.findings | length)) }}</span>
       {%- for c in doc.categories %}<span class="fd-chip">{{ c }}</span>{% endfor %}
     </p>
+    {#- [구글 품질 2단계 2026-11-20] GRM 요지 — 이 문서의 지적 문장만으로 쓴 두세 문장(doc_gist.view 가 검사·해시를
+        통과한 것만 넘긴다. 국문 트리 전용). 없으면 아무것도 그리지 않는다. -#}
+    {%- if doc_gist %}
+    <div class="fd-gist"><b>{{ doc_gist.label }}</b><p>{{ doc_gist.text }}</p><small>{{ doc_gist.note }}</small></div>
+    {%- endif %}
     {#- [실사관 표기 2026-08-31] 값이 있을 때만 렌더한다(빈 라벨 금지). 코호트(문서
         5건 이상) 여부와 무관하게 이름 자체는 전원 평문 — 코호트는 findings_inspector_index
         RPC 가 정하는 런타임 개념이라 정적 빌드가 재현하면 정의가 갈라진다(드리프트).
@@ -272,6 +281,17 @@
       <ul class="fd-cl">
         {%- for c in cited_clauses %}
         <li><a href="{{ rel_root }}findings/clause/{{ c.slug }}/"><b>{{ c.code }}</b>{% if c.title_en %} <span>{{ c.title_en }}</span>{% endif %}</a><span class="fd-cl-n">{{ _('같은 조항으로 지적된 다른 공개 문서 {n}건', n=c.others) }}</span></li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+    {%- if standard_refs %}
+    <section class="fd-ctx" id="standards">
+      <h2 class="fd-sec-h">{{ _('이 문서가 본문에 적은 기준') }}</h2>
+      <p class="fd-ctx-note">{{ _('지적 본문에 적힌 기준의 원문(공식 게시본)으로 바로 갑니다.') }}</p>
+      <ul class="fd-cl">
+        {%- for s in standard_refs %}
+        <li><a href="{{ rel_root }}{{ s.href }}"><b>{{ s.code }}</b>{% if s.title %} <span>{{ s.title }}</span>{% endif %}</a></li>
         {%- endfor %}
       </ul>
     </section>

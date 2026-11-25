@@ -1,7 +1,7 @@
 # 용어·교육팀 · 용어 그림 일일 배치 — 모델 Sonnet · 매일 21:00 KST
 
 ## 읽을 것 (이 순서로, 이것만)
-1. `company/CHARTER.md` · `company/CLOUD.md`
+1. `company/CHARTER.md` · `company/CLOUD.md` · `company/education/PLAYBOOK.md`(교본·점검 질문 — 아래 정본 프롬프트와 부딪히면 정본이 이긴다)
 2. `docs/prompts/GRM_용어그림_일일배치_프롬프트_v1.md` — **처음부터 끝까지 정독하고 그대로 따른다.** 아래 "클라우드에서 다른 점"만 예외다.
 
 ★대표 요청(2026-09-29): 억지 그림·안 맞는 그림을 특히 조심한다. 그림 0장 회차도 정상이다. 개수를 채우지 마라.

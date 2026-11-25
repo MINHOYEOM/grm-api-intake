@@ -33,6 +33,10 @@ on:
         description: '스캔 PDF OCR 쪽수 상한(비우면 수집기 기본 200). 예산 소진(scan-ocr-budget)으로 남은 행을 다시 돌릴 때 올린다'
         type: string
         default: ''
+      doc_ids:
+        description: '이 문서만 처리(쉼표 구분 document_id 또는 숫자, 예: 192058,190492). 주면 since 는 무시'
+        type: string
+        default: ''
 
 permissions:
   actions: read
@@ -86,6 +90,7 @@ jobs:
           IN_SINCE: ${{ github.event_name != 'schedule' && inputs.since || '' }}
           IN_LIMIT: ${{ inputs.limit }}
           IN_OCR_BUDGET: ${{ github.event_name == 'schedule' && '1500' || inputs.ocr_page_budget }}
+          IN_DOC_IDS: ${{ github.event_name != 'schedule' && inputs.doc_ids || '' }}
         run: |
           set -uo pipefail
           if [ -z "${IN_SINCE:-}" ]; then IN_SINCE=$(date -u -d '45 days ago' +%Y-%m-%d); fi   # 예약 실행 = 최근 45일
@@ -101,7 +106,11 @@ jobs:
             fi
             export FDA483_OCR_PAGE_BUDGET="$IN_OCR_BUDGET"
           fi
+          if [ -n "${IN_DOC_IDS:-}" ] && ! printf '%s' "$IN_DOC_IDS" | grep -qE '^[0-9a-z, -]+$'; then
+            echo "::error::doc_ids 는 숫자·fda483-숫자·쉼표만 허용"; exit 2
+          fi
           args=(--since "$IN_SINCE" --report fda483_body_full_report.json)
+          if [ -n "${IN_DOC_IDS:-}" ]; then args+=(--doc-ids "$IN_DOC_IDS"); fi
           if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
           if [ "${IN_PROBE:-false}" = "true" ]; then args+=(--probe-pdf); fi
           if [ -n "${IN_LIMIT:-}" ]; then args+=(--limit "$IN_LIMIT"); fi
@@ -109,7 +118,7 @@ jobs:
           rc=$?
           {
             echo "### FDA 483 body-full backfill"
-            echo "- apply: \`${IN_APPLY:-false}\` · probe_pdf: \`${IN_PROBE:-false}\` · since: \`${IN_SINCE}\` · limit: \`${IN_LIMIT:-전부}\` · ocr_page_budget: \`${IN_OCR_BUDGET:-기본}\` · exit: \`${rc}\`"
+            echo "- apply: \`${IN_APPLY:-false}\` · probe_pdf: \`${IN_PROBE:-false}\` · since: \`${IN_SINCE}\` · limit: \`${IN_LIMIT:-전부}\` · ocr_page_budget: \`${IN_OCR_BUDGET:-기본}\` · doc_ids: \`${IN_DOC_IDS:-없음}\` · exit: \`${rc}\`"
             echo '```json'
             head -c 6000 fda483_body_full_report.json 2>/dev/null || echo '(리포트 없음)'
             echo

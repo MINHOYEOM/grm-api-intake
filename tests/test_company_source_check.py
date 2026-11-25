@@ -2,7 +2,7 @@
 """교열 판정이 회차마다 갈린 4가지를 코드로 고정한다(2026-11-23) — 개인 실명·가림 값 추측·직원 진술 단정·날짜 불일치.
 
 재료는 실제 산출물에서 그대로 뗐다:
-  - 리허설 1122b 2차 반려(dfd5fdee): fda483-196329 'Kenneth F Tesch'·196343 'Matthew A. Leo'(개인 실명),
+  - 리허설 1122b 2차 반려(dfd5fdee): fda483-196329 'Bennick F Varch'·196343 'Matthew A. Leo'(개인 실명),
     196444 'filling [redacted]' → 'filling parts/equipment'(가림 값 추측), 196410 'acknowledged … backdated' → 'records backdated'(진술 단정).
   - 리허설 1121d~1122b WHO 서류 평가 카드 who-whopir-98cfb8b39789: '실사 기간: … 미국 FDA(2026-03-02~07)' vs 코드 실사일 2026-09-22.
   - 11-23 실발행: 교열이 196329·196343 을 '개인 사업체 업체명' 이라며 통과 → 발행 PR 에서 손으로 '개인 사업자'.
@@ -36,7 +36,7 @@ gc = _load_module("company_guess_check_src", "company/editorial/guess_check.py")
 precheck = _load_module("company_precheck_src", "company/editorial/precheck.py")
 
 # ── 실제 산출물 조각 ─────────────────────────────────────────────────────────
-TESCH_BODY = ("Specifically, you offered an animal for sale on [redacted] and was found to have an antibiotic residue of "
+VARCH_BODY = ("Specifically, you offered an animal for sale on [redacted] and was found to have an antibiotic residue of "
               "Ampicillin in the kidney at 0.0799 ppm with a tolerance of 0.01 ppm. This cow was treated with ampicillin "
               "on you farm on 8/16/25 and 8/19/25.")
 GENZYME_BODY = ("Specifically, A) On January 12, 2026, filling (b) (4) used for (b) (4) contained unknown brownish white residue "
@@ -81,10 +81,10 @@ def _run(cid, card, row, sc):
 # ── ① 개인 실명 ──────────────────────────────────────────────────────────────
 class PersonFirmTest(unittest.TestCase):
     def test_person_name_forms(self):
-        for name in ("Kenneth F Tesch", "Matthew A. Leo", "Frederick J. Raal", "Mary Ann K. Smith", "John B. Doe Jr."):
+        for name in ("Bennick F Varch", "Matthew A. Leo", "Frederick J. Raal", "Mary Ann K. Smith", "John B. Doe Jr."):
             self.assertTrue(grm_findings.person_firm_name(name), name)
         # 브리프 483 업체 449곳 실측: 두 낱말·법인 낱말은 사람으로 보지 않는다
-        for name in ("Novo Nordisk", "Sanofi Pasteur", "Excel Vision", "Genzyme Ireland Limited", "Kenneth F Tesch Farms",
+        for name in ("Novo Nordisk", "Sanofi Pasteur", "Excel Vision", "Genzyme Ireland Limited", "Bennick F Varch Farms",
                      "John A. Smith Dairy", "B. Braun Medical Inc", "International Laboratories Corp", ""):
             self.assertFalse(grm_findings.person_firm_name(name), name)
 
@@ -97,37 +97,37 @@ class PersonFirmTest(unittest.TestCase):
         src = (ROOT / "web" / "render.py").read_text(encoding="utf-8")
         self.assertIn("REDACTED_PERSON_BY_LANG = _GRM_REDACTED_PERSON_BY_LANG", src)
         self.assertNotIn('REDACTED_PERSON_BY_LANG = {"ko"', src)
-        self.assertEqual(grm_findings.redact_person_firm("Kenneth F Tesch"), "개인 사업자")
-        self.assertEqual(grm_findings.redact_person_firm("Kenneth F Tesch", "en"), "Individual business")
+        self.assertEqual(grm_findings.redact_person_firm("Bennick F Varch"), "개인 사업자")
+        self.assertEqual(grm_findings.redact_person_firm("Bennick F Varch", "en"), "Individual business")
         self.assertEqual(grm_findings.redact_person_firm("Genzyme Ireland Limited"), "Genzyme Ireland Limited")
 
     def test_1122b_and_1123_prose_blocks(self):
         """1122b 2차 반려 = 11-23 교열 통과분. 같은 재료면 매번 막힌다(국·영 둘 다)."""
         for cid, firm, ko, en in (
-                ("fda483-196329", "Kenneth F Tesch",
-                 "FDA가 미국의 사육 농가 Kenneth F Tesch(업체)에 Form 483(관찰사항 1건)을 발행했다.",
-                 "FDA issued a Form 483 with 1 observation to Kenneth F Tesch, a grower in the United States."),
+                ("fda483-196329", "Bennick F Varch",
+                 "FDA가 미국의 사육 농가 Bennick F Varch(업체)에 Form 483(관찰사항 1건)을 발행했다.",
+                 "FDA issued a Form 483 with 1 observation to Bennick F Varch, a grower in the United States."),
                 ("fda483-196343", "Matthew A. Leo",
                  "FDA가 미국의 육우 목장 Matthew A. Leo(업체)에 Form 483(관찰사항 2건)을 발행했다.",
                  "FDA issued a Form 483 with 2 observations to Matthew A. Leo, a beef ranch in the United States.")):
-            b, _ = _run(cid, _card(summary=ko, en_summary=en), _row(cid, firm, TESCH_BODY), _sc(cid, firm))
+            b, _ = _run(cid, _card(summary=ko, en_summary=en), _row(cid, firm, VARCH_BODY), _sc(cid, firm))
             self.assertEqual([x.split(":")[0] for x in b], [f"개인 실명 {cid}.summary", f"개인 실명 {cid}.en.summary"])
             self.assertIn("개인 사업자", b[0])
 
     def test_fixed_prose_passes_and_surname_alone_blocks(self):
-        cid, firm = "fda483-196329", "Kenneth F Tesch"
+        cid, firm = "fda483-196329", "Bennick F Varch"
         ok = _card(summary="FDA가 축산 농가(개인 사업자)에 Form 483(관찰사항 1건)을 발행했다.",
                    en_summary="FDA issued a Form 483 with 1 observation to a grower (an individual business).")
-        b, w = _run(cid, ok, _row(cid, firm, TESCH_BODY), _sc(cid, firm))
+        b, w = _run(cid, ok, _row(cid, firm, VARCH_BODY), _sc(cid, firm))
         self.assertEqual([x for x in b if x.startswith("개인 실명")], [])
-        b, _ = _run(cid, _card(summary="Tesch 농장에 Form 483 을 발행했다."), _row(cid, firm, TESCH_BODY), _sc(cid, firm))
-        self.assertTrue(any("'Tesch'" in x for x in b))
+        b, _ = _run(cid, _card(summary="Varch 농장에 Form 483 을 발행했다."), _row(cid, firm, VARCH_BODY), _sc(cid, firm))
+        self.assertTrue(any("'Varch'" in x for x in b))
 
     def test_scaffold_code_slots_redacted(self):
         """코드 칸(headline_target·업체 사실값·제목)은 스캐폴드가 같은 함수로 가린다 — 11-23 발행 PR 의 손 수정이 다음부터 자동."""
-        row = {"source": "FDA_483", "kind": "fda-483", "firm": "Kenneth F Tesch", "headline": "Kenneth F Tesch"}
+        row = {"source": "FDA_483", "kind": "fda-483", "firm": "Bennick F Varch", "headline": "Bennick F Varch"}
         self.assertEqual(cs._headline_target(row), "개인 사업자")
-        rows = cs._w2_extra_fda_483(row, {"firm": "Kenneth F Tesch", "fei_number": "3041017158", "record_date": "12/22/2025"})
+        rows = cs._w2_extra_fda_483(row, {"firm": "Bennick F Varch", "fei_number": "3041017158", "record_date": "12/22/2025"})
         self.assertEqual(rows[0], ("제조소/업체", "개인 사업자 · FEI 3041017158"))
         row2 = {"source": "FDA_483", "firm": "Genzyme Ireland Limited", "headline": "x"}
         self.assertEqual(cs._headline_target(row2), "Genzyme Ireland Limited")
@@ -135,9 +135,9 @@ class PersonFirmTest(unittest.TestCase):
         self.assertEqual(wl[0], ("업체/제조소", "개인 사업자"))
 
     def test_deep_names_block(self):
-        cid, firm = "fda483-196329", "Kenneth F Tesch"
-        deep = {"items": {cid: {"observations_ko": [{"number": "1", "deficiency_ko": "Kenneth F Tesch 가 판매했다"}]}}}
-        b, _ = gc.deep_source_lines(deep, {cid: _row(cid, firm, TESCH_BODY)}, {cid: _sc(cid, firm)})
+        cid, firm = "fda483-196329", "Bennick F Varch"
+        deep = {"items": {cid: {"observations_ko": [{"number": "1", "deficiency_ko": "Bennick F Varch 가 판매했다"}]}}}
+        b, _ = gc.deep_source_lines(deep, {cid: _row(cid, firm, VARCH_BODY)}, {cid: _sc(cid, firm)})
         self.assertTrue(b and b[0].startswith(f"개인 실명 {cid}.deep.observations_ko[0]"))
 
 
@@ -204,9 +204,9 @@ class DateTest(unittest.TestCase):
         self.assertFalse(gc.date_in_source(2025, 1, 9, src))
 
     def test_unknown_date_blocks_front(self):
-        cid, firm = "fda483-196329", "Kenneth F Tesch"
+        cid, firm = "fda483-196329", "Bennick F Varch"
         b, _ = _run(cid, _card(key_facts=["관찰 1: 이 소는 2025-08-16과 2025-08-21에 투여받음"]),
-                    _row(cid, firm, TESCH_BODY), _sc(cid, firm))
+                    _row(cid, firm, VARCH_BODY), _sc(cid, firm))
         self.assertEqual([x.split(" — ")[0] for x in b if x.startswith("원문에 없는 날짜")],
                          [f"원문에 없는 날짜 {cid}.key_facts[0]: '2025-08-21'"])
 
@@ -226,14 +226,14 @@ class DateTest(unittest.TestCase):
         self.assertEqual([x for x in b if "날짜" in x], [])
 
     def test_deep_dates_warn_only(self):
-        cid, firm = "fda483-196329", "Kenneth F Tesch"
+        cid, firm = "fda483-196329", "Bennick F Varch"
         deep = {cid: {"observations_ko": [{"number": "1", "detail_ko": "2025-08-21 에 투여했다"}]}}
-        b, w = gc.deep_source_lines(deep, {cid: _row(cid, firm, TESCH_BODY)}, {cid: _sc(cid, firm)})
+        b, w = gc.deep_source_lines(deep, {cid: _row(cid, firm, VARCH_BODY)}, {cid: _sc(cid, firm)})
         self.assertEqual(b, [])
         self.assertTrue(any(x.startswith(f"원문에 없는 날짜 의심 {cid}.deep") for x in w))
 
     def test_no_handoff_row_downgrades_to_warning(self):
-        cid, firm = "fda483-196329", "Kenneth F Tesch"
+        cid, firm = "fda483-196329", "Bennick F Varch"
         b, w = _run(cid, _card(key_facts=["2025-08-21 투여"]), None, _sc(cid, firm))
         self.assertEqual([x for x in b if "날짜" in x], [])
         self.assertTrue(any(x.startswith("원문에 없는 날짜 의심") for x in w))
@@ -242,10 +242,10 @@ class DateTest(unittest.TestCase):
 # ── 배선: 기자 사전 점검(terms·deep)과 교열 코드 검사(source)가 같은 함수 ─────────
 class WiringTest(unittest.TestCase):
     def _folder(self, tmp):
-        cid, firm = "fda483-196329", "Kenneth F Tesch"
-        delta = {"cards": {cid: _card(summary="Kenneth F Tesch(업체)에 483을 발행했다.",
-                                      en_summary="FDA issued a 483 to Kenneth F Tesch.")}}
-        handoff = {"rows": [_row(cid, firm, TESCH_BODY)]}
+        cid, firm = "fda483-196329", "Bennick F Varch"
+        delta = {"cards": {cid: _card(summary="Bennick F Varch(업체)에 483을 발행했다.",
+                                      en_summary="FDA issued a 483 to Bennick F Varch.")}}
+        handoff = {"rows": [_row(cid, firm, VARCH_BODY)]}
         scaffold = {"cards": [_sc(cid, firm)]}
         paths = {}
         for name, obj in (("delta.json", delta), ("delta.A.json", delta), ("handoff.json", handoff), ("scaffold.json", scaffold)):
@@ -278,7 +278,7 @@ class WiringTest(unittest.TestCase):
             shard = os.path.join(tmp, "deep.A.json")
             with open(shard, "w", encoding="utf-8") as f:
                 json.dump({"items": {"fda483-196329": {"observations_ko": [
-                    {"number": "1", "deficiency_ko": "Kenneth F Tesch 가 판매했다"}]}}}, f, ensure_ascii=False)
+                    {"number": "1", "deficiency_ko": "Bennick F Varch 가 판매했다"}]}}}, f, ensure_ascii=False)
             code, out = self._cli(["deep", p["handoff.json"], shard, "--scaffold", p["scaffold.json"]])
             self.assertEqual(code, 1)
             self.assertIn("개인 실명 fda483-196329.deep.observations_ko[0]", out)

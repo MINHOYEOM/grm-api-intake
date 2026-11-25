@@ -660,7 +660,6 @@ grm-api-intake/
 ├─ gsc_index_sample.py          # [성장·유입] 구글 색인 표본 점검(주 1회, grm-gsc-index-sample.yml) — 문서 페이지를 render.is_thin_doc_page 로 얇음/두꺼움으로 나눠 주차 고정 표본을 URL Inspection API 로 확인. Job Summary·아티팩트만, DB 쓰기 없음
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ backfill_mfds_gmp_assessment.py     # 저장 텍스트로 식약처 GMP 실사 첨부 지적 재판정
-├─ recollect_mfds_gmp_attachment.py    # 식약처 GMP 실사 기존 행의 첨부 본문 재수집 CLI(국내 IP PC 전용, dry 기본, --ids)
 ├─ backfill_raw_signals_from_notion.py # Notion에만 남은 수집 행의 Supabase 사본 보충
 ├─ backfill_recall_detail.py           # 기존 발행 회수 카드에 결정론 상세 소급 병합
 ├─ collect_rum_referrer_paths.py       # RUM 유입 출처와 도착 경로 교차 집계

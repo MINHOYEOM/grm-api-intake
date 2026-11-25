@@ -24,6 +24,8 @@ PC 예약작업 `grm-monday-ops-routine` 중 **클라우드에서 볼 수 있는
    - `grm-web-publish.yml` — 최근 실행이 실패면 그 실행 URL 과 함께 `★발행 조립 실패`.
    - 발송 리포트 본문(emails_sent·errors)은 status.json 에 없다 — 적지 않는다(성공 여부까지만 본다).
 
+독자 문의·제안(독자지원)은 이 점검에서 보지 않는다 — 2026-11-21 부터 고객만족팀(`company/customer/inbox.md`) 몫이다(종합상황실 겸임 해제).
+
 ## 기록·보고
 `company/run/$D/ops.md` 하나만 쓰고(브랜치 사용법은 `brief-prep.md` "기록"과 같다) 커밋·push.
 첫 3줄은 `CHARTER.md` 형식. 그 아래 한 줄에 한 가지: 발행 PR · 번역(공개 N, 주간 +M) · 경고 이슈 · 방치 PR · 막힘.

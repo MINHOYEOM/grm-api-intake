@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T13:07:57Z",
+ "generated_at": "2026-11-25T14:43:16Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45620333178,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-25T13:07:08Z",
-    "updatedAt": "2026-11-25T13:07:13Z",
-    "headBranch": "tmp/all-combined-1125",
-    "displayTitle": "Merge remote-tracking branch 'origin/fix/farm-address-1125' into tmp/…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45620333178"
-   },
-   {
-    "databaseId": 45618941598,
+    "databaseId": 45634932232,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T12:58:44Z",
-    "updatedAt": "2026-11-25T13:07:22Z",
+    "createdAt": "2026-11-25T14:31:09Z",
+    "updatedAt": "2026-11-25T14:42:46Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1961 from MINHOYEOM/claude/fixture-and-debarment-…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45618941598"
+    "displayTitle": "Merge pull request #1954 from MINHOYEOM/fix/farm-address-1125",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634932232"
    },
    {
-    "databaseId": 45616876416,
+    "databaseId": 45634247025,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-25T12:45:44Z",
-    "updatedAt": "2026-11-25T12:54:47Z",
-    "headBranch": "fix/farm-address-1125",
-    "displayTitle": "fix(privacy): 11-23호 개인 농장 번지 생략 + 개인 사업자 번지 게이트·브릿지 자동 정리",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45616876416"
+    "createdAt": "2026-11-25T14:27:25Z",
+    "updatedAt": "2026-11-25T14:35:02Z",
+    "headBranch": "codex/daily-reconcile-ledger",
+    "displayTitle": "feat(recon): 매일 대조 장부 1단계 (draft)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634247025"
    },
    {
-    "databaseId": 45614024587,
+    "databaseId": 45634244700,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T12:28:04Z",
-    "updatedAt": "2026-11-25T12:41:46Z",
+    "createdAt": "2026-11-25T14:27:24Z",
+    "updatedAt": "2026-11-25T14:35:41Z",
     "headBranch": "codex/ci-slot-wait",
     "displayTitle": "main 병합: §5.1 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45614024587"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634244700"
    },
    {
-    "databaseId": 45613901035,
+    "databaseId": 45634236488,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T12:27:17Z",
-    "updatedAt": "2026-11-25T12:44:10Z",
-    "headBranch": "codex/483-inspectors-names",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/483-inspectors-…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45613901035"
+    "createdAt": "2026-11-25T14:27:20Z",
+    "updatedAt": "2026-11-25T14:34:50Z",
+    "headBranch": "codex/daily-reconcile-ledger",
+    "displayTitle": "main 병합: MFDS 수집 건수 필드(order_check)와 대조 장부 필드 충돌 해소",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634236488"
+   },
+   {
+    "databaseId": 45634227607,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T14:27:17Z",
+    "updatedAt": "2026-11-25T14:35:45Z",
+    "headBranch": "codex/ci-no-network",
+    "displayTitle": "main 병합: §5.1 충돌 해소",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45634227607"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45637047680,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T14:42:50Z",
+    "updatedAt": "2026-11-25T14:43:02Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45637047680"
+   },
+   {
     "databaseId": 45620391512,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45559200187"
-   },
-   {
-    "databaseId": 45537737310,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T03:07:19Z",
-    "updatedAt": "2026-11-25T03:07:30Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45537737310"
    }
   ],
   "grm-findings-translate-apply.yml": [

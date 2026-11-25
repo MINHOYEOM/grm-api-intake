@@ -2021,3 +2021,14 @@ def fda483_prose_grew(old_text: str, new_text: str) -> bool:
     """새 판이 옛 판보다 본문이 늘었나(순수 함수) — 5낱말 이상이면서 5% 넘게. 판독 흔들림은 늘었다고 보지 않는다."""
     before, after = fda483_prose_words(old_text), fda483_prose_words(new_text)
     return after - before >= FDA483_PROSE_MIN_GROWTH and after > before * (1 + FDA483_PROSE_TOLERANCE)
+
+
+def fda483_bare_signature_is_prose(text: str, end: int, *, other_marker_near: bool, endpos: int | None = None) -> bool:
+    """맨 `SIGNATURE` 표지가 서명란이 아니라 산문 표제("ELECTRONIC SIGNATURES")인가(순수 함수).
+
+    곁(±200자)에 다른 양식 표지가 없고, 표지 뒤 400자 안에 산문 낱말이 `FDA483_SIGNER_TAIL_MAX_PROSE` 개를
+    넘으면 산문으로 본다. 수집기의 절단점(`collect_fda_483._footer_cut`)과 발행 게이트가 같이 쓴다."""
+    if other_marker_near:
+        return False
+    stop = len(text or "") if endpos is None else endpos
+    return fda483_prose_words((text or "")[end:min(stop, end + 400)]) > FDA483_SIGNER_TAIL_MAX_PROSE

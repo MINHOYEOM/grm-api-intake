@@ -611,7 +611,6 @@ _BOILERPLATE_RE = _FDA483_FOOTER_RE  # 후방호환 별칭(옛 이름 참조 안
 # 진짜 서명란은 EMPLOYEE(S)·SEE REVERSE·DATE ISSUED 같은 다른 표지가 함께 있거나 뒤가 이름·날짜뿐이라 그대로 잘린다.
 _BARE_SIGNATURE_RE = re.compile(r"(?-i:SIGNATURE|SIGJ)")
 _FOOTER_NEIGHBOR_WINDOW = 200
-_FOOTER_PROSE_WINDOW = 400
 
 
 def _footer_cut(text: str, pos: int = 0, endpos: int | None = None) -> "re.Match[str] | None":
@@ -622,8 +621,7 @@ def _footer_cut(text: str, pos: int = 0, endpos: int | None = None) -> "re.Match
             return m
         lo, hi = max(0, m.start() - _FOOTER_NEIGHBOR_WINDOW), min(len(text), m.end() + _FOOTER_NEIGHBOR_WINDOW)
         others = [x for x in _FDA483_FOOTER_RE.finditer(text, lo, hi) if not _BARE_SIGNATURE_RE.fullmatch(x.group(0))]
-        after = text[m.end():min(end, m.end() + _FOOTER_PROSE_WINDOW)]
-        if not others and gf.fda483_prose_words(after) > gf.FDA483_SIGNER_TAIL_MAX_PROSE:
+        if gf.fda483_bare_signature_is_prose(text, m.end(), other_marker_near=bool(others), endpos=end):
             continue
         return m
     return None

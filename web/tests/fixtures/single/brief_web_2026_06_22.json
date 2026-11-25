@@ -1563,7 +1563,7 @@
    "signal_tier": 1,
    "signal_label": "Low",
    "type_tag": "Guidance",
-   "headline_target": "Andrew Jonathan Morgan: Final Debarment Order",
+   "headline_target": "Bertil Hovanick Dorsev: Final Debarment Order",
    "title_issue": "",
    "summary": "",
    "facts": [
@@ -1581,12 +1581,12 @@
     },
     {
      "label": "주제",
-     "value": "Andrew Jonathan Morgan: Final Debarment Order"
+     "value": "Bertil Hovanick Dorsev: Final Debarment Order"
     }
    ],
    "quotes": [
     {
-     "original": "The Food and Drug Administration (FDA or the Agency) is issuing an order under the Federal Food, Drug, and Cosmetic Act (FD&C Act) debarring Andrew Jonathan Morgan for a period of 5 years from importing or offering for import any drug into the United…",
+     "original": "The Food and Drug Administration (FDA or the Agency) is issuing an order under the Federal Food, Drug, and Cosmetic Act (FD&C Act) debarring Bertil Hovanick Dorsev for a period of 5 years from importing or offering for import any drug into the United…",
      "translation": ""
     }
    ],
@@ -1598,7 +1598,7 @@
    "merged_items": [],
    "sources": {
     "info_url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=food-and-drug-administration&conditions%5Bpublication_date%5D%5Bgte%5D=2026-06-11&conditions%5Bpublication_date%5D%5Blte%5D=2026-06-18&per_page=100&order=newest",
-    "official_url": "https://www.federalregister.gov/documents/2026/06/17/2026-12167/andrew-jonathan-morgan-final-debarment-order",
+    "official_url": "https://www.federalregister.gov/documents/2026/06/17/2026-12167/bertil-hovanick-dorsev-final-debarment-order",
     "official_is_pdf": false,
     "link_check": {
      "info": "pending",

@@ -99,6 +99,18 @@ _DEFICIENCY_PRESENT_RE = re.compile(
     r".{0,60}?(?:있음|미흡|부적합|불\s*적?\s*합|일탈|\d+\s*건))",
     re.S,
 )
+# [표 본문 판정 2026-11-25 #9] 결론 줄이 "지적(보완)사항(Deficiencies)" 뒤에 각주(1)~3))가
+# 끼는 서식(한국코러스 11-20)은 위 present 정규식의 '있음·N건·분야+판정어' 어느 것에도 안
+# 걸려 `unknown` 이 됐다. 그런데 본문에는 지적 표(헤더+데이터 행)가 실재한다. 근거는 구조다:
+# ① 표 헤더 `분야 구분 근거 법령 지적(보완)사항 요약`(각주 번호 1)·2)·3) 허용)가 있고
+# ② **그 뒤에** `<분야어> <중대|중요|기타>` 데이터 행이 하나라도 있으면 present.
+# 각주의 "품질경영, 시설장비, ..." 나열은 분야어 뒤가 쉼표라 안 맞고, 헤더만 있고 행이 없는
+# 문서(표 내용이 텍스트층에 없는 경우)는 그대로 unknown 으로 남겨 사람이 본다.
+# `none` 판정이 먼저 실행되므로 무지적 명시 문서에는 영향이 없다(승격 전용).
+_DEFICIENCY_TABLE_HEADER_RE = re.compile(
+    r"분야\s*\d?\)?\s*구분\s*\d?\)?\s*근거\s*법령\s*지적\s*\(?\s*보완\s*\)?\s*사항\s*요약")
+_DEFICIENCY_TABLE_ROW_RE = re.compile(
+    r"(?:품질경영|시설장비|제조(?!소)|시험실|원자재|포장표시|허가관리|품질)\s*(?:중대|중요|기타)(?![가-힣])")
 # 표지·개요(제조소 현황·실사 개요)를 건너뛰고 '평가 결과 지적(보완)사항' 결론
 # 섹션부터 잘라내기 위한 앵커(우선순위 순). PDF 본문은
 # [표지 → 제조소 현황 → 실태조사 개요 → 실태조사 결과 → 평가 결과 지적(보완)사항(Deficiencies)]
@@ -378,6 +390,17 @@ def _get_bytes(url: str, *, timeout: int = 30, accept: str = "*/*") -> bytes:
     )
 
 
+# [서식 잡음 2026-11-25] 문서 맨 끝의 부서명 머리글이 글자 사이 공백으로 쪼개져("의 료 제 품 안
+# 전 과", "한 약 정 책 과") 발췌 끝에 그대로 붙었다. 한 글자짜리 한글 토큰이 4개 이상 이어진
+# **꼬리**만 자른다 — 본문 중간은 건드리지 않고, 실제 문장(토큰이 2자 이상)은 걸리지 않는다.
+_EXCERPT_TRAILING_SPACED_NOISE_RE = re.compile(r"(?:\s+[가-힣](?=\s|$)){4,}\s*$")
+
+
+def strip_excerpt_noise(excerpt: str) -> str:
+    """발췌 끝에 붙은 글자 사이 공백 부서명 머리글을 제거(없으면 그대로). 순수 함수."""
+    return _EXCERPT_TRAILING_SPACED_NOISE_RE.sub("", excerpt or "").strip()
+
+
 def _extract_deficiency_excerpt(text: str) -> str:
     """표지·개요를 건너뛰고 '평가 결과 지적(보완)사항' 결론 섹션부터 반환(없으면 "").
 
@@ -391,7 +414,7 @@ def _extract_deficiency_excerpt(text: str) -> str:
     for pat in _DEFICIENCY_EXCERPT_PATTERNS:
         m = re.search(pat, compact)
         if m:
-            return compact[m.start():].strip()
+            return strip_excerpt_noise(compact[m.start():].strip())
     return ""
 
 
@@ -412,10 +435,45 @@ def _assess_deficiency(text: str) -> str:
     # 오늘 `unknown` 이 나오는 문서만 `none` 으로 바꾼다(회귀가 구조로 불가능하다).
     if _INSPECTION_PASS_RE.search(compact):
         return "none"
+    header = _DEFICIENCY_TABLE_HEADER_RE.search(compact)
+    if header and _DEFICIENCY_TABLE_ROW_RE.search(compact, header.end()):
+        return "present"
     # 종전 fallback("Deficiencies" 존재 + 어디에도 '없음' 없음 → present)은 B3 와
     # 동일한 오승격 경로(헤더만 있는 정상/영문 보고서를 Tier 3 로) — 제거.
     # 판정 근거 불충분은 unknown → manual_review_required 로 사람이 본다.
     return "unknown"
+
+
+def assess_deficiency_with_rows(text: str, table_row_count: int = 0) -> str:
+    """본문 판정 + 표 행 수 — 수집기와 소급 백필이 **같이 부르는 단일 함수**.
+
+    표 행이 1개라도 추출됐으면 지적이 실재하는 것이므로 본문 판정이 unknown 이어도
+    present 다(DB 실측: status=extracted 인데 판정 unknown 113건). none 은 건드리지 않는다
+    — 본문이 '없음'이라는데 표 행이 있으면 사람이 봐야 하는 모순이라 승격하지 않는다.
+    """
+    base = _assess_deficiency(text)
+    if base == "unknown" and table_row_count > 0:
+        return "present"
+    return base
+
+
+def derive_table_status(text: str, table_row_count: int, deficiency: str) -> str:
+    """저장된 행의 `gmp_deficiency_table_status` 를 수집 시점 규칙으로 되산출(PDF 불필요).
+
+    `_parse_deficiency_table` 의 0행 분기와 같은 규칙: 사전평가 → skipped-type, 지적 present →
+    gate-degraded, unknown → unreadable, 그 밖(none) → empty. 본문이 없으면 "" (판정 불가).
+    """
+    if table_row_count > 0:
+        return "extracted"
+    if not (text or "").strip():
+        return ""
+    if _detect_inspection_type(text) == "pre_market":
+        return "skipped-type"
+    if deficiency == "present":
+        return "gate-degraded"
+    if deficiency == "unknown":
+        return "unreadable"
+    return "empty"
 
 
 def _deficiency_table_enabled() -> bool:
@@ -877,6 +935,8 @@ def _parse_attachment(doc_id: str) -> _AttachmentParse:
     deficiency = _assess_deficiency(text)
     deficiencies, table_status = _parse_deficiency_table(
         data, file_format, text, deficiency, doc_id)
+    # 표 행이 추출됐는데 본문 판정만 unknown 인 모순을 막는다(소급 백필과 같은 함수).
+    deficiency = assess_deficiency_with_rows(text, len(deficiencies))
     return _AttachmentParse(
         status=status,
         file_format=file_format,
@@ -1043,6 +1103,43 @@ def _body(raw: dict[str, str], attachment: _AttachmentParse,
     return "\n".join(part for part in parts if not part.endswith(": "))
 
 
+def attachment_payload_fields(attachment: _AttachmentParse,
+                              manual_review: bool) -> dict[str, Any]:
+    """첨부 파싱 결과 → raw_payload 의 첨부 관련 키 전부(수집기·재수집 CLI 공용 단일 함수).
+
+    `_to_item` 이 쓰던 블록을 그대로 옮긴 것이다(키·조건 불변). 이미 있는 행의 본문을 다시
+    채우는 도구(`recollect_mfds_gmp_attachment.py`)가 같은 키를 같은 규칙으로 만들게 한다.
+    """
+    out: dict[str, Any] = {
+        "attachment_parse_status": attachment.status,
+        "attachment_file_format": attachment.file_format,
+        "attachment_bytes": attachment.bytes_downloaded,
+        "attachment_pages": attachment.pages,
+        "attachment_deficiency_assessment": attachment.deficiency,
+        "manual_review_required": manual_review,
+    }
+    if attachment.error:
+        out["attachment_parse_error"] = attachment.error
+    if attachment.text:
+        out["attachment_text"] = attachment.text
+    if attachment.deficiency_excerpt:
+        out["attachment_deficiency_excerpt"] = attachment.deficiency_excerpt
+    # [상세보기 결정론 승격 2026-07-02] periodic 지적 표 성공 시만 구조 배열 기록(card_scaffold
+    # deterministic_detail 소비). status 는 관측용(플래그 on 시도분만) — off 면 키 자체 부재.
+    if attachment.deficiencies:
+        out["gmp_deficiencies"] = attachment.deficiencies
+    if attachment.deficiency_table_status:
+        out["gmp_deficiency_table_status"] = attachment.deficiency_table_status
+    return out
+
+
+def attachment_manual_review(attachment: _AttachmentParse) -> bool:
+    """`_to_item` 의 manual_review 판정과 같은 식(재수집 CLI 공용)."""
+    return attachment.deficiency_table_status == "unreadable" or (
+        attachment.deficiency == "unknown" and attachment.status not in ("pdf-ok", "hwpx-ok")
+    )
+
+
 def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
     doc_id = raw.get("doc_id", "").strip()
     manufacturer = raw.get("manufacturer", "").strip()
@@ -1071,33 +1168,14 @@ def _to_item(raw: dict[str, str], api_query_url: str) -> IntakeItem | None:
     # P0 개선: 첨부를 자동판독하지 못해 지적사항 유무를 확정 못한 경우(주로 구형 .hwp/OLE,
     # 다운로드 실패, 스캔본 등)에는 침묵 강등되지 않도록 '수동확인 필요' 플래그를 남긴다.
     # 무차별 Tier 3 승격은 노이즈가 크므로 Tier 2는 유지하되, Routine이 사람 확인을 큐잉하도록 표시.
-    manual_review = attachment.deficiency_table_status == "unreadable" or (
-        attachment.deficiency == "unknown" and attachment.status not in ("pdf-ok", "hwpx-ok")
-    )
+    manual_review = attachment_manual_review(attachment)
 
     raw_payload: dict[str, Any] = {
         "source": "nedrug CCBBD03",
         **raw,
         "download_url": download_url,
-        "attachment_parse_status": attachment.status,
-        "attachment_file_format": attachment.file_format,
-        "attachment_bytes": attachment.bytes_downloaded,
-        "attachment_pages": attachment.pages,
-        "attachment_deficiency_assessment": attachment.deficiency,
-        "manual_review_required": manual_review,
+        **attachment_payload_fields(attachment, manual_review),
     }
-    if attachment.error:
-        raw_payload["attachment_parse_error"] = attachment.error
-    if attachment.text:
-        raw_payload["attachment_text"] = attachment.text
-    if attachment.deficiency_excerpt:
-        raw_payload["attachment_deficiency_excerpt"] = attachment.deficiency_excerpt
-    # [상세보기 결정론 승격 2026-07-02] periodic 지적 표 성공 시만 구조 배열 기록(card_scaffold
-    # deterministic_detail 소비). status 는 관측용(플래그 on 시도분만) — off 면 키 자체 부재.
-    if attachment.deficiencies:
-        raw_payload["gmp_deficiencies"] = attachment.deficiencies
-    if attachment.deficiency_table_status:
-        raw_payload["gmp_deficiency_table_status"] = attachment.deficiency_table_status
 
     return IntakeItem(
         source=SOURCE_MFDS,

@@ -650,6 +650,9 @@ def _issued_head(seg):
     return re.split(r",| - | — |–|\s\(|\|", seg, maxsplit=1)[0]
 
 
+_ROLE_RANK = {"recipient": 0, "debarred": 1, "fda_contact": 2, "person": 3}
+
+
 def _person_candidates(text):
     """원문 → [(역할, 후보 문자열)](순수). 역할: recipient(483 수신인 칸)·fda_contact('ATTN:' 뒤 호칭)·person(그 밖의 호칭 뒤)."""
     out = []
@@ -660,8 +663,8 @@ def _person_candidates(text):
                 and re.search(r"\d", line_before):
             continue                                   # 'Patterson Dr Ste 100' — 번지수 뒤 Dr 은 Drive
         cand = m.group(1)
-        if re.match(r"[A-Z][A-Za-z\-]*['’]s\b", cand):
-            continue                                   # "Dr. Reddy's Laboratories" — 소유격은 회사명
+        if re.match(r"[A-Z][A-Za-z\-]*(?:['’]|&#0?39;|&apos;)s\b", text[m.start(1):m.start(1) + 40]):
+            continue                                   # "Dr. Reddy's"·'Dr. Reddy’s'·'Dr. Reddy&#039;s' — 소유격은 회사명
         parts = _NAME_TOKEN_RE.findall(cand)
         if len(parts) >= 2:
             last = cand.rfind(parts[-1])
@@ -678,6 +681,8 @@ def _person_candidates(text):
             if _name_tokens_of(after):                 # '… Site Lead TO: — STREET ADDRESS' 처럼 뒤가 비면 앞을 쓴다
                 cand = after
         out.append(("recipient", cand))
+    for name in guess_check._gf.debarred_person_names(text):   # 자격박탈 명령 대상 개인(같은 함수 — grm_findings)
+        out.append(("debarred", name))
     return out
 
 
@@ -685,11 +690,11 @@ def source_person_roles(text, firm_text=""):
     """원문 → {개인 이름 낱말: 역할}(순수). 업체명에 든 낱말·전부 대문자 낱말(FIRM·NAME·NMI 등 서식 글자)은 뺀다.
     한 낱말이 여러 역할로 나오면 recipient > fda_contact > person."""
     firm_low = (firm_text or "").lower()
-    rank = {"recipient": 0, "fda_contact": 1, "person": 2}
+    rank = _ROLE_RANK
     roles = {}
     for role, cand in _person_candidates(text or ""):
         for t in _name_tokens_of(cand):
-            if t.isupper() or t.lower() in firm_low:
+            if t.isupper() or (role != "debarred" and t.lower() in firm_low):   # 자격박탈 명령은 제목이 곧 이름 — 업체명 면제 없음
                 continue
             if t not in roles or rank[role] < rank[roles[t]]:
                 roles[t] = role
@@ -699,7 +704,7 @@ def source_person_roles(text, firm_text=""):
 def merge_person_roles(texts, firm_text="", exclude_text=""):
     """여러 원문 조각 → {낱말: 역할}(순수). 조각마다 `source_person_roles` 를 돌려 합친다(머리글 정규식이 조각 경계를 넘지 않게).
     `exclude_text`(FDA 실사관 서명 등 공식 인물)에 든 낱말은 뺀다."""
-    rank = {"recipient": 0, "fda_contact": 1, "person": 2}
+    rank = _ROLE_RANK
     excl = set(re.findall(r"[A-Za-z'\-]+", exclude_text or ""))
     roles = {}
     for text in texts:
@@ -822,7 +827,7 @@ def redact_person_names(text, roles, labels):
     spans = person_name_spans(list(roles), text)
     if not spans:
         return text, 0
-    rank = {"recipient": 0, "fda_contact": 1, "person": 2}
+    rank = _ROLE_RANK
     parts, pos = [], 0
     for start, end, hit in spans:
         role = min((roles[t] for t in hit), key=rank.__getitem__)

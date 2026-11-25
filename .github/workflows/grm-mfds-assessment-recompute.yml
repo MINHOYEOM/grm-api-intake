@@ -9,7 +9,7 @@ name: GRM MFDS GMP Assessment Recompute (backfill)
 #
 # ★네트워크 없음: 판정 입력인 `attachment_text` 가 이미 raw_signals 에 있다. PDF 를 다시
 #   받지 않는다(nedrug 는 해외 IP 차단이라 러너에서 받을 수도 없다). 따라서 이 잡이
-#   고치는 것은 판정·인용문뿐이고, 지적 **표**(gmp_deficiencies)는 PDF 바이트가 있어야
+#   고치는 것은 판정·인용문·표 상태(gmp_deficiency_table_status, 2026-11-25 추가: 상태 없음·empty 행만)뿐이고, 지적 **표**(gmp_deficiencies)는 PDF 바이트가 있어야
 #   하므로 신규 수집분에서만 채워진다.
 #
 # ★git 쓰기 없음(checkout read-only) · Notion 무접촉 · 발행 파이프라인 무간섭.

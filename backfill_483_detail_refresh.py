@@ -490,6 +490,7 @@ def run(
     sleep_fn: Callable[[float], None] = time.sleep,
     resume_from: str | None = None,
     add_missing: bool = False,
+    on_changed: Callable[[dict[str, Any], dict[str, Any]], None] | None = None,
 ) -> DetailRefreshReport:
     c = _collector()
     report = DetailRefreshReport(dry_run=dry_run, since=since, truncated_only=truncated_only,
@@ -639,6 +640,8 @@ def run(
             continue
         report.docs_changed += 1
         report.observations_changed += changed
+        if on_changed is not None:
+            on_changed(r, {**raw, _OBS_KEY: refreshed})
         if dry_run or patch_fn is None:
             continue
         try:
@@ -650,6 +653,50 @@ def run(
         report.patched += 1
     report.processed = report.candidates
     return report
+
+
+def stale_preview(findings: list[dict[str, Any]],
+                  changed: list[tuple[dict[str, Any], dict[str, Any]]]) -> dict[str, Any]:
+    """[11-25] 소급 뒤 재번역(stale) 대기열 미리 보기(순수 함수, DB 쓰기 없음).
+
+    재번역 대기열을 실제로 만드는 `findings_detail_export.build_queue(stale_only=True)` 를 **그대로** 바뀔 문서의
+    옛 raw·새 raw 에 각각 돌려 차이를 낸다(같은 함수 — 짝 규칙을 베끼지 않는다).
+      new_stale: 소급 뒤에만 대기열에 드는 국문 있는 행(= 재번역 부하)
+      unpaired_changed_obs: 바뀐 관찰 중 같은 (raw_signal_id, 표제 키) findings 행이 없는 것 — 표제가 바뀌어
+        stale 짝을 못 찾는 관찰(번역 대상에서 조용히 빠진다)."""
+    import findings_detail_export as fde
+    rids = {str(row.get("raw_signal_id")) for row, _ in changed}
+    fs = [f for f in findings if str(f.get("raw_signal_id")) in rids]
+    with_ko = [f for f in fs if str(f.get("detail_text_ko") or "").strip()]
+    before_raws = [row for row, _ in changed]
+    after_raws = [{**row, "raw_json": raw} for row, raw in changed]
+    q_before, st_before = fde.build_queue(with_ko, before_raws, stale_only=True)
+    q_after, st_after = fde.build_queue(with_ko, after_raws, stale_only=True)
+    ids_before = {x["finding_id"] for x in q_before}
+    new_stale = sorted({x["finding_id"] for x in q_after} - ids_before)
+    keys = {(str(f.get("raw_signal_id")), fde._heading_key(f.get("finding_text"))) for f in fs}
+    unpaired: list[dict[str, Any]] = []
+    for row, raw in changed:
+        old_raw = row.get("raw_json")
+        old_raw = json.loads(old_raw) if isinstance(old_raw, str) else dict(old_raw or {})
+        for o_old, o_new in zip(old_raw.get(_OBS_KEY) or [], raw.get(_OBS_KEY) or []):
+            if o_old == o_new:
+                continue
+            rid = str(row.get("raw_signal_id"))
+            if (rid, fde._heading_key(o_new.get("deficiency"))) not in keys:
+                unpaired.append({"doc": row.get("document_id"), "number": o_new.get("number"),
+                                 "deficiency_changed": o_old.get("deficiency") != o_new.get("deficiency"),
+                                 "deficiency_head": str(o_new.get("deficiency") or "")[:90]})
+    after_chars = {x["finding_id"]: len(x["detail_text"]) for x in q_after}
+    return {
+        "changed_docs": len(changed), "findings_in_changed_docs": len(fs), "with_ko": len(with_ko),
+        "stale_before": len(ids_before), "stale_after": len(q_after), "new_stale": len(new_stale),
+        "new_stale_chars": sum(after_chars.get(i, 0) for i in new_stale),
+        "unpaired_changed_obs": len(unpaired),
+        "unpaired_heading_changed": sum(1 for u in unpaired if u["deficiency_changed"]),
+        "ambiguous_after": st_after.get("ambiguous", 0),
+        "new_stale_ids": new_stale, "unpaired": unpaired,
+    }
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -670,6 +717,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--remaining-ids-path",
                    help="도중에 멈추면 남은 document_id 를 이 파일에 한 줄씩 쓴다(다 돌면 파일을 만들지 않는다).")
     p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록.")
+    p.add_argument("--stale-preview-path",
+                   help="(읽기 전용) 바뀔 문서에 대해 findings_detail_export --mode stale 대기열 전후를 계산해 기록.")
     p.add_argument("--supabase-url", help="미지정 시 $SUPABASE_URL")
     p.add_argument("--service-role-key", help="미지정 시 $SUPABASE_SERVICE_ROLE_KEY")
     return p
@@ -689,6 +738,7 @@ def main(argv: list[str] | None = None) -> int:
     since = args.since or (_ALL_TIME if args.truncated_only else DEFAULT_SINCE)
     rows = _fetch_rows(base_url, service_key, since, args.until)
     ids = {x for x in re.split(r"[\s,]+", args.doc_ids or "") if x}
+    changed: list[tuple[dict[str, Any], dict[str, Any]]] = []
     report = run(
         rows, dry_run=not args.apply, since=since, limit=args.limit, doc_ids=ids or None,
         truncated_only=args.truncated_only,
@@ -696,7 +746,18 @@ def main(argv: list[str] | None = None) -> int:
         patch_fn=lambda row, raw: _patch(base_url, service_key, row, raw),
         resume_from=args.resume_from,
         add_missing=args.add_missing_observations,
+        on_changed=(lambda row, raw: changed.append((row, raw))) if args.stale_preview_path else None,
     )
+    if args.stale_preview_path:
+        findings = fsb._fetch_all_pages(
+            base_url, service_key, "findings",
+            select="finding_id,raw_signal_id,published_date,finding_text,detail_text,detail_text_ko",
+            page_size=1000, order="finding_id.asc",
+            extra_params={"source": f"eq.{SOURCE_FDA_483}", "scope_status": "eq.ok"})
+        preview = stale_preview(findings, changed)
+        Path(args.stale_preview_path).write_text(
+            json.dumps(preview, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(json.dumps({k: v for k, v in preview.items() if not isinstance(v, list)}, ensure_ascii=False))
     data = report_payload(report)
     payload = json.dumps(data, ensure_ascii=False, indent=2)
     banner = incomplete_banner(data)

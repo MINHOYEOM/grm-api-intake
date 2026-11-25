@@ -102,7 +102,7 @@ jobs:
           FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}
         run: |
           set -euo pipefail
-          ARGS=(--report-path detail_refresh_report.json --remaining-ids-path detail_refresh_remaining_ids.txt)
+          ARGS=(--report-path detail_refresh_report.json --remaining-ids-path detail_refresh_remaining_ids.txt --stale-preview-path stale_preview.json)
           if [ -n "${IN_SINCE}" ]; then
             ARGS+=(--since "${IN_SINCE}")
           fi
@@ -164,4 +164,5 @@ jobs:
           path: |
             detail_refresh_report.json
             detail_refresh_remaining_ids.txt
+            stale_preview.json
           if-no-files-found: ignore

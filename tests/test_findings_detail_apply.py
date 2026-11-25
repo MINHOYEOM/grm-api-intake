@@ -90,6 +90,25 @@ class QaTest(unittest.TestCase):
         self.assertTrue(any(p.startswith("kept_tokens_invalid") for p in
                             qa.check(en, ko, strict=True, kept_tokens=["c0A"])))
 
+    def test_strict_statute_citation_is_not_redaction(self):
+        """11-25 표제 실측: 503B(b)(2)(A)·211.67(b)(4) 는 조항 인용 — 가림 변형으로 실격시키지 않는다."""
+        self.assertEqual(qa.readability("귀사는 section 503B(b)(2)(A)가 요구하는 보고서를 제출하지 않았다. "
+                                        "21 CFR 211.67(b)(4) 참조."), [])
+        for bad in ("귀사의 SOP는 (b) (4) 를 요구한다.", "귀사의 SOP는 the(b)(4) 를 요구한다.", "시험은 () (4) 이다."):
+            self.assertTrue(any(p.startswith("redact_variant") for p in qa.readability(bad)), bad)
+
+    def test_strict_lot_number_with_at_sign_kept_whole(self):
+        """11-25 표제 실측: 로트 07022014@43 의 @43 을 [redacted] 로 바꾸고 43 만 ocr_dropped 로 빼면 통과하던 구멍."""
+        en = "Specifically, on 7/2/2014 I observed lot 07022014@43 filled at 3ml into a 7 ml vial."
+        good = "구체적으로, 7/2/2014 실사관은 로트 07022014@43 이 7 ml 바이알에 3ml 충전된 것을 관찰했다."
+        bad = "구체적으로, 7/2/2014 실사관은 로트 07022014 [redacted] 이 7 ml 바이알에 3ml 충전된 것을 관찰했다."
+        self.assertEqual(qa.check(en, good, strict=True), [])
+        probs = qa.check(en, bad, strict=True, ocr_dropped=["43"])
+        self.assertTrue(any(p.startswith("lot_missing:07022014@43") for p in probs), probs)
+        # 로트 토큰 전체를 OCR 오독으로 신고한 경우만 면제
+        self.assertFalse(any(p.startswith("lot_missing") for p in
+                             qa.check(en, bad, strict=True, ocr_dropped=["07022014@43", "43"])))
+
     def test_strict_form_block_and_untranslated(self):
         self.assertTrue(any(p.startswith("form_block") for p in qa.readability(
             "귀사는 조사하지 않았다. DISTRICT ADDRESS AND PHONE NUMBER Industry Information: www.fda.gov/oc/industry")))

@@ -1088,6 +1088,50 @@ def _redact_person_names(cards: list[dict[str, Any]], deep_deltas: dict[str, Any
         if n:
             report.redacted_name_ids.append(str(card.get("id")))
             report.warnings.append(f"[실명 가림] {card.get('id')}: 원문 상세 {n}곳의 개인 이름을 역할 표기로 바꿈")
+    _redact_debarred_persons(cards, report)
+
+
+_DEBARRED_SKIP_KEYS = frozenset(("sources", "official_url", "url", "evidence_url", "href", "id"))
+_HANGUL_RE = re.compile(r"[가-힣]")
+
+
+def _redact_debarred_persons(cards: list[dict[str, Any]], report: "AssembleReport") -> None:
+    """FDA 자격박탈 명령 대상 개인 이름 → '[debarred individual]'(한글 칸은 '[자격박탈 대상자]')(제자리).
+    이름은 카드의 원문 칸(제목·사실값·인용)에서 `grm_findings.debarred_person_names` 로 찾는다 — 판정 게이트와 같은 함수.
+    출처 링크(URL)는 원문 주소라 그대로 둔다."""
+    import grm_findings as _gf
+
+    def walk(node: Any, names: list[str]) -> int:
+        n = 0
+        if isinstance(node, dict):
+            for k, v in list(node.items()):
+                if k in _DEBARRED_SKIP_KEYS:
+                    continue
+                if isinstance(v, str):
+                    new = _gf.redact_debarred_person(v, names, "ko" if _HANGUL_RE.search(v) else "en")
+                    if new != v:
+                        node[k], n = new, n + 1
+                else:
+                    n += walk(v, names)
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                if isinstance(v, str):
+                    new = _gf.redact_debarred_person(v, names, "ko" if _HANGUL_RE.search(v) else "en")
+                    if new != v:
+                        node[i], n = new, n + 1
+                else:
+                    n += walk(v, names)
+        return n
+
+    for card in cards:
+        names: list[str] = []
+        for _, text in _detail_text_slots({k: v for k, v in card.items() if k not in _DEBARRED_SKIP_KEYS}):
+            for name in _gf.debarred_person_names(text):
+                if name not in names:
+                    names.append(name)
+        if names and walk(card, names):
+            report.redacted_name_ids.append(str(card.get("id")))
+            report.warnings.append(f"[실명 가림] {card.get('id')}: 자격박탈 명령 대상 개인 이름을 역할 표기로 바꿈")
 
 
 # ── 결정론 상세 유형 분류 — "원문 서사를 손에 쥐었는가" ────────────────────────

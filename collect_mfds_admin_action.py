@@ -60,6 +60,25 @@ GRM_PROBLEM_PREFIX = "[GRM 문제]"
 LAST_HEALTH: dict[str, Any] = {}
 
 
+def judge_page_order(page_edges: list[tuple[str, str]]) -> str:
+    """페이지별 (첫 처분일, 끝 처분일) 목록으로 API 정렬 방향을 판정한다(순수 함수·추가 요청 0).
+
+    첫 쪽 첫 건 vs 마지막 쪽 끝 건의 ISO 날짜를 비교한다. 반환: newest-first | oldest-first |
+    unknown(날짜 없음·같음). `order=Y` 가 최신순이라는 설계 문서 근거를 실제 응답으로 한 번
+    확인하기 위한 관측이다 — 2,000건(MAX_PAGES×PAGE_SIZE)을 넘으면 오래된순일 때 최신 몫이
+    영구히 안 보이므로, 넘기 전에 확정해 둔다.
+    """
+    dated = [(a, b) for a, b in page_edges if a and b]
+    if not dated:
+        return "unknown"
+    first, last = dated[0][0], dated[-1][1]
+    if first > last:
+        return "newest-first"
+    if first < last:
+        return "oldest-first"
+    return "unknown"
+
+
 def _set_last_health(
     *,
     collected: int,
@@ -71,6 +90,7 @@ def _set_last_health(
     window_count: int = 0,
     duplicate_count: int = 0,
     raw_count: int = 0,
+    order_check: str = "",
 ) -> None:
     global LAST_HEALTH
     total_count_warning = ""
@@ -93,6 +113,7 @@ def _set_last_health(
         "excluded_count": filtered,
         "duplicate_count": duplicate_count,
         "raw_count": raw_count,
+        "order_check": order_check,
     }
 
 ADMIN_TIER3_TERMS = [
@@ -398,6 +419,7 @@ def collect_mfds_admin_actions(
     filtered_count = 0
     window_count = duplicate_count = raw_count = 0
     pages_seen = 0
+    page_edges: list[tuple[str, str]] = []
     _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
                      filtered=0, page_warnings=[])
     paginator = datago_paginate(
@@ -408,6 +430,8 @@ def collect_mfds_admin_actions(
         for raw_items, masked_url in paginator:
             pages_seen += 1
             raw_count += len(raw_items)
+            page_dates = [d for d in (_item_date(r) for r in raw_items) if d]
+            page_edges.append((page_dates[0], page_dates[-1]) if page_dates else ("", ""))
             for raw in raw_items:
                 date_iso = _item_date(raw)
                 if not _within_window(date_iso, start, end):
@@ -455,8 +479,19 @@ def collect_mfds_admin_actions(
         f"{len(items)}건 (Tier 3={tier3_count}, Tier 2={tier2_count}, "
         f"filtered={filtered_count}, totalCount={total_count})",
     )
+    order_check = judge_page_order(page_edges)
+    first_edge = next((a for a, _ in page_edges if a), "")
+    last_edge = next((b for _, b in reversed(page_edges) if b), "")
+    if order_check == "oldest-first":
+        log("WARN", "[GRM 문제] 식약처 행정처분 API 정렬이 오래된순 — "
+                    f"1쪽 {first_edge} < 끝쪽 {last_edge}. 2,000건 초과 시 최신 몫 누락")
+    else:
+        log("INFO", f"MFDS admin-action 정렬 확인: {order_check} "
+                    f"(첫 쪽 첫 건 {first_edge or '-'}, 끝 쪽 끝 건 {last_edge or '-'}, "
+                    f"쪽 {pages_seen})")
     _set_last_health(collected=len(items), total_count=total_count,
                      pages_seen=pages_seen, truncated=bool(paginator.truncated),
                      filtered=filtered_count, page_warnings=[], window_count=window_count,
-                     duplicate_count=duplicate_count, raw_count=raw_count)
+                     duplicate_count=duplicate_count, raw_count=raw_count,
+                     order_check=order_check)
     return items, truncated_msg

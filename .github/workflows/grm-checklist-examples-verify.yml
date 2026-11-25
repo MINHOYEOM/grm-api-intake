@@ -57,7 +57,7 @@ jobs:
       # 판정기 자체의 오프라인 회귀(수리 전 실측 4건을 잡는가 · 수리 후 실측을 통과시키는가).
       # 라이브를 보기 전에 **검사기가 눈멀지 않았는지** 먼저 확인한다.
       - name: 판정기 오프라인 검증
-        run: python -m unittest tests.test_checklist_examples_guard -v
+        run: python -m ci_network_guard tests.test_checklist_examples_guard -v
 
       - name: 자격증명 선점검
         env:

@@ -163,6 +163,18 @@ jobs:
         if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed != 'true'
         run: gh pr edit "${{ steps.pr.outputs.number }}" --add-label automation-warning
 
+      # 기본 GITHUB_TOKEN 으로 머지하면 main push 가 웹 배포를 깨우지 않는다.
+      # 이 경우 후보 PR 을 남기고, CI 대기에 들어가기 전에 실패를 드러낸다.
+      - name: Verify token for merge-triggered deployment
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
+        env:
+          HAS_DEPLOY_TRIGGER_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN != '' || secrets.ADMIN_GITHUB_ACTIONS_TOKEN != '' }}
+        run: |
+          if [ "$HAS_DEPLOY_TRIGGER_TOKEN" != 'true' ]; then
+            echo '::error::웹 배포를 트리거할 머지 토큰이 없습니다 (GRM_PUBLISH_TOKEN 또는 ADMIN_GITHUB_ACTIONS_TOKEN). 후보 PR을 남깁니다.'
+            exit 1
+          fi
+
       - name: Dispatch CI gate
         if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
         run: |
@@ -184,13 +196,13 @@ jobs:
           gh run watch "$RUN_ID" --exit-status
 
       - name: Merge only after green CI
+        id: merge
         if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
         run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
 
-      # refresh 가 죽으면 이후 스텝(커밋·PR·CI)은 전부 스킵된다 — 불완전 스냅샷으로 PR 을
-      # 열지 않는다(11-07 사례). 한 주를 조용히 넘기지 않도록 이슈로 알린다.
+      # 조회부터 골든·PR·CI·머지까지 같은 실패 이슈로 추적한다.
       - name: Open or update docs-refresh issue
-        if: failure() && steps.refresh.outcome == 'failure'
+        if: failure()
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
@@ -198,10 +210,8 @@ jobs:
             const label = 'findings-docs';
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const body = [
-              '문서 페이지 정본 갱신(`grm-findings-docs.yml`)이 실패해 이번 주 PR 을 만들지 않았습니다.',
-              '',
-              '대개 `findings_search` RPC 일시 오류로 일부 페이지를 재시도 후에도 못 읽은 경우입니다 ' +
-                '(불완전한 스냅샷은 확정하지 않습니다). 로그의 사유를 확인하고 workflow_dispatch 로 재실행하세요.',
+              '업체·문서 페이지 주간 갱신(`grm-findings-docs.yml`)에 실패했습니다.',
+              '실행 로그에서 실패한 단계와 후보 PR 유무를 확인하세요.',
               '',
               `실행: ${runUrl}`,
               '',
@@ -233,7 +243,7 @@ jobs:
             }
 
       - name: Close docs-refresh issue on recovery
-        if: always() && steps.refresh.outcome == 'success'
+        if: success() && (steps.changes.outputs.changed == 'false' || steps.merge.outcome == 'success')
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |

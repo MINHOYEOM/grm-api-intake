@@ -101,6 +101,35 @@ class DetailRefreshReport:
     stopped_at_document_id: str = ""
     resume_from: str = ""
     remaining_doc_ids: list[str] = field(default_factory=list)
+    # [11-26 DB 완전성] 다시 읽으니 새로 잡히는 관찰(저장 배열에 그 번호가 없음 = findings 행도 없음).
+    # 기본은 세기만 한다. --add-missing-observations 일 때만 raw 배열에 덧붙인다(행 추가는 그 뒤
+    # findings 추출 재실행 `grm-findings-backfill.yml` document_ids 가 한다).
+    new_observations: int = 0
+    new_observation_docs: int = 0
+    new_observations_added: int = 0
+    new_observation_doc_ids: list[str] = field(default_factory=list)
+    new_observation_samples: list[dict[str, Any]] = field(default_factory=list)
+
+
+def _num_key(o: dict[str, Any]) -> int:
+    n = str(o.get("number") or "")
+    return int(n) if n.isdigit() else 0
+
+
+def missing_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """다시 읽은 관찰 중 저장 배열에 **번호가 없는** 것(순수 함수). 같은 표제가 다른 번호로 이미 있으면
+    (번호 판독만 다른 같은 관찰) 넣지 않는다 — 중복 행을 만들지 않는다."""
+    have_nums = {str(o.get("number") or "") for o in old}
+    have_defs = {" ".join(str(o.get("deficiency") or "").split()).lower() for o in old}
+    out: list[dict[str, Any]] = []
+    for o in new:
+        num = str(o.get("number") or "")
+        d = " ".join(str(o.get("deficiency") or "").split()).lower()
+        if not num or num in have_nums or not d or d in have_defs:
+            continue
+        out.append(dict(o))
+        have_nums.add(num)
+    return out
 
 
 def incomplete_banner(report: dict[str, Any]) -> str:
@@ -460,6 +489,7 @@ def run(
     patch_fn: Callable[[dict[str, Any], dict[str, Any]], None] | None = None,
     sleep_fn: Callable[[float], None] = time.sleep,
     resume_from: str | None = None,
+    add_missing: bool = False,
 ) -> DetailRefreshReport:
     c = _collector()
     report = DetailRefreshReport(dry_run=dry_run, since=since, truncated_only=truncated_only,
@@ -590,6 +620,21 @@ def run(
                         "before_tail": str(o_old.get("detail") or "")[-120:],
                         "after_tail": o_new["detail"][-160:],
                     })
+        missing = missing_observations(old, new)
+        if missing:
+            report.new_observations += len(missing)
+            report.new_observation_docs += 1
+            report.new_observation_doc_ids.append(doc)
+            for o in missing:
+                if len(report.new_observation_samples) < _SAMPLE_MAX:
+                    report.new_observation_samples.append({
+                        "doc": doc, "number": o.get("number"),
+                        "deficiency": str(o.get("deficiency") or "")[:160],
+                        "detail_len": len(str(o.get("detail") or ""))})
+            if add_missing:
+                refreshed = sorted([*refreshed, *missing], key=_num_key)
+                report.new_observations_added += len(missing)
+                changed += len(missing)
         if not changed:
             continue
         report.docs_changed += 1
@@ -618,6 +663,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--limit", type=int, default=None, help="처리 문서 수 상한.")
     p.add_argument("--doc-ids", default="", help="선택: document_id/raw_signal_id 목록(공백·쉼표).")
     p.add_argument("--delay-seconds", type=float, default=FDA_483_PDF_DELAY_SECONDS, help="PDF 요청 간 대기(초).")
+    p.add_argument("--add-missing-observations", action="store_true", default=False,
+                   help="다시 읽어 새로 잡힌 관찰(저장 배열에 번호 없음)을 raw 배열에 덧붙인다. 기본은 세기만.")
     p.add_argument("--resume-from", default=None,
                    help="이 raw_signal_id 부터(포함) 잇는다 — 앞 실행 보고서의 stopped_at_raw_signal_id.")
     p.add_argument("--remaining-ids-path",
@@ -648,6 +695,7 @@ def main(argv: list[str] | None = None) -> int:
         delay_seconds=args.delay_seconds,
         patch_fn=lambda row, raw: _patch(base_url, service_key, row, raw),
         resume_from=args.resume_from,
+        add_missing=args.add_missing_observations,
     )
     data = report_payload(report)
     payload = json.dumps(data, ensure_ascii=False, indent=2)

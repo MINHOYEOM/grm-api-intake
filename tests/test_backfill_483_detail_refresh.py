@@ -397,3 +397,44 @@ class IncompleteRunResume1126Test(unittest.TestCase):
         self.assertIn("detail_refresh_remaining_ids.txt", wf.split("Upload report", 1)[1])
         summary = wf.split("Write step summary", 1)[1]
         self.assertLess(summary.index("incomplete_banner(r)"), summary.index("### 483 상세 다시 읽기"))
+
+
+class MissingObservations1126Test(unittest.TestCase):
+    """[11-26 DB 완전성] 다시 읽어 새로 잡히는 관찰(저장 배열에 번호 없음)은 기본으로 세기만, 옵션일 때만 덧붙인다."""
+
+    def setUp(self):
+        import collect_fda_483 as c
+        with open(os.path.join(FIX, "fda483_garbled_header_gap_heading_1126.txt"), encoding="utf-8") as fh:
+            self.text = fh.read()
+        new = c._extract_483_observations_from_text(self.text, {})
+        self.old = [dict(o) for o in new if o["number"] != "2"]      # 운영처럼 관찰 2 가 없는 저장 배열
+        self.raw = {"fda483_body_full": self.text, b._OBS_KEY: self.old}
+
+    def test_counted_but_not_added_by_default(self):
+        patched: dict = {}
+        rep = b.run([_row(self.raw)], dry_run=False, patch_fn=lambda rid, r: patched.update(r))
+        self.assertEqual((rep.new_observations, rep.new_observation_docs, rep.new_observations_added), (1, 1, 0))
+        self.assertEqual(rep.new_observation_samples[0]["number"], "2")
+        self.assertEqual(rep.new_observation_doc_ids, ["fda483-195434"])
+        self.assertFalse(patched)          # 다른 변화가 없으면 쓰지 않는다
+
+    def test_added_in_number_order_when_asked(self):
+        patched: dict = {}
+        rep = b.run([_row(self.raw)], dry_run=False, add_missing=True, patch_fn=lambda rid, r: patched.update(r))
+        self.assertEqual(rep.new_observations_added, 1)
+        self.assertEqual([o["number"] for o in patched[b._OBS_KEY]], ["1", "2", "3"])
+        self.assertTrue(patched[b._OBS_KEY][1]["deficiency"].startswith("The accuracy"))
+
+    def test_same_heading_under_other_number_is_not_duplicated(self):
+        new = [{"number": "4", "deficiency": "Written procedures are not followed.", "detail": "x"}]
+        old = [{"number": "3", "deficiency": "Written  procedures are NOT followed.", "detail": "x"}]
+        self.assertEqual(b.missing_observations(old, new), [])
+        self.assertEqual(b.missing_observations([], new), new)
+
+    def test_workflow_exposes_add_missing_default_off(self):
+        with open(WF, encoding="utf-8") as fh:
+            wf = fh.read()
+        block = wf.split("add_missing_observations:", 1)[1].split("resume_from:", 1)[0]
+        self.assertIn("default: false", block)
+        self.assertIn("ARGS+=(--add-missing-observations)", wf)
+        self.assertIn("new_observations", wf.split("Write step summary", 1)[1])

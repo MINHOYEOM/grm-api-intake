@@ -587,7 +587,9 @@ _FDA483_FOOTER_RE = re.compile(
     r"|PURSUANT\s+TO\s+SECTION\s+704\s*\(b\)"
     #   ③ OCR 이 Y 를 V 로 읽은 EMPLOYEE(S) — "EMPLOVEE(S" (위 EMP..OY 마커가 OY 를 못 찾는다).
     #      대문자 고정 — 산문의 "employees" 는 오탐하지 않는다.
-    r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
+    #      [11-25] EMP 뒤 L 을 소문자 l 로 읽은 "EMPlOVEE{S)"(189485 6쪽)도 잡는다 — 못 잡으면 뒤의
+    #      `INSPECTIONAL OBSERVATIONS` 가 쪽 경계 시작이 돼 서명자 블록이 상세 본문에 남았다.
+    r"|(?-i:EMP[A-Za-z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
     #   ④ [2026-10-27] 연속 기재 양식(Continuation Sheet) 마지막 줄 "*DATES OF INSPECTION
     #      1/21/2026(Wed), … <실사관 이름>" — 발행분 42관찰의 detail 끝에 실사일 나열과 서명자
     #      이름이 그대로 실렸다. 대문자 고정이고 괄호 없는 "DATES" 만 잡는다 — 페이지 머리말 칸

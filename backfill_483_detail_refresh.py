@@ -17,6 +17,9 @@
   `backfill_wl_truncation_restore.py --source fda483` 계획 → 번역 outbox restore 경로로 영문·국문을 함께 바꾼다.
 ★원문: 저장된 `fda483_body_full` 이 있으면 그것을 쓴다(PDF 요청·OCR 없음). 없으면 PDF 를 다시 받는다.
 ★기본은 dry-run — 바뀔 관찰 수와 품질 지표(문장 온전·서명란 흔적·깨진 가림 표시)의 전후를 보고만 한다.
+★[11-25] 본문 축소 가드(`guard_shrink`) — 다시 읽은 판의 산문 낱말이 옛 판보다 5% 넘게 적으면 바꾸지 않는다.
+  쪽 끝 절단(옛 수집기가 서명란에서 끊어 다음 쪽 첫 항목이 빠진 관찰, 실측 189485 obs4)의 복원 규모를
+  `pagebreak_*` 로 센다. raw 를 고친 뒤 findings.detail_text 는 `findings_detail_export.py --mode stale` 경로로 맞춘다.
 """
 from __future__ import annotations
 
@@ -77,6 +80,17 @@ class DetailRefreshReport:
     incomplete_samples: list[dict[str, Any]] = field(default_factory=list)
     # [11-11] 다시 읽은 뒤에도 잘림 띠에 남은 관찰의 원인 진단 — 원문에서 옛 상세 끝 바로 뒤에 무엇이 오나
     diagnostics: list[dict[str, Any]] = field(default_factory=list)
+    # [11-25 쪽 끝 절단] 옛 수집기가 쪽 경계에서 끊은 관찰 — 다시 읽기로 본문(산문 낱말)이 늘어난 관찰과,
+    # 그중 옛 상세에 없던 하위 항목 머리(`C.`·`iii.`)가 새로 생긴 관찰(= 다음 쪽 첫 항목이 빠져 있던 꼴).
+    pagebreak_extended: int = 0
+    pagebreak_items_added: int = 0
+    pagebreak_docs: int = 0
+    prose_words_before: int = 0
+    prose_words_after: int = 0
+    # 본문 축소 가드 — 새 상세의 산문 낱말이 옛 상세보다 줄면 바꾸지 않고 옛 상세(정리본)를 둔다.
+    shrink_blocked: int = 0
+    shrink_samples: list[dict[str, Any]] = field(default_factory=list)
+    pagebreak_samples: list[dict[str, Any]] = field(default_factory=list)
 
 
 def _collector():
@@ -111,6 +125,62 @@ def tidy_old_detail(detail: str) -> str:
     c = _collector()
     d = c.trim_detail_tail(detail)
     return c.normalize_483_redactions(d) if d else (detail or "")
+
+
+# ── [11-25 쪽 끝 절단 소급] 본문 축소 가드·복원 계측 ─────────────────────────────────────────────
+# 번역팀 실측(189485 obs4): 옛 수집기가 6쪽 서명란에서 관찰을 끊어 다음 쪽 첫 항목(C.)이 상세에 없었다.
+# 지금 수집기(쪽 넘김 잇기 #1461·#1529)는 잇지만, 저장된 옛 행은 다시 읽어야 고쳐진다.
+# 다시 읽은 판이 옛 판보다 **본문이 적으면** 바꾸지 않는다 — 저장 단계에서는 줄이지 않는다는 원칙.
+# 본문 양은 산문 낱말(소문자 3자 이상, 수집기 `_LOWER_WORD_RE` 와 같은 판정)로 센다: 쪽 블록 잡문
+# (서명자·머리말·양식 낱말)은 대문자·약어라 거의 세지 않으므로, 잡문만 걷힌 정상 교체는 막지 않는다.
+# 판독(OCR) 판이 달라 생기는 작은 흔들림은 허용한다(5%).
+SHRINK_TOLERANCE = 0.05
+SHRINK_MIN_WORDS = 20
+EXTEND_MIN_WORDS = 5
+_ITEM_HEAD_RE = re.compile(r"(?<![A-Za-z0-9])(?:([A-L])\.\s+(?=[A-Z(])|(i{1,3}|iv|vi{0,3}|ix)\.\s)")
+_SAMPLE_MAX = 20
+
+
+def prose_words(text: str) -> int:
+    """본문 양 — 산문 낱말 수(순수 함수). 수집기의 산문 판정과 같은 정규식을 쓴다."""
+    return len(_collector()._LOWER_WORD_RE.findall(text or ""))
+
+
+def shrinks_body(old_text: str, new_text: str) -> bool:
+    """새 판이 옛 판보다 본문이 줄었나(순수 함수). 옛 판이 짧으면(산문 20낱말 미만) 판정하지 않는다."""
+    before = prose_words(old_text)
+    if before < SHRINK_MIN_WORDS:
+        return False
+    return prose_words(new_text) < before * (1 - SHRINK_TOLERANCE)
+
+
+def item_heads(text: str) -> set[str]:
+    """하위 항목 머리(`A.`·`ii.`) 집합(순수 함수)."""
+    return {(m.group(1) or m.group(2)) for m in _ITEM_HEAD_RE.finditer(text or "")}
+
+
+def _obs_text(o: dict[str, Any]) -> str:
+    d = str(o.get("deficiency") or "")
+    if d.endswith(TRUNC_DEFICIENCY_SUFFIX):
+        d = d[:-len(TRUNC_DEFICIENCY_SUFFIX)]
+    return f"{d} {o.get('detail') or ''}"
+
+
+def guard_shrink(old: list[dict[str, Any]], refreshed: list[dict[str, Any]]
+                 ) -> tuple[list[dict[str, Any]], list[int]]:
+    """본문 축소 가드(순수 함수) — 표제+상세의 본문이 옛 판보다 줄어드는 교체는 되돌린다.
+    되돌린 관찰은 옛 표제와 옛 상세(서명란 꼬리·가림 표시만 정리)를 둔다. (새 목록, 되돌린 위치)."""
+    out: list[dict[str, Any]] = []
+    blocked: list[int] = []
+    for i, (o_old, o_new) in enumerate(zip(old, refreshed)):
+        changed = (str(o_old.get("detail") or "") != str(o_new.get("detail") or "")
+                   or str(o_old.get("deficiency") or "") != str(o_new.get("deficiency") or ""))
+        if changed and shrinks_body(_obs_text(o_old), _obs_text(o_new)):
+            blocked.append(i)
+            out.append({**o_old, "detail": tidy_old_detail(str(o_old.get("detail") or ""))})
+        else:
+            out.append(o_new)
+    return out, blocked
 
 
 TRUNC_DEFICIENCY_SUFFIX = "..."
@@ -411,6 +481,35 @@ def run(
             report.errors.append(f"{doc}: extract_raised:{type(exc).__name__}")
             continue
         refreshed, matched, unmatched = refreshed_observations(old, new, text)
+        refreshed, blocked = guard_shrink(old, refreshed)
+        report.shrink_blocked += len(blocked)
+        for i in blocked:
+            if len(report.shrink_samples) < _SAMPLE_MAX:
+                cand = refreshed_observations([old[i]], new, text)[0][0]
+                report.shrink_samples.append({
+                    "doc": doc, "number": old[i].get("number"),
+                    "prose_before": prose_words(_obs_text(old[i])),
+                    "prose_new": prose_words(_obs_text(cand)),
+                    "new_tail": str(cand.get("detail") or "")[-160:]})
+        doc_pagebreak = False
+        for o_old, o_new in zip(old, refreshed):
+            pb, pa = prose_words(_obs_text(o_old)), prose_words(_obs_text(o_new))
+            report.prose_words_before += pb
+            report.prose_words_after += pa
+            if pa - pb < EXTEND_MIN_WORDS or pa <= pb * (1 + SHRINK_TOLERANCE):
+                continue                      # 판독 흔들림 수준의 차이는 복원으로 세지 않는다
+            report.pagebreak_extended += 1
+            doc_pagebreak = True
+            added = sorted(item_heads(str(o_new.get("detail") or ""))
+                           - item_heads(str(o_old.get("detail") or "")))
+            if added:
+                report.pagebreak_items_added += 1
+            if len(report.pagebreak_samples) < _SAMPLE_MAX and (added or not report.pagebreak_samples):
+                report.pagebreak_samples.append({
+                    "doc": doc, "number": o_old.get("number"), "prose_before": pb, "prose_after": pa,
+                    "items_added": added, "before_tail": str(o_old.get("detail") or "")[-120:],
+                    "after_tail": str(o_new.get("detail") or "")[-160:]})
+        report.pagebreak_docs += doc_pagebreak
         if doc_ids:
             report.diagnostics.extend(diagnose_residual(doc, refreshed, new, text))
         report.observations_matched += matched

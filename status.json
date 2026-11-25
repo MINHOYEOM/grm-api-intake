@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T03:07:42Z",
+ "generated_at": "2026-11-25T06:15:14Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45558174787,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T06:06:31Z",
+    "updatedAt": "2026-11-25T06:14:56Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh recent regulatory news (#1948)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45558174787"
+   },
+   {
+    "databaseId": 45555351007,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-25T05:41:45Z",
+    "updatedAt": "2026-11-25T05:49:12Z",
+    "headBranch": "automation/news-auto-45555274266",
+    "displayTitle": "chore: refresh recent regulatory news",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45555351007"
+   },
+   {
     "databaseId": 45536729562,
     "status": "completed",
     "conclusion": "success",
@@ -260,28 +282,6 @@
     "headBranch": "codex/inspector-blank-dry",
     "displayTitle": "fix: CLI main() 에서 stdout UTF-8 재설정(main 의 test_cli_stdout_encoding 가드)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526267490"
-   },
-   {
-    "databaseId": 45526243844,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-25T01:30:30Z",
-    "updatedAt": "2026-11-25T01:38:35Z",
-    "headBranch": "codex/wl-pair-restore-dry",
-    "displayTitle": "feat(wl): 본문만 바뀐 짝 findings restore 계획 도구 (기본 dry)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526243844"
-   },
-   {
-    "databaseId": 45526239247,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T01:30:28Z",
-    "updatedAt": "2026-11-25T01:38:25Z",
-    "headBranch": "codex/wl-pair-restore-dry",
-    "displayTitle": "fix: CLI main() 에서 stdout UTF-8 재설정(main 의 test_cli_stdout_encoding 가드)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526239247"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45559200187,
+    "status": "completed",
+    "conclusion": "skipped",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T06:15:02Z",
+    "updatedAt": "2026-11-25T06:15:03Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45559200187"
+   },
+   {
     "databaseId": 45537737310,
     "status": "completed",
     "conclusion": "skipped",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45514271326"
-   },
-   {
-    "databaseId": 45458784946,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-24T18:22:14Z",
-    "updatedAt": "2026-11-24T18:22:15Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45458784946"
    }
   ],
   "grm-findings-translate-apply.yml": [

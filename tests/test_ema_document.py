@@ -364,5 +364,15 @@ class MonitorGateTest(unittest.TestCase):
         self.assertEqual(clean["issues"][0]["action"], "close")
 
 
+class BackfillWorkflowContractTest(unittest.TestCase):
+    def test_exit_1_is_captured_not_fatal_under_bash_e(self):
+        """exit 1 = 못 채운 행 있음. bash -e 에서 `cmd; rc=$?` 는 rc 에 닿기 전에 단계를 죽인다."""
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                            ".github", "workflows", "grm-blank-excerpts-backfill.yml")
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        self.assertIn('backfill_blank_excerpts.py "${args[@]}" > /dev/null || rc=$?', text)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -74,8 +74,9 @@ jobs:
             done
           fi
           if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
-          python backfill_blank_excerpts.py "${args[@]}" > /dev/null
-          rc=$?
+          # 러너 기본 셸은 bash -e 라 `rc=$?` 앞에서 exit 1(못 채운 행 있음)이 단계를 죽였다(11-25 dry run 45530338720).
+          rc=0
+          python backfill_blank_excerpts.py "${args[@]}" > /dev/null || rc=$?
           {
             echo "### Blank excerpts backfill"
             echo "- apply: \`${IN_APPLY:-false}\` · sources: \`${IN_SOURCES:-전부}\` · ingested_since: \`${IN_SINCE:-전 기간}\` · exit: \`${rc}\` (1 = 못 채운 행 있음)"

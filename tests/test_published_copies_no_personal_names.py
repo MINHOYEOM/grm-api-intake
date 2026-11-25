@@ -304,12 +304,12 @@ class PersonalStreetAddressTest(unittest.TestCase):
     def test_judge_catches_farm_and_skips_agency_office(self):
         import grm_findings as g
         text = ("DISTRICT ADDRESS AND PHONE NUMBER\n250 Marquette Ave,\nSte.\n600\nMinneapolis,\nMN 55401\n"
-                "NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED\nKenneth F Tesch, Owner\nFIRM NAME\n"
-                "STREET ADDRESS\nKenneth F Tesch\n234797\nPickard Ave\nCITY, STATE, ZIP CODE, COUNTRY")
-        self.assertEqual([a for _, _, a in g.street_addresses(text)], ["234797\nPickard Ave"])
-        out = g.redact_person_firm_source(text, "Kenneth F Tesch")
-        self.assertNotIn("Pickard", out)
-        self.assertNotIn("Tesch", out)
+                "NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED\nJorn K Testerson, Owner\nFIRM NAME\n"
+                "STREET ADDRESS\nJorn K Testerson\n990001\nExample Ave\nCITY, STATE, ZIP CODE, COUNTRY")
+        self.assertEqual([a for _, _, a in g.street_addresses(text)], ["990001\nExample Ave"])
+        out = g.redact_person_firm_source(text, "Jorn K Testerson")
+        self.assertNotIn("Example Ave", out)
+        self.assertNotIn("Testerson", out)
         self.assertIn("250 Marquette Ave", out)          # 규제기관 사무소 주소는 남는다
         self.assertIn(g.STREET_REDACTED, out)
 
@@ -321,13 +321,13 @@ class PersonalStreetAddressTest(unittest.TestCase):
     def test_bridge_redacts_person_firm_body(self):
         import delta_bridge
         payload = {"rows": [
-            {"web_card_id": "fda483-1", "firm": "Kenneth F Tesch",
-             "deep_analysis_input": {"body_full": "FIRM NAME\nKenneth F Tesch\n234797\nPickard Ave\nOBSERVATION 1"}},
+            {"web_card_id": "fda483-1", "firm": "Jorn K Testerson",
+             "deep_analysis_input": {"body_full": "FIRM NAME\nJorn K Testerson\n990001\nExample Ave\nOBSERVATION 1"}},
             {"web_card_id": "fda483-2", "firm": "Acme Pharma Inc.",
              "deep_analysis_input": {"body_full": "FIRM NAME\nAcme Pharma Inc.\n12 Main Street\nOBSERVATION 1"}}]}
         bodies = delta_bridge.extract_handoff_body_full(payload)
-        self.assertNotIn("Pickard", bodies["fda483-1"])
-        self.assertNotIn("Tesch", bodies["fda483-1"])
+        self.assertNotIn("Example Ave", bodies["fda483-1"])
+        self.assertNotIn("Testerson", bodies["fda483-1"])
         self.assertIn("12 Main Street", bodies["fda483-2"])
 
 

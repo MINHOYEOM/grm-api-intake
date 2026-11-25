@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T16:13:58Z",
+ "generated_at": "2026-11-25T16:50:39Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45651462075,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 45656724179,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-25T16:41:59Z",
+    "updatedAt": "2026-11-25T16:50:13Z",
+    "headBranch": "claude/subscribe-prompts-1126",
+    "displayTitle": "feat(구독): 한 화면에 구독 칸 하나 + 팝업 하나 — 기관 목록 한 곳·한국어 화면 영문 제목 제거·팝업 밝게",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45656724179"
+   },
+   {
+    "databaseId": 45656699876,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-25T16:41:49Z",
+    "updatedAt": "2026-11-25T16:49:49Z",
+    "headBranch": "codex/ko-country-names-40",
+    "displayTitle": "feat(국가명): 한국어 국가명 40개국 + 매칭 경계 강화 (11차 2)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45656699876"
+   },
+   {
+    "databaseId": 45656679708,
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T16:09:43Z",
-    "updatedAt": "2026-11-25T16:09:47Z",
+    "createdAt": "2026-11-25T16:41:43Z",
+    "updatedAt": "2026-11-25T16:49:46Z",
+    "headBranch": "codex/ko-country-names-40",
+    "displayTitle": "feat(국가명): 한국어 국가명 표 40개국 확장 + 용어 매칭 경계 강화(접두어 오매칭 차단)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45656679708"
+   },
+   {
+    "databaseId": 45655323530,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T16:34:23Z",
+    "updatedAt": "2026-11-25T16:42:12Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1835 from MINHOYEOM/automation/glossary-cases-aut…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45655323530"
+   },
+   {
+    "databaseId": 45653559503,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-25T16:24:42Z",
+    "updatedAt": "2026-11-25T16:33:03Z",
     "headBranch": "claude/llms-clause-rows-1126",
     "displayTitle": "feat(seo): llms.txt 에 조항 원문·실사 대비 노트 — 빙·AI 검색이 닿는 면을 알린다",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45651462075"
-   },
-   {
-    "databaseId": 45651452406,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-25T16:09:38Z",
-    "updatedAt": "2026-11-25T16:09:42Z",
-    "headBranch": "claude/home-keypoint-spacing-1126",
-    "displayTitle": "fix(홈): '이번 주 핵심' 가운뎃점 묶음을 낱말 단위로 — 글자 사이 태그 경계 제거",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45651452406"
-   },
-   {
-    "databaseId": 45650914992,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T16:05:11Z",
-    "updatedAt": "2026-11-25T16:13:27Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1841 from MINHOYEOM/claude/google-quality-stage2-…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45650914992"
-   },
-   {
-    "databaseId": 45649526078,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T15:53:53Z",
-    "updatedAt": "2026-11-25T16:04:12Z",
-    "headBranch": "codex/firm-pages-weekly-fix",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/firm-pages-week…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45649526078"
-   },
-   {
-    "databaseId": 45649514860,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T15:53:47Z",
-    "updatedAt": "2026-11-25T16:01:46Z",
-    "headBranch": "codex/483-dump-pdf",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/483-dump-pdf",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45649514860"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45653559503"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45656781426,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T16:42:16Z",
+    "updatedAt": "2026-11-25T16:50:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45656781426"
+   },
+   {
     "databaseId": 45651913678,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45620391512"
-   },
-   {
-    "databaseId": 45612451891,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T12:18:14Z",
-    "updatedAt": "2026-11-25T12:28:07Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612451891"
    }
   ],
   "grm-findings-translate-apply.yml": [

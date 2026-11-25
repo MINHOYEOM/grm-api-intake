@@ -90,6 +90,53 @@ class DuplicateAndClausePredicateTest(unittest.TestCase):
             en_doc, {"chars": 500, "text_ko": "가" * 300}, "ko"), "")
         self.assertEqual(ct.google_noindex_reason(
             en_doc, {"chars": 500, "text_ko": "가" * 10}, "ko"), "short")
+        # [2단계] 짧은 원문이라도 인용 문서가 3건 이상이면 인용 블록이 서서 E 에서 풀린다. D 는 그대로.
+        self.assertEqual(ct.google_noindex_reason(en_doc, {"chars": 134}, "en", 2), "short")
+        self.assertEqual(ct.google_noindex_reason(en_doc, {"chars": 134}, "en", 3), "")
+        self.assertEqual(ct.google_noindex_reason(en_doc, long_c, "ko", 50), "untranslated")
+
+    def test_citing_findings(self):
+        import clause_text_page as ct
+        src = {"schema": ct.SCHEMA, "source": {"key": "cfr21", "lang": "en"},
+               "docs": [{"key": "211", "code": "21 CFR Part 211", "url": "u"},
+                        {"key": "1271", "code": "21 CFR Part 1271", "url": "u"}],
+               "clauses": [
+                   {"id": "a", "doc": "211", "number": "211.192", "slug": "211-192",
+                    "code": "21 CFR 211.192", "text": "x", "chars": 1},
+                   {"id": "b", "doc": "1271", "number": "1271.75", "slug": "1271-75",
+                    "code": "21 CFR 1271.75", "text": "y", "chars": 1},
+                   {"id": "c", "doc": "211", "number": "211.22", "slug": "211-22",
+                    "code": "21 CFR 211.22", "text": "", "chars": 0}]}
+        view = ct.build([src])
+        docs = [
+            {"document_id": "d1", "slug": "s1", "published_date": "2025-01-01", "findings": [
+                {"finding_id": "f1", "text_ko": "가 (21 CFR 211.192(a)).",
+                 "cfr_refs": ["21 CFR 211.192(a)", "21 CFR 211.192"]},
+                {"finding_id": "f2", "text_ko": "나 (21 CFR 1271.75). 같은 문서의 211.22 도 보라.",
+                 "cfr_refs": ["21 CFR 1271.75", "21 CFR 211.22"]}]},
+            {"document_id": "d2", "slug": "s2", "published_date": "2026-01-01", "findings": [
+                {"finding_id": "f3", "text_ko": "다", "text_orig": "C (21 CFR 211.192 and 211.22(a)).",
+                 "cfr_refs": ["21 CFR 211.192"]},
+                {"finding_id": "f4", "text_ko": "", "text_orig": "(21 CFR 211.192)",
+                 "cfr_refs": ["21 CFR 211.192"]},
+                # 권고문에 딸려 온 조항 — 본문 첫 인용에 없으면 세지 않는다(211.34 오염 사례)
+                {"finding_id": "f5", "text_ko": "라 (21 CFR 211.100). 컨설턴트(211.192)를 권한다.",
+                 "cfr_refs": ["21 CFR 211.100", "21 CFR 211.192"]}]},
+        ]
+        self.assertEqual(ct.headline_sections("x (21 CFR 211.22(a) and 211.192). y 211.34"),
+                         {"211.22", "211.192"})
+        self.assertEqual(ct.headline_sections("인용 없음"), set())
+        self.assertEqual(ct.headline_sections("a" * 700 + " consultant (21 CFR 211.34)."), set())
+        out = ct.citing_findings(docs, view, lambda f: f.get("text_ko") or "")
+        h192 = "clauses/cfr21/211/211-192/"
+        # 하위항은 섹션으로 접혀 한 지적이 두 번 세지지 않는다 · 빈 본문은 세지 않는다
+        self.assertEqual((out[h192]["documents"], out[h192]["findings"]), (2, 2))
+        self.assertEqual([s["finding_id"] for s in out[h192]["samples"]], ["f3", "f1"])
+        self.assertEqual(out["clauses/cfr21/1271/1271-75/"]["findings"], 1)  # 네 자리 Part
+        self.assertEqual(len(out), 2)  # 본문 없는 조항(목차에만 서는 번호)에는 붙이지 않는다
+        only = ct.citing_findings(docs, view, lambda f: f.get("text_ko") or "",
+                                  doc_ok=lambda d: d["slug"] == "s2")
+        self.assertEqual(only[h192]["documents"], 1)
 
 
 class ThinPageMetaTest(unittest.TestCase):
@@ -174,16 +221,75 @@ class ThinPageMetaTest(unittest.TestCase):
         """국문 트리의 외국어 원문 조항(D)과 300자 미만 조항(E)만 구글에서 뺀다."""
         import clause_text_page as ct
         seen = {"untranslated": 0, "short": 0, "": 0}
+        views = {lg: ct.build(ct.for_lang(ct.load_sources(), lg)) for lg in ("ko", "en")}
+        cites = render.clause_text_cites(self.data, views)
+        rescued = with_block = 0
         for lang, root in (("ko", self.out), ("en", self.out / "en")):
-            view = ct.build(ct.for_lang(ct.load_sources(), lang))
-            for d, c in ct.pages(view):
+            for d, c in ct.pages(views[lang]):
                 p = root / c["href"] / "index.html"
                 html = p.read_text(encoding="utf-8")
-                why = ct.google_noindex_reason(d, c, lang)
+                cite = cites[lang].get(c["href"])
+                n_docs = (cite or {}).get("documents", 0)
+                why = ct.google_noindex_reason(d, c, lang, n_docs)
                 self.assertEqual(GOOGLEBOT in html, bool(why), f"{lang} {c['href']}")
                 self.assertIsNone(ROBOTS_NOINDEX.search(html), c["href"])
                 seen[why] += 1
+                # [2단계] 인용 블록은 인용이 있는 조항에만, 사례마다 문서 링크가 실제 페이지로 간다
+                self.assertEqual('class="ct-cites"' in html, bool(cite), c["href"])
+                if cite:
+                    with_block += 1
+                    for s in cite["samples"]:
+                        self.assertIn(f'findings/doc/{s["doc_slug"]}/', html)
+                        self.assertTrue((root / "findings" / "doc" / s["doc_slug"] / "index.html").is_file(),
+                                        f"{lang} {s['doc_slug']}")
+                    if not why and ct.google_noindex_reason(d, c, lang) == "short":
+                        rescued += 1
         self.assertTrue(all(seen.values()), seen)
+        self.assertGreater(with_block, 0)
+        self.assertGreater(rescued, 0)  # 짧은 원문이지만 인용으로 돌아온 조항이 실제로 있다
+
+    def test_stage2_translation_and_gist_blocks(self):
+        """[구글 품질 2단계 2026-11-20] 국문 참고 번역·GRM 요지가 실빌드에 실리는가(국문 트리만).
+        번역된 조항은 국문 블록이 있고 '준비 중' 문구가 없다. 300자 이상이면 sitemap.xml 로 돌아온다.
+        요지는 doc_gist.view 가 넘긴 문서에만, 영문 트리에는 없다."""
+        import clause_text_page as ct
+        import doc_gist
+        gset = set(re.findall(r"<loc>https?://[^/]+/([^<]*)</loc>",
+                              (self.out / "sitemap.xml").read_text(encoding="utf-8")))
+        n_ko = n_back = 0
+        for d, c in ct.pages(ct.build(ct.load_sources())):
+            if d["source"]["lang"] == "ko":
+                continue
+            ko = (self.out / c["href"] / "index.html").read_text(encoding="utf-8")
+            en = (self.out / "en" / c["href"] / "index.html").read_text(encoding="utf-8")
+            self.assertNotIn("국문 참고 번역", en, c["href"])
+            if c["ko_paras"]:
+                n_ko += 1
+                self.assertIn("국문 참고 번역", ko, c["href"])
+                import html as _h
+                self.assertIn(c["ko_paras"][0], _h.unescape(ko), c["href"])
+                self.assertNotIn("국문 번역은 준비 중", ko, c["href"])
+                if len(c["text_ko"]) >= ct.GOOGLE_MIN_CHARS:
+                    n_back += 1
+                    self.assertIn(c["href"], gset, c["href"])
+            else:
+                self.assertNotIn("국문 참고 번역", ko, c["href"])
+        self.assertGreater(n_ko, 0)
+        self.assertGreater(n_back, 0)
+        gists = doc_gist.load_outbox()
+        n_gist = 0
+        for d in self.data["documents"]:
+            p = self.out / "findings" / "doc" / d["slug"] / "index.html"
+            if not p.is_file():
+                continue
+            v = doc_gist.view(d, gists)
+            html = p.read_text(encoding="utf-8")
+            self.assertEqual('class="fd-gist"' in html, v is not None, d["slug"])
+            n_gist += v is not None
+            pe = self.out / "en" / "findings" / "doc" / d["slug"] / "index.html"
+            if pe.is_file():
+                self.assertNotIn('class="fd-gist"', pe.read_text(encoding="utf-8"), d["slug"])
+        self.assertGreater(n_gist, 0)
 
     def test_other_pages_untouched(self):
         for rel in ("index.html", "findings/index.html", "sitemap.xml"):

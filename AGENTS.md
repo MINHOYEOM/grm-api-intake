@@ -45,6 +45,7 @@
 ## 커밋
 
 - Codex가 작성한 커밋의 마지막 줄에는 `Co-Authored-By: Codex <noreply@openai.com>`을 넣는다.
+- push 전 `python ci_slot_wait.py` 실행.
 
 ## 보고
 - 대표는 비개발자입니다. 보고는 한국어로 짧게, 첫 줄에 결론과 PR 링크. 문제는 무엇·영향·제안·필요한 결정을 한 줄씩.

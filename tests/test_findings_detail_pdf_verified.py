@@ -58,7 +58,13 @@ class PdfVerifiedTest(unittest.TestCase):
             self.assertTrue(it["finding_id"].startswith("finding-"), it)
             self.assertRegex(it["source"], qa._PDF_SOURCE_RE)
             self.assertTrue(it["reason"].strip())
-            self.assertIn(it["status"], ("todo", "done"))
+            # todo = 아직 초안 없음 · review = 초안 있음, 사람이 PDF 와 대조 대기 · done = 반영 끝
+            self.assertIn(it["status"], ("todo", "review", "done"))
+            if it["status"] == "review":
+                # 초안은 사람 확인 전이라 pdf_verified 를 달지 않는다. 가림은 [redacted] 로 — (b)(4) 꼴은 strict 실격.
+                self.assertNotIn("pdf_verified", it)
+                self.assertTrue(it["draft_ko"].strip() and it["draft_basis"].strip())
+                self.assertEqual(qa.readability(it["draft_ko"]), [])
 
 
 if __name__ == "__main__":

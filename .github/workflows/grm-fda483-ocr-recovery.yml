@@ -94,6 +94,10 @@ on:
         description: 'WL 전용·수동. 비우지 않으면 본문 회수는 건너뛰고 본문 교체 후속(raw_body_followup.py)만 돈다 — raw_signal_versions.changed_by LIKE 패턴(예: backfill_wl_body_recovery:4532%)으로 고른 행의 분류(row_json)·findings 를 새 본문 기준과 대조한다. apply=false(기본)면 세기만, true 면 새 본문에만 있는 findings 를 넣는다(기존 행은 쓰지 않음).'
         type: string
         default: ''
+      force_ocr:
+        description: '수동·1회성. true = PDF 에 글자층이 있어도 무시하고 쪽 전체를 다시 판독한다(깨진 글자층 스캔본용, 11-25 실측 189485·191183). 운영 행 교체 가드(named 관찰 증가·표제 유지·본문 손실 차단, body_shrunk)는 그대로다 — 관찰 수가 같으면 교체하지 않으니 diag=dump-text 와 함께 켜서 판독 전문을 사람 확인(pdf_verified) 자료로 쓴다. 예약 실행은 쓰지 않는다.'
+        type: boolean
+        default: false
       diag:
         description: '진단 전용(쓰기 없음 · 켜면 회수는 하지 않는다). dump-text = doc_ids 문서의 판독 전문(OCR 포함)을 아티팩트 ocr_text_dump/ 로 올린다(파서 수리용 원문). scan-mixed = FDA 483 PDF 를 받아 글자 없는 이미지 쪽이 있는 문서(섞인 PDF) 규모를 센다(OCR 없음 · doc_ids·limit 로 좁힐 수 있음). 결과는 아티팩트 fda483-ocr-recovery-report.'
         type: choice
@@ -167,6 +171,7 @@ jobs:
           IN_DIAG: ${{ github.event_name != 'schedule' && inputs.diag || 'none' }}
           FDA483_OCR_PAGE_BUDGET: ${{ github.event_name == 'schedule' && '600' || inputs.ocr_page_budget }}
           FDA483_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}
+          FDA483_FORCE_OCR: ${{ github.event_name != 'schedule' && inputs.force_ocr && '1' || '' }}
         run: |
           set -euo pipefail
           ARGS=(--report-path ocr_recovery_report.json --mode "${IN_MODE}")
@@ -247,12 +252,13 @@ jobs:
           IN_MODE: ${{ github.event_name == 'schedule' && 'recoverable' || inputs.mode }}
           IN_OCR_BUDGET: ${{ github.event_name == 'schedule' && '600' || inputs.ocr_page_budget }}
           IN_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}
+          IN_FORCE_OCR: ${{ inputs.force_ocr && 'true' || 'false' }}
         run: |
           IN_DELAY="${IN_DELAY:-도구 기본값}"
           {
             echo "### GRM FDA 483 OCR Recovery (\`${IN_EVENT}\`)"
             echo ""
-            echo "apply: \`${IN_APPLY}\` / mode: \`${IN_MODE}\` / ocr_budget: \`${IN_OCR_BUDGET}\` / ocr_dpi: \`${IN_OCR_DPI}\` / limit: \`${IN_LIMIT}\` / delay_seconds: \`${IN_DELAY}\` / doc_ids: \`${IN_DOC_IDS}\`"
+            echo "apply: \`${IN_APPLY}\` / mode: \`${IN_MODE}\` / ocr_budget: \`${IN_OCR_BUDGET}\` / ocr_dpi: \`${IN_OCR_DPI}\` / force_ocr: \`${IN_FORCE_OCR}\` / limit: \`${IN_LIMIT}\` / delay_seconds: \`${IN_DELAY}\` / doc_ids: \`${IN_DOC_IDS}\`"
             echo ""
             if [ -f ocr_recovery_report.json ]; then
               echo "#### 복구 리포트 (backfill_483_ocr_recovery.py)"

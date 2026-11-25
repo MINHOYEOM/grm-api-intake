@@ -162,6 +162,50 @@ class RedactRulesTest(unittest.TestCase):
         self.assertEqual(card, before)
 
 
+class DebarmentTest(unittest.TestCase):
+    """FDA 자격박탈 명령 대상 개인 — 공식 처분이라도 민간 개인이라 싣지 않는다(11-21 결정, 06-22 호 실발행분)."""
+
+    def test_detector_forms(self):
+        import grm_findings as gf
+        self.assertEqual(gf.debarred_person_names("Bertil Hovanick Dorsev: Final Debarment Order"), ["Bertil Hovanick Dorsev"])
+        self.assertEqual(gf.debarred_person_names("Quent R. Arbel; Denial of Hearing; Final Debarment Order"), ["Quent R. Arbel"])
+        self.assertEqual(gf.debarred_person_names(
+            "FDA is issuing an order under the FD&C Act debarring Bertil Hovanick Dorsev for a period of 5 years"),
+            ["Bertil Hovanick Dorsev"])
+        for text in ("Acme Pharma Inc.: Final Debarment Order", "Notice: Final Debarment Order",
+                     "Food and Drug Administration; Final Debarment Order"):
+            self.assertEqual(gf.debarred_person_names(text), [], text)
+
+    def test_publish_path_redacts_and_keeps_source_url(self):
+        url = "https://www.federalregister.gov/documents/2026/06/17/2026-12167/bertil-hovanick-dorsev-final-debarment-order"
+        card = {"id": "2026-12167", "headline_target": "Bertil Hovanick Dorsev: Final Debarment Order",
+                "facts": [{"label": "주제", "value": "Bertil Hovanick Dorsev: Final Debarment Order"}],
+                "quotes": [{"original": "FDA is issuing an order debarring Bertil Hovanick Dorsev for a period of 5 years.",
+                            "ko": "FDA는 Bertil Hovanick Dorsev 에 대해 5년간 자격박탈 명령을 내린다."}],
+                "sources": {"official_url": url}}
+        rep = apb.AssembleReport()
+        apb._redact_person_names([card], {}, rep)
+        self.assertEqual(card["headline_target"], "[debarred individual]: Final Debarment Order")
+        self.assertEqual(card["facts"][0]["value"], "[debarred individual]: Final Debarment Order")
+        self.assertIn("debarring [debarred individual] for", card["quotes"][0]["original"])
+        self.assertIn("[자격박탈 대상자]", card["quotes"][0]["ko"])
+        self.assertEqual(card["sources"]["official_url"], url)          # 원문 주소는 그대로
+        self.assertEqual(rep.redacted_name_ids, ["2026-12167"])
+        names = precheck.source_person_names("Bertil Hovanick Dorsev: Final Debarment Order")
+        self.assertEqual(names, {"Bertil", "Hovanick", "Dorsev"})       # 게이트·사전 점검도 같은 함수로 잡는다
+
+    def test_no_published_brief_names_a_debarred_person(self):
+        import grm_findings as gf
+        hits = []
+        for path in sorted((DATA / "briefs").glob("brief_web_*.json")):
+            for card in _load(path).get("cards") or []:
+                for slot, text in apb._detail_text_slots(
+                        {k: v for k, v in card.items() if k not in apb._DEBARRED_SKIP_KEYS}):
+                    if gf.debarred_person_names(text):
+                        hits.append(f"{path.name} | {card.get('id')} | {slot}")
+        self.assertEqual(hits, [])
+
+
 class JudgeNarrowingTest(unittest.TestCase):
     """① 판정 함수 후보 좁히기 — #1937 이 남긴 오탐 3개와 단일 낱말 일치."""
 

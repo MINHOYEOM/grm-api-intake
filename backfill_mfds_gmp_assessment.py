@@ -52,8 +52,10 @@ import mfds_inspection_attendees_store as mas
 import raw_versioning as rv
 
 from collect_mfds_gmp_inspection import (
-    _assess_deficiency,
     _extract_deficiency_excerpt,
+    assess_deficiency_with_rows,
+    derive_table_status,
+    strip_excerpt_noise,
 )
 
 SOURCE = "MFDS"
@@ -71,6 +73,8 @@ class Report:
     upgraded: int = 0                      # unknown → none/present (의도한 회수)
     downgrades_blocked: int = 0            # 후퇴 판정 — 적용하지 않고 보고만
     excerpt_filled: int = 0                # 판정은 그대로인데 excerpt 만 새로 생김
+    status_filled: int = 0                 # gmp_deficiency_table_status 새로 채움(상태 없음 행)
+    status_changed: int = 0                # 기존 empty → unreadable/gate-degraded 정정
     applied: int = 0
     failed: int = 0
     transitions: dict[str, int] = field(default_factory=dict)
@@ -83,6 +87,7 @@ class Report:
             "unchanged": self.unchanged, "upgraded": self.upgraded,
             "downgrades_blocked": self.downgrades_blocked,
             "excerpt_filled": self.excerpt_filled,
+            "status_filled": self.status_filled, "status_changed": self.status_changed,
             "applied": self.applied, "failed": self.failed,
             "transitions": dict(sorted(self.transitions.items())),
             "samples": self.samples[:10], "errors": self.errors[:20],
@@ -149,14 +154,30 @@ def _payload(raw: Any) -> dict[str, Any]:
     return {}
 
 
+# 상태 칸을 손대도 되는 전이. 빈 칸 채우기 + `empty`(0행·판정 없음 가정) 정정만 허용한다.
+# extracted·skipped-type·gate-degraded·parse-fail 은 수집 시점 관측값이라 덮지 않는다.
+_STATUS_OVERWRITABLE = ("", "empty")
+
+
+def _row_count(payload: dict[str, Any]) -> int:
+    rows = payload.get("gmp_deficiencies")
+    return len(rows) if isinstance(rows, list) else 0
+
+
 def plan_row(row: dict[str, Any]) -> dict[str, Any] | None:
-    """이 행에 적용할 변경(없으면 None). 순수 함수 — dry-run/apply 공용."""
+    """이 행에 적용할 변경(없으면 None). 순수 함수 — dry-run/apply 공용.
+
+    판정은 수집기와 **같은 함수**(`assess_deficiency_with_rows`)로 다시 낸다 — 표 행이
+    저장돼 있으면 본문 판정이 unknown 이어도 present(113건 승격 경로). 상태 칸은
+    `derive_table_status`(수집 시점 규칙의 되산출)로 비어 있거나 `empty` 인 행만 채운다.
+    """
     payload = _payload(row.get("raw_json"))
     text = str(payload.get("attachment_text") or "")
     if not text.strip():
         return {"kind": "no_text"}
     old = str(payload.get("attachment_deficiency_assessment") or "unknown")
-    new = _assess_deficiency(text)
+    rows_n = _row_count(payload)
+    new = assess_deficiency_with_rows(text, rows_n)
     old_excerpt = str(payload.get("attachment_deficiency_excerpt") or "")
     new_excerpt = _extract_deficiency_excerpt(text)
 
@@ -165,8 +186,22 @@ def plan_row(row: dict[str, Any]) -> dict[str, Any] | None:
     changed_assess = new != old
     # excerpt 는 **채우기만** 한다. 기존 값을 다른 값으로 바꾸지 않는다(발행된 카드의
     # 인용문이 소급으로 흔들리면 안 된다 — 앵커를 맨 뒤에 둔 이유와 같은 규율).
-    fill_excerpt = bool(new_excerpt) and not old_excerpt
-    if not (changed_assess or fill_excerpt):
+    # 예외 하나: 옛 값이 "새 값 + 꼬리 서식 잡음(글자 사이 공백 부서명)"이면 잡음만 걷어낸 새 값으로
+    # 바꾼다(내용은 같고 꼬리만 다르다 — 인용문이 흔들리지 않는다). 그 밖의 다른 값은 그대로 둔다.
+    clean_excerpt = bool(new_excerpt) and bool(old_excerpt) and old_excerpt != new_excerpt \
+        and strip_excerpt_noise(old_excerpt) == new_excerpt
+    fill_excerpt = (bool(new_excerpt) and not old_excerpt) or clean_excerpt
+
+    old_status = str(payload.get("gmp_deficiency_table_status") or "")
+    new_status = old_status
+    if old_status in _STATUS_OVERWRITABLE:
+        derived = derive_table_status(text, rows_n, new)
+        # empty 를 empty 로 되쓰거나 비어 있는 곳에 ""(판정 불가)를 쓰지 않는다.
+        if derived and derived != old_status:
+            new_status = derived
+    changed_status = new_status != old_status
+
+    if not (changed_assess or fill_excerpt or changed_status):
         return None
 
     updated = dict(payload)
@@ -174,9 +209,13 @@ def plan_row(row: dict[str, Any]) -> dict[str, Any] | None:
         updated["attachment_deficiency_assessment"] = new
     if fill_excerpt:
         updated["attachment_deficiency_excerpt"] = new_excerpt
+    if changed_status:
+        updated["gmp_deficiency_table_status"] = new_status
     return {
         "kind": "update", "old": old, "new": new,
         "changed_assess": changed_assess, "fill_excerpt": fill_excerpt,
+        "changed_status": changed_status,
+        "status_old": old_status, "status_new": new_status,
         "raw_json": updated,
     }
 
@@ -217,12 +256,22 @@ def run(apply: bool) -> Report:
                 f"강등 판정 차단 {row.get('raw_signal_id')}: {plan['old']} → {plan['new']}")
             continue
 
-        key_t = f"{plan['old']}→{plan['new']}" if plan["changed_assess"] else "excerpt-only"
+        if plan["changed_assess"]:
+            key_t = f"{plan['old']}→{plan['new']}"
+        elif plan["changed_status"]:
+            key_t = f"status-only:{plan['status_old'] or 'none'}→{plan['status_new']}"
+        else:
+            key_t = "excerpt-only"
         report.transitions[key_t] = report.transitions.get(key_t, 0) + 1
         if plan["changed_assess"]:
             report.upgraded += 1
         if plan["fill_excerpt"]:
             report.excerpt_filled += 1
+        if plan["changed_status"]:
+            if plan["status_old"]:
+                report.status_changed += 1
+            else:
+                report.status_filled += 1
         if len(report.samples) < 10:
             report.samples.append({
                 "raw_signal_id": str(row.get("raw_signal_id") or ""),

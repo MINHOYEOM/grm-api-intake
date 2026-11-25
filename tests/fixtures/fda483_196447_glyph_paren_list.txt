@@ -18,7 +18,7 @@ Industry Information: Www. fda.gov/oc/industry
 3008919796
 NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT 1S ISSUED
 TO:
-Sarina Cheng, QA Compliance Department Deputy Manager
+Marika Chova, QA Compliance Department Deputy Manager
 FIRM NAME
 STREET ADDRESS
 Adimmune Corporation
@@ -107,7 +107,7 @@ nines,
 NAME
 AND TITLE OF INDIVIDUALTOWHOMREPORTISISSUED ~~ S—C—CCCO
 TO;
-Sarina Cheng, QA Compliance Department Deputy Manager
+Marika Chova, QA Compliance Department Deputy Manager
 sess eesssseseeeesttneenee
 eT
 ee ee ee

@@ -42,7 +42,8 @@ on:
   # ★ 2026-11-16 발행 배포 직후 발송 — 11-16 은 예약 3회(14:23·15:23·16:23 KST)가 하나도 뜨지 않았고,
   #   그 전 주들도 22시대에야 떴다(GitHub 예약 크론 지각). 발행 PR(`publish(web): …`) 머지로 도는
   #   main 배포가 성공하면 곧바로 같은 send 파이프라인을 탄다. 예약은 백업으로 남긴다.
-  #   멱등 ③(캠페인명)이 중복 발송을 막고, 발행 커밋이 아닌 배포에는 잡이 생기지 않는다(아래 if).
+  #   멱등 ③(캠페인명)이 중복 발송을 막고, 발행 커밋이 아닌 배포에는 발송 잡이 생기지 않는다
+  #   (trigger-gate 잡 → publish_trigger.py — squash·rebase·일반 머지 모두 발행, 11-25 수리).
   workflow_run:
     workflows: ["GRM Web Deploy"]
     types: [completed]
@@ -70,15 +71,49 @@ permissions:
 concurrency:
   # 같은 호 동시 발송 차단(멱등이 이중 안전망이지만 동시성도 끊는다). 스케줄은 inputs 가 없으므로
   # event_name 으로 폴백 — 두 스케줄 런이 직렬화된다(취소하지 않고 큐).
-  group: grm-newsletter-${{ github.event.inputs.publish_date || github.event_name }}
+  # ★ 11-25 — workflow_run 은 배포 커밋(head_sha)별로 나눈다. 이제 모든 배포가 trigger-gate 잡을
+  #   잠깐 돌리므로, 한 그룹으로 묶으면 대기 중인 발행 런이 뒤이은 일반 배포 런에 밀려 취소될 수
+  #   있다(GitHub 는 같은 그룹 대기 런을 1개만 남긴다). 실제 발송 직렬화는 아래 send·newsletter-en
+  #   잡의 잡 단위 concurrency 가 맡는다(발송 직전 멱등 재확인과 함께 이중 발송 0).
+  group: grm-newsletter-${{ github.event.inputs.publish_date || github.event.workflow_run.head_sha || github.event_name }}
   cancel-in-progress: false
 
 jobs:
+  # ── 발행 머지 판정(workflow_run 전용) — 판정은 publish_trigger.py 한 곳 ─────────────
+  #   ★ 2026-11-25 수리 — 11-16 의 `startsWith(head_commit.message, 'publish(web)')` 는 squash
+  #   머지만 가정했다. 11-23 발행 PR #1873 이 일반 머지로 들어가 배포 커밋 제목이
+  #   `Merge pull request #1873 from …/publish/brief-2026-11-23` 이 되자 발송이 skipped 됐다.
+  #   이제 squash·rebase·일반 머지 모두 발행으로 본다(tests/test_publish_trigger.py).
+  #   발행이 아닌 배포면 is_publish=false → 아래 발송 잡들은 생기지 않는다.
+  #   예약·수동 실행엔 이 잡이 없고(skipped) 발송 잡은 기존대로 돈다.
+  trigger-gate:
+    if: ${{ github.event_name == 'workflow_run' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      is_publish: ${{ steps.judge.outputs.is_publish }}
+      publish_date: ${{ steps.judge.outputs.publish_date }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: 발행 머지인가 — publish_trigger.py (표준 라이브러리만)
+        id: judge
+        env:
+          # 커밋 메시지는 env 로만 전달(쉘 직접 보간 금지 — 스크립트 인젝션 회피).
+          EVENT_NAME: ${{ github.event_name }}
+          WR_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          HEAD_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
+        run: |
+          set -euo pipefail
+          python3 publish_trigger.py | tee -a "$GITHUB_OUTPUT"
+
   # ── 게이트 ①②(구조·provenance·링크체크) + 멱등 사전점검 ③ + 메일 HTML 아티팩트(D5) ──
   #   여기서 '보낼 호가 있는지'(should_send)까지 결정한다. 그래야 send 잡은 실제 보낼 새 호가
   #   있을 때만 생성된다(멱등 skip 은 발송 0).
   validate-build:
-    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_commit.message, 'publish(web)')) }}
+    needs: trigger-gate
+    if: ${{ !cancelled() && (github.event_name != 'workflow_run' || needs.trigger-gate.outputs.is_publish == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -161,7 +196,12 @@ jobs:
   #   validate 모드면 이 잡 자체가 없으므로 발송도 0.
   send:
     needs: validate-build
-    if: ${{ needs.validate-build.outputs.should_send == 'true' }}
+    # trigger-gate 가 skipped(예약·수동)여도 이 잡이 따라 skip 되지 않게 결과를 직접 본다.
+    if: ${{ !cancelled() && needs.validate-build.result == 'success' && needs.validate-build.outputs.should_send == 'true' }}
+    # 발송은 런 단위가 아니라 이 잡 단위로 직렬화한다(어느 트리거든 한 번에 하나 — 멱등 재확인).
+    concurrency:
+      group: grm-newsletter-send-ko
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -196,7 +236,11 @@ jobs:
   #   한 잡 안에서 스냅샷→게이트→미리보기→멱등→발송을 끝낸다(스냅샷을 잡 사이로 옮기지
   #   않는다 — 미리보기와 발송이 같은 파일을 본다).
   newsletter-en:
-    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_commit.message, 'publish(web)')) }}
+    needs: trigger-gate
+    if: ${{ !cancelled() && (github.event_name != 'workflow_run' || needs.trigger-gate.outputs.is_publish == 'true') }}
+    concurrency:
+      group: grm-newsletter-send-en
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

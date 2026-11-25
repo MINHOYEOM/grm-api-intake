@@ -351,6 +351,16 @@ def _fetch_text(pdf_url: str) -> tuple[str, str]:
 _MEDIA_ID_RE = re.compile(r"(\d{4,})$")
 
 
+def _reset_forced() -> None:
+    from collect_fda_483 import reset_last_forced_read
+    reset_last_forced_read()
+
+
+def _forced_read() -> dict[str, Any]:
+    from collect_fda_483 import last_forced_read
+    return last_forced_read()
+
+
 def dump_texts(doc_ids: list[str], out_dir: str, *,
                fetch_text: Callable[[str], tuple[str, str]] | None = None) -> list[dict[str, Any]]:
     """[11-12 진단 전용·쓰기 없음] 지목한 483 의 판독 전문(OCR 포함)을 `<out_dir>/<doc>.txt` 로 남긴다.
@@ -366,6 +376,7 @@ def dump_texts(doc_ids: list[str], out_dir: str, *,
             rows.append({"doc": doc, "status": "bad_doc_id", "chars": 0})
             continue
         url = f"https://www.fda.gov/media/{m.group(1)}/download"
+        _reset_forced()
         try:
             text, status = text_fn(url)
         except Exception as exc:  # noqa: BLE001 — 진단 도구: 건별 실패를 적고 계속
@@ -373,7 +384,17 @@ def dump_texts(doc_ids: list[str], out_dir: str, *,
         name = f"fda483-{m.group(1)}"
         if text:
             Path(out_dir, f"{name}.txt").write_text(text, encoding="utf-8")
-        rows.append({"doc": name, "url": url, "status": status, "chars": len(text or "")})
+        row: dict[str, Any] = {"doc": name, "url": url, "status": status, "chars": len(text or "")}
+        # [11-26] force_ocr 로 다시 읽었는데 채택되지 않았으면(관찰 수 감소 등) 그 판독 전문도 따로 남긴다 —
+        # 사람이 PDF 로 국문을 쓸 때(pdf_verified) 두 판을 맞대어 볼 자료. 강제 판독이 없으면 아무것도 바뀌지 않는다.
+        forced = _forced_read()
+        if forced.get("text", "").strip():
+            row["forced_adopted"] = bool(forced.get("adopted"))
+            row["forced_status"] = forced.get("status", "")
+            row["forced_chars"] = len(forced["text"])
+            if not forced.get("adopted"):
+                Path(out_dir, f"{name}.forced.txt").write_text(forced["text"], encoding="utf-8")
+        rows.append(row)
         if status == FDA_BOT_BLOCK:
             break
     return rows

@@ -583,6 +583,7 @@ grm-api-intake/
 ├─ grm_health.py, source_silence.py  # health 판정(소스 오류·`kr-egress-proxy-unreachable`·`source-silent:*` 전부 warning) · Supabase 마지막 수집일 기반 무음 판정(레지스트리 `silence_days` 3단 10/21/35일 · ICH 는 제외)
 ├─ probe_mfds_egress.py            # MFDS/nedrug/law.go.kr 러너 도달 프로브 — 첫 줄 `[PROXY] reachable|unreachable|unconfigured`
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
+├─ wl_pair_restore.py               # WL 본문만 바뀐 짝 findings restore 계획 도구(기본 dry)
 ├─ ci_shard.py                     # CI unittest 샤딩 러너(클래스 단위 LPT 균형, tests/ci_shard_timings.json) — grm-ci.yml 4 샤드
 ├─ intake_exclusion.py             # 수집 제외 장부 — 원천에서 받았지만 규칙으로 의도적으로 버린 문서의 기록(130). 규칙 버전이 같을 때만 재수신 생략
 ├─ raw_drift.py                    # [원문 갱신 규칙 R0] 이미 받은 문서의 오늘 판을 정본 raw_json 과 비교해 소스별 같음·다름·흔들린 칸·줄어듦을 health `store.drift` 로 **보고만**(쓰기 없음, `RAW_DRIFT_MEASURE`)

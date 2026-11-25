@@ -603,6 +603,28 @@ _FDA483_FOOTER_RE = re.compile(
     re.I,
 )
 _BOILERPLATE_RE = _FDA483_FOOTER_RE  # 후방호환 별칭(옛 이름 참조 안전)
+
+# [11-26] 맨 `SIGNATURE` 표지는 산문 표제와 겹친다 — "ELECTRONIC RECORDS AND ELECTRONIC SIGNATURES"(Part 11
+# 관찰 소제목, 실측 193583 EIR 본문). 관찰 안에 이 표제가 오면 첫 표지에서 자르는 규칙이 그 뒤 문장을 지웠다
+# (저장 단계 절단). 다른 양식 표지가 곁에 없는 **맨 SIGNATURE** 이고 뒤에 산문이 이어지면(산문 낱말 2개 초과,
+# 판독 변형 서명란과 같은 기준 `grm_findings.FDA483_SIGNER_TAIL_MAX_PROSE`) 자르는 자리로 보지 않는다.
+# 진짜 서명란은 EMPLOYEE(S)·SEE REVERSE·DATE ISSUED 같은 다른 표지가 함께 있거나 뒤가 이름·날짜뿐이라 그대로 잘린다.
+_BARE_SIGNATURE_RE = re.compile(r"(?-i:SIGNATURE|SIGJ)")
+_FOOTER_NEIGHBOR_WINDOW = 200
+
+
+def _footer_cut(text: str, pos: int = 0, endpos: int | None = None) -> "re.Match[str] | None":
+    """`_FDA483_FOOTER_RE.search` 와 같되, 산문 표제의 맨 SIGNATURE 는 건너뛴다(순수 함수)."""
+    end = len(text) if endpos is None else endpos
+    for m in _FDA483_FOOTER_RE.finditer(text, pos, end):
+        if not _BARE_SIGNATURE_RE.fullmatch(m.group(0)):
+            return m
+        lo, hi = max(0, m.start() - _FOOTER_NEIGHBOR_WINDOW), min(len(text), m.end() + _FOOTER_NEIGHBOR_WINDOW)
+        others = [x for x in _FDA483_FOOTER_RE.finditer(text, lo, hi) if not _BARE_SIGNATURE_RE.fullmatch(x.group(0))]
+        if gf.fda483_bare_signature_is_prose(text, m.end(), other_marker_near=bool(others), endpos=end):
+            continue
+        return m
+    return None
 # 위 EMPLOYEE 마커가 선행 고립 I/l 을 흡수하지 못하는 잔여 경우를 대비한 안전망(가벼운 후처리).
 # 실제 산문에서 문장이 고립된 단일 I/l 로 끝나는 경우는 사실상 없어(대명사 "I"는 문장 중간),
 # 오탐 위험 없이 절단 후 남은 낱자 잔재만 제거한다.
@@ -1753,7 +1775,7 @@ def _skip_pagebreak_block(chunk: str) -> str:
     """관찰 표제 **직후**에 온 페이지 경계 양식 블록을 건너뛴 본문을 돌려준다(순수 함수).
 
     푸터가 표제 바로 뒤가 아니면(= 관찰 끝의 정상 푸터) 입력을 그대로 돌려준다."""
-    m = _FDA483_FOOTER_RE.search(chunk or "")
+    m = _footer_cut(chunk or "")
     if not m or m.start() > _PAGEBREAK_FOOTER_HEAD:
         return chunk
     offset = 0
@@ -1769,7 +1791,7 @@ def _skip_pagebreak_block(chunk: str) -> str:
 def _clean_observation_chunk(chunk: str) -> str:
     """Observation 본문 chunk 에서 페이지 하단 서명/양식 푸터 블록을 제거(가장 이른 마커에서 절단)."""
     text = re.sub(r"[\r\f]+", "\n", chunk or "")
-    m = _FDA483_FOOTER_RE.search(text)
+    m = _footer_cut(text)
     if m:
         text = text[:m.start()]
     text = _TRAILING_STRAY_LETTER_RE.sub("", text)
@@ -1783,7 +1805,7 @@ def _clean_observation_detail(detail: str) -> str:
     (Mixlab Obs2·5)은 deficiency 만 표시하고 detail 은 생략(garbage 미노출). 순수 함수.
     (재추출뿐 아니라 이미 저장된 detail 문자열 재청소(backfill)에도 그대로 쓴다.)"""
     text = re.sub(r"\s+", " ", detail or "").strip()
-    m = _FDA483_FOOTER_RE.search(text)
+    m = _footer_cut(text)
     if m:
         # 주의: 여기서 `.` 를 rstrip 대상에서 제외한다(구버전은 " :-.\t" 로 마침표까지 잘라
         # 정상 문장의 종결 마침표까지 날리는 부작용이 있었다 — 2026-07-12 hardening 에서 수정).
@@ -2358,7 +2380,7 @@ def _signer_cut(text: str, start: int = 0, end: int | None = None) -> int | None
 def _footer_start(text: str, lo: int, hi: int) -> int | None:
     """쪽 번호(hi) 앞 서명란 블록의 시작. 마커가 하나도 없으면 None(쪽 경계로 보지 않는다)."""
     cands: list[int] = []
-    m = _FDA483_FOOTER_RE.search(text, lo, hi)
+    m = _footer_cut(text, lo, hi)
     if m:
         cands.append(m.start())
     s = _signer_cut(text, lo, hi)
@@ -2566,8 +2588,13 @@ def _is_prose_line(line: str) -> bool:
     return not (_SIGNER_TITLE_RE.search(s) or _FOOTER_MARK_RE.search(s))
 
 
-def _footer_block_resume(text: str, fs: int, before: str, est_hint: str) -> int | None:
-    """서명란 시작(fs) 뒤 본문 재개 줄의 시작 위치. 확신 조건을 못 넘으면 None."""
+def _footer_block_resume(text: str, fs: int, before: str, est_hint: str,
+                         mark_from: int | None = None) -> int | None:
+    """서명란 시작(fs) 뒤 본문 재개 줄의 시작 위치. 확신 조건을 못 넘으면 None.
+
+    마커 종류는 `mark_from`(서명란 블록 맨 윗줄, 기본 fs)부터 센다 — [11-26 191183] 첫 잘림 마커가
+    `FORM FDA` 이고 그 위 줄들(`SEE` / 이름 / `REVERSE OF` / 이름 / `THIS PAGE`)이 서명란인 쪽에서,
+    fs 부터만 세면 마커가 1종뿐이라 잇지 못하고 관찰이 그 쪽 끝에서 잘렸다."""
     end = min(len(text), fs + _FOOTER_JOIN_WINDOW)
     p = text.find("\n", fs)
     while p != -1 and p < end:
@@ -2577,7 +2604,8 @@ def _footer_block_resume(text: str, fs: int, before: str, est_hint: str) -> int 
             return None                              # 양식 뒷면 고지·회신 편지·다음 관찰 표제 — 관찰은 여기서 끝났다
         if _is_prose_line(line) and not _is_header_value_line(line, est_hint) \
                 and not _looks_like_est_value(line, est_hint):
-            marks = {m.group(0).upper()[:5] for m in _FOOTER_MARK_RE.finditer(text, fs, p)}
+            lo = fs if mark_from is None else min(mark_from, fs)
+            marks = {m.group(0).upper()[:5] for m in _FOOTER_MARK_RE.finditer(text, lo, p)}
             if len(marks) < 2 or not before.strip():
                 return None
             # 대문자로 시작하는 새 문장은 받지 않는다 — 앵커를 잃은 **다음 관찰 표제**(실측 90268
@@ -2634,7 +2662,7 @@ def _join_footer_pages(seg: str, est_hint: str = "") -> str:
     out: list[str] = []
     cursor = 0
     while True:
-        m = _FDA483_FOOTER_RE.search(seg, cursor)
+        m = _footer_cut(seg, cursor)
         if not m:
             break
         fs = m.start()
@@ -2650,7 +2678,7 @@ def _join_footer_pages(seg: str, est_hint: str = "") -> str:
             ls = _signer_lines_start(seg, max(cursor, fs - _PAGE_BLOCK_WINDOW), ls)
         start = _header_block_start(seg, max(cursor, fs - _PAGE_BLOCK_WINDOW), ls)
         before = seg[cursor:start].rstrip()
-        resume = _footer_block_resume(seg, fs, before, est_hint)
+        resume = _footer_block_resume(seg, fs, before, est_hint, mark_from=ls)
         if resume is None:
             break
         out.append(seg[cursor:start])
@@ -2726,6 +2754,10 @@ def trim_detail_tail(detail: str) -> str:
     if m:
         nm = _SIGNER_NAME_BEFORE_RE.search(d, max(0, m.start() - 60), m.start())
         d = d[:nm.start() if nm else m.start()].rstrip(" :-\t")
+    # [11-26] 판독 변형 서명란(`EMF'I..OYEE(S) SIGNA T…`) — 뒤에 산문이 없을 때만 걷는다(발행 게이트와 같은 함수).
+    variant = gf.fda483_signer_variant_tail_start(d)
+    if variant is not None:
+        d = d[:variant].rstrip(" :-\t")
     return d
 
 
@@ -2985,8 +3017,8 @@ def _extract_483_observations_from_text(
     scoped = _scope_to_observation_list(body)
     primary = _observations_from_anchors(
         _cut_at_annotations(scoped),
-        lambda s: _with_glyph_first_anchor(
-            s, _select_observation_anchors(s, list(_OBS_RE.finditer(s)))),
+        lambda s: _with_gap_heading_anchors(s, _with_glyph_first_anchor(
+            s, _select_observation_anchors(s, list(_OBS_RE.finditer(s))))),
         hints,
         gate=_is_publishable_deficiency,
         fragment_heads=True,
@@ -3016,6 +3048,44 @@ def _with_glyph_first_anchor(body: str, anchors: list[re.Match[str]]) -> list[re
     if glyph is None:
         return anchors
     return [glyph, *anchors]
+
+
+# [11-26 191183] 번호가 건너뛴 자리(1 → 3)의 깨진 표제 줄 — `OBSERVATIO~ 2`. 정상 앵커(`_OBS_RE`)가 못 읽어
+# 관찰 2 가 관찰 1 상세에 통째로 붙거나(쪽 잇기 뒤) 사라졌다(쪽 끝 절단 때). **줄 전체가 표제뿐**인 줄만
+# 받는다 — 문장 속 상호참조(`refer to Observation 2.`)는 같은 줄에 산문이 있어 걸리지 않는다.
+_OBS_GAP_HEADING_RE = re.compile(
+    r"(?m)^[ \t]*O\s?B\s?S\s?E\s?R\s?V\s?A\s?T\s?I\S{0,3}?[ \t]*[#.:\-]?[ \t]*(\d{1,2})[ \t]*[.:]?[ \t]*$")
+
+
+_GAP_XREF_BEFORE_RE = re.compile(r"\b(?:refer\s+to|see|per|in|under|and|of)\s*[\r\n]+\s*$", re.I)
+
+
+def _with_gap_heading_anchors(body: str, anchors: list[re.Match[str]]) -> list[re.Match[str]]:
+    """앵커 번호가 건너뛴 구간(n → m, m-n ≥ 2)에서 빠진 번호의 깨진 표제 줄을 찾아 끼운다(순수 함수).
+
+    빠진 번호가 아닌 줄·구간 밖 줄은 보지 않으므로 번호가 이어지는 문서의 출력은 바뀌지 않는다."""
+    out: list[re.Match[str]] = []
+    for i, a in enumerate(anchors):
+        out.append(a)
+        if i + 1 >= len(anchors):
+            break
+        b = anchors[i + 1]
+        try:
+            lo_n, hi_n = int(a.group(1)), int(b.group(1))
+        except (TypeError, ValueError):
+            continue
+        if hi_n - lo_n < 2:
+            continue
+        want = lo_n + 1
+        for g in _OBS_GAP_HEADING_RE.finditer(body, a.end(), b.start()):
+            if _GAP_XREF_BEFORE_RE.search(body, max(a.end(), g.start() - 40), g.start()):
+                continue                    # `…please refer to⏎OBSERVATION 2⏎` — 줄을 넘긴 상호참조
+            if int(g.group(1)) == want:
+                out.append(g)
+                want += 1
+                if want >= hi_n:
+                    break
+    return out
 
 
 def _scope_to_observation_list(body: str) -> str:

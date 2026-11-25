@@ -302,3 +302,139 @@ class PageEndCutBackfillTest(unittest.TestCase):
         self.assertEqual(b.item_heads("A. The x. B. Two items ii. three"), {"A", "B", "ii"})
         self.assertEqual(b.prose_words("SEE REVERSE Velmora Quist, PhD the sterile product"), 3)
         self.assertFalse(b.shrinks_body("short text", ""))
+
+
+def _pdf_row(rid: str, doc: str) -> dict:
+    raw = {"pdf_url": f"https://x/{doc}.pdf", b._OBS_KEY: OLD_OBS}
+    return {"raw_signal_id": rid, "document_id": doc, "raw_json": json.dumps(raw, ensure_ascii=False)}
+
+
+_ROWS5 = [_pdf_row(f"rawsig-{i}", f"fda483-{i}") for i in "abcde"]
+WF = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                  ".github", "workflows", "grm-fda483-detail-refresh.yml")
+
+
+def _block_on(doc_url_part: str):
+    def fn(url):
+        return ("", b.FDA_BOT_BLOCK) if doc_url_part in url else (_text("195434"), "ok")
+    return fn
+
+
+class IncompleteRunResume1126Test(unittest.TestCase):
+    """[11-26] 봇 차단으로 도중에 멈춘 실행이 전체처럼 읽히지 않게 — 11-25 dry 가 2,453 중 2,202 에서 멈췄다."""
+
+    def test_bot_block_marks_incomplete_with_stop_point_and_remaining(self):
+        rep = b.run(list(reversed(_ROWS5)), dry_run=True, sleep_fn=lambda s: None,
+                    text_fn=_block_on("fda483-c"))
+        self.assertTrue(rep.incomplete)
+        self.assertEqual(rep.stop_reason, b.FDA_BOT_BLOCK)
+        self.assertEqual((rep.processed, rep.total_candidates), (2, 5))
+        self.assertEqual((rep.stopped_at_raw_signal_id, rep.stopped_at_document_id), ("rawsig-c", "fda483-c"))
+        # 막힌 문서부터 끝까지 — 막힌 문서도 다음 실행이 다시 읽는다
+        self.assertEqual(rep.remaining_doc_ids, ["fda483-c", "fda483-d", "fda483-e"])
+        self.assertEqual(b.exit_code(rep), 1)
+
+    def test_resume_from_continues_at_stop_point_and_completes(self):
+        first = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None, text_fn=_block_on("fda483-c"))
+        seen: list[str] = []
+
+        def ok(url):
+            seen.append(url)
+            return _text("195434"), "ok"
+        second = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None, text_fn=ok,
+                       resume_from=first.stopped_at_raw_signal_id)
+        self.assertEqual([u.rsplit("/", 1)[-1] for u in seen], ["fda483-c.pdf", "fda483-d.pdf", "fda483-e.pdf"])
+        self.assertFalse(second.incomplete)
+        self.assertEqual((second.processed, second.total_candidates), (3, 3))
+        self.assertEqual(first.processed + second.processed, len(_ROWS5))
+        self.assertEqual(b.incomplete_banner(b.report_payload(second)), "")
+        self.assertEqual(b.exit_code(second), 0)
+
+    def test_limit_stop_is_also_marked_incomplete(self):
+        rep = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None,
+                    text_fn=lambda u: (_text("195434"), "ok"), limit=2)
+        self.assertEqual((rep.incomplete, rep.stop_reason, rep.processed, rep.total_candidates),
+                         (True, "limit", 2, 5))
+        self.assertEqual(rep.stopped_at_raw_signal_id, "rawsig-c")
+
+    def test_complete_run_is_not_incomplete(self):
+        rep = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None, text_fn=lambda u: (_text("195434"), "ok"))
+        self.assertEqual((rep.incomplete, rep.processed, rep.total_candidates, rep.remaining_doc_ids),
+                         (False, 5, 5, []))
+
+    def test_payload_puts_incomplete_fields_first_and_banner_names_numbers(self):
+        rep = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None, text_fn=_block_on("fda483-c"))
+        data = b.report_payload(rep)
+        self.assertEqual(list(data)[:4], ["incomplete", "stop_reason", "processed", "total_candidates"])
+        banner = b.incomplete_banner(data)
+        for part in ("미완료", "처리 2/후보 5", "rawsig-c", "--resume-from rawsig-c", "남은 문서 3"):
+            self.assertIn(part, banner)
+
+    def test_main_writes_remaining_ids_file(self):
+        import functools
+        import tempfile
+        from unittest import mock
+        run_offline = functools.partial(b.run, text_fn=_block_on("fda483-d"), sleep_fn=lambda s: None)
+        with tempfile.TemporaryDirectory() as d:
+            rem, rp = os.path.join(d, "rem.txt"), os.path.join(d, "r.json")
+            with mock.patch.object(b, "_resolve_credentials", return_value=("https://x.supabase.co", "k")), \
+                    mock.patch.object(b, "_fetch_rows", return_value=_ROWS5), \
+                    mock.patch.object(b, "run", run_offline):
+                code = b.main(["--since", "1900-01-01", "--report-path", rp, "--remaining-ids-path", rem,
+                               "--delay-seconds", "0"])
+            self.assertEqual(code, 1)
+            with open(rem, encoding="utf-8") as fh:
+                self.assertEqual(fh.read().split(), ["fda483-d", "fda483-e"])
+            with open(rp, encoding="utf-8") as fh:
+                self.assertTrue(json.load(fh)["incomplete"])
+
+    def test_workflow_passes_resume_and_shows_banner_first(self):
+        with open(WF, encoding="utf-8") as fh:
+            wf = fh.read()
+        self.assertIn("resume_from:", wf)
+        self.assertIn('ARGS+=(--resume-from "${IN_RESUME_FROM}")', wf)
+        self.assertIn("--remaining-ids-path detail_refresh_remaining_ids.txt", wf)
+        self.assertIn("detail_refresh_remaining_ids.txt", wf.split("Upload report", 1)[1])
+        summary = wf.split("Write step summary", 1)[1]
+        self.assertLess(summary.index("incomplete_banner(r)"), summary.index("### 483 상세 다시 읽기"))
+
+
+class MissingObservations1126Test(unittest.TestCase):
+    """[11-26 DB 완전성] 다시 읽어 새로 잡히는 관찰(저장 배열에 번호 없음)은 기본으로 세기만, 옵션일 때만 덧붙인다."""
+
+    def setUp(self):
+        import collect_fda_483 as c
+        with open(os.path.join(FIX, "fda483_garbled_header_gap_heading_1126.txt"), encoding="utf-8") as fh:
+            self.text = fh.read()
+        new = c._extract_483_observations_from_text(self.text, {})
+        self.old = [dict(o) for o in new if o["number"] != "2"]      # 운영처럼 관찰 2 가 없는 저장 배열
+        self.raw = {"fda483_body_full": self.text, b._OBS_KEY: self.old}
+
+    def test_counted_but_not_added_by_default(self):
+        patched: dict = {}
+        rep = b.run([_row(self.raw)], dry_run=False, patch_fn=lambda rid, r: patched.update(r))
+        self.assertEqual((rep.new_observations, rep.new_observation_docs, rep.new_observations_added), (1, 1, 0))
+        self.assertEqual(rep.new_observation_samples[0]["number"], "2")
+        self.assertEqual(rep.new_observation_doc_ids, ["fda483-195434"])
+        self.assertFalse(patched)          # 다른 변화가 없으면 쓰지 않는다
+
+    def test_added_in_number_order_when_asked(self):
+        patched: dict = {}
+        rep = b.run([_row(self.raw)], dry_run=False, add_missing=True, patch_fn=lambda rid, r: patched.update(r))
+        self.assertEqual(rep.new_observations_added, 1)
+        self.assertEqual([o["number"] for o in patched[b._OBS_KEY]], ["1", "2", "3"])
+        self.assertTrue(patched[b._OBS_KEY][1]["deficiency"].startswith("The accuracy"))
+
+    def test_same_heading_under_other_number_is_not_duplicated(self):
+        new = [{"number": "4", "deficiency": "Written procedures are not followed.", "detail": "x"}]
+        old = [{"number": "3", "deficiency": "Written  procedures are NOT followed.", "detail": "x"}]
+        self.assertEqual(b.missing_observations(old, new), [])
+        self.assertEqual(b.missing_observations([], new), new)
+
+    def test_workflow_exposes_add_missing_default_off(self):
+        with open(WF, encoding="utf-8") as fh:
+            wf = fh.read()
+        block = wf.split("add_missing_observations:", 1)[1].split("resume_from:", 1)[0]
+        self.assertIn("default: false", block)
+        self.assertIn("ARGS+=(--add-missing-observations)", wf)
+        self.assertIn("new_observations", wf.split("Write step summary", 1)[1])

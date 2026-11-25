@@ -33,6 +33,14 @@ on:
         description: '선택: document_id 목록(공백/쉼표 구분).'
         type: string
         default: ''
+      add_missing_observations:
+        description: 'true = 다시 읽어 새로 잡힌 관찰(저장 배열에 번호 없음)을 raw 배열에 덧붙인다(apply 와 함께, 대표 확인 후). 기본 false = 세기만. 행 추가는 그 뒤 grm-findings-backfill.yml document_ids.'
+        type: boolean
+        default: false
+      resume_from:
+        description: '선택: 이 raw_signal_id 부터(포함) 잇는다 — 앞 실행이 미완료로 멈췄을 때 그 요약의 멈춘 raw_signal_id.'
+        type: string
+        default: ''
       ocr_page_budget:
         description: 'OCR 페이지 예산(실행 1회당).'
         type: string
@@ -89,10 +97,12 @@ jobs:
           IN_UNTIL: ${{ inputs.until }}
           IN_LIMIT: ${{ inputs.limit }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
+          IN_RESUME_FROM: ${{ inputs.resume_from }}
+          IN_ADD_MISSING: ${{ inputs.add_missing_observations }}
           FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}
         run: |
           set -euo pipefail
-          ARGS=(--report-path detail_refresh_report.json)
+          ARGS=(--report-path detail_refresh_report.json --remaining-ids-path detail_refresh_remaining_ids.txt)
           if [ -n "${IN_SINCE}" ]; then
             ARGS+=(--since "${IN_SINCE}")
           fi
@@ -111,6 +121,12 @@ jobs:
           if [ -n "${IN_DOC_IDS}" ]; then
             ARGS+=(--doc-ids "${IN_DOC_IDS}")
           fi
+          if [ "${IN_ADD_MISSING}" = "true" ]; then
+            ARGS+=(--add-missing-observations)
+          fi
+          if [ -n "${IN_RESUME_FROM}" ]; then
+            ARGS+=(--resume-from "${IN_RESUME_FROM}")
+          fi
           python backfill_483_detail_refresh.py "${ARGS[@]}"
 
       - name: Write step summary
@@ -119,12 +135,18 @@ jobs:
           if [ -f detail_refresh_report.json ]; then
             python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
+          from backfill_483_detail_refresh import incomplete_banner
           r = json.load(open("detail_refresh_report.json", encoding="utf-8"))
+          banner = incomplete_banner(r)
+          if banner:   # 미완료면 맨 위에 — 아래 숫자를 전체로 읽지 않게
+              print(f"> **{banner}**\n")
           print(f"### 483 상세 다시 읽기 (dry_run={r['dry_run']}, since={r['since']})\n")
           print(f"후보 {r['candidates']} · 원문 전문 {r['from_body_full']} · PDF {r['from_pdf']} · 본문 없음 {r['no_text']} · 실패 {r['failed']}")
           print(f"바뀐 문서 {r['docs_changed']} · 바뀐 관찰 {r['observations_changed']} (짝 맞음 {r['observations_matched']} / 짝 없음 {r['observations_unmatched']}) · PATCH {r['patched']}\n")
           print(f"옛 상한 잘림 의심 관찰 {r['truncated_before']} → {r['truncated_after']} · 표제 복원 {r['deficiency_restored']} (truncated_only={r['truncated_only']})\n")
           print(f"쪽 끝 절단 복원: 본문 늘어난 관찰 {r['pagebreak_extended']} (문서 {r['pagebreak_docs']}) · 그중 새 하위 항목 생김 {r['pagebreak_items_added']} · 산문 낱말 {r['prose_words_before']} → {r['prose_words_after']} · 본문 축소 가드로 막음 {r['shrink_blocked']}\n")
+          print(f"새로 잡히는 관찰(행 없음) {r.get('new_observations', 0)} (문서 {r.get('new_observation_docs', 0)}) · raw 에 덧붙임 {r.get('new_observations_added', 0)}"
+                "  — 덧붙인 문서는 grm-findings-backfill.yml document_ids 로 행을 만든다.")
           print("| 지표 | 전 | 후 |\n|---|---|---|")
           b, a = r["before"], r["after"]
           for k, label in (("observations", "상세 있는 관찰"), ("complete_sentence", "문장 온전"),
@@ -139,5 +161,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: detail-refresh-report
-          path: detail_refresh_report.json
+          path: |
+            detail_refresh_report.json
+            detail_refresh_remaining_ids.txt
           if-no-files-found: ignore

@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.335` |
+| 문서 버전 | `v1.336` |
 | 최종 수정일 | 2026-11-25 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -202,8 +202,8 @@ flowchart TD
 | 보조 | **주간 용어 추가**(최근 4호 브리프가 스스로 병기한 짝 중 사전에 없는 말 → `glossary_candidates.py` 후보 → 세션이 **공식 문서에 정의가 있는 것만** 0~5개 작성 + 사례 결정 → `glossary_lint`·용어 테스트·골든 재동결 → PR → CI 머지. 좋은 후보가 없는 주는 0개가 정상 — 사이트에 '매주 추가'를 약속하지 않는다. 다음 배포에서 용어집 PDF 도 새 판) | 클라우드 예약작업(용어·교육팀 `company/education/glossary-weekly.md`, 화 08:00 KST·PR 만 열고 머지는 `grm-stranded-batch-pr.yml`) · 백업 로컬 태스크 `grm-glossary-weekly`(11-14 까지) · 규율 `docs/prompts/GRM_주간용어추가_프롬프트_v1.md` | 화 10:17 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | **용어 그림 일일 배치**(그림 없는 용어·다시 볼 그림 → `glossary_figs.py queue` → 세션이 **정의 문장에 그릴 구조(눈금·경계·흐름·전후·부분/전체·인과)가 있을 때만** 그림 → `check`(두 언어 × Pretendard 실측) + 독립 검토자 1명 → 장부 `glossary_fig_review.json`(redo·skip) → PR → CI 머지. 성과는 그림 개수가 아니라 판정 — 그릴 구조가 없으면 skip 이 정상) | 클라우드 예약작업(용어·교육팀 `company/education/glossary-fig-daily.md`, 매일 21:00 KST·PR 만 열고 머지는 `grm-stranded-batch-pr.yml`) · 로컬 태스크 `grm-glossary-fig-daily` 는 꺼짐 · 규율 `docs/prompts/GRM_용어그림_일일배치_프롬프트_v1.md` | 매일 21:00 KST | 없음 |
 | 보조 | **주간 퀴즈 미생성 감시**(로컬 태스크의 침묵을 클라우드에서 본다 — 이번 주 세트 부재 시 `quiz-freshness` 이슈, 생기면 자동 종료) | `grm-quiz-freshness.yml` | cron 화 13:10 KST | 없음 |
-| 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
-| 보조 | **뉴스레터 발송 누락 감시**(발행 PR 머지 뒤 Admin 발송이 빠진 주를 Brevo 캠페인 상태로 탐지 — dispatch_log 는 진실이 아니다) | `grm-newsletter-freshness.yml` | cron 월 20:13 · 화 09:13 KST + dispatch | 없음 |
+| 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | 발행 배포 성공 직후(workflow_run → `publish_trigger.py` 가 발행 머지 판정, 머지 방식 무관) + 백업 cron 월 14:23·15:23·16:23 KST | 없음 |
+| 보조 | **뉴스레터 발송 누락 감시**(발행 PR 머지 뒤 Admin 발송이 빠진 주를 Brevo 캠페인 상태로 탐지 — dispatch_log 는 진실이 아니다) | `grm-newsletter-freshness.yml` | cron 월 10:43~19:43 매시·20:13 · 화 09:13 KST + dispatch — 월요일 낮은 발행 PR 머지 + 2시간 지나도 캠페인이 없을 때만 경보(`apply_publish_grace`) | 없음 |
 | 보조 | **주간 성장 리포트 메일**(지난주 구독자·방문·신청·채널/구역/경로별·검색·회원·뉴스레터 발송 여부 — 공개 저장소라 이슈가 아니라 운영자 메일로) | `grm-growth-weekly.yml` → `web/growth_weekly.py` | dispatch 만(09-28 예약 해제 — 매일 성장 일보·/admin 과 중복) | 없음 |
 | 보조 | **링크드인 카드뉴스 자동 생성**(최신 브리프 → 캐러셀 PDF + 게시 본문 txt · `/briefs/{date}/linkedin.pdf`·`linkedin.txt` **+ 영문판 `linkedin_en.*`**, 슬라이드별 PNG `linkedin_NN.png`·`linkedin_en_NN.png` + 매니페스트 `linkedin_cards.json`(`--png`, 2026-11-02 — 작성창에 문서 첨부가 없어져 이미지 글로 올린다 · /admin/ 링크드인 탭이 내려받기로 소비), 카드 JSON 의 key_facts·시사점·점검 + 용어사전 정의 그대로 · LLM 0 · 영문은 카드의 `en` 블록에서만 — 한국 업체명은 로마자로 옮기지 않고 건수로만 남긴다) · 게시 본문은 **'이번 주 한 건'**(헤드라인 카드 1건의 사실·시사점·점검 2개, 2026-09-23 마케팅 계획 L-02) 이 기본이고 `--caption summary` 로 종전 요약형을 낸다 · 본문 URL 에만 UTM(`linkedin/social/{date}_weekly`, `web/utm.py`) — 슬라이드 URL 은 깨끗하게 · **월간 결산 덱**(`--months auto` — 최신 호의 달과 그 전 달, `/monthly/{YYYY-MM}/linkedin.pdf`, 달마다 헤드라인 1건씩 최대 5 + 카드 유형 숫자 1장) | `grm-web-deploy.yml` 안 `web/linkedin_cards.py` 스텝(비차단·러너 Chrome 인쇄) | ⑤·⑦ 렌더 직후 | **게시만 사람**(PDF 첨부·txt 복붙·버튼 — API 자동 게시는 LinkedIn 승인 필요라 미채택) |
 | 보조 | **GMP 규제 용어집 PDF**(용어사전 정본 → A4 PDF · 표지·GRM 소개·전체 색인·초성별 본문·뒤표지, 용어마다 '온라인에서 보기' 링크와 QR(UTM `glossary_pdf`) · `/files/grm-gmp-glossary.pdf`. **구독자 자료** — 구독 확인 메일의 버튼 → 도착 페이지 `/welcome/` 에서만 링크되고 sitemap 비등록·`_headers` noindex. 만든 뒤 PyMuPDF 로 용어 수를 다시 센다 · `site_probe` 가 두 주소의 200 을 매일 본다) | `grm-web-deploy.yml` → `web/glossary_pdf.py` | 배포마다(비차단 스텝) | 없음 |
@@ -586,6 +586,7 @@ grm-api-intake/
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ conftest.py                      # pytest/unittest 공통 진입에서 네트워크 가드 적용
 ├─ ci_network_guard.py              # CI·로컬 시험의 외부 네트워크 차단 가드
+├─ pr_merge_plan.py                 # 열린 PR 머지 순서·파일 겹침 예측(읽기 전용)
 ├─ audit_483_inspector_blanks.py    # FDA 483 실사관 빈칸 사유 판정(dry)
 ├─ wl_pair_restore.py               # WL 본문만 바뀐 짝 findings restore 계획 도구(기본 dry)
 ├─ ci_shard.py                     # CI unittest 샤딩 러너(클래스 단위 LPT 균형, tests/ci_shard_timings.json) — grm-ci.yml 4 샤드
@@ -613,6 +614,7 @@ grm-api-intake/
 ├─ brief_preview_check.py          # 발행 브리프 미리보기 5유형 점검(#1922 — grm-web-publish.yml 경고 단계, Markdown 표 출력)
 ├─ brief_metrics_ledger.py          # 호별 품질 지표(말투·심층 상투어·483 마감기한 등)를 발행본에서 읽어 JSONL/CSV 한 줄로 누적 — 읽기 전용·발행 직후 수동 실행
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
+├─ publish_trigger.py               # 발행 머지 판정 — main 배포 커밋 제목이 발행(squash·rebase `publish(web)`·일반 머지 `…/publish/brief-날짜`)인가 → grm-newsletter-send 의 trigger-gate(11-25)
 ├─ fda_body_coverage.py             # 발행 전 FDA 카드 본문 결손 점검(483·WL·회수 건수·비율·임계 → ok/recover/alert) + handoff 상태 조회 — 판정 순수 함수
 ├─ verify_published_sources.py     # 발행 카드 ↔ 원문 대조(네트워크 검증층 — 수집 실패로 인한 누락 탐지; 범위 밖으로 뺀 483 은 발행 격차로 세지 않음, 11-09)
 ├─ assemble_regression_guard.py    # 재조립 회귀 가드(발행본 대비 카드 소실·값 되돌림 판정) — `--carry-published-facts` 로 발행 뒤 정정한 facts 를 재조립이 되돌리지 않게 유지, grm-web-publish 는 `--carry-only` 로 호출(11-09)
@@ -665,6 +667,7 @@ grm-api-intake/
 ├─ gsc_index_sample.py          # [성장·유입] 구글 색인 표본 점검(주 1회, grm-gsc-index-sample.yml) — 문서 페이지를 render.is_thin_doc_page 로 얇음/두꺼움으로 나눠 주차 고정 표본을 URL Inspection API 로 확인. Job Summary·아티팩트만, DB 쓰기 없음
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ backfill_mfds_gmp_assessment.py     # 저장 텍스트로 식약처 GMP 실사 첨부 지적 재판정
+├─ recollect_mfds_gmp_attachment.py    # 식약처 GMP 실사 기존 행의 첨부 본문 재수집 CLI(국내 IP PC 전용, dry 기본, --ids)
 ├─ backfill_raw_signals_from_notion.py # Notion에만 남은 수집 행의 Supabase 사본 보충
 ├─ backfill_recall_detail.py           # 기존 발행 회수 카드에 결정론 상세 소급 병합
 ├─ collect_rum_referrer_paths.py       # RUM 유입 출처와 도착 경로 교차 집계

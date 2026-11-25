@@ -1,0 +1,111 @@
+import io
+import socket
+import sys
+import unittest
+import urllib.request
+from contextlib import redirect_stderr, redirect_stdout
+from types import SimpleNamespace
+from unittest.mock import patch
+
+import requests
+
+import ci_network_guard
+import ci_shard
+from ci_network_guard import ExternalNetworkBlocked, NetworkGuard
+
+
+HOST = "network-guard.invalid"
+URL = f"https://{HOST}/"
+
+
+class NetworkGuardTest(unittest.TestCase):
+    def test_socket_blocks_external_before_transport_and_allows_loopback(self):
+        guard = NetworkGuard()
+        guard.test_id = "example.Test.test_socket"
+        with patch.object(socket, "create_connection") as connect, guard.installed():
+            with self.assertRaisesRegex(
+                ExternalNetworkBlocked, rf"example\.Test\.test_socket.*{HOST}"
+            ):
+                socket.create_connection((HOST, 443))
+            connect.assert_not_called()
+            for host in ("localhost", "127.0.0.1", "::1", "::ffff:127.0.0.1"):
+                socket.create_connection((host, 5432))
+            self.assertEqual(connect.call_count, 4)
+
+    def test_sendmsg_blocks_external_destination_before_transport(self):
+        sock = SimpleNamespace(family=socket.AF_INET)
+        guard = NetworkGuard()
+        buffers = [b"test"]
+        with (
+            patch.object(socket.socket, "sendmsg", create=True) as sendmsg,
+            guard.installed(),
+        ):
+            with self.assertRaisesRegex(ExternalNetworkBlocked, r"socket\.sendmsg"):
+                socket.socket.sendmsg(sock, buffers, [], 0, (HOST, 443))
+            with self.assertRaisesRegex(ExternalNetworkBlocked, r"socket\.sendmsg"):
+                socket.socket.sendmsg(sock, buffers, address=(HOST, 443))
+            sendmsg.assert_not_called()
+            socket.socket.sendmsg(sock, buffers, [], 0, ("127.0.0.1", 443))
+            socket.socket.sendmsg(sock, buffers)
+            self.assertEqual(sendmsg.call_count, 2)
+
+    def test_http_clients_block_target_before_transport(self):
+        with (
+            patch.object(requests.adapters.HTTPAdapter, "send") as requests_transport,
+            patch.object(urllib.request.OpenerDirector, "_open") as urllib_transport,
+            NetworkGuard().installed(),
+        ):
+            for get in (requests.get, urllib.request.urlopen):
+                with self.assertRaisesRegex(ExternalNetworkBlocked, HOST):
+                    get(URL)
+            requests_transport.assert_not_called()
+            urllib_transport.assert_not_called()
+
+    def test_direct_unittest_fails_on_block_swallowed_during_discovery(self):
+        class PassingTest(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        def discover(*args, **kwargs):
+            try:
+                socket.create_connection((HOST, 443))
+            except ExternalNetworkBlocked:
+                pass
+            return unittest.TestSuite([PassingTest()])
+
+        stderr = io.StringIO()
+        with (
+            patch.object(socket, "create_connection") as transport,
+            patch.object(unittest.TestLoader, "discover", side_effect=discover),
+            redirect_stderr(stderr),
+        ):
+            self.assertEqual(ci_network_guard.main(["runner", "discover"]), 1)
+            transport.assert_not_called()
+        self.assertIn("Ran 1 test", stderr.getvalue())
+        self.assertIn(HOST, stderr.getvalue())
+
+    def test_shard_fails_even_when_the_test_catches_the_block(self):
+        class CatchesNetworkError(unittest.TestCase):
+            def runTest(self):
+                try:
+                    socket.create_connection((HOST, 443))
+                except Exception:
+                    pass
+
+        test = CatchesNetworkError()
+        stderr = io.StringIO()
+        # Stub the transport so the mutation check cannot open a real connection.
+        with (
+            patch.object(socket, "create_connection") as transport,
+            patch.object(ci_shard, "discover", return_value=[test]),
+            patch.object(ci_shard, "load_timings", return_value={}),
+            patch.object(sys, "path", sys.path.copy()),
+            redirect_stdout(io.StringIO()),
+            redirect_stderr(stderr),
+        ):
+            self.assertEqual(ci_shard.main(["--index", "0", "--total", "1"]), 1)
+        output = stderr.getvalue()
+        self.assertIn("FAILED (failures=1)", output)
+        self.assertIn(test.id(), output)
+        self.assertIn(HOST, output)
+        transport.assert_not_called()

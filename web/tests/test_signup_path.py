@@ -28,6 +28,8 @@ import test_render   # noqa: E402
 
 KO_ACTION = "https://sibforms.example.com/serve/ko"
 EN_ACTION = "https://sibforms.example.com/serve/en"
+# 첫 화면 구독 폼 — 하단 밴드(#grm-sub-form) 또는, 2026-11-26 부터 하단 밴드를 끈 홈의 첫 화면 띠(.grm-inl-form).
+BAND_FORM_RE = r'<form[^>]*(?:id="grm-sub-form"|class="grm-inl-form")'
 
 
 def _build(out: pathlib.Path, *, fields: bool) -> None:
@@ -72,7 +74,7 @@ class SignupPathGateTest(unittest.TestCase):
 
     def test_gate_off_leaves_forms_and_scripts_untouched(self):
         for lang, html in self._pages(self.off).items():
-            self.assertIn('id="grm-sub-form"', html, lang)
+            self.assertRegex(html, BAND_FORM_RE, lang)
             self.assertNotIn("SIGNUP_PATH", html, lang)
             self.assertNotIn("SIGNUP_LANG", html, lang)
             self.assertNotIn("function signupPath(", html, lang)
@@ -81,8 +83,8 @@ class SignupPathGateTest(unittest.TestCase):
         pages = self._pages(self.on)
         self.assertIn("en", pages, "영문 페이지가 빌드에 없다 — 영문 동일 동작을 못 본다")
         for lang, html in pages.items():
-            for fid in ("grm-sub-form", "grm-cta-form"):
-                m = re.search(r'<form[^>]*id="%s".*?</form>' % fid, html, re.S)
+            for fid, rx in (("band", BAND_FORM_RE), ("grm-cta-form", r'<form[^>]*id="grm-cta-form"')):
+                m = re.search(rx + r'.*?</form>', html, re.S)
                 self.assertIsNotNone(m, f"{lang}:{fid} 폼 없음")
                 form = m.group(0)
                 self.assertIn('name="SIGNUP_PATH"', form, f"{lang}:{fid}")

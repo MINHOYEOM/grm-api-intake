@@ -184,3 +184,41 @@ class WebFda483PublishGateTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SignerVariantTailGate1126Test(unittest.TestCase):
+    """[11-26] 판독 변형 서명란은 **꼬리일 때만** 막는다 — 수집기 trim_detail_tail 과 같은 함수
+    (grm_findings.fda483_signer_variant_tail_start). 쪽 경계 중간(뒤로 산문이 이어짐)은 막지 않는다."""
+
+    def _violations(self, detail):
+        card = _card([_obs(1, detail=detail, detail_ko="국문 상세.")])
+        return render.validate_483_observations([_brief([card])])
+
+    def test_tail_variant_is_blocked(self):
+        for tail in ("EIM'LOYEE(S)", "EM PLOYEE(S)", "SIGNATVRE", "ENPI.OVEE(S) NAME AND TITLE (Print or Type)"):
+            v = self._violations("Records were not reviewed by the quality unit. " + tail)
+            self.assertTrue(any("FOOTER_GARBAGE" in x for x in v), (tail, v))
+
+    def test_mid_text_variant_is_not_blocked(self):
+        v = self._violations("Garments are disposed of after use, EMPL OWEE(S) and reuse. The firm does not "
+                             "track and reconcile cleanroom garments that are expired.")
+        self.assertEqual(v, [])
+
+    def test_gate_and_collector_share_one_function(self):
+        import grm_findings as gf
+        self.assertIs(render._gf_signer_variant_tail_start, gf.fda483_signer_variant_tail_start)
+
+
+class BareSignatureHeadingGate1126Test(unittest.TestCase):
+    """[11-26] 산문 표제 "ELECTRONIC SIGNATURES" 는 잔재가 아니다 — 수집기와 같은 함수로 판정한다."""
+
+    def _v(self, detail):
+        return render.validate_483_observations([_brief([_card([_obs(1, detail=detail, detail_ko="국문.")])])])
+
+    def test_prose_heading_is_not_blocked(self):
+        self.assertEqual(self._v("Audit trails were not reviewed. ELECTRONIC RECORDS AND ELECTRONIC SIGNATURES "
+                                 "Shared login credentials were used by four analysts on the system."), [])
+
+    def test_bare_signature_signer_line_is_blocked(self):
+        v = self._v("The batch record was incomplete. SIGNATURE | Velmora Quist 07/02/2025")
+        self.assertTrue(any("FOOTER_GARBAGE" in x for x in v), v)

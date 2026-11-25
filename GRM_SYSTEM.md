@@ -588,6 +588,8 @@ grm-api-intake/
 ├─ probe_mfds_egress.py            # MFDS/nedrug/law.go.kr 러너 도달 프로브 — 첫 줄 `[PROXY] reachable|unreachable|unconfigured`
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ daily_reconcile_ledger.py        # 수집기 health 와 DB 집계의 일별 대조 장부
+├─ conftest.py                      # pytest/unittest 공통 진입에서 네트워크 가드 적용
+├─ ci_network_guard.py              # CI·로컬 시험의 외부 네트워크 차단 가드
 ├─ ci_slot_wait.py                 # push 전 PR CI 자리 및 수집 시간 창 확인
 ├─ pr_merge_plan.py                 # 열린 PR 머지 순서·파일 겹침 예측(읽기 전용)
 ├─ audit_483_inspector_blanks.py    # FDA 483 실사관 빈칸 사유 판정(dry)

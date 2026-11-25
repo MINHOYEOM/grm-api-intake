@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T02:40:07Z",
+ "generated_at": "2026-11-25T02:46:54Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -230,11 +230,11 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 45534305007,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-25T02:37:39Z",
-    "updatedAt": "2026-11-25T02:37:43Z",
+    "updatedAt": "2026-11-25T02:46:05Z",
     "headBranch": "automation/findings-facets-auto-45533840434",
     "displayTitle": "chore: refresh findings facet pages",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45534305007"
@@ -287,11 +287,11 @@
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 45534580239,
-    "status": "queued",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-25T02:40:01Z",
-    "updatedAt": "2026-11-25T02:40:01Z",
+    "updatedAt": "2026-11-25T02:40:34Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45534580239"
@@ -628,6 +628,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 45534666438,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-25T02:40:43Z",
+    "updatedAt": "2026-11-25T02:41:06Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45534666438"
+   },
+   {
     "databaseId": 45503810073,
     "status": "completed",
     "conclusion": "success",
@@ -670,17 +681,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45374563844"
-   },
-   {
-    "databaseId": 45350035194,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-24T07:42:14Z",
-    "updatedAt": "2026-11-24T07:42:40Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45350035194"
    }
   ],
   "grm-cloud-request.yml": [

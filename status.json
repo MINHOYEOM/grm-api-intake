@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T10:35:22Z",
+ "generated_at": "2026-11-25T12:39:04Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45593512128,
+    "databaseId": 45614024587,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-25T12:28:04Z",
+    "updatedAt": "2026-11-25T12:34:33Z",
+    "headBranch": "codex/ci-slot-wait",
+    "displayTitle": "main 병합: §5.1 충돌 해소",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45614024587"
+   },
+   {
+    "databaseId": 45613901035,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-25T12:27:17Z",
+    "updatedAt": "2026-11-25T12:36:30Z",
+    "headBranch": "codex/483-inspectors-names",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/483-inspectors-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45613901035"
+   },
+   {
+    "databaseId": 45612111567,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-25T10:17:13Z",
-    "updatedAt": "2026-11-25T10:30:49Z",
-    "headBranch": "codex/daily-reconcile-ledger",
-    "displayTitle": "feat(recon): 매일 대조 장부 1단계 (draft)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45593512128"
+    "createdAt": "2026-11-25T12:16:04Z",
+    "updatedAt": "2026-11-25T12:33:54Z",
+    "headBranch": "claude/fixture-and-debarment-names-1125",
+    "displayTitle": "fix(privacy): 시험 자료 실명 22건 정리 + FDA 자격박탈 대상자 실명(판정·자동 가림·06-22 발행본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612111567"
    },
    {
-    "databaseId": 45593506238,
+    "databaseId": 45612097828,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T10:17:10Z",
-    "updatedAt": "2026-11-25T10:35:11Z",
-    "headBranch": "codex/daily-reconcile-ledger",
-    "displayTitle": "main 병합(#1918 머지 후): GRM_SYSTEM.md §5.1 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45593506238"
+    "createdAt": "2026-11-25T12:15:57Z",
+    "updatedAt": "2026-11-25T12:38:06Z",
+    "headBranch": "claude/fixture-and-debarment-names-1125",
+    "displayTitle": "fix(privacy): FDA 자격박탈 명령 대상 개인 실명 — 판정·자동 가림·06-22 발행본·시험 자료",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612097828"
    },
    {
-    "databaseId": 45593457396,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-25T10:16:51Z",
-    "updatedAt": "2026-11-25T10:31:45Z",
-    "headBranch": "codex/pr-merge-plan",
-    "displayTitle": "main 병합: GRM_SYSTEM.md §5.1 트리 줄 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45593457396"
-   },
-   {
-    "databaseId": 45593447321,
+    "databaseId": 45611389287,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T10:16:48Z",
-    "updatedAt": "2026-11-25T10:24:09Z",
-    "headBranch": "codex/inspector-blank-dry",
-    "displayTitle": "main 병합: GRM_SYSTEM.md §5.1 트리 줄 충돌 해소",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45593447321"
-   },
-   {
-    "databaseId": 45593220559,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T10:15:26Z",
-    "updatedAt": "2026-11-25T10:23:10Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1918 from MINHOYEOM/codex/wl-pair-restore-dry",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45593220559"
+    "createdAt": "2026-11-25T12:11:27Z",
+    "updatedAt": "2026-11-25T12:34:08Z",
+    "headBranch": "claude/mfds-gmp-recollect-1125",
+    "displayTitle": "Merge branch 'main' into claude/mfds-gmp-recollect-1125",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45611389287"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45612451891,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-25T12:18:14Z",
+    "updatedAt": "2026-11-25T12:28:07Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45612451891"
+   },
+   {
     "databaseId": 45594486522,
     "status": "completed",
     "conclusion": "skipped",
@@ -442,20 +453,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45526386041"
-   },
-   {
-    "databaseId": 45518107921,
-    "status": "completed",
-    "conclusion": "skipped",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T00:26:33Z",
-    "updatedAt": "2026-11-25T00:26:35Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45518107921"
    }
   ],
   "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 45611177935,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-25T12:10:07Z",
+    "updatedAt": "2026-11-25T12:18:42Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1958 from MINHOYEOM/data/483-title-readable",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45611177935"
+   },
    {
     "databaseId": 45509969219,
     "status": "completed",
@@ -499,27 +510,16 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1862 from MINHOYEOM/claude/findings-translate-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44998263047"
-   },
-   {
-    "databaseId": 44881417441,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-21T07:41:38Z",
-    "updatedAt": "2026-11-21T07:44:05Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1848 from MINHOYEOM/claude/findings-translate-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/44881417441"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 45578940342,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-25T08:44:31Z",
-    "updatedAt": "2026-11-25T08:55:23Z",
+    "updatedAt": "2026-11-25T11:06:08Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45578940342"

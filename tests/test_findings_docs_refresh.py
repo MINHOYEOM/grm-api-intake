@@ -20,6 +20,7 @@ import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -500,25 +501,25 @@ class NarrowConsoleEncodingTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self._real = fdr.collect_documents
         self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
         self.out = Path(self.tmp) / "sub" / "findings_docs.json"
-
-        def fake(base_url, anon_key, *, min_findings, page_size, log):
-            # 제외 사유에 em-dash 가 붙어 나가는 경로를 그대로 태운다.
-            return ([_doc(n=3)], Counter({"발행일 없음": 2}))
-        fdr.collect_documents = fake
-
-    def tearDown(self):
-        fdr.collect_documents = self._real
-        shutil.rmtree(self.tmp, ignore_errors=True)
+        # 제외 사유에 em-dash 가 붙어 나가는 경로를 그대로 태운다.
+        self.enterContext(mock.patch.object(
+            fdr, "collect_documents", return_value=([_doc(n=3)], Counter({"발행일 없음": 2}))))
+        self.enterContext(mock.patch.object(fdr, "fetch_similar_edges", return_value=[]))
+        self.enterContext(mock.patch.object(fdr, "fetch_gmp_certs", return_value=[{"firm_key": "acme"}]))
+        self.enterContext(mock.patch.object(fdr, "fetch_gmp_new_firms", return_value=[]))
 
     def _run(self, stream, extra=()):
         real = sys.stdout
         sys.stdout = stream
         try:
             return fdr.main(["--supabase-url", "https://x.supabase.co",
-                             "--supabase-anon-key", "k", "--out", str(self.out), *extra])
+                             "--supabase-anon-key", "k", "--out", str(self.out),
+                             "--similar-out", str(self.out.with_name("similar.json")),
+                             "--gmp-cert-out", str(self.out.with_name("gmp_certs.json")),
+                             *extra])
         finally:
             sys.stdout = real
 

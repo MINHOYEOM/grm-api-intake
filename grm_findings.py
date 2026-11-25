@@ -1378,9 +1378,9 @@ def normalize_firm_name(name: str) -> str:
 
 
 # [개인 사업자 2026-11-23] 업체명 칸이 **사람 이름**인 경우(483 수신 업체가 개인 농장·개인 사업자 —
-# 11-23호 'Kenneth F Tesch'·'Matthew A. Leo'). 2026-11-21 대표 결정(공직자·기관 대표 공식 발표 외 개인 실명 금지)에 따라
+# 11-23호 'Bennick F Varch'·'Matthew A. Leo'). 2026-11-21 대표 결정(공직자·기관 대표 공식 발표 외 개인 실명 금지)에 따라
 # 그 자리는 '개인 사업자' 로 쓴다. 표기는 여기 한 곳(`web/render.py` 가 영어 트리에서 같은 표로 바꾼다 — #1876).
-# 판정은 **확실한 꼴만**: 이름 + 가운데 이니셜 + 성(`Kenneth F Tesch`·`Matthew A. Leo`·`Frederick J. Raal`), 법인·업종 낱말 없음.
+# 판정은 **확실한 꼴만**: 이름 + 가운데 이니셜 + 성(`Bennick F Varch`·`Matthew A. Leo`·`Frederick J. Raal`), 법인·업종 낱말 없음.
 # 두 낱말 이름('Novo Nordisk'·'Sanofi Pasteur'·'Excel Vision' — 브리프 483 업체 449곳 실측 8곳이 전부 법인)은 코드가 못 가른다.
 REDACTED_PERSON_BY_LANG = {"ko": "개인 사업자", "en": "Individual business"}
 _PERSON_NAME_RE = re.compile(
@@ -1409,6 +1409,39 @@ def person_firm_name_suspect(name: str, establishment_type: str = "") -> bool:
     if not text or person_firm_name(text) or _ORG_WORD_RE.search(text):
         return False
     return bool(_PERSON_TWO_RE.match(text)) and bool(_INDIVIDUAL_ESTABLISHMENT_RE.search(_text(establishment_type)))
+
+
+# [자격박탈 대상자 2026-11-25] FDA 자격박탈 명령(Federal Register 'Final Debarment Order')은 공식 처분이지만 대상이
+# **민간 개인**이라 11-21 결정상 실명을 싣지 않는다(06-22 호 실발행분). 문서 제목 '<이름>: Final Debarment Order' 와
+# 본문 '… debarring <이름> for/from …' 두 꼴만 잡는다. 법인 낱말이 있으면(회사 자격박탈) 사람이 아니다.
+DEBARRED_PERSON_BY_LANG = {"ko": "[자격박탈 대상자]", "en": "[debarred individual]"}
+_DEBARMENT_TITLE_RE = re.compile(
+    r"(?<![A-Za-z])((?:[A-Z][A-Za-z'\-]*\.?\s+){1,4}[A-Z][A-Za-z'\-]+)\s*[:;]\s*(?:[A-Z][A-Za-z ]{0,40};\s*)?"
+    r"(?:Final\s+)?(?:Debarment|Disqualification)\s+Order")
+_AGENCY_WORD_RE = re.compile(
+    r"\b(?:administration|agency|department|office|service|commission|notice|order|federal|register|hearing|"
+    r"denial|final|proposed|rule|docket|united|states|food|drug)\b", re.IGNORECASE)
+_DEBARRING_RE = re.compile(
+    r"\bdebarring\s+((?:[A-Z][A-Za-z'\-]*\.?\s+){1,4}?[A-Z][A-Za-z'\-]+)(?=\s*(?:,|\(|for\b|from\b|\.|$))")
+
+
+def debarred_person_names(text: str) -> list[str]:
+    """자격박탈 명령 문구 속 개인 이름(순수) — 제목 '<이름>: Final Debarment Order'·본문 'debarring <이름> for …'."""
+    out = []
+    for rx in (_DEBARMENT_TITLE_RE, _DEBARRING_RE):
+        for m in rx.finditer(_text(text)):
+            name = m.group(1).strip()
+            if not (_ORG_WORD_RE.search(name) or _AGENCY_WORD_RE.search(name)) and name not in out:
+                out.append(name)
+    return out
+
+
+def redact_debarred_person(text: str, names: "list[str] | None" = None, lang: str = "en") -> str:
+    """자격박탈 대상자 이름 → 역할 표기(순수). `names` 를 안 주면 그 글에서 찾는다. URL 같은 소문자 꼴은 건드리지 않는다."""
+    label = DEBARRED_PERSON_BY_LANG.get(lang, DEBARRED_PERSON_BY_LANG["en"])
+    for name in sorted(names if names is not None else debarred_person_names(text), key=len, reverse=True):
+        text = re.sub(r"(?<![A-Za-z])" + re.escape(name) + r"(?![A-Za-z])", label, text)
+    return text
 
 
 def redact_person_firm(name: str, lang: str = "ko") -> str:

@@ -91,6 +91,26 @@ class DetailRefreshReport:
     shrink_blocked: int = 0
     shrink_samples: list[dict[str, Any]] = field(default_factory=list)
     pagebreak_samples: list[dict[str, Any]] = field(default_factory=list)
+    # [11-26 미완료 표시] FDA 봇 차단(또는 --limit)으로 도중에 멈추면 숫자가 전체처럼 읽힌다(11-25 dry 가 2,453 중
+    # 2,202 에서 멈췄는데 전체로 보고됨). 멈춘 지점·남은 문서를 보고서 맨 앞 필드로 남기고 --resume-from 으로 잇는다.
+    incomplete: bool = False
+    stop_reason: str = ""
+    total_candidates: int = 0
+    processed: int = 0
+    stopped_at_raw_signal_id: str = ""
+    stopped_at_document_id: str = ""
+    resume_from: str = ""
+    remaining_doc_ids: list[str] = field(default_factory=list)
+
+
+def incomplete_banner(report: dict[str, Any]) -> str:
+    """보고서가 전체를 다 돌지 못했으면 맨 위에 둘 한 줄(순수 함수). 다 돌았으면 빈 문자열."""
+    if not report.get("incomplete"):
+        return ""
+    return (f"⚠ 미완료({report.get('stop_reason') or '?'}): 처리 {report.get('processed', 0)}/후보 "
+            f"{report.get('total_candidates', 0)} · 멈춘 raw_signal_id {report.get('stopped_at_raw_signal_id') or '?'}"
+            f" ({report.get('stopped_at_document_id') or '?'}) · 남은 문서 {len(report.get('remaining_doc_ids') or [])}"
+            f" — 이 숫자는 전체가 아니다. `--resume-from {report.get('stopped_at_raw_signal_id') or '?'}` 로 이어 돌린다.")
 
 
 def _gf():
@@ -439,14 +459,19 @@ def run(
     text_fn: Callable[[str], tuple[str, str]] = _fetch_text,
     patch_fn: Callable[[dict[str, Any], dict[str, Any]], None] | None = None,
     sleep_fn: Callable[[float], None] = time.sleep,
+    resume_from: str | None = None,
 ) -> DetailRefreshReport:
     c = _collector()
-    report = DetailRefreshReport(dry_run=dry_run, since=since, truncated_only=truncated_only)
-    for r in rows:
-        if limit and report.candidates >= limit:
-            break
+    report = DetailRefreshReport(dry_run=dry_run, since=since, truncated_only=truncated_only,
+                                 resume_from=resume_from or "")
+    # 후보를 먼저 다 고른다 — 도중에 멈춰도 '처리 N/후보 M' 과 남은 문서를 정확히 낼 수 있게.
+    # 순서는 raw_signal_id 오름차순(_fetch_rows 와 같음) — --resume-from 이 그 순서의 한 지점을 가리킨다.
+    cands: list[tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]] = []
+    for r in sorted(rows, key=lambda x: str(x.get("raw_signal_id") or "")):
         rid = str(r.get("raw_signal_id") or "")
         doc = str(r.get("document_id") or "")
+        if resume_from and rid < resume_from:
+            continue
         if doc_ids and doc not in doc_ids and rid not in doc_ids:
             continue
         raw = r.get("raw_json")
@@ -456,6 +481,24 @@ def run(
             continue
         if truncated_only and not has_truncated_observation(old):
             continue
+        cands.append((r, raw, old))
+    report.total_candidates = len(cands)
+
+    def _stop(i: int, reason: str) -> None:
+        r_stop = cands[i][0]
+        report.incomplete = True
+        report.stop_reason = reason
+        report.stopped_at_raw_signal_id = str(r_stop.get("raw_signal_id") or "")
+        report.stopped_at_document_id = str(r_stop.get("document_id") or "")
+        report.remaining_doc_ids = [str(x[0].get("document_id") or x[0].get("raw_signal_id") or "")
+                                    for x in cands[i:]]
+
+    for i, (r, raw, old) in enumerate(cands):
+        if limit and report.candidates >= limit:
+            _stop(i, "limit")
+            break
+        rid = str(r.get("raw_signal_id") or "")
+        doc = str(r.get("document_id") or "")
         report.candidates += 1
         text = str(raw.get("fda483_body_full") or "")
         if text:
@@ -475,6 +518,8 @@ def run(
             if status == FDA_BOT_BLOCK:
                 report.failed += 1
                 report.errors.append(f"{doc}: {FDA_BOT_BLOCK}")
+                report.candidates -= 1   # 이 문서는 처리되지 않았다 — 남은 문서에 넣어 다음 실행이 다시 읽는다
+                _stop(i, FDA_BOT_BLOCK)
                 break
             if not text:
                 report.no_text += 1
@@ -558,6 +603,7 @@ def run(
             report.errors.append(f"{doc}: patch_failed:{type(exc).__name__}")
             continue
         report.patched += 1
+    report.processed = report.candidates
     return report
 
 
@@ -572,6 +618,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--limit", type=int, default=None, help="처리 문서 수 상한.")
     p.add_argument("--doc-ids", default="", help="선택: document_id/raw_signal_id 목록(공백·쉼표).")
     p.add_argument("--delay-seconds", type=float, default=FDA_483_PDF_DELAY_SECONDS, help="PDF 요청 간 대기(초).")
+    p.add_argument("--resume-from", default=None,
+                   help="이 raw_signal_id 부터(포함) 잇는다 — 앞 실행 보고서의 stopped_at_raw_signal_id.")
+    p.add_argument("--remaining-ids-path",
+                   help="도중에 멈추면 남은 document_id 를 이 파일에 한 줄씩 쓴다(다 돌면 파일을 만들지 않는다).")
     p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록.")
     p.add_argument("--supabase-url", help="미지정 시 $SUPABASE_URL")
     p.add_argument("--service-role-key", help="미지정 시 $SUPABASE_SERVICE_ROLE_KEY")
@@ -581,6 +631,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
     args = build_arg_parser().parse_args(argv)
     creds = _resolve_credentials(args)
     if creds is None:
@@ -596,12 +647,34 @@ def main(argv: list[str] | None = None) -> int:
         truncated_only=args.truncated_only,
         delay_seconds=args.delay_seconds,
         patch_fn=lambda row, raw: _patch(base_url, service_key, row, raw),
+        resume_from=args.resume_from,
     )
-    payload = json.dumps(asdict(report), ensure_ascii=False, indent=2)
+    data = report_payload(report)
+    payload = json.dumps(data, ensure_ascii=False, indent=2)
+    banner = incomplete_banner(data)
+    if banner:
+        print(banner, file=sys.stderr)
     print(payload)
     if args.report_path:
         Path(args.report_path).write_text(payload + "\n", encoding="utf-8")
-    return 1 if report.failed else 0
+    if args.remaining_ids_path and report.incomplete:
+        Path(args.remaining_ids_path).write_text("\n".join(report.remaining_doc_ids) + "\n", encoding="utf-8")
+    return exit_code(report)
+
+
+_HEAD_FIELDS = ("incomplete", "stop_reason", "processed", "total_candidates",
+                "stopped_at_raw_signal_id", "stopped_at_document_id", "resume_from")
+
+
+def report_payload(report: DetailRefreshReport) -> dict[str, Any]:
+    """보고서 dict — 미완료 표시 필드를 맨 앞에 둔다(숫자만 보고 전체로 읽지 않게)."""
+    data = asdict(report)
+    return {**{k: data.pop(k) for k in _HEAD_FIELDS}, **data}
+
+
+def exit_code(report: DetailRefreshReport) -> int:
+    """실패가 있거나 봇 차단으로 멈추면 1 — 미완료 실행이 초록으로 끝나지 않게."""
+    return 1 if (report.failed or report.stop_reason == FDA_BOT_BLOCK) else 0
 
 
 if __name__ == "__main__":

@@ -37,6 +37,7 @@ from typing import Any
 
 import inject_slots
 import card_weight
+import firm_groups
 import inspection_card
 from grm_taxonomy import is_out_of_scope_483
 
@@ -254,6 +255,32 @@ def merge_fda483_disclosures(cards: list[dict[str, Any]]) -> list[dict[str, Any]
         "목록에 자사 공급망·수급처 시설이 있는지 확인",
         "해당 시 FDA FOIA 원문(PDF) 직접 열람",
     ]
+    # [영문 디제스트 2026-11-20] 한국어 서사를 위에서 통째로 갈아 쓰므로 영문 갈래도 같은 디제스트로 쓴다.
+    # ★리허설 1120j: 대표(fda483-196348)는 기자가 **낱장 카드**로 쓴 en(시사점·점검 없음 — 관찰 원문이 없어
+    #   한국어도 비웠다)을 그대로 들고 나가, 한국어만 디제스트 시사점·점검으로 채워진 반쪽 영어가 됐다 →
+    #   영문 게이트(check_en_slots) exit 1. 접힘은 호 전체를 봐야 정해지므로(샤드마다 1장씩이면 기자는 모른다)
+    #   기자가 막을 수 없다 — 한국어를 쓰는 이 자리에서 영어도 쓴다. 11-02 호 영문 디제스트는 손으로 써서
+    #   건수가 한국어(4건)와 달랐다(11건) — 결정론으로 같은 n 을 쓴다.
+    rep["en"] = {
+        "title_issue": "Multiple 483 inspection records released",
+        "summary": (
+            f"FDA OII FOIA Electronic Reading Room released {n} Form 483 inspection records. "
+            "The original PDFs are public, but the individual observation text could not be obtained "
+            "automatically, so only the list of facilities and inspection dates is summarized."),
+        "key_facts": [
+            f"Records released: {n} (observation text not obtained automatically; original PDFs are public)",
+            f"Representative facility: {rep_fac.replace(' · ', ', ')}, plus {n - 1} others",
+            "Source: FDA OII FOIA Electronic Reading Room",
+        ],
+        "implication": (
+            "Release of inspection records without the observation text is not in itself a signal for "
+            "action. Domestic firms should check whether any facility in their supply chain appears on "
+            "the list and, if so, read the original PDF directly."),
+        "checks": [
+            "Whether any facility in your supply chain or sourcing appears on the list",
+            "If so, read the original FDA FOIA PDF directly",
+        ],
+    }
     rep["merged_count"] = n
     rep["merged_items"] = facilities
     rep["merged_noun"] = "건"
@@ -799,6 +826,17 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     report.adopted = len(adopted_cards)
     report.resources = len(resource_notes)
 
+    # [업체 그룹 묶음 2026-11-23] 화면 묶음은 렌더가 등록 원천(web/data/firm_groups.json)·같은 FEI
+    # 로만 정한다. 여기서는 카드를 바꾸지 않고, 같은 이름 계열인데 한 묶음으로 덮이지 않는 카드를
+    # '그룹 등록 후보'로 알린다(막지 않음). 원천 형식이 깨졌으면(근거 칸 비움 등) 발행을 막는다 —
+    # 렌더가 같은 원천을 읽다 죽기 전에 원인을 조립에서 보이게.
+    try:
+        _fg_reg = firm_groups.load_registry()
+        for line in firm_groups.candidate_lines(adopted_cards, _fg_reg):
+            report.warnings.append(f"[그룹] {line}")
+    except (firm_groups.RegistryError, ValueError) as e:
+        report.errors.append(f"[그룹] {e}")
+
     # 브리프 메타 재계산(assemble_web_brief 규약 미러) — 채택분 기준.
     out = copy.deepcopy(injected)
     out["cards"] = adopted_cards
@@ -921,21 +959,26 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
         source_text = payload.get("source_text") if isinstance(payload, dict) else None
         if not (isinstance(source_text, str) and source_text.strip()):
             continue
-        fresh = _f._extract_483_observations_from_text(source_text)
+        seen: list[str] = []
+        fresh = _f._extract_483_observations_from_text(source_text, seen=seen)
         if not fresh:
             continue                      # degrade — 기존 관찰 유지
+        # [2026-11-23] 건수는 rows 길이가 아니라 원문 번호 표제에서 센다(fda483_observation_count
+        # — 규칙의 단일 출처). 단정 못 하면 None → count 키를 비운다(조용히 틀린 숫자 금지).
+        count = _f.fda483_observation_count(fresh, seen)
         before = [(o.get("number"), o.get("deficiency"), o.get("detail"))
                   for o in (dd or {}).get("observations", []) if isinstance(o, dict)]
         after = [(o["number"], o["deficiency"], o["detail"]) for o in fresh]
-        if before == after:
+        if before == after and (dd or {}).get("count") == count:
             continue
         # 관찰과 무관한 블록 필드(실사관 이름 `inspectors` 등)는 그대로 물려준다 — 관찰만 바꾼다.
         # [2026-10-27] 종전엔 블록을 새로 만들어 `inspectors` 가 재추출 때마다 사라졌다.
-        refreshed: dict[str, Any] = {
-            "type": "fda_483_observations", "count": len(fresh), "observations": fresh,
-        }
+        refreshed: dict[str, Any] = {"type": "fda_483_observations"}
+        if count is not None:
+            refreshed["count"] = count
+        refreshed["observations"] = fresh
         refreshed.update({k: v for k, v in (dd or {}).items()
-                          if k not in refreshed and k != "text_source"})
+                          if k not in refreshed and k not in ("text_source", "count")})
         # [OCR 출처 표기 2026-07-27] 이 `source_text` 가 원문 텍스트층인지 우리 OCR 판독인지
         # 그대로 물려준다 — 판독물을 "원문"이라고 표시하지 않기 위해서다. 소급 복구 패치
         # (`fda483_ocr_backfill.py`)가 `source_text_status` 를 함께 싣는다. 없으면 기존과 동일
@@ -948,7 +991,8 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
         report.refreshed_483_ids.append(str(card.get("id")))
         report.warnings.append(
             f"[483] {card.get('id')}: 관찰 원문 재추출 — 번호 "
-            f"{[b[0] for b in before]} → {[a[0] for a in after]} "
+            f"{[b[0] for b in before]} → {[a[0] for a in after]} · 건수 "
+            f"{(dd or {}).get('count')} → {count if count is not None else '비움(번호 불연속 — 단정 불가)'} "
             f"({'스캐폴드가 낡은 파서 산출' if before else '스캐폴드에 블록 없음 — 신설'})")
 
 
@@ -1234,6 +1278,7 @@ def _refresh_wl_violations(out: dict[str, Any], deep_deltas: dict[str, Any],
     바뀐 카드는 report 에 남긴다 — 조용한 주입 금지.
     """
     import collect_intake as _ci          # 지연 import — 조립 경로가 수집기 로드에 묶이지 않게
+    from card_scaffold import wl_violation_row
 
     for card in out.get("cards", []):
         if card.get("card_type") != "Warning Letter":
@@ -1245,7 +1290,7 @@ def _refresh_wl_violations(out: dict[str, Any], deep_deltas: dict[str, Any],
         source_text = payload.get("source_text") if isinstance(payload, dict) else None
         if not (isinstance(source_text, str) and source_text.strip()):
             continue
-        fresh = _ci.extract_wl_violations_from_text(source_text)
+        fresh = [wl_violation_row(v) for v in _ci.extract_wl_violations_from_text(source_text)]   # 스캐폴드와 같은 행 함수(heading 유지)
         if not fresh:
             continue                      # degrade — 기존 상태 유지
         before = [(v.get("number"), v.get("statement")) for v in (dd or {}).get("violations", [])

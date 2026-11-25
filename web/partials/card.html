@@ -38,10 +38,14 @@
 {%- macro insp_row(r) -%}
 <li style="display:flex;gap:8px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line)"><span class="mono" style="flex:none;min-width:2.4em;font-size:12px;color:var(--muted)">{{ r.no }}</span>{% if r.sev %}<span class="dt-badge" style="flex:none{% if r.sev_cls != 'critical' %};color:var(--body-s);background:var(--strong){% endif %}">{{ r.sev }}</span>{% endif %}<span style="flex:1;min-width:0;font-size:14.5px;line-height:1.5;color:var(--ink)">{% if r.area %}<span class="dt-law">{{ r.area }}</span> · {% endif %}{{ r.text }}{% if r.clause %} <span class="dt-law">{{ r.clause }}</span>{% endif %}{% if r.more %}<span style="display:block;font-size:13px;color:var(--muted)">{{ r.more }}</span>{% endif %}{% if r.note %}<span style="display:block;font-size:12.5px;color:var(--muted)">→ {{ r.note }}</span>{% endif %}</span></li>
 {%- endmacro -%}
-<article class="card{% if card.is_evA %} evA{% endif %}{% if card.is_domestic %} dom{% endif %}" id="{{ card.anchor }}" data-card-type="{{ card.card_type }}" data-signal-tier="{{ card.signal_tier }}" data-evidence="{{ card.evidence_level }}"{% if card.firm_key %} data-firm-key="{{ card.firm_key }}"{% endif %}{% if card.weight %} data-weight="{{ card.weight }}"{% if card.list_tag %} data-tag="{{ card.list_tag }}"{% endif %}{% endif %}>
+<article class="card{% if card.is_evA %} evA{% endif %}{% if card.is_domestic %} dom{% endif %}" id="{{ card.anchor }}" data-card-type="{{ card.card_type }}" data-signal-tier="{{ card.signal_tier }}" data-evidence="{{ card.evidence_level }}"{% if card.firm_key %} data-firm-key="{{ card.firm_key }}"{% endif %}{% if card.weight %} data-weight="{{ card.weight }}"{% if card.list_tag %} data-tag="{{ card.list_tag }}"{% endif %}{% endif %}{% if card.old_insp %} data-old-insp="{{ card.old_insp.label }} · {{ card.old_insp.date_label }}"{% endif %}>
   {#- [브리프 카드 A안 2026-11-16] 표지 상자·이모지·[유형 · 기관] 줄 대신 제목 위 글자 한 줄. -#}
   {%- if card.kicker %}
   <div class="kline">{% for k in card.kicker %}<span>{{ k }}</span>{% endfor %}</div>
+  {%- endif %}
+  {%- if card.old_insp %}
+  {#- [업체 그룹 묶음 2026-11-23] 실사일이 게시일보다 2년 넘게 앞선 카드 — 실사일을 머리에 올린다. grm.css 프리즈 — 인라인. -#}
+  <p class="old-insp" data-insp="{{ card.old_insp.date }}" style="margin:6px 0 0;font-size:13px;line-height:1.5;color:var(--muted)"><span style="display:inline-block;padding:1px 8px;margin-right:6px;border:1px solid var(--coral);border-radius:999px;color:var(--coral-2);font-weight:600">{{ card.old_insp.label }}</span><b style="color:var(--ink)">{{ card.old_insp.date_label }}</b> · {{ card.old_insp.lag }}</p>
   {%- endif %}
   <div class="c-title">{{ card.headline_target }}{% if card.title_issue %} — <b>{{ card.title_issue }}</b>{% endif %}</div>
   {%- if card.hook_line %}
@@ -284,7 +288,7 @@
   <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>{{ _("위반항목 상세") }} <span class="sub">· {{ _("{n}건", n=dd.count) }} · {{ _("원문 기반") }}</span></summary>
     {%- for r in dd.violations %}
     <div class="dt-row obs-row">
-      <div class="dt-h"><span class="obs-num">{{ _("위반 {n}", n=r.number) }}</span>{% if r.citation %}<span class="dt-law">{{ r.citation }}</span>{% endif %}</div>
+      <div class="dt-h"><span class="obs-num">{{ _("위반 {n}", n=r.number) }}</span>{% if r.citation %}<span class="dt-law">{{ r.citation }}</span>{% endif %}{% if r.heading %}<span class="dt-chip">{{ r.heading_ko or r.heading }}</span>{% endif %}</div>
       {%- if r.statement_ko %}
       <div class="obs-orig"><span class="viol-lang">{{ _("원문 · FDA Warning Letter") }}</span><p class="obs-en">{{ r.statement }}</p></div>
       <div class="obs-ko"><span class="viol-lang ko">{{ _("국문 해석") }}</span><p class="dt-sum">{{ r.statement_ko }}</p></div>

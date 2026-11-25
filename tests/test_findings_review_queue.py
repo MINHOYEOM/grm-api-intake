@@ -64,6 +64,26 @@ class SummarizeTest(unittest.TestCase):
         self.assertEqual(r["status"], "overdue")
         self.assertEqual(r["unknown_age"], 1)
 
+    def test_out_of_scope_rows_get_longer_deadline(self):
+        # #1759: 식품 업체 non_pharma WL 26건이 6.9일 → 경보. 범위 밖은 14일 기한.
+        rows = [_row(f"finding-n{i}", 6.9, scope="non_pharma") for i in range(26)]
+        r = q.summarize(rows, now=_NOW, max_age_days=3)
+        self.assertEqual(r["status"], "ok")
+        self.assertEqual(r["overdue"], 0)
+        self.assertEqual(r["out_of_scope_waiting"], 26)
+        self.assertEqual(r["out_of_scope_max_age_days"], 14)
+
+    def test_out_of_scope_past_deadline_still_alerts_and_ok_scope_keeps_short_deadline(self):
+        rows = [_row("finding-old", 15, scope="non_pharma"), _row("finding-ok", 4, scope="ok"),
+                _row("finding-new", 6.9, scope="non_pharma")]
+        r = q.summarize(rows, now=_NOW, max_age_days=3)
+        self.assertEqual([x["finding_id"] for x in r["overdue_rows"]], ["finding-old", "finding-ok"])
+        self.assertEqual(r["out_of_scope_waiting"], 1)
+
+    def test_out_of_scope_unknown_age_still_overdue(self):
+        r = q.summarize([_row("finding-x", None, scope="non_pharma")], now=_NOW, max_age_days=3)
+        self.assertEqual(r["status"], "overdue")
+
     def test_listing_is_capped_and_truncation_is_reported(self):
         rows = [_row(f"finding-{i:03d}", 10 + i) for i in range(q._MAX_LISTED + 5)]
         r = q.summarize(rows, now=_NOW, max_age_days=3)

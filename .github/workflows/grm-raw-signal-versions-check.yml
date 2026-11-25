@@ -8,6 +8,8 @@ on:
       - 'web/migrations/*raw_signal*'
       - 'tests/sql/raw_signal_versions.sql'
       - 'tests/sql/raw_signals_write_lock.sql'
+      - 'web/migrations/*findings_superseded*'
+      - 'tests/sql/findings_superseded.sql'
       - '.github/workflows/grm-raw-signal-versions-check.yml'
   workflow_dispatch:
 permissions:
@@ -27,3 +29,8 @@ jobs:
         run: |
           sudo -u postgres createdb raw_signals_write_lock_test
           sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d raw_signals_write_lock_test -f tests/sql/raw_signals_write_lock.sql
+      # [166 2026-11-24] findings '대체됨' 표식 — 숨김 조건 재확인·기록·되돌리기·권한.
+      - name: Check findings supersede (166) in an isolated PostgreSQL database
+        run: |
+          sudo -u postgres createdb findings_superseded_test
+          sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d findings_superseded_test -f tests/sql/findings_superseded.sql

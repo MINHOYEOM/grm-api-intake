@@ -5,7 +5,8 @@
 
 | 팀 | 일 | 지시문 | 모델 | 클라우드 | PC 백업 | 클라우드가 했다는 표식 |
 |---|---|---|---|---|---|---|
-| 브리프편집팀 | 월요일 브리프 | `editorial/` | Sonnet·(Opus 델타 워커·Sonnet 심층 워커, 가변 샤드)·Sonnet | 월 07:20·07:45(재시도)·08:00(워커 7)·08:40(보강 4)·09:05 | v16 Routine 월 09:30 | handoff CONSUMED |
+| 브리프편집팀 | 월요일 브리프 | `editorial/` | Sonnet·(Opus 델타 워커·Sonnet 심층 워커, 가변 샤드)·Sonnet | 월 07:20·07:45(재시도)·08:00(워커 7)·08:40(보강 4)·08:45(교열 1차)·09:02(재작업)·09:12(교열 2차) | 없음(v16 백업 Routine 꺼짐 — 아래 백업 v17) | `copyedit.json` `published: true` |
+| 브리프편집팀 | 월요일 브리프 백업 v17 | `editorial/backup.md` | Opus | 월 09:30 | 없음 | `company/run/<날짜>/backup/copyedit.json` `status: 완료`(편집팀이 넘긴 주는 아무것도 쓰지 않는 것이 정상) |
 | 용어·교육팀 | 주간 용어 추가 | `education/glossary-weekly.md` | Sonnet | 화 08:00 | 화 10:17 | 브랜치 `claude/glossary-weekly-YYYYWW` 또는 `glossary(weekly): YYYYWW` PR |
 | 용어·교육팀 | 용어 그림 일일 배치 | `education/glossary-fig-daily.md` | Sonnet | 매일 21:00 | (PC 작업은 꺼짐) | 브랜치 `claude/glossary-fig-daily-YYYYMMDD-HHMM` PR |
 | 용어·교육팀 | 주간 퀴즈 | `education/quiz-weekly.md` | Sonnet | 월 12:30·16:30 | 월 15:00·19:00 | `quiz_bank.json` 의 이번 주 문항 · 브랜치 `claude/quiz-weekly-YYYYWW` |
@@ -22,20 +23,21 @@
 등록은 **매주 월요일 13:30 KST(UTC 04:30, `30 4 * * 1`)** 로 걸고, 지시문이 "이번 달 결과가 이미 있으면 끝"으로 첫 월요일 외 실행을 막는다 — 첫 월요일에 못 돌았으면(보류·PC 꺼짐 아님·크론 지각) 다음 월요일이 자동으로 따라잡는다.
 실패하면 `상태: 보류` 로 끝나며 보류는 "이미 함"이 아니다(다음 월요일에 다시 시도).
 
-## 백업 Routine "Global Regulatory Monitoring [GRM]" (월 09:30)의 역할
-이름은 그대로 둔다(변경은 대표 확인 후). 평소의 발행 주체가 아니다. **편집팀 발행이 코드 게이트를 못 넘겨 handoff 가 OPEN 으로 남았을 때,
-같은 형식(`docs/prompts/GRM_Prompt_v16.md` 델타)으로 카드 글을 만들어 Notion 에 예치하는 보조 발행**을 한다.
-예치된 델타는 편집팀 것과 같은 길(발행 브릿지 → 조립 게이트 → Admin 승인)을 탄다 — 게이트가 느슨해지지 않는다.
-편집팀이 마감(handoff CONSUMED)까지 끝낸 주에는 돌 일이 없다. 편집팀이 못 넘긴 이유(게이트 거부 메시지)는
-`company/run/<날짜>/copyedit.json` 의 `code_gate` 에 남으니, 백업이 돌았다면 그 파일부터 본다.
+## 백업 Routine "Global Regulatory Monitoring [GRM]" (월 09:30) — 꺼짐
+Notion 을 발행 길에서 뺄 때(11-23 호 편집팀 발행 성공 뒤, 대표 결정) 함께 껐다. 이 Routine 은 Notion handoff 를 읽고 Notion 에 델타를 예치했는데,
+저장소 변수 `GRM_INTAKE_NOTION=off` 이후로 수집기는 Notion handoff 를 만들지 않고 발행 브릿지는 Notion 예치를 읽지 않는다.
+그 자리는 **백업 v17**(`company/editorial/backup.md`, 월 09:30 · 별도 Routine "GRM 브리프 백업 v17")이 맡는다 — 저장소 handoff 를 읽고,
+발행 브릿지가 편집팀 반납을 쓸 수 없을 때만(판정 `company/editorial/backup_gate.py`) 같은 브랜치의 `company/run/<날짜>/backup/` 에 편집팀과 같은 파일로 반납한다.
+편집팀 반납과 백업 반납이 둘 다 있으면 브릿지는 편집팀 것을 쓰고, main 에는 한 날짜에 하나만 기록된다.
+백업도 못 넘긴 호는 종합상황실(월 10:45)이 `★델타 없음` 으로 잡고 대표가 정한다. 이유는 `copyedit.json` 의 `code_gate` 와 `backup/backup.md` 첫 줄에 남는다.
 
 ## 한눈에 보기 — 누가 언제 무슨 일을 하고, 안 돌면 어떻게 되나
 시각은 KST. 상세는 위 표와 각 지시문. "확인 필요" = 문서에 근거가 없어 적지 않은 항목.
 
 | Routine | 언제 | 무슨 일 | 안 돌면 |
 |---|---|---|---|
-| 브리프편집팀 (데스크·기자·교열) | 월 07:20 · 07:45 · 08:00 · 08:40 · 09:05 | 월요일 주간 브리프 카드의 글을 쓰고 교열해 Notion 에 예치, 마감 | 09:30 백업 Routine 이 이어받는다(handoff 가 OPEN 인 한) |
-| 백업 "Global Regulatory Monitoring [GRM]" | 월 09:30 | 편집팀이 못 끝냈을 때 같은 형식으로 델타를 만들어 Notion 에 쓰는 보조 발행 | 마지막 안전망이라 대신할 곳이 없다. 발행 브릿지(월 07:07~13:37, 30분 간격)가 예치를 못 찾으면 워치독이 경보 이슈를 연다 → 사람이 확인 |
+| 브리프편집팀 (데스크·기자·교열) | 월 07:20 · 07:45 · 08:00 · 08:40 · 08:45 · 09:02 · 09:12 | 월요일 주간 브리프 카드의 글을 쓰고 교열해 실행 브랜치에 반납(발행 브릿지가 가져간다) | 백업 v17(월 09:30)이 이어받는다 |
+| 브리프편집팀 백업 v17 | 월 09:30 (09:40 까지 편집팀 대기 · 11:00 시작 시한) | 편집팀이 못 넘긴 호를 혼자 마감해 `backup/` 에 반납 | 종합상황실 10:45 가 `★델타 없음` 으로 잡고 대표가 정한다 |
 | 용어·교육팀 — 주간 용어 추가 | 화 08:00 | 용어사전에 새 용어를 더해 PR | PC 백업(화 10:17) |
 | 용어·교육팀 — 용어 그림 일일 배치 | 매일 21:00 | 용어 개념 그림을 검토해 PR(맞는 그림이 없으면 0장이 정상) | PC 백업 없음(꺼짐). 빠진 날을 나중에 메우는지는 확인 필요 |
 | 용어·교육팀 — 주간 퀴즈 | 월 12:30 · 16:30 | 이번 주 퀴즈 문항을 `quiz_bank.json` 에 추가 | PC 백업(월 15:00 · 19:00) |

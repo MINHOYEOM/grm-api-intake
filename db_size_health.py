@@ -3,8 +3,12 @@
 
 왜: 2026-11-12 실측 366MB / 500MB(73%). 한도를 넘으면 DB 가 읽기 전용이 돼 수집이 멈춘다. 154 가 하루
 한 번 크기를 기록하고(ops_db_size_daily), 이 점검이 RPC `grm_db_size_status()`(service_role 전용)를 읽어
-  1) 사용률이 WARN_RATIO(80%) 이상인가
+  1) 사용률이 WARN_RATIO(85%) 이상인가
   2) 최근 하루 증가량으로 한도까지 RUNWAY_DAYS(60일) 미만인가
+
+165(2026-11-20) 보정: 한도는 보수 기준 500,000,000 B · DB 전체 합(template 포함, Supabase 문서 SQL). status 가
+`used_bytes`(DB 전체 합)를 주면 그것으로, 없으면(165 미적용) 종전 `db_bytes` 로 센다. 하루 증가량은 일회성
+적재(11-16 임베딩 +21MB)에 끌려가지 않게 `growth_7d_median_per_day`(7일 중앙값)를 먼저 쓴다.
   3) 기록이 36시간 넘게 멈췄는가(pg_cron 정지)
 중 하나라도 맞으면 exit 1 → 전용 라벨 이슈(운영 센터 infra). --status-json 으로 네트워크 없이 판정만 한다.
 
@@ -27,7 +31,7 @@ from grm_cli import normalize_supabase_url, resolve_supabase_service_credentials
 RPC_NAME = "grm_db_size_status"
 SCHEMA_VERSION = "grm-db-size-health/v1"
 DEFAULT_TIMEOUT_SECONDS = 30.0
-WARN_RATIO = 0.80
+WARN_RATIO = 0.85   # 165: 보수 기준 85%(425MB)
 RUNWAY_DAYS = 60
 STALE_HOURS = 36
 MB = 1024 * 1024
@@ -44,12 +48,20 @@ def _parse_ts(value: Any) -> dt.datetime | None:
 
 
 def growth_per_day(status: dict[str, Any]) -> float | None:
-    """가장 짧은 창의 하루 증가량(7일 → 28일 → 전체 순). 기록이 모자라면 None."""
-    for key in ("growth_7d_per_day", "growth_28d_per_day", "growth_all_per_day"):
+    """하루 증가량 — 7일 중앙값(165) → 7일 평균 → 28일 → 전체 순. 기록이 모자라면 None."""
+    for key in ("growth_7d_median_per_day", "growth_7d_per_day", "growth_28d_per_day", "growth_all_per_day"):
         value = status.get(key)
         if value is not None:
             return float(value)
     return None
+
+
+def used_bytes(status: dict[str, Any]) -> float:
+    """한도와 견줄 사용량 — 165 의 used_bytes(DB 전체 합)가 있으면 그것, 없으면 db_bytes."""
+    value = status.get("used_bytes")
+    if value is None:
+        value = status.get("db_bytes")
+    return float(value or 0)
 
 
 def runway_days(status: dict[str, Any]) -> float | None:
@@ -57,7 +69,7 @@ def runway_days(status: dict[str, Any]) -> float | None:
     growth = growth_per_day(status)
     if growth is None or growth <= 0:
         return None
-    left = float(status.get("limit_bytes") or 0) - float(status.get("db_bytes") or 0)
+    left = float(status.get("limit_bytes") or 0) - used_bytes(status)
     return max(left, 0.0) / growth
 
 
@@ -67,7 +79,7 @@ def evaluate(status: dict[str, Any], *, now: dt.datetime | None = None) -> list[
     now = now or dt.datetime.now(dt.timezone.utc)
     if not status.get("db_bytes"):
         return ["DB 크기 기록이 없습니다 — 154 미적용 또는 pg_cron grm-db-size-daily 정지"]
-    used = float(status.get("db_bytes") or 0)
+    used = used_bytes(status)
     limit = float(status.get("limit_bytes") or 0) or 1.0
     ratio = used / limit
     if ratio >= WARN_RATIO:
@@ -132,6 +144,7 @@ def main(argv: list[str] | None = None) -> int:
     days = runway_days(status)
     report = {"schema_version": SCHEMA_VERSION, "ok": not problems, "problems": problems,
               "db_mb": round(float(status.get("db_bytes") or 0) / MB, 1),
+              "used_mb": round(used_bytes(status) / MB, 1),
               "limit_mb": round(float(status.get("limit_bytes") or 0) / MB, 1),
               "used_ratio": status.get("used_ratio"), "rows": status.get("rows"),
               "growth_mb_per_day": (round(growth_per_day(status) / MB, 2)
@@ -144,7 +157,7 @@ def main(argv: list[str] | None = None) -> int:
         for line in problems:
             print(f"[db-size] 문제: {line}")
         return 1
-    print(f"[db-size] 정상 · {report['db_mb']}MB / {report['limit_mb']}MB · 한도까지 "
+    print(f"[db-size] 정상 · {report['used_mb']}MB / {report['limit_mb']}MB · 한도까지 "
           f"{report['runway_days'] if report['runway_days'] is not None else '증가 없음'}일")
     return 0
 

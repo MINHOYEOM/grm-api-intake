@@ -56,6 +56,8 @@ import zipfile
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable
 
+from grm_cli import BulkWriteError, BulkWriteRun
+
 PARSER_VERSION = "grm-deficiency-examples/v1"
 DEFAULT_USER_AGENT = "GRM-Intake/1.1 (+github-actions)"  # grm_common.DEFAULT_USER_AGENT 와 같은 값
 
@@ -804,8 +806,6 @@ class Db:
         return r.json()
 
 
-CHUNK = 800
-
 
 def source_payload(src: Source, sha: str, size: int, headers: dict[str, str], n: int) -> dict[str, Any]:
     return {"source_key": src.key, "agency": src.agency, "year": src.year, "lang": src.lang,
@@ -814,16 +814,20 @@ def source_payload(src: Source, sha: str, size: int, headers: dict[str, str], n:
             "parser_version": PARSER_VERSION}
 
 
-def write_source(db: Db, src: Source, rows: list[Row], meta: dict[str, Any]) -> dict[str, Any]:
+def write_source(db: Db, src: Source, rows: list[Row], meta: dict[str, Any],
+                 *, bulk: BulkWriteRun | None = None) -> dict[str, Any]:
     """chunk 단위 upsert → finalize(이번에 없는 row_no 삭제 + 원천 장부 갱신). 같은 입력 재실행 = 변화 0."""
     totals = {"inserted": 0, "updated": 0, "unchanged": 0}
     payload_rows = [r.to_payload() for r in rows]
-    for i in range(0, len(payload_rows), CHUNK):
+
+    def send(batch, _offset):
         res = db.rpc("deficiency_examples_upsert",
                      {"p_source_key": src.key, "p_agency": src.agency, "p_year": src.year,
-                      "p_lang": src.lang, "p_rows": payload_rows[i:i + CHUNK]})
+                      "p_lang": src.lang, "p_rows": batch})
         for k in totals:
             totals[k] += int(res.get(k, 0))
+
+    (bulk or BulkWriteRun()).write(payload_rows, send)
     fin = db.rpc("deficiency_examples_finalize",
                  {"p_source": meta["source"], "p_keep": [r.row_no for r in rows]})
     totals["deleted"] = int(fin.get("deleted", 0))
@@ -841,6 +845,7 @@ def run(*, apply: bool, only: set[str] | None, fetch: Callable[[str], tuple[byte
     report: dict[str, Any] = {"mode": "apply" if apply else "dry-run", "parser_version": PARSER_VERSION,
                               "run_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
                               "sources": [], "failures": [], "failure_kind": ""}
+    bulk = BulkWriteRun()
     known: dict[str, str] = {}
     if apply and db is not None:
         try:
@@ -886,7 +891,12 @@ def run(*, apply: bool, only: set[str] | None, fetch: Callable[[str], tuple[byte
             continue
         meta["source"] = source_payload(src, sha, len(data), headers, len(rows))
         try:
-            ent["write"] = write_source(db, src, rows, meta)
+            ent["write"] = write_source(db, src, rows, meta, bulk=bulk)
+        except BulkWriteError as exc:
+            ent["error"] = f"db: {exc}"
+            report["failures"].append(f"db:{src.key}")
+            report["failure_kind"] = "db"
+            break
         except Exception as exc:  # noqa: BLE001
             ent["error"] = f"db: {exc}"
             report["failures"].append(f"db:{src.key}")

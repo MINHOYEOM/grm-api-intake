@@ -1,0 +1,578 @@
+[
+  {
+    "finding_id": "finding-3e2d4e1421b896b319c13258",
+    "finding_text": "1.혜원클린프리미엄보건용마스크(KF94)(흰색): 품질부적합(분진포집효율)",
+    "finding_text_ko": "혜원클린프리미엄보건용마스크(KF94)(흰색)는 품질부적합(분진포집효율)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4b0e611b246bae765c21f94d",
+    "finding_text": "Written procedures for cleaning and calibration ofequipment are not adequately described or fully followed.",
+    "finding_text_ko": "장비의 세척 및 교정에 관한 절차서가 충분히 기술되어 있지 않거나 충분히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9308fcbcee2e87e84f72ffbf",
+    "finding_text": "Process validation activities do not adequately demonstrate that the manufacturing process can reproducibly manufacture drug substance meeting predetermined quality attributes.",
+    "finding_text_ko": "공정 밸리데이션 활동이 제조공정이 사전에 정한 품질 특성을 충족하는 원료의약품을 재현성 있게 제조할 수 있음을 충분히 입증하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cc5d10d8fee95ad7a89501e5",
+    "finding_text": "닥터피앤비프리미엄보건용마스크(KF94)(흰색): 품질부적합(분진포집효율)",
+    "finding_text_ko": "닥터피앤비프리미엄보건용마스크(KF94)(흰색)는 품질부적합(분진포집효율)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d77769254b8caef758f13c58",
+    "finding_text": "브이핏황사방역마스크(KF94)(흰색): 품질부적합(분진포집효율)",
+    "finding_text_ko": "브이핏황사방역마스크(KF94)(흰색)는 품질부적합(분진포집효율)이다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-723c01e1a269b42379aa36bc",
+    "finding_text": "자연세상목단피: 이산화황",
+    "finding_text_ko": "자연세상목단피는 이산화황이 문제로 지적되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8e92061c2eb1a73830e44912",
+    "finding_text": "Written records of investigations into unexplained discrepancies, the failure of a batch or any of its components to meet specifications, do not always include appropriate documentation, conclusions, and follow-up.",
+    "finding_text_ko": "원인불명의 불일치, 그리고 배치 또는 그 구성 성분이 규격을 충족하지 못한 경우에 대한 조사 기록에 적절한 문서화, 결론 및 후속조치가 항상 포함되어 있지는 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8eb1a1ff38a7e24432cedc8a",
+    "finding_text": "With the current acceptance criteria of the , there is insufficient data to support that the current cleaning of the can assure no eybetween vaccine products when the same are used inproduction with different",
+    "finding_text_ko": "현재의 허용기준으로는, 서로 다른 제품을 생산할 때 동일한 설비를 사용하는 경우 현행 세척으로 백신 제품 간 교차오염이 없음을 보증할 수 있다고 뒷받침하기에 데이터가 불충분하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8ef180ad82ad997ffa4e94aa",
+    "finding_text": "Buildings used for the production and storage are not maintained in a good state of repair.",
+    "finding_text_ko": "생산 및 보관에 사용되는 건물이 양호한 상태로 유지·보수되고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8ef95a16579c14e2b6c71a22",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing.",
+    "finding_text_ko": "품질관리 부서의 책임과 절차가 문서화되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8fa617e46e417acff4b7f091",
+    "finding_text": "Thegyay method used during the assay testing of®® has not been proven to be stability indicating.",
+    "finding_text_ko": "의 함량시험에 사용된 분석법이 안정성 지시(stability indicating) 특성을 가진다는 것이 입증되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-90cdf3dbf001145f90486553",
+    "finding_text": "The written stability testing program is not consistently followed, evidencing a lack of adequate Quality Unit oversight over the stability testing process and its associated controls, thereby compromising the integrity and reliability of stability data generated for drug substances and intermediates.",
+    "finding_text_ko": "문서화된 안정성시험 프로그램이 일관되게 준수되지 않고 있으며, 이는 품질부서의 안정성시험 공정 및 관련 관리에 대한 감독이 부족함을 보여 주고, 그 결과 원료의약품 및 중간체에 대해 생성된 안정성 데이터의 완전성과 신뢰성을 훼손한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-931cd5c56f1138cbb6ddcd0a",
+    "finding_text": "Samples taken of in-process materials for determination ofconformance to specifications are not representative.",
+    "finding_text_ko": "규격 적합성을 판정하기 위해 채취한 공정 중 물질의 시료가 대표성이 없다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-932b4ff153b8654dcb9defa2",
+    "finding_text": "A risk-based approach to the control of the appropriate processes needed for the quality management system has not been applied.",
+    "finding_text_ko": "품질경영시스템에 필요한 공정의 관리에 위험 기반 접근법이 적용되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9427b6aaa16a2e59f069147e",
+    "finding_text": "You lack personnel with the necessary background and training to perform their assigned functions.",
+    "finding_text_ko": "배정된 업무를 수행하는 데 필요한 배경지식과 교육훈련을 갖춘 인력이 부족하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95199fbb2b4ca9fb00134d00",
+    "finding_text": "You did not validate all test methods THIS.",
+    "finding_text_ko": "모든 시험방법을 밸리데이션하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9701ac0ab246e5b2d2601e60",
+    "finding_text": "Complaint handling records were not adequately maintained.",
+    "finding_text_ko": "불만 처리 기록이 적절하게 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-971632eac230ba940d0db631",
+    "finding_text": "Reserve samples are not always handled appropriately and/or retained is representative or consistent of finished drug substance or (b) (4) configuration being distributed and/or marketed.",
+    "finding_text_ko": "보관용 검체(reserve sample)가 항상 적절하게 취급되지 않으며, 유통 및/또는 판매되는 완제 원료의약품 또는 (b) (4) 구성을 대표하거나 일관되게 보관되고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-972c69c50b7ab1aeccc07f6c",
+    "finding_text": "Procedures describing the handling of all written and oral complaints regarding a drug product are not followed.",
+    "finding_text_ko": "완제의약품에 관한 모든 서면 및 구두 불만의 처리 절차가 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-97e7527d8374ebb9d4436056",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리 부서의 책임과 절차가 충분히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-99711200a075b10224008505",
+    "finding_text": "Your manufacturing process foro drug product is not consistently producing a product that meets its established specifications.",
+    "finding_text_ko": "귀사의 완제의약품 제조공정이 설정된 규격을 충족하는 제품을 일관되게 생산하지 못하고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9af054047f99a0cb56ae5d8c",
+    "finding_text": "Buildings used in the manufacturing, processing and holding of a drug product are not maintained in a good state of repair,",
+    "finding_text_ko": "완제의약품의 제조, 가공 및 보관에 사용되는 건물이 양호한 상태로 유지·보수되고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b6bf60af705ebbce853ee0d",
+    "finding_text": "Lack of appropriate controls to prevent contaminations of manufactured drug substances.",
+    "finding_text_ko": "제조된 원료의약품의 오염을 방지하기 위한 적절한 관리가 부족하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9bf6e606824560084b121909",
+    "finding_text": "선일강활: 중금속(카드뮴)",
+    "finding_text_ko": "선일강활은 중금속(카드뮴)이 문제로 지적되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c534e51290176613a5104e8",
+    "finding_text": "There is a failure to thoroughly review the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치 또는 그 구성 성분이 규격을 충족하지 못한 경우, 해당 배치가 이미 유통되었는지 여부와 관계없이 이를 철저히 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c7dd7406f297f1136ed1986",
+    "finding_text": "Procedures designed to prevent objectionable microorganisms in drug products not required to be sterile are not established and written.",
+    "finding_text_ko": "무균이 요구되지 않는 완제의약품에서 유해 미생물(objectionable microorganisms)을 방지하기 위한 절차가 수립·문서화되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9d27c989cdae91b2ba4da1d1",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "원인불명의 불일치 및 배치 또는 그 구성 성분이 규격을 충족하지 못한 경우, 해당 배치가 이미 유통되었는지 여부와 관계없이 이를 철저히 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9e408272d1d4edfc0d9fc2e5",
+    "finding_text": "Equipment and utensils are not sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변화시킬 수 있는 오염을 방지하기 위해 장비와 기구를 적절한 주기로 위생처리(sanitize)하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9e408465e12afcb3e05d2abb",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리 부서의 책임과 절차가 문서화되어 있지 않고 충분히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f6c7c7efd4eadbd8716013a",
+    "finding_text": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to aseptic processing of drug products.",
+    "finding_text_ko": "완제의약품의 무균공정(aseptic processing) 관련 작업에서 오염이나 혼동을 방지하기 위한 구분되거나 정해진 구역이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9fd8bae5363fbd220deee873",
+    "finding_text": "better than or equal the to the USP method.",
+    "finding_text_ko": "USP 방법과 같거나 그보다 우수하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a0cb6097094a32569ec99487",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing or fully followed.",
+    "finding_text_ko": "품질관리 부서의 책임과 절차가 문서화되어 있지 않거나 충분히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a1557acb4a80b4a459460c1b",
+    "finding_text": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to aseptic processing of drug products.",
+    "finding_text_ko": "완제의약품의 무균공정(aseptic processing) 관련 작업에서 오염이나 혼동을 방지하기 위한 구분되거나 정해진 구역이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a15b1b4b129d375c666f0317",
+    "finding_text": "Adequate records are not maintained to ensure complete accountability and traceability of recovered solvents used in the manufacture of APIs.",
+    "finding_text_ko": "원료의약품(API) 제조에 사용된 회수 용매의 전체 수불 및 추적성을 보장하기 위한 기록이 적절하게 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a266c427f811f342e76de09e",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established.",
+    "finding_text_ko": "무균을 표방하는 완제의약품의 미생물 오염을 방지하기 위한 절차가 수립되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a273b1e7b4679d2b30a38c7d",
+    "finding_text": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)). You failed to exercise appropriate controls over your computerized systems. During the inspection, you admitted to preserving raw chromatographic data but failing to retain the processed chromatograms. Additionally, you lacked adequate controls for the spreadsheets and documents used for CGMP data entry, review, and retention. During the inspection, our investigator identified several uncontrolled and unlocked worksheets containing CGMP trending data for the (b)(4) system, leaving the data vulnerable to alteration or deletion. In your response, you commit to developing an electronic records control procedure, restricting unauthorized modification of spreadsheets used for CGMP data processing, and initiating a retrospective data integrity assessment. You established interim measures, including independent analyst and quality unit review of processed chromatograms prior to disposition, and evaluating your chromatographic software for enhanced data retention and audit trail capability. Your response is inadequate. You do not explain how your retrospective assessment will comprehensively identify data integrity and control gaps. This is concerning because post-analysis modifications prevent the reconstruction of previously processed chromatograms. You also do not explain how you will validate your spreadsheets to ensure formulas are accurate and secure from manipulation. Additionally, you provide no timelines for finalizing procedures or completing your chromatography software evaluation and validation. In response to this letter, provide: A comprehensive assessment of documentation systems used throughout your manufacturing and laboratory operations to determine where documentation practices are insufficient. Include a detailed CAPA plan that comprehensively remediates your firm’s documentation practices to ensure you retain attributable, legible, complete, original, accurate, contemporaneous records throughout your operation. An updated validation for your chromatography peak processing method and evidence that the processed chromatograms are retained within the computer system. CGMP Consultant Recommended Based upon the nature of the violations we identified at your firm, you should engage a consultant qualified as set forth in 21 CFR 211.34 to evaluate your operations and to assist your firm in meeting CGMP requirements. The qualified consultant should also perform a comprehensive six-system audit 1 of your entire operation for CGMP compliance and evaluate the completion and efficacy of your corrective actions and preventive actions before you pursue resolution of your firm’s compliance status with FDA. Your use of a consultant does not relieve your firm’s obligation to comply with CGMP. Your firm’s executive management remains responsible for resolving all deficiencies and systemic flaws to ensure ongoing CGMP compliance.",
+    "finding_text_ko": "귀사는 시험실 기록에 규정된 규격 및 기준에 대한 적합성을 보장하는 데 필요한 모든 시험에서 얻은 완전한 데이터가 포함되도록 보장하지 못했다(21 CFR 211.194(a)). 귀사는 전산화 시스템에 대한 적절한 관리를 하지 못했다. 실사 중 귀사는 원시 크로마토그래피 데이터는 보존했으나 처리된 크로마토그램은 보관하지 않았음을 시인했다. 또한 CGMP 데이터의 입력, 검토 및 보관에 사용되는 스프레드시트와 문서에 대한 관리도 미흡했다. 실사 중 당국 조사관은 (b)(4) 시스템의 CGMP 추이 데이터가 담긴 관리되지 않고 잠겨 있지 않은 워크시트 여러 개를 확인했으며, 이로 인해 데이터가 변경 또는 삭제에 취약한 상태였다. 귀사는 회신에서 전자기록 관리 절차 마련, CGMP 데이터 처리에 사용되는 스프레드시트의 무단 수정 제한, 소급 데이터 완전성 평가 착수를 이행하겠다고 약속했다. 귀사는 처리된 크로마토그램의 처분 전 독립적인 분석자 및 품질부서 검토, 데이터 보존 및 감사추적(audit trail) 기능 강화를 위한 크로마토그래피 소프트웨어 평가 등의 임시 조치를 마련했다. 그러나 귀사의 회신은 부적절하다. 소급 평가가 데이터 완전성 및 관리상의 공백을 어떻게 포괄적으로 식별할지 설명하지 않았다. 분석 후 변경은 이전에 처리된 크로마토그램의 재구성을 불가능하게 하므로 우려된다. 또한 스프레드시트의 수식이 정확하고 조작으로부터 안전하도록 어떻게 밸리데이션할 것인지도 설명하지 않았다. 아울러 절차 확정 또는 크로마토그래피 소프트웨어 평가 및 밸리데이션 완료에 대한 일정을 제시하지 않았다. 이 서한에 대한 회신으로 다음을 제출하라: 문서화 관행이 불충분한 부분을 파악하기 위한 제조 및 시험실 전반에서 사용되는 문서화 시스템에 대한 포괄적 평가. 귀사 전반에 걸쳐 귀속 가능(attributable)하고, 판독 가능(legible)하며, 완전하고(complete), 원본이며(original), 정확하고(accurate), 동시에 작성된(contemporaneous) 기록을 보존하도록 귀사의 문서화 관행을 포괄적으로 시정하는 상세 CAPA 계획. 크로마토그래피 피크 처리 방법에 대한 갱신된 밸리데이션 및 처리된 크로마토그램이 컴퓨터 시스템 내에 보존되고 있다는 증거. CGMP 컨설턴트 권고: 확인된 위반의 성격에 비추어, 21 CFR 211.34에 규정된 자격을 갖춘 컨설턴트를 선임하여 귀사의 운영을 평가하고 CGMP 요건 충족을 지원받아야 한다. 해당 컨설턴트는 또한 귀사가 FDA와 규제 준수 상태의 해결을 추진하기 전에 전체 운영에 대한 CGMP 준수 여부의 포괄적인 6개 시스템 감사(six-system audit)를 수행하고 시정조치 및 예방조치(CAPA)의 완료 여부와 효과를 평가해야 한다. 컨설턴트를 활용하더라도 귀사의 CGMP 준수 의무는 면제되지 않는다. 귀사의 경영진은 지속적인 CGMP 준수를 보장하기 위해 모든 결함과 체계적 결함을 해소할 책임을 계속 진다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a2b3af492ed91fb620094e85",
+    "finding_text": "Procedures to ensure that purchased product conforms to specified purchasing information have not been adequately documented.",
+    "finding_text_ko": "구매한 제품이 지정된 구매 정보에 부합하는지 확인하는 절차가 충분히 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a373824e6860398d9509dd83",
+    "finding_text": "Your firm failed to maintain adequate quality oversight over changes to the established acceptance criterion for 100% visual inspection.",
+    "finding_text_ko": "귀사는 100% 육안검사의 설정된 허용기준 변경에 대한 적절한 품질 감독을 유지하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a7e855c9ce49da819b1835fa",
+    "finding_text": "The quality control unit lacks responsibility to approve and reject all procedures or specifications impacting on the identity, strength, quality and purity of drug products.",
+    "finding_text_ko": "품질관리 부서가 의약품의 동일성, 함량, 품질 및 순도에 영향을 미치는 모든 절차 또는 규격을 승인하고 거부할 책임을 갖고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a80766e3948596af39a6bea9",
+    "finding_text": "Written procedures are not established for evaluations done at least annually and including provisions for a review of investigations conducted for each drug product.",
+    "finding_text_ko": "최소 연 1회 실시하는 평가에 대한 절차서, 그리고 각 완제의약품에 대해 수행된 조사의 검토에 관한 규정이 수립되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a82d309d415acb85a21d5142",
+    "finding_text": "Laboratory records do not include complete records of the periodic calibration of laboratory instruments.",
+    "finding_text_ko": "시험실 기록에 시험 기기의 정기 교정에 대한 완전한 기록이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a8cdb6dacdb000ac3cff3df0",
+    "finding_text": "Samples taken of in-process materials for determination ofconformance to specifications are not representative.",
+    "finding_text_ko": "규격 적합성을 판정하기 위해 채취한 공정 중 물질의 시료가 대표성이 없다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a909026a14a2344db0650aae",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release. Your firm also failed to conduct appropriate laboratory testing, as necessary, for each batch of drug product required to be free of objectionable microorganisms (21 CFR 211.165(a) and 211.165(b)). Your firm manufactures OTC drug products such as (b)(4) which are labeled as “sterile.” Based on the records and information provided, you do not demonstrate that you conduct adequate finished drug product testing including microbiological tests on your OTC drug products. For example, you indicate that you do not test each batch of finished drug product for conformance to product release specifications before each batch release. This includes not conducting sterility testing on your drug product purporting to be sterile. Testing is an essential part of CGMP to ensure that the drug products you manufacture conform to all pre-determined quality attributes appropriate for their intended use. Drug products must be tested for identity and strength of the active ingredient, prior to release and distribution. Without adequate testing, you do not have scientific evidence to assure that your drug products conform to appropriate specifications before release.",
+    "finding_text_ko": "귀사는 각 완제의약품 배치에 대해, 출하 전 완제의약품의 최종 규격(각 활성 성분의 동일성 및 함량 포함)에 대한 만족스러운 적합성을 확인하는 적절한 시험실 판정을 갖추지 못했다. 또한 유해 미생물(objectionable microorganisms)이 없어야 하는 각 완제의약품 배치에 대해 필요한 적절한 시험실 시험을 수행하지 못했다(21 CFR 211.165(a) 및 211.165(b)). 귀사는 “sterile”로 표시된 (b)(4) 등의 OTC 의약품을 제조한다. 제공된 기록과 정보에 근거할 때, 귀사는 OTC 의약품에 대해 미생물 시험을 포함한 적절한 완제의약품 시험을 수행한다는 점을 입증하지 못한다. 예를 들어 귀사는 각 배치 출하 전에 출하 규격 적합성에 대해 완제의약품 각 배치를 시험하지 않는다고 밝혔다. 여기에는 무균을 표방하는 의약품에 대한 무균시험(sterility testing)을 수행하지 않는 것도 포함된다. 시험은 제조하는 의약품이 의도한 용도에 적합한 모든 사전 정해진 품질 특성에 부합함을 보증하는 CGMP의 필수 요소다. 의약품은 출하 및 유통 전에 활성 성분의 동일성과 함량에 대해 시험해야 한다. 적절한 시험이 없으면 귀사는 의약품이 출하 전에 적절한 규격에 부합한다는 과학적 근거를 갖지 못한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a934709f5d0e975daf606230",
+    "finding_text": "An appropriate laboratory determination to ensure that each batch of a PET drug product conforms to specifications was not conducted before final release.",
+    "finding_text_ko": "최종 출하 전에 각 PET 의약품 배치가 규격에 적합한지 확인하는 적절한 시험실 판정이 수행되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a991b78b390c904210993fbf",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate standards designed to assure that conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 동일성, 함량, 품질 및 순도에 관한 적절한 기준에 부합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 기준의 설정이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a9eb1d23c5bc5b22bd1c4090",
+    "finding_text": "HCT/Ps for which the applicable donor eligibility requirements were not met were not prominently labeled with the appropriate warning statements.",
+    "finding_text_ko": "해당 기증자 적격성 요건을 충족하지 못한 HCT/P에 적절한 경고 문구가 눈에 띄게 표시되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aa453647775d346a125dcdcf",
+    "finding_text": "Failure to establish appropriate cleaning procedures for all manufacturing equipment.",
+    "finding_text_ko": "모든 제조 장비에 대한 적절한 세척 절차를 수립하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-abe35652779dc267e564c955",
+    "finding_text": "Control procedures are not established which monitor the output of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug product.",
+    "finding_text_ko": "공정 중 물질 및 완제의약품의 특성 변동을 유발할 수 있는 제조공정의 산출물을 모니터링하는 관리 절차가 수립되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ad4cd0d840ebc47d7cfee8bf",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ad82822f27154f3d6d9dde9f",
+    "finding_text": "The persons double-checking the cleaning and maintenance are not dating, signing, or initialing the equipment cleaning and use log.",
+    "finding_text_ko": "세척 및 유지보수를 이중 확인하는 담당자가 장비 세척·사용 일지에 날짜 기재, 서명 또는 이니셜 기재를 하지 않고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-adf0a611cf8d25566ed40b24",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room and equipment to produce aseptic conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역의 무균 상태 조성을 위한 실 및 장비의 세척·소독 시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-afe2b5486cbc32b347c626d7",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b303b6dcd0fc28627e28862d",
+    "finding_text": "Four out of four deviation and out-of-specification investigations reviewed did not include t root causes and actions to be taken to prevent a reoccurrence that were fully justified by the investigation.",
+    "finding_text_ko": "검토한 일탈(deviation) 및 시험 부적합(OOS) 조사 4건 모두에서, 근본 원인과 재발 방지를 위해 취할 조치가 조사로 충분히 정당화되어 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b31e9756c4a5dc73671acfc2",
+    "finding_text": "Your firm failed to adequately control non-process equipment located in drug substance manufacturing clean areas.",
+    "finding_text_ko": "귀사는 원료의약품 제조 청정구역에 위치한 비공정 장비를 적절히 관리하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b421104c6b723e5f3000ec49",
+    "finding_text": "Failure to ensure proper monitoring of the study and ensure the study is conducted in accordance with the protocol and/or investigational plan.",
+    "finding_text_ko": "시험이 적절하게 모니터링되고 프로토콜 및/또는 임상시험계획에 따라 수행되도록 보장하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b5dcd888290ab8ad1b412202",
+    "finding_text": "Procedures to control environmental conditions have not been adequately established.",
+    "finding_text_ko": "환경 조건을 관리하는 절차가 적절하게 수립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b6a7cebc312418aff14046e2",
+    "finding_text": "Buildings used in the processing of a drug product are not maintained in a good state of repair.",
+    "finding_text_ko": "완제의약품 가공에 사용되는 건물이 양호한 상태로 유지·보수되고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b6d93fbe2fabfe0115eecdfe",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 의약품이 동일성, 함량, 품질 및 순도에 관한 적절한 기준에 부합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 시험 절차의 설정이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b6f0776f5d8fd3dba44666a4",
+    "finding_text": "Reserve samples from representative sample lots or batches of drug products selected by acceptable statistical procedures are not examined visually at least once a year for evidence of deterioration.",
+    "finding_text_ko": "허용 가능한 통계적 절차로 선정된 대표 시료 로트 또는 배치의 완제의약품 보관용 검체를 열화 징후에 대해 최소 연 1회 육안 검사하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b73b2d396efd666393777238",
+    "finding_text": "Adequate exhaust systems or other systems to control contaminants are lacking in areas where air contamination might occur during production.",
+    "finding_text_ko": "생산 중 공기 오염이 발생할 수 있는 구역에 오염물질을 관리할 적절한 배기 시스템 또는 기타 시스템이 없다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b75fce8de3c4b572a0e7d543",
+    "finding_text": "Discrepancy and failure investigations relatedww were not complete and expanded as necessary to assess product impact.",
+    "finding_text_ko": "관련 불일치 및 부적합 조사가 완전하지 않았고, 제품에 미치는 영향을 평가하는 데 필요한 만큼 확대되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b78cf242cac87cd654e4548f",
+    "finding_text": "Testing and release of drug product for distribution do not include appropriate laboratory determination of satisfactory conformance to the final specifications and identity and strength of each active ingredient prior to release.",
+    "finding_text_ko": "완제의약품의 시험 및 출하 판정에, 출하 전 최종 규격과 각 활성 성분의 동일성 및 함량에 대한 만족스러운 적합성을 확인하는 적절한 시험실 판정이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b912f1b011d9017cdc75109a",
+    "finding_text": "There are deficiencies in the testing and qualification of raw materials used in the manufacturing of the MAGE- A4-c1032 lentiviral vector.",
+    "finding_text_ko": "MAGE-A4-c1032 렌티바이러스 벡터 제조에 사용된 원자재의 시험 및 적격성 평가에 미비점이 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ba0f55d1036c8dbf073120e6",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing.",
+    "finding_text_ko": "품질관리 부서의 책임과 절차가 문서화되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ba110685a499bce935ca3335",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치가 이미 유통되었는지 여부와 관계없이, 원인불명의 불일치를 철저히 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ba134ee393dd36f38302316c",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, or followed.",
+    "finding_text_ko": "무균을 표방하는 완제의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되지 않았거나 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bbc21db1465e9027697ee39c",
+    "finding_text": "The quality control unit lacks responsibility for approving or rejecting drug products manufactured, processed and packed under contract by another company.",
+    "finding_text_ko": "품질관리 부서가 타사에 위탁하여 제조·가공·포장된 의약품을 승인하거나 거부할 책임을 갖고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bd98c4301161f66dce6473b5",
+    "finding_text": "현진창출: 중금속(납, 카드뮴)",
+    "finding_text_ko": "현진창출은 중금속(납, 카드뮴)이 문제로 지적되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bf2b8af17e98b0d6cca4ae68",
+    "finding_text": "Laboratory Incident Investigations for High-Performance Liquid Chromatography (HPLC) Injection-to- Injection Area Variability Failures Were Inadequate.",
+    "finding_text_ko": "고성능 액체크로마토그래피(HPLC)의 주입 간 면적 변동(injection-to-injection area variability) 부적합에 대한 시험실 이상 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c08503d4251567c755f708b3",
+    "finding_text": "Records of the results of monitoring of supplier capability or performance were not maintained.",
+    "finding_text_ko": "공급업체의 역량 또는 성과 모니터링 결과 기록이 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c1cc21ef7a9fd0f14f41209e",
+    "finding_text": "Written records are not always made of investigations into unexplained discrepancies.",
+    "finding_text_ko": "원인불명의 불일치에 대한 조사 기록이 항상 작성되지는 않는다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c23ac1f7cadcb5f0abe92ea6",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c2db053995d9cd7211cc959e",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리 부서의 책임과 절차가 충분히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c307810d813dbfa941a5c493",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate designed to assure that conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 동일성, 함량, 품질 및 순도에 관한 적절한 기준에 부합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 항목의 설정이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c46b8b17a707fb2b1296dd3e",
+    "finding_text": "Equipment used in the manufacture of active pharmaceutical ingredients is not fully qualified.",
+    "finding_text_ko": "원료의약품(API) 제조에 사용되는 장비가 충분히 적격성평가(qualification)되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c5d45a4b73fd73df99255e51",
+    "finding_text": "During the filling ofm@ drug product,o® mg® ml,® nl vial on May 13, 2026, an operator failed to set the oe as indicated in stepw of SOP-00273 ©© Standard Operating Procedure (version 14, effective date: April 16, 2026).",
+    "finding_text_ko": "2026년 5월 13일 의약품 충전 중, 작업자가 SOP-00273(버전 14, 시행일: 2026년 4월 16일)의 해당 단계에 명시된 대로 설정하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c5ea19b2da0ecf2797b4f7cf",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established.",
+    "finding_text_ko": "무균을 표방하는 완제의약품의 미생물 오염을 방지하기 위한 절차가 수립되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c64fa6d728ded77fcd5f3491",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+    "finding_text_ko": "품질관리 부서의 책임과 절차가 충분히 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c75c22246862f74a22a59bcb",
+    "finding_text": "There is a failure to thoroughly review the failure of a batch or any or its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "배치 또는 그 구성 성분이 규격을 충족하지 못한 경우, 해당 배치가 이미 유통되었는지 여부와 관계없이 이를 철저히 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c8470feb4f67e8f59feb8b4b",
+    "finding_text": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards.",
+    "finding_text_ko": "시험실 기록에 설정된 규격 및 기준에 대한 적합성을 보증하는 데 필요한 모든 시험, 검사 및 분석에서 얻은 완전한 데이터가 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c9cc3e4b0b03e947139334d4",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "마스터 생산 및 관리 기록 또는 기타 기록의 변경이 권한 있는 인원에 의해서만 이루어지도록 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ca4b41cb57607748300b9824",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cb24803c62d4cd1290dec914",
+    "finding_text": "Each lot of components are not withheld from use until the lot has been sampled, tested, examined, and released by the quality control unit.",
+    "finding_text_ko": "각 구성 성분 로트가 품질관리 부서에 의해 시료 채취, 시험, 검사 및 출하 승인될 때까지 사용이 보류되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cb41985f9be72a9c9aac2379",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+    "finding_text_ko": "무균을 표방하는 완제의약품의 미생물 오염을 방지하기 위한 절차가 수립되지 않았거나 준수되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cc78db922f86bb546e69c691",
+    "finding_text": "Your firm failed to maintain adequate control and traceability of temperature monitoring sensors within the building management system.",
+    "finding_text_ko": "귀사는 건물관리시스템(building management system) 내 온도 모니터링 센서에 대한 적절한 관리와 추적성을 유지하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cd1bf56e813614f2807ddae6",
+    "finding_text": "Failure to obtain a representative sample of each batch of each raw material for release testing.",
+    "finding_text_ko": "출하 시험을 위해 각 원자재의 각 배치에서 대표 시료를 확보하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cd4ef283ca5fd5f345672e72",
+    "finding_text": "Batch production and control records for each batch of drug product produced do not include an accurate reproduction of the appropriate master production or control record which was checked for accuracy, dated and signed.",
+    "finding_text_ko": "각 완제의약품 배치의 배치 생산 및 관리 기록에, 정확성을 확인하고 날짜를 기재하고 서명한 해당 마스터 생산 또는 관리 기록의 정확한 사본이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cdf240df3608277892059791",
+    "finding_text": "The proposed maximum holding times for the ss intermediates includi (4) (b)(4) and have not been validated for the manufacturing process at production scale.",
+    "finding_text_ko": "중간체에 대해 제안된 최대 보관 시간((4) (b)(4) 포함)이 생산 규모의 제조공정에서 밸리데이션되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cec5525df523cff1120fc97e",
+    "finding_text": "The batch production and control records are deficient in that they do not include documentation ofthe accomplishment of each significant step in manufacturing, processing, and holding.",
+    "finding_text_ko": "배치 생산 및 관리 기록에 제조, 가공 및 보관의 각 중요 단계 수행에 대한 문서화가 포함되어 있지 않아 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ceeb733c040ef4aa6a285da5",
+    "finding_text": "There is a failure to maintain equipment in a clean and orderly manner to prevent contamination that could alter the quality of the drug substance.",
+    "finding_text_ko": "원료의약품의 품질을 변화시킬 수 있는 오염을 방지하기 위해 장비를 청결하고 정돈된 상태로 유지하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cf1874cacea6180183ce7c68",
+    "finding_text": "Established test procedures are not documented at the tume ofperformance.",
+    "finding_text_ko": "설정된 시험 절차가 수행 시점에 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d0b00f4040a4ff78c74c9807",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "마스터 생산 및 관리 기록 또는 기타 기록의 변경이 권한 있는 인원에 의해서만 이루어지도록 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d161ae1cba7b85c5be5f4d8c",
+    "finding_text": "Equipment and utensils are not cleaned, maintained, sanitized at appropriate intervals to prevent, contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변화시킬 수 있는 오염을 방지하기 위해 장비와 기구를 적절한 주기로 세척, 유지관리 및 위생처리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d2dc5d0b72b7cc8bd0664ee5",
+    "finding_text": "Laboratory records are deficient in that they do not include a complete record of all data obtained during testing.",
+    "finding_text_ko": "시험실 기록이 시험 중 얻은 모든 데이터의 완전한 기록을 포함하지 않아 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d441ee1cf0982a7c5462fa85",
+    "finding_text": "Firm failed to establish and implement controls to prevent mix-ups of material from one dedicated area to another.",
+    "finding_text_ko": "한 전용 구역에서 다른 전용 구역으로의 물질 혼동을 방지하는 관리를 수립하고 이행하지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d6c8d1355aef6fbf2968990f",
+    "finding_text": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+    "finding_text_ko": "마스터 생산 및 관리 기록 또는 기타 기록의 변경이 권한 있는 인원에 의해서만 이루어지도록 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지고 있지 않다.",
+    "translation_method": "llm_assisted"
+  }
+]

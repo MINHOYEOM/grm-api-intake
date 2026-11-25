@@ -54,6 +54,43 @@ _AI_TELL_RE = re.compile("|".join(AI_TELLS))
 _NUM = re.compile(r"\d+")
 _WS = re.compile(r"\s+")
 
+# ── 어림 표현 겹침 게이트 (2026-11-24) ──────────────────────────────────────────────────────────
+# 11-23 a1 첫 줄이 "기준일탈 300건 넘게 중 200건 넘게가 무효화됐습니다" 로 나갔다 — 한 문장에 어림이 둘이면
+# 분자·분모가 다 흐려져 읽기 어색하고 정확한 말이 아니다. 문장 단위 규칙:
+#   1) 한 문장(표지 헤드라인은 두 줄을 한 문장으로 본다)에 어림 표현은 최대 1개.
+#   2) 분수형(N 중 M)이면 분모에만 어림을 허용한다 — 둘 다 어림이면 문장을 나눠 쓴다
+#      ("300건 넘게를 조사하지 않았습니다. 이 중 200건 넘게는 무효화됐습니다.").
+#   3) 서한·DB 에 정확한 수가 있으면 정확한 수를 쓴다(슬롯 작성 지침 — 코드는 ①을 강제한다).
+_APPROX_KO = re.compile(
+    r"\d[\d,.]*\s*[가-힣%]{0,3}\s*(?:넘게|넘는|넘어|넘도록|이상|여\s*(?:건|개|곳|명|회|장)|가량|남짓|안팎|쯤|정도)"
+    r"|약\s*\d|대략\s*\d|수십|수백|수천")
+_APPROX_EN = re.compile(
+    r"\b(?:over|more\s+than|about|approximately|approx\.?|nearly|almost|roughly|around|at\s+least|up\s+to|some)\s+\$?\d[\d,]*"
+    r"|\d[\d,]*\s*\+|~\s*\d|\d[\d,]*\s+or\s+(?:more|so)\b", re.I)
+_SENT_SPLIT = re.compile(r"(?<=[.?!。])\s+(?=[A-Z0-9가-힣“‘\"'(])")
+
+
+def approx_marks(sentence: str, lang: str = "ko") -> list[str]:
+    rx = _APPROX_EN if lang == "en" else _APPROX_KO
+    return [m.group(0).strip() for m in rx.finditer(sentence or "")]
+
+
+def approx_overlap_problems(path: str, text: str, lang: str = "ko") -> list[str]:
+    """한 문장에 어림 표현이 2개 이상이면 사유 목록. 문장은 `. ? !` 뒤 공백에서 가른다."""
+    out: list[str] = []
+    for sent in _SENT_SPLIT.split(_norm(text)):
+        marks = approx_marks(sent, lang)
+        if len(marks) >= 2:
+            out.append(f"{path}: 한 문장에 어림 표현 {len(marks)}개 {marks} — 분모에만 어림을 쓰고 문장을 나눠라: {sent[:40]}…"
+                       if lang != "en" else
+                       f"{path}: {len(marks)} approximations in one sentence {marks} — approximate the denominator only, split the sentence: {sent[:40]}…")
+    return out
+
+
+def approx_headline_problems(path: str, lines: list[str], lang: str = "ko") -> list[str]:
+    """표지 헤드라인은 두 줄이 한 문장이다."""
+    return approx_overlap_problems(path, " ".join(str(x) for x in lines or []), lang)
+
 # 슬롯 글자 수 상한 — 1080x1350 카드 안에 들어가는 실측 근사(한글 1자 = 1.0)
 LIMITS = {"headline_line": 15.5, "bar_label": 25, "row_text": 78, "flow": 15, "item_title": 14,
           "item_text": 62, "pair_resp": 28, "pair_judg": 66, "check": 40, "question": 40}

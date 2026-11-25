@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from dataclasses import asdict, dataclass, field
@@ -38,13 +39,16 @@ from typing import Any, Callable
 import findings_supabase_append as fsa
 import findings_supabase_backfill as fsb
 import raw_versioning as rv
-from grm_common import SOURCE_FDA_483, log
+import backfill_483_inspectors_from_body as inspectors_from_body
+from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_483, body_shrunk, log
+from grm_http_policy import FDA_BACKFILL_DELAY_SECONDS
 
 BODY_KEY = "fda483_body_full"
+INSPECTORS_KEY = "fda483_inspectors"
 OUT_OF_SCOPE = "out-of-scope"
 SELECT_COLUMNS = "raw_signal_id,document_id,published_date,raw_json,row_json,raw_sha256"
 CHANGED_BY = "backfill_483_body_full"
-_PDF_DELAY_S = 30.0          # fda.gov robots Crawl-Delay
+_PDF_DELAY_S = float(FDA_BACKFILL_DELAY_SECONDS)
 _NOTION_SLEEP_S = 0.34       # Notion 3 req/s
 
 
@@ -62,11 +66,18 @@ class Report:
     pdf_no_observations: int = 0     # 받았지만 관찰사항이 파싱되지 않음 → 일일 규칙상 전문 아님
     pdf_failed: int = 0
     pdf_not_probed: int = 0          # dry-run 에서 PDF 를 받지 않은 수
+    shrunk: int = 0                  # 기존 전문보다 짧아 건너뛴 행
     applied: int = 0
+    inspectors_added: int = 0        # 전문과 함께 실사관(fda483_inspectors)도 새로 채운 행
     unchanged: int = 0
     conflict: int = 0
     errors: list[str] = field(default_factory=list)
     examples: dict[str, list[str]] = field(default_factory=dict)
+    rows: list[dict[str, Any]] = field(default_factory=list)   # 행별 결과(문서·결과·옛→새 전문 길이)
+
+    def row(self, doc: str, outcome: str, old_chars: int = 0, new_chars: int = 0, via: str = "") -> None:
+        self.rows.append({"document_id": doc, "outcome": outcome, "old_chars": old_chars,
+                          "new_chars": new_chars, "via": via})
 
     def note(self, key: str, doc_id: str) -> None:
         bucket = self.examples.setdefault(key, [])
@@ -86,12 +97,34 @@ def _loads(text: Any) -> dict[str, Any]:
 
 # ── 대상 ─────────────────────────────────────────────────────────────────────
 
-def fetch_candidates(base_url: str, service_key: str, since: str) -> list[dict[str, Any]]:
+def fetch_candidates(base_url: str, service_key: str, since: str,
+                     doc_ids: list[str] | None = None) -> list[dict[str, Any]]:
+    """doc_ids 가 있으면 그 문서만 본다(게시일 하한 무시) — 완전성 점검 목록처럼 정해진 행만 다시 돌릴 때."""
+    params = {"source": f"eq.{SOURCE_FDA_483}", "raw_json": f"not.like.*{BODY_KEY}*"}
+    if doc_ids:
+        params["document_id"] = "in.(" + ",".join(doc_ids) + ")"
+    else:
+        params["published_date"] = f"gte.{since}"
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals", select=SELECT_COLUMNS, page_size=200,
-        order="raw_signal_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_483}", "published_date": f"gte.{since}",
-                      "raw_json": f"not.like.*{BODY_KEY}*"})
+        order="raw_signal_id.asc", extra_params=params)
+
+
+_DOC_ID_RE = re.compile(r"^fda483-[0-9]+$")
+
+
+def parse_doc_ids(value: str) -> list[str]:
+    """쉼표·공백 구분 목록 → document_id 목록. 숫자만 주면 `fda483-` 를 붙인다. 형식이 틀리면 ValueError."""
+    out: list[str] = []
+    for token in re.split(r"[\s,]+", value or ""):
+        if not token:
+            continue
+        doc = token if token.startswith("fda483-") else f"fda483-{token}"
+        if not _DOC_ID_RE.match(doc):
+            raise ValueError(f"document_id 형식이 아니다: {token!r}")
+        if doc not in out:
+            out.append(doc)
+    return out
 
 
 def fetch_ledger_ids(base_url: str, service_key: str) -> set[str]:
@@ -112,9 +145,11 @@ def select_targets(rows: list[dict[str, Any]], ledger: set[str], rep: Report) ->
         doc = str(row.get("document_id") or "")
         if str(raw.get("fda483_text_status") or "") == OUT_OF_SCOPE:
             rep.skipped_out_of_scope += 1
+            rep.row(doc, "skipped_out_of_scope")
             continue
         if doc in ledger:
             rep.skipped_ledger += 1
+            rep.row(doc, "skipped_ledger")
             continue
         out.append(row)
     rep.targets = len(out)
@@ -156,6 +191,13 @@ def body_from_pdf(raw: dict[str, Any], doc_id: str) -> tuple[str, str]:
 def new_record(row: dict[str, Any], body: str) -> tuple[dict[str, Any], str]:
     raw = _loads(row.get("raw_json"))
     raw[BODY_KEY] = body
+    # [2026-11-23] 전문을 채우면서 실사관도 같은 공통 함수로 뽑는다(R5 — 종전엔 전문만 쓰고 실사관 칸은
+    # 빈 채로 남았다, 수집완전성 점검 11-22 9-3). 이미 이름이 있으면 덮지 않는다. 못 뽑으면 키를 달지 않는다.
+    if not raw.get(INSPECTORS_KEY):
+        import collect_fda_483 as fda483
+        names = fda483._extract_483_inspectors(body)
+        if names:
+            raw[INSPECTORS_KEY] = names
     raw_text, sha = rv.canonical_raw(raw)
     return {"raw_json": raw_text, "raw_sha256": sha, "row_json": str(row.get("row_json") or "")}, sha
 
@@ -167,12 +209,14 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
         notion_body: Callable[[str], str],
         pdf_body: Callable[[dict[str, Any], str], tuple[str, str]],
         applier: Callable[..., dict[str, Any]] | None,
-        sleeper: Callable[[float], None] = time.sleep) -> Report:
+        sleeper: Callable[[float], None] = time.sleep,
+        findings_patcher: Callable[[str, list[str]], str] | None = None) -> Report:
     rep = Report(mode="apply" if apply else "dry-run", since=since)
     for row in select_targets(rows, ledger, rep):
         doc = str(row.get("document_id") or "")
         raw = _loads(row.get("raw_json"))
         body, via = "", ""
+        old_chars = len(str(raw.get(BODY_KEY) or ""))
         page_id = notion_index.get(doc, "")
         if page_id:
             sleeper(_NOTION_SLEEP_S)
@@ -188,6 +232,7 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
             rep.note("notion_missing", doc)
             if not (apply or probe_pdf):
                 rep.pdf_not_probed += 1
+                rep.row(doc, "pdf_not_probed", old_chars)
                 continue
             sleeper(_PDF_DELAY_S)
             try:
@@ -195,27 +240,52 @@ def run(rows: list[dict[str, Any]], ledger: set[str], *, apply: bool, probe_pdf:
             except Exception as exc:  # noqa: BLE001
                 rep.pdf_failed += 1
                 rep.errors.append(f"pdf({doc}):{type(exc).__name__}")
+                rep.row(doc, f"pdf_failed:{type(exc).__name__}", old_chars)
                 continue
+            if status == FDA_BOT_BLOCK:
+                rep.pdf_failed += 1
+                rep.errors.append(f"pdf({doc}):{FDA_BOT_BLOCK}")
+                rep.row(doc, FDA_BOT_BLOCK, old_chars)
+                break
             if not body:
                 if status == "no-observations":
                     rep.pdf_no_observations += 1
                     rep.note("pdf_no_observations", doc)
+                    rep.row(doc, "pdf_no_observations", old_chars)
                 else:
                     rep.pdf_failed += 1
                     rep.note(f"pdf_failed:{status}", doc)
+                    rep.row(doc, f"pdf_failed:{status}", old_chars)
                 continue
             via = "pdf"
             rep.via_pdf += 1
+        if body_shrunk(raw.get(BODY_KEY), body):
+            rep.shrunk += 1
+            rep.note("shrunk", doc)
+            rep.row(doc, "shrunk", old_chars, len(body), via)
+            continue
         if not apply:
+            rep.row(doc, "would_apply", old_chars, len(body), via)
             continue
         record, _sha = new_record(row, body)
+        new_names = (_loads(record["raw_json"]).get(INSPECTORS_KEY) or []) \
+            if not raw.get(INSPECTORS_KEY) else []
+        added = [BODY_KEY] + ([INSPECTORS_KEY] if new_names else [])
         result = applier(raw_signal_id=str(row["raw_signal_id"]),
                          expected_raw_sha256=str(row.get("raw_sha256") or ""),
                          record=record, change_kind="repair", changed_by=CHANGED_BY,
-                         diff_summary={"added": [BODY_KEY], "via": via, "chars": len(body)})
+                         diff_summary={"added": added, "via": via, "chars": len(body)})
         status = str(result.get("status") or "error")
+        rep.row(doc, status, old_chars, len(body), via)
         if status == "applied":
             rep.applied += 1
+            if new_names:
+                rep.inspectors_added += 1
+                if findings_patcher is not None:
+                    # findings 행의 inspector_names 는 적재 때 raw 에서 복사된다 — 빈 행만 같은 이름으로.
+                    err = findings_patcher(str(row["raw_signal_id"]), list(new_names))
+                    if err:
+                        rep.errors.append(f"findings({doc}):{err}")
         elif status == "unchanged":
             rep.unchanged += 1
         elif status == "conflict":
@@ -239,7 +309,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--since", default="2026-06-01", help="게시일 하한(YYYY-MM-DD)")
     ap.add_argument("--limit", type=int, default=0, help="처리할 최대 대상 수(0=전부)")
     ap.add_argument("--report", default="fda483_body_full_report.json")
+    ap.add_argument("--doc-ids", default="",
+                    help="이 document_id 들만 처리(쉼표 구분, 숫자만 써도 됨). 주면 --since 는 무시")
     args = ap.parse_args(argv)
+    try:
+        doc_ids = parse_doc_ids(args.doc_ids)
+    except ValueError as exc:
+        ap.error(str(exc))
 
     base_url = fsa._normalize_base_url(os.environ.get("SUPABASE_URL", "").strip())
     service_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
@@ -249,7 +325,7 @@ def main(argv: list[str] | None = None) -> int:
         log("ERROR", "SUPABASE_URL(https)·SUPABASE_SERVICE_ROLE_KEY·NOTION_TOKEN·NOTION_DATABASE_ID 가 필요하다")
         return 2
 
-    rows = fetch_candidates(base_url, service_key, args.since)
+    rows = fetch_candidates(base_url, service_key, args.since, doc_ids)
     if args.limit:
         rows = rows[:args.limit]
     ledger = fetch_ledger_ids(base_url, service_key)
@@ -260,13 +336,15 @@ def main(argv: list[str] | None = None) -> int:
 
     rep = run(rows, ledger, apply=args.apply, probe_pdf=args.probe_pdf, notion_index=index,
               since=args.since, notion_body=lambda pid: body_from_notion(token, pid),
-              pdf_body=body_from_pdf, applier=_apply if args.apply else None)
+              pdf_body=body_from_pdf, applier=_apply if args.apply else None,
+              findings_patcher=(lambda rid, names: inspectors_from_body.patch_empty_findings(
+                  base_url, service_key, rid, names)[1]) if args.apply else None)
     with open(args.report, "w", encoding="utf-8") as fh:
         json.dump(asdict(rep), fh, ensure_ascii=False, indent=1)
     log("INFO", f"483 전문 소급 {rep.mode}: 대상 {rep.targets} · 노션 {rep.via_notion} · PDF {rep.via_pdf} "
                 f"· 노션 없음 {rep.notion_missing}(PDF 미확인 {rep.pdf_not_probed}) "
                 f"· 관찰 파싱 안 됨 {rep.pdf_no_observations} · PDF 실패 {rep.pdf_failed} "
-                f"· 적용 {rep.applied} · 같음 {rep.unchanged} · 충돌 {rep.conflict} · 오류 {len(rep.errors)}")
+                f"· 적용 {rep.applied}(실사관도 채움 {rep.inspectors_added}) · 같음 {rep.unchanged} · 충돌 {rep.conflict} · 오류 {len(rep.errors)}")
     return 1 if rep.errors and args.apply else 0
 
 

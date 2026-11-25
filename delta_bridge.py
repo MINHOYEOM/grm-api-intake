@@ -669,7 +669,7 @@ def _authoritative_source_text(token: str, db_id: str, date_str: str,
       - 없다 + 변수 없음(기본) → Notion(종전과 같다).
     """
     ref = handoff_ref if isinstance(handoff_ref, dict) else None
-    if ref is not None or handoff_body_source() == SOURCE_GIT:
+    if ref is not None or handoff_body_source() == SOURCE_GIT or notion_off():
         try:
             bodies = fetch_handoff_body_full_git(date_str, str((ref or {}).get("sha256") or ""))
         except Exception as e:  # noqa: BLE001 — 선택 계층. 어떤 실패도 델타 기록을 막지 않는다
@@ -682,6 +682,10 @@ def _authoritative_source_text(token: str, db_id: str, date_str: str,
         if ref is not None:
             log("WARN", f"git handoff 로 만든 호({date_str})인데 사본을 쓸 수 없음 — "
                         "반납된 source_text 로 계속(Notion handoff 로 대신하지 않는다)")
+            return
+        if notion_off():
+            log("WARN", f"handoff git 사본 없음({date_str}) — GRM_INTAKE_NOTION=off 라 Notion 을 읽지 않고 "
+                        "반납된 source_text 로 계속")
             return
         log("WARN", f"handoff git 사본 없음({date_str}) — Notion handoff 로 넘어감")
     try:
@@ -961,6 +965,11 @@ SOURCE_NOTION = "notion"
 SOURCE_GIT = "git"
 GIT_BRANCH_TPL = "claude/company-{date}"
 GIT_RUN_DIR_TPL = "company/run/{date}"
+# [백업 v17] 편집팀이 마감하지 못한 호를 백업 Routine(`company/editorial/backup.md`)이 같은 브랜치의
+#   하위 폴더 `company/run/{date}/backup/` 에 **편집팀과 같은 파일·같은 형식**으로 반납한다.
+#   브릿지는 편집팀 반납을 먼저 보고, 채택할 수 없을 때만 이 폴더를 본다(같은 채택 조건).
+#   한 날짜에 main 에 쓰는 것은 하나뿐이다 — 먼저 기록된 쪽이 이긴다(_existing_conflicts).
+BACKUP_SUBDIR = "backup"
 COMPARE_DIR = "_delta_compare"  # 워크플로가 아티팩트로 올린다(커밋 대상 아님)
 
 
@@ -971,6 +980,18 @@ def resolve_source(cli_value: "str | None") -> str:
         log("WARN", f"{ENV_DELTA_SOURCE}={raw!r} 는 모르는 값 — 기본 `notion` 으로 진행")
         return SOURCE_NOTION
     return raw
+
+
+def notion_off() -> bool:
+    """[노션 은퇴 2026-11-23 이후] 저장소 변수 GRM_INTAKE_NOTION=off — 브릿지도 노션을 읽지도 쓰지도 않는다.
+
+    수집기와 같은 변수·같은 판정(`grm_queue.notion_intake_off`). off 면:
+      · 정본 길은 언제나 git(편집팀 반납). 노션 예비 길·노션 예치 비교·CONSUMED 마감이 없다.
+      · 채택 가능한 반납이 검증에서 떨어지면 노션으로 넘기지 않고 **빨간 run** 으로 드러낸다.
+      · `NOTION_TOKEN` 이 없어도 돈다.
+    """
+    import grm_queue
+    return grm_queue.notion_intake_off()
 
 
 def _kst_today() -> str:
@@ -1015,8 +1036,10 @@ def git_read_run_file(date_str: str, name: str) -> "str | None":
     return r.stdout.decode("utf-8")
 
 
-def load_git_run(date_str: str, read=None) -> dict[str, Any]:
+def load_git_run(date_str: str, read=None, sub: str = "") -> dict[str, Any]:
     """git 반납 한 주를 읽어 채택 여부를 판정한다(순수 판정 + 주입 가능한 reader).
+
+    sub: 실행 폴더 안의 하위 폴더(`backup` = 백업 v17 반납). 비면 편집팀 반납(종전과 같다).
 
     채택 조건(전부): ① `copyedit.json` 이 있고 `status=="완료"` ② 교열 코드 검사
     `code_gate.ran` 이고 `exit==0` ③ reject 0(`counts.reject` 와 `cards[].verdict` 둘 다)
@@ -1027,10 +1050,16 @@ def load_git_run(date_str: str, read=None) -> dict[str, Any]:
     채택 불가여도 `delta`·`deep` 은 읽을 수 있으면 채워 둔다 — **비교에는 쓰고, 기록에는 안 쓴다.**
     반환: {"date","branch","found","adoptable","reason","delta","deep"}.
     """
-    read = read or git_read_run_file
+    base_read = read or git_read_run_file
+    prefix = f"{sub.strip('/')}/" if sub else ""
+
+    def read(d: str, name: str) -> "str | None":
+        return base_read(d, prefix + name)
+
     out: dict[str, Any] = {"date": date_str, "branch": GIT_BRANCH_TPL.format(date=date_str),
                            "found": False, "adoptable": False, "reason": "",
-                           "delta": None, "deep": None}
+                           "delta": None, "deep": None, "sub": sub or "",
+                           "by": "backup" if sub == BACKUP_SUBDIR else "editorial"}
     reasons: list[str] = []
 
     delta_text = read(date_str, "delta.json")
@@ -1038,7 +1067,8 @@ def load_git_run(date_str: str, read=None) -> dict[str, Any]:
     copy_text = read(date_str, "copyedit.json")
     out["found"] = any(t is not None for t in (delta_text, deep_text, copy_text))
     if not out["found"]:
-        out["reason"] = f"브랜치 {out['branch']} 에 반납 파일 없음"
+        where = f"{out['branch']}" + (f" 의 {prefix}" if prefix else "")
+        out["reason"] = f"브랜치 {where} 에 반납 파일 없음"
         return out
 
     if delta_text is None:
@@ -1266,7 +1296,8 @@ def load_run_scaffold(run: dict[str, Any], delta: dict[str, Any], read=None) -> 
     if not isinstance(delta.get("handoff_ref"), dict):
         return None
     read = read or git_read_run_file
-    text = read(run["date"], SCAFFOLD_RUN_NAME)
+    sub = str(run.get("sub") or "").strip("/")
+    text = read(run["date"], f"{sub}/{SCAFFOLD_RUN_NAME}" if sub else SCAFFOLD_RUN_NAME)
     if text is None:
         raise DeltaBridgeError(
             f"git handoff 로 만든 호인데 {run.get('branch')} 에 {SCAFFOLD_RUN_NAME} 이 없다")
@@ -1304,28 +1335,76 @@ def write_scaffold(text: str, date_str: str) -> bool:
     return True
 
 
-def bridge_from_git(token: str, db_id: str, date_str: str, read=None) -> "int | None":
+def _copyedit_done(date_str: str, read=None) -> bool:
+    """그 날짜 브랜치의 `copyedit.json` 이 `status=="완료"`·`published: true`(교열이 발행 반납을 마쳤다)인가.
+    못 읽으면 False."""
+    try:
+        text = (read or git_read_run_file)(date_str, "copyedit.json")
+    except Exception:  # noqa: BLE001 — 판정 보조, 실패는 '모름'
+        return False
+    obj = _try_json_dict(text) if text is not None else None
+    return bool(obj) and obj.get("status") == "완료" and obj.get("published") is True
+
+
+def bridge_from_git(token: str, db_id: str, date_str: str, read=None,
+                    held: "list[str] | None" = None, notion: bool = True) -> "int | None":
     """git 모드: 채택 가능한 git 반납이 있으면 기록하고 종료코드를, 아니면 None(노션으로 넘김).
 
     git 쪽 검증이 실패해도 None 을 돌려 노션 예비 길로 넘어간다 — 노션은 예비이자 검증된 길이다.
+    `held` 를 주면, 교열이 반납을 **완료**로 마쳤는데 git 으로 기록하지 못한 사유를 거기에 적는다
+    (main 이 노션에서도 쓰지 못했을 때 run 을 실패로 끝내는 근거 — 11-23 사전 점검 B).
+    notion=False(GRM_INTAKE_NOTION=off): 넘어갈 노션 길이 없다. 채택 조건을 채운 반납이 검증에서
+    떨어지면 None 대신 DeltaBridgeError 를 올려 run 을 빨갛게 만든다(조용히 '반납 없음'처럼 끝나지 않게).
+    노션 예치 비교도 하지 않는다.
     """
+    def _hold(reason: str) -> None:
+        if held is not None and _copyedit_done(date_str, read=read):
+            held.append(reason)
+
     run = load_git_run(date_str, read=read)
-    if not run["adoptable"]:
-        log("INFO", f"git 반납 채택 안 함({run['branch']}): {run['reason']} — 노션 예치로 넘어감")
+    picked = None
+    failure: "DeltaBridgeError | None" = None
+    if run["adoptable"]:
+        try:
+            picked = _prepare_adoptable(token, db_id, run, read)
+        except DeltaBridgeError as e:
+            failure = e
+            log("WARN", f"편집팀 git 반납 검증 실패 — 백업 반납을 본다: {e}")
+        except NotionHandoffError as e:
+            log("WARN", f"git 반납 처리 중 노션 조회 실패 — 노션 예치로 넘어감: {e}")
+            _hold(f"git 반납 처리 중 노션 조회 실패: {e}")
+            return None
+    else:
+        log("INFO", f"편집팀 git 반납 채택 안 함({run['branch']}): {run['reason']}")
+    if picked is None:
+        # [백업 v17] 편집팀 반납을 쓸 수 없을 때만 같은 브랜치의 backup/ 을 같은 조건으로 본다.
+        brun = load_git_run(date_str, read=read, sub=BACKUP_SUBDIR)
+        if brun["adoptable"]:
+            try:
+                picked = _prepare_adoptable(token, db_id, brun, read)
+                run = brun
+                log("INFO", f"백업 v17 반납을 쓴다({brun['branch']} 의 {BACKUP_SUBDIR}/)")
+            except DeltaBridgeError as e:
+                failure = failure or e
+                log("WARN", f"백업 git 반납 검증 실패: {e}")
+            except NotionHandoffError as e:
+                log("WARN", f"백업 반납 처리 중 노션 조회 실패 — 노션 예치로 넘어감: {e}")
+                _hold(f"백업 반납 처리 중 노션 조회 실패: {e}")
+                return None
+        elif brun["found"]:
+            log("INFO", f"백업 git 반납 채택 안 함: {brun['reason']}")
+    if picked is None:
+        _hold(f"git 반납 검증 실패: {failure}" if failure is not None
+              else f"git 반납 채택 안 함({run['branch']}): {run['reason']}")
+        if failure is not None:
+            if not notion:
+                raise DeltaBridgeError(f"git 반납 검증 실패(노션 예비 길 없음): {failure}") from failure
+            log("WARN", f"git 반납 검증 실패 — 노션 예치로 넘어감: {failure}")
+            return None
+        if notion:
+            log("INFO", "채택할 git 반납 없음 — 노션 예치로 넘어감")
         return None
-    try:
-        delta, deep, date_str = prepare_git_run(token, db_id, run)
-    except DeltaBridgeError as e:
-        log("WARN", f"git 반납 검증 실패 — 노션 예치로 넘어감: {e}")
-        return None
-    except NotionHandoffError as e:
-        log("WARN", f"git 반납 처리 중 노션 조회 실패 — 노션 예치로 넘어감: {e}")
-        return None
-    try:
-        scaffold_text = load_run_scaffold(run, delta, read=read)
-    except DeltaBridgeError as e:
-        log("WARN", f"git 반납의 스캐폴드를 쓸 수 없음 — 노션 예치로 넘어감: {e}")
-        return None
+    delta, deep, date_str, scaffold_text = picked
 
     conflicts = _existing_conflicts(delta, deep, date_str)
     if conflicts:
@@ -1342,8 +1421,9 @@ def bridge_from_git(token: str, db_id: str, date_str: str, read=None) -> "int | 
         if scaffold_text is not None and write_scaffold(scaffold_text, date_str):
             wrote = True
         # 같은 날 노션 예치도 있으면 비교만 하고 그 페이지는 OPEN 으로 둔다(사람이 볼 물증).
+        # GRM_INTAKE_NOTION=off 면 노션을 읽지 않는다.
         try:
-            page = select_open_delta(token, db_id, publish_date=date_str)
+            page = None if not notion else select_open_delta(token, db_id, publish_date=date_str)
             if page is not None:
                 n_delta, n_deep, _ = extract_delta(_attach_code_blocks(token, page))
                 if n_deep is not None:
@@ -1360,8 +1440,20 @@ def bridge_from_git(token: str, db_id: str, date_str: str, read=None) -> "int | 
     _github_output("wrote", "true" if wrote else "false")
     _github_output("date", date_str)
     _github_output("source", SOURCE_GIT)
-    print(f"브릿지 완료(git 반납): date={date_str} wrote={wrote}")
+    _github_output("by", run.get("by") or "editorial")
+    print(f"브릿지 완료(git 반납 · {run.get('by') or 'editorial'}): date={date_str} wrote={wrote}")
     return 0
+
+
+def _prepare_adoptable(token: str, db_id: str, run: dict[str, Any], read=None
+                       ) -> tuple[dict[str, Any], "dict[str, Any] | None", str, "str | None"]:
+    """채택 조건을 채운 반납 하나를 발행 문(검증·원문 정본화·스캐폴드)에 통과시킨다. 실패는 DeltaBridgeError."""
+    delta, deep, date_str = prepare_git_run(token, db_id, run)
+    try:
+        scaffold_text = load_run_scaffold(run, delta, read=read)
+    except DeltaBridgeError as e:
+        raise DeltaBridgeError(f"스캐폴드를 쓸 수 없음: {e}") from e
+    return delta, deep, date_str, scaffold_text
 
 
 def compare_only(token: str, db_id: str, date_str: str, read=None) -> int:
@@ -1489,6 +1581,27 @@ def _github_output(key: str, value: str) -> None:
         f.write(f"{key}={value}\n")
 
 
+def _fail_unrecorded_return(git_date: str, git_held: "list[str]", tail: str) -> bool:
+    """[11-23 사전 점검 B] 교열은 반납을 완료로 마쳤는데 git 으로 기록하지 못했고, 대신할 길도 없다 —
+    초록 '클린 skip' 이면 그 주가 조용히 발행되지 않는다. 실패로 알리고 True 를 돌려 run 을 빨갛게 한다.
+    이미 main 에 그 주 델타가 있으면 해당 없음(False). 노션 길(OPEN 델타 없음)·노션 off 길이 같이 쓴다."""
+    if not git_held or os.path.exists(_delta_path(git_date)):
+        return False
+    reason = " · ".join(git_held)
+    msg = f"{git_date} 교열 반납(copyedit.json status=완료)을 기록하지 못했다 — {reason}. {tail}"
+    print(f"ERROR: {msg}", file=sys.stderr)
+    print(f"::error title=교열 반납 미기록::{msg}")
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        try:
+            with open(summary, "a", encoding="utf-8") as f:
+                f.write(f"### 교열 반납 미기록 ({git_date})\n\n- {msg}\n"
+                        "- 고친 뒤 브릿지를 `publish_date` 로 다시 돌린다.\n\n")
+        except OSError:
+            pass
+    return True
+
+
 def main(argv: list[str] | None = None) -> int:
     # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다 — cp949 는 한글은
     # 찍어도 em-dash/불릿 같은 글자를 못 찍어 UnicodeEncodeError 로 죽는다. ubuntu CI 는
@@ -1514,9 +1627,18 @@ def main(argv: list[str] | None = None) -> int:
                           "(--publish-date 필수).")
     args = ap.parse_args(argv)
     source = resolve_source(args.source)
+    off = notion_off()
+    if off:
+        # [노션 은퇴] 노션 길이 없다 — 정본은 git 반납 하나, 노션 마감(CONSUMED)도 없다.
+        if args.consume:
+            log("INFO", "GRM_INTAKE_NOTION=off — 노션 마감(CONSUMED) 없음, 할 일 없음")
+            return 0
+        if source != SOURCE_GIT:
+            log("WARN", f"GRM_INTAKE_NOTION=off 인데 정본 길이 {source!r} — git 으로 진행(노션 길 없음)")
+            source = SOURCE_GIT
 
     token = os.environ.get("NOTION_TOKEN", "")
-    if not token:
+    if not token and not off:
         print("ERROR: NOTION_TOKEN 환경변수 없음", file=sys.stderr)
         return 1
 
@@ -1526,15 +1648,26 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         return compare_only(token, args.db, args.publish_date)
 
+    git_held: list[str] = []
+    git_date = ""
     if source == SOURCE_GIT and not args.consume:
         git_date = args.publish_date or _kst_today()
         try:
-            rc = bridge_from_git(token, args.db, git_date)
+            rc = bridge_from_git(token, args.db, git_date, held=git_held, notion=not off)
         except DeltaBridgeError as e:
             print(f"ERROR: {e}", file=sys.stderr)
             return 1
         if rc is not None:
             return rc
+        if off:
+            # 반납이 아직 없거나 교열이 `완료` 가 아니다 — 30분 뒤 회차가 다시 본다. 자동 백업은 없다.
+            _github_output("wrote", "false")
+            _github_output("date", git_date)
+            if _fail_unrecorded_return(git_date, git_held,
+                                       "GRM_INTAKE_NOTION=off 라 노션 예비 길도 없다 — 이번 run 은 아무것도 쓰지 않았다."):
+                return 1
+            log("INFO", f"git 반납 없음/미채택({git_date}) — GRM_INTAKE_NOTION=off 라 노션 예비 길 없음")
+            return 0
 
     try:
         page = select_open_delta(token, args.db, publish_date=args.publish_date)
@@ -1557,8 +1690,11 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             if rc is not None:
                 return rc
-        log("INFO", "no OPEN web-delta — nothing to bridge")
         _github_output("wrote", "false")
+        if _fail_unrecorded_return(git_date, git_held,
+                                   "노션에도 OPEN 델타가 없어 이번 run 은 아무것도 쓰지 않았다."):
+            return 1
+        log("INFO", "no OPEN web-delta — nothing to bridge")
         return 0
 
     if args.consume:

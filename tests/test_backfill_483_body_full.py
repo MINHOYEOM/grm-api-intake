@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from unittest import mock
 
 import backfill_483_body_full as bb
 import raw_versioning as rv
@@ -62,6 +63,14 @@ class DryRunTest(unittest.TestCase):
 
 
 class ApplyTest(unittest.TestCase):
+    def test_write_guard_rejects_shrink_if_a_filled_row_reaches_backfill(self) -> None:
+        row = _row("fda483-1", dict(_BASE_RAW, fda483_body_full="The full inspection text"))
+        with mock.patch.object(bb, "select_targets", return_value=[row]):
+            rep, calls = _run([row], apply=True, pdf=lambda raw, doc: ("The full inspection", "ok"))
+        self.assertEqual((rep.shrunk, rep.applied), (1, 0))
+        self.assertEqual(rep.examples["shrunk"], ["fda483-1"])
+        self.assertEqual(calls, [])
+
     def test_adds_only_body_key_and_uses_expected_sha(self) -> None:
         row = _row("fda483-1", dict(_BASE_RAW))
         rep, calls = _run([row], apply=True, index={"fda483-1": "p1"}, notion=lambda pid: "FULL")
@@ -100,6 +109,47 @@ class ApplyTest(unittest.TestCase):
                           index={"fda483-1": "p1"}, notion=boom, pdf=lambda raw, doc: ("PDF", "ok"))
         self.assertEqual((rep.via_pdf, rep.applied), (1, 1))
         self.assertEqual(rep.errors, ["notion(fda483-1):RuntimeError"])
+
+
+class DocIdsScopeTest(unittest.TestCase):
+    """[11-25 #7] 완전성 점검 26건처럼 정해진 문서만 dry/apply 할 수 있어야 한다."""
+
+    def test_parse_doc_ids_accepts_numbers_and_full_ids_dedups(self) -> None:
+        self.assertEqual(bb.parse_doc_ids("192058, fda483-190492 192058,80738"),
+                         ["fda483-192058", "fda483-190492", "fda483-80738"])
+        self.assertEqual(bb.parse_doc_ids(""), [])
+
+    def test_parse_doc_ids_rejects_other_shapes(self) -> None:
+        for bad in ("who-whopir-1", "fda483-12a", "1);drop"):
+            with self.assertRaises(ValueError):
+                bb.parse_doc_ids(bad)
+
+    def test_fetch_candidates_uses_doc_ids_instead_of_since(self) -> None:
+        with mock.patch.object(bb.fsb, "_fetch_all_pages", return_value=[]) as fetch:
+            bb.fetch_candidates("https://x", "k", "2026-06-01", ["fda483-1", "fda483-2"])
+            params = fetch.call_args.kwargs["extra_params"]
+        self.assertEqual(params["document_id"], "in.(fda483-1,fda483-2)")
+        self.assertNotIn("published_date", params)
+        with mock.patch.object(bb.fsb, "_fetch_all_pages", return_value=[]) as fetch:
+            bb.fetch_candidates("https://x", "k", "2026-06-01")
+            params = fetch.call_args.kwargs["extra_params"]
+        self.assertEqual(params["published_date"], "gte.2026-06-01")
+        self.assertNotIn("document_id", params)
+
+    def test_report_rows_record_each_outcome_with_lengths(self) -> None:
+        rows = [_row("fda483-1", dict(_BASE_RAW)), _row("fda483-2", dict(_BASE_RAW)),
+                _row("fda483-3", dict(_BASE_RAW))]
+
+        def pdf(_raw, doc):
+            return ("PDF TEXT", "ok") if doc == "fda483-1" else ("", "no-observations")
+
+        rep, calls = _run(rows, probe_pdf=True, pdf=pdf, ledger=("fda483-3",))
+        self.assertEqual(calls, [])
+        by_doc = {r["document_id"]: r for r in rep.rows}
+        self.assertEqual(by_doc["fda483-1"]["outcome"], "would_apply")
+        self.assertEqual((by_doc["fda483-1"]["old_chars"], by_doc["fda483-1"]["new_chars"]), (0, 8))
+        self.assertEqual(by_doc["fda483-2"]["outcome"], "pdf_no_observations")
+        self.assertEqual(by_doc["fda483-3"]["outcome"], "skipped_ledger")
 
 
 if __name__ == "__main__":

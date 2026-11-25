@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-16T10:09:19+00:00",
+  "checked_at": "2026-11-23T11:14:46+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -30,10 +30,10 @@
   "summary": {
     "blocked": 63,
     "broken": 0,
-    "needs_review": 144,
-    "ok": 423,
-    "references": 752,
-    "unique_urls": 630
+    "needs_review": 165,
+    "ok": 404,
+    "references": 754,
+    "unique_urls": 632
   },
   "urls": {
     "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf": {
@@ -774,8 +774,8 @@
     "https://health.ec.europa.eu/document/download/18d76565-137b-41d2-a602-794527f708c1_en?filename=chapter_3.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/18d76565-137b-41d2-a602-794527f708c1_en?filename=chapter_3.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -792,7 +792,7 @@
       "status": "ok"
     },
     "https://health.ec.europa.eu/document/download/19052fee-a596-47a1-b564-052128360d82_en?filename=mra_batch-certificate_05-2011.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/19052fee-a596-47a1-b564-052128360d82_en?filename=mra_batch-certificate_05-2011.pdf",
       "http_status": 206,
       "method": "GET",
@@ -852,10 +852,10 @@
       "status": "ok"
     },
     "https://health.ec.europa.eu/document/download/2a19f8d5-cc25-44ea-9296-d38e3a6c278c_en?filename=anx10_en.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/2a19f8d5-cc25-44ea-9296-d38e3a6c278c_en?filename=anx10_en.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -874,8 +874,8 @@
     "https://health.ec.europa.eu/document/download/363e435b-23cf-4cb3-9c74-322addb81340_en?filename=anx12_en.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/363e435b-23cf-4cb3-9c74-322addb81340_en?filename=anx12_en.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -892,11 +892,11 @@
       "status": "ok"
     },
     "https://health.ec.europa.eu/document/download/380fdf24-8a1e-4f65-809b-e08d990d5f9e_en?filename=2018_annex2_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/380fdf24-8a1e-4f65-809b-e08d990d5f9e_en?filename=2018_annex2_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -909,7 +909,7 @@
           "item_id": "eu-gmp-annex2"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://health.ec.europa.eu/document/download/3b293ba6-c7f9-4a63-8121-303a18c30120_en?filename=template_imp_batch_certification.docx": {
       "attempts": 1,
@@ -927,11 +927,11 @@
       "status": "ok"
     },
     "https://health.ec.europa.eu/document/download/3db7d485-61e2-4f61-a16a-82a6dbf0e914_en?filename=anx09_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/3db7d485-61e2-4f61-a16a-82a6dbf0e914_en?filename=anx09_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -944,7 +944,7 @@
           "item_id": "eu-gmp-annex9"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://health.ec.europa.eu/document/download/4a1fdb4f-6f6f-49c4-b264-8056e5bbe078_en?filename=chapter_5.pdf": {
       "attempts": 1,
@@ -969,8 +969,8 @@
     "https://health.ec.europa.eu/document/download/58b5106a-cf6f-4352-9dca-1caf5d27d97e_en?filename=vol4-chap7_2012-06_en.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/58b5106a-cf6f-4352-9dca-1caf5d27d97e_en?filename=vol4-chap7_2012-06_en.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -987,11 +987,11 @@
       "status": "ok"
     },
     "https://health.ec.europa.eu/document/download/6e8ae778-73d0-4a1e-a374-a06e791152a7_en?filename=guideline_handling-shipping_investigational-mp_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/6e8ae778-73d0-4a1e-a374-a06e791152a7_en?filename=guideline_handling-shipping_investigational-mp_en.pdf",
-      "http_status": 200,
-      "method": "HEAD",
-      "reason": "reachable",
+      "http_status": 429,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -1004,10 +1004,10 @@
           "item_id": "eu-gmp-part3-imp-handling-shipping"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://health.ec.europa.eu/document/download/78d31fc9-760f-4fe9-9ccd-95595ef48a71_en?filename=2018_annex17_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/78d31fc9-760f-4fe9-9ccd-95595ef48a71_en?filename=2018_annex17_en.pdf",
       "http_status": 206,
       "method": "GET",
@@ -1029,8 +1029,8 @@
     "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -1049,8 +1049,8 @@
     "https://health.ec.europa.eu/document/download/831d392e-bcc4-4552-8011-2b724b8655de_en?filename=c2026-4135_en_act_en.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/831d392e-bcc4-4552-8011-2b724b8655de_en?filename=c2026-4135_en_act_en.pdf",
-      "http_status": 200,
-      "method": "HEAD",
+      "http_status": 206,
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -1069,8 +1069,8 @@
     "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf",
-      "http_status": 200,
-      "method": "HEAD",
+      "http_status": 206,
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -1109,8 +1109,8 @@
     "https://health.ec.europa.eu/document/download/a0b206a0-5788-406b-9e20-e0525b16e712_en?filename=guideline_adopted_1_en_act_part1_v3.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/a0b206a0-5788-406b-9e20-e0525b16e712_en?filename=guideline_adopted_1_en_act_part1_v3.pdf",
-      "http_status": 200,
-      "method": "HEAD",
+      "http_status": 206,
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -1129,9 +1129,9 @@
     "https://health.ec.europa.eu/document/download/a28a88b2-d510-40c6-a40d-c1989819e13e_en?filename=annex14_rev30-03_2011_en.pdf": {
       "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/a28a88b2-d510-40c6-a40d-c1989819e13e_en?filename=annex14_rev30-03_2011_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -1144,10 +1144,10 @@
           "item_id": "eu-gmp-annex14"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://health.ec.europa.eu/document/download/ab1d8ff2-fdc9-49ab-a3aa-73f80471f92b_en?filename=2013_01_28_template.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/ab1d8ff2-fdc9-49ab-a3aa-73f80471f92b_en?filename=2013_01_28_template.pdf",
       "http_status": 206,
       "method": "GET",
@@ -1189,9 +1189,9 @@
     "https://health.ec.europa.eu/document/download/b9b0cf46-07a6-4243-b801-446ccfcd2d72_en?filename=2005_12_14_annex19_en.pdf": {
       "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/b9b0cf46-07a6-4243-b801-446ccfcd2d72_en?filename=2005_12_14_annex19_en.pdf",
-      "http_status": 429,
+      "http_status": 206,
       "method": "GET",
-      "reason": "transient_or_access_control:http_429",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -1204,13 +1204,13 @@
           "item_id": "eu-gmp-annex19-2005"
         }
       ],
-      "status": "needs_review"
+      "status": "ok"
     },
     "https://health.ec.europa.eu/document/download/b9dfcd18-73d2-45f8-a3a7-e4558fdc2d58_en?filename=2009_07_annex6.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/b9dfcd18-73d2-45f8-a3a7-e4558fdc2d58_en?filename=2009_07_annex6.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -1247,11 +1247,11 @@
       "status": "ok"
     },
     "https://health.ec.europa.eu/document/download/bf281e1f-4897-469a-ba60-18d867b14a94_en?filename=2008_09_annex3_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/bf281e1f-4897-469a-ba60-18d867b14a94_en?filename=2008_09_annex3_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -1264,13 +1264,13 @@
           "item_id": "eu-gmp-annex3"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://health.ec.europa.eu/document/download/c3bac13b-689e-4d01-8321-dbf088bb692a_en?filename=gmp_mah_rp_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://health.ec.europa.eu/document/download/c3bac13b-689e-4d01-8321-dbf088bb692a_en?filename=gmp_mah_rp_en.pdf",
-      "http_status": 200,
-      "method": "HEAD",
+      "http_status": 206,
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -1349,8 +1349,8 @@
     "https://health.ec.europa.eu/document/download/e2ddfe65-7b4e-4765-b71b-4681772d2949_en": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/e2ddfe65-7b4e-4765-b71b-4681772d2949_en",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -1369,8 +1369,8 @@
     "https://health.ec.europa.eu/document/download/e458c423-f564-4171-b344-030a461c567f_en?filename=vol4-chap1_2013-01_en.pdf": {
       "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/e458c423-f564-4171-b344-030a461c567f_en?filename=vol4-chap1_2013-01_en.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -1387,7 +1387,7 @@
       "status": "ok"
     },
     "https://health.ec.europa.eu/document/download/fd318dd6-2404-4e67-82b0-2324825e4d90_en?filename=vol4_an7_2008_09_en.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://health.ec.europa.eu/document/download/fd318dd6-2404-4e67-82b0-2324825e4d90_en?filename=vol4_an7_2008_09_en.pdf",
       "http_status": 206,
       "method": "GET",
@@ -3712,11 +3712,11 @@
       "status": "blocked"
     },
     "https://www.ema.europa.eu/en/documents/other/questions-and-answers-design-space-verification_en.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.ema.europa.eu/en/documents/other/questions-and-answers-design-space-verification_en.pdf",
-      "http_status": 429,
-      "method": "GET",
-      "reason": "transient_or_access_control:http_429",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -3729,11 +3729,31 @@
           "item_id": "ema-gmp-023"
         }
       ],
-      "status": "needs_review"
+      "status": "ok"
     },
     "https://www.ema.europa.eu/en/documents/other/questions-and-answers-implementation-risk-based-prevention-cross-contamination-production-and-guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different_en.pdf": {
       "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/other/questions-and-answers-implementation-risk-based-prevention-cross-contamination-production-and-guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different_en.pdf",
+      "http_status": 206,
+      "method": "GET",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-025"
+        },
+        {
+          "field": "pdf_url",
+          "file": "ema.json",
+          "item_id": "ema-gmp-025"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/co-ordinating-good-manufacturing-practice-gmp-inspections-centrally-authorised-products_en.pdf": {
+      "attempts": 2,
+      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/co-ordinating-good-manufacturing-practice-gmp-inspections-centrally-authorised-products_en.pdf",
       "http_status": 429,
       "method": "GET",
       "reason": "transient_or_access_control:http_429",
@@ -3741,42 +3761,22 @@
         {
           "field": "official_url",
           "file": "ema.json",
-          "item_id": "ema-gmp-025"
+          "item_id": "ema-gmp-012"
         },
         {
           "field": "pdf_url",
           "file": "ema.json",
-          "item_id": "ema-gmp-025"
+          "item_id": "ema-gmp-012"
         }
       ],
       "status": "needs_review"
     },
-    "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/co-ordinating-good-manufacturing-practice-gmp-inspections-centrally-authorised-products_en.pdf": {
-      "attempts": 2,
-      "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/co-ordinating-good-manufacturing-practice-gmp-inspections-centrally-authorised-products_en.pdf",
-      "http_status": 206,
-      "method": "GET",
-      "reason": "reachable",
-      "references": [
-        {
-          "field": "official_url",
-          "file": "ema.json",
-          "item_id": "ema-gmp-012"
-        },
-        {
-          "field": "pdf_url",
-          "file": "ema.json",
-          "item_id": "ema-gmp-012"
-        }
-      ],
-      "status": "ok"
-    },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/conduct-inspections-pharmaceutical-manufacturers-or-importers_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/conduct-inspections-pharmaceutical-manufacturers-or-importers_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -3789,14 +3789,14 @@
           "item_id": "ema-gmp-004"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/eu-eea-programme-maintenance-equivalence-supervision-good-manufacturing-practice-compliance-pharmaceutical-companies_en.pdf": {
       "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/eu-eea-programme-maintenance-equivalence-supervision-good-manufacturing-practice-compliance-pharmaceutical-companies_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -3809,10 +3809,10 @@
           "item_id": "ema-gmp-014"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guidance-occasions-when-it-appropriate-competent-authorities-conduct-inspections-premises-manufacturers-importers-distributors-active-substances-manufacturers-or-importers-excipients-used-starting_en.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guidance-occasions-when-it-appropriate-competent-authorities-conduct-inspections-premises-manufacturers-importers-distributors-active-substances-manufacturers-or-importers-excipients-used-starting_en.pdf",
       "http_status": 206,
       "method": "GET",
@@ -3832,11 +3832,11 @@
       "status": "ok"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guideline-training-qualifications-good-manufacturing-practice-gmp-inspectors_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guideline-training-qualifications-good-manufacturing-practice-gmp-inspectors_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -3849,14 +3849,14 @@
           "item_id": "ema-gmp-006"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/history-changes-compilation-procedures_en.pdf": {
       "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/history-changes-compilation-procedures_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -3869,10 +3869,10 @@
           "item_id": "ema-bd3d03a4ab3c"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-good-manufacturing-practice-gmp-certificate_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-good-manufacturing-practice-gmp-certificate_en.pdf",
       "http_status": 206,
       "method": "GET",
@@ -3892,11 +3892,11 @@
       "status": "ok"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-manufacturer-importer-authorisation_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/interpretation-union-format-manufacturer-importer-authorisation_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -3909,14 +3909,14 @@
           "item_id": "ema-gmp-015"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/introduction-compilation-union-procedures-inspections-exchange-information_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/introduction-compilation-union-procedures-inspections-exchange-information_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -3929,14 +3929,14 @@
           "item_id": "ema-d82e72955ef3"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/issue-update-good-manufacturing-practice-gmp-certificates_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/issue-update-good-manufacturing-practice-gmp-certificates_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -3949,14 +3949,14 @@
           "item_id": "ema-gmp-008"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/management-classification-reports-suspected-quality-defects-medicinal-products-risk-based-decision-making_en.pdf": {
       "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/management-classification-reports-suspected-quality-defects-medicinal-products-risk-based-decision-making_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -3969,7 +3969,7 @@
           "item_id": "ema-gmp-002"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/management-rapid-alerts-arising-quality-defects-risk-assessment_en.pdf": {
       "attempts": 2,
@@ -3994,8 +3994,8 @@
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/model-risk-based-planning-inspections-pharmaceutical-manufacturers_en.pdf": {
       "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/model-risk-based-planning-inspections-pharmaceutical-manufacturers_en.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -4012,11 +4012,11 @@
       "status": "ok"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/outline-procedure-co-ordinating-verification-gmp-status-manufacturers-third-countries_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/outline-procedure-co-ordinating-verification-gmp-status-manufacturers-third-countries_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -4029,14 +4029,14 @@
           "item_id": "ema-gmp-005"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-compliance-management_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-compliance-management_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -4049,14 +4049,14 @@
           "item_id": "ema-gmp-013"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-dealing-serious-good-manufacturing-practice-gmp-non-compliance-information-originating-third-country-authorities-or-international-organisations_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-dealing-serious-good-manufacturing-practice-gmp-non-compliance-information-originating-third-country-authorities-or-international-organisations_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -4069,13 +4069,13 @@
           "item_id": "ema-gmp-010"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-dealing-serious-good-manufacturing-practice-gmp-non-compliance-requiring-co-ordinated-measures-protect-public-or-animal-health_en.pdf": {
       "attempts": 1,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/procedure-dealing-serious-good-manufacturing-practice-gmp-non-compliance-requiring-co-ordinated-measures-protect-public-or-animal-health_en.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -4092,11 +4092,11 @@
       "status": "ok"
     },
     "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/quality-systems-framework-good-manufacturing-practice-gmp-inspectorates_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/quality-systems-framework-good-manufacturing-practice-gmp-inspectorates_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -4109,14 +4109,14 @@
           "item_id": "ema-gmp-001"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-manufacture-finished-dosage-form-revision-1_en.pdf": {
       "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-manufacture-finished-dosage-form-revision-1_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "pdf_url",
@@ -4124,10 +4124,10 @@
           "item_id": "ema-gmp-017"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-process-validation-finished-products-information-and-data-be-provided-regulatory-submissions-revision-1_en.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-process-validation-finished-products-information-and-data-be-provided-regulatory-submissions-revision-1_en.pdf",
       "http_status": 206,
       "method": "GET",
@@ -4144,8 +4144,8 @@
     "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities_en.pdf": {
       "attempts": 1,
       "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities_en.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -4162,11 +4162,11 @@
       "status": "ok"
     },
     "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-sterilisation-medicinal-product-active-substance-excipient-and-primary-container_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-sterilisation-medicinal-product-active-substance-excipient-and-primary-container_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "pdf_url",
@@ -4174,13 +4174,13 @@
           "item_id": "ema-gmp-020"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/scientific-guideline/international-conference-harmonisation-technical-requirements-registration-pharmaceuticals-human-guideline-q10-pharmaceutical-quality-system-step-5_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/international-conference-harmonisation-technical-requirements-registration-pharmaceuticals-human-guideline-q10-pharmaceutical-quality-system-step-5_en.pdf",
-      "http_status": 206,
-      "method": "GET",
+      "http_status": 200,
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -4192,11 +4192,11 @@
       "status": "ok"
     },
     "https://www.ema.europa.eu/en/documents/scientific-guideline/note-guidance-start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form_en.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/note-guidance-start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form_en.pdf",
-      "http_status": 206,
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "pdf_url",
@@ -4204,7 +4204,7 @@
           "item_id": "ema-gmp-019"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/documents/scientific-guideline/questions-and-answers-improving-understanding-normal-operating-range-nor-proven-acceptable-range-par-design-space-dsp-and-normal-variability-process-parameters_en.pdf": {
       "attempts": 2,
@@ -4257,11 +4257,11 @@
       "status": "ok"
     },
     "https://www.ema.europa.eu/en/ich-guideline-q13-continuous-manufacturing-drug-substances-and-drug-products-scientific-guideline": {
-      "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-guideline-q13-continuous-manufacturing-drug-substances-drug-products",
-      "http_status": 206,
+      "attempts": 2,
+      "final_url": "https://www.ema.europa.eu/en/ich-guideline-q13-continuous-manufacturing-drug-substances-and-drug-products-scientific-guideline",
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -4269,10 +4269,10 @@
           "item_id": "ema-355a641be612"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/ich-q10-pharmaceutical-quality-system-scientific-guideline": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-q10-pharmaceutical-quality-system",
       "http_status": 206,
       "method": "GET",
@@ -4293,10 +4293,10 @@
     },
     "https://www.ema.europa.eu/en/ich-q8-q9-q10-questions-answers-scientific-guideline": {
       "attempts": 2,
-      "final_url": "https://www.ema.europa.eu/en/ich-q8-q9-q10-questions-answers-scientific-guideline",
-      "http_status": 429,
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-q8-q9-q10-questions-answers",
+      "http_status": 206,
       "method": "GET",
-      "reason": "transient_or_access_control:http_429",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -4304,14 +4304,14 @@
           "item_id": "ema-c2268063be73"
         }
       ],
-      "status": "needs_review"
+      "status": "ok"
     },
     "https://www.ema.europa.eu/en/ich-q8-r2-pharmaceutical-development-scientific-guideline": {
       "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-q8-r2-pharmaceutical-development",
-      "http_status": 429,
+      "http_status": 206,
       "method": "GET",
-      "reason": "transient_or_access_control:http_429",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -4319,10 +4319,10 @@
           "item_id": "ema-9f5df91aaf2e"
         }
       ],
-      "status": "needs_review"
+      "status": "ok"
     },
     "https://www.ema.europa.eu/en/ich-q9-quality-risk-management-scientific-guideline": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-q9-quality-risk-management",
       "http_status": 206,
       "method": "GET",
@@ -4337,11 +4337,11 @@
       "status": "ok"
     },
     "https://www.ema.europa.eu/en/manufacture-finished-dosage-form-human-scientific-guideline": {
-      "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/manufacture-finished-dosage-form-human",
-      "http_status": 206,
+      "attempts": 2,
+      "final_url": "https://www.ema.europa.eu/en/manufacture-finished-dosage-form-human-scientific-guideline",
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -4349,14 +4349,14 @@
           "item_id": "ema-gmp-017"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/process-validation-finished-products-information-data-be-provided-regulatory-submissions-scientific-guideline": {
-      "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/process-validation-finished-products-information-data-be-provided-regulatory-submissions",
-      "http_status": 206,
+      "attempts": 2,
+      "final_url": "https://www.ema.europa.eu/en/process-validation-finished-products-information-data-be-provided-regulatory-submissions-scientific-guideline",
+      "http_status": 429,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "transient_or_access_control:http_429",
       "references": [
         {
           "field": "official_url",
@@ -4364,7 +4364,7 @@
           "item_id": "ema-gmp-018"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities-scientific-guideline": {
       "attempts": 1,
@@ -4388,7 +4388,7 @@
     },
     "https://www.ema.europa.eu/en/start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form-scientific-guideline": {
       "attempts": 2,
-      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form",
+      "final_url": "https://www.ema.europa.eu/en/start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form-scientific-guideline",
       "http_status": 429,
       "method": "GET",
       "reason": "transient_or_access_control:http_429",
@@ -4402,11 +4402,11 @@
       "status": "needs_review"
     },
     "https://www.ema.europa.eu/en/sterilisation-medicinal-product-active-substance-excipient-primary-container-scientific-guideline": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/sterilisation-medicinal-product-active-substance-excipient-primary-container",
-      "http_status": 429,
+      "http_status": 206,
       "method": "GET",
-      "reason": "transient_or_access_control:http_429",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -4414,7 +4414,7 @@
           "item_id": "ema-gmp-020"
         }
       ],
-      "status": "needs_review"
+      "status": "ok"
     },
     "https://www.ema.europa.eu/en/use-ionizing-radiation-manufacture-medicinal-products-scientific-guideline": {
       "attempts": 2,
@@ -5347,11 +5347,11 @@
       "status": "ok"
     },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3e-guideline-extractables-and-leachables": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3e-guideline-extractables-and-leachables",
-      "http_status": 206,
+      "http_status": null,
       "method": "GET",
-      "reason": "reachable",
+      "reason": "network_or_tls:TooManyRedirects",
       "references": [
         {
           "field": "official_url",
@@ -5359,7 +5359,7 @@
           "item_id": "fda-e49e88e2b0a5"
         }
       ],
-      "status": "ok"
+      "status": "needs_review"
     },
     "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q3e-guideline-extractables-and-leachables-supporting-documentation-class-3-leachable-monographs": {
       "attempts": 1,
@@ -8761,6 +8761,36 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15996": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15996",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15996"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15997": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15997",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15997"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -9272,7 +9302,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000266954.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000266954.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -9302,7 +9332,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000267517.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -9377,7 +9407,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280046.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280046.pdf",
       "http_status": 200,
       "method": "HEAD",

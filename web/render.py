@@ -6172,6 +6172,18 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         " 한국어 풀이·공식 출처·실제 지적사례 연결",
         f"- [자료실]({base_url}/library/): FDA·EMA·PIC/S·ICH·WHO·식약처 지침·가이드라인"
         " 공식 원문 링크",
+    ]
+    # [검색 유입 점검 2026-11-26] 조항 원문·실사 대비 노트가 이 안내에 없었다 — 빙 유입의 둘째 묶음이
+    # 조항 원문(en/clauses·en/library)인데 AI 검색에는 알리지 않았다. 국문 트리는 영문 트리와 같은
+    # 렌더러가 함께 내므로 영문 면이 있으면 국문 면도 있다(없는 면은 적지 않는다).
+    _ep = en_paths or set()
+    if "clauses/" in _ep:
+        lines.append(f"- [기준 조항 원문]({base_url}/clauses/): 식약처 GMP·21 CFR·EU GMP·ICH 조항을"
+                     " 원문 그대로 — 21 CFR 조항은 그 조항을 인용한 실제 지적과 연결")
+    if "inspection-notes/" in _ep:
+        lines.append(f"- [실사 대비 노트]({base_url}/inspection-notes/): 주제별로 실사에서 실제"
+                     " 지적된 문장과 출처")
+    lines += [
         f"- [이용안내]({base_url}/guide/): 서비스 활용법과 자주 묻는 질문",
         f"- [주간 퀴즈]({base_url}/quiz/): 그 주 규제 소식 기반 학습 퀴즈",
         f"- [소개]({base_url}/about/): 서비스를 만든 이유와 만드는 방식, 연락처",
@@ -6219,6 +6231,11 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
      "{terms} GMP and quality terms explained in plain English with official sources"),
     ("library/", "Reference library",
      "Official FDA, EMA, PIC/S, ICH, WHO and MFDS guidance documents"),
+    ("clauses/", "Regulation texts",
+     "21 CFR, EU GMP and ICH clauses in their original wording; 21 CFR clauses list"
+     " the findings that cite them"),
+    ("inspection-notes/", "Inspection readiness notes",
+     "Topic notes built from sentences regulators actually wrote in findings, with sources"),
     ("archive/", "Weekly brief archive", "Past weekly regulatory briefs"),
     ("guide/", "Guide", "How to use the service, and frequently asked questions"),
     ("quiz/", "Weekly quiz", "Learning quiz based on that week's regulatory news"),

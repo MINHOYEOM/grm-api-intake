@@ -15,15 +15,17 @@ import time
 from collections.abc import Callable, Iterable
 from contextlib import redirect_stdout
 from dataclasses import dataclass
-from html import unescape
 from typing import Any
 
 import collect_intake as intake
 import collect_who as who
+import ema_document
 import findings_supabase_backfill as fsb
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url
 from grm_common import SOURCE_ECA, SOURCE_EMA, SOURCE_MHRA, SOURCE_WHO
+from grm_http_policy import (BACKFILL_429_RETRY_WAITS_SECONDS, BACKFILL_ARTICLE_DELAY_SECONDS,
+                             BACKFILL_WHO_DELAY_SECONDS)
 
 TARGET_FIELDS = {
     SOURCE_WHO: "whopir_report",
@@ -32,6 +34,8 @@ TARGET_FIELDS = {
     SOURCE_MHRA: "mhra_alert_body",
 }
 MHRA_ALERT_PREFIX = "https://www.gov.uk/drug-device-alerts/"
+SOURCE_KEYS = {"who": SOURCE_WHO, "ema": SOURCE_EMA, "eca": SOURCE_ECA, "mhra": SOURCE_MHRA}
+_DATE_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
 
 
 @dataclass(frozen=True)
@@ -39,6 +43,9 @@ class Readers:
     whopir: Callable[[str], tuple[str, dict[str, Any] | None, str]]
     article: Callable[[str, str], str]
     mhra: Callable[[str], str]
+    # [11-25 #8] EMA 는 기사 HTML·문서 PDF 를 모두 읽는 공통 판독기(ema_document.read_ema_fulltext).
+    # 일일 수집기(collect_intake._enrich_ema_article_excerpts)와 같은 함수다. 없으면 article 로 읽는다.
+    ema: Callable[[str], "ema_document.EmaDocument"] | None = None
 
 
 def _object(value: Any) -> dict[str, Any]:
@@ -69,6 +76,8 @@ def backfill(
         if field is None:
             continue
         result = {"source": source, "document_id": row.get("document_id")}
+        if row.get("ingested_at"):
+            result["ingested_at"] = str(row["ingested_at"])[:10]
         try:
             raw = _object(row.get("raw_json"))
             metadata = _object(row.get("row_json") or {})
@@ -76,7 +85,7 @@ def backfill(
             results.append({**result, "status": "invalid_json"})
             continue
 
-        if not _blank(raw.get(field)):
+        if not _blank(raw.get(field)) or (source == SOURCE_EMA and ema_document.fulltext(raw).strip()):
             continue
         urls = (row.get("official_url"), metadata.get("official_url"), raw.get("link"))
         url = next((value.strip() for value in urls if isinstance(value, str) and value.strip()), "")
@@ -101,7 +110,19 @@ def backfill(
             results.append({**result, "status": "missing_url"})
             continue
 
-        if source == SOURCE_WHO:
+        doc_info: dict[str, Any] = {}
+        if source == SOURCE_EMA and readers.ema is not None:
+            doc = readers.ema(url)
+            # 저장 형식(분할·메타)과 저장 게이트(전문 == 판독 전문)는 공통 함수가 정한다.
+            recovered = ema_document.raw_patch(doc)
+            status = doc.status
+            doc_info = {"format": doc.format, "pages": doc.pages, "chars": len(doc.text),
+                        "document_link": ema_document.is_document_url(url), "url": url}
+            if not doc.ok:
+                # 실패 사유 메타만 있는 패치는 쓰지 않는다(빈칸은 감시가 사유와 함께 센다).
+                results.append({**result, "status": status, **doc_info})
+                continue
+        elif source == SOURCE_WHO:
             _, report, status = readers.whopir(url)
             # 수집기의 발췌는 길이 제한이 있으므로 백필은 구조화 전문만 저장한다.
             recovered = {field: report}
@@ -112,8 +133,12 @@ def backfill(
             recovered = {field: readers.article(url, "EMA" if source == SOURCE_EMA else "ECA")}
             status = "empty_excerpt"
 
-        patch = {key: value for key, value in recovered.items()
-                 if _blank(raw.get(key)) and not _blank(value)}
+        if doc_info:
+            # 본문이 빈 것은 위에서 확인했다. 옛 실패 메타(ema_document)는 새 판독 메타로 바꾼다.
+            patch = dict(recovered)
+        else:
+            patch = {key: value for key, value in recovered.items()
+                     if _blank(raw.get(key)) and not _blank(value)}
         complete = field in patch
         if not patch:
             results.append({**result, "status": status})
@@ -127,38 +152,30 @@ def backfill(
                 continue
         results.append({
             **result, "status": "applied" if apply else "would_apply", "fields": fields,
-            "complete": complete,
+            "complete": complete, **doc_info,
         })
     return results
 
 
 def _read_whopir(url: str) -> tuple[str, dict[str, Any] | None, str]:
-    time.sleep(who.WHOPIR_EXCERPT_DELAY_SECONDS)
+    time.sleep(max(who.WHOPIR_EXCERPT_DELAY_SECONDS, BACKFILL_WHO_DELAY_SECONDS))
     return who._fetch_whopir_detail(url)
 
 
-def _extract_full_article_excerpt(html_text: str) -> str:
-    """Apply the collector paragraph selection without a length cap."""
-    text = html_text or ""
-    text = re.sub(r"(?is)<(script|style|nav|header|footer)[^>]*>.*?</\1>", " ", text)
-    paras = re.findall(r"(?is)<p[^>]*>(.*?)</p>", text)
-    parts: list[str] = []
-    for p in paras:
-        t = re.sub(r"(?s)<[^>]+>", " ", p)
-        t = unescape(t)
-        t = re.sub(r"\s+", " ", t).strip()
-        if t:
-            parts.append(t)
-    return " ".join(parts)
+# 수집기 `<p>` 선택 규칙(상한 없음)과 429 재시도는 ema_document 의 공통 함수다(규칙을 베끼지 않는다).
+_extract_full_article_excerpt = ema_document.extract_html_text
+
+
+def _get_article(url: str, sleeper: Callable[[float], None] | None = None) -> Any:
+    """429 는 Retry-After(없으면 30·60초)만큼 쉬고 두 번까지 다시 묻는다."""
+    return ema_document.get_with_retry(url, sleeper=sleeper,
+                                       timeout=intake.ECA_ARTICLE_EXCERPT_FETCH_TIMEOUT)
 
 
 def _read_article(url: str, label: str) -> str:
-    time.sleep(intake.ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
+    time.sleep(max(intake.ECA_ARTICLE_EXCERPT_DELAY_SECONDS, BACKFILL_ARTICLE_DELAY_SECONDS))
     try:
-        resp = intake.requests.get(url, timeout=intake.ECA_ARTICLE_EXCERPT_FETCH_TIMEOUT, headers={
-            "User-Agent": "GRM-Intake/1.1 (+github-actions)",
-            "Accept": "text/html",
-        })
+        resp = _get_article(url)
         if resp.status_code == 403:
             intake.log("WARN", f"{label} 기사 본문 403 — excerpt 건너뜀(카드 그대로): {intake.truncate(url, 80)}")
             return ""
@@ -172,8 +189,12 @@ def _read_article(url: str, label: str) -> str:
     return excerpt
 
 
+def _read_ema(url: str) -> "ema_document.EmaDocument":
+    return ema_document.read_ema_fulltext(url)
+
+
 def _read_mhra(url: str) -> str:
-    time.sleep(intake.MHRA_ALERT_BODY_DELAY_SECONDS)
+    time.sleep(max(intake.MHRA_ALERT_BODY_DELAY_SECONDS, BACKFILL_ARTICLE_DELAY_SECONDS))
     return intake._fetch_mhra_alert_body(url)
 
 
@@ -186,7 +207,15 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--apply", action="store_true", help="판독 결과를 DB에 저장")
+    parser.add_argument("--source", action="append", choices=sorted(SOURCE_KEYS),
+                        help="이 소스만(여러 번 지정 가능). 없으면 네 소스 전부")
+    parser.add_argument("--ingested-since", default="",
+                        help="적재일(ingested_at) 하한 YYYY-MM-DD — 완전성 점검 범위(최근 60일)만 돌릴 때")
+    parser.add_argument("--output", default="", help="JSON 결과를 이 파일에도 쓴다")
     args = parser.parse_args(argv)
+    if args.ingested_since and not _DATE_RE.match(args.ingested_since):
+        parser.error("--ingested-since 는 YYYY-MM-DD")
+    sources = [SOURCE_KEYS[k] for k in (args.source or [])] or list(TARGET_FIELDS)
     base = normalize_supabase_url(os.environ.get("SUPABASE_URL", ""))
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     if not base or not key:
@@ -194,11 +223,14 @@ def main(argv: list[str] | None = None) -> int:
 
     rows = []
     try:
-        for source in TARGET_FIELDS:
+        for source in sources:
+            params = {"source": f"eq.{source}"}
+            if args.ingested_since:
+                params["ingested_at"] = f"gte.{args.ingested_since}"
             rows.extend(fsb._fetch_all_pages(
                 base, key, "raw_signals",
-                select="source,document_id,official_url,raw_signal_id,raw_sha256,raw_json,row_json",
-                page_size=500, order="raw_signal_id.asc", extra_params={"source": f"eq.{source}"},
+                select="source,document_id,official_url,raw_signal_id,raw_sha256,raw_json,row_json,ingested_at",
+                page_size=500, order="raw_signal_id.asc", extra_params=params,
             ))
     except RuntimeError:
         print("raw_signals 조회 실패", file=sys.stderr)
@@ -210,9 +242,20 @@ def main(argv: list[str] | None = None) -> int:
                        diff_summary={"changed_fields": fields})
 
     with redirect_stdout(sys.stderr):
-        results = backfill(rows, Readers(_read_whopir, _read_article, _read_mhra),
+        results = backfill(rows, Readers(_read_whopir, _read_article, _read_mhra, _read_ema),
                            apply=args.apply, write=write)
-    print(json.dumps({"mode": "apply" if args.apply else "dry_run", "rows": results}, indent=2))
+    summary: dict[str, dict[str, int]] = {}
+    for r in results:
+        bucket = summary.setdefault(r["source"], {})
+        key_ = "complete" if r.get("complete") else r["status"]
+        bucket[key_] = bucket.get(key_, 0) + 1
+    out = json.dumps({"mode": "apply" if args.apply else "dry_run", "sources": sources,
+                      "ingested_since": args.ingested_since, "summary": summary,
+                      "rows": results}, ensure_ascii=False, indent=2)
+    print(out)
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as fh:
+            fh.write(out)
     return int(any(r["status"] != "excluded_unrelated" and not r.get("complete") for r in results))
 
 

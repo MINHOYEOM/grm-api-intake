@@ -36,6 +36,7 @@ from functools import lru_cache
 from typing import Any, Iterable
 
 import requests
+from grm_cli import BulkWriteError, BulkWriteRun
 
 DEFAULT_TIMEOUT_SECONDS = 15
 _MAX_ATTEMPTS = 2            # 최초 1회 + 5xx/타임아웃 재시도 1회
@@ -293,23 +294,38 @@ class ExclusionLedger:
         if not self.enabled:
             return
         rows = list(self._pending.values())
-        for i in range(0, len(rows), _WRITE_CHUNK):
-            chunk = rows[i:i + _WRITE_CHUNK]
-            err = self._rpc("intake_exclusion_record", {"p_rows": chunk})
-            if err:
-                self.flush_failed += len(chunk)
-                self.last_error = err
-            else:
-                self.flushed += len(chunk)
         keys = [{"source": s, "document_id": d} for (s, d) in self._released]
-        for i in range(0, len(keys), _WRITE_CHUNK):
-            chunk = keys[i:i + _WRITE_CHUNK]
-            err = self._rpc("intake_exclusion_release", {"p_keys": chunk})
+        bulk = BulkWriteRun()
+        flushed = released = 0
+
+        def record(batch, _offset):
+            nonlocal flushed
+            err = self._rpc("intake_exclusion_record", {"p_rows": batch})
             if err:
-                self.release_failed += len(chunk)
                 self.last_error = err
-            else:
-                self.released += len(chunk)
+                return False
+            flushed += len(batch)
+            return True
+
+        def release(batch, _offset):
+            nonlocal released
+            err = self._rpc("intake_exclusion_release", {"p_keys": batch})
+            if err:
+                self.last_error = err
+                return False
+            released += len(batch)
+            return True
+
+        try:
+            bulk.require_capacity(len(rows) + len(keys))
+            bulk.write(rows, record, batch_size=_WRITE_CHUNK)
+            bulk.write(keys, release, batch_size=_WRITE_CHUNK)
+        except BulkWriteError as exc:
+            self.last_error = str(exc)
+        self.flushed += flushed
+        self.released += released
+        self.flush_failed += len(rows) - flushed
+        self.release_failed += len(keys) - released
 
     def _rpc(self, fn: str, body: dict[str, Any]) -> str:
         """성공이면 "", 실패면 오류 요약(예외 문구 아님)."""

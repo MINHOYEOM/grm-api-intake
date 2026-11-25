@@ -379,6 +379,76 @@ def dump_texts(doc_ids: list[str], out_dir: str, *,
     return rows
 
 
+def _fetch_pdf_bytes(pdf_url: str) -> bytes:
+    from grm_common import http_get_bytes
+
+    return http_get_bytes(pdf_url, timeout=30, retries=FDA_483_MIXED_PDF_HTTP_RETRIES,
+                          headers={"Accept": "application/pdf"}, label="FDA 483 PDF(dump)")
+
+
+def _render_signature_pages(data: bytes) -> dict[int, bytes]:
+    """Render the last two pages and pages with the signature label, numbered from one."""
+    import pymupdf  # type: ignore[import-not-found]
+
+    with pymupdf.open(stream=data, filetype="pdf") as pdf:
+        if not pdf.page_count:
+            raise ValueError("PDF has no pages")
+        selected = set(range(max(0, pdf.page_count - 2), pdf.page_count))
+        for index, page in enumerate(pdf):
+            text = " ".join(page.get_text("text").upper().split())
+            if "NAME AND TITLE OF INDIVIDUAL" in text:
+                selected.add(index)
+        return {index + 1: pdf[index].get_pixmap(dpi=150, alpha=False).tobytes("png")
+                for index in sorted(selected)}
+
+
+def dump_pdfs(doc_ids: list[str], out_dir: str, *,
+              fetch_bytes: Callable[[str], bytes] | None = None,
+              render_pages: Callable[[bytes], dict[int, bytes]] | None = None) -> list[dict[str, Any]]:
+    """지목한 483 원 PDF 와 서명 확인용 PNG 를 DB 조회 없이 저장한다."""
+    get = fetch_bytes or _fetch_pdf_bytes
+    render = render_pages or _render_signature_pages
+    destination = Path(out_dir)
+    destination.mkdir(parents=True, exist_ok=True)
+    rows: list[dict[str, Any]] = []
+    for doc in doc_ids:
+        match = _MEDIA_ID_RE.search(doc)
+        if not match:
+            rows.append({"doc": doc, "status": "bad_doc_id"})
+            continue
+        media_id = match.group(1)
+        name = f"fda483-{media_id}"
+        url = f"https://www.fda.gov/media/{media_id}/download"
+        row: dict[str, Any] = {"doc": name, "url": url}
+        rows.append(row)
+        try:
+            data = get(url)
+        except FdaBotBlockError:
+            row["status"] = FDA_BOT_BLOCK
+            break
+        except Exception as exc:  # noqa: BLE001 — 진단 도구: 건별 실패를 적고 계속
+            row.update(status="fetch_failed", reason=f"{type(exc).__name__}: {exc}")
+            continue
+        if not data:
+            row["status"] = "empty_pdf"
+            continue
+
+        pdf_path = destination / f"{name}.pdf"
+        pdf_path.write_bytes(data)
+        row.update(pdf=pdf_path.name, bytes=len(data), pages=[])
+        try:
+            images = render(data)
+        except Exception as exc:  # noqa: BLE001 — 원 PDF를 남기고 다음 문서로 진행
+            row.update(status="render_failed", reason=f"{type(exc).__name__}: {exc}")
+            continue
+        for page, png in sorted(images.items()):
+            image_path = destination / f"{name}_p{page}.png"
+            image_path.write_bytes(png)
+            row["pages"].append(image_path.name)
+        row["status"] = "pdf-ok"
+    return rows
+
+
 def _def_key(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", (text or "").lower())[:80]
 
@@ -1162,6 +1232,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="진단 전용(쓰기 없음): --doc-ids 문서의 판독 전문을 이 폴더에 <doc>.txt 로 남기고 끝낸다.",
     )
     p.add_argument(
+        "--dump-pdf-dir", default="", metavar="DIR",
+        help="진단 전용(DB 접근 없음): --doc-ids 문서의 원 PDF와 서명 확인용 PNG를 이 폴더에 남긴다.",
+    )
+    p.add_argument(
         "--apply", action="store_true", default=False,
         help="실제 upsert 수행. 기본은 dry-run(조회+PDF fetch+재구성까지 하되 쓰기는 생략).",
     )
@@ -1196,17 +1270,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     args = build_arg_parser().parse_args(argv)
 
-    if args.dump_text_dir:
+    if args.dump_pdf_dir or args.dump_text_dir:
         ids = _parse_doc_ids(args.doc_ids)
         if not ids:
-            print("--dump-text-dir 는 --doc-ids 와 함께 쓴다(진단 전용).", file=sys.stderr)
+            flag = "--dump-pdf-dir" if args.dump_pdf_dir else "--dump-text-dir"
+            print(f"{flag} 는 --doc-ids 와 함께 쓴다(진단 전용).", file=sys.stderr)
             return 2
-        rows = dump_texts(ids, args.dump_text_dir)
-        payload = json.dumps({"dump_text": rows}, ensure_ascii=False, indent=2)
+        if args.dump_pdf_dir:
+            report = {"dump_pdf": dump_pdfs(ids, args.dump_pdf_dir)}
+        else:
+            report = {"dump_text": dump_texts(ids, args.dump_text_dir)}
+        payload = json.dumps(report, ensure_ascii=False, indent=2)
         print(payload)
         if args.report_path:
             Path(args.report_path).write_text(payload + "\n", encoding="utf-8")

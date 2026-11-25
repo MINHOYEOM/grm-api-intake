@@ -264,14 +264,17 @@ def upsert_rows(url: str, key: str, rows: "list[dict[str, Any]]", *,
     base = grm_cli.normalize_supabase_url(url)
     if not base:
         raise SystemExit("SUPABASE_URL 형식 오류(https:// 로 시작해야 함)")
-    r = requests.post(base + "/rest/v1/" + TABLE, params={"on_conflict": "campaign_id"},
-                      data=json.dumps(rows), timeout=timeout,
-                      headers={"apikey": key, "Authorization": "Bearer " + key,
-                               "Content-Type": "application/json",
-                               "Prefer": "resolution=merge-duplicates,return=minimal"})
-    if r.status_code >= 300:
-        # PUBLIC 저장소 — 응답 본문(캠페인명·수치가 섞일 수 있다)은 찍지 않는다.
-        raise UpsertError(r.status_code, _missing_column(r))
+    def send(batch, _offset):
+        r = requests.post(base + "/rest/v1/" + TABLE, params={"on_conflict": "campaign_id"},
+                          data=json.dumps(batch), timeout=timeout,
+                          headers={"apikey": key, "Authorization": "Bearer " + key,
+                                   "Content-Type": "application/json",
+                                   "Prefer": "resolution=merge-duplicates,return=minimal"})
+        if r.status_code >= 300:
+            # PUBLIC 저장소 — 응답 본문(캠페인명·수치가 섞일 수 있다)은 찍지 않는다.
+            raise UpsertError(r.status_code, _missing_column(r))
+
+    grm_cli.BulkWriteRun().write(rows, send)
 
 
 class UpsertError(SystemExit):

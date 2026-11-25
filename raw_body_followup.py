@@ -50,6 +50,7 @@ from typing import Any, Callable, Iterable
 
 import findings_extractors as fe
 import findings_store
+from grm_cli import BulkWriteError, BulkWriteRun
 import grm_findings as gf
 from grm_common import SOURCE_FDA_WL, log
 
@@ -275,10 +276,11 @@ def _default_get_rows(base_url: str, service_key: str, table: str, select: str, 
     return raw_update._get_rows(base_url, service_key, table, select, key, ids, get=requests.get)
 
 
-def _default_append(base_url: str, service_key: str, findings: list[dict[str, Any]]
+def _default_append(base_url: str, service_key: str, findings: list[dict[str, Any]],
+                    *, bulk: BulkWriteRun
                     ) -> tuple[int, int, bool, list[str]]:
     import findings_supabase_append as fsa
-    return fsa._append_findings_batch(base_url, service_key, findings)
+    return fsa._append_findings_batch(base_url, service_key, findings, bulk=bulk)
 
 
 def followup(base_url: str, service_key: str,
@@ -299,7 +301,10 @@ def followup(base_url: str, service_key: str,
     import raw_update
 
     get_rows = get_rows or _default_get_rows
-    append_fn = append_fn or _default_append
+    bulk = BulkWriteRun()
+    if append_fn is None:
+        def append_fn(base, key, rows):
+            return _default_append(base, key, rows, bulk=bulk)
     pairs = [(o, n) for o, n in changes
              if body_changed(str(n.get("source") or ""), _json_object(o.get("raw_json")),
                              _json_object(n.get("raw_json")))]
@@ -389,17 +394,26 @@ def followup(base_url: str, service_key: str,
     if sup_items:
         summary["supersede_due"] = len(sup_items)
         if not dry_run:
-            res = (supersede_fn or _default_supersede)(base_url, service_key, sup_items,
-                                                       changed_by or "raw_body_followup")
-            if res.get("unavailable"):
-                summary["supersede_unavailable"] = True
-                log("WARN", f"옛 덩어리 숨김 대상 {len(sup_items)}건 — migration 166 미적용이라 이번엔 숨기지 않음")
-            elif res.get("error"):
-                summary["write_errors"] += 1
-                summary["errors"].append(f"supersede: {res['error']}")
-            else:
-                summary["superseded"] = int(res.get("superseded") or 0)
-                summary["supersede_skipped"] = list(res.get("skipped") or [])
+            supersede = supersede_fn or _default_supersede
+
+            def send(batch, _offset):
+                res = supersede(base_url, service_key, batch, changed_by or "raw_body_followup")
+                if res.get("unavailable"):
+                    summary["supersede_unavailable"] = True
+                    log("WARN", f"옛 덩어리 숨김 대상 {len(sup_items)}건 — migration 166 미적용이라 이번엔 숨기지 않음")
+                    raise BulkWriteError("supersede RPC unavailable")
+                elif res.get("error"):
+                    raise BulkWriteError(str(res["error"]))
+                else:
+                    summary["superseded"] += int(res.get("superseded") or 0)
+                    summary["supersede_skipped"].extend(res.get("skipped") or [])
+
+            try:
+                bulk.write(sup_items, send)
+            except BulkWriteError as exc:
+                if not summary["supersede_unavailable"]:
+                    summary["write_errors"] += 1
+                    summary["errors"].append(f"supersede: {exc}")
     summary["tier_transitions"] = dict(sorted(tiers.items()))
     summary["relevance_transitions"] = dict(sorted(rels.items()))
     log("INFO", f"본문 교체 후속{' [DRY]' if dry_run else ''}: 행 {len(pairs)} · 분류 어긋남 "

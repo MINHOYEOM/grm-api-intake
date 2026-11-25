@@ -69,6 +69,7 @@ from typing import Any, Callable
 import requests
 
 import findings_supabase_append as fsa
+from grm_cli import BULK_BATCH_MAX, BulkWriteError, BulkWriteRun
 from collect_fda_inspections import (
     DEFAULT_FISCAL_YEARS,
     DEFAULT_RETRIES,
@@ -100,7 +101,7 @@ DEFAULT_TIMEOUT_SECONDS = 120   # LongDescription 이 붙어 페이지가 classi
 TABLE = "fda_inspection_citations"
 ON_CONFLICT = "inspection_id,citation_id"
 UPSERT_RESOLUTION = "merge-duplicates"
-UPSERT_CHUNK_SIZE = 1000
+UPSERT_CHUNK_SIZE = BULK_BATCH_MAX
 
 CLASSIFICATIONS_TABLE = "fda_inspections"
 LINK_PAGE_SIZE = 1000
@@ -426,16 +427,34 @@ def run(*, dry_run: bool, base_url: str, service_key: str, api_user: str, api_ke
         report.would_upsert = len(payloads)
         log("INFO", f"[DRY] upsert 대상 {len(payloads)}건 (실적재 없음)")
     else:
-        for i in range(0, len(payloads), chunk_size):
-            chunk = payloads[i:i + chunk_size]
+        bulk = BulkWriteRun()
+        pending = payloads
+        if len(payloads) > bulk.remaining:
+            try:
+                pending = fsa._changed_rows(base_url, service_key, TABLE, payloads, ON_CONFLICT)
+            except RuntimeError as exc:
+                report.errors.append(str(exc))
+                return report, 1
+        selected = pending[:bulk.remaining]
+
+        def send(chunk, i):
             status, _rows, err = poster(base_url, service_key, TABLE, chunk, ON_CONFLICT,
                                         resolution=UPSERT_RESOLUTION)
             if err:
                 report.upsert_chunk_failed += 1
                 report.errors.append(
                     f"upsert_chunk_failed(start={i},size={len(chunk)}):status={status}:{err}")
-                continue
+                return False
             report.upserted += len(chunk)
+            return True
+
+        try:
+            bulk.write(selected, send, batch_size=chunk_size)
+        except BulkWriteError as exc:
+            report.errors.append(str(exc))
+        deferred = len(pending) - len(selected)
+        if deferred:
+            report.errors.append(f"write_deferred:{deferred}:rerun_same_selection")
         log("INFO", f"적재 {report.upserted}건 / 청크실패 {report.upsert_chunk_failed}")
 
     # ★요청한 ProgramArea 마다 0건 하한 -- 라벨 가정이 틀렸거나 응답이 비었다는 신호.
@@ -449,7 +468,7 @@ def run(*, dry_run: bool, base_url: str, service_key: str, api_user: str, api_ke
         log("ERROR", f"ProgramArea {empty} 0건 -- 라벨이 다를 수 있다: {excluded}")
         return report, 2
 
-    exit_code = 1 if (report.normalize_failed or report.upsert_chunk_failed
+    exit_code = 1 if (report.errors or report.normalize_failed or report.upsert_chunk_failed
                       or report.duplicate_keys) else 0
     return report, exit_code
 

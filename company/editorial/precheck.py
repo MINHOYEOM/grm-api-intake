@@ -603,26 +603,235 @@ def accuracy_warn_lines(delta, scaffold=None, deep=None, handoff=None):
 # 든 낱말은 여기서 뺀다 — 업체명 자체가 사람 이름인 경우는 `guess_check.person_firm_lines` 가 **막는다**(2026-11-23,
 # 11-23 실발행 196329·196343 — 이 경고가 업체명이라며 빼던 자리). 번역·음역은 못 잡는다 — **경고만**.
 # ─────────────────────────────────────────────────────────────────────────────
-_HONORIFIC_NAME_RE = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof)[.,]?\s+((?:[A-Z][A-Za-z'\-]+\.?\s?){1,3})")
+# [2026-11-25 후보 좁히기] 이름 칸은 **줄을 넘지 않는다**('Mr. Ravel Okonder⏎Chief Executive Officer' 의 'Chief'), 마침표 없는
+# 'Dr' 은 줄바꿈 앞이거나 같은 줄 앞에 번지수가 있으면 주소의 Drive 다('616 Atrium Dr Ste 100' 의 'Ste'). 수신인 칸 안에
+# 실사일 칸이 끼면 'TO:' 뒤만 본다('DATE(S) OF INSPECTION September 19 … TO: Tor Vasky' 의 'September'). 직함 낱말이 나오면
+# 거기서 이름이 끝난다('Pelkastrom Chief Executive Officer'·'Morlai Zha (Vice President)'). 호칭 뒤 이름 바로 다음에
+# 법인명이 붙으면(경고서한 'U.S. Agent: Mr. Dovan Krest Atlantic Wellcare Systems Corp.') 마지막 낱말은 법인명이다.
+_HONORIFIC_NAME_RE = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof)(?:\.\s*|,?[ \t]+)((?:[A-Z][A-Za-z'\-]+\.?[ \t]?){1,3})")
 _ISSUED_TO_RE = re.compile(r"INDIVIDUAL\s+TO\s+WHOM\s+REPORT\b.{0,12}?ISSUED(.{0,160}?)FIRM\s*NAME", re.S | re.I)
-_ISSUED_LEAD_RE = re.compile(r"^(?:[\W_]*(?:To|TO)\s*:)?[\W_]*(?:(?:Mr|Mrs|Ms|Dr|Prof)[.,]?\s+)?")
+_ISSUED_LEAD_RE = re.compile(r"^(?:[\W_]*(?:To|TO)\s*:)?[\W_]*(?:(?:Mr|Mrs|Ms|Dr|Prof)(?:[.,]\s*|\s+))?")
+_ISSUED_TO_MARK_RE = re.compile(r"\b(?:[Tt]o|TO)\s*:|\bTO\b(?=\s+[A-Z])")
+_NMI_RE = re.compile(r"\(\s*N\.?\s*M\.?\s*I\.?\s*\)\s*", re.I)   # '(NMI)' = 가운데 이름 없음 표기
 _NAME_TOKEN_RE = re.compile(r"[A-Z][A-Za-z'\-]{2,}")
+_ATTN_BEFORE_RE = re.compile(r"\bATTN\s*:?\s*$", re.I)
+_ORG_TAIL_RE = re.compile(r"(?:[A-Z][\w&'\-]*\.?,?[ \t]+){0,5}?(?:Corp|Corporation|Inc|Ltd|LLC|Limited|Group|GmbH|Co|"
+                          r"Company|Pvt|AG|plc|Pharma|Pharmaceuticals?|Laborator(?:y|ies))\b")
+# 이름이 끝나는 직함 낱말 — 이 낱말부터 뒤는 이름이 아니다.
+_TITLE_WORDS = frozenset((
+    "Chief Executive Officer Officers President Vice Director Directors Chairman Chairwoman Chair Owner Owners Manager "
+    "Managers General Secretary Treasurer Head Senior Sr Operations Operating Operation Quality Managing Founder "
+    "Co-Founder Partner Plant Site Factory Corporate Registrar Agent Supervisor Representative Principal Proprietor "
+    "Administrator Pharmacist Member Lead Assistant Associate Deputy Global Regional Responsible Production "
+    "Manufacturing Technical Scientific Medical Compliance Regulatory Affairs Board Executive Investigator "
+    "Superintendent Coordinator Specialist Engineer Analyst Officer Pharmacy Leader Group Division Department").split())
+# 이름 자리에 끼어드는 비-이름 낱말 — 주소 약어·서식 글자·달 이름. 뺀다(이름은 거기서 끝나지 않는다).
+_NOT_NAME_WORDS = frozenset((
+    "Ste Suite Street Road Avenue Ave Blvd Boulevard Drive Floor Building Bldg Unit Lane Highway Hwy Parkway Pkwy "
+    "Annotations Annotation Observations Observation Page Employee Employees Signature Inspection Date Dates Number "
+    "January February March April May June July August September October November December "
+    "Jan Feb Mar Apr Jun Jul Aug Sep Sept Oct Nov Dec").split())
+
+
+def _name_tokens_of(cand):
+    """후보 문자열 → 이름 낱말(직함 낱말에서 끊고, 비-이름 낱말은 건너뛴다)."""
+    toks = []
+    for t in _NAME_TOKEN_RE.findall(cand):
+        if t in _TITLE_WORDS:
+            break
+        if t not in _NOT_NAME_WORDS and not t.isupper():   # 전부 대문자 = 서식 글자(FIRM·NAME·NMI·STREET)
+            toks.append(t)
+    return toks
+
+
+def _issued_head(seg):
+    """수신인 칸 조각 → 이름 부분(쉼표·대시·괄호·세로줄 앞)."""
+    seg = _ISSUED_LEAD_RE.sub("", seg.strip())
+    return re.split(r",| - | — |–|\s\(|\|", seg, maxsplit=1)[0]
+
+
+def _person_candidates(text):
+    """원문 → [(역할, 후보 문자열)](순수). 역할: recipient(483 수신인 칸)·fda_contact('ATTN:' 뒤 호칭)·person(그 밖의 호칭 뒤)."""
+    out = []
+    for m in _HONORIFIC_NAME_RE.finditer(text):
+        head = m.group(0)
+        line_before = text[text.rfind("\n", 0, m.start()) + 1:m.start()]
+        if not head.startswith(("Dr.", "Prof.", "Mr.", "Mrs.", "Ms.")) and head.startswith("Dr") \
+                and re.search(r"\d", line_before):
+            continue                                   # 'Patterson Dr Ste 100' — 번지수 뒤 Dr 은 Drive
+        cand = m.group(1)
+        if re.match(r"[A-Z][A-Za-z\-]*['’]s\b", cand):
+            continue                                   # "Dr. Reddy's Laboratories" — 소유격은 회사명
+        parts = _NAME_TOKEN_RE.findall(cand)
+        if len(parts) >= 2:
+            last = cand.rfind(parts[-1])
+            if _ORG_TAIL_RE.match(text, m.start(1) + last):
+                cand = cand[:last]                     # 'Dovan Krest Atlantic Wellcare … Corp.' → 'Dovan Krest'
+        role = "fda_contact" if _ATTN_BEFORE_RE.search(text[max(0, m.start() - 12):m.start()]) else "person"
+        out.append((role, cand))
+    for m in _ISSUED_TO_RE.finditer(text):
+        block = _NMI_RE.sub(" ", re.sub(r"\s+", " ", m.group(1))).strip()
+        cand = _issued_head(block)
+        marks = list(_ISSUED_TO_MARK_RE.finditer(block))
+        if marks:                                      # 실사일·FEI 칸이 끼어든 머리글 — 'TO:' 뒤가 수신인
+            after = _issued_head(block[marks[-1].end():])
+            if _name_tokens_of(after):                 # '… Site Lead TO: — STREET ADDRESS' 처럼 뒤가 비면 앞을 쓴다
+                cand = after
+        out.append(("recipient", cand))
+    return out
+
+
+def source_person_roles(text, firm_text=""):
+    """원문 → {개인 이름 낱말: 역할}(순수). 업체명에 든 낱말·전부 대문자 낱말(FIRM·NAME·NMI 등 서식 글자)은 뺀다.
+    한 낱말이 여러 역할로 나오면 recipient > fda_contact > person."""
+    firm_low = (firm_text or "").lower()
+    rank = {"recipient": 0, "fda_contact": 1, "person": 2}
+    roles = {}
+    for role, cand in _person_candidates(text or ""):
+        for t in _name_tokens_of(cand):
+            if t.isupper() or t.lower() in firm_low:
+                continue
+            if t not in roles or rank[role] < rank[roles[t]]:
+                roles[t] = role
+    return roles
+
+
+def merge_person_roles(texts, firm_text="", exclude_text=""):
+    """여러 원문 조각 → {낱말: 역할}(순수). 조각마다 `source_person_roles` 를 돌려 합친다(머리글 정규식이 조각 경계를 넘지 않게).
+    `exclude_text`(FDA 실사관 서명 등 공식 인물)에 든 낱말은 뺀다."""
+    rank = {"recipient": 0, "fda_contact": 1, "person": 2}
+    excl = set(re.findall(r"[A-Za-z'\-]+", exclude_text or ""))
+    roles = {}
+    for text in texts:
+        for t, role in source_person_roles(text, firm_text).items():
+            if t not in excl and (t not in roles or rank[role] < rank[roles[t]]):
+                roles[t] = role
+    return roles
 
 
 def source_person_names(text, firm_text=""):
-    """원문 → 개인 이름 낱말 집합(순수). 업체명에 든 낱말·전부 대문자 낱말(FIRM·NAME·NMI 등 서식 글자)은 뺀다."""
-    text = text or ""
-    cands = [m.group(1) for m in _HONORIFIC_NAME_RE.finditer(text)]
-    for m in _ISSUED_TO_RE.finditer(text):
-        block = _ISSUED_LEAD_RE.sub("", re.sub(r"\s+", " ", m.group(1)).strip())
-        cands.append(re.split(r",| - | — |–", block, maxsplit=1)[0])
-    firm_low = (firm_text or "").lower()
-    toks = set()
-    for c in cands:
-        for t in _NAME_TOKEN_RE.findall(c):
-            if not t.isupper() and t.lower() not in firm_low:
-                toks.add(t)
-    return toks
+    """원문 → 개인 이름 낱말 집합(순수). `source_person_roles` 의 낱말."""
+    return set(source_person_roles(text, firm_text))
+
+
+# ── 이름 자리 찾기 — 판정(게이트·사전 점검)과 가림(발행 조립)이 **같은 함수**를 쓴다 ─────────────────
+# 이름 낱말 앞뒤로 호칭·이니셜·짧은 낱말('Dr. Ko Zun'·'Mr. XO Brimtal'·'Darvin G. Ostrell'·'R.K.T.P.L. Dravesh')을 묶어
+# 한 자리로 본다. [단일 낱말 보완] 호칭도 다른 이름 낱말도 없이 **낱말 하나만** 나온 자리는, 그 낱말이 보통 낱말이기도 하면
+# (같은 글에 소문자로 나오거나 흔한 영어 낱말 — 'More'·'Else'·'Key'·'Spain' 의 문장 첫머리) 이름으로 세지 않는다.
+# 호칭 바로 뒤 대문자 낱말 둘까지는 이름 자리에 넣는다 — 업체명이 아들 이름인 꼴('Norvex Lifesciences (formerly Pelvik)' 의
+# 'Mr. Pelvik Velloc')에서 'Mr. Pelvik [업체 임원]' 이 남지 않게.
+# [2026-11-25] 정규식 하나로 짜면 이니셜·짧은 낱말이 길게 이어진 OCR 글에서 역추적이 폭발한다(지수 시간) —
+# 낱말을 한 번 훑는 선형 스캔으로 한다.
+_SHORT_STOP = frozenset("To At In Of By On An As If It No Or So Up We He My Is Be Do Go Am Us".split())
+_HONORIFICS = frozenset(("Mr", "Mrs", "Ms", "Dr", "Prof"))
+_SEP_RE = re.compile(r"[ \t]*(?:\r?\n[ \t]*)?")   # 이름 사이 = 공백, 줄바꿈은 한 번까지(OCR 머리글 'Mark\nS. Kelvaro')
+_CAP_TOKEN_RE = re.compile(r"(?<![A-Za-z'\-])[A-Z](?:\.[A-Z])+\.?|(?<![A-Za-z'\-])[A-Z][A-Za-z'\-]*\.?")
+_COMMON_WORDS = frozenset((
+    "more else key will may mark bill rose grant hope joy faith summer winter spring fall bell white black brown green "
+    "gray grey small long short young king rich lane field hall wood stone page case cook price spain china france "
+    "india japan jordan israel georgia chad").split())
+
+
+def _cap_tokens(text, nameset):
+    """대문자로 시작하는 낱말 → [(시작, 끝, 종류, 낱말)]. 종류: hon(호칭)·name(원문 이름)·init(이니셜)·short(1~2자)·cap(그 밖)."""
+    out = []
+    for m in _CAP_TOKEN_RE.finditer(text):
+        raw = m.group(0)
+        dot = raw.endswith(".")
+        word = raw[:-1] if dot else raw
+        start, end = m.start(), m.end()
+        if word in nameset and "." not in word:
+            kind, end = "name", start + len(word)          # 'Ostrell.' 의 마침표는 이름 밖
+        elif word in _HONORIFICS:
+            kind = "hon"
+        elif re.fullmatch(r"[A-Z](?:\.[A-Z])*", word) and dot:
+            kind = "init"                                  # 'G.'·'M.V.V.S.N.'
+        elif re.fullmatch(r"[A-Z][a-z]?", word) and word not in _SHORT_STOP:
+            kind = "short"                                 # 'Lu'·'G'
+        else:
+            kind, end = "cap", start + len(word)
+        out.append((start, end, kind, word))
+    return out
+
+
+def _adjacent(text, a_end, b_start, after_hon=False):
+    gap = text[a_end:b_start]
+    return bool(re.fullmatch(r"\s*", gap)) if after_hon else bool(_SEP_RE.fullmatch(gap))
+
+
+def _ambiguous_single(token, text):
+    low = token.lower()
+    return low in _COMMON_WORDS or low in guess_check._EN_STOP or bool(
+        re.search(rf"(?<![A-Za-z]){re.escape(low)}(?![A-Za-z])", text))
+
+
+def person_name_spans(names, text):
+    """[(시작, 끝, 걸린 이름 낱말들)](순수) — 산문에서 원문 개인 이름이 나오는 자리."""
+    names = [n for n in (names or ()) if n]
+    if not (names and text):
+        return []
+    toks = _cap_tokens(text, set(names))
+    unit = ("name", "init", "short")
+    out, i, n = [], 0, len(toks)
+    while i < n:
+        if toks[i][2] not in unit:
+            i += 1
+            continue
+        e = i                                                  # 이니셜·짧은 낱말·이름이 붙어 이어진 줄 [i..e]
+        while e + 1 < n and toks[e + 1][2] in unit and _adjacent(text, toks[e][1], toks[e + 1][0]):
+            e += 1
+        names_at = [k for k in range(i, e + 1) if toks[k][2] == "name"]
+        if not names_at:
+            i = e + 1
+            continue
+        last = names_at[-1]
+        end = toks[last][1]
+        tail = last + 1                                        # 'Mark S. Kelvaro' — 이름 뒤 이니셜 하나(성 앞)
+        if (tail <= e and toks[tail][2] == "init" and len(toks[tail][3]) == 1 and tail + 1 < n
+                and re.fullmatch(r"\s+", text[toks[tail][1]:toks[tail + 1][0]])):
+            end = toks[tail][1]
+        start, hon = toks[i][0], False
+        for k in range(0, 4):                                  # 호칭 + (전부 대문자 1) + 대문자 낱말 0~2 + 이름 줄
+            j = i - k - 1
+            if j < 0:
+                break
+            mids = toks[j + 1:i]
+            if any(t[2] != "cap" for t in mids) or (k == 3 and not mids[0][3].isupper()):
+                break
+            if any(not _adjacent(text, a[1], b[0]) for a, b in zip(toks[j + 1:i], toks[j + 2:i + 1])):
+                break
+            if toks[j][2] == "hon" and _adjacent(text, toks[j][1], toks[j + 1][0], after_hon=True):
+                start, hon = toks[j][0], True
+                break
+        hit = [toks[k][3] for k in names_at]
+        single = i == last and end == toks[last][1]
+        if hon or not (single and _ambiguous_single(hit[0], text)):
+            out.append((start, end, hit))                      # 낱말 하나뿐인 자리 + 보통 낱말 — 이름으로 세지 않는다
+        i = e + 1
+    return out
+
+
+def person_name_hits(names, text):
+    """산문에 나온 원문 개인 이름 낱말 집합(순수) — 게이트·사전 점검의 판정."""
+    return {t for _, _, hit in person_name_spans(names, text) for t in hit}
+
+
+def redact_person_names(text, roles, labels):
+    """(가린 문자열, 바꾼 자리 수)(순수). `roles` = `source_person_roles` 결과, `labels` = {역할: 표기}.
+    자리마다 그 자리 낱말의 역할(recipient > fda_contact > person)로 표기를 고른다. 원문 저장본에는 쓰지 않는다 — 화면 사본 전용."""
+    spans = person_name_spans(list(roles), text)
+    if not spans:
+        return text, 0
+    rank = {"recipient": 0, "fda_contact": 1, "person": 2}
+    parts, pos = [], 0
+    for start, end, hit in spans:
+        role = min((roles[t] for t in hit), key=rank.__getitem__)
+        seg = text[start:end]
+        trail = seg[len(seg.rstrip()):]
+        parts += [text[pos:start], labels.get(role) or labels["person"], trail]
+        pos = end
+    parts.append(text[pos:])
+    return "".join(parts), len(spans)
 
 
 def _name_source(row, sc):
@@ -656,7 +865,7 @@ def private_name_warn_lines(delta=None, deep=None, rows=None, scaffold_cards=Non
             return
         names = source_person_names(_name_source(row, sc), _firm_text(row, sc))
         for slot, text in slots:
-            hit = sorted(n for n in names if re.search(rf"(?<![A-Za-z]){re.escape(n)}(?![A-Za-z])", text))
+            hit = sorted(person_name_hits(names, text))
             if hit:
                 out.append(f"개인 실명 의심 {cid}.{tag}{slot}: {', '.join(hit)} — 원문의 개인 이름(483 수신인·호칭 뒤 이름)이다. "
                            f"공직자·규제기관 공식 인물이 아니면 '시설 책임자'·'업체 대표'·'해당 임원'으로 쓴다")

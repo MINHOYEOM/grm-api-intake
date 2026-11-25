@@ -4860,9 +4860,9 @@
    "signal_tier": 3,
    "signal_label": "High",
    "type_tag": "483",
-   "headline_target": "Frederick J. Raal",
+   "headline_target": "개인 사업자",
    "title_issue": "원자료 누락(ISR)",
-   "summary": "FDA 가 임상시험자 Frederick J. Raal 을 2025년 9월 실사하고 관찰사항을 발부했다. 등록·투여·완료된 피험자 일부에서 의뢰자에게 보고된 주사부위반응(ISR) 측정값의 원자료가 누락돼 있었다.",
+   "summary": "FDA 가 임상시험자(개인 사업자)를 2025년 9월 실사하고 관찰사항을 발부했다. 등록·투여·완료된 피험자 일부에서 의뢰자에게 보고된 주사부위반응(ISR) 측정값의 원자료가 누락돼 있었다.",
    "facts": [
     {
      "label": "발행일",
@@ -4874,7 +4874,7 @@
     },
     {
      "label": "제조소/업체",
-     "value": "Frederick J. Raal · FEI 3009568404"
+     "value": "개인 사업자 · FEI 3009568404"
     },
     {
      "label": "시설 · 유형",
@@ -4949,7 +4949,7 @@
    },
    "en": {
     "title_issue": "Source data missing for reported values",
-    "summary": "FDA inspected the clinical investigator Frederick J. Raal in September 2025 and issued observations. For some subjects who were enrolled, dosed and completed the study, the source data for injection site reaction measurements reported to the sponsor was missing.",
+    "summary": "FDA inspected a clinical investigator (an individual business) in September 2025 and issued observations. For some subjects who were enrolled, dosed and completed the study, the source data for injection site reaction measurements reported to the sponsor was missing.",
     "implication": "Even where a value sits in the data capture system, without source data it is a number that cannot be verified. Firms should check that source data verification in the trials they are involved in works at the level of individual measured values.",
     "key_facts": [
      "Source data missing for injection site reaction measurements reported through the electronic data capture system for some enrolled, dosed and completed subjects",

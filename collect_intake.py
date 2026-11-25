@@ -47,9 +47,19 @@ from zoneinfo import ZoneInfo
 
 import requests
 
+import ema_document
 import grm_queue
 import intake_exclusion as _xl
+from grm_http_policy import (
+    FDA_WL_BODY_FETCH_ATTEMPTS as WL_BODY_FETCH_ATTEMPTS,
+    FDA_WL_BODY_RETRY_BACKOFF_SECONDS as WL_BODY_RETRY_BACKOFF_SECONDS,
+    FDA_WL_BODY_RETRYABLE_STATUS as _WL_RETRYABLE_STATUS,
+    NOTION_WRITE_DELAY_SECONDS,
+)
 from grm_common import (
+    FDA_BOT_BLOCK,
+    FdaBotBlockError,
+    fda_checked_request,
     HTTPClientError,
     KR_EGRESS_PROXY_REACHABLE,
     KR_EGRESS_PROXY_UNREACHABLE,
@@ -2326,16 +2336,22 @@ EMA_ARTICLE_EXCERPT_CAP = 30
 
 
 def _enrich_ema_article_excerpts(items: list[IntakeItem]) -> None:
-    """관련 EMA 항목의 기사 본문을 raw_payload["article_excerpt"] 에 싣는다(in-place).
+    """관련 EMA 항목의 원문 전문(기사 HTML·문서 PDF)을 raw_payload["article_excerpt"] 에 싣는다(in-place).
+
+    판독 메타·실패 사유는 raw_payload["ema_document"] 에 남는다(ema_document.raw_patch).
 
     실패(403/timeout/본문 미발견)는 graceful — 그 항목만 본문 없이 남고 수집은 계속된다.
     """
     fetched = 0
     capped = False
     for item in items:
-        if item.qa_relevance not in ("Likely", "Possible"):
-            continue          # 카드가 될 항목만 — 무관 항목까지 긁지 않는다
         if not item.official_url:
+            continue
+        # 카드가 될 항목만 — 무관 항목까지 긁지 않는다. [11-25 #8] 단, EMA 문서(PDF)는 제목에 분류
+        # 키워드가 없어 미판정(Pending)으로 오는 일이 대부분이다(빈칸 106행 전부 Pending). 관련도 판정의
+        # 근거가 본문뿐이므로 미판정 문서는 읽는다. 무관(Unrelated)은 여전히 읽지 않는다.
+        if item.qa_relevance not in ("Likely", "Possible") and not (
+                item.qa_relevance == "Pending" and ema_document.is_document_url(item.official_url)):
             continue
         if item.raw_payload.get("article_excerpt"):
             continue
@@ -2345,13 +2361,17 @@ def _enrich_ema_article_excerpts(items: list[IntakeItem]) -> None:
                             "나머지 항목은 본문 없이 유지")
                 capped = True
             break
-        time.sleep(ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
-        excerpt = _fetch_article_excerpt(item.official_url, "EMA")
+        # [11-25 #8] 기사 HTML·문서 PDF 모두 공통 판독기(ema_document)가 **전문**을 읽는다. 저장
+        # 단계에서 자르지 않는다(대표 결정) — 화면·브리프 입력은 card_scaffold 가 줄인다. 간격 2초·
+        # 429 재시도는 판독기 안(#1938 값). 빈칸 백필(backfill_blank_excerpts)도 같은 함수를 부른다.
+        doc = ema_document.read_ema_fulltext(item.official_url)
         fetched += 1
-        if excerpt:
-            item.raw_payload["article_excerpt"] = excerpt
+        ema_document.apply_to_raw(item.raw_payload, doc)
+        if not doc.ok:
+            level = "WARN" if ema_document.is_document_url(item.official_url) else "INFO"
+            log(level, f"EMA 원문 전문 미확보({doc.status}) — 카드 그대로: {truncate(item.official_url, 80)}")
     if fetched:
-        log("INFO", f"EMA 기사 본문 fetch {fetched}건 시도")
+        log("INFO", f"EMA 원문 fetch {fetched}건 시도")
 
 
 def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
@@ -3395,7 +3415,7 @@ def _fetch_wl_listing_datatables(html_text: str, start: date) -> list[dict[str, 
             params[f"columns[{i}][orderable]"] = "true"
             params[f"columns[{i}][search][value]"] = ""
             params[f"columns[{i}][search][regex]"] = "false"
-        resp = requests.get(config["url"] + "?" + urllib.parse.urlencode(params), timeout=30,
+        resp = fda_checked_request(requests.get, config["url"] + "?" + urllib.parse.urlencode(params), timeout=30,
                             headers={
                                 "User-Agent": "GRM-Intake/1.1 (+github-actions)",
                                 "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -3442,15 +3462,7 @@ def wl_static_listing_may_be_truncated(rows: list[dict[str, Any]], start: date) 
 WL_BODY_STATUS_OK = "ok"
 WL_BODY_STATUS_403 = "fetch-403"
 WL_BODY_STATUS_NO_ANCHOR = "no-anchor"
-# [차단 판정 한 곳 2026-11-24] fda.gov(Akamai)는 요청이 몰리면 403 이 아니라 `apology_objects/abuse-detection-apology`
-# 404 로 바꿔 돌려준다 — 종전엔 "404 Not Found"(파일 없음)와 구분이 안 됐다. 'fetch-fail:' 접두는 그대로라 하류 사유
-# 매핑(card_scaffold._ABSENT_REASON_LABELS)은 바뀌지 않는다. 같은 IP 즉시 재시도는 차단을 길게 하므로 재시도하지 않는다.
-WL_BODY_STATUS_BOT_BLOCK = "fetch-fail:bot-block"
-FDA_BOT_BLOCK_MARKERS = ("abuse-detection-apology", "apology_objects")
-
-
-def is_fda_bot_block_url(url: object) -> bool:
-    return any(m in str(url or "") for m in FDA_BOT_BLOCK_MARKERS)
+WL_BODY_STATUS_BOT_BLOCK = FDA_BOT_BLOCK
 
 
 # [WL 본문 재시도 2026-10-28] 편지 페이지 GET 은 종전 **한 번**이었다. 일시 장애(5xx·429·
@@ -3459,9 +3471,6 @@ def is_fda_bot_block_url(url: object) -> bool:
 # 그래서 일시 장애에 한해 짧게 재시도한다. **403 은 재시도하지 않는다** — fda.gov 의 403 은
 # 같은 러너 IP 에 대한 봇 차단이라 몇 초 뒤 같은 IP 로 다시 두드려도 결과가 같고 차단만
 # 길어진다. 403 은 다음 날 다른 러너에서 도는 예약 회수(`backfill_wl_body_recovery.py`)가 맡는다.
-WL_BODY_FETCH_ATTEMPTS = 3
-WL_BODY_RETRY_BACKOFF_SECONDS = (2.0, 5.0)
-_WL_RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 _wl_retry_sleep: Callable[[float], None] = time.sleep   # 테스트가 패치한다
 
 
@@ -3476,13 +3485,10 @@ def _fetch_wl_letter_html(url: str, label: str = "") -> tuple[str, str]:
     for attempt in range(1, WL_BODY_FETCH_ATTEMPTS + 1):
         transient = False
         try:
-            resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
+            resp = fda_checked_request(requests.get, url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
                 "User-Agent": "GRM-Intake/1.1 (+github-actions)",
                 "Accept": "text/html",
             })
-            if is_fda_bot_block_url(getattr(resp, "url", "")):
-                log("WARN", f"FDA WL 본문{label} 봇 차단(abuse-detection-apology) — 재시도하지 않음: {truncate(url, 80)}")
-                return "", WL_BODY_STATUS_BOT_BLOCK
             if resp.status_code == 403:
                 log("WARN", f"FDA WL 본문{label} 403 — 건너뜀(메타 카드 유지): {truncate(url, 80)}")
                 return "", WL_BODY_STATUS_403
@@ -3491,6 +3497,8 @@ def _fetch_wl_letter_html(url: str, label: str = "") -> tuple[str, str]:
             if attempt > 1:
                 log("INFO", f"FDA WL 본문{label} 재시도 {attempt}회차 성공: {truncate(url, 80)}")
             return resp.text, WL_BODY_STATUS_OK
+        except FdaBotBlockError:
+            return "", WL_BODY_STATUS_BOT_BLOCK
         except (requests.Timeout, requests.ConnectionError) as e:
             transient = True
             last_error = truncate(str(e), 120)
@@ -3704,7 +3712,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     LAST_WL_HEALTH = {"wl_body": wl_body_health, "wl_body_full": wl_body_full_health,
                       "listing": listing_health}
     try:
-        resp = requests.get(FDA_WL_URL, timeout=30, headers={
+        resp = fda_checked_request(requests.get, FDA_WL_URL, timeout=30, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
             "Accept": "text/html",
         })
@@ -3713,6 +3721,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
             return [], "HTTP 403"
         resp.raise_for_status()
         html_text = resp.text
+    except FdaBotBlockError:
+        listing_health["detail"] = FDA_BOT_BLOCK
+        return [], FDA_BOT_BLOCK
     except requests.RequestException as e:
         log("WARN", f"FDA WL HTTP 실패: {e}")
         return [], str(e)
@@ -3722,6 +3733,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     try:
         listing_rows = _fetch_wl_listing_datatables(html_text, start)
         listing_health["backbone"] = WL_LISTING_BACKBONE_DATATABLES
+    except FdaBotBlockError:
+        listing_health["detail"] = FDA_BOT_BLOCK
+        return [], FDA_BOT_BLOCK
     except (requests.RequestException, ValueError, RuntimeError) as e:
         listing_health["detail"] = truncate(f"{type(e).__name__}: {e}", 160)
         log("WARN", f"FDA WL DataTables 목록 실패 — 정적 HTML(최신 10행)로 폴백: "
@@ -3743,6 +3757,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         return [], msg
 
     items: list[IntakeItem] = []
+    body_error = None
     for row in listing_rows:
         cols = row.get("_cols", [])
         if len(cols) < 4:
@@ -3808,9 +3823,11 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         # WHY-1 #2: 게이트 통과(유지) WL 의 편지 본문에서 위반 excerpt 추출(flag on 시).
         # 실패는 graceful(키 미기록 → 목록 메타 카드 유지). in-window 유지 WL 은 소수라 부담 낮음.
         excerpt_result: tuple[str, str] | None = None
-        if wl_body_enabled and wl_href:
+        if wl_body_enabled and wl_href and not body_error:
             wl_body_health["attempted"] += 1
             excerpt_result = _fetch_wl_body_excerpt(wl_href)
+            if excerpt_result[1] == FDA_BOT_BLOCK:
+                body_error = FDA_BOT_BLOCK
             if not excerpt_result[0]:
                 wl_body_health["failed"] += 1
 
@@ -3818,9 +3835,11 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         # (docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력. wl_body_enabled 와 완전
         # 독립 — 기존 excerpt 플로우는 이 블록의 영향을 받지 않는다(additive).
         full_result: tuple[str, str] | None = None
-        if wl_body_full_enabled and wl_href:
+        if wl_body_full_enabled and wl_href and not body_error:
             wl_body_full_health["attempted"] += 1
             full_result = _fetch_wl_body_full(wl_href)
+            if full_result[1] == FDA_BOT_BLOCK:
+                body_error = FDA_BOT_BLOCK
             if not full_result[0]:
                 wl_body_full_health["failed"] += 1
 
@@ -3831,7 +3850,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         ))
 
     log("INFO", f"FDA WL 수집 완료: {len(items)}건")
-    return items, None
+    if body_error:
+        listing_health["detail"] = body_error
+    return items, body_error
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -4087,7 +4108,7 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             continue
         if notion_write:
             # Notion rate limit 방어: 삽입 간 최소 0.34s 지연 (≤ 3 req/s)
-            time.sleep(0.34)
+            time.sleep(NOTION_WRITE_DELAY_SECONDS)
             ok = notion_create_page(token, db_id, item, run_date, collected_at,
                                     modality_enabled=modality_enabled)
         else:

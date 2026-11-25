@@ -78,7 +78,8 @@ import raw_body_followup as rbf
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import SOURCE_FDA_WL, log
+from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_WL, body_shrunk, log, normalize_whitespace
+from grm_http_policy import FDA_WL_RECOVERY_DELAY_SECONDS
 
 SCHEMA_VERSION = "grm-wl-body-recovery/v1"
 
@@ -86,7 +87,7 @@ DEFAULT_TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
 _DEFAULT_PAGE_SIZE = 1000
 # fda.gov robots Crawl-Delay 는 백필 페치가 30초로 지킨다. 회수 대상은 하루 한 줌이라
 # 그 정도 간격도 부담이 없다 — 기본값을 같은 예의 수준으로 둔다.
-_DEFAULT_DELAY_SECONDS = 5.0
+_DEFAULT_DELAY_SECONDS = FDA_WL_RECOVERY_DELAY_SECONDS
 DEFAULT_TIME_BUDGET_SECONDS = 1200.0   # 워크플로 timeout-minutes 30 에서 10분 여유(마지막 fetch·재시도·리포트)
 _MAX_SAMPLES = 20
 _BROAD_FAILURE_MIN_ATTEMPTS = 3
@@ -100,7 +101,7 @@ KNOWN_RAW_KEYS = frozenset({
 })
 # 다시 읽어도 결과가 같을 사유. 이 표식이 붙은 행은 후보가 아니다(재시도가 끊긴다).
 DEFINITIVE_STATUSES = ("no-anchor",)
-BOT_BLOCK_STATUS = "fetch-fail:bot-block"   # collect_intake.WL_BODY_STATUS_BOT_BLOCK 과 같은 값(테스트가 대조)
+BOT_BLOCK_STATUS = FDA_BOT_BLOCK
 
 # 영구 403 정책(모듈 docstring). 표식은 모두 `fetch-403` 토큰으로 시작한다 — 하류 사유 매핑 계약.
 STATUS_403 = "fetch-403"
@@ -231,15 +232,11 @@ def is_body_start_candidate(raw: dict[str, Any], *, explicit: bool = False) -> b
                            or str(raw.get("wl_violations_status") or "") == "body_head_truncated")
 
 
-def _norm_ws(text: str) -> str:
-    return " ".join(str(text or "").split())
-
-
 def old_body_inside_new(old_full: str, new_full: str, probe_chars: int = 200) -> bool:
     """옛(잘린) 본문의 앞 `probe_chars` 자가 새 본문 안에 그대로 있는가 — 같은 편지를 다시 받았다는 대조.
     새 본문이 옛 본문의 **앞쪽을 더한** 것일 때만 참이다(다른 글이 오면 거짓 → 쓰지 않는다)."""
-    probe = _norm_ws(old_full)[:probe_chars]
-    return bool(probe) and probe in _norm_ws(new_full)
+    probe = normalize_whitespace(old_full)[:probe_chars]
+    return bool(probe) and probe in normalize_whitespace(new_full)
 
 
 def first_403_date(raw: dict[str, Any], collected_at: str) -> date | None:
@@ -502,9 +499,9 @@ def run(
             report.bot_blocked = True
             report.stopped_at = label
             report.still_empty += 1
-            _bump(report, "bot-block")
-            report.errors.append(f"{label}: fda-bot-block — 이후 요청 중단")
-            log("ERROR", f"FDA 봇 차단 감지({label}) — 남은 행 요청을 중단합니다")
+            _bump(report, BOT_BLOCK_STATUS)
+            report.errors.append(f"{label}: {BOT_BLOCK_STATUS} — 이후 요청 중단")
+            log("ERROR", f"{BOT_BLOCK_STATUS} ({label}) — 남은 행 요청을 중단합니다")
             break
         if not full and rebuild_body_start:
             # 있는 본문을 표식으로 덮지 않는다 — 이번에 못 받았으면 그대로 둔다.
@@ -515,7 +512,7 @@ def run(
         if rebuild_body_start and full == old_full:
             report.body_start_unchanged += 1
             continue
-        if rebuild_body_start and len(_norm_ws(full)) < len(_norm_ws(old_full)):
+        if rebuild_body_start and body_shrunk(old_full, full):
             report.body_shrunk += 1               # 줄어드는 행은 쓰지 않는다
             _bump(report, "body_shrunk")
             report.body_changes.append({"raw_signal_id": str(r.get("raw_signal_id") or ""),

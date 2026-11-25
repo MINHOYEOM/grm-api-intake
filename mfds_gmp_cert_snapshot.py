@@ -39,6 +39,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from grm_cli import BulkWriteError, BulkWriteRun
+
 SCHEMA_VERSION = "grm-mfds-gmp-cert/v1"
 ENDPOINT = (
     "https://apis.data.go.kr/1471000/DrugGmpStbltJgmtIssuStusService"
@@ -175,14 +177,18 @@ class Rest:
             raise RuntimeError(f"rpc {name} {resp.status_code}: {resp.text}")
         return resp.json()
 
-    def upsert(self, table: str, rows: list[dict[str, Any]], on_conflict: str) -> None:
+    def upsert(self, table: str, rows: list[dict[str, Any]], on_conflict: str,
+               *, bulk: BulkWriteRun | None = None) -> None:
         h = {**self.h, "Prefer": "resolution=merge-duplicates,return=minimal"}
-        for i in range(0, len(rows), 500):
+
+        def send(batch, _offset):
             resp = self.r.post(f"{self.base}/{table}", params={"on_conflict": on_conflict},
-                               headers=h, data=json.dumps(rows[i:i + 500], ensure_ascii=False)
+                               headers=h, data=json.dumps(batch, ensure_ascii=False)
                                .encode("utf-8"), timeout=120)
             if resp.status_code >= 300:
                 raise RuntimeError(f"upsert {table} {resp.status_code}: {resp.text}")
+
+        (bulk or BulkWriteRun()).write(rows, send)
 
 
 # ── main ─────────────────────────────────────────────────────────────────────────
@@ -236,11 +242,13 @@ def main(argv: list[str] | None = None) -> int:
         print("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 필요", file=sys.stderr)
         return 2
     rest = Rest(url, skey)
-    have = {r["cert_id"]: r["last_seen_on"]
-            for r in rest.get_all("mfds_gmp_cert", {"select": "cert_id,last_seen_on"})}
+    have = {r["cert_id"]: r for r in rest.get_all(
+        "mfds_gmp_cert", {"select": "cert_id,first_seen_on,last_seen_on"},
+    )}
     new = [r for r in rows if r["cert_id"] not in have]
+    new_today = len(new) + sum(have.get(r["cert_id"], {}).get("first_seen_on") == today for r in rows)
     gone = sorted(set(have) - {r["cert_id"] for r in rows})
-    report.update({"existing_rows": len(have), "new_rows": len(new),
+    report.update({"existing_rows": len(have), "new_rows": new_today,
                    "not_in_this_listing": len(gone),
                    "source_firms": len({r["firm_name"] for r in rows}),
                    "source_bizrnos": len({r["bizrno"] for r in rows if r["bizrno"]})})
@@ -251,8 +259,16 @@ def main(argv: list[str] | None = None) -> int:
             # first_seen_on 은 기존 행이면 보존한다 → 두 갈래로 보낸다.
             old = [{k: v for k, v in r.items() if k != "first_seen_on"}
                    for r in rows if r["cert_id"] in have]
-            rest.upsert("mfds_gmp_cert", new, "cert_id")
-            rest.upsert("mfds_gmp_cert", old, "cert_id")
+            bulk = BulkWriteRun()
+            # Rows stamped today have already been sent by this day's snapshot.
+            old = [row for row in old if have[row["cert_id"]]["last_seen_on"] != today]
+            pending = len(new) + len(old)
+            rest.upsert("mfds_gmp_cert", new[:bulk.remaining - 1], "cert_id", bulk=bulk)
+            rest.upsert("mfds_gmp_cert", old[:bulk.remaining - 1], "cert_id", bulk=bulk)
+            if pending > bulk.attempted:
+                raise BulkWriteError(
+                    f"snapshot deferred: {pending - bulk.attempted} rows remain; rerun on the same KST date"
+                )
             link = rest.rpc("grm_link_mfds_gmp_cert")
             report["link"] = link
             unlinked = rest.get_all("mfds_gmp_cert", {
@@ -264,9 +280,9 @@ def main(argv: list[str] | None = None) -> int:
             rest.upsert("mfds_gmp_cert_snapshot", [{
                 "snapshot_on": today, "total_count": got["total_count"],
                 "fetched": len(got["items"]), "distinct_rows": len(rows),
-                "new_rows": len(new), "complete": got["complete"],
+                "new_rows": new_today, "complete": got["complete"],
                 "linked_rows": link.get("linked_rows"), "unlinked_rows": link.get("unlinked_rows"),
-                "report": report}], "snapshot_on")
+                "report": report}], "snapshot_on", bulk=bulk)
         except Exception as e:  # noqa: BLE001
             report["append_error"] = str(e)
             rc = 1

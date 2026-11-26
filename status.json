@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T04:23:11Z",
+ "generated_at": "2026-11-26T04:25:07Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -230,11 +230,11 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 45754075519,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-26T04:15:40Z",
-    "updatedAt": "2026-11-26T04:15:44Z",
+    "updatedAt": "2026-11-26T04:24:42Z",
     "headBranch": "main",
     "displayTitle": "Merge pull request #1988 from MINHOYEOM/claude/desc-dup-noun-1126",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45754075519"
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45755029448,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T04:24:44Z",
+    "updatedAt": "2026-11-26T04:24:57Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45755029448"
+   },
+   {
     "databaseId": 45747516097,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45716025260"
-   },
-   {
-    "databaseId": 45709466311,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T22:00:37Z",
-    "updatedAt": "2026-11-25T22:00:56Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45709466311"
    }
   ],
   "grm-findings-translate-apply.yml": [

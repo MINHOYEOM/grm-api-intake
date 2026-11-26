@@ -8,3 +8,7 @@
   X-Robots-Tag: noindex
 /welcome/*
   X-Robots-Tag: noindex
+/briefs/:date/naver-blog.html
+  X-Robots-Tag: noindex
+/briefs/:date/naver-blog
+  X-Robots-Tag: noindex

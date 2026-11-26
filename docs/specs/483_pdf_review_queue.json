@@ -10,15 +10,33 @@
     "finding_id": "finding-0b0c1035bdcdabfbe07725d3",
     "document_id": "fda483-189485",
     "source": "https://www.fda.gov/media/189485/download",
-    "reason": "깨진 글자층 스캔 — force_ocr dry 로 먼저 다시 판독하고, 그래도 깨지면 사람이 PDF 로 확인.",
-    "status": "todo"
+    "reason": "깨진 글자층 스캔. force_ocr dry(run 45624873621)는 문장을 살렸으나 글자층의 RABS 구절을 잃고 가림 자리를 빈칸으로 빼 영문 교체 부적합 → 사람 확인 국문.",
+    "status": "review",
+    "page": "6 of 13 (Observation 4)",
+    "draft_basis": "운영 detail_text(글자층) + force_ocr 판독(run 45624873621) 맞대기. 가림 자리는 [redacted], 두 판 모두 깨진 구절은 [판독 불확실].",
+    "draft_ko": "구체적으로, A. 실사관은 [redacted] 충전 라인에서 [redacted] 제품 배치 #[redacted]([redacted] 2025) 및 [redacted] 배치 #[redacted]([redacted] 2025) 제조를 위한 무균 설치·충전 작업을 관찰하면서 다음과 같은 무균 공정 결함을 확인했다. i. [redacted] 중 [redacted] 장치의 [redacted] 부분이 [redacted] 위의 일차 공기(first air)를 방해했다. 이어서 접근 제한 장벽 시스템(RABS) 안의 [redacted] [판독 불확실: 층류(laminar flow) 장치 관련 구절]. ii. 충전·마개 장착 작업대 설치 중 작업자가 [redacted] 수집 호스와 [redacted] 등 보호되지 않은 무균 부품을 장갑 낀 손으로 다루는 것이 관찰되었다. 이 부품들은 충전·마개 장착 공정 중 노출된 [redacted]와 제품 바로 위에 위치한다. iii. [redacted] 튜브 설치 중 작업자의 장갑 낀 손과 비무균 [redacted]이 노출된 튜브 위의 일차 공기를 방해했다. B. 귀사의 [redacted] 육안 검사 프로그램은 귀사 시설에서 제조한 완제품이 표방하는 품질 특성을 갖추었음을 충분히 보증하지 못한다. 구체적으로, [redacted] 안에 이물이나 입자가 든 [redacted]는 용기 완전성을 손상시키고 무균 제품의 미생물 오염 위험을 만들 수 있는데도 치명 결함(critical defect)으로 분류되지 않는다.",
+    "check_points": [
+      "A 첫 문장: 충전 라인 이름·제품명·배치 번호·날짜가 가림인지(글자층·강제 판독 모두 판독 불가)",
+      "A.i 둘째 문장: RABS 안 [redacted] 층류(laminar flow) 장치 구절 — 강제 판독에서 통째로 빠짐",
+      "B: '[redacted] 육안 검사 프로그램'의 가림 위치"
+    ],
+    "data_issue": "운영 detail_text 가 쪽 경계(6쪽 끝)에서 끊겨 같은 관찰의 C 항(무균 작업자 적격성 — 배지충전 중 모든 중요 개입 수행 요구 없음)이 빠져 있다. 초안은 운영 영문 범위(A·B)만 옮겼다. C 복원은 483 상세 추출 쪽 일감."
   },
   {
     "finding_id": "finding-6f0a83c4708369e5e72bd97e",
     "document_id": "fda483-191183",
     "source": "https://www.fda.gov/media/191183/download",
-    "reason": "깨진 글자층 스캔 — force_ocr dry 로 먼저 다시 판독하고, 그래도 깨지면 사람이 PDF 로 확인.",
-    "status": "todo"
+    "reason": "깨진 글자층 스캔. force_ocr dry(run 45670879796)는 쪽 머리말·문장 골격을 살렸으나 관찰 수가 줄어 불채택이고, 가림 자리를 ®@ 같은 잡음으로 바꾸고 줄 끝을 잘라(1쪽 'in 2 product i') 영문 교체 부적합 → 사람 확인 국문.",
+    "status": "review",
+    "page": "1~3 of 18 (Observation 1, 표 1~3)",
+    "draft_basis": "운영 detail_text(글자층) + force_ocr 판독(run 45670879796) 맞대기. 가림 자리는 [redacted]. 표 값은 두 판 모두 가림이라 옮기지 않고 표가 있다는 사실만 적었다.",
+    "draft_ko": "구체적으로, 귀사의 품질 부서는 규제상 허용 섭취량(AI) 한도를 충족하지 못한 [redacted] 의약품 배치에 대해 적절한 시장 조치를 취하지 않았다. 예를 들어, [redacted] 캡슐(USP)의 상업용 배치 [redacted]개가 [redacted] 위해성 평가의 일부로 분석되었을 때 [redacted] 불순물의 AI 한도 NMT [redacted] ppm 을 충족하지 못했다. 표 1 에는 함량, 배치 번호, 제조일, 사용기한, 시험일, 시험 시점의 검체 경과 기간, 결과가 실려 있으나 값은 모두 가려져 있다. 추가 상업용 배치 [redacted]개에 대한 귀사의 후속 평가에서 [redacted]개 배치가 [redacted] 분석 시 [redacted] 불순물의 AI 한도 NMT [redacted] ppm 을 충족하지 못했다. 세부 내용은 표 2 와 같다(값은 가림). 추가 상업용 배치 [redacted]개를 더 평가한 결과, [redacted] 중 분석했을 때 [redacted]개 배치가 [redacted] 불순물의 AI 한도 NMT [redacted] ppm 을 충족하지 못한 것으로 드러났다. 세부 내용은 표 3 과 같다(값은 가림).",
+    "check_points": [
+      "1쪽 첫 문장: '적절한 시장 조치' 대상이 '[redacted] 의약품 배치' 인지(글자층 'b:4tcl1P<: nf..th..JJ~..rrvg product', 강제 판독은 줄 끝 잘림)",
+      "1쪽: 불순물 이름·AI 한도 수치가 가림인지(글자층 '11 •1 l\\TMl (b)(4)', 강제 판독 없음)",
+      "3쪽 표 머리글 '(NMT 4 ppm)' — 글자층에만 있고 강제 판독은 'NMT@@ ppm'. 실제 4 ppm 인지 가림 조각인지 확인 후 초안에 반영"
+    ],
+    "data_issue": "관찰 1 은 1~7쪽인데 운영 detail_text 는 3쪽 끝에서 끊겨 4~7쪽(A. 기준 초과 배치 계속 출하·조사 미실시·SOP 3건 위반, 표 4, D. 건강위해평가 미실시 등)이 빠져 있다. 초안은 운영 영문 범위(1~3쪽)만 옮겼다. 4~7쪽 복원은 483 상세 추출 쪽 일감."
   },
   {
     "finding_id": "finding-3d480b7d0e687a2435302fc3",

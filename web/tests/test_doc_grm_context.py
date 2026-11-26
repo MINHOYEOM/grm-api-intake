@@ -150,6 +150,48 @@ class ViewTest(unittest.TestCase):
                          [("BETA", 2, "beta-firm"), ("GAMMA", 1, None)])
 
 
+class StandardRefsTest(unittest.TestCase):
+    """GRM 연결이 빈 문서 — 본문이 글자 그대로 적은 기준의 원문 페이지 링크(DB 행 0)."""
+
+    @classmethod
+    def setUpClass(cls):
+        import clause_text_page as ctp
+        cls.ctp = ctp
+        src = ctp.load_sources()
+        if not src:
+            raise unittest.SkipTest("clauses 정본 없음")
+        cls.view = ctp.build(src)
+        cls.labels = ctp.href_labels(cls.view)
+
+    def _doc(self, orig, cfr=None, src="FDA Warning Letter"):
+        return {"document_id": "X", "slug": "x", "source": src,
+                "findings": [{"finding_id": "f1", "text_orig": orig, "text_ko": "", "cfr_refs": cfr or []}]}
+
+    def test_labels_are_literal_only(self):
+        d = self._doc("Not compliant with Annex 1 of EU GMP. See ICH Q9 and 21 CFR 211.68(a).")
+        got = self.ctp.cited_standard_labels(d)
+        self.assertEqual(got, ["21 CFR 211.68", "ICH Q9", "EU GMP Annex 1"])
+
+    def test_annex1_needs_gmp_and_not_annex_11(self):
+        self.assertEqual(self.ctp.cited_standard_labels(self._doc("per Annex 1 of the contract")), [])
+        self.assertEqual(self.ctp.cited_standard_labels(self._doc("EU GMP Annex 11 computerised")), [])
+
+    def test_mfds_byl_not_linked(self):
+        d = self._doc("시험실 기타 [별표 1] 제7.1호 - 자재 관리방안", src="MFDS")
+        self.assertEqual(render.doc_standard_view(d, self.view, self.labels), [])
+
+    def test_view_links_exist_and_dedup(self):
+        d = self._doc("x 21 CFR 211.68 y", cfr=["21 CFR 211.68(a)", "21 CFR 211.68(b)"])
+        out = render.doc_standard_view(d, self.view, self.labels)
+        self.assertEqual(len(out), 1)
+        self.assertIn(out[0]["href"], self.labels)
+        self.assertTrue(out[0]["href"].startswith("clauses/cfr21/"))
+
+    def test_unknown_section_makes_nothing(self):
+        d = self._doc("21 CFR 9999.9 was cited", cfr=["21 CFR 9999.9"])
+        self.assertEqual(render.doc_standard_view(d, self.view, self.labels), [])
+
+
 class RenderedPagesTest(unittest.TestCase):
     """실제 정본으로 짓고, 블록 유무가 뷰와 일치하는지·링크가 실재하는지 전수 대조."""
 

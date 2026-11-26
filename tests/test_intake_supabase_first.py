@@ -258,7 +258,7 @@ class MainFallbackTest(unittest.TestCase):
         rid_old = ci.raw_signal_from_intake_item(
             _item(document_id="wl-old"), collected_at=fixed_now)["raw_signal_id"]
         lookup = (lambda url, key, ids: {rid_old}) if supabase_lookup else (lambda *a: None)
-        with mock.patch.dict(os.environ, env), \
+        with mock.patch.dict(os.environ, env, clear=True), \
                 mock.patch.object(sys, "argv", ["collect_intake.py"]), \
                 mock.patch.object(ci, "now_kst", return_value=fixed_now), \
                 mock.patch.object(ci.time, "sleep"), \
@@ -269,6 +269,8 @@ class MainFallbackTest(unittest.TestCase):
                 mock.patch.object(ci, "_configure_exclusion_ledger"), \
                 mock.patch.object(ci, "_run_collection", return_value=collected), \
                 mock.patch.object(ci, "notion_query_existing_keys", side_effect=err), \
+                mock.patch("source_silence.query_last_seen", return_value=({}, [])), \
+                mock.patch.object(ci, "notion_count_aged_unconsumed_new", return_value=0), \
                 mock.patch.object(ci, "existing_raw_signal_ids", side_effect=lookup), \
                 mock.patch.object(ci, "append_intake_item_to_supabase", return_value=_ok()), \
                 mock.patch.object(ci, "notion_create_page", return_value=True) as create:

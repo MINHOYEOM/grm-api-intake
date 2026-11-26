@@ -1,0 +1,152 @@
+name: GRM Findings Detail Stale Monitor
+
+# [2026-11-26] 483 상세 재번역(stale) 대기열 일일 감시 — 읽기 전용, 알림만.
+# findings_detail_stale_monitor.py 가 findings_detail_export 의 stale 대기열과 **같은 함수**로 행 수를 센다.
+# stale > 0 인 상태가 3일 넘게 줄지 않으면 운영 이슈(label: findings-detail-stale)를 열고, 줄거나 0 이 되면 닫는다.
+# stale 행이 있으면 재번역 원문 묶음(R-*.json)을 아티팩트 `findings-detail-stale-<날짜>`(7일)로 올린다.
+# 번역(국문 작성)은 하지 않는다 — 번역팀이 아티팩트를 받아 국문을 채워 detail_outbox PR 로 낸다.
+#
+# 일별 기록은 Actions 캐시로 넘긴다(키는 실행마다 새로, 복원은 최신). ★cache 는 job 이 성공해야 저장되므로
+# breach 를 red job 으로 만들지 않는다 — 알림은 이슈로만 낸다(red 로 끝내면 그날 기록이 저장되지 않아
+# 다음 날 추세를 못 본다).
+on:
+  schedule:
+    # 매일 21:30 UTC = 06:30 KST. 백로그 모니터(21:00 UTC) 다음.
+    - cron: '30 21 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write        # stale 정체 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: findings-detail-stale-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    name: Count 483 detail re-translation (stale) queue
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Restore daily history
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: detail_stale_history.json
+          key: detail-stale-history-${{ github.run_id }}
+          restore-keys: detail-stale-history-
+
+      - name: Count stale queue (read-only)
+        id: monitor
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python findings_detail_stale_monitor.py --history detail_stale_history.json --output detail_stale_report.json --export-dir detail_stale_export
+
+      # [2026-11-26] stale 행이 있으면 재번역 원문 묶음(R-*.json, findings_detail_export --mode stale 과 같은 함수)을
+      # 아티팩트로 올린다 — 서비스 키 없는 번역 세션이 `gh run download <run> -n findings-detail-stale-<날짜>` 로 받는다.
+      # 파일에는 finding_id·md5·게시일·원문 detail_text 만 있다(자격 증명 없음, 시험이 고정). 보관 7일.
+      - name: Stamp export date
+        id: stamp
+        if: always()
+        run: echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload stale re-translation source (if any)
+        if: always() && hashFiles('detail_stale_export/R/*.json') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: findings-detail-stale-${{ steps.stamp.outputs.date }}
+          path: detail_stale_export/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### 483 상세 재번역(stale) 대기열"
+            echo ""
+            if [ -f detail_stale_report.json ]; then
+              echo '```json'
+              cat detail_stale_report.json
+              echo '```'
+            else
+              echo "detail_stale_report.json 이 없습니다 (자격 증명 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update stale issue
+        if: steps.monitor.outcome == 'failure'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            let r = {};
+            try { r = JSON.parse(fs.readFileSync('detail_stale_report.json', 'utf8')); }
+            catch (e) { r = { status: 'error', errors: ['detail_stale_report.json 파싱 실패'] }; }
+            const title = '[findings-detail-stale] 483 상세 재번역 대기가 줄지 않습니다';
+            const label = 'findings-detail-stale';
+            const lines = [];
+            if ((r.errors || []).length) {
+              lines.push('**모니터 오류** — 이번 실행은 대기열을 세지 못했습니다:');
+              for (const e of r.errors) lines.push(`- ${e}`);
+            } else {
+              lines.push(`- 재번역 대기(stale): **${r.stale}**행 · 잡문만 바뀌어 건너뛴 행: ${r.junk_only_skipped}`);
+              if (r.baseline) lines.push(`- 기준: ${r.baseline.date} ${r.baseline.stale}행`);
+              for (const b of (r.breaches || [])) lines.push(`- \`${b.code}\` — ${b.message}`);
+            }
+            const body = lines.join('\n')
+              + `\n\n검사일: ${r.date || '?'} · 실행: ${context.runId}`
+              + `\n워크플로 \`grm-findings-detail-stale-monitor.yml\` · 대기가 줄면 자동으로 닫힙니다.`;
+            try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label }); }
+            catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo,
+                name: label, color: 'd93f0b', description: '483 상세 재번역 대기 정체' });
+            }
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body });
+              core.notice(`기존 이슈 #${existing.number} 갱신`);
+            } else {
+              const { data: created } = await github.rest.issues.create({ owner: context.repo.owner,
+                repo: context.repo.repo, title, body, labels: [label], assignees: [context.repo.owner] });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close stale issue on recovery
+        if: steps.monitor.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[findings-detail-stale] 483 상세 재번역 대기가 줄지 않습니다';
+            const label = 'findings-detail-stale';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body: `재번역 대기가 줄어 자동으로 닫습니다 (실행 ${context.runId}).` });
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed' });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }

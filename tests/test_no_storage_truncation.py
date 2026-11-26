@@ -121,6 +121,8 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('findings_extractors.py', 'if len(deficiency) >= _FDA483_FRAGMENT_MAX_LEN:'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
     ('findings_extractors.py', 'return len(d) < _FDA483_FRAGMENT_MAX_LEN and len(_FDA483_WORD_RE.findall(d)) < 3'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
     ('findings_extractors.py', 'len(deficiency) < _FDA483_FRAGMENT_MAX_LEN'): ('decision', '483 단독 짧은 표제 판정(30자 미만) — 대체 표제+나머지 상세 = 원 상세, 저장은 원문'),
+    ('findings_translate_pick.py', 'DEFAULT_MAX_CHARS = 40_000'): ('decision', '일일 번역 대상 고르기 예산(원문 합계) — 행을 자르지 않고 고를 행 수만 정한다, 저장은 원문'),
+    ('findings_translate_pick.py', 'ap.add_argument("--max-chars", type=int, default=DEFAULT_MAX_CHARS)'): ('decision', '일일 번역 대상 고르기 예산(원문 합계) — 행을 자르지 않고 고를 행 수만 정한다, 저장은 원문'),
     ('grm_notion.py', 'props[PROP_TYPE_CLASS] = _select(item.type_or_class[:100])'): ('genuine', 'Notion select 옵션 이름 100자 한도'),
 }
 

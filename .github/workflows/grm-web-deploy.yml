@@ -195,6 +195,14 @@ jobs:
             rm -f "$PREV"
             echo "::warning::sitemap-full.xml 받기 실패(HTTP $CODE) — 이번 배포는 IndexNow 건너뜀"
           fi
+          # [내용 비교 2026-11-26] 라이브 본문 지문 목록 — 없으면(첫 배포) lastmod 비교만 한다.
+          curl -fsSL --max-time 60 https://grm-solutions.com/indexnow-manifest.json             -o "${{ runner.temp }}/prev_manifest.json" || rm -f "${{ runner.temp }}/prev_manifest.json"
+
+      # [내용 비교 2026-11-26] 본문 지문 목록을 dist 루트에 싣는다(다음 배포가 라이브에서 받아 비교). 비차단.
+      - name: Write IndexNow page manifest (non-blocking)
+        if: steps.creds.outputs.have == 'true'
+        continue-on-error: true
+        run: python indexnow_submit.py --sitemap web/dist/sitemap-full.xml --dist web/dist --write-manifest web/dist/indexnow-manifest.json
 
       # ── C3: 배포(Cloudflare Pages) — prod/preview 분류는 Cloudflare 가 브랜치명으로 판정. ──
       #   production 브랜치(vars.CF_PAGES_PROD_BRANCH, Cloudflare 설정과 일치)로의 머지만 라이브.
@@ -216,7 +224,9 @@ jobs:
         continue-on-error: true
         run: |
           if [ -s "${{ runner.temp }}/prev_sitemap.xml" ]; then
-            python indexnow_submit.py --sitemap web/dist/sitemap-full.xml --previous "${{ runner.temp }}/prev_sitemap.xml"
+            MAN=""
+            if [ -s "${{ runner.temp }}/prev_manifest.json" ]; then MAN="--dist web/dist --previous-manifest ${{ runner.temp }}/prev_manifest.json"; fi
+            python indexnow_submit.py --sitemap web/dist/sitemap-full.xml --previous "${{ runner.temp }}/prev_sitemap.xml" $MAN
           else
             echo "::warning::이전 sitemap 없음 — IndexNow 제출 건너뜀(전수는 grm-indexnow-full.yml)"
           fi

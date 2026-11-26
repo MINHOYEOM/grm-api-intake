@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [구독 권유 정리 2026-11-26] 첫 화면 줄형 칸이 이 화면의 구독 칸이다 — 하단 밴드를 끈다(base.html). -#}
+{% set sub_inline_on = True %}
 {% block content %}
 <main>
   <div class="wrap detail-head">
@@ -37,8 +39,20 @@
       {%- endfor %}
     </ul></div>
     {%- endif %}
+    {%- if must_see %}
+    {#- [브리프 첫 화면 2026-11-26 · 대표 결정] 이번 주 꼭 볼 5건 — 고르는 규칙은 render.select_must_see 하나.
+        칸을 누르면 아래 그 카드로 간다. 국·영 같은 카드(판정은 번역 전 값). -#}
+    <section class="must" aria-labelledby="must-h">
+      <div class="must-h"><h2 id="must-h">{{ _("이번 주 꼭 볼 {n}건", n=must_see|length) }}</h2><span>{{ _("처분·국내 실사·무균 지적·공동 지침") }}</span></div>
+      <div class="must-g">
+      {%- for m in must_see %}
+        <a class="must-c must-{{ m.tone }}" href="#{{ m.anchor }}"><span class="must-n">{{ loop.index }}</span><span class="must-t">{{ m.label }}</span><span class="must-f">{{ m.firm }}</span><span class="must-i">{{ m.issue }}</span>{% if m.why %}<span class="must-w">{{ m.why }}</span>{% endif %}<span class="must-go">{{ _("카드 보기") }}</span></a>
+      {%- endfor %}
+      </div>
+    </section>
+    {%- endif %}
     {#- [구독 유입 2026-11-17] 요약 아래 줄형 구독 칸 — newsletter 게이트 안(env-off 빌드 출력 0). -#}
-    {%- with sub_kind='brief', sub_slot='top' %}{% include "partials/sub_inline.html" %}{% endwith %}
+    {%- with sub_kind='brief', sub_slot='top', sub_anchor=True %}{% include "partials/sub_inline.html" %}{% endwith %}
     {%- if glance %}
     {#- [브리프 4단 2026-11-12] 주간 현황 — 카드 묶음·종류로 센 건수와 DB 국가·분류 값으로 센 한 줄
         (render.build_brief_glance · 정본 web/data/brief_glance.json). 줄이 없으면 건수 칸만. -#}
@@ -63,6 +77,16 @@
         (JS scripts 블록의 스크롤 스파이가 active 카드의 details 를 auto-open, auto-close
         없음). 스타일은 이 파일 <style>(TOC 관련 블록 아래)에만 — grm.css 무접촉. -#}
     <aside class="toc" id="toc"><div class="l">{{ _("목차") }}<button class="toc-close" type="button" aria-label="{{ _('목차 닫기') }}"><i class="ti ti-x"></i></button></div><div>
+      {%- if agency_counts %}
+      {#- [목차 축약 2026-11-26 · 대표 결정] 업체 이름 나열 대신 기관별 건수. 카드 목록 전체는 아래 '전체 보기'에 접어 둔다
+          (HTML 은 그대로 — 검색엔진·스크롤 스파이가 읽는다). -#}
+      <div class="toc-ag"><div class="toc-ag-l">{{ _("기관별") }}</div>
+        {%- for a in agency_counts %}
+        <div class="toc-ag-r"><span>{{ a.name }}</span><span class="n">{{ a.n }}</span></div>
+        {%- endfor %}
+      </div>
+      <details class="toc-all"><summary><span>{{ _("전체 카드 {n}장", n=brief.coverage.rendered) }}</span><span class="toc-all-go">{{ _("전체 보기") }}</span></summary>
+      {%- endif %}
       {%- for section in sections %}
       <details class="toc-grp" data-slug="{{ section.slug }}">
         <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">{{ section.name }}</span><span class="n">{{ section.count }}</span></summary>
@@ -71,6 +95,9 @@
         {%- endfor %}
       </details>
       {%- endfor %}
+      {%- if agency_counts %}
+      </details>
+      {%- endif %}
       {%- if brief.resources %}
       <a class="sec" href="#sec-resources">{{ _("전문지 브리핑") }}</a>
       {%- endif %}
@@ -210,6 +237,33 @@
 .toc-grp-chev{font-size:14px;color:var(--coral);flex:none;transition:var(--tr);transform:rotate(-90deg)}
 .toc-grp[open] .toc-grp-chev{transform:rotate(0deg)}
 @media(prefers-reduced-motion:reduce){.toc-grp-chev{transition:none}}
+/* [브리프 첫 화면 2026-11-26] 이번 주 꼭 볼 5건 + 목차 기관별 축약 — 밝은 면, 검은 띠 없음. PC 기준 5칸. */
+.must{margin:26px 0 4px}
+.must-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.must-h h2{font-family:var(--serif);font-weight:600;font-size:22px;line-height:1.3;color:var(--ink);margin:0}
+.must-h span{font-size:13px;color:var(--muted)}
+.must-g{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:14px}
+.must-c{--c:var(--coral);display:flex;flex-direction:column;gap:7px;padding:16px 16px 14px;background:#fff;border:1px solid var(--line);border-top:4px solid var(--c);border-radius:var(--rad-s);text-decoration:none;color:inherit;word-break:keep-all;transition:var(--tr)}
+.must-c:hover{border-color:var(--coral);box-shadow:0 10px 26px -18px rgba(26,24,21,.4)}
+.must-fda{--c:#3E5C76}.must-mfds{--c:#2F6B5E}.must-etc{--c:#6B4E71}
+.must-n{font-family:var(--serif);font-size:24px;line-height:1;color:var(--coral)}
+.must-t{align-self:flex-start;font-size:12px;font-weight:600;padding:1px 8px;border-radius:4px;color:var(--c);background:color-mix(in srgb,var(--c) 12%,#fff)}
+.must-f{font-weight:600;font-size:14px;line-height:1.4;color:var(--ink);overflow-wrap:anywhere}
+.must-i{font-family:var(--serif);font-weight:600;font-size:16px;line-height:1.4;color:var(--ink)}
+.must-w{font-size:13px;line-height:1.55;color:var(--body)}
+.must-go{margin-top:auto;font-size:12.5px;font-weight:600;color:var(--coral-2)}
+@media(max-width:1100px){.must-g{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.must-g{grid-template-columns:1fr}}
+.toc-ag{margin:0 0 10px}
+.toc-ag-l{font-size:12px;font-weight:600;color:var(--muted);margin:2px 0 4px}
+.toc-ag-r{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink)}
+.toc-ag-r .n{font-size:12.5px;color:var(--muted)}
+.toc-all{border:0;margin:0}
+.toc-all>summary{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;list-style:none;padding:9px 12px;margin:4px 0 6px;background:var(--coral-tint,#F4E7DF);border-radius:var(--rad-s);font-size:13.5px;font-weight:600;color:var(--ink)}
+.toc-all>summary::-webkit-details-marker{display:none}
+.toc-all>summary::marker{display:none}
+.toc-all-go{font-size:12.5px;color:var(--coral-2)}
+.toc-all[open]>summary .toc-all-go{visibility:hidden}
 /* [성장 2차] 요약 복사 버튼 — .tldr 우상단 절대배치(기존 흐름 무변형·grm.css 무접촉).
    position:static→relative 는 단독으론 시각 무변형이라 안전하다. */
 .detail-head .tldr{position:relative}

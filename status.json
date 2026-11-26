@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-26T22:03:35Z",
+ "generated_at": "2026-11-26T23:18:21Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 45907760933,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-26T22:55:08Z",
+    "updatedAt": "2026-11-26T23:10:01Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45907760933"
+   },
    {
     "databaseId": 45738073009,
     "status": "completed",
@@ -100,17 +111,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45071052190"
-   },
-   {
-    "databaseId": 45069455261,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "schedule",
-    "createdAt": "2026-11-22T20:58:53Z",
-    "updatedAt": "2026-11-22T21:16:47Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45069455261"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -732,6 +732,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 45907760933,
+   "created_at": "2026-11-26T22:55:08Z",
+   "has_web_brief": false
+  },
+  {
    "run_id": 45738073009,
    "created_at": "2026-11-26T01:47:07Z",
    "has_web_brief": true
@@ -755,14 +760,169 @@
    "run_id": 45323080860,
    "created_at": "2026-11-24T03:58:02Z",
    "has_web_brief": true
-  },
-  {
-   "run_id": 45301070728,
-   "created_at": "2026-11-24T00:55:33Z",
-   "has_web_brief": true
   }
  ],
  "intake_counts": [
+  {
+   "schema": "grm-intake-counts/v1",
+   "run_id": 45907760933,
+   "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45907760933",
+   "created_at": "2026-11-26T22:55:08Z",
+   "conclusion": "success",
+   "run_date_kst": "2026-11-27",
+   "event": "workflow_dispatch",
+   "dry_run": true,
+   "active": [
+    "eca",
+    "ema",
+    "fr",
+    "mhra",
+    "pics",
+    "recall",
+    "wl"
+   ],
+   "total": 695,
+   "sources": [
+    {
+     "key": "fr",
+     "label": "Federal Register",
+     "fetched": 9,
+     "error": false
+    },
+    {
+     "key": "recall",
+     "label": "OpenFDA Recall",
+     "fetched": 132,
+     "error": false
+    },
+    {
+     "key": "ema",
+     "label": "EMA RSS",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mhra",
+     "label": "MHRA RSS",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mhra_alert",
+     "label": "MHRA Drug/Device Alerts",
+     "fetched": 4,
+     "error": false
+    },
+    {
+     "key": "pics",
+     "label": "PIC/S RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eca",
+     "label": "ECA Academy RSS",
+     "fetched": 4,
+     "error": false
+    },
+    {
+     "key": "wl",
+     "label": "FDA Warning Letters",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mfds",
+     "label": "MFDS RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_law",
+     "label": "MFDS Law/Admrul",
+     "fetched": 3,
+     "error": false
+    },
+    {
+     "key": "mfds_recall",
+     "label": "MFDS Recall",
+     "fetched": 37,
+     "error": false
+    },
+    {
+     "key": "mfds_admin",
+     "label": "MFDS Admin",
+     "fetched": 25,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_cert",
+     "label": "MFDS GMP Certificate",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_safety_letter",
+     "label": "MFDS Safety Letter",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_inspection",
+     "label": "MFDS GMP Inspection",
+     "fetched": 3,
+     "error": false
+    },
+    {
+     "key": "ich",
+     "label": "ICH",
+     "fetched": 31,
+     "error": false
+    },
+    {
+     "key": "who",
+     "label": "WHO",
+     "fetched": 172,
+     "error": false
+    },
+    {
+     "key": "hc",
+     "label": "Health Canada",
+     "fetched": 9,
+     "error": false
+    },
+    {
+     "key": "fda483",
+     "label": "FDA 483",
+     "fetched": 254,
+     "error": false
+    },
+    {
+     "key": "ispe",
+     "label": "ISPE iSpeak RSS",
+     "fetched": 9,
+     "error": false
+    },
+    {
+     "key": "search",
+     "label": "Brave Search",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eu_gmp_ncr",
+     "label": "EU GMP NCR (EudraGMDP)",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mhra_gmp_ncr",
+     "label": "MHRA GMP NCR",
+     "fetched": 0,
+     "error": false
+    }
+   ]
+  },
   {
    "schema": "grm-intake-counts/v1",
    "run_id": 45738073009,

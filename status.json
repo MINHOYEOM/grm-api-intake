@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T08:49:47Z",
+ "generated_at": "2026-11-26T12:07:14Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45785204741,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T08:40:47Z",
-    "updatedAt": "2026-11-26T08:49:20Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1995 from MINHOYEOM/claude/extraction-gap-snapsho…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45785204741"
-   },
-   {
-    "databaseId": 45781342736,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T08:13:26Z",
-    "updatedAt": "2026-11-26T08:22:22Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1989 from MINHOYEOM/claude/naver-blog-html-1126",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45781342736"
-   },
-   {
-    "databaseId": 45765795790,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45815598597,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-26T06:05:27Z",
-    "updatedAt": "2026-11-26T06:12:31Z",
-    "headBranch": "claude/extraction-gap-snapshot-1126",
-    "displayTitle": "fix(감시): extraction_gap_by_source 를 pg_cron 스냅샷으로(169) + 신선도 경보",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45765795790"
+    "createdAt": "2026-11-26T12:00:15Z",
+    "updatedAt": "2026-11-26T12:00:19Z",
+    "headBranch": "codex/daily-reconcile-ledger",
+    "displayTitle": "feat(recon): 매일 대조 장부 1단계 (draft)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45815598597"
    },
    {
-    "databaseId": 45765782868,
+    "databaseId": 45815592828,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-26T12:00:13Z",
+    "updatedAt": "2026-11-26T12:00:17Z",
+    "headBranch": "codex/daily-reconcile-ledger",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/daily-reconcile…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45815592828"
+   },
+   {
+    "databaseId": 45815253161,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-26T06:05:20Z",
-    "updatedAt": "2026-11-26T06:12:51Z",
-    "headBranch": "claude/extraction-gap-snapshot-1126",
-    "displayTitle": "fix(감시): extraction_gap_by_source 를 pg_cron 스냅샷으로 — RPC 는 읽기만 + 신선도 경보",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45765782868"
-   },
-   {
-    "databaseId": 45762120292,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T05:31:07Z",
-    "updatedAt": "2026-11-26T05:38:45Z",
+    "createdAt": "2026-11-26T11:57:52Z",
+    "updatedAt": "2026-11-26T12:06:40Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1990 from MINHOYEOM/claude/extraction-gap-rpc-tim…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45762120292"
+    "displayTitle": "Merge pull request #2002 from MINHOYEOM/claude/translation-queue-inde…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45815253161"
+   },
+   {
+    "databaseId": 45811410971,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T11:31:48Z",
+    "updatedAt": "2026-11-26T11:39:30Z",
+    "headBranch": "codex/ema-relevance-apply",
+    "displayTitle": "feat(EMA): 관련도 반영 수동 워크플로 + 판정 69건 입력 (apply 기본 false)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45811410971"
+   },
+   {
+    "databaseId": 45808808621,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T11:14:45Z",
+    "updatedAt": "2026-11-26T11:23:08Z",
+    "headBranch": "codex/collect-cap-health",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/collect-cap-health",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45808808621"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45816610528,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T12:06:43Z",
+    "updatedAt": "2026-11-26T12:06:59Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45816610528"
+   },
+   {
     "databaseId": 45786424020,
     "status": "completed",
     "conclusion": "success",
@@ -442,20 +453,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45755029448"
-   },
-   {
-    "databaseId": 45747516097,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T03:13:23Z",
-    "updatedAt": "2026-11-26T03:13:38Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45747516097"
    }
   ],
   "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 45788934527,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-26T09:06:40Z",
+    "updatedAt": "2026-11-26T09:48:07Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1996 from MINHOYEOM/chore/findings-translate-483-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45788934527"
+   },
    {
     "databaseId": 45771211867,
     "status": "completed",
@@ -499,27 +510,16 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1934 from MINHOYEOM/claude/findings-translate-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45509969219"
-   },
-   {
-    "databaseId": 45297689150,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T00:30:20Z",
-    "updatedAt": "2026-11-24T00:33:54Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1884 from MINHOYEOM/claude/findings-translate-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45297689150"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 45783637545,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-26T08:29:50Z",
-    "updatedAt": "2026-11-26T08:29:54Z",
+    "updatedAt": "2026-11-26T11:19:11Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45783637545"
@@ -628,6 +628,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 45786994509,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-26T08:53:26Z",
+    "updatedAt": "2026-11-26T08:53:54Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45786994509"
+   },
+   {
     "databaseId": 45709146997,
     "status": "completed",
     "conclusion": "success",
@@ -670,17 +681,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45503810073"
-   },
-   {
-    "databaseId": 45490304631,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-24T21:21:41Z",
-    "updatedAt": "2026-11-24T21:22:05Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45490304631"
    }
   ],
   "grm-cloud-request.yml": [

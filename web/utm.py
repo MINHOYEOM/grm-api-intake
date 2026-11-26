@@ -24,6 +24,7 @@
   | 주간 메일 속 소식 | newsletter   | email     | `service_update`               |
   | 용어집 PDF        | glossary_pdf | pdf       | `glossary_pdf`                 |
   | 구독 확인 메일    | welcome      | email     | `confirm`                      |
+  | 네이버 블로그 원고 | naver_blog   | blog      | `{YYYY-MM-DD}_483`             |
 
 ★2026-11-04 개정 — 우리가 **내보내는 모든 링크**에 표식을 붙인다(성장분석팀 11-04 조사: 가입
 경로 '직접' 6/23건의 정체를 못 쪼갠 원인이 메일 본문 링크에 표식이 없던 것). 메일 본문(주간·
@@ -59,6 +60,7 @@ CHANNELS: dict[str, tuple[str, str, str]] = {
     "linkedin_weekly": ("linkedin", "social", "{date}_weekly"),
     "linkedin_monthly": ("linkedin", "social", "monthly_{month}"),
     "welcome_confirm": ("welcome", "email", "confirm"),
+    "naver_blog": ("naver_blog", "blog", "{date}_483"),
 }
 
 

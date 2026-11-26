@@ -1,28 +1,20 @@
-{#- [구독 유입 대책 2026-11-17 · 대표 확정 섞은 안 + N1 표준형] 본문 속 줄형 구독 칸.
-    부르는 쪽이 `{% with sub_kind=..., sub_slot=... %}{% include %}` 로 넘긴다.
-      sub_kind — brief(요약 아래) · glossary(정의 아래) · doc(지적 문서 끝) · findings(영문 지적사항 첫 화면) · home(영문 홈 첫 화면)
-      (+ home_brief: 홈 '이번 주 핵심' 아래)
-      sub_slot — top(첫 화면·정의/요약 아래) | mid(홈 본문 중간) | end(본문 끝) → 집계 키 inline_<slot>_view / _submit (migration 160)
-      sub_stack — 좁은 열(홈 반쪽 열)에서 표제·설명·폼을 한 열로 쌓는다
-    · 1행: 명사형 표제 + 이메일 칸·'무료 구독' 버튼 / 2행: 작은 회색 설명. 확인 메일 안내·꼬리표는 끝 상자(하단 밴드)에만.
+{#- [구독 유입 대책 2026-11-17 · 대표 확정 섞은 안 + N1 표준형 → 구독 권유 정리 2026-11-26] 첫 화면 구독 칸.
+    부르는 쪽이 `{% with sub_kind=..., sub_slot='top', sub_anchor=True %}{% include %}` 로 넘기고,
+    그 템플릿은 `{% set sub_inline_on = True %}` 를 세워 하단 밴드를 끈다 — 한 화면에 구독 칸 하나 + 하단 팝업 하나.
+      sub_kind — brief(요약 아래) · glossary(정의 아래) · findings(영문 지적사항 첫 화면) · home(홈 첫 화면 밴드, sub_band)
+      sub_anchor — 이 칸이 id="subscribe" 를 받는다(헤더 '무료 구독'·메일·링크드인 #subscribe 링크의 도착점)
+    · 기관 목록은 {{ sub_agencies }}·{{ sub_agency_n }} 만 쓴다(render._make_env 한 곳에서 정함).
+    · 하단 밴드가 없는 화면이라 공지 메일 근거인 동의 범위 문장을 이 칸에도 싣는다.
     · 폼 경로는 하단 밴드와 같다 — 같은 sibforms 주소(언어 환경마다 render.py 가 넣는다)·허니팟·locale·
       SIGNUP_PATH/LANG 숨은 칸. 제출·성공 표시·이미 구독한 브라우저 숨김은 base.html 의 스크립트가 맡는다.
     · newsletter 게이트 안이라 env-off(로컬·CI) 빌드에서는 출력 0 — 골든 byte-diff 0.
     · 문구는 발송 요일을 앞세우지 않고 받는 것을 앞세운다(대표 지시 2026-11-17). -#}
 {%- if newsletter_form_action and not hide_subscribe %}
-{%- if sub_kind == 'brief' %}{% set _t = _("주간 브리프 메일") %}{% set _d = _("매주 FDA·EU·식약처 실사 지적 소식을 받아 보세요.") %}
+{%- if sub_kind == 'brief' %}{% set _t = _("주간 브리프 메일") %}{% set _d = _("매주 {a}의 실사 지적 소식을 받아 보세요.", a=sub_agencies) %}
 {%- elif sub_kind == 'glossary' and sub_offer_glossary_pdf %}{% set _t = _("GMP 용어집 PDF") %}{% set _d = _("구독을 확인하면 한·영 대조 GMP 용어집 PDF를 받습니다. 매주 실사 지적 소식도 함께 보내 드립니다.") %}
 {%- elif sub_kind == 'glossary' %}{% set _t = _("실사 지적 주간 메일") %}{% set _d = _("GMP 용어가 쓰인 새 실사 지적을 매주 받아 보세요.") %}
-{%- elif sub_kind == 'doc' %}{% set _t = _("새 지적 알림 메일") %}{% set _d = _("FDA·EU·식약처의 새 실사 지적을 매주 원문 링크와 함께 받아 보세요.") %}
-{%- elif sub_kind == 'home_brief' %}{% set _t = _("이번 주 소식 메일") %}{% set _d = _("주간 브리프의 핵심과 기관 원문 링크를 메일로 받아 보세요.") %}
-{%- elif sub_kind == 'note' %}{% set _t = _("실사 지적 주간 메일") %}{% set _d = _("실사 대비 노트에 이어 FDA·EU·식약처의 새 실사 지적을 매주 받아 보세요.") %}
-{%- elif sub_kind == 'clause' %}{% set _t = _("조항 인용 지적 메일") %}{% set _d = _("조항이 인용된 새 실사 지적을 원문 링크와 함께 매주 받아 보세요.") %}
-{%- elif sub_kind == 'quiz' %}{% set _t = _("지적 사례 주간 메일") %}{% set _d = _("퀴즈 소재가 되는 실제 지적 사례를 매주 메일로 받아 보세요.") %}
-{%- elif sub_kind == 'library' %}{% set _t = _("규제 자료 주간 메일") %}{% set _d = _("새 가이드라인·공식 문서 소식과 실사 지적을 매주 받아 보세요.") %}
-{%- elif sub_kind == 'notfound' %}{% set _t = _("GRM 주간 브리프") %}{% set _d = _("찾던 페이지 대신, 매주 FDA·EU·식약처 실사 지적 소식을 받아 보세요.") %}
-{%- elif sub_kind == 'firm' %}{% set _t = _("업체 지적 알림 메일") %}{% set _d = _("FDA·EU·식약처의 새 지적 기록을 매주 받아 보세요.") %}
-{%- elif sub_kind == 'findings' %}{% set _t = _("지적사항 주간 메일") %}{% set _d = _("매주 FDA·EU·식약처 실사 지적 소식을 원문 링크와 함께 받아 보세요.") %}
-{%- else %}{% set _t = _("주간 실사 지적 메일") %}{% set _d = _("FDA·EU·식약처의 새 실사 지적을 매주 받아 보세요.") %}
+{%- elif sub_kind == 'findings' %}{% set _t = _("지적사항 주간 메일") %}{% set _d = _("매주 {a}의 실사 지적 소식을 원문 링크와 함께 받아 보세요.", a=sub_agencies) %}
+{%- else %}{% set _t = _("주간 실사 지적 메일") %}{% set _d = _("{a}의 새 실사 지적을 매주 받아 보세요.", a=sub_agencies) %}
 {%- endif -%}
 {%- if sub_band %}
 {#- [홈 구독 밴드 2026-11-24 · 대표 요청 "어디서 구독해야 할지 모르겠다"] 홈 첫 화면의 색 면 밴드(시안 C = 전폭 띠 A + 카드 B 섞은 안).
@@ -32,14 +24,18 @@
     ★이미 구독한 브라우저에서도 숨기지 않는다(base.html 의 grm-inl 숨김이 --band 를 건너뛴다) — 구독자 화면에서
       구독 칸이 전부 사라져 '어디서 구독하나'가 된 것이 이 밴드의 출발점이다(동료에게 권하는 자리이기도 하다).
     사실 문안만: 기관 수는 하단 밴드 지적사항 DB 칸과 같은 여섯 기관. 발송 요일은 앞세우지 않는다. -#}
-<aside class="grm-inl grm-inl--band" data-sub-slot="top" data-sub-zone="home-band" aria-label="{{ _('메일 구독') }}">
+{#- [구독 권유 정리 2026-11-26] 홈은 이 밴드 하나 + 하단 팝업만 둔다(하단 밴드·'이번 주 핵심' 아래 칸은 뺐다).
+    하단 밴드에 있던 GRM 자랑 타일을 사실 칸으로 옮기고, 공지 메일의 근거인 동의 범위 문장도 여기에 둔다. -#}
+<aside class="grm-inl grm-inl--band" id="subscribe" data-sub-slot="top" data-sub-zone="home-band" aria-label="{{ _('메일 구독') }}">
   <div class="grm-inl-in">
     <div class="grm-inl-tx">
       <p class="grm-band-eb">{{ _("GRM 주간 브리프") }}</p>
-      <h2 class="grm-band-t">{{ _("FDA·EU·식약처 실사 지적, 매주 메일로 받아 보세요") }}</h2>
+      <h2 class="grm-band-t">{{ _("{n}개 규제기관의 실사 지적, 매주 메일로 받아 보세요", n=sub_agency_n) }}</h2>
       <ul class="grm-band-facts">
-        <li><b>{{ _("6개 기관") }}</b><span>{{ _("FDA·EU·영국·WHO·캐나다·식약처") }}</span></li>
-        <li><b>{{ _("기관 원문") }}</b><span>{{ _("지적마다 원문 링크") }}</span></li>
+        <li><b>{{ _("지적사항 DB") }}</b><span>{{ sub_agencies }}</span></li>
+        <li><b>{{ _("업체별 이력") }}</b><span>{{ _("483·경고서한·실사 결과") }}</span></li>
+        <li><b>{{ _("조항 원문") }}</b><span>{{ _("지적에 인용된 조항") }}</span></li>
+        <li><b>{{ _("용어사전") }}</b><span>{{ _("정의·지적 사례·그림") }}</span></li>
         <li><b>{{ _("무료") }}</b><span>{{ _("언제든 해지") }}</span></li>
       </ul>
     </div>
@@ -51,15 +47,15 @@
         {% if signup_path_fields %}<input type="hidden" name="SIGNUP_PATH" value="" /><input type="hidden" name="SIGNUP_LANG" value="" />{% endif %}
         <button class="grm-inl-btn" type="submit">{{ _("무료 구독") }}</button>
       </form>
-      <p class="grm-band-n">{{ _("확인 메일의 버튼을 누르면 구독이 완료됩니다.") }}</p>
+      <p class="grm-band-n">{{ _("확인 메일의 버튼을 누르면 구독이 완료됩니다.") }} {{ _("사이트에 새로운 기능이 생기면 함께 안내드립니다.") }}</p>
     </div>
   </div>
   <p class="grm-inl-done" role="status" aria-live="polite" hidden><b>{{ _("확인 메일을 보냈습니다") }}</b> {{ _("메일의 구독 확인 버튼을 누르면 구독이 완료됩니다.") }}</p>
 </aside>
 {%- else -%}
-{% if sub_wrap %}<div class="wrap">{% endif %}<aside class="grm-inl{% if sub_stack %} grm-inl--stack{% endif %}" data-sub-slot="{{ sub_slot or 'top' }}" aria-label="{{ _('메일 구독') }}">
+{% if sub_wrap %}<div class="wrap">{% endif %}<aside class="grm-inl{% if sub_stack %} grm-inl--stack{% endif %}"{% if sub_anchor %} id="subscribe"{% endif %} data-sub-slot="{{ sub_slot or 'top' }}" aria-label="{{ _('메일 구독') }}">
   <div class="grm-inl-in">
-    <div class="grm-inl-tx"><b>{{ _t }}</b><span>{{ _d }}</span></div>
+    <div class="grm-inl-tx"><b>{{ _t }}</b><span>{{ _d }} {{ _("사이트에 새로운 기능이 생기면 함께 안내드립니다.") }}</span></div>
     <form class="grm-inl-form" action="{{ newsletter_form_action }}" method="post">
       <input type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       <input type="text" name="email_address_check" value="" class="sub-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
@@ -68,7 +64,7 @@
       <button class="grm-inl-btn" type="submit">{{ _("무료 구독") }}</button>
     </form>
   </div>
-  <p class="grm-inl-done" role="status" aria-live="polite" hidden><b>{{ _("확인 메일을 보냈습니다") }}</b> {{ _("메일의 구독 확인 버튼을 누르면 구독이 완료됩니다.") }}</p>
+  <p class="grm-inl-done" role="status" aria-live="polite" hidden><b>{{ _("확인 메일을 보냈습니다") }}</b> {% if sub_kind == 'glossary' and sub_offer_glossary_pdf %}{{ _("메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}{% else %}{{ _("메일의 구독 확인 버튼을 누르면 구독이 완료됩니다.") }}{% endif %}</p>
 </aside>{% if sub_wrap %}</div>{% endif %}
 {%- endif -%}
 {%- endif -%}

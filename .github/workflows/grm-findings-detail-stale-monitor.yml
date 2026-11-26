@@ -3,7 +3,8 @@ name: GRM Findings Detail Stale Monitor
 # [2026-11-26] 483 상세 재번역(stale) 대기열 일일 감시 — 읽기 전용, 알림만.
 # findings_detail_stale_monitor.py 가 findings_detail_export 의 stale 대기열과 **같은 함수**로 행 수를 센다.
 # stale > 0 인 상태가 3일 넘게 줄지 않으면 운영 이슈(label: findings-detail-stale)를 열고, 줄거나 0 이 되면 닫는다.
-# 번역 배치는 만들지 않는다(사람/번역팀이 `findings_detail_export.py --mode stale` 로 만든다).
+# stale 행이 있으면 재번역 원문 묶음(R-*.json)을 아티팩트 `findings-detail-stale-<날짜>`(7일)로 올린다.
+# 번역(국문 작성)은 하지 않는다 — 번역팀이 아티팩트를 받아 국문을 채워 detail_outbox PR 로 낸다.
 #
 # 일별 기록은 Actions 캐시로 넘긴다(키는 실행마다 새로, 복원은 최신). ★cache 는 job 이 성공해야 저장되므로
 # breach 를 red job 으로 만들지 않는다 — 알림은 이슈로만 낸다(red 로 끝내면 그날 기록이 저장되지 않아
@@ -55,7 +56,24 @@ jobs:
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: python findings_detail_stale_monitor.py --history detail_stale_history.json --output detail_stale_report.json
+        run: python findings_detail_stale_monitor.py --history detail_stale_history.json --output detail_stale_report.json --export-dir detail_stale_export
+
+      # [2026-11-26] stale 행이 있으면 재번역 원문 묶음(R-*.json, findings_detail_export --mode stale 과 같은 함수)을
+      # 아티팩트로 올린다 — 서비스 키 없는 번역 세션이 `gh run download <run> -n findings-detail-stale-<날짜>` 로 받는다.
+      # 파일에는 finding_id·md5·게시일·원문 detail_text 만 있다(자격 증명 없음, 시험이 고정). 보관 7일.
+      - name: Stamp export date
+        id: stamp
+        if: always()
+        run: echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload stale re-translation source (if any)
+        if: always() && hashFiles('detail_stale_export/R/*.json') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: findings-detail-stale-${{ steps.stamp.outputs.date }}
+          path: detail_stale_export/
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Write step summary
         if: always()

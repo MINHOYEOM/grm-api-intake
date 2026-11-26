@@ -97,7 +97,81 @@ class SameQueueFunctionTest(unittest.TestCase):
         self.assertEqual((counts["stale"], counts["junk_only_skipped"]), (1, 1))
 
 
+class ExportArtifactTest(unittest.TestCase):
+    """[2026-11-26] 감시가 stale 원문 묶음을 아티팩트용 폴더에 쓴다 — 서비스 키 없는 번역 세션이 이걸 받는다.
+
+    ① CLI(`findings_detail_export --mode stale`)와 같은 파일 ② 원문 말고 비밀값 없음 ③ stale 0 이면 안 씀."""
+
+    KEY = "sb_secret_TEST_ONLY_do_not_leak_0123456789"
+    URL = "https://example-test-project.supabase.co"
+
+    def _inputs(self, grown=True):
+        t, old = SameQueueFunctionTest.TEXT, SameQueueFunctionTest.OLD
+        new = old + (" B. Containers with foreign matter are not classified as critical defects at all." if grown else "")
+        findings = [{"finding_id": "f1", "raw_signal_id": "r1", "published_date": "2025-11-05",
+                     "finding_text": t, "detail_text": old}]
+        raws = [{"raw_signal_id": "r1", "raw_json": {"fda_483_observations": [
+            {"number": "1", "deficiency": t, "detail": new}]}}]
+        return findings, raws
+
+    def _run_monitor(self, inputs, out):
+        import tempfile
+        from unittest.mock import patch
+        import findings_detail_export as fde
+        tmp = tempfile.mkdtemp()
+        with patch.object(fde, "fetch_inputs", lambda base, key, mode: inputs):
+            m.main(["--supabase-url", self.URL, "--service-role-key", self.KEY, "--today", "2026-11-26",
+                    "--output", os.path.join(tmp, "r.json"), "--export-dir", out])
+        return tmp
+
+    def test_artifact_matches_cli_export_and_holds_no_secret(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import findings_detail_export as fde
+        inputs = self._inputs()
+        a, b = tempfile.mkdtemp(), tempfile.mkdtemp()
+        self._run_monitor(inputs, a)
+        with patch.object(fde, "fetch_inputs", lambda base, key, mode: inputs):
+            fde.main(["--mode", "stale", "--out", b, "--supabase-url", self.URL, "--service-role-key", self.KEY])
+        files = lambda d: {str(p.relative_to(d)): p.read_text(encoding="utf-8") for p in Path(d).rglob("*.json")}  # noqa: E731
+        self.assertEqual(files(a), files(b))
+        self.assertIn(os.path.join("R", "R-0001.json"), files(a))
+        import json
+        rows = json.loads(files(a)[os.path.join("R", "R-0001.json")])
+        self.assertEqual(sorted(rows[0]), ["detail_text", "finding_id", "finding_text_md5", "published_date"])
+        for name, text in files(a).items():
+            self.assertNotIn(self.KEY, text, name)
+            self.assertNotIn("example-test-project", text, name)
+            self.assertNotIn("service", text.lower(), name)
+
+    def test_no_stale_rows_writes_nothing(self):
+        import tempfile
+        out = os.path.join(tempfile.mkdtemp(), "x")
+        self._run_monitor(self._inputs(grown=False), out)
+        self.assertFalse(os.path.exists(out))
+
+    def test_export_and_monitor_stay_read_only(self):
+        """두 파일 어디에도 쓰기 요청(PATCH·POST·DELETE·upsert)이 없다 — 감시 워크플로는 읽기 전용."""
+        for name in ("findings_detail_export.py", "findings_detail_stale_monitor.py"):
+            with open(os.path.join(REPO, name), encoding="utf-8") as fh:
+                src = fh.read()
+            self.assertIsNone(re.search(r"""["'](PATCH|POST|DELETE|PUT)["']|upsert|_patch_rows|_post_rows""", src), name)
+
+
 class WorkflowContractTest(unittest.TestCase):
+    def test_stale_source_artifact_step(self):
+        wf = open(WF, encoding="utf-8").read()
+        self.assertIn("--export-dir detail_stale_export", wf)
+        m_ = re.search(r"- name: Upload stale re-translation source.*?(?=\n      - name:|\Z)", wf, re.S)
+        self.assertIsNotNone(m_)
+        step = m_.group(0)
+        self.assertIn("name: findings-detail-stale-${{ steps.stamp.outputs.date }}", step)
+        self.assertIn("path: detail_stale_export/", step)
+        self.assertIn("retention-days: 7", step)
+        self.assertIn("hashFiles('detail_stale_export/R/*.json') != ''", step)
+        self.assertNotIn("secrets.", step)
+
     def setUp(self):
         with open(WF, encoding="utf-8") as fh:
             self.wf = fh.read()

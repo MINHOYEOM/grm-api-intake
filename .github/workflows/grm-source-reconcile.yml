@@ -269,6 +269,24 @@ jobs:
           set -euo pipefail
           python content_completeness.py --json content-completeness.json --report content-completeness.md --run-url "$RUN_URL" | tee -a "$GITHUB_STEP_SUMMARY"
 
+      # 칸 대조(수집 완전성 N2) — 소스별 "완전한 행" 계약으로 결손 행을 세고 번호를 남긴다(field_contract.py).
+      # 저장(coverage_daily.incomplete, migration 173)은 repo 변수 GRM_FIELD_CONTRACT_APPLY=true 일 때만 —
+      # migration 적용 전에 켜면 칸이 없어 저장이 실패한다. 꺼져 있어도 측정·요약·아티팩트는 매일 남는다.
+      - name: Run field contract (N2, non-blocking)
+        id: field_contract
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GRM_FIELD_CONTRACT_APPLY: ${{ vars.GRM_FIELD_CONTRACT_APPLY }}
+        run: |
+          set -euo pipefail
+          args=(--json field-contract.json --report field-contract.md)
+          if [ "$GRM_FIELD_CONTRACT_APPLY" = true ]; then
+            args+=(--apply)
+          fi
+          python field_contract.py "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Upload result
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -277,6 +295,8 @@ jobs:
           path: |
             content-completeness.json
             content-completeness.md
+            field-contract.json
+            field-contract.md
           if-no-files-found: warn
           retention-days: 30
 

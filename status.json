@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-11-25T22:46:41Z",
+ "generated_at": "2026-11-26T01:02:39Z",
  "workflows": {
   "grm-intake.yml": [
    {
     "databaseId": 45713603518,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_dispatch",
     "createdAt": "2026-11-25T22:29:06Z",
-    "updatedAt": "2026-11-25T22:29:11Z",
+    "updatedAt": "2026-11-25T22:47:20Z",
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45713603518"
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45714938668,
+    "databaseId": 45731997061,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T22:38:21Z",
-    "updatedAt": "2026-11-25T22:46:10Z",
+    "createdAt": "2026-11-26T00:53:56Z",
+    "updatedAt": "2026-11-26T01:02:10Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1979 from MINHOYEOM/claude/subscribe-prompts-1126",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45714938668"
+    "displayTitle": "Merge pull request #1984 from MINHOYEOM/claude/brief-must5-1126",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45731997061"
    },
    {
-    "databaseId": 45708398389,
+    "databaseId": 45728946535,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T00:28:10Z",
+    "updatedAt": "2026-11-26T00:36:30Z",
+    "headBranch": "claude/meta-desc-floor-1126",
+    "displayTitle": "메타 설명 최소 길이: 짧은 설명(국 80자·영 110자 미만)에 묶음 한 문장을 덧붙인다",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728946535"
+   },
+   {
+    "databaseId": 45728891541,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-25T21:53:17Z",
-    "updatedAt": "2026-11-25T22:02:09Z",
-    "headBranch": "claude/subscribe-prompts-1126",
-    "displayTitle": "feat(구독): 한 화면에 구독 칸 하나 + 팝업 하나 — 기관 목록 한 곳·한국어 화면 영문 제목 제거·팝업 밝게",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45708398389"
+    "createdAt": "2026-11-26T00:27:41Z",
+    "updatedAt": "2026-11-26T00:35:27Z",
+    "headBranch": "claude/naver-blog-483-1126",
+    "displayTitle": "네이버 블로그 원고: 매주 '이번 주 483 한 건 해설' 자동 생성",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728891541"
    },
    {
-    "databaseId": 45708389409,
+    "databaseId": 45728884385,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-25T21:53:14Z",
-    "updatedAt": "2026-11-25T22:00:54Z",
-    "headBranch": "claude/subscribe-prompts-1126",
-    "displayTitle": "구독 정리: 영문 복수형 표지 {s}·홈 첫 화면 폼을 가입 경로 시험이 보게",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45708389409"
+    "createdAt": "2026-11-26T00:27:37Z",
+    "updatedAt": "2026-11-26T00:35:31Z",
+    "headBranch": "claude/naver-blog-483-1126",
+    "displayTitle": "네이버 블로그 원고: 매주 '이번 주 483 한 건 해설'을 briefs/{pub}/naver-blog.txt 로",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728884385"
    },
    {
-    "databaseId": 45708325926,
+    "databaseId": 45728775070,
     "status": "completed",
     "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T21:52:47Z",
-    "updatedAt": "2026-11-25T22:00:31Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1983 from MINHOYEOM/claude/483-signer-gate-publis…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45708325926"
-   },
-   {
-    "databaseId": 45706962189,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T21:43:35Z",
-    "updatedAt": "2026-11-25T21:51:18Z",
-    "headBranch": "codex/unittest-collect-guard",
-    "displayTitle": "Merge remote-tracking branch 'origin/codex/ci-shard-balance' into cod…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45706962189"
+    "event": "pull_request",
+    "createdAt": "2026-11-26T00:26:42Z",
+    "updatedAt": "2026-11-26T00:35:15Z",
+    "headBranch": "claude/brief-must5-1126",
+    "displayTitle": "브리프 첫 화면: 이번 주 꼭 볼 5건 + 목차 기관별 축약",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728775070"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45732949959,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T01:02:13Z",
+    "updatedAt": "2026-11-26T01:02:28Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45732949959"
+   },
+   {
     "databaseId": 45716025260,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45690937320"
-   },
-   {
-    "databaseId": 45685214287,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T19:26:28Z",
-    "updatedAt": "2026-11-25T19:26:40Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45685214287"
    }
   ],
   "grm-findings-translate-apply.yml": [
@@ -732,6 +732,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 45713603518,
+   "created_at": "2026-11-25T22:29:06Z",
+   "has_web_brief": false
+  },
+  {
    "run_id": 45533605021,
    "created_at": "2026-11-25T02:31:50Z",
    "has_web_brief": true
@@ -755,14 +760,169 @@
    "run_id": 45084280088,
    "created_at": "2026-11-22T23:37:49Z",
    "has_web_brief": false
-  },
-  {
-   "run_id": 45074596791,
-   "created_at": "2026-11-22T21:53:22Z",
-   "has_web_brief": false
   }
  ],
  "intake_counts": [
+  {
+   "schema": "grm-intake-counts/v1",
+   "run_id": 45713603518,
+   "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45713603518",
+   "created_at": "2026-11-25T22:29:06Z",
+   "conclusion": "success",
+   "run_date_kst": "2026-11-26",
+   "event": "workflow_dispatch",
+   "dry_run": true,
+   "active": [
+    "eca",
+    "ema",
+    "fr",
+    "mhra",
+    "pics",
+    "recall",
+    "wl"
+   ],
+   "total": 717,
+   "sources": [
+    {
+     "key": "fr",
+     "label": "Federal Register",
+     "fetched": 9,
+     "error": false
+    },
+    {
+     "key": "recall",
+     "label": "OpenFDA Recall",
+     "fetched": 132,
+     "error": false
+    },
+    {
+     "key": "ema",
+     "label": "EMA RSS",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mhra",
+     "label": "MHRA RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mhra_alert",
+     "label": "MHRA Drug/Device Alerts",
+     "fetched": 4,
+     "error": false
+    },
+    {
+     "key": "pics",
+     "label": "PIC/S RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eca",
+     "label": "ECA Academy RSS",
+     "fetched": 4,
+     "error": false
+    },
+    {
+     "key": "wl",
+     "label": "FDA Warning Letters",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mfds",
+     "label": "MFDS RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_law",
+     "label": "MFDS Law/Admrul",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mfds_recall",
+     "label": "MFDS Recall",
+     "fetched": 42,
+     "error": false
+    },
+    {
+     "key": "mfds_admin",
+     "label": "MFDS Admin",
+     "fetched": 24,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_cert",
+     "label": "MFDS GMP Certificate",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_safety_letter",
+     "label": "MFDS Safety Letter",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_inspection",
+     "label": "MFDS GMP Inspection",
+     "fetched": 2,
+     "error": false
+    },
+    {
+     "key": "ich",
+     "label": "ICH",
+     "fetched": 31,
+     "error": false
+    },
+    {
+     "key": "who",
+     "label": "WHO",
+     "fetched": 172,
+     "error": false
+    },
+    {
+     "key": "hc",
+     "label": "Health Canada",
+     "fetched": 9,
+     "error": false
+    },
+    {
+     "key": "fda483",
+     "label": "FDA 483",
+     "fetched": 276,
+     "error": false
+    },
+    {
+     "key": "ispe",
+     "label": "ISPE iSpeak RSS",
+     "fetched": 9,
+     "error": false
+    },
+    {
+     "key": "search",
+     "label": "Brave Search",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eu_gmp_ncr",
+     "label": "EU GMP NCR (EudraGMDP)",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mhra_gmp_ncr",
+     "label": "MHRA GMP NCR",
+     "fetched": 0,
+     "error": false
+    }
+   ]
+  },
   {
    "schema": "grm-intake-counts/v1",
    "run_id": 45533605021,

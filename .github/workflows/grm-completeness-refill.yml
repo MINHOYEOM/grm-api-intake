@@ -1,0 +1,134 @@
+name: GRM Completeness Refill (N3, same-day)
+
+# 수집 완전성 N3 — 자동 메움 공통 고리(completeness_refill.py 도크스트링).
+# 원천 대조가 끝나면 한 번, 그 뒤 매시 한 번(23:00 KST 마감 전까지) 돈다. 놓침·결손 번호를 소스별 재수집
+# 경로로 넘기고(WL 은 이 잡 안에서 `--ids` 후 즉시 재대조, 483·식약처는 전용 워크플로 호출) 남은 것을
+# refill-state.json 으로 다음 회차에 넘긴다. 결과 줄은 아티팩트 completeness-refill 에 남고 N6 일보가 읽는다.
+#
+# 쓰기: repo 변수 GRM_REFILL_APPLY=true 일 때만 재수집 도구에 apply 를 넘기고 워크플로를 부른다.
+#       꺼져 있으면 WL 은 dry 로만 돌고 dispatch 는 계획만 남는다(DB·다른 워크플로에 손대지 않음).
+# 끄기: repo 변수 ENABLE_COMPLETENESS_REFILL=false.
+
+on:
+  workflow_run:
+    workflows: ["GRM Source Reconcile (daily, after intake)"]
+    types: [completed]
+  schedule:
+    # 매시 23분, 00~13 UTC = 09:23~22:23 KST. 수집 창(02:17~04:17 KST)과 겹치지 않는다.
+    - cron: '23 0-13 * * *'
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'true = GRM_REFILL_APPLY 가 켜져 있을 때 실제 재수집(꺼져 있으면 무시하고 계획만)'
+        type: boolean
+        default: false
+
+permissions:
+  actions: write       # 직전 회차·원천 대조 아티팩트 내려받기 + 재수집 워크플로 호출(workflow_dispatch)
+  contents: read
+  issues: write        # 회차 자체 실패 경보(reconcile-monitor)
+
+concurrency:
+  group: grm-completeness-refill
+  cancel-in-progress: false
+
+jobs:
+  refill:
+    if: >-
+      vars.ENABLE_COMPLETENESS_REFILL != 'false' &&
+      (github.event_name != 'workflow_run' ||
+       (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 원천 대조 직후 회차: 그 실행의 아티팩트(source-reconcile·content-completeness)를 받는다.
+      # 시간 회차: 대조 파일 없이 직전 상태의 남은 소스만 다시 대조한다(completeness_refill.run_pass).
+      - name: Download inputs and previous state
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TRIGGER_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -uo pipefail
+          if [ -n "$TRIGGER_RUN_ID" ]; then
+            gh run download "$TRIGGER_RUN_ID" -R "$GITHUB_REPOSITORY" -n source-reconcile -D inputs \
+              || echo "원천 대조 아티팩트 없음(run $TRIGGER_RUN_ID)"
+            gh run download "$TRIGGER_RUN_ID" -R "$GITHUB_REPOSITORY" -n content-completeness -D inputs \
+              || echo "내용 완전성 아티팩트 없음(run $TRIGGER_RUN_ID)"
+          fi
+          prev=$(gh run list -R "$GITHUB_REPOSITORY" --workflow grm-completeness-refill.yml --status success \
+                 --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$prev" ]; then
+            gh run download "$prev" -R "$GITHUB_REPOSITORY" -n completeness-refill -D prev \
+              || echo "직전 회차 상태 없음(run $prev)"
+          fi
+          ls -la inputs prev 2>/dev/null || true
+
+      - name: Refill pass
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          # 재대조(source_reconcile.py)는 원천 대조 잡과 같은 환경을 쓴다.
+          GRM_INTAKE_NOTION: ${{ vars.GRM_INTAKE_NOTION || 'on' }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
+          MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          ENABLE_FDA_483: ${{ vars.ENABLE_FDA_483 || 'true' }}
+          ENABLE_MFDS_RECALL: ${{ vars.ENABLE_MFDS_RECALL || 'true' }}
+          ENABLE_MFDS_ADMIN: ${{ vars.ENABLE_MFDS_ADMIN || 'true' }}
+          IN_APPLY: ${{ vars.GRM_REFILL_APPLY == 'true' && (github.event_name != 'workflow_dispatch' || inputs.apply) }}
+        run: |
+          set -euo pipefail
+          args=(--out-state refill-state.json --json completeness-refill.json --report completeness-refill.md)
+          if [ -f inputs/source-reconcile.json ]; then args+=(--reconcile inputs/source-reconcile.json); fi
+          if [ -f inputs/field-contract.json ]; then args+=(--fields inputs/field-contract.json); fi
+          if [ -f prev/refill-state.json ]; then args+=(--state prev/refill-state.json); fi
+          if [ "$IN_APPLY" = true ]; then args+=(--apply); fi
+          python completeness_refill.py "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: completeness-refill
+          path: |
+            refill-state.json
+            completeness-refill.json
+            completeness-refill.md
+            refill-*.json
+            refill-recheck.md
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Alert if the refill pass itself failed
+        if: failure() && github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title='[GRM 문제] 수집 완전성 자동 메움 자체가 실패했습니다'
+          existing=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --label reconcile-monitor \
+                     --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" -R "$GITHUB_REPOSITORY" --body "다시 실패: $RUN_URL"
+          else
+            gh label create reconcile-monitor -R "$GITHUB_REPOSITORY" --color D93F0B --force >/dev/null
+            gh issue create -R "$GITHUB_REPOSITORY" --title "$title" --label reconcile-monitor \
+              --body "completeness_refill.py 회차가 실패했습니다. 놓침·결손이 그날 다시 받아지지 않았습니다. 실행: $RUN_URL"
+          fi

@@ -17,7 +17,7 @@ from tests.test_migration_function_grants import _statements, _violations
 
 DAY = date(2026, 11, 25)
 DB_ENV = {"SUPABASE_URL": "https://db.example", "SUPABASE_SERVICE_ROLE_KEY": "test"}
-MIGRATION = Path(__file__).resolve().parents[1] / "web/migrations/168_coverage_daily.sql"
+MIGRATION = Path(__file__).resolve().parents[1] / "web/migrations/171_coverage_daily.sql"
 
 
 def _health(**changes):

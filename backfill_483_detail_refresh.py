@@ -418,7 +418,9 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]],
                      if str(n.get("deficiency") or "").strip() and not _header_leak(str(n["deficiency"]))]
             if len(clean) > 1:
                 # 같은 번호가 둘 이상(판독 중복, 실측 69958) — 옛 혼입 표제 **안에** 그 표제 앞부분이 있는 것 하나만.
+                # 표제가 글자까지 같은 후보는 하나로 본다(같은 관찰이 두 번 읽힌 것, 69958 obs4).
                 clean = [n for n in clean if _norm(str(n["deficiency"]))[:_PREFIX_PROBE // 2] in _norm(old_def)]
+                clean = list({str(n["deficiency"]): n for n in reversed(clean)}.values())
             if len(clean) == 1:
                 matched += 1
                 n = clean[0]

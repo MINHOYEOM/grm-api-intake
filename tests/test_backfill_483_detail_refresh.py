@@ -312,6 +312,14 @@ class HeaderLeakDuplicateNumbers1126Test(unittest.TestCase):
         self.assertEqual([o["deficiency"] for o in out], [h1, h2])
         self.assertEqual(matched, 2)
 
+    def test_identical_duplicate_candidates_count_as_one(self):
+        p = "08/19/2008 FE/NUMBER 3000000001 TYPE ESTABUSHMENT INSPECTED Homeopathic Drug Manufacturing "
+        h = "Investigations of an unexplained discrepancy did not extend to other batches of the same drug."
+        old = [{"number": "4", "deficiency": p + h, "detail": "a"}, {"number": "4", "deficiency": p + h, "detail": "a"}]
+        new = [{"number": "4", "deficiency": h, "detail": "a"}, {"number": "4", "deficiency": h, "detail": "a"}]
+        out, _m, _u = b.refreshed_observations(old, new)
+        self.assertEqual([o["deficiency"] for o in out], [h, h])
+
 
 class HeaderLeakKeepsOldDetail1126Test(unittest.TestCase):
     """★11-26: 표제는 바로잡되 다시 읽은 상세가 줄었으면 옛 상세를 둔다(축소 가드에 통째로 막히지 않게)."""

@@ -9,6 +9,7 @@ findings_backlog_monitor.requests.post 를 목킹한다(실 네트워크·실 Su
 
 from __future__ import annotations
 
+import datetime as _dt
 import unittest
 from unittest import mock
 
@@ -161,7 +162,8 @@ class RunMonitorTest(unittest.TestCase):
 
 
 def _gap(rows):
-    return {"generated_at": "2026-08-01T15:46:22Z",
+    # 169 부터 모니터가 generated_at 신선도를 본다 — 픽스처는 "방금 계산한" 스냅샷으로 둔다.
+    return {"generated_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "totals": {"sources": len(rows), "docs": sum(r["docs"] for r in rows),
                        "zero_findings": sum(r["zero_findings"] for r in rows)},
             "by_source": rows}
@@ -581,6 +583,69 @@ class ExtractionGapNoUnguardedParse1126Test(unittest.TestCase):
         body = self._sql().split("$$")[1]
         self.assertNotIn("exists (select 1 from public.findings f", body)
         self.assertIn("select distinct f.raw_signal_id from public.findings f", body)
+
+
+class ExtractionGapSnapshot1126Test(unittest.TestCase):
+    """★11-26 169: 168 뒤에도 공유 인스턴스에서 같은 계산이 1~19s 로 흔들려(모니터 왕복 8,426ms)
+    계산을 요청 경로에서 뺐다 — pg_cron 이 6시간마다 rpc_snapshot 에 동결, RPC 는 읽기만.
+    cron 이 멈추면 RPC 는 빠르게 **낡은** 값을 준다 → generated_at 신선도를 모니터가 본다."""
+
+    _NOW = _dt.datetime(2026, 11, 26, 12, 0, 0, tzinfo=_dt.timezone.utc)
+
+    def test_fresh_snapshot_is_green(self):
+        self.assertEqual(mon.evaluate_snapshot_age(
+            {"generated_at": "2026-11-26T00:40:05Z"}, now=self._NOW, max_age_hours=24), [])
+
+    def test_stale_snapshot_is_red(self):
+        b = mon.evaluate_snapshot_age(
+            {"generated_at": "2026-11-25T11:00:00Z"}, now=self._NOW, max_age_hours=24)
+        self.assertEqual([x["code"] for x in b], ["extraction-gap-snapshot-stale"])
+        self.assertEqual(b[0]["value"], 25.0)
+
+    def test_missing_generated_at_is_red(self):
+        for bad in ({}, {"generated_at": None}, {"generated_at": "어제"}, None):
+            self.assertEqual([x["code"] for x in mon.evaluate_snapshot_age(bad, now=self._NOW)],
+                             ["extraction-gap-snapshot-stale"])
+
+    def test_run_monitor_turns_red_on_stale_snapshot(self):
+        gap = _gap([_src("FDA 483", 2000, 1)])
+        gap["generated_at"] = "2026-11-20T00:00:00Z"
+        posts = [_FakePostResponse(200, _stats(100, 100)), _FakePostResponse(200, gap),
+                 _FakePostResponse(200, [])]
+        with mock.patch.object(mon.requests, "post", side_effect=posts):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY, now=self._NOW)
+        self.assertEqual(report["status"], "failure")
+        self.assertEqual([b["code"] for b in report["breaches"]], ["extraction-gap-snapshot-stale"])
+        self.assertEqual(report["extraction_gap_generated_at"], "2026-11-20T00:00:00Z")
+
+    def _mig(self, name):
+        import os
+        d = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web", "migrations")
+        with open(os.path.join(d, name), encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_public_rpc_reads_snapshot_and_compute_is_preserved_by_rename(self):
+        sql = self._mig("169_extraction_gap_snapshot.sql")
+        self.assertIn("alter function public.extraction_gap_by_source() rename to "
+                      "extraction_gap_by_source_compute", sql, "본문은 복제하지 않고 rename 으로 보존")
+        body = sql.split("create function public.extraction_gap_by_source()", 1)[1].split("$$")[1]
+        self.assertIn("from public.rpc_snapshot s", body)
+        self.assertIn("s.rpc = 'extraction_gap_by_source'", body)
+        self.assertNotIn("jsonb_each_text", body, "공개 RPC 는 계산하지 않는다")
+        self.assertNotIn("refreshed_at", body, "낡았다고 폴백 계산하지 않는다 — 신선도는 모니터가 본다")
+
+    def test_refresh_is_scheduled_with_its_own_timeout_and_seeded(self):
+        sql = self._mig("169_extraction_gap_snapshot.sql")
+        self.assertRegex(sql, r"cron\.schedule\(\s*'grm-extraction-gap-snapshot'")
+        self.assertIn("set statement_timeout = '120s'; select public.extraction_gap_snapshot_refresh()", sql)
+        self.assertRegex(sql, r"\nselect public\.extraction_gap_snapshot_refresh\(\);")
+
+    def test_acl_closed_to_anon_and_authenticated(self):
+        sql = self._mig("169_extraction_gap_snapshot.sql")
+        for fn in ("extraction_gap_by_source_compute()", "extraction_gap_snapshot_refresh()"):
+            self.assertIn(f"revoke execute on function public.{fn} from public, anon, authenticated;", sql)
+        self.assertIn("revoke execute on function public.extraction_gap_by_source() from anon, authenticated;", sql)
+        self.assertIn("grant execute on function public.extraction_gap_by_source() to service_role;", sql)
 
 
 if __name__ == "__main__":

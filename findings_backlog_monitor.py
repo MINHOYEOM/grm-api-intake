@@ -55,6 +55,12 @@ _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
 #   500 이면 PostgREST 오류 코드도 적는다 — 57014 면 시간 초과, 그 밖이면 고장이다.
 POSTGREST_STATEMENT_TIMEOUT_MS = 8000
 DEFAULT_RPC_NEAR_TIMEOUT_MS = POSTGREST_STATEMENT_TIMEOUT_MS // 2
+
+# ★스냅샷 신선도(2026-11-26, 169). extraction_gap_by_source() 는 이제 pg_cron 이 6시간마다 계산해 둔
+#   rpc_snapshot 을 읽는다(요청 경로에서 계산을 뺐다 — 168 뒤에도 공유 인스턴스에서 1~19s 로 흔들렸다).
+#   cron 이 죽으면 RPC 는 빠르게 **낡은** 값을 준다 — 그걸 모르면 감시가 조용히 멈춘 것과 같다.
+#   페이로드의 generated_at(계산 시각)이 이 시간보다 오래되면 적색. 6시간 주기 × 4 = 하루 놓침까지 허용.
+DEFAULT_EXTRACTION_SNAPSHOT_MAX_AGE_HOURS = 24
 _STATS_RPC = "findings_stats"
 
 # 기본 임계 — 정상 steady-state 일일 유입은 "소량"이므로 300 이상 적체는 정상 하루치를
@@ -157,6 +163,40 @@ def _postgrest_error_code(resp: Any) -> str:
     if isinstance(code, str) and code.isascii() and code.isalnum() and len(code) <= 8:
         return code
     return ""
+
+
+def evaluate_snapshot_age(
+    payload: Any, *, now: datetime, max_age_hours: int = DEFAULT_EXTRACTION_SNAPSHOT_MAX_AGE_HOURS,
+) -> list[dict[str, Any]]:
+    """extraction_gap 페이로드의 generated_at → 낡음 breach. 순수 함수.
+    generated_at 이 없거나 읽을 수 없으면 그것도 breach 다(신선도를 모르는 채 초록이면 안 된다)."""
+    raw = payload.get("generated_at") if isinstance(payload, dict) else None
+    try:
+        generated = datetime.strptime(str(raw), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        generated = None
+    if generated is None:
+        return [{
+            "code": "extraction-gap-snapshot-stale",
+            "metric": "generated_at",
+            "value": None,
+            "threshold": max_age_hours,
+            "message": f"{_EXTRACTION_RPC} 페이로드에 generated_at 이 없다 — 스냅샷 신선도를 알 수 없다.",
+        }]
+    age_h = (now - generated).total_seconds() / 3600.0
+    if age_h <= max_age_hours:
+        return []
+    return [{
+        "code": "extraction-gap-snapshot-stale",
+        "metric": "generated_at",
+        "value": round(age_h, 1),
+        "threshold": max_age_hours,
+        "generated_at": raw,
+        "message": (
+            f"{_EXTRACTION_RPC} 스냅샷이 {age_h:.1f}시간 전 계산값이다(허용 {max_age_hours}시간) — "
+            "pg_cron 잡 grm-extraction-gap-snapshot 이 멈췄을 수 있다(cron.job_run_details 확인)."
+        ),
+    }]
 
 
 def evaluate_rpc_timings(
@@ -365,6 +405,8 @@ def run_monitor(
     extraction_min_docs: int = DEFAULT_EXTRACTION_GAP_MIN_DOCS,
     country_unmapped_min_rows: int = DEFAULT_COUNTRY_UNMAPPED_MIN_ROWS,
     rpc_near_timeout_ms: int = DEFAULT_RPC_NEAR_TIMEOUT_MS,
+    extraction_snapshot_max_age_hours: int = DEFAULT_EXTRACTION_SNAPSHOT_MAX_AGE_HOURS,
+    now: datetime | None = None,
 ) -> dict[str, Any]:
     """findings_stats + extraction_gap_by_source + findings_country_unmapped 판정.
 
@@ -441,6 +483,10 @@ def run_monitor(
         min_docs=extraction_min_docs,
     )
     report["extraction_gap"] = ex_summary
+    report["extraction_gap_generated_at"] = ex_data.get("generated_at")
+    ex_breaches = list(ex_breaches) + evaluate_snapshot_age(
+        ex_data, now=now or datetime.now(timezone.utc),
+        max_age_hours=extraction_snapshot_max_age_hours)
     if ex_breaches:
         report["breaches"] = list(report.get("breaches") or []) + ex_breaches
         report["status"] = "failure"
@@ -537,6 +583,13 @@ def main(argv: list[str] | None = None) -> int:
         help=("RPC 하나가 이 ms 를 넘으면 breach(rpc-near-timeout). PostgREST statement_timeout "
               f"{POSTGREST_STATEMENT_TIMEOUT_MS}ms 를 넘기 전에 알리려는 선. 기본 {DEFAULT_RPC_NEAR_TIMEOUT_MS}."),
     )
+    parser.add_argument(
+        "--extraction-snapshot-max-age-hours",
+        type=int,
+        default=DEFAULT_EXTRACTION_SNAPSHOT_MAX_AGE_HOURS,
+        help=("extraction_gap_by_source 스냅샷(generated_at)이 이 시간보다 오래되면 breach. "
+              f"기본 {DEFAULT_EXTRACTION_SNAPSHOT_MAX_AGE_HOURS}."),
+    )
     parser.add_argument("--supabase-url", help="Supabase project URL (falls back to $SUPABASE_URL)")
     parser.add_argument(
         "--service-role-key",
@@ -564,6 +617,7 @@ def main(argv: list[str] | None = None) -> int:
         extraction_min_docs=args.extraction_min_docs,
         country_unmapped_min_rows=args.country_unmapped_min_rows,
         rpc_near_timeout_ms=args.rpc_near_timeout_ms,
+        extraction_snapshot_max_age_hours=args.extraction_snapshot_max_age_hours,
     )
     _write_report(args.output, report)
 

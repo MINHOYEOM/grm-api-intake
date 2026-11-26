@@ -231,6 +231,49 @@ class FirstSentenceNoCapTest(unittest.TestCase):
         self.assertFalse(head.endswith("..."))
 
 
+class HeaderLeakHeadingRefresh1126Test(unittest.TestCase):
+    """★11-26 ⑤: 옛 표제가 쪽 머리말 혼입이면 다시 읽은 같은 번호의 깨끗한 표제로 바꾼다(#1997 수리 뒤).
+    detail refresh 는 원래 상세만 바꿔서(표제는 280자 절단 복원 ②뿐) 이 꼴을 못 고쳤다(dry 8문서 docs_changed=0)."""
+
+    LEAK = ("Orsolya Venn, Vice President of Fulfillment Operations Quillmere Pharma CITY, STATE, ZIP CODE, "
+            "COUNTRY Rockville, MD 20857 TYPE ESTABLISHMENT INSPECTED Producer of Sterile Drugs Aseptic "
+            "processing areas are deficient regarding the system for cleaning and disinfecting the room.")
+    CLEAN = "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room."
+
+    def test_leaked_heading_is_replaced_by_the_clean_one(self):
+        old = [{"number": "1", "deficiency": "Records are incomplete.", "detail": "Specifically, a."},
+               {"number": "2", "deficiency": self.LEAK, "detail": "Specifically, the cleaner is not sterile."}]
+        new = [{"number": "1", "deficiency": "Records are incomplete.", "detail": "Specifically, a."},
+               {"number": "2", "deficiency": self.CLEAN, "detail": "Specifically, the cleaner is not sterile."}]
+        out, matched, unmatched = b.refreshed_observations(old, new)
+        self.assertEqual(out[1]["deficiency"], self.CLEAN)
+        self.assertEqual(out[0], old[0])
+        self.assertEqual((matched, unmatched), (2, 0))
+
+    def test_whole_header_heading_with_empty_detail_gets_real_heading(self):
+        leak = ("Orsolya Venn, Vice President Clinical Affairs TO: CITY, STATE, ZIP CODE, COUNTRY TYPE "
+                "ESTABLISHMENT INSPECTED Rockville, MD 20857 Outsourcing Facility")
+        old = [{"number": "11", "deficiency": leak, "detail": ""}]
+        new = [{"number": "11", "deficiency": "The statistical quality control criteria fail to include "
+                "appropriate rejection levels.", "detail": "Specifically, there are no reject limits."}]
+        out, _m, _u = b.refreshed_observations(old, new)
+        self.assertTrue(out[0]["deficiency"].startswith("The statistical quality control"))
+        self.assertTrue(out[0]["detail"].startswith("Specifically"))
+
+    def test_no_change_when_reread_still_leaks_or_is_ambiguous(self):
+        old = [{"number": "2", "deficiency": self.LEAK, "detail": "d"}]
+        still = [{"number": "2", "deficiency": self.LEAK, "detail": "d"}]
+        self.assertEqual(b.refreshed_observations(old, still)[0][0]["deficiency"], self.LEAK)
+        two = [{"number": "2", "deficiency": self.CLEAN, "detail": "x"},
+               {"number": "2", "deficiency": "Another heading entirely different from the first one.", "detail": "y"}]
+        self.assertEqual(b.refreshed_observations(old, two)[0][0]["deficiency"], self.LEAK)
+
+    def test_clean_old_heading_is_never_touched_by_rule_5(self):
+        old = [{"number": "3", "deficiency": self.CLEAN, "detail": "Specifically, a."}]
+        new = [{"number": "3", "deficiency": "A different reading of the heading text here.", "detail": "Specifically, a."}]
+        self.assertEqual(b.refreshed_observations(old, new)[0][0]["deficiency"], self.CLEAN)
+
+
 if __name__ == "__main__":
     unittest.main()
 

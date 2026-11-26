@@ -363,6 +363,11 @@ def completed_sentence(old_detail: str, new: list[dict[str, Any]], source_text: 
     return od + added if added else None
 
 
+def _header_leak(deficiency: str) -> bool:
+    import findings_extractors as fe
+    return fe._fda483_is_form_header_leak(deficiency)
+
+
 def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]], source_text: str = ""
                            ) -> tuple[list[dict[str, Any]], int, int]:
     """기존 관찰 목록의 detail(과 잘린 표제)을 바꾼 새 목록 + (짝 맞은 수, 짝 없는 수). 순수 함수.
@@ -373,6 +378,7 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]],
        ③ 번호가 같고 새 상세가 옛 상세의 앞부분으로 시작하며 더 김(옛 1,200자 절단) → 상세만.
        ④ 옛 상세가 1,200자 절단 조각이고 그 끝이 다시 읽은 관찰(없으면 원문 전체) 한 곳에만 있음
           → 끊긴 문장만 잇는다.
+       ⑤ 옛 표제가 쪽 머리말 혼입이고 같은 번호의 혼입 아닌 새 관찰이 하나 → 표제·상세를 새 것으로.
     짝 ②가 안 된 280자+"..." 표제는 원문 전체에서 첫 문장 끝까지 잇는다(`completed_deficiency`).
     다시 읽은 상세가 비면(①·③) 기존 상세(정리본)를 둔다."""
     by_key = {(str(o.get("number")), str(o.get("deficiency") or "")): o for o in new}
@@ -397,6 +403,19 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]],
             n = restored[0]
             out.append({**o, "deficiency": str(n["deficiency"]), "detail": str(n.get("detail") or "")})
             continue
+        # ⑤ [11-26] 옛 표제가 **쪽 머리말 혼입**(수신인·주소·`CITY, STATE …`부터 시작)이고, 같은 번호의
+        #    새 관찰 중 혼입이 아닌 것이 정확히 하나 → 표제를 새 것으로(수집기 수리 #1997 뒤 다시 읽기).
+        #    판정은 findings 가드와 **같은 함수**다(규칙 복제 금지). 새 상세가 비면 옛 상세를 둔다.
+        if _header_leak(old_def):
+            clean = [n for n in same_num
+                     if str(n.get("deficiency") or "").strip() and not _header_leak(str(n["deficiency"]))]
+            if len(clean) == 1:
+                matched += 1
+                n = clean[0]
+                nd = str(n.get("detail") or "")
+                out.append({**o, "deficiency": str(n["deficiency"]),
+                            "detail": nd if nd.strip() else tidy_old_detail(old_detail)})
+                continue
         extended = [n for n in same_num if _extends_detail(old_detail, str(n.get("detail") or ""))]
         if len(extended) == 1:
             matched += 1

@@ -132,10 +132,12 @@ jobs:
         env:
           EVENT: ${{ steps.ctx.outputs.event }}
           UNDER: ${{ steps.ctx.outputs.under }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
           echo "## FDA 본문 결손 — 1차(수집 직후 스캐폴드)" >> "$GITHUB_STEP_SUMMARY"
-          python fda_body_coverage.py check --brief "_scaffold/brief_web_${UNDER}.json" \
+          python fda_body_coverage.py check --brief "_scaffold/brief_web_${UNDER}.json" --read-db \
             --intake-event "$EVENT" \
             --kst-hour "$(TZ='Asia/Seoul' date '+%-H')" --kst-minute "$(TZ='Asia/Seoul' date '+%-M')" \
             --report-json coverage_1.json --summary-md "$GITHUB_STEP_SUMMARY" --issue-md issue.md \
@@ -239,10 +241,12 @@ jobs:
         if: steps.regen.outputs.done == 'true'
         env:
           UNDER: ${{ steps.ctx.outputs.under }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
           echo "## FDA 본문 결손 — 2차(자동 회수 + handoff 재생성 후)" >> "$GITHUB_STEP_SUMMARY"
-          python fda_body_coverage.py check --brief "_scaffold2/brief_web_${UNDER}.json" \
+          python fda_body_coverage.py check --brief "_scaffold2/brief_web_${UNDER}.json" --read-db \
             --intake-event schedule --recovery-attempted \
             --report-json coverage_2.json --summary-md "$GITHUB_STEP_SUMMARY" --issue-md issue.md \
             | tee -a "$GITHUB_OUTPUT"

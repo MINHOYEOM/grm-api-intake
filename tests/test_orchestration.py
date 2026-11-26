@@ -486,6 +486,30 @@ class EvaluateHealthFda483DegradedTest(unittest.TestCase):
     완전성 미보장만 표면화한다. flag off(시도 0·truncated 0)면 finding 미발생.
     """
 
+    def test_fda483_fulltext_gap_warns_from_one_stored_document(self) -> None:
+        from findings_supabase_backfill import count_fda483_fulltext_gaps
+
+        row = {"source": "FDA 483", "raw_json": {"fda_483_observations": [{"deficiency": "x"}]}}
+        for rows, expected in (([], 0), ([row], 1)):
+            with self.subTest(count=expected):
+                count = count_fda483_fulltext_gaps(rows)
+                health = ci._evaluate_health(**_health_kwargs(
+                    stats=ci.CollectionStats(), enable_fda483=True, fda483_fulltext_gap_count=count,
+                ))
+                warnings = [item for item in health.warnings if item.code == "fda483-fulltext-gap"]
+                self.assertEqual(len(warnings), expected)
+                self.assertEqual(health.exit_code, 0)
+                if warnings:
+                    self.assertIn("483 전문 결손 1건", warnings[0].message)
+
+    def test_fda483_fulltext_gap_query_failure_is_unmeasured(self) -> None:
+        health = ci._evaluate_health(**_health_kwargs(
+            stats=ci.CollectionStats(), enable_fda483=True, fda483_fulltext_gap_query_failed=True,
+        ))
+        self.assertIn("fda483-fulltext-gap-query-failed", _codes(health.warnings))
+        self.assertNotIn("fda483-fulltext-gap", _codes(health.warnings))
+        self.assertEqual(health.exit_code, 0)
+
     def test_fda483_excerpt_failed_is_warning_not_failure(self) -> None:
         stats = ci.CollectionStats()
         stats.fda483_excerpt_attempted = 5

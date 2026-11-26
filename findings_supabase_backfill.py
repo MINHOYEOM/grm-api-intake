@@ -72,6 +72,7 @@ import findings_supabase_append as fsa
 from grm_cli import header_ci as _header_ci
 from grm_cli import parse_content_range as _parse_content_range
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
+from grm_common import SOURCE_FDA_483
 
 
 DEFAULT_TIMEOUT_SECONDS = fsa.DEFAULT_TIMEOUT_SECONDS
@@ -480,6 +481,29 @@ def _raw_json(raw_signal: dict[str, Any]) -> dict[str, Any]:
     return findings_extractors._json_object(raw_signal.get("raw_json"))
 
 
+def count_fda483_fulltext_gaps(rows: list[dict[str, Any]]) -> int:
+    """저장된 관찰이 하나 이상 있고 전문이 비어 있는 FDA 483 문서 수."""
+    count = 0
+    for row in rows:
+        if row.get("source") != SOURCE_FDA_483:
+            continue
+        raw = _raw_json(row)
+        observations = findings_extractors._dicts(raw.get("fda_483_observations"))
+        body = raw.get("fda483_body_full")
+        if observations and not (isinstance(body, str) and body.strip()):
+            count += 1
+    return count
+
+
+def read_fda483_fulltext_gap_count(base_url: str, service_key: str) -> int:
+    rows = _fetch_all_pages(
+        base_url.rstrip("/"), service_key, "raw_signals", select="source,raw_json",
+        page_size=200, order="raw_signal_id.asc",
+        extra_params={"source": f"eq.{SOURCE_FDA_483}", "raw_json": "like.*fda_483_observations*"},
+    )
+    return count_fda483_fulltext_gaps(rows)
+
+
 def _scope_inputs(raw_signal: dict[str, Any], finding: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     """DB 트리거(grm_findings_scope_status_trigger)가 분류 함수에 넘기는 인자를 같은 규칙으로 만든다.
     반환 (함수 이름 | "", 인자). 이름이 비면 트리거가 분기하지 않는 출처(scope_status 기본 'ok')."""
@@ -844,8 +868,11 @@ def _write_document_report(
 
 
 def main(argv: list[str] | None = None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = argparse.ArgumentParser(
         description="FIND-1 M12 -- backfill findings for raw_signals already in Supabase "
         "that never got findings extracted/inserted (no LLM, no git writes; READ + "

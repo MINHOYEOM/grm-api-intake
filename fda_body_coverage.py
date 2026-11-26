@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from dataclasses import dataclass, field
 from typing import Any
@@ -199,10 +200,6 @@ def handoff_status_db(run_date: str, *, base_url: str, service_key: str, store: 
 
 
 def _emit(pairs: dict[str, object]) -> None:
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")   # publish_watchdog._emit 와 같은 이유(cp949)
-    except (AttributeError, OSError):
-        pass
     for k, v in pairs.items():
         if isinstance(v, bool):
             v = "true" if v else "false"
@@ -210,10 +207,16 @@ def _emit(pairs: dict[str, object]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description="발행 전 FDA 본문 결손 점검")
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("check", help="브리프 JSON 의 FDA 결손을 세고 다음 행동을 판정")
     c.add_argument("--brief", required=True)
+    c.add_argument("--read-db", action="store_true", help="정본의 483 전문 결손 건수를 읽기 전용으로 조회")
     c.add_argument("--intake-event", default="schedule")
     c.add_argument("--kst-hour", type=int, default=0)
     c.add_argument("--kst-minute", type=int, default=0)
@@ -228,7 +231,6 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     if args.cmd == "handoff-status":
-        import os
         import grm_queue
         source = (os.environ.get(HANDOFF_STATUS_SOURCE_ENV, "") or "notion").strip().lower()
         if grm_queue.notion_intake_off():
@@ -253,13 +255,31 @@ def main(argv: list[str] | None = None) -> int:
     action, reason = decide(report, intake_event=args.intake_event, kst_hour=args.kst_hour,
                             kst_minute=args.kst_minute,
                             recovery_attempted=args.recovery_attempted)
+    fulltext_gap: dict[str, int | str] = {}
+    gap_summary = ""
+    if args.read_db:
+        from findings_supabase_backfill import read_fda483_fulltext_gap_count
+
+        url = os.environ.get("SUPABASE_URL", "").strip()
+        key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+        count: int | str = "unconfigured"
+        count_text = "미확인 (DB 접속 설정 없음)"
+        if url and key:
+            try:
+                count = read_fda483_fulltext_gap_count(url, key)
+                count_text = f"{count}건"
+            except RuntimeError:
+                count = "query_failed"
+                count_text = "미확인 (조회 실패)"
+        fulltext_gap["fda483_fulltext_gap_count"] = count
+        gap_summary = f"\n- 483 전문 결손 (정본 전체, 관찰 있음): {count_text}\n"
     if args.report_json:
         with open(args.report_json, "w", encoding="utf-8") as fh:
-            json.dump({**report.to_dict(), "action": action, "reason": reason}, fh,
+            json.dump({**report.to_dict(), "action": action, "reason": reason, **fulltext_gap}, fh,
                       ensure_ascii=False, indent=1)
     if args.summary_md:
         with open(args.summary_md, "a", encoding="utf-8") as fh:
-            fh.write(summary_markdown(report) + f"\n판정: `{action}` — {reason}\n")
+            fh.write(summary_markdown(report) + gap_summary + f"\n판정: `{action}` — {reason}\n")
     if args.issue_md:
         with open(args.issue_md, "w", encoding="utf-8") as fh:
             fh.write("\n".join(issue_lines(report)) + "\n")
@@ -270,6 +290,7 @@ def main(argv: list[str] | None = None) -> int:
         "over": ",".join(report.over),
         "missing_483": k483.missing,
         "total_483": k483.total,
+        **fulltext_gap,
         # 회수 대상 document_id(= 483 카드 id). 공백 구분 — 회수 워크플로 doc_ids 입력 형식.
         "recover_ids": " ".join(i for i in k483.missing_ids if i.startswith("fda483-")),
     })

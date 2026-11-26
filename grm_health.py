@@ -287,6 +287,8 @@ def _evaluate_health(
     #   `grm_common.probe_kr_egress_proxy` 산출물. 빈 문자열 = 미측정(종전 호출 호환).
     kr_egress_proxy_status: str = "",
     kr_egress_proxy_detail: str = "",
+    fda483_fulltext_gap_count: int | None = None,
+    fda483_fulltext_gap_query_failed: bool = False,
 ) -> HealthCheckResult:
     health = HealthCheckResult()
 
@@ -784,6 +786,19 @@ def _evaluate_health(
             #   그게 0 이면 dedup 사전조회가 실패해 전량 재수집 폴백으로 돌고 있다는 뜻이다.
             "① 로그의 `기보유 건너뜀` 이 0 이면 dedup 사전조회 실패(전량 재수집 폴백) — "
             "그것부터 확인. ② 신규 유입이 실제로 많을 때만 FDA483_OCR_PAGE_BUDGET 상향",
+        )
+    if fda483_fulltext_gap_count is not None and fda483_fulltext_gap_count > 0:
+        health.add_warning(
+            "fda483-fulltext-gap",
+            "FDA 483",
+            f"483 전문 결손 {fda483_fulltext_gap_count}건 — 관찰은 저장됐으나 전문이 비어 있음",
+            "정본 raw_signals의 fda483_body_full 확보 여부를 확인하세요.",
+        )
+    if fda483_fulltext_gap_query_failed:
+        health.add_warning(
+            "fda483-fulltext-gap-query-failed",
+            "FDA 483",
+            "483 전문 결손 건수 조회 실패 — 미판정",
         )
     if stats.fda483_observations_failed > 0:
         health.add_warning(

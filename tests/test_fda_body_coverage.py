@@ -4,17 +4,22 @@
 알리는 health 경고는 수집 실행 단위였고, **발행 직전 그 주 브리프 기준으로** 세어 보는
 장치가 없었다. 이 테스트는 판정(건수·비율·임계·다음 행동)을 고정한다.
 """
+import contextlib
+import io
 import json
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 import fda_body_coverage as cov
+import findings_supabase_backfill as backfill
 
 
 def _c483(media, *, detail=True, est="Drug Manufacturer", merged=0):
@@ -127,6 +132,40 @@ class DecideTest(unittest.TestCase):
 
 
 class OutputTest(unittest.TestCase):
+    def test_pre_publish_audit_reports_stored_fulltext_gaps(self):
+        observations = [{"deficiency": "x"}, {"deficiency": "y"}]
+        rows = [
+            {"source": "FDA 483", "raw_json": json.dumps({"fda_483_observations": observations})},
+            {"source": "FDA 483", "raw_json": {"fda_483_observations": observations,
+                                               "fda483_body_full": " \n "}},
+            {"source": "FDA 483", "raw_json": {"fda_483_observations": observations,
+                                               "fda483_body_full": None}},
+            {"source": "FDA 483", "raw_json": {"fda_483_observations": observations,
+                                               "fda483_body_full": "Full text"}},
+            {"source": "FDA 483", "raw_json": {"fda_483_observations": []}},
+            {"source": "FDA 483", "raw_json": {"fda_483_observations": [None]}},
+            {"source": "FDA 483", "raw_json": "not valid JSON"},
+            {"source": "FDA WL", "raw_json": {"fda_483_observations": observations}},
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            brief = Path(directory) / "brief.json"
+            brief.write_text(json.dumps(_brief(_c483(1))), encoding="utf-8")
+            summary = Path(directory) / "summary.md"
+            output = io.StringIO()
+            with (patch.dict(os.environ, {"SUPABASE_URL": "https://db.invalid",
+                                          "SUPABASE_SERVICE_ROLE_KEY": "fake-key"}),
+                  patch.object(backfill, "_fetch_all_pages", return_value=rows) as fetch,
+                  contextlib.redirect_stdout(output)):
+                self.assertEqual(cov.main(["check", "--brief", str(brief), "--read-db",
+                                           "--summary-md", str(summary)]), 0)
+            self.assertIn("fda483_fulltext_gap_count=3", output.getvalue().splitlines())
+            self.assertIn("action=ok", output.getvalue().splitlines())
+            self.assertIn("- 483 전문 결손 (정본 전체, 관찰 있음): 3건",
+                          summary.read_text(encoding="utf-8").splitlines())
+            fetch.assert_called_once()
+            self.assertEqual(fetch.call_args.args, ("https://db.invalid", "fake-key", "raw_signals"))
+            self.assertEqual(fetch.call_args.kwargs["extra_params"]["source"], "eq.FDA 483")
+
     def test_issue_lines_use_admin_warning_format(self):
         """Admin 운영 상태 센터는 `- [code] …` 줄을 경고로 읽는다(admin-github warningIssueSummary)."""
         lines = cov.issue_lines(cov.measure(_brief(*[_c483(i, detail=False) for i in range(4)])))

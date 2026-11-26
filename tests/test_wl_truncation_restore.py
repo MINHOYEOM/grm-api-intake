@@ -274,7 +274,8 @@ class ApplyServiceRestoreTest(unittest.TestCase):
         self.assertTrue(body["finding_text_ko"].strip())
         self.assertEqual(body["translation_method"], "llm_assisted")
         self.assertNotIn("category_code", body)                     # 분류 불변
-        self.assertEqual(patch.call_args.kwargs["params"], {"finding_id": "eq.f-001"})
+        # 11-26(#2003): PATCH 응답은 id 만 — 복원 행(최대 3만 자 원문)을 되받지 않는다. 키는 여전히 PK 뿐.
+        self.assertEqual(patch.call_args.kwargs["params"], {"finding_id": "eq.f-001", "select": "finding_id"})
         self.assertNotIn("finding_text", get.call_args.kwargs["params"])
 
     def test_md5_mismatch_writes_nothing(self):

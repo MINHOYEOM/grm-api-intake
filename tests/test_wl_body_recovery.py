@@ -7,19 +7,27 @@
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import sys
+import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from datetime import date
+from pathlib import Path
 from unittest import mock
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import backfill_wl_body_recovery as rec  # noqa: E402
+import collect_fda_backfill as backfill  # noqa: E402
 import collect_intake as ci  # noqa: E402
 import findings_store  # noqa: E402
+import source_reconcile as sr  # noqa: E402
+from grm_http_policy import FDA_WL_RECOVERY_DELAY_SECONDS  # noqa: E402
+from tests.test_collect_fda_backfill import _WL_AJAX_ROW  # noqa: E402
 from tests.test_wl_body import _WIN_END, _WIN_START, _WL_LIST_HTML, _Resp  # noqa: E402
 
 # 위반 표제가 뽑히는 본문(번호 + 21 CFR 인용).
@@ -274,6 +282,164 @@ class RebuildBodyStartTest(unittest.TestCase):
                                                doc_ids=[row["document_id"]])
         upsert.assert_not_called()
         self.assertEqual(report.body_start_unchanged, 1)
+
+
+class NamedWlRecoveryTest(unittest.TestCase):
+    def test_cli_fetches_only_named_incomplete_row_and_defaults_to_dry_run(self):
+        good = _live_record(_Resp(_LETTER_HTML))
+        raw = json.loads(good["raw_json"])
+        del raw["wl_violations"]
+        gap = dict(good, raw_json=json.dumps(raw))
+        unrelated = dict(gap, raw_signal_id="rawsig-other", document_id="other")
+        complete = dict(good, raw_signal_id="rawsig-complete", document_id="complete")
+        letter = mock.Mock(side_effect=_letter_from_html(_LETTER_HTML))
+        with (
+            patch.object(rec, "_resolve_credentials", return_value=("https://x.supabase.co", "k")),
+            patch.object(rec, "_fetch_raw_signals", return_value=[unrelated, complete, gap]) as lookup,
+            patch.object(rec, "_fetch_letter", letter),
+            patch.object(rec, "_upsert_raw_signal") as update,
+            patch.object(rec, "_find_missing_wl_rows") as listing,
+            patch.object(rec, "_default_sleep") as sleep,
+            redirect_stdout(io.StringIO()),
+        ):
+            code = rec.main(["--ids", f"{gap['raw_signal_id']},{gap['document_id']}", "complete"])
+        self.assertEqual(code, 0)
+        lookup.assert_called_once_with("https://x.supabase.co", "k",
+                                       ids=sorted([gap["raw_signal_id"], gap["document_id"], "complete"]))
+        letter.assert_called_once_with(raw["url"])
+        sleep.assert_called_once_with(FDA_WL_RECOVERY_DELAY_SECONDS)
+        update.assert_not_called()
+        listing.assert_not_called()
+
+    def test_equal_body_is_written_when_violations_are_recovered(self):
+        good = _live_record(_Resp(_LETTER_HTML))
+        raw = json.loads(good["raw_json"])
+        del raw["wl_violations"]
+        gap = dict(good, raw_json=json.dumps(raw))
+        update = mock.Mock(return_value=(200, [], ""))
+        report, code = rec.run(
+            base_url="https://x.supabase.co", service_key="k", dry_run=False,
+            ids=[good["raw_signal_id"]], fetch_raw_signals=lambda *a, **k: [gap],
+            fetch_letter=_letter_from_html(_LETTER_HTML), upsert_raw_signal=update, sleeper=mock.Mock(),
+        )
+        self.assertEqual((code, report.recovered, report.unresolved_ids), (0, 1, []))
+        update.assert_called_once_with("https://x.supabase.co", "k", good, row=gap)
+
+    def test_shrunk_body_is_not_written_and_remains_unresolved(self):
+        good = _live_record(_Resp(_LETTER_HTML))
+        raw = json.loads(good["raw_json"])
+        del raw["wl_violations"]
+        raw["wl_body_full"] += " A stored paragraph."
+        gap = dict(good, raw_json=json.dumps(raw))
+        update = mock.Mock(return_value=(200, [], ""))
+        with redirect_stderr(io.StringIO()) as stderr:
+            report, code = rec.run(
+                base_url="https://x.supabase.co", service_key="k", dry_run=False,
+                ids=[good["document_id"]], fetch_raw_signals=lambda *a, **k: [gap],
+                fetch_letter=_letter_from_html(_LETTER_HTML), upsert_raw_signal=update, sleeper=mock.Mock(),
+            )
+        update.assert_not_called()
+        self.assertEqual((code, report.body_shrunk, report.unresolved_ids), (1, 1, [good["document_id"]]))
+        self.assertIn("::warning", stderr.getvalue())
+
+    def test_bot_block_stops_letter_requests_and_reports_all_pending_ids(self):
+        row = _live_record(_Resp(_LETTER_HTML))
+        raw = json.loads(row["raw_json"])
+        for key in _BODY_KEYS:
+            raw.pop(key, None)
+        first = dict(row, raw_json=json.dumps(raw))
+        second = dict(first, raw_signal_id="rawsig-z", document_id="second")
+        for blocked_at in ("listing", "letter"):
+            with self.subTest(blocked_at=blocked_at), redirect_stderr(io.StringIO()):
+                ids = [first["document_id"], "second"]
+                if blocked_at == "listing":
+                    ids.append("missing")
+                letter = mock.Mock(return_value=("", "", rec.BOT_BLOCK_STATUS))
+                finder = mock.Mock(side_effect=rec.FdaBotBlockError())
+                update = mock.Mock()
+                report, code = rec.run(
+                    base_url="https://x.supabase.co", service_key="k", dry_run=False, ids=ids,
+                    fetch_raw_signals=lambda *a, **k: [first, second], find_missing=finder,
+                    fetch_letter=letter, upsert_raw_signal=update, sleeper=mock.Mock(),
+                )
+                self.assertEqual((code, report.bot_blocked, report.unresolved_ids), (1, True, sorted(ids)))
+                if blocked_at == "listing":
+                    letter.assert_not_called()
+                else:
+                    letter.assert_called_once()
+                update.assert_not_called()
+
+    def test_reconcile_alert_and_retry_of_a_missing_document(self):
+        listed = backfill._wl_row_from_ajax(_WL_AJAX_ROW)
+        doc_id = backfill._wl_document_id(listed)
+        doc = sr.SourceDoc(doc_id, listed["wl_href"], listed["subject"], listed["date_iso"])
+        outcome = sr.FetchOutcome(docs=[doc])
+        store = {}
+
+        def reconcile():
+            return sr.reconcile_source(
+                sr.SPEC_BY_KEY["wl"], outcome, run_date=date(2026, 11, 26),
+                window=(date.fromisoformat(doc.published), date(2026, 11, 26)),
+                collected={f"{ci.SOURCE_FDA_WL}::{i}" for i in store}, ledger={},
+            )
+
+        def insert(_base, _key, records, _errors):
+            for record in records:
+                store[record["document_id"]] = record
+            return len(records)
+
+        result = reconcile()
+        self.assertEqual(sr.plan_issues([result])[0]["action"], "open")
+        self.assertEqual([row["document_id"] for row in result.missed], [doc_id])
+        recovered_letter = _letter_from_html(_LETTER_HTML)(doc.url)
+        with (
+            tempfile.TemporaryDirectory() as tmp,
+            patch.object(rec, "_resolve_credentials", return_value=("https://x.supabase.co", "k")),
+            patch.object(rec, "_fetch_raw_signals", side_effect=lambda *a, **k: list(store.values())),
+            patch.object(backfill, "_wl_listing_config", return_value={}),
+            patch.object(backfill, "_wl_listing_page",
+                         return_value={"data": [_WL_AJAX_ROW], "recordsFiltered": 1}) as page,
+            patch.object(backfill, "_post_raw_signals", side_effect=insert) as post,
+            patch.object(rec, "_fetch_letter", side_effect=[("", "", "fetch-fail:HTTP 503"),
+                                                           recovered_letter]) as letter,
+            patch.object(rec, "_default_sleep"),
+            redirect_stdout(io.StringIO()),
+            redirect_stderr(io.StringIO()) as stderr,
+        ):
+            report = Path(tmp) / "reconcile.json"
+            report.write_text(json.dumps({"sources": [{"key": "ema", "missed": ["unrelated"]},
+                                                       result.as_dict()]}), encoding="utf-8")
+            output = Path(tmp) / "recovery.json"
+            args = ["--ids-json", str(report), "--report-path", str(output), "--apply"]
+            self.assertEqual(rec.main(args), 1)
+            self.assertIn("::warning", stderr.getvalue())
+            self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["unresolved_ids"], [doc_id])
+            self.assertEqual(store, {})
+            self.assertEqual(rec.main(args), 0)
+            self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["unresolved_ids"], [])
+            self.assertEqual(rec.main(args), 0)
+        post.assert_called_once()
+        self.assertEqual(page.call_count, 2)
+        self.assertEqual(letter.call_args_list, [mock.call(doc.url)] * 2)
+        raw = json.loads(store[doc_id]["raw_json"])
+        self.assertEqual(raw["wl_body_full"], recovered_letter[1])
+        self.assertGreater(len(raw["wl_violations"]), 0)
+        self.assertEqual(sr.plan_issues([reconcile()])[0]["action"], "close")
+
+    def test_json_incomplete_ids_and_empty_input(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ids.json"
+            path.write_text(json.dumps({"missed": ["missing"], "incomplete": [
+                {"document_id": "gap", "raw_signal_id": "rawsig-gap"},
+            ]}), encoding="utf-8")
+            self.assertEqual(rec._read_reconcile_ids(path), ["missing", "rawsig-gap", "gap"])
+        lookup = mock.Mock()
+        report, code = rec.run(
+            base_url="https://x.supabase.co", service_key="k", dry_run=False,
+            ids=[], fetch_raw_signals=lookup,
+        )
+        self.assertEqual((code, report.candidates, report.unresolved_ids), (0, 0, []))
+        lookup.assert_not_called()
 
 
 class Permanent403Test(unittest.TestCase):

@@ -683,6 +683,46 @@ def _wl_item_from_row(nrow: dict[str, str], office_gate_verdict: str,
     )
 
 
+def _wl_listing_config() -> dict[str, Any]:
+    html = http_get_html(ci.FDA_WL_URL, timeout=30, retries=FDA_HTTP_RETRIES, label="FDA WL backfill config")
+    config = _extract_datatable_config(html, WL_SOLR_VIEW_NAME)
+    if config is None:
+        raise RuntimeError("fda-wl-ajax-config-missing")
+    return config
+
+
+def _wl_listing_page(config: dict[str, Any], offset: int, size: int, *, draw: int = 1) -> dict[str, Any]:
+    params = _datatable_query_params(
+        config["params"], start=offset, length=size, draw=draw,
+        num_columns=_WL_NUM_COLUMNS, order_column=_WL_COL_POSTED,
+    )
+    text = http_get_html(
+        config["url"] + "?" + urlencode(params), timeout=30, retries=FDA_HTTP_RETRIES,
+        headers={
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "Referer": ci.FDA_WL_URL,
+            "X-Requested-With": "XMLHttpRequest",
+        },
+        label="FDA WL DataTables",
+    )
+    data = json.loads(text)
+    return data if isinstance(data, dict) else {}
+
+
+def _wl_document_id(nrow: dict[str, str]) -> str:
+    return ci._stable_doc_id(SOURCE_FDA_WL, nrow["firm"], nrow["wl_href"] or ci.FDA_WL_URL, nrow["date_iso"])
+
+
+def _wl_gate(nrow: dict[str, str]) -> tuple[str, bool]:
+    firm, subject, office = nrow["firm"], nrow["subject"], nrow["issuing_office"]
+    headline = subject or firm or "FDA Warning Letter"
+    verdict = ci._fda_wl_office_gate(office, headline, subject, firm)
+    gated = verdict == "exclude" or (
+        verdict == "unknown" and ci._is_low_value_fda_warning_letter(headline, subject, office, firm)
+    )
+    return verdict, gated
+
+
 def run_wl(
     *,
     offset: int,
@@ -707,10 +747,7 @@ def run_wl(
 
     try:
         sleeper(delay)
-        html = http_get_html(ci.FDA_WL_URL, timeout=30, retries=FDA_HTTP_RETRIES, label="FDA WL backfill config")
-        config = _extract_datatable_config(html, WL_SOLR_VIEW_NAME)
-        if config is None:
-            raise RuntimeError("fda-wl-ajax-config-missing")
+        config = _wl_listing_config()
     except FdaBotBlockError:
         report.errors.append(FDA_BOT_BLOCK)
         return report, 2
@@ -720,23 +757,7 @@ def run_wl(
 
     try:
         sleeper(delay)
-        params = _datatable_query_params(
-            config["params"], start=offset, length=max_docs, draw=1,
-            num_columns=_WL_NUM_COLUMNS, order_column=_WL_COL_POSTED,
-        )
-        url = config["url"] + "?" + urlencode(params)
-        text = http_get_html(
-            url, timeout=30, retries=FDA_HTTP_RETRIES,
-            headers={
-                "Accept": "application/json, text/javascript, */*; q=0.01",
-                "Referer": ci.FDA_WL_URL,
-                "X-Requested-With": "XMLHttpRequest",
-            },
-            label="FDA WL DataTables",
-        )
-        data = json.loads(text)
-        if not isinstance(data, dict):
-            data = {}
+        data = _wl_listing_page(config, offset, max_docs)
     except FdaBotBlockError:
         report.errors.append(FDA_BOT_BLOCK)
         return report, 2
@@ -760,20 +781,13 @@ def run_wl(
 
     to_post: list[dict[str, Any]] = []
     for nrow in nrows:
-        firm = nrow["firm"]
         wl_href = nrow["wl_href"]
-        date_iso = nrow["date_iso"]
-        doc_id = ci._stable_doc_id(SOURCE_FDA_WL, firm, wl_href or ci.FDA_WL_URL, date_iso)
+        doc_id = _wl_document_id(nrow)
         if doc_id in existing_ids:
             report.skipped_existing += 1
             continue
 
-        headline = nrow["subject"] or firm or "FDA Warning Letter"
-        verdict = ci._fda_wl_office_gate(nrow["issuing_office"], headline, nrow["subject"], firm)
-        gated = verdict == "exclude" or (
-            verdict == "unknown"
-            and ci._is_low_value_fda_warning_letter(headline, nrow["subject"], nrow["issuing_office"], firm)
-        )
+        verdict, gated = _wl_gate(nrow)
         if gated:
             report.skipped_gated += 1
             continue
@@ -1072,8 +1086,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     args = build_arg_parser().parse_args(argv)
 
     if args.auto and (args.source is not None or args.offset is not None):

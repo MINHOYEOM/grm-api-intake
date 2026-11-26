@@ -120,14 +120,28 @@ def _status(row: dict[str, Any]) -> str:
         else str(_loads(row.get("raw_json")).get("fda483_text_status") or "")
 
 
+def human_locked(row: dict[str, Any]) -> bool:
+    """[11-26] 사람이 원본 PDF 이미지로 확인한 행 — `apply_483_human_verdicts` 가 단 기록·표식.
+    이 행은 채우기·감사 어느 쪽 대상도 아니다: 사람 판독 이름은 글자층(OCR)과 철자가 달라(실측: 글자층이 'm' 을 'nn' 으로 읽은 이름)
+    감사가 '전문에 글자 그대로 없음' 으로 OCR 결과로 덮어쓰고, 서명 가림 행(`absent-in-source`)은 영원히 빈칸이다."""
+    if "body" in row:
+        return bool(row.get("lock"))
+    raw = _loads(row.get("raw_json"))
+    check = raw.get("fda483_inspectors_check")
+    return (raw.get("fda483_inspectors_status") == "absent-in-source"
+            or (isinstance(check, dict) and check.get("method") == "human-pdf-image"))
+
+
 def is_target(row: dict[str, Any]) -> bool:
-    """채우기 대상 — 전문 있음 ∧ 실사관 없음 ∧ 범위 밖 아님."""
-    return bool(row_body(row)) and not stored_names(row) and _status(row) != OUT_OF_SCOPE
+    """채우기 대상 — 전문 있음 ∧ 실사관 없음 ∧ 범위 밖 아님 ∧ 사람 확인 행 아님."""
+    return (bool(row_body(row)) and not stored_names(row) and _status(row) != OUT_OF_SCOPE
+            and not human_locked(row))
 
 
 def is_audit_target(row: dict[str, Any]) -> bool:
-    """감사 대상 — 전문 있음 ∧ 실사관 **있음** ∧ 범위 밖 아님."""
-    return bool(row_body(row)) and bool(stored_names(row)) and _status(row) != OUT_OF_SCOPE
+    """감사 대상 — 전문 있음 ∧ 실사관 **있음** ∧ 범위 밖 아님 ∧ 사람 확인 행 아님."""
+    return (bool(row_body(row)) and bool(stored_names(row)) and _status(row) != OUT_OF_SCOPE
+            and not human_locked(row))
 
 
 def bad_stored_names(names: list[str], body: str) -> list[dict[str, str]]:

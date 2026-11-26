@@ -10,8 +10,9 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
 `findings.finding_text`(영문 원문, 불변)에 국문 `finding_text_ko` 를 채운다. 국문이 없으면 공개 RLS(`006_findings_publish_gate.sql`)가
 웹 노출을 막는다. 이 작업은 **번역 배치 JSON 을 만들어 PR 로 올리는 것까지**다 — DB 반영은 머지 후 `grm-findings-translate-apply.yml` 이 한다.
 
-- **1회 상한 100건**, `published_date` 최신순. 나머지는 다음 날 이어서.
-- **품질 우선**: 100건을 성실히 완역하기 어렵다고 판단되면 건수를 줄인다(60건도 정상).
+- **고르기는 코드가 한다** — `findings_translate_pick.py`(원문 4만 자·100건 중 먼저 닿는 쪽, 최신순 줄과 오래된 순 줄을 번갈아, 어느 줄도 행을 건너뛰지 않음).
+  고른 행은 전부 완역한다. 길다고 빼거나 다른 행으로 바꾸지 않는다 — 2026-11-25·26 에 긴 WL 행을 매일 이월해 미번역이 319 로 쌓였다.
+- 나머지는 다음 날 이어서. 일일 배치로 못 따라잡는 적체는 `backlog_alert` 로 알린다(절차 6·결과).
 
 ## 절차
 `D=$(TZ=Asia/Seoul date +%F)`, 표식 브랜치 `B=claude/findings-translate-$D`, 스크래치 `/tmp/tr`.
@@ -25,8 +26,11 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
 4. **브릿지 가드:** `plan.json` 의 `queue_source` 가 `"rpc"` 가 아니면 번역하지 말고
    `★브릿지(009 RPC) 미적용 — 번역 파이프라인이 미번역 행을 볼 수 없음` 을 맨 위에 쓰고 끝낸다.
 5. `source_db.untranslated` 가 0 이면 `git push origin HEAD:refs/heads/$B`(표식만 — 1 에서 방금 받은 main 위다) 후 `오늘 번역할 신규 항목 없음` 으로 끝낸다.
-6. `items[]` 에서 최신순 최대 100건을 골라 `finding_text_ko` 를 채우고 `translation_method` 를 `"llm_assisted"` 로 둔 완성본을
-   **별도 파일** `/tmp/tr/filled.json` 에 쓴다(고른 항목만 담는다). `plan.json` 은 절대 고치지 않는다 — 적용 도구가 원문을 바이트로 대조해,
+6. `python3 findings_translate_pick.py /tmp/tr/plan.json --output /tmp/tr/pick.json` 으로 오늘 번역할 행을 고른다(출력 한 줄 요약을 결과에 옮긴다).
+   `pick.json` 의 `items[]` **전부**에 `finding_text_ko` 를 채우고 `translation_method` 를 `"llm_assisted"` 로 둔 완성본을
+   **별도 파일** `/tmp/tr/filled.json` 에 쓴다(고른 항목만 담는다). 한 행도 빼지 않는다.
+   `backlog_alert` 가 `true` 면(잔여 원문이 일일 예산 5일치 초과) 이슈를 연다 — 제목 `번역 적체 — 잔여 {remaining_rows}건·{remaining_chars}자`,
+   라벨 `automation-warning`, 본문 = 출처별 건수·원문 길이 중앙값. 같은 제목의 열린 이슈가 있으면 본문만 갱신한다. 번역팀이 일괄 처리한다. `plan.json` 은 절대 고치지 않는다 — 적용 도구가 원문을 바이트로 대조해,
    한 글자라도 다르면 배치 전체를 거부한다. 번역 지침(반드시 지킨다):
    - 독자: 한국 제약사 GMP/QA 실무자. 문체는 간결한 보고체("~했다/~하지 않았다").
    - 업계 고유 개념은 원어 유지 또는 병기: 무균공정(aseptic), 배지충전(media fill), 일탈(deviation), 허위표시(misbranded),
@@ -36,7 +40,7 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
    - **사실 왜곡 금지**: 없는 내용 추가 금지, 수치·날짜·조항 번호 변경 금지. 긴 원문도 요약하지 말고 완역한다.
    - `finding_text_ko` 는 원문과 같은 문자열이면 안 되고 한글을 1자 이상 담아야 한다(위반 시 배치 전체 거부).
    - 원문이 한국어(MFDS 등)인 표 형태 지적사항은 문장형 평문으로 다듬되 사실·수치·조항 번호는 그대로.
-6-1. **WL 절단 복원(restore)** — 6단계 일반 항목이 100건 미만이면 남은 용량을 restore 항목으로 채운다. 계획은 Actions 아티팩트인데 `/actions` 가 막혀 있어,
+6-1. **WL 절단 복원(restore)** — 6단계 `pick.json` 의 `picked_chars` 가 4만 자 미만이고 `remaining_rows` 가 0 일 때만 남은 용량을 restore 항목으로 채운다. 계획은 Actions 아티팩트인데 `/actions` 가 막혀 있어,
    `grm-wl-truncation-restore-plan.yml` 이 `claude/ops-status` 브랜치 `wl-restore/` 에 사본을 둔다:
    `git fetch origin claude/ops-status && mkdir -p /tmp/restore && git show FETCH_HEAD:wl-restore/wl_truncation_restore_plan.json > /tmp/restore/wl_truncation_restore_plan.json`.
    - 사본이 없으면(첫 실행 전) 요청 마커 `wl-restore-plan`(인자 없음, 브랜치 `claude/request-$D-wl-restore`, `company/CLOUD.md` "Actions 다리")을 한 번 올리고
@@ -54,7 +58,7 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
    (`git fetch origin main && git log -1 --format=%H FETCH_HEAD -- translations/outbox`)의 check-runs 중 이름이 `Apply queued translation outbox → Supabase` 인 것의
    `conclusion` 이 `success` 일 때만 `git mv` 로 `translations/applied/` 에 옮긴다. 아니면 그대로 두고 `apply 미확인으로 outbox 정리 보류` 를 남긴다.
 10. `git add translations/outbox/$D-batch.json`(9 의 이동분은 이미 스테이징됨). 커밋 `chore(findings): 일일 번역 배치 $D - N건`. `git push -u origin $B`.
-11. PR(`gh api`) — 제목 **`chore(findings): 일일 번역 배치 $D`**, 본문: N건 번역(상한 100·최신 우선, 잔여 M건은 다음 실행), dry-run 검증 통과(ready=true),
+11. PR(`gh api`) — 제목 **`chore(findings): 일일 번역 배치 $D`**, 본문: N건 번역(`findings_translate_pick.py` 선택, 원문 X자, 잔여 M건·Y자는 다음 실행, backlog_alert 값), dry-run 검증 통과(ready=true),
     머지되면 `grm-findings-translate-apply.yml` 이 Supabase 에 반영. **머지하지 않는다** — CI 초록 3시간 뒤 워치독이 머지한다.
 12. **번역 표본 판정:** `translations/applied/` 에서 오늘 것을 뺀 가장 최근 배치 파일(20행 미만이면 그 앞 파일까지, 최대 20행)을 읽어
     각 행을 판정한다 — ① 의미 보존(없는 사실·주체·제품·수치·원인 추가 없음, 중요 내용 누락 없음) ② 극성 보존(미실시·부적합·없음·not·failed to 유지)
@@ -63,7 +67,7 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
     본문 = finding_id·기준·사유 표). 데이터는 고치지 않는다.
 
 ## 결과 (최종 메시지)
-맨 위 3줄(`CHARTER.md`) 다음에 한 줄씩: 번역 N건 · 잔여 미번역 M건 · outbox 정리 여부 · PR 번호 · 표본 판정 `m행 중 FAIL n·주의 k`.
+맨 위 3줄(`CHARTER.md`) 다음에 한 줄씩: 번역 N건(원문 X자) · 잔여 미번역 M건·Y자 · backlog_alert(참이면 이슈 번호) · outbox 정리 여부 · PR 번호 · 표본 판정 `m행 중 FAIL n·주의 k`.
 
 ## 금지
 Supabase 직접 쓰기(커넥터 포함) · 코드 수정(`grm_findings.py`·`findings_extractors.py`·`findings_translate.py` 등) · 검증 우회 · `main` push·머지.

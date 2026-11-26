@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """식약처 GMP 첨부 재수집 CLI — 순수 부분·가드·멱등(네트워크·DB 없음)."""
 import json
+from contextlib import redirect_stdout
+from io import StringIO
 import os
 import sys
 import unittest
 from types import SimpleNamespace
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -154,6 +157,37 @@ class RunTest(unittest.TestCase):
 
 
 class MainTest(unittest.TestCase):
+    def test_missing_attachment_fails_then_next_approved_run_fills_it(self):
+        doc_id = _BARE["doc_id"]
+        row = _row(_BARE)
+
+        def save_attachment(base, key, stored_row, payload):
+            stored_row["raw_json"] = json.dumps(payload, ensure_ascii=False)
+
+        output = StringIO()
+        with (
+            patch.dict(os.environ, {"ENABLE_GMP_DEFICIENCY_TABLE": "true"}),
+            patch.object(r, "_creds", return_value=("fake-db", "fake-key")),
+            patch.object(r, "fetch_rows", return_value={doc_id: row}),
+            patch.object(
+                g, "_parse_attachment",
+                side_effect=[_att(text="", status="download-fail"), _att()],
+            ),
+            patch.object(r, "_apply", side_effect=save_attachment) as apply,
+            redirect_stdout(output),
+        ):
+            self.assertEqual(r.main(["--ids", doc_id]), 1)
+            self.assertEqual(json.loads(output.getvalue())["no_text"], [doc_id])
+            apply.assert_not_called()
+            self.assertNotIn("attachment_text", json.loads(row["raw_json"]))
+
+            output.seek(0)
+            output.truncate()
+            self.assertEqual(r.main(["--ids", doc_id, "--apply"]), 0)
+            self.assertEqual(json.loads(output.getvalue())["applied"], 1)
+            apply.assert_called_once()
+            self.assertEqual(json.loads(row["raw_json"])["attachment_text"], _NONE_TEXT)
+
     def test_empty_ids_is_usage_error(self):
         self.assertEqual(r.main(["--ids", " , "]), 2)
 

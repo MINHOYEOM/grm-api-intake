@@ -133,6 +133,8 @@ import collect_fda_import_alert as _ia  # noqa: E402
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
 # (재수집 없음), 렌더 단에도 같은 분류기로 최후 방어선을 둔다(단일 진실원 재사용).
 from grm_findings import evidence_url_quality_error as _evidence_url_quality_error  # noqa: E402
+from grm_findings import fda483_signer_variant_tail_start as _gf_signer_variant_tail_start  # noqa: E402
+from grm_findings import fda483_bare_signature_is_prose as _gf_bare_signature_is_prose  # noqa: E402
 # [WHOPIR 결론 한 줄 2026-11-03] 결론은 접힌 상세(`deterministic_detail.outcome`)에만 있었다.
 # 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
 from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
@@ -158,6 +160,7 @@ import clause_text_page  # noqa: E402  [기준 조항 원문 2026-11-15] /clause
 import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
 import news_page  # noqa: E402  [최근 규제 소식 2026-11-10]
 import inspection_notes_page  # noqa: E402  [실사 대비 노트 2026-11-15] 주제별 지적 문장 묶음
+import doc_gist  # noqa: E402  [구글 품질 2단계 2026-11-20] 국문 짧은 문서 첫머리 'GRM 요지'
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -1687,6 +1690,232 @@ def _glance_line(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any
         if v >= GLANCE_MIN and v * 3 >= len(matched):
             return tr("문서 {n}건 중 {k}건에 {cat} 지적", n=len(matched), k=v, cat=tr(labels[k]))
     return ""
+
+
+# ── [브리프 첫 화면 2026-11-26 · 대표 결정] 이번 주 꼭 볼 5건 ──────────────────────────
+# 고르는 규칙은 이 함수 하나에만 둔다(시험: tests/test_brief_must_see.py). 매주 발행분에 그대로 적용된다.
+#   묶음 0 처분      — 경고서한, 식약처 행정처분 중 허가 취소
+#   묶음 1 식약처    — GMP 실사(지적 있는 것), 그 밖의 행정처분
+#   묶음 2 483       — 무균·데이터 신뢰성 지적 483, 관찰사항이 많은 순(나머지 묶음은 편집 순서 = 화면 순서)
+#   묶음 3 지침      — 여러 기관이 함께 낸 해석·지침이 먼저
+# 묶음마다 한 건씩 먼저 고르고, 남은 자리는 같은 순서로 다시 돈다. 한 기관은 최대 2건.
+# 한 줄 표(row) 카드와 회수는 고르지 않는다. 판정은 번역 전 원본 카드 값으로 한다(국·영 같은 5건).
+MUST_SEE_N = 5
+MUST_SEE_PER_AGENCY = 2
+_MUST_STERILE_DI_RE = re.compile(r"무균|데이터|원자료|허위|위조|재작성|환경 ?모니터링|청정|배지충전")
+_MUST_JOINT_RE = re.compile(r"harmoni[sz]ed|통일|공동|PIC/S", re.I)
+_MUST_GUIDE_TYPES = ("규제 소식", "지침·안내서", "Guidance", "고시·개정법령")
+
+
+def _must_see_key(card: dict[str, Any]) -> "tuple[int, int, int, int] | None":
+    """(묶음, 묶음 안 우선, -관찰 수(483만), 화면 순서) — 고르지 않는 카드면 None."""
+    if card.get("card_weight") == "row":
+        return None
+    ct = card.get("card_type") or ""
+    text = f"{card.get('headline_target') or ''} {card.get('title_issue') or ''} {card.get('hook_line') or ''}"
+    n = int((card.get("deterministic_detail") or {}).get("count") or 0)
+    order = card.get("render_order")
+    order = order if isinstance(order, int) else 10 ** 6
+    if ct == "Warning Letter":
+        return (0, 0, 0, order)
+    if ct == "행정처분":
+        return (0, 1, 0, order) if "취소" in text else (1, 1, 0, order)
+    if ct == "GMP실사":
+        return (1, 0, 0, order)
+    if card.get("type_tag") == "483" and _MUST_STERILE_DI_RE.search(text):
+        return (2, 0, -n, order)
+    if ct in _MUST_GUIDE_TYPES:
+        return (3, 0 if _MUST_JOINT_RE.search(text) else 1, 0, order)
+    return None
+
+
+def select_must_see(cards: list[dict[str, Any]], n: int = MUST_SEE_N,
+                    per_agency: int = MUST_SEE_PER_AGENCY) -> list[int]:
+    """이번 주 꼭 볼 카드의 위치(`cards` 안 index) — 묶음 순서대로 돌려준다."""
+    buckets: dict[int, list[tuple[tuple[int, int, int, int], int]]] = {0: [], 1: [], 2: [], 3: []}
+    for i, c in enumerate(cards):
+        k = _must_see_key(c)
+        if k is not None:
+            buckets[k[0]].append((k, i))
+    for b in buckets.values():
+        b.sort()
+    picked: dict[int, tuple[int, int, int, int]] = {}
+    per: dict[str, int] = {}
+
+    def take(b: int) -> bool:
+        for k, i in buckets[b]:
+            ag = cards[i].get("agency") or ""
+            if i in picked or per.get(ag, 0) >= per_agency:
+                continue
+            picked[i] = k
+            per[ag] = per.get(ag, 0) + 1
+            return True
+        return False
+
+    progress = True
+    while len(picked) < n and progress:
+        progress = False
+        for b in (0, 1, 2, 3):
+            if len(picked) < n and take(b):
+                progress = True
+    return sorted(picked, key=lambda i: picked[i])
+
+
+def build_must_see(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any]],
+                   tr: Translator = _KO) -> list[dict[str, Any]]:
+    """화면용 5칸 — `card_views` 는 `cards_raw` 와 같은 순서(언어별 문장은 뷰에서)."""
+    out = []
+    for i in select_must_see(cards_raw):
+        c, cv = cards_raw[i], card_views[i]
+        ag = c.get("agency") or ""
+        ag_t = tr(_AGENCY_DISPLAY[ag]) if ag in _AGENCY_DISPLAY else ag
+        ct = c.get("card_type") or ""
+        if ct == "Warning Letter":
+            label = tr("{a} 경고서한", a=ag_t)
+        elif ct == "행정처분":
+            label = tr("식약처 행정처분")
+        elif ct == "GMP실사":
+            label = tr("식약처 GMP 실사")
+        elif c.get("type_tag") == "483":
+            label = tr("{a} 483", a=ag_t)
+        else:
+            label = tr("{a} 지침·소식", a=ag_t)
+        out.append({
+            "anchor": cv["anchor"],
+            "label": label,
+            "tone": {"FDA": "fda", "MFDS": "mfds"}.get(ag, "etc"),
+            "firm": cv.get("headline_target") or "",
+            "issue": cv.get("title_issue") or "",
+            "why": cv.get("hook_line") or "",
+        })
+    return out
+
+
+def brief_agency_counts(cards_raw: list[dict[str, Any]], tr: Translator = _KO) -> list[dict[str, Any]]:
+    """목차 축약 — 기관별 카드 수(많은 순, 같으면 이름순)."""
+    cnt: dict[str, int] = {}
+    for c in cards_raw:
+        ag = c.get("agency") or ""
+        if ag:
+            cnt[ag] = cnt.get(ag, 0) + 1
+    return [{"name": tr(_AGENCY_DISPLAY[a]) if a in _AGENCY_DISPLAY else a, "n": v}
+            for a, v in sorted(cnt.items(), key=lambda kv: (-kv[1], kv[0]))]
+
+
+# ── [네이버 블로그 원고 2026-11-26 · 대표 결정] 이번 주 483 한 건 해설 ──────────────────
+# 매 빌드가 briefs/{pub}/naver-blog.txt 로 낸다(share.txt 와 같은 자리·같은 규율 — sitemap 비등록).
+# 고르는 카드는 '이번 주 꼭 볼 5건'의 483 칸과 같다(select_must_see 를 그대로 부른다 — 규칙을 베끼지 않는다).
+# 문장은 발행된 카드 원문 그대로 옮긴다(새 문장을 짓지 않는다). 계정·게시는 대표가 한다.
+NAVER_BLOG_FILE = "naver-blog.txt"
+# [네이버 블로그 붙여넣기 쪽 2026-11-26] 같은 원고를 복사 단추 둘(제목·본문)로 — 본문은 text/html 로
+# 복사해 스마트에디터에 붙여도 문단·굵은 글씨·링크가 산다. 사이트 틀(base.html)을 쓰되 noindex·sitemap 비등록.
+# 글과 쪽은 naver_blog_483_doc() 한 벌에서 나온다(평문·HTML 이 갈라지지 않게). /admin/ '네이버 블로그' 탭이
+# 최신 발행일로 이 주소를 연다 — 매주 사람이 주소를 챙기지 않는다. 가드: tests/test_naver_blog_draft.py
+NAVER_BLOG_PAGE = "naver-blog.html"
+# GRM 네이버 블로그(대표 계정 2026-11-26) — 붙여넣기 쪽·/admin/ 탭의 '글쓰기 바로가기'. 원고 속 사이트 링크는
+# utm.CHANNELS["naver_blog"] 표식을 달아 블로그에서 온 방문을 따로 센다.
+NAVER_BLOG_HOME = "https://blog.naver.com/grmsolution"
+NAVER_BLOG_WRITE_URL = NAVER_BLOG_HOME + "/postwrite"
+_BLOG_FACT_LABELS = ("발행일", "실사일", "시설 · 유형")
+
+
+def pick_blog_483(cards: list[dict[str, Any]]) -> "int | None":
+    """해설할 483 — 꼭 볼 5건의 483 칸, 없으면 관찰 수가 가장 많은 483(표 한 줄 카드 제외)."""
+    for i in select_must_see(cards):
+        if cards[i].get("type_tag") == "483":
+            return i
+    pool = [(-int((c.get("deterministic_detail") or {}).get("count") or 0),
+             c.get("render_order") if isinstance(c.get("render_order"), int) else 10 ** 6, i)
+            for i, c in enumerate(cards)
+            if c.get("type_tag") == "483" and c.get("card_weight") != "row"]
+    return min(pool)[2] if pool else None
+
+
+def naver_blog_483_doc(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
+                       brief_url: str, title_dateform: str, pub: str = "") -> dict[str, Any]:
+    """블로그 원고 한 벌 — {"title": 제목(없으면 ""), "blocks": [...]}.
+
+    블록 꼴: ("p", 문장) · ("hp", 소제목, 문장) · ("list", 소제목, [항목]) · ("links", 소제목, [(이름, URL)])
+    · ("link_p", 이름, URL). `card_views` 는 `cards` 와 같은 순서(문서 링크만 뷰에서 쓴다)."""
+    from utm import channel_url  # 채널 표식 정본(web/utm.py) — 발행일이 있을 때만 단다
+
+    def tag(u: str) -> str:
+        return channel_url(u, "naver_blog", date=pub) if pub else u
+
+    home = _abs_url("")
+    i = pick_blog_483(cards)
+    if i is None:
+        return {"title": "", "blocks": [
+            ("p", f"[{title_dateform}] 이번 주에는 해설할 FDA 483 이 없습니다."),
+            ("link_p", "이번 주 규제뉴스 전체", tag(brief_url))]}
+    c, cv = cards[i], card_views[i]
+    n = int((c.get("deterministic_detail") or {}).get("count") or 0)
+    facts = {f.get("label"): f.get("value") for f in (c.get("facts") or []) if isinstance(f, dict)}
+    blocks: list[tuple[Any, ...]] = []
+    meta = [f"{k.replace(' · ', ' ')} {str(facts[k]).removesuffix(' · 483')}"
+            for k in _BLOG_FACT_LABELS if facts.get(k)]
+    if meta:
+        blocks.append(("p", " · ".join(meta)))
+    if c.get("summary"):
+        blocks.append(("p", c["summary"]))
+    if c.get("key_facts"):
+        blocks.append(("list", f"FDA가 적은 관찰사항{f' ({n}건 중 주요 내용)' if n else ''}",
+                       list(c["key_facts"])))
+    if c.get("implication"):
+        blocks.append(("hp", "함께 적힌 내용", c["implication"]))
+    if c.get("checks"):
+        blocks.append(("list", "우리 현장에서 확인할 것", list(c["checks"])))
+    links = []
+    if cv.get("doc_href"):
+        links.append(("483 원문과 지적 전체(한국어)", tag(_abs_url(cv["doc_href"]))))
+    links += [("이번 주 규제뉴스 전체", tag(brief_url)),
+              ("실사 지적을 매주 메일로 받기(무료)", tag(f"{home}#subscribe"))]
+    blocks += [("links", "원문과 더 보기", links),
+               ("p", "이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. "
+                     "요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다."),
+               ("p", "#FDA483 #GMP #제약품질 #실사대비 #GRM")]
+    return {"title": f"FDA 483 해설 | {c.get('headline_target') or ''} — {c.get('title_issue') or ''}",
+            "blocks": blocks}
+
+
+def build_naver_blog_483(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
+                         brief_url: str, title_dateform: str, pub: str = "") -> str:
+    """블로그 원고(한국어 평문) — naver_blog_483_doc() 를 줄글로 편다."""
+    doc = naver_blog_483_doc(cards, card_views, brief_url, title_dateform, pub)
+    lines = [f"제목: {doc['title']}", ""] if doc["title"] else []
+    for b in doc["blocks"]:
+        if b[0] == "p":
+            lines += [b[1], ""]
+        elif b[0] == "hp":
+            lines += [b[1], b[2], ""]
+        elif b[0] == "list":
+            lines += [b[1]] + [f"- {k}" for k in b[2]] + [""]
+        elif b[0] == "links":
+            lines += [b[1]] + [f"- {k}: {u}" for k, u in b[2]] + [""]
+        elif b[0] == "link_p":
+            lines += [f"{b[1]}: {b[2]}", ""]
+    return "\n".join(lines)
+
+
+def build_naver_blog_html(doc: dict[str, Any]) -> str:
+    """붙여넣기용 본문 HTML — 스마트에디터가 받아들이는 태그만(p·b·a·br). 블록 사이 빈 문단 한 줄."""
+    esc = _html.escape
+    out: list[str] = []
+    for b in doc["blocks"]:
+        if out:
+            out.append("<p><br></p>")
+        if b[0] == "p":
+            out.append(f"<p>{esc(b[1])}</p>")
+        elif b[0] == "hp":
+            out.append(f"<p><b>{esc(b[1])}</b></p><p>{esc(b[2])}</p>")
+        elif b[0] == "list":
+            out.append(f"<p><b>{esc(b[1])}</b></p>" + "".join(f"<p>· {esc(k)}</p>" for k in b[2]))
+        elif b[0] == "links":
+            out.append(f"<p><b>{esc(b[1])}</b></p>" + "".join(
+                f'<p>· <a href="{esc(u)}">{esc(k)}</a></p>' for k, u in b[2]))
+        elif b[0] == "link_p":
+            out.append(f'<p><a href="{esc(b[2])}">{esc(b[1])}</a></p>')
+    return "\n".join(out)
 
 
 def build_brief_glance(sections: list[dict[str, Any]], card_views: list[dict[str, Any]],
@@ -4413,6 +4642,28 @@ def doc_clause_view(doc: dict[str, Any], clause_by_section: dict[str, dict[str, 
     return out
 
 
+STANDARD_REFS_SHOW = 6
+
+
+def doc_standard_view(doc: dict[str, Any], text_view: dict[str, Any],
+                      labels: "dict[str, tuple[str, str]]",
+                      limit: int = STANDARD_REFS_SHOW) -> list[dict[str, str]]:
+    """[GRM 연결 빈 문서 2026-11-20] 이 문서의 지적 본문이 적은 기준의 **원문 페이지**(/clauses/) 링크.
+    비슷한 지적도 조항 지도도 없는 문서에만 쓴다(호출부가 가른다). 라벨→주소는 ref_href 가 확실할 때만 낸다."""
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for label in clause_text_page.cited_standard_labels(doc):
+        href = clause_text_page.ref_href(text_view, label)
+        if not href or href in seen or href not in labels:
+            continue
+        seen.add(href)
+        code, title = labels[href]
+        out.append({"href": href, "code": code, "title": title})
+        if len(out) >= limit:
+            break
+    return out
+
+
 def firm_similar_view(firm_docs: list[dict[str, Any]],
                       similar: dict[str, list[list[Any]]],
                       docs_by_id: dict[str, dict[str, Any]], lang: str,
@@ -4621,6 +4872,23 @@ def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
         "request_head": link(parts["request_head"]) if parts["request_head"] else "",
         "requests": [link(r) for r in parts["requests"]],
     }
+
+
+def clause_text_cites(docs_data: "dict[str, Any] | None",
+                      views: dict[str, dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
+    """[구글 품질 2단계 2026-11-20] 언어 → (조항 원문 페이지 주소 → 이 조항을 인용한 지적).
+
+    렌더·sitemap 판정·테스트가 이 한 함수를 본다(갈라지지 않게). 영어 트리는 문서 페이지가 서는
+    문서(doc_is_english)만, 본문은 원문(영어)만 센다 — findings/clause 영어판과 같은 규율."""
+    docs = (docs_data or {}).get("documents") or []
+    out = {DEFAULT_LANG: clause_text_page.citing_findings(
+        docs, views[DEFAULT_LANG], lambda f: finding_body(f, DEFAULT_LANG))}
+    if "en" in views:
+        out["en"] = clause_text_page.citing_findings(
+            docs, views["en"],
+            lambda f: "" if _HANGUL_RE.search(finding_body(f, "en")) else finding_body(f, "en"),
+            doc_ok=doc_is_english)
+    return out
 
 
 def doc_is_english(doc: dict[str, Any]) -> bool:
@@ -5259,13 +5527,21 @@ _HOME_TLDR_PREFIXES: tuple[tuple[str, str], ...] = (
 )
 
 
-_HOME_MIDDOT_RE = re.compile(r"(\S)·")
+_HOME_MIDDOT_TOKEN_RE = re.compile(r"\S+")
+
+
+def _home_nobreak_token(m: "re.Match[str]") -> str:
+    tok = m.group(0)
+    return f'<span class="ht-nb">{tok}</span>' if re.search(r"\S·", tok) else tok
 
 
 def home_nobreak_middot(line: str) -> Markup:
     """가운뎃점 앞에서 줄이 끊기지 않게 한다 — "위조·DEG" 가 "위조 / ·DEG" 로 갈라지면 다음
-    줄이 점으로 시작한다(375px 실측). 글자는 그대로 두고 앞 글자와 점만 한 덩어리로 묶는다."""
-    return Markup(_HOME_MIDDOT_RE.sub(r'<span class="ht-nb">\1·</span>', str(_escape(line or ""))))
+    줄이 점으로 시작한다(375px 실측). 글자는 그대로 두고 **띄어쓰기 단위 낱말 전체**를 묶는다.
+    [2026-11-26] 예전에는 점 앞 한 글자만 묶어("충<span>전·</span>포") 낱말 한가운데에 태그
+    경계가 생겼다 — 화면 읽기·텍스트 추출이 "충 전· 포 장·"·"충포출하한"으로 깨졌다. 태그 경계는
+    늘 빈칸 자리에만 둔다(test_home_keypoints_have_no_tag_inside_a_word 가 지킨다)."""
+    return Markup(_HOME_MIDDOT_TOKEN_RE.sub(_home_nobreak_token, str(_escape(line or ""))))
 
 
 def home_source_tag(line: str) -> dict[str, str]:
@@ -6052,7 +6328,10 @@ def build_headers_txt() -> str:
     # [마케팅 2026-09-28] 구독 확인 뒤에만 가는 두 경로 — 링크가 사이트 어디에도 없고
     # sitemap 에도 없지만, 주소가 퍼지면 검색엔진이 주울 수 있어 헤더로도 막는다
     # (도착 페이지는 템플릿 meta 로도 한 겹 더). PDF 는 meta 를 달 수 없어 헤더가 유일한 길.
-    for path in ("/files/*", "/welcome/*"):
+    # [네이버 블로그 원고 쪽 2026-11-26] 대표가 붙여 넣을 원고 — 페이지 meta 와 두 겹. Pages 는 .html 을
+    # 확장자 없는 주소로 308 하므로 두 꼴 모두 건다.
+    for path in ("/files/*", "/welcome/*",
+                 f"/briefs/:date/{NAVER_BLOG_PAGE}", f"/briefs/:date/{NAVER_BLOG_PAGE.removesuffix('.html')}"):
         lines += [path, "  X-Robots-Tag: noindex"]
     return "\n".join(lines) + "\n"
 
@@ -6124,6 +6403,18 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         " 한국어 풀이·공식 출처·실제 지적사례 연결",
         f"- [자료실]({base_url}/library/): FDA·EMA·PIC/S·ICH·WHO·식약처 지침·가이드라인"
         " 공식 원문 링크",
+    ]
+    # [검색 유입 점검 2026-11-26] 조항 원문·실사 대비 노트가 이 안내에 없었다 — 빙 유입의 둘째 묶음이
+    # 조항 원문(en/clauses·en/library)인데 AI 검색에는 알리지 않았다. 국문 트리는 영문 트리와 같은
+    # 렌더러가 함께 내므로 영문 면이 있으면 국문 면도 있다(없는 면은 적지 않는다).
+    _ep = en_paths or set()
+    if "clauses/" in _ep:
+        lines.append(f"- [기준 조항 원문]({base_url}/clauses/): 식약처 GMP·21 CFR·EU GMP·ICH 조항을"
+                     " 원문 그대로 — 21 CFR 조항은 그 조항을 인용한 실제 지적과 연결")
+    if "inspection-notes/" in _ep:
+        lines.append(f"- [실사 대비 노트]({base_url}/inspection-notes/): 주제별로 실사에서 실제"
+                     " 지적된 문장과 출처")
+    lines += [
         f"- [이용안내]({base_url}/guide/): 서비스 활용법과 자주 묻는 질문",
         f"- [주간 퀴즈]({base_url}/quiz/): 그 주 규제 소식 기반 학습 퀴즈",
         f"- [소개]({base_url}/about/): 서비스를 만든 이유와 만드는 방식, 연락처",
@@ -6171,6 +6462,11 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
      "{terms} GMP and quality terms explained in plain English with official sources"),
     ("library/", "Reference library",
      "Official FDA, EMA, PIC/S, ICH, WHO and MFDS guidance documents"),
+    ("clauses/", "Regulation texts",
+     "21 CFR, EU GMP and ICH clauses in their original wording; 21 CFR clauses list"
+     " the findings that cite them"),
+    ("inspection-notes/", "Inspection readiness notes",
+     "Topic notes built from sentences regulators actually wrote in findings, with sources"),
     ("archive/", "Weekly brief archive", "Past weekly regulatory briefs"),
     ("guide/", "Guide", "How to use the service, and frequently asked questions"),
     ("quiz/", "Weekly quiz", "Learning quiz based on that week's regulatory news"),
@@ -6564,6 +6860,56 @@ QUIZ_DESCRIPTION = N_("GRM 주간 퀴즈 — 규제·품질 용어와 최근 공
                       "전 직원 학습 퀴즈. 선택 즉시 정답·해설·근거 링크를 확인하세요.")
 
 
+# ── [설명문 최소 길이 2026-11-26] 빙 '메타 설명이 짧은 페이지가 많다' 권고 ─────────────────────
+# 짧은 설명(한국어 80자·영어 110자 미만)에는 그 묶음이 무엇을 담는지 한 문장을 덧붙인다. 새 사실을 짓지
+# 않고 묶음의 성격만 말한다(숫자·기관 목록 없음 — 낡지 않게). 가드: tests/test_meta_description_floor.py
+# 덧붙일 문장이 끝맺는 명사(_DESC_TAIL_NOUNS)가 원래 설명에 이미 있으면 그 문장은 건너뛴다
+# ('…용어사전 — … 용어사전입니다.' 같은 겹침 방지, 11-26 해밀턴 14 지적).
+DESC_MIN_CHARS = {"ko": 80, "en": 110}
+_DESC_TR: "dict[str, Translator]" = {}
+_DESC_TAILS: tuple[tuple[str, str], ...] = (
+    ("findings/firm/", N_("문서마다 지적 문장과 공식 원문 링크를 함께 실었습니다.")),
+    ("findings/docs/", N_("문서를 열면 지적 전체를 읽고 업체·조항·분류로 이어서 찾아볼 수 있습니다.")),
+    ("findings/c/", N_("분류마다 실제 지적 문장과 근거 조항, 원문 문서를 함께 볼 수 있습니다.")),
+    ("glossary/", N_("GMP 실무 용어를 정의와 관련 조항, 실제 지적 문장으로 풀어 둔 용어사전입니다.")),
+    ("inspection-notes/", N_("무균·데이터 신뢰성·일탈 조사처럼 실사에서 반복되는 주제별로 정리했습니다.")),
+    ("briefs/", N_("FDA 483·경고서한, 식약처 처분·실사, 회수 소식을 카드로 정리한 주간 규제뉴스입니다.")),
+    ("library/", N_("규제기관 지침과 공식 문서를 원문 링크와 함께 모은 자료실입니다.")),
+    ("clauses/", N_("조항마다 공식 원문 링크와 그 조항을 인용한 실사 지적을 함께 둡니다.")),
+    ("", N_("GRM 은 규제기관이 공개한 실사 지적을 한국어로 정리해 매주 갱신합니다.")),
+)
+
+
+_DESC_TAIL_NOUNS: dict[str, str] = {
+    "glossary/": N_("용어사전"),
+    "briefs/": N_("주간 규제뉴스"),
+    "library/": N_("자료실"),
+}
+
+def extend_short_description(desc: str, site_path: str, lang: str,
+                             tr: "Translator | None" = None) -> str:
+    """짧은 설명에 묶음 한 문장을 덧붙인다. 비어 있으면(404·관리 화면 등) 그대로 둔다."""
+    desc = (desc or "").strip()
+    floor = DESC_MIN_CHARS.get(lang, DESC_MIN_CHARS["en"])
+    if not desc or len(desc) >= floor:
+        return desc
+    if tr is None:
+        tr = _DESC_TR.get(lang) or _DESC_TR.setdefault(
+            lang, _KO if lang == DEFAULT_LANG else Translator(lang))
+    path = site_path[len("en/"):] if site_path.startswith("en/") else site_path
+    # 묶음 문장 → 그래도 짧으면 사이트 한 문장(맨 끝 항목). 같은 문장은 두 번 붙이지 않는다.
+    for pre, t in [next((x for x in _DESC_TAILS if path.startswith(x[0]))), _DESC_TAILS[-1]]:
+        tail = tr(t)
+        if len(desc) >= floor or tail in desc:
+            continue
+        noun = _DESC_TAIL_NOUNS.get(pre)
+        if noun and tr(noun).casefold() in desc.casefold():
+            continue
+        sep = "" if desc.endswith((".", "다", "。")) else "."
+        desc = f"{desc}{sep} {tail}"
+    return desc
+
+
 def _abs_url(rel_path: str = "") -> str:
     """SITE_BASE_URL + 경로 → 절대 canonical(트레일링 슬래시 디렉터리형). 랜딩=베이스/."""
     return f"{SITE_BASE_URL}/{rel_path}"
@@ -6714,8 +7060,18 @@ def _make_env(lang: str = DEFAULT_LANG,
     env.filters["gmp_operations"] = split_gmp_operations
     # [다국어 2단계] 템플릿 전역 `_("…")` — 문구 사전. 한국어는 항등(Markup 으로 그대로),
     # 영어는 카탈로그 결손 시 즉시 실패. 슬롯 `{name}` 값은 escape 된다.
-    env.globals["_"] = (translator or Translator(lang)).template_gettext()
+    tr = translator or Translator(lang)
+    env.globals["_"] = tr.template_gettext()
+    # [구독 권유 정리 2026-11-26] 구독 칸·하단 밴드·팝업이 말하는 기관 목록은 여기 한 곳에서만
+    # 정한다. 곳마다 따로 적다가 "FDA·EU·영국·WHO·캐나다·식약처"·"FDA·EMA·PIC/S·식약처"·
+    # "FDA·EU·식약처"가 한 화면에 섞였다. 템플릿은 {{ sub_agencies }}·{{ sub_agency_n }} 만 쓴다
+    # (tests/test_subscribe_prompts.py 가 템플릿에 기관 목록을 손으로 적으면 실패한다).
+    env.globals["sub_agencies"] = Markup(_escape(tr("FDA·EU·영국·WHO·캐나다·식약처")))
+    env.globals["sub_agency_n"] = len(SUBSCRIBE_AGENCIES)
     return env
+
+
+SUBSCRIBE_AGENCIES = ("FDA", "EU", "영국", "WHO", "캐나다", "식약처")
 
 
 def _write(path: Path, text: str) -> None:
@@ -6864,6 +7220,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                       "label": LANG_ENDONYM[lg], "current": lg == tree_lang}
                      for lg in SUPPORTED_LANGS]
                     if pp.path in en_paths else [])
+            if ctx.get("description"):
+                ctx["description"] = extend_short_description(
+                    str(ctx["description"]), pp.site_path, pp.lang)
             return tree_env.get_template(template).render({
                 "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
                 "canonical": pp.canonical, "latest_slug": latest_slug,
@@ -8134,7 +8493,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # [SEO 2단계 2026-11-09] GRM 고유 맥락 입력 — 비슷한 지적(정본 파일)·조항(뷰 재사용).
         similar_by_doc = load_findings_similar() if render_doc_pages else {}
         partial_detail_ids = load_partial_detail_ids() if render_doc_pages else frozenset()
+        # [구글 품질 2단계 2026-11-20] GRM 요지(translations/doc_gist_outbox) — 지적 본문 해시가 같고 검사를 통과한 것만.
+        doc_gists = doc_gist.load_outbox() if render_doc_pages else {}
         docs_by_id = {d["document_id"]: d for d in documents}
+        clause_labels_by_lang = {_lg: clause_text_page.href_labels(_v)
+                                 for _lg, _v in clause_text_views.items()}
         clause_by_section_by_lang = {
             DEFAULT_LANG: {c["section"]: c for c in clause_views},
             "en": {c["section"]: c for c in clause_views_en},
@@ -8195,6 +8558,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     if _index else [])
                 _used: set[str] = set()
                 _labels = agency_labels_by_lang[_lg]
+                _similar_cases = doc_similar_view(
+                    doc, similar_by_doc.get(doc["document_id"]), docs_by_id, _lg,
+                    _doc_slugs_by_lang.get(_lg), _canonical_firm_key)
+                _cited_clauses = doc_clause_view(
+                    doc, clause_by_section_by_lang.get(_lg, {}), _lg)
                 # 분류 라벨은 **데이터에 한국어로** 실려 있고 템플릿이 그대로 찍는다 —
                 # 언어 트리에 맞춰 뷰에서 번역한 사본을 넘긴다(정본 데이터는 무변형).
                 _doc = doc if _lg == DEFAULT_LANG else {
@@ -8254,17 +8622,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
                     # [다국어] 그 언어 트리에 있는 것만 잇는다(_firm_slug_for).
                     firm_page_slug=_firm_slug_for(doc, _lg),
-                    similar_cases=doc_similar_view(
-                        doc, similar_by_doc.get(doc["document_id"]), docs_by_id, _lg,
-                        _doc_slugs_by_lang.get(_lg), _canonical_firm_key),
+                    doc_gist=(doc_gist.view(doc, doc_gists) if _lg == DEFAULT_LANG else None),
+                    similar_cases=_similar_cases,
                     # [UI 2단 2026-11-12] 483 '구체 내용' — 본문은 런타임(doc-detail.js)이
                     # findings 의 상세 칸을 읽어 붙인다(파일에 싣지 않는다 — 국문만 830만 자).
                     detail_runtime=(doc.get("source") == "FDA 483"),
                     detail_partial_ids=sorted(
                         f["finding_id"] for f in (doc.get("findings") or [])
                         if f.get("finding_id") in partial_detail_ids),
-                    cited_clauses=doc_clause_view(
-                        doc, clause_by_section_by_lang.get(_lg, {}), _lg),
+                    cited_clauses=_cited_clauses,
+                    standard_refs=(
+                        [] if (_similar_cases or _cited_clauses) else doc_standard_view(
+                            doc, clause_text_views.get(_lg, clause_text_view_en),
+                            clause_labels_by_lang.get(_lg, {}))),
                     backlinks=build_backlink_panel(
                         "doc", doc.get("document_id", ""), index=card_issue_index,
                         lang=_lg,
@@ -8332,7 +8702,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              " 정리했습니다({y1}~{y2}).",
                              name=fp["name"], d=f"{fp['doc_count']:,}",
                              n=f"{fp['finding_count']:,}",
-                             y1=fp["first_seen"][:4], y2=fp["last_seen"][:4]),
+                             y1=fp["first_seen"][:4], y2=fp["last_seen"][:4]).replace(
+                                 f"({fp['first_seen'][:4]}~{fp['first_seen'][:4]})",
+                                 f"({fp['first_seen'][:4]})"),
                          # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
                          json_ld=firm_page.breadcrumb_json_ld([
                              (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),
@@ -8434,6 +8806,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [기준 조항 원문 2026-11-15] /clauses/ 색인·문서 목차·조항 페이지 — ko·en 같은 함수(두 벌 금지).
     # 본문은 영어 원문 그대로라 두 트리가 같은 경로를 낸다(en_paths 는 위에서 같은 뷰로 선언).
     # sitemap lastmod 는 비운다 — 조항에는 개정일 필드가 없고, 수집일은 수정일이 아니다(지어낸 날짜 금지).
+    # [구글 품질 2단계 2026-11-20] 21 CFR 조항마다 "이 조항을 인용한 지적" — 언어마다 그 트리에 문서
+    # 페이지가 있는 문서만 센다. 렌더와 sitemap 판정(아래 D·E 루프)이 같은 값을 본다.
+    _ct_cites = clause_text_cites(docs_data, clause_text_views)
     if clause_text_view["sources"]:
         for _lg, _pg, _em, _tr in trees:
             _ctv = clause_text_views.get(_lg, clause_text_view_en)
@@ -8441,6 +8816,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 continue
             _ct_cases = clause_slugs if _lg == DEFAULT_LANG else {c["slug"] for c in clause_views_en}
             _ct_terms = clause_text_page.terms_by_href(_ctv, glossary_terms, _lg)
+            _ct_cite = _ct_cites.get(_lg) or {}
+            _ct_labels = {k: _tr(v) for k, v in _clause_agency_labels.items()}
             _ip = _pg(clause_text_page.ROUTE)
             _em("clauses_index.html", _ip,
                 page_title=_tr("기준 조항 원문 · GRM"),
@@ -8465,7 +8842,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for _d, _c in clause_text_page.pages(_ctv):
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
-                _ct_gni = clause_text_page.google_noindex_reason(_d, _c, _lg)
+                _cite = _ct_cite.get(_c["href"])
+                _ct_gni = clause_text_page.google_noindex_reason(
+                    _d, _c, _lg, (_cite or {}).get("documents", 0))
                 _em("clause_text.html", _cp,
                     page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
                     nav_active="findings",
@@ -8477,6 +8856,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     cases_href=(f"findings/clause/{clause_slug(_sec)}/"
                                 if _sec and clause_slug(_sec) in _ct_cases else ""),
                     terms=_ct_terms.get(_c["href"]) or [],
+                    cite=_cite, agency_labels=_ct_labels,
                     google_noindex=bool(_ct_gni),
                 )
         for _path in sorted(clause_text_page.tree_paths(clause_text_view)):
@@ -8485,7 +8865,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (영문 트리 경로는 en_paths 로 sitemap 에 들어가므로 언어마다 따로 센다).
     for _lg in (DEFAULT_LANG, "en"):
         for _d, _c in clause_text_page.pages(clause_text_views[_lg]):
-            _why = clause_text_page.google_noindex_reason(_d, _c, _lg)
+            _why = clause_text_page.google_noindex_reason(
+                _d, _c, _lg, (_ct_cites[_lg].get(_c["href"]) or {}).get("documents", 0))
             if _why:
                 _mark_google_noindex(_lg, _c["href"], f"clause_{_why}")
 
@@ -8751,6 +9132,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             brief=ctx,
             sections=sections,
             glance=build_brief_glance(sections, card_views, cards_sorted, glance_db, tr),
+            must_see=build_must_see(card_views, cards_sorted, tr),
+            agency_counts=brief_agency_counts(cards_sorted, tr),
             card_weighted=any(cv.get("weight") for cv in card_views),
             lib_update_week=lib_update_week,
             json_ld=build_brief_article_json_ld(
@@ -8767,6 +9150,20 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         share_file = brief_page.file("share.txt")
         _write(out_dir / share_file, "\n".join(share_lines) + "\n")
         written.append(share_file)
+        # [네이버 블로그 원고 2026-11-26] 이번 주 483 한 건 해설 — 고정 경로, 매주 저절로.
+        blog_file = brief_page.file(NAVER_BLOG_FILE)
+        _write(out_dir / blog_file,
+               build_naver_blog_483(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"], pub))
+        written.append(blog_file)
+        # 같은 원고의 붙여넣기 쪽(복사 단추 둘) — 브리프와 같은 자리라 상대 경로가 브리프와 같다.
+        blog_doc = naver_blog_483_doc(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"], pub)
+        blog_page_file = brief_page.file(NAVER_BLOG_PAGE)
+        _write(out_dir / blog_page_file, render_page(
+            "naver_blog.html", brief_page, page_title=f"네이버 블로그 원고 · {pub} · GRM",
+            nav_active="", description="", canonical="", hide_subscribe=True,
+            blog_pub=pub, blog_title=blog_doc["title"], blog_write_url=NAVER_BLOG_WRITE_URL,
+            blog_body_html=build_naver_blog_html(blog_doc)))
+        written.append(blog_page_file)
 
         # [다국어 5단계 2026-09-04] 영문 브리프 — **서사 다섯과 tldr 이 전부 영어인 호만**
         # 낸다(반쪽 영어 금지). 오늘의 발행분에는 그 슬롯이 없으므로 아무 페이지도 나오지
@@ -8794,6 +9191,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 sections=(_en_sections := _build_sections(en_card_views, en_tr)),
                 glance=build_brief_glance(_en_sections, en_card_views, cards_sorted, glance_db,
                                           en_tr),
+                must_see=build_must_see(en_card_views, cards_sorted, en_tr),
+                agency_counts=brief_agency_counts(cards_sorted, en_tr),
                 card_weighted=any(cv.get("weight") for cv in en_card_views),
                 ko_only_names=count_ko_only_names(en_card_views),
                 # [다국어 2026-09-05] 한국어판과 **같은 창(window)** 을 영어 카탈로그로
@@ -9101,11 +9500,27 @@ _FOOTER_GARBAGE_RE = re.compile(
     r"|(?-i:Digitally\s+signed\s+by)"     # 대문자 D 스탬프만 — 산문 "digitally signed by the …" 제외
     r"|observations\s+of\s+objectionable\s+conditions"
     r"|PURSUANT\s+TO\s+SECTION\s+704\s*\(b\)"
-    r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
+    r"|(?-i:EMP[A-Za-z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
     # [2026-10-27] 연속 기재 양식 마지막 줄의 실사일·서명자 나열(수집기 ④와 같은 마커).
     r"|(?-i:[*\"]?\s*DATES\s+OF\s+INSPECTION)|Dates\s+of\s+inspection\s*:",
     re.I,
 )
+
+
+_BARE_SIGNATURE_RE = re.compile(r"(?-i:SIGNATURE|SIGJ)")
+
+
+def _footer_garbage_hit(detail: str) -> bool:
+    """[11-26] `_FOOTER_GARBAGE_RE` 검출 — 단, 산문 표제의 맨 SIGNATURE("ELECTRONIC SIGNATURES")는 잔재로 보지
+    않는다. 판정은 수집기 절단점과 같은 함수(`grm_findings.fda483_bare_signature_is_prose`)."""
+    for m in _FOOTER_GARBAGE_RE.finditer(detail):
+        if not _BARE_SIGNATURE_RE.fullmatch(m.group(0)):
+            return True
+        lo, hi = max(0, m.start() - 200), min(len(detail), m.end() + 200)
+        near = any(not _BARE_SIGNATURE_RE.fullmatch(x.group(0)) for x in _FOOTER_GARBAGE_RE.finditer(detail, lo, hi))
+        if not _gf_bare_signature_is_prose(detail, m.end(), other_marker_near=near):
+            return True
+    return False
 
 
 def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
@@ -9135,7 +9550,9 @@ def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str
             if isinstance(detail, str) and detail.strip():
                 if not (isinstance(obs.get("detail_ko"), str) and obs.get("detail_ko").strip()):
                     violations.append(f"{loc}: MISSING_DETAIL_KO")
-                if _FOOTER_GARBAGE_RE.search(detail):
+                # [11-26] 판독 변형 서명란은 꼬리일 때만 — 수집기 trim_detail_tail 과 같은 함수.
+                if (_footer_garbage_hit(detail)
+                        or _gf_signer_variant_tail_start(detail) is not None):
                     violations.append(f"{loc}: FOOTER_GARBAGE")
 
     for item in cards_or_briefs:

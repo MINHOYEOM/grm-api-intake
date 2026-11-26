@@ -1667,9 +1667,9 @@
      {
       "number": "10",
       "deficiency": "Laboratory records do not include complete data derived from all tests, examination and assay necessary to assure compliance with established specifications and standards.",
-      "detail": "Specifically, A. Laboratory results within the LIMS system are not adequately verified to ensure that data obtained from the chromatography system are appropriately reported. For example, the total impurities related to EMPI.O f/S/ SIGNATVRE",
+      "detail": "Specifically, A. Laboratory results within the LIMS system are not adequately verified to ensure that data obtained from the chromatography system are appropriately reported. For example, the total impurities related to EMPI.O f/S/",
       "deficiency_ko": "시험실 기록에 수립된 규격·기준의 준수를 담보하는 데 필요한 모든 시험·검사·정량으로부터 도출된 완전한 데이터가 포함되어 있지 않다.",
-      "detail_ko": "구체적으로, A. LIMS 시스템 내 시험 결과가 크로마토그래피 시스템에서 얻은 데이터가 적절히 보고되도록 충분히 검증되지 않는다. 예를 들어 총 유연물질 — (※ 이 항목의 영문 뒤에는 스캔 원문의 서명란 잔재가 붙어 있다 — 지적 내용이 아니다.)"
+      "detail_ko": "구체적으로, A. LIMS 시스템 내 시험 결과가 크로마토그래피 시스템에서 얻은 데이터가 적절히 보고되도록 충분히 검증되지 않는다. 예를 들어 총 유연물질 —"
      }
     ]
    },

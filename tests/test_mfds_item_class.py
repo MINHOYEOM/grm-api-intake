@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import unittest
+from unittest import mock
 
 import collect_intake as ci
 import grm_mfds_item_class as mic
@@ -178,9 +179,18 @@ class LookupContractTest(unittest.TestCase):
 
     def test_multi_item_seq_takes_first_and_marks(self) -> None:
         raw: dict = {}
-        mic.enrich_raw_payload(raw, "197400553,197400555", service_key="")
+        html = "<table><tbody><tr><td>품목구분생물의약품</td></tr></tbody></table>"
+        with (
+            mock.patch.object(mic, "_lookups_used", 0),
+            mock.patch.object(mic, "http_get_html", return_value=html) as get_html,
+        ):
+            mic.enrich_raw_payload(raw, "197400553,197400555", service_key="")
         self.assertTrue(raw.get("mfds_item_seq_multi"))
-        self.assertEqual(mic._first_item_seq("197400553,197400555"), "197400553")
+        get_html.assert_called_once_with(
+            f"{mic.NEDRUG_SEARCH}?searchYn=true&itemSeq=197400553",
+            timeout=20, retries=1, label="nedrug 품목구분",
+        )
+        self.assertEqual(raw[mic.KEY_GUBUN_LOOKUP], mic.LOOKUP_OK)
 
 
 if __name__ == "__main__":

@@ -86,6 +86,7 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('backfill_wl_truncation_restore.py', 'max_old_chars: int = DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('backfill_wl_truncation_restore.py', '"wl": {"source": SOURCE_FDA_WL, "ellipsis": ELLIPSIS, "max_old_chars": DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('backfill_wl_truncation_restore.py', 'return new_text[:280].rstrip() + "..."'): ('decision', '옛 483 표제 280자 절단 재현(진단용 legacy_match — 저장 아님)'),
+    ('backfill_483_detail_refresh.py', '"deficiency": str(o.get("deficiency") or "")[:160],'): ('diagnostic', '새로 잡히는 관찰 보고서 표본(new_observation_samples) — 저장 아님, raw 에는 전문을 덧붙인다'),
     ('collect_deficiency_examples.py', 'ent["sample"] = [{"locator": r.locator, "statement": r.statement[:160], "clauses": r.clauses[:3],'): ('diagnostic', '실행 리포트 표본'),
     ('collect_deficiency_examples.py', 'found.append({"agency": agency, "lang": lang, "url": href, "label": label[:200]})'): ('diagnostic', '자료 목록 탐색 결과 라벨(리포트용)'),
     ('collect_fda_483.py', 'FDA483_EXCERPT_MAX_CHARS = 1500'): ('excerpt', '483 발췌(카드 미리보기) — 전문은 fda_483_observations(표제·상세 무절단, 11-10)와 fda483_body_full(심층 분석 켜진 문서)'),
@@ -121,6 +122,8 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('findings_extractors.py', 'if len(deficiency) >= _FDA483_FRAGMENT_MAX_LEN:'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
     ('findings_extractors.py', 'return len(d) < _FDA483_FRAGMENT_MAX_LEN and len(_FDA483_WORD_RE.findall(d)) < 3'): ('decision', '483 조각 표제 판정(30자 미만) — 저장은 원문'),
     ('findings_extractors.py', 'len(deficiency) < _FDA483_FRAGMENT_MAX_LEN'): ('decision', '483 단독 짧은 표제 판정(30자 미만) — 대체 표제+나머지 상세 = 원 상세, 저장은 원문'),
+    ('findings_translate_pick.py', 'DEFAULT_MAX_CHARS = 40_000'): ('decision', '일일 번역 대상 고르기 예산(원문 합계) — 행을 자르지 않고 고를 행 수만 정한다, 저장은 원문'),
+    ('findings_translate_pick.py', 'ap.add_argument("--max-chars", type=int, default=DEFAULT_MAX_CHARS)'): ('decision', '일일 번역 대상 고르기 예산(원문 합계) — 행을 자르지 않고 고를 행 수만 정한다, 저장은 원문'),
     ('grm_notion.py', 'props[PROP_TYPE_CLASS] = _select(item.type_or_class[:100])'): ('genuine', 'Notion select 옵션 이름 100자 한도'),
 }
 

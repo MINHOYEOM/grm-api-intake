@@ -51,10 +51,10 @@ jobs:
         run: pip install -r requirements.txt
       # 두 스위트를 **각각** 돌린다 — web/ 은 루트 discover 에 안 잡힌다(별도 트리).
       - name: unittest (repo root)
-        run: python -m unittest discover -s tests -v
+        run: python -m ci_network_guard discover -s tests -v
       - name: unittest (web)
         working-directory: web
-        run: python -m unittest discover -s tests -v
+        run: PYTHONPATH=.. python -m ci_network_guard discover -s tests -v
 
   corpus:
     name: Redaction guard byte-invariance over the regression corpus

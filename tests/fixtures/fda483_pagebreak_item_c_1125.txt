@@ -1,0 +1,55 @@
+OBSERVATION 4
+Procedures designed to prevent microbiological contamination of drug products purporting to be
+sterile are not established and followed.
+Specifically,
+A. While observing the setup and filling operations on the filling line, the following deficiencies
+in the aseptic processes were noted:
+i. During installation of the filling stations the operator was observed handling unprotected
+sterile parts with gloved hands. These components are positioned directly above the exposed
+product during the filling and stoppering process.
+B. Your visual inspection program does not provide adequate assurance that finished products
+possess their purported quality attributes. Specifically, containers with foreign matter
+are not classified as critical defects, despite their potential to compromise container integrity
+and to create a risk of microbial contamination of
+the sterile product.
+EMPlOVEE{S) NAME ANO Till£ (Prf(',f or Type}
+CATE ISS.UEO
+Velmora Quist, PhD, Pharmaceutical Scientist
+SEE
+Torvald Brennick, PhD, Lead Biologist
+REVERSE
+Ju ly 4, 2025
+OF THIS
+PAGE
+FORM FDA • Bl (09108)
+PRE."VIOUS EOl710N OOSOL'!TE
+INSPECTIONAL OBSERVATIONS
+Page 6 OF 13
+
+DEPARTMENTOF HEALTH ANO HUMAN SERVICES
+FOOD AND DRUG A OM INISTRA TION
+10903 New Hampshire Avenue; White Oak Building 51/Room 2269
+Silver Spring. MD 20993-0002
+N AM€ ANO T rLE OF ND'VIOU"'-l ro W""i)M RED()RT 1$SIJEI)
+Chief Executive Officer
+Examplefirm HF.
+CITY, STATf . ZIPCOOE. COUNTRY
+STRHT AOORESS
+Sampleway 15-19
+TVPE !::STABLISHMENT INSPECTED
+Exampletown, Iceland
+Drug Substance and Drug Product Manufacturer
+OA l:::(St OF INSPECTION
+06/26/2025 -07/04/2025
+C£1NUMBER
+3000000001
+C. Aseptic personnel qualification does not require the inclusion of all critical interventions during
+aseptic process simulation (media fill). No evaluation was conducted to verify that each certified
+operator performed the interventions during a media fill.
+D. Your firm lacks adequate assurance that critical process equipment used for sterile drug
+product manufacture is maintained in a validated state.
+Observation 5
+Written records of unexplained discrepancies do not always contain a thorough investigation.
+Specifically,
+A. You implemented a quality system update for management of laboratory events and deviation
+records are no longer opened for unplanned departures from specification.

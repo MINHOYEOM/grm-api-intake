@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T12:07:14Z",
+ "generated_at": "2026-11-26T12:43:45Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45815598597,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-26T12:00:15Z",
-    "updatedAt": "2026-11-26T12:00:19Z",
-    "headBranch": "codex/daily-reconcile-ledger",
-    "displayTitle": "feat(recon): 매일 대조 장부 1단계 (draft)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45815598597"
-   },
-   {
-    "databaseId": 45815592828,
+    "databaseId": 45822024133,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-26T12:00:13Z",
-    "updatedAt": "2026-11-26T12:00:17Z",
-    "headBranch": "codex/daily-reconcile-ledger",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/daily-reconcile…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45815592828"
+    "createdAt": "2026-11-26T12:41:35Z",
+    "updatedAt": "2026-11-26T12:41:39Z",
+    "headBranch": "codex/mhra-body-refetch",
+    "displayTitle": "Merge origin/main",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45822024133"
    },
    {
-    "databaseId": 45815253161,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45821907716,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-26T11:57:52Z",
-    "updatedAt": "2026-11-26T12:06:40Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #2002 from MINHOYEOM/claude/translation-queue-inde…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45815253161"
+    "createdAt": "2026-11-26T12:40:50Z",
+    "updatedAt": "2026-11-26T12:40:53Z",
+    "headBranch": "codex/automation-pr-stall",
+    "displayTitle": "Merge origin/main",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45821907716"
    },
    {
-    "databaseId": 45811410971,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45821763127,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-26T11:31:48Z",
-    "updatedAt": "2026-11-26T11:39:30Z",
+    "createdAt": "2026-11-26T12:39:56Z",
+    "updatedAt": "2026-11-26T12:39:59Z",
     "headBranch": "codex/ema-relevance-apply",
-    "displayTitle": "feat(EMA): 관련도 반영 수동 워크플로 + 판정 69건 입력 (apply 기본 false)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45811410971"
+    "displayTitle": "Merge origin/main",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45821763127"
    },
    {
-    "databaseId": 45808808621,
+    "databaseId": 45820973581,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-26T11:14:45Z",
-    "updatedAt": "2026-11-26T11:23:08Z",
-    "headBranch": "codex/collect-cap-health",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/collect-cap-health",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45808808621"
+    "createdAt": "2026-11-26T12:34:51Z",
+    "updatedAt": "2026-11-26T12:43:07Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1910 from MINHOYEOM/codex/daily-reconcile-ledger",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45820973581"
+   },
+   {
+    "databaseId": 45817143475,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-26T12:10:11Z",
+    "updatedAt": "2026-11-26T12:24:34Z",
+    "headBranch": "claude/glossary-fig-daily-20261126-2106",
+    "displayTitle": "glossary(fig): 2026-11-26 새 그림 0 · 다시 그림 0 · 보류 5 — 위험 통제·위험 감소·위험 허용·위험 소통·위험 검토",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45817143475"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45822275689,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T12:43:11Z",
+    "updatedAt": "2026-11-26T12:43:28Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45822275689"
+   },
+   {
     "databaseId": 45816610528,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45762950215"
-   },
-   {
-    "databaseId": 45755029448,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T04:24:44Z",
-    "updatedAt": "2026-11-26T04:24:57Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45755029448"
    }
   ],
   "grm-findings-translate-apply.yml": [

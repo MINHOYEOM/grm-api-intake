@@ -80,6 +80,7 @@ def scan(root: Path = ROOT) -> Counter:
 #   display    = 사이트용 파생 스냅샷(원본은 DB 에 그대로)
 #   excerpt    = 의도된 짧은 발췌 — 같은 문서의 전문이 다른 칸에 무절단으로 저장된다(전문 칸 이름을 이유에 적는다)
 ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
+    ('backfill_mhra_alert_body.py', r'preview = json.dumps(body[:200], ensure_ascii=False).replace("|", r"\|")'): ('diagnostic', '전후 비교 표의 표시용 200자 표본'),
     ('backfill_wl_truncation_restore.py', 'DEFAULT_MAX_OLD_CHARS = 500'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('backfill_wl_truncation_restore.py', 'max_old_chars: int = DEFAULT_MAX_OLD_CHARS'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('backfill_wl_truncation_restore.py', 'max_old_chars: int = DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),

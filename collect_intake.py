@@ -2418,14 +2418,11 @@ def _govuk_content_api_url(page_url: str) -> str:
     return f"{_GOVUK_CONTENT_API}/{path}" if path else ""
 
 
-def _fetch_mhra_alert_body(page_url: str) -> str:
-    """gov.uk Content API 에서 알림 본문(`details.body`) 텍스트를 뽑는다. 실패는 ""(graceful).
-
-    HTML 태그만 걷어내고 **문장은 손대지 않는다** — 상세 블록이 원문 verbatim 이어야
-    카드가 근거를 보여줄 수 있다(생성 0)."""
+def _read_mhra_alert_body(page_url: str) -> tuple[str, str]:
+    """gov.uk Content API의 전문 텍스트와 실패 사유를 반환한다."""
     api = _govuk_content_api_url(page_url)
     if not api:
-        return ""
+        return "", "잘못된 gov.uk URL"
     try:
         resp = requests.get(api, timeout=MHRA_ALERT_BODY_TIMEOUT, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
@@ -2433,15 +2430,28 @@ def _fetch_mhra_alert_body(page_url: str) -> str:
         })
         resp.raise_for_status()
         payload = resp.json()
-    except (requests.RequestException, ValueError) as e:  # noqa: BLE001
-        log("WARN", f"MHRA 알림 본문 fetch 실패(카드 그대로): {truncate(str(e), 120)}")
-        return ""
-    body = ((payload.get("details") or {}).get("body") or "") if isinstance(payload, dict) else ""
+    except (requests.RequestException, ValueError) as exc:
+        return "", f"Content API 조회 실패 ({type(exc).__name__})"
+    details = payload.get("details") if isinstance(payload, dict) else None
+    if not isinstance(details, dict):
+        return "", "Content API 응답에 details 객체 없음"
+    body = details.get("body")
+    if body is None:
+        return "", "본문 비어 있음"
+    if not isinstance(body, str):
+        return "", "Content API 본문 형식 오류"
     text = _html_unescape(_MHRA_BODY_TAG_RE.sub(" ", body))
     text = " ".join(text.split())
-    if not text:
-        log("INFO", f"MHRA 알림 본문 비어 있음 — 카드 그대로: {truncate(page_url, 80)}")
-    return text  # [2026-11-10] 저장 단계 무절단 — 표시 단계에서만 줄인다
+    return text, "" if text else "본문 비어 있음"
+
+
+def _fetch_mhra_alert_body(page_url: str) -> str:
+    """일일 수집기에 전문 텍스트를 반환한다. 실패 시 빈 문자열을 반환한다."""
+    text, reason = _read_mhra_alert_body(page_url)
+    if reason:
+        level = "INFO" if reason == "본문 비어 있음" else "WARN"
+        log(level, f"MHRA 알림 {reason} — 카드 그대로: {truncate(page_url, 80)}")
+    return text
 
 
 def collect_mhra_alerts(start: date, end: date) -> tuple[list[IntakeItem], str | None]:

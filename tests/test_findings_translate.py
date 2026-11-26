@@ -1323,5 +1323,42 @@ class SqliteSourceRegressionTest(unittest.TestCase):
         self.assertEqual(rc, 2)
 
 
+class RpcTiming1126Test(unittest.TestCase):
+    """★11-26: 번역 큐 RPC 가 anon 3초 벽에서 두 번 끊겼다(170 이 고침). 넘기 전에 알리는 계측을 고정한다."""
+
+    def setUp(self):
+        translate.RPC_MS.clear()
+
+    def test_records_ms_and_warns_past_half_of_anon_timeout(self):
+        import io
+        from contextlib import redirect_stderr
+        err = io.StringIO()
+        with mock.patch.object(translate.requests, "post", return_value=_FakeResponse(200, {"items": []})),                 mock.patch.object(translate.time, "monotonic", side_effect=[0.0, 1.6]), redirect_stderr(err):
+            status, _data, _h, e = translate._supabase_post_rpc(_SB_URL, _SB_KEY, "findings_translation_queue", {})
+        self.assertEqual((status, e), (200, ""))
+        self.assertEqual(translate.RPC_MS["findings_translation_queue"], 1600)
+        self.assertIn("::warning", err.getvalue())
+
+    def test_fast_call_is_quiet(self):
+        import io
+        from contextlib import redirect_stderr
+        err = io.StringIO()
+        with mock.patch.object(translate.requests, "post", return_value=_FakeResponse(200, {"items": []})),                 mock.patch.object(translate.time, "monotonic", side_effect=[0.0, 0.2]), redirect_stderr(err):
+            translate._supabase_post_rpc(_SB_URL, _SB_KEY, "findings_translation_queue", {})
+        self.assertEqual(translate.RPC_MS["findings_translation_queue"], 200)
+        self.assertEqual(err.getvalue(), "")
+
+    def test_500_carries_postgrest_timeout_code_without_message(self):
+        body = {"code": "57014", "message": "canceling statement due to statement timeout"}
+        with mock.patch.object(translate.requests, "post",
+                               side_effect=[_FakeResponse(500, body), _FakeResponse(500, body)]):
+            status, data, _h, e = translate._supabase_post_rpc(_SB_URL, _SB_KEY, "findings_translation_queue", {})
+        self.assertEqual((status, data), (500, None))
+        self.assertIn("http_500 code=57014", e)
+        self.assertIn("statement_timeout 3s", e)
+        self.assertNotIn("canceling", e)
+        self.assertNotIn(_SB_KEY, e)
+
+
 if __name__ == "__main__":
     unittest.main()

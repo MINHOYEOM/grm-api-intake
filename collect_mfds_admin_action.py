@@ -52,6 +52,7 @@ REGION_MFDS = "Korea (MFDS)"
 PAGE_SIZE = 100
 MAX_PAGES = 20
 TOTAL_COUNT_WARNING_THRESHOLD = 1_500
+GRM_PROBLEM_PREFIX = "[GRM 문제]"
 
 # [백필 관측 2026-08-05] recall 과 동형 — 페이지 실패는 1건이라도 수집했으면
 # `(items, None)` 으로 조용히 부분 성공한다. 반환값 규약(매일 라인)은 그대로 두고
@@ -86,13 +87,16 @@ def _set_last_health(
     truncated: bool,
     filtered: int,
     page_warnings: list[str],
+    window_count: int = 0,
+    duplicate_count: int = 0,
+    raw_count: int = 0,
     order_check: str = "",
 ) -> None:
     global LAST_HEALTH
     total_count_warning = ""
     if total_count > TOTAL_COUNT_WARNING_THRESHOLD:
         total_count_warning = (
-            f"[GRM 문제] 식약처 행정처분 원천 총건수 {total_count:,}건 "
+            f"{GRM_PROBLEM_PREFIX} 식약처 행정처분 원천 총건수 {total_count:,}건 "
             f"— 경보 기준 {TOTAL_COUNT_WARNING_THRESHOLD:,}건 초과 "
             f"(수집 상한 {MAX_PAGES * PAGE_SIZE:,}건)"
         )
@@ -105,6 +109,10 @@ def _set_last_health(
         "truncated": truncated,
         "filtered": filtered,
         "page_warnings": list(page_warnings),
+        "window_count": window_count,
+        "excluded_count": filtered,
+        "duplicate_count": duplicate_count,
+        "raw_count": raw_count,
         "order_check": order_check,
     }
 
@@ -409,6 +417,7 @@ def collect_mfds_admin_actions(
     tier3_count = 0
     tier2_count = 0
     filtered_count = 0
+    window_count = duplicate_count = raw_count = 0
     pages_seen = 0
     page_edges: list[tuple[str, str]] = []
     _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
@@ -420,17 +429,20 @@ def collect_mfds_admin_actions(
     try:
         for raw_items, masked_url in paginator:
             pages_seen += 1
+            raw_count += len(raw_items)
             page_dates = [d for d in (_item_date(r) for r in raw_items) if d]
             page_edges.append((page_dates[0], page_dates[-1]) if page_dates else ("", ""))
             for raw in raw_items:
                 date_iso = _item_date(raw)
                 if not _within_window(date_iso, start, end):
                     continue
+                window_count += 1
                 item = _to_item(raw, masked_url)
                 if item is None:
                     filtered_count += 1
                     continue
                 if item.document_id in seen_ids:
+                    duplicate_count += 1
                     continue
                 seen_ids.add(item.document_id)
                 items.append(item)
@@ -444,11 +456,13 @@ def collect_mfds_admin_actions(
             log("WARN", msg)
             _set_last_health(collected=len(items), total_count=paginator.total_count,
                              pages_seen=pages_seen, truncated=False,
-                             filtered=filtered_count, page_warnings=[msg])
+                             filtered=filtered_count, page_warnings=[msg], window_count=window_count,
+                             duplicate_count=duplicate_count, raw_count=raw_count)
             return items, None
         _set_last_health(collected=0, total_count=paginator.total_count,
                          pages_seen=pages_seen, truncated=False,
-                         filtered=filtered_count, page_warnings=[msg])
+                         filtered=filtered_count, page_warnings=[msg], window_count=window_count,
+                         duplicate_count=duplicate_count, raw_count=raw_count)
         return [], msg
 
     total_count = paginator.total_count
@@ -477,5 +491,7 @@ def collect_mfds_admin_actions(
                     f"쪽 {pages_seen})")
     _set_last_health(collected=len(items), total_count=total_count,
                      pages_seen=pages_seen, truncated=bool(paginator.truncated),
-                     filtered=filtered_count, page_warnings=[], order_check=order_check)
+                     filtered=filtered_count, page_warnings=[], window_count=window_count,
+                     duplicate_count=duplicate_count, raw_count=raw_count,
+                     order_check=order_check)
     return items, truncated_msg

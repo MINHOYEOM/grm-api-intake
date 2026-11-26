@@ -415,6 +415,7 @@ def run_monitor(
     report: dict[str, Any] = {
         "checked_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "status": "ok",
+        "backlog_checked": False,
         "totals": {"findings": 0, "public_findings": 0},
         "untranslated_gap": 0,
         "needs_review": 0,
@@ -449,12 +450,26 @@ def run_monitor(
         report["errors"].append("findings_stats returned a non-object payload")
         return report
 
+    totals = data.get("totals")
+    review = data.get("by_review_status")
+    if (not isinstance(totals, dict)
+            or any(type(totals.get(key)) is not int or totals[key] < 0
+                   for key in ("findings", "public_findings"))
+            or totals["public_findings"] > totals["findings"]
+            or not isinstance(review, list)
+            or any(not isinstance(row, dict) or not isinstance(row.get("review_status"), str)
+                   or type(row.get("cnt")) is not int or row["cnt"] < 0 for row in review)):
+        report["status"] = "error"
+        report["errors"].append("findings_stats returned invalid backlog counts")
+        return report
+
     evaluated = evaluate_backlog(
         data,
         gap_threshold=gap_threshold,
         needs_review_threshold=needs_review_threshold,
     )
     report.update(evaluated)
+    report["backlog_checked"] = True
     report.setdefault("errors", [])
     report["rpc_ms"] = timings
     report["thresholds"] = {
@@ -536,8 +551,11 @@ def _write_report(path: str | None, report: dict[str, Any]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = argparse.ArgumentParser(
         description="FIND-1 findings 백로그 모니터 — 미번역 격차·검수 백로그 임계 감시"
         "(READ ONLY; findings write·git write 없음). 임계 초과 시 exit 1(red)."

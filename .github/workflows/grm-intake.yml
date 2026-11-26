@@ -608,18 +608,22 @@ jobs:
             let health;
             try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); }
             catch (error) { console.log(`health JSON parse failed: ${error}`); return; }
-            const warnings = health?.health?.warnings || [];
+            const warnings = health?.health?.warnings;
+            if (!Array.isArray(warnings)) {
+              console.log('health JSON has no warnings array; skipping issue reconciliation');
+              return;
+            }
             const title = 'GRM Intake 운영 경고';
             async function ensureLabel(name, color, description) {
               try { await github.rest.issues.getLabel({ owner, repo, name }); }
               catch (error) { if (error.status !== 404) throw error; await github.rest.issues.createLabel({ owner, repo, name, color, description }); }
             }
-            await ensureLabel('grm-intake', '0e8a16', 'GRM intake automation');
-            await ensureLabel('automation-warning', 'fbca04', 'GRM automation warning');
-            const { data: issues } = await github.rest.issues.listForRepo({
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
               owner, repo, state: 'open', labels: 'automation-warning', per_page: 100,
             });
-            const existing = issues.find((issue) => issue.title === title);
+            const matches = issues.filter(issue => !issue.pull_request && issue.title === title)
+              .sort((a, b) => a.number - b.number);
+            const existing = matches[0];
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
             // 오늘 = 파이프라인의 하루(KST). 형식이 깨졌으면 UTC 날짜로 폴백한다.
@@ -657,12 +661,12 @@ jobs:
               return Math.max(1, Math.round((b - a) / 86400000) + 1);
             }
 
-            // ── (A) 경고 0 → 해소 처리(직전에 상태가 있던 이슈만 1회 코멘트 후 close) ──
+            // ── (A) 경고 0 → 일치하는 열린 이슈를 닫고 각각 한 번 코멘트 ──
             if (!warnings.length) {
-              if (existing) {
-                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+              for (const issue of matches) {
+                await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed' });
+                await github.rest.issues.createComment({ owner, repo, issue_number: issue.number,
                   body: '✅ 최신 scheduled run 에서 경고가 모두 해소되었습니다. 이슈를 닫습니다.' });
-                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
               }
               console.log('no warnings; nothing to alert');
               return;
@@ -714,6 +718,8 @@ jobs:
 
             // ── (B) 최초 발생 → 이슈 생성(=1회 알림) ────────────────────────────────
             if (!existing) {
+              await ensureLabel('grm-intake', '0e8a16', 'GRM intake automation');
+              await ensureLabel('automation-warning', 'fbca04', 'GRM automation warning');
               await github.rest.issues.create({ owner, repo, title, body: buildBody(),
                 labels: ['grm-intake', 'automation-warning'], assignees: [owner] });
               console.log(`created warning issue (codes: ${codes.join(',')})`);

@@ -629,11 +629,14 @@ def _evaluate_health(
             "일부 항목 누락 가능성이 있어 수동 확인이 필요합니다.",
         )
     if enable_mfds_gmp_inspection and stats.mfds_gmp_inspection_manual_review:
+        unreadable = stats.mfds_gmp_inspection_unreadable_tables
+        other = stats.mfds_gmp_inspection_manual_review - unreadable
         health.add_warning(
             "gmp-attachment-manual-review",
             "MFDS GMP Inspection",
             f"GMP 실태조사 첨부 {stats.mfds_gmp_inspection_manual_review}건 수동 확인 필요",
-            f"parse_status={stats.mfds_gmp_inspection_parse_status}",
+            f"결함표 판독 불명 {unreadable}건 · 기타 첨부 수동 확인 {other}건 · "
+            f"전체 첨부 파싱 상태={stats.mfds_gmp_inspection_parse_status}",
         )
     for warning in stats.mfds_gmp_inspection_page_warnings:
         health.add_warning(

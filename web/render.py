@@ -1692,6 +1692,116 @@ def _glance_line(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any
     return ""
 
 
+# ── [브리프 첫 화면 2026-11-26 · 대표 결정] 이번 주 꼭 볼 5건 ──────────────────────────
+# 고르는 규칙은 이 함수 하나에만 둔다(시험: tests/test_brief_must_see.py). 매주 발행분에 그대로 적용된다.
+#   묶음 0 처분      — 경고서한, 식약처 행정처분 중 허가 취소
+#   묶음 1 식약처    — GMP 실사(지적 있는 것), 그 밖의 행정처분
+#   묶음 2 483       — 무균·데이터 신뢰성 지적 483, 관찰사항이 많은 순(나머지 묶음은 편집 순서 = 화면 순서)
+#   묶음 3 지침      — 여러 기관이 함께 낸 해석·지침이 먼저
+# 묶음마다 한 건씩 먼저 고르고, 남은 자리는 같은 순서로 다시 돈다. 한 기관은 최대 2건.
+# 한 줄 표(row) 카드와 회수는 고르지 않는다. 판정은 번역 전 원본 카드 값으로 한다(국·영 같은 5건).
+MUST_SEE_N = 5
+MUST_SEE_PER_AGENCY = 2
+_MUST_STERILE_DI_RE = re.compile(r"무균|데이터|원자료|허위|위조|재작성|환경 ?모니터링|청정|배지충전")
+_MUST_JOINT_RE = re.compile(r"harmoni[sz]ed|통일|공동|PIC/S", re.I)
+_MUST_GUIDE_TYPES = ("규제 소식", "지침·안내서", "Guidance", "고시·개정법령")
+
+
+def _must_see_key(card: dict[str, Any]) -> "tuple[int, int, int, int] | None":
+    """(묶음, 묶음 안 우선, -관찰 수(483만), 화면 순서) — 고르지 않는 카드면 None."""
+    if card.get("card_weight") == "row":
+        return None
+    ct = card.get("card_type") or ""
+    text = f"{card.get('headline_target') or ''} {card.get('title_issue') or ''} {card.get('hook_line') or ''}"
+    n = int((card.get("deterministic_detail") or {}).get("count") or 0)
+    order = card.get("render_order")
+    order = order if isinstance(order, int) else 10 ** 6
+    if ct == "Warning Letter":
+        return (0, 0, 0, order)
+    if ct == "행정처분":
+        return (0, 1, 0, order) if "취소" in text else (1, 1, 0, order)
+    if ct == "GMP실사":
+        return (1, 0, 0, order)
+    if card.get("type_tag") == "483" and _MUST_STERILE_DI_RE.search(text):
+        return (2, 0, -n, order)
+    if ct in _MUST_GUIDE_TYPES:
+        return (3, 0 if _MUST_JOINT_RE.search(text) else 1, 0, order)
+    return None
+
+
+def select_must_see(cards: list[dict[str, Any]], n: int = MUST_SEE_N,
+                    per_agency: int = MUST_SEE_PER_AGENCY) -> list[int]:
+    """이번 주 꼭 볼 카드의 위치(`cards` 안 index) — 묶음 순서대로 돌려준다."""
+    buckets: dict[int, list[tuple[tuple[int, int, int, int], int]]] = {0: [], 1: [], 2: [], 3: []}
+    for i, c in enumerate(cards):
+        k = _must_see_key(c)
+        if k is not None:
+            buckets[k[0]].append((k, i))
+    for b in buckets.values():
+        b.sort()
+    picked: dict[int, tuple[int, int, int, int]] = {}
+    per: dict[str, int] = {}
+
+    def take(b: int) -> bool:
+        for k, i in buckets[b]:
+            ag = cards[i].get("agency") or ""
+            if i in picked or per.get(ag, 0) >= per_agency:
+                continue
+            picked[i] = k
+            per[ag] = per.get(ag, 0) + 1
+            return True
+        return False
+
+    progress = True
+    while len(picked) < n and progress:
+        progress = False
+        for b in (0, 1, 2, 3):
+            if len(picked) < n and take(b):
+                progress = True
+    return sorted(picked, key=lambda i: picked[i])
+
+
+def build_must_see(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any]],
+                   tr: Translator = _KO) -> list[dict[str, Any]]:
+    """화면용 5칸 — `card_views` 는 `cards_raw` 와 같은 순서(언어별 문장은 뷰에서)."""
+    out = []
+    for i in select_must_see(cards_raw):
+        c, cv = cards_raw[i], card_views[i]
+        ag = c.get("agency") or ""
+        ag_t = tr(_AGENCY_DISPLAY[ag]) if ag in _AGENCY_DISPLAY else ag
+        ct = c.get("card_type") or ""
+        if ct == "Warning Letter":
+            label = tr("{a} 경고서한", a=ag_t)
+        elif ct == "행정처분":
+            label = tr("식약처 행정처분")
+        elif ct == "GMP실사":
+            label = tr("식약처 GMP 실사")
+        elif c.get("type_tag") == "483":
+            label = tr("{a} 483", a=ag_t)
+        else:
+            label = tr("{a} 지침·소식", a=ag_t)
+        out.append({
+            "anchor": cv["anchor"],
+            "label": label,
+            "tone": {"FDA": "fda", "MFDS": "mfds"}.get(ag, "etc"),
+            "firm": cv.get("headline_target") or "",
+            "issue": cv.get("title_issue") or "",
+            "why": cv.get("hook_line") or "",
+        })
+    return out
+
+
+def brief_agency_counts(cards_raw: list[dict[str, Any]], tr: Translator = _KO) -> list[dict[str, Any]]:
+    """목차 축약 — 기관별 카드 수(많은 순, 같으면 이름순)."""
+    cnt: dict[str, int] = {}
+    for c in cards_raw:
+        ag = c.get("agency") or ""
+        if ag:
+            cnt[ag] = cnt.get(ag, 0) + 1
+    return [{"name": tr(_AGENCY_DISPLAY[a]) if a in _AGENCY_DISPLAY else a, "n": v}
+            for a, v in sorted(cnt.items(), key=lambda kv: (-kv[1], kv[0]))]
+
+
 def build_brief_glance(sections: list[dict[str, Any]], card_views: list[dict[str, Any]],
                        cards_raw: list[dict[str, Any]], db: dict[str, dict[str, Any]],
                        tr: Translator = _KO) -> "dict[str, Any] | None":
@@ -8848,6 +8958,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             brief=ctx,
             sections=sections,
             glance=build_brief_glance(sections, card_views, cards_sorted, glance_db, tr),
+            must_see=build_must_see(card_views, cards_sorted, tr),
+            agency_counts=brief_agency_counts(cards_sorted, tr),
             card_weighted=any(cv.get("weight") for cv in card_views),
             lib_update_week=lib_update_week,
             json_ld=build_brief_article_json_ld(
@@ -8891,6 +9003,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 sections=(_en_sections := _build_sections(en_card_views, en_tr)),
                 glance=build_brief_glance(_en_sections, en_card_views, cards_sorted, glance_db,
                                           en_tr),
+                must_see=build_must_see(en_card_views, cards_sorted, en_tr),
+                agency_counts=brief_agency_counts(cards_sorted, en_tr),
                 card_weighted=any(cv.get("weight") for cv in en_card_views),
                 ko_only_names=count_ko_only_names(en_card_views),
                 # [다국어 2026-09-05] 한국어판과 **같은 창(window)** 을 영어 카탈로그로

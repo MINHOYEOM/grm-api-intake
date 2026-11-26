@@ -15,8 +15,10 @@ name: GRM Findings Translate Apply (M9b)
 #
 # ★outbox 누적 금지(2026-07-13 기아 장애): 적용 완료 배치가 outbox 에 수십 개 쌓이면
 # 매 실행 전량 재PATCH 가 timeout-minutes(10분)를 초과해 최신 배치가 영구 미반영된다.
-# 방어 2겹 — ①스크립트가 최신 파일 우선(역순) 처리 ②M9c 번역 세션이 새 배치 PR 에서
-# 직전 apply 성공이 확인된 기존 outbox 배치를 translations/applied/ 로 아카이브.
+# 방어 4겹 — ①스크립트가 최신 파일 우선(역순) 처리 ②M9c 번역 세션이 새 배치 PR 에서
+# 직전 apply 성공이 확인된 기존 outbox 배치를 translations/applied/ 로 아카이브
+# ③[11-26] 라이브 행을 50개씩 묶음 조회(항목마다 GET 하지 않는다) ④[11-26] 시간 예산 — 넘기 전에
+# 스스로 멈추고 incomplete·items_remaining 을 남긴 채 적색. 반영은 멱등이라 다음 실행이 이어 받는다.
 on:
   push:
     branches: [main]
@@ -35,7 +37,9 @@ jobs:
   apply:
     name: Apply queued translation outbox → Supabase
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # [11-26] 10분에 잘려 cancelled(보고서 없음·회색) — 스크립트가 먼저 18분 예산에서 스스로 멈추고
+    # 남은 수를 적은 보고서를 남긴 채 적색(exit 1)으로 끝나게, 잡 상한은 그보다 넉넉히 둔다.
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -67,7 +71,8 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          python findings_translate_apply_service.py --output apply_report.json
+          # 묶음 조회(50개씩 in.(…))·시간 예산 1,080초 — 넘기면 incomplete 로 적색, 다음 실행이 이어 받는다.
+          python findings_translate_apply_service.py --output apply_report.json --batch-size 50 --time-budget-seconds 1080
 
       - name: Write step summary
         if: always()

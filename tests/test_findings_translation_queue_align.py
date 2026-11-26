@@ -52,5 +52,35 @@ class TranslationQueueAlignTest(unittest.TestCase):
         self.assertIn("'finding_text'", self.code)
 
 
+class TranslationQueueUsesPartialIndex1126Test(unittest.TestCase):
+    """★11-26 170: 큐가 anon(3초 벽)에서 시간 초과 — `coalesce(finding_text_ko, '') = ''` 가 부분 인덱스
+    ops_findings_untranslated_idx 의 조건(`finding_text_ko = ''`)과 글자가 달라 findings 전 행을 두 번 훑었다.
+    **최신** 큐 정의의 조건이 인덱스 조건과 같은 글자여야 한다(파일명을 손으로 적지 않고 최신 정의를 찾는다)."""
+
+    _DEF = re.compile(r"create\s+or\s+replace\s+function\s+public\.findings_translation_queue\(", re.I)
+    _IDX = re.compile(r"create\s+index[^;]*ops_findings_untranslated_idx[^;]*?\swhere\s+([^;]*);",
+                      re.I | re.S)
+
+    def _latest_queue(self) -> str:
+        hits = [p for p in sorted(_MIGRATIONS_DIR.glob("*.sql"))
+                if self._DEF.search(_strip_sql_comments(p.read_text(encoding="utf-8")))]
+        self.assertTrue(hits)
+        return _strip_sql_comments(hits[-1].read_text(encoding="utf-8"))
+
+    def _index_predicate(self) -> str:
+        for p in sorted(_MIGRATIONS_DIR.glob("*.sql")):
+            m = self._IDX.search(_strip_sql_comments(p.read_text(encoding="utf-8")))
+            if m:
+                return m.group(1)
+        self.fail("ops_findings_untranslated_idx 정의를 못 찾았다")
+
+    def test_queue_predicate_matches_partial_index(self):
+        code = self._latest_queue()
+        self.assertNotIn("coalesce(finding_text_ko", code, "coalesce 를 두르면 부분 인덱스를 못 탄다")
+        self.assertIn("finding_text_ko = ''", self._index_predicate().replace("(", "").replace(")", ""))
+        self.assertEqual(code.count("where finding_text_ko = '' and scope_status = 'ok'"), 2,
+                         "count·items 두 where 절 모두 인덱스 조건 글자여야 한다")
+
+
 if __name__ == "__main__":
     unittest.main()

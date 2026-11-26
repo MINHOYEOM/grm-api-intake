@@ -77,6 +77,13 @@ from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 DEFAULT_TIMEOUT_SECONDS = fsa.DEFAULT_TIMEOUT_SECONDS
 _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
 _DEFAULT_PAGE_SIZE = 1000
+# ★raw_signals 는 행이 무겁다(raw_json text — 11-26 실측 1,000행 한 쪽이 9~11MB). 한 쪽을
+#   1,000행으로 받으면 PostgREST 가 authenticator statement_timeout 8s 안에 못 내 http_500 이 나고
+#   (11-26 findings-backfill dry 가 GET raw_signals 500 으로 아무것도 못 했다) 483 본문 복원으로
+#   계속 무거워진다. 쪽을 작게 나눈다 — 요청 수만 늘 뿐 결과는 같다.
+_RAW_SIGNALS_PAGE_SIZE = 200
+# 지목 문서(document_ids)는 전량을 받지 않고 그 문서만 in.(…) 으로 받는다(한 번에 이만큼).
+_RAW_SIGNALS_DOC_ID_CHUNK = 50
 
 
 @dataclass(frozen=True)
@@ -215,20 +222,40 @@ def _fetch_all_pages(
     return rows
 
 
+def _postgrest_in_list(values: list[str]) -> str:
+    """PostgREST `in.(…)` 값 목록 — 값마다 큰따옴표로 감싸 쉼표·괄호가 섞여도 깨지지 않게 한다."""
+    quoted = ['"' + v.replace("\\", "\\\\").replace('"', '\\"') + '"' for v in values]
+    return "in.(" + ",".join(quoted) + ")"
+
+
 def fetch_raw_signals(
     base_url: str,
     service_key: str,
     *,
-    page_size: int = _DEFAULT_PAGE_SIZE,
+    page_size: int = _RAW_SIGNALS_PAGE_SIZE,
+    document_ids: list[str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Fetch every raw_signals row (select=*), fully paginated. raw_json/
+    """Fetch raw_signals rows (select=*), fully paginated. raw_json/
     row_json come back as text (they're text columns) -- callers pass the
     row straight into findings_extractors.findings_from_raw_signal, which
     parses them internally via its own _json_object helper.
+
+    document_ids 를 주면 그 문서들만 받는다(document_id in.(…) 를 묶음으로). 주지 않으면 전량.
     """
     base = _normalize_base_url(base_url)
     if base is None:
         raise ValueError("findings_supabase_backfill: SUPABASE_URL must start with https://")
+    if document_ids:
+        ids = sorted({str(i) for i in document_ids if i})
+        rows: list[dict[str, Any]] = []
+        for start in range(0, len(ids), _RAW_SIGNALS_DOC_ID_CHUNK):
+            chunk = ids[start:start + _RAW_SIGNALS_DOC_ID_CHUNK]
+            rows.extend(_fetch_all_pages(
+                base, service_key, "raw_signals", select="*", page_size=page_size,
+                order="raw_signal_id.asc", extra_params={"document_id": _postgrest_in_list(chunk)},
+            ))
+        rows.sort(key=lambda r: str(r.get("raw_signal_id") or ""))
+        return rows
     return _fetch_all_pages(
         base, service_key, "raw_signals", select="*", page_size=page_size, order="raw_signal_id.asc",
     )
@@ -308,7 +335,10 @@ def run_backfill(
         return BackfillReport(errors=("SUPABASE_URL must start with https://",))
 
     try:
-        raw_signals = fetch_raw_signals(base, service_key)
+        if document_ids:
+            raw_signals = fetch_raw_signals(base, service_key, document_ids=list(document_ids))
+        else:
+            raw_signals = fetch_raw_signals(base, service_key)
         existing_ids = fetch_existing_finding_raw_ids(base, service_key)
     except (RuntimeError, ValueError) as exc:
         return BackfillReport(errors=(str(exc),))
@@ -880,6 +910,11 @@ def main(argv: list[str] | None = None) -> int:
     # are idempotent (a duplicate 409 is not an error) and nothing here is
     # destructive, so a follow-up run naturally retries anything transient.
     # The report is the source of truth for operators; CI is not gated on it.
+    # ★[11-26] 단, **읽기 자체가 실패해 아무 문서도 못 본 경우**는 실패로 끝낸다. 종전엔
+    #   GET raw_signals http_500 인데도 exit 0 이라 워크플로가 초록으로 끝났다 — 보고서를 열어
+    #   보기 전엔 "0건 추가"가 정상인지 고장인지 구분할 수 없었다.
+    if report.errors and report.raw_scanned == 0:
+        return 1
     return 0
 
 

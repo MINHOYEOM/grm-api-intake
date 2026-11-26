@@ -1,0 +1,74 @@
+[
+  {
+    "finding_id": "finding-e1143a0d009d905f5603a16c",
+    "finding_text": "Written documents are inadequate to ensure proper documentation of manufacturing operations.",
+    "finding_text_ko": "제조 작업을 적절하게 문서화하기 위해 마련한 서면 문서가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ae0dcf58ea941bacf5026bea",
+    "finding_text": "The statistical quality control criteria fail to include appropriate rejection levels.",
+    "finding_text_ko": "통계적 품질관리 기준에 적절한 불합격 판정 수준을 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-48c41094c83574faf1b26450",
+    "finding_text": "Equipment and utensils are not cleaned and maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "완제의약품의 안전성, 동일성, 함량, 품질 또는 순도를 변화시킬 수 있는 오염을 방지하도록 설비와 기구를 적절한 주기로 세척하고 유지관리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0f584d070da91a25f0a0d40f",
+    "finding_text": "Batch production and control records do not include the results of any investigation made into any unexplained discrepancy, whether or not the batch of drug product had already been distributed.",
+    "finding_text_ko": "해당 완제의약품 제조단위가 이미 유통되었는지와 관계없이, 제조단위별 제조 및 관리 기록에 원인이 밝혀지지 않은 불일치에 대해 실시한 조사 결과를 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-37630449944647763d6ee0b3",
+    "finding_text": "The written stability program for drug prodncts does not describe the storage conditions for samples retained for testing.",
+    "finding_text_ko": "완제의약품의 서면 안정성 프로그램에 시험용으로 보관한 검체의 보관 조건을 명시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-59e39e7663ad3979410a08fe",
+    "finding_text": "Batch production and control records do not include the identity ofindividual major equipment used for each batch ofdrug product produced.",
+    "finding_text_ko": "제조단위별 제조 및 관리 기록에 각 완제의약품 제조단위의 생산에 사용한 개별 주요 설비의 식별 정보를 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8ecf2efe4d3bf4484ed5ec19",
+    "finding_text": "Complete records shall be maintained for any testing and standardization of laboratory reference standards, reagents, and standard solntions.",
+    "finding_text_ko": "시험실 표준품, 시약 및 표준용액에 대해 실시하는 모든 시험과 표준화의 기록을 빠짐없이 보관해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a6dda7de4a2cd6782a52f6b8",
+    "finding_text": "Batch production and control records do not include the results ofany investigation made into any unexplained discrepancy, whether or not the batch of drug product had already been distributed.",
+    "finding_text_ko": "해당 완제의약품 제조단위가 이미 유통되었는지와 관계없이, 제조단위별 제조 및 관리 기록에 원인이 밝혀지지 않은 불일치에 대해 실시한 조사 결과를 포함하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4d05cc7fdcf3a6d4515d723",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room to produce aseptic conditions.",
+    "finding_text_ko": "무균공정(aseptic) 구역에서 무균 조건을 조성하기 위한 작업실 청소 및 소독 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dc836b8b8bbc4fbc238dd613",
+    "finding_text": "Investigations ofan unexplained discrepancy did not extend to other batches ofthe same drug product and other drug products that may have been associated with the specific failure or discrepancy.",
+    "finding_text_ko": "원인이 밝혀지지 않은 불일치를 조사하면서, 해당 실패 또는 불일치와 관련되었을 가능성이 있는 동일 완제의약품의 다른 제조단위와 다른 완제의약품까지 조사 범위를 확대하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f476eec79ddb7f1564c6d6e4",
+    "finding_text": "Written procedures are inadequate or do not provide adequate details to ensure product quality.",
+    "finding_text_ko": "제품 품질을 보장하기 위한 서면 절차가 미흡하거나 필요한 세부 사항을 충분히 명시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4205571bce527a4c28fec220",
+    "finding_text": "Records are not maintained so that data therein can be reviewed at least annually to evaluate the quality standards of each drug product to determine the need for changes in specifications or manufacturing or control procedures.",
+    "finding_text_ko": "각 완제의약품의 품질 기준을 평가하여 규격이나 제조 또는 관리 절차를 변경할 필요가 있는지 판단할 수 있도록, 기록에 포함된 데이터를 적어도 매년 한 차례 검토할 수 있는 상태로 기록을 유지하지 않았다.",
+    "translation_method": "llm_assisted"
+  }
+]

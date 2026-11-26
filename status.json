@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T08:22:53Z",
+ "generated_at": "2026-11-26T08:49:47Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45785204741,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T08:40:47Z",
+    "updatedAt": "2026-11-26T08:49:20Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1995 from MINHOYEOM/claude/extraction-gap-snapsho…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45785204741"
+   },
+   {
     "databaseId": 45781342736,
     "status": "completed",
     "conclusion": "success",
@@ -271,17 +282,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1990 from MINHOYEOM/claude/extraction-gap-rpc-tim…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45762120292"
-   },
-   {
-    "databaseId": 45756603682,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-26T04:39:32Z",
-    "updatedAt": "2026-11-26T04:47:17Z",
-    "headBranch": "claude/naver-blog-html-1126",
-    "displayTitle": "네이버 블로그 붙여넣기 쪽 + /admin/ 탭 (복사 단추 둘, 매주 자동)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45756603682"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45786424020,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T08:49:25Z",
+    "updatedAt": "2026-11-26T08:49:37Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45786424020"
+   },
+   {
     "databaseId": 45782606385,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45747516097"
-   },
-   {
-    "databaseId": 45739251484,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T01:58:05Z",
-    "updatedAt": "2026-11-26T01:58:18Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45739251484"
    }
   ],
   "grm-findings-translate-apply.yml": [
@@ -514,6 +514,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 45783637545,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-26T08:29:50Z",
+    "updatedAt": "2026-11-26T08:29:54Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45783637545"
+   },
+   {
     "databaseId": 45707416923,
     "status": "completed",
     "conclusion": "failure",
@@ -556,17 +567,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45370598411"
-   },
-   {
-    "databaseId": 45293346194,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-23T23:58:52Z",
-    "updatedAt": "2026-11-24T02:10:54Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45293346194"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [

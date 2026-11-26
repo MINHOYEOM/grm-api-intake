@@ -1720,6 +1720,43 @@ def _text_corruption_ratio(text: str) -> float:
     return bad / max(len(text), 1)
 
 
+# [11-26] 표제 **앞**에 쪽 머리말이 그대로 남은 꼴 — 판독이 라벨을 깨뜨려(`ESTABUSHMENT`·`FE/NUMBER`)
+# 머리말 청소(`gf.strip_fda483_page_header`)를 빠져나온 것(실측 69958 obs3~5·78684 obs11·18:
+# `08/19/2008 … FE/NUMBER … TYPE ESTABUSHMENT INSPECTED <시설 유형> <진짜 표제>`). 판정은 findings 가드와
+# **같은 함수**(findings_extractors._fda483_is_form_header_leak)이고, 마지막 머리말 라벨 뒤에서 시설 유형
+# 값을 건너뛴 **첫 문장 머리**(대문자 낱말 + 소문자 낱말 셋)부터를 표제로 쓴다. 확신이 없으면 그대로 둔다
+# (그러면 findings 가드가 막는다 — 지어내지 않는다).
+_SENTENCE_HEAD_RE = re.compile(r"(?<![A-Za-z])[A-Z][a-z]+(?:[ ,]+[a-z]{2,}){3}")
+
+
+def strip_leaked_header_prefix(deficiency: str, est_hint: str = "") -> str:
+    """혼입 표제에서 머리말 앞부분을 걷어낸 표제(순수 함수). 혼입이 아니거나 확신이 없으면 원본."""
+    import findings_extractors as fe
+    d = deficiency or ""
+    if not fe._fda483_is_form_header_leak(d):
+        return d
+    end = d.find(". ")
+    labels = [m for m in fe._FDA483_FORM_HEADER_LEAK_RE.finditer(d) if end == -1 or m.start() < end]
+    if not labels:
+        return d
+    rest = d[labels[-1].end():]
+    rest = re.sub(r"^[A-Z!|]*\s*", "", rest)          # 라벨 낱말 꼬리(`INSPEC|TED`)
+    hint = set(_est_words(est_hint))
+    m = None
+    for cand in _SENTENCE_HEAD_RE.finditer(rest):
+        head = _est_words(cand.group(0))[:2]
+        if hint and head and all(w in hint for w in head):
+            continue                                       # 시설 유형 값(`Manufacturer of sterile …`)
+        m = cand
+        break
+    if not m:
+        return d
+    out = rest[m.start():].strip()
+    if len(out) < 30 or fe._fda483_is_form_header_leak(out):
+        return d
+    return out
+
+
 def strip_leading_observation_noise(deficiency: str) -> str:
     """관찰 표제 앞에 붙은 OCR/양식 파편을 떼어낸다(순수 함수).
 
@@ -1781,14 +1818,43 @@ def _skip_pagebreak_block(chunk: str) -> str:
     m = _footer_cut(chunk or "")
     if not m or m.start() > _PAGEBREAK_FOOTER_HEAD:
         return chunk
+    lines = (chunk or "").splitlines(keepends=True)
     offset = 0
-    for line in (chunk or "").splitlines(keepends=True):
+    for i, line in enumerate(lines):
         stripped = line.strip()
         if (len(stripped) >= _PROSE_LINE_MIN_LEN
-                and sum(1 for c in stripped if c.islower()) >= _PROSE_LINE_MIN_LOWER):
+                and sum(1 for c in stripped if c.islower()) >= _PROSE_LINE_MIN_LOWER
+                and not _is_page_header_value_line(lines, i)):
             return chunk[offset:]
         offset += len(line)
     return chunk                # 경계 미확정 — 지어내지 않고 종전 동작을 유지한다
+
+
+# [11-26] 다음 쪽 머리말의 **값 줄**(수신인 `<이름>, Vice President of Fulfillment Operations`·
+# `10903 New Hampshire Avenue; White Oak Building 51, Room 2269 …`)도 길고 소문자가 많아 위 산문 기준을
+# 통과했다 — 표제가 머리말 값부터 시작해 `… CITY, STATE, ZIP CODE … TYPE ESTABLISHMENT INSPECTED …` 가
+# 표제로 저장됐다(실측 99355 obs2·175813 obs2·185443 obs11·193867 obs3, 11-26 backfill 유입 4행).
+# 머리말 값 줄은 **뒤 몇 줄 안에 양식 라벨이 또 온다**(값-라벨이 번갈아 찍힌다). 본문 첫 줄 뒤에는
+# 라벨이 오지 않는다 — 그 차이로 가른다. 줄 자체에 라벨이 있어도 값 줄이다.
+_HEADER_VALUE_LOOKAHEAD = 3
+
+
+def _is_page_header_value_line(lines: list[str], i: int) -> bool:
+    def _form(s: str) -> bool:
+        return bool(gf._FDA483_LABEL_RE.search(s) or _PAGE_HEADER_START_RE.search(s)
+                    or _PAGE_HEADER_END_RE.search(s))
+    if _form(lines[i]):
+        return True
+    seen = 0
+    for nxt in lines[i + 1:]:
+        if not nxt.strip():
+            continue
+        if _form(nxt):
+            return True
+        seen += 1
+        if seen >= _HEADER_VALUE_LOOKAHEAD:
+            break
+    return False
 
 
 def _clean_observation_chunk(chunk: str) -> str:
@@ -3165,6 +3231,7 @@ def _observations_from_anchors(
         # 남는다(실측: 신규 727건 중 23건이 정상 경로로 들어오면서 "| There is a failure…"
         # 형태로 저장됐다). 순수 접두 제거라 정상 표제에는 영향이 없다(내용 절단 상한 있음).
         deficiency = strip_leading_observation_noise(deficiency)
+        deficiency = strip_leaked_header_prefix(deficiency, hints.get("establishment_type", ""))
         # 건수 근거(`seen`)에는 gate 에서 빠질 표제도 넣는다 — 단, 서식 뒷면 안내문(`1. Pursuant
         # to Section 704(b)… 2. To assist firms…`)은 관찰이 아니므로 넣지 않는다(실측 196455:
         # 관찰 1~6 뒤에 안내문 1·2 가 붙어 번호가 1..6,1,2 가 됐다). 청소 전 구간 머리로 본다 —
@@ -3464,6 +3531,7 @@ def _single_unnumbered_observation(
     chunk = _LEADING_SECTION_HEADING_RE.sub("", chunk, count=1)
     deficiency, detail = _first_sentence(chunk)
     deficiency = strip_leading_observation_noise(deficiency)
+    deficiency = strip_leaked_header_prefix(deficiency, hints.get("establishment_type", ""))
     if len(deficiency) < FDA483_SINGLE_OBS_MIN_CHARS:
         return []
     if not _DEFICIENCY_CLAIM_RE.search(deficiency):

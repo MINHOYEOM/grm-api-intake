@@ -229,6 +229,35 @@ _FDA483_RETITLE_MIN_LEN = 30
 _FDA483_RETITLE_MIN_WORDS = 3
 
 
+# [11-26] 표제에 **쪽 머리말 양식 라벨**이 섞인 꼴 — 관찰 표제가 쪽 맨 아래에 걸려 다음 쪽 머리말
+# 값 줄(수신인·주소)부터 표제로 잡힌 것(실측 11-26 backfill 유입 4행: `<수신인 이름>, Vice President …
+# CITY, STATE, ZIP CODE, COUNTRY … TYPE ESTABLISHMENT INSPECTED …`). 수집기 쪽 원인은 고쳤지만
+# (collect_fda_483._is_page_header_value_line) 판독이 깨진 스캔·다른 쪽 순서로 다시 들어와도 findings 로
+# **공개되지 않게** 여기서 막는다. 라벨은 대문자 고정 — 산문 표제는 이 낱말을 대문자로 쓰지 않는다.
+# 깨진 판독(`ZIP COOE`·`ESTABUSHMENT`)도 받도록 낱말 머리만 본다.
+_FDA483_FORM_HEADER_LEAK_RE = re.compile(
+    r"(?-i:CITY,\s*STATE"
+    # 판독 깨짐(실측 69958): `1i'PE ESTAllUSHMENT`·`FE/NUMBER`·`FElNUMBER`·`FE NUMBER`·`STREET AOORESS`
+    r"|\S{0,2}[YP]PE\s+(?:OF\s+)?EST[A-Za-z!|]{4,10}\s+[I1l|]?NSPEC"
+    r"|NAME\s+AND\s+TITLE\s+OF\s+INDI"
+    r"|DISTRICT\s+(?:OFFICE\s+)?ADDRESS"
+    r"|STREET\s+A[DO0]{2}RESS"
+    r"|DATE\(S\)\s+OF\s+INSPECTION"
+    r"|\bFE[I1l/]?\s*NUMBER\b)")
+
+
+def _fda483_is_form_header_leak(deficiency: str) -> bool:
+    """머리말 라벨이 **첫 문장이 끝나기 전에** 나오면 혼입이다 — 머리말 블록은 표제 앞에 온다.
+    정상 표제 **뒤**에 붙은 쪽 꼬리 잡음(`… not established. AMENDMENT 1 EMPLOYEE(S) SIGNATURE`)은
+    진짜 관찰이라 여기서 지우지 않는다(서명란 낱말은 아예 보지 않는다)."""
+    d = deficiency or ""
+    m = _FDA483_FORM_HEADER_LEAK_RE.search(d)
+    if not m:
+        return False
+    end = d.find(". ")
+    return end == -1 or m.start() < end
+
+
 def _fda483_is_annotation(deficiency: str) -> bool:
     return bool(_FDA483_ANNOTATION_TITLE_RE.search(deficiency or ""))
 
@@ -461,6 +490,8 @@ def _fda_483_observation_rows(
         )
         if _fda483_is_annotation(deficiency):
             continue
+        if _fda483_is_form_header_leak(deficiency):
+            continue                     # 머리말 혼입 표제 — 공개하면 쓰레기다(수집기 수리 뒤의 마지막 그물)
         if _fda483_is_fragment_title(deficiency) and _FDA483_DATES_FOOTER_DETAIL_RE.search(detail):
             continue
         ordinal = _positive_int(observation.get("number"), default=index)

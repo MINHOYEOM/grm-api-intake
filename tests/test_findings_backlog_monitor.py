@@ -9,6 +9,7 @@ findings_backlog_monitor.requests.post 를 목킹한다(실 네트워크·실 Su
 
 from __future__ import annotations
 
+import datetime as _dt
 import unittest
 from unittest import mock
 
@@ -161,7 +162,8 @@ class RunMonitorTest(unittest.TestCase):
 
 
 def _gap(rows):
-    return {"generated_at": "2026-08-01T15:46:22Z",
+    # 169 부터 모니터가 generated_at 신선도를 본다 — 픽스처는 "방금 계산한" 스냅샷으로 둔다.
+    return {"generated_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "totals": {"sources": len(rows), "docs": sum(r["docs"] for r in rows),
                        "zero_findings": sum(r["zero_findings"] for r in rows)},
             "by_source": rows}
@@ -494,6 +496,156 @@ class CountryUnmappedWiringTest(unittest.TestCase):
         urls = [c.args[0] if c.args else c.kwargs["url"] for c in posted.call_args_list]
         self.assertEqual(len(urls), 3, "RPC 3개를 모두 불러야 한다")
         self.assertTrue(any(u.endswith("/rpc/findings_country_unmapped") for u in urls), urls)
+
+
+class RpcTimingGuard1126Test(unittest.TestCase):
+    """★11-26: extraction_gap_by_source() 가 문서 증가로 8s(statement_timeout)를 넘겨 http_500 →
+    감시 전체가 꺼졌다. 넘기 전에 알리는 장치(rpc-near-timeout)와 500 의 원인 코드를 고정한다."""
+
+    def _posts(self):
+        return [_FakePostResponse(200, _stats(100, 100)),
+                _FakePostResponse(200, _gap([_src("FDA 483", 2000, 1)])),
+                _FakePostResponse(200, [])]
+
+    def test_threshold_boundary(self):
+        self.assertEqual(mon.evaluate_rpc_timings({"a": 4000}, near_timeout_ms=4000), [])
+        b = mon.evaluate_rpc_timings({"a": 4001}, near_timeout_ms=4000)
+        self.assertEqual([x["code"] for x in b], ["rpc-near-timeout"])
+        self.assertEqual(b[0]["rpc"], "a")
+
+    def test_default_is_half_of_postgrest_timeout(self):
+        self.assertEqual(mon.DEFAULT_RPC_NEAR_TIMEOUT_MS * 2, mon.POSTGREST_STATEMENT_TIMEOUT_MS)
+
+    def test_slow_rpc_turns_report_red_and_records_ms(self):
+        # 호출마다 monotonic 두 번(시작·끝). 두 번째 RPC(추출 격차)만 5초 걸린다.
+        clock = [0.0, 0.1, 10.0, 15.0, 20.0, 20.2]
+        with mock.patch.object(mon.requests, "post", side_effect=self._posts()), \
+                mock.patch.object(mon.time, "monotonic", side_effect=clock):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "failure")
+        self.assertEqual(report["rpc_ms"]["extraction_gap_by_source"], 5000)
+        self.assertEqual(report["rpc_ms"]["findings_stats"], 100)
+        codes = [b["code"] for b in report["breaches"]]
+        self.assertEqual(codes, ["rpc-near-timeout"])
+        self.assertEqual(report["breaches"][0]["rpc"], "extraction_gap_by_source")
+
+    def test_fast_rpcs_stay_green(self):
+        clock = [0.0, 0.1, 1.0, 2.0, 3.0, 3.1]
+        with mock.patch.object(mon.requests, "post", side_effect=self._posts()), \
+                mock.patch.object(mon.time, "monotonic", side_effect=clock):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "ok", report["breaches"])
+        self.assertEqual(sorted(report["rpc_ms"]), sorted(
+            ["findings_stats", "extraction_gap_by_source", "findings_country_unmapped"]))
+
+    def test_500_reports_postgrest_timeout_code(self):
+        err = {"code": "57014", "message": "canceling statement due to statement timeout",
+               "details": None, "hint": None}
+        posts = [_FakePostResponse(200, _stats(100, 100)),
+                 _FakePostResponse(500, err), _FakePostResponse(500, err)]
+        with mock.patch.object(mon.requests, "post", side_effect=posts):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "error")
+        self.assertEqual(len(report["errors"]), 1)
+        self.assertIn("http_500 code=57014", report["errors"][0])
+        self.assertIn("statement_timeout", report["errors"][0])
+        self.assertNotIn("canceling", report["errors"][0], "본문 message 는 싣지 않는다")
+
+    def test_500_without_json_body_keeps_plain_status(self):
+        posts = [_FakePostResponse(200, _stats(100, 100)),
+                 _FakePostResponse(500), _FakePostResponse(500)]
+        with mock.patch.object(mon.requests, "post", side_effect=posts):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["errors"], ["extraction_gap_by_source RPC failed (http_500)"])
+
+
+class ExtractionGapNoUnguardedParse1126Test(unittest.TestCase):
+    """★11-26: 함수가 행마다 raw_json::jsonb 를 무조건 파싱하면 문서가 늘수록 선형으로 느려져
+    결국 8s 를 넘는다(095 = 웜 10.1s). 최신 정의에서 jsonb_each_text 는 **값싼 사전 판정
+    (case when … then exists) 뒤에서만** 불려야 하고, findings 탐침은 행마다가 아니라 한 번이어야 한다."""
+
+    _sql = ExtractionGapMigrationContractTest._sql
+
+    def test_every_jsonb_parse_is_behind_a_prefilter(self):
+        import re as _re
+        sql = self._sql()
+        body = sql.split("$$")[1]
+        lines = body.splitlines()
+        parses = [i for i, ln in enumerate(lines) if "jsonb_each_text(" in ln]
+        self.assertTrue(parses, "판정식이 사라졌다 — 095 와 같은 exists 판정이 있어야 한다")
+        for i in parses:
+            self.assertRegex(lines[i], r"^\s*then exists \(select 1 from jsonb_each_text\(",
+                             f"사전 판정 없이 파싱한다: {lines[i].strip()}")
+            self.assertTrue(_re.search(r"case when ", lines[i - 1]),
+                            f"바로 앞 줄이 case when 사전 판정이 아니다: {lines[i - 1].strip()}")
+
+    def test_findings_probe_is_not_per_row(self):
+        body = self._sql().split("$$")[1]
+        self.assertNotIn("exists (select 1 from public.findings f", body)
+        self.assertIn("select distinct f.raw_signal_id from public.findings f", body)
+
+
+class ExtractionGapSnapshot1126Test(unittest.TestCase):
+    """★11-26 169: 168 뒤에도 공유 인스턴스에서 같은 계산이 1~19s 로 흔들려(모니터 왕복 8,426ms)
+    계산을 요청 경로에서 뺐다 — pg_cron 이 6시간마다 rpc_snapshot 에 동결, RPC 는 읽기만.
+    cron 이 멈추면 RPC 는 빠르게 **낡은** 값을 준다 → generated_at 신선도를 모니터가 본다."""
+
+    _NOW = _dt.datetime(2026, 11, 26, 12, 0, 0, tzinfo=_dt.timezone.utc)
+
+    def test_fresh_snapshot_is_green(self):
+        self.assertEqual(mon.evaluate_snapshot_age(
+            {"generated_at": "2026-11-26T00:40:05Z"}, now=self._NOW, max_age_hours=24), [])
+
+    def test_stale_snapshot_is_red(self):
+        b = mon.evaluate_snapshot_age(
+            {"generated_at": "2026-11-25T11:00:00Z"}, now=self._NOW, max_age_hours=24)
+        self.assertEqual([x["code"] for x in b], ["extraction-gap-snapshot-stale"])
+        self.assertEqual(b[0]["value"], 25.0)
+
+    def test_missing_generated_at_is_red(self):
+        for bad in ({}, {"generated_at": None}, {"generated_at": "어제"}, None):
+            self.assertEqual([x["code"] for x in mon.evaluate_snapshot_age(bad, now=self._NOW)],
+                             ["extraction-gap-snapshot-stale"])
+
+    def test_run_monitor_turns_red_on_stale_snapshot(self):
+        gap = _gap([_src("FDA 483", 2000, 1)])
+        gap["generated_at"] = "2026-11-20T00:00:00Z"
+        posts = [_FakePostResponse(200, _stats(100, 100)), _FakePostResponse(200, gap),
+                 _FakePostResponse(200, [])]
+        with mock.patch.object(mon.requests, "post", side_effect=posts):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY, now=self._NOW)
+        self.assertEqual(report["status"], "failure")
+        self.assertEqual([b["code"] for b in report["breaches"]], ["extraction-gap-snapshot-stale"])
+        self.assertEqual(report["extraction_gap_generated_at"], "2026-11-20T00:00:00Z")
+
+    def _mig(self, name):
+        import os
+        d = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web", "migrations")
+        with open(os.path.join(d, name), encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_public_rpc_reads_snapshot_and_compute_is_preserved_by_rename(self):
+        sql = self._mig("169_extraction_gap_snapshot.sql")
+        self.assertIn("alter function public.extraction_gap_by_source() rename to "
+                      "extraction_gap_by_source_compute", sql, "본문은 복제하지 않고 rename 으로 보존")
+        body = sql.split("create function public.extraction_gap_by_source()", 1)[1].split("$$")[1]
+        self.assertIn("from public.rpc_snapshot s", body)
+        self.assertIn("s.rpc = 'extraction_gap_by_source'", body)
+        self.assertNotIn("jsonb_each_text", body, "공개 RPC 는 계산하지 않는다")
+        self.assertNotIn("refreshed_at", body, "낡았다고 폴백 계산하지 않는다 — 신선도는 모니터가 본다")
+
+    def test_refresh_is_scheduled_with_its_own_timeout_and_seeded(self):
+        sql = self._mig("169_extraction_gap_snapshot.sql")
+        self.assertRegex(sql, r"cron\.schedule\(\s*'grm-extraction-gap-snapshot'")
+        self.assertIn("set statement_timeout = '120s'; select public.extraction_gap_snapshot_refresh()", sql)
+        self.assertRegex(sql, r"\nselect public\.extraction_gap_snapshot_refresh\(\);")
+
+    def test_acl_closed_to_anon_and_authenticated(self):
+        sql = self._mig("169_extraction_gap_snapshot.sql")
+        for fn in ("extraction_gap_by_source_compute()", "extraction_gap_snapshot_refresh()"):
+            self.assertIn(f"revoke execute on function public.{fn} from public, anon, authenticated;", sql)
+        self.assertIn("revoke execute on function public.extraction_gap_by_source() from anon, authenticated;", sql)
+        self.assertIn("grant execute on function public.extraction_gap_by_source() to service_role;", sql)
 
 
 if __name__ == "__main__":

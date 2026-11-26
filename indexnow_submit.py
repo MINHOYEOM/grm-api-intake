@@ -16,13 +16,23 @@
 그래서 증분 제출에는 상한(--max-urls, 기본 MAX_INCREMENTAL)을 두고, 넘으면 아무것도 보내지 않는다
 (빙의 대량 제출 자제 권고). 정말 전수가 필요하면 사람이 --all 로 돌린다.
 
---previous 가 있으면 새 URL 또는 `<lastmod>` 가 바뀐 URL 만 보낸다. 제출 실패(4xx/5xx·네트워크)는
+--previous 가 있으면 새 URL 또는 `<lastmod>` 가 바뀐 URL 만 보낸다.
+
+[내용 비교 2026-11-26] `<lastmod>` 는 페이지 공개일이라 템플릿만 바뀐 배포(조항 페이지 '인용한 지적' 칸 등)는
+0건이었다(11-25~26 배포 16건 제출 0). 그래서 배포마다 페이지 본문 지문 목록(`indexnow-manifest.json`,
+dist 루트)을 함께 올리고, 다음 배포 때 라이브 목록과 비교해 **본문이 바뀐 URL 도** 보낸다
+(`--dist`·`--previous-manifest`). 지문은 자산 캐시 꼬리(`?v=…`)를 뺀 HTML 의 sha1 앞 12자다(빌드는
+결정론이라 데이터·템플릿이 그대로면 지문도 그대로). 합친 수가 상한을 넘으면 내용 비교분만 빼고
+lastmod 증분은 그대로 보낸다. 제출 실패(4xx/5xx·네트워크)는
 배포를 막지 않도록 경고만 남기고 exit 0 (`--strict` 일 때만 exit 1).
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
+import re
 import sys
 import time
 import xml.etree.ElementTree as ET
@@ -41,6 +51,9 @@ OK_STATUS = (200, 202)
 #: 증분 제출 1회 상한. 평시 증분은 수십~수백 건이고, 가장 큰 정상 증분(11-16 조항 원문 신설)이 약 2,900건
 #: 이었다. 구글용·전체 sitemap 을 섞어 비교하는 사고는 약 6천 건이라 이 선에서 막힌다.
 MAX_INCREMENTAL = 5000
+#: 배포마다 dist 루트에 올리는 본문 지문 목록 — 다음 배포가 라이브에서 받아 비교한다.
+MANIFEST_NAME = "indexnow-manifest.json"
+_VOLATILE_RE = re.compile(r"\?v=[0-9a-f]{6,}")
 
 
 def parse_sitemap(text: str) -> dict[str, str]:
@@ -67,6 +80,37 @@ def diff_urls(current: dict[str, str], previous: dict[str, str] | None) -> list[
     if previous is None:
         return list(current)
     return [u for u, m in current.items() if u not in previous or previous[u] != m]
+
+
+def page_digest(html: str) -> str:
+    """본문 지문 — 자산 캐시 꼬리(?v=…)를 뺀 HTML 의 sha1 앞 12자."""
+    return hashlib.sha1(_VOLATILE_RE.sub("", html).encode("utf-8")).hexdigest()[:12]
+
+
+def url_to_file(url: str, dist: str, host: str = HOST) -> str | None:
+    """https://host/a/b/ → dist/a/b/index.html (다른 호스트·디렉터리형 아님이면 None)."""
+    prefix = f"https://{host}/"
+    if not url.startswith(prefix) or not url.endswith("/"):
+        return None
+    rel = url[len(prefix):]
+    return os.path.join(dist, *[p for p in rel.split("/") if p], "index.html")
+
+
+def build_manifest(urls, dist: str) -> dict[str, str]:
+    """sitemap URL → 본문 지문(파일이 있는 것만). sitemap 에 없는 페이지(noindex 등)는 다루지 않는다."""
+    out: dict[str, str] = {}
+    for u in urls:
+        f = url_to_file(u, dist)
+        if f and os.path.isfile(f):
+            out[u] = page_digest(_read(f))
+    return out
+
+
+def diff_content(current: dict[str, str], previous: dict[str, str] | None) -> list[str]:
+    """양쪽에 다 있는데 지문이 달라진 URL(새 URL 은 sitemap 비교가 맡는다)."""
+    if not previous:
+        return []
+    return [u for u, d in current.items() if u in previous and previous[u] != d]
 
 
 def batches(urls: list[str], size: int = BATCH_SIZE):
@@ -136,9 +180,21 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--strict", action="store_true", help="실패 시 exit 1")
     ap.add_argument("--max-urls", type=int, default=MAX_INCREMENTAL,
                     help="증분 제출 상한 — 넘으면 보내지 않는다(--all 에는 적용 안 함)")
+    ap.add_argument("--dist", help="빌드 폴더 — 본문 지문을 잰다")
+    ap.add_argument("--write-manifest", help="본문 지문 목록을 이 경로에 쓰고 끝낸다(--dist 필요)")
+    ap.add_argument("--previous-manifest", help="배포 전 라이브 지문 목록 — 본문이 바뀐 URL 도 보낸다")
     args = ap.parse_args(argv)
 
     current = parse_sitemap(_read(args.sitemap))
+    if args.write_manifest:
+        if not args.dist:
+            print("::warning::--write-manifest 에는 --dist 가 필요")
+            return 1 if args.strict else 0
+        man = build_manifest(current, args.dist)
+        with open(args.write_manifest, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(man, f, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        print(f"IndexNow 지문 목록: {len(man)}건 → {args.write_manifest}")
+        return 0
     previous = None
     if not args.all and args.previous:
         try:
@@ -151,6 +207,21 @@ def main(argv: list[str] | None = None) -> int:
         return 1 if args.strict else 0
 
     urls = diff_urls(current, previous)
+    if previous is not None and args.dist and args.previous_manifest:
+        try:
+            prev_man = json.loads(_read(args.previous_manifest))
+        except (OSError, ValueError) as e:
+            print(f"::warning::이전 지문 목록 읽기 실패({e}) — 내용 비교 없이 진행")
+            prev_man = None
+        changed = diff_content(build_manifest(current, args.dist), prev_man)
+        seen = set(urls)
+        extra = [u for u in changed if u not in seen]
+        print(f"IndexNow: 본문이 바뀐 URL {len(changed)}건(lastmod 그대로인 것 {len(extra)}건)")
+        if len(urls) + len(extra) > args.max_urls:
+            print(f"::warning::내용 비교분 {len(extra)}건을 더하면 상한 {args.max_urls}건을 넘어 그 몫은 빼고 보낸다")
+        else:
+            order = {u: i for i, u in enumerate(current)}
+            urls = sorted(seen | set(extra), key=lambda u: order.get(u, 10 ** 9))
     print(f"IndexNow: sitemap {len(current)}건 중 제출 대상 {len(urls)}건")
     if previous is not None and len(urls) > args.max_urls:
         print(f"::warning::증분 {len(urls)}건이 상한 {args.max_urls}건을 넘어 제출하지 않음 — "

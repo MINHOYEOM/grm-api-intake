@@ -78,8 +78,8 @@
 {% endif %}
     </aside>
   </div>
-  {#- [구독 유입 2026-11-17 · 대표 지시] 본문 끝 줄형 구독 칸 — newsletter 게이트 안(env-off 출력 0). -#}
-  {%- with sub_kind='library', sub_slot='end', sub_wrap=True %}{% include "partials/sub_inline.html" %}{% endwith +%}
+  {#- [구독 권유 정리 2026-11-26] 본문 끝 줄형 구독 칸은 뺐다 — 바로 아래 하단 밴드와 같은 자리였다(한 화면 구독 칸 하나 + 팝업 하나). 아래 set 은 줄바꿈 처리를 종전과 같게 두는 자리표시다. -#}
+  {%- set _sub_end = none +%}
 </main>
 <style>
 /* [자료실] 허브 — grm.css 토큰만 사용(프리즈 보존). 카탈로그 카드 그리드.

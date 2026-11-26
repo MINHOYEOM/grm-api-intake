@@ -71,3 +71,12 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
 
 ## 금지
 Supabase 직접 쓰기(커넥터 포함) · 코드 수정(`grm_findings.py`·`findings_extractors.py`·`findings_translate.py` 등) · 검증 우회 · `main` push·머지.
+
+## 483 상세 재번역(stale) 원문 — 이 작업의 절차 밖, 번역팀이 일괄로
+483 상세(`detail_text`)가 소급 수리로 바뀌어 국문(`detail_text_ko`)이 낡은 행은 이 일일 작업이 번역하지 않는다.
+원문은 서비스 키가 있어야 읽히므로, 매일 06:30 KST `grm-findings-detail-stale-monitor.yml` 이 stale 행이 있을 때
+재번역 원문 묶음(`R/R-*.json`, `findings_detail_export.py --mode stale` 과 같은 함수)을 아티팩트로 올린다(보관 7일).
+- 받기: `gh run list --workflow grm-findings-detail-stale-monitor.yml -L 1` 로 run 번호를 찾고
+  `gh run download <run> -n findings-detail-stale-<YYYY-MM-DD> -D <폴더>`. 아티팩트가 없으면 그날 stale 0 이다.
+- 번역은 `docs/specs/483_detail_translation_brief.md` 규칙대로 같은 파일에 `detail_text_ko` 를 더해
+  `translations/detail_outbox/<같은 파일 이름>` 으로 낸다(원문·md5 는 고치지 않는다).

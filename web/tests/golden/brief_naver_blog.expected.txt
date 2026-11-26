@@ -1,0 +1,26 @@
+제목: FDA 483 해설 | Pharmaneek Inc — 위험의약품 교차오염 방지 미흡
+
+발행일 2026-06-22 · 실사일 04/08/2026 · 시설 유형 Producer of Non Sterile Drug Products
+
+FDA가 Pharmaneek Inc(FEI 3014484244, Indiana) 비무균 완제의약품 제조소 실사에서 위험의약품(hazardous drugs) 취급 시 교차오염 방지를 위한 격리·세척 미흡을 관찰(FDA Form 483)했다.
+
+FDA가 적은 관찰사항
+- 지적: 위험의약품 취급 시 격리·작업면·기구·인원 오염방지 조치 미흡
+- 시설 유형: Producer of Non Sterile Drug Products
+- 실사일: 2026-04-08
+
+함께 적힌 내용
+FDA가 비무균 제조소의 위험의약품(HD) 교차오염 방지 체계를 직접 지적한 것은, HD 관련 CGMP 집행이 격리 기준서·세척 검증 수준까지 구체화하고 있음을 보여준다. 위험의약품을 취급하는 비무균 제조소는 HD 격리·세척 SOPs 및 인원 보호 절차를 점검해야 한다.
+
+우리 현장에서 확인할 것
+- 위험의약품 격리·세척 기준서(SOP) 및 이행 기록 적정성
+- HD 취급 인원 교차오염 방지 교육 현황
+
+원문과 더 보기
+- 483 원문과 지적 전체(한국어): https://grm-solutions.com/findings/doc/fda483-193232/
+- 이번 주 규제뉴스 전체: https://grm-solutions.com/briefs/2026-06-26/
+- 실사 지적을 매주 메일로 받기(무료): https://grm-solutions.com/#subscribe
+
+이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. 요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다.
+
+#FDA483 #GMP #제약품질 #실사대비 #GRM

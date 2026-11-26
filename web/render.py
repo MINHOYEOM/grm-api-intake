@@ -1802,6 +1802,68 @@ def brief_agency_counts(cards_raw: list[dict[str, Any]], tr: Translator = _KO) -
             for a, v in sorted(cnt.items(), key=lambda kv: (-kv[1], kv[0]))]
 
 
+# ── [네이버 블로그 원고 2026-11-26 · 대표 결정] 이번 주 483 한 건 해설 ──────────────────
+# 매 빌드가 briefs/{pub}/naver-blog.txt 로 낸다(share.txt 와 같은 자리·같은 규율 — sitemap 비등록).
+# 고르는 카드는 '이번 주 꼭 볼 5건'의 483 칸과 같다(select_must_see 를 그대로 부른다 — 규칙을 베끼지 않는다).
+# 문장은 발행된 카드 원문 그대로 옮긴다(새 문장을 짓지 않는다). 계정·게시는 대표가 한다.
+NAVER_BLOG_FILE = "naver-blog.txt"
+_BLOG_FACT_LABELS = ("발행일", "실사일", "시설 · 유형")
+
+
+def pick_blog_483(cards: list[dict[str, Any]]) -> "int | None":
+    """해설할 483 — 꼭 볼 5건의 483 칸, 없으면 관찰 수가 가장 많은 483(표 한 줄 카드 제외)."""
+    for i in select_must_see(cards):
+        if cards[i].get("type_tag") == "483":
+            return i
+    pool = [(-int((c.get("deterministic_detail") or {}).get("count") or 0),
+             c.get("render_order") if isinstance(c.get("render_order"), int) else 10 ** 6, i)
+            for i, c in enumerate(cards)
+            if c.get("type_tag") == "483" and c.get("card_weight") != "row"]
+    return min(pool)[2] if pool else None
+
+
+def build_naver_blog_483(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
+                         brief_url: str, title_dateform: str) -> str:
+    """블로그 원고(한국어 평문). `card_views` 는 `cards` 와 같은 순서(문서 링크만 뷰에서 쓴다)."""
+    home = _abs_url("")
+    i = pick_blog_483(cards)
+    if i is None:
+        return "\n".join([
+            f"[{title_dateform}] 이번 주에는 해설할 FDA 483 이 없습니다.", "",
+            f"이번 주 규제뉴스 전체: {brief_url}", ""])
+    c, cv = cards[i], card_views[i]
+    firm = c.get("headline_target") or ""
+    issue = c.get("title_issue") or ""
+    n = int((c.get("deterministic_detail") or {}).get("count") or 0)
+    facts = {f.get("label"): f.get("value") for f in (c.get("facts") or []) if isinstance(f, dict)}
+    lines = [f"제목: FDA 483 해설 | {firm} — {issue}", ""]
+    meta = [f"{k.replace(' · ', ' ')} {str(facts[k]).removesuffix(' · 483')}"
+            for k in _BLOG_FACT_LABELS if facts.get(k)]
+    if meta:
+        lines += [" · ".join(meta), ""]
+    if c.get("summary"):
+        lines += [c["summary"], ""]
+    if c.get("key_facts"):
+        lines.append(f"FDA가 적은 관찰사항{f' ({n}건 중 주요 내용)' if n else ''}")
+        lines += [f"- {k}" for k in c["key_facts"]]
+        lines.append("")
+    if c.get("implication"):
+        lines += ["함께 적힌 내용", c["implication"], ""]
+    if c.get("checks"):
+        lines.append("우리 현장에서 확인할 것")
+        lines += [f"- {k}" for k in c["checks"]]
+        lines.append("")
+    lines.append("원문과 더 보기")
+    if cv.get("doc_href"):
+        lines.append(f"- 483 원문과 지적 전체(한국어): {_abs_url(cv['doc_href'])}")
+    lines += [f"- 이번 주 규제뉴스 전체: {brief_url}",
+              f"- 실사 지적을 매주 메일로 받기(무료): {home}#subscribe", "",
+              "이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. "
+              "요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다.", "",
+              "#FDA483 #GMP #제약품질 #실사대비 #GRM", ""]
+    return "\n".join(lines)
+
+
 def build_brief_glance(sections: list[dict[str, Any]], card_views: list[dict[str, Any]],
                        cards_raw: list[dict[str, Any]], db: dict[str, dict[str, Any]],
                        tr: Translator = _KO) -> "dict[str, Any] | None":
@@ -8976,6 +9038,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         share_file = brief_page.file("share.txt")
         _write(out_dir / share_file, "\n".join(share_lines) + "\n")
         written.append(share_file)
+        # [네이버 블로그 원고 2026-11-26] 이번 주 483 한 건 해설 — 고정 경로, 매주 저절로.
+        blog_file = brief_page.file(NAVER_BLOG_FILE)
+        _write(out_dir / blog_file,
+               build_naver_blog_483(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"]))
+        written.append(blog_file)
 
         # [다국어 5단계 2026-09-04] 영문 브리프 — **서사 다섯과 tldr 이 전부 영어인 호만**
         # 낸다(반쪽 영어 금지). 오늘의 발행분에는 그 슬롯이 없으므로 아무 페이지도 나오지

@@ -187,7 +187,7 @@ class NoRegressionTest(unittest.TestCase):
         self.assertGreater(checked, 10)
 
     def test_formats_tuple_lists_new_formats(self):
-        self.assertEqual(ci.WL_VIOLATION_FORMATS[-2:], ("F5", "F6"))
+        self.assertEqual(ci.WL_VIOLATION_FORMATS[-3:], ("F5", "F6", "F7"))
 
     def test_out_of_scope_letters_never_reach_f5_f6(self):
         s = next(s for s in _load()["samples"] if s["expect_format"] == "F6")

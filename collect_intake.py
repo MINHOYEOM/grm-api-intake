@@ -2980,7 +2980,7 @@ WL_VIOLATIONS_SCOPE_STATUSES = (WL_VIOLATIONS_STATUS_OUT_OF_SCOPE, WL_VIOLATIONS
                                WL_VIOLATIONS_STATUS_NON_DRUG)
 WL_VIOLATIONS_STATUSES = (*WL_VIOLATIONS_SCOPE_STATUSES, WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED,
                           WL_VIOLATIONS_STATUS_UNSUPPORTED)
-WL_VIOLATION_FORMATS = ("F1", "F1b", "F2", "F3", "F3b", "F4", "F5", "F6")
+WL_VIOLATION_FORMATS = ("F1", "F1b", "F2", "F3", "F3b", "F4", "F5", "F6", "F7")
 
 
 def _wl_sentence_end(t: str, start: int, limit: int) -> int:
@@ -3235,13 +3235,48 @@ def _wl_violations_scope_reason(t: str, *, issuing_office: str = "") -> str:
     return ""
 
 
+_WL_GLP_CITE_RE = re.compile(r"\b(?:21\s+CFR|Section)\s+58\.\d+\b(?:\([0-9a-z]+\))*", re.I)
+_WL_GLP_CONTEXT_RE = re.compile(
+    r"\b(?:GLP(?!\s*[-‐‑–]?\s*[12](?!\d))|good\s+laboratory\s+practices?|21\s+CFR\s+Part\s+58)\b", re.I)
+_WL_GLP_DEFECT_RE = re.compile(r"\b(?:failed\s+to|did\s+not|failure\s+(?:to|of))\b", re.I)
+_WL_GLP_GUIDANCE_RE = re.compile(r"^(?:If|See|Refer|Please|Under)\b", re.I)
+
+
+def is_wl_glp(raw: dict[str, Any]) -> bool:
+    """제목·저장 본문의 GLP 용어/Part 58 인용으로 감사 대상을 찾는다."""
+    return any(_WL_GLP_CONTEXT_RE.search(value) or _WL_GLP_CITE_RE.search(value)
+               for value in (str(raw.get("subject") or ""), str(raw.get("wl_body_full") or "")))
+
+
+def _extract_wl_f7(t: str) -> list[dict[str, str]]:
+    """F7 — Part 58 인용과 결함 서술이 한 문장에 있는 GLP 위반."""
+    conclusion = _WL_CONCLUSION_RE.search(t)
+    end = conclusion.start() if conclusion else len(t)
+    if not _WL_GLP_CITE_RE.search(t, 0, end):
+        return []
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+    start = 0
+    heads = [(m.start(), m.end() - 1) for m in _WL_NUMBERED_HEAD_RE.finditer(t, 0, end)]
+    for stop, next_start in [*heads, (end, end)]:
+        for statement in _wl_sentences(t, start, stop):
+            cites = _WL_GLP_CITE_RE.findall(statement)
+            if (cites and _WL_GLP_DEFECT_RE.search(statement) and not _WL_GLP_GUIDANCE_RE.search(statement)
+                    and statement not in seen):
+                seen.add(statement)
+                out.append({"number": str(len(out) + 1), "statement": statement,
+                            "citation": " · ".join(dict.fromkeys(cites))})
+        start = next_start
+    return out
+
+
 def extract_wl_violations_detail(
     text: str, *, extended: bool = True, issuing_office: str = "",
 ) -> tuple[list[dict[str, str]], str]:
     """WL 본문 → (위반항목, 형식 또는 빈 사유). 일일 수집·과거분 백필·WL 복구·재추출이 모두 이 함수
     (`build_wl_item` 경유)를 부른다 — 경로마다 규칙이 갈라지는 일을 막는다.
 
-    형식(`WL_VIOLATION_FORMATS`): F1 → F1b → F2 → F3 → F3b → F4 → F5 → F6, 앞 형식이 빈 목록일 때만 다음을 시도.
+    형식(`WL_VIOLATION_FORMATS`): F1 → F1b → F2 → F3 → F3b → F4 → F5 → F6 → F7, 앞 형식이 빈 목록일 때만 다음을 시도.
     `extended=False`(관련도 Unrelated·담배센터)면 F1·F1b 만 — 비의약 서한에 법 조항 문장이 붙지 않게.
     빈 목록이면 두 번째 값이 사유(`WL_VIOLATIONS_STATUSES`), 본문 자체가 없으면 "".
     """
@@ -3274,6 +3309,9 @@ def extract_wl_violations_detail(
             rows = _extract_wl_f5(findings, dscsa_offset=True)
             if rows:
                 return rows, "F5"
+        rows = _extract_wl_f7(t)
+        if rows:
+            return rows, "F7"
     if _WL_BODY_HEAD_TRUNCATED_RE.match(t):
         return [], WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED
     scope_reason = _wl_violations_scope_reason(t, issuing_office=issuing_office)

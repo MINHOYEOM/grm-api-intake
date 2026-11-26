@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T02:01:36Z",
+ "generated_at": "2026-11-26T03:13:50Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,69 +229,69 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45738346760,
+    "databaseId": 45747336537,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-26T03:11:43Z",
+    "updatedAt": "2026-11-26T03:11:46Z",
+    "headBranch": "claude/desc-dup-noun-1126",
+    "displayTitle": "메타 설명: 덧붙일 문장 명사 겹침 건너뛰기 (용어사전)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45747336537"
+   },
+   {
+    "databaseId": 45747326777,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-26T03:11:37Z",
+    "updatedAt": "2026-11-26T03:11:41Z",
+    "headBranch": "claude/desc-dup-noun-1126",
+    "displayTitle": "메타 설명: 덧붙일 문장의 명사가 원래 설명에 있으면 건너뛴다 (용어사전 겹침)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45747326777"
+   },
+   {
+    "databaseId": 45746546352,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-26T01:49:38Z",
-    "updatedAt": "2026-11-26T01:58:02Z",
+    "createdAt": "2026-11-26T03:04:29Z",
+    "updatedAt": "2026-11-26T03:13:20Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1986 from MINHOYEOM/claude/naver-blog-483-1126",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45738346760"
+    "displayTitle": "Merge pull request #1987 from MINHOYEOM/claude/meta-desc-floor-1126",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45746546352"
    },
    {
-    "databaseId": 45731997061,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T00:53:56Z",
-    "updatedAt": "2026-11-26T01:02:10Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1984 from MINHOYEOM/claude/brief-must5-1126",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45731997061"
-   },
-   {
-    "databaseId": 45728946535,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T00:28:10Z",
-    "updatedAt": "2026-11-26T00:36:30Z",
-    "headBranch": "claude/meta-desc-floor-1126",
-    "displayTitle": "메타 설명 최소 길이: 짧은 설명(국 80자·영 110자 미만)에 묶음 한 문장을 덧붙인다",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728946535"
-   },
-   {
-    "databaseId": 45728891541,
+    "databaseId": 45742852697,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-26T00:27:41Z",
-    "updatedAt": "2026-11-26T00:35:27Z",
-    "headBranch": "claude/naver-blog-483-1126",
-    "displayTitle": "네이버 블로그 원고: 매주 '이번 주 483 한 건 해설' 자동 생성",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728891541"
+    "createdAt": "2026-11-26T02:30:17Z",
+    "updatedAt": "2026-11-26T02:39:04Z",
+    "headBranch": "claude/meta-desc-floor-1126",
+    "displayTitle": "메타 설명 최소 길이: 짧은 설명에 묶음 한 문장을 덧붙인다(빙 권고)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45742852697"
    },
    {
-    "databaseId": 45728884385,
+    "databaseId": 45742848761,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-26T00:27:37Z",
-    "updatedAt": "2026-11-26T00:35:31Z",
-    "headBranch": "claude/naver-blog-483-1126",
-    "displayTitle": "네이버 블로그 원고: 매주 '이번 주 483 한 건 해설'을 briefs/{pub}/naver-blog.txt 로",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728884385"
+    "createdAt": "2026-11-26T02:30:15Z",
+    "updatedAt": "2026-11-26T02:38:53Z",
+    "headBranch": "claude/meta-desc-floor-1126",
+    "displayTitle": "Merge origin/main into claude/meta-desc-floor-1126 — 영문 골든 5장 재동결",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45742848761"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 45739631289,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-26T02:01:29Z",
-    "updatedAt": "2026-11-26T02:01:33Z",
+    "updatedAt": "2026-11-26T02:01:40Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45739631289"
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45747516097,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T03:13:23Z",
+    "updatedAt": "2026-11-26T03:13:38Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45747516097"
+   },
+   {
     "databaseId": 45739251484,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45709466311"
-   },
-   {
-    "databaseId": 45695204244,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T20:27:54Z",
-    "updatedAt": "2026-11-25T20:28:09Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45695204244"
    }
   ],
   "grm-findings-translate-apply.yml": [

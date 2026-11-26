@@ -1,5 +1,5 @@
 -- ============================================================================
--- 169_extraction_gap_rpc_fast.sql — [운영 감시 복구] extraction_gap_by_source() 가
+-- 168_extraction_gap_rpc_fast.sql — [운영 감시 복구] extraction_gap_by_source() 가
 --   statement_timeout 8s 를 넘겨 http_500 을 내던 것을 고친다(판정·응답 키 불변).
 --
 -- ★무엇이 깨졌나(2026-11-26): Findings Backlog Monitor run 45748412092 가

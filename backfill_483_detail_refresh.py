@@ -423,8 +423,11 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]],
                 matched += 1
                 n = clean[0]
                 nd = str(n.get("detail") or "")
+                # 표제만 바로잡는 게 목적이다 — 새 상세가 비거나 옛 상세보다 줄면 옛 상세를 둔다
+                # (dry 실측 69958 obs5·78684 obs11: 다시 읽은 상세가 판독 깨짐으로 짧았다).
+                keep_old = not nd.strip() or shrinks_body(old_detail, nd)
                 out.append({**o, "deficiency": str(n["deficiency"]),
-                            "detail": nd if nd.strip() else tidy_old_detail(old_detail)})
+                            "detail": tidy_old_detail(old_detail) if keep_old else nd})
                 continue
         extended = [n for n in same_num if _extends_detail(old_detail, str(n.get("detail") or ""))]
         if len(extended) == 1:

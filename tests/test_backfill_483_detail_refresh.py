@@ -313,6 +313,20 @@ class HeaderLeakDuplicateNumbers1126Test(unittest.TestCase):
         self.assertEqual(matched, 2)
 
 
+class HeaderLeakKeepsOldDetail1126Test(unittest.TestCase):
+    """★11-26: 표제는 바로잡되 다시 읽은 상세가 줄었으면 옛 상세를 둔다(축소 가드에 통째로 막히지 않게)."""
+
+    def test_heading_fixed_old_detail_kept_when_new_detail_shrinks(self):
+        long_detail = HeaderLeakShrinkGuard1126Test.DETAIL
+        old = [{"number": "5", "deficiency": HeaderLeakHeadingRefresh1126Test.LEAK, "detail": long_detail}]
+        new = [{"number": "5", "deficiency": HeaderLeakHeadingRefresh1126Test.CLEAN, "detail": "Specifically, short."}]
+        out, _m, _u = b.refreshed_observations(old, new)
+        out, blocked = b.guard_shrink(old, out)
+        self.assertEqual(blocked, [])
+        self.assertEqual(out[0]["deficiency"], HeaderLeakHeadingRefresh1126Test.CLEAN)
+        self.assertEqual(out[0]["detail"], b.tidy_old_detail(long_detail))
+
+
 if __name__ == "__main__":
     unittest.main()
 

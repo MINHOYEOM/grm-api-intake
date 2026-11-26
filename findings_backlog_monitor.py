@@ -35,6 +35,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from datetime import datetime, timezone
 from typing import Any
 
@@ -46,6 +47,14 @@ from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 
 _HTTP_TIMEOUT_SECONDS = 15
 _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
+
+# ★RPC 시간 감시(2026-11-26). PostgREST 는 authenticator 역할의 statement_timeout(8s) 안에서
+#   돈다. extraction_gap_by_source() 가 문서가 늘면서 조용히 느려지다 11-26 에 8s 를 넘겨
+#   http_500 으로 감시 전체가 꺼졌다(11-25 까지 초록). 넘고 나서야 아는 구조였다 →
+#   RPC 마다 걸린 ms 를 보고서(rpc_ms)에 싣고, **선의 절반을 넘으면 미리 적색**을 띄운다.
+#   500 이면 PostgREST 오류 코드도 적는다 — 57014 면 시간 초과, 그 밖이면 고장이다.
+POSTGREST_STATEMENT_TIMEOUT_MS = 8000
+DEFAULT_RPC_NEAR_TIMEOUT_MS = POSTGREST_STATEMENT_TIMEOUT_MS // 2
 _STATS_RPC = "findings_stats"
 
 # 기본 임계 — 정상 steady-state 일일 유입은 "소량"이므로 300 이상 적체는 정상 하루치를
@@ -88,10 +97,14 @@ def _post_stats_rpc(
     *,
     rpc: str = _STATS_RPC,
     timeout: int = _HTTP_TIMEOUT_SECONDS,
+    timings: dict[str, int] | None = None,
 ) -> tuple[int, Any, str]:
     """POST rpc/<rpc> (인자 없음, body {}). service-role 키를 apikey+Bearer 로 싣되
     키는 반환 error 문자열에 절대 넣지 않는다(timeout/http_{status}/예외타입명만).
     반환: (status_code, parsed_json_or_None, error_summary). error_summary 는 2xx 에서 "".
+    timings 를 주면 마지막 시도의 소요 ms 를 timings[rpc] 에 적는다(성공한 호출만).
+    5xx 면 PostgREST 오류 코드(예: 57014 = statement_timeout)를 error_summary 에 붙인다 —
+    코드는 숫자·영문 짧은 값이라 키나 원문이 섞이지 않는다.
     """
     url = f"{base_url}/rest/v1/rpc/{rpc}"
     headers = {
@@ -100,6 +113,7 @@ def _post_stats_rpc(
         "Content-Type": "application/json",
     }
     for attempt in range(1, _MAX_ATTEMPTS + 1):
+        started = time.monotonic()
         try:
             resp = requests.post(url, headers=headers, json={}, timeout=timeout)
         except requests.exceptions.Timeout:
@@ -109,10 +123,15 @@ def _post_stats_rpc(
         except requests.exceptions.RequestException as exc:
             return 0, None, type(exc).__name__
 
+        elapsed_ms = int(round((time.monotonic() - started) * 1000))
         if resp.status_code >= 500:
             if attempt < _MAX_ATTEMPTS:
                 continue
-            return resp.status_code, None, f"http_{resp.status_code}"
+            code = _postgrest_error_code(resp)
+            suffix = f" code={code}" if code else ""
+            if code == "57014":
+                suffix += f" statement_timeout {POSTGREST_STATEMENT_TIMEOUT_MS // 1000}s 초과"
+            return resp.status_code, None, f"http_{resp.status_code}{suffix}"
         if resp.status_code >= 400:
             return resp.status_code, None, f"http_{resp.status_code}"
 
@@ -120,9 +139,46 @@ def _post_stats_rpc(
             data = resp.json()
         except ValueError:
             return resp.status_code, None, "invalid_response_shape"
+        if timings is not None:
+            timings[rpc] = elapsed_ms
         return resp.status_code, data, ""
 
     return 0, None, "retry_exhausted"  # unreachable safety net
+
+
+def _postgrest_error_code(resp: Any) -> str:
+    """PostgREST 오류 본문의 `code`(예: '57014')만 꺼낸다. 형식이 다르면 ''.
+    짧은 영숫자만 받는다 — 본문의 message/details 는 싣지 않는다."""
+    try:
+        body = resp.json()
+    except Exception:  # noqa: BLE001 — 본문이 JSON 이 아니면 코드 없음
+        return ""
+    code = body.get("code") if isinstance(body, dict) else None
+    if isinstance(code, str) and code.isascii() and code.isalnum() and len(code) <= 8:
+        return code
+    return ""
+
+
+def evaluate_rpc_timings(
+    timings: dict[str, int], *, near_timeout_ms: int = DEFAULT_RPC_NEAR_TIMEOUT_MS,
+) -> list[dict[str, Any]]:
+    """RPC 소요 ms → breaches. 선(statement_timeout)의 절반을 넘으면 넘기 전에 알린다. 순수 함수."""
+    breaches: list[dict[str, Any]] = []
+    for rpc, ms in sorted((timings or {}).items()):
+        if isinstance(ms, int) and ms > near_timeout_ms:
+            breaches.append({
+                "code": "rpc-near-timeout",
+                "metric": "rpc_ms",
+                "rpc": rpc,
+                "value": ms,
+                "threshold": near_timeout_ms,
+                "message": (
+                    f"{rpc} RPC 가 {ms}ms 걸렸다 — PostgREST statement_timeout "
+                    f"{POSTGREST_STATEMENT_TIMEOUT_MS}ms 의 절반({near_timeout_ms}ms)을 넘었다. "
+                    "넘으면 http_500 으로 감시가 꺼진다 — 함수를 가볍게 고칠 때다."
+                ),
+            })
+    return breaches
 
 
 def _int(value: Any) -> int:
@@ -308,6 +364,7 @@ def run_monitor(
     extraction_pct_threshold: float = DEFAULT_EXTRACTION_GAP_PCT,
     extraction_min_docs: int = DEFAULT_EXTRACTION_GAP_MIN_DOCS,
     country_unmapped_min_rows: int = DEFAULT_COUNTRY_UNMAPPED_MIN_ROWS,
+    rpc_near_timeout_ms: int = DEFAULT_RPC_NEAR_TIMEOUT_MS,
 ) -> dict[str, Any]:
     """findings_stats + extraction_gap_by_source + findings_country_unmapped 판정.
 
@@ -330,7 +387,9 @@ def run_monitor(
         },
         "breaches": [],
         "errors": [],
+        "rpc_ms": {},
     }
+    timings: dict[str, int] = report["rpc_ms"]
 
     base = _normalize_supabase_url(base_url)
     if base is None:
@@ -338,7 +397,7 @@ def run_monitor(
         report["errors"].append("SUPABASE_URL must start with https://")
         return report
 
-    status, data, err = _post_stats_rpc(base, service_key)
+    status, data, err = _post_stats_rpc(base, service_key, timings=timings)
     if err:
         report["status"] = "error"
         report["errors"].append(f"findings_stats RPC failed ({err})")
@@ -355,6 +414,7 @@ def run_monitor(
     )
     report.update(evaluated)
     report.setdefault("errors", [])
+    report["rpc_ms"] = timings
     report["thresholds"] = {
         "gap": gap_threshold, "needs_review": needs_review_threshold,
         "extraction_pct": extraction_pct_threshold,
@@ -364,7 +424,8 @@ def run_monitor(
 
     # ★추출 격차는 별도 RPC. 이 호출이 실패하면 **조용히 넘어가지 않는다** — 감시가 꺼진
     #   줄 모르고 초록을 믿는 것이 이 저장소가 이미 두 번 당한 함정이다(CI shim 표류).
-    ex_status, ex_data, ex_err = _post_stats_rpc(base, service_key, rpc=_EXTRACTION_RPC)
+    ex_status, ex_data, ex_err = _post_stats_rpc(base, service_key, rpc=_EXTRACTION_RPC,
+                                                 timings=timings)
     if ex_err:
         report["status"] = "error"
         report["errors"].append(f"{_EXTRACTION_RPC} RPC failed ({ex_err})")
@@ -387,7 +448,8 @@ def run_monitor(
     # ★국가 미매핑도 별도 RPC. 추출 격차와 같은 이유로 **실패를 조용히 넘기지 않는다** —
     #   감시가 꺼진 줄 모르고 초록을 믿는 것이 이 저장소가 이미 두 번 당한 함정이다.
     #   반환은 배열(`[{site_country, findings}]`)이라 dict 가 아니다 — 형 검사를 다르게 한다.
-    cu_status, cu_data, cu_err = _post_stats_rpc(base, service_key, rpc=_COUNTRY_UNMAPPED_RPC)
+    cu_status, cu_data, cu_err = _post_stats_rpc(base, service_key, rpc=_COUNTRY_UNMAPPED_RPC,
+                                                 timings=timings)
     if cu_err:
         report["status"] = "error"
         report["errors"].append(f"{_COUNTRY_UNMAPPED_RPC} RPC failed ({cu_err})")
@@ -402,6 +464,11 @@ def run_monitor(
     report["country_unmapped"] = cu_summary
     if cu_breaches:
         report["breaches"] = list(report.get("breaches") or []) + cu_breaches
+        report["status"] = "failure"
+
+    slow = evaluate_rpc_timings(timings, near_timeout_ms=rpc_near_timeout_ms)
+    if slow:
+        report["breaches"] = list(report.get("breaches") or []) + slow
         report["status"] = "failure"
     return report
 
@@ -463,6 +530,13 @@ def main(argv: list[str] | None = None) -> int:
               "**존재 자체가 신호**라 기본값이 1이다 — 미매핑 변종 1건은 그 나라가 국가 축에서 "
               f"통째로 빠진다는 뜻이다. 기본 {DEFAULT_COUNTRY_UNMAPPED_MIN_ROWS}."),
     )
+    parser.add_argument(
+        "--rpc-near-timeout-ms",
+        type=int,
+        default=DEFAULT_RPC_NEAR_TIMEOUT_MS,
+        help=("RPC 하나가 이 ms 를 넘으면 breach(rpc-near-timeout). PostgREST statement_timeout "
+              f"{POSTGREST_STATEMENT_TIMEOUT_MS}ms 를 넘기 전에 알리려는 선. 기본 {DEFAULT_RPC_NEAR_TIMEOUT_MS}."),
+    )
     parser.add_argument("--supabase-url", help="Supabase project URL (falls back to $SUPABASE_URL)")
     parser.add_argument(
         "--service-role-key",
@@ -489,6 +563,7 @@ def main(argv: list[str] | None = None) -> int:
         extraction_pct_threshold=args.extraction_pct_threshold,
         extraction_min_docs=args.extraction_min_docs,
         country_unmapped_min_rows=args.country_unmapped_min_rows,
+        rpc_near_timeout_ms=args.rpc_near_timeout_ms,
     )
     _write_report(args.output, report)
 

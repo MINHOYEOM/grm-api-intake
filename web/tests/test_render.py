@@ -317,6 +317,7 @@ SINGLE_GOLDENS = [
     ("briefs/2026-06-26/share.txt", "brief_share.expected.txt"),
     # [네이버 블로그 원고 2026-11-26] 이번 주 483 한 건 해설 — share.txt 옆 고정 경로.
     ("briefs/2026-06-26/naver-blog.txt", "brief_naver_blog.expected.txt"),
+    ("briefs/2026-06-26/naver-blog.html", "brief_naver_blog_page.expected.html"),
     ("sitemap.xml", "sitemap.expected.xml"),
     # [구글 품질 1단계 2026-11-19] IndexNow 용 전체 목록 — 구글용 sitemap.xml 과 별개.
     ("sitemap-full.xml", "sitemap_full.expected.xml"),

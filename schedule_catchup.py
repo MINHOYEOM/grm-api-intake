@@ -123,7 +123,7 @@ CRON_AUDIT: dict[str, tuple[str, str]] = {
     "grm-findings-review-queue.yml": ("C", "검수 대기 건수와 최장 대기 시간을 재고 이슈로 알린다."),
     "grm-findings-search-cache-health.yml": ("C", "검색 캐시 적재는 별도 pg_cron 이 하고 이 잡은 신선도를 감시한다."),
     "grm-findings-taxonomy-drift.yml": ("C", "현행 분류기와 저장된 분류 차이를 조회한다."),
-    "grm-gsc-index-sample.yml": ("C", "Google 색인 표본 점검 결과를 요약과 아티팩트로 남긴다."),
+    "grm-gsc-quality-weekly.yml": ("C", "Google 색인 표본과 주간 품질 보고서를 요약과 아티팩트로 남긴다."),
     "grm-library-linkcheck.yml": ("C", "library_linkcheck.py 가 기존 자료실 URL의 상태를 점검해 상태 스냅샷을 쓴다."),
     "grm-newsletter-freshness.yml": ("C", "해당 호 실발송 여부를 사후 확인하고 지연 이슈를 연다."),
     "grm-ops-measure.yml": ("C", "ops_measure_github.py 가 운영 목표의 현재 측정값과 최근 성공 시각을 갱신한다."),

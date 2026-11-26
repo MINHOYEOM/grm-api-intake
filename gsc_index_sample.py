@@ -34,6 +34,7 @@ sys.path.insert(0, str(ROOT / "web"))
 INSPECT_URL = "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect"
 SITE = "https://grm-solutions.com"
 DEFAULT_PER_BUCKET = 15
+KST = dt.timezone(dt.timedelta(hours=9), "KST")
 
 
 def week_key(today: dt.date) -> str:
@@ -104,7 +105,8 @@ def main(argv: list[str] | None = None) -> int:
         csc.list_sites(token), "grm-solutions.com")
 
     docs = (json.load(open(a.docs, encoding="utf-8")) or {}).get("documents") or []
-    wk = week_key(dt.date.today())
+    observed_on = dt.datetime.now(KST).date()
+    wk = week_key(observed_on)
     rows: list[dict[str, Any]] = []
     for lang in ("ko", "en"):
         for bucket, ids in buckets(docs, lang).items():
@@ -113,8 +115,8 @@ def main(argv: list[str] | None = None) -> int:
                 rows.append({"lang": lang, "bucket": bucket, "url": url, **inspect(token, site_url, url)})
 
     summary = summarize(rows)
-    pathlib.Path(a.out).write_text(json.dumps({"week": wk, "summary": summary, "rows": rows},
-                                              ensure_ascii=False, indent=1), encoding="utf-8")
+    payload = {"week": wk, "observed_on": observed_on.isoformat(), "summary": summary, "rows": rows}
+    pathlib.Path(a.out).write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
     lines = [f"## 구글 색인 표본 {wk} (묶음당 {a.per_bucket}건)", "", "| 묶음 | 상태별 개수 |", "|---|---|"]
     for k, v in sorted(summary.items()):
         lines.append(f"| {k} | " + " · ".join(f"{s} {n}" for s, n in v.items()) + " |")

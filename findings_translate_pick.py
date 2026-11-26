@@ -79,6 +79,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--max-chars", type=int, default=DEFAULT_MAX_CHARS)
     ap.add_argument("--max-rows", type=int, default=DEFAULT_MAX_ROWS)
     args = ap.parse_args(argv)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     with open(args.plan, encoding="utf-8") as fh:
         plan = json.load(fh)
     result = pick(plan.get("items") or [], args.max_chars, args.max_rows)

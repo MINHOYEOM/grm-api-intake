@@ -1835,7 +1835,8 @@ def pick_blog_483(cards: list[dict[str, Any]]) -> "int | None":
 def naver_blog_483_doc(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
                        brief_url: str, title_dateform: str, pub: str = "",
                        glossary_terms: "list[dict[str, Any]] | None" = None,
-                       term_freq: "dict[str, int] | None" = None) -> dict[str, Any]:
+                       term_freq: "dict[str, int] | None" = None,
+                       why: "list[str] | None" = None) -> dict[str, Any]:
     """블로그 원고 한 벌 — {"title": 제목(없으면 ""), "blocks": [...], "site_text": 겹침 비교용 카드 문장}.
 
     [위성 원고 2026-11-26] 사이트 카드 문장(요약·핵심 사실·시사점)을 그대로 붙이지 않는다 — 같은 글이 두 곳에
@@ -1875,6 +1876,10 @@ def naver_blog_483_doc(cards: list[dict[str, Any]], card_views: list[dict[str, A
         blocks.append(("hp", "이번 문서의 쟁점",
                        f"GRM 사이트 해설이 꼽은 쟁점은 {issue}입니다. "
                        "관찰사항별 한국어 해설과 원문은 아래 링크에 있습니다."))
+    # [왜 중요한가 슬롯 2026-11-26] 편집팀 Routine 이 쓴 블로그 전용 2~3문장(web/data/naver_blog/<발행일>.json).
+    # 호출부가 naver_blog_slot_problems() 를 통과한 것만 넘긴다 — 없으면 이 칸이 빠질 뿐(발행을 막지 않는다).
+    if why:
+        blocks.append(("hp", "왜 중요한가", " ".join(_nb_clean(w) for w in why)))
     # 2) 문서 기본 정보 — 카드의 사실 표(facts) 값 그대로.
     info = [f"{lab.replace(' · ', ' ')}: {facts[k].removesuffix(' · 483')}"
             for k, lab in _BLOG_FACT_LABELS if facts.get(k)]
@@ -2069,6 +2074,83 @@ def naver_blog_checks(doc: dict[str, Any], site_text: "str | None" = None) -> li
         ("사이트 문장 겹침", ov <= NAVER_BLOG_OVERLAP_MAX, f"{ov:.0%}", f"≤{NAVER_BLOG_OVERLAP_MAX:.0%}", True),
     ]
     return [{"name": a, "ok": bool(b), "value": c, "target": d, "hard": e} for a, b, c, d, e in rows]
+
+
+# ── [네이버 블로그 '왜 중요한가' 슬롯 2026-11-26] 편집팀 Routine 이 매주 쓰는 블로그 전용 해설 2~3문장 ──────────
+# 파일: web/data/naver_blog/<발행일>.json = {"schema": "grm-naver-blog-why/v1", "pub", "card_id", "why": [문장 2~3]}.
+# 규칙(슬롯 게이트 = 이 함수 한 곳 — 빌드·CLI(web/naver_blog_slot.py --check)·시험이 같이 부른다):
+#   고른 483(pick_blog_483)과 같은 카드 · 문장 2~3개·각 20~160자 · 느낌표·회사 규모 낮춰 부르기·마크다운 흔적 금지 ·
+#   숫자는 카드·관찰 자료에 있는 것만(새 사실 금지) · 사이트 카드 문장과 겹침 ≤ NAVER_BLOG_OVERLAP_MAX.
+# 빌드는 게이트를 못 넘는 슬롯을 조용히 쓰지 않는다 — 경고 한 줄 남기고 그 칸만 뺀다(발행은 막지 않는다).
+NAVER_BLOG_SLOT_DIR = WEB_DIR / "data" / "naver_blog"
+NAVER_BLOG_SLOT_SCHEMA = "grm-naver-blog-why/v1"
+_NB_WHY_BANNED = ("중소", "영세", "작은 회사", "!")
+
+
+def naver_blog_slot_material(card: dict[str, Any]) -> str:
+    """슬롯 문장의 숫자가 거슬러 올라가야 할 자료 — 사이트 카드 문장 + 사실 표 + 483 관찰 제목."""
+    dd = card.get("deterministic_detail") or {}
+    parts = [naver_blog_site_text(card)]
+    parts += [str(f.get("value") or "") for f in (card.get("facts") or []) if isinstance(f, dict)]
+    parts += [str(o.get("deficiency_ko") or "") for o in (dd.get("observations") or [])]
+    if dd.get("count"):
+        parts.append(f"{dd['count']}건")
+    return "\n".join(parts)
+
+
+def naver_blog_slot_problems(slot: dict[str, Any], card: "dict[str, Any] | None") -> list[str]:
+    """슬롯이 게이트를 못 넘는 까닭 목록(비면 통과)."""
+    probs: list[str] = []
+    if not isinstance(slot, dict) or slot.get("schema") != NAVER_BLOG_SLOT_SCHEMA:
+        return [f"schema 가 {NAVER_BLOG_SLOT_SCHEMA} 가 아니다"]
+    if card is None:
+        return ["이번 호에 해설할 483 이 없다"]
+    if slot.get("card_id") != card.get("id"):
+        probs.append(f"card_id {slot.get('card_id')!r} ≠ 고른 483 {card.get('id')!r}")
+    why = slot.get("why")
+    if not (isinstance(why, list) and 2 <= len(why) <= 3 and all(isinstance(w, str) for w in why)):
+        return probs + ["why 는 문장 2~3개 목록이어야 한다"]
+    material = naver_blog_slot_material(card)
+    for k, w in enumerate(why, 1):
+        if not 20 <= len(w.strip()) <= 160:
+            probs.append(f"why[{k}] 길이 {len(w.strip())}자(20~160)")
+        for bad in _NB_WHY_BANNED:
+            if bad in w:
+                probs.append(f"why[{k}] 금지 표현 {bad!r}")
+        if w != _nb_clean(w):
+            probs.append(f"why[{k}] 마크다운 흔적·보이지 않는 문자")
+        for num in re.findall(r"\d+(?:[.,]\d+)*", w):
+            if num not in material:
+                probs.append(f"why[{k}] 숫자 {num} 이 카드·관찰 자료에 없다(새 사실 금지)")
+    ov = naver_blog_overlap(" ".join(why), naver_blog_site_text(card))
+    if ov > NAVER_BLOG_OVERLAP_MAX:
+        probs.append(f"사이트 카드 문장과 겹침 {ov:.0%} > {NAVER_BLOG_OVERLAP_MAX:.0%}")
+    return probs
+
+
+def load_naver_blog_why(pub: str, card: "dict[str, Any] | None") -> "list[str] | None":
+    """그 호 슬롯의 why 문장 — 파일이 없거나 게이트를 못 넘으면 None(경고만)."""
+    path = NAVER_BLOG_SLOT_DIR / f"{pub}.json"
+    if not path.exists():
+        return None
+    try:
+        slot = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print(f"[naver-blog] {path.name} 읽기 실패 — 왜 중요한가 칸을 뺀다: {e}", file=sys.stderr)
+        return None
+    probs = naver_blog_slot_problems(slot, card)
+    if probs:
+        print(f"[naver-blog] {path.name} 게이트 미통과 — 칸을 뺀다: {'; '.join(probs)}", file=sys.stderr)
+        return None
+    return list(slot["why"])
+
+
+def naver_blog_pick_from_brief(brief: dict[str, Any]) -> "dict[str, Any] | None":
+    """브리프 JSON → 블로그가 해설할 483 카드(빌드와 같은 정렬·같은 pick_blog_483)."""
+    renderable = [c for c in (brief.get("cards") or []) if _is_renderable(c)]
+    cards = sorted(renderable, key=lambda c: (c.get("render_order") is None, c.get("render_order")))
+    i = pick_blog_483(cards)
+    return cards[i] if i is not None else None
 
 
 def build_brief_glance(sections: list[dict[str, Any]], card_views: list[dict[str, Any]],
@@ -9306,8 +9388,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # [네이버 블로그 원고 2026-11-26] 이번 주 483 한 건 해설 — 고정 경로, 매주 저절로.
         # 원고 한 벌(doc)에서 평문·붙여넣기 쪽이 함께 나온다. 용어 칸은 브리프 카드 용어 빈도(드문 것부터)를 쓴다.
         # ★card_views 는 위에서 용어 링크(Markup)가 끼워졌을 수 있지만 원고는 원본 카드(cards_sorted) 문장만 읽는다.
+        _blog_i = pick_blog_483(cards_sorted)
         blog_doc = naver_blog_483_doc(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"], pub,
-                                      glossary_terms, brief_term_freq_by_lang.get(DEFAULT_LANG))
+                                      glossary_terms, brief_term_freq_by_lang.get(DEFAULT_LANG),
+                                      load_naver_blog_why(pub, cards_sorted[_blog_i] if _blog_i is not None else None))
         blog_file = brief_page.file(NAVER_BLOG_FILE)
         _write(out_dir / blog_file, build_naver_blog_txt(blog_doc))
         written.append(blog_file)

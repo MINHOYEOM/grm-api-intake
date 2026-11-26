@@ -458,6 +458,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         <span class="admin-nav-label">발행 (매주 월요일)</span>
         <button type="button" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>발행·운영</button>
         <button type="button" data-tab="linkedin"><i class="ti ti-brand-linkedin"></i>링크드인</button>
+        <button type="button" data-tab="naverblog"><i class="ti ti-article"></i>네이버 블로그</button>
         <span class="admin-nav-label">독자</span>
         <button type="button" data-tab="newsletter"><i class="ti ti-mail-forward"></i>뉴스레터</button>
         <button type="button" data-tab="subscribers"><i class="ti ti-address-book"></i>구독자</button>
@@ -643,6 +644,16 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             <li>본문 복사를 눌러 붙여넣는다. 맨 아래 AI 생성 고지 한 줄이 남아 있는지 본다.</li>
             <li>게시를 누른다. 영문은 국문을 게시한 뒤에 같은 방식으로 한 번 더.</li>
           </ol>
+        </section>
+
+        <section class="admin-panel" data-panel="naverblog" hidden>
+          <div class="admin-panel-head">
+            <div><h2>이번 주 네이버 블로그</h2><p class="sub">최신 발행분의 483 해설 원고입니다. 원고 쪽에서 제목·본문을 복사해 붙여 넣고 발행만 누르면 됩니다.</p></div>
+            <span class="admin-pill warn" id="grm-nb-state">확인 중</span>
+          </div>
+          <div class="admin-li-row"><span>제목</span><code id="grm-nb-title">-</code></div>
+          <div class="admin-li-actions"><a class="btn coral" id="grm-nb-open" href="#" target="_blank" rel="noopener"><i class="ti ti-external-link"></i>원고 쪽 열기</a><a class="btn" id="grm-nb-write" href="https://blog.naver.com/grmsolution/postwrite" target="_blank" rel="noopener"><i class="ti ti-pencil"></i>블로그 글쓰기 열기</a></div>
+          <div class="admin-status" id="grm-nb-status" role="status" aria-live="polite"></div>
         </section>
 
         <section class="admin-panel" data-panel="growth" hidden>

@@ -14,8 +14,10 @@ from __future__ import annotations
 import json
 import os
 import sys
+import tempfile
 import unittest
 from dataclasses import asdict
+from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -620,7 +622,6 @@ class DumpTextTest(unittest.TestCase):
     """[11-12] 진단 전용 원문 덤프 — DB 없이 PDF URL 을 만들어 판독 전문만 남긴다."""
 
     def test_dump_writes_text_per_doc_without_db(self):
-        import tempfile
         calls = []
 
         def fake_fetch(url):
@@ -637,7 +638,6 @@ class DumpTextTest(unittest.TestCase):
         self.assertEqual([r["status"] for r in rows], ["pdf-ok-ocr", "scan-no-text", "bad_doc_id"])
 
     def test_main_dump_needs_doc_ids_and_no_credentials(self):
-        import tempfile
         with tempfile.TemporaryDirectory() as d, \
                 mock.patch.object(rec, "_fetch_text", return_value=("T", "pdf-ok")), \
                 mock.patch.dict(os.environ, {"SUPABASE_URL": "", "SUPABASE_SERVICE_ROLE_KEY": ""}):
@@ -645,6 +645,106 @@ class DumpTextTest(unittest.TestCase):
             self.assertEqual(rec.main(["--dump-text-dir", d, "--doc-ids", "fda483-1234"]), 0)
             self.assertTrue(os.path.exists(os.path.join(d, "fda483-1234.txt")))
 
+
+class DumpPdfTest(unittest.TestCase):
+    def test_writes_original_bytes_and_numbered_images_and_reports_bad_doc_id(self):
+        data = b"%PDF-fake\x00\xff"
+        fetch = mock.Mock(return_value=data)
+        render = mock.Mock(return_value={3: b"png3", 1: b"png1"})
+        with tempfile.TemporaryDirectory() as d:
+            rows = rec.dump_pdfs(["fda483-195467", "bogus", "195468"], d,
+                                 fetch_bytes=fetch, render_pages=render)
+            files = {p.name: p.read_bytes() for p in Path(d).iterdir()}
+
+        self.assertEqual(fetch.call_args_list, [
+            mock.call("https://www.fda.gov/media/195467/download"),
+            mock.call("https://www.fda.gov/media/195468/download"),
+        ])
+        self.assertEqual(render.call_args_list, [mock.call(data), mock.call(data)])
+        self.assertEqual(files, {
+            "fda483-195467.pdf": data, "fda483-195467_p1.png": b"png1", "fda483-195467_p3.png": b"png3",
+            "fda483-195468.pdf": data, "fda483-195468_p1.png": b"png1", "fda483-195468_p3.png": b"png3",
+        })
+        self.assertEqual([r["status"] for r in rows], ["pdf-ok", "bad_doc_id", "pdf-ok"])
+        self.assertEqual(rows[0]["pages"], ["fda483-195467_p1.png", "fda483-195467_p3.png"])
+
+    def test_bot_block_stops_batch(self):
+        fetch = mock.Mock(side_effect=[b"pdf", rec.FdaBotBlockError()])
+        render = mock.Mock(return_value={1: b"png"})
+        with tempfile.TemporaryDirectory() as d:
+            rows = rec.dump_pdfs(["195467", "195468", "195469"], d, fetch_bytes=fetch, render_pages=render)
+            self.assertEqual(sorted(p.name for p in Path(d).iterdir()),
+                             ["fda483-195467.pdf", "fda483-195467_p1.png"])
+
+        self.assertEqual(fetch.call_count, 2)
+        render.assert_called_once_with(b"pdf")
+        self.assertEqual([r["status"] for r in rows], ["pdf-ok", rec.FDA_BOT_BLOCK])
+
+    def test_render_failure_leaves_pdf_and_reports_reason(self):
+        fetch = mock.Mock(return_value=b"original")
+        render = mock.Mock(side_effect=[ValueError("broken page"), {2: b"png"}])
+        with tempfile.TemporaryDirectory() as d:
+            rows = rec.dump_pdfs(["195467", "195468"], d, fetch_bytes=fetch, render_pages=render)
+            self.assertEqual({p.name: p.read_bytes() for p in Path(d).iterdir()}, {
+                "fda483-195467.pdf": b"original",
+                "fda483-195468.pdf": b"original",
+                "fda483-195468_p2.png": b"png",
+            })
+        self.assertEqual(rows[0]["status"], "render_failed")
+        self.assertEqual(rows[0]["reason"], "ValueError: broken page")
+        self.assertEqual(rows[0]["pages"], [])
+        self.assertEqual(rows[1]["status"], "pdf-ok")
+
+    def test_main_requires_ids_and_bypasses_recovery_even_with_apply(self):
+        with tempfile.TemporaryDirectory() as d, \
+                mock.patch.object(rec, "_fetch_pdf_bytes", return_value=b"pdf") as fetch, \
+                mock.patch.object(rec, "_render_signature_pages", return_value={1: b"png"}), \
+                mock.patch.object(rec, "_resolve_credentials") as credentials, \
+                mock.patch.object(rec, "run") as recover:
+            self.assertEqual(rec.main(["--dump-pdf-dir", d]), 2)
+            fetch.assert_not_called()
+            report = Path(d, "report.json")
+            self.assertEqual(rec.main(["--dump-pdf-dir", d, "--doc-ids", "fda483-195467",
+                                       "--apply", "--report-path", str(report)]), 0)
+            self.assertEqual(json.loads(report.read_text(encoding="utf-8"))["dump_pdf"][0]["status"], "pdf-ok")
+            credentials.assert_not_called()
+            recover.assert_not_called()
+
+    def test_renderer_selects_signature_and_last_pages_at_150_dpi(self):
+        import pymupdf  # type: ignore[import-not-found]
+
+        for page_count, labels, expected in (
+                (4, {1, 3}, [1, 3, 4]), (4, set(), [3, 4]), (1, set(), [1])):
+            with self.subTest(page_count=page_count, labels=labels), pymupdf.open() as doc:
+                for page_no in range(1, page_count + 1):
+                    page = doc.new_page(width=288, height=144)
+                    if page_no in labels:
+                        page.insert_text((20, 40), "Name and Title\nof Individual")
+                images = rec._render_signature_pages(doc.tobytes())
+                self.assertEqual(list(images), expected)
+                for png in images.values():
+                    self.assertTrue(png.startswith(b"\x89PNG\r\n\x1a\n"))
+                    image = pymupdf.Pixmap(png)
+                    self.assertEqual((image.width, image.height), (600, 300))
+
+    def test_workflow_dumps_pdf_and_excludes_apply_paths(self):
+        workflow_path = Path(__file__).resolve().parents[1] / ".github/workflows/grm-fda483-ocr-recovery.yml"
+        workflow = workflow_path.read_text(encoding="utf-8")
+        self.assertIn("          - dump-pdf\n", workflow)
+        self.assertIn("            ocr_text_dump/\n            pdf_dump/\n", workflow)
+        step = workflow.split("- name: Run FDA 483 OCR recovery\n", 1)[1]
+        branch, after = step.split('if [ "${IN_DIAG}" = "dump-pdf" ]; then\n', 1)[1].split("\n          fi", 1)
+        self.assertIn("python backfill_483_ocr_recovery.py --dump-pdf-dir pdf_dump", branch)
+        self.assertIn('--doc-ids "${IN_DOC_IDS}" --report-path ocr_recovery_report.json', branch)
+        self.assertIn('echo "recovered=0" >> "$GITHUB_OUTPUT"\n            exit 0', branch)
+        self.assertNotIn("--apply", branch)
+        self.assertIn("ARGS+=(--apply)", after)
+        m12 = workflow.split("- name: Chain M12 findings backfill (raw -> findings)\n", 1)[1].splitlines()[0]
+        notion = workflow.split("- name: Sync empty Notion 483 rows from Supabase (weekly brief input)\n", 1)[1].splitlines()[0]
+        wl = workflow.split("\n  recover-wl:\n", 1)[1].splitlines()[2]
+        self.assertIn("steps.recover.outputs.recovered != '0'", m12)
+        self.assertIn("inputs.apply && inputs.diag != 'dump-pdf'", notion)
+        self.assertIn("inputs.diag != 'dump-pdf' && (inputs.target == 'wl' || inputs.target == 'all')", wl)
 
 
 def _mixed_pdf_bytes() -> bytes:

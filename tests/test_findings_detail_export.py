@@ -232,5 +232,51 @@ class ExistingPairRuleUnchangedTest(unittest.TestCase):
         self.assertEqual((stats["queued"], stats["unchanged"]), (0, 13))
 
 
+class StaleProseGrowthOnlyTest(unittest.TestCase):
+    """[11-26] stale 대기열은 본문(산문 낱말)이 늘어난 행만 — 잡문만 걷힌 행은 건너뛰고 따로 센다.
+
+    쪽 끝 절단 소급(#1966)이 바꾸는 관찰 중 절반가량은 서명란 꼬리만 걷힌 행이다. 그런 행을 매주 재번역에
+    보내지 않도록, 백필 복원 계수와 **같은 함수**(grm_findings.fda483_prose_grew)로 거른다."""
+
+    TEXT = "Procedures designed to prevent microbiological contamination are not established."
+    OLD = ("Specifically, A. The operator handled unprotected sterile parts with gloved hands during setup. "
+           "B. Containers with foreign matter are not classified as critical defects.")
+
+    def _run(self, new_detail: str, **kw):
+        findings = [{"finding_id": "f1", "raw_signal_id": "r1", "published_date": "2025-11-05",
+                     "finding_text": self.TEXT, "detail_text": self.OLD + " EMPlOVEE{S) SEE REVERSE"}]
+        raws = [{"raw_signal_id": "r1", "raw_json": {"fda_483_observations": [
+            {"number": "4", "deficiency": self.TEXT, "detail": new_detail}]}}]
+        return ex.build_queue(findings, raws, stale_only=True, **kw)
+
+    def test_page_end_restore_is_queued(self):
+        grown = self.OLD + (" C. Aseptic personnel qualification does not require the inclusion of all "
+                            "critical interventions during the media fill simulation.")
+        queue, stats = self._run(grown)
+        self.assertEqual((stats["queued"], stats["junk_only_skipped"]), (1, 0))
+        self.assertIn("C. Aseptic", queue[0]["detail_text"])
+
+    def test_junk_only_cleanup_is_skipped_and_counted(self):
+        queue, stats = self._run(self.OLD)
+        self.assertEqual((stats["queued"], stats["junk_only_skipped"], stats["unchanged"]), (0, 1, 0))
+
+    def test_all_changes_switch_keeps_junk_only_rows(self):
+        _, stats = self._run(self.OLD, prose_growth_only=False)
+        self.assertEqual((stats["queued"], stats["junk_only_skipped"]), (1, 0))
+
+    def test_pending_mode_is_not_filtered(self):
+        findings = [{"finding_id": "f1", "raw_signal_id": "r1", "published_date": "2025-11-05",
+                     "finding_text": self.TEXT, "detail_text": None}]
+        raws = [{"raw_signal_id": "r1", "raw_json": {"fda_483_observations": [
+            {"number": "4", "deficiency": self.TEXT, "detail": self.OLD}]}}]
+        self.assertEqual(ex.build_queue(findings, raws)[1]["queued"], 1)
+
+    def test_same_rule_as_backfill_counter(self):
+        import backfill_483_detail_refresh as b
+        import grm_findings as gf
+        self.assertIs(b._gf().fda483_prose_grew, gf.fda483_prose_grew)
+        self.assertEqual(b.prose_words(self.OLD), gf.fda483_prose_words(self.OLD))
+
+
 if __name__ == "__main__":
     unittest.main()

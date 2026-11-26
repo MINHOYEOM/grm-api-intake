@@ -228,6 +228,9 @@ def is_out_of_scope_483_establishment(establishment_type: str) -> bool:
     est = (establishment_type or "").strip()
     if not est:
         return False
+    # FDA 식품·축산 시설 유형. 의약품 유형에 섞인 단어까지 제외하지 않도록 전체 값으로 맞춘다.
+    if " ".join(est.lower().split()) in {"grower", "beef ranch"}:
+        return True
     if _FDA483_OUT_OF_SCOPE_EST_RE.search(est):
         return True
     return bool(_FDA483_DEVICE_EST_RE.search(est) and not _FDA483_PHARMA_GUARD_RE.search(est))

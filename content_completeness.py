@@ -22,7 +22,7 @@
       * 그 밖의 소스는 **코드로** 본다: 사이트 계층(web/·supabase/·findings_*·kg_*) 또는 브리프 조립 파일이
         칸 이름을 문자열로 읽는지.
       경보: 아무도 안 읽는 칸 / findings 소스인데 도달률 5% 미만인 긴 칸(중앙값 300자 이상).
-  (V) 경고서한 위반항목 빈칸 — 본문이 있는 행을 사유별로 집계하고 미지 형식만 경보로 올린다.
+  (V) 경고서한 위반항목 빈칸 — 미지 형식과 저장 본문 앞부분 결손을 따로 경보로 올린다.
       판정은 수집기와 같은 함수 `collect_intake.wl_violations_gap_kind`.
       0 이 아니면 경보. 고치는 길: grm-wl-violations-reextract.yml(dry → 대표 승인 → apply).
 
@@ -96,14 +96,14 @@ _URL = re.compile(r"^https?://", re.I)
 _WS = re.compile(r"\s+")
 
 # 설계상 상한이 있는 칸(발췌). 잘림 경보에서 빼고 보고서의 "의도된 상한" 칸에만 적는다.
-INTENTIONAL_CAPS: dict[tuple[str, str], str] = {
-    ("FDA 483", "fda483_excerpt"): "PDF 앞부분 발췌(1,500자). 전문은 fda483_body_full·관찰 목록에 따로 있다",
-    ("FDA Warning Letter", "wl_body_excerpt"): "본문 발췌(1,500자). 전문은 wl_body_full",
-    ("ECA Academy", "eca_article_excerpt"): "기사 발췌(1,200자) — 남의 기사 전문은 저장하지 않는다",
-    ("ISPE", "article_excerpt"): "기사 발췌(1,200자) — 남의 기사 전문은 저장하지 않는다",
-    ("ISPE", "description"): "RSS 요약(800자) — 기사 발췌가 따로 있다",
-    ("WHO", "whopir_excerpt"): "WHOPIR 발췌(1,500자). 보고서 구조화 값은 whopir_report",
-    ("Federal Register", "excerpts"): "FR API 가 주는 검색 발췌(원천 쪽 상한). 요약은 abstract 로 쓴다",
+INTENTIONAL_CAPS: dict[tuple[str, str], tuple[int, str]] = {
+    ("FDA 483", "fda483_excerpt"): (1500, "PDF 앞부분 발췌(1,500자). 전문은 fda483_body_full·관찰 목록에 따로 있다"),
+    ("FDA Warning Letter", "wl_body_excerpt"): (1500, "본문 발췌(1,500자). 전문은 wl_body_full"),
+    ("ECA Academy", "eca_article_excerpt"): (1200, "기사 발췌(1,200자) — 남의 기사 전문은 저장하지 않는다"),
+    ("ISPE", "article_excerpt"): (1200, "기사 발췌(1,200자) — 남의 기사 전문은 저장하지 않는다"),
+    ("ISPE", "description"): (800, "RSS 요약(800자) — 기사 발췌가 따로 있다"),
+    ("WHO", "whopir_excerpt"): (1500, "WHOPIR 발췌(1,500자). 보고서 구조화 값은 whopir_report"),
+    ("Federal Register", "excerpts"): (255, "FR API 가 주는 검색 발췌(원천 쪽 상한). 요약은 abstract 로 쓴다"),
 }
 
 # 사이트에 안 나가는 게 맞는 산문 칸(추출 원료·정형 문구). 미사용 경보에서 뺀다.
@@ -335,7 +335,8 @@ def detect_truncation(stats: Iterable[FieldStats], code_caps: list[dict[str, Any
             rows = [(r, d) for l in range(c["band_from"], c["cap"] + 1) for r, d, t in fs.long_rows.get(l, [])
                     if t not in tmpl]
             dates = sorted(d for _, d in rows if d)
-            key = (fs.source, fs.path)
+            cap = c["cap"]
+            allowed_cap, reason = INTENTIONAL_CAPS.get((fs.source, fs.path), (0, ""))
             out.append({
                 "source": fs.source, "path": fs.path, "cap": c["cap"], "distinct": c["hits"],
                 "below": c["below"], "rows": len(rows),
@@ -343,7 +344,7 @@ def detect_truncation(stats: Iterable[FieldStats], code_caps: list[dict[str, Any
                 "first_collected": dates[0][:10] if dates else "", "last_collected": dates[-1][:10] if dates else "",
                 "samples": sorted({r for r, _ in rows})[:5],
                 "code_caps": match_code_cap(c["cap"], code_caps),
-                "intentional": INTENTIONAL_CAPS.get(key, ""),
+                "intentional": reason if allowed_cap - band_width(allowed_cap) <= cap <= allowed_cap else "",
             })
     out.sort(key=lambda x: (bool(x["intentional"]), -x["rows"]))
     return out
@@ -519,12 +520,14 @@ def collect_stats(raw_rows: Iterable[dict[str, Any]], finding_rows: Iterable[dic
 def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20) -> dict[str, Any]:
     """(V) 경고서한 위반항목 빈칸 — 사유별 행 수(수집기와 같은 판정 함수)."""
     from collect_intake import (
-        WL_VIOLATIONS_SCOPE_STATUSES, WL_VIOLATIONS_STATUS_UNSUPPORTED, wl_violations_gap_kind,
+        WL_VIOLATIONS_SCOPE_STATUSES, WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED,
+        WL_VIOLATIONS_STATUS_UNSUPPORTED, wl_body_head_truncated, wl_violations_gap_kind,
     )
     from grm_common import SOURCE_FDA_WL
     by_kind: dict[str, int] = defaultdict(int)
     unmarked_docs: list[str] = []
     unsupported_docs: list[str] = []
+    truncated_docs: list[str] = []
     for r in raw_rows:
         if str(r.get("source") or "") != SOURCE_FDA_WL:
             continue
@@ -534,18 +537,27 @@ def wl_violation_gaps(raw_rows: Iterable[dict[str, Any]], *, max_docs: int = 20)
                 raw = json.loads(raw)
             except ValueError:
                 continue
-        kind = wl_violations_gap_kind(raw if isinstance(raw, dict) else {})
+        if not isinstance(raw, dict):
+            continue
+        kind = wl_violations_gap_kind(raw)
         if not kind:
             continue
+        if wl_body_head_truncated(str(raw["wl_body_full"])):
+            kind = WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED
+        doc = str(r.get("document_id") or "")
         by_kind[kind] += 1
         if kind == "unmarked" and len(unmarked_docs) < max_docs:
-            unmarked_docs.append(str(r.get("document_id") or ""))
+            unmarked_docs.append(doc)
+        if kind == WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED and len(truncated_docs) < max_docs:
+            truncated_docs.append(doc)
         if kind == WL_VIOLATIONS_STATUS_UNSUPPORTED and len(unsupported_docs) < max_docs:
-            unsupported_docs.append(str(r.get("document_id") or ""))
+            unsupported_docs.append(doc)
     return {"unmarked": by_kind.get("unmarked", 0), "by_kind": dict(sorted(by_kind.items())),
             "unmarked_docs": unmarked_docs,
             "unsupported": by_kind.get(WL_VIOLATIONS_STATUS_UNSUPPORTED, 0),
             "unsupported_docs": unsupported_docs,
+            "body_head_truncated": by_kind.get(WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED, 0),
+            "body_head_truncated_docs": truncated_docs,
             "out_of_scope": {kind: by_kind[kind] for kind in WL_VIOLATIONS_SCOPE_STATUSES if kind in by_kind}}
 
 
@@ -616,6 +628,7 @@ def build_report(stats: list[FieldStats], findings_text: dict[str, str], *, toda
         "counts": {"truncated": len(alarms_t), "unused": len(alarms_u),
                    "intentional_caps": len(trunc) - len(alarms_t),
                    "wl_violation_gaps": int((wl_gaps or {}).get("unsupported") or 0),
+                   "wl_body_head_truncated": int((wl_gaps or {}).get("body_head_truncated") or 0),
                    "ema_document_gaps": int((ema_gaps or {}).get("blank") or 0)},
         "wl_violation_gaps": wl_gaps or {},
         "ema_document_gaps": ema_gaps or {},
@@ -678,6 +691,10 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines += ["## 경고서한 위반항목 빈칸(미지 형식)", "",
                   f"**{c['wl_violation_gaps']}행** — 원문 형식을 확인해 추출 규칙을 보완합니다.", "",
                   f"문서 예: {', '.join(g.get('unsupported_docs') or [])}", ""]
+    if c.get("wl_body_head_truncated"):
+        lines += ["## 경고서한 저장 본문 앞부분 결손 의심", "",
+                  f"**{c['wl_body_head_truncated']}행** — 저장된 `wl_body_full` 앞부분을 원문과 대조합니다.", "",
+                  f"문서 예: {', '.join(g.get('body_head_truncated_docs') or [])}", ""]
     if g:
         lines += [f"경고서한 위반항목 사유별 집계: {g.get('by_kind', {})}", ""]
         scope = g.get("out_of_scope") or {}
@@ -691,7 +708,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                   "`grm-blank-excerpts-backfill.yml`(sources=ema)로 채우고, 사유가 남으면 판독기(ema_document)를 고칩니다.", "",
                   f"사유별: {e.get('by_reason', {})}", "",
                   f"문서 예: {', '.join(e.get('docs') or [])}", ""]
-    if not t_alarm and not u_alarm and not c.get("wl_violation_gaps") and not c.get("ema_document_gaps"):
+    if not any((t_alarm, u_alarm, c.get("wl_violation_gaps"), c.get("wl_body_head_truncated"), c.get("ema_document_gaps"))):
         lines.append("이상 없음.")
     return "\n".join(lines) + "\n"
 
@@ -700,6 +717,7 @@ def fingerprint(report: dict[str, Any]) -> str:
     keys = sorted([f"T|{t['source']}|{t['path']}|{t['cap']}" for t in report["truncation"] if not t["intentional"]]
                   + [f"U|{u['source']}|{u['path']}" for u in report["usage"] if u["alarm"]]
                   + (["V|wl_violations"] if report["counts"].get("wl_violation_gaps") else [])
+                  + (["H|wl_body_full"] if report["counts"].get("wl_body_head_truncated") else [])
                   + (["E|ema_document"] if report["counts"].get("ema_document_gaps") else []))
     return "content-fp:" + hashlib.sha256("\n".join(keys).encode("utf-8")).hexdigest()[:16]
 
@@ -709,7 +727,7 @@ def plan_issues(report: dict[str, Any]) -> list[dict[str, Any]]:
     칸마다 이슈를 열지 않고 하나로 모은다(감시기 이슈가 쏟아지면 무시당한다 — 2026-10 교훈)."""
     c = report["counts"]
     base = {"key": "content", "source": "내용 완전성", "title": ISSUE_TITLE, "labels": list(ISSUE_LABELS)}
-    if c["truncated"] or c["unused"] or c.get("wl_violation_gaps") or c.get("ema_document_gaps"):
+    if any(c.get(k) for k in ("truncated", "unused", "wl_violation_gaps", "wl_body_head_truncated", "ema_document_gaps")):
         fp = fingerprint(report)
         body = render_markdown(report) + "\n" + (f"실행: {report['run_url']}\n\n" if report.get("run_url") else "") + \
             "데이터는 고치지 않았다(감시는 읽기 전용). 의도된 칸이면 `content_completeness.py` 의 " \
@@ -717,6 +735,7 @@ def plan_issues(report: dict[str, Any]) -> list[dict[str, Any]]:
         return [{**base, "action": "open", "body": body, "fingerprint": fp, "verdict": "found",
                  "comment": f"목록이 바뀌었습니다 — 잘림 {c['truncated']}칸 · 안 쓰이는 칸 {c['unused']}개"
                             f" · 경고서한 위반항목 빈칸 {c.get('wl_violation_gaps', 0)}행"
+                            f" · 경고서한 본문 앞부분 결손 {c.get('wl_body_head_truncated', 0)}행"
                             f" · EMA 문서 본문 빈칸 {c.get('ema_document_gaps', 0)}행"}]
     return [{**base, "action": "close", "verdict": "ok",
              "comment": "잘림·안 쓰이는 칸이 더 보이지 않아 자동으로 닫습니다."}]
@@ -768,6 +787,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"::warning title=content-completeness::잘림 의심 {c['truncated']}칸 · 안 쓰이는 칸 {c['unused']}개", flush=True)
     if c.get("wl_violation_gaps"):
         print(f"::warning title=wl-violations-gap::경고서한 위반항목 미지 형식 {c['wl_violation_gaps']}행", flush=True)
+    if c.get("wl_body_head_truncated"):
+        print(f"::warning title=wl-body-head-truncated::경고서한 저장 본문 앞부분 결손 {c['wl_body_head_truncated']}행",
+              flush=True)
     return 0
 
 

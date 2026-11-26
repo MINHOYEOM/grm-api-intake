@@ -51,9 +51,8 @@ jobs:
 
       # [OCR 엔진 누락 수리 2026-07-30] 이 워크플로는 483 원문을 collect_fda_483.
       # _fetch_fda483_pdf_text 로 되받아 발행 카드와 대조한다. 엔진이 없으면 스캔 483 의
-      # text 가 빈 문자열이 되어 found=0 이 되고, 불일치 판정은 `found > shown` 이므로
-      # **0 은 결코 불일치를 일으키지 못한다** — 정작 검증이 가장 필요한 문서들이 전부
-      # 조용히 'ok' 로 통과했다(거짓 음성). required=false: 대조는 계속하되 엔진 부재는
+      # 원문을 판독하지 못하면 보고서에 '?' 로 표시하고 공개 findings·발행 범위는
+      # 확인 가능한 근거로 계속 대조한다. required=false: 대조는 계속하되 엔진 부재는
       # 액션의 주석·잡 요약으로 드러난다.
       - name: Install OCR engine (tesseract)
         uses: ./.github/actions/setup-ocr
@@ -132,7 +131,7 @@ jobs:
             for (const issue of open.filter(i => i.title === title)) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number,
-                body: `최근 발행분 원문 대조가 일치해 자동으로 닫는다 (실행: ${context.runId}).`,
+                body: `최근 발행분에서 확인 가능한 원문·공개 범위의 불일치가 0건입니다 (실행: ${context.runId}).`,
               });
               await github.rest.issues.update({
                 owner: context.repo.owner, repo: context.repo.repo,

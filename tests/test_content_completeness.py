@@ -120,6 +120,27 @@ class FindCapsTest(unittest.TestCase):
         self.assertTrue(found[0]["intentional"])
         self.assertEqual(found[0]["recent_rows"], 0)
 
+    def test_new_shorter_storage_cap_on_an_excerpt_opens_an_issue(self):
+        rng = random.Random(17)
+        fs = cc.FieldStats("FDA Warning Letter", "wl_body_excerpt")
+        for i in range(70):
+            fs.add(capped(rng, 900), ref=f"wl-{i}", collected="2026-11-25")
+        report = cc.build_report([fs], {}, today=TODAY)
+        self.assertEqual(report["counts"]["truncated"], 1)
+        self.assertEqual(report["counts"]["intentional_caps"], 0)
+        self.assertEqual(report["issues"][0]["action"], "open")
+
+    def test_wl_head_cut_is_an_alarm_even_with_a_stale_format_status(self):
+        raw = {"source": "FDA Warning Letter", "document_id": "wl-example", "raw_json": {
+            "wl_body_full": "Specifically, the equipment records were incomplete.",
+            "wl_violations_status": "unsupported_format",
+        }}
+        report = cc.build_report([], {}, today=TODAY, wl_gaps=cc.wl_violation_gaps([raw]))
+        self.assertEqual(report["counts"]["wl_body_head_truncated"], 1)
+        self.assertEqual(report["counts"]["wl_violation_gaps"], 0)
+        self.assertEqual(report["issues"][0]["action"], "open")
+        self.assertIn("wl-example", cc.render_markdown(report))
+
     def test_source_ends_document_is_not_counted_as_cut(self):
         """[11-11] 원문 자체가 거기서 끝나는 관찰(문서·번호 예외)은 잘림 몰림 집계에서 빠진다 — 같은 길이
         같은 문서라도 예외 번호가 아닌 관찰은 그대로 센다."""

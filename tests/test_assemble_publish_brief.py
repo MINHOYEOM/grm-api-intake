@@ -237,6 +237,10 @@ class OutOfScope483Test(unittest.TestCase):
             "fda483-4": self._483("fda483-4", "Sterile Drug Manufacturer"),
             "fda483-5": self._483("fda483-5", "Manufacturer",
                                   "Aseptic processing areas are deficient; media fill failed."),
+            "fda483-6": self._483("fda483-6", "Grower",
+                                  "Records did not show the date of the inspection."),
+            "fda483-7": self._483("fda483-7", "Beef Ranch",
+                                  "Records did not show the date of the inspection."),
         }
         s["cards"].extend(cards.values())
         d = copy.deepcopy(self.delta)
@@ -246,11 +250,12 @@ class OutOfScope483Test(unittest.TestCase):
         base_out, base_report = apb.assemble_publish_brief(_blank_scaffold_from(self.truth), self.delta)
         out, report = apb.assemble_publish_brief(s, d, strict=True)
         ids = {c["id"] for c in out["cards"]}
-        self.assertEqual(sorted(report.out_of_scope_483_ids), ["fda483-1", "fda483-2", "fda483-3"])
+        excluded = {"fda483-1", "fda483-2", "fda483-3", "fda483-6", "fda483-7"}
+        self.assertEqual(set(report.out_of_scope_483_ids), excluded)
         self.assertTrue({"fda483-4", "fda483-5"} <= ids)
-        self.assertFalse({"fda483-1", "fda483-2", "fda483-3"} & ids)
+        self.assertFalse(excluded & ids)
         self.assertEqual(out["brief"]["coverage"]["rendered"], len(out["cards"]))
-        self.assertTrue(any("범위 밖 483 3장" in w for w in report.warnings))
+        self.assertTrue(any("범위 밖 483 5장" in w for w in report.warnings))
         # 범위 밖이 없는 기존 발행본(07-06 fixture)은 한 장도 빠지지 않는다.
         self.assertEqual(base_report.out_of_scope_483_ids, [])
         self.assertEqual(len(out["cards"]), len(base_out["cards"]) + 2)

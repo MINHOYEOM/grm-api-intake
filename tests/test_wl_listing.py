@@ -97,6 +97,8 @@ class WlListingDatatablesTest(unittest.TestCase):
         self.assertEqual(len(items), 14)
         self.assertEqual(ci.LAST_WL_HEALTH["listing"]["backbone"], "datatables")
         self.assertFalse(ci.LAST_WL_HEALTH["listing"]["truncated"])
+        self.assertEqual(ci.LAST_WL_HEALTH["listing"]["fetched"], 15)
+        self.assertFalse(ci.LAST_WL_HEALTH["listing"]["cap_hit"])
         # 업체 셀 엔티티 복원 + 상대 href 정규화(정적 경로와 같은 결과)
         self.assertEqual(items[0].firm, "Firm 0 & Co")
         self.assertTrue(items[0].official_url.startswith("https://www.fda.gov/warning-letters/"))
@@ -128,6 +130,10 @@ class WlListingDatatablesTest(unittest.TestCase):
         self.assertIn("page-cap", listing["detail"])
         self.assertTrue(listing["truncated"])
         self.assertEqual(len(items), 10)
+        self.assertEqual(listing["source_total"], 999)
+        self.assertEqual(listing["fetched"], ci.WL_LISTING_MAX_PAGES * ci.WL_LISTING_PAGE_LENGTH)
+        self.assertTrue(listing["cap_hit"])
+        self.assertIn("[GRM 문제]", listing["cap_warning"])
 
     def test_datatables_failure_falls_back_to_static_with_truncation_flag(self) -> None:
         items, err, _ = self._collect(_list_html(10), requests.Timeout("slow"))

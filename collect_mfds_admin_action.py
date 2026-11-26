@@ -16,6 +16,7 @@ from datetime import date
 from typing import Any
 
 from grm_common import (
+    cap_health,
     DatagoPageError,
     datago_paginate,
     env_flag,
@@ -86,6 +87,7 @@ def _set_last_health(
     truncated: bool,
     filtered: int,
     page_warnings: list[str],
+    cap: dict[str, Any] | None = None,
     order_check: str = "",
 ) -> None:
     global LAST_HEALTH
@@ -98,6 +100,7 @@ def _set_last_health(
         )
         log("WARN", total_count_warning)
     LAST_HEALTH = {
+        **(cap or cap_health("식약처 행정처분", None, 0)),
         "collected": collected,
         "total_count": total_count,
         "total_count_warning": total_count_warning,
@@ -401,6 +404,8 @@ def collect_mfds_admin_actions(
     service_key: str,
 ) -> tuple[list[IntakeItem], str | None]:
     """Collect MFDS administrative action records."""
+    _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
+                     filtered=0, page_warnings=[])
     if not service_key:
         return [], "DATA_GO_KR_SERVICE_KEY 환경변수 필요"
 
@@ -411,8 +416,6 @@ def collect_mfds_admin_actions(
     filtered_count = 0
     pages_seen = 0
     page_edges: list[tuple[str, str]] = []
-    _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
-                     filtered=0, page_warnings=[])
     paginator = datago_paginate(
         ADMIN_API_ENDPOINT, service_key=service_key, extract=_extract_items,
         http_get=http_get_json, max_pages=MAX_PAGES, page_size=PAGE_SIZE,
@@ -443,10 +446,12 @@ def collect_mfds_admin_actions(
         if items:
             log("WARN", msg)
             _set_last_health(collected=len(items), total_count=paginator.total_count,
+                             cap=paginator.health("식약처 행정처분"),
                              pages_seen=pages_seen, truncated=False,
                              filtered=filtered_count, page_warnings=[msg])
             return items, None
         _set_last_health(collected=0, total_count=paginator.total_count,
+                         cap=paginator.health("식약처 행정처분"),
                          pages_seen=pages_seen, truncated=False,
                          filtered=filtered_count, page_warnings=[msg])
         return [], msg
@@ -476,6 +481,7 @@ def collect_mfds_admin_actions(
                     f"(첫 쪽 첫 건 {first_edge or '-'}, 끝 쪽 끝 건 {last_edge or '-'}, "
                     f"쪽 {pages_seen})")
     _set_last_health(collected=len(items), total_count=total_count,
+                     cap=paginator.health("식약처 행정처분"),
                      pages_seen=pages_seen, truncated=bool(paginator.truncated),
                      filtered=filtered_count, page_warnings=[], order_check=order_check)
     return items, truncated_msg

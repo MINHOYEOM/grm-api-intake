@@ -62,6 +62,7 @@ from grm_taxonomy import (
 )
 from grm_http_policy import FDA_483_PDF_DELAY_SECONDS, FDA_HTTP_RETRIES
 from grm_common import (
+    cap_health,
     FDA_BOT_BLOCK, FdaBotBlockError, _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log,
 )
 from collect_intake import (
@@ -350,6 +351,8 @@ def reset_ocr_health() -> None:
 def ocr_health() -> dict[str, Any]:
     """이번 실행의 OCR 관측치 스냅샷 — 예산 사용량 + 상태코드별 건수 + 파생 플래그."""
     return {
+        **cap_health("FDA 483 OCR", None, _OCR_BUDGET["used"],
+                     cap_hit=_OCR_BUDGET["remaining"] <= 0),
         "pages_used": _OCR_BUDGET["used"],
         "budget": FDA483_OCR_PAGE_BUDGET,
         "exhausted": _OCR_BUDGET["remaining"] <= 0,
@@ -3686,6 +3689,7 @@ def collect_fda_483(
     _OCR_BUDGET["used"] = 0
     reset_ocr_health()
     excerpt_health: dict[str, Any] = {
+        **cap_health("FDA 483 PDF", None, 0),
         "attempted": 0, "ok": 0, "failed": 0, "capped": False, "warnings": [],
         # [수집 사각 표면화 2026-07-27] cap 때문에 **한 번도 시도되지 않은** 윈도우 내 문서 수.
         # 종전엔 "cap 도달" 한 줄만 남아 몇 건이 통째로 빠졌는지 아무도 몰랐고, 그 문서들이
@@ -3722,6 +3726,7 @@ def collect_fda_483(
         "fda_483_deep": deep_health,
         "fda483_inspectors": inspectors_health,
         "source_degraded": False,
+        "fda_483_ocr": ocr_health(),
     }
 
     log("INFO", f"FDA 483 수집(백본 3단 DataTables→전수JSON→정적HTML): {OII_READING_ROOM_URL}")
@@ -3738,6 +3743,7 @@ def collect_fda_483(
             "fda483_inspectors": inspectors_health,
             "source_degraded": source_degraded,
             "backbone": _LAST_BACKBONE,
+            "fda_483_ocr": ocr_health(),
         }
         return [], ("FDA 483 수집 실패: 백본 3단(DataTables/전수JSON/정적HTML) 모두 483 행 0 — "
                     "소스 구조 변경 또는 일시 장애(수동 확인 필요)")
@@ -3753,6 +3759,7 @@ def collect_fda_483(
     skipped_known = 0
     skipped_excluded = 0
     body_error = None
+    pdf_candidates = 0
     for nrow in in_window:
         media_id = nrow["media_id"]
         if not media_id or media_id in seen:
@@ -3804,6 +3811,8 @@ def collect_fda_483(
         # ★ `capped` 로 루프를 빠져나가지 않는다 — 종전 `and not capped` 는 상한 도달 후
         #   첫 문서에서만 분기를 평가해 **몇 건이 통째로 빠졌는지 셀 수 없었다**. 이제 전건을
         #   지나가며 미시도 수를 센다(작업은 여전히 상한까지만 — 비용 불변).
+        if pdf_url:
+            pdf_candidates += 1
         if pdf_url and not body_error:
             in_scope_attempted = (excerpt_health["attempted"]
                                   - excerpt_health["dropped_out_of_scope"])
@@ -3906,6 +3915,8 @@ def collect_fda_483(
         if item is not None:             # dedup 은 위 media_id seen 으로 보장(doc_id=fda483-<id>)
             items.append(item)
 
+    excerpt_health.update(cap_health("FDA 483 PDF", pdf_candidates,
+                                     excerpt_health["attempted"], cap_hit=excerpt_health["capped"]))
     LAST_HEALTH = {
         "fda483_excerpt": excerpt_health,
         "fda_483_observations": observations_health,

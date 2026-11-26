@@ -559,6 +559,10 @@ class ExcerptTest(unittest.TestCase):
             items, _ = f.collect_fda_483(START, END)
         self.assertEqual(f.LAST_HEALTH["fda483_excerpt"]["attempted"], 2)
         self.assertTrue(f.LAST_HEALTH["fda483_excerpt"]["capped"])
+        cap = f.LAST_HEALTH["fda483_excerpt"]
+        self.assertEqual((cap["source_total"], cap["fetched"]), (3, 2))
+        self.assertTrue(cap["cap_hit"])
+        self.assertIn("[GRM 문제]", cap["cap_warning"])
         self.assertEqual(len(items), 3)        # cap 은 excerpt 만 제한, 항목은 전부 유지
 
 
@@ -1329,6 +1333,15 @@ class OcrEngineObservabilityTest(unittest.TestCase):
         self.assertEqual(health["ok"], 1)
         self.assertEqual(health["budget_skipped"], 1)
         self.assertEqual(health["engine_unavailable"], 0)
+
+    def test_cap_health_records_consumed_ocr_pages(self):
+        for used, remaining in ((4, 1), (5, 0)):
+            with self.subTest(used=used), patch.dict(f._OCR_BUDGET, used=used, remaining=remaining):
+                health = f.ocr_health()
+                self.assertIsNone(health["source_total"])
+                self.assertEqual(health["fetched"], used)
+                self.assertEqual(health["cap_hit"], remaining == 0)
+                self.assertEqual("[GRM 문제]" in health["cap_warning"], remaining == 0)
 
     def test_collect_run_resets_counters(self):
         """실행별 리셋 — 이전 실행의 부재가 다음 실행 경보로 새면 안 된다."""

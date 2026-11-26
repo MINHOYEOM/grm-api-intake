@@ -35,7 +35,7 @@ from typing import Any
 from urllib.parse import urljoin, urlsplit
 
 import intake_exclusion as _xl
-from grm_common import env_flag, http_get_bytes, http_get_html, log
+from grm_common import cap_health, env_flag, http_get_bytes, http_get_html, log
 from collect_intake import (
     IntakeItem,
     SOURCE_WHO,
@@ -915,7 +915,13 @@ def enrich_whopir_items(items: "list[IntakeItem]") -> dict[str, Any]:
     반환 = health dict(`LAST_HEALTH["whopir_excerpt"]` 에도 반영).
     """
     enabled = _whopir_excerpt_enabled()
+    candidates = [
+        item.raw_payload for item in items
+        if isinstance(item.raw_payload, dict) and item.raw_payload.get("channel") == "whopir"
+        and item.raw_payload.get("pdf_url")
+    ]
     health: dict[str, Any] = {
+        **cap_health("WHOPIR 발췌", len(candidates), 0),
         "enabled": enabled, "attempted": 0, "ok": 0, "failed": 0,
         "structured": 0, "capped": False, "warnings": [],
     }
@@ -925,13 +931,8 @@ def enrich_whopir_items(items: "list[IntakeItem]") -> dict[str, Any]:
     LAST_HEALTH = {**LAST_HEALTH, "whopir_excerpt": health}
     if not enabled:
         return health
-    for item in items:
-        raw = item.raw_payload
-        if not isinstance(raw, dict) or raw.get("channel") != "whopir":
-            continue
-        url = str(raw.get("pdf_url") or "")
-        if not url:
-            continue
+    for raw in candidates:
+        url = str(raw["pdf_url"])
         if health["attempted"] >= WHOPIR_EXCERPT_MAX_ITEMS:
             health["capped"] = True
             break
@@ -950,6 +951,8 @@ def enrich_whopir_items(items: "list[IntakeItem]") -> dict[str, Any]:
             warn = f"WHOPIR excerpt 실패({status}): {url}"
             health["warnings"].append(warn)
             log("WARN", warn + " — 링크 카드로 유지(manual_review)")
+    health.update(cap_health("WHOPIR 발췌", len(candidates), health["attempted"],
+                             cap_hit=health["capped"]))
     if health["capped"]:
         log("WARN", f"WHOPIR excerpt cap({WHOPIR_EXCERPT_MAX_ITEMS}) 도달 — "
                     f"나머지 신규 항목은 excerpt 없이 링크 카드로 유지")
@@ -959,14 +962,17 @@ def enrich_whopir_items(items: "list[IntakeItem]") -> dict[str, Any]:
 
 
 def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
+    global LAST_HEALTH
     items: list[IntakeItem] = []
     seen: set[str] = set()
     dateless: list[str] = []               # 실사일 미추출 항목(침묵 금지 — 아래 health/sentinel)
     excerpt_enabled = _whopir_excerpt_enabled()
     excerpt_health: dict[str, Any] = {
+        **cap_health("WHOPIR 발췌", None, 0),
         "enabled": excerpt_enabled, "attempted": 0, "ok": 0, "failed": 0,
         "structured": 0, "capped": False, "warnings": [],
     }
+    LAST_HEALTH = {**LAST_HEALTH, "whopir_excerpt": excerpt_health}
     for page in range(WHOPIR_MAX_PAGES):
         url = WHOPIR_MED_URL if page == 0 else f"{WHOPIR_MED_URL}?page={page}"
         time.sleep(REQUEST_DELAY_SECONDS)
@@ -1030,7 +1036,7 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
     else:
         # for-else: break 없이 WHOPIR_MAX_PAGES 소진 = cap 도달(이후 페이지 누락 가능)
         log("WARN", f"WHO WHOPIR 페이지 cap({WHOPIR_MAX_PAGES}) 도달 — 이후 보고서 누락 가능")
-    global LAST_HEALTH
+    excerpt_health["source_total"] = len(items)
     dates_health = {
         "total": len(items), "dated": len(items) - len(dateless),
         "dateless": len(dateless), "samples": dateless[:3],

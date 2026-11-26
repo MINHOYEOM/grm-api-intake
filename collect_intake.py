@@ -57,6 +57,7 @@ from grm_http_policy import (
     NOTION_WRITE_DELAY_SECONDS,
 )
 from grm_common import (
+    cap_health, parse_int_safe,
     FDA_BOT_BLOCK,
     FdaBotBlockError,
     fda_checked_request,
@@ -799,6 +800,7 @@ class CollectionStats:
     # Supabase(정본)를 먼저 쓰고 Notion(주간 대기열)을 뒤에 쓴다. 두 곳의 성공·실패와
     # 중복 판정 기준(notion / supabase-fallback)을 따로 센다. 키는 `_new_store_counters()`.
     store_summary: dict[str, Any] = field(default_factory=dict)
+    collection_caps: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def total_insert_failures(self) -> int:
         return (
@@ -1710,6 +1712,16 @@ def _fr_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+LAST_CAP_HEALTH: dict[str, dict[str, Any]] = {}
+
+
+def _record_cap(stats: CollectionStats, label: str, health: dict[str, Any]) -> None:
+    if "cap_hit" in health:
+        stats.collection_caps[label] = {
+            key: health[key] for key in ("source_total", "fetched", "cap_hit", "cap_warning")
+        }
+
+
 def collect_openfda_recalls(start: date, end: date,
                             api_key: str | None) -> tuple[list[IntakeItem], str | None]:
     """OpenFDA Drug Enforcement 항목 수집. report_date 는 지연 일괄 공개되므로
@@ -1718,6 +1730,9 @@ def collect_openfda_recalls(start: date, end: date,
     search = f"report_date:[{start.strftime('%Y%m%d')}+TO+{end.strftime('%Y%m%d')}]"
     items: list[IntakeItem] = []
     skip = 0
+    fetched = 0
+    source_total = None
+    cap_hit = False
     api_query_url_for_log: str | None = None
     try:
         while True:
@@ -1738,12 +1753,18 @@ def collect_openfda_recalls(start: date, end: date,
             except HTTPClientError as e:
                 # OpenFDA 는 해당 기간 결과 0건일 때 404 를 반환하는 것이 관행
                 if e.status_code == 404:
+                    if skip == 0:
+                        source_total = 0
                     log("INFO", "OpenFDA 404 (해당 기간 결과 0건) — 정상 종료")
                     return items, None
                 # 404 외 4xx (401, 403 등) 는 실제 에러로 처리
                 raise RuntimeError(str(e)) from e
             results = data.get("results", []) or []
-            meta_total = (data.get("meta", {}).get("results", {}) or {}).get("total", 0)
+            fetched += len(results)
+            meta = data.get("meta", {}).get("results", {}) or {}
+            meta_total = meta.get("total", 0)
+            if "total" in meta:
+                source_total = parse_int_safe(meta_total, None)
             log("INFO", f"OpenFDA skip={skip}: {len(results)} 건 (total {meta_total})")
             for r in results:
                 items.append(_recall_to_item(r, api_query_url_for_log or url))
@@ -1751,6 +1772,7 @@ def collect_openfda_recalls(start: date, end: date,
             if not results or skip >= meta_total:
                 break
             if skip >= OPENFDA_MAX_TOTAL:
+                cap_hit = True
                 msg = (f"OpenFDA OPENFDA_MAX_TOTAL({OPENFDA_MAX_TOTAL}) 상한 초과 — truncated "
                        f"(수집 {len(items)}건, meta.total={meta_total}, 이후 항목 누락 가능)")
                 log("WARN", msg)
@@ -1759,6 +1781,8 @@ def collect_openfda_recalls(start: date, end: date,
     except Exception as e:
         log("ERROR", f"OpenFDA 수집 실패: {e}")
         return items, str(e)
+    finally:
+        LAST_CAP_HEALTH["recall"] = cap_health("OpenFDA 회수", source_total, fetched, cap_hit=cap_hit)
 
 
 def _mask_api_key(url: str) -> str:
@@ -1915,10 +1939,12 @@ def _record_rss_exclusion(spec: "RssFeedSpec", doc_id: str, f: "_RssItemFields")
 
 
 def collect_rss_feed(spec: RssFeedSpec, start: date,
-                     end: date) -> tuple[list[IntakeItem], str | None]:
+                     end: date, *, health: dict[str, Any] | None = None
+                     ) -> tuple[list[IntakeItem], str | None]:
     """RssFeedSpec 하나로 RSS/Atom 피드를 수집해 IntakeItem 리스트를 반환한다(배치6 Phase3)."""
     items: list[IntakeItem] = []
     errors: list[str] = []
+    feed_total = 0
     for feed_name, feed_url in spec.feeds:
         if spec.accumulate_errors:
             log("INFO", f"{spec.label} 수집: {feed_name} ({feed_url})")
@@ -1944,6 +1970,7 @@ def collect_rss_feed(spec: RssFeedSpec, start: date,
             return [], str(e)
 
         for el in spec.iter_items(root):
+            feed_total += 1
             f = spec.extract(el, feed_name, feed_url)
             if not _within_window(f.date_iso, start, end):
                 continue
@@ -1975,6 +2002,8 @@ def collect_rss_feed(spec: RssFeedSpec, start: date,
                 raw_payload=f.raw_payload,
             ))
 
+    if health is not None and not errors:
+        health["source_total"] = feed_total
     if spec.accumulate_errors:
         # 오류가 있어도 다른 피드에서 수집한 항목은 반환 (graceful degradation)
         log("INFO", f"{spec.label} 수집 완료: {len(items)}건 (errors={len(errors)})")
@@ -2323,7 +2352,8 @@ def collect_ema_rss(start: date, end: date) -> tuple[list[IntakeItem], str | Non
     주당 항목이 많아 전수 fetch 는 낭비다. 기본 off(`ENABLE_EMA_ARTICLE_EXCERPT`) —
     off 면 이 블록이 실행되지 않아 산출물이 기존과 byte 동일하다.
     """
-    items, err = collect_rss_feed(_EMA_FEED_SPEC, start, end)
+    LAST_CAP_HEALTH["ema"] = cap_health("EMA 발췌", None, 0)
+    items, err = collect_rss_feed(_EMA_FEED_SPEC, start, end, health=LAST_CAP_HEALTH["ema"])
     if items and env_flag("ENABLE_EMA_ARTICLE_EXCERPT"):
         _enrich_ema_article_excerpts(items)
     return items, err
@@ -2370,6 +2400,8 @@ def _enrich_ema_article_excerpts(items: list[IntakeItem]) -> None:
         if not doc.ok:
             level = "WARN" if ema_document.is_document_url(item.official_url) else "INFO"
             log(level, f"EMA 원문 전문 미확보({doc.status}) — 카드 그대로: {truncate(item.official_url, 80)}")
+    LAST_CAP_HEALTH["ema"] = cap_health(
+        "EMA 발췌", LAST_CAP_HEALTH.get("ema", {}).get("source_total"), fetched, cap_hit=capped)
     if fetched:
         log("INFO", f"EMA 원문 fetch {fetched}건 시도")
 
@@ -2451,9 +2483,11 @@ def collect_mhra_alerts(start: date, end: date) -> tuple[list[IntakeItem], str |
     추가 조회해 알림 전문을 `raw_payload["mhra_alert_body"]` 에 싣는다(cap 10건·delay 1s·
     실패 조용히 skip). 기본 off — off 면 이 블록이 실행되지 않아 산출물 byte 동일.
     """
-    items, err = collect_rss_feed(_MHRA_ALERT_FEED_SPEC, start, end)
+    LAST_CAP_HEALTH["mhra_alert"] = cap_health("MHRA 경보 본문", None, 0)
+    items, err = collect_rss_feed(_MHRA_ALERT_FEED_SPEC, start, end, health=LAST_CAP_HEALTH["mhra_alert"])
+    fetched = 0
+    capped = False
     if items and env_flag("ENABLE_MHRA_ALERT_BODY"):
-        capped = False
         for i, item in enumerate(items):
             if i >= MHRA_ALERT_BODY_CAP:
                 if not capped:
@@ -2465,8 +2499,11 @@ def collect_mhra_alerts(start: date, end: date) -> tuple[list[IntakeItem], str |
                 continue
             time.sleep(MHRA_ALERT_BODY_DELAY_SECONDS)
             body = _fetch_mhra_alert_body(item.official_url)
+            fetched += 1
             if body:
                 item.raw_payload["mhra_alert_body"] = body
+    LAST_CAP_HEALTH["mhra_alert"] = cap_health(
+        "MHRA 경보 본문", LAST_CAP_HEALTH["mhra_alert"]["source_total"], fetched, cap_hit=capped)
     return items, err
 
 
@@ -2538,9 +2575,11 @@ def collect_eca_rss(start: date, end: date) -> tuple[list[IntakeItem], str | Non
     에 싣는다(cap 10건·per-item delay 1s·403/timeout 은 조용히 skip). 기본 off — off 면 이
     블록 자체가 실행되지 않아 산출물이 기존과 byte 동일(§4 골든 불변 하드 요구).
     """
-    items, err = collect_rss_feed(_ECA_FEED_SPEC, start, end)
+    LAST_CAP_HEALTH["eca"] = cap_health("ECA 발췌", None, 0)
+    items, err = collect_rss_feed(_ECA_FEED_SPEC, start, end, health=LAST_CAP_HEALTH["eca"])
+    fetched = 0
+    capped = False
     if items and env_flag("ENABLE_ECA_ARTICLE_EXCERPT"):
-        capped = False
         for i, item in enumerate(items):
             if i >= ECA_ARTICLE_EXCERPT_CAP:
                 if not capped:
@@ -2552,8 +2591,11 @@ def collect_eca_rss(start: date, end: date) -> tuple[list[IntakeItem], str | Non
                 continue
             time.sleep(ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
             excerpt = _fetch_eca_article_excerpt(item.official_url)
+            fetched += 1
             if excerpt:
                 item.raw_payload["eca_article_excerpt"] = excerpt
+    LAST_CAP_HEALTH["eca"] = cap_health(
+        "ECA 발췌", LAST_CAP_HEALTH["eca"]["source_total"], fetched, cap_hit=capped)
     return items, err
 
 
@@ -3390,7 +3432,8 @@ def _wl_datatable_cols(raw: Any) -> list[str] | None:
     return cols
 
 
-def _fetch_wl_listing_datatables(html_text: str, start: date) -> list[dict[str, Any]]:
+def _fetch_wl_listing_datatables(html_text: str, start: date, *,
+                                 health: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     """WL DataTables 뷰를 게시일 내림차순으로 창 시작일까지 읽는다. 실패는 예외로 올린다.
 
     창 시작일보다 오래된 행이 나오거나 원천이 끝나면 멈춘다. 쪽 상한에 걸리면 절단이므로
@@ -3400,6 +3443,8 @@ def _fetch_wl_listing_datatables(html_text: str, start: date) -> list[dict[str, 
     if config is None:
         raise RuntimeError("wl-datatables-config-missing")
     rows: list[dict[str, Any]] = []
+    source_total = None
+    fetched = 0
     for page in range(WL_LISTING_MAX_PAGES):
         params = dict(config["params"])
         params.update({
@@ -3427,6 +3472,12 @@ def _fetch_wl_listing_datatables(html_text: str, start: date) -> list[dict[str, 
         raw_rows = data.get("data") if isinstance(data, dict) else None
         if not isinstance(raw_rows, list):
             raise RuntimeError("wl-datatables-bad-payload")
+        total = parse_int_safe(data.get("recordsTotal"), None)
+        if total is not None:
+            source_total = total
+        fetched += len(raw_rows)
+        if health is not None:
+            health.update(cap_health("FDA WL 목록", source_total, fetched))
         oldest = ""
         for raw in raw_rows:
             cols = _wl_datatable_cols(raw)
@@ -3438,6 +3489,8 @@ def _fetch_wl_listing_datatables(html_text: str, start: date) -> list[dict[str, 
                 oldest = posted
         if len(raw_rows) < WL_LISTING_PAGE_LENGTH or (oldest and oldest < start.isoformat()):
             return rows
+    if health is not None:
+        health.update(cap_health("FDA WL 목록", source_total, fetched, cap_hit=True))
     raise RuntimeError(f"wl-datatables-page-cap({WL_LISTING_MAX_PAGES}) — 창 시작일 미도달")
 
 
@@ -3709,6 +3762,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         "enabled": wl_body_full_enabled, "attempted": 0, "failed": 0,
     }
     listing_health: dict[str, Any] = {"backbone": "", "rows": 0, "truncated": False, "detail": ""}
+    listing_health.update(cap_health("FDA WL 목록", None, 0))
     LAST_WL_HEALTH = {"wl_body": wl_body_health, "wl_body_full": wl_body_full_health,
                       "listing": listing_health}
     try:
@@ -3731,7 +3785,7 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     # [WL 목록 절단 수리 2026-10-27] DataTables 전수 뷰 1차 → 정적 HTML(최신 10행) 폴백.
     listing_rows: list[dict[str, Any]] = []
     try:
-        listing_rows = _fetch_wl_listing_datatables(html_text, start)
+        listing_rows = _fetch_wl_listing_datatables(html_text, start, health=listing_health)
         listing_health["backbone"] = WL_LISTING_BACKBONE_DATATABLES
     except FdaBotBlockError:
         listing_health["detail"] = FDA_BOT_BLOCK
@@ -3745,6 +3799,8 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         parser.feed(html_text)
         listing_rows = parser.rows
         listing_health["backbone"] = WL_LISTING_BACKBONE_STATIC
+        if not listing_health["fetched"]:
+            listing_health["fetched"] = len(listing_rows)
         listing_health["truncated"] = wl_static_listing_may_be_truncated(listing_rows, start)
         if listing_health["truncated"]:
             log("WARN", f"FDA WL 정적 표 {len(listing_rows)}행이 전부 수집 창 안 — 창 안 "
@@ -4330,6 +4386,7 @@ def _health_payload(
         "flags": flags,
         "health": health.to_dict(),
         "sources": _source_health_rows(stats),
+        "collection_caps": dict(stats.collection_caps),
         # 제외 장부 - 소스별 excluded 가 원천 대조(원천=수집+제외+미뤄짐)의 '제외' 항이다(가산 키).
         "exclusion_ledger": dict(stats.exclusion_ledger),
         # [대기열 0단계] 저장 순서·두 저장소 성패·중복 판정 기준(가산 키).
@@ -4570,7 +4627,9 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
 
     recall_items: list[IntakeItem] = []
     if "recall" in active:
+        LAST_CAP_HEALTH.pop("recall", None)
         recall_items, rec_err = collect_openfda_recalls(enf_start, end, openfda_key)
+        _record_cap(stats, "OpenFDA 회수", LAST_CAP_HEALTH.get("recall", {}))
         stats.recall_fetched = len(recall_items)
         if rec_err:
             stats.recall_error = True
@@ -4581,7 +4640,9 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
     # ── Phase 2: RSS / HTML (v15.1) ───────────────────────────────────────
     ema_items: list[IntakeItem] = []
     if "ema" in active:
+        LAST_CAP_HEALTH.pop("ema", None)
         ema_items, ema_err = collect_ema_rss(start, end)
+        _record_cap(stats, "EMA 발췌", LAST_CAP_HEALTH.get("ema", {}))
         stats.ema_fetched = len(ema_items)
         if ema_err:
             stats.ema_error = True
@@ -4596,7 +4657,9 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             stats.mhra_error = True
             stats.mhra_error_msg = mhra_err
         # [MHRA 회수 커버리지 수리] 같은 "mhra" 토큰으로 의약품 회수 채널도 함께 수집.
+        LAST_CAP_HEALTH.pop("mhra_alert", None)
         mhra_alert_items, mhra_alert_err = collect_mhra_alerts(start, end)
+        _record_cap(stats, "MHRA 경보 본문", LAST_CAP_HEALTH.get("mhra_alert", {}))
         stats.mhra_alert_fetched = len(mhra_alert_items)
         if mhra_alert_err:
             stats.mhra_alert_error = True
@@ -4612,7 +4675,9 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
 
     eca_items: list[IntakeItem] = []
     if "eca" in active:
+        LAST_CAP_HEALTH.pop("eca", None)
         eca_items, eca_err = collect_eca_rss(start, end)
+        _record_cap(stats, "ECA 발췌", LAST_CAP_HEALTH.get("eca", {}))
         stats.eca_fetched = len(eca_items)
         if eca_err:
             stats.eca_error = True
@@ -4636,6 +4701,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         stats.wl_violations_unsupported_docs = wl_v["unsupported_docs"]
         stats.wl_violations_out_of_scope = wl_v["out_of_scope"]
         wl_listing = LAST_WL_HEALTH.get("listing") or {}
+        _record_cap(stats, "FDA WL 목록", wl_listing)
         stats.wl_listing_backbone = str(wl_listing.get("backbone") or "")
         stats.wl_listing_truncated = bool(wl_listing.get("truncated"))
         stats.wl_listing_detail = str(wl_listing.get("detail") or "")
@@ -4694,10 +4760,11 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             mfds_recall_items = []
         else:
             try:
-                from collect_mfds_recall import collect_mfds_recall
+                import collect_mfds_recall as mfds_recall
                 # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
-                mfds_recall_items, mfds_recall_err = collect_mfds_recall(
+                mfds_recall_items, mfds_recall_err = mfds_recall.collect_mfds_recall(
                     enf_start, end, data_go_kr_service_key)
+                _record_cap(stats, "식약처 회수", mfds_recall.LAST_HEALTH)
             except Exception as e:
                 mfds_recall_items, mfds_recall_err = [], str(e)
         stats.mfds_recall_fetched = len(mfds_recall_items)
@@ -4721,6 +4788,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
                 # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
                 mfds_admin_items, mfds_admin_err = mfds_admin.collect_mfds_admin_actions(
                     enf_start, end, data_go_kr_service_key)
+                _record_cap(stats, "식약처 행정처분", mfds_admin.LAST_HEALTH)
                 stats.mfds_admin_total_count_warning = mfds_admin.LAST_HEALTH.get(
                     "total_count_warning", "")
             except Exception as e:
@@ -4742,9 +4810,10 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             mfds_gmp_cert_items = []
         else:
             try:
-                from collect_mfds_gmp_cert import collect_mfds_gmp_certs
-                mfds_gmp_cert_items, mfds_gmp_cert_err = collect_mfds_gmp_certs(
+                import collect_mfds_gmp_cert as mfds_gmp_cert
+                mfds_gmp_cert_items, mfds_gmp_cert_err = mfds_gmp_cert.collect_mfds_gmp_certs(
                     start, end, data_go_kr_service_key)
+                _record_cap(stats, "식약처 GMP 적합판정", mfds_gmp_cert.LAST_HEALTH)
             except Exception as e:
                 mfds_gmp_cert_items, mfds_gmp_cert_err = [], str(e)
         stats.mfds_gmp_cert_fetched = len(mfds_gmp_cert_items)
@@ -4764,9 +4833,10 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             mfds_safety_letter_items = []
         else:
             try:
-                from collect_mfds_safety_letter import collect_mfds_safety_letters
-                mfds_safety_letter_items, mfds_safety_letter_err = collect_mfds_safety_letters(
+                import collect_mfds_safety_letter as mfds_safety_letter
+                mfds_safety_letter_items, mfds_safety_letter_err = mfds_safety_letter.collect_mfds_safety_letters(
                     start, end, data_go_kr_service_key)
+                _record_cap(stats, "식약처 안전성서한", mfds_safety_letter.LAST_HEALTH)
             except Exception as e:
                 mfds_safety_letter_items, mfds_safety_letter_err = [], str(e)
         stats.mfds_safety_letter_fetched = len(mfds_safety_letter_items)
@@ -4786,6 +4856,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             mfds_gmp_inspection_items, mfds_gmp_inspection_err = mfds_gmp_module.collect_mfds_gmp_inspections(
                 start, end)
             gmp_health = getattr(mfds_gmp_module, "LAST_HEALTH", {}) or {}
+            _record_cap(stats, "식약처 GMP 실사", gmp_health)
         except Exception as e:
             mfds_gmp_inspection_items, mfds_gmp_inspection_err = [], str(e)
             gmp_health = {}
@@ -4843,6 +4914,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         stats.who_fetched = len(who_items)
         # P1: WHOPIR excerpt 실패/cap 은 graceful(링크 카드 유지) — warning 표면화용 집계.
         whopir_excerpt_health = who_health.get("whopir_excerpt") or {}
+        _record_cap(stats, "WHOPIR 발췌", whopir_excerpt_health)
         stats.whopir_excerpt_attempted = int(whopir_excerpt_health.get("attempted") or 0)
         stats.whopir_excerpt_failed = int(whopir_excerpt_health.get("failed") or 0)
         stats.whopir_excerpt_capped = int(bool(whopir_excerpt_health.get("capped")))
@@ -4889,6 +4961,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         stats.fda483_fetched = len(fda483_items)
         # P1: 483 excerpt 실패/cap·전수 경로 degrade 는 graceful — warning 표면화용 집계.
         fda483_excerpt_health = fda483_health.get("fda483_excerpt") or {}
+        _record_cap(stats, "FDA 483 PDF", fda483_excerpt_health)
         stats.fda483_excerpt_attempted = int(fda483_excerpt_health.get("attempted") or 0)
         stats.fda483_excerpt_failed = int(fda483_excerpt_health.get("failed") or 0)
         stats.fda483_excerpt_capped = int(bool(fda483_excerpt_health.get("capped")))
@@ -4904,6 +4977,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         # 여기서 **아무도 읽지 않아** 경보 경로에 오르지 못했다 — 엔진 부재도, 매 실행
         # 예산 소진도 로그 한 줄로 끝났다. 두 신호를 stats 로 끌어올려 grm_health 가 본다.
         fda483_ocr_health = fda483_health.get("fda_483_ocr") or {}
+        _record_cap(stats, "FDA 483 OCR", fda483_ocr_health)
         stats.fda483_ocr_engine_unavailable = int(
             fda483_ocr_health.get("engine_unavailable") or 0)
         stats.fda483_ocr_engine_reason = str(fda483_ocr_health.get("engine_reason") or "")
@@ -5556,6 +5630,7 @@ def main() -> int:
             if _new_who:
                 log("INFO", f"WHOPIR 보강 대상(신규): {len(_new_who)}건 / 수집 {len(who_items)}건")
             _h = _who_enrich.enrich_whopir_items(_new_who)
+            _record_cap(stats, "WHOPIR 발췌", _h)
             stats.whopir_excerpt_attempted = int(_h.get("attempted") or 0)
             stats.whopir_excerpt_failed = int(_h.get("failed") or 0)
             stats.whopir_excerpt_capped = int(bool(_h.get("capped")))

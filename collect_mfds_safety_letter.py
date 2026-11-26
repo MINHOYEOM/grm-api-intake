@@ -8,6 +8,7 @@ from datetime import date
 from typing import Any
 
 from grm_common import (
+    cap_health,
     DatagoPageError,
     datago_extract_items,
     datago_paginate,
@@ -115,12 +116,17 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
     )
 
 
+LAST_HEALTH: dict[str, Any] = {}
+
+
 def collect_mfds_safety_letters(
     start: date,
     end: date,
     service_key: str,
 ) -> tuple[list[IntakeItem], str | None]:
     """Collect MFDS medicinal safety letters."""
+    global LAST_HEALTH
+    LAST_HEALTH = cap_health("식약처 안전성서한", None, 0)
     if not service_key:
         return [], "DATA_GO_KR_SERVICE_KEY 환경변수 필요"
 
@@ -141,12 +147,14 @@ def collect_mfds_safety_letters(
                 seen_ids.add(item.document_id)
                 items.append(item)
     except DatagoPageError as e:
+        LAST_HEALTH = paginator.health("식약처 안전성서한")
         msg = f"MFDS safety-letter API page={e.page_no} 실패: {e.cause}"
         if items:
             log("WARN", msg)
             return items, None
         return [], msg
 
+    LAST_HEALTH = paginator.health("식약처 안전성서한")
     total_count = paginator.total_count
     truncated_msg: str | None = None
     if paginator.truncated:

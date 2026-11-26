@@ -16,6 +16,7 @@ from datetime import date
 from typing import Any
 
 from grm_common import (
+    cap_health,
     DatagoPageError,
     datago_paginate,
     http_get_json,
@@ -61,9 +62,11 @@ def _set_last_health(
     pages_seen: int,
     truncated: bool,
     page_warnings: list[str],
+    cap: dict[str, Any] | None = None,
 ) -> None:
     global LAST_HEALTH
     LAST_HEALTH = {
+        **(cap or cap_health("식약처 회수", None, 0)),
         "collected": collected,
         "total_count": total_count,
         "pages_seen": pages_seen,
@@ -180,13 +183,13 @@ def collect_mfds_recall(
     Returns (items, error_msg). A page-level failure is fatal only if no item was
     collected; otherwise the partial collection is returned with a warning log.
     """
+    _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
+                     page_warnings=[])
     if not service_key:
         return [], "DATA_GO_KR_SERVICE_KEY 환경변수 필요"
 
     items: list[IntakeItem] = []
     seen_ids: set[str] = set()
-    _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
-                     page_warnings=[])
     pages_seen = 0
     # 정렬 비의존(B2): data.go.kr recall 응답의 정렬 순서를 가정하지 않는다. 요청에 order
     # 미지정(admin 의 order:Y 와 달리 미검증)이므로 날짜 기반 조기중단을 쓰지 않고 datago_paginate
@@ -212,9 +215,11 @@ def collect_mfds_recall(
             # 매일 라인 계약 유지(부분 수집을 치명적으로 보지 않는다). 다만 흔적은 남긴다.
             log("WARN", msg)
             _set_last_health(collected=len(items), total_count=paginator.total_count,
+                             cap=paginator.health("식약처 회수"),
                              pages_seen=pages_seen, truncated=False, page_warnings=[msg])
             return items, None
         _set_last_health(collected=0, total_count=paginator.total_count,
+                         cap=paginator.health("식약처 회수"),
                          pages_seen=pages_seen, truncated=False, page_warnings=[msg])
         return [], msg
 
@@ -233,6 +238,7 @@ def collect_mfds_recall(
         f"{len(items)}건 (totalCount={total_count})",
     )
     _set_last_health(collected=len(items), total_count=total_count,
+                     cap=paginator.health("식약처 회수"),
                      pages_seen=pages_seen, truncated=bool(paginator.truncated),
                      page_warnings=[])
     return items, truncated_msg

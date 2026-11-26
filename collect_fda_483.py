@@ -1139,8 +1139,10 @@ def strip_483_form_boilerplate(text: str) -> str:
     return re.sub(r"\s+", " ", compact).strip()
 
 
-def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
+def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int | None = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
     """483 PDF fetch → 평탄화 텍스트. fetch 는 grm_common.http_get_bytes(404 포함 retry/backoff).
+
+    `max_chars=None` 은 전문 저장용으로 길이 상한 없이 읽는다.
 
     ★상한은 483 전용 FDA483_TEXT_MAX_CHARS(200000·≈74쪽)를 **기본**으로 쓴다 — 공유 PDF 엔진의
     기본 상한(GMP용 12000)은 8쪽+ 483 의 뒤 Observation 을 잘라, 이 라이브 경로를 쓰는 **결정론
@@ -1181,7 +1183,7 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
 
 
 def _read_fda483_pdf_text(
-    data: bytes, max_chars: int, extract_pdf_text: Callable[..., tuple[str, str]],
+    data: bytes, max_chars: int | None, extract_pdf_text: Callable[..., tuple[str, str]],
 ) -> tuple[str, str]:
     """PDF bytes → 평탄화 텍스트(텍스트층, 필요하면 빈 쪽만 OCR). `_fetch_fda483_pdf_text` 본체."""
     text, status = extract_pdf_text(data, max_chars=max_chars)
@@ -1270,7 +1272,7 @@ def _needs_ocr(text: str) -> bool:
     return _is_notice_only(text) or not _is_substantive_text(text, boilerplate)
 
 
-def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
+def _ocr_483_pdf_text(data: bytes, max_chars: int | None = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
     """스캔 483 PDF → 페이지 단위 OCR 텍스트. 반환 (text, status).
 
     설계 원칙
@@ -1291,7 +1293,7 @@ def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tu
     return text, status
 
 
-def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int,
+def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int | None,
                                 force_all: bool = False) -> tuple[str, str]:
     """실제 추출 본체. 반환 경로가 여섯 갈래라 **계수는 위 래퍼가 단독으로** 맡는다 —
     반환마다 카운터를 손으로 올리면 나중에 추가되는 경로가 반드시 하나 빠진다.
@@ -1381,7 +1383,7 @@ def _ensure_tessdata_prefix() -> None:
             os.environ["TESSDATA_PREFIX"] = found
 
 
-def _full_ocr_fallback(data: bytes, text: str, status: str, max_chars: int) -> tuple[str, str]:
+def _full_ocr_fallback(data: bytes, text: str, status: str, max_chars: int | None) -> tuple[str, str]:
     """본문은 있는데 관찰 0건 → 모든 쪽을 렌더링해 다시 판독, 관찰이 나올 때만 채택한다.
 
     `_fetch_fda483_pdf_text` 의 마지막 단계(호출부가 "본문 있음·관찰 0건·OCR on"을 보장한다).
@@ -1410,7 +1412,7 @@ def _full_ocr_fallback(data: bytes, text: str, status: str, max_chars: int) -> t
     return text, status
 
 
-def _forced_full_ocr(data: bytes, text: str, status: str, max_chars: int) -> tuple[str, str]:
+def _forced_full_ocr(data: bytes, text: str, status: str, max_chars: int | None) -> tuple[str, str]:
     """`FDA483_FORCE_OCR` 경로 — 텍스트층을 무시하고 모든 쪽을 다시 판독한다(CLI 우선, 없으면 내장 엔진).
 
     채택 조건: 판독 결과가 비지 않고 관찰 수가 텍스트층보다 **줄지 않을 때**. 그렇지 않으면 원래 텍스트를
@@ -1464,7 +1466,7 @@ def _repair_cli_bang(text: str) -> str:
     return _CLI_BANG_RE.sub(_fix, text or "")
 
 
-def _reocr_483_pdf_text(data: bytes, max_chars: int) -> tuple[str, str]:
+def _reocr_483_pdf_text(data: bytes, max_chars: int | None) -> tuple[str, str]:
     """모든 쪽을 렌더링해 tesseract CLI 로 판독한다(텍스트층 무시). (text, status).
 
     전면 OCR 폴백(`force_all`)과 같은 이유로 이미지 유무로 거르지 않는다 — 표제가 벡터 윤곽선인

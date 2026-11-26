@@ -14,7 +14,7 @@ import io
 import json
 import os
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from datetime import date
 from pathlib import Path
 from unittest import mock
@@ -991,6 +991,104 @@ class CliTest(unittest.TestCase):
         self.assertEqual(data["schema_version"], "grm-findings-backfill-fetch/v1")
         self.assertEqual(data["next_offset"], 200)
         self.assertNotIn(_SERVICE_KEY, json.dumps(data))
+
+
+class Fda483MediaIdsTest(unittest.TestCase):
+    def setUp(self) -> None:
+        env = {"SUPABASE_URL": _BASE_URL, "SUPABASE_SERVICE_ROLE_KEY": _SERVICE_KEY}
+        self.enterContext(mock.patch.dict(os.environ, env))
+        self.enterContext(mock.patch.object(backfill, "_default_sleep"))
+        self.existing = self.enterContext(mock.patch.object(
+            backfill, "fetch_existing_document_ids", return_value={"fda483-555002"},
+        ))
+        self.index = self.enterContext(mock.patch.object(
+            backfill.fda483, "_fetch_legacy_json_rows",
+            return_value=([_483_JSON_ROW_A, _483_JSON_ROW_B, _483_JSON_ROW_C], 3),
+        ))
+        self.text = "Example facility maintained trial records.\n" * 6000 + "END OF DOCUMENT"
+        self.pdf = self.enterContext(mock.patch.object(
+            backfill.fda483, "_fetch_fda483_pdf_text", return_value=(self.text, "pdf-ok"),
+        ))
+        self.post = self.enterContext(mock.patch.object(backfill, "_post_raw_signals", return_value=1))
+
+    def run_cli(self, *flags: str) -> tuple[dict, int]:
+        with redirect_stdout(io.StringIO()) as out:
+            code = backfill.main(list(flags))
+        return json.loads(out.getvalue()), code
+
+    def test_dry_counts_existing_and_absent_unique_ids(self) -> None:
+        report, code = self.run_cli("--media-ids", "555002, 555003 555003, 999999")
+        self.assertEqual(code, 0)
+        self.assertEqual(report["requested"], 3)
+        self.assertEqual(report["skipped_existing"], 1)
+        self.assertEqual(report["missing_in_db"], 2)
+        self.assertEqual(report["fetched"], 0)
+        self.index.assert_not_called()
+        self.pdf.assert_not_called()
+        self.post.assert_not_called()
+
+    def test_apply_skips_existing_and_saves_only_selected_absent_id_in_full(self) -> None:
+        with mock.patch.object(backfill, "recent_483_skip_days", return_value=10000):
+            report, code = self.run_cli("--source", "fda483", "--media-ids", "555002,555003", "--apply")
+        self.assertEqual(code, 0)
+        self.assertEqual(report["skipped_existing"], 1)
+        self.assertEqual(report["appended"], 1)
+        self.pdf.assert_called_once_with(backfill.fda483._pdf_url("555003"), max_chars=None)
+        self.post.assert_called_once()
+        records = self.post.call_args.args[2]
+        self.assertEqual([record["document_id"] for record in records], ["fda483-555003"])
+        self.assertEqual(json.loads(records[0]["raw_json"])["fda483_body_full"], self.text)
+
+    def test_apply_with_only_existing_ids_never_calls_fda(self) -> None:
+        report, code = self.run_cli("--media-ids", "555002", "--apply")
+        self.assertEqual(code, 0)
+        self.assertEqual(report["skipped_existing"], 1)
+        self.assertEqual(report["missing_in_db"], 0)
+        self.index.assert_not_called()
+        self.pdf.assert_not_called()
+        self.post.assert_not_called()
+
+    def test_absent_from_fda_index_is_reported_without_pdf_fetch_or_write(self) -> None:
+        fetch_index = mock.Mock(return_value=([_483_JSON_ROW_A], 1))
+        fetch_pdf = mock.Mock()
+        report, code = backfill.run_483_media_ids(
+            media_ids=["999999"], delay=0, dry_run=False, base_url=_BASE_URL,
+            service_key=_SERVICE_KEY, sleeper=lambda _: None,
+            fetch_index=fetch_index, fetch_pdf=fetch_pdf,
+        )
+        self.assertEqual(code, 1)
+        self.assertEqual(report.missing_in_db, 1)
+        self.assertEqual(report.not_found_in_fda_index, ["999999"])
+        fetch_index.assert_called_once_with()
+        fetch_pdf.assert_not_called()
+        self.post.assert_not_called()
+
+    def test_invalid_media_ids_fail_before_any_lookup(self) -> None:
+        for value in ("", " , ", "555002, fda483-555003", "-2", "0", "００１"):
+            with self.subTest(value=value), redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
+                with self.assertRaises(SystemExit) as exc:
+                    backfill.main(["--media-ids", value, "--apply"])
+                self.assertEqual(exc.exception.code, 2)
+        self.existing.assert_not_called()
+        self.index.assert_not_called()
+        self.pdf.assert_not_called()
+        self.post.assert_not_called()
+
+    def test_failed_db_lookup_does_not_report_a_missing_count_or_write(self) -> None:
+        self.existing.side_effect = RuntimeError("existing-ids-get-failed:invalid-json")
+        report, code = self.run_cli("--media-ids", "555003", "--apply")
+        self.assertEqual(code, 2)
+        self.assertIsNone(report["missing_in_db"])
+        self.index.assert_not_called()
+        self.pdf.assert_not_called()
+        self.post.assert_not_called()
+
+    def test_unreadable_pdf_is_not_appended(self) -> None:
+        self.pdf.return_value = ("", "fetch-fail:404")
+        report, code = self.run_cli("--media-ids", "555003", "--apply")
+        self.assertEqual(code, 1)
+        self.assertEqual(report["errors"], ["483-document-unreadable(fda483-555003):fetch-fail"])
+        self.post.assert_not_called()
 
 
 class BackfillFetchWorkflowTest(unittest.TestCase):

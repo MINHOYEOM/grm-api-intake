@@ -1,0 +1,98 @@
+# FDA 483 사람 판독 결과의 원천 칸 반영 — apply_483_human_verdicts.py (10차 B 실사관 · 10차 D 서명 가림 표식).
+#
+# 사람이 원본 PDF 쪽 이미지로 확인한 실사관 이름(findings 에 이미 반영된 값)을 raw_json.fda483_inspectors 로 옮기고,
+# 서명란 자체가 가려진 문서에는 fda483_inspectors_status=absent-in-source 를 단다. 둘 다 사람 확인 기록
+# (fda483_inspectors_check)을 함께 달아 재추출 도구가 다시 건드리지 않게 한다.
+# 기본 dry-run. 보고서에는 문서 id·이름 수·사유만 싣는다(이름 자체는 싣지 않는다).
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: '실제로 쓴다(기본 false = dry-run)'
+        type: boolean
+        default: false
+      at:
+        description: '사람 판독 날짜(YYYY-MM-DD)'
+        type: string
+        required: true
+      from_findings:
+        description: 'findings 의 사람 판독 이름을 원천 칸으로 옮길 document_id(쉼표)'
+        type: string
+        default: ''
+      absent_json:
+        description: '서명 가림 표식 {"fda483-…": "redacted-b6", …}'
+        type: string
+        default: ''
+      names_json:
+        description: 'findings 행이 없는 문서용 {"fda483-…": {"names": [...], "evidence": "근거"}}'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fda483-inspectors-from-body
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Apply human-verified 483 inspector verdicts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Apply (dry-run unless apply=true)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_APPLY: ${{ inputs.apply }}
+          IN_AT: ${{ inputs.at }}
+          IN_FROM: ${{ inputs.from_findings }}
+          IN_ABSENT: ${{ inputs.absent_json }}
+          IN_NAMES: ${{ inputs.names_json }}
+        run: |
+          set -uo pipefail
+          if ! printf '%s' "$IN_AT" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+            echo "::error::at 은 YYYY-MM-DD"; exit 2
+          fi
+          if [ -n "${IN_FROM:-}" ] && ! printf '%s' "$IN_FROM" | grep -qE '^[A-Za-z0-9_, -]+$'; then
+            echo "::error::from_findings 는 영숫자·쉼표·하이픈만"; exit 2
+          fi
+          args=(--at "$IN_AT" --report report.json --markdown table.md)
+          if [ -n "${IN_FROM:-}" ]; then args+=(--from-findings "$IN_FROM"); fi
+          if [ -n "${IN_ABSENT:-}" ]; then args+=(--absent-json "$IN_ABSENT"); fi
+          if [ -n "${IN_NAMES:-}" ]; then args+=(--names-json "$IN_NAMES"); fi
+          if [ "${IN_APPLY:-false}" = "true" ]; then args+=(--apply); fi
+          python apply_483_human_verdicts.py "${args[@]}" > /dev/null
+          rc=$?
+          {
+            echo "### FDA 483 사람 판독 반영"
+            echo "- apply: \`${IN_APPLY:-false}\` · at: \`${IN_AT}\` · exit: \`${rc}\`"
+            cat table.md 2>/dev/null || echo '(표 없음)'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fda483-human-verdicts-report
+          path: |
+            report.json
+            table.md
+          if-no-files-found: ignore
+          retention-days: 30

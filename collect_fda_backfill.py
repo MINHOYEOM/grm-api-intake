@@ -70,6 +70,10 @@ mirroring findings_supabase_append.py's and findings_supabase_backfill.py's conv
 reading-room DataTables AJAX is unreachable (Akamai bot-block) or its config is missing --
 see `run_483` and `BackfillFetchReport.backbone` for the offset-vs-full-scan tradeoff this
 forces.
+
+`--media-ids '12345,67890'` selects FDA 483s by PDF media ID, independent of the
+scheduled scan's date window and pagination. By default it only counts matches in
+raw_signals. With `--apply` it resolves absent IDs in the full FDA 483 JSON index.
 """
 
 from __future__ import annotations
@@ -82,6 +86,7 @@ import sys
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta, timezone
+from functools import partial
 from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import urlencode, urljoin
@@ -160,6 +165,13 @@ class BackfillFetchReport:
     would_fetch: list[str] = field(default_factory=list)
 
 
+@dataclass
+class MediaIdBackfillReport(BackfillFetchReport):
+    requested: int = 0
+    missing_in_db: int | None = None
+    not_found_in_fda_index: list[str] = field(default_factory=list)
+
+
 def _default_sleep(seconds: float) -> None:
     if seconds:
         time.sleep(seconds)
@@ -205,9 +217,10 @@ def _get_existing_ids_page(
         try:
             data = resp.json()
         except ValueError:
-            data = []
-        rows = data if isinstance(data, list) else []
-        return rows, dict(resp.headers)
+            raise RuntimeError("existing-ids-get-failed:invalid-json") from None
+        if not isinstance(data, list):
+            raise RuntimeError("existing-ids-get-failed:invalid-response")
+        return data, dict(resp.headers)
     raise RuntimeError("existing-ids-get-failed:retry_exhausted")  # unreachable safety net
 
 
@@ -438,7 +451,20 @@ def run_483(
         elif isinstance(total, (int, float)) and offset + len(raw_rows) >= total:
             report.exhausted = True
 
-    deep_enabled = fda483._deep_enabled()
+    return _process_483_rows(
+        nrows, report, existing_ids=existing_ids, today=today, recent_days=recent_days,
+        dry_run=dry_run, base_url=base_url, service_key=service_key, bulk=bulk,
+        delay=delay, sleeper=sleeper, fetch_pdf=fda483._fetch_fda483_pdf_text,
+    )
+
+
+def _process_483_rows(
+    nrows: list[dict[str, str]], report: BackfillFetchReport, *, existing_ids: set[str],
+    today: date, recent_days: int, dry_run: bool, base_url: str, service_key: str,
+    bulk: BulkWriteRun | None, delay: float, sleeper: Sleeper,
+    fetch_pdf: Callable[[str], tuple[str, str]], store_full_text: bool = False,
+) -> tuple[BackfillFetchReport, int]:
+    deep_enabled = store_full_text or fda483._deep_enabled()
     to_post: list[dict[str, Any]] = []
     for nrow in nrows:
         media_id = nrow.get("media_id", "")
@@ -465,7 +491,7 @@ def run_483(
         try:
             sleeper(delay)
             pdf_url = fda483._pdf_url(media_id)
-            text, text_status = fda483._fetch_fda483_pdf_text(pdf_url)
+            text, text_status = fetch_pdf(pdf_url)
             if text_status == FDA_BOT_BLOCK:
                 report.errors.append(FDA_BOT_BLOCK)
                 break
@@ -483,7 +509,7 @@ def run_483(
             observation_count = (
                 fda483.fda483_observation_count(observations, obs_seen) if observations else "same"
             )
-            body_full = text if deep_enabled and observations else ""
+            body_full = text if deep_enabled and (store_full_text or observations) else ""
             # [실사관 배선 2026-07-31] 일일 수집기(collect_fda_483.collect_fda_483)와 동일한
             # 위치·조건으로 맞춘다 -- ENABLE_FDA_483_OBSERVATIONS/ENABLE_FDA_483_DEEP 과
             # 무관하게 항상 수행하는 순수 결정론 파서다(네트워크 추가 요청 0 -- 위에서 이미
@@ -504,6 +530,9 @@ def run_483(
         # 다시 집는다(존재하지 않으므로 skipped_existing 에 걸리지 않는다).
         if fda483.is_ocr_engine_unavailable(text_status) and not text:
             report.skipped_ocr_unavailable += 1
+            continue
+        if store_full_text and not text.strip():
+            report.errors.append(f"483-document-unreadable({doc_id}):{text_status.split(':', 1)[0]}")
             continue
 
         # Share the daily collector's item builder while preserving backfill observations
@@ -534,7 +563,7 @@ def run_483(
     if not dry_run and to_post:
         report.appended = _post_raw_signals(base_url, service_key, to_post, report.errors, bulk=bulk)
         if any(error.startswith("bulk-write:") for error in report.errors):
-            report.next_offset = offset
+            report.next_offset = report.offset
             return report, 1
 
     # [침묵 금지 2026-07-30] 보류가 있었으면 stderr 로 띄운다 — 리포트 JSON 은 잡 요약을
@@ -549,6 +578,69 @@ def run_483(
         )
 
     return report, 2 if FDA_BOT_BLOCK in report.errors else 0
+
+
+def _parse_media_ids(value: str) -> list[str]:
+    ids = [part for part in re.split(r"[,\s]+", value) if part]
+    if not ids or any(re.fullmatch(r"[1-9][0-9]*", media_id) is None for media_id in ids):
+        raise argparse.ArgumentTypeError("--media-ids requires positive decimal IDs separated by commas or spaces")
+    return list(dict.fromkeys(ids))
+
+
+def run_483_media_ids(
+    *, media_ids: list[str], delay: float, dry_run: bool, base_url: str, service_key: str,
+    sleeper: Sleeper | None = None,
+    fetch_index: Callable[[], tuple[list[dict[str, str]], int]] | None = None,
+    fetch_pdf: Callable[[str], tuple[str, str]] | None = None,
+) -> tuple[MediaIdBackfillReport, int]:
+    """Count DB matches, then resolve and fetch only absent IDs on apply."""
+    media_ids = list(dict.fromkeys(media_ids))
+    report = MediaIdBackfillReport(
+        source="fda483", requested=len(media_ids), max_docs=len(media_ids), backbone="",
+    )
+    try:
+        existing_ids = fetch_existing_document_ids(base_url, service_key, SOURCE_FDA_483)
+    except Exception as exc:  # noqa: BLE001
+        report.errors.append(f"existing-ids-fetch-failed:{type(exc).__name__}")
+        return report, 2
+
+    missing = [media_id for media_id in media_ids if f"fda483-{media_id}" not in existing_ids]
+    report.skipped_existing = len(media_ids) - len(missing)
+    report.missing_in_db = len(missing)
+    if dry_run or not missing:
+        report.exhausted = True
+        return report, 0
+
+    sleeper = sleeper or _default_sleep
+    fetch_index = fetch_index or fda483._fetch_legacy_json_rows
+    report.backbone = fda483.BACKBONE_LEGACY_JSON
+    try:
+        sleeper(delay)
+        rows, total = fetch_index()
+    except FdaBotBlockError:
+        report.errors.append(FDA_BOT_BLOCK)
+        return report, 2
+    except Exception as exc:  # noqa: BLE001
+        report.errors.append(f"list-json-failed:{type(exc).__name__}")
+        return report, 2
+    if not total:
+        report.errors.append("list-json-empty-or-unavailable")
+        return report, 2
+
+    by_media_id = {row["media_id"]: row for row in rows}
+    selected = [by_media_id[media_id] for media_id in missing if media_id in by_media_id]
+    report.not_found_in_fda_index = [media_id for media_id in missing if media_id not in by_media_id]
+    report.listed = len(selected)
+    report.exhausted = True
+    fda483.reset_ocr_health()
+    _, code = _process_483_rows(
+        selected, report, existing_ids=existing_ids, today=datetime.now(timezone.utc).date(),
+        recent_days=0, dry_run=False, base_url=base_url, service_key=service_key, bulk=None,
+        delay=delay, sleeper=sleeper, store_full_text=True,
+        fetch_pdf=fetch_pdf or partial(fda483._fetch_fda483_pdf_text, max_chars=None),
+    )
+    incomplete = report.not_found_in_fda_index or report.errors or report.skipped_ocr_unavailable
+    return report, code or int(bool(incomplete))
 
 
 # ---------------------------------------------------------------------------
@@ -1037,9 +1129,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "bypasses Notion; robots Crawl-Delay=30 aware; 483/WL share a host).",
         allow_abbrev=False,
     )
-    # --source is required unless --auto (checked in main -- explicit exit-2 check,
+    # --source is required unless --auto or --media-ids (checked in main -- explicit exit-2 check,
     # matching the existing credential-validation style).
     parser.add_argument("--source", choices=("fda483", "fda_wl"))
+    parser.add_argument(
+        "--media-ids", type=_parse_media_ids,
+        help="FDA 483 PDF media IDs (one comma/space-separated list). Default: count DB "
+        "matches only. --apply fetches all absent IDs without date or page limits. "
+        "Incompatible with --auto, --offset, or --source fda_wl.",
+    )
     parser.add_argument("--offset", type=int, default=None)  # manual mode default: 0
     parser.add_argument("--max-docs", type=int, default=200)
     parser.add_argument(
@@ -1072,10 +1170,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     args = build_arg_parser().parse_args(argv)
 
+    if args.media_ids and (args.auto or args.offset is not None or args.source == "fda_wl"):
+        print("collect_fda_backfill: --media-ids cannot be combined with --auto, --offset, "
+              "or --source fda_wl", file=sys.stderr)
+        return 2
     if args.auto and (args.source is not None or args.offset is not None):
         print(
             "collect_fda_backfill: --auto cannot be combined with --source/--offset "
@@ -1083,8 +1188,8 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
-    if not args.auto and args.source is None:
-        print("collect_fda_backfill: --source is required (or use --auto)", file=sys.stderr)
+    if not args.auto and args.source is None and args.media_ids is None:
+        print("collect_fda_backfill: --source is required (or use --auto or --media-ids)", file=sys.stderr)
         return 2
 
     url = (args.supabase_url or os.environ.get("SUPABASE_URL") or "").strip()
@@ -1101,7 +1206,13 @@ def main(argv: list[str] | None = None) -> int:
         print("collect_fda_backfill: SUPABASE_URL must start with https://", file=sys.stderr)
         return 2
 
-    if args.auto:
+    if args.media_ids:
+        report, exit_code = run_483_media_ids(
+            media_ids=args.media_ids, delay=args.delay, dry_run=not args.apply,
+            base_url=base, service_key=key,
+        )
+        report_dict = asdict(report)
+    elif args.auto:
         report_dict, exit_code = run_auto(
             max_docs=args.max_docs, delay=args.delay,
             fetch_budget=args.auto_fetch_budget,
@@ -1127,6 +1238,7 @@ __all__ = [
     "BackfillFetchReport",
     "fetch_existing_document_ids",
     "run_483",
+    "run_483_media_ids",
     "run_wl",
     "run_auto",
     "main",

@@ -6863,6 +6863,8 @@ QUIZ_DESCRIPTION = N_("GRM 주간 퀴즈 — 규제·품질 용어와 최근 공
 # ── [설명문 최소 길이 2026-11-26] 빙 '메타 설명이 짧은 페이지가 많다' 권고 ─────────────────────
 # 짧은 설명(한국어 80자·영어 110자 미만)에는 그 묶음이 무엇을 담는지 한 문장을 덧붙인다. 새 사실을 짓지
 # 않고 묶음의 성격만 말한다(숫자·기관 목록 없음 — 낡지 않게). 가드: tests/test_meta_description_floor.py
+# 덧붙일 문장이 끝맺는 명사(_DESC_TAIL_NOUNS)가 원래 설명에 이미 있으면 그 문장은 건너뛴다
+# ('…용어사전 — … 용어사전입니다.' 같은 겹침 방지, 11-26 해밀턴 14 지적).
 DESC_MIN_CHARS = {"ko": 80, "en": 110}
 _DESC_TR: "dict[str, Translator]" = {}
 _DESC_TAILS: tuple[tuple[str, str], ...] = (
@@ -6877,6 +6879,12 @@ _DESC_TAILS: tuple[tuple[str, str], ...] = (
     ("", N_("GRM 은 규제기관이 공개한 실사 지적을 한국어로 정리해 매주 갱신합니다.")),
 )
 
+
+_DESC_TAIL_NOUNS: dict[str, str] = {
+    "glossary/": N_("용어사전"),
+    "briefs/": N_("주간 규제뉴스"),
+    "library/": N_("자료실"),
+}
 
 def extend_short_description(desc: str, site_path: str, lang: str,
                              tr: "Translator | None" = None) -> str:
@@ -6893,6 +6901,9 @@ def extend_short_description(desc: str, site_path: str, lang: str,
     for pre, t in [next((x for x in _DESC_TAILS if path.startswith(x[0]))), _DESC_TAILS[-1]]:
         tail = tr(t)
         if len(desc) >= floor or tail in desc:
+            continue
+        noun = _DESC_TAIL_NOUNS.get(pre)
+        if noun and tr(noun).casefold() in desc.casefold():
             continue
         sep = "" if desc.endswith((".", "다", "。")) else "."
         desc = f"{desc}{sep} {tail}"

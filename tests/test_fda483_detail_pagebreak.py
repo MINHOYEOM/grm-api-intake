@@ -269,6 +269,41 @@ class NoStorageCapTest(unittest.TestCase):
         self.assertFalse(hasattr(c, "_cap_detail"))
 
 
+class PageHeaderValueNotHeading1126Test(unittest.TestCase):
+    """★11-26: 관찰 표제(`OBSERVATION 2`)가 쪽 맨 아래에 걸리면 표제 직후 서명란 → 다음 쪽 머리말 → 진짜
+    표제 순이다. `_skip_pagebreak_block` 이 머리말 **값 줄**(수신인 `<이름>, Vice President of …`)을
+    산문으로 오인해 거기서 표제를 시작했다 — `… CITY, STATE, ZIP CODE … TYPE ESTABLISHMENT INSPECTED …` 가
+    표제로 저장·공개됐다(실측 11-26 backfill 유입 4행). 머리말 값 줄은 뒤 몇 줄 안에 양식 라벨이 또 온다."""
+
+    def _rows(self):
+        import os
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures",
+                         "fda483_pagebreak_header_value_heading_1126.txt")
+        with open(p, encoding="utf-8") as fh:
+            text = fh.read()
+        return c._extract_483_observations_from_text(text, {"establishment_type": "Producer of Sterile Drugs"})
+
+    def test_heading_after_page_header_is_the_real_heading(self):
+        rows = {r["number"]: r for r in self._rows()}
+        self.assertEqual(sorted(rows), ["1", "2", "3"])
+        self.assertTrue(rows["2"]["deficiency"].startswith(
+            "Aseptic processing areas are deficient regarding the system for cleaning"), rows["2"]["deficiency"])
+        for r in rows.values():
+            for leak in ("CITY, STATE", "TYPE ESTABLISHMENT", "Vice President", "Quillmere"):
+                self.assertNotIn(leak, r["deficiency"])
+        self.assertTrue(rows["2"]["detail"].startswith("Specifically"), rows["2"]["detail"])
+
+    def test_value_line_predicate(self):
+        lines = [s + "\n" for s in (
+            "Orsolya Venn, Vice President of Fulfillment and Distribution Operations",
+            "FIRM NAME", "Quillmere Pharma Limited")]
+        self.assertTrue(c._is_page_header_value_line(lines, 0))
+        body = [s + "\n" for s in (
+            "Aseptic processing areas are deficient regarding the system for cleaning and",
+            "produce aseptic conditions.", "Specifically,", "1. The cleaner is not sterile.")]
+        self.assertFalse(c._is_page_header_value_line(body, 0))
+
+
 if __name__ == "__main__":
     unittest.main()
 

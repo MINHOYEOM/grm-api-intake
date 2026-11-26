@@ -1778,14 +1778,43 @@ def _skip_pagebreak_block(chunk: str) -> str:
     m = _footer_cut(chunk or "")
     if not m or m.start() > _PAGEBREAK_FOOTER_HEAD:
         return chunk
+    lines = (chunk or "").splitlines(keepends=True)
     offset = 0
-    for line in (chunk or "").splitlines(keepends=True):
+    for i, line in enumerate(lines):
         stripped = line.strip()
         if (len(stripped) >= _PROSE_LINE_MIN_LEN
-                and sum(1 for c in stripped if c.islower()) >= _PROSE_LINE_MIN_LOWER):
+                and sum(1 for c in stripped if c.islower()) >= _PROSE_LINE_MIN_LOWER
+                and not _is_page_header_value_line(lines, i)):
             return chunk[offset:]
         offset += len(line)
     return chunk                # 경계 미확정 — 지어내지 않고 종전 동작을 유지한다
+
+
+# [11-26] 다음 쪽 머리말의 **값 줄**(수신인 `<이름>, Vice President of Fulfillment Operations`·
+# `10903 New Hampshire Avenue; White Oak Building 51, Room 2269 …`)도 길고 소문자가 많아 위 산문 기준을
+# 통과했다 — 표제가 머리말 값부터 시작해 `… CITY, STATE, ZIP CODE … TYPE ESTABLISHMENT INSPECTED …` 가
+# 표제로 저장됐다(실측 99355 obs2·175813 obs2·185443 obs11·193867 obs3, 11-26 backfill 유입 4행).
+# 머리말 값 줄은 **뒤 몇 줄 안에 양식 라벨이 또 온다**(값-라벨이 번갈아 찍힌다). 본문 첫 줄 뒤에는
+# 라벨이 오지 않는다 — 그 차이로 가른다. 줄 자체에 라벨이 있어도 값 줄이다.
+_HEADER_VALUE_LOOKAHEAD = 3
+
+
+def _is_page_header_value_line(lines: list[str], i: int) -> bool:
+    def _form(s: str) -> bool:
+        return bool(gf._FDA483_LABEL_RE.search(s) or _PAGE_HEADER_START_RE.search(s)
+                    or _PAGE_HEADER_END_RE.search(s))
+    if _form(lines[i]):
+        return True
+    seen = 0
+    for nxt in lines[i + 1:]:
+        if not nxt.strip():
+            continue
+        if _form(nxt):
+            return True
+        seen += 1
+        if seen >= _HEADER_VALUE_LOOKAHEAD:
+            break
+    return False
 
 
 def _clean_observation_chunk(chunk: str) -> str:

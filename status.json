@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T12:43:45Z",
+ "generated_at": "2026-11-26T14:28:12Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45822024133,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-26T12:41:35Z",
-    "updatedAt": "2026-11-26T12:41:39Z",
-    "headBranch": "codex/mhra-body-refetch",
-    "displayTitle": "Merge origin/main",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45822024133"
-   },
-   {
-    "databaseId": 45821907716,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-26T12:40:50Z",
-    "updatedAt": "2026-11-26T12:40:53Z",
-    "headBranch": "codex/automation-pr-stall",
-    "displayTitle": "Merge origin/main",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45821907716"
-   },
-   {
-    "databaseId": 45821763127,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-26T12:39:56Z",
-    "updatedAt": "2026-11-26T12:39:59Z",
-    "headBranch": "codex/ema-relevance-apply",
-    "displayTitle": "Merge origin/main",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45821763127"
-   },
-   {
-    "databaseId": 45820973581,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T12:34:51Z",
-    "updatedAt": "2026-11-26T12:43:07Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1910 from MINHOYEOM/codex/daily-reconcile-ledger",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45820973581"
-   },
-   {
-    "databaseId": 45817143475,
+    "databaseId": 45835963915,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-26T12:10:11Z",
-    "updatedAt": "2026-11-26T12:24:34Z",
-    "headBranch": "claude/glossary-fig-daily-20261126-2106",
-    "displayTitle": "glossary(fig): 2026-11-26 새 그림 0 · 다시 그림 0 · 보류 5 — 위험 통제·위험 감소·위험 허용·위험 소통·위험 검토",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45817143475"
+    "createdAt": "2026-11-26T14:08:17Z",
+    "updatedAt": "2026-11-26T14:16:41Z",
+    "headBranch": "codex/ko-country-names-40",
+    "displayTitle": "feat(국가명): 한국어 국가명 40개국 + 매칭 경계 강화 (11차 2)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45835963915"
+   },
+   {
+    "databaseId": 45835953619,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T14:08:13Z",
+    "updatedAt": "2026-11-26T14:16:44Z",
+    "headBranch": "codex/ko-country-names-40",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/ko-country-name…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45835953619"
+   },
+   {
+    "databaseId": 45835775081,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T14:07:08Z",
+    "updatedAt": "2026-11-26T14:14:35Z",
+    "headBranch": "codex/rum-bot-kr-direct",
+    "displayTitle": "Merge origin/main",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45835775081"
+   },
+   {
+    "databaseId": 45835608281,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T14:06:06Z",
+    "updatedAt": "2026-11-26T14:14:32Z",
+    "headBranch": "codex/483-out-of-scope-mark",
+    "displayTitle": "Merge origin/main",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45835608281"
+   },
+   {
+    "databaseId": 45822024133,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T12:41:35Z",
+    "updatedAt": "2026-11-26T12:48:49Z",
+    "headBranch": "codex/mhra-body-refetch",
+    "displayTitle": "Merge origin/main",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45822024133"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -457,6 +457,28 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 45833062093,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T13:50:31Z",
+    "updatedAt": "2026-11-26T13:51:00Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #2004 from MINHOYEOM/fix/findings-outbox-archive",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45833062093"
+   },
+   {
+    "databaseId": 45826914195,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T13:12:36Z",
+    "updatedAt": "2026-11-26T13:15:34Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #2001 from MINHOYEOM/chore/findings-translate-483-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45826914195"
+   },
+   {
     "databaseId": 45788934527,
     "status": "completed",
     "conclusion": "cancelled",
@@ -488,28 +510,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1981 from MINHOYEOM/claude/findings-translate-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45758523406"
-   },
-   {
-    "databaseId": 45611177935,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-25T12:10:07Z",
-    "updatedAt": "2026-11-25T12:18:42Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1958 from MINHOYEOM/data/483-title-readable",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45611177935"
-   },
-   {
-    "databaseId": 45509969219,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-24T23:26:20Z",
-    "updatedAt": "2026-11-24T23:36:21Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1934 from MINHOYEOM/claude/findings-translate-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45509969219"
    }
   ],
   "grm-findings-backfill-fetch.yml": [

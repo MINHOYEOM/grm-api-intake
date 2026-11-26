@@ -139,7 +139,8 @@ class ApplySuccessTest(unittest.TestCase):
         #    in-process, never sent in the PATCH URL.
         self.assertEqual(patch.call_count, 1)
         _, kwargs = patch.call_args
-        self.assertEqual(kwargs["params"], {"finding_id": "eq.f-001"})
+        # 11-26: 응답은 id 만 돌려받는다(행 전체의 최대 3만 자 원문을 되받지 않게).
+        self.assertEqual(kwargs["params"], {"finding_id": "eq.f-001", "select": "finding_id"})
         self.assertNotIn("finding_text", kwargs["params"])
         self.assertEqual(kwargs["json"]["finding_text_ko"], "관찰사항 1 국문 번역.")
         self.assertEqual(kwargs["json"]["translation_method"], "llm_assisted")
@@ -670,6 +671,110 @@ class CredentialsTest(unittest.TestCase):
 
         self.assertEqual(rc, 0)
         self.assertEqual(patch.call_args.kwargs["headers"]["apikey"], _SERVICE_KEY)
+
+
+def _fake_batch_get(already_ko: set[str] | None = None):
+    """묶음 GET 가짜 — `in.("f-001","f-002",…)` 를 풀어 각 id 의 라이브 행을 돌려준다.
+    already_ko 에 든 id 는 이미 같은 번역이 들어간 행(→ PATCH 안 보냄)."""
+    already_ko = already_ko or set()
+
+    def _get(url, params=None, json=None, headers=None, timeout=None):  # noqa: A002
+        raw = params["finding_id"]
+        assert raw.startswith("in.("), raw
+        ids = [v.strip('"') for v in raw[4:-1].split(",")]
+        rows = []
+        for fid in ids:
+            i = int(fid.rsplit("-", 1)[1])
+            row = {"finding_id": fid, "finding_text": f"Observation number {i} was not documented."}
+            if fid in already_ko:
+                row.update({"finding_text_ko": f"관찰사항 {i} 국문 번역.", "translation_method": "llm_assisted"})
+            rows.append(row)
+        return _FakeResponse(200, rows)
+    return _get
+
+
+class BatchLookupAndBudget1126Test(unittest.TestCase):
+    """★11-26: M9b 가 outbox 1,624항목을 항목마다 GET 해 timeout-minutes 10 에 잘렸다(cancelled, 보고서 없음).
+    묶음 조회로 GET 수를 줄이고, 시간 예산을 넘기 전에 멈춰 적색으로 남은 수를 알린다."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+
+    def test_batch_lookup_sends_one_get_per_chunk_and_patches_only_new(self) -> None:
+        items = [_outbox_item(i) for i in range(1, 121)]          # 120 → 50·50·20 = GET 3번
+        _write_outbox_file(self._tmp.name, "2026-11-26-batch.json", items)
+        already = {f"f-{i:03d}" for i in range(1, 101)}            # 100건은 이미 반영
+        with _patch_get(side_effect=_fake_batch_get(already)) as get, _patch_patch(
+            side_effect=lambda url, params=None, json=None, headers=None, timeout=None:  # noqa: A002
+                _FakeResponse(200, [{"finding_id": params["finding_id"][3:]}])
+        ) as patch:
+            report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY, batch_size=50)
+        self.assertEqual(get.call_count, 3)
+        self.assertEqual(report["lookup_requests"], 3)
+        self.assertEqual(patch.call_count, 20)
+        self.assertEqual((report["items_unchanged"], report["items_succeeded"]), (100, 20))
+        self.assertEqual(report["errors"], [])
+        self.assertFalse(report["incomplete"])
+        for call in get.call_args_list:
+            self.assertNotIn("finding_text", call.kwargs["params"])    # 원문은 URL 에 싣지 않는다
+
+    def test_batch_lookup_missing_row_is_matched_zero(self) -> None:
+        _write_outbox_file(self._tmp.name, "b.json", [_outbox_item(1), _outbox_item(2)])
+
+        def _get(url, params=None, json=None, headers=None, timeout=None):  # noqa: A002
+            return _FakeResponse(200, [{"finding_id": "f-001",
+                                        "finding_text": "Observation number 1 was not documented."}])
+        with _patch_get(side_effect=_get), _patch_patch(
+            return_value=_FakeResponse(200, [{"finding_id": "f-001"}])) as patch:
+            report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY, batch_size=50)
+        self.assertEqual(patch.call_count, 1)
+        self.assertEqual((report["items_succeeded"], report["items_matched_zero"]), (1, 1))
+
+    def test_batch_get_failure_falls_back_to_per_item_and_is_reported(self) -> None:
+        _write_outbox_file(self._tmp.name, "b.json", [_outbox_item(1)])
+        calls = {"n": 0}
+
+        def _get(url, params=None, json=None, headers=None, timeout=None):  # noqa: A002
+            calls["n"] += 1
+            if params["finding_id"].startswith("in."):
+                return _FakeResponse(500)
+            return _fake_get_matching(url, params=params)
+        with _patch_get(side_effect=_get), _patch_patch(
+            return_value=_FakeResponse(200, [{"finding_id": "f-001"}])):
+            report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY, batch_size=50)
+        self.assertEqual(report["items_succeeded"], 1)
+        self.assertTrue(any("fell back to per-item GET" in e for e in report["errors"]))
+
+    def test_time_budget_stops_early_and_counts_remaining(self) -> None:
+        _write_outbox_file(self._tmp.name, "2026-11-26-new.json", [_outbox_item(i) for i in range(1, 6)])
+        _write_outbox_file(self._tmp.name, "2026-11-01-old.json", [_outbox_item(i) for i in range(6, 9)])
+        ticks = iter([0.0, 1.0, 2.0, 999.0, 999.0, 999.0, 999.0, 999.0, 999.0, 999.0])
+        with _patch_get(side_effect=_fake_batch_get()), _patch_patch(
+            side_effect=lambda url, params=None, json=None, headers=None, timeout=None:  # noqa: A002
+                _FakeResponse(200, [{"finding_id": params["finding_id"][3:]}])):
+            report = svc.apply_outbox(self._tmp.name, _BASE_URL, _SERVICE_KEY, batch_size=50,
+                                      time_budget_seconds=100, clock=lambda: next(ticks))
+        self.assertTrue(report["incomplete"])
+        self.assertEqual(report["items_succeeded"], 2)              # 최신 파일 앞 2건만
+        self.assertEqual(report["items_remaining"], 3 + 3)
+        self.assertTrue(any("time budget" in e for e in report["errors"]))
+
+    def test_cli_incomplete_exits_1_and_writes_report(self) -> None:
+        _write_outbox_file(self._tmp.name, "b.json", [_outbox_item(1), _outbox_item(2)])
+        out = os.path.join(self._tmp.name, "report.json")
+        env = dict(os.environ, SUPABASE_URL=_BASE_URL, SUPABASE_SERVICE_ROLE_KEY=_SERVICE_KEY)
+        with mock.patch.dict(os.environ, env, clear=True), \
+                _patch_get(side_effect=_fake_batch_get()), \
+                _patch_patch(return_value=_FakeResponse(200, [{"finding_id": "f-001"}])), \
+                mock.patch.object(svc.time, "monotonic", side_effect=[0.0] + [10_000.0] * 20):
+            code = svc.main(["--outbox-dir", self._tmp.name, "--output", out,
+                             "--batch-size", "50", "--time-budget-seconds", "60"])
+        self.assertEqual(code, 1)
+        with open(out, encoding="utf-8") as fh:
+            rep = json.load(fh)
+        self.assertTrue(rep["incomplete"])
+        self.assertEqual(rep["items_remaining"], 2)
 
 
 if __name__ == "__main__":

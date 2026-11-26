@@ -220,6 +220,7 @@ jobs:
           echo "KST now : $(TZ='Asia/Seoul' date '+%Y-%m-%d %H:%M:%S')"
 
       - name: Run collector
+        id: collector
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
@@ -739,3 +740,24 @@ jobs:
               const ages = codes.map((c) => `${c}@${daysSince(state[c].f, today)}d`).join(',');
               console.log(`no rung due (${ages}); body updated silently, no comment`);
             }
+
+      - name: Reconcile daily MFDS coverage
+        if: ${{ !cancelled() && vars.GRM_RECONCILE_LEDGER == 'true' && !inputs.dry_run }}
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          COLLECTOR_OUTCOME: ${{ steps.collector.outcome }}
+          GRM_RECONCILE_LEDGER: ${{ vars.GRM_RECONCILE_LEDGER }}
+        run: |
+          # Actions 표현식의 문자열 비교는 대소문자를 구분하지 않는다.
+          if [ "$GRM_RECONCILE_LEDGER" != true ]; then
+            exit 0
+          fi
+          args=(--apply)
+          if [ "$COLLECTOR_OUTCOME" != success ]; then
+            args+=(--collection-failed)
+          fi
+          python daily_reconcile_ledger.py "${args[@]}"

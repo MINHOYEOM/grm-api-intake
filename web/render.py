@@ -1807,6 +1807,15 @@ def brief_agency_counts(cards_raw: list[dict[str, Any]], tr: Translator = _KO) -
 # 고르는 카드는 '이번 주 꼭 볼 5건'의 483 칸과 같다(select_must_see 를 그대로 부른다 — 규칙을 베끼지 않는다).
 # 문장은 발행된 카드 원문 그대로 옮긴다(새 문장을 짓지 않는다). 계정·게시는 대표가 한다.
 NAVER_BLOG_FILE = "naver-blog.txt"
+# [네이버 블로그 붙여넣기 쪽 2026-11-26] 같은 원고를 복사 단추 둘(제목·본문)로 — 본문은 text/html 로
+# 복사해 스마트에디터에 붙여도 문단·굵은 글씨·링크가 산다. 사이트 틀(base.html)을 쓰되 noindex·sitemap 비등록.
+# 글과 쪽은 naver_blog_483_doc() 한 벌에서 나온다(평문·HTML 이 갈라지지 않게). /admin/ '네이버 블로그' 탭이
+# 최신 발행일로 이 주소를 연다 — 매주 사람이 주소를 챙기지 않는다. 가드: tests/test_naver_blog_draft.py
+NAVER_BLOG_PAGE = "naver-blog.html"
+# GRM 네이버 블로그(대표 계정 2026-11-26) — 붙여넣기 쪽·/admin/ 탭의 '글쓰기 바로가기'. 원고 속 사이트 링크는
+# utm.CHANNELS["naver_blog"] 표식을 달아 블로그에서 온 방문을 따로 센다.
+NAVER_BLOG_HOME = "https://blog.naver.com/grmsolution"
+NAVER_BLOG_WRITE_URL = NAVER_BLOG_HOME + "/postwrite"
 _BLOG_FACT_LABELS = ("발행일", "실사일", "시설 · 유형")
 
 
@@ -1822,46 +1831,91 @@ def pick_blog_483(cards: list[dict[str, Any]]) -> "int | None":
     return min(pool)[2] if pool else None
 
 
-def build_naver_blog_483(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
-                         brief_url: str, title_dateform: str) -> str:
-    """블로그 원고(한국어 평문). `card_views` 는 `cards` 와 같은 순서(문서 링크만 뷰에서 쓴다)."""
+def naver_blog_483_doc(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
+                       brief_url: str, title_dateform: str, pub: str = "") -> dict[str, Any]:
+    """블로그 원고 한 벌 — {"title": 제목(없으면 ""), "blocks": [...]}.
+
+    블록 꼴: ("p", 문장) · ("hp", 소제목, 문장) · ("list", 소제목, [항목]) · ("links", 소제목, [(이름, URL)])
+    · ("link_p", 이름, URL). `card_views` 는 `cards` 와 같은 순서(문서 링크만 뷰에서 쓴다)."""
+    from utm import channel_url  # 채널 표식 정본(web/utm.py) — 발행일이 있을 때만 단다
+
+    def tag(u: str) -> str:
+        return channel_url(u, "naver_blog", date=pub) if pub else u
+
     home = _abs_url("")
     i = pick_blog_483(cards)
     if i is None:
-        return "\n".join([
-            f"[{title_dateform}] 이번 주에는 해설할 FDA 483 이 없습니다.", "",
-            f"이번 주 규제뉴스 전체: {brief_url}", ""])
+        return {"title": "", "blocks": [
+            ("p", f"[{title_dateform}] 이번 주에는 해설할 FDA 483 이 없습니다."),
+            ("link_p", "이번 주 규제뉴스 전체", tag(brief_url))]}
     c, cv = cards[i], card_views[i]
-    firm = c.get("headline_target") or ""
-    issue = c.get("title_issue") or ""
     n = int((c.get("deterministic_detail") or {}).get("count") or 0)
     facts = {f.get("label"): f.get("value") for f in (c.get("facts") or []) if isinstance(f, dict)}
-    lines = [f"제목: FDA 483 해설 | {firm} — {issue}", ""]
+    blocks: list[tuple[Any, ...]] = []
     meta = [f"{k.replace(' · ', ' ')} {str(facts[k]).removesuffix(' · 483')}"
             for k in _BLOG_FACT_LABELS if facts.get(k)]
     if meta:
-        lines += [" · ".join(meta), ""]
+        blocks.append(("p", " · ".join(meta)))
     if c.get("summary"):
-        lines += [c["summary"], ""]
+        blocks.append(("p", c["summary"]))
     if c.get("key_facts"):
-        lines.append(f"FDA가 적은 관찰사항{f' ({n}건 중 주요 내용)' if n else ''}")
-        lines += [f"- {k}" for k in c["key_facts"]]
-        lines.append("")
+        blocks.append(("list", f"FDA가 적은 관찰사항{f' ({n}건 중 주요 내용)' if n else ''}",
+                       list(c["key_facts"])))
     if c.get("implication"):
-        lines += ["함께 적힌 내용", c["implication"], ""]
+        blocks.append(("hp", "함께 적힌 내용", c["implication"]))
     if c.get("checks"):
-        lines.append("우리 현장에서 확인할 것")
-        lines += [f"- {k}" for k in c["checks"]]
-        lines.append("")
-    lines.append("원문과 더 보기")
+        blocks.append(("list", "우리 현장에서 확인할 것", list(c["checks"])))
+    links = []
     if cv.get("doc_href"):
-        lines.append(f"- 483 원문과 지적 전체(한국어): {_abs_url(cv['doc_href'])}")
-    lines += [f"- 이번 주 규제뉴스 전체: {brief_url}",
-              f"- 실사 지적을 매주 메일로 받기(무료): {home}#subscribe", "",
-              "이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. "
-              "요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다.", "",
-              "#FDA483 #GMP #제약품질 #실사대비 #GRM", ""]
+        links.append(("483 원문과 지적 전체(한국어)", tag(_abs_url(cv["doc_href"]))))
+    links += [("이번 주 규제뉴스 전체", tag(brief_url)),
+              ("실사 지적을 매주 메일로 받기(무료)", tag(f"{home}#subscribe"))]
+    blocks += [("links", "원문과 더 보기", links),
+               ("p", "이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. "
+                     "요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다."),
+               ("p", "#FDA483 #GMP #제약품질 #실사대비 #GRM")]
+    return {"title": f"FDA 483 해설 | {c.get('headline_target') or ''} — {c.get('title_issue') or ''}",
+            "blocks": blocks}
+
+
+def build_naver_blog_483(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
+                         brief_url: str, title_dateform: str, pub: str = "") -> str:
+    """블로그 원고(한국어 평문) — naver_blog_483_doc() 를 줄글로 편다."""
+    doc = naver_blog_483_doc(cards, card_views, brief_url, title_dateform, pub)
+    lines = [f"제목: {doc['title']}", ""] if doc["title"] else []
+    for b in doc["blocks"]:
+        if b[0] == "p":
+            lines += [b[1], ""]
+        elif b[0] == "hp":
+            lines += [b[1], b[2], ""]
+        elif b[0] == "list":
+            lines += [b[1]] + [f"- {k}" for k in b[2]] + [""]
+        elif b[0] == "links":
+            lines += [b[1]] + [f"- {k}: {u}" for k, u in b[2]] + [""]
+        elif b[0] == "link_p":
+            lines += [f"{b[1]}: {b[2]}", ""]
     return "\n".join(lines)
+
+
+def build_naver_blog_html(doc: dict[str, Any]) -> str:
+    """붙여넣기용 본문 HTML — 스마트에디터가 받아들이는 태그만(p·b·a·br). 블록 사이 빈 문단 한 줄."""
+    esc = _html.escape
+    out: list[str] = []
+    for b in doc["blocks"]:
+        if out:
+            out.append("<p><br></p>")
+        if b[0] == "p":
+            out.append(f"<p>{esc(b[1])}</p>")
+        elif b[0] == "hp":
+            out.append(f"<p><b>{esc(b[1])}</b></p><p>{esc(b[2])}</p>")
+        elif b[0] == "list":
+            out.append(f"<p><b>{esc(b[1])}</b></p>" + "".join(f"<p>· {esc(k)}</p>" for k in b[2]))
+        elif b[0] == "links":
+            out.append(f"<p><b>{esc(b[1])}</b></p>" + "".join(
+                f'<p>· <a href="{esc(u)}">{esc(k)}</a></p>' for k, u in b[2]))
+        elif b[0] == "link_p":
+            out.append(f'<p><a href="{esc(b[2])}">{esc(b[1])}</a></p>')
+    return "\n".join(out)
 
 
 def build_brief_glance(sections: list[dict[str, Any]], card_views: list[dict[str, Any]],
@@ -6274,7 +6328,10 @@ def build_headers_txt() -> str:
     # [마케팅 2026-09-28] 구독 확인 뒤에만 가는 두 경로 — 링크가 사이트 어디에도 없고
     # sitemap 에도 없지만, 주소가 퍼지면 검색엔진이 주울 수 있어 헤더로도 막는다
     # (도착 페이지는 템플릿 meta 로도 한 겹 더). PDF 는 meta 를 달 수 없어 헤더가 유일한 길.
-    for path in ("/files/*", "/welcome/*"):
+    # [네이버 블로그 원고 쪽 2026-11-26] 대표가 붙여 넣을 원고 — 페이지 meta 와 두 겹. Pages 는 .html 을
+    # 확장자 없는 주소로 308 하므로 두 꼴 모두 건다.
+    for path in ("/files/*", "/welcome/*",
+                 f"/briefs/:date/{NAVER_BLOG_PAGE}", f"/briefs/:date/{NAVER_BLOG_PAGE.removesuffix('.html')}"):
         lines += [path, "  X-Robots-Tag: noindex"]
     return "\n".join(lines) + "\n"
 
@@ -9096,8 +9153,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # [네이버 블로그 원고 2026-11-26] 이번 주 483 한 건 해설 — 고정 경로, 매주 저절로.
         blog_file = brief_page.file(NAVER_BLOG_FILE)
         _write(out_dir / blog_file,
-               build_naver_blog_483(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"]))
+               build_naver_blog_483(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"], pub))
         written.append(blog_file)
+        # 같은 원고의 붙여넣기 쪽(복사 단추 둘) — 브리프와 같은 자리라 상대 경로가 브리프와 같다.
+        blog_doc = naver_blog_483_doc(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"], pub)
+        blog_page_file = brief_page.file(NAVER_BLOG_PAGE)
+        _write(out_dir / blog_page_file, render_page(
+            "naver_blog.html", brief_page, page_title=f"네이버 블로그 원고 · {pub} · GRM",
+            nav_active="", description="", canonical="", hide_subscribe=True,
+            blog_pub=pub, blog_title=blog_doc["title"], blog_write_url=NAVER_BLOG_WRITE_URL,
+            blog_body_html=build_naver_blog_html(blog_doc)))
+        written.append(blog_page_file)
 
         # [다국어 5단계 2026-09-04] 영문 브리프 — **서사 다섯과 tldr 이 전부 영어인 호만**
         # 낸다(반쪽 영어 금지). 오늘의 발행분에는 그 슬롯이 없으므로 아무 페이지도 나오지

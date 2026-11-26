@@ -1,4 +1,4 @@
--- 173_coverage_daily_incomplete.sql — 수집 완전성 N2(칸 대조) 결과를 매일 장부(171)에 함께 쌓는다.
+-- 172_coverage_daily_incomplete.sql — 수집 완전성 N2(칸 대조) 결과를 매일 장부(171)에 함께 쌓는다.
 --
 -- 가산형: 칸 하나만 더한다(null 허용 — 171 장부만 쓴 날·이 칸이 생기기 전 날은 null).
 -- 값 = field_contract.py 의 payload {"measured_at", "total_incomplete", "sources": {계약 키: 집계}, …}.

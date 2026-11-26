@@ -14,7 +14,7 @@
 회귀 기준 = 데이터품질팀 11-26 전 기간 결산(GRM_전기간_누락결산_2026-11-26.md 부록의 select)과 같은 수.
 
 출력: JSON(소스별 행 수·결손 수·칸별 결손·결손 번호 앞 ID_LIMIT 개). `--apply` 면 그날(KST) coverage_daily 행의
-`incomplete` 칸에 쓴다(migration 173). 이 모듈은 경보를 내지 않는다 — 알리는 일은 N6 일보가 한다.
+`incomplete` 칸에 쓴다(migration 172). 이 모듈은 경보를 내지 않는다 — 알리는 일은 N6 일보가 한다.
 읽기는 REST GET 만, 쓰기는 coverage_daily 한 칸뿐. 서비스키는 로그에 싣지 않는다.
 """
 from __future__ import annotations

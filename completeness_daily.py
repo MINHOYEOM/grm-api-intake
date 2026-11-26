@@ -6,7 +6,7 @@
 입력(모두 그날 이미 만들어진 판정 — 원천은 다시 부르지 않는다)
   ① 문서 대조   source_reconcile.py 결과(그날 grm-source-reconcile 아티팩트 `source-reconcile.json`). 없으면 "대조 안 돎".
   ② 매일 장부   coverage_daily(171) 의 식약처 행정처분·회수 칸 — 원천 총건수 대비 설명되지 않은 차이.
-  ③ 칸 대조     coverage_daily.incomplete(173, field_contract.py) — 오늘과 어제의 소스별 결손 수.
+  ③ 칸 대조     coverage_daily.incomplete(172, field_contract.py) — 오늘과 어제의 소스별 결손 수.
 
 소스별 한 줄 = 정상 / 메우는 중(n) / **사람 필요(n)**
   · 사람 필요: 놓침(missed)·원천 불가·저장소 불가·대조 안 돎·장부 차이·측정 불가, 결손이 어제보다 줄지 않음.

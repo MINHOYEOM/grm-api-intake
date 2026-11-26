@@ -270,7 +270,7 @@ jobs:
           python content_completeness.py --json content-completeness.json --report content-completeness.md --run-url "$RUN_URL" | tee -a "$GITHUB_STEP_SUMMARY"
 
       # 칸 대조(수집 완전성 N2) — 소스별 "완전한 행" 계약으로 결손 행을 세고 번호를 남긴다(field_contract.py).
-      # 저장(coverage_daily.incomplete, migration 173)은 repo 변수 GRM_FIELD_CONTRACT_APPLY=true 일 때만 —
+      # 저장(coverage_daily.incomplete, migration 172)은 repo 변수 GRM_FIELD_CONTRACT_APPLY=true 일 때만 —
       # migration 적용 전에 켜면 칸이 없어 저장이 실패한다. 꺼져 있어도 측정·요약·아티팩트는 매일 남는다.
       - name: Run field contract (N2, non-blocking)
         id: field_contract

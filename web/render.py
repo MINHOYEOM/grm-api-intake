@@ -6631,6 +6631,45 @@ QUIZ_DESCRIPTION = N_("GRM 주간 퀴즈 — 규제·품질 용어와 최근 공
                       "전 직원 학습 퀴즈. 선택 즉시 정답·해설·근거 링크를 확인하세요.")
 
 
+# ── [설명문 최소 길이 2026-11-26] 빙 '메타 설명이 짧은 페이지가 많다' 권고 ─────────────────────
+# 짧은 설명(한국어 80자·영어 110자 미만)에는 그 묶음이 무엇을 담는지 한 문장을 덧붙인다. 새 사실을 짓지
+# 않고 묶음의 성격만 말한다(숫자·기관 목록 없음 — 낡지 않게). 가드: tests/test_meta_description_floor.py
+DESC_MIN_CHARS = {"ko": 80, "en": 110}
+_DESC_TR: "dict[str, Translator]" = {}
+_DESC_TAILS: tuple[tuple[str, str], ...] = (
+    ("findings/firm/", N_("문서마다 지적 문장과 공식 원문 링크를 함께 실었습니다.")),
+    ("findings/docs/", N_("문서를 열면 지적 전체를 읽고 업체·조항·분류로 이어서 찾아볼 수 있습니다.")),
+    ("findings/c/", N_("분류마다 실제 지적 문장과 근거 조항, 원문 문서를 함께 볼 수 있습니다.")),
+    ("glossary/", N_("GMP 실무 용어를 정의와 관련 조항, 실제 지적 문장으로 풀어 둔 용어사전입니다.")),
+    ("inspection-notes/", N_("무균·데이터 신뢰성·일탈 조사처럼 실사에서 반복되는 주제별로 정리했습니다.")),
+    ("briefs/", N_("FDA 483·경고서한, 식약처 처분·실사, 회수 소식을 카드로 정리한 주간 규제뉴스입니다.")),
+    ("library/", N_("규제기관 지침과 공식 문서를 원문 링크와 함께 모은 자료실입니다.")),
+    ("clauses/", N_("조항마다 공식 원문 링크와 그 조항을 인용한 실사 지적을 함께 둡니다.")),
+    ("", N_("GRM 은 규제기관이 공개한 실사 지적을 한국어로 정리해 매주 갱신합니다.")),
+)
+
+
+def extend_short_description(desc: str, site_path: str, lang: str,
+                             tr: "Translator | None" = None) -> str:
+    """짧은 설명에 묶음 한 문장을 덧붙인다. 비어 있으면(404·관리 화면 등) 그대로 둔다."""
+    desc = (desc or "").strip()
+    floor = DESC_MIN_CHARS.get(lang, DESC_MIN_CHARS["en"])
+    if not desc or len(desc) >= floor:
+        return desc
+    if tr is None:
+        tr = _DESC_TR.get(lang) or _DESC_TR.setdefault(
+            lang, _KO if lang == DEFAULT_LANG else Translator(lang))
+    path = site_path[len("en/"):] if site_path.startswith("en/") else site_path
+    # 묶음 문장 → 그래도 짧으면 사이트 한 문장(맨 끝 항목). 같은 문장은 두 번 붙이지 않는다.
+    for pre, t in [next((x for x in _DESC_TAILS if path.startswith(x[0]))), _DESC_TAILS[-1]]:
+        tail = tr(t)
+        if len(desc) >= floor or tail in desc:
+            continue
+        sep = "" if desc.endswith((".", "다", "。")) else "."
+        desc = f"{desc}{sep} {tail}"
+    return desc
+
+
 def _abs_url(rel_path: str = "") -> str:
     """SITE_BASE_URL + 경로 → 절대 canonical(트레일링 슬래시 디렉터리형). 랜딩=베이스/."""
     return f"{SITE_BASE_URL}/{rel_path}"
@@ -6941,6 +6980,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                       "label": LANG_ENDONYM[lg], "current": lg == tree_lang}
                      for lg in SUPPORTED_LANGS]
                     if pp.path in en_paths else [])
+            if ctx.get("description"):
+                ctx["description"] = extend_short_description(
+                    str(ctx["description"]), pp.site_path, pp.lang)
             return tree_env.get_template(template).render({
                 "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
                 "canonical": pp.canonical, "latest_slug": latest_slug,
@@ -8420,7 +8462,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              " 정리했습니다({y1}~{y2}).",
                              name=fp["name"], d=f"{fp['doc_count']:,}",
                              n=f"{fp['finding_count']:,}",
-                             y1=fp["first_seen"][:4], y2=fp["last_seen"][:4]),
+                             y1=fp["first_seen"][:4], y2=fp["last_seen"][:4]).replace(
+                                 f"({fp['first_seen'][:4]}~{fp['first_seen'][:4]})",
+                                 f"({fp['first_seen'][:4]})"),
                          # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
                          json_ld=firm_page.breadcrumb_json_ld([
                              (_tr("홈"), "/"), (_tr("찾아보기"), "browse/"),

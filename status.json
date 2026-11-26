@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T14:28:12Z",
+ "generated_at": "2026-11-26T22:03:35Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45835963915,
+    "databaseId": 45901377175,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T21:55:17Z",
+    "updatedAt": "2026-11-26T22:03:09Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #2017 from MINHOYEOM/claude/glossary-fig-daily-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45901377175"
+   },
+   {
+    "databaseId": 45860312522,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-26T14:08:17Z",
-    "updatedAt": "2026-11-26T14:16:41Z",
-    "headBranch": "codex/ko-country-names-40",
-    "displayTitle": "feat(국가명): 한국어 국가명 40개국 + 매칭 경계 강화 (11차 2)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45835963915"
+    "createdAt": "2026-11-26T16:36:25Z",
+    "updatedAt": "2026-11-26T16:44:04Z",
+    "headBranch": "claude/field-contract-n2-1126",
+    "displayTitle": "feat(completeness): N2 칸 대조 계약 + N6 수집 완전성 일보 (migration 173)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45860312522"
    },
    {
-    "databaseId": 45835953619,
+    "databaseId": 45860302216,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-26T14:08:13Z",
-    "updatedAt": "2026-11-26T14:16:44Z",
-    "headBranch": "codex/ko-country-names-40",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into codex/ko-country-name…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45835953619"
+    "createdAt": "2026-11-26T16:36:21Z",
+    "updatedAt": "2026-11-26T16:44:40Z",
+    "headBranch": "claude/field-contract-n2-1126",
+    "displayTitle": "fix(migration): 칸 대조 저장 칸 번호 173 → 172 (결번 검사, 티로 3 배정)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45860302216"
    },
    {
-    "databaseId": 45835775081,
+    "databaseId": 45859130537,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-26T14:07:08Z",
-    "updatedAt": "2026-11-26T14:14:35Z",
-    "headBranch": "codex/rum-bot-kr-direct",
-    "displayTitle": "Merge origin/main",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45835775081"
+    "createdAt": "2026-11-26T16:28:42Z",
+    "updatedAt": "2026-11-26T16:37:19Z",
+    "headBranch": "codex/collect-cap-health-r2",
+    "displayTitle": "Merge origin/main into codex/collect-cap-health (N4-1 충돌 해소)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45859130537"
    },
    {
-    "databaseId": 45835608281,
+    "databaseId": 45856349760,
     "status": "completed",
     "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T14:06:06Z",
-    "updatedAt": "2026-11-26T14:14:32Z",
-    "headBranch": "codex/483-out-of-scope-mark",
-    "displayTitle": "Merge origin/main",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45835608281"
-   },
-   {
-    "databaseId": 45822024133,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T12:41:35Z",
-    "updatedAt": "2026-11-26T12:48:49Z",
-    "headBranch": "codex/mhra-body-refetch",
-    "displayTitle": "Merge origin/main",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45822024133"
+    "event": "pull_request",
+    "createdAt": "2026-11-26T16:11:08Z",
+    "updatedAt": "2026-11-26T16:21:04Z",
+    "headBranch": "claude/naver-blog-widget-assets",
+    "displayTitle": "assets: 네이버 블로그 위젯 배너 3장",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45856349760"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45902239867,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T22:03:15Z",
+    "updatedAt": "2026-11-26T22:03:27Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45902239867"
+   },
+   {
     "databaseId": 45822275689,
     "status": "completed",
     "conclusion": "success",
@@ -442,20 +453,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45782606385"
-   },
-   {
-    "databaseId": 45762950215,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T05:38:48Z",
-    "updatedAt": "2026-11-26T05:39:00Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45762950215"
    }
   ],
   "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 45843344134,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T14:52:20Z",
+    "updatedAt": "2026-11-26T14:53:55Z",
+    "headBranch": "main",
+    "displayTitle": "translations: 표제 번역 85행 (일일 배치, 11-26 저녁) (#2014)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45843344134"
+   },
    {
     "databaseId": 45833062093,
     "status": "completed",
@@ -499,20 +510,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1992 from MINHOYEOM/chore/findings-translate-wl-b…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45771211867"
-   },
-   {
-    "databaseId": 45758523406,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T04:58:15Z",
-    "updatedAt": "2026-11-26T05:02:59Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1981 from MINHOYEOM/claude/findings-translate-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45758523406"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 45899661857,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-26T21:39:45Z",
+    "updatedAt": "2026-11-26T21:39:49Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45899661857"
+   },
    {
     "databaseId": 45783637545,
     "status": "completed",
@@ -556,17 +567,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45501777334"
-   },
-   {
-    "databaseId": 45370598411,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-24T10:00:40Z",
-    "updatedAt": "2026-11-24T12:17:13Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45370598411"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -628,6 +628,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 45901345885,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-26T21:55:01Z",
+    "updatedAt": "2026-11-26T21:55:20Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45901345885"
+   },
+   {
     "databaseId": 45786994509,
     "status": "completed",
     "conclusion": "success",
@@ -670,17 +681,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45534666438"
-   },
-   {
-    "databaseId": 45503810073,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-24T22:45:00Z",
-    "updatedAt": "2026-11-24T23:26:37Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45503810073"
    }
   ],
   "grm-cloud-request.yml": [

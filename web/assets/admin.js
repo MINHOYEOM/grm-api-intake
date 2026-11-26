@@ -478,6 +478,7 @@
       renderContentChecks();
       renderSystemChecks();
       renderLinkedin();
+      renderNaverBlog();
       byId("grm-index-state").className = "admin-pill ok";
       txt("grm-index-state", "인덱스 정상");
     }).catch(function (error) {
@@ -533,6 +534,26 @@
       var pill = byId("grm-li-state");
       if (!failed.length) { pill.className = "admin-pill ok"; pill.textContent = pub + " 발행분"; setStatus(byId("grm-li-status"), ""); }
       else { pill.className = "admin-pill warn"; pill.textContent = pub + " · " + failed.join("·") + " 없음"; setStatus(byId("grm-li-status"), failed.join("·") + " 본문을 불러오지 못했습니다. 배포의 LinkedIn cards 단계가 실패했거나 옛 브리프일 수 있습니다.", "err"); }
+    });
+  }
+  // 네이버 블로그 탭 — 배포가 만든 /briefs/{발행일}/naver-blog.html(복사 단추 둘)을 최신 발행일로 연다.
+  // 제목은 같은 자리의 naver-blog.txt 첫 줄('제목: …')에서 읽는다. 게시는 사람(render.NAVER_BLOG_PAGE).
+  function renderNaverBlog() {
+    if (!byId("grm-nb-open") || !state.latest || !state.latest.date) return;
+    var pub = state.latest.date, base = "/briefs/" + pub + "/", pill = byId("grm-nb-state");
+    byId("grm-nb-open").setAttribute("href", base + "naver-blog.html");
+    fetch(base + "naver-blog.txt").then(function (r) {
+      if (!r.ok) throw new Error(String(r.status));
+      return r.text();
+    }).then(function (body) {
+      var first = body.split("\n")[0] || "";
+      txt("grm-nb-title", first.indexOf("제목: ") === 0 ? first.slice(4) : "이번 주에는 해설할 483 이 없습니다");
+      pill.className = "admin-pill ok"; pill.textContent = pub + " 발행분";
+      setStatus(byId("grm-nb-status"), "");
+    }).catch(function () {
+      pill.className = "admin-pill warn"; pill.textContent = pub + " · 원고 없음";
+      txt("grm-nb-title", "-");
+      setStatus(byId("grm-nb-status"), "원고를 불러오지 못했습니다. 배포가 아직 끝나지 않았거나 옛 브리프일 수 있습니다.", "err");
     });
   }
   qsa("[data-copy]").forEach(function (b) { b.addEventListener("click", function () { copyFrom(b.getAttribute("data-copy"), b); }); });

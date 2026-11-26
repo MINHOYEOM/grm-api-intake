@@ -230,7 +230,14 @@ def guard_shrink(old: list[dict[str, Any]], refreshed: list[dict[str, Any]]
     for i, (o_old, o_new) in enumerate(zip(old, refreshed)):
         changed = (str(o_old.get("detail") or "") != str(o_new.get("detail") or "")
                    or str(o_old.get("deficiency") or "") != str(o_new.get("deficiency") or ""))
-        if changed and shrinks_body(_obs_text(o_old), _obs_text(o_new)):
+        old_def, new_def = str(o_old.get("deficiency") or ""), str(o_new.get("deficiency") or "")
+        if _header_leak(old_def) and not _header_leak(new_def):
+            # [11-26 짝 ⑤] 혼입 표제의 머리말 낱말(수신인·주소·시설 유형)은 본문이 아니다 — 그게 빠져
+            # 줄어든 것을 축소로 세면 고칠 수 없다(dry 실측 193867 45→40·161553 111→105). 상세만 본다.
+            shrank = shrinks_body(str(o_old.get("detail") or ""), str(o_new.get("detail") or ""))
+        else:
+            shrank = shrinks_body(_obs_text(o_old), _obs_text(o_new))
+        if changed and shrank:
             blocked.append(i)
             out.append({**o_old, "detail": tidy_old_detail(str(o_old.get("detail") or ""))})
         else:
@@ -363,6 +370,11 @@ def completed_sentence(old_detail: str, new: list[dict[str, Any]], source_text: 
     return od + added if added else None
 
 
+def _header_leak(deficiency: str) -> bool:
+    import findings_extractors as fe
+    return fe._fda483_is_form_header_leak(deficiency)
+
+
 def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]], source_text: str = ""
                            ) -> tuple[list[dict[str, Any]], int, int]:
     """기존 관찰 목록의 detail(과 잘린 표제)을 바꾼 새 목록 + (짝 맞은 수, 짝 없는 수). 순수 함수.
@@ -373,6 +385,7 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]],
        ③ 번호가 같고 새 상세가 옛 상세의 앞부분으로 시작하며 더 김(옛 1,200자 절단) → 상세만.
        ④ 옛 상세가 1,200자 절단 조각이고 그 끝이 다시 읽은 관찰(없으면 원문 전체) 한 곳에만 있음
           → 끊긴 문장만 잇는다.
+       ⑤ 옛 표제가 쪽 머리말 혼입이고 같은 번호의 혼입 아닌 새 관찰이 하나 → 표제·상세를 새 것으로.
     짝 ②가 안 된 280자+"..." 표제는 원문 전체에서 첫 문장 끝까지 잇는다(`completed_deficiency`).
     다시 읽은 상세가 비면(①·③) 기존 상세(정리본)를 둔다."""
     by_key = {(str(o.get("number")), str(o.get("deficiency") or "")): o for o in new}
@@ -397,6 +410,27 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]],
             n = restored[0]
             out.append({**o, "deficiency": str(n["deficiency"]), "detail": str(n.get("detail") or "")})
             continue
+        # ⑤ [11-26] 옛 표제가 **쪽 머리말 혼입**(수신인·주소·`CITY, STATE …`부터 시작)이고, 같은 번호의
+        #    새 관찰 중 혼입이 아닌 것이 정확히 하나 → 표제를 새 것으로(수집기 수리 #1997 뒤 다시 읽기).
+        #    판정은 findings 가드와 **같은 함수**다(규칙 복제 금지). 새 상세가 비면 옛 상세를 둔다.
+        if _header_leak(old_def):
+            clean = [n for n in same_num
+                     if str(n.get("deficiency") or "").strip() and not _header_leak(str(n["deficiency"]))]
+            if len(clean) > 1:
+                # 같은 번호가 둘 이상(판독 중복, 실측 69958) — 옛 혼입 표제 **안에** 그 표제 앞부분이 있는 것 하나만.
+                # 표제가 글자까지 같은 후보는 하나로 본다(같은 관찰이 두 번 읽힌 것, 69958 obs4).
+                clean = [n for n in clean if _norm(str(n["deficiency"]))[:_PREFIX_PROBE // 2] in _norm(old_def)]
+                clean = list({str(n["deficiency"]): n for n in reversed(clean)}.values())
+            if len(clean) == 1:
+                matched += 1
+                n = clean[0]
+                nd = str(n.get("detail") or "")
+                # 표제만 바로잡는 게 목적이다 — 새 상세가 비거나 옛 상세보다 줄면 옛 상세를 둔다
+                # (dry 실측 69958 obs5·78684 obs11: 다시 읽은 상세가 판독 깨짐으로 짧았다).
+                keep_old = not nd.strip() or shrinks_body(old_detail, nd)
+                out.append({**o, "deficiency": str(n["deficiency"]),
+                            "detail": tidy_old_detail(old_detail) if keep_old else nd})
+                continue
         extended = [n for n in same_num if _extends_detail(old_detail, str(n.get("detail") or ""))]
         if len(extended) == 1:
             matched += 1

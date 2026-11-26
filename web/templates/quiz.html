@@ -92,8 +92,8 @@
     </section>
     {#- 필터 결과가 0건일 때(예: 전체를 다 푼 뒤 "안 푼 문항만") — 빈 화면 대신 안내. -#}
     <p class="qz-empty" id="grm-qz-empty" hidden>{{ _('조건에 맞는 문항이 없습니다. 다른 필터를 선택하세요.') }}</p>
-    {#- [구독 유입 2026-11-17 · 대표 지시] 본문 끝 줄형 구독 칸 — newsletter 게이트 안(env-off 출력 0). -#}
-    {%- with sub_kind='quiz', sub_slot='end' %}{% include "partials/sub_inline.html" %}{% endwith +%}
+    {#- [구독 권유 정리 2026-11-26] 본문 끝 줄형 구독 칸은 뺐다 — 바로 아래 하단 밴드와 같은 자리였다(한 화면 구독 칸 하나 + 팝업 하나). 아래 set 은 줄바꿈 처리를 종전과 같게 두는 자리표시다. -#}
+    {%- set _sub_end = none +%}
   </div>
 </main>
 {% include "backtotop.html" %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block meta_robots %}
+{#- 대표가 블로그에 붙여 넣을 원고 쪽 — 목록에 없고 색인하지 않는다(_headers 의 X-Robots-Tag 와 두 겹). -#}
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+{% block content %}
+{#- [네이버 블로그 붙여넣기 쪽 2026-11-26] 원고 한 벌은 render.naver_blog_483_doc().
+    제목 복사 = 평문, 본문 복사 = text/html(+평문 대체) — 스마트에디터에 붙여도 문단·굵은 글씨·링크가 산다.
+    /admin/ '네이버 블로그' 탭이 최신 발행일로 이 주소를 연다. 한국어판만(블로그가 한국어). -#}
+<style>
+  .nb{max-width:760px;margin:0 auto;padding:48px 0 64px}
+  .nb h1{font-family:var(--serif);font-size:clamp(24px,3.4vw,32px);line-height:1.3;color:var(--ink);margin:0 0 6px;word-break:keep-all}
+  .nb-sub{font-family:var(--sans);font-size:14px;color:var(--muted);margin:0 0 14px;word-break:keep-all}
+  .nb-go{margin:0 0 24px}
+  .nb-box{border:1px solid var(--line-2);background:#fff;border-radius:var(--rad);padding:20px 22px;margin:0 0 18px}
+  .nb-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
+  .nb-head b{font-family:var(--sans);font-size:15px;color:var(--ink)}
+  .nb-title{font-family:var(--sans);font-size:17px;line-height:1.5;color:var(--ink);margin:0;word-break:keep-all}
+  .nb-body{font-family:var(--sans);font-size:15px;line-height:1.75;color:var(--body);word-break:keep-all;max-height:520px;overflow:auto}
+  .nb-body p{margin:0}
+  .nb-body a{color:var(--coral)}
+  .nb-steps{font-family:var(--sans);font-size:14px;line-height:1.8;color:var(--muted);margin:24px 0 0;padding-left:20px;word-break:keep-all}
+  .nb-ok{font-family:var(--sans);font-size:13px;color:var(--muted);min-height:18px;margin:8px 0 0}
+</style>
+<main>
+  <div class="wrap">
+    <div class="nb">
+      <h1>{{ _("네이버 블로그 원고") }}</h1>
+      <p class="nb-sub">{{ _("{date} 발행분 · 이번 주 FDA 483 한 건 해설", date=blog_pub) }}</p>
+      <p class="nb-go"><a class="btn" href="{{ blog_write_url }}" target="_blank" rel="noopener">{{ _("블로그 글쓰기 열기") }}</a></p>
+      {% if blog_title %}
+      <section class="nb-box">
+        <div class="nb-head"><b>{{ _("제목") }}</b><button class="btn" type="button" id="nb-copy-title">{{ _("제목 복사") }}</button></div>
+        <p class="nb-title" id="nb-title">{{ blog_title }}</p>
+      </section>
+      {% endif %}
+      <section class="nb-box">
+        <div class="nb-head"><b>{{ _("본문") }}</b><button class="btn coral" type="button" id="nb-copy-body">{{ _("본문 복사") }}</button></div>
+        <div class="nb-body" id="nb-body">{{ blog_body_html|safe }}</div>
+      </section>
+      <p class="nb-ok" id="nb-ok" role="status" aria-live="polite" data-done="{{ _('복사했습니다. 블로그 글쓰기 화면에 붙여 넣으세요.') }}" data-fail="{{ _('복사하지 못했습니다. 본문을 직접 선택해 복사해 주세요.') }}"></p>
+      <ol class="nb-steps">
+        <li>{{ _("블로그 글쓰기 열기를 누른다(GRM 블로그에 로그인된 브라우저에서).") }}</li>
+        <li>{{ _("제목 복사를 눌러 제목 칸에 붙여 넣는다.") }}</li>
+        <li>{{ _("본문 복사를 눌러 본문 칸에 붙여 넣는다. 맨 아래 AI 고지 한 줄이 남아 있는지 본다.") }}</li>
+        <li>{{ _("발행을 누른다.") }}</li>
+      </ol>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var ok = document.getElementById("nb-ok");
+  function say(k) { ok.textContent = ok.getAttribute(k); }
+  function selectCopy(el) {
+    var r = document.createRange(), s = window.getSelection();
+    r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r);
+    var done = false;
+    try { done = document.execCommand("copy"); } catch (e) { done = false; }
+    s.removeAllRanges();
+    say(done ? "data-done" : "data-fail");
+  }
+  var t = document.getElementById("nb-copy-title");
+  if (t) t.addEventListener("click", function () {
+    var el = document.getElementById("nb-title"), text = el.textContent.trim();
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { say("data-done"); }, function () { selectCopy(el); });
+    else selectCopy(el);
+  });
+  document.getElementById("nb-copy-body").addEventListener("click", function () {
+    var el = document.getElementById("nb-body");
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      navigator.clipboard.write([new ClipboardItem({
+        "text/html": new Blob([el.innerHTML], { type: "text/html" }),
+        "text/plain": new Blob([el.innerText], { type: "text/plain" })
+      })]).then(function () { say("data-done"); }, function () { selectCopy(el); });
+    } else selectCopy(el);
+  });
+})();
+</script>
+{% endblock %}

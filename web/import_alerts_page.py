@@ -8,8 +8,8 @@
 
 ★국가 라벨: 수집기 국가 표기 → ISO2(grm_findings.normalize_country, 한국은 수집기 is_korea 우선) →
   한국어 이름(COUNTRY_LABELS_KO — findings.js 의 같은 이름 표와 동일 계약, 테스트가 대조). 매핑에
-  없는 나라는 FDA 표기 그대로 보여 준다(추측 번역 금지). 영어 화면은 같은 한국어 키를 en.json 으로
-  옮긴다(findings.js 가 이미 같은 키를 쓴다 — 키가 새로 생기지 않는다).
+  없는 나라는 보충 표와 국가 용어로 조회한다. 둘 다 모르는 나라는 FDA 표기 그대로 보여 준다.
+  영어 화면은 한국어 키를 en.json으로 옮기고 수입경보 전용 보충 표의 국가는 FDA 표기를 쓴다.
 """
 from __future__ import annotations
 
@@ -102,6 +102,7 @@ def list_view(snapshot: "dict[str, Any] | None", *, tr: Callable[..., str], lang
     if not snapshot:
         return None
     slugs = firm_slugs or {}
+    term_labels_ko = {**_gf.country_labels_ko(), **COUNTRY_LABELS_KO, "EU": "유럽연합"}
     rows: list[dict[str, Any]] = []
     for r in snapshot.get("listings") or []:
         if not isinstance(r, dict):
@@ -116,14 +117,19 @@ def list_view(snapshot: "dict[str, Any] | None", *, tr: Callable[..., str], lang
             continue
         ckey = country_key(country)
         label_ko = COUNTRY_LABELS_KO.get(ckey)
-        extra_ko = EXTRA_COUNTRY_LABELS_KO.get(ckey) if lang == "ko" else None
+        extra_ko = EXTRA_COUNTRY_LABELS_KO.get(ckey)
+        if label_ko is None and extra_ko is None:
+            label_ko = term_labels_ko.get(_gf.match_country_term(country))
+        country_label = (extra_ko or country) if lang == "ko" else country
+        if label_ko:
+            country_label = tr(label_ko)
         published = str(r.get("firm_published") or "")
         rows.append({
             "alert_no": alert_no,
             "firm_name": name,
             "city": city,
             "country_key": ckey,
-            "country_label": tr(label_ko) if label_ko else (extra_ko or country),
+            "country_label": country_label,
             "firm_published": published if _DATE_RE.match(published) else "",
             "n_products": len(r.get("product_codes") or []),
             "active": r.get("active") is True,

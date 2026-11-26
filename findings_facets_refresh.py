@@ -51,11 +51,8 @@ service-role 로 세면 **RLS 를 우회해 비공개 행까지 집계**되어, 
 ## 라벨의 출처
 
   · **분류** — RPC 응답의 `category_label_ko`(DB 정본). 여기서 만들지 않는다.
-  · **국가** — `grm_findings._COUNTRY_CODE_MAP`(정본, 이름→코드)을 **역인덱스**해 한국어
-    표기를 얻는다. 새 맵을 손으로 적지 않는다 — 그 맵은 마이그레이션 055 의 SQL CASE 와
-    파리티가 테스트로 고정돼 있어 이 파일이 사본을 들면 즉시 갈라진다. 한국어 표기가 없는
-    코드(IS·MY 등)는 **페이지를 만들지 않는다**(제목이 "IS" 인 페이지는 검색에 무의미하다).
-    고치려면 정본 맵과 055 SQL 을 함께 늘려야 하므로 이 스크립트의 범위 밖이다.
+  · **국가** — `grm_findings.country_labels_ko()`에서 한국어 표기를 얻는다.
+    한국어 표기가 없는 코드는 페이지를 만들지 않는다.
   · **기관** — 저장소에 정본 맵이 없어 여기서 정의한다(5개·저드리프트). 대신 **모르는
     코드는 실패**시켜 드리프트를 침묵이 아니라 오류로 만든다(게이트 4).
 """
@@ -102,20 +99,7 @@ AGENCY_LABELS_KO: dict[str, str] = {
     "MHRA": "영국 MHRA",
 }
 
-_HANGUL = re.compile(r"[가-힣]")
-
-
-def country_labels_ko() -> dict[str, str]:
-    """ISO2 → 한국어 국가명. `_COUNTRY_CODE_MAP`(이름→코드) 역인덱스에서 파생한다.
-
-    같은 코드에 한국어 키가 여럿이면 먼저 나온 것을 쓴다(정본 dict 는 삽입 순서가 고정된
-    리터럴이라 결정론). 한국어 키가 없는 코드는 결과에 없으며, 호출부가 그 코드를 건너뛴다.
-    """
-    out: dict[str, str] = {}
-    for name, code in grm_findings._COUNTRY_CODE_MAP.items():
-        if _HANGUL.search(name) and code not in out:
-            out[code] = name
-    return out
+country_labels_ko = grm_findings.country_labels_ko
 
 
 def slugify_code(code: str) -> str:

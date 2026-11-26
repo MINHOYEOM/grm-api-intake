@@ -243,6 +243,45 @@ class NormalizeCountryParityTest(unittest.TestCase):
 
 
 # ----------------------------------------------------------------------------
+class CountryTermTest(unittest.TestCase):
+    def test_korean_labels_expand_without_replacing_existing_labels(self):
+        labels = grm_findings.country_labels_ko()
+        previous = {code: name for name, code in _FIXTURES if re.search(r"[가-힣]", name)}
+        self.assertEqual(len(previous), 33)
+        self.assertEqual({code: labels[code] for code in previous}, previous)
+        self.assertGreaterEqual(len(labels), 40)
+        expected = {
+            "GB": "영국", "CH": "스위스", "BR": "브라질", "SG": "싱가포르",
+            "TH": "태국", "MY": "말레이시아", "SA": "사우디아라비아",
+            "TR": "튀르키예", "RU": "러시아", "AR": "아르헨티나",
+            "LU": "룩셈부르크", "NE": "니제르", "NG": "나이지리아",
+        }
+        for code, label in expected.items():
+            with self.subTest(code=code):
+                self.assertEqual(labels[code], label)
+                self.assertEqual(grm_findings.match_country_term(label), code)
+        self.assertNotIn("EU", labels)
+
+    def test_exact_country_and_region_terms(self):
+        for value, code in (
+            ("Niger", "NE"), ("Nigeria", "NG"), ("인도", "IN"), ("인도네시아", "ID"),
+            ("  European\t Union ", "EU"), ("유럽연합", "EU"), ("ｅｕ", "EU"),
+            ("E.U.", "EU"), ("u.k.", "GB"), ("U.S.A.", "US"), ("한국", "KR"),
+            ("Russian Federation", "RU"), ("사우디", "SA"), ("터키", "TR"),
+        ):
+            with self.subTest(value=value):
+                self.assertEqual(grm_findings.match_country_term(value), code)
+
+    def test_rejects_partial_matches(self):
+        for value in (
+            "", " ", "Nigerian", "Niger2", "xNiger", "nigeria_group",
+            "인도네시아어", "남인도", "인도·인도네시아", "비유럽연합", "유럽연합측",
+            "NEU", "EUGMP", "EU_27", "EU GMP", "Koreatown", "Korea North",
+        ):
+            with self.subTest(value=value):
+                self.assertEqual(grm_findings.match_country_term(value), "")
+
+
 # Part 2: 057_grm_normalize_country_ddapi.sql (the *live* grm_normalize_country
 # body -- 055 superseded, see module docstring) <-> grm_findings._COUNTRY_CODE_MAP
 # parity.

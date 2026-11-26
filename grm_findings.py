@@ -12,6 +12,7 @@ import datetime
 import hashlib
 import json
 import re
+import unicodedata
 from dataclasses import dataclass
 from typing import Any
 
@@ -1770,6 +1771,97 @@ _COUNTRY_CODE_MAP: dict[str, str] = {
     "united arab emirates": "AE",
 }
 _COUNTRY_WHITESPACE_RE = re.compile(r"\s+")
+_COUNTRY_HANGUL_RE = re.compile(r"[가-힣]")
+
+# 화면 표시용 보충 표기. 기존 한국어 라벨은 _COUNTRY_CODE_MAP에서 가져온다.
+_COUNTRY_LABELS_KO_ADDITIONS = {
+    "AE": "아랍에미리트",
+    "AR": "아르헨티나",
+    "AW": "아루바",
+    "BD": "방글라데시",
+    "BG": "불가리아",
+    "BR": "브라질",
+    "CH": "스위스",
+    "CL": "칠레",
+    "CO": "콜롬비아",
+    "CR": "코스타리카",
+    "CZ": "체코",
+    "DO": "도미니카공화국",
+    "EE": "에스토니아",
+    "EG": "이집트",
+    "HK": "홍콩",
+    "HR": "크로아티아",
+    "HU": "헝가리",
+    "IS": "아이슬란드",
+    "JO": "요르단",
+    "LB": "레바논",
+    "LK": "스리랑카",
+    "LT": "리투아니아",
+    "LU": "룩셈부르크",
+    "LV": "라트비아",
+    "MO": "마카오",
+    "MT": "몰타",
+    "MY": "말레이시아",
+    "NE": "니제르",
+    "NG": "나이지리아",
+    "NZ": "뉴질랜드",
+    "OM": "오만",
+    "PH": "필리핀",
+    "PL": "폴란드",
+    "RU": "러시아",
+    "SA": "사우디아라비아",
+    "SG": "싱가포르",
+    "SK": "슬로바키아",
+    "TH": "태국",
+    "TR": "튀르키예",
+    "UY": "우루과이",
+}
+
+
+def country_labels_ko() -> dict[str, str]:
+    """국가 코드별 표시명. 기존 표기가 여럿이면 처음 등록된 표기를 쓴다."""
+    labels: dict[str, str] = {}
+    for name, code in _COUNTRY_CODE_MAP.items():
+        if _COUNTRY_HANGUL_RE.search(name):
+            labels.setdefault(code, name)
+    return {**_COUNTRY_LABELS_KO_ADDITIONS, **labels}
+
+
+_COUNTRY_LABELS_KO = country_labels_ko()
+_COUNTRY_TERMS = {
+    **_COUNTRY_CODE_MAP,
+    **{code.lower(): code for code in _COUNTRY_LABELS_KO},
+    **{label: code for code, label in _COUNTRY_LABELS_KO.items()},
+    "u.s.": "US",
+    "u.s.a.": "US",
+    "united states of america": "US",
+    "uk": "GB",
+    "u.k.": "GB",
+    "한국": "KR",
+    "korea republic of": "KR",
+    "korea the republic of": "KR",
+    "키프로스": "CY",
+    "터키": "TR",
+    "남아프리카공화국": "ZA",
+    "luxembourg": "LU",
+    "niger": "NE",
+    "nigeria": "NG",
+    "russia": "RU",
+    "russian federation": "RU",
+    "saudi arabia": "SA",
+    "사우디": "SA",
+    "유럽연합": "EU",
+    "유럽 연합": "EU",
+    "european union": "EU",
+    "eu": "EU",
+    "e.u.": "EU",
+}
+
+
+def match_country_term(value: str) -> str:
+    """국가·지역 입력란의 전체 값을 등록된 용어와 비교한다."""
+    term = unicodedata.normalize("NFKC", _text(value))
+    return _COUNTRY_TERMS.get(" ".join(term.split()).casefold(), "")
 
 
 def normalize_country(value: str) -> str:

@@ -1660,10 +1660,7 @@ def _glance_line(card_views: list[dict[str, Any]], cards_raw: list[dict[str, Any
         u = ((raw.get("sources") or {}).get("official_url") or "").strip()
         if u.startswith("http"):
             by_type.setdefault(cv.get("card_type") or "", []).append(u)
-    country_ko: dict[str, str] = {}
-    for name, code in _gf._COUNTRY_CODE_MAP.items():
-        if code not in country_ko and _HANGUL_RE.search(name):
-            country_ko[code] = name
+    country_ko = _gf.country_labels_ko()
     best: "tuple[float, str] | None" = None
     for t, urls in by_type.items():
         n = len(urls)
@@ -4382,6 +4379,11 @@ DATA_LABEL_KEYS: tuple[str, ...] = (
 # [다국어 5단계 2026-09-04] 주간 브리프 카드가 **데이터로** 들고 오는 표시 라벨.
 # 위와 같은 이유로 여기에 등록한다(소스에 리터럴이 없어 추출기가 못 본다). 어휘가 닫혀
 # 있어야 영어 브리프가 성립하므로, 새 값이 들어오면 `WebEnBriefTest` 가 이름을 대며 실패한다.
+# [국가명 40개국] 수입경보 국가 라벨은 grm_findings(웹 밖)의 용어 표에서 데이터로 오므로 소스에 리터럴이 없다 — 여기에 등록한다.
+COUNTRY_TERM_LABEL_KEYS: tuple[str, ...] = (
+    N_("나이지리아"), N_("남아프리카 공화국"), N_("니제르"), N_("러시아"), N_("룩셈부르크"), N_("사우디아라비아"), N_("사이프러스"), N_("유럽연합"),
+)
+
 BRIEF_LABEL_KEYS: tuple[str, ...] = (
     # card_type · type_tag — 카드 종류
     N_("FDA 483 실사 관찰"), N_("GMP 비준수"), N_("GMP실사"), N_("UK GMP 비준수"),

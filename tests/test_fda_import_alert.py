@@ -116,7 +116,9 @@ class NormalizeTest(unittest.TestCase):
 
     def test_korea(self):
         self.assertTrue(ia.is_korea("KOREA (THE REPUBLIC OF)"))
+        self.assertTrue(ia.is_korea("South Korea"))
         self.assertFalse(ia.is_korea("KOREA (THE DEMOCRATIC PEOPLE'S REPUBLIC OF)"))
+        self.assertFalse(ia.is_korea("KOREATOWN"))
         self.assertFalse(ia.is_korea("JAPAN"))
 
     def test_in_document_duplicates_merge(self):

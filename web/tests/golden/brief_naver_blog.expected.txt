@@ -1,16 +1,20 @@
-제목: FDA 483 해설 | Pharmaneek Inc — 위험의약품 교차오염 방지 미흡
+제목: FDA 483 해설 · 위험의약품 교차오염 방지 미흡
 
-발행일 2026-06-22 · 실사일 04/08/2026 · 시설 유형 Producer of Non Sterile Drug Products
+FDA 483 한 건을 골라 정리합니다. 이번에 볼 문서는 Pharmaneek Inc의 Form 483 입니다.
 
-FDA가 Pharmaneek Inc(FEI 3014484244, Indiana) 비무균 완제의약품 제조소 실사에서 위험의약품(hazardous drugs) 취급 시 교차오염 방지를 위한 격리·세척 미흡을 관찰(FDA Form 483)했다.
+이번 문서의 쟁점
+GRM 사이트 해설이 꼽은 쟁점은 위험의약품 교차오염 방지 미흡입니다. 관찰사항별 한국어 해설과 원문은 아래 링크에 있습니다.
 
-FDA가 적은 관찰사항
-- 지적: 위험의약품 취급 시 격리·작업면·기구·인원 오염방지 조치 미흡
+문서 기본 정보
+- 제조소/업체: Pharmaneek Inc · FEI 3014484244
 - 시설 유형: Producer of Non Sterile Drug Products
-- 실사일: 2026-04-08
+- 실사일: 04/08/2026
+- 발행일: 2026-06-22
 
-함께 적힌 내용
-FDA가 비무균 제조소의 위험의약품(HD) 교차오염 방지 체계를 직접 지적한 것은, HD 관련 CGMP 집행이 격리 기준서·세척 검증 수준까지 구체화하고 있음을 보여준다. 위험의약품을 취급하는 비무균 제조소는 HD 격리·세척 SOPs 및 인원 보호 절차를 점검해야 한다.
+글에 나온 용어
+- 교차오염(Cross-Contamination): 한 물질 또는 제품이 다른 물질이나 제품에 의해 오염되는 것입니다.
+- 격리(Quarantine): 출하·부적합·재가공 결정이 내려질 때까지 자재나 제품을 물리적 또는 효과적인 방법으로 분리한 상태입니다.
+- 오염(Contamination): 생산·검체채취·포장·보관·운송 중 물질에 화학·미생물 불순물이나 이물이 원하지 않게 들어오는 것입니다.
 
 우리 현장에서 확인할 것
 - 위험의약품 격리·세척 기준서(SOP) 및 이행 기록 적정성
@@ -21,6 +25,7 @@ FDA가 비무균 제조소의 위험의약품(HD) 교차오염 방지 체계를 
 - 이번 주 규제뉴스 전체: https://grm-solutions.com/briefs/2026-06-26/?utm_source=naver_blog&utm_medium=blog&utm_campaign=2026-06-26_483
 - 실사 지적을 매주 메일로 받기(무료): https://grm-solutions.com/?utm_source=naver_blog&utm_medium=blog&utm_campaign=2026-06-26_483#subscribe
 
-이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. 요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다.
+이 글의 출처
+이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. 요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다. 용어 풀이는 GRM 용어사전에서 옮겼습니다.
 
-#FDA483 #GMP #제약품질 #실사대비 #GRM
+#FDA483 #Form483 #FDA실사 #GMP #제약품질 #실사대비 #GRM

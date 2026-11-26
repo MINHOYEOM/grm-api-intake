@@ -9,9 +9,11 @@ test_findings_extractors.py and test_grm_findings.py.
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import unittest
+from contextlib import redirect_stdout
 from unittest import mock
 
 import findings_extractors as extractors
@@ -397,6 +399,49 @@ class CliTest(unittest.TestCase):
              mock.patch("findings_supabase_backfill.fetch_existing_finding_raw_ids", return_value=set()):
             exit_code = backfill.main(["--dry-run"])
         self.assertEqual(exit_code, 0)
+
+
+class RawSignalsFetchSizing1126Test(unittest.TestCase):
+    """★11-26: findings-backfill dry(document_ids 356건)가 GET raw_signals http_500 으로 아무것도
+    못 했는데 exit 0(초록)이었다. 원인은 raw_signals 를 1,000행(9~11MB) 쪽으로 **전량** 받던 것 —
+    PostgREST 8s 를 넘는다. 지목 문서는 그 문서만, 전량은 작은 쪽으로, 읽기 실패는 적색으로."""
+
+    def test_default_raw_page_is_small(self) -> None:
+        empty = _FakeGetResponse(200, [], headers={"Content-Range": "*/0"})
+        with mock.patch("findings_supabase_backfill.requests.get", return_value=empty) as get:
+            backfill.fetch_raw_signals(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(get.call_args_list[0].kwargs["headers"]["Range"],
+                         f"0-{backfill._RAW_SIGNALS_PAGE_SIZE - 1}")
+        self.assertLessEqual(backfill._RAW_SIGNALS_PAGE_SIZE, 200)
+
+    def test_document_ids_fetch_only_those_docs_in_chunks(self) -> None:
+        ids = [f"fda483-{n}" for n in range(1, 121)]   # 120 → 50·50·20
+        def _get(url, *, headers, params, timeout):
+            vals = params["document_id"][len("in.("):-1].split(",")
+            rows = [{"raw_signal_id": "r-" + v.strip('"'), "document_id": v.strip('"')} for v in vals]
+            return _FakeGetResponse(200, rows, headers={"Content-Range": f"0-{len(rows) - 1}/{len(rows)}"})
+        with mock.patch("findings_supabase_backfill.requests.get", side_effect=_get) as get:
+            rows = backfill.fetch_raw_signals(_BASE_URL, _SERVICE_KEY, document_ids=ids + ids[:3])
+        self.assertEqual(get.call_count, 3)
+        for call in get.call_args_list:
+            self.assertTrue(call.kwargs["params"]["document_id"].startswith('in.("fda483-'))
+        self.assertEqual(sorted(r["document_id"] for r in rows), sorted(ids))
+
+    def test_run_backfill_passes_document_ids_to_fetch(self) -> None:
+        with mock.patch("findings_supabase_backfill.fetch_raw_signals", return_value=[]) as frs,              mock.patch("findings_supabase_backfill.fetch_existing_finding_raw_ids", return_value=set()):
+            backfill.run_backfill(_BASE_URL, _SERVICE_KEY, dry_run=True, document_ids=["fda483-1"])
+            backfill.run_backfill(_BASE_URL, _SERVICE_KEY, dry_run=True)
+        self.assertEqual(frs.call_args_list[0].kwargs.get("document_ids"), ["fda483-1"])
+        self.assertIsNone(frs.call_args_list[1].kwargs.get("document_ids"))
+
+    def test_in_list_quotes_values(self) -> None:
+        self.assertEqual(backfill._postgrest_in_list(["a,b", 'c"d']), 'in.("a,b","c\\"d")')
+
+    def test_main_exits_1_when_read_fails(self) -> None:
+        env = dict(os.environ, SUPABASE_URL=_BASE_URL, SUPABASE_SERVICE_ROLE_KEY=_SERVICE_KEY)
+        with mock.patch.dict(os.environ, env, clear=True),              mock.patch("findings_supabase_backfill.fetch_raw_signals",
+                        side_effect=RuntimeError("findings_supabase_backfill: GET raw_signals failed (http_500)")),              redirect_stdout(io.StringIO()):
+            self.assertEqual(backfill.main(["--dry-run"]), 1)
 
 
 if __name__ == "__main__":

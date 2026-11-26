@@ -71,6 +71,54 @@ class ForceOcrTest(unittest.TestCase):
         self.assertEqual(self.calls["reocr"], 0)
 
 
+class ForcedDumpTest(unittest.TestCase):
+    """[11-26] force_ocr + dump-text — 채택되지 않은 강제 판독 전문도 <doc>.forced.txt 로 남긴다(191183 실측)."""
+
+    def _dump(self, env, layer_text, reocr_text, obs):
+        import tempfile
+        import backfill_483_ocr_recovery as rec
+        d = tempfile.mkdtemp()
+        with patch.dict(os.environ, env, clear=False), \
+                patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7"), \
+                patch.object(f, "_read_fda483_pdf_text", lambda *a, **k: (layer_text, "pdf-ok")), \
+                patch.object(f, "_reocr_483_pdf_text", lambda data, mc: (reocr_text, "pdf-ok-reocr")), \
+                patch.object(f, "_extract_483_observations_from_text", obs):
+            rows = rec.dump_texts(["fda483-191183"], d)
+        files = sorted(os.listdir(d))
+        read = {n: Path(d, n).read_text(encoding="utf-8") for n in files}
+        return rows, read
+
+    def test_rejected_forced_read_is_kept_beside_text_layer(self):
+        obs = lambda t: [1, 2] if t == GARBLED else [1]  # noqa: E731 — 강제 판독이 관찰을 덜 낸다 → 불채택
+        rows, read = self._dump({"ENABLE_FDA_483_OCR": "true", "FDA483_FORCE_OCR": "1"}, GARBLED, CLEAN, obs)
+        self.assertEqual(read["fda483-191183.txt"], GARBLED)
+        self.assertEqual(read["fda483-191183.forced.txt"], CLEAN)
+        self.assertEqual((rows[0]["forced_adopted"], rows[0]["forced_chars"]), (False, len(CLEAN)))
+
+    def test_adopted_forced_read_writes_one_file(self):
+        rows, read = self._dump({"ENABLE_FDA_483_OCR": "true", "FDA483_FORCE_OCR": "1"}, GARBLED, CLEAN,
+                                lambda t: [1])
+        self.assertEqual(sorted(read), ["fda483-191183.txt"])
+        self.assertEqual(read["fda483-191183.txt"], CLEAN)
+        self.assertTrue(rows[0]["forced_adopted"])
+
+    def test_default_dump_unchanged(self):
+        """force_ocr 가 꺼져 있으면 파일·보고 행 모양이 종전과 같다."""
+        rows, read = self._dump({"ENABLE_FDA_483_OCR": "true", "FDA483_FORCE_OCR": ""}, GARBLED, CLEAN,
+                                lambda t: [1])
+        self.assertEqual(sorted(read), ["fda483-191183.txt"])
+        self.assertEqual(sorted(rows[0]), ["chars", "doc", "status", "url"])
+
+    def test_forced_state_does_not_leak_between_docs(self):
+        import tempfile
+        import backfill_483_ocr_recovery as rec
+        f._LAST_FORCED_READ.update(text="stale", status="x", adopted=False)
+        d = tempfile.mkdtemp()
+        rows = rec.dump_texts(["fda483-1234"], d, fetch_text=lambda url: ("T", "pdf-ok"))
+        self.assertNotIn("forced_chars", rows[0])
+        self.assertFalse(os.path.exists(os.path.join(d, "fda483-1234.forced.txt")))
+
+
 class ForceOcrWorkflowTest(unittest.TestCase):
     WF = ROOT / ".github" / "workflows" / "grm-fda483-ocr-recovery.yml"
 

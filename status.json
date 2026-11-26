@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T03:13:50Z",
+ "generated_at": "2026-11-26T04:23:11Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45747336537,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-26T03:11:43Z",
-    "updatedAt": "2026-11-26T03:11:46Z",
-    "headBranch": "claude/desc-dup-noun-1126",
-    "displayTitle": "메타 설명: 덧붙일 문장 명사 겹침 건너뛰기 (용어사전)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45747336537"
-   },
-   {
-    "databaseId": 45747326777,
+    "databaseId": 45754075519,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-26T03:11:37Z",
-    "updatedAt": "2026-11-26T03:11:41Z",
-    "headBranch": "claude/desc-dup-noun-1126",
-    "displayTitle": "메타 설명: 덧붙일 문장의 명사가 원래 설명에 있으면 건너뛴다 (용어사전 겹침)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45747326777"
-   },
-   {
-    "databaseId": 45746546352,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T03:04:29Z",
-    "updatedAt": "2026-11-26T03:13:20Z",
+    "createdAt": "2026-11-26T04:15:40Z",
+    "updatedAt": "2026-11-26T04:15:44Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1987 from MINHOYEOM/claude/meta-desc-floor-1126",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45746546352"
+    "displayTitle": "Merge pull request #1988 from MINHOYEOM/claude/desc-dup-noun-1126",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45754075519"
    },
    {
-    "databaseId": 45742852697,
+    "databaseId": 45752555137,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-26T02:30:17Z",
-    "updatedAt": "2026-11-26T02:39:04Z",
-    "headBranch": "claude/meta-desc-floor-1126",
-    "displayTitle": "메타 설명 최소 길이: 짧은 설명에 묶음 한 문장을 덧붙인다(빙 권고)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45742852697"
+    "createdAt": "2026-11-26T04:01:28Z",
+    "updatedAt": "2026-11-26T04:09:32Z",
+    "headBranch": "claude/extraction-gap-rpc-timeout-1126",
+    "displayTitle": "fix(감시): extraction_gap_by_source 8s 초과 http_500 수리 + 넘기 전 경보(169)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45752555137"
    },
    {
-    "databaseId": 45742848761,
+    "databaseId": 45752487114,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-26T02:30:15Z",
-    "updatedAt": "2026-11-26T02:38:53Z",
-    "headBranch": "claude/meta-desc-floor-1126",
-    "displayTitle": "Merge origin/main into claude/meta-desc-floor-1126 — 영문 골든 5장 재동결",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45742848761"
+    "createdAt": "2026-11-26T04:00:52Z",
+    "updatedAt": "2026-11-26T04:09:04Z",
+    "headBranch": "claude/extraction-gap-rpc-timeout-1126",
+    "displayTitle": "fix(감시): extraction_gap_by_source 8s 초과 http_500 수리 + 넘기 전 경보",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45752487114"
+   },
+   {
+    "databaseId": 45751845547,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-26T03:54:28Z",
+    "updatedAt": "2026-11-26T04:01:49Z",
+    "headBranch": "claude/naver-blog-html-1126",
+    "displayTitle": "네이버 블로그 붙여넣기 쪽 + /admin/ 탭 (복사 단추 둘, 매주 자동)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45751845547"
+   },
+   {
+    "databaseId": 45751802772,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T03:54:03Z",
+    "updatedAt": "2026-11-26T04:01:52Z",
+    "headBranch": "claude/naver-blog-html-1126",
+    "displayTitle": "네이버 블로그 붙여넣기 쪽 naver-blog.html + /admin/ '네이버 블로그' 탭",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45751802772"
    }
   ],
   "grm-scaffold-mirror.yml": [

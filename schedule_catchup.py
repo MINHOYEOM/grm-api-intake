@@ -118,7 +118,7 @@ CRON_AUDIT: dict[str, tuple[str, str]] = {
     "grm-checklist-examples-verify.yml": ("C", "자가점검 사례가 해당 조항의 실제 지적인지 검증한다."),
     "grm-db-size-health.yml": ("C", "별도 pg_cron 이 기록한 용량을 읽어 한도·기록 정지를 알린다."),
     "grm-findings-backlog-monitor.yml": ("C", "미번역 격차와 검수 백로그가 임계를 넘으면 이슈로 알린다."),
-    "grm-findings-detail-stale-monitor.yml": ("C", "483 상세 재번역 대기 행 수를 읽기 전용으로 세고 3일 넘게 줄지 않으면 이슈로 알린다(빠진 날은 다음 실행이 가장 최근 3일 전 기록과 비교)."),
+    "grm-findings-detail-stale-monitor.yml": ("C", "483 상세 재번역 대기 행 수를 읽기 전용으로 세고 3일 넘게 줄지 않으면 이슈로 알린다(빠진 날은 다음 실행이 가장 최근 3일 전 기록과 비교). stale 이 있으면 재번역 원문 묶음을 아티팩트(7일)로 올린다 — 빠진 날은 다음 실행이 그날 대기열 전체를 다시 올린다."),
     "grm-findings-classification-audit.yml": ("C", "지적 분류 표류를 읽기 전용으로 점검한다."),
     "grm-findings-review-queue.yml": ("C", "검수 대기 건수와 최장 대기 시간을 재고 이슈로 알린다."),
     "grm-findings-search-cache-health.yml": ("C", "검색 캐시 적재는 별도 pg_cron 이 하고 이 잡은 신선도를 감시한다."),

@@ -315,6 +315,9 @@ SINGLE_GOLDENS = [
     ("llms.txt", "llms.expected.txt"),
     ("_headers", "headers.expected.txt"),
     ("briefs/2026-06-26/share.txt", "brief_share.expected.txt"),
+    # [네이버 블로그 원고 2026-11-26] 이번 주 483 한 건 해설 — share.txt 옆 고정 경로.
+    ("briefs/2026-06-26/naver-blog.txt", "brief_naver_blog.expected.txt"),
+    ("briefs/2026-06-26/naver-blog.html", "brief_naver_blog_page.expected.html"),
     ("sitemap.xml", "sitemap.expected.xml"),
     # [구글 품질 1단계 2026-11-19] IndexNow 용 전체 목록 — 구글용 sitemap.xml 과 별개.
     ("sitemap-full.xml", "sitemap_full.expected.xml"),
@@ -8969,8 +8972,11 @@ class WebHeadersFileTest(unittest.TestCase):
     def test_unlisted_subscriber_paths_are_noindex_only(self):
         """[마케팅 2026-09-28] 구독 확인 도착 페이지·용어집 PDF — noindex 한 줄씩, 그 밖의 규칙 없음."""
         blocks = self._blocks(render.build_headers_txt())
-        self.assertEqual(set(blocks), {"/*", "/files/*", "/welcome/*"})
-        for path in ("/files/*", "/welcome/*"):
+        # [네이버 블로그 붙여넣기 쪽 2026-11-26] 대표 전용 원고 쪽 — .html 과 Pages 가 308 하는 확장자 없는 꼴 둘 다.
+        blog = (f"/briefs/:date/{render.NAVER_BLOG_PAGE}",
+                f"/briefs/:date/{render.NAVER_BLOG_PAGE.removesuffix('.html')}")
+        self.assertEqual(set(blocks), {"/*", "/files/*", "/welcome/*", *blog})
+        for path in ("/files/*", "/welcome/*", *blog):
             self.assertEqual(blocks[path], ["  X-Robots-Tag: noindex"], path)
 
     def test_headers_written_to_dist_root(self):
@@ -16023,6 +16029,10 @@ class WebZoneIaTest(unittest.TestCase):
             seen.add(cur)
             queue.extend(self._links(cur, self.pages[cur]))
         unreachable = sorted(set(self.pages) - seen - set(self.UNREACHABLE_OK))
+        # [네이버 블로그 붙여넣기 쪽 2026-11-26] 브리프마다 한 장 — 대표가 /admin/ '네이버 블로그' 탭으로만 연다
+        # (noindex·sitemap 밖, 공개 링크를 두지 않는 것이 의도). 탭 배선은 tests/test_naver_blog_draft.py 가 본다.
+        unreachable = [p for p in unreachable
+                       if not (p.startswith("briefs/") and p.endswith("/" + render.NAVER_BLOG_PAGE))]
         self.assertEqual(
             unreachable, [],
             "홈에서 링크로 닿지 않는 페이지가 있다(기능이 있어도 아무도 쓸 수 없다). "

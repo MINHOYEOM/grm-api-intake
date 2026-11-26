@@ -103,6 +103,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--history", help="일별 기록 JSON(읽고 오늘 기록을 넣어 다시 쓴다).")
     p.add_argument("--output", help="보고서 JSON 경로.")
     p.add_argument("--today", help="기준일 YYYY-MM-DD(기본: 오늘 UTC).")
+    p.add_argument("--export-dir", help="stale 행이 있으면 재번역 원문 묶음(R-*.json)을 이 폴더에 쓴다 — "
+                                        "findings_detail_export --mode stale 과 같은 함수(아티팩트용, 2026-11-26).")
     p.add_argument("--supabase-url")
     p.add_argument("--service-role-key")
     args = p.parse_args(argv)
@@ -126,6 +128,9 @@ def main(argv: list[str] | None = None) -> int:
     else:
         report, new_history = run(findings, raws, history, today)
         report["errors"] = []
+        if args.export_dir and int(report.get("stale") or 0) > 0:
+            exported = fde.export_queue(findings, raws, Path(args.export_dir), "stale")
+            report["export"] = {"dir": args.export_dir, "shards": exported["shards"]}
     report["history_restored"] = had_history
     text = json.dumps(report, ensure_ascii=False, indent=2)
     print(text)

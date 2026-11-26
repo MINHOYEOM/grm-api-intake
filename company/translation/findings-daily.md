@@ -54,9 +54,10 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
 7. `python3 findings_translate.py --apply /tmp/tr/filled.json --source supabase --sql-output /tmp/tr/$D.sql --outbox-output translations/outbox/$D-batch.json --output /tmp/tr/apply_report.json --pretty`
    (`--sql-output` 은 필수다. SQL 은 저장소 밖에 쓴다).
 8. `apply_report.json` 의 `ready` 가 `false` 면 아무것도 커밋하지 말고, 어떤 항목이 왜 실패했는지 요약해 `실패` 로 끝낸다(우회 금지).
-9. **outbox 정리(기아 방지):** `translations/outbox/` 에 오늘 것 말고 다른 `*.json` 이 있으면, 그 파일들을 마지막으로 바꾼 main 커밋
-   (`git fetch origin main && git log -1 --format=%H FETCH_HEAD -- translations/outbox`)의 check-runs 중 이름이 `Apply queued translation outbox → Supabase` 인 것의
-   `conclusion` 이 `success` 일 때만 `git mv` 로 `translations/applied/` 에 옮긴다. 아니면 그대로 두고 `apply 미확인으로 outbox 정리 보류` 를 남긴다.
+9. **outbox 정리(기아 방지):** `git fetch origin main && python3 findings_outbox_archive.py --ref FETCH_HEAD --keep $D-batch.json --apply`.
+   파일마다 main 첫 부모 줄기의 머지 커밋에서 반영 체크(`Apply queued translation outbox → Supabase`) success 를 확인한 것만 `git mv` 로
+   `translations/applied/` 에 옮긴다(판정은 코드가 한다 — 체크를 못 읽으면 남긴다). 출력의 `moved` 개수와 `keep:*` 이유를 결과에 한 줄로 남긴다.
+   (2026-11-14~26 정리가 멈춘 원인: 옛 규칙의 `git log -1 -- translations/outbox` 가 머지 커밋이 아니라 PR 브랜치 커밋을 돌려줘 체크가 늘 없었다.)
 10. `git add translations/outbox/$D-batch.json`(9 의 이동분은 이미 스테이징됨). 커밋 `chore(findings): 일일 번역 배치 $D - N건`. `git push -u origin $B`.
 11. PR(`gh api`) — 제목 **`chore(findings): 일일 번역 배치 $D`**, 본문: N건 번역(`findings_translate_pick.py` 선택, 원문 X자, 잔여 M건·Y자는 다음 실행, backlog_alert 값), dry-run 검증 통과(ready=true),
     머지되면 `grm-findings-translate-apply.yml` 이 Supabase 에 반영. **머지하지 않는다** — CI 초록 3시간 뒤 워치독이 머지한다.

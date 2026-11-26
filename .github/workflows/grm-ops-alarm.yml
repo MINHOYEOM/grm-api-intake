@@ -10,6 +10,7 @@ name: GRM Ops Alarm Owner
 #    (11-15: 감시기가 스스로 닫은 #1463·#1513·#1515 의 업무가 다음 날 07:41 까지 관리자 창에 열린 채 남았다.
 #     감시기마다 sync 호출을 붙이면 새 감시기가 빠뜨리므로, 동기화 주기를 줄여 한곳에서 덮는다. 공개 저장소라 Actions 무료.)
 #  - 매시간 41분: 열린 경보 이슈 전부 동기화 + 닫힌 이슈 완료 처리 + 방치 감시(멱등 — 방치 표시는 이슈당 1회).
+#    원천 대조 판정이 26시간 넘게 없으면 실행에 경보를 남긴다. GRM_RECONCILE_STALENESS_APPLY=true 일 때 이슈도 동기화한다.
 #  - 수동(workflow_dispatch): 같은 동기화. 처음 켤 때 이미 열려 있는 경보(#1274·#1267·#1255·#1214 …)를 일괄 등록하는 경로.
 #
 # ## 안전 장치
@@ -37,15 +38,106 @@ permissions:
   contents: read
   issues: write
 
-concurrency:
-  group: grm-ops-alarm
-  cancel-in-progress: false
-
 jobs:
+  reconcile-staleness:
+    # 수집 실패로 원천 대조 잡이 건너뛰어도 이 시간별 검사는 실행된다.
+    if: >-
+      github.event_name == 'schedule' && vars.ENABLE_SOURCE_RECONCILE != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: grm-reconcile-staleness
+      cancel-in-progress: false
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Check source reconciliation freshness
+        id: reconcile-freshness
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          # 대조 잡과 같은 수집기 플래그. 기본값은 source_reconcile.SPECS 에서 읽는다.
+          ENABLE_MFDS: ${{ vars.ENABLE_MFDS }}
+          ENABLE_FDA_483: ${{ vars.ENABLE_FDA_483 }}
+          ENABLE_MFDS_RECALL: ${{ vars.ENABLE_MFDS_RECALL }}
+          ENABLE_MFDS_ADMIN: ${{ vars.ENABLE_MFDS_ADMIN }}
+          ENABLE_ICH: ${{ vars.ENABLE_ICH }}
+          ENABLE_WHO: ${{ vars.ENABLE_WHO }}
+          ENABLE_HC: ${{ vars.ENABLE_HC }}
+          ENABLE_ISPE: ${{ vars.ENABLE_ISPE }}
+          ENABLE_EU_GMP_NCR: ${{ vars.ENABLE_EU_GMP_NCR }}
+          ENABLE_MHRA_GMP_NCR: ${{ vars.ENABLE_MHRA_GMP_NCR }}
+        run: |
+          set -euo pipefail
+          reports="$RUNNER_TEMP/reconcile-reports"
+          mkdir -p "$reports"
+          # 실행 생성 시각에는 대기 시간이 포함되므로 판정 기준(26시간)보다 넓게 찾는다.
+          since=$(date -u -d '2 days ago' +%FT%TZ)
+          runs=$(gh api --paginate --method GET \
+            "repos/$GITHUB_REPOSITORY/actions/workflows/grm-source-reconcile.yml/runs" \
+            -f branch="$DEFAULT_BRANCH" -f created=">=$since" -F per_page=100 \
+            --jq '.workflow_runs[].id')
+          for run in $runs; do
+            artifact=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts?name=source-reconcile" \
+              --jq '.artifacts[] | select(.expired == false) | .id')
+            [ -n "$artifact" ] || continue
+            gh run download "$run" --name source-reconcile --dir "$reports/$run"
+          done
+          alarm=$(python source_reconcile.py --check-freshness "$reports")
+          printf 'alarm=%s\n' "$alarm" >> "$GITHUB_OUTPUT"
+          if [ -n "$alarm" ]; then
+            printf '::warning title=원천 대조 지연::%s\n' "$alarm"
+            printf '%s\n' "$alarm" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Sync reconciliation staleness alarm issue
+        # 승인 후 적용 변수를 켜면 기존 경보 이슈 → 업무 경로에 등록된다.
+        if: vars.GRM_RECONCILE_STALENESS_APPLY == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          ALARM: ${{ steps.reconcile-freshness.outputs.alarm }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const title = '[source-reconcile] 원천 대조 판정 지연';
+            const label = 'reconcile-staleness';
+            const alarm = process.env.ALARM;
+            if (alarm) {
+              try { await github.rest.issues.getLabel({ owner, repo, name: label }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name: label, color: 'd93f0b',
+                  description: '26시간 내 완료된 원천 대조 판정 없음' });
+              }
+            }
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'open', labels: label, per_page: 100,
+            });
+            const existing = open.find(issue => issue.title === title && !issue.pull_request);
+            if (alarm && !existing) {
+              await github.rest.issues.create({ owner, repo, title, body: alarm, labels: [label] });
+            } else if (alarm && existing.body !== alarm) {
+              await github.rest.issues.update({ owner, repo, issue_number: existing.number, body: alarm });
+            } else if (!alarm && existing) {
+              await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+            }
+
   sync:
     name: sync
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    concurrency:
+      group: grm-ops-alarm
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:

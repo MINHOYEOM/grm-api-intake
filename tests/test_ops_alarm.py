@@ -255,7 +255,16 @@ class WorkflowTest(unittest.TestCase):
         # 매시간: GITHUB_TOKEN 으로 닫힌 경보는 이벤트가 없어 동기화만이 업무를 닫는다(11-15)
         self.assertRegex(self.code, r"schedule:\n\s+- cron: '41 \* \* \* \*'")
         self.assertIn("workflow_dispatch:", self.code)
-        self.assertNotIn("pull_request", self.code)
+        self.assertNotRegex(self.code, r"(?m)^  pull_request(?:_target)?:")
+
+    def test_reconcile_staleness_routes_to_ops_and_requires_apply_for_issue_writes(self):
+        staleness = self.code.split("  reconcile-staleness:", 1)[1].split("\n  sync:", 1)[0]
+        self.assertIn("github.event_name == 'schedule'", staleness)
+        self.assertIn('python source_reconcile.py --check-freshness "$reports"', staleness)
+        self.assertIn("::warning title=원천 대조 지연", staleness)
+        self.assertIn("if: vars.GRM_RECONCILE_STALENESS_APPLY == 'true'", staleness)
+        self.assertTrue(al.is_alarm(["reconcile-staleness"]))
+        self.assertEqual(al.team_for(["reconcile-staleness"]), "infra")
 
     def test_default_off_and_dry_run(self):
         self.assertIn("ENABLED: ${{ vars.GRM_OPS_ALARM_ENABLED }}", self.code)

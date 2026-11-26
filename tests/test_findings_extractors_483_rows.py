@@ -290,5 +290,38 @@ class Fda483SameTitleUnchangedTest(unittest.TestCase):
         self.assertEqual(report["dropped_duplicate_text"], 1)
 
 
+class FormHeaderLeakTitle1126Test(unittest.TestCase):
+    """★11-26: 쪽 머리말 값 줄부터 잡힌 표제(`<이름>, Vice President … CITY, STATE, ZIP CODE, COUNTRY …
+    TYPE ESTABLISHMENT INSPECTED …`)가 findings 로 공개됐다(backfill 유입 4행). 수집기 원인 수리와 별개로
+    findings 에 다시 들어오지 않게 막는 마지막 그물."""
+
+    _LEAK = ("Orsolya Venn, Vice President Clinical and Regulatory Affairs TO: CITY, STATE, ZIP CODE, "
+             "COUNTRY TYPE ESTABLISHMENT INSPECTED Rockville, MD 20857 Outsourcing Facility")
+    _LEAK_OCR = ("Orsolya Venn, Vi c e President Quillmere Pharma CITY, STATE, ZIP COOE, COUNTRY Rockville "
+                 "TYPE ESTABUSHMENT INSPECTED Producer of Sterile Drugs Aseptic processing areas are deficient.")
+
+    def test_leaked_title_is_not_extracted_but_neighbours_are(self):
+        sig = _signal("fda483-000001", [
+            _obs("1", "Written records of investigations do not always include the conclusions and follow-up."),
+            _obs("2", self._LEAK, ""),
+            _obs("3", self._LEAK_OCR, "Specifically, the disinfectant is not sterile."),
+            _obs("4", "The labels of your outsourcing facility's drug products are deficient."),
+        ])
+        texts = _texts(extractors.findings_from_raw_signal(sig))
+        self.assertEqual(len(texts), 2, texts)
+        for t in texts:
+            self.assertNotIn("CITY, STATE", t)
+
+    def test_prose_with_lowercase_words_is_not_a_leak(self):
+        for ok in ("The firm did not verify the city, state, and zip code of each supplier.",
+                   "Records of the type of establishment inspected were incomplete.",
+                   "There is no FEI registration number recorded for the contract laboratory."):
+            self.assertFalse(extractors._fda483_is_form_header_leak(ok), ok)
+
+    def test_backfill_report_names_the_reason(self):
+        import findings_supabase_backfill as fsb
+        self.assertEqual(fsb.noise_reason(self._LEAK, "FDA 483"), "쪽 머리말 혼입")
+
+
 if __name__ == "__main__":
     unittest.main()

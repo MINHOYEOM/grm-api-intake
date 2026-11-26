@@ -231,5 +231,314 @@ class FirstSentenceNoCapTest(unittest.TestCase):
         self.assertFalse(head.endswith("..."))
 
 
+class HeaderLeakHeadingRefresh1126Test(unittest.TestCase):
+    """★11-26 ⑤: 옛 표제가 쪽 머리말 혼입이면 다시 읽은 같은 번호의 깨끗한 표제로 바꾼다(#1997 수리 뒤).
+    detail refresh 는 원래 상세만 바꿔서(표제는 280자 절단 복원 ②뿐) 이 꼴을 못 고쳤다(dry 8문서 docs_changed=0)."""
+
+    LEAK = ("Orsolya Venn, Vice President of Fulfillment Operations Quillmere Pharma CITY, STATE, ZIP CODE, "
+            "COUNTRY Rockville, MD 20857 TYPE ESTABLISHMENT INSPECTED Producer of Sterile Drugs Aseptic "
+            "processing areas are deficient regarding the system for cleaning and disinfecting the room.")
+    CLEAN = "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room."
+
+    def test_leaked_heading_is_replaced_by_the_clean_one(self):
+        old = [{"number": "1", "deficiency": "Records are incomplete.", "detail": "Specifically, a."},
+               {"number": "2", "deficiency": self.LEAK, "detail": "Specifically, the cleaner is not sterile."}]
+        new = [{"number": "1", "deficiency": "Records are incomplete.", "detail": "Specifically, a."},
+               {"number": "2", "deficiency": self.CLEAN, "detail": "Specifically, the cleaner is not sterile."}]
+        out, matched, unmatched = b.refreshed_observations(old, new)
+        self.assertEqual(out[1]["deficiency"], self.CLEAN)
+        self.assertEqual(out[0], old[0])
+        self.assertEqual((matched, unmatched), (2, 0))
+
+    def test_whole_header_heading_with_empty_detail_gets_real_heading(self):
+        leak = ("Orsolya Venn, Vice President Clinical Affairs TO: CITY, STATE, ZIP CODE, COUNTRY TYPE "
+                "ESTABLISHMENT INSPECTED Rockville, MD 20857 Outsourcing Facility")
+        old = [{"number": "11", "deficiency": leak, "detail": ""}]
+        new = [{"number": "11", "deficiency": "The statistical quality control criteria fail to include "
+                "appropriate rejection levels.", "detail": "Specifically, there are no reject limits."}]
+        out, _m, _u = b.refreshed_observations(old, new)
+        self.assertTrue(out[0]["deficiency"].startswith("The statistical quality control"))
+        self.assertTrue(out[0]["detail"].startswith("Specifically"))
+
+    def test_no_change_when_reread_still_leaks_or_is_ambiguous(self):
+        old = [{"number": "2", "deficiency": self.LEAK, "detail": "d"}]
+        still = [{"number": "2", "deficiency": self.LEAK, "detail": "d"}]
+        self.assertEqual(b.refreshed_observations(old, still)[0][0]["deficiency"], self.LEAK)
+        # 후보가 둘이고 어느 쪽도 옛 표제 안에 없다 → 모호 → 그대로
+        two = [{"number": "2", "deficiency": "Equipment is not cleaned at appropriate intervals.", "detail": "x"},
+               {"number": "2", "deficiency": "Another heading entirely different from the first one.", "detail": "y"}]
+        self.assertEqual(b.refreshed_observations(old, two)[0][0]["deficiency"], self.LEAK)
+
+    def test_clean_old_heading_is_never_touched_by_rule_5(self):
+        old = [{"number": "3", "deficiency": self.CLEAN, "detail": "Specifically, a."}]
+        new = [{"number": "3", "deficiency": "A different reading of the heading text here.", "detail": "Specifically, a."}]
+        self.assertEqual(b.refreshed_observations(old, new)[0][0]["deficiency"], self.CLEAN)
+
+
+class HeaderLeakShrinkGuard1126Test(unittest.TestCase):
+    """★11-26: 혼입 표제를 바로잡으면 머리말 낱말이 빠져 산문 수가 준다 — 그건 축소가 아니다.
+    대신 상세가 줄면 여전히 막는다."""
+
+    LEAK = HeaderLeakHeadingRefresh1126Test.LEAK
+    CLEAN = HeaderLeakHeadingRefresh1126Test.CLEAN
+    DETAIL = ("Specifically, during the walk-through of the manufacturing area the logbook reflected completed "
+              "cycles while the electronic system showed a different number of cycles, and this discrepancy "
+              "between the physical records and the system represents inadequate documentation practices.")
+
+    def test_dropping_header_words_is_not_a_shrink(self):
+        old = [{"number": "3", "deficiency": self.LEAK, "detail": self.DETAIL}]
+        new = [{"number": "3", "deficiency": self.CLEAN, "detail": self.DETAIL}]
+        out, blocked = b.guard_shrink(old, new)
+        self.assertEqual(blocked, [])
+        self.assertEqual(out[0]["deficiency"], self.CLEAN)
+
+    def test_detail_shrink_is_still_blocked(self):
+        old = [{"number": "3", "deficiency": self.LEAK, "detail": self.DETAIL}]
+        new = [{"number": "3", "deficiency": self.CLEAN, "detail": "Specifically, the logbook differed."}]
+        _out, blocked = b.guard_shrink(old, new)
+        self.assertEqual(blocked, [0])
+
+
+class HeaderLeakDuplicateNumbers1126Test(unittest.TestCase):
+    """★11-26: 판독 중복으로 같은 번호가 둘(실측 69958 obs3·4) — 옛 혼입 표제 안에 든 쪽으로 짝짓는다."""
+
+    def test_duplicate_numbers_pair_by_containment(self):
+        p = "08/19/2008 FE/NUMBER 3000000001 TYPE ESTABUSHMENT INSPECTED Homeopathic Drug Manufacturing "
+        h1 = "Batch production and control records do not include the results ofany investigation made."
+        h2 = "Batch production and control records do not include the results of any investigation made."
+        old = [{"number": "3", "deficiency": p + h1, "detail": "a"}, {"number": "3", "deficiency": p + h2, "detail": "b"}]
+        new = [{"number": "3", "deficiency": h1, "detail": "a"}, {"number": "3", "deficiency": h2, "detail": "b"}]
+        out, matched, _u = b.refreshed_observations(old, new)
+        self.assertEqual([o["deficiency"] for o in out], [h1, h2])
+        self.assertEqual(matched, 2)
+
+    def test_identical_duplicate_candidates_count_as_one(self):
+        p = "08/19/2008 FE/NUMBER 3000000001 TYPE ESTABUSHMENT INSPECTED Homeopathic Drug Manufacturing "
+        h = "Investigations of an unexplained discrepancy did not extend to other batches of the same drug."
+        old = [{"number": "4", "deficiency": p + h, "detail": "a"}, {"number": "4", "deficiency": p + h, "detail": "a"}]
+        new = [{"number": "4", "deficiency": h, "detail": "a"}, {"number": "4", "deficiency": h, "detail": "a"}]
+        out, _m, _u = b.refreshed_observations(old, new)
+        self.assertEqual([o["deficiency"] for o in out], [h, h])
+
+
+class HeaderLeakKeepsOldDetail1126Test(unittest.TestCase):
+    """★11-26: 표제는 바로잡되 다시 읽은 상세가 줄었으면 옛 상세를 둔다(축소 가드에 통째로 막히지 않게)."""
+
+    def test_heading_fixed_old_detail_kept_when_new_detail_shrinks(self):
+        long_detail = HeaderLeakShrinkGuard1126Test.DETAIL
+        old = [{"number": "5", "deficiency": HeaderLeakHeadingRefresh1126Test.LEAK, "detail": long_detail}]
+        new = [{"number": "5", "deficiency": HeaderLeakHeadingRefresh1126Test.CLEAN, "detail": "Specifically, short."}]
+        out, _m, _u = b.refreshed_observations(old, new)
+        out, blocked = b.guard_shrink(old, out)
+        self.assertEqual(blocked, [])
+        self.assertEqual(out[0]["deficiency"], HeaderLeakHeadingRefresh1126Test.CLEAN)
+        self.assertEqual(out[0]["detail"], b.tidy_old_detail(long_detail))
+
+
 if __name__ == "__main__":
     unittest.main()
+
+
+# [11-25 쪽 끝 절단 소급] 189485 꼴 — 옛 저장 행은 6쪽 서명란에서 끊겨 다음 쪽 첫 항목(C.)이 없었다.
+_PB_DEF = ("Procedures designed to prevent microbiological contamination of drug products purporting to be "
+           "sterile are not established and followed.")
+_PB_OLD_DETAIL = (
+    "Specifically, A. While observing the setup and filling operations on the filling line, the following "
+    "deficiencies in the aseptic processes were noted: i. During installation of the filling stations the "
+    "operator was observed handling unprotected sterile parts with gloved hands. These components are "
+    "positioned directly above the exposed product during the filling and stoppering process. B. Your visual "
+    "inspection program does not provide adequate assurance that finished products possess their purported "
+    "quality attributes. Specifically, containers with foreign matter are not classified as critical defects, "
+    "despite their potential to compromise container integrity and to create a risk of microbial "
+    "contamination of the sterile product. EMPlOVEE{S) NAME ANO Till£ Velmora Quist, PhD, Pharmaceutical "
+    "Scientist SEE Torvald Brennick, PhD, Lead Biologist REVERSE OF THIS PAGE")
+
+
+def _pb_raw(old_detail: str = _PB_OLD_DETAIL) -> dict:
+    with open(os.path.join(FIX, "fda483_pagebreak_item_c_1125.txt"), encoding="utf-8") as fh:
+        body = fh.read()
+    return {"fda483_body_full": body,
+            "establishment_type": "Drug Substance and Drug Product Manufacturer", "firm": "Examplefirm HF.",
+            b._OBS_KEY: [{"number": "4", "deficiency": _PB_DEF, "detail": old_detail}]}
+
+
+class PageEndCutBackfillTest(unittest.TestCase):
+    def test_next_page_item_is_restored_and_counted(self):
+        patched: dict = {}
+        rep = b.run([_row(_pb_raw())], dry_run=False, patch_fn=lambda rid, r: patched.update(r),
+                    text_fn=lambda u: self.fail("PDF 를 받으면 안 된다"))
+        d = patched[b._OBS_KEY][0]["detail"]
+        self.assertIn("C. Aseptic personnel qualification", d)
+        self.assertNotIn("Velmora", d)
+        self.assertEqual((rep.pagebreak_extended, rep.pagebreak_items_added, rep.pagebreak_docs), (1, 1, 1))
+        self.assertEqual(rep.pagebreak_samples[0]["items_added"], ["C", "D"])
+        self.assertEqual(rep.shrink_blocked, 0)
+        self.assertGreater(rep.prose_words_after, rep.prose_words_before)
+
+    def test_dry_run_reports_without_writing(self):
+        rep = b.run([_row(_pb_raw())], dry_run=True, patch_fn=lambda rid, r: self.fail("쓰면 안 된다"))
+        self.assertEqual((rep.pagebreak_items_added, rep.patched), (1, 0))
+
+    def test_shrinking_reread_is_blocked_and_old_kept(self):
+        longer = _PB_OLD_DETAIL.replace("REVERSE OF THIS PAGE", "") + (
+            " C. Aseptic personnel qualification does not require the inclusion of all critical interventions "
+            "during aseptic process simulation and the media fill records were never reviewed by anyone at all "
+            "in the quality unit during the period covered by this inspection or before it.")
+        rep = b.run([_row(_pb_raw(longer))], dry_run=True)
+        self.assertEqual(rep.shrink_blocked, 0, "다시 읽은 판이 옛 판보다 길면 막지 않는다")
+        # 다시 읽은 판(원문)보다 옛 판이 본문이 많다 → 바꾸지 않는다
+        old = [{"number": "4", "deficiency": _PB_DEF, "detail": longer + " " + longer}]
+        new = [{"number": "4", "deficiency": _PB_DEF, "detail": "Specifically, A. While observing the setup."}]
+        refreshed, _m, _u = b.refreshed_observations(old, new)
+        self.assertEqual(refreshed[0]["detail"], "Specifically, A. While observing the setup.")
+        guarded, blocked = b.guard_shrink(old, refreshed)
+        self.assertEqual(blocked, [0])
+        self.assertTrue(guarded[0]["detail"].startswith(longer[:200]))
+
+    def test_footer_only_cleanup_is_not_blocked(self):
+        old = [{"number": "4", "deficiency": _PB_DEF, "detail": _PB_OLD_DETAIL}]
+        cleaned = _PB_OLD_DETAIL.split(" EMPlOVEE")[0]
+        guarded, blocked = b.guard_shrink(old, [{**old[0], "detail": cleaned}])
+        self.assertEqual(blocked, [])
+        self.assertEqual(guarded[0]["detail"], cleaned)
+
+    def test_prose_and_item_helpers(self):
+        self.assertEqual(b.item_heads("A. The x. B. Two items ii. three"), {"A", "B", "ii"})
+        self.assertEqual(b.prose_words("SEE REVERSE Velmora Quist, PhD the sterile product"), 3)
+        self.assertFalse(b.shrinks_body("short text", ""))
+
+
+def _pdf_row(rid: str, doc: str) -> dict:
+    raw = {"pdf_url": f"https://x/{doc}.pdf", b._OBS_KEY: OLD_OBS}
+    return {"raw_signal_id": rid, "document_id": doc, "raw_json": json.dumps(raw, ensure_ascii=False)}
+
+
+_ROWS5 = [_pdf_row(f"rawsig-{i}", f"fda483-{i}") for i in "abcde"]
+WF = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                  ".github", "workflows", "grm-fda483-detail-refresh.yml")
+
+
+def _block_on(doc_url_part: str):
+    def fn(url):
+        return ("", b.FDA_BOT_BLOCK) if doc_url_part in url else (_text("195434"), "ok")
+    return fn
+
+
+class IncompleteRunResume1126Test(unittest.TestCase):
+    """[11-26] 봇 차단으로 도중에 멈춘 실행이 전체처럼 읽히지 않게 — 11-25 dry 가 2,453 중 2,202 에서 멈췄다."""
+
+    def test_bot_block_marks_incomplete_with_stop_point_and_remaining(self):
+        rep = b.run(list(reversed(_ROWS5)), dry_run=True, sleep_fn=lambda s: None,
+                    text_fn=_block_on("fda483-c"))
+        self.assertTrue(rep.incomplete)
+        self.assertEqual(rep.stop_reason, b.FDA_BOT_BLOCK)
+        self.assertEqual((rep.processed, rep.total_candidates), (2, 5))
+        self.assertEqual((rep.stopped_at_raw_signal_id, rep.stopped_at_document_id), ("rawsig-c", "fda483-c"))
+        # 막힌 문서부터 끝까지 — 막힌 문서도 다음 실행이 다시 읽는다
+        self.assertEqual(rep.remaining_doc_ids, ["fda483-c", "fda483-d", "fda483-e"])
+        self.assertEqual(b.exit_code(rep), 1)
+
+    def test_resume_from_continues_at_stop_point_and_completes(self):
+        first = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None, text_fn=_block_on("fda483-c"))
+        seen: list[str] = []
+
+        def ok(url):
+            seen.append(url)
+            return _text("195434"), "ok"
+        second = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None, text_fn=ok,
+                       resume_from=first.stopped_at_raw_signal_id)
+        self.assertEqual([u.rsplit("/", 1)[-1] for u in seen], ["fda483-c.pdf", "fda483-d.pdf", "fda483-e.pdf"])
+        self.assertFalse(second.incomplete)
+        self.assertEqual((second.processed, second.total_candidates), (3, 3))
+        self.assertEqual(first.processed + second.processed, len(_ROWS5))
+        self.assertEqual(b.incomplete_banner(b.report_payload(second)), "")
+        self.assertEqual(b.exit_code(second), 0)
+
+    def test_limit_stop_is_also_marked_incomplete(self):
+        rep = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None,
+                    text_fn=lambda u: (_text("195434"), "ok"), limit=2)
+        self.assertEqual((rep.incomplete, rep.stop_reason, rep.processed, rep.total_candidates),
+                         (True, "limit", 2, 5))
+        self.assertEqual(rep.stopped_at_raw_signal_id, "rawsig-c")
+
+    def test_complete_run_is_not_incomplete(self):
+        rep = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None, text_fn=lambda u: (_text("195434"), "ok"))
+        self.assertEqual((rep.incomplete, rep.processed, rep.total_candidates, rep.remaining_doc_ids),
+                         (False, 5, 5, []))
+
+    def test_payload_puts_incomplete_fields_first_and_banner_names_numbers(self):
+        rep = b.run(_ROWS5, dry_run=True, sleep_fn=lambda s: None, text_fn=_block_on("fda483-c"))
+        data = b.report_payload(rep)
+        self.assertEqual(list(data)[:4], ["incomplete", "stop_reason", "processed", "total_candidates"])
+        banner = b.incomplete_banner(data)
+        for part in ("미완료", "처리 2/후보 5", "rawsig-c", "--resume-from rawsig-c", "남은 문서 3"):
+            self.assertIn(part, banner)
+
+    def test_main_writes_remaining_ids_file(self):
+        import functools
+        import tempfile
+        from unittest import mock
+        run_offline = functools.partial(b.run, text_fn=_block_on("fda483-d"), sleep_fn=lambda s: None)
+        with tempfile.TemporaryDirectory() as d:
+            rem, rp = os.path.join(d, "rem.txt"), os.path.join(d, "r.json")
+            with mock.patch.object(b, "_resolve_credentials", return_value=("https://x.supabase.co", "k")), \
+                    mock.patch.object(b, "_fetch_rows", return_value=_ROWS5), \
+                    mock.patch.object(b, "run", run_offline):
+                code = b.main(["--since", "1900-01-01", "--report-path", rp, "--remaining-ids-path", rem,
+                               "--delay-seconds", "0"])
+            self.assertEqual(code, 1)
+            with open(rem, encoding="utf-8") as fh:
+                self.assertEqual(fh.read().split(), ["fda483-d", "fda483-e"])
+            with open(rp, encoding="utf-8") as fh:
+                self.assertTrue(json.load(fh)["incomplete"])
+
+    def test_workflow_passes_resume_and_shows_banner_first(self):
+        with open(WF, encoding="utf-8") as fh:
+            wf = fh.read()
+        self.assertIn("resume_from:", wf)
+        self.assertIn('ARGS+=(--resume-from "${IN_RESUME_FROM}")', wf)
+        self.assertIn("--remaining-ids-path detail_refresh_remaining_ids.txt", wf)
+        self.assertIn("detail_refresh_remaining_ids.txt", wf.split("Upload report", 1)[1])
+        summary = wf.split("Write step summary", 1)[1]
+        self.assertLess(summary.index("incomplete_banner(r)"), summary.index("### 483 상세 다시 읽기"))
+
+
+class MissingObservations1126Test(unittest.TestCase):
+    """[11-26 DB 완전성] 다시 읽어 새로 잡히는 관찰(저장 배열에 번호 없음)은 기본으로 세기만, 옵션일 때만 덧붙인다."""
+
+    def setUp(self):
+        import collect_fda_483 as c
+        with open(os.path.join(FIX, "fda483_garbled_header_gap_heading_1126.txt"), encoding="utf-8") as fh:
+            self.text = fh.read()
+        new = c._extract_483_observations_from_text(self.text, {})
+        self.old = [dict(o) for o in new if o["number"] != "2"]      # 운영처럼 관찰 2 가 없는 저장 배열
+        self.raw = {"fda483_body_full": self.text, b._OBS_KEY: self.old}
+
+    def test_counted_but_not_added_by_default(self):
+        patched: dict = {}
+        rep = b.run([_row(self.raw)], dry_run=False, patch_fn=lambda rid, r: patched.update(r))
+        self.assertEqual((rep.new_observations, rep.new_observation_docs, rep.new_observations_added), (1, 1, 0))
+        self.assertEqual(rep.new_observation_samples[0]["number"], "2")
+        self.assertEqual(rep.new_observation_doc_ids, ["fda483-195434"])
+        self.assertFalse(patched)          # 다른 변화가 없으면 쓰지 않는다
+
+    def test_added_in_number_order_when_asked(self):
+        patched: dict = {}
+        rep = b.run([_row(self.raw)], dry_run=False, add_missing=True, patch_fn=lambda rid, r: patched.update(r))
+        self.assertEqual(rep.new_observations_added, 1)
+        self.assertEqual([o["number"] for o in patched[b._OBS_KEY]], ["1", "2", "3"])
+        self.assertTrue(patched[b._OBS_KEY][1]["deficiency"].startswith("The accuracy"))
+
+    def test_same_heading_under_other_number_is_not_duplicated(self):
+        new = [{"number": "4", "deficiency": "Written procedures are not followed.", "detail": "x"}]
+        old = [{"number": "3", "deficiency": "Written  procedures are NOT followed.", "detail": "x"}]
+        self.assertEqual(b.missing_observations(old, new), [])
+        self.assertEqual(b.missing_observations([], new), new)
+
+    def test_workflow_exposes_add_missing_default_off(self):
+        with open(WF, encoding="utf-8") as fh:
+            wf = fh.read()
+        block = wf.split("add_missing_observations:", 1)[1].split("resume_from:", 1)[0]
+        self.assertIn("default: false", block)
+        self.assertIn("ARGS+=(--add-missing-observations)", wf)
+        self.assertIn("new_observations", wf.split("Write step summary", 1)[1])

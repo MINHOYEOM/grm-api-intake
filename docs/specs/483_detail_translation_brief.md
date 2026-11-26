@@ -65,3 +65,5 @@ strict 로 검사한다 — 옛 파일은 `tests/fixtures/detail_outbox_legacy.t
 - 기록이 온전하면 strict 는 **숫자·코드·로트 대조만** 면제한다(국문 숫자는 원본과 맞고 OCR 영문과는 어긋나므로).
   한글·한자·가림 개수·길이·읽기 좋음 검사는 그대로다. 기록 칸이 하나라도 비거나 형식이 틀리면 `pdf_verified_invalid` 로 실격.
 - 영문 detail_text 는 여전히 운영 값 그대로 싣는다(바이트 불변). 끝나면 목록의 status 를 done 으로 바꾼다.
+- 목록 상태: `todo`(초안 없음) → `review`(두 판을 맞댄 `draft_ko` 초안이 있고 사람이 PDF 와 대조 대기 — 초안에는 pdf_verified 를 달지 않는다,
+  가림은 [redacted], 확실하지 않은 구절은 [판독 불확실]) → `done`. 강제 판독이 채택되지 않은 문서는 dump-text 아티팩트의 `<doc>.forced.txt` 도 함께 본다.

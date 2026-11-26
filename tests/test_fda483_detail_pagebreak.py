@@ -304,6 +304,33 @@ class PageHeaderValueNotHeading1126Test(unittest.TestCase):
         self.assertFalse(c._is_page_header_value_line(body, 0))
 
 
+class LeakedHeaderPrefixStrip1126Test(unittest.TestCase):
+    """★11-26: 판독이 머리말 라벨을 깨뜨려 청소를 빠져나온 표제 앞 머리말(실측 69958·78684)을 걷는다."""
+
+    def test_garbled_header_prefix_is_stripped(self):
+        cases = [
+            ("08/19/2008 - 08/28/2008* FE/NUMBER 3000000001 TYPE ESTABUSHMENT INSPECTED Homeopathic Drug "
+             "Manufacturing Batch production and control records do not include the results.",
+             "Homeopathic Drug Manufacturer", "Batch production and control records"),
+            ("08/19/2008* FE NUMBER 3000000001 STREET AOORESS 12 Parklawn Dr 1i'PE ESTAllUSHMENT INSPECTED "
+             "Homeopathic Drug Manufacturing Batch production and control records do not include the identity.",
+             "Homeopathic Drug Manufacturer", "Batch production and control records"),
+            ("TYPE ESTABLISHMENT INSPECTED Rx Drug Manufacturer The written stability program for drug products "
+             "does not describe the storage conditions.", "Drug Manufacturer", "The written stability program"),
+            ("TYPE ESTABLISHMENT INSPECTED Manufacturer of sterile and non sterile drugs Equipment is not "
+             "cleaned at appropriate intervals.", "Manufacturer of sterile and non sterile drugs", "Equipment is not"),
+        ]
+        for d, est, head in cases:
+            self.assertTrue(c.strip_leaked_header_prefix(d, est).startswith(head), d)
+
+    def test_uncertain_or_clean_is_left_alone(self):
+        whole = ("Orsolya Venn, Vice President Clinical Affairs TO: CITY, STATE, ZIP CODE, COUNTRY TYPE "
+                 "ESTABLISHMENT INSPECTED Rockville, MD 20857 Outsourcing Facility")
+        self.assertEqual(c.strip_leaked_header_prefix(whole, "Outsourcing Facility"), whole)
+        ok = "Equipment is not cleaned at appropriate intervals to prevent contamination."
+        self.assertEqual(c.strip_leaked_header_prefix(ok, "Drug Manufacturer"), ok)
+
+
 if __name__ == "__main__":
     unittest.main()
 

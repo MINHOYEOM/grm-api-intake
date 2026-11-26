@@ -237,11 +237,13 @@ _FDA483_RETITLE_MIN_WORDS = 3
 # 깨진 판독(`ZIP COOE`·`ESTABUSHMENT`)도 받도록 낱말 머리만 본다.
 _FDA483_FORM_HEADER_LEAK_RE = re.compile(
     r"(?-i:CITY,\s*STATE"
-    r"|\bTYPE\s+(?:OF\s+)?ESTAB[A-Z!|]{4,10}\s+INSPEC"
+    # 판독 깨짐(실측 69958): `1i'PE ESTAllUSHMENT`·`FE/NUMBER`·`FElNUMBER`·`FE NUMBER`·`STREET AOORESS`
+    r"|\S{0,2}[YP]PE\s+(?:OF\s+)?EST[A-Za-z!|]{4,10}\s+[I1l|]?NSPEC"
     r"|NAME\s+AND\s+TITLE\s+OF\s+INDI"
     r"|DISTRICT\s+(?:OFFICE\s+)?ADDRESS"
+    r"|STREET\s+A[DO0]{2}RESS"
     r"|DATE\(S\)\s+OF\s+INSPECTION"
-    r"|\bFEI\s*NUMBER\b)")
+    r"|\bFE[I1l/]?\s*NUMBER\b)")
 
 
 def _fda483_is_form_header_leak(deficiency: str) -> bool:

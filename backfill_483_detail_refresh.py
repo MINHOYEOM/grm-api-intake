@@ -230,7 +230,14 @@ def guard_shrink(old: list[dict[str, Any]], refreshed: list[dict[str, Any]]
     for i, (o_old, o_new) in enumerate(zip(old, refreshed)):
         changed = (str(o_old.get("detail") or "") != str(o_new.get("detail") or "")
                    or str(o_old.get("deficiency") or "") != str(o_new.get("deficiency") or ""))
-        if changed and shrinks_body(_obs_text(o_old), _obs_text(o_new)):
+        old_def, new_def = str(o_old.get("deficiency") or ""), str(o_new.get("deficiency") or "")
+        if _header_leak(old_def) and not _header_leak(new_def):
+            # [11-26 짝 ⑤] 혼입 표제의 머리말 낱말(수신인·주소·시설 유형)은 본문이 아니다 — 그게 빠져
+            # 줄어든 것을 축소로 세면 고칠 수 없다(dry 실측 193867 45→40·161553 111→105). 상세만 본다.
+            shrank = shrinks_body(str(o_old.get("detail") or ""), str(o_new.get("detail") or ""))
+        else:
+            shrank = shrinks_body(_obs_text(o_old), _obs_text(o_new))
+        if changed and shrank:
             blocked.append(i)
             out.append({**o_old, "detail": tidy_old_detail(str(o_old.get("detail") or ""))})
         else:
@@ -409,6 +416,9 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]],
         if _header_leak(old_def):
             clean = [n for n in same_num
                      if str(n.get("deficiency") or "").strip() and not _header_leak(str(n["deficiency"]))]
+            if len(clean) > 1:
+                # 같은 번호가 둘 이상(판독 중복, 실측 69958) — 옛 혼입 표제 **안에** 그 표제 앞부분이 있는 것 하나만.
+                clean = [n for n in clean if _norm(str(n["deficiency"]))[:_PREFIX_PROBE // 2] in _norm(old_def)]
             if len(clean) == 1:
                 matched += 1
                 n = clean[0]

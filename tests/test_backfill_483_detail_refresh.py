@@ -264,7 +264,8 @@ class HeaderLeakHeadingRefresh1126Test(unittest.TestCase):
         old = [{"number": "2", "deficiency": self.LEAK, "detail": "d"}]
         still = [{"number": "2", "deficiency": self.LEAK, "detail": "d"}]
         self.assertEqual(b.refreshed_observations(old, still)[0][0]["deficiency"], self.LEAK)
-        two = [{"number": "2", "deficiency": self.CLEAN, "detail": "x"},
+        # 후보가 둘이고 어느 쪽도 옛 표제 안에 없다 → 모호 → 그대로
+        two = [{"number": "2", "deficiency": "Equipment is not cleaned at appropriate intervals.", "detail": "x"},
                {"number": "2", "deficiency": "Another heading entirely different from the first one.", "detail": "y"}]
         self.assertEqual(b.refreshed_observations(old, two)[0][0]["deficiency"], self.LEAK)
 
@@ -272,6 +273,44 @@ class HeaderLeakHeadingRefresh1126Test(unittest.TestCase):
         old = [{"number": "3", "deficiency": self.CLEAN, "detail": "Specifically, a."}]
         new = [{"number": "3", "deficiency": "A different reading of the heading text here.", "detail": "Specifically, a."}]
         self.assertEqual(b.refreshed_observations(old, new)[0][0]["deficiency"], self.CLEAN)
+
+
+class HeaderLeakShrinkGuard1126Test(unittest.TestCase):
+    """★11-26: 혼입 표제를 바로잡으면 머리말 낱말이 빠져 산문 수가 준다 — 그건 축소가 아니다.
+    대신 상세가 줄면 여전히 막는다."""
+
+    LEAK = HeaderLeakHeadingRefresh1126Test.LEAK
+    CLEAN = HeaderLeakHeadingRefresh1126Test.CLEAN
+    DETAIL = ("Specifically, during the walk-through of the manufacturing area the logbook reflected completed "
+              "cycles while the electronic system showed a different number of cycles, and this discrepancy "
+              "between the physical records and the system represents inadequate documentation practices.")
+
+    def test_dropping_header_words_is_not_a_shrink(self):
+        old = [{"number": "3", "deficiency": self.LEAK, "detail": self.DETAIL}]
+        new = [{"number": "3", "deficiency": self.CLEAN, "detail": self.DETAIL}]
+        out, blocked = b.guard_shrink(old, new)
+        self.assertEqual(blocked, [])
+        self.assertEqual(out[0]["deficiency"], self.CLEAN)
+
+    def test_detail_shrink_is_still_blocked(self):
+        old = [{"number": "3", "deficiency": self.LEAK, "detail": self.DETAIL}]
+        new = [{"number": "3", "deficiency": self.CLEAN, "detail": "Specifically, the logbook differed."}]
+        _out, blocked = b.guard_shrink(old, new)
+        self.assertEqual(blocked, [0])
+
+
+class HeaderLeakDuplicateNumbers1126Test(unittest.TestCase):
+    """★11-26: 판독 중복으로 같은 번호가 둘(실측 69958 obs3·4) — 옛 혼입 표제 안에 든 쪽으로 짝짓는다."""
+
+    def test_duplicate_numbers_pair_by_containment(self):
+        p = "08/19/2008 FE/NUMBER 3000000001 TYPE ESTABUSHMENT INSPECTED Homeopathic Drug Manufacturing "
+        h1 = "Batch production and control records do not include the results ofany investigation made."
+        h2 = "Batch production and control records do not include the results of any investigation made."
+        old = [{"number": "3", "deficiency": p + h1, "detail": "a"}, {"number": "3", "deficiency": p + h2, "detail": "b"}]
+        new = [{"number": "3", "deficiency": h1, "detail": "a"}, {"number": "3", "deficiency": h2, "detail": "b"}]
+        out, matched, _u = b.refreshed_observations(old, new)
+        self.assertEqual([o["deficiency"] for o in out], [h1, h2])
+        self.assertEqual(matched, 2)
 
 
 if __name__ == "__main__":

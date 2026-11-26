@@ -1,0 +1,43 @@
+name: GRM Google Quality Weekly Report
+
+on:
+  schedule:
+    - cron: '27 0 * * 1' # 월요일 09:27 KST, 운영 집중 시간대 밖
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -q -r requirements.txt
+      - name: Inspect weekly sample
+        timeout-minutes: 20
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ vars.GSC_SITE_URL }}
+        run: python gsc_index_sample.py
+      - name: Record weekly quality report
+        if: ${{ !cancelled() }}
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python gsc_quality_weekly.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607afa02 # v4.6.2
+        if: ${{ !cancelled() }}
+        with:
+          name: gsc-quality-weekly
+          path: |
+            _ops/reports/gsc_quality_*.md
+            gsc_index_sample.json
+          if-no-files-found: warn
+          retention-days: 90

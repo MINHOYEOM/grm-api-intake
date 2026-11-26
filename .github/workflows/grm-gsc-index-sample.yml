@@ -2,10 +2,8 @@ name: GRM Google Index Sample (weekly)
 
 # 구글 색인 표본 점검(2026-11-09) — 얇은 문서(#1429 googlebot noindex) vs 두꺼운 문서가 구글에 실제로
 # 색인됐는지 URL Inspection API 로 매주 같은 방식의 표본(묶음당 15건, 총 60건 ≤ 하루 쿼터 2,000)을 본다.
-# 결과는 Job Summary 표 + 아티팩트. DB·저장소 쓰기 없음. 화요일 검색 개선 리포트 전에 돈다.
+# 수동 점검 결과는 Job Summary 표 + 아티팩트. 주간 예약은 grm-gsc-quality-weekly.yml에서 같은 점검을 실행한다.
 on:
-  schedule:
-    - cron: "40 19 * * 1"   # 월 19:40 UTC = 화 04:40 KST
   workflow_dispatch:
     inputs:
       per_bucket:

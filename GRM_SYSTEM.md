@@ -631,6 +631,7 @@ grm-api-intake/
 ├─ findings_store.py, findings_views.py
 ├─ findings_supabase.py, findings_supabase_append.py   # Postgres DDL/로드 · 직행 append
 ├─ findings_translate.py, findings_translate_apply_service.py  # 번역 export/apply · CI 반영
+├─ findings_outbox_archive.py  # 반영 끝난 outbox 배치 → translations/applied/ (머지 커밋의 반영 체크로 판정)
 ├─ findings_translate_pick.py  # 일일 번역 대상 고르기(글자 예산·두 줄 교대·건너뛰기 없음·적체 신호)
 ├─ findings_detail_export.py, findings_detail_apply.py, findings_detail_qa.py  # 483 관찰 상세 번역 대기열 내보내기(읽기 전용, finding↔raw 관찰 짝)·국문 배치 반영·결정론 번역 검증(수치·코드·가림 표시·한자·길이)
 ├─ findings_search_export.py, findings_search_page.py  # 검색 export · 오프라인 뷰어

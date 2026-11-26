@@ -269,6 +269,68 @@ class NoStorageCapTest(unittest.TestCase):
         self.assertFalse(hasattr(c, "_cap_detail"))
 
 
+class PageHeaderValueNotHeading1126Test(unittest.TestCase):
+    """★11-26: 관찰 표제(`OBSERVATION 2`)가 쪽 맨 아래에 걸리면 표제 직후 서명란 → 다음 쪽 머리말 → 진짜
+    표제 순이다. `_skip_pagebreak_block` 이 머리말 **값 줄**(수신인 `<이름>, Vice President of …`)을
+    산문으로 오인해 거기서 표제를 시작했다 — `… CITY, STATE, ZIP CODE … TYPE ESTABLISHMENT INSPECTED …` 가
+    표제로 저장·공개됐다(실측 11-26 backfill 유입 4행). 머리말 값 줄은 뒤 몇 줄 안에 양식 라벨이 또 온다."""
+
+    def _rows(self):
+        import os
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures",
+                         "fda483_pagebreak_header_value_heading_1126.txt")
+        with open(p, encoding="utf-8") as fh:
+            text = fh.read()
+        return c._extract_483_observations_from_text(text, {"establishment_type": "Producer of Sterile Drugs"})
+
+    def test_heading_after_page_header_is_the_real_heading(self):
+        rows = {r["number"]: r for r in self._rows()}
+        self.assertEqual(sorted(rows), ["1", "2", "3"])
+        self.assertTrue(rows["2"]["deficiency"].startswith(
+            "Aseptic processing areas are deficient regarding the system for cleaning"), rows["2"]["deficiency"])
+        for r in rows.values():
+            for leak in ("CITY, STATE", "TYPE ESTABLISHMENT", "Vice President", "Quillmere"):
+                self.assertNotIn(leak, r["deficiency"])
+        self.assertTrue(rows["2"]["detail"].startswith("Specifically"), rows["2"]["detail"])
+
+    def test_value_line_predicate(self):
+        lines = [s + "\n" for s in (
+            "Orsolya Venn, Vice President of Fulfillment and Distribution Operations",
+            "FIRM NAME", "Quillmere Pharma Limited")]
+        self.assertTrue(c._is_page_header_value_line(lines, 0))
+        body = [s + "\n" for s in (
+            "Aseptic processing areas are deficient regarding the system for cleaning and",
+            "produce aseptic conditions.", "Specifically,", "1. The cleaner is not sterile.")]
+        self.assertFalse(c._is_page_header_value_line(body, 0))
+
+
+class LeakedHeaderPrefixStrip1126Test(unittest.TestCase):
+    """★11-26: 판독이 머리말 라벨을 깨뜨려 청소를 빠져나온 표제 앞 머리말(실측 69958·78684)을 걷는다."""
+
+    def test_garbled_header_prefix_is_stripped(self):
+        cases = [
+            ("08/19/2008 - 08/28/2008* FE/NUMBER 3000000001 TYPE ESTABUSHMENT INSPECTED Homeopathic Drug "
+             "Manufacturing Batch production and control records do not include the results.",
+             "Homeopathic Drug Manufacturer", "Batch production and control records"),
+            ("08/19/2008* FE NUMBER 3000000001 STREET AOORESS 12 Parklawn Dr 1i'PE ESTAllUSHMENT INSPECTED "
+             "Homeopathic Drug Manufacturing Batch production and control records do not include the identity.",
+             "Homeopathic Drug Manufacturer", "Batch production and control records"),
+            ("TYPE ESTABLISHMENT INSPECTED Rx Drug Manufacturer The written stability program for drug products "
+             "does not describe the storage conditions.", "Drug Manufacturer", "The written stability program"),
+            ("TYPE ESTABLISHMENT INSPECTED Manufacturer of sterile and non sterile drugs Equipment is not "
+             "cleaned at appropriate intervals.", "Manufacturer of sterile and non sterile drugs", "Equipment is not"),
+        ]
+        for d, est, head in cases:
+            self.assertTrue(c.strip_leaked_header_prefix(d, est).startswith(head), d)
+
+    def test_uncertain_or_clean_is_left_alone(self):
+        whole = ("Orsolya Venn, Vice President Clinical Affairs TO: CITY, STATE, ZIP CODE, COUNTRY TYPE "
+                 "ESTABLISHMENT INSPECTED Rockville, MD 20857 Outsourcing Facility")
+        self.assertEqual(c.strip_leaked_header_prefix(whole, "Outsourcing Facility"), whole)
+        ok = "Equipment is not cleaned at appropriate intervals to prevent contamination."
+        self.assertEqual(c.strip_leaked_header_prefix(ok, "Drug Manufacturer"), ok)
+
+
 if __name__ == "__main__":
     unittest.main()
 

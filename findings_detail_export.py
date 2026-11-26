@@ -157,6 +157,21 @@ def write_shards(queue: list[dict[str, Any]], out: Path, shards: tuple[str, ...]
     return summary
 
 
+def export_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]], out: Path, mode: str,
+                 shards: tuple[str, ...] | None = None, all_changes: bool = False) -> dict[str, Any]:
+    """대기열 → 묶음 파일 + summary. CLI 와 일일 stale 감시의 아티팩트(2026-11-26)가 **같은 함수**를 쓴다.
+
+    파일에는 finding_id·finding_text_md5·published_date·detail_text(원문)만 담긴다 — 자격 증명·URL 없음."""
+    queue, stats = build_queue(findings, raws, stale_only=mode == "stale", prose_growth_only=not all_changes)
+    shards = shards or (("R",) if mode == "stale" else SHARDS)
+    summary = write_shards(queue, out, shards)
+    report = {"mode": mode, "stats": stats, "shards": summary}
+    out.mkdir(parents=True, exist_ok=True)
+    (out / f"summary-{'-'.join(shards)}.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+                                                         encoding="utf-8")
+    return report
+
+
 def fetch_inputs(base: str, service_key: str, mode: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """대기열 입력(읽기 전용) — findings(483·scope ok·국문 유무는 mode 로) + 483 raw. 일일 stale 감시
     (`findings_detail_stale_monitor`)도 이 함수를 그대로 써서 대기열과 같은 모집단을 센다."""
@@ -191,14 +206,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     base = _normalize_base_url(creds[0])
     findings, raws = fetch_inputs(base, creds[1], args.mode)
-    queue, stats = build_queue(findings, raws, stale_only=args.mode == "stale",
-                               prose_growth_only=not args.all_changes)
-    out = Path(args.out)
-    shards = tuple(x for x in args.prefix.split(",") if x) or (("R",) if args.mode == "stale" else SHARDS)
-    summary = write_shards(queue, out, shards)
-    report = {"mode": args.mode, "stats": stats, "shards": summary}
-    out.mkdir(parents=True, exist_ok=True)
-    (out / f"summary-{'-'.join(shards)}.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    shards = tuple(x for x in args.prefix.split(",") if x) or None
+    report = export_queue(findings, raws, Path(args.out), args.mode, shards=shards, all_changes=args.all_changes)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 

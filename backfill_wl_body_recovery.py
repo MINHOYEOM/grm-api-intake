@@ -58,6 +58,8 @@ fda.gov 의 403 은 러너 IP 봇 차단이다. GitHub 러너 IP 는 날마다 �
 
 exit code: 자격증명/URL/조회 실패 → 2 · 건별 실패가 광범위(시도의 절반 이상)면 → 1 · 그 외 0.
 dry-run(기본)은 fetch·재구성까지 하고 쓰기만 건너뛴다.
+--ids / --ids-json 은 대조에서 발견한 놓침·결손만 처리한다. 남은 번호는 unresolved_ids 로
+보고하고 1 로 종료한다. 같은 입력으로 재실행하면 완료 행은 건너뛰고 남은 행만 다시 받는다.
 """
 
 from __future__ import annotations
@@ -67,6 +69,7 @@ import json
 import re
 import sys
 import time
+from collections.abc import Iterator
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -78,7 +81,7 @@ import raw_body_followup as rbf
 import raw_versioning as rv
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import FDA_BOT_BLOCK, SOURCE_FDA_WL, body_shrunk, log, normalize_whitespace
+from grm_common import FDA_BOT_BLOCK, FdaBotBlockError, SOURCE_FDA_WL, body_shrunk, log, normalize_whitespace
 from grm_http_policy import FDA_WL_RECOVERY_DELAY_SECONDS
 
 SCHEMA_VERSION = "grm-wl-body-recovery/v1"
@@ -156,6 +159,8 @@ class WlBodyRecoveryReport:
     # [본문 교체 후속 2026-11-24] raw_body_followup.followup 요약(분류 전→후·findings 넣기·restore·stale).
     followup: dict[str, Any] = field(default_factory=dict)
     restore_plan_items: int = 0
+    skipped_complete: int = 0
+    unresolved_ids: list[str] = field(default_factory=list)
 
 
 def _default_sleep(seconds: float) -> None:
@@ -183,6 +188,49 @@ def _parse_doc_ids(value: str) -> list[str]:
     if not value:
         return []
     return [p for p in re.split(r"[,\s]+", value.strip()) if p]
+
+
+def _read_reconcile_ids(path: Path) -> list[str]:
+    """Read a list, a WL result, or the WL entry in a source-reconcile artifact."""
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    if isinstance(data, dict) and "sources" in data:
+        sources = data["sources"]
+        if not isinstance(sources, list) or any(not isinstance(s, dict) for s in sources):
+            raise ValueError("sources must be a list of source results")
+        data = next((s for s in sources if s.get("key") == "wl"), None)
+        if data is None:
+            raise ValueError("source-reconcile report has no WL result")
+    if isinstance(data, dict):
+        if data.get("key", "wl") != "wl" or data.get("source", SOURCE_FDA_WL) != SOURCE_FDA_WL:
+            raise ValueError("expected an FDA WL result")
+        groups = [data[key] for key in ("missed", "incomplete") if key in data]
+    else:
+        groups = [data]
+    if not groups or any(not isinstance(group, list) for group in groups):
+        raise ValueError("expected an ID list or missed/incomplete lists")
+    ids: list[str] = []
+    for group in groups:
+        for entry in group:
+            values = [entry]
+            if isinstance(entry, dict):
+                values = [entry[key] for key in ("raw_signal_id", "document_id") if key in entry]
+            if not values or any(not isinstance(value, str) or not value.strip() for value in values):
+                raise ValueError("each entry must contain a non-empty raw_signal_id or document_id")
+            ids.extend(value.strip() for value in values)
+    return ids
+
+
+def _row_ids(row: dict[str, Any]) -> set[str]:
+    return {str(row[key]) for key in ("raw_signal_id", "document_id") if row.get(key)}
+
+
+def _named_complete(raw: dict[str, Any]) -> bool:
+    from collect_intake import WL_VIOLATIONS_SCOPE_STATUSES, wl_violations_gap_kind
+
+    status = str(raw.get("wl_body_status") or "")
+    if not str(raw.get("wl_body_full") or "").strip():
+        return status.startswith("fetch-fail") and "404" in status
+    return wl_violations_gap_kind(raw) in ("filled", *WL_VIOLATIONS_SCOPE_STATUSES)
 
 
 def is_permanent_403(status: str) -> bool:
@@ -301,17 +349,86 @@ def _rebuild_item(raw: dict[str, Any], excerpt: tuple[str, str], full: tuple[str
 
 
 def _fetch_raw_signals(base_url: str, service_key: str, *, with_body: bool = False,
-                       page_size: int = _DEFAULT_PAGE_SIZE) -> list[dict[str, Any]]:
+                       page_size: int = _DEFAULT_PAGE_SIZE,
+                       ids: list[str] | None = None) -> list[dict[str, Any]]:
     """source='FDA Warning Letter' 중 raw_json 에 `wl_body_full` 문자열이 없는 행(서버 좁히기).
 
     `with_body` 면 반대로 본문이 있는 행(`--rebuild-body-start`)."""
-    return fsb._fetch_all_pages(
-        base_url, service_key, "raw_signals",
-        select="raw_signal_id,document_id,collected_at,raw_sha256,raw_json,row_json",
-        page_size=page_size, order="raw_signal_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_WL}",
-                      "raw_json": ("like" if with_body else "not.like") + ".*wl_body_full*"},
-    )
+    def fetch(filters: dict[str, str]) -> list[dict[str, Any]]:
+        return fsb._fetch_all_pages(
+            base_url, service_key, "raw_signals",
+            select="raw_signal_id,document_id,collected_at,raw_sha256,raw_json,row_json",
+            page_size=page_size, order="raw_signal_id.asc",
+            extra_params={"source": f"eq.{SOURCE_FDA_WL}", **filters},
+        )
+
+    if ids is None:
+        return fetch({"raw_json": ("like" if with_body else "not.like") + ".*wl_body_full*"})
+    rows: dict[str, dict[str, Any]] = {}
+    for start in range(0, len(ids), 50):
+        values = ",".join(json.dumps(value, ensure_ascii=False) for value in ids[start:start + 50])
+        for row in fetch({"or": f"(raw_signal_id.in.({values}),document_id.in.({values}))"}):
+            rows[row["raw_signal_id"]] = row
+    return list(rows.values())
+
+
+def _find_missing_wl_rows(
+    ids: set[str], *, sleeper: Sleeper, delay_seconds: float, deadline_reached: Callable[[], bool],
+) -> Iterator[dict[str, Any]]:
+    """Yield metadata for requested IDs only, using the window backfill's FDA listing."""
+    import collect_fda_backfill as backfill
+
+    if deadline_reached():
+        return
+    remaining = set(ids)
+    sleeper(delay_seconds)
+    config = backfill._wl_listing_config()
+    offset, size, draw = 0, 100, 1
+    previous_page = None
+    while remaining and not deadline_reached():
+        sleeper(delay_seconds)
+        data = backfill._wl_listing_page(config, offset, size, draw=draw)
+        rows = data.get("data")
+        if not isinstance(rows, list) or (rows and rows == previous_page):
+            raise RuntimeError("wl-datatables-invalid-page")
+        for entry in rows:
+            nrow = backfill._wl_row_from_ajax(entry)
+            if not nrow or not nrow["wl_href"]:
+                continue
+            doc_id = backfill._wl_document_id(nrow)
+            if doc_id not in remaining and not any(value.startswith("rawsig-") for value in remaining):
+                continue
+            verdict, gated = backfill._wl_gate(nrow)
+            if gated:
+                continue
+            item = backfill._wl_item_from_row(nrow, verdict, None, None)
+            row = findings_store.raw_signal_from_intake_item(
+                item, collected_at=datetime.now(timezone.utc).isoformat(),
+            )
+            matched = remaining & _row_ids(row)
+            if matched:
+                remaining.difference_update(matched)
+                yield row
+        offset += len(rows)
+        total = data.get("recordsFiltered", data.get("recordsTotal"))
+        if not rows or (isinstance(total, int) and offset >= total) or (total is None and len(rows) < size):
+            break
+        previous_page = rows
+        draw += 1
+
+
+def _insert_missing_wl(base: str, service_key: str, record: dict[str, Any], *,
+                       row: dict[str, Any]) -> tuple[int, list[dict[str, Any]] | None, str]:
+    from collect_fda_backfill import _post_raw_signals
+    from grm_findings import validate_raw_signal
+
+    if validate_raw_signal(record):
+        return 0, None, "invalid_record"
+    errors: list[str] = []
+    inserted = _post_raw_signals(base, service_key, [record], errors)
+    if errors or not inserted:
+        return 0, None, "insert_failed" if errors else "insert_conflict"
+    return 201, None, ""
 
 
 def _upsert_raw_signal(base_url: str, service_key: str, record: dict[str, Any], *,
@@ -391,10 +508,13 @@ def run(
     limit: int | None = None,
     delay_seconds: float = _DEFAULT_DELAY_SECONDS,
     doc_ids: list[str] | None = None,
+    ids: list[str] | None = None,
     fetch_raw_signals: Callable[..., list[dict[str, Any]]] | None = None,
     fetch_letter: Callable[[str], tuple[str, str, str]] | None = None,
+    find_missing: Callable[..., Iterator[dict[str, Any]]] | None = None,
     rebuild_item: Callable[..., Any] | None = None,
     upsert_raw_signal: Callable[..., tuple[int, list[dict[str, Any]] | None, str]] | None = None,
+    insert_raw_signal: Callable[..., tuple[int, list[dict[str, Any]] | None, str]] | None = None,
     sleeper: Sleeper | None = None,
     today: date | None = None,
     rebuild_body_start: bool = False,
@@ -414,42 +534,75 @@ def run(
     clock_fn = clock or time.monotonic
     t0 = clock_fn()
     today = today or datetime.now(timezone.utc).date()
+    named = ids is not None
+    pending = set(ids or [])
 
     report = WlBodyRecoveryReport(mode="dry_run" if dry_run else "apply", limit=limit,
                                   delay_seconds=delay_seconds,
-                                  rebuild_body_start=rebuild_body_start)
+                                  rebuild_body_start=rebuild_body_start, unresolved_ids=sorted(pending))
     base = _normalize_base_url(base_url)
     if base is None:
         report.errors.append("SUPABASE_URL must start with https://")
         return report, 2
 
     try:
-        rows = (fetch_raw(base, service_key, with_body=True) if rebuild_body_start
-                else fetch_raw(base, service_key))
+        if named:
+            rows = fetch_raw(base, service_key, ids=sorted(pending)) if pending else []
+        else:
+            rows = (fetch_raw(base, service_key, with_body=True) if rebuild_body_start
+                    else fetch_raw(base, service_key))
     except (RuntimeError, ValueError) as exc:
         report.errors.append(str(exc))
         log("ERROR", f"WL 본문 회수 조회 실패: {exc}")
         return report, 2
     report.scanned = len(rows)
 
-    wanted = set(doc_ids or [])
-
-    def _named(r: dict[str, Any]) -> bool:
-        return (str(r.get("raw_signal_id") or "") in wanted
-                or str(r.get("document_id") or "") in wanted)
+    wanted = pending.copy() if named else set(doc_ids or [])
+    missing = wanted.copy()
+    new_records: set[str] = set()
 
     targets: list[dict[str, Any]] = []
     for r in rows:
+        matched = wanted & _row_ids(r)
+        if named and not matched:
+            continue
         raw = _json_object(r.get("raw_json"))
-        if rebuild_body_start:
-            if is_body_start_candidate(raw, explicit=bool(wanted) and _named(r)):
+        if named:
+            missing.difference_update(matched)
+            if _named_complete(raw):
+                report.skipped_complete += 1
+                pending.difference_update(matched)
+            else:
+                targets.append(r)
+        elif rebuild_body_start:
+            if is_body_start_candidate(raw, explicit=bool(matched)):
                 targets.append(r)
         elif is_recovery_candidate(raw, include_permanent_403=bool(doc_ids)):
             targets.append(r)
         elif not raw.get("wl_body_full"):
             report.skipped_definitive += 1
-    if wanted:
-        targets = [r for r in targets if _named(r)]
+    if not named and wanted:
+        targets = [r for r in targets if wanted & _row_ids(r)]
+    if named and missing:
+        finder = find_missing or _find_missing_wl_rows
+        try:
+            for r in finder(
+                missing, sleeper=sleep_fn, delay_seconds=delay_seconds,
+                deadline_reached=lambda: bool(time_budget_seconds and clock_fn() - t0 >= time_budget_seconds),
+            ):
+                matched = missing & _row_ids(r)
+                if matched:
+                    missing.difference_update(matched)
+                    new_records.add(r["raw_signal_id"])
+                    targets.append(r)
+        except FdaBotBlockError:
+            report.bot_blocked = True
+            report.errors.append(f"FDA WL listing: {BOT_BLOCK_STATUS}")
+            _bump(report, BOT_BLOCK_STATUS)
+        except (RuntimeError, ValueError) as exc:
+            report.errors.append(f"FDA WL listing failed: {type(exc).__name__}")
+        if missing and not report.bot_blocked:
+            report.errors.append("FDA WL: requested IDs absent from storage and unresolved in FDA listing")
     targets.sort(key=lambda r: str(r.get("raw_signal_id") or ""))
     report.candidates_total = len(targets)
     if limit is not None and limit > 0:     # 0 이하 = 전건(형제 백필과 같은 규약)
@@ -459,7 +612,10 @@ def run(
     report.time_budget_seconds = float(time_budget_seconds or 0)
 
     for idx, r in enumerate(targets):
+        if report.bot_blocked:
+            break
         label = str(r.get("document_id") or r.get("raw_signal_id") or "")
+        is_new = r["raw_signal_id"] in new_records if named else False
         elapsed = clock_fn() - t0
         if time_budget_seconds and elapsed >= time_budget_seconds:
             # 예산 소진 — 이 행부터 끝까지는 다음 회차. 리포트는 정상으로 남는다.
@@ -469,6 +625,7 @@ def run(
             break
         if progress_cb is not None and idx:
             report.elapsed_seconds = round(elapsed, 1)
+            report.unresolved_ids = sorted(pending)
             progress_cb(report)
         raw = _json_object(r.get("raw_json"))
         unknown = sorted(set(raw) - KNOWN_RAW_KEYS)
@@ -487,6 +644,8 @@ def run(
         sleep_fn(delay_seconds)
         try:
             excerpt, full, status = letter_fn(url)
+        except FdaBotBlockError:
+            excerpt, full, status = "", "", BOT_BLOCK_STATUS
         except Exception as exc:  # noqa: BLE001 — 건별 실패는 계속
             report.failed += 1
             _bump(report, f"fetch_raised:{type(exc).__name__}")
@@ -503,23 +662,24 @@ def run(
             report.errors.append(f"{label}: {BOT_BLOCK_STATUS} — 이후 요청 중단")
             log("ERROR", f"{BOT_BLOCK_STATUS} ({label}) — 남은 행 요청을 중단합니다")
             break
-        if not full and rebuild_body_start:
+        old_full = str(raw.get("wl_body_full") or "")
+        if not full and (rebuild_body_start or is_new or (named and old_full)):
             # 있는 본문을 표식으로 덮지 않는다 — 이번에 못 받았으면 그대로 둔다.
             report.still_empty += 1
             _bump(report, status.split(":", 1)[0] or "empty")
             continue
-        old_full = str(raw.get("wl_body_full") or "")
         if rebuild_body_start and full == old_full:
             report.body_start_unchanged += 1
             continue
-        if rebuild_body_start and body_shrunk(old_full, full):
+        if (rebuild_body_start or named) and full and body_shrunk(old_full, full):
             report.body_shrunk += 1               # 줄어드는 행은 쓰지 않는다
             _bump(report, "body_shrunk")
             report.body_changes.append({"raw_signal_id": str(r.get("raw_signal_id") or ""),
                                         "old_chars": len(old_full), "new_chars": len(full),
                                         "skipped": "shrunk"})
             continue
-        if rebuild_body_start and starts_after_cut_head(old_full) and not old_body_inside_new(old_full, full):
+        if ((rebuild_body_start or named) and starts_after_cut_head(old_full)
+                and not old_body_inside_new(old_full, full)):
             report.body_diverged += 1             # 다시 받은 글이 옛 본문을 품지 않는다 — 다른 글
             _bump(report, "body_diverged")
             report.body_changes.append({"raw_signal_id": str(r.get("raw_signal_id") or ""),
@@ -552,6 +712,8 @@ def run(
                           service_key=service_key, dry_run=dry_run, upsert_fn=upsert_fn,
                           written=written):
                 continue
+            if named and _named_complete(item.raw_payload):
+                pending.difference_update(_row_ids(r))
             if is_permanent_403(new_status):
                 report.permanent_403 += 1
                 report.permanent_403_docs.append(label)
@@ -570,11 +732,22 @@ def run(
             _bump(report, f"rebuild_raised:{type(exc).__name__}")
             report.errors.append(f"{label}: rebuild_raised:{type(exc).__name__}")
             continue
+        payload = getattr(item, "raw_payload", {}) or {}
+        violations = payload.get("wl_violations") or []
+        complete = named and _named_complete(payload)
+        if named and len(violations) < len(raw.get("wl_violations") or []):
+            _bump(report, "violations_shrunk")
+            continue
+        if named and not complete and full == old_full:
+            _bump(report, "violations_still_missing")
+            continue
+        write_fn = (insert_raw_signal or _insert_missing_wl) if is_new else upsert_fn
         if not _write(report, label=label, row=r, item=item, base=base,
-                      service_key=service_key, dry_run=dry_run, upsert_fn=upsert_fn,
+                      service_key=service_key, dry_run=dry_run, upsert_fn=write_fn,
                           written=written):
             continue
-        violations = (getattr(item, "raw_payload", {}) or {}).get("wl_violations") or []
+        if complete:
+            pending.difference_update(_row_ids(r))
         report.recovered += 1
         if rebuild_body_start:
             _payload = getattr(item, "raw_payload", {}) or {}
@@ -606,6 +779,7 @@ def run(
             plan_sink(fu_plan)
         followup_failed = followup_failed or bool(fu_summary.get("write_errors")) or bool(fu_summary.get("lookup_failed"))
     report.elapsed_seconds = round(clock_fn() - t0, 1)
+    report.unresolved_ids = sorted(pending)
     report.deferred_next = len(report.deferred_docs)
     if report.attempted:
         report.avg_seconds_per_attempt = round(report.elapsed_seconds / report.attempted, 1)
@@ -616,7 +790,10 @@ def run(
                 f"· 대상 {report.candidates}건 · 이번에도 못 받음 {report.still_empty}건 "
                 f"· 확정 사유로 표식 교체 {report.status_resolved}건 · 영구 403 확정 "
                 f"{report.permanent_403}건 · 실패 {report.failed}건")
-    return report, (1 if (_is_broad_failure(report) or followup_failed) else 0)
+    if named and report.unresolved_ids:
+        print(f"::warning title=FDA WL named recovery::{len(report.unresolved_ids)} requested IDs unresolved",
+              file=sys.stderr)
+    return report, (1 if (_is_broad_failure(report) or followup_failed or report.unresolved_ids) else 0)
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -629,9 +806,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="이번 실행의 문서 수 상한. 0 또는 미지정이면 전건.")
     p.add_argument("--delay-seconds", type=float, default=_DEFAULT_DELAY_SECONDS,
                    help=f"편지 요청 간 대기(초) — fda.gov 예의(기본 {_DEFAULT_DELAY_SECONDS:g}).")
-    p.add_argument("--doc-ids", default="",
+    selection = p.add_mutually_exclusive_group()
+    selection.add_argument("--doc-ids", default="",
                    help="선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분). "
                         "지정하면 영구 403 표식 행도 다시 시도한다.")
+    selection.add_argument("--ids", nargs="+", metavar="ID",
+                           help="대조에서 발견한 WL raw_signal_id 또는 document_id 목록(공백/쉼표 구분).")
+    selection.add_argument("--ids-json", type=Path, metavar="PATH",
+                           help="번호 배열, missed/incomplete 배열, 또는 source-reconcile JSON 파일.")
     p.add_argument("--rebuild-body-start", action="store_true", default=False,
                    help="본문이 있지만 문장 중간(소문자)에서 시작하는 행(+ --doc-ids 지정 행)을 다시 "
                         "받아 재구성한다(수동 전용 — 모듈 docstring).")
@@ -647,9 +829,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
-    args = build_arg_parser().parse_args(argv)
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+    parser = build_arg_parser()
+    args = parser.parse_args(argv)
+    ids = None
+    if args.ids is not None or args.ids_json is not None:
+        if args.rebuild_body_start:
+            parser.error("--ids/--ids-json cannot be combined with --rebuild-body-start")
+        try:
+            ids = (_read_reconcile_ids(args.ids_json) if args.ids_json is not None
+                   else _parse_doc_ids(" ".join(args.ids)))
+        except (OSError, ValueError) as exc:
+            parser.error(f"--ids-json: {exc}")
+        if args.ids is not None and not ids:
+            parser.error("--ids requires at least one ID")
     creds = _resolve_credentials(args)
     if creds is None:
         print("backfill_wl_body_recovery: --supabase-url/--service-role-key 또는 "
@@ -668,6 +865,7 @@ def main(argv: list[str] | None = None) -> int:
         base_url=base_url, service_key=service_key, dry_run=not args.apply,
         limit=args.limit, delay_seconds=args.delay_seconds,
         doc_ids=_parse_doc_ids(args.doc_ids),
+        ids=ids,
         rebuild_body_start=args.rebuild_body_start,
         time_budget_seconds=args.time_budget_seconds or None,
         progress_cb=_flush if args.report_path else None,

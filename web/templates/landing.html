@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [구독 권유 정리 2026-11-26] 첫 화면 밴드가 이 화면의 구독 칸이다 — 하단 밴드를 끈다(base.html). -#}
+{% set sub_inline_on = True %}
 {% block content %}
 {#- [홈 4단 2026-11-12 · 내용 먼저 2026-11-14] 대표 확정안(GRM_웹사이트UIUX_개선안_2026-11-11_Fable.md
     0절 2번) 순서는 그대로다: 사이트 소개 한 문장 → 검색 → 제공 정보 세 칸 → 이번 주 핵심 /
@@ -103,8 +105,8 @@
       </ul>
 {% endif %}
       <p class="home-links"><a href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">{{ _("주간 브리프 {n}호", n=cover.issue_no) }}</a>{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html">{{ _("지난 호") }}</a>{% endif %}</p>
-      {#- [구독 유입 2026-11-17] 이번 주 핵심 아래 — 이번 주 소식 메일 받기(자리 키 mid). 반쪽 열이라 한 열로 쌓는다. -#}
-      {%- with sub_kind='home_brief', sub_slot='mid', sub_stack=True %}{% include "partials/sub_inline.html" %}{% endwith +%}
+      {#- [구독 권유 정리 2026-11-26] '이번 주 핵심' 아래 구독 칸은 뺐다 — 홈은 첫 화면 밴드 하나 + 팝업 하나. 아래 set 은 줄바꿈 처리를 종전과 같게 두는 자리표시다. -#}
+      {%- set _sub_mid = none +%}
     </div>
 {% endif %}
 {% if showcase and showcase.new_docs %}

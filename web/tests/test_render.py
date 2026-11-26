@@ -8368,10 +8368,16 @@ class WebRenderHardeningTest(unittest.TestCase):
             out = self._render_site([_minimal_brief("2026-06-02")])
             h_on = (out / "briefs/2026-06-02/index.html").read_text(encoding="utf-8")
             landing_on = (out / "index.html").read_text(encoding="utf-8")
+            archive_on = (out / "archive/index.html").read_text(encoding="utf-8")
         finally:
             render.NEWSLETTER_FORM_ACTION = a0
-        self.assertIn('class="subscribe"', h_on)
-        self.assertIn('class="subscribe"', landing_on)          # 전 페이지(랜딩에도)
+        # [구독 권유 정리 2026-11-26] 한 화면에 구독 칸 하나 — 첫 화면 칸이 있는 브리프·홈은 하단 밴드가 없고
+        # 그 칸이 #subscribe 도착점이다. 첫 화면 칸이 없는 화면(아카이브)은 하단 밴드.
+        self.assertNotIn('class="subscribe"', h_on)
+        self.assertIn('<aside class="grm-inl" id="subscribe"', h_on)
+        self.assertNotIn('class="subscribe"', landing_on)
+        self.assertIn('id="subscribe" data-sub-slot="top" data-sub-zone="home-band"', landing_on)
+        self.assertIn('class="subscribe"', archive_on)
         self.assertIn('action="https://newsletter.example.com/subscribe" method="post"', h_on)
         # Brevo 실제 폼 필드 정합: 이메일=EMAIL(대문자) + 봇방지 허니팟 + locale 히든.
         self.assertIn('type="email" name="EMAIL"', h_on)
@@ -8386,7 +8392,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         # 한글 안전(§4) — 폼 밴드에 인라인 자간/대문자·한글 mono 0. WebKoreanSafetyTest 는
         # 폼-off 빌드만 스캔하므로 on 경로(밴드 한정 범위)를 여기서 보강한다.
         import re as _re
-        band = h_on[h_on.index('class="subscribe"'):h_on.index("<footer")]
+        band = archive_on[archive_on.index('class="subscribe"'):archive_on.index("<footer")]
         self.assertNotIn("letter-spacing", band)
         self.assertNotIn("text-transform", band)
         self.assertIsNone(_re.search(r'class="[^"]*\bmono\b[^"]*"', band),
@@ -8399,6 +8405,7 @@ class WebRenderHardeningTest(unittest.TestCase):
             render.NEWSLETTER_FORM_ACTION = a0
         self.assertNotIn("javascript:alert", h_bad)
         self.assertNotIn('class="subscribe"', h_bad)
+        self.assertNotIn('class="grm-inl', h_bad)
 
     def test_english_pages_subscribe_only_to_the_english_list(self):
         """[영문 구독 2026-10-18] 영어 페이지의 구독 문은 **영문 리스트 폼**만 쓴다.
@@ -8430,8 +8437,10 @@ class WebRenderHardeningTest(unittest.TestCase):
         # [구독 유입 2026-11-17] 영문 지적사항은 첫 화면 줄형 칸(.grm-inl)이 한 자리 더, 홈은 첫 화면·'이번 주 핵심'
         # 아래 두 자리 더 — 모두 같은 영문 폼.
         for name, html in (("home", en_home), ("glossary", en_glossary), ("findings", en_findings)):
-            n_forms = 2 + html.count('<aside class="grm-inl')  # 밴드·배너 + 줄형 칸 수(홈 가운데 칸은 이번 주 호가 있을 때만)
-            self.assertIn('class="subscribe"', html, f"en {name}: 밴드가 없다")
+            # [구독 권유 정리 2026-11-26] 구독 칸(하단 밴드 또는 첫 화면 칸) 하나 + 배너 하나.
+            n_blocks = html.count('<section class="subscribe"') + html.count('<aside class="grm-inl')
+            self.assertEqual(n_blocks, 1, f"en {name}: 구독 칸 {n_blocks}개")
+            n_forms = 1 + n_blocks
             self.assertIn('id="grm-cta"', html, f"en {name}: 배너가 없다")
             self.assertEqual(html.count(f' action="{en_action}"'), n_forms, f"en {name}: 영문 폼 자리 수")
             self.assertNotIn(f' action="{ko_action}"', html, f"en {name}: 한국어 리스트 폼이 기본값이 됐다")
@@ -8442,7 +8451,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         # 영어 용어사전 구역은 한국어 리스트 전용 PDF 제안이 아니라 기본 문안으로 접힌다.
         self.assertNotIn("Glossary PDF", en_glossary)
         self.assertIn("<h2>Inspection findings from the FDA, Europe and Korea, every week</h2>", en_glossary)
-        self.assertIn("<h2>Get the week's FDA, EU and MFDS inspection findings</h2>", en_findings)
+        self.assertIn('<aside class="grm-inl" id="subscribe"', en_findings)
         # 홈 첫 화면 줄형 칸은 두 언어 모두, 지적사항 목록 첫 화면 칸은 영문만(render.py sub_inline_lists).
         # [홈 구독 밴드 2026-11-24] 홈 첫 화면 칸은 색 면 밴드(grm-inl--band)가 됐다 — 같은 칸·같은 폼.
         self.assertIn('class="grm-inl grm-inl--band"', en_home)
@@ -8452,8 +8461,8 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn('class="grm-inl"', ko_findings)
         # 줄형 칸도 각 언어 리스트 폼만 — 한국어 홈의 칸이 영문 리스트로 가면 안 된다.
         self.assertNotIn(f'class="grm-inl-form" action="{en_action}"', ko_home)
-        # 실물 링크 — 영문 메일의 주인공(지적 기록) 면으로.
-        self.assertIn("See recent findings first", en_home)
+        # 실물 링크 — 영문 메일의 주인공(지적 기록) 면으로(하단 밴드가 있는 화면).
+        self.assertIn("See recent findings first", en_glossary)
         self.assertNotIn("최근 지적 기록 먼저 보기", ko_home)
 
     def test_home_subscribe_band_on_ko_and_en_home(self):
@@ -8483,7 +8492,10 @@ class WebRenderHardeningTest(unittest.TestCase):
             self.assertIn(f'class="grm-inl-form" action="{action}"', band, f"{lang}: 자기 언어 리스트 폼이 아니다")
             self.assertIn('name="SIGNUP_PATH"', band, f"{lang}: 084 경로 칸이 없다")
             self.assertIn('class="sub-hp"', band)
-            self.assertEqual(band.count("<li>"), 3, f"{lang}: 사실 세 칸")
+            self.assertEqual(band.count("<li>"), 5, f"{lang}: GRM 자랑 사실 다섯 칸")
+            self.assertIn('id="subscribe"', html[start:start + 200], f"{lang}: #subscribe 도착점")
+            self.assertNotIn('<section class="subscribe"', html, f"{lang}: 홈에 하단 밴드가 또 있다")
+            self.assertEqual(html.count('<aside class="grm-inl'), 1, f"{lang}: 홈 구독 칸은 밴드 하나")
             # 첫 화면: 소개·검색이 있는 첫 구획 안, '제공 정보' 구획보다 앞.
             top_sec = html[html.index('<section class="wrap home-top">'):]
             self.assertLess(top_sec.index('grm-inl--band'), top_sec.index("</section>"), f"{lang}: 밴드가 첫 구획 밖이다")
@@ -8492,7 +8504,7 @@ class WebRenderHardeningTest(unittest.TestCase):
             self.assertNotIn("text-transform", band)
             if lang == "en":
                 self.assertIsNone(_re.search(r"[가-힣]", band), "영문 홈 밴드에 한글이 있다")
-                self.assertIn("FDA, EU and MFDS inspection findings, every week by email", band)
+                self.assertIn("Inspection findings from 6 regulators, every week by email", band)
         css = (out / "index.html").read_text(encoding="utf-8")
         rule = _re.search(r"\.grm-inl--band\{([^}]*)\}", css).group(1)
         self.assertIn("background:#FBEEE7", rule, "밴드는 밝은 색 면이다(검은 띠 금지)")
@@ -8520,7 +8532,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         en_action = "https://en.example.com/subscribe"
         try:
             render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = ko_action, ""
-            only_ko = (self._render_site([_minimal_brief("2026-06-09")]) / "index.html").read_text(encoding="utf-8")
+            only_ko = (self._render_site([_minimal_brief("2026-06-09")]) / "glossary/index.html").read_text(encoding="utf-8")
             render.NEWSLETTER_FORM_ACTION_EN = en_action
             out = self._render_site([_minimal_brief("2026-06-10")])
         finally:
@@ -8528,9 +8540,10 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn('class="subscribe"', only_ko)
         self.assertNotIn("data-sub-lang", only_ko)
 
-        for path, default, legend in (("index.html", "ko", "받을 메일 언어"),
-                                      ("en/index.html", "en", "Email language"),
-                                      ("en/findings/index.html", "en", "Email language")):
+        # [구독 권유 정리 2026-11-26] 밴드·배너 두 자리가 다 있는 화면(첫 화면 구독 칸이 없는 화면)에서 본다.
+        for path, default, legend in (("glossary/index.html", "ko", "받을 메일 언어"),
+                                      ("en/glossary/index.html", "en", "Email language"),
+                                      ("en/findings/docs/index.html", "en", "Email language")):
             html = (out / path).read_text(encoding="utf-8")
             self.assertEqual(html.count('<fieldset class="sub-lang" data-sub-lang hidden>'), 2,
                              f"{path}: 밴드·배너 두 자리에 선택지")
@@ -8563,6 +8576,7 @@ class WebRenderHardeningTest(unittest.TestCase):
             render.NEWSLETTER_FORM_ACTION = a0
 
         home = (out / "index.html").read_text(encoding="utf-8")               # nav_active=home
+        archive = (out / "archive/index.html").read_text(encoding="utf-8")    # 기본 구역(하단 밴드가 있는 화면)
         glossary = (out / "glossary/index.html").read_text(encoding="utf-8")  # nav_active=glossary
         findings = (out / "findings/index.html").read_text(encoding="utf-8")  # nav_active=findings
         trends = (out / "findings/trends/index.html").read_text(encoding="utf-8")  # nav_active=trends
@@ -8570,7 +8584,7 @@ class WebRenderHardeningTest(unittest.TestCase):
 
         consent = "사이트에 새로운 기능이 생기면 함께 안내드립니다"
         h2_glossary = "구독하면 GMP 규제 용어집 PDF를 드립니다"   # [마케팅 2026-09-28] 용어집 PDF 제안
-        h2_findings = "FDA·EU·식약처 실사 지적, 매주 받아 보세요"
+        h2_findings = "6개 규제기관의 실사 지적, 매주 받아 보세요"   # [2026-11-26] 기관 목록은 sub_agencies 한 곳에서
         h2_default = "글로벌 GMP 규제 소식, 한국어로 매주 받아 보세요"
         all_h2 = (h2_glossary, h2_findings, h2_default)
 
@@ -8578,7 +8592,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         for zone_name, html, expect_h2 in (
                 ("glossary", glossary, h2_glossary),
                 ("findings", findings, h2_findings),
-                ("home", home, h2_default)):
+                ("archive", archive, h2_default)):
             self.assertIn('class="subscribe"', html, f"{zone_name} 페이지에 밴드가 없다")
             self.assertIn(f"<h2>{expect_h2}</h2>", html, f"{zone_name} 밴드 h2 가 어긋난다")
             for other_h2 in all_h2:
@@ -8625,8 +8639,10 @@ class WebRenderHardeningTest(unittest.TestCase):
         welcome = (out / "welcome/index.html").read_text(encoding="utf-8")
         done_pdf = "메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다."
         for name, html in (("색인", index), ("용어", term)):
-            band = html[html.index('class="subscribe"'):html.index("<footer")]
-            self.assertIn(done_pdf, band, f"{name}: 밴드 성공 문구가 PDF 를 말하지 않는다")
+            # [구독 권유 정리 2026-11-26] 용어 화면은 정의 아래 칸이 그 화면의 구독 칸(하단 밴드 없음).
+            band = (html[html.index('class="subscribe"'):html.index("<footer")] if 'class="subscribe"' in html
+                    else html[html.index('<aside class="grm-inl"'):html.index("</aside>", html.index('<aside class="grm-inl"'))])
+            self.assertIn(done_pdf, band, f"{name}: 구독 칸 성공 문구가 PDF 를 말하지 않는다")
             cta = html[html.index('id="grm-cta"'):]
             self.assertIn(done_pdf, cta, f"{name}: 배너 성공 문구가 PDF 를 말하지 않는다")
         self.assertNotIn(done_pdf, home, "용어사전 밖 구역에 PDF 성공 문구가 샜다")
@@ -8646,12 +8662,18 @@ class WebRenderHardeningTest(unittest.TestCase):
         a0 = render.NEWSLETTER_FORM_ACTION
         try:
             render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
-            html = self._render_detail(_minimal_brief("2026-06-06"))
+            out = self._render_site([_minimal_brief("2026-06-06")])
+            html = (out / "archive/index.html").read_text(encoding="utf-8")
+            brief = (out / "briefs/2026-06-06/index.html").read_text(encoding="utf-8")
         finally:
             render.NEWSLETTER_FORM_ACTION = a0
         i = html.index("a[href=\"#subscribe\"]")
         js = html[i:html.index("</script>", i)]
-        self.assertIn("grm-sub-email", js)
+        self.assertIn("input[type=email]", js)
+        # [구독 권유 정리 2026-11-26] 하단 밴드가 없는 화면에서도 이동 스크립트가 돌고, 도착점은 첫 화면 칸이다.
+        self.assertIn("a[href=\"#subscribe\"]", brief)
+        self.assertIn("document.getElementById('subscribe')", brief)
+        self.assertIn('<aside class="grm-inl" id="subscribe"', brief)
         self.assertIn(".focus(", js)
         self.assertIn("sub-flash", js)
         self.assertIn("style.display='none'", js)
@@ -8668,7 +8690,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         a0 = render.NEWSLETTER_FORM_ACTION
         try:
             render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
-            html = self._render_detail(_minimal_brief("2026-06-06"))
+            html = (self._render_site([_minimal_brief("2026-06-06")]) / "archive/index.html").read_text(encoding="utf-8")
         finally:
             render.NEWSLETTER_FORM_ACTION = a0
 
@@ -20751,12 +20773,14 @@ class SubscribePeekLinkTest(unittest.TestCase):
         try:
             render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
             out = self._render([_minimal_brief(older), _minimal_brief(latest)])
-            landing = (out / "index.html").read_text(encoding="utf-8")
-            detail = (out / "briefs" / older / "index.html").read_text(encoding="utf-8")
+            # [구독 권유 정리 2026-11-26] 홈·브리프는 첫 화면 칸이 그 화면의 구독 칸이라 하단 밴드가 없다 —
+            # 밴드가 있는 화면(아카이브·용어사전 색인)에서 본다.
+            landing = (out / "archive" / "index.html").read_text(encoding="utf-8")
+            detail = (out / "glossary" / "index.html").read_text(encoding="utf-8")
             en_landing = (out / "en" / "index.html").read_text(encoding="utf-8")
         finally:
             render.NEWSLETTER_FORM_ACTION = a0
-        for name, html, root in (("랜딩", landing, ""), ("브리프 상세", detail, "../../")):
+        for name, html, root in (("아카이브", landing, "../"), ("용어사전", detail, "../")):
             band = html[html.index('class="subscribe"'):html.index("<footer")]
             self.assertIn('class="sub-peek"', band, f"{name}: 링크 줄 없음")
             self.assertIn("이번 주 소식 먼저 보기", band, f"{name}: 문구 없음")

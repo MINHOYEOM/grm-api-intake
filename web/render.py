@@ -133,6 +133,8 @@ import collect_fda_import_alert as _ia  # noqa: E402
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
 # (재수집 없음), 렌더 단에도 같은 분류기로 최후 방어선을 둔다(단일 진실원 재사용).
 from grm_findings import evidence_url_quality_error as _evidence_url_quality_error  # noqa: E402
+from grm_findings import fda483_signer_variant_tail_start as _gf_signer_variant_tail_start  # noqa: E402
+from grm_findings import fda483_bare_signature_is_prose as _gf_bare_signature_is_prose  # noqa: E402
 # [WHOPIR 결론 한 줄 2026-11-03] 결론은 접힌 상세(`deterministic_detail.outcome`)에만 있었다.
 # 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
 from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
@@ -6779,8 +6781,18 @@ def _make_env(lang: str = DEFAULT_LANG,
     env.filters["gmp_operations"] = split_gmp_operations
     # [다국어 2단계] 템플릿 전역 `_("…")` — 문구 사전. 한국어는 항등(Markup 으로 그대로),
     # 영어는 카탈로그 결손 시 즉시 실패. 슬롯 `{name}` 값은 escape 된다.
-    env.globals["_"] = (translator or Translator(lang)).template_gettext()
+    tr = translator or Translator(lang)
+    env.globals["_"] = tr.template_gettext()
+    # [구독 권유 정리 2026-11-26] 구독 칸·하단 밴드·팝업이 말하는 기관 목록은 여기 한 곳에서만
+    # 정한다. 곳마다 따로 적다가 "FDA·EU·영국·WHO·캐나다·식약처"·"FDA·EMA·PIC/S·식약처"·
+    # "FDA·EU·식약처"가 한 화면에 섞였다. 템플릿은 {{ sub_agencies }}·{{ sub_agency_n }} 만 쓴다
+    # (tests/test_subscribe_prompts.py 가 템플릿에 기관 목록을 손으로 적으면 실패한다).
+    env.globals["sub_agencies"] = Markup(_escape(tr("FDA·EU·영국·WHO·캐나다·식약처")))
+    env.globals["sub_agency_n"] = len(SUBSCRIBE_AGENCIES)
     return env
+
+
+SUBSCRIBE_AGENCIES = ("FDA", "EU", "영국", "WHO", "캐나다", "식약처")
 
 
 def _write(path: Path, text: str) -> None:
@@ -9193,6 +9205,22 @@ _FOOTER_GARBAGE_RE = re.compile(
 )
 
 
+_BARE_SIGNATURE_RE = re.compile(r"(?-i:SIGNATURE|SIGJ)")
+
+
+def _footer_garbage_hit(detail: str) -> bool:
+    """[11-26] `_FOOTER_GARBAGE_RE` 검출 — 단, 산문 표제의 맨 SIGNATURE("ELECTRONIC SIGNATURES")는 잔재로 보지
+    않는다. 판정은 수집기 절단점과 같은 함수(`grm_findings.fda483_bare_signature_is_prose`)."""
+    for m in _FOOTER_GARBAGE_RE.finditer(detail):
+        if not _BARE_SIGNATURE_RE.fullmatch(m.group(0)):
+            return True
+        lo, hi = max(0, m.start() - 200), min(len(detail), m.end() + 200)
+        near = any(not _BARE_SIGNATURE_RE.fullmatch(x.group(0)) for x in _FOOTER_GARBAGE_RE.finditer(detail, lo, hi))
+        if not _gf_bare_signature_is_prose(detail, m.end(), other_marker_near=near):
+            return True
+    return False
+
+
 def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
     """FDA 483 Observation 카드 발행 게이트 — 브리프 리스트(각 {"brief":…, "cards":[...]}
     형태, load_briefs() 산출 그대로) 또는 카드 리스트를 받아 위반 목록(사람이 읽을 문자열)을
@@ -9220,7 +9248,9 @@ def validate_483_observations(cards_or_briefs: list[dict[str, Any]]) -> list[str
             if isinstance(detail, str) and detail.strip():
                 if not (isinstance(obs.get("detail_ko"), str) and obs.get("detail_ko").strip()):
                     violations.append(f"{loc}: MISSING_DETAIL_KO")
-                if _FOOTER_GARBAGE_RE.search(detail):
+                # [11-26] 판독 변형 서명란은 꼬리일 때만 — 수집기 trim_detail_tail 과 같은 함수.
+                if (_footer_garbage_hit(detail)
+                        or _gf_signer_variant_tail_start(detail) is not None):
                     violations.append(f"{loc}: FOOTER_GARBAGE")
 
     for item in cards_or_briefs:

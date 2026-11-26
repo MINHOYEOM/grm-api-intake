@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.337` |
+| 문서 버전 | `v1.338` |
 | 최종 수정일 | 2026-11-26 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -562,7 +562,8 @@ grm-api-intake/
 ├─ collect_fda_inspections.py      # FDA 실사 등급(NAI/VAI/OAI) DDAPI 수집기 → public.fda_inspections 직행(findings/카드 미생성·GMP 외 ProjectArea 클라이언트 배제·회계연도 창 실행일 계산·월 1회 크론 + 수동 dispatch)
 ├─ probe_source_reachability.py    # 후보 소스에 러너가 닿는지 착수 전 1회 판정(기본 UA/브라우저 UA 2회 → OPEN·UA_GATED·BLOCKED) · `--targets silent` = 무음 12종(피드 항목 수·최신 날짜·파서 표식 검사)
 ├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
-├─ backfill_483_inspectors_from_body.py # 저장 전문(fda483_body_full)만으로 실사관 재추출(외부 요청 0) — 공통 함수 _extract_483_inspectors·글자 그대로 검사·raw_signal_apply_version(repair)+빈 findings.inspector_names 만 PATCH·dry 기본·행별 사유·--audit-filled 로 전문에 없는/이름 아닌 저장 이름 감사·덮어쓰기
+├─ backfill_483_inspectors_from_body.py # 저장 전문(fda483_body_full)만으로 실사관 재추출(외부 요청 0) — 공통 함수 _extract_483_inspectors·글자 그대로 검사·raw_signal_apply_version(repair)+빈 findings.inspector_names 만 PATCH·dry 기본·행별 사유·--audit-filled 로 전문에 없는/이름 아닌 저장 이름 감사·덮어쓰기 · 사람 확인 행(`fda483_inspectors_check`·`absent-in-source`)은 채우기·감사 대상 제외
+├─ apply_483_human_verdicts.py         # 483 사람 판독(원본 PDF 이미지) 결과를 원천 칸에 — findings 의 판독 이름을 raw_json.fda483_inspectors 로(문서 안 이름 집합 하나일 때만)·findings 행 없는 문서는 근거 문장 필수 입력·서명 가림 문서는 fda483_inspectors_status=absent-in-source+사유·사람 확인 기록 fda483_inspectors_check·raw_signal_apply_version(repair)·dry 기본·보고서에 이름 미기재
 ├─ mfds_gmp_cert_snapshot.py      # 식약처 GMP 적합판정서 월 1회 전체 목록 → mfds_gmp_cert(142) 적재·업체 연결(브리프 무접촉)
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
@@ -588,6 +589,7 @@ grm-api-intake/
 ├─ probe_mfds_egress.py            # MFDS/nedrug/law.go.kr 러너 도달 프로브 — 첫 줄 `[PROXY] reachable|unreachable|unconfigured`
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스
 ├─ backfill_mhra_alert_body.py      # 지정한 MHRA 경보 본문 재조회와 원문 버전 백필(dry-run 기본)
+├─ daily_reconcile_ledger.py        # 수집기 health 와 DB 집계의 일별 대조 장부
 ├─ conftest.py                      # pytest/unittest 공통 진입에서 네트워크 가드 적용
 ├─ ci_network_guard.py              # CI·로컬 시험의 외부 네트워크 차단 가드
 ├─ ci_slot_wait.py                 # push 전 PR CI 자리 및 수집 시간 창 확인
@@ -840,6 +842,7 @@ grm-api-intake/
    ├─ grm-hc-inspection-backfill.yml     # [FIND-1] Health Canada GMP 실사 리포트카드 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-fda-inspections-backfill.yml   # FDA 실사 등급(NAI/VAI/OAI) DDAPI 적재(월 1일 15:47 UTC 크론 = 항상 --apply · 8/15/22일은 실패 이슈가 열렸을 때만 복구 재시도 · workflow_dispatch 는 dry_run 기본 true)
    ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
+   ├─ grm-fda483-human-verdicts.yml      # 483 사람 판독 결과의 원천 칸 반영(dispatch 전용·apply 기본 false·`at` 판독일 필수·from_findings/absent_json/names_json·concurrency 는 실사관 재추출과 같은 그룹)
    ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·잡별 예약 실패 경보)
    ├─ grm-483-obs-split.yml             # 483 관찰 분할 소급(backfill_483_obs_split.py)을 자격증명 러너에서 실행(workflow_dispatch 전용·apply 기본 false·apply 는 main ref 만·doc_ids 선택) → 아티팩트 fda483-obs-split-report-{dry|apply}(30일)

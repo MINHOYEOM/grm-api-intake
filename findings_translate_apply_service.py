@@ -62,6 +62,7 @@ import hashlib
 import json
 import re
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -205,8 +206,12 @@ def _apply_one_finding(
     item: dict[str, Any],
     *,
     timeout: int = DEFAULT_TIMEOUT_SECONDS,
+    live_rows: list[dict[str, Any]] | None = None,
 ) -> tuple[str, str]:
     """Read-before-write apply of one outbox item, keyed on finding_id only.
+
+    `live_rows`(11-26): 묶음 조회(`_prefetch_live_rows`)로 이미 받은 이 finding_id 의 라이브 행(0~1개).
+    주면 행별 GET 을 보내지 않는다 — 판정(원문 대조·같은 값 건너뛰기·PATCH)은 그대로다.
 
     Returns (outcome, error_detail) where outcome is one of "succeeded",
     "matched_zero", "unchanged" (live row already holds these values -- no
@@ -237,15 +242,18 @@ def _apply_one_finding(
 
     # 1) Fetch the live row by primary key (short URL). finding_id is the
     #    findings PK, so this returns 0 or 1 rows.
-    _status, rows, err = _send_findings_request(
-        "get",
-        base_url,
-        service_key,
-        params={"finding_id": f"eq.{finding_id}", "select": _GET_SELECT},
-        timeout=timeout,
-    )
-    if err:
-        return "errored", f"finding_id={finding_id} GET failed ({err})"
+    if live_rows is not None:
+        rows = live_rows
+    else:
+        _status, rows, err = _send_findings_request(
+            "get",
+            base_url,
+            service_key,
+            params={"finding_id": f"eq.{finding_id}", "select": _GET_SELECT},
+            timeout=timeout,
+        )
+        if err:
+            return "errored", f"finding_id={finding_id} GET failed ({err})"
 
     # Only a row whose live finding_text still byte-matches the outbox item is
     # eligible -- this reproduces the original finding_id+finding_text eq
@@ -291,7 +299,8 @@ def _apply_one_finding(
         "patch",
         base_url,
         service_key,
-        params={"finding_id": f"eq.{finding_id}"},
+        # return=representation 은 행 전체(최대 3만 자 원문 포함)를 돌려준다 — 행 수 확인에는 id 면 된다.
+        params={"finding_id": f"eq.{finding_id}", "select": "finding_id"},
         json_body=body,
         timeout=timeout,
     )
@@ -311,14 +320,62 @@ def _apply_one_finding(
     )
 
 
+# ★묶음 조회·시간 예산(2026-11-26). #1996 머지 뒤 M9b(run 45788934527 1차)가 timeout-minutes 10 에 걸려
+#   cancelled — outbox 15개 파일 1,624항목을 **항목마다 GET 한 번씩** 다시 읽는다(대부분 이미 반영돼
+#   PATCH 는 0인데도). DB CPU 가 흔들리는 날(같은 날 다른 RPC 1~19s)엔 그 왕복만으로 10분을 넘고,
+#   잘린 실행은 보고서도 못 남기고 회색(cancelled)으로 끝나 반영이 덜 됐는지 알 수 없었다.
+#   · 묶음 조회: 파일마다 finding_id 를 N 개씩 `in.(…)` 로 한 번에 받는다(1,624 GET → ~35 GET).
+#   · 시간 예산: 넘기 전에 스스로 멈추고 incomplete·items_remaining 을 적고 **적색(exit 1)** 으로 끝낸다.
+#     반영은 멱등이라(같은 값은 PATCH 안 함) 다음 실행이 남은 것부터 자연히 이어 받는다.
+DEFAULT_LOOKUP_BATCH = 50
+
+
+def _postgrest_in(values: list[str]) -> str:
+    """PostgREST `in.(…)` — 값마다 큰따옴표로 감싼다(쉼표·괄호가 섞여도 깨지지 않게)."""
+    quoted = ['"' + v.replace("\\", "\\\\").replace('"', '\\"') + '"' for v in values]
+    return "in.(" + ",".join(quoted) + ")"
+
+
+def _prefetch_live_rows(
+    base_url: str, service_key: str, finding_ids: list[str], *, batch_size: int,
+    timeout: int = DEFAULT_TIMEOUT_SECONDS,
+) -> tuple[dict[str, list[dict[str, Any]]] | None, int, str]:
+    """finding_id → 라이브 행 목록(없으면 빈 목록). (맵 또는 None, 보낸 GET 수, 오류)."""
+    ids = list(dict.fromkeys(i for i in finding_ids if i))
+    live: dict[str, list[dict[str, Any]]] = {i: [] for i in ids}
+    sent = 0
+    for start in range(0, len(ids), batch_size):
+        chunk = ids[start:start + batch_size]
+        _status, rows, err = _send_findings_request(
+            "get", base_url, service_key,
+            params={"finding_id": _postgrest_in(chunk), "select": "finding_id," + _GET_SELECT},
+            timeout=timeout,
+        )
+        sent += 1
+        if err:
+            return None, sent, f"batch GET failed ({err})"
+        for r in rows or []:
+            fid = str(r.get("finding_id") or "")
+            if fid in live:
+                live[fid].append(r)
+    return live, sent, ""
+
+
 def apply_outbox(
     outbox_dir: str | Path,
     base_url: str,
     service_key: str,
     *,
     dry_run: bool = False,
+    batch_size: int = 0,
+    time_budget_seconds: float = 0,
+    clock: Any = None,
 ) -> dict[str, Any]:
     """Read every *.json batch under outbox_dir and PATCH each item to Supabase.
+
+    batch_size>0: 파일마다 라이브 행을 묶음으로 미리 받는다(행별 GET 없음). 0 이면 종전 행별 GET.
+    time_budget_seconds>0: 예산을 넘기면 남은 항목을 처리하지 않고 incomplete=True 로 끝낸다(errors 에도
+    한 줄 — CLI 는 exit 1).
 
     Pure orchestration: no git operations, no file mutation of outbox_dir
     (files are read-only inputs and are never moved/deleted/rewritten). In
@@ -334,8 +391,13 @@ def apply_outbox(
         "items_matched_zero": 0,
         "items_unchanged": 0,   # 2026-11-20: 라이브가 이미 같은 값 — PATCH 안 보냄(쓰기 0)
         "items_errored": 0,
+        "lookup_requests": 0,
+        "incomplete": False,
+        "items_remaining": 0,
         "errors": [],
     }
+    clock = clock or time.monotonic
+    started = clock()
     if base is None:
         report["errors"].append("SUPABASE_URL must start with https://")
         return report
@@ -349,8 +411,24 @@ def apply_outbox(
             report["items_errored"] += 1
             report["errors"].append(f"{path.name}: failed to parse outbox file ({parse_err})")
             continue
+        if report["incomplete"]:
+            report["items_remaining"] += len(items)
+            continue
 
-        for item in items:
+        live: dict[str, list[dict[str, Any]]] | None = None
+        if batch_size > 0 and not dry_run and items:
+            live, sent, perr = _prefetch_live_rows(
+                base, service_key, [str(i.get("finding_id") or "") for i in items], batch_size=batch_size)
+            report["lookup_requests"] += sent
+            if perr:
+                live = None                 # 묶음 조회 실패 — 이 파일은 종전 행별 GET 으로
+                report["errors"].append(f"{path.name}: {perr} — fell back to per-item GET")
+
+        for idx, item in enumerate(items):
+            if time_budget_seconds > 0 and clock() - started > time_budget_seconds:
+                report["incomplete"] = True
+                report["items_remaining"] += len(items) - idx
+                break
             report["items_total"] += 1
 
             if dry_run:
@@ -367,7 +445,8 @@ def apply_outbox(
             #     scheduled run naturally revisits it.
             #   - errored: a transport/HTTP failure or an anomalous row count.
             #   - succeeded: exactly one row updated.
-            outcome, detail = _apply_one_finding(base, service_key, item)
+            rows = None if live is None else live.get(str(item.get("finding_id") or ""), [])
+            outcome, detail = _apply_one_finding(base, service_key, item, live_rows=rows)
             if outcome == "succeeded":
                 report["items_succeeded"] += 1
             elif outcome == "matched_zero":
@@ -378,6 +457,10 @@ def apply_outbox(
                 report["items_errored"] += 1
                 report["errors"].append(f"{path.name}: {detail}")
 
+    if report["incomplete"]:
+        report["errors"].append(
+            f"time budget {time_budget_seconds:.0f}s reached — {report['items_remaining']} items not applied "
+            "this run (idempotent: the next run resumes them)")
     return report
 
 
@@ -420,6 +503,15 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Read and count outbox items without issuing any PATCH requests",
     )
+    parser.add_argument(
+        "--batch-size", type=int, default=0,
+        help="Look up live rows N finding_ids per GET (0 = legacy one GET per item). "
+             f"CI uses {DEFAULT_LOOKUP_BATCH}.",
+    )
+    parser.add_argument(
+        "--time-budget-seconds", type=float, default=0,
+        help="Stop before this many seconds, report incomplete and exit 1 (0 = no budget).",
+    )
     args = parser.parse_args(argv)
 
     creds = _resolve_credentials(args)
@@ -432,7 +524,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     base_url, service_key = creds
 
-    report = apply_outbox(args.outbox_dir, base_url, service_key, dry_run=args.dry_run)
+    report = apply_outbox(args.outbox_dir, base_url, service_key, dry_run=args.dry_run,
+                          batch_size=args.batch_size, time_budget_seconds=args.time_budget_seconds)
     # Report JSON is always printed/written before we decide the exit code --
     # even a red (exit 1) run leaves the report behind for the workflow's
     # step summary to surface.

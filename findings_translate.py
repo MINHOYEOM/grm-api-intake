@@ -54,6 +54,7 @@ import os
 import re
 import sqlite3
 import sys
+import time
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
@@ -218,6 +219,36 @@ def _supabase_get(
     return 0, None, {}, "retry_exhausted"  # unreachable safety net
 
 
+# ★RPC 시간 계측(2026-11-26). 번역 루틴은 **anon 키**로 RPC 를 부른다 — anon 의 statement_timeout 은
+#   3초다. findings_translation_queue 가 조건 글자 차이로 부분 인덱스를 못 타고 전 행을 훑다가 11-26 에
+#   두 번 3초를 넘었다(170 이 고침). 넘고 나서야 아는 구조였다 → 호출마다 걸린 ms 를 RPC_MS 에 남기고,
+#   3초의 절반을 넘으면 GitHub Actions 경고(::warning)로 **넘기 전에** 띄운다. 5xx 면 PostgREST 오류 코드
+#   (57014 = 시간 초과)를 오류 문자열에 붙인다 — 시간 초과인지 고장인지 바로 갈린다.
+ANON_STATEMENT_TIMEOUT_MS = 3000
+RPC_SLOW_WARN_MS = ANON_STATEMENT_TIMEOUT_MS // 2
+RPC_MS: dict[str, int] = {}
+
+
+def _note_rpc_ms(function_name: str, ms: int) -> None:
+    RPC_MS[function_name] = ms
+    if ms > RPC_SLOW_WARN_MS:
+        print(f"::warning title=RPC 지연 {function_name}::{ms}ms — anon statement_timeout "
+              f"{ANON_STATEMENT_TIMEOUT_MS}ms 의 절반({RPC_SLOW_WARN_MS}ms)을 넘었다. 넘으면 500 이 난다.",
+              file=sys.stderr)
+
+
+def _postgrest_error_code(resp: Any) -> str:
+    """PostgREST 오류 본문의 `code`(예: '57014')만. 형식이 다르면 ''. message 는 싣지 않는다."""
+    try:
+        body = resp.json()
+    except Exception:  # noqa: BLE001
+        return ""
+    code = body.get("code") if isinstance(body, dict) else None
+    if isinstance(code, str) and code.isascii() and code.isalnum() and len(code) <= 8:
+        return code
+    return ""
+
+
 def _supabase_post_rpc(
     base_url: str,
     anon_key: str,
@@ -241,6 +272,7 @@ def _supabase_post_rpc(
     }
 
     for attempt in range(1, _SUPABASE_MAX_ATTEMPTS + 1):
+        started = time.monotonic()
         try:
             resp = requests.post(url, headers=headers, json=body, timeout=timeout)
         except requests.exceptions.Timeout:
@@ -250,10 +282,15 @@ def _supabase_post_rpc(
         except requests.exceptions.RequestException as exc:
             return 0, None, {}, type(exc).__name__
 
+        elapsed_ms = int(round((time.monotonic() - started) * 1000))
         if resp.status_code >= 500:
             if attempt < _SUPABASE_MAX_ATTEMPTS:
                 continue
-            return resp.status_code, None, dict(resp.headers), f"http_{resp.status_code}"
+            code = _postgrest_error_code(resp)
+            suffix = f" code={code}" if code else ""
+            if code == "57014":
+                suffix += f" statement_timeout {ANON_STATEMENT_TIMEOUT_MS // 1000}s 초과"
+            return resp.status_code, None, dict(resp.headers), f"http_{resp.status_code}{suffix}"
         if resp.status_code >= 400:
             return resp.status_code, None, dict(resp.headers), f"http_{resp.status_code}"
 
@@ -261,6 +298,7 @@ def _supabase_post_rpc(
             data = resp.json()
         except ValueError:
             data = None
+        _note_rpc_ms(function_name, elapsed_ms)
         return resp.status_code, data, dict(resp.headers), ""
 
     return 0, None, {}, "retry_exhausted"  # unreachable safety net

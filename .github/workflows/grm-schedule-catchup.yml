@@ -37,6 +37,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read  # 장기 미머지 automation PR 조회
   actions: write   # 대상 워크플로 workflow_dispatch
   issues: write    # 경보 이슈
 
@@ -56,6 +57,7 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
           sparse-checkout: |
             schedule_catchup.py
+            automation_pr_alarm.py
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
@@ -70,3 +72,11 @@ jobs:
           args=()
           if [ "${IN_DRY}" = "true" ]; then args+=(--dry-run); fi
           python schedule_catchup.py "${args[@]}"
+      - name: 3일 이상 열린 automation PR 경보
+        if: always() && !cancelled()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 1000 \
+            --json headRefName,createdAt,state | python automation_pr_alarm.py

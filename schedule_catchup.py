@@ -85,6 +85,7 @@ ACTIVE_STATUSES = ("queued", "in_progress", "waiting", "pending", "requested")
 CRON_AUDIT: dict[str, tuple[str, str]] = {
     # A — 시점별 기록, 발행 마감, 또는 원문 회수 경로.
     "grm-db-backup.yml": ("A", "암호화 주간 덤프. 다음 주 덤프로 빠진 주의 복구 지점을 만들 수 없다."),
+    "grm-fda-citations-snapshot.yml": ("A", "월간 조항 스냅샷 예약 누락은 경보만 남긴다. 생성된 PR은 사람이 머지한다."),
     "grm-delta-bridge.yml": ("A", "월요일 발행에 필요한 해당 슬롯의 Notion 델타를 main 에 이관한다."),
     "grm-fda483-body-full-backfill.yml": ("A", "최근 45일 483 전문을 채워 월요일 handoff 전에 본문을 확보한다."),
     "grm-fda483-ocr-recovery.yml": ("A", "일일 수집이 다시 받지 않는 483·WL 본문을 정해진 회수 창과 상한 안에서 채운다."),
@@ -95,7 +96,6 @@ CRON_AUDIT: dict[str, tuple[str, str]] = {
     "grm-stranded-batch-pr.yml": ("A", "미머지 번역 배치로 생긴 적재 공백과 월요일 링크드인 초안 PR 정체를 해소한다."),
     # B — 다음 실행에서 이전 작업분을 포함하거나 최신 상태로 다시 만든다.
     "grm-deficiency-examples.yml": ("B", "날짜 증분 대신 SOURCES 원본을 다시 읽어 멱등 적재한다."),
-    "grm-fda-citations-snapshot.yml": ("B", "원장에서 공개 조항 JSON 전체를 재산출한다."),
     "grm-fda-citations.yml": ("B", "활성 상태의 다음 월간 실행이 최근 7개 회계연도 전량을 다시 upsert 한다."),
     "grm-fda-inspections-backfill.yml": ("B", "8·15·22일 복구 예약이 미갱신 월을 확인하며 매번 최근 7개 회계연도 전량을 갱신한다."),
     "grm-feedback-retention.yml": ("B", "정리 시점에 완료 후 365일을 넘긴 전체 행을 대상으로 하므로 누락분도 다시 잡힌다."),
@@ -105,10 +105,10 @@ CRON_AUDIT: dict[str, tuple[str, str]] = {
     "grm-findings-facets.yml": ("B", "모음 페이지의 건수·최근 사례를 현재 데이터에서 재측정한다."),
     "grm-findings-review-promote.yml": ("B", "남아 있는 needs_review 행을 다음 회차에도 조회한다."),
     "grm-findings-search-cache-sync.yml": ("B", "사전 파일 변경 push 와 금요일 백스톱이 같은 최신 검색어 목록을 동기화한다."),
-    "grm-glossary-cases.yml": ("B", "다음 번에 용어별 사례 건수를 현재 데이터에서 다시 측정한다."),
+    "grm-glossary-cases.yml": ("B", "다음 실행에서 사례 건수를 다시 측정한다. CI 대기 중 중단된 PR은 장기 미머지 경보에서 센다."),
     "grm-hc-inspection-backfill.yml": ("B", "주간 실행이 겹치는 최근 60일 창을 멱등 재수집한다."),
     "grm-kg-link.yml": ("B", "일일 그래프 연결은 최근 7일을 다시 처리한다."),
-    "grm-library-staging.yml": ("B", "나머지 요일의 복구 예약이 격리 이슈와 자료실 신선도를 보고 다시 만든다."),
+    "grm-library-staging.yml": ("B", "월요일 예약이 지연·누락돼도 다른 요일 예약이 generated_on으로 주간 결손을 복구한다."),
     "grm-news-refresh.yml": ("B", "raw_signals 에서 소식 정본을 매일 다시 만들고 브리프 요약도 갱신한다."),
     "grm-ops-alarm.yml": ("B", "이슈 이벤트와 시간당 재대조가 열린 경보·완료 상태를 운영 업무에 반영한다."),
     "grm-schedule-catchup.yml": ("B", "후속 30분 예약과 workflow_run 이 아직 유효한 보완 슬롯을 재검사한다."),
@@ -152,6 +152,7 @@ TARGETS: tuple[Target, ...] = (
     Target("grm-delta-bridge.yml", ("7,37 22-23 * * 0", "7,37 0-5 * * 1"), 45, 4 * 60),
     Target("grm-publish-watchdog.yml", ("13 0,2,4 * * 1",), 60, 6 * 60),
     Target("grm-db-backup.yml", ("37 20 * * 0",), 60, 6 * 60),
+    Target("grm-fda-citations-snapshot.yml", ("47 16 2 * *",), 90, 24 * 60),
     Target("grm-mfds-gmp-cert-monthly.yml", ("40 18 1 * *",), 90, 12 * 60),
     Target("grm-rum-analytics.yml", ("30 4 * * *", "30 16 * * *"), 90, 6 * 60),
 )
@@ -417,13 +418,16 @@ def _act(gh: Any, planned: list[tuple[Target, Decision]], fda_busy: list[str], n
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--dry-run", action="store_true", help="판정만 출력(dispatch·경보 없음)")
     ap.add_argument("--ref", default=os.environ.get("CATCHUP_REF", "main"))
     ap.add_argument("--summary", default=os.environ.get("GITHUB_STEP_SUMMARY", ""))
     args = ap.parse_args(argv)
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
     repo, token = os.environ.get("GITHUB_REPOSITORY", ""), os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN", "")
     if not repo or not token:
         print("::error::GITHUB_REPOSITORY·GH_TOKEN 필요")

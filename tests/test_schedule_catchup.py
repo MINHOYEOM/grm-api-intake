@@ -323,6 +323,7 @@ class RunAll(unittest.TestCase):
             "grm-mfds-gmp-cert-monthly.yml": ("2026-11-01T18:40Z", {"mode": "dry-run"}, "점검"),
             "grm-rum-analytics.yml": ("2026-11-23T04:30Z", {"probe": "true"}, "점검"),
             "grm-stranded-batch-pr.yml": ("2026-11-23T08:41Z", None, "경보"),
+            "grm-fda-citations-snapshot.yml": ("2026-11-02T16:47Z", None, "경보"),
             "grm-publish-watchdog.yml": ("2026-11-23T00:13Z", None, "경보"),
             "grm-db-backup.yml": ("2026-11-22T20:37Z", {}, "apply"),
         }

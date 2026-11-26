@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T05:39:12Z",
+ "generated_at": "2026-11-26T08:22:53Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,39 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45781342736,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T08:13:26Z",
+    "updatedAt": "2026-11-26T08:22:22Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1989 from MINHOYEOM/claude/naver-blog-html-1126",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45781342736"
+   },
+   {
+    "databaseId": 45765795790,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-26T06:05:27Z",
+    "updatedAt": "2026-11-26T06:12:31Z",
+    "headBranch": "claude/extraction-gap-snapshot-1126",
+    "displayTitle": "fix(감시): extraction_gap_by_source 를 pg_cron 스냅샷으로(169) + 신선도 경보",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45765795790"
+   },
+   {
+    "databaseId": 45765782868,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T06:05:20Z",
+    "updatedAt": "2026-11-26T06:12:51Z",
+    "headBranch": "claude/extraction-gap-snapshot-1126",
+    "displayTitle": "fix(감시): extraction_gap_by_source 를 pg_cron 스냅샷으로 — RPC 는 읽기만 + 신선도 경보",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45765782868"
+   },
+   {
     "databaseId": 45762120292,
     "status": "completed",
     "conclusion": "success",
@@ -249,39 +282,6 @@
     "headBranch": "claude/naver-blog-html-1126",
     "displayTitle": "네이버 블로그 붙여넣기 쪽 + /admin/ 탭 (복사 단추 둘, 매주 자동)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45756603682"
-   },
-   {
-    "databaseId": 45756596607,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T04:39:28Z",
-    "updatedAt": "2026-11-26T04:47:48Z",
-    "headBranch": "claude/naver-blog-html-1126",
-    "displayTitle": "Merge origin/main + 블로그 쪽을 의도된 미링크·noindex 로 등록(도달성·_headers 시험), 영문 …",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45756596607"
-   },
-   {
-    "databaseId": 45756121371,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-26T04:34:54Z",
-    "updatedAt": "2026-11-26T04:42:11Z",
-    "headBranch": "claude/extraction-gap-rpc-timeout-1126",
-    "displayTitle": "fix(감시): extraction_gap_by_source 8s 초과 http_500 수리 + 넘기 전 경보(168)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45756121371"
-   },
-   {
-    "databaseId": 45756116971,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T04:34:52Z",
-    "updatedAt": "2026-11-26T04:41:57Z",
-    "headBranch": "claude/extraction-gap-rpc-timeout-1126",
-    "displayTitle": "fix: 마이그레이션 번호 169 → 168 (main 에 168 없음 — 연속 번호 시험)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45756116971"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45782606385,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T08:22:26Z",
+    "updatedAt": "2026-11-26T08:22:39Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45782606385"
+   },
+   {
     "databaseId": 45762950215,
     "status": "completed",
     "conclusion": "success",
@@ -442,20 +453,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45739251484"
-   },
-   {
-    "databaseId": 45732949959,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T01:02:13Z",
-    "updatedAt": "2026-11-26T01:02:28Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45732949959"
    }
   ],
   "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 45771211867,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T06:52:20Z",
+    "updatedAt": "2026-11-26T07:00:16Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1992 from MINHOYEOM/chore/findings-translate-wl-b…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45771211867"
+   },
    {
     "databaseId": 45758523406,
     "status": "completed",
@@ -499,17 +510,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1884 from MINHOYEOM/claude/findings-translate-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45297689150"
-   },
-   {
-    "databaseId": 45136925085,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-23T08:13:50Z",
-    "updatedAt": "2026-11-23T08:19:19Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1870 from MINHOYEOM/claude/findings-translate-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45136925085"
    }
   ],
   "grm-findings-backfill-fetch.yml": [

@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-26T01:02:39Z",
+ "generated_at": "2026-11-26T01:58:30Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 45738073009,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-26T01:47:07Z",
+    "updatedAt": "2026-11-26T01:47:11Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45738073009"
+   },
    {
     "databaseId": 45713603518,
     "status": "completed",
@@ -100,17 +111,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45069455261"
-   },
-   {
-    "databaseId": 45039409414,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-22T15:38:12Z",
-    "updatedAt": "2026-11-22T15:50:46Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45039409414"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45738346760,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-26T01:49:38Z",
+    "updatedAt": "2026-11-26T01:58:02Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1986 from MINHOYEOM/claude/naver-blog-483-1126",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45738346760"
+   },
+   {
     "databaseId": 45731997061,
     "status": "completed",
     "conclusion": "success",
@@ -271,17 +282,6 @@
     "headBranch": "claude/naver-blog-483-1126",
     "displayTitle": "네이버 블로그 원고: 매주 '이번 주 483 한 건 해설'을 briefs/{pub}/naver-blog.txt 로",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728884385"
-   },
-   {
-    "databaseId": 45728775070,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-26T00:26:42Z",
-    "updatedAt": "2026-11-26T00:35:15Z",
-    "headBranch": "claude/brief-must5-1126",
-    "displayTitle": "브리프 첫 화면: 이번 주 꼭 볼 5건 + 목차 기관별 축약",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45728775070"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45739251484,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-26T01:58:05Z",
+    "updatedAt": "2026-11-26T01:58:18Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45739251484"
+   },
+   {
     "databaseId": 45732949959,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45695204244"
-   },
-   {
-    "databaseId": 45690937320,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-25T20:01:41Z",
-    "updatedAt": "2026-11-25T20:01:53Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45690937320"
    }
   ],
   "grm-findings-translate-apply.yml": [

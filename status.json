@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T08:07:37Z",
+ "generated_at": "2026-11-27T15:35:32Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,50 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45985137485,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-27T10:48:03Z",
+    "updatedAt": "2026-11-27T10:56:06Z",
+    "headBranch": "claude/clause-find-tooltip-rebased",
+    "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁 (#2037 rebase)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45985137485"
+   },
+   {
+    "databaseId": 45985129003,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-27T10:47:59Z",
+    "updatedAt": "2026-11-27T10:56:10Z",
+    "headBranch": "claude/clause-find-tooltip-rebased",
+    "displayTitle": "test: 조항 국문 번역 본문 보존 검사를 태그 제거 후 비교로 (용어 툴팁이 낱말을 a 로 감쌈)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45985129003"
+   },
+   {
+    "databaseId": 45976117644,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-27T09:43:43Z",
+    "updatedAt": "2026-11-27T09:52:01Z",
+    "headBranch": "claude/clause-find-tooltip-rebased",
+    "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁 (#2037 rebase)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45976117644"
+   },
+   {
+    "databaseId": 45976042710,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-27T09:43:11Z",
+    "updatedAt": "2026-11-27T09:51:22Z",
+    "headBranch": "claude/clause-find-tooltip-rebased",
+    "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45976042710"
+   },
+   {
     "databaseId": 45962093480,
     "status": "completed",
     "conclusion": "success",
@@ -238,50 +282,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #2035 from MINHOYEOM/claude/en-subscribe-conversio…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45962093480"
-   },
-   {
-    "databaseId": 45957424460,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-27T07:17:19Z",
-    "updatedAt": "2026-11-27T07:25:45Z",
-    "headBranch": "claude/en-subscribe-conversion-051bdd",
-    "displayTitle": "feat(en): 영문 지적사항 상세·업체·조항 면 구독 칸 + 문구 개선 + 시험",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45957424460"
-   },
-   {
-    "databaseId": 45957419760,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T07:17:17Z",
-    "updatedAt": "2026-11-27T07:25:39Z",
-    "headBranch": "claude/en-subscribe-conversion-051bdd",
-    "displayTitle": "fix(en): en.json 키 정렬 복구 + 영문 골든 재동결(i18n 해시)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45957419760"
-   },
-   {
-    "databaseId": 45956984400,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-27T07:13:31Z",
-    "updatedAt": "2026-11-27T07:22:53Z",
-    "headBranch": "codex/clause-find-tooltip",
-    "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45956984400"
-   },
-   {
-    "databaseId": 45956965478,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T07:13:21Z",
-    "updatedAt": "2026-11-27T07:21:29Z",
-    "headBranch": "codex/clause-find-tooltip",
-    "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45956965478"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -514,6 +514,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 45967948506,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-27T08:44:00Z",
+    "updatedAt": "2026-11-27T11:40:14Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45967948506"
+   },
+   {
     "databaseId": 45899661857,
     "status": "completed",
     "conclusion": "success",
@@ -556,17 +567,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45578940342"
-   },
-   {
-    "databaseId": 45501777334,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-24T22:31:50Z",
-    "updatedAt": "2026-11-25T01:32:30Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45501777334"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -628,6 +628,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 45970647527,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-27T09:04:23Z",
+    "updatedAt": "2026-11-27T09:04:33Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45970647527"
+   },
+   {
     "databaseId": 45901345885,
     "status": "completed",
     "conclusion": "success",
@@ -670,17 +681,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45582523194"
-   },
-   {
-    "databaseId": 45534666438,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-25T02:40:43Z",
-    "updatedAt": "2026-11-25T02:41:06Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45534666438"
    }
   ],
   "grm-cloud-request.yml": [

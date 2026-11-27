@@ -2,26 +2,26 @@
   "schema": "grm-glossary-cases/v1",
   "source": "public.findings_search RPC (p_q=q, p_orig_lang=en, p_text_only=true) totals — /en/findings/?q=q&text=1 결과와 동일 함수",
   "orig_lang": "en",
-  "measured_on": "2026-11-20",
+  "measured_on": "2026-11-27",
   "note": "glossary.json의 term_en(0건이면 괄호·슬래시를 뗀 주 표현)을 검색어로 삼고, 원문이 영어인 공개 지적에서 실제 결과가 있는 용어만 사례를 싣는다.",
   "items": [
     {
       "id": "gmp",
       "q": "Good Manufacturing Practice",
-      "findings": 903,
-      "documents": 786
+      "findings": 961,
+      "documents": 841
     },
     {
       "id": "active-ingredient",
       "q": "Active Ingredient",
-      "findings": 845,
-      "documents": 733
+      "findings": 982,
+      "documents": 758
     },
     {
       "id": "api",
       "q": "Active Pharmaceutical Ingredient",
-      "findings": 181,
-      "documents": 177
+      "findings": 208,
+      "documents": 200
     },
     {
       "id": "api-starting-material",
@@ -32,14 +32,14 @@
     {
       "id": "drug-product",
       "q": "Drug Product",
-      "findings": 6738,
-      "documents": 2457
+      "findings": 7221,
+      "documents": 2573
     },
     {
       "id": "batch",
       "q": "Batch",
-      "findings": 2913,
-      "documents": 1746
+      "findings": 3101,
+      "documents": 1826
     },
     {
       "id": "batch-number",
@@ -50,8 +50,8 @@
     {
       "id": "batch-record",
       "q": "Batch Records",
-      "findings": 157,
-      "documents": 146
+      "findings": 207,
+      "documents": 190
     },
     {
       "id": "bulk-product",
@@ -62,8 +62,8 @@
     {
       "id": "intermediate",
       "q": "Intermediate",
-      "findings": 144,
-      "documents": 115
+      "findings": 154,
+      "documents": 122
     },
     {
       "id": "intermediate-product",
@@ -74,50 +74,50 @@
     {
       "id": "finished-product",
       "q": "Finished Product",
-      "findings": 592,
-      "documents": 535
+      "findings": 604,
+      "documents": 545
     },
     {
       "id": "starting-material",
       "q": "Starting Material",
-      "findings": 23,
-      "documents": 20
+      "findings": 24,
+      "documents": 21
     },
     {
       "id": "raw-material",
       "q": "Raw Material",
-      "findings": 835,
-      "documents": 669
+      "findings": 900,
+      "documents": 731
     },
     {
       "id": "packaging-material",
       "q": "Packaging Material",
-      "findings": 285,
-      "documents": 262
+      "findings": 289,
+      "documents": 266
     },
     {
       "id": "manufacture",
       "q": "Manufacture",
-      "findings": 2146,
-      "documents": 1209
+      "findings": 2282,
+      "documents": 1303
     },
     {
       "id": "production",
       "q": "Production",
-      "findings": 2576,
-      "documents": 1690
+      "findings": 2701,
+      "documents": 1767
     },
     {
       "id": "packaging",
       "q": "Packaging",
-      "findings": 736,
-      "documents": 628
+      "findings": 753,
+      "documents": 637
     },
     {
       "id": "manufacturer",
       "q": "Manufacturer",
-      "findings": 522,
-      "documents": 435
+      "findings": 586,
+      "documents": 489
     },
     {
       "id": "marketing-authorization",
@@ -128,26 +128,26 @@
     {
       "id": "authorized-person",
       "q": "Authorized Person",
-      "findings": 128,
-      "documents": 126
+      "findings": 137,
+      "documents": 135
     },
     {
       "id": "batch-release",
       "q": "Batch Release",
-      "findings": 102,
-      "documents": 96
+      "findings": 104,
+      "documents": 98
     },
     {
       "id": "quarantine",
       "q": "Quarantine",
-      "findings": 130,
-      "documents": 121
+      "findings": 135,
+      "documents": 125
     },
     {
       "id": "reprocessing",
       "q": "Reprocessing",
-      "findings": 46,
-      "documents": 45
+      "findings": 47,
+      "documents": 46
     },
     {
       "id": "reworking",
@@ -158,62 +158,62 @@
     {
       "id": "recall",
       "q": "Product Recall",
-      "findings": 306,
-      "documents": 239
+      "findings": 319,
+      "documents": 249
     },
     {
       "id": "expiry-date",
       "q": "Expiry Date",
-      "findings": 53,
+      "findings": 54,
       "documents": 51
     },
     {
       "id": "retest-date",
       "q": "Retest Date",
-      "findings": 185,
-      "documents": 183
+      "findings": 198,
+      "documents": 194
     },
     {
       "id": "acceptance-criteria",
       "q": "Acceptance Criteria",
-      "findings": 104,
-      "documents": 98
+      "findings": 107,
+      "documents": 101
     },
     {
       "id": "specification",
       "q": "Specification",
-      "findings": 2832,
-      "documents": 1782
+      "findings": 2974,
+      "documents": 1863
     },
     {
       "id": "quality",
       "q": "Quality",
-      "findings": 5234,
-      "documents": 2972
+      "findings": 5518,
+      "documents": 3114
     },
     {
       "id": "quality-assurance",
       "q": "Quality Assurance",
-      "findings": 261,
-      "documents": 230
+      "findings": 310,
+      "documents": 275
     },
     {
       "id": "quality-control",
       "q": "Quality Control",
-      "findings": 1738,
-      "documents": 1351
+      "findings": 1810,
+      "documents": 1410
     },
     {
       "id": "quality-unit",
       "q": "Quality Unit",
-      "findings": 583,
-      "documents": 486
+      "findings": 604,
+      "documents": 502
     },
     {
       "id": "pharmaceutical-quality-system",
       "q": "Pharmaceutical Quality System",
-      "findings": 55,
-      "documents": 55
+      "findings": 57,
+      "documents": 56
     },
     {
       "id": "quality-manual",
@@ -230,8 +230,8 @@
     {
       "id": "state-of-control",
       "q": "State of Control",
-      "findings": 318,
-      "documents": 271
+      "findings": 326,
+      "documents": 277
     },
     {
       "id": "control-strategy",
@@ -242,20 +242,20 @@
     {
       "id": "quality-risk-management",
       "q": "Quality Risk Management",
-      "findings": 40,
-      "documents": 38
+      "findings": 43,
+      "documents": 39
     },
     {
       "id": "risk",
       "q": "Risk",
-      "findings": 1582,
-      "documents": 1066
+      "findings": 1717,
+      "documents": 1119
     },
     {
       "id": "hazard",
       "q": "Hazard",
-      "findings": 400,
-      "documents": 344
+      "findings": 412,
+      "documents": 356
     },
     {
       "id": "risk-analysis",
@@ -266,14 +266,14 @@
     {
       "id": "risk-evaluation",
       "q": "Risk Evaluation",
-      "findings": 6,
-      "documents": 5
+      "findings": 7,
+      "documents": 6
     },
     {
       "id": "risk-assessment",
       "q": "Risk Assessment",
-      "findings": 555,
-      "documents": 364
+      "findings": 565,
+      "documents": 371
     },
     {
       "id": "risk-control",
@@ -302,56 +302,56 @@
     {
       "id": "severity",
       "q": "Severity",
-      "findings": 58,
-      "documents": 58
+      "findings": 69,
+      "documents": 62
     },
     {
       "id": "capa",
       "q": "Corrective and Preventive Action",
-      "findings": 102,
-      "documents": 96
+      "findings": 140,
+      "documents": 100
     },
     {
       "id": "corrective-action",
       "q": "Corrective Action",
-      "findings": 1315,
-      "documents": 902
+      "findings": 1471,
+      "documents": 925
     },
     {
       "id": "preventive-action",
       "q": "Preventive Action",
-      "findings": 679,
-      "documents": 575
+      "findings": 783,
+      "documents": 588
     },
     {
       "id": "root-cause-analysis",
       "q": "Root Cause Analysis",
-      "findings": 67,
-      "documents": 64
+      "findings": 69,
+      "documents": 66
     },
     {
       "id": "deviation",
       "q": "Deviation",
-      "findings": 1317,
-      "documents": 1172
+      "findings": 1346,
+      "documents": 1186
     },
     {
       "id": "change-control",
       "q": "Change Control",
-      "findings": 581,
-      "documents": 575
+      "findings": 582,
+      "documents": 576
     },
     {
       "id": "change-management",
       "q": "Change Management",
-      "findings": 120,
-      "documents": 115
+      "findings": 121,
+      "documents": 116
     },
     {
       "id": "supplier-qualification",
       "q": "Supplier Qualification",
-      "findings": 77,
-      "documents": 72
+      "findings": 80,
+      "documents": 75
     },
     {
       "id": "outsourced-activities",
@@ -368,62 +368,62 @@
     {
       "id": "product-quality-review",
       "q": "Product Quality Review",
-      "findings": 201,
-      "documents": 201
+      "findings": 202,
+      "documents": 202
     },
     {
       "id": "product-complaint",
       "q": "Product Complaint",
-      "findings": 12,
-      "documents": 12
+      "findings": 13,
+      "documents": 13
     },
     {
       "id": "sop",
       "q": "Standard Operating Procedure",
-      "findings": 848,
-      "documents": 793
+      "findings": 875,
+      "documents": 808
     },
     {
       "id": "procedure",
       "q": "Procedure",
-      "findings": 6330,
-      "documents": 3207
+      "findings": 6714,
+      "documents": 3319
     },
     {
       "id": "documentation",
       "q": "Documentation",
-      "findings": 1612,
-      "documents": 1253
+      "findings": 1731,
+      "documents": 1287
     },
     {
       "id": "record",
       "q": "Record",
-      "findings": 3743,
-      "documents": 2487
+      "findings": 3975,
+      "documents": 2561
     },
     {
       "id": "raw-data",
       "q": "Raw Data",
-      "findings": 68,
+      "findings": 69,
       "documents": 59
     },
     {
       "id": "electronic-record",
       "q": "Electronic Record",
-      "findings": 33,
-      "documents": 33
+      "findings": 34,
+      "documents": 34
     },
     {
       "id": "data-integrity",
       "q": "Data Integrity",
-      "findings": 170,
-      "documents": 143
+      "findings": 173,
+      "documents": 145
     },
     {
       "id": "audit-trail",
       "q": "Audit Trail",
-      "findings": 64,
-      "documents": 55
+      "findings": 66,
+      "documents": 57
     },
     {
       "id": "computerised-system",
@@ -440,8 +440,8 @@
     {
       "id": "validation",
       "q": "Validation",
-      "findings": 1797,
-      "documents": 1351
+      "findings": 1870,
+      "documents": 1403
     },
     {
       "id": "validation-master-plan",
@@ -452,20 +452,20 @@
     {
       "id": "validation-protocol",
       "q": "Validation Protocol",
-      "findings": 71,
-      "documents": 66
+      "findings": 76,
+      "documents": 70
     },
     {
       "id": "validation-report",
       "q": "Validation Report",
-      "findings": 80,
-      "documents": 74
+      "findings": 81,
+      "documents": 75
     },
     {
       "id": "qualification",
       "q": "Qualification",
-      "findings": 1062,
-      "documents": 900
+      "findings": 1081,
+      "documents": 913
     },
     {
       "id": "installation-qualification",
@@ -482,14 +482,14 @@
     {
       "id": "performance-qualification",
       "q": "Performance Qualification",
-      "findings": 178,
-      "documents": 176
+      "findings": 183,
+      "documents": 181
     },
     {
       "id": "process-validation",
       "q": "Process Validation",
-      "findings": 273,
-      "documents": 249
+      "findings": 283,
+      "documents": 257
     },
     {
       "id": "continued-process-verification",
@@ -500,56 +500,56 @@
     {
       "id": "revalidation",
       "q": "Revalidation",
-      "findings": 94,
-      "documents": 94
+      "findings": 99,
+      "documents": 99
     },
     {
       "id": "cleaning-validation",
       "q": "Cleaning Validation",
-      "findings": 157,
-      "documents": 157
+      "findings": 161,
+      "documents": 161
     },
     {
       "id": "calibration",
       "q": "Calibration",
-      "findings": 673,
-      "documents": 642
+      "findings": 684,
+      "documents": 653
     },
     {
       "id": "worst-case",
       "q": "Worst Case",
-      "findings": 98,
-      "documents": 98
+      "findings": 101,
+      "documents": 101
     },
     {
       "id": "analytical-procedure",
       "q": "Analytical Procedure",
-      "findings": 19,
-      "documents": 19
+      "findings": 25,
+      "documents": 23
     },
     {
       "id": "accuracy",
       "q": "Accuracy",
-      "findings": 590,
-      "documents": 548
+      "findings": 609,
+      "documents": 564
     },
     {
       "id": "precision",
       "q": "Precision",
-      "findings": 36,
-      "documents": 36
+      "findings": 39,
+      "documents": 38
     },
     {
       "id": "repeatability",
       "q": "Repeatability",
-      "findings": 11,
-      "documents": 10
+      "findings": 12,
+      "documents": 11
     },
     {
       "id": "specificity",
       "q": "Specificity",
-      "findings": 99,
-      "documents": 98
+      "findings": 102,
+      "documents": 101
     },
     {
       "id": "linearity",
@@ -560,8 +560,8 @@
     {
       "id": "range",
       "q": "Range",
-      "findings": 256,
-      "documents": 243
+      "findings": 278,
+      "documents": 251
     },
     {
       "id": "detection-limit",
@@ -572,32 +572,32 @@
     {
       "id": "robustness",
       "q": "Robustness",
-      "findings": 19,
-      "documents": 19
+      "findings": 20,
+      "documents": 20
     },
     {
       "id": "assay",
       "q": "Assay",
-      "findings": 249,
-      "documents": 220
+      "findings": 270,
+      "documents": 240
     },
     {
       "id": "identification-test",
       "q": "Identification Test",
-      "findings": 124,
-      "documents": 122
+      "findings": 131,
+      "documents": 128
     },
     {
       "id": "purity-test",
       "q": "Purity Test",
-      "findings": 40,
-      "documents": 39
+      "findings": 42,
+      "documents": 41
     },
     {
       "id": "impurity",
       "q": "Impurity",
-      "findings": 71,
-      "documents": 67
+      "findings": 74,
+      "documents": 70
     },
     {
       "id": "impurity-profile",
@@ -608,32 +608,32 @@
     {
       "id": "reference-standard",
       "q": "Reference Standard",
-      "findings": 25,
-      "documents": 21
+      "findings": 29,
+      "documents": 24
     },
     {
       "id": "oos",
       "q": "Out-of-Specification",
-      "findings": 524,
-      "documents": 496
+      "findings": 530,
+      "documents": 502
     },
     {
       "id": "oot",
       "q": "Out-of-Trend",
-      "findings": 74,
-      "documents": 73
+      "findings": 77,
+      "documents": 76
     },
     {
       "id": "stability-testing",
       "q": "Stability Testing",
-      "findings": 347,
-      "documents": 322
+      "findings": 362,
+      "documents": 333
     },
     {
       "id": "cleanroom",
       "q": "Cleanroom",
-      "findings": 227,
-      "documents": 166
+      "findings": 230,
+      "documents": 169
     },
     {
       "id": "cleanroom-classification",
@@ -650,26 +650,26 @@
     {
       "id": "bioburden",
       "q": "Bioburden",
-      "findings": 76,
-      "documents": 66
+      "findings": 78,
+      "documents": 68
     },
     {
       "id": "endotoxin",
       "q": "Endotoxin",
-      "findings": 81,
-      "documents": 63
+      "findings": 85,
+      "documents": 67
     },
     {
       "id": "pyrogen",
       "q": "Pyrogen",
-      "findings": 235,
-      "documents": 214
+      "findings": 241,
+      "documents": 219
     },
     {
       "id": "aseptic-processing",
       "q": "Aseptic Processing",
-      "findings": 1714,
-      "documents": 939
+      "findings": 1820,
+      "documents": 973
     },
     {
       "id": "aseptic-process-simulation",
@@ -680,20 +680,20 @@
     {
       "id": "environmental-monitoring",
       "q": "Environmental Monitoring",
-      "findings": 241,
-      "documents": 201
+      "findings": 251,
+      "documents": 210
     },
     {
       "id": "alert-limit",
       "q": "Alert Limit",
-      "findings": 62,
-      "documents": 62
+      "findings": 63,
+      "documents": 63
     },
     {
       "id": "action-limit",
       "q": "Action Limit",
-      "findings": 58,
-      "documents": 58
+      "findings": 61,
+      "documents": 61
     },
     {
       "id": "hepa-filter",
@@ -710,7 +710,7 @@
     {
       "id": "rabs",
       "q": "Restricted Access Barrier System",
-      "findings": 23,
+      "findings": 24,
       "documents": 23
     },
     {
@@ -722,8 +722,8 @@
     {
       "id": "sterility",
       "q": "Sterility",
-      "findings": 377,
-      "documents": 269
+      "findings": 384,
+      "documents": 273
     },
     {
       "id": "sterility-assurance-level",
@@ -734,8 +734,8 @@
     {
       "id": "sterility-test",
       "q": "Sterility Test",
-      "findings": 127,
-      "documents": 99
+      "findings": 130,
+      "documents": 101
     },
     {
       "id": "contamination-control-strategy",
@@ -746,32 +746,32 @@
     {
       "id": "contamination",
       "q": "Contamination",
-      "findings": 3050,
-      "documents": 1924
+      "findings": 3230,
+      "documents": 2026
     },
     {
       "id": "cross-contamination",
       "q": "Cross-Contamination",
-      "findings": 303,
-      "documents": 285
+      "findings": 314,
+      "documents": 294
     },
     {
       "id": "depyrogenation",
       "q": "Depyrogenation",
-      "findings": 15,
-      "documents": 15
+      "findings": 16,
+      "documents": 16
     },
     {
       "id": "biological-indicator",
       "q": "Biological Indicator",
-      "findings": 19,
-      "documents": 19
+      "findings": 20,
+      "documents": 20
     },
     {
       "id": "disinfection",
       "q": "Disinfection",
-      "findings": 104,
-      "documents": 98
+      "findings": 108,
+      "documents": 100
     },
     {
       "id": "line-clearance",
@@ -806,8 +806,8 @@
     {
       "id": "first-air",
       "q": "First Air",
-      "findings": 43,
-      "documents": 36
+      "findings": 44,
+      "documents": 37
     },
     {
       "id": "critical-zone",
@@ -818,8 +818,8 @@
     {
       "id": "unidirectional-airflow",
       "q": "Unidirectional Airflow",
-      "findings": 85,
-      "documents": 71
+      "findings": 86,
+      "documents": 72
     },
     {
       "id": "airflow-visualization-study",
@@ -830,8 +830,8 @@
     {
       "id": "critical-intervention",
       "q": "Critical Intervention",
-      "findings": 3,
-      "documents": 3
+      "findings": 4,
+      "documents": 4
     },
     {
       "id": "personnel-monitoring",
@@ -872,8 +872,8 @@
     {
       "id": "metadata",
       "q": "Metadata",
-      "findings": 3,
-      "documents": 3
+      "findings": 4,
+      "documents": 4
     },
     {
       "id": "data-lifecycle",
@@ -902,8 +902,8 @@
     {
       "id": "archive",
       "q": "Archiving",
-      "findings": 5,
-      "documents": 4
+      "findings": 8,
+      "documents": 6
     },
     {
       "id": "audit-trail-review",
@@ -938,26 +938,26 @@
     {
       "id": "data-retention",
       "q": "Data Retention",
-      "findings": 19,
-      "documents": 19
+      "findings": 21,
+      "documents": 21
     },
     {
       "id": "attributable",
       "q": "Attributable",
-      "findings": 133,
-      "documents": 126
+      "findings": 138,
+      "documents": 128
     },
     {
       "id": "legible",
       "q": "Legible",
-      "findings": 125,
-      "documents": 122
+      "findings": 127,
+      "documents": 123
     },
     {
       "id": "contemporaneous",
       "q": "Contemporaneous",
-      "findings": 168,
-      "documents": 149
+      "findings": 172,
+      "documents": 151
     },
     {
       "id": "original-data",
@@ -968,8 +968,8 @@
     {
       "id": "accurate",
       "q": "Accurate",
-      "findings": 312,
-      "documents": 272
+      "findings": 350,
+      "documents": 279
     },
     {
       "id": "detectability",
@@ -980,14 +980,14 @@
     {
       "id": "uncertainty",
       "q": "Uncertainty",
-      "findings": 8,
+      "findings": 9,
       "documents": 8
     },
     {
       "id": "harm",
       "q": "Harm",
-      "findings": 1186,
-      "documents": 891
+      "findings": 1319,
+      "documents": 949
     },
     {
       "id": "residual-risk",
@@ -1004,56 +1004,56 @@
     {
       "id": "written-procedure",
       "q": "Written Procedures",
-      "findings": 1461,
-      "documents": 1077
+      "findings": 1517,
+      "documents": 1112
     },
     {
       "id": "quality-control-unit",
       "q": "Quality Control Unit",
-      "findings": 1250,
-      "documents": 1060
+      "findings": 1303,
+      "documents": 1107
     },
     {
       "id": "laboratory-controls",
       "q": "Laboratory Controls",
-      "findings": 397,
-      "documents": 388
+      "findings": 432,
+      "documents": 419
     },
     {
       "id": "sampling-plan",
       "q": "Sampling Plan",
-      "findings": 255,
-      "documents": 247
+      "findings": 265,
+      "documents": 257
     },
     {
       "id": "adverse-event",
       "q": "Adverse Event",
-      "findings": 156,
-      "documents": 138
+      "findings": 196,
+      "documents": 141
     },
     {
       "id": "quality-system",
       "q": "Quality System",
-      "findings": 460,
-      "documents": 414
+      "findings": 472,
+      "documents": 420
     },
     {
       "id": "container-closure",
       "q": "Container Closure System",
-      "findings": 54,
-      "documents": 53
+      "findings": 56,
+      "documents": 54
     },
     {
       "id": "water-system",
       "q": "Water System",
-      "findings": 130,
-      "documents": 115
+      "findings": 131,
+      "documents": 116
     },
     {
       "id": "visual-inspection",
       "q": "Visual Inspection",
-      "findings": 132,
-      "documents": 115
+      "findings": 138,
+      "documents": 120
     },
     {
       "id": "field-alert",
@@ -1064,20 +1064,20 @@
     {
       "id": "in-process-control",
       "q": "In-Process Control",
-      "findings": 41,
-      "documents": 41
+      "findings": 42,
+      "documents": 42
     },
     {
       "id": "quality-agreement",
       "q": "Quality Agreement",
-      "findings": 544,
-      "documents": 535
+      "findings": 545,
+      "documents": 536
     },
     {
       "id": "preventive-maintenance",
       "q": "Preventive Maintenance",
-      "findings": 120,
-      "documents": 115
+      "findings": 123,
+      "documents": 118
     },
     {
       "id": "equipment-qualification",
@@ -1088,32 +1088,32 @@
     {
       "id": "laboratory-investigation",
       "q": "Laboratory Investigation",
-      "findings": 79,
-      "documents": 72
+      "findings": 86,
+      "documents": 79
     },
     {
       "id": "shelf-life",
       "q": "Shelf Life",
-      "findings": 84,
-      "documents": 82
+      "findings": 89,
+      "documents": 86
     },
     {
       "id": "non-conformance",
       "q": "Non-conformance",
-      "findings": 28,
-      "documents": 26
+      "findings": 29,
+      "documents": 27
     },
     {
       "id": "purified-water",
       "q": "Purified Water",
-      "findings": 51,
-      "documents": 48
+      "findings": 52,
+      "documents": 49
     },
     {
       "id": "management-review",
       "q": "Management Review",
-      "findings": 98,
-      "documents": 96
+      "findings": 99,
+      "documents": 97
     },
     {
       "id": "labeling-control",
@@ -1124,8 +1124,8 @@
     {
       "id": "complaint-handling",
       "q": "Complaint Handling",
-      "findings": 29,
-      "documents": 29
+      "findings": 30,
+      "documents": 30
     },
     {
       "id": "good-documentation-practices",
@@ -1142,14 +1142,14 @@
     {
       "id": "microbial-limits",
       "q": "Microbial Limits",
-      "findings": 101,
-      "documents": 99
+      "findings": 104,
+      "documents": 101
     },
     {
       "id": "sanitation",
       "q": "Sanitation",
-      "findings": 426,
-      "documents": 397
+      "findings": 427,
+      "documents": 398
     },
     {
       "id": "pest-control",
@@ -1160,8 +1160,8 @@
     {
       "id": "master-production-record",
       "q": "Master Production and Control Record",
-      "findings": 183,
-      "documents": 174
+      "findings": 193,
+      "documents": 184
     },
     {
       "id": "ongoing-stability-programme",
@@ -1178,50 +1178,50 @@
     {
       "id": "mix-up",
       "q": "Mix-up",
-      "findings": 226,
-      "documents": 218
+      "findings": 238,
+      "documents": 230
     },
     {
       "id": "training",
       "q": "Training",
-      "findings": 908,
-      "documents": 804
+      "findings": 965,
+      "documents": 820
     },
     {
       "id": "certificate-of-analysis",
       "q": "Certificate of Analysis",
-      "findings": 212,
-      "documents": 205
+      "findings": 226,
+      "documents": 219
     },
     {
       "id": "pressure-differential",
       "q": "Pressure Differential",
-      "findings": 31,
-      "documents": 31
+      "findings": 34,
+      "documents": 34
     },
     {
       "id": "sporicidal-agent",
       "q": "Sporicidal Agent",
-      "findings": 63,
-      "documents": 61
+      "findings": 64,
+      "documents": 62
     },
     {
       "id": "time-limits-on-production",
       "q": "Time Limit",
-      "findings": 61,
-      "documents": 61
+      "findings": 64,
+      "documents": 64
     },
     {
       "id": "yield",
       "q": "Yield",
-      "findings": 150,
-      "documents": 140
+      "findings": 155,
+      "documents": 144
     },
     {
       "id": "reconciliation",
       "q": "Reconciliation",
-      "findings": 71,
-      "documents": 71
+      "findings": 115,
+      "documents": 114
     },
     {
       "id": "equipment-use-log",
@@ -1238,8 +1238,8 @@
     {
       "id": "adulterated-drug",
       "q": "Adulterated Drug",
-      "findings": 38,
-      "documents": 37
+      "findings": 42,
+      "documents": 38
     },
     {
       "id": "advanced-therapy-medicinal-product",
@@ -1250,8 +1250,8 @@
     {
       "id": "colony-forming-unit",
       "q": "Colony Forming Unit",
-      "findings": 28,
-      "documents": 28
+      "findings": 29,
+      "documents": 29
     },
     {
       "id": "drug-master-file",
@@ -1268,14 +1268,20 @@
     {
       "id": "quality-management-system",
       "q": "Quality Management System",
-      "findings": 74,
-      "documents": 72
+      "findings": 76,
+      "documents": 73
     },
     {
       "id": "import-alert",
       "q": "Import Alert",
-      "findings": 34,
-      "documents": 32
+      "findings": 36,
+      "documents": 34
+    },
+    {
+      "id": "acceptance-quality-limit",
+      "q": "Acceptance Quality Limit",
+      "findings": 2,
+      "documents": 2
     }
   ],
   "excluded": [

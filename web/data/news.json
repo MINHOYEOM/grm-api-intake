@@ -1,42 +1,42 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-25",
+ "measured_on": "2026-11-27",
  "window_days": 60,
  "totals": {
-  "items": 474
+  "items": 475
  },
  "by_source": [
   {
    "v": "OpenFDA Recall",
-   "c": 182
+   "c": 194
+  },
+  {
+   "v": "Federal Register",
+   "c": 79
   },
   {
    "v": "ECA Academy",
    "c": 78
   },
   {
-   "v": "Federal Register",
-   "c": 75
-  },
-  {
    "v": "MFDS",
-   "c": 47
-  },
-  {
-   "v": "EMA",
-   "c": 39
+   "c": 52
   },
   {
    "v": "ISPE",
-   "c": 19
+   "c": 20
   },
   {
    "v": "Health Canada",
-   "c": 18
+   "c": 19
   },
   {
    "v": "MHRA Inspectorate",
-   "c": 13
+   "c": 16
+  },
+  {
+   "v": "EMA",
+   "c": 14
   },
   {
    "v": "PIC/S",
@@ -49,11 +49,116 @@
  ],
  "items": [
   {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-27",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Allegations of Regulatory Misconduct Voluntarily Submitted to the Center for Devices and Radiological Health",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/27/2026-24046/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-27",
+   "title": "Individualized Human Genome Editing Products: Considerations for BLA Submission and Postapproval Management; Draft Guidance for Industry; Extension of Comment Period",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/27/2026-24021/individualized-human-genome-editing-products-considerations-for-bla-submission-and-postapproval"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-27",
+   "title": "한약(생약)제제 벤조피렌 안전성 평가 및 자료작성 방법",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16011"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-27",
+   "title": "합성펩타이드 의약품의 임상시험 시 비임상시험 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16009"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "regulation-final",
+   "published_date": "2026-11-26",
+   "title": "의약품 등의 안전에 관한 규칙",
+   "official_url": "https://www.law.go.kr/DRF/lawService.do?OC=sapphire_5&target=law&MST=292313&type=HTML&mobileYn=&efYd=20261126"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "regulation-final",
+   "published_date": "2026-11-26",
+   "title": "첨단바이오의약품 안전 및 지원에 관한 규칙",
+   "official_url": "https://www.law.go.kr/DRF/lawService.do?OC=sapphire_5&target=law&MST=292045&type=HTML&mobileYn=&efYd=20261127"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "GMP",
+   "published_date": "2026-11-26",
+   "title": "MHRA expectations concerning packaging operations to minimise the risk of mix-ups",
+   "official_url": "https://mhrainspectorate.blog.gov.uk/2026/11/26/mhra-expectations-concerning-packaging-operations-to-minimise-the-risk-of-mix-ups/"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-11-25",
+   "title": "Guideline on good pharmacovigilance practices: Module IX – Signal management (superseded)",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-good-pharmacovigilance-practices-module-ix-signal-management-superseded_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-25",
+   "title": "Over-the-Counter Monograph Order Requests: Format and Content; Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/25/2026-24015/over-the-counter-monograph-order-requests-format-and-content-guidance-for-industry-availability"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Proposed Rule",
+   "published_date": "2026-11-25",
+   "title": "VIAVI Solutions; Filing of Color Additive Petition",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/25/2026-24009/viavi-solutions-filing-of-color-additive-petition"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-25",
+   "title": "Not Every Artificial Intelligence (AI) Feature Needs the Same Assurance: Finding the Right Level of Effort",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/not-every-artificial-intelligence-ai-feature-needs-same-assurance"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 3 Medicines Recall",
+   "published_date": "2026-11-25",
+   "title": "Class 3 Medicines Recall: Mercury Pharmaceuticals Limited, Bexarotene 75 mg soft capsules, EL(26)A/51",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-3-medicines-recall-mercury-pharmaceuticals-limited-bexarotene-75-mg-soft-capsules-el-26-a-slash-51"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 4 Medicines Defect Notification",
+   "published_date": "2026-11-25",
+   "title": "Class 4 Medicines Defect Notification: Takeda UK Limited, PROSTAP PD DCS 1.88 mg powder and solvent for prolonged-release suspension for injection in pre-filled syringe, EL(26)A/52",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-takeda-uk-limited-prostap-pd-dcs-1-dot-88-mg-powder-and-solvent-for-prolonged-release-suspension-for-injection-in-pre-filled-syringe-el-26-a-slash-52"
+  },
+  {
    "source": "ECA Academy",
    "source_kind": "GMP News",
    "published_date": "2026-11-24",
    "title": "What is the Process for Cleaning Validation in the Pharmaceutical Industry?",
    "official_url": "https://www.gmp-compliance.org/gmp-news/what-is-the-process-for-cleaning-validation-in-the-pharmaceutical-industry"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-24",
+   "title": "[HC] TAVNEOS (avacopan) - Canadian Patient Transition and Market Withdrawal Plan",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/tavneos-avacopan-canadian-patient-transition-and-market-withdrawal-plan"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "regulation-final",
+   "published_date": "2026-11-24",
+   "title": "첨단재생의료 및 첨단바이오의약품 안전 및 지원에 관한 법률 시행령",
+   "official_url": "https://www.law.go.kr/DRF/lawService.do?OC=sapphire_5&target=law&MST=291987&type=HTML&mobileYn=&efYd=20261127"
   },
   {
    "source": "MHRA Inspectorate",
@@ -196,6 +301,62 @@
    "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15997"
   },
   {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-11-18",
+   "title": "UMARY Acido Hialuronico, also known as: \"New Hyaluronic Acid 850mg Sealed 30 Caps\", Suplemento Alimenticio, Contenido Neto: 30 capletas de 850 mg.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-18",
+   "title": "Lisdexamfetamine Dimesylate Capsules 40 mg, 100-count bottle, Rx Only, Manufactured by: Ohm Laboratories, New Brunswick, NJ 08901, Distributed by: Sun Pharmaceutical Industries, Inc., Cranbury, NJ 08512. NDC 57664-049-88.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-18",
+   "title": "ORL Organic Oral Care Bubblegum Kids Mouthwash, 16.9 oz., ORL, ORL Labs, LLC, Scottsdale, Arizona, USA, UPC# #850006245475",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-18",
+   "title": "ORL Organic Oral Care Bubblegum Kids natural toothpaste, 4 oz., ORL, Manufactured in USA, ORL LAbs, LLC, Scottsdale, Arizona, USA, UPC# 850006245505",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-18",
+   "title": "ORL Organic Oral Care Cinnamint toothpaste, 4 oz., ORL, ORL Labs, LLC, Scottsdale, Arizona, USA UPC# 850006245512",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-18",
+   "title": "ORL Organic Oral Care Fresh Mint natural toothpaste, 4 oz., ORL, Manufactured in USA, ORL Labs, LLC, Scottsdale, Arizona, USA, UPC 850006245499",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-18",
+   "title": "ORL Organic Oral Care Fresh mint mouthwash, 16.9 oz., ORL, Manufactured in USA, ORL Labs, LLC, Scottsdale, Arizona, USA, UPC# #850006245451",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-18",
+   "title": "Organic Oral Care Cinnamint Kids Mouthwash, 16.9 oz., ORL, ORL Labs, LLC, Scottsdale, Arizona, USA, 16.9 oz. UPC# #850006245468",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
    "source": "EMA",
    "source_kind": "news",
    "published_date": "2026-11-17",
@@ -313,13 +474,6 @@
    "published_date": "2026-11-13",
    "title": "Meeting highlights from the Committee for Medicinal Products for Human Use (CHMP) 9-12 November 2026",
    "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-9-12-november-2026"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-11-13",
-   "title": "Draft guideline on veterinary good pharmacovigilance practices (VGVP) - List of medically important (MI) VeDDRA terms",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-veterinary-good-pharmacovigilance-practices-vgvp-list-medically-important-mi-veddra-terms_en.pdf"
   },
   {
    "source": "Federal Register",
@@ -599,6 +753,13 @@
    "source_kind": "Class II",
    "published_date": "2026-11-11",
    "title": "ELECTRO B COMPLEX (MDV) **49ML**, VMC, Victory Medical Center Pharmacy, Austin, Texas",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-11",
+   "title": "Famotidine Injection, 200 mg per 50 mL (4 mg per mL), 1 x 50 mL Multi-Dose Vial, For Intravenous Use, Rx only, Sterile, Mfd. for SAGENT Pharmaceuticals, Schaumburg, IL 60173. NDC: 25021-756-50",
    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
   },
   {
@@ -903,20 +1064,6 @@
    "official_url": "https://www.gmp-compliance.org/gmp-news/single-temperature-incubation-in-ambient-monitoring-is-it-permissible-and-advisable"
   },
   {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-11-09",
-   "title": "Draft guideline on predictive biomarker assays in the context of medicinal product lifecycle",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-predictive-biomarker-assays-context-medicinal-product-lifecycle_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-11-09",
-   "title": "Draft guideline on risk assessment of medicinal products in human reproduction and breastfeeding: from data to product information - Revision 1",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-risk-assessment-medicinal-products-human-reproduction-breastfeeding-data-product-information-revision-1_en.pdf"
-  },
-  {
    "source": "Health Canada",
    "source_kind": "hc-recall",
    "published_date": "2026-11-09",
@@ -1088,6 +1235,13 @@
    "source": "OpenFDA Recall",
    "source_kind": "Class II",
    "published_date": "2026-11-04",
+   "title": "Cyanocobalamin Injection, USP, 1000 mcg/mL, 25 x 1 mL multi-dose vials, Rx only, American Regent INC, Shirley, NY, 11967, NDC 0517-0031-25, (Vial NDC: 0517-0031-01)",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-11-04",
    "title": "Delta Foremost Sani-Foam Mango, Net Contents: 1000 ML, 33.8 FL OZ, Manufactured Expressly For: Delta Foremost Chemical Corp., 3915 Air Park Street, Memphis, TN 38118,",
    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
   },
@@ -1249,6 +1403,13 @@
    "source": "OpenFDA Recall",
    "source_kind": "Class III",
    "published_date": "2026-11-04",
+   "title": "Tridacaine III / Lidocaine Patch 5%, 15 envelopes containing 1 patch each per pouch, Rx only, Distributed by: Trifluent Pharma San Antonio, TX 78213, NDC 73352-835-15.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-11-04",
    "title": "ValuHealth Extra Strength Pain Relief Acetaminophen 500 mg, 40-caplets per bottle, Distributed by:Prodose, Inc. Ronkonkoma, NY 11779, Made in India. UPC 8 50026 88900 0",
    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
   },
@@ -1265,20 +1426,6 @@
    "published_date": "2026-11-04",
    "title": "Vecuronium Bromide for Injection, 20mg, 10 Single-Dose Vials per carton, Sterile, Rx Only, Mfd. for Meitheal Pharmaceuticals, Chicago, IL. NDC: 71288-745-21",
    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "OpenFDA Recall",
-   "source_kind": "Not Yet Classified",
-   "published_date": "2026-11-04",
-   "title": "Tridacaine III / Lidocaine Patch 5%, 15 envelopes containing 1 patch each per pouch, Rx only, Distributed by: Trifluent Pharma San Antonio, TX 78213, NDC 73352-835-15.",
-   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "inspections",
-   "published_date": "2026-11-03",
-   "title": "QRD Appendix V - Adverse-drug-reaction reporting details",
-   "official_url": "https://www.ema.europa.eu/system/files/documents/template-form/qrd-appendix-v-adverse-drug-reaction-reporting-details-en.docx"
   },
   {
    "source": "Federal Register",
@@ -1377,13 +1524,6 @@
    "published_date": "2026-10-30",
    "title": "Meeting highlights from the Pharmacovigilance Risk Assessment Committee (PRAC) 26 - 29 October 2026",
    "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-pharmacovigilance-risk-assessment-committee-prac-26-29-october-2026"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-10-30",
-   "title": "List of centrally authorised products with safety-related changes to the product information",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/list-centrally-authorised-products-safety-related-changes-product-information_en.xlsx"
   },
   {
    "source": "Federal Register",
@@ -1489,13 +1629,6 @@
    "published_date": "2026-10-30",
    "title": "「한약(생약)제제 등의 품목허가·신고에 관한 규정」 일부개정고시(식품의약품안전처 고시 제2026-73호)",
    "official_url": "https://www.mfds.go.kr/brd/m_207/view.do?seq=15202"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-10-29",
-   "title": "EMA closed on All Souls' Day, 2 November",
-   "official_url": "https://www.ema.europa.eu/en/news/ema-closed-all-souls-day-2-november"
   },
   {
    "source": "ISPE",
@@ -1642,6 +1775,13 @@
    "source_kind": "Class I",
    "published_date": "2026-10-28",
    "title": "Argatroban Injection, USP, 250 mg/2.5mL (100 mg/mL), 2.5 mL x 1 Single Dose Vial, Rx only, Manufactured for: Endo USA, Malvern,PA 19355/Argatroban Injection, 250 mg/2.5mL (100 mg/mL), 2.5 mL x 1 Single Dose Vial, Rx only, Distributed by: Par Pharmaceutical, Chestnut Ridge, NY 10977, NDC 42023-182-01.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-10-28",
+   "title": "Brevital Sodium (Methohexital Sodium), For Injection, USP, 500 mg/vial, 500 mg Multiple Dose Vial,, Rx only, Distributed by: Par Pharmaceutical, Chestnut Ridge, NY 10977, NDC: 42023-105-01.",
    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
   },
   {
@@ -1809,6 +1949,13 @@
    "source": "OpenFDA Recall",
    "source_kind": "Class II",
    "published_date": "2026-10-28",
+   "title": "Testosterone Cypionate / Testosterone Propionate 200/10 mg/mL, 30mL vials, This Is A Compounded Drug, Intramuscular Use, Office Use Only, 8400 Esters Blvd, STE 190, Irving, TX 75063. NDC 73271-1229-1",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
    "title": "Testosterone Cypionate, 200 mg/mL, packaged in a) 5 mL vials (NDC 73271-1225-1) and b) 30 m vials ( NDC 73271-1226-2) This Is A Compounded Dug, Intramuscular Use, Office Use Only, 8400 Esters Blvd, STE 190, Irving, TX 75063.",
    "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
   },
@@ -1916,13 +2063,6 @@
    "published_date": "2026-10-26",
    "title": "Class 2 Medicines Recall: Xeal Pharma, Clopidogrel Oral Liquids (all strengths), EL(26)A/43",
    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-xeal-pharma-clopidogrel-oral-liquids-all-strengths-el-26-a-slash-43"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-10-23",
-   "title": "AMA and EMA issue joint guidance on Ebola vaccine development",
-   "official_url": "https://www.ema.europa.eu/en/news/ama-ema-issue-joint-guidance-ebola-vaccine-development"
   },
   {
    "source": "Federal Register",
@@ -2121,34 +2261,6 @@
    "official_url": "https://www.gmp-compliance.org/gmp-news/switzerland-gmp-compliance-by-foreign-manufacturers"
   },
   {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-10-19",
-   "title": "Draft Data Quality Framework (DQF) for EU medicines regulation: application to collection, management and submission of Adverse Drug Reaction reports",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/draft-data-quality-framework-dqf-eu-medicines-regulation-application-collection-management-submission-adverse-drug-reaction-reports_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-10-19",
-   "title": "Methodological Principles for the Assessment of Section 5.1 of the Summary of Product Characteristics",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/methodological-principles-assessment-section-51-summary-product-characteristics_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-10-19",
-   "title": "Concept paper on the need for revision of the guideline on clinical investigation of medicinal products in the treatment of hypertension (EMA/CHMP/29947/2013/Rev.4)",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/concept-paper-need-revision-guideline-clinical-investigation-medicinal-products-treatment-hypertension-ema-chmp-29947-2013-rev4_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-10-19",
-   "title": "Reflection paper on methodological aspects in confirmatory platform trials",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/reflection-paper-methodological-aspects-confirmatory-platform-trials_en.pdf"
-  },
-  {
    "source": "Health Canada",
    "source_kind": "hc-recall",
    "published_date": "2026-10-19",
@@ -2161,13 +2273,6 @@
    "published_date": "2026-10-16",
    "title": "Meeting highlights from the Committee for Medicinal Products for Human Use (CHMP) 12-15 October 2026",
    "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-12-15-october-2026"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-10-16",
-   "title": "Concept paper on clinical trials in recipients of kidney transplantation",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/concept-paper-clinical-trials-recipients-kidney-transplantation_en.pdf"
   },
   {
    "source": "Federal Register",
@@ -2203,20 +2308,6 @@
    "published_date": "2026-10-16",
    "title": "「의약품 제조 및 품질관리에 관한 규정」 일부개정고시(안) 행정예고(식품의약품안전처 공고 제2026-500호)",
    "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44301"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-10-15",
-   "title": "EMA recommends authorisation of Rasonque for metastatic pancreatic cancer",
-   "official_url": "https://www.ema.europa.eu/en/news/ema-recommends-authorisation-rasonque-metastatic-pancreatic-cancer"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-10-15",
-   "title": "Draft reflection paper on the investigation of drug interactions of herbal medicinal products",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-reflection-paper-investigation-drug-interactions-herbal-medicinal-products_en.pdf"
   },
   {
    "source": "Federal Register",
@@ -2618,27 +2709,6 @@
    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-norgine-pharmaceuticals-limited-pedmarqsi-80-mg-slash-ml-solution-for-infusion-el-26-a-slash-42"
   },
   {
-   "source": "EMA",
-   "source_kind": "inspections",
-   "published_date": "2026-10-09",
-   "title": "Annual report of the Pharmacovigilance Inspectors Working Group for 2025",
-   "official_url": "https://www.ema.europa.eu/system/files/documents/annual-report/annual-report-pharmacovigilance-inspectors-working-group-2025-en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "inspections",
-   "published_date": "2026-10-09",
-   "title": "Questions and answers on the PIP compliance verification procedure at EMA, and on paediatric rewards",
-   "official_url": "https://www.ema.europa.eu/system/files/documents/regulatory-procedural-guideline/questions-answers-procedure-pip-compliance-verification-en_0.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-10-09",
-   "title": "Questions and answers on the PIP compliance verification procedure at EMA, and on paediatric rewards",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/questions-answers-pip-compliance-verification-procedure-ema-paediatric-rewards_en.pdf"
-  },
-  {
    "source": "Federal Register",
    "source_kind": "Notice",
    "published_date": "2026-10-09",
@@ -2700,20 +2770,6 @@
    "published_date": "2026-10-09",
    "title": "Requirements for Additional Traceability Records for Certain Foods: Enforcement Policy for Certain Retail Food Establishments and Restaurants; Draft Guidance for Industry; Availability",
    "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20721/requirements-for-additional-traceability-records-for-certain-foods-enforcement-policy-for-certain"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-10-08",
-   "title": "Clinical trial applications advice pilot becomes permanent",
-   "official_url": "https://www.ema.europa.eu/en/news/clinical-trial-applications-advice-pilot-becomes-permanent"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-10-08",
-   "title": "Draft guideline on the requirements for demonstrating therapeutic equivalence for nasal products",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-requirements-demonstrating-therapeutic-equivalence-nasal-products_en.pdf"
   },
   {
    "source": "Federal Register",
@@ -2819,27 +2875,6 @@
    "published_date": "2026-10-06",
    "title": "European Medicines Agency post-authorisation procedural advice for users of the centralised procedure: document with tracked changes",
    "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/european-medicines-agency-post-authorisation-procedural-advice-users-centralised-procedure-document-tracked-changes_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-10-06",
-   "title": "European Medicines Agency pre-authorisation procedural advice for users of the centralised procedure",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/european-medicines-agency-pre-authorisation-procedural-advice-users-centralised-procedure_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "regulatory-guidelines",
-   "published_date": "2026-10-06",
-   "title": "European Medicines Agency pre-authorisation procedural advice for users of the centralised procedure: document with tracked changes",
-   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/european-medicines-agency-pre-authorisation-procedural-advice-users-centralised-procedure-document-tracked-changes_en.pdf"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "scientific-guidelines",
-   "published_date": "2026-10-06",
-   "title": "Concept paper on the guideline revision on good pharmacogenomic practice",
-   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/concept-paper-guideline-revision-good-pharmacogenomic-practice_en.pdf"
   },
   {
    "source": "Federal Register",
@@ -2961,13 +2996,6 @@
    "official_url": "https://www.gov.uk/drug-device-alerts/class-3-medicines-recall-norgine-limited-movicol-plain-13-dot-7g-powder-for-oral-solution-el-26-a-slash-41"
   },
   {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-10-02",
-   "title": "Meeting highlights from the Pharmacovigilance Risk Assessment Committee (PRAC) 28 September - 1 October",
-   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-pharmacovigilance-risk-assessment-committee-prac-28-september-1-october"
-  },
-  {
    "source": "MFDS",
    "source_kind": "guidance-internal",
    "published_date": "2026-10-02",
@@ -2980,20 +3008,6 @@
    "published_date": "2026-10-01",
    "title": "Advice on ‘end-of-year’ submission dates for type I variations in 2026",
    "official_url": "https://www.ema.europa.eu/en/news/advice-end-year-submission-dates-type-i-variations-2026"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-10-01",
-   "title": "EMA Management Board: highlights of September 2026 meeting",
-   "official_url": "https://www.ema.europa.eu/en/news/ema-management-board-highlights-september-2026-meeting"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-10-01",
-   "title": "Executive Director speech at EMA women’s health multi-stakeholder workshop",
-   "official_url": "https://www.ema.europa.eu/en/news/executive-director-speech-ema-womens-health-multi-stakeholder-workshop"
   },
   {
    "source": "EMA",
@@ -3099,13 +3113,6 @@
    "published_date": "2026-09-30",
    "title": "Warehouse Temperature Excursions: What Does the FDA Expect?",
    "official_url": "https://www.gmp-compliance.org/gmp-news/warehouse-temperature-excursions-what-does-the-fda-expect"
-  },
-  {
-   "source": "EMA",
-   "source_kind": "news",
-   "published_date": "2026-09-30",
-   "title": "Women are missing from medicines development: EMA’s roadmap for change",
-   "official_url": "https://www.ema.europa.eu/en/news/women-are-missing-medicines-development-emas-roadmap-change"
   },
   {
    "source": "Federal Register",

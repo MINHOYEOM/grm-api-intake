@@ -8843,8 +8843,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
                 _cite = _ct_cite.get(_c["href"])
+                _cases_href = (f"findings/clause/{clause_slug(_sec)}/"
+                               if _sec and clause_slug(_sec) in _ct_cases else "")
                 _ct_gni = clause_text_page.google_noindex_reason(
-                    _d, _c, _lg, (_cite or {}).get("documents", 0))
+                    _d, _c, _lg, (_cite or {}).get("documents", 0),
+                    bare=not clause_text_page.has_grm_addition(
+                        (_cite or {}).get("documents", 0),
+                        _ct_terms.get(_c["href"]), _cases_href))
                 _em("clause_text.html", _cp,
                     page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
                     nav_active="findings",
@@ -8853,8 +8858,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         (_tr("홈"), "/"), (_tr("기준 조항 원문"), "clauses/"),
                         (_d["code"], _d["path"]), (_c["number"], "")]),
                     doc=_d, clause=_c,
-                    cases_href=(f"findings/clause/{clause_slug(_sec)}/"
-                                if _sec and clause_slug(_sec) in _ct_cases else ""),
+                    cases_href=_cases_href,
                     terms=_ct_terms.get(_c["href"]) or [],
                     cite=_cite, agency_labels=_ct_labels,
                     google_noindex=bool(_ct_gni),
@@ -8864,9 +8868,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [구글 품질 1단계] 조항 D·E — sitemap 제외 집합은 렌더 루프 밖에서 같은 술어로 채운다
     # (영문 트리 경로는 en_paths 로 sitemap 에 들어가므로 언어마다 따로 센다).
     for _lg in (DEFAULT_LANG, "en"):
+        _gn_terms = clause_text_page.terms_by_href(
+            clause_text_views[_lg], glossary_terms or [], _lg)
+        _gn_cases = (clause_slugs if _lg == DEFAULT_LANG
+                     else {c["slug"] for c in clause_views_en})
         for _d, _c in clause_text_page.pages(clause_text_views[_lg]):
+            _gn_n = (_ct_cites[_lg].get(_c["href"]) or {}).get("documents", 0)
+            _gn_sec = _c["number"] if _d["source_key"] == "cfr21" else ""
+            _gn_case = (f"findings/clause/{clause_slug(_gn_sec)}/"
+                        if _gn_sec and clause_slug(_gn_sec) in _gn_cases else "")
             _why = clause_text_page.google_noindex_reason(
-                _d, _c, _lg, (_ct_cites[_lg].get(_c["href"]) or {}).get("documents", 0))
+                _d, _c, _lg, _gn_n,
+                bare=not clause_text_page.has_grm_addition(
+                    _gn_n, _gn_terms.get(_c["href"]), _gn_case))
             if _why:
                 _mark_google_noindex(_lg, _c["href"], f"clause_{_why}")
 

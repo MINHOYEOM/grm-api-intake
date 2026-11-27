@@ -4529,6 +4529,15 @@ def is_duplicate_doc_page(doc: dict[str, Any], ratios: dict[str, float]) -> bool
     return ratios.get(doc.get("document_id", ""), 0.0) >= DUP_DOC_MIN_RATIO
 
 
+def doc_has_grm_addition(similar: Any, cited_clauses: Any, standard_refs: Any,
+                         doc_terms: Any, backlinks: Any) -> bool:
+    """[구글 유입 2026-11-27 규칙 F] 문서 페이지에 GRM 고유 블록(비슷한 지적·인용 조항·기준 링크·
+    관련 용어·실린 브리프 호)이 하나라도 서는가. 렌더가 이 함수 하나로 meta 와 sitemap 제외를 정한다.
+    하나라도 생기면 다음 빌드에서 구글 색인 대상으로 자동 복귀."""
+    cells = backlinks.get("cells") if isinstance(backlinks, dict) else backlinks
+    return any(bool(x) for x in (similar, cited_clauses, standard_refs, doc_terms, cells))
+
+
 def google_noindex_doc_page(doc: dict[str, Any], lang: str,
                             ratios: dict[str, float]) -> bool:
     """문서 페이지를 구글에서 뺄까(A 얇음 또는 B 중복). 템플릿 메타와 sitemap 이 **이 함수 하나**를 본다."""
@@ -8584,6 +8593,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 # [UI 2단 2026-11-12] 관련 용어 칸 — 본문에 실제로 링크된 용어만(선정 순서).
                 _doc_terms = [{"id": tid, "label": surface} for surface, tid in _sel
                               if tid in _used]
+                _std_refs = ([] if (_similar_cases or _cited_clauses) else doc_standard_view(
+                    doc, clause_text_views.get(_lg, clause_text_view_en),
+                    clause_labels_by_lang.get(_lg, {})))
+                _backlinks = build_backlink_panel(
+                    "doc", doc.get("document_id", ""), index=card_issue_index,
+                    lang=_lg,
+                    issue_slugs=(all_issue_slugs if _lg == DEFAULT_LANG else en_brief_slugs),
+                    rel_root=_pp.rel_root, tr=_tr)
+                # [구글 유입 2026-11-27] 영문 문서에 GRM 덧붙임이 하나도 없으면(규칙 F) 구글만 뺀다.
+                _doc_bare = (_lg != DEFAULT_LANG and not doc_has_grm_addition(
+                    _similar_cases, _cited_clauses, _std_refs, _doc_terms, _backlinks))
+                if _doc_bare and doc["slug"] not in google_noindex_doc[_lg]:
+                    _mark_google_noindex(_lg, f"findings/doc/{doc['slug']}/", "doc_bare")
                 _emit("findings_doc.html", _pp,
                     next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
                     doc_terms=_doc_terms,
@@ -8602,7 +8624,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          (_tr("문서로 찾기"), "findings/docs/")),
                         (doc["firm_name"], "")]),
                     doc=_doc, agency_labels=_labels,
-                    google_noindex=doc["slug"] in google_noindex_doc[_lg],
+                    google_noindex=(doc["slug"] in google_noindex_doc[_lg]) or _doc_bare,
                     source_label=doc_source_label(doc),
                     # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                     # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
@@ -8631,15 +8653,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         f["finding_id"] for f in (doc.get("findings") or [])
                         if f.get("finding_id") in partial_detail_ids),
                     cited_clauses=_cited_clauses,
-                    standard_refs=(
-                        [] if (_similar_cases or _cited_clauses) else doc_standard_view(
-                            doc, clause_text_views.get(_lg, clause_text_view_en),
-                            clause_labels_by_lang.get(_lg, {}))),
-                    backlinks=build_backlink_panel(
-                        "doc", doc.get("document_id", ""), index=card_issue_index,
-                        lang=_lg,
-                        issue_slugs=(all_issue_slugs if _lg == DEFAULT_LANG else en_brief_slugs),
-                        rel_root=_pp.rel_root, tr=_tr),
+                    standard_refs=_std_refs,
+                    backlinks=_backlinks,
                 )
 
         # [B1] 업체 페이지. sitemap 은 **데이터에서** 파생하고(렌더 스위치와 무관),

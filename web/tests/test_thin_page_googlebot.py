@@ -121,6 +121,25 @@ class DuplicateAndClausePredicateTest(unittest.TestCase):
         self.assertEqual(src.count("clause_text_page.google_noindex_reason("), 2)
         self.assertEqual(src.count("bare=not clause_text_page.has_grm_addition("), 2)
 
+    def test_doc_bare_predicate(self):
+        """[구글 유입 2026-11-27 규칙 F] 영문 문서에 GRM 블록이 하나도 없을 때만 bare. 하나라도 생기면 복귀."""
+        f = render.doc_has_grm_addition
+        empty_panel = {"title": "t", "cells": []}
+        self.assertFalse(f([], [], [], [], empty_panel))
+        self.assertFalse(f(None, None, None, None, None))
+        self.assertTrue(f([{"slug": "a"}], [], [], [], empty_panel))   # 비슷한 지적
+        self.assertTrue(f([], [{"code": "c"}], [], [], empty_panel))   # 인용 조항
+        self.assertTrue(f([], [], [{"code": "s"}], [], empty_panel))   # 기준 링크
+        self.assertTrue(f([], [], [], [{"id": "t"}], empty_panel))     # 관련 용어
+        self.assertTrue(f([], [], [], [], {"cells": [{"key": "briefs"}]}))  # 실린 브리프 호
+
+    def test_render_wires_doc_bare_to_meta_and_sitemap(self):
+        """페이지 meta(google_noindex 인자)와 sitemap 제외(_mark_google_noindex)가 같은 _doc_bare 하나를 본다."""
+        src = pathlib.Path(render.__file__).read_text(encoding="utf-8")
+        self.assertEqual(src.count("_doc_bare = (_lg != DEFAULT_LANG and not doc_has_grm_addition("), 1)
+        self.assertIn('"doc_bare")', src)
+        self.assertIn("google_noindex=(doc[\"slug\"] in google_noindex_doc[_lg]) or _doc_bare", src)
+
     def test_citing_findings(self):
         import clause_text_page as ct
         src = {"schema": ct.SCHEMA, "source": {"key": "cfr21", "lang": "en"},

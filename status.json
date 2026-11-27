@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T02:31:22Z",
+ "generated_at": "2026-11-27T02:38:51Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -230,11 +230,11 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 45928745069,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-27T02:30:38Z",
-    "updatedAt": "2026-11-27T02:30:58Z",
+    "updatedAt": "2026-11-27T02:38:20Z",
     "headBranch": "main",
     "displayTitle": "Merge pull request #2029 from MINHOYEOM/claude/google-bare-doc-noindex",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45928745069"
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45929512364,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-27T02:38:24Z",
+    "updatedAt": "2026-11-27T02:38:39Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45929512364"
+   },
+   {
     "databaseId": 45928778350,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45822275689"
-   },
-   {
-    "databaseId": 45816610528,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T12:06:43Z",
-    "updatedAt": "2026-11-26T12:06:59Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45816610528"
    }
   ],
   "grm-findings-translate-apply.yml": [

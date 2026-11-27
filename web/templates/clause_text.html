@@ -61,6 +61,35 @@
       </div>
     </section>
     {%- endif %}
+    {#- [조항 덧붙임 2026-11-27] 본문에 정확 일치로 나온 용어사전 용어(3개 이상일 때만) + 같은 주제로 분류된 실제 지적
+        (사람이 맞춘 고정 표). 뷰는 clause_text_page.key_terms_by_href·topic_cases_by_href. -#}
+    {%- if key_terms %}
+    <section>
+      <h2 class="ct-sec-h">{{ _('이 조항의 핵심 용어') }}</h2>
+      <ul class="ct-notes">
+        {%- for t in key_terms %}
+        <li><a href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.label }}</a>{% if t.gist %} — {{ t.gist }}{% endif %}</li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+    {%- if topic_cases %}
+    <section>
+      <h2 class="ct-sec-h">{{ _('이 주제의 실제 지적') }}</h2>
+      <p class="ct-note" style="margin-bottom:12px">{{ _('이 조항을 직접 인용한 지적이 아니라, 같은 주제로 분류된 공개 지적 사례입니다.') }}</p>
+      <div class="ct-cites ct-topic">
+        {%- for s in topic_cases %}
+        <article class="ct-cite">
+          <p class="ct-cite-m"><span>{{ agency_labels.get(s.agency, s.agency) }}</span><span>{{ s.firm_name }}</span><span>{{ s.published_date }}</span></p>
+          <p class="ct-cite-t">{{ s.body }}</p>
+          {%- if s.doc_slug %}
+          <a class="ct-cite-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">{{ _('이 문서의 지적 전체 보기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          {%- endif %}
+        </article>
+        {%- endfor %}
+      </div>
+    </section>
+    {%- endif %}
     {%- if clause.notes %}
     <section>
       <h2 class="ct-sec-h">{{ _('각주·출처 표기') }}</h2>

@@ -273,6 +273,10 @@ class ThinPageMetaTest(unittest.TestCase):
         seen = {"untranslated": 0, "short": 0, "bare": 0, "": 0}
         views = {lg: ct.build(ct.for_lang(ct.load_sources(), lg)) for lg in ("ko", "en")}
         cites = render.clause_text_cites(self.data, views)
+        # [조항 덧붙임 2026-11-27] 렌더와 같은 입력: 용어 페이지가 실제로 만들어진 용어만
+        gl = render.load_glossary()
+        ids = {t["id"] for t in gl if (self.out / "glossary" / t["id"] / "index.html").is_file()}
+        extra = render.clause_text_extras(self.data, views, gl, ids)
         rescued = with_block = 0
         for lang, root in (("ko", self.out), ("en", self.out / "en")):
             for d, c in ct.pages(views[lang]):
@@ -286,7 +290,9 @@ class ThinPageMetaTest(unittest.TestCase):
                              and f'findings/clause/{c["number"].replace(".", "-")}/' in html)
                 why = ct.google_noindex_reason(
                     d, c, lang, n_docs,
-                    bare=not ct.has_grm_addition(n_docs, terms, "x" if has_cases else ""))
+                    bare=not ct.has_grm_addition(
+                        n_docs, terms, "x" if has_cases else "",
+                        extra[lang]["key_terms"].get(c["href"]), extra[lang]["topic_cases"].get(c["href"])))
                 self.assertEqual(GOOGLEBOT in html, bool(why), f"{lang} {c['href']}")
                 self.assertIsNone(ROBOTS_NOINDEX.search(html), c["href"])
                 seen[why] += 1

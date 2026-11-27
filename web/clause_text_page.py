@@ -170,11 +170,21 @@ GOOGLE_MIN_CHARS = 300
 GOOGLE_MIN_CITED_DOCS = 3
 
 
-def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str,
-                          cited_docs: int = 0) -> str:
-    """"" 이면 구글 색인 대상. 아니면 "untranslated"(D) 또는 "short"(E).
+#: [구글 유입 2026-11-27] F. 공식 원문 그대로이고 GRM 이 덧붙인 것이 하나도 없는 조항 — 인용 지적·관련 용어·
+#: 사례 모음 링크가 모두 없다. 구글 스팸 정책의 "원문을 그대로 옮긴 페이지"에 해당한다. 11-27 실측: 영문 조항
+#: 1,230장 중 626장(EU GMP 320·ICH 151·21 CFR 155), 국문 식약처 고시 260장. 구글봇에만 noindex 라 빙·네이버는
+#: 그대로다. 덧붙일 것이 생기면(인용 지적·용어 연결) 다음 빌드에서 저절로 돌아온다.
+def has_grm_addition(cited_docs: int, terms: "list | None", cases_href: str) -> bool:
+    """조항 페이지에 GRM 고유 블록(인용 지적·관련 용어·사례 모음 링크)이 하나라도 서는가."""
+    return cited_docs > 0 or bool(terms) or bool(cases_href)
 
-    `cited_docs` = 그 언어 트리에서 이 조항을 인용한 공개 문서 수(`citing_findings` 의 documents)."""
+
+def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str,
+                          cited_docs: int = 0, bare: bool = False) -> str:
+    """"" 이면 구글 색인 대상. 아니면 "untranslated"(D)·"short"(E)·"bare"(F).
+
+    `cited_docs` = 그 언어 트리에서 이 조항을 인용한 공개 문서 수(`citing_findings` 의 documents).
+    `bare` = `has_grm_addition` 이 거짓(원문뿐). 기본 False 라 종전 호출은 판정이 바뀌지 않는다."""
     foreign = (doc.get("source") or {}).get("lang", "en") != "ko"
     if lang == "ko" and foreign:
         if not clause.get("text_ko"):
@@ -184,6 +194,8 @@ def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str
         n = clause.get("chars") or 0
     if n < GOOGLE_MIN_CHARS and cited_docs < GOOGLE_MIN_CITED_DOCS:
         return "short"
+    if bare:
+        return "bare"
     return ""
 
 

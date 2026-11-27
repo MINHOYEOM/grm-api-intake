@@ -329,7 +329,8 @@ class ThinPageMetaTest(unittest.TestCase):
                 n_ko += 1
                 self.assertIn("국문 참고 번역", ko, c["href"])
                 import html as _h
-                self.assertIn(c["ko_paras"][0], _h.unescape(ko), c["href"])
+                # 용어 툴팁이 본문 낱말을 <a class="ct-term"> 로 감싼다 — 보존하는 것은 태그를 벗긴 본문 텍스트다.
+                self.assertIn(c["ko_paras"][0], _h.unescape(re.sub(r"<[^>]+>", "", ko)), c["href"])
                 self.assertNotIn("국문 번역은 준비 중", ko, c["href"])
                 if len(c["text_ko"]) >= ct.GOOGLE_MIN_CHARS:
                     n_back += 1

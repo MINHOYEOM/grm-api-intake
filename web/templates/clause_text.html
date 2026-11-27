@@ -17,6 +17,16 @@
     {%- if clause.path %}<p class="ct-path" lang="{{ doc.source.lang }}">{{ clause.path | join(' › ') }}</p>{% endif %}
   </div>
   <div class="wrap ct-body">
+    <form class="ct-find" id="clause-find" role="search" aria-label="{{ _('조항 본문 찾기') }}" hidden>
+      <div class="ct-find-controls" data-find-controls hidden>
+        <label for="clause-query">{{ _('조항 본문 찾기') }}</label>
+        <input id="clause-query" name="query" type="search" autocomplete="off" />
+        <button type="button" data-find-prev disabled>{{ _('이전 일치') }}</button>
+        <button type="button" data-find-next disabled>{{ _('다음 일치') }}</button>
+        <output for="clause-query" aria-live="polite" aria-atomic="true"></output>
+      </div>
+      <p class="ct-note" data-find-unavailable hidden>{{ _('브라우저의 페이지 찾기를 사용하세요.') }}</p>
+    </form>
     {#- [구글 품질 2단계 2026-11-20] 국문 참고 번역(translations/clause_outbox → clause_translation.apply).
         국문 트리에서 번역이 있을 때만 원문 위에 둔다. 안내 문구는 원천별로 뷰가 정한다(ICH·EC 는 '승인 번역 아님'). -#}
     {%- if lang == 'ko' and clause.ko_paras %}
@@ -24,8 +34,8 @@
       <h2 class="ct-sec-h">{{ doc.source.ko_label }}</h2>
       {%- if clause.title_ko %}<p class="ct-sub">{{ clause.title_ko }}</p>{% endif %}
       <div class="ct-text" lang="ko">
-        {%- for p in clause.ko_paras %}
-        <p>{{ p }}</p>
+        {%- for p in ko_paragraphs %}
+        <p data-find-block>{{ p }}</p>
         {%- endfor %}
       </div>
       <p class="ct-note" style="margin-top:10px">{{ doc.source.ko_note }}</p>
@@ -34,8 +44,8 @@
     <section>
       <h2 class="ct-sec-h">{{ _('조항 원문') }}</h2>
       <div class="ct-text" lang="{{ doc.source.lang }}">
-        {%- for p in clause.paras %}
-        <p>{{ p }}</p>
+        {%- for p in source_paragraphs %}
+        <p data-find-block>{{ p }}</p>
         {%- endfor %}
       </div>
       {%- if lang == 'ko' and doc.source.lang != 'ko' and not clause.ko_paras %}
@@ -120,4 +130,8 @@
     {%- set _sub_end = none +%}
   </div>
 </main>
+{% endblock %}
+{% block scripts %}
+<script src="{{ asset_root }}assets/clause_tooltip.js?v={{ clause_asset_versions['clause_tooltip.js'] }}" defer></script>
+<script src="{{ asset_root }}assets/clause_find.js?v={{ clause_asset_versions['clause_find.js'] }}" defer></script>
 {% endblock %}

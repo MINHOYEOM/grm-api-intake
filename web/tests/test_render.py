@@ -29,6 +29,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from html.parser import HTMLParser
 
 from markupsafe import escape as _esc
 
@@ -19863,6 +19864,41 @@ def presence_diffs(out, pairs, main_only: bool = False) -> "list[str]":
     return out
 
 
+class ClauseHTML(HTMLParser):
+    def __init__(self, html):
+        super().__init__()
+        self.find_boxes = 0
+        self.scripts = []
+        self.paragraphs = []
+        self.current = None
+        self.term_lang = ""
+        self.terms = []
+        self.feed(html)
+
+    def handle_starttag(self, tag, attrs):
+        attr = dict(attrs)
+        if tag == "form" and attr.get("id") == "clause-find":
+            self.find_boxes += 1
+        if tag == "script" and attr.get("src"):
+            self.scripts.append(attr["src"].split("?", 1)[0])
+        if tag == "div" and attr.get("class") == "ct-text":
+            self.term_lang = attr["lang"]
+        if tag == "p" and "data-find-block" in attr:
+            self.current = []
+        if tag == "a" and "data-clause-definition" in attr:
+            self.terms.append((self.term_lang if self.current is not None else None,
+                               attr["href"], attr["data-clause-definition"]))
+
+    def handle_data(self, text):
+        if self.current is not None:
+            self.current.append(text)
+
+    def handle_endtag(self, tag):
+        if tag == "p" and self.current is not None:
+            self.paragraphs.append((self.term_lang, "".join(self.current)))
+            self.current = None
+
+
 class WebEnTreeTest(unittest.TestCase):
     """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
 
@@ -19940,6 +19976,58 @@ class WebEnTreeTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_all_clause_pages_include_find_and_matching_tooltips(self):
+        ct = render.clause_text_page
+        sources = ct.load_sources()
+        terms = render.load_glossary()
+        definitions = {lang: {t["id"]: (t.get(f"easy_{lang}") or "").strip() for t in terms}
+                       for lang in ("ko", "en")}
+        surfaces = {lang: render.build_doc_term_link_index(terms, lang) for lang in definitions}
+        counts = collections.Counter()
+        out = self.out
+        expected_routes = set()
+        for lang, tree in (("ko", out), ("en", out / "en")):
+            glossary_ids = {p.parent.name for p in (tree / "glossary").glob("*/index.html")}
+            selected_by_lang = {
+                lg: [(surface, tid) for surface, tid in pairs if definitions[lg][tid] and tid in glossary_ids]
+                for lg, pairs in surfaces.items()
+            }
+            for doc, clause in ct.pages(ct.build(ct.for_lang(sources, lang))):
+                path = tree / clause["href"] / "index.html"
+                expected_routes.add(path)
+                with self.subTest(lang=lang, clause=clause["href"]):
+                    html = self.pages[path.relative_to(out).as_posix()]
+                    parsed = ClauseHTML(html)
+                    self.assertEqual(parsed.find_boxes, 1)
+                    parent = path.parent.relative_to(out).as_posix()
+                    scripts = [posixpath.normpath(posixpath.join("/" + parent, src))
+                               for src in parsed.scripts]
+                    tooltip = "/assets/clause_tooltip.js"
+                    find = "/assets/clause_find.js"
+                    self.assertIn(tooltip, scripts)
+                    self.assertIn(find, scripts)
+                    self.assertLess(scripts.index(tooltip), scripts.index(find))
+                    if lang == "en":
+                        self.assertLess(scripts.index("/assets/i18n-en.js"), scripts.index(find))
+                    self.assertIn("Find in clause" if lang == "en" else "조항 본문 찾기", html)
+                    paragraphs = [("ko", p) for p in clause["ko_paras"]] if lang == "ko" else []
+                    paragraphs += [(doc["source"]["lang"], p) for p in clause["paras"]]
+                    self.assertEqual(parsed.paragraphs, paragraphs)
+                    used = collections.defaultdict(set)
+                    expected = []
+                    for body_lang, paragraph in paragraphs:
+                        selected = selected_by_lang.get(body_lang, [])
+                        for _, _, tid in render.term_link_spans(paragraph, selected, used[body_lang], body_lang):
+                            href = posixpath.relpath(f"glossary/{tid}/", clause["href"]) + "/"
+                            expected.append((body_lang, href, definitions[body_lang][tid]))
+                    self.assertEqual(parsed.terms, expected)
+                    counts[lang] += len(expected)
+        generated = set((out / "clauses").glob("*/*/*/index.html"))
+        generated.update((out / "en" / "clauses").glob("*/*/*/index.html"))
+        self.assertEqual(generated, expected_routes)
+        self.assertGreater(counts["ko"], 0)
+        self.assertGreater(counts["en"], 0)
 
     # ── 집합 ────────────────────────────────────────────────────────────────
     def test_emitted_en_paths_match_the_declared_set(self):

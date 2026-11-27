@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T01:52:50Z",
+ "generated_at": "2026-11-27T02:31:22Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45925075133,
-    "status": "queued",
+    "databaseId": 45928745069,
+    "status": "in_progress",
     "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-27T02:30:38Z",
+    "updatedAt": "2026-11-27T02:30:58Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #2029 from MINHOYEOM/claude/google-bare-doc-noindex",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45928745069"
+   },
+   {
+    "databaseId": 45928279319,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-27T02:25:51Z",
+    "updatedAt": "2026-11-27T02:30:54Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh live regulatory library (#2032)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45928279319"
+   },
+   {
+    "databaseId": 45925205459,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-27T01:54:14Z",
+    "updatedAt": "2026-11-27T02:02:11Z",
+    "headBranch": "claude/google-bare-doc-noindex",
+    "displayTitle": "feat(seo): 덧붙임 0인 영문 문서 구글 전용 noindex (실측 3장) + 가드",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925205459"
+   },
+   {
+    "databaseId": 45925202383,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-27T01:54:12Z",
+    "updatedAt": "2026-11-27T02:02:35Z",
+    "headBranch": "claude/google-bare-doc-noindex",
+    "displayTitle": "test: 영문 문서 meta 시험이 규칙 F(덧붙임 0) noindex 를 인정 — 블록 마커 부재를 함께 단언",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925202383"
+   },
+   {
+    "databaseId": 45925075133,
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-27T01:52:48Z",
-    "updatedAt": "2026-11-27T01:52:48Z",
+    "updatedAt": "2026-11-27T02:01:14Z",
     "headBranch": "automation/library-auto-45924654494",
     "displayTitle": "chore: refresh live regulatory library",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925075133"
-   },
-   {
-    "databaseId": 45924924744,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-27T01:51:10Z",
-    "updatedAt": "2026-11-27T01:51:13Z",
-    "headBranch": "automation/glossary-cases-auto-45923972461",
-    "displayTitle": "chore: refresh glossary case counts",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45924924744"
-   },
-   {
-    "databaseId": 45924505121,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-27T01:46:43Z",
-    "updatedAt": "2026-11-27T01:46:47Z",
-    "headBranch": "claude/google-bare-doc-noindex",
-    "displayTitle": "test: 영문 문서 meta 시험이 규칙 F(덧붙임 0) noindex 를 인정 — 블록 마커 부재를 함께 단언",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45924505121"
-   },
-   {
-    "databaseId": 45924282776,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T01:44:23Z",
-    "updatedAt": "2026-11-27T01:52:21Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #2028 from MINHOYEOM/claude/google-bare-clause-noi…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45924282776"
-   },
-   {
-    "databaseId": 45921116912,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-27T01:11:18Z",
-    "updatedAt": "2026-11-27T01:19:11Z",
-    "headBranch": "claude/google-bare-clause-noindex",
-    "displayTitle": "feat(seo): 원문뿐인 조항 886장 구글 전용 noindex (구글 유입 진단 1순위)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45921116912"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45928778350,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-27T02:30:56Z",
+    "updatedAt": "2026-11-27T02:31:12Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45928778350"
+   },
+   {
     "databaseId": 45925039792,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45816610528"
-   },
-   {
-    "databaseId": 45786424020,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T08:49:25Z",
-    "updatedAt": "2026-11-26T08:49:37Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45786424020"
    }
   ],
   "grm-findings-translate-apply.yml": [

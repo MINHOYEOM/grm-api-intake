@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [영문 구독 2026-11-27] 영문 트리는 첫 화면 줄형 칸이 구독 칸이다 — 하단 밴드를 끈다(base.html). 한국어는 종전 그대로. -#}
+{% set sub_inline_on = sub_inline_lists %}
 {#- [구글 품질 1단계 2026-11-19] 구글에서만 뺄 조항(국문 미번역 D·짧은 원문 E)은 구글봇만 noindex — 판정은 clause_text_page.google_noindex_reason, sitemap.xml 도 같은 판정으로 뺀다. -#}
 {% block meta_robots %}{% if google_noindex %}<meta name="googlebot" content="noindex, follow" />
 {% endif %}{% endblock %}
@@ -15,6 +17,8 @@
     <h1 class="ct-h1">{{ clause.code }}</h1>
     {%- if clause.title %}<p class="ct-sub" lang="{{ doc.source.lang }}">{{ clause.title }}</p>{% endif %}
     {%- if clause.path %}<p class="ct-path" lang="{{ doc.source.lang }}">{{ clause.path | join(' › ') }}</p>{% endif %}
+    {#- [영문 구독 2026-11-27] 영문 독자는 검색으로 이 면에 곧장 들어온다 — 첫 화면에 줄형 구독 칸(영문 트리만). -#}
+    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top', sub_anchor=True %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
   </div>
   <div class="wrap ct-body">
     {#- [구글 품질 2단계 2026-11-20] 국문 참고 번역(translations/clause_outbox → clause_translation.apply).

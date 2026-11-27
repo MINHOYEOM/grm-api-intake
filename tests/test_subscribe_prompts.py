@@ -140,6 +140,37 @@ class SubscribeBuiltSiteTest(unittest.TestCase):
             self.assertEqual(html.count('data-sub-zone="home-band"'), 1, rel)
             self.assertNotIn('<section class="subscribe"', html, rel)
 
+
+    # [영문 구독 2026-11-27] 영문 독자는 지적사항 상세·업체·조항·용어 면으로 검색해 곧장 들어온다.
+    # 맨 아래 띠까지 내려가지 않으므로 이 면들은 첫 화면에 줄형 칸을 가져야 한다. 새 영문 면을
+    # 만들면서 칸을 빼먹으면(= 6주간 구독 1명이던 상태로 돌아가면) 여기서 걸린다.
+    EN_LANDING_PREFIXES = ("en/findings/doc/", "en/findings/firm/", "en/findings/clause/", "en/clauses/", "en/glossary/")
+
+    def test_english_landing_pages_open_with_an_inline_card(self):
+        checked = {}
+        for rel, html in self._pages():
+            pref = next((p for p in self.EN_LANDING_PREFIXES if rel.startswith(p)), None)
+            if not pref or rel == pref + "index.html":
+                continue
+            checked[pref] = checked.get(pref, 0) + 1
+            self.assertEqual(html.count('<aside class="grm-inl'), 1, f"{rel}: 영문 첫 화면 구독 칸이 없다")
+            self.assertEqual(html.count('data-sub-slot="top"'), 1, rel)
+            card = html[html.index('<aside class="grm-inl'):]
+            card = card[:card.index("</aside>")]
+            self.assertIsNone(re.search(r"[가-힣]", card), f"{rel}: 영문 칸에 한글이 섞였다")
+            self.assertIn("https://en.example.com/subscribe", card, f"{rel}: 영문 리스트 폼이 아니다")
+            # 첫 화면: 칸이 본문 뒤쪽이 아니라 앞쪽(제목 바로 아래)에 서야 한다.
+            self.assertLess(html.index('<aside class="grm-inl'), len(html) * 0.5, f"{rel}: 칸이 첫 화면이 아니다")
+        self.assertGreaterEqual(len(checked), 2, f"시험 빌드에 영문 상세 면이 거의 없다: {checked}")
+
+    def test_english_card_advertises_assets_without_stale_numbers(self):
+        html = (self.out / "en/findings/index.html").read_text(encoding="utf-8")
+        card = html[html.index('<aside class="grm-inl'):]
+        card = card[:card.index("</aside>")]
+        for word in ("company history", "section text", "glossary diagrams", "Korean and English"):
+            self.assertIn(word, card)
+        self.assertIsNone(re.search(r"\d{2,}\s*(findings|documents|firms|companies)", card), "곧 낡는 숫자")
+
     def test_korean_pages_have_no_english_kicker_or_other_agency_lists(self):
         for rel, html in self._pages():
             if rel.startswith("en/"):

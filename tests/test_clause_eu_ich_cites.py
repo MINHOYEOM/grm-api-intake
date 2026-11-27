@@ -81,3 +81,70 @@ class CitingWiringTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class KeyTermsAndTopicTest(unittest.TestCase):
+    """[조항 덧붙임 2026-11-27] 핵심 용어(3개 미만이면 비움) · 같은 주제 지적(고정 표만) · 같은 판정 함수."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json
+        cls.view = ctp.build(ctp.load_sources())
+        gp = pathlib.Path(__file__).resolve().parent.parent / "web" / "data" / "glossary.json"
+        cls.gloss = json.loads(gp.read_text(encoding="utf-8"))
+
+    def test_min_terms_rule(self):
+        out = ctp.key_terms_by_href(self.view, self.gloss, "en")
+        self.assertTrue(out)
+        for href, rows in out.items():
+            self.assertGreaterEqual(len(rows), ctp.KEY_TERMS_MIN, href)
+            self.assertLessEqual(len(rows), ctp.KEY_TERMS_MAX, href)
+            for r in rows:
+                self.assertTrue(r["gist"], (href, r["id"]))
+
+    def test_common_terms_not_counted(self):
+        out = ctp.key_terms_by_href(self.view, self.gloss, "en")
+        ids = {r["id"] for rows in out.values() for r in rows}
+        self.assertNotIn("quality", {i.lower() for i in ids})
+
+    def test_term_ids_filter(self):
+        out = ctp.key_terms_by_href(self.view, self.gloss, "en", term_ids={"nonexistent"})
+        self.assertEqual(out, {})
+
+    def test_topic_table_is_fixed_and_unmapped_is_empty(self):
+        self.assertEqual(ctp.topic_labels("eu_gmp", "ch8", "8.5"), ["불만/회수"])
+        self.assertEqual(ctp.topic_labels("eu_gmp", "annex1", "9.3"), ["환경모니터링"])
+        self.assertEqual(ctp.topic_labels("eu_gmp", "annex1", "1"), [])        # 범위 — 비움
+        self.assertEqual(ctp.topic_labels("eu_gmp", "ch9", "9.1"), [])         # 표에 없음
+        self.assertEqual(ctp.topic_labels("ich", "q9", "4.1"), [])
+        self.assertEqual(ctp.topic_labels("mfds_gmp", "rule", "제4조"), [])
+
+    def test_topic_cases_deterministic_distinct_firms(self):
+        docs = [{"document_id": f"d{i}", "slug": f"d{i}", "agency": "X", "firm_name": f"F{i}",
+                 "published_date": "2026-01-0%d" % (i % 9 + 1),
+                 "findings": [{"finding_id": f"f{i}", "category_label_ko": "불만/회수", "text_orig": f"Complaint {i}."}]}
+                for i in range(10)]
+        a = ctp.topic_cases_by_href(docs, self.view, lambda f: f["text_orig"])
+        b = ctp.topic_cases_by_href(docs, self.view, lambda f: f["text_orig"])
+        self.assertEqual(a, b)
+        href = ctp._find(self.view, "eu_gmp", "ch8", "8.5")["href"]
+        self.assertEqual(len(a[href]), ctp.TOPIC_CASES_N)
+        self.assertEqual(len({r["firm_name"] for r in a[href]}), ctp.TOPIC_CASES_N)
+        self.assertNotIn(ctp._find(self.view, "eu_gmp", "ch9", "9.1")["href"], a)
+
+    def test_topic_cases_need_n(self):
+        docs = [{"document_id": "d", "slug": "d", "firm_name": "F", "findings": [
+            {"finding_id": "f", "category_label_ko": "불만/회수", "text_orig": "x"}]}]
+        self.assertEqual(ctp.topic_cases_by_href(docs, self.view, lambda f: f["text_orig"]), {})
+
+    def test_blocks_lift_bare_via_same_function(self):
+        self.assertTrue(ctp.has_grm_addition(0, None, "", [{"id": "a"}], None))
+        self.assertTrue(ctp.has_grm_addition(0, None, "", None, [{"b": 1}]))
+        self.assertFalse(ctp.has_grm_addition(0, None, "", None, None))
+        self.assertFalse(ctp.has_grm_addition(0, None, ""))                    # 종전 호출 불변
+        d = self.view["index"][("eu_gmp", "ch8")]
+        c = ctp._find(self.view, "eu_gmp", "ch8", "8.5")
+        long_c = dict(c, chars=999)
+        self.assertEqual(ctp.google_noindex_reason(d, long_c, "en", 0, bare=True), "bare")
+        self.assertEqual(ctp.google_noindex_reason(
+            d, long_c, "en", 0, bare=not ctp.has_grm_addition(0, None, "", None, [1])), "")

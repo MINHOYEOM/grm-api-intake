@@ -77,7 +77,7 @@
     <section>
       <h2 class="ct-sec-h">{{ _('이 주제의 실제 지적') }}</h2>
       <p class="ct-note" style="margin-bottom:12px">{{ _('이 조항을 직접 인용한 지적이 아니라, 같은 주제로 분류된 공개 지적 사례입니다.') }}</p>
-      <div class="ct-cites">
+      <div class="ct-cites ct-topic">
         {%- for s in topic_cases %}
         <article class="ct-cite">
           <p class="ct-cite-m"><span>{{ agency_labels.get(s.agency, s.agency) }}</span><span>{{ s.firm_name }}</span><span>{{ s.published_date }}</span></p>

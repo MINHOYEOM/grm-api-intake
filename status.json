@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T01:52:31Z",
+ "generated_at": "2026-11-27T01:52:50Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45925075133,
+    "status": "queued",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-27T01:52:48Z",
+    "updatedAt": "2026-11-27T01:52:48Z",
+    "headBranch": "automation/library-auto-45924654494",
+    "displayTitle": "chore: refresh live regulatory library",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925075133"
+   },
+   {
     "databaseId": 45924924744,
     "status": "in_progress",
     "conclusion": "",
@@ -271,27 +282,16 @@
     "headBranch": "claude/google-bare-clause-noindex",
     "displayTitle": "feat(seo): 원문뿐인 조항 886장 구글 전용 noindex (구글 유입 진단 1순위)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45921116912"
-   },
-   {
-    "databaseId": 45921113612,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T01:11:16Z",
-    "updatedAt": "2026-11-27T01:19:37Z",
-    "headBranch": "claude/google-bare-clause-noindex",
-    "displayTitle": "test(golden): sitemap 골든 재동결 — 원문뿐 조항 884행 제외",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45921113612"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 45925039405,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-27T01:52:25Z",
-    "updatedAt": "2026-11-27T01:52:29Z",
+    "updatedAt": "2026-11-27T01:52:36Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925039405"
@@ -401,11 +401,11 @@
   "grm-newsletter-send.yml": [
    {
     "databaseId": 45925039792,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-27T01:52:25Z",
-    "updatedAt": "2026-11-27T01:52:29Z",
+    "updatedAt": "2026-11-27T01:52:39Z",
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925039792"

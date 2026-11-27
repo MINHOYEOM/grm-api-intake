@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T05:47:59Z",
+ "generated_at": "2026-11-27T05:57:03Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -230,11 +230,11 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 45947889941,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-27T05:47:30Z",
-    "updatedAt": "2026-11-27T05:47:42Z",
+    "updatedAt": "2026-11-27T05:56:37Z",
     "headBranch": "main",
     "displayTitle": "Merge pull request #2034 from MINHOYEOM/claude/clause-terms-topic-cases",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45947889941"
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45948771490,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-27T05:56:41Z",
+    "updatedAt": "2026-11-27T05:56:53Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45948771490"
+   },
+   {
     "databaseId": 45947901480,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45928778350"
-   },
-   {
-    "databaseId": 45925039792,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-27T01:52:25Z",
-    "updatedAt": "2026-11-27T01:52:39Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925039792"
    }
   ],
   "grm-findings-translate-apply.yml": [

@@ -1126,6 +1126,22 @@
       "doc_type": "guidance-industry",
       "published_date": "2026-11-18",
       "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15996"
+    },
+    {
+      "id": "data0011-16011",
+      "title_en": "한약(생약)제제 벤조피렌 안전성 평가 및 자료작성 방법",
+      "title_ko": "한약(생약)제제 벤조피렌 안전성 평가 및 자료작성 방법",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-11-27",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16011"
+    },
+    {
+      "id": "data0011-16009",
+      "title_en": "합성펩타이드 의약품의 임상시험 시 비임상시험 가이드라인",
+      "title_ko": "합성펩타이드 의약품의 임상시험 시 비임상시험 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-11-27",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16009"
     }
   ]
 }

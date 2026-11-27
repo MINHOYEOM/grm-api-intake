@@ -1,26 +1,26 @@
 {
   "schema_version": "grm-library-staging-diff/v1",
-  "generated_on": "2026-11-19",
+  "generated_on": "2026-11-27",
   "live_catalog_swapped": true,
   "sources": {
     "mfds": {
-      "baseline_count": 135,
-      "candidate_count": 137,
+      "baseline_count": 137,
+      "candidate_count": 139,
       "new_count": 2,
       "changed_count": 0,
       "removed_count": 0,
       "new_ids": [
-        "data0011-15996",
-        "data0011-15997"
+        "data0011-16009",
+        "data0011-16011"
       ],
       "changed_ids": [],
       "removed_ids": [],
-      "collector_items": 50,
-      "derived_items": 32,
-      "dropped_items": 18,
+      "collector_items": 44,
+      "derived_items": 28,
+      "dropped_items": 16,
       "collector_error": null,
       "change_count": 2,
-      "change_percent": 1.48
+      "change_percent": 1.46
     },
     "ich": {
       "baseline_count": 31,
@@ -49,22 +49,6 @@
       "removed_ids": [],
       "collector_items": 63,
       "derived_items": 63,
-      "dropped_items": 0,
-      "collector_error": null,
-      "change_count": 0,
-      "change_percent": 0.0
-    },
-    "ema": {
-      "baseline_count": 33,
-      "candidate_count": 33,
-      "new_count": 0,
-      "changed_count": 0,
-      "removed_count": 0,
-      "new_ids": [],
-      "changed_ids": [],
-      "removed_ids": [],
-      "collector_items": 28,
-      "derived_items": 28,
       "dropped_items": 0,
       "collector_error": null,
       "change_count": 0,
@@ -183,8 +167,12 @@
       "change_percent": 0.0
     }
   },
-  "collector_errors": {},
-  "skipped_sources": {},
+  "collector_errors": {
+    "ema": "EMA 절차 문서 0건(<10) — 페이지 구조 변경 의심(https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-manufacturing-practice/compilation-union-procedures-inspections-exchange-information)"
+  },
+  "skipped_sources": {
+    "ema": "EMA 절차 문서 0건(<10) — 페이지 구조 변경 의심(https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-manufacturing-practice/compilation-union-procedures-inspections-exchange-information)"
+  },
   "gate": {
     "max_change_count": 20,
     "max_change_percent": 30.0,

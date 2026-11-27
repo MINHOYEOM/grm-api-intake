@@ -230,6 +230,32 @@ def headline_sections(text: str) -> set[str]:
     return set(_SEC_NUM.findall(t[i:j]))
 
 
+# ── [조항 인용 연결 2026-11-27] EU GMP·ICH 조항 표기 → (원천, 문서, 조항 번호) ─────────────────────────
+# 정밀도가 우선이다. 지적 본문이 **문서 이름과 조항 번호를 함께** 적은 표기만 잇는다 — "Annex 1 에 부적합"
+# 처럼 문서만 말한 것은 어느 조항인지 알 수 없어 잇지 않는다(11-27 실측: EU·ICH 언급 대부분이 문서 단위).
+# 번호는 소수점이 있는 `N.M` 꼴만, 그 번호가 실제 조항으로 존재할 때만(citing_findings 의 _find) 센다.
+_NUM = r"(\d{1,2}\.\d{1,3})(?!\d|\.\d)"
+# 문서 이름과 번호 사이는 쉼표·콜론·§·"paragraph/point/section/clause" 중 하나가 있어야 한다(맨 공백만이면 "Annex 1 5.2 mg" 같은 오독).
+_LEAD = r"(?:\s*[,:]\s*(?:paragraphs?|points?|sections?|clauses?|§)?\s*|\s*§\s*|\s+(?:paragraphs?|points?|sections?|clauses?)\s+)"
+_EU_CH_REF = re.compile(r"\b(?:EU\s+GMP\s+(?:Part\s+I,?\s+)?|EudraLex\s+Vol(?:ume)?\.?\s*4,?\s+(?:Part\s+I,?\s+)?)Chapter\s+([1-9])\b" + _LEAD + _NUM, re.I)
+_EU_AN1_REF = re.compile(r"\bAnnex\s*(?:1|I)\b(?:\s+of\s+(?:the\s+)?(?:EU\s+)?GMP(?:\s+Guidelines?)?)?" + _LEAD + _NUM, re.I)
+_ICH_REF = re.compile(r"\bICH\s*Q\s*(7|10)\b" + _LEAD + _NUM, re.I)
+
+
+def eu_ich_clause_refs(text: str) -> "list[tuple[str, str, str]]":
+    """지적 원문 → [(원천, 문서 키, 조항 번호)]. 문서+번호가 함께 적힌 표기만; 애매하면 빈 목록."""
+    out: list[tuple[str, str, str]] = []
+    t = text or ""
+    for m in _EU_CH_REF.finditer(t):
+        if m.group(2).split(".")[0] == m.group(1):  # "Chapter 5 … 3.2" 처럼 장과 번호가 어긋나면 버린다
+            out.append(("eu_gmp", f"ch{m.group(1)}", m.group(2)))
+    for m in _EU_AN1_REF.finditer(t):
+        out.append(("eu_gmp", "annex1", m.group(1)))
+    for m in _ICH_REF.finditer(t):
+        out.append(("ich", f"q{m.group(1)}", m.group(2)))
+    return sorted(set(out))
+
+
 def citing_findings(docs: "list[dict[str, Any]] | None", view: dict[str, Any], body,
                     *, doc_ok=None, max_samples: int = CITE_SAMPLES) -> dict[str, dict[str, Any]]:
     """조항 페이지 주소 → {"documents", "findings", "samples"}. 순수 함수(입력은 커밋 정본뿐).
@@ -254,13 +280,15 @@ def citing_findings(docs: "list[dict[str, Any]] | None", view: dict[str, Any], b
                 sec = f"{m.group(1)}.{m.group(2)}"
                 if sec in head:
                     secs.add((m.group(1), sec))
-            if not secs:
+            targets = [("cfr21", part, sec) for part, sec in sorted(secs)]
+            targets += eu_ich_clause_refs(f.get("text_orig") or "")
+            if not targets:
                 continue
             text = (body(f) or "").strip()
             if not text:
                 continue
-            for part, sec in sorted(secs):
-                c = _find(view, "cfr21", part, sec)
+            for src, part, sec in targets:
+                c = _find(view, src, part, sec)
                 if not c or not c.get("href"):
                     continue
                 rows.setdefault(c["href"], []).append({

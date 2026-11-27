@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T02:38:51Z",
+ "generated_at": "2026-11-27T04:08:08Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 45937276767,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-27T03:59:19Z",
+    "updatedAt": "2026-11-27T04:07:39Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #2031 from MINHOYEOM/automation/glossary-cases-aut…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45937276767"
+   },
+   {
     "databaseId": 45928745069,
     "status": "completed",
     "conclusion": "success",
@@ -271,17 +282,6 @@
     "headBranch": "claude/google-bare-doc-noindex",
     "displayTitle": "test: 영문 문서 meta 시험이 규칙 F(덧붙임 0) noindex 를 인정 — 블록 마커 부재를 함께 단언",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925202383"
-   },
-   {
-    "databaseId": 45925075133,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-27T01:52:48Z",
-    "updatedAt": "2026-11-27T02:01:14Z",
-    "headBranch": "automation/library-auto-45924654494",
-    "displayTitle": "chore: refresh live regulatory library",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925075133"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45938101405,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-27T04:07:42Z",
+    "updatedAt": "2026-11-27T04:07:57Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45938101405"
+   },
+   {
     "databaseId": 45929512364,
     "status": "completed",
     "conclusion": "success",
@@ -442,20 +453,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45902239867"
-   },
-   {
-    "databaseId": 45822275689,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T12:43:11Z",
-    "updatedAt": "2026-11-26T12:43:28Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45822275689"
    }
   ],
   "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 45934907058,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-27T03:33:58Z",
+    "updatedAt": "2026-11-27T03:34:30Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #2027 from MINHOYEOM/claude/findings-translate-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45934907058"
+   },
    {
     "databaseId": 45843344134,
     "status": "completed",
@@ -499,17 +510,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1996 from MINHOYEOM/chore/findings-translate-483-…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45788934527"
-   },
-   {
-    "databaseId": 45771211867,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T06:52:20Z",
-    "updatedAt": "2026-11-26T07:00:16Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1992 from MINHOYEOM/chore/findings-translate-wl-b…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45771211867"
    }
   ],
   "grm-findings-backfill-fetch.yml": [

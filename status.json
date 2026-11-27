@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T04:08:08Z",
+ "generated_at": "2026-11-27T05:21:37Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45937276767,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T03:59:19Z",
-    "updatedAt": "2026-11-27T04:07:39Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #2031 from MINHOYEOM/automation/glossary-cases-aut…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45937276767"
+    "databaseId": 45944544552,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-27T05:13:48Z",
+    "updatedAt": "2026-11-27T05:13:52Z",
+    "headBranch": "claude/en-subscribe-conversion-051bdd",
+    "displayTitle": "feat(en): 영문 지적사항 상세·업체·조항 면 구독 칸 + 문구 개선 + 시험",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45944544552"
    },
    {
-    "databaseId": 45928745069,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 45944518739,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-27T02:30:38Z",
-    "updatedAt": "2026-11-27T02:38:20Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #2029 from MINHOYEOM/claude/google-bare-doc-noindex",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45928745069"
+    "createdAt": "2026-11-27T05:13:33Z",
+    "updatedAt": "2026-11-27T05:13:36Z",
+    "headBranch": "claude/en-subscribe-conversion-051bdd",
+    "displayTitle": "feat(en): 영문 지적사항 상세·업체·조항 면 첫 화면에 구독 칸 + 문구 개선, 영문 상세 면 구독 칸 시험",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45944518739"
    },
    {
-    "databaseId": 45928279319,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-27T02:25:51Z",
-    "updatedAt": "2026-11-27T02:30:54Z",
-    "headBranch": "main",
-    "displayTitle": "chore: refresh live regulatory library (#2032)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45928279319"
-   },
-   {
-    "databaseId": 45925205459,
+    "databaseId": 45944047969,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-27T01:54:14Z",
-    "updatedAt": "2026-11-27T02:02:11Z",
-    "headBranch": "claude/google-bare-doc-noindex",
-    "displayTitle": "feat(seo): 덧붙임 0인 영문 문서 구글 전용 noindex (실측 3장) + 가드",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925205459"
+    "createdAt": "2026-11-27T05:09:03Z",
+    "updatedAt": "2026-11-27T05:18:15Z",
+    "headBranch": "claude/clause-terms-topic-cases",
+    "displayTitle": "feat(seo): 조항 페이지 GRM 덧붙임(핵심 용어·같은 주제 지적) — noindex 657장 해제 (+#2030 포함)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45944047969"
    },
    {
-    "databaseId": 45925202383,
+    "databaseId": 45944044451,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-27T01:54:12Z",
-    "updatedAt": "2026-11-27T02:02:35Z",
-    "headBranch": "claude/google-bare-doc-noindex",
-    "displayTitle": "test: 영문 문서 meta 시험이 규칙 F(덧붙임 0) noindex 를 인정 — 블록 마커 부재를 함께 단언",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925202383"
+    "createdAt": "2026-11-27T05:09:01Z",
+    "updatedAt": "2026-11-27T05:17:07Z",
+    "headBranch": "claude/clause-terms-topic-cases",
+    "displayTitle": "fix(i18n): en.json 키 정렬 복원 (test_catalog_file_is_sorted_for_stable_di…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45944044451"
+   },
+   {
+    "databaseId": 45939145726,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-27T04:18:12Z",
+    "updatedAt": "2026-11-27T04:26:09Z",
+    "headBranch": "claude/clause-terms-topic-cases",
+    "displayTitle": "feat(seo): 조항 페이지 GRM 덧붙임(핵심 용어·같은 주제 지적) — noindex 657장 해제 (+#2030 포함)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45939145726"
    }
   ],
   "grm-scaffold-mirror.yml": [

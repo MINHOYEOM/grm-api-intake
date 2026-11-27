@@ -209,6 +209,11 @@ class ThinPageMetaTest(unittest.TestCase):
                 continue
             html = p.read_text(encoding="utf-8")
             want = render.google_noindex_doc_page(d, lang, ratios)
+            if (lang == "en" and not want and GOOGLEBOT in html):
+                # [구글 유입 2026-11-27 규칙 F] 얇음·중복이 아닌데 빠진 영문 문서는 GRM 덧붙임 0 이어야 한다.
+                for marker in ('id="similar"', 'id="clauses"', 'id="standards"'):
+                    self.assertNotIn(marker, html, f"{lang} {d['slug']} {marker}")
+                want = True
             self.assertEqual(GOOGLEBOT in html, want, f"{lang} {d['slug']}")
             self.assertIsNone(ROBOTS_NOINDEX.search(html), d["slug"])
             if render.is_thin_doc_page(d, lang):

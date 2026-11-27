@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T05:21:37Z",
+ "generated_at": "2026-11-27T05:47:59Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 45944544552,
+    "databaseId": 45947889941,
     "status": "in_progress",
     "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-27T05:47:30Z",
+    "updatedAt": "2026-11-27T05:47:42Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #2034 from MINHOYEOM/claude/clause-terms-topic-cases",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45947889941"
+   },
+   {
+    "databaseId": 45947884064,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-27T05:47:26Z",
+    "updatedAt": "2026-11-27T05:47:33Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh recent regulatory news (#2036)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45947884064"
+   },
+   {
+    "databaseId": 45945493094,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-27T05:23:14Z",
+    "updatedAt": "2026-11-27T05:30:51Z",
+    "headBranch": "automation/news-auto-45945433064",
+    "displayTitle": "chore: refresh recent regulatory news",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45945493094"
+   },
+   {
+    "databaseId": 45944544552,
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-27T05:13:48Z",
-    "updatedAt": "2026-11-27T05:13:52Z",
+    "updatedAt": "2026-11-27T05:22:02Z",
     "headBranch": "claude/en-subscribe-conversion-051bdd",
     "displayTitle": "feat(en): 영문 지적사항 상세·업체·조항 면 구독 칸 + 문구 개선 + 시험",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45944544552"
    },
    {
     "databaseId": 45944518739,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-27T05:13:33Z",
-    "updatedAt": "2026-11-27T05:13:36Z",
+    "updatedAt": "2026-11-27T05:22:11Z",
     "headBranch": "claude/en-subscribe-conversion-051bdd",
     "displayTitle": "feat(en): 영문 지적사항 상세·업체·조항 면 첫 화면에 구독 칸 + 문구 개선, 영문 상세 면 구독 칸 시험",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45944518739"
-   },
-   {
-    "databaseId": 45944047969,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-27T05:09:03Z",
-    "updatedAt": "2026-11-27T05:18:15Z",
-    "headBranch": "claude/clause-terms-topic-cases",
-    "displayTitle": "feat(seo): 조항 페이지 GRM 덧붙임(핵심 용어·같은 주제 지적) — noindex 657장 해제 (+#2030 포함)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45944047969"
-   },
-   {
-    "databaseId": 45944044451,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T05:09:01Z",
-    "updatedAt": "2026-11-27T05:17:07Z",
-    "headBranch": "claude/clause-terms-topic-cases",
-    "displayTitle": "fix(i18n): en.json 키 정렬 복원 (test_catalog_file_is_sorted_for_stable_di…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45944044451"
-   },
-   {
-    "databaseId": 45939145726,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-27T04:18:12Z",
-    "updatedAt": "2026-11-27T04:26:09Z",
-    "headBranch": "claude/clause-terms-topic-cases",
-    "displayTitle": "feat(seo): 조항 페이지 GRM 덧붙임(핵심 용어·같은 주제 지적) — noindex 657장 해제 (+#2030 포함)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45939145726"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 45947901480,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-27T05:47:37Z",
+    "updatedAt": "2026-11-27T05:47:50Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45947901480"
+   },
+   {
     "databaseId": 45938101405,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45925039792"
-   },
-   {
-    "databaseId": 45902239867,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-26T22:03:15Z",
-    "updatedAt": "2026-11-26T22:03:27Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45902239867"
    }
   ],
   "grm-findings-translate-apply.yml": [

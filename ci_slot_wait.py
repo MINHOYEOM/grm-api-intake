@@ -69,6 +69,25 @@ def wait_for_slot(args, *, read_runs, now, sleep, monotonic, excluded_branch=Non
             return 1
 
 
+# 편집팀 push(claude/company-*)는 PR CI 를 띄우지 않으므로 자리를 기다리지 않는다.
+# 기다리다 120초를 넘겨 백그라운드로 가면 세션이 끝나며 push 가 사라진다(11-28 리허설 불합격).
+NO_SLOT_BRANCH_PREFIXES = ("claude/company-",)
+
+
+def _skip_slot_wait(branch: str | None) -> bool:
+    return bool(branch) and branch.startswith(NO_SLOT_BRANCH_PREFIXES)
+
+
+def _detect_branch(current_branch) -> str | None:
+    try:
+        if current_branch is not None:
+            return current_branch()
+        return subprocess.check_output(("git", "branch", "--show-current"), encoding="utf-8",
+                                       stderr=subprocess.DEVNULL).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
 def main(
     argv=None, *, read_runs=None, now=None, sleep=time.sleep,
     monotonic=time.monotonic, current_branch=None,
@@ -91,6 +110,10 @@ def main(
     args = parser.parse_args(argv)
     if args.max_wait_min < 0:
         parser.error("--max-wait-min은 0 이상이어야 합니다.")
+
+    if not args.dry_run and _skip_slot_wait(_detect_branch(current_branch)):
+        print("claude/company-* 브랜치는 PR CI 를 띄우지 않으므로 CI 자리를 기다리지 않습니다 · push 가능")
+        return 0
 
     try:
         excluded_branch = None

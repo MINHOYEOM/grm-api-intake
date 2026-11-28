@@ -2968,6 +2968,11 @@ _WL_SECTION_TOKEN_RE = re.compile(r"\d{3}[A-Za-z]?(?:\([0-9A-Za-z]{1,6}\))*")
 _WL_PHS_ACT_RE = re.compile(r"\s*of the (?:Public Health Service Act|PHS Act)\b")
 _WL_BODY_HEAD_TRUNCATED_RE = re.compile(r"^\s*(?:Specifically,|\d{1,2}\s+As described|Conclusion\b)")
 
+
+def wl_body_head_truncated(text: str) -> bool:
+    """저장 본문이 위반 문장 뒤의 문단이나 각주에서 시작하는 알려진 형태인가."""
+    return bool(_WL_BODY_HEAD_TRUNCATED_RE.match(" ".join(text.split())))
+
 # 빈 목록 사유(`wl_violations_status`) — 닫힌 목록.
 WL_VIOLATIONS_STATUS_OUT_OF_SCOPE = "out_of_scope"            # 관련도 Unrelated·담배센터 — F2~F4 미적용
 WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED = "body_head_truncated"  # 저장 본문이 'Specifically,'·각주로 시작
@@ -3275,7 +3280,7 @@ def extract_wl_violations_detail(
             rows = _extract_wl_f5(findings, dscsa_offset=True)
             if rows:
                 return rows, "F5"
-    if _WL_BODY_HEAD_TRUNCATED_RE.match(t):
+    if wl_body_head_truncated(t):
         return [], WL_VIOLATIONS_STATUS_BODY_HEAD_TRUNCATED
     scope_reason = _wl_violations_scope_reason(t, issuing_office=issuing_office)
     if scope_reason:

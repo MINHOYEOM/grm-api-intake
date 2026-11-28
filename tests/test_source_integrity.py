@@ -10,9 +10,13 @@
 
 from __future__ import annotations
 
+import json
 import os
 import sys
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -241,6 +245,45 @@ class VerifyPublishedSourcesTest(unittest.TestCase):
         # fda483-193663: 원문 5건·전부 scope ok 인데 카드는 0 → 진짜 발행 격차.
         row = {"shown": 0, "found": 5, "db_total": 5, "db_ok": 5}
         self.assertEqual(vps.classify(row), "publish-gap")
+
+    def test_wl_audit_counts_visible_rows_even_when_metadata_and_source_disagree(self):
+        card = {"id": "wl-1", "card_type": "Warning Letter", "deterministic_detail": {
+            "type": "wl_violations", "count": 2,
+            "violations": [{"number": "1", "statement": "The quality unit did not review the records."},
+                           {"number": "2", "statement": ""}],
+        }}
+        scope = {"wl-1": {"total": 2, "ok": 2, "non_pharma": 0, "fragment": 0}}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "brief_web_2026_11_23.json"
+            path.write_text(json.dumps({"cards": [card]}), encoding="utf-8")
+            with patch.object(vps, "BRIEF_GLOB", str(path)), patch.object(vps, "DELTA_GLOB", str(path.parent / "delta_*.json")), \
+                    patch.object(vps, "_db_scope_counts", return_value=scope), \
+                    patch.object(vps, "_found_wl", return_value=(0, "fetch-fail:Timeout")), \
+                    patch.object(vps, "REQUEST_DELAY", 0):
+                rows, gaps = vps.verify(1)
+        self.assertEqual(rows[0]["shown"], 1)
+        self.assertEqual([r["verdict"] for r in gaps], ["publish-gap"])
+        self.assertIn("| 1 | 2/2 | ? | fetch-fail:Timeout |", vps.format_report(gaps, rows))
+
+    def test_published_out_of_scope_card_is_a_leak_when_ocr_cannot_read(self):
+        row = {"kind": "483", "published": True, "oos_483": True,
+               "shown": 1, "found": 0, "db_total": 1, "db_ok": 0}
+        self.assertEqual(vps.classify(row), "scope-card-leak")
+        self.assertEqual(vps.classify({**row, "oos_483": False}), "findings-hidden")
+
+    def test_audit_uses_published_inspection_rows_including_expandable_rows(self):
+        items = [{"orig": "The quality unit did not review the records."} for _ in range(6)]
+        card = {
+            "id": "wl-1", "card_type": "Warning Letter",
+            "deterministic_detail": {"type": "wl_violations", "count": 8},
+            "inspection": {"items": [*items, {"orig": ""}]},
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "brief_web_2026_11_23.json"
+            path.write_text(json.dumps({"cards": [card]}), encoding="utf-8")
+            with patch.object(vps, "BRIEF_GLOB", str(path)), patch.object(vps, "DELTA_GLOB", str(path.parent / "delta_*.json")):
+                state, _ = vps._published_state(1)
+        self.assertEqual(state["wl-1"]["shown"], 6)
 
     def test_extraction_gap_when_db_has_nothing(self):
         # fda483-193696 Biograft: findings 자체가 0건 → 수집 시점 추출 실패.

@@ -54,10 +54,13 @@ REQUEST_DELAY = FDA_PUBLISHED_SOURCE_CHECK_DELAY_SECONDS
 def _published_state(weeks: int) -> "tuple[dict[str, dict[str, Any]], list[str]]":
     """발행 이력에서 (카드 상태, 대상 날짜) 수집.
 
-    반환 `state[card_id] = {"date","kind","shown","url"}`. `shown` 은 그 카드가 실제로 보여준
-    상세 건수(디제스트로 접힌 483 은 브리프에 없으므로 0). 접힌 카드는 델타에서 id 를
+    `shown` 은 렌더용 앞면 블록의 항목 수다. `published` 는 실제 브리프에 있음을 뜻한다.
+    디제스트로 접힌 483 은 상세 건수가 0이고, 델타에서 id 를
     복원한다 — 접힌 것들이야말로 "관찰 없음" 판정을 받은 카드라 검증 대상의 핵심이다.
     """
+    from assemble_publish_brief import _is_out_of_scope_483_card
+    from inspection_card import build_inspection_block
+
     briefs = sorted(glob.glob(BRIEF_GLOB))
     if weeks > 0:
         briefs = briefs[-weeks:]
@@ -65,24 +68,36 @@ def _published_state(weeks: int) -> "tuple[dict[str, dict[str, Any]], list[str]]
     state: dict[str, dict[str, Any]] = {}
 
     for path, date in zip(briefs, dates):
-        brief = json.loads(open(path, encoding="utf-8").read())
+        with open(path, encoding="utf-8") as stream:
+            brief = json.load(stream)
         for c in brief.get("cards") or []:
             cid = str(c.get("id", ""))
             kind = _card_kind(c)
             if not kind:
                 continue
-            dd = c.get("deterministic_detail")
+            block = c.get("inspection")
+            if not isinstance(block, dict):
+                detail = c.get("deterministic_detail")
+                expected_type = "fda_483_observations" if kind == "483" else "wl_violations"
+                block = (build_inspection_block(c) or {}) if isinstance(detail, dict) and detail.get("type") == expected_type else {}
+            # 앞면에서 접힌 행도 펼치면 보인다. 표시할 문장이 있는 행을 모두 센다.
+            shown = sum(1 for item in block.get("items") or []
+                        if isinstance(item, dict) and (item.get("text") or item.get("orig")))
             state[cid] = {
                 "date": date, "kind": kind,
-                "shown": dd.get("count", 0) if isinstance(dd, dict) else 0,
+                "shown": shown,
                 "url": (c.get("sources") or {}).get("official_url", ""),
+                "published": True,
+                "oos_483": kind == "483" and _is_out_of_scope_483_card(c),
             }
 
     for path in sorted(glob.glob(DELTA_GLOB)):
         date = os.path.basename(path)[6:-5]
         if date not in dates:
             continue
-        for cid in (json.loads(open(path, encoding="utf-8").read()).get("cards") or {}):
+        with open(path, encoding="utf-8") as stream:
+            delta = json.load(stream)
+        for cid in delta.get("cards") or {}:
             if cid.startswith("fda483-") and cid not in state:
                 state[cid] = {"date": date + "(접힘)", "kind": "483", "shown": 0, "url": ""}
     return state, dates
@@ -206,7 +221,7 @@ def _db_scope_counts(state: dict[str, dict[str, Any]]) -> "dict[str, dict[str, i
             if st == "ok":
                 bucket["ok"] += 1
             elif st in ("non_pharma", "fragment"):
-                bucket[st] += 1      # 비공개 사유 분포 — findings-hidden 알림에 싣는다
+                bucket[st] += 1      # 비공개 사유 분포
 
     out: dict[str, dict[str, int]] = {cid: {"total": 0, "ok": 0, "non_pharma": 0, "fragment": 0}
                                       for cid in state}
@@ -233,12 +248,14 @@ def _db_scope_counts(state: dict[str, dict[str, Any]]) -> "dict[str, dict[str, i
 
 
 def classify(row: dict[str, Any]) -> str:
-    """한 행의 판정. ok / scope-excluded / publish-gap / extraction-gap / unknown-no-db.
+    """한 행의 판정. 발행 범위 위반·사이트 비공개·추출/발행 격차를 확인한다.
 
     ★세 사건을 한 카운터에 합치지 않는다 — 처방이 전부 다르다.
     """
     found, shown = row["found"], row["shown"]
     total, ok = row.get("db_total"), row.get("db_ok")
+    if row.get("published") and row.get("oos_483"):
+        return "scope-card-leak"     # 범위 밖임을 확인한 카드가 브리프에는 발행됐다
     # ★[findings-hidden 2026-11-12] 카드는 발행됐는데 그 문서의 findings 가 **하나도 공개되지 않는**(전부
     # scope_status≠ok) 경우. 사이트 /findings/ 에서 그 지적이 통째로 사라진 것이라 원문 건수와
     # 무관하게 본다 — 아래 `found <= shown` 은 건수만 보므로 이 경우를 '일치(ok)'로 지나쳤다
@@ -246,11 +263,9 @@ def classify(row: dict[str, Any]) -> str:
     # 자동 수리 없음 — 분류기가 틀렸는지 조립기 관문이 틀렸는지 사람이 가른다.
     if shown > 0 and total is not None and ok is not None and total > 0 and ok == 0:
         return "findings-hidden"
-    if found <= shown:
-        return "ok"
     if total is None or ok is None:
-        return "unknown-no-db"      # DB 를 못 봤다 → 종전 판정(보수적으로 불일치 취급)
-    if found > total:
+        return "unknown-no-db" if found > shown else "ok"
+    if found > shown and found > total:
         hdr = row.get("obs_headers")
         if total > 0 and ok <= shown and hdr is not None and hdr <= total:
             # ★[count-drift 2026-11-12, #1214 fda483-195468] 원문의 **`OBSERVATION n` 번호 머리 수**
@@ -266,6 +281,8 @@ def classify(row: dict[str, Any]) -> str:
             # 의도대로 뺀 483 — 카드가 적게 보인 게 맞다(이슈 #1214 오탐 4건).
             return "scope-excluded"
         return "publish-gap"        # 뽑았고 공개 대상인데 카드가 덜 보여줬다
+    if found <= shown:
+        return "ok"
     return "scope-excluded"         # 뽑았으나 scope 로 정상 제외 — 결함 아님
 
 
@@ -292,6 +309,7 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
             found, status = _found_wl(info["url"])
         counts = (scope or {}).get(cid)
         row = {**info, "id": cid, "found": found, "status": status,
+               "source_read": bool(text) if info["kind"] == "483" else status == "ok",
                "obs_headers": hdr,
                "db_total": counts["total"] if counts else None,
                "db_ok": counts["ok"] if counts else None,
@@ -299,13 +317,13 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
                "db_fragment": counts["fragment"] if counts else None}
         # 조립기가 범위 밖으로 뺀 483 은 발행 격차가 아니다. 격차 후보일 때만 판정한다
         # (목록 조회 1회 비용을 격차 없는 카드에는 쓰지 않는다).
-        if (info["kind"] == "483" and found > info["shown"]
+        if (info["kind"] == "483" and not row.get("oos_483")
                 and (counts or {}).get("ok", 0) > info["shown"]):
             row["oos_483"] = _is_out_of_scope_483(_establishment_type(cid), text)
         row["verdict"] = classify(row)
         rows.append(row)
         print(f"[{i:>3}/{len(state)}] {cid:<18} {info['date']:<18} "
-              f"카드{info['shown']:>2} 원문{found:>2} "
+              f"카드{info['shown']:>2} 원문{(str(found) if row['source_read'] else '?'):>2} "
               f"DB{'' if counts is None else str(counts['ok']) + '/' + str(counts['total']):>6} "
               f"{status:<16} {row['verdict']}", flush=True)
         time.sleep(REQUEST_DELAY)
@@ -313,7 +331,7 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
     # (카드가 더 많음)도 알리지 않는다 — 파서가 뒤에 더 보수적으로 바뀐 경우라 발행물이
     # 틀렸다는 뜻이 아니다.
     mismatches = [r for r in rows
-                  if r["verdict"] in ("extraction-gap", "publish-gap", "findings-hidden",
+                  if r["verdict"] in ("extraction-gap", "publish-gap", "findings-hidden", "scope-card-leak",
                                    "unknown-no-db")]
     return rows, mismatches
 
@@ -322,8 +340,10 @@ _VERDICT_HELP = {
     "extraction-gap": ("추출 격차 — 원문에는 있는데 **findings 자체가 없습니다**(수집 시점 "
                        "파서 실패). 조치: 해당 소스 파서를 보고, 원문 재수집·재추출."),
     "publish-gap": ("발행 격차 — findings 가 있고 공개 대상(`scope_status='ok'`)인데 카드가 "
-                    "덜 보여줬습니다. 조치: deep 델타에 `source_text`(+483 이면 "
-                    "`observations_ko`)를 넣고 발행 재조립."),
+                    "덜 보여줬습니다. 조치: deep 델타의 `source_text`와 국문 병기"
+                    "(`observations_ko` 또는 `violations_ko`)를 확인하고 발행 재조립."),
+    "scope-card-leak": ("범위 밖 FDA 483 카드가 브리프에 발행됐습니다. "
+                        "`is_out_of_scope_483` 판정으로 발행 대상을 다시 확인합니다."),
     "findings-hidden": ("사이트 비공개 — 카드는 발행됐는데 그 문서의 findings 가 **전부 비공개**"
                         "(`scope_status≠ok`)라 `/findings/` 에서 사라졌습니다. 조치: ① 분류기 과차단이면 "
                         "시설 유형·업체명을 보고 `grm_classify_483_scope` 재분류 후보로(11-12 Henogen "
@@ -355,6 +375,11 @@ def format_report(mismatches: list[dict[str, Any]],
                  "등 — 추출 실패 아님, 불일치로 세지 않음). 건수 차이가 크면 원문을 직접 확인: "
                  + ", ".join(f"`{r['id']}`(카드 {r['shown']}·DB {r['db_total']}·원문 {r['found']})"
                              for r in drift[:12]) + ("…" if len(drift) > 12 else ""))
+    unread = [r for r in (rows or []) if r.get("source_read") is False]
+    if unread:
+        tail += f"\n\n참고: 원문 판독 불가 {len(unread)}장(`?`). 확인 가능한 카드·DB 건수로 대조했습니다."
+    if not mismatches and unread:
+        return "확인 가능한 범위에서 불일치 0건입니다." + tail
     if not mismatches:
         return "발행 카드와 원문이 전부 일치합니다(불일치 0)." + tail
 
@@ -362,16 +387,17 @@ def format_report(mismatches: list[dict[str, Any]],
     for r in mismatches:
         by_verdict.setdefault(r["verdict"], []).append(r)
     head = " · ".join(f"{v} {len(rs)}건" for v, rs in sorted(by_verdict.items()))
-    lines = [f"발행 카드가 원문보다 적게 보여주는 항목 **{len(mismatches)}건** ({head}):", ""]
+    lines = [f"발행 카드와 원문·공개 범위 불일치 **{len(mismatches)}건** ({head}):", ""]
     for verdict, rs in sorted(by_verdict.items()):
         lines += [f"### {verdict} — {len(rs)}건", ""]
-        lines.append("| 발행일 | 카드 | 카드 표시 | DB(공개/전체) | 원문 | 상태 |")
+        lines.append("| 발행일 | 카드 | 카드 관찰/위반항목 | DB(공개/전체) | 원문 | 상태 |")
         lines.append("|---|---|---|---|---|---|")
         for r in rs:
             db = "?" if r.get("db_total") is None else f"{r['db_ok']}/{r['db_total']}"
+            found = "?" if r.get("source_read") is False else r["found"]
             lines.append(f"| {r['date']} | `{r['id']}` | {r['shown']} | {db} | "
-                         f"{r['found']} | {r['status']} |")
-        if verdict == "findings-hidden":
+                         f"{found} | {r['status']} |")
+        if verdict in ("findings-hidden", "scope-card-leak"):
             lines.append("")
             lines += [f"- `{r['id']}` 비공개 사유: non_pharma {r.get('db_non_pharma') or 0}건 · "
                       f"fragment {r.get('db_fragment') or 0}건" for r in rs]

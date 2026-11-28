@@ -106,7 +106,7 @@
   "fda483-196499": {
    "title_issue": "위탁 업무 품질계약·캠페인 세척 밸리데이션",
    "hook_line": "원료 출하·재시험을 제3자에 맡겼으나 품질계약에 절차·규격을 정하지 않음",
-   "summary": "FDA가 독일 비무균 원료의약품 제조소 Celgene Chemical GmbH에 Form 483(관찰사항 5건)을 발행했다. 위탁 업무의 품질계약, 캠페인 세척 밸리데이션, 공정 중 관리 시스템 적합성, 안정성 프로그램, 임시직 교육을 지적했다.",
+   "summary": "FDA가 스위스 비무균 원료의약품 제조소 Celgene Chemical GmbH에 Form 483(관찰사항 5건)을 발행했다. 위탁 업무의 품질계약, 캠페인 세척 밸리데이션, 공정 중 관리 시스템 적합성, 안정성 프로그램, 임시직 교육을 지적했다.",
    "key_facts": [
     "관찰 1: 원료 출하·재시험을 제3자 수탁자에게 맡겼으나 공유 절차·규격을 품질계약에 정하지 않음",
     "관찰 2: 캠페인 제조 설비의 세척 밸리데이션이 오염물 축적·이월을 다루지 않음",
@@ -122,7 +122,7 @@
    "en": {
     "title_issue": "Contractor quality agreement, campaign cleaning",
     "hook_line": "Raw material release delegated to a contractor without procedures in the quality agreement",
-    "summary": "FDA issued a Form 483 with five observations to the German non-sterile API manufacturing site of Celgene Chemical GmbH, citing the quality agreement with a contractor, campaign cleaning validation, system suitability for in-process checks, the stability program and training of temporary staff.",
+    "summary": "FDA issued a Form 483 with five observations to the Swiss non-sterile API manufacturing site of Celgene Chemical GmbH, citing the quality agreement with a contractor, campaign cleaning validation, system suitability for in-process checks, the stability program and training of temporary staff.",
     "key_facts": [
      "Observation 1: release and retesting of raw materials delegated to a third party, but shared procedures and specifications are not specified in the quality agreement",
      "Observation 2: cleaning validation for campaign manufacturing does not address build-up and carry-over of contaminants",

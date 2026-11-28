@@ -3846,14 +3846,11 @@ def select_doc_term_links(
     return _select_term_links_from_blob(blob, index, doc_freq, limit, lang)
 
 
-def link_terms_in_text(
-    text: str, selected: list[tuple[str, str]], rel_root: str, used: set[str],
+def term_link_spans(
+    text: str, selected: list[tuple[str, str]], used: set[str],
     lang: str = DEFAULT_LANG,
-) -> Markup:
-    """본문 1 조각에 용어 링크를 끼운다 — 텍스트 무변형(escape 후 `<a>` 만 삽입).
-
-    `used` 는 **페이지 단위**로 공유한다(지적 5 건에 같은 용어가 나와도 링크는 첫 곳 하나).
-    """
+) -> list[tuple[int, int, str]]:
+    """Pick non-overlapping spans in selection order, sharing `used` across paragraphs."""
     spans: list[tuple[int, int, str]] = []
     for surface, tid in selected:
         if tid in used:
@@ -3865,18 +3862,43 @@ def link_terms_in_text(
         if pos >= 0:
             spans.append((pos, end, tid))
             used.add(tid)
-    if not spans:
-        return Markup(str(_escape(text)))
-    spans.sort()
+    return sorted(spans)
+
+
+def link_terms_in_text(
+    text: str, selected: list[tuple[str, str]], rel_root: str, used: set[str],
+    lang: str = DEFAULT_LANG,
+) -> Markup:
+    """Escape the source text and link each selected term once per page."""
     out: list[str] = []
     cursor = 0
-    for start, end, tid in spans:
+    for start, end, tid in term_link_spans(text, selected, used, lang):
         out.append(str(_escape(text[cursor:start])))
         out.append(f'<a class="fd-term" href="{rel_root}glossary/{tid}/">'
                    f'{_escape(text[start:end])}</a>')
         cursor = end
     out.append(str(_escape(text[cursor:])))
     return Markup("".join(out))
+
+
+def clause_term_paragraphs(
+    paragraphs: list[str], selected: list[tuple[str, str]], definitions: dict[str, str],
+    rel_root: str, used: set[str], lang: str,
+) -> list[Markup]:
+    """Add glossary links with inline definitions while preserving paragraph text."""
+    rendered = []
+    for text in paragraphs:
+        out: list[str] = []
+        cursor = 0
+        for start, end, tid in term_link_spans(text, selected, used, lang):
+            out.append(str(_escape(text[cursor:start])))
+            out.append(f'<a class="ct-term" href="{_escape(rel_root)}glossary/{_escape(tid)}/" '
+                       f'data-clause-definition="{_escape(definitions[tid])}">'
+                       f'{_escape(text[start:end])}</a>')
+            cursor = end
+        out.append(str(_escape(text[cursor:])))
+        rendered.append(Markup("".join(out)))
+    return rendered
 
 
 # ── [브리프 카드 용어 자동 링크 2026-09-08] 지적문서 페이지(`/findings/doc/<slug>/`)와
@@ -8848,6 +8870,18 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _ct_cites = clause_text_cites(docs_data, clause_text_views)
     _ct_extra = clause_text_extras(docs_data, clause_text_views, glossary_terms or [], glossary_term_ids)
     if clause_text_view["sources"]:
+        _ct_tooltip_definitions = {
+            lg: {t["id"]: t[f"easy_{lg}"].strip() for t in glossary_terms or []
+                 if (t.get(f"easy_{lg}") or "").strip()}
+            for lg in SUPPORTED_LANGS
+        }
+        _ct_tooltip_ids = set(glossary_term_ids)
+        _ct_tooltip_surfaces = {
+            lg: [(surface, tid) for surface, tid in build_doc_term_link_index(glossary_terms or [], lg)
+                 if tid in _ct_tooltip_definitions[lg] and tid in _ct_tooltip_ids]
+            for lg in SUPPORTED_LANGS
+        }
+        _ct_asset_versions = {name: _asset_ver(name) for name in ("clause_find.js", "clause_tooltip.js")}
         for _lg, _pg, _em, _tr in trees:
             _ctv = clause_text_views.get(_lg, clause_text_view_en)
             if not _ctv["sources"]:
@@ -8879,6 +8913,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     )
             for _d, _c in clause_text_page.pages(_ctv):
                 _cp = _pg(_c["href"])
+                _source_lang = _d["source"]["lang"]
+                _used: dict[str, set[str]] = {lg: set() for lg in SUPPORTED_LANGS}
+                _ko_paras = clause_term_paragraphs(
+                    _c["ko_paras"], _ct_tooltip_surfaces[DEFAULT_LANG], _ct_tooltip_definitions[DEFAULT_LANG],
+                    _cp.rel_root, _used[DEFAULT_LANG], DEFAULT_LANG) if _lg == DEFAULT_LANG else []
+                _paras = clause_term_paragraphs(
+                    _c["paras"], _ct_tooltip_surfaces.get(_source_lang, []),
+                    _ct_tooltip_definitions.get(_source_lang, {}), _cp.rel_root,
+                    _used.get(_source_lang, set()), _source_lang)
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
                 _cite = _ct_cite.get(_c["href"])
                 _cases_href = (f"findings/clause/{clause_slug(_sec)}/"
@@ -8897,7 +8940,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     json_ld=_cp.breadcrumb_json_ld([
                         (_tr("홈"), "/"), (_tr("기준 조항 원문"), "clauses/"),
                         (_d["code"], _d["path"]), (_c["number"], "")]),
-                    doc=_d, clause=_c,
+                    doc=_d, clause=_c, ko_paragraphs=_ko_paras, source_paragraphs=_paras,
+                    clause_asset_versions=_ct_asset_versions,
                     cases_href=_cases_href,
                     terms=_ct_terms.get(_c["href"]) or [],
                     key_terms=_kt, topic_cases=_tc,

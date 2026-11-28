@@ -1,0 +1,277 @@
+{
+  "removed": [
+    {
+      "web_card_id": "fda483-196499",
+      "slot": "deep.inspectional_significance",
+      "item": "칸 삭제",
+      "action": "선택 절을 비움",
+      "evidence": "2-2 ② 원문 부재 단정 — '원문에 반복 관찰 표시나 이전 실사 이력은 없다'(원문 본문을 확보한 483 에서 부재를 말하는 서술, [핵심 원칙] 2-1). 실사일 2018-06-18~22(June 18 - 22, 2018)·5건은 원문과 맞음"
+    },
+    {
+      "web_card_id": "fda483-196512",
+      "slot": "deep.key_violations[1]",
+      "item": "칸 삭제",
+      "action": "지적 1번을 뺌(남은 지적 2개)",
+      "evidence": "2-2 ② 원문은 'prevent product [redacted] within the area from the [redacted] valve'(가려진 동사) 인데 심층은 '제품이 새는 것'(leak)으로 가려진 값을 채움"
+    },
+    {
+      "web_card_id": "fda483-196514",
+      "slot": "deep.key_violations[2]",
+      "item": "칸 삭제",
+      "action": "지적 2번을 뺌(남은 지적 3개)",
+      "evidence": "2-2 ① 원문은 'the deviation report indicated that no CAPA was necessary'(일탈 보고서) 인데 국문은 '시험실 오염 조사에서' 로 바꿈"
+    },
+    {
+      "web_card_id": "fda483-196515",
+      "slot": "deep.key_violations[5]",
+      "item": "칸 삭제",
+      "action": "지적 5번을 뺌(남은 지적 8개)",
+      "evidence": "2-2 ① 원문은 'pre-sterilization bulk product'(멸균 전 벌크) 인데 '출하 전 벌크'로 씀(같은 카드 obs_ko 는 '멸균 전 벌크'로 맞음)"
+    },
+    {
+      "web_card_id": "fda483-196473",
+      "slot": "deep.key_violations[2].observation",
+      "item": "심층 삭제",
+      "action": "지적 2번을 뺌(남은 지적 2개)",
+      "evidence": "자가점검 ③ 진술 단정: 원문은 'Your firm stated that the operator login allows control over valves and set points' — 업체 진술인데 카드는 진술 표기 없이 사실로 씀(앞면 implication 은 '진술했다'로 맞게 씀)"
+    },
+    {
+      "web_card_id": "fda483-196479",
+      "slot": "deep.key_violations[0].observation",
+      "item": "심층 삭제",
+      "action": "지적 0번을 뺌(남은 지적 3개)",
+      "evidence": "자가점검 ② 원문에 없는 말: 원문은 QC Manager 가 'does verify the purity and strength of these APIs to what is stated in the manufacturer's certificate of analysis' 라고 진술 — 카드는 '시험성적서 값만으로 받아들인다'로 바꿔 원문에 없는 '만으로 수용' 뜻을 보탬(심층 번역 detail_ko 는 원문대로 '대조해 검증한다')"
+    },
+    {
+      "web_card_id": "fda483-196493",
+      "slot": "deep.observations_ko[1].detail_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 1칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "자가점검 ② 원문에 없는 말: 원문 'atypical results … Assay test results for R&D [redacted] USP, Batch No.' 에 '주사제(Injection)'가 없는데 번역이 '[가림] 주사제(USP)'로 보탬"
+    },
+    {
+      "web_card_id": "fda483-196493",
+      "slot": "deep.key_violations[0].observation",
+      "item": "심층 삭제",
+      "action": "지적 0번을 뺌(남은 지적 3개)",
+      "evidence": "자가점검 ② 가림·OCR 깨진 값 추정: 원문은 'manufactured in July 2019 and September … tested in Ju 9' 로 깨져 있음 — 카드는 '2019-07 제조 / 2019-09 시험'으로 날짜를 짜 맞춤"
+    },
+    {
+      "web_card_id": "fda483-196495",
+      "slot": "deep.key_violations[4].observation",
+      "item": "심층 삭제",
+      "action": "지적 4번을 뺌(남은 지적 4개)",
+      "evidence": "자가점검 ② 원문에 없는 말: 원문 관찰 5A 는 보관 시료 검토 결과 'the release testing has not yet performed' 일 뿐 '배치 출하 승인이 이뤄졌다'는 말이 없음(승인 사실을 보탬)"
+    },
+    {
+      "web_card_id": "fda483-196497",
+      "slot": "deep.key_violations[2].observation",
+      "item": "심층 삭제",
+      "action": "지적 2번을 뺌(남은 지적 3개)",
+      "evidence": "자가점검 ② 가림 값 추정: 원문의 속도 상한(no more than [redacted] vials per…)과 실제 속도([redacted]~[redacted])는 모두 가려져 있어 '절차서 상한과 맞지 않았다'는 관계를 알 수 없음(원문은 '충분한 검사를 허용하지 않는 속도'까지만)"
+    },
+    {
+      "web_card_id": "fda483-196497",
+      "slot": "deep.key_violations[0].observation",
+      "item": "심층 삭제",
+      "action": "지적 0번을 뺌(남은 지적 2개)",
+      "evidence": "자가점검 ③ 원문보다 강한 단정: 원문은 'you do not perform environmental monitoring during set up and filling operations inside the [redacted]' — 장소 한정(…내부)을 빼고 '환경 모니터링도 하지 않았다'로 일반화(평판 설치 자체가 모니터링)"
+    },
+    {
+      "web_card_id": "fda483-196501",
+      "slot": "deep.observations_ko[0].detail_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 1칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "사실 오류: 2-2 ① 원문 STP 6항은 '표준 시료 1회(one (1) reference sample injection) + 시료 2회(two (2) sample injections)' 인데 국문은 '표준 시료 1회 주입으로 제한' — 시료 2회가 빠져 횟수가 달라짐(원문 인용 번역)"
+    },
+    {
+      "web_card_id": "fda483-196501",
+      "slot": "deep.key_violations[2].observation",
+      "item": "심층 삭제",
+      "action": "지적 2번을 뺌(남은 지적 6개)",
+      "evidence": "사실 오류: 2-2 ① 같은 오류 — '주입을 표준품 1회로 제한한다' (원문: 기준 시료 1회 + 시료 2회)"
+    },
+    {
+      "web_card_id": "fda483-196509",
+      "slot": "deep.observations_ko[0].detail_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 1칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "사실 오류: 2-2 ① 원문 'released the lot on 8/18/2026 and shipped … on 8/18/2025' 인데 국문은 '2025-08-18에 출하 승인'으로 연도를 바꿈(원문 글자 그대로 옮겨야 함)"
+    },
+    {
+      "web_card_id": "fda483-196509",
+      "slot": "deep.observations_ko[0].detail_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 1칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "가림·깨진 값 추정: 2-2 ② 원문 OCR '3/14/9025' 의 사건 번호 'OF-346' 을 'QE-346' 으로 고쳐 씀(앞뒤 QE-342·QE-355 를 보고 추정 — 깨진 값은 확정된 부분만)"
+    },
+    {
+      "web_card_id": "fda483-196524",
+      "slot": "deep.key_violations[0].citation",
+      "item": "심층 삭제",
+      "action": "지적 0번을 뺌(남은 지적 4개)",
+      "evidence": "조항 오류: 원문에 조항 표기 없음. 관찰 1 결함문('Equipment ... is not of appropriate design to facilitate operations for its intended use')은 설비 설계 조항(21 CFR 211.63)인데 211.65(설비 구조)로 인용"
+    },
+    {
+      "web_card_id": "fda483-196530",
+      "slot": "deep.key_violations[2].risk",
+      "item": "심층 삭제",
+      "action": "지적 2번을 뺌(남은 지적 3개)",
+      "evidence": "원문과 다른 행위자: 원문: management had received login credentials via text message for a radiochemist to access another employee's user account — 문자로 로그인 정보를 받은 쪽은 경영진인데, 심층은 방사화학자가 받은 것으로 적음(앞면 implication·observations_ko 는 경영진으로 맞음)"
+    },
+    {
+      "web_card_id": "fda483-196542",
+      "slot": "deep.key_violations[10].observation",
+      "item": "심층 삭제",
+      "action": "지적 10번을 뺌(남은 지적 14개)",
+      "evidence": "원문보다 강한 단정: '회사 공동 대표이사에 해당하는 H' — 원문은 'The initial \"H\" is consistent with the first initial of your firm's Co-Chief Executive Officer'(첫 글자 일치)일 뿐 H 가 공동 대표이사라고 단정하지 않음(같은 카드 key_violations[8]은 '이름 첫 글자와 일치한다'로 정확히 적음)"
+    },
+    {
+      "web_card_id": "fda483-196544",
+      "slot": "deep.key_violations[1].observation",
+      "item": "심층 삭제",
+      "action": "지적 1번을 뺌(남은 지적 1개)",
+      "evidence": "원문보다 강한 단정: 원문 'Exception Reports are only considered for review when an investigation concludes nonconforming product may have been shipped'(출하됐을 수 있다)를 '부적합 제품이 출하됐다고 결론난 조사'로 단정(앞면 implication·observations_ko 는 '출하됐을 수 있다'로 정확)"
+    },
+    {
+      "web_card_id": "fda483-196551",
+      "slot": "deep.key_violations[1].observation",
+      "item": "심층 삭제",
+      "action": "지적 1번을 뺌(남은 지적 5개)",
+      "evidence": "가림·OCR 깨진 값 추정: '기술자가 노출된 부위를 소독하지 않거나' — 원문은 'failed to sanitize th[…] SPOY hat were exposed to the Grade B environment'로 OCR 이 깨져 대상 명사를 알 수 없음(observations_ko 는 [가림]로 둠). '부위'는 추정으로 채운 말"
+    },
+    {
+      "web_card_id": "fda483-196662",
+      "slot": "deep.observations_ko[2].detail_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 1칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "원문에 없는 말(②): '[가림] 시간이 작업자별로 일정하지 않아 보였고' — 원문은 'appeared to be inconsistent fo ens'(OCR 깨짐)뿐이라 '작업자별로'는 깨진 값을 추정해 채움"
+    },
+    {
+      "web_card_id": "fda483-196662",
+      "slot": "deep.key_violations[1].observation",
+      "item": "심층 삭제",
+      "action": "지적 1번을 뺌(남은 지적 3개)",
+      "evidence": "원문에 없는 말(②): '소독 시점으로부터 허용 시간을 넘겼다' — 원문은 'more than [redacted] from the beginning of the last sanitization'(가려진 값)이라 '허용 시간'이라는 성격을 추정해 보탬"
+    },
+    {
+      "web_card_id": "fda483-196664",
+      "slot": "deep.key_violations[4].observation",
+      "item": "심층 삭제",
+      "action": "지적 4번을 뺌(남은 지적 7개)",
+      "evidence": "원문에 없는 말(②): '상당수에 확인이 없고' — 원문은 활성·비활성 성분 수와 미수행 수 모두 가려진 값이라 '상당수'라는 규모를 추정해 보탬"
+    },
+    {
+      "web_card_id": "fda483-196664",
+      "slot": "deep.key_violations[0].risk",
+      "item": "심층 삭제",
+      "action": "지적 0번을 뺌(남은 지적 6개)",
+      "evidence": "원문에 없는 말(②): '[가림]은 … 의약품 제조와 … 분석 시험법에 쓰였다' — 원문은 '회사가 미국 시장용 의약품을 제조·출하했고 [가림]은 분석 시험법에 쓰인다'로, 제조에 쓰였다는 결합은 원문에 없음"
+    },
+    {
+      "web_card_id": "fda483-196665",
+      "slot": "deep.observations_ko[0].detail_ko",
+      "item": "심층 삭제",
+      "action": "국문 해석 1칸을 안내문으로 바꿈(원문 병기 게이트 — 뺄 수 없다)",
+      "evidence": "원문에 없는 말(②): '5층 블록의 충전기 라인' — 원문은 'Plant Block-'에서 번호가 빠진 깨진 값인데 '5층'을 추정해 채움"
+    },
+    {
+      "web_card_id": "fda483-196665",
+      "slot": "deep.key_violations[0].observation",
+      "item": "심층 삭제",
+      "action": "심층분석 통째로 뺌(지적이 하나도 남지 않는다)",
+      "evidence": "원문에 없는 말(②): '후속 조사가 이뤄지지 않았다' — 원문은 눕힌 바이알 수를 파악하지 않아 영향 조사를 할 근거가 없다는 것이지 조사가 없었다는 말이 아님"
+    },
+    {
+      "web_card_id": "fda483-196493",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'추정 원인(API 부착)으로 보고 배관 길이를 줄이는 변경' — 원문은 추정 원인 조사의 CAPA(새 라인 설치, PR265211)와 배관 단축(PR270865, 사유: 먼 거리로 인한 벌크 손실)이 별개 변경이라 인과 결합이 원문에 없음"
+    },
+    {
+      "web_card_id": "fda483-196497",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "en.hook_line 'reached in with arm, shoulder and head' 는 원문·한국어의 'part of their head'(머리 일부)를 빼 한국어와 뜻이 어긋남(국·영 짝 불일치) — 국·영 짝으로 비움"
+    },
+    {
+      "web_card_id": "fda483-196507",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "2-2 ②·⑥ '위탁 시험실이 보고한 점도 기준일탈' — 원문은 'results received from their control testing laboratory'(관리 시험실). '위탁' 은 원문에 없는 결합이고 영문 implication 은 'control testing laboratory' 라 국·영 짝도 어긋남"
+    },
+    {
+      "web_card_id": "fda483-196508",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "2-2 ⑤ 깨진 형식 — 한 줄 안에 가림 표기 '[가림]'(영문 '[redacted]')이 그대로 노출됨. 가려진 설비 이름이라 R10·R11 상 문장이 성립하지 않음"
+    },
+    {
+      "web_card_id": "fda483-196521",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "2-2 ③ 원문 'failed to conduct a complete risk assessment'(완전한 위험평가를 하지 않음) 인데 hook 은 '위험평가를 하지 않음'으로 '완전한' 을 뺌(요약은 '완전한'으로 맞음)"
+    },
+    {
+      "web_card_id": "fda483-196536",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'이 시험법들로 만든 자료로 공정 성능 적격성평가를 뒷받침했다(관찰 4)' — 관찰 4 는 '정확성·특이성이 확립되지 않은 분석법'(가림)으로 만든 불순물·역가 자료라고만 하고 관찰 3 의 두 시험법과 같다고 쓰지 않음. 원문에 없는 결합(영문 'PPQ data were generated with these methods'도 같음)"
+    },
+    {
+      "web_card_id": "fda483-196546",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "'A등급 충전실' — 원문은 충전실에 Grade A 공기가 공급된다(is supplied with Grade A air)고만 하고 방 등급을 A로 분류하지 않음(앞면 key_facts[2]는 'A등급 공기가 공급되는 충전실'로 정확). 영문 'Grade A filling room'도 같음"
+    },
+    {
+      "web_card_id": "fda483-196551",
+      "slot": "implication",
+      "item": "칸 삭제",
+      "action": "국·영 implication 비움",
+      "evidence": "'품질부서는 그 균을 유해 미생물로 보지 않는다며' — 원문은 'According to your Qu'(OCR 잘림, 스캐폴드 'Quality [redacted]')로 주체가 잘려 있고 같은 서한 관찰 4 에서는 Quality Director 로 적음. 부서로 채운 것은 추정(영문은 Quality 로만 적어 국영도 어긋남)"
+    },
+    {
+      "web_card_id": "recall-cfaf944acc02",
+      "slot": "hook_line",
+      "item": "칸 삭제",
+      "action": "국·영 hook_line 지움",
+      "evidence": "원문은 '초과 검출 우려에 따른 사전예방적 조치'인데 hook_line 은 '우려'를 빼 '초과 검출'을 단정함(가능성→단정, 2-2 ③). 국·영 hook 도 같은 칸으로 비움"
+    },
+    {
+      "web_card_id": "admin-2026008455",
+      "slot": "key_facts[2]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 2번 뺌",
+      "evidence": "국문 '더모프레드크림 등'(제품명)이 en.key_facts[2] 에 없음 — 국·영 짝 불일치(②⑥); 처분 내용은 summary·심층에 남음"
+    },
+    {
+      "web_card_id": "fda483-196506",
+      "slot": "key_facts[0]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 0번 뺌",
+      "evidence": "2-2 ①·⑥ '2025년 12월 11일 사이 고위험 일탈 3건' — 원문은 'within eleven (11) days in December 2025'(12월 중 11일 안에). 국문은 12월 11일이라는 날짜로 읽혀 영문(within eleven days)과도 어긋남. 나머지 두 key_facts 가 남는다"
+    },
+    {
+      "web_card_id": "fda483-196514",
+      "slot": "key_facts[3]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 3번 뺌",
+      "evidence": "2-2 ① '관찰 14' — 원문에서 이 문서의 관찰 번호는 6(C 항: 'Observation 14 of the Form FDA 483 dated November 22, 2014 has not been corrected'). 14 는 2014년 Form 483 의 번호라 번호를 잘못 붙임(심층은 관찰 6 으로 맞게 적음)"
+    },
+    {
+      "web_card_id": "fda483-196521",
+      "slot": "key_facts[0]",
+      "item": "칸 삭제",
+      "action": "국·영 key_facts 0번 뺌",
+      "evidence": "2-2 ③·⑥ '알려진 발암물질 생성을 반영한 위험평가 … 미실시' — 원문·영문 key_facts 는 'no complete risk assessment' 인데 국문만 '완전한' 이 빠져 국·영 짝 불일치"
+    }
+  ]
+}

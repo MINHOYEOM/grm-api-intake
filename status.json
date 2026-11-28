@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-28T07:41:40Z",
+ "generated_at": "2026-11-28T13:56:58Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 46117668588,
+    "databaseId": 46151976811,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-28T13:55:00Z",
+    "updatedAt": "2026-11-28T13:55:03Z",
+    "headBranch": "claude/collect-cap-health-r3-1128",
+    "displayTitle": "fix(test): 대조 장부 시험의 페이지네이터 Mock 에 health() 를 붙임",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46151976811"
+   },
+   {
+    "databaseId": 46151434516,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-28T06:40:10Z",
-    "updatedAt": "2026-11-28T06:48:18Z",
-    "headBranch": "claude/naver-blog-why-1126-r2",
-    "displayTitle": "naver-blog: '왜 중요한가' 슬롯 도입 (#1999 위) (#2007 대체)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46117668588"
+    "createdAt": "2026-11-28T13:48:23Z",
+    "updatedAt": "2026-11-28T13:55:17Z",
+    "headBranch": "codex/test-render-speed",
+    "displayTitle": "test(속도): 렌더 시험 4개 클래스 렌더 1회 공유 (CI 병목)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46151434516"
    },
    {
-    "databaseId": 46117656323,
+    "databaseId": 46151419051,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-28T06:40:01Z",
-    "updatedAt": "2026-11-28T06:46:54Z",
-    "headBranch": "claude/naver-blog-why-1126-r2",
-    "displayTitle": "Merge branch 'claude/naver-blog-seo-1126-r2' into claude/naver-blog-w…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46117656323"
+    "createdAt": "2026-11-28T13:48:12Z",
+    "updatedAt": "2026-11-28T13:55:20Z",
+    "headBranch": "codex/test-render-speed",
+    "displayTitle": "test(속도): 렌더 시험 4개 클래스가 같은 입력 렌더를 클래스당 1회로 공유 (assert·골든 불변)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46151419051"
    },
    {
-    "databaseId": 46116701232,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-28T06:27:41Z",
-    "updatedAt": "2026-11-28T06:36:14Z",
-    "headBranch": "claude/naver-blog-seo-1126-r2",
-    "displayTitle": "네이버 블로그 원고: 사이트 위성 글 + 규칙 점검 한 곳(겹침 25% 가드) (#1999 대체)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116701232"
-   },
-   {
-    "databaseId": 46116686635,
+    "databaseId": 46151354929,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-28T06:27:30Z",
-    "updatedAt": "2026-11-28T06:36:20Z",
-    "headBranch": "claude/naver-blog-seo-1126-r2",
-    "displayTitle": "Merge origin/main into 블로그 위성 원고 (영문 골든 재동결)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116686635"
-   },
-   {
-    "databaseId": 46116161088,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-28T06:20:42Z",
-    "updatedAt": "2026-11-28T06:29:14Z",
+    "createdAt": "2026-11-28T13:47:24Z",
+    "updatedAt": "2026-11-28T13:56:35Z",
     "headBranch": "main",
-    "displayTitle": "assets: 네이버 블로그 사이드바 위젯 배너 3장(용어사전·지적 찾아보기·구독) (#2024)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116161088"
+    "displayTitle": "네이버 블로그 원고를 사이트 위성 글로 + 규칙 점검 한 곳(naver_blog_checks) (#2048)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46151354929"
+   },
+   {
+    "databaseId": 46143100542,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "pull_request",
+    "createdAt": "2026-11-28T12:07:28Z",
+    "updatedAt": "2026-11-28T12:15:12Z",
+    "headBranch": "claude/glossary-fig-daily-20261128-2106",
+    "displayTitle": "glossary(fig): 2026-11-28 새 그림 0 · 다시 그림 0 · 보류 5 — 변경관리·위탁활동·근본원인분석·SOP·기록",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46143100542"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 46152107492,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-28T13:56:36Z",
+    "updatedAt": "2026-11-28T13:56:49Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46152107492"
+   },
+   {
     "databaseId": 46116818865,
     "status": "completed",
     "conclusion": "success",
@@ -442,20 +453,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45948771490"
-   },
-   {
-    "databaseId": 45947901480,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-27T05:47:37Z",
-    "updatedAt": "2026-11-27T05:47:50Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45947901480"
    }
   ],
   "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 46125973236,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-28T08:28:27Z",
+    "updatedAt": "2026-11-28T08:29:25Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #2039 from MINHOYEOM/claude/findings-translate-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46125973236"
+   },
    {
     "databaseId": 45934907058,
     "status": "completed",
@@ -499,20 +510,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #2001 from MINHOYEOM/chore/findings-translate-483-…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45826914195"
-   },
-   {
-    "databaseId": 45788934527,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-26T09:06:40Z",
-    "updatedAt": "2026-11-26T09:48:07Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1996 from MINHOYEOM/chore/findings-translate-483-…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45788934527"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 46123551846,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-28T07:57:30Z",
+    "updatedAt": "2026-11-28T10:54:19Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46123551846"
+   },
    {
     "databaseId": 46070112558,
     "status": "completed",
@@ -556,17 +567,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45783637545"
-   },
-   {
-    "databaseId": 45707416923,
-    "status": "completed",
-    "conclusion": "failure",
-    "event": "schedule",
-    "createdAt": "2026-11-25T21:46:40Z",
-    "updatedAt": "2026-11-25T21:50:18Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45707416923"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -628,6 +628,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 46125830036,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-28T08:26:34Z",
+    "updatedAt": "2026-11-28T08:28:30Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46125830036"
+   },
+   {
     "databaseId": 46071555417,
     "status": "completed",
     "conclusion": "success",
@@ -670,17 +681,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45786994509"
-   },
-   {
-    "databaseId": 45709146997,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-25T21:58:24Z",
-    "updatedAt": "2026-11-25T21:58:58Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45709146997"
    }
   ],
   "grm-cloud-request.yml": [

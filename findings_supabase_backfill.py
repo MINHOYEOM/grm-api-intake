@@ -608,6 +608,8 @@ def noise_reason(text: str, source: str) -> str:
         return "서식 안내문"
     if findings_extractors._fda483_is_annotation(t):
         return "주석란 잡문"
+    if findings_extractors._fda483_is_form_header_leak(t):
+        return "쪽 머리말 혼입"
     if findings_extractors._fda483_is_fragment_title(t):
         return "표제 조각"
     if len(t) < _REPORT_SHORT_TITLE:

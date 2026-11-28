@@ -680,6 +680,7 @@ class CollectionStats:
     mfds_admin_error: bool = False
     mfds_admin_error_msg: str = ""
     mfds_admin_total_count_warning: str = ""
+    mfds_reconcile_health: dict[str, dict[str, Any]] = field(default_factory=dict)
     mfds_gmp_cert_fetched: int = 0
     mfds_gmp_cert_inserted: int = 0
     mfds_gmp_cert_skipped_dup: int = 0
@@ -4330,6 +4331,7 @@ def _health_payload(
         "flags": flags,
         "health": health.to_dict(),
         "sources": _source_health_rows(stats),
+        "mfds_reconcile_health": stats.mfds_reconcile_health,
         # 제외 장부 - 소스별 excluded 가 원천 대조(원천=수집+제외+미뤄짐)의 '제외' 항이다(가산 키).
         "exclusion_ledger": dict(stats.exclusion_ledger),
         # [대기열 0단계] 저장 순서·두 저장소 성패·중복 판정 기준(가산 키).
@@ -4694,10 +4696,13 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
             mfds_recall_items = []
         else:
             try:
-                from collect_mfds_recall import collect_mfds_recall
+                import collect_mfds_recall as mfds_recall
                 # P0: 지연공개 대응 — 넓은 enforcement 윈도우 사용
-                mfds_recall_items, mfds_recall_err = collect_mfds_recall(
+                mfds_recall_items, mfds_recall_err = mfds_recall.collect_mfds_recall(
                     enf_start, end, data_go_kr_service_key)
+                stats.mfds_reconcile_health["mfds_recall"] = dict(
+                    mfds_recall.LAST_HEALTH, window_start=enf_start.isoformat(),
+                    window_end=end.isoformat(), failed=bool(mfds_recall_err))
             except Exception as e:
                 mfds_recall_items, mfds_recall_err = [], str(e)
         stats.mfds_recall_fetched = len(mfds_recall_items)
@@ -4723,6 +4728,9 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
                     enf_start, end, data_go_kr_service_key)
                 stats.mfds_admin_total_count_warning = mfds_admin.LAST_HEALTH.get(
                     "total_count_warning", "")
+                stats.mfds_reconcile_health["mfds_admin"] = dict(
+                    mfds_admin.LAST_HEALTH, window_start=enf_start.isoformat(),
+                    window_end=end.isoformat(), failed=bool(mfds_admin_err))
             except Exception as e:
                 mfds_admin_items, mfds_admin_err = [], str(e)
         stats.mfds_admin_fetched = len(mfds_admin_items)

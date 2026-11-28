@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [영문 구독 2026-11-27] 영문 트리는 첫 화면 줄형 칸이 구독 칸이다 — 하단 밴드를 끈다(base.html). 한국어는 종전 그대로. -#}
+{% set sub_inline_on = sub_inline_lists %}
 {#- [SEO 2026-11-09·11-19] 구글에서만 뺄 문서(얇음 A·중복 B)는 구글봇만 noindex(네이버·빙은 색인 유지) — 판정은 render.google_noindex_doc_page, sitemap.xml 도 같은 판정으로 뺀다. -#}
 {% block meta_robots %}{% if google_noindex %}<meta name="googlebot" content="noindex, follow" />
 {% endif %}{% endblock %}
@@ -144,6 +146,8 @@
       <span class="fd-chip">{{ _("지적 {n}건", n=(doc.findings | length)) }}</span>
       {%- for c in doc.categories %}<span class="fd-chip">{{ c }}</span>{% endfor %}
     </p>
+    {#- [영문 구독 2026-11-27] 영문 독자는 검색으로 이 면에 곧장 들어온다 — 첫 화면에 줄형 구독 칸(영문 트리만). -#}
+    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top', sub_anchor=True %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
     {#- [구글 품질 2단계 2026-11-20] GRM 요지 — 이 문서의 지적 문장만으로 쓴 두세 문장(doc_gist.view 가 검사·해시를
         통과한 것만 넘긴다. 국문 트리 전용). 없으면 아무것도 그리지 않는다. -#}
     {%- if doc_gist %}

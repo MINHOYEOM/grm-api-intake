@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [영문 구독 2026-11-27] 영문 트리는 첫 화면 줄형 칸이 구독 칸이다 — 하단 밴드를 끈다(base.html). 한국어는 종전 그대로. -#}
+{% set sub_inline_on = sub_inline_lists %}
 {% block content %}
 {#- [기준 조항 원문] /clauses/{src}/{doc}/ — 문서 1건의 조항 목차. 소제목뿐인 번호는 글자로만, 본문 있는
     조항은 그 조항 페이지로. 미리보기는 화면에서만 줄인다(CSS 말줄임 · 데이터 무절단). -#}
@@ -12,6 +14,7 @@
     <h1 class="ct-h1">{{ doc.code }}</h1>
     {%- if doc.title %}<p class="ct-sub" lang="{{ doc.source.lang }}">{{ doc.title }}</p>{% endif %}
     {%- if doc.version %}<p class="ct-path" lang="{{ doc.source.lang }}">{{ doc.version }}</p>{% endif %}
+    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top', sub_anchor=True %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
     <div class="ct-links" style="margin-top:16px">
       <a href="{{ doc.url }}" target="_blank" rel="noopener">{{ _('공식 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
     </div>

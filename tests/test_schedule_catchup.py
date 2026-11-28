@@ -324,6 +324,7 @@ class RunAll(unittest.TestCase):
             "grm-rum-analytics.yml": ("2026-11-23T04:30Z", {"probe": "true"}, "점검"),
             "grm-stranded-batch-pr.yml": ("2026-11-23T08:41Z", None, "경보"),
             "grm-publish-watchdog.yml": ("2026-11-23T00:13Z", None, "경보"),
+            "grm-completeness-daily.yml": ("2026-11-23T14:07Z", None, "경보"),
             "grm-db-backup.yml": ("2026-11-22T20:37Z", {}, "apply"),
         }
         targets = {t.workflow: t for t in sc.TARGETS}

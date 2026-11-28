@@ -22,6 +22,11 @@ import render  # noqa: E402
 
 
 def main(argv: "list[str] | None" = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--brief", required=True, type=Path)
     g = ap.add_mutually_exclusive_group(required=True)

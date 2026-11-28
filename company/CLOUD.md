@@ -31,7 +31,7 @@ gh api "$R/issues?state=open&labels=automation-warning" --jq '.[]|select(.pull_r
 다른 브랜치의 파일은 `git fetch origin <branch>` 후 `git show FETCH_HEAD:<path>` 로 읽는다.
 
 ## 브랜치·PR·머지
-- push 전 `python ci_slot_wait.py` 실행.
+- push 전 `python ci_slot_wait.py` 실행. **단, `claude/company-*` 브랜치(편집팀 기자·교열·백업)는 건너뛴다** — PR CI 를 띄우지 않고, 기다리다 120초를 넘겨 백그라운드로 가면 세션이 끝나며 push 가 사라진다(11-28 리허설 불합격). 스크립트도 이 접두 브랜치면 바로 통과시킨다.
 - push 는 `claude/` 로 시작하는 브랜치에만. PR 제목은 지시문이 정한 형식 그대로 쓴다 — PC 백업의 중복 확인과 자동 머지가 그 제목을 찾는다.
 - 머지하지 않는다. `grm-stranded-batch-pr.yml` 이 6시간마다 돌며 CI 가 전부 성공하고 3시간 지난 PR 을 머지한다
   (대상 제목: `chore(findings): 일일 번역 배치` · `glossary(weekly):` · `quiz(weekly):` · `glossary(fig):`).

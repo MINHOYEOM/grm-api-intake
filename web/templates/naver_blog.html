@@ -20,6 +20,10 @@
   .nb-body p{margin:0}
   .nb-body a{color:var(--coral)}
   .nb-steps{font-family:var(--sans);font-size:14px;line-height:1.8;color:var(--muted);margin:24px 0 0;padding-left:20px;word-break:keep-all}
+  .nb-checks ul{list-style:none;margin:0;padding:0;font-family:var(--sans);font-size:14px;line-height:1.8;color:var(--body)}
+  .nb-checks li.warn span:first-child{color:var(--coral)}
+  .nb-target,.nb-note{color:var(--muted)}
+  .nb-note{font-family:var(--sans);font-size:13px;margin:8px 0 0}
   .nb-ok{font-family:var(--sans);font-size:13px;color:var(--muted);min-height:18px;margin:8px 0 0}
 </style>
 <main>
@@ -38,6 +42,17 @@
         <div class="nb-head"><b>{{ _("본문") }}</b><button class="btn coral" type="button" id="nb-copy-body">{{ _("본문 복사") }}</button></div>
         <div class="nb-body" id="nb-body">{{ blog_body_html|safe }}</div>
       </section>
+      {% if blog_checks %}
+      <section class="nb-box nb-checks" id="nb-checks">
+        <div class="nb-head"><b>{{ _("점검") }}</b></div>
+        <ul>
+          {% for r in blog_checks %}
+          <li class="{{ 'ok' if r.ok else 'warn' }}"><span aria-hidden="true">{{ "✓" if r.ok else "△" }}</span> {{ r.name }} {{ r.value }} <span class="nb-target">({{ r.target }})</span></li>
+          {% endfor %}
+        </ul>
+        <p class="nb-note">{{ _("△ 는 발행을 막지 않습니다. 카드 내용이 적은 주에 생깁니다.") }}</p>
+      </section>
+      {% endif %}
       <p class="nb-ok" id="nb-ok" role="status" aria-live="polite" data-done="{{ _('복사했습니다. 블로그 글쓰기 화면에 붙여 넣으세요.') }}" data-fail="{{ _('복사하지 못했습니다. 본문을 직접 선택해 복사해 주세요.') }}"></p>
       <ol class="nb-steps">
         <li>{{ _("블로그 글쓰기 열기를 누른다(GRM 블로그에 로그인된 브라우저에서).") }}</li>

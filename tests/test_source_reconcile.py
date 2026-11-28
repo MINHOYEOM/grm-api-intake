@@ -8,12 +8,15 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import sys
 import unittest
-from datetime import date
+from contextlib import redirect_stdout
+from datetime import date, datetime, timedelta
 from pathlib import Path
-from unittest.mock import MagicMock
+from tempfile import TemporaryDirectory
+from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -40,6 +43,93 @@ def recon(docs, *, collected=(), ledger=None, run=RUN, spec=SPEC, **kw):
 
 def row(basis="metadata", first="2026-11-30", reason="out_of_scope_type"):
     return sr.LedgerRow(basis=basis, reason_code=reason, first_seen=first, last_seen=first)
+
+
+class ReconcileStalenessTest(unittest.TestCase):
+    NOW = datetime(2026, 12, 1, 12, tzinfo=sr.KST)
+
+    def report(self, hours_ago, verdict=sr.V_OK, key="wl"):
+        return {
+            "generated_at": (self.NOW - timedelta(hours=hours_ago)).isoformat(),
+            "sources": [{"key": key, "verdict": verdict}],
+        }
+
+    def alarm(self, *reports, sources=("wl",)):
+        return sr.reconcile_staleness_alarm(now=self.NOW, sources=sources, reports=reports)
+
+    def test_25_and_26_hours_are_fresh(self):
+        for hours in (25, 26):
+            with self.subTest(hours=hours):
+                self.assertEqual(self.alarm(self.report(hours)), "")
+
+    def test_27_hours_and_missing_source_alarm_with_one_line(self):
+        alarm = self.alarm(self.report(27), self.report(25, key="mfds_rss"),
+                           sources=("wl", "mfds_rss", "fda483"))
+        self.assertEqual(alarm, "최근 26시간 내 완료된 원천 대조 판정 없음 — fda483, wl")
+
+    def test_no_verdict_alarms(self):
+        self.assertTrue(self.alarm().endswith("— wl"))
+
+    def test_consecutive_skips_keep_alarm_until_next_real_reconcile(self):
+        old = self.report(49)
+        first_skip = self.report(25, "skipped")
+        second_skip = self.report(1, "skipped")
+        missing_report_alarm = self.alarm(old)
+        self.assertTrue(missing_report_alarm)
+        self.assertEqual(self.alarm(old, first_skip), missing_report_alarm)
+        self.assertEqual(self.alarm(old, first_skip, second_skip), missing_report_alarm)
+
+        # 다음 실행의 기존 대조 창에는 건너뛴 날의 문서도 들어온다.
+        spec = sr.SPEC_BY_KEY["wl"]
+        missed_day = (self.NOW - timedelta(days=2)).date()
+        previous_doc = doc("from-skipped-day", missed_day.isoformat())
+
+        def fetch(start, end):
+            self.assertLessEqual(start, missed_day)
+            self.assertGreaterEqual(end, missed_day)
+            return sr.FetchOutcome(docs=[previous_doc])
+
+        with (
+            patch.object(sr, "datetime", wraps=datetime) as clock,
+            patch.object(sr, "load_collected_keys", return_value=({f"{spec.source}::from-skipped-day"}, set())),
+            patch.object(sr, "load_ledger", return_value={}),
+        ):
+            clock.now.return_value = self.NOW
+            recovered = sr.run(
+                run_date=self.NOW.date(), base_days=7, enf_days=30, specs=(spec,),
+                fetchers={spec.key: fetch},
+                env={"NOTION_TOKEN": "fake", "NOTION_DATABASE_ID": "fake",
+                     "SUPABASE_URL": "https://fake.invalid", "SUPABASE_SERVICE_ROLE_KEY": "fake"},
+            )
+        self.assertEqual(recovered["sources"][0]["counts"]["collected"], 1)
+        self.assertEqual(recovered["sources"][0]["counts"]["missed"], 0)
+        self.assertEqual(self.alarm(old, first_skip, second_skip, recovered), "")
+
+    def test_unreachable_or_disabled_does_not_refresh_expected_source(self):
+        for verdict in (sr.V_UNREACHABLE, sr.V_STORE_UNREACHABLE, sr.V_DISABLED):
+            with self.subTest(verdict=verdict):
+                self.assertTrue(self.alarm(self.report(27), self.report(1, verdict)))
+
+    def test_freshness_cli_reads_only_saved_reports(self):
+        with (
+            TemporaryDirectory() as tmp,
+            patch.object(sr, "run", side_effect=AssertionError("live reconcile")),
+            patch.object(sr, "datetime", wraps=datetime) as clock,
+        ):
+            clock.now.return_value = self.NOW
+            output = io.StringIO()
+            args = ["--check-freshness", tmp, "--sources", "wl"]
+            with redirect_stdout(output):
+                self.assertEqual(sr.main(args), 0)
+            self.assertTrue(output.getvalue().strip().endswith("— wl"))
+
+            report_dir = Path(tmp) / "123"
+            report_dir.mkdir()
+            (report_dir / "source-reconcile.json").write_text(json.dumps(self.report(1)), encoding="utf-8")
+            output = io.StringIO()
+            with redirect_stdout(output):
+                self.assertEqual(sr.main(args), 0)
+            self.assertEqual(output.getvalue(), "")
 
 
 class EquationTest(unittest.TestCase):

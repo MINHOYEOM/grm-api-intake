@@ -42,6 +42,7 @@ import sys
 import urllib.parse
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
+from pathlib import Path
 from typing import Any, Callable, Iterable
 from zoneinfo import ZoneInfo
 
@@ -83,6 +84,8 @@ VERDICT_LABEL_KO = {
     V_DEFERRED_ONLY: "전부 미뤄짐", V_STORE_UNREACHABLE: "저장소 대조 불가", V_DISABLED: "수집 꺼짐",
 }
 _CLOSEABLE = frozenset({V_OK, V_QUIET, V_DEFERRED_ONLY, V_DISABLED})   # 이 판정이면 열린 이슈를 닫는다
+_COMPLETED_VERDICTS = frozenset({V_OK, V_MISSED, V_QUIET, V_DEFERRED_ONLY})
+RECONCILE_MAX_AGE = timedelta(hours=26)
 
 WINDOW_BASE = "base"   # 수집기 기본 창(--window-days, 7)
 WINDOW_ENF = "enf"     # 지연공개 창(MFDS_ENFORCEMENT_WINDOW_DAYS, 30)
@@ -221,6 +224,27 @@ class SourceResult:
 # ─────────────────────────────────────────────────────────────────────────────
 # 순수 함수 — 등식·판정
 # ─────────────────────────────────────────────────────────────────────────────
+def reconcile_staleness_alarm(
+    *, now: datetime, sources: Iterable[str], reports: Iterable[dict[str, Any]],
+) -> str:
+    """보고서의 소스별 대조 완료 시각으로 경보 한 줄을 만든다."""
+    cutoff = now - RECONCILE_MAX_AGE
+    fresh = set()
+    for report in reports:
+        generated_at = datetime.fromisoformat(report["generated_at"])
+        if generated_at.tzinfo is None or not cutoff <= generated_at <= now:
+            continue
+        fresh.update(
+            row["key"] for row in report.get("sources", ())
+            if row["verdict"] in _COMPLETED_VERDICTS
+        )
+
+    stale = sorted(set(sources) - fresh)
+    if stale:
+        return f"최근 26시간 내 완료된 원천 대조 판정 없음 — {', '.join(stale)}"
+    return ""
+
+
 def noid_document_id(official_url: str, title: str, date_iso: str) -> str:
     """문서 키가 비어 있을 때 수집기가 합성하는 키(`collect_intake.insert_items` 의 식 그대로).
 
@@ -1357,12 +1381,25 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--report", default="source-reconcile.md")
     ap.add_argument("--no-store", action="store_true", help="Notion·제외 장부를 읽지 않고 원천 건수만 센다")
     ap.add_argument("--run-url", default="")
+    ap.add_argument("--check-freshness", type=Path, metavar="REPORT_DIR",
+                    help="저장된 대조 보고서로 경보 한 줄만 출력(읽기 전용)")
     args = ap.parse_args(argv)
 
     env = dict(os.environ)
+    specs = tuple(SPEC_BY_KEY[k] for k in args.sources) if args.sources else SPECS
+    if args.check_freshness is not None:
+        if not args.check_freshness.is_dir():
+            ap.error("--check-freshness: 대조 보고서 디렉터리가 필요합니다")
+        enabled = [s.key for s in specs if not s.flag or _flag(env, s.flag, s.flag_default)]
+        reports = (json.loads(path.read_text(encoding="utf-8"))
+                   for path in args.check_freshness.glob("*/source-reconcile.json"))
+        alarm = reconcile_staleness_alarm(now=datetime.now(KST), sources=enabled, reports=reports)
+        if alarm:
+            _emit(alarm)
+        return 0
+
     base = args.window_days or _int_env(env, "GRM_WINDOW_DAYS", DEFAULT_WINDOW_DAYS)
     enf = max(base, _int_env(env, "MFDS_ENFORCEMENT_WINDOW_DAYS", DEFAULT_ENF_WINDOW_DAYS))
-    specs = tuple(SPEC_BY_KEY[k] for k in args.sources) if args.sources else SPECS
     run_date = kst_today()
     _emit(f"원천 대조 시작 run_date(KST)={run_date} 기본창={base}일 지연공개창={enf}일 소스={[s.key for s in specs]}")
     report = run(run_date=run_date, base_days=base, enf_days=enf, specs=specs, env=env,

@@ -33,6 +33,7 @@ SWITCH_SKIP = "vars.GRM_INTAKE_NOTION != 'off'"
 # off 를 스스로 아는 스크립트 — off 면 노션 API 를 부르지 않는다(실행 검사: 위 docstring).
 OFF_AWARE = {
     "collect_intake.py": "tests/test_intake_notion_off.py",
+    "completeness_refill.py": "tests/test_completeness_refill.py",
     "delta_bridge.py": "tests/test_bridge_notion_off.py",
     "fda_body_coverage.py": "tests/test_bridge_notion_off.py",
     "source_reconcile.py": "tests/test_notion_off_surroundings.py",

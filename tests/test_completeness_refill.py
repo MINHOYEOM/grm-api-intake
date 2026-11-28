@@ -272,6 +272,31 @@ class StateTest(unittest.TestCase):
                     self.assertRegex(text, rf"\n      {name}:\n", f"{key}: 워크플로에 입력 {name} 없음")
 
 
+class NotionOffTest(unittest.TestCase):
+    """GRM_INTAKE_NOTION=off 면 자식 프로세스(재수집·재대조)에 노션 열쇠가 가지 않는다 — 노션 호출 금지."""
+
+    def test_off_strips_notion_keys_from_children(self):
+        seen = []
+
+        def fake_run(cmd, **kw):
+            seen.append(kw.get("env") or {})
+            return type("P", (), {"returncode": 1})()
+
+        env = {"GRM_INTAKE_NOTION": "off", "NOTION_TOKEN": "t", "NOTION_DATABASE_ID": "d", "SUPABASE_URL": "u"}
+        with patch.dict(os.environ, env, clear=True), patch.object(cr.subprocess, "run", side_effect=fake_run):
+            cr._default_runner(["backfill_wl_body_recovery.py"])
+            self.assertIsNone(cr._default_reconciler(["wl"]))
+        self.assertEqual(len(seen), 2)
+        for child in seen:
+            self.assertNotIn("NOTION_TOKEN", child)
+            self.assertNotIn("NOTION_DATABASE_ID", child)
+            self.assertEqual(child.get("SUPABASE_URL"), "u")
+
+    def test_on_keeps_notion_keys(self):
+        with patch.dict(os.environ, {"GRM_INTAKE_NOTION": "on", "NOTION_TOKEN": "t"}, clear=True):
+            self.assertEqual(cr.child_env()["NOTION_TOKEN"], "t")
+
+
 class MainTest(unittest.TestCase):
     def test_main_dry_run_writes_outputs(self):
         with tempfile.TemporaryDirectory() as tmp:

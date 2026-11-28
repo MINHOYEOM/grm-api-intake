@@ -305,8 +305,23 @@ Dispatcher = Callable[[str, dict[str, str]], str]          # "sent" | "busy" | "
 Reconciler = Callable[[list[str]], "dict[str, Any] | None"]
 
 
+# 노션 은퇴 스위치 — off 면 자식 프로세스(재수집 도구·재대조)에 노션 열쇠를 넘기지 않는다. 재대조
+# (source_reconcile.py)는 스스로 off 를 알지만, 열쇠 자체를 빼 두면 이 고리가 부르는 어떤 도구도 노션을 못 부른다.
+NOTION_ENV_KEYS = ("NOTION_TOKEN", "NOTION_DATABASE_ID")
+
+
+def child_env() -> dict[str, str]:
+    from grm_queue import notion_intake_off
+
+    env = dict(os.environ)
+    if notion_intake_off():
+        for k in NOTION_ENV_KEYS:
+            env.pop(k, None)
+    return env
+
+
 def _default_runner(argv: list[str]) -> int:
-    return subprocess.run([sys.executable, *argv], check=False).returncode
+    return subprocess.run([sys.executable, *argv], check=False, env=child_env()).returncode
 
 
 def _gh(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -334,7 +349,8 @@ def _default_dispatcher(workflow: str, inputs: dict[str, str]) -> str:
 def _default_reconciler(keys: list[str]) -> dict[str, Any] | None:
     out = "refill-recheck.json"
     code = subprocess.run([sys.executable, "source_reconcile.py", "--sources", *keys,
-                           "--json", out, "--report", "refill-recheck.md"], check=False).returncode
+                           "--json", out, "--report", "refill-recheck.md"], check=False,
+                          env=child_env()).returncode
     return _load_json(out) if code == 0 else None
 
 

@@ -1,26 +1,26 @@
 {
   "schema_version": "grm-library-staging-diff/v1",
-  "generated_on": "2026-11-27",
+  "generated_on": "2026-11-28",
   "live_catalog_swapped": true,
   "sources": {
     "mfds": {
-      "baseline_count": 137,
-      "candidate_count": 139,
+      "baseline_count": 139,
+      "candidate_count": 141,
       "new_count": 2,
       "changed_count": 0,
       "removed_count": 0,
       "new_ids": [
-        "data0011-16009",
-        "data0011-16011"
+        "data0011-16005",
+        "data0011-16012"
       ],
       "changed_ids": [],
       "removed_ids": [],
-      "collector_items": 44,
-      "derived_items": 28,
+      "collector_items": 42,
+      "derived_items": 26,
       "dropped_items": 16,
       "collector_error": null,
       "change_count": 2,
-      "change_percent": 1.46
+      "change_percent": 1.44
     },
     "ich": {
       "baseline_count": 31,

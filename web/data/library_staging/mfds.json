@@ -1142,6 +1142,22 @@
       "doc_type": "guidance-industry",
       "published_date": "2026-11-27",
       "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16009"
+    },
+    {
+      "id": "data0011-16012",
+      "title_en": "필터 사용 전 멸균 후 완전성 시험(PUPSIT) 수행 시 고려사항",
+      "title_ko": "필터 사용 전 멸균 후 완전성 시험(PUPSIT) 수행 시 고려사항",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-11-27",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16012"
+    },
+    {
+      "id": "data0011-16005",
+      "title_en": "호흡기세포융합바이러스 감염증 예방목적 단클론항체의약품 개발 시 비임상 및 임상 고려사항",
+      "title_ko": "호흡기세포융합바이러스 감염증 예방목적 단클론항체의약품 개발 시 비임상 및 임상 고려사항",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-11-26",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16005"
     }
   ]
 }

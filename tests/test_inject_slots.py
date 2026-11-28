@@ -14,6 +14,7 @@ import pathlib
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 import card_scaffold as cs
 import inject_slots as inj
@@ -451,15 +452,17 @@ class DeepAnalysisRenderSmokeTest(unittest.TestCase):
 
     def _render_brief_html(self, brief: dict) -> str:
         web_dir = pathlib.Path(__file__).resolve().parent.parent / "web"
-        sys.path.insert(0, str(web_dir))
-        import render  # noqa: E402
-        with tempfile.TemporaryDirectory() as tmp:
+        with (mock.patch.object(sys, "path", [str(web_dir), *sys.path]),
+              tempfile.TemporaryDirectory() as tmp):
+            import render  # noqa: E402
+
             data_dir = pathlib.Path(tmp) / "data"
             data_dir.mkdir()
             (data_dir / "brief_web_2026_07_01.json").write_text(
                 json.dumps(brief, ensure_ascii=False, indent=1), encoding="utf-8")
             out_dir = pathlib.Path(tmp) / "dist"
-            render.render_site(data_dir=data_dir, out_dir=out_dir)
+            # These cases inspect the brief HTML, so skip standalone document pages.
+            render.render_site(data_dir=data_dir, out_dir=out_dir, render_doc_pages=False)
             return (out_dir / "briefs" / "2026-07-01" / "index.html").read_text(encoding="utf-8")
 
     def test_deep_analysis_renders_when_present(self) -> None:

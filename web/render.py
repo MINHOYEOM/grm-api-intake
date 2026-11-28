@@ -1816,7 +1816,8 @@ NAVER_BLOG_PAGE = "naver-blog.html"
 # utm.CHANNELS["naver_blog"] 표식을 달아 블로그에서 온 방문을 따로 센다.
 NAVER_BLOG_HOME = "https://blog.naver.com/grmsolution"
 NAVER_BLOG_WRITE_URL = NAVER_BLOG_HOME + "/postwrite"
-_BLOG_FACT_LABELS = ("발행일", "실사일", "시설 · 유형")
+_BLOG_FACT_LABELS = (("제조소/업체", "제조소/업체"), ("시설 · 유형", "시설 유형"),
+                     ("실사일", "실사일"), ("발행일", "발행일"))
 
 
 def pick_blog_483(cards: list[dict[str, Any]]) -> "int | None":
@@ -1832,11 +1833,18 @@ def pick_blog_483(cards: list[dict[str, Any]]) -> "int | None":
 
 
 def naver_blog_483_doc(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
-                       brief_url: str, title_dateform: str, pub: str = "") -> dict[str, Any]:
-    """블로그 원고 한 벌 — {"title": 제목(없으면 ""), "blocks": [...]}.
+                       brief_url: str, title_dateform: str, pub: str = "",
+                       glossary_terms: "list[dict[str, Any]] | None" = None,
+                       term_freq: "dict[str, int] | None" = None) -> dict[str, Any]:
+    """블로그 원고 한 벌 — {"title": 제목(없으면 ""), "blocks": [...], "site_text": 겹침 비교용 카드 문장}.
+
+    [위성 원고 2026-11-26] 사이트 카드 문장(요약·핵심 사실·시사점)을 그대로 붙이지 않는다 — 같은 글이 두 곳에
+    있으면 네이버가 중복 문서로 본다. 대신 카드 사실 표·483 관찰 제목 전체·용어사전 풀이(모두 커밋된 데이터)로
+    짓고 사이트 해설로 잇는다. 지어낸 사실 0, LLM 0. 규칙 점검은 naver_blog_checks() 한 곳.
 
     블록 꼴: ("p", 문장) · ("hp", 소제목, 문장) · ("list", 소제목, [항목]) · ("links", 소제목, [(이름, URL)])
-    · ("link_p", 이름, URL). `card_views` 는 `cards` 와 같은 순서(문서 링크만 뷰에서 쓴다)."""
+    · ("link_p", 이름, URL). `card_views` 는 `cards` 와 같은 순서(문서 링크만 뷰에서 쓴다).
+    `glossary_terms` 가 없으면 용어 칸을 빼고, `term_freq`(브리프 카드 용어 빈도)가 있으면 드문 용어부터 고른다."""
     from utm import channel_url  # 채널 표식 정본(web/utm.py) — 발행일이 있을 때만 단다
 
     def tag(u: str) -> str:
@@ -1849,40 +1857,92 @@ def naver_blog_483_doc(cards: list[dict[str, Any]], card_views: list[dict[str, A
             ("p", f"[{title_dateform}] 이번 주에는 해설할 FDA 483 이 없습니다."),
             ("link_p", "이번 주 규제뉴스 전체", tag(brief_url))]}
     c, cv = cards[i], card_views[i]
-    n = int((c.get("deterministic_detail") or {}).get("count") or 0)
-    facts = {f.get("label"): f.get("value") for f in (c.get("facts") or []) if isinstance(f, dict)}
+    dd = c.get("deterministic_detail") or {}
+    n = int(dd.get("count") or 0)
+    facts = {f.get("label"): _nb_clean(f.get("value")) for f in (c.get("facts") or [])
+             if isinstance(f, dict) and f.get("value")}
+    firm = _nb_clean(c.get("headline_target"))
+    issue = _nb_clean(c.get("title_issue"))
     blocks: list[tuple[Any, ...]] = []
-    meta = [f"{k.replace(' · ', ' ')} {str(facts[k]).removesuffix(' · 483')}"
-            for k in _BLOG_FACT_LABELS if facts.get(k)]
-    if meta:
-        blocks.append(("p", " · ".join(meta)))
-    if c.get("summary"):
-        blocks.append(("p", c["summary"]))
-    if c.get("key_facts"):
-        blocks.append(("list", f"FDA가 적은 관찰사항{f' ({n}건 중 주요 내용)' if n else ''}",
-                       list(c["key_facts"])))
-    if c.get("implication"):
-        blocks.append(("hp", "함께 적힌 내용", c["implication"]))
+    # 1) 첫 문단 — 키워드(FDA 483)와 업체·관찰 수. 연결 문장은 고정, 사실은 카드 값.
+    intro = "FDA 483 한 건을 골라 정리합니다."
+    if firm:
+        intro += f" 이번에 볼 문서는 {firm}의 Form 483 입니다."
+    if n:
+        intro += f" FDA가 적은 관찰사항은 {n}건입니다."
+    blocks.append(("p", intro))
+    if issue:
+        blocks.append(("hp", "이번 문서의 쟁점",
+                       f"GRM 사이트 해설이 꼽은 쟁점은 {issue}입니다. "
+                       "관찰사항별 한국어 해설과 원문은 아래 링크에 있습니다."))
+    # 2) 문서 기본 정보 — 카드의 사실 표(facts) 값 그대로.
+    info = [f"{lab.replace(' · ', ' ')}: {facts[k].removesuffix(' · 483')}"
+            for k, lab in _BLOG_FACT_LABELS if facts.get(k)]
+    if not facts.get("제조소/업체") and firm:
+        info.insert(0, f"제조소/업체: {firm}")
+    if n:
+        info.append(f"관찰사항: {n}건")
+    if info:
+        blocks.append(("list", "문서 기본 정보", info))
+    # 3) 관찰사항 제목 — 483 관찰 원문의 한국어 제목(deterministic_detail). 같은 제목은 번호를 묶는다.
+    #    사이트 카드는 이 중 몇 건만 풀어 쓰므로 블로그는 전체 목록을 보여 준다(카드 문장 재게시가 아니다).
+    by_title: dict[str, list[str]] = {}
+    for o in dd.get("observations") or []:
+        t = _nb_clean(o.get("deficiency_ko"))
+        if t:
+            by_title.setdefault(t, []).append(str(o.get("number") or "").strip())
+    if by_title:
+        blocks.append(("list", f"FDA가 적은 관찰사항 {n or len(by_title)}건의 제목",
+                       [f"관찰 {'·'.join(x for x in nums if x)}: {t}" if any(nums) else t
+                        for t, nums in by_title.items()]))
+    # 4) 글에 나온 용어 — 카드·관찰 제목에 실제로 나온 표제어만, GRM 용어사전(glossary.json) 쉬운 풀이 그대로.
+    if glossary_terms:
+        by_id = {t["id"]: t for t in glossary_terms if t.get("id")}
+        blob = "\n".join([_card_term_link_blob(c), *by_title])
+        sel = _select_term_links_from_blob(blob, build_doc_term_link_index(glossary_terms),
+                                           term_freq or {}, 6)
+        items = []
+        for _surface, tid in sel:
+            t = by_id.get(tid) or {}
+            easy = _nb_clean(t.get("easy_ko"))
+            if easy and len(items) < 3:
+                en = _nb_clean(t.get("term_en"))
+                items.append(f"{_nb_clean(t.get('term_ko'))}{f'({en})' if en else ''}: {easy}")
+        if items:
+            blocks.append(("list", "글에 나온 용어", items))
+    # 5) 현장 점검 질문 — 사이트 카드의 점검 항목(짧은 질문이라 그대로 둔다).
     if c.get("checks"):
-        blocks.append(("list", "우리 현장에서 확인할 것", list(c["checks"])))
+        blocks.append(("list", "우리 현장에서 확인할 것", [_nb_clean(k) for k in c["checks"] if k]))
     links = []
     if cv.get("doc_href"):
         links.append(("483 원문과 지적 전체(한국어)", tag(_abs_url(cv["doc_href"]))))
     links += [("이번 주 규제뉴스 전체", tag(brief_url)),
               ("실사 지적을 매주 메일로 받기(무료)", tag(f"{home}#subscribe"))]
+    note = ("이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. "
+            "요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다.")
+    if any(b[0] == "list" and b[1] == "글에 나온 용어" for b in blocks):
+        note += " 용어 풀이는 GRM 용어사전에서 옮겼습니다."
     blocks += [("links", "원문과 더 보기", links),
-               ("p", "이 글은 FDA가 공개한 Form 483 을 바탕으로 GRM(grm-solutions.com)이 정리했습니다. "
-                     "요약·번역에는 생성형 AI 를 썼고, 기준은 FDA 영어 원문입니다."),
-               ("p", "#FDA483 #GMP #제약품질 #실사대비 #GRM")]
-    return {"title": f"FDA 483 해설 | {c.get('headline_target') or ''} — {c.get('title_issue') or ''}",
-            "blocks": blocks}
+               ("hp", "이 글의 출처", note),
+               ("p", "#FDA483 #Form483 #FDA실사 #GMP #제약품질 #실사대비 #GRM")]
+    title = f"FDA 483 해설 · {firm}, {issue}" if firm and issue else f"FDA 483 해설 · {firm or issue}"
+    if len(title) > NAVER_BLOG_TITLE_MAX and issue:
+        title = f"FDA 483 해설 · {issue}"      # 업체는 본문 첫 문단·기본 정보에 남는다
+    return {"title": title, "blocks": blocks, "site_text": naver_blog_site_text(c)}
 
 
 def build_naver_blog_483(cards: list[dict[str, Any]], card_views: list[dict[str, Any]],
-                         brief_url: str, title_dateform: str, pub: str = "") -> str:
+                         brief_url: str, title_dateform: str, pub: str = "",
+                         glossary_terms: "list[dict[str, Any]] | None" = None,
+                         term_freq: "dict[str, int] | None" = None) -> str:
     """블로그 원고(한국어 평문) — naver_blog_483_doc() 를 줄글로 편다."""
-    doc = naver_blog_483_doc(cards, card_views, brief_url, title_dateform, pub)
-    lines = [f"제목: {doc['title']}", ""] if doc["title"] else []
+    return build_naver_blog_txt(naver_blog_483_doc(cards, card_views, brief_url, title_dateform, pub,
+                                                   glossary_terms, term_freq))
+
+
+def build_naver_blog_txt(doc: dict[str, Any]) -> str:
+    """원고 한 벌 → 평문(naver-blog.txt). 붙여넣기 HTML(build_naver_blog_html)과 같은 doc 에서 나온다."""
+    lines =[f"제목: {doc['title']}", ""] if doc["title"] else []
     for b in doc["blocks"]:
         if b[0] == "p":
             lines += [b[1], ""]
@@ -1916,6 +1976,99 @@ def build_naver_blog_html(doc: dict[str, Any]) -> str:
         elif b[0] == "link_p":
             out.append(f'<p><a href="{esc(b[2])}">{esc(b[1])}</a></p>')
     return "\n".join(out)
+
+
+# ── [네이버 블로그 점검 2026-11-26] 규칙 한 곳 — 시험(전 발행호 게이트)과 붙여넣기 쪽(점검 목록)이 같은 함수를 부른다.
+# hard = 생성기가 늘 지킬 수 있는 것(어기면 시험 실패) · soft = 카드가 얼마나 풍부한지에 달린 것(쪽에 △ 로만 보인다).
+NAVER_BLOG_TITLE_MAX = 40
+NAVER_BLOG_KEYWORD = "FDA 483"
+NAVER_BLOG_BODY_MIN = 1200
+# 블로그 어절 5-gram 중 사이트 카드 문장에도 있는 몫의 상한. 실측(11-26, 483 이 있는 발행호 19건): 카드를 그대로
+# 옮기던 원고 65~86%, 위성 원고 3~14%, 위성 + 핵심 사실(key_facts) 재게시 8~33%. 상한 25% = 최댓값 위 11%p 여유이면서
+# 요약·핵심 사실을 다시 붙이면 여러 호가 걸리는 자리(35% 는 핵심 사실 재게시를 못 잡는다).
+NAVER_BLOG_OVERLAP_MAX = 0.25
+_NB_INVISIBLE_RE = re.compile("[­᠎​-‏‪-‮⁠-⁤⁦-⁩﻿\U000e0000-\U000e007f]")
+_NB_SITE_HOST = "grm-solutions.com"
+
+
+def _nb_clean(s: str) -> str:
+    """원고에 들어갈 문자열 — 보이지 않는 유니코드·마크다운 흔적(**, |, 줄머리 #)을 걷는다(사실은 바꾸지 않는다)."""
+    s = _NB_INVISIBLE_RE.sub("", str(s or "")).replace("**", "").replace("|", "·")
+    return re.sub(r"(?m)^#+\s*", "", s).strip()
+
+
+def naver_blog_site_text(card: dict[str, Any]) -> str:
+    """겹침 비교 대상 — 사이트 카드에 실린 문장(제목·요약·핵심 사실·시사점·점검)."""
+    parts = [f"{card.get('headline_target') or ''} {card.get('title_issue') or ''}", card.get("summary") or ""]
+    parts += list(card.get("key_facts") or []) + [card.get("implication") or ""] + list(card.get("checks") or [])
+    return "\n".join(p for p in parts if p)
+
+
+def _nb_shingles(text: str, n: int = 5) -> set[tuple[str, ...]]:
+    out: set[tuple[str, ...]] = set()
+    for line in text.splitlines():
+        toks = [t for t in (w.strip(".,·:;()[]'\"?“”‘’") for w in line.split()) if t]
+        out.update(tuple(toks[k:k + n]) for k in range(len(toks) - n + 1))
+    return out
+
+
+def naver_blog_overlap(blog_text: str, site_text: str) -> float:
+    """블로그 어절 5-gram 가운데 사이트 문장에도 있는 몫(0~1). 블로그 5-gram 이 없으면 0."""
+    mine = _nb_shingles(blog_text)
+    return len(mine & _nb_shingles(site_text)) / len(mine) if mine else 0.0
+
+
+def naver_blog_lines(doc: dict[str, Any]) -> list[str]:
+    """원고 본문 줄(제목 제외, URL 제외) — 길이·겹침·흔적 점검이 보는 글."""
+    out: list[str] = []
+    for b in doc["blocks"]:
+        if b[0] == "p":
+            out.append(b[1])
+        elif b[0] == "hp":
+            out += [b[1], b[2]]
+        elif b[0] == "list":
+            out += [b[1], *b[2]]
+        elif b[0] == "links":
+            out += [b[1], *(k for k, _ in b[2])]
+        elif b[0] == "link_p":
+            out.append(b[1])
+    return out
+
+
+def naver_blog_checks(doc: dict[str, Any], site_text: "str | None" = None) -> list[dict[str, Any]]:
+    """[{name, ok, value, target, hard}] — 네이버 블로그 원고 규칙(공개 SEO 도구에서 옮긴 결정적 규칙만)."""
+    title = doc.get("title") or ""
+    lines = naver_blog_lines(doc)
+    body = "\n".join(lines)
+    site = doc.get("site_text", "") if site_text is None else site_text
+    tags = [ln for ln in lines if ln.startswith("#") and all(w.startswith("#") for w in ln.split())]
+    n_tags = sum(len(ln.split()) for ln in tags)
+    urls = [u for b in doc["blocks"] for u in ([x for _, x in b[2]] if b[0] == "links" else
+                                                 [b[2]] if b[0] == "link_p" else [])]
+    site_links = len({u.split("?")[0].split("#")[0] for u in urls if _NB_SITE_HOST in u})
+    heads = sum(1 for b in doc["blocks"] if b[0] in ("hp", "list", "links"))
+    md = [ln for ln in [title, *lines] if ln not in tags and (ln.startswith("#") or "**" in ln or "|" in ln)]
+    invisible = len(_NB_INVISIBLE_RE.findall(title + body))
+    first_p = next((b[1] for b in doc["blocks"] if b[0] == "p"), "")
+    ov = naver_blog_overlap(body, site) if site else 0.0
+    kw = title.find(NAVER_BLOG_KEYWORD)
+    has_title = bool(title)
+    rows = [
+        ("제목 길이", len(title) <= NAVER_BLOG_TITLE_MAX, f"{len(title)}자", f"≤{NAVER_BLOG_TITLE_MAX}자", False),
+        ("제목 앞 15자 안 키워드", (not has_title) or 0 <= kw <= 15 - len(NAVER_BLOG_KEYWORD),
+         f"{kw + 1}번째 글자" if kw >= 0 else "없음", "15자 안", True),
+        ("제목 키워드 반복", title.count(NAVER_BLOG_KEYWORD) < 3, f"{title.count(NAVER_BLOG_KEYWORD)}회", "3회 미만", True),
+        ("첫 문단 키워드", (not has_title) or NAVER_BLOG_KEYWORD in first_p,
+         "있음" if NAVER_BLOG_KEYWORD in first_p else "없음", "있음", True),
+        ("본문 길이", len(body) >= NAVER_BLOG_BODY_MIN, f"{len(body):,}자", f"≥{NAVER_BLOG_BODY_MIN:,}자", False),
+        ("소제목", (not has_title) or heads >= 3, f"{heads}개", "3개 이상", True),
+        ("해시태그", (not has_title) or 5 <= n_tags <= 10,f"{n_tags}개", "5~10개", True),
+        ("사이트 링크", 1 <= site_links <= 3, f"{site_links}개", "1~3개", True),
+        ("마크다운 흔적", not md, f"{len(md)}줄", "0줄", True),
+        ("보이지 않는 문자", invisible == 0, f"{invisible}자", "0자", True),
+        ("사이트 문장 겹침", ov <= NAVER_BLOG_OVERLAP_MAX, f"{ov:.0%}", f"≤{NAVER_BLOG_OVERLAP_MAX:.0%}", True),
+    ]
+    return [{"name": a, "ok": bool(b), "value": c, "target": d, "hard": e} for a, b, c, d, e in rows]
 
 
 def build_brief_glance(sections: list[dict[str, Any]], card_views: list[dict[str, Any]],
@@ -9208,18 +9361,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         _write(out_dir / share_file, "\n".join(share_lines) + "\n")
         written.append(share_file)
         # [네이버 블로그 원고 2026-11-26] 이번 주 483 한 건 해설 — 고정 경로, 매주 저절로.
+        # 원고 한 벌(doc)에서 평문·붙여넣기 쪽이 함께 나온다. 용어 칸은 브리프 카드 용어 빈도(드문 것부터)를 쓴다.
+        # ★card_views 는 위에서 용어 링크(Markup)가 끼워졌을 수 있지만 원고는 원본 카드(cards_sorted) 문장만 읽는다.
+        blog_doc = naver_blog_483_doc(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"], pub,
+                                      glossary_terms, brief_term_freq_by_lang.get(DEFAULT_LANG))
         blog_file = brief_page.file(NAVER_BLOG_FILE)
-        _write(out_dir / blog_file,
-               build_naver_blog_483(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"], pub))
+        _write(out_dir / blog_file, build_naver_blog_txt(blog_doc))
         written.append(blog_file)
-        # 같은 원고의 붙여넣기 쪽(복사 단추 둘) — 브리프와 같은 자리라 상대 경로가 브리프와 같다.
-        blog_doc = naver_blog_483_doc(cards_sorted, card_views, brief_page.canonical, ctx["title_dateform"], pub)
+        # 같은 원고의 붙여넣기 쪽(복사 단추 둘 + 점검 목록) — 브리프와 같은 자리라 상대 경로가 브리프와 같다.
         blog_page_file = brief_page.file(NAVER_BLOG_PAGE)
         _write(out_dir / blog_page_file, render_page(
             "naver_blog.html", brief_page, page_title=f"네이버 블로그 원고 · {pub} · GRM",
             nav_active="", description="", canonical="", hide_subscribe=True,
             blog_pub=pub, blog_title=blog_doc["title"], blog_write_url=NAVER_BLOG_WRITE_URL,
-            blog_body_html=build_naver_blog_html(blog_doc)))
+            blog_body_html=build_naver_blog_html(blog_doc),
+            # 점검 목록 — 카드 풍부도에 달린 규칙(soft)과 겹침 값만 △/✓ 로. hard 규칙은 시험이 막는다.
+            blog_checks=[r for r in naver_blog_checks(blog_doc)
+                         if blog_doc["title"] and (not r["hard"] or r["name"] == "사이트 문장 겹침")]))
         written.append(blog_page_file)
 
         # [다국어 5단계 2026-09-04] 영문 브리프 — **서사 다섯과 tldr 이 전부 영어인 호만**

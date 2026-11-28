@@ -157,6 +157,55 @@ def backfill(
     return results
 
 
+# ── 번호 지정 재수집 (수집 완전성 N3) ────────────────────────────────────────────
+IDS_MAX = 100
+_IDS_OK = frozenset({"complete", "already_filled", "excluded_unrelated"})
+
+
+def parse_ids(value: str) -> list[str]:
+    """쉼표·줄바꿈 구분 문서 번호(순서 유지·중복 제거). `Source::번호` 꼴이면 번호만 쓴다."""
+    out: list[str] = []
+    for chunk in str(value or "").replace("\n", ",").split(","):
+        token = chunk.strip().rsplit("::", 1)[-1].strip()
+        if token and token not in out:
+            out.append(token)
+    return out
+
+
+def ids_filter(ids: list[str]) -> str:
+    """PostgREST `in.(...)` 값. 번호는 큰따옴표로 감싸고 안의 따옴표·백슬래시는 이스케이프한다."""
+    quoted = []
+    for i in ids:
+        escaped = i.replace("\\", "\\\\").replace('"', '\\"')
+        quoted.append(f'"{escaped}"')
+    return "in.(" + ",".join(quoted) + ")"
+
+
+def id_report(ids: list[str], rows: list[dict[str, Any]],
+              results: list[dict[str, Any]]) -> dict[str, str]:
+    """지정 번호마다 결과 하나. 원문 판독 대상인데 채워지지 않았거나 DB 에 없으면 '정상'이 아니다.
+
+    - not_found: 지정 소스의 raw_signals 에 그 번호가 없다(수집 자체가 빠짐 — 문서 대조 쪽 경로로)
+    - already_filled: 행은 있고 판독 칸이 이미 차 있다(또는 판독 대상 채널이 아님) — 정상
+    - complete / would_apply: 이번에 채움(dry 면 채울 수 있음)
+    - 그 밖(빈 판독·URL 없음·쓰기 실패 등): 이번 실행에서 못 메움 → exit 1 로 경보
+    """
+    present = {str(r.get("document_id") or "") for r in rows}
+    by_id: dict[str, dict[str, Any]] = {}
+    for r in results:
+        by_id[str(r.get("document_id") or "")] = r
+    out: dict[str, str] = {}
+    for i in ids:
+        if i not in present:
+            out[i] = "not_found"
+        elif i not in by_id:
+            out[i] = "already_filled"
+        else:
+            r = by_id[i]
+            out[i] = "complete" if r.get("complete") and r["status"] == "applied" else r["status"]
+    return out
+
+
 def _read_whopir(url: str) -> tuple[str, dict[str, Any] | None, str]:
     time.sleep(max(who.WHOPIR_EXCERPT_DELAY_SECONDS, BACKFILL_WHO_DELAY_SECONDS))
     return who._fetch_whopir_detail(url)
@@ -212,9 +261,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--ingested-since", default="",
                         help="적재일(ingested_at) 하한 YYYY-MM-DD — 완전성 점검 범위(최근 60일)만 돌릴 때")
     parser.add_argument("--output", default="", help="JSON 결과를 이 파일에도 쓴다")
+    parser.add_argument("--ids", default="",
+                        help=f"수집 완전성 N3: 이 문서 번호만(쉼표 구분, 최대 {IDS_MAX}). "
+                             "대조·칸 점검이 결손으로 찍은 번호를 그대로 넣는다")
     args = parser.parse_args(argv)
     if args.ingested_since and not _DATE_RE.match(args.ingested_since):
         parser.error("--ingested-since 는 YYYY-MM-DD")
+    ids = parse_ids(args.ids)
+    if args.ids and not ids:
+        parser.error("--ids 에 문서 번호가 없습니다")
+    if len(ids) > IDS_MAX:
+        parser.error(f"--ids 는 한 번에 {IDS_MAX}건까지입니다({len(ids)}건)")
     sources = [SOURCE_KEYS[k] for k in (args.source or [])] or list(TARGET_FIELDS)
     base = normalize_supabase_url(os.environ.get("SUPABASE_URL", ""))
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
@@ -227,6 +284,8 @@ def main(argv: list[str] | None = None) -> int:
             params = {"source": f"eq.{source}"}
             if args.ingested_since:
                 params["ingested_at"] = f"gte.{args.ingested_since}"
+            if ids:
+                params["document_id"] = ids_filter(ids)
             rows.extend(fsb._fetch_all_pages(
                 base, key, "raw_signals",
                 select="source,document_id,official_url,raw_signal_id,raw_sha256,raw_json,row_json,ingested_at",
@@ -249,13 +308,21 @@ def main(argv: list[str] | None = None) -> int:
         bucket = summary.setdefault(r["source"], {})
         key_ = "complete" if r.get("complete") else r["status"]
         bucket[key_] = bucket.get(key_, 0) + 1
-    out = json.dumps({"mode": "apply" if args.apply else "dry_run", "sources": sources,
-                      "ingested_since": args.ingested_since, "summary": summary,
-                      "rows": results}, ensure_ascii=False, indent=2)
+    payload: dict[str, Any] = {"mode": "apply" if args.apply else "dry_run", "sources": sources,
+                               "ingested_since": args.ingested_since, "summary": summary,
+                               "rows": results}
+    id_status: dict[str, str] = {}
+    if ids:
+        id_status = id_report(ids, rows, results)
+        payload["ids"] = id_status
+    out = json.dumps(payload, ensure_ascii=False, indent=2)
     print(out)
     if args.output:
         with open(args.output, "w", encoding="utf-8") as fh:
             fh.write(out)
+    ok_ids = _IDS_OK | ({"would_apply"} if not args.apply else set())
+    if any(s not in ok_ids for s in id_status.values()):
+        return 1
     return int(any(r["status"] != "excluded_unrelated" and not r.get("complete") for r in results))
 
 

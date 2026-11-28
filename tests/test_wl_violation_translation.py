@@ -338,7 +338,8 @@ class WlViolationRenderSmokeTest(unittest.TestCase):
             (data_dir / "brief_web_2026_07_01.json").write_text(
                 json.dumps(brief, ensure_ascii=False, indent=1), encoding="utf-8")
             out_dir = pathlib.Path(tmp) / "dist"
-            render.render_site(data_dir=data_dir, out_dir=out_dir)
+            # 이 시험은 주간 브리프 HTML만 검사한다.
+            render.render_site(data_dir=data_dir, out_dir=out_dir, render_doc_pages=False)
             return (out_dir / "briefs" / "2026-07-01" / "index.html").read_text(encoding="utf-8")
 
     def test_ko_and_original_both_rendered(self):

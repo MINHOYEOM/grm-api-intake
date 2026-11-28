@@ -87,12 +87,19 @@ jobs:
               'quiz(weekly):',
               'glossary(fig):',
               'linkedin(anatomy):',
+              'naver-blog(why):',
             ];
             // 링크드인 해부 슬롯 PR — 데이터 2파일(web/data/linkedin_anatomy/)뿐이고 검증은 슬롯 게이트(linkedin_grm --check)·CI 가 한다.
             // 그날 게시 준비에 맞추려고 유예를 30분으로 줄인다. 이 폴더 밖 파일이 하나라도 있으면 머지하지 않는다.
             const ANATOMY_PREFIX = 'linkedin(anatomy):';
             const ANATOMY_GRACE_MS = 30 * 60 * 1000;
             const ANATOMY_PATH = 'web/data/linkedin_anatomy/';
+            // 네이버 블로그 '왜 중요한가' 슬롯 PR(2026-11-26) — 해부 슬롯과 같은 규율: 데이터 폴더 한 곳뿐 + 30분 유예.
+            // 검증은 슬롯 게이트(web/naver_blog_slot.py --check = render.naver_blog_slot_problems)·CI 가 한다.
+            const SLOT_RULES = [
+              { prefix: ANATOMY_PREFIX, path: ANATOMY_PATH },
+              { prefix: 'naver-blog(why):', path: 'web/data/naver_blog/' },
+            ];
             const ISSUE_TITLE = '일일 번역 배치 PR 방치 — 검사 실패 또는 충돌';
             const LABEL_FINDINGS = 'grm-findings';
             const LABEL_FAILURE = 'automation-failure';
@@ -158,7 +165,8 @@ jobs:
                 continue;
               }
 
-              const isAnatomy = pr.title.startsWith(ANATOMY_PREFIX);
+              const slotRule = SLOT_RULES.find((r) => pr.title.startsWith(r.prefix));
+              const isAnatomy = Boolean(slotRule);
               const ageMs = Date.now() - new Date(pr.created_at).getTime();
               if (ageMs <= (isAnatomy ? ANATOMY_GRACE_MS : GRACE_MS)) {
                 console.log(`#${pr.number} 초록·머지가능이지만 생성 ${Math.round(ageMs / 60000)}분 전 — ${isAnatomy ? '30분' : '3시간'} 유예 대기.`);
@@ -166,9 +174,9 @@ jobs:
               }
               if (isAnatomy) {
                 const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: pr.number, per_page: 100 });
-                const outside = files.map((f) => f.filename).filter((f) => !f.startsWith(ANATOMY_PATH));
+                const outside = files.map((f) => f.filename).filter((f) => !f.startsWith(slotRule.path));
                 if (outside.length > 0) {
-                  console.log(`#${pr.number} 해부 슬롯 PR 인데 ${ANATOMY_PATH} 밖 파일이 있다(${outside.join(', ')}) — 머지하지 않는다(사람 검토).`);
+                  console.log(`#${pr.number} 슬롯 PR 인데 ${slotRule.path} 밖 파일이 있다(${outside.join(', ')}) — 머지하지 않는다(사람 검토).`);
                   continue;
                 }
               }

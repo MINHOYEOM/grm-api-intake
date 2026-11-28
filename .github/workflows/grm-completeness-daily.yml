@@ -65,7 +65,12 @@ jobs:
             gh run download "$run_id" -R "$GITHUB_REPOSITORY" -n source-reconcile -D reconcile \
               || echo "아티팩트 없음(run $run_id)"
           fi
-          ls -la reconcile 2>/dev/null || true
+          # 그날 마지막 자동 메움 회차(N3). 아침 놓침을 그날 메웠는지 일보가 이 결과로 판정한다.
+          refill_id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow grm-completeness-refill.yml --status success                       --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$refill_id" ]; then
+            gh run download "$refill_id" -R "$GITHUB_REPOSITORY" -n completeness-refill -D refill               || echo "자동 메움 아티팩트 없음(run $refill_id)"
+          fi
+          ls -la reconcile refill 2>/dev/null || true
 
       - name: Build report
         id: report
@@ -78,7 +83,7 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          args=(--reconcile reconcile/source-reconcile.json --json completeness-daily.json --run-url "$RUN_URL")
+          args=(--reconcile reconcile/source-reconcile.json --refill refill/completeness-refill.json --json completeness-daily.json --run-url "$RUN_URL")
           if [ -n "$IN_DAY" ]; then
             if ! printf '%s' "$IN_DAY" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
               echo "::error::day 형식은 YYYY-MM-DD"; exit 1

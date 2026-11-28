@@ -33,6 +33,13 @@ def ledger(admin_diff=0, incomplete=None):
             "incomplete": incomplete}
 
 
+def refill(*lines, day=DAY, apply=True):
+    return {"day": day.isoformat(), "apply": apply, "lines": list(lines)}
+
+
+REFILL_OK = refill()
+
+
 def n2(**counts):
     return {"sources": {k: {"label": k, "incomplete": n, "by_field": {"f": n} if n else {},
                             "incomplete_ids": [f"{k}-{i}" for i in range(n)]} for k, n in counts.items()}}
@@ -41,7 +48,7 @@ def n2(**counts):
 class LinesTest(unittest.TestCase):
     def test_all_normal_is_one_line(self):
         lines = cd.build_lines(DAY, reconcile(src("fda483"), src("wl", "source_quiet")),
-                               ledger(incomplete=n2(fda483=0)), None)
+                               ledger(incomplete=n2(fda483=0)), None, REFILL_OK)
         result = cd.plan(DAY, lines, {})
         self.assertTrue(result["normal"])
         self.assertEqual(result["summary"], "2026-11-26 전 소스 정상")
@@ -93,9 +100,49 @@ class LinesTest(unittest.TestCase):
         self.assertEqual(cd.hc_line(MONDAY)[0].state, cd.HUMAN)
 
 
+class RefillOverlayTest(unittest.TestCase):
+    """N3 자동 메움 결과 겹치기 — 아침 놓침을 그날 메웠으면 정상, 못 메웠으면 사람 필요(이유 붙임)."""
+
+    def lines(self, *refill_lines, report=None, apply=True):
+        return cd.build_lines(DAY, report or reconcile(src("wl", "missed", ["wl-1"])),
+                              ledger(incomplete=n2()), None, refill(*refill_lines, apply=apply))
+
+    def test_filled_same_day_turns_line_ok(self):
+        lines = self.lines({"key": "wl", "state": "done", "reason": "재수집 → 재대조 정상"})
+        wl = next(l for l in lines if l.key == "reconcile:wl")
+        self.assertEqual(wl.state, cd.OK)
+        self.assertTrue(cd.plan(DAY, lines, {})["normal"])
+
+    def test_unfilled_stays_human_with_refill_reason(self):
+        lines = self.lines({"key": "wl", "state": "wait", "reason": "원천 불가 2회째", "ids": ["wl-1"], "count": 1})
+        wl = next(l for l in lines if l.key == "reconcile:wl")
+        self.assertEqual(wl.state, cd.HUMAN)
+        self.assertIn("자동 메움: 원천 대기 원천 불가 2회째", wl.reason)
+        self.assertEqual(wl.items, ["wl-1"])
+
+    def test_missing_or_stale_refill_needs_human(self):
+        for rf in (None, refill(day=date(2026, 11, 25))):
+            lines = cd.build_lines(DAY, reconcile(src("wl")), ledger(incomplete=n2()), None, rf)
+            self.assertEqual([l.state for l in lines if l.key == "refill"], [cd.HUMAN])
+
+    def test_refill_only_human_line_surfaces(self):
+        lines = self.lines({"key": "fda483", "state": "human", "reason": "DB 에 행이 없는 놓침", "ids": ["d"], "count": 1},
+                           {"key": "mfds_gmp", "state": "pending", "reason": "요청함", "ids": ["g"], "count": 1},
+                           report=reconcile(src("wl")))
+        extra = [(l.key, l.state) for l in lines if l.key.startswith("refill:")]
+        self.assertEqual(extra, [("refill:fda483", cd.HUMAN)])
+
+    def test_apply_off_is_noted_not_alarmed(self):
+        lines = self.lines(report=reconcile(src("wl")), apply=False)
+        note = [l for l in lines if l.key == "refill"]
+        self.assertEqual([l.state for l in note], [cd.OK])
+        self.assertIn("GRM_REFILL_APPLY", note[0].reason)
+
+
 class PlanTest(unittest.TestCase):
     def test_day_count_carries_over(self):
-        lines = cd.build_lines(DAY, reconcile(src("wl", "missed", ["wl-1"])), ledger(incomplete=n2()), None)
+        lines = cd.build_lines(DAY, reconcile(src("wl", "missed", ["wl-1"])), ledger(incomplete=n2()), None,
+                               REFILL_OK)
         first = cd.plan(DAY, lines, {})
         self.assertNotIn("일째", first["title"])
         state = cd.parse_state(first["body"])
@@ -106,10 +153,10 @@ class PlanTest(unittest.TestCase):
 
     def test_resolved_item_drops_from_state(self):
         lines = cd.build_lines(DAY, reconcile(src("wl", "missed", ["wl-1"]), src("ema", "missed", ["e"])),
-                               ledger(incomplete=n2()), None)
+                               ledger(incomplete=n2()), None, REFILL_OK)
         state = cd.parse_state(cd.plan(DAY, lines, {})["body"])
         next_lines = cd.build_lines(DAY, reconcile(src("wl"), src("ema", "missed", ["e"])),
-                                    ledger(incomplete=n2()), None)
+                                    ledger(incomplete=n2()), None, REFILL_OK)
         self.assertEqual(set(cd.plan(DAY, next_lines, state)["since"]), {"reconcile:ema"})
 
 

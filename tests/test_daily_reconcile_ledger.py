@@ -12,6 +12,7 @@ from unittest.mock import Mock, patch
 import collect_mfds_admin_action
 import collect_mfds_recall
 import daily_reconcile_ledger as ledger
+import grm_common
 from tests.test_migration_function_grants import _statements, _violations
 
 
@@ -93,6 +94,10 @@ class DailyReconcileLedgerTest(unittest.TestCase):
                 inside = {"date": "2026-10-26"}
                 paginator = Mock(total_count=4, truncated=False)
                 paginator.__iter__ = Mock(return_value=iter([([outside, inside, inside, inside], "")]))
+                # 실제 _DatagoPaginator 처럼 상한 건강값(dict)을 돌려준다(N4-1 cap_health).
+                paginator.health = Mock(
+                    side_effect=lambda label: grm_common.cap_health(label, 4, 1),
+                )
                 item = SimpleNamespace(document_id="same", signal_tier="Tier 3")
                 with (
                     patch.object(module, "LAST_HEALTH", {}),

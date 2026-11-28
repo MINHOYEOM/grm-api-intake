@@ -204,6 +204,11 @@ class EcaCollectRssExcerptGateTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertEqual(len(items), n)                    # 목록 자체는 cap 과 무관 전건 유지
         self.assertEqual(len(calls), ci.ECA_ARTICLE_EXCERPT_CAP)  # fetch 만 cap 적용
+        cap = ci.LAST_CAP_HEALTH["eca"]
+        self.assertEqual(cap["source_total"], n)
+        self.assertEqual(cap["fetched"], len(calls))
+        self.assertTrue(cap["cap_hit"])
+        self.assertIn("[GRM 문제]", cap["cap_warning"])
         with_excerpt = sum(1 for it in items if it.raw_payload.get("eca_article_excerpt"))
         self.assertEqual(with_excerpt, ci.ECA_ARTICLE_EXCERPT_CAP)
         # cap 이후 항목은 excerpt 없이 메타 카드 그대로.

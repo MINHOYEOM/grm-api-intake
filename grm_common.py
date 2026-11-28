@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from urllib.parse import urlencode, urlparse
-from typing import Any, Callable
+from typing import Any, Callable, overload
 
 import requests
 
@@ -413,7 +413,15 @@ def http_get_xml(
 # ── data.go.kr 공통 유틸리티 ──────────────────────────────────────────────────
 
 
-def parse_int_safe(value: Any, default: int = 0) -> int:
+@overload
+def parse_int_safe(value: Any, default: int = 0) -> int: ...
+
+
+@overload
+def parse_int_safe(value: Any, default: None) -> int | None: ...
+
+
+def parse_int_safe(value: Any, default: int | None = 0) -> int | None:
     """Safely parse an integer value, returning *default* on failure."""
     try:
         return int(value)
@@ -486,6 +494,21 @@ def mask_service_key(url: str) -> str:
     return re.sub(r"([?&]serviceKey=)[^&]+", r"\1***REDACTED***", url)
 
 
+def cap_health(label: str, source_total: int | None, fetched: int, *,
+               cap_hit: bool = False) -> dict[str, Any]:
+    """Record work done in the cap's units. An unreported source total stays unknown."""
+    total = f"{source_total:,}" if source_total is not None else "미제공"
+    return {
+        "source_total": source_total,
+        "fetched": fetched,
+        "cap_hit": cap_hit,
+        "cap_warning": (
+            f"[GRM 문제] {label} 수집 상한 도달 — 원천 {total}, 처리 {fetched:,}"
+            if cap_hit else ""
+        ),
+    }
+
+
 class DatagoPageError(RuntimeError):
     """data.go.kr 페이지 요청 실패 — page_no·원인 첨부(수집기가 부분/치명 판정)."""
 
@@ -527,6 +550,11 @@ class _DatagoPaginator:
         self.retries = retries
         self.truncated = False
         self.total_count = 0
+        self.source_total: int | None = None
+        self.fetched = 0
+
+    def health(self, label: str) -> dict[str, Any]:
+        return cap_health(label, self.source_total, self.fetched, cap_hit=self.truncated)
 
     def __iter__(self):
         page_no = 1
@@ -548,6 +576,12 @@ class _DatagoPaginator:
             except Exception as e:  # noqa: BLE001
                 raise DatagoPageError(page_no, e) from e
             self.total_count = total_count
+            body = data.get("body")
+            if isinstance(body, dict):
+                total = parse_int_safe(body.get("totalCount"), None)
+                if total is not None:
+                    self.source_total = total
+            self.fetched += len(raw_items)
             if not raw_items:
                 return
             yield raw_items, masked_url

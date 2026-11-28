@@ -16,6 +16,7 @@ from datetime import date
 from typing import Any
 
 from grm_common import (
+    cap_health,
     DatagoPageError,
     datago_paginate,
     http_get_json,
@@ -61,6 +62,7 @@ def _set_last_health(
     pages_seen: int,
     truncated: bool,
     page_warnings: list[str],
+    cap: dict[str, Any] | None = None,
     window_count: int = 0,
     excluded_count: int = 0,
     duplicate_count: int = 0,
@@ -68,6 +70,7 @@ def _set_last_health(
 ) -> None:
     global LAST_HEALTH
     LAST_HEALTH = {
+        **(cap or cap_health("식약처 회수", None, 0)),
         "collected": collected,
         "total_count": total_count,
         "pages_seen": pages_seen,
@@ -188,13 +191,13 @@ def collect_mfds_recall(
     Returns (items, error_msg). A page-level failure is fatal only if no item was
     collected; otherwise the partial collection is returned with a warning log.
     """
+    _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
+                     page_warnings=[])
     if not service_key:
         return [], "DATA_GO_KR_SERVICE_KEY 환경변수 필요"
 
     items: list[IntakeItem] = []
     seen_ids: set[str] = set()
-    _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
-                     page_warnings=[])
     pages_seen = 0
     window_count = excluded_count = duplicate_count = raw_count = 0
     # 정렬 비의존(B2): data.go.kr recall 응답의 정렬 순서를 가정하지 않는다. 요청에 order
@@ -227,11 +230,13 @@ def collect_mfds_recall(
             # 매일 라인 계약 유지(부분 수집을 치명적으로 보지 않는다). 다만 흔적은 남긴다.
             log("WARN", msg)
             _set_last_health(collected=len(items), total_count=paginator.total_count,
+                             cap=paginator.health("식약처 회수"),
                              pages_seen=pages_seen, truncated=False, page_warnings=[msg],
                              window_count=window_count, excluded_count=excluded_count,
                              duplicate_count=duplicate_count, raw_count=raw_count)
             return items, None
         _set_last_health(collected=0, total_count=paginator.total_count,
+                         cap=paginator.health("식약처 회수"),
                          pages_seen=pages_seen, truncated=False, page_warnings=[msg],
                          window_count=window_count, excluded_count=excluded_count,
                          duplicate_count=duplicate_count, raw_count=raw_count)
@@ -252,6 +257,7 @@ def collect_mfds_recall(
         f"{len(items)}건 (totalCount={total_count})",
     )
     _set_last_health(collected=len(items), total_count=total_count,
+                     cap=paginator.health("식약처 회수"),
                      pages_seen=pages_seen, truncated=bool(paginator.truncated),
                      page_warnings=[], window_count=window_count, excluded_count=excluded_count,
                      duplicate_count=duplicate_count, raw_count=raw_count)

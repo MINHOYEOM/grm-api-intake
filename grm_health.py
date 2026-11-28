@@ -643,6 +643,10 @@ def _evaluate_health(
             warning[:240],
         )
 
+    for label, cap in stats.collection_caps.items():
+        if cap["cap_hit"]:
+            health.add_warning("collection-cap-hit", label, cap["cap_warning"])
+
     if stats.mfds_admin_total_count_warning:
         health.add_warning(
             "mfds-admin-total-count",

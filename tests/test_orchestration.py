@@ -183,6 +183,79 @@ def _codes(findings):
 
 
 class EvaluateHealthFailureBranchTest(unittest.TestCase):
+    def test_datago_collection_caps_count_rows_before_filter_and_raise_health_warning(self) -> None:
+        import collect_mfds_gmp_cert as cert
+        import collect_mfds_recall as recall
+        import collect_mfds_safety_letter as safety
+
+        collectors = (
+            (mfds_admin, mfds_admin.collect_mfds_admin_actions),
+            (recall, recall.collect_mfds_recall),
+            (cert, cert.collect_mfds_gmp_certs),
+            (safety, safety.collect_mfds_safety_letters),
+        )
+        day = date(2026, 11, 22)
+        for module, collect in collectors:
+            with (
+                self.subTest(collector=module.__name__),
+                patch.object(module, "MAX_PAGES", 5),
+                patch.object(module, "PAGE_SIZE", 1),
+                patch.object(module, "_to_item", return_value=None),
+                patch.object(module, "log"),
+                patch.object(module, "LAST_HEALTH", {}),
+            ):
+                for total, fetched, cap_hit in ((6, 5, True), (4, 4, False), (5, 5, False)):
+                    with self.subTest(total=total):
+                        def fake_page(_endpoint, *, params, **_kwargs):
+                            return {
+                                "header": {"resultCode": "00"},
+                                "body": {
+                                    "pageNo": params["pageNo"],
+                                    "numOfRows": 1,
+                                    "totalCount": total,
+                                    "items": {"item": {"LAST_SETTLE_DATE": day.isoformat()}},
+                                },
+                            }
+
+                        with patch.object(module, "http_get_json", side_effect=fake_page) as get:
+                            items, error = collect(day, day, "fake")
+                        self.assertEqual(items, [])
+                        self.assertEqual(get.call_count, fetched)
+                        self.assertEqual(bool(error), cap_hit)
+                        cap = module.LAST_HEALTH
+                        self.assertEqual((cap["source_total"], cap["fetched"], cap["cap_hit"]),
+                                         (total, fetched, cap_hit))
+                        stats = ci.CollectionStats()
+                        ci._record_cap(stats, module.__name__, cap)
+                        health = ci._evaluate_health(**_health_kwargs(stats=stats))
+                        warnings = [w for w in health.warnings if w.code == "collection-cap-hit"]
+                        self.assertEqual(len(warnings), int(cap_hit))
+                        if cap_hit:
+                            self.assertIn("[GRM 문제]", cap["cap_warning"])
+                            self.assertEqual(warnings[0].message, cap["cap_warning"])
+                        else:
+                            self.assertEqual(cap["cap_warning"], "")
+
+    def test_openfda_records_source_total_and_rows_at_cap(self) -> None:
+        day = date(2026, 11, 22)
+        for total, expected in ((7, True), (4, False)):
+            with (
+                self.subTest(total=total),
+                patch.object(ci, "OPENFDA_MAX_TOTAL", 5),
+                patch.object(ci, "LAST_CAP_HEALTH", {}),
+                patch.object(ci, "http_get_json", return_value={
+                    "meta": {"results": {"total": total}},
+                    "results": [{}] * min(total, 5),
+                }) as get,
+            ):
+                items, error = ci.collect_openfda_recalls(day, day, None)
+                get.assert_called_once()
+                cap = ci.LAST_CAP_HEALTH["recall"]
+                self.assertEqual((cap["source_total"], cap["fetched"], cap["cap_hit"]),
+                                 (total, len(items), expected))
+                self.assertEqual(bool(error), expected)
+                self.assertEqual("[GRM 문제]" in cap["cap_warning"], expected)
+
     def test_mfds_admin_warns_only_above_source_total_count_threshold(self) -> None:
         day = date(2026, 11, 22)
         for total_count, should_warn in ((1501, True), (1500, False)):

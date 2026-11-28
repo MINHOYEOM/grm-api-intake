@@ -18,7 +18,7 @@ from datetime import date
 from html.parser import HTMLParser
 from typing import Any
 
-from grm_common import env_flag, http_get_bytes, log
+from grm_common import cap_health, env_flag, http_get_bytes, log
 from collect_intake import (
     IntakeItem,
     SOURCE_MFDS,
@@ -1049,6 +1049,7 @@ def _set_last_health(
 ) -> None:
     global LAST_HEALTH
     LAST_HEALTH = {
+        **cap_health("식약처 GMP 실사", None, parsed_rows, cap_hit=max_pages_reached),
         "item_count": item_count,
         "parsed_rows": parsed_rows,
         "parse_status_counts": dict(parse_status_counts),

@@ -15,7 +15,6 @@ from __future__ import annotations
 import json
 import pathlib
 import re
-import shutil
 import sys
 import tempfile
 import unittest
@@ -131,23 +130,21 @@ class RenderedFirmPagesTest(unittest.TestCase):
                 # 미끼 — 수집기 정규화는 같고(GMBH 는 법인격) 법인격 표기만 다르다 → 붙으면 안 된다.
                 row("66-40", decoy_name + " GmbH", "GERMANY", "Decoyburg", "2020-01-01")]
         assert ia.normalize_firm_name(decoy_name + " GmbH") == ia.normalize_firm_name(decoy_name)
-        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_ia_"))
-        snap_path = cls._tmp / "import_alerts.json"
+        tmp = tempfile.TemporaryDirectory(prefix="grmweb_ia_")
+        cls.addClassCleanup(tmp.cleanup)
+        tmp_path = pathlib.Path(tmp.name)
+        snap_path = tmp_path / "import_alerts.json"
         snap_path.write_text(refresh.serialize(
             refresh.build_snapshot(rows, measured_on="2026-11-09")), encoding="utf-8")
         cls._saved = render.IMPORT_ALERTS_FILE
         render.IMPORT_ALERTS_FILE = snap_path
         try:
-            cls.out = cls._tmp / "site"
+            cls.out = tmp_path / "site"
             render.render_site(SINGLE_FIXTURES, cls.out, render_doc_pages=True)
         finally:
             render.IMPORT_ALERTS_FILE = cls._saved
         cls.hit_slug = render._firm_slug(cls.hit_key)
         cls.decoy_slug = render._firm_slug(cls.decoy_key)
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls._tmp, ignore_errors=True)
 
     @staticmethod
     def _block(html):

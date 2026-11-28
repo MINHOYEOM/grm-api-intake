@@ -1,9 +1,9 @@
 {
  "schema": "grm-news/v1",
- "measured_on": "2026-11-27",
+ "measured_on": "2026-11-28",
  "window_days": 60,
  "totals": {
-  "items": 475
+  "items": 474
  },
  "by_source": [
   {
@@ -16,11 +16,11 @@
   },
   {
    "v": "ECA Academy",
-   "c": 78
+   "c": 73
   },
   {
    "v": "MFDS",
-   "c": 52
+   "c": 53
   },
   {
    "v": "ISPE",
@@ -31,12 +31,12 @@
    "c": 19
   },
   {
-   "v": "MHRA Inspectorate",
-   "c": 16
+   "v": "EMA",
+   "c": 17
   },
   {
-   "v": "EMA",
-   "c": 14
+   "v": "MHRA Inspectorate",
+   "c": 16
   },
   {
    "v": "PIC/S",
@@ -48,6 +48,27 @@
   }
  ],
  "items": [
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-11-27",
+   "title": "Executive Director speech at European media workshop on vaccines",
+   "official_url": "https://www.ema.europa.eu/en/news/executive-director-speech-european-media-workshop-vaccines"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-11-27",
+   "title": "Meeting highlights from the Pharmacovigilance Risk Assessment Committee (PRAC) 23-26 November 2026",
+   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-pharmacovigilance-risk-assessment-committee-prac-23-26-november-2026"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-11-27",
+   "title": "Use of GLP-1 medicines shifts towards obesity treatment in Europe, new study shows",
+   "official_url": "https://www.ema.europa.eu/en/news/use-glp-1-medicines-shifts-towards-obesity-treatment-europe-new-study-shows"
+  },
   {
    "source": "Federal Register",
    "source_kind": "Notice",
@@ -66,6 +87,13 @@
    "source": "MFDS",
    "source_kind": "guidance-industry",
    "published_date": "2026-11-27",
+   "title": "필터 사용 전 멸균 후 완전성 시험(PUPSIT) 수행 시 고려사항",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16012"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-27",
    "title": "한약(생약)제제 벤조피렌 안전성 평가 및 자료작성 방법",
    "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16011"
   },
@@ -75,6 +103,13 @@
    "published_date": "2026-11-27",
    "title": "합성펩타이드 의약품의 임상시험 시 비임상시험 가이드라인",
    "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16009"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-26",
+   "title": "호흡기세포융합바이러스 감염증 예방목적 단클론항체의약품 개발 시 비임상 및 임상 고려사항",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=16005"
   },
   {
    "source": "MFDS",
@@ -117,6 +152,13 @@
    "published_date": "2026-11-25",
    "title": "VIAVI Solutions; Filing of Color Additive Petition",
    "official_url": "https://www.federalregister.gov/documents/2026/11/25/2026-24009/viavi-solutions-filing-of-color-additive-petition"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-25",
+   "title": "[HC] Various Clef des Champs Inc. natural health products: Out-of-specification (microbial contamination)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/various-clef-champs-inc-natural-health-products-out-specification-microbial"
   },
   {
    "source": "ISPE",
@@ -3323,55 +3365,6 @@
    "published_date": "2026-09-29",
    "title": "생균치료제 제조시설 운영 관리 지침",
    "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15297"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-28",
-   "title": "Cleaning Validation in the Manufacture of non-sterile Medicinal Products: new Information from the EMA",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/cleaning-validation-in-the-manufacture-of-non-sterile-medicinal-products-new-information-from-the-ema"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-28",
-   "title": "EMA publishes final ICH M13B Guideline and Q&A on Bioequivalence",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-publishes-final-ich-m13b-guideline-and-q-a-on-bioequivalence"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-28",
-   "title": "FDA Warning Letter: Deficiencies in Impurity Testing, Stability, OOS Investigations and Temperature Control",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-deficiencies-in-impurity-testing-stability-oos-investigations-and-temperature-control"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-28",
-   "title": "New Japanese Pharmacopoeia Drafts (September 2026) Open for Public Comment",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/new-japanese-pharmacopoeia-drafts-september-2026-open-for-public-comment"
-  },
-  {
-   "source": "ECA Academy",
-   "source_kind": "GMP News",
-   "published_date": "2026-09-28",
-   "title": "The Relationship between the BP and the Ph. Eur.",
-   "official_url": "https://www.gmp-compliance.org/gmp-news/the-relationship-between-the-bp-and-the-ph-eur"
-  },
-  {
-   "source": "Health Canada",
-   "source_kind": "hc-recall",
-   "published_date": "2026-09-28",
-   "title": "[HC] PMS-FAMPRIDINE 10 mg Tablet: Affected lot may contain foreign material particles.",
-   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/pms-fampridine-10-mg-tablet-affected-lot-may-contain-foreign-material-particles"
-  },
-  {
-   "source": "MFDS",
-   "source_kind": "guidance-internal",
-   "published_date": "2026-09-28",
-   "title": "변경관리 계획서 자료 검토에 관한 업무",
-   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15296"
   }
  ]
 }

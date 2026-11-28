@@ -144,5 +144,52 @@ class FromBodyRespectsHumanCheckTest(unittest.TestCase):
         self.assertTrue(fb.is_audit_target(plain_filled))
 
 
+class RealReplaceRawSignatureTest(unittest.TestCase):
+    """가짜 replacer 가 아니라 실제 raw_versioning.replace_raw 시그니처로 apply 경로를 탄다(HTTP 만 가짜)."""
+
+    def _post(self, calls, status="applied"):
+        class _Resp:
+            status_code = 200
+
+            def json(self_inner):
+                return {"status": status}
+
+        def post(url, headers=None, json=None, timeout=None):
+            calls.append((url, json))
+            return _Resp()
+        return post
+
+    def test_apply_goes_through_real_replace_raw(self):
+        rows = [_row("fda483-100020", {"fda483_body_full": BODY})]
+        calls = []
+        rep = h.run(rows, from_findings={"fda483-100020": [["Velmor Kalpa"]]}, names_input={}, absent_input={},
+                    at=AT, apply=True, replacer=h.make_replacer("https://x.supabase.co", "svc", post=self._post(calls)))
+        self.assertEqual((rep.applied, rep.errors), (1, []))
+        self.assertEqual(len(calls), 1)
+        url, body = calls[0]
+        self.assertTrue(url.endswith("/rest/v1/rpc/raw_signal_apply_version"))
+        self.assertEqual(body["p_raw_signal_id"], "rawsig-fda483-100020")
+        self.assertEqual(body["p_change_kind"], "repair")
+        self.assertIn("Velmor Kalpa", body["p_record"]["raw_json"])
+
+    def test_apply_without_replacer_fails_before_any_write(self):
+        rows = [_row("fda483-100021", {"fda483_body_full": BODY})]
+        with self.assertRaises(ValueError):
+            h.run(rows, from_findings={"fda483-100021": [["Velmor Kalpa"]]}, names_input={}, absent_input={},
+                  at=AT, apply=True)
+
+    def test_main_apply_path_binds_credentials_to_replace_raw(self):
+        """main --apply 가 접속 정보를 묶은 실제 replace_raw 를 넘기는지(11-28 TypeError 회귀)."""
+        import os
+        from unittest import mock
+        rows = [_row("fda483-100022", {"fda483_body_full": BODY})]
+        calls = []
+        post = self._post(calls)
+        env = {"SUPABASE_URL": "https://x.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "svc"}
+        with mock.patch.dict(os.environ, env),                 mock.patch.object(fb, "fetch_rows", return_value=rows),                 mock.patch.object(h, "_fetch_finding_name_sets", return_value={"rawsig-fda483-100022": [["Velmor Kalpa"]]}),                 mock.patch.object(fb, "patch_empty_findings", return_value=(0, "")),                 mock.patch("raw_versioning.requests.post", post):
+            rc = h.main(["--from-findings", "fda483-100022", "--at", AT, "--apply"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(calls), 1)
+
 if __name__ == "__main__":
     unittest.main()

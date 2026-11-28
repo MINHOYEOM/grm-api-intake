@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-28T06:29:41Z",
+ "generated_at": "2026-11-28T07:41:40Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,23 +229,45 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 46117668588,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-28T06:40:10Z",
+    "updatedAt": "2026-11-28T06:48:18Z",
+    "headBranch": "claude/naver-blog-why-1126-r2",
+    "displayTitle": "naver-blog: '왜 중요한가' 슬롯 도입 (#1999 위) (#2007 대체)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46117668588"
+   },
+   {
+    "databaseId": 46117656323,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-28T06:40:01Z",
+    "updatedAt": "2026-11-28T06:46:54Z",
+    "headBranch": "claude/naver-blog-why-1126-r2",
+    "displayTitle": "Merge branch 'claude/naver-blog-seo-1126-r2' into claude/naver-blog-w…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46117656323"
+   },
+   {
     "databaseId": 46116701232,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-28T06:27:41Z",
-    "updatedAt": "2026-11-28T06:27:45Z",
+    "updatedAt": "2026-11-28T06:36:14Z",
     "headBranch": "claude/naver-blog-seo-1126-r2",
     "displayTitle": "네이버 블로그 원고: 사이트 위성 글 + 규칙 점검 한 곳(겹침 25% 가드) (#1999 대체)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116701232"
    },
    {
     "databaseId": 46116686635,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
     "createdAt": "2026-11-28T06:27:30Z",
-    "updatedAt": "2026-11-28T06:27:34Z",
+    "updatedAt": "2026-11-28T06:36:20Z",
     "headBranch": "claude/naver-blog-seo-1126-r2",
     "displayTitle": "Merge origin/main into 블로그 위성 원고 (영문 골든 재동결)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116686635"
@@ -260,28 +282,6 @@
     "headBranch": "main",
     "displayTitle": "assets: 네이버 블로그 사이드바 위젯 배너 3장(용어사전·지적 찾아보기·구독) (#2024)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116161088"
-   },
-   {
-    "databaseId": 46116026407,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-28T06:19:01Z",
-    "updatedAt": "2026-11-28T06:20:57Z",
-    "headBranch": "main",
-    "displayTitle": "feat(completeness): N2 칸 대조 계약 + N6 수집 완전성 일보 (migration 173) (#2018)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116026407"
-   },
-   {
-    "databaseId": 46109996538,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-28T04:59:04Z",
-    "updatedAt": "2026-11-28T05:07:20Z",
-    "headBranch": "automation/news-auto-46109959080",
-    "displayTitle": "chore: refresh recent regulatory news",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46109996538"
    }
   ],
   "grm-scaffold-mirror.yml": [

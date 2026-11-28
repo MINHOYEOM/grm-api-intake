@@ -1,0 +1,425 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-28",
+ "shard": "F",
+ "cards": {
+  "a8687ec486b8": {
+   "title_issue": "제약 세척 밸리데이션 절차 해설",
+   "summary": "ECA가 제약 산업의 세척 밸리데이션 절차를 다룬 글을 게재했다. EU에서는 세척 밸리데이션 요구사항이 EU GMP 지침 Part I 제5장 'Production'에 있다고 설명했다.",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "How cleaning validation works in pharma",
+    "summary": "ECA published an article on the process for cleaning validation in the pharmaceutical industry, noting that EU requirements are set out in Chapter 5 'Production' of the EU GMP Guide Part I.",
+    "key_facts": [],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "fda483-196540": {
+   "title_issue": "재가공 배치 조사 없음",
+   "hook_line": "재가공 절차서가 재가공 배치에 일탈을 요구하지 않음",
+   "summary": "FDA가 재포장·재표시업체 Sagecor Health, LLC에 Form 483(관찰사항 2건)을 발행했다. 재가공 배치를 조사하지 않는 점과 재가공 기록이 불완전한 점을 지적했다.",
+   "key_facts": [
+    "관찰 1: 재가공 절차서 WI-082(Rev. B, 2024-06-20 시행)가 재가공 배치에 일탈을 요구하지 않아 원인 조사를 하지 않음",
+    "관찰 1: 포일 파우치 밀봉 불량으로 재가공한 배치에서 품질 담당자는 밀봉 불량, 작업자는 표시 문제로 사유를 달리 적었으나 조사·조정하지 않음",
+    "관찰 2: 재가공마다 제조기록서를 만들지 않았고, 폐기한 라벨·외포장의 수량 대조 기록이 불충분함"
+   ],
+   "implication": "",
+   "checks": [
+    "재가공 배치마다 원인 조사를 하는가? (관찰 1)",
+    "재가공 때 폐기한 포장 자재의 수량을 따로 대조하는가? (관찰 2)"
+   ],
+   "en": {
+    "title_issue": "Reprocessed batches not investigated",
+    "hook_line": "Reprocessing procedure says deviations are not required for reprocessed batches",
+    "summary": "FDA issued a Form 483 with two observations to repackager and relabeler Sagecor Health, LLC, citing no investigations of reprocessed batches and incomplete reprocessing records.",
+    "key_facts": [
+     "Observation 1: reprocessing procedure WI-082, Rev. B, effective 06/20/2024, states deviations are not required for reprocessed batches, so causes are not investigated",
+     "Observation 1: for a batch reprocessed for improperly sealed foil pouches, quality personnel recorded a sealing failure and the operator a labeling issue, and the discrepancy was not reconciled",
+     "Observation 2: batch records are not prepared for each reprocessing event, and accountability of discarded labels and overwraps was inadequately documented"
+    ],
+    "implication": "",
+    "checks": [
+     "Do you investigate the cause for every reprocessed batch? (Observation 1)",
+     "Do you separately reconcile packaging components discarded during reprocessing? (Observation 2)"
+    ]
+   }
+  },
+  "hc-82996": {
+   "title_issue": "미생물 오염 천연건강제품 회수",
+   "hook_line": "위타니아 캡슐 등 천연건강제품, 미생물 오염으로 Type II 회수",
+   "summary": "Clef des Champs Inc.의 여러 천연건강제품이 기준일탈(미생물 오염)로 회수됐다.",
+   "key_facts": [
+    "사유: 오염 — 기준일탈(미생물 오염)",
+    "제품·범위: 여러 천연건강제품(Withania somnifera 500 mg 캡슐 등)",
+    "등급: Type II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "오염"
+   ],
+   "en": {
+    "title_issue": "Natural health products, microbial contamination",
+    "hook_line": "Natural health products recalled for microbial contamination, Type II",
+    "summary": "Various Clef des Champs Inc. natural health products were recalled as out-of-specification for microbial contamination.",
+    "key_facts": [
+     "Reason: contamination, out-of-specification (microbial contamination)",
+     "Product and scope: various natural health products, including Withania somnifera 500 mg capsules",
+     "Class: Type II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "admin-2026008455": {
+   "title_issue": "경제적 이익 제공 판매업무정지",
+   "hook_line": "판매촉진 목적 경제적 이익 제공으로 해당품목 판매업무정지 3개월",
+   "summary": "식약처가 (주)비보존제약에 해당품목 판매업무정지 3개월을 처분했다. 상호 변경 전 회사 대표가 의료기관에 판매촉진 목적으로 경제적 이익을 제공했다.",
+   "key_facts": [
+    "위반: 2016~2019년 의료기관에 의약품 채택·처방유도 등 판매촉진 목적으로 경제적 이익을 제공함(총 30회 47,860,000원, 총 31회 139,600,000원)",
+    "경위: 이니스트바이오제약(주)는 2021. 2. 1. ㈜비보존제약으로 상호를 변경함",
+    "처분: 해당품목 판매업무정지 3개월(2026. 12. 10. ~ 2027. 3. 9.) — 더모프레드크림 등",
+    "근거: 구 ｢약사법｣ 제47조제2항, 제76조, 구 ｢의약품 등의 안전에 관한 규칙｣ 제95조 [별표 8] Ⅱ. 개별기준 제35호 다목"
+   ],
+   "implication": "",
+   "checks": [
+    "판매촉진 비용 집행에 대한 내부 감사 기록이 있는가?",
+    "의료기관에 제공한 금전·물품을 품목별로 추적하는가?"
+   ],
+   "en": {
+    "title_issue": "Sales suspension over economic benefits",
+    "hook_line": "Sales of the products suspended for 3 months over economic benefits for sales promotion",
+    "summary": "MFDS suspended sales of a pharmaceutical company's products for 3 months after the company, under its former name, provided economic benefits to medical institutions to promote sales.",
+    "key_facts": [
+     "Violation: from 2016 to 2019 economic benefits were provided to medical institutions to promote adoption and prescription of drugs (47,860,000 won over 30 occasions and 139,600,000 won over 31 occasions)",
+     "Timeline: the company changed its name on February 1, 2021",
+     "Sanction: 3-month suspension of sales of the products concerned (December 10, 2026 to March 9, 2027)",
+     "Basis: former Pharmaceutical Affairs Act Articles 47(2) and 76, and former Enforcement Rule Article 95 [Annex 8] II item 35(c)"
+    ],
+    "implication": "",
+    "checks": [
+     "Is there an internal audit record of sales promotion spending?",
+     "Do you track money or goods provided to medical institutions by product?"
+    ]
+   }
+  },
+  "law-291987": {
+   "title_issue": "첨단재생바이오법 시행령 일부개정",
+   "summary": "보건복지부·식약처 소관 ‘첨단재생의료 및 첨단바이오의약품 안전 및 지원에 관한 법률 시행령’이 일부개정돼 공포됐다.",
+   "key_facts": [
+    "시행일: 2026-11-27"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Advanced regenerative bio act decree amended",
+    "summary": "The Enforcement Decree of the Act on the Safety of and Support for Advanced Regenerative Medicine and Advanced Biological Products was partially amended and promulgated.",
+    "key_facts": [
+     "Effective date: 2026-11-27"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "law-292045": {
+   "title_issue": "첨단바이오의약품 규칙 일부개정",
+   "summary": "식약처 소관 ‘첨단바이오의약품 안전 및 지원에 관한 규칙’이 일부개정(총리령)돼 공포됐다.",
+   "key_facts": [
+    "시행일: 2026-11-27"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Advanced biological products rule amended",
+    "summary": "The MFDS rule on the safety of and support for advanced biological products was partially amended by Prime Minister's decree and promulgated.",
+    "key_facts": [
+     "Effective date: 2026-11-27"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "law-292313": {
+   "title_issue": "의약품 등의 안전에 관한 규칙 일부개정",
+   "summary": "식약처 소관 ‘의약품 등의 안전에 관한 규칙’이 일부개정(총리령)돼 공포됐다.",
+   "key_facts": [
+    "시행일: 2026-11-26"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Drug safety enforcement rule amended",
+    "summary": "The MFDS enforcement rule on the safety of drugs was partially amended by Prime Minister's decree and promulgated.",
+    "key_facts": [
+     "Effective date: 2026-11-26"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "10e98ad460f8": {
+   "title_issue": "포장 작업 혼입 방지 MHRA 기대사항",
+   "hook_line": "포장 혼입으로 최근 회수가 이어지고 실사관이 중대 결함을 지적",
+   "summary": "MHRA가 포장 작업에서 부품·제품 혼입 위험을 줄이기 위한 기대사항을 게시했다. 최근 혼입 문제로 회수가 여러 건 있었고 GMP 실사관이 중대(critical) 결함을 여러 건 지적했다고 밝혔다.",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "MHRA expectations to prevent packaging mix-ups",
+    "hook_line": "Recent recalls and critical deficiencies raised over packaging mix-ups",
+    "summary": "MHRA published its expectations for packaging operations to minimise the risk of mix-ups, noting a number of recent recalls and several critical deficiencies raised by GMP Inspectors.",
+    "key_facts": [],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "53e187608366": {
+   "title_issue": "함량 표시 오류 병행수입품 회수",
+   "hook_line": "5 mg 정제가 10 mg으로 표시된 상자에 담겨 공급, Class 2",
+   "summary": "병행수입 Brintellix 5 mg 필름코팅정 1배치가 10 mg으로 잘못 표시된 상자에 담겨 회수됐다.",
+   "key_facts": [
+    "사유: 함량 표시 오류 — 5 mg 정제가 10 mg 정제로 표시된 밀봉 상자에 포장됨",
+    "제품·범위: 병행수입 Brintellix 5 mg 필름코팅정 1배치(Batch 2856920/4245Z), 영향 수량 미확인",
+    "등급: Class 2",
+    "조치: 약국 등은 해당 재고를 격리해 공급업체에 반품"
+   ],
+   "implication": "MHRA는 10 mg을 처방받은 환자가 5 mg을 복용하면 효과가 줄 수 있다고 밝혔다. 병행수입 포장만 이 결함에 해당한다.",
+   "checks": [
+    "병행수입 재포장 때 블리스터 함량과 상자 표시를 대조하는가?",
+    "같은 품목의 다른 함량을 한 라인에서 연달아 포장할 때 라인 정리를 확인하는가?"
+   ],
+   "quotes_translation": [
+    "Quadrant Pharmaceuticals Ltd는 제품 함량 표시 오류로 수량 미상의 제품에 영향을 준 Brintellix 5 mg 필름코팅정(10 mg 정제로 잘못 표시) 1배치를 회수한다."
+   ],
+   "en": {
+    "title_issue": "Parallel import mislabelled strength",
+    "hook_line": "5 mg tablets supplied in cartons labelled as 10 mg, Class 2",
+    "summary": "One batch of parallel imported Brintellix 5 mg film-coated tablets was recalled after being supplied in sealed cartons labelled as 10 mg tablets.",
+    "key_facts": [
+     "Reason: labelling error with product strength, 5 mg tablets packed in sealed cartons labelled as 10 mg",
+     "Product and scope: one batch (2856920/4245Z) of parallel imported Brintellix 5 mg film-coated tablets, unknown number of units",
+     "Class: Class 2",
+     "Action: quarantine remaining stock and return it to the supplier"
+    ],
+    "implication": "MHRA stated a patient prescribed 10 mg who takes 5 mg may have reduced effectiveness. Only the parallel imported packs are affected.",
+    "checks": [
+     "During parallel import repackaging, do you check blister strength against the carton label?",
+     "When different strengths are packed back to back, do you verify line clearance?"
+    ]
+   }
+  },
+  "5a7190516de7": {
+   "title_issue": "캡슐 검은·파란 반점 예방 회수",
+   "hook_line": "추가 합격 품질 수준 검사에서 반점 캡슐 발견, Class 3",
+   "summary": "Bexarotene 75 mg 연질캡슐 배치 5GJ0551이 검은색·파란색 반점이 있는 캡슐이 발견돼 예방 차원에서 회수됐다.",
+   "key_facts": [
+    "사유: 도매 전 사업장의 추가 합격 품질 수준 검사에서 검은색·파란색 반점이 있는 캡슐 여러 개 확인",
+    "제품·범위: Bexarotene 75 mg 연질캡슐 배치 5GJ0551(100캡슐)",
+    "등급: Class 3",
+    "조치: 해당 배치 공급 즉시 중단, 남은 재고 격리·반품"
+   ],
+   "implication": "추가 검사는 영국 약국의 불만을 받은 뒤 시작됐다. 환자 위해 보고는 없었다.",
+   "checks": [
+    "캡슐 외관 불만이 들어오면 같은 배치 보관 시료를 추가로 검사하는가?",
+    "연질캡슐 외관 결함 기준에 반점이 들어 있는가?"
+   ],
+   "quotes_translation": [
+    "Mercury Pharmaceuticals Limited는 도매 전 사업장에서 실시한 추가 합격 품질 수준(AQL) 검사에서 검은색/파란색 반점이 있는 캡슐 여러 개가 확인됨에 따라 예방 조치로 Bexarotene 75 mg 연질캡슐 배치 5GJ0551을 회수한다…"
+   ],
+   "en": {
+    "title_issue": "Precautionary recall, spotted capsules",
+    "hook_line": "Capsules with black or blue spots found in additional quality limit testing, Class 3",
+    "summary": "Bexarotene 75 mg soft capsules, batch 5GJ0551, were recalled as a precaution after several capsules with black or blue spots were identified.",
+    "key_facts": [
+     "Reason: several capsules with black/blue spots found during additional Acceptable Quality Limit (AQL) testing at the pre-wholesaler's site",
+     "Product and scope: Bexarotene 75 mg soft capsules, batch 5GJ0551 (100 capsules)",
+     "Class: Class 3",
+     "Action: stop supplying the batch immediately, quarantine and return remaining packs"
+    ],
+    "implication": "The testing was initiated after a complaint from a pharmacy in the UK. No patient harm reports have been received.",
+    "checks": [
+     "When a capsule appearance complaint arrives, do you test retained samples from the same batch?",
+     "Do your soft capsule appearance criteria include spots?"
+    ]
+   }
+  },
+  "81dca5a5fdb0": {
+   "title_issue": "투여 경로 표시 오류 결함 통지",
+   "hook_line": "피하 전용 제품의 주사기 표시에 근육 투여도 가능하다고 기재",
+   "summary": "PROSTAP PD DCS 1.88 mg 사전충전 주사기 제품의 투여 지침과 표시에 오류가 있어 결함 통지가 나왔다.",
+   "key_facts": [
+    "사유: 표시 결함 — 피하 주사 전용 제품인데 투여 지침 5단계와 주사기 표시에 피하 또는 근육 투여가 가능하다고 기재",
+    "제품·범위: PROSTAP PD DCS 1.88 mg 사전충전 주사기, Batch 523373·518961",
+    "등급: Class 4"
+   ],
+   "implication": "MHRA 통지는 이 문제를 표시 결함으로 분류했다. 회사는 예상 위해 정도를 경미로 분류했다.",
+   "checks": [
+    "제품설명서와 주사기 표시의 투여 경로가 일치하는지 대조하는가?",
+    "표시 문안 변경 때 모든 표시 자재를 함께 검토하는가?"
+   ],
+   "quotes_translation": [
+    "Takeda UK Limited는 PROSTAP PD DCS 1.88 mg의 투여 지침과 표시에서 오류를 확인했다.",
+    "이 제품은 피하 주사로만 투여해야 한다."
+   ],
+   "en": {
+    "title_issue": "Wrong administration route on labelling",
+    "hook_line": "Subcutaneous-only product labelled for SC or IM use on the syringe",
+    "summary": "A defect notification was issued for PROSTAP PD DCS 1.88 mg pre-filled syringes because of errors in the administration instructions and labelling.",
+    "key_facts": [
+     "Reason: labelling defect; the product is for subcutaneous injection only, but Step 5 of the instructions and the syringe label state SC or IM use",
+     "Product and scope: PROSTAP PD DCS 1.88 mg pre-filled syringe, batches 523373 and 518961",
+     "Class: Class 4"
+    ],
+    "implication": "The notification describes this as a labelling defect. Takeda UK Limited classified the expected severity of harm as minor.",
+    "checks": [
+     "Do you check that the route of administration matches across the SmPC and syringe label?",
+     "When labelling text changes, do you review all labelling components together?"
+    ]
+   }
+  },
+  "c4ccf0ca4043": {
+   "title_issue": "환자용 설명서 안전 정보 누락",
+   "hook_line": "8개 배치 91,134팩이 안전 정보가 빠진 설명서로 유통",
+   "summary": "Toradol 30 mg/mL 주사액 일부 배치의 환자용 설명서에서 위장관 문합부 누출 관련 안전 정보가 빠져 결함 통지가 나왔다.",
+   "key_facts": [
+    "사유: 환자용 설명서 2항에서 위장관 문합부 누출 관련 안전 정보 누락",
+    "제품·범위: Toradol 30 mg/mL 주사액, 8개 배치 91,134팩 유통, 미유통 1배치 포함",
+    "등급: Class 4"
+   ],
+   "implication": "현재 가용 재고는 모두 해당 설명서 판이다. 표시, 제품특성요약서 등 다른 정보는 맞다.",
+   "checks": [
+    "환자용 설명서 개정이 출하되는 배치에 반영됐는지 확인하는가?",
+    "설명서 판 관리에서 승인된 최신 판만 포장에 쓰이도록 막는가?"
+   ],
+   "quotes_translation": [
+    "Atnahs Pharma UK Ltd는 Toradol 30 mg/mL 주사액 일부 배치와 함께 공급된 환자용 설명서에서 위장관 문합부 누출 관련 안전 정보가 누락됐다고 MHRA에 알렸다…"
+   ],
+   "en": {
+    "title_issue": "Safety text missing from patient leaflet",
+    "hook_line": "91,134 packs from 8 batches distributed with an outdated leaflet",
+    "summary": "A defect notification was issued because safety information on gastrointestinal anastomotic leakage was omitted from the patient leaflets of certain Toradol 30 mg/mL injection batches.",
+    "key_facts": [
+     "Reason: safety information on gastrointestinal anastomotic leakage omitted from Section 2 of the patient leaflet",
+     "Product and scope: Toradol 30 mg/mL solution for injection, 91,134 packs from 8 affected batches distributed, plus one undistributed batch",
+     "Class: Class 4"
+    ],
+    "implication": "Currently all available stock contains the affected leaflet version. All other information on the label and SmPC is correct.",
+    "checks": [
+     "Do you confirm leaflet revisions are applied to the batches being released?",
+     "Does version control prevent superseded leaflets from being used in packaging?"
+    ]
+   }
+  },
+  "D-0172-2027": {
+   "title_issue": "유리 입자 검출 주사제 회수",
+   "hook_line": "시아노코발라민 주사제, 유리로 확인된 입자로 Class II",
+   "summary": "Cyanocobalamin(시아노코발라민) 주사액 다회용 바이알이 유리로 확인된 입자 검출로 회수됐다.",
+   "key_facts": [
+    "사유: 입자 검출 — 유리로 확인",
+    "제품·범위: Cyanocobalamin Injection 1000 mcg/mL 다회용 바이알, Lot 24394",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "입자 이물 존재: 유리로 확인됨"
+   ],
+   "en": {
+    "title_issue": "Injection recalled for glass particulates",
+    "hook_line": "Cyanocobalamin injection recalled for particulates identified as glass, Class II",
+    "summary": "Cyanocobalamin injection multi-dose vials were recalled after particulate matter identified as glass was found.",
+    "key_facts": [
+     "Reason: presence of particulate matter identified as glass",
+     "Product and scope: Cyanocobalamin Injection 1000 mcg/mL multi-dose vials, lot 24394",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0174-2027": {
+   "title_issue": "용출 규격 부적합 캡슐 회수",
+   "hook_line": "리스덱스암페타민 캡슐, 용출 규격 부적합으로 Class II",
+   "summary": "Lisdexamfetamine Dimesylate 40 mg 캡슐이 용출 규격 부적합으로 회수됐다.",
+   "key_facts": [
+    "사유: 용출 규격 부적합",
+    "제품·범위: Lisdexamfetamine Dimesylate 40 mg 캡슐 100정 병, Lot AD97036·AE05842, 17,760 bottles",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "용출 규격 부적합"
+   ],
+   "en": {
+    "title_issue": "Capsules recalled for failed dissolution",
+    "hook_line": "Lisdexamfetamine capsules recalled for failed dissolution, Class II",
+    "summary": "Lisdexamfetamine dimesylate 40 mg capsules were recalled for failed dissolution specifications.",
+    "key_facts": [
+     "Reason: failed dissolution specifications",
+     "Product and scope: Lisdexamfetamine Dimesylate Capsules 40 mg, 100-count bottles, lots AD97036 and AE05842, 17,760 bottles",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0175-2027": {
+   "title_issue": "호르몬 교차오염 구강용품 회수",
+   "hook_line": "치약·구강청결제에서 호르몬 성분 검출, Class II",
+   "summary": "ORL Labs LLC의 치약·구강청결제가 FDA 시료 검사에서 호르몬 성분이 검출돼 교차오염으로 동일 사유 6품목 일괄 회수됐다.",
+   "key_facts": [
+    "사유: 교차오염 — FDA 시료 검사에서 프로게스테론·에스트라디올 또는 DHEA 검출",
+    "제품·범위: 동일 사유 6품목 일괄 회수(치약·구강청결제), 3976 units",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "교차오염: 회사는 FDA로부터 시료 검사에서 프로게스테론, 에스트라디올 또는 디하이드로에피안드로스테론(DHEA)이 검출됐다는 통보를 받았다"
+   ],
+   "en": {
+    "title_issue": "Oral care products, hormone cross-contamination",
+    "hook_line": "Hormones found in toothpaste and mouthwash, Class II",
+    "summary": "ORL Labs LLC toothpaste and mouthwash products were recalled for cross-contamination after FDA sampling found hormones; six products were recalled for the same reason.",
+    "key_facts": [
+     "Reason: cross-contamination; FDA sampling found progesterone, estradiol or dehydroepiandrosterone (DHEA)",
+     "Product and scope: six toothpaste and mouthwash products recalled for the same reason, 3976 units",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0185-2027": {
+   "title_issue": "입자 검출 파모티딘 주사제 회수",
+   "hook_line": "파모티딘 주사제 1,720 vials, 입자 검출로 Class II",
+   "summary": "Famotidine(파모티딘) 주사액 다회용 바이알이 입자 검출로 회수됐다.",
+   "key_facts": [
+    "사유: 입자 검출",
+    "제품·범위: Famotidine Injection 200 mg per 50 mL 다회용 바이알, Lot E243A001, 1,720 vials",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "입자 이물 존재"
+   ],
+   "en": {
+    "title_issue": "Famotidine injection, particulate matter",
+    "hook_line": "1,720 vials of famotidine injection recalled for particulate matter, Class II",
+    "summary": "Famotidine injection multi-dose vials were recalled for the presence of particulate matter.",
+    "key_facts": [
+     "Reason: presence of particulate matter",
+     "Product and scope: Famotidine Injection 200 mg per 50 mL multi-dose vials, lot E243A001, 1,720 vials",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  }
+ }
+}

@@ -602,6 +602,7 @@ grm-api-intake/
 ├─ raw_update.py                   # [원문 갱신 규칙 R4] 건너뛴 항목의 오늘 판을 정본 위에 얹어 소스별 본문 칸 지문이 바뀌고 나빠지지 않았을 때만 `raw_signal_apply_version` 으로 갱신(하루 상한 `RAW_UPDATE_MAX`·끄기 `RAW_UPDATE_APPLY=false`) · 본문이 바뀌면 분류 칸 재계산·지적사항 후속은 `raw_body_followup`
 ├─ raw_body_followup.py            # 본문 교체 후속(본문을 바꾸는 모든 길의 공용 함수): 분류 칸(관련도·tier·제품군)을 일일 수집과 같은 build 함수로 재계산 · 같은 추출기로 findings 재추출 → 새 본문에만 있는 글은 같은 삽입 함수로 넣고, 본문만 바뀐 짝은 restore 계획, 옛 본문에만 남은 행은 지우지 않고, 같은 문서의 새 글이 모두 정리·공개되면 `--supersede` 로 되돌릴 수 있는 '대체됨'(scope_status=superseded, migration 166 · `findings_supersessions` 기록 · `grm_findings_unsupersede` 되돌리기)으로 숨김 · `--since-days N --check` 따라잡기·검사(raw_signal_versions 기준)
 ├─ source_reconcile.py             # 원천 대조 감시 — 원천 건수 = 수집 + 의도적 제외 + 미뤄짐 등식을 매일 센다(grm-source-reconcile)
+├─ completeness_refill.py          # 수집 완전성 N3 자동 메움 — 놓침·결손 번호를 소스별 재수집 경로(WL --ids·483 named·식약처 워크플로)로 넘기고 재대조, 남은 번호는 상태로 이월(grm-completeness-refill)
 ├─ content_completeness.py         # 내용 완전성 감시 — 원자료 전 칸을 펴서 잘림(같은 길이대에서 문장 중간에 끝나는 값의 몰림)·모아 놓고 사이트·브리프에 안 닿는 칸을 찾는다(grm-source-reconcile 의 content 잡, 읽기 전용)
 ├─ field_contract.py               # 수집 완전성 N2 칸 대조 — 소스별 "완전한 행" 계약으로 결손 행 수·번호를 세어 coverage_daily.incomplete 에 쌓는다(grm-source-reconcile 의 content 잡)
 ├─ completeness_daily.py           # 수집 완전성 N6 일보 — 문서 대조·매일 장부·칸 대조를 모아 소스별 정상/메우는 중/사람 필요 한 줄, [GRM 문제] 일보 이슈 하나를 돌려쓴다(grm-completeness-daily.yml, 23:07 KST)
@@ -822,6 +823,7 @@ grm-api-intake/
    ├─ grm-ops-measure.yml                # [자동 측정] 매일 07:23 KST web/ops_measure_github.py — 기본 dry-run, GRM_OPS_MEASURE_ENABLED=true 일 때만 ops_goal_set·ops_member_touch 쓰기(SUPABASE_SERVICE_ROLE_KEY 재사용·마스킹·읽기 권한만)
    ├─ grm-completeness-daily.yml         # [수집 완전성 N6] 매일 23:07 KST completeness_daily.py — 사람 필요 목록 일보 이슈(라벨 completeness-daily)
    ├─ grm-source-reconcile.yml           # [원천 대조] 매일 수집 뒤 source_reconcile.py — 원천 대비 누락 감시 + content 잡(content_completeness.py — 잘림·안 쓰이는 칸 · field_contract.py — N2 칸 대조)
+   ├─ grm-completeness-refill.yml        # [수집 완전성 N3] 원천 대조 뒤 + 매시(09:23~22:23 KST) completeness_refill.py — 놓침·결손 번호 지정 재수집 → 재대조(쓰기는 GRM_REFILL_APPLY)
    ├─ grm-ops-alarm.yml                  # [경보 담당] 경보 라벨 이슈 → 운영 센터 업무(web/ops_alarm_sync.py), 매일 07:41 KST 점검
    ├─ grm-findings-review-queue.yml      # [검토 대기] needs_review 큐 나이 감시 — 데이터품질팀 업무
    ├─ grm-fda-import-alert.yml           # [수입경보] 66-40·66-41 스냅샷(현재 수집 꺼짐)

@@ -7,6 +7,9 @@
   ① 문서 대조   source_reconcile.py 결과(그날 grm-source-reconcile 아티팩트 `source-reconcile.json`). 없으면 "대조 안 돎".
   ② 매일 장부   coverage_daily(171) 의 식약처 행정처분·회수 칸 — 원천 총건수 대비 설명되지 않은 차이.
   ③ 칸 대조     coverage_daily.incomplete(172, field_contract.py) — 오늘과 어제의 소스별 결손 수.
+  ④ 자동 메움   completeness_refill.py 의 그날 마지막 회차(`completeness-refill.json`, N3). 아침 대조의 놓침을
+                그날 다시 받아 재대조로 닫았으면 그 줄은 정상으로 바꾸고, 못 닫았으면 사람 필요에 이유를 붙인다.
+                결과가 없으면(고리가 안 돎) 사람 필요 한 줄.
 
 소스별 한 줄 = 정상 / 메우는 중(n) / **사람 필요(n)**
   · 사람 필요: 놓침(missed)·원천 불가·저장소 불가·대조 안 돎·장부 차이·측정 불가, 결손이 어제보다 줄지 않음.
@@ -150,12 +153,48 @@ def hc_line(day: date) -> list[Line]:
                  "원천 불가 — 옛 서버 불통(10-31~), 새 도메인에 GMP 없음. 대체 원천 결정 필요(주 1회 알림)", count=1)]
 
 
+REFILL_STATE_KO = {"pending": "메우는 중", "wait": "원천 대기", "human": "사람 필요"}
+
+
+def refill_overlay(lines: list[Line], refill: Mapping[str, Any] | None, day: date) -> list[Line]:
+    """자동 메움(N3) 결과를 문서 대조 줄에 겹친다. 마감(23:00) 뒤라 남은 것은 메우는 중이 아니라 사람 필요다."""
+    if not isinstance(refill, Mapping) or str(refill.get("day") or "") != day.isoformat():
+        return lines + [Line("refill", "자동 메움(N3)", HUMAN, "오늘 자동 메움 결과 없음(안 돎·실패)", count=1)]
+    by_key: dict[str, list[Mapping[str, Any]]] = {}
+    for r in refill.get("lines") or []:
+        if isinstance(r, Mapping) and r.get("key"):
+            by_key.setdefault(str(r["key"]), []).append(r)
+    out = []
+    for line in lines:
+        rs = by_key.pop(line.key.removeprefix("reconcile:"), None) if line.key.startswith("reconcile:") else None
+        if rs and line.state == HUMAN:
+            if all(r.get("state") == "done" for r in rs):
+                line = Line(line.key, line.label, OK, "아침 놓침 → 자동 메움·재대조 정상")
+            else:
+                notes = "; ".join(f"{REFILL_STATE_KO.get(str(r.get('state')), r.get('state'))} {r.get('reason')}"
+                                  for r in rs if r.get("state") != "done")
+                line = Line(line.key, line.label, HUMAN, f"{line.reason} · 자동 메움: {notes}"[:300],
+                            line.count, line.items, line.url)
+        out.append(line)
+    for key, rs in sorted(by_key.items()):             # 대조 줄이 없는 소스(칸 결손 재수집 등) — 사람 필요만 올린다
+        for r in rs:
+            if r.get("state") == "human":
+                ids = [str(i) for i in (r.get("ids") or [])[:MAX_IDS]]
+                out.append(Line(f"refill:{key}", f"{key} 자동 메움", HUMAN, str(r.get("reason") or ""),
+                                int(r.get("count") or len(ids)), ids))
+    if not refill.get("apply"):
+        out.append(Line("refill", "자동 메움(N3)", OK, "쓰기 꺼짐(GRM_REFILL_APPLY) — 계획·dry 만"))
+    return out
+
+
 def build_lines(day: date, reconcile: Mapping[str, Any] | None,
-                ledger_today: Mapping[str, Any] | None, ledger_yesterday: Mapping[str, Any] | None) -> list[Line]:
+                ledger_today: Mapping[str, Any] | None, ledger_yesterday: Mapping[str, Any] | None,
+                refill: Mapping[str, Any] | None = None) -> list[Line]:
     incomplete_today = (ledger_today or {}).get("incomplete")
     incomplete_yesterday = (ledger_yesterday or {}).get("incomplete")
-    return (reconcile_lines(reconcile, day) + ledger_lines(ledger_today)
-            + field_lines(incomplete_today, incomplete_yesterday) + hc_line(day))
+    lines = (reconcile_lines(reconcile, day) + ledger_lines(ledger_today)
+             + field_lines(incomplete_today, incomplete_yesterday) + hc_line(day))
+    return refill_overlay(lines, refill, day)
 
 
 def parse_state(body: str) -> dict[str, str]:
@@ -247,6 +286,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="수집 완전성 N6 일보")
     ap.add_argument("--reconcile", type=Path, default=Path("source-reconcile.json"),
                     help="그날 source_reconcile 결과(없으면 '대조 안 돎')")
+    ap.add_argument("--refill", type=Path, default=Path("completeness-refill.json"),
+                    help="그날 마지막 자동 메움 회차 결과(N3, 없으면 '자동 메움 안 돎')")
     ap.add_argument("--day", default="", help="KST 날짜(기본 오늘)")
     ap.add_argument("--json", default="completeness-daily.json")
     ap.add_argument("--apply", action="store_true", help="이슈 생성·갱신·닫기")
@@ -257,6 +298,10 @@ def main(argv: list[str] | None = None) -> int:
         reconcile = json.loads(args.reconcile.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         reconcile = None
+    try:
+        refill = json.loads(args.refill.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        refill = None
     base = os.environ.get("SUPABASE_URL", "").strip().rstrip("/")
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     ledger_today = ledger_yesterday = None
@@ -268,7 +313,7 @@ def main(argv: list[str] | None = None) -> int:
             read_error = type(exc).__name__
     else:
         read_error = "SUPABASE 미설정"
-    lines = build_lines(day, reconcile, ledger_today, ledger_yesterday)
+    lines = build_lines(day, reconcile, ledger_today, ledger_yesterday, refill)
     if read_error:
         lines.append(Line("store", "일보 저장소 읽기", HUMAN, f"coverage_daily 읽기 실패({read_error})", count=1))
     existing = open_issue() if args.apply else None

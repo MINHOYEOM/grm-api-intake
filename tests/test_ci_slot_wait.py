@@ -35,7 +35,8 @@ class CiSlotWaitTests(unittest.TestCase):
         with redirect_stdout(stdout), redirect_stderr(stderr):
             code = main(
                 argv, read_runs=lambda: next(snapshots), now=lambda: self.current_time,
-                sleep=self.sleep, monotonic=lambda: self.elapsed, current_branch=current_branch,
+                sleep=self.sleep, monotonic=lambda: self.elapsed,
+                current_branch=current_branch or (lambda: ""),  # 실제 git 브랜치에 시험이 흔들리지 않게
             )
         self.assertEqual(list(snapshots), [])
         return code, stdout.getvalue(), stderr.getvalue()
@@ -115,3 +116,17 @@ class CiSlotWaitTests(unittest.TestCase):
                 self.assertEqual(code, 0)
                 self.assertEqual(self.sleeps, [])
                 self.assertIn("2개 · push 가능", stdout)
+
+    def test_company_branch_skips_the_wait_even_when_ci_is_full(self):
+        # 편집팀 push 는 PR CI 를 안 띄운다. 기다리다 백그라운드로 가면 push 가 사라진다(11-28).
+        for branch in ("claude/company-2026-11-30", "claude/company-backup-1130"):
+            with self.subTest(branch=branch):
+                self.sleeps.clear()
+                code, stdout, _ = self.run_cli([], current_branch=lambda b=branch: b)
+                self.assertEqual(code, 0)
+                self.assertEqual(self.sleeps, [])
+                self.assertIn("push 가능", stdout)
+
+    def test_non_company_branch_still_waits(self):
+        code, _, _ = self.run_cli(["--max-wait-min", "0"], BUSY, current_branch=lambda: "claude/glossary-weekly")
+        self.assertNotEqual(code, 0)

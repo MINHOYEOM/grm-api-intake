@@ -1,0 +1,347 @@
+[
+ {
+  "doc": "2676e60353",
+  "verdict": "likely",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Guidance on the details of the classification of variations requiring assessment…\" · 이유: 변경(variation) 분류 = 품질 변경관리"
+ },
+ {
+  "doc": "1bae7194b5",
+  "verdict": "likely",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Questions and answers on the impact of Mutual Recognition Agreement (MRA)…\" / \"EMA Inspections Office\" · 이유: EU-미국 GMP 상호인정"
+ },
+ {
+  "doc": "309191405f",
+  "verdict": "likely",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Annex 22 expert workshop draft agenda…\" · 이유: GMP Annex 22(AI)"
+ },
+ {
+  "doc": "2561126e6d",
+  "verdict": "likely",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EudraGMDP is undergoing modernisation, with the new EudraGMDP scheduled to launch in Q1 2027.\" · 이유: GMP 증명서 DB"
+ },
+ {
+  "doc": "9a114bbddf",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"…influenza virus strains/sequences that vaccine manufacturers should include…\" · 이유: 백신 제조 균주 변경"
+ },
+ {
+  "doc": "a88680568d",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): 위와 같은 문장(갱신판) — \"…influenza virus strains/sequences that vaccine manufacturers should include…\" · 이유: 같음"
+ },
+ {
+  "doc": "0971560944",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Amended Biologics Working Party Vaccines Quality Operational Expert Group (BV-OEG) Influen…\" · 이유: 백신 품질 작업반"
+ },
+ {
+  "doc": "d288d37f3a",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): 위와 같은 제목(갱신판) — \"Amended Biologics Working Party Vaccines Quality Operational Expert Group (BV-OEG) Influen…\" · 이유: 같음"
+ },
+ {
+  "doc": "9f97ec99af",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"ETF recommends updating COVID-19 vaccines to target XFG variant\" · 이유: 제조 조성 변경"
+ },
+ {
+  "doc": "52661ce330",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"…calling on medicine developers, manufacturers, regulators and national control laboratories…\" · 이유: 시험법(동물시험 대체)·출하시험"
+ },
+ {
+  "doc": "640900fe15",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"…submit type IA annual updates… no later than 20 November 2026.\" · 이유: 변경 제출 마감"
+ },
+ {
+  "doc": "09815f25b4",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"European Medicines Agency post-authorisation procedural advice…\" · 이유: 허가 후 변경 절차"
+ },
+ {
+  "doc": "86f9bb74d8",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): 위와 같은 제목(중복 게시) — \"European Medicines Agency post-authorisation procedural advice…\" · 이유: 같음"
+ },
+ {
+  "doc": "78e973efdc",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Notice to sponsors on validation and qualification of computerised systems used in clinica…\" · 이유: 컴퓨터화 시스템 밸리데이션(임상)"
+ },
+ {
+  "doc": "2c1d27fbc8",
+  "verdict": "possible",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): 위와 같은 제목(중복 게시) — \"Notice to sponsors on validation and qualification of computerised systems used in clinica…\" · 이유: 같음"
+ },
+ {
+  "doc": "10249672b5",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EU tracks progress towards 2030 clinical trial targets\" · 이유: 임상"
+ },
+ {
+  "doc": "651ff9a782",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EMA closed on Whit Monday, 25 May\" · 이유: 휴무 공지"
+ },
+ {
+  "doc": "2641199dee",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Guideline on good pharmacovigilance practices (GVP): Module VII…\" · 이유: 약물감시"
+ },
+ {
+  "doc": "66cd35189c",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Meeting highlights from the Committee for Veterinary Medicinal Products (CVMP)…\" · 이유: 수의"
+ },
+ {
+  "doc": "48f67bf1ff",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Questions and answers on periodic safety update report single-assessment (PSUSA)…\" · 이유: 약물감시"
+ },
+ {
+  "doc": "cf1e28143f",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EMA has recommended granting a marketing authorisation… Jascayd (nerandomilast)…\" · 이유: 허가 소식"
+ },
+ {
+  "doc": "e605c35fd0",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"List of centrally authorised products with safety-related changes to the product informati…\" · 이유: 안전성 표시 변경 목록"
+ },
+ {
+  "doc": "47a1e1c9d4",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Concept paper… development of medicinal products for the treatment of smoking\" · 이유: 임상 지침"
+ },
+ {
+  "doc": "74395e291f",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Pharmacovigilance-related regulatory recommendations for centrally authorised veterinary…\" · 이유: 수의 약물감시"
+ },
+ {
+  "doc": "5e7ee0826c",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"United for Health: EMA in WorldPride 2026\" · 이유: 홍보"
+ },
+ {
+  "doc": "77acfd609c",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EMA, AMA and African regulatory authorities join forces on Ebola outbreak response\" · 이유: 공중보건 대응"
+ },
+ {
+  "doc": "30167797c8",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Concept paper… use of External controls for…\" · 이유: 임상"
+ },
+ {
+  "doc": "f02b85c9a1",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Member states contact points for translations review\" · 이유: 번역 행정"
+ },
+ {
+  "doc": "58001248cb",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Checklist for the submission of Day 215 product information annexes…\" · 이유: 번역 제출"
+ },
+ {
+  "doc": "a8ac68e8a5",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Today, EMA released its 2025 annual report…\" · 이유: 연차보고"
+ },
+ {
+  "doc": "255c0fbaaa",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Meeting highlights from the Pharmacovigilance Risk Assessment Committee (PRAC)…\" · 이유: 약물감시"
+ },
+ {
+  "doc": "f86a133d4d",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Products Management Services (PMS) - Implementation of ISO…\" · 이유: 데이터 표준"
+ },
+ {
+  "doc": "35507504d9",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"IRIS guide for applicants…\" · 이유: 제출 포털"
+ },
+ {
+  "doc": "2c85e4e537",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EMA Management Board: highlights of June 2026 meeting\" · 이유: 이사회"
+ },
+ {
+  "doc": "eac99b732e",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"IRIS guide to registration and RPIs\" · 이유: 제출 포털"
+ },
+ {
+  "doc": "1109a68cfb",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Committee for Advanced Therapies (CAT) rules of procedure\" · 이유: 위원회 절차"
+ },
+ {
+  "doc": "a539f45fec",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Meeting highlights from the Committee for Veterinary Medicinal Products (CVMP)…\" · 이유: 수의"
+ },
+ {
+  "doc": "a4bf76ef05",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Concept paper… clinical evaluation of antifungal agents\" · 이유: 임상"
+ },
+ {
+  "doc": "16f69a012b",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"INS-GCP-1 procedure for coordinating good-clinical-practice inspections…\" · 이유: GCP 실사(GMP 아님)"
+ },
+ {
+  "doc": "fda6ac3e47",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): 위와 같은 제목(중복 게시) — \"INS-GCP-1 procedure for coordinating good-clinical-practice inspections…\" · 이유: 같음"
+ },
+ {
+  "doc": "ce53ed43e5",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Draft guideline on the clinical requirements for medicines intended for the treatment of s…\" · 이유: 임상"
+ },
+ {
+  "doc": "dd8be3ef55",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Draft guideline on the clinical requirements for medicines intended for the treatment of t…\" · 이유: 임상"
+ },
+ {
+  "doc": "3f8cf7438c",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Women are missing from medicines development: EMA's roadmap for change\" · 이유: 정책"
+ },
+ {
+  "doc": "bba0d03877",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Executive Director speech at EMA women's health multi-stakeholder workshop\" · 이유: 연설"
+ },
+ {
+  "doc": "6005d56b3e",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EMA Management Board: highlights of September 2026 meeting\" · 이유: 이사회"
+ },
+ {
+  "doc": "3a1b20154a",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"List of centrally authorised products with safety-related changes…\" · 이유: 안전성 표시"
+ },
+ {
+  "doc": "c7fc975684",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Meeting highlights from the Pharmacovigilance Risk Assessment Committee (PRAC)…\" · 이유: 약물감시"
+ },
+ {
+  "doc": "9ab04ab86e",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"European Medicines Agency pre-authorisation procedural advice…\" · 이유: 허가 전 절차"
+ },
+ {
+  "doc": "3c5d9622cc",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): 위와 같은 제목(중복 게시) — \"European Medicines Agency pre-authorisation procedural advice…\" · 이유: 같음"
+ },
+ {
+  "doc": "41be3d4f02",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Concept paper on the guideline revision on good pharmacogenomic practice\" · 이유: 임상"
+ },
+ {
+  "doc": "a4e36e03b1",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Clinical trial applications advice pilot becomes permanent\" · 이유: 임상"
+ },
+ {
+  "doc": "34119a71c3",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Draft guideline on the requirements for demonstrating therapeutic equivalence for nasal pr…\" · 이유: 생동성(임상)"
+ },
+ {
+  "doc": "aa2b3ed44c",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Questions and answers on the PIP compliance verification procedure…\" · 이유: 소아 개발계획"
+ },
+ {
+  "doc": "995387aa3a",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): 위와 같은 제목(중복 게시) — \"Questions and answers on the PIP compliance verification procedure…\" · 이유: 같음"
+ },
+ {
+  "doc": "9baabc293b",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Annual report of the Pharmacovigilance Inspectors Working Group for 2025\" · 이유: 약물감시 실사"
+ },
+ {
+  "doc": "15bc2af6d8",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EMA recommends authorisation of Rasonque for metastatic pancreatic cancer\" · 이유: 허가 소식"
+ },
+ {
+  "doc": "192f4453ac",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Draft reflection paper on the investigation of drug interactions of herbal medicinal produ…\" · 이유: 임상"
+ },
+ {
+  "doc": "c77e328fdd",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Concept paper on clinical trials in recipients of kidney transplantation\" · 이유: 임상"
+ },
+ {
+  "doc": "e2d19ba2bf",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Reflection paper on methodological aspects in confirmatory platform trials\" · 이유: 임상"
+ },
+ {
+  "doc": "64713dfec9",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Data Quality Framework (DQF)… Adverse Drug Reaction reports\" · 이유: 약물감시"
+ },
+ {
+  "doc": "3648ab2ee4",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Methodological Principles for the Assessment of Section 5.1 of the Summary of Product Char…\" · 이유: 허가 심사"
+ },
+ {
+  "doc": "13bd2d38e7",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Concept paper… clinical investigation of medicinal products in the treatment of hypertension\" · 이유: 임상"
+ },
+ {
+  "doc": "1b47c45e02",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"AMA and EMA issue joint guidance on Ebola vaccine development\" · 이유: 임상 개발"
+ },
+ {
+  "doc": "6d84b5d6aa",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"EMA closed on All Souls' Day, 2 November\" · 이유: 휴무 공지"
+ },
+ {
+  "doc": "73d8751997",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"List of centrally authorised products with safety-related changes…\" · 이유: 안전성 표시"
+ },
+ {
+  "doc": "fc86f40929",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"QRD Appendix V - Adverse-drug-reaction reporting details\" · 이유: 약물감시"
+ },
+ {
+  "doc": "57304bd6c6",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Draft guideline on risk assessment of medicinal products in human reproduction and breastf…\" · 이유: 임상 안전성"
+ },
+ {
+  "doc": "2e33f5284e",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Draft guideline on predictive biomarker assays in the context of medicinal product lifecyc…\" · 이유: 임상"
+ },
+ {
+  "doc": "cc5b9fbd64",
+  "verdict": "unrelated",
+  "evidence": "규칙 dq-ema-2026-11-25 · 근거(원문): \"Draft guideline on veterinary good pharmacovigilance practices (VGVP)…\" · 이유: 수의"
+ }
+]

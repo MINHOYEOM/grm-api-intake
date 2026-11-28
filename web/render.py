@@ -4682,6 +4682,15 @@ def is_duplicate_doc_page(doc: dict[str, Any], ratios: dict[str, float]) -> bool
     return ratios.get(doc.get("document_id", ""), 0.0) >= DUP_DOC_MIN_RATIO
 
 
+def doc_has_grm_addition(similar: Any, cited_clauses: Any, standard_refs: Any,
+                         doc_terms: Any, backlinks: Any) -> bool:
+    """[구글 유입 2026-11-27 규칙 F] 문서 페이지에 GRM 고유 블록(비슷한 지적·인용 조항·기준 링크·
+    관련 용어·실린 브리프 호)이 하나라도 서는가. 렌더가 이 함수 하나로 meta 와 sitemap 제외를 정한다.
+    하나라도 생기면 다음 빌드에서 구글 색인 대상으로 자동 복귀."""
+    cells = backlinks.get("cells") if isinstance(backlinks, dict) else backlinks
+    return any(bool(x) for x in (similar, cited_clauses, standard_refs, doc_terms, cells))
+
+
 def google_noindex_doc_page(doc: dict[str, Any], lang: str,
                             ratios: dict[str, float]) -> bool:
     """문서 페이지를 구글에서 뺄까(A 얇음 또는 B 중복). 템플릿 메타와 sitemap 이 **이 함수 하나**를 본다."""
@@ -5041,6 +5050,28 @@ def clause_text_cites(docs_data: "dict[str, Any] | None",
             docs, views["en"],
             lambda f: "" if _HANGUL_RE.search(finding_body(f, "en")) else finding_body(f, "en"),
             doc_ok=doc_is_english)
+    return out
+
+
+def clause_text_extras(docs_data: "dict[str, Any] | None", views: dict[str, dict[str, Any]],
+                       glossary_terms: "list[dict[str, Any]]",
+                       term_ids: "Any" = None) -> dict[str, dict[str, dict[str, Any]]]:
+    """[조항 덧붙임 2026-11-27] 언어 → {"key_terms", "topic_cases"}(조항 원문 페이지 주소 → 블록 내용).
+
+    렌더와 sitemap·googlebot 판정이 이 한 함수를 본다(`clause_text_cites` 와 같은 규율)."""
+    docs = (docs_data or {}).get("documents") or []
+    ids = set(term_ids) if term_ids is not None else None
+    out = {}
+    for lg, view in views.items():
+        if lg == DEFAULT_LANG:
+            body, ok = (lambda f: finding_body(f, DEFAULT_LANG)), None
+        else:
+            body = lambda f: "" if _HANGUL_RE.search(finding_body(f, "en")) else finding_body(f, "en")
+            ok = doc_is_english
+        out[lg] = {
+            "key_terms": clause_text_page.key_terms_by_href(view, glossary_terms, lg, ids),
+            "topic_cases": clause_text_page.topic_cases_by_href(docs, view, body, doc_ok=ok),
+        }
     return out
 
 
@@ -8737,6 +8768,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 # [UI 2단 2026-11-12] 관련 용어 칸 — 본문에 실제로 링크된 용어만(선정 순서).
                 _doc_terms = [{"id": tid, "label": surface} for surface, tid in _sel
                               if tid in _used]
+                _std_refs = ([] if (_similar_cases or _cited_clauses) else doc_standard_view(
+                    doc, clause_text_views.get(_lg, clause_text_view_en),
+                    clause_labels_by_lang.get(_lg, {})))
+                _backlinks = build_backlink_panel(
+                    "doc", doc.get("document_id", ""), index=card_issue_index,
+                    lang=_lg,
+                    issue_slugs=(all_issue_slugs if _lg == DEFAULT_LANG else en_brief_slugs),
+                    rel_root=_pp.rel_root, tr=_tr)
+                # [구글 유입 2026-11-27] 영문 문서에 GRM 덧붙임이 하나도 없으면(규칙 F) 구글만 뺀다.
+                _doc_bare = (_lg != DEFAULT_LANG and not doc_has_grm_addition(
+                    _similar_cases, _cited_clauses, _std_refs, _doc_terms, _backlinks))
+                if _doc_bare and doc["slug"] not in google_noindex_doc[_lg]:
+                    _mark_google_noindex(_lg, f"findings/doc/{doc['slug']}/", "doc_bare")
                 _emit("findings_doc.html", _pp,
                     next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
                     doc_terms=_doc_terms,
@@ -8755,7 +8799,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          (_tr("문서로 찾기"), "findings/docs/")),
                         (doc["firm_name"], "")]),
                     doc=_doc, agency_labels=_labels,
-                    google_noindex=doc["slug"] in google_noindex_doc[_lg],
+                    google_noindex=(doc["slug"] in google_noindex_doc[_lg]) or _doc_bare,
                     source_label=doc_source_label(doc),
                     # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                     # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
@@ -8784,15 +8828,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         f["finding_id"] for f in (doc.get("findings") or [])
                         if f.get("finding_id") in partial_detail_ids),
                     cited_clauses=_cited_clauses,
-                    standard_refs=(
-                        [] if (_similar_cases or _cited_clauses) else doc_standard_view(
-                            doc, clause_text_views.get(_lg, clause_text_view_en),
-                            clause_labels_by_lang.get(_lg, {}))),
-                    backlinks=build_backlink_panel(
-                        "doc", doc.get("document_id", ""), index=card_issue_index,
-                        lang=_lg,
-                        issue_slugs=(all_issue_slugs if _lg == DEFAULT_LANG else en_brief_slugs),
-                        rel_root=_pp.rel_root, tr=_tr),
+                    standard_refs=_std_refs,
+                    backlinks=_backlinks,
                 )
 
         # [B1] 업체 페이지. sitemap 은 **데이터에서** 파생하고(렌더 스위치와 무관),
@@ -8962,6 +8999,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [구글 품질 2단계 2026-11-20] 21 CFR 조항마다 "이 조항을 인용한 지적" — 언어마다 그 트리에 문서
     # 페이지가 있는 문서만 센다. 렌더와 sitemap 판정(아래 D·E 루프)이 같은 값을 본다.
     _ct_cites = clause_text_cites(docs_data, clause_text_views)
+    _ct_extra = clause_text_extras(docs_data, clause_text_views, glossary_terms or [], glossary_term_ids)
     if clause_text_view["sources"]:
         for _lg, _pg, _em, _tr in trees:
             _ctv = clause_text_views.get(_lg, clause_text_view_en)
@@ -8996,8 +9034,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 _cp = _pg(_c["href"])
                 _sec = _c["number"] if _d["source_key"] == "cfr21" else ""
                 _cite = _ct_cite.get(_c["href"])
+                _cases_href = (f"findings/clause/{clause_slug(_sec)}/"
+                               if _sec and clause_slug(_sec) in _ct_cases else "")
+                _kt = _ct_extra[_lg]["key_terms"].get(_c["href"]) or []
+                _tc = _ct_extra[_lg]["topic_cases"].get(_c["href"]) or []
                 _ct_gni = clause_text_page.google_noindex_reason(
-                    _d, _c, _lg, (_cite or {}).get("documents", 0))
+                    _d, _c, _lg, (_cite or {}).get("documents", 0),
+                    bare=not clause_text_page.has_grm_addition(
+                        (_cite or {}).get("documents", 0),
+                        _ct_terms.get(_c["href"]), _cases_href, _kt, _tc))
                 _em("clause_text.html", _cp,
                     page_title=_tr("{code} 원문 · GRM", code=_c["code"]),
                     nav_active="findings",
@@ -9006,9 +9051,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         (_tr("홈"), "/"), (_tr("기준 조항 원문"), "clauses/"),
                         (_d["code"], _d["path"]), (_c["number"], "")]),
                     doc=_d, clause=_c,
-                    cases_href=(f"findings/clause/{clause_slug(_sec)}/"
-                                if _sec and clause_slug(_sec) in _ct_cases else ""),
+                    cases_href=_cases_href,
                     terms=_ct_terms.get(_c["href"]) or [],
+                    key_terms=_kt, topic_cases=_tc,
                     cite=_cite, agency_labels=_ct_labels,
                     google_noindex=bool(_ct_gni),
                 )
@@ -9017,9 +9062,21 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [구글 품질 1단계] 조항 D·E — sitemap 제외 집합은 렌더 루프 밖에서 같은 술어로 채운다
     # (영문 트리 경로는 en_paths 로 sitemap 에 들어가므로 언어마다 따로 센다).
     for _lg in (DEFAULT_LANG, "en"):
+        _gn_terms = clause_text_page.terms_by_href(
+            clause_text_views[_lg], glossary_terms or [], _lg)
+        _gn_cases = (clause_slugs if _lg == DEFAULT_LANG
+                     else {c["slug"] for c in clause_views_en})
         for _d, _c in clause_text_page.pages(clause_text_views[_lg]):
+            _gn_n = (_ct_cites[_lg].get(_c["href"]) or {}).get("documents", 0)
+            _gn_sec = _c["number"] if _d["source_key"] == "cfr21" else ""
+            _gn_case = (f"findings/clause/{clause_slug(_gn_sec)}/"
+                        if _gn_sec and clause_slug(_gn_sec) in _gn_cases else "")
             _why = clause_text_page.google_noindex_reason(
-                _d, _c, _lg, (_ct_cites[_lg].get(_c["href"]) or {}).get("documents", 0))
+                _d, _c, _lg, _gn_n,
+                bare=not clause_text_page.has_grm_addition(
+                    _gn_n, _gn_terms.get(_c["href"]), _gn_case,
+                    _ct_extra[_lg]["key_terms"].get(_c["href"]),
+                    _ct_extra[_lg]["topic_cases"].get(_c["href"])))
             if _why:
                 _mark_google_noindex(_lg, _c["href"], f"clause_{_why}")
 

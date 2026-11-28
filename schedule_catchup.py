@@ -84,6 +84,7 @@ ACTIVE_STATUSES = ("queued", "in_progress", "waiting", "pending", "requested")
 # A: 데이터·발행 결손 → TARGETS. B: 후속 실행이 회수. C: 감시·알림. D: 외부 발송 → 보완 금지.
 CRON_AUDIT: dict[str, tuple[str, str]] = {
     # A — 시점별 기록, 발행 마감, 또는 원문 회수 경로.
+    "grm-completeness-daily.yml": ("A", "그날 마감 뒤 사람 필요 목록을 내는 하루 한 번의 지점이다. 빠진 날은 다음 날 일보가 그날 판정을 대신 못 한다."),
     "grm-db-backup.yml": ("A", "암호화 주간 덤프. 다음 주 덤프로 빠진 주의 복구 지점을 만들 수 없다."),
     "grm-delta-bridge.yml": ("A", "월요일 발행에 필요한 해당 슬롯의 Notion 델타를 main 에 이관한다."),
     "grm-fda483-body-full-backfill.yml": ("A", "최근 45일 483 전문을 채워 월요일 handoff 전에 본문을 확보한다."),
@@ -153,6 +154,7 @@ TARGETS: tuple[Target, ...] = (
     Target("grm-publish-watchdog.yml", ("13 0,2,4 * * 1",), 60, 6 * 60),
     Target("grm-db-backup.yml", ("37 20 * * 0",), 60, 6 * 60),
     Target("grm-mfds-gmp-cert-monthly.yml", ("40 18 1 * *",), 90, 12 * 60),
+    Target("grm-completeness-daily.yml", ("7 14 * * *",), 90, 8 * 60),
     Target("grm-rum-analytics.yml", ("30 4 * * *", "30 16 * * *"), 90, 6 * 60),
 )
 

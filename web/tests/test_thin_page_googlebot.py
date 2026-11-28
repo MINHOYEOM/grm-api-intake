@@ -95,6 +95,51 @@ class DuplicateAndClausePredicateTest(unittest.TestCase):
         self.assertEqual(ct.google_noindex_reason(en_doc, {"chars": 134}, "en", 3), "")
         self.assertEqual(ct.google_noindex_reason(en_doc, long_c, "ko", 50), "untranslated")
 
+    def test_clause_bare_reason(self):
+        """[구글 유입 2026-11-27] 원문뿐(GRM 덧붙임 0)인 조항은 길어도 구글에서 뺀다."""
+        import clause_text_page as ct
+        en_doc = {"source": {"lang": "en"}}
+        long_c = {"chars": 500, "text_ko": ""}
+        self.assertFalse(ct.has_grm_addition(0, [], ""))
+        self.assertFalse(ct.has_grm_addition(0, None, ""))
+        self.assertTrue(ct.has_grm_addition(1, [], ""))
+        self.assertTrue(ct.has_grm_addition(0, [{"id": "t"}], ""))
+        self.assertTrue(ct.has_grm_addition(0, [], "findings/clause/211-22/"))
+        self.assertEqual(ct.google_noindex_reason(en_doc, long_c, "en", 0, bare=True), "bare")
+        # 덧붙임이 생기면 다음 빌드에서 자동 복귀
+        self.assertEqual(ct.google_noindex_reason(en_doc, long_c, "en", 1, bare=False), "")
+        # 종전 호출(bare 생략)은 판정이 바뀌지 않는다
+        self.assertEqual(ct.google_noindex_reason(en_doc, long_c, "en"), "")
+        # 짧음(E)·미번역(D)이 우선한다
+        self.assertEqual(ct.google_noindex_reason(en_doc, {"chars": 10}, "en", 0, bare=True), "short")
+        self.assertEqual(ct.google_noindex_reason(en_doc, long_c, "ko", 0, bare=True), "untranslated")
+
+    def test_render_wires_bare_at_both_sites(self):
+        """렌더(페이지 meta)와 sitemap 제외 루프가 같은 bare 판정을 넘긴다 — 한쪽만 빠지면
+        페이지는 noindex 인데 sitemap 에 남거나 그 반대가 된다."""
+        src = pathlib.Path(render.__file__).read_text(encoding="utf-8")
+        self.assertEqual(src.count("clause_text_page.google_noindex_reason("), 2)
+        self.assertEqual(src.count("bare=not clause_text_page.has_grm_addition("), 2)
+
+    def test_doc_bare_predicate(self):
+        """[구글 유입 2026-11-27 규칙 F] 영문 문서에 GRM 블록이 하나도 없을 때만 bare. 하나라도 생기면 복귀."""
+        f = render.doc_has_grm_addition
+        empty_panel = {"title": "t", "cells": []}
+        self.assertFalse(f([], [], [], [], empty_panel))
+        self.assertFalse(f(None, None, None, None, None))
+        self.assertTrue(f([{"slug": "a"}], [], [], [], empty_panel))   # 비슷한 지적
+        self.assertTrue(f([], [{"code": "c"}], [], [], empty_panel))   # 인용 조항
+        self.assertTrue(f([], [], [{"code": "s"}], [], empty_panel))   # 기준 링크
+        self.assertTrue(f([], [], [], [{"id": "t"}], empty_panel))     # 관련 용어
+        self.assertTrue(f([], [], [], [], {"cells": [{"key": "briefs"}]}))  # 실린 브리프 호
+
+    def test_render_wires_doc_bare_to_meta_and_sitemap(self):
+        """페이지 meta(google_noindex 인자)와 sitemap 제외(_mark_google_noindex)가 같은 _doc_bare 하나를 본다."""
+        src = pathlib.Path(render.__file__).read_text(encoding="utf-8")
+        self.assertEqual(src.count("_doc_bare = (_lg != DEFAULT_LANG and not doc_has_grm_addition("), 1)
+        self.assertIn('"doc_bare")', src)
+        self.assertIn("google_noindex=(doc[\"slug\"] in google_noindex_doc[_lg]) or _doc_bare", src)
+
     def test_citing_findings(self):
         import clause_text_page as ct
         src = {"schema": ct.SCHEMA, "source": {"key": "cfr21", "lang": "en"},
@@ -164,6 +209,11 @@ class ThinPageMetaTest(unittest.TestCase):
                 continue
             html = p.read_text(encoding="utf-8")
             want = render.google_noindex_doc_page(d, lang, ratios)
+            if (lang == "en" and not want and GOOGLEBOT in html):
+                # [구글 유입 2026-11-27 규칙 F] 얇음·중복이 아닌데 빠진 영문 문서는 GRM 덧붙임 0 이어야 한다.
+                for marker in ('id="similar"', 'id="clauses"', 'id="standards"'):
+                    self.assertNotIn(marker, html, f"{lang} {d['slug']} {marker}")
+                want = True
             self.assertEqual(GOOGLEBOT in html, want, f"{lang} {d['slug']}")
             self.assertIsNone(ROBOTS_NOINDEX.search(html), d["slug"])
             if render.is_thin_doc_page(d, lang):
@@ -220,9 +270,13 @@ class ThinPageMetaTest(unittest.TestCase):
     def test_clause_pages(self):
         """국문 트리의 외국어 원문 조항(D)과 300자 미만 조항(E)만 구글에서 뺀다."""
         import clause_text_page as ct
-        seen = {"untranslated": 0, "short": 0, "": 0}
+        seen = {"untranslated": 0, "short": 0, "bare": 0, "": 0}
         views = {lg: ct.build(ct.for_lang(ct.load_sources(), lg)) for lg in ("ko", "en")}
         cites = render.clause_text_cites(self.data, views)
+        # [조항 덧붙임 2026-11-27] 렌더와 같은 입력: 용어 페이지가 실제로 만들어진 용어만
+        gl = render.load_glossary()
+        ids = {t["id"] for t in gl if (self.out / "glossary" / t["id"] / "index.html").is_file()}
+        extra = render.clause_text_extras(self.data, views, gl, ids)
         rescued = with_block = 0
         for lang, root in (("ko", self.out), ("en", self.out / "en")):
             for d, c in ct.pages(views[lang]):
@@ -230,7 +284,15 @@ class ThinPageMetaTest(unittest.TestCase):
                 html = p.read_text(encoding="utf-8")
                 cite = cites[lang].get(c["href"])
                 n_docs = (cite or {}).get("documents", 0)
-                why = ct.google_noindex_reason(d, c, lang, n_docs)
+                terms = ct.terms_by_href(views[lang], render.load_glossary(), lang).get(c["href"])
+                # 사례 모음 링크는 페이지에 실제로 실렸는지로 본다(렌더와 같은 판정의 결과물)
+                has_cases = (d["source_key"] == "cfr21"
+                             and f'findings/clause/{c["number"].replace(".", "-")}/' in html)
+                why = ct.google_noindex_reason(
+                    d, c, lang, n_docs,
+                    bare=not ct.has_grm_addition(
+                        n_docs, terms, "x" if has_cases else "",
+                        extra[lang]["key_terms"].get(c["href"]), extra[lang]["topic_cases"].get(c["href"])))
                 self.assertEqual(GOOGLEBOT in html, bool(why), f"{lang} {c['href']}")
                 self.assertIsNone(ROBOTS_NOINDEX.search(html), c["href"])
                 seen[why] += 1

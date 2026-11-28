@@ -170,11 +170,23 @@ GOOGLE_MIN_CHARS = 300
 GOOGLE_MIN_CITED_DOCS = 3
 
 
-def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str,
-                          cited_docs: int = 0) -> str:
-    """"" 이면 구글 색인 대상. 아니면 "untranslated"(D) 또는 "short"(E).
+#: [구글 유입 2026-11-27] F. 공식 원문 그대로이고 GRM 이 덧붙인 것이 하나도 없는 조항 — 인용 지적·관련 용어·
+#: 사례 모음 링크가 모두 없다. 구글 스팸 정책의 "원문을 그대로 옮긴 페이지"에 해당한다. 11-27 실측: 영문 조항
+#: 1,230장 중 626장(EU GMP 320·ICH 151·21 CFR 155), 국문 식약처 고시 260장. 구글봇에만 noindex 라 빙·네이버는
+#: 그대로다. 덧붙일 것이 생기면(인용 지적·용어 연결) 다음 빌드에서 저절로 돌아온다.
+def has_grm_addition(cited_docs: int, terms: "list | None", cases_href: str,
+                     key_terms: "list | None" = None, topic_cases: "list | None" = None) -> bool:
+    """조항 페이지에 GRM 고유 블록(인용 지적·관련 용어·사례 모음 링크)이 하나라도 서는가."""
+    return (cited_docs > 0 or bool(terms) or bool(cases_href)
+            or bool(key_terms) or bool(topic_cases))
 
-    `cited_docs` = 그 언어 트리에서 이 조항을 인용한 공개 문서 수(`citing_findings` 의 documents)."""
+
+def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str,
+                          cited_docs: int = 0, bare: bool = False) -> str:
+    """"" 이면 구글 색인 대상. 아니면 "untranslated"(D)·"short"(E)·"bare"(F).
+
+    `cited_docs` = 그 언어 트리에서 이 조항을 인용한 공개 문서 수(`citing_findings` 의 documents).
+    `bare` = `has_grm_addition` 이 거짓(원문뿐). 기본 False 라 종전 호출은 판정이 바뀌지 않는다."""
     foreign = (doc.get("source") or {}).get("lang", "en") != "ko"
     if lang == "ko" and foreign:
         if not clause.get("text_ko"):
@@ -184,6 +196,8 @@ def google_noindex_reason(doc: dict[str, Any], clause: dict[str, Any], lang: str
         n = clause.get("chars") or 0
     if n < GOOGLE_MIN_CHARS and cited_docs < GOOGLE_MIN_CITED_DOCS:
         return "short"
+    if bare:
+        return "bare"
     return ""
 
 
@@ -218,6 +232,32 @@ def headline_sections(text: str) -> set[str]:
     return set(_SEC_NUM.findall(t[i:j]))
 
 
+# ── [조항 인용 연결 2026-11-27] EU GMP·ICH 조항 표기 → (원천, 문서, 조항 번호) ─────────────────────────
+# 정밀도가 우선이다. 지적 본문이 **문서 이름과 조항 번호를 함께** 적은 표기만 잇는다 — "Annex 1 에 부적합"
+# 처럼 문서만 말한 것은 어느 조항인지 알 수 없어 잇지 않는다(11-27 실측: EU·ICH 언급 대부분이 문서 단위).
+# 번호는 소수점이 있는 `N.M` 꼴만, 그 번호가 실제 조항으로 존재할 때만(citing_findings 의 _find) 센다.
+_NUM = r"(\d{1,2}\.\d{1,3})(?!\d|\.\d)"
+# 문서 이름과 번호 사이는 쉼표·콜론·§·"paragraph/point/section/clause" 중 하나가 있어야 한다(맨 공백만이면 "Annex 1 5.2 mg" 같은 오독).
+_LEAD = r"(?:\s*[,:]\s*(?:paragraphs?|points?|sections?|clauses?|§)?\s*|\s*§\s*|\s+(?:paragraphs?|points?|sections?|clauses?)\s+)"
+_EU_CH_REF = re.compile(r"\b(?:EU\s+GMP\s+(?:Part\s+I,?\s+)?|EudraLex\s+Vol(?:ume)?\.?\s*4,?\s+(?:Part\s+I,?\s+)?)Chapter\s+([1-9])\b" + _LEAD + _NUM, re.I)
+_EU_AN1_REF = re.compile(r"\bAnnex\s*(?:1|I)\b(?:\s+of\s+(?:the\s+)?(?:EU\s+)?GMP(?:\s+Guidelines?)?)?" + _LEAD + _NUM, re.I)
+_ICH_REF = re.compile(r"\bICH\s*Q\s*(7|10)\b" + _LEAD + _NUM, re.I)
+
+
+def eu_ich_clause_refs(text: str) -> "list[tuple[str, str, str]]":
+    """지적 원문 → [(원천, 문서 키, 조항 번호)]. 문서+번호가 함께 적힌 표기만; 애매하면 빈 목록."""
+    out: list[tuple[str, str, str]] = []
+    t = text or ""
+    for m in _EU_CH_REF.finditer(t):
+        if m.group(2).split(".")[0] == m.group(1):  # "Chapter 5 … 3.2" 처럼 장과 번호가 어긋나면 버린다
+            out.append(("eu_gmp", f"ch{m.group(1)}", m.group(2)))
+    for m in _EU_AN1_REF.finditer(t):
+        out.append(("eu_gmp", "annex1", m.group(1)))
+    for m in _ICH_REF.finditer(t):
+        out.append(("ich", f"q{m.group(1)}", m.group(2)))
+    return sorted(set(out))
+
+
 def citing_findings(docs: "list[dict[str, Any]] | None", view: dict[str, Any], body,
                     *, doc_ok=None, max_samples: int = CITE_SAMPLES) -> dict[str, dict[str, Any]]:
     """조항 페이지 주소 → {"documents", "findings", "samples"}. 순수 함수(입력은 커밋 정본뿐).
@@ -242,13 +282,15 @@ def citing_findings(docs: "list[dict[str, Any]] | None", view: dict[str, Any], b
                 sec = f"{m.group(1)}.{m.group(2)}"
                 if sec in head:
                     secs.add((m.group(1), sec))
-            if not secs:
+            targets = [("cfr21", part, sec) for part, sec in sorted(secs)]
+            targets += eu_ich_clause_refs(f.get("text_orig") or "")
+            if not targets:
                 continue
             text = (body(f) or "").strip()
             if not text:
                 continue
-            for part, sec in sorted(secs):
-                c = _find(view, "cfr21", part, sec)
+            for src, part, sec in targets:
+                c = _find(view, src, part, sec)
                 if not c or not c.get("href"):
                     continue
                 rows.setdefault(c["href"], []).append({
@@ -275,6 +317,187 @@ def pages(view: dict[str, Any]):
             for c in d["clauses"]:
                 if c["href"]:
                     yield d, c
+
+
+# ── [조항 덧붙임 2026-11-27] 핵심 용어 + 같은 주제의 실제 지적 ────────────────────────────────
+# 구글이 원문 그대로 옮긴 페이지로 본 조항에 GRM 고유의 덧붙임을 만든다. 둘 다 독자가 이 조항을 읽을 때
+# 실제로 쓸모가 있어야 한다 — 억지 블록 금지.
+#  ① 핵심 용어: 조항 본문에 용어사전 용어가 **정확 일치**로 KEY_TERMS_MIN 개 이상 나올 때만(1~2개는 비운다).
+#     흔한 용어(이 언어 트리 조항의 COMMON_TERM_RATIO 넘게 나오는 batch·quality 등)는 센 값에서 뺀다.
+#  ② 같은 주제의 실제 지적: 조항 → 지적 분류 대응은 사람이 읽어 맞춘 아래 고정 표(장·Annex 단위)뿐이다.
+#     표에 없으면 비운다. 조항을 직접 인용한 지적이 아니라 "같은 주제로 분류된 지적"임을 화면에 밝힌다.
+KEY_TERMS_MIN = 3
+KEY_TERMS_MAX = 6
+COMMON_TERM_RATIO = 0.12
+TOPIC_CASES_N = 3
+TOPIC_BODY_MAX = 700  # 읽기 좋은 길이의 지적만 후보로 둔다(본문은 자르지 않는다)
+
+_QMS = ["기타 품질시스템", "일탈/CAPA/조사"]
+_ANNEX1_SECS = {
+    "3": ["기타 품질시스템", "무균보증/무균공정"], "4": ["설비/시설", "무균보증/무균공정"],
+    "5": ["설비/시설"], "6": ["설비/시설"], "7": ["교육/작업자"],
+    "8": ["무균보증/무균공정", "오염/교차오염 관리"], "9": ["환경모니터링"],
+    "10": ["시험실/품질관리", "무균보증/무균공정"],
+}
+_API_SECS = {
+    "2": ["기타 품질시스템", "품질부서 관리감독"], "3": ["교육/작업자"], "4": ["설비/시설"],
+    "5": ["설비/시설"], "6": ["문서화/기록관리"], "7": ["원자재/공급업체 관리"], "9": ["표시/포장"],
+    "10": ["안정성/보관"], "11": ["시험실/품질관리"], "12": ["공정밸리데이션", "밸리데이션/적격성평가"],
+    "13": ["규제보고/변경관리"],
+}
+_FPP_SECS = {
+    "1": _QMS, "2": ["교육/작업자"], "3": ["설비/시설"], "4": ["문서화/기록관리"],
+    "6": ["시험실/품질관리"], "7": ["원자재/공급업체 관리"], "8": ["불만/회수"],
+}
+#: (원천, 문서 키) → {최상위 번호 | "*": [지적 분류(category_label_ko)]}
+TOPIC_TABLE: dict[tuple[str, str], dict[str, list[str]]] = {
+    ("eu_gmp", "ch1"): {"*": _QMS},
+    ("eu_gmp", "ch2"): {"*": ["교육/작업자"]},
+    ("eu_gmp", "ch3"): {"*": ["설비/시설", "오염/교차오염 관리"]},
+    ("eu_gmp", "ch4"): {"*": ["문서화/기록관리", "데이터 완전성"]},
+    ("eu_gmp", "ch5"): {"*": ["오염/교차오염 관리", "원자재/공급업체 관리"]},
+    ("eu_gmp", "ch6"): {"*": ["시험실/품질관리"]},
+    ("eu_gmp", "ch7"): {"*": ["원자재/공급업체 관리"]},
+    ("eu_gmp", "ch8"): {"*": ["불만/회수"]},
+    ("eu_gmp", "annex1"): _ANNEX1_SECS,
+    ("ich", "q7"): {**_API_SECS, "15": ["불만/회수"], "16": ["원자재/공급업체 관리"]},
+    ("ich", "q10"): {"2": _QMS, "3": _QMS},
+    ("mfds_gmp", "byl1"): _ANNEX1_SECS,
+    ("mfds_gmp", "byl9"): {"*": ["컴퓨터화시스템", "데이터 완전성"]},
+    ("mfds_gmp", "byl13"): {"5": ["밸리데이션/적격성평가"], "6": ["밸리데이션/적격성평가"],
+                            "7": ["공정밸리데이션"], "9": ["공정밸리데이션"], "11": ["시험실/품질관리"],
+                            "12": ["세척밸리데이션"], "13": ["규제보고/변경관리"]},
+    ("mfds_gmp", "byl15"): _API_SECS,
+    ("mfds_gmp", "byl17"): _FPP_SECS,
+}
+_HANGUL = re.compile(r"[가-힣]")
+
+
+def topic_labels(src: str, doc: str, number: str) -> list[str]:
+    """조항 → 같은 주제 지적 분류(고정 표). 표에 없으면 []."""
+    t = TOPIC_TABLE.get((src, doc))
+    if not t:
+        return []
+    top = str(number).split(".")[0]
+    return list(t.get(top) or t.get("*") or [])
+
+
+def _term_surfaces(t: dict[str, Any], lang: str) -> set[str]:
+    names = [t.get("term_ko") if lang == "ko" else t.get("term_en")]
+    names += [a for a in t.get("aliases") or [] if bool(_HANGUL.search(a)) == (lang == "ko")]
+    out: set[str] = set()
+    for n in names:
+        n = (n or "").strip()
+        if not n:
+            continue
+        base = re.sub(r"\s*\([^)]*\)", "", n).strip()
+        for inner in re.findall(r"\(([^)]*)\)", n):
+            out.update(y.strip() for y in re.split(r",|\bor\b|/", inner))
+        out.update(y.strip() for y in re.split(r"\s/\s", base))
+        out.add(n)
+    return {s for s in out if len(s) >= 3 and not re.fullmatch(r"[\d\W]+", s)}
+
+
+def _clause_plain(d: dict[str, Any], c: dict[str, Any], lang: str) -> str:
+    """그 언어 트리에서 독자가 실제로 읽는 본문."""
+    foreign = (d.get("source") or {}).get("lang", "en") != "ko"
+    if lang == "ko" and foreign:
+        return " ".join(c.get("ko_paras") or [])
+    return " ".join(c.get("paras") or [])
+
+
+def _gist(t: dict[str, Any], lang: str) -> str:
+    s = ((t.get("easy_ko") if lang == "ko" else t.get("easy_en")) or "").strip()
+    if len(s) <= 160:
+        return s
+    cut = re.search(r"[.。]\s", s)
+    return s[:cut.start() + 1] if cut else s
+
+
+def key_terms_by_href(view: dict[str, Any], glossary_terms: "list[dict[str, Any]] | None", lang: str,
+                      term_ids: "set[str] | None" = None) -> dict[str, list[dict[str, str]]]:
+    """조항 페이지 주소 → 본문에 정확 일치로 나온 핵심 용어(KEY_TERMS_MIN 이상일 때만). 순수·결정론.
+
+    용어 순서는 조항 본문 속 첫 등장 위치. `term_ids` 가 있으면 용어 페이지가 있는 용어만 쓴다(링크 깨짐 방지)."""
+    pats = []
+    for t in glossary_terms or []:
+        tid = t.get("id") or ""
+        if not tid or (term_ids is not None and tid not in term_ids):
+            continue
+        ss = _term_surfaces(t, lang)
+        if not ss or not (t.get("easy_ko") if lang == "ko" else t.get("easy_en")):
+            continue
+        rx = re.compile("|".join(r"(?<![A-Za-z0-9가-힣])" + re.escape(s) + r"(?![A-Za-z0-9가-힣])"
+                                 for s in sorted(ss, key=len, reverse=True)), 0 if lang == "ko" else re.I)
+        pats.append((t, rx))
+    rows = []
+    df: dict[str, int] = {}
+    for d, c in pages(view):
+        txt = _clause_plain(d, c, lang)
+        if not txt:
+            continue
+        found = {}
+        for t, rx in pats:
+            m = rx.search(txt)
+            if m:
+                found[t["id"]] = (m.start(), t)
+        for tid in found:
+            df[tid] = df.get(tid, 0) + 1
+        rows.append((c["href"], found))
+    n = max(len(rows), 1)
+    common = {tid for tid, k in df.items() if k > COMMON_TERM_RATIO * n}
+    out: dict[str, list[dict[str, str]]] = {}
+    for href, found in rows:
+        keep = sorted(((pos, t) for tid, (pos, t) in found.items() if tid not in common),
+                      key=lambda x: (x[0], x[1]["id"]))
+        if len(keep) < KEY_TERMS_MIN:
+            continue
+        out[href] = [{"id": t["id"],
+                      "label": (t.get("term_ko") if lang == "ko" else t.get("term_en")) or t["id"],
+                      "gist": _gist(t, lang)} for _, t in keep[:KEY_TERMS_MAX]]
+    return out
+
+
+def topic_cases_by_href(docs: "list[dict[str, Any]] | None", view: dict[str, Any], body,
+                        *, doc_ok=None, n: int = TOPIC_CASES_N) -> dict[str, list[dict[str, Any]]]:
+    """조항 페이지 주소 → 같은 주제로 분류된 지적 사례 n건(고정 표 TOPIC_TABLE 에 있는 조항만).
+
+    후보 = 표가 가리키는 분류의 공개 지적 가운데 읽는 언어 본문이 있고 TOPIC_BODY_MAX 자 이하인 것.
+    조항마다 sha1(주소+지적 id) 순으로 서로 다른 업체 n건을 고른다 — 결정론이면서 조항마다 다른 사례가 선다."""
+    import hashlib
+    pool: dict[str, list[dict[str, Any]]] = {}
+    for d in docs or []:
+        if doc_ok is not None and not doc_ok(d):
+            continue
+        for f in d.get("findings") or []:
+            lab = f.get("category_label_ko") or ""
+            text = (body(f) or "").strip()
+            if not lab or not text or len(text) > TOPIC_BODY_MAX:
+                continue
+            pool.setdefault(lab, []).append({
+                "agency": d.get("agency") or "", "firm_name": d.get("firm_name") or "",
+                "published_date": d.get("published_date") or "", "doc_slug": d.get("slug") or "",
+                "document_id": d.get("document_id") or "", "finding_id": f.get("finding_id") or "",
+                "body": text})
+    out: dict[str, list[dict[str, Any]]] = {}
+    for dv, c in pages(view):
+        labs = topic_labels(dv["source_key"], dv["key"], c["number"])
+        cand = [r for lab in labs for r in pool.get(lab, [])]
+        if not cand:
+            continue
+        cand.sort(key=lambda r: hashlib.sha1((c["href"] + "|" + r["finding_id"]).encode()).hexdigest())
+        picked, firms = [], set()
+        for r in cand:
+            fk = r["firm_name"] or r["finding_id"]
+            if fk in firms:
+                continue
+            firms.add(fk)
+            picked.append(r)
+            if len(picked) == n:
+                break
+        if len(picked) == n:
+            out[c["href"]] = sorted(picked, key=lambda r: (r["published_date"], r["finding_id"]), reverse=True)
+    return out
 
 
 # ── 근거 조항 해석기 ─────────────────────────────────────────────────────────

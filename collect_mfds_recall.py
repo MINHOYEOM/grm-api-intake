@@ -61,6 +61,10 @@ def _set_last_health(
     pages_seen: int,
     truncated: bool,
     page_warnings: list[str],
+    window_count: int = 0,
+    excluded_count: int = 0,
+    duplicate_count: int = 0,
+    raw_count: int = 0,
 ) -> None:
     global LAST_HEALTH
     LAST_HEALTH = {
@@ -69,6 +73,10 @@ def _set_last_health(
         "pages_seen": pages_seen,
         "truncated": truncated,
         "page_warnings": list(page_warnings),
+        "window_count": window_count,
+        "excluded_count": excluded_count,
+        "duplicate_count": duplicate_count,
+        "raw_count": raw_count,
     }
 
 
@@ -188,6 +196,7 @@ def collect_mfds_recall(
     _set_last_health(collected=0, total_count=0, pages_seen=0, truncated=False,
                      page_warnings=[])
     pages_seen = 0
+    window_count = excluded_count = duplicate_count = raw_count = 0
     # 정렬 비의존(B2): data.go.kr recall 응답의 정렬 순서를 가정하지 않는다. 요청에 order
     # 미지정(admin 의 order:Y 와 달리 미검증)이므로 날짜 기반 조기중단을 쓰지 않고 datago_paginate
     # 의 totalCount/빈 페이지 종료에만 의존한다(page 1 의 과거 행으로 후속 페이지 최신 회수 누락 방지).
@@ -197,12 +206,18 @@ def collect_mfds_recall(
     try:
         for raw_items, masked_url in paginator:
             pages_seen += 1
+            raw_count += len(raw_items)
             for raw in raw_items:
                 date_iso = _item_date(raw)
                 if not _within_window(date_iso, start, end):
                     continue
+                window_count += 1
                 item = _to_item(raw, masked_url)
-                if item is None or item.document_id in seen_ids:
+                if item is None:
+                    excluded_count += 1
+                    continue
+                if item.document_id in seen_ids:
+                    duplicate_count += 1
                     continue
                 seen_ids.add(item.document_id)
                 items.append(item)
@@ -212,10 +227,14 @@ def collect_mfds_recall(
             # 매일 라인 계약 유지(부분 수집을 치명적으로 보지 않는다). 다만 흔적은 남긴다.
             log("WARN", msg)
             _set_last_health(collected=len(items), total_count=paginator.total_count,
-                             pages_seen=pages_seen, truncated=False, page_warnings=[msg])
+                             pages_seen=pages_seen, truncated=False, page_warnings=[msg],
+                             window_count=window_count, excluded_count=excluded_count,
+                             duplicate_count=duplicate_count, raw_count=raw_count)
             return items, None
         _set_last_health(collected=0, total_count=paginator.total_count,
-                         pages_seen=pages_seen, truncated=False, page_warnings=[msg])
+                         pages_seen=pages_seen, truncated=False, page_warnings=[msg],
+                         window_count=window_count, excluded_count=excluded_count,
+                         duplicate_count=duplicate_count, raw_count=raw_count)
         return [], msg
 
     total_count = paginator.total_count
@@ -234,5 +253,6 @@ def collect_mfds_recall(
     )
     _set_last_health(collected=len(items), total_count=total_count,
                      pages_seen=pages_seen, truncated=bool(paginator.truncated),
-                     page_warnings=[])
+                     page_warnings=[], window_count=window_count, excluded_count=excluded_count,
+                     duplicate_count=duplicate_count, raw_count=raw_count)
     return items, truncated_msg

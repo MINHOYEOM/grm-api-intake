@@ -1,0 +1,3948 @@
+{
+ "status": "완료",
+ "round": 1,
+ "published": false,
+ "rehearsal": true,
+ "by": "backup",
+ "code_gate": {
+  "ran": true,
+  "exit": 0,
+  "message": ""
+ },
+ "reused": {
+  "desk": false,
+  "shards": []
+ },
+ "cards": [
+  {
+   "web_card_id": "fda483-196472",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Air Products and Chemicals",
+     "source": "Air Products and Chemicals"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "Capability",
+     "source": "Capability"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "verification method",
+     "source": "verification method"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "a Gage Reliability and Reproducibility Study",
+     "source": "a Gage Reliability and Reproducibility Study"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "analyzer",
+     "source": "analyzer"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "and approved by the quality unit",
+     "source": "and approved by the quality unit"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "시험 절차는 적절한 조직 단위가 작성하고 품질부서가 검토·승인해야 한다.",
+     "source": "The establishment of test procedures shall be drafted by the appropriate organizational unit and reviewed and approved by the quality unit."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196473",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Airgas USA",
+     "source": "Airgas USA"
+    },
+    {
+     "slot": "implication",
+     "claim": "operator",
+     "source": "operator"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "the air separation unit",
+     "source": "the air separation unit"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "status tags",
+     "source": "status tags"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "Observation 1",
+     "source": "Observation 1"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "the Distributed Control System (DCS",
+     "source": "the Distributed Control System (DCS"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "Airgas Merchant Gases(AMG",
+     "source": "Airgas Merchant Gases(AMG"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196474",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Catalent Pharma Solutions",
+     "source": "Catalent Pharma Solutions"
+    },
+    {
+     "slot": "implication",
+     "claim": "Didymella gardenia, Priestia aryabhattai, Alternaria alternata",
+     "source": "Didymella gardenia, Priestia aryabhattai, Alternaria alternata"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "R-539963-RO",
+     "source": "R-539963-RO"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "disinfectant efficacy",
+     "source": "disinfectant efficacy"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "adequate evaluation of cleaning and disinfection",
+     "source": "adequate evaluation of cleaning and disinfection"
+    },
+    {
+     "slot": "deep.inspectional_significance",
+     "claim": "47, 77, 24",
+     "source": "47, 77, 24"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196476",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "I 3 Pharmaceuticals",
+     "source": "I 3 Pharmaceuticals"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "nine months after sampling",
+     "source": "nine months after sampling"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "or batch and equipment hold requirements",
+     "source": "or batch and equipment hold requirements"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Unqualified equipment",
+     "source": "Unqualified equipment"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "Equipment #PR077 as",
+     "source": "Equipment #PR077 as"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "의약품의 제조·가공·포장·보관에 쓰는 설비가 의도한 용도의 작업과 세척·유지관리를 쉽게 할 수 있는 적절한 설계가 아니다.",
+     "source": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use and cleaning and maintenance."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196478",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Bernd Richter",
+     "source": "Bernd Richter"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "during the inspection",
+     "source": "during the inspection"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "needed to remove",
+     "source": "needed to remove"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "in-process testing",
+     "source": "in-process testing"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "for a validated process",
+     "source": "for a validated process"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Observation 2",
+     "source": "Observation 2"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "밸리데이션된 공정의 공정 변수를 감시·관리하는 절차가 적절히 수립되지 않았다.",
+     "source": "Procedures for monitoring and control of process parameters for a validated process have not been adequately established."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196479",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Tan-Alize Kozmetik ve Temizlik Urunleri Sanayi ve Ticaret",
+     "source": "Tan-Alize Kozmetik ve Temizlik Urunleri Sanayi ve Ticaret"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "in stability chambers",
+     "source": "in stability chambers"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "are not maintained as classified areas",
+     "source": "are not maintained as classified areas"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "identity",
+     "source": "identity"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "identity and purity of",
+     "source": "identity and purity of"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "written stability testing program",
+     "source": "written stability testing program"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "samples were not",
+     "source": "samples were not"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "QA QC EQ 053",
+     "source": "QA QC EQ 053"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196480",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "AMGEN Singapore Manufacturing Pte",
+     "source": "AMGEN Singapore Manufacturing Pte"
+    },
+    {
+     "slot": "implication",
+     "claim": "Amgen Thousand Oaks",
+     "source": "Amgen Thousand Oaks"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Disinfectant efficacy study",
+     "source": "Disinfectant efficacy study"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Disinfectant",
+     "source": "Disinfectant"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "only four materials of construction",
+     "source": "only four materials of construction"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "not adequately established",
+     "source": "not adequately established"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "Amgen Thousand",
+     "source": "Amgen Thousand"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196481",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Jiangsu Hengrui Medicine Co",
+     "source": "Jiangsu Hengrui Medicine Co"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "A control room operator",
+     "source": "A control room operator"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "witnessed a control room operator access",
+     "source": "witnessed a control room operator access"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Raw material",
+     "source": "Raw material"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "raw material release",
+     "source": "raw material release"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "by the Particle Measuring System (PMS) and Enterprise Building Integrator",
+     "source": "by the Particle Measuring System (PMS) and Enterprise Building Integrator"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "시험실 관리에 원료가 확인·함량·품질·순도의 적절한 기준에 맞음을 보증하도록 설계된 과학적으로 타당하고 적절한 시료 채취 계획의 수립이 포함되지 않는다.",
+     "source": "Laboratory controls do not include the establishment of scientifically sound and appropriate sampling plans designed to assure that components conform to appropriate standards of identity, strength, quality and purity."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196483",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Digestive Care",
+     "source": "Digestive Care"
+    },
+    {
+     "slot": "implication",
+     "claim": "ID DCI #1292",
+     "source": "ID DCI #1292"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "identified as clean",
+     "source": "identified as clean"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "cleaning validation",
+     "source": "cleaning validation"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "not cleaned at appropriate intervals",
+     "source": "not cleaned at appropriate intervals"
+    },
+    {
+     "slot": "deep.key_violations[1].observation",
+     "claim": "DCI #1292",
+     "source": "DCI #1292"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196484",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Fragrance Manufacturing",
+     "source": "Fragrance Manufacturing"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "one batch per year",
+     "source": "one batch per year"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "Improper spacing and fan usage during",
+     "source": "Improper spacing and fan usage during"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Stability program",
+     "source": "Stability program"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "less than one batch per year",
+     "source": "less than one batch per year"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "to prevent contamination or mix-ups",
+     "source": "to prevent contamination or mix-ups"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "SOP GEN-0018",
+     "source": "SOP GEN-0018"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196485",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Merck life Science Technologies (Nantong) Co",
+     "source": "Merck life Science Technologies (Nantong) Co"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "root cause",
+     "source": "root cause"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "None of the",
+     "source": "None of the"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Complaint",
+     "source": "Complaint"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "contamination (3 batches) and",
+     "source": "contamination (3 batches) and"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "are not jeopardized",
+     "source": "are not jeopardized"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "amount of material taken from each container",
+     "source": "amount of material taken from each container"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "SOP QM039",
+     "source": "SOP QM039"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196486",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Dr. Reddy's Laboratories",
+     "source": "Dr. Reddy's Laboratories"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "was not tested or controlled",
+     "source": "was not tested or controlled"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "and ointments distributed to the U.S. market was not tested",
+     "source": "and ointments distributed to the U.S. market was not tested"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "In-process",
+     "source": "In-process"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "until June 30, 2026",
+     "source": "until June 30, 2026"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "the USP monograph",
+     "source": "the USP monograph"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "systems in place to",
+     "source": "systems in place to"
+    },
+    {
+     "slot": "deep.observations_ko[2].detail_ko",
+     "claim": "GUI-GLOB-QA-0069",
+     "source": "GUI-GLOB-QA-0069"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196487",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Les Produits Chimiques B.G.R",
+     "source": "Les Produits Chimiques B.G.R"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "released to the U.S. market",
+     "source": "released to the U.S. market"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "since the last FDA inspection in 2019",
+     "source": "since the last FDA inspection in 2019"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "method verification",
+     "source": "method verification"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "method verification studies",
+     "source": "method verification studies"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "a scientifically sound root cause assessment",
+     "source": "a scientifically sound root cause assessment"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "원료의약품의 제조·가공·포장·보관에 쓰는 설비가 의도한 용도의 작업과 세척·유지관리를 쉽게 할 수 있도록 적절히 설계·배치되지 않았다.",
+     "source": "Equipment used in the manufacture, processing, packing or holding of active pharmaceutical ingredients is not of appropriate design and suitably located to facilitate operations for its intended use and cleaning and maintenance."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196488",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Goran Pharma Private",
+     "source": "Goran Pharma Private"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Original retain sample",
+     "source": "Original retain sample"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "There is no documented justification or control",
+     "source": "There is no documented justification or control"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Inspection records",
+     "source": "Inspection records"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "electronic capture and retention of visual inspection records",
+     "source": "electronic capture and retention of visual inspection records"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "products shipped to the USA",
+     "source": "products shipped to the USA"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "incubator usage log",
+     "source": "incubator usage log"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "축소 기법으로 보존하는 원료 기록을 볼 수 있는 적절한 판독기나 복사 장비를 바로 쓸 수 있게 갖추지 않았다.",
+     "source": "Suitable reader or photocopying equipment was not made readily available for component records maintained using reduction techniques."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196493",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "en.summary",
+     "claim": "finished drug product",
+     "source": "finished drug product"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "were destroyed in January 2025",
+     "source": "were destroyed in January 2025"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "According to the Head of Operations, approximately 311",
+     "source": "According to the Head of Operations, approximately 311"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Logbooks",
+     "source": "Logbooks"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "no holistic quality risk assessment",
+     "source": "no holistic quality risk assessment"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "Observation 5",
+     "source": "Observation 5"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "PR #187356",
+     "source": "PR #187356"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196494",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Amneal Pharmaceuticals Private",
+     "source": "Amneal Pharmaceuticals Private"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "to the U.S",
+     "source": "to the U.S"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "without a thorough risk assessment",
+     "source": "without a thorough risk assessment"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "released",
+     "source": "released"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "released to the U.S. market",
+     "source": "released to the U.S. market"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "were marked with black pen",
+     "source": "were marked with black pen"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "an uncontrolled shredder",
+     "source": "an uncontrolled shredder"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "SOP AL-SM-025-001",
+     "source": "SOP AL-SM-025-001"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196495",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Apotex Pharmachem India Pvt",
+     "source": "Apotex Pharmachem India Pvt"
+    },
+    {
+     "slot": "implication",
+     "claim": "PR #103412, 128792",
+     "source": "PR #103412, 128792"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "without scientific rationale",
+     "source": "without scientific rationale"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "cleaning validation",
+     "source": "cleaning validation"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "product changeover cleaning validation",
+     "source": "product changeover cleaning validation"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "master production and control records",
+     "source": "master production and control records"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "Observation 4",
+     "source": "Observation 4"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "STP #FPM 179/04",
+     "source": "STP #FPM 179/04"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196496",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Qilu Pharmaceutical Co., Ltd. (High Tech Zone",
+     "source": "Qilu Pharmaceutical Co., Ltd. (High Tech Zone"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Working reference standards",
+     "source": "Working reference standards"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "from the Gongbei R&D site for",
+     "source": "from the Gongbei R&D site for"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "reference standards",
+     "source": "reference standards"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "parameters of critical",
+     "source": "parameters of critical"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "the Master Production Record",
+     "source": "the Master Production Record"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "의약품 제조에 쓰는 설비가 의도한 용도에 적합함이 입증되지 않았다.",
+     "source": "Equipment used in the manufacturing of drug products has not been demonstrated to be suitable for its intended use."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196497",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Hangzhou Zhongmei Huadong Pharmaceutical Co",
+     "source": "Hangzhou Zhongmei Huadong Pharmaceutical Co"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "opened the",
+     "source": "opened the"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "for visual inspection qualification of liquid filled",
+     "source": "for visual inspection qualification of liquid filled"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "visual inspection",
+     "source": "visual inspection"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "plates were not disinfected",
+     "source": "plates were not disinfected"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Type B and Type C defects",
+     "source": "Type B and Type C defects"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "deletion and modification of files",
+     "source": "deletion and modification of files"
+    },
+    {
+     "slot": "deep.observations_ko[3].detail_ko",
+     "claim": "OpenLab CDS",
+     "source": "OpenLab CDS"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196498",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Nicobrand",
+     "source": "Nicobrand"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "stability samples",
+     "source": "stability samples"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "hose that is part of the",
+     "source": "hose that is part of the"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "water sampling",
+     "source": "water sampling"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "assay and chromatographic purity",
+     "source": "assay and chromatographic purity"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "water at the point of use",
+     "source": "water at the point of use"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "a TOC result",
+     "source": "a TOC result"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "원료의약품에 사용 시점에 확인·함량·품질·순도 기준을 충족함을 보증하는 적절한 안정성 자료로 정한 재시험일/유효기한이 표시되지 않는다.",
+     "source": "Drug substances do not beara retest/expiration date determined by appropriate stability data to assure they meet applicable standards of identity, strength, quality, and purity at the time of use."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196499",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Celgene Chemical",
+     "source": "Celgene Chemical"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "in the quality agreement",
+     "source": "in the quality agreement"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "not trained in TRN-000865 GMP Training",
+     "source": "not trained in TRN-000865 GMP Training"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "quality agreement",
+     "source": "quality agreement"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "are not specified in the quality agreement",
+     "source": "are not specified in the quality agreement"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "build-up and carry-over of contaminants",
+     "source": "build-up and carry-over of contaminants"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "not reviewed when new data becomes available",
+     "source": "not reviewed when new data becomes available"
+    },
+    {
+     "slot": "deep.observations_ko[4].detail_ko",
+     "claim": "TRN-000865 GMP",
+     "source": "TRN-000865 GMP"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196500",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Pious Laboratories Private",
+     "source": "Pious Laboratories Private"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "calculation error",
+     "source": "calculation error"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "error was not identified during",
+     "source": "error was not identified during"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Particle size",
+     "source": "Particle size"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "quality unit did not identify the",
+     "source": "quality unit did not identify the"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "written procedure to",
+     "source": "written procedure to"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "품질관리부서에 발생한 오류를 충분히 조사할 권한이 없다.",
+     "source": "The quality control unit lacks authority to fully investigate errors that have occurred."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196501",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Cohance Lifesciences",
+     "source": "Cohance Lifesciences"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "unvalidated in-house methods",
+     "source": "unvalidated in-house methods"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "distributed into U.S. commerce and remain within",
+     "source": "distributed into U.S. commerce and remain within"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Unvalidated methods",
+     "source": "Unvalidated methods"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "Observation 1",
+     "source": "Observation 1"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Phase II investigation",
+     "source": "Phase II investigation"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "change control procedure",
+     "source": "change control procedure"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "to ensure the correct carrier gas (nitrogen or helium) is",
+     "source": "to ensure the correct carrier gas (nitrogen or helium) is"
+    },
+    {
+     "slot": "deep.observations_ko[2].detail_ko",
+     "claim": "ZenVector",
+     "source": "ZenVector"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196504",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Jiangsu Hengrui Pharmaceuticals Co",
+     "source": "Jiangsu Hengrui Pharmaceuticals Co"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "environmental monitoring records",
+     "source": "environmental monitoring records"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "original environmental records were never located",
+     "source": "original environmental records were never located"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "correction to the prior Warning Letter",
+     "source": "correction to the prior Warning Letter"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "dynamic environmental monitoring records",
+     "source": "dynamic environmental monitoring records"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "batch records",
+     "source": "batch records"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "A) D1IDR2025127C -",
+     "source": "A) D1IDR2025127C -"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196505",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "업체 API Solutions",
+     "source": "업체 API Solutions"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "temperature records for",
+     "source": "temperature records for"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "Drug products stored in these areas have a defined",
+     "source": "Drug products stored in these areas have a defined"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "temperature mapping",
+     "source": "temperature mapping"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "temperature mapping studies",
+     "source": "temperature mapping studies"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "signatures on batch packaging and re-labeling records",
+     "source": "signatures on batch packaging and re-labeling records"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "no documented evidence of",
+     "source": "no documented evidence of"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "회사는 의약품이 표방하는 확인·함량·순도·품질을 갖추도록 보증하는 생산·공정 관리용 문서화된 절차를 적절히 수립하지 않았다.",
+     "source": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196506",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Canyon Rush",
+     "source": "Canyon Rush"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "tests could not be reconstructed and were invalidated with no",
+     "source": "tests could not be reconstructed and were invalidated with no"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "could not be reconstructed and were invalidated",
+     "source": "could not be reconstructed and were invalidated"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Sterility",
+     "source": "Sterility"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "within eleven (11) days in December 2025",
+     "source": "within eleven (11) days in December 2025"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "completed past due dates without",
+     "source": "completed past due dates without"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "used for environmental monitoring",
+     "source": "used for environmental monitoring"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "LIR-24-035, LIR-24-036",
+     "source": "LIR-24-035, LIR-24-036"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196507",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "CTK OTC Laboratories",
+     "source": "CTK OTC Laboratories"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "failures for distributed",
+     "source": "failures for distributed"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "previously cited during the December 2024 inspection",
+     "source": "previously cited during the December 2024 inspection"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "stability failures",
+     "source": "stability failures"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "Observation 1",
+     "source": "Observation 1"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "cleaning validation does not include all products",
+     "source": "cleaning validation does not include all products"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "for viscosity testing",
+     "source": "for viscosity testing"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "RT-CV-2601-001",
+     "source": "RT-CV-2601-001"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196508",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "InvaTech Pharma Solutions",
+     "source": "InvaTech Pharma Solutions"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "EC-061367",
+     "source": "EC-061367"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "Quarantined and approved components were stored together without physical separation",
+     "source": "Quarantined and approved components were stored together without physical separation"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "High-risk component",
+     "source": "High-risk component"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "each container of each shipment of each lot",
+     "source": "each container of each shipment of each lot"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Observation 2",
+     "source": "Observation 2"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "used to package prescription drug products, was",
+     "source": "used to package prescription drug products, was"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "qualified against official compendial standards",
+     "source": "qualified against official compendial standards"
+    },
+    {
+     "slot": "deep.observations_ko[2].detail_ko",
+     "claim": "ID: EC-061367",
+     "source": "ID: EC-061367"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196509",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "key_facts[1]",
+     "claim": "Class III",
+     "source": "Class III"
+    },
+    {
+     "slot": "en.summary",
+     "claim": "Eco Lips, Inc",
+     "source": "Eco Lips, Inc"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Recurring documentation and",
+     "source": "Recurring documentation and"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "could not confirm the amount of product currently on the",
+     "source": "could not confirm the amount of product currently on the"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "labeling",
+     "source": "labeling"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "and batch record deviations",
+     "source": "and batch record deviations"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "ingredient information on the Drug Facts",
+     "source": "ingredient information on the Drug Facts"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 1",
+     "source": "Observation 1"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "EL-QA-SOP-0055 Rev",
+     "source": "EL-QA-SOP-0055 Rev"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196510",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Par Sterile Products",
+     "source": "Par Sterile Products"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "no deviation was opened",
+     "source": "no deviation was opened"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "The batch record for",
+     "source": "The batch record for"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Rules for",
+     "source": "Rules for"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "to complete missing",
+     "source": "to complete missing"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "PAR-ROC-SOP-00231",
+     "source": "PAR-ROC-SOP-00231"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196511",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Par Sterile Products",
+     "source": "Par Sterile Products"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Multiple interventions",
+     "source": "Multiple interventions"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "were brought into the Grade A area",
+     "source": "were brought into the Grade A area"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "aseptic practice",
+     "source": "aseptic practice"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "during batch record execution",
+     "source": "during batch record execution"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "cleaning and disinfection",
+     "source": "cleaning and disinfection"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "in the Grade A area",
+     "source": "in the Grade A area"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "VV-SOP-00286",
+     "source": "VV-SOP-00286"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196512",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "JHP Pharmaceuticals",
+     "source": "JHP Pharmaceuticals"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "found on a",
+     "source": "found on a"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "while the room was still on hold",
+     "source": "while the room was still on hold"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "HEPA filtered supply air outlets",
+     "source": "HEPA filtered supply air outlets"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "as a contributing root cause",
+     "source": "as a contributing root cause"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "for handling product",
+     "source": "for handling product"
+    },
+    {
+     "slot": "deep.observations_ko[2].detail_ko",
+     "claim": "C) SOP-MAN-GEN-03111-RO",
+     "source": "C) SOP-MAN-GEN-03111-RO"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196513",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Par Sterile Products",
+     "source": "Par Sterile Products"
+    },
+    {
+     "slot": "implication",
+     "claim": "03520, 03282",
+     "source": "03520, 03282"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "filter failures from January 2019 to June 2021",
+     "source": "filter failures from January 2019 to June 2021"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "HEPA filter failures",
+     "source": "HEPA filter failures"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "failures from January 2019 to June 2021",
+     "source": "failures from January 2019 to June 2021"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "hand washing station in the visitor",
+     "source": "hand washing station in the visitor"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "environmental monitoring",
+     "source": "environmental monitoring"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "PAR-ROC-SOP-00013 Rev",
+     "source": "PAR-ROC-SOP-00013 Rev"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196514",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Par Sterile Products",
+     "source": "Par Sterile Products"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "vials with glass particulates were",
+     "source": "vials with glass particulates were"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "10 vials with glass particles",
+     "source": "10 vials with glass particles"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "training and",
+     "source": "training and"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "483 dated November 22, 2014 has not been corrected",
+     "source": "483 dated November 22, 2014 has not been corrected"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "137 additional vials with glass particulates were",
+     "source": "137 additional vials with glass particulates were"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "had 10 missing vials",
+     "source": "had 10 missing vials"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "2014-11-22 자 Form 483의 [가림]이(가) 시정되지 않았다. 현행 문서 번호 PAR-ROC-SOP-00170(개정 64)은 [가림] 제조에 쓰는 깔때기가 [가림]에서 세척 공정을 수행한 뒤에도 깨끗하지 않으면 (회신에서 약속한 대로) 조사를 시작하도록 요구하지 않는다.",
+     "source": "of the Form PDA 483 dated November 22, 2014 has not been corrected in that the current version ofDocument Number PAR-ROC-SOP-00170 (Revision 64) does not require the initiation of an investigation (as committed to in the response) if the funnel used in (b) (4) manufacturing is not clean after the cleaning process has been performed in the (b) (4) A 7."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196515",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Unither Manufacturing",
+     "source": "Unither Manufacturing"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "a media fill",
+     "source": "a media fill"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "Approximately 70 or more deviations",
+     "source": "Approximately 70 or more deviations"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Media fill",
+     "source": "Media fill"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "under the same conditions",
+     "source": "under the same conditions"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "release or on stability",
+     "source": "release or on stability"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "repeated up to five times",
+     "source": "repeated up to five times"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "repeat observation from",
+     "source": "repeat observation from"
+    },
+    {
+     "slot": "deep.observations_ko[2].detail_ko",
+     "claim": "ROC-SOP-0039",
+     "source": "ROC-SOP-0039"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196517",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Targeted Genomics",
+     "source": "Targeted Genomics"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "Class II GlutenID Genetic Health Risk",
+     "source": "Class II GlutenID Genetic Health Risk"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Could not provide",
+     "source": "Could not provide"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "kit assembly and distribution to Firm A since 2-1-2026",
+     "source": "kit assembly and distribution to Firm A since 2-1-2026"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "and outsourced process",
+     "source": "and outsourced process"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "Class II GlutenID Genetic Health Risk Test",
+     "source": "Class II GlutenID Genetic Health Risk Test"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "controls over outsourced processes",
+     "source": "controls over outsourced processes"
+    },
+    {
+     "slot": "deep.key_violations[0].observation",
+     "claim": "Class II GlutenID Genetic Health",
+     "source": "Class II GlutenID Genetic Health"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196520",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "MSN Laboratories Private",
+     "source": "MSN Laboratories Private"
+    },
+    {
+     "slot": "implication",
+     "claim": "AR-G-0054-006",
+     "source": "AR-G-0054-006"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "by the quality unit",
+     "source": "by the quality unit"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "chromatograms",
+     "source": "chromatograms"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "in the past 29 months",
+     "source": "in the past 29 months"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Observation 2",
+     "source": "Observation 2"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "SOP AR-G-0054-006",
+     "source": "SOP AR-G-0054-006"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196521",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Hy-Gro Chemicals Pharmtek Pvt",
+     "source": "Hy-Gro Chemicals Pharmtek Pvt"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "a known carcinogen",
+     "source": "a known carcinogen"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "software discrepancies associated with",
+     "source": "software discrepancies associated with"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "carcinogen",
+     "source": "carcinogen"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "complete risk assessment",
+     "source": "complete risk assessment"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "disruption impact assessment",
+     "source": "disruption impact assessment"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "유통용 의약품의 시험과 출하에 출하 전 적절한 최종 규격 적합성의 시험실 판정이 포함되지 않는다.",
+     "source": "Testing and release of drug product for distribution do not include laboratory determination of conformance to an appropriate final specification, prior to release."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196522",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Rentschler Biopharma",
+     "source": "Rentschler Biopharma"
+    },
+    {
+     "slot": "implication",
+     "claim": "Bacillus spp",
+     "source": "Bacillus spp"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "Bacillus",
+     "source": "Bacillus"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "spore formers",
+     "source": "spore formers"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "endospore formers, objectionable microorganisms",
+     "source": "endospore formers, objectionable microorganisms"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Observation 2",
+     "source": "Observation 2"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "the cell bank transport system for internal transfer",
+     "source": "the cell bank transport system for internal transfer"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "2021-0046, 2021-0058, 2021-0060, 2021-0133, 2021-0145, 2021-0196, 2021-0268, 2021-0322, 2021-0324, 2021-0436, 2021-0544, 2022-0004",
+     "source": "2021-0046, 2021-0058, 2021-0060, 2021-0133, 2021-0145, 2021-0196, 2021-0268, 2021-0322, 2021-0324, 2021-0436, 2021-0544, 2022-0004"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196523",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Pace Analytical Life Sciences",
+     "source": "Pace Analytical Life Sciences"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "8 freezer excursions",
+     "source": "8 freezer excursions"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "a client method was revised and approved by another client",
+     "source": "a client method was revised and approved by another client"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Stability chamber",
+     "source": "Stability chamber"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "occurred before corrective actions were fully implemented",
+     "source": "occurred before corrective actions were fully implemented"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "laboratory records are not attributable to the person performing",
+     "source": "laboratory records are not attributable to the person performing"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "DEV-6595, DEV-6686, DEV-6765",
+     "source": "DEV-6595, DEV-6686, DEV-6765"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196524",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "en.summary",
+     "claim": "of purified water",
+     "source": "of purified water"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "eighty-four",
+     "source": "eighty-four"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "out of specification results, are discarded daily",
+     "source": "out of specification results, are discarded daily"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Purified water",
+     "source": "Purified water"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "purified water used to clean compounding tanks",
+     "source": "purified water used to clean compounding tanks"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "from 05JAN2026 to 19MAY2026",
+     "source": "from 05JAN2026 to 19MAY2026"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "growth promotion testing",
+     "source": "growth promotion testing"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "files on the computer connected to",
+     "source": "files on the computer connected to"
+    },
+    {
+     "slot": "deep.observations_ko[4].detail_ko",
+     "claim": "SOP-V082",
+     "source": "SOP-V082"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196530",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Molecular Imaging Program at",
+     "source": "Molecular Imaging Program at"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Sterility test",
+     "source": "Sterility test"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "supplier qualifications were performed at the previous location",
+     "source": "supplier qualifications were performed at the previous location"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "do not document all",
+     "source": "do not document all"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "is not conducted on the",
+     "source": "is not conducted on the"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "no written procedures for",
+     "source": "no written procedures for"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "growth promotion testing",
+     "source": "growth promotion testing"
+    },
+    {
+     "slot": "deep.observations_ko[2].detail_ko",
+     "claim": "ISO Class 5",
+     "source": "ISO Class 5"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196531",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "University of Texas Southwestern Medical",
+     "source": "University of Texas Southwestern Medical"
+    },
+    {
+     "slot": "implication",
+     "claim": "Stenotrophomonas",
+     "source": "Stenotrophomonas"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "was not separately investigated",
+     "source": "was not separately investigated"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Nonconforming batch",
+     "source": "Nonconforming batch"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "elevated microbial counts in the ISO 7 production room",
+     "source": "elevated microbial counts in the ISO 7 production room"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "sterility testing was not initiated",
+     "source": "sterility testing was not initiated"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "an abnormal occurrence report",
+     "source": "an abnormal occurrence report"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "029.A013",
+     "source": "029.A013"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196532",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "업체 My CHS Rx",
+     "source": "업체 My CHS Rx"
+    },
+    {
+     "slot": "implication",
+     "claim": "Revision",
+     "source": "Revision"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "not involved in",
+     "source": "not involved in"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "No quality",
+     "source": "No quality"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "implement a CGMP",
+     "source": "implement a CGMP"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "CGMP training program",
+     "source": "CGMP training program"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "packaging and relabeling",
+     "source": "packaging and relabeling"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "examined or tested",
+     "source": "examined or tested"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "품질관리부서가 없다.",
+     "source": "There is no quality control unit."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196533",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "ClorDiSys Solutions",
+     "source": "ClorDiSys Solutions"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "sanitation procedure for the room",
+     "source": "sanitation procedure for the room"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "sanitation procedure for",
+     "source": "sanitation procedure for"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "no written cleaning and sanitation procedure for the room used",
+     "source": "no written cleaning and sanitation procedure for the room used"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "위생 관리의 책임을 정하고, 세척 일정을 제시하며, 쓸 방법·설비·자재를 충분히 자세히 기술한 문서화된 절차가 없다.",
+     "source": "There is a lack of written procedures assigning responsibility, providing cleaning schedules and describing in sufficient detail the methods, equipment and materials to be used for sanitation."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196536",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "TriRx Huntsville Pharmaceutical Services",
+     "source": "TriRx Huntsville Pharmaceutical Services"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Intermediate precision",
+     "source": "Intermediate precision"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "This method validation was performed in 2020",
+     "source": "This method validation was performed in 2020"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "method validation",
+     "source": "method validation"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "complaint investigations for multiple",
+     "source": "complaint investigations for multiple"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "did not test the active ingredient",
+     "source": "did not test the active ingredient"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "all acceptance criteria were met",
+     "source": "all acceptance criteria were met"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "is not calibrated for the",
+     "source": "is not calibrated for the"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "CC2025-0002, CC2025-0028, CC2026-0022, CC2026-0048",
+     "source": "CC2025-0002, CC2025-0028, CC2026-0022, CC2026-0048"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196538",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Access Business Group",
+     "source": "Access Business Group"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "open ends in direct contact with the floor",
+     "source": "open ends in direct contact with the floor"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "are used in",
+     "source": "are used in"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "plate counts",
+     "source": "plate counts"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "inside a light fixture and",
+     "source": "inside a light fixture and"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "resting on the floor",
+     "source": "resting on the floor"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "a single analyst",
+     "source": "a single analyst"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "Access Business",
+     "source": "Access Business"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196539",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Omega & Delta Co",
+     "source": "Omega & Delta Co"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "procedure for",
+     "source": "procedure for"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "2024 and 2025 (pending completion) Annual Product Reviews",
+     "source": "2024 and 2025 (pending completion) Annual Product Reviews"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "annual product review",
+     "source": "annual product review"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "was not completed by the",
+     "source": "was not completed by the"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "written procedures for rework",
+     "source": "written procedures for rework"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "JO102 Rev. 03",
+     "source": "JO102 Rev. 03"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196541",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Viatris Pharmaceuticals",
+     "source": "Viatris Pharmaceuticals"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "An unidentified peak",
+     "source": "An unidentified peak"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "records (21.30%) were completed or extended on time",
+     "source": "records (21.30%) were completed or extended on time"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Nitrosamine",
+     "source": "Nitrosamine"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "released to the U.S. market without assurance",
+     "source": "released to the U.S. market without assurance"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Observation 2",
+     "source": "Observation 2"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "from November 2025 through April 2026",
+     "source": "from November 2025 through April 2026"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "due dates without timely extension requests",
+     "source": "due dates without timely extension requests"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "NDEA, NMPA, NDIPA, NIPEA, NDBA",
+     "source": "NDEA, NMPA, NDIPA, NIPEA, NDBA"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196542",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "EnGeneIC Pty",
+     "source": "EnGeneIC Pty"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "environmental monitoring of any kind",
+     "source": "environmental monitoring of any kind"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "to bring endotoxin values within",
+     "source": "to bring endotoxin values within"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "or quality",
+     "source": "or quality"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "processing and aseptic filling",
+     "source": "processing and aseptic filling"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "endotoxin and sterility",
+     "source": "endotoxin and sterility"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "contamination events were not documented",
+     "source": "contamination events were not documented"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "no quality unit",
+     "source": "no quality unit"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "무균을 표방하는 의약품의 미생물 오염을 막도록 설계된 절차가 수립·문서화·준수되지 않는다.",
+     "source": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196544",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "en.summary",
+     "claim": "annual product quality reviews",
+     "source": "annual product quality reviews"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "annual product",
+     "source": "annual product"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "in individual batch records with no aggregated log or tracking",
+     "source": "in individual batch records with no aggregated log or tracking"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "deviations",
+     "source": "deviations"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "despite exception reports documenting",
+     "source": "despite exception reports documenting"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "a representative number of batch records, trending methodology, CAPA documentation",
+     "source": "a representative number of batch records, trending methodology, CAPA documentation"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "B. QAP-02.040,00",
+     "source": "B. QAP-02.040,00"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196545",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Eurofins SF Analytical Laboratories",
+     "source": "Eurofins SF Analytical Laboratories"
+    },
+    {
+     "slot": "implication",
+     "claim": "139 CFU/1",
+     "source": "139 CFU/1"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "plates were approved and released to customers",
+     "source": "plates were approved and released to customers"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Cracked plates",
+     "source": "Cracked plates"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "no deviation or investigation",
+     "source": "no deviation or investigation"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "omitted from the official raw data",
+     "source": "omitted from the official raw data"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "insoluble product particles and",
+     "source": "insoluble product particles and"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "the TOC instrument holds",
+     "source": "the TOC instrument holds"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "Q-SOP71879",
+     "source": "Q-SOP71879"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196546",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Eriochem",
+     "source": "Eriochem"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "aseptic filling",
+     "source": "aseptic filling"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "in the non-dedicated filling room",
+     "source": "in the non-dedicated filling room"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "media fill",
+     "source": "media fill"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "or integrity testing",
+     "source": "or integrity testing"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "airflow studies do not",
+     "source": "airflow studies do not"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "start and end times for",
+     "source": "start and end times for"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "배치가 이미 유통됐는지와 관계없이, 설명되지 않은 불일치나 배치·구성 성분의 규격 불합격을 철저히 검토하지 않는다.",
+     "source": "There is a failure to thoroughly review any unexplained discrepancy or the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196547",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "SK Biotek Co., Ltd (Sejong",
+     "source": "SK Biotek Co., Ltd (Sejong"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "testing of",
+     "source": "testing of"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "batch records whether hold steps are required and documented during",
+     "source": "batch records whether hold steps are required and documented during"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "hold times",
+     "source": "hold times"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "microbial enumeration testing of",
+     "source": "microbial enumeration testing of"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "hold times are not documented",
+     "source": "hold times are not documented"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "회사가 정한 원료의약품 [가림]의 미생물 계수 시험 규격은 간헐(스킵 로트) 시험이나 시험 주기 축소를 허용한다.",
+     "source": "Your firm's established specifications for the microbial enumeration testing of APlm@ @) (4) permit intermittent (skip-lot) or reduced testing frequency."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196548",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Apex International Mfg",
+     "source": "Apex International Mfg"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Finished drug products in",
+     "source": "Finished drug products in"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Supplier",
+     "source": "Supplier"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "does not define a requalification process",
+     "source": "does not define a requalification process"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "SP-00-078",
+     "source": "SP-00-078"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196549",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Nippon Sanso Matheson",
+     "source": "Nippon Sanso Matheson"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Electronic source data",
+     "source": "Electronic source data"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Analyzer",
+     "source": "Analyzer"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "electronic source data generated by",
+     "source": "electronic source data generated by"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "are not reviewed against source data",
+     "source": "are not reviewed against source data"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "의료용 가스의 제조·가공·보관에서 자료를 기록·저장·사용하는 컴퓨터 시스템이 적절히 밸리데이션되지 않았다.",
+     "source": "Computerized systems are not appropriately validated to record, store, or use data in the manufacturing, processing, and holding of medical gases."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196550",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Copperhead Chemical Company",
+     "source": "Copperhead Chemical Company"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "analyst error based",
+     "source": "analyst error based"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "to analyst error based solely on unverified",
+     "source": "to analyst error based solely on unverified"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Clean hold time",
+     "source": "Clean hold time"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "VR-PH-068 failed to validate",
+     "source": "VR-PH-068 failed to validate"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Observation 2",
+     "source": "Observation 2"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "not placed at the",
+     "source": "not placed at the"
+    },
+    {
+     "slot": "deep.observations_ko[0].deficiency_ko",
+     "claim": "정해진 세척 후 보관 시간을 뒷받침하도록 제조 설비의 세척 절차가 관련 문서화 절차 전반에 수립·밸리데이션·일관되게 기록되지 않았다.",
+     "source": "Cleaning procedures for manufacturing equipment are not established, validated, or consistently documented across applicable written procedures to support the established clean hold time."
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196551",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Mylan Laboratories",
+     "source": "Mylan Laboratories"
+    },
+    {
+     "slot": "implication",
+     "claim": "Burkholderia",
+     "source": "Burkholderia"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Aseptic areas",
+     "source": "Aseptic areas"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "Observation 1",
+     "source": "Observation 1"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "airflow visualization studies",
+     "source": "airflow visualization studies"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "not submitted within three working days",
+     "source": "not submitted within three working days"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "positive product control",
+     "source": "positive product control"
+    },
+    {
+     "slot": "deep.observations_ko[1].detail_ko",
+     "claim": "Form-000610094",
+     "source": "Form-000610094"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196552",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Mylan Laboratories",
+     "source": "Mylan Laboratories"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "TrackWise",
+     "source": "TrackWise"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "email attachments",
+     "source": "email attachments"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "were shipped to the US Market",
+     "source": "were shipped to the US Market"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "investigation",
+     "source": "investigation"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "not documented in",
+     "source": "not documented in"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "changes were not",
+     "source": "changes were not"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "a repeat deficiency from",
+     "source": "a repeat deficiency from"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "containing draft investigations",
+     "source": "containing draft investigations"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "Caliber LIMS",
+     "source": "Caliber LIMS"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196553",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Astellas Pharma",
+     "source": "Astellas Pharma"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "The 'vial fell' alarm occurred more than 26 times",
+     "source": "The 'vial fell' alarm occurred more than 26 times"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "fill weight scale is not calibrated over",
+     "source": "fill weight scale is not calibrated over"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "First air",
+     "source": "First air"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "first air over",
+     "source": "first air over"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "the 'vial fell' alarm occurred more than 26 times during",
+     "source": "the 'vial fell' alarm occurred more than 26 times during"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 2",
+     "source": "Observation 2"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "the visual inspection",
+     "source": "the visual inspection"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "SOP-AST-28969",
+     "source": "SOP-AST-28969"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196662",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Lupin Limited (Biotech",
+     "source": "Lupin Limited (Biotech"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "less than one minute",
+     "source": "less than one minute"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "at least three units with water drops",
+     "source": "at least three units with water drops"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Aseptic interventions",
+     "source": "Aseptic interventions"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "units with water drops",
+     "source": "units with water drops"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "the operator repeatedly inserted",
+     "source": "the operator repeatedly inserted"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "Observation 3",
+     "source": "Observation 3"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "Observation 4",
+     "source": "Observation 4"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "DP_030999",
+     "source": "DP_030999"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196663",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Steril-Gene Life Sciences Pvt",
+     "source": "Steril-Gene Life Sciences Pvt"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "vials with",
+     "source": "vials with"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "There are no instructions to visually inspect",
+     "source": "There are no instructions to visually inspect"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Visual inspection",
+     "source": "Visual inspection"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "the approved vials bin",
+     "source": "the approved vials bin"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "for the manufacturing and sterile holding tanks",
+     "source": "for the manufacturing and sterile holding tanks"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "#PR/086-09",
+     "source": "#PR/086-09"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196664",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "en.summary",
+     "claim": "drug product",
+     "source": "drug product"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "1,475,525 returned",
+     "source": "1,475,525 returned"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "no electronic records to trace",
+     "source": "no electronic records to trace"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "supplier",
+     "source": "supplier"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "Observation 1",
+     "source": "Observation 1"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "taken from the manufacturer COA",
+     "source": "taken from the manufacturer COA"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "annual product review for the US market",
+     "source": "annual product review for the US market"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "lock and key",
+     "source": "lock and key"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "No. STP-1213-05",
+     "source": "No. STP-1213-05"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196665",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "업체 Steril-Gene Life Sciences Private",
+     "source": "업체 Steril-Gene Life Sciences Private"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "the batch record",
+     "source": "the batch record"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "contact with the",
+     "source": "contact with the"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "interventions",
+     "source": "interventions"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "the Restricted Access Barrier",
+     "source": "the Restricted Access Barrier"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "Class A(ISO 5",
+     "source": "Class A(ISO 5"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196669",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "업체 Therapak",
+     "source": "업체 Therapak"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "supplier",
+     "source": "supplier"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "VP, Quality and Regulatory confirmed that no audit has ever",
+     "source": "VP, Quality and Regulatory confirmed that no audit has ever"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "Observation 1",
+     "source": "Observation 1"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "SOP-QA009-01",
+     "source": "SOP-QA009-01"
+    }
+   ]
+  },
+  {
+   "web_card_id": "14bd157cfa5e",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "제조소 Alkem Laboratories",
+     "source": "제조소 Alkem Laboratories"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "CFR 211.192",
+     "source": "CFR 211.192"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "CFR 211.100(a",
+     "source": "CFR 211.100(a"
+    },
+    {
+     "slot": "key_facts[2]",
+     "claim": "CFR 211.67(b",
+     "source": "CFR 211.67(b"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "dissolution results in March 2025",
+     "source": "dissolution results in March 2025"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "from July 2024 to August 2025 for the U.S. market",
+     "source": "from July 2024 to August 2025 for the U.S. market"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "process control",
+     "source": "process control"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "results in March 2025",
+     "source": "results in March 2025"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "is not in a state of control",
+     "source": "is not in a state of control"
+    },
+    {
+     "slot": "en.key_facts[2]",
+     "claim": "written procedures for",
+     "source": "written procedures for"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "FDA may withhold approval of new applications",
+     "source": "FDA may withhold approval of new applications"
+    },
+    {
+     "slot": "deep.key_violations[0].original",
+     "claim": "1. Your firm failed to thoroughly investigate any unexplained discrepancy or failure",
+     "source": "1. Your firm failed to thoroughly investigate any unexplained discrepancy or failure"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008395",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "재평가 자료 미제출",
+     "source": "재평가 자료 미제출"
+    },
+    {
+     "slot": "summary",
+     "claim": "재평가에 필요한 자료를 제출기한",
+     "source": "재평가에 필요한 자료를 제출기한"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "허가취소(3차 처분",
+     "source": "허가취소(3차 처분"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가",
+     "source": "한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "해당 품목 허가취소(3차 처분",
+     "source": "해당 품목 허가취소(3차 처분"
+    },
+    {
+     "slot": "key_facts[2]",
+     "claim": "「의약품 등의 안전에 관한 규칙」 제95조 [별표8]",
+     "source": "「의약품 등의 안전에 관한 규칙」 제95조 [별표8]"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "’26.3.17",
+     "source": "’26.3.17"
+    },
+    {
+     "slot": "deep.key_violations[0].original",
+     "claim": "○ 의약품 등 재평가 자료 미제출(3차 처분) -「약사법」제33조에 따라 한약(생약)제제 전문의약품(필름코팅정) 동등성",
+     "source": "○ 의약품 등 재평가 자료 미제출(3차 처분) -「약사법」제33조에 따라 한약(생약)제제 전문의약품(필름코팅정) 동등성"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008415",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "'의약품 제조 및 품질관리기준 적합판정' 취소를",
+     "source": "'의약품 제조 및 품질관리기준 적합판정' 취소를"
+    },
+    {
+     "slot": "implication",
+     "claim": "시험성적서를 적합으로",
+     "source": "시험성적서를 적합으로"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "포장 후 잔량, 제조기록서가 없는",
+     "source": "포장 후 잔량, 제조기록서가 없는"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "시험성적서를 적합",
+     "source": "시험성적서를 적합"
+    },
+    {
+     "slot": "key_facts[2]",
+     "claim": "'의약품 제조 및 품질관리기준 적합판정'",
+     "source": "'의약품 제조 및 품질관리기준 적합판정'"
+    },
+    {
+     "slot": "key_facts[3]",
+     "claim": "｢약사법｣ 제38조의3제1항 및 제3항제2호",
+     "source": "｢약사법｣ 제38조의3제1항 및 제3항제2호"
+    },
+    {
+     "slot": "deep.key_violations[0].original",
+     "claim": "○ ‘세포테탄(제20221117-210-J-1405호)’을 제조하면서 포장 후 잔량, 제조기록서가 없는(제조번호나 유효기간 미상) 원료 등을",
+     "source": "○ ‘세포테탄(제20221117-210-J-1405호)’을 제조하면서 포장 후 잔량, 제조기록서가 없는(제조번호나 유효기간 미상) 원료 등을"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "무균시험이 진행 중인데",
+     "source": "무균시험이 진행 중이었으나"
+    }
+   ],
+   "notes": [
+    {
+     "item": "날짜·조항 표기 꼴",
+     "slot": "deep.key_violations[0].description",
+     "evidence": "허가번호 '제20221117-210-J-1405호'는 문서 번호라 원문 그대로"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008495",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "유통한약재 품질검사 부적합",
+     "source": "유통한약재 품질검사 부적합"
+    },
+    {
+     "slot": "summary",
+     "claim": "해당 품목 제조업무정지",
+     "source": "해당 품목 제조업무정지"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "0.3ppm 이하",
+     "source": "0.3ppm 이하"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "유통한약재 품질검사 부적합 —",
+     "source": "유통한약재 품질검사 부적합 —"
+    },
+    {
+     "slot": "key_facts[3]",
+     "claim": "「약사법」 제62조제11호",
+     "source": "「약사법」 제62조제11호"
+    },
+    {
+     "slot": "deep.key_violations[0].original",
+     "claim": "- 품목: 푸른무약목통(제조번호: PUJ08625111A, 사용기한: 2028. 11. 3.) - 시험항목: 성상 -",
+     "source": "- 품목: 푸른무약목통(제조번호: PUJ08625111A, 사용기한: 2028. 11. 3.) - 시험항목: 성상 -"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008515",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "제조업무정지 기간",
+     "source": "제조업무정지 기간"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "제조업무정지 기간에",
+     "source": "제조업무정지 기간에"
+    },
+    {
+     "slot": "key_facts[3]",
+     "claim": "｢약사법｣ 제76조제1항제3호 및 제3항",
+     "source": "｢약사법｣ 제76조제1항제3호 및 제3항"
+    },
+    {
+     "slot": "en.summary",
+     "claim": "solution",
+     "source": "solution"
+    },
+    {
+     "slot": "deep.key_violations[0].original",
+     "claim": "○ 제조업무정지 기간에 제조업무를 수행한 사실이 있음 - 해당 품목 제조업무정지 기간(2026",
+     "source": "○ 제조업무정지 기간에 제조업무를 수행한 사실이 있음 - 해당 품목 제조업무정지 기간(2026"
+    }
+   ]
+  },
+  {
+   "web_card_id": "data0011-16012",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "필터 사용 전 멸균 후 완전성시험",
+     "source": "필터 사용 전 멸균 후 완전성시험"
+    },
+    {
+     "slot": "summary",
+     "claim": "사용 전 멸균 후 완전성 시험(PUPSIT) 수행 시",
+     "source": "사용 전 멸균 후 완전성 시험(PUPSIT) 수행 시"
+    }
+   ]
+  },
+  {
+   "web_card_id": "gmpinspect-1Q8MhRPjDvN",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "방사성의약품 제조소",
+     "source": "방사성의약품 제조소"
+    },
+    {
+     "slot": "summary",
+     "claim": "GMP 정기실태조사",
+     "source": "GMP 정기실태조사"
+    },
+    {
+     "slot": "implication",
+     "claim": "'기타' 지적사항은",
+     "source": "'기타' 지적사항은"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "시험수행자와 시험 결과를 검토·승인하는 자를 분리할",
+     "source": "시험수행자와 시험 결과를 검토·승인하는 자를 분리할"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "평가 결과: 지적(보완)사항(Deficiencies) 있음",
+     "source": "평가 결과: 지적(보완)사항(Deficiencies) 있음"
+    },
+    {
+     "slot": "checks[0]",
+     "claim": "결과를 검토·승인하는",
+     "source": "결과를 검토·승인하는"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "deficiencies",
+     "source": "deficiencies"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "시험수행자와 검토·승인자 분리",
+     "source": "시험수행자와 시험 결과를 검토·승인하는 자를 분리할 것"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-12ccd858aec6",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "key_facts[0]",
+     "claim": "순도시험 2)곰팡이독소",
+     "source": "순도시험 2)곰팡이독소"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "현진백강잠, 순도시험(곰팡이독소)",
+     "source": "[회수·판매중지] 현진백강잠 — (주)현진제약"
+    },
+    {
+     "slot": "summary",
+     "claim": "순도시험(곰팡이독소)",
+     "source": "순도시험 2)곰팡이독소"
+    },
+    {
+     "slot": "key_facts[2]",
+     "claim": "회수명령(강제)",
+     "source": "회수명령 (강제)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-760fb20ddac5",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "분진포집효율 부적합",
+     "source": "분진포집효율 부적합"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "제로가드덴탈형황사방역마스크(KF94)(대형,소형)(흰색,검정색",
+     "source": "제로가드덴탈형황사방역마스크(KF94)(대형,소형)(흰색,검정색"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "KF94 마스크",
+     "source": "제로가드덴탈형황사방역마스크(KF94)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-7c2b803d1f37",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "불순물(N-nitroso-N-desmethyl-tramadol) 허용기준",
+     "source": "불순물(N-nitroso-N-desmethyl-tramadol) 허용기준"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "불순물(N-nitroso-N-desmethyl-tramadol) 허용기준 초과",
+     "source": "불순물(N-nitroso-N-desmethyl-tramadol) 허용기준 초과"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "tramadol",
+     "source": "tramadol"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "N-nitroso-N-desmethyl-tramadol",
+     "source": "N-nitroso-N-desmethyl-tramadol"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-8ddb728eb3b9",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "분진포집효율 부적합",
+     "source": "분진포집효율 부적합"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "윈썬프리미엄보건방역마스크(KF94)(대형)(흰색,검정색",
+     "source": "윈썬프리미엄보건방역마스크(KF94)(대형)(흰색,검정색"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "KF94 마스크(대형)",
+     "source": "윈썬프리미엄보건방역마스크(KF94)(대형)"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-cfaf944acc02",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "불순물(NDMA",
+     "source": "불순물(NDMA"
+    },
+    {
+     "slot": "summary",
+     "claim": "불순물(NDMA) 초과 검출 우려에 따른 사전예방적 조치로",
+     "source": "불순물(NDMA) 초과 검출 우려에 따른 사전예방적 조치로"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "틴자정150밀리그램",
+     "source": "틴자정150밀리그램"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "불순물(NDMA) 초과 검출 우려에 따른 사전예방적 조치",
+     "source": "불순물(NDMA) 초과 검출 우려에 따른 사전예방적 조치"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "틴자정150밀리그램(니자티딘",
+     "source": "틴자정150밀리그램(니자티딘"
+    }
+   ]
+  },
+  {
+   "web_card_id": "recall-dfe247bc36de",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "시판 후 안정성 시험(유연물질) 기준 초과 우려에 따른 사전 예방적",
+     "source": "시판 후 안정성 시험(유연물질) 기준 초과 우려에 따른 사전 예방적"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "알림타액상주25밀리그램/밀리리터(페메트렉시드이나트륨염칠수화물",
+     "source": "알림타액상주25밀리그램/밀리리터(페메트렉시드이나트륨염칠수화물"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "시판 후 안정성 시험(유연물질)",
+     "source": "시판 후 안정성 시험(유연물질) 기준 초과 우려"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0156-2027",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Brevital",
+     "source": "Brevital"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "Brevital Sodium (Methohexital Sodium), For Injection, USP, 500 mg/vial",
+     "source": "Brevital Sodium (Methohexital Sodium), For Injection, USP, 500 mg/vial"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "particulates identified as cellulose",
+     "source": "particulates identified as cellulose"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "cellulose",
+     "source": "cellulose"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "presence of particulate matter; particulates identified as cellulose",
+     "source": "presence of particulate matter; particulates identified as cellulose"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0189-2027",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "UMARY Acido Hialuronico",
+     "source": "UMARY Acido Hialuronico"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "NDA/ANDA",
+     "source": "NDA/ANDA"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "Hyaluronic Acid 850mg Sealed 30 Caps",
+     "source": "Hyaluronic Acid 850mg Sealed 30 Caps"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Hyaluronic acid",
+     "source": "Hyaluronic acid"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "undeclared",
+     "source": "undeclared"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "marketed without approved NDA/ANDA",
+     "source": "marketed without approved NDA/ANDA"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "New Hyaluronic Acid 850mg Sealed 30 Caps",
+     "source": "New Hyaluronic Acid 850mg Sealed 30 Caps"
+    }
+   ],
+   "notes": [
+    {
+     "item": "용어표 표기 차이",
+     "slot": "key_facts[1]",
+     "evidence": "제품명 원문 '850mg' 숫자·단위 붙임 — 원문 그대로 둠"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0192-2027",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "200/10 mg/mL",
+     "source": "200/10 mg/mL"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "Testosterone Cypionate / Testosterone Propionate 200/10 mg/mL, 30mL vials",
+     "source": "Testosterone Cypionate / Testosterone Propionate 200/10 mg/mL, 30mL vials"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "lack of sterility assurance",
+     "source": "lack of sterility assurance"
+    }
+   ],
+   "notes": [
+    {
+     "item": "용어표 표기 차이",
+     "slot": "key_facts[1]",
+     "evidence": "제품명 원문 '30mL' — 원문 그대로 둠"
+    }
+   ]
+  },
+  {
+   "web_card_id": "a8687ec486b8",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "en.summary",
+     "claim": "requirements for cleaning validation in a GMP environment are set",
+     "source": "requirements for cleaning validation in a GMP environment are set"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "cleaning validation",
+     "source": "cleaning validation"
+    }
+   ]
+  },
+  {
+   "web_card_id": "fda483-196540",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "업체 Sagecor Health",
+     "source": "업체 Sagecor Health"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "deviations are not required for reprocessed batches",
+     "source": "deviations are not required for reprocessed batches"
+    },
+    {
+     "slot": "en.implication",
+     "claim": "batches since June of 2024 without adequate tracking, trending",
+     "source": "batches since June of 2024 without adequate tracking, trending"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "No investigation",
+     "source": "No investigation"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "for each reprocessing event, and existing reprocessing records",
+     "source": "for each reprocessing event, and existing reprocessing records"
+    },
+    {
+     "slot": "deep.observations_ko[0].detail_ko",
+     "claim": "SOP WI-082",
+     "source": "SOP WI-082"
+    }
+   ]
+  },
+  {
+   "web_card_id": "hc-82996",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Clef des Champs",
+     "source": "Clef des Champs"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "Withania somnifera 500 mg",
+     "source": "Withania somnifera 500 mg"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Natural health product",
+     "source": "Natural health product"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Natural health products",
+     "source": "Natural health products"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "contamination",
+     "source": "contamination"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "various natural health products",
+     "source": "various natural health products"
+    },
+    {
+     "slot": "en.key_facts[3]",
+     "claim": "verify if your product is affected",
+     "source": "verify if your product is affected"
+    }
+   ]
+  },
+  {
+   "web_card_id": "admin-2026008455",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "해당 품목 판매업무정지",
+     "source": "해당 품목 판매업무정지"
+    },
+    {
+     "slot": "implication",
+     "claim": "이니스트바이오제약(주)는",
+     "source": "이니스트바이오제약(주)는"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "합계 139,600,000원",
+     "source": "합계 139,600,000원"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "의약품 채택·처방유도·거래유지 등 판매촉진",
+     "source": "의약품 채택·처방유도·거래유지 등 판매촉진"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "합계 47,860,000원",
+     "source": "합계 47,860,000원"
+    },
+    {
+     "slot": "key_facts[3]",
+     "claim": "제47조제2항, 제76조",
+     "source": "제47조제2항, 제76조"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "47,860,000",
+     "source": "47,860,000"
+    },
+    {
+     "slot": "deep.key_violations[0].original",
+     "claim": "2016. 10월경부터 2019. 3월경까지 의료기관 ‘연세봄이비인후과의원(서울특별시 서대문구 통일로 448, 4층)’에 ‘데코라펜정(덱시부프로펜)’ 등",
+     "source": "2016. 10월경부터 2019. 3월경까지 의료기관 ‘연세봄이비인후과의원(서울특별시 서대문구 통일로 448, 4층)’에 ‘데코라펜정(덱시부프로펜)’ 등"
+    }
+   ]
+  },
+  {
+   "web_card_id": "law-291987",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "및 첨단바이오의약품 안전 및 지원에 관한 법률",
+     "source": "및 첨단바이오의약품 안전 및 지원에 관한 법률"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "시행일: 2026-11-27",
+     "source": "시행일자: 20261127"
+    }
+   ]
+  },
+  {
+   "web_card_id": "law-292045",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "title_issue",
+     "claim": "첨단바이오의약품",
+     "source": "첨단바이오의약품"
+    },
+    {
+     "slot": "summary",
+     "claim": "안전 및 지원에 관한",
+     "source": "안전 및 지원에 관한"
+    }
+   ]
+  },
+  {
+   "web_card_id": "law-292313",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "key_facts[0]",
+     "claim": "2026-11-26",
+     "source": "2026-11-26"
+    },
+    {
+     "slot": "key_facts[0]",
+     "claim": "시행일: 2026-11-26",
+     "source": "시행일자: 20261126"
+    }
+   ]
+  },
+  {
+   "web_card_id": "10e98ad460f8",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "en.summary",
+     "claim": "packaging operations to minimise the risk of mix-ups",
+     "source": "packaging operations to minimise the risk of mix-ups"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Expectations",
+     "source": "Expectations"
+    }
+   ]
+  },
+  {
+   "web_card_id": "53e187608366",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Brintellix 5 mg",
+     "source": "Brintellix 5 mg"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "One batch of Brintellix 5 mg",
+     "source": "One batch of Brintellix 5 mg"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "labelling error",
+     "source": "labelling error"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "labelling error with the product strength",
+     "source": "labelling error with the product strength"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "one batch of Brintellix 5 mg film-coated tablets",
+     "source": "one batch of Brintellix 5 mg film-coated tablets"
+    }
+   ]
+  },
+  {
+   "web_card_id": "5a7190516de7",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Bexarotene 75 mg",
+     "source": "Bexarotene 75 mg"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Capsules with",
+     "source": "Capsules with"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "several capsules with black/blue spots",
+     "source": "several capsules with black/blue spots"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Bexarotene 75 mg soft capsules, batch 5GJ0551",
+     "source": "Bexarotene 75 mg soft capsules, batch 5GJ0551"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "capsules with spots",
+     "source": "capsules with black/blue spots"
+    }
+   ]
+  },
+  {
+   "web_card_id": "81dca5a5fdb0",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "PROSTAP PD DCS 1.88",
+     "source": "PROSTAP PD DCS 1.88"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "PROSTAP PD DCS 1.88 mg",
+     "source": "PROSTAP PD DCS 1.88 mg"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "Administration instructions in",
+     "source": "Administration instructions in"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Administration",
+     "source": "Administration"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "the product should only be",
+     "source": "the product should only be"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "PROSTAP PD DCS 1.88 mg powder and solvent for prolonged-release",
+     "source": "PROSTAP PD DCS 1.88 mg powder and solvent for prolonged-release"
+    }
+   ]
+  },
+  {
+   "web_card_id": "c4ccf0ca4043",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "Atnahs Pharma UK",
+     "source": "Atnahs Pharma UK"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "Toradol 30 mg/mL",
+     "source": "Toradol 30 mg/mL"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "Safety information",
+     "source": "Safety information"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "omitted from the Patient Information Leaflets",
+     "source": "omitted from the Patient Information Leaflets"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "certain batches of Toradol 30 mg/mL Solution for Injection",
+     "source": "certain batches of Toradol 30 mg/mL Solution for Injection"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "anastomotic leakage safety information",
+     "source": "safety information relating to gastrointestinal anastomotic leakage was omitted"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0172-2027",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "summary",
+     "claim": "1000 mcg/mL",
+     "source": "1000 mcg/mL"
+    },
+    {
+     "slot": "key_facts[1]",
+     "claim": "Cyanocobalamin Injection, USP, 1000 mcg/mL, 25 x 1 mL",
+     "source": "Cyanocobalamin Injection, USP, 1000 mcg/mL, 25 x 1 mL"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "presence of particulate matter",
+     "source": "presence of particulate matter"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Cyanocobalamin Injection, USP, 1000 mcg/mL, 25 x 1 mL multi-dose",
+     "source": "Cyanocobalamin Injection, USP, 1000 mcg/mL, 25 x 1 mL multi-dose"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "glass particulates",
+     "source": "Particulate matter: Identified as glass"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0174-2027",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "key_facts[1]",
+     "claim": "Lisdexamfetamine Dimesylate Capsules 40 mg",
+     "source": "Lisdexamfetamine Dimesylate Capsules 40 mg"
+    },
+    {
+     "slot": "en.summary",
+     "claim": "failed dissolution specifications",
+     "source": "failed dissolution specifications"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "failed dissolution",
+     "source": "failed dissolution"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "Lisdexamfetamine Dimesylate Capsules 40 mg, 100-count bottle",
+     "source": "Lisdexamfetamine Dimesylate Capsules 40 mg, 100-count bottle"
+    },
+    {
+     "slot": "hook_line",
+     "claim": "리스덱스암페타민 캡슐",
+     "source": "Dimesylate Capsules 40 mg, 100-count bottle, Rx Only"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0175-2027",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "key_facts[1]",
+     "claim": "Organic Oral Care",
+     "source": "Organic Oral Care"
+    },
+    {
+     "slot": "en.summary",
+     "claim": "ORL Labs LLC",
+     "source": "ORL Labs LLC"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "toothpaste",
+     "source": "toothpaste"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "cross-contamination",
+     "source": "cross-contamination"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "or dehydroepiandrosterone (DHEA",
+     "source": "or dehydroepiandrosterone (DHEA"
+    },
+    {
+     "slot": "en.key_facts[1]",
+     "claim": "ORL Organic Oral Care",
+     "source": "ORL Organic Oral Care"
+    }
+   ]
+  },
+  {
+   "web_card_id": "D-0185-2027",
+   "verdict": "pass",
+   "checked": [
+    {
+     "slot": "key_facts[1]",
+     "claim": "Famotidine Injection, 200 mg per 50 mL (4 mg per",
+     "source": "Famotidine Injection, 200 mg per 50 mL (4 mg per"
+    },
+    {
+     "slot": "en.hook_line",
+     "claim": "200 mg per 50 mL",
+     "source": "200 mg per 50 mL"
+    },
+    {
+     "slot": "en.title_issue",
+     "claim": "particulate matter",
+     "source": "particulate matter"
+    },
+    {
+     "slot": "en.key_facts[0]",
+     "claim": "presence of particulate matter",
+     "source": "presence of particulate matter"
+    }
+   ]
+  }
+ ],
+ "counts": {
+  "cards": 97,
+  "pass": 97,
+  "reject": 0,
+  "fails_total": 0,
+  "notes_total": 3
+ }
+}

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-28T13:56:58Z",
+ "generated_at": "2026-11-28T15:26:56Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 46151976811,
+    "databaseId": 46159151008,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-28T15:18:18Z",
+    "updatedAt": "2026-11-28T15:18:22Z",
+    "headBranch": "claude/naver-blog-why-1126-r2",
+    "displayTitle": "naver-blog: '왜 중요한가' 슬롯 도입 (#1999 위) (#2007 대체)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46159151008"
+   },
+   {
+    "databaseId": 46159147863,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-28T13:55:00Z",
-    "updatedAt": "2026-11-28T13:55:03Z",
-    "headBranch": "claude/collect-cap-health-r3-1128",
-    "displayTitle": "fix(test): 대조 장부 시험의 페이지네이터 Mock 에 health() 를 붙임",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46151976811"
+    "createdAt": "2026-11-28T15:18:16Z",
+    "updatedAt": "2026-11-28T15:18:19Z",
+    "headBranch": "claude/naver-blog-why-1126-r2",
+    "displayTitle": "fix(naver_blog_slot): 좁은 콘솔 인코딩에서 main() 이 죽지 않게 stdout/stderr utf-8 재설정",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46159147863"
    },
    {
-    "databaseId": 46151434516,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-28T13:48:23Z",
-    "updatedAt": "2026-11-28T13:55:17Z",
-    "headBranch": "codex/test-render-speed",
-    "displayTitle": "test(속도): 렌더 시험 4개 클래스 렌더 1회 공유 (CI 병목)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46151434516"
-   },
-   {
-    "databaseId": 46151419051,
+    "databaseId": 46159051251,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-28T13:48:12Z",
-    "updatedAt": "2026-11-28T13:55:20Z",
-    "headBranch": "codex/test-render-speed",
-    "displayTitle": "test(속도): 렌더 시험 4개 클래스가 같은 입력 렌더를 클래스당 1회로 공유 (assert·골든 불변)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46151419051"
-   },
-   {
-    "databaseId": 46151354929,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-28T13:47:24Z",
-    "updatedAt": "2026-11-28T13:56:35Z",
+    "createdAt": "2026-11-28T15:17:09Z",
+    "updatedAt": "2026-11-28T15:26:28Z",
     "headBranch": "main",
-    "displayTitle": "네이버 블로그 원고를 사이트 위성 글로 + 규칙 점검 한 곳(naver_blog_checks) (#2048)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46151354929"
+    "displayTitle": "test(속도): 렌더 시험 4개 클래스가 같은 입력 렌더를 클래스당 1회로 공유 (assert·골든 불변) (#2056)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46159051251"
    },
    {
-    "databaseId": 46143100542,
+    "databaseId": 46156524197,
     "status": "completed",
-    "conclusion": "failure",
+    "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-28T12:07:28Z",
-    "updatedAt": "2026-11-28T12:15:12Z",
-    "headBranch": "claude/glossary-fig-daily-20261128-2106",
-    "displayTitle": "glossary(fig): 2026-11-28 새 그림 0 · 다시 그림 0 · 보류 5 — 변경관리·위탁활동·근본원인분석·SOP·기록",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46143100542"
+    "createdAt": "2026-11-28T14:48:13Z",
+    "updatedAt": "2026-11-28T14:57:10Z",
+    "headBranch": "codex/test-render-speed-2",
+    "displayTitle": "test(속도): WL 위반 렌더 시험 문서 페이지 생략 (CI 병목)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46156524197"
+   },
+   {
+    "databaseId": 46156517613,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-28T14:48:09Z",
+    "updatedAt": "2026-11-28T14:56:38Z",
+    "headBranch": "codex/test-render-speed-2",
+    "displayTitle": "test(속도): WL 위반 렌더 시험 문서 페이지 생략 + 업체 페이지 시험 임시 폴더 정리",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46156517613"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 46159878906,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-28T15:26:30Z",
+    "updatedAt": "2026-11-28T15:26:47Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46159878906"
+   },
+   {
     "databaseId": 46152107492,
     "status": "completed",
     "conclusion": "success",
@@ -442,20 +453,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45963221951"
-   },
-   {
-    "databaseId": 45948771490,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-27T05:56:41Z",
-    "updatedAt": "2026-11-27T05:56:53Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45948771490"
    }
   ],
   "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 46156463400,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-28T14:47:29Z",
+    "updatedAt": "2026-11-28T14:48:38Z",
+    "headBranch": "main",
+    "displayTitle": "chore(번역): 지적사항 표제 125행 한국어 번역 outbox (11-28 plan, Codex) (#2052)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46156463400"
+   },
    {
     "databaseId": 46125973236,
     "status": "completed",
@@ -499,17 +510,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #2004 from MINHOYEOM/fix/findings-outbox-archive",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45833062093"
-   },
-   {
-    "databaseId": 45826914195,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-26T13:12:36Z",
-    "updatedAt": "2026-11-26T13:15:34Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #2001 from MINHOYEOM/chore/findings-translate-483-…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45826914195"
    }
   ],
   "grm-findings-backfill-fetch.yml": [

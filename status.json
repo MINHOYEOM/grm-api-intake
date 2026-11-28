@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-28T01:43:31Z",
+ "generated_at": "2026-11-28T06:21:28Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,59 +229,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 46093805078,
+    "databaseId": 46116161088,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-28T06:20:42Z",
+    "updatedAt": "2026-11-28T06:21:01Z",
+    "headBranch": "main",
+    "displayTitle": "assets: 네이버 블로그 사이드바 위젯 배너 3장(용어사전·지적 찾아보기·구독) (#2024)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116161088"
+   },
+   {
+    "databaseId": 46116026407,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-28T06:19:01Z",
+    "updatedAt": "2026-11-28T06:20:57Z",
+    "headBranch": "main",
+    "displayTitle": "feat(completeness): N2 칸 대조 계약 + N6 수집 완전성 일보 (migration 173) (#2018)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116026407"
+   },
+   {
+    "databaseId": 46109996538,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-28T01:34:47Z",
-    "updatedAt": "2026-11-28T01:43:04Z",
-    "headBranch": "automation/library-auto-46093393646",
+    "createdAt": "2026-11-28T04:59:04Z",
+    "updatedAt": "2026-11-28T05:07:20Z",
+    "headBranch": "automation/news-auto-46109959080",
+    "displayTitle": "chore: refresh recent regulatory news",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46109996538"
+   },
+   {
+    "databaseId": 46102048199,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-28T03:16:26Z",
+    "updatedAt": "2026-11-28T03:25:48Z",
+    "headBranch": "automation/library-auto-46101598251",
     "displayTitle": "chore: refresh live regulatory library",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46093805078"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46102048199"
    },
    {
-    "databaseId": 45985137485,
+    "databaseId": 46097991239,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-27T10:48:03Z",
-    "updatedAt": "2026-11-27T10:56:06Z",
-    "headBranch": "claude/clause-find-tooltip-rebased",
-    "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁 (#2037 rebase)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45985137485"
-   },
-   {
-    "databaseId": 45985129003,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T10:47:59Z",
-    "updatedAt": "2026-11-27T10:56:10Z",
-    "headBranch": "claude/clause-find-tooltip-rebased",
-    "displayTitle": "test: 조항 국문 번역 본문 보존 검사를 태그 제거 후 비교로 (용어 툴팁이 낱말을 a 로 감쌈)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45985129003"
-   },
-   {
-    "databaseId": 45976117644,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-27T09:43:43Z",
-    "updatedAt": "2026-11-27T09:52:01Z",
-    "headBranch": "claude/clause-find-tooltip-rebased",
-    "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁 (#2037 rebase)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45976117644"
-   },
-   {
-    "databaseId": 45976042710,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T09:43:11Z",
-    "updatedAt": "2026-11-27T09:51:22Z",
-    "headBranch": "claude/clause-find-tooltip-rebased",
-    "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45976042710"
+    "createdAt": "2026-11-28T02:25:23Z",
+    "updatedAt": "2026-11-28T02:34:24Z",
+    "headBranch": "automation/library-auto-46097572900",
+    "displayTitle": "chore: refresh live regulatory library",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46097991239"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 46116184755,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-28T06:21:00Z",
+    "updatedAt": "2026-11-28T06:21:18Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116184755"
+   },
+   {
     "databaseId": 45963221951,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45938101405"
-   },
-   {
-    "databaseId": 45929512364,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-27T02:38:24Z",
-    "updatedAt": "2026-11-27T02:38:39Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45929512364"
    }
   ],
   "grm-findings-translate-apply.yml": [

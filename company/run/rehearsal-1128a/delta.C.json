@@ -100,11 +100,11 @@
    }
   },
   "fda483-196520": {
-   "title_issue": "무효 크로마토그램 약 1,200건 미검토",
-   "hook_line": "29개월간 무효 처리 약 1,200건을 품질부서가 검토하지 않음",
-   "summary": "FDA가 연구개발 시험실 MSN Laboratories Private Limited에 Form 483(관찰사항 2건)을 발행했다. 크로마토그램 무효 처리를 과학적 조사 없이 하고 품질부서가 검토하지 않은 점 등을 지적했다.",
+   "title_issue": "무효 크로마토그램 약 1,200건 검토 미흡",
+   "hook_line": "29개월간 무효 처리 약 1,200건, 품질부서의 적절한 검토 없음",
+   "summary": "FDA가 연구개발 시험실 MSN Laboratories Private Limited에 Form 483(관찰사항 2건)을 발행했다. 크로마토그램 무효 처리를 과학적 조사 없이 하고 품질부서가 충분히 검토하지 못한 점 등을 지적했다.",
    "key_facts": [
-    "관찰 1: 절차서 AR-G-0054-006의 크로마토그램 무효 처리 규정에 과학적 조사·경향 분석 장치 없음, 29개월간 약 1,200건 검토 없음",
+    "관찰 1: 절차서 AR-G-0054-006의 크로마토그램 무효 처리 규정에 과학적 조사·경향 분석 장치 없음, 29개월간 약 1,200건이 품질부서의 적절한 검토 없이 기록",
     "관찰 2: 예방정비 프로그램이 전자 시스템을 다 포함하지 않고 소프트웨어 오류 기록을 검토하지 않음"
    ],
    "implication": "전산 부서는 외부 업체 원격 수리에 원격 데스크톱 프로토콜을 쓰면서 이중 인증·소프트웨어 업데이트·세션별 비밀번호·방화벽·계정 잠금 같은 보안 절차서를 제시하지 않았다(관찰 2).",
@@ -114,11 +114,11 @@
     "외부 업체 원격 접속에 이중 인증을 쓰는가? (관찰 2)"
    ],
    "en": {
-    "title_issue": "About 1,200 invalid chromatograms unreviewed",
-    "hook_line": "About 1,200 invalids recorded in 29 months without quality unit review",
-    "summary": "FDA issued a Form 483 with 2 observations to MSN Laboratories Private Limited, an R&D laboratory, citing chromatogram invalidations without scientifically sound investigation or quality unit review.",
+    "title_issue": "About 1,200 invalids lacked appropriate review",
+    "hook_line": "About 1,200 invalids recorded in 29 months without appropriate quality unit review",
+    "summary": "FDA issued a Form 483 with 2 observations to MSN Laboratories Private Limited, an R&D laboratory, citing chromatogram invalidations without scientifically sound investigation and without adequate quality unit review.",
     "key_facts": [
-     "Observation 1: invalidation section of SOP AR-G-0054-006 provides no scientifically sound investigation or trending; approximately 1,200 invalids in 29 months without review",
+     "Observation 1: invalidation section of SOP AR-G-0054-006 provides no scientifically sound investigation or trending; approximately 1,200 invalids recorded in 29 months without appropriate quality unit review",
      "Observation 2: preventive maintenance lacks complete maintenance of electronic systems; software error logs not reviewed"
     ],
     "implication": "The IT department uses Remote Desktop Protocol for remote repair by third-party vendors but provided no protocol or SOP covering two-factor authentication, software updates, unique passwords, firewalls or account lockout (Observation 2).",
@@ -198,12 +198,12 @@
   "fda483-196523": {
    "title_issue": "냉동고 이탈 반복·기록 일탈 100건 이상",
    "hook_line": "2026년 2월 이후 냉동고 온도 이탈 8건 발생",
-   "summary": "FDA가 위탁시험기관 Pace Analytical Life Sciences, LLC에 Form 483(관찰사항 2건)을 발행했다. 안정성 챔버의 예비 체계와 절차가 없어 온도 이탈이 반복된 점 등을 지적했다.",
+   "summary": "FDA가 위탁시험기관 Pace Analytical Life Sciences, LLC에 Form 483(관찰사항 2건)을 발행했다. 안정성 챔버의 적절한 예비 체계와 절차 관리를 수립하지 않은 점 등을 지적했다.",
    "key_facts": [
     "관찰 1: 안정성 챔버 예비 체계·절차 미흡, 냉동고 압축기 고장 뒤 시정조치를 마치기 전 두 번째 온도 이탈",
     "관찰 2: 2024년 5월~2026년 5월 일탈 162건 중 100건 이상이 기록 관련 실패"
    ],
-   "implication": "2026-02-09 이탈 보고서 1706에 따라 2026-03-13 일탈 7164를 열었고 2026-03-23 연 시정조치 3911은 초안 상태다(관찰 1). 회사는 즉시 조치로 교육을 했다고 진술했으나 교육 기록이 없었다(관찰 1). 시정조치 3693을 유효로 종결한 뒤에도 기록 귀속 불가 일탈 DEV-6595 등이 기록됐다(관찰 2). 고객 데이터 기밀 위반은 고객 불만 COMP-093을 받은 뒤에야 시정조치 3887을 열었다(관찰 2). 그 뒤 2026-03-16 데이터 보고서 파일이 다른 고객에게 열린 일탈 DEV-7166이 기록됐다(관찰 2).",
+   "implication": "2026-02-09 이탈 보고서 1706에 따라 2026-03-13 일탈 7164를 열었고 2026-03-23 연 시정조치 3911은 초안 상태다(관찰 1). 회사는 즉시 조치로 교육을 했다고 진술했으나 교육 기록이 없었다(관찰 1). 시정조치 3693을 유효로 종결한 뒤에도 기록 귀속 불가 일탈 DEV-6595 등이 기록됐다(관찰 2). 고객 데이터 기밀 위반은 COMP-093을 받은 뒤에야 시정조치 3887을 열었다(관찰 2). 그 뒤 2026-03-16 데이터 보고서 파일이 다른 고객에게 열린 일탈 DEV-7166이 기록됐다(관찰 2).",
    "checks": [
     "안정성 냉동고 고장 때 시료를 옮기는 예비 절차가 문서로 있는가? (관찰 1)",
     "시정조치를 유효로 종결한 뒤 같은 일탈의 재발을 추적하는가? (관찰 2)",
@@ -212,12 +212,12 @@
    "en": {
     "title_issue": "Repeat freezer excursions; 100+ record deviations",
     "hook_line": "8 freezer excursions since February 2026",
-    "summary": "FDA issued a Form 483 with 2 observations to Pace Analytical Life Sciences, LLC, a contract testing laboratory, citing no adequate backup systems or procedures for stability chambers, with repeated temperature excursions.",
+    "summary": "FDA issued a Form 483 with 2 observations to Pace Analytical Life Sciences, LLC, a contract testing laboratory, citing failure to establish adequate backup systems and procedural controls for its stability chambers.",
     "key_facts": [
      "Observation 1: inadequate backup systems and procedures for stability chambers; a second excursion occurred after a freezer compressor failure before corrective actions were complete",
      "Observation 2: of 162 deviations from May 2024 through May 2026, over 100 were documentation-related failures"
     ],
-    "implication": "Excursion Event Report 1706 dated 2026-02-09 led to Deviation 7164 on 2026-03-13, and CAT 3911 opened 2026-03-23 remains in draft (Observation 1). The firm stated training was conducted shortly after, but no training records were available (Observation 1). Deviations for unattributable records, including DEV-6595, continued after CAT 3693 was closed as effective (Observation 2). Corrective action CAT 3887 on client data confidentiality was initiated only after complaint COMP-093 (Observation 2). DEV-7166 on 2026-03-16 recorded a data report file made accessible to the wrong client (Observation 2).",
+    "implication": "Excursion Event Report 1706 dated 2026-02-09 led to Deviation 7164 on 2026-03-13, and CAT 3911 opened 2026-03-23 remains in draft (Observation 1). The firm stated training was conducted shortly after, but no training records were available (Observation 1). Deviations for unattributable records, including DEV-6595, continued after CAT 3693 was closed as effective (Observation 2). Corrective action CAT 3887 on client data confidentiality was initiated only after receiving COMP-093 (Observation 2). DEV-7166 on 2026-03-16 recorded a data report file made accessible to the wrong client (Observation 2).",
     "checks": [
      "Is there a documented backup procedure to move samples when a stability freezer fails? (Observation 1)",
      "After closing a corrective action as effective, do you track recurrence of the same deviation? (Observation 2)",

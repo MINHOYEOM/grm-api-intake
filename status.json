@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-27T23:43:47Z",
+ "generated_at": "2026-11-28T01:43:31Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 46093241965,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-28T01:28:01Z",
+    "updatedAt": "2026-11-28T01:43:22Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46093241965"
+   },
    {
     "databaseId": 46026760862,
     "status": "completed",
@@ -100,17 +111,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45301070728"
-   },
-   {
-    "databaseId": 45084280088,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-22T23:37:49Z",
-    "updatedAt": "2026-11-22T23:48:26Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45084280088"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -229,6 +229,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 46093805078,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-28T01:34:47Z",
+    "updatedAt": "2026-11-28T01:43:04Z",
+    "headBranch": "automation/library-auto-46093393646",
+    "displayTitle": "chore: refresh live regulatory library",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46093805078"
+   },
+   {
     "databaseId": 45985137485,
     "status": "completed",
     "conclusion": "success",
@@ -271,20 +282,20 @@
     "headBranch": "claude/clause-find-tooltip-rebased",
     "displayTitle": "feat(조항): 기준조항 페이지 안 찾기 + 용어 툴팁",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45976042710"
-   },
-   {
-    "databaseId": 45962093480,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-27T07:57:56Z",
-    "updatedAt": "2026-11-27T08:07:08Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #2035 from MINHOYEOM/claude/en-subscribe-conversio…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45962093480"
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 46094542370,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-28T01:43:25Z",
+    "updatedAt": "2026-11-28T01:43:34Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46094542370"
+   },
    {
     "databaseId": 46028430490,
     "status": "completed",
@@ -328,17 +339,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45534580239"
-   },
-   {
-    "databaseId": 45512969235,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-24T23:48:02Z",
-    "updatedAt": "2026-11-24T23:48:17Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45512969235"
    }
   ],
   "grm-watchlist-notify.yml": [
@@ -515,11 +515,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 46070112558,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-27T21:24:33Z",
-    "updatedAt": "2026-11-27T21:24:37Z",
+    "updatedAt": "2026-11-28T00:18:49Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46070112558"
@@ -743,6 +743,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 46093241965,
+   "created_at": "2026-11-28T01:28:01Z",
+   "has_web_brief": true
+  },
+  {
    "run_id": 46026760862,
    "created_at": "2026-11-27T15:38:53Z",
    "has_web_brief": true
@@ -766,14 +771,169 @@
    "run_id": 45713603518,
    "created_at": "2026-11-25T22:29:06Z",
    "has_web_brief": false
-  },
-  {
-   "run_id": 45533605021,
-   "created_at": "2026-11-25T02:31:50Z",
-   "has_web_brief": true
   }
  ],
  "intake_counts": [
+  {
+   "schema": "grm-intake-counts/v1",
+   "run_id": 46093241965,
+   "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46093241965",
+   "created_at": "2026-11-28T01:28:01Z",
+   "conclusion": "success",
+   "run_date_kst": "2026-11-28",
+   "event": "schedule",
+   "dry_run": false,
+   "active": [
+    "eca",
+    "ema",
+    "fr",
+    "mhra",
+    "pics",
+    "recall",
+    "wl"
+   ],
+   "total": 448,
+   "sources": [
+    {
+     "key": "fr",
+     "label": "Federal Register",
+     "fetched": 7,
+     "error": false
+    },
+    {
+     "key": "recall",
+     "label": "OpenFDA Recall",
+     "fetched": 102,
+     "error": false
+    },
+    {
+     "key": "ema",
+     "label": "EMA RSS",
+     "fetched": 6,
+     "error": false
+    },
+    {
+     "key": "mhra",
+     "label": "MHRA RSS",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mhra_alert",
+     "label": "MHRA Drug/Device Alerts",
+     "fetched": 4,
+     "error": false
+    },
+    {
+     "key": "pics",
+     "label": "PIC/S RSS",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eca",
+     "label": "ECA Academy RSS",
+     "fetched": 4,
+     "error": false
+    },
+    {
+     "key": "wl",
+     "label": "FDA Warning Letters",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "mfds",
+     "label": "MFDS RSS",
+     "fetched": 4,
+     "error": false
+    },
+    {
+     "key": "mfds_law",
+     "label": "MFDS Law/Admrul",
+     "fetched": 3,
+     "error": false
+    },
+    {
+     "key": "mfds_recall",
+     "label": "MFDS Recall",
+     "fetched": 40,
+     "error": false
+    },
+    {
+     "key": "mfds_admin",
+     "label": "MFDS Admin",
+     "fetched": 25,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_cert",
+     "label": "MFDS GMP Certificate",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_safety_letter",
+     "label": "MFDS Safety Letter",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mfds_gmp_inspection",
+     "label": "MFDS GMP Inspection",
+     "fetched": 1,
+     "error": false
+    },
+    {
+     "key": "ich",
+     "label": "ICH",
+     "fetched": 31,
+     "error": false
+    },
+    {
+     "key": "who",
+     "label": "WHO",
+     "fetched": 172,
+     "error": false
+    },
+    {
+     "key": "hc",
+     "label": "Health Canada",
+     "fetched": 10,
+     "error": false
+    },
+    {
+     "key": "fda483",
+     "label": "FDA 483",
+     "fetched": 28,
+     "error": false
+    },
+    {
+     "key": "ispe",
+     "label": "ISPE iSpeak RSS",
+     "fetched": 9,
+     "error": false
+    },
+    {
+     "key": "search",
+     "label": "Brave Search",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "eu_gmp_ncr",
+     "label": "EU GMP NCR (EudraGMDP)",
+     "fetched": 0,
+     "error": false
+    },
+    {
+     "key": "mhra_gmp_ncr",
+     "label": "MHRA GMP NCR",
+     "fetched": 0,
+     "error": false
+    }
+   ]
+  },
   {
    "schema": "grm-intake-counts/v1",
    "run_id": 46026760862,

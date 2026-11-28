@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [영문 구독 2026-11-27] 영문 트리는 첫 화면 줄형 칸이 구독 칸이다 — 하단 밴드를 끈다(base.html). 한국어는 종전 그대로. -#}
+{% set sub_inline_on = sub_inline_lists %}
 {#- [구글 품질 1단계 2026-11-19] 구글에서만 뺄 조항(국문 미번역 D·짧은 원문 E)은 구글봇만 noindex — 판정은 clause_text_page.google_noindex_reason, sitemap.xml 도 같은 판정으로 뺀다. -#}
 {% block meta_robots %}{% if google_noindex %}<meta name="googlebot" content="noindex, follow" />
 {% endif %}{% endblock %}
@@ -15,6 +17,8 @@
     <h1 class="ct-h1">{{ clause.code }}</h1>
     {%- if clause.title %}<p class="ct-sub" lang="{{ doc.source.lang }}">{{ clause.title }}</p>{% endif %}
     {%- if clause.path %}<p class="ct-path" lang="{{ doc.source.lang }}">{{ clause.path | join(' › ') }}</p>{% endif %}
+    {#- [영문 구독 2026-11-27] 영문 독자는 검색으로 이 면에 곧장 들어온다 — 첫 화면에 줄형 구독 칸(영문 트리만). -#}
+    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top', sub_anchor=True %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
   </div>
   <div class="wrap ct-body">
     {#- [구글 품질 2단계 2026-11-20] 국문 참고 번역(translations/clause_outbox → clause_translation.apply).
@@ -50,6 +54,35 @@
       <p class="ct-note" style="margin-bottom:12px">{{ _('공개 문서에서 이 조항을 인용한 지적 {n}건 가운데 최근 사례입니다.', n=cite.findings) }}</p>
       <div class="ct-cites">
         {%- for s in cite.samples %}
+        <article class="ct-cite">
+          <p class="ct-cite-m"><span>{{ agency_labels.get(s.agency, s.agency) }}</span><span>{{ s.firm_name }}</span><span>{{ s.published_date }}</span></p>
+          <p class="ct-cite-t">{{ s.body }}</p>
+          {%- if s.doc_slug %}
+          <a class="ct-cite-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">{{ _('이 문서의 지적 전체 보기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          {%- endif %}
+        </article>
+        {%- endfor %}
+      </div>
+    </section>
+    {%- endif %}
+    {#- [조항 덧붙임 2026-11-27] 본문에 정확 일치로 나온 용어사전 용어(3개 이상일 때만) + 같은 주제로 분류된 실제 지적
+        (사람이 맞춘 고정 표). 뷰는 clause_text_page.key_terms_by_href·topic_cases_by_href. -#}
+    {%- if key_terms %}
+    <section>
+      <h2 class="ct-sec-h">{{ _('이 조항의 핵심 용어') }}</h2>
+      <ul class="ct-notes">
+        {%- for t in key_terms %}
+        <li><a href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.label }}</a>{% if t.gist %} — {{ t.gist }}{% endif %}</li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+    {%- if topic_cases %}
+    <section>
+      <h2 class="ct-sec-h">{{ _('이 주제의 실제 지적') }}</h2>
+      <p class="ct-note" style="margin-bottom:12px">{{ _('이 조항을 직접 인용한 지적이 아니라, 같은 주제로 분류된 공개 지적 사례입니다.') }}</p>
+      <div class="ct-cites ct-topic">
+        {%- for s in topic_cases %}
         <article class="ct-cite">
           <p class="ct-cite-m"><span>{{ agency_labels.get(s.agency, s.agency) }}</span><span>{{ s.firm_name }}</span><span>{{ s.published_date }}</span></p>
           <p class="ct-cite-t">{{ s.body }}</p>

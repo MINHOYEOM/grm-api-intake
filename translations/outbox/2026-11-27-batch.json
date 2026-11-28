@@ -1,0 +1,86 @@
+[
+  {
+    "finding_id": "finding-e1143a0d009d905f5603a16c",
+    "finding_text": "Written documents are inadequate to ensure proper documentation of manufacturing operations.",
+    "finding_text_ko": "제조 작업의 적절한 문서화를 보장하기에 서면 문서가 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4205571bce527a4c28fec220",
+    "finding_text": "Records are not maintained so that data therein can be reviewed at least annually to evaluate the quality standards of each drug product to determine the need for changes in specifications or manufacturing or control procedures.",
+    "finding_text_ko": "각 의약품의 품질 기준을 평가하고 규격 또는 제조·관리 절차의 변경 필요성을 판단할 수 있도록 최소 연 1회 기록 내 데이터를 검토할 수 있게 기록을 유지하고 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ae0dcf58ea941bacf5026bea",
+    "finding_text": "The statistical quality control criteria fail to include appropriate rejection levels.",
+    "finding_text_ko": "통계적 품질관리 기준에 적절한 불합격 수준이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-564205923351dc3e34589a21",
+    "finding_text": "OF THIS PAGE | Tiara N Brown-Crosen, Generic Drug User Fee | xX gemactusen Amendments (GDUFA) erACoe ‘Signed by:Cheryt A.",
+    "finding_text_ko": "OF THIS PAGE | Tiara N Brown-Crosen, Generic Drug User Fee | xX gemactusen Amendments (GDUFA) erACoe ‘Signed by:Cheryt A. (OCR 판독 불량으로 손상된 원문이며 해독 가능한 지적 내용 없음)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-48c41094c83574faf1b26450",
+    "finding_text": "Equipment and utensils are not cleaned and maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "장비와 기구를 적절한 주기로 세척·유지관리하지 않아 의약품의 안전성, 확인(identity), 함량, 품질 또는 순도를 변화시킬 수 있는 오염을 방지하지 못한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c7c1e1474b621ae2df82065a",
+    "finding_text": "CDER/OPQ/OPMA/DBM, Attn: Zhihao {Peter) Qiu, Ph.D., Acting Director 10903 New Hampshire Avenue; White Oak Building 22, Room 5112 Silver Spring, MD 20993 (301) 796-6655 I Email: OPFBLAlnspection483Responses@fda.hhs.gov NAME AND TITl.E OF INOMOUAL TO~ REPORT ISSUED Mr.",
+    "finding_text_ko": "CDER/OPQ/OPMA/DBM, Attn: Zhihao {Peter) Qiu, Ph.D., Acting Director 10903 New Hampshire Avenue; White Oak Building 22, Room 5112 Silver Spring, MD 20993 (301) 796-6655 I Email: OPFBLAlnspection483Responses@fda.hhs.gov NAME AND TITl.E OF INOMOUAL TO~ REPORT ISSUED Mr. (수신처 주소·연락처 등 서식 머리말이며 지적 내용 없음)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dc836b8b8bbc4fbc238dd613",
+    "finding_text": "Investigations ofan unexplained discrepancy did not extend to other batches ofthe same drug product and other drug products that may have been associated with the specific failure or discrepancy.",
+    "finding_text_ko": "원인을 알 수 없는 불일치에 대한 조사가 같은 의약품의 다른 배치와, 해당 실패 또는 불일치와 관련되었을 수 있는 다른 의약품으로 확대되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f476eec79ddb7f1564c6d6e4",
+    "finding_text": "Written procedures are inadequate or do not provide adequate details to ensure product quality.",
+    "finding_text_ko": "서면 절차가 미흡하거나 제품 품질을 보장할 만큼 충분히 상세하지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4d05cc7fdcf3a6d4515d723",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room to produce aseptic conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역에서 무균 상태를 조성하기 위한 실내 세척·소독 시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0f584d070da91a25f0a0d40f",
+    "finding_text": "Batch production and control records do not include the results of any investigation made into any unexplained discrepancy, whether or not the batch of drug product had already been distributed.",
+    "finding_text_ko": "배치 생산 및 관리 기록(batch production and control records)에, 원인을 알 수 없는 불일치에 대해 수행한 조사 결과가 포함되어 있지 않다. 해당 배치가 이미 출하되었는지 여부와 무관하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a6dda7de4a2cd6782a52f6b8",
+    "finding_text": "Batch production and control records do not include the results ofany investigation made into any unexplained discrepancy, whether or not the batch of drug product had already been distributed.",
+    "finding_text_ko": "배치 생산 및 관리 기록(batch production and control records)에, 원인을 알 수 없는 불일치에 대해 수행한 조사 결과가 포함되어 있지 않다. 해당 배치가 이미 출하되었는지 여부와 무관하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-37630449944647763d6ee0b3",
+    "finding_text": "The written stability program for drug prodncts does not describe the storage conditions for samples retained for testing.",
+    "finding_text_ko": "의약품에 대한 서면 안정성 프로그램에 시험용으로 보관한 시료의 보관 조건이 기술되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8ecf2efe4d3bf4484ed5ec19",
+    "finding_text": "Complete records shall be maintained for any testing and standardization of laboratory reference standards, reagents, and standard solntions.",
+    "finding_text_ko": "실험실 기준 물질, 시약 및 표준용액의 모든 시험과 표준화에 대한 완전한 기록을 유지해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-59e39e7663ad3979410a08fe",
+    "finding_text": "Batch production and control records do not include the identity ofindividual major equipment used for each batch ofdrug product produced.",
+    "finding_text_ko": "배치 생산 및 관리 기록에 배치별로 사용한 개별 주요 장비의 확인 정보(identity)가 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  }
+]

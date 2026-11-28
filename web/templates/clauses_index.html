@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [영문 구독 2026-11-27] 영문 트리는 첫 화면 줄형 칸이 구독 칸이다 — 하단 밴드를 끈다(base.html). 한국어는 종전 그대로. -#}
+{% set sub_inline_on = sub_inline_lists %}
 {% block content %}
 {#- [기준 조항 원문] /clauses/ — 원천별 문서 목록. 데이터 = web/data/clauses/*.json(clause_text_page.build). -#}
 {% include "partials/clauses_style.html" %}
@@ -12,6 +14,7 @@
     {%- if lang == 'ko' %}
     <p class="ct-note" style="margin-top:10px">{{ _('해외 기준의 본문은 원문(영어)입니다. 국문 번역은 준비 중입니다.') }}</p>
     {%- endif %}
+    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top', sub_anchor=True %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
   </div>
   <div class="wrap ct-body">
     {%- for s in ct.sources %}

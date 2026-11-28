@@ -1,0 +1,117 @@
+name: GRM Completeness Daily Report (23:07 KST)
+
+# 수집 완전성 N6 — 사람이 보는 지점, 하루 한 번 한 곳(completeness_daily.py 도크스트링).
+# 그날의 문서 대조(grm-source-reconcile 아티팩트)·매일 장부·칸 대조(coverage_daily)를 모아 소스별 한 줄
+# (정상 / 메우는 중 / 사람 필요)을 만들고 `[GRM 문제] 수집 완전성 일보` 이슈 하나를 돌려쓴다.
+# 라벨 completeness-daily → 운영 경보 표(131)는 grm-ops-alarm 이 옮긴다. 정상인 날은 열린 이슈를 닫는다.
+# 일보 자체가 죽으면 reconcile-monitor 이슈를 연다(감시가 조용히 죽지 않게).
+# 읽기: Supabase coverage_daily GET · Actions 아티팩트. 쓰기: GitHub 이슈뿐. DB 쓰기 없음.
+# 끄기: repo 변수 ENABLE_COMPLETENESS_DAILY=false.
+
+on:
+  schedule:
+    # 14:07 UTC = 23:07 KST — 하루 마감(23:00) 직후. 정각을 피한다.
+    - cron: '7 14 * * *'
+  workflow_dispatch:
+    inputs:
+      day:
+        description: 'KST 날짜 YYYY-MM-DD (비우면 오늘)'
+        type: string
+        default: ''
+      apply:
+        description: '이슈를 만들거나 갱신·닫기(false = 요약만)'
+        type: boolean
+        default: false
+
+permissions:
+  actions: read        # 그날 원천 대조 아티팩트 내려받기
+  contents: read
+  issues: write        # 일보 이슈 하나 생성/갱신/종료
+
+concurrency:
+  group: grm-completeness-daily
+  cancel-in-progress: false
+
+jobs:
+  report:
+    if: vars.ENABLE_COMPLETENESS_DAILY != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 가장 최근 원천 대조 실행의 아티팩트를 받는다. 오늘 것이 아니면 일보가 run_date 로 걸러
+      # "오늘 대조 결과 없음"(사람 필요)으로 적는다 — 대조가 안 돈 날을 조용히 넘기지 않는다.
+      - name: Download latest source-reconcile result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          run_id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow grm-source-reconcile.yml --limit 1 \
+                   --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$run_id" ]; then
+            gh run download "$run_id" -R "$GITHUB_REPOSITORY" -n source-reconcile -D reconcile \
+              || echo "아티팩트 없음(run $run_id)"
+          fi
+          ls -la reconcile 2>/dev/null || true
+
+      - name: Build report
+        id: report
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          IN_DAY: ${{ inputs.day }}
+          IN_APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          args=(--reconcile reconcile/source-reconcile.json --json completeness-daily.json --run-url "$RUN_URL")
+          if [ -n "$IN_DAY" ]; then
+            if ! printf '%s' "$IN_DAY" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+              echo "::error::day 형식은 YYYY-MM-DD"; exit 1
+            fi
+            args+=(--day "$IN_DAY")
+          fi
+          if [ "$IN_APPLY" = true ]; then
+            args+=(--apply)
+          fi
+          python completeness_daily.py "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: completeness-daily
+          path: completeness-daily.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Alert if the report itself failed
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title='[GRM 문제] 수집 완전성 일보 자체가 실패했습니다'
+          existing=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --label reconcile-monitor \
+                     --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" -R "$GITHUB_REPOSITORY" --body "다시 실패: $RUN_URL"
+          else
+            gh label create reconcile-monitor -R "$GITHUB_REPOSITORY" --color D93F0B --force >/dev/null
+            gh issue create -R "$GITHUB_REPOSITORY" --title "$title" --label reconcile-monitor \
+              --body "completeness_daily.py 가 실패했습니다. 그날 사람 필요 목록이 나가지 않았습니다. 실행: $RUN_URL"
+          fi

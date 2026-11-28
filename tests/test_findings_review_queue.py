@@ -112,6 +112,8 @@ class MeasureFetchTest(unittest.TestCase):
 
     def test_main_exit_codes(self):
         rows = [_row("finding-a", 10)]
+        # main() 은 진짜 현재 시각을 쓴다. 고정 _NOW 기준 10일 전 행은 달력이 가면 30일을 넘어 시험이 저절로 깨진다(11-28).
+        rows[0]["ingested_at"] = (datetime.now(timezone.utc) - timedelta(days=10)).isoformat()
         resp = _Resp(200, rows, headers={"Content-Range": "0-0/1"})
         env = {"SUPABASE_URL": _BASE, "SUPABASE_SERVICE_ROLE_KEY": _KEY}
         with mock.patch.dict(os.environ, env), \

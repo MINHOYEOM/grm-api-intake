@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{#- [영문 구독 2026-11-27] 영문 트리는 첫 화면 줄형 칸이 구독 칸이다 — 하단 밴드를 끈다(base.html). 한국어는 종전 그대로. -#}
+{% set sub_inline_on = sub_inline_lists %}
 {#- [SEO 2026-11-09·11-19] 얇은 업체 페이지(C)는 구글봇만 noindex(네이버·빙은 색인 유지) — 판정은 render.is_thin_firm_page, sitemap.xml 도 같은 판정으로 뺀다. -#}
 {% block meta_robots %}{% if google_noindex %}<meta name="googlebot" content="noindex, follow" />
 {% endif %}{% endblock %}
@@ -125,6 +127,8 @@
     <p class="ff-lede">{{ _("규제기관이 공개한 실사 문서 <b>{a}건</b>에서 확인된 지적 <b>{b}건</b>입니다. 아래 <b>행마다 날짜의 종류</b>를 함께 적었습니다.", a=firm.doc_count, b=firm.finding_count) }}</p>
     {#- [UI 3단 2026-11-12] 칩 걷어냄 — 기관·기간은 한 줄 평문(문서·지적 건수는 위 한 줄 요약에 있다). -#}
     <p class="ff-sub">{% for a in firm.agencies %}{{ agency_labels.get(a, a) }}{% if not loop.last %} · {% endif %}{% endfor %} · <b>{{ firm.first_seen }}</b> ~ <b>{{ firm.last_seen }}</b></p>
+    {#- [영문 구독 2026-11-27] 영문 독자는 검색으로 이 면에 곧장 들어온다 — 첫 화면에 줄형 구독 칸(영문 트리만). -#}
+    {%- if sub_inline_lists %}{% with sub_kind='findings', sub_slot='top', sub_anchor=True %}{% include "partials/sub_inline.html" %}{% endwith %}{% endif +%}
     {#- [식약처 GMP 적합판정 2026-11-11] DB 가 업체와 연결한 판정서만(render.firm_gmp_cert_index).
         한국어 트리에만 넘어온다(원천 값이 한국어). 판정일은 원천에 없어 유효기한만 적는다. -#}
     {%- if gmp_certs %}

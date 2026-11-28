@@ -45,6 +45,7 @@ LABEL_TEAM: tuple[tuple[str, str], ...] = (
     ("db-size-health", "infra"),  # DB 크기 무료 한도 근접(154 · grm-db-size-health.yml)
     ("grm-findings", "quality"),
     ("content-completeness", "quality"),  # 내용 완전성(잘림·안 쓰이는 칸 · content_completeness.py)
+    ("completeness-daily", "quality"),  # 수집 완전성 일보(N6 · completeness_daily.py) — 사람 필요 목록
     ("reconciliation", "infra"),
     ("source-verify", "infra"),
     ("grm-intake", "infra"),

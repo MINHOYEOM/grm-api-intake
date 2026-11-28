@@ -13,7 +13,7 @@
 {%- if sub_kind == 'brief' %}{% set _t = _("주간 브리프 메일") %}{% set _d = _("매주 {a}의 실사 지적 소식을 받아 보세요.", a=sub_agencies) %}
 {%- elif sub_kind == 'glossary' and sub_offer_glossary_pdf %}{% set _t = _("GMP 용어집 PDF") %}{% set _d = _("구독을 확인하면 한·영 대조 GMP 용어집 PDF를 받습니다. 매주 실사 지적 소식도 함께 보내 드립니다.") %}
 {%- elif sub_kind == 'glossary' %}{% set _t = _("실사 지적 주간 메일") %}{% set _d = _("GMP 용어가 쓰인 새 실사 지적을 매주 받아 보세요.") %}
-{%- elif sub_kind == 'findings' %}{% set _t = _("지적사항 주간 메일") %}{% set _d = _("매주 {a}의 실사 지적 소식을 원문 링크와 함께 받아 보세요.", a=sub_agencies) %}
+{%- elif sub_kind == 'findings' %}{% set _t = _("원문과 대조한 새 지적, 매주 메일로") %}{% set _d = _("매주 {a}의 새 지적 기록을 보내 드립니다. 업체별 이력·조항 원문·용어 그림으로 이어지고, 한·영 두 언어로 읽습니다.", a=sub_agencies) %}
 {%- else %}{% set _t = _("주간 실사 지적 메일") %}{% set _d = _("{a}의 새 실사 지적을 매주 받아 보세요.", a=sub_agencies) %}
 {%- endif -%}
 {%- if sub_band %}

@@ -1,0 +1,269 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-28",
+ "shard": "E",
+ "items": {
+  "fda483-196472": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "교체한 분석기를 승인하는 데 쓴 신뢰성·재현성/게이지 능력 평가에서 어떤 검증 방법을 썼는지 문서를 제시하지 못했다(관찰 1).",
+      "citation": "21 CFR 211.160(a)"
+     }
+    ],
+    "inspectional_significance": "",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "시험 절차는 적절한 조직 단위가 작성하고 품질부서가 검토·승인해야 한다.",
+     "detail_ko": "구체적으로, 2023-05-04 회사는 분석기 [가림]을(를) 트레일러에 [가림]을(를) 적재할 때 [가림] 함량을 측정하는 데 쓰는 동일한 [가림](으)로 교체했다. 표준작업절차서(SOP) 50-0075 '공정 밸리데이션, 개정 3, 핵심 분석기 교체'에 따르면 같은 종류 교체나 동등 모델 변경에는 게이지 신뢰성·재현성 평가가 필요한 [가림] 방법이다. 회사는 2023-05-05 통계적 품질관리 - 정밀도, 품질보증 - 신뢰성·재현성/게이지 능력 평가([가림] 방법)를 수행해 [가림] 트레일러 충전 중 미량 [가림] 감시에 교체 [가림]을(를) 쓰도록 승인했다. 그러나 회사는 교체 [가림]의 사용을 승인하는 데 쓴 신뢰성·재현성/게이지 능력 평가를 수행할 때 사용한 검증 방법의 문서를 제시하지 못했다."
+    }
+   ]
+  },
+  "fda483-196473": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "가동 중지 설비 상태를 다루는 표준작업절차서(SOP)가 없고, 2026-04-21 현장 점검에서 가동하지 않는 설비에 상태 표시를 일관되게 쓰지 않았다(관찰 1).",
+      "citation": "21 CFR 211.22(d)"
+     },
+     {
+      "observation": "운전원이 산업용 지정 트레일러를 의료용 가스로 충전했다고 세 번 잘못 기록했고, 세 번 모두 충전 뒤에야 발견됐다(관찰 1)."
+     },
+     {
+      "observation": "비적합 #23656의 근본원인을 인력 부족으로 결론 냈으나 판단 근거·영향 배치·발생일 기록이 없었고, 회사는 철저한 조사를 하지 않았다고 인정했다(관찰 1)."
+     },
+     {
+      "observation": "공기분리장치를 제어하는 분산제어시스템에 여러 사람이 쓰는 공용 로그인 2개를 사용해 설비를 조작한 개인을 기록으로 식별할 수 없다(관찰 2).",
+      "citation": "21 CFR 211.68"
+     }
+    ],
+    "inspectional_significance": "회사는 비적합 #23656 조사가 미흡했다는 점을 바로잡으려고 2026-04-22 비적합 #24054를 새로 열었다(관찰 1).",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "품질부서에 적용되는 책임과 절차는 문서로 작성되어야 하며, 그 문서화된 절차를 따라야 한다.",
+     "detail_ko": "구체적으로, A. 품질관리부서에는 설비의 가동 중지 상태를 다루는 표준작업절차서(SOP)가 없다. 2025-05-04 새 [가림] 장치 도입으로 [가림] 및 [가림] 제조에 쓰이는 [가림] 공기 압축기, [가림] 압축기, [가림] 압축기 [가림] 및 내부 [가림] 등 여러 설비가 사용 중지됐다. 2026-04-21 시설 현장 점검에서 가동하지 않는 설비에 상태 표시나 사용 중지 표시를 일관되게 쓰지 않는 것이 관찰됐다. 회사는 이 설비가 완전히 가동 중지된 것이 아니라 '보관' 상태이며 나중에 쓸 수 있다고 진술했다. 그러나 그 설비에는 여전히 현재 사용 상태를 정하는 상태 표시가 일관되게 쓰이지 않는다. B. 2025-03-04, 2025-03-05, 2025-03-08 회사의 [가림] 벌크 운전원이 산업용 [가림]으로 지정된 트레일러를 [가림] 의료용 가스로 충전했다고 잘못 기록했다. 이 오류는 세 번 모두 트레일러에 제품을 충전한 뒤에야 발견됐다. 이는 '로트 및 배치 기록 정정 기록부'에 기록돼 있으며 다음 로트와 날짜를 참조한다. 2025-03-04: 로트. 회사는 [가림] 벌크 운전원이 2025년 3월 전에 필요한 Airgas Merchant Gases(AMG) 제품 출하 담당자(PRS) [가림] 교육을 받았다는 문서를 제시하지 못했다. C. 품질관리부서는 배치 번호 [가림] 및 [가림]의 액체 제품 저장 탱크가 정해진 한도 [가림]을(를) 넘겨 보관된 2025-06-09 자 내부 비적합 #23656을 적절히 조사하지 않았다. 회사는 근본원인이 인력 부족으로 판단됐다고 진술했다. 그러나 내부 비적합 #23656 문서에는 근본원인을 어떻게 확인했는지, 영향받은 배치/로트, 발생일에 관한 추가 정보가 없었다. 회사는 철저한 조사를 하지 않았다고 인정했다. 그 결과 내부 비적합 #23656의 미흡한 조사를 다루기 위해 2026-04-22 내부 비적합 #24054가 생성됐다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "기기·장치·게이지·기록 장치의 교정 또는 교정 확인을 확립된 문서화 프로그램에 따라 적절한 간격으로 수행하는 요건이 충족되지 않는다.",
+     "detail_ko": "구체적으로, 2026-04-21 시설 현장 점검에서 공기분리장치의 공정을 감시·제어하는 데 쓰는 분산제어시스템(DCS)이 'engineer'와 'operator' 두 개의 공용 로그인 자격을 쓰며 여러 인원이 접근하는 것이 관찰됐다. 회사는 'operator' 로그인으로 의료용 가스 순도에 영향을 주는 밸브 조정과 설정값 변경을 할 수 있고 [가림] 명이 이를 쓰며, 'engineer' 로그인은 시스템 정지 같은 추가 제어가 가능하고 두 명이 쓴다고 진술했다. 공용 로그인 자격을 쓰는 이 방식으로는 어느 개인이 설비를 조작했는지 식별하는 적절한 기록을 유지할 수 없어, 설비 조작·제어 활동의 책임 소재를 보증하지 못한다."
+    }
+   ]
+  },
+  "fda483-196480": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "소독제 효력시험을 이 제조소의 환경 분리균과 재질로 하지 않고 다른 제조소 연구를 썼으며, 재질은 바닥·벽·설비·창 4종만 포함했다(관찰 1).",
+      "citation": "21 CFR 211.67"
+     },
+     {
+      "observation": "미생물 평판 판독 절차 SOP-418520에 최소 배양 시간 뒤의 판독 시한이 없다(관찰 2)."
+     },
+     {
+      "observation": "물품 반입 시 포장 외면 소독 방법이 절차서 SOP-423923에 없고, 작업자가 소독제를 일관되지 않게 뿌리고 닦았다(관찰 2).",
+      "citation": "21 CFR 211.113(b)"
+     }
+    ],
+    "inspectional_significance": "",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "회사는 이 제조소에 특화된 환경 분리균과 재질을 바탕으로 소독제 효력시험(DES)을 수행하지 않았다.",
+     "detail_ko": "RPT-526033(버전 6.0) 'ASM 및 [가림]에서 쓰는 소독제 효력에 관한 기술 평가'에 따르면 회사는 Amgen Thousand Oaks(ATO)와 [가림]에서 수행한 연구를 썼다. 구체적으로, a. 회사는 ATO 소독제 적격성평가 시험에 재질 4종(바닥, 벽, 설비, 창)만 포함했다. 이 소독제 효력시험은 시설의 모든 대표 제조 표면에 대한 소독제와 살포자제의 항균·살포자 효력에 관해 소독 절차를 적절히 뒷받침하지 못한다. 예를 들어, [가림] 의자, [가림] 설비 포장 등에 쓰는 재질이 시험에 포함되지 않았다. b. ATO와 [가림] 소독제 적격성평가 시험에서 시험한 환경 분리균은 ATO와 [가림]에서 검출된 분리균이었다. 시험에는 ASM 자체 분리균이 포함되지 않았다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "원료의약품의 미생물 오염을 막도록 설계된 절차가 적절히 수립되지 않았다.",
+     "detail_ko": "구체적으로, a. 2024-05-08 실사관들은 환경 평판 판독을 관찰했다. 회사의 담당 전문가는 미생물 부하 평판을 최소 배양 시간이 지난 뒤 언제든 판독할 수 있다고 진술했다. 회사에는 평판 판독의 최대 시간이 정해져 있지 않다. SOP-418520(버전 17) '미생물 평판 판독 및 승인'에는 최소 배양 시간 이후 평판 판독의 시간 제한이 없다. b. 2024-05-08 실사관들은 작업자가 비등급 및 등급 제조 구역으로 반입하는 [가림] 물품 포장의 외면을 소독하는 것을 관찰했다. 작업자는 마른 천을 쓰고 포장 외면을 닦기 전에 소독제를 뿌렸다. 작업자가 소독제를 뿌리고 포장재를 닦는 방식이 일관되지 않았다. 마른 천이 소독제에 충분히 젖었는지, 닦기가 모든 표면을 소독제로 덮었는지 보증이 없다. 문서화된 절차 SOP-423923 'ASM 인원, 물품 및 설비 이동'에는 제조 구역으로 반입하기 전에 물품에 소독제를 뿌리고 닦는 작업 지시가 없다."
+    }
+   ]
+  },
+  "fda483-196500": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "2024-10-07 원료 입도 분석의 상대표준편차(%) 계산 오류를 품질관리 검토, 품질보증 확인, 조사 어느 단계에서도 찾지 못했다(관찰 1).",
+      "citation": "21 CFR 211.22(a)"
+     },
+     {
+      "observation": "일반의약품 입도 분석의 허용 기준인 상대표준편차(%)를 계산하는 밸리데이션된 계산식이나 문서화된 절차가 없다(관찰 2).",
+      "citation": "21 CFR 211.160(b)"
+     }
+    ],
+    "inspectional_significance": "",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "품질관리부서에 발생한 오류를 충분히 조사할 권한이 없다.",
+     "detail_ko": "구체적으로, 회사의 품질부서는 2024-10-07 수행한 원료 [가림]의 입도 분포 분석 중 상대표준편차(%) 계산 오류를 찾지 못했다. 이 오류는 품질관리의 분석 자료 검토, 품질보증의 확인, 해당 분석에 대해 수행한 조사 중 어느 단계에서도 발견되지 않았다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "시험실 관리에 원료·공정 중 물질·의약품이 확인·함량·품질·순도의 적절한 기준에 맞음을 보증하도록 설계된 과학적으로 타당하고 적절한 기준과 시험 절차의 수립이 포함되지 않는다.",
+     "detail_ko": "구체적으로, 회사에는 일반의약품 입도 분포 분석의 허용 기준인 상대표준편차(%)를 올바르게 계산하는 밸리데이션된 계산식도 문서화된 절차도 없다."
+    }
+   ]
+  },
+  "fda483-196517": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "위험 관리 절차가 요구한 고장 유형 영향 분석을 Class II GlutenID Genetic Health Risk Test에 대해 제시하지 못했다(관찰 1)."
+     },
+     {
+      "observation": "키트 조립·배송을 맡은 업체 A를 품질에 직접 영향을 주는 공급업체로 분류하고도 공급업체 성과 평가표로만 평가했고, 공급업체 적격성평가 양식도 없었다(관찰 2)."
+     }
+    ],
+    "inspectional_significance": "",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "품질경영시스템에 필요한 적절한 공정 관리에 위험 기반 접근을 적용하지 않았다.",
+     "detail_ko": "구체적으로, 회사 절차 '위험 관리 Rev. 1'(2026-03-01)은 잠재 고장 유형과 그 영향을 체계적으로 평가하는 데 고장 유형 영향 분석(FMEA)을 쓰도록 정한다. 회사는 절차가 요구하는 대로 Class II GlutenID Genetic Health Risk Test의 고장 유형 영향 분석을 제시하지 못했다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "제품의 요구사항 적합성에 영향을 주는 외주 공정의 관리가 관련 위험에 비례하지 않는다.",
+     "detail_ko": "구체적으로, 회사 절차 '외주 및 구매 관리 Rev. 1'(시행 2026-03-21)은 구매한 제품과 서비스가 정해진 요구사항에 맞도록 공급업체와 외주 공정의 선정, 평가, 승인, 감시, 재평가 과정을 정한다. 절차는 제품 품질·안전에 직접 영향을 주는 모든 공급업체를 [가림](으)로 분류한다. [가림] 공급업체에는 더 엄격한 적격성평가와 강화된 감시·감사가 필요하지만 절차에 더 자세히 정해져 있지 않다. 절차는 [가림] 공급업체 평가를 위한 [가림] 감사나 감사·평가 주기 같은 요건을 정하지 않는다. 업체 A는 완제 유전자 검사 키트를 공급하고 Class II 유전 변이 검출·건강 위험 평가 시스템인 회사의 GlutenID Genetic Health Risk Test 최종 사용자에게 배송한다. 회사는 업체 A를 제품 품질과 안전에 직접 영향을 주는 [가림] 공급업체로 분류했다. 회사는 [가림] 공급업체에 더 엄격한 적격성평가와 강화된 감시·감사를 요구하지만, 업체 A에 대해서는 공급업체 성과 평가표로 평가만 했다. 또한 2026-03-23 서명한 업체 A와의 품질계약은 유전자 검사 키트 조립·배송 외주 공정에 대한 관리와 제품이 기기 규격을 충족하는 방식을 충분히 정하지 않는다. 회사 절차는 모든 공급업체에 공급업체 적격성평가 양식을 작성하도록 요구하지만 업체 A의 양식은 제시되지 않았다. 회사는 2026-02-01부터 키트 조립·배송을 업체 A에 외주했다."
+    }
+   ]
+  },
+  "fda483-196551": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "2016년 최초 적격성평가 뒤 무균 구역을 열여섯 번 재적격성평가했으나 무균 작업 재개 전 소독 효과를 생물학적 지표로 확인하지 않았다(관찰 1).",
+      "citation": "21 CFR 211.42(c)(10)"
+     },
+     {
+      "observation": "기류 시각화 시험이 충전 작업을 포함한 동적 조건으로 완전히 수행되지 않았고 개입 중 일방향 기류가 막혔다(관찰 2).",
+      "citation": "21 CFR 211.113(b)"
+     },
+     {
+      "observation": "Burkholderia cepacia가 13번 검출됐으나 조사하지 않았고, 유통 배치의 안정성 기준일탈(OOS)에 현장 경보 보고서를 3영업일 안에 내지 않았다(관찰 3).",
+      "citation": "21 CFR 314.81(b)(1)"
+     },
+     {
+      "observation": "엔도톡신 시험 절차서를 따르지 않아 양성 제품 대조 시료 하나가 음성이 돼 시험이 무효화됐다(관찰 5).",
+      "citation": "21 CFR 211.160(a)"
+     }
+    ],
+    "inspectional_significance": "품질 부서는 Burkholderia cepacia를 부적합 미생물로 보지 않아 조사하지 않았다(관찰 3).",
+    "required_remediation": {
+     "deadline": "회신은 의무가 아니다. 15영업일 안에 받은 회신은 FDA가 후속 조치를 정할 때 검토한다.",
+     "items": []
+    },
+    "administrative_risks": ""
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "무균 공정 구역의 작업실과 설비를 세척·소독해 무균 조건을 만드는 체계가 미흡하다.",
+     "detail_ko": "구체적으로, 회사는 무균 구역을 [가림] 재적격성평가한다. 수 주가 걸릴 수 있는 무균 구역 재적격성평가 중에는 무균 작업을 하지 않는다. [가림] 품질 책임자에 따르면 [가림]의 무균 조제물을 준비하고, 2016년 최초 적격성평가 때 생물학적 지표로 [가림]이(가) 효과적임을 입증했다. 그러나 그 뒤 회사는 [가림] 라인의 설비 변경·개조 등으로 무균 구역을 열여섯 번 재적격성평가했고, 무균 작업 재개 전 무균 구역이 적절히 소독됐는지 보증하도록 생물학적 지표로 [가림]을(를) 확인한 적이 없다. 또한 회사는 제조사 설명서에 적힌 [가림]의 정비를 한 번도 하지 않았다. [가림]에 시작한 마지막 재적격성평가 이후 [가림] 라인에서 무균 충전한 의약품 약 [가림] 배치가 미국으로 출하됐다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "무균을 표방하는 의약품의 미생물 오염을 막도록 설계된 절차에 무균 공정의 적절한 밸리데이션이 포함되지 않았다.",
+     "detail_ko": "구체적으로, 1) 실사관들은 미국에 유통되는 무균의약품의 무균 생산에 쓰는 [가림] 라인(2023년 8월)과 바이알 라인(2024년 1월)에서 수행한 기류 시각화 시험 영상을 봤다. 관찰된 결함은 다음 등이다. a) [가림] 라인과 바이알 라인의 연기 시험이 동적 조건으로 완전히 수행되지 않았다. 고유 [가림] 작업과 문 열고 닫기 개입은 모의했으나 일상 제조 작업을 모의하는 충전 작업이 항상 수행되지는 않았다. b) 마개를 끼운 무균 충전 의약품을 무균 라인에서 [가림](으)로 연속 A등급 환경 아래 이송하는 것이 [가림] 라인의 동적 연기 시험에서 명확히 입증되지 않았다. c) [가림] d) [가림] 무균 라인에서 바이알 라인을 움직이는 레버에 손을 뻗었다. e) 무균 기술자가 [가림] 라인 이동 중 B등급 환경에 노출된 [가림]을(를) A등급 환경으로 돌아올 때 소독하지 않았다. f) [가림] 라인에서 [가림] 보충 고유 개입 중 HEPA 일방향 기류가 막혔다. g) 바이알 라인의 [가림] 마개 봉지를 자르는 데 쓴 메스를 A등급 환경에 들이기 전에 소독하지 않았다. [가림] 주사제 USP 등 무균의약품이 무균 제조돼 미국에 유통됐다. 2) 실사관들은 [가림] 주사제 USP(배치 번호 [가림]) 생산 뒤 [가림] 충전 라인의 생산 후 세척 CCTV 영상을 검토했다. Form-000610094 설비 세척 기록에는 제한 접근 차단막(RABS, A등급) 안에서 무엇을 세척했는지와 책임 배정이 없다. 충전실 카메라 각도의 제한된 시야 때문에 일부만이지만 차단막 안 생산 후 세척 영상 검토에서 다음 결함이 확인됐다. a) 생산 후 세척 담당자가 세척한 뒤 [가림] 기계의 여러 위치를 만졌다. 담당자는 만진 곳을 소독하지 않았고 그 위치를 다시 세척하지 않았다. b) 생산 후 세척 담당자가 [가림] 라인 세척(라인 분해) 중 팔뚝을 [가림]에 걸쳤다. c) [가림] 라인의 세척(라인 분해)이 아직 진행 중인데 다른 라인 충전 구역에서 세척이 이미 시작됐다. SOP-000565893 '바이알 충전기 운전·세척 및 무균 구역 기계 세척 일반 절차'(시행 2024-03-25, 버전 24.0)에 따르면 차단막의 [가림]이(가) 세척 중 빠지고 있다. 또한 생산 후 세척 담당자는 SOP-000565893이 정한 고위험에서 저위험 구역 순서의 세척을 따르지 않는다. 한 세척 담당자가 [가림]을(를) 세척하다 [가림](으)로 옮겨 간 것이 관찰됐다. 2024년 1월부터 현재까지 Form-000610094 설비 세척 기록을 검토한 결과 같은 조건의 [가림] 충전 라인 세척이 [가림] 걸렸으나, 실사관이 검토한 배치 후 세척 CCTV 영상에서는 [가림] 걸렸다. 설비 세척 기록으로는 차단막 안 설비 세척 시간이 넓게 차이 나는 이유를 알 수 없다. 3) [가림] 주사제 USP(배치 번호 [가림]) 충전 영상 검토 중 약 16:36에 무균 생산 작업자가 고유 개입 '[가림] 제거'로 라인이 멈춘 뒤 충전을 다시 시작하면서 [가림] 라인에서 천천히 신중하게 움직이지 않은 것이 관찰됐다. 또한 [가림]이(가) 다시 쓰기 전에 부적절하게 세척됐다."
+    },
+    {
+     "number": "3",
+     "deficiency_ko": "설명되지 않은 불일치에 대한 조사를 서면 기록으로 남기지 않는다.",
+     "detail_ko": "구체적으로, 2021-03-13 이후 Hosur 무균 시설의 [가림] 시스템 일상 감시 중 Burkholderia cepacia가 열세 번 분리됐다. 품질 부서에 따르면 Burkholderia cepacia는 부적합 미생물로 간주되지 않으며, 그람음성 미생물인 Burkholderia cepacia가 [가림] 시스템에서 검출된 영향을 판단하는 조사는 수행되지 않았다. [가림]은(는) 무균의약품 무균 생산에 쓰는 충전 [가림]과 이송 탱크 같은 비전용 설비 세척에 쓰인다. 또한 [가림]은(는) [가림] 제조에 쓰는 원료다. 관찰 4: 허가에 정한 규격을 충족하지 못한 유통 배치에 관한 정보를 받은 뒤 3영업일 안에 현장 경보 보고서를 제출하지 않았다. 구체적으로, 회사는 미국에 유통된 [가림] 주사 현탁액 USP(배치 [가림])의 9개월 함량 안정성 시험에서 기준일탈(OOS) 불합격을 알게 된 뒤 3영업일 안에 현장 경보 보고서(FAR)를 제출하지 않았다. 조사 PR #3341427은 2023-11-25 시작됐다. 품질 책임자는 조사를 평가하고 현장 경보 보고서가 필요 없다고 판단했다. 그러나 [가림]단계 제조 조사가 시작됐고 2024-01-11에야 완료됐다."
+    },
+    {
+     "number": "5",
+     "deficiency_ko": "문서화된 시험 절차에서 벗어난 것이 정당화되지 않는다.",
+     "detail_ko": "구체적으로, 절차서 '세균 엔도톡신 시험' SOP-0005658 버전 13.0(시행 2024-03-20)은 [가림]하도록 정한다. 2024-05-13 [가림] 시료 엔도톡신 시험 중 실사관은 미생물 담당자가 시험관을 [가림]하지 않고 판독 중 시험관을 [가림]하는 등 문서화된 시험 절차를 따르지 않는 것을 관찰했고, 그 결과 이중 양성 제품 대조(PPC) 시료 두 개 중 하나가 음성으로 나와 시험이 무효화됐다. 회사는 무균 충전 의약품 제조에 쓰는 [가림]을(를) 엔도톡신에 대해 일상적으로 시험한다."
+    }
+   ]
+  },
+  "14bd157cfa5e": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.192",
+      "original": "1. Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). A. Deficient investigations into unexpected dissolution test results You failed to adequately investigate unexpected discrepancies. For example, your 2021 feasibility study showed a notable decrease in dissolution rate when excipients from new suppliers were used in the manufacture of (b)(4) tablets, USP. You also observed a notably lower initial dissolution result for (b)(4) tablets, USP, batch # (b)(4) , manufactured in July 2022 with excipients from new suppliers. Despite these quality signals, you did not initiate an investigation until you obtained out-of-specification (OOS) dissolution results during release testing in March 2025 for (b)(4) tablets, USP, batches # (b)(4) , and out-of-trend (OOT) dissolution results in March 2025 for batch # (b)(4) at the three-month stability interval. Your investigation for these batches concluded “batch to batch inconsistency for drug release and compression characteristics,” and the probable cause as differences in excipient characteristics from new suppliers evaluated in your 2021 feasibility study. Moreover, FDA tested and obtained failing dissolution results for your (b)(4) tablets, USP, batch # (b)(4) . Based on notification of this failure, you then analyzed reserve samples across multiple dosages and identified several batches that did not comply with the dissolution testing specification. You took market action in (b)(4) , including recalls, on (b)(4) batches of (b)(4) tablets manufactured from July 2024 to August 2025 for the U.S. market. However, the delay in initiating your investigation resulted in (b)(4) potentially impacted batches that remained on the market through their full (b)(4) shelf life.",
+      "description": "회사는 설명되지 않은 불일치나 배치 또는 그 구성 성분의 규격 불합격을, 배치가 이미 유통됐는지와 관계없이 철저히 조사하지 않았다(21 CFR 211.192). A. 예상하지 못한 용출 시험 결과에 대한 미흡한 조사. 회사는 예상하지 못한 불일치를 적절히 조사하지 않았다. 예를 들어, 회사의 2021년 타당성 시험에서 [가림] 정 USP 제조에 새 공급업체의 첨가제를 썼을 때 용출 속도가 눈에 띄게 낮아졌다. 회사는 또한 새 공급업체 첨가제로 2022년 7월 제조한 [가림] 정 USP 배치 # [가림]에서 눈에 띄게 낮은 초기 용출 결과를 관찰했다. 이런 품질 징후에도 회사는 2025년 3월 [가림] 정 USP 배치 # [가림]의 출하 시험에서 기준일탈(OOS) 용출 결과를, 2025년 3월 배치 # [가림]의 3개월 안정성 시점에서 경향이탈 결과 용출 결과를 얻을 때까지 조사를 시작하지 않았다. 이 배치들에 대한 조사는 '약물 방출과 압축 특성의 배치 간 불일치'로 결론 냈고, 추정 원인을 2021년 타당성 시험에서 평가한 새 공급업체 첨가제 특성의 차이로 보았다. 또한 FDA는 [가림] 정 USP 배치 # [가림]을(를) 시험해 용출 불합격 결과를 얻었다. 이 불합격을 통보받은 뒤 회사는 여러 함량의 보관 검체를 분석해 용출 시험 규격에 맞지 않는 배치 여러 개를 확인했다. 회사는 [가림]에 미국 시장용으로 2024년 7월부터 2025년 8월까지 제조한 [가림] 정 [가림] 배치에 대해 회수를 포함한 시장 조치를 했다. 그러나 조사 시작이 늦어져 영향을 받았을 수 있는 [가림] 배치가 전체 [가림] 유효기간 동안 시장에 남아 있었다.",
+      "risk": "영향을 받았을 수 있는 배치가 유효기간 내내 시장에 남아 있었다(위반 1)."
+     },
+     {
+      "citation": "21 CFR 211.100(a)",
+      "original": "2. Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)). The manufacturing process for (b)(4) tablets is not in a state of control. Since 2021, multiple batches of (b)(4) tablets, USP have failed dissolution specifications and were either rejected or recalled. For example, the tableting (b)(4) has not been thoroughly evaluated to determine the impact on finished drug product dissolution. The (b)(4) specification evolved without clear scientific justification from (b)(4) in your 2016 feasibility study to (b)(4) in an October 2023 batch record. Your August 2024 investigation cited “higher (b)(4) ” as the probable root cause of the dissolution failure and further revised the (b)(4) range to (b)(4) . This change in (b)(4) range was also not scientifically justified. Notably, in 2026, you classified (b)(4) as “non-critical” despite being previously identified as the root cause of the dissolution failure. In addition to (b)(4) tablets, USP, you also provided documentation regarding approximately (b)(4) additional tableted drug product formulations where the (b)(4) ranges were not scientifically justified. Your firm’s pattern of establishing or changing process parameters without adequate scientific justification indicates a deficient process validation program.",
+      "description": "회사는 제조하는 의약품이 표방하는 확인·함량·품질·순도를 갖추도록 설계된 생산·공정 관리용 문서화된 절차를 적절히 수립하지 않았다(21 CFR 211.100(a)). [가림] 정의 제조 공정은 관리 상태가 아니다. 2021년 이후 [가림] 정 USP 여러 배치가 용출 규격에 불합격해 부적합 처리되거나 회수됐다. 예를 들어, 타정 [가림]이(가) 완제의약품 용출에 주는 영향을 판단하도록 철저히 평가되지 않았다. [가림] 규격은 2016년 타당성 시험의 [가림]에서 2023년 10월 제조기록서의 [가림](으)로 명확한 과학적 근거 없이 바뀌었다. 2024년 8월 조사는 용출 불합격의 추정 근본원인으로 '높은 [가림]'을(를) 들고 [가림] 범위를 다시 [가림](으)로 바꿨다. 이 [가림] 범위 변경도 과학적 근거가 없었다. 특히 2026년에 회사는 앞서 용출 불합격의 근본원인으로 확인된 [가림]을(를) '비핵심'으로 분류했다. [가림] 정 USP 외에도 회사는 [가림] 범위에 과학적 근거가 없는 약 [가림]개의 다른 정제 처방에 관한 문서를 제출했다. 적절한 과학적 근거 없이 공정 변수를 정하거나 바꾸는 회사의 양상은 공정 밸리데이션 프로그램이 미흡함을 나타낸다.",
+      "risk": "2021년 이후 여러 배치가 용출 규격에 불합격해 부적합 처리되거나 회수됐다(위반 2)."
+     },
+     {
+      "citation": "21 CFR 211.67(b)",
+      "original": "3. Your firm failed to establish and follow adequate written procedures for cleaning and maintenance of equipment (21 CFR 211.67(b)). Your firm failed to ensure adequate oversight of your equipment maintenance program. For example, between January 2024 and April 2026, approximately (b)(4) machine parts, including (b)(4) were reported as damaged and removed for destruction, without an adequate system in place to assess the quality and safety impact on drug products manufactured using this unsuitable equipment. We also note that your (b)(4) system failed to (b)(4) contamination in your distributed drug product, based on a product complaint received in 2022. Although the batch was recalled, your investigation failed to evaluate whether the (b)(4) system could (b)(4) contamination of the complaint sample’s physical dimensions. This gap in your investigation indicates the known deficiency in your (b)(4) controls has not been fully remediated. Additionally, a (b)(4) dedicated to (b)(4) production, which was cleaned and stored on March 27, 2026, was found with rust-like discoloration on April 20, 2026, demonstrating inadequate post-cleaning inspection and failure to maintain equipment in a suitable state.",
+      "description": "회사는 설비 세척·유지관리에 관한 적절한 문서화된 절차를 수립·준수하지 않았다(21 CFR 211.67(b)). 회사는 설비 정비 프로그램을 적절히 감독하지 않았다. 예를 들어, 2024년 1월부터 2026년 4월까지 [가림] 등 약 [가림]개의 기계 부품이 손상으로 보고돼 폐기용으로 제거됐으나, 이 부적합 설비로 제조한 의약품의 품질·안전 영향을 평가하는 적절한 체계가 없었다. FDA는 또한 2022년 받은 제품 불만에 근거해 회사의 [가림] 시스템이 유통된 의약품의 오염을 [가림]하지 못했다고 적는다. 해당 배치는 회수됐지만, 조사는 [가림] 시스템이 불만 시료의 물리적 크기의 오염을 [가림]할 수 있는지 평가하지 않았다. 이 조사의 공백은 [가림] 관리의 알려진 결함이 완전히 시정되지 않았음을 나타낸다. 또한 2026-03-27 세척·보관한 [가림] 생산 전용 [가림]이(가) 2026-04-20 녹 같은 변색이 있는 채로 발견돼, 세척 후 점검이 미흡하고 설비를 적합한 상태로 유지하지 못했음을 나타낸다.",
+      "risk": "손상 부품으로 제조한 의약품의 품질·안전 영향을 평가하는 체계가 없었다(위반 3)."
+     }
+    ],
+    "fda_evaluation": "FDA는 2026-05-22 회신을 받아들이지 않았다. 회사는 해당 배치가 2025년 8월 6개월 시점에야 기준일탈에 이르렀고 새 공급업체 원료 특성 평가는 절차에 없던 공백이며 고쳤다고 답했으나, FDA는 시판 제품의 품질 경향을 찾고 조사하지 못한 점과 과거 평가의 소급 검토가 빠진 점을 들어 미흡하다고 판단했다(위반 1). 회사는 [가림] 규격이 과학 기반 시험이 아니라 과거 경향 자료에서 나왔다고 인정했고, FDA는 변경관리로 추가한 한도에 과학적 근거가 없다고 보았다(위반 2). 회사는 손상 설비 평가 절차를 개정했다고 답했으나 FDA는 부적합 설비 사용을 막는 감독과 [가림] 시스템의 적절성에 대한 보증이 없다고 보았다(위반 3).",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(CDER-OC-OMQ-Communications@fda.hhs.gov)",
+     "items": [
+      "최근 3년 미국 의약품의 모든 기준일탈 결과에 대한 소급·독립 검토와 보고서(위반 1)",
+      "기준일탈·경향이탈 결과 조사 체계의 종합 검토와 시정 계획(위반 1)",
+      "일탈·불일치·불만·기준일탈·불합격 조사 체계의 독립 평가와 시정 실행 계획(위반 1)",
+      "시정 및 예방조치(CAPA) 프로그램의 독립 평가와 시정 계획(위반 1)",
+      "원료·용기·마개 자재 시스템의 종합·독립 검토(위반 1)",
+      "시판 의약품별 공정 능력과 제품 품질 성과의 종합·독립 검토(위반 2)",
+      "제품 수명주기 관리 상태를 보증하는 밸리데이션 프로그램 요약과 공정 성능 적격성평가 일정(위반 2)",
+      "시설·설비에 대한 일상 운영 관리 감독의 시정 및 예방조치(CAPA) 계획(위반 3)",
+      "[가림] 정의 미국 시장용 제조 재개 의향 확인"
+     ]
+    },
+    "administrative_risks": "FDA는 위반이 완전히 해결될 때까지 이 회사를 제조소로 기재한 신규 신청이나 변경 신청의 승인을 보류할 수 있다고 적었다. FDA는 이 제조소에서 만든 제품의 미국 반입을 FD&C Act section 801(a)(3)에 따라 거부할 수 있다고 적었다. FDA는 시정 확인을 위해 재실사할 수 있다고 적었다."
+   },
+   "violations_ko": [
+    {
+     "number": "1",
+     "statement_ko": "회사는 배치가 이미 유통됐는지와 관계없이 설명되지 않은 불일치나 배치 또는 그 구성 성분의 규격 불합격을 철저히 조사하지 않았다 (21 CFR 211.192)."
+    },
+    {
+     "number": "2",
+     "statement_ko": "회사는 제조하는 의약품이 표방하는 확인(identity)·함량(strength)·품질(quality)·순도(purity)를 갖추도록 설계된 생산·공정 관리용 문서화된 절차를 적절히 수립하지 않았다 (21 CFR 211.100(a))."
+    },
+    {
+     "number": "3",
+     "statement_ko": "회사는 설비 세척·유지관리에 관한 적절한 문서화된 절차를 수립·준수하지 않았다 (21 CFR 211.67(b))."
+    }
+   ]
+  }
+ }
+}

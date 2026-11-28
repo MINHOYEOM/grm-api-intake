@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-28T06:21:28Z",
+ "generated_at": "2026-11-28T06:29:41Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -229,12 +229,34 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 46116161088,
+    "databaseId": 46116701232,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-28T06:27:41Z",
+    "updatedAt": "2026-11-28T06:27:45Z",
+    "headBranch": "claude/naver-blog-seo-1126-r2",
+    "displayTitle": "네이버 블로그 원고: 사이트 위성 글 + 규칙 점검 한 곳(겹침 25% 가드) (#1999 대체)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116701232"
+   },
+   {
+    "databaseId": 46116686635,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
+    "createdAt": "2026-11-28T06:27:30Z",
+    "updatedAt": "2026-11-28T06:27:34Z",
+    "headBranch": "claude/naver-blog-seo-1126-r2",
+    "displayTitle": "Merge origin/main into 블로그 위성 원고 (영문 골든 재동결)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116686635"
+   },
+   {
+    "databaseId": 46116161088,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
     "createdAt": "2026-11-28T06:20:42Z",
-    "updatedAt": "2026-11-28T06:21:01Z",
+    "updatedAt": "2026-11-28T06:29:14Z",
     "headBranch": "main",
     "displayTitle": "assets: 네이버 블로그 사이드바 위젯 배너 3장(용어사전·지적 찾아보기·구독) (#2024)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116161088"
@@ -260,28 +282,6 @@
     "headBranch": "automation/news-auto-46109959080",
     "displayTitle": "chore: refresh recent regulatory news",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46109996538"
-   },
-   {
-    "databaseId": 46102048199,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-28T03:16:26Z",
-    "updatedAt": "2026-11-28T03:25:48Z",
-    "headBranch": "automation/library-auto-46101598251",
-    "displayTitle": "chore: refresh live regulatory library",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46102048199"
-   },
-   {
-    "databaseId": 46097991239,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-28T02:25:23Z",
-    "updatedAt": "2026-11-28T02:34:24Z",
-    "headBranch": "automation/library-auto-46097572900",
-    "displayTitle": "chore: refresh live regulatory library",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46097991239"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -400,6 +400,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 46116818865,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-28T06:29:18Z",
+    "updatedAt": "2026-11-28T06:29:30Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/46116818865"
+   },
+   {
     "databaseId": 46116184755,
     "status": "completed",
     "conclusion": "success",
@@ -442,17 +453,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45947901480"
-   },
-   {
-    "databaseId": 45938101405,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-27T04:07:42Z",
-    "updatedAt": "2026-11-27T04:07:57Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/45938101405"
    }
   ],
   "grm-findings-translate-apply.yml": [

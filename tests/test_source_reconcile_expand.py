@@ -72,6 +72,7 @@ class SpecTest(unittest.TestCase):
             "eu_ncr": g.SOURCE_EU_GMP_NCR, "pics": g.SOURCE_PICS, "eca": g.SOURCE_ECA,
             "ispe": g.SOURCE_ISPE, "ich": g.SOURCE_ICH, "who_rss": g.SOURCE_WHO, "who_insp": g.SOURCE_WHO,
             "hc_recall": g.SOURCE_HC, "mfds_recall": g.SOURCE_MFDS, "mfds_admin": g.SOURCE_MFDS,
+            "mfds_gmp": g.SOURCE_MFDS,
         }
         self.assertEqual({s.key: s.source for s in sr.SPECS}, want)
 

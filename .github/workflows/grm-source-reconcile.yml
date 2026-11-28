@@ -100,6 +100,7 @@ jobs:
           ENABLE_FDA_483: ${{ vars.ENABLE_FDA_483 || 'true' }}
           ENABLE_MFDS_RECALL: ${{ vars.ENABLE_MFDS_RECALL || 'true' }}
           ENABLE_MFDS_ADMIN: ${{ vars.ENABLE_MFDS_ADMIN || 'true' }}
+          ENABLE_MFDS_GMP_INSPECTION: ${{ vars.ENABLE_MFDS_GMP_INSPECTION || 'true' }}
           ENABLE_ICH: ${{ vars.ENABLE_ICH || 'false' }}
           ENABLE_WHO: ${{ vars.ENABLE_WHO || 'false' }}
           ENABLE_HC: ${{ vars.ENABLE_HC || 'false' }}
@@ -126,7 +127,7 @@ jobs:
               src_args=()
               for t in "${TOKENS[@]}"; do
                 case "$t" in
-                  fda483|wl|recall|mfds_rss|fr|ema|mhra_blog|mhra_alert|mhra_ncr|eu_ncr|pics|eca|ispe|ich|who_rss|who_insp|hc_recall|mfds_recall|mfds_admin) src_args+=("$t") ;;
+                  fda483|wl|recall|mfds_rss|fr|ema|mhra_blog|mhra_alert|mhra_ncr|eu_ncr|pics|eca|ispe|ich|who_rss|who_insp|hc_recall|mfds_recall|mfds_admin|mfds_gmp) src_args+=("$t") ;;
                   *) echo "::error ::invalid source token"; exit 1 ;;
                 esac
               done

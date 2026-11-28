@@ -148,6 +148,9 @@ SPECS: tuple[SourceSpec, ...] = (
                flag="ENABLE_MFDS_RECALL", issue_name="MFDS 회수·판매중지"),
     SourceSpec("mfds_admin", "MFDS", "식약처 행정처분(API)", "mfds-admin", WINDOW_ENF,
                flag="ENABLE_MFDS_ADMIN", issue_name="MFDS 행정처분", ledger_from=LEDGER_EXPANSION_FROM),
+    # [수집 완전성 N1 2026-11-26] 식약처 GMP 실사(nedrug CCBBD03). 수집기와 같은 등록일 창(base).
+    SourceSpec("mfds_gmp", "MFDS", "식약처 GMP 실사(nedrug)", "mfds-gmp-inspection", WINDOW_BASE,
+               flag="ENABLE_MFDS_GMP_INSPECTION", issue_name="MFDS GMP 실사"),
 )
 SPEC_BY_KEY = {s.key: s for s in SPECS}
 
@@ -952,6 +955,70 @@ def fetch_mfds_admin(start: date, end: date) -> FetchOutcome:
                         title_fields=("ITEM_NAME", "ADM_DISPS_NAME", "ENTP_NAME"))
 
 
+GMP_LIST_DELAY_SECONDS = 1.0   # nedrug 쪽 사이 간격 — 수집기·재수집 CLI 와 같은 원천 예의
+
+
+def fetch_mfds_gmp_inspection(start: date, end: date, *, sleep: Callable[[float], None] | None = None
+                              ) -> FetchOutcome:
+    """식약처 GMP 실사 목록(nedrug CCBBD03) → 등록일 창 안 문서. **첨부는 받지 않는다**(목록 쪽만).
+
+    목록 요청·행 해석·창 판정·문서 키는 수집기 `collect_mfds_gmp_inspection` 의 함수 그대로다(키가 갈라지지
+    않게). 수집기의 의료용 가스 제외 규칙(`_is_medical_gas_gmp_noise`)은 제외 장부에 연결돼 있지 않아
+    여기서도 같은 함수로 뺀다 — 빼지 않으면 의도적 제외가 매일 놓침으로 찍힌다. nedrug 는 해외 IP 를
+    막으므로 `MFDS_HTTP_PROXY`(KR egress)가 있어야 한다(수집기 `_get_bytes` 가 그대로 태운다)."""
+    import time as _time
+
+    import collect_mfds_gmp_inspection as g
+    sleep = sleep or _time.sleep
+    docs: list[SourceDoc] = []
+    notes: list[str] = []
+    excluded = 0
+    page_no = 1
+    partial = False
+    while page_no <= g.MAX_PAGES:
+        if page_no > 1:
+            sleep(GMP_LIST_DELAY_SECONDS)
+        try:
+            html_text = g._get_bytes(g._request_url(page_no), timeout=30,
+                                     accept="text/html,application/xhtml+xml").decode("utf-8", errors="replace")
+        except Exception as exc:  # noqa: BLE001
+            if not docs and page_no == 1:
+                raise SourceFetchError(safe_error(exc)) from None
+            partial = True
+            notes.append(f"쪽 {page_no} 실패 — 목록이 전수가 아니다: {safe_error(exc)}")
+            break
+        rows = g._parse_rows(html_text)
+        if not rows:
+            if page_no == 1:
+                raise SourceFetchError("GMP 실사 목록 행 0건 — 구조 변경 의심")
+            break
+        page_dates: list[str] = []
+        for raw in rows:
+            date_iso = g._parse_date(raw.get("registered_date", ""))
+            if date_iso:
+                page_dates.append(date_iso)
+            if not in_window(date_iso, start, end):
+                continue
+            if g._is_medical_gas_gmp_noise(raw):
+                excluded += 1
+                continue
+            doc_id = raw.get("doc_id", "").strip()
+            if not doc_id:
+                continue
+            docs.append(SourceDoc(document_id=f"gmpinspect-{doc_id}", url=g._download_url(doc_id),
+                                  title=f"[GMP실사] {raw.get('manufacturer', '').strip()}",
+                                  published=date_iso))
+        if page_dates and max(page_dates) < start.isoformat():
+            break
+        page_no += 1
+    else:
+        partial = True
+        notes.append(f"쪽 상한({g.MAX_PAGES}) 도달 — 창 시작일까지 못 내려갔다")
+    if excluded:
+        notes.append(f"의료용 가스 제외 규칙 {excluded}건(수집기와 같은 함수)")
+    return FetchOutcome(docs=_dedupe(docs), partial=partial, notes=notes)
+
+
 FETCHERS: dict[str, Callable[[date, date], FetchOutcome]] = {
     "fda483": fetch_fda483, "wl": fetch_wl, "recall": fetch_recall,
     "mfds_rss": fetch_mfds_rss, "fr": fetch_fr,
@@ -961,6 +1028,7 @@ FETCHERS: dict[str, Callable[[date, date], FetchOutcome]] = {
     "mhra_ncr": fetch_mhra_gmp_ncr, "eu_ncr": fetch_eu_gmp_ncr,
     "ich": fetch_ich, "who_rss": fetch_who_rss, "who_insp": fetch_who_inspections,
     "hc_recall": fetch_hc_recall, "mfds_recall": fetch_mfds_recall, "mfds_admin": fetch_mfds_admin,
+    "mfds_gmp": fetch_mfds_gmp_inspection,
 }
 
 

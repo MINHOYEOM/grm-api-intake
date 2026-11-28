@@ -31,6 +31,7 @@ import argparse
 import json
 import re
 import sys
+from functools import partial
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable
 
@@ -102,10 +103,21 @@ def plan_row(row: dict[str, Any], *, names: list[str] | None = None, absent_reas
     return new, ""
 
 
+def make_replacer(base_url: str, service_key: str, post: Callable[..., Any] | None = None) -> Callable[..., Any]:
+    """실제 `raw_versioning.replace_raw(base_url, service_key, row, new_raw, ...)` 에 접속 정보를 묶는다.
+
+    run() 은 (row, new, **kw) 로만 부른다. 접속 정보를 안 묶으면 apply 첫 호출이 TypeError 로 죽는다.
+    """
+    import raw_versioning as rv
+    return partial(rv.replace_raw, base_url, service_key, post=post) if post else partial(rv.replace_raw, base_url, service_key)
+
+
 def run(rows: list[dict[str, Any]], *, from_findings: dict[str, list[list[str]]],
         names_input: dict[str, Any], absent_input: dict[str, str], at: str,
         apply: bool = False, replacer: Callable[..., Any] | None = None,
         findings_patcher: Callable[..., tuple[int, str]] | None = None) -> Report:
+    if apply and replacer is None:
+        raise ValueError("apply 에는 replacer(make_replacer) 가 필요하다")
     rep = Report(mode="apply" if apply else "dry-run")
     by_doc = {str(r.get("document_id") or ""): r for r in rows}
     asked = list(dict.fromkeys([*from_findings, *names_input, *absent_input]))
@@ -157,7 +169,7 @@ def run(rows: list[dict[str, Any]], *, from_findings: dict[str, list[list[str]]]
         import raw_versioning as rv
         diff = {"source": CHECK_METHOD, "action": line["action"], "names": line["names"]}
         try:
-            res = (replacer or rv.replace_raw)(row, new, change_kind="repair",
+            res = replacer(row, new, change_kind="repair",
                                                changed_by=rv.run_label(CHANGED_BY), diff_summary=diff)
         except rv.ApplyVersionError as exc:
             line["reason"] = exc.status
@@ -258,7 +270,8 @@ def main(argv: list[str] | None = None) -> int:
     from_findings = {d: sets.get(rid_by_doc.get(d, ""), []) for d in ff_docs}
     patcher = (lambda rid, names: fb.patch_empty_findings(base, key, rid, names)) if args.apply else None
     rep = run(rows, from_findings=from_findings, names_input=names_input, absent_input=absent_input,
-              at=args.at, apply=args.apply, findings_patcher=patcher)
+              at=args.at, apply=args.apply, findings_patcher=patcher,
+              replacer=make_replacer(base, key) if args.apply else None)
     if args.report:
         with open(args.report, "w", encoding="utf-8") as fh:
             json.dump(asdict(rep), fh, ensure_ascii=False, indent=2)

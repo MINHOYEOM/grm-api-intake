@@ -95,6 +95,7 @@ CRON_AUDIT: dict[str, tuple[str, str]] = {
     "grm-rum-analytics.yml": ("A", "RUM 은 8일 재수집하지만 collect_newsletter_subscribers.py 는 KST 당일 구독자 수만 기록한다."),
     "grm-stranded-batch-pr.yml": ("A", "미머지 번역 배치로 생긴 적재 공백과 월요일 링크드인 초안 PR 정체를 해소한다."),
     # B — 다음 실행에서 이전 작업분을 포함하거나 최신 상태로 다시 만든다.
+    "grm-completeness-refill.yml": ("B", "매시 회차가 직전 상태의 남은 번호를 이어 받아 다시 대조·재수집한다."),
     "grm-deficiency-examples.yml": ("B", "날짜 증분 대신 SOURCES 원본을 다시 읽어 멱등 적재한다."),
     "grm-fda-citations-snapshot.yml": ("B", "원장에서 공개 조항 JSON 전체를 재산출한다."),
     "grm-fda-citations.yml": ("B", "활성 상태의 다음 월간 실행이 최근 7개 회계연도 전량을 다시 upsert 한다."),

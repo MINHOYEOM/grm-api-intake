@@ -105,6 +105,23 @@ class EvaluateBacklogTest(unittest.TestCase):
 
 
 class RunMonitorTest(unittest.TestCase):
+    def test_missing_stats_cannot_confirm_recovery(self):
+        with mock.patch.object(mon.requests, "post", return_value=_FakePostResponse(200, {})):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "error")
+        self.assertFalse(report["backlog_checked"])
+
+    def test_valid_backlog_counts_survive_auxiliary_rpc_error(self):
+        with mock.patch.object(mon.requests, "post", side_effect=[
+            _FakePostResponse(200, _stats(27845, 27545, needs_review=266)),
+            _FakePostResponse(404),
+        ]):
+            report = mon.run_monitor(_BASE_URL, _SERVICE_KEY)
+        self.assertEqual(report["status"], "error")
+        self.assertTrue(report["backlog_checked"])
+        self.assertEqual(report["untranslated_gap"], 300)
+        self.assertEqual(report["breaches"], [])
+
     def test_happy_path_reads_stats_and_reports(self):
         payload = _stats(11548, 9187, needs_review=181, rejected=52)
         # run_monitor 는 RPC 3개를 순서대로 부른다: findings_stats → extraction_gap_by_source

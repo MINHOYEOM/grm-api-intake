@@ -382,12 +382,18 @@ class EvaluateHealthInfoAndWarningTest(unittest.TestCase):
 
     def test_gmp_manual_review_is_warning_with_count(self) -> None:
         stats = ci.CollectionStats()
-        stats.mfds_gmp_inspection_manual_review = 2
+        stats.mfds_gmp_inspection_manual_review = 1
+        stats.mfds_gmp_inspection_unreadable_tables = 1
+        stats.mfds_gmp_inspection_parse_status = {"pdf-ok": 2}
         health = ci._evaluate_health(**_health_kwargs(
             stats=stats, enable_mfds_gmp_inspection=True))
         warning = next(w for w in health.warnings
                        if w.code == "gmp-attachment-manual-review")
-        self.assertIn("2건", warning.message)
+        self.assertIn("1건", warning.message)
+        self.assertIn("결함표 판독 불명 1건", warning.detail)
+        self.assertIn("기타 첨부 수동 확인 0건", warning.detail)
+        self.assertIn("'pdf-ok': 2", warning.detail)
+        self.assertEqual(health.exit_code, 0)
 
     def test_modality_preflight_degraded_is_warning(self) -> None:
         health = ci._evaluate_health(**_health_kwargs(

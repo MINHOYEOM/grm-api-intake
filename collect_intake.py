@@ -702,6 +702,7 @@ class CollectionStats:
     mfds_gmp_inspection_parse_status: dict[str, int] = field(default_factory=dict)
     mfds_gmp_inspection_deficiency: dict[str, int] = field(default_factory=dict)
     mfds_gmp_inspection_manual_review: int = 0
+    mfds_gmp_inspection_unreadable_tables: int = 0
     mfds_gmp_inspection_page_warnings: list[str] = field(default_factory=list)
     # [상세보기 결정론 승격 2026-07-02] 지적 표 추출 관측 — collect_mfds_gmp_inspection.LAST_HEALTH
     # ["deficiency_table"] 집계분(WHOPIR excerpt health 동형). 실패/degrade 는 warning 표면화용.
@@ -4801,6 +4802,10 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         stats.mfds_gmp_inspection_parse_status = dict(gmp_health.get("parse_status_counts") or {})
         stats.mfds_gmp_inspection_deficiency = dict(gmp_health.get("deficiency_counts") or {})
         stats.mfds_gmp_inspection_manual_review = int(gmp_health.get("manual_review_count") or 0)
+        stats.mfds_gmp_inspection_unreadable_tables = sum(
+            item.raw_payload.get("gmp_deficiency_table_status") == "unreadable"
+            for item in mfds_gmp_inspection_items
+        )
         stats.mfds_gmp_inspection_page_warnings = list(gmp_health.get("page_warnings") or [])
         # [상세보기 결정론 승격 2026-07-02] 지적 표 추출 관측(degrade 는 요약카드 유지 — 비차단).
         deficiency_table_health = gmp_health.get("deficiency_table") or {}

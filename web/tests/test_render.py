@@ -29,6 +29,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 from markupsafe import escape as _esc
 
@@ -240,6 +241,15 @@ def fnd_results_block(html: str) -> str:
     start = html.index('id="fnd-results" class="fnd-results">')
     end = html.index('<nav class="fnd-pager" id="fnd-pager-bottom"', start)
     return html[start:end]
+
+
+def _render_brief_test_site(data: pathlib.Path, out: pathlib.Path, *,
+                            glossary_terms: list[dict] | None = None) -> None:
+    """Build brief test sites without unrelated findings and glossary corpora."""
+    with (mock.patch.object(render, "load_findings_docs", return_value=None),
+          mock.patch.object(render, "load_findings_facets", return_value=None),
+          mock.patch.object(render, "load_glossary", return_value=glossary_terms)):
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
 
 
 def _build_single(out: pathlib.Path, *, doc_pages: bool = _DOC_PAGES_IN_TESTS) -> None:
@@ -8168,21 +8178,41 @@ def _minimal_brief(pub: str, *, card: dict | None = None, ai_disclosure: bool = 
 
 
 class WebRenderHardeningTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        tmp = tempfile.TemporaryDirectory(prefix="grmweb_h_shared_")
+        cls.addClassCleanup(tmp.cleanup)
+        root = pathlib.Path(tmp.name)
+        with mock.patch.object(render, "NEWSLETTER_FORM_ACTION",
+                               "https://newsletter.example.com/subscribe"):
+            cls.newsletter_june05 = cls._build_site(root / "june05", [_minimal_brief("2026-06-05")])
+            cls.newsletter_june06 = cls._build_site(root / "june06", [_minimal_brief("2026-06-06")])
+
     def setUp(self):
-        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_h_"))
+        tmp = tempfile.TemporaryDirectory(prefix="grmweb_h_")
+        self.addCleanup(tmp.cleanup)
+        self.tmp = pathlib.Path(tmp.name)
 
-    def tearDown(self):
-        shutil.rmtree(self.tmp, ignore_errors=True)
-
-    def _render_site(self, briefs: list[dict]) -> pathlib.Path:
-        data, out = self.tmp / "data", self.tmp / "out"
-        data.mkdir(parents=True, exist_ok=True)
+    @staticmethod
+    def _build_site(tmp: pathlib.Path, briefs: list[dict], *,
+                    keep_findings: bool = False) -> pathlib.Path:
+        data, out = tmp / "data", tmp / "out"
+        data.mkdir(parents=True)
         for br in briefs:
             pub = br["brief"]["publish_date"]
             (data / f"brief_web_{pub}.json").write_text(
                 json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+        if keep_findings:
+            render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+        else:
+            # Keep the findings shell and a glossary term page for the newsletter checks.
+            terms = (render.load_glossary() or [])[:1]
+            _render_brief_test_site(data, out, glossary_terms=terms)
         return out
+
+    def _render_site(self, briefs: list[dict], *, keep_findings: bool = False) -> pathlib.Path:
+        tmp = pathlib.Path(tempfile.mkdtemp(dir=self.tmp))
+        return self._build_site(tmp, briefs, keep_findings=keep_findings)
 
     def _render_detail(self, brief: dict) -> str:
         out = self._render_site([brief])
@@ -8537,7 +8567,8 @@ class WebRenderHardeningTest(unittest.TestCase):
             render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = ko_action, ""
             only_ko = (self._render_site([_minimal_brief("2026-06-09")]) / "glossary/index.html").read_text(encoding="utf-8")
             render.NEWSLETTER_FORM_ACTION_EN = en_action
-            out = self._render_site([_minimal_brief("2026-06-10")])
+            # The English findings document listing needs the real document corpus.
+            out = self._render_site([_minimal_brief("2026-06-10")], keep_findings=True)
         finally:
             render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = a0, e0
         self.assertIn('class="subscribe"', only_ko)
@@ -8571,13 +8602,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         구역을 스스로 판단하지 않는다). render_site() 전체 파이프라인으로 실제 페이지를
         지어, 판정이 나뉘는 두 자리(밴드·배너)를 각각 직접 본다 — 하나만 고치고 다른 자리를
         놓치는 사고(과거 판정 2곳 결함 사례, #1054/#1056)를 막는다."""
-        a0 = render.NEWSLETTER_FORM_ACTION
-        try:
-            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
-            out = self._render_site([_minimal_brief("2026-06-05")])
-        finally:
-            render.NEWSLETTER_FORM_ACTION = a0
-
+        out = self.newsletter_june05
         home = (out / "index.html").read_text(encoding="utf-8")               # nav_active=home
         archive = (out / "archive/index.html").read_text(encoding="utf-8")    # 기본 구역(하단 밴드가 있는 화면)
         glossary = (out / "glossary/index.html").read_text(encoding="utf-8")  # nav_active=glossary
@@ -8630,12 +8655,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         """[마케팅 2026-09-28] 용어사전 구역의 제안(용어집 PDF)이 폼이 켜진 빌드에서 실제로
         나가는지 — 밴드 성공 문구·배너 성공 문구가 PDF 로 가는 길을 말하고, 색인 상단 카드가
         밴드 폼으로 이어지며, 도착 페이지(/welcome/)에는 구독 권유가 하나도 없다."""
-        a0 = render.NEWSLETTER_FORM_ACTION
-        try:
-            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
-            out = self._render_site([_minimal_brief("2026-06-05")])
-        finally:
-            render.NEWSLETTER_FORM_ACTION = a0
+        out = self.newsletter_june05
         index = (out / "glossary/index.html").read_text(encoding="utf-8")
         term = next((out / "glossary").glob("*/index.html")).read_text(encoding="utf-8")
         home = (out / "index.html").read_text(encoding="utf-8")
@@ -8662,14 +8682,9 @@ class WebRenderHardeningTest(unittest.TestCase):
         """[2026-11-15 대표 신고] '무료 구독'(#subscribe)을 눌러도 아무 일이 없어 보였다 — 밴드가 링크
         바로 아래라 스크롤이 거의 안 움직이고, 이미 구독한 브라우저는 밴드가 숨어 링크가 빈 곳을 가리켰다.
         밴드가 있으면 이메일 칸에 커서+강조, 숨었으면 링크를 감춘다(hidden 속성 말고 style)."""
-        a0 = render.NEWSLETTER_FORM_ACTION
-        try:
-            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
-            out = self._render_site([_minimal_brief("2026-06-06")])
-            html = (out / "archive/index.html").read_text(encoding="utf-8")
-            brief = (out / "briefs/2026-06-06/index.html").read_text(encoding="utf-8")
-        finally:
-            render.NEWSLETTER_FORM_ACTION = a0
+        out = self.newsletter_june06
+        html = (out / "archive/index.html").read_text(encoding="utf-8")
+        brief = (out / "briefs/2026-06-06/index.html").read_text(encoding="utf-8")
         i = html.index("a[href=\"#subscribe\"]")
         js = html[i:html.index("</script>", i)]
         self.assertIn("input[type=email]", js)
@@ -8690,12 +8705,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         밴드는 안 그랬다 — 이미 구독한 방문자도 다음 페이지에서 빈 폼을 또 만난다(이중
         요청). 같은 감사에서 나온 나머지 두 결함(배너 모바일 탭 크기·확인메일 발신자
         미표기)도 함께 잰다."""
-        a0 = render.NEWSLETTER_FORM_ACTION
-        try:
-            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
-            html = (self._render_site([_minimal_brief("2026-06-06")]) / "archive/index.html").read_text(encoding="utf-8")
-        finally:
-            render.NEWSLETTER_FORM_ACTION = a0
+        html = (self.newsletter_june06 / "archive/index.html").read_text(encoding="utf-8")
 
         # 밴드 스크립트 — 구독 완료 확인(grm-sub-ok)이 폼 가로채기 배선보다 먼저 나와야
         # 한다(index order) — 늦으면 이미 구독한 방문자도 빈 폼을 계속 본다.
@@ -15648,11 +15658,11 @@ class WebNewSourceRenderTest(unittest.TestCase):
     앵커 점프 정상 — 사이트 JS 가 getElementById 경로만 쓴다).
     """
 
-    def setUp(self):
-        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_ncr_"))
-
-    def tearDown(self):
-        shutil.rmtree(self.tmp, ignore_errors=True)
+    @classmethod
+    def setUpClass(cls):
+        tmp = tempfile.TemporaryDirectory(prefix="grmweb_ncr_shared_")
+        cls.addClassCleanup(tmp.cleanup)
+        cls.out, cls.html = cls._build_site(pathlib.Path(tmp.name), cls._brief())
 
     # 실 수집기 산출 형태를 그대로 본뜬 최소 카드(값은 합성이나 키·타입은 동형).
     EU_DETAIL = {
@@ -15675,21 +15685,22 @@ class WebNewSourceRenderTest(unittest.TestCase):
     }
     MHRA_ID = "Insp GMP 52165/19076958-0001"
 
-    def _brief(self):
+    @classmethod
+    def _brief(cls):
         eu = _card(0, id="186143", agency="EMA", card_type="EU GMP 비준수",
                    type_tag="GMP 비준수", group_label="💊 합성의약품",
                    evidence_level="A", signal_tier=3, signal_label="High",
                    headline_target="Sichuan New Hawk Biotechnology Co. Ltd.",
                    title_issue="원료의약품 GMP 비준수", summary="EU NCR 요약.",
                    key_facts=["a"], implication="시사점.", checks=["점검"],
-                   deterministic_detail=self.EU_DETAIL)
-        uk = _card(1, id=self.MHRA_ID, agency="MHRA", card_type="UK GMP 비준수",
+                   deterministic_detail=cls.EU_DETAIL)
+        uk = _card(1, id=cls.MHRA_ID, agency="MHRA", card_type="UK GMP 비준수",
                    type_tag="GMP 비준수", group_label="🧬 바이오의약품",
                    evidence_level="A", signal_tier=3, signal_label="High",
                    headline_target="Geno Pharmaceuticals Private Limited",
                    title_issue="무균 공정 GMP 비준수", summary="UK NCR 요약.",
                    key_facts=["a"], implication="시사점.", checks=["점검"],
-                   deterministic_detail=self.MHRA_DETAIL)
+                   deterministic_detail=cls.MHRA_DETAIL)
         ispe = _card(2, id="b10549ee6d97", agency="ISPE", card_type="규제 소식",
                      type_tag="News", group_label="▫️ 기타",
                      evidence_level="B", signal_tier=2, signal_label="Med",
@@ -15702,18 +15713,23 @@ class WebNewSourceRenderTest(unittest.TestCase):
         br["brief"]["agencies"] = ["EMA", "MHRA", "ISPE"]
         return br
 
-    def _render(self):
-        data, out = self.tmp / "data", self.tmp / "out"
-        data.mkdir(parents=True, exist_ok=True)
-        br = self._brief()
+    @staticmethod
+    def _build_site(tmp, br):
+        data, out = tmp / "data", tmp / "out"
+        data.mkdir()
         (data / "brief_web_2026-07-27.json").write_text(
             json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+        _render_brief_test_site(data, out)
         return out, (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+
+    def _render_variant(self, br):
+        with tempfile.TemporaryDirectory(prefix="grmweb_ncr_") as tmp:
+            _, html = self._build_site(pathlib.Path(tmp), br)
+        return html
 
     def test_eu_gmp_ncr_detail_block_rendered_verbatim(self):
         """EU NCR 상세 분기가 실제로 그려지고 원문이 절단·유실 없이 실린다."""
-        _, html = self._render()
+        html = self.html
         self.assertIn("비준수 상세", html)
         self.assertIn("EudraGMDP", html)
         self.assertIn("발행 NCA · Austria", html)
@@ -15726,7 +15742,7 @@ class WebNewSourceRenderTest(unittest.TestCase):
 
     def test_mhra_gmp_ncr_detail_block_rendered_with_mhra_label(self):
         """UK NCR 은 EU 와 동형이되 출처 라벨이 MHRA 여야 한다(분기 뒤바뀜 방지)."""
-        _, html = self._render()
+        html = self.html
         self.assertIn("발행기관 · MHRA", html)
         self.assertIn("원문 · MHRA", html)
         for key in ("operations", "nature", "action", "additional"):
@@ -15735,14 +15751,14 @@ class WebNewSourceRenderTest(unittest.TestCase):
 
     def test_ispe_card_renders_as_news(self):
         """ISPE 는 결정론 상세가 없는 소식 카드 — 상세 블록 없이도 정상 렌더된다."""
-        _, html = self._render()
+        html = self.html
         self.assertIn("ISPE iSpeak", html)
         self.assertIn("ISPE 블로그 요약.", html)
 
     def test_mhra_card_id_with_space_keeps_anchor_consistent(self):
         """공백·슬래시가 든 document_id 도 렌더를 깨뜨리지 않고
         article id·search-index href 가 **같은 값**으로 일치한다(드리프트 0)."""
-        out, html = self._render()
+        out, html = self.out, self.html
         self.assertIn(f'id="{self.MHRA_ID}"', html,
                       "MHRA 카드의 상세 앵커가 document_id 와 다르다")
         idx = json.loads((out / "assets" / "search-index.json").read_text(encoding="utf-8"))
@@ -15756,16 +15772,11 @@ class WebNewSourceRenderTest(unittest.TestCase):
         """[OCR 출처 표기 2026-07-27] 판독물을 "원문 · FDA 483" 이라고 부르지 않는다."""
         obs = [{"number": "1", "deficiency": "Aseptic failure.", "detail": "Specifically, x.",
                 "deficiency_ko": "무균 실패.", "detail_ko": "구체적으로, x."}]
-        data, out = self.tmp / "data", self.tmp / "out"
-        data.mkdir(parents=True, exist_ok=True)
         br = self._brief()
         br["cards"][0]["deterministic_detail"] = {
             "type": "fda_483_observations", "count": 1, "observations": obs,
             "text_source": "ocr"}
-        (data / "brief_web_2026-07-27.json").write_text(
-            json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
-        html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+        html = self._render_variant(br)
         self.assertIn("원문 · FDA 483 · OCR 판독", html)
         self.assertIn("스캔 원문 OCR 판독", html)
         self.assertIn("기계 판독(OCR)으로 옮겼다", html)
@@ -15774,21 +15785,16 @@ class WebNewSourceRenderTest(unittest.TestCase):
         """텍스트층 산출 카드는 종전 라벨 그대로 — 골든 불변(additive)."""
         obs = [{"number": "1", "deficiency": "Aseptic failure.", "detail": "",
                 "deficiency_ko": "무균 실패."}]
-        data, out = self.tmp / "data", self.tmp / "out"
-        data.mkdir(parents=True, exist_ok=True)
         br = self._brief()
         br["cards"][0]["deterministic_detail"] = {
             "type": "fda_483_observations", "count": 1, "observations": obs}
-        (data / "brief_web_2026-07-27.json").write_text(
-            json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
-        html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+        html = self._render_variant(br)
         self.assertIn("원문 · FDA 483", html)
         self.assertNotIn("OCR 판독", html)
 
     def test_ncr_detail_without_ko_stays_english_only(self):
         """`*_ko` 미보유 카드는 국문 블록이 아예 안 나온다(additive — 기존 발행분 불변)."""
-        _, html = self._render()
+        html = self.html
         self.assertNotIn("국문 해석", html)
 
     def test_ncr_detail_renders_korean_alongside_original(self):
@@ -15804,15 +15810,10 @@ class WebNewSourceRenderTest(unittest.TestCase):
             "additional_ko": "시정 후 재실사를 요청할 수 있다.",
         }
         mhra_ko = {"nature_ko": "A등급 충전구역 무균조건 유지 실패."}
-        data, out = self.tmp / "data", self.tmp / "out"
-        data.mkdir(parents=True, exist_ok=True)
         br = self._brief()
         br["cards"][0]["deterministic_detail"] = {**self.EU_DETAIL, **eu_ko}
         br["cards"][1]["deterministic_detail"] = {**self.MHRA_DETAIL, **mhra_ko}
-        (data / "brief_web_2026-07-27.json").write_text(
-            json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
-        html = (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+        html = self._render_variant(br)
         for ko in list(eu_ko.values()) + list(mhra_ko.values()):
             self.assertIn(ko, html, f"국문 번역이 렌더에서 빠졌다: {ko!r}")
         # 원문은 그대로 남아 있어야 한다 — 국문이 원문을 밀어내면 근거가 사라진다.
@@ -15836,14 +15837,9 @@ class WebNewSourceRenderTest(unittest.TestCase):
     }
 
     def _render_whopir(self, detail):
-        data, out = self.tmp / "data", self.tmp / "out"
-        data.mkdir(parents=True, exist_ok=True)
         br = self._brief()
         br["cards"][0]["deterministic_detail"] = detail
-        (data / "brief_web_2026-07-27.json").write_text(
-            json.dumps(br, ensure_ascii=False), encoding="utf-8")
-        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
-        return (out / "briefs" / "2026-07-27" / "index.html").read_text(encoding="utf-8")
+        return self._render_variant(br)
 
     def test_whopir_report_block_renders_outcome_and_sections(self):
         """종전엔 링크와 excerpt 뿐이라 보고서 구조가 통째로 유실됐다(2026-07-27 지적)."""
@@ -15907,7 +15903,7 @@ class WebNewSourceRenderTest(unittest.TestCase):
 
     def test_new_sources_reach_search_index(self):
         """세 소스 전부 검색 인덱스에 편입된다(발행은 됐는데 검색에서 사라지는 것 방지)."""
-        out, _ = self._render()
+        out = self.out
         idx = json.loads((out / "assets" / "search-index.json").read_text(encoding="utf-8"))
         rows = idx["cards"] if isinstance(idx, dict) and "cards" in idx else idx
         types = {r.get("card_type") for r in rows}
@@ -17976,6 +17972,12 @@ class WebEnBriefTest(unittest.TestCase):
     생기지 않는다는 두 방향을 모두 고정한다.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        tmp = tempfile.TemporaryDirectory(prefix="grmweb_enbrief_shared_")
+        cls.addClassCleanup(tmp.cleanup)
+        cls.out = cls._build_site(pathlib.Path(tmp.name), cls._brief())
+
     @staticmethod
     def _brief(pub="2026-06-01", *, en=True, invented=False):
         card = {
@@ -18015,14 +18017,19 @@ class WebEnBriefTest(unittest.TestCase):
         return {"schema": "grm-web-card/v1", "brief": meta, "cards": [card]}
 
     def _build(self, brief):
-        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enbrief_"))
+        tmp = tempfile.TemporaryDirectory(prefix="grmweb_enbrief_")
+        self.addCleanup(tmp.cleanup)
+        return self._build_site(pathlib.Path(tmp.name), brief)
+
+    @staticmethod
+    def _build_site(tmp, brief):
         data = tmp / "data"
         data.mkdir(parents=True)
         (data / f"brief_web_{brief['brief']['publish_date']}.json").write_text(
             json.dumps(brief, ensure_ascii=False), encoding="utf-8")
         out = tmp / "site"
-        render.render_site(data, out, render_doc_pages=False)
-        return tmp, out
+        _render_brief_test_site(data, out)
+        return out
 
     # ── 슬롯 판정 ────────────────────────────────────────────────────────────
     def test_card_needs_all_five_narrative_fields(self):
@@ -18049,29 +18056,26 @@ class WebEnBriefTest(unittest.TestCase):
 
     # ── 렌더 ────────────────────────────────────────────────────────────────
     def test_english_brief_and_archive_appear_when_the_data_is_there(self):
-        tmp, out = self._build(self._brief())
-        try:
-            page = out / "en" / "briefs" / "2026-06-01" / "index.html"
-            self.assertTrue(page.is_file(), "영문 브리프가 렌더되지 않았다")
-            html = page.read_text(encoding="utf-8")
-            self.assertIn('<html lang="en">', html)
-            self.assertIn("Critical cleaning validation deficiency", html)
-            self.assertIn("1 critical and 8 major deficiencies", html)
-            self.assertIn("GMP non-compliance", html, "카드 종류 라벨이 한국어다")
-            self.assertIn("<span>Small molecule</span>", html, "제형 라벨이 한국어다")
-            self.assertNotIn("💊", html)
-            self.assertIn("Published", html, "표 라벨이 한국어다")
-            for gone in ("세척 밸리데이션 중대결함", "중대결함 1건과", "GMP 비준수"):
-                self.assertNotIn(gone, html, f"영문 브리프에 한국어 잔존: {gone}")
-            # 앵커는 원본 값 그대로 — 두 언어판의 딥링크가 갈라지면 안 된다.
-            ko = (out / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
-            self.assertIn('id="sec-글로벌"', ko)
-            self.assertIn('id="sec-글로벌"', html)
-            archive = out / "en" / "archive" / "index.html"
-            self.assertTrue(archive.is_file(), "영문 아카이브가 없다")
-            self.assertIn("2026-06-01", archive.read_text(encoding="utf-8"))
-        finally:
-            shutil.rmtree(tmp, ignore_errors=True)
+        out = self.out
+        page = out / "en" / "briefs" / "2026-06-01" / "index.html"
+        self.assertTrue(page.is_file(), "영문 브리프가 렌더되지 않았다")
+        html = page.read_text(encoding="utf-8")
+        self.assertIn('<html lang="en">', html)
+        self.assertIn("Critical cleaning validation deficiency", html)
+        self.assertIn("1 critical and 8 major deficiencies", html)
+        self.assertIn("GMP non-compliance", html, "카드 종류 라벨이 한국어다")
+        self.assertIn("<span>Small molecule</span>", html, "제형 라벨이 한국어다")
+        self.assertNotIn("💊", html)
+        self.assertIn("Published", html, "표 라벨이 한국어다")
+        for gone in ("세척 밸리데이션 중대결함", "중대결함 1건과", "GMP 비준수"):
+            self.assertNotIn(gone, html, f"영문 브리프에 한국어 잔존: {gone}")
+        # 앵커는 원본 값 그대로 — 두 언어판의 딥링크가 갈라지면 안 된다.
+        ko = (out / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="sec-글로벌"', ko)
+        self.assertIn('id="sec-글로벌"', html)
+        archive = out / "en" / "archive" / "index.html"
+        self.assertTrue(archive.is_file(), "영문 아카이브가 없다")
+        self.assertIn("2026-06-01", archive.read_text(encoding="utf-8"))
 
     def test_english_archive_and_tldr_never_fall_back_to_korean(self):
         """★제목·요약은 **영어로 다시 만든다** — 한국어 행을 거르기만 하면 안 된다.
@@ -18080,34 +18084,28 @@ class WebEnBriefTest(unittest.TestCase):
         `brief.en.tldr` 을 안 보면 영어 화면에 한국어 제목이 그대로 실린다 — 화면 전체가
         영어인데 제목만 한국어면 "번역이 덜 됐다"로 읽힌다.
         """
-        tmp, out = self._build(self._brief())
-        try:
-            archive = (out / "en" / "archive" / "index.html").read_text(encoding="utf-8")
-            self.assertIn("One-line English summary", archive)
-            self.assertNotIn("국문 요약 한 줄", archive)
-            brief = (out / "en" / "briefs" / "2026-06-01" / "index.html").read_text(
-                encoding="utf-8")
-            self.assertIn("One-line English summary", brief)
-            self.assertNotIn("국문 요약 한 줄", brief)
-            # 한국어판은 그대로 한국어 요약을 쓴다(회귀 방지).
-            ko = (out / "archive" / "index.html").read_text(encoding="utf-8")
-            self.assertIn("국문 요약 한 줄", ko)
-        finally:
-            shutil.rmtree(tmp, ignore_errors=True)
+        out = self.out
+        archive = (out / "en" / "archive" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("One-line English summary", archive)
+        self.assertNotIn("국문 요약 한 줄", archive)
+        brief = (out / "en" / "briefs" / "2026-06-01" / "index.html").read_text(
+            encoding="utf-8")
+        self.assertIn("One-line English summary", brief)
+        self.assertNotIn("국문 요약 한 줄", brief)
+        # 한국어판은 그대로 한국어 요약을 쓴다(회귀 방지).
+        ko = (out / "archive" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("국문 요약 한 줄", ko)
 
     def test_nothing_is_rendered_without_the_english_slots(self):
         """오늘의 실제 발행분이 이 상태다 — 슬롯이 없으면 **아무 페이지도 생기지 않는다**."""
-        tmp, out = self._build(self._brief(en=False))
-        try:
-            self.assertFalse((out / "en" / "briefs").exists())
-            self.assertFalse((out / "en" / "archive").exists())
-            sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
-            self.assertNotIn("/en/briefs/", sitemap)
-            self.assertNotIn("/en/archive/", sitemap)
-            # 한국어판은 평소대로 나온다.
-            self.assertTrue((out / "briefs" / "2026-06-01" / "index.html").is_file())
-        finally:
-            shutil.rmtree(tmp, ignore_errors=True)
+        out = self._build(self._brief(en=False))
+        self.assertFalse((out / "en" / "briefs").exists())
+        self.assertFalse((out / "en" / "archive").exists())
+        sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertNotIn("/en/briefs/", sitemap)
+        self.assertNotIn("/en/archive/", sitemap)
+        # 한국어판은 평소대로 나온다.
+        self.assertTrue((out / "briefs" / "2026-06-01" / "index.html").is_file())
 
     def test_live_briefs_english_coverage_is_all_or_nothing(self):
         """실 데이터 기준 — 소급 백필(2026-09-05) 이후 영문이 붙은 호의 상태.
@@ -18235,19 +18233,16 @@ class WebEnBriefTest(unittest.TestCase):
 
     def test_en_brief_toc_has_the_same_group_count_as_korean(self):
         """빌드 실측판 — 목차 `<details class="toc-grp">` 개수가 두 언어판에서 같은가."""
-        tmp, out = self._build(self._grouped_brief())
-        try:
-            ko = (out / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
-            en = (out / "en" / "briefs" / "2026-06-01"
-                  / "index.html").read_text(encoding="utf-8")
-            ko_n = ko.count('<details class="toc-grp"')
-            en_n = en.count('<details class="toc-grp"')
-            self.assertEqual(ko_n, 3, "픽스처가 3그룹이 아니다 — 이 검사가 무의미해진다")
-            self.assertEqual(en_n, ko_n, f"영문 목차 그룹 {en_n}개 / 한국어 {ko_n}개")
-            labels = re.findall(r'toc-grp-label">([^<]*)<', en)
-            self.assertEqual(labels, ["Global", "Korea", "Recall"], labels)
-        finally:
-            shutil.rmtree(tmp, ignore_errors=True)
+        out = self._build(self._grouped_brief())
+        ko = (out / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
+        en = (out / "en" / "briefs" / "2026-06-01"
+              / "index.html").read_text(encoding="utf-8")
+        ko_n = ko.count('<details class="toc-grp"')
+        en_n = en.count('<details class="toc-grp"')
+        self.assertEqual(ko_n, 3, "픽스처가 3그룹이 아니다 — 이 검사가 무의미해진다")
+        self.assertEqual(en_n, ko_n, f"영문 목차 그룹 {en_n}개 / 한국어 {ko_n}개")
+        labels = re.findall(r'toc-grp-label">([^<]*)<', en)
+        self.assertEqual(labels, ["Global", "Korea", "Recall"], labels)
 
     # ── 자료실 스트립(C2) ────────────────────────────────────────────────────
     @staticmethod
@@ -18292,15 +18287,12 @@ class WebEnBriefTest(unittest.TestCase):
         """
         payload, en_pair, ko_pair = self._library_update_fixture()
         self.assertIsNotNone(en_pair, "영문 제목 항목이 없다 — 픽스처가 무의미하다")
-        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enlibstrip_"))
-        updates = tmp / "library_updates.json"
-        updates.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
-        original = render.LIBRARY_UPDATES_FILE
-        render.LIBRARY_UPDATES_FILE = updates
-        try:
-            # 합성 브리프의 window(2026-05-25~05-31)가 이력 날짜를 감싼다.
-            tmp2, out = self._build(self._brief())
-            try:
+        with tempfile.TemporaryDirectory(prefix="grmweb_enlibstrip_") as tmp:
+            updates = pathlib.Path(tmp) / "library_updates.json"
+            updates.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+            with mock.patch.object(render, "LIBRARY_UPDATES_FILE", updates):
+                # 합성 브리프의 window(2026-05-25~05-31)가 이력 날짜를 감싼다.
+                out = self._build(self._brief())
                 ko_b = (out / "briefs" / "2026-06-01"
                         / "index.html").read_text(encoding="utf-8")
                 en_b = (out / "en" / "briefs" / "2026-06-01"
@@ -18330,10 +18322,6 @@ class WebEnBriefTest(unittest.TestCase):
                     re.findall(r"</b> · .*?(\d+) items?\b", en_b),
                     re.findall(r"</b> · .*?(\d+)건", ko_b),
                     "요약 줄의 건수가 언어에 따라 달라졌다")
-            finally:
-                shutil.rmtree(tmp2, ignore_errors=True)
-        finally:
-            render.LIBRARY_UPDATES_FILE = original
             shutil.rmtree(tmp, ignore_errors=True)
 
     def test_library_update_rows_and_counts_match_across_languages(self):

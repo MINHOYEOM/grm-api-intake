@@ -1,0 +1,438 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-28",
+ "shard": "E",
+ "cards": {
+  "14bd157cfa5e": {
+   "title_issue": "용출 실패 조사 지연·공정 관리 미흡",
+   "hook_line": "2021년 용출 저하 징후에도 2025년 3월 기준일탈 뒤에야 조사 시작",
+   "summary": "FDA가 인도 제조소 Alkem Laboratories Limited에 경고서한을 발행했다. 용출 시험 결과와 불만 조사 미흡, 생산·공정 관리 절차, 설비 세척·유지관리 등 위반 3건을 지적했다.",
+   "key_facts": [
+    "위반 1: 불일치·규격 불합격을 철저히 조사하지 않음 — 용출 저하 징후를 2025년 3월 기준일탈(OOS)이 나올 때까지 조사하지 않음, 정제 파손 불만 약 38건 조사 미흡(21 CFR 211.192)",
+    "위반 2: 정제 공정 변수를 과학적 근거 없이 정하거나 바꿔 공정이 관리 상태가 아님(21 CFR 211.100(a))",
+    "위반 3: 설비 세척·유지관리 절차를 수립·준수하지 않음(21 CFR 211.67(b))",
+    "당국 조치: 위반 해결 때까지 신규 신청 승인 보류 가능, 미국 반입 거부 가능, 15영업일 안에 서면 회신 요구"
+   ],
+   "implication": "회사는 해당 배치가 2025년 8월 6개월 안정성 시점에야 기준일탈에 이르렀다고 회신했으나, FDA는 출시 제품 전반의 관련 품질 경향을 찾고 조사하지 못한 점을 설명하지 못한다며 받아들이지 않았다(위반 1). 회사는 2024년 7월부터 2025년 8월까지 미국 시장용으로 제조한 배치에 회수를 포함한 시장 조치를 했다(위반 1). 시정 및 예방조치(CAPA) 시행 뒤에도 정제 파손 불만이 계속 들어왔고, 현장 경보 보고서는 실사가 시작된 뒤에야 제출됐다(위반 1). 회사는 공정 변수 규격이 과학 기반 시험이 아니라 과거 경향 자료에서 나왔다고 인정했다(위반 2). 회사는 해당 정제의 미국 시장용 생산을 일시 중단하기로 약속했다.",
+   "checks": [
+    "새 공급업체 원료를 도입할 때 완제품 용출에 주는 영향을 평가하는가? (위반 1)",
+    "제품 불만에 대한 CAPA 뒤 같은 불만이 재발하는지 추적하는가? (위반 1)",
+    "공정 변수 범위를 바꿀 때 과학적 근거를 문서로 남기는가? (위반 2)"
+   ],
+   "en": {
+    "title_issue": "Delayed dissolution probe, process control",
+    "hook_line": "Investigation began only after failing dissolution results in March 2025",
+    "summary": "FDA issued a warning letter to the Indian manufacturing site of Alkem Laboratories Limited, citing three violations including inadequate investigation of dissolution results and complaints, production and process control procedures, and equipment cleaning and maintenance.",
+    "key_facts": [
+     "Violation 1: unexplained discrepancies and failures not thoroughly investigated; no investigation of dissolution signals until OOS results in March 2025, and inadequate investigation of approximately 38 broken tablet complaints (21 CFR 211.192)",
+     "Violation 2: tablet process parameters set or changed without scientific justification, so the process is not in a state of control (21 CFR 211.100(a))",
+     "Violation 3: written procedures for equipment cleaning and maintenance not established and followed (21 CFR 211.67(b))",
+     "Agency action: FDA may withhold approval of new applications and refuse admission of articles; written response requested within fifteen business days"
+    ],
+    "implication": "The firm responded that the batch did not reach the OOS threshold until the six-month stability interval in August 2025, but FDA found the response inadequate because it does not account for the failure to identify and investigate related quality trends (Violation 1). The firm took market action, including recalls, on batches made from July 2024 to August 2025 for the U.S. market (Violation 1). Complaints for broken tablets continued after the CAPAs, and a FAR was not submitted until after the inspection started (Violation 1). The firm acknowledged its process specifications were derived from historical trend data rather than science-based studies (Violation 2). The firm committed to temporarily suspend production of the tablets for the U.S. market.",
+    "checks": [
+     "Is the impact of new supplier excipients on finished product dissolution evaluated? (Violation 1)",
+     "Is recurrence of the same complaint tracked after a CAPA? (Violation 1)",
+     "Is scientific justification documented when process parameter ranges change? (Violation 2)"
+    ]
+   }
+  },
+  "admin-2026008395": {
+   "title_issue": "재평가 자료 미제출 허가취소",
+   "hook_line": "재평가 자료를 기한 안에 내지 않아 2품목 허가취소(3차 처분)",
+   "summary": "식약처가 정우신약(주)에 해당 품목 허가취소(3차 처분)를 처분했다. 한약(생약)제제 동등성 재평가에 필요한 자료를 제출기한 안에 내지 않았다.",
+   "key_facts": [
+    "위반: 한약(생약)제제 전문의약품(필름코팅정) 동등성 재평가 자료를 제출기한(’26.3.17.) 안에 제출하지 않음",
+    "처분: 해당 품목 허가취소(3차 처분, 2026-12-02) — 알티렌정, 젠카민정",
+    "근거: 「약사법」 제33조·제76조, 「의약품 등의 안전에 관한 규칙」 제95조 [별표8]"
+   ],
+   "implication": "이번 처분은 3차 처분이다.",
+   "checks": [
+    "재평가 대상 품목의 자료 제출기한을 품목별로 관리하는가?",
+    "재평가 자료 준비 일정이 제출기한보다 앞서 잡혀 있는가?"
+   ],
+   "en": {
+    "title_issue": "License revoked for missing re-evaluation data",
+    "hook_line": "Two products' licenses revoked (third action) after re-evaluation data was not submitted",
+    "summary": "MFDS revoked the licenses of the products concerned (third action) of a manufacturer after it failed to submit data required for an equivalence re-evaluation of herbal prescription drugs by the deadline.",
+    "key_facts": [
+     "Violation: data for the equivalence re-evaluation of herbal prescription film-coated tablets not submitted by the deadline (’26.3.17.)",
+     "Sanction: license revocation for the products concerned (third action, 2026-12-02) covering two herbal tablet products",
+     "Basis: Pharmaceutical Affairs Act Articles 33 and 76, Enforcement Rule on the Safety of Drugs Article 95 [Annex 8]"
+    ],
+    "implication": "This is the third action.",
+    "checks": [
+     "Are re-evaluation submission deadlines tracked for each product?",
+     "Is the re-evaluation data preparation scheduled ahead of the deadline?"
+    ]
+   }
+  },
+  "admin-2026008415": {
+   "title_issue": "제조기록서·시험일지 거짓 작성 GMP 취소",
+   "hook_line": "무균시험이 진행 중인데 적합 처리해 출하, GMP 적합판정 취소",
+   "summary": "식약처가 에스피씨(주)에 '의약품 제조 및 품질관리기준 적합판정' 취소를 처분했다. 허가와 다르게 제조하고 제조지시 및 기록서와 시험일지·시험성적서를 반복해 거짓 작성했다.",
+   "key_facts": [
+    "위반: 세포테탄을 포장 후 잔량, 제조기록서가 없는 원료 등을 섞어 1개 배치로 제조하고 '제조지시 및 기록서'를 반복해 거짓 작성",
+    "위반: 세포티암염산염·건조탄산나트륨 등 6품목의 무균시험 진행 중 시험일자·결과를 거짓 작성하고 시험성적서를 적합 처리해 출하",
+    "처분: '의약품 제조 및 품질관리기준 적합판정' 취소(2026-12-08 자) — 세팔로스포린제제[합성(무균), 합성(비무균)]",
+    "근거: ｢약사법｣ 제38조의3제1항 및 제3항제2호"
+   ],
+   "implication": "무균시험 결과가 확인되지 않았는데도 시험성적서를 적합으로 처리해 출하를 진행했다. 거짓 작성이 반복됐다고 처분문에 적혔다.",
+   "checks": [
+    "무균시험이 끝나기 전에 시험성적서를 적합 처리할 수 없게 시스템이 막는가?",
+    "제조기록서에 없는 원료나 포장 후 잔량을 배치에 섞지 못하게 관리하는가?",
+    "시험일지의 시작·종료일을 원자료와 대조하는가?"
+   ],
+   "en": {
+    "title_issue": "GMP approval revoked for falsified records",
+    "hook_line": "Shipped as conforming while sterility tests were still running; GMP approval revoked",
+    "summary": "MFDS revoked the GMP conformity approval of a manufacturer that manufactured differently from its license and repeatedly falsified batch manufacturing records, test logs and certificates of analysis.",
+    "key_facts": [
+     "Violation: a cefotetan product was made as one batch by mixing leftover packaged product and materials without batch records, and the batch manufacturing record was repeatedly falsified",
+     "Violation: for 6 products including a cefotiam hydrochloride product, test dates and results were falsified while sterility tests were ongoing, and certificates of analysis were marked conforming before shipment",
+     "Sanction: revocation of the GMP conformity approval (effective 2026-12-08) for cephalosporin products (synthetic sterile and non-sterile)",
+     "Basis: Pharmaceutical Affairs Act Article 38-3(1) and (3)2"
+    ],
+    "implication": "Certificates of analysis were marked conforming and shipments proceeded although sterility test results had not been confirmed. The disposition notice states the falsification was repeated.",
+    "checks": [
+     "Does your system block approval of a certificate of analysis before sterility testing ends?",
+     "Are leftover packaged product and undocumented materials prevented from entering a batch?",
+     "Are test log start and end dates checked against raw data?"
+    ]
+   }
+  },
+  "admin-2026008495": {
+   "title_issue": "유통한약재 품질검사 부적합 제조업무정지",
+   "hook_line": "카드뮴 0.5ppm(기준 0.3ppm 이하), 제조업무정지 3개월",
+   "summary": "식약처가 (주)푸른무약에 해당 품목 제조업무정지 3개월을 처분했다. 유통 한약재 2품목이 품질검사에서 부적합 판정을 받았다.",
+   "key_facts": [
+    "위반: 유통한약재 품질검사 부적합 — 푸른무약목통 성상(주피 미제거), 푸른무약건강 중금속(카드뮴)",
+    "경위: 푸른무약건강 카드뮴 기준 0.3ppm 이하, 결과 0.5ppm",
+    "처분: 해당 품목 제조업무정지 3개월(2026-12-02~2027-03-01) — 푸른무약목통, 푸른무약건강",
+    "근거: 「약사법」 제62조제11호, 제76조제1항제4호·제5호의17·제3항"
+   ],
+   "implication": "",
+   "checks": [
+    "한약재 성상 검사에서 주피 제거 여부를 확인하는가?",
+    "한약재 중금속 시험 결과를 출하 전에 기준과 대조하는가?"
+   ],
+   "en": {
+    "title_issue": "Herbal materials failed quality tests",
+    "hook_line": "Cadmium 0.5ppm against a 0.3ppm limit; 3-month manufacturing suspension for two items",
+    "summary": "MFDS suspended a manufacturer's manufacturing operations for the products concerned for 3 months after two distributed herbal medicinal materials failed quality testing.",
+    "key_facts": [
+     "Violation: distributed herbal materials failed quality testing; one failed the appearance test (outer bark not removed) and one failed heavy metals (cadmium)",
+     "Timeline: cadmium limit 0.3ppm or less, result 0.5ppm",
+     "Sanction: 3-month manufacturing suspension for the two products (2026-12-02 to 2027-03-01)",
+     "Basis: Pharmaceutical Affairs Act Article 62(11) and Article 76(1)4, 5-17 and (3)"
+    ],
+    "implication": "",
+    "checks": [
+     "Does appearance testing of herbal materials confirm removal of outer bark?",
+     "Are heavy metal results for herbal materials checked against limits before release?"
+    ]
+   }
+  },
+  "admin-2026008515": {
+   "title_issue": "제조업무정지 기간 중 제조 신고취소",
+   "hook_line": "제조업무정지 기간에 의약외품을 제조해 품목 신고취소",
+   "summary": "식약처가 제이케이제약(주)에 해당 품목 신고취소를 처분했다. 제조업무정지 기간(2026-06-16~2026-06-30)에 의약외품 후레쉬드림아이액의 제조업무를 수행했다.",
+   "key_facts": [
+    "위반: 제조업무정지 기간 중 제조업무 수행",
+    "경위: 제조업무정지 기간 2026-06-16~2026-06-30에 후레쉬드림아이액(폴리헥사메틸렌비구아니드염산염액20%) 제조",
+    "처분: 해당 품목 신고취소(2026-12-10)",
+    "근거: ｢약사법｣ 제76조제1항제3호 및 제3항"
+   ],
+   "implication": "",
+   "checks": [
+    "제조업무정지 처분을 받은 품목의 생산 계획이 정지 기간 동안 막히는가?",
+    "정지 기간 중 제조지시서가 발행되지 않았는지 확인하는가?"
+   ],
+   "en": {
+    "title_issue": "Cancelled for manufacturing during suspension",
+    "hook_line": "Quasi-drug manufactured during a suspension period; product registration cancelled",
+    "summary": "MFDS cancelled the registration of a quasi-drug eye solution product of a manufacturer that carried out manufacturing during a manufacturing suspension period (2026-06-16 to 2026-06-30).",
+    "key_facts": [
+     "Violation: manufacturing carried out during a manufacturing suspension period",
+     "Timeline: the polyhexamethylene biguanide hydrochloride 20% quasi-drug solution was manufactured during the suspension from 2026-06-16 to 2026-06-30",
+     "Sanction: cancellation of the product registration (2026-12-10)",
+     "Basis: Pharmaceutical Affairs Act Article 76(1)3 and (3)"
+    ],
+    "implication": "",
+    "checks": [
+     "Is production of a suspended product blocked during the suspension period?",
+     "Is it confirmed that no manufacturing orders were issued during the suspension?"
+    ]
+   }
+  },
+  "data0011-16012": {
+   "title_issue": "필터 사용 전 멸균 후 완전성시험 고려사항",
+   "summary": "식약처가 '필터 사용 전 멸균 후 완전성 시험(PUPSIT) 수행 시 고려사항'을 공개했다.",
+   "key_facts": [],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Considerations for PUPSIT",
+    "summary": "MFDS published considerations for performing pre-use post-sterilization integrity testing (PUPSIT) of filters.",
+    "key_facts": [],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "gmpinspect-1Q8MhRPjDvN": {
+   "title_issue": "방사성의약품 제조소 정기실사 지적 1건",
+   "hook_line": "품질경영 분야 기타 지적 1건, 시험수행자와 검토·승인자 분리 요구",
+   "summary": "식약처(서울지방식품의약품안전청)가 삼성서울병원 방사성의약품제조소의 GMP 정기실태조사 결과를 공개했다. 평가 결과 지적(보완)사항이 있었다.",
+   "key_facts": [
+    "지적 1: 품질경영 분야 기타 — 시험수행자와 시험 결과를 검토·승인하는 자를 분리할 것([별표1] 제3.1)",
+    "평가 결과: 지적(보완)사항(Deficiencies) 있음 — 무균-일반제제(방사성의약품)-주사제",
+    "후속: 보완완료"
+   ],
+   "implication": "실사는 2026-02-11~2026-02-13(3일) 현장실사로 진행됐다. '기타' 지적사항은 시정·보완하도록 하며, 이행계획 확인 뒤 타당성이 인정되면 GMP 적합판정서를 발급한다.",
+   "checks": [
+    "시험을 수행한 사람과 그 결과를 검토·승인하는 사람이 다른가? (지적 1)",
+    "인원이 적은 제조소에서도 시험 결과 검토·승인자를 따로 지정해 두었는가? (지적 1)"
+   ],
+   "en": {
+    "title_issue": "One finding at a radiopharmaceutical site",
+    "hook_line": "One 'other' finding: separate the tester from the person approving results",
+    "summary": "MFDS (Seoul Regional Office) published the results of a routine GMP inspection of the radiopharmaceutical manufacturing site at Samsung Medical Center, which found deficiencies.",
+    "key_facts": [
+     "Finding 1: quality management, other — separate the person performing tests from the person reviewing and approving results ([Annex 1] 3.1)",
+     "Outcome: deficiencies found; sterile radiopharmaceutical injections",
+     "Follow-up: corrective action completed"
+    ],
+    "implication": "The on-site inspection ran from 2026-02-11 to 2026-02-13 (3 days). 'Other' findings are to be corrected, and a GMP certificate is issued once the implementation plan is confirmed as appropriate.",
+    "checks": [
+     "Is the person performing a test different from the person reviewing and approving it? (Finding 1)",
+     "Even at small sites, is a separate reviewer and approver of test results designated? (Finding 1)"
+    ]
+   }
+  },
+  "recall-12ccd858aec6": {
+   "title_issue": "순도시험 곰팡이독소 회수",
+   "hook_line": "현진백강잠, 순도시험(곰팡이독소)으로 회수명령(강제)",
+   "summary": "현진백강잠이 순도시험(곰팡이독소)으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 순도시험 2)곰팡이독소",
+    "제품·범위: 현진백강잠",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for mycotoxin purity test failure",
+    "hook_line": "A herbal medicine recalled for failing the purity test for mycotoxins (mandatory)",
+    "summary": "A herbal medicine product was recalled for failing the purity test for mycotoxins (mandatory recall order).",
+    "key_facts": [
+     "Reason: purity test 2) mycotoxins",
+     "Product and scope: one herbal medicine product",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-760fb20ddac5": {
+   "title_issue": "분진포집효율 부적합 회수",
+   "hook_line": "KF94 마스크, 분진포집효율 부적합으로 회수명령(강제)",
+   "summary": "제로가드덴탈형황사방역마스크(KF94)가 분진포집효율 부적합으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 분진포집효율 부적합",
+    "제품·범위: 제로가드덴탈형황사방역마스크(KF94)(대형,소형)(흰색,검정색)",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for failed filtration efficiency",
+    "hook_line": "A KF94 mask recalled for failed dust filtration efficiency (mandatory)",
+    "summary": "A KF94 health mask product was recalled for failing the dust filtration efficiency test (mandatory recall order).",
+    "key_facts": [
+     "Reason: dust filtration efficiency failure",
+     "Product and scope: one KF94 mask product (large and small sizes, white and black)",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-7c2b803d1f37": {
+   "title_issue": "불순물 허용기준 초과 영업자 회수",
+   "hook_line": "휴트라돌세미정, 불순물 허용기준 초과로 영업자 회수",
+   "summary": "휴트라돌세미정이 불순물(N-nitroso-N-desmethyl-tramadol) 허용기준 초과로 회수됐다(영업자 회수).",
+   "key_facts": [
+    "사유: 불순물(N-nitroso-N-desmethyl-tramadol) 허용기준 초과",
+    "제품·범위: 휴트라돌세미정",
+    "구분: 영업자 회수"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Recall for nitrosamine impurity over limit",
+    "hook_line": "A tramadol tablet recalled for N-nitroso-N-desmethyl-tramadol above its limit (voluntary)",
+    "summary": "A tramadol combination tablet product was recalled because the impurity N-nitroso-N-desmethyl-tramadol exceeded its acceptable limit (voluntary recall by the company).",
+    "key_facts": [
+     "Reason: impurity (N-nitroso-N-desmethyl-tramadol) above the acceptable limit",
+     "Product and scope: one tramadol tablet product",
+     "Type: voluntary recall by the company"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-8ddb728eb3b9": {
+   "title_issue": "보건용 마스크 분진포집효율 부적합 회수",
+   "hook_line": "KF94 마스크(대형), 분진포집효율 부적합으로 회수명령(강제)",
+   "summary": "윈썬프리미엄보건방역마스크(KF94)가 분진포집효율 부적합으로 회수됐다(회수명령, 강제).",
+   "key_facts": [
+    "사유: 분진포집효율 부적합",
+    "제품·범위: 윈썬프리미엄보건방역마스크(KF94)(대형)(흰색,검정색)",
+    "구분: 회수명령(강제)"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Mask recall for filtration efficiency",
+    "hook_line": "A large KF94 mask recalled for failed dust filtration efficiency (mandatory)",
+    "summary": "A KF94 health mask product (large size) was recalled for failing the dust filtration efficiency test (mandatory recall order).",
+    "key_facts": [
+     "Reason: dust filtration efficiency failure",
+     "Product and scope: one KF94 mask product (large, white and black)",
+     "Type: mandatory recall order"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-cfaf944acc02": {
+   "title_issue": "불순물(NDMA) 사전예방 회수",
+   "hook_line": "틴자정150밀리그램 시중 유통품, 사전예방적 영업자 회수",
+   "summary": "틴자정150밀리그램(니자티딘)이 불순물(NDMA) 초과 검출 우려에 따른 사전예방적 조치로 회수됐다(영업자 회수).",
+   "key_facts": [
+    "사유: 불순물(NDMA) 초과 검출 우려에 따른 사전예방적 조치",
+    "제품·범위: 틴자정150밀리그램(니자티딘) 시중 유통품",
+    "구분: 영업자 회수"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Precautionary NDMA recall",
+    "hook_line": "Nizatidine 150 mg tablets in distribution recalled as a precaution (voluntary)",
+    "summary": "A nizatidine 150 mg tablet product was recalled from distribution as a precaution over concern of NDMA impurity above the limit (voluntary recall by the company).",
+    "key_facts": [
+     "Reason: precautionary measure over concern of NDMA impurity detected above the limit",
+     "Product and scope: nizatidine 150 mg tablets in distribution",
+     "Type: voluntary recall by the company"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "recall-dfe247bc36de": {
+   "title_issue": "시판 후 안정성 유연물질 사전 예방 회수",
+   "hook_line": "알림타액상주, 시판 후 안정성 시험(유연물질)으로 영업자 회수",
+   "summary": "알림타액상주25밀리그램/밀리리터(페메트렉시드이나트륨염칠수화물)가 시판 후 안정성 시험(유연물질) 기준 초과 우려에 따른 사전 예방적 영업자 회수로 회수됐다.",
+   "key_facts": [
+    "사유: 시판 후 안정성 시험(유연물질) 기준 초과 우려에 따른 사전 예방적 조치",
+    "제품·범위: 알림타액상주25밀리그램/밀리리터(페메트렉시드이나트륨염칠수화물)",
+    "구분: 영업자 회수"
+   ],
+   "implication": "",
+   "checks": [],
+   "en": {
+    "title_issue": "Precautionary recall on stability impurities",
+    "hook_line": "A pemetrexed injection recalled as a precaution over post-marketing stability results",
+    "summary": "A pemetrexed 25 mg/mL injection product was recalled as a precaution over concern that related substances in post-marketing stability testing would exceed the limit (voluntary recall by the company).",
+    "key_facts": [
+     "Reason: precaution over concern of related substances exceeding the limit in post-marketing stability testing",
+     "Product and scope: one pemetrexed 25 mg/mL injection product",
+     "Type: voluntary recall by the company"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0156-2027": {
+   "title_issue": "셀룰로스 입자 검출 회수",
+   "hook_line": "메토헥시탈 500 mg 바이알, 셀룰로스 입자로 Class I 회수",
+   "summary": "Brevital Sodium(메토헥시탈나트륨) 주사용 500 mg 바이알이 입자 존재로 회수됐다(Class I). 입자는 셀룰로스로 확인됐다.",
+   "key_facts": [
+    "사유: 입자 존재 — 셀룰로스로 확인",
+    "제품·범위: Brevital Sodium (Methohexital Sodium), For Injection, USP, 500 mg/vial",
+    "등급: Class I"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "입자 존재; 입자는 셀룰로스로 확인됨"
+   ],
+   "en": {
+    "title_issue": "Recall for cellulose particulates",
+    "hook_line": "Methohexital 500 mg vials recalled after particulates identified as cellulose (Class I)",
+    "summary": "Brevital Sodium (methohexital sodium) for injection, 500 mg/vial, was recalled for the presence of particulate matter identified as cellulose (Class I).",
+    "key_facts": [
+     "Reason: presence of particulate matter; particulates identified as cellulose",
+     "Product and scope: Brevital Sodium (Methohexital Sodium), For Injection, USP, 500 mg/vial",
+     "Class: Class I"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0189-2027": {
+   "title_issue": "미표시 의약 성분 혼입 회수",
+   "hook_line": "히알루론산 캡슐에서 덱사메타손 등 미표시 성분, Class I 회수",
+   "summary": "UMARY Acido Hialuronico 캡슐이 승인 없이 판매됐고 FDA 시험에서 미표시 성분이 검출돼 회수됐다(Class I).",
+   "key_facts": [
+    "사유: 승인된 NDA/ANDA 없이 판매, FDA 시험에서 미표시 성분 덱사메타손·디클로페낙·오메프라졸 검출",
+    "제품·범위: UMARY Acido Hialuronico(New Hyaluronic Acid 850mg Sealed 30 Caps)",
+    "등급: Class I"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "승인된 NDA/ANDA 없이 판매됨 - FDA 시험실 분석에서 제품에 미표시 성분인 덱사메타손, 디클로페낙, 오메프라졸이 섞인 것으로 확인됨."
+   ],
+   "en": {
+    "title_issue": "Recall for undeclared drug ingredients",
+    "hook_line": "Hyaluronic acid capsules found with undeclared dexamethasone and other drugs (Class I)",
+    "summary": "UMARY Acido Hialuronico capsules were recalled after being marketed without approval and found by FDA analysis to contain undeclared ingredients (Class I).",
+    "key_facts": [
+     "Reason: marketed without approved NDA/ANDA; FDA analysis found undeclared dexamethasone, diclofenac and omeprazole",
+     "Product and scope: UMARY Acido Hialuronico (New Hyaluronic Acid 850mg Sealed 30 Caps)",
+     "Class: Class I"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  },
+  "D-0192-2027": {
+   "title_issue": "무균성 보증 부족 회수",
+   "hook_line": "테스토스테론 30 mL 바이알, 무균성 보증 부족 Class II 회수",
+   "summary": "테스토스테론 시피오네이트/테스토스테론 프로피오네이트 200/10 mg/mL 30 mL 바이알이 무균성 보증 부족으로 회수됐다(Class II).",
+   "key_facts": [
+    "사유: 무균성 보증 부족",
+    "제품·범위: Testosterone Cypionate / Testosterone Propionate 200/10 mg/mL, 30mL vials",
+    "등급: Class II"
+   ],
+   "implication": "",
+   "checks": [],
+   "quotes_translation": [
+    "무균성 보증 부족."
+   ],
+   "en": {
+    "title_issue": "Recall for lack of sterility assurance",
+    "hook_line": "Testosterone 200/10 mg/mL 30 mL vials recalled for lack of sterility assurance (Class II)",
+    "summary": "Testosterone cypionate/testosterone propionate 200/10 mg/mL 30 mL vials were recalled for lack of sterility assurance (Class II).",
+    "key_facts": [
+     "Reason: lack of sterility assurance",
+     "Product and scope: Testosterone Cypionate / Testosterone Propionate 200/10 mg/mL, 30mL vials",
+     "Class: Class II"
+    ],
+    "implication": "",
+    "checks": []
+   }
+  }
+ }
+}
